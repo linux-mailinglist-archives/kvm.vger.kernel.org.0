@@ -2,122 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC85A52C120
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:50:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1AC952C137
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:50:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240817AbiERRS6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 13:18:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54322 "EHLO
+        id S240810AbiERRSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 13:18:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240806AbiERRS4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 13:18:56 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A743820D4FE
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:18:55 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id p22so4766812lfo.10
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:18:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PvLMOafpFWueHNghY/35HDJcyXRvgnUf+BvHO3GruXs=;
-        b=gp1vjOlcYuo+tcvUZcEV3+a8c6kLoVbz5ui6B19Ndey58Hq7YD0y5rQo7FE4xjY2dK
-         n9b9xHgQ4OUQYOuWk0UzKbnblKDmPb3w7ZFxE1SW68zn/GbLT7pjJNllDz1JQMVsv5kY
-         YqGWEo82EfZTpP8ks+TGjzzilgFjtEgdhzg55zgJgoanca5RqZKLUo2zUwwaK1XixIF4
-         Ghewl0CcYPyO+WmruwDzrAnVRiv4oBsl7uFOLZ+N2U60FoOpjBAVKc6IVp9lhz+quXnn
-         8o/kSBoDYtToZKhcjUJ3ru4qkREYaHQ7TuoGIWxdMFza+AK8uNcKoCBZLoTBqfdyXrjI
-         7oPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PvLMOafpFWueHNghY/35HDJcyXRvgnUf+BvHO3GruXs=;
-        b=5R8OjxfGbZ2T/s17+yklYBOESAPwyD1r/C57b0eE8V6nIZ9KZ1B3oN2Pec1Knd3FYQ
-         ENgOiGuwqcF+6zxYHfcryfcFOsC5mHhZCjhKEz0fTFt2G5UTnL7afX5zsu23Wh8IO3um
-         5TGdI1L/RkGkmML1Y8cIULlaWl/3EadIiyX4O3tuhu4IdKq9yCDBfiTPsrh4EQfUAYfM
-         sybuL1xnOkxVfwO0iYSnmTdnruRWGP4AKGv1arpdj5cBzWfG6iEChpEQCNwWpIxukE15
-         VvHcESogFCUHVZsQcT/zycl9zBErdPApxH0OpXWnu7wCVpsxIJIP57FndrRl6DBPHF+N
-         yplg==
-X-Gm-Message-State: AOAM532VUqTJQpVOPKTwr+IjtXts+ske/pH9vHopuAlpslTr5XUqh6I3
-        XBQjRN2D+xdHOgJKqXkVLGBx8ytPa6/fdAqZcgTTUg==
-X-Google-Smtp-Source: ABdhPJw8+JK6ro2/RXZcq5g5nqrB3ZZOOE004+kTbc09e3cYdP4yQkS0VR2Z+G9RWn/q3tx7Y1pTiR0p1BFUK7gOTsY=
-X-Received: by 2002:a05:6512:1291:b0:473:b522:ef58 with SMTP id
- u17-20020a056512129100b00473b522ef58mr375721lfs.190.1652894333475; Wed, 18
- May 2022 10:18:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220517190524.2202762-1-dmatlack@google.com> <20220517190524.2202762-9-dmatlack@google.com>
- <YoQD0EDDeW+P3rSh@xz-m1.local>
-In-Reply-To: <YoQD0EDDeW+P3rSh@xz-m1.local>
-From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 18 May 2022 10:18:27 -0700
-Message-ID: <CALzav=eET=9bS5O5bSs3YYc+1BuJBw6NDmPO6YLWL1V_MhBJag@mail.gmail.com>
-Subject: Re: [PATCH v2 08/10] KVM: selftests: Drop unnecessary rule for $(LIBKVM_OBJS)
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
+        with ESMTP id S240799AbiERRSn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 13:18:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 836EF1FD858
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:18:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652894321;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0BnymVMEzqHt15JHGr551ETl2svdvZxWrL7y2dAiM+Y=;
+        b=N3x9UDZUCHN2c3C9jny3/MSTdp7BPhIStK61BaCy76zCknXqKOsHyG5wIXkgfSI/Lq/GGq
+        hgVg0xraKsfEcWMJlcjU1e55oyRD2nA/2kKLIyUdDnBU+Lc+AA52So6ZScQqzQqhdmzauQ
+        wa65aEr6ReKBbNTYJctYWcpcUCeTDDQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-624-NAZMGsfCMHmaHC6yFq_7GQ-1; Wed, 18 May 2022 13:18:36 -0400
+X-MC-Unique: NAZMGsfCMHmaHC6yFq_7GQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D56D38349AD;
+        Wed, 18 May 2022 17:18:34 +0000 (UTC)
+Received: from starship (unknown [10.40.192.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 943C52166B26;
+        Wed, 18 May 2022 17:18:32 +0000 (UTC)
+Message-ID: <92fb7b8962e1da874dde2789f0d9c1f3887a63dc.camel@redhat.com>
+Subject: Re: [PATCH v5 16/17] KVM: x86: nSVM: always intercept x2apic msrs
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Wed, 18 May 2022 20:18:31 +0300
+In-Reply-To: <20220518162652.100493-17-suravee.suthikulpanit@amd.com>
+References: <20220518162652.100493-1-suravee.suthikulpanit@amd.com>
+         <20220518162652.100493-17-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 17, 2022 at 1:21 PM Peter Xu <peterx@redhat.com> wrote:
->
-> On Tue, May 17, 2022 at 07:05:22PM +0000, David Matlack wrote:
-> > Drop the "all: $(LIBKVM_OBJS)" rule. The KVM selftests already depend
-> > on $(LIBKVM_OBJS), so there is no reason to have this rule.
-> >
-> > Suggested-by: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: David Matlack <dmatlack@google.com>
->
-> Since previous patch touched the same line, normally for such a trivial
-> change I'll just squash into it.  Or at least it should be before the
-> previous patch then that one contains one less LOC change.  Anyway:
+On Wed, 2022-05-18 at 11:26 -0500, Suravee Suthikulpanit wrote:
+> From: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> As a preparation for x2avic, this patch ensures that x2apic msrs
+> are always intercepted for the nested guest.
+> 
+> Reviewed-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> Tested-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/svm/nested.c | 5 +++++
+>  arch/x86/kvm/svm/svm.h    | 9 +++++++++
+>  2 files changed, 14 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index f209c1ca540c..b61f8939c210 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -230,6 +230,11 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
+>  			break;
+>  
+>  		p      = msrpm_offsets[i];
+> +
+> +		/* x2apic msrs are intercepted always for the nested guest */
+> +		if (is_x2apic_msrpm_offset(p))
+> +			continue;
+> +
+>  		offset = svm->nested.ctl.msrpm_base_pa + (p * 4);
+>  
+>  		if (kvm_vcpu_read_guest(&svm->vcpu, offset, &value, 4))
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 818817b11f53..309445619756 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -517,6 +517,15 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+>  	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+>  }
+>  
+> +static inline bool is_x2apic_msrpm_offset(u32 offset)
+> +{
+> +	/* 4 msrs per u8, and 4 u8 in u32 */
+> +	u32 msr = offset * 16;
+> +
+> +	return (msr >= APIC_BASE_MSR) &&
+> +	       (msr < (APIC_BASE_MSR + 0x100));
+> +}
+> +
+>  /* svm.c */
+>  #define MSR_INVALID				0xffffffffU
+>  
 
-The previous patch does touch this line but this is a logically
-distinct change so I think it makes sense to split out.
+Just one thing, this patch should be earlier in the series (or even first one),
+to avoid having a commit window where the problem exists, where malicious
+L1 can get access to L0's apic msrs this way.
 
-You're right though that it'd probably make sense to re-order this
-before the previous patch. i.e. Drop the line "all: $(STATIC_LIBS)".
+Best regards,
+	Maxim Levitsky
 
-
-
->
-> Reviewed-by: Peter Xu <peterx@redhat.com>
->
-> Thanks,
->
-> > ---
-> >  tools/testing/selftests/kvm/Makefile | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index cd7a9df4ad6d..0889fc17baa5 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -189,7 +189,6 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
-> >       $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-> >
-> >  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
-> > -all: $(LIBKVM_OBJS)
-> >  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
-> >
-> >  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
-> > --
-> > 2.36.0.550.gb090851708-goog
-> >
->
-> --
-> Peter Xu
->
