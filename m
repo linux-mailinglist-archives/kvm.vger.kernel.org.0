@@ -2,153 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1AC352BF6F
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 18:13:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1065B52BF99
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 18:14:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239432AbiERPeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 11:34:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52630 "EHLO
+        id S239429AbiERPer (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 11:34:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239438AbiERPeD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 11:34:03 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B93C174DD0;
-        Wed, 18 May 2022 08:33:54 -0700 (PDT)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IFO4Kc007205;
-        Wed, 18 May 2022 15:33:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=H6Vc3MVfyrLUyE4tx33xTvG94JG+q8zgiXWOBhDaWFQ=;
- b=pwQUWmd4ThOuY5539Mk5g04fHqX087GUVCiz/pRcD+nA4GNtRQZ3HWBXZbTSOrmxlB6U
- fWg3Gsb/vJdBiwo1fgSo291F2OTqC7IiRQKoR1NGxqgU2k3yZ6H5RfBpOO+f7ZcNwqNk
- Mba9KYjW5PRiRn8P/JvffHI2VXiD9hiZG11XGUycQGdsQou9FULaRaOeOn5A6qpeXe+R
- fnrmIMPmK8I6WUR2Yw//+cocKr4igf4aa2GNt2RpuFkyTOGdpzbHoLsN4eLGXmYHw/gK
- G2KhWjU/LpsFAI1uk0DQJo69jYsTCBf0u1BqKG3UlhSztDz0bln6h9D3ZaKdeHal9qbz cA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g53dm8762-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 15:33:44 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IFTiUU032585;
-        Wed, 18 May 2022 15:33:43 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g53dm875r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 15:33:43 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IFJwgq026460;
-        Wed, 18 May 2022 15:33:42 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma02dal.us.ibm.com with ESMTP id 3g242amrwh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 15:33:42 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IFXfMN19923388
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 May 2022 15:33:41 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD72C12405C;
-        Wed, 18 May 2022 15:33:41 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 68F1612405A;
-        Wed, 18 May 2022 15:33:38 +0000 (GMT)
-Received: from [9.211.37.97] (unknown [9.211.37.97])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 18 May 2022 15:33:38 +0000 (GMT)
-Message-ID: <34c5fd53-c75c-cb96-c627-9d30b8c45c37@linux.ibm.com>
-Date:   Wed, 18 May 2022 11:33:37 -0400
+        with ESMTP id S239425AbiERPep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 11:34:45 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5F7762A1
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 08:34:43 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id nr2-20020a17090b240200b001df2b1bfc40so5960270pjb.5
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 08:34:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FR9qyGtEo59tSbFrJbMFBVFHC4OKA2OLIt+JMoIDPvM=;
+        b=RtS3h7w6VWloSj64YgK8YxUYZKqX5IVbhO1MmjCN7A70qZVqpfOQ5786Qw2V3fGfbs
+         OWncq6hdYddmMJ/3fDGm+d9VcRRwoGPORUnyl8GonyRs79stfm/aB9WYjYBBNT7WtF5g
+         ohiFV9BU32FC/iyhTxUM5ImlaBnS14jdf1RkmAF7J8R3o0iXbFMsKT7Tq6Pg+JwVSrhA
+         Y5WdbKNUMGd+640+L/r//U7KhZ4ktkMrfIf/Hry9lgq8OTicFUuwW7b98pXWzyHvLj7M
+         eWhHL1TE14JiYXauOLvzcQQRBacVOYh8D1HEz8Y+8q67pkSCYm9ea3svHKzyMDpsV8XH
+         +eDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FR9qyGtEo59tSbFrJbMFBVFHC4OKA2OLIt+JMoIDPvM=;
+        b=Zga+OpJt5ceMEfIz47DOyGHRmGD+mOdTDeZePVC8aIxemwZEE2FMb2UFjkXWpRQWwP
+         JywJ8UcsgEGtQTvhDcrhdZe/wyMhJaV772069RrR/dIERapk0KSsnoty4ILZ9hDnv0aY
+         nK3OxzUVGJ794oCoFrKpEMgNAQSfFvjEiEhDgcpcFXLFFdLV2AWdCQGNWO3gsuqwdLPb
+         b82PIOa6/XOPks2olorjaTsKQvV+tib3wNCPTyjFiwScFy3GVY0Vpj0fmh0Ds4cDarC8
+         o+c5yZqQKajTpf9zm5GnkcNn2VBqmkqiQjn9MgPG2fmMDuwjmW4AvHgQa7tn8aEEN6BO
+         tDyg==
+X-Gm-Message-State: AOAM532osNhdNFYT2nKrXHcIDrj34nr5kctZKCKQk7/BKpD9STRKVrAg
+        kqXTD6QLZ+oEKLj1wq8/hqyoVw==
+X-Google-Smtp-Source: ABdhPJzyykcy3MUxSxpp0AlR8glBuhiHrygpxmJfu0hexllbVvSOfHMABHxBTUyB4oFrQ3Vi0ZV1RA==
+X-Received: by 2002:a17:90a:a82:b0:1da:3763:5cf5 with SMTP id 2-20020a17090a0a8200b001da37635cf5mr81975pjw.55.1652888083156;
+        Wed, 18 May 2022 08:34:43 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m5-20020a17090b068500b001df99ceff43sm2888402pjz.36.2022.05.18.08.34.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 08:34:42 -0700 (PDT)
+Date:   Wed, 18 May 2022 15:34:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Suleiman Souhlal <suleiman@google.com>
+Cc:     Wei Zhang <zhanwei@google.com>, Sangwhan Moon <sxm@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Fix incorrect VM-exit profiling
+Message-ID: <YoUSDmKrE6ryO4XB@google.com>
+References: <20220412195846.3692374-1-zhanwei@google.com>
+ <YnmqgFkhqWklrQIw@google.com>
+ <CAN86XOYNpzEUN0aL9g=_GQFz5zdXX9Pvcs_TDmBVyJZDTfXREg@mail.gmail.com>
+ <YnwRld0aH8489+XQ@google.com>
+ <CAN86XOZdW7aZXhSU2=gP5TrRQc8wLmtTQui0J2kwhchp2pnbeQ@mail.gmail.com>
+ <CABCjUKCCc2irAnJrGWfKAnXJj-pb=YNL4F0uAEr-c0LMX22_hw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH 1/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        borntraeger@linux.ibm.com, jjherne@linux.ibm.com,
-        akrowiak@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220517180851.166538-1-mjrosato@linux.ibm.com>
- <20220517180851.166538-2-mjrosato@linux.ibm.com>
- <2e51b388-48d0-4689-07f4-65f607dbce59@linux.ibm.com>
- <20220518151247.GI1343366@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20220518151247.GI1343366@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: x8aS-_aMEqYWg_MOFc4u10zptZE03O1w
-X-Proofpoint-ORIG-GUID: UVwqhqkeeZKxIv-g8DOJjNo9QYNkHSaQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-18_05,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 mlxlogscore=999 malwarescore=0 impostorscore=0 suspectscore=0
- phishscore=0 adultscore=0 bulkscore=0 priorityscore=1501 mlxscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205180089
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABCjUKCCc2irAnJrGWfKAnXJj-pb=YNL4F0uAEr-c0LMX22_hw@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/22 11:12 AM, Jason Gunthorpe wrote:
-> On Wed, May 18, 2022 at 10:37:48AM -0400, Matthew Rosato wrote:
->> On 5/17/22 2:08 PM, Matthew Rosato wrote:
->>> Rather than relying on a notifier for associating the KVM with
->>> the group, let's assume that the association has already been
->>> made prior to device_open.  The first time a device is opened
->>> associate the group KVM with the device.
->>>
->>> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>
->> ...
->>
->>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
->>> index cfcff7764403..c5d421eda275 100644
->>> +++ b/drivers/vfio/vfio.c
->>> @@ -10,6 +10,7 @@
->>>     * Author: Tom Lyon, pugs@cisco.com
->>>     */
->>> +#include "linux/kvm_host.h"
->>>    #include <linux/cdev.h>
->>>    #include <linux/compat.h>
->>>    #include <linux/device.h>
->>> @@ -1083,6 +1084,13 @@ static struct file *vfio_device_open(struct vfio_device *device)
->>>    	mutex_lock(&device->dev_set->lock);
->>>    	device->open_count++;
->>> +	down_write(&device->group->group_rwsem);
->>> +	if (device->open_count == 1 && device->group->kvm) {
->>> +		device->kvm = device->group->kvm;
->>> +		kvm_get_kvm(device->kvm);
->>
->> Did some more compile testing, since vfio has no hard kvm dependency,
->> kvm_get_kvm and kvm_put_kvm are an issue if KVM is a module while vfio is
->> built-in...
+On Wed, May 18, 2022, Suleiman Souhlal wrote:
+> On Tue, May 17, 2022 at 4:30 AM Wei Zhang <zhanwei@google.com> wrote:
+> >
+> > > Please don't top-post.  From https://people.kernel.org/tglx/notes-about-netiquette:
+> >
+> > Ah, I didn't know this should be avoided. Thanks for the info!
+> >
+> > > My preference would be to find a more complete, KVM-specific solution.  The
+> > > profiling stuff seems like it's a dead end, i.e. will always be flawed in some
+> > > way.  If this cleanup didn't require a new hypercall then I wouldn't care, but
+> > > I don't love having to extend KVM's guest/host ABI for something that ideally
+> > > will become obsolete sooner than later.
+> >
+> > I also feel that adding a new hypercall is too much here. A
+> > KVM-specific solution is definitely better, and the eBPF based
+> > approach you mentioned sounds like the ultimate solution (at least for
+> > inspecting exit reasons).
+> >
+> > +Suleiman What do you think? The on-going work Sean described sounds
+> > promising, perhaps we should put this patch aside for the time being.
 > 
-> Ugh, my other plan was to have the driver itself capture the kvm, ie
-> we lock the group_rwsem to keep the group->kvm valid and then pass the
-> kvm to open_device in some way, then the driver can kvm_get_kvm() it
-> 
+> I'm ok with that.
+> That said, the advantage of the current solution is that it already
+> exists and is very easy to use, by anyone, without having to write any
+> code. The proposed solution doesn't sound like it will be as easy.
 
-Hrm... If we did that we would have to re-evaluate some other usage of 
-the rwsem e.g. if driver open_device calls vfio_register_iommu_notifier 
-it will try to get the rwsem but it's already locked.
-
-> Alternatively, I don't know why kvm_get_kvm() is an exported symbol
-> when it is just calling refcount_inc() - inlining it would be an
-> improvement I think.
-> 
-
-I think that would work for kvm_get_kvm, but kvm_put_kvm (which we also 
-need) calls kvm_destroy_kvm after the refcount_dec and that can't be inlined
+My goal/hope is to make the eBPF approach just as easy by providing/building a
+library of KVM eBPF programs in tools/ so that doing common things like profiling
+VM-Exits doesn't require reinventing the wheel.  And those programs could be used
+(and thus implicitly tested) by KVM selftests to verify the kernel functionality.
