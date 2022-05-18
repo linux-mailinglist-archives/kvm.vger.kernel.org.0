@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0769C52B42D
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 10:06:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBB6352B473
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 10:19:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232646AbiERIGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 04:06:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55004 "EHLO
+        id S232692AbiERINJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 04:13:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232691AbiERIF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 04:05:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24EA6F0D
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 01:05:58 -0700 (PDT)
+        with ESMTP id S232680AbiERINH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 04:13:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5FB585909C
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 01:13:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652861157;
+        s=mimecast20190719; t=1652861585;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Vb9VySVR+4W+uz+Lu99v5HuhF6i+HtZKB3KJwQnTgSg=;
-        b=KvBHVRjkX51vbyLsRjpWsnfBScO5QcTWR8dH2JP0Wz6CuzWR6LRyJcQP45RV8pyt6TUdgA
-        twU3GsOMq7ypr5m056sn0iW20/YXiyMrQmn78lnjq+nP8yzQgZCKOmugqGhjGRCB2jHJDg
-        aNI06Mg8fm1TYPGHVdg/FFYKr5vL6X4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=dfHp/HP/b9AoGe09y0NtWxK8atBPRWLQkNOyfDM+It8=;
+        b=SvmSC3oyW+h0G7bugaTFXlTWaIMxXhgskARGpFcjWS+wqVw5wMK9OaYuMvoGSocX89QhgA
+        Ee/wciGyo8RBx4u2p75WFc0+eAq3amHTi/A1h3DhWJ2VqvDF9549xl9zrLipWMIX/FwGmV
+        KxH6Bft27MZeRwpgMGhH5nXUdu5X+zs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-102-R0f1jJMMO4akhGP3NhyeTQ-1; Wed, 18 May 2022 04:05:56 -0400
-X-MC-Unique: R0f1jJMMO4akhGP3NhyeTQ-1
-Received: by mail-wm1-f71.google.com with SMTP id p24-20020a1c5458000000b003945d2ffc6eso568062wmi.5
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 01:05:56 -0700 (PDT)
+ us-mta-199-5TUgyHZuPemZchg7siImXQ-1; Wed, 18 May 2022 04:13:04 -0400
+X-MC-Unique: 5TUgyHZuPemZchg7siImXQ-1
+Received: by mail-wr1-f71.google.com with SMTP id bv12-20020a0560001f0c00b0020e359b3852so324612wrb.14
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 01:13:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Vb9VySVR+4W+uz+Lu99v5HuhF6i+HtZKB3KJwQnTgSg=;
-        b=cnS45QUbVajG/KT9YLeVcOMp2dazTtgS8spwXG5c3341aaymrBijdrXAxMxAh1ltKp
-         xhaN04Q+p7h3asVDw/MoltAwQ+BMQ/WzpNsdLxHdAUD+jIroCpsLyPSnyMWfF7Kp/CRp
-         y2El3tLVtmzvfxX/hlHimTn+CUXnBaAcu4vxoEiVO19AKUyTStjiPyQZEZtDXSXshi6k
-         gQKJHZaihLuDmkroLNPdNj1Js8iwNx47Pj/qtOe9BV6UYJGyL4lO4gt5By3fK9zPWkQX
-         w3bpuusk4r4v5LAPJdN2ad0JeqWEE3ZJF2VKe7n0b3xGDFrq3yA90kGgisOZcOgN8WSs
-         cs0A==
-X-Gm-Message-State: AOAM533M4blwlnWvdgAvF+1JDrHzFqxXOT6Bl4z0khnsicKLRAjePwAT
-        7EDHWEUUNEW36dYeTvULeo3/t0CJfUmNDNSxSrb04qZoXft9GDAW2fwpkmwD8B8iT3wMXsBaLwm
-        uo91o9qfNQK9+
-X-Received: by 2002:a05:6000:1846:b0:20e:5d27:7ca7 with SMTP id c6-20020a056000184600b0020e5d277ca7mr3564811wri.536.1652861155048;
-        Wed, 18 May 2022 01:05:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/30cS4PJxmHAl+2xrMBwaMFiCWGXTdx7x4IINri6wxV/RgNXy9UYZKLMriIL5IvLAWmSHMw==
-X-Received: by 2002:a05:6000:1846:b0:20e:5d27:7ca7 with SMTP id c6-20020a056000184600b0020e5d277ca7mr3564789wri.536.1652861154786;
-        Wed, 18 May 2022 01:05:54 -0700 (PDT)
+        bh=dfHp/HP/b9AoGe09y0NtWxK8atBPRWLQkNOyfDM+It8=;
+        b=X1npS0PpgZrPIGfr3xRsG/bk6ULLfvf2fovcpr9HYXgQ0QURVWi/uu6mYROp7HvGDW
+         QiYICcjul81e3ZHQ8IURjkH+WLBpFCjXd2pXk/NXpj4X5j+kVbujjpSCbc01uZXBshXZ
+         jNVxhWweXM7GIw4WK+dbBJ/Bx3U4bs1gF4xJ66nbTiNYpcj0DpKN1lCk5O8movc7vuD/
+         vaoANDn8Kl7glin6cb1INw/PYrGv3C0VV72iwl68mdIhA/fNr688Ej5HkluzK6uEuuOe
+         WuCUULUvNJSBXpcjpCNfiNUbsY6T4RPd3nsOmy52SLXegzUdRcTFBMwHTzTeWhRN2ui0
+         S6Aw==
+X-Gm-Message-State: AOAM533MgRsu9M1/JuhplKrzuRJGq0e6ofn1P3OL5qhtUh9innVB04j7
+        gOfErgzsR2cTM+yD9LMLo71QEHf8MFsaeEGyVHD6uF31B+xA6SqcZbYv9lh+LNU7tD2mCnnxmQd
+        hbi2c3NZeCrYB
+X-Received: by 2002:a05:600c:3512:b0:394:7c3b:53c0 with SMTP id h18-20020a05600c351200b003947c3b53c0mr24455448wmq.170.1652861582939;
+        Wed, 18 May 2022 01:13:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmNMudMu1d4TT8vFzZFh+w0PrvObISRbOyWdvBWos1oyuudQE5xGQFE4p1tyR3Ib1wLmx3uw==
+X-Received: by 2002:a05:600c:3512:b0:394:7c3b:53c0 with SMTP id h18-20020a05600c351200b003947c3b53c0mr24455422wmq.170.1652861582709;
+        Wed, 18 May 2022 01:13:02 -0700 (PDT)
 Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id y21-20020a7bcd95000000b0039489e1bbd6sm3594130wmj.47.2022.05.18.01.05.53
+        by smtp.gmail.com with ESMTPSA id e4-20020adf9bc4000000b0020d0c48d135sm1293889wrc.15.2022.05.18.01.13.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 01:05:54 -0700 (PDT)
-Message-ID: <db7ebd91-818d-f63e-6835-c38b9881383a@redhat.com>
-Date:   Wed, 18 May 2022 10:05:53 +0200
+        Wed, 18 May 2022 01:13:02 -0700 (PDT)
+Message-ID: <1dda12f3-2552-54d4-0946-73c168ff7d26@redhat.com>
+Date:   Wed, 18 May 2022 10:13:01 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
-Subject: Re: [PATCH v5 3/9] target/s390x: add zpci-interp to cpu models
+Subject: Re: [PATCH v5 4/9] s390x/pci: add routine to get host function handle
+ from CLP info
 Content-Language: en-US
 To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
 Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
@@ -69,9 +70,9 @@ Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
         pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
         pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
 References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
- <20220404181726.60291-4-mjrosato@linux.ibm.com>
+ <20220404181726.60291-5-mjrosato@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220404181726.60291-4-mjrosato@linux.ibm.com>
+In-Reply-To: <20220404181726.60291-5-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -85,31 +86,44 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 04/04/2022 20.17, Matthew Rosato wrote:
-> The zpci-interp feature is used to specify whether zPCI interpretation is
-> to be used for this guest.
+> In order to interface with the underlying host zPCI device, we need
+> to know it's function handle.  Add a routine to grab this from the
+> vfio CLP capabilities chain.
 > 
 > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 > ---
->   hw/s390x/s390-virtio-ccw.c          | 1 +
->   target/s390x/cpu_features_def.h.inc | 1 +
->   target/s390x/gen-features.c         | 2 ++
->   target/s390x/kvm/kvm.c              | 1 +
->   4 files changed, 5 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 90480e7cf9..b190234308 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -805,6 +805,7 @@ static void ccw_machine_6_2_instance_options(MachineState *machine)
->       static const S390FeatInit qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V6_2 };
->   
->       ccw_machine_7_0_instance_options(machine);
-> +    s390_cpudef_featoff_greater(14, 1, S390_FEAT_ZPCI_INTERP);
->       s390_set_qemu_cpu_model(0x3906, 14, 2, qemu_cpu_feat);
+>   hw/s390x/s390-pci-vfio.c         | 83 ++++++++++++++++++++++++++------
+>   include/hw/s390x/s390-pci-vfio.h |  6 +++
+>   2 files changed, 73 insertions(+), 16 deletions(-)
+[...]
+> diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
+> index ff708aef50..0c2e4b5175 100644
+> --- a/include/hw/s390x/s390-pci-vfio.h
+> +++ b/include/hw/s390x/s390-pci-vfio.h
+> @@ -20,6 +20,7 @@ bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
+>   S390PCIDMACount *s390_pci_start_dma_count(S390pciState *s,
+>                                             S390PCIBusDevice *pbdev);
+>   void s390_pci_end_dma_count(S390pciState *s, S390PCIDMACount *cnt);
+> +bool s390_pci_get_host_fh(S390PCIBusDevice *pbdev, uint32_t *fh);
+>   void s390_pci_get_clp_info(S390PCIBusDevice *pbdev);
+>   #else
+>   static inline bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
+> @@ -33,6 +34,11 @@ static inline S390PCIDMACount *s390_pci_start_dma_count(S390pciState *s,
 >   }
+>   static inline void s390_pci_end_dma_count(S390pciState *s,
+>                                             S390PCIDMACount *cnt) { }
+> +static inline bool s390_pci_get_host_fh(S390PCIBusDevice *pbdev,
+> +                                        unsigned int *fh)
 
-This needs to be moved into ccw_machine_7_0_instance_options() now that 7.0 
-has been released without this feature.
+This prototype does not match the one before the else - please replace 
+"unsigned int" with "uint32_t".
 
   Thomas
+
+> +{
+> +    return false;
+> +}
+>   static inline void s390_pci_get_clp_info(S390PCIBusDevice *pbdev) { }
+>   #endif
+>   
 
