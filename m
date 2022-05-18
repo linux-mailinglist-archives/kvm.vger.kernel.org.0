@@ -2,138 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CBA352B727
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 12:13:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F239152B82D
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 12:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234946AbiERKHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 06:07:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
+        id S235186AbiERKr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 06:47:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234941AbiERKHP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 06:07:15 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam08on2044.outbound.protection.outlook.com [40.107.101.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 399A714CDCF;
-        Wed, 18 May 2022 03:07:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m1I5P3wQTVk5zbKWMj2HxGzUNERNymjwxc1fgETZn3XogpXWmfgQm97hh4Ffss5T10+YNpZxn6SfpF+FsejPgEOLGRGQkLU6QPycp5BC8SwVESZP6MEiNJgl030W6mXPVsIjJ0cJ4ewDLcoHSV5AnGy3JhrCVWMShu5OyCVQ8sca3hni+9Juz3LjAVcbMpSimJzIxkO7hihGBKxBo9J5IQLUPuHyKfUK20lacUY8QeyFopepX5ufd510q+yFIkGobVxc0S26Je1OejpGEZI8ksB/LbwTUzdvsn/dpYPUb43weOKpbwm/QNnV2wvsiAHxed8C37gOLMgxcvT9/5NVfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fFHeKE/4/kP/ojVtLSDw8A2ssA3IvS2csM8Ney8cbeY=;
- b=dd9iDFr3W3jxqADo8oAsHB29Ko7DW2XUWFvmqOqzxoROjgSgsCaChpZLPmgUqr71tZvjDvpNngM4icAfRnPBxatRE8WAGHKgSclLlflAuxjP/2L+X6XS3BRlIFFQXSBasppiDis4XbKDrcmwWHpHnTWKmd0afdYLCvSHFJx5RmXdo7z8Kpsis7RzOsrjGJF1MwKfHKpvNp8nM7I6DiXFsU1tPvJJyTthshHBS0WhRfH4L4ugxyWn3AXzXJpad9jCw1gS2JJEK1gcIV6czR2dlL2wKdSHWJAZsM+YWe19gmbP1uO8lNK7276av0oDFEwyXtNzT6L3cyPc00EHODl2Ag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fFHeKE/4/kP/ojVtLSDw8A2ssA3IvS2csM8Ney8cbeY=;
- b=OAwMsxmHYT39MLh0myEJXu+1d425wUvUWshrj/UKdvh9eI43JCTevLpLv8SM3YqND/nPD0up59T0Gr1UtgCbrpWu1S/j/U71LUw7eLB/u3tzmnxUz4q6VztK8rgrMGYwszZ3NqcAukz2KcoUXHSADyBd8GcO5PX+bD7vSteteGX9t9jhwzCoBDD9+rfU0b9UIAEzDj14gssTS3Q+cRGr9YptGHIX4KJGhHyGS/GVIDbDnuqXY3EWqSeNIRXH+tt341Q2m3q5CqtV3bD5vC9PEIqXh03eQquKf7kUDhT0r3k0ALB0YMPNxYA5YxR3Kh/Jn6r5k8n6EruAcy+3dtNy9Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13)
- by MN2PR12MB3296.namprd12.prod.outlook.com (2603:10b6:208:aa::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.18; Wed, 18 May
- 2022 10:07:12 +0000
-Received: from BL1PR12MB5304.namprd12.prod.outlook.com
- ([fe80::a9fa:62ae:bbc8:9d7d]) by BL1PR12MB5304.namprd12.prod.outlook.com
- ([fe80::a9fa:62ae:bbc8:9d7d%6]) with mapi id 15.20.5273.014; Wed, 18 May 2022
- 10:07:12 +0000
-Message-ID: <ed5773f8-7194-4d2d-b5b2-7546c2f1b2bd@nvidia.com>
-Date:   Wed, 18 May 2022 15:36:59 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v4 4/4] vfio/pci: Move the unused device into low power
- state with runtime PM
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20220517100219.15146-1-abhsahu@nvidia.com>
- <20220517100219.15146-5-abhsahu@nvidia.com>
- <20220517140259.1021cf85.alex.williamson@redhat.com>
-X-Nvconfidentiality: public
-From:   Abhishek Sahu <abhsahu@nvidia.com>
-In-Reply-To: <20220517140259.1021cf85.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0098.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:af::8) To BL1PR12MB5304.namprd12.prod.outlook.com
- (2603:10b6:208:314::13)
+        with ESMTP id S235146AbiERKrx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 06:47:53 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D477E90CCC;
+        Wed, 18 May 2022 03:47:51 -0700 (PDT)
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IAKZxj013497;
+        Wed, 18 May 2022 10:47:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=a6QBUi0AHQA+C2I98hT+CKa0i+amRKFGVmLjhD5CvTY=;
+ b=S46wlk35wfN8YRtmjz8DIYMBPr+TXFlJTxn0TzLAaUV2IHvi1yM5z8QmlyQxP0WJU3ZC
+ h/mPBrV7Ws5NpOk0KbWkXyAsSOZeU5HUaYqM6O5+AZT596cesGN2eFa6hc/2sfmYjYjB
+ r8vIXhX0sOAK+EggUpfGgYcnhfv84YqPSiSv2nQC9hb1VeKwRGEZJdM1iv7IY4ap/IEn
+ UWAH5ZecGDUSSN1+o4HONOGlTInWYdR82QPqnjqsQKSOJyyd1DtqNnuvG4ss15C3kntt
+ Wu7eRyWhU6s4/L7ZePtEron+3ytFh0iqY+md5qStAXMIF+3GSCw5DkRscMypgusqHWKV VA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4xybruem-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 10:47:51 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IALWAW019839;
+        Wed, 18 May 2022 10:47:50 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4xybrue5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 10:47:50 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IAlabt017562;
+        Wed, 18 May 2022 10:47:48 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3g2429djxk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 May 2022 10:47:48 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IAlj3P46793088
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 May 2022 10:47:45 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47DC8A405B;
+        Wed, 18 May 2022 10:47:45 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 862C7A4054;
+        Wed, 18 May 2022 10:47:44 +0000 (GMT)
+Received: from [9.171.22.150] (unknown [9.171.22.150])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 18 May 2022 10:47:44 +0000 (GMT)
+Message-ID: <93c07dce-a64a-fa1a-f70c-9db22ca53f68@linux.ibm.com>
+Date:   Wed, 18 May 2022 12:51:33 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5bd1ecc0-ef9b-4522-afee-08da38b62d28
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3296:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB3296B5D160FFDE2252558CBCCCD19@MN2PR12MB3296.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5X3s86J5aKuYlo8fUkgpyckb43c/ihM4hk1p7/DoabVD9i0XPExwN67mXuR9xiFuwYaJeimSM8IRUSk1CTpLQLLnvuaDg/UNdHK8IZoiuCNnEORTPFwOn3Bt4je05SO7aMFx90l3ky9vS98Rn0oLxmCax60qttMXrQe0j8B31XfHdC+Rsp+uPuWLtESxmt8rAywIawVjRv13VQdhBoSeQ3kAWMWviSH02RknJAMo8Lp6dZyTStfmmA2aa1929KbrZHh6Wci+pQv1N0nnpADTQn453gwCU4ndnytwhuLnKQY8CMW6dHeU4EhoM5gVIJ/cUpk5C+3EAS2FIQELfdktE1DAmR0t5iKEBKZ+dCk7XcE1wMDBIoYErjgiD0eNjdBIQ8XAL5cZN4pzoJ8yCgpbKBVX0w61tdjte71WsqGgl8BRghtE/9Pwge1DRkaBu7rW1lNoU81OY8jroDGFLnUgsqDrwQdAjm6+pjsU8fmknD3Kmh6iNbvkn2kL9sLW8ZuTUosfmn7ravXscMHBjUALZy7+qlxkZPsNH9CNigALYy2nRqkMuqXfUUuLlsfnNOiRf/ot0B0NeHYATxtN09tBZRhxxgu8lK2Htc9bQWdWIzdNJP8iX35idd6t/unWw6rDWbAeQnVZDUd1qKUwJdSlaumChyCwy1Z2o0Lbg+BVIAJ5TkVfbxMbk8+go+qYDT4wwtFCcIYbSVFlxF1BA7SpiSlpx/0JX8gwXs+v6dITD7SfdODyr0QXnVx2/mSkIQur
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5304.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(83380400001)(6666004)(2906002)(186003)(55236004)(26005)(6512007)(53546011)(2616005)(6506007)(8936002)(316002)(31686004)(6916009)(54906003)(31696002)(36756003)(66556008)(4326008)(66946007)(8676002)(86362001)(66476007)(7416002)(5660300002)(508600001)(38100700002)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UDZ0VURCeWFFcEt2WGxrU2FTdUd6T2htOHVmWnZHZ1QxSHNMYzNqSFZnWk9z?=
- =?utf-8?B?Zm4wWmNCY2EyK1Nzbk04WnczVHc2eWRlaEcwOTEwTTE5WlB1ekNiY2tTQnpI?=
- =?utf-8?B?UWYvdG40V3FaNFdPUm41d1hMZ00xZ2lIT1A4SmpwRWplUW1ialRYRjQ5NHlo?=
- =?utf-8?B?Y1ZhbFpSZEtpdDZCSWZYOVJBcjIxQmVRcVRjWDlYMzZocVpuK0dWcVVJTXg0?=
- =?utf-8?B?ei94aXA1M0FSZk1OMzVNVVlmZHlNbDE1VDRvODZtMkJaTGxBa0EzdU8wSDhy?=
- =?utf-8?B?MVRCVDg2ZlRjcU1BNFg4bmtTTjlGOS9mOG52NGtUQkpYRGZReUpIVFhwV1NN?=
- =?utf-8?B?aUV4WlV0b2NXL2hZVVBxTlpxaklzOTEwQVM1dkYzTXE1YmQ4cit0YkRaVmNF?=
- =?utf-8?B?ODhyUmJYNGlZYmNIK3pyV253eVRGT3d6bTVIVmRTb0Z4NVdrVndLZHc4Vkx4?=
- =?utf-8?B?YlFnZkpsL2ZVdnR2SW40Vk5KTFJNTXc5NkdGK0dzOTJsMzhWckpSZ1g1cEVh?=
- =?utf-8?B?ZmdsakNTb3FGTE9lejNoVlI5dk5HUmFVZWFXdld6bDJ4UkFSZWFKckVkQVQ1?=
- =?utf-8?B?bjRCeS9TUVlCbUV2TWtaMFY1R21CcjRhcnRVRmhXU2xiTEVnbFN5bFduS2Vh?=
- =?utf-8?B?dzd2bEl6R014WFlRK3pZZ01NWnVYRDVXeXVnY2oyS3FVRC9tOWZlUEdVYXZx?=
- =?utf-8?B?ZGw0dnIxc2lBQzF0anZzZjRYQ0RBSXdMblhnUmhTTjRuSWdlVUtIRllTdThy?=
- =?utf-8?B?MTlmQXZLMjFxN05aeTcwS1ZlMVVUdG5Da21VTjg4WjF3RFo3MlRYNU85RGh1?=
- =?utf-8?B?dWJlOUdER3NJc3F4ZmxDNGtnQUdsdmpGOEoyTkMzNFRUYktPZlNkWmgyMDl5?=
- =?utf-8?B?MXZXUC9FUjNvQm5SY1ZCR0tqWlVNVS9hVnpLU2hFQ0o0KzMrclkrL1VkNERF?=
- =?utf-8?B?QUlqSjRoVUpUWXpQYkJnZVl2a2lCUG5PcTRGUitlek1vcDl4bllWeFBKOEY1?=
- =?utf-8?B?Umx4SklFUkFJNllLRGJhMjE0VFhwVDAyeWZUcWdKT2FJd1lDbXZwamFqV0hO?=
- =?utf-8?B?cEIzVzk5ZCttYnZET2hPMVd6V1NsdTJrOE4vaDBDcVo3MysxbmJiNVJyVHpk?=
- =?utf-8?B?WFhmbVI3a3hEa2VQTVd2YlVublJpQ3R6UTd0S21GZGE1VVR5ZUlUTloxdTNE?=
- =?utf-8?B?MHF3WFltZXh0SkdwcDVQaVdYbjc3V1V2Wlg4WWVibnNXRGVDWFI0NUhlTGVl?=
- =?utf-8?B?TDB4ZVZuVXRUUGxsRVB0ZSt5K3ZNUzJYdkRYb3dWZjJRYlk0ZlUwaUIzR2R3?=
- =?utf-8?B?MGFKVjZYK2R2WW10VE9waDl3UFVXNzVicXVOSUZZcGh6M0NnUnREaTYrUVUz?=
- =?utf-8?B?bmNiUS9qbGtmeDdUWWU5TUFOcnB0S0QyWnpDSW44THJoeEpjMitPTlIxTC9V?=
- =?utf-8?B?dWxFZzR0bk1OVCs0YzVTeGI4djRKU0xBNjROcG9DcXMzc28vc3ZlWHJGblg0?=
- =?utf-8?B?c3dpckhUNTAwaXJ3RGpMSGhmcUlvVVJ3UnVRRDBsMEx4RVViZUd4VjdoanFN?=
- =?utf-8?B?eEc5SUZhaE41M0RnS2prNzBWeWVjUVNxTnJGLzVhNFZ4cW5yTXZqMFRmdXFM?=
- =?utf-8?B?eW8vd1ZnYzVtQTVVS3RjNFpld1ZBSWNqcXNZWEFLWlhVRzdaQmpkazhSQ0lJ?=
- =?utf-8?B?NXBBaVM0SS9SalpRZUl4V2VLdVA0YUszTnNOZHhBSnMzRFgwbHJ1UDFZWjhx?=
- =?utf-8?B?d3B3aHlPT2pVN1h3K0J3cXFOUjZ6cmw4TnZrb3JJOFBxcmFmOEcyYXNKMmUy?=
- =?utf-8?B?U2U1b0R1M293QW1QTmpDMHNKaUhsWXUzMHRlWXpIV3llZHQ1RkVsTnY5aDdF?=
- =?utf-8?B?YVREcWdrVjNFVlhycnFBUnRoU2JnY1pUVkJKK3cyZDZoNkFvbS9xQUkrV1dC?=
- =?utf-8?B?eU93S1JIQlRrRFlYSXZTSi9iSUxpYW1YVXBBaHpRS3lhSHhlZW1mTHlMbDRk?=
- =?utf-8?B?MGpXYS92QXoxRXo1OFpNd0JyK2hQOHAxcDdqOVIrUlVuTU94L3ZGTGliREFw?=
- =?utf-8?B?dDd6RFNsdjYwcXYxZm8ybEtFSmptOUdMek9ETTFkYlB4NVZoay9kMkExSVNE?=
- =?utf-8?B?dzZHc2dra1dHZ3p2Q1RuMlQvb1hoVmVSOEovUW9LSGd1MnVGVlVqZTFSWU9x?=
- =?utf-8?B?M0gvam55dk0wdjdtcDc1MExmSXJRekE5V3dKWlI0d2V4TFNlZXJwOVVZZVBR?=
- =?utf-8?B?MHBVbmJ1NE1haHVybVl5MjJ0RFY3WTY4K1p1dlR3YkJZSWFzYW9CVTVtU0tQ?=
- =?utf-8?B?RXZsalpPby85cWFoOHlGSm5wOStvTHpLVExpNGZlQkRIZnRKa2krZz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5bd1ecc0-ef9b-4522-afee-08da38b62d28
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5304.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2022 10:07:12.2952
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +p2dU0qnjnA4tzaep6Hu1ylPFgCfopGCK4/qckhbPBD1UvgK/aeLFHixhPOkdWCO5yiJTUVN+n2DkuqthUm3Ng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3296
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v9 3/3] s390x: KVM: resetting the Topology-Change-Report
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220506092403.47406-1-pmorel@linux.ibm.com>
+ <20220506092403.47406-4-pmorel@linux.ibm.com>
+ <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gWM6D2RUNeri6TMwnWSmYV-0XgbZd999
+X-Proofpoint-ORIG-GUID: pR25ogm1zAWtbYYs3loDU5iJEGD5d6Nv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-18_03,2022-05-17_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 impostorscore=0 spamscore=0
+ phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205180059
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -141,37 +98,172 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/2022 1:32 AM, Alex Williamson wrote:
-> On Tue, 17 May 2022 15:32:19 +0530
-> Abhishek Sahu <abhsahu@nvidia.com> wrote:
->> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
->> index 4fe9a4efc751..5ea1b3099036 100644
->> --- a/drivers/vfio/pci/vfio_pci_core.c
->> +++ b/drivers/vfio/pci/vfio_pci_core.c
->> @@ -156,7 +156,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
->>  }
->>  
->>  struct vfio_pci_group_info;
->> -static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
->> +static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
->>  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->>  				      struct vfio_pci_group_info *groups);
->>  
->> @@ -275,6 +275,19 @@ void vfio_pci_lock_and_set_power_state(struct vfio_pci_core_device *vdev,
->>  	up_write(&vdev->memory_lock);
->>  }
->>  
->> +#ifdef CONFIG_PM
+
+
+On 5/12/22 11:31, David Hildenbrand wrote:
+> On 06.05.22 11:24, Pierre Morel wrote:
+>> During a subsystem reset the Topology-Change-Report is cleared.
+>> Let's give userland the possibility to clear the MTCR in the case
+>> of a subsystem reset.
+>>
+>> To migrate the MTCR, let's give userland the possibility to
+>> query the MTCR state.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   arch/s390/include/uapi/asm/kvm.h |  5 ++
+>>   arch/s390/kvm/kvm-s390.c         | 79 ++++++++++++++++++++++++++++++++
+>>   2 files changed, 84 insertions(+)
+>>
+>> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+>> index 7a6b14874d65..abdcf4069343 100644
+>> --- a/arch/s390/include/uapi/asm/kvm.h
+>> +++ b/arch/s390/include/uapi/asm/kvm.h
+>> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+>>   #define KVM_S390_VM_CRYPTO		2
+>>   #define KVM_S390_VM_CPU_MODEL		3
+>>   #define KVM_S390_VM_MIGRATION		4
+>> +#define KVM_S390_VM_CPU_TOPOLOGY	5
+>>   
+>>   /* kvm attributes for mem_ctrl */
+>>   #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+>> @@ -171,6 +172,10 @@ struct kvm_s390_vm_cpu_subfunc {
+>>   #define KVM_S390_VM_MIGRATION_START	1
+>>   #define KVM_S390_VM_MIGRATION_STATUS	2
+>>   
+>> +/* kvm attributes for cpu topology */
+>> +#define KVM_S390_VM_CPU_TOPO_MTR_CLEAR	0
+>> +#define KVM_S390_VM_CPU_TOPO_MTR_SET	1
+>> +
+>>   /* for KVM_GET_REGS and KVM_SET_REGS */
+>>   struct kvm_regs {
+>>   	/* general purpose regs for s390 */
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index c8bdce31464f..80a1244f0ead 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -1731,6 +1731,76 @@ static void kvm_s390_sca_set_mtcr(struct kvm *kvm)
+>>   	ipte_unlock(kvm);
+>>   }
+>>   
+>> +/**
+>> + * kvm_s390_sca_clear_mtcr
+>> + * @kvm: guest KVM description
+>> + *
+>> + * Is only relevant if the topology facility is present,
+>> + * the caller should check KVM facility 11
+>> + *
+>> + * Updates the Multiprocessor Topology-Change-Report to signal
+>> + * the guest with a topology change.
+>> + */
+>> +static void kvm_s390_sca_clear_mtcr(struct kvm *kvm)
+>> +{
+>> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+>> +
+>> +	ipte_lock(kvm);
+>> +	sca->utility  &= ~SCA_UTILITY_MTCR;
 > 
-> Neither of the CONFIG_PM checks added are actually needed afaict, both
-> struct dev_pm_ops and the pm pointer on struct device_driver are defined
-> regardless.  Thanks,
 > 
-> Alex
+> One space too much.
+> 
+> sca->utility &= ~SCA_UTILITY_MTCR;
+> 
+>> +	ipte_unlock(kvm);
+>> +}
+>> +
+>> +static int kvm_s390_set_topology(struct kvm *kvm, struct kvm_device_attr *attr)
+>> +{
+>> +	if (!test_kvm_facility(kvm, 11))
+>> +		return -ENXIO;
+>> +
+>> +	switch (attr->attr) {
+>> +	case KVM_S390_VM_CPU_TOPO_MTR_SET:
+>> +		kvm_s390_sca_set_mtcr(kvm);
+>> +		break;
+>> +	case KVM_S390_VM_CPU_TOPO_MTR_CLEAR:
+>> +		kvm_s390_sca_clear_mtcr(kvm);
+>> +		break;
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>> + * kvm_s390_sca_get_mtcr
+>> + * @kvm: guest KVM description
+>> + *
+>> + * Is only relevant if the topology facility is present,
+>> + * the caller should check KVM facility 11
+>> + *
+>> + * reports to QEMU the Multiprocessor Topology-Change-Report.
+>> + */
+>> +static int kvm_s390_sca_get_mtcr(struct kvm *kvm)
+>> +{
+>> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+>> +	int val;
+>> +
+>> +	ipte_lock(kvm);
+>> +	val = !!(sca->utility & SCA_UTILITY_MTCR);
+>> +	ipte_unlock(kvm);
+>> +
+>> +	return val;
+>> +}
+>> +
+>> +static int kvm_s390_get_topology(struct kvm *kvm, struct kvm_device_attr *attr)
+>> +{
+>> +	int mtcr;
+> 
+> I think we prefer something like u16 when copying to user space.
+
+I come back here.
+I think I prefer to keep the int.
+
+the u16 is more than the MTCR but the entire utility field, so what 
+should I do:
+
+rename the function to kvm_s390_get_sca_utility() ?
+and then should I modify the KVM_S390_VM_CPU_TOPOLOGY
+to KVM_S390_VM_SCA_UTILITY ?
+
+I do not like that, I do not think we should report/handle more 
+information than expected/needed.
+
+I can mask the MTCR bit and return a u16 with bit 0 (0x8000) set
+but I find this a little weird
+
+I admit an int is may be not optimal.
+logically I should report a bool but I do not like to report a bool 
+through the UAPI.
+
+The more I think about it the more I think an int is OK.
+Or in the case we want to spare memory space I can create a flag in a 
+u16 but it should theoretically be different than the firmware MTCR bit. 
+Could be 0x0001.
+But still, it is only to leave during the copy_to_user where the copy of 
+an int may be as good or better than the copy of a u16.
+
+So any more opinion on this?
+
+Regards,
+Pierre
+
+> 
+>> +
+>> +	if (!test_kvm_facility(kvm, 11))
+>> +		return -ENXIO;
+>> +
+>> +	mtcr = kvm_s390_sca_get_mtcr(kvm);
+>> +	if (copy_to_user((void __user *)attr->addr, &mtcr, sizeof(mtcr)))
+>> +		return -EFAULT;
+>> +
+>> +	return 0;
+>> +}
+> 
+> You should probably add documentation, and document that only the last
+> bit (0x1) has a meaning.
+> 
+> Apart from that LGTM.
 > 
 
- Yes. These are not needed for build.
- I will remove these explicit CONFIG_PM checks.
-
- Regards,
- Abhishek
+-- 
+Pierre Morel
+IBM Lab Boeblingen
