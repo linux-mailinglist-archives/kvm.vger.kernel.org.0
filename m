@@ -2,219 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D60852BD6A
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:18:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7AD952BBEA
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:15:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237461AbiERMr3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 08:47:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42870 "EHLO
+        id S237502AbiERMrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 08:47:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237794AbiERMqc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 08:46:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BD4771A3595
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 05:43:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652877790;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8sp1AZTsVwKlhQc+YaMhxHvmVTkY1Ldp+tQJ/IC5G3M=;
-        b=iZ5QASfTGD5gt+sBfljrNgRJNtJzkIyRMG0bZaYnirEK6k9abbu6QsW2z+9zLJFYuhiaKN
-        eoyG/bkjcWGDaLsQ5j10C7dPw7PIhTD37sMpUIYPCQlAzNnp79OEBEwb5ARmKL+2tXTR96
-        E++zzvGH9sUvhzOjzahtvDfwc+Kupiw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-110-P3jI9QJhNNq-M-dGg5YOpg-1; Wed, 18 May 2022 08:43:09 -0400
-X-MC-Unique: P3jI9QJhNNq-M-dGg5YOpg-1
-Received: by mail-wr1-f70.google.com with SMTP id w20-20020adfd1b4000000b0020cbb4347e6so552806wrc.17
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 05:43:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=8sp1AZTsVwKlhQc+YaMhxHvmVTkY1Ldp+tQJ/IC5G3M=;
-        b=dL813PbjRsUGBRItIbZGjz/FhW1NoFSy2M5cz4lgLsKb4ed1hdCuA5YYQbf/T/aVSM
-         pWSzWBhalCtaeB1Vlfp4ObyEkPXQJPhdVVFsimpkKaK3whCRtDj/F/p4y67T3/qVk2xb
-         LpoqqxhNkbIyEJMCsCwwuv2+lWk0J8RCpFwEczHLNaa/kIOtMv5Km6MbYNiFCSl1TjBQ
-         Dz1+xZA9isQAbGvi61fwxmVYFcTl5aiqGe33lbasCBKRAUAr7qCTkUSY3IP6yh/ani7U
-         3VAT6SKhcPls0biC+dkmm1g68v7xF6zPmPyVZ2BObm01FI6Uu24t1CJ5jhp0j6sa1qr+
-         mTmA==
-X-Gm-Message-State: AOAM530RURf1epsnkeMchujN/6iBbOoDx1Ft7lw6aE2188G7HVz1odMB
-        +X5uDAtehtJTUodflp86pDEFXP/CRUQsnt3XNGQEA705KIKUX8oNLOR5Bp0HgJ72q5QiE8WLZ1z
-        LCkCJQWZc7i10
-X-Received: by 2002:a05:600c:4f15:b0:394:8ea0:bb45 with SMTP id l21-20020a05600c4f1500b003948ea0bb45mr25964709wmq.206.1652877788573;
-        Wed, 18 May 2022 05:43:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyhEfV7UD7ccFso+2Cr2aFdjNKyFXmOetoImfKzVeTI8YIwgYAJmh/GUkPIje9ETqc0ZXPaMw==
-X-Received: by 2002:a05:600c:4f15:b0:394:8ea0:bb45 with SMTP id l21-20020a05600c4f1500b003948ea0bb45mr25964676wmq.206.1652877788335;
-        Wed, 18 May 2022 05:43:08 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f1-20020a5d64c1000000b0020c5253d927sm1990018wri.115.2022.05.18.05.43.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 05:43:07 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 14/34] KVM: x86: Introduce .post_hv_l2_tlb_flush()
- nested hook
-In-Reply-To: <deae695da02d7f22dcfa4635eec53ab61baf9026.camel@redhat.com>
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
- <20220414132013.1588929-15-vkuznets@redhat.com>
- <deae695da02d7f22dcfa4635eec53ab61baf9026.camel@redhat.com>
-Date:   Wed, 18 May 2022 14:43:07 +0200
-Message-ID: <871qwrui3o.fsf@redhat.com>
+        with ESMTP id S238281AbiERMrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 08:47:02 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D7B61BB117
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 05:45:03 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D27E1042;
+        Wed, 18 May 2022 05:44:22 -0700 (PDT)
+Received: from [10.2.13.43] (Q2TWYV475D.cambridge.arm.com [10.2.13.43])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AC993F73D;
+        Wed, 18 May 2022 05:44:21 -0700 (PDT)
+Message-ID: <3376d2b0-7eec-212b-aedf-c4aa34be254c@arm.com>
+Date:   Wed, 18 May 2022 13:44:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v2 00/23] EFI and ACPI support for arm64
+Content-Language: en-GB
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
+        jade.alglave@arm.com, alexandru.elisei@arm.com
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <YoPhyyz+l3NkcAb5@google.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <YoPhyyz+l3NkcAb5@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-9.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+Hi Ricardo,
 
-> On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
->> Hyper-V supports injecting synthetic L2->L1 exit after performing
->> L2 TLB flush operation but the procedure is vendor specific.
->> Introduce .post_hv_l2_tlb_flush() nested hook for it.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/include/asm/kvm_host.h |  1 +
->>  arch/x86/kvm/Makefile           |  3 ++-
->>  arch/x86/kvm/svm/hyperv.c       | 11 +++++++++++
->>  arch/x86/kvm/svm/hyperv.h       |  2 ++
->>  arch/x86/kvm/svm/nested.c       |  1 +
->>  arch/x86/kvm/vmx/evmcs.c        |  4 ++++
->>  arch/x86/kvm/vmx/evmcs.h        |  1 +
->>  arch/x86/kvm/vmx/nested.c       |  1 +
->>  8 files changed, 23 insertions(+), 1 deletion(-)
->>  create mode 100644 arch/x86/kvm/svm/hyperv.c
->> 
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 8b2a52bf26c0..ce62fde5f4ff 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1558,6 +1558,7 @@ struct kvm_x86_nested_ops {
->>  	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
->>  			    uint16_t *vmcs_version);
->>  	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
->> +	void (*post_hv_l2_tlb_flush)(struct kvm_vcpu *vcpu);
->>  };
->>  
->>  struct kvm_x86_init_ops {
->> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
->> index 30f244b64523..b6d53b045692 100644
->> --- a/arch/x86/kvm/Makefile
->> +++ b/arch/x86/kvm/Makefile
->> @@ -25,7 +25,8 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
->>  			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
->>  kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
->>  
->> -kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
->> +kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
->> +			   svm/sev.o svm/hyperv.o
->>  
->>  ifdef CONFIG_HYPERV
->>  kvm-amd-y		+= svm/svm_onhyperv.o
->> diff --git a/arch/x86/kvm/svm/hyperv.c b/arch/x86/kvm/svm/hyperv.c
->> new file mode 100644
->> index 000000000000..c0749fc282fe
->> --- /dev/null
->> +++ b/arch/x86/kvm/svm/hyperv.c
->> @@ -0,0 +1,11 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * AMD SVM specific code for Hyper-V on KVM.
->> + *
->> + * Copyright 2022 Red Hat, Inc. and/or its affiliates.
->> + */
->> +#include "hyperv.h"
->> +
->> +void svm_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu)
->> +{
->> +}
->> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
->> index 8cf702fed7e5..a2b0d7580b0d 100644
->> --- a/arch/x86/kvm/svm/hyperv.h
->> +++ b/arch/x86/kvm/svm/hyperv.h
->> @@ -48,4 +48,6 @@ static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
->>  	hv_vcpu->nested.vp_id = hve->hv_vp_id;
->>  }
->>  
->> +void svm_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu);
->> +
->>  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index 2d1a76343404..de3f27301b5c 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -1665,4 +1665,5 @@ struct kvm_x86_nested_ops svm_nested_ops = {
->>  	.get_nested_state_pages = svm_get_nested_state_pages,
->>  	.get_state = svm_get_nested_state,
->>  	.set_state = svm_set_nested_state,
->> +	.post_hv_l2_tlb_flush = svm_post_hv_l2_tlb_flush,
->>  };
->> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
->> index 87e3dc10edf4..e390e67496df 100644
->> --- a/arch/x86/kvm/vmx/evmcs.c
->> +++ b/arch/x86/kvm/vmx/evmcs.c
->> @@ -437,3 +437,7 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->>  
->>  	return 0;
->>  }
->> +
->> +void vmx_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu)
->> +{
->> +}
->> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
->> index 8d70f9aea94b..b120b0ead4f3 100644
->> --- a/arch/x86/kvm/vmx/evmcs.h
->> +++ b/arch/x86/kvm/vmx/evmcs.h
->> @@ -244,5 +244,6 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->>  			uint16_t *vmcs_version);
->>  void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata);
->>  int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
->> +void vmx_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu);
->>  
->>  #endif /* __KVM_X86_VMX_EVMCS_H */
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index ee88921c6156..cc6c944b5815 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -6850,4 +6850,5 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
->>  	.write_log_dirty = nested_vmx_write_pml_buffer,
->>  	.enable_evmcs = nested_enable_evmcs,
->>  	.get_evmcs_version = nested_get_evmcs_version,
->> +	.post_hv_l2_tlb_flush = vmx_post_hv_l2_tlb_flush,
->>  };
->
->
-> I think that the name of the function is misleading, since it is not called
-> after each L2 HV tlb flush, but only after a flush which needs to inject
-> that synthetic VM exit.
->
-> I think something like 'inject_synthetic_l2_hv_tlb_flush_vmexit' 
-> (not a good name IMHO, but you get the idea) would be better.
->
+On 17/05/2022 18:56, Ricardo Koller wrote:
+> Hi Nikos,
+> 
+> On Fri, May 06, 2022 at 09:55:42PM +0100, Nikos Nikoleris wrote:
+>> Hello,
+>>
+>> This patch series adds initial support for building arm64 tests as EFI
+>> tests and running them under QEMU. Much like x86_64 we import external
+>> dependencies from gnu-efi and adopt them to work with types and other
+>> assumptions from kvm-unit-tests. In addition, this series adds support
+>> for discovering parts of the machine using ACPI.
+>>
+>> The first set of patches moves the existing ACPI code to the common
+>> lib path. Then, it extends definitions and functions to allow for more
+>> robust discovery of ACPI tables. In arm64, we add support for setting
+>> up the PSCI conduit, discovering the UART, timers and cpus via
+>> ACPI. The code retains existing behavior and gives priority to
+>> discovery through DT when one has been provided.
+>>
+>> In the second set of patches, we add support for getting the command
+>> line from the EFI shell. This is a requirement for many of the
+>> existing arm64 tests.
+>>
+>> In the third set of patches, we import code from gnu-efi, make minor
+>> changes and add an alternative setup sequence from arm64 systems that
+>> boot through EFI. Finally, we add support in the build system and a
+>> run script which is used to run an EFI app.
+>>
+>> After this set of patches one can build arm64 EFI tests:
+>>
+>> $> ./configure --enable-efi
+>> $> make
+>>
+>> And use the run script to run an EFI tests:
+>>
+>> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+>>
+> 
+> Thanks very much for this!
+> 
+> I'm having some issues with the other tests. I'm cross-compiling with
+> gcc-11. But then "selftest setup" passes and others, like the timer
+> test, fail:
+> 
+> 	$ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- \
+> 		--processor=max --enable-efi
+> 	$ make
+> 
+> 	passes:
+> 	$ ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 \
+> 		-append "setup smp=2 mem=256"
+> 
+> 	fails:
+> 	$ ./arm/efi/run ./arm/timer.efi -smp 1 -m 256
+> 
+> 	Load address: 5833e000
+> 	PC: 5834ad20 PC offset: cd20
+> 	Unhandled exception ec=0x25 (DABT_EL1)
+> 	Vector: 4 (el1h_sync)
+> 	ESR_EL1:         96000006, ec=0x25 (DABT_EL1)
+> 	FAR_EL1: 0000000000000004 (valid)
+> 	Exception frame registers:
+> 	pc : [<000000005834ad20>] lr : [<000000005834cadc>] pstate: 600003c5
+> 	sp : 000000005f70fd80
+> 	x29: 000000005f70ffe0 x28: 0000000000000000
+> 	x27: 000000005835dc50 x26: 000000005834eb80
+> 	x25: 000000000000d800 x24: 000000005f70fe50
+> 	x23: 0000000000000000 x22: 000000005835f000
+> 	x21: 000000005834eb80 x20: 0000000000000000
+> 	x19: 00000000ffffffff x18: 0000000000000000
+> 	x17: 0000000000000009 x16: 000000005bae8c38
+> 	x15: 0000000000000002 x14: 0000000000000001
+> 	x13: 0000000058350000 x12: 0000000058350000
+> 	x11: 000000005833e000 x10: 000000000005833d
+> 	x9 : 0000000000000000 x8 : 0000000000000000
+> 	x7 : 0000000000000000 x6 : 0000000000000001
+> 	x5 : 00000000000000c9 x4 : 000000005f70fe68
+> 	x3 : 000000005f70fe68 x2 : 000000005834eb80
+> 	x1 : 00000000ffffffff x0 : 0000000000000000
+> 
 
-Naming is hard indeed,
+Thank you for having a look!
 
-hv_inject_synthetic_vmexit_post_tlb_flush()
+Apologies, I should have been more explicit about this. At this point, 
+not all tests run successfully. There are bits and pieces missing, some 
+of which I tried to list in this TODO list and more that I missed. For 
+example, to get the timer tests to pass we have to add support for GIC 
+initialization through ACPI.
 
-seems to be accurate.
+I've continued working on this series, and I will be ironing some of 
+these issues out and, in the meantime, I wanted some early feedback on 
+whether some of these features are even desirable upstream (e.g., ACPI 
+support for arm64).
 
--- 
-Vitaly
+I don't want to spam the list too much and I will wait for comments 
+before I send a v3 but I already have a couple of fixes and one more 
+patch [1]. With these applied both the timer and most gicv3 tests pass.
 
+[1]: https://github.com/relokin/kvm-unit-tests/tree/target-efi-upstream
+
+Thanks,
+
+Nikos
+
+> Thanks!
+> Ricardo
+> 
+>> Or all tests:
+>>
+>> $> ./run_tests.sh
+>>
+>> There are a few items that this series does not address but they would
+>> be useful to have:
+>>
+>> * Support for booting the system from EL2. Currently, we assume that a
+>> tests starts running at EL1. This the case when we run with EFI, it's
+>> not always the case in hardware.
+>>
+>> * Support for reading environment variables and populating __envp.
+>>
+>> * Support for discovering the chr-testdev through ACPI.
+>>
+>> PS: Apologies for the mess with v1. Due to a mistake in my git
+>> send-email configuration some patches didn't make it to the list and
+>> the right recipients.
+>>
+>> Thanks,
+>>
+>> Nikos
+>>
+>> Andrew Jones (3):
+>>    arm/arm64: mmu_disable: Clean and invalidate before disabling
+>>    arm/arm64: Rename etext to _etext
+>>    arm64: Add a new type of memory type flag MR_F_RESERVED
+>>
+>> Nikos Nikoleris (20):
+>>    lib: Move acpi header and implementation to lib
+>>    lib: Ensure all struct definition for ACPI tables are packed
+>>    lib: Add support for the XSDT ACPI table
+>>    lib: Extend the definition of the ACPI table FADT
+>>    arm/arm64: Add support for setting up the PSCI conduit through ACPI
+>>    arm/arm64: Add support for discovering the UART through ACPI
+>>    arm/arm64: Add support for timer initialization through ACPI
+>>    arm/arm64: Add support for cpu initialization through ACPI
+>>    lib/printf: Support for precision modifier in printing strings
+>>    lib/printf: Add support for printing wide strings
+>>    lib/efi: Add support for getting the cmdline
+>>    lib: Avoid ms_abi for calls related to EFI on arm64
+>>    arm/arm64: Add a setup sequence for systems that boot through EFI
+>>    arm64: Copy code from GNU-EFI
+>>    arm64: Change GNU-EFI imported file to use defined types
+>>    arm64: Use code from the gnu-efi when booting with EFI
+>>    lib: Avoid external dependency in libelf
+>>    x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
+>>    arm64: Add support for efi in Makefile
+>>    arm64: Add an efi/run script
+>>
+>>   scripts/runtime.bash        |  14 +-
+>>   arm/efi/run                 |  61 +++++++++
+>>   arm/run                     |   8 +-
+>>   configure                   |  15 ++-
+>>   Makefile                    |   4 -
+>>   arm/Makefile.arm            |   6 +
+>>   arm/Makefile.arm64          |  18 ++-
+>>   arm/Makefile.common         |  48 +++++--
+>>   x86/Makefile.common         |   2 +-
+>>   x86/Makefile.x86_64         |   4 +
+>>   lib/linux/efi.h             |  44 ++++++
+>>   lib/arm/asm/setup.h         |   3 +
+>>   lib/arm/asm/timer.h         |   2 +
+>>   lib/x86/asm/setup.h         |   2 +-
+>>   lib/acpi.h                  | 260 ++++++++++++++++++++++++++++++++++++
+>>   lib/stdlib.h                |   1 +
+>>   lib/x86/acpi.h              | 112 ----------------
+>>   lib/acpi.c                  | 124 +++++++++++++++++
+>>   lib/arm/io.c                |  21 ++-
+>>   lib/arm/mmu.c               |   4 +
+>>   lib/arm/psci.c              |  25 +++-
+>>   lib/arm/setup.c             | 247 +++++++++++++++++++++++++++-------
+>>   lib/arm/timer.c             |  73 ++++++++++
+>>   lib/devicetree.c            |   2 +-
+>>   lib/efi.c                   | 123 +++++++++++++++++
+>>   lib/printf.c                | 183 +++++++++++++++++++++++--
+>>   lib/string.c                |   2 +-
+>>   lib/x86/acpi.c              |  82 ------------
+>>   arm/efi/elf_aarch64_efi.lds |  63 +++++++++
+>>   arm/flat.lds                |   2 +-
+>>   arm/cstart.S                |  29 +++-
+>>   arm/cstart64.S              |  28 +++-
+>>   arm/efi/crt0-efi-aarch64.S  | 143 ++++++++++++++++++++
+>>   arm/dummy.c                 |   4 +
+>>   arm/efi/reloc_aarch64.c     |  93 +++++++++++++
+>>   x86/s3.c                    |  20 +--
+>>   x86/vmexit.c                |   4 +-
+>>   37 files changed, 1556 insertions(+), 320 deletions(-)
+>>   create mode 100755 arm/efi/run
+>>   create mode 100644 lib/acpi.h
+>>   delete mode 100644 lib/x86/acpi.h
+>>   create mode 100644 lib/acpi.c
+>>   create mode 100644 lib/arm/timer.c
+>>   delete mode 100644 lib/x86/acpi.c
+>>   create mode 100644 arm/efi/elf_aarch64_efi.lds
+>>   create mode 100644 arm/efi/crt0-efi-aarch64.S
+>>   create mode 100644 arm/dummy.c
+>>   create mode 100644 arm/efi/reloc_aarch64.c
+>>
+>> -- 
+>> 2.25.1
+>>
