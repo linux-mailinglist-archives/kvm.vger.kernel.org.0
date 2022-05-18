@@ -2,111 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16BF852C1A1
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:51:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9E2352C1D8
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 20:09:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241127AbiERRaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 13:30:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37632 "EHLO
+        id S241147AbiERRvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 13:51:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241081AbiERRaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 13:30:25 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D0620EE27
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:30:23 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id s18-20020a056830149200b006063fef3e17so1812951otq.12
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:30:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Ht+o1v4WgCfvjgo/qhN8PI77GOqAL6Usil1s/qDlKEc=;
-        b=qslx4Kxe0MdKnxcQfQXMnUdOcTZiGV44XcLHRsfKASQZBciW61JsS57gs187YXqaNL
-         qx58MClubyqqH6idmOyeB1EpKl/ZcxC6stgTJ6OUBPupMvqu1zW07lxrOZUkiNfC7kM5
-         fG/x6B0U3qzhtCG+yz0KRcxKKW1TDlXcKhMGymm4eNpWaK5M8OBetNEp/AVn7G2MNNZs
-         lDZo/Cg9Dk087rQubyzCJBO0jKks4aE99hAQ0GUs6uYZdAODtf0673MZx0J65oTDY/Jn
-         n8gHsZ7zWsHUigSw6VNhbvo3cApdxHixf33ml5cZb6JGliQJPhLGCFeggUtneI0WioNk
-         ywnw==
+        with ESMTP id S241094AbiERRvR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 13:51:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EF9D622B22
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:51:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652896274;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=49hW2Lgkit3FFJ0TGEQAkc/9Izoyz7QsMkLjDXmi4AY=;
+        b=fzpt5aMYtzcQUknWNpFa6KdePQOcD7ZS5BqxJzhnhXL7ywqj9ZDUECE/qWLwVllipcz1yK
+        e8NJNFnN3FEOXyGDtZloOKf1QFXogkeHDKZCDULswOlT9adcQKvEJ3VIH9aik7v6myq4t7
+        hNZWAXNyvEWzTwbhiCjY7pgv8z63Rak=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-556-hBTzrlT8PcuIqId5LtJ2FQ-1; Wed, 18 May 2022 13:51:13 -0400
+X-MC-Unique: hBTzrlT8PcuIqId5LtJ2FQ-1
+Received: by mail-io1-f70.google.com with SMTP id t1-20020a056602140100b0065393cc1dc3so692926iov.5
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:51:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Ht+o1v4WgCfvjgo/qhN8PI77GOqAL6Usil1s/qDlKEc=;
-        b=Pc3TM/ajtHCD34syq48HDajmsXheAhRsOeyvtsWnq+8FUD06kcW0KSdTcDeBEgMw7p
-         Q1yMZwlcMnSLCiz1bYCaLOv2m0fXPS1oUD9L4/fH5YXA6nY1Y8YsZua6BaS2AV6onK/4
-         P0eTCEvR/nV4Q9Imhj12O1MB3GJjbnpbclCGrnwac+5mjoL+o0Zvb+IuHkFZos5f2+62
-         jJq7PElw6TSv8Hju/iX4Pgpuzv8keOJMqVtmdV3upvuEQccvqne+AFHZJsb7YMrZUHtg
-         eGc8g2GviIaxrmOMh///V0zQii36uT76thV+nqBZ1Bs5HN49smlVa10WEQtZWkhVoYUF
-         6B8w==
-X-Gm-Message-State: AOAM533BpbNWn8ci856UE0ii6V0Jpgf1S+ymN6XreHGuknANveE59ohL
-        QHlVynNwXO9xWrJ0dgY4fLYn3DjwOY0sq9UlIz1AU9m/Spo=
-X-Google-Smtp-Source: ABdhPJwNd30qHng5tnxQBG13Zw0WMGkrVHJ56vVtIp4LvthS2FZNkDqgTzgL2Xj6BMYwFI0eBetIgotVmeXRtHAS0CI=
-X-Received: by 2002:a05:6830:1c65:b0:606:3cc:862 with SMTP id
- s5-20020a0568301c6500b0060603cc0862mr311027otg.75.1652895023004; Wed, 18 May
- 2022 10:30:23 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=49hW2Lgkit3FFJ0TGEQAkc/9Izoyz7QsMkLjDXmi4AY=;
+        b=EsK0GPoqGKtcZldMyOjmSYthByUpJRwvrJSTYAPQVm8grABQKcgyTdq1bUJtisFCBS
+         W51AHMzUNXQ/iQNkQWaLCDNNM/x6g2w95Lc0RjhaeA6mVnnc8Jf1v4fUhKsnI4VoWOBK
+         1NG+yVQHCHKlULqofsFFH7v1/SiO1WOYqMZSZx5l3drVJkJW5J8PuV5Vj3763ScPHTbf
+         shHNPukqsklVPmssOvGytsasyuHMJ/l1ol4/ie937oumAhoLhorkBQJFMU0hcb/Ii4bG
+         Gwo8oXVrymR/ex8FzTGnPhejl0JNpL7ClzRRsLFzbHh5qCdE3UPLQhCmf6YKmgB8Yxfj
+         urHg==
+X-Gm-Message-State: AOAM532UXdSN01hwJ3d3f7MBeX+lhtqzDQIMu+Cu82toTM8DR9vPsxyQ
+        Qudg20njsz4cccfQnYmKaGVIZXJADNPbCs2elyX7drZzXNeMTWoIn7ZtRnO/huxDkutATQoEqao
+        32QnlPA7U5x0W
+X-Received: by 2002:a05:6638:dc7:b0:32b:a483:16b8 with SMTP id m7-20020a0566380dc700b0032ba48316b8mr423071jaj.66.1652896272821;
+        Wed, 18 May 2022 10:51:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy4yot0L8H1GFnxd+jBFDsw6Yt7jnmhEuw0qSATO4iI9tLeFnhC04lgVq81N4r1GIYOBFpfHg==
+X-Received: by 2002:a05:6638:dc7:b0:32b:a483:16b8 with SMTP id m7-20020a0566380dc700b0032ba48316b8mr423057jaj.66.1652896272606;
+        Wed, 18 May 2022 10:51:12 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id g15-20020a92dd8f000000b002cf5aae6645sm727757iln.2.2022.05.18.10.51.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 10:51:12 -0700 (PDT)
+Date:   Wed, 18 May 2022 11:51:10 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Wan Jiabing <wanjiabing@vivo.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Yi Liu <yi.l.liu@intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kvm/vfio: Fix potential deadlock problem in vfio
+Message-ID: <20220518115110.23a0e929.alex.williamson@redhat.com>
+In-Reply-To: <20220517023441.4258-1-wanjiabing@vivo.com>
+References: <20220517023441.4258-1-wanjiabing@vivo.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <CAPUGS=oTTzn+HjXMdSK7jsysCagfipmnj25ofNFKD03rq=3Brw@mail.gmail.com>
-In-Reply-To: <CAPUGS=oTTzn+HjXMdSK7jsysCagfipmnj25ofNFKD03rq=3Brw@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 18 May 2022 10:30:11 -0700
-Message-ID: <CALMp9eQbpxHpGXJjYesH=SJu_LiCmCVTXYwV+w7YfdGpfc_Yzw@mail.gmail.com>
-Subject: Re: A really weird guest crash, that ONLY happens on KVM, and ONLY on
- 6th gen+ Intel Core CPU's
-To:     Brian Cowan <brcowan@gmail.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 18, 2022 at 10:14 AM Brian Cowan <brcowan@gmail.com> wrote:
->
-> Hi all, looking for hints on a wild crash.
->
-> The company I work for has a kernel driver used to literally make a db
-> query result look like a filesystem=E2=80=A6 The =E2=80=9Cdatabase=E2=80=
-=9D in question being
-> a proprietary SCM repository=E2=80=A6 (ClearCase, for those who have been
-> around forever=E2=80=A6 Like me=E2=80=A6)
->
-> We have a crash on mounting the remote repository ONE way (ClearCase
-> =E2=80=9CAutomatic views=E2=80=9D) but not another (ClearCase =E2=80=9CDy=
-namic views=E2=80=9D) where
-> both use the same kernel driver=E2=80=A6 The guest OS is RHEL 7.8, not
-> registered with RH (since the VM is only supposed to last a couple of
-> days.) The host OS is Ubuntu 20.04.2 LTS, though that does not seem to
-> matter.
->
-> The wild part is that this only happens when the ClearCase host is a
-> KVM guest, and only on 6th-generation or newer . It does NOT happen
-> on:
-> * VMWare Virtual machines configured identically
-> * VirtualBox Virtual machines Configured identically
-> * 2nd generation intel core hosts running the same KVM release.
-> (because OF COURSE my office "secondary desktop" host is ancient...
-> * A 4th generation I7 host running Ubuntu 22.04 and that version=E2=80=99=
-s
-> default KVM. (Because I am a laptop packrat. That laptop had been
-> sitting on a bookshelf for 3+ years and I went "what if...")
->
-> If I edit the KVM configuration and change the =E2=80=9Cmirror host CPU=
-=E2=80=9D
-> option to use the 2nd or 4th generation CPU options, the crash stops
-> happening=E2=80=A6 If this was happening on physical machines, the VM cra=
-sh
-> would make sense, but it's literally a hypervisor-specific crash.
->
-> Any hints, tips, or comments would be most appreciated... Never
-> thought I'd be trying to debug kernel/hypervisor interactions, but
-> here I am...
+On Tue, 17 May 2022 10:34:41 +0800
+Wan Jiabing <wanjiabing@vivo.com> wrote:
 
-Guest crash or hypervisor crash? If the former, can you provide the
-guest's console output?
+> Fix following coccicheck warning:
+> ./virt/kvm/vfio.c:258:1-7: preceding lock on line 236
+> 
+> If kvm_vfio_file_iommu_group() failed, code would goto err_fdput with
+> mutex_lock acquired and then return ret. It might cause potential
+> deadlock. Move mutex_unlock bellow err_fdput tag to fix it. 
+> 
+> Fixes: d55d9e7a45721 ("kvm/vfio: Store the struct file in the kvm_vfio_group")
+> Signed-off-by: Wan Jiabing <wanjiabing@vivo.com>
+> ---
+>  virt/kvm/vfio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+> index 8f9f7fffb96a..ce1b01d02c51 100644
+> --- a/virt/kvm/vfio.c
+> +++ b/virt/kvm/vfio.c
+> @@ -252,8 +252,8 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
+>  		break;
+>  	}
+>  
+> -	mutex_unlock(&kv->lock);
+>  err_fdput:
+> +	mutex_unlock(&kv->lock);
+>  	fdput(f);
+>  	return ret;
+>  }
+
+Applied to vfio next branch for v5.19.  Thanks!
+
+Alex
+
