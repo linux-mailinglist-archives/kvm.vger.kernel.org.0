@@ -2,129 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0838552BFAC
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 18:14:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11B5E52C056
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:09:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239969AbiERQNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 12:13:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45744 "EHLO
+        id S239997AbiERQQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 12:16:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239966AbiERQND (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 12:13:03 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10FFF1D8656
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:13:02 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id y32so4495389lfa.6
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:13:01 -0700 (PDT)
+        with ESMTP id S239971AbiERQQn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 12:16:43 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E89A76D1
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:16:41 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id w17-20020a17090a529100b001db302efed6so2539422pjh.4
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:16:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=H6zF8B/ZSKV/Brh9eLFZw1hXLm47c36XIa6p1tImmdM=;
-        b=q+ZpEruT+d1GpzFvdWqACxwEsITa0S5fGrMm0v+DNrEpLFJPPhTaVRr3v6Td+CT1xT
-         yrfCPjOF8Qz28anp9If4YMUT3Ji2oUM6VmIilt6ie1hME1dSJVjofoWD3SZwQEWdqVtb
-         1HM0rH7QAMjESaj4m2o1Y38AbzdABeHVXNNNQT1/gXDnPS+k4x2hGs8Wbh+2Ep2614nE
-         KJI2bl7vo7g5SooTo76AMr7DEOupVc6OwLiRiKHFrw4FAQqS58xOmHP70ZzHtc1CPszB
-         TJLQvkpg5LEo4dknOMAHGJp1SoiL6s+VvLLSl8NxBHDtA7xN8pFw0LIi65neeTbGZGly
-         V69w==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=27J+LsUtyeeYy/GvJkk2tphV2jBbsCOsrmpZjooJvdA=;
+        b=WsFMsQRAqPFYtDRXv1eq/d16y4WXmvGrQzz4CAO9ARgrPBnZudm/BdIonig9LJyFcm
+         x6L1zSSnkCAOWz2YA0yASGUB+S/LnV93goRZsCwFI/c0oM6Wt6HovjUhwpPIhHwnAmgf
+         0UULa2rgpV/0NpYuJBZ1n9Y7Z3J0NyCqw3cQu4ZP70oCUpqlb8b8MsNZ0F22EDY2ZbA3
+         5E1hyQWNsllEe7cLvGs3pzHDGEMwvrxA4n0ilcZn7OsnEXZa9Xik24fr3nohv7oQ4WX1
+         CW6+uDBt2U+dmO+Q5ct+H8Au3VCnLrnBY51f3Z4vRidqf2HwVg5OVps7L3et5gtGQ2aA
+         EKFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=H6zF8B/ZSKV/Brh9eLFZw1hXLm47c36XIa6p1tImmdM=;
-        b=V7xUUcL+rGfIfwMb5K4EBNn0g/r7fgXIsOXwWE/Q0JTFDYzC5J+o5NFwdSwrTVZpqa
-         5dUxWazVPh2jZE34MOL6Cq7AYWVuCNrpG30f4AI29VjXeX+G6kwhXgEEIDLR0ynCKsgq
-         s8F/RIZ4jigH9OtSd+4IxU1jjapShjLfEmA8WsJT+LdGjD0qxRJwtusADxFpjviY/94C
-         laBVApV5QMLXMlRZrDyPkd1RKTFVXPoopfXc+e/eioUGB78PbvpT+FQaqCYLkJN3u6za
-         FI/ub1v5H7FPdmoMrAv5eDvdrIoI7CiQ0XUQBy7gBanEk0KlKTf+kFhQ9+Z9hm4UfKLP
-         u3Dg==
-X-Gm-Message-State: AOAM533wmceQS+ZS/7U8REbgY0flfcnijzyB2ztBSms6u5KFMR80L6QP
-        8bKeEBd+19ba15ab3IIYthDX5Zy+Ysj8wDhn8tFSqA==
-X-Google-Smtp-Source: ABdhPJystWMw9ywhHUO0y68UaGPUmjNh9ytFLUX0K2lSVHAWKhSyw3Ny7W72qS88BZt8zVr/Yp3oYzYpbgksGEo8gTs=
-X-Received: by 2002:a19:674c:0:b0:448:3f49:e6d5 with SMTP id
- e12-20020a19674c000000b004483f49e6d5mr184257lfj.518.1652890380187; Wed, 18
- May 2022 09:13:00 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=27J+LsUtyeeYy/GvJkk2tphV2jBbsCOsrmpZjooJvdA=;
+        b=qmgVK+8DaV6GEnWVnh/8TJZzVDqQ/5fCJjfEXJN3wg1AHru1iqrXGKGbbrhl5Vs9Xb
+         eqIKFyIFUBQw0Q7+Kq4cNUe0YmO8QG3mWilN0jCMRynqqLZCGM/dmLMt5mPNwc5pRiws
+         KYigDihyj2KX88ip2j++Zab9xhcz2KnUxZohu0tx6z1OQWyO/B3dLlTm5S4YqPj4HYJx
+         Y0w0mebQr387Jx4f8/X7HikER0VgkXRe4VUHwY5xbVL+xPDzIonDgkju0GRLxnxrIBmR
+         ceGA1EAsUz+z4ckDI6yF+rqcav+hsTD4cpp9RSO0kDOh0OfrbeJ3JQp4ln6BB08QX+Xo
+         OhOg==
+X-Gm-Message-State: AOAM533/VidAfBjnPUfQt2TiXyRt1DlIFhkxUfSiw46Y4X/EL3IcNE0J
+        HH6U64q2H42METT38iTBgH80hQ==
+X-Google-Smtp-Source: ABdhPJzlMzaxzyxYIp0EtYqROS3OrIc3ty0dMgOLbrexh3oQF/2zOIfjp3/5KS2qx0kdvnbCWlOOjg==
+X-Received: by 2002:a17:90a:7441:b0:1df:5f54:502c with SMTP id o1-20020a17090a744100b001df5f54502cmr770638pjk.129.1652890600319;
+        Wed, 18 May 2022 09:16:40 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 4-20020a170902e9c400b0015e8d4eb264sm1893016plk.174.2022.05.18.09.16.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 09:16:39 -0700 (PDT)
+Date:   Wed, 18 May 2022 16:16:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     John Allen <john.allen@amd.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        jmattson@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v15 07/14] KVM: VMX: Emulate reads and writes to CET MSRs
+Message-ID: <YoUb4/iP+X+xgsfQ@google.com>
+References: <20210203113421.5759-1-weijiang.yang@intel.com>
+ <20210203113421.5759-8-weijiang.yang@intel.com>
+ <YoUW4Oh0eRL9um5m@dell9853host>
 MIME-Version: 1.0
-References: <20220517190524.2202762-1-dmatlack@google.com> <20220517190524.2202762-11-dmatlack@google.com>
- <YoQDjx242f0AAUDS@xz-m1.local> <YoT5/TRyA/QKTsqL@xz-m1.local> <YoUPtB0KtRuWl4p7@google.com>
-In-Reply-To: <YoUPtB0KtRuWl4p7@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 18 May 2022 09:12:33 -0700
-Message-ID: <CALzav=crRhStBy8zouM964ygU7-n72LkMo0m0g4xc5un4Cp1mA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/10] KVM: selftests: Add option to run
- dirty_log_perf_test vCPUs in L2
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoUW4Oh0eRL9um5m@dell9853host>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 18, 2022 at 8:24 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 18, 2022, Peter Xu wrote:
-> > On Tue, May 17, 2022 at 04:20:31PM -0400, Peter Xu wrote:
-> > > On Tue, May 17, 2022 at 07:05:24PM +0000, David Matlack wrote:
-> > > > +uint64_t perf_test_nested_pages(int nr_vcpus)
-> > > > +{
-> > > > + /*
-> > > > +  * 513 page tables to identity-map the L2 with 1G pages, plus a few
-> > > > +  * pages per-vCPU for data structures such as the VMCS.
-> > > > +  */
-> > > > + return 513 + 10 * nr_vcpus;
-> > >
-> > > Shouldn't that 513 magic value be related to vm->max_gfn instead (rather
-> > > than assuming all hosts have 39 bits PA)?
-> > >
-> > > If my math is correct, it'll require 1GB here just for the l2->l1 pgtables
-> > > on a 5-level host to run this test nested. So I had a feeling we'd better
-> > > still consider >4 level hosts some day very soon..  No strong opinion, as
-> > > long as this test is not run by default.
-> >
-> > I had a feeling that when I said N level I actually meant N-1 level in all
-> > above, since 39 bits are for 3 level not 4 level?..
-> >
-> > Then it's ~512GB pgtables on 5 level?  If so I do think we'd better have a
-> > nicer way to do this identity mapping..
->
-> Agreed, mapping all theoretically possible gfns into L2 is doomed to fail for
-> larger MAXPHYADDR systems.
+On Wed, May 18, 2022, John Allen wrote:
+> On Wed, Feb 03, 2021 at 07:34:14PM +0800, Yang Weijiang wrote:
+> > +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> > +		if (!cet_is_ssp_msr_accessible(vcpu, msr_info))
+> > +			return 1;
+> > +		if ((data & GENMASK(2, 0)) || is_noncanonical_address(data, vcpu))
+> 
+> Sorry to revive this old thread. I'm working on the corresponding SVM
+> bits for shadow stack and I noticed the above check. Why isn't this
+> GENMASK(1, 0)? The *SSP MSRs should be a 4-byte aligned canonical
+> address meaning that just bits 1 and 0 should always be zero. I was
+> looking through the previous versions of the set and found that this
+> changed between versions 11 and 12, but I don't see any discussion
+> related to this on the list.
 
-Peter, I think your original math was correct. For 4-level we need 1
-L4 + 512 L3 tables (i.e. ~2MiB) to map the entire address space. Each
-of the L3 tables contains 512 PTEs that each points to a 1GiB page,
-mapping in total 512 * 512 = 256 TiBd.
+Huh.  I'm not entirely sure what to make of the SDM's wording:
 
-So for 5-level we need 1 L5 + 512 L4 + 262144 L3 table (i.e. ~1GiB).
+  The linear address written must be aligned to 8 bytes and bits 2:0 must be 0
+  (hardware requires bits 1:0 to be 0).
 
->
-> Page table allocations are currently hardcoded to come from memslot0.  memslot0
-> is required to be in lower DRAM, and thus tops out at ~3gb for all intents and
-> purposes because we need to leave room for the xAPIC.
->
-> And I would strongly prefer not to plumb back the ability to specificy an alternative
-> memslot for page table allocations, because except for truly pathological tests that
-> functionality is unnecessary and pointless complexity.
->
-> > I don't think it's very hard - walk the mem regions in kvm_vm.regions
-> > should work for us?
->
-> Yeah.  Alternatively, The test can identity map all of memory <4gb and then also
-> map "guest_test_phys_mem - guest_num_pages".  I don't think there's any other memory
-> to deal with, is there?
-
-This isn't necessary for 4-level, but also wouldn't be too hard to
-implement. I can take a stab at implementing in v3 if we think 5-level
-selftests are coming soon.
+Looking at the rest of the CET stuff, I believe requiring 8-byte alignment is
+correct, and that the "hardware requires" blurb is trying to call out that the
+SSP stored in hardware will always be 4-byte aligned but not necessarily 8-byte
+aligned in order to play nice with 32-bit/compatibility mode.  But "base" addresses
+that come from software, e.g. via MSRs and whatnot, must always be 8-byte aligned.
