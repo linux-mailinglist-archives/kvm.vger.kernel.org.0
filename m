@@ -2,218 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7ADFC52BCAE
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:17:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2CB952BC3B
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:16:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236954AbiERMtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 08:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60794 "EHLO
+        id S237767AbiERNZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 09:25:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236739AbiERMtu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 08:49:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C23B818DAC2
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 05:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652878186;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ud+EoewnZynIABdLMtBZtAj7r2i0k69OeMeQkGeRK8k=;
-        b=FerM3AaQf4sOabJ6AbxkBUzVic7OrT3xI5qr0rc2RHclIwOMF+929wSHNzNcTwDSLKSWrj
-        iipYnDh9jPGoEhPJk31dKHSQZNXlIPOQNFI9WVvgrMCKF/UBtVIMXTUOGLsRfACNUqgzDl
-        ahK9HPAtBBQBo+mGnuik0/8/xqyXiH8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-449-y84T1USJP3O-JM7cwBbXYA-1; Wed, 18 May 2022 08:49:43 -0400
-X-MC-Unique: y84T1USJP3O-JM7cwBbXYA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C1C429DD9B4;
-        Wed, 18 May 2022 12:49:43 +0000 (UTC)
-Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C65C42026D6A;
-        Wed, 18 May 2022 12:49:40 +0000 (UTC)
-Message-ID: <57aa037a77ba8d8e182d8c77233c5954dd2fa2d9.camel@redhat.com>
-Subject: Re: [PATCH v3 14/34] KVM: x86: Introduce .post_hv_l2_tlb_flush()
- nested hook
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+        with ESMTP id S237722AbiERNZV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 09:25:21 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE35E1B5FAD;
+        Wed, 18 May 2022 06:25:18 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id z7-20020a17090abd8700b001df78c7c209so5616912pjr.1;
+        Wed, 18 May 2022 06:25:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Xg60UELkO1AELegT163+kFb9GluCuJgTwNP9GFmBOlE=;
+        b=Hu1Y9Jp6WbY/BIfab/L98ljDQF2FBYAUDeJRDKv11ts6TfRcuyRrPX7aPlXS6C9kjr
+         2LUxAskhD3SIAsRr5O4ISY4DnMqMZ5h51cyVE1L1tqddNvh4kEOk10CleELn1/ST5MEP
+         C+lFJHqI74sm+HMiz/kTUlxrkQ+cySLCN5F+VdtYIEOifr5Qmxro6ipYIM8vMQ+er1sJ
+         OrEFhPqY1j9Q/YLcNcsQTGgv68XSPH1My6CjFdH5K1ybHKA7kUf6r0aRWC/cBcUuWx48
+         CWbwhb5cmIkdm46xO8sHM2h+F4LvzzrsRH2QZNoTh3rM5O3hiwRZkO7xwEL6Xi2P70Bu
+         V/EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Xg60UELkO1AELegT163+kFb9GluCuJgTwNP9GFmBOlE=;
+        b=Cn/lBDnbKlfirOtdtjG1ZXV/+uutWvom4NuOomWpXroGNOHGxUrtmhnY08FESM8xHT
+         ZRlAKu16evQ71mYNAFrEh7VKCOEW9KlxcuMcBfyc1pShSZR3bjTGk6acp39QbraXDWRC
+         im7fgn+Rse/zfYl37kK16C0R5wAurUbIvnr5rQ+cEzylIQ6eD4a7PqOSX1smyjGI1wtZ
+         CPhB7Tqa01ovmvY+xCc8f0OWvO1unOLUI1tzGDINbupuaUnmDo0pCRqlL6iZsbjNGMUZ
+         4ZsYjgoLXzf39haM5fLWYM3TeGV1vQnE/00ilhcto8tEfF+g9Ckb/jdSsL8tA8XMoIot
+         +ulg==
+X-Gm-Message-State: AOAM5327SyVYwdx8MXHDAXVceClxcAMGuvBgPfwhgw61fYZLiGiCaU+F
+        z17WfA6raps27bvbYjBPTkk=
+X-Google-Smtp-Source: ABdhPJyaJZL3M0KoOZQCpG0CgO0wIreYrrvXS0f5a9/wQiAcrQBlTga4/N9oi+uHkKZaCxd8Nqt4qg==
+X-Received: by 2002:a17:90b:4f41:b0:1de:bd14:7721 with SMTP id pj1-20020a17090b4f4100b001debd147721mr30894092pjb.9.1652880318372;
+        Wed, 18 May 2022 06:25:18 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.117])
+        by smtp.gmail.com with ESMTPSA id s13-20020a17090302cd00b0015e8d4eb244sm1625549plk.142.2022.05.18.06.25.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 06:25:17 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 18 May 2022 15:49:39 +0300
-In-Reply-To: <871qwrui3o.fsf@redhat.com>
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
-         <20220414132013.1588929-15-vkuznets@redhat.com>
-         <deae695da02d7f22dcfa4635eec53ab61baf9026.camel@redhat.com>
-         <871qwrui3o.fsf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH RESEND v3 00/11] KVM: x86/pmu: More refactoring to get rid of PERF_TYPE_HARDWAR
+Date:   Wed, 18 May 2022 21:25:01 +0800
+Message-Id: <20220518132512.37864-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-05-18 at 14:43 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
-> > > Hyper-V supports injecting synthetic L2->L1 exit after performing
-> > > L2 TLB flush operation but the procedure is vendor specific.
-> > > Introduce .post_hv_l2_tlb_flush() nested hook for it.
-> > > 
-> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > ---
-> > >  arch/x86/include/asm/kvm_host.h |  1 +
-> > >  arch/x86/kvm/Makefile           |  3 ++-
-> > >  arch/x86/kvm/svm/hyperv.c       | 11 +++++++++++
-> > >  arch/x86/kvm/svm/hyperv.h       |  2 ++
-> > >  arch/x86/kvm/svm/nested.c       |  1 +
-> > >  arch/x86/kvm/vmx/evmcs.c        |  4 ++++
-> > >  arch/x86/kvm/vmx/evmcs.h        |  1 +
-> > >  arch/x86/kvm/vmx/nested.c       |  1 +
-> > >  8 files changed, 23 insertions(+), 1 deletion(-)
-> > >  create mode 100644 arch/x86/kvm/svm/hyperv.c
-> > > 
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 8b2a52bf26c0..ce62fde5f4ff 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1558,6 +1558,7 @@ struct kvm_x86_nested_ops {
-> > >  	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
-> > >  			    uint16_t *vmcs_version);
-> > >  	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
-> > > +	void (*post_hv_l2_tlb_flush)(struct kvm_vcpu *vcpu);
-> > >  };
-> > >  
-> > >  struct kvm_x86_init_ops {
-> > > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> > > index 30f244b64523..b6d53b045692 100644
-> > > --- a/arch/x86/kvm/Makefile
-> > > +++ b/arch/x86/kvm/Makefile
-> > > @@ -25,7 +25,8 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
-> > >  			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
-> > >  kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-> > >  
-> > > -kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
-> > > +kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
-> > > +			   svm/sev.o svm/hyperv.o
-> > >  
-> > >  ifdef CONFIG_HYPERV
-> > >  kvm-amd-y		+= svm/svm_onhyperv.o
-> > > diff --git a/arch/x86/kvm/svm/hyperv.c b/arch/x86/kvm/svm/hyperv.c
-> > > new file mode 100644
-> > > index 000000000000..c0749fc282fe
-> > > --- /dev/null
-> > > +++ b/arch/x86/kvm/svm/hyperv.c
-> > > @@ -0,0 +1,11 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/*
-> > > + * AMD SVM specific code for Hyper-V on KVM.
-> > > + *
-> > > + * Copyright 2022 Red Hat, Inc. and/or its affiliates.
-> > > + */
-> > > +#include "hyperv.h"
-> > > +
-> > > +void svm_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +}
-> > > diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
-> > > index 8cf702fed7e5..a2b0d7580b0d 100644
-> > > --- a/arch/x86/kvm/svm/hyperv.h
-> > > +++ b/arch/x86/kvm/svm/hyperv.h
-> > > @@ -48,4 +48,6 @@ static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
-> > >  	hv_vcpu->nested.vp_id = hve->hv_vp_id;
-> > >  }
-> > >  
-> > > +void svm_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu);
-> > > +
-> > >  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
-> > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > > index 2d1a76343404..de3f27301b5c 100644
-> > > --- a/arch/x86/kvm/svm/nested.c
-> > > +++ b/arch/x86/kvm/svm/nested.c
-> > > @@ -1665,4 +1665,5 @@ struct kvm_x86_nested_ops svm_nested_ops = {
-> > >  	.get_nested_state_pages = svm_get_nested_state_pages,
-> > >  	.get_state = svm_get_nested_state,
-> > >  	.set_state = svm_set_nested_state,
-> > > +	.post_hv_l2_tlb_flush = svm_post_hv_l2_tlb_flush,
-> > >  };
-> > > diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> > > index 87e3dc10edf4..e390e67496df 100644
-> > > --- a/arch/x86/kvm/vmx/evmcs.c
-> > > +++ b/arch/x86/kvm/vmx/evmcs.c
-> > > @@ -437,3 +437,7 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
-> > >  
-> > >  	return 0;
-> > >  }
-> > > +
-> > > +void vmx_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +}
-> > > diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-> > > index 8d70f9aea94b..b120b0ead4f3 100644
-> > > --- a/arch/x86/kvm/vmx/evmcs.h
-> > > +++ b/arch/x86/kvm/vmx/evmcs.h
-> > > @@ -244,5 +244,6 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
-> > >  			uint16_t *vmcs_version);
-> > >  void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata);
-> > >  int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
-> > > +void vmx_post_hv_l2_tlb_flush(struct kvm_vcpu *vcpu);
-> > >  
-> > >  #endif /* __KVM_X86_VMX_EVMCS_H */
-> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > > index ee88921c6156..cc6c944b5815 100644
-> > > --- a/arch/x86/kvm/vmx/nested.c
-> > > +++ b/arch/x86/kvm/vmx/nested.c
-> > > @@ -6850,4 +6850,5 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
-> > >  	.write_log_dirty = nested_vmx_write_pml_buffer,
-> > >  	.enable_evmcs = nested_enable_evmcs,
-> > >  	.get_evmcs_version = nested_get_evmcs_version,
-> > > +	.post_hv_l2_tlb_flush = vmx_post_hv_l2_tlb_flush,
-> > >  };
-> > 
-> > I think that the name of the function is misleading, since it is not called
-> > after each L2 HV tlb flush, but only after a flush which needs to inject
-> > that synthetic VM exit.
-> > 
-> > I think something like 'inject_synthetic_l2_hv_tlb_flush_vmexit' 
-> > (not a good name IMHO, but you get the idea) would be better.
-> > 
-> 
-> Naming is hard indeed,
+Hi,
 
-Indeed :-)
+This is a follow up to [0]. By keeping the same semantics of eventsel
+for gp and fixed counters, the reprogram code could be made more
+symmetrical, simpler and even faster [1], and based on that, it fixes the
+obsolescence amd_event_mapping issue [2].
 
-https://www.monkeyuser.com/2019/_/
+Most of the changes are code refactoring, which help to review key
+changes more easily. Patches are rebased on top of kvm/queue.
 
+One of the notable changes is that we ended up removing the
+reprogram_{gp, fixed}_counter() functions and replacing it with the
+merged reprogram_counter(), where KVM programs pmc->perf_event
+with only the PERF_TYPE_RAW type for any type of counter
+(suggested by Jim as well).  PeterZ confirmed the idea, "think so;
+the HARDWARE is just a convenience wrapper over RAW IIRC". 
 
-> 
-> hv_inject_synthetic_vmexit_post_tlb_flush()
+Practically, this change drops the guest pmu support on the hosts without
+X86_FEATURE_ARCH_PERFMON  (the oldest Pentium 4), where the
+PERF_TYPE_HARDWAR is intentionally introduced so that hosts can
+map the architectural guest PMU events to their own. (thanks to Paolo)
 
-Looks great!
+The 3rd patch removes the call trace in the commit message while we still
+think that kvm->arch.pmu_event_filter requires SRCU protection in terms
+of pmu_event_filter functionality, similar to "kvm->arch.msr_filter".
 
-Best regards,
-	Maxim Levitsky
+Please check more details in each commit and feel free to comment.
 
-> 
-> seems to be accurate.
-> 
+[0] https://lore.kernel.org/kvm/20211116122030.4698-1-likexu@tencent.com/
+[1] https://lore.kernel.org/kvm/ebfac3c7-fbc6-78a5-50c5-005ea11cc6ca@gmail.com/
+[2] https://lore.kernel.org/kvm/20220117085307.93030-1-likexu@tencent.com/
 
+Thanks,
+Like Xu
+
+---
+v3: https://lore.kernel.org/kvm/20220411093537.11558-1-likexu@tencent.com/
+v3 -> v3 RESEND Changelog:
+-  Rebase on the top kvm-queue tree;
+
+v2 -> v3 Changelog:
+- Use static_call stuff for .hw_event_is_unavail hook;
+- Drop unrelated 0012 patch since we have addressed the issue;
+- Drop passing HSW_IN_TX* bits for pmc_reprogram_counter();
+
+v1: https://lore.kernel.org/kvm/20220221115201.22208-1-likexu@tencent.com/
+v1 -> v2 Changelog:
+- Get all the vPMC tests I have on hand to pass;
+- Update obsolete AMD PMU comments; (Jim)
+- Fix my carelessness for [-Wconstant-logical-operand] in 0009; (0day)
+- Add "u64 new_config" to reuse perf_event for fixed CTRs; (0day)
+- Add patch 0012 to attract attention to review;
+
+Like Xu (11):
+  KVM: x86/pmu: Update comments for AMD gp counters
+  KVM: x86/pmu: Extract check_pmu_event_filter() from the same semantics
+  KVM: x86/pmu: Protect kvm->arch.pmu_event_filter with SRCU
+  KVM: x86/pmu: Pass only "struct kvm_pmc *pmc" to reprogram_counter()
+  KVM: x86/pmu: Drop "u64 eventsel" for reprogram_gp_counter()
+  KVM: x86/pmu: Drop "u8 ctrl, int idx" for reprogram_fixed_counter()
+  KVM: x86/pmu: Use only the uniform interface reprogram_counter()
+  KVM: x86/pmu: Use PERF_TYPE_RAW to merge reprogram_{gp,fixed}counter()
+  perf: x86/core: Add interface to query perfmon_event_map[] directly
+  KVM: x86/pmu: Replace pmc_perf_hw_id() with perf_get_hw_event_config()
+  KVM: x86/pmu: Drop amd_event_mapping[] in the KVM context
+
+ arch/x86/events/core.c                 |  11 ++
+ arch/x86/include/asm/kvm-x86-pmu-ops.h |   2 +-
+ arch/x86/include/asm/perf_event.h      |   6 +
+ arch/x86/kvm/pmu.c                     | 157 ++++++++++---------------
+ arch/x86/kvm/pmu.h                     |   8 +-
+ arch/x86/kvm/svm/pmu.c                 |  62 ++--------
+ arch/x86/kvm/vmx/pmu_intel.c           |  62 +++++-----
+ 7 files changed, 121 insertions(+), 187 deletions(-)
+
+-- 
+2.36.1
 
