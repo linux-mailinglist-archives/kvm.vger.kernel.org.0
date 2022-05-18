@@ -2,128 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBB6352B473
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 10:19:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 598F252B516
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 10:38:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232692AbiERINJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 04:13:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56058 "EHLO
+        id S233075AbiERI2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 04:28:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232680AbiERINH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 04:13:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5FB585909C
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 01:13:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652861585;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dfHp/HP/b9AoGe09y0NtWxK8atBPRWLQkNOyfDM+It8=;
-        b=SvmSC3oyW+h0G7bugaTFXlTWaIMxXhgskARGpFcjWS+wqVw5wMK9OaYuMvoGSocX89QhgA
-        Ee/wciGyo8RBx4u2p75WFc0+eAq3amHTi/A1h3DhWJ2VqvDF9549xl9zrLipWMIX/FwGmV
-        KxH6Bft27MZeRwpgMGhH5nXUdu5X+zs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-199-5TUgyHZuPemZchg7siImXQ-1; Wed, 18 May 2022 04:13:04 -0400
-X-MC-Unique: 5TUgyHZuPemZchg7siImXQ-1
-Received: by mail-wr1-f71.google.com with SMTP id bv12-20020a0560001f0c00b0020e359b3852so324612wrb.14
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 01:13:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dfHp/HP/b9AoGe09y0NtWxK8atBPRWLQkNOyfDM+It8=;
-        b=X1npS0PpgZrPIGfr3xRsG/bk6ULLfvf2fovcpr9HYXgQ0QURVWi/uu6mYROp7HvGDW
-         QiYICcjul81e3ZHQ8IURjkH+WLBpFCjXd2pXk/NXpj4X5j+kVbujjpSCbc01uZXBshXZ
-         jNVxhWweXM7GIw4WK+dbBJ/Bx3U4bs1gF4xJ66nbTiNYpcj0DpKN1lCk5O8movc7vuD/
-         vaoANDn8Kl7glin6cb1INw/PYrGv3C0VV72iwl68mdIhA/fNr688Ej5HkluzK6uEuuOe
-         WuCUULUvNJSBXpcjpCNfiNUbsY6T4RPd3nsOmy52SLXegzUdRcTFBMwHTzTeWhRN2ui0
-         S6Aw==
-X-Gm-Message-State: AOAM533MgRsu9M1/JuhplKrzuRJGq0e6ofn1P3OL5qhtUh9innVB04j7
-        gOfErgzsR2cTM+yD9LMLo71QEHf8MFsaeEGyVHD6uF31B+xA6SqcZbYv9lh+LNU7tD2mCnnxmQd
-        hbi2c3NZeCrYB
-X-Received: by 2002:a05:600c:3512:b0:394:7c3b:53c0 with SMTP id h18-20020a05600c351200b003947c3b53c0mr24455448wmq.170.1652861582939;
-        Wed, 18 May 2022 01:13:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwmNMudMu1d4TT8vFzZFh+w0PrvObISRbOyWdvBWos1oyuudQE5xGQFE4p1tyR3Ib1wLmx3uw==
-X-Received: by 2002:a05:600c:3512:b0:394:7c3b:53c0 with SMTP id h18-20020a05600c351200b003947c3b53c0mr24455422wmq.170.1652861582709;
-        Wed, 18 May 2022 01:13:02 -0700 (PDT)
-Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id e4-20020adf9bc4000000b0020d0c48d135sm1293889wrc.15.2022.05.18.01.13.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 01:13:02 -0700 (PDT)
-Message-ID: <1dda12f3-2552-54d4-0946-73c168ff7d26@redhat.com>
-Date:   Wed, 18 May 2022 10:13:01 +0200
+        with ESMTP id S232879AbiERI2f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 04:28:35 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8950C1157E3;
+        Wed, 18 May 2022 01:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652862512; x=1684398512;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5CA8FtuEdlmAndh2dvdGmeNEcE6jVfqnArBWtfSrmrA=;
+  b=T77Ti53zY/cDro6twKpVk6a3ZYDPZrftjEvM7kSkp7WtVhjr9y0vL96h
+   zyynd+J5uz0rMxptYFR+qu/u25bkhfiahlOVuYZ68KDm92qiadTI1Z6TH
+   bGw1Q1OJlL3BH8YCztZU7eSDtFZtWMKDEVsTvrccDEm2z63brOET92W4j
+   nhi6FZdQ2d1YFSoDcR1rvzGsyLzx1QkB/J4TW5U6R86DHlfAFiwtEIhD2
+   eOdQ0Wh3LnrARM0D8R8NwSObMMrJgNsxVgM8eSS8xlPOopBJbe5XWOvO3
+   s8IvVMYbodQ44zSjJB0JEDHx1S2vY57rhTfpB6pcz8/4vtFGtfvV6RrR3
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10350"; a="357962971"
+X-IronPort-AV: E=Sophos;i="5.91,234,1647327600"; 
+   d="scan'208";a="357962971"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 01:28:32 -0700
+X-IronPort-AV: E=Sophos;i="5.91,234,1647327600"; 
+   d="scan'208";a="523408190"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 01:28:25 -0700
+Date:   Wed, 18 May 2022 16:28:17 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        intel-gfx@lists.freedesktop.org,
+        Sean Christopherson <seanjc@google.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org
+Subject: Re: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the guest
+ and/or host changes apic id/base from the defaults.
+Message-ID: <20220518082811.GA8765@gao-cwp>
+References: <20220427200314.276673-1-mlevitsk@redhat.com>
+ <20220427200314.276673-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v5 4/9] s390x/pci: add routine to get host function handle
- from CLP info
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com,
-        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
-        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20220404181726.60291-1-mjrosato@linux.ibm.com>
- <20220404181726.60291-5-mjrosato@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220404181726.60291-5-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220427200314.276673-3-mlevitsk@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/04/2022 20.17, Matthew Rosato wrote:
-> In order to interface with the underlying host zPCI device, we need
-> to know it's function handle.  Add a routine to grab this from the
-> vfio CLP capabilities chain.
+On Wed, Apr 27, 2022 at 11:02:57PM +0300, Maxim Levitsky wrote:
+>Neither of these settings should be changed by the guest and it is
+>a burden to support it in the acceleration code, so just inhibit
+>it instead.
+>
+>Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
+>
+>Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>---
+> arch/x86/include/asm/kvm_host.h |  3 +++
+> arch/x86/kvm/lapic.c            | 25 ++++++++++++++++++++++---
+> arch/x86/kvm/lapic.h            |  8 ++++++++
+> 3 files changed, 33 insertions(+), 3 deletions(-)
+>
+>diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>index 63eae00625bda..636df87542555 100644
+>--- a/arch/x86/include/asm/kvm_host.h
+>+++ b/arch/x86/include/asm/kvm_host.h
+>@@ -1070,6 +1070,8 @@ enum kvm_apicv_inhibit {
+> 	APICV_INHIBIT_REASON_ABSENT,
+> 	/* AVIC is disabled because SEV doesn't support it */
+> 	APICV_INHIBIT_REASON_SEV,
+>+	/* APIC ID and/or APIC base was changed by the guest */
+>+	APICV_INHIBIT_REASON_RO_SETTINGS,
+
+You need to add it to check_apicv_inhibit_reasons as well.
+
+> };
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   hw/s390x/s390-pci-vfio.c         | 83 ++++++++++++++++++++++++++------
->   include/hw/s390x/s390-pci-vfio.h |  6 +++
->   2 files changed, 73 insertions(+), 16 deletions(-)
-[...]
-> diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
-> index ff708aef50..0c2e4b5175 100644
-> --- a/include/hw/s390x/s390-pci-vfio.h
-> +++ b/include/hw/s390x/s390-pci-vfio.h
-> @@ -20,6 +20,7 @@ bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
->   S390PCIDMACount *s390_pci_start_dma_count(S390pciState *s,
->                                             S390PCIBusDevice *pbdev);
->   void s390_pci_end_dma_count(S390pciState *s, S390PCIDMACount *cnt);
-> +bool s390_pci_get_host_fh(S390PCIBusDevice *pbdev, uint32_t *fh);
->   void s390_pci_get_clp_info(S390PCIBusDevice *pbdev);
->   #else
->   static inline bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
-> @@ -33,6 +34,11 @@ static inline S390PCIDMACount *s390_pci_start_dma_count(S390pciState *s,
->   }
->   static inline void s390_pci_end_dma_count(S390pciState *s,
->                                             S390PCIDMACount *cnt) { }
-> +static inline bool s390_pci_get_host_fh(S390PCIBusDevice *pbdev,
-> +                                        unsigned int *fh)
+> struct kvm_arch {
+>@@ -1258,6 +1260,7 @@ struct kvm_arch {
+> 	hpa_t	hv_root_tdp;
+> 	spinlock_t hv_root_tdp_lock;
+> #endif
+>+	bool apic_id_changed;
 
-This prototype does not match the one before the else - please replace 
-"unsigned int" with "uint32_t".
+What's the value of this boolean? No one reads it.
 
-  Thomas
+> };
+> 
+> struct kvm_vm_stat {
+>diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+>index 66b0eb0bda94e..8996675b3ef4c 100644
+>--- a/arch/x86/kvm/lapic.c
+>+++ b/arch/x86/kvm/lapic.c
+>@@ -2038,6 +2038,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
+> 	}
+> }
+> 
+>+static void kvm_lapic_check_initial_apic_id(struct kvm_lapic *apic)
+>+{
+>+	if (kvm_apic_has_initial_apic_id(apic))
+>+		return;
+>+
+>+	pr_warn_once("APIC ID change is unsupported by KVM");
 
-> +{
-> +    return false;
-> +}
->   static inline void s390_pci_get_clp_info(S390PCIBusDevice *pbdev) { }
->   #endif
->   
+It is misleading because changing xAPIC ID is supported by KVM; it just
+isn't compatible with APICv. Probably this pr_warn_once() should be
+removed.
 
+>+
+>+	kvm_set_apicv_inhibit(apic->vcpu->kvm,
+>+			APICV_INHIBIT_REASON_RO_SETTINGS);
+
+The indentation here looks incorrect to me.
+	kvm_set_apicv_inhibit(apic->vcpu->kvm,
+			      APICV_INHIBIT_REASON_RO_SETTINGS);
+
+>+
+>+	apic->vcpu->kvm->arch.apic_id_changed = true;
+>+}
+>+
+> static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> {
+> 	int ret = 0;
+>@@ -2046,9 +2059,11 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> 
+> 	switch (reg) {
+> 	case APIC_ID:		/* Local APIC ID */
+>-		if (!apic_x2apic_mode(apic))
+>+		if (!apic_x2apic_mode(apic)) {
+>+
+> 			kvm_apic_set_xapic_id(apic, val >> 24);
+>-		else
+>+			kvm_lapic_check_initial_apic_id(apic);
+>+		} else
+> 			ret = 1;
+> 		break;
+> 
+>@@ -2335,8 +2350,11 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+> 			     MSR_IA32_APICBASE_BASE;
+> 
+> 	if ((value & MSR_IA32_APICBASE_ENABLE) &&
+>-	     apic->base_address != APIC_DEFAULT_PHYS_BASE)
+>+	     apic->base_address != APIC_DEFAULT_PHYS_BASE) {
+>+		kvm_set_apicv_inhibit(apic->vcpu->kvm,
+>+				APICV_INHIBIT_REASON_RO_SETTINGS);
+> 		pr_warn_once("APIC base relocation is unsupported by KVM");
+>+	}
+> }
+> 
+> void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
+>@@ -2649,6 +2667,7 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+> 		}
+> 	}
+> 
+>+	kvm_lapic_check_initial_apic_id(vcpu->arch.apic);
+> 	return 0;
+> }
+> 
+>diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+>index 4e4f8a22754f9..b9c406d383080 100644
+>--- a/arch/x86/kvm/lapic.h
+>+++ b/arch/x86/kvm/lapic.h
+>@@ -252,4 +252,12 @@ static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
+> 	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+> }
+> 
+>+static inline bool kvm_apic_has_initial_apic_id(struct kvm_lapic *apic)
+>+{
+>+	if (apic_x2apic_mode(apic))
+>+		return true;
+
+I suggest warning of x2apic mode:
+	if (WARN_ON_ONCE(apic_x2apic_mode(apic)))
+
+Because it is weird that callers care about initial apic id when apic is
+in x2apic mode.
