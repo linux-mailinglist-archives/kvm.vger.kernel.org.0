@@ -2,211 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 598F252B516
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 10:38:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB05152B592
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 11:01:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233075AbiERI2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 04:28:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
+        id S233747AbiERJBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 05:01:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232879AbiERI2f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 04:28:35 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8950C1157E3;
-        Wed, 18 May 2022 01:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652862512; x=1684398512;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5CA8FtuEdlmAndh2dvdGmeNEcE6jVfqnArBWtfSrmrA=;
-  b=T77Ti53zY/cDro6twKpVk6a3ZYDPZrftjEvM7kSkp7WtVhjr9y0vL96h
-   zyynd+J5uz0rMxptYFR+qu/u25bkhfiahlOVuYZ68KDm92qiadTI1Z6TH
-   bGw1Q1OJlL3BH8YCztZU7eSDtFZtWMKDEVsTvrccDEm2z63brOET92W4j
-   nhi6FZdQ2d1YFSoDcR1rvzGsyLzx1QkB/J4TW5U6R86DHlfAFiwtEIhD2
-   eOdQ0Wh3LnrARM0D8R8NwSObMMrJgNsxVgM8eSS8xlPOopBJbe5XWOvO3
-   s8IvVMYbodQ44zSjJB0JEDHx1S2vY57rhTfpB6pcz8/4vtFGtfvV6RrR3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10350"; a="357962971"
-X-IronPort-AV: E=Sophos;i="5.91,234,1647327600"; 
-   d="scan'208";a="357962971"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 01:28:32 -0700
-X-IronPort-AV: E=Sophos;i="5.91,234,1647327600"; 
-   d="scan'208";a="523408190"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 01:28:25 -0700
-Date:   Wed, 18 May 2022 16:28:17 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org,
-        Sean Christopherson <seanjc@google.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Subject: Re: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the guest
- and/or host changes apic id/base from the defaults.
-Message-ID: <20220518082811.GA8765@gao-cwp>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
- <20220427200314.276673-3-mlevitsk@redhat.com>
+        with ESMTP id S233724AbiERJAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 05:00:54 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 987B8625B
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 02:00:51 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 31EA11042;
+        Wed, 18 May 2022 02:00:51 -0700 (PDT)
+Received: from [10.57.35.187] (unknown [10.57.35.187])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E2EC93F66F;
+        Wed, 18 May 2022 02:00:49 -0700 (PDT)
+Message-ID: <2813ff66-0bb2-d7df-646f-833fc813e721@arm.com>
+Date:   Wed, 18 May 2022 10:00:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220427200314.276673-3-mlevitsk@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v2 00/23] EFI and ACPI support for arm64
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
+        jade.alglave@arm.com
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <Yn5mkl9iW/GfkU4G@monolith.localdoman>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <Yn5mkl9iW/GfkU4G@monolith.localdoman>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-9.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 11:02:57PM +0300, Maxim Levitsky wrote:
->Neither of these settings should be changed by the guest and it is
->a burden to support it in the acceleration code, so just inhibit
->it instead.
->
->Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
->
->Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->---
-> arch/x86/include/asm/kvm_host.h |  3 +++
-> arch/x86/kvm/lapic.c            | 25 ++++++++++++++++++++++---
-> arch/x86/kvm/lapic.h            |  8 ++++++++
-> 3 files changed, 33 insertions(+), 3 deletions(-)
->
->diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->index 63eae00625bda..636df87542555 100644
->--- a/arch/x86/include/asm/kvm_host.h
->+++ b/arch/x86/include/asm/kvm_host.h
->@@ -1070,6 +1070,8 @@ enum kvm_apicv_inhibit {
-> 	APICV_INHIBIT_REASON_ABSENT,
-> 	/* AVIC is disabled because SEV doesn't support it */
-> 	APICV_INHIBIT_REASON_SEV,
->+	/* APIC ID and/or APIC base was changed by the guest */
->+	APICV_INHIBIT_REASON_RO_SETTINGS,
+Hi Alex,
 
-You need to add it to check_apicv_inhibit_reasons as well.
+On 13/05/2022 15:09, Alexandru Elisei wrote:
+> Hi,
+> 
+> On Fri, May 06, 2022 at 09:55:42PM +0100, Nikos Nikoleris wrote:
+>> Hello,
+>>
+>> This patch series adds initial support for building arm64 tests as EFI
+>> tests and running them under QEMU. Much like x86_64 we import external
+> 
+> I would like to see kvm-unit-tests run as an EFI app on real hardware.
+> QEMU's implementation of the architecture might be different than real
+> hardware, where considerations like power consumption, performance or die
+> area dictate how a particular feature is implementated. For example, I
+> don't know how out-of-order TCG is, and bugs like missing barriers are more
+> easily detected on highly out-of-order implementations.
+> 
+> On the other hand, I'm not opposed to this series if the purpose is just to
+> add the skeleton code needed to boot under EFI and hardware support comes
+> later.
 
-> };
-> 
-> struct kvm_arch {
->@@ -1258,6 +1260,7 @@ struct kvm_arch {
-> 	hpa_t	hv_root_tdp;
-> 	spinlock_t hv_root_tdp_lock;
-> #endif
->+	bool apic_id_changed;
+I fully agree with you. This series is just the first step in getting 
+EFI apps to run on real hardware. Hopefully, it's in the right direction 
+and helps further development and testing for some of the functionality 
+that we will need anyway.
 
-What's the value of this boolean? No one reads it.
+If I understand correctly, we can run EFI tests with KVM too, at least 
+for as long as we're fine with starting from EL1 so we should be exposed 
+to some of the timing issues already.
 
-> };
 > 
-> struct kvm_vm_stat {
->diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->index 66b0eb0bda94e..8996675b3ef4c 100644
->--- a/arch/x86/kvm/lapic.c
->+++ b/arch/x86/kvm/lapic.c
->@@ -2038,6 +2038,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
-> 	}
-> }
+>> dependencies from gnu-efi and adopt them to work with types and other
+>> assumptions from kvm-unit-tests. In addition, this series adds support
+>> for discovering parts of the machine using ACPI.
+>>
+>> The first set of patches moves the existing ACPI code to the common
+>> lib path. Then, it extends definitions and functions to allow for more
+>> robust discovery of ACPI tables. In arm64, we add support for setting
+>> up the PSCI conduit, discovering the UART, timers and cpus via
+>> ACPI. The code retains existing behavior and gives priority to
+>> discovery through DT when one has been provided.
+>>
+>> In the second set of patches, we add support for getting the command
+>> line from the EFI shell. This is a requirement for many of the
+>> existing arm64 tests.
+>>
+>> In the third set of patches, we import code from gnu-efi, make minor
+>> changes and add an alternative setup sequence from arm64 systems that
+>> boot through EFI. Finally, we add support in the build system and a
+>> run script which is used to run an EFI app.
+>>
+>> After this set of patches one can build arm64 EFI tests:
+>>
+>> $> ./configure --enable-efi
+>> $> make
+>>
+>> And use the run script to run an EFI tests:
+>>
+>> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+>>
+>> Or all tests:
+>>
+>> $> ./run_tests.sh
+>>
+>> There are a few items that this series does not address but they would
+>> be useful to have:
+>>
+>> * Support for booting the system from EL2. Currently, we assume that a
+>> tests starts running at EL1. This the case when we run with EFI, it's
+>> not always the case in hardware.
 > 
->+static void kvm_lapic_check_initial_apic_id(struct kvm_lapic *apic)
->+{
->+	if (kvm_apic_has_initial_apic_id(apic))
->+		return;
->+
->+	pr_warn_once("APIC ID change is unsupported by KVM");
+> I would add to that the fact that the vmalloc area is between 3 and 4 GB.
+> What happens if real hardware has main memory there? For this point at
+> least, for testing you can use my kvmtool series that allows the user to
+> set the memory base address [1].
 
-It is misleading because changing xAPIC ID is supported by KVM; it just
-isn't compatible with APICv. Probably this pr_warn_once() should be
-removed.
+I am not sure, I fully understand the problem with this. In 13/26, we 
+use the efi memory map to avoid making many assumption about the 
+physical memory map, but I will have a look at the functionality we 
+implement in vmalloc.c to understand this. On a high level, I agree with 
+you. The goal should to have tests discover as much about the underlying 
+system as possible.
 
->+
->+	kvm_set_apicv_inhibit(apic->vcpu->kvm,
->+			APICV_INHIBIT_REASON_RO_SETTINGS);
+FWIW, this TODO list is missing many points that I've already discovered 
+and I am sure there will be a few more on top of that.
 
-The indentation here looks incorrect to me.
-	kvm_set_apicv_inhibit(apic->vcpu->kvm,
-			      APICV_INHIBIT_REASON_RO_SETTINGS);
+> 
+> I think there might be other assumptions that kvm-unit-tests makes which
+> are not true when running on baremetal. That's why I would prefer that EFI
+> support is also tested on baremetal.
+> 
+> [1] https://lore.kernel.org/all/20220428155602.29445-1-alexandru.elisei@arm.com/
+> 
 
->+
->+	apic->vcpu->kvm->arch.apic_id_changed = true;
->+}
->+
-> static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> {
-> 	int ret = 0;
->@@ -2046,9 +2059,11 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> 
-> 	switch (reg) {
-> 	case APIC_ID:		/* Local APIC ID */
->-		if (!apic_x2apic_mode(apic))
->+		if (!apic_x2apic_mode(apic)) {
->+
-> 			kvm_apic_set_xapic_id(apic, val >> 24);
->-		else
->+			kvm_lapic_check_initial_apic_id(apic);
->+		} else
-> 			ret = 1;
-> 		break;
-> 
->@@ -2335,8 +2350,11 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
-> 			     MSR_IA32_APICBASE_BASE;
-> 
-> 	if ((value & MSR_IA32_APICBASE_ENABLE) &&
->-	     apic->base_address != APIC_DEFAULT_PHYS_BASE)
->+	     apic->base_address != APIC_DEFAULT_PHYS_BASE) {
->+		kvm_set_apicv_inhibit(apic->vcpu->kvm,
->+				APICV_INHIBIT_REASON_RO_SETTINGS);
-> 		pr_warn_once("APIC base relocation is unsupported by KVM");
->+	}
-> }
-> 
-> void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
->@@ -2649,6 +2667,7 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
-> 		}
-> 	}
-> 
->+	kvm_lapic_check_initial_apic_id(vcpu->arch.apic);
-> 	return 0;
-> }
-> 
->diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
->index 4e4f8a22754f9..b9c406d383080 100644
->--- a/arch/x86/kvm/lapic.h
->+++ b/arch/x86/kvm/lapic.h
->@@ -252,4 +252,12 @@ static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
-> 	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
-> }
-> 
->+static inline bool kvm_apic_has_initial_apic_id(struct kvm_lapic *apic)
->+{
->+	if (apic_x2apic_mode(apic))
->+		return true;
+I agree, hopefully testing with KVM and TCG is helpful but I wouldn't 
+expect it to be sufficient.
 
-I suggest warning of x2apic mode:
-	if (WARN_ON_ONCE(apic_x2apic_mode(apic)))
+Thanks,
 
-Because it is weird that callers care about initial apic id when apic is
-in x2apic mode.
+Nikos
+
+> Thanks,
+> Alex
+> 
+>>
+>> * Support for reading environment variables and populating __envp.
+>>
+>> * Support for discovering the chr-testdev through ACPI.
+>>
+>> PS: Apologies for the mess with v1. Due to a mistake in my git
+>> send-email configuration some patches didn't make it to the list and
+>> the right recipients.
+>>
+>> Thanks,
+>>
+>> Nikos
+>>
+>> Andrew Jones (3):
+>>    arm/arm64: mmu_disable: Clean and invalidate before disabling
+>>    arm/arm64: Rename etext to _etext
+>>    arm64: Add a new type of memory type flag MR_F_RESERVED
+>>
+>> Nikos Nikoleris (20):
+>>    lib: Move acpi header and implementation to lib
+>>    lib: Ensure all struct definition for ACPI tables are packed
+>>    lib: Add support for the XSDT ACPI table
+>>    lib: Extend the definition of the ACPI table FADT
+>>    arm/arm64: Add support for setting up the PSCI conduit through ACPI
+>>    arm/arm64: Add support for discovering the UART through ACPI
+>>    arm/arm64: Add support for timer initialization through ACPI
+>>    arm/arm64: Add support for cpu initialization through ACPI
+>>    lib/printf: Support for precision modifier in printing strings
+>>    lib/printf: Add support for printing wide strings
+>>    lib/efi: Add support for getting the cmdline
+>>    lib: Avoid ms_abi for calls related to EFI on arm64
+>>    arm/arm64: Add a setup sequence for systems that boot through EFI
+>>    arm64: Copy code from GNU-EFI
+>>    arm64: Change GNU-EFI imported file to use defined types
+>>    arm64: Use code from the gnu-efi when booting with EFI
+>>    lib: Avoid external dependency in libelf
+>>    x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
+>>    arm64: Add support for efi in Makefile
+>>    arm64: Add an efi/run script
+>>
+>>   scripts/runtime.bash        |  14 +-
+>>   arm/efi/run                 |  61 +++++++++
+>>   arm/run                     |   8 +-
+>>   configure                   |  15 ++-
+>>   Makefile                    |   4 -
+>>   arm/Makefile.arm            |   6 +
+>>   arm/Makefile.arm64          |  18 ++-
+>>   arm/Makefile.common         |  48 +++++--
+>>   x86/Makefile.common         |   2 +-
+>>   x86/Makefile.x86_64         |   4 +
+>>   lib/linux/efi.h             |  44 ++++++
+>>   lib/arm/asm/setup.h         |   3 +
+>>   lib/arm/asm/timer.h         |   2 +
+>>   lib/x86/asm/setup.h         |   2 +-
+>>   lib/acpi.h                  | 260 ++++++++++++++++++++++++++++++++++++
+>>   lib/stdlib.h                |   1 +
+>>   lib/x86/acpi.h              | 112 ----------------
+>>   lib/acpi.c                  | 124 +++++++++++++++++
+>>   lib/arm/io.c                |  21 ++-
+>>   lib/arm/mmu.c               |   4 +
+>>   lib/arm/psci.c              |  25 +++-
+>>   lib/arm/setup.c             | 247 +++++++++++++++++++++++++++-------
+>>   lib/arm/timer.c             |  73 ++++++++++
+>>   lib/devicetree.c            |   2 +-
+>>   lib/efi.c                   | 123 +++++++++++++++++
+>>   lib/printf.c                | 183 +++++++++++++++++++++++--
+>>   lib/string.c                |   2 +-
+>>   lib/x86/acpi.c              |  82 ------------
+>>   arm/efi/elf_aarch64_efi.lds |  63 +++++++++
+>>   arm/flat.lds                |   2 +-
+>>   arm/cstart.S                |  29 +++-
+>>   arm/cstart64.S              |  28 +++-
+>>   arm/efi/crt0-efi-aarch64.S  | 143 ++++++++++++++++++++
+>>   arm/dummy.c                 |   4 +
+>>   arm/efi/reloc_aarch64.c     |  93 +++++++++++++
+>>   x86/s3.c                    |  20 +--
+>>   x86/vmexit.c                |   4 +-
+>>   37 files changed, 1556 insertions(+), 320 deletions(-)
+>>   create mode 100755 arm/efi/run
+>>   create mode 100644 lib/acpi.h
+>>   delete mode 100644 lib/x86/acpi.h
+>>   create mode 100644 lib/acpi.c
+>>   create mode 100644 lib/arm/timer.c
+>>   delete mode 100644 lib/x86/acpi.c
+>>   create mode 100644 arm/efi/elf_aarch64_efi.lds
+>>   create mode 100644 arm/efi/crt0-efi-aarch64.S
+>>   create mode 100644 arm/dummy.c
+>>   create mode 100644 arm/efi/reloc_aarch64.c
+>>
+>> -- 
+>> 2.25.1
+>>
