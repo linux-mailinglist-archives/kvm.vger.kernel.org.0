@@ -2,214 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 347F352B648
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 11:29:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2D0D52B6C3
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 12:12:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233975AbiERJTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 05:19:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48522 "EHLO
+        id S234531AbiERJkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 05:40:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233660AbiERJTx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 05:19:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AE2FE1498E8
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 02:19:52 -0700 (PDT)
+        with ESMTP id S234623AbiERJkf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 05:40:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A1FF212B014
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 02:40:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652865591;
+        s=mimecast20190719; t=1652866803;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FfQDoCx9YIWbfG5ICgqi0/8r2euHWDbQ6lJ6poxNOJI=;
-        b=TIskYCl/k8CIPtrSl11YTCmB6M6zgab4O8EfpgCW12EPOkh+aL34meHWUwmkPrtMdZQ5yC
-        CN5K88kw+XtNXL6ZuuQfQKWM24liGdUL/7KaVlsbpnV09pKqiqwB6sZhCyRfOfYwFcWQBA
-        8YPm5qF1R9QmY8dw2lJimLkbxAxXPBM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=c34pXnvrLBTdu53YSF6eBsxL++Hmtq6hDZGLgHJNwTE=;
+        b=hG62/kZF4BOGNTsT1C0dF+pXD0P8b6ZpTLcV3++BtqvlqNvfR3ztUNiiX2X4HzJkwa9yyo
+        XgIupBc1FnbjecqDrWk1JmSzH1zXBuHuyG5BqkSqXlgrpCZk2qvt/ouLEJiOlZz/gPODWp
+        /oRESvyRRHBGpt3jEVAja41ocvyWQEI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-623-RH9VTxYoPV2akexXAA5CCw-1; Wed, 18 May 2022 05:19:50 -0400
-X-MC-Unique: RH9VTxYoPV2akexXAA5CCw-1
-Received: by mail-wm1-f72.google.com with SMTP id bi5-20020a05600c3d8500b0039489e1d18dso2613424wmb.5
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 02:19:50 -0700 (PDT)
+ us-mta-614-K4KfYwaFOvWrlnXJtVMhUw-1; Wed, 18 May 2022 05:40:02 -0400
+X-MC-Unique: K4KfYwaFOvWrlnXJtVMhUw-1
+Received: by mail-wr1-f70.google.com with SMTP id p10-20020adfaa0a000000b0020c4829af5fso411609wrd.16
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 02:40:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=FfQDoCx9YIWbfG5ICgqi0/8r2euHWDbQ6lJ6poxNOJI=;
-        b=244o94fbX9glcaNct6eYwPVM7nOI3rYadtusgXHyJPfVJhbOwSBQG15tvNYlNuELdC
-         6NjCKz58pLsVN81IHe4DSglKmHPCFQod3CDesabrEGx/b4jOpTt841Rm/+JYgKbK6dIf
-         oHHShudAxxjRztrLO+58+EethHCfQt42U/hDNAU0wSj0TzADfLGBDXjeBmgc5WvGHr+g
-         HPSOaS4E/T+K1iU4nCc8yYAqqx65lb6QcWHNv33dX4el3wiCC+0a6DwZLd1KuNLCcMqR
-         a2YRQEIuA1n+FDJxY3+qngenRTZqHtUDkxQ+EnNoQP9Q1Rws1uspOZmajCsfZxeJHsTH
-         0RgQ==
-X-Gm-Message-State: AOAM530VBePNlBDmLrLTZXe22XxDKFNpvW5xaByjBD57/lXE56YZY2UN
-        vd/FNvPyN0v/v9XWbJnCs5To+OmAAw8e929ORcqHbqvrP+ONnn+8HdydNQCUk5Tagnf9P6ezIX8
-        Hy7qMozzNiNIW
-X-Received: by 2002:a5d:620c:0:b0:20c:f50a:dafa with SMTP id y12-20020a5d620c000000b0020cf50adafamr19134852wru.460.1652865589422;
-        Wed, 18 May 2022 02:19:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzHrtbhj492w0kHpkAlu6o5m/V/peik9KAB4tIG5515RWJkzoHRSpTFHl1FPFzCrDotK9xN7A==
-X-Received: by 2002:a5d:620c:0:b0:20c:f50a:dafa with SMTP id y12-20020a5d620c000000b0020cf50adafamr19134831wru.460.1652865589144;
-        Wed, 18 May 2022 02:19:49 -0700 (PDT)
-Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id p14-20020a05600c1d8e00b0039456fb80b3sm3774686wms.43.2022.05.18.02.19.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 02:19:48 -0700 (PDT)
-Message-ID: <a44b1bd2-db54-6c8a-d80f-e2cc645207b2@redhat.com>
-Date:   Wed, 18 May 2022 11:19:47 +0200
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=c34pXnvrLBTdu53YSF6eBsxL++Hmtq6hDZGLgHJNwTE=;
+        b=5iHKIIXRA2ubxOPvLXDbRSRJ282Zim40sKA3OnlVm0FzdIBk4Ro4jc0C19LVCamRK6
+         CQM+FAdZsGhMlD58ytGDbqRRdV/uUwbnLEhrrtSWeyFXq4rLAL+MBkRdisJrWWMZbVva
+         l6jIYGcbk80y+VhAPF0S/e8vLS5M5RqopzOldVy5y2+6QDDSDEN/3tbdkM5sHkmS75Gd
+         TRFfskvcmsM8k9aFRI6+cfLP0qCFM6OfQH2lJ8bSqJ5BE1gDYhx+W3w6MsViMZ/dqOCO
+         mj66+pYyqw5KU37q3ypIGDxGQILHGfdGqCyCPagDGeBdwsgw+UgY1/kKwyAQYDqO4N99
+         zYmA==
+X-Gm-Message-State: AOAM531wYelfSgW69QmhG7dMiK7Ks9rE7RPNXHhOMr3vYuBYHlZMi234
+        4/1N+TVIOB39CXmW9pXDQTsmY7cm8Rtdofrmal5V7Hq278jPnjFN67tuCdHRE1mzCn7HyGAB9At
+        YPoi+G9pC6zW1
+X-Received: by 2002:a5d:64a6:0:b0:20c:64ef:c9cc with SMTP id m6-20020a5d64a6000000b0020c64efc9ccmr23442642wrp.190.1652866800905;
+        Wed, 18 May 2022 02:40:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwiEqoSrZOrLmPBvvdAYGRFeiSuRih5wH0v7Lk5FK0WcUjZB2gyXHtFOvFf599ep2NMC2DTDQ==
+X-Received: by 2002:a5d:64a6:0:b0:20c:64ef:c9cc with SMTP id m6-20020a5d64a6000000b0020c64efc9ccmr23442620wrp.190.1652866800658;
+        Wed, 18 May 2022 02:40:00 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h8-20020adf9cc8000000b0020c5253d8dbsm1475137wre.39.2022.05.18.02.39.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 02:39:59 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 04/34] KVM: x86: hyper-v: Handle
+ HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently
+In-Reply-To: <165aea185dfef1eba9ba0f4fd1c3a95361c41396.camel@redhat.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+ <20220414132013.1588929-5-vkuznets@redhat.com>
+ <165aea185dfef1eba9ba0f4fd1c3a95361c41396.camel@redhat.com>
+Date:   Wed, 18 May 2022 11:39:59 +0200
+Message-ID: <877d6juqkw.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v7 20/22] KVM: s390: add KVM_S390_ZPCI_OP to manage guest
- zPCI devices
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, pasic@linux.ibm.com,
-        pbonzini@redhat.com, corbet@lwn.net, jgg@nvidia.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220513191509.272897-1-mjrosato@linux.ibm.com>
- <20220513191509.272897-21-mjrosato@linux.ibm.com>
- <7b13aca2-fb3e-3b84-8d3d-e94966fac5f2@redhat.com>
- <0c6a4f7b-f43a-8f4c-49bb-db10ca010f1f@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <0c6a4f7b-f43a-8f4c-49bb-db10ca010f1f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/05/2022 17.35, Matthew Rosato wrote:
-> On 5/16/22 5:52 AM, Thomas Huth wrote:
->> On 13/05/2022 21.15, Matthew Rosato wrote:
->>> The KVM_S390_ZPCI_OP ioctl provides a mechanism for managing
->>> hardware-assisted virtualization features for s390X zPCI passthrough.
->>
->> s/s390X/s390x/
->>
->>> Add the first 2 operations, which can be used to enable/disable
->>> the specified device for Adapter Event Notification interpretation.
->>>
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>> ---
->>>   Documentation/virt/kvm/api.rst | 45 +++++++++++++++++++
->>>   arch/s390/kvm/kvm-s390.c       | 23 ++++++++++
->>>   arch/s390/kvm/pci.c            | 81 ++++++++++++++++++++++++++++++++++
->>>   arch/s390/kvm/pci.h            |  2 +
->>>   include/uapi/linux/kvm.h       | 31 +++++++++++++
->>>   5 files changed, 182 insertions(+)
->>>
->>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>> index 4a900cdbc62e..a7cd5ebce031 100644
->>> --- a/Documentation/virt/kvm/api.rst
->>> +++ b/Documentation/virt/kvm/api.rst
->>> @@ -5645,6 +5645,51 @@ enabled with ``arch_prctl()``, but this may change 
->>> in the future.
->>>   The offsets of the state save areas in struct kvm_xsave follow the 
->>> contents
->>>   of CPUID leaf 0xD on the host.
->>> +4.135 KVM_S390_ZPCI_OP
->>> +--------------------
->>> +
->>> +:Capability: KVM_CAP_S390_ZPCI_OP
->>> +:Architectures: s390
->>> +:Type: vcpu ioctl
->>
->> vcpu? ... you're wiring it up in  kvm_arch_vm_ioctl() later, so I assume 
->> it's rather a VM ioctl?
-> 
-> Yup, VM ioctl, bad copy/paste job...
-> 
->>
->>> +:Parameters: struct kvm_s390_zpci_op (in)
->>> +:Returns: 0 on success, <0 on error
->>> +
->>> +Used to manage hardware-assisted virtualization features for zPCI devices.
->>> +
->>> +Parameters are specified via the following structure::
->>> +
->>> +  struct kvm_s390_zpci_op {
->>> +    /* in */
->>
->> If all is "in", why is there a copy_to_user() in the code later?
->>
-> 
-> Oh no, this is a leftover from a prior version...  Good catch.  There should 
-> no longer be a copy_to_user.
-> 
->>> +    __u32 fh;        /* target device */
->>> +    __u8  op;        /* operation to perform */
->>> +    __u8  pad[3];
->>> +    union {
->>> +        /* for KVM_S390_ZPCIOP_REG_AEN */
->>> +        struct {
->>> +            __u64 ibv;    /* Guest addr of interrupt bit vector */
->>> +            __u64 sb;    /* Guest addr of summary bit */
->>
->> If this is really a vcpu ioctl, what kind of addresses are you talking 
->> about here? virtual addresses? real addresses? absolute addresses?
-> 
-> It's a VM ioctl.  These are guest kernel physical addresses that are later 
-> pinned in arch/s390/kvm/pci.c:kvm_s390_pci_aif_enable() as part of handling 
-> the ioctl.
-> 
->>
->>> +            __u32 flags;
->>> +            __u32 noi;    /* Number of interrupts */
->>> +            __u8 isc;    /* Guest interrupt subclass */
->>> +            __u8 sbo;    /* Offset of guest summary bit vector */
->>> +            __u16 pad;
->>> +        } reg_aen;
->>> +        __u64 reserved[8];
->>> +    } u;
->>> +  };
->>> +
->>> +The type of operation is specified in the "op" field.
->>> +KVM_S390_ZPCIOP_REG_AEN is used to register the VM for adapter event
->>> +notification interpretation, which will allow firmware delivery of adapter
->>> +events directly to the vm, with KVM providing a backup delivery mechanism;
->>> +KVM_S390_ZPCIOP_DEREG_AEN is used to subsequently disable interpretation of
->>> +adapter event notifications.
->>> +
->>> +The target zPCI function must also be specified via the "fh" field. For the
->>> +KVM_S390_ZPCIOP_REG_AEN operation, additional information to establish 
->>> firmware
->>> +delivery must be provided via the "reg_aen" struct.
->>> +
->>> +The "reserved" field is meant for future extensions.
->>
->> Maybe also mention the "pad" fields? And add should these also be 
->> initialized to 0 by the calling userspace program?
-> 
-> Sure, I can mention them.  And yes, I agree that userspace should initialize 
-> them to 0, I'll update the QEMU series accordingly.
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-I just spotted the corresponding patch in the QEMU series, and I think it 
-should already be fine there, since you're using "= { ... }" while declaring 
-the variables:
+> On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
+>> Currently, HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls are handled
+>> the exact same way as HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE{,EX}: by
+>> flushing the whole VPID and this is sub-optimal. Switch to handling
+>> these requests with 'flush_tlb_gva()' hooks instead. Use the newly
+>> introduced TLB flush ring to queue the requests.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/hyperv.c | 132 ++++++++++++++++++++++++++++++++++++------
+>>  1 file changed, 115 insertions(+), 17 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> index d66c27fd1e8a..759e1a16e5c3 100644
+>> --- a/arch/x86/kvm/hyperv.c
+>> +++ b/arch/x86/kvm/hyperv.c
+>> @@ -1805,6 +1805,13 @@ static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
+>>  				  sparse_banks, consumed_xmm_halves, offset);
+>>  }
+>>  
+>> +static int kvm_hv_get_tlb_flush_entries(struct kvm *kvm, struct kvm_hv_hcall *hc, u64 entries[],
+>> +				       int consumed_xmm_halves, gpa_t offset)
+>> +{
+>> +	return kvm_hv_get_hc_data(kvm, hc, hc->rep_cnt, hc->rep_cnt,
+>> +				  entries, consumed_xmm_halves, offset);
+>> +}
+>> +
+>>  static inline int hv_tlb_flush_ring_free(struct kvm_vcpu_hv *hv_vcpu,
+>>  					 int read_idx, int write_idx)
+>>  {
+>> @@ -1814,12 +1821,13 @@ static inline int hv_tlb_flush_ring_free(struct kvm_vcpu_hv *hv_vcpu,
+>>  	return read_idx - write_idx - 1;
+>>  }
+>>  
+>> -static void hv_tlb_flush_ring_enqueue(struct kvm_vcpu *vcpu)
+>> +static void hv_tlb_flush_ring_enqueue(struct kvm_vcpu *vcpu, u64 *entries, int count)
+>>  {
+>>  	struct kvm_vcpu_hv_tlb_flush_ring *tlb_flush_ring;
+>>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>>  	int ring_free, write_idx, read_idx;
+>>  	unsigned long flags;
+>> +	int i;
+>>  
+>>  	if (!hv_vcpu)
+>>  		return;
+>> @@ -1845,14 +1853,34 @@ static void hv_tlb_flush_ring_enqueue(struct kvm_vcpu *vcpu)
+>>  	if (!ring_free)
+>>  		goto out_unlock;
+>>  
+>> -	tlb_flush_ring->entries[write_idx].addr = 0;
+>> -	tlb_flush_ring->entries[write_idx].flush_all = 1;
+>>  	/*
+>> -	 * Advance write index only after filling in the entry to
+>> -	 * synchronize with lockless reader.
+>> +	 * All entries should fit on the ring leaving one free for 'flush all'
+>> +	 * entry in case another request comes in. In case there's not enough
+>> +	 * space, just put 'flush all' entry there.
+>> +	 */
+>> +	if (!count || count >= ring_free - 1 || !entries) {
+>> +		tlb_flush_ring->entries[write_idx].addr = 0;
+>> +		tlb_flush_ring->entries[write_idx].flush_all = 1;
+>> +		/*
+>> +		 * Advance write index only after filling in the entry to
+>> +		 * synchronize with lockless reader.
+>> +		 */
+>> +		smp_wmb();
+>> +		tlb_flush_ring->write_idx = (write_idx + 1) % KVM_HV_TLB_FLUSH_RING_SIZE;
+>> +		goto out_unlock;
+>> +	}
+>> +
+>> +	for (i = 0; i < count; i++) {
+>> +		tlb_flush_ring->entries[write_idx].addr = entries[i];
+>> +		tlb_flush_ring->entries[write_idx].flush_all = 0;
+>> +		write_idx = (write_idx + 1) % KVM_HV_TLB_FLUSH_RING_SIZE;
+>> +	}
+>> +	/*
+>> +	 * Advance write index only after filling in the entry to synchronize
+>> +	 * with lockless reader.
+>>  	 */
+>>  	smp_wmb();
+>> -	tlb_flush_ring->write_idx = (write_idx + 1) % KVM_HV_TLB_FLUSH_RING_SIZE;
+>> +	tlb_flush_ring->write_idx = write_idx;
+>>  
+>>  out_unlock:
+>>  	spin_unlock_irqrestore(&tlb_flush_ring->write_lock, flags);
+>> @@ -1862,15 +1890,58 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct kvm_vcpu_hv_tlb_flush_ring *tlb_flush_ring;
+>>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>> +	struct kvm_vcpu_hv_tlb_flush_entry *entry;
+>> +	int read_idx, write_idx;
+>> +	u64 address;
+>> +	u32 count;
+>> +	int i, j;
+>>  
+>> -	kvm_vcpu_flush_tlb_guest(vcpu);
+>> -
+>> -	if (!hv_vcpu)
+>> +	if (!tdp_enabled || !hv_vcpu) {
+>> +		kvm_vcpu_flush_tlb_guest(vcpu);
+>>  		return;
+>> +	}
+>>  
+>>  	tlb_flush_ring = &hv_vcpu->tlb_flush_ring;
+>>  
+>> -	tlb_flush_ring->read_idx = tlb_flush_ring->write_idx;
+>> +	/*
+>> +	 * TLB flush must be performed on the target vCPU so 'read_idx'
+>> +	 * (AKA 'tail') cannot change underneath, the compiler is free
+>> +	 * to re-read it.
+>> +	 */
+>> +	read_idx = tlb_flush_ring->read_idx;
+>> +
+>> +	/*
+>> +	 * 'write_idx' (AKA 'head') can be concurently updated by a different
+>> +	 * vCPU so we must be sure it's read once.
+>> +	 */
+>> +	write_idx = READ_ONCE(tlb_flush_ring->write_idx);
+>> +
+>> +	/* Pairs with smp_wmb() in hv_tlb_flush_ring_enqueue() */
+>> +	smp_rmb();
+>> +
+>> +	for (i = read_idx; i != write_idx; i = (i + 1) % KVM_HV_TLB_FLUSH_RING_SIZE) {
+>> +		entry = &tlb_flush_ring->entries[i];
+>> +
+>> +		if (entry->flush_all)
+>> +			goto out_flush_all;
+>
+> I have an idea: instead of special 'flush all entry' in the ring,
+> just have a boolean in parallel to the ring.
+>
+> Also the ring buffer entries will be 2x smaller since they won't need
+> to have the 'flush all' boolean.
+>
+> This would allow to just flush the whole thing and discard the ring if that boolean is set,
+> allow to not enqueue anything to the ring also if the boolean is already set,
+> also we won't need to have extra space in the ring for that entry, etc, etc.
+>
+> Or if using kfifo, then it can contain plain u64 items, which is even more natural.
+>
 
-+int s390_pci_kvm_aif_disable(S390PCIBusDevice *pbdev)
-+{
-+    struct kvm_s390_zpci_op args = {
-+        .fh = pbdev->fh,
-+        .op = KVM_S390_ZPCIOP_DEREG_AEN
-+    };
+In the next version I switch to fifo and get rid of 'flush_all' entries
+but instead of a boolean I use a 'magic' value of '-1' in GVA. This way
+we don't need to synchronize with the reader and add any special
+handling for the flag.
 
-That means unspecified fields will be set to 0 by the compiler already, as 
-far as I know.
+Note, in the future we may get back to having flags as part of entries
+as it is now possible to analize guest's CR3. We'll likely add
+'AddressSpace' to each entry. The 'flush all' entry, however, will
+always remain 'special' to handle ring overflow case.
 
-  Thomas
+-- 
+Vitaly
 
