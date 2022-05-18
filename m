@@ -2,260 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0ABA52B799
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 12:13:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5C3952B6FB
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 12:12:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233978AbiERJut (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 05:50:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53316 "EHLO
+        id S234852AbiERJ5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 05:57:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234627AbiERJuq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 05:50:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4C46426AE8
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 02:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652867441;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MFPqNngbhurlXb9z2VG6oI79AAlWQ0hNU+ijxe8hQD8=;
-        b=YyU0rgKZEHTW+FPdGZ2vZL4aBWraO/ldFHKWme+7YyS2+mL1wH9iGQMY7UYULbJyZ7bs1J
-        WVptQyVmqL/L8gFZ/xEuxqI+rakWwBXWP06gc//s24enHTdVMi2bbiHIeKY0ROjUxuWuGO
-        YymwWKjsthivwkC2rcSzLd6u72qTLdE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-320-iUSXRWdkNa2yhFYazfRDPw-1; Wed, 18 May 2022 05:50:35 -0400
-X-MC-Unique: iUSXRWdkNa2yhFYazfRDPw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CAD65811E76;
-        Wed, 18 May 2022 09:50:34 +0000 (UTC)
-Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 23D031410F36;
-        Wed, 18 May 2022 09:50:27 +0000 (UTC)
-Message-ID: <8c78939bf01a98554696add10e17b07631d97a28.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the
- guest and/or host changes apic id/base from the defaults.
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org,
-        Sean Christopherson <seanjc@google.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Date:   Wed, 18 May 2022 12:50:27 +0300
-In-Reply-To: <20220518082811.GA8765@gao-cwp>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-3-mlevitsk@redhat.com>
-         <20220518082811.GA8765@gao-cwp>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
+        with ESMTP id S234832AbiERJ4x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 05:56:53 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2068.outbound.protection.outlook.com [40.107.212.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216D4B481;
+        Wed, 18 May 2022 02:56:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q0jAof5HiOlBl/mu/5zzLvmizvICAnM4tcsHAtBXrABHbxryqmDsnOgKwt1vos3M1KMZ/XG9ocq11Tc0xvWVqzAdN4qKVIuKEVIH0JdJiVylhKx3iQvQ7t1RI2ZdWqr4I+1Hfw4T/ASrnwhWAMB6YpzhwYmbQ6iDct6/UZZ9ogLY0M7g1XO4LRQPVgbeEbO3RZexMbl6dG8cLVIscBoAG5bfZRWChohQK7Myww7QRQpqtsi6TWKGYItNBcVf4TUmv7p221g3d47th/NlycJXd5qzBHsQneryf+zqDLuvRzSeU9yvxbV1larbWaCq4gmLb8WO3zKZsacPkS+xRZM07Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PaVES08J3sVpC23GYBru/Kj/4tXMsN+dcud6cCuTyGg=;
+ b=WYoq7Krgcx9AoOdSfn42Y7fFD2Dqy12cSB2gZGmbEQH+8TnWXPAyoWeHcFDVAky0Rlvjurn9f/yuCrigHdvfrjV8GPsoa4qKpxoOrGeqQBhJJtR+hDV1jWexIehmLHAjgNk9aV6HMDnIlggwBsdz6ataCLimL9XzAXfzWj7HBDP21ypmn+Ys1jaJemNaVyKekTOLfdmL0QPLDZltUXJlUfDQBh42Oloe0gTqCzBj9cb2vAuxkXCNRVWJTYTs2QMYvitPfMKBknlvvNQAjXcro+jCsAX8jSNBrbf7I2RmSRVCqd+UcfiIK9Lc6ZIe2p684NV2ad7kPtPQ9k8b37Rg0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PaVES08J3sVpC23GYBru/Kj/4tXMsN+dcud6cCuTyGg=;
+ b=nXWG9czhmU8XdI6wvh/eL5fhqiVc+yU/OsY5w93qnpdEvTcne6B63IrXJvuihX32STWn8VGVaP5dMbwdKBDXs58n3aFv5dSUgWsU8cGJgxenpYOKPBlhYmMYv7lI6v4uz4OcsEe9oICrjqsf71pJQ6noqQ9od1lBL7/5Fh93zO5iAfgzsKNoizqQQwRadaebKghfZ3Ckg+ceeEZsA++c/g01nZDt0NN2eUbw4EalF3VRgOohchDiOpJJM/Disf8esfG5HUCDrQzvU8mHxa59SJj4CMcXlTP2heENJZRQGIjtFDE0RrLu1z9jtD0kDBG31T0Yf51xFMBwhCfVHfZUBg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13)
+ by DM4PR12MB5069.namprd12.prod.outlook.com (2603:10b6:5:388::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.14; Wed, 18 May
+ 2022 09:56:50 +0000
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::a9fa:62ae:bbc8:9d7d]) by BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::a9fa:62ae:bbc8:9d7d%6]) with mapi id 15.20.5273.014; Wed, 18 May 2022
+ 09:56:50 +0000
+Message-ID: <1df0a2f1-928a-034a-b5b5-1b24b09ce1d5@nvidia.com>
+Date:   Wed, 18 May 2022 15:26:37 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v4 2/4] vfio/pci: Change the PF power state to D0 before
+ enabling VFs
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20220517100219.15146-1-abhsahu@nvidia.com>
+ <20220517100219.15146-3-abhsahu@nvidia.com>
+ <20220517122710.093c9c19.alex.williamson@redhat.com>
+X-Nvconfidentiality: public
+From:   Abhishek Sahu <abhsahu@nvidia.com>
+In-Reply-To: <20220517122710.093c9c19.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-ClientProxiedBy: MAXPR0101CA0049.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:e::11) To BL1PR12MB5304.namprd12.prod.outlook.com
+ (2603:10b6:208:314::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 67a4e646-ba13-482b-6a4b-08da38b4ba45
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5069:EE_
+X-Microsoft-Antispam-PRVS: <DM4PR12MB50697C3E66B6355B3B665363CCD19@DM4PR12MB5069.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6PaFSBkLjnj5S7DZ7oWVsbc5WCfSz4GPR2RmrCS1lLnpZ9TJzw675/gcPs+5MxYtC4VEANXHW24VqqnoqE4TNSguvfdTJ8lWnvBvlEKg3sM6H/l8ehzbUyl9V0SNqj4ZSWg4/47nXoI97MzM5jVpPf280kmn9aMEGPM25iziQ0N/uSo8La6l1j/fiQD5M7nfURkcB/GNKUu7TsQyan4oI7g3gE0+NJBxe6GFJPDP2uvJ5XttYaEu7JphpY/Btrum0AIFN17xYMF5VCFbImndaGdjJMeI4AkAIWPLedTixE4i/LZhNH9q4m1XAcxERZibtWJG1njxhkULKYJvl+ZBf3RVylN70PAhFNMDYzekKvfeartbFzYzggP6NqGOVyOqy4k5vDAhhlczSmP5+Tz4xHuSHfPbu96fPFuP99KzB/C0eaMqi24hedRx2xOHZl016Hs4+oqC5Lktbab1MzJW4ovsBhm8YBmjIU3XG10UE9vtBfSDGPvQdNH3YOXf3LURK8/tQl1+pIvSX5u3ZZVK3zCCfh5KWJvBUJ3nPxC44z/E1WIwB+SdR1UpuY4XdAhbKbxkdwVAxzadaJTiEmTop1cT2oJp2oZQ67kW/3i/pS9O8GnZHAMIqA4v5bJlAanbFxw0XSxOv6sUcop2jkiyOcjSLzOyKAmOK2yKYqMEGigu3NAMU4wLS9nGXu87SBk7uRoMJ5qqD+35tM2QWkEWhRLh1aBAtNs/top8LdFZCz4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5304.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(83380400001)(5660300002)(54906003)(86362001)(31696002)(66946007)(2616005)(7416002)(186003)(4326008)(66556008)(8676002)(6512007)(66476007)(508600001)(6916009)(6486002)(6666004)(8936002)(316002)(53546011)(55236004)(36756003)(31686004)(38100700002)(2906002)(26005)(6506007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OUpEWHU2c2luMmNLYXhMWDRiTXdLbytOcTM0OUw4YzFHeG1KY3o3U3E2cEhT?=
+ =?utf-8?B?UnVvMXBhT2k1T2Y3YSttK21aY3J5dXJ0YW5vMkpHZjlmaUwyWFdlaG9JZ3pU?=
+ =?utf-8?B?NUZaeUlFTlp5NHh5aE5YMHlRaVdJcUllaytiMHh2UXdTZDFUZ3Q3SnRNNDR6?=
+ =?utf-8?B?N0svTDdRWU9ScTJuU3VjTGNkMEd2QUFYbEpWZ1NJL2VIeEFmK0xtcU9tM2lm?=
+ =?utf-8?B?NXQycE5FNXFMMnBNK1R3R3huaE93VWdLcThjUlhBbEhSV2RCVkFkNWt2cnRT?=
+ =?utf-8?B?QXZBenFRRXdIYzJPVjhMR2s2dzBSazBpTEtnWFlNLzdSczZReUplMDY2MjdM?=
+ =?utf-8?B?OFV3K2lHdG9zblhQOEY5K1ZTTmhTa2dWZFovdUprRk5DTDVRTzg4RHVKQUx6?=
+ =?utf-8?B?akx0bGxYVTRkcWVrNHg4SjRZa1l5YldqNStuZlRjckl3blhCKzI5WGNOVWRi?=
+ =?utf-8?B?eXg3UTBtNml1Vmt1RXlFWnV2L3Y3ZnRib0pHTy8rNzJaQ05GWktqeGIzWDBm?=
+ =?utf-8?B?eElnNmFJMzBHSGlnZjZlL2FxcE00SGkyQXFFUUNrOHJpeVJVVi9KM2lBMjdJ?=
+ =?utf-8?B?ZmNGVGVtUkZsL0pWbzJiVXU3RUhENWp4aEVBcGZQR3NDRlhmQk1ZYVl0SHVJ?=
+ =?utf-8?B?bUlrN1lkaVlMRXlpR1VaaWNudDVKTms0N05oNlZqRkpMdlExdEtYTHFHdnpT?=
+ =?utf-8?B?TlNibXhjRkFjRUU2YU9pRXhDOThEWHFoRWc0Q0thMkJFTElUOTFCbzhNSmtH?=
+ =?utf-8?B?aFI4Nmx2M2JYKzJhQ1o4ODdGUW1ta1g1WFcrRC9WUEhsQmtTZWg1SW5paGxH?=
+ =?utf-8?B?NEQyaHJicmZwYytteTBmbVpwbVhudXY2VGJ2R2hrNHZzVW9pV3JFK1pGMm50?=
+ =?utf-8?B?SWRhSzdUZ2RuSlFtLy9xZnlhdHVJVkhBOXc4azVSUkVxVTVrd0xSUWZjRjZ3?=
+ =?utf-8?B?Ukl2alVsVzRESlFlWHE1b21NMk5nTVhyNGkzSkdvb2Q0dVRJRXZxV2FSQWkz?=
+ =?utf-8?B?UDRVekVSa0oyWmZ6a0RyUUc0RGdWQktMdXRVc0hNT0hSSGYyZzliMC84TkZo?=
+ =?utf-8?B?Z0ZyMkZPaTZ6VXF1MC9WMGl5UmRhV2M5aHA1NmNESFZVRWUvMXB5REhnWk9V?=
+ =?utf-8?B?dkQvY0IvbTFXcS9ZMkdtWnZrdHp4T0xnTlRENUVWaXprZWlyS09RSnk3U3Yw?=
+ =?utf-8?B?cWtzWFhlYVF5RnloREw5SFpHdVAxbGVMK3N5REpDRGk3TXIzMzNaRy9PemhV?=
+ =?utf-8?B?SmJZZU80c2NjNUVvdXQwU1M3bHJKMVZqTVdERHJhYmgvdVNpc09pbkxGUVdk?=
+ =?utf-8?B?N1JkWHREQmFIekxvZW1ZRncyTVYyaVBxdDhCVGZoSW9oNHR6bGlQTDlVVTlu?=
+ =?utf-8?B?NTN0TFpKZ25jRzFZMEppaEgvLzZmWUdiVUMvQ3AxTkEzU01jUDJTVHJJUWJZ?=
+ =?utf-8?B?TlNDSytzc2hidTZDNjl6QU1FTUdOWmVzZHc1amY2bVFhY0NPNEozTFNJZTc2?=
+ =?utf-8?B?VDFRR3pXWWcxQ1FxQ2k0b2IyNk5KeVFvYzZLb2JZNTZUb1F0QytJOXNKZm1k?=
+ =?utf-8?B?eWUzZjFwaVdkVkFxZGk1K3c4ZUFxUHJ5dk1lMWhySGVLT2xFV2V1UGpHczFz?=
+ =?utf-8?B?MWtIdWpPT2FLNmY4OVlXc0VyWCtMOE5FWVpJTzlXN3VvQm54VHpCc3ZEVkFn?=
+ =?utf-8?B?WDUvYlpkbis4TCtlRFJPMUd4Vzgwcm1pekU1Mkl4Y00yVGdteGg5Uk8vY21a?=
+ =?utf-8?B?bUFWY0FFd21GNDVvQmNhalNDR1BWTnF5YWkrbkRjbk9wTHgrWllEVk8yTFRI?=
+ =?utf-8?B?Vm5qMWk3QzVoSGgyMi9RNk1GYmY5ZVdFdnZMOUduUkJxZEI3N2ZqYkNvczVL?=
+ =?utf-8?B?amdWS1JzT0VMUjk0SWFTMC9tQThHTmNvanhwK0YxUHdFME1aYm9ETTZ1NDdj?=
+ =?utf-8?B?TmtXTE0vUUdqRFFqOWV6Sy9ONnU3RHE0Tk5DNFdtUFJsOWZLa3B0L3VmQUdm?=
+ =?utf-8?B?WHplZVFSNnVla2hLTWNZOFc4UUt5NjBaR0thNVR0QUIxTDZ2TzRDdFpFRGVY?=
+ =?utf-8?B?aWthSUNEM2Qwd0l3eGhxS2Rka1Nmd2VSclg2K00zQlVpK0lsaXpaanNzUTZT?=
+ =?utf-8?B?ZUNGY1M5S2RrQm1hM3ArTm14c3dNU1R2VFAyWTFOeWtFVW40K3QzTmRjUnll?=
+ =?utf-8?B?a3dRTTAxWnBJeWg0cTkyZ25HUCt0cG1QTG1OVjRQOEw0ZkVreXNjcjZUa2ZU?=
+ =?utf-8?B?UGN2SFFQcndwWjZRWjFDOFhPSVRqanZtZ0xaQW03emRmUS9lUXdGRjY4LytS?=
+ =?utf-8?B?VGVSYTBLNWVCdjZmcHRUdERxem0zaEJsRmZ1eHJNTlZybThLYllXdz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67a4e646-ba13-482b-6a4b-08da38b4ba45
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5304.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2022 09:56:50.0475
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xSIWxD/wsNAOySGmi3zPsGa3zBXIVn4KoxG8UCUVfGOUsnQ3Q7TcXstafmmLWfhL2FNCk7ghNk+L7Gk9tu4PGg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5069
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-05-18 at 16:28 +0800, Chao Gao wrote:
-> On Wed, Apr 27, 2022 at 11:02:57PM +0300, Maxim Levitsky wrote:
-> > Neither of these settings should be changed by the guest and it is
-> > a burden to support it in the acceleration code, so just inhibit
-> > it instead.
-> > 
-> > Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> > arch/x86/include/asm/kvm_host.h |  3 +++
-> > arch/x86/kvm/lapic.c            | 25 ++++++++++++++++++++++---
-> > arch/x86/kvm/lapic.h            |  8 ++++++++
-> > 3 files changed, 33 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 63eae00625bda..636df87542555 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1070,6 +1070,8 @@ enum kvm_apicv_inhibit {
-> > 	APICV_INHIBIT_REASON_ABSENT,
-> > 	/* AVIC is disabled because SEV doesn't support it */
-> > 	APICV_INHIBIT_REASON_SEV,
-> > +	/* APIC ID and/or APIC base was changed by the guest */
-> > +	APICV_INHIBIT_REASON_RO_SETTINGS,
+On 5/17/2022 11:57 PM, Alex Williamson wrote:
+> On Tue, 17 May 2022 15:32:17 +0530
+> Abhishek Sahu <abhsahu@nvidia.com> wrote:
 > 
-> You need to add it to check_apicv_inhibit_reasons as well.
-True, forgot about it.
-
+>> According to [PCIe v5 9.6.2] for PF Device Power Management States
+>>
+>>  "The PF's power management state (D-state) has global impact on its
+>>   associated VFs. If a VF does not implement the Power Management
+>>   Capability, then it behaves as if it is in an equivalent
+>>   power state of its associated PF.
+>>
+>>   If a VF implements the Power Management Capability, the Device behavior
+>>   is undefined if the PF is placed in a lower power state than the VF.
+>>   Software should avoid this situation by placing all VFs in lower power
+>>   state before lowering their associated PF's power state."
+>>
+>> From the vfio driver side, user can enable SR-IOV when the PF is in D3hot
+>> state. If VF does not implement the Power Management Capability, then
+>> the VF will be actually in D3hot state and then the VF BAR access will
+>> fail. If VF implements the Power Management Capability, then VF will
+>> assume that its current power state is D0 when the PF is D3hot and
+>> in this case, the behavior is undefined.
+>>
+>> To support PF power management, we need to create power management
+>> dependency between PF and its VF's. The runtime power management support
+>> may help with this where power management dependencies are supported
+>> through device links. But till we have such support in place, we can
+>> disallow the PF to go into low power state, if PF has VF enabled.
+>> There can be a case, where user first enables the VF's and then
+>> disables the VF's. If there is no user of PF, then the PF can put into
+>> D3hot state again. But with this patch, the PF will still be in D0
+>> state after disabling VF's since detecting this case inside
+>> vfio_pci_core_sriov_configure() requires access to
+>> struct vfio_device::open_count along with its locks. But the subsequent
+>> patches related to runtime PM will handle this case since runtime PM
+>> maintains its own usage count.
+>>
+>> Also, vfio_pci_core_sriov_configure() can be called at any time
+>> (with and without vfio pci device user), so the power state change
+>> needs to be protected with the required locks.
+>>
+>> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
+>> ---
+>>  drivers/vfio/pci/vfio_pci_core.c | 11 +++++++++++
+>>  1 file changed, 11 insertions(+)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+>> index b9f222ca48cf..4fe9a4efc751 100644
+>> --- a/drivers/vfio/pci/vfio_pci_core.c
+>> +++ b/drivers/vfio/pci/vfio_pci_core.c
+>> @@ -217,6 +217,10 @@ int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t stat
+>>  	bool needs_restore = false, needs_save = false;
+>>  	int ret;
+>>  
+>> +	/* Prevent changing power state for PFs with VFs enabled */
+>> +	if (pci_num_vf(pdev) && state > PCI_D0)
+>> +		return -EBUSY;
+>> +
+>>  	if (vdev->needs_pm_restore) {
+>>  		if (pdev->current_state < PCI_D3hot && state >= PCI_D3hot) {
+>>  			pci_save_state(pdev);
+>> @@ -1960,6 +1964,13 @@ int vfio_pci_core_sriov_configure(struct vfio_pci_core_device *vdev,
+>>  		}
+>>  		list_add_tail(&vdev->sriov_pfs_item, &vfio_pci_sriov_pfs);
+>>  		mutex_unlock(&vfio_pci_sriov_pfs_mutex);
+>> +
+>> +		/*
+>> +		 * The PF power state should always be higher than the VF power
+>> +		 * state. If PF is in the low power state, then change the
+>> +		 * power state to D0 first before enabling SR-IOV.
+>> +		 */
+>> +		vfio_pci_lock_and_set_power_state(vdev, PCI_D0);
 > 
-> > };
-> > 
-> > struct kvm_arch {
-> > @@ -1258,6 +1260,7 @@ struct kvm_arch {
-> > 	hpa_t	hv_root_tdp;
-> > 	spinlock_t hv_root_tdp_lock;
-> > #endif
-> > +	bool apic_id_changed;
+> But we need to hold memory_lock across the next function or else
+> userspace could race a write to the PM register to set D3 before
+> pci_num_vf() can protect us.  Thanks,
 > 
-> What's the value of this boolean? No one reads it.
-
-I use it in later patches to kill the guest during nested VM entry 
-if it attempts to use nested AVIC after any vCPU changed APIC ID.
-
-I mentioned this boolean in the commit description.
-
-This boolean avoids the need to go over all vCPUs and checking
-if they still have the initial apic id.
-
-In the future maybe we can introduce a more generic 'taint'
-bitmap with various flags like that, indicating that the guest
-did something unexpected.
-
-BTW, the other option in regard to the nested AVIC is just to ignore this issue completely.
-The code itself always uses vcpu_id's, thus regardless of when/how often the guest changes
-its apic ids, my code would just use the initial APIC ID values consistently.
-
-In this case I won't need this boolean.
-
-> 
-> > };
-> > 
-> > struct kvm_vm_stat {
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 66b0eb0bda94e..8996675b3ef4c 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2038,6 +2038,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
-> > 	}
-> > }
-> > 
-> > +static void kvm_lapic_check_initial_apic_id(struct kvm_lapic *apic)
-> > +{
-> > +	if (kvm_apic_has_initial_apic_id(apic))
-> > +		return;
-> > +
-> > +	pr_warn_once("APIC ID change is unsupported by KVM");
-> 
-> It is misleading because changing xAPIC ID is supported by KVM; it just
-> isn't compatible with APICv. Probably this pr_warn_once() should be
-> removed.
-
-Honestly since nobody uses this feature, I am not sure if to call this supported,
-I am sure that KVM has more bugs in regard of using non standard APIC ID.
-This warning might hopefuly make someone complain about it if this
-feature is actually used somewhere.
-
-> 
-> > +
-> > +	kvm_set_apicv_inhibit(apic->vcpu->kvm,
-> > +			APICV_INHIBIT_REASON_RO_SETTINGS);
-> 
-> The indentation here looks incorrect to me.
-> 	kvm_set_apicv_inhibit(apic->vcpu->kvm,
-> 			      APICV_INHIBIT_REASON_RO_SETTINGS);
-
-True, will fix.
-
-> 
-> > +
-> > +	apic->vcpu->kvm->arch.apic_id_changed = true;
-> > +}
-> > +
-> > static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> > {
-> > 	int ret = 0;
-> > @@ -2046,9 +2059,11 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> > 
-> > 	switch (reg) {
-> > 	case APIC_ID:		/* Local APIC ID */
-> > -		if (!apic_x2apic_mode(apic))
-> > +		if (!apic_x2apic_mode(apic)) {
-> > +
-> > 			kvm_apic_set_xapic_id(apic, val >> 24);
-> > -		else
-> > +			kvm_lapic_check_initial_apic_id(apic);
-> > +		} else
-> > 			ret = 1;
-> > 		break;
-> > 
-> > @@ -2335,8 +2350,11 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
-> > 			     MSR_IA32_APICBASE_BASE;
-> > 
-> > 	if ((value & MSR_IA32_APICBASE_ENABLE) &&
-> > -	     apic->base_address != APIC_DEFAULT_PHYS_BASE)
-> > +	     apic->base_address != APIC_DEFAULT_PHYS_BASE) {
-> > +		kvm_set_apicv_inhibit(apic->vcpu->kvm,
-> > +				APICV_INHIBIT_REASON_RO_SETTINGS);
-> > 		pr_warn_once("APIC base relocation is unsupported by KVM");
-> > +	}
-> > }
-> > 
-> > void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
-> > @@ -2649,6 +2667,7 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
-> > 		}
-> > 	}
-> > 
-> > +	kvm_lapic_check_initial_apic_id(vcpu->arch.apic);
-> > 	return 0;
-> > }
-> > 
-> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> > index 4e4f8a22754f9..b9c406d383080 100644
-> > --- a/arch/x86/kvm/lapic.h
-> > +++ b/arch/x86/kvm/lapic.h
-> > @@ -252,4 +252,12 @@ static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
-> > 	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
-> > }
-> > 
-> > +static inline bool kvm_apic_has_initial_apic_id(struct kvm_lapic *apic)
-> > +{
-> > +	if (apic_x2apic_mode(apic))
-> > +		return true;
-> 
-> I suggest warning of x2apic mode:
-> 	if (WARN_ON_ONCE(apic_x2apic_mode(apic)))
-> 
-> Because it is weird that callers care about initial apic id when apic is
-> in x2apic mode.
-
-Yes but due to something I don't agree with, but also something that I gave up
-on arguing upon, KVM userspace API kind of supports setting APIC ID != initial apic id,
-even in x2apic mode, and disallowing it, is considered API breakage,
-therefore this case is possible.
-
-This case should still trigger a warning in kvm_lapic_check_initial_apic_id.
-
-Best regards,
-	Maxim Levitsky
-
-
+> Alex
 > 
 
+ Thanks Alex.
+ Yes. We need to bring pci_enable_sriov() also to protect this race
+ condition. I will update this in my next version.
+ 
+ Regards,
+ Abhishek
+
+>>  		ret = pci_enable_sriov(pdev, nr_virtfn);
+>>  		if (ret)
+>>  			goto out_del;
+> 
 
