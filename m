@@ -2,135 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7141252BD21
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:17:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D02EE52BC7A
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 16:16:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238141AbiERNpl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 09:45:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44842 "EHLO
+        id S238252AbiERNq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 09:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238078AbiERNpk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 09:45:40 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641751C0F02;
-        Wed, 18 May 2022 06:45:39 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IDcSwp005627;
-        Wed, 18 May 2022 13:45:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=V6PGtDK1VCCS96hbIhyakpbQcaCZx/fTqzri3oe+JKI=;
- b=kMAspi2IHP4PdXm14UB/q8Oh0CEKby673X28I8+pRD3XDtgYT+akcttNbiICLWkcssnV
- j8g/1n4zSFvGAX2CUou+xRMdWL7QT0WvaG2s+L2ifbXhenLgOzFpdEZtW9w4HvwAG8WV
- PIkUyHtSSo4cN/6HdvveakU0mQmaucpbICMA7YeSP/xij5KKlpslOBkoAi1qLKCJMLii
- VDup58mwW5+M1LLpw7IJA5Lavx61w43zSuIXuJHi3j1AXup6jhWNBGIBf7uTvqO6mRwK
- jvW+n3zLqczW1utgrHd45u5NmxaFg1/uiVDa9mTi2n6nQGY31T2SClurcKuzcvtBghy/ jA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g51uxr5kw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 13:45:34 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IDclbG006083;
-        Wed, 18 May 2022 13:45:34 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g51uxr5jw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 13:45:34 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IDgsxJ016007;
-        Wed, 18 May 2022 13:45:32 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3g2428vq26-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 13:45:31 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IDiq8729884682
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 May 2022 13:44:52 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1FE45A4054;
-        Wed, 18 May 2022 13:45:28 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A775EA405F;
-        Wed, 18 May 2022 13:45:27 +0000 (GMT)
-Received: from [9.145.45.168] (unknown [9.145.45.168])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 18 May 2022 13:45:27 +0000 (GMT)
-Message-ID: <48550162-0f8c-4b23-dea4-b9060b24eed9@linux.ibm.com>
-Date:   Wed, 18 May 2022 15:45:27 +0200
+        with ESMTP id S238227AbiERNqP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 09:46:15 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48CEB1660A0;
+        Wed, 18 May 2022 06:46:13 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id p26so3092091eds.5;
+        Wed, 18 May 2022 06:46:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=emRjXefipDOzrwdl8ti4tobydfrsmYJDX4jGfv6NVQ0=;
+        b=pIHdu6fIeKCNQmUl5G4GpNW9g6jdq0neC47gphBI7RbN6tDJkRsGWSJN4ghLXVdfDm
+         5TMUze5gPB2RFYUZaFjmDzWkR6qoZxfSSUs2vtGQGujllsd2i70kdsDNdI9uK1zKffR+
+         0Wgxh20ZP1WoX0V6tvTXvS70XhbCqhJEXuKp6I6kMTwXnaqfP2a19GVEnxk487rIBKrp
+         ciz1ml30BB9zUq9Us3VLPWe5tZNRI19qmgVaDCUCCUBaafQ9oR0DCFxyu0d+rptskH2r
+         TD3k21IgN0HEYs9tpIx/vOXUsSfqnRqJvHobRs3t90NwnoPa4aq36Fy1rLlJQNzdo1VP
+         x+UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=emRjXefipDOzrwdl8ti4tobydfrsmYJDX4jGfv6NVQ0=;
+        b=Nf1YCn/v1P5ryMYFEirgnfs8NvtjM8ugRGcZ2qeDXo9nAMFH/OLvH3iCB4MNdDQhOY
+         CuP/UJmeq/I7wIeBVYNxVoA2xB5gbJDFouR5UGjPLlNTu3VgLcwH6lUhwGHpVKzVIMxM
+         Njg2483p7n3porTr4xrmWfv5jqGU0rT9eC6n9bVGXGiamFjLqV/PPhNxI3RZ+tDw4uzf
+         6lXq2BD1yvBPeGIFuzIgNhGmiZOOAu4EQhUiIE2OqrnGwkrfuvE1cZGHcWT+CXRuo8ZP
+         6U41reCl/rXMIG7miUuPU1dX15jHouqHR3kCA/vWAzDGfuZVyiVdyKm4Pu1o9/as93FJ
+         YNcQ==
+X-Gm-Message-State: AOAM533148pjJPwLeaOgKds2voUGhUU1/JixTDL4jMKV78HlbMJP220V
+        LLWum9CLeaXhCSNwHeuKMDqoFCRrvSY=
+X-Google-Smtp-Source: ABdhPJyyhd52GApSXiohLZHMyt262d3u6jppghaYnQsCjdUgo1MQlHiw7S6Qqjm/uv8D1EfEf5H//A==
+X-Received: by 2002:a05:6402:26ca:b0:427:c181:b0ed with SMTP id x10-20020a05640226ca00b00427c181b0edmr24670287edd.400.1652881571541;
+        Wed, 18 May 2022 06:46:11 -0700 (PDT)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id s27-20020a170906221b00b006f3ef214e73sm954490ejs.217.2022.05.18.06.46.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 06:46:10 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [PATCH] KVM: VMX: Use try_cmpxchg64 in pi_try_set_control
+Date:   Wed, 18 May 2022 15:45:50 +0200
+Message-Id: <20220518134550.2358-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Heiko Carstens <hca@linux.ibm.com>,
-        Steffen Eiden <seiden@linux.ibm.com>
-Cc:     Greg KH <greg@kroah.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nico Boehr <nrb@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
-References: <20220510144724.3321985-1-seiden@linux.ibm.com>
- <20220510144724.3321985-2-seiden@linux.ibm.com> <YoTcxhulemnqiUbC@osiris>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v4 1/2] drivers/s390/char: Add Ultravisor io device
-In-Reply-To: <YoTcxhulemnqiUbC@osiris>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: aHzQbWoMDfk-vwBiUB2ssxDIqzQxyXtN
-X-Proofpoint-GUID: uEfrS6DjIVrYZO9ueDhA5bJYYpaJRZ3b
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-18_05,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 lowpriorityscore=0
- adultscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 clxscore=1015
- phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205180079
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/22 13:47, Heiko Carstens wrote:
-> On Tue, May 10, 2022 at 02:47:23PM +0000, Steffen Eiden wrote:
->> diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
->> index 6cc4b19acf85..e9b9902abbaf 100644
->> --- a/drivers/s390/char/Kconfig
->> +++ b/drivers/s390/char/Kconfig
->> @@ -100,6 +100,16 @@ config SCLP_OFB
->>   	  This option enables the Open-for-Business interface to the s390
->>   	  Service Element.
->>   
->> +config S390_UV_UAPI
->> +	def_tristate y
->> +	prompt "Ultravisor userspace API"
->> +	help
->> +	  Selecting exposes parts of the UV interface to userspace
->> +	  by providing a misc character device at /dev/uv.
->> +	  Using IOCTLs one can interact with the UV.
->> +	  The device is only available if the Ultravisor
->> +	  Facility (158) is present.
-> 
-> Is there a reason why this is default "y"? If you think this should be
-> compiled into the kernel if used, then why allow to make it a module
-> at all?
-> Instead you could get rid of a couple if lines of code.
+Use try_cmpxchg64 instead of cmpxchg64 (*ptr, old, new) != old
+in pi_try_set_control.  cmpxchg returns success in ZF flag, so this
+change saves a compare after cmpxchg (and related move instruction
+in front of cmpxchg):
 
-There was a lot of discussion around this already and the "Y" was chosen 
-as auto-loading this is a pain and therefore the SCLP and CHSC-Misc set 
-it to Y and we took that as an example (Steffen spoke to Peter to get 
-guidance).
+  b9:   88 44 24 60             mov    %al,0x60(%rsp)
+  bd:   48 89 c8                mov    %rcx,%rax
+  c0:   c6 44 24 62 f2          movb   $0xf2,0x62(%rsp)
+  c5:   48 8b 74 24 60          mov    0x60(%rsp),%rsi
+  ca:   f0 49 0f b1 34 24       lock cmpxchg %rsi,(%r12)
+  d0:   48 39 c1                cmp    %rax,%rcx
+  d3:   75 cf                   jne    a4 <vmx_vcpu_pi_load+0xa4>
 
-I'm sure that we want the possibility to have this as a module. 
-Personally I'd choose "m" over "y" since the module is only useful for a 
-very small amount of users.
+patched:
+
+  c1:   88 54 24 60             mov    %dl,0x60(%rsp)
+  c5:   c6 44 24 62 f2          movb   $0xf2,0x62(%rsp)
+  ca:   48 8b 54 24 60          mov    0x60(%rsp),%rdx
+  cf:   f0 48 0f b1 13          lock cmpxchg %rdx,(%rbx)
+  d4:   75 d5                   jne    ab <vmx_vcpu_pi_load+0xab>
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+---
+Patch requires commits 0aa7be05d83cc584da0782405e8007e351dfb6cc
+and c2df0a6af177b6c06a859806a876f92b072dc624 from tip.git
+---
+ arch/x86/kvm/vmx/posted_intr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 3834bb30ce54..4d41d5994a26 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -34,7 +34,7 @@ static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
+ 	return &(to_vmx(vcpu)->pi_desc);
+ }
+ 
+-static int pi_try_set_control(struct pi_desc *pi_desc, u64 old, u64 new)
++static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
+ {
+ 	/*
+ 	 * PID.ON can be set at any time by a different vCPU or by hardware,
+@@ -42,7 +42,7 @@ static int pi_try_set_control(struct pi_desc *pi_desc, u64 old, u64 new)
+ 	 * update must be retried with a fresh snapshot an ON change causes
+ 	 * the cmpxchg to fail.
+ 	 */
+-	if (cmpxchg64(&pi_desc->control, old, new) != old)
++	if (!try_cmpxchg64(&pi_desc->control, pold, new))
+ 		return -EBUSY;
+ 
+ 	return 0;
+@@ -111,7 +111,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 		 * descriptor was modified on "put" to use the wakeup vector.
+ 		 */
+ 		new.nv = POSTED_INTR_VECTOR;
+-	} while (pi_try_set_control(pi_desc, old.control, new.control));
++	} while (pi_try_set_control(pi_desc, &old.control, new.control));
+ 
+ 	local_irq_restore(flags);
+ 
+@@ -161,7 +161,7 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
+ 
+ 		/* set 'NV' to 'wakeup vector' */
+ 		new.nv = POSTED_INTR_WAKEUP_VECTOR;
+-	} while (pi_try_set_control(pi_desc, old.control, new.control));
++	} while (pi_try_set_control(pi_desc, &old.control, new.control));
+ 
+ 	/*
+ 	 * Send a wakeup IPI to this CPU if an interrupt may have been posted
+-- 
+2.35.1
+
