@@ -2,71 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7FD452C06B
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:10:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74F3452C19F
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:51:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240673AbiERRBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 13:01:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34388 "EHLO
+        id S240909AbiERRMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 13:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240653AbiERRBc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 13:01:32 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F354333E1E;
-        Wed, 18 May 2022 10:01:29 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id i1so2349627plg.7;
-        Wed, 18 May 2022 10:01:29 -0700 (PDT)
+        with ESMTP id S240900AbiERRMA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 13:12:00 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9537D682B
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:11:58 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id m23so3351926ljc.0
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=RcLHuOHV+RcpwGuZbYj1dwn0uVanHpALeVRluvJ4g1I=;
-        b=K04yJM6DTJUgL8ulQk9SeqQC4aMUlA0X9pcm/57phnuJEd8CJpCNkJ53QfDFtTCd29
-         1z4efV2UH/LoajUWyy9G98L46LR0FKlvEA3JC/fC9f0fGvu84OcftYWXlfNTowf5VFOT
-         GzlVf8UhUQSW9CtN4neQwhArRRFr2C7oZiGsL0FnruJF0tkpJMSr71FIwFk27Qpk2zsm
-         vQwoSZm2vgRaMuyqYsEaFVFJ7ea+XatN1hnmzpGBstBCq16R8txpKOlzHtKDvRoJZQpC
-         TqeOrnGnQHDGypzLstsrySlutf/CBsGfqEOslSTa6b0GsBiMFBQP1atedfF7w7tjb4YH
-         47VA==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SZBlJV5SkOMUJnqiFtH47DECyQFpTZiRBCog/QFYkaA=;
+        b=TdqfYQ45NIxmdRDL/iBJjaUrU26F6Gcl3kfGKUBBKB1jcuk3PqVsn13jUbEmqHiLGa
+         22IGAWbWQdq+/DMQfFPC2fX8Z/7037DA4aax3BFQHx5YbIVDEnHfieOugOKla7sSmEMR
+         IayWw03MJ7zT3J9pNQm6fzPr1VXIoc1ao4S220W0vBDc9KJ23sOZ1X85vTKClnhHCd0V
+         j044YA5VELx15EUPI7pFNei0de35boewEyRj+eK+WvHwLK6eymIXeheRzPoto4trAg4m
+         qkb3HDtcIt0o5FfstriJ7H1WKZUbpRUUeGf14eBs6OXgccLXnh/3h3DlAvcTazmYgkSF
+         c+JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=RcLHuOHV+RcpwGuZbYj1dwn0uVanHpALeVRluvJ4g1I=;
-        b=bN4Kl9WEyiETuVgM64Z6V7qb6CIooimgLKwJv3ALXFjUIPap2sKw/Hc5SX0xHQzgdV
-         2jer88HyuG5aP2zQMkU/uNolXo/8qq13iLkt4xhjZKxIjiktEajoxbftS9QRElt0+jOg
-         zlrwKEtkYcTclhJOfJ0pWxokztlaUH9/pHmo01Kw8//Z0KifxWxXA0GxVcAXSVXesxYx
-         CU1dYSIXJhxD7RJ5PRcRTZNiq1NppHNQfrJhDk4F/+LVIAafPDVC+Y7OFAWZG8MVKz1Z
-         DqL1B1fnEf714vMflp7BHYh1mvpE/8xn9V4SiE4fMRfhS2wFbwl5uXBP6CjjkSH1oOfa
-         w3PA==
-X-Gm-Message-State: AOAM532uBtvD6pZwJmGnO6eDpE3gQEHNzuc3hiijlYuR0KVFoXUPOEvx
-        R8ADIC7ldzX7PXgr7e2aqSE=
-X-Google-Smtp-Source: ABdhPJx0XLUuLwYHCSHly5djoS/xd+ihCGXyWkcmfhvIY5k20ccuv0i5oQYvMkcbWEEftuSU5Zlbog==
-X-Received: by 2002:a17:902:f64c:b0:156:7ceb:b579 with SMTP id m12-20020a170902f64c00b001567cebb579mr496428plg.73.1652893288645;
-        Wed, 18 May 2022 10:01:28 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.117])
-        by smtp.gmail.com with ESMTPSA id p42-20020a056a0026ea00b0050dc762818dsm2283240pfw.103.2022.05.18.10.01.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 10:01:28 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] KVM: x86/pmu: Update global enable_pmu when PMU is undetected
-Date:   Thu, 19 May 2022 01:01:18 +0800
-Message-Id: <20220518170118.66263-3-likexu@tencent.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220518170118.66263-1-likexu@tencent.com>
-References: <20220518170118.66263-1-likexu@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SZBlJV5SkOMUJnqiFtH47DECyQFpTZiRBCog/QFYkaA=;
+        b=LRroUFogZ+UR48E0ZtYwD+S/KAldziArBd5805sSrX+BhQUwHOjEqUMy1F3YBdEJ9I
+         D56aAsEUEh1tYdGSFSl4FeH3KHQla2A2fNVLnNKPtt+tvW62BggR+45IPD324B10ddgw
+         4bWeoeyj6+pAogRxLEr1+095RGWUByVixaliSHoqBrIQLr5tbEynfAtfRotRmb1PgbJx
+         1B8gErzTMYDt3IIsDcgpZKNQgYSUAvM/YBU7Yahef14NeHpFmRjBMaLrs7UcOS2nnLxZ
+         pOGzL03qgQPQkt0gZoy9yEbLDydxaxtb3Tf7+dGP+c+4TyK5C2WxcuTPNFn6/7pXaeM1
+         S2nA==
+X-Gm-Message-State: AOAM5326wLrkWntUCjizgVvk9wCGbx0TeDNR7W9W+Lvw4Bgl2DkMOmr2
+        irkA59CC659BVE23AFBAolrXJKyZqnL4Tfdsc75MQA==
+X-Google-Smtp-Source: ABdhPJyBkM6A1SesEEsi7CUd4eASLAmMUNIZ2b7t65sLE8Fo2Igp/CWfwHG+dUEz/9VlmAd8UBpIrP5NXdIxeBW8BuI=
+X-Received: by 2002:a2e:b98b:0:b0:24f:1b64:a7b7 with SMTP id
+ p11-20020a2eb98b000000b0024f1b64a7b7mr197861ljp.331.1652893916972; Wed, 18
+ May 2022 10:11:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20220518135111.3535-1-ubizjak@gmail.com>
+In-Reply-To: <20220518135111.3535-1-ubizjak@gmail.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Wed, 18 May 2022 10:11:30 -0700
+Message-ID: <CALzav=e4G_=uSLaRetNFn5FGEiuRFK7=za0Wi9G422LsxFVruA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Use try_cmpxchg64 in tdp_mmu_set_spte_atomic
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,71 +68,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Wed, May 18, 2022 at 7:08 AM Uros Bizjak <ubizjak@gmail.com> wrote:
+>
+> Use try_cmpxchg64 instead of cmpxchg64 (*ptr, old, new) != old in
+> tdp_mmu_set_spte_atomic.  cmpxchg returns success in ZF flag, so this
+> change saves a compare after cmpxchg (and related move instruction
+> in front of cmpxchg). Also, remove explicit assignment to iter->old_spte
+> when cmpxchg fails, this is what try_cmpxchg does implicitly.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 
-On some virt platforms (L1 guest w/o PMU), the value of module parameter
-'enable_pmu' for nested L2 guests should be updated at initialisation.
+Nice cleanup.
 
-Considering that there is no concept of "architecture pmu" in AMD or Hygon
-and that the versions (prior to Zen 4) are all 0, but that the theoretical
-available counters are at least AMD64_NUM_COUNTERS, the utility
-check_hw_exists() is reused in the initialisation call path.
+Reviewed-by: David Matlack <dmatlack@google.com>
 
-Opportunistically update Intel specific comments.
-
-Fixes: 8eeac7e999e8 ("KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/events/core.c |  6 ++++++
- arch/x86/kvm/pmu.h     | 15 ++++++++++-----
- 2 files changed, 16 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 7f1d10dbabc0..865eeb500a71 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -2982,6 +2982,12 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
- 
- void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
- {
-+	if (!check_hw_exists(&pmu, x86_pmu.num_counters,
-+			     x86_pmu.num_counters_fixed)) {
-+		memset(cap, 0, sizeof(*cap));
-+		return;
-+	}
-+
- 	cap->version		= x86_pmu.version;
- 	/*
- 	 * KVM doesn't support the hybrid PMU yet.
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index ecf2962510e4..b200d080a8a3 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -150,14 +150,19 @@ extern struct x86_pmu_capability kvm_pmu_cap;
- 
- static inline void kvm_init_pmu_capability(void)
- {
-+	bool is_intel = boot_cpu_data.x86_vendor == X86_VENDOR_INTEL;
-+
- 	perf_get_x86_pmu_capability(&kvm_pmu_cap);
- 
--	/*
--	 * Only support guest architectural pmu on
--	 * a host with architectural pmu.
--	 */
--	if (!kvm_pmu_cap.version)
-+	 /*
-+	  * For Intel, only support guest architectural pmu
-+	  * on a host with architectural pmu.
-+	  */
-+	if ((is_intel && !kvm_pmu_cap.version) || !kvm_pmu_cap.num_counters_gp) {
- 		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
-+		enable_pmu = false;
-+		return;
-+	}
- 
- 	kvm_pmu_cap.version = min(kvm_pmu_cap.version, 2);
- 	kvm_pmu_cap.num_counters_fixed = min(kvm_pmu_cap.num_counters_fixed,
--- 
-2.36.1
-
+> ---
+> Patch requires commits 0aa7be05d83cc584da0782405e8007e351dfb6cc
+> and c2df0a6af177b6c06a859806a876f92b072dc624 from tip.git
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 12 +-----------
+>  1 file changed, 1 insertion(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 922b06bf4b94..1ccc1a0f8123 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -633,7 +633,6 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
+>                                           u64 new_spte)
+>  {
+>         u64 *sptep = rcu_dereference(iter->sptep);
+> -       u64 old_spte;
+>
+>         /*
+>          * The caller is responsible for ensuring the old SPTE is not a REMOVED
+> @@ -649,17 +648,8 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
+>          * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
+>          * does not hold the mmu_lock.
+>          */
+> -       old_spte = cmpxchg64(sptep, iter->old_spte, new_spte);
+> -       if (old_spte != iter->old_spte) {
+> -               /*
+> -                * The page table entry was modified by a different logical
+> -                * CPU. Refresh iter->old_spte with the current value so the
+> -                * caller operates on fresh data, e.g. if it retries
+> -                * tdp_mmu_set_spte_atomic().
+> -                */
+> -               iter->old_spte = old_spte;
+> +       if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
+>                 return -EBUSY;
+> -       }
+>
+>         __handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
+>                               new_spte, iter->level, true);
+> --
+> 2.35.1
+>
