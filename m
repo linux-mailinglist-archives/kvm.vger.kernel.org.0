@@ -2,102 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86F2B52C03C
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:09:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B84CC52C013
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:09:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240319AbiERQdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 12:33:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
+        id S240354AbiERQhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 12:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240314AbiERQdN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 12:33:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2422C18DAE3
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:33:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652891589;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=6BW+tomAtB+5qk/t/SKeP6VB//NGldp/mpIoLmV3bKM=;
-        b=WOepCd9pQK4U8McLcvFf/IQUeh4XaFVGD3w0LnLxjtChigIWuVYDhsCJ752XQn3aI+amEt
-        pnIJ+QbAZsH/DE3405c274Xsl7Wz0Bgu7U/+Ck40jJGpaaSsDmBfIq1EJ16OnnGZMawM20
-        FShGTCDisWHhuiYOMEBkflU/DRjUp+c=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-91-9qrMfAqINCuTyUnfWZeGFw-1; Wed, 18 May 2022 12:33:08 -0400
-X-MC-Unique: 9qrMfAqINCuTyUnfWZeGFw-1
-Received: by mail-wm1-f70.google.com with SMTP id c62-20020a1c3541000000b0038ec265155fso3117970wma.6
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:33:08 -0700 (PDT)
+        with ESMTP id S240385AbiERQhr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 12:37:47 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1B01A15F8
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:37:45 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id m12so2302349plb.4
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 09:37:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OlUGigunER2dUQovHcmZ08w4DbPhm8v/S8Qaa0mftNM=;
+        b=g6AEVguYfYkUMW5pTSZT4JC8WIruEWrizuHoM9NBCSmpT54HponQsh+JSFHRJH5oes
+         5xHoGHCW02PlVpG5ae5rU6f04G7MSNBoK52Q67Q/9WhQ74mK/0Y0eAzmnFLw2XxFATck
+         NV6RsFpOVKY6eQIBVsyXraqc7zsxVev3AVJkgpQ4P6ZhuCWLZWzsTld4dKGx82tqZQjZ
+         +nJJbZx0htV07O1aM5plILoLvR3dDPir09C6a2oDgiNeSXD138r4xlEde4LHIY1G0PSG
+         iABe3D/KZb7Ui2LH+zVMyYbI7e0VupHtXd7EWaWHo1sPdq0IInND9NobPnLma3CmBKXA
+         HkSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=6BW+tomAtB+5qk/t/SKeP6VB//NGldp/mpIoLmV3bKM=;
-        b=aaENkM8P9moIT04GS5ZERXrtVt8NQfnuiMIUyEnfjBWkb59ccTQHcUikYJfcLjJF32
-         47NDC02qh7wtkaMffaqQTWRuWHHsl2/YIapGaItDZkW32LXI/+JC6Pip75NwAxTRDENg
-         MWNKPIdLtVbD/ccd1KKNZc7k0VfqNdOdVAgRakJBogCYURQOOBbp7niTQ0Rok1jlFLGU
-         SvcoOKpMZgSit2RCJXjOUpaTPSd/DqWH15pxQ5hBmAOAKQJ0ExgCVOD5tvRB2V204z03
-         jAUNwoXQ8UgBagbOBUnF62Xb2dF0wQLMbxR65hSGKpqmZeuGed9BBIARz8YD3FHITZ5x
-         tcaQ==
-X-Gm-Message-State: AOAM530YkUeM+dxJWMt6yG1UDPsDaou/8aOZu9AirG3wx/aN7mbcL53+
-        eAKhNWTBr8w/06fap2OmlKiDs4nGe1ZdTbji4NX7fVUivKTu6ovNQcseHMCyyNim4NCcXmjD6K4
-        Ak7WzYsNbO64K
-X-Received: by 2002:a05:6000:1688:b0:20d:a533:fc5 with SMTP id y8-20020a056000168800b0020da5330fc5mr459071wrd.338.1652891586808;
-        Wed, 18 May 2022 09:33:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyfNEmIPPO7ty/Qr0Slw7Q7GYnij8heyI7qsewEV2V5kqhFnMGnfmQUh+NwrkEXhVzH3oNxug==
-X-Received: by 2002:a05:6000:1688:b0:20d:a533:fc5 with SMTP id y8-20020a056000168800b0020da5330fc5mr459036wrd.338.1652891586395;
-        Wed, 18 May 2022 09:33:06 -0700 (PDT)
-Received: from redhat.com ([151.81.230.224])
-        by smtp.gmail.com with ESMTPSA id x10-20020a7bc20a000000b003942a244ebesm2121054wmi.3.2022.05.18.09.33.05
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OlUGigunER2dUQovHcmZ08w4DbPhm8v/S8Qaa0mftNM=;
+        b=xz17ygG7FAuD1hakjLzXI/Gw5M3kJQA3MHemW0UfUg4I5+Jh0U6Q+WomL2zGx1yKZm
+         tg+O05A4X74T/JG6auIvmu6H609wdCWR0cv6fqRuBeGoBr3jUnH9K9cC2kPtK1NzXunr
+         nhjtqimHVKPQP7wXer+DUHiPTgVZOwT/k7+ASq3NWBo/+/dKPJOpDsKfAtLn3YmUBkVB
+         XkvSkAeE0LpUZMCk4O74disFKQ6fI/VR7+DJ/S/WRl5dcUwLOdOOMf7Fiqrg8Pa3f2rZ
+         kTWW8yGoVPrO0/Yt/ttwdFcsxgeZnaRsDJQlbwldvFN/BSZsj5FqF7rOdr7q3WBE6fs4
+         RfVQ==
+X-Gm-Message-State: AOAM530PW9F1pMIq/Rymn0MtqsI8wA4XIZfKbjSFYXvn92KaYEduo3Qe
+        EQLb1PN4vDGsbwPgKLyX6D80yQ==
+X-Google-Smtp-Source: ABdhPJywSP4hndDCPZEIjn0VwLPzwKqjE+0I1Dtt2M9SLG1nyqLRrRMOxdxRY6iieZ7YHnfkTtQpTw==
+X-Received: by 2002:a17:902:7c13:b0:156:ca91:877f with SMTP id x19-20020a1709027c1300b00156ca91877fmr236602pll.15.1652891864884;
+        Wed, 18 May 2022 09:37:44 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a9-20020a170902710900b0015e8d4eb1c6sm1914791pll.16.2022.05.18.09.37.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 09:33:06 -0700 (PDT)
-Date:   Wed, 18 May 2022 12:33:04 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        elic@nvidia.com, jasowang@redhat.com, mst@redhat.com
-Subject: [GIT PULL] mlx5: last minute fixup
-Message-ID: <20220518123304-mutt-send-email-mst@kernel.org>
+        Wed, 18 May 2022 09:37:44 -0700 (PDT)
+Date:   Wed, 18 May 2022 16:37:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 10/10] KVM: selftests: Add option to run
+ dirty_log_perf_test vCPUs in L2
+Message-ID: <YoUg1Fq1tMGISJX5@google.com>
+References: <20220517190524.2202762-1-dmatlack@google.com>
+ <20220517190524.2202762-11-dmatlack@google.com>
+ <YoQDjx242f0AAUDS@xz-m1.local>
+ <YoT5/TRyA/QKTsqL@xz-m1.local>
+ <YoUPtB0KtRuWl4p7@google.com>
+ <CALzav=crRhStBy8zouM964ygU7-n72LkMo0m0g4xc5un4Cp1mA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CALzav=crRhStBy8zouM964ygU7-n72LkMo0m0g4xc5un4Cp1mA@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 42226c989789d8da4af1de0c31070c96726d990c:
+On Wed, May 18, 2022, David Matlack wrote:
+> On Wed, May 18, 2022 at 8:24 AM Sean Christopherson <seanjc@google.com> wrote:
+> > Page table allocations are currently hardcoded to come from memslot0.  memslot0
+> > is required to be in lower DRAM, and thus tops out at ~3gb for all intents and
+> > purposes because we need to leave room for the xAPIC.
+> >
+> > And I would strongly prefer not to plumb back the ability to specificy an alternative
+> > memslot for page table allocations, because except for truly pathological tests that
+> > functionality is unnecessary and pointless complexity.
+> >
+> > > I don't think it's very hard - walk the mem regions in kvm_vm.regions
+> > > should work for us?
+> >
+> > Yeah.  Alternatively, The test can identity map all of memory <4gb and then also
+> > map "guest_test_phys_mem - guest_num_pages".  I don't think there's any other memory
+> > to deal with, is there?
+> 
+> This isn't necessary for 4-level, but also wouldn't be too hard to
+> implement. I can take a stab at implementing in v3 if we think 5-level
+> selftests are coming soon.
 
-  Linux 5.18-rc7 (2022-05-15 18:08:58 -0700)
+The current incarnation of nested_map_all_1g() is broken irrespective of 5-level
+paging.  If MAXPHYADDR > 48, then bits 51:48 will either be ignored or will cause
+reserved #PF or #GP[*].  Because the test puts memory at max_gfn, identity mapping
+test memory will fail if 4-level paging is used and MAXPHYADDR > 48.
 
-are available in the Git repository at:
+I think the easist thing would be to restrict the "starting" upper gfn to the min
+of max_gfn and the max addressable gfn based on whether 4-level or 5-level paging
+is in use.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+[*] Intel's SDM is comically out-of-date and pretends 5-level EPT doesn't exist,
+    so I'm not sure what happens if a GPA is greater than the PWL.
 
-for you to fetch changes up to acde3929492bcb9ceb0df1270230c422b1013798:
+    Section "28.3.2 EPT Translation Mechanism" still says:
 
-  vdpa/mlx5: Use consistent RQT size (2022-05-18 12:31:31 -0400)
+    The EPT translation mechanism uses only bits 47:0 of each guest-physical address.
 
-----------------------------------------------------------------
-mlx5: last minute fixup
-
-The patch has been on list for a while but as it was posted as part of a
-thread it was missed.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Eli Cohen (1):
-      vdpa/mlx5: Use consistent RQT size
-
- drivers/vdpa/mlx5/net/mlx5_vnet.c | 61 ++++++++++++++-------------------------
- 1 file changed, 21 insertions(+), 40 deletions(-)
-
+    No processors supporting the Intel 64 architecture support more than 48
+    physical-address bits. Thus, no such processor can produce a guest-physical
+    address with more than 48 bits. An attempt to use such an address causes a
+    page fault. An attempt to load CR3 with such an address causes a general-protection
+    fault. If PAE paging is being used, an attempt to load CR3 that would load a
+    PDPTE with such an address causes a general-protection fault.
