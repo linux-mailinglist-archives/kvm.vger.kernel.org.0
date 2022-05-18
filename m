@@ -2,268 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F239152B82D
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 12:57:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD35552B84F
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 13:13:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235186AbiERKr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 06:47:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50354 "EHLO
+        id S235326AbiERLE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 07:04:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235146AbiERKrx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 06:47:53 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D477E90CCC;
-        Wed, 18 May 2022 03:47:51 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IAKZxj013497;
-        Wed, 18 May 2022 10:47:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=a6QBUi0AHQA+C2I98hT+CKa0i+amRKFGVmLjhD5CvTY=;
- b=S46wlk35wfN8YRtmjz8DIYMBPr+TXFlJTxn0TzLAaUV2IHvi1yM5z8QmlyQxP0WJU3ZC
- h/mPBrV7Ws5NpOk0KbWkXyAsSOZeU5HUaYqM6O5+AZT596cesGN2eFa6hc/2sfmYjYjB
- r8vIXhX0sOAK+EggUpfGgYcnhfv84YqPSiSv2nQC9hb1VeKwRGEZJdM1iv7IY4ap/IEn
- UWAH5ZecGDUSSN1+o4HONOGlTInWYdR82QPqnjqsQKSOJyyd1DtqNnuvG4ss15C3kntt
- Wu7eRyWhU6s4/L7ZePtEron+3ytFh0iqY+md5qStAXMIF+3GSCw5DkRscMypgusqHWKV VA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4xybruem-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 10:47:51 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24IALWAW019839;
-        Wed, 18 May 2022 10:47:50 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g4xybrue5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 10:47:50 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24IAlabt017562;
-        Wed, 18 May 2022 10:47:48 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3g2429djxk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 May 2022 10:47:48 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24IAlj3P46793088
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 May 2022 10:47:45 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47DC8A405B;
-        Wed, 18 May 2022 10:47:45 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 862C7A4054;
-        Wed, 18 May 2022 10:47:44 +0000 (GMT)
-Received: from [9.171.22.150] (unknown [9.171.22.150])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 18 May 2022 10:47:44 +0000 (GMT)
-Message-ID: <93c07dce-a64a-fa1a-f70c-9db22ca53f68@linux.ibm.com>
-Date:   Wed, 18 May 2022 12:51:33 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v9 3/3] s390x: KVM: resetting the Topology-Change-Report
+        with ESMTP id S235314AbiERLE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 07:04:56 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 628E016ABDC;
+        Wed, 18 May 2022 04:04:50 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 8625A5FD02;
+        Wed, 18 May 2022 14:04:46 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1652871886;
+        bh=LODBtXgVWXeDIhrxNBTcRKzCMopjOGlAebIgj56+PFc=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=f1f9f7GLgayU0KcG8GkZvNRPVm8QoQ6tJhupA1lEvqCbNokpSZUEHDmdJxNGeaMUD
+         8WTpg9IWj7IlJsyQrki6W93TiTVYDuTwAB26skzvwTv9as5d16E9yq7txk+DQmndZV
+         AK9CSLx3SBE9kxEdMehVlugfw+YumUyPS75hkWiYsVjJhKddVmCeliQEIl2fdxGrQJ
+         dIAAEVlrwoj2E5jXAz/B/hoql+XlT5UT2I8Wfm6SAb3rGzn8RR5BSxWh+uChdTYH6v
+         Q5s5GBEKazQ/IcLqWzck4Lnl/cZ/XoTFp/s3y19lw6PZ70uaiyC4gwpvLkhFPglF+I
+         JNvidZnvWOYcA==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Wed, 18 May 2022 14:04:42 +0300 (MSK)
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: Re: [RFC PATCH v1 0/8] virtio/vsock: experimental zerocopy receive
+Thread-Topic: [RFC PATCH v1 0/8] virtio/vsock: experimental zerocopy receive
+Thread-Index: AQHYZb23ItH0dwyJNkOi7nYOIXQV0q0jA7cAgAFMqQA=
+Date:   Wed, 18 May 2022 11:04:30 +0000
+Message-ID: <413d821f-3893-befa-7009-2f87ef51af7a@sberdevices.ru>
+References: <7cdcb1e1-7c97-c054-19cf-5caeacae981d@sberdevices.ru>
+ <20220517151404.vqse5tampdsaaeji@sgarzare-redhat>
+In-Reply-To: <20220517151404.vqse5tampdsaaeji@sgarzare-redhat>
+Accept-Language: en-US
 Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com
-References: <20220506092403.47406-1-pmorel@linux.ibm.com>
- <20220506092403.47406-4-pmorel@linux.ibm.com>
- <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <76fd0c11-5b9b-0032-183b-54db650f13b1@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gWM6D2RUNeri6TMwnWSmYV-0XgbZd999
-X-Proofpoint-ORIG-GUID: pR25ogm1zAWtbYYs3loDU5iJEGD5d6Nv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-18_03,2022-05-17_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 impostorscore=0 spamscore=0
- phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205180059
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <217C56C3E9FC4D43B2D4D269C09CB458@sberdevices.ru>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/05/18 05:46:00 #19466178
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/12/22 11:31, David Hildenbrand wrote:
-> On 06.05.22 11:24, Pierre Morel wrote:
->> During a subsystem reset the Topology-Change-Report is cleared.
->> Let's give userland the possibility to clear the MTCR in the case
->> of a subsystem reset.
->>
->> To migrate the MTCR, let's give userland the possibility to
->> query the MTCR state.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   arch/s390/include/uapi/asm/kvm.h |  5 ++
->>   arch/s390/kvm/kvm-s390.c         | 79 ++++++++++++++++++++++++++++++++
->>   2 files changed, 84 insertions(+)
->>
->> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
->> index 7a6b14874d65..abdcf4069343 100644
->> --- a/arch/s390/include/uapi/asm/kvm.h
->> +++ b/arch/s390/include/uapi/asm/kvm.h
->> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
->>   #define KVM_S390_VM_CRYPTO		2
->>   #define KVM_S390_VM_CPU_MODEL		3
->>   #define KVM_S390_VM_MIGRATION		4
->> +#define KVM_S390_VM_CPU_TOPOLOGY	5
->>   
->>   /* kvm attributes for mem_ctrl */
->>   #define KVM_S390_VM_MEM_ENABLE_CMMA	0
->> @@ -171,6 +172,10 @@ struct kvm_s390_vm_cpu_subfunc {
->>   #define KVM_S390_VM_MIGRATION_START	1
->>   #define KVM_S390_VM_MIGRATION_STATUS	2
->>   
->> +/* kvm attributes for cpu topology */
->> +#define KVM_S390_VM_CPU_TOPO_MTR_CLEAR	0
->> +#define KVM_S390_VM_CPU_TOPO_MTR_SET	1
->> +
->>   /* for KVM_GET_REGS and KVM_SET_REGS */
->>   struct kvm_regs {
->>   	/* general purpose regs for s390 */
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index c8bdce31464f..80a1244f0ead 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -1731,6 +1731,76 @@ static void kvm_s390_sca_set_mtcr(struct kvm *kvm)
->>   	ipte_unlock(kvm);
->>   }
->>   
->> +/**
->> + * kvm_s390_sca_clear_mtcr
->> + * @kvm: guest KVM description
->> + *
->> + * Is only relevant if the topology facility is present,
->> + * the caller should check KVM facility 11
->> + *
->> + * Updates the Multiprocessor Topology-Change-Report to signal
->> + * the guest with a topology change.
->> + */
->> +static void kvm_s390_sca_clear_mtcr(struct kvm *kvm)
->> +{
->> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
->> +
->> +	ipte_lock(kvm);
->> +	sca->utility  &= ~SCA_UTILITY_MTCR;
-> 
-> 
-> One space too much.
-> 
-> sca->utility &= ~SCA_UTILITY_MTCR;
-> 
->> +	ipte_unlock(kvm);
->> +}
->> +
->> +static int kvm_s390_set_topology(struct kvm *kvm, struct kvm_device_attr *attr)
->> +{
->> +	if (!test_kvm_facility(kvm, 11))
->> +		return -ENXIO;
->> +
->> +	switch (attr->attr) {
->> +	case KVM_S390_VM_CPU_TOPO_MTR_SET:
->> +		kvm_s390_sca_set_mtcr(kvm);
->> +		break;
->> +	case KVM_S390_VM_CPU_TOPO_MTR_CLEAR:
->> +		kvm_s390_sca_clear_mtcr(kvm);
->> +		break;
->> +	}
->> +	return 0;
->> +}
->> +
->> +/**
->> + * kvm_s390_sca_get_mtcr
->> + * @kvm: guest KVM description
->> + *
->> + * Is only relevant if the topology facility is present,
->> + * the caller should check KVM facility 11
->> + *
->> + * reports to QEMU the Multiprocessor Topology-Change-Report.
->> + */
->> +static int kvm_s390_sca_get_mtcr(struct kvm *kvm)
->> +{
->> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
->> +	int val;
->> +
->> +	ipte_lock(kvm);
->> +	val = !!(sca->utility & SCA_UTILITY_MTCR);
->> +	ipte_unlock(kvm);
->> +
->> +	return val;
->> +}
->> +
->> +static int kvm_s390_get_topology(struct kvm *kvm, struct kvm_device_attr *attr)
->> +{
->> +	int mtcr;
-> 
-> I think we prefer something like u16 when copying to user space.
-
-I come back here.
-I think I prefer to keep the int.
-
-the u16 is more than the MTCR but the entire utility field, so what 
-should I do:
-
-rename the function to kvm_s390_get_sca_utility() ?
-and then should I modify the KVM_S390_VM_CPU_TOPOLOGY
-to KVM_S390_VM_SCA_UTILITY ?
-
-I do not like that, I do not think we should report/handle more 
-information than expected/needed.
-
-I can mask the MTCR bit and return a u16 with bit 0 (0x8000) set
-but I find this a little weird
-
-I admit an int is may be not optimal.
-logically I should report a bool but I do not like to report a bool 
-through the UAPI.
-
-The more I think about it the more I think an int is OK.
-Or in the case we want to spare memory space I can create a flag in a 
-u16 but it should theoretically be different than the firmware MTCR bit. 
-Could be 0x0001.
-But still, it is only to leave during the copy_to_user where the copy of 
-an int may be as good or better than the copy of a u16.
-
-So any more opinion on this?
-
-Regards,
-Pierre
-
-> 
->> +
->> +	if (!test_kvm_facility(kvm, 11))
->> +		return -ENXIO;
->> +
->> +	mtcr = kvm_s390_sca_get_mtcr(kvm);
->> +	if (copy_to_user((void __user *)attr->addr, &mtcr, sizeof(mtcr)))
->> +		return -EFAULT;
->> +
->> +	return 0;
->> +}
-> 
-> You should probably add documentation, and document that only the last
-> bit (0x1) has a meaning.
-> 
-> Apart from that LGTM.
-> 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+SGVsbG8gU3RlZmFubywNCg0KT24gMTcuMDUuMjAyMiAxODoxNCwgU3RlZmFubyBHYXJ6YXJlbGxh
+IHdyb3RlOg0KPiBIaSBBcnNlbml5LA0KPiANCj4gT24gVGh1LCBNYXkgMTIsIDIwMjIgYXQgMDU6
+MDQ6MTFBTSArMDAwMCwgQXJzZW5peSBLcmFzbm92IHdyb3RlOg0KPj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgSU5UUk9EVUNUSU9ODQo+
+Pg0KPj4gwqDCoMKgwqBIZWxsbywgdGhpcyBpcyBleHBlcmltZW50YWwgaW1wbGVtZW50YXRpb24g
+b2YgdmlydGlvIHZzb2NrIHplcm9jb3B5DQo+PiByZWNlaXZlLiBJdCB3YXMgaW5zcGlyZWQgYnkg
+VENQIHplcm9jb3B5IHJlY2VpdmUgYnkgRXJpYyBEdW1hemV0LiBUaGlzIEFQSSB1c2VzDQo+PiBz
+YW1lIGlkZWE6IGNhbGwgJ21tYXAoKScgb24gc29ja2V0J3MgZGVzY3JpcHRvciwgdGhlbiBldmVy
+eSAnZ2V0c29ja29wdCgpJyB3aWxsDQo+PiBmaWxsIHByb3ZpZGVkIHZtYSBhcmVhIHdpdGggcGFn
+ZXMgb2YgdmlydGlvIFJYIGJ1ZmZlcnMuIEFmdGVyIHJlY2VpdmVkIGRhdGEgd2FzDQo+PiBwcm9j
+ZXNzZWQgYnkgdXNlciwgcGFnZXMgbXVzdCBiZSBmcmVlZCBieSAnbWFkdmlzZSgpJ8KgIGNhbGwg
+d2l0aCBNQURWX0RPTlRORUVEDQo+PiBmbGFnIHNldChpZiB1c2VyIHdvbid0IGNhbGwgJ21hZHZp
+c2UoKScsIG5leHQgJ2dldHNvY2tvcHQoKScgd2lsbCBmYWlsKS4NCj4gDQo+IFNvdW5kcyBjb29s
+LCBidXQgbWF5YmUgd2Ugd291bGQgbmVlZCBzb21lIHNvY2tldC9uZXQgZXhwZXJ0cyBoZXJlIGZv
+ciByZXZpZXcuDQoNClllcywgdGhhdCB3b3VsZCBiZSBncmVhdA0KDQo+IA0KPiBDb3VsZCB3ZSBk
+byBzb21ldGhpbmcgc2ltaWxhciBmb3IgdGhlIHNlbmRpbmcgcGF0aCBhcyB3ZWxsPw0KDQpIZXJl
+IGFyZSB0aG91Z2h0cyBhYm91dCB6ZXJvY29weSB0cmFuc21pc3Npb246DQogIA0KSSB0cmllZCB0
+byBpbXBsZW1lbnQgdGhpcyBmZWF0dXJlIGluIHRoZSBmb2xsb3dpbmcgd2F5OiB1c2VyIGNyZWF0
+ZXMNCnNvbWUgcGFnZSBhbGlnbmVkIGJ1ZmZlciwgdGhlbiBkdXJpbmcgdHggcGFja2V0IGFsbG9j
+YXRpb24gaW5zdGVhZCBvZg0KY3JlYXRpbmcgZGF0YSBidWZmZXIgd2l0aCAna21hbGxvYygpJywg
+aSB0cmllZCB0byBhZGQgdXNlcidzIGJ1ZmZlcg0KdG8gdmlydGlvIHF1ZXVlLiBCdXQgZm91bmQg
+cHJvYmxlbTogYXMga2VybmVsIHZpcnRpbyBBUEkgdXNlcyB2aXJ0dWFsDQphZGRyZXNzZXMgdG8g
+YWRkIG5ldyBidWZmZXJzLCBpbiB0aGUgZGVlcCBvZiB2aXJ0aW8gc3Vic3lzdGVtDQondmlydF90
+b19waHlzKCknIGlzIGNhbGxlZCB0byBnZXQgcGh5c2ljYWwgYWRkcmVzcyBvZiBidWZmZXIsIHNv
+IHVzZXIncw0KdmlydHVhbCBhZGRyZXNzIHdvbid0IGJlIHRyYW5zbGF0ZWQgY29ycmVjdGx5IHRv
+IHBoeXNpY2FsIGFkZHJlc3MoaW4NCnRoZW9yeSwgaSBjYW4gcGVyZm9ybSBwYWdlIHdhbGsgZm9y
+IHN1Y2ggdXNlcidzIHZhLCBnZXQgcGh5c2ljYWwgYWRkcmVzcw0KYW5kIHBhc3Mgc29tZSAiZmFr
+ZSIgdmlydHVhbCBhZGRyZXNzIHRvIHZpcnRpbyBBUEkgaW4gb3JkZXIgdG8gbWFrZQ0KJ3ZpcnRf
+dG9fcGh5cygpJyByZXR1cm4gdmFsaWQgcGh5c2ljYWwgYWRkcmVzcyhidXQgaSB0aGluayB0aGlz
+IGlzIHVnbHkpLg0KDQoNCklmIHdlIGFyZSB0YWxraW5nIGFib3V0ICdtbWFwKCknIHdheSwgaSB0
+aGluayB3ZSBjYW4gZG8gdGhlIGZvbGxvd2luZzoNCnVzZXIgY2FsbHMgJ21tYXAoKScgb24gc29j
+a2V0LCBrZXJuZWwgZmlsbHMgbmV3bHkgY3JlYXRlZCBtYXBwaW5nIHdpdGgNCmFsbG9jYXRlZCBw
+YWdlcyhhbGwgcGFnZXMgaGF2ZSBydyBwZXJtaXNzaW9ucykuIE5vdyB1c2VyIGNhbiB1c2UgcGFn
+ZXMNCm9mIHRoaXMgbWFwcGluZyhlLmcuIGZpbGwgaXQgd2l0aCBkYXRhKS4gRmluYWxseSwgdG8g
+c3RhcnQgdHJhbnNtaXNzaW9uLA0KdXNlciBjYWxscyAnZ2V0c29ja29wdCgpJyBvciBzb21lICdp
+b2N0bCgpJyBhbmQga2VybmVsIHByb2Nlc3NlcyBkYXRhIG9mDQp0aGlzIG1hcHBpbmcuIEFsc28g
+YXMgdGhpcyBjYWxsIHdpbGwgcmV0dXJuIGltbWVkaWF0ZWx5KGUuZy4gaXQgaXMNCmFzeW5jaHJv
+bm91cyksIHNvbWUgY29tcGxldGlvbiBsb2dpYyBtdXN0IGJlIGltcGxlbWVudGVkLiBGb3IgZXhh
+bXBsZQ0KdXNlIHNhbWUgd2F5IGFzIE1TR19aRVJPQ09QWSB1c2VzIC0gcG9sbCBlcnJvciBxdWV1
+ZSBvZiBzb2NrZXQgdG8gZ2V0DQptZXNzYWdlIHRoYXQgcGFnZXMgY291bGQgYmUgcmV1c2VkLCBv
+ciBkb24ndCBhbGxvdyB1c2VyIHRvIHdvcmsgd2l0aA0KdGhlc2UgcGFnZXM6IHVubWFwIGl0LCBw
+ZXJmb3JtIHRyYW5zbWlzc2lvbiBhbmQgZmluYWxseSBmcmVlIHBhZ2VzLg0KVG8gc3RhcnQgbmV3
+IHRyYW5zbWlzc2lvbiB1c2VyIG5lZWQgdG8gY2FsbCAnbW1hcCgpJyBhZ2Fpbi4NCg0KICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIE9SDQoNCkkgdGhpbmsgdGhlcmUgaXMgYW5vdGhlciB1bnVz
+dWFsIHdheSBmb3IgemVyb2NvcHkgdHg6IGxldCdzIHVzZSAndm1zcGxpY2UoKScNCi8nc3BsaWNl
+KCknLiBJbiB0aGlzIGFwcHJvYWNoIHRvIHRyYW5zbWl0IHNvbWV0aGluZywgdXNlciBkb2VzIHRo
+ZSBmb2xsb3dpbmcNCnN0ZXBzOg0KMSkgQ3JlYXRlcyBwaXBlLg0KMikgQ2FsbHMgJ3Ztc3BsaWNl
+KFNQTElDRV9GX0dJRlQpJyBvbiB0aGlzIHBpcGUsIGluc2VydCBkYXRhIHBhZ2VzIHRvIGl0Lg0K
+ICAgU1BMSUNFX0ZfR0lGVCBhbGxvd3MgdXNlciB0byBmb3JnZXQgYWJvdXQgYWxsb2NhdGVkIHBh
+Z2VzIC0ga2VybmVsIHdpbGwNCiAgIGZyZWUgaXQuDQozKSBDYWxscyAnc3BsaWNlKFNQTElDRV9G
+X01PVkUpJyBmcm9tIHBpcGUgdG8gc29ja2V0LiBTUExJQ0VfRl9NT1ZFIHdpbGwNCiAgIG1vdmUg
+cGFnZXMgZnJvbSBwaXBlIHRvIHNvY2tldChlLmcuIGluIHNwZWNpYWwgc29ja2V0IGNhbGxiYWNr
+IHdlIGdvdA0KICAgc2V0IG9mIHBpcGUncyBwYWdlcyBhcyBpbnB1dCBhcmd1bWVudCBhbmQgYWxs
+IHBhZ2VzIHdpbGwgYmUgaW5zZXJ0ZWQNCiAgIHRvIHZpcnRpbyBxdWV1ZSkuDQoNCkJ1dCBhcyBT
+UExJQ0VfRl9NT1ZFIHN1cHBvcnQgaXMgZGlzYWJsZWQsIGl0IG11c3QgYmUgcmVwYWlyZWQgZmly
+c3QuDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICANCj4gDQo+Pg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgREVUQUlMUw0KPj4NCj4+IMKgwqDCoMKg
+SGVyZSBpcyBob3cgbWFwcGluZyB3aXRoIG1hcHBlZCBwYWdlcyBsb29rcyBleGFjdGx5OiBmaXJz
+dCBwYWdlIG1hcHBpbmcNCj4+IGNvbnRhaW5zIGFycmF5IG9mIHRyaW1tZWQgdmlydGlvIHZzb2Nr
+IHBhY2tldCBoZWFkZXJzIChpbiBjb250YWlucyBvbmx5IGxlbmd0aA0KPj4gb2YgZGF0YSBvbiB0
+aGUgY29ycmVzcG9uZGluZyBwYWdlIGFuZCAnZmxhZ3MnIGZpZWxkKToNCj4+DQo+PiDCoMKgwqDC
+oHN0cnVjdCB2aXJ0aW9fdnNvY2tfdXNyX2hkciB7DQo+PiDCoMKgwqDCoMKgwqDCoCB1aW50MzJf
+dCBsZW5ndGg7DQo+PiDCoMKgwqDCoMKgwqDCoCB1aW50MzJfdCBmbGFnczsNCj4+IMKgwqDCoMKg
+fTsNCj4+DQo+PiBGaWVsZMKgICdsZW5ndGgnIGFsbG93cyB1c2VyIHRvIGtub3cgZXhhY3Qgc2l6
+ZSBvZiBwYXlsb2FkIHdpdGhpbiBlYWNoIHNlcXVlbmNlDQo+PiBvZiBwYWdlcyBhbmQgJ2ZsYWdz
+JyBhbGxvd3MgdXNlciB0byBoYW5kbGUgU09DS19TRVFQQUNLRVQgZmxhZ3Moc3VjaCBhcyBtZXNz
+YWdlDQo+PiBib3VuZHMgb3IgcmVjb3JkIGJvdW5kcykuIEFsbCBvdGhlciBwYWdlcyBhcmUgZGF0
+YSBwYWdlcyBmcm9tIFJYIHF1ZXVlLg0KPj4NCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUGFn
+ZSAwwqDCoMKgwqDCoCBQYWdlIDHCoMKgwqDCoMKgIFBhZ2UgTg0KPj4NCj4+IMKgwqDCoMKgWyBo
+ZHIxIC4uIGhkck4gXVsgZGF0YSBdIC4uIFsgZGF0YSBdDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAg
+fMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqAgXsKgwqDCoMKgwqDCoMKgwqDCoMKgIF4NCj4+
+IMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoCB8wqDCoMKg
+wqDCoMKgwqDCoMKgwqAgfA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCAq
+LS0tLS0tLS0tLS0tLS0tLS0tLSoNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCAqLS0tLS0tLS0tLS0t
+LS0tLSoNCj4+DQo+PiDCoMKgwqDCoE9mIGNvdXJzZSwgc2luZ2xlIGhlYWRlciBjb3VsZCByZXBy
+ZXNlbnQgYXJyYXkgb2YgcGFnZXMgKHdoZW4gcGFja2V0J3MNCj4+IGJ1ZmZlciBpcyBiaWdnZXIg
+dGhhbiBvbmUgcGFnZSkuU28gaGVyZSBpcyBleGFtcGxlIG9mIGRldGFpbGVkIG1hcHBpbmcgbGF5
+b3V0DQo+PiBmb3Igc29tZSBzZXQgb2YgcGFja2FnZXMuIExldHMgY29uc2lkZXIgdGhhdCB3ZSBo
+YXZlIHRoZSBmb2xsb3dpbmcgc2VxdWVuY2XCoCBvZg0KPj4gcGFja2FnZXM6IDU2IGJ5dGVzLCA0
+MDk2IGJ5dGVzIGFuZCA4MjAwIGJ5dGVzLiBBbGwgcGFnZXM6IDAsMSwyLDMsNCBhbmQgNSB3aWxs
+DQo+PiBiZSBpbnNlcnRlZCB0byB1c2VyJ3Mgdm1hKHZtYSBpcyBsYXJnZSBlbm91Z2gpLg0KPj4N
+Cj4+IMKgwqDCoMKgUGFnZSAwOiBbWyBoZHIwIF1bIGhkciAxIF1bIGhkciAyIF1bIGhkciAzIF0g
+Li4uIF0NCj4+IMKgwqDCoMKgUGFnZSAxOiBbIDU2IF0NCj4+IMKgwqDCoMKgUGFnZSAyOiBbIDQw
+OTYgXQ0KPj4gwqDCoMKgwqBQYWdlIDM6IFsgNDA5NiBdDQo+PiDCoMKgwqDCoFBhZ2UgNDogWyA0
+MDk2IF0NCj4+IMKgwqDCoMKgUGFnZSA1OiBbIDggXQ0KPj4NCj4+IMKgwqDCoMKgUGFnZSAwIGNv
+bnRhaW5zIG9ubHkgYXJyYXkgb2YgaGVhZGVyczoNCj4+IMKgwqDCoMKgJ2hkcjAnIGhhcyA1NiBp
+biBsZW5ndGggZmllbGQuDQo+PiDCoMKgwqDCoCdoZHIxJyBoYXMgNDA5NiBpbiBsZW5ndGggZmll
+bGQuDQo+PiDCoMKgwqDCoCdoZHIyJyBoYXMgODIwMCBpbiBsZW5ndGggZmllbGQuDQo+PiDCoMKg
+wqDCoCdoZHIzJyBoYXMgMCBpbiBsZW5ndGggZmllbGQodGhpcyBpcyBlbmQgb2YgZGF0YSBtYXJr
+ZXIpLg0KPj4NCj4+IMKgwqDCoMKgUGFnZSAxIGNvcnJlc3BvbmRzIHRvICdoZHIwJyBhbmQgaGFz
+IG9ubHkgNTYgYnl0ZXMgb2YgZGF0YS4NCj4+IMKgwqDCoMKgUGFnZSAyIGNvcnJlc3BvbmRzIHRv
+ICdoZHIxJyBhbmQgZmlsbGVkIHdpdGggZGF0YS4NCj4+IMKgwqDCoMKgUGFnZSAzIGNvcnJlc3Bv
+bmRzIHRvICdoZHIyJyBhbmQgZmlsbGVkIHdpdGggZGF0YS4NCj4+IMKgwqDCoMKgUGFnZSA0IGNv
+cnJlc3BvbmRzIHRvICdoZHIyJyBhbmQgZmlsbGVkIHdpdGggZGF0YS4NCj4+IMKgwqDCoMKgUGFn
+ZSA1IGNvcnJlc3BvbmRzIHRvICdoZHIyJyBhbmQgaGFzIG9ubHkgOCBieXRlcyBvZiBkYXRhLg0K
+Pj4NCj4+IMKgwqDCoMKgVGhpcyBwYXRjaHNldCBhbHNvIGNoYW5nZXMgcGFja2V0cyBhbGxvY2F0
+aW9uIHdheTogdG9kYXkgaW1wbGVtZW50YXRpb24NCj4+IHVzZXMgb25seSAna21hbGxvYygpJyB0
+byBjcmVhdGUgZGF0YSBidWZmZXIuIFByb2JsZW0gaGFwcGVucyB3aGVuIHdlIHRyeSB0byBtYXAN
+Cj4+IHN1Y2ggYnVmZmVycyB0byB1c2VyJ3Mgdm1hIC0ga2VybmVsIGZvcmJpZHMgdG8gbWFwIHNs
+YWIgcGFnZXMgdG8gdXNlcidzIHZtYShhcw0KPj4gcGFnZXMgb2YgIm5vdCBsYXJnZSIgJ2ttYWxs
+b2MoKScgYWxsb2NhdGlvbnMgYXJlIG1hcmtlZCB3aXRoIFBhZ2VTbGFiIGZsYWcgYW5kDQo+PiAi
+bm90IGxhcmdlIiBjb3VsZCBiZSBiaWdnZXIgdGhhbiBvbmUgcGFnZSkuIFNvIHRvIGF2b2lkIHRo
+aXMsIGRhdGEgYnVmZmVycyBub3cNCj4+IGFsbG9jYXRlZCB1c2luZyAnYWxsb2NfcGFnZXMoKScg
+Y2FsbC4NCj4+DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgVEVTVFMNCj4+DQo+PiDCoMKgwqDCoFRoaXMgcGF0Y2hz
+ZXQgdXBkYXRlcyAndnNvY2tfdGVzdCcgdXRpbGl0eTogdHdvIHRlc3RzIGZvciBuZXcgZmVhdHVy
+ZQ0KPj4gd2VyZSBhZGRlZC4gRmlyc3QgdGVzdCBjb3ZlcnMgaW52YWxpZCBjYXNlcy4gU2Vjb25k
+IGNoZWNrcyB2YWxpZCB0cmFuc21pc3Npb24NCj4+IGNhc2UuDQo+IA0KPiBUaGFua3MgZm9yIGFk
+ZGluZyB0aGUgdGVzdCENCj4gDQo+Pg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEJFTkNITUFSS0lORw0KPj4NCj4+IMKgwqDC
+oMKgRm9yIGJlbmNobWFrcmluZyBJJ3ZlIGFkZGVkIHNtYWxsIHV0aWxpdHkgJ3J4X3plcm9jb3B5
+Jy4gSXQgd29ya3MgaW4NCj4+IGNsaWVudC9zZXJ2ZXIgbW9kZS4gV2hlbiBjbGllbnQgY29ubmVj
+dHMgdG8gc2VydmVyLCBzZXJ2ZXIgc3RhcnRzIHNlbmRpbmcgZXhhY3QNCj4+IGFtb3VudCBvZiBk
+YXRhIHRvIGNsaWVudChhbW91bnQgaXMgc2V0IGFzIGlucHV0IGFyZ3VtZW50KS5DbGllbnQgcmVh
+ZHMgZGF0YSBhbmQNCj4+IHdhaXRzIGZvciBuZXh0IHBvcnRpb24gb2YgaXQuIENsaWVudCB3b3Jr
+cyBpbiB0d28gbW9kZXM6IGNvcHkgYW5kIHplcm8tY29weS4gSW4NCj4+IGNvcHkgbW9kZSBjbGll
+bnQgdXNlcyAncmVhZCgpJyBjYWxsIHdoaWxlIGluIHplcm9jb3B5IG1vZGUgc2VxdWVuY2Ugb2Yg
+J21tYXAoKScNCj4+IC8nZ2V0c29ja29wdCgpJy8nbWFkdmlzZSgpJyBhcmUgdXNlZC4gU21hbGxl
+ciBhbW91bnQgb2YgdGltZSBmb3IgdHJhbnNtaXNzaW9uDQo+PiBpcyBiZXR0ZXIuIEZvciBzZXJ2
+ZXIsIHdlIGNhbiBzZXQgc2l6ZSBvZiB0eCBidWZmZXIgYW5kIGZvciBjbGllbnQgd2UgY2FuIHNl
+dA0KPj4gc2l6ZSBvZiByeCBidWZmZXIgb3IgcnggbWFwcGluZyBzaXplKGluIHplcm9jb3B5IG1v
+ZGUpLiBVc2FnZSBvZiB0aGlzIHV0aWxpdHkNCj4+IGlzIHF1aWV0IHNpbXBsZToNCj4+DQo+PiBG
+b3IgY2xpZW50IG1vZGU6DQo+Pg0KPj4gLi9yeF96ZXJvY29weSAtLW1vZGUgY2xpZW50IFstLXpl
+cm9jb3B5XSBbLS1yeF0NCj4+DQo+PiBGb3Igc2VydmVyIG1vZGU6DQo+Pg0KPj4gLi9yeF96ZXJv
+Y29weSAtLW1vZGUgc2VydmVyIFstLW1iXSBbLS10eF0NCj4+DQo+PiBbLS1tYl0gc2V0cyBudW1i
+ZXIgb2YgbWVnYWJ5dGVzIHRvIHRyYW5zZmVyLg0KPj4gWy0tcnhdIHNldHMgc2l6ZSBvZiByZWNl
+aXZlIGJ1ZmZlci9tYXBwaW5nIGluIHBhZ2VzLg0KPj4gWy0tdHhdIHNldHMgc2l6ZSBvZiB0cmFu
+c21pdCBidWZmZXIgaW4gcGFnZXMuDQo+Pg0KPj4gSSBjaGVja2VkIGZvciB0cmFuc21pc3Npb24g
+b2YgNDAwMG1iIG9mIGRhdGEuIEhlcmUgYXJlIHNvbWUgcmVzdWx0czoNCj4+DQo+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzaXplIG9mIHJ4L3R4
+IGJ1ZmZlcnMgaW4gcGFnZXMNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICotLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0qDQo+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgIDjCoMKgIHzCoMKgwqAgMzLCoMKgwqAgfMKgwqDC
+oCA2NMKgwqAgfMKgwqAgMjU2wqDCoMKgIHzCoMKgIDUxMsKgwqDCoCB8DQo+PiAqLS0tLS0tLS0t
+LS0tLS0qLS0tLS0tLS0qLS0tLS0tLS0tLSotLS0tLS0tLS0qLS0tLS0tLS0tLSotLS0tLS0tLS0t
+Kg0KPj4gfMKgwqAgemVyb2NvcHnCoMKgIHzCoMKgIDI0wqDCoCB8wqDCoCAxMC42wqDCoCB8wqAg
+MTIuMsKgwqAgfMKgwqAgMjMuNsKgwqAgfMKgwqDCoCAyMcKgwqDCoCB8IHNlY3MgdG8NCj4+ICot
+LS0tLS0tLS0tLS0tLSotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tIHByb2Nlc3MNCj4+IHwgbm9uLXplcm9jb3B5IHzCoMKgIDEzwqDCoCB8wqDCoCAx
+Ni40wqDCoCB8wqAgMjQuN8KgwqAgfMKgwqAgMjcuMsKgwqAgfMKgwqAgMjMuOcKgwqAgfCA0MDAw
+IG1iDQo+PiAqLS0tLS0tLS0tLS0tLS0qLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4NCj4+IEkgdGhpbmssIHRoYXQgcmVzdWx0cyBhcmUgbm90
+IHNvIGltcHJlc3NpdmUsIGJ1dCBhdCBsZWFzdCBpdCBpcyBub3Qgd29yc2UgdGhhbg0KPj4gY29w
+eSBtb2RlIGFuZCB0aGVyZSBpcyBubyBuZWVkIHRvIGFsbG9jYXRlIG1lbW9yeSBmb3IgcHJvY2Vz
+c2luZyBkYXRlLg0KPiANCj4gV2h5IGlzIGl0IHR3aWNlIGFzIHNsb3cgaW4gdGhlIGZpcnN0IGNv
+bHVtbj8NCg0KTWF5IGJlIHRoaXMgaXMgYmVjYXVzZSBtZW1vcnkgY29weWluZyBmb3Igc21hbGwg
+YnVmZmVycyBpcyB2ZXJ5IGZhc3QuLi4gaSdsbA0KYW5hbHl6ZSBpdCBkZWVwbHkuDQoNCj4gDQo+
+Pg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgUFJPQkxFTVMNCj4+DQo+PiDCoMKgwqDCoFVwZGF0ZWQgcGFja2V0J3MgYWxs
+b2NhdGlvbiBsb2dpYyBjcmVhdGVzIHNvbWUgcHJvYmxlbTogd2hlbiBob3N0IGdldHMNCj4+IGRh
+dGEgZnJvbSBndWVzdChpbiB2aG9zdC12c29jayksIGl0IGFsbG9jYXRlcyBhdCBsZWFzdCBvbmUg
+cGFnZSBmb3IgZWFjaCBwYWNrZXQNCj4+IChldmVuIGlmIHBhY2tldCBoYXMgMSBieXRlIHBheWxv
+YWQpLiBJIHRoaW5rIHRoaXMgY291bGQgYmUgcmVzb2x2ZWQgaW4gc2V2ZXJhbA0KPj4gd2F5czoN
+Cj4gDQo+IENhbiB3ZSBzb21laG93IGNvcHkgdGhlIGluY29taW5nIHBhY2tldHMgaW50byB0aGUg
+cGF5bG9hZCBvZiB0aGUgYWxyZWFkeSBxdWV1ZWQgcGFja2V0Pw0KDQpNYXkgYmUsIGknbGwgYW5h
+bHl6ZSBpdC4uLg0KDQo+IA0KPiBUaGlzIHJlbWluZHMgbWUgdGhhdCB3ZSBoYXZlIHlldCB0byBm
+aXggYSBzaW1pbGFyIHByb2JsZW0gd2l0aCBrbWFsbG9jKCkgYXMgd2VsbC4uLg0KPiANCj4gaHR0
+cHM6Ly9idWd6aWxsYS5rZXJuZWwub3JnL3Nob3dfYnVnLmNnaT9pZD0yMTUzMjkNCg0KWWVzLCBi
+dXQgaXQgaXMgYSBsaXR0bGUgYml0IGRpZmZlcmVudCBjYXNlOiBJSVVDIHRoaXMgYnVnIGhhcHBl
+bnMgYmVjYXVzZSAna21hbGxvYygpJw0KdXNlcyBtZW1vcnkgY2h1bmtzIG9mIHNvbWUgcHJlYWxs
+b2NhdGVkIHNpemUuDQoNCj4gDQo+PiDCoMKgwqDCoDEpIE1ha2UgemVyb2NvcHkgcnggbW9kZSBk
+aXNhYmxlZCBieSBkZWZhdWx0LCBzbyBpZiB1c2VyIGRpZG4ndCBlbmFibGUNCj4+IGl0LCBjdXJy
+ZW50ICdrbWFsbG9jKCknIHdheSB3aWxsIGJlIHVzZWQuDQo+IA0KPiBUaGF0IHNvdW5kcyByZWFz
+b25hYmxlIHRvIG1lLCBJIGd1ZXNzIGFsc28gVENQIG5lZWRzIGEgc2V0c29ja29wdCgpIGNhbGwg
+dG8gZW5hYmxlIHRoZSBmZWF0dXJlLCByaWdodD8NCg0KWWVzLCBZb3UncmUgcmlnaHQuIEkgdGhp
+bmsgaSdsbCBhZGQgdGhpcyB0byB2Mi4NCg0KPiANCj4+IMKgwqDCoMKgMikgVXNlICdrbWFsbG9j
+KCknIGZvciAic21hbGwiIHBhY2tldHMsIGVsc2UgY2FsbCBwYWdlIGFsbG9jYXRvci4gQnV0DQo+
+PiBpbiB0aGlzIGNhc2UsIHdlIGhhdmUgbWl4IG9mIHBhY2tldHMsIGFsbG9jYXRlZCBpbiB0d28g
+ZGlmZmVyZW50IHdheXMgdGh1cw0KPj4gZHVyaW5nIHplcm9jb3B5aW5nIHRvIHVzZXIoZS5nLiBt
+YXBwaW5nIHBhZ2VzIHRvIHZtYSksIHN1Y2ggc21hbGwgcGFja2V0cyB3aWxsDQo+PiBiZSBoYW5k
+bGVkIGluIHNvbWUgc3R1cGlkIHdheTogd2UgbmVlZCB0byBhbGxvY2F0ZSBvbmUgcGFnZSBmb3Ig
+dXNlciwgY29weSBkYXRhDQo+PiB0byBpdCBhbmQgdGhlbiBpbnNlcnQgcGFnZSB0byB1c2VyJ3Mg
+dm1hLg0KPiANCj4gSXQgc2VlbXMgbW9yZSBkaWZmaWN1bHQgdG8gbWUsIGJ1dCBhdCB0aGUgc2Ft
+ZSB0aW1lIGRvYWJsZS4gSSB3b3VsZCBnbyBtb3JlIG9uIG9wdGlvbiAxLCB0aG91Z2guDQo+IA0K
+Pj4NCj4+IFAuUzogb2YgY291cnNlIHRoaXMgaXMgZXhwZXJpbWVudGFsIFJGQywgc28gd2hhdCBk
+byBZb3UgdGhpbmsgZ3V5cz8NCj4gDQo+IEl0IHNlZW1zIGNvb2wgOi0pDQo+IA0KPiBCdXQgSSB3
+b3VsZCBsaWtlIHNvbWUgZmVlZGJhY2sgZnJvbSB0aGUgbmV0IGd1eXMgdG8gaGF2ZSBzb21lIFRD
+UC1saWtlIHRoaW5ncy4NCg0KT2ssIGknbGwgcHJlcGFyZSB2MiBhbnl3YXk6IGkgbmVlZCB0byBh
+bmFseXplIHBlcmZvcm1hbmNlLCBtYXkgYmUgbW9yZSB0ZXN0IGNvdmVyYWdlLCByZWJhc2UNCm92
+ZXIgbGF0ZXN0IGtlcm5lbCBhbmQgd29yayBvbiBwYWNrZXQgYWxsb2NhdGlvbiBwcm9ibGVtKGZy
+b20gYWJvdmUpLg0KDQo+IA0KPiBUaGFua3MsDQo+IFN0ZWZhbm8NCj4gDQoNClRoYW5rcw0KDQo=
