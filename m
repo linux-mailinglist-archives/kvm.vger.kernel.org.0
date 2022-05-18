@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F125552C1E3
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 20:09:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B0F752C1EA
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 20:09:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241288AbiERR7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 13:59:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37840 "EHLO
+        id S241277AbiERR70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 13:59:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241173AbiERR7O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 13:59:14 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D6C8CB0D
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:12 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id d12-20020a17090a628c00b001dcd2efca39so1571074pjj.2
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:12 -0700 (PDT)
+        with ESMTP id S241251AbiERR7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 13:59:16 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 900678CB37
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:14 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id b20-20020a62a114000000b0050a6280e374so1486506pff.13
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:59:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ngCuMiQQu2crWaF3N2+jr0MQPsojQwzxANrtvFLoUs0=;
-        b=gEFnGQRvL1SNUeweZldlNB86h9cbsmE4kfueDxykeLC/dgnbC0SW+2zdJwA8PwDw3d
-         nJcI92lhr0cTAkYC081GdamU0nFn4qz63tbJnUHAWZZM7p0i5OC3efWKdPGxiDYYSOvn
-         US1kgaHZgh0AJrTlTCqeqJ0KWTTu5Vg5Zm/3+VdiiecTxvK+6Mc8P74ANC43GhnciX3l
-         klYm8L1zxexX5JH4E0wKhLTh05FhuSJb/RCh8FZMMnl2aduowRZrqhMoO3eQFiOXDC+E
-         5xQtRe/6bAGUTFBmBJ/8cVelvh0swyS46siJSC75IlQtQyz52F8D0yN3qSHhIOJuvU7o
-         r2kQ==
+        bh=OZkEtfeO16+WBXKIrEVzWaZgX0pGEVfJdhpX9jyjq9s=;
+        b=XJnCL2DYM9o+Jy3j+sEoMXrtNq6JAflArhwOtUHIjrEJ8kcHsgAPojP2qMv6peZSpu
+         AVnDrXhMKunZ+7DZv8Ykv0Xkyb4dOPzi3bZnMCqecQ2bk5JiSZNRSl5Ll4UYCVlHOF9l
+         vrMxF6Hgc8ELAaEsQW04jMYqjYJulXTOreiHeNdsa5Zv6D+y5WW11Ee6AKmwybmm8JX1
+         SBi5k0bDcYSbA9Q4cQNcBwwYLFFiPoU6k2ncYTfq6vQQGTST7+g+Ay8IDn63zRbNrdUq
+         VdqpFcYBnP9M/mrXKdjnnCiIAKV+DZB4adpHjcpMLZeJb3vOBQodZed2QVril2oAvOZP
+         CQhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ngCuMiQQu2crWaF3N2+jr0MQPsojQwzxANrtvFLoUs0=;
-        b=7/Q4uSWkL4Nqu8r2MABFucHxUJ8cPYeB6bCKs2coLL9poO4PDOgrpSO55TfWAE4ww5
-         rCmAccwQYCoUkKt7/aPhy0V56PgX2be5Z+diEioejR/8GSzrrtlLRl0cASl85KZWdJVz
-         OjKo83POEeiCyj00Cn1BCvRe/JOI5+qonbOQxvShaFxV8+GkWBjHu0kFUte7VzqUjZLp
-         myeCn+NDsDiDQpCaDoJNz+OGvzkW5KkaBrzl6PxW4vX8yhPmlrGaLFnv/uohwUZR/YLB
-         mp/b0eteCILWSQF7bCoYylLWe9WSQtk8l8LVmt/bqZ9iZ6CC3meW+OBgR7bLWlX4tv2E
-         NGYw==
-X-Gm-Message-State: AOAM533gF1YfjollzZYX5aQz+PMHRdWtjuIWYKJvTyHLT8Dvr3cwwn0q
-        XW9bg3TOQf7QGiTmkjeBQFUOUtWoXyAVPCiW9hcIkbBaO7Y61St2639V+vwY8leW4jAJGeo8P85
-        tSkJADhvbIdZZmKSYs5G63T/JCtDt9SU9q545GUWg2T06kMExgNqktUgnEQ==
-X-Google-Smtp-Source: ABdhPJyBeXg2Aa9RwjM1V9d2ErVROM4+cPUe/IbabCLnLVoPOu/rW/D34Dh5ELw+xdfdzqlCet6MBrjc+sk=
+        bh=OZkEtfeO16+WBXKIrEVzWaZgX0pGEVfJdhpX9jyjq9s=;
+        b=uf3x9lYCU5vLZiIUWi8umCj61+yQOMFEj5h46hWp/WTKlIG+zgaVkBnkMi31js+ulb
+         RoskFVVYF6qpU2fJ4LfDPeZhepHFkjuv+hlPwFWjFORFxfUBYCWUYqpfnDkIQXROczfS
+         NLeBZPQ9VeqAXMlNxt6N8o2jU+zUso45FXhS845lhX+kwWQputiv+X14JZxQTARgB5Co
+         6cASx2OBxL5C8/QWUs2Xx07O4x69YA0YAgqu2HQI9gCVcmoihZ7rOe6BgwNubYN1dxLm
+         GNuP+CNR8fpOgdx5DkKUye0xQLLSRES3+B5gBmT2YJiEL4auOXn7E3Frri0CHITMoI/6
+         bvLw==
+X-Gm-Message-State: AOAM533iOCmQJCN+28awEU13ZG6bkTK2deeU0qdrHxtVeLnAdFTEgI4P
+        qXNzfV0IuIQqwDSRa487pXITB5fbETIBDCsYuUnY5JvV2lN58l7acNHiuv3XG284RYCxslJ5J4Q
+        9HKtqctkReno85hptFkAY57Xm0P2YMFXDIGGDi7V7Ti4ItF5xDFZK0DvPug==
+X-Google-Smtp-Source: ABdhPJx5Hvz7aJKam/sS0xyXJXyVtOFQQc1blLiFh+vfuuj+mPAMcQ+wZ2ANZdo1mfsv8fBY7dTmpQyN9J0=
 X-Received: from oupton3.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a17:90a:2a8a:b0:1df:26ba:6333 with SMTP id
- j10-20020a17090a2a8a00b001df26ba6333mr350472pjd.0.1652896751753; Wed, 18 May
- 2022 10:59:11 -0700 (PDT)
-Date:   Wed, 18 May 2022 17:58:08 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6a00:22d4:b0:510:6d75:e3da with SMTP id
+ f20-20020a056a0022d400b005106d75e3damr520307pfj.3.1652896753816; Wed, 18 May
+ 2022 10:59:13 -0700 (PDT)
+Date:   Wed, 18 May 2022 17:58:09 +0000
 In-Reply-To: <20220518175811.2758661-1-oupton@google.com>
-Message-Id: <20220518175811.2758661-3-oupton@google.com>
+Message-Id: <20220518175811.2758661-4-oupton@google.com>
 Mime-Version: 1.0
 References: <20220518175811.2758661-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH v2 2/5] KVM: Shove vcpu stats_id init into kvm_vcpu_init()
+Subject: [PATCH v2 3/5] KVM: Get an fd before creating the VM
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
@@ -68,40 +68,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Initialize the field alongside other kvm_vcpu fields. No functional
-change intended.
+Hoist fd init to the very beginning of kvm_create_vm() so we can make
+use of it in other init routines.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- virt/kvm/kvm_main.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ virt/kvm/kvm_main.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 36dc9271d039..778151333ac0 100644
+index 778151333ac0..87ccab74dc80 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -440,6 +440,10 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	vcpu->ready = false;
- 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
- 	vcpu->last_used_slot = NULL;
+@@ -4774,25 +4774,27 @@ EXPORT_SYMBOL_GPL(file_is_kvm);
+ 
+ static int kvm_dev_ioctl_create_vm(unsigned long type)
+ {
+-	int r;
++	int r, fd;
+ 	struct kvm *kvm;
+ 	struct file *file;
+ 
++	fd = get_unused_fd_flags(O_CLOEXEC);
++	if (fd < 0)
++		return fd;
 +
-+	/* Fill the stats id string for the vcpu */
-+	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
-+		 task_pid_nr(current), id);
+ 	kvm = kvm_create_vm(type);
+-	if (IS_ERR(kvm))
+-		return PTR_ERR(kvm);
++	if (IS_ERR(kvm)) {
++		r = PTR_ERR(kvm);
++		goto put_fd;
++	}
++
+ #ifdef CONFIG_KVM_MMIO
+ 	r = kvm_coalesced_mmio_init(kvm);
+ 	if (r < 0)
+ 		goto put_kvm;
+ #endif
+-	r = get_unused_fd_flags(O_CLOEXEC);
+-	if (r < 0)
+-		goto put_kvm;
+-
+ 	file = anon_inode_getfile("kvm-vm", &kvm_vm_fops, kvm, O_RDWR);
+ 	if (IS_ERR(file)) {
+-		put_unused_fd(r);
+ 		r = PTR_ERR(file);
+ 		goto put_kvm;
+ 	}
+@@ -4804,17 +4806,19 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
+ 	 * care of doing kvm_put_kvm(kvm).
+ 	 */
+ 	if (kvm_create_vm_debugfs(kvm, r) < 0) {
+-		put_unused_fd(r);
+ 		fput(file);
+-		return -ENOMEM;
++		r = -ENOMEM;
++		goto put_fd;
+ 	}
+ 	kvm_uevent_notify_change(KVM_EVENT_CREATE_VM, kvm);
+ 
+-	fd_install(r, file);
+-	return r;
++	fd_install(fd, file);
++	return fd;
+ 
+ put_kvm:
+ 	kvm_put_kvm(kvm);
++put_fd:
++	put_unused_fd(fd);
+ 	return r;
  }
  
- static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
-@@ -3807,10 +3811,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	if (r)
- 		goto unlock_vcpu_destroy;
- 
--	/* Fill the stats id string for the vcpu */
--	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
--		 task_pid_nr(current), id);
--
- 	/* Now it's all set up, let userspace reach it */
- 	kvm_get_kvm(kvm);
- 	r = create_vcpu_fd(vcpu);
 -- 
 2.36.1.124.g0e6072fb45-goog
 
