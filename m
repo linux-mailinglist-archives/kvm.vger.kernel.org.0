@@ -2,132 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB48452C123
-	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:50:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16BF852C1A1
+	for <lists+kvm@lfdr.de>; Wed, 18 May 2022 19:51:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241008AbiERR0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 13:26:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52908 "EHLO
+        id S241127AbiERRaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 13:30:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241026AbiERR0A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 13:26:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C62AF1207C7
-        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:25:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652894757;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1WCkVPu890CUqv7zkicLIU9/u8yZ1yze5Jtj6/5oVwc=;
-        b=BYOD0hdbpEzlFMHANB6Z8yeRF6v+aHOyThR6yc+9xkdWDGUMDjay+HeuPwlGU8NKTWSben
-        kVtAQjGIpshvR/FGwURu/u3KTe9NsmGO+Xxf7hq9aS7MsKq7+sEyPdKtO+D9/0FNTYzZfe
-        DzDguf+H/AJjCwKK0W8lu9zErN2/hsg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-128-w5xu3Rk9PdKSdUlpL5wKYQ-1; Wed, 18 May 2022 13:25:53 -0400
-X-MC-Unique: w5xu3Rk9PdKSdUlpL5wKYQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42B24101AA4D;
-        Wed, 18 May 2022 17:25:53 +0000 (UTC)
-Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 33E87400D277;
-        Wed, 18 May 2022 17:25:51 +0000 (UTC)
-Message-ID: <4884cd0232880cde91b9d068182ce035a7734df2.camel@redhat.com>
-Subject: Re: [PATCH v5 16/17] KVM: x86: nSVM: always intercept x2apic msrs
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Wed, 18 May 2022 20:25:50 +0300
-In-Reply-To: <92fb7b8962e1da874dde2789f0d9c1f3887a63dc.camel@redhat.com>
-References: <20220518162652.100493-1-suravee.suthikulpanit@amd.com>
-         <20220518162652.100493-17-suravee.suthikulpanit@amd.com>
-         <92fb7b8962e1da874dde2789f0d9c1f3887a63dc.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S241081AbiERRaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 13:30:25 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D0620EE27
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:30:23 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id s18-20020a056830149200b006063fef3e17so1812951otq.12
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 10:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Ht+o1v4WgCfvjgo/qhN8PI77GOqAL6Usil1s/qDlKEc=;
+        b=qslx4Kxe0MdKnxcQfQXMnUdOcTZiGV44XcLHRsfKASQZBciW61JsS57gs187YXqaNL
+         qx58MClubyqqH6idmOyeB1EpKl/ZcxC6stgTJ6OUBPupMvqu1zW07lxrOZUkiNfC7kM5
+         fG/x6B0U3qzhtCG+yz0KRcxKKW1TDlXcKhMGymm4eNpWaK5M8OBetNEp/AVn7G2MNNZs
+         lDZo/Cg9Dk087rQubyzCJBO0jKks4aE99hAQ0GUs6uYZdAODtf0673MZx0J65oTDY/Jn
+         n8gHsZ7zWsHUigSw6VNhbvo3cApdxHixf33ml5cZb6JGliQJPhLGCFeggUtneI0WioNk
+         ywnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Ht+o1v4WgCfvjgo/qhN8PI77GOqAL6Usil1s/qDlKEc=;
+        b=Pc3TM/ajtHCD34syq48HDajmsXheAhRsOeyvtsWnq+8FUD06kcW0KSdTcDeBEgMw7p
+         Q1yMZwlcMnSLCiz1bYCaLOv2m0fXPS1oUD9L4/fH5YXA6nY1Y8YsZua6BaS2AV6onK/4
+         P0eTCEvR/nV4Q9Imhj12O1MB3GJjbnpbclCGrnwac+5mjoL+o0Zvb+IuHkFZos5f2+62
+         jJq7PElw6TSv8Hju/iX4Pgpuzv8keOJMqVtmdV3upvuEQccvqne+AFHZJsb7YMrZUHtg
+         eGc8g2GviIaxrmOMh///V0zQii36uT76thV+nqBZ1Bs5HN49smlVa10WEQtZWkhVoYUF
+         6B8w==
+X-Gm-Message-State: AOAM533BpbNWn8ci856UE0ii6V0Jpgf1S+ymN6XreHGuknANveE59ohL
+        QHlVynNwXO9xWrJ0dgY4fLYn3DjwOY0sq9UlIz1AU9m/Spo=
+X-Google-Smtp-Source: ABdhPJwNd30qHng5tnxQBG13Zw0WMGkrVHJ56vVtIp4LvthS2FZNkDqgTzgL2Xj6BMYwFI0eBetIgotVmeXRtHAS0CI=
+X-Received: by 2002:a05:6830:1c65:b0:606:3cc:862 with SMTP id
+ s5-20020a0568301c6500b0060603cc0862mr311027otg.75.1652895023004; Wed, 18 May
+ 2022 10:30:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <CAPUGS=oTTzn+HjXMdSK7jsysCagfipmnj25ofNFKD03rq=3Brw@mail.gmail.com>
+In-Reply-To: <CAPUGS=oTTzn+HjXMdSK7jsysCagfipmnj25ofNFKD03rq=3Brw@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 18 May 2022 10:30:11 -0700
+Message-ID: <CALMp9eQbpxHpGXJjYesH=SJu_LiCmCVTXYwV+w7YfdGpfc_Yzw@mail.gmail.com>
+Subject: Re: A really weird guest crash, that ONLY happens on KVM, and ONLY on
+ 6th gen+ Intel Core CPU's
+To:     Brian Cowan <brcowan@gmail.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-05-18 at 20:18 +0300, Maxim Levitsky wrote:
-> On Wed, 2022-05-18 at 11:26 -0500, Suravee Suthikulpanit wrote:
-> > From: Maxim Levitsky <mlevitsk@redhat.com>
-> > 
-> > As a preparation for x2avic, this patch ensures that x2apic msrs
-> > are always intercepted for the nested guest.
-> > 
-> > Reviewed-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> > Tested-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 5 +++++
-> >  arch/x86/kvm/svm/svm.h    | 9 +++++++++
-> >  2 files changed, 14 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index f209c1ca540c..b61f8939c210 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -230,6 +230,11 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
-> >  			break;
-> >  
-> >  		p      = msrpm_offsets[i];
-> > +
-> > +		/* x2apic msrs are intercepted always for the nested guest */
-> > +		if (is_x2apic_msrpm_offset(p))
-> > +			continue;
-> > +
-> >  		offset = svm->nested.ctl.msrpm_base_pa + (p * 4);
-> >  
-> >  		if (kvm_vcpu_read_guest(&svm->vcpu, offset, &value, 4))
-> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> > index 818817b11f53..309445619756 100644
-> > --- a/arch/x86/kvm/svm/svm.h
-> > +++ b/arch/x86/kvm/svm/svm.h
-> > @@ -517,6 +517,15 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
-> >  	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
-> >  }
-> >  
-> > +static inline bool is_x2apic_msrpm_offset(u32 offset)
-> > +{
-> > +	/* 4 msrs per u8, and 4 u8 in u32 */
-> > +	u32 msr = offset * 16;
-> > +
-> > +	return (msr >= APIC_BASE_MSR) &&
-> > +	       (msr < (APIC_BASE_MSR + 0x100));
-> > +}
-> > +
-> >  /* svm.c */
-> >  #define MSR_INVALID				0xffffffffU
-> >  
-> 
-> Just one thing, this patch should be earlier in the series (or even first one),
-> to avoid having a commit window where the problem exists, where malicious
-> L1 can get access to L0's apic msrs this way.
-> 
-> Best regards,
-> 	Maxim Levitsky
+On Wed, May 18, 2022 at 10:14 AM Brian Cowan <brcowan@gmail.com> wrote:
+>
+> Hi all, looking for hints on a wild crash.
+>
+> The company I work for has a kernel driver used to literally make a db
+> query result look like a filesystem=E2=80=A6 The =E2=80=9Cdatabase=E2=80=
+=9D in question being
+> a proprietary SCM repository=E2=80=A6 (ClearCase, for those who have been
+> around forever=E2=80=A6 Like me=E2=80=A6)
+>
+> We have a crash on mounting the remote repository ONE way (ClearCase
+> =E2=80=9CAutomatic views=E2=80=9D) but not another (ClearCase =E2=80=9CDy=
+namic views=E2=80=9D) where
+> both use the same kernel driver=E2=80=A6 The guest OS is RHEL 7.8, not
+> registered with RH (since the VM is only supposed to last a couple of
+> days.) The host OS is Ubuntu 20.04.2 LTS, though that does not seem to
+> matter.
+>
+> The wild part is that this only happens when the ClearCase host is a
+> KVM guest, and only on 6th-generation or newer . It does NOT happen
+> on:
+> * VMWare Virtual machines configured identically
+> * VirtualBox Virtual machines Configured identically
+> * 2nd generation intel core hosts running the same KVM release.
+> (because OF COURSE my office "secondary desktop" host is ancient...
+> * A 4th generation I7 host running Ubuntu 22.04 and that version=E2=80=99=
+s
+> default KVM. (Because I am a laptop packrat. That laptop had been
+> sitting on a bookshelf for 3+ years and I went "what if...")
+>
+> If I edit the KVM configuration and change the =E2=80=9Cmirror host CPU=
+=E2=80=9D
+> option to use the 2nd or 4th generation CPU options, the crash stops
+> happening=E2=80=A6 If this was happening on physical machines, the VM cra=
+sh
+> would make sense, but it's literally a hypervisor-specific crash.
+>
+> Any hints, tips, or comments would be most appreciated... Never
+> thought I'd be trying to debug kernel/hypervisor interactions, but
+> here I am...
 
-Besides this, I guess I currently don't see anything else seriously wrong with this patch
-series.
-
-Hopefully I didn't miss anything serious.
-
-Best regards,
-	Maxim Levitsky
-
+Guest crash or hypervisor crash? If the former, can you provide the
+guest's console output?
