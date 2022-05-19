@@ -2,123 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F321D52CECE
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 10:59:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50AD552CF10
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 11:12:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235711AbiESI7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 04:59:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43750 "EHLO
+        id S235833AbiESJMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 05:12:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233827AbiESI67 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 04:58:59 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFFCA5026;
-        Thu, 19 May 2022 01:58:56 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24J8nFZA002716;
-        Thu, 19 May 2022 08:58:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=PW9pRZh/0g9UlTgZKMWzgw6MGsGz+5XiXcei0cxYmrk=;
- b=bHp1ktdgA89ERzJwH0V5/8EjQ4gM2tX2LXlkLr4dstIAzCuWOHWb/laASeQo0YPsVZYr
- wiB4FeliK+5Ql6qUTPuPuZyM+FJtYnfflvxG+yvfeAx/ktXQm4SfqKsbJUePZiEWcwh0
- DXVaEZZ0VaI1hKpsVgjiug7qedijQ5Q8/Zw5VJWnpbOu57BWrqBIEvNkrpYV4ht50ZUT
- LJAO3nGdFvgdZkoeeLQ4fWQ2F5/1kbABqwGnEkey9a6tDOupsM48Refg/9V1RiBymnJT
- FYI1L2B2HiUX2kI5huuY8Zh0/jwtKsoFqHTV3TXm9EYW/X/zQnhZsKeaAnTSuR6p7KGK Zg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5jqgg53j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 May 2022 08:58:55 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24J8pHPH012272;
-        Thu, 19 May 2022 08:58:54 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5jqgg527-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 May 2022 08:58:54 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24J8v3rM027704;
-        Thu, 19 May 2022 08:58:51 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3g2428nn9r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 May 2022 08:58:51 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24J8is8938863284
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 May 2022 08:44:54 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7F48EAE056;
-        Thu, 19 May 2022 08:58:48 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9BF5AE045;
-        Thu, 19 May 2022 08:58:47 +0000 (GMT)
-Received: from [9.171.67.171] (unknown [9.171.67.171])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 19 May 2022 08:58:47 +0000 (GMT)
-Message-ID: <c608db21-8030-a346-5294-d9d681685734@linux.ibm.com>
-Date:   Thu, 19 May 2022 11:02:38 +0200
+        with ESMTP id S232424AbiESJMR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 05:12:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BAFEB56775
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 02:12:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652951535;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=C7uZ8GjzotyzPb+OIEuRVJxWtUaoDnZX9WfGiYxdAlI=;
+        b=hK8hRnGUqAkKIsrpfZ/bT5SdR/JcrssYTHE7eJitMQ6YXM+7RbaT0Ow05VS0XbmYQ8ihcT
+        GgALWwb2OZb72I2COAX96EgfW9C0yQzIe6PldIPi2f36+3CI//yO+3iDaBa/xZ+VcsjnZE
+        AdU4Tsm8ycHo7cWVDOnp199PSYOuITY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-107-42xPHF2LM8qSqGmMvQBH2Q-1; Thu, 19 May 2022 05:12:14 -0400
+X-MC-Unique: 42xPHF2LM8qSqGmMvQBH2Q-1
+Received: by mail-wm1-f71.google.com with SMTP id h133-20020a1c218b000000b003972dbb1066so812803wmh.4
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 02:12:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=C7uZ8GjzotyzPb+OIEuRVJxWtUaoDnZX9WfGiYxdAlI=;
+        b=MpG9Dv9MXN/g08aCyDcgvxYlca9MkD7Hj+wBuecRpBP8nA4sh9VHSb0K8yDbNxJ5Uc
+         cerlv8Ia7bx3GFPlp2UE7kBUMWsIoXxRG/BD5wRrnItFfdVNZIYL7NEJ6A3ceib9qTbA
+         M2Hk+Dw6kjRsWH/V0LhTdjKb/Tyu8GSR2PBc+XRLwVZ2U6Sdre8JY5XAG0R1zXZqlzbf
+         mAOaiq+w4jhOy9ZfCJBg+h4qCmBS7EBQaKFT/iTdxymyV2rVerXodd9dUnMpKP//LeNC
+         7v8xZjlCholJwQuUsjXaT/xVXseifKk+YydNV0I781zyeqGV/ldQpkiUms8+LBj20R7b
+         y4AA==
+X-Gm-Message-State: AOAM532DW6rRhov+fK17QonTplD9KHRtiuxBfJ2WtSzijk9CiIbV+HRH
+        uUYXQpsk82id+xFwVkYe21IeGOGIK+siUdqUMvRtE5vOlf1rLkVY1ZCpgduHp6CYKaSSLNvKcEN
+        0Jz9WpcYFQLOI
+X-Received: by 2002:a05:600c:24a:b0:394:4ce6:57db with SMTP id 10-20020a05600c024a00b003944ce657dbmr3314841wmj.193.1652951533213;
+        Thu, 19 May 2022 02:12:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwAjJ9ypKrE9q84MzsZpXh8nKsN8Ag++Nlblpj2jTGJaJr1Jf9MyW+TEzh6O3hOz+eJ6ih0Ag==
+X-Received: by 2002:a05:600c:24a:b0:394:4ce6:57db with SMTP id 10-20020a05600c024a00b003944ce657dbmr3314812wmj.193.1652951532964;
+        Thu, 19 May 2022 02:12:12 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id d15-20020a1c730f000000b00394975e14f4sm3750939wmb.8.2022.05.19.02.12.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 02:12:12 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 20/34] KVM: x86: KVM_REQ_TLB_FLUSH_CURRENT is a
+ superset of KVM_REQ_HV_TLB_FLUSH too
+In-Reply-To: <6c9add3244d86080ccd8c3c72a37b9ee112d45b8.camel@redhat.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+ <20220414132013.1588929-21-vkuznets@redhat.com>
+ <6c9add3244d86080ccd8c3c72a37b9ee112d45b8.camel@redhat.com>
+Date:   Thu, 19 May 2022 11:12:11 +0200
+Message-ID: <87mtfdubro.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v9 0/3] s390x: KVM: CPU Topology
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, frankja@linux.ibm.com,
-        cohuck@redhat.com, david@redhat.com, thuth@redhat.com,
-        imbrenda@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220506092403.47406-1-pmorel@linux.ibm.com>
- <f9cb28d5-2aa5-f902-53ab-592b08672c62@de.ibm.com> <YoXZxhindugH4WxI@osiris>
- <1e2bfeeb-6514-a55d-61eb-6391dcc96256@de.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <1e2bfeeb-6514-a55d-61eb-6391dcc96256@de.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PiQBAJIUs3IfjcaLZdSylac6UXtMxIyB
-X-Proofpoint-GUID: yhiyBlCszgpKEzND9y6WXgeTCNoRpHim
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-19_01,2022-05-19_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- suspectscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0 bulkscore=0
- impostorscore=0 mlxlogscore=721 priorityscore=1501 spamscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2205190049
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
+> On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
+>> KVM_REQ_TLB_FLUSH_CURRENT is an even stronger operation than
+>> KVM_REQ_TLB_FLUSH_GUEST so KVM_REQ_HV_TLB_FLUSH needs not to be
+>> processed after it.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/x86.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index e5aec386d299..d3839e648ab3 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -3357,8 +3357,11 @@ static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
+>>   */
+>>  void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
+>>  {
+>> -	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+>> +	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu)) {
+>>  		kvm_vcpu_flush_tlb_current(vcpu);
+>> +		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu))
+>> +			kvm_hv_vcpu_empty_flush_tlb(vcpu);
+>> +	}
+>>  
+>>  	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu)) {
+>>  		kvm_vcpu_flush_tlb_guest(vcpu);
+>
+>
+> I think that this patch should be moved near patch 1 and/or even squished with it.
+>
 
-On 5/19/22 10:07, Christian Borntraeger wrote:
-> Am 19.05.22 um 07:46 schrieb Heiko Carstens:
->> On Wed, May 18, 2022 at 05:26:59PM +0200, Christian Borntraeger wrote:
->>> Pierre,
->>>
->>> please use "KVM: s390x:" and not "s390x: KVM:" for future series.
->>
->> My grep arts ;) tell me that you probably want "KVM: s390:" without
->> "x" for the kernel.
-> 
-> yes :-)
+Sure, will merge.
 
-Thanks, both of you.
-I change it accordingly.
-
-Regards,
-Pierre
+This, however, made me think there's room for optimization here. In some
+cases, when both KVM_REQ_TLB_FLUSH_CURRENT and KVM_REQ_TLB_FLUSH_GUEST
+were requested, there's no need to flush twice, e.g. on SVM
+.flush_tlb_current == .flush_tlb_guest. I'll probably not go into this
+territory with this series as it's already fairly big, just something
+for the future.
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Vitaly
+
