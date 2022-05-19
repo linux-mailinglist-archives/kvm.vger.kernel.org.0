@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7474B52C91D
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 03:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 866A352C9E3
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 04:43:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232391AbiESBFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 21:05:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46398 "EHLO
+        id S232983AbiESCnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 22:43:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230476AbiESBFS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 21:05:18 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36811CE16;
-        Wed, 18 May 2022 18:05:17 -0700 (PDT)
+        with ESMTP id S233017AbiESCm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 22:42:58 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F28D9E95;
+        Wed, 18 May 2022 19:42:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652922317; x=1684458317;
+  t=1652928176; x=1684464176;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=FON4eDfFwoyqPsYBMR3zCyP6L0REBuQlLSooLaoyyGc=;
-  b=f2j+S3kIpG/i65ehqZXWOgRZ5ei2tkD8J8qAXC5vjhdIuKGNblOZFQNl
-   zY5q5BUpNAjp4V6K7L7F9KHVqG26CiOLuDJeT2D+qj/kA/dyPudxsgFYn
-   cCl3c0Whuf4ACHWNyw/HyzESWSzBJmqZyzN+C7Zw6R5UwXLUsf1s7Ue27
-   khAUdgVaQLRl1TwjrQkwdnemNkU2PT7tY01lcnakE4aj3bfTe9PwN/D6Y
-   JoTHF8kfeMT1QM2k8Dm7Yj60SQpqO7xwcukTXv9n7x5fby/zGEmG/7OKO
-   L30kqjsZeDDw/AcqDKUT6VuKExegX3v8RIM7ckHP+W2YDQ+AqrlBMNcFI
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10351"; a="297264158"
+  bh=l6xV8ekPzx3Yt2dpmJfC+atg0RJvwErhgJl3h4CHsSg=;
+  b=Z6eSmOSaI+PW8Tze8JurZaE/hpOxkEg06iX77Sdx6dhDfjItJ1abTEtj
+   eoSD84lKbiQgxEG1Pu9MwFHVChw2nkG9PdrsyIo3i8SEaprARniuASzvs
+   mH5WfGzQfKf6Pn1XFDxc2+3wDNafNujQzhvAve++RmSo0lXmF84ynkHvK
+   Vnd7ncFdgP8IPS+l9PKoIZDGv4rv2iwu7wHY0tAmumLIbM1il3gJYGTIY
+   /5pjzLpo+lYx3lKyawmFzZTWnUxVYl5zAE1lCG8Ee03unhtS80MpI9bZN
+   xQOn/caeneTlxsN1HzTM0vePT9wTMrHJfNkSrQYX6567x/k5XjK7XQbZS
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10351"; a="271680412"
 X-IronPort-AV: E=Sophos;i="5.91,236,1647327600"; 
-   d="scan'208";a="297264158"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 18:05:16 -0700
+   d="scan'208";a="271680412"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 19:42:46 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,236,1647327600"; 
-   d="scan'208";a="523804352"
+   d="scan'208";a="545836026"
 Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 18 May 2022 18:05:15 -0700
+  by orsmga006.jf.intel.com with ESMTP; 18 May 2022 19:42:44 -0700
 Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
         (envelope-from <lkp@intel.com>)
-        id 1nrUbK-0002qT-A6;
-        Thu, 19 May 2022 01:05:14 +0000
-Date:   Thu, 19 May 2022 09:04:27 +0800
+        id 1nrW7f-0002xn-4X;
+        Thu, 19 May 2022 02:42:43 +0000
+Date:   Thu, 19 May 2022 10:42:17 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Uros Bizjak <ubizjak@gmail.com>,
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Uros Bizjak <ubizjak@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 Subject: Re: [PATCH] KVM: VMX: Use try_cmpxchg64 in pi_try_set_control
-Message-ID: <202205190852.VUijQkwc-lkp@intel.com>
+Message-ID: <202205191028.PcCtw7Xz-lkp@intel.com>
 References: <20220518134550.2358-1-ubizjak@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20220518134550.2358-1-ubizjak@gmail.com>
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -77,31 +78,35 @@ https://git-scm.com/docs/git-format-patch]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Uros-Bizjak/KVM-VMX-Use-try_cmpxchg64-in-pi_try_set_control/20220518-214709
 base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
-config: i386-debian-10.3-kselftests (https://download.01.org/0day-ci/archive/20220519/202205190852.VUijQkwc-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.2.0-20) 11.2.0
+config: i386-randconfig-a002 (https://download.01.org/0day-ci/archive/20220519/202205191028.PcCtw7Xz-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 853fa8ee225edf2d0de94b0dcbd31bea916e825e)
 reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
         # https://github.com/intel-lab-lkp/linux/commit/2af4f7c4ecfcaedf9b98ba30ee508dc0d9002955
         git remote add linux-review https://github.com/intel-lab-lkp/linux
         git fetch --no-tags linux-review Uros-Bizjak/KVM-VMX-Use-try_cmpxchg64-in-pi_try_set_control/20220518-214709
         git checkout 2af4f7c4ecfcaedf9b98ba30ee508dc0d9002955
         # save the config file
         mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kvm/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kvm/
 
 If you fix the issue, kindly add following tag as appropriate
 Reported-by: kernel test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   arch/x86/kvm/vmx/posted_intr.c: In function 'pi_try_set_control':
->> arch/x86/kvm/vmx/posted_intr.c:45:14: error: implicit declaration of function 'try_cmpxchg64'; did you mean 'try_cmpxchg'? [-Werror=implicit-function-declaration]
-      45 |         if (!try_cmpxchg64(&pi_desc->control, pold, new))
-         |              ^~~~~~~~~~~~~
-         |              try_cmpxchg
-   cc1: some warnings being treated as errors
+>> arch/x86/kvm/vmx/posted_intr.c:45:7: error: call to undeclared function 'try_cmpxchg64'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+           if (!try_cmpxchg64(&pi_desc->control, pold, new))
+                ^
+   arch/x86/kvm/vmx/posted_intr.c:45:7: note: did you mean '__cmpxchg64'?
+   arch/x86/include/asm/cmpxchg_32.h:47:19: note: '__cmpxchg64' declared here
+   static inline u64 __cmpxchg64(volatile u64 *ptr, u64 old, u64 new)
+                     ^
+   1 error generated.
 
 
-vim +45 arch/x86/kvm/vmx/posted_intr.c
+vim +/try_cmpxchg64 +45 arch/x86/kvm/vmx/posted_intr.c
 
     36	
     37	static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
