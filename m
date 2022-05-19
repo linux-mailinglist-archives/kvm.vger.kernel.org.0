@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DD2852D4B3
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:46:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A1DB52D4BD
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:46:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238799AbiESNqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:46:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51308 "EHLO
+        id S232385AbiESNqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:46:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239121AbiESNpG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S239128AbiESNpG (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 19 May 2022 09:45:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0541B5B3F0
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:44:57 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED8FDA5036
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:45:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 963406179E
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:44:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86938C36AE7;
-        Thu, 19 May 2022 13:44:52 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8913561798
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:45:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E9DBC36AE5;
+        Thu, 19 May 2022 13:44:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652967896;
-        bh=/a8/l7RJWZHY7hWaGIhGiCgxQi3kK7qNlpV74vXL9LE=;
+        s=k20201202; t=1652967900;
+        bh=SxLFdfnMnEkcdrJsQkkeO75KQ4eQ7yY1tbJ5lT5ChX8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Fh8c5EEbrBocWn0/lbHq/tOjwQAeOeCpvwb1HjvKWwOCOFcLRVML86UOKzPSI3V2J
-         M6sQ+8Cc85Z+LtafNVYgt+IFIilx2fIhgbu75oaIuiFI6TXQoR7Bj2uRq9UID0IUjl
-         Ip+LSj0r7Y1wsbnve37h+sVkLs+8TvWOeE2NJZ+n2xsGsr/8w7ImG6UMBDjAHBWlML
-         C6VYkCXFBpzQsGesBkH7Wc99/MmLzYHr7hJYSCHtI5GOqkA6vJl45WLRc2NWafy+rB
-         jvJTQ/npO6byjhnxdCJtVN9qyNC6ooBVfH3RaI7dpiGumqb1vT4vqf4k/wlG65/PBl
-         MR5Q+ayZpl6Jg==
+        b=XPqQc4zFWaMfABPQw5/dfWp2s/7zHYM4gze5jPW/dQaRUBPmocGR+TcexDTEnwGMM
+         WJvO3tIobJKM1MzgXouAiiYjA6CHFTaOdjqSOS7lvHtFc1O+EfmIX3u5EgX2Z+2OUM
+         rmB9N6bKE5jmxc9UB4Uz85VqPcUA9C2pduwt5TbVOmXPD9dt+ZCNk+XaHvw391dfX7
+         bkGM4ItJ/0wz5rTkUnSMJDbIKUL3Ofi3USzyfEbSkeyh8W6b5rgCg5PK+vS17guiNl
+         fbt/1HMMOHa6ZTqaEkpF/0aqIgAskIulImvKfGdF2DHv6grWpZrwdvlssJWnyolUGG
+         A4MDzh0YrL17Q==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 38/89] KVM: arm64: Don't map host sections in pkvm
-Date:   Thu, 19 May 2022 14:41:13 +0100
-Message-Id: <20220519134204.5379-39-will@kernel.org>
+Subject: [PATCH 39/89] KVM: arm64: Extend memory donation to allow host-to-guest transitions
+Date:   Thu, 19 May 2022 14:41:14 +0100
+Message-Id: <20220519134204.5379-40-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -66,66 +66,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Quentin Perret <qperret@google.com>
+In preparation for supporting protected guests, where guest memory
+defaults to being inaccessible to the host, extend our memory protection
+mechanisms to support donation of pages from the host to a specific
+guest.
 
-We no longer need to map the host's .rodata and .bss sections in the
-pkvm hypervisor, so let's remove those mappings. This will avoid
-creating dependencies at EL2 on host-controlled data-structures.
-
-Signed-off-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kernel/image-vars.h  |  6 ------
- arch/arm64/kvm/hyp/nvhe/setup.c | 14 +++-----------
- 2 files changed, 3 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 62 +++++++++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c                  |  2 +-
+ 3 files changed, 64 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 3e2489d23ff0..2d4d6836ff47 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -115,12 +115,6 @@ KVM_NVHE_ALIAS_HYP(__memcpy, __pi_memcpy);
- KVM_NVHE_ALIAS_HYP(__memset, __pi_memset);
- #endif
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 364432276fe0..b01b5cdb38de 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -69,6 +69,7 @@ int __pkvm_host_reclaim_page(u64 pfn);
+ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+ int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu);
++int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu);
  
--/* Kernel memory sections */
--KVM_NVHE_ALIAS(__start_rodata);
--KVM_NVHE_ALIAS(__end_rodata);
--KVM_NVHE_ALIAS(__bss_start);
--KVM_NVHE_ALIAS(__bss_stop);
--
- /* Hyp memory sections */
- KVM_NVHE_ALIAS(__hyp_idmap_text_start);
- KVM_NVHE_ALIAS(__hyp_idmap_text_end);
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index a851de624074..c55661976f64 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -119,23 +119,15 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ bool addr_is_memory(phys_addr_t phys);
+ int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 2e92be8bb463..d0544259eb01 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -890,6 +890,14 @@ static int guest_ack_share(u64 addr, const struct pkvm_mem_transition *tx,
+ 					      size, PKVM_NOPAGE);
+ }
+ 
++static int guest_ack_donation(u64 addr, const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++
++	return __guest_check_page_state_range(tx->completer.guest.vcpu, addr,
++					      size, PKVM_NOPAGE);
++}
++
+ static int guest_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
+ 				enum kvm_pgtable_prot perms)
+ {
+@@ -903,6 +911,17 @@ static int guest_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
+ 				      prot, &vcpu->arch.pkvm_memcache);
+ }
+ 
++static int guest_complete_donation(u64 addr, const struct pkvm_mem_transition *tx)
++{
++	enum kvm_pgtable_prot prot = pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED);
++	struct kvm_vcpu *vcpu = tx->completer.guest.vcpu;
++	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
++	u64 size = tx->nr_pages * PAGE_SIZE;
++
++	return kvm_pgtable_stage2_map(&vm->pgt, addr, size, tx->completer.guest.phys,
++				      prot, &vcpu->arch.pkvm_memcache);
++}
++
+ static int check_share(struct pkvm_mem_share *share)
+ {
+ 	const struct pkvm_mem_transition *tx = &share->tx;
+@@ -1088,6 +1107,9 @@ static int check_donation(struct pkvm_mem_donation *donation)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_ack_donation(completer_addr, tx);
+ 		break;
++	case PKVM_ID_GUEST:
++		ret = guest_ack_donation(completer_addr, tx);
++		break;
+ 	default:
+ 		ret = -EINVAL;
  	}
+@@ -1122,6 +1144,9 @@ static int __do_donate(struct pkvm_mem_donation *donation)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_complete_donation(completer_addr, tx);
+ 		break;
++	case PKVM_ID_GUEST:
++		ret = guest_complete_donation(completer_addr, tx);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -1362,6 +1387,43 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
  
- 	/*
--	 * Map the host's .bss and .rodata sections RO in the hypervisor, but
--	 * transfer the ownership from the host to the hypervisor itself to
--	 * make sure it can't be donated or shared with another entity.
-+	 * Map the host sections RO in the hypervisor, but transfer the
-+	 * ownership from the host to the hypervisor itself to make sure they
-+	 * can't be donated or shared with another entity.
- 	 *
- 	 * The ownership transition requires matching changes in the host
- 	 * stage-2. This will be done later (see finalize_host_mappings()) once
- 	 * the hyp_vmemmap is addressable.
- 	 */
- 	prot = pkvm_mkstate(PAGE_HYP_RO, PKVM_PAGE_SHARED_OWNED);
--	ret = pkvm_create_mappings(__start_rodata, __end_rodata, prot);
--	if (ret)
--		return ret;
--
--	ret = pkvm_create_mappings(__hyp_bss_end, __bss_stop, prot);
--	if (ret)
--		return ret;
--
- 	ret = pkvm_create_mappings(&kvm_vgic_global_state,
- 				   &kvm_vgic_global_state + 1, prot);
- 	if (ret)
++int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu)
++{
++	int ret;
++	u64 host_addr = hyp_pfn_to_phys(pfn);
++	u64 guest_addr = hyp_pfn_to_phys(gfn);
++	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
++	struct pkvm_mem_donation donation = {
++		.tx	= {
++			.nr_pages	= 1,
++			.initiator	= {
++				.id	= PKVM_ID_HOST,
++				.addr	= host_addr,
++				.host	= {
++					.completer_addr = guest_addr,
++				},
++			},
++			.completer	= {
++				.id	= PKVM_ID_GUEST,
++				.guest	= {
++					.vcpu = vcpu,
++					.phys = host_addr,
++				},
++			},
++		},
++	};
++
++	host_lock_component();
++	guest_lock_component(vm);
++
++	ret = do_donate(&donation);
++
++	guest_unlock_component(vm);
++	host_unlock_component();
++
++	return ret;
++}
++
+ static int hyp_zero_page(phys_addr_t phys)
+ {
+ 	void *addr;
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index a6676fd14cf9..2069e6833831 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -47,7 +47,7 @@
+ 					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+ 
+ #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
+-#define KVM_MAX_OWNER_ID		1
++#define KVM_MAX_OWNER_ID		FIELD_MAX(KVM_INVALID_PTE_OWNER_MASK)
+ 
+ struct kvm_pgtable_walk_data {
+ 	struct kvm_pgtable		*pgt;
 -- 
 2.36.1.124.g0e6072fb45-goog
 
