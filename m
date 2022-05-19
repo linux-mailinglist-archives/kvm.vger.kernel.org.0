@@ -2,74 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08FA452D3D3
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:21:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B15152D3E3
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:26:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238718AbiESNV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:21:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55346 "EHLO
+        id S238725AbiESN0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:26:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237524AbiESNV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:21:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00D7913D3A
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:21:24 -0700 (PDT)
+        with ESMTP id S238730AbiESNZz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:25:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0DE926552
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:25:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652966483;
+        s=mimecast20190719; t=1652966749;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Hpom49djhvCnTb6qInWen/ieAQCL5jjwhDfWzOA/1YI=;
-        b=B3mmF7nC1LJx304eLE0YA7JEZ3NbGOuGey3HlmkNKoDnKA6gZc9fsLMDan3SF6A34xHlZE
-        KME9ux5/2ON2jbd3dIF+Yu+C5jofVIPzAO0XqXjaoFT7eciI3KaVkvtnwp6OTXLquTGm48
-        4ivdeObRdJxp5CviJDmwV9QLHrZChqc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=75Y0NpupHMOFuzVb3xvKt/AKuCsIT0oTLd57CRpCu3M=;
+        b=cx7rcvHxi54OUdQHYMtt7jlGhw1f0RoNLXqe5Y6a+LfU8idY8MsFCsKCgb0mYW7ocKgxzP
+        V8976Wi87ebPdmdQBgwH2CZSimKl4ORQ+6DBSoIBtQshq44i7VT2e9GjvXix5vo8N55sLs
+        NiJRSpFcjfWJaKl16He71zh+2vTUbtM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-547-8C3yUru1OKqyUyUTZHkhdQ-1; Thu, 19 May 2022 09:21:22 -0400
-X-MC-Unique: 8C3yUru1OKqyUyUTZHkhdQ-1
-Received: by mail-wr1-f72.google.com with SMTP id h3-20020adffa83000000b0020e5f0b8090so1554080wrr.19
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:21:22 -0700 (PDT)
+ us-mta-488-pCRrYDb-PMe_zzZdOqPRFQ-1; Thu, 19 May 2022 09:25:48 -0400
+X-MC-Unique: pCRrYDb-PMe_zzZdOqPRFQ-1
+Received: by mail-wr1-f69.google.com with SMTP id m8-20020adfc588000000b0020c4edd8a57so1559554wrg.10
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:25:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Hpom49djhvCnTb6qInWen/ieAQCL5jjwhDfWzOA/1YI=;
-        b=z01b53D31LaveFFgAY/GzdfPt6zOPlFbTfX3o+qVmU51pCB2TG1SuSy43u45NjMmg4
-         DLOzblJCpImQj0Ej/VmD7x4vNs7pi6w6/KAdKo0h2XGiCJGjCcjYtw8VBSwik2a7Siwd
-         2u1lTtDXB6NONTikjbfysTDhe+OMf/u0kMI78pvLTWXbrmSNTtnE1QPIUgO8k40IKOQv
-         FVJGchTMroPc7cKaDBDJ0HQqHVZ3LUlEs7TAEolYZoAWmTFghtd+7vo4n84ITuyYSdHX
-         bBhuiDFlAkov2UfvpKSbybbPZIxTFJcdTZDI4DvSiPDF68Hkf0Muy+aBKW8QUW75dJVj
-         Rb7g==
-X-Gm-Message-State: AOAM533xuar5jUOyHJOChaBv0mfJrFjbBdG5XG8jySfu5QsaEYR7k2XJ
-        7ITUVFVCizWebzyFeDkCETOaLREXrjmgo9giRC/GSDUdLC792L9OChhvhMjKTEY9s0Ye7zQEbiC
-        ZvQ5R9fKnweki
-X-Received: by 2002:a05:600c:58a:b0:396:ec38:3a32 with SMTP id o10-20020a05600c058a00b00396ec383a32mr4335262wmd.17.1652966481236;
-        Thu, 19 May 2022 06:21:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyNZ+ITXlkXhJxW6Q5XcQaFta6ZHSrXalQ6c/tAHwf2yreBtyLq555ki1sZF+2io9pSfqLbeQ==
-X-Received: by 2002:a05:600c:58a:b0:396:ec38:3a32 with SMTP id o10-20020a05600c058a00b00396ec383a32mr4335242wmd.17.1652966481028;
-        Thu, 19 May 2022 06:21:21 -0700 (PDT)
-Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
-        by smtp.gmail.com with ESMTPSA id c25-20020adfa319000000b0020c6b78eb5asm5161779wrb.68.2022.05.19.06.21.20
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=75Y0NpupHMOFuzVb3xvKt/AKuCsIT0oTLd57CRpCu3M=;
+        b=ODQU81r7TzNfp+Az+d9Zzs8tr+6X2kdllR2javChz7/vUZKoIFvomPFJAa4j0iLFCs
+         0S1L4iWShlC5Fre/OegFsVbBuNwBdM5i6otSzC0uLVAPMbgUtuI03ax7j748OMt1zjbD
+         5cTcSm0/V43L4B+dtA0TRWMj+T5NrxhSpmVP+xMtqyO9x3T0MsiUjwK0P59rLIuqOTKk
+         duGbkg/pGSYo5B3hFpgkyPLwkQdd+49nQGzYbaLv01yz1E/TBoMFq+Uhs7k3izUzIwPT
+         wqzaz54V9AwbRJgpq2JudEkWUcJWAJDCRYYT2A/XOC8/jdZglv4d3Hm01Gn8k55cAxNZ
+         oLgg==
+X-Gm-Message-State: AOAM533K+QUkhmefNBLU6oTAyS8fO8GHIvl0JrhMgGlPltiVl6zwK29O
+        9q7IYNqqD8tWZDCNSizPCA05yCXH/g8ZRVJolhVRldADjJGLVG3UHqSlWaXDfKdX0+z6EJ/XYw+
+        U+KParvb5YJey
+X-Received: by 2002:adf:f90d:0:b0:20c:de32:4d35 with SMTP id b13-20020adff90d000000b0020cde324d35mr3966801wrr.583.1652966746852;
+        Thu, 19 May 2022 06:25:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx9W9dMYRQYX3UHOU1Zw7N7bebDtVFsqnIveWxprkdMv9F88Yalhrjguy5n7lJT1Kg8HKj30Q==
+X-Received: by 2002:adf:f90d:0:b0:20c:de32:4d35 with SMTP id b13-20020adff90d000000b0020cde324d35mr3966782wrr.583.1652966746637;
+        Thu, 19 May 2022 06:25:46 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o16-20020a05600c511000b003942a244ec8sm4618177wms.13.2022.05.19.06.25.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 06:21:20 -0700 (PDT)
-Date:   Thu, 19 May 2022 15:21:18 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
-        alexandru.elisei@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 01/23] lib: Move acpi header and
- implementation to lib
-Message-ID: <20220519132118.gwfmclcaeejjnhp3@gator>
-References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-2-nikos.nikoleris@arm.com>
+        Thu, 19 May 2022 06:25:46 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 17/34] KVM: x86: hyper-v: Introduce fast
+ kvm_hv_l2_tlb_flush_exposed() check
+In-Reply-To: <3a4199c0b7ba7cf82c4eadf2881e24be609c2f0d.camel@redhat.com>
+References: <20220414132013.1588929-1-vkuznets@redhat.com>
+ <20220414132013.1588929-18-vkuznets@redhat.com>
+ <3a4199c0b7ba7cf82c4eadf2881e24be609c2f0d.camel@redhat.com>
+Date:   Thu, 19 May 2022 15:25:45 +0200
+Message-ID: <877d6hu012.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220506205605.359830-2-nikos.nikoleris@arm.com>
+Content-Type: text/plain
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,113 +82,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 06, 2022 at 09:55:43PM +0100, Nikos Nikoleris wrote:
-> This change is in preparation of using ACPI in arm64 systems booting
-> with EFI.
-> 
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> ---
->  x86/Makefile.common  | 2 +-
->  lib/x86/asm/setup.h  | 2 +-
->  lib/{x86 => }/acpi.h | 4 ++--
->  lib/{x86 => }/acpi.c | 0
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-I like that diffstat that git-format-patch -M creates when only
-moving, but not changing a file. I'd prefer we take the opportunity
-to update the file's coding style though and then confirm we didn't
-introduce any changes with a whitespace ignoring diff.
+> On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
+>> Introduce a helper to quickly check if KVM needs to handle VMCALL/VMMCALL
+>> from L2 in L0 to process L2 TLB flush requests.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/include/asm/kvm_host.h | 1 +
+>>  arch/x86/kvm/hyperv.c           | 6 ++++++
+>>  arch/x86/kvm/hyperv.h           | 7 +++++++
+>>  3 files changed, 14 insertions(+)
+>> 
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index ce62fde5f4ff..168600490bd1 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -616,6 +616,7 @@ struct kvm_vcpu_hv {
+>>  		u32 enlightenments_eax; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EAX */
+>>  		u32 enlightenments_ebx; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EBX */
+>>  		u32 syndbg_cap_eax; /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
+>> +		u32 nested_features_eax; /* HYPERV_CPUID_NESTED_FEATURES.EAX */
+>>  	} cpuid_cache;
+>>  
+>>  	struct kvm_vcpu_hv_tlb_flush_ring tlb_flush_ring[HV_NR_TLB_FLUSH_RINGS];
+>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> index 79aabe0c33ec..68a0df4e3f66 100644
+>> --- a/arch/x86/kvm/hyperv.c
+>> +++ b/arch/x86/kvm/hyperv.c
+>> @@ -2281,6 +2281,12 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
+>>  		hv_vcpu->cpuid_cache.syndbg_cap_eax = entry->eax;
+>>  	else
+>>  		hv_vcpu->cpuid_cache.syndbg_cap_eax = 0;
+>> +
+>> +	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_NESTED_FEATURES, 0);
+>> +	if (entry)
+>> +		hv_vcpu->cpuid_cache.nested_features_eax = entry->eax;
+>> +	else
+>> +		hv_vcpu->cpuid_cache.nested_features_eax = 0;
+>>  }
+>>  
+>>  int kvm_hv_set_enforce_cpuid(struct kvm_vcpu *vcpu, bool enforce)
+>> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+>> index f593c9fd1dee..d8cb6d70dbc8 100644
+>> --- a/arch/x86/kvm/hyperv.h
+>> +++ b/arch/x86/kvm/hyperv.h
+>> @@ -168,6 +168,13 @@ static inline void kvm_hv_vcpu_empty_flush_tlb(struct kvm_vcpu *vcpu)
+>>  	tlb_flush_ring->read_idx = tlb_flush_ring->write_idx;
+>>  }
+>>  
+>> +static inline bool kvm_hv_l2_tlb_flush_exposed(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>> +
+>> +	return hv_vcpu && (hv_vcpu->cpuid_cache.nested_features_eax & HV_X64_NESTED_DIRECT_FLUSH);
+>> +}
+>
+> Tiny nipick (feel free to ignore): maybe use 'supported' instead of 'exposed',
+> as we don't use this term in KVM often.
+>
 
->  x86/s3.c             | 2 +-
->  x86/vmexit.c         | 2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
->  rename lib/{x86 => }/acpi.h (99%)
->  rename lib/{x86 => }/acpi.c (100%)
-> 
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index b903988..4cdba79 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -2,6 +2,7 @@
->  
->  all: directories test_cases
->  
-> +cflatobjs += lib/acpi.o
->  cflatobjs += lib/pci.o
->  cflatobjs += lib/pci-edu.o
->  cflatobjs += lib/alloc.o
-> @@ -18,7 +19,6 @@ cflatobjs += lib/x86/apic.o
->  cflatobjs += lib/x86/atomic.o
->  cflatobjs += lib/x86/desc.o
->  cflatobjs += lib/x86/isr.o
-> -cflatobjs += lib/x86/acpi.o
->  cflatobjs += lib/x86/stack.o
->  cflatobjs += lib/x86/fault_test.o
->  cflatobjs += lib/x86/delay.o
-> diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-> index 24d4fa9..f46462c 100644
-> --- a/lib/x86/asm/setup.h
-> +++ b/lib/x86/asm/setup.h
-> @@ -4,7 +4,7 @@
->  unsigned long setup_tss(u8 *stacktop);
->  
->  #ifdef CONFIG_EFI
-> -#include "x86/acpi.h"
-> +#include "acpi.h"
->  #include "x86/apic.h"
->  #include "x86/processor.h"
->  #include "x86/smp.h"
-> diff --git a/lib/x86/acpi.h b/lib/acpi.h
-> similarity index 99%
-> rename from lib/x86/acpi.h
-> rename to lib/acpi.h
-> index 67ba389..1e89840 100644
-> --- a/lib/x86/acpi.h
-> +++ b/lib/acpi.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _X86_ACPI_H_
-> -#define _X86_ACPI_H_
-> +#ifndef _ACPI_H_
-> +#define _ACPI_H_
->  
->  #include "libcflat.h"
->  
-> diff --git a/lib/x86/acpi.c b/lib/acpi.c
-> similarity index 100%
-> rename from lib/x86/acpi.c
-> rename to lib/acpi.c
-> diff --git a/x86/s3.c b/x86/s3.c
-> index 6e41d0c..378d37a 100644
-> --- a/x86/s3.c
-> +++ b/x86/s3.c
-> @@ -1,5 +1,5 @@
->  #include "libcflat.h"
-> -#include "x86/acpi.h"
-> +#include "acpi.h"
->  #include "asm/io.h"
->  
->  static u32* find_resume_vector_addr(void)
-> diff --git a/x86/vmexit.c b/x86/vmexit.c
-> index 4adec78..2bac049 100644
-> --- a/x86/vmexit.c
-> +++ b/x86/vmexit.c
-> @@ -1,9 +1,9 @@
-> +#include "acpi.h"
->  #include "libcflat.h"
+Indeed we don't. Basically, this is guest_cpuid_has() but for a Hyper-V
+bit. I don't quite like 'supported' because we don't actually check
+whether KVM or even L1 guest 'support' this feature or not, we check
+whether the feature was 'exposed' to L1 so it can actually use it. I'm
+going to rename this to
 
-I prefer libcflat.h on top.
+ guest_hv_cpuid_has_l2_tlb_flush()
 
->  #include "smp.h"
->  #include "pci.h"
->  #include "x86/vm.h"
->  #include "x86/desc.h"
-> -#include "x86/acpi.h"
->  #include "x86/apic.h"
->  #include "x86/isr.h"
->  
-> -- 
-> 2.25.1
-> 
+then.
 
-Thanks,
-drew
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>
+
+Thanks!
+
+-- 
+Vitaly
 
