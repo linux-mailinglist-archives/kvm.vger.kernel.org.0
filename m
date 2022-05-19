@@ -2,63 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85A6852D501
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:48:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7EA052D46C
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:44:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236418AbiESNsy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:48:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36052 "EHLO
+        id S239070AbiESNo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:44:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239253AbiESNso (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:48:44 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB6E57100
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:48:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6613BB824B0
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:48:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1902C34100;
-        Thu, 19 May 2022 13:48:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652968098;
-        bh=OyFqMF74W3M0ZJLxEHZqbx0RH1+q2b7I75jA3NgE6M0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Sz4Qvp4rwr5g8e+HWqFvIn6o9WgbBHyu5HzK01BvWg2WbaepceHeDw2Oz4wrGY8uO
-         aM7RkaxjPEp0BlTRFMv2G7K2U6Y54m/l1hoIiKuOssQGg1p4i8o4JRpOE4JkhEUjtu
-         y1viTLNwKan5or5hlpGg7/3bb5GdQ2sSqlFRtVt8Kw26H188iSXMKY6TNLO9J0IR0v
-         09XbcaTj4KmKVntmkWy3hOmTiJBA1MJbGs/mTlm1mDdvISFqM46gbapaqFy9TNpQsw
-         e3bHaqnQUCzRzxlAq/EASYphq1ah49F36RW2faizlxHl00uW96cYtRQcQ49lHdXwm4
-         jsg7IDRuYuYAg==
-From:   Will Deacon <will@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 89/89] Documentation: KVM: Add some documentation for Protected KVM on arm64
-Date:   Thu, 19 May 2022 14:42:04 +0100
-Message-Id: <20220519134204.5379-90-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20220519134204.5379-1-will@kernel.org>
-References: <20220519134204.5379-1-will@kernel.org>
+        with ESMTP id S229782AbiESNmo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:42:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2C3A73CA70
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:42:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652967762;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cc6v35h5umjQC0TnVPsA9e8Ju9AJ+4sNLFkL8hlX4lM=;
+        b=emr4cSql47O17+LOUEUdwdqWU1O9RqTWhIEMOMVmHsYUPVKfmn1HEhedHTVC86efAHcfeP
+        SOYXjK76TW9ksQvCTj9cBOiAtrJ67P2mGpD/wt72xOB14a9DuTS3RRcR/enbhm2gDyXH7O
+        aF+Acu64jH9wMzRZJs0gCt4hTN2pW2s=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-473-ySXRCjAHPViuUMaf66a80w-1; Thu, 19 May 2022 09:42:40 -0400
+X-MC-Unique: ySXRCjAHPViuUMaf66a80w-1
+Received: by mail-wm1-f72.google.com with SMTP id m26-20020a7bcb9a000000b0039455e871b6so1838810wmi.8
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:42:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cc6v35h5umjQC0TnVPsA9e8Ju9AJ+4sNLFkL8hlX4lM=;
+        b=6wYe2Z13NuIthzMEqJ39g7ZlHBUgm4B2f0VQ4Qjuc7lz8LkQRQkm1fQ+romUiAGpRU
+         t3RTemZJrV+XqZTM9FP8/3LNeXxL6uc+skg5P9s2rWtdFicaMYdi9S3SPbeZ3dZJPf+s
+         uOXe0dD+wY3V8HHxcCWELrSuNdv2XvcnZ1uoly7keXUIdKOzXMXEVZj6BjO3tvkkqqwb
+         pSPY5U1zjUS6tP6/adMKoyAYyIGXoCArlAYiALD/wkTuinU3iMECW54fGGRf7bjCJ2I8
+         fOlSrlkgum4XLoHxB/my7ETVtL3MvnXHO6q0S0oophTrLEyWJ3vncuSuSwiVxGq+K6SQ
+         1m4w==
+X-Gm-Message-State: AOAM533UCMgS2pkZ9JXM6JVv+U/KtlJWkDQWFyssLzXiCCdrK9xF4aNx
+        ACLu0UTIz16xzZEDjOMBfntccIWiC5nPO+HC8PRiS6YiJ6iL4hiRex6zrcNV2AmcuUdWKUI+lh4
+        uIIuL0hJuf8i5
+X-Received: by 2002:a05:600c:1c1f:b0:394:6950:2bda with SMTP id j31-20020a05600c1c1f00b0039469502bdamr4477969wms.52.1652967759762;
+        Thu, 19 May 2022 06:42:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXUG31Hl0QIY94TSGDFiNH/UduvjVL+8FtbeYhtoE7IuCtr6ZQdM1+BfetQtGi+GBBsvxj3g==
+X-Received: by 2002:a05:600c:1c1f:b0:394:6950:2bda with SMTP id j31-20020a05600c1c1f00b0039469502bdamr4477956wms.52.1652967759567;
+        Thu, 19 May 2022 06:42:39 -0700 (PDT)
+Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
+        by smtp.gmail.com with ESMTPSA id i13-20020adfaacd000000b0020cd8f1d25csm4742736wrc.8.2022.05.19.06.42.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 06:42:39 -0700 (PDT)
+Date:   Thu, 19 May 2022 15:42:37 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
+        alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 04/23] lib: Extend the definition of
+ the ACPI table FADT
+Message-ID: <20220519134237.jrwug2lqmov43cnd@gator>
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <20220506205605.359830-5-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220506205605.359830-5-nikos.nikoleris@arm.com>
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,147 +77,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some initial documentation for the Protected KVM (pKVM) feature on
-arm64, describing the user ABI for creating protected VMs as well as
-their limitations.
+On Fri, May 06, 2022 at 09:55:46PM +0100, Nikos Nikoleris wrote:
+> This change add more fields in the APCI table FADT to allow for the
+> discovery of the PSCI conduit in arm64 systems. The definition for
+> FADT is similar to the one in include/acpi/actbl.h in Linux.
+> 
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  lib/acpi.h   | 35 ++++++++++++++++++++++++++++++-----
+>  lib/acpi.c   |  2 +-
+>  x86/s3.c     |  2 +-
+>  x86/vmexit.c |  2 +-
+>  4 files changed, 33 insertions(+), 8 deletions(-)
 
-Signed-off-by: Will Deacon <will@kernel.org>
----
- .../admin-guide/kernel-parameters.txt         |  4 +-
- Documentation/virt/kvm/arm/index.rst          |  1 +
- Documentation/virt/kvm/arm/pkvm.rst           | 96 +++++++++++++++++++
- 3 files changed, 100 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/virt/kvm/arm/pkvm.rst
+Looks fine to me, so
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 63a764ec7fec..b8841a969f59 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2437,7 +2437,9 @@
- 			      protected guests.
- 
- 			protected: nVHE-based mode with support for guests whose
--				   state is kept private from the host.
-+				   state is kept private from the host. See
-+				   Documentation/virt/kvm/arm/pkvm.rst for more
-+				   information about this mode of operation.
- 
- 			Defaults to VHE/nVHE based on hardware support. Setting
- 			mode to "protected" will disable kexec and hibernation
-diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-index b4067da3fcb6..49c388df662a 100644
---- a/Documentation/virt/kvm/arm/index.rst
-+++ b/Documentation/virt/kvm/arm/index.rst
-@@ -9,6 +9,7 @@ ARM
- 
-    hyp-abi
-    hypercalls
-+   pkvm
-    psci
-    pvtime
-    ptp_kvm
-diff --git a/Documentation/virt/kvm/arm/pkvm.rst b/Documentation/virt/kvm/arm/pkvm.rst
-new file mode 100644
-index 000000000000..64f099a5ac2e
---- /dev/null
-+++ b/Documentation/virt/kvm/arm/pkvm.rst
-@@ -0,0 +1,96 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Protected virtual machines (pKVM)
-+=================================
-+
-+Introduction
-+------------
-+
-+Protected KVM (pKVM) is a KVM/arm64 extension which uses the two-stage
-+translation capability of the Armv8 MMU to isolate guest memory from the host
-+system. This allows for the creation of a confidential computing environment
-+without relying on whizz-bang features in hardware, but still allowing room for
-+complementary technologies such as memory encryption and hardware-backed
-+attestation.
-+
-+The major implementation change brought about by pKVM is that the hypervisor
-+code running at EL2 is now largely independent of (and isolated from) the rest
-+of the host kernel running at EL1 and therefore additional hypercalls are
-+introduced to manage manipulation of guest stage-2 page tables, creation of VM
-+data structures and reclamation of memory on teardown. An immediate consequence
-+of this change is that the host itself runs with an identity mapping enabled
-+at stage-2, providing the hypervisor code with a mechanism to restrict host
-+access to an arbitrary physical page.
-+
-+Enabling pKVM
-+-------------
-+
-+The pKVM hypervisor is enabled by booting the host kernel at EL2 with
-+"``kvm-arm.mode=protected``" on the command-line. Once enabled, VMs can be spawned
-+in either protected or non-protected state, although the hypervisor is still
-+responsible for managing most of the VM metadata in either case.
-+
-+Limitations
-+-----------
-+
-+Enabling pKVM places some significant limitations on KVM guests, regardless of
-+whether they are spawned in protected state. It is therefore recommended only
-+to enable pKVM if protected VMs are required, with non-protected state acting
-+primarily as a debug and development aid.
-+
-+If you're still keen, then here is an incomplete list of caveats that apply
-+to all VMs running under pKVM:
-+
-+- Guest memory cannot be file-backed (with the exception of shmem/memfd) and is
-+  pinned as it is mapped into the guest. This prevents the host from
-+  swapping-out, migrating, merging or generally doing anything useful with the
-+  guest pages. It also requires that the VMM has either ``CAP_IPC_LOCK`` or
-+  sufficient ``RLIMIT_MEMLOCK`` to account for this pinned memory.
-+
-+- GICv2 is not supported and therefore GICv3 hardware is required in order
-+  to expose a virtual GICv3 to the guest.
-+
-+- Read-only memslots are unsupported and therefore dirty logging cannot be
-+  enabled.
-+
-+- Memslot configuration is fixed once a VM has started running, with subsequent
-+  move or deletion requests being rejected with ``-EPERM``.
-+
-+- There are probably many others.
-+
-+Since the host is unable to tear down the hypervisor when pKVM is enabled,
-+hibernation (``CONFIG_HIBERNATION``) and kexec (``CONFIG_KEXEC``) will fail
-+with ``-EBUSY``.
-+
-+If you are not happy with these limitations, then please don't enable pKVM :)
-+
-+VM creation
-+-----------
-+
-+When pKVM is enabled, protected VMs can be created by specifying the
-+``KVM_VM_TYPE_ARM_PROTECTED`` flag in the machine type identifier parameter
-+passed to ``KVM_CREATE_VM``.
-+
-+Protected VMs are instantiated according to a fixed vCPU configuration
-+described by the ID register definitions in
-+``arch/arm64/include/asm/kvm_pkvm.h``. Only a subset of the architectural
-+features that may be available to the host are exposed to the guest and the
-+capabilities advertised by ``KVM_CHECK_EXTENSION`` are limited accordingly,
-+with the vCPU registers being initialised to their architecturally-defined
-+values.
-+
-+Where not defined by the architecture, the registers of a protected vCPU
-+are reset to zero with the exception of the PC and X0 which can be set
-+either by the ``KVM_SET_ONE_REG`` interface or by a call to PSCI ``CPU_ON``.
-+
-+VM runtime
-+----------
-+
-+By default, memory pages mapped into a protected guest are inaccessible to the
-+host and any attempt by the host to access such a page will result in the
-+injection of an abort at EL1 by the hypervisor. For accesses originating from
-+EL0, the host will then terminate the current task with a ``SIGSEGV``.
-+
-+pKVM exposes additional hypercalls to protected guests, primarily for the
-+purpose of establishing shared-memory regions with the host for communication
-+and I/O. These hypercalls are documented in hypercalls.rst.
--- 
-2.36.1.124.g0e6072fb45-goog
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+but we should get sign-off from x86 people since they've been expecting
+fadt to be rev1 all this time and now it's changing.
+
+Thanks,
+drew
+
+> 
+> diff --git a/lib/acpi.h b/lib/acpi.h
+> index d80b983..9f27eb1 100644
+> --- a/lib/acpi.h
+> +++ b/lib/acpi.h
+> @@ -62,7 +62,15 @@ struct acpi_table_xsdt {
+>      u64 table_offset_entry[1];
+>  } __attribute__ ((packed));
+>  
+> -struct fadt_descriptor_rev1
+> +struct acpi_generic_address {
+> +    u8 space_id;            /* Address space where struct or register exists */
+> +    u8 bit_width;           /* Size in bits of given register */
+> +    u8 bit_offset;          /* Bit offset within the register */
+> +    u8 access_width;        /* Minimum Access size (ACPI 3.0) */
+> +    u64 address;            /* 64-bit address of struct or register */
+> +} __attribute__ ((packed));
+> +
+> +struct acpi_table_fadt
+>  {
+>      ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
+>      u32 firmware_ctrl;          /* Physical address of FACS */
+> @@ -100,10 +108,27 @@ struct fadt_descriptor_rev1
+>      u8  day_alrm;               /* Index to day-of-month alarm in RTC CMOS RAM */
+>      u8  mon_alrm;               /* Index to month-of-year alarm in RTC CMOS RAM */
+>      u8  century;                /* Index to century in RTC CMOS RAM */
+> -    u8  reserved4;              /* Reserved */
+> -    u8  reserved4a;             /* Reserved */
+> -    u8  reserved4b;             /* Reserved */
+> -};
+> +    u16 boot_flags;             /* IA-PC Boot Architecture Flags (see below for individual flags) */
+> +    u8 reserved;                /* Reserved, must be zero */
+> +    u32 flags;                  /* Miscellaneous flag bits (see below for individual flags) */
+> +    struct acpi_generic_address reset_register;     /* 64-bit address of the Reset register */
+> +    u8 reset_value;             /* Value to write to the reset_register port to reset the system */
+> +    u16 arm_boot_flags;         /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
+> +    u8 minor_revision;          /* FADT Minor Revision (ACPI 5.1) */
+> +    u64 Xfacs;                  /* 64-bit physical address of FACS */
+> +    u64 Xdsdt;                  /* 64-bit physical address of DSDT */
+> +    struct acpi_generic_address xpm1a_event_block;  /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
+> +    struct acpi_generic_address xpm1b_event_block;  /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
+> +    struct acpi_generic_address xpm1a_control_block;        /* 64-bit Extended Power Mgt 1a Control Reg Blk address */
+> +    struct acpi_generic_address xpm1b_control_block;        /* 64-bit Extended Power Mgt 1b Control Reg Blk address */
+> +    struct acpi_generic_address xpm2_control_block; /* 64-bit Extended Power Mgt 2 Control Reg Blk address */
+> +    struct acpi_generic_address xpm_timer_block;    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
+> +    struct acpi_generic_address xgpe0_block;        /* 64-bit Extended General Purpose Event 0 Reg Blk address */
+> +    struct acpi_generic_address xgpe1_block;        /* 64-bit Extended General Purpose Event 1 Reg Blk address */
+> +    struct acpi_generic_address sleep_control;      /* 64-bit Sleep Control register (ACPI 5.0) */
+> +    struct acpi_generic_address sleep_status;       /* 64-bit Sleep Status register (ACPI 5.0) */
+> +    u64 hypervisor_id;      /* Hypervisor Vendor ID (ACPI 6.0) */
+> +}  __attribute__ ((packed));
+>  
+>  struct facs_descriptor_rev1
+>  {
+> diff --git a/lib/acpi.c b/lib/acpi.c
+> index 9b8700c..e8440ae 100644
+> --- a/lib/acpi.c
+> +++ b/lib/acpi.c
+> @@ -46,7 +46,7 @@ void* find_acpi_table_addr(u32 sig)
+>  
+>  	/* FACS is special... */
+>  	if (sig == FACS_SIGNATURE) {
+> -		struct fadt_descriptor_rev1 *fadt;
+> +		struct acpi_table_fadt *fadt;
+>  
+>  		fadt = find_acpi_table_addr(FACP_SIGNATURE);
+>  		if (!fadt)
+> diff --git a/x86/s3.c b/x86/s3.c
+> index 89d69fc..16e79f8 100644
+> --- a/x86/s3.c
+> +++ b/x86/s3.c
+> @@ -30,7 +30,7 @@ extern char resume_start, resume_end;
+>  
+>  int main(int argc, char **argv)
+>  {
+> -	struct fadt_descriptor_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+> +	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+>  	struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+>  	char *addr, *resume_vec = (void*)0x1000;
+>  
+> diff --git a/x86/vmexit.c b/x86/vmexit.c
+> index 2bac049..fcc0760 100644
+> --- a/x86/vmexit.c
+> +++ b/x86/vmexit.c
+> @@ -206,7 +206,7 @@ int pm_tmr_blk;
+>  static void inl_pmtimer(void)
+>  {
+>      if (!pm_tmr_blk) {
+> -	struct fadt_descriptor_rev1 *fadt;
+> +	struct acpi_table_fadt *fadt;
+>  
+>  	fadt = find_acpi_table_addr(FACP_SIGNATURE);
+>  	pm_tmr_blk = fadt->pm_tmr_blk;
+> -- 
+> 2.25.1
+> 
 
