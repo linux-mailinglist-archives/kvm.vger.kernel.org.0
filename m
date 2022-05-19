@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E823452D487
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:46:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FF3152D453
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:43:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231309AbiESNoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:44:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48482 "EHLO
+        id S230091AbiESNni (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:43:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238927AbiESNnH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:43:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC58B3ED25
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:43:05 -0700 (PDT)
+        with ESMTP id S232729AbiESNnM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:43:12 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3577145794
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:43:11 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5D2056179E
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:43:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D396C36AE5;
-        Thu, 19 May 2022 13:43:01 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id ECC50B824A6
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:43:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43F89C34116;
+        Thu, 19 May 2022 13:43:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652967784;
-        bh=pr8cqSQ8LvDyMaXSEUTsEP4ASMbp/gW/nK760YXNIiY=;
+        s=k20201202; t=1652967788;
+        bh=oi7nWzoEc9504XVLiQbs3WOiWyACarQzLX8Qdeo+Dpw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=E1ymsAlqWNYi4MaLBoT7GrxsUccaUMDmwKl4xv0+QaTqkv6BNMmmhOEAuscujcOn2
-         BuAgQSkWx0WQQFf7HlU5mA+F/75KfDuiAjH2rhSG7kS6I9e1A6/Evdd4/a7b8zD8Ns
-         FgopfyyoMPQdR689n/Gy99tgOEZUEyFro3NIe29XtHkS5DpNrVp2Dp/5DI1iF4jBnc
-         HSJaJCrp9DRebNcGq+DDrv/BRbY3JEcIN0yDexAeptt9G6doRvfEkKwqv/bMthhEld
-         IEQOUak1DFZW4Q7DoJCtTYBjVXSYqx0z0XU3m4GuyuDEWOdq1HPq01YzU6HWJ1u98K
-         l7lcgt2aNgRhg==
+        b=ai111Mz0yHXfWZMGyOqaSqwA9EjJszWyeipWxoXH4bKfwJiONtB6AokrT5YO6fxXy
+         9u6ezzZPGE4TeufbhdNMQF/ZQ12AY4knHRhVLZTDuKlUkXc5DQIyv55G5TRcdaELC9
+         rM0UsX8PBisyFeOpGQHneOoOtLkNOfmZ/r7tamviaFfjxKWW+RtYgEIxlIS5np+A2D
+         rLM/stmgcRcPBPaBWg80PvCimoaZG+MkEZ4a9lUdNuWV8XVarZpqr4Z+8tSJZvtHn7
+         0ZUH9opzUbAo1QFK9461OePcWNuWp2JcLZPAoROtYECwKWOfRfTYGkzbPsvotb8l71
+         9wltMwOLSDvOw==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 10/89] KVM: arm64: Implement do_donate() helper for donating memory
-Date:   Thu, 19 May 2022 14:40:45 +0100
-Message-Id: <20220519134204.5379-11-will@kernel.org>
+Subject: [PATCH 11/89] KVM: arm64: Prevent the donation of no-map pages
+Date:   Thu, 19 May 2022 14:40:46 +0100
+Message-Id: <20220519134204.5379-12-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -58,8 +58,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_FILL_THIS_FORM_SHORT,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -68,330 +68,85 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Quentin Perret <qperret@google.com>
 
-Transferring ownership information of a memory region from one component
-to another can be achieved using a "donate" operation, which results
-in the previous owner losing access to the underlying pages entirely.
+Memory regions marked as no-map in DT routinely include TrustZone
+carevouts and such. Although donating such pages to the hypervisor may
+not breach confidentiality, it may be used to corrupt its state in
+uncontrollable ways. To prevent this, let's block host-initiated memory
+transitions targeting no-map pages altogether in nVHE protected mode as
+there should be no valid reason to do this currently.
 
-Implement a do_donate() helper, along the same lines as do_{un,}share,
-and provide this functionality for the host-{to,from}-hyp cases as this
-will later be used to donate/reclaim memory pages to store VM metadata
-at EL2.
+Thankfully, the pKVM EL2 hypervisor has a full copy of the host's list
+of memblock regions, hence allowing to check for the presence of the
+MEMBLOCK_NOMAP flag on any given region at EL2 easily.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 239 ++++++++++++++++++
- 2 files changed, 241 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index f5705a1e972f..c87b19b2d468 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -60,6 +60,8 @@ enum pkvm_component_id {
- int __pkvm_prot_finalize(void);
- int __pkvm_host_share_hyp(u64 pfn);
- int __pkvm_host_unshare_hyp(u64 pfn);
-+int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
-+int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
- 
- bool addr_is_memory(phys_addr_t phys);
- int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index ff86f5bd230f..c30402737548 100644
+index c30402737548..a7156fd13bc8 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -391,6 +391,9 @@ struct pkvm_mem_transition {
- 				/* Address in the completer's address space */
- 				u64	completer_addr;
- 			} host;
-+			struct {
-+				u64	completer_addr;
-+			} hyp;
- 		};
- 	} initiator;
- 
-@@ -404,6 +407,10 @@ struct pkvm_mem_share {
- 	const enum kvm_pgtable_prot		completer_prot;
+@@ -193,7 +193,7 @@ struct kvm_mem_range {
+ 	u64 end;
  };
  
-+struct pkvm_mem_donation {
-+	const struct pkvm_mem_transition	tx;
-+};
-+
- struct check_walk_data {
- 	enum pkvm_page_state	desired;
- 	enum pkvm_page_state	(*get_page_state)(kvm_pte_t pte);
-@@ -503,6 +510,46 @@ static int host_initiate_unshare(u64 *completer_addr,
- 	return __host_set_page_state_range(addr, size, PKVM_PAGE_OWNED);
+-static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
++static struct memblock_region *find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
+ {
+ 	int cur, left = 0, right = hyp_memblock_nr;
+ 	struct memblock_region *reg;
+@@ -216,18 +216,28 @@ static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
+ 		} else {
+ 			range->start = reg->base;
+ 			range->end = end;
+-			return true;
++			return reg;
+ 		}
+ 	}
+ 
+-	return false;
++	return NULL;
  }
  
-+static int host_initiate_donation(u64 *completer_addr,
-+				  const struct pkvm_mem_transition *tx)
-+{
-+	u8 owner_id = tx->completer.id;
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+
-+	*completer_addr = tx->initiator.host.completer_addr;
-+	return host_stage2_set_owner_locked(tx->initiator.addr, size, owner_id);
-+}
-+
-+static bool __host_ack_skip_pgtable_check(const struct pkvm_mem_transition *tx)
-+{
-+	return !(IS_ENABLED(CONFIG_NVHE_EL2_DEBUG) ||
-+		 tx->initiator.id != PKVM_ID_HYP);
-+}
-+
-+static int __host_ack_transition(u64 addr, const struct pkvm_mem_transition *tx,
-+				 enum pkvm_page_state state)
-+{
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+
-+	if (__host_ack_skip_pgtable_check(tx))
-+		return 0;
-+
-+	return __host_check_page_state_range(addr, size, state);
-+}
-+
-+static int host_ack_donation(u64 addr, const struct pkvm_mem_transition *tx)
-+{
-+	return __host_ack_transition(addr, tx, PKVM_NOPAGE);
-+}
-+
-+static int host_complete_donation(u64 addr, const struct pkvm_mem_transition *tx)
-+{
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+	u8 host_id = tx->completer.id;
-+
-+	return host_stage2_set_owner_locked(addr, size, host_id);
-+}
-+
- static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
+ bool addr_is_memory(phys_addr_t phys)
  {
- 	if (!kvm_pte_valid(pte))
-@@ -523,6 +570,27 @@ static int __hyp_check_page_state_range(u64 addr, u64 size,
- 	return check_page_state_range(&pkvm_pgtable, addr, size, &d);
+ 	struct kvm_mem_range range;
+ 
+-	return find_mem_range(phys, &range);
++	return !!find_mem_range(phys, &range);
++}
++
++static bool addr_is_allowed_memory(phys_addr_t phys)
++{
++	struct memblock_region *reg;
++	struct kvm_mem_range range;
++
++	reg = find_mem_range(phys, &range);
++
++	return reg && !(reg->flags & MEMBLOCK_NOMAP);
  }
  
-+static int hyp_request_donation(u64 *completer_addr,
-+				const struct pkvm_mem_transition *tx)
-+{
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+	u64 addr = tx->initiator.addr;
-+
-+	*completer_addr = tx->initiator.hyp.completer_addr;
-+	return __hyp_check_page_state_range(addr, size, PKVM_PAGE_OWNED);
-+}
-+
-+static int hyp_initiate_donation(u64 *completer_addr,
-+				 const struct pkvm_mem_transition *tx)
-+{
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+	int ret;
-+
-+	*completer_addr = tx->initiator.hyp.completer_addr;
-+	ret = kvm_pgtable_hyp_unmap(&pkvm_pgtable, tx->initiator.addr, size);
-+	return (ret != size) ? -EFAULT : 0;
-+}
-+
- static bool __hyp_ack_skip_pgtable_check(const struct pkvm_mem_transition *tx)
+ static bool is_in_mem_range(u64 addr, struct kvm_mem_range *range)
+@@ -346,7 +356,7 @@ static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot pr
+ static int host_stage2_idmap(u64 addr)
  {
- 	return !(IS_ENABLED(CONFIG_NVHE_EL2_DEBUG) ||
-@@ -554,6 +622,16 @@ static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
- 					    PKVM_PAGE_SHARED_BORROWED);
- }
- 
-+static int hyp_ack_donation(u64 addr, const struct pkvm_mem_transition *tx)
-+{
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+
-+	if (__hyp_ack_skip_pgtable_check(tx))
-+		return 0;
-+
-+	return __hyp_check_page_state_range(addr, size, PKVM_NOPAGE);
-+}
-+
- static int hyp_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
- 			      enum kvm_pgtable_prot perms)
- {
-@@ -572,6 +650,15 @@ static int hyp_complete_unshare(u64 addr, const struct pkvm_mem_transition *tx)
- 	return (ret != size) ? -EFAULT : 0;
- }
- 
-+static int hyp_complete_donation(u64 addr,
-+				 const struct pkvm_mem_transition *tx)
-+{
-+	void *start = (void *)addr, *end = start + (tx->nr_pages * PAGE_SIZE);
-+	enum kvm_pgtable_prot prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_OWNED);
-+
-+	return pkvm_create_mappings_locked(start, end, prot);
-+}
-+
- static int check_share(struct pkvm_mem_share *share)
- {
- 	const struct pkvm_mem_transition *tx = &share->tx;
-@@ -724,6 +811,94 @@ static int do_unshare(struct pkvm_mem_share *share)
- 	return WARN_ON(__do_unshare(share));
- }
- 
-+static int check_donation(struct pkvm_mem_donation *donation)
-+{
-+	const struct pkvm_mem_transition *tx = &donation->tx;
-+	u64 completer_addr;
-+	int ret;
-+
-+	switch (tx->initiator.id) {
-+	case PKVM_ID_HOST:
-+		ret = host_request_owned_transition(&completer_addr, tx);
-+		break;
-+	case PKVM_ID_HYP:
-+		ret = hyp_request_donation(&completer_addr, tx);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+	}
-+
-+	if (ret)
-+		return ret;
-+
-+	switch (tx->completer.id){
-+	case PKVM_ID_HOST:
-+		ret = host_ack_donation(completer_addr, tx);
-+		break;
-+	case PKVM_ID_HYP:
-+		ret = hyp_ack_donation(completer_addr, tx);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+	}
-+
-+	return ret;
-+}
-+
-+static int __do_donate(struct pkvm_mem_donation *donation)
-+{
-+	const struct pkvm_mem_transition *tx = &donation->tx;
-+	u64 completer_addr;
-+	int ret;
-+
-+	switch (tx->initiator.id) {
-+	case PKVM_ID_HOST:
-+		ret = host_initiate_donation(&completer_addr, tx);
-+		break;
-+	case PKVM_ID_HYP:
-+		ret = hyp_initiate_donation(&completer_addr, tx);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+	}
-+
-+	if (ret)
-+		return ret;
-+
-+	switch (tx->completer.id){
-+	case PKVM_ID_HOST:
-+		ret = host_complete_donation(completer_addr, tx);
-+		break;
-+	case PKVM_ID_HYP:
-+		ret = hyp_complete_donation(completer_addr, tx);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * do_donate():
-+ *
-+ * The page owner transfers ownership to another component, losing access
-+ * as a consequence.
-+ *
-+ * Initiator: OWNED	=> NOPAGE
-+ * Completer: NOPAGE	=> OWNED
-+ */
-+static int do_donate(struct pkvm_mem_donation *donation)
-+{
-+	int ret;
-+
-+	ret = check_donation(donation);
-+	if (ret)
-+		return ret;
-+
-+	return WARN_ON(__do_donate(donation));
-+}
-+
- int __pkvm_host_share_hyp(u64 pfn)
- {
+ 	struct kvm_mem_range range;
+-	bool is_memory = find_mem_range(addr, &range);
++	bool is_memory = !!find_mem_range(addr, &range);
+ 	enum kvm_pgtable_prot prot;
  	int ret;
-@@ -789,3 +964,67 @@ int __pkvm_host_unshare_hyp(u64 pfn)
  
- 	return ret;
- }
-+
-+int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
-+{
-+	int ret;
-+	u64 host_addr = hyp_pfn_to_phys(pfn);
-+	u64 hyp_addr = (u64)__hyp_va(host_addr);
-+	struct pkvm_mem_donation donation = {
-+		.tx	= {
-+			.nr_pages	= nr_pages,
-+			.initiator	= {
-+				.id	= PKVM_ID_HOST,
-+				.addr	= host_addr,
-+				.host	= {
-+					.completer_addr = hyp_addr,
-+				},
-+			},
-+			.completer	= {
-+				.id	= PKVM_ID_HYP,
-+			},
-+		},
-+	};
-+
-+	host_lock_component();
-+	hyp_lock_component();
-+
-+	ret = do_donate(&donation);
-+
-+	hyp_unlock_component();
-+	host_unlock_component();
-+
-+	return ret;
-+}
-+
-+int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
-+{
-+	int ret;
-+	u64 host_addr = hyp_pfn_to_phys(pfn);
-+	u64 hyp_addr = (u64)__hyp_va(host_addr);
-+	struct pkvm_mem_donation donation = {
-+		.tx	= {
-+			.nr_pages	= nr_pages,
-+			.initiator	= {
-+				.id	= PKVM_ID_HYP,
-+				.addr	= hyp_addr,
-+				.hyp	= {
-+					.completer_addr = host_addr,
-+				},
-+			},
-+			.completer	= {
-+				.id	= PKVM_ID_HOST,
-+			},
-+		},
-+	};
-+
-+	host_lock_component();
-+	hyp_lock_component();
-+
-+	ret = do_donate(&donation);
-+
-+	hyp_unlock_component();
-+	host_unlock_component();
-+
-+	return ret;
-+}
+@@ -424,7 +434,7 @@ static int __check_page_state_visitor(u64 addr, u64 end, u32 level,
+ 	struct check_walk_data *d = arg;
+ 	kvm_pte_t pte = *ptep;
+ 
+-	if (kvm_pte_valid(pte) && !addr_is_memory(kvm_pte_to_phys(pte)))
++	if (kvm_pte_valid(pte) && !addr_is_allowed_memory(kvm_pte_to_phys(pte)))
+ 		return -EINVAL;
+ 
+ 	return d->get_page_state(pte) == d->desired ? 0 : -EPERM;
 -- 
 2.36.1.124.g0e6072fb45-goog
 
