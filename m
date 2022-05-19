@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61C1452D4FF
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:48:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2D6052D509
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:49:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239297AbiESNsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:48:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54132 "EHLO
+        id S238941AbiESNtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:49:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231621AbiESNsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:48:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EEE91E3E0
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:47:55 -0700 (PDT)
+        with ESMTP id S239175AbiESNsR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:48:17 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F8C23FBED
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:48:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1A329617CA
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FA43C34115;
-        Thu, 19 May 2022 13:47:38 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CFB74B824B0
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05AF1C385B8;
+        Thu, 19 May 2022 13:47:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652968062;
-        bh=U5L7YKpcVZ4RGBMLh9l/9JmqOUeaR68eA9xYHCvM3eA=;
+        s=k20201202; t=1652968066;
+        bh=p4epx9gpbWHrqgR4lCHBD+OJVcMuF2+CwY/eYIiDFs8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Q+Ks1TY6Op73OxzQK3ChLtd/TSZuV9gBh2YroRocI9RKFy09F1zcAGk9CdV3M5IxC
-         XjhGIB1gsZkQe+MAXANKkVhd2iTHJNKBC7gJs2+ZVaIPmtCJlmr+P0nrm/+DqRn5p9
-         KyDWNcTpwlkiOkDYlZhOAv6aa6DnFue54lCccxOch7gHIXVij5y8nhgsdN6nTqB+9r
-         1WzVTquG5+Kig1mctkHhHOS6BI+MtGMuJCiE7a2vXnE2MKO3ptt2MHBW5821u3HxJ3
-         lPU9JocWCCzZZS0aX4Vt048eG6NXkFJjZCJ4bIAjVtxD5S1VidlCnPPcepaNbSOEgL
-         CoamQoUCITO4g==
+        b=b3NX1aHtHJU6tzqRl9/COho2WNeulJ3zXdWEhi9RI6d91qW/bA7+rXfzwLabysnxO
+         rO0lDyDbRy7+Ymcg/NMsVi0LFInppO07IoqKihDBZeGvEEZ0hX1PlW0uPD8Ad3XHyi
+         c8C5LIbwC99YWuru23eZYC0e53HGfhJjVr/BmrIp4337cXYJRHlVnsKEcH8rEfdLLQ
+         6rzguHJ/GqQ4HyblsBpNR+h4jwwchu/+kTWu7VzFwibZI9t2BOafulpf2jFNGIfTgR
+         trXoPHJ+qV8DfeiQRy67jGv5XvrFq47kqruU5D4EfOJd6oI3Io2aqFr6w2mzHk6aDH
+         fBDIBwcjZNNqQ==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 80/89] KVM: arm64: Refactor enter_exception64()
-Date:   Thu, 19 May 2022 14:41:55 +0100
-Message-Id: <20220519134204.5379-81-will@kernel.org>
+Subject: [PATCH 81/89] KVM: arm64: Inject SIGSEGV on illegal accesses
+Date:   Thu, 19 May 2022 14:41:56 +0100
+Message-Id: <20220519134204.5379-82-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -68,156 +68,150 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Quentin Perret <qperret@google.com>
 
-In order to simplify the injection of exceptions in the host in pkvm
-context, let's factor out of enter_exception64() the code calculating
-the exception offset from VBAR_EL1 and the cpsr.
+The pKVM hypervisor will currently panic if the host tries to access
+memory that it doesn't own (e.g. protected guest memory). Sadly, as
+guest memory can still be mapped into the VMM's address space, userspace
+can trivially crash the kernel/hypervisor by poking into guest memory.
+
+To prevent this, inject the abort back in the host with S1PTW set in the
+ESR, hence allowing the host to differentiate this abort from normal
+userspace faults and inject a SIGSEGV cleanly.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  5 ++
- arch/arm64/kvm/hyp/exception.c       | 89 ++++++++++++++++------------
- 2 files changed, 57 insertions(+), 37 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 50 ++++++++++++++++++++++++++-
+ arch/arm64/mm/fault.c                 | 22 ++++++++++++
+ 2 files changed, 71 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 2a79c861b8e0..8b6c391bbee8 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -41,6 +41,11 @@ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
- void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
- void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
- 
-+unsigned long get_except64_offset(unsigned long psr, unsigned long target_mode,
-+				  enum exception_type type);
-+unsigned long get_except64_cpsr(unsigned long old, bool has_mte,
-+				unsigned long sctlr, unsigned long mode);
-+
- void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
- 
- static inline int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index c5d009715402..14a80b0e2f91 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -60,31 +60,12 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
- 		vcpu->arch.ctxt.spsr_und = val;
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index d0544259eb01..8459dc33e460 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -549,6 +549,50 @@ static int host_stage2_idmap(u64 addr)
+ 	return ret;
  }
  
--/*
-- * This performs the exception entry at a given EL (@target_mode), stashing PC
-- * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-- * The EL passed to this function *must* be a non-secure, privileged mode with
-- * bit 0 being set (PSTATE.SP == 1).
-- *
-- * When an exception is taken, most PSTATE fields are left unchanged in the
-- * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
-- * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-- * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
-- *
-- * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
-- * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
-- *
-- * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
-- * MSB to LSB.
-- */
--static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
--			      enum exception_type type)
-+unsigned long get_except64_offset(unsigned long psr, unsigned long target_mode,
-+				  enum exception_type type)
- {
--	unsigned long sctlr, vbar, old, new, mode;
-+	u64 mode = psr & (PSR_MODE_MASK | PSR_MODE32_BIT);
- 	u64 exc_offset;
- 
--	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
--
- 	if      (mode == target_mode)
- 		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
- 	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
-@@ -94,28 +75,32 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
- 	else
- 		exc_offset = LOWER_EL_AArch32_VECTOR;
- 
--	switch (target_mode) {
--	case PSR_MODE_EL1h:
--		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL1);
--		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
--		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
--		break;
--	default:
--		/* Don't do that */
--		BUG();
--	}
--
--	*vcpu_pc(vcpu) = vbar + exc_offset + type;
-+	return exc_offset + type;
-+}
- 
--	old = *vcpu_cpsr(vcpu);
--	new = 0;
-+/*
-+ * When an exception is taken, most PSTATE fields are left unchanged in the
-+ * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
-+ * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-+ * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
-+ *
-+ * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
-+ * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
-+ *
-+ * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
-+ * MSB to LSB.
-+ */
-+unsigned long get_except64_cpsr(unsigned long old, bool has_mte,
-+				unsigned long sctlr, unsigned long target_mode)
++static void host_inject_abort(struct kvm_cpu_context *host_ctxt)
 +{
-+	u64 new = 0;
- 
- 	new |= (old & PSR_N_BIT);
- 	new |= (old & PSR_Z_BIT);
- 	new |= (old & PSR_C_BIT);
- 	new |= (old & PSR_V_BIT);
- 
--	if (kvm_has_mte(vcpu->kvm))
-+	if (has_mte)
- 		new |= PSR_TCO_BIT;
- 
- 	new |= (old & PSR_DIT_BIT);
-@@ -151,6 +136,36 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
- 
- 	new |= target_mode;
- 
-+	return new;
-+}
++	u64 spsr = read_sysreg_el2(SYS_SPSR);
++	u64 esr = read_sysreg_el2(SYS_ESR);
++	u64 ventry, ec;
 +
-+/*
-+ * This performs the exception entry at a given EL (@target_mode), stashing PC
-+ * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-+ * The EL passed to this function *must* be a non-secure, privileged mode with
-+ * bit 0 being set (PSTATE.SP == 1).
-+ */
-+static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
-+			      enum exception_type type)
-+{
-+	u64 offset = get_except64_offset(*vcpu_cpsr(vcpu), target_mode, type);
-+	unsigned long sctlr, vbar, old, new;
-+
-+	switch (target_mode) {
-+	case PSR_MODE_EL1h:
-+		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL1);
-+		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
-+		break;
-+	default:
-+		/* Don't do that */
-+		BUG();
++	/* Repaint the ESR to report a same-level fault if taken from EL1 */
++	if ((spsr & PSR_MODE_MASK) != PSR_MODE_EL0t) {
++		ec = ESR_ELx_EC(esr);
++		if (ec == ESR_ELx_EC_DABT_LOW)
++			ec = ESR_ELx_EC_DABT_CUR;
++		else if (ec == ESR_ELx_EC_IABT_LOW)
++			ec = ESR_ELx_EC_IABT_CUR;
++		else
++			WARN_ON(1);
++		esr &= ~ESR_ELx_EC_MASK;
++		esr |= ec << ESR_ELx_EC_SHIFT;
 +	}
 +
-+	*vcpu_pc(vcpu) = vbar + offset;
++	/*
++	 * Since S1PTW should only ever be set for stage-2 faults, we're pretty
++	 * much guaranteed that it won't be set in ESR_EL1 by the hardware. So,
++	 * let's use that bit to allow the host abort handler to differentiate
++	 * this abort from normal userspace faults.
++	 *
++	 * Note: although S1PTW is RES0 at EL1, it is guaranteed by the
++	 * architecture to be backed by flops, so it should be safe to use.
++	 */
++	esr |= ESR_ELx_S1PTW;
 +
-+	old = *vcpu_cpsr(vcpu);
-+	new = get_except64_cpsr(old, kvm_has_mte(vcpu->kvm), sctlr, target_mode);
- 	*vcpu_cpsr(vcpu) = new;
- 	__vcpu_write_spsr(vcpu, old);
++	write_sysreg_el1(esr, SYS_ESR);
++	write_sysreg_el1(spsr, SYS_SPSR);
++	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
++	write_sysreg_el1(read_sysreg_el2(SYS_FAR), SYS_FAR);
++
++	ventry = read_sysreg_el1(SYS_VBAR);
++	ventry += get_except64_offset(spsr, PSR_MODE_EL1h, except_type_sync);
++	write_sysreg_el2(ventry, SYS_ELR);
++
++	spsr = get_except64_cpsr(spsr, system_supports_mte(),
++				 read_sysreg_el1(SYS_SCTLR), PSR_MODE_EL1h);
++	write_sysreg_el2(spsr, SYS_SPSR);
++}
++
+ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+ {
+ 	struct kvm_vcpu_fault_info fault;
+@@ -560,7 +604,11 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+ 
+ 	addr = (fault.hpfar_el2 & HPFAR_MASK) << 8;
+ 	ret = host_stage2_idmap(addr);
+-	BUG_ON(ret && ret != -EAGAIN);
++
++	if (ret == -EPERM)
++		host_inject_abort(host_ctxt);
++	else
++		BUG_ON(ret && ret != -EAGAIN);
  }
+ 
+ struct pkvm_mem_transition {
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 77341b160aca..2b2c16a2535c 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -41,6 +41,7 @@
+ #include <asm/system_misc.h>
+ #include <asm/tlbflush.h>
+ #include <asm/traps.h>
++#include <asm/virt.h>
+ 
+ struct fault_info {
+ 	int	(*fn)(unsigned long far, unsigned int esr,
+@@ -257,6 +258,15 @@ static inline bool is_el1_permission_fault(unsigned long addr, unsigned int esr,
+ 	return false;
+ }
+ 
++static bool is_pkvm_stage2_abort(unsigned int esr)
++{
++	/*
++	 * S1PTW should only ever be set in ESR_EL1 if the pkvm hypervisor
++	 * injected a stage-2 abort -- see host_inject_abort().
++	 */
++	return is_pkvm_initialized() && (esr & ESR_ELx_S1PTW);
++}
++
+ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
+ 							unsigned int esr,
+ 							struct pt_regs *regs)
+@@ -268,6 +278,9 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
+ 	    (esr & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_FAULT)
+ 		return false;
+ 
++	if (is_pkvm_stage2_abort(esr))
++		return false;
++
+ 	local_irq_save(flags);
+ 	asm volatile("at s1e1r, %0" :: "r" (addr));
+ 	isb();
+@@ -383,6 +396,8 @@ static void __do_kernel_fault(unsigned long addr, unsigned int esr,
+ 			msg = "read from unreadable memory";
+ 	} else if (addr < PAGE_SIZE) {
+ 		msg = "NULL pointer dereference";
++	} else if (is_pkvm_stage2_abort(esr)) {
++		msg = "access to hypervisor-protected memory";
+ 	} else {
+ 		if (kfence_handle_page_fault(addr, esr & ESR_ELx_WNR, regs))
+ 			return;
+@@ -572,6 +587,13 @@ static int __kprobes do_page_fault(unsigned long far, unsigned int esr,
+ 					 addr, esr, regs);
+ 	}
+ 
++	if (is_pkvm_stage2_abort(esr)) {
++		if (!user_mode(regs))
++			goto no_context;
++		arm64_force_sig_fault(SIGSEGV, SEGV_ACCERR, far, "stage-2 fault");
++		return 0;
++	}
++
+ 	perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS, 1, regs, addr);
+ 
+ 	/*
 -- 
 2.36.1.124.g0e6072fb45-goog
 
