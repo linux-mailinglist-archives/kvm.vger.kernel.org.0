@@ -2,771 +2,722 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A357052D763
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 17:22:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B83B52D749
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 17:19:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240872AbiESPWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 11:22:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36992 "EHLO
+        id S240769AbiESPTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 11:19:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240801AbiESPWg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 11:22:36 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42EFDEC33E
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 08:22:31 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id v11so5437037pff.6
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 08:22:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bWjEMev9ajuRS1nciq9J62Rk6yEktXUlae30g4fnIW8=;
-        b=iTq077DV71kYOjOKP9BG/2DodkpUgQ8JRAgSE8Z2UW/F+5v7krbw6x2eMOIZ2SI8QH
-         YCy11T87q/VBPbnGBXPpSzIPc/XXGU2Y3moVfS62O1JIr5vL60/hDeN20b0fd3+T1F5P
-         yRGITUIGfA4EyMrnqFKtVGWZSwtF63nyy9GhMvz6qD8Di+ofADtRDi6/+VsFL87Ogla0
-         Eh2P7SvHq78ahfMNqooCExLtrI3c/sSvtO6RyERH5NB6nIkZCFNzZQJFPIFh+KIpkuXL
-         4t9q6HhM+NAWdjonhZBq3Q7Oj1o+VdLCeI2ff8ZumkF9D/i/6c5fTtXMhGWo+5C2F4Xz
-         FIvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bWjEMev9ajuRS1nciq9J62Rk6yEktXUlae30g4fnIW8=;
-        b=r/DVk/4YpJFX/qNqQXxCFu5kAc2qGp+CHWchZgwGf43McNkOfBH5rd6YvHpTOCmDd1
-         b8B/gDvpU+Lp4j3InRQcVMp+lV1XM2sN8sAlIpRZsjXdxGHKxV0cg0RG7nDQgDGRRxHH
-         5/L6TPIcyAeFOe3BpLZ8oCbSmt+RuxrQPu0GyeMrV1OyI6eqw8lGAcJ1GADKmfPhPWgC
-         TqNoebjwhFdQ9yM6LPI6GAvOQrwJygzNUSSCu0NXH5XIvSDDhNaD+Qc7l0qiAlb+Grrh
-         oKT71NDv4oEzbYvP+X5rcBAjX9ptuykPGllf49OAKWnFJ+DJkM4qzQ9nrrFbc+TwDP97
-         2MOw==
-X-Gm-Message-State: AOAM531GnKI3iIV7J2jghh/2MPdDjcttBReylXWkKAb+5B8uWiraOsy7
-        JTX64f5LFKhZdIjkAB82ZErbchJa9HD95Q==
-X-Google-Smtp-Source: ABdhPJzQG8MLgMIEoPtONITwJ7YdvDNd1MAzVhWcFIUYfu4DhAu5vVjkwBNAX1XrtS+pBavi/fgRCQ==
-X-Received: by 2002:a05:6a00:158c:b0:50f:83c5:c147 with SMTP id u12-20020a056a00158c00b0050f83c5c147mr5411859pfk.44.1652973750387;
-        Thu, 19 May 2022 08:22:30 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u32-20020a634720000000b003db580384d6sm3611554pga.60.2022.05.19.08.22.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 08:22:29 -0700 (PDT)
-Date:   Thu, 19 May 2022 15:22:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 3/3] KVM: VMX: Enable Notify VM exit
-Message-ID: <YoZgsng3wNWgEXaM@google.com>
-References: <20220421072958.16375-1-chenyi.qiang@intel.com>
- <20220421072958.16375-4-chenyi.qiang@intel.com>
- <YoVzf8tPgONxjmZM@google.com>
- <a3212daa-16d8-71a8-ef65-f73af268c089@intel.com>
+        with ESMTP id S240744AbiESPTT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 11:19:19 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12AB7C1EC8
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 08:19:17 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24JFF1Ej022766;
+        Thu, 19 May 2022 15:19:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=l0in9EcT59Wx1ct8UsJ0e2uo8R9lS6jIGcWjgWdWtfA=;
+ b=JHChDqACGY60Rz1WjpEpBv9zk34QtNPVPi0SdmKUUbdi0aDCqcXDyDIDc9O5ltDToC/v
+ 3hfpgHx4PPIBCWuy9h4mUbc0K0sVEqw+Jv/Xd3/QJbDnEc/EXBJ+Bwlrukz/zysZ01yv
+ nED0/TO7Le/0mcYc9ZknKxw98vUNvsaRVGhwdNJrlqrcmNidXerN81lQIHd2q5ZF/mcj
+ 3dFuNdM17JGUYCjcDSmZZ+7RliUEwQ/Vx/0IJq2ENJjO7ZZkRwvGV9ScqPmoDI280irT
+ 4RENoumNuuWd7A6FerBu+pgYe+G8DKSjJo99d2CTCiZjrcAHOKtX/5wvUKD7yW718xSi Mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5rc2r2nd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 May 2022 15:19:09 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24JFJ9TG007894;
+        Thu, 19 May 2022 15:19:09 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5rc2r2m4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 May 2022 15:19:09 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24JFCrFC014504;
+        Thu, 19 May 2022 15:19:06 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 3g2428x3f3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 May 2022 15:19:06 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24JFJ3Jp47972858
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 May 2022 15:19:03 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 74DE442041;
+        Thu, 19 May 2022 15:19:03 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5CF8C4203F;
+        Thu, 19 May 2022 15:19:02 +0000 (GMT)
+Received: from [9.171.72.157] (unknown [9.171.72.157])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 19 May 2022 15:19:02 +0000 (GMT)
+Message-ID: <ebbd2e46-3abb-2920-fa6c-f1b74fc1c203@linux.ibm.com>
+Date:   Thu, 19 May 2022 17:22:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a3212daa-16d8-71a8-ef65-f73af268c089@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v7 03/13] s390x: topology: CPU topology objects and
+ structures
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, philmd@redhat.com,
+        eblake@redhat.com, armbru@redhat.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com, frankja@linux.ibm.com
+References: <20220420115745.13696-1-pmorel@linux.ibm.com>
+ <20220420115745.13696-4-pmorel@linux.ibm.com>
+ <f18cc9b2-c897-d15b-706f-7a2cba2a1484@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <f18cc9b2-c897-d15b-706f-7a2cba2a1484@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cFU10m_vSX7_2etylKv3-IsNPo5kj0-u
+X-Proofpoint-ORIG-GUID: Qys9Q7kivP-wzxkAvahMcLuRpJTJ61wB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-19_04,2022-05-19_03,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=0 priorityscore=1501 bulkscore=0 mlxscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 spamscore=0 adultscore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205190090
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 19, 2022, Chenyi Qiang wrote:
+
+
+On 5/19/22 12:45, Thomas Huth wrote:
+> On 20/04/2022 13.57, Pierre Morel wrote:
+>> We use new objects to have a dynamic administration of the CPU topology.
+>> The highest level object in this implementation is the s390 book and
+>> in this first implementation of CPU topology for S390 we have a single
+>> book.
+>> The book is built as a SYSBUS bridge during the CPU initialization.
+>> Other objects, sockets and core will be built after the parsing
+>> of the QEMU -smp argument.
+>>
+>> Every object under this single book will be build dynamically
+>> immediately after a CPU has be realized if it is needed.
+>> The CPU will fill the sockets once after the other, according to the
+>> number of core per socket defined during the smp parsing.
+>>
+>> Each CPU inside a socket will be represented by a bit in a 64bit
+>> unsigned long. Set on plug and clear on unplug of a CPU.
+>>
+>> For the S390 CPU topology, thread and cores are merged into
+>> topology cores and the number of topology cores is the multiplication
+>> of cores by the numbers of threads.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   hw/s390x/cpu-topology.c         | 361 ++++++++++++++++++++++++++++++++
+>>   hw/s390x/meson.build            |   1 +
+>>   hw/s390x/s390-virtio-ccw.c      |   4 +
+>>   include/hw/s390x/cpu-topology.h |  74 +++++++
+>>   target/s390x/cpu.h              |  47 +++++
+>>   5 files changed, 487 insertions(+)
+>>   create mode 100644 hw/s390x/cpu-topology.c
+>>   create mode 100644 include/hw/s390x/cpu-topology.h
+>>
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> new file mode 100644
+>> index 0000000000..b7131b4ac3
+>> --- /dev/null
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -0,0 +1,361 @@
+>> +/*
+>> + * CPU Topology
+>> + *
+>> + * Copyright 2021 IBM Corp.
 > 
+> 2022 now?
+
+as time goes by...
+
 > 
-> On 5/19/2022 6:30 AM, Sean Christopherson wrote:
-> Thanks Sean for your patch. I think an unintentional change is mixed in it:
+>> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+>> +
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or 
+>> (at
+>> + * your option) any later version. See the COPYING file in the top-level
+>> + * directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu/error-report.h"
+>> +#include "hw/sysbus.h"
+>> +#include "hw/s390x/cpu-topology.h"
+>> +#include "hw/qdev-properties.h"
+>> +#include "hw/boards.h"
+>> +#include "qemu/typedefs.h"
+>> +#include "target/s390x/cpu.h"
+>> +#include "hw/s390x/s390-virtio-ccw.h"
+>> +
+>> +static S390TopologyCores *s390_create_cores(S390TopologySocket *socket,
+>> +                                            int origin)
+>> +{
+>> +    DeviceState *dev;
+>> +    S390TopologyCores *cores;
+>> +    const MachineState *ms = MACHINE(qdev_get_machine());
+>> +
+>> +    if (socket->bus->num_children >= (ms->smp.cores * 
+>> ms->smp.threads)) {
 > 
-> @@ -4739,7 +4725,8 @@ static int
-> kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
->  	return (kvm_arch_interrupt_allowed(vcpu) &&
->  		kvm_cpu_accept_dm_intr(vcpu) &&
->  		!kvm_event_needs_reinjection(vcpu) &&
-> -		!vcpu->arch.exception.pending);
-> +		!vcpu->arch.exception.pending &&
-> +		!kvm_test_request(KVM_REQ_TRIPLE_FAULT, vcpu));
->  }
+> You can drop the innermost parentheses.
+
+OK
+
 > 
-> Maybe this should belong to the patch 1?
-
-Good eyes!  Let's keep it out for now.  I do think it's the right behavior, but
-it is woefully incomplete; pretty much every patch that checks
-vcpu->arch.exception.pending also needs to check for pending triple fault.
-
-I'll add a patch to my exception/event cleanup series[*], which introduces
-kvm_is_exception_pending(), i.e. provides exactly the wrapper needed to handle
-a pending triple fault with minimal effort.
-
-[*] https://lore.kernel.org/all/20220311032801.3467418-1-seanjc@google.com
-
-
-Here's a new version without the spurious change...
-
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Wed, 18 May 2022 13:52:51 -0700
-Subject: [PATCH] KVM: x86: Introduce "struct kvm_caps" to track misc
- caps/settings
-
-Add kvm_caps to hold a variety of capabilites and defaults that aren't
-handled by kvm_cpu_caps because they aren't CPUID bits in order to reduce
-the amount of boilerplate code required to add a new feature.  The vast
-majority (all?) of the caps interact with vendor code and are written
-only during initialization, i.e. should be tagged __read_mostly, declared
-extern in x86.h, and exported.
-
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h | 15 -----
- arch/x86/kvm/cpuid.c            |  8 +--
- arch/x86/kvm/debugfs.c          |  4 +-
- arch/x86/kvm/lapic.c            |  2 +-
- arch/x86/kvm/svm/nested.c       |  4 +-
- arch/x86/kvm/svm/svm.c          | 13 +++--
- arch/x86/kvm/vmx/nested.c       |  4 +-
- arch/x86/kvm/vmx/vmx.c          | 22 ++++----
- arch/x86/kvm/x86.c              | 97 ++++++++++++++-------------------
- arch/x86/kvm/x86.h              | 26 ++++++++-
- 10 files changed, 94 insertions(+), 101 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9cdc5bbd721f..d895d25c5b2f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1661,21 +1661,6 @@ extern bool tdp_enabled;
-
- u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
-
--/* control of guest tsc rate supported? */
--extern bool kvm_has_tsc_control;
--/* maximum supported tsc_khz for guests */
--extern u32  kvm_max_guest_tsc_khz;
--/* number of bits of the fractional part of the TSC scaling ratio */
--extern u8   kvm_tsc_scaling_ratio_frac_bits;
--/* maximum allowed value of TSC scaling ratio */
--extern u64  kvm_max_tsc_scaling_ratio;
--/* 1ull << kvm_tsc_scaling_ratio_frac_bits */
--extern u64  kvm_default_tsc_scaling_ratio;
--/* bus lock detection supported? */
--extern bool kvm_has_bus_lock_exit;
--
--extern u64 kvm_mce_cap_supported;
--
- /*
-  * EMULTYPE_NO_DECODE - Set when re-emulating an instruction (after completing
-  *			userspace I/O) to indicate that the emulation context
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 8c1a3b2430a8..6822fc9ae86d 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -199,7 +199,7 @@ void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
-
- /*
-  * Calculate guest's supported XCR0 taking into account guest CPUID data and
-- * supported_xcr0 (comprised of host configuration and KVM_SUPPORTED_XCR0).
-+ * KVM's supported XCR0 (comprised of host's XCR0 and KVM_SUPPORTED_XCR0).
-  */
- static u64 cpuid_get_supported_xcr0(struct kvm_cpuid_entry2 *entries, int nent)
- {
-@@ -209,7 +209,7 @@ static u64 cpuid_get_supported_xcr0(struct kvm_cpuid_entry2 *entries, int nent)
- 	if (!best)
- 		return 0;
-
--	return (best->eax | ((u64)best->edx << 32)) & supported_xcr0;
-+	return (best->eax | ((u64)best->edx << 32)) & kvm_caps.supported_xcr0;
- }
-
- static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
-@@ -927,8 +927,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		}
- 		break;
- 	case 0xd: {
--		u64 permitted_xcr0 = supported_xcr0 & xstate_get_guest_group_perm();
--		u64 permitted_xss = supported_xss;
-+		u64 permitted_xcr0 = kvm_caps.supported_xcr0 & xstate_get_guest_group_perm();
-+		u64 permitted_xss = kvm_caps.supported_xss;
-
- 		entry->eax &= permitted_xcr0;
- 		entry->ebx = xstate_required_size(permitted_xcr0, false);
-diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-index 9240b3b7f8dd..cfed36aba2f7 100644
---- a/arch/x86/kvm/debugfs.c
-+++ b/arch/x86/kvm/debugfs.c
-@@ -48,7 +48,7 @@ DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL,
-
- static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
- {
--	*val = kvm_tsc_scaling_ratio_frac_bits;
-+	*val = kvm_caps.tsc_scaling_ratio_frac_bits;
- 	return 0;
- }
-
-@@ -66,7 +66,7 @@ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_
- 				    debugfs_dentry, vcpu,
- 				    &vcpu_timer_advance_ns_fops);
-
--	if (kvm_has_tsc_control) {
-+	if (kvm_caps.has_tsc_control) {
- 		debugfs_create_file("tsc-scaling-ratio", 0444,
- 				    debugfs_dentry, vcpu,
- 				    &vcpu_tsc_scaling_fops);
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 21ab69db689b..5fd678c90288 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1602,7 +1602,7 @@ static inline void __wait_lapic_expire(struct kvm_vcpu *vcpu, u64 guest_cycles)
- 	 * that __delay() uses delay_tsc whenever the hardware has TSC, thus
- 	 * always for VMX enabled hardware.
- 	 */
--	if (vcpu->arch.tsc_scaling_ratio == kvm_default_tsc_scaling_ratio) {
-+	if (vcpu->arch.tsc_scaling_ratio == kvm_caps.default_tsc_scaling_ratio) {
- 		__delay(min(guest_cycles,
- 			nsec_to_cycles(vcpu, timer_advance_ns)));
- 	} else {
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index bed5e1692cef..d14370cec23a 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -648,7 +648,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
-
- 	vmcb02->control.tsc_offset = vcpu->arch.tsc_offset;
-
--	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
-+	if (svm->tsc_ratio_msr != kvm_caps.default_tsc_scaling_ratio) {
- 		WARN_ON(!svm->tsc_scaling_enabled);
- 		nested_svm_update_tsc_ratio_msr(vcpu);
- 	}
-@@ -979,7 +979,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 		vmcb_mark_dirty(vmcb01, VMCB_INTERCEPTS);
- 	}
-
--	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
-+	if (svm->tsc_ratio_msr != kvm_caps.default_tsc_scaling_ratio) {
- 		WARN_ON(!svm->tsc_scaling_enabled);
- 		vcpu->arch.tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
- 		svm_write_tsc_multiplier(vcpu, vcpu->arch.tsc_scaling_ratio);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3b49337998ec..480eef001074 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1225,7 +1225,7 @@ static void __svm_vcpu_reset(struct kvm_vcpu *vcpu)
-
- 	svm_init_osvw(vcpu);
- 	vcpu->arch.microcode_version = 0x01000065;
--	svm->tsc_ratio_msr = kvm_default_tsc_scaling_ratio;
-+	svm->tsc_ratio_msr = kvm_caps.default_tsc_scaling_ratio;
-
- 	if (sev_es_guest(vcpu->kvm))
- 		sev_es_vcpu_reset(svm);
-@@ -4769,7 +4769,7 @@ static __init void svm_set_cpu_caps(void)
- {
- 	kvm_set_cpu_caps();
-
--	supported_xss = 0;
-+	kvm_caps.supported_xss = 0;
-
- 	/* CPUID 0x80000001 and 0x8000000A (SVM features) */
- 	if (nested) {
-@@ -4845,7 +4845,8 @@ static __init int svm_hardware_setup(void)
-
- 	init_msrpm_offsets();
-
--	supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
-+	kvm_caps.supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
-+				     XFEATURE_MASK_BNDCSR);
-
- 	if (boot_cpu_has(X86_FEATURE_FXSR_OPT))
- 		kvm_enable_efer_bits(EFER_FFXSR);
-@@ -4855,11 +4856,11 @@ static __init int svm_hardware_setup(void)
- 			tsc_scaling = false;
- 		} else {
- 			pr_info("TSC scaling supported\n");
--			kvm_has_tsc_control = true;
-+			kvm_caps.has_tsc_control = true;
- 		}
- 	}
--	kvm_max_tsc_scaling_ratio = SVM_TSC_RATIO_MAX;
--	kvm_tsc_scaling_ratio_frac_bits = 32;
-+	kvm_caps.max_tsc_scaling_ratio = SVM_TSC_RATIO_MAX;
-+	kvm_caps.tsc_scaling_ratio_frac_bits = 32;
-
- 	tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a6688663da4d..aab4745eb1ee 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2548,7 +2548,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 			vmx_get_l2_tsc_multiplier(vcpu));
-
- 	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
-
- 	nested_vmx_transition_tlb_flush(vcpu, vmcs12, true);
-@@ -4610,7 +4610,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
- 	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
- 	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
-
- 	if (vmx->nested.l1_tpr_threshold != -1)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 8bbcf2071faf..b06eafa5884d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1715,7 +1715,7 @@ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
- 	    nested_cpu_has2(vmcs12, SECONDARY_EXEC_TSC_SCALING))
- 		return vmcs12->tsc_multiplier;
-
--	return kvm_default_tsc_scaling_ratio;
-+	return kvm_caps.default_tsc_scaling_ratio;
- }
-
- static void vmx_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-@@ -7537,7 +7537,7 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
-
- 	/* CPUID 0xD.1 */
--	supported_xss = 0;
-+	kvm_caps.supported_xss = 0;
- 	if (!cpu_has_vmx_xsaves())
- 		kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
-
-@@ -7678,9 +7678,9 @@ static int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
- 		delta_tsc = 0;
-
- 	/* Convert to host delta tsc if tsc scaling is enabled */
--	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_default_tsc_scaling_ratio &&
-+	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_caps.default_tsc_scaling_ratio &&
- 	    delta_tsc && u64_shl_div_u64(delta_tsc,
--				kvm_tsc_scaling_ratio_frac_bits,
-+				kvm_caps.tsc_scaling_ratio_frac_bits,
- 				vcpu->arch.l1_tsc_scaling_ratio, &delta_tsc))
- 		return -ERANGE;
-
-@@ -8057,8 +8057,8 @@ static __init int hardware_setup(void)
- 	}
-
- 	if (!cpu_has_vmx_mpx())
--		supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
--				    XFEATURE_MASK_BNDCSR);
-+		kvm_caps.supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
-+					     XFEATURE_MASK_BNDCSR);
-
- 	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
- 	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
-@@ -8125,11 +8125,11 @@ static __init int hardware_setup(void)
- 		enable_ipiv = false;
-
- 	if (cpu_has_vmx_tsc_scaling())
--		kvm_has_tsc_control = true;
-+		kvm_caps.has_tsc_control = true;
-
--	kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
--	kvm_tsc_scaling_ratio_frac_bits = 48;
--	kvm_has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();
-+	kvm_caps.max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
-+	kvm_caps.tsc_scaling_ratio_frac_bits = 48;
-+	kvm_caps.has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();
-
- 	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
-
-@@ -8186,7 +8186,7 @@ static __init int hardware_setup(void)
- 		vmx_x86_ops.request_immediate_exit = __kvm_request_immediate_exit;
- 	}
-
--	kvm_mce_cap_supported |= MCG_LMCE_P;
-+	kvm_caps.supported_mce_cap |= MCG_LMCE_P;
-
- 	if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
- 		return -EINVAL;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 04812eaaf61b..a1ad422e2f37 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -87,8 +87,11 @@
-
- #define MAX_IO_MSRS 256
- #define KVM_MAX_MCE_BANKS 32
--u64 __read_mostly kvm_mce_cap_supported = MCG_CTL_P | MCG_SER_P;
--EXPORT_SYMBOL_GPL(kvm_mce_cap_supported);
-+
-+struct kvm_caps kvm_caps __read_mostly = {
-+	.supported_mce_cap = MCG_CTL_P | MCG_SER_P,
-+};
-+EXPORT_SYMBOL_GPL(kvm_caps);
-
- #define  ERR_PTR_USR(e)  ((void __user *)ERR_PTR(e))
-
-@@ -151,19 +154,6 @@ module_param(min_timer_period_us, uint, S_IRUGO | S_IWUSR);
- static bool __read_mostly kvmclock_periodic_sync = true;
- module_param(kvmclock_periodic_sync, bool, S_IRUGO);
-
--bool __read_mostly kvm_has_tsc_control;
--EXPORT_SYMBOL_GPL(kvm_has_tsc_control);
--u32  __read_mostly kvm_max_guest_tsc_khz;
--EXPORT_SYMBOL_GPL(kvm_max_guest_tsc_khz);
--u8   __read_mostly kvm_tsc_scaling_ratio_frac_bits;
--EXPORT_SYMBOL_GPL(kvm_tsc_scaling_ratio_frac_bits);
--u64  __read_mostly kvm_max_tsc_scaling_ratio;
--EXPORT_SYMBOL_GPL(kvm_max_tsc_scaling_ratio);
--u64 __read_mostly kvm_default_tsc_scaling_ratio;
--EXPORT_SYMBOL_GPL(kvm_default_tsc_scaling_ratio);
--bool __read_mostly kvm_has_bus_lock_exit;
--EXPORT_SYMBOL_GPL(kvm_has_bus_lock_exit);
--
- /* tsc tolerance in parts per million - default to 1/2 of the NTP threshold */
- static u32 __read_mostly tsc_tolerance_ppm = 250;
- module_param(tsc_tolerance_ppm, uint, S_IRUGO | S_IWUSR);
-@@ -235,8 +225,6 @@ EXPORT_SYMBOL_GPL(enable_apicv);
-
- u64 __read_mostly host_xss;
- EXPORT_SYMBOL_GPL(host_xss);
--u64 __read_mostly supported_xss;
--EXPORT_SYMBOL_GPL(supported_xss);
-
- const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	KVM_GENERIC_VM_STATS(),
-@@ -309,8 +297,6 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- };
-
- u64 __read_mostly host_xcr0;
--u64 __read_mostly supported_xcr0;
--EXPORT_SYMBOL_GPL(supported_xcr0);
-
- static struct kmem_cache *x86_emulator_cache;
-
-@@ -2345,12 +2331,12 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
-
- 	/* Guest TSC same frequency as host TSC? */
- 	if (!scale) {
--		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
-+		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_caps.default_tsc_scaling_ratio);
- 		return 0;
- 	}
-
- 	/* TSC scaling supported? */
--	if (!kvm_has_tsc_control) {
-+	if (!kvm_caps.has_tsc_control) {
- 		if (user_tsc_khz > tsc_khz) {
- 			vcpu->arch.tsc_catchup = 1;
- 			vcpu->arch.tsc_always_catchup = 1;
-@@ -2362,10 +2348,10 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
- 	}
-
- 	/* TSC scaling required  - calculate ratio */
--	ratio = mul_u64_u32_div(1ULL << kvm_tsc_scaling_ratio_frac_bits,
-+	ratio = mul_u64_u32_div(1ULL << kvm_caps.tsc_scaling_ratio_frac_bits,
- 				user_tsc_khz, tsc_khz);
-
--	if (ratio == 0 || ratio >= kvm_max_tsc_scaling_ratio) {
-+	if (ratio == 0 || ratio >= kvm_caps.max_tsc_scaling_ratio) {
- 		pr_warn_ratelimited("Invalid TSC scaling ratio - virtual-tsc-khz=%u\n",
- 			            user_tsc_khz);
- 		return -1;
-@@ -2383,7 +2369,7 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
- 	/* tsc_khz can be zero if TSC calibration fails */
- 	if (user_tsc_khz == 0) {
- 		/* set tsc_scaling_ratio to a safe value */
--		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
-+		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_caps.default_tsc_scaling_ratio);
- 		return -1;
- 	}
-
-@@ -2460,18 +2446,18 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
-  * (frac) represent the fractional part, ie. ratio represents a fixed
-  * point number (mult + frac * 2^(-N)).
-  *
-- * N equals to kvm_tsc_scaling_ratio_frac_bits.
-+ * N equals to kvm_caps.tsc_scaling_ratio_frac_bits.
-  */
- static inline u64 __scale_tsc(u64 ratio, u64 tsc)
- {
--	return mul_u64_u64_shr(tsc, ratio, kvm_tsc_scaling_ratio_frac_bits);
-+	return mul_u64_u64_shr(tsc, ratio, kvm_caps.tsc_scaling_ratio_frac_bits);
- }
-
- u64 kvm_scale_tsc(u64 tsc, u64 ratio)
- {
- 	u64 _tsc = tsc;
-
--	if (ratio != kvm_default_tsc_scaling_ratio)
-+	if (ratio != kvm_caps.default_tsc_scaling_ratio)
- 		_tsc = __scale_tsc(ratio, tsc);
-
- 	return _tsc;
-@@ -2498,11 +2484,11 @@ u64 kvm_calc_nested_tsc_offset(u64 l1_offset, u64 l2_offset, u64 l2_multiplier)
- {
- 	u64 nested_offset;
-
--	if (l2_multiplier == kvm_default_tsc_scaling_ratio)
-+	if (l2_multiplier == kvm_caps.default_tsc_scaling_ratio)
- 		nested_offset = l1_offset;
- 	else
- 		nested_offset = mul_s64_u64_shr((s64) l1_offset, l2_multiplier,
--						kvm_tsc_scaling_ratio_frac_bits);
-+						kvm_caps.tsc_scaling_ratio_frac_bits);
-
- 	nested_offset += l2_offset;
- 	return nested_offset;
-@@ -2511,9 +2497,9 @@ EXPORT_SYMBOL_GPL(kvm_calc_nested_tsc_offset);
-
- u64 kvm_calc_nested_tsc_multiplier(u64 l1_multiplier, u64 l2_multiplier)
- {
--	if (l2_multiplier != kvm_default_tsc_scaling_ratio)
-+	if (l2_multiplier != kvm_caps.default_tsc_scaling_ratio)
- 		return mul_u64_u64_shr(l1_multiplier, l2_multiplier,
--				       kvm_tsc_scaling_ratio_frac_bits);
-+				       kvm_caps.tsc_scaling_ratio_frac_bits);
-
- 	return l1_multiplier;
- }
-@@ -2555,7 +2541,7 @@ static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 l1_multipli
- 	else
- 		vcpu->arch.tsc_scaling_ratio = l1_multiplier;
-
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		static_call(kvm_x86_write_tsc_multiplier)(
- 			vcpu, vcpu->arch.tsc_scaling_ratio);
- }
-@@ -2691,7 +2677,7 @@ static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
-
- static inline void adjust_tsc_offset_host(struct kvm_vcpu *vcpu, s64 adjustment)
- {
--	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_default_tsc_scaling_ratio)
-+	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_caps.default_tsc_scaling_ratio)
- 		WARN_ON(adjustment < 0);
- 	adjustment = kvm_scale_tsc((u64) adjustment,
- 				   vcpu->arch.l1_tsc_scaling_ratio);
-@@ -3104,7 +3090,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
-
- 	/* With all the info we got, fill in the values */
-
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		tgt_tsc_khz = kvm_scale_tsc(tgt_tsc_khz,
- 					    v->arch.l1_tsc_scaling_ratio);
-
-@@ -3610,7 +3596,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
- 		 * XSAVES/XRSTORS to save/restore PT MSRs.
- 		 */
--		if (data & ~supported_xss)
-+		if (data & ~kvm_caps.supported_xss)
- 			return 1;
- 		vcpu->arch.ia32_xss = data;
- 		kvm_update_cpuid_runtime(vcpu);
-@@ -4370,7 +4356,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- 	case KVM_CAP_TSC_CONTROL:
- 	case KVM_CAP_VM_TSC_CONTROL:
--		r = kvm_has_tsc_control;
-+		r = kvm_caps.has_tsc_control;
- 		break;
- 	case KVM_CAP_X2APIC_API:
- 		r = KVM_X2APIC_API_VALID_FLAGS;
-@@ -4392,7 +4378,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = sched_info_on();
- 		break;
- 	case KVM_CAP_X86_BUS_LOCK_EXIT:
--		if (kvm_has_bus_lock_exit)
-+		if (kvm_caps.has_bus_lock_exit)
- 			r = KVM_BUS_LOCK_DETECTION_OFF |
- 			    KVM_BUS_LOCK_DETECTION_EXIT;
- 		else
-@@ -4401,7 +4387,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_XSAVE2: {
- 		u64 guest_perm = xstate_get_guest_group_perm();
-
--		r = xstate_required_size(supported_xcr0 & guest_perm, false);
-+		r = xstate_required_size(kvm_caps.supported_xcr0 & guest_perm, false);
- 		if (r < sizeof(struct kvm_xsave))
- 			r = sizeof(struct kvm_xsave);
- 		break;
-@@ -4439,7 +4425,7 @@ static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
-
- 	switch (attr->attr) {
- 	case KVM_X86_XCOMP_GUEST_SUPP:
--		if (put_user(supported_xcr0, uaddr))
-+		if (put_user(kvm_caps.supported_xcr0, uaddr))
- 			return -EFAULT;
- 		return 0;
- 	default:
-@@ -4516,8 +4502,8 @@ long kvm_arch_dev_ioctl(struct file *filp,
- 	}
- 	case KVM_X86_GET_MCE_CAP_SUPPORTED:
- 		r = -EFAULT;
--		if (copy_to_user(argp, &kvm_mce_cap_supported,
--				 sizeof(kvm_mce_cap_supported)))
-+		if (copy_to_user(argp, &kvm_caps.supported_mce_cap,
-+				 sizeof(kvm_caps.supported_mce_cap)))
- 			goto out;
- 		r = 0;
- 		break;
-@@ -4801,7 +4787,7 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
- 	r = -EINVAL;
- 	if (!bank_num || bank_num > KVM_MAX_MCE_BANKS)
- 		goto out;
--	if (mcg_cap & ~(kvm_mce_cap_supported | 0xff | 0xff0000))
-+	if (mcg_cap & ~(kvm_caps.supported_mce_cap | 0xff | 0xff0000))
- 		goto out;
- 	r = 0;
- 	vcpu->arch.mcg_cap = mcg_cap;
-@@ -5093,7 +5079,8 @@ static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
-
- 	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu,
- 					      guest_xsave->region,
--					      supported_xcr0, &vcpu->arch.pkru);
-+					      kvm_caps.supported_xcr0,
-+					      &vcpu->arch.pkru);
- }
-
- static void kvm_vcpu_ioctl_x86_get_xcrs(struct kvm_vcpu *vcpu,
-@@ -5598,8 +5585,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = -EINVAL;
- 		user_tsc_khz = (u32)arg;
-
--		if (kvm_has_tsc_control &&
--		    user_tsc_khz >= kvm_max_guest_tsc_khz)
-+		if (kvm_caps.has_tsc_control &&
-+		    user_tsc_khz >= kvm_caps.max_guest_tsc_khz)
- 			goto out;
-
- 		if (user_tsc_khz == 0)
-@@ -6039,7 +6026,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		    (cap->args[0] & KVM_BUS_LOCK_DETECTION_EXIT))
- 			break;
-
--		if (kvm_has_bus_lock_exit &&
-+		if (kvm_caps.has_bus_lock_exit &&
- 		    cap->args[0] & KVM_BUS_LOCK_DETECTION_EXIT)
- 			kvm->arch.bus_lock_detection_enabled = true;
- 		r = 0;
-@@ -6588,8 +6575,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -EINVAL;
- 		user_tsc_khz = (u32)arg;
-
--		if (kvm_has_tsc_control &&
--		    user_tsc_khz >= kvm_max_guest_tsc_khz)
-+		if (kvm_caps.has_tsc_control &&
-+		    user_tsc_khz >= kvm_caps.max_guest_tsc_khz)
- 			goto out;
-
- 		if (user_tsc_khz == 0)
-@@ -8745,7 +8732,7 @@ static void kvm_hyperv_tsc_notifier(void)
- 	/* TSC frequency always matches when on Hyper-V */
- 	for_each_present_cpu(cpu)
- 		per_cpu(cpu_tsc_khz, cpu) = tsc_khz;
--	kvm_max_guest_tsc_khz = tsc_khz;
-+	kvm_caps.max_guest_tsc_khz = tsc_khz;
-
- 	list_for_each_entry(kvm, &vm_list, vm_list) {
- 		__kvm_start_pvclock_update(kvm);
-@@ -9007,7 +8994,7 @@ int kvm_arch_init(void *opaque)
-
- 	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
- 		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
--		supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
-+		kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
- 	}
-
- 	if (pi_inject_timer == -1)
-@@ -11703,13 +11690,13 @@ int kvm_arch_hardware_setup(void *opaque)
- 	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
-
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
--		supported_xss = 0;
-+		kvm_caps.supported_xss = 0;
-
- #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
- 	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
- #undef __kvm_cpu_cap_has
-
--	if (kvm_has_tsc_control) {
-+	if (kvm_caps.has_tsc_control) {
- 		/*
- 		 * Make sure the user can only configure tsc_khz values that
- 		 * fit into a signed integer.
-@@ -11717,10 +11704,10 @@ int kvm_arch_hardware_setup(void *opaque)
- 		 * be 1 on all machines.
- 		 */
- 		u64 max = min(0x7fffffffULL,
--			      __scale_tsc(kvm_max_tsc_scaling_ratio, tsc_khz));
--		kvm_max_guest_tsc_khz = max;
-+			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
-+		kvm_caps.max_guest_tsc_khz = max;
- 	}
--	kvm_default_tsc_scaling_ratio = 1ULL << kvm_tsc_scaling_ratio_frac_bits;
-+	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
- 	kvm_init_msr_list();
- 	return 0;
- }
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 588792f00334..359d0454ad28 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -8,6 +8,25 @@
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
-
-+struct kvm_caps {
-+	/* control of guest tsc rate supported? */
-+	bool has_tsc_control;
-+	/* maximum supported tsc_khz for guests */
-+	u32  max_guest_tsc_khz;
-+	/* number of bits of the fractional part of the TSC scaling ratio */
-+	u8   tsc_scaling_ratio_frac_bits;
-+	/* maximum allowed value of TSC scaling ratio */
-+	u64  max_tsc_scaling_ratio;
-+	/* 1ull << kvm_caps.tsc_scaling_ratio_frac_bits */
-+	u64  default_tsc_scaling_ratio;
-+	/* bus lock detection supported? */
-+	bool has_bus_lock_exit;
-+
-+	u64 supported_mce_cap;
-+	u64 supported_xcr0;
-+	u64 supported_xss;
-+};
-+
- void kvm_spurious_fault(void);
-
- #define KVM_NESTED_VMENTER_CONSISTENCY_CHECK(consistency_check)		\
-@@ -283,14 +302,15 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
-
- extern u64 host_xcr0;
--extern u64 supported_xcr0;
- extern u64 host_xss;
--extern u64 supported_xss;
-+
-+extern struct kvm_caps kvm_caps;
-+
- extern bool enable_pmu;
-
- static inline bool kvm_mpx_supported(void)
- {
--	return (supported_xcr0 & (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR))
-+	return (kvm_caps.supported_xcr0 & (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR))
- 		== (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
- }
-
-
-base-commit: a3808d88461270c71d3fece5e51cc486ecdac7d0
---
-2.36.1.124.g0e6072fb45-goog
-
-
+> Also, can this situation ever happen? If not, please turn it into an 
+> assert() instead.
+>  >> +        return NULL;
+> 
+> You return NULL here, but the callers don't check for NULL and use the 
+> pointer anyway. So either this should not return NULL or you have to 
+> check the value at the calling site.
+
+It can happen, I must check the return value at the caller.
+Thanks
+
+> 
+>> +    }
+>> +
+>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_CORES);
+>> +    qdev_realize_and_unref(dev, socket->bus, &error_fatal);
+>> +
+>> +    cores = S390_TOPOLOGY_CORES(dev);
+>> +    cores->origin = origin;
+>> +    socket->cnt += 1;
+>> +
+>> +    return cores;
+>> +}
+>> +
+>> +static S390TopologySocket *s390_create_socket(S390TopologyBook *book, 
+>> int id)
+>> +{
+>> +    DeviceState *dev;
+>> +    S390TopologySocket *socket;
+>> +    const MachineState *ms = MACHINE(qdev_get_machine());
+> 
+> You already look up the MachineState pointer in s390_topology_new_cpu() 
+> ... so to optimize a little bit, you could pass it in as parameter here 
+> instead.
+
+Yes, thanks
+
+> 
+>> +    if (book->bus->num_children >= ms->smp.sockets) {
+>> +        return NULL;
+> 
+> Here again - the callers do not check for NULL pointer values, so this 
+> should either not return NULL or the callers need to be changed.
+
+hum, should never happen so I will change this with an assert.
+But searching the answer I found a beautiful bug in the caller.
+
+> 
+>> +    }
+>> +
+>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_SOCKET);
+>> +    qdev_realize_and_unref(dev, book->bus, &error_fatal);
+>> +
+>> +    socket = S390_TOPOLOGY_SOCKET(dev);
+>> +    socket->socket_id = id;
+>> +    book->cnt++;
+>> +
+>> +    return socket;
+>> +}
+>> +
+>> +/*
+>> + * s390_get_cores:
+>> + * @socket: the socket to search into
+>> + * @origin: the origin specified for the S390TopologyCores
+>> + *
+>> + * returns a pointer to a S390TopologyCores structure within a socket 
+>> having
+>> + * the specified origin.
+>> + * First search if the socket is already containing the 
+>> S390TopologyCores
+>> + * structure and if not create one with this origin.
+>> + */
+>> +static S390TopologyCores *s390_get_cores(S390TopologySocket *socket, 
+>> int origin)
+>> +{
+>> +    S390TopologyCores *cores;
+>> +    BusChild *kid;
+>> +
+>> +    QTAILQ_FOREACH(kid, &socket->bus->children, sibling) {
+>> +        cores = S390_TOPOLOGY_CORES(kid->child);
+>> +        if (cores->origin == origin) {
+>> +            return cores;
+>> +        }
+>> +    }
+>> +    return s390_create_cores(socket, origin);
+>> +}
+>> +
+>> +/*
+>> + * s390_get_socket:
+>> + * @book: The book to search into
+>> + * @socket_id: the identifier of the socket to search for
+>> + *
+>> + * returns a pointer to a S390TopologySocket structure within a book 
+>> having
+>> + * the specified socket_id.
+>> + * First search if the book is already containing the S390TopologySocket
+>> + * structure and if not create one with this socket_id.
+>> + */
+>> +static S390TopologySocket *s390_get_socket(S390TopologyBook *book,
+>> +                                           int socket_id)
+>> +{
+>> +    S390TopologySocket *socket;
+>> +    BusChild *kid;
+>> +
+>> +    QTAILQ_FOREACH(kid, &book->bus->children, sibling) {
+>> +        socket = S390_TOPOLOGY_SOCKET(kid->child);
+>> +        if (socket->socket_id == socket_id) {
+>> +            return socket;
+>> +        }
+>> +    }
+>> +    return s390_create_socket(book, socket_id);
+>> +}
+>> +
+>> +/*
+>> + * s390_topology_new_cpu:
+>> + * @core_id: the core ID is machine wide
+>> + *
+>> + * We have a single book returned by s390_get_topology(),
+>> + * then we build the hierarchy on demand.
+>> + * Note that we do not destroy the hierarchy on error creating
+>> + * an entry in the topology, we just keep it empty.
+>> + * We do not need to worry about not finding a topology level
+>> + * entry this would have been caught during smp parsing.
+>> + */
+>> +void s390_topology_new_cpu(int core_id)
+>> +{
+>> +    const MachineState *ms = MACHINE(qdev_get_machine());
+>> +    S390TopologyBook *book;
+>> +    S390TopologySocket *socket;
+>> +    S390TopologyCores *cores;
+>> +    int cores_per_socket, sock_idx;
+>> +    int origin, bit;
+>> +
+>> +    book = s390_get_topology();
+>> +
+>> +    cores_per_socket = ms->smp.max_cpus / ms->smp.sockets;
+>> +
+>> +    sock_idx = (core_id / cores_per_socket);
+>> +    socket = s390_get_socket(book, sock_idx);
+>> +
+>> +    /*
+>> +     * At the core level, each CPU is represented by a bit in a 64bit
+>> +     * unsigned long. Set on plug and clear on unplug of a CPU.
+>> +     * The firmware assume that all CPU in the core description have 
+>> the same
+>> +     * type, polarization and are all dedicated or shared.
+>> +     * In the case a socket contains CPU with different type, 
+>> polarization
+>> +     * or dedication then they will be defined in different CPU 
+>> containers.
+>> +     * Currently we assume all CPU are identical and the only reason 
+>> to have
+>> +     * several S390TopologyCores inside a socket is to have more than 
+>> 64 CPUs
+>> +     * in that case the origin field, representing the offset of the 
+>> first CPU
+>> +     * in the CPU container allows to represent up to the maximal 
+>> number of
+>> +     * CPU inside several CPU containers inside the socket container.
+>> +     */
+>> +    origin = 64 * (core_id / 64);
+>> +
+>> +    cores = s390_get_cores(socket, origin);
+>> +
+>> +    bit = 63 - (core_id - origin);
+>> +    set_bit(bit, &cores->mask);
+>> +    cores->origin = origin;
+>> +}
+>> +
+>> +/*
+>> + * Setting the first topology: 1 book, 1 socket
+>> + * This is enough for 64 cores if the topology is flat (single socket)
+>> + */
+>> +void s390_topology_setup(MachineState *ms)
+>> +{
+>> +    DeviceState *dev;
+>> +
+>> +    /* Create BOOK bridge device */
+>> +    dev = qdev_new(TYPE_S390_TOPOLOGY_BOOK);
+>> +    object_property_add_child(qdev_get_machine(),
+>> +                              TYPE_S390_TOPOLOGY_BOOK, OBJECT(dev));
+>> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+>> +}
+>> +
+>> +S390TopologyBook *s390_get_topology(void)
+>> +{
+>> +    static S390TopologyBook *book;
+>> +
+>> +    if (!book) {
+>> +        book = S390_TOPOLOGY_BOOK(
+>> +            object_resolve_path(TYPE_S390_TOPOLOGY_BOOK, NULL));
+>> +        assert(book != NULL);
+>> +    }
+>> +
+>> +    return book;
+>> +}
+>> +
+>> +/* --- CORES Definitions --- */
+>> +
+>> +static Property s390_topology_cores_properties[] = {
+>> +    DEFINE_PROP_BOOL("dedicated", S390TopologyCores, dedicated, false),
+>> +    DEFINE_PROP_UINT8("polarity", S390TopologyCores, polarity,
+>> +                      S390_TOPOLOGY_POLARITY_H),
+>> +    DEFINE_PROP_UINT8("cputype", S390TopologyCores, cputype,
+>> +                      S390_TOPOLOGY_CPU_TYPE),
+>> +    DEFINE_PROP_UINT16("origin", S390TopologyCores, origin, 0),
+>> +    DEFINE_PROP_UINT64("mask", S390TopologyCores, mask, 0),
+>> +    DEFINE_PROP_UINT8("id", S390TopologyCores, id, 0),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>> +static void cpu_cores_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(oc);
+>> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>> +
+>> +    device_class_set_props(dc, s390_topology_cores_properties);
+>> +    hc->unplug = qdev_simple_device_unplug_cb;
+>> +    dc->bus_type = TYPE_S390_TOPOLOGY_SOCKET_BUS;
+>> +    dc->desc = "topology cpu entry";
+>> +}
+>> +
+>> +static const TypeInfo cpu_cores_info = {
+>> +    .name          = TYPE_S390_TOPOLOGY_CORES,
+>> +    .parent        = TYPE_DEVICE,
+>> +    .instance_size = sizeof(S390TopologyCores),
+>> +    .class_init    = cpu_cores_class_init,
+>> +    .interfaces = (InterfaceInfo[]) {
+>> +        { TYPE_HOTPLUG_HANDLER },
+>> +        { }
+>> +    }
+>> +};
+>> +
+>> +/* --- SOCKETS Definitions --- */
+>> +static Property s390_topology_socket_properties[] = {
+>> +    DEFINE_PROP_UINT8("socket_id", S390TopologySocket, socket_id, 0),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>> +static char *socket_bus_get_dev_path(DeviceState *dev)
+>> +{
+>> +    S390TopologySocket *socket = S390_TOPOLOGY_SOCKET(dev);
+>> +    DeviceState *book = dev->parent_bus->parent;
+>> +    char *id = qdev_get_dev_path(book);
+>> +    char *ret;
+>> +
+>> +    if (id) {
+>> +        ret = g_strdup_printf("%s:%02d", id, socket->socket_id);
+>> +        g_free(id);
+>> +    } else {
+>> +        ret = g_strdup_printf("_:%02d", socket->socket_id);
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static void socket_bus_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    BusClass *k = BUS_CLASS(oc);
+>> +
+>> +    k->get_dev_path = socket_bus_get_dev_path;
+>> +    k->max_dev = S390_MAX_SOCKETS;
+>> +}
+>> +
+>> +static const TypeInfo socket_bus_info = {
+>> +    .name = TYPE_S390_TOPOLOGY_SOCKET_BUS,
+>> +    .parent = TYPE_BUS,
+>> +    .instance_size = 0,
+>> +    .class_init = socket_bus_class_init,
+>> +};
+>> +
+>> +static void s390_socket_device_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    S390TopologySocket *socket = S390_TOPOLOGY_SOCKET(dev);
+>> +    BusState *bus;
+>> +
+>> +    bus = qbus_new(TYPE_S390_TOPOLOGY_SOCKET_BUS, dev,
+>> +                   TYPE_S390_TOPOLOGY_SOCKET_BUS);
+>> +    qbus_set_hotplug_handler(bus, OBJECT(dev));
+>> +    socket->bus = bus;
+>> +}
+>> +
+>> +static void socket_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(oc);
+>> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>> +
+>> +    hc->unplug = qdev_simple_device_unplug_cb;
+>> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>> +    dc->bus_type = TYPE_S390_TOPOLOGY_BOOK_BUS;
+>> +    dc->realize = s390_socket_device_realize;
+>> +    device_class_set_props(dc, s390_topology_socket_properties);
+>> +    dc->desc = "topology socket";
+>> +}
+>> +
+>> +static const TypeInfo socket_info = {
+>> +    .name          = TYPE_S390_TOPOLOGY_SOCKET,
+>> +    .parent        = TYPE_DEVICE,
+>> +    .instance_size = sizeof(S390TopologySocket),
+>> +    .class_init    = socket_class_init,
+>> +    .interfaces = (InterfaceInfo[]) {
+>> +        { TYPE_HOTPLUG_HANDLER },
+>> +        { }
+>> +    }
+>> +};
+>> +
+>> +static char *book_bus_get_dev_path(DeviceState *dev)
+>> +{
+>> +    return g_strdup_printf("00");
+> 
+> If you just want to duplicate a static string, please g_strdup() instead.
+
+OK, thanks.
+
+> 
+>> +}
+>> +
+>> +static void book_bus_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    BusClass *k = BUS_CLASS(oc);
+>> +
+>> +    k->get_dev_path = book_bus_get_dev_path;
+>> +    k->max_dev = S390_MAX_BOOKS;
+>> +}
+>> +
+>> +static const TypeInfo book_bus_info = {
+>> +    .name = TYPE_S390_TOPOLOGY_BOOK_BUS,
+>> +    .parent = TYPE_BUS,
+>> +    .instance_size = 0,
+>> +    .class_init = book_bus_class_init,
+>> +};
+>> +
+>> +static void s390_book_device_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    S390TopologyBook *book = S390_TOPOLOGY_BOOK(dev);
+>> +    BusState *bus;
+>> +
+>> +    bus = qbus_new(TYPE_S390_TOPOLOGY_BOOK_BUS, dev,
+>> +                   TYPE_S390_TOPOLOGY_BOOK_BUS);
+>> +    qbus_set_hotplug_handler(bus, OBJECT(dev));
+>> +    book->bus = bus;
+>> +}
+>> +
+>> +static void book_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(oc);
+>> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>> +
+>> +    hc->unplug = qdev_simple_device_unplug_cb;
+>> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>> +    dc->realize = s390_book_device_realize;
+>> +    dc->desc = "topology book";
+>> +}
+>> +
+>> +static const TypeInfo book_info = {
+>> +    .name          = TYPE_S390_TOPOLOGY_BOOK,
+>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>> +    .instance_size = sizeof(S390TopologyBook),
+>> +    .class_init    = book_class_init,
+>> +    .interfaces = (InterfaceInfo[]) {
+>> +        { TYPE_HOTPLUG_HANDLER },
+>> +        { }
+>> +    }
+>> +};
+>> +
+>> +static void topology_register(void)
+>> +{
+>> +    type_register_static(&cpu_cores_info);
+>> +    type_register_static(&socket_bus_info);
+>> +    type_register_static(&socket_info);
+>> +    type_register_static(&book_bus_info);
+>> +    type_register_static(&book_info);
+>> +}
+>> +
+>> +type_init(topology_register);
+>> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+>> index 28484256ec..74678861cf 100644
+>> --- a/hw/s390x/meson.build
+>> +++ b/hw/s390x/meson.build
+>> @@ -2,6 +2,7 @@ s390x_ss = ss.source_set()
+>>   s390x_ss.add(files(
+>>     'ap-bridge.c',
+>>     'ap-device.c',
+>> +  'cpu-topology.c',
+>>     'ccw-device.c',
+>>     'css-bridge.c',
+>>     'css.c',
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index 90480e7cf9..179846e3a3 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -42,6 +42,7 @@
+>>   #include "sysemu/sysemu.h"
+>>   #include "hw/s390x/pv.h"
+>>   #include "migration/blocker.h"
+>> +#include "hw/s390x/cpu-topology.h"
+>>   static Error *pv_mig_blocker;
+>> @@ -88,6 +89,7 @@ static void s390_init_cpus(MachineState *machine)
+>>       /* initialize possible_cpus */
+>>       mc->possible_cpu_arch_ids(machine);
+>> +    s390_topology_setup(machine);
+>>       for (i = 0; i < machine->smp.cpus; i++) {
+>>           s390x_new_cpu(machine->cpu_type, i, &error_fatal);
+>>       }
+>> @@ -305,6 +307,8 @@ static void s390_cpu_plug(HotplugHandler 
+>> *hotplug_dev,
+>>       g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
+>>       ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
+>> +    s390_topology_new_cpu(cpu->env.core_id);
+> 
+> Why not pass the "ms" MachineState value to s390_topology_new_cpu() 
+> here, so you don't have to look it up there again?
+
+Yes, will do.
+
+> 
+>>       if (dev->hotplugged) {
+>>           raise_irq_cpu_hotplug();
+>>       }
+>> diff --git a/include/hw/s390x/cpu-topology.h 
+>> b/include/hw/s390x/cpu-topology.h
+>> new file mode 100644
+>> index 0000000000..e6e013a8b8
+>> --- /dev/null
+>> +++ b/include/hw/s390x/cpu-topology.h
+>> @@ -0,0 +1,74 @@
+>> +/*
+>> + * CPU Topology
+>> + *
+>> + * Copyright 2021 IBM Corp.
+> 
+> 2022 now?
+
+We are not getting younger....
+
+> 
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or 
+>> (at
+>> + * your option) any later version. See the COPYING file in the top-level
+>> + * directory.
+>> + */
+>> +#ifndef HW_S390X_CPU_TOPOLOGY_H
+>> +#define HW_S390X_CPU_TOPOLOGY_H
+>> +
+>> +#include "hw/qdev-core.h"
+>> +#include "qom/object.h"
+>> +
+>> +#define S390_TOPOLOGY_CPU_TYPE    0x03
+>> +
+>> +#define S390_TOPOLOGY_POLARITY_H  0x00
+>> +#define S390_TOPOLOGY_POLARITY_VL 0x01
+>> +#define S390_TOPOLOGY_POLARITY_VM 0x02
+>> +#define S390_TOPOLOGY_POLARITY_VH 0x03
+>> +
+>> +#define TYPE_S390_TOPOLOGY_CORES "topology cores"
+>> +    /*
+>> +     * Each CPU inside a socket will be represented by a bit in a 64bit
+>> +     * unsigned long. Set on plug and clear on unplug of a CPU.
+>> +     * All CPU inside a mask share the same dedicated, polarity and
+>> +     * cputype values.
+>> +     * The origin is the offset of the first CPU in a mask.
+>> +     */
+>> +struct S390TopologyCores {
+>> +    DeviceState parent_obj;
+>> +    uint8_t id;
+>> +    bool dedicated;
+>> +    uint8_t polarity;
+>> +    uint8_t cputype;
+> 
+> What's the benefit of using uint8_ts here? Why not simply an "int"?
+
+none, int is OK
+
+> 
+>> +    uint16_t origin;
+>> +    uint64_t mask;
+>> +    int cnt;
+>> +};
+>> +typedef struct S390TopologyCores S390TopologyCores;
+>> +OBJECT_DECLARE_SIMPLE_TYPE(S390TopologyCores, S390_TOPOLOGY_CORES)
+>> +
+>> +#define TYPE_S390_TOPOLOGY_SOCKET "topology socket"
+>> +#define TYPE_S390_TOPOLOGY_SOCKET_BUS "socket-bus"
+>> +struct S390TopologySocket {
+>> +    DeviceState parent_obj;
+>> +    BusState *bus;
+>> +    uint8_t socket_id;
+> 
+> Again, why uint8_t ?
+OK
+
+> 
+>> +    int cnt;
+>> +};
+>> +typedef struct S390TopologySocket S390TopologySocket;
+>> +OBJECT_DECLARE_SIMPLE_TYPE(S390TopologySocket, S390_TOPOLOGY_SOCKET)
+>> +#define S390_MAX_SOCKETS 4
+>> +
+>> +#define TYPE_S390_TOPOLOGY_BOOK "topology book"
+>> +#define TYPE_S390_TOPOLOGY_BOOK_BUS "book-bus"
+>> +struct S390TopologyBook {
+>> +    SysBusDevice parent_obj;
+>> +    BusState *bus;
+>> +    uint8_t book_id;
+> 
+> dito
+
+yes, right
+
+> 
+>> +    int cnt;
+>> +};
+>> +typedef struct S390TopologyBook S390TopologyBook;
+>> +OBJECT_DECLARE_SIMPLE_TYPE(S390TopologyBook, S390_TOPOLOGY_BOOK)
+>> +#define S390_MAX_BOOKS 1
+>> +
+>> +S390TopologyBook *s390_init_topology(void);
+>> +
+>> +S390TopologyBook *s390_get_topology(void);
+>> +void s390_topology_setup(MachineState *ms);
+>> +void s390_topology_new_cpu(int core_id);
+>> +
+>> +#endif
+> 
+>   Thomas
+> 
+
+Thanks Thomas for the review,
+
+Regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
