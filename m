@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA5B352D507
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:49:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE46552D50A
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:49:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238932AbiESNta (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:49:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37412 "EHLO
+        id S238816AbiESNtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:49:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239219AbiESNt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:49:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E2993FBDA
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:49:11 -0700 (PDT)
+        with ESMTP id S237307AbiESNth (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:49:37 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D821A045
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:49:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DB065617D2
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:48:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4DACC36AE3;
-        Thu, 19 May 2022 13:47:58 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 81456B824A6
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:48:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA919C385B8;
+        Thu, 19 May 2022 13:48:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652968082;
-        bh=/Mo4K/TZgcyHThL34GJtkzmcE7F2fxw8lRcqi2rTW/c=;
+        s=k20201202; t=1652968086;
+        bh=S0NIjDKf9+rgpK0PQjxkwGZ1hayqbk6xeRNbkZiaeAQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lZctvavEBzQ00kZTcii/cmXssJ+6ByUMt0ooYB9x1ORwmzX45NFefcdnDcrDq00F3
-         8AUjJ3/5aQHqluBsoZAe2pb/lrKTqMGWEV1HGuQaUq2ta0BAlykMFyaBdVDuRcD4Oy
-         UWTk3wBiKP9OguhQsQK1r3WxxQRCcQp7BDFBsDO4pxIhoI4cr0nF2xF67J0ne5r7Cl
-         CVqHMqRNqN0zkRVfrQmTEojUH4MWxc6tBUzJ6EKZxn3pEUs8neqIjbPrywBgK2QNFf
-         RsJKYFDUThn20OmDAG98aF1azY8/pjt5MOK3eJ6zQD7xU/u1I01BzedjWJU6qbOc1x
-         Q6JDZvF3zpbhw==
+        b=V5NfQ+2MWe5P5aBo/67wWU4PsJrsByA2i3PIYW5amw33uWiZxKKHtRExK7tShypjR
+         3RVV7PraQRArJOIzQiwnm58dAl0OvyWJlKtVbA9kxMzEA/M5YnwvdM0pfqrgQ75RHg
+         mWgxOoZAJGVJXCiNYqfkJJ+7coKcovUfOlLvMoweq/LKnbzMlcvuIi3WfyIyL7mtNy
+         Zd7UtBcY9qvZtCJXIIGWBGN37rhXsjkAK2N0jHQh4LqnfHPWC60nCN7hu+U1+mw1Cu
+         ETJl94SJxf9ramNn7jNOykMirgiO6qu5E8gSoFHfZeESZ8+SSPT1+uKzIrIBakI9/9
+         KPZkXwdwX2m7g==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 85/89] KVM: arm64: Document the KVM/arm64-specific calls in hypercalls.rst
-Date:   Thu, 19 May 2022 14:42:00 +0100
-Message-Id: <20220519134204.5379-86-will@kernel.org>
+Subject: [PATCH 86/89] KVM: arm64: Reformat/beautify PTP hypercall documentation
+Date:   Thu, 19 May 2022 14:42:01 +0100
+Message-Id: <20220519134204.5379-87-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -66,83 +66,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM/arm64 makes use of the SMCCC "Vendor Specific Hypervisor Service
-Call Range" to expose KVM-specific hypercalls to guests in a
-discoverable and extensible fashion.
+The PTP hypercall documentation doesn't produce the best-looking table
+when formatting in HTML as all of the return value definitions end up
+on the same line.
 
-Document the existence of this interface and the discovery hypercall.
+Reformat the PTP hypercall documentation to follow the formatting used
+by hypercalls.rst.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- Documentation/virt/kvm/arm/hypercalls.rst | 46 +++++++++++++++++++++++
- Documentation/virt/kvm/arm/index.rst      |  1 +
- 2 files changed, 47 insertions(+)
- create mode 100644 Documentation/virt/kvm/arm/hypercalls.rst
+ Documentation/virt/kvm/arm/ptp_kvm.rst | 38 ++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
-new file mode 100644
-index 000000000000..17be111f493f
---- /dev/null
-+++ b/Documentation/virt/kvm/arm/hypercalls.rst
-@@ -0,0 +1,46 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===============================================
-+KVM/arm64-specific hypercalls exposed to guests
-+===============================================
-+
-+This file documents the KVM/arm64-specific hypercalls which may be
-+exposed by KVM/arm64 to guest operating systems. These hypercalls are
-+issued using the HVC instruction according to version 1.1 of the Arm SMC
-+Calling Convention (DEN0028/C):
-+
-+https://developer.arm.com/docs/den0028/c
-+
-+All KVM/arm64-specific hypercalls are allocated within the "Vendor
-+Specific Hypervisor Service Call" range with a UID of
-+``28b46fb6-2ec5-11e9-a9ca-4b564d003a74``. This UID should be queried by the
-+guest using the standard "Call UID" function for the service range in
-+order to determine that the KVM/arm64-specific hypercalls are available.
-+
-+``ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID``
-+---------------------------------------------
-+
-+Provides a discovery mechanism for other KVM/arm64 hypercalls.
-+
-++---------------------+-------------------------------------------------------------+
-+| Presence:           | Mandatory for the KVM/arm64 UID                             |
-++---------------------+-------------------------------------------------------------+
-+| Calling convention: | HVC32                                                       |
-++---------------------+----------+--------------------------------------------------+
-+| Function ID:        | (uint32) | 0x86000000                                       |
-++---------------------+----------+--------------------------------------------------+
-+| Arguments:          | None                                                        |
-++---------------------+----------+----+---------------------------------------------+
-+| Return Values:      | (uint32) | R0 | Bitmap of available function numbers 0-31   |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint32) | R1 | Bitmap of available function numbers 32-63  |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint32) | R2 | Bitmap of available function numbers 64-95  |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint32) | R3 | Bitmap of available function numbers 96-127 |
-++---------------------+----------+----+---------------------------------------------+
-+
+diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
+index aecdc80ddcd8..7c0960970a0e 100644
+--- a/Documentation/virt/kvm/arm/ptp_kvm.rst
++++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+@@ -7,19 +7,29 @@ PTP_KVM is used for high precision time sync between host and guests.
+ It relies on transferring the wall clock and counter value from the
+ host to the guest using a KVM-specific hypercall.
+ 
+-* ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID: 0x86000001
 +``ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID``
 +----------------------------------------
-+
-+See ptp_kvm.rst
-diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-index 78a9b670aafe..b4067da3fcb6 100644
---- a/Documentation/virt/kvm/arm/index.rst
-+++ b/Documentation/virt/kvm/arm/index.rst
-@@ -8,6 +8,7 @@ ARM
-    :maxdepth: 2
  
-    hyp-abi
-+   hypercalls
-    psci
-    pvtime
-    ptp_kvm
+-This hypercall uses the SMC32/HVC32 calling convention:
++Retrieve current time information for the specific counter. There are no
++endianness restrictions.
+ 
+-ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
+-    ==============    ========    =====================================
+-    Function ID:      (uint32)    0x86000001
+-    Arguments:        (uint32)    KVM_PTP_VIRT_COUNTER(0)
+-                                  KVM_PTP_PHYS_COUNTER(1)
+-    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
+-                      (uint32)    Upper 32 bits of wall clock time (r0)
+-                      (uint32)    Lower 32 bits of wall clock time (r1)
+-                      (uint32)    Upper 32 bits of counter (r2)
+-                      (uint32)    Lower 32 bits of counter (r3)
+-    Endianness:                   No Restrictions.
+-    ==============    ========    =====================================
+++---------------------+-------------------------------------------------------+
++| Presence:           | Optional                                              |
+++---------------------+-------------------------------------------------------+
++| Calling convention: | HVC32                                                 |
+++---------------------+----------+--------------------------------------------+
++| Function ID:        | (uint32) | 0x86000001                                 |
+++---------------------+----------+----+---------------------------------------+
++| Arguments:          | (uint32) | R1 | ``KVM_PTP_VIRT_COUNTER (0)``          |
++|                     |          |    +---------------------------------------+
++|                     |          |    | ``KVM_PTP_PHYS_COUNTER (1)``          |
+++---------------------+----------+----+---------------------------------------+
++| Return Values:      | (int32)  | R0 | ``NOT_SUPPORTED (-1)`` on error, else |
++|                     |          |    | upper 32 bits of wall clock time      |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R1 | Lower 32 bits of wall clock time      |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R2 | Upper 32 bits of counter              |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R3 | Lower 32 bits of counter              |
+++---------------------+----------+----+---------------------------------------+
 -- 
 2.36.1.124.g0e6072fb45-goog
 
