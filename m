@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67EF352D4FA
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:48:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0F3F52D4ED
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:48:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233435AbiESNse (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:48:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56656 "EHLO
+        id S234012AbiESNsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:48:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239133AbiESNrx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:47:53 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E931147073
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:47:30 -0700 (PDT)
+        with ESMTP id S239090AbiESNr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:47:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDA23616A
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:47:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 46144B824B0
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B259C36AE9;
-        Thu, 19 May 2022 13:46:59 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6E68F617D4
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6397DC34116;
+        Thu, 19 May 2022 13:47:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652968022;
-        bh=PaDvO7OrWACJT+4yuXWM0lxUPvUE9Q+FqN8Dtq8OkYs=;
+        s=k20201202; t=1652968026;
+        bh=c/cAcfak9Xq41vGzDwWXcOzbHn4dVNJfvW6JUCOKNTI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tsTVC9ijsjxTgVKN4ZxQeljZ4egvZyASLAVQrvNK+vfin5WkChvWM0MZ4vaVc8lUQ
-         MA29CgUqKr29/+PkljcpierdXtaBJX5oOr6BOpA3se/asO+cglnCIDcv3OLJuLKP23
-         SR4Nof5VZ/pOobQ02GymuIKcskCFnIaCMr8ibihB7O356lPuI8IGTzRI4z+y2fHXsx
-         D5KXzW/rCs5CthslpRLqrCQYLYF8f6fQS5WL3c9GOpe+SbtNMpVmjIrdEQeuK58cYS
-         4K1jjEA2EV/O6mBBEAmylVFqpYmi48myGiIB6ssoTpfLRzn5Tfiw7oQ0l41QhntPgG
-         WYFQRuKnZ3Z6w==
+        b=MnPjV3KuVwQUlMfc1bxb7Eh0vxVdKcadWa6N25Tysz4Od0+B2FJt1LWs8WjIylfl2
+         Cr7z63W96JEuaQRNGEl84zm2GC3vU9pwfmjV4x7GThKwuEKXS9ycGnTlTnrcHZD0s9
+         xBz+tzYcC5a1FccAF49rSQR+OdlxpFXHQo+CLJAZaBXWPtDv/+MtfwBTvoTe4U6i2D
+         0IwivhMTCBHyjYAqAnqchlXudb+DJRsnLE5QHlI/LvKZKaat5NMAy13xAdavTcYHar
+         rdgZwtbrDknGepmUFtuyn0yr4A+dYOmx08mBYfc2pxGgzFBjiFgFNwhn4q/LWXpCYd
+         kvP4cYDsuQnfQ==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 70/89] KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for hyp use
-Date:   Thu, 19 May 2022 14:41:45 +0100
-Message-Id: <20220519134204.5379-71-will@kernel.org>
+Subject: [PATCH 71/89] KVM: arm64: Initialize shadow vm state at hyp
+Date:   Thu, 19 May 2022 14:41:46 +0100
+Message-Id: <20220519134204.5379-72-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -68,71 +68,130 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Fuad Tabba <tabba@google.com>
 
-Move kvm_vcpu_enable_ptrauth() to a shared header to be used by
-hyp in protected mode.
-
-No functional change intended.
+Do not rely on the state of the vm as provided by the host, but
+initialize it instead at EL2 to a known good and safe state.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 16 ++++++++++++++++
- arch/arm64/kvm/reset.c               | 16 ----------------
- 2 files changed, 16 insertions(+), 16 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 71 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d62405ce3e6d..bb56aff4de95 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -43,6 +43,22 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 839506a546c7..51da5c1d7e0d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -6,6 +6,9 @@
  
- void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
- 
-+static inline int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * For now make sure that both address/generic pointer authentication
-+	 * features are requested by the userspace together and the system
-+	 * supports these capabilities.
-+	 */
-+	if (!test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
-+	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features) ||
-+	    !system_has_full_ptr_auth())
-+		return -EINVAL;
+ #include <linux/kvm_host.h>
+ #include <linux/mm.h>
 +
-+	vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_PTRAUTH;
-+	return 0;
-+}
++#include <asm/kvm_emulate.h>
 +
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
- 	return !(vcpu->arch.hcr_el2 & HCR_RW);
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index c07265ea72fd..cc25f540962b 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -165,22 +165,6 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
- 		memset(vcpu->arch.sve_state, 0, vcpu_sve_state_size(vcpu));
+ #include <nvhe/mem_protect.h>
+ #include <nvhe/memory.h>
+ #include <nvhe/pkvm.h>
+@@ -315,6 +318,53 @@ struct kvm_shadow_vcpu_state *pkvm_loaded_shadow_vcpu_state(void)
+ 	return __this_cpu_read(loaded_shadow_state);
  }
  
--static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
--{
--	/*
--	 * For now make sure that both address/generic pointer authentication
--	 * features are requested by the userspace together and the system
--	 * supports these capabilities.
--	 */
--	if (!test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
--	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features) ||
--	    !system_has_full_ptr_auth())
--		return -EINVAL;
--
--	vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_PTRAUTH;
--	return 0;
--}
--
- static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
++/* Check and copy the supported features for the vcpu from the host. */
++static void copy_features(struct kvm_vcpu *shadow_vcpu, struct kvm_vcpu *host_vcpu)
++{
++	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
++
++	/* No restrictions for non-protected VMs. */
++	if (!kvm_vm_is_protected(shadow_vcpu->kvm)) {
++		bitmap_copy(shadow_vcpu->arch.features,
++			    host_vcpu->arch.features,
++			    KVM_VCPU_MAX_FEATURES);
++		return;
++	}
++
++	bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
++
++	/*
++	 * For protected vms, always allow:
++	 * - CPU starting in poweroff state
++	 * - PSCI v0.2
++	 */
++	set_bit(KVM_ARM_VCPU_POWER_OFF, allowed_features);
++	set_bit(KVM_ARM_VCPU_PSCI_0_2, allowed_features);
++
++	/*
++	 * Check if remaining features are allowed:
++	 * - Performance Monitoring
++	 * - Scalable Vectors
++	 * - Pointer Authentication
++	 */
++	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), PVM_ID_AA64DFR0_ALLOW))
++		set_bit(KVM_ARM_VCPU_PMU_V3, allowed_features);
++
++	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_SVE), PVM_ID_AA64PFR0_ALLOW))
++		set_bit(KVM_ARM_VCPU_SVE, allowed_features);
++
++	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_API), PVM_ID_AA64ISAR1_ALLOW) &&
++	    FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_APA), PVM_ID_AA64ISAR1_ALLOW))
++		set_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, allowed_features);
++
++	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI), PVM_ID_AA64ISAR1_ALLOW) &&
++	    FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA), PVM_ID_AA64ISAR1_ALLOW))
++		set_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, allowed_features);
++
++	bitmap_and(shadow_vcpu->arch.features, host_vcpu->arch.features,
++		   allowed_features, KVM_VCPU_MAX_FEATURES);
++}
++
+ static void unpin_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
+ 			     unsigned int nr_vcpus)
  {
- 	struct kvm_vcpu *tmp;
+@@ -350,6 +400,17 @@ static int set_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
+ 	return 0;
+ }
+ 
++static int init_ptrauth(struct kvm_vcpu *shadow_vcpu)
++{
++	int ret = 0;
++
++	if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, shadow_vcpu->arch.features) ||
++	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, shadow_vcpu->arch.features))
++		ret = kvm_vcpu_enable_ptrauth(shadow_vcpu);
++
++	return ret;
++}
++
+ static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
+ 			       struct kvm_vcpu **vcpu_array,
+ 			       int *last_ran,
+@@ -357,10 +418,12 @@ static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
+ 			       unsigned int nr_vcpus)
+ {
+ 	int i;
++	int ret;
+ 
+ 	vm->host_kvm = kvm;
+ 	vm->kvm.created_vcpus = nr_vcpus;
+ 	vm->kvm.arch.vtcr = host_kvm.arch.vtcr;
++	vm->kvm.arch.pkvm.enabled = READ_ONCE(kvm->arch.pkvm.enabled);
+ 	vm->kvm.arch.mmu.last_vcpu_ran = last_ran;
+ 	vm->last_ran_size = last_ran_size;
+ 	memset(vm->kvm.arch.mmu.last_vcpu_ran, -1, sizeof(int) * hyp_nr_cpus);
+@@ -377,8 +440,16 @@ static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
+ 		shadow_vcpu->vcpu_idx = i;
+ 
+ 		shadow_vcpu->arch.hw_mmu = &vm->kvm.arch.mmu;
++		shadow_vcpu->arch.power_off = true;
++
++		copy_features(shadow_vcpu, host_vcpu);
++
++		ret = init_ptrauth(shadow_vcpu);
++		if (ret)
++			return ret;
+ 
+ 		pkvm_vcpu_init_traps(shadow_vcpu, host_vcpu);
++		kvm_reset_pvm_sys_regs(shadow_vcpu);
+ 	}
+ 
+ 	return 0;
 -- 
 2.36.1.124.g0e6072fb45-goog
 
