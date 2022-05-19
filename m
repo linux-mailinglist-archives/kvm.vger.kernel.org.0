@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FB1652D4FD
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DD7F52D4FE
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:48:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237992AbiESNsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:48:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59562 "EHLO
+        id S239209AbiESNss (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:48:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239206AbiESNr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:47:56 -0400
+        with ESMTP id S239229AbiESNsA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:48:00 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FA38D028B
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:47:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50EBDE33E
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:47:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 33276B824A6
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A117C385AA;
-        Thu, 19 May 2022 13:47:07 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EED00B824AE
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50D87C34117;
+        Thu, 19 May 2022 13:47:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652968030;
-        bh=hCh5aMXsjpfqNJ0ujhIzhZM+KshM303G+POWXF8vjmk=;
+        s=k20201202; t=1652968034;
+        bh=RYzz4i/BOxS0OcFaoS3qfD1miQC80/tTsW0x1NowfrY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SpObs3l33bmi2hgGcZfQGielUdcM4kiaTitgszKPs+CAXPpQgg3DOTn+vtj7f/FA8
-         3O7wmJz2Oo92OeK3eiHNZlE6YbQAjYjHcighQwArM8zp8MEPexpWB7X6kBaW1LapNl
-         vlA/B03vD6+WJFpPbWuX0cEA/qfvGGjKgYbz7J5NnxLhCMcHIJd0bl7ZQcJQIkZkyM
-         jO5NXEPxUQw4aaO5yh2+J+j3OzdL96JkVUrCojCtQtJ5H4I4+H/zLufXur3kEGH6jD
-         FxeD34LXtYEIE1Fi2SopnbaioFPax+Dt4ve6AN5gds75b8IFtvPsi+pbGGYFiCjcii
-         dwLjo9/zYy7PQ==
+        b=N2c/oSD/VTDmAKjYyy2DWTAOgsB/u/4It/Wha8qRNDwDUsXaJayc3PyaaTuNTUuiA
+         bms34Goz8eJ/lek44x643XoUqlOU1I5URcPJ7mskY6GN2/z5QTSFBthBx6mMCGCfvL
+         cN8Z3QsPPKzjGcodk70XSYWwF0tnMrfBJtE6ADD/7yl596PKP1N+FDHg1bre3mZ/Do
+         oBYtr6LcycuM+4mcApwNoGN8d3/P+yPfSD69YieyaJglK9jLYv7ZcetwHZlitdX6BY
+         G5qrFbP2sw3Xe9KeOpkBpESviRMZisKlJGQcWIhPAbRc6cjgajMMj7V/vPvPT6rv0J
+         EYbQ3h2cOwXmg==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 72/89] KVM: arm64: Track the SVE state in the shadow vcpu
-Date:   Thu, 19 May 2022 14:41:47 +0100
-Message-Id: <20220519134204.5379-73-will@kernel.org>
+Subject: [PATCH 73/89] KVM: arm64: Add HVC handling for protected guests at EL2
+Date:   Thu, 19 May 2022 14:41:48 +0100
+Message-Id: <20220519134204.5379-74-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -66,97 +66,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
 
-When dealing with a guest with SVE enabled, make sure the host SVE
-state is pinned at EL2 S1, and that the shadow state is correctly
-initialised (and then unpinned on teardown).
+Rather than forwarding guest hypercalls back to the host for handling,
+implement some basic handling at EL2 which will later be extending to
+provide additional functionality such as PSCI.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c |  9 ++++----
- arch/arm64/kvm/hyp/nvhe/pkvm.c     | 33 ++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 24 ++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 22 ++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c       |  1 +
+ 4 files changed, 49 insertions(+)
 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index e772f9835a86..33d34cc639ea 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -101,4 +101,6 @@ bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
+ void kvm_reset_pvm_sys_regs(struct kvm_vcpu *vcpu);
+ int kvm_check_pvm_sysreg_table(void);
+ 
++bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code);
++
+ #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 5d6cee7436f4..1e39dc7eab4d 100644
+index 1e39dc7eab4d..26c8709f5494 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -416,8 +416,7 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
- 		if (host_flags & KVM_ARM64_PKVM_STATE_DIRTY)
- 			__flush_vcpu_state(shadow_state);
+@@ -4,6 +4,8 @@
+  * Author: Andrew Scull <ascull@google.com>
+  */
  
--		shadow_vcpu->arch.sve_state = kern_hyp_va(host_vcpu->arch.sve_state);
--		shadow_vcpu->arch.sve_max_vl = host_vcpu->arch.sve_max_vl;
-+		shadow_vcpu->arch.flags = host_flags;
- 
- 		shadow_vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS & ~(HCR_RW | HCR_TWI | HCR_TWE);
- 		shadow_vcpu->arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2);
-@@ -488,8 +487,10 @@ static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state,
- 		BUG();
- 	}
- 
--	host_flags = READ_ONCE(host_vcpu->arch.flags) &
--		~(KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_INCREMENT_PC);
-+	host_flags = shadow_vcpu->arch.flags;
-+	if (shadow_state_is_protected(shadow_state))
-+		host_flags &= ~(KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_INCREMENT_PC);
++#include <kvm/arm_hypercalls.h>
 +
- 	WRITE_ONCE(host_vcpu->arch.flags, host_flags);
- 	shadow_state->exit_code = exit_reason;
+ #include <hyp/adjust_pc.h>
+ 
+ #include <asm/pgtable-types.h>
+@@ -42,6 +44,13 @@ static void handle_pvm_entry_wfx(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *sh
+ 				   KVM_ARM64_INCREMENT_PC;
  }
+ 
++static void handle_pvm_entry_hvc64(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shadow_vcpu)
++{
++	u64 ret = READ_ONCE(host_vcpu->arch.ctxt.regs.regs[0]);
++
++	vcpu_set_reg(shadow_vcpu, 0, ret);
++}
++
+ static void handle_pvm_entry_sys64(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shadow_vcpu)
+ {
+ 	unsigned long host_flags;
+@@ -195,6 +204,19 @@ static void handle_pvm_exit_sys64(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *s
+ 	}
+ }
+ 
++static void handle_pvm_exit_hvc64(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shadow_vcpu)
++{
++	int i;
++
++	WRITE_ONCE(host_vcpu->arch.fault.esr_el2,
++		   shadow_vcpu->arch.fault.esr_el2);
++
++	/* Pass the hvc function id (r0) as well as any potential arguments. */
++	for (i = 0; i < 8; i++)
++		WRITE_ONCE(host_vcpu->arch.ctxt.regs.regs[i],
++			   vcpu_get_reg(shadow_vcpu, i));
++}
++
+ static void handle_pvm_exit_iabt(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shadow_vcpu)
+ {
+ 	WRITE_ONCE(host_vcpu->arch.fault.esr_el2,
+@@ -273,6 +295,7 @@ static void handle_vm_exit_abt(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shad
+ static const shadow_entry_exit_handler_fn entry_pvm_shadow_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_WFx]		= handle_pvm_entry_wfx,
++	[ESR_ELx_EC_HVC64]		= handle_pvm_entry_hvc64,
+ 	[ESR_ELx_EC_SYS64]		= handle_pvm_entry_sys64,
+ 	[ESR_ELx_EC_IABT_LOW]		= handle_pvm_entry_iabt,
+ 	[ESR_ELx_EC_DABT_LOW]		= handle_pvm_entry_dabt,
+@@ -281,6 +304,7 @@ static const shadow_entry_exit_handler_fn entry_pvm_shadow_handlers[] = {
+ static const shadow_entry_exit_handler_fn exit_pvm_shadow_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_WFx]		= handle_pvm_exit_wfx,
++	[ESR_ELx_EC_HVC64]		= handle_pvm_exit_hvc64,
+ 	[ESR_ELx_EC_SYS64]		= handle_pvm_exit_sys64,
+ 	[ESR_ELx_EC_IABT_LOW]		= handle_pvm_exit_iabt,
+ 	[ESR_ELx_EC_DABT_LOW]		= handle_pvm_exit_dabt,
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 51da5c1d7e0d..9feeb0b5433a 100644
+index 9feeb0b5433a..92e60ebeced5 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -372,7 +372,19 @@ static void unpin_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
+@@ -7,6 +7,8 @@
+ #include <linux/kvm_host.h>
+ #include <linux/mm.h>
  
- 	for (i = 0; i < nr_vcpus; i++) {
- 		struct kvm_vcpu *host_vcpu = shadow_vcpu_states[i].host_vcpu;
-+		struct kvm_vcpu *shadow_vcpu = &shadow_vcpu_states[i].shadow_vcpu;
-+		size_t sve_state_size;
-+		void *sve_state;
++#include <kvm/arm_hypercalls.h>
 +
- 		hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
-+
-+		if (!test_bit(KVM_ARM_VCPU_SVE, shadow_vcpu->arch.features))
-+			continue;
-+
-+		sve_state = shadow_vcpu->arch.sve_state;
-+		sve_state = kern_hyp_va(sve_state);
-+		sve_state_size = vcpu_sve_state_size(shadow_vcpu);
-+		hyp_unpin_shared_mem(sve_state, sve_state + sve_state_size);
- 	}
+ #include <asm/kvm_emulate.h>
+ 
+ #include <nvhe/mem_protect.h>
+@@ -797,3 +799,23 @@ int __pkvm_teardown_shadow(unsigned int shadow_handle)
+ 	hyp_spin_unlock(&shadow_lock);
+ 	return err;
  }
++
++/*
++ * Handler for protected VM HVC calls.
++ *
++ * Returns true if the hypervisor has handled the exit, and control should go
++ * back to the guest, or false if it hasn't.
++ */
++bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	u32 fn = smccc_get_function(vcpu);
++
++	switch (fn) {
++	case ARM_SMCCC_VERSION_FUNC_ID:
++		/* Nothing to be handled by the host. Go back to the guest. */
++		smccc_set_retval(vcpu, ARM_SMCCC_VERSION_1_1, 0, 0, 0);
++		return true;
++	default:
++		return false;
++	}
++}
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 6bb979ee51cc..87338775288c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -205,6 +205,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
  
-@@ -448,6 +460,27 @@ static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
- 		if (ret)
- 			return ret;
- 
-+		if (test_bit(KVM_ARM_VCPU_SVE, shadow_vcpu->arch.features)) {
-+			size_t sve_state_size;
-+			void *sve_state;
-+
-+			shadow_vcpu->arch.sve_state = READ_ONCE(host_vcpu->arch.sve_state);
-+			shadow_vcpu->arch.sve_max_vl = READ_ONCE(host_vcpu->arch.sve_max_vl);
-+
-+			sve_state = kern_hyp_va(shadow_vcpu->arch.sve_state);
-+			sve_state_size = vcpu_sve_state_size(shadow_vcpu);
-+
-+			if (!shadow_vcpu->arch.sve_state || !sve_state_size ||
-+			    hyp_pin_shared_mem(sve_state,
-+					       sve_state + sve_state_size)) {
-+				clear_bit(KVM_ARM_VCPU_SVE,
-+					  shadow_vcpu->arch.features);
-+				shadow_vcpu->arch.sve_state = NULL;
-+				shadow_vcpu->arch.sve_max_vl = 0;
-+				return -EINVAL;
-+			}
-+		}
-+
- 		pkvm_vcpu_init_traps(shadow_vcpu, host_vcpu);
- 		kvm_reset_pvm_sys_regs(shadow_vcpu);
- 	}
+ static const exit_handler_fn pvm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_HVC64]		= kvm_handle_pvm_hvc64,
+ 	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
+ 	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_fpsimd,
 -- 
 2.36.1.124.g0e6072fb45-goog
 
