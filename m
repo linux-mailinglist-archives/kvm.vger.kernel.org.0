@@ -2,102 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38F4C52D51E
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:53:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DAB552D53F
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:57:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232608AbiESNwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:52:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39146 "EHLO
+        id S239020AbiESN5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:57:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239658AbiESNva (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:51:30 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9611D3587E;
-        Thu, 19 May 2022 06:50:51 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id n8so4876330plh.1;
-        Thu, 19 May 2022 06:50:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:in-reply-to:content-transfer-encoding;
-        bh=pKpFP9RGX9sn0Ig4M9NyUZOvPgJ7w1TiKhqL9WQm+0Q=;
-        b=jcDYZfi759s5Mlu7jhgne/ZPbKHLfvvjfv6oJd+gHZ3g6OuiO+nPZTJfUSLFDzX/zW
-         Rd55HQgTBfSGejtBMv+tWitvZoPNWz4m5+8QYr/iV1lOpQqSFHzWoNchEv0GPnJaUGY2
-         C9ZyuQ4k/GMq6YCyUQ71k05QccqPR9JkB7V58r/Mk7x8IxYAAzliowzXiI61O3ytUm5/
-         g8kAwPi1etRjB0pKorOjK999mBuWxnE00xztW0AV8grEZ/+71hU19i7raFNDjZb0F5Cn
-         AwdY0hZcNVpQu6KGRvo73eJD7lM59+4QLk/NI+X7O6l/Qn1jNCl/nRy5pqspUvjT3XAv
-         KRBQ==
+        with ESMTP id S239476AbiESNz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:55:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 77764EC332
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652968488;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tTanSs7ixnkAjo9zyEJ/DPrrL683Og2jCRv+H++Lzi4=;
+        b=ekSoMz54dTatnGONj8xQUfQO6u2BFr6QcoQBJJxP/USCzW3IIq+ovPxnhlAzKZrI4I1wMi
+        oZHS2okjE6QYIt2dOYHygOhAnMxJjWFSLpRzt6GNvx9Y6NDthEh4hmoSmWFYpX99H01/pw
+        npbtD/a5rVp+AjlW5EjC3HRf/b7QXn4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-91-8utqmHhxN6S8KP6B39cHzw-1; Thu, 19 May 2022 09:54:47 -0400
+X-MC-Unique: 8utqmHhxN6S8KP6B39cHzw-1
+Received: by mail-wr1-f72.google.com with SMTP id z5-20020a5d4d05000000b0020e6457f2b4so1140344wrt.1
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:54:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=pKpFP9RGX9sn0Ig4M9NyUZOvPgJ7w1TiKhqL9WQm+0Q=;
-        b=eD3KcaqH0+AaqFwuxTjJjA6pQ3PpdrUR2JCMYzAdYvCjBR0FxmSoHyH4eeyt8jUtJd
-         g/TJj5PpNxZ+CGcnBAaa/Aiks/3sKXuYzgsIDm1Xoh4Yg+0a9v2SG6ryWpD+f79CK334
-         LFI27F8YowKohqcVbD9P2Rt5mQHLYROlGvx2FV2BEouOBtHB5PKr/zf8Rln6CTaZ5tsK
-         6c0DziIjUtUlck4ZgK5dXDkNuBALVxYj9eS7wDUzsq5gBsQkVgOFzeEo5VM788Fu8k3F
-         f5MOT/5Oq+W/BQNii2vjTSuzT+pE6Fy1im7k1XY2kfJwmKtrB5qxfaD0nAxBsg3Eyz9i
-         qIzQ==
-X-Gm-Message-State: AOAM531ZtSE9mxnGL4speKIskc1Ov8hNPY2dih2EEvwizubOLnSJfsoF
-        qzX+6aI8rAP83o5MO7VHi2sI+TZLPIZhIQ==
-X-Google-Smtp-Source: ABdhPJxVTxmk3s33tgplIYzlfkFACaXmVnGcM5PsTGgW557aQqH+WvVreHsA3E6F3i5Z2tSPG98iZA==
-X-Received: by 2002:a17:902:b289:b0:161:df12:8b04 with SMTP id u9-20020a170902b28900b00161df128b04mr2670353plr.125.1652968226721;
-        Thu, 19 May 2022 06:50:26 -0700 (PDT)
-Received: from [192.168.255.10] ([203.205.141.86])
-        by smtp.gmail.com with ESMTPSA id 11-20020a17090a034b00b001cd4989ff62sm3449153pjf.41.2022.05.19.06.50.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 May 2022 06:50:26 -0700 (PDT)
-Message-ID: <d7461fd4-f6ec-1a0b-6768-0008a3092add@gmail.com>
-Date:   Thu, 19 May 2022 21:50:22 +0800
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tTanSs7ixnkAjo9zyEJ/DPrrL683Og2jCRv+H++Lzi4=;
+        b=YHwd5lwtzb+OgP4tH5sMWI4PmluadIqUNsjWUh2wZuM7aJvSkIi/lFf82G4vZyOSiU
+         C0doYbedYWx1fuG6+9XXIsyvy2JCzvE7LcuvPxWB3j+zaLsr1h1lr7Myuy6wmUxqanWW
+         UTl8aJ/DIMbi/L+dkZa9pszJRECyVrF1X2Dg7MmHDknHlEeWDBPAHaMfYFehooJy/qoz
+         G9/v++ih/37awBe7Dch3TRglLY29VieAFDAknhY0EgA8Ubvhqx3j/gPqKIwihwMYzc+j
+         ajB6SvkfIZ4jRT/UKuQxPy1hkWm8NTxthzCFYhWowcHZtxt068PwGv//6l0vPwK56ccx
+         ivmg==
+X-Gm-Message-State: AOAM530CEpMPfptc/h/54NqgCU9Nctbazvd+jYILrLRO/Z0ZOV1GAYH0
+        u6kz2l2R+d1TnTP8dloTNaoobkLRGZIDLKWiWHtlZ+7pmaPEmZEbRlnlaCL7Kad5llZcfIXkBDO
+        HvuJGYC6RXsAa
+X-Received: by 2002:a5d:5952:0:b0:20d:9f7:ff5b with SMTP id e18-20020a5d5952000000b0020d09f7ff5bmr4159746wri.11.1652968486058;
+        Thu, 19 May 2022 06:54:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxUZ+fxCxgWklkkHWV/qnYHTFBU0kYGaf3DC5+ppxGQo8FPVsDkSx/e4OjI7ysGObCV380A4g==
+X-Received: by 2002:a5d:5952:0:b0:20d:9f7:ff5b with SMTP id e18-20020a5d5952000000b0020d09f7ff5bmr4159729wri.11.1652968485849;
+        Thu, 19 May 2022 06:54:45 -0700 (PDT)
+Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
+        by smtp.gmail.com with ESMTPSA id t17-20020adfa2d1000000b0020cf071a168sm5339749wra.29.2022.05.19.06.54.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 06:54:45 -0700 (PDT)
+Date:   Thu, 19 May 2022 15:54:43 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
+        alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 05/23] arm/arm64: Add support for
+ setting up the PSCI conduit through ACPI
+Message-ID: <20220519135443.pwhntjvxk64n7toc@gator>
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <20220506205605.359830-6-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [PATCH RESEND v12 00/17] KVM: x86/pmu: Add basic support to
- enable guest PEBS via DS
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
-References: <20220411101946.20262-1-likexu@tencent.com>
- <87fsl5u3bg.fsf@redhat.com> <e0b96ebd-00ee-ead4-cf35-af910e847ada@gmail.com>
-In-Reply-To: <e0b96ebd-00ee-ead4-cf35-af910e847ada@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220506205605.359830-6-nikos.nikoleris@arm.com>
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/5/2022 9:31 pm, Like Xu wrote:
-> ==== Test Assertion Failure ====
->     lib/x86_64/processor.c:1207: r == nmsrs
->     pid=6702 tid=6702 errno=7 - Argument list too long
->        1    0x000000000040da11: vcpu_save_state at processor.c:1207 
-> (discriminator 4)
->        2    0x00000000004024e5: main at state_test.c:209 (discriminator 6)
->        3    0x00007f9f48c2d55f: ?? ??:0
->        4    0x00007f9f48c2d60b: ?? ??:0
->        5    0x00000000004026d4: _start at ??:?
->     Unexpected result from KVM_GET_MSRS, r: 29 (failed MSR was 0x3f1)
+On Fri, May 06, 2022 at 09:55:47PM +0100, Nikos Nikoleris wrote:
+> In systems with ACPI support and when a DT is not provided, we can use
+> the FADT to discover whether PSCI calls need to use smc or hvc
+> calls. This change implements this but retains the default behavior;
+> we check if a valid DT is provided, if not, we try to setup the PSCI
+> conduit using ACPI.
 > 
-> I don't think any of these failing tests care about MSR_IA32_PEBS_ENABLE
-> in particular, they're just trying to do KVM_GET_MSRS/KVM_SET_MSRS.
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  arm/Makefile.common |  1 +
+>  lib/acpi.h          |  5 +++++
+>  lib/arm/psci.c      | 23 ++++++++++++++++++++++-
+>  lib/devicetree.c    |  2 +-
+>  4 files changed, 29 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 38385e0..8e9b3bb 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -38,6 +38,7 @@ cflatobjs += lib/alloc_page.o
+>  cflatobjs += lib/vmalloc.o
+>  cflatobjs += lib/alloc.o
+>  cflatobjs += lib/devicetree.o
+> +cflatobjs += lib/acpi.o
+>  cflatobjs += lib/pci.o
+>  cflatobjs += lib/pci-host-generic.o
+>  cflatobjs += lib/pci-testdev.o
+> diff --git a/lib/acpi.h b/lib/acpi.h
+> index 9f27eb1..139ccba 100644
+> --- a/lib/acpi.h
+> +++ b/lib/acpi.h
+> @@ -130,6 +130,11 @@ struct acpi_table_fadt
+>      u64 hypervisor_id;      /* Hypervisor Vendor ID (ACPI 6.0) */
+>  }  __attribute__ ((packed));
+>  
+> +/* Masks for FADT ARM Boot Architecture Flags (arm_boot_flags) ACPI 5.1 */
+> +
+> +#define ACPI_FADT_PSCI_COMPLIANT    (1)         /* 00: [V5+] PSCI 0.2+ is implemented */
+> +#define ACPI_FADT_PSCI_USE_HVC      (1<<1)      /* 01: [V5+] HVC must be used instead of SMC as the PSCI conduit */
+> +
+>  struct facs_descriptor_rev1
+>  {
+>      u32 signature;           /* ACPI Signature */
+> diff --git a/lib/arm/psci.c b/lib/arm/psci.c
+> index 9c031a1..0e96d19 100644
+> --- a/lib/arm/psci.c
+> +++ b/lib/arm/psci.c
+> @@ -6,6 +6,7 @@
+>   *
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+> +#include <acpi.h>
+>  #include <devicetree.h>
+>  #include <asm/psci.h>
+>  #include <asm/setup.h>
+> @@ -56,7 +57,7 @@ void psci_system_off(void)
+>  	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
+>  }
+>  
+> -void psci_set_conduit(void)
+> +static void psci_set_conduit_fdt(void)
+>  {
+>  	const void *fdt = dt_fdt();
+>  	const struct fdt_property *method;
+> @@ -75,3 +76,23 @@ void psci_set_conduit(void)
+>  	else
+>  		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
+>  }
+> +
+> +static void psci_set_conduit_acpi(void)
+> +{
+> +	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+> +	assert_msg(fadt, "Unable to find ACPI FADT");
+> +	assert_msg(fadt->arm_boot_flags & ACPI_FADT_PSCI_COMPLIANT,
+> +		   "PSCI is not supported in this platfrom");
+> +	if (fadt->arm_boot_flags & ACPI_FADT_PSCI_USE_HVC)
+> +		psci_invoke = psci_invoke_hvc;
+> +	else
+> +		psci_invoke = psci_invoke_smc;
+> +}
+> +
+> +void psci_set_conduit(void)
+> +{
+> +	if (dt_available())
+> +		psci_set_conduit_fdt();
+> +	else
+> +		psci_set_conduit_acpi();
+> +}
+> diff --git a/lib/devicetree.c b/lib/devicetree.c
+> index 78c1f6f..3ff9d16 100644
+> --- a/lib/devicetree.c
+> +++ b/lib/devicetree.c
+> @@ -16,7 +16,7 @@ const void *dt_fdt(void)
+>  
+>  bool dt_available(void)
+>  {
+> -	return fdt_check_header(fdt) == 0;
+> +	return fdt && fdt_check_header(fdt) == 0;
+>  }
+>  
+>  int dt_get_nr_cells(int fdtnode, u32 *nr_address_cells, u32 *nr_size_cells)
+> -- 
+> 2.25.1
+>
 
-One of the lessons I learned here is that the members of msrs_to_save_all[]
-are part of the KVM ABI. We don't add feature-related MSRs until the last
-step of the KVM exposure feature (in this case, adding MSR_IA32_PEBS_ENABLE,
-MSR_IA32_DS_AREA, MSR_PEBS_DATA_CFG to msrs_to_save_all[] should take
-effect along with exposing the CPUID bits).
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-Awaiting a ruling from the core guardian on this part of the git-bisect deficiency.
