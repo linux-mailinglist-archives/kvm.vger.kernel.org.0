@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9698252DA5E
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 18:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4169C52DA6C
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 18:40:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241669AbiESQhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 12:37:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52344 "EHLO
+        id S242088AbiESQii (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 12:38:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbiESQhu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 12:37:50 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D860CD809B
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 09:37:49 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id c22so5568490pgu.2
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 09:37:49 -0700 (PDT)
+        with ESMTP id S240934AbiESQih (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 12:38:37 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64822DFF45
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 09:38:33 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id nk9-20020a17090b194900b001df2fcdc165so9305797pjb.0
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 09:38:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=F28DbulQ0jEkQGLikm8EqDCBfoSZOeUw515EvhneCFA=;
-        b=mIZhrXQ4iFDgPsYFsZ60+OFftLbzg2tZW+uB4Ooe2VBWkW8cBXZysVagXo2RHoj2JB
-         lB5PsP+r0vtw5PFYL7B5Y3KWrKTQz5GQdLa12HpSuDW1l8BJQScklN/B+swR9iP2becL
-         eRKAYpFxwRMcG0SHKNoGGPgJxYRV9lyd62T7ErM9+iqtrSjZUFBFRxMcnzUY3VZ88IEl
-         dM/9ug6NofL/hobVN6loSHRaQ19j9XqB1sHW50BI4yWVP3eobgOMPogH4GixJA/neC7R
-         4W7l6Z6XIGmCOCHUYVm1JJfgNgrAyb903+W2X5UumWnHyOF6RUtPiBKwafzpWnNSbDqk
-         JieQ==
+        bh=5R5CIsenxtrkxTKlA3MXRGhcGTe2bd3z24V2JTX79wc=;
+        b=qKiBkzaLa8x6UswSmJfUjwYZA/+8KqTAJth5R0NSkIFDS+OYa4KsG2uOIOgIGEQdP4
+         F8mf2P2TCB85o7/umxXqrhR9Y71M26PoV9VW5PCToTGFtrBnh84Ox36EcDFBLWVp71jD
+         XUqHHJtkU1aIZoAcr/4yG0jh3rkr4iZ6nyVh6EgEC+gAcHqOjsaXpiFmpOLk1JBJsMqF
+         Dy47hm/WdCkWyLrEe65dUCuQzyzmf/ZvJxQxRDY8dIqoUHYIFuyJWOvXaxPmG2/nZQaw
+         4q2fomKvJhevs2t2VPjRs0pMPgC3OMNtFLTy1febiE8+FpKTb9FgypUFQEX5dL8geTIh
+         bWJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=F28DbulQ0jEkQGLikm8EqDCBfoSZOeUw515EvhneCFA=;
-        b=wGfkfi0sSVDMkILWQ+n682mONsMVsto3TAGvQOMFHNyXI9O85d7yKRrnHtNG4J2M8+
-         nYRFzL8LYtg+pGt/e5PgUo8X0ktOFtZD5XFFBVy9jJXSq1xe7sDiOMMupw/U8dAFJ5Vw
-         ywrmDjJGLK1H8bf1juvG520JyZco1ji/gyRzB680KQ4eKBJcT3ZLtnRlyhdULut8+uht
-         GxMucP5+U5zO3UR+CSjoPjviabuN1EyBFK8aSrf+v/d4h+M4rleioXELEFIiQRFJzmnE
-         /IDIjfE+8qMSHip5BKV8i31t/tQaDsGrQZ6TeFfOW/pztnw56KOe1IreiuYtqvdtVRXj
-         QJLw==
-X-Gm-Message-State: AOAM533IsLAtKK63if4y4P9r9N5FEcSC5R5fN6AjCA03/PxQU0YZTOEL
-        4/kEkxaN+uAFnvVr+mexPuLvYg==
-X-Google-Smtp-Source: ABdhPJx1nKZBsvM/1s0Knp+K6VPSacbbVwoq4r4yMLooMeqC6xBtrejZP6toBWYuM4j+VwQpyBM+WQ==
-X-Received: by 2002:a63:d611:0:b0:3c6:afdf:819b with SMTP id q17-20020a63d611000000b003c6afdf819bmr4622740pgg.513.1652978269170;
-        Thu, 19 May 2022 09:37:49 -0700 (PDT)
+        bh=5R5CIsenxtrkxTKlA3MXRGhcGTe2bd3z24V2JTX79wc=;
+        b=U6L4Z7KT3/p6W0KsIPLBtVy5WTMkfTPl7JtwlFZrFl+YGofVY5NXHNoJDvCxBloEws
+         rf+11c53iVAvDhmlc6eyVMC4BvrNQq/pxznh4c3YKIMusPNBRjH84sNXamgNm25KdAQO
+         Zaaz+RHAlA7Jy5k+5l/E/uHdcAUrgzjU7ZaP41MEY3FhXaXFdwMpmKT17KzwXfxRewyC
+         UvjBi89VxuSK9NJI1k0h3z4ucIut+GrFpjSD1QKT2drAO0ELVYppdq029wCEDVGfeNkR
+         EN4N94r7kPHupZ8fhPOXPfz1sLQUEFouqzXEnBsFrbxyaHoLwXY30dU+MJwz+p2d9Zo/
+         rGOA==
+X-Gm-Message-State: AOAM532oIpNrRoLBFIxXT5vN2jFV76ZG0r1aqAjP0iboPLRxJtL1KOmy
+        pImJPV3BDiOUtj/aveOHCQjMSQ==
+X-Google-Smtp-Source: ABdhPJxiRsm84/7Erm3zrVNXQjVrfgfFlxyNelaI6knzQLt/AHi12NfjLuBHc0kegGIYgOlMcbZmkQ==
+X-Received: by 2002:a17:902:db11:b0:161:9513:da41 with SMTP id m17-20020a170902db1100b001619513da41mr5545300plx.145.1652978312706;
+        Thu, 19 May 2022 09:38:32 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p6-20020a170902780600b0015e8d4eb24dsm4023212pll.151.2022.05.19.09.37.48
+        by smtp.gmail.com with ESMTPSA id a32-20020a056a001d2000b0050dc762819bsm4173554pfx.117.2022.05.19.09.38.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 09:37:48 -0700 (PDT)
-Date:   Thu, 19 May 2022 16:37:44 +0000
+        Thu, 19 May 2022 09:38:32 -0700 (PDT)
+Date:   Thu, 19 May 2022 16:38:28 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
@@ -71,20 +71,20 @@ Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
         intel-gvt-dev@lists.freedesktop.org,
         dri-devel@lists.freedesktop.org
-Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
- tracking externally
-Message-ID: <YoZyWOh4NPA0uN5J@google.com>
+Subject: Re: [RFC PATCH v3 05/19] x86: KVMGT: use
+ kvm_page_track_write_tracking_enable
+Message-ID: <YoZyhIuvxNZBOdko@google.com>
 References: <20220427200314.276673-1-mlevitsk@redhat.com>
- <20220427200314.276673-5-mlevitsk@redhat.com>
+ <20220427200314.276673-6-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220427200314.276673-5-mlevitsk@redhat.com>
+In-Reply-To: <20220427200314.276673-6-mlevitsk@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -92,20 +92,22 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
->  	node->track_write = kvm_mmu_pte_write;
->  	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
->  	kvm_page_track_register_notifier(kvm, node);
+> @@ -1948,6 +1949,10 @@ static int kvmgt_guest_init(struct mdev_device *mdev)
+>  	if (__kvmgt_vgpu_exist(vgpu, kvm))
+>  		return -EEXIST;
+>  
+> +	ret = kvm_page_track_write_tracking_enable(kvm);
+> +	if (ret)
+> +		return ret;
 
-Can you add a patch to move this call to kvm_page_track_register_notifier() into
-mmu_enable_write_tracking(), and simultaneously add a WARN in the register path
-that page tracking is enabled?
+If for some reason my idea to enable tracking during kvm_page_track_register_notifier()
+doesn't pan out, it's probably worth adding a comment saying that enabling write
+tracking can't be undone.
 
-Oh, actually, a better idea. Add an inner __kvm_page_track_register_notifier()
-that is not exported and thus used only by KVM, invoke mmu_enable_write_tracking()
-from the exported kvm_page_track_register_notifier(), and then do the above.
-That will require modifying KVMGT and KVM in a single patch, but that's ok.
-
-That will avoid any possibility of an external user failing to enabling tracking
-before registering its notifier, and also avoids bikeshedding over what to do with
-the one-line wrapper to enable tracking.
+> +
+>  	info = vzalloc(sizeof(struct kvmgt_guest_info));
+>  	if (!info)
+>  		return -ENOMEM;
+> -- 
+> 2.26.3
+> 
