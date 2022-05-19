@@ -2,71 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F39F52D3BE
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08FA452D3D3
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:21:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237616AbiESNRz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51528 "EHLO
+        id S238718AbiESNV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:21:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230395AbiESNRw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:17:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A6ACC6E72
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:17:51 -0700 (PDT)
+        with ESMTP id S237524AbiESNV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:21:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00D7913D3A
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:21:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652966271;
+        s=mimecast20190719; t=1652966483;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=01BESG2uCPhimnx8DReFdy0DlJ4QMHpS2L9Swc0yo2k=;
-        b=boDYFWb8lTL0Ny1Z8dYqXH6dSpwTphsw8woBscD/t3BD1zsIWWPRN6/i0G/Q71I8jaKhmR
-        Xjjh5NCirqjNLaeUFTciCCJP7nDrrwZU6dnW5C0gupGagRc+7GAUH77ujGBokgUokp6dEb
-        ayMWSg01qBqfcsidPFTuWK0WN98SNgk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Hpom49djhvCnTb6qInWen/ieAQCL5jjwhDfWzOA/1YI=;
+        b=B3mmF7nC1LJx304eLE0YA7JEZ3NbGOuGey3HlmkNKoDnKA6gZc9fsLMDan3SF6A34xHlZE
+        KME9ux5/2ON2jbd3dIF+Yu+C5jofVIPzAO0XqXjaoFT7eciI3KaVkvtnwp6OTXLquTGm48
+        4ivdeObRdJxp5CviJDmwV9QLHrZChqc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-332-HQq70FNoOb-2TD1PcpF7pA-1; Thu, 19 May 2022 09:17:49 -0400
-X-MC-Unique: HQq70FNoOb-2TD1PcpF7pA-1
-Received: by mail-wm1-f72.google.com with SMTP id o24-20020a05600c379800b003943412e81dso1821349wmr.6
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:17:49 -0700 (PDT)
+ us-mta-547-8C3yUru1OKqyUyUTZHkhdQ-1; Thu, 19 May 2022 09:21:22 -0400
+X-MC-Unique: 8C3yUru1OKqyUyUTZHkhdQ-1
+Received: by mail-wr1-f72.google.com with SMTP id h3-20020adffa83000000b0020e5f0b8090so1554080wrr.19
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:21:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=01BESG2uCPhimnx8DReFdy0DlJ4QMHpS2L9Swc0yo2k=;
-        b=AMiZ00Ng+NNJZUYWqQh8x94T0sTHQ3LzNRSYM7UqZEfT/YwRBkXKFnd6sSBLS2Mi+p
-         I4Nzu6N3GmkCnR93DTBQSlhR7i4OIOp8NtH+ZOPhmZcgAF8af5s6SJxxylAbzFfY4uVi
-         TUtiSH57El8W4ej9U0gATUVtQCfUjEuqfk9fywu2W9OnnZp+y1Z96II7H7ZYTypuRVri
-         NVObD2tY8PyH8tJ0t2SlGTPssTd+C1W2UEiluo25yr54TfoWaGTzr7Q4aHjZt1KMbbZr
-         W4Hr9BLcIzwVF/jFjRAlncRvl8299w9Keg6tU4QqVPLu9DidPIclfdsXLUbcOqzpO+D5
-         69Sw==
-X-Gm-Message-State: AOAM531MilRSfnws0YoyjaQAH+816MjQBnXb+mO0/3fL8RmB8yGkBSQm
-        9hfIZCE2Dii6K/UGKteJlWQ3bwDIT4IhSIcmUYFPjMP0nPo/DtW/NJ8/OxKpHzs/OCkly4ClT2/
-        p6eHAv+KULNzr
-X-Received: by 2002:a5d:4948:0:b0:20e:58f8:f4ce with SMTP id r8-20020a5d4948000000b0020e58f8f4cemr4144303wrs.229.1652966268810;
-        Thu, 19 May 2022 06:17:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzea54GleR3V8gSV3Typ5KTVqofFeLNxh+4IfZYorS9h5xtqSlWrcvi9a9DdP7tSlEVd/mz5g==
-X-Received: by 2002:a5d:4948:0:b0:20e:58f8:f4ce with SMTP id r8-20020a5d4948000000b0020e58f8f4cemr4144290wrs.229.1652966268599;
-        Thu, 19 May 2022 06:17:48 -0700 (PDT)
+        bh=Hpom49djhvCnTb6qInWen/ieAQCL5jjwhDfWzOA/1YI=;
+        b=z01b53D31LaveFFgAY/GzdfPt6zOPlFbTfX3o+qVmU51pCB2TG1SuSy43u45NjMmg4
+         DLOzblJCpImQj0Ej/VmD7x4vNs7pi6w6/KAdKo0h2XGiCJGjCcjYtw8VBSwik2a7Siwd
+         2u1lTtDXB6NONTikjbfysTDhe+OMf/u0kMI78pvLTWXbrmSNTtnE1QPIUgO8k40IKOQv
+         FVJGchTMroPc7cKaDBDJ0HQqHVZ3LUlEs7TAEolYZoAWmTFghtd+7vo4n84ITuyYSdHX
+         bBhuiDFlAkov2UfvpKSbybbPZIxTFJcdTZDI4DvSiPDF68Hkf0Muy+aBKW8QUW75dJVj
+         Rb7g==
+X-Gm-Message-State: AOAM533xuar5jUOyHJOChaBv0mfJrFjbBdG5XG8jySfu5QsaEYR7k2XJ
+        7ITUVFVCizWebzyFeDkCETOaLREXrjmgo9giRC/GSDUdLC792L9OChhvhMjKTEY9s0Ye7zQEbiC
+        ZvQ5R9fKnweki
+X-Received: by 2002:a05:600c:58a:b0:396:ec38:3a32 with SMTP id o10-20020a05600c058a00b00396ec383a32mr4335262wmd.17.1652966481236;
+        Thu, 19 May 2022 06:21:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyNZ+ITXlkXhJxW6Q5XcQaFta6ZHSrXalQ6c/tAHwf2yreBtyLq555ki1sZF+2io9pSfqLbeQ==
+X-Received: by 2002:a05:600c:58a:b0:396:ec38:3a32 with SMTP id o10-20020a05600c058a00b00396ec383a32mr4335242wmd.17.1652966481028;
+        Thu, 19 May 2022 06:21:21 -0700 (PDT)
 Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
-        by smtp.gmail.com with ESMTPSA id n10-20020a5d6b8a000000b0020c5253d8dfsm4747514wrx.43.2022.05.19.06.17.47
+        by smtp.gmail.com with ESMTPSA id c25-20020adfa319000000b0020c6b78eb5asm5161779wrb.68.2022.05.19.06.21.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 06:17:48 -0700 (PDT)
-Date:   Thu, 19 May 2022 15:17:46 +0200
+        Thu, 19 May 2022 06:21:20 -0700 (PDT)
+Date:   Thu, 19 May 2022 15:21:18 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
         alexandru.elisei@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 02/23] lib: Ensure all struct
- definition for ACPI tables are packed
-Message-ID: <20220519131746.cpiiq5ndfvip4asq@gator>
+Subject: Re: [kvm-unit-tests PATCH v2 01/23] lib: Move acpi header and
+ implementation to lib
+Message-ID: <20220519132118.gwfmclcaeejjnhp3@gator>
 References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-3-nikos.nikoleris@arm.com>
+ <20220506205605.359830-2-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220506205605.359830-3-nikos.nikoleris@arm.com>
+In-Reply-To: <20220506205605.359830-2-nikos.nikoleris@arm.com>
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -77,109 +77,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 06, 2022 at 09:55:44PM +0100, Nikos Nikoleris wrote:
-> All ACPI table definitions are provided with precise definitions of
-> field sizes and offsets, make sure that no compiler optimization can
-> interfere with the memory layout of the corresponding structs.
-
-That seems like a reasonable thing to do. I'm wondering why Linux doesn't
-appear to do it. I see u-boot does, but not for all tables, which also
-makes me scratch my head... I see this patch packs every struct except
-rsdp_descriptor. Is there a reason it was left out?
-
-Another comment below
-
+On Fri, May 06, 2022 at 09:55:43PM +0100, Nikos Nikoleris wrote:
+> This change is in preparation of using ACPI in arm64 systems booting
+> with EFI.
 > 
 > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 > ---
->  lib/acpi.h | 11 ++++++++---
->  x86/s3.c   | 16 ++++------------
->  2 files changed, 12 insertions(+), 15 deletions(-)
+>  x86/Makefile.common  | 2 +-
+>  lib/x86/asm/setup.h  | 2 +-
+>  lib/{x86 => }/acpi.h | 4 ++--
+>  lib/{x86 => }/acpi.c | 0
+
+I like that diffstat that git-format-patch -M creates when only
+moving, but not changing a file. I'd prefer we take the opportunity
+to update the file's coding style though and then confirm we didn't
+introduce any changes with a whitespace ignoring diff.
+
+>  x86/s3.c             | 2 +-
+>  x86/vmexit.c         | 2 +-
+>  6 files changed, 6 insertions(+), 6 deletions(-)
+>  rename lib/{x86 => }/acpi.h (99%)
+>  rename lib/{x86 => }/acpi.c (100%)
 > 
-> diff --git a/lib/acpi.h b/lib/acpi.h
-> index 1e89840..42a2c16 100644
-> --- a/lib/acpi.h
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index b903988..4cdba79 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -2,6 +2,7 @@
+>  
+>  all: directories test_cases
+>  
+> +cflatobjs += lib/acpi.o
+>  cflatobjs += lib/pci.o
+>  cflatobjs += lib/pci-edu.o
+>  cflatobjs += lib/alloc.o
+> @@ -18,7 +19,6 @@ cflatobjs += lib/x86/apic.o
+>  cflatobjs += lib/x86/atomic.o
+>  cflatobjs += lib/x86/desc.o
+>  cflatobjs += lib/x86/isr.o
+> -cflatobjs += lib/x86/acpi.o
+>  cflatobjs += lib/x86/stack.o
+>  cflatobjs += lib/x86/fault_test.o
+>  cflatobjs += lib/x86/delay.o
+> diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
+> index 24d4fa9..f46462c 100644
+> --- a/lib/x86/asm/setup.h
+> +++ b/lib/x86/asm/setup.h
+> @@ -4,7 +4,7 @@
+>  unsigned long setup_tss(u8 *stacktop);
+>  
+>  #ifdef CONFIG_EFI
+> -#include "x86/acpi.h"
+> +#include "acpi.h"
+>  #include "x86/apic.h"
+>  #include "x86/processor.h"
+>  #include "x86/smp.h"
+> diff --git a/lib/x86/acpi.h b/lib/acpi.h
+> similarity index 99%
+> rename from lib/x86/acpi.h
+> rename to lib/acpi.h
+> index 67ba389..1e89840 100644
+> --- a/lib/x86/acpi.h
 > +++ b/lib/acpi.h
-> @@ -3,6 +3,11 @@
+> @@ -1,5 +1,5 @@
+> -#ifndef _X86_ACPI_H_
+> -#define _X86_ACPI_H_
+> +#ifndef _ACPI_H_
+> +#define _ACPI_H_
 >  
 >  #include "libcflat.h"
 >  
-> +/*
-> + * All tables and structures must be byte-packed to match the ACPI
-> + * specification, since the tables are provided by the system BIOS
-> + */
-> +
->  #define ACPI_SIGNATURE(c1, c2, c3, c4) \
->  	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
->  
-> @@ -44,12 +49,12 @@ struct rsdp_descriptor {        /* Root System Descriptor Pointer */
->  struct acpi_table {
->      ACPI_TABLE_HEADER_DEF
->      char data[0];
-> -};
-> +} __attribute__ ((packed));
->  
->  struct rsdt_descriptor_rev1 {
->      ACPI_TABLE_HEADER_DEF
->      u32 table_offset_entry[0];
-> -};
-> +} __attribute__ ((packed));
->  
->  struct fadt_descriptor_rev1
->  {
-> @@ -104,7 +109,7 @@ struct facs_descriptor_rev1
->      u32 S4bios_f        : 1;    /* Indicates if S4BIOS support is present */
->      u32 reserved1       : 31;   /* Must be 0 */
->      u8  reserved3 [40];         /* Reserved - must be zero */
-> -};
-> +} __attribute__ ((packed));
->  
->  void set_efi_rsdp(struct rsdp_descriptor *rsdp);
->  void* find_acpi_table_addr(u32 sig);
+> diff --git a/lib/x86/acpi.c b/lib/acpi.c
+> similarity index 100%
+> rename from lib/x86/acpi.c
+> rename to lib/acpi.c
 > diff --git a/x86/s3.c b/x86/s3.c
-
-The changes below in this file are unrelated, so they should be in a
-separate patch. However, I'm also curious why they're needed. I see
-that find_acpi_table_addr() can return NULL, so it doesn't seem like
-we should be removing the check, but instead changing the check to
-an assert.
-
-> index 378d37a..89d69fc 100644
+> index 6e41d0c..378d37a 100644
 > --- a/x86/s3.c
 > +++ b/x86/s3.c
-> @@ -2,15 +2,6 @@
->  #include "acpi.h"
+> @@ -1,5 +1,5 @@
+>  #include "libcflat.h"
+> -#include "x86/acpi.h"
+> +#include "acpi.h"
 >  #include "asm/io.h"
 >  
-> -static u32* find_resume_vector_addr(void)
-> -{
-> -    struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
-> -    if (!facs)
-> -        return 0;
-> -    printf("FACS is at %p\n", facs);
-> -    return &facs->firmware_waking_vector;
-> -}
-> -
->  #define RTC_SECONDS_ALARM       1
->  #define RTC_MINUTES_ALARM       3
->  #define RTC_HOURS_ALARM         5
-> @@ -40,12 +31,13 @@ extern char resume_start, resume_end;
->  int main(int argc, char **argv)
->  {
->  	struct fadt_descriptor_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
-> -	volatile u32 *resume_vector_ptr = find_resume_vector_addr();
-> +	struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
->  	char *addr, *resume_vec = (void*)0x1000;
+>  static u32* find_resume_vector_addr(void)
+> diff --git a/x86/vmexit.c b/x86/vmexit.c
+> index 4adec78..2bac049 100644
+> --- a/x86/vmexit.c
+> +++ b/x86/vmexit.c
+> @@ -1,9 +1,9 @@
+> +#include "acpi.h"
+>  #include "libcflat.h"
+
+I prefer libcflat.h on top.
+
+>  #include "smp.h"
+>  #include "pci.h"
+>  #include "x86/vm.h"
+>  #include "x86/desc.h"
+> -#include "x86/acpi.h"
+>  #include "x86/apic.h"
+>  #include "x86/isr.h"
 >  
-> -	*resume_vector_ptr = (u32)(ulong)resume_vec;
-> +	facs->firmware_waking_vector = (u32)(ulong)resume_vec;
->  
-> -	printf("resume vector addr is %p\n", resume_vector_ptr);
-> +	printf("FACS is at %p\n", facs);
-> +	printf("resume vector addr is %p\n", &facs->firmware_waking_vector);
->  	for (addr = &resume_start; addr < &resume_end; addr++)
->  		*resume_vec++ = *addr;
->  	printf("copy resume code from %p\n", &resume_start);
 > -- 
 > 2.25.1
 > 
