@@ -2,67 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 111C552D3EE
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:28:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 525F552D414
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:31:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238745AbiESN2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:28:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46776 "EHLO
+        id S238941AbiESNbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:31:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232260AbiESN2P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:28:15 -0400
+        with ESMTP id S239103AbiESNbH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:31:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 36C31CC15A
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:28:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C55DFB5A
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:31:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652966893;
+        s=mimecast20190719; t=1652967062;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=chcH0p5yUvxNOuMG6xpUSYUYVPOIVaBK57Vn0yWf5ZY=;
-        b=IVGg9dBBk6ahhouYwbpcQIbZYlWCIC4jNy/lT0idJXsWwypI3/wdPukOcqWzXzvVPQmGDt
-        bAZsBlyd74chYOxLemRN5ZxsAiyDb+5XKxMOaabhNWfkp/n/aJbzDHyYnZjMW59WZhuAed
-        cOA9+1UiGsX7Zx07E+H3BlFkVmq0xa4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Ffzx9wGkT5wlV7c6Z4hj/te6b5+TFfNhlnjuC9CE4ko=;
+        b=iHPmocydiwCBdgFuhz/9XehZM6SMk44Ot9FC+g3fc9J+KSay2HuNwUsfpq/WJdBEfkIp6w
+        W/tyr1VQIB8E7ul6N2Jaz2p+k5PsiiVp3svs19psGT3p4UVSGWP1LYtS3O3a2XsBqI1Lex
+        1I1tsw2Tvi1TvhIGvcB1yyAcYaAiaXU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-132-u1DynL4UM6W4pJ-h8IxAYQ-1; Thu, 19 May 2022 09:28:10 -0400
-X-MC-Unique: u1DynL4UM6W4pJ-h8IxAYQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D237E811E81;
-        Thu, 19 May 2022 13:28:09 +0000 (UTC)
-Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 88B94492CA2;
-        Thu, 19 May 2022 13:28:07 +0000 (UTC)
-Message-ID: <cb54921d6834ff2b4eda61b78c423125ca315d7d.camel@redhat.com>
-Subject: Re: [PATCH v3 17/34] KVM: x86: hyper-v: Introduce fast
- kvm_hv_l2_tlb_flush_exposed() check
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 19 May 2022 16:28:06 +0300
-In-Reply-To: <877d6hu012.fsf@redhat.com>
-References: <20220414132013.1588929-1-vkuznets@redhat.com>
-         <20220414132013.1588929-18-vkuznets@redhat.com>
-         <3a4199c0b7ba7cf82c4eadf2881e24be609c2f0d.camel@redhat.com>
-         <877d6hu012.fsf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-646-V2R8i86aM4GNpbjELEJB8g-1; Thu, 19 May 2022 09:30:59 -0400
+X-MC-Unique: V2R8i86aM4GNpbjELEJB8g-1
+Received: by mail-wr1-f69.google.com with SMTP id u26-20020adfb21a000000b0020ac48a9aa4so1566817wra.5
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:30:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ffzx9wGkT5wlV7c6Z4hj/te6b5+TFfNhlnjuC9CE4ko=;
+        b=wYuUY90cP42acEbpUy/42OhB1jZZ2MFElBk4OK8m1ckc/0q3gmLss2LBNqf0wBY/mt
+         lqpNI3cwnQnuIKCt7Hmt+HetvS5RMQGCam2prbLBZlWNxLBAWfjrHNCY++SDjOl8S9Sm
+         UxhTCb3IYIV+i9ubrkE8jngFPsWnWLKS6NHi4K0+kkySJo5g9TEeNaZMxlUB1monfEB1
+         gnp1hH3/ioo61iBgaKIm91OfuP+CjtKX1FedLVHX4YwJoLDajfJdFdazXlGTJIZePy0A
+         e/PFMyZCBHgRMLYVl2+XMZ27oUxDghj9zMJOeh4KTWCmtLugumdjhLlYd1nbBdLicI2C
+         iUOA==
+X-Gm-Message-State: AOAM533r57O2Bs1RoLqln53NOcXjm1XtY0nFXKGsC8cweic1cCMsQ0gq
+        870f129TVVR5PtsAo6jezwXOz9E3Rx8hBin6IhPsuH0pM8Xao85qrxYNi2eqxWedlzMJYV34Ijs
+        F5bloUwNLoLe2
+X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr3939844wmi.90.1652967057776;
+        Thu, 19 May 2022 06:30:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzvky8ssQcwaWe78kzJXatrtfXXtQl7A6U+KvRNrLu216KeqKVuwElwEvaZA58Xnk2qgh7d1w==
+X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr3939827wmi.90.1652967057573;
+        Thu, 19 May 2022 06:30:57 -0700 (PDT)
+Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
+        by smtp.gmail.com with ESMTPSA id m13-20020a7bcf2d000000b003942a244f47sm6693424wmg.32.2022.05.19.06.30.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 06:30:57 -0700 (PDT)
+Date:   Thu, 19 May 2022 15:30:55 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
+        alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 03/23] lib: Add support for the XSDT
+ ACPI table
+Message-ID: <20220519133055.zous23go2tkfdlqe@gator>
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <20220506205605.359830-4-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220506205605.359830-4-nikos.nikoleris@arm.com>
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,87 +77,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-05-19 at 15:25 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
+On Fri, May 06, 2022 at 09:55:45PM +0100, Nikos Nikoleris wrote:
+> XSDT provides pointers to other ACPI tables much like RSDT. However,
+> contrary to RSDT that provides 32-bit addresses, XSDT provides 64-bit
+> pointers. ACPI requires that if XSDT is valid then it takes precedence
+> over RSDT.
 > 
-> > On Thu, 2022-04-14 at 15:19 +0200, Vitaly Kuznetsov wrote:
-> > > Introduce a helper to quickly check if KVM needs to handle VMCALL/VMMCALL
-> > > from L2 in L0 to process L2 TLB flush requests.
-> > > 
-> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > ---
-> > >  arch/x86/include/asm/kvm_host.h | 1 +
-> > >  arch/x86/kvm/hyperv.c           | 6 ++++++
-> > >  arch/x86/kvm/hyperv.h           | 7 +++++++
-> > >  3 files changed, 14 insertions(+)
-> > > 
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index ce62fde5f4ff..168600490bd1 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -616,6 +616,7 @@ struct kvm_vcpu_hv {
-> > >  		u32 enlightenments_eax; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EAX */
-> > >  		u32 enlightenments_ebx; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EBX */
-> > >  		u32 syndbg_cap_eax; /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
-> > > +		u32 nested_features_eax; /* HYPERV_CPUID_NESTED_FEATURES.EAX */
-> > >  	} cpuid_cache;
-> > >  
-> > >  	struct kvm_vcpu_hv_tlb_flush_ring tlb_flush_ring[HV_NR_TLB_FLUSH_RINGS];
-> > > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> > > index 79aabe0c33ec..68a0df4e3f66 100644
-> > > --- a/arch/x86/kvm/hyperv.c
-> > > +++ b/arch/x86/kvm/hyperv.c
-> > > @@ -2281,6 +2281,12 @@ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
-> > >  		hv_vcpu->cpuid_cache.syndbg_cap_eax = entry->eax;
-> > >  	else
-> > >  		hv_vcpu->cpuid_cache.syndbg_cap_eax = 0;
-> > > +
-> > > +	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_NESTED_FEATURES, 0);
-> > > +	if (entry)
-> > > +		hv_vcpu->cpuid_cache.nested_features_eax = entry->eax;
-> > > +	else
-> > > +		hv_vcpu->cpuid_cache.nested_features_eax = 0;
-> > >  }
-> > >  
-> > >  int kvm_hv_set_enforce_cpuid(struct kvm_vcpu *vcpu, bool enforce)
-> > > diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> > > index f593c9fd1dee..d8cb6d70dbc8 100644
-> > > --- a/arch/x86/kvm/hyperv.h
-> > > +++ b/arch/x86/kvm/hyperv.h
-> > > @@ -168,6 +168,13 @@ static inline void kvm_hv_vcpu_empty_flush_tlb(struct kvm_vcpu *vcpu)
-> > >  	tlb_flush_ring->read_idx = tlb_flush_ring->write_idx;
-> > >  }
-> > >  
-> > > +static inline bool kvm_hv_l2_tlb_flush_exposed(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> > > +
-> > > +	return hv_vcpu && (hv_vcpu->cpuid_cache.nested_features_eax & HV_X64_NESTED_DIRECT_FLUSH);
-> > > +}
-> > 
-> > Tiny nipick (feel free to ignore): maybe use 'supported' instead of 'exposed',
-> > as we don't use this term in KVM often.
-> > 
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  lib/acpi.h |   6 ++++
+>  lib/acpi.c | 103 ++++++++++++++++++++++++++++++++---------------------
+>  2 files changed, 68 insertions(+), 41 deletions(-)
 > 
-> Indeed we don't. Basically, this is guest_cpuid_has() but for a Hyper-V
-> bit. I don't quite like 'supported' because we don't actually check
-> whether KVM or even L1 guest 'support' this feature or not, we check
-> whether the feature was 'exposed' to L1 so it can actually use it. I'm
-> going to rename this to
-> 
->  guest_hv_cpuid_has_l2_tlb_flush()
-Sounds perfect!
+> diff --git a/lib/acpi.h b/lib/acpi.h
+> index 42a2c16..d80b983 100644
+> --- a/lib/acpi.h
+> +++ b/lib/acpi.h
+> @@ -13,6 +13,7 @@
+>  
+>  #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
+>  #define RSDT_SIGNATURE ACPI_SIGNATURE('R','S','D','T')
+> +#define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
+>  #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
+>  #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
+>  
+> @@ -56,6 +57,11 @@ struct rsdt_descriptor_rev1 {
+>      u32 table_offset_entry[0];
+>  } __attribute__ ((packed));
+>  
+> +struct acpi_table_xsdt {
+> +    ACPI_TABLE_HEADER_DEF
+> +    u64 table_offset_entry[1];
+> +} __attribute__ ((packed));
+> +
+>  struct fadt_descriptor_rev1
+>  {
+>      ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
+> diff --git a/lib/acpi.c b/lib/acpi.c
+> index de275ca..9b8700c 100644
+> --- a/lib/acpi.c
+> +++ b/lib/acpi.c
+> @@ -38,45 +38,66 @@ static struct rsdp_descriptor *get_rsdp(void)
+>  
+>  void* find_acpi_table_addr(u32 sig)
+>  {
+> -    struct rsdp_descriptor *rsdp;
+> -    struct rsdt_descriptor_rev1 *rsdt;
+> -    void *end;
+> -    int i;
+> -
+> -    /* FACS is special... */
+> -    if (sig == FACS_SIGNATURE) {
+> -        struct fadt_descriptor_rev1 *fadt;
+> -        fadt = find_acpi_table_addr(FACP_SIGNATURE);
+> -        if (!fadt) {
+> -            return NULL;
+> -        }
+> -        return (void*)(ulong)fadt->firmware_ctrl;
+> -    }
+> -
+> -    rsdp = get_rsdp();
+> -    if (rsdp == NULL) {
+> -        printf("Can't find RSDP\n");
+> -        return 0;
+> -    }
+> -
+> -    if (sig == RSDP_SIGNATURE) {
+> -        return rsdp;
+> -    }
+> -
+> -    rsdt = (void*)(ulong)rsdp->rsdt_physical_address;
+> -    if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
+> -        return 0;
+> -
+> -    if (sig == RSDT_SIGNATURE) {
+> -        return rsdt;
+> -    }
+> -
+> -    end = (void*)rsdt + rsdt->length;
+> -    for (i=0; (void*)&rsdt->table_offset_entry[i] < end; i++) {
+> -        struct acpi_table *t = (void*)(ulong)rsdt->table_offset_entry[i];
+> -        if (t && t->signature == sig) {
+> -            return t;
+> -        }
+> -    }
+> -   return NULL;
 
-Best regards,
-	Maxim Levitsky
+Let's definitely fix the coding style earlier in the series. Either while
+moving the file or as another patch right after moving the file. That, or
+use the old style for this file when updating it, since we don't want to
+mix styles in the same file.
 
-> 
-> then.
-> 
-> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > 
-> 
-> Thanks!
-> 
+> +	struct rsdp_descriptor *rsdp;
+> +	struct rsdt_descriptor_rev1 *rsdt;
+> +	struct acpi_table_xsdt *xsdt = NULL;
+> +	void *end;
+> +	int i;
+> +
+> +	/* FACS is special... */
+> +	if (sig == FACS_SIGNATURE) {
+> +		struct fadt_descriptor_rev1 *fadt;
+> +
+> +		fadt = find_acpi_table_addr(FACP_SIGNATURE);
+> +		if (!fadt)
+> +			return NULL;
+> +
+> +		return (void*)(ulong)fadt->firmware_ctrl;
+> +	}
+> +
+> +	rsdp = get_rsdp();
+> +	if (rsdp == NULL) {
+> +		printf("Can't find RSDP\n");
+> +		return 0;
+> +	}
+> +
+> +	if (sig == RSDP_SIGNATURE)
+> +		return rsdp;
+> +
+> +	rsdt = (void *)(ulong)rsdp->rsdt_physical_address;
+> +	if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
+> +		rsdt = NULL;
+> +
+> +	if (sig == RSDT_SIGNATURE)
+> +		return rsdt;
+> +
+> +	if (rsdp->revision > 1)
+> +		xsdt = (void *)(ulong)rsdp->xsdt_physical_address;
+> +	if (!xsdt || xsdt->signature != XSDT_SIGNATURE)
+> +		xsdt = NULL;
+> +
+> +	if (sig == XSDT_SIGNATURE)
+> +		return xsdt;
+> +
+> +	// APCI requires that we first try to use XSDT if it's valid,
+> +	//  we use to find other tables, otherwise we use RSDT.
 
+/* ... */ style comments please. And the comment looks like it's missing
+something like "When it's valid..."
+
+> +	if (xsdt) {
+> +		end = (void *)(ulong)xsdt + xsdt->length;
+> +		for (i = 0; (void *)&xsdt->table_offset_entry[i] < end; i++) {
+> +			struct acpi_table *t =
+> +				(void *)xsdt->table_offset_entry[i];
+
+nit: The kernel's checkpatch allows 100 char line length. Let's use all of them :-)
+
+> +			if (t && t->signature == sig)
+> +				return t;
+> +		}
+> +	} else if (rsdt) {
+> +		end = (void *)rsdt + rsdt->length;
+> +		for (i = 0; (void *)&rsdt->table_offset_entry[i] < end; i++) {
+> +			struct acpi_table *t =
+> +				(void *)(ulong)rsdt->table_offset_entry[i];
+
+Same nit as above.
+
+> +			if (t && t->signature == sig)
+> +				return t;
+> +		}
+> +	}
+> +
+> +	return NULL;
+>  }
+> -- 
+> 2.25.1
+>
+
+Thanks,
+drew 
 
