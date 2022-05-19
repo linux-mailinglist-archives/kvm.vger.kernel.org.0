@@ -2,107 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 946AB52D23F
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 14:16:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE52752D274
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 14:28:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237866AbiESMPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 08:15:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41114 "EHLO
+        id S237927AbiESM2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 08:28:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237804AbiESMOv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 08:14:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1D78BBA565
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 05:14:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652962488;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aRBcedztDVErkTvap/GROtONAbxkQWp2teij5HtPU3s=;
-        b=d2WNs2Y6Hpfhe6/IyjEmNTE6SQsK9wlnw4qDH0WaOYR+i4sOoksTjBv0Z6YySWKg2tdJPb
-        2e3xm7/C4LLobMsZnsnr3iIo60MXisxQa0BaAczmhAwq2pty6bTKiV34FU8GpeMOOzhi7G
-        DPAZPbrldmXtVPDBzei8maW5vZtpzoc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-350-Yhd_S9tvOV2f6Zi3SFEodw-1; Thu, 19 May 2022 08:14:47 -0400
-X-MC-Unique: Yhd_S9tvOV2f6Zi3SFEodw-1
-Received: by mail-wr1-f69.google.com with SMTP id s14-20020adfa28e000000b0020ac7532f08so1494574wra.15
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 05:14:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=aRBcedztDVErkTvap/GROtONAbxkQWp2teij5HtPU3s=;
-        b=e49GBLD19aElZVKuBuSA8uPhtbmeTBUNs3+oJ9rvLqP5gpivV002hIksPgf6x5gk2c
-         R+IKMseDhZ3rzPfD5iTpJwT+Di/JqQM7XxBIOD28voVByS3/UQVXA33IkFrWXUFnWQvQ
-         1DSk2+aCguoT8m8vQUKK3JUZ79rsKljTkoFUA/HbfS6IL7zOwhV5jBzYYnlI1lDc1QVk
-         08Hynj/DxqozTo0lffXSiaIfsj4imsKS7tAZfsX6EoVc+oSBrjUFLDhMDSTo233OpjOG
-         ZDP8L1CoA6jsQpqlsz06Z817BPz5NwyRk1jHeg/HNYXQH+lqHygbsMcKK6lri29bSYor
-         0VVg==
-X-Gm-Message-State: AOAM5333Nn3/IlJ/2teq5Wr4ABj83duO2FWp/hVuOPecyec6rurhq3Cp
-        nu08stGjJmNHojeY+FRwoIDut8v11jlFMRkdr4/j4ho/yBul+6p0hMOPfFrh5SEv1ODr4DYAEwL
-        w2Tf0EOF1dAj/
-X-Received: by 2002:a5d:644e:0:b0:20e:7267:9ef7 with SMTP id d14-20020a5d644e000000b0020e72679ef7mr753026wrw.520.1652962485995;
-        Thu, 19 May 2022 05:14:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzc+tWUUsH9tzuVJImbGkhJ0Ej3I7mAxCSsBZ31dKE1NnaH+Ud9Wbb8jH/BhjS13pLD1tIPoQ==
-X-Received: by 2002:a5d:644e:0:b0:20e:7267:9ef7 with SMTP id d14-20020a5d644e000000b0020e72679ef7mr753012wrw.520.1652962485831;
-        Thu, 19 May 2022 05:14:45 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id e17-20020a05600c255100b0039734037303sm483830wma.38.2022.05.19.05.14.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 05:14:45 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH RESEND v12 00/17] KVM: x86/pmu: Add basic support to
- enable guest PEBS via DS
-In-Reply-To: <20220411101946.20262-1-likexu@tencent.com>
-References: <20220411101946.20262-1-likexu@tencent.com>
-Date:   Thu, 19 May 2022 14:14:43 +0200
-Message-ID: <87fsl5u3bg.fsf@redhat.com>
+        with ESMTP id S230522AbiESM2C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 08:28:02 -0400
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE52BA57A;
+        Thu, 19 May 2022 05:28:01 -0700 (PDT)
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 20D5C1C0B92; Thu, 19 May 2022 14:27:58 +0200 (CEST)
+Date:   Thu, 19 May 2022 14:27:46 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Arseny Maslennikov <ar@cs.msu.ru>
+Cc:     Walt Drummond <walt@drummond.us>, Theodore Ts'o <tytso@mit.edu>,
+        "Eric W. Biederman" <ebiederm@xmission.com>, aacraid@microsemi.com,
+        viro@zeniv.linux.org.uk, anna.schumaker@netapp.com, arnd@arndb.de,
+        bsegall@google.com, bp@alien8.de, chuck.lever@oracle.com,
+        bristot@redhat.com, dave.hansen@linux.intel.com,
+        dwmw2@infradead.org, dietmar.eggemann@arm.com, dinguyen@kernel.org,
+        geert@linux-m68k.org, gregkh@linuxfoundation.org, hpa@zytor.com,
+        idryomov@gmail.com, mingo@redhat.com, yzaikin@google.com,
+        ink@jurassic.park.msu.ru, jejb@linux.ibm.com, jmorris@namei.org,
+        bfields@fieldses.org, jlayton@kernel.org, jirislaby@kernel.org,
+        john.johansen@canonical.com, juri.lelli@redhat.com,
+        keescook@chromium.org, mcgrof@kernel.org,
+        martin.petersen@oracle.com, mattst88@gmail.com, mgorman@suse.de,
+        oleg@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
+        rth@twiddle.net, richard@nod.at, serge@hallyn.com,
+        rostedt@goodmis.org, tglx@linutronix.de,
+        trond.myklebust@hammerspace.com, vincent.guittot@linaro.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-m68k@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [RFC PATCH 0/8] signals: Support more than 64 signals
+Message-ID: <20220519122746.GA3904@localhost>
+References: <20220103181956.983342-1-walt@drummond.us>
+ <87iluzidod.fsf@email.froward.int.ebiederm.org>
+ <YdSzjPbVDVGKT4km@mit.edu>
+ <87pmp79mxl.fsf@email.froward.int.ebiederm.org>
+ <YdTI16ZxFFNco7rH@mit.edu>
+ <CADCN6nzT-Dw-AabtwWrfVRDd5HzMS3EOy8WkeomicJF07nQyoA@mail.gmail.com>
+ <YdiUiHAhLyfgpvVY@cello>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YdiUiHAhLyfgpvVY@cello>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Like Xu <like.xu.linux@gmail.com> writes:
+Hi!
 
-...
+> > The only standard tools that support SIGINFO are sleep, dd and ping,
+> > (and kill, for obvious reasons) so it's not like there's a vast hole
+> > in the tooling or something, nor is there a large legacy software base
+> > just waiting for SIGINFO to appear.   So while I very much enjoyed
+> > figuring out how to make SIGINFO work ...
+> 
+> As far as I recall, GNU make on *BSD does support SIGINFO (Not a
+> standard tool, but obviously an established one).
+> 
+> The developers of strace have expressed interest in SIGINFO support
+> to print tracer status messages (unfortunately, not on a public list).
+> Computational software can use this instead of stderr progress spam, if
+> run in an interactive fashion on a terminal, as it frequently is. There
+> is a user base, it's just not very vocal on kernel lists. :)
 
-Hi, the following commit
+And often it would be useful if cp supported this. Yes, this
+is feature I'd like to see.
 
->   KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
-
-(currently in kvm/queue) breaks a number of selftests, e.g.:
-
-# ./tools/testing/selftests/kvm/x86_64/state_test 
-==== Test Assertion Failure ====
-  lib/x86_64/processor.c:1207: r == nmsrs
-  pid=6702 tid=6702 errno=7 - Argument list too long
-     1	0x000000000040da11: vcpu_save_state at processor.c:1207 (discriminator 4)
-     2	0x00000000004024e5: main at state_test.c:209 (discriminator 6)
-     3	0x00007f9f48c2d55f: ?? ??:0
-     4	0x00007f9f48c2d60b: ?? ??:0
-     5	0x00000000004026d4: _start at ??:?
-  Unexpected result from KVM_GET_MSRS, r: 29 (failed MSR was 0x3f1)
-
-I don't think any of these failing tests care about MSR_IA32_PEBS_ENABLE
-in particular, they're just trying to do KVM_GET_MSRS/KVM_SET_MSRS.
+BR,							Pavel
 
 -- 
-Vitaly
-
