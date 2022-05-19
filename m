@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 696E252D4B1
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:46:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 214E352D4C9
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:47:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232222AbiESNqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:46:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50212 "EHLO
+        id S239011AbiESNrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:47:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231169AbiESNoy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:44:54 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E67A3CEBAA
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:44:10 -0700 (PDT)
+        with ESMTP id S231617AbiESNoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:44:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A85ACFE11
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:44:13 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 97CC8B82477
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:44:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBC73C385AA;
-        Thu, 19 May 2022 13:44:04 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F381861783
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:44:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2348C34100;
+        Thu, 19 May 2022 13:44:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652967848;
-        bh=IhSeOWQnVbLScTEq7xNJkFboB+w6CZDfIqkfMBGCjiM=;
+        s=k20201202; t=1652967852;
+        bh=3RiCLx91vvFl1eY7jTdmSanbOyZssF2WI8MnbolxOp4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Q9r6DPcBOzmStsuUUfc3UU7T7QcuduC5In0lc9hRBgmHPF+9ZpRFpGvm7y/bNY1Fz
-         WzKnjAYdPbvwzbHhhlEeGIdkx44ml6A50hfRtUVu0j7l2VRmd3llDu9GA0o7BC7ZHl
-         e6E9nAzaLoEwqDvGLMZMPVJQxJxyYp1uome95uL8qzP9Kx1anpNDThG9NNAQbJcAgx
-         pMksAfq2wqlmNu0VtzOjETnS/BLYqsNiUosjhG7L22YO3XMhafBoGZhNkukkxsElT5
-         UMvZmGCxAmGH84KawM/xtHQPsSrfPhw5H6SSTe2v5qgFOKZhc1i4FL/pW0BhkCOoOF
-         pUexcEEEbhcWg==
+        b=tVjz539inNrid512QIfuKXH8AgCnxGbY4bE+QRsfW30XUSmNgTTNGortoeqc7Z0bv
+         owdABQKqQWhZ8ijGi6dMzjCaNADYiil1TVlW/++fgyqGa/BrkUuxh0zMWrzUaDxFqS
+         kCSVqhtNuwUG6gsN2ipKCJ//+gai7qOy2R3KfmR2oMTGN1yDMVMZ3NryZv6DVxXcI2
+         A3gChDgh6VLMeJhy4A2LWrvU+gJIDksmKpyHA2a25Omdz/vJrwJh5fCS0byIuRFWxc
+         NgUrbxUbV3Eg5bzChzEbLzlKYpg/XppikPgSsfd7cdtM7stREYHTg7Uyq9986xt36r
+         zDuAweUiltMnA==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 26/89] KVM: arm64: Provide a hypercall for the host to reclaim guest memory
-Date:   Thu, 19 May 2022 14:41:01 +0100
-Message-Id: <20220519134204.5379-27-will@kernel.org>
+Subject: [PATCH 27/89] KVM: arm64: Extend memory sharing to allow host-to-guest transitions
+Date:   Thu, 19 May 2022 14:41:02 +0100
+Message-Id: <20220519134204.5379-28-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -58,210 +58,208 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_FILL_THIS_FORM_SHORT,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement a new hypercall, __pkvm_host_reclaim_page(), so that the host
-at EL1 can reclaim pages that were previously donated to EL2. This
-allows EL2 to defer clearing of guest memory on teardown and allows
-preemption in the host after reclaiming each page.
+In preparation for handling guest stage-2 mappings at EL2, extend our
+memory protection mechanisms to support sharing of pages from the host
+to a specific guest.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h              |  1 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
- arch/arm64/kvm/hyp/include/nvhe/memory.h      |  7 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  8 ++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 91 ++++++++++++++++++-
- 5 files changed, 107 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h             |   8 +-
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 100 ++++++++++++++++++
+ 3 files changed, 108 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index f5030e88eb58..a68381699c40 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -64,6 +64,7 @@ enum __kvm_host_smccc_func {
- 	/* Hypercalls available after pKVM finalisation */
- 	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_reclaim_page,
- 	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 32ac88e60e6b..264b1d2c4eb6 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -421,8 +421,12 @@ struct kvm_vcpu_arch {
+ 	/* Don't run the guest (internal implementation need) */
+ 	bool pause;
+ 
+-	/* Cache some mmu pages needed inside spinlock regions */
+-	struct kvm_mmu_memory_cache mmu_page_cache;
++	union {
++		/* Cache some mmu pages needed inside spinlock regions */
++		struct kvm_mmu_memory_cache mmu_page_cache;
++		/* Pages to be donated to pkvm/EL2 if it runs out */
++		struct kvm_hyp_memcache pkvm_memcache;
++	};
+ 
+ 	/* Target CPU and feature flags */
+ 	int target;
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 663019992b67..ecedc545e608 100644
+index ecedc545e608..364432276fe0 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -64,6 +64,7 @@ extern unsigned long hyp_nr_cpus;
- int __pkvm_prot_finalize(void);
- int __pkvm_host_share_hyp(u64 pfn);
- int __pkvm_host_unshare_hyp(u64 pfn);
-+int __pkvm_host_reclaim_page(u64 pfn);
+@@ -57,6 +57,7 @@ extern struct host_kvm host_kvm;
+ enum pkvm_component_id {
+ 	PKVM_ID_HOST,
+ 	PKVM_ID_HYP,
++	PKVM_ID_GUEST,
+ };
+ 
+ extern unsigned long hyp_nr_cpus;
+@@ -67,6 +68,7 @@ int __pkvm_host_unshare_hyp(u64 pfn);
+ int __pkvm_host_reclaim_page(u64 pfn);
  int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
++int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu);
  
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index 29f2ebe306bc..15b719fefc86 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -7,6 +7,13 @@
- 
- #include <linux/types.h>
- 
-+/*
-+ * Accesses to struct hyp_page flags are serialized by the host stage-2
-+ * page-table lock.
-+ */
-+#define HOST_PAGE_NEED_POISONING	BIT(0)
-+#define HOST_PAGE_PENDING_RECLAIM	BIT(1)
-+
- struct hyp_page {
- 	unsigned short refcount;
- 	u8 order;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 8e51cdab00b7..629d306c91c0 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -155,6 +155,13 @@ static void handle___pkvm_host_unshare_hyp(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) = __pkvm_host_unshare_hyp(pfn);
- }
- 
-+static void handle___pkvm_host_reclaim_page(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(u64, pfn, host_ctxt, 1);
-+
-+	cpu_reg(host_ctxt, 1) = __pkvm_host_reclaim_page(pfn);
-+}
-+
- static void handle___pkvm_create_private_mapping(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-@@ -211,6 +218,7 @@ static const hcall_t host_hcall[] = {
- 
- 	HANDLE_FUNC(__pkvm_host_share_hyp),
- 	HANDLE_FUNC(__pkvm_host_unshare_hyp),
-+	HANDLE_FUNC(__pkvm_host_reclaim_page),
- 	HANDLE_FUNC(__kvm_adjust_pc),
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
+ bool addr_is_memory(phys_addr_t phys);
+ int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index bcf84e157d4b..adb6a880c684 100644
+index adb6a880c684..2e92be8bb463 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -260,15 +260,51 @@ int kvm_guest_prepare_stage2(struct kvm_shadow_vm *vm, void *pgd)
- 	return 0;
+@@ -579,11 +579,21 @@ struct pkvm_mem_transition {
+ 			struct {
+ 				u64	completer_addr;
+ 			} hyp;
++			struct {
++				struct kvm_vcpu *vcpu;
++			} guest;
+ 		};
+ 	} initiator;
+ 
+ 	struct {
+ 		enum pkvm_component_id	id;
++
++		union {
++			struct {
++				struct kvm_vcpu *vcpu;
++				phys_addr_t phys;
++			} guest;
++		};
+ 	} completer;
+ };
+ 
+@@ -847,6 +857,52 @@ static int hyp_complete_donation(u64 addr,
+ 	return pkvm_create_mappings_locked(start, end, prot);
  }
  
-+static int reclaim_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+		enum kvm_pgtable_walk_flags flag,
-+		void * const arg)
++static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte)
 +{
-+	kvm_pte_t pte = *ptep;
-+	struct hyp_page *page;
-+
 +	if (!kvm_pte_valid(pte))
-+		return 0;
++		return PKVM_NOPAGE;
 +
-+	page = hyp_phys_to_page(kvm_pte_to_phys(pte));
-+	switch (pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte))) {
-+	case PKVM_PAGE_OWNED:
-+		page->flags |= HOST_PAGE_NEED_POISONING;
-+		fallthrough;
-+	case PKVM_PAGE_SHARED_BORROWED:
-+	case PKVM_PAGE_SHARED_OWNED:
-+		page->flags |= HOST_PAGE_PENDING_RECLAIM;
-+		break;
-+	default:
-+		return -EPERM;
-+	}
-+
-+	return 0;
++	return pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte));
 +}
 +
- void reclaim_guest_pages(struct kvm_shadow_vm *vm, struct kvm_hyp_memcache *mc)
- {
-+
-+	struct kvm_pgtable_walker walker = {
-+		.cb     = reclaim_walker,
-+		.flags  = KVM_PGTABLE_WALK_LEAF
++static int __guest_check_page_state_range(struct kvm_vcpu *vcpu, u64 addr,
++					  u64 size, enum pkvm_page_state state)
++{
++	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
++	struct check_walk_data d = {
++		.desired	= state,
++		.get_page_state	= guest_get_page_state,
 +	};
- 	void *addr;
- 
--	/* Dump all pgtable pages in the hyp_pool */
-+	host_lock_component();
- 	guest_lock_component(vm);
 +
-+	/* Reclaim all guest pages and dump all pgtable pages in the hyp_pool */
-+	BUG_ON(kvm_pgtable_walk(&vm->pgt, 0, BIT(vm->pgt.ia_bits), &walker));
- 	kvm_pgtable_stage2_destroy(&vm->pgt);
- 	vm->kvm.arch.mmu.pgd_phys = 0ULL;
++	hyp_assert_lock_held(&vm->lock);
++	return check_page_state_range(&vm->pgt, addr, size, &d);
++}
 +
- 	guest_unlock_component(vm);
-+	host_unlock_component();
- 
- 	/* Drain the hyp_pool into the memcache */
- 	addr = hyp_alloc_pages(&vm->pool, 0);
-@@ -1225,3 +1261,56 @@ void hyp_unpin_shared_mem(void *from, void *to)
- 	hyp_unlock_component();
++static int guest_ack_share(u64 addr, const struct pkvm_mem_transition *tx,
++			   enum kvm_pgtable_prot perms)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++
++	if (perms != KVM_PGTABLE_PROT_RWX)
++		return -EPERM;
++
++	return __guest_check_page_state_range(tx->completer.guest.vcpu, addr,
++					      size, PKVM_NOPAGE);
++}
++
++static int guest_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
++				enum kvm_pgtable_prot perms)
++{
++	struct kvm_vcpu *vcpu = tx->completer.guest.vcpu;
++	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
++	u64 size = tx->nr_pages * PAGE_SIZE;
++	enum kvm_pgtable_prot prot;
++
++	prot = pkvm_mkstate(perms, PKVM_PAGE_SHARED_BORROWED);
++	return kvm_pgtable_stage2_map(&vm->pgt, addr, size, tx->completer.guest.phys,
++				      prot, &vcpu->arch.pkvm_memcache);
++}
++
+ static int check_share(struct pkvm_mem_share *share)
+ {
+ 	const struct pkvm_mem_transition *tx = &share->tx;
+@@ -868,6 +924,9 @@ static int check_share(struct pkvm_mem_share *share)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_ack_share(completer_addr, tx, share->completer_prot);
+ 		break;
++	case PKVM_ID_GUEST:
++		ret = guest_ack_share(completer_addr, tx, share->completer_prot);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -896,6 +955,9 @@ static int __do_share(struct pkvm_mem_share *share)
+ 	case PKVM_ID_HYP:
+ 		ret = hyp_complete_share(completer_addr, tx, share->completer_prot);
+ 		break;
++	case PKVM_ID_GUEST:
++		ret = guest_complete_share(completer_addr, tx, share->completer_prot);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -1262,6 +1324,44 @@ void hyp_unpin_shared_mem(void *from, void *to)
  	host_unlock_component();
  }
-+
-+static int hyp_zero_page(phys_addr_t phys)
+ 
++int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu)
 +{
-+	void *addr;
-+
-+	addr = hyp_fixmap_map(phys);
-+	if (!addr)
-+		return -EINVAL;
-+	memset(addr, 0, PAGE_SIZE);
-+	__clean_dcache_guest_page(addr, PAGE_SIZE);
-+
-+	return hyp_fixmap_unmap();
-+}
-+
-+int __pkvm_host_reclaim_page(u64 pfn)
-+{
-+	u64 addr = hyp_pfn_to_phys(pfn);
-+	struct hyp_page *page;
-+	kvm_pte_t pte;
 +	int ret;
++	u64 host_addr = hyp_pfn_to_phys(pfn);
++	u64 guest_addr = hyp_pfn_to_phys(gfn);
++	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
++	struct pkvm_mem_share share = {
++		.tx	= {
++			.nr_pages	= 1,
++			.initiator	= {
++				.id	= PKVM_ID_HOST,
++				.addr	= host_addr,
++				.host	= {
++					.completer_addr = guest_addr,
++				},
++			},
++			.completer	= {
++				.id	= PKVM_ID_GUEST,
++				.guest	= {
++					.vcpu = vcpu,
++					.phys = host_addr,
++				},
++			},
++		},
++		.completer_prot	= KVM_PGTABLE_PROT_RWX,
++	};
 +
 +	host_lock_component();
++	guest_lock_component(vm);
 +
-+	ret = kvm_pgtable_get_leaf(&host_kvm.pgt, addr, &pte, NULL);
-+	if (ret)
-+		goto unlock;
++	ret = do_share(&share);
 +
-+	if (host_get_page_state(pte) == PKVM_PAGE_OWNED)
-+		goto unlock;
-+
-+	page = hyp_phys_to_page(addr);
-+	if (!(page->flags & HOST_PAGE_PENDING_RECLAIM)) {
-+		ret = -EPERM;
-+		goto unlock;
-+	}
-+
-+	if (page->flags & HOST_PAGE_NEED_POISONING) {
-+		ret = hyp_zero_page(addr);
-+		if (ret)
-+			goto unlock;
-+		page->flags &= ~HOST_PAGE_NEED_POISONING;
-+	}
-+
-+	ret = host_stage2_set_owner_locked(addr, PAGE_SIZE, PKVM_ID_HOST);
-+	if (ret)
-+		goto unlock;
-+	page->flags &= ~HOST_PAGE_PENDING_RECLAIM;
-+
-+unlock:
++	guest_unlock_component(vm);
 +	host_unlock_component();
 +
 +	return ret;
 +}
++
+ static int hyp_zero_page(phys_addr_t phys)
+ {
+ 	void *addr;
 -- 
 2.36.1.124.g0e6072fb45-goog
 
