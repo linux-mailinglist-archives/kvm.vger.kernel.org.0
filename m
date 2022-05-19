@@ -2,184 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80B2852DA52
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 18:35:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9698252DA5E
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 18:38:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241316AbiESQfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 12:35:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42600 "EHLO
+        id S241669AbiESQhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 12:37:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229822AbiESQfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 12:35:16 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2038AD02AC;
-        Thu, 19 May 2022 09:35:16 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24JG7pPu017535;
-        Thu, 19 May 2022 16:35:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2T5NhEA+6P1WIyw4DeeIGw9BcvZEFkKAL6lWgW6LRvc=;
- b=bExy/vlOeydJMgjLGuPMNuvb9obIIWE9x/rU49vHC3V/5k9VMhSd+0/UeZ+B1L2D6J7m
- 0X4QznkbKuVVhQHAFQGpVmxUQddGnyrBnOXfokCuHudV+Bq33OTQo+qOGtPVwxUFrc1S
- kqyQ4Hxuf8+wR8LJpM/3mklKexinY0l1llFFhqoIiYUEr/Wf0GZnLiNUvULcelPgToPM
- cPqS+mDshGmx1JT/qYYgtB3SWDrL6Tq/v+mKWCYLEsR2ItGLR8y/XOWbL0BN098MDRnj
- lgtcoySH2NpVfpzASFJOJP2bf8cRLDMGdqdZr8JABJeYAQ4uFwnCwAAfzf2CyB395UJ8 7A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5rsf9a8j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 May 2022 16:35:07 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24JGRO0F009332;
-        Thu, 19 May 2022 16:35:07 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5rsf9a80-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 May 2022 16:35:07 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24JGStQ1017503;
-        Thu, 19 May 2022 16:35:05 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma05wdc.us.ibm.com with ESMTP id 3g242an11b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 May 2022 16:35:05 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24JGZ5rq39452944
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 May 2022 16:35:05 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 01060124060;
-        Thu, 19 May 2022 16:35:05 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2940912405B;
-        Thu, 19 May 2022 16:35:02 +0000 (GMT)
-Received: from [9.211.37.97] (unknown [9.211.37.97])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 19 May 2022 16:35:01 +0000 (GMT)
-Message-ID: <f7a30821-5885-261f-5197-088d6f76dcc4@linux.ibm.com>
-Date:   Thu, 19 May 2022 12:35:00 -0400
+        with ESMTP id S229862AbiESQhu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 12:37:50 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D860CD809B
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 09:37:49 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id c22so5568490pgu.2
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 09:37:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=F28DbulQ0jEkQGLikm8EqDCBfoSZOeUw515EvhneCFA=;
+        b=mIZhrXQ4iFDgPsYFsZ60+OFftLbzg2tZW+uB4Ooe2VBWkW8cBXZysVagXo2RHoj2JB
+         lB5PsP+r0vtw5PFYL7B5Y3KWrKTQz5GQdLa12HpSuDW1l8BJQScklN/B+swR9iP2becL
+         eRKAYpFxwRMcG0SHKNoGGPgJxYRV9lyd62T7ErM9+iqtrSjZUFBFRxMcnzUY3VZ88IEl
+         dM/9ug6NofL/hobVN6loSHRaQ19j9XqB1sHW50BI4yWVP3eobgOMPogH4GixJA/neC7R
+         4W7l6Z6XIGmCOCHUYVm1JJfgNgrAyb903+W2X5UumWnHyOF6RUtPiBKwafzpWnNSbDqk
+         JieQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=F28DbulQ0jEkQGLikm8EqDCBfoSZOeUw515EvhneCFA=;
+        b=wGfkfi0sSVDMkILWQ+n682mONsMVsto3TAGvQOMFHNyXI9O85d7yKRrnHtNG4J2M8+
+         nYRFzL8LYtg+pGt/e5PgUo8X0ktOFtZD5XFFBVy9jJXSq1xe7sDiOMMupw/U8dAFJ5Vw
+         ywrmDjJGLK1H8bf1juvG520JyZco1ji/gyRzB680KQ4eKBJcT3ZLtnRlyhdULut8+uht
+         GxMucP5+U5zO3UR+CSjoPjviabuN1EyBFK8aSrf+v/d4h+M4rleioXELEFIiQRFJzmnE
+         /IDIjfE+8qMSHip5BKV8i31t/tQaDsGrQZ6TeFfOW/pztnw56KOe1IreiuYtqvdtVRXj
+         QJLw==
+X-Gm-Message-State: AOAM533IsLAtKK63if4y4P9r9N5FEcSC5R5fN6AjCA03/PxQU0YZTOEL
+        4/kEkxaN+uAFnvVr+mexPuLvYg==
+X-Google-Smtp-Source: ABdhPJx1nKZBsvM/1s0Knp+K6VPSacbbVwoq4r4yMLooMeqC6xBtrejZP6toBWYuM4j+VwQpyBM+WQ==
+X-Received: by 2002:a63:d611:0:b0:3c6:afdf:819b with SMTP id q17-20020a63d611000000b003c6afdf819bmr4622740pgg.513.1652978269170;
+        Thu, 19 May 2022 09:37:49 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p6-20020a170902780600b0015e8d4eb24dsm4023212pll.151.2022.05.19.09.37.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 09:37:48 -0700 (PDT)
+Date:   Thu, 19 May 2022 16:37:44 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org
+Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
+ tracking externally
+Message-ID: <YoZyWOh4NPA0uN5J@google.com>
+References: <20220427200314.276673-1-mlevitsk@redhat.com>
+ <20220427200314.276673-5-mlevitsk@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v2 1/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, jgg@nvidia.com,
-        alex.williamson@redhat.com
-Cc:     cohuck@redhat.com, borntraeger@linux.ibm.com,
-        jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220518212607.467538-1-mjrosato@linux.ibm.com>
- <20220518212607.467538-2-mjrosato@linux.ibm.com>
- <0ab6bb11-4510-0efc-0ad6-507d749022f2@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <0ab6bb11-4510-0efc-0ad6-507d749022f2@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: n5MRbdrtyYeMwoOhhvnPEZ_kAMqepiPR
-X-Proofpoint-ORIG-GUID: fw9NAjzqH5y8tJAgl_wa0ExUc7gQwGLZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-19_05,2022-05-19_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- malwarescore=0 priorityscore=1501 phishscore=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 impostorscore=0 suspectscore=0 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205190095
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220427200314.276673-5-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/19/22 12:23 PM, Tony Krowiak wrote:
-> I made a few comments, but other than that this looks good to
-> me:
-> 
-> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> 
+On Wed, Apr 27, 2022, Maxim Levitsky wrote:
+> @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+>  	node->track_write = kvm_mmu_pte_write;
+>  	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+>  	kvm_page_track_register_notifier(kvm, node);
 
-...
+Can you add a patch to move this call to kvm_page_track_register_notifier() into
+mmu_enable_write_tracking(), and simultaneously add a WARN in the register path
+that page tracking is enabled?
 
-> I'm not sure what version of the code on which the patch was rebased, 
+Oh, actually, a better idea. Add an inner __kvm_page_track_register_notifier()
+that is not exported and thus used only by KVM, invoke mmu_enable_write_tracking()
+from the exported kvm_page_track_register_notifier(), and then do the above.
+That will require modifying KVMGT and KVM in a single patch, but that's ok.
 
-Was on top of Jason's vfio_group_locking series, but now would apply on 
-vfio-next since Alex pulled that series in to vfio-next.
-
-> but in the
-> latest master branch from our repository the kvm_get_kvm(kvm) function is
-> called inside of the if block below. I'm fine with moving outside of the 
-> block, but
-> I don't see a corresponding removal of it from inside the block.
-
-Yeah, I didn't notice those there.  v3 will simply remove my get/put 
-additions and leave yours as-is.
-
-...
-
->> vfio_ap_mdev_group_notifier;
->> -    events = VFIO_GROUP_NOTIFY_SET_KVM;
->> +    if (!vdev->kvm)
->> +        return -EPERM;
-> 
-> Perhaps -EINVAL or -EFAULT?
-> 
-
-Whichever you'd prefer?  If I don't hear back I'll just use -EINVAL in v3.
-
->> -    ret = vfio_register_notifier(vdev, VFIO_GROUP_NOTIFY, &events,
->> -                     &matrix_mdev->group_notifier);
->> +    ret = vfio_ap_mdev_set_kvm(matrix_mdev, vdev->kvm);
->>       if (ret)
->>           return ret;
->> @@ -1415,12 +1400,11 @@ static int vfio_ap_mdev_open_device(struct 
->> vfio_device *vdev)
->>       ret = vfio_register_notifier(vdev, VFIO_IOMMU_NOTIFY, &events,
->>                        &matrix_mdev->iommu_notifier);
->>       if (ret)
->> -        goto out_unregister_group;
->> +        goto err_kvm;
->>       return 0;
->> -out_unregister_group:
->> -    vfio_unregister_notifier(vdev, VFIO_GROUP_NOTIFY,
->> -                 &matrix_mdev->group_notifier);
->> +err_kvm:
->> +    vfio_ap_mdev_unset_kvm(matrix_mdev);
->>       return ret;
->>   }
->> @@ -1431,8 +1415,6 @@ static void vfio_ap_mdev_close_device(struct 
->> vfio_device *vdev)
->>       vfio_unregister_notifier(vdev, VFIO_IOMMU_NOTIFY,
->>                    &matrix_mdev->iommu_notifier);
->> -    vfio_unregister_notifier(vdev, VFIO_GROUP_NOTIFY,
->> -                 &matrix_mdev->group_notifier);
->>       vfio_ap_mdev_unset_kvm(matrix_mdev);
-> 
-> I'm not sure if this matters, but the vfio_ap_mdev_unset_kvm(matrix_mdev)
-> function uses the KVM pointer stored in matrix_mdev->kvm. I can't imagine
-> the KVM pointer stored in vdev->kvm being different than matrix_mdev->kvm,
-
-With this patch matrix_mdev->kvm is set from the value in vdev->kvm 
-during vfio_ap_mdev_set_kvm (basically, doing the work that the notifier 
-was doing but instead of getting it from notifier data get it from the 
-vfio_device)
-
-> but thought I should point it out. Previously, this function was called 
-> by the
-> notifier handler which did not have access to the KVM pointer which is 
-> why it
-> was retrieved from matrix_mdev->kvm. Even if the vdev->kvm and
-> matrix_mdev->kvm did not match, we should probably go ahead and call
-> the unset function anyway to remove access to AP resources for the guest 
-> and
-> reset the queues.
-> 
-
+That will avoid any possibility of an external user failing to enabling tracking
+before registering its notifier, and also avoids bikeshedding over what to do with
+the one-line wrapper to enable tracking.
