@@ -2,44 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30F5852D961
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 17:52:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB83052D9B1
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 18:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239347AbiESPwR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 11:52:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47242 "EHLO
+        id S241658AbiESQBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 12:01:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241385AbiESPwJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 11:52:09 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD4D2737B3
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 08:52:06 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A56E1477;
-        Thu, 19 May 2022 08:52:06 -0700 (PDT)
-Received: from [10.57.36.62] (unknown [10.57.36.62])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCCD03F718;
-        Thu, 19 May 2022 08:52:05 -0700 (PDT)
-Message-ID: <be60c5e6-8313-6547-49d2-ab0700cabd89@arm.com>
-Date:   Thu, 19 May 2022 16:52:04 +0100
+        with ESMTP id S241611AbiESQBS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 12:01:18 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B93220F3;
+        Thu, 19 May 2022 09:01:17 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id n8so5212613plh.1;
+        Thu, 19 May 2022 09:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Izt2XQIS+k/iuXA05DKzoWcR89KdN5/M9JpMeEiR3dk=;
+        b=l+Z5DmtzF2PgSdkzReMXkCr0cikUBHlWtJhOoNkfVGm38LC7zuwnjIKP8w+S8zYU0l
+         O4KR91U+cpCxuuu8g/ETUF4jAo+xXwGpo9ryb50c+J5XpKR09Q2O/bbEf5xlk3+M3pGj
+         NQuZ2LoiJRuECGmMkbVOPLY8bq3ECkxQkzJ8bbVEM+SkQoVSGXZWFb/fbZq06ipYJmZ+
+         tnjZ9RJ1+72C+V8v8qoDrHh+3fTfDx+nvvykt+VzOwUefQYg7/JwMzNhWkMXSkYbuiGu
+         8oDyZsL61cYx3FGPVXl02kA1U1YcDh6V1U5D60XchTn+d1nNi+6e8OYl1IH4MF+lDyk1
+         mYiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Izt2XQIS+k/iuXA05DKzoWcR89KdN5/M9JpMeEiR3dk=;
+        b=IZqZdBnZoFdIssS+eWZP7/I0c1VCP/cRiy6G5vMOCQi8wnSC8gR0qApKPNBLdOX67g
+         q0C7B7H7h5buDgVWwY6VJUu0T2Ehel3lcOBLwykMmLFqsx0H//rr8H2wzJgzxzqU8GSR
+         RR71QI2E/t3u/ocyrX3wytMt4CMwB/8zHX2CpVJI8IT/WvLvQb+KX8JEygcsUkwIupO1
+         J1S8DRAb5EjFdaUVo5fER2Oj7fu3JmAKThIA+S6Byjt0weuVvYTgIOYgZwj0Uvq1sXZl
+         3RR/I5Rz+CwRdt8JE3pT70u1p0A6HLriD3qYmlzIcByFoiS3RiJ277DkZI1ioH35Pm7X
+         RGfQ==
+X-Gm-Message-State: AOAM532K9T2t5NRlPEEr8gB08R7h/NCVNE9sRx6mfEj66Mm/iLeM4dyi
+        FBHuXFMyELoJkzxv+TGrgt6a1+ezAHF/A8SJxOc=
+X-Google-Smtp-Source: ABdhPJxuAHz6fXhLGH98VdN5BYkURgBOorxd4Mtvxw41lKe+Kr0/EjkshxnhJApKfZa/HsAUzAKQ9vip789BEWDnuAk=
+X-Received: by 2002:a17:903:24f:b0:15c:e3b8:a640 with SMTP id
+ j15-20020a170903024f00b0015ce3b8a640mr5309537plh.5.1652976076357; Thu, 19 May
+ 2022 09:01:16 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [kvm-unit-tests PATCH v2 02/23] lib: Ensure all struct definition
- for ACPI tables are packed
-Content-Language: en-GB
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
-        alexandru.elisei@arm.com
-References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-3-nikos.nikoleris@arm.com>
- <20220519131746.cpiiq5ndfvip4asq@gator>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20220519131746.cpiiq5ndfvip4asq@gator>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20220428205116.861003-1-yury.norov@gmail.com> <20220428205116.861003-4-yury.norov@gmail.com>
+ <20220519150929.GA3145933@roeck-us.net>
+In-Reply-To: <20220519150929.GA3145933@roeck-us.net>
+From:   Yury Norov <yury.norov@gmail.com>
+Date:   Thu, 19 May 2022 09:01:00 -0700
+Message-ID: <CAAH8bW8ju7XLkbYya1A1OtqGVGDUAk7dPyw01RsDzg+v7xihyQ@mail.gmail.com>
+Subject: Re: [PATCH 3/5] lib/bitmap: add test for bitmap_{from,to}_arr64
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     linux-kernel@vger.kernel.org,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -47,159 +76,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+On Thu, May 19, 2022 at 8:09 AM Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> On Thu, Apr 28, 2022 at 01:51:14PM -0700, Yury Norov wrote:
+> > Test newly added bitmap_{from,to}_arr64() functions similarly to
+> > already existing bitmap_{from,to}_arr32() tests.
+> >
+> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
+>
+> With this patch in linux-next (including next-20220519), I see lots of
+> bitmap test errors when booting 32-bit ppc images in qemu. Examples:
+>
+> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0", got "0,65"
+> ...
+> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128"
+> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-129"
+> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-130"
+> ...
+> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-209"
+> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-210"
+>
+> and so on. It only  gets worse from there, and ends with:
+>
+> test_bitmap: parselist: 14: input is '0-2047:128/256' OK, Time: 4274
+> test_bitmap: bitmap_print_to_pagebuf: input is '0-32767
+> ', Time: 127267
+> test_bitmap: failed 337 out of 3801 tests
+>
+> Other architectures and 64-bit ppc builds seem to be fine.
 
-On 19/05/2022 14:17, Andrew Jones wrote:
-> On Fri, May 06, 2022 at 09:55:44PM +0100, Nikos Nikoleris wrote:
->> All ACPI table definitions are provided with precise definitions of
->> field sizes and offsets, make sure that no compiler optimization can
->> interfere with the memory layout of the corresponding structs.
-> 
-> That seems like a reasonable thing to do. I'm wondering why Linux doesn't
-> appear to do it. I see u-boot does, but not for all tables, which also
-> makes me scratch my head... I see this patch packs every struct except
-> rsdp_descriptor. Is there a reason it was left out?
-> 
+Hi Guenter,
 
-Thanks for the review!
+Thanks for letting me know. It's really weird because it has already
+been for 2 weeks
+in next with no issues. But I tested it on mips32, not powerpc. I'll
+check what happens
+there.
 
-Linux uses the following:
-
-/*
-  * All tables must be byte-packed to match the ACPI specification, since
-  * the tables are provided by the system BIOS.
-  */
-#pragma pack(1)
-
-
-...
-
-
-/* Reset to default packing */
-
-#pragma pack()
-
-
-Happy to switch to #pragma, if we prefer this style.
-
-I missed rsdp_descriptor, it should be packed will fix in v3.
-
-
-> Another comment below
-> 
->>
->> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->> ---
->>   lib/acpi.h | 11 ++++++++---
->>   x86/s3.c   | 16 ++++------------
->>   2 files changed, 12 insertions(+), 15 deletions(-)
->>
->> diff --git a/lib/acpi.h b/lib/acpi.h
->> index 1e89840..42a2c16 100644
->> --- a/lib/acpi.h
->> +++ b/lib/acpi.h
->> @@ -3,6 +3,11 @@
->>   
->>   #include "libcflat.h"
->>   
->> +/*
->> + * All tables and structures must be byte-packed to match the ACPI
->> + * specification, since the tables are provided by the system BIOS
->> + */
->> +
->>   #define ACPI_SIGNATURE(c1, c2, c3, c4) \
->>   	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
->>   
->> @@ -44,12 +49,12 @@ struct rsdp_descriptor {        /* Root System Descriptor Pointer */
->>   struct acpi_table {
->>       ACPI_TABLE_HEADER_DEF
->>       char data[0];
->> -};
->> +} __attribute__ ((packed));
->>   
->>   struct rsdt_descriptor_rev1 {
->>       ACPI_TABLE_HEADER_DEF
->>       u32 table_offset_entry[0];
->> -};
->> +} __attribute__ ((packed));
->>   
->>   struct fadt_descriptor_rev1
->>   {
->> @@ -104,7 +109,7 @@ struct facs_descriptor_rev1
->>       u32 S4bios_f        : 1;    /* Indicates if S4BIOS support is present */
->>       u32 reserved1       : 31;   /* Must be 0 */
->>       u8  reserved3 [40];         /* Reserved - must be zero */
->> -};
->> +} __attribute__ ((packed));
->>   
->>   void set_efi_rsdp(struct rsdp_descriptor *rsdp);
->>   void* find_acpi_table_addr(u32 sig);
->> diff --git a/x86/s3.c b/x86/s3.c
-> 
-> The changes below in this file are unrelated, so they should be in a
-> separate patch. However, I'm also curious why they're needed. I see
-> that find_acpi_table_addr() can return NULL, so it doesn't seem like
-> we should be removing the check, but instead changing the check to
-> an assert.
-> 
-
-These changes are necessary to appease gcc after requiring struct 
-facs_descriptor_rev1 to be packed.
-
->> index 378d37a..89d69fc 100644
->> --- a/x86/s3.c
->> +++ b/x86/s3.c
->> @@ -2,15 +2,6 @@
->>   #include "acpi.h"
->>   #include "asm/io.h"
->>   
->> -static u32* find_resume_vector_addr(void)
->> -{
->> -    struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
->> -    if (!facs)
->> -        return 0;
->> -    printf("FACS is at %p\n", facs);
->> -    return &facs->firmware_waking_vector;
-
-This statement in particular results to a gcc warning. We can't get a 
-reference to member of a packed struct.
-
-"taking address of packed member of ‘struct facs_descriptor_rev1’ may 
-result in an unaligned pointer value"
-
-What I could do is move the x86/* changes in a separate patch in 
-preparation of this one that packs all structs in <acpi.h>
+Can you please share your config and qemu image if possible?
 
 Thanks,
-
-Nikos
-
->> -}
->> -
->>   #define RTC_SECONDS_ALARM       1
->>   #define RTC_MINUTES_ALARM       3
->>   #define RTC_HOURS_ALARM         5
->> @@ -40,12 +31,13 @@ extern char resume_start, resume_end;
->>   int main(int argc, char **argv)
->>   {
->>   	struct fadt_descriptor_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
->> -	volatile u32 *resume_vector_ptr = find_resume_vector_addr();
->> +	struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
->>   	char *addr, *resume_vec = (void*)0x1000;
->>   
->> -	*resume_vector_ptr = (u32)(ulong)resume_vec;
->> +	facs->firmware_waking_vector = (u32)(ulong)resume_vec;
->>   
->> -	printf("resume vector addr is %p\n", resume_vector_ptr);
->> +	printf("FACS is at %p\n", facs);
->> +	printf("resume vector addr is %p\n", &facs->firmware_waking_vector);
->>   	for (addr = &resume_start; addr < &resume_end; addr++)
->>   		*resume_vec++ = *addr;
->>   	printf("copy resume code from %p\n", &resume_start);
->> -- 
->> 2.25.1
->>
-> 
-> Thanks,
-> drew
-> 
+Yury
