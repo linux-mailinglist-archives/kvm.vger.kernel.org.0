@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C78F52D4CE
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:47:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEAF052D4CD
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:47:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239094AbiESNrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:47:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52276 "EHLO
+        id S231858AbiESNrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:47:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239203AbiESNpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:45:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B075D285
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:45:44 -0700 (PDT)
+        with ESMTP id S239237AbiESNpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:45:54 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E36511D
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:45:50 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D762617A2
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:45:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DCE9C385B8;
-        Thu, 19 May 2022 13:45:40 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C75B7B8235B
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:45:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25501C34100;
+        Thu, 19 May 2022 13:45:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652967943;
-        bh=asJoncPL+c6dfZ/3VORJ/alvAWHNYckJGw8PqP4+tBY=;
+        s=k20201202; t=1652967947;
+        bh=vn94WCmAYZN6zOdSO+ooW8+de2325RR/Q7OATfCvR9k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=L9Orza4KSbC9vQrWJ3Tdpkf5OTTU93Oo1gTMd1dI63A9fHRNnEu5loZB782PADBIL
-         cvCVl0O91yfYB6H6MhLOJmWdDLj283djRcWJXVOFt7ItkAtU0vXHKnOYfVVeHUEEZF
-         LGr5iuxb9bzHP4LkFZec4BpH9SxlV5R4jD3h1mUvIcOB4x1nWaq+5EL6S6B4OSq5ej
-         4CR0+hOzax7kpQLq+Ts7beEvTrmd5FLccgxmyXBI5kiL9y/uLPYs0TFwiZokdI7Bwg
-         YcMIwoiK3UuNs1UAWGmTTHQaHhNBGh1Z2lVEKRxcckcwWleWstBmiSvS/z6+oDx43V
-         FUrKMus3wzSWg==
+        b=YWFWQwTQ5O1KPqUp4BW5LPJrK1PuwVjN4EzxwAUnvG9gKXhFK29lUf6lJCynTmQIY
+         uuMF81D9IwMYXDoVfnf80ZErySl4bRkjRdJnmNTXylawqPQbuVSX7ng/D9cFD6o35g
+         InsiV34IuXF/t7k7pEd+BVAkOnKwqbpkxLsqi0/9qBBcGc/p1RAoQOpXNfg/oZUbNE
+         QQAnwIRB783+q8GGoqZRySDQTalK6LEId6R7zRcOepIeV9Pi2pG0wO7Lg3Zeyao50t
+         iB3nCYJg/r5LeOJHjZ1PjccVQpsPbVBB7UNvLWkIbzJ43AdLz8rhzMjROferhnKAoX
+         ZMdk4tF0CqUgA==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 50/89] KVM: arm64: Ensure that TLBs and I-cache are private to each vcpu
-Date:   Thu, 19 May 2022 14:41:25 +0100
-Message-Id: <20220519134204.5379-51-will@kernel.org>
+Subject: [PATCH 51/89] KVM: arm64: Introduce per-EC entry/exit handlers
+Date:   Thu, 19 May 2022 14:41:26 +0100
+Message-Id: <20220519134204.5379-52-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -66,260 +66,182 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Fuad Tabba <tabba@google.com>
+From: Marc Zyngier <maz@kernel.org>
 
-Guarantee that both TLBs and I-cache are private to each vcpu.
-Flush the CPU context if a different vcpu from the same vm is
-loaded on the same physical CPU.
+Introduce per-EC entry/exit handlers at EL2 and provide initial
+implementations to manage the 'flags' and fault information registers.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  9 +++++--
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 17 ++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 34 ++++++++++++++++++++++++--
- arch/arm64/kvm/pkvm.c                  | 20 +++++++++++----
- 4 files changed, 70 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 99 +++++++++++++++++++++++---
+ 2 files changed, 94 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 343d87877aa2..da8de2b7afb4 100644
+index da8de2b7afb4..d070400b5616 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -45,6 +45,9 @@ struct kvm_shadow_vm {
- 	/* The total size of the donated shadow area. */
- 	size_t shadow_area_size;
+@@ -25,6 +25,9 @@ struct kvm_shadow_vcpu_state {
+ 	/* A pointer to the shadow vm. */
+ 	struct kvm_shadow_vm *shadow_vm;
  
-+	/* The total size of the donated area for last_ran. */
-+	size_t last_ran_size;
++	/* Tracks exit code for the protected guest. */
++	u32 exit_code;
 +
- 	struct kvm_pgtable pgt;
- 	struct kvm_pgtable_mm_ops mm_ops;
- 	struct hyp_pool pool;
-@@ -78,8 +81,10 @@ static inline bool vcpu_is_protected(struct kvm_vcpu *vcpu)
- }
- 
- void hyp_shadow_table_init(void *tbl);
--int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
--		       size_t shadow_size, unsigned long pgd_hva);
-+int __pkvm_init_shadow(struct kvm *kvm,
-+		       unsigned long shadow_hva, size_t shadow_size,
-+		       unsigned long pgd_hva,
-+		       unsigned long last_ran_hva, size_t last_ran_size);
- int __pkvm_teardown_shadow(unsigned int shadow_handle);
- 
- struct kvm_shadow_vcpu_state *
+ 	/*
+ 	 * Points to the per-cpu pointer of the cpu where it's loaded, or NULL
+ 	 * if not loaded.
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 86dff0dc05f3..229ef890d459 100644
+index 229ef890d459..bbf2621f1862 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -145,6 +145,7 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
- 	DECLARE_REG(u64, hcr_el2, host_ctxt, 3);
- 	struct kvm_shadow_vcpu_state *shadow_state;
- 	struct kvm_vcpu *shadow_vcpu;
-+	int *last_ran;
+@@ -24,6 +24,51 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
- 	if (!is_protected_kvm_enabled())
- 		return;
-@@ -155,6 +156,17 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
+ void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
  
- 	shadow_vcpu = &shadow_state->shadow_vcpu;
- 
-+	/*
-+	 * Guarantee that both TLBs and I-cache are private to each vcpu. If a
-+	 * vcpu from the same VM has previously run on the same physical CPU,
-+	 * nuke the relevant contexts.
-+	 */
-+	last_ran = &shadow_vcpu->arch.hw_mmu->last_vcpu_ran[hyp_smp_processor_id()];
-+	if (*last_ran != shadow_vcpu->vcpu_id) {
-+		__kvm_flush_cpu_context(shadow_vcpu->arch.hw_mmu);
-+		*last_ran = shadow_vcpu->vcpu_id;
-+	}
++typedef void (*shadow_entry_exit_handler_fn)(struct kvm_vcpu *, struct kvm_vcpu *);
 +
- 	if (shadow_state_is_protected(shadow_state)) {
- 		/* Propagate WFx trapping flags, trap ptrauth */
- 		shadow_vcpu->arch.hcr_el2 &= ~(HCR_TWE | HCR_TWI |
-@@ -436,9 +448,12 @@ static void handle___pkvm_init_shadow(struct kvm_cpu_context *host_ctxt)
- 	DECLARE_REG(unsigned long, host_shadow_va, host_ctxt, 2);
- 	DECLARE_REG(size_t, shadow_size, host_ctxt, 3);
- 	DECLARE_REG(unsigned long, pgd, host_ctxt, 4);
-+	DECLARE_REG(unsigned long, last_ran, host_ctxt, 5);
-+	DECLARE_REG(size_t, last_ran_size, host_ctxt, 6);
- 
- 	cpu_reg(host_ctxt, 1) = __pkvm_init_shadow(host_kvm, host_shadow_va,
--						   shadow_size, pgd);
-+						   shadow_size, pgd,
-+						   last_ran, last_ran_size);
- }
- 
- static void handle___pkvm_teardown_shadow(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index f18f622336b8..c0403416ce1d 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -338,6 +338,8 @@ static int set_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
- 
- static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
- 			       struct kvm_vcpu **vcpu_array,
-+			       int *last_ran,
-+			       size_t last_ran_size,
- 			       unsigned int nr_vcpus)
- {
- 	int i;
-@@ -345,6 +347,9 @@ static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
- 	vm->host_kvm = kvm;
- 	vm->kvm.created_vcpus = nr_vcpus;
- 	vm->kvm.arch.vtcr = host_kvm.arch.vtcr;
-+	vm->kvm.arch.mmu.last_vcpu_ran = last_ran;
-+	vm->last_ran_size = last_ran_size;
-+	memset(vm->kvm.arch.mmu.last_vcpu_ran, -1, sizeof(int) * hyp_nr_cpus);
- 
- 	for (i = 0; i < nr_vcpus; i++) {
- 		struct kvm_shadow_vcpu_state *shadow_vcpu_state = &vm->shadow_vcpu_states[i];
-@@ -471,6 +476,15 @@ static int check_shadow_size(unsigned int nr_vcpus, size_t shadow_size)
- 	return 0;
- }
- 
-+/*
-+ * Check whether the size of the area donated by the host is sufficient for
-+ * tracking the last vcpu that has run a physical cpu on this vm.
-+ */
-+static int check_last_ran_size(size_t size)
++static void handle_vm_entry_generic(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shadow_vcpu)
 +{
-+	return size >= (hyp_nr_cpus * sizeof(int)) ? 0 : -ENOMEM;
++	unsigned long host_flags = READ_ONCE(host_vcpu->arch.flags);
++
++	shadow_vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
++				     KVM_ARM64_EXCEPT_MASK);
++
++	if (host_flags & KVM_ARM64_PENDING_EXCEPTION) {
++		shadow_vcpu->arch.flags |= KVM_ARM64_PENDING_EXCEPTION;
++		shadow_vcpu->arch.flags |= host_flags & KVM_ARM64_EXCEPT_MASK;
++	} else if (host_flags & KVM_ARM64_INCREMENT_PC) {
++		shadow_vcpu->arch.flags |= KVM_ARM64_INCREMENT_PC;
++	}
 +}
 +
- static void *map_donated_memory_noclear(unsigned long host_va, size_t size)
- {
- 	void *va = (void *)kern_hyp_va(host_va);
-@@ -530,6 +544,10 @@ static void unmap_donated_memory_noclear(void *va, size_t size)
-  * pgd_hva: The host va of the area being donated for the stage-2 PGD for
-  *	    the VM. Must be page aligned. Its size is implied by the VM's
-  *	    VTCR.
-+ * last_ran_hva: The host va of the area being donated for hyp to use to track
-+ *		 the most recent physical cpu on which each vcpu has run.
-+ * last_ran_size: The size of the area being donated at last_ran_hva.
-+ *	          Must be a multiple of the page size.
-  * Note: An array to the host KVM VCPUs (host VA) is passed via the pgd, as to
-  *	 not to be dependent on how the VCPU's are layed out in struct kvm.
-  *
-@@ -537,9 +555,11 @@ static void unmap_donated_memory_noclear(void *va, size_t size)
-  * negative error code on failure.
-  */
- int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
--		       size_t shadow_size, unsigned long pgd_hva)
-+		       size_t shadow_size, unsigned long pgd_hva,
-+		       unsigned long last_ran_hva, size_t last_ran_size)
- {
- 	struct kvm_shadow_vm *vm = NULL;
-+	void *last_ran = NULL;
- 	unsigned int nr_vcpus;
- 	size_t pgd_size = 0;
- 	void *pgd = NULL;
-@@ -555,12 +575,20 @@ int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
- 	if (ret)
- 		goto err_unpin_kvm;
- 
-+	ret = check_last_ran_size(last_ran_size);
-+	if (ret)
-+		goto err_unpin_kvm;
++static void handle_vm_exit_generic(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shadow_vcpu)
++{
++	WRITE_ONCE(host_vcpu->arch.fault.esr_el2,
++		   shadow_vcpu->arch.fault.esr_el2);
++}
 +
- 	ret = -ENOMEM;
- 
- 	vm = map_donated_memory(shadow_hva, shadow_size);
- 	if (!vm)
- 		goto err_remove_mappings;
- 
-+	last_ran = map_donated_memory(last_ran_hva, last_ran_size);
-+	if (!last_ran)
-+		goto err_remove_mappings;
++static void handle_vm_exit_abt(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *shadow_vcpu)
++{
++	WRITE_ONCE(host_vcpu->arch.fault.esr_el2,
++		   shadow_vcpu->arch.fault.esr_el2);
++	WRITE_ONCE(host_vcpu->arch.fault.far_el2,
++		   shadow_vcpu->arch.fault.far_el2);
++	WRITE_ONCE(host_vcpu->arch.fault.hpfar_el2,
++		   shadow_vcpu->arch.fault.hpfar_el2);
++	WRITE_ONCE(host_vcpu->arch.fault.disr_el1,
++		   shadow_vcpu->arch.fault.disr_el1);
++}
 +
- 	pgd_size = kvm_pgtable_stage2_pgd_size(host_kvm.arch.vtcr);
- 	pgd = map_donated_memory_noclear(pgd_hva, pgd_size);
- 	if (!pgd)
-@@ -570,7 +598,7 @@ int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
- 	if (ret)
- 		goto err_remove_mappings;
- 
--	ret = init_shadow_structs(kvm, vm, pgd, nr_vcpus);
-+	ret = init_shadow_structs(kvm, vm, pgd, last_ran, last_ran_size, nr_vcpus);
- 	if (ret < 0)
- 		goto err_unpin_host_vcpus;
- 
-@@ -595,6 +623,7 @@ int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
- 	unpin_host_vcpus(vm->shadow_vcpu_states, nr_vcpus);
- err_remove_mappings:
- 	unmap_donated_memory(vm, shadow_size);
-+	unmap_donated_memory(last_ran, last_ran_size);
- 	unmap_donated_memory_noclear(pgd, pgd_size);
- err_unpin_kvm:
- 	hyp_unpin_shared_mem(kvm, kvm + 1);
-@@ -636,6 +665,7 @@ int __pkvm_teardown_shadow(unsigned int shadow_handle)
- 	shadow_size = vm->shadow_area_size;
- 	hyp_unpin_shared_mem(vm->host_kvm, vm->host_kvm + 1);
- 
-+	unmap_donated_memory(vm->kvm.arch.mmu.last_vcpu_ran, vm->last_ran_size);
- 	memset(vm, 0, shadow_size);
- 	for (addr = vm; addr < (void *)vm + shadow_size; addr += PAGE_SIZE)
- 		push_hyp_memcache(mc, addr, hyp_virt_to_phys);
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 40e5490ef453..67aad91dc3e5 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -111,8 +111,8 @@ static int __kvm_shadow_create(struct kvm *kvm)
++static const shadow_entry_exit_handler_fn entry_vm_shadow_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= handle_vm_entry_generic,
++};
++
++static const shadow_entry_exit_handler_fn exit_vm_shadow_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= handle_vm_exit_generic,
++	[ESR_ELx_EC_IABT_LOW]		= handle_vm_exit_abt,
++	[ESR_ELx_EC_DABT_LOW]		= handle_vm_exit_abt,
++};
++
+ static void flush_vgic_state(struct kvm_vcpu *host_vcpu,
+ 			     struct kvm_vcpu *shadow_vcpu)
  {
- 	struct kvm_vcpu *vcpu, **vcpu_array;
- 	unsigned int shadow_handle;
--	size_t pgd_sz, shadow_sz;
--	void *pgd, *shadow_addr;
-+	size_t pgd_sz, shadow_sz, last_ran_sz;
-+	void *pgd, *shadow_addr, *last_ran;
- 	unsigned long idx;
- 	int ret;
+@@ -99,6 +144,8 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
+ {
+ 	struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
+ 	struct kvm_vcpu *host_vcpu = shadow_state->host_vcpu;
++	shadow_entry_exit_handler_fn ec_handler;
++	u8 esr_ec;
  
-@@ -138,6 +138,14 @@ static int __kvm_shadow_create(struct kvm *kvm)
- 		goto free_pgd;
- 	}
+ 	shadow_vcpu->arch.ctxt		= host_vcpu->arch.ctxt;
  
-+	/* Allocate memory to donate to hyp for tracking mmu->last_vcpu_ran. */
-+	last_ran_sz = PAGE_ALIGN(num_possible_cpus() * sizeof(int));
-+	last_ran = alloc_pages_exact(last_ran_sz, GFP_KERNEL_ACCOUNT);
-+	if (!last_ran) {
-+		ret = -ENOMEM;
-+		goto free_shadow;
+@@ -109,8 +156,6 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
+ 	shadow_vcpu->arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
+ 	shadow_vcpu->arch.cptr_el2	= host_vcpu->arch.cptr_el2;
+ 
+-	shadow_vcpu->arch.flags		= host_vcpu->arch.flags;
+-
+ 	shadow_vcpu->arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
+ 	shadow_vcpu->arch.host_fpsimd_state = host_vcpu->arch.host_fpsimd_state;
+ 
+@@ -118,24 +163,62 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
+ 
+ 	flush_vgic_state(host_vcpu, shadow_vcpu);
+ 	flush_timer_state(shadow_state);
++
++	switch (ARM_EXCEPTION_CODE(shadow_state->exit_code)) {
++	case ARM_EXCEPTION_IRQ:
++	case ARM_EXCEPTION_EL1_SERROR:
++	case ARM_EXCEPTION_IL:
++		break;
++	case ARM_EXCEPTION_TRAP:
++		esr_ec = ESR_ELx_EC(kvm_vcpu_get_esr(shadow_vcpu));
++		ec_handler = entry_vm_shadow_handlers[esr_ec];
++		if (ec_handler)
++			ec_handler(host_vcpu, shadow_vcpu);
++		break;
++	default:
++		BUG();
 +	}
 +
- 	/* Stash the vcpu pointers into the PGD */
- 	BUILD_BUG_ON(KVM_MAX_VCPUS > (PAGE_SIZE / sizeof(u64)));
- 	vcpu_array = pgd;
-@@ -145,7 +153,7 @@ static int __kvm_shadow_create(struct kvm *kvm)
- 		/* Indexing of the vcpus to be sequential starting at 0. */
- 		if (WARN_ON(vcpu->vcpu_idx != idx)) {
- 			ret = -EINVAL;
--			goto free_shadow;
-+			goto free_last_ran;
- 		}
++	shadow_state->exit_code = 0;
+ }
  
- 		vcpu_array[idx] = vcpu;
-@@ -153,9 +161,9 @@ static int __kvm_shadow_create(struct kvm *kvm)
+-static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
++static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state,
++			      u32 exit_reason)
+ {
+ 	struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
+ 	struct kvm_vcpu *host_vcpu = shadow_state->host_vcpu;
++	shadow_entry_exit_handler_fn ec_handler;
++	unsigned long host_flags;
++	u8 esr_ec;
  
- 	/* Donate the shadow memory to hyp and let hyp initialize it. */
- 	ret = kvm_call_hyp_nvhe(__pkvm_init_shadow, kvm, shadow_addr, shadow_sz,
--				pgd);
-+				pgd, last_ran, last_ran_sz);
- 	if (ret < 0)
--		goto free_shadow;
-+		goto free_last_ran;
+ 	host_vcpu->arch.ctxt		= shadow_vcpu->arch.ctxt;
  
- 	shadow_handle = ret;
+ 	host_vcpu->arch.hcr_el2		= shadow_vcpu->arch.hcr_el2;
+ 	host_vcpu->arch.cptr_el2	= shadow_vcpu->arch.cptr_el2;
  
-@@ -163,6 +171,8 @@ static int __kvm_shadow_create(struct kvm *kvm)
- 	kvm->arch.pkvm.shadow_handle = shadow_handle;
- 	return 0;
+-	host_vcpu->arch.fault		= shadow_vcpu->arch.fault;
+-
+-	host_vcpu->arch.flags		= shadow_vcpu->arch.flags;
+-
+ 	sync_vgic_state(host_vcpu, shadow_vcpu);
+ 	sync_timer_state(shadow_state);
++
++	switch (ARM_EXCEPTION_CODE(exit_reason)) {
++	case ARM_EXCEPTION_IRQ:
++		break;
++	case ARM_EXCEPTION_TRAP:
++		esr_ec = ESR_ELx_EC(kvm_vcpu_get_esr(shadow_vcpu));
++		ec_handler = exit_vm_shadow_handlers[esr_ec];
++		if (ec_handler)
++			ec_handler(host_vcpu, shadow_vcpu);
++		break;
++	case ARM_EXCEPTION_EL1_SERROR:
++	case ARM_EXCEPTION_IL:
++		break;
++	default:
++		BUG();
++	}
++
++	host_flags = READ_ONCE(host_vcpu->arch.flags) &
++		~(KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_INCREMENT_PC);
++	WRITE_ONCE(host_vcpu->arch.flags, host_flags);
++	shadow_state->exit_code = exit_reason;
+ }
  
-+free_last_ran:
-+	free_pages_exact(last_ran, last_ran_sz);
- free_shadow:
- 	free_pages_exact(shadow_addr, shadow_sz);
- free_pgd:
+ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
+@@ -231,7 +314,7 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
+ 
+ 		ret = __kvm_vcpu_run(&shadow_state->shadow_vcpu);
+ 
+-		sync_shadow_state(shadow_state);
++		sync_shadow_state(shadow_state, ret);
+ 	} else {
+ 		ret = __kvm_vcpu_run(vcpu);
+ 	}
 -- 
 2.36.1.124.g0e6072fb45-goog
 
