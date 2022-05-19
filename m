@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2D6052D509
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:49:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEDAB52D506
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:49:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238941AbiESNtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:49:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35952 "EHLO
+        id S239268AbiESNtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239175AbiESNsR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:48:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F8C23FBED
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:48:00 -0700 (PDT)
+        with ESMTP id S239183AbiESNtP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:49:15 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B20AA1C11D
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:48:59 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CFB74B824B0
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05AF1C385B8;
-        Thu, 19 May 2022 13:47:42 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A32ABB824D9
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:47:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0148C34115;
+        Thu, 19 May 2022 13:47:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652968066;
-        bh=p4epx9gpbWHrqgR4lCHBD+OJVcMuF2+CwY/eYIiDFs8=;
+        s=k20201202; t=1652968070;
+        bh=NKHi1S9dowrOA1pvVkNqiZvmnGHhmVg8DFJ6rMj+TKc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=b3NX1aHtHJU6tzqRl9/COho2WNeulJ3zXdWEhi9RI6d91qW/bA7+rXfzwLabysnxO
-         rO0lDyDbRy7+Ymcg/NMsVi0LFInppO07IoqKihDBZeGvEEZ0hX1PlW0uPD8Ad3XHyi
-         c8C5LIbwC99YWuru23eZYC0e53HGfhJjVr/BmrIp4337cXYJRHlVnsKEcH8rEfdLLQ
-         6rzguHJ/GqQ4HyblsBpNR+h4jwwchu/+kTWu7VzFwibZI9t2BOafulpf2jFNGIfTgR
-         trXoPHJ+qV8DfeiQRy67jGv5XvrFq47kqruU5D4EfOJd6oI3Io2aqFr6w2mzHk6aDH
-         fBDIBwcjZNNqQ==
+        b=pqzWyoHjbCn6oAOlNYD9hpVLuM89F2FGpkJ8NTddouNuMdMtGPvDW877U56SGOwin
+         YP84w9Rt6Em7GWReORDO1DQZCUsXVPuV01k+lII5m03Qx82csKUval6UmcuEzL7aPc
+         utPesrK4fY3INarMNKM5CjIA6jYDQhF8TJASsqzR/v0GMepYn49ZPYnoyLlnzRMCcK
+         Ni0YahpftDDpFzzEAB+emQPWWXNjNt86dlad9gzGM7G8yPXupPEXFtd6thBY4bs2XK
+         4zWA4liV9l+GHzDQTU/6/cYgvby1i0anp7LaStJCoYwobBD6+GeOQSmdruEWTvwmSl
+         r5ARzxRNMIDVg==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 81/89] KVM: arm64: Inject SIGSEGV on illegal accesses
-Date:   Thu, 19 May 2022 14:41:56 +0100
-Message-Id: <20220519134204.5379-82-will@kernel.org>
+Subject: [PATCH 82/89] KVM: arm64: Support TLB invalidation in guest context
+Date:   Thu, 19 May 2022 14:41:57 +0100
+Message-Id: <20220519134204.5379-83-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -66,152 +66,200 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Quentin Perret <qperret@google.com>
+Typically, TLB invalidation of guest stage-2 mappings using nVHE is
+performed by a hypercall originating from the host. For the invalidation
+instruction to be effective, therefore, __tlb_switch_to_{guest,host}()
+swizzle the active stage-2 context around the TLBI instruction.
 
-The pKVM hypervisor will currently panic if the host tries to access
-memory that it doesn't own (e.g. protected guest memory). Sadly, as
-guest memory can still be mapped into the VMM's address space, userspace
-can trivially crash the kernel/hypervisor by poking into guest memory.
+With guest-to-host memory sharing and unsharing hypercalls originating
+from the guest under pKVM, there is now a need to support both guest
+and host VMID invalidations issued from guest context.
 
-To prevent this, inject the abort back in the host with S1PTW set in the
-ESR, hence allowing the host to differentiate this abort from normal
-userspace faults and inject a SIGSEGV cleanly.
+Replace the __tlb_switch_to_{guest,host}() functions with a more general
+{enter,exit}_vmid_context() implementation which supports being invoked
+from guest context and acts as a no-op if the target context matches the
+running context.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 50 ++++++++++++++++++++++++++-
- arch/arm64/mm/fault.c                 | 22 ++++++++++++
- 2 files changed, 71 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/nvhe/tlb.c | 96 ++++++++++++++++++++++++++++-------
+ 1 file changed, 78 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d0544259eb01..8459dc33e460 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -549,6 +549,50 @@ static int host_stage2_idmap(u64 addr)
- 	return ret;
- }
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index d296d617f589..3f5601176fab 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -11,26 +11,62 @@
+ #include <nvhe/mem_protect.h>
  
-+static void host_inject_abort(struct kvm_cpu_context *host_ctxt)
-+{
-+	u64 spsr = read_sysreg_el2(SYS_SPSR);
-+	u64 esr = read_sysreg_el2(SYS_ESR);
-+	u64 ventry, ec;
+ struct tlb_inv_context {
+-	u64		tcr;
++	struct kvm_s2_mmu	*mmu;
++	u64			tcr;
++	u64			sctlr;
+ };
+ 
+-static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+-				  struct tlb_inv_context *cxt)
++static void enter_vmid_context(struct kvm_s2_mmu *mmu,
++			       struct tlb_inv_context *cxt)
+ {
++	struct kvm_s2_mmu *host_mmu = &host_kvm.arch.mmu;
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_vcpu *vcpu;
 +
-+	/* Repaint the ESR to report a same-level fault if taken from EL1 */
-+	if ((spsr & PSR_MODE_MASK) != PSR_MODE_EL0t) {
-+		ec = ESR_ELx_EC(esr);
-+		if (ec == ESR_ELx_EC_DABT_LOW)
-+			ec = ESR_ELx_EC_DABT_CUR;
-+		else if (ec == ESR_ELx_EC_IABT_LOW)
-+			ec = ESR_ELx_EC_IABT_CUR;
-+		else
-+			WARN_ON(1);
-+		esr &= ~ESR_ELx_EC_MASK;
-+		esr |= ec << ESR_ELx_EC_SHIFT;
++	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
++	vcpu = host_ctxt->__hyp_running_vcpu;
++	cxt->mmu = NULL;
++
++	/*
++	 * If we're already in the desired context, then there's nothing
++	 * to do.
++	 */
++	if (vcpu) {
++		if (mmu == vcpu->arch.hw_mmu || WARN_ON(mmu != host_mmu))
++			return;
++	} else if (mmu == host_mmu) {
++		return;
 +	}
 +
-+	/*
-+	 * Since S1PTW should only ever be set for stage-2 faults, we're pretty
-+	 * much guaranteed that it won't be set in ESR_EL1 by the hardware. So,
-+	 * let's use that bit to allow the host abort handler to differentiate
-+	 * this abort from normal userspace faults.
-+	 *
-+	 * Note: although S1PTW is RES0 at EL1, it is guaranteed by the
-+	 * architecture to be backed by flops, so it should be safe to use.
-+	 */
-+	esr |= ESR_ELx_S1PTW;
-+
-+	write_sysreg_el1(esr, SYS_ESR);
-+	write_sysreg_el1(spsr, SYS_SPSR);
-+	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-+	write_sysreg_el1(read_sysreg_el2(SYS_FAR), SYS_FAR);
-+
-+	ventry = read_sysreg_el1(SYS_VBAR);
-+	ventry += get_except64_offset(spsr, PSR_MODE_EL1h, except_type_sync);
-+	write_sysreg_el2(ventry, SYS_ELR);
-+
-+	spsr = get_except64_cpsr(spsr, system_supports_mte(),
-+				 read_sysreg_el1(SYS_SCTLR), PSR_MODE_EL1h);
-+	write_sysreg_el2(spsr, SYS_SPSR);
-+}
-+
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
- {
- 	struct kvm_vcpu_fault_info fault;
-@@ -560,7 +604,11 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
++	cxt->mmu = mmu;
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+ 		u64 val;
  
- 	addr = (fault.hpfar_el2 & HPFAR_MASK) << 8;
- 	ret = host_stage2_idmap(addr);
--	BUG_ON(ret && ret != -EAGAIN);
+ 		/*
+ 		 * For CPUs that are affected by ARM 1319367, we need to
+-		 * avoid a host Stage-1 walk while we have the guest's
+-		 * VMID set in the VTTBR in order to invalidate TLBs.
+-		 * We're guaranteed that the S1 MMU is enabled, so we can
+-		 * simply set the EPD bits to avoid any further TLB fill.
++		 * avoid a Stage-1 walk with the old VMID while we have
++		 * the new VMID set in the VTTBR in order to invalidate TLBs.
++		 * We're guaranteed that the host S1 MMU is enabled, so
++		 * we can simply set the EPD bits to avoid any further
++		 * TLB fill. For guests, we ensure that the S1 MMU is
++		 * temporarily enabled in the next context.
+ 		 */
+ 		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
+ 		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
+ 		write_sysreg_el1(val, SYS_TCR);
+ 		isb();
 +
-+	if (ret == -EPERM)
-+		host_inject_abort(host_ctxt);
-+	else
-+		BUG_ON(ret && ret != -EAGAIN);
- }
- 
- struct pkvm_mem_transition {
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 77341b160aca..2b2c16a2535c 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -41,6 +41,7 @@
- #include <asm/system_misc.h>
- #include <asm/tlbflush.h>
- #include <asm/traps.h>
-+#include <asm/virt.h>
- 
- struct fault_info {
- 	int	(*fn)(unsigned long far, unsigned int esr,
-@@ -257,6 +258,15 @@ static inline bool is_el1_permission_fault(unsigned long addr, unsigned int esr,
- 	return false;
- }
- 
-+static bool is_pkvm_stage2_abort(unsigned int esr)
-+{
-+	/*
-+	 * S1PTW should only ever be set in ESR_EL1 if the pkvm hypervisor
-+	 * injected a stage-2 abort -- see host_inject_abort().
-+	 */
-+	return is_pkvm_initialized() && (esr & ESR_ELx_S1PTW);
-+}
-+
- static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
- 							unsigned int esr,
- 							struct pt_regs *regs)
-@@ -268,6 +278,9 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
- 	    (esr & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_FAULT)
- 		return false;
- 
-+	if (is_pkvm_stage2_abort(esr))
-+		return false;
-+
- 	local_irq_save(flags);
- 	asm volatile("at s1e1r, %0" :: "r" (addr));
- 	isb();
-@@ -383,6 +396,8 @@ static void __do_kernel_fault(unsigned long addr, unsigned int esr,
- 			msg = "read from unreadable memory";
- 	} else if (addr < PAGE_SIZE) {
- 		msg = "NULL pointer dereference";
-+	} else if (is_pkvm_stage2_abort(esr)) {
-+		msg = "access to hypervisor-protected memory";
- 	} else {
- 		if (kfence_handle_page_fault(addr, esr & ESR_ELx_WNR, regs))
- 			return;
-@@ -572,6 +587,13 @@ static int __kprobes do_page_fault(unsigned long far, unsigned int esr,
- 					 addr, esr, regs);
++		if (vcpu) {
++			val = cxt->sctlr = read_sysreg_el1(SYS_SCTLR);
++			if (!(val & SCTLR_ELx_M)) {
++				val |= SCTLR_ELx_M;
++				write_sysreg_el1(val, SYS_SCTLR);
++				isb();
++			}
++		} else {
++			/* The host S1 MMU is always enabled. */
++			cxt->sctlr = SCTLR_ELx_M;
++		}
  	}
  
-+	if (is_pkvm_stage2_abort(esr)) {
-+		if (!user_mode(regs))
-+			goto no_context;
-+		arm64_force_sig_fault(SIGSEGV, SEGV_ACCERR, far, "stage-2 fault");
-+		return 0;
-+	}
+ 	/*
+@@ -39,20 +75,44 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+ 	 * ensuring that we always have an ISB, but not two ISBs back
+ 	 * to back.
+ 	 */
+-	__load_stage2(mmu, kern_hyp_va(mmu->arch));
++	if (vcpu)
++		__load_host_stage2();
++	else
++		__load_stage2(mmu, kern_hyp_va(mmu->arch));
 +
- 	perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS, 1, regs, addr);
+ 	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
+ }
+ 
+-static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
++static void exit_vmid_context(struct tlb_inv_context *cxt)
+ {
+-	__load_host_stage2();
++	struct kvm_s2_mmu *mmu = cxt->mmu;
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_vcpu *vcpu;
++
++	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
++	vcpu = host_ctxt->__hyp_running_vcpu;
++
++	if (!mmu)
++		return;
++
++	if (vcpu)
++		__load_stage2(mmu, kern_hyp_va(mmu->arch));
++	else
++		__load_host_stage2();
+ 
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+-		/* Ensure write of the host VMID */
++		/* Ensure write of the old VMID */
+ 		isb();
+-		/* Restore the host's TCR_EL1 */
++
++		if (!(cxt->sctlr & SCTLR_ELx_M)) {
++			write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
++			isb();
++		}
++
+ 		write_sysreg_el1(cxt->tcr, SYS_TCR);
+ 	}
++
++	cxt->mmu = NULL;
+ }
+ 
+ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+@@ -63,7 +123,7 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+ 	dsb(ishst);
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	enter_vmid_context(mmu, &cxt);
  
  	/*
+ 	 * We could do so much better if we had the VA as well.
+@@ -106,7 +166,7 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+ 	if (icache_is_vpipt())
+ 		icache_inval_all_pou();
+ 
+-	__tlb_switch_to_host(&cxt);
++	exit_vmid_context(&cxt);
+ }
+ 
+ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+@@ -116,13 +176,13 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ 	dsb(ishst);
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	enter_vmid_context(mmu, &cxt);
+ 
+ 	__tlbi(vmalls12e1is);
+ 	dsb(ish);
+ 	isb();
+ 
+-	__tlb_switch_to_host(&cxt);
++	exit_vmid_context(&cxt);
+ }
+ 
+ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+@@ -130,14 +190,14 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ 	struct tlb_inv_context cxt;
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	enter_vmid_context(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
+ 	asm volatile("ic iallu");
+ 	dsb(nsh);
+ 	isb();
+ 
+-	__tlb_switch_to_host(&cxt);
++	exit_vmid_context(&cxt);
+ }
+ 
+ void __kvm_flush_vm_context(void)
 -- 
 2.36.1.124.g0e6072fb45-goog
 
