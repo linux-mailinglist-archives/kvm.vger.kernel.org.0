@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B02A952D4D0
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:47:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEC8452D4D3
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:47:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239006AbiESNrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:47:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54130 "EHLO
+        id S239016AbiESNrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:47:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232622AbiESNqS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:46:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4B3101E1
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:46:01 -0700 (PDT)
+        with ESMTP id S232234AbiESNqT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:46:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962FE11A24
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:46:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AAAF6B824AB
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:46:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A3E1C36AE5;
-        Thu, 19 May 2022 13:45:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E1F8617C1
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:46:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3F12C36AE3;
+        Thu, 19 May 2022 13:45:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652967959;
-        bh=cvBKGfWFAbmH68bmeDTUSse0RpVg4TXL+HSHAKVcsow=;
+        s=k20201202; t=1652967963;
+        bh=7ZFIfc31Ljwo59UHFdAV6Hez2rIIXtc9xnETxzvgDvc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XQp2SFcckGWaZ9r0J9knvbktkXOKat0vRrw0drOozmkrj5NmVw+v4Z1R1k2SIUxh/
-         tZNo0nxM6bw4OZGYXFVFUR2oF9sQ2KLHxFgTEMcna2qXdo7NDaeG3hkx+WH2jsnXiH
-         xlxQcV3WCwpZWdkEK6BnY/k5Ca1DblJjAl/yKHX6pct9uCx/nLEZa2UBebBkYHq9JZ
-         l0fQFEOiUQMJpeZbA51jyKB3gtseKc8z4xyhtMzLuWBxXsc2mphJwz61qYXJ1cNL/f
-         SimpwFLv03rxan7C6ccAVnO/6rzgBCSNmoIIWii5vMFHu+SEutvx5hKD5X4YPZmAmq
-         mmtHtc6gGT3FQ==
+        b=hNozO7SAuAmOJdzhDHTWB9npt/YWIKfntAwQlt+/2AvOsFzCQNebP/51xqpn41wk1
+         96KzcgKZXipkIg24qNupD07sJ2r64RuIRxqqo1tJ2a32q2UXrSAldrnfIb98VURoY5
+         YUYDNmr873wEVy0bboxF855tUenGFoqND3EUw0sweETF5f59IHlF51rMLc61GSPmvT
+         WPb1ZTT5+2GypfGQPtEo94PyYFeAAyMP4yA+Gg6VuN1n8ZAyngEJ+zHZK0izgZbvRi
+         W8oSNpgO9c0UAULEJ5YJQY0ncWOdyZtoKVrCaIJwwq6kStQ/pz+YT2diOGExHV+yM/
+         nfjt/yA+6Accw==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 54/89] KVM: arm64: Reduce host/shadow vcpu state copying
-Date:   Thu, 19 May 2022 14:41:29 +0100
-Message-Id: <20220519134204.5379-55-will@kernel.org>
+Subject: [PATCH 55/89] KVM: arm64: Do not pass the vcpu to __pkvm_host_map_guest()
+Date:   Thu, 19 May 2022 14:41:30 +0100
+Message-Id: <20220519134204.5379-56-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -66,66 +66,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
 
-When running with pKVM enabled, protected guests run with a fixed CPU
-configuration and therefore features such as hardware debug and SVE are
-unavailable and their state does not need to be copied from the host
-structures on each flush operation. Although non-protected guests do
-require the host and shadow structures to be kept in-sync with each
-other, we can defer writing back to the host to an explicit sync
-hypercall, rather than doing it after every vCPU run.
+__pkvm_host_map_guest() always applies to the loaded vcpu in hyp, and
+should not trust the host to provide the vcpu.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 15 ++++-----------
+ arch/arm64/kvm/mmu.c               |  6 +++---
+ 2 files changed, 7 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 228736a9ab40..e82c0faf6c81 100644
+index e82c0faf6c81..0f1c9d27f6eb 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -196,17 +196,18 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
+@@ -445,20 +445,15 @@ static void handle___pkvm_host_map_guest(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(u64, pfn, host_ctxt, 1);
+ 	DECLARE_REG(u64, gfn, host_ctxt, 2);
+-	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 3);
+-	struct kvm_shadow_vcpu_state *shadow_state;
++	struct kvm_vcpu *host_vcpu;
+ 	struct kvm_vcpu *shadow_vcpu;
+-	struct kvm *host_kvm;
+-	unsigned int handle;
++	struct kvm_shadow_vcpu_state *shadow_state;
+ 	int ret = -EINVAL;
  
- 		if (host_flags & KVM_ARM64_PKVM_STATE_DIRTY)
- 			__flush_vcpu_state(shadow_state);
--	}
+ 	if (!is_protected_kvm_enabled())
+ 		goto out;
  
--	shadow_vcpu->arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
--	shadow_vcpu->arch.sve_max_vl	= host_vcpu->arch.sve_max_vl;
-+		shadow_vcpu->arch.sve_state = kern_hyp_va(host_vcpu->arch.sve_state);
-+		shadow_vcpu->arch.sve_max_vl = host_vcpu->arch.sve_max_vl;
+-	host_vcpu = kern_hyp_va(host_vcpu);
+-	host_kvm = kern_hyp_va(host_vcpu->kvm);
+-	handle = host_kvm->arch.pkvm.shadow_handle;
+-	shadow_state = pkvm_load_shadow_vcpu_state(handle, host_vcpu->vcpu_idx);
++	shadow_state = pkvm_loaded_shadow_vcpu_state();
+ 	if (!shadow_state)
+ 		goto out;
  
--	shadow_vcpu->arch.hcr_el2	= host_vcpu->arch.hcr_el2;
--	shadow_vcpu->arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
-+		shadow_vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS & ~(HCR_RW | HCR_TWI | HCR_TWE);
-+		shadow_vcpu->arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2);
+@@ -468,11 +463,9 @@ static void handle___pkvm_host_map_guest(struct kvm_cpu_context *host_ctxt)
+ 	/* Topup shadow memcache with the host's */
+ 	ret = pkvm_refill_memcache(shadow_vcpu, host_vcpu);
+ 	if (ret)
+-		goto out_put_state;
++		goto out;
  
--	shadow_vcpu->arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
-+		shadow_vcpu->arch.mdcr_el2 = host_vcpu->arch.mdcr_el2;
-+		shadow_vcpu->arch.debug_ptr = kern_hyp_va(host_vcpu->arch.debug_ptr);
-+	}
+ 	ret = __pkvm_host_share_guest(pfn, gfn, shadow_vcpu);
+-out_put_state:
+-	pkvm_put_shadow_vcpu_state(shadow_state);
+ out:
+ 	cpu_reg(host_ctxt, 1) =  ret;
+ }
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c74c431588a3..137d4382ed1c 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1143,9 +1143,9 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 	return 0;
+ }
  
--	shadow_vcpu->arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
-+	shadow_vcpu->arch.vsesr_el2 = host_vcpu->arch.vsesr_el2;
+-static int pkvm_host_map_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu)
++static int pkvm_host_map_guest(u64 pfn, u64 gfn)
+ {
+-	int ret = kvm_call_hyp_nvhe(__pkvm_host_map_guest, pfn, gfn, vcpu);
++	int ret = kvm_call_hyp_nvhe(__pkvm_host_map_guest, pfn, gfn);
  
- 	flush_vgic_state(host_vcpu, shadow_vcpu);
- 	flush_timer_state(shadow_state);
-@@ -238,10 +239,10 @@ static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state,
- 	unsigned long host_flags;
- 	u8 esr_ec;
+ 	/*
+ 	 * Getting -EPERM at this point implies that the pfn has already been
+@@ -1211,7 +1211,7 @@ static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
  
--	host_vcpu->arch.ctxt		= shadow_vcpu->arch.ctxt;
--
--	host_vcpu->arch.hcr_el2		= shadow_vcpu->arch.hcr_el2;
--
-+	/*
-+	 * Don't sync the vcpu GPR/sysreg state after a run. Instead,
-+	 * leave it in the shadow until someone actually requires it.
-+	 */
- 	sync_vgic_state(host_vcpu, shadow_vcpu);
- 	sync_timer_state(shadow_state);
- 
+ 	write_lock(&kvm->mmu_lock);
+ 	pfn = page_to_pfn(page);
+-	ret = pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT, vcpu);
++	ret = pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT);
+ 	if (ret) {
+ 		if (ret == -EAGAIN)
+ 			ret = 0;
 -- 
 2.36.1.124.g0e6072fb45-goog
 
