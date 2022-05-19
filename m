@@ -2,249 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 525F552D414
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:31:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09E9F52D419
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:32:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238941AbiESNbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:31:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50788 "EHLO
+        id S238345AbiESNb4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:31:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239103AbiESNbH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:31:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C55DFB5A
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:31:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652967062;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ffzx9wGkT5wlV7c6Z4hj/te6b5+TFfNhlnjuC9CE4ko=;
-        b=iHPmocydiwCBdgFuhz/9XehZM6SMk44Ot9FC+g3fc9J+KSay2HuNwUsfpq/WJdBEfkIp6w
-        W/tyr1VQIB8E7ul6N2Jaz2p+k5PsiiVp3svs19psGT3p4UVSGWP1LYtS3O3a2XsBqI1Lex
-        1I1tsw2Tvi1TvhIGvcB1yyAcYaAiaXU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-V2R8i86aM4GNpbjELEJB8g-1; Thu, 19 May 2022 09:30:59 -0400
-X-MC-Unique: V2R8i86aM4GNpbjELEJB8g-1
-Received: by mail-wr1-f69.google.com with SMTP id u26-20020adfb21a000000b0020ac48a9aa4so1566817wra.5
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:30:58 -0700 (PDT)
+        with ESMTP id S235342AbiESNbx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:31:53 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114512CE23;
+        Thu, 19 May 2022 06:31:52 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d22so4792139plr.9;
+        Thu, 19 May 2022 06:31:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=NeBhBDbLvND8TXeCRztU3OoO0UgF77pFRvz7RKCrOXE=;
+        b=qCihqc2ueuq0ep5U2t2Yk+coPUZ5bLTTvg6iGnfg6JSitGwLYLNHBRe+A9ojsKO4Xw
+         lQx8l7egXFo3SitSVionCf7skJKIPE7y2IE86dJn9O9MRlzLUGo/R+UhVkOmNtCRFbp/
+         6kg3Jti6oExWDjraoUteTqSLNbKvFlvPSW9JbxpJmpv4E8uITu+JBjPNcN7MWnCj9IcS
+         B3f/k88LJ/PJBfIxSSVJ2HVN14Iwz/8QGZT8+y0gDE8WDiGSdVOmTUnrcf0C1+o2piXx
+         GrrpcN8+5tX4rDQlDP0cRjja7Ga3oib9FFc8BOQAlcQ9fymyStq5qS/qt4X5+IKgRveO
+         20fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ffzx9wGkT5wlV7c6Z4hj/te6b5+TFfNhlnjuC9CE4ko=;
-        b=wYuUY90cP42acEbpUy/42OhB1jZZ2MFElBk4OK8m1ckc/0q3gmLss2LBNqf0wBY/mt
-         lqpNI3cwnQnuIKCt7Hmt+HetvS5RMQGCam2prbLBZlWNxLBAWfjrHNCY++SDjOl8S9Sm
-         UxhTCb3IYIV+i9ubrkE8jngFPsWnWLKS6NHi4K0+kkySJo5g9TEeNaZMxlUB1monfEB1
-         gnp1hH3/ioo61iBgaKIm91OfuP+CjtKX1FedLVHX4YwJoLDajfJdFdazXlGTJIZePy0A
-         e/PFMyZCBHgRMLYVl2+XMZ27oUxDghj9zMJOeh4KTWCmtLugumdjhLlYd1nbBdLicI2C
-         iUOA==
-X-Gm-Message-State: AOAM533r57O2Bs1RoLqln53NOcXjm1XtY0nFXKGsC8cweic1cCMsQ0gq
-        870f129TVVR5PtsAo6jezwXOz9E3Rx8hBin6IhPsuH0pM8Xao85qrxYNi2eqxWedlzMJYV34Ijs
-        F5bloUwNLoLe2
-X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr3939844wmi.90.1652967057776;
-        Thu, 19 May 2022 06:30:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzvky8ssQcwaWe78kzJXatrtfXXtQl7A6U+KvRNrLu216KeqKVuwElwEvaZA58Xnk2qgh7d1w==
-X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr3939827wmi.90.1652967057573;
-        Thu, 19 May 2022 06:30:57 -0700 (PDT)
-Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
-        by smtp.gmail.com with ESMTPSA id m13-20020a7bcf2d000000b003942a244f47sm6693424wmg.32.2022.05.19.06.30.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 06:30:57 -0700 (PDT)
-Date:   Thu, 19 May 2022 15:30:55 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
-        alexandru.elisei@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 03/23] lib: Add support for the XSDT
- ACPI table
-Message-ID: <20220519133055.zous23go2tkfdlqe@gator>
-References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-4-nikos.nikoleris@arm.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=NeBhBDbLvND8TXeCRztU3OoO0UgF77pFRvz7RKCrOXE=;
+        b=5G1QvuE9JJb/MBogdvvnkK5P60fH+aawh5iCyui9oR145t17cPEyd7CUt8dHgjVL0k
+         oCzBcipnYxUqboJwtDiaRKu+SVwNA8Cz7RLjfpc60y350aEVIfW5NNPYurNf2eO9puS2
+         G/JX0HHpcB1lyh/a2DnvZhNy8MwNjFTJW7zvrnfSlllr4cQE1xMJnZxuEWA71g3t/cTW
+         8eHfnQEpcoabVK3PT5OX8mOVEC50VXDWvSUPeBp1tNZAtJqRughiGG4hyW/nwrN6xQwd
+         8R67/zeY6OB+aiUGOSl0cOSjCPCkAfIVp9QYKohXb29g2Jj35HWlYfj3PwF4a+tSDMYA
+         BM+g==
+X-Gm-Message-State: AOAM5313DUJhEWSxvYBuwB1cMIWH35hpSebDaUaCCeOICWSnQ7EBSAXF
+        6Mevol7hRb7TDemJmz7Ivgc=
+X-Google-Smtp-Source: ABdhPJzje9/9enhIU8B7DPtTNIzLDHv31g/rhqCVLWPzu3d35117+jsw135QPxrsPBI2grjOaMvP6w==
+X-Received: by 2002:a17:90b:4d8c:b0:1df:8f22:b699 with SMTP id oj12-20020a17090b4d8c00b001df8f22b699mr5337535pjb.152.1652967111496;
+        Thu, 19 May 2022 06:31:51 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.80])
+        by smtp.gmail.com with ESMTPSA id o6-20020a62f906000000b0050dc76281fcsm4170777pfh.214.2022.05.19.06.31.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 May 2022 06:31:50 -0700 (PDT)
+Message-ID: <e0b96ebd-00ee-ead4-cf35-af910e847ada@gmail.com>
+Date:   Thu, 19 May 2022 21:31:46 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220506205605.359830-4-nikos.nikoleris@arm.com>
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH RESEND v12 00/17] KVM: x86/pmu: Add basic support to
+ enable guest PEBS via DS
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20220411101946.20262-1-likexu@tencent.com>
+ <87fsl5u3bg.fsf@redhat.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <87fsl5u3bg.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 06, 2022 at 09:55:45PM +0100, Nikos Nikoleris wrote:
-> XSDT provides pointers to other ACPI tables much like RSDT. However,
-> contrary to RSDT that provides 32-bit addresses, XSDT provides 64-bit
-> pointers. ACPI requires that if XSDT is valid then it takes precedence
-> over RSDT.
+On 19/5/2022 8:14 pm, Vitaly Kuznetsov wrote:
+> Like Xu <like.xu.linux@gmail.com> writes:
 > 
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> ---
->  lib/acpi.h |   6 ++++
->  lib/acpi.c | 103 ++++++++++++++++++++++++++++++++---------------------
->  2 files changed, 68 insertions(+), 41 deletions(-)
+> ...
 > 
-> diff --git a/lib/acpi.h b/lib/acpi.h
-> index 42a2c16..d80b983 100644
-> --- a/lib/acpi.h
-> +++ b/lib/acpi.h
-> @@ -13,6 +13,7 @@
->  
->  #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
->  #define RSDT_SIGNATURE ACPI_SIGNATURE('R','S','D','T')
-> +#define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
->  #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
->  #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
->  
-> @@ -56,6 +57,11 @@ struct rsdt_descriptor_rev1 {
->      u32 table_offset_entry[0];
->  } __attribute__ ((packed));
->  
-> +struct acpi_table_xsdt {
-> +    ACPI_TABLE_HEADER_DEF
-> +    u64 table_offset_entry[1];
-> +} __attribute__ ((packed));
-> +
->  struct fadt_descriptor_rev1
->  {
->      ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
-> diff --git a/lib/acpi.c b/lib/acpi.c
-> index de275ca..9b8700c 100644
-> --- a/lib/acpi.c
-> +++ b/lib/acpi.c
-> @@ -38,45 +38,66 @@ static struct rsdp_descriptor *get_rsdp(void)
->  
->  void* find_acpi_table_addr(u32 sig)
->  {
-> -    struct rsdp_descriptor *rsdp;
-> -    struct rsdt_descriptor_rev1 *rsdt;
-> -    void *end;
-> -    int i;
-> -
-> -    /* FACS is special... */
-> -    if (sig == FACS_SIGNATURE) {
-> -        struct fadt_descriptor_rev1 *fadt;
-> -        fadt = find_acpi_table_addr(FACP_SIGNATURE);
-> -        if (!fadt) {
-> -            return NULL;
-> -        }
-> -        return (void*)(ulong)fadt->firmware_ctrl;
-> -    }
-> -
-> -    rsdp = get_rsdp();
-> -    if (rsdp == NULL) {
-> -        printf("Can't find RSDP\n");
-> -        return 0;
-> -    }
-> -
-> -    if (sig == RSDP_SIGNATURE) {
-> -        return rsdp;
-> -    }
-> -
-> -    rsdt = (void*)(ulong)rsdp->rsdt_physical_address;
-> -    if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
-> -        return 0;
-> -
-> -    if (sig == RSDT_SIGNATURE) {
-> -        return rsdt;
-> -    }
-> -
-> -    end = (void*)rsdt + rsdt->length;
-> -    for (i=0; (void*)&rsdt->table_offset_entry[i] < end; i++) {
-> -        struct acpi_table *t = (void*)(ulong)rsdt->table_offset_entry[i];
-> -        if (t && t->signature == sig) {
-> -            return t;
-> -        }
-> -    }
-> -   return NULL;
+> Hi, the following commit
+> 
+>>    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+> 
+> (currently in kvm/queue) breaks a number of selftests, e.g.:
 
-Let's definitely fix the coding style earlier in the series. Either while
-moving the file or as another patch right after moving the file. That, or
-use the old style for this file when updating it, since we don't want to
-mix styles in the same file.
+Indeed, e.g.:
 
-> +	struct rsdp_descriptor *rsdp;
-> +	struct rsdt_descriptor_rev1 *rsdt;
-> +	struct acpi_table_xsdt *xsdt = NULL;
-> +	void *end;
-> +	int i;
-> +
-> +	/* FACS is special... */
-> +	if (sig == FACS_SIGNATURE) {
-> +		struct fadt_descriptor_rev1 *fadt;
-> +
-> +		fadt = find_acpi_table_addr(FACP_SIGNATURE);
-> +		if (!fadt)
-> +			return NULL;
-> +
-> +		return (void*)(ulong)fadt->firmware_ctrl;
-> +	}
-> +
-> +	rsdp = get_rsdp();
-> +	if (rsdp == NULL) {
-> +		printf("Can't find RSDP\n");
-> +		return 0;
-> +	}
-> +
-> +	if (sig == RSDP_SIGNATURE)
-> +		return rsdp;
-> +
-> +	rsdt = (void *)(ulong)rsdp->rsdt_physical_address;
-> +	if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
-> +		rsdt = NULL;
-> +
-> +	if (sig == RSDT_SIGNATURE)
-> +		return rsdt;
-> +
-> +	if (rsdp->revision > 1)
-> +		xsdt = (void *)(ulong)rsdp->xsdt_physical_address;
-> +	if (!xsdt || xsdt->signature != XSDT_SIGNATURE)
-> +		xsdt = NULL;
-> +
-> +	if (sig == XSDT_SIGNATURE)
-> +		return xsdt;
-> +
-> +	// APCI requires that we first try to use XSDT if it's valid,
-> +	//  we use to find other tables, otherwise we use RSDT.
+x86_64/hyperv_clock
+x86_64/max_vcpuid_cap_test
+x86_64/mmu_role_test
 
-/* ... */ style comments please. And the comment looks like it's missing
-something like "When it's valid..."
+> 
+> # ./tools/testing/selftests/kvm/x86_64/state_test
 
-> +	if (xsdt) {
-> +		end = (void *)(ulong)xsdt + xsdt->length;
-> +		for (i = 0; (void *)&xsdt->table_offset_entry[i] < end; i++) {
-> +			struct acpi_table *t =
-> +				(void *)xsdt->table_offset_entry[i];
+This test continues to be silent after the top commit a3808d884612 ("KVM: x86/pmu:
+Expose CPUIDs feature bits PDCM, DS, DTES64"), which implies a root cause.
 
-nit: The kernel's checkpatch allows 100 char line length. Let's use all of them :-)
+Anyway, thanks for this git-bisect report.
 
-> +			if (t && t->signature == sig)
-> +				return t;
-> +		}
-> +	} else if (rsdt) {
-> +		end = (void *)rsdt + rsdt->length;
-> +		for (i = 0; (void *)&rsdt->table_offset_entry[i] < end; i++) {
-> +			struct acpi_table *t =
-> +				(void *)(ulong)rsdt->table_offset_entry[i];
-
-Same nit as above.
-
-> +			if (t && t->signature == sig)
-> +				return t;
-> +		}
-> +	}
-> +
-> +	return NULL;
->  }
-> -- 
-> 2.25.1
->
-
-Thanks,
-drew 
-
+> ==== Test Assertion Failure ====
+>    lib/x86_64/processor.c:1207: r == nmsrs
+>    pid=6702 tid=6702 errno=7 - Argument list too long
+>       1	0x000000000040da11: vcpu_save_state at processor.c:1207 (discriminator 4)
+>       2	0x00000000004024e5: main at state_test.c:209 (discriminator 6)
+>       3	0x00007f9f48c2d55f: ?? ??:0
+>       4	0x00007f9f48c2d60b: ?? ??:0
+>       5	0x00000000004026d4: _start at ??:?
+>    Unexpected result from KVM_GET_MSRS, r: 29 (failed MSR was 0x3f1)
+> 
+> I don't think any of these failing tests care about MSR_IA32_PEBS_ENABLE
+> in particular, they're just trying to do KVM_GET_MSRS/KVM_SET_MSRS.
+> 
