@@ -2,118 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FB1952DC33
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 20:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D0D052DC4D
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 20:04:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243503AbiESR74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 13:59:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43342 "EHLO
+        id S243595AbiESSEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 14:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243482AbiESR7v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 13:59:51 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10613D02B1
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 10:59:51 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id a9so3705332pgv.12
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 10:59:51 -0700 (PDT)
+        with ESMTP id S243584AbiESSEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 14:04:44 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADB8A5FF13;
+        Thu, 19 May 2022 11:04:43 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id m25so7405290oih.2;
+        Thu, 19 May 2022 11:04:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ZG6+lov3cxhj/3dSakUHhK2uNdevz22kJZXDGdoSRa0=;
-        b=HvGK5AoIKlR1DmUqXH/3JrsgrNgbI6CxqpjF7swr+ovrKu9ZKjE7XFxxmYv5z3A4vQ
-         zFvQc+wGmpLaOyrkIJfRysB6FfJmuK3rzqDDq5QwJ8NqQicHM1NYueDGQHY29Zvh8kHv
-         72G71y5GU883B6GtWgxh3517kplrz9FUDcsN/S9p18ysjhsmBWGWVLC6+jrce5mXeS6T
-         hJn8crK4Rfll/pVc0Gv4CF49L5PbbjNKLks6UUXq/cSzeSqtlzT/NQv9bHnwLI+Udrs2
-         SiGoXwNhhOVN26ONktooTtWmXg4Z+AJ3q26Zn8cOCnchPiM8WqoZ8sfHvLkx6kvoibLf
-         jBiA==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:content-language:to
+         :cc:references:from:subject:in-reply-to:content-transfer-encoding;
+        bh=a1fLBAz97REz0jfdyucNaKEBoM0Z0pYoEHkMNeMyZmY=;
+        b=Uts+jMb3MuoaLS6OeCoJ3tuosalXIzzvigYxaCpoSx3sFYls89Wumpe/Q58z2wrNmu
+         uZDjciUuAI2Jcke0yVuUjvfAfyn+ViKpwGP+sdS0F3voNA6rwPhM5d82ZaywhLIAtEvt
+         TIPcqmHb0UpUpygoeFdlTbGwkpBu+e6jqlSZm7Zd2OcLEZ9SW4OCW9ZyZ76Yob8kkBTQ
+         nQgs6I7U7v/ESkep7gZkqYUFQGquqIhOifSReKBK68+3J3TPD80MJ9weARpS8CEQ20r/
+         glGtntZ04BwGNeI/zwovNrOJeGeTmkO4c05pv+tSxIZh8Xi6BXea2sBrux1CXhdk8Wg7
+         bR2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZG6+lov3cxhj/3dSakUHhK2uNdevz22kJZXDGdoSRa0=;
-        b=NLq8+uGpAK1sTpItTfuJkU3kp0b3B02hsnesfWWqL5URl14cxsCfHWxU6XwJvvyCIx
-         0pXL6kviND9Po3jl6nhT5lQLt3xNoxYZewLGnaLQGzrfIHx8mcam6rdqD/uxOVoOr13R
-         C1JOMSUa3sDJ/NTVY2ublc2oc9bNmv7DDtKmU73DxJJ3LSakO+YjtwocYh1QAbA/UxvW
-         +hO2ZiqfchX98PlT9UIEZrbJnBUlJT34zgU8z/ZTUuEH6UfB7COkL431DQmxyExtTfAC
-         brvPSr7R4BN6SH5K9i8L831HSkR9/bW6Q4NVCvx0OUhkvLmO2EYhAOihAMmsYDP0I9qV
-         8Qug==
-X-Gm-Message-State: AOAM530HHwZ+TxPBVAb/YzR11CuqY8S0XSff6oqoU3MqnnnHaueBlm69
-        K89+bfvbLMj3hTY4XfDNGtuoJA==
-X-Google-Smtp-Source: ABdhPJwJrgaenuQoJ3gtMljcMqROuGtxxtaXevg8lRhJyXVzkZRsV/Svi9mn3qMabsx3sZ23y479Zg==
-X-Received: by 2002:a65:554d:0:b0:3c6:3f22:72cd with SMTP id t13-20020a65554d000000b003c63f2272cdmr4900212pgr.283.1652983190330;
-        Thu, 19 May 2022 10:59:50 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x7-20020a170902b40700b0015e8d4eb254sm4009372plr.158.2022.05.19.10.59.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 10:59:49 -0700 (PDT)
-Date:   Thu, 19 May 2022 17:59:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lei Wang <lei4.wang@intel.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, chenyi.qiang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: VMX: Read BNDCFGS if not from_vmentry
-Message-ID: <YoaFknp7Swj0DdRw@google.com>
-References: <20220421091331.11196-1-lei4.wang@intel.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=a1fLBAz97REz0jfdyucNaKEBoM0Z0pYoEHkMNeMyZmY=;
+        b=4IMSjrUW3FMW+Lvr4dqGLElv0mcO9f7jvUTweCTm2LV3LBOABRGhGBY8W7h7g9cJK/
+         bT18ct9gkT6J1SQkhsWNNstY44O1TPJvcaCIeP+m9y+keTX4FdaisftXhfPWtmpWxxep
+         UIUm3Nn7M8SX4DIckvvyQUGG9q3Tw9bz7NG3JEHiBTgv10PPAAfLqSeFCbKeP2r70WIo
+         79Oehaf9bc/VBfmGSm/2fUtY4JjRUGO7tnlsYSNA5UpqczG2U0TRRB47ojCh976aUKQV
+         tFZzGpdqrpzp/W7X6YM1e4i6gr3nEpnCRtw0bNAFIqXgfnnKtntzQyhjbIABhL7O7ijD
+         /8ng==
+X-Gm-Message-State: AOAM532Mm1zqed1Pqm6YidNPpkXfGdFjSkxUGaDgcjHSWNb07bowoPY9
+        0pEydtNlwG0DZGT1dqcGLQKRWqvP7g542Q==
+X-Google-Smtp-Source: ABdhPJz3kOxPGC9IfIhJm0Kyu8j0LIFXBDddhJhj2FaXxItDd/dLBGPf5K1ZLyli35hlNUxOtMYwuw==
+X-Received: by 2002:a05:6808:14cf:b0:328:ab6f:187b with SMTP id f15-20020a05680814cf00b00328ab6f187bmr3326747oiw.14.1652983482969;
+        Thu, 19 May 2022 11:04:42 -0700 (PDT)
+Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id e4-20020a056870a60400b000f169cbbb32sm114390oam.43.2022.05.19.11.04.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 May 2022 11:04:42 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <872607af-5647-a255-83f2-3bf75b7f0df4@roeck-us.net>
+Date:   Thu, 19 May 2022 11:04:39 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220421091331.11196-1-lei4.wang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Content-Language: en-US
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220428205116.861003-1-yury.norov@gmail.com>
+ <20220428205116.861003-4-yury.norov@gmail.com>
+ <20220519150929.GA3145933@roeck-us.net>
+ <CAAH8bW8ju7XLkbYya1A1OtqGVGDUAk7dPyw01RsDzg+v7xihyQ@mail.gmail.com>
+From:   Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH 3/5] lib/bitmap: add test for bitmap_{from,to}_arr64
+In-Reply-To: <CAAH8bW8ju7XLkbYya1A1OtqGVGDUAk7dPyw01RsDzg+v7xihyQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 21, 2022, Lei Wang wrote:
-> In the migration case, if nested state is set after MSR state, the value
-> needs to come from the current MSR value.
+On 5/19/22 09:01, Yury Norov wrote:
+> On Thu, May 19, 2022 at 8:09 AM Guenter Roeck <linux@roeck-us.net> wrote:
+>>
+>> On Thu, Apr 28, 2022 at 01:51:14PM -0700, Yury Norov wrote:
+>>> Test newly added bitmap_{from,to}_arr64() functions similarly to
+>>> already existing bitmap_{from,to}_arr32() tests.
+>>>
+>>> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+>>
+>> With this patch in linux-next (including next-20220519), I see lots of
+>> bitmap test errors when booting 32-bit ppc images in qemu. Examples:
+>>
+>> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0", got "0,65"
+>> ...
+>> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128"
+>> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-129"
+>> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-130"
+>> ...
+>> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-209"
+>> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-210"
+>>
+>> and so on. It only  gets worse from there, and ends with:
+>>
+>> test_bitmap: parselist: 14: input is '0-2047:128/256' OK, Time: 4274
+>> test_bitmap: bitmap_print_to_pagebuf: input is '0-32767
+>> ', Time: 127267
+>> test_bitmap: failed 337 out of 3801 tests
+>>
+>> Other architectures and 64-bit ppc builds seem to be fine.
 > 
-> Signed-off-by: Lei Wang <lei4.wang@intel.com>
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Hi Guenter,
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index f18744f7ff82..58a1fa7defc9 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3381,7 +3381,8 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  	if (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
->  		vmx->nested.vmcs01_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
->  	if (kvm_mpx_supported() &&
-> -		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
-> +	    (!from_vmentry ||
+> Thanks for letting me know. It's really weird because it has already
+> been for 2 weeks
+> in next with no issues. But I tested it on mips32, not powerpc. I'll
+> check what happens
+> there.
+> 
+Oh, I have seen the problem for a while, it is just that -next is in
+such a bad shape that it is difficult to bisect individual problems.
 
-Gah, my bad, this isn't correct either.  The minor issue is that it should check
-vmx->nested.nested_run_pending, not just from_vmentry.  If nested state is restored
-and a VM-Entry is pending, then the MSRs that were saved+restore were L1's MSRs,
-not L2's MSRs.
+> Can you please share your config and qemu image if possible?
+> 
 
-That won't cause problems because the consumption correctly checks nested_run_pending,
-it's just confusing and an unnecessary VMREAD.
+First, you have to revert commit b033767848c411
+("powerpc/code-patching: Use jump_label for testing freed initmem")
+to avoid a crash. After that, a recent version of qemu should work
+with the following command line.
 
-But that's a moot point because vmcs01 will not hold the correct value in the SMM
-case.  Luckily, BNDCFGS is easy to handle because it's unconditionally saved on
-VM-Exit, which means that vmcs12 is guaranteed to hold the correct value for both
-SMM and state restore (without pending entry) because the pseudo-VM-Exit for both
-will always save vmcs02's value into vmcs12.
+qemu-system-ppc -kernel arch/powerpc/boot/uImage -M mpc8544ds \
+	-m 256 -no-reboot -initrd rootfs.cpio \
+	--append "rdinit=/sbin/init coherent_pool=512k mem=256M console=ttyS0" \
+	-monitor none -nographic
 
-GUEST_IA32_DEBUGCTL is a much bigger pain because it's conditionally saved on
-exit.   I think the least awful approach would be to save L2's value into
-vmcs01_debugctl prior to the forced exit in vmx_enter_smm(), but that will require
-more changes to the state restore flow.  Grr.
+Configuration is mpc85xx_defconfig with CONFIG_TEST_BITMAP enabled.
+I used the root file system (initrd) from
+https://github.com/groeck/linux-build-test/blob/master/rootfs/ppc/rootfs.cpio.gz
 
-I'll send patches for both BNDCFGS and IA32_DEBUGCTL, and will take a careful look
-at the PKS stuff too.  I'm guessing it should follow the BNDCFGS logic.
-
-Sorry for the runaround.
+Hope this helps,
+Guenter
