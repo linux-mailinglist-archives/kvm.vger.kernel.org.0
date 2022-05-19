@@ -2,105 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D81052CEAC
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 10:51:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4071752CEDA
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 11:02:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235637AbiESIu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 04:50:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51392 "EHLO
+        id S235748AbiESJBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 05:01:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231838AbiESIu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 04:50:57 -0400
-Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EBD109B;
-        Thu, 19 May 2022 01:50:48 -0700 (PDT)
-Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-d6e29fb3d7so5943286fac.7;
-        Thu, 19 May 2022 01:50:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=s/jKTM8nU9QM/2p2qPlG421S2RUaa03Kvk8UUYYHtlg=;
-        b=epSxT9TMjeanb166onZsIfWhvoMygyPn4fGEFLp0dS+HeiZ5rtmuurVeamS+ty4RKM
-         KoKtTSwclnIpKNd1Lpua0MZui8kxcAHrk/6vlnGNoKmLId7WrDGDzi74cEQrNFerEm27
-         dY4lk3q+oO+H/Sby6PUvA1v59g2/uXXTGxWoKoM7LaW8KxgaBVQ+Hi35Z3ntB+AglLpT
-         lEVZj/L91AHjEoSCFQ+TfrXlp8iY+goi8njZHWUq/MY5ZF951GtMf0LV5dQD6btCnt6l
-         Xh8ddytJ3oECbyw0K0Rdc7N2i9WOOq2+nMiXO9Pv7ZjAITDBq7et908jTg+3gtbR8yo4
-         +bQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=s/jKTM8nU9QM/2p2qPlG421S2RUaa03Kvk8UUYYHtlg=;
-        b=UXRO3k3fAZdRbyJq4d+mGS9HJojRSlUlk106hWIr0RAJiHoJRGHA3QFMziEwRvqMHp
-         W33ZAVIAQxzhWZJ7wT9XYS8Nn1arU+b76LEaZIoGOfj2rDd3apiZWF/8sdoaoOcB4pfq
-         DwMptpGDYkh4DOgC8+08NPrquoYiFUeE5Qtggxql2xOhoSsiRR4XaVPEiZx7PK1iFf3D
-         4vXE+2+94b3hLeBY1SU/aJ8Mp6PRe08ymKvv6h4KwA66aMfB0UtXETFCBEg6ZqjTilYm
-         h8Xekw1gPPPxMw9SOf4q88JJIpBgKNn0KlY5LDb46XEAVDhS6Cpov+ESQX8SXibStZzl
-         S3nA==
-X-Gm-Message-State: AOAM530euq1FnJrW+R3Art1trmBUz/C0fCnx/6owM2zmZvNsnPhwlItx
-        IIoa2oz2tOqhQ5FFO9duC4ZtFkjqjL4jPRPXCvFMHGCC
-X-Google-Smtp-Source: ABdhPJy0iY2R0vgsXz9NosQtaKPCaAqqgY79hu+YUz6RmsMviX9IKBJlflLg7nACAsalGqatvr83Yiau6+xJITKPqpc=
-X-Received: by 2002:a05:6870:311d:b0:de:9b6c:362b with SMTP id
- v29-20020a056870311d00b000de9b6c362bmr2262545oaa.200.1652950247928; Thu, 19
- May 2022 01:50:47 -0700 (PDT)
+        with ESMTP id S233283AbiESJBg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 05:01:36 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2B8C340F1;
+        Thu, 19 May 2022 02:01:35 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24J8GNQD006931;
+        Thu, 19 May 2022 09:01:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=hqtw9iKEIdORIKukZHNl3n2cAgbzR2rjnUa/NIrGhOs=;
+ b=gc6BAGUj2LD24mYZDvaxzhpmqa3jkdw5dTXyJj31rA2B2cDwOoTCS97PghLeDgGQjuVB
+ hO0NQpPpDL4R3DxQpsCYt2t0y0NZGvAlGzG+G9Caj8bhRjFsB+OIf2ineNrzt7qzYRj2
+ eaIslSX4bKjuXYNDFik9D0x5fqhZJ7Hzmjsqnk6rqOFosVhw1/KswhQuzA5tMq0inzZN
+ Sh2211O7XTIzlJRIQBKTUTXtgDu5chCBp7ISWYcdWwljh5ZduwvnvkQzteFoeGhUEQRV
+ KRlnAYso08hsA6X42624GjKSQxKgX4Q2kJIBKibYd6W2PxLTTH/hwbSusIGQKjXR6dMz Ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5j7xgxtx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 May 2022 09:01:34 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24J8l8SZ003882;
+        Thu, 19 May 2022 09:01:33 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g5j7xgxt3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 May 2022 09:01:33 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24J8wiI6020848;
+        Thu, 19 May 2022 09:01:31 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3g2428wmqf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 May 2022 09:01:31 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24J91RgX59113822
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 May 2022 09:01:27 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C2F334C044;
+        Thu, 19 May 2022 09:01:27 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D1FB4C040;
+        Thu, 19 May 2022 09:01:27 +0000 (GMT)
+Received: from [9.171.62.1] (unknown [9.171.62.1])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 19 May 2022 09:01:27 +0000 (GMT)
+Message-ID: <6060cfc8-6ae9-1710-3022-1edfbf53b1ca@de.ibm.com>
+Date:   Thu, 19 May 2022 11:01:26 +0200
 MIME-Version: 1.0
-References: <1652236710-36524-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1652236710-36524-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 19 May 2022 16:50:36 +0800
-Message-ID: <CANRm+Cz0S7DwojGkGOuyygGnZb8xz1T-fOCjQm5pzf5tCadPvg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: LAPIC: Disarm LAPIC timer includes pending
- timer around TSC deadline switch
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v9 2/3] s390x: KVM: guest support for topology function
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        frankja@linux.ibm.com, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220506092403.47406-1-pmorel@linux.ibm.com>
+ <20220506092403.47406-3-pmorel@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <20220506092403.47406-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZEhNCHMUTscsRMlEzW6Ljpk70RL7rqQE
+X-Proofpoint-ORIG-GUID: fQCwIjp9idH_71e1DkTjHc-vFXVWdTAb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-19_01,2022-05-19_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0
+ adultscore=0 suspectscore=0 clxscore=1015 impostorscore=0 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205190049
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ping,
-On Wed, 11 May 2022 at 10:39, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> The timer is disarmed when switching between TSC deadline and other modes,
-> however, the pending timer is still in-flight, so let's accurately set
-> everything to a disarmed state, this patch does it by clearing pending
-> when canceling the timer.
->
-> Fixes: 4427593258 (KVM: x86: thoroughly disarm LAPIC timer around TSC deadline switch)
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v1 -> v2:
->  * clear pending in cancel_apic_timer
->
->  arch/x86/kvm/lapic.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 66b0eb0bda94..6268880c8eed 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1548,6 +1548,7 @@ static void cancel_apic_timer(struct kvm_lapic *apic)
->         if (apic->lapic_timer.hv_timer_in_use)
->                 cancel_hv_timer(apic);
->         preempt_enable();
-> +       atomic_set(&apic->lapic_timer.pending, 0);
->  }
->
->  static void apic_update_lvtt(struct kvm_lapic *apic)
-> --
-> 2.25.1
->
+
+
+Am 06.05.22 um 11:24 schrieb Pierre Morel:
+> We let the userland hypervisor know if the machine support the CPU
+> topology facility using a new KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+> 
+> The PTF instruction will report a topology change if there is any change
+> with a previous STSI_15_1_2 SYSIB.
+> Changes inside a STSI_15_1_2 SYSIB occur if CPU bits are set or clear
+> inside the CPU Topology List Entry CPU mask field, which happens with
+> changes in CPU polarization, dedication, CPU types and adding or
+> removing CPUs in a socket.
+> 
+> The reporting to the guest is done using the Multiprocessor
+> Topology-Change-Report (MTCR) bit of the utility entry of the guest's
+> SCA which will be cleared during the interpretation of PTF.
+> 
+> To check if the topology has been modified we use a new field of the
+> arch vCPU to save the previous real CPU ID at the end of a schedule
+> and verify on next schedule that the CPU used is in the same socket.
+> We do not report polarization, CPU Type or dedication change.
+
+I think we should not do this. When PTF returns with "has changed" the guest
+Linux will rebuild its schedule domains. And this is a really expensive
+operation as far as I can tell. And the host Linux scheduler WILL schedule
+too often to other CPUs. So in essence this will result in Linux guests
+rebuilding their scheduler domains all the time.
+So remove the "previous CPU logic" for now and only trigger an MTCR when
+userspace says so.  (eg. on config changes). The idea was to have user
+defined schedule domains. Following host schedule decisions will be
+nearly impossible.
