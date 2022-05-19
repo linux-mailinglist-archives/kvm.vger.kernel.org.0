@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53F7352D452
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:43:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAE3552D44B
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 15:43:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238969AbiESNnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 09:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
+        id S232608AbiESNnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 09:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238809AbiESNmx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 09:42:53 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8430C3EF02
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:42:47 -0700 (PDT)
+        with ESMTP id S238884AbiESNm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 09:42:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31913EF03
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 06:42:49 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 41513B824A6
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:42:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DD7AC34100;
-        Thu, 19 May 2022 13:42:41 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7FCDD617A0
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 13:42:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7076EC34117;
+        Thu, 19 May 2022 13:42:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652967765;
-        bh=zEyj8WLPsyQCMesj24K7D/KNcr+nQZHaLAKHGDzvuq4=;
+        s=k20201202; t=1652967768;
+        bh=3z3t2BrkvfovB2h5pwI3p5yIYTZRtSIyBD74PPTs0Yw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fD8yVP55ECUDTOIB2ZF91hhiW/pXGiOLRiH9DKxoF7SKZ3tRhXC/oVAYXimZ6UkrM
-         x4FY73V72GW1+D4lL4qnxnASYOOVFx43W3TcuBHcnLH86nuNNDUqMpmh9qc/QPgAw+
-         mnDgOHMcuIyIjRH080UE8TEP5c3VV8hgTmjUjaz0x6Jruxinnc/iZZ6YXvkDqMnefn
-         C51HST7GtdYV5X/a63U6pctf6w8xqghITrg/sedqgU1aeT3HE4/rLJNMJ28kINcp2s
-         Qa2zmIgtsaB0hNLWo9VzrMowddP3w1ZE7D5EyS5VUJcEZBCjUhRJDS/k2edTmPVwaz
-         DrMacKmPY4bHg==
+        b=G96M87Oxdl/MhNzXxjemh8P8hD9d+d9tOTeB1WXdxsMsH/EX7wiqHwKlO5j4HVvMB
+         wppa1c+r5WyEKdbCnTaUShA+X7bXIr9pA2c6YB91FBoyEpHaDekbZd8KYShe9IjrIg
+         BEZZBNvs+EiDogN8GOQi0dblPZK60+tPLi7j3z7IaA3DbWMh7En4SWPK8B5anJsFV5
+         krURr+mlbzyq44nBBAoo4S+S2XsRIt/yn0eJGgr5gSgsNm9uP6SuTVVPf14nOrnRdL
+         XgRvIlCY06gv78RiJd88/i8CdBGh5f/ctqmlqy0lkb8PIHLvHrCs5AihtV08LBnJvV
+         YUJHDdmCFdWbQ==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -47,11 +47,10 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Fuad Tabba <tabba@google.com>,
         Oliver Upton <oupton@google.com>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        David Brazdil <dbrazdil@google.com>
-Subject: [PATCH 05/89] KVM: arm64: Extend comment in has_vhe()
-Date:   Thu, 19 May 2022 14:40:40 +0100
-Message-Id: <20220519134204.5379-6-will@kernel.org>
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 06/89] KVM: arm64: Drop stale comment
+Date:   Thu, 19 May 2022 14:40:41 +0100
+Message-Id: <20220519134204.5379-7-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -67,36 +66,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-has_vhe() expands to a compile-time constant when evaluated from the VHE
-or nVHE code, alternatively checking a static key when called from
-elsewhere in the kernel. On face value, this looks like a case of
-premature optimization, but in fact this allows symbol references on
-VHE-specific code paths to be dropped from the nVHE object.
+From: Marc Zyngier <maz@kernel.org>
 
-Expand the comment in has_vhe() to make this clearer, hopefully
-discouraging anybody from simplifying the code.
+The layout of 'struct kvm_vcpu_arch' has evolved significantly since
+the initial port of KVM/arm64, so remove the stale comment suggesting
+that a prefix of the structure is used exclusively from assembly code.
 
-Cc: David Brazdil <dbrazdil@google.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/virt.h | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 3c8af033a997..0e80db4327b6 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -113,6 +113,9 @@ static __always_inline bool has_vhe(void)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e3b25dc6c367..14ed7c7ad797 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -339,11 +339,6 @@ struct kvm_vcpu_arch {
+ 	struct arch_timer_cpu timer_cpu;
+ 	struct kvm_pmu pmu;
+ 
+-	/*
+-	 * Anything that is not used directly from assembly code goes
+-	 * here.
+-	 */
+-
  	/*
- 	 * Code only run in VHE/NVHE hyp context can assume VHE is present or
- 	 * absent. Otherwise fall back to caps.
-+	 * This allows the compiler to discard VHE-specific code from the
-+	 * nVHE object, reducing the number of external symbol references
-+	 * needed to link.
- 	 */
- 	if (is_vhe_hyp_code())
- 		return true;
+ 	 * Guest registers we preserve during guest debugging.
+ 	 *
 -- 
 2.36.1.124.g0e6072fb45-goog
 
