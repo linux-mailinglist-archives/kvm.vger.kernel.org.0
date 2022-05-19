@@ -2,110 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B604452CA77
-	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 05:41:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CC0552CA8B
+	for <lists+kvm@lfdr.de>; Thu, 19 May 2022 05:48:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233285AbiESDlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 May 2022 23:41:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53218 "EHLO
+        id S233146AbiESDsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 May 2022 23:48:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231555AbiESDld (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 May 2022 23:41:33 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16D661299;
-        Wed, 18 May 2022 20:41:31 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id v65so5030513oig.10;
-        Wed, 18 May 2022 20:41:31 -0700 (PDT)
+        with ESMTP id S232257AbiESDsG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 May 2022 23:48:06 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B967A87A23
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 20:48:05 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id e3so4524236ios.6
+        for <kvm@vger.kernel.org>; Wed, 18 May 2022 20:48:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:content-language:to
-         :cc:references:from:subject:in-reply-to:content-transfer-encoding;
-        bh=E+Jeeum5dAYeu7JrVKgmUScX8K6q6nSaD3V1Uo7Z0xo=;
-        b=KFjvSCT6GXj5Kr0HO4phTFW0x5Mhrxpol/LwndM9mgk+gt2L/LZ/5khjHvxx9tCYCl
-         ccDkePOGAv4JpJmRo0Xqzh6ClQpZnN/1/b7sQl4OHAEBLezdGI2XWE9/o/Z1OZFdJplA
-         hvInyanC3HKTFBbmtIho+sxxjhNvtMvXN/SpDUcK6pzwbtXhkX4B8r6bM063uhwPRf2Y
-         cRgCWW0s7tOlAD3+MsxhCIYV0WDd/vE6gTqXbb2/O3YdWrgPTUK3f0QWoOCgnNy5j+zJ
-         Pm+2UwK0eLGDknVSYV48h5O6crlLJ0idezAZuMW3TB+ty1IBtVt29pHwTXbVrYvZnNon
-         S1IA==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=V7aykxkpRlTrHcdok+1A8qMCzSLka/rVSLMo9eqIxnA=;
+        b=nCjjPyCmNUJwmxdEVP2MJRlqhK1VkKhityQGd1WRlCSn1KQoYBU7MSH7G9iBptN0ZA
+         K9F/9TOtJDNQ6HlNozRI9gtk+YKBCMp6p1alj9uaGotX3V4uQnc6RclOHQpJoMb8tC52
+         kUfLP0MeMGnms+fOZi0nljeddiouf8PS1LChbh7rouNciJANho6lK6y6e8JZlw5oqc5i
+         1HW/FeboKCrQHRzUdaXSuUDy44kHr3JnrNSp55V38SMxTp48Bv65UUhRxDEegqsVbsRv
+         x4UiPJUKeZDHotEucB35lECImraRroX9wvVueZLWO2rzVs2iSqBV4wTlAWP3cDy724d3
+         UIvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=E+Jeeum5dAYeu7JrVKgmUScX8K6q6nSaD3V1Uo7Z0xo=;
-        b=EtZhacL/d18FgsjrPbP9gxyZELnbKYYaNtw7UuaOJx/brlb9fcpMmwOuF+GiTZenp8
-         fey8HZRxPh0kSt7wffo6dU+r08h0zE6cDa5R280j3kxA6BJTOCkgEWCeM5LhR1Y0maAy
-         ggHDh0UpExM1Sr3yl8gw3lBMrXR6ITp2UZpcGBsh4a69fL/ley4JuPEcizN0acZ15PhN
-         9zXi6DITCuSyWRQ1ACEQB+JVLmxdPdJdafWMuYKLIegpRFlA9R9spvmKZu+vq5TXqkRJ
-         SAQQTF+m3Scj5qD6OuHD9/C8ggkE9rTUji5TFwKXGWUhz8e4fabgzWem6+2m+0ij5kfM
-         g/IA==
-X-Gm-Message-State: AOAM531/coR7asKGSwU72tEuTg4HuwM2zYawY60B08nSnijGw1whHHLS
-        E1ipsCCvo6oZacnHqIljgBo=
-X-Google-Smtp-Source: ABdhPJzNbyvmXREi3jFpQ1BXha9I4ZZcQvTagfhdtbiKBgx1gr2M0BpSR/Ospfm2JXh/HEBEZ+zfpQ==
-X-Received: by 2002:aca:4154:0:b0:322:7a9c:7daa with SMTP id o81-20020aca4154000000b003227a9c7daamr1784072oia.52.1652931691271;
-        Wed, 18 May 2022 20:41:31 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id p4-20020aca4204000000b0032694a9925esm1451284oia.10.2022.05.18.20.41.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 20:41:30 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <0530d502-1291-23f3-64ac-97bd38a26bd4@roeck-us.net>
-Date:   Wed, 18 May 2022 20:41:27 -0700
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=V7aykxkpRlTrHcdok+1A8qMCzSLka/rVSLMo9eqIxnA=;
+        b=heuUSgqYJLOGtugc3E/nAf7I+YSPBy3DRefFO7li4bg9U/uaYLZB9WHGoYlKpl1/vQ
+         IkBFv3kAx9FBTIXRgRukwfYm4uHTuvnXx+UgaqcjRofFqHh8qGROXzbDPLzGN9AgCv0l
+         BUgut7CHibge04CjF5q4yRW1Xj4156UKFKa9gAIwF9iIEXRWcBa8Lq3RjPlF6axR/ePy
+         G7MKc+v5pazUIujoYHXXM87ommOqjmPr4dm3JvSk5BOYroPjIOiEObr1U1lu0TC0HHcE
+         4l04ZTrwR6XeEq7Pon5BumPPC4RmU0sW73DAOEgFrYBUy7yH+moW/ckUauZIdIqZdIug
+         6ODg==
+X-Gm-Message-State: AOAM533XCviOfhv8tUp3rS1zwnyfUDnTrSDxsfPFyiHsyWJ7Ef6uoeqF
+        Qlc/1ZoylnnQ5KgbajeUoqBCOA6xMc/ZUA==
+X-Google-Smtp-Source: ABdhPJyF43/gmULs/erOMWf06SK+pEavs8YWgCinIHa60Rx65dQweOqX0OpvpMJfoexchX+275tbQw==
+X-Received: by 2002:a05:6602:2f0c:b0:65a:d5f3:7572 with SMTP id q12-20020a0566022f0c00b0065ad5f37572mr1475954iow.22.1652932084930;
+        Wed, 18 May 2022 20:48:04 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id f1-20020a02a101000000b0032e833105fesm332923jag.177.2022.05.18.20.48.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 20:48:04 -0700 (PDT)
+Date:   Thu, 19 May 2022 03:48:00 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, pbonzini@redhat.com, maz@kernel.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v3 02/13] KVM: selftests: aarch64: Add vm_get_pte_gpa
+ library function
+Message-ID: <YoW98HI27sP5lHKR@google.com>
+References: <20220408004120.1969099-1-ricarkol@google.com>
+ <20220408004120.1969099-3-ricarkol@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Content-Language: en-US
-To:     kernel test robot <lkp@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-staging@lists.linux.dev, linux-omap@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-hwmon@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
-        Linux Memory Management List <linux-mm@kvack.org>
-References: <6285958d.+Z2aDZ4O1Y9eiazd%lkp@intel.com>
-From:   Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 736ee37e2e8eed7fe48d0a37ee5a709514d478b3
-In-Reply-To: <6285958d.+Z2aDZ4O1Y9eiazd%lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220408004120.1969099-3-ricarkol@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/22 17:55, kernel test robot wrote:
-> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> branch HEAD: 736ee37e2e8eed7fe48d0a37ee5a709514d478b3  Add linux-next specific files for 20220518
-> 
-> Error/Warning reports:
-> 
-> https://lore.kernel.org/linux-mm/202204291924.vTGZmerI-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205041248.WgCwPcEV-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205122113.uLKzd3SZ-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205172344.3GFeaum1-lkp@intel.com
-> https://lore.kernel.org/linux-mm/202205190527.o9wVEvHI-lkp@intel.com
-> 
-> Error/Warning: (recently discovered and may have been fixed)
-> 
-[ .. ]
-> drivers/hwmon/nct6775-platform.c:199:9: sparse:    unsigned char
-> drivers/hwmon/nct6775-platform.c:199:9: sparse:    void
+Hey Ricardo,
 
-This is getting tiresome. Every driver using outb() on m68k will
-experience that "problem". As far as I can see, it is caused by
+Sorry about my last email hitting your v2. I fudged my inbox filtering
+so v3 missed my explicit-cc inbox. Oops!
 
-#define out_8(addr,b) (void)((*(__force volatile u8 *) (unsigned long)(addr)) = (b))
+On Thu, Apr 07, 2022 at 05:41:09PM -0700, Ricardo Koller wrote:
+> Add a library function (in-guest)
 
-in arch/m68k/include/asm/raw_io.h. I have no idea what the
-"(void)" is for, but removing it "fixes" the problem.
-Either case, this is not a problem with the nct6775 driver,
-nor is it a new problem.
+This function is called from host userspace, no?
 
-Guenter
+> to get the GPA of the PTE of a
+> particular GVA.  This will be used in a future commit by a test to clear
+> and check the AF (access flag) of a particular page.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../selftests/kvm/include/aarch64/processor.h |  2 ++
+>  .../selftests/kvm/lib/aarch64/processor.c     | 24 +++++++++++++++++--
+>  2 files changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index 8f9f46979a00..caa572d83062 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -125,6 +125,8 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+>  void vm_install_sync_handler(struct kvm_vm *vm,
+>  		int vector, int ec, handler_fn handler);
+>  
+> +vm_paddr_t vm_get_pte_gpa(struct kvm_vm *vm, vm_vaddr_t gva);
+> +
+>  static inline void cpu_relax(void)
+>  {
+>  	asm volatile("yield" ::: "memory");
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 9343d82519b4..ee006d354b79 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -139,7 +139,7 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+>  	_virt_pg_map(vm, vaddr, paddr, attr_idx);
+>  }
+>  
+> -vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+> +vm_paddr_t vm_get_pte_gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+>  {
+>  	uint64_t *ptep;
+>  
+> @@ -162,7 +162,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+>  			goto unmapped_gva;
+>  		/* fall through */
+>  	case 2:
+> -		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pte_index(vm, gva) * 8;
+> +		ptep = (uint64_t *)(pte_addr(vm, *ptep) + pte_index(vm, gva) * 8);
+
+this seems a bit odd. ptep is an HVA in the above cases, but really a
+GPA here.
+
+Also -- not your code but the baked-in assumption that the stage-1 MMU
+always maps at leaf page granularity might be a bit of a mess if we ever
+do anything more interesting inside of the guest.
+
+>  		if (!ptep)
+>  			goto unmapped_gva;
+>  		break;
+> @@ -170,6 +170,26 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+>  		TEST_FAIL("Page table levels must be 2, 3, or 4");
+>  	}
+>  
+> +	return (vm_paddr_t)ptep;
+> +
+> +unmapped_gva:
+> +	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
+> +	exit(1);
+
+Isn't this just a workaround for the fact that TEST_FAIL() doesn't have
+the noreturn attribute specified somewhere?
+
+> +}
+> +
+> +vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+> +{
+> +	uint64_t *ptep;
+> +	vm_paddr_t ptep_gpa;
+> +
+> +	ptep_gpa = vm_get_pte_gpa(vm, gva);
+> +	if (!ptep_gpa)
+> +		goto unmapped_gva;
+
+This branch will never be taken since vm_get_pte_gpa() will explode on
+its own, right?
+
+--
+Thanks,
+Oliver
