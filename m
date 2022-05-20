@@ -2,114 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58EE952EF20
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 17:25:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B771852EF25
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 17:26:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350860AbiETPZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 11:25:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33426 "EHLO
+        id S1350822AbiETP0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 11:26:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350813AbiETPY7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 11:24:59 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 601041790B2;
-        Fri, 20 May 2022 08:24:56 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id jx22so2789639ejb.12;
-        Fri, 20 May 2022 08:24:56 -0700 (PDT)
+        with ESMTP id S1350888AbiETP01 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 11:26:27 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213C41A043
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 08:26:25 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id n18so7646512plg.5
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 08:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YELfX0pmeRUgrcCLL0vitmfjUp+FF2g5+k5k9fNku9Y=;
-        b=pKR31M0v6C/YLf4xLrR/H2QGjVd5fR7zibIY7qMC7AxbzZUl02O+jEagoEsrP1OvYY
-         U1ELKH8KmnXSOLc3zivWXuyW3h4xIvGD+6TYrS4zEHglmBz1E3MzfaGKFKqjb/0yKZd3
-         8vlgaohBPH+/6epiKmYQynin1DPIAsuV1CDY7Id3hjAUGAu4HYQOtBC03sbXe6V7Winm
-         5Q6uTatnhOjWjktyKdGMFt90zH1mq56n5/teSOHK2C2dXQjcRFtger6iUnky7GQEkK0P
-         usM1DIPiRi8kSvMCpBPWlc5Dy2fjgHVkJjOHfIysA3N5UIt9xG+xrJADm/syXTI4tNB4
-         j5xA==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8ckWBW9Fjr8xfgmBSfl+f9OgYv33qOKWhE+4JMMaKRw=;
+        b=YYKHGP0IgfoQO6iOkN2ka8HPPVxXUyAoEDo+2ihZzUth1zktKy9n8ZiIrmV3i6Pr5f
+         USXGGFoKspuxJPO0aMNObOuYCrsTSa2NpXp+464JfldeLFdnfFOZTf1ggDrjvjC5ocqm
+         nzPALDWD90tkwTwHmPzPN0kppGLCHWFL2t3x2432bxvN+tpRZiW0aNxwVkYBkWlgjMrw
+         a19vj/qDTkocip60j68nf4ZcF9Ma6xVFg7cfBczNrpOniGA0PT7awGCJRgxZupem+ZU5
+         LVxWS/TR7q+8RwxKwdEJ9lEhi+JUn+JXW+cKdGde9mFMZT6Frg00Hc4ruPUVinzJeDWw
+         V9Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YELfX0pmeRUgrcCLL0vitmfjUp+FF2g5+k5k9fNku9Y=;
-        b=lPTW4Vljpfm5WEBuoGmwcWI0MSYoIkBhh2oPalYh6E2dVxBYbyOThCE4FISdCB2i+t
-         607srHr5z/5AjHriMcQ7HhJNiKgoj0FR3TgPnHiWX3Cr8nRvgxtpJgW9O7tY3n3tfMEz
-         aHp0E8KqIJZyC30o8GxEcPFpK84bz+fGviCxYd2qV0jve1LLeT1j4iprVsgS4cZn1UbD
-         7U/xK/I7ehBaONMe/OkFNS4Rex4aE27EXVBCf1R3FDoMicYZu0vQipv8kXLJMcA8Bm6Y
-         QmZe8NX2TahI2ZSE82U+ghogwPbrgGVmaM2JwnF24zt54T8RbeFdNR8c9tQ/WywMQAeE
-         BPLA==
-X-Gm-Message-State: AOAM533qIQc3DN52h05k6PAhEc3a+ZihZZzaw8Mp/8+CfkMnMoaWvSg8
-        +f7OYc3Mu6JxVBVOMOVbQtKTL8pKKMDKaQ==
-X-Google-Smtp-Source: ABdhPJzFUg9+Nw69pvwrhOYP4aLoaeB6c3kLan/f7n6vyz0QQZqAxtBXlGmxunn6uOcH9Df/Ci0gzQ==
-X-Received: by 2002:a17:907:7e91:b0:6f4:3b93:1f6e with SMTP id qb17-20020a1709077e9100b006f43b931f6emr4434383ejc.91.1653060294829;
-        Fri, 20 May 2022 08:24:54 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id md17-20020a170906ae9100b006feaf472637sm759468ejb.53.2022.05.20.08.24.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 May 2022 08:24:54 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <d84d9853-d055-50b6-669f-de2f24304f15@redhat.com>
-Date:   Fri, 20 May 2022 17:24:51 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8ckWBW9Fjr8xfgmBSfl+f9OgYv33qOKWhE+4JMMaKRw=;
+        b=JZClpJ8tEj4Hq+9H/lro0HrAF4P5u27QtcH8AEzr5ym2H4V53UGWddlHY/HCqGrnUV
+         YCI43w+vu6sgCdKiilTYqztffMhf69ZMI2+rFuKQOqSP4uvBRo130Vc5G0sp+E4JdOCZ
+         uXsnAC7YzqrptR87nk6GuCUaj/6XyUtysVmUBqmaLQaPf0fV7Te+C8Wba9fALkejwq5/
+         b6S7wESgg02JdJrSWVpdvOkC5rwX4OOfwm0ft+OZJKCHlkptwA7ubV8om6DAIRLssiAg
+         Wpewsx+jLfrlJSF4r/KTQ8eiPOo6A66ZFx32y/CSAPAw6Itp18Yem8cKadMk3ysLVgbR
+         MuYw==
+X-Gm-Message-State: AOAM531Ufx8iMf8pq+1hRGXCBn0WP4cNt9pC4mQUyiMobg/slvsKlxVy
+        Nsl3l9Zhia63PQNzcxhqAiRhTQ==
+X-Google-Smtp-Source: ABdhPJyvH8cQUP9G2+GlRDfRUJU8C+SmDJDAAkcuc+H+1+M9X3nr7cpEqMmdgUw+vfbbiQeLFseMkw==
+X-Received: by 2002:a17:902:854c:b0:158:35ce:9739 with SMTP id d12-20020a170902854c00b0015835ce9739mr10156221plo.150.1653060384458;
+        Fri, 20 May 2022 08:26:24 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u8-20020a1709026e0800b00161435e7475sm5843105plk.157.2022.05.20.08.26.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 May 2022 08:26:23 -0700 (PDT)
+Date:   Fri, 20 May 2022 15:26:20 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Gao Chao <chao.gao@intel.com>
+Subject: Re: [PATCH] KVM: x86: Inhibit APICv/AVIC when changing apic id/base
+ from the defaults
+Message-ID: <YoezHLoQ3J2mjv1n@google.com>
+References: <20220520144656.25579-1-guang.zeng@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v3 6/8] KVM: Fully serialize gfn=>pfn cache refresh via
- mutex
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Mingwei Zhang <mizhang@google.com>
-References: <20220429210025.3293691-1-seanjc@google.com>
- <20220429210025.3293691-7-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220429210025.3293691-7-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220520144656.25579-1-guang.zeng@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/22 23:00, Sean Christopherson wrote:
-> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-> index 05cb0bcbf662..eaef31462bbe 100644
-> --- a/virt/kvm/pfncache.c
-> +++ b/virt/kvm/pfncache.c
-> @@ -157,6 +157,13 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
->   	if (page_offset + len > PAGE_SIZE)
->   		return -EINVAL;
->   
-> +	/*
-> +	 * If another task is refreshing the cache, wait for it to complete.
-> +	 * There is no guarantee that concurrent refreshes will see the same
-> +	 * gpa, memslots generation, etc..., so they must be fully serialized.
-> +	 */
-> +	mutex_lock(&gpc->refresh_lock);
-> +
->   	write_lock_irq(&gpc->lock);
->   
->   	old_pfn = gpc->pfn;
-> @@ -248,6 +255,8 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
->    out:
->   	write_unlock_irq(&gpc->lock);
->   
-> +	mutex_unlock(&gpc->refresh_lock);
-> +
->   	gpc_release_pfn_and_khva(kvm, old_pfn, old_khva);
->   
->   	return ret;
+On Fri, May 20, 2022, Zeng Guang wrote:
+> From: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Neither of these settings should be changed by the guest and it is a burden
+> to support it in the acceleration code, so just inhibit APICv/AVIC in case
+> such rare cases happen.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
 
-Does kvm_gfn_to_pfn_cache_unmap also need to take the mutex, to avoid 
-the WARN_ON(gpc->valid)?
+All of my comments on Maxim's posting still apply[*].  At this point, unless Paolo
+wants wield his hammer of authority and do a bunch of fixup, the fastest way forward
+will be to wait for Maxim to respond and post patches 1-3 of that series separately.
 
-Paolo
+[*] https://lore.kernel.org/all/YoZrG3n5fgMp4LQl@google.com
