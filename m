@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 371F152F640
-	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 01:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB79B52F63F
+	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 01:33:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354143AbiETXdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 19:33:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51370 "EHLO
+        id S1354159AbiETXdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 19:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354134AbiETXdN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 19:33:13 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2A319FF4E
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:11 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id d10-20020a17090a7bca00b001df1d7dd8cfso4916531pjl.8
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:11 -0700 (PDT)
+        with ESMTP id S243528AbiETXdO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 19:33:14 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7896B199B36
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:13 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id z186-20020a6233c3000000b00510a6bc2864so4742762pfz.10
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=MemxomWyn3xFxsnJwUeubmFMBZbsEx+Q3Mj2FuHfdHM=;
-        b=i/93yJ80eBOooJOB0I8qsv1MgkNa4IgHe5LpU1h/N9cNUeGqiPzQu/8mcOYKti/o31
-         0TTloyK1pbGwJmbWzi+oZjPHzgiScKbF5vssoEpSWyMvT1dSHaMk73W/8YmD89OVjmLd
-         5XzHLWy8xrVHiObz9zb0GBiQgM2TEiJsHPLVvA/LCHrNgCiQqA3cTurBFZpkjbk2GrUG
-         cek9kx0qnwjpL3TI5gesjRD0/kMjp6GyBsCAiBvPxmPAdqOytSEyNhGNx7Usa7dS00m2
-         0GpAYdXGKkaXA9Ci8XydObCgq0LMVcK+Itz6oPD+/eF6P0Cv2egzni8j9rkUe8UuyuNB
-         bdJg==
+        bh=vHJUCGMEgJqpClQFFW0EWRWWAeT42MMPHlt4o+8BnGc=;
+        b=p9kSyvLQx2Zcxh3pNRyiwAII5bzE9hhRdnONEsbj4YPpdix0dmYBcRPnQocosjh5rm
+         78Grm3y27uBlrAKebW/VWrBu2sD2F6ZgrcjFaZDFJh3eSpGfb/NYkHUJNT3TSSfvPDSk
+         9350tPhHBwhFKHjgRTHcikraAy1tD2LW8XNO94Kz+9zhwv/LozAuuOCWXhXGPUtjMtYO
+         tD+YOLEOyrDsbijG6YYheLC4cgIDIl0jVh0oP2KdVg/gtLwYrXMFt7sFNX0lk8csCq4/
+         6KkQnzIbZCt7nnTI9xZpIXwWp4gkFGXL5+iWM6+EDRU2L65DSpiTUheI7D9i6x9iXXBh
+         wQ+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=MemxomWyn3xFxsnJwUeubmFMBZbsEx+Q3Mj2FuHfdHM=;
-        b=qSEruGVVbi2fiA+tgvgrZjlUTkAKQUN+7lTCatrCdP6eXjQEmY1QB8QnrYwflaLx3U
-         IlJfzmKMAWSOeyMtEgQdqNuOyiFqrlJhbhQQNGQFqyI+nHSdkMpXaFlaray7PvPwoKWP
-         Eat0CDJ/kdbrD748w7j5o8pRRTSwpAuAU+JlWawOuhGgGauEiw36BkuYSbaMjHKD4FCt
-         DmV8ZssDu8rBMmwt4qPLwFV6HHFhyTTvMX/z6/cGV8SW/bojeGq/3anrM0j28deaQBn7
-         ecWm2uONUpgyournLO5+TIPS+ZH8wXltggZKo1aEaHVlsyQl8IFJgx4J7s0iRH/n61DP
-         8ndA==
-X-Gm-Message-State: AOAM5309BoNRfSkuXl7l8LR8UwkzL5jcQepjl8HnYxZhjvd7NRzmt0Os
-        nHgBejD4pfAk2VfKBt77hQr0F0yZ6dXQRQ==
-X-Google-Smtp-Source: ABdhPJzZsgzxjbJ10PsYQdoPxB1yJ/95ezm1QVZWzawOSVId6FDEpPYtvuN2kOAxGWivTrseepqlu7fQBgqB4w==
+        bh=vHJUCGMEgJqpClQFFW0EWRWWAeT42MMPHlt4o+8BnGc=;
+        b=a79t6NZavIovrbOKyM4AQNNGkZuo4ZAZpNSATzBBuMDjDQRXC3Z6ocCnyAqweTrZmn
+         9+Td6HjJIosSGl+YFwiZuAZjVuSWSslWUYcl3tIlp+M/EHw9Hb8Uy7sF4mQo6YlcKnvZ
+         fCQ8jlkW3DuWJZf6TedFqYMbyL+NKJBenv+6+YAxqKbiN6fyGh3+AMBCTUSA3fF2Rsl+
+         03k+ZxFx3AR6f/jE+2Q+G2QkQqdmF7sYuXvcRXiqfhhDDekOQ/DT+9pRsnTCOPig2fpS
+         quc7+eifE2xQwxemBxJlzxMgaXAqpFG+v9gXOkEWMpEw6KLoVjEfJQQyd/xOs3gNpnII
+         cwNQ==
+X-Gm-Message-State: AOAM531CViCHql7rIBXbxzV0JrU18Czsx9TeMOm9rvML8hNxyzeMdQdD
+        RiXYY1rR9yzwr1ZxWyqKsJ3h1I0rWqF7ew==
+X-Google-Smtp-Source: ABdhPJxWEA52/Ew9jC+/Mr4wrmF+W4/T+jyMdqd+SSZKG+rwsjDU/8KXerbAE6YQRyofVA7xkw42+bC785bMsQ==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:6b0b:b0:158:d1e7:3d0f with SMTP
- id o11-20020a1709026b0b00b00158d1e73d0fmr11507496plk.71.1653089591052; Fri,
- 20 May 2022 16:33:11 -0700 (PDT)
-Date:   Fri, 20 May 2022 23:32:48 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:164a:b0:1dc:981d:f197 with SMTP
+ id il10-20020a17090b164a00b001dc981df197mr14135472pjb.228.1653089593011; Fri,
+ 20 May 2022 16:33:13 -0700 (PDT)
+Date:   Fri, 20 May 2022 23:32:49 +0000
 In-Reply-To: <20220520233249.3776001-1-dmatlack@google.com>
-Message-Id: <20220520233249.3776001-11-dmatlack@google.com>
+Message-Id: <20220520233249.3776001-12-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220520233249.3776001-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH v4 10/11] KVM: selftests: Add option to run
- dirty_log_perf_test vCPUs in L2
+Subject: [PATCH v4 11/11] KVM: selftests: Restrict test region to 48-bit
+ physical addresses when using nested
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Ben Gardon <bgardon@google.com>,
@@ -73,399 +73,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add an option to dirty_log_perf_test that configures the vCPUs to run in
-L2 instead of L1. This makes it possible to benchmark the dirty logging
-performance of nested virtualization, which is particularly interesting
-because KVM must shadow L1's EPT/NPT tables.
+The selftests nested code only supports 4-level paging at the moment.
+This means it cannot map nested guest physical addresses with more than
+48 bits. Allow perf_test_util nested mode to work on hosts with more
+than 48 physical addresses by restricting the guest test region to
+48-bits.
 
-For now this support only works on x86_64 CPUs with VMX. Otherwise
-passing -n results in the test being skipped.
+While here, opportunistically fix an off-by-one error when dealing with
+vm_get_max_gfn(). perf_test_util.c was treating this as the maximum
+number of GFNs, rather than the maximum allowed GFN. This didn't result
+in any correctness issues, but it did end up shifting the test region
+down slightly when using huge pages.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/dirty_log_perf_test.c       |  10 +-
- .../selftests/kvm/include/perf_test_util.h    |   9 ++
- .../selftests/kvm/include/x86_64/processor.h  |   4 +
- .../selftests/kvm/include/x86_64/vmx.h        |   4 +
- .../selftests/kvm/lib/perf_test_util.c        |  35 +++++-
- .../selftests/kvm/lib/x86_64/perf_test_util.c | 112 ++++++++++++++++++
- tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  15 +++
- 8 files changed, 182 insertions(+), 8 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
+ .../testing/selftests/kvm/lib/perf_test_util.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 83b9ffa456ea..42cb904f6e54 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -49,6 +49,7 @@ LIBKVM += lib/test_util.c
- 
- LIBKVM_x86_64 += lib/x86_64/apic.c
- LIBKVM_x86_64 += lib/x86_64/handlers.S
-+LIBKVM_x86_64 += lib/x86_64/perf_test_util.c
- LIBKVM_x86_64 += lib/x86_64/processor.c
- LIBKVM_x86_64 += lib/x86_64/svm.c
- LIBKVM_x86_64 += lib/x86_64/ucall.c
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 7b47ae4f952e..d60a34cdfaee 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -336,8 +336,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- static void help(char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-i iterations] [-p offset] [-g]"
--	       "[-m mode] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
-+	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
-+	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
- 	       "[-x memslots]\n", name);
- 	puts("");
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
-@@ -351,6 +351,7 @@ static void help(char *name)
- 	printf(" -p: specify guest physical test memory offset\n"
- 	       "     Warning: a low offset can conflict with the loaded test code.\n");
- 	guest_modes_help();
-+	printf(" -n: Run the vCPUs in nested mode (L2)\n");
- 	printf(" -b: specify the size of the memory region which should be\n"
- 	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
- 	       "     (default: 1G)\n");
-@@ -387,7 +388,7 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ghi:p:m:b:f:v:os:x:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:os:x:")) != -1) {
- 		switch (opt) {
- 		case 'g':
- 			dirty_log_manual_caps = 0;
-@@ -401,6 +402,9 @@ int main(int argc, char *argv[])
- 		case 'm':
- 			guest_modes_cmdline(optarg);
- 			break;
-+		case 'n':
-+			perf_test_args.nested = true;
-+			break;
- 		case 'b':
- 			guest_percpu_mem_size = parse_size(optarg);
- 			break;
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index a86f953d8d36..d822cb670f1c 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -30,10 +30,15 @@ struct perf_test_vcpu_args {
- 
- struct perf_test_args {
- 	struct kvm_vm *vm;
-+	/* The starting address and size of the guest test region. */
- 	uint64_t gpa;
-+	uint64_t size;
- 	uint64_t guest_page_size;
- 	int wr_fract;
- 
-+	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
-+	bool nested;
-+
- 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
- 
-@@ -49,5 +54,9 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
- 
- void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
- void perf_test_join_vcpu_threads(int vcpus);
-+void perf_test_guest_code(uint32_t vcpu_id);
-+
-+uint64_t perf_test_nested_pages(int nr_vcpus);
-+void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus);
- 
- #endif /* SELFTEST_KVM_PERF_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 04f1d540bcb2..2aaea757432a 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -477,6 +477,10 @@ enum pg_level {
- #define PG_LEVEL_SHIFT(_level) ((_level - 1) * 9 + 12)
- #define PG_LEVEL_SIZE(_level) (1ull << PG_LEVEL_SHIFT(_level))
- 
-+#define PG_SIZE_4K PG_LEVEL_SIZE(PG_LEVEL_4K)
-+#define PG_SIZE_2M PG_LEVEL_SIZE(PG_LEVEL_2M)
-+#define PG_SIZE_1G PG_LEVEL_SIZE(PG_LEVEL_1G)
-+
- void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level);
- 
- /*
-diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-index 3b1794baa97c..cc3604f8f1d3 100644
---- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-@@ -96,6 +96,7 @@
- #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
- #define VMX_MISC_SAVE_EFER_LMA			0x00000020
- 
-+#define VMX_EPT_VPID_CAP_1G_PAGES		0x00020000
- #define VMX_EPT_VPID_CAP_AD_BITS		0x00200000
- 
- #define EXIT_REASON_FAILED_VMENTRY	0x80000000
-@@ -608,6 +609,7 @@ bool load_vmcs(struct vmx_pages *vmx);
- 
- bool nested_vmx_supported(void);
- void nested_vmx_check_supported(void);
-+bool ept_1g_pages_supported(void);
- 
- void nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
- 		   uint64_t nested_paddr, uint64_t paddr);
-@@ -615,6 +617,8 @@ void nested_map(struct vmx_pages *vmx, struct kvm_vm *vm,
- 		 uint64_t nested_paddr, uint64_t paddr, uint64_t size);
- void nested_map_memslot(struct vmx_pages *vmx, struct kvm_vm *vm,
- 			uint32_t memslot);
-+void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
-+			    uint64_t addr, uint64_t size);
- void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
- 		  uint32_t eptp_memslot);
- void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm);
 diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 722df3a28791..b2ff2cee2e51 100644
+index b2ff2cee2e51..f989ff91f022 100644
 --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
 +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -40,7 +40,7 @@ static bool all_vcpu_threads_running;
-  * Continuously write to the first 8 bytes of each page in the
-  * specified region.
-  */
--static void guest_code(uint32_t vcpu_id)
-+void perf_test_guest_code(uint32_t vcpu_id)
- {
- 	struct perf_test_args *pta = &perf_test_args;
- 	struct perf_test_vcpu_args *vcpu_args = &pta->vcpu_args[vcpu_id];
-@@ -108,7 +108,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
- {
- 	struct perf_test_args *pta = &perf_test_args;
+@@ -110,6 +110,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
  	struct kvm_vm *vm;
--	uint64_t guest_num_pages;
-+	uint64_t guest_num_pages, slot0_pages = DEFAULT_GUEST_PHY_PAGES;
+ 	uint64_t guest_num_pages, slot0_pages = DEFAULT_GUEST_PHY_PAGES;
  	uint64_t backing_src_pagesz = get_backing_src_pagesz(backing_src);
++	uint64_t region_end_gfn;
  	int i;
  
-@@ -134,13 +134,20 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
- 		    "Guest memory cannot be evenly divided into %d slots.",
- 		    slots);
- 
-+	/*
-+	 * If using nested, allocate extra pages for the nested page tables and
-+	 * in-memory data structures.
-+	 */
-+	if (pta->nested)
-+		slot0_pages += perf_test_nested_pages(vcpus);
-+
- 	/*
- 	 * Pass guest_num_pages to populate the page tables for test memory.
- 	 * The memory is also added to memslot 0, but that's a benign side
- 	 * effect as KVM allows aliasing HVAs in meslots.
- 	 */
--	vm = vm_create_with_vcpus(mode, vcpus, DEFAULT_GUEST_PHY_PAGES,
--				  guest_num_pages, 0, guest_code, NULL);
-+	vm = vm_create_with_vcpus(mode, vcpus, slot0_pages, guest_num_pages, 0,
-+				  perf_test_guest_code, NULL);
+ 	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+@@ -151,18 +152,29 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
  
  	pta->vm = vm;
  
-@@ -161,7 +168,9 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
++	/* Put the test region at the top guest physical memory. */
++	region_end_gfn = vm_get_max_gfn(vm) + 1;
++
++#ifdef __x86_64__
++	/*
++	 * When running vCPUs in L2, restrict the test region to 48 bits to
++	 * avoid needing 5-level page tables to identity map L2.
++	 */
++	if (pta->nested)
++		region_end_gfn = min(region_end_gfn, (1UL << 48) / pta->guest_page_size);
++#endif
+ 	/*
+ 	 * If there should be more memory in the guest test region than there
+ 	 * can be pages in the guest, it will definitely cause problems.
+ 	 */
+-	TEST_ASSERT(guest_num_pages < vm_get_max_gfn(vm),
++	TEST_ASSERT(guest_num_pages < region_end_gfn,
+ 		    "Requested more guest memory than address space allows.\n"
+ 		    "    guest pages: %" PRIx64 " max gfn: %" PRIx64
+ 		    " vcpus: %d wss: %" PRIx64 "]\n",
+-		    guest_num_pages, vm_get_max_gfn(vm), vcpus,
++		    guest_num_pages, region_end_gfn - 1, vcpus,
+ 		    vcpu_memory_bytes);
+ 
+-	pta->gpa = (vm_get_max_gfn(vm) - guest_num_pages) * pta->guest_page_size;
++	pta->gpa = (region_end_gfn - guest_num_pages) * pta->guest_page_size;
+ 	pta->gpa = align_down(pta->gpa, backing_src_pagesz);
+ #ifdef __s390x__
  	/* Align to 1M (segment size) */
- 	pta->gpa = align_down(pta->gpa, 1 << 20);
- #endif
--	pr_info("guest physical test memory offset: 0x%lx\n", pta->gpa);
-+	pta->size = guest_num_pages * pta->guest_page_size;
-+	pr_info("guest physical test memory: [0x%lx, 0x%lx)\n",
-+		pta->gpa, pta->gpa + pta->size);
- 
- 	/* Add extra memory slots for testing */
- 	for (i = 0; i < slots; i++) {
-@@ -178,6 +187,11 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
- 
- 	perf_test_setup_vcpus(vm, vcpus, vcpu_memory_bytes, partition_vcpu_memory_access);
- 
-+	if (pta->nested) {
-+		pr_info("Configuring vCPUs to run in L2 (nested).\n");
-+		perf_test_setup_nested(vm, vcpus);
-+	}
-+
- 	ucall_init(vm, NULL);
- 
- 	/* Export the shared variables to the guest. */
-@@ -198,6 +212,17 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
- 	sync_global_to_guest(vm, perf_test_args);
- }
- 
-+uint64_t __weak perf_test_nested_pages(int nr_vcpus)
-+{
-+	return 0;
-+}
-+
-+void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus)
-+{
-+	pr_info("%s() not support on this architecture, skipping.\n", __func__);
-+	exit(KSFT_SKIP);
-+}
-+
- static void *vcpu_thread_main(void *data)
- {
- 	struct vcpu_thread *vcpu = data;
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c b/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
-new file mode 100644
-index 000000000000..e258524435a0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
-@@ -0,0 +1,112 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * x86_64-specific extensions to perf_test_util.c.
-+ *
-+ * Copyright (C) 2022, Google, Inc.
-+ */
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <linux/bitmap.h>
-+#include <linux/bitops.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "perf_test_util.h"
-+#include "../kvm_util_internal.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+void perf_test_l2_guest_code(uint64_t vcpu_id)
-+{
-+	perf_test_guest_code(vcpu_id);
-+	vmcall();
-+}
-+
-+extern char perf_test_l2_guest_entry[];
-+__asm__(
-+"perf_test_l2_guest_entry:"
-+"	mov (%rsp), %rdi;"
-+"	call perf_test_l2_guest_code;"
-+"	ud2;"
-+);
-+
-+static void perf_test_l1_guest_code(struct vmx_pages *vmx, uint64_t vcpu_id)
-+{
-+#define L2_GUEST_STACK_SIZE 64
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	unsigned long *rsp;
-+
-+	GUEST_ASSERT(vmx->vmcs_gpa);
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx));
-+	GUEST_ASSERT(load_vmcs(vmx));
-+	GUEST_ASSERT(ept_1g_pages_supported());
-+
-+	rsp = &l2_guest_stack[L2_GUEST_STACK_SIZE - 1];
-+	*rsp = vcpu_id;
-+	prepare_vmcs(vmx, perf_test_l2_guest_entry, rsp);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-+	GUEST_DONE();
-+}
-+
-+uint64_t perf_test_nested_pages(int nr_vcpus)
-+{
-+	/*
-+	 * 513 page tables is enough to identity-map 256 TiB of L2 with 1G
-+	 * pages and 4-level paging, plus a few pages per-vCPU for data
-+	 * structures such as the VMCS.
-+	 */
-+	return 513 + 10 * nr_vcpus;
-+}
-+
-+void perf_test_setup_ept(struct vmx_pages *vmx, struct kvm_vm *vm)
-+{
-+	uint64_t start, end;
-+
-+	prepare_eptp(vmx, vm, 0);
-+
-+	/*
-+	 * Identity map the first 4G and the test region with 1G pages so that
-+	 * KVM can shadow the EPT12 with the maximum huge page size supported
-+	 * by the backing source.
-+	 */
-+	nested_identity_map_1g(vmx, vm, 0, 0x100000000ULL);
-+
-+	start = align_down(perf_test_args.gpa, PG_SIZE_1G);
-+	end = align_up(perf_test_args.gpa + perf_test_args.size, PG_SIZE_1G);
-+	nested_identity_map_1g(vmx, vm, start, end - start);
-+}
-+
-+void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus)
-+{
-+	struct vmx_pages *vmx, *vmx0 = NULL;
-+	struct kvm_regs regs;
-+	vm_vaddr_t vmx_gva;
-+	int vcpu_id;
-+
-+	nested_vmx_check_supported();
-+
-+	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
-+		vmx = vcpu_alloc_vmx(vm, &vmx_gva);
-+
-+		if (vcpu_id == 0) {
-+			perf_test_setup_ept(vmx, vm);
-+			vmx0 = vmx;
-+		} else {
-+			/* Share the same EPT table across all vCPUs. */
-+			vmx->eptp = vmx0->eptp;
-+			vmx->eptp_hva = vmx0->eptp_hva;
-+			vmx->eptp_gpa = vmx0->eptp_gpa;
-+		}
-+
-+		/*
-+		 * Override the vCPU to run perf_test_l1_guest_code() which will
-+		 * bounce it into L2 before calling perf_test_guest_code().
-+		 */
-+		vcpu_regs_get(vm, vcpu_id, &regs);
-+		regs.rip = (unsigned long) perf_test_l1_guest_code;
-+		vcpu_regs_set(vm, vcpu_id, &regs);
-+		vcpu_args_set(vm, vcpu_id, 2, vmx_gva, vcpu_id);
-+	}
-+}
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-index 5bf169179455..b77a01d0a271 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-@@ -203,6 +203,11 @@ static bool ept_vpid_cap_supported(uint64_t mask)
- 	return rdmsr(MSR_IA32_VMX_EPT_VPID_CAP) & mask;
- }
- 
-+bool ept_1g_pages_supported(void)
-+{
-+	return ept_vpid_cap_supported(VMX_EPT_VPID_CAP_1G_PAGES);
-+}
-+
- /*
-  * Initialize the control fields to the most basic settings possible.
-  */
-@@ -439,6 +444,9 @@ void __nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
- 	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
- 		    "unknown or unsupported guest mode, mode: 0x%x", vm->mode);
- 
-+	TEST_ASSERT((nested_paddr >> 48) == 0,
-+		    "Nested physical address 0x%lx requires 5-level paging",
-+		    nested_paddr);
- 	TEST_ASSERT((nested_paddr % page_size) == 0,
- 		    "Nested physical address not on page boundary,\n"
- 		    "  nested_paddr: 0x%lx page_size: 0x%lx",
-@@ -547,6 +555,13 @@ void nested_map_memslot(struct vmx_pages *vmx, struct kvm_vm *vm,
- 	}
- }
- 
-+/* Identity map a region with 1GiB Pages. */
-+void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
-+			    uint64_t addr, uint64_t size)
-+{
-+	__nested_map(vmx, vm, addr, addr, size, PG_LEVEL_1G);
-+}
-+
- void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
- 		  uint32_t eptp_memslot)
- {
 -- 
 2.36.1.124.g0e6072fb45-goog
 
