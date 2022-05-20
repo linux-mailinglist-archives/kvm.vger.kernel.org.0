@@ -2,163 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA62A52F0D0
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 18:37:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED55C52F128
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 18:57:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351663AbiETQhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 12:37:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36478 "EHLO
+        id S1351949AbiETQ5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 12:57:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235754AbiETQhG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 12:37:06 -0400
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC0A8387B3;
-        Fri, 20 May 2022 09:37:03 -0700 (PDT)
+        with ESMTP id S1351933AbiETQ5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 12:57:16 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B7D14A246
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 09:57:15 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id i1so7841233plg.7
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 09:57:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=JY4A6xv4nS9LZ51NJpN/owFDD24ycphxEf09kh6TztY=;
-  b=gSEReqYDO1m/zB9EejV8qw6w5Rr8rJtxx2vBISyzNJIdeEp3WiiAlpzi
-   IjleG3XXlW8sfVMlRJortc2Nj2dOt58jjmT39c6/n1ZqI7pEL8L7hSv5L
-   BAf26dVn9FlozDXMHuz0CnrJTEV6RwhkOqKHXoYbt7sgANxzLIPIfv1eJ
-   U=;
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="5.91,239,1647298800"; 
-   d="scan'208";a="37390969"
-Received: from 245.122.68.85.rev.sfr.net (HELO hadrien) ([85.68.122.245])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2022 18:37:01 +0200
-Date:   Fri, 20 May 2022 18:37:01 +0200 (CEST)
-From:   Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To:     Gautam Dawar <gautam.dawar@xilinx.com>
-cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        kbuild-all@lists.01.org
-Subject: [mst-vhost:vhost 26/43] drivers/vhost/vdpa.c:1003:3-9: preceding
- lock on line 991 (fwd)
-Message-ID: <alpine.DEB.2.22.394.2205201835450.2929@hadrien>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6SpNaB2y1Al28S6NM7uzx+ecVRdfZl8NU3/XOGW88bQ=;
+        b=FlSBAkr4ofMj/1FfrjZdKJHGWxG5It1GsGUnToRA0ztAQWucRqPq4eJCdV9rBICATG
+         p22NWsd07otLxl9qy0pg3FlOUwx8PnAG1t198y4QkGLfPzgimEVAMvWu2HQG70OGWgdS
+         rWLo2Ju0uuDXL89mk3bvO92g5uE8YJGwBQ3Q4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6SpNaB2y1Al28S6NM7uzx+ecVRdfZl8NU3/XOGW88bQ=;
+        b=AUPmW9QD7wcFUjXzkDTKzNE0Dl8KvYyqLOh90ASxBGilEub/7uF+KV/QnFbQGaiMc7
+         wOu5nNydojMOgXFXttw9hV25CVxkyVkZP+64HRBZYhRYh7eyvjKlujd07vr+liNjZW9o
+         7KcBL4P3g1ZmHpbJohZSmC0yqM9nUuwvt7p+q+7M7q6LP6vIlz0ZKFRxVMiT2TcHhLiV
+         OO3y2FclLf1TDTde83L72NgX4Outa+phIGAmdc1i0arJ/5lRTEJH9FoGQAYBBqrV+0GO
+         F0qlDQAJab5niWscQBlZZTCZk7/5OPO+cKzrfB5crqcCT+iofa/WeC9QSf0HNiimnhVv
+         c9qw==
+X-Gm-Message-State: AOAM532Ol5dysLfiRbvennbMxQclDpb8gmosrX8i7+THrMot1UkrHR7F
+        WkVLXWlNd5iaq2Q6vtm9msa0fA==
+X-Google-Smtp-Source: ABdhPJxkVZRhHdGR5NDul9Khe/5JxygEEdSRxZBEPGrG33xqgtDPzhBAR+c7Iv2CIauYTn5mEid49Q==
+X-Received: by 2002:a17:90b:1a8c:b0:1dc:1c62:2c0c with SMTP id ng12-20020a17090b1a8c00b001dc1c622c0cmr12594751pjb.140.1653065834734;
+        Fri, 20 May 2022 09:57:14 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id e21-20020aa79815000000b005104c6d7941sm2060007pfl.31.2022.05.20.09.57.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 May 2022 09:57:14 -0700 (PDT)
+From:   Kees Cook <keescook@chromium.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH] KVM: x86/emulator: Bounds check reg nr against reg array size
+Date:   Fri, 20 May 2022 09:57:04 -0700
+Message-Id: <20220520165705.2140042-1-keescook@chromium.org>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1901; h=from:subject; bh=JJuMLpa4bRxd+XIVXJHSB00fFvogB4eo+vqKcUS+E5c=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBih8hg9y6m79FVwywHWrIpyRZj+n8gfvE1kdQ4vttq CxUDwHGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYofIYAAKCRCJcvTf3G3AJtHhEA CJetvbOuFyM9hM1wpAXtchIPly9FkjVoOpZjYYW1QuSIQo44/BvNeHZFgtxmVE3BGchr2akYhClwI1 nTy/7bc8Z/i6DFUm6mF0VpTt0Sj32XouSRJb8goy+KJNCO9mn0AaJFfOLkDysFXw98ov7nAl3TrICA 7wXEzs7MPwStZ+Eg3Fod2/LmHSNCyPjgVwguQAPJY2y820fqEWhr58sH6d/hQeSqRZ9/V3N+NM9+Z8 wVEOxxBwVUkzqYUYEq4BavHyE2qUfMpCEUgu9ijb/b+x9/ekkWVFb6/nIQ+KDMKc9bFrAFjJbUrqFp 4XsOUjfjJQXz04M1TibNo0mCM22Ph10iUFlXxYIMpa6kcHkVAnGDU6H2tiGst+/H7j9LjL6+sLFoHE f6uBS262o12sISPjZJP4MzsnmMbJAmoqtpEU/Ws/bIf3VDoB0HLdd7MVOLGk5FH20k+RnLy/GDR2bm zNkBmURh2qIWVrUtbWyNZaM3mpVWY0LQGcUfBYKzRMgPFwl92+nyVeptwm6yaVjTndDHqE7aPBxpVz oW+pJ2XsLw+/GHfLO46BNH9VH3hMBmsDZBcNjriHMERtI97JI6UO/RowyS22w48uZwAu7+nYUlWum7 v0TUYX74ldqPWaE9gjBI2b+XcHC9ERv93e/aHHQ7TvsfTV22SA5aqoQy1mlw==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please check whether an unlock is needed before line 1003.
+GCC 12 sees that it might be possible for "nr" to be outside the _regs
+array. Add explicit bounds checking.
 
-julia
+In function 'reg_read',
+    inlined from 'reg_rmw' at ../arch/x86/kvm/emulate.c:266:2:
+../arch/x86/kvm/emulate.c:254:27: warning: array subscript 32 is above array bounds of 'long unsigned int[17]' [-Warray-bounds]
+  254 |         return ctxt->_regs[nr];
+      |                ~~~~~~~~~~~^~~~
+In file included from ../arch/x86/kvm/emulate.c:23:
+../arch/x86/kvm/kvm_emulate.h: In function 'reg_rmw':
+../arch/x86/kvm/kvm_emulate.h:366:23: note: while referencing '_regs'
+  366 |         unsigned long _regs[NR_VCPU_REGS];
+      |                       ^~~~~
 
----------- Forwarded message ----------
-Date: Fri, 20 May 2022 17:35:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: kbuild@lists.01.org
-Cc: lkp@intel.com, Julia Lawall <julia.lawall@lip6.fr>
-Subject: [mst-vhost:vhost 26/43] drivers/vhost/vdpa.c:1003:3-9: preceding lock
-    on line 991
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: x86@kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ arch/x86/kvm/emulate.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-CC: kbuild-all@lists.01.org
-BCC: lkp@intel.com
-CC: kvm@vger.kernel.org
-CC: virtualization@lists.linux-foundation.org
-CC: netdev@vger.kernel.org
-TO: Gautam Dawar <gautam.dawar@xilinx.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Jason Wang <jasowang@redhat.com>
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-head:   73211bf1bc3ac0a3c544225e270401c1fe5d395d
-commit: a1468175bb17ca5e477147de5d886e7a22d93527 [26/43] vhost-vdpa: support ASID based IOTLB API
-:::::: branch date: 10 hours ago
-:::::: commit date: 10 hours ago
-config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20220520/202205201721.rGqusahl-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 11.3.0
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Julia Lawall <julia.lawall@lip6.fr>
-
-
-cocci warnings: (new ones prefixed by >>)
->> drivers/vhost/vdpa.c:1003:3-9: preceding lock on line 991
-   drivers/vhost/vdpa.c:1016:2-8: preceding lock on line 991
-
-vim +1003 drivers/vhost/vdpa.c
-
-4c8cf31885f69e Tiwei Bie    2020-03-26   980
-0f05062453fb51 Gautam Dawar 2022-03-30   981  static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u32 asid,
-4c8cf31885f69e Tiwei Bie    2020-03-26   982  					struct vhost_iotlb_msg *msg)
-4c8cf31885f69e Tiwei Bie    2020-03-26   983  {
-4c8cf31885f69e Tiwei Bie    2020-03-26   984  	struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
-25abc060d28213 Jason Wang   2020-08-04   985  	struct vdpa_device *vdpa = v->vdpa;
-25abc060d28213 Jason Wang   2020-08-04   986  	const struct vdpa_config_ops *ops = vdpa->config;
-a1468175bb17ca Gautam Dawar 2022-03-30   987  	struct vhost_iotlb *iotlb = NULL;
-a1468175bb17ca Gautam Dawar 2022-03-30   988  	struct vhost_vdpa_as *as = NULL;
-4c8cf31885f69e Tiwei Bie    2020-03-26   989  	int r = 0;
-4c8cf31885f69e Tiwei Bie    2020-03-26   990
-a9d064524fc3cf Xie Yongji   2021-04-12  @991  	mutex_lock(&dev->mutex);
-a9d064524fc3cf Xie Yongji   2021-04-12   992
-4c8cf31885f69e Tiwei Bie    2020-03-26   993  	r = vhost_dev_check_owner(dev);
-4c8cf31885f69e Tiwei Bie    2020-03-26   994  	if (r)
-a9d064524fc3cf Xie Yongji   2021-04-12   995  		goto unlock;
-4c8cf31885f69e Tiwei Bie    2020-03-26   996
-a1468175bb17ca Gautam Dawar 2022-03-30   997  	if (msg->type == VHOST_IOTLB_UPDATE ||
-a1468175bb17ca Gautam Dawar 2022-03-30   998  	    msg->type == VHOST_IOTLB_BATCH_BEGIN) {
-a1468175bb17ca Gautam Dawar 2022-03-30   999  		as = vhost_vdpa_find_alloc_as(v, asid);
-a1468175bb17ca Gautam Dawar 2022-03-30  1000  		if (!as) {
-a1468175bb17ca Gautam Dawar 2022-03-30  1001  			dev_err(&v->dev, "can't find and alloc asid %d\n",
-a1468175bb17ca Gautam Dawar 2022-03-30  1002  				asid);
-a1468175bb17ca Gautam Dawar 2022-03-30 @1003  			return -EINVAL;
-a1468175bb17ca Gautam Dawar 2022-03-30  1004  		}
-a1468175bb17ca Gautam Dawar 2022-03-30  1005  		iotlb = &as->iotlb;
-a1468175bb17ca Gautam Dawar 2022-03-30  1006  	} else
-a1468175bb17ca Gautam Dawar 2022-03-30  1007  		iotlb = asid_to_iotlb(v, asid);
-a1468175bb17ca Gautam Dawar 2022-03-30  1008
-a1468175bb17ca Gautam Dawar 2022-03-30  1009  	if ((v->in_batch && v->batch_asid != asid) || !iotlb) {
-a1468175bb17ca Gautam Dawar 2022-03-30  1010  		if (v->in_batch && v->batch_asid != asid) {
-a1468175bb17ca Gautam Dawar 2022-03-30  1011  			dev_info(&v->dev, "batch id %d asid %d\n",
-a1468175bb17ca Gautam Dawar 2022-03-30  1012  				 v->batch_asid, asid);
-a1468175bb17ca Gautam Dawar 2022-03-30  1013  		}
-a1468175bb17ca Gautam Dawar 2022-03-30  1014  		if (!iotlb)
-a1468175bb17ca Gautam Dawar 2022-03-30  1015  			dev_err(&v->dev, "no iotlb for asid %d\n", asid);
-a1468175bb17ca Gautam Dawar 2022-03-30  1016  		return -EINVAL;
-a1468175bb17ca Gautam Dawar 2022-03-30  1017  	}
-a1468175bb17ca Gautam Dawar 2022-03-30  1018
-4c8cf31885f69e Tiwei Bie    2020-03-26  1019  	switch (msg->type) {
-4c8cf31885f69e Tiwei Bie    2020-03-26  1020  	case VHOST_IOTLB_UPDATE:
-3111cb7283065a Gautam Dawar 2022-03-30  1021  		r = vhost_vdpa_process_iotlb_update(v, iotlb, msg);
-4c8cf31885f69e Tiwei Bie    2020-03-26  1022  		break;
-4c8cf31885f69e Tiwei Bie    2020-03-26  1023  	case VHOST_IOTLB_INVALIDATE:
-3111cb7283065a Gautam Dawar 2022-03-30  1024  		vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
-4c8cf31885f69e Tiwei Bie    2020-03-26  1025  		break;
-25abc060d28213 Jason Wang   2020-08-04  1026  	case VHOST_IOTLB_BATCH_BEGIN:
-a1468175bb17ca Gautam Dawar 2022-03-30  1027  		v->batch_asid = asid;
-25abc060d28213 Jason Wang   2020-08-04  1028  		v->in_batch = true;
-25abc060d28213 Jason Wang   2020-08-04  1029  		break;
-25abc060d28213 Jason Wang   2020-08-04  1030  	case VHOST_IOTLB_BATCH_END:
-25abc060d28213 Jason Wang   2020-08-04  1031  		if (v->in_batch && ops->set_map)
-a1468175bb17ca Gautam Dawar 2022-03-30  1032  			ops->set_map(vdpa, asid, iotlb);
-25abc060d28213 Jason Wang   2020-08-04  1033  		v->in_batch = false;
-a1468175bb17ca Gautam Dawar 2022-03-30  1034  		if (!iotlb->nmaps)
-a1468175bb17ca Gautam Dawar 2022-03-30  1035  			vhost_vdpa_remove_as(v, asid);
-25abc060d28213 Jason Wang   2020-08-04  1036  		break;
-4c8cf31885f69e Tiwei Bie    2020-03-26  1037  	default:
-4c8cf31885f69e Tiwei Bie    2020-03-26  1038  		r = -EINVAL;
-4c8cf31885f69e Tiwei Bie    2020-03-26  1039  		break;
-4c8cf31885f69e Tiwei Bie    2020-03-26  1040  	}
-a9d064524fc3cf Xie Yongji   2021-04-12  1041  unlock:
-a9d064524fc3cf Xie Yongji   2021-04-12  1042  	mutex_unlock(&dev->mutex);
-4c8cf31885f69e Tiwei Bie    2020-03-26  1043
-4c8cf31885f69e Tiwei Bie    2020-03-26  1044  	return r;
-4c8cf31885f69e Tiwei Bie    2020-03-26  1045  }
-4c8cf31885f69e Tiwei Bie    2020-03-26  1046
-
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 89b11e7dca8a..fbcbc012a3ae 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -247,6 +247,8 @@ enum x86_transfer_type {
+ 
+ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
+ {
++	if (WARN_ON(nr >= ARRAY_SIZE(ctxt->_regs)))
++		return 0;
+ 	if (!(ctxt->regs_valid & (1 << nr))) {
+ 		ctxt->regs_valid |= 1 << nr;
+ 		ctxt->_regs[nr] = ctxt->ops->read_gpr(ctxt, nr);
+@@ -256,6 +258,8 @@ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
+ 
+ static ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned nr)
+ {
++	if (WARN_ON(nr >= ARRAY_SIZE(ctxt->_regs)))
++		return 0;
+ 	ctxt->regs_valid |= 1 << nr;
+ 	ctxt->regs_dirty |= 1 << nr;
+ 	return &ctxt->_regs[nr];
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.32.0
+
