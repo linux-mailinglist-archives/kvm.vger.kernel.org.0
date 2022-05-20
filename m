@@ -2,57 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A3BA52EE15
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:25:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6421552EE18
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:25:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350238AbiETOZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 10:25:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60122 "EHLO
+        id S1350269AbiETOZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 10:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239775AbiETOZT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 10:25:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ECF5A169E0B
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 07:25:18 -0700 (PDT)
+        with ESMTP id S1350263AbiETOZu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 10:25:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 278F213E24
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 07:25:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653056718;
+        s=mimecast20190719; t=1653056748;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
         bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=V9vsLq2ZHv3itlaQMq3Wv5e6vyd87qnHUS2fKQvj7K/PAo64aeXzpOQZ8nK7/rgZqusQ0s
-        vyMOtRvZ5kz5B+wvo54VUg122eiDiLKw3H6eWBkotFdweRmBUEMlxPn/tTnxoM/hb5t8nF
-        RzwDDwad4kKBYVW86R54cPof8wcFHyM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        b=bW66nGQ/ay30wcSAa8NBt3GpZGifVJUkbBs+NV8PO5Fr68XNHsaoYwrfeDK1IPdNFaj5xz
+        jtnwJDXz0Gd4zOmlWp5w4hIUviN0AzGVbxrmkzxBOkUPAKbjJfli//WglNb4X4qyA07fCN
+        F3t2Ubo76v5Oa/+PmLG+dKMTdinWRDo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-452-OqMw7BtCPaC4PmshjPNdmw-1; Fri, 20 May 2022 10:25:16 -0400
-X-MC-Unique: OqMw7BtCPaC4PmshjPNdmw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-391-0PtWeGl-PVeo4WJC3z5LJQ-1; Fri, 20 May 2022 10:25:45 -0400
+X-MC-Unique: 0PtWeGl-PVeo4WJC3z5LJQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0E14811E78;
-        Fri, 20 May 2022 14:25:15 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 535763C1E323;
+        Fri, 20 May 2022 14:25:44 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 37BF37B7C;
-        Fri, 20 May 2022 14:25:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 09E38C50941;
+        Fri, 20 May 2022 14:25:43 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com
-Subject: Re: [PATCH v2] KVM: x86/pmu: Don't pre-set the pmu->global_ctrl when refreshing
-Date:   Fri, 20 May 2022 10:25:13 -0400
-Message-Id: <20220520142513.3331358-1-pbonzini@redhat.com>
-In-Reply-To: <20220510044407.26445-1-likexu@tencent.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     linux-doc@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Suresh Warrier <warrier@linux.vnet.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND] KVM: powerpc: remove extraneous asterisk from rm_host_ipi_action comment
+Date:   Fri, 20 May 2022 10:25:41 -0400
+Message-Id: <20220520142541.3331516-1-pbonzini@redhat.com>
+In-Reply-To: <20220506070747.16309-1-bagasdotme@gmail.com>
 References: 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
