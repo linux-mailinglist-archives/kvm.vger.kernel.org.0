@@ -2,52 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57FC752F1BE
+	by mail.lfdr.de (Postfix) with ESMTP id F26DC52F1C0
 	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 19:37:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352204AbiETRgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 13:36:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34656 "EHLO
+        id S1352261AbiETRgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 13:36:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237137AbiETRgm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 13:36:42 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36B180221
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:41 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id 15-20020aa7920f000000b0050cf449957fso4552757pfo.9
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:41 -0700 (PDT)
+        with ESMTP id S1352248AbiETRgq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 13:36:46 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C787D819AC
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:44 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id g63-20020a636b42000000b003db2a3daf30so4428387pgc.22
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=q1W2cETP/PGdc7K+yjcpeKM7X2tKBthgwgAGxzabNqs=;
-        b=UNt4LfacHhwGIVlzBUK8F/EHU9DoBgtCrQ+UEjs5gHkjWgGIxeShapzPo2rynDg/4y
-         U4pP6c/t4WmNK8dMnS708bxJbJOKXnCRp4hKBCHtUdt0oqEhhc54jfKnBkd+sfZMRY3U
-         75kpDk9eGGxf2ray3O6WCQemAa+3lnEQKv8Et4yY+YIdf4FCRDwoS2CPalOsRjlhKFq/
-         Vy82Hv7uj/mifoRq8Lc8PyLSjWanGYT/I0nDtq+286OwDcjImHLoL44KUU463+fl+S9d
-         FDTqzGIBdLUOlcNMDp4zLQQ9P+TfXJxjjv4PypmiptSwM/sDIDTrbXvspuxJpdGnLOXm
-         y/WQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=GdWBZFDhJiVgrbjToTXhMKwWYC+jS0aqPfp6IBtPjQU=;
+        b=MeXm4aLrzF/JggIkcCr1PvoEpV6DMd8bww6676h5oDd2dcsV8p3zOG5LystUOsuCGl
+         +PK5X74pQ7RrY9thlR1anCQ1iKunPHuXh6p0LSoV6fQXAFirPznf/6vTI+vZblqAN83Z
+         UXkgTosFoxaddqiKXxYXfvgF9tZWkISLTJGGY/PZw9wI3nMByRT4Ls0s40EPdTKBTf6f
+         +ur9xWSNfb7kk8gwo5lwWQLLiu8AzQAyXBaLpMnUfybCi74VQ84/z1G9y1E8YR2IRI/E
+         ULn5dYSsQJj8N2iisfxOD6wdcS2AbCWy0rs0JMMwM3qMMsT6Jhw9utNdoyS2foJHH862
+         Bwvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=q1W2cETP/PGdc7K+yjcpeKM7X2tKBthgwgAGxzabNqs=;
-        b=2UhklrmsZNf1O/+eNFd2HLgmNYy23dnvtNU1LMqCOH6nfdy8lndVWNP3hmSsfO9z6u
-         ebUDjf0TORZjDEs3tR3/2/RWYWUZI5TnKoeq/Dyf6fSE0vwTW0+27HVCR18i06iOTx92
-         Ph+jrdtbyfwVEMMSsynNx09H/PvrEMZWr/i7HwMS8g/+evVFAvr2srjPjaYwzrgwdxny
-         ZG9zUbsp0qiCI2z8BzUiVuSl/tUgxLbRaK3ZfXLJ/JcoPSpCNalIlozKq0VUUKJvRj/a
-         u/OT/Qcko8YJIj5O+IYLB/UnnFl23bkri9ZzmB2qgX2rVq/GST/rDejtaWY/Y/VVax51
-         yJHw==
-X-Gm-Message-State: AOAM531T+4Go3/RtI0xkmslhlO48AXeCiCOmttE+LrLeyi7k7fKluPiy
-        2QutzBeVp7RFLoTjV7SfO5Kwsdlb
-X-Google-Smtp-Source: ABdhPJxQ/A+52gSrgfpxwfVjkjdQqN1sZinII0MTLgwd0/hYy6Cbe6bldq92AGo4jA1+4iBrtdSRlvTW
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=GdWBZFDhJiVgrbjToTXhMKwWYC+jS0aqPfp6IBtPjQU=;
+        b=bNmVACf4ytJmGYswvgM3zmyBiPwNCjiaQexc0+/UH0BlrCuRjR42AqG6DAfhZ1GgAN
+         rv2J+ZxsWCHW+IBTGjzqx2uunCq4tawN89QJk9r0JfhwoAKIE0tLJmLbnpg3AodutU6m
+         9oAMwh9IVYOiy/BsBso58WKt8zAbUNezrw5yoJU1F1i7rYnjdvOAwcu6+iDodLfgI1wU
+         AMjthwBnHgUGFX+bnVqENSS65t0RG7U194ZgoU9FEcJCaUUdQJ18np/xUOwtKzYPKmrt
+         J+d8qxFCP3zSG74KDgFhs2Lr3/fJnQhp21bfZBt0mw2ZN5VNt9/ygrwQPV4GDcoNKoHY
+         P/Tw==
+X-Gm-Message-State: AOAM533tyj6yeLJpyk/pDUis77LS5jl4YNSMofLkeXlrzixMzOrCp2/c
+        M/NRw8lzv/ZptmnhUxHTHRfCeJSD
+X-Google-Smtp-Source: ABdhPJwNVlkpJ/TPfKNggxiFy6ka3cDtK7QG8lj+hLMU3nOs4j8N8YMHpgHu7wabKnt8E4PztWXcDYsQ
 X-Received: from juew-desktop.sea.corp.google.com ([2620:15c:100:202:4c5:ddc5:8182:560f])
- (user=juew job=sendgmr) by 2002:a63:ec54:0:b0:3c6:aa29:15fe with SMTP id
- r20-20020a63ec54000000b003c6aa2915femr9281469pgj.552.1653068201374; Fri, 20
- May 2022 10:36:41 -0700 (PDT)
-Date:   Fri, 20 May 2022 10:36:30 -0700
-Message-Id: <20220520173638.94324-1-juew@google.com>
+ (user=juew job=sendgmr) by 2002:a05:6a00:1393:b0:518:68fe:f036 with SMTP id
+ t19-20020a056a00139300b0051868fef036mr5258388pfg.54.1653068204233; Fri, 20
+ May 2022 10:36:44 -0700 (PDT)
+Date:   Fri, 20 May 2022 10:36:31 -0700
+In-Reply-To: <20220520173638.94324-1-juew@google.com>
+Message-Id: <20220520173638.94324-2-juew@google.com>
 Mime-Version: 1.0
+References: <20220520173638.94324-1-juew@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH v4 0/8] KVM: x86: Add CMCI and UCNA emulation
+Subject: [PATCH v4 1/8] KVM: x86: Make APIC_VERSION capture only the magic 0x14UL.
 From:   Jue Wang <juew@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -70,91 +74,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series implement emulation for Corrected Machine Check
-Interrupt (CMCI) signaling and UnCorrectable No Action required (UCNA)
-error injection.
+To implement Corrected Machine Check Interrupt (CMCI) as another
+LVT vector, the APIC LVT logic needs to be able to handle an additional
+LVT vector conditioned on whether MCG_CMCI_P is enabled on the vCPU,
+this is because CMCI signaling can only be enabled when the CPU's
+MCG_CMCI_P bit is set (Intel SDM, section 15.3.1.1).
 
-UCNA errors signaled via CMCI allow a guest to be notified as soon as
-uncorrectable memory errors get detected by some background threads,
-e.g., threads that migrate guest memory across hosts or threads that
-constantly scan system memory for errors [1].
+This patch factors out the dependency on KVM_APIC_LVT_NUM from the
+APIC_VERSION macro. In later patches, KVM_APIC_LVT_NUM will be replaced
+with a helper kvm_apic_get_nr_lvt_entries that reports different LVT
+number conditioned on whether MCG_CMCI_P is enabled on the vCPU.
 
-Upon receiving UCNAs, guest kernel isolates the poisoned pages which may
-still be free, preventing future accesses that may cause fatal MCEs.
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jue Wang <juew@google.com>
+---
+ arch/x86/kvm/lapic.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-1. https://lore.kernel.org/linux-mm/8eceffc0-01e8-2a55-6eb9-b26faa9e3caf@intel.com/t/
-
-
-Patch 1-3 clean up KVM APIC LVT logic in preparation to adding APIC_LVTCMCI.
-
-Patch 4 adds CMCI emulation to lapic.
-
-Patch 5 updates the allocation of mce_banks to use array allocation api.
-
-Patch 6 adds emulation for MSR_IA32_MCx_CTL2 registers that provide per
-bank control of CMCI signaling.
-
-Patch 7 enables MCG_CMCI_P by default and handles injected UCNA errors.
-
-Patch 8 adds a KVM self test that exercises UCNA injection.
-
-v4 changes
-- Incorporate feedback from David Matlack <dmatlack@google.com>
-- Rewrite the change logs to be more descriptive.
-- Add a KVM self test.
-
-v3 changes
-- Incorporate feedback from Sean Christopherson <seanjc@google.com>
-- Split clean up to KVM APIC LVT logic to 3 patches.
-- Put the clean up of mce_array allocation in a separate patch.
-- Base the MCi_CTL2 register emulation on Sean's clean up and fix
-series [2]
-- Fix bugs around MCi_CTL2 register offset validation and the free of
-mci_ctl2_banks array.
-- Rewrite the change log with more details in architectural information
-about CMCI, UCNA and MCG_CMCI_P.
-- Fix various comments and wrapping style.
-
-2. https://lore.kernel.org/lkml/20220512222716.4112548-1-seanjc@google.com/T/
-
-
-v2 chanegs
-- Incorporate feedback from Sean Christopherson <seanjc@google.com>
-- Split the single patch into 4:
-  1). clean up KVM APIC LVT logic
-  2). add CMCI emulation to lapic
-  3). add emulation of MSR_IA32_MCx_CTL2
-  4). enable MCG_CMCI_P and handle injected UCNAs
-- Fix various style issues.
-
-Jue Wang (8):
-  KVM: x86: Make APIC_VERSION capture only the magic 0x14UL.
-  KVM: x86: Fill apic_lvt_mask with enums / explicit entries.
-  KVM: x86: Add APIC_LVTx() macro.
-  KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to
-    lapic.
-  KVM: x86: Use kcalloc to allocate the mce_banks array.
-  KVM: x86: Add emulation for MSR_IA32_MCx_CTL2 MSRs.
-  KVM: x86: Enable CMCI capability by default and handle injected UCNA
-    errors
-  KVM: x86: Add a self test for UCNA injection.
-
- arch/x86/include/asm/kvm_host.h               |   1 +
- arch/x86/kvm/lapic.c                          |  58 +++-
- arch/x86/kvm/lapic.h                          |  15 +-
- arch/x86/kvm/vmx/vmx.c                        |   1 +
- arch/x86/kvm/x86.c                            | 182 ++++++++---
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/apic.h       |   1 +
- .../selftests/kvm/include/x86_64/mce.h        |  25 ++
- .../selftests/kvm/include/x86_64/processor.h  |   1 +
- .../selftests/kvm/lib/x86_64/processor.c      |   2 +-
- .../kvm/x86_64/ucna_injection_test.c          | 287 ++++++++++++++++++
- 12 files changed, 517 insertions(+), 58 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/mce.h
- create mode 100644 tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 66b0eb0bda94..a5caa77e279f 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -54,7 +54,7 @@
+ #define PRIo64 "o"
+ 
+ /* 14 is the version for Xeon and Pentium 8.4.8*/
+-#define APIC_VERSION			(0x14UL | ((KVM_APIC_LVT_NUM - 1) << 16))
++#define APIC_VERSION			0x14UL
+ #define LAPIC_MMIO_LENGTH		(1 << 12)
+ /* followed define is not in apicdef.h */
+ #define MAX_APIC_VECTOR			256
+@@ -401,7 +401,7 @@ static inline int apic_lvt_nmi_mode(u32 lvt_val)
+ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+-	u32 v = APIC_VERSION;
++	u32 v = APIC_VERSION | ((KVM_APIC_LVT_NUM - 1) << 16);
+ 
+ 	if (!lapic_in_kernel(vcpu))
+ 		return;
 -- 
 2.36.1.124.g0e6072fb45-goog
 
