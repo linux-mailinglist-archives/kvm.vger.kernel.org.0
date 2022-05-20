@@ -2,53 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2C3152EB5C
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 14:00:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2FF252EB62
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 14:00:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348820AbiETMAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 08:00:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
+        id S1348873AbiETMAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 08:00:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243571AbiETMAV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 08:00:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AFEDC3EBA4
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 05:00:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653048017;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=605A85MV8zA5Tmbn3R+kznNXMiIuQQdRxWs90LDiRko=;
-        b=YQiORPRGUl8yHDy6Cc2bxxVmyVc+/1+XEPVIN2ZkcqEGVogNuTYYvvggmOcc/QTc/cjM/k
-        R4/XRlpemmyoxGePs8r/ABT5Nko0a1P5KC9jvq+E2bfSMjQ5qpoFzkvxU5GLFschK7mWcy
-        ODo6+nz/raIyHI30t+96Q9mtF3betSI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-413-yhoQ07uhNDSq52_IpxLa3w-1; Fri, 20 May 2022 08:00:14 -0400
-X-MC-Unique: yhoQ07uhNDSq52_IpxLa3w-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S1348855AbiETMAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 08:00:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 325183ED28
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 05:00:39 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 37B7B3C0218E;
-        Fri, 20 May 2022 12:00:14 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D9323403152;
-        Fri, 20 May 2022 12:00:13 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     likexu@tencent.com
-Subject: [PATCH] KVM: x86/pmu: remove useless prototype
-Date:   Fri, 20 May 2022 08:00:13 -0400
-Message-Id: <20220520120013.3312909-1-pbonzini@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C3EAD61E16
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 12:00:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB670C385A9;
+        Fri, 20 May 2022 12:00:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653048038;
+        bh=Scz4kC4NvraS6veC/zLWgf2acAax2Vcwh4OHRl50J1E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WIdn/I3veJNvab0brCv2TRj3VbbrX+3kSUT7O7XNA1eCPNBuREyIUvuOm+Q//NIzS
+         yMc/CvhK7ItiIgbKedStpGKyUHxuFSALDvi2VVes2wuglTN+LOAEE6Z9rZBKAdwwrf
+         ZzJURU+rHZzS/PjLfR5WJGR/KW8VZe9SdmTEVmBEQVM7XAvJbFtwGPgG8S7x/JmxsM
+         H5bCeZqrykXgzyT0Wf+HOdQdCoUOfpRkSqamgLfLf2IcHUCPIjYBHfhh1/EggOnAW2
+         6E6a8Zpp5SHzvSeeuYOu2/eqI9zm4xDWhoBQEn4P0WfimTi9+FcJ+Burzj28UcLy+n
+         b/4/nREQbqAig==
+Date:   Fri, 20 May 2022 13:00:32 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+Message-ID: <20220520120032.GB6700@willie-the-truck>
+References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
+ <3521de8b-3163-7ff0-a823-5d4ec96a2ae5@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3521de8b-3163-7ff0-a823-5d4ec96a2ae5@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -56,23 +58,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/pmu.h | 1 -
- 1 file changed, 1 deletion(-)
+On Fri, May 20, 2022 at 12:02:23PM +0100, Robin Murphy wrote:
+> On 2022-05-10 17:55, Jason Gunthorpe via iommu wrote:
+> > This control causes the ARM SMMU drivers to choose a stage 2
+> > implementation for the IO pagetable (vs the stage 1 usual default),
+> > however this choice has no visible impact to the VFIO user.
+> 
+> Oh, I should have read more carefully... this isn't entirely true. Stage 2
+> has a different permission model from stage 1, so although it's arguably
+> undocumented behaviour, VFIO users that know enough about the underlying
+> system could use this to get write-only mappings if they so wish.
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 0bce361f72b8..4e9785d3dc70 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -196,7 +196,6 @@ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
- void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
- int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
- void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id);
--void kvm_init_pmu_capability(void);
- 
- bool is_vmware_backdoor_pmc(u32 pmc_idx);
- 
--- 
-2.31.1
+There's also an impact on combining memory attributes, but it's not hugely
+clear how that impacts userspace via things like VFIO_DMA_CC_IOMMU.
 
+> There may potentially also be visible differences in translation performance
+> between stages, although I imagine that's firmly over in the niche of things
+> that users might look at for system validation purposes, rather than for
+> practical usefulness.
+> 
+> > Further qemu
+> > never implemented this and no other userspace user is known.
+> > 
+> > The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
+> > new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
+> > SMMU translation services to the guest operating system" however the rest
+> > of the API to set the guest table pointer for the stage 1 was never
+> > completed, or at least never upstreamed, rendering this part useless dead
+> > code.
+> > 
+> > Since the current patches to enable nested translation, aka userspace page
+> > tables, rely on iommufd and will not use the enable_nesting()
+> > iommu_domain_op, remove this infrastructure. However, don't cut too deep
+> > into the SMMU drivers for now expecting the iommufd work to pick it up -
+> > we still need to create S2 IO page tables.
+> > 
+> > Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
+> > enable_nesting iommu_domain_op.
+> > 
+> > Just in-case there is some userspace using this continue to treat
+> > requesting it as a NOP, but do not advertise support any more.
+> 
+> This also seems a bit odd, especially given that it's not actually a no-op;
+> surely either it's supported and functional or it isn't?
+> 
+> In all honesty, I'm not personally attached to this code either way. If this
+> patch had come 5 years ago, when the interface already looked like a bit of
+> a dead end, I'd probably have agreed more readily. But now, when we're
+> possibly mere months away from implementing the functional equivalent for
+> IOMMUFD, which if done right might be able to support a trivial compat layer
+> for this anyway, I just don't see what we gain from not at least waiting to
+> see where that ends up. The given justification reads as "get rid of this
+> code that we already know we'll need to bring back in some form, and
+> half-break an unpopular VFIO ABI because it doesn't do *everything* that its
+> name might imply", which just isn't convincing me.
+
+I'm inclined to agree although we can very easily revert this patch when we
+need to bring the stuff back, it would just be a bit churny.
+
+Will
