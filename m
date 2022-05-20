@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B75FC52E0E8
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 01:53:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FE6352E16F
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 02:55:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343750AbiESXxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 19:53:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38302 "EHLO
+        id S1344168AbiETAzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 20:55:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235762AbiESXxW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 19:53:22 -0400
+        with ESMTP id S243354AbiETAzA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 20:55:00 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B571128174
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 16:53:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354C5133255
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 17:54:59 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2BFF0B82944
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 23:53:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DD1B5C34114
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 23:53:18 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E071BB82966
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 00:54:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A1D49C3411E
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 00:54:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653004398;
-        bh=5y3kG79cgm+2BWkGSkjlBs9ipPlJTH5/AhD2/3APqdg=;
+        s=k20201202; t=1653008096;
+        bh=cdQeUsfGHoSlDb/yaa0+35fQeVt9IAokOSypxgkCRbQ=;
         h=From:To:Subject:Date:From;
-        b=Ak9QLq1vFzQ4+fTyLa5zy+UqBexaSYL2bS2eFluMoOpvKBJcuAtE+Ycb849ZKCabF
-         dBxEiHyCaolN3kDuXZ+8F9HOqxZ014aHMhgmSCIsz8jV6G1MOV4MMdJWEKTlxcbWaw
-         +2Dcc3gI+OzsTwsTVMKPnz9Eo351+IxMZAjzCg4f56A1gqcUe2XeZyWSpPxNpfA8Rp
-         2aAZnt9ZUpYV+BhSkM0JBe9bf6W0N5txfS1aTzStF70db52XIUwyXqvezLbN7y+BqA
-         /qUi4RlwijqWo1w8y6DCU0o/1dx0PsEXThx8YTkrZ2UqX27O1RCgv5M8FcDFvvLEnx
-         /UT/kSttvi/xw==
+        b=QyBmqOLDKfw9sN3iXHYzMe8ZOAmjB08qZv2Wms5Vx0LHLKgvg7yHLFqlJ666X7emZ
+         95oSwQbafkiAa6zcpAWF7+AEVAl64aRV0+NzmWEG+x056wgua3M0uD4ZGx3iPjLeMF
+         NM5dI0HYvwMu9ZHbXVgLAD2By1xHGpkUZX7OUv1+oBaGkGuset5cSgak3/kJYZv81L
+         mScxyu8hpF3DZQtVLvOMqUcwiDT+a0PyaLp7XYriZkJnUts6s2GrQV8wUA2Ybw5Jaz
+         K37kTepVvUtKRSjiiNhcf74Y3AeK7hMB/0BuRilKncYbBArgNQ8b1Ta3NN6pQWlaAU
+         KsHL03IT+90Xw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C203FCC13B2; Thu, 19 May 2022 23:53:18 +0000 (UTC)
+        id 88A86C05FD5; Fri, 20 May 2022 00:54:56 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
-Subject: [Bug 216002] New: When a break point is set, nested virtualization
- sees "kvm_queue_exception: Assertion `!env->exception_has_payload' failed."
-Date:   Thu, 19 May 2022 23:53:18 +0000
+Subject: [Bug 216003] New: Single stepping Windows 7 bootloader results in
+ Assertion `ret < cpu->num_ases && ret >= 0' failed.
+Date:   Fri, 20 May 2022 00:54:56 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: new
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -54,8 +54,8 @@ X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: bug_id short_desc product version
  cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-216002-28872@https.bugzilla.kernel.org/>
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-216003-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -71,12 +71,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216002
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216003
 
-            Bug ID: 216002
-           Summary: When a break point is set, nested virtualization sees
-                    "kvm_queue_exception: Assertion
-                    `!env->exception_has_payload' failed."
+            Bug ID: 216003
+           Summary: Single stepping Windows 7 bootloader results in
+                    Assertion `ret < cpu->num_ases && ret >=3D 0' failed.
            Product: Virtualization
            Version: unspecified
     Kernel Version: 5.17.6-200.fc35.x86_64
@@ -91,63 +90,48 @@ https://bugzilla.kernel.org/show_bug.cgi?id=3D216002
           Reporter: ercli@ucdavis.edu
         Regression: No
 
-Created attachment 301001
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D301001&action=3Dedit
-Archive file that contains 1.img and 2.img
-
-One configuration that reproduces this bug:
 CPU model: Intel(R) Core(TM) i7-4510U CPU @ 2.00GHz
 Host kernel version: 5.17.6-200.fc35.x86_64
 Host kernel arch: x86_64
-Guest: I am running a microhypervisor called XMHF. It is 32-bits. I am using
-the microhypervisor to launch a nested guest OS I wrote myself, called LHV.
+Guest: Windows 7 or Windows 10 BIOS mode boot loader. 32-bits.
 This bug still exists if using -machine kernel_irqchip=3Doff
-It is impossible to test this bug with -accel tcg, because TCG does not sup=
-port
-nested virtualization.
+This bug no longer exists if using -accel tcg
 
 How to reproduce:
 
-This bug happens when the guest is debugged. So first start GDB:
-gdb --ex 'target remote :::1234' --ex 'hb *0' --ex c
-The command above will simply set a break point in the guest. The address of
-the break point (0 in this case) is arbitrary
+1. Install Windows 7 or Windows 10 in QEMU. Use MBR and BIOS (i.e. do not u=
+se
+GPT and UEFI). For example, I installed Windows on a 32G disk, and it resul=
+ts
+in around 3 partitions: 50M, 31.5G (this is C:), 450M. Only the MBR header
+(around 1 M) and the 50M disk is needed. For example,
+https://drive.google.com/uc?id=3D1mLvKsPSuLbeckwcdnavnQMu8QxOwvX29 can be u=
+sed to
+reproduce this bug. Suppose Windows is installed in w.img.
 
-Then, in another shell, run QEMU:
-qemu-system-i386 -m 512M -gdb tcp::1234 -smp 2 -cpu Haswell,vmx=3Dyes -enab=
-le-kvm
--serial stdio -drive media=3Ddisk,file=3D1.img,index=3D1 -drive
-media=3Ddisk,file=3D2.img,index=3D2
+2. Start QEMU
+qemu-system-x86_64 --drive media=3Ddisk,file=3Dw.img,format=3Draw,index=3D1=
+ -s -S
+-enable-kvm
 
-1.img and 2.img are attached as a.tar.xz in this bug report. If interested,
-1.img's source code is
-https://github.com/lxylxy123456/uberxmhf/tree/a8610d2f9e69263c014b5e48270e4=
-2690b73b85d
-. 2.img's source code is
-https://github.com/lxylxy123456/uberxmhf/tree/10afe107cbeadb1c4dbe7f9b8e41c=
-2a50c47bda5
-.
+3. Start GDB
+gdb --ex 'target remote :::1234' --ex 'hb *0x7c00' --ex c --ex 'si 10000' -=
+-ex
+q
+This GDB command starts from the MBR header and runs 10000 instructions. Wh=
+en I
+am reproducing it, running 1000 is enough to reproduce this problem. If this
+problem cannot be reproduced, try to increase this number.
 
-After running QEMU and GDB above, XMHF and LHV will print a lot of messages=
- in
-the serial port:
+4. See error in QEMU:
+qemu-system-x86_64: ../hw/core/cpu-sysemu.c:77: cpu_asidx_from_attrs: Asser=
+tion
+`ret < cpu->num_ases && ret >=3D 0' failed.
+Aborted (core dumped)
 
-...
-CPU #0: vcpu_vaddr_ptr=3D0x01e06080, esp=3D0x01e11000
-CPU #1: vcpu_vaddr_ptr=3D0x01e06540, esp=3D0x01e15000
-BSP(0x00): Rallying APs...
-BSP(0x00): APs ready, doing DRTM...
-LAPIC base and status=3D0xfee00900
-Sending INIT IPI to all APs...
-
-Then I see an assertion error:
-
-qemu-system-i386: ../target/i386/kvm/kvm.c:645: kvm_queue_exception: Assert=
-ion
-`!env->exception_has_payload' failed.
-
-Expected result: KVM should not crash. The behavior should be the same as if
-only the QEMU runs (i.e. GDB does not run)
+Expected behavior: there should not be an assertion error. GDB should be ab=
+le
+to single step a lot of instructions successfully.
 
 --=20
 You may reply to this email to add a comment.
