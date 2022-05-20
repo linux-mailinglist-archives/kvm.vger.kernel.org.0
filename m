@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A539D52F1BF
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 19:37:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B170B52F1BC
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 19:37:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352290AbiETRg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 13:36:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35378 "EHLO
+        id S1352267AbiETRhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 13:37:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352292AbiETRgw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 13:36:52 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5DB80221
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:50 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id u1-20020a17090a2b8100b001d9325a862fso4558280pjd.6
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:50 -0700 (PDT)
+        with ESMTP id S1352300AbiETRgz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 13:36:55 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021428CB3D
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:53 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 185-20020a6304c2000000b003f5d1f7f49aso4451846pge.7
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=WfQVdpk3KC0ZrKW0uOOMpSnVFPF0oApLtFRNK/IW/54=;
-        b=jl9x8sHu3l+6astnzShzJE5hVWme/+zuCxpnKR9kTiB7o9kJFwoNXZ1TDDXSAs1eik
-         dURXZJfLXxPKswZXNFfJDFwqnSXl4bMhJvSd2cHNS/1hbW1LRJFI0US0VMqMvvXr6Ly0
-         lr34Ri7NZZMq9l9woAgG+Z5d928QUps/f1HOrcVy6GeQ6wfLTI3bYeJMQHMJj9tNOqvh
-         rb4WBIKXSh2uQt7nsxsgQJPGYxs79JfSXgtr+uVLE6yfLmTZ4d+dB1kRTBw4/pUPRkPC
-         eHhUjL800IxsPTs4GauYByCovtT/ZG0vYYs+p+b1VJ+KpBsGiZ5z7IafYRL7yfg8OP37
-         YuIQ==
+        bh=0vS5tkNj/9TlbMnAs+B1cjDPjcuZkRtuDIjGGmBhLLU=;
+        b=PEmM1RGmVuLBu120z/RlrWPyZpLJYhPj+jDp22paKqbA/AW15hv5/0aK0v72q/e89H
+         z8Ct1YOmwPpr+CX+7sNGXnn1e5P+zjwlLZvf/uuu1OeIe7khyBlkltTJPHDywwSyI9PY
+         7HYYg1JHOnR8Mmq0hY8xzTSngiCMWr5WMTVpDuO7OYY4+syqH3vCoEfwlsUwzuC12is9
+         7IFRDUTL3i95C5s9zR00oBMqY8T0QVO4FnbmX9VK32pEci18oxqSckrsWr+cVAURioQe
+         di6DfTnjJkDs0c2fzNJzC2JOOVU0/R5DCScyVS+DcvM2YjSm+j1CSM5d94jlaRrGcMVl
+         LkTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=WfQVdpk3KC0ZrKW0uOOMpSnVFPF0oApLtFRNK/IW/54=;
-        b=PL5QCy7c6Q8q0a+rNLilVMTZ4iwPgmYYepoc3Cey8uqrBq8xvoPJnxx9Sbrch8/CyS
-         /mQ6A9N1uYM+ljS10guffs69o+lx2+hyRlZnixVPbaIotvyPvPRctUooiAghp/7+NMGB
-         enlU1X5nCdrQY2Z/eAt7I8sim3/rgINHEy5wIjjGMOy81oLQRPY7ofAGYODxvyhkEsCx
-         YKzOGBL1hQArzEzRMMh6RyGLsPC2YpApgI39YZENoC5OopgH3JNf6MwHmTQcA7ECnW8+
-         wYqCUuW+xIC3FAAZ6bie65LbM/0q/m52tQetuIHovwSaR1U2CkIn/i3Ajmku5gw4ki6T
-         z5Ug==
-X-Gm-Message-State: AOAM530TKbrLJMp69kNB5QN2X9FOwip7gOIHrpCq0m/RUsozFItvcdee
-        /uGMiyYtvEeLYicyQIeVPj4hBBBN
-X-Google-Smtp-Source: ABdhPJxbzbYd1i+dndeXTNOGvIP/tAZfeW4D00c79VNIkJGIY0714UqdPXvzZvpzjYurgczyn+o6ecoC
+        bh=0vS5tkNj/9TlbMnAs+B1cjDPjcuZkRtuDIjGGmBhLLU=;
+        b=TRumoWcRImyC5DnYjyJ6lVz4pjmOwJzesjzqFyHyk8FbS88MenbJ8DTbvS0zh1Err2
+         3Dh4JvW7gixYPvpbQ/GNupRQfiisI8wI2CYfqrWo7nAmPgWblZ2cDyAeWTqRhMuVQ0/y
+         R7UwEC+8mzJuOecHJrD6BjwUT2ApkJCweee3Z8nFfwdSjdZoF5fnWkx/HC2NBJBKLqLN
+         9b9LTR+ktbdB9wdKTPV062trx0UvHuivSbx0GU6RI/GNOYnNyxY6d9hdu4oSWI7Rn0Om
+         kbWALKmn6gBvsZrD5PgZRImA6kmeNQCt02dDtR8MZIpTwqq459qL9apBMtA4tWUq0QFd
+         0j7g==
+X-Gm-Message-State: AOAM530PQpb8TBlz5cNl2bU/FTs6wy6qkb8j3dW/bAtjR5MEgLsSRhnw
+        zfP5Tc46I+FRXSDSXY47sJFIlULP
+X-Google-Smtp-Source: ABdhPJyhNjLRNc0GopP5PHCHktoHPui+KBu6dJbbM+pH4fINJdFd4yaSbUXeatsX2631xXX4JnzbxL/Q
 X-Received: from juew-desktop.sea.corp.google.com ([2620:15c:100:202:4c5:ddc5:8182:560f])
- (user=juew job=sendgmr) by 2002:a62:cd0b:0:b0:518:11b3:c9f with SMTP id
- o11-20020a62cd0b000000b0051811b30c9fmr11238387pfg.46.1653068210183; Fri, 20
- May 2022 10:36:50 -0700 (PDT)
-Date:   Fri, 20 May 2022 10:36:34 -0700
+ (user=juew job=sendgmr) by 2002:a05:6a00:2450:b0:4f7:bf07:c063 with SMTP id
+ d16-20020a056a00245000b004f7bf07c063mr10926460pfj.51.1653068213138; Fri, 20
+ May 2022 10:36:53 -0700 (PDT)
+Date:   Fri, 20 May 2022 10:36:35 -0700
 In-Reply-To: <20220520173638.94324-1-juew@google.com>
-Message-Id: <20220520173638.94324-5-juew@google.com>
+Message-Id: <20220520173638.94324-6-juew@google.com>
 Mime-Version: 1.0
 References: <20220520173638.94324-1-juew@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH v4 4/8] KVM: x86: Add Corrected Machine Check Interrupt (CMCI)
- emulation to lapic.
+Subject: [PATCH v4 5/8] KVM: x86: Use kcalloc to allocate the mce_banks array.
 From:   Jue Wang <juew@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -75,135 +74,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds the handling of APIC_LVTCMCI, conditioned on whether the
-vCPU has set MCG_CMCI_P in MCG_CAP register.
+Corrected Machine Check Interrupt (CMCI) can be configured via the per
+Machine Check bank registers: IA32_MCI_CTL2. To emulate IA32_MCI_CTL2
+registers, it's necessary to introduce another array mci_ctl2_banks
+in analogy to the mce_banks array under struct kvm_vcpu_arch.
 
+This patch updates the allocation of mce_banks with the array allocation
+API (kcalloc) as a precedent for the later mci_ctl2_banks.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Jue Wang <juew@google.com>
 ---
- arch/x86/kvm/lapic.c | 40 +++++++++++++++++++++++++++++++++-------
- arch/x86/kvm/lapic.h |  3 ++-
- 2 files changed, 35 insertions(+), 8 deletions(-)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index db12d2ef1aef..e2186a7c0eed 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -27,6 +27,7 @@
- #include <linux/math64.h>
- #include <linux/slab.h>
- #include <asm/processor.h>
-+#include <asm/mce.h>
- #include <asm/msr.h>
- #include <asm/page.h>
- #include <asm/current.h>
-@@ -398,14 +399,26 @@ static inline int apic_lvt_nmi_mode(u32 lvt_val)
- 	return (lvt_val & (APIC_MODE_MASK | APIC_LVT_MASKED)) == APIC_DM_NMI;
- }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4790f0d7d40b..0e839077ce52 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11224,7 +11224,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 		goto fail_free_lapic;
+ 	vcpu->arch.pio_data = page_address(page);
  
-+static inline bool kvm_is_cmci_supported(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.mcg_cap & MCG_CMCI_P;
-+}
-+
-+static inline int kvm_apic_get_nr_lvt_entries(struct kvm_lapic *apic)
-+{
-+	return KVM_APIC_MAX_NR_LVT_ENTRIES - !kvm_is_cmci_supported(apic->vcpu);
-+}
-+
- void kvm_apic_set_version(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
--	u32 v = APIC_VERSION | ((KVM_APIC_MAX_NR_LVT_ENTRIES - 1) << 16);
-+	u32 v = 0;
- 
- 	if (!lapic_in_kernel(vcpu))
- 		return;
- 
-+	v = APIC_VERSION | ((kvm_apic_get_nr_lvt_entries(apic) - 1) << 16);
-+
- 	/*
- 	 * KVM emulates 82093AA datasheet (with in-kernel IOAPIC implementation)
- 	 * which doesn't have EOI register; Some buggy OSes (e.g. Windows with
-@@ -425,7 +438,8 @@ static const unsigned int apic_lvt_mask[KVM_APIC_MAX_NR_LVT_ENTRIES] = {
- 	[LVT_PERFORMANCE_COUNTER] = LVT_MASK | APIC_MODE_MASK,
- 	[LVT_LINT0] = LINT_MASK,
- 	[LVT_LINT1] = LINT_MASK,
--	[LVT_ERROR] = LVT_MASK
-+	[LVT_ERROR] = LVT_MASK,
-+	[LVT_CMCI] = LVT_MASK | APIC_MODE_MASK
- };
- 
- static int find_highest_vector(void *bitmap)
-@@ -1445,6 +1459,9 @@ static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
- 		APIC_REG_MASK(APIC_TMCCT) |
- 		APIC_REG_MASK(APIC_TDCR);
- 
-+	if (kvm_is_cmci_supported(apic->vcpu))
-+		valid_reg_mask |= APIC_REG_MASK(APIC_LVTCMCI);
-+
- 	/*
- 	 * ARBPRI and ICR2 are not valid in x2APIC mode.  WARN if KVM reads ICR
- 	 * in x2APIC mode as it's an 8-byte register in x2APIC and needs to be
-@@ -2083,12 +2100,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
- 		apic_set_spiv(apic, val & mask);
- 		if (!(val & APIC_SPIV_APIC_ENABLED)) {
- 			int i;
--			u32 lvt_val;
- 
--			for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++) {
--				lvt_val = kvm_lapic_get_reg(apic, APIC_LVTx(i));
-+			for (i = 0; i < kvm_apic_get_nr_lvt_entries(apic); i++) {
- 				kvm_lapic_set_reg(apic, APIC_LVTx(i),
--					     lvt_val | APIC_LVT_MASKED);
-+					kvm_lapic_get_reg(apic, APIC_LVTx(i)) | APIC_LVT_MASKED);
- 			}
- 			apic_update_lvtt(apic);
- 			atomic_set(&apic->lapic_timer.pending, 0);
-@@ -2140,6 +2155,17 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
- 		apic_update_lvtt(apic);
- 		break;
- 
-+	case APIC_LVTCMCI:
-+		if (!kvm_is_cmci_supported(apic->vcpu)) {
-+			ret = 1;
-+			break;
-+		}
-+		if (!kvm_apic_sw_enabled(apic))
-+			val |= APIC_LVT_MASKED;
-+		val &= apic_lvt_mask[LVT_CMCI];
-+		kvm_lapic_set_reg(apic, APIC_LVTCMCI, val);
-+		break;
-+
- 	case APIC_TMICT:
- 		if (apic_lvtt_tscdeadline(apic))
- 			break;
-@@ -2383,7 +2409,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 		kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
- 	kvm_apic_set_version(apic->vcpu);
- 
--	for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++)
-+	for (i = 0; i < kvm_apic_get_nr_lvt_entries(apic); i++)
- 		kvm_lapic_set_reg(apic, APIC_LVTx(i), APIC_LVT_MASKED);
- 	apic_update_lvtt(apic);
- 	if (kvm_vcpu_is_reset_bsp(vcpu) &&
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 2d197ed0b8ce..16298bcb2abf 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -35,11 +35,12 @@ enum lapic_lvt_entry {
- 	LVT_LINT0,
- 	LVT_LINT1,
- 	LVT_ERROR,
-+	LVT_CMCI,
- 
- 	KVM_APIC_MAX_NR_LVT_ENTRIES,
- };
- 
--#define APIC_LVTx(x) (APIC_LVTT + 0x10 * (x))
-+#define APIC_LVTx(x) ((x) == LVT_CMCI ? APIC_LVTCMCI : APIC_LVTT + 0x10 * (x))
- 
- struct kvm_timer {
- 	struct hrtimer timer;
+-	vcpu->arch.mce_banks = kzalloc(KVM_MAX_MCE_BANKS * sizeof(u64) * 4,
++	vcpu->arch.mce_banks = kcalloc(KVM_MAX_MCE_BANKS * 4, sizeof(u64),
+ 				       GFP_KERNEL_ACCOUNT);
+ 	if (!vcpu->arch.mce_banks)
+ 		goto fail_free_pio_data;
 -- 
 2.36.1.124.g0e6072fb45-goog
 
