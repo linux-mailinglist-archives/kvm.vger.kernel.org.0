@@ -2,102 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC92752EEEE
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 17:20:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 343A652EF04
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 17:22:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240572AbiETPUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 11:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51498 "EHLO
+        id S1349552AbiETPW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 11:22:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234738AbiETPUl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 11:20:41 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F791778B7;
-        Fri, 20 May 2022 08:20:40 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id wh22so16073391ejb.7;
-        Fri, 20 May 2022 08:20:40 -0700 (PDT)
+        with ESMTP id S229864AbiETPWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 11:22:54 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC0E90CF6
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 08:22:51 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id i1so7632189plg.7
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 08:22:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9HTaK+V9ZiDiK1i2vlbbpCkD2/xh0tAla8E3HggozQY=;
-        b=BSRx5Z5tm6wPBmbRw+L6iv01M0mxWLakRDU1Fshi/8cmtyCW4nFYuwEkMsA0aB97EE
-         FzB+3peMTk26SJTMrCkSv+puJddtXwM49ZIGWCdN1QxR8e3yej/b+YWFD/vRUDx+9i66
-         NkLXYs7UkS+pZRRO6RoCHTqrMkTXw+ZJFF9LcIIMAJQKcl6EflIjSQmReXIL9z5bXlzP
-         0txnvAar7jb+VjuGOAfsOayrcNl0Hdc5lUCUY9yIVu9+gnuvSVSmBcbuckSY5D8rCjsD
-         llXpQSG0MsUA90jGpHxJV6lDBM7Oxi8LCSuJVwU2jpCeTzac+6MHNZp0yVUMj7MX9AsP
-         d73w==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=X3IHiwJ5wNPFuRIjw/VX2fzWcO2GqNMg+EtMwnbtcCE=;
+        b=Lw9XBrUO4xElFv3poICpOcWJu7FGnbiIqec8UL03MtLFgaxCtXdELyyU01GqXohLhG
+         ShwFlWiXPeW6W8Q56lO3LDtvidFAo2yugJk9HsvO51es/ka1Jey05DtwFXvURpcBxfpc
+         mDSYYNXPRkjUoUy0fmdipEdgQibnoNIEXsNzqeWm4OT9DxLKxxZJmaocxd7wQoW4VaNC
+         96wPbMsKKeZmGgU3mKOKYQuiRCUHxBzf9VPs6ANwTfUo3tbyKcJUnmCYm4noTepL5bgG
+         LJ/QLgGZnJoYH3RmYJTNOHkbissXm6C6k/G4lUOr467x5nxIzo2SMtkpg+mRdtjxEEKg
+         9gOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9HTaK+V9ZiDiK1i2vlbbpCkD2/xh0tAla8E3HggozQY=;
-        b=nKU48s+NGaM29ugH3B2XfgI4QFW4qOE9KT/+pDFUIlK/NqukBs2gaSgXajFstF2DO1
-         668dR2U+O27etDu4VFpWKy5UFqG0hNg5ck1DtEYIXMzbssyXnLTcyCd91vBfmeHOa3rC
-         GgAkkIJ2pbjgSCT9lgVVSd5dfqLEiKuMEtBOVbeOzJ1RMYCZ98XUjKMfGJn4IOTpP9Xw
-         L3EZ1L7BZ9m55gfMR7S8T8mAaEPVqgl41f5ZiTfm0EQEM2JHDONBWSj/PPMDvIp0WT9B
-         09Ws7fS63n/1gPlNmvlP72VVx3fOWPIUdcyjuhfOjZPUhYVQ1gf0V/LnFeghOmIZIWZs
-         35Cg==
-X-Gm-Message-State: AOAM532kEgJA6nSRP5bJjpFOg/lVMIFM/niWT7JgEGm0JUKBcc3JKnqh
-        UNvO7c50ZSbf5sMEHQV7dnQ=
-X-Google-Smtp-Source: ABdhPJwSFrnTnzwIxD4CF5hQegGI00d/gtJIbpbGQ9sMCHRp8qU0jBb9OAfnyXhm0w5TWxxsrDX48A==
-X-Received: by 2002:a17:907:6d8a:b0:6fe:1b36:dfcc with SMTP id sb10-20020a1709076d8a00b006fe1b36dfccmr9038948ejc.579.1653060039247;
-        Fri, 20 May 2022 08:20:39 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id el22-20020a170907285600b006f3ef214e57sm3203545ejc.189.2022.05.20.08.20.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 May 2022 08:20:38 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <d54216c8-e936-1ee4-8280-ae5e2b5f0ba7@redhat.com>
-Date:   Fri, 20 May 2022 17:20:37 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=X3IHiwJ5wNPFuRIjw/VX2fzWcO2GqNMg+EtMwnbtcCE=;
+        b=N3kMqWzSV8Gk6Xm88dXiwYy3a+mfl8NaCTFiNTPLizNckN1tB2WJWzM5INK6gCKC36
+         b6tYxb5fiY3HeYdceGSNT2AXplk4M3K17Ai/TTnbAmmjMAvkmdSsOWF3/Ajf0IFnQHZb
+         Q4NU/xjZkZWtlGt425aLQgL4qS8KGnZZDy7MGK8GKQoyIwuwrSs5GVW9zaNXg4KWc1zd
+         7ujhP2XpZD0c7MadJN2SlDrv+EKFn3LF9NSMnpkH+wuJu5/2scYp3YO0Vo5MpN5EyvCk
+         HVwSoc+aEuLMOwJw9XDqGMGqm5tVrlNvBoZpEMnEYq4ujlc+SjATzFPRNA4mJRbSWb+e
+         /jBg==
+X-Gm-Message-State: AOAM533uQuT/13IYcur3juGpuuxYbYJxjhV3hQ4bJ4kCe8Nf0TM1E4vL
+        Skh+vlRe2QtkvNInrUMeem0XIQ==
+X-Google-Smtp-Source: ABdhPJwuvq1qttPnmoP+Ns3E7RUaVZkJpXBX26PbcqkQaKLv3r2ql2j3lVmm8sCHrFVsSaZoHLYVrQ==
+X-Received: by 2002:a17:903:244d:b0:161:ac9e:60ce with SMTP id l13-20020a170903244d00b00161ac9e60cemr10626530pls.160.1653060170586;
+        Fri, 20 May 2022 08:22:50 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x21-20020a62fb15000000b0050dc76281b8sm1990007pfm.146.2022.05.20.08.22.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 May 2022 08:22:50 -0700 (PDT)
+Date:   Fri, 20 May 2022 15:22:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brian Cowan <brcowan@gmail.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: A really weird guest crash, that ONLY happens on KVM, and ONLY
+ on 6th gen+ Intel Core CPU's
+Message-ID: <YoeyRibqS3dzvku6@google.com>
+References: <CAPUGS=oTTzn+HjXMdSK7jsysCagfipmnj25ofNFKD03rq=3Brw@mail.gmail.com>
+ <YoVkkrXbGFz3PmVY@google.com>
+ <CAPUGS=pK57C+yb7Pr5o-LFBWHE-jP8+6-zSrigxVm=hcOtqi=g@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH RESEND v3 11/11] KVM: x86/pmu: Drop amd_event_mapping[] in
- the KVM context
-Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220518132512.37864-1-likexu@tencent.com>
- <20220518132512.37864-12-likexu@tencent.com>
- <3d30f1ac-558f-0ce6-3d46-e223f117899b@redhat.com>
- <6b30a3bc-9509-d506-4f81-2db0baeedad2@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <6b30a3bc-9509-d506-4f81-2db0baeedad2@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPUGS=pK57C+yb7Pr5o-LFBWHE-jP8+6-zSrigxVm=hcOtqi=g@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/20/22 16:27, Like Xu wrote:
-> 
->> 
->> Apart from patch 3, the series looks good.  I'll probably delay it
->> to 5.20 so that you can confirm the SRCU issue, but it's queued.
-> 
-> I have checked it's protected under srcu_read_lock/unlock() for
-> existing usages, so did JimM.
-> 
-> TBH, patch 3 is only inspired by the fact why the protection against
->  kvm->arch.msr_filter does not appear for kvm->arch.pmu_event_filter,
-> and my limited searching scope has not yet confirmed whether it
-> prevents the same spider.
+On Fri, May 20, 2022, Brian Cowan wrote:
+> Disabling smap seems to fix the problem...
 
-Ok, I'll drop it.
+Mwhahaha, I should have found someone to bet me real money :-)
 
-Paolo
+> Now for the hard question: WHY?
+
+The most likely scenario it that there's a SMAP violation (#PF due to a kernel
+access to user data without an override to tell the CPU that the access is intentional)
+somewhere in the guest that crashes/panics the guest kernel.  Assuming that's the
+case, there are three-ish possibilities:
+
+  1. There's a bug your company's custom kernel driver.
+  2. There's a SMAP violation somewhere else in RHEL 7.8, which is an 8+ year old
+     frankenkernel...
+  3. There's a bug in your version of KVM related to SMAP virtualization
+
+#3 begs the question, does this fail on bare metal that supports SMAP?  If so,
+then that rules out #3.
+
+If the crash occurs only when doing stuff related to your custom driver, #1 is
+most likely the culprit.
+
+One way to try and debug further would be to disable EPT in KVM (load kvm_intel with
+ept=0) and then use KVM tracepoints to see when the guest dies.  If it's a SMAP
+violation, there should be an injected SMAP #PF shortly before the guest dies.
