@@ -2,258 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2848352E6E7
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 10:04:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE4CB52E868
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 11:10:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239294AbiETIEr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 04:04:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43856 "EHLO
+        id S1345912AbiETJKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 05:10:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238939AbiETIEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 04:04:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9F48014D78E
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 01:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653033881;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vxIfyueKTwi8me9odGJZHdVY8aeJtK9bNyPeP1e4+B0=;
-        b=YrJ3vSiCY1z6ZoIA7ZvT9Tz4U132v0jZd97qMU+AQwQKY8Dcm2oly/bPG6VsNqbZb5Up0p
-        W+E/K5UMXmDSw6Gx15v0D//rCnLvfB7v8CHRpasc9uYpIe8a9+B9RTrPOLNuiZ6gl9BLtS
-        Zp+rlGmZmtNn969W3vFPk8CI8BJ2hXY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-655-fhj1Ys_YNKCkwwALJ0_k9g-1; Fri, 20 May 2022 04:04:40 -0400
-X-MC-Unique: fhj1Ys_YNKCkwwALJ0_k9g-1
-Received: by mail-qv1-f71.google.com with SMTP id e3-20020a056214110300b0045abb0e1760so6178694qvs.3
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 01:04:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vxIfyueKTwi8me9odGJZHdVY8aeJtK9bNyPeP1e4+B0=;
-        b=m1V77ugwYramS1RfwB/JRto0cC91JalcZtqmGEesRpOdA+kQMCKLDWWGN/pdjBc+oC
-         Eo6rtb8+kqfxzwqk9PiF458IyXx4iPzsiE+Sa6L4QjmZMTfHOWjF4t3GEawY8VtR4p+O
-         Hkiyt/ma7wLUcKV2FcgGxLuX4XCEq19S3IfvhsLWC32WCDkgEoMjdBgnvnNLztuJBeuV
-         On3mc6fFiVmhvF9p5mLgPCpCnubu2E3dLHoTkspW/iJd7Evvuqk8qsw4dm0aB2NLkhaF
-         cQBmug0mmihUiDeFgjuIiv4FgmdrbUqpVVErb2fkP5iYBypbCT5iS10AulGGP3awrkC2
-         oZHw==
-X-Gm-Message-State: AOAM533tvT4UL+bzOubZEDwucxV1njKPAZ4g5lcq/vbkLG9aPCMlpuc5
-        IWWWdNbUWx++IA1l1ySzqNJrWyOoriJyviFXJwXNJ0jDTdN5du61KLQZavSrX5lDFjZBBlyfMtG
-        v1qSb1VWwl6DHWtLajErVXZANuhoi
-X-Received: by 2002:a05:622a:110c:b0:2f3:d347:6f8d with SMTP id e12-20020a05622a110c00b002f3d3476f8dmr6667348qty.403.1653033879830;
-        Fri, 20 May 2022 01:04:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwrb+athTnq5oBuQh5GySrh9ZKPVoFX6p6p05bd/oosxd7+KoHF5tjlJJsnXBkIab10yK1Mr+zLUaEumNvqgQM=
-X-Received: by 2002:a05:622a:110c:b0:2f3:d347:6f8d with SMTP id
- e12-20020a05622a110c00b002f3d3476f8dmr6667325qty.403.1653033879554; Fri, 20
- May 2022 01:04:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220330180436.24644-1-gdawar@xilinx.com>
-In-Reply-To: <20220330180436.24644-1-gdawar@xilinx.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 20 May 2022 10:04:03 +0200
-Message-ID: <CAJaqyWdVef5fOLRRnx+F9LNpqYZuLPq-sC750G58KmGFyon2_w@mail.gmail.com>
-Subject: Re: [PATCH v2 00/19] Control VQ support in vDPA
-To:     Gautam Dawar <gautam.dawar@xilinx.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        martinpo@xilinx.com, pabloc@xilinx.com, dinang@xilinx.com,
-        tanuj.kamde@amd.com, habetsm.xilinx@gmail.com,
-        ecree.xilinx@gmail.com, Gautam Dawar <gdawar@xilinx.com>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Eli Cohen <elic@nvidia.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Longpeng <longpeng2@huawei.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Zhang Min <zhang.min9@zte.com.cn>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S234697AbiETJKa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 05:10:30 -0400
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2048.outbound.protection.outlook.com [40.107.20.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AC71312AC
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 02:10:28 -0700 (PDT)
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
+ b=UIBtKA6M3Ps83k62I8Xmhqq7JUSNfdnY7giSgvf+L5km1RCd5OU+bhnEhM4EaHIwWSHAHhsIwuSK8ApKkgGq3XLxjnh8ghItf+y/tB8V8QZS+Oh5Zqcv359Nt4QJUVSKscnqgvuWeF2/FZ3DWNo0bFZrKGrzeg8c5HM16/6xmGNsGF1Nhnuof0C2GTfHEs3AjLr7EwNFUvZ/GqDOXb6k6JMJKT8OH/w8T0zQBtfC82qe6x1QXt2iJ7TZkJf0/ozDosYXnkRsyv/uqqxEn20Nun7zwE4swWNnPgnfUk0oyzgZdQu+XItY4RIWmYXVvn6mUGnxJy3O2rBrM5vsFafMrw==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iLfVggiy+eJGUccLh5mE1nO5Fe/MG7OQtb8z6PYFLeE=;
+ b=Y7YKOfkIwpuN0iO2hJMb497R2vwwzZNJJ6QoQDnM9uY9sS/8mTTydzm5e5Y5vMpwAdoPZ6q616thGPZwI6fWtXa6MhmOOt3pe2Iwnjdp2pZNfr004N879ZfKuTW/HkqOJF7/VG6yMR+A/A3rkJ1t4wG3oGZry2Jd8nsdSOT8YkN1LD1QmeRBBjf4JDno7okOashwKvV9vKTLB+GERKM2TlzFrscbLNSeOUszFNt5RTcvzmLUYD6lxLcPjNVRiqLVXfXZDaKIEpFyJiJ591gcnb/bBMAMRe4BVeMJ6ntj2/NXOGCmyweSatEs5460Vgu7wsyd2pPx0gqA3dgCoEd1ag==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 63.35.35.123) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=armh.onmicrosoft.com; arc=pass (0
+ oda=1 ltdi=1 spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iLfVggiy+eJGUccLh5mE1nO5Fe/MG7OQtb8z6PYFLeE=;
+ b=U0dxFMMH908PXIYd3B9UVjxrqb6cHq5l1Ygv20c5RlrTfmk2KxkEKNLxj6M2ojWm50jbuh6ptHA4s2/y3O9Vl3w7fDSsTviJnEAWSpg9wIMlqk0jmrYH18i2ccbN5TTUdkMOLF1/S64rqoTgYAKL6LCXay9FBQ40tnHHWOcnBbI=
+Received: from DB6PR0601CA0002.eurprd06.prod.outlook.com (2603:10a6:4:7b::12)
+ by VI1PR0802MB2272.eurprd08.prod.outlook.com (2603:10a6:800:9d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.14; Fri, 20 May
+ 2022 09:10:25 +0000
+Received: from DBAEUR03FT032.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:4:7b:cafe::80) by DB6PR0601CA0002.outlook.office365.com
+ (2603:10a6:4:7b::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.13 via Frontend
+ Transport; Fri, 20 May 2022 09:10:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+ pr=C
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DBAEUR03FT032.mail.protection.outlook.com (100.127.142.185) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5273.14 via Frontend Transport; Fri, 20 May 2022 09:10:25 +0000
+Received: ("Tessian outbound 9a0893f586e2:v119"); Fri, 20 May 2022 09:10:25 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: 583c523d89baee39
+X-CR-MTA-TID: 64aa7808
+Received: from a71f5ea7cab4.1
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 1535C4FE-BCF5-4D5E-BCA8-FDDA96E63C35.1;
+        Fri, 20 May 2022 09:10:18 +0000
+Received: from EUR03-AM5-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id a71f5ea7cab4.1
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Fri, 20 May 2022 09:10:18 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f+Q+G0/SyjAdw0dZ44MfA69Vb2m4sfLctSoBVHzaimH06aF6ZXOXME6lN5nkYkxU/2YIQl1TADAlsQrrde33vfhIvo9ifz67rU/M49k4zAEHZ9vnuCrwW4YqD7MLSqhVrquI1QkLXesEXzCunCT+wIOe9wnobXLpn8qulUwoRb9FYBxHwdO+7cs21phI+w8QdwmMFWYKL1pKy7Pw0wiufEyl+es+mHTQUXSxLUOyawvpUAZ/3TYXhZvIPDqldYos1KxIBDGj2J/Ye8zkteAQAkn8p8mGbHiksyxYwJfRtqXiEXPXEXkCP4UJINhSio/znB49Fry3jPXdMViQWBdb8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iLfVggiy+eJGUccLh5mE1nO5Fe/MG7OQtb8z6PYFLeE=;
+ b=is80okNuEwtd2Na4zO6Nwco5wYjUIfLwXlQWHJuT1Jd1fs7dX7m7ScvBlvfNpEf7V9MMcgwlFOX+9ZvoqUF2chg/upcYxtcFhYtgJ8lYphBW7rsW8c7x3wkdskt+j3xYs2qZ/xgFXPLUf435xE4fsdEDESvmgMFowLTQx7u/cJQsi0igwn1JwRaZ59t3srEPsMaSkfuxLVf0di8fUv6YXrKR6R+4cER/xSatyHZfCH7WGa46vbTBH77JYb7SQcjw8Mt/+mZqaUCSuB39ikmdZB7mxrtJN4Zv4o8TwPIVwuNEClrEV7B8EP5ryhet/U0HiD34TaH1wFWUYJUpkYBP8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iLfVggiy+eJGUccLh5mE1nO5Fe/MG7OQtb8z6PYFLeE=;
+ b=U0dxFMMH908PXIYd3B9UVjxrqb6cHq5l1Ygv20c5RlrTfmk2KxkEKNLxj6M2ojWm50jbuh6ptHA4s2/y3O9Vl3w7fDSsTviJnEAWSpg9wIMlqk0jmrYH18i2ccbN5TTUdkMOLF1/S64rqoTgYAKL6LCXay9FBQ40tnHHWOcnBbI=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from PAXPR08MB7017.eurprd08.prod.outlook.com (2603:10a6:102:1df::21)
+ by HE1PR0802MB2441.eurprd08.prod.outlook.com (2603:10a6:3:de::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.17; Fri, 20 May
+ 2022 09:10:15 +0000
+Received: from PAXPR08MB7017.eurprd08.prod.outlook.com
+ ([fe80::21e9:1af8:8c5a:75d5]) by PAXPR08MB7017.eurprd08.prod.outlook.com
+ ([fe80::21e9:1af8:8c5a:75d5%5]) with mapi id 15.20.5273.017; Fri, 20 May 2022
+ 09:10:15 +0000
+Message-ID: <21a2a499-a61b-8d25-92c6-c91e6d5ea2f9@arm.com>
+Date:   Fri, 20 May 2022 10:10:14 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH kvm-unit-tests 2/2] lib: Add ctype.h and collect is*
+ functions
+Content-Language: en-GB
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, thuth@redhat.com
+References: <20220519170724.580956-1-drjones@redhat.com>
+ <20220519170724.580956-3-drjones@redhat.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20220519170724.580956-3-drjones@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-ClientProxiedBy: LO4P123CA0441.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a9::14) To PAXPR08MB7017.eurprd08.prod.outlook.com
+ (2603:10a6:102:1df::21)
+MIME-Version: 1.0
+X-MS-Office365-Filtering-Correlation-Id: 50369963-1096-4591-ad6e-08da3a409391
+X-MS-TrafficTypeDiagnostic: HE1PR0802MB2441:EE_|DBAEUR03FT032:EE_|VI1PR0802MB2272:EE_
+X-Microsoft-Antispam-PRVS: <VI1PR0802MB22725EFCE41D28FDE4B9D6AAF7D39@VI1PR0802MB2272.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: I6erH4z5H64wQ/8FR0gjIrMVk/8BrANCYMOz3o6i59JZvhwkvRhZkvsiDK7qQk8HeiJBvdYN8j6gbeusDpW4ec6OPC+Th6HM2soiWywUsyUMaIQOMF63Tbdh72pk/bmnVo0YC4gipCkJ1Ox3Z3X4yWETnIWYQ8D/iIZo9Q6FcuR9cWqttJahs+ArkmqTSQnqUvkVf7VEFo+9tEzgZRrqBIoO50FHtvDzNKYtkb2jX/XLLpfoAcqpGu/jlmDA+0HIaMGWScgWauQMb0he8OfPmF0fbOjvjQwhpwvh/wtEMS6uVoydEJsq1/33VbkDpNT+1wo+j6AsrWtMG2ykJYIBRXRzWgZ1UkVzAN78vbyktTkz1y+8N9bBfB8PMQs+j6qnVcz/cuumJbz4WqUS7fmBqSTauHafHUnEV5X1I9Re70zdi66uWpSHddY8iiedOd0pHE3CJw+r5gst8izY71sLhyQ40Vp9Z+j0RSQ2iO+rsdqHjCrtdeRGOghw593kauWtRfRnUjDCuuZoG4ApE0orIYXqMw2E3zFxOBZ75DEFrBwtQPnvkkOe55jQrz3h3ayqdd9/WNOUmSaZOcfXxewY0dtmyKXKYxe8Uaim8a/0Ofk/HCSsvBIPyLl/MdwFuBPK5z7aUcmJjXTzF4XSFfZrXdkHxnzxPGJ+nnaGxnXSOVfk7Dl0l+cfPku4u2E+iOwA43asivFPnMBDf4l6CgbbO6/dp75BCcMjYqMcMxWwyIM=
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR08MB7017.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8936002)(2616005)(6486002)(5660300002)(508600001)(8676002)(4326008)(66476007)(66946007)(44832011)(2906002)(66556008)(53546011)(316002)(38100700002)(31686004)(31696002)(36756003)(26005)(6512007)(83380400001)(6506007)(186003)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2441
+Original-Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DBAEUR03FT032.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs: ffe82883-5f07-4ec8-42cc-08da3a408dbb
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: q/DNQthayrWhomvBQHHVA2fKV5OJ8nOX7ovn40a1O5hPBOZVsHDtQinODS9znoAz/lGAy038wuiBt1x72EQjJ1O5JGMPPkPf+eQbQObO2q6CUd5euFRxKqyBehikpET9FQVX/1DxddJuTF16+kY4Hby6y6ViZJJtogQMvCrhA4UTCT37ZswuG1RBAIyjWMPapZoT9tLES/X3ONfkmRREdK63YIg/nMCQm4r4uQX+R//ZplAFLiSrDwkXnU1w8dCaPPeQkwshwhuAM9hHRxUVDzZaBvB8vlA3OU1nwCnMHMyMbxVwIdtEBMMifH3upJl02hBdMNIFUo+lRkcOt/sKfORjvdBvc6zGXY/3VLkPwH0HeUTPceuWx+IqVPYRNFwhANU7n69ZqObkex05iG16zn02780CyIxGBU1TKz5mEeRBsSuqaZD2j5D5MOsjtaFwjrFpaoJ1XUGpAnr9/DcxJDjUBYzX5LHN7eIcYN3NCbFQT/PhvdtkNGzApc1E2aJZXja7pMTHXFMPXGrx9qp4mk2ZClEaNHJbQRZBdtr9SiaYmXqnbUpJN4sHRY9whn+3B+yHTNVhukumWBUjlZh6tOQXdkSWDSincDCA1bVI9rNrddSnLO4Pitu1Dft7PpwN4b7LU4lolCgGFa724pCL9HBjHgMrJp6iXg7dmZHDFYGOwAd0b9uRWoJEQct6HYZzgIz2E4xE7NxIxROwQLjIVw==
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(31696002)(26005)(44832011)(186003)(53546011)(6512007)(86362001)(316002)(40460700003)(356005)(5660300002)(82310400005)(36756003)(31686004)(81166007)(70206006)(47076005)(70586007)(8936002)(336012)(6486002)(6506007)(2616005)(36860700001)(8676002)(107886003)(4326008)(2906002)(508600001)(83380400001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2022 09:10:25.4462
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50369963-1096-4591-ad6e-08da3a409391
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource: DBAEUR03FT032.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0802MB2272
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 30, 2022 at 8:05 PM Gautam Dawar <gautam.dawar@xilinx.com> wrot=
-e:
+On 19/05/2022 18:07, Andrew Jones wrote:
+> We've been slowly adding ctype functions to different files without
+> even exporting them. Let's change that.
 >
-> Hi All:
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>   lib/argv.c   |  7 ++-----
+>   lib/ctype.h  | 40 ++++++++++++++++++++++++++++++++++++++++
+>   lib/string.c |  6 +-----
+>   3 files changed, 43 insertions(+), 10 deletions(-)
+>   create mode 100644 lib/ctype.h
 >
-> This series tries to add the support for control virtqueue in vDPA.
+> diff --git a/lib/argv.c b/lib/argv.c
+> index 0312d74011d3..951b176ae8b1 100644
+> --- a/lib/argv.c
+> +++ b/lib/argv.c
+> @@ -6,6 +6,7 @@
+>    */
 >
-> Control virtqueue is used by networking device for accepting various
-> commands from the driver. It's a must to support multiqueue and other
-> configurations.
+>   #include "libcflat.h"
+> +#include "ctype.h"
+>   #include "argv.h"
+>   #include "auxinfo.h"
 >
-> When used by vhost-vDPA bus driver for VM, the control virtqueue
-> should be shadowed via userspace VMM (Qemu) instead of being assigned
-> directly to Guest. This is because Qemu needs to know the device state
-> in order to start and stop device correctly (e.g for Live Migration).
+> @@ -19,10 +20,6 @@ char **environ =3D __environ;
+>   static char args_copy[1000];
+>   static char *copy_ptr =3D args_copy;
 >
-> This requies to isolate the memory mapping for control virtqueue
-> presented by vhost-vDPA to prevent guest from accessing it directly.
+> -#define isblank(c) ((c) =3D=3D ' ' || (c) =3D=3D '\t')
+> -#define isalpha(c) (((c) >=3D 'A' && (c) <=3D 'Z') || ((c) >=3D 'a' && (=
+c) <=3D 'z') || (c) =3D=3D '_')
+> -#define isalnum(c) (isalpha(c) || ((c) >=3D '0' && (c) <=3D '9'))
+> -
+>   static const char *skip_blanks(const char *p)
+>   {
+>       while (isblank(*p))
+> @@ -92,7 +89,7 @@ static char *env_next(char *env)
+>       if (!*env)
+>               return env;
 >
-> To achieve this, vDPA introduce two new abstractions:
+> -     if (isalpha(*env)) {
+> +     if (isalpha(*env) || *env =3D=3D '_') {
+>               bool invalid =3D false;
 >
-> - address space: identified through address space id (ASID) and a set
->                  of memory mapping in maintained
-> - virtqueue group: the minimal set of virtqueues that must share an
->                  address space
->
-> Device needs to advertise the following attributes to vDPA:
->
-> - the number of address spaces supported in the device
-> - the number of virtqueue groups supported in the device
-> - the mappings from a specific virtqueue to its virtqueue groups
->
-> The mappings from virtqueue to virtqueue groups is fixed and defined
-> by vDPA device driver. E.g:
->
-> - For the device that has hardware ASID support, it can simply
->   advertise a per virtqueue group.
-> - For the device that does not have hardware ASID support, it can
->   simply advertise a single virtqueue group that contains all
->   virtqueues. Or if it wants a software emulated control virtqueue, it
->   can advertise two virtqueue groups, one is for cvq, another is for
->   the rest virtqueues.
->
-> vDPA also allow to change the association between virtqueue group and
-> address space. So in the case of control virtqueue, userspace
-> VMM(Qemu) may use a dedicated address space for the control virtqueue
-> group to isolate the memory mapping.
->
-> The vhost/vhost-vDPA is also extend for the userspace to:
->
-> - query the number of virtqueue groups and address spaces supported by
->   the device
-> - query the virtqueue group for a specific virtqueue
-> - assocaite a virtqueue group with an address space
-> - send ASID based IOTLB commands
->
-> This will help userspace VMM(Qemu) to detect whether the control vq
-> could be supported and isolate memory mappings of control virtqueue
-> from the others.
->
-> To demonstrate the usage, vDPA simulator is extended to support
-> setting MAC address via a emulated control virtqueue.
->
-> Please review.
->
-> Changes since RFC v2:
->
-> - Fixed memory leak for asid 0 in vhost_vdpa_remove_as()
-> - Removed unnecessary NULL check for iotlb in vhost_vdpa_unmap() and
->   changed its return type to void.
-> - Removed insignificant used_as member field from struct vhost_vdpa.
-> - Corrected the iommu parameter in call to vringh_set_iotlb() from
->   vdpasim_set_group_asid()
-> - Fixed build errors with vdpa_sim_net
-> - Updated alibaba, vdpa_user and virtio_pci vdpa parent drivers to
->   call updated vDPA APIs and ensured successful build
-> - Tested control (MAC address configuration) and data-path using
->   single virtqueue pair on Xilinx (now AMD) SN1022 SmartNIC device
->   and vdpa_sim_net software device using QEMU release at [1]
-> - Removed two extra blank lines after set_group_asid() in
->   include/linux/vdpa.h
->
-> Changes since v1:
->
-> - Rebased the v1 patch series on vhost branch of MST vhost git repo
->   git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=3Dvhost
-> - Updates to accommodate vdpa_sim changes from monolithic module in
->   kernel used v1 patch series to current modularized class (net, block)
->   based approach.
-> - Added new attributes (ngroups and nas) to "vdpasim_dev_attr" and
->   propagated them from vdpa_sim_net to vdpa_sim
-> - Widened the data-type for "asid" member of vhost_msg_v2 to __u32
->   to accommodate PASID
-> - Fixed the buildbot warnings
-> - Resolved all checkpatch.pl errors and warnings
-> - Tested both control and datapath with Xilinx Smartnic SN1000 series
->   device using QEMU implementing the Shadow virtqueue and support for
->   VQ groups and ASID available at [1]
->
-> Changes since RFC:
->
-> - tweak vhost uAPI documentation
-> - switch to use device specific IOTLB really in patch 4
-> - tweak the commit log
-> - fix that ASID in vhost is claimed to be 32 actually but 16bit
->   actually
-> - fix use after free when using ASID with IOTLB batching requests
-> - switch to use Stefano's patch for having separated iov
-> - remove unused "used_as" variable
-> - fix the iotlb/asid checking in vhost_vdpa_unmap()
->
-> [1] Development QEMU release with support for SVQ, VQ groups and ASID:
->   github.com/eugpermar/qemu/releases/tag/vdpa_sw_live_migration.d%2F
->   asid_groups-v1.d%2F00
->
-> Thanks
->
-> Gautam Dawar (19):
->   vhost: move the backend feature bits to vhost_types.h
->   virtio-vdpa: don't set callback if virtio doesn't need it
->   vhost-vdpa: passing iotlb to IOMMU mapping helpers
->   vhost-vdpa: switch to use vhost-vdpa specific IOTLB
->   vdpa: introduce virtqueue groups
->   vdpa: multiple address spaces support
->   vdpa: introduce config operations for associating ASID to a virtqueue
->     group
->   vhost_iotlb: split out IOTLB initialization
->   vhost: support ASID in IOTLB API
->   vhost-vdpa: introduce asid based IOTLB
->   vhost-vdpa: introduce uAPI to get the number of virtqueue groups
->   vhost-vdpa: introduce uAPI to get the number of address spaces
->   vhost-vdpa: uAPI to get virtqueue group id
->   vhost-vdpa: introduce uAPI to set group ASID
->   vhost-vdpa: support ASID based IOTLB API
->   vdpa_sim: advertise VIRTIO_NET_F_MTU
->   vdpa_sim: factor out buffer completion logic
->   vdpa_sim: filter destination mac address
->   vdpasim: control virtqueue support
->
->  drivers/vdpa/alibaba/eni_vdpa.c      |   2 +-
->  drivers/vdpa/ifcvf/ifcvf_main.c      |   8 +-
->  drivers/vdpa/mlx5/net/mlx5_vnet.c    |  11 +-
->  drivers/vdpa/vdpa.c                  |   5 +
->  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 100 ++++++++--
->  drivers/vdpa/vdpa_sim/vdpa_sim.h     |   3 +
->  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 169 +++++++++++++----
->  drivers/vdpa/vdpa_user/vduse_dev.c   |   3 +-
->  drivers/vdpa/virtio_pci/vp_vdpa.c    |   2 +-
->  drivers/vhost/iotlb.c                |  23 ++-
->  drivers/vhost/vdpa.c                 | 267 +++++++++++++++++++++------
->  drivers/vhost/vhost.c                |  23 ++-
->  drivers/vhost/vhost.h                |   4 +-
->  drivers/virtio/virtio_vdpa.c         |   2 +-
->  include/linux/vdpa.h                 |  44 ++++-
->  include/linux/vhost_iotlb.h          |   2 +
->  include/uapi/linux/vhost.h           |  26 ++-
->  include/uapi/linux/vhost_types.h     |  11 +-
->  18 files changed, 563 insertions(+), 142 deletions(-)
->
+>               p =3D env + 1;
+> diff --git a/lib/ctype.h b/lib/ctype.h
+> new file mode 100644
+> index 000000000000..ce787a60cdf3
+> --- /dev/null
+> +++ b/lib/ctype.h
+> @@ -0,0 +1,40 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef _CTYPE_H_
+> +#define _CTYPE_H_
+> +
+> +static inline int isblank(int c)
+> +{
+> +     return c =3D=3D ' ' || c =3D=3D '\t';
+> +}
+> +
+> +static inline int islower(int c)
+> +{
+> +     return c >=3D 'a' && c <=3D 'z';
+> +}
+> +
+> +static inline int isupper(int c)
+> +{
+> +     return c >=3D 'A' && c <=3D 'Z';
+> +}
+> +
+> +static inline int isalpha(int c)
 
-Hoping it's not too late for this, but I tested this series with my
-latest qemu CVQ SVQ RFC (v8). So, in that regard,
+minor nit: I think there is a trailing whitespace in the line above,
+otherwise:
 
-Reviewed-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
+Thanks,
+
+Nikos
+
+> +{
+> +     return isupper(c) || islower(c);
+> +}
+> +
+> +static inline int isdigit(int c)
+> +{
+> +     return c >=3D '0' && c <=3D '9';
+> +}
+> +
+> +static inline int isalnum(int c)
+> +{
+> +     return isalpha(c) || isdigit(c);
+> +}
+> +
+> +static inline int isspace(int c)
+> +{
+> +        return c =3D=3D ' ' || c =3D=3D '\t' || c =3D=3D '\r' || c =3D=
+=3D '\n' || c =3D=3D '\v' || c =3D=3D '\f';
+> +}
+> +
+> +#endif /* _CTYPE_H_ */
+> diff --git a/lib/string.c b/lib/string.c
+> index a3a8f3b1ce0b..6d8a6380db92 100644
+> --- a/lib/string.c
+> +++ b/lib/string.c
+> @@ -6,6 +6,7 @@
+>    */
+>
+>   #include "libcflat.h"
+> +#include "ctype.h"
+>   #include "stdlib.h"
+>   #include "linux/compiler.h"
+>
+> @@ -163,11 +164,6 @@ void *memchr(const void *s, int c, size_t n)
+>       return NULL;
+>   }
+>
+> -static int isspace(int c)
+> -{
+> -     return c =3D=3D ' ' || c =3D=3D '\t' || c =3D=3D '\r' || c =3D=3D '=
+\n' || c =3D=3D '\v' || c =3D=3D '\f';
+> -}
+> -
+>   static unsigned long long __strtoll(const char *nptr, char **endptr,
+>                                   int base, bool is_signed, bool is_longl=
+ong)
+>   {
+IMPORTANT NOTICE: The contents of this email and any attachments are confid=
+ential and may also be privileged. If you are not the intended recipient, p=
+lease notify the sender immediately and do not disclose the contents to any=
+ other person, use it for any purpose, or store or copy the information in =
+any medium. Thank you.
