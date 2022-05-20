@@ -2,55 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2FF252EB62
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 14:00:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B9BB52EB66
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 14:01:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348873AbiETMAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 08:00:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49996 "EHLO
+        id S1348872AbiETMBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 08:01:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348855AbiETMAk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 08:00:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 325183ED28
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 05:00:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C3EAD61E16
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 12:00:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB670C385A9;
-        Fri, 20 May 2022 12:00:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653048038;
-        bh=Scz4kC4NvraS6veC/zLWgf2acAax2Vcwh4OHRl50J1E=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WIdn/I3veJNvab0brCv2TRj3VbbrX+3kSUT7O7XNA1eCPNBuREyIUvuOm+Q//NIzS
-         yMc/CvhK7ItiIgbKedStpGKyUHxuFSALDvi2VVes2wuglTN+LOAEE6Z9rZBKAdwwrf
-         ZzJURU+rHZzS/PjLfR5WJGR/KW8VZe9SdmTEVmBEQVM7XAvJbFtwGPgG8S7x/JmxsM
-         H5bCeZqrykXgzyT0Wf+HOdQdCoUOfpRkSqamgLfLf2IcHUCPIjYBHfhh1/EggOnAW2
-         6E6a8Zpp5SHzvSeeuYOu2/eqI9zm4xDWhoBQEn4P0WfimTi9+FcJ+Burzj28UcLy+n
-         b/4/nREQbqAig==
-Date:   Fri, 20 May 2022 13:00:32 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
-Message-ID: <20220520120032.GB6700@willie-the-truck>
-References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
- <3521de8b-3163-7ff0-a823-5d4ec96a2ae5@arm.com>
+        with ESMTP id S1348990AbiETMBM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 08:01:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F8755FD4
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 05:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653048069;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T1/te+4Y4ho6udDKU3FETTF4lh1tRvJCKy5k3ZgQWfQ=;
+        b=gkwAIZQNU6UGt1Y/Pw+6l4pk9psDUkdylZrkkgMYcc5ysgSV/gNRJIeLsmIuHAexWtlAYC
+        2Ybpg3T7LUZJOl149qmD/UoG+Q49h5QrR0cPCriE+srrIrSwmTYggPtPsqcOV8notSSGr7
+        shc9PJbR2RdNF4khKRoPdWoJXYi1zE0=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-28-jJYeWG-rPnix4tuKx9YZXQ-1; Fri, 20 May 2022 08:01:07 -0400
+X-MC-Unique: jJYeWG-rPnix4tuKx9YZXQ-1
+Received: by mail-pl1-f197.google.com with SMTP id x23-20020a170902b41700b0015ea144789fso4043213plr.13
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 05:01:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=T1/te+4Y4ho6udDKU3FETTF4lh1tRvJCKy5k3ZgQWfQ=;
+        b=toGWzIRp8FKFSuXAhwumz4QJKg4NDhdZflvkR0iDkppmrvhHDTEajpV78h3NXSaLBe
+         /zSSDcG+CUOFPI4nrsYReXpskWv4viXGqfEWtF8Uoa3sVKWM96lWkcpFwBjMcyghRp5b
+         bBguK8/Dp7H6v1vpoyASwKigbm3bOqUi4kjk2uMCVj3my8rB4U+3Tf+i/OzItzcs+tmp
+         vg+wcukYkfFRQO2DWrHa8KOB72MQhk9g1rED81fi9/wQeUflMXyXE21SXNg2E73QfcAt
+         BXBZTlVkGGJYBaeYfB1kSYRiRwveAuW6I78KCUDQdl5lDsuwGo0UzY2RGSohylJiAfpj
+         L4Og==
+X-Gm-Message-State: AOAM530B2bOxXY9Z7BQWZltoQdvjDM55xfMCzIQcJjt725/aYWBrSsds
+        b/XjIqqEUF3HNYi/2K3ezgbtL5h6VzOpOp4eNqS9LGldR4jlFCu4pL15H2oqtYAI26Uj34S9CQq
+        5kMpth25HbN6pb/iQcwcBOtCk3/3S
+X-Received: by 2002:a05:6a00:174a:b0:4fd:ac35:6731 with SMTP id j10-20020a056a00174a00b004fdac356731mr9599118pfc.71.1653048066246;
+        Fri, 20 May 2022 05:01:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyw8odYerMJXPa7j+8qH+HKggUd27IfpqiiBb6TBD0oWyj+epTj2Yq+QIkthft/bauWj3S2LYpOoYBUKf2zvHM=
+X-Received: by 2002:a05:6a00:174a:b0:4fd:ac35:6731 with SMTP id
+ j10-20020a056a00174a00b004fdac356731mr9599093pfc.71.1653048065938; Fri, 20
+ May 2022 05:01:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3521de8b-3163-7ff0-a823-5d4ec96a2ae5@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+References: <20220518170118.66263-1-likexu@tencent.com>
+In-Reply-To: <20220518170118.66263-1-likexu@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri, 20 May 2022 14:00:54 +0200
+Message-ID: <CABgObfaNZqE+z5WA8VRPco9c_Swa15qyom7ieHGFRWzw39kU=g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: x86/pmu: Move the vmx_icl_pebs_cpu[] definition
+ out of the header file
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,62 +78,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022 at 12:02:23PM +0100, Robin Murphy wrote:
-> On 2022-05-10 17:55, Jason Gunthorpe via iommu wrote:
-> > This control causes the ARM SMMU drivers to choose a stage 2
-> > implementation for the IO pagetable (vs the stage 1 usual default),
-> > however this choice has no visible impact to the VFIO user.
-> 
-> Oh, I should have read more carefully... this isn't entirely true. Stage 2
-> has a different permission model from stage 1, so although it's arguably
-> undocumented behaviour, VFIO users that know enough about the underlying
-> system could use this to get write-only mappings if they so wish.
+Queued all three, thanks.
 
-There's also an impact on combining memory attributes, but it's not hugely
-clear how that impacts userspace via things like VFIO_DMA_CC_IOMMU.
+Paolo
 
-> There may potentially also be visible differences in translation performance
-> between stages, although I imagine that's firmly over in the niche of things
-> that users might look at for system validation purposes, rather than for
-> practical usefulness.
-> 
-> > Further qemu
-> > never implemented this and no other userspace user is known.
-> > 
-> > The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
-> > new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
-> > SMMU translation services to the guest operating system" however the rest
-> > of the API to set the guest table pointer for the stage 1 was never
-> > completed, or at least never upstreamed, rendering this part useless dead
-> > code.
-> > 
-> > Since the current patches to enable nested translation, aka userspace page
-> > tables, rely on iommufd and will not use the enable_nesting()
-> > iommu_domain_op, remove this infrastructure. However, don't cut too deep
-> > into the SMMU drivers for now expecting the iommufd work to pick it up -
-> > we still need to create S2 IO page tables.
-> > 
-> > Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
-> > enable_nesting iommu_domain_op.
-> > 
-> > Just in-case there is some userspace using this continue to treat
-> > requesting it as a NOP, but do not advertise support any more.
-> 
-> This also seems a bit odd, especially given that it's not actually a no-op;
-> surely either it's supported and functional or it isn't?
-> 
-> In all honesty, I'm not personally attached to this code either way. If this
-> patch had come 5 years ago, when the interface already looked like a bit of
-> a dead end, I'd probably have agreed more readily. But now, when we're
-> possibly mere months away from implementing the functional equivalent for
-> IOMMUFD, which if done right might be able to support a trivial compat layer
-> for this anyway, I just don't see what we gain from not at least waiting to
-> see where that ends up. The given justification reads as "get rid of this
-> code that we already know we'll need to bring back in some form, and
-> half-break an unpopular VFIO ABI because it doesn't do *everything* that its
-> name might imply", which just isn't convincing me.
+On Wed, May 18, 2022 at 7:01 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> From: Like Xu <likexu@tencent.com>
+>
+> Defining a static const array in a header file would introduce redundant
+> definitions to the point of confusing semantics, and such a use case woul=
+d
+> only bring complaints from the compiler:
+>
+> arch/x86/kvm/pmu.h:20:32: warning: =E2=80=98vmx_icl_pebs_cpu=E2=80=99 def=
+ined but not used [-Wunused-const-variable=3D]
+>    20 | static const struct x86_cpu_id vmx_icl_pebs_cpu[] =3D {
+>       |                                ^~~~~~~~~~~~~~~~
+>
+> Fixes: a095df2c5f48 ("KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake=
+ guest PDIR counter")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/pmu.c | 7 +++++++
+>  arch/x86/kvm/pmu.h | 8 --------
+>  2 files changed, 7 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index b5d0c36b869b..a2eaae85d97b 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/bsearch.h>
+>  #include <linux/sort.h>
+>  #include <asm/perf_event.h>
+> +#include <asm/cpu_device_id.h>
+>  #include "x86.h"
+>  #include "cpuid.h"
+>  #include "lapic.h"
+> @@ -27,6 +28,12 @@
+>  struct x86_pmu_capability __read_mostly kvm_pmu_cap;
+>  EXPORT_SYMBOL_GPL(kvm_pmu_cap);
+>
+> +static const struct x86_cpu_id vmx_icl_pebs_cpu[] =3D {
+> +       X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
+> +       X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
+> +       {}
+> +};
+> +
+>  /* NOTE:
+>   * - Each perf counter is defined as "struct kvm_pmc";
+>   * - There are two types of perf counters: general purpose (gp) and fixe=
+d.
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index dbf4c83519a4..ecf2962510e4 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -4,8 +4,6 @@
+>
+>  #include <linux/nospec.h>
+>
+> -#include <asm/cpu_device_id.h>
+> -
+>  #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
+>  #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu=
+))
+>  #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
+> @@ -17,12 +15,6 @@
+>  #define VMWARE_BACKDOOR_PMC_REAL_TIME          0x10001
+>  #define VMWARE_BACKDOOR_PMC_APPARENT_TIME      0x10002
+>
+> -static const struct x86_cpu_id vmx_icl_pebs_cpu[] =3D {
+> -       X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
+> -       X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
+> -       {}
+> -};
+> -
+>  struct kvm_event_hw_type_mapping {
+>         u8 eventsel;
+>         u8 unit_mask;
+> --
+> 2.36.1
+>
 
-I'm inclined to agree although we can very easily revert this patch when we
-need to bring the stuff back, it would just be a bit churny.
-
-Will
