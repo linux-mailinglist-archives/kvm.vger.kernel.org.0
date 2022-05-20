@@ -2,123 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 249BD52EC7E
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 14:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC40E52EC9C
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 14:51:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349482AbiETMqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 08:46:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49688 "EHLO
+        id S1349560AbiETMvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 08:51:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348109AbiETMqg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 08:46:36 -0400
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462E75C84F;
-        Fri, 20 May 2022 05:46:35 -0700 (PDT)
-Received: by mail-qk1-f178.google.com with SMTP id g207so3970013qke.7;
-        Fri, 20 May 2022 05:46:35 -0700 (PDT)
+        with ESMTP id S1349599AbiETMvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 08:51:10 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92322CCB4;
+        Fri, 20 May 2022 05:51:09 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id s3so10645234edr.9;
+        Fri, 20 May 2022 05:51:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=V3DAp54HsR3fyNdArmfnvQ0CwRlJGsKOeC+42b+iHQ0=;
+        b=Vud9r0Y5Ez5deYlLUYP2wU3jpXRdKrLCdeLDyRx+u6vvEwlbY2wbYf7Rx8ZRr2v92Y
+         0cKG4NobDF5DtvRZJEXTNLgTqvUuLpWCZy86yVFmhyijSku72DuB0S/eC5TGVcGt4PxZ
+         DukujkSki12wJrJlc0Z9CtN6sx4cIjNQfpuP2mlUuX5K/SliobjnpfNoLrS1wigCyibA
+         k0EC/Jb5URGb3S/FvNfa6rhKhY19GUXL2wCtiMFfxbQnJwxZrFT8bOhemlnXk9lI9Vqy
+         vo+WDEns6xSeEaTe1zxogS1WyPpbk1s5DLB2eIr+2s+Pb2F4DEBSONQqy71f8fXFzAj1
+         0Tow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UhZYflED6/DiNr1feOC9OhkU49iweDam4jS4WznrIsk=;
-        b=P3H251hbfEKCS0STYhh+ttBN6k4JmCVqAIgJw2sY6OCa/0DUJ8nnJvDHC0OMbW5njm
-         X32Why/FWk49NtmkhlOE/5/vqT3kuE6mcXD7QY9xafdbxyWvySw8uD3zS3v2olp7uAS6
-         j0IarfLosYyy803yAOymeMM5cblvWe8InrjXH7ugU2lEDXkhASGKcg78A6DGHkPcXgzj
-         D/N8WUK9EkOsRFwQivqRztuGL7H75e4wpRL3WIVeyV5HvpXG5cz2ss7hsEHLbPMNc25a
-         dtLfDYEYyrc64d/zMzldBS1QQ8j4b2F27w/Xbs9iLo4aPlDUZCu6wqafCCSDD0j6AMjW
-         tOrQ==
-X-Gm-Message-State: AOAM531N30c3giO9I5iF4yRTinkq8xX4RxQtR39Uev507e8OssJLZL9n
-        Ucz0Zrl6t0T1ejPS+ksdhrai4BRKeGs0mw==
-X-Google-Smtp-Source: ABdhPJzQr1I56C3kTXejdctJYTvYMH8Xf51D+8crHXB+jVEBShmCHRyrvEprSSKn1QJ+AoaLhmGh7g==
-X-Received: by 2002:a05:620a:454f:b0:6a0:5212:96d2 with SMTP id u15-20020a05620a454f00b006a0521296d2mr6187861qkp.603.1653050793932;
-        Fri, 20 May 2022 05:46:33 -0700 (PDT)
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com. [209.85.219.174])
-        by smtp.gmail.com with ESMTPSA id 202-20020a3703d3000000b0069fc13ce213sm3111969qkd.68.2022.05.20.05.46.32
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=V3DAp54HsR3fyNdArmfnvQ0CwRlJGsKOeC+42b+iHQ0=;
+        b=C7SbNdbowcmUmLNP61kZ4mNJNZmFBggfmz4GajdESYWt82zT1S5NAU+slL1GQjwTCy
+         Ic1lMUaft9gpG7f39uTt4iZz8zLDiPsWchZVngdTj+u2tsapCz8T/IapZ5C04Fc8F8qn
+         3BBKgSQrGbRRgXoKUInji4ydhH+UsPyjcbRkAOkqPj3diERDMhqioBhpsSgt6hekP2Mr
+         iLYNViKnrRCjAvf/PrpvbJDS63LKMculM/35NYDeLl6YgJ0aRPosrUQRqLQvp2MG0rzH
+         5RJ6O2RD3ayaG6fRLI6kgTRoSGY01JXbmIZ2zTfGiYmY2EmoYzNz4W05Qo+Tj/cicjgx
+         2RKQ==
+X-Gm-Message-State: AOAM532attkfxEZN3CRWBL+VI3pN2QE3r05jPVjA1tJe8p+4NL9aTxK/
+        /kgmj5lt63j39wheg1f3wWk=
+X-Google-Smtp-Source: ABdhPJxbE8Jb05zTg96BkFazUYGB8EmfOSIeL9XG8ttE8UcTpipKKyNxSB/lkfFzn8CTzcF+qi5zpQ==
+X-Received: by 2002:a05:6402:d51:b0:42a:b2cc:33b2 with SMTP id ec17-20020a0564020d5100b0042ab2cc33b2mr10782525edb.248.1653051068183;
+        Fri, 20 May 2022 05:51:08 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id 14-20020a17090602ce00b006fe89cafc42sm3049145ejk.172.2022.05.20.05.51.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 May 2022 05:46:33 -0700 (PDT)
-Received: by mail-yb1-f174.google.com with SMTP id j2so14097403ybu.0;
-        Fri, 20 May 2022 05:46:32 -0700 (PDT)
-X-Received: by 2002:a05:6902:389:b0:633:31c1:d0f7 with SMTP id
- f9-20020a056902038900b0063331c1d0f7mr9068692ybs.543.1653050792549; Fri, 20
- May 2022 05:46:32 -0700 (PDT)
+        Fri, 20 May 2022 05:51:07 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <31f3de9a-a752-e322-ebd0-731c42afd47a@redhat.com>
+Date:   Fri, 20 May 2022 14:51:06 +0200
 MIME-Version: 1.0
-References: <6285958d.+Z2aDZ4O1Y9eiazd%lkp@intel.com> <0530d502-1291-23f3-64ac-97bd38a26bd4@roeck-us.net>
- <CAMuHMdU3SYOwE5ftDwymQpVwWmpbC=1Ytyp0Y9GaeUS2i1cP+A@mail.gmail.com>
-In-Reply-To: <CAMuHMdU3SYOwE5ftDwymQpVwWmpbC=1Ytyp0Y9GaeUS2i1cP+A@mail.gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 20 May 2022 14:46:20 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVx7r-4TVV9uVJppT-7ZAriov01BUNk4ghU9Bs4uY28vQ@mail.gmail.com>
-Message-ID: <CAMuHMdVx7r-4TVV9uVJppT-7ZAriov01BUNk4ghU9Bs4uY28vQ@mail.gmail.com>
-Subject: Re: [linux-next:master] BUILD REGRESSION 736ee37e2e8eed7fe48d0a37ee5a709514d478b3
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     kernel test robot <lkp@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-staging@lists.linux.dev,
-        "open list:TI ETHERNET SWITCH DRIVER (CPSW)" 
-        <linux-omap@vger.kernel.org>, linux-nvme@lists.infradead.org,
-        linux-hwmon@vger.kernel.org,
-        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        linux-sparse@vger.kernel.org,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH RESEND v3 03/11] KVM: x86/pmu: Protect
+ kvm->arch.pmu_event_filter with SRCU
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220518132512.37864-1-likexu@tencent.com>
+ <20220518132512.37864-4-likexu@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220518132512.37864-4-likexu@tencent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022 at 2:40 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> On Thu, May 19, 2022 at 8:48 AM Guenter Roeck <linux@roeck-us.net> wrote:
-> > On 5/18/22 17:55, kernel test robot wrote:
-> > > tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> > > branch HEAD: 736ee37e2e8eed7fe48d0a37ee5a709514d478b3  Add linux-next specific files for 20220518
-> > >
-> > > Error/Warning reports:
-> > >
-> > > https://lore.kernel.org/linux-mm/202204291924.vTGZmerI-lkp@intel.com
-> > > https://lore.kernel.org/linux-mm/202205041248.WgCwPcEV-lkp@intel.com
-> > > https://lore.kernel.org/linux-mm/202205122113.uLKzd3SZ-lkp@intel.com
-> > > https://lore.kernel.org/linux-mm/202205172344.3GFeaum1-lkp@intel.com
-> > > https://lore.kernel.org/linux-mm/202205190527.o9wVEvHI-lkp@intel.com
-> > >
-> > > Error/Warning: (recently discovered and may have been fixed)
-> > >
-> > [ .. ]
-> > > drivers/hwmon/nct6775-platform.c:199:9: sparse:    unsigned char
-> > > drivers/hwmon/nct6775-platform.c:199:9: sparse:    void
-> >
-> > This is getting tiresome. Every driver using outb() on m68k will
-> > experience that "problem". As far as I can see, it is caused by
-> >
-> > #define out_8(addr,b) (void)((*(__force volatile u8 *) (unsigned long)(addr)) = (b))
-> >
-> > in arch/m68k/include/asm/raw_io.h. I have no idea what the
-> > "(void)" is for,
->
-> The "(void)" makes sure there is no return value.
-> Which matters if the result of a function returning void is propagated
-> to another function returning void.
+On 5/18/22 15:25, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> Similar to "kvm->arch.msr_filter", KVM should guarantee that vCPUs will
+> see either the previous filter or the new filter when user space calls
+> KVM_SET_PMU_EVENT_FILTER ioctl with the vCPU running so that guest
+> pmu events with identical settings in both the old and new filter have
+> deterministic behavior.
+> 
+> Fixes: 66bb8a065f5a ("KVM: x86: PMU Event Filter")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
 
-Which, FTR, sparse also doesn't like:
+Please always include the call trace where SRCU is not taken.  The ones 
+I reconstructed always end up at a place inside srcu_read_lock/unlock:
 
-    error: return expression in void function
+reprogram_gp_counter/reprogram_fixed_counter
+   amd_pmu_set_msr
+    kvm_set_msr_common
+     svm_set_msr
+      __kvm_set_msr
+      kvm_set_msr_ignored_check
+       kvm_set_msr_with_filter
+        kvm_emulate_wrmsr**
+        emulator_set_msr_with_filter**
+       kvm_set_msr
+        emulator_set_msr**
+       do_set_msr
+        __msr_io
+         msr_io
+          ioctl(KVM_SET_MSRS)**
+   intel_pmu_set_msr
+    kvm_set_msr_common
+     vmx_set_msr (see svm_set_msr)
+   reprogram_counter
+    global_ctrl_changed
+     intel_pmu_set_msr (see above)
+    kvm_pmu_handle_event
+     vcpu_enter_guest**
+    kvm_pmu_incr_counter
+     kvm_pmu_trigger_event
+      nested_vmx_run**
+      kvm_skip_emulated_instruction**
+      x86_emulate_instruction**
+   reprogram_fixed_counters
+    intel_pmu_set_msr (see above)
 
-Gr{oetje,eeting}s,
+Paolo
 
-                        Geert
+>   arch/x86/kvm/pmu.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index f189512207db..24624654e476 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -246,8 +246,9 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+>   	struct kvm *kvm = pmc->vcpu->kvm;
+>   	bool allow_event = true;
+>   	__u64 key;
+> -	int idx;
+> +	int idx, srcu_idx;
+>   
+> +	srcu_idx = srcu_read_lock(&kvm->srcu);
+>   	filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
+>   	if (!filter)
+>   		goto out;
+> @@ -270,6 +271,7 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+>   	}
+>   
+>   out:
+> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>   	return allow_event;
+>   }
+>   
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
