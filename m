@@ -2,145 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DEA4952EDBF
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:05:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 389F052EDCC
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:07:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350100AbiETOFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 10:05:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53114 "EHLO
+        id S1348054AbiETOH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 10:07:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236471AbiETOFf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 10:05:35 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7133D7A466;
-        Fri, 20 May 2022 07:05:34 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id fd25so10952273edb.3;
-        Fri, 20 May 2022 07:05:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xqRSEjWYdwzjgqqrBK7n3d3BWHqbAI1WmVJdVsPHdzY=;
-        b=hpGgi2DP4fY8eeSk24xHGBwf9dXFz1DoUMuVMAluPutpfuFAXNt++YnDEiwAuSlvi1
-         wKAcl24hRdyYDaPD0gJsd7N+PM9JgAEXoquw+nBjomwECoZLbY+sPa5aN5Q5E3JUmZ8U
-         XwiPTQbC0f+uv0w4mUg9sqh43c1Dr48+FAWZItaEYlOXziO5ZA7xGsS3hP5mEz2vQo9e
-         O1fTAGQPoMYa8USQgvDMzJchxgsZ/+MjE0KvDfTaAXDUaWUv/Eg/7PyW4poncMbuquaM
-         xegD+lRkF2CX2DZ+vcznpTHM/blCQA4pak9bzDzhw3pHi8YZc9jQCsdFKpP1LkdX7tJP
-         D7hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xqRSEjWYdwzjgqqrBK7n3d3BWHqbAI1WmVJdVsPHdzY=;
-        b=CxSagnwAdAE+lcy45qkevdJFXgCGmKu73UiPyo9xFKOCgNLJ4q8YGNiktUZXiX+hD6
-         CoK1Kg86Rk+Z1OOL1za78MZjKOjLbdTcL7/EYjNaEBkWzzzmf4DciBp55wfNZeKdo9nx
-         88TSkmRU98fpUukuhdSESGwVoFCitm4iGQtoY0JbmQhrocMqrbj8hwyAyZbxNepqFkTZ
-         IJfmRzpdGv0qW0CoxaR764/Z5kSokll9BMyzccf1BQ0XgoJhW8WwRlFPFegU8QUBa292
-         SO/PMj7qflGpoAZchXZIE5CJ8O2zMo3OW1mDcUtkIjeZBSpQ9AanOHs3+1reR+r97POY
-         UMfQ==
-X-Gm-Message-State: AOAM533TXN71iUzLnupTdJeqoa3rSkr9ZMDPIpecPgjFRwM7vMzdNzwg
-        /9LycdWwYzCTq7ooiKCpsdE=
-X-Google-Smtp-Source: ABdhPJwtHhtrpMri3jGlX7fK78xgzfY2QhnH38KjZRTtrP0mHRhd7OyS6HTAeg76jINoaFzpQdIWJQ==
-X-Received: by 2002:a05:6402:1612:b0:42a:be18:8c8 with SMTP id f18-20020a056402161200b0042abe1808c8mr11160802edv.223.1653055532922;
-        Fri, 20 May 2022 07:05:32 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id 26-20020a170906225a00b006f3ef214db9sm3214636ejr.31.2022.05.20.07.05.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 May 2022 07:05:32 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <fb4a9151-e56c-d16c-f09c-ac098e41a791@redhat.com>
-Date:   Fri, 20 May 2022 16:05:29 +0200
+        with ESMTP id S1350123AbiETOGB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 10:06:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92EC4D625;
+        Fri, 20 May 2022 07:05:54 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24KDD8aq016276;
+        Fri, 20 May 2022 14:05:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=cAuTtd+nj0jhArr6PJ9LjRWhoCED1E6gEqoFubFipnA=;
+ b=jdueWvFeQFje4VPCDlJMmKPljBU5dHQSQ0FxVO0Vu2MtHWZD1mlSvl3cwKbfVSO/BOmQ
+ QvwQG1IngeMB7JShCb1buJa/2Zv4Vin8tnm5VWHEqmp23/TBR/6O6wgMOZXeJ9NAn6YA
+ CPgvVo3Heb6vWuBtsENhSDctDy/3hVv9SyRsolBzkznDP3TdczUkgdKMU1PROT7LjCMo
+ XuWWm7+jRGkpQWovKU1KjxDaArBFqWWNOxDbNsRgOTOkkUFZILnJwSU1beAtH+8oZ77e
+ glzb1tm0ABTvnCKHgXK0qrcySKxFzpA3Tcoe7Ff6/gDEO6JKweX2Wa1YvBQCpjdHs4d3 uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g6bp2s95n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 May 2022 14:05:53 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24KDl05T016192;
+        Fri, 20 May 2022 14:05:53 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g6bp2s94w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 May 2022 14:05:53 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24KDqmaI007787;
+        Fri, 20 May 2022 14:05:51 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3g2429gwug-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 May 2022 14:05:51 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24KE5mrj48038344
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 20 May 2022 14:05:48 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 44E3AAE051;
+        Fri, 20 May 2022 14:05:48 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07E99AE045;
+        Fri, 20 May 2022 14:05:48 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 20 May 2022 14:05:47 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v2 0/2] s390x: Avoid gcc 12 warnings
+Date:   Fri, 20 May 2022 16:05:44 +0200
+Message-Id: <20220520140546.311193-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] KVM: x86: SVM: fix nested PAUSE filtering
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-References: <20220518072709.730031-1-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220518072709.730031-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jl-E3R8KIbKrGQX1I-UmJu63KAQe3yot
+X-Proofpoint-GUID: 1rzUP55Cx00tnA3pngPEycOn4UV-7I-m
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-20_04,2022-05-20_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 adultscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999
+ impostorscore=0 suspectscore=0 mlxscore=0 spamscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205200099
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/22 09:27, Maxim Levitsky wrote:
-> To fix this, change the fallback strategy - ignore the guest threshold
-> values, but use/update the host threshold values, instead of using zeros.
+gcc 12 warns if a memory operand to inline asm points to memory in the
+first 4k bytes. However, in our case, these operands are fine, either
+because we actually want to use that memory, or expect and handle the
+resulting exception.
 
-Hmm, now I remember why it was using the guest values.  It's because, if
-the L1 hypervisor specifies COUNT=0 or does not have filtering enabled,
-we need to obey and inject a vmexit on every PAUSE.  So something like this:
+v1 -> v2
+ * replace mechanism, don't use pragmas, instead use an extern symbol so
+   gcc cannot conclude that the pointer is <4k
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index f209c1ca540c..e6153fd3ae47 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -616,6 +616,8 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
-  	struct kvm_vcpu *vcpu = &svm->vcpu;
-  	struct vmcb *vmcb01 = svm->vmcb01.ptr;
-  	struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
-+	u32 pause_count12;
-+	u32 pause_thresh12;
-  
-  	/*
-  	 * Filled at exit: exit_code, exit_code_hi, exit_info_1, exit_info_2,
-@@ -671,20 +673,25 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
-  	if (!nested_vmcb_needs_vls_intercept(svm))
-  		vmcb02->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
-  
-+	pause_count12 = svm->pause_filter_enabled ? svm->nested.ctl.pause_filter_count : 0;
-+	pause_thresh12 = svm->pause_threshold_enabled ? svm->nested.ctl.pause_filter_thresh : 0;
-  	if (kvm_pause_in_guest(svm->vcpu.kvm)) {
--		/* use guest values since host doesn't use them */
--		vmcb02->control.pause_filter_count =
--				svm->pause_filter_enabled ?
--				svm->nested.ctl.pause_filter_count : 0;
--
--		vmcb02->control.pause_filter_thresh =
--				svm->pause_threshold_enabled ?
--				svm->nested.ctl.pause_filter_thresh : 0;
-+		/* use guest values since host doesn't intercept PAUSE */
-+		vmcb02->control.pause_filter_count = pause_count12;
-+		vmcb02->control.pause_filter_thresh = pause_thresh12;
-  
-  	} else {
--		/* use host values otherwise */
-+		/* start from host values otherwise */
-  		vmcb02->control.pause_filter_count = vmcb01->control.pause_filter_count;
-  		vmcb02->control.pause_filter_thresh = vmcb01->control.pause_filter_thresh;
-+
-+		/* ... but ensure filtering is disabled if so requested.  */
-+		if (vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_PAUSE)) {
-+			if (!pause_count12)
-+				vmcb02->control.pause_filter_count = 0;
-+			if (!pause_thresh12)
-+				vmcb02->control.pause_filter_thresh = 0;
-+		}
-  	}
-  
-  	nested_svm_transition_tlb_flush(vcpu);
+   This new extern symbol refers to the lowcore. As a result, code
+   generation for lowcore accesses becomes worse.
+
+   Alternatives:
+    * Don't use extern symbol for lowcore, just for problematic pointers
+    * Hide value from gcc via inline asm
+    * Disable the warning globally
+    * Use memory clobber instead of memory output
+      Use address in register input instead of memory input
+          (may require WRITE_ONCE)
+    * Don't use gcc 12.0, with newer versions --param=min-pagesize=0 might
+      avoid the problem
+
+Janis Schoetterl-Glausch (2):
+  s390x: Introduce symbol for lowcore and use it
+  s390x: Fix gcc 12 warning about array bounds
+
+ lib/s390x/asm/arch_def.h   |  2 ++
+ lib/s390x/asm/facility.h   |  4 +--
+ lib/s390x/asm/mem.h        |  4 +++
+ lib/s390x/css.h            |  2 --
+ lib/s390x/css_lib.c        | 12 ++++----
+ lib/s390x/fault.c          | 10 +++----
+ lib/s390x/interrupt.c      | 61 +++++++++++++++++++-------------------
+ lib/s390x/mmu.c            |  3 +-
+ s390x/flat.lds             |  1 +
+ s390x/snippets/c/flat.lds  |  1 +
+ s390x/css.c                |  4 +--
+ s390x/diag288.c            |  4 +--
+ s390x/edat.c               |  5 ++--
+ s390x/emulator.c           | 15 +++++-----
+ s390x/mvpg.c               |  7 ++---
+ s390x/sclp.c               |  3 +-
+ s390x/skey.c               |  2 +-
+ s390x/skrf.c               | 11 +++----
+ s390x/smp.c                | 23 +++++++-------
+ s390x/snippets/c/spec_ex.c |  5 ++--
+ 20 files changed, 83 insertions(+), 96 deletions(-)
 
 
-What do you think?
+base-commit: 8719e8326101c1be8256617caf5835b57e819339
+-- 
+2.33.1
+
