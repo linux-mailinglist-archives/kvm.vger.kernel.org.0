@@ -2,139 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FE6352E16F
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 02:55:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A56DF52E1EE
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 03:24:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344168AbiETAzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 May 2022 20:55:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
+        id S1344435AbiETBYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 May 2022 21:24:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243354AbiETAzA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 May 2022 20:55:00 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354C5133255
-        for <kvm@vger.kernel.org>; Thu, 19 May 2022 17:54:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E071BB82966
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 00:54:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A1D49C3411E
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 00:54:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653008096;
-        bh=cdQeUsfGHoSlDb/yaa0+35fQeVt9IAokOSypxgkCRbQ=;
-        h=From:To:Subject:Date:From;
-        b=QyBmqOLDKfw9sN3iXHYzMe8ZOAmjB08qZv2Wms5Vx0LHLKgvg7yHLFqlJ666X7emZ
-         95oSwQbafkiAa6zcpAWF7+AEVAl64aRV0+NzmWEG+x056wgua3M0uD4ZGx3iPjLeMF
-         NM5dI0HYvwMu9ZHbXVgLAD2By1xHGpkUZX7OUv1+oBaGkGuset5cSgak3/kJYZv81L
-         mScxyu8hpF3DZQtVLvOMqUcwiDT+a0PyaLp7XYriZkJnUts6s2GrQV8wUA2Ybw5Jaz
-         K37kTepVvUtKRSjiiNhcf74Y3AeK7hMB/0BuRilKncYbBArgNQ8b1Ta3NN6pQWlaAU
-         KsHL03IT+90Xw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 88A86C05FD5; Fri, 20 May 2022 00:54:56 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216003] New: Single stepping Windows 7 bootloader results in
- Assertion `ret < cpu->num_ases && ret >= 0' failed.
-Date:   Fri, 20 May 2022 00:54:56 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ercli@ucdavis.edu
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-216003-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S240777AbiETBYn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 May 2022 21:24:43 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342792CDEE
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 18:24:42 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id a9so4471310pgv.12
+        for <kvm@vger.kernel.org>; Thu, 19 May 2022 18:24:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=EFGW6KkwvyY4pQb6+GcqplYjxXlO6yZ13EE/09wmTnc=;
+        b=TI6lTngyykFfvljrDLE4Pa5ypaSRcLJnl9IAzY25aN01OhcPFu4uW2bOL3O1xhYzxI
+         LupT/aqYQ9bCN+AaYRdZkne92MvzQZA3N3B9bTA9TyETdKNrTe4WyIerRd0F5SfbjFQ7
+         ZyQ07KG+FSOdlMKklCNdiuV4NMNuWPQNi2YMcnuO2lhnWirISKNZWUv33S2IbC5yrzf/
+         nHurKgWtdIcYFm0bKuJMPzRekdGBeI1/QGJY3FgKeBfZVyoSLQIi354kSLtNLlTJuhxG
+         CAjYscNZrNCP37ZNGR5eSYPJtIhBhy5wKRXpnnF9hn19ETyHJClBRSt+2SLJ9pgZeqQF
+         sahw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=EFGW6KkwvyY4pQb6+GcqplYjxXlO6yZ13EE/09wmTnc=;
+        b=jvP5ruXKAH+4xFI3RDvanggdq09SgkWJrC4wJmPy5bC9Ms5lllZwxKqJjREEeXZaor
+         nibhdZed5VbWF2LyIv0dxzgW9v00Lp6ErWxzje6/8rqSXhxMZCSt/pTydwMHafxL9fSu
+         W3LVm0vdBkaGRR5uh9bzAHodcXi8rjC1I7kbtSVB6GJgHRt3N/6QnM7AKQ1JTPMSHSI2
+         mm9gdvvV4iSHifOXNi+5Frn0TLMwsv/uMqdbaHP+znt3ShUgaEoVobVjCCg/oi9OtuUB
+         wp2eQxSjYqiQySOKRh7jFk71Qs6ecnK5bMtXqpAaCl9rcN0a/pMXQWQeMuRJxjCYAU8M
+         OIZg==
+X-Gm-Message-State: AOAM531NmKqgT8f78eKHRKkAi7f60pzt6UBEWNqW46V+QkKNRfPWDNKV
+        ekC5vQFGK7b3KCvDl9cW/WMvUw==
+X-Google-Smtp-Source: ABdhPJxQQ4zdCljbCK2lum+5DPvq5tArBDIZ1+hRcJo2nqBaO0J/3a+zpKX9d2WoKT0Lw7zNyl7H1A==
+X-Received: by 2002:a05:6a00:ad2:b0:4f1:2734:a3d9 with SMTP id c18-20020a056a000ad200b004f12734a3d9mr7398933pfl.61.1653009881457;
+        Thu, 19 May 2022 18:24:41 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p17-20020a170902c71100b0015e8d4eb28fsm4300576plp.217.2022.05.19.18.24.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 18:24:40 -0700 (PDT)
+Date:   Fri, 20 May 2022 01:24:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lei Wang <lei4.wang@intel.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, chenyi.qiang@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 8/8] KVM: VMX: Enable PKS for nested VM
+Message-ID: <Yobt1XwOfb5M6Dfa@google.com>
+References: <20220424101557.134102-1-lei4.wang@intel.com>
+ <20220424101557.134102-9-lei4.wang@intel.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220424101557.134102-9-lei4.wang@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216003
+Nit, use "KVM: nVMX:" for the shortlog scope.
 
-            Bug ID: 216003
-           Summary: Single stepping Windows 7 bootloader results in
-                    Assertion `ret < cpu->num_ases && ret >=3D 0' failed.
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.17.6-200.fc35.x86_64
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: ercli@ucdavis.edu
-        Regression: No
+On Sun, Apr 24, 2022, Lei Wang wrote:
+> @@ -2433,6 +2437,10 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+>  		if (kvm_mpx_supported() && vmx->nested.nested_run_pending &&
+>  		    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+>  			vmcs_write64(GUEST_BNDCFGS, vmcs12->guest_bndcfgs);
+> +
+> +		if (vmx->nested.nested_run_pending &&
+> +		    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS))
+> +			vmcs_write64(GUEST_IA32_PKRS, vmcs12->guest_ia32_pkrs);
 
-CPU model: Intel(R) Core(TM) i7-4510U CPU @ 2.00GHz
-Host kernel version: 5.17.6-200.fc35.x86_64
-Host kernel arch: x86_64
-Guest: Windows 7 or Windows 10 BIOS mode boot loader. 32-bits.
-This bug still exists if using -machine kernel_irqchip=3Doff
-This bug no longer exists if using -accel tcg
+As mentioned in the BNDCFGS thread, this does the wrong thing for SMM.  But, after
+a lot of thought, handling this in nested_vmx_enter_non_root_mode() would be little
+more than a band-aid, and a messy one at that, because KVM's SMM emulation is
+horrifically broken with respect to nVMX.
 
-How to reproduce:
+Entry does to SMM does not modify _any_ state that is not saved in SMRAM.  That
+we're having to deal with this crap is a symptom of KVM doing the complete wrong
+thing by piggybacking nested_vmx_vmexit() and nested_vmx_enter_non_root_mode().
 
-1. Install Windows 7 or Windows 10 in QEMU. Use MBR and BIOS (i.e. do not u=
-se
-GPT and UEFI). For example, I installed Windows on a 32G disk, and it resul=
-ts
-in around 3 partitions: 50M, 31.5G (this is C:), 450M. Only the MBR header
-(around 1 M) and the 50M disk is needed. For example,
-https://drive.google.com/uc?id=3D1mLvKsPSuLbeckwcdnavnQMu8QxOwvX29 can be u=
-sed to
-reproduce this bug. Suppose Windows is installed in w.img.
+The SDM's description of CET spells this out very, very clearly:
 
-2. Start QEMU
-qemu-system-x86_64 --drive media=3Ddisk,file=3Dw.img,format=3Draw,index=3D1=
- -s -S
--enable-kvm
+  On processors that support CET shadow stacks, when the processor enters SMM,
+  the processor saves the SSP register to the SMRAM state save area (see Table 31-3)
+  and clears CR4.CET to 0. Thus, the initial execution environment of the SMI handler
+  has CET disabled and all of the CET state of the interrupted program is still in the
+  machine. An SMM that uses CET is required to save the interrupted program’s CET
+  state and restore the CET state prior to exiting SMM.
 
-3. Start GDB
-gdb --ex 'target remote :::1234' --ex 'hb *0x7c00' --ex c --ex 'si 10000' -=
--ex
-q
-This GDB command starts from the MBR header and runs 10000 instructions. Wh=
-en I
-am reproducing it, running 1000 is enough to reproduce this problem. If this
-problem cannot be reproduced, try to increase this number.
+It mostly works because no guest SMM handler does anything with most of the MSRs,
+but it's all wildy wrong.  A concrete example of a lurking bug is if vmcs12 uses
+the VM-Exit MSR load list, in which case the forced nested_vmx_vmexit() will load
+state that is never undone.
 
-4. See error in QEMU:
-qemu-system-x86_64: ../hw/core/cpu-sysemu.c:77: cpu_asidx_from_attrs: Asser=
-tion
-`ret < cpu->num_ases && ret >=3D 0' failed.
-Aborted (core dumped)
+So, my very strong vote is to ignore SMM and let someone who actually cares about
+SMM fix that mess properly by adding custom flows for exiting/re-entering L2 on
+SMI/RSM.
 
-Expected behavior: there should not be an assertion error. GDB should be ab=
-le
-to single step a lot of instructions successfully.
+>  	}
+>  
+>  	if (nested_cpu_has_xsaves(vmcs12))
+> @@ -2521,6 +2529,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+>  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+>  		vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
+> +	if (kvm_cpu_cap_has(X86_FEATURE_PKS) &&
 
---=20
-You may reply to this email to add a comment.
+ERROR: trailing whitespace
+#85: FILE: arch/x86/kvm/vmx/nested.c:3407:
++^Iif (kvm_cpu_cap_has(X86_FEATURE_PKS) && $
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> +	    (!vmx->nested.nested_run_pending ||
+> +	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS)))
+> +		vmcs_write64(GUEST_IA32_PKRS, vmx->nested.vmcs01_guest_pkrs);
+> +
+>  	vmx_set_rflags(vcpu, vmcs12->guest_rflags);
+>  
+>  	/* EXCEPTION_BITMAP and CR0_GUEST_HOST_MASK should basically be the
+> @@ -2897,6 +2910,10 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
+>  					   vmcs12->host_ia32_perf_global_ctrl)))
+>  		return -EINVAL;
+>  
+> +	if ((vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PKRS) &&
+> +	    CC(!kvm_pkrs_valid(vmcs12->host_ia32_pkrs)))
+> +		return -EINVAL;
+> +
+>  #ifdef CONFIG_X86_64
+>  	ia32e = !!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE);
+>  #else
+> @@ -3049,6 +3066,10 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+>  	if (nested_check_guest_non_reg_state(vmcs12))
+>  		return -EINVAL;
+>  
+> +	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS) &&
+> +	    CC(!kvm_pkrs_valid(vmcs12->guest_ia32_pkrs)))
+> +		return -EINVAL;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -3384,6 +3405,10 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>  	    (!from_vmentry ||
+>  	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+>  		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> +	if (kvm_cpu_cap_has(X86_FEATURE_PKS) && 
+> +	    (!from_vmentry ||
+
+This should be "!vmx->nested.nested_run_pending" instead of "!from_vmentry" to
+avoid the unnecessary VMREAD when restoring L2 with a pending VM-Enter. 
+	
+> +	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS)))
+> +		vmx->nested.vmcs01_guest_pkrs = vmcs_read64(GUEST_IA32_PKRS);
+>  
+>  	/*
+>  	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
+
+...
+
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 91723a226bf3..82f79ac46d7b 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -222,6 +222,8 @@ struct nested_vmx {
+>  	u64 vmcs01_debugctl;
+>  	u64 vmcs01_guest_bndcfgs;
+>  
+
+Please pack these together, i.e. don't have a blank line between the various
+vmcs01_* fields.
+
+> +	u64 vmcs01_guest_pkrs;
+> +
+>  	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
+>  	int l1_tpr_threshold;
+>  
+> -- 
+> 2.25.1
+> 
