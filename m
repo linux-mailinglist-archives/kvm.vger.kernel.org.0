@@ -2,151 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD89B52EE56
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:39:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1C6852EE62
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:45:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350406AbiETOjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 10:39:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
+        id S1346535AbiETOpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 10:45:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350399AbiETOjo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 10:39:44 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E9A170F1B
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 07:39:42 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id n10so6795565qvi.5
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 07:39:42 -0700 (PDT)
+        with ESMTP id S244390AbiETOpT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 10:45:19 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF1F170F22;
+        Fri, 20 May 2022 07:45:19 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id fw21-20020a17090b129500b001df9f62edd6so6557834pjb.0;
+        Fri, 20 May 2022 07:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TTmi/1xkgT1AjVxJzskAr+COf/0zmPlsvxgfjW6STHE=;
-        b=Gxvhl+k8BBXk02rLhNHh59M59iKaZySmrURL5ViwDbexkz4AQDcT1PrTxGRwwIA9b6
-         /1f2ADWNgafFMzN43IhcFiyinqNnehHn/mS0YJbtMR6z731PyisnndoOkG4QNw19YD3d
-         5k+xSboSMaMN7QvahZpDuaMGQOESeBd5F4Bx3mh8jgB1uyY3ssyoK0Xq2S2xeP72/K83
-         PKpXip7h0Y+PpB3dm95FI4ngwmEccKM7+EXoqGyFtJ1eCsv33X6U8TW4FvS5JNrN09KR
-         w9b5Y7kbJX4XTJASFVGfGrpW2a4CWNMPykU0xVE8Gyft/WvrlN09/Biji8rIPx+RUWjW
-         tCtA==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=bV1fOV8EkPPKwTjdd+pCTFwZ+Tvzp6iCg5Gu+jWNb7o=;
+        b=jYSUm9nn4IZq15zBrPNJHS6DY7JGyShjxIH5jVqHz3lgZUe4TFRyDUIi6Ny2znOkyg
+         i/mFcUTWJ1kSTywrvoYWpYustfL3dCTrXzUbLEqBrvafbSxYS7F1quVM1ZXumO6oU0sC
+         WXlC4XUm438GrqA+ZKNsk9bPfwleiJZofZgP38x3cTvVYOXvICUE/JW0cEUXtHPVeHLA
+         nMV3LVccHDDYLtQm4CQhR0bx75KczIbJXobfeMI2U+G+1wolu6Z5ST819jqOhX80H3tZ
+         fS4T1I+V3DSH7sHywI+tZOaIxcOeTqs/hFUq1VSOedpJ2kigBc96Vp3+2mREwXQKOBxv
+         nFYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TTmi/1xkgT1AjVxJzskAr+COf/0zmPlsvxgfjW6STHE=;
-        b=V+mwiUfC6P9DplLgY6fsNG/J6Mw60OahV6HMCalAWEq9kONTHvaPPoCBaYb+1H3Tgx
-         seAirkbYh+c8XfyOubhHpzEZCJbJXTghZyV9g/D27cg7ykEbwD5vYTRKXE45PqQmhdnC
-         qHViA+Da2Q4I3sEBefn1yf2a39hQyhaL52a/eNHQu/FE7YPNOugmCTziAEsY8aM6Q4/i
-         /Ezrt3bAIG+8rUre2XRPtwGGW47YkOttG/y4G3Q256Wg7AqH5znNU6s5bdpeyA51YTd0
-         WbsZjDSdqOEqGeSSkXUk6vaxF2Yj7kn1AyWjVIzYNPEwLVkuM6GeJHwQP6ojvQgMeoeo
-         jAEg==
-X-Gm-Message-State: AOAM531hfzdZjmkPP3Byi561/965ST9vKfTQdVjsfWB9JoQzHS80Eyi3
-        7oWfAlphfiun3Q2ul2u3c7EM7A==
-X-Google-Smtp-Source: ABdhPJzkvB4GuJsVQAvtAye6NIsbWLxTJ8yuyfKdI6Dpev7Y/X++dkHVcr1QgV/boWcwi159jErlrw==
-X-Received: by 2002:ad4:4208:0:b0:461:d262:7842 with SMTP id k8-20020ad44208000000b00461d2627842mr8117176qvp.113.1653057582042;
-        Fri, 20 May 2022 07:39:42 -0700 (PDT)
-Received: from localhost (cpe-98-15-154-102.hvc.res.rr.com. [98.15.154.102])
-        by smtp.gmail.com with ESMTPSA id 196-20020a3706cd000000b0069fd12a957bsm3076730qkg.17.2022.05.20.07.39.41
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=bV1fOV8EkPPKwTjdd+pCTFwZ+Tvzp6iCg5Gu+jWNb7o=;
+        b=wkhEMgqUVcxFGn25E9zVuDju5fOrJHXqNf4SjSFwMw98hnjZla1NBak/ywGp/8+UfY
+         2AEW/LjBxFwp5rlOiuef5vbcIupi9V8uFt5TmLiCH0pSirV7baQcmdSrcuV5U36A+b+E
+         q/71pPcao8sjTnXIbM0U6Q1oX6nF/F6nBFPRXQy9EQ7G+AHgAzzbe8A3TQ1jarxbEp27
+         a9WliSPRQkCxj4WSrCMJ3uvxF1Y8SY4+6nScC4IMVOQT+wYpWSY+5TaHaSkCJBSyLfA6
+         MTERmnw7lMVg5nhOutnY6EzH3XN+7T9IzbIK9ttcJDC1tY0WnmSIBeXASXd2ONFSl+40
+         Gi9Q==
+X-Gm-Message-State: AOAM532tKw/WAsE1A380DHLzxIMzbGRLOD3IP0KXMssAIdMLIG4KEZMx
+        Qa2Px/LV5yxsffh2WkxwVlg=
+X-Google-Smtp-Source: ABdhPJyGaT7E+U0fr95zdMFKOzoFCFHlE57Co3IqQ8mOUYHRFFWs0oGNzpnjz814PubMJ4j+W7U6Wg==
+X-Received: by 2002:a17:902:9a42:b0:158:bf91:ecec with SMTP id x2-20020a1709029a4200b00158bf91ececmr10227542plv.115.1653057918534;
+        Fri, 20 May 2022 07:45:18 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.25])
+        by smtp.gmail.com with ESMTPSA id a13-20020aa7864d000000b0051829b1595dsm1932698pfo.130.2022.05.20.07.45.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 May 2022 07:39:41 -0700 (PDT)
-Date:   Fri, 20 May 2022 10:39:40 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Shakeel Butt <shakeelb@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Oliver Upton <oupton@google.com>,
-        Cgroups <cgroups@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
-Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-Message-ID: <YoeoLJNQTam5fJSu@cmpxchg.org>
-References: <20220429201131.3397875-1-yosryahmed@google.com>
- <20220429201131.3397875-2-yosryahmed@google.com>
- <87ilqoi77b.wl-maz@kernel.org>
- <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
- <Yn2TGJ4vZ/fst+CY@cmpxchg.org>
- <Yn2YYl98Vhh/UL0w@google.com>
- <Yn5+OtZSSUZZgTQj@cmpxchg.org>
- <Yn6DeEGLyR4Q0cDp@google.com>
- <CALvZod6nERq4j=L0V+pc-rd5+QKi4yb_23tWV-1MF53xL5KE6Q@mail.gmail.com>
- <CAJD7tka-5+XRkthNV4qCg8woPCpjcwynQoRBame-3GP1L8y+WQ@mail.gmail.com>
+        Fri, 20 May 2022 07:45:18 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     pbonzini@redhat.com
+Cc:     jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sandipan.das@amd.com,
+        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com
+Subject: [PATCH v2 2/3] KVM: x86/svm/pmu: Direct access pmu->gp_counter[] to implement amd_*_to_pmc()
+Date:   Fri, 20 May 2022 22:45:12 +0800
+Message-Id: <20220520144512.88454-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220510115718.93335-2-likexu@tencent.com>
+References: <20220510115718.93335-2-likexu@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJD7tka-5+XRkthNV4qCg8woPCpjcwynQoRBame-3GP1L8y+WQ@mail.gmail.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 19, 2022 at 06:56:54PM -0700, Yosry Ahmed wrote:
-> On Fri, May 13, 2022 at 10:14 AM Shakeel Butt <shakeelb@google.com> wrote:
-> >
-> > On Fri, May 13, 2022 at 9:12 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > [...]
-> > >
-> > > It was mostly an honest question, I too am trying to understand what userspace
-> > > wants to do with this information.  I was/am also trying to understand the benefits
-> > > of doing the tracking through page_state and not a dedicated KVM stat.  E.g. KVM
-> > > already has specific stats for the number of leaf pages mapped into a VM, why not
-> > > do the same for non-leaf pages?
-> >
-> > Let me answer why a more general stat is useful and the potential
-> > userspace reaction:
-> >
-> > For a memory type which is significant enough, it is useful to expose
-> > it in the general interfaces, so that the general data/stat collection
-> > infra can collect them instead of having workload dependent stat
-> > collectors. In addition, not necessarily that stat has to have a
-> > userspace reaction in an online fashion. We do collect stats for
-> > offline analysis which greatly influence the priority order of
-> > optimization workitems.
-> >
-> > Next the question is do we really need a separate stat item
-> > (secondary_pagetable instead of just plain pagetable) exposed in the
-> > stable API? To me secondary_pagetable is general (not kvm specific)
-> > enough and can be significant, so having a separate dedicated stat
-> > should be ok. Though I am ok with lump it with pagetable stat for now
-> > but we do want it to be accounted somewhere.
-> 
-> Any thoughts on this? Johannes?
+From: Like Xu <likexu@tencent.com>
 
-I agree that this memory should show up in vmstat/memory.stat in some
-form or another.
+AMD only has gp counters, whose corresponding vPMCs are initialised
+and stored in pmu->gp_counter[] in order of idx, so we can access this
+array directly based on any valid pmc->idx, without any help from other
+interfaces at all. The amd_rdpmc_ecx_to_pmc() can now reuse this part
+of the code quite naturally.
 
-The arguments on whether this should be part of NR_PAGETABLE or a
-separate entry seem a bit vague to me. I was hoping somebody more
-familiar with KVM could provide a better picture of memory consumption
-in that area.
+Opportunistically apply array_index_nospec() to reduce the attack
+surface for speculative execution and remove the dead code.
 
-Sean had mentioned that these allocations already get tracked through
-GFP_KERNEL_ACCOUNT. That's good, but if they are significant enough to
-track, they should be represented in memory.stat in some form. Sean
-also pointed out though that those allocations tend to scale rather
-differently than the page tables, so it probably makes sense to keep
-those two things separate at least.
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+v1 -> v2 Changelog:
+- Remove unused helper get_msr_base();
 
-Any thoughts on putting shadow page tables and iommu page tables into
-the existing NR_PAGETABLE item? If not, what are the cons?
+ arch/x86/kvm/svm/pmu.c | 45 +++++++-----------------------------------
+ 1 file changed, 7 insertions(+), 38 deletions(-)
 
-And creating (maybe later) a separate NR_VIRT for the other
-GPF_KERNEL_ACCOUNT allocations in kvm?
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index a3b78342a221..6cd8d3c2000c 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -61,21 +61,14 @@ static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[] = {
+ static_assert(ARRAY_SIZE(amd_event_mapping) ==
+ 	     ARRAY_SIZE(amd_f17h_event_mapping));
+ 
+-static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
++static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+ {
+-	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
++	unsigned int num_counters = pmu->nr_arch_gp_counters;
+ 
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
+-		if (type == PMU_TYPE_COUNTER)
+-			return MSR_F15H_PERF_CTR;
+-		else
+-			return MSR_F15H_PERF_CTL;
+-	} else {
+-		if (type == PMU_TYPE_COUNTER)
+-			return MSR_K7_PERFCTR0;
+-		else
+-			return MSR_K7_EVNTSEL0;
+-	}
++	if (pmc_idx >= num_counters)
++		return NULL;
++
++	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
+ }
+ 
+ static enum index msr_to_index(u32 msr)
+@@ -186,22 +179,6 @@ static bool amd_pmc_is_enabled(struct kvm_pmc *pmc)
+ 	return true;
+ }
+ 
+-static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+-{
+-	unsigned int base = get_msr_base(pmu, PMU_TYPE_COUNTER);
+-	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+-
+-	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
+-		/*
+-		 * The idx is contiguous. The MSRs are not. The counter MSRs
+-		 * are interleaved with the event select MSRs.
+-		 */
+-		pmc_idx *= 2;
+-	}
+-
+-	return get_gp_pmc_amd(pmu, base + pmc_idx, PMU_TYPE_COUNTER);
+-}
+-
+ static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+@@ -215,15 +192,7 @@ static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+ static struct kvm_pmc *amd_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+ 	unsigned int idx, u64 *mask)
+ {
+-	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+-	struct kvm_pmc *counters;
+-
+-	idx &= ~(3u << 30);
+-	if (idx >= pmu->nr_arch_gp_counters)
+-		return NULL;
+-	counters = pmu->gp_counters;
+-
+-	return &counters[idx];
++	return amd_pmc_idx_to_pmc(vcpu_to_pmu(vcpu), idx & ~(3u << 30));
+ }
+ 
+ static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+-- 
+2.36.1
+
