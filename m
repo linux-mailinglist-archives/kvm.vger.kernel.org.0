@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1C6852EE62
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:45:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F39C452EE66
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:47:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346535AbiETOpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 10:45:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38786 "EHLO
+        id S1350357AbiETOrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 10:47:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244390AbiETOpT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 10:45:19 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF1F170F22;
-        Fri, 20 May 2022 07:45:19 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id fw21-20020a17090b129500b001df9f62edd6so6557834pjb.0;
-        Fri, 20 May 2022 07:45:19 -0700 (PDT)
+        with ESMTP id S234821AbiETOrK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 10:47:10 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093396D848;
+        Fri, 20 May 2022 07:47:09 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id s3so11064173edr.9;
+        Fri, 20 May 2022 07:47:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=bV1fOV8EkPPKwTjdd+pCTFwZ+Tvzp6iCg5Gu+jWNb7o=;
-        b=jYSUm9nn4IZq15zBrPNJHS6DY7JGyShjxIH5jVqHz3lgZUe4TFRyDUIi6Ny2znOkyg
-         i/mFcUTWJ1kSTywrvoYWpYustfL3dCTrXzUbLEqBrvafbSxYS7F1quVM1ZXumO6oU0sC
-         WXlC4XUm438GrqA+ZKNsk9bPfwleiJZofZgP38x3cTvVYOXvICUE/JW0cEUXtHPVeHLA
-         nMV3LVccHDDYLtQm4CQhR0bx75KczIbJXobfeMI2U+G+1wolu6Z5ST819jqOhX80H3tZ
-         fS4T1I+V3DSH7sHywI+tZOaIxcOeTqs/hFUq1VSOedpJ2kigBc96Vp3+2mREwXQKOBxv
-         nFYQ==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SWTQFgB8L0HOjZtQc1uTglM1zJk6QTSSIlavXmQwbTw=;
+        b=kqbsM/w2QOwGxf2UjEnlVOncYqn2rwW8vphGroA5HeE2AtSamnO3PFv5sXcDBpwLr1
+         rrc4DEABL98OCWqPpH0vVGcgyJxmzR/HtoUmRpAOOgMJGnCAWo5EO69SXfO5ZrPU9Bj/
+         eP1vGtB9z20A6qW/OeA04MVbY8EF+E/1jW5Er72EmdxngcDfXQXR2pcdezafWxvrDRWt
+         D0SfozJgFeLbto3IiK2QzSe3rueCMiD9qh/EYguwxQe1sqTuik0T/NninI2M3oQAsxLK
+         gNYbmcR2Xv0ZHG9bgB4t3fU58kU+E5pm2+nB/HW6YjAdTRhUBtP8LQuK8FGnkkUuC2Sz
+         vbIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=bV1fOV8EkPPKwTjdd+pCTFwZ+Tvzp6iCg5Gu+jWNb7o=;
-        b=wkhEMgqUVcxFGn25E9zVuDju5fOrJHXqNf4SjSFwMw98hnjZla1NBak/ywGp/8+UfY
-         2AEW/LjBxFwp5rlOiuef5vbcIupi9V8uFt5TmLiCH0pSirV7baQcmdSrcuV5U36A+b+E
-         q/71pPcao8sjTnXIbM0U6Q1oX6nF/F6nBFPRXQy9EQ7G+AHgAzzbe8A3TQ1jarxbEp27
-         a9WliSPRQkCxj4WSrCMJ3uvxF1Y8SY4+6nScC4IMVOQT+wYpWSY+5TaHaSkCJBSyLfA6
-         MTERmnw7lMVg5nhOutnY6EzH3XN+7T9IzbIK9ttcJDC1tY0WnmSIBeXASXd2ONFSl+40
-         Gi9Q==
-X-Gm-Message-State: AOAM532tKw/WAsE1A380DHLzxIMzbGRLOD3IP0KXMssAIdMLIG4KEZMx
-        Qa2Px/LV5yxsffh2WkxwVlg=
-X-Google-Smtp-Source: ABdhPJyGaT7E+U0fr95zdMFKOzoFCFHlE57Co3IqQ8mOUYHRFFWs0oGNzpnjz814PubMJ4j+W7U6Wg==
-X-Received: by 2002:a17:902:9a42:b0:158:bf91:ecec with SMTP id x2-20020a1709029a4200b00158bf91ececmr10227542plv.115.1653057918534;
-        Fri, 20 May 2022 07:45:18 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.25])
-        by smtp.gmail.com with ESMTPSA id a13-20020aa7864d000000b0051829b1595dsm1932698pfo.130.2022.05.20.07.45.15
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SWTQFgB8L0HOjZtQc1uTglM1zJk6QTSSIlavXmQwbTw=;
+        b=UQGkEyXSzxRUKXzrnCI/No6Uu8rb+CTs09cjSxSKAoEoF1UqBI62q69gTZOdCpX0rH
+         DYs6TZswWOhbScKbDqBSDyJAxeg7kx1+JWxYGL9QrplIzxF4hys6XPZWYr5C5Kny16CT
+         sm+qh3qZ0zzVZo4CGZmNkcKB7gDxO4QGJcGD0HPfP59tcN9MjHsj7bl67JyjN84GKNbR
+         dn5PMFRLfL/WC2xSCTioUl0PhNTZFP4FwnCN1fArfyDqIMhGpQnN0ZtABCNEyi2eQw3H
+         Q1AYXs7o/tHb/59Gb2PIVmEnKMdm7q+lCr2mOrc4wpCpDOYqOBt5pGPAo2772Sz1G3eN
+         MdxQ==
+X-Gm-Message-State: AOAM533a/gjExsUBt2V9T/zagToEdKTet1HpZuBMtJqu05Z1G/OpxSOy
+        ZYQ+gCOgkoC3ds6s0rwNEU/twPfIQLc=
+X-Google-Smtp-Source: ABdhPJwoFRUDuX17QRDGhaE8MUYmI9XsJtewhQ+/m1a98o+oddwFTlmOHJFPz4XvmG2vEgnGz46+jw==
+X-Received: by 2002:a05:6402:3447:b0:42a:a449:ebb with SMTP id l7-20020a056402344700b0042aa4490ebbmr11130353edc.75.1653058027304;
+        Fri, 20 May 2022 07:47:07 -0700 (PDT)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id zp26-20020a17090684fa00b006f3ef214e2fsm3345013ejb.149.2022.05.20.07.47.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 May 2022 07:45:18 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     pbonzini@redhat.com
-Cc:     jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sandipan.das@amd.com,
-        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com
-Subject: [PATCH v2 2/3] KVM: x86/svm/pmu: Direct access pmu->gp_counter[] to implement amd_*_to_pmc()
-Date:   Fri, 20 May 2022 22:45:12 +0800
-Message-Id: <20220520144512.88454-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220510115718.93335-2-likexu@tencent.com>
-References: <20220510115718.93335-2-likexu@tencent.com>
+        Fri, 20 May 2022 07:47:07 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: x86/mmu: Use try_cmpxchg64 in fast_pf_fix_direct_spte
+Date:   Fri, 20 May 2022 16:46:35 +0200
+Message-Id: <20220520144635.63134-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -71,97 +72,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+Use try_cmpxchg64 instead of cmpxchg64 (*ptr, old, new) != old in
+fast_pf_fix_direct_spte. cmpxchg returns success in ZF flag, so this
+change saves a compare after cmpxchg (and related move instruction
+in front of cmpxchg).
 
-AMD only has gp counters, whose corresponding vPMCs are initialised
-and stored in pmu->gp_counter[] in order of idx, so we can access this
-array directly based on any valid pmc->idx, without any help from other
-interfaces at all. The amd_rdpmc_ecx_to_pmc() can now reuse this part
-of the code quite naturally.
-
-Opportunistically apply array_index_nospec() to reduce the attack
-surface for speculative execution and remove the dead code.
-
-Signed-off-by: Like Xu <likexu@tencent.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
 ---
-v1 -> v2 Changelog:
-- Remove unused helper get_msr_base();
 
- arch/x86/kvm/svm/pmu.c | 45 +++++++-----------------------------------
- 1 file changed, 7 insertions(+), 38 deletions(-)
+The patch is against tip tree.
+---
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index a3b78342a221..6cd8d3c2000c 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -61,21 +61,14 @@ static struct kvm_event_hw_type_mapping amd_f17h_event_mapping[] = {
- static_assert(ARRAY_SIZE(amd_event_mapping) ==
- 	     ARRAY_SIZE(amd_f17h_event_mapping));
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 311e4e1d7870..347bfd8bc5a3 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3073,7 +3073,7 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 	 *
+ 	 * Compare with set_spte where instead shadow_dirty_mask is set.
+ 	 */
+-	if (cmpxchg64(sptep, old_spte, new_spte) != old_spte)
++	if (!try_cmpxchg64(sptep, &old_spte, new_spte))
+ 		return false;
  
--static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
-+static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- {
--	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-+	unsigned int num_counters = pmu->nr_arch_gp_counters;
- 
--	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
--		if (type == PMU_TYPE_COUNTER)
--			return MSR_F15H_PERF_CTR;
--		else
--			return MSR_F15H_PERF_CTL;
--	} else {
--		if (type == PMU_TYPE_COUNTER)
--			return MSR_K7_PERFCTR0;
--		else
--			return MSR_K7_EVNTSEL0;
--	}
-+	if (pmc_idx >= num_counters)
-+		return NULL;
-+
-+	return &pmu->gp_counters[array_index_nospec(pmc_idx, num_counters)];
- }
- 
- static enum index msr_to_index(u32 msr)
-@@ -186,22 +179,6 @@ static bool amd_pmc_is_enabled(struct kvm_pmc *pmc)
- 	return true;
- }
- 
--static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
--{
--	unsigned int base = get_msr_base(pmu, PMU_TYPE_COUNTER);
--	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
--
--	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
--		/*
--		 * The idx is contiguous. The MSRs are not. The counter MSRs
--		 * are interleaved with the event select MSRs.
--		 */
--		pmc_idx *= 2;
--	}
--
--	return get_gp_pmc_amd(pmu, base + pmc_idx, PMU_TYPE_COUNTER);
--}
--
- static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-@@ -215,15 +192,7 @@ static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- static struct kvm_pmc *amd_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
- 	unsigned int idx, u64 *mask)
- {
--	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
--	struct kvm_pmc *counters;
--
--	idx &= ~(3u << 30);
--	if (idx >= pmu->nr_arch_gp_counters)
--		return NULL;
--	counters = pmu->gp_counters;
--
--	return &counters[idx];
-+	return amd_pmc_idx_to_pmc(vcpu_to_pmu(vcpu), idx & ~(3u << 30));
- }
- 
- static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 	if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
 -- 
-2.36.1
+2.35.3
 
