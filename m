@@ -2,114 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EDA152EE77
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BE4C52EE7B
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 16:49:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350461AbiETOt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 10:49:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50632 "EHLO
+        id S1350498AbiETOtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 10:49:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350409AbiETOtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 10:49:25 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 726331737DE
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 07:49:24 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id t11-20020a17090a6a0b00b001df6f318a8bso11681795pjj.4
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 07:49:24 -0700 (PDT)
+        with ESMTP id S1350494AbiETOtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 10:49:46 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 026511737EF;
+        Fri, 20 May 2022 07:49:44 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id en5so11126992edb.1;
+        Fri, 20 May 2022 07:49:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=f1NRmKh5Rhsxk9PmTkCXw/A8MNF/NhHvXEmLtT1IpHE=;
-        b=QZq4zlFkytnpkoKLHXfPVTDwcf9UtqLUzauaG+cSAnYVATmyPX81nLvs7hhmFyWBhe
-         CbWOigB+fYckwMOkgfGsCJ0urV15tiqwqIWj3aFa+InB8MHitijRYDLZqlyktUnOHdzK
-         1E/BkiyELKk1vHvrUiViJjXSEKszJYX395HLQWuDEFyfTdtW8F8lUTlYL3NXfdkIM609
-         87aKY/zH8Ngh+Qhb2+aojh/ynF4pK/Flk9qjGL93ex6Hec84NYU6elLaxICYnxjkr8Kp
-         hFXOe3z4bKd/JlXrfT/tb54mcnS+iQd+zJ/dt7EZNoN1Gcp2G5wD2CmWphQ7IJj+qdGI
-         PXcQ==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3lQxYbWXEP6uwC0KR1H8SjH5k3UicDj1ai6gDVQrEtI=;
+        b=Qc4Z7iVvog+zQB82KcR6ielXaXYpNOWCAt8CUU9cXNlzEq6A6C1M/tX5nMx8Xs7vYS
+         vuqrTYf6yR0sifhuKxsEx3PfOFXL/395V/IpZ+yXtKeq6K2pT/b/5WgWOcDhxDNsRlkY
+         U57E/0G0LKzY7uCglzvDzoOPnmEGM53fEovsSE5QJkEXJe6vOVwP9Gq9QlqI+fMdIew2
+         sPUdX9pfo5Npiu3VpD9fNecYoXRuPRfQQ7Sno3kRjnYyJdGW9QP7lqDzuwivHEjWrw1p
+         t1cs+zW9s41+n3+U6MU7FV/uc3+1Z9c9/M/OJ55fAQFGkvj+UQMvpIu6MCephR0L06sO
+         WS8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=f1NRmKh5Rhsxk9PmTkCXw/A8MNF/NhHvXEmLtT1IpHE=;
-        b=c9ydaG4d0bisZqfZAPAmzTebcdFLnjwjNp4CCcLPWpTO4qyfQJbBZ5Y/VYS+QPWuYn
-         d0BzYIMLUSTGAuJ/c75Q8Bn+muVpYRc3GMA7P8V2ptpw4XIUk8I03Fl4CewVmmGDuZ4U
-         hp6cBmrxmVLbhfn+uV74UOPvYRmNgiPEJ9ysJ8p0qW3MssZdcBMgdcfHKUJQT/wAEEn+
-         9CNt1VyOVfdLUURkGmCVeFcm1Ktkdw6GEn0373KBlY20BiyTLkOvAr7wvSj96elML43v
-         Wmgbb60fQgWsXWwHtKFsR5zGvfqvN2ZhIqwffzjuI4tAlPXVMThSoJm5yYebzAnIUuls
-         LQEA==
-X-Gm-Message-State: AOAM5320CO6seeR19EWNiSGTh/dvFW7g3ub+oTKRAfL1lYSfNYVmX+I6
-        GnQLRthGd+wS1l1dlqyTLDY7RQ==
-X-Google-Smtp-Source: ABdhPJyEbl4XhIo7xvkFoiHhRz1H+L7M1KeQghT2ol/Uc3pk9wA/MY8rSpYGOfK4Zij5dnpx8N4gnA==
-X-Received: by 2002:a17:902:d502:b0:161:bc5f:7b2d with SMTP id b2-20020a170902d50200b00161bc5f7b2dmr9675245plg.140.1653058163758;
-        Fri, 20 May 2022 07:49:23 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id t4-20020a170902e84400b0015e8d4eb248sm5871611plg.146.2022.05.20.07.49.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 May 2022 07:49:23 -0700 (PDT)
-Date:   Fri, 20 May 2022 14:49:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Yajun Deng <yajun.deng@linux.dev>, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Move kzalloc out of atomic context on
- PREEMPT_RT
-Message-ID: <YoeqbxPwOnOZx5oI@google.com>
-References: <20220519090218.2230653-1-yajun.deng@linux.dev>
- <YoZeI6UeQbP3t1dF@google.com>
- <f7585471-43be-4b40-f398-dfd7dc937131@redhat.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3lQxYbWXEP6uwC0KR1H8SjH5k3UicDj1ai6gDVQrEtI=;
+        b=hwdUnlauP/QU8Snk3z4xBxBc4XEMsL0MjDTT8Wfsp76TSvIA/URhXlWptipvA50ONT
+         OZ6fYZ7gf2aaKoqyj0Mw/hREPIXCnSZA0W5seN/XuL9HsWH+MkDblpqMRBuTU6X+nIFW
+         zZcfs4vL5QTWP3acroXbTpjW8zSPnO+2Du8v/yk/jJF2Ki2fUFbhG5WrEWbAUkJjtgNW
+         fp8ZcmKUZWc8iN8VJzQqL0t1atFlFEWHRyyTuLZxo0U0H6VcLZtmqG43F4xpzTuLP819
+         qN4dz5fdnn8cY+XxQLf956RIZZgow+UrGFyMD6FFzhWE9Gij3y71v/u2w4G9OhaMQP32
+         uwgA==
+X-Gm-Message-State: AOAM532+lBBwd3OTXQTEFhLm1c9UMjBoQ1znsPd/rhlE71hMkgYyA1Qj
+        XyY8t8aqeGj2mJzXL3dMVvk1Wk8QBuOeuQ==
+X-Google-Smtp-Source: ABdhPJzouOMsHp5AumLigjIAucsoC6vK+9Cp9dTYqJqCpkMV1w2fMIUyqFUcWwS8nHDlBaYG1plAwQ==
+X-Received: by 2002:a05:6402:4396:b0:427:f2dc:b11 with SMTP id o22-20020a056402439600b00427f2dc0b11mr11479587edc.298.1653058182595;
+        Fri, 20 May 2022 07:49:42 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id ra48-20020a17090769b000b006fe9a2874cdsm1808233ejc.103.2022.05.20.07.49.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 May 2022 07:49:42 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <035a5300-27e1-e212-1ed7-0449e9d20615@redhat.com>
+Date:   Fri, 20 May 2022 16:49:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7585471-43be-4b40-f398-dfd7dc937131@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2 6/8] KVM: Fix multiple races in gfn=>pfn cache refresh
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Woodhouse <dwmw@amazon.co.uk>,
+        Mingwei Zhang <mizhang@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <20220427014004.1992589-1-seanjc@google.com>
+ <20220427014004.1992589-7-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220427014004.1992589-7-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022, Paolo Bonzini wrote:
-> On 5/19/22 17:11, Sean Christopherson wrote:
-> > AFAICT, kfree() is safe to call under a raw spinlock, so this?  Compile tested
-> > only...
-> 
-> Freeing outside the lock is not complicated enough to check if it is:
-> 
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 6aa1241a80b7..f849f7c9fbf2 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -229,12 +229,15 @@ void kvm_async_pf_task_wake(u32 token)
->  		dummy->cpu = smp_processor_id();
->  		init_swait_queue_head(&dummy->wq);
->  		hlist_add_head(&dummy->link, &b->list);
-> +		dummy = NULL;
->  	} else {
-> -		kfree(dummy);
->  		apf_task_wake_one(n);
->  	}
->  	raw_spin_unlock(&b->lock);
-> -	return;
-> +
-> +	/* A dummy token might be allocated and ultimately not used.  */
-> +	if (dummy)
-> +		kfree(dummy);
->  }
->  EXPORT_SYMBOL_GPL(kvm_async_pf_task_wake);
-> 
-> 
-> I queued your patch with the above fixup.
+On 4/27/22 03:40, Sean Christopherson wrote:
+> +		 * Wait for mn_active_invalidate_count, not mmu_notifier_count,
+> +		 * to go away, as the invalidation in the mmu_notifier event
+> +		 * occurs_before_  mmu_notifier_count is elevated.
+> +		 *
+> +		 * Note, mn_active_invalidate_count can change at any time as
+> +		 * it's not protected by gpc->lock.  But, it is guaranteed to
+> +		 * be elevated before the mmu_notifier acquires gpc->lock, and
+> +		 * isn't dropped until after mmu_notifier_seq is updated.  So,
+> +		 * this task may get a false positive of sorts, i.e. see an
+> +		 * elevated count and wait even though it's technically safe to
+> +		 * proceed (becase the mmu_notifier will invalidate the cache
+> +		 *_after_  it's refreshed here), but the cache will never be
+> +		 * refreshed with stale data, i.e. won't get false negatives.
 
-Ha, I wrote it exactly that way, then grepped around found a few instances of kfree()
-being called in side a raw spinlock, so changed it back :-)
+I am all for lavish comments, but I think this is even too detailed.  What about:
 
-100% agree it's not worth having to generate another patch if it turns out those
-callers are wrong.
+                 /*
+                  * mn_active_invalidate_count acts for all intents and purposes
+                  * like mmu_notifier_count here; but we cannot use the latter
+                  * because the invalidation in the mmu_notifier event occurs
+                  * _before_ mmu_notifier_count is elevated.
+                  *
+                  * Note, it does not matter that mn_active_invalidate_count
+                  * is not protected by gpc->lock.  It is guaranteed to
+                  * be elevated before the mmu_notifier acquires gpc->lock, and
+                  * isn't dropped until after mmu_notifier_seq is updated.
+                  */
+
+Paolo
