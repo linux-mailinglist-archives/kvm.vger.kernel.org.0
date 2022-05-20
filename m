@@ -2,71 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5ECA052ECE5
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 15:12:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8DAC52ECF3
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 15:17:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349636AbiETNMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 09:12:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47174 "EHLO
+        id S1349722AbiETNRv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 09:17:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348037AbiETNMP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 09:12:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F214E146745
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 06:12:12 -0700 (PDT)
+        with ESMTP id S236665AbiETNRt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 09:17:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 93A7914A240
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 06:17:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653052332;
+        s=mimecast20190719; t=1653052666;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+5nV8tCQI3oqLbTA5SCZ4g2sr1Sj+tUNQuV71eHdmE4=;
-        b=InWyXs3PCARcrAEfBy2+lK1FQ6UVFqjhq+OvkixwhZF33M4LwcFoLHPe5JzIi0f0gS5NJ5
-        uiBb/mX6OnUZtWdAO48UWBhoCf4m1PjhWKzjPY/y7P7fdD0j0U5xZaej6oRbI4LqI4ETpc
-        TyNE4O+qlKTPYnfdmYDddYPoXqwxKfs=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=+/TKgozQmA8S48TUFeyHxAZ+3/KdSbiwoYfpe0+qGGM=;
+        b=Kz1kwEKNzYtyoGmWxCjQ3IHBsa6RGBbcyYK7r9GvZFmeYU+0oGotpgEE5FPkjeCxn3s+9M
+        6BQ75iOPDtyFzac0gmN2YlnGO1xAVAIAEh7MxIJsFtn3oHemaFSIfbujA+mhBzJMTUGsao
+        x/K0m3IaOUo54C7bkak0CSy0+sPXT7Q=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-621-EGeomIC0NWaDhwp-P0xpNQ-1; Fri, 20 May 2022 09:12:10 -0400
-X-MC-Unique: EGeomIC0NWaDhwp-P0xpNQ-1
-Received: by mail-ej1-f70.google.com with SMTP id bt15-20020a170906b14f00b006fe9c3afbc2so2335548ejb.17
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 06:12:10 -0700 (PDT)
+ us-mta-544-NeBtCj9ONni-MrDmGBlzfQ-1; Fri, 20 May 2022 09:17:45 -0400
+X-MC-Unique: NeBtCj9ONni-MrDmGBlzfQ-1
+Received: by mail-ed1-f72.google.com with SMTP id h11-20020aa7c60b000000b0042ab2287015so5625129edq.3
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 06:17:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=+5nV8tCQI3oqLbTA5SCZ4g2sr1Sj+tUNQuV71eHdmE4=;
-        b=zbsmtxb4JEFtqLjkv0GLhfwJAA7G/FPB8/DzE7hFPWYxl0n691YNhRvAQ5qfLbJaek
-         HtGWVH9qqWmKkwKWgdfH6FWJrIYCcKCpQ2hS4JlzBjN6iHDTPuoZDbViX0JMYJucBTSn
-         3oBtmjQpixORFSdFGs6S/NcGbCNiA4O0JdX/mfajbxDt3QhwEvIIaNmYXBeUQYq5NAtU
-         UhXcX3WO07MChIRy8X6Gifqz5U7f+eblA2ZRRCtfqcpR1B3Vx11NqvijO9LAZXU9agFN
-         +WFWxU66SPQwShoR2EoIn6X0WRAH3B0AT+sgt8G2W9jeha6Frx94Eg6fu6jmoGIiUtFJ
-         oe0w==
-X-Gm-Message-State: AOAM531V0OEHfbUA0/lmGgBajGeD94U9iv29I5QaBeZGA/EEeguphgul
-        p8V1PoCM9xFD72944ahClYtQPvJiuTo4rAZL9eqBDlpAdJgjGHdqCYoiLwoXF6oZao3cevEw014
-        WQBcZEsAPldew
-X-Received: by 2002:aa7:d38f:0:b0:42a:a2e6:90d9 with SMTP id x15-20020aa7d38f000000b0042aa2e690d9mr10778437edq.305.1653052329607;
-        Fri, 20 May 2022 06:12:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzmoF0iLvTnkJ3kfMJRJlyQ7URlnlSbbkLWcwjOQ/BNEHsnsipIq7G5N/8XON+tREjWiZe6dg==
-X-Received: by 2002:aa7:d38f:0:b0:42a:a2e6:90d9 with SMTP id x15-20020aa7d38f000000b0042aa2e690d9mr10778421edq.305.1653052329465;
-        Fri, 20 May 2022 06:12:09 -0700 (PDT)
+        bh=+/TKgozQmA8S48TUFeyHxAZ+3/KdSbiwoYfpe0+qGGM=;
+        b=NQjkYI7iERT+O1CIZS6AILm00A92dZKC+QocqiSwfJVC3VefiOImH0pk9sXg5lqKTD
+         t7fyunIKk8LoFQCGHLjjYertk/bIvntu6kAVKglE1HZoBcxpKv0x+tgWgiEmRchwpVR0
+         reAKvr6Kmpx/Rk0Bbl7I5/RsQUWz+kI4Dy2sJjToTd+s4ai1YN3JNKey6e6vekf1wnz0
+         K1+nNXJaeNSISyX+lKIyhAgRWNXSjXi/2aDmd/W4t6XWuaMBxz79fvpyCGlb/KlfjEWT
+         Adv6wgF5G4YCRGeM2rrxvbwh1H/Qwu7+axewD7AuNxWfHIdxyWh1Cy7sFuHlNKy1vfhF
+         iB7Q==
+X-Gm-Message-State: AOAM530lSQSvAI6E1b6lU+b4KfQTiHv1KJ/Y5HZ0O9KWOuhrTZ7iju7o
+        vC5PBXmZWWCnz6Kpnh/GHJNAjtFGSRmP77gUOZ9pe5fzhnw1SlsWPETHU9fgV0up5A86omJo+Dh
+        Cqeq3+dhijI87RZEoqJjrEhKFuEq3str17e2axMcbi6XBONrQ+/K4MR+je1iI3g8=
+X-Received: by 2002:a17:907:a0ca:b0:6f8:5bef:b9c with SMTP id hw10-20020a170907a0ca00b006f85bef0b9cmr8799198ejc.630.1653052664204;
+        Fri, 20 May 2022 06:17:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwDtgLamQcdSO7Tm2tjrgVK1a742egM7gnqHBGsMy9/y7sxkgOmWF0fSUq1kmZnqSANh2hgkg==
+X-Received: by 2002:a17:907:a0ca:b0:6f8:5bef:b9c with SMTP id hw10-20020a170907a0ca00b006f85bef0b9cmr8799177ejc.630.1653052663972;
+        Fri, 20 May 2022 06:17:43 -0700 (PDT)
 Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
-        by smtp.gmail.com with ESMTPSA id 1-20020a170906004100b006f3ef214dc7sm3114291ejg.45.2022.05.20.06.12.08
+        by smtp.gmail.com with ESMTPSA id 9-20020a17090601c900b006f3ef214db7sm3185890ejj.29.2022.05.20.06.17.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 May 2022 06:12:08 -0700 (PDT)
-Date:   Fri, 20 May 2022 15:12:07 +0200
+        Fri, 20 May 2022 06:17:43 -0700 (PDT)
+Date:   Fri, 20 May 2022 15:17:41 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, thuth@redhat.com, nikos.nikoleris@arm.com
 Subject: Re: [PATCH kvm-unit-tests 2/2] lib: Add ctype.h and collect is*
  functions
-Message-ID: <20220520131207.c36niz3enmtssofs@gator>
+Message-ID: <20220520131741.lytat34cnn2lyqbw@gator>
 References: <20220519170724.580956-1-drjones@redhat.com>
  <20220519170724.580956-3-drjones@redhat.com>
- <21a2a499-a61b-8d25-92c6-c91e6d5ea2f9@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <21a2a499-a61b-8d25-92c6-c91e6d5ea2f9@arm.com>
+In-Reply-To: <20220519170724.580956-3-drjones@redhat.com>
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -77,17 +76,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022 at 10:10:14AM +0100, Nikos Nikoleris wrote:
-> > +
-> > +static inline int isalpha(int c)
+On Thu, May 19, 2022 at 07:07:24PM +0200, Andrew Jones wrote:
+> We've been slowly adding ctype functions to different files without
+> even exporting them. Let's change that.
 > 
-> minor nit: I think there is a trailing whitespace in the line above,
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 
-You're right and I've fixed it now.
-
-> otherwise:
-> 
-> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+I need to send a v2 of this series, because besides the trailing
+space Nikos points out, I just noticed that I forgot a check
+for '_' in argv.c.
 
 Thanks,
 drew
