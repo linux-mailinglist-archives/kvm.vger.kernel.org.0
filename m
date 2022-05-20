@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFB5152ED07
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 15:24:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A3C752ED08
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 15:24:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346815AbiETNYR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 09:24:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35362 "EHLO
+        id S1349769AbiETNYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 09:24:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233476AbiETNYP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 09:24:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2D28A1498C4
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 06:24:13 -0700 (PDT)
+        with ESMTP id S1349729AbiETNYW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 09:24:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4EDC914A246
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 06:24:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653053052;
+        s=mimecast20190719; t=1653053059;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sTcTaw03oaPmzs4jzNtmsHzpR8MojXUS/OMTsoWSJTw=;
-        b=eyHMTHW+oqAsagHJCzuJPknzHFXhtaFmonzowmF6UbrbposMZDD2LBYemoPvYmWy0gyxZW
-        P4cmFkUWG6DBa4EgQuPM/f046QvWuOXk+qpTpixa3v82az/DKXl+s385KXj3Op1qK0IySv
-        SanD9xFvcM/bt4FzuVs6nNK4Tdp+bgg=
+        bh=0n8Km5qwGblBje4LgPiwmYschJacvJ2NWC8xCL4T6yM=;
+        b=T7lj50yO+skCjcC3q7+K7wX19CjqcBxjti+qxNmQa7PEKPSIv2VQy5owhGaOy8t2z3p1HA
+        PU01V1ivEsavvgPeFkJYFqDcZq165DH2CPvOosfCLP69hJ/uMgRxm1cBXhEWFxSZajeHEd
+        xm2IQbNor6uccZuy/EIVCEu3yUT5PnE=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-527-Cv1KH9fRNsu75dSD5V8jCw-1; Fri, 20 May 2022 09:24:09 -0400
-X-MC-Unique: Cv1KH9fRNsu75dSD5V8jCw-1
+ us-mta-410-cAWYTcefPHqmehaMkUtNvA-1; Fri, 20 May 2022 09:24:10 -0400
+X-MC-Unique: cAWYTcefPHqmehaMkUtNvA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A6736811E75;
-        Fri, 20 May 2022 13:24:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5FC1485A5BB;
+        Fri, 20 May 2022 13:24:10 +0000 (UTC)
 Received: from gator.redhat.com (unknown [10.40.194.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 044C440D2820;
-        Fri, 20 May 2022 13:24:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 106CA40D2820;
+        Fri, 20 May 2022 13:24:08 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, thuth@redhat.com, nikos.nikoleris@arm.com
-Subject: [PATCH kvm-unit-tests v2 1/2] lib: Fix whitespace
-Date:   Fri, 20 May 2022 15:24:03 +0200
-Message-Id: <20220520132404.700626-2-drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests v2 2/2] lib: Add ctype.h and collect is* functions
+Date:   Fri, 20 May 2022 15:24:04 +0200
+Message-Id: <20220520132404.700626-3-drjones@redhat.com>
 In-Reply-To: <20220520132404.700626-1-drjones@redhat.com>
 References: <20220520132404.700626-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -59,987 +59,126 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-printf.c and string.c are a couple of the original files and are
-the last that still have the original formatting. Let's finally
-clean them up!
-
-The change was done by modifying Linux's scripts/Lindent to use
-100 columns instead of 80 and then manually reverting a few
-changes that I didn't like, which I found by diffing with -b.
+We've been slowly adding ctype functions to different files without
+even exporting them. Let's change that.
 
 Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/printf.c | 427 +++++++++++++++++++++++++--------------------------
- lib/string.c | 354 +++++++++++++++++++++---------------------
- 2 files changed, 390 insertions(+), 391 deletions(-)
+ lib/argv.c   |  9 +++------
+ lib/ctype.h  | 40 ++++++++++++++++++++++++++++++++++++++++
+ lib/string.c |  6 +-----
+ 3 files changed, 44 insertions(+), 11 deletions(-)
+ create mode 100644 lib/ctype.h
 
-diff --git a/lib/printf.c b/lib/printf.c
-index 1269723ef720..383799ec0717 100644
---- a/lib/printf.c
-+++ b/lib/printf.c
-@@ -10,285 +10,284 @@
- #define BUFSZ 2000
+diff --git a/lib/argv.c b/lib/argv.c
+index 0312d74011d3..9ffa673ef3a1 100644
+--- a/lib/argv.c
++++ b/lib/argv.c
+@@ -6,6 +6,7 @@
+  */
  
- typedef struct pstream {
--    char *buffer;
--    int remain;
--    int added;
-+	char *buffer;
-+	int remain;
-+	int added;
- } pstream_t;
+ #include "libcflat.h"
++#include "ctype.h"
+ #include "argv.h"
+ #include "auxinfo.h"
  
- typedef struct strprops {
--    char pad;
--    int npad;
--    bool alternate;
-+	char pad;
-+	int npad;
-+	bool alternate;
- } strprops_t;
+@@ -19,10 +20,6 @@ char **environ = __environ;
+ static char args_copy[1000];
+ static char *copy_ptr = args_copy;
  
- static void addchar(pstream_t *p, char c)
- {
--    if (p->remain) {
--	*p->buffer++ = c;
--	--p->remain;
--    }
--    ++p->added;
-+	if (p->remain) {
-+		*p->buffer++ = c;
-+		--p->remain;
-+	}
-+	++p->added;
- }
- 
- static void print_str(pstream_t *p, const char *s, strprops_t props)
- {
--    const char *s_orig = s;
--    int npad = props.npad;
+-#define isblank(c) ((c) == ' ' || (c) == '\t')
+-#define isalpha(c) (((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z') || (c) == '_')
+-#define isalnum(c) (isalpha(c) || ((c) >= '0' && (c) <= '9'))
 -
--    if (npad > 0) {
--	npad -= strlen(s_orig);
--	while (npad > 0) {
--	    addchar(p, props.pad);
--	    --npad;
-+	const char *s_orig = s;
-+	int npad = props.npad;
+ static const char *skip_blanks(const char *p)
+ {
+ 	while (isblank(*p))
+@@ -92,12 +89,12 @@ static char *env_next(char *env)
+ 	if (!*env)
+ 		return env;
+ 
+-	if (isalpha(*env)) {
++	if (isalpha(*env) || *env == '_') {
+ 		bool invalid = false;
+ 
+ 		p = env + 1;
+ 		while (*p && *p != '=' && *p != '\n') {
+-			if (!isalnum(*p))
++			if (!(isalnum(*p) || *p == '_'))
+ 				invalid = true;
+ 			++p;
+ 		}
+diff --git a/lib/ctype.h b/lib/ctype.h
+new file mode 100644
+index 000000000000..0b43d626478a
+--- /dev/null
++++ b/lib/ctype.h
+@@ -0,0 +1,40 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef _CTYPE_H_
++#define _CTYPE_H_
 +
-+	if (npad > 0) {
-+		npad -= strlen(s_orig);
-+		while (npad > 0) {
-+			addchar(p, props.pad);
-+			--npad;
-+		}
- 	}
--    }
- 
--    while (*s)
--	addchar(p, *s++);
-+	while (*s)
-+		addchar(p, *s++);
- 
--    if (npad < 0) {
--	props.pad = ' '; /* ignore '0' flag with '-' flag */
--	npad += strlen(s_orig);
--	while (npad < 0) {
--	    addchar(p, props.pad);
--	    ++npad;
-+	if (npad < 0) {
-+		props.pad = ' ';	/* ignore '0' flag with '-' flag */
-+		npad += strlen(s_orig);
-+		while (npad < 0) {
-+			addchar(p, props.pad);
-+			++npad;
-+		}
- 	}
--    }
- }
- 
- static char digits[16] = "0123456789abcdef";
- 
- static void print_int(pstream_t *ps, long long n, int base, strprops_t props)
- {
--    char buf[sizeof(long) * 3 + 2], *p = buf;
--    int s = 0, i;
-+	char buf[sizeof(long) * 3 + 2], *p = buf;
-+	int s = 0, i;
- 
--    if (n < 0) {
--	n = -n;
--	s = 1;
--    }
-+	if (n < 0) {
-+		n = -n;
-+		s = 1;
-+	}
- 
--    while (n) {
--	*p++ = digits[n % base];
--	n /= base;
--    }
-+	while (n) {
-+		*p++ = digits[n % base];
-+		n /= base;
-+	}
- 
--    if (s)
--	*p++ = '-';
-+	if (s)
-+		*p++ = '-';
- 
--    if (p == buf)
--	*p++ = '0';
-+	if (p == buf)
-+		*p++ = '0';
- 
--    for (i = 0; i < (p - buf) / 2; ++i) {
--	char tmp;
-+	for (i = 0; i < (p - buf) / 2; ++i) {
-+		char tmp;
- 
--	tmp = buf[i];
--	buf[i] = p[-1-i];
--	p[-1-i] = tmp;
--    }
-+		tmp = buf[i];
-+		buf[i] = p[-1 - i];
-+		p[-1 - i] = tmp;
-+	}
- 
--    *p = 0;
-+	*p = 0;
- 
--    print_str(ps, buf, props);
-+	print_str(ps, buf, props);
- }
- 
- static void print_unsigned(pstream_t *ps, unsigned long long n, int base,
- 			   strprops_t props)
- {
--    char buf[sizeof(long) * 3 + 3], *p = buf;
--    int i;
--
--    while (n) {
--	*p++ = digits[n % base];
--	n /= base;
--    }
--
--    if (p == buf)
--	*p++ = '0';
--    else if (props.alternate && base == 16) {
--	if (props.pad == '0') {
--	    addchar(ps, '0');
--	    addchar(ps, 'x');
--
--	    if (props.npad > 0)
--		props.npad = MAX(props.npad - 2, 0);
--	} else {
--	    *p++ = 'x';
--	    *p++ = '0';
-+	char buf[sizeof(long) * 3 + 3], *p = buf;
-+	int i;
++static inline int isblank(int c)
++{
++	return c == ' ' || c == '\t';
++}
 +
-+	while (n) {
-+		*p++ = digits[n % base];
-+		n /= base;
-+	}
++static inline int islower(int c)
++{
++	return c >= 'a' && c <= 'z';
++}
 +
-+	if (p == buf)
-+		*p++ = '0';
-+	else if (props.alternate && base == 16) {
-+		if (props.pad == '0') {
-+			addchar(ps, '0');
-+			addchar(ps, 'x');
++static inline int isupper(int c)
++{
++	return c >= 'A' && c <= 'Z';
++}
 +
-+			if (props.npad > 0)
-+				props.npad = MAX(props.npad - 2, 0);
-+		} else {
-+			*p++ = 'x';
-+			*p++ = '0';
-+		}
- 	}
--    }
- 
--    for (i = 0; i < (p - buf) / 2; ++i) {
--	char tmp;
-+	for (i = 0; i < (p - buf) / 2; ++i) {
-+		char tmp;
- 
--	tmp = buf[i];
--	buf[i] = p[-1-i];
--	p[-1-i] = tmp;
--    }
-+		tmp = buf[i];
-+		buf[i] = p[-1 - i];
-+		p[-1 - i] = tmp;
-+	}
- 
--    *p = 0;
-+	*p = 0;
- 
--    print_str(ps, buf, props);
-+	print_str(ps, buf, props);
- }
- 
- static int fmtnum(const char **fmt)
- {
--    const char *f = *fmt;
--    int len = 0, num;
-+	const char *f = *fmt;
-+	int len = 0, num;
- 
--    if (*f == '-')
--	++f, ++len;
-+	if (*f == '-')
-+		++f, ++len;
- 
--    while (*f >= '0' && *f <= '9')
--	++f, ++len;
-+	while (*f >= '0' && *f <= '9')
-+		++f, ++len;
- 
--    num = atol(*fmt);
--    *fmt += len;
--    return num;
-+	num = atol(*fmt);
-+	*fmt += len;
-+	return num;
- }
- 
- int vsnprintf(char *buf, int size, const char *fmt, va_list va)
- {
--    pstream_t s;
--
--    s.buffer = buf;
--    s.remain = size - 1;
--    s.added = 0;
--    while (*fmt) {
--	char f = *fmt++;
--	int nlong = 0;
--	strprops_t props;
--	memset(&props, 0, sizeof(props));
--	props.pad = ' ';
--
--	if (f != '%') {
--	    addchar(&s, f);
--	    continue;
--	}
--    morefmt:
--	f = *fmt++;
--	switch (f) {
--	case '%':
--	    addchar(&s, '%');
--	    break;
--	case 'c':
--            addchar(&s, va_arg(va, int));
--	    break;
--	case '\0':
--	    --fmt;
--	    break;
--	case '#':
--	    props.alternate = true;
--	    goto morefmt;
--	case '0':
--	    props.pad = '0';
--	    ++fmt;
--	    /* fall through */
--	case '1'...'9':
--	case '-':
--	    --fmt;
--	    props.npad = fmtnum(&fmt);
--	    goto morefmt;
--	case 'l':
--	    ++nlong;
--	    goto morefmt;
--	case 't':
--	case 'z':
--	    /* Here we only care that sizeof(size_t) == sizeof(long).
--	     * On a 32-bit platform it doesn't matter that size_t is
--	     * typedef'ed to int or long; va_arg will work either way.
--	     * Same for ptrdiff_t (%td).
--	     */
--	    nlong = 1;
--	    goto morefmt;
--	case 'd':
--	    switch (nlong) {
--	    case 0:
--		print_int(&s, va_arg(va, int), 10, props);
--		break;
--	    case 1:
--		print_int(&s, va_arg(va, long), 10, props);
--		break;
--	    default:
--		print_int(&s, va_arg(va, long long), 10, props);
--		break;
--	    }
--	    break;
--	case 'u':
--	    switch (nlong) {
--	    case 0:
--		print_unsigned(&s, va_arg(va, unsigned), 10, props);
--		break;
--	    case 1:
--		print_unsigned(&s, va_arg(va, unsigned long), 10, props);
--		break;
--	    default:
--		print_unsigned(&s, va_arg(va, unsigned long long), 10, props);
--		break;
--	    }
--	    break;
--	case 'x':
--	    switch (nlong) {
--	    case 0:
--		print_unsigned(&s, va_arg(va, unsigned), 16, props);
--		break;
--	    case 1:
--		print_unsigned(&s, va_arg(va, unsigned long), 16, props);
--		break;
--	    default:
--		print_unsigned(&s, va_arg(va, unsigned long long), 16, props);
--		break;
--	    }
--	    break;
--	case 'p':
--	    props.alternate = true;
--	    print_unsigned(&s, (unsigned long)va_arg(va, void *), 16, props);
--	    break;
--	case 's':
--	    print_str(&s, va_arg(va, const char *), props);
--	    break;
--	default:
--	    addchar(&s, f);
--	    break;
-+	pstream_t s;
++static inline int isalpha(int c)
++{
++	return isupper(c) || islower(c);
++}
 +
-+	s.buffer = buf;
-+	s.remain = size - 1;
-+	s.added = 0;
-+	while (*fmt) {
-+		char f = *fmt++;
-+		int nlong = 0;
-+		strprops_t props;
-+		memset(&props, 0, sizeof(props));
-+		props.pad = ' ';
++static inline int isdigit(int c)
++{
++	return c >= '0' && c <= '9';
++}
 +
-+		if (f != '%') {
-+			addchar(&s, f);
-+			continue;
-+		}
-+morefmt:
-+		f = *fmt++;
-+		switch (f) {
-+		case '%':
-+			addchar(&s, '%');
-+			break;
-+		case 'c':
-+			addchar(&s, va_arg(va, int));
-+			break;
-+		case '\0':
-+			--fmt;
-+			break;
-+		case '#':
-+			props.alternate = true;
-+			goto morefmt;
-+		case '0':
-+			props.pad = '0';
-+			++fmt;
-+			/* fall through */
-+		case '1' ... '9':
-+		case '-':
-+			--fmt;
-+			props.npad = fmtnum(&fmt);
-+			goto morefmt;
-+		case 'l':
-+			++nlong;
-+			goto morefmt;
-+		case 't':
-+		case 'z':
-+			/* Here we only care that sizeof(size_t) == sizeof(long).
-+			 * On a 32-bit platform it doesn't matter that size_t is
-+			 * typedef'ed to int or long; va_arg will work either way.
-+			 * Same for ptrdiff_t (%td).
-+			 */
-+			nlong = 1;
-+			goto morefmt;
-+		case 'd':
-+			switch (nlong) {
-+			case 0:
-+				print_int(&s, va_arg(va, int), 10, props);
-+				break;
-+			case 1:
-+				print_int(&s, va_arg(va, long), 10, props);
-+				break;
-+			default:
-+				print_int(&s, va_arg(va, long long), 10, props);
-+				break;
-+			}
-+			break;
-+		case 'u':
-+			switch (nlong) {
-+			case 0:
-+				print_unsigned(&s, va_arg(va, unsigned), 10, props);
-+				break;
-+			case 1:
-+				print_unsigned(&s, va_arg(va, unsigned long), 10, props);
-+				break;
-+			default:
-+				print_unsigned(&s, va_arg(va, unsigned long long), 10, props);
-+				break;
-+			}
-+			break;
-+		case 'x':
-+			switch (nlong) {
-+			case 0:
-+				print_unsigned(&s, va_arg(va, unsigned), 16, props);
-+				break;
-+			case 1:
-+				print_unsigned(&s, va_arg(va, unsigned long), 16, props);
-+				break;
-+			default:
-+				print_unsigned(&s, va_arg(va, unsigned long long), 16, props);
-+				break;
-+			}
-+			break;
-+		case 'p':
-+			props.alternate = true;
-+			print_unsigned(&s, (unsigned long)va_arg(va, void *), 16, props);
-+			break;
-+		case 's':
-+			print_str(&s, va_arg(va, const char *), props);
-+			break;
-+		default:
-+			addchar(&s, f);
-+			break;
-+		}
- 	}
--    }
--    *s.buffer = 0;
--    return s.added;
-+	*s.buffer = 0;
-+	return s.added;
- }
- 
--
- int snprintf(char *buf, int size, const char *fmt, ...)
- {
--    va_list va;
--    int r;
-+	va_list va;
-+	int r;
- 
--    va_start(va, fmt);
--    r = vsnprintf(buf, size, fmt, va);
--    va_end(va);
--    return r;
-+	va_start(va, fmt);
-+	r = vsnprintf(buf, size, fmt, va);
-+	va_end(va);
-+	return r;
- }
- 
- int vprintf(const char *fmt, va_list va)
- {
--    char buf[BUFSZ];
--    int r;
-+	char buf[BUFSZ];
-+	int r;
- 
--    r = vsnprintf(buf, sizeof(buf), fmt, va);
--    puts(buf);
--    return r;
-+	r = vsnprintf(buf, sizeof(buf), fmt, va);
-+	puts(buf);
-+	return r;
- }
- 
- int printf(const char *fmt, ...)
- {
--    va_list va;
--    char buf[BUFSZ];
--    int r;
--
--    va_start(va, fmt);
--    r = vsnprintf(buf, sizeof buf, fmt, va);
--    va_end(va);
--    puts(buf);
--    return r;
-+	va_list va;
-+	char buf[BUFSZ];
-+	int r;
++static inline int isalnum(int c)
++{
++	return isalpha(c) || isdigit(c);
++}
 +
-+	va_start(va, fmt);
-+	r = vsnprintf(buf, sizeof buf, fmt, va);
-+	va_end(va);
-+	puts(buf);
-+	return r;
- }
- 
- void binstr(unsigned long x, char out[BINSTR_SZ])
++static inline int isspace(int c)
++{
++        return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
++}
++
++#endif /* _CTYPE_H_ */
 diff --git a/lib/string.c b/lib/string.c
-index 27106dae0b0b..a3a8f3b1ce0b 100644
+index a3a8f3b1ce0b..6d8a6380db92 100644
 --- a/lib/string.c
 +++ b/lib/string.c
-@@ -11,281 +11,281 @@
+@@ -6,6 +6,7 @@
+  */
  
- size_t strlen(const char *buf)
- {
--    size_t len = 0;
-+	size_t len = 0;
+ #include "libcflat.h"
++#include "ctype.h"
+ #include "stdlib.h"
+ #include "linux/compiler.h"
  
--    while (*buf++)
--	++len;
--    return len;
-+	while (*buf++)
-+		++len;
-+	return len;
+@@ -163,11 +164,6 @@ void *memchr(const void *s, int c, size_t n)
+ 	return NULL;
  }
  
- size_t strnlen(const char *buf, size_t maxlen)
- {
--    const char *sc;
-+	const char *sc;
- 
--    for (sc = buf; maxlen-- && *sc != '\0'; ++sc)
--        /* nothing */;
--    return sc - buf;
-+	for (sc = buf; maxlen-- && *sc != '\0'; ++sc)
-+		/* nothing */ ;
-+	return sc - buf;
- }
- 
- char *strcat(char *dest, const char *src)
- {
--    char *p = dest;
-+	char *p = dest;
- 
--    while (*p)
--	++p;
--    while ((*p++ = *src++) != 0)
--	;
--    return dest;
-+	while (*p)
-+		++p;
-+	while ((*p++ = *src++) != 0)
-+		;
-+	return dest;
- }
- 
- char *strcpy(char *dest, const char *src)
- {
--    *dest = 0;
--    return strcat(dest, src);
-+	*dest = 0;
-+	return strcat(dest, src);
- }
- 
- int strncmp(const char *a, const char *b, size_t n)
- {
--    for (; n--; ++a, ++b)
--        if (*a != *b || *a == '\0')
--            return *a - *b;
-+	for (; n--; ++a, ++b)
-+		if (*a != *b || *a == '\0')
-+			return *a - *b;
- 
--    return 0;
-+	return 0;
- }
- 
- int strcmp(const char *a, const char *b)
- {
--    return strncmp(a, b, SIZE_MAX);
-+	return strncmp(a, b, SIZE_MAX);
- }
- 
- char *strchr(const char *s, int c)
- {
--    while (*s != (char)c)
--	if (*s++ == '\0')
--	    return NULL;
--    return (char *)s;
-+	while (*s != (char)c)
-+		if (*s++ == '\0')
-+			return NULL;
-+	return (char *)s;
- }
- 
- char *strrchr(const char *s, int c)
- {
--    const char *last = NULL;
--    do {
--        if (*s == (char)c)
--            last = s;
--    } while (*s++);
--    return (char *)last;
-+	const char *last = NULL;
-+	do {
-+		if (*s == (char)c)
-+			last = s;
-+	} while (*s++);
-+	return (char *)last;
- }
- 
- char *strchrnul(const char *s, int c)
- {
--    while (*s && *s != (char)c)
--        s++;
--    return (char *)s;
-+	while (*s && *s != (char)c)
-+		s++;
-+	return (char *)s;
- }
- 
- char *strstr(const char *s1, const char *s2)
- {
--    size_t l1, l2;
+-static int isspace(int c)
+-{
+-	return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
+-}
 -
--    l2 = strlen(s2);
--    if (!l2)
--	return (char *)s1;
--    l1 = strlen(s1);
--    while (l1 >= l2) {
--	l1--;
--	if (!memcmp(s1, s2, l2))
--	    return (char *)s1;
--	s1++;
--    }
--    return NULL;
-+	size_t l1, l2;
-+
-+	l2 = strlen(s2);
-+	if (!l2)
-+		return (char *)s1;
-+	l1 = strlen(s1);
-+	while (l1 >= l2) {
-+		l1--;
-+		if (!memcmp(s1, s2, l2))
-+			return (char *)s1;
-+		s1++;
-+	}
-+	return NULL;
- }
- 
- void *memset(void *s, int c, size_t n)
- {
--    size_t i;
--    char *a = s;
-+	size_t i;
-+	char *a = s;
- 
--    for (i = 0; i < n; ++i)
--        a[i] = c;
-+	for (i = 0; i < n; ++i)
-+		a[i] = c;
- 
--    return s;
-+	return s;
- }
- 
- void *memcpy(void *dest, const void *src, size_t n)
- {
--    size_t i;
--    char *a = dest;
--    const char *b = src;
-+	size_t i;
-+	char *a = dest;
-+	const char *b = src;
- 
--    for (i = 0; i < n; ++i)
--        a[i] = b[i];
-+	for (i = 0; i < n; ++i)
-+		a[i] = b[i];
- 
--    return dest;
-+	return dest;
- }
- 
- int memcmp(const void *s1, const void *s2, size_t n)
- {
--    const unsigned char *a = s1, *b = s2;
--    int ret = 0;
--
--    while (n--) {
--	ret = *a - *b;
--	if (ret)
--	    break;
--	++a, ++b;
--    }
--    return ret;
-+	const unsigned char *a = s1, *b = s2;
-+	int ret = 0;
-+
-+	while (n--) {
-+		ret = *a - *b;
-+		if (ret)
-+			break;
-+		++a, ++b;
-+	}
-+	return ret;
- }
- 
- void *memmove(void *dest, const void *src, size_t n)
- {
--    const unsigned char *s = src;
--    unsigned char *d = dest;
--
--    if (d <= s) {
--	while (n--)
--	    *d++ = *s++;
--    } else {
--	d += n, s += n;
--	while (n--)
--	    *--d = *--s;
--    }
--    return dest;
-+	const unsigned char *s = src;
-+	unsigned char *d = dest;
-+
-+	if (d <= s) {
-+		while (n--)
-+			*d++ = *s++;
-+	} else {
-+		d += n, s += n;
-+		while (n--)
-+			*--d = *--s;
-+	}
-+	return dest;
- }
- 
- void *memchr(const void *s, int c, size_t n)
- {
--    const unsigned char *str = s, chr = (unsigned char)c;
-+	const unsigned char *str = s, chr = (unsigned char)c;
- 
--    while (n--)
--	if (*str++ == chr)
--	    return (void *)(str - 1);
--    return NULL;
-+	while (n--)
-+		if (*str++ == chr)
-+			return (void *)(str - 1);
-+	return NULL;
- }
- 
- static int isspace(int c)
- {
--    return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
-+	return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
- }
- 
  static unsigned long long __strtoll(const char *nptr, char **endptr,
--                                    int base, bool is_signed,
--                                    bool is_longlong) {
--    unsigned long long ull = 0;
--    const char *s = nptr;
--    int neg, c;
--
--    assert(base == 0 || (base >= 2 && base <= 36));
--
--    while (isspace(*s))
--        s++;
--
--    if (*s == '-') {
--        neg = 1;
--        s++;
--    } else {
--        neg = 0;
--        if (*s == '+')
--            s++;
--    }
--
--    if (base == 0 || base == 16) {
--        if (*s == '0') {
--            s++;
--            if (*s == 'x' || *s == 'X') {
--                 s++;
--                 base = 16;
--            } else if (base == 0)
--                 base = 8;
--        } else if (base == 0)
--            base = 10;
--    }
--
--    while (*s) {
--        if (*s >= '0' && *s < '0' + base && *s <= '9')
--            c = *s - '0';
--        else if (*s >= 'a' && *s < 'a' + base - 10)
--            c = *s - 'a' + 10;
--        else if (*s >= 'A' && *s < 'A' + base - 10)
--            c = *s - 'A' + 10;
--        else
--            break;
--
--        if (!is_longlong) {
--            if (is_signed) {
--                long sl = (long)ull;
--                assert(!check_mul_overflow(sl, base));
--                assert(!check_add_overflow(sl * base, c));
--            } else {
--                unsigned long ul = (unsigned long)ull;
--                assert(!check_mul_overflow(ul, base));
--                assert(!check_add_overflow(ul * base, c));
--            }
--        } else {
--            if (is_signed) {
--                long long sll = (long long)ull;
--                assert(!check_mul_overflow(sll, base));
--                assert(!check_add_overflow(sll * base, c));
--            } else {
--                assert(!check_mul_overflow(ull, base));
--                assert(!check_add_overflow(ull * base, c));
--            }
--        }
--
--        ull = ull * base + c;
--        s++;
--    }
--
--    if (neg)
--        ull = -ull;
--
--    if (endptr)
--        *endptr = (char *)s;
--
--    return ull;
-+				    int base, bool is_signed, bool is_longlong)
-+{
-+	unsigned long long ull = 0;
-+	const char *s = nptr;
-+	int neg, c;
-+
-+	assert(base == 0 || (base >= 2 && base <= 36));
-+
-+	while (isspace(*s))
-+		s++;
-+
-+	if (*s == '-') {
-+		neg = 1;
-+		s++;
-+	} else {
-+		neg = 0;
-+		if (*s == '+')
-+			s++;
-+	}
-+
-+	if (base == 0 || base == 16) {
-+		if (*s == '0') {
-+			s++;
-+			if (*s == 'x' || *s == 'X') {
-+				s++;
-+				base = 16;
-+			} else if (base == 0)
-+				base = 8;
-+		} else if (base == 0)
-+			base = 10;
-+	}
-+
-+	while (*s) {
-+		if (*s >= '0' && *s < '0' + base && *s <= '9')
-+			c = *s - '0';
-+		else if (*s >= 'a' && *s < 'a' + base - 10)
-+			c = *s - 'a' + 10;
-+		else if (*s >= 'A' && *s < 'A' + base - 10)
-+			c = *s - 'A' + 10;
-+		else
-+			break;
-+
-+		if (!is_longlong) {
-+			if (is_signed) {
-+				long sl = (long)ull;
-+				assert(!check_mul_overflow(sl, base));
-+				assert(!check_add_overflow(sl * base, c));
-+			} else {
-+				unsigned long ul = (unsigned long)ull;
-+				assert(!check_mul_overflow(ul, base));
-+				assert(!check_add_overflow(ul * base, c));
-+			}
-+		} else {
-+			if (is_signed) {
-+				long long sll = (long long)ull;
-+				assert(!check_mul_overflow(sll, base));
-+				assert(!check_add_overflow(sll * base, c));
-+			} else {
-+				assert(!check_mul_overflow(ull, base));
-+				assert(!check_add_overflow(ull * base, c));
-+			}
-+		}
-+
-+		ull = ull * base + c;
-+		s++;
-+	}
-+
-+	if (neg)
-+		ull = -ull;
-+
-+	if (endptr)
-+		*endptr = (char *)s;
-+
-+	return ull;
- }
- 
- long int strtol(const char *nptr, char **endptr, int base)
+ 				    int base, bool is_signed, bool is_longlong)
  {
--    return __strtoll(nptr, endptr, base, true, false);
-+	return __strtoll(nptr, endptr, base, true, false);
- }
- 
- unsigned long int strtoul(const char *nptr, char **endptr, int base)
- {
--    return __strtoll(nptr, endptr, base, false, false);
-+	return __strtoll(nptr, endptr, base, false, false);
- }
- 
- long long int strtoll(const char *nptr, char **endptr, int base)
- {
--    return __strtoll(nptr, endptr, base, true, true);
-+	return __strtoll(nptr, endptr, base, true, true);
- }
- 
- unsigned long long int strtoull(const char *nptr, char **endptr, int base)
- {
--    return __strtoll(nptr, endptr, base, false, true);
-+	return __strtoll(nptr, endptr, base, false, true);
- }
- 
- long atol(const char *ptr)
- {
--    return strtol(ptr, NULL, 10);
-+	return strtol(ptr, NULL, 10);
- }
- 
- extern char **environ;
- 
- char *getenv(const char *name)
- {
--    char **envp = environ, *delim;
--    int len;
--
--    while (*envp) {
--        delim = strchr(*envp, '=');
--        assert(delim);
--        len = delim - *envp;
--        if (memcmp(name, *envp, len) == 0 && !name[len])
--            return delim + 1;
--        ++envp;
--    }
--    return NULL;
-+	char **envp = environ, *delim;
-+	int len;
-+
-+	while (*envp) {
-+		delim = strchr(*envp, '=');
-+		assert(delim);
-+		len = delim - *envp;
-+		if (memcmp(name, *envp, len) == 0 && !name[len])
-+			return delim + 1;
-+		++envp;
-+	}
-+	return NULL;
- }
- 
- /* Very simple glob matching. Allows '*' at beginning and end of pattern. */
 -- 
 2.34.3
 
