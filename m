@@ -2,292 +2,308 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D318552EA6F
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 13:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 293C752EA85
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 13:09:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347026AbiETLCg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 07:02:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32772 "EHLO
+        id S1348414AbiETLJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 07:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239653AbiETLCd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 07:02:33 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3221C12AB03
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 04:02:31 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C6CB21FB;
-        Fri, 20 May 2022 04:02:29 -0700 (PDT)
-Received: from [10.57.82.55] (unknown [10.57.82.55])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9FD903F718;
-        Fri, 20 May 2022 04:02:28 -0700 (PDT)
-Message-ID: <3521de8b-3163-7ff0-a823-5d4ec96a2ae5@arm.com>
-Date:   Fri, 20 May 2022 12:02:23 +0100
+        with ESMTP id S236657AbiETLJw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 07:09:52 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F62B5E150;
+        Fri, 20 May 2022 04:09:46 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 5C8B15FD02;
+        Fri, 20 May 2022 14:09:43 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1653044983;
+        bh=B/ctd2o5HhALu7eTC7OlATdRNjiQQiFgO5NLRhMIWIY=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=DEkkjyrfLL5WGP8dG8iQae/86xsxHY5NOVIIJy67sMxdCDjLJHMM2YNpGM880IB03
+         Sp5iHqkG4D6TxAS2okT61Unjx9w61D1dh3MgA80WQ5sXBy5Px39V2n8vfK84zQ5b3f
+         wJVCV21S/G80mrw9nVyBYNh86snRo9y2UjOcl4r/zgZSxMeYVe2Y3HTRNhruK9bifX
+         7czWbFVw88e1zLVthxny0d2/6VFKrRZ9QGrVo/I/FZd4EgzmYba7vwe7yP7rcPplP3
+         HHbn9iovss0xPVLB7Gshi/eja047l50CTbHtqePMfnrSdwAGnZDpG03Wd42yjj7IkE
+         gfciTjUS5NM5Q==
+Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Fri, 20 May 2022 14:09:39 +0300 (MSK)
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>
+Subject: Re: [RFC PATCH v1 0/8] virtio/vsock: experimental zerocopy receive
+Thread-Topic: [RFC PATCH v1 0/8] virtio/vsock: experimental zerocopy receive
+Thread-Index: AQHYZb23ItH0dwyJNkOi7nYOIXQV0q0jA7cAgAFMqQCAAVm8AIABzE+A
+Date:   Fri, 20 May 2022 11:09:11 +0000
+Message-ID: <27f906a8-181f-e6d8-f5a1-035604a2decb@sberdevices.ru>
+References: <7cdcb1e1-7c97-c054-19cf-5caeacae981d@sberdevices.ru>
+ <20220517151404.vqse5tampdsaaeji@sgarzare-redhat>
+ <413d821f-3893-befa-7009-2f87ef51af7a@sberdevices.ru>
+ <20220519074208.q2bmytl2dphtjgse@sgarzare-redhat>
+In-Reply-To: <20220519074208.q2bmytl2dphtjgse@sgarzare-redhat>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BE9B5EB63D3E7E428B68FB54B927D7F2@sberdevices.ru>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Will Deacon <will@kernel.org>
-References: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/05/20 07:43:00 #19495920
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-05-10 17:55, Jason Gunthorpe via iommu wrote:
-> This control causes the ARM SMMU drivers to choose a stage 2
-> implementation for the IO pagetable (vs the stage 1 usual default),
-> however this choice has no visible impact to the VFIO user.
-
-Oh, I should have read more carefully... this isn't entirely true. Stage 
-2 has a different permission model from stage 1, so although it's 
-arguably undocumented behaviour, VFIO users that know enough about the 
-underlying system could use this to get write-only mappings if they so wish.
-
-There may potentially also be visible differences in translation 
-performance between stages, although I imagine that's firmly over in the 
-niche of things that users might look at for system validation purposes, 
-rather than for practical usefulness.
-
-> Further qemu
-> never implemented this and no other userspace user is known.
-> 
-> The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
-> new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
-> SMMU translation services to the guest operating system" however the rest
-> of the API to set the guest table pointer for the stage 1 was never
-> completed, or at least never upstreamed, rendering this part useless dead
-> code.
-> 
-> Since the current patches to enable nested translation, aka userspace page
-> tables, rely on iommufd and will not use the enable_nesting()
-> iommu_domain_op, remove this infrastructure. However, don't cut too deep
-> into the SMMU drivers for now expecting the iommufd work to pick it up -
-> we still need to create S2 IO page tables.
-> 
-> Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
-> enable_nesting iommu_domain_op.
-> 
-> Just in-case there is some userspace using this continue to treat
-> requesting it as a NOP, but do not advertise support any more.
-
-This also seems a bit odd, especially given that it's not actually a 
-no-op; surely either it's supported and functional or it isn't?
-
-In all honesty, I'm not personally attached to this code either way. If 
-this patch had come 5 years ago, when the interface already looked like 
-a bit of a dead end, I'd probably have agreed more readily. But now, 
-when we're possibly mere months away from implementing the functional 
-equivalent for IOMMUFD, which if done right might be able to support a 
-trivial compat layer for this anyway, I just don't see what we gain from 
-not at least waiting to see where that ends up. The given justification 
-reads as "get rid of this code that we already know we'll need to bring 
-back in some form, and half-break an unpopular VFIO ABI because it 
-doesn't do *everything* that its name might imply", which just isn't 
-convincing me.
-
-Thanks,
-Robin.
-
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ----------------
->   drivers/iommu/arm/arm-smmu/arm-smmu.c       | 16 ----------------
->   drivers/iommu/iommu.c                       | 10 ----------
->   drivers/vfio/vfio_iommu_type1.c             | 12 +-----------
->   include/linux/iommu.h                       |  3 ---
->   include/uapi/linux/vfio.h                   |  2 +-
->   6 files changed, 2 insertions(+), 57 deletions(-)
-> 
-> It would probably make sense for this to go through the VFIO tree with Robin's
-> ack for the SMMU changes.
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 627a3ed5ee8fd1..b901e8973bb4ea 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2724,21 +2724,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
->   	return group;
->   }
->   
-> -static int arm_smmu_enable_nesting(struct iommu_domain *domain)
-> -{
-> -	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> -	int ret = 0;
-> -
-> -	mutex_lock(&smmu_domain->init_mutex);
-> -	if (smmu_domain->smmu)
-> -		ret = -EPERM;
-> -	else
-> -		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
-> -	mutex_unlock(&smmu_domain->init_mutex);
-> -
-> -	return ret;
-> -}
-> -
->   static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
->   {
->   	return iommu_fwspec_add_ids(dev, args->args, 1);
-> @@ -2865,7 +2850,6 @@ static struct iommu_ops arm_smmu_ops = {
->   		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
->   		.iotlb_sync		= arm_smmu_iotlb_sync,
->   		.iova_to_phys		= arm_smmu_iova_to_phys,
-> -		.enable_nesting		= arm_smmu_enable_nesting,
->   		.free			= arm_smmu_domain_free,
->   	}
->   };
-> diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> index 568cce590ccc13..239e6f6585b48d 100644
-> --- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> +++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> @@ -1507,21 +1507,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
->   	return group;
->   }
->   
-> -static int arm_smmu_enable_nesting(struct iommu_domain *domain)
-> -{
-> -	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> -	int ret = 0;
-> -
-> -	mutex_lock(&smmu_domain->init_mutex);
-> -	if (smmu_domain->smmu)
-> -		ret = -EPERM;
-> -	else
-> -		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
-> -	mutex_unlock(&smmu_domain->init_mutex);
-> -
-> -	return ret;
-> -}
-> -
->   static int arm_smmu_set_pgtable_quirks(struct iommu_domain *domain,
->   		unsigned long quirks)
->   {
-> @@ -1600,7 +1585,6 @@ static struct iommu_ops arm_smmu_ops = {
->   		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
->   		.iotlb_sync		= arm_smmu_iotlb_sync,
->   		.iova_to_phys		= arm_smmu_iova_to_phys,
-> -		.enable_nesting		= arm_smmu_enable_nesting,
->   		.set_pgtable_quirks	= arm_smmu_set_pgtable_quirks,
->   		.free			= arm_smmu_domain_free,
->   	}
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 857d4c2fd1a206..f33c0d569a5d03 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2561,16 +2561,6 @@ static int __init iommu_init(void)
->   }
->   core_initcall(iommu_init);
->   
-> -int iommu_enable_nesting(struct iommu_domain *domain)
-> -{
-> -	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-> -		return -EINVAL;
-> -	if (!domain->ops->enable_nesting)
-> -		return -EINVAL;
-> -	return domain->ops->enable_nesting(domain);
-> -}
-> -EXPORT_SYMBOL_GPL(iommu_enable_nesting);
-> -
->   int iommu_set_pgtable_quirks(struct iommu_domain *domain,
->   		unsigned long quirk)
->   {
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 9394aa9444c10c..ff669723b0488f 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -74,7 +74,6 @@ struct vfio_iommu {
->   	uint64_t		num_non_pinned_groups;
->   	wait_queue_head_t	vaddr_wait;
->   	bool			v2;
-> -	bool			nesting;
->   	bool			dirty_page_tracking;
->   	bool			container_open;
->   	struct list_head	emulated_iommu_groups;
-> @@ -2207,12 +2206,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->   	if (!domain->domain)
->   		goto out_free_domain;
->   
-> -	if (iommu->nesting) {
-> -		ret = iommu_enable_nesting(domain->domain);
-> -		if (ret)
-> -			goto out_domain;
-> -	}
-> -
->   	ret = iommu_attach_group(domain->domain, group->iommu_group);
->   	if (ret)
->   		goto out_domain;
-> @@ -2546,9 +2539,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
->   	switch (arg) {
->   	case VFIO_TYPE1_IOMMU:
->   		break;
-> -	case VFIO_TYPE1_NESTING_IOMMU:
-> -		iommu->nesting = true;
-> -		fallthrough;
-> +	case __VFIO_RESERVED_TYPE1_NESTING_IOMMU:
->   	case VFIO_TYPE1v2_IOMMU:
->   		iommu->v2 = true;
->   		break;
-> @@ -2634,7 +2625,6 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->   	switch (arg) {
->   	case VFIO_TYPE1_IOMMU:
->   	case VFIO_TYPE1v2_IOMMU:
-> -	case VFIO_TYPE1_NESTING_IOMMU:
->   	case VFIO_UNMAP_ALL:
->   	case VFIO_UPDATE_VADDR:
->   		return 1;
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 9208eca4b0d1ac..51cb4d3eb0d391 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -272,7 +272,6 @@ struct iommu_ops {
->    * @iotlb_sync: Flush all queued ranges from the hardware TLBs and empty flush
->    *            queue
->    * @iova_to_phys: translate iova to physical address
-> - * @enable_nesting: Enable nesting
->    * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
->    * @free: Release the domain after use.
->    */
-> @@ -300,7 +299,6 @@ struct iommu_domain_ops {
->   	phys_addr_t (*iova_to_phys)(struct iommu_domain *domain,
->   				    dma_addr_t iova);
->   
-> -	int (*enable_nesting)(struct iommu_domain *domain);
->   	int (*set_pgtable_quirks)(struct iommu_domain *domain,
->   				  unsigned long quirks);
->   
-> @@ -496,7 +494,6 @@ extern int iommu_page_response(struct device *dev,
->   extern int iommu_group_id(struct iommu_group *group);
->   extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
->   
-> -int iommu_enable_nesting(struct iommu_domain *domain);
->   int iommu_set_pgtable_quirks(struct iommu_domain *domain,
->   		unsigned long quirks);
->   
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index fea86061b44e65..6e0640f0a4cad7 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -35,7 +35,7 @@
->   #define VFIO_EEH			5
->   
->   /* Two-stage IOMMU */
-> -#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
-> +#define __VFIO_RESERVED_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
->   
->   #define VFIO_SPAPR_TCE_v2_IOMMU		7
->   
-> 
-> base-commit: c5eb0a61238dd6faf37f58c9ce61c9980aaffd7a
+SGVsbG8gU3RlZmFubywNCg0KT24gMTkuMDUuMjAyMiAxMDo0MiwgU3RlZmFubyBHYXJ6YXJlbGxh
+IHdyb3RlOg0KPiBPbiBXZWQsIE1heSAxOCwgMjAyMiBhdCAxMTowNDozMEFNICswMDAwLCBBcnNl
+bml5IEtyYXNub3Ygd3JvdGU6DQo+PiBIZWxsbyBTdGVmYW5vLA0KPj4NCj4+IE9uIDE3LjA1LjIw
+MjIgMTg6MTQsIFN0ZWZhbm8gR2FyemFyZWxsYSB3cm90ZToNCj4+PiBIaSBBcnNlbml5LA0KPj4+
+DQo+Pj4gT24gVGh1LCBNYXkgMTIsIDIwMjIgYXQgMDU6MDQ6MTFBTSArMDAwMCwgQXJzZW5peSBL
+cmFzbm92IHdyb3RlOg0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBJTlRST0RVQ1RJT04NCj4+Pj4NCj4+Pj4gwqDCoMKgwqBIZWxs
+bywgdGhpcyBpcyBleHBlcmltZW50YWwgaW1wbGVtZW50YXRpb24gb2YgdmlydGlvIHZzb2NrIHpl
+cm9jb3B5DQo+Pj4+IHJlY2VpdmUuIEl0IHdhcyBpbnNwaXJlZCBieSBUQ1AgemVyb2NvcHkgcmVj
+ZWl2ZSBieSBFcmljIER1bWF6ZXQuIFRoaXMgQVBJIHVzZXMNCj4+Pj4gc2FtZSBpZGVhOiBjYWxs
+ICdtbWFwKCknIG9uIHNvY2tldCdzIGRlc2NyaXB0b3IsIHRoZW4gZXZlcnkgJ2dldHNvY2tvcHQo
+KScgd2lsbA0KPj4+PiBmaWxsIHByb3ZpZGVkIHZtYSBhcmVhIHdpdGggcGFnZXMgb2YgdmlydGlv
+IFJYIGJ1ZmZlcnMuIEFmdGVyIHJlY2VpdmVkIGRhdGEgd2FzDQo+Pj4+IHByb2Nlc3NlZCBieSB1
+c2VyLCBwYWdlcyBtdXN0IGJlIGZyZWVkIGJ5ICdtYWR2aXNlKCknwqAgY2FsbCB3aXRoIE1BRFZf
+RE9OVE5FRUQNCj4+Pj4gZmxhZyBzZXQoaWYgdXNlciB3b24ndCBjYWxsICdtYWR2aXNlKCknLCBu
+ZXh0ICdnZXRzb2Nrb3B0KCknIHdpbGwgZmFpbCkuDQo+Pj4NCj4+PiBTb3VuZHMgY29vbCwgYnV0
+IG1heWJlIHdlIHdvdWxkIG5lZWQgc29tZSBzb2NrZXQvbmV0IGV4cGVydHMgaGVyZSBmb3IgcmV2
+aWV3Lg0KPj4NCj4+IFllcywgdGhhdCB3b3VsZCBiZSBncmVhdA0KPj4NCj4+Pg0KPj4+IENvdWxk
+IHdlIGRvIHNvbWV0aGluZyBzaW1pbGFyIGZvciB0aGUgc2VuZGluZyBwYXRoIGFzIHdlbGw/DQo+
+Pg0KPj4gSGVyZSBhcmUgdGhvdWdodHMgYWJvdXQgemVyb2NvcHkgdHJhbnNtaXNzaW9uOg0KPj4N
+Cj4+IEkgdHJpZWQgdG8gaW1wbGVtZW50IHRoaXMgZmVhdHVyZSBpbiB0aGUgZm9sbG93aW5nIHdh
+eTogdXNlciBjcmVhdGVzDQo+PiBzb21lIHBhZ2UgYWxpZ25lZCBidWZmZXIsIHRoZW4gZHVyaW5n
+IHR4IHBhY2tldCBhbGxvY2F0aW9uIGluc3RlYWQgb2YNCj4+IGNyZWF0aW5nIGRhdGEgYnVmZmVy
+IHdpdGggJ2ttYWxsb2MoKScsIGkgdHJpZWQgdG8gYWRkIHVzZXIncyBidWZmZXINCj4+IHRvIHZp
+cnRpbyBxdWV1ZS4gQnV0IGZvdW5kIHByb2JsZW06IGFzIGtlcm5lbCB2aXJ0aW8gQVBJIHVzZXMg
+dmlydHVhbA0KPj4gYWRkcmVzc2VzIHRvIGFkZCBuZXcgYnVmZmVycywgaW4gdGhlIGRlZXAgb2Yg
+dmlydGlvIHN1YnN5c3RlbQ0KPj4gJ3ZpcnRfdG9fcGh5cygpJyBpcyBjYWxsZWQgdG8gZ2V0IHBo
+eXNpY2FsIGFkZHJlc3Mgb2YgYnVmZmVyLCBzbyB1c2VyJ3MNCj4+IHZpcnR1YWwgYWRkcmVzcyB3
+b24ndCBiZSB0cmFuc2xhdGVkIGNvcnJlY3RseSB0byBwaHlzaWNhbCBhZGRyZXNzKGluDQo+PiB0
+aGVvcnksIGkgY2FuIHBlcmZvcm0gcGFnZSB3YWxrIGZvciBzdWNoIHVzZXIncyB2YSwgZ2V0IHBo
+eXNpY2FsIGFkZHJlc3MNCj4+IGFuZCBwYXNzIHNvbWUgImZha2UiIHZpcnR1YWwgYWRkcmVzcyB0
+byB2aXJ0aW8gQVBJIGluIG9yZGVyIHRvIG1ha2UNCj4+ICd2aXJ0X3RvX3BoeXMoKScgcmV0dXJu
+IHZhbGlkIHBoeXNpY2FsIGFkZHJlc3MoYnV0IGkgdGhpbmsgdGhpcyBpcyB1Z2x5KS4NCj4gDQo+
+IEFuZCBtYXliZSB3ZSBzaG91bGQgYWxzbyBwaW4gdGhlIHBhZ2VzIHRvIHByZXZlbnQgdGhlbSBm
+cm9tIGJlaW5nIHJlcGxhY2VkLg0KPiANCj4gSSB0aGluayB3ZSBzaG91bGQgZG8gc29tZXRoaW5n
+IHNpbWlsYXIgdG8gd2hhdCB3ZSBkbyBpbiB2aG9zdC12ZHBhLg0KPiBUYWtlIGEgbG9vayBhdCB2
+aG9zdF92ZHBhX3BhX21hcCgpIGluIGRyaXZlcnMvdmhvc3QvdmRwYS5jDQoNCkhtLCBvay4gSSds
+bCByZWFkIGFib3V0IHZkcGEuLi4NCg0KPiANCj4+DQo+Pg0KPj4gSWYgd2UgYXJlIHRhbGtpbmcg
+YWJvdXQgJ21tYXAoKScgd2F5LCBpIHRoaW5rIHdlIGNhbiBkbyB0aGUgZm9sbG93aW5nOg0KPj4g
+dXNlciBjYWxscyAnbW1hcCgpJyBvbiBzb2NrZXQsIGtlcm5lbCBmaWxscyBuZXdseSBjcmVhdGVk
+IG1hcHBpbmcgd2l0aA0KPj4gYWxsb2NhdGVkIHBhZ2VzKGFsbCBwYWdlcyBoYXZlIHJ3IHBlcm1p
+c3Npb25zKS4gTm93IHVzZXIgY2FuIHVzZSBwYWdlcw0KPj4gb2YgdGhpcyBtYXBwaW5nKGUuZy4g
+ZmlsbCBpdCB3aXRoIGRhdGEpLiBGaW5hbGx5LCB0byBzdGFydCB0cmFuc21pc3Npb24sDQo+PiB1
+c2VyIGNhbGxzICdnZXRzb2Nrb3B0KCknIG9yIHNvbWUgJ2lvY3RsKCknIGFuZCBrZXJuZWwgcHJv
+Y2Vzc2VzIGRhdGEgb2YNCj4+IHRoaXMgbWFwcGluZy4gQWxzbyBhcyB0aGlzIGNhbGwgd2lsbCBy
+ZXR1cm4gaW1tZWRpYXRlbHkoZS5nLiBpdCBpcw0KPj4gYXN5bmNocm9ub3VzKSwgc29tZSBjb21w
+bGV0aW9uIGxvZ2ljIG11c3QgYmUgaW1wbGVtZW50ZWQuIEZvciBleGFtcGxlDQo+PiB1c2Ugc2Ft
+ZSB3YXkgYXMgTVNHX1pFUk9DT1BZIHVzZXMgLSBwb2xsIGVycm9yIHF1ZXVlIG9mIHNvY2tldCB0
+byBnZXQNCj4+IG1lc3NhZ2UgdGhhdCBwYWdlcyBjb3VsZCBiZSByZXVzZWQsIG9yIGRvbid0IGFs
+bG93IHVzZXIgdG8gd29yayB3aXRoDQo+PiB0aGVzZSBwYWdlczogdW5tYXAgaXQsIHBlcmZvcm0g
+dHJhbnNtaXNzaW9uIGFuZCBmaW5hbGx5IGZyZWUgcGFnZXMuDQo+PiBUbyBzdGFydCBuZXcgdHJh
+bnNtaXNzaW9uIHVzZXIgbmVlZCB0byBjYWxsICdtbWFwKCknIGFnYWluLg0KPj4NCj4+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgT1INCj4+DQo+
+PiBJIHRoaW5rIHRoZXJlIGlzIGFub3RoZXIgdW51c3VhbCB3YXkgZm9yIHplcm9jb3B5IHR4OiBs
+ZXQncyB1c2UgJ3Ztc3BsaWNlKCknDQo+PiAvJ3NwbGljZSgpJy4gSW4gdGhpcyBhcHByb2FjaCB0
+byB0cmFuc21pdCBzb21ldGhpbmcsIHVzZXIgZG9lcyB0aGUgZm9sbG93aW5nDQo+PiBzdGVwczoN
+Cj4+IDEpIENyZWF0ZXMgcGlwZS4NCj4+IDIpIENhbGxzICd2bXNwbGljZShTUExJQ0VfRl9HSUZU
+KScgb24gdGhpcyBwaXBlLCBpbnNlcnQgZGF0YSBwYWdlcyB0byBpdC4NCj4+IMKgIFNQTElDRV9G
+X0dJRlQgYWxsb3dzIHVzZXIgdG8gZm9yZ2V0IGFib3V0IGFsbG9jYXRlZCBwYWdlcyAtIGtlcm5l
+bCB3aWxsDQo+PiDCoCBmcmVlIGl0Lg0KPj4gMykgQ2FsbHMgJ3NwbGljZShTUExJQ0VfRl9NT1ZF
+KScgZnJvbSBwaXBlIHRvIHNvY2tldC4gU1BMSUNFX0ZfTU9WRSB3aWxsDQo+PiDCoCBtb3ZlIHBh
+Z2VzIGZyb20gcGlwZSB0byBzb2NrZXQoZS5nLiBpbiBzcGVjaWFsIHNvY2tldCBjYWxsYmFjayB3
+ZSBnb3QNCj4+IMKgIHNldCBvZiBwaXBlJ3MgcGFnZXMgYXMgaW5wdXQgYXJndW1lbnQgYW5kIGFs
+bCBwYWdlcyB3aWxsIGJlIGluc2VydGVkDQo+PiDCoCB0byB2aXJ0aW8gcXVldWUpLg0KPj4NCj4+
+IEJ1dCBhcyBTUExJQ0VfRl9NT1ZFIHN1cHBvcnQgaXMgZGlzYWJsZWQsIGl0IG11c3QgYmUgcmVw
+YWlyZWQgZmlyc3QuDQo+IA0KPiBTcGxpY2Ugc2VlbXMgaW50ZXJlc3RpbmcsIGJ1dCBpdCB3b3Vs
+ZCBiZSBuaWNlIElmIHdlIGRvIHNvbWV0aGluZyBzaW1pbGFyIHRvIFRDUC4gSUlVQyB0aGV5IHVz
+ZSBhIGZsYWcgZm9yIHNlbmQoMik6DQo+IA0KPiDCoMKgwqAgc2VuZChmZCwgYnVmLCBzaXplb2Yo
+YnVmKSwgTVNHX1pFUk9DT1BZKTsNCj4gDQoNClllcywgYnV0IGluIHRoaXMgd2F5IGkgdGhpbms6
+DQoxKSBXaGF0IGlzICdidWYnPyBJdCBjYW4ndCBiZSB1c2VyJ3MgYWRkcmVzcywgc2luY2UgdGhp
+cyBidWZmZXIgbXVzdCBiZSBpbnNlcnRlZCB0byB0eCBxdWV1ZS4NCiAgIEUuZy4gaXQgbXVzdCBi
+ZSBhbGxvY2F0ZWQgYnkga2VybmVsIGFuZCB0aGVuIHJldHVybmVkIHRvIHVzZXIgZm9yIHR4IHB1
+cnBvc2VzLiBJbiBUQ1ANCiAgIGNhc2UsICdidWYnIGlzIHVzZXIncyBhZGRyZXNzKG9mIGNvdXJz
+ZSBwYWdlIGFsaWduZWQpIGJlY2F1c2UgVENQIGxvZ2ljIHVzZXMgc2tfYnVmZiB3aGljaA0KICAg
+YWxsb3dzIHRvIHVzZSBzdWNoIG1lbW9yeSBhcyBkYXRhIGJ1ZmZlci4NCjIpIFRvIHdhaXQgdHgg
+cHJvY2VzcyBpcyBkb25lKGUuZy4gcGFnZXMgY2FuIGJlIHVzZWQgYWdhaW4pLCBzdWNoIEFQSShz
+ZW5kICsgTVNHX1pFUk9DT1BZKSwNCiAgIHVzZXMgc29ja2V0J3MgZXJyb3IgcXVldWUgLSBwb2xs
+IGV2ZW50cyB0aGF0IHR4IGlzIGZpbmlzaGVkLiBTbyBzYW1lIHdheSBtdXN0IGJlDQogICBpbXBs
+ZW1lbnRlZCBmb3IgdmlydGlvIHZzb2NrLg0KDQo+IMKgDQo+Pg0KPj4+DQo+Pj4+DQo+Pj4+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIERFVEFJTFMNCj4+Pj4NCj4+Pj4gwqDCoMKgwqBIZXJlIGlzIGhvdyBtYXBwaW5nIHdpdGgg
+bWFwcGVkIHBhZ2VzIGxvb2tzIGV4YWN0bHk6IGZpcnN0IHBhZ2UgbWFwcGluZw0KPj4+PiBjb250
+YWlucyBhcnJheSBvZiB0cmltbWVkIHZpcnRpbyB2c29jayBwYWNrZXQgaGVhZGVycyAoaW4gY29u
+dGFpbnMgb25seSBsZW5ndGgNCj4+Pj4gb2YgZGF0YSBvbiB0aGUgY29ycmVzcG9uZGluZyBwYWdl
+IGFuZCAnZmxhZ3MnIGZpZWxkKToNCj4+Pj4NCj4+Pj4gwqDCoMKgwqBzdHJ1Y3QgdmlydGlvX3Zz
+b2NrX3Vzcl9oZHIgew0KPj4+PiDCoMKgwqDCoMKgwqDCoCB1aW50MzJfdCBsZW5ndGg7DQo+Pj4+
+IMKgwqDCoMKgwqDCoMKgIHVpbnQzMl90IGZsYWdzOw0KPj4+PiDCoMKgwqDCoH07DQo+Pj4+DQo+
+Pj4+IEZpZWxkwqAgJ2xlbmd0aCcgYWxsb3dzIHVzZXIgdG8ga25vdyBleGFjdCBzaXplIG9mIHBh
+eWxvYWQgd2l0aGluIGVhY2ggc2VxdWVuY2UNCj4+Pj4gb2YgcGFnZXMgYW5kICdmbGFncycgYWxs
+b3dzIHVzZXIgdG8gaGFuZGxlIFNPQ0tfU0VRUEFDS0VUIGZsYWdzKHN1Y2ggYXMgbWVzc2FnZQ0K
+Pj4+PiBib3VuZHMgb3IgcmVjb3JkIGJvdW5kcykuIEFsbCBvdGhlciBwYWdlcyBhcmUgZGF0YSBw
+YWdlcyBmcm9tIFJYIHF1ZXVlLg0KPj4+Pg0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFBh
+Z2UgMMKgwqDCoMKgwqAgUGFnZSAxwqDCoMKgwqDCoCBQYWdlIE4NCj4+Pj4NCj4+Pj4gwqDCoMKg
+wqBbIGhkcjEgLi4gaGRyTiBdWyBkYXRhIF0gLi4gWyBkYXRhIF0NCj4+Pj4gwqDCoMKgwqDCoMKg
+wqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgIF7CoMKgwqDCoMKgwqDCoMKgwqDC
+oCBeDQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDC
+oCB8wqDCoMKgwqDCoMKgwqDCoMKgwqAgfA0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDC
+oMKgwqDCoMKgICotLS0tLS0tLS0tLS0tLS0tLS0tKg0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAg
+fMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8DQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDC
+oCB8wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+Pj4gwqDCoMKgwqDCoMKgwqDC
+oMKgICotLS0tLS0tLS0tLS0tLS0tKg0KPj4+Pg0KPj4+PiDCoMKgwqDCoE9mIGNvdXJzZSwgc2lu
+Z2xlIGhlYWRlciBjb3VsZCByZXByZXNlbnQgYXJyYXkgb2YgcGFnZXMgKHdoZW4gcGFja2V0J3MN
+Cj4+Pj4gYnVmZmVyIGlzIGJpZ2dlciB0aGFuIG9uZSBwYWdlKS5TbyBoZXJlIGlzIGV4YW1wbGUg
+b2YgZGV0YWlsZWQgbWFwcGluZyBsYXlvdXQNCj4+Pj4gZm9yIHNvbWUgc2V0IG9mIHBhY2thZ2Vz
+LiBMZXRzIGNvbnNpZGVyIHRoYXQgd2UgaGF2ZSB0aGUgZm9sbG93aW5nIHNlcXVlbmNlwqAgb2YN
+Cj4+Pj4gcGFja2FnZXM6IDU2IGJ5dGVzLCA0MDk2IGJ5dGVzIGFuZCA4MjAwIGJ5dGVzLiBBbGwg
+cGFnZXM6IDAsMSwyLDMsNCBhbmQgNSB3aWxsDQo+Pj4+IGJlIGluc2VydGVkIHRvIHVzZXIncyB2
+bWEodm1hIGlzIGxhcmdlIGVub3VnaCkuDQo+Pj4+DQo+Pj4+IMKgwqDCoMKgUGFnZSAwOiBbWyBo
+ZHIwIF1bIGhkciAxIF1bIGhkciAyIF1bIGhkciAzIF0gLi4uIF0NCj4+Pj4gwqDCoMKgwqBQYWdl
+IDE6IFsgNTYgXQ0KPj4+PiDCoMKgwqDCoFBhZ2UgMjogWyA0MDk2IF0NCj4+Pj4gwqDCoMKgwqBQ
+YWdlIDM6IFsgNDA5NiBdDQo+Pj4+IMKgwqDCoMKgUGFnZSA0OiBbIDQwOTYgXQ0KPj4+PiDCoMKg
+wqDCoFBhZ2UgNTogWyA4IF0NCj4+Pj4NCj4+Pj4gwqDCoMKgwqBQYWdlIDAgY29udGFpbnMgb25s
+eSBhcnJheSBvZiBoZWFkZXJzOg0KPj4+PiDCoMKgwqDCoCdoZHIwJyBoYXMgNTYgaW4gbGVuZ3Ro
+IGZpZWxkLg0KPj4+PiDCoMKgwqDCoCdoZHIxJyBoYXMgNDA5NiBpbiBsZW5ndGggZmllbGQuDQo+
+Pj4+IMKgwqDCoMKgJ2hkcjInIGhhcyA4MjAwIGluIGxlbmd0aCBmaWVsZC4NCj4+Pj4gwqDCoMKg
+wqAnaGRyMycgaGFzIDAgaW4gbGVuZ3RoIGZpZWxkKHRoaXMgaXMgZW5kIG9mIGRhdGEgbWFya2Vy
+KS4NCj4+Pj4NCj4+Pj4gwqDCoMKgwqBQYWdlIDEgY29ycmVzcG9uZHMgdG8gJ2hkcjAnIGFuZCBo
+YXMgb25seSA1NiBieXRlcyBvZiBkYXRhLg0KPj4+PiDCoMKgwqDCoFBhZ2UgMiBjb3JyZXNwb25k
+cyB0byAnaGRyMScgYW5kIGZpbGxlZCB3aXRoIGRhdGEuDQo+Pj4+IMKgwqDCoMKgUGFnZSAzIGNv
+cnJlc3BvbmRzIHRvICdoZHIyJyBhbmQgZmlsbGVkIHdpdGggZGF0YS4NCj4+Pj4gwqDCoMKgwqBQ
+YWdlIDQgY29ycmVzcG9uZHMgdG8gJ2hkcjInIGFuZCBmaWxsZWQgd2l0aCBkYXRhLg0KPj4+PiDC
+oMKgwqDCoFBhZ2UgNSBjb3JyZXNwb25kcyB0byAnaGRyMicgYW5kIGhhcyBvbmx5IDggYnl0ZXMg
+b2YgZGF0YS4NCj4+Pj4NCj4+Pj4gwqDCoMKgwqBUaGlzIHBhdGNoc2V0IGFsc28gY2hhbmdlcyBw
+YWNrZXRzIGFsbG9jYXRpb24gd2F5OiB0b2RheSBpbXBsZW1lbnRhdGlvbg0KPj4+PiB1c2VzIG9u
+bHkgJ2ttYWxsb2MoKScgdG8gY3JlYXRlIGRhdGEgYnVmZmVyLiBQcm9ibGVtIGhhcHBlbnMgd2hl
+biB3ZSB0cnkgdG8gbWFwDQo+Pj4+IHN1Y2ggYnVmZmVycyB0byB1c2VyJ3Mgdm1hIC0ga2VybmVs
+IGZvcmJpZHMgdG8gbWFwIHNsYWIgcGFnZXMgdG8gdXNlcidzIHZtYShhcw0KPj4+PiBwYWdlcyBv
+ZiAibm90IGxhcmdlIiAna21hbGxvYygpJyBhbGxvY2F0aW9ucyBhcmUgbWFya2VkIHdpdGggUGFn
+ZVNsYWIgZmxhZyBhbmQNCj4+Pj4gIm5vdCBsYXJnZSIgY291bGQgYmUgYmlnZ2VyIHRoYW4gb25l
+IHBhZ2UpLiBTbyB0byBhdm9pZCB0aGlzLCBkYXRhIGJ1ZmZlcnMgbm93DQo+Pj4+IGFsbG9jYXRl
+ZCB1c2luZyAnYWxsb2NfcGFnZXMoKScgY2FsbC4NCj4+Pj4NCj4+Pj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFRFU1RT
+DQo+Pj4+DQo+Pj4+IMKgwqDCoMKgVGhpcyBwYXRjaHNldCB1cGRhdGVzICd2c29ja190ZXN0JyB1
+dGlsaXR5OiB0d28gdGVzdHMgZm9yIG5ldyBmZWF0dXJlDQo+Pj4+IHdlcmUgYWRkZWQuIEZpcnN0
+IHRlc3QgY292ZXJzIGludmFsaWQgY2FzZXMuIFNlY29uZCBjaGVja3MgdmFsaWQgdHJhbnNtaXNz
+aW9uDQo+Pj4+IGNhc2UuDQo+Pj4NCj4+PiBUaGFua3MgZm9yIGFkZGluZyB0aGUgdGVzdCENCj4+
+Pg0KPj4+Pg0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgQkVOQ0hNQVJLSU5HDQo+Pj4+DQo+Pj4+IMKgwqDCoMKgRm9yIGJl
+bmNobWFrcmluZyBJJ3ZlIGFkZGVkIHNtYWxsIHV0aWxpdHkgJ3J4X3plcm9jb3B5Jy4gSXQgd29y
+a3MgaW4NCj4+Pj4gY2xpZW50L3NlcnZlciBtb2RlLiBXaGVuIGNsaWVudCBjb25uZWN0cyB0byBz
+ZXJ2ZXIsIHNlcnZlciBzdGFydHMgc2VuZGluZyBleGFjdA0KPj4+PiBhbW91bnQgb2YgZGF0YSB0
+byBjbGllbnQoYW1vdW50IGlzIHNldCBhcyBpbnB1dCBhcmd1bWVudCkuQ2xpZW50IHJlYWRzIGRh
+dGEgYW5kDQo+Pj4+IHdhaXRzIGZvciBuZXh0IHBvcnRpb24gb2YgaXQuIENsaWVudCB3b3JrcyBp
+biB0d28gbW9kZXM6IGNvcHkgYW5kIHplcm8tY29weS4gSW4NCj4+Pj4gY29weSBtb2RlIGNsaWVu
+dCB1c2VzICdyZWFkKCknIGNhbGwgd2hpbGUgaW4gemVyb2NvcHkgbW9kZSBzZXF1ZW5jZSBvZiAn
+bW1hcCgpJw0KPj4+PiAvJ2dldHNvY2tvcHQoKScvJ21hZHZpc2UoKScgYXJlIHVzZWQuIFNtYWxs
+ZXIgYW1vdW50IG9mIHRpbWUgZm9yIHRyYW5zbWlzc2lvbg0KPj4+PiBpcyBiZXR0ZXIuIEZvciBz
+ZXJ2ZXIsIHdlIGNhbiBzZXQgc2l6ZSBvZiB0eCBidWZmZXIgYW5kIGZvciBjbGllbnQgd2UgY2Fu
+IHNldA0KPj4+PiBzaXplIG9mIHJ4IGJ1ZmZlciBvciByeCBtYXBwaW5nIHNpemUoaW4gemVyb2Nv
+cHkgbW9kZSkuIFVzYWdlIG9mIHRoaXMgdXRpbGl0eQ0KPj4+PiBpcyBxdWlldCBzaW1wbGU6DQo+
+Pj4+DQo+Pj4+IEZvciBjbGllbnQgbW9kZToNCj4+Pj4NCj4+Pj4gLi9yeF96ZXJvY29weSAtLW1v
+ZGUgY2xpZW50IFstLXplcm9jb3B5XSBbLS1yeF0NCj4+Pj4NCj4+Pj4gRm9yIHNlcnZlciBtb2Rl
+Og0KPj4+Pg0KPj4+PiAuL3J4X3plcm9jb3B5IC0tbW9kZSBzZXJ2ZXIgWy0tbWJdIFstLXR4XQ0K
+Pj4+Pg0KPj4+PiBbLS1tYl0gc2V0cyBudW1iZXIgb2YgbWVnYWJ5dGVzIHRvIHRyYW5zZmVyLg0K
+Pj4+PiBbLS1yeF0gc2V0cyBzaXplIG9mIHJlY2VpdmUgYnVmZmVyL21hcHBpbmcgaW4gcGFnZXMu
+DQo+Pj4+IFstLXR4XSBzZXRzIHNpemUgb2YgdHJhbnNtaXQgYnVmZmVyIGluIHBhZ2VzLg0KPj4+
+Pg0KPj4+PiBJIGNoZWNrZWQgZm9yIHRyYW5zbWlzc2lvbiBvZiA0MDAwbWIgb2YgZGF0YS4gSGVy
+ZSBhcmUgc29tZSByZXN1bHRzOg0KPj4+Pg0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzaXplIG9mIHJ4L3R4IGJ1ZmZlcnMgaW4gcGFnZXMN
+Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSoNCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgfMKgwqDCoCA4wqDCoCB8wqDCoMKgIDMywqDCoMKgIHzCoMKgwqAgNjTCoMKgIHzCoMKg
+IDI1NsKgwqDCoCB8wqDCoCA1MTLCoMKgwqAgfA0KPj4+PiAqLS0tLS0tLS0tLS0tLS0qLS0tLS0t
+LS0qLS0tLS0tLS0tLSotLS0tLS0tLS0qLS0tLS0tLS0tLSotLS0tLS0tLS0tKg0KPj4+PiB8wqDC
+oCB6ZXJvY29wecKgwqAgfMKgwqAgMjTCoMKgIHzCoMKgIDEwLjbCoMKgIHzCoCAxMi4ywqDCoCB8
+wqDCoCAyMy42wqDCoCB8wqDCoMKgIDIxwqDCoMKgIHwgc2VjcyB0bw0KPj4+PiAqLS0tLS0tLS0t
+LS0tLS0qLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LSBwcm9jZXNzDQo+Pj4+IHwgbm9uLXplcm9jb3B5IHzCoMKgIDEzwqDCoCB8wqDCoCAxNi40wqDC
+oCB8wqAgMjQuN8KgwqAgfMKgwqAgMjcuMsKgwqAgfMKgwqAgMjMuOcKgwqAgfCA0MDAwIG1iDQo+
+Pj4+ICotLS0tLS0tLS0tLS0tLSotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tDQo+Pj4+DQo+Pj4+IEkgdGhpbmssIHRoYXQgcmVzdWx0cyBhcmUgbm90
+IHNvIGltcHJlc3NpdmUsIGJ1dCBhdCBsZWFzdCBpdCBpcyBub3Qgd29yc2UgdGhhbg0KPj4+PiBj
+b3B5IG1vZGUgYW5kIHRoZXJlIGlzIG5vIG5lZWQgdG8gYWxsb2NhdGUgbWVtb3J5IGZvciBwcm9j
+ZXNzaW5nIGRhdGUuDQo+Pj4NCj4+PiBXaHkgaXMgaXQgdHdpY2UgYXMgc2xvdyBpbiB0aGUgZmly
+c3QgY29sdW1uPw0KPj4NCj4+IE1heSBiZSB0aGlzIGlzIGJlY2F1c2UgbWVtb3J5IGNvcHlpbmcg
+Zm9yIHNtYWxsIGJ1ZmZlcnMgaXMgdmVyeSBmYXN0Li4uIGknbGwNCj4+IGFuYWx5emUgaXQgZGVl
+cGx5Lg0KPiANCj4gTWF5YmUgSSBtaXN1bmRlcnN0b29kLCBieSBzbWFsbCBidWZmZXJzIGhlcmUg
+d2hhdCBkbyB5b3UgbWVhbj8NCj4gDQo+IEkgdGhvdWdodCA4IHdhcyB0aGUgbnVtYmVyIG9mIHBh
+Z2VzLCBzbyAzMktCIGJ1ZmZlcnMuDQoNClllcywgOCBpcyBzaXplIGluIHBhZ2VzLiBBbnl3YXks
+IGkgbmVlZCB0byBjaGVjayBpdCBtb3JlIGRlZXBseS4NCg0KPiANCj4+DQo+Pj4NCj4+Pj4NCj4+
+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgUFJPQkxFTVMNCj4+Pj4NCj4+Pj4gwqDCoMKgwqBVcGRhdGVkIHBhY2tldCdzIGFs
+bG9jYXRpb24gbG9naWMgY3JlYXRlcyBzb21lIHByb2JsZW06IHdoZW4gaG9zdCBnZXRzDQo+Pj4+
+IGRhdGEgZnJvbSBndWVzdChpbiB2aG9zdC12c29jayksIGl0IGFsbG9jYXRlcyBhdCBsZWFzdCBv
+bmUgcGFnZSBmb3IgZWFjaCBwYWNrZXQNCj4+Pj4gKGV2ZW4gaWYgcGFja2V0IGhhcyAxIGJ5dGUg
+cGF5bG9hZCkuIEkgdGhpbmsgdGhpcyBjb3VsZCBiZSByZXNvbHZlZCBpbiBzZXZlcmFsDQo+Pj4+
+IHdheXM6DQo+Pj4NCj4+PiBDYW4gd2Ugc29tZWhvdyBjb3B5IHRoZSBpbmNvbWluZyBwYWNrZXRz
+IGludG8gdGhlIHBheWxvYWQgb2YgdGhlIGFscmVhZHkgcXVldWVkIHBhY2tldD8NCj4+DQo+PiBN
+YXkgYmUsIGknbGwgYW5hbHl6ZSBpdC4uLg0KPiANCj4gVGhhbmtzIQ0KPiANCj4+DQo+Pj4NCj4+
+PiBUaGlzIHJlbWluZHMgbWUgdGhhdCB3ZSBoYXZlIHlldCB0byBmaXggYSBzaW1pbGFyIHByb2Js
+ZW0gd2l0aCBrbWFsbG9jKCkgYXMgd2VsbC4uLg0KPj4+DQo+Pj4gaHR0cHM6Ly9idWd6aWxsYS5r
+ZXJuZWwub3JnL3Nob3dfYnVnLmNnaT9pZD0yMTUzMjkNCj4+DQo+PiBZZXMsIGJ1dCBpdCBpcyBh
+IGxpdHRsZSBiaXQgZGlmZmVyZW50IGNhc2U6IElJVUMgdGhpcyBidWcgaGFwcGVucyBiZWNhdXNl
+ICdrbWFsbG9jKCknDQo+PiB1c2VzIG1lbW9yeSBjaHVua3Mgb2Ygc29tZSBwcmVhbGxvY2F0ZWQg
+c2l6ZS4NCj4gDQo+IFllcCwgSSBtZWFuIEkgdGhpbmsgdGhlIHByb2JsZW0gaXMgdGhhdCB3aGVu
+IHdlIHJlY2VpdmUgMS1ieXRlIHBhY2tldHMsIHdlIGhhdmUgYWxsIHRoZSBoZWFkZXIgcXVldWVk
+IHVwIHRoYXQgd2UgZG9uJ3QgY29uc2lkZXIgaW4gdGhlIGNyZWRpdCBtZWNoYW5pc20uIEEgbGl0
+dGxlIGJpdCBkaWZmZXJlbnQuDQo+IA0KPj4NCj4+Pg0KPj4+PiDCoMKgwqDCoDEpIE1ha2UgemVy
+b2NvcHkgcnggbW9kZSBkaXNhYmxlZCBieSBkZWZhdWx0LCBzbyBpZiB1c2VyIGRpZG4ndCBlbmFi
+bGUNCj4+Pj4gaXQsIGN1cnJlbnQgJ2ttYWxsb2MoKScgd2F5IHdpbGwgYmUgdXNlZC4NCj4+Pg0K
+Pj4+IFRoYXQgc291bmRzIHJlYXNvbmFibGUgdG8gbWUsIEkgZ3Vlc3MgYWxzbyBUQ1AgbmVlZHMg
+YSBzZXRzb2Nrb3B0KCkgY2FsbCB0byBlbmFibGUgdGhlIGZlYXR1cmUsIHJpZ2h0Pw0KPj4NCj4+
+IFllcywgWW91J3JlIHJpZ2h0LiBJIHRoaW5rIGknbGwgYWRkIHRoaXMgdG8gdjIuDQo+Pg0KPj4+
+DQo+Pj4+IMKgwqDCoMKgMikgVXNlICdrbWFsbG9jKCknIGZvciAic21hbGwiIHBhY2tldHMsIGVs
+c2UgY2FsbCBwYWdlIGFsbG9jYXRvci4gQnV0DQo+Pj4+IGluIHRoaXMgY2FzZSwgd2UgaGF2ZSBt
+aXggb2YgcGFja2V0cywgYWxsb2NhdGVkIGluIHR3byBkaWZmZXJlbnQgd2F5cyB0aHVzDQo+Pj4+
+IGR1cmluZyB6ZXJvY29weWluZyB0byB1c2VyKGUuZy4gbWFwcGluZyBwYWdlcyB0byB2bWEpLCBz
+dWNoIHNtYWxsIHBhY2tldHMgd2lsbA0KPj4+PiBiZSBoYW5kbGVkIGluIHNvbWUgc3R1cGlkIHdh
+eTogd2UgbmVlZCB0byBhbGxvY2F0ZSBvbmUgcGFnZSBmb3IgdXNlciwgY29weSBkYXRhDQo+Pj4+
+IHRvIGl0IGFuZCB0aGVuIGluc2VydCBwYWdlIHRvIHVzZXIncyB2bWEuDQo+Pj4NCj4+PiBJdCBz
+ZWVtcyBtb3JlIGRpZmZpY3VsdCB0byBtZSwgYnV0IGF0IHRoZSBzYW1lIHRpbWUgZG9hYmxlLiBJ
+IHdvdWxkIGdvIG1vcmUgb24gb3B0aW9uIDEsIHRob3VnaC4NCj4+Pg0KPj4+Pg0KPj4+PiBQLlM6
+IG9mIGNvdXJzZSB0aGlzIGlzIGV4cGVyaW1lbnRhbCBSRkMsIHNvIHdoYXQgZG8gWW91IHRoaW5r
+IGd1eXM/DQo+Pj4NCj4+PiBJdCBzZWVtcyBjb29sIDotKQ0KPj4+DQo+Pj4gQnV0IEkgd291bGQg
+bGlrZSBzb21lIGZlZWRiYWNrIGZyb20gdGhlIG5ldCBndXlzIHRvIGhhdmUgc29tZSBUQ1AtbGlr
+ZSB0aGluZ3MuDQo+Pg0KPj4gT2ssIGknbGwgcHJlcGFyZSB2MiBhbnl3YXk6IGkgbmVlZCB0byBh
+bmFseXplIHBlcmZvcm1hbmNlLCBtYXkgYmUgbW9yZSB0ZXN0IGNvdmVyYWdlLCByZWJhc2UNCj4+
+IG92ZXIgbGF0ZXN0IGtlcm5lbCBhbmQgd29yayBvbiBwYWNrZXQgYWxsb2NhdGlvbiBwcm9ibGVt
+KGZyb20gYWJvdmUpLg0KPiANCj4gSWYgeW91IGhhdmUgdGltZSwgaXQgd291bGQgYmUgY29vbCB0
+byBtb2RpZnkgc29tZSBwZXJmb3JtYW5jZSB0b29sIHRoYXQgYWxyZWFkeSBzdXBwb3J0cyB2c29j
+ayB0byB0YWtlIGFkdmFudGFnZSBvZiB0aGlzIGZlYXR1cmUgYW5kIGxvb2sgYmV0dGVyIGF0IHBl
+cmZvcm1hbmNlLg0KPiANCj4gV2UgY3VycmVudGx5IGhhdmUgYm90aCBpcGVyZjMgKEkgaGF2ZSBh
+IG1vZGlmaWVkIGZvcmsgZm9yIHZzb2NrIFsxXSkgYW5kIHVwZXJmICh0aGV5IGhhdmUgbWVyZ2Vk
+IHVwc3RyZWFtIHRoZSB2c29jayBzdXBwb3J0KS4NCj4gDQo+IFBlcmhhcHMgdGhlIGVhc2llc3Qg
+dG8gdHdlYWsgaXMgaXBlcmYtdnNvY2ssIGl0IHNob3VsZCBhbHJlYWR5IGhhdmUgYSAtLXplcm9j
+b3B5IG9wdGlvbi4NCg0KQWNrDQoNCj4gDQo+IFRoYW5rcywNCj4gU3RlZmFubw0KPiANCj4gWzFd
+IGh0dHBzOi8vZ2l0aHViLmNvbS9zdGVmYW5vLWdhcnphcmVsbGEvaXBlcmYtdnNvY2sNCj4gDQoN
+Cg==
