@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83E9652F63C
-	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 01:33:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A47A52F63D
+	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 01:33:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351257AbiETXdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 19:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
+        id S1354123AbiETXdR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 19:33:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354122AbiETXdH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 19:33:07 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803E71A7D1B
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:06 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id w12-20020a170902e88c00b00161f70f090eso1250388plg.11
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:06 -0700 (PDT)
+        with ESMTP id S1348253AbiETXdK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 19:33:10 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D5219FF7F
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:08 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id r14-20020a17090a1bce00b001df665a2f8bso5358256pjr.4
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 16:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=+O7sOCqFij4Cg9LTfpyCAY9gXqKy94OnTf8FSIBC0lo=;
-        b=KRxARGEGLtZcSh9RlvhfAxNRi/v2I1ypEBjKXthu7qovhojcytukPPz6d/CIEr5+UE
-         6ArivDKm6N41zBjZEhkJrvU1BKyw/0wkWwdn8Cf7GvFxMxNqpr8b3dd5jRVzsd7r/Lpf
-         bo+04tinYDngLertfMgdZJu8mD/TVY8dtt/6ngs9GjLDhdvzxPnpEE5QiOtNMqj8HVuJ
-         /IQ08fseLBdbh/ixfrW+vO6fQfFcbYtQ9XLmbL4xfa6b2Y9oFFsiaDt7wBE6PgRgjXfk
-         BKmSxWOJLJqnPR8aefXHTphN0ZrWA2A1PPi4BOjlFnB53ZMhLyuoBtCa5MbDADpEAaNx
-         iOWQ==
+        bh=uIcCRTk30Rd3Z1grC6z/5SkL7Y9z8d0k84iCVKmVWzQ=;
+        b=YjSiYjx2ENUy1/0HB+kQNJnmnRJmYT/VE/dNmCxKFY+yzvldUgLpr5SgkevfN6+AEt
+         5nI3g62miRCQUDmYQUOZ+HHroYnhdkK4qjwlEwwbpjAiamAjjCKEFQmpUTL9Wo9g/ALT
+         D9lGpcnX+JhlV1Hss986OK29PUBwBGKDZis3ub6kjX7Rqwj0aQ5zl4R8MtPIr5BdOl27
+         AlGvXMZRzIh9Hqhc2V/WwmkpnHccj3Qs8XWG2F6tBJYafiO9ZFGZpv4EntuGBjJp4i5S
+         PqkefuTnJ0ZC5DO0TCpP6tnmwGz0pZf8JAKs5Je3aVaDoTc5ZRttGH64jCLmfjp4dcbV
+         22gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=+O7sOCqFij4Cg9LTfpyCAY9gXqKy94OnTf8FSIBC0lo=;
-        b=1UzL6CMj1LgiodE1OLXyhYZL2WfG8NYfdiFUyhT1OEo3BsEk6HmRhAV0tjTvi6K+Z6
-         Ps/yKIBAVvXZpwDRSDoDKu3wG+kuj8l365nLlGE2wK17a41+s9x3Ft6C8F/YI0+jioYS
-         ZioAVhqmHc7Ah72OScl4sxdp/OYWa4fggWO4bhzC7toPLL4p0eBKSaf1YANGuXrm+3ae
-         twldomuNjjFSjdb1nrs5e7lsN3MUYo9v8mx8jBN7LRZX0FgfXoFe15ApTAgch+L+kZyb
-         FGtPtLet1OofTiMenO4VEXzGU+VUtd/QUufTfPfPIDLDvkJ+UujpbWQopx5nnp+VpCk3
-         XqiQ==
-X-Gm-Message-State: AOAM533zBev8cMnddNxHPu7T290F/SH7yLGGxRxlyYAxDPcTDaioYLyV
-        Gunupldc7WXI0Am7YMNd9Rzw1HX18oUHDQ==
-X-Google-Smtp-Source: ABdhPJyiFbp4MV+j6mWFwm4EEwIoYtKq737jRlE26jFb62bAEldjFQXxgt2taNuoLX80ihRfvfPqtycugrDHaQ==
+        bh=uIcCRTk30Rd3Z1grC6z/5SkL7Y9z8d0k84iCVKmVWzQ=;
+        b=PrYGOTs/aYdrqB5sUKJawx/YoFpFQK7QdAQb5VfK59TGdXkiSsGSBwPiG2CnEaJ8c5
+         C321kKJlOS8yqrbzLFmcVRIRFAFN2HNVFtkAhUlC6di9EW6J4da1gyVo60kp1hUYlKcX
+         ZkMfqg0A+PUPVRjqBW/AGKcZaqDmUYHEJkSvkm9mvYt4QOn8bdUYmypvQTgnNkBfNexP
+         ta+lDvXj2+IagVACXt6WJ71uwWGqe5UPNDnZmIQ3VWqAw7dcOUzf1lSzLngvz7VqItAa
+         Xb6+ZO4GfMIC2Aj9KtksQbj9RLHPuEkjWLU0MhjplM5+dB4a8OBzBiQ/Hv/SChYzhaZE
+         4ikw==
+X-Gm-Message-State: AOAM533Lts7bgOUcuenZVmiXj0+3pLXaAbkyEn70I9bSVpy/DBkWCzif
+        MmbRT+VM0EtOGoPezZPhB6p/PHn1B4RFiA==
+X-Google-Smtp-Source: ABdhPJwUBntIs9c/BhgpeWdPf7WA+InB6rt05MG8XmHTJNz2LVRczjGwep7zsdSn39M6e3CqkqQc1yTI55PdLQ==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:8d83:b0:1dd:258c:7c55 with SMTP
- id d3-20020a17090a8d8300b001dd258c7c55mr490709pjo.1.1653089585563; Fri, 20
- May 2022 16:33:05 -0700 (PDT)
-Date:   Fri, 20 May 2022 23:32:45 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:4f05:b0:1df:afae:180b with SMTP
+ id p5-20020a17090a4f0500b001dfafae180bmr13668728pjh.80.1653089587556; Fri, 20
+ May 2022 16:33:07 -0700 (PDT)
+Date:   Fri, 20 May 2022 23:32:46 +0000
 In-Reply-To: <20220520233249.3776001-1-dmatlack@google.com>
-Message-Id: <20220520233249.3776001-8-dmatlack@google.com>
+Message-Id: <20220520233249.3776001-9-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220520233249.3776001-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH v4 07/11] KVM: selftests: Drop unnecessary rule for STATIC_LIBS
+Subject: [PATCH v4 08/11] KVM: selftests: Link selftests directly with lib
+ object files
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Ben Gardon <bgardon@google.com>,
@@ -72,27 +73,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the "all: $(STATIC_LIBS)" rule. The KVM selftests already depend
-on $(STATIC_LIBS), so there is no reason to have an extra "all" rule.
+The linker does obey strong/weak symbols when linking static libraries,
+it simply resolves an undefined symbol to the first-encountered symbol.
+This means that defining __weak arch-generic functions and then defining
+arch-specific strong functions to override them in libkvm will not
+always work.
 
-Suggested-by: Peter Xu <peterx@redhat.com>
+More specifically, if we have:
+
+lib/generic.c:
+
+  void __weak foo(void)
+  {
+          pr_info("weak\n");
+  }
+
+  void bar(void)
+  {
+          foo();
+  }
+
+lib/x86_64/arch.c:
+
+  void foo(void)
+  {
+          pr_info("strong\n");
+  }
+
+And a selftest that calls bar(), it will print "weak". Now if you make
+generic.o explicitly depend on arch.o (e.g. add function to arch.c that
+is called directly from generic.c) it will print "strong". In other
+words, it seems that the linker is free to throw out arch.o when linking
+because generic.o does not explicitly depend on it, which causes the
+linker to lose the strong symbol.
+
+One solution is to link libkvm.a with --whole-archive so that the linker
+doesn't throw away object files it thinks are unnecessary. However that
+is a bit difficult to plumb since we are using the common selftests
+makefile rules. An easier solution is to drop libkvm.a just link
+selftests with all the .o files that were originally in libkvm.a.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/Makefile | 1 -
- 1 file changed, 1 deletion(-)
+ tools/testing/selftests/kvm/Makefile | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 8c3db2f75315..ae49abe682a7 100644
+index ae49abe682a7..0889fc17baa5 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -192,7 +192,6 @@ $(OUTPUT)/libkvm.a: $(LIBKVM_OBJS)
- 	$(AR) crs $@ $^
+@@ -173,12 +173,13 @@ LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
+ # $(TEST_GEN_PROGS) starts with $(OUTPUT)/
+ include ../lib.mk
  
+-STATIC_LIBS := $(OUTPUT)/libkvm.a
+ LIBKVM_C := $(filter %.c,$(LIBKVM))
+ LIBKVM_S := $(filter %.S,$(LIBKVM))
+ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
+ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+-EXTRA_CLEAN += $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(STATIC_LIBS) cscope.*
++LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ)
++
++EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
+ 
+ x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+@@ -187,12 +188,8 @@ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+ 
+-LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ)
+-$(OUTPUT)/libkvm.a: $(LIBKVM_OBJS)
+-	$(AR) crs $@ $^
+-
  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
--all: $(STATIC_LIBS)
- $(TEST_GEN_PROGS): $(STATIC_LIBS)
+-$(TEST_GEN_PROGS): $(STATIC_LIBS)
++$(TEST_GEN_PROGS): $(LIBKVM_OBJS)
  
  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+ cscope:
 -- 
 2.36.1.124.g0e6072fb45-goog
 
