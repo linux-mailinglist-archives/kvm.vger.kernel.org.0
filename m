@@ -2,74 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8C0752F065
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 18:18:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1252752F0B3
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 18:32:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351511AbiETQSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 12:18:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56418 "EHLO
+        id S1351638AbiETQcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 12:32:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232607AbiETQSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 12:18:44 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0236D86A;
-        Fri, 20 May 2022 09:18:44 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id v10so8115729pgl.11;
-        Fri, 20 May 2022 09:18:44 -0700 (PDT)
+        with ESMTP id S244553AbiETQcD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 12:32:03 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41833467E
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 09:32:02 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id y41so8162486pfw.12
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 09:32:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sJkmL3cNNCMdY+tXxffweIx723JB3I+sakjvH9x5oPk=;
-        b=pKqLfq/DCIUJC4+qM7NiWzWHEvd6SrtREbZVUXsyCE/WXQz6k3GgmSapoKl75dVARm
-         DbiSfwlfIBtgrDKulb5CpFbtKpSkHN6f5nnd5qso6EHWyRCL/FqSYE1YV8/gLhAZBryA
-         oY2gKX7F82zdYn4EfMvajmTTI5ItAx/NUx9Udla5wndZ47Ky33OlQ22/uFJA9kvkUnlR
-         o0DVwt8vrrM2QUoPS2/u76YmC5xVNy3LV5hwY+r8Y/gyFVz0b87Q0y20zxyDZ6B6xVZL
-         0Mo4RGXMptD21gYHBroNYsA7W2lBPaZ0V7c9Yh6nEJ/jP++Fd8IjP97FF7cfBPtm7rtU
-         f3vA==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=SzItUW0RGTe8ShIv3stQK+W3HlY6O/3mA4zqLcRGqJc=;
+        b=PzMJGGKM0liKfpSZu42fuPpNSgDQEt9yH+9w2C7yME17A4Xd6iyfNhJwoP7E3p363m
+         3Sr2Ftd4UVbIX7L0sAfzhDR0UOClzzbQ0hxSbtTa6vipdUzBEKwb20DWi1QFoKXMbAGB
+         FBvqJgzWqPZwZ3f7hqr194VOX3BvttIdDDqdu2FCX4GXGbtYywmAsxEtfLE+9P2KJ25f
+         0b68NUFjWgP0i6gJ55P1eEEN/vKEBKzNnJ9opb0eiHUvBbfMdqbAs9yfdt7ZeNK+/BGx
+         d3PBm/t0WyDU4t8pbCOBFl87PqVpDIhCoNfawihVuZrBhZCCSk7c8GakPsoordb+5fX4
+         6dcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sJkmL3cNNCMdY+tXxffweIx723JB3I+sakjvH9x5oPk=;
-        b=cEdJTmQ1GtDApbN3fZuMOu3lugLXsTNN9mYu+flGgRO15E9mBqTO35YYDSkBxGEW+5
-         DEEmRHQgvV1jMKRZAWNj+znJziLJxLTPQvLtDYPm6oS6/aadU7yeRHyrJwMLw68ssrgk
-         ZhgXvibcbvZtx3S59yy4aUCml6WGnMJaW0UdQE91Qzu6sQdaIFtnKoVb8QYuDRtH4pDH
-         ITj4k1svPL9NcqlxBq0IOWHKZ2ONGwkabAhzgiaaJrXKMkMCfvKdt38YhKBSFCxCiJqa
-         e//ZCuIADW3TNbkzhVyAOseXORWczNX1AmzZbmCGqSW55Od4emRfdVFSjpo5LnJYgc6Q
-         erEg==
-X-Gm-Message-State: AOAM530yAn6j6WDSucM+cXh6qd7zZnTQ5sca0RDf2RWbeyeiZVMdqfvO
-        HruN2XWEMVNkFVRG5hqO9DmUyi9t+urGHFdyS5M=
-X-Google-Smtp-Source: ABdhPJx+qcYi6F2bg4WVAwh754TW7golfOR49ep220qUtfFvRzJQads+gxDHdltL7DRwree4z7Rg9gCYETyar8r/p2w=
-X-Received: by 2002:a65:694b:0:b0:3f5:f32a:3adc with SMTP id
- w11-20020a65694b000000b003f5f32a3adcmr9069654pgq.541.1653063523816; Fri, 20
- May 2022 09:18:43 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SzItUW0RGTe8ShIv3stQK+W3HlY6O/3mA4zqLcRGqJc=;
+        b=UWmJVtxBOnr7+Mwsnv8RgtBfaK8guYPQamlLUxWg4C3Ioyg3XWq7BR+Gnq2aL6I2ZQ
+         nYct0wadtxzjZ4v7chkUw+/B8Qp5iGJpa3nsm+IQtMDPF7iiFr5p2DIewIFMYCFmY2KY
+         MOPQBgHURj/GMUEDHf84BKRVLfuk511zH5d6tAsHD4twLOL+AAbtb66NkxzjMyGRphqG
+         6XMteugsgo9JFXH2RN1e8p30M0phw4ALUPKBYNzcVu4Wg5K6k13Pd+mAcVeLwseHleeb
+         rp5LgV7muB7AWoDiBP89ukKzY2C0C0AfO9SUx6D+Ki6IlJf23Alr7Nl+Al+YF+WwXBEI
+         5MSA==
+X-Gm-Message-State: AOAM533IpOYXPyNsK0UJhDeITmENsh7mPkFySPWtP3d5aJYUnAVZfBV1
+        BQlPOf0a8m1zjJ2T4a11naVHgQ==
+X-Google-Smtp-Source: ABdhPJwF5grmfxO4RF5xZ26433l2Q5OTsV92U+/XH0s8a/N4+jlSDTIfigkguDeqgETo44XtIyhtBA==
+X-Received: by 2002:a63:d054:0:b0:3f2:50df:e008 with SMTP id s20-20020a63d054000000b003f250dfe008mr9132653pgi.317.1653064322022;
+        Fri, 20 May 2022 09:32:02 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id o6-20020a17090a4e8600b001d840f4eee0sm2077563pjh.20.2022.05.20.09.32.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 May 2022 09:32:00 -0700 (PDT)
+Date:   Fri, 20 May 2022 16:31:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Xu, Yanfei" <yanfei.xu@intel.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "Liang, Kan" <kan.liang@intel.com>
+Subject: Re: [PATCH] KVM: x86: Fix the intel_pt PMI handling wrongly
+ considered from guest
+Message-ID: <YofCfNsl6O45hYr0@google.com>
+References: <20220515171633.902901-1-yanfei.xu@intel.com>
+ <YoJYah+Ct90aj1I5@google.com>
+ <DM6PR11MB41380A9DD32D6542CBC3A90BF0D39@DM6PR11MB4138.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-References: <20220428205116.861003-1-yury.norov@gmail.com> <20220428205116.861003-4-yury.norov@gmail.com>
- <20220519150929.GA3145933@roeck-us.net> <CAAH8bW8ju7XLkbYya1A1OtqGVGDUAk7dPyw01RsDzg+v7xihyQ@mail.gmail.com>
- <872607af-5647-a255-83f2-3bf75b7f0df4@roeck-us.net>
-In-Reply-To: <872607af-5647-a255-83f2-3bf75b7f0df4@roeck-us.net>
-From:   Yury Norov <yury.norov@gmail.com>
-Date:   Fri, 20 May 2022 09:18:33 -0700
-Message-ID: <CAAH8bW9zdMCV_JJ7abC6jY=0W-oTK5g0refFgFHLYWCykVk5KA@mail.gmail.com>
-Subject: Re: [PATCH 3/5] lib/bitmap: add test for bitmap_{from,to}_arr64
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB41380A9DD32D6542CBC3A90BF0D39@DM6PR11MB4138.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,68 +85,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 19, 2022 at 11:04 AM Guenter Roeck <linux@roeck-us.net> wrote:
->
-> On 5/19/22 09:01, Yury Norov wrote:
-> > On Thu, May 19, 2022 at 8:09 AM Guenter Roeck <linux@roeck-us.net> wrote:
-> >>
-> >> On Thu, Apr 28, 2022 at 01:51:14PM -0700, Yury Norov wrote:
-> >>> Test newly added bitmap_{from,to}_arr64() functions similarly to
-> >>> already existing bitmap_{from,to}_arr32() tests.
-> >>>
-> >>> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> >>
-> >> With this patch in linux-next (including next-20220519), I see lots of
-> >> bitmap test errors when booting 32-bit ppc images in qemu. Examples:
-> >>
-> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0", got "0,65"
-> >> ...
-> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128"
-> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-129"
-> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-130"
-> >> ...
-> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-209"
-> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-210"
-> >>
-> >> and so on. It only  gets worse from there, and ends with:
-> >>
-> >> test_bitmap: parselist: 14: input is '0-2047:128/256' OK, Time: 4274
-> >> test_bitmap: bitmap_print_to_pagebuf: input is '0-32767
-> >> ', Time: 127267
-> >> test_bitmap: failed 337 out of 3801 tests
-> >>
-> >> Other architectures and 64-bit ppc builds seem to be fine.
-> >
-> > Hi Guenter,
-> >
-> > Thanks for letting me know. It's really weird because it has already
-> > been for 2 weeks
-> > in next with no issues. But I tested it on mips32, not powerpc. I'll
-> > check what happens
-> > there.
-> >
-> Oh, I have seen the problem for a while, it is just that -next is in
-> such a bad shape that it is difficult to bisect individual problems.
->
-> > Can you please share your config and qemu image if possible?
-> >
->
-> First, you have to revert commit b033767848c411
-> ("powerpc/code-patching: Use jump_label for testing freed initmem")
-> to avoid a crash. After that, a recent version of qemu should work
-> with the following command line.
->
-> qemu-system-ppc -kernel arch/powerpc/boot/uImage -M mpc8544ds \
->         -m 256 -no-reboot -initrd rootfs.cpio \
->         --append "rdinit=/sbin/init coherent_pool=512k mem=256M console=ttyS0" \
->         -monitor none -nographic
->
-> Configuration is mpc85xx_defconfig with CONFIG_TEST_BITMAP enabled.
-> I used the root file system (initrd) from
-> https://github.com/groeck/linux-build-test/blob/master/rootfs/ppc/rootfs.cpio.gz
+Please don't top-post.
 
-Yes, that helped a lot. Thanks, I was able to reproduce it. I'll take
-a look shortly.
+On Fri, May 20, 2022, Xu, Yanfei wrote:
+> From: Sean Christopherson <seanjc@google.com> 
+> On Mon, May 16, 2022, Yanfei Xu wrote:
+> > diff --git a/arch/x86/include/asm/kvm_host.h 
+> > b/arch/x86/include/asm/kvm_host.h index 4ff36610af6a..308cf19f123d 
+> > 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1582,8 +1582,14 @@ static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
+> >  		return -ENOTSUPP;
+> >  }
+> >  
+> > +enum kvm_intr_type {
+> > +	/* Values are arbitrary, but must be non-zero. */
+> > +	KVM_HANDLING_IRQ = 1,
+> > +	KVM_HANDLING_NMI,
+> > +};
+> > +
+> >  #define kvm_arch_pmi_in_guest(vcpu) \
+> > -	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
+> > +	((vcpu) && (vcpu)->arch.handling_intr_from_guest == 
+> > +KVM_HANDLING_NMI)
+> 
+> My understanding is that this isn't correct as a general change, as perf
+> events can use regular IRQs in some cases.  See commit dd60d217062f4 ("KVM:
+> x86: Fix perf timer mode IP reporting").
+> 
+> I assume there's got to be a way to know which mode perf is using, e.g. we
+> should be able to make this look something like:
+> 
+> 	((vcpu) && (vcpu)->arch.handling_intr_from_guest == kvm_pmi_vector)
 
-Thanks,
-Yury
+> Hi Sean,
+> You are right, the change of kvm_arch_pmi_in_guest is incorrect, because it should cover two cases of PMI. 
+> For the PMI of intel pt, it certainly is the NMI PMI. So how about fixing it like below?
+
+Yep, that works.  I did enough spelunking to figure out how we can fix the generic
+issue, but it's per-event and requires a decent amount of plumbing in perf.
+
+perf_guest_handle_intel_pt_intr() doesn't bother with perf_guest_state() since it's
+such a specialized event, so fixing this in vmx_handle_intel_pt_intr() would likely
+be the long-term solution even if/when the generic case is fixed.
