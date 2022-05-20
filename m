@@ -2,395 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B74A552F3B1
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 21:09:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71EF852F40D
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 21:54:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353194AbiETTJC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 15:09:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        id S1353333AbiETTym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 15:54:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353175AbiETTJA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 15:09:00 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23EA2197F62;
-        Fri, 20 May 2022 12:08:59 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24KHT8JS025308;
-        Fri, 20 May 2022 19:08:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=x+T+WxIrfKzas3rLyu97XexyZdkzQLKxU0HzboK4YEE=;
- b=EuPBS7cB+ca0aC+7tl3XNU45zpe2N5ZfWiDt0DZt+KHVHu9AR0rCqaAl8Z5U0jru9wts
- IALJP5cQV+i+skha5BktXPX9Obg84TqfltRwGvSEZAMJ5KwUFaSJXVtnGdRCJELo/PWS
- 80u4v1GS8W6E17yL0wGVMFyz0wfC1mcfxzphwLfiBPfMO9wHxU5uhup7qKM692jnpn2V
- M+AhEaSq7SEScNzQ2e+44Fx6tZvuXz/h/7qNH0bg9J531Re9araOS2NgfuyJ/TYP/CVF
- 2M6jl6jykki5bUH+VAhc/N4EOQ+OGc/7M+C2gPb2R+noJv0Uktt9e3/LrVp9IrhkWgcA og== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g6fe49n1w-1
+        with ESMTP id S238363AbiETTyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 15:54:40 -0400
+Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6B6196698;
+        Fri, 20 May 2022 12:54:39 -0700 (PDT)
+Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
+        by mx0a-002c1b01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24KEdsVa018233;
+        Fri, 20 May 2022 12:53:34 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=proofpoint20171006;
+ bh=HOI2FXfrCklr8eN65JVepP6NGZogRxkp/FWag4X0Uiw=;
+ b=UqBEwvkvRX9i73H0XpsELwHceGe2ZUKsanvLWvhwIxCoZDrmrBoLbmBVxhM2aScX0GIE
+ 5Ph7ZgIJzIjIUzm55aca1XJ8vALhbIf+TJEOJY6ySQJlsVTouBN89eTOtYLyV8jTwGil
+ 6UmrvQP/BRDYhIHTZ7he1XKMkLLZ/n375wrwq4xiRW2CHNZ+V/2C1+pXsgc+ljWSKXkK
+ TCLjq9uvydPPi66qSFs9GXalPN7gsB6AG9WkGILyT/hknjba2WgtJ3LRN35h7PkVlHFG
+ tWvWIUt9JeH4uZJFpJwmhl0UFBhZ1xcl2k+o6skOho/Q8RsoDelGOd8RK0ld6OqWHTRK 0w== 
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2175.outbound.protection.outlook.com [104.47.57.175])
+        by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 3g2byyx3ky-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 May 2022 19:08:58 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24KIc5fk015334;
-        Fri, 20 May 2022 19:08:58 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g6fe49n13-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 May 2022 19:08:58 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24KIr0Sr026316;
-        Fri, 20 May 2022 19:08:55 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3g2429h805-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 May 2022 19:08:55 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24KJ8Cps32899520
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 May 2022 19:08:12 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB088AE045;
-        Fri, 20 May 2022 19:08:52 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7CD4FAE04D;
-        Fri, 20 May 2022 19:08:52 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 20 May 2022 19:08:52 +0000 (GMT)
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 3/3] s390x: Rework TEID decoding and usage
-Date:   Fri, 20 May 2022 21:08:50 +0200
-Message-Id: <20220520190850.3445768-4-scgl@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220520190850.3445768-1-scgl@linux.ibm.com>
-References: <20220520190850.3445768-1-scgl@linux.ibm.com>
-MIME-Version: 1.0
+        Fri, 20 May 2022 12:53:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YmCvdSLlVjOVkmW941IYxocxggIIFK/t8MlW+Z7h6XZXZ/qmLy1AKBy/fjg2xk+rDMZURBzzzgcvGVFvG5890V30k7jG2b9cQZKAUFYecQHI+1EqPspqANDY0UMXUGoE/bdDIjFZGFJGGsY6QAjwUg5qYQNlKOdVBGuWDiaSMVBbow3ZLN40Icpx5IeHbZhSCnV6jK7Bjh9B2WjTUqwjPqEXrn285KFrhscBOrTZNKRJUxuJ15jWxTb0uzQ8v2Xx5rzc6oQh4dx5YXdFILi1blt+4Pgj5ZOPI4SgDn9pKvT94uUTFc7FRm4ZZIMG3xBxJeK9EJGvZC8LKM+tqR32+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HOI2FXfrCklr8eN65JVepP6NGZogRxkp/FWag4X0Uiw=;
+ b=mi5EbxOOiqgKa1ifoiiT2CZwO2RdfGjB3WNM/N7V66HcrZPXzSx+D17LU93QbCanhYDPWOiE8dA6zbI8bUqGlyOeZoRzErifXu+7f1W60Y2u/GxpNwMSsJ55ea4IXr4r1r7rq6j6xMxYVof70hOton2T1I7Wn2s3TZmcSFLngfagB1fsuNDr/lY6RoSmRPvzSVyvER8VJW318u2Kr5Hgj2t4t2A5Vwi6/fqlBn1DobAKfkDs+3n1fDmrMKRQopxhjNUFASLQNrjyUWArmjol8xuDVG8MEm8VBa1Tss5ngevNszzYC5YUIpaVuFjZk+fpKpzaHaD/7TVfu+3Wd51lzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com (2603:10b6:208:4b::10)
+ by BY5PR02MB6535.namprd02.prod.outlook.com (2603:10b6:a03:1da::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.17; Fri, 20 May
+ 2022 19:53:29 +0000
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::fd14:ff80:d4d9:c81f]) by BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::fd14:ff80:d4d9:c81f%5]) with mapi id 15.20.5273.017; Fri, 20 May 2022
+ 19:53:29 +0000
+From:   Jon Kohler <jon@nutanix.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Waiman Long <longman@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Jon Kohler <jon@nutanix.com>
+Subject: [PATCH v2] KVM: VMX: do not disable interception for MSR_IA32_SPEC_CTRL on eIBRS
+Date:   Fri, 20 May 2022 15:53:03 -0400
+Message-Id: <20220520195303.58692-1-jon@nutanix.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -q2ZS869OEJ7jjXY41FUxU6Vu93t2aEw
-X-Proofpoint-ORIG-GUID: 5_84DRMUtgBy687CjZTUI4zxydMOouMm
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0176.namprd03.prod.outlook.com
+ (2603:10b6:a03:338::31) To BL0PR02MB4579.namprd02.prod.outlook.com
+ (2603:10b6:208:4b::10)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6c4874d4-ad0d-43ec-3da5-08da3a9a6948
+X-MS-TrafficTypeDiagnostic: BY5PR02MB6535:EE_
+X-Microsoft-Antispam-PRVS: <BY5PR02MB6535A2278451CF072852A029AFD39@BY5PR02MB6535.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: U9N/R1Ueh24gr0V2SPpbXVNxvnu9QNs3rwKxVLOb0qNceeN5j4A1Hxxh1neiuEktSc/NYcNBP6WRr8+o94OYeS+AaTlKXKKu0K734K0kcLKEP842yzwTXPMyPX4c9f0dXuzB74a+Z/+4LWeC5qYWWF64wvmqoKdwU58hhke6+uCDHV+Jz0qWsh1X7t4iHZdMFCI/nZ3Fe+NuMRQJAa/jBSfgTxd+VZ6Kss+UgNDyWbL2FuCG/mJvtXIniJ+KFigk2VAKkunmqp0UASgvdQkMdSW0sMpkzqEUx22giLpNF9ybyjYVw5bvKmAjGdnEATB48BuRphO3yVXVs1fl9q2A/BrzZP3VAF5xKhVM6ZArVA7eviUN4RIKPN92+VTPhuzHtCgxiPEwWPGu3yo/oSJWB1kZCeoTwYmIv9AfhVlLcDE9LaO1n2oAMzVSHjbAhC2fntWsUD448PStvfYjlfD3l9L9Ozkv62QLIEO6Oe4cGkTZTnQ3bgzfLRRerM4nHtX3/A10zXJrCPIJYxYcSiry2JkZaoQpt0bKmxaax60REclEYMZ5AkuiYw8xJX7NackY20OiHMc12JgESd6usnDZlbxZjDCkHkh+pJIuWrxBN8iIlEnSTR8vaOUmOZ/xuzhkQ1FXhWv7ON4EzF8tBK6tXLlho6/53qVKzMDWn9Zc4+5PUySItgotXZclIwOpXWM3bxFpYse/f38vuiulB4cOzA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR02MB4579.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(316002)(186003)(2616005)(6506007)(107886003)(921005)(508600001)(1076003)(38100700002)(86362001)(6512007)(83380400001)(36756003)(6486002)(7416002)(5660300002)(66946007)(66556008)(66476007)(52116002)(2906002)(6666004)(110136005)(8676002)(8936002)(4326008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?1LZ5sfYD7g8XfZeKm7Wu6vxrSP8FujAD22I75mNP4Ye+GhELAWDmXnc7Mkw8?=
+ =?us-ascii?Q?aTdkDTergMCdrAZQkBKHC+HuDpv7aVaLOqsyCRkS55WlyFT5C5+oU3YGdWyv?=
+ =?us-ascii?Q?GJllWCCm0H0wEzyzq/OZE5p5c9wzAPUbNFavIG0SAm+7SPwJzj5hI6S5YH0k?=
+ =?us-ascii?Q?vSHx/numRPRwpPd2EtP/zRuy6QaMqBydk5bV/HWtZj5/MfJZ60URDUUF5mqa?=
+ =?us-ascii?Q?+enNtaeLdpUdA0DO+GOpd1Lw45ZvnU3JQX6hPNS2GEv1+e8Sqp9fr2Q4mEXx?=
+ =?us-ascii?Q?jaMya02ZTwLR9+JexVWKASOIe3a54XJC9dNXwapBL72EhCPt//ky70FYkE+2?=
+ =?us-ascii?Q?xHwothi4vst7DC8Z1o862tXvXJmAB0NImcY4M1r/wba0nAR1yaR9KHSfMvuB?=
+ =?us-ascii?Q?wka02loc/wyAo4wjaB91hUxTOIN9TWTlrGlW3w2gY+uUUl4ENtRMsT9uMUah?=
+ =?us-ascii?Q?kBioEyVCuFoi2c/VGegrlKeMGsy0YU6b71gl9bkY8qI1mEZuakj7c9jevbcE?=
+ =?us-ascii?Q?q13NLrmoZqfrEN5/tSp7BOBjSdAgvbMeFseeV0627bjoKkgOaOtkSR9UNjwO?=
+ =?us-ascii?Q?wOkZIjDzSA8YHrGHd9xSlmCv9OaDE7wV8ZYqLN+KZvWxOV199x6sPwAYaSSF?=
+ =?us-ascii?Q?HCOPrHq4wIBE07DeFWYd9ve/Smi/wtQVqXYjEy0roxAucfo/tqpuYHr+Ak8o?=
+ =?us-ascii?Q?Bhn0ha9YELOpfhAV5xuXtvnLbaxnt5lPVCgQ2xzN5W7dmI+JlGw3N+Nv0rHQ?=
+ =?us-ascii?Q?c3l4RQvH0kvsKhTV+QJwXhg+RkYPoMANbBgmKmzVqd6VDGt2rqwulQvvAqNw?=
+ =?us-ascii?Q?2xe+u1JJVwkgXY6bPxO13lHYBWEGNGwmuy09cWOllWBbGI1qRMtYG7LWjF61?=
+ =?us-ascii?Q?put2vssT4HcpWZVk3ZOA26ef5MtvAZHnoViEJNC1cRgXzOMkqCQ3m2p3nelZ?=
+ =?us-ascii?Q?iliXymy3oZRzVgoEgfaCtWI8jKfCmDlnNVl724SGnW+F0mDrEI5Ew8Ekireg?=
+ =?us-ascii?Q?EZNhK2MvneRVzQIEthAu6eeA+VSOjmnwbVFZeJuSHSGTf0VZkk+ECneeEv1T?=
+ =?us-ascii?Q?LpxGrrlPF/k5jcIaCdIFMV5e8r8IDrM6kNZvCm9FqP5UmRHneY2kL173foje?=
+ =?us-ascii?Q?q0I4Wlhu4eRTB54vQ+f0jR9zgw8OK0f1lj437bixURKm1HVPB8MqN1jYHzti?=
+ =?us-ascii?Q?fMa6nnqiMMlabr4RuvKX2PuoBGO1HDViJnMsgLoK1A06AIJeZlvFG2oCAEWq?=
+ =?us-ascii?Q?dInVflP0GsL125SqR1uhlBzh/89m9P0AF/r8GcrNh/nDp+NStS2qxQqQmfIf?=
+ =?us-ascii?Q?69EyJpgrdUZ/thVZ/oeU6a3vHCp7zFlbIe7Cho3of33H4zMpfKNAc1qyHqgr?=
+ =?us-ascii?Q?DcUl6kqFzw4/xdHR2B8hj6kWKHnIGlG0OcKw1Zk88OrCsVXK4foJJgTenohA?=
+ =?us-ascii?Q?OzV/QxR0NXDIYzwcGSSVTMgmUPJgISM53OL5j5Yg3AdxM/2StOpTgy9HMWMr?=
+ =?us-ascii?Q?EiVsr+PAloRXWu1M0WDc4n5qjP8gA9GO3NNOAtSGWDioIRzDnBlAo33rkfDX?=
+ =?us-ascii?Q?4kJ2i990UlvERhA2QwINEQEk1VKnIFtDUL6DSGPaPRSVLhGaZ89Yk4WE6ct9?=
+ =?us-ascii?Q?mEdWxucyX5mfvYapmY1Oop+xME5CwvLvglwnJKbdso2Rzo+jyeDa9XxtyNhl?=
+ =?us-ascii?Q?i9FmCSGCSxOllh6FVSvbW5bCMU5F8WHn2dcSWbLoxmoZ3FyGqARCKPj7HSXm?=
+ =?us-ascii?Q?0Dgg0gU56sSqMAOOdV2wykeoxnChcv53meiMN+QfS6i60rwfeUtXgNYmAvNz?=
+X-MS-Exchange-AntiSpam-MessageData-1: PHcgpmPkWkoTkT5DZkDSc5qjrzffOttZ8KEmjQgiBql7fOQ7JxpZ0vJZ
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c4874d4-ad0d-43ec-3da5-08da3a9a6948
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR02MB4579.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2022 19:53:29.5812
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s5HjgzWgb3kUU+oUAJOGr+GiwVt5uior+3kF+dA2Ih2C0Ygk5iw932xokTijK6MHh3rhb9MgPyqFjALQu/kcm4JTFVDopKpMWMhQhI8jymw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6535
+X-Proofpoint-GUID: RnsYQuXuWhmHX8so6cmfLT4ilIJPGNb9
+X-Proofpoint-ORIG-GUID: RnsYQuXuWhmHX8so6cmfLT4ilIJPGNb9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-20_06,2022-05-20_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 lowpriorityscore=0
- suspectscore=0 clxscore=1015 mlxlogscore=999 mlxscore=0 spamscore=0
- bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205200119
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Reason: safe
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The translation-exception identification (TEID) contains information to
-identify the cause of certain program exceptions, including translation
-exceptions occurring during dynamic address translation, as well as
-protection exceptions.
-The meaning of fields in the TEID is complex, depending on the exception
-occurring and various potentially installed facilities.
+Avoid expensive rdmsr on every VM Exit for MSR_IA32_SPEC_CTRL on
+eIBRS enabled systems iff the guest only sets IA32_SPEC_CTRL[0] (IBRS)
+and not [1] (STIBP) or [2] (SSBD) by not disabling interception in
+the MSR bitmap. Note: this logic is only for eIBRS, as Intel's guidance
+has long been that eIBRS only needs to be set once, so most guests with
+eIBRS awareness should behave nicely. We would not want to accidentally
+regress misbehaving guests on pre-eIBRS systems, who might be spamming
+IBRS MSR without the hypervisor being able to see it today.
 
-Rework the type describing the TEID, in order to ease decoding.
-Change the existing code interpreting the TEID and extend it to take the
-installed suppression-on-protection facility into account.
+eIBRS enabled guests using just IBRS will only write SPEC_CTRL MSR
+once or twice per vCPU on boot, so it is far better to take those
+VM exits on boot than having to read and save this msr on every
+single VM exit forever. This outcome was suggested on Andrea's commit
+2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
+however, since interception is still unilaterally disabled, the rdmsr
+tax is still there even after that commit.
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+This is a significant win for eIBRS enabled systems as this rdmsr
+accounts for roughly ~50% of time for vmx_vcpu_run() as observed
+by perf top disassembly, and is in the critical path for all
+VM-Exits, including fastpath exits.
+
+Update relevant comments in vmx_vcpu_run() and opportunistically
+update comments for both MSR_IA32_SPEC_CTRL and MSR_IA32_PRED_CMD to
+make it clear how L1 vs L2 handling works.
+
+Fixes: 2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
+Signed-off-by: Jon Kohler <jon@nutanix.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Waiman Long <longman@redhat.com>
 ---
- lib/s390x/asm/interrupt.h | 66 ++++++++++++++++++++++++++--------
- lib/s390x/fault.h         | 30 ++++------------
- lib/s390x/fault.c         | 74 +++++++++++++++++++++++++++------------
- lib/s390x/interrupt.c     |  2 +-
- s390x/edat.c              | 20 +++++++----
- 5 files changed, 124 insertions(+), 68 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 62 ++++++++++++++++++++----------------------
+ 1 file changed, 29 insertions(+), 33 deletions(-)
 
-diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
-index d9ab0bd7..8d5bfbf9 100644
---- a/lib/s390x/asm/interrupt.h
-+++ b/lib/s390x/asm/interrupt.h
-@@ -20,23 +20,61 @@
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 610355b9ccce..11c76b0db77b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2057,20 +2057,32 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
  
- union teid {
- 	unsigned long val;
--	struct {
--		unsigned long addr:52;
--		unsigned long fetch:1;
--		unsigned long store:1;
--		unsigned long reserved:6;
--		unsigned long acc_list_prot:1;
--		/*
--		 * depending on the exception and the installed facilities,
--		 * the m field can indicate several different things,
--		 * including whether the exception was triggered by a MVPG
--		 * instruction, or whether the addr field is meaningful
--		 */
--		unsigned long m:1;
--		unsigned long asce_id:2;
-+	union {
-+		/* common fields DAT exc & protection exc */
-+		struct {
-+			uint64_t addr			: 52 -  0;
-+			uint64_t acc_exc_f_s		: 54 - 52;
-+			uint64_t side_effect_acc	: 55 - 54;
-+			uint64_t /* reserved */		: 55 - 54;
-+			uint64_t asce_id		: 64 - 62;
-+		};
-+		/* DAT exc */
-+		struct {
-+			uint64_t /* pad */		: 61 -  0;
-+			uint64_t dat_move_page		: 62 - 61;
-+		};
-+		/* suppression on protection */
-+		struct {
-+			uint64_t /* pad */		: 60 -  0;
-+			uint64_t sop_acc_list		: 61 - 60;
-+			uint64_t sop_teid_predictable	: 62 - 61;
-+		};
-+		/* enhanced suppression on protection 1 */
-+		struct {
-+			uint64_t /* pad */		: 61 -  0;
-+			uint64_t esop1_acc_list_or_dat	: 62 - 61;
-+		};
-+		/* enhanced suppression on protection 2 */
-+		struct {
-+			uint64_t /* pad */		: 56 -  0;
-+			uint64_t esop2_prot_code_0	: 57 - 56;
-+			uint64_t /* pad */		: 60 - 57;
-+			uint64_t esop2_prot_code_1	: 61 - 60;
-+			uint64_t esop2_prot_code_2	: 62 - 61;
-+		};
- 	};
- };
- 
-+enum prot_code {
-+	PROT_KEY_LAP,
-+	PROT_DAT,
-+	PROT_KEY,
-+	PROT_ACC_LIST,
-+	PROT_LAP,
-+	PROT_IEP,
-+};
+ 		vmx->spec_ctrl = data;
+-		if (!data)
 +
-+static inline enum prot_code teid_esop2_prot_code(union teid teid)
-+{
-+	int code = 0;
-+
-+	code = code << 1 | teid.esop2_prot_code_0;
-+	code = code << 1 | teid.esop2_prot_code_1;
-+	code = code << 1 | teid.esop2_prot_code_2;
-+	return (enum prot_code)code;
-+}
-+
- void register_pgm_cleanup_func(void (*f)(void));
- void handle_pgm_int(struct stack_frame_int *stack);
- void handle_ext_int(struct stack_frame_int *stack);
-diff --git a/lib/s390x/fault.h b/lib/s390x/fault.h
-index 726da2f0..867997f2 100644
---- a/lib/s390x/fault.h
-+++ b/lib/s390x/fault.h
-@@ -11,32 +11,16 @@
- #define _S390X_FAULT_H_
++		/*
++		 * Disable interception on the first non-zero write, unless the
++		 * guest is hosted on an eIBRS system and setting only
++		 * SPEC_CTRL_IBRS, which is typically set once at boot and never
++		 * touched again.  All other bits are often set on a per-task
++		 * basis, i.e. may change frequently, so the benefit of avoiding
++		 * VM-exits during guest context switches outweighs the cost of
++		 * RDMSR on every VM-Exit to save the guest's value.
++		 */
++		if (!data ||
++		    (boot_cpu_has(X86_FEATURE_IBRS_ENHANCED) &&
++			 data == SPEC_CTRL_IBRS))
+ 			break;
  
- #include <bitops.h>
-+#include <asm/facility.h>
-+#include <asm/interrupt.h>
+ 		/*
+-		 * For non-nested:
+-		 * When it's written (to non-zero) for the first time, pass
+-		 * it through.
+-		 *
+-		 * For nested:
+-		 * The handling of the MSR bitmap for L2 guests is done in
+-		 * nested_vmx_prepare_msr_bitmap. We should not touch the
+-		 * vmcs02.msr_bitmap here since it gets completely overwritten
+-		 * in the merging. We update the vmcs01 here for L1 as well
+-		 * since it will end up touching the MSR anyway now.
++		 * Update vmcs01.msr_bitmap even if L2 is active, i.e. disable
++		 * interception for the vCPU on the first write regardless of
++		 * whether the WRMSR came from L1 or L2.  vmcs02's bitmap is a
++		 * combination of vmcs01 and vmcs12 bitmaps, and will be
++		 * recomputed by nested_vmx_prepare_msr_bitmap() on the next
++		 * nested VM-Enter.  Note, this does mean that future WRMSRs
++		 * from L2 will be intercepted until the next nested VM-Exit if
++		 * L2 was the first to write, but L1 exposing the MSR to L2
++		 * without first writing it is unlikely and not worth the
++		 * extra bit of complexity.
+ 		 */
+ 		vmx_disable_intercept_for_msr(vcpu,
+ 					      MSR_IA32_SPEC_CTRL,
+@@ -2098,15 +2110,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		wrmsrl(MSR_IA32_PRED_CMD, PRED_CMD_IBPB);
  
- /* Instruction execution prevention, i.e. no-execute, 101 */
--static inline bool prot_is_iep(uint64_t teid)
-+static inline bool prot_is_iep(union teid teid)
- {
--	if (test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) && test_bit_inv(61, &teid))
--		return true;
--
--	return false;
--}
--
--/* Standard DAT exception, 001 */
--static inline bool prot_is_datp(uint64_t teid)
--{
--	if (!test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) && test_bit_inv(61, &teid))
--		return true;
--
--	return false;
--}
--
--/* Low-address protection exception, 100 */
--static inline bool prot_is_lap(uint64_t teid)
--{
--	if (test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) && !test_bit_inv(61, &teid))
--		return true;
--
--	return false;
-+	if (!test_facility(130))
-+		return false;
-+	/* IEP installed -> ESOP2 installed */
-+	return teid_esop2_prot_code(teid) == PROT_IEP;
- }
- 
- void print_decode_teid(uint64_t teid);
-diff --git a/lib/s390x/fault.c b/lib/s390x/fault.c
-index efa62fcb..02b3c098 100644
---- a/lib/s390x/fault.c
-+++ b/lib/s390x/fault.c
-@@ -13,35 +13,63 @@
- #include <asm/page.h>
- #include <fault.h>
- 
--/* Decodes the protection exceptions we'll most likely see */
--static void print_decode_pgm_prot(uint64_t teid)
--{
--	if (prot_is_lap(teid)) {
--		printf("Type: LAP\n");
--		return;
--	}
--
--	if (prot_is_iep(teid)) {
--		printf("Type: IEP\n");
--		return;
--	}
- 
--	if (prot_is_datp(teid)) {
--		printf("Type: DAT\n");
--		return;
-+static void print_decode_pgm_prot(union teid teid, bool dat)
-+{
-+	switch (get_supp_on_prot_facility()) {
-+	case SOP_NONE:
-+		printf("Type: ?\n");
-+		break;
-+	case SOP_BASIC:
-+		if (teid.sop_teid_predictable && dat && teid.sop_acc_list)
-+			printf("Type: ACC\n");
-+		else
-+			printf("Type: ?\n");
-+		break;
-+	case SOP_ENHANCED_1:
-+		if (teid.esop1_acc_list_or_dat) {
-+			if (teid.sop_acc_list)
-+				printf("Type: ACC\n");
-+			else
-+				printf("Type: DAT\n");
-+		} else {
-+			printf("Type: KEY or LAP\n");
-+		}
-+		break;
-+	case SOP_ENHANCED_2:
-+		switch (teid_esop2_prot_code(teid)) {
-+		case PROT_KEY_LAP:
-+			printf("Type: KEY or LAP\n");
-+			break;
-+		case PROT_DAT:
-+			printf("Type: DAT\n");
-+			break;
-+		case PROT_KEY:
-+			printf("Type: KEY\n");
-+			break;
-+		case PROT_ACC_LIST:
-+			printf("Type: ACC\n");
-+			break;
-+		case PROT_LAP:
-+			printf("Type: LAP\n");
-+			break;
-+		case PROT_IEP:
-+			printf("Type: IEP\n");
-+			break;
-+		}
- 	}
- }
- 
--void print_decode_teid(uint64_t teid)
-+void print_decode_teid(uint64_t raw_teid)
- {
--	int asce_id = teid & 3;
-+	union teid teid = { .val = raw_teid };
- 	bool dat = lowcore.pgm_old_psw.mask & PSW_MASK_DAT;
- 
- 	printf("Memory exception information:\n");
- 	printf("DAT: %s\n", dat ? "on" : "off");
- 
- 	printf("AS: ");
--	switch (asce_id) {
-+	switch (teid.asce_id) {
- 	case AS_PRIM:
- 		printf("Primary\n");
+ 		/*
+-		 * For non-nested:
+-		 * When it's written (to non-zero) for the first time, pass
+-		 * it through.
+-		 *
+-		 * For nested:
+-		 * The handling of the MSR bitmap for L2 guests is done in
+-		 * nested_vmx_prepare_msr_bitmap. We should not touch the
+-		 * vmcs02.msr_bitmap here since it gets completely overwritten
+-		 * in the merging.
++		 * Disable interception on the first IBPB, odds are good IBPB
++		 * will be a frequent guest action.  See the comment for
++		 * MSR_IA32_SPEC_CTRL for details on the nested interaction.
+ 		 */
+ 		vmx_disable_intercept_for_msr(vcpu, MSR_IA32_PRED_CMD, MSR_TYPE_W);
  		break;
-@@ -57,7 +85,7 @@ void print_decode_teid(uint64_t teid)
- 	}
- 
- 	if (lowcore.pgm_int_code == PGM_INT_CODE_PROTECTION)
--		print_decode_pgm_prot(teid);
-+		print_decode_pgm_prot(teid, dat);
+@@ -6887,19 +6893,9 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	vmx_vcpu_enter_exit(vcpu, vmx);
  
  	/*
- 	 * If teid bit 61 is off for these two exception the reported
-@@ -65,10 +93,10 @@ void print_decode_teid(uint64_t teid)
+-	 * We do not use IBRS in the kernel. If this vCPU has used the
+-	 * SPEC_CTRL MSR it may have left it on; save the value and
+-	 * turn it off. This is much more efficient than blindly adding
+-	 * it to the atomic save/restore list. Especially as the former
+-	 * (Saving guest MSRs on vmexit) doesn't even exist in KVM.
+-	 *
+-	 * For non-nested case:
+-	 * If the L01 MSR bitmap does not intercept the MSR, then we need to
+-	 * save it.
+-	 *
+-	 * For nested case:
+-	 * If the L02 MSR bitmap does not intercept the MSR, then we need to
+-	 * save it.
++	 * Save SPEC_CTRL if it may have been written by the guest, the current
++	 * value in hardware is used by x86_spec_ctrl_restore_host() to avoid
++	 * WRMSR if the current value matches the host's desired value.
  	 */
- 	if ((lowcore.pgm_int_code == PGM_INT_CODE_SECURE_STOR_ACCESS ||
- 	     lowcore.pgm_int_code == PGM_INT_CODE_SECURE_STOR_VIOLATION) &&
--	    !test_bit_inv(61, &teid)) {
--		printf("Address: %lx, unpredictable\n ", teid & PAGE_MASK);
-+	    !teid.sop_teid_predictable) {
-+		printf("Address: %lx, unpredictable\n ", raw_teid & PAGE_MASK);
- 		return;
- 	}
--	printf("TEID: %lx\n", teid);
--	printf("Address: %lx\n\n", teid & PAGE_MASK);
-+	printf("TEID: %lx\n", raw_teid);
-+	printf("Address: %lx\n\n", raw_teid & PAGE_MASK);
- }
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index 6da20c44..ac3d1ecd 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -77,7 +77,7 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
- 		break;
- 	case PGM_INT_CODE_PROTECTION:
- 		/* Handling for iep.c test case. */
--		if (prot_is_iep(lowcore.trans_exc_id))
-+		if (prot_is_iep((union teid) { .val = lowcore.trans_exc_id }))
- 			/*
- 			 * We branched to the instruction that caused
- 			 * the exception so we can use the return
-diff --git a/s390x/edat.c b/s390x/edat.c
-index c6c25042..af442039 100644
---- a/s390x/edat.c
-+++ b/s390x/edat.c
-@@ -37,14 +37,20 @@ static bool check_pgm_prot(void *ptr)
- 		return false;
- 
- 	teid.val = lowcore.trans_exc_id;
--
--	/*
--	 * depending on the presence of the ESOP feature, the rest of the
--	 * field might or might not be meaningful when the m field is 0.
--	 */
--	if (!teid.m)
-+	switch (get_supp_on_prot_facility()) {
-+	case SOP_NONE:
- 		return true;
--	return (!teid.acc_list_prot && !teid.asce_id &&
-+	case SOP_BASIC:
-+		if (!teid.sop_teid_predictable)
-+			return true;
-+	case SOP_ENHANCED_1:
-+		if (!teid.esop1_acc_list_or_dat)
-+			return false;
-+	case SOP_ENHANCED_2:
-+		if (teid_esop2_prot_code(teid) != 1)
-+			return false;
-+	}
-+	return (!teid.sop_acc_list && !teid.asce_id &&
- 		(teid.addr == ((unsigned long)ptr >> PAGE_SHIFT)));
- }
- 
+ 	if (unlikely(!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL)))
+ 		vmx->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
 -- 
-2.33.1
+2.30.1 (Apple Git-130)
 
