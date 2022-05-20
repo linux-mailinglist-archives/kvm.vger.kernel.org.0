@@ -2,73 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D4E252F1B4
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 19:34:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57FC752F1BE
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 19:37:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237137AbiETRcL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 13:32:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53978 "EHLO
+        id S1352204AbiETRgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 13:36:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234947AbiETRcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 13:32:10 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A04C419A9
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:32:09 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id v11so8309416pff.6
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:32:09 -0700 (PDT)
+        with ESMTP id S237137AbiETRgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 13:36:42 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36B180221
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:41 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id 15-20020aa7920f000000b0050cf449957fso4552757pfo.9
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 10:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ZBKb0fjscPpUrzXEuZ8CHp+jRIIn9EphQZhgAcnYOMI=;
-        b=hPLF5ByV6OKZuxe0zweoZ6AmxwzQpA4YFOwx9e14kGQJ8frtXM7sTOs3yFC3P6sdeg
-         KUscqjAPu1SJ+eUV66whGKEF8HstKqxdQLSgGc4ePoYEZQLxMF0dQ9raKg0tG407moTy
-         pqdzq7XWNunDRkjvBKPxsjljdfQHzxRL/H9ZgdMEf5wh1u78qkuQMg6m5h80XofwNRKB
-         dZqNo3SchhJVu9KCFZGvBwEbaBqLo2wTv0LJ7HdT69wf7yyuRNLG8C8tXmWFqpDrhrHj
-         v9lr0CbcvrQ4DEF8qznBh+J+GgzAAGDhbgTsM+hoO4zDyN6a/ggd9MAI2J+KiaB4bnLu
-         FU4A==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=q1W2cETP/PGdc7K+yjcpeKM7X2tKBthgwgAGxzabNqs=;
+        b=UNt4LfacHhwGIVlzBUK8F/EHU9DoBgtCrQ+UEjs5gHkjWgGIxeShapzPo2rynDg/4y
+         U4pP6c/t4WmNK8dMnS708bxJbJOKXnCRp4hKBCHtUdt0oqEhhc54jfKnBkd+sfZMRY3U
+         75kpDk9eGGxf2ray3O6WCQemAa+3lnEQKv8Et4yY+YIdf4FCRDwoS2CPalOsRjlhKFq/
+         Vy82Hv7uj/mifoRq8Lc8PyLSjWanGYT/I0nDtq+286OwDcjImHLoL44KUU463+fl+S9d
+         FDTqzGIBdLUOlcNMDp4zLQQ9P+TfXJxjjv4PypmiptSwM/sDIDTrbXvspuxJpdGnLOXm
+         y/WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZBKb0fjscPpUrzXEuZ8CHp+jRIIn9EphQZhgAcnYOMI=;
-        b=P6ds4ah4mueHLzrdVEIFpwUazlAGOj+bb8xbXwpRo2yz+APedAatkm/bDEkgHzP+on
-         GoyOHN2KvjBsn2Ir804fMlz+pVmyfcZ+Er2KP5uMu97eZwuH2nY/S0Xz5W+7gI3BFxI9
-         LByLSbsSNY/sPOsnINj/GZ6V2sc2POaooogbD4o1DULRemYLk/F8aXdPKKjGB/yvT+7W
-         zdfI2C4x42X7WEG4YzTNrPAACg1zFsOuT2u4c2hawRRXaxSmXPOxHeLxplmit7+RvB7u
-         MG+jtfQI2Btk8cRDOr0F2pf7vHNWJ8Ta7GKuV+vq8V1SegwSY9bt3Dd5azH1XAtah4O+
-         h+ig==
-X-Gm-Message-State: AOAM532yeb9JwhKToQczYWK3wWMUkmS+nvmCs6Ytv6GQXkcevk7CKaNM
-        V3SbGXSJEA8bT0lJB50d5zSPdA==
-X-Google-Smtp-Source: ABdhPJy/ZpW9fR0g5/rnyZmK5ygUqSdFNk+ECOXEaQsYVb5idh6wFSqoVoMNRGPaChhO5h//d6M/mg==
-X-Received: by 2002:a65:44c1:0:b0:3f6:26e8:77a9 with SMTP id g1-20020a6544c1000000b003f626e877a9mr9350381pgs.204.1653067928701;
-        Fri, 20 May 2022 10:32:08 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l4-20020a170902f68400b0015e8d4eb1d2sm36893plg.28.2022.05.20.10.32.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 May 2022 10:32:08 -0700 (PDT)
-Date:   Fri, 20 May 2022 17:32:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=q1W2cETP/PGdc7K+yjcpeKM7X2tKBthgwgAGxzabNqs=;
+        b=2UhklrmsZNf1O/+eNFd2HLgmNYy23dnvtNU1LMqCOH6nfdy8lndVWNP3hmSsfO9z6u
+         ebUDjf0TORZjDEs3tR3/2/RWYWUZI5TnKoeq/Dyf6fSE0vwTW0+27HVCR18i06iOTx92
+         Ph+jrdtbyfwVEMMSsynNx09H/PvrEMZWr/i7HwMS8g/+evVFAvr2srjPjaYwzrgwdxny
+         ZG9zUbsp0qiCI2z8BzUiVuSl/tUgxLbRaK3ZfXLJ/JcoPSpCNalIlozKq0VUUKJvRj/a
+         u/OT/Qcko8YJIj5O+IYLB/UnnFl23bkri9ZzmB2qgX2rVq/GST/rDejtaWY/Y/VVax51
+         yJHw==
+X-Gm-Message-State: AOAM531T+4Go3/RtI0xkmslhlO48AXeCiCOmttE+LrLeyi7k7fKluPiy
+        2QutzBeVp7RFLoTjV7SfO5Kwsdlb
+X-Google-Smtp-Source: ABdhPJxQ/A+52gSrgfpxwfVjkjdQqN1sZinII0MTLgwd0/hYy6Cbe6bldq92AGo4jA1+4iBrtdSRlvTW
+X-Received: from juew-desktop.sea.corp.google.com ([2620:15c:100:202:4c5:ddc5:8182:560f])
+ (user=juew job=sendgmr) by 2002:a63:ec54:0:b0:3c6:aa29:15fe with SMTP id
+ r20-20020a63ec54000000b003c6aa2915femr9281469pgj.552.1653068201374; Fri, 20
+ May 2022 10:36:41 -0700 (PDT)
+Date:   Fri, 20 May 2022 10:36:30 -0700
+Message-Id: <20220520173638.94324-1-juew@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
+Subject: [PATCH v4 0/8] KVM: x86: Add CMCI and UCNA emulation
+From:   Jue Wang <juew@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/emulator: Bounds check reg nr against reg array
- size
-Message-ID: <YofQlBrlx18J7h9Y@google.com>
-References: <20220520165705.2140042-1-keescook@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220520165705.2140042-1-keescook@chromium.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Matlack <dmatlack@google.com>
+Cc:     Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        Greg Thelen <gthelen@google.com>,
+        Jiaqi Yan <jiaqiyan@google.com>, Jue Wang <juew@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,76 +70,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022, Kees Cook wrote:
-> GCC 12 sees that it might be possible for "nr" to be outside the _regs
-> array. Add explicit bounds checking.
+This patch series implement emulation for Corrected Machine Check
+Interrupt (CMCI) signaling and UnCorrectable No Action required (UCNA)
+error injection.
 
-I think GCC 12 is wrong.
+UCNA errors signaled via CMCI allow a guest to be notified as soon as
+uncorrectable memory errors get detected by some background threads,
+e.g., threads that migrate guest memory across hosts or threads that
+constantly scan system memory for errors [1].
 
-There are four uses of reg_rmw() that don't use hardcoded registers:
+Upon receiving UCNAs, guest kernel isolates the poisoned pages which may
+still be free, preventing future accesses that may cause fatal MCEs.
 
-   $ git grep reg_rmw | grep -v VCPU_REGS_
-   emulate.c:static ulong *reg_rmw(struct x86_emulate_ctxt *ctxt, unsigned nr)
-1  emulate.c:	ulong *preg = reg_rmw(ctxt, reg);
-2  emulate.c:		p = (unsigned char *)reg_rmw(ctxt, modrm_reg & 3) + 1;
-3  emulate.c:		p = reg_rmw(ctxt, modrm_reg);
-4  emulate.c:		assign_register(reg_rmw(ctxt, reg), val, ctxt->op_bytes);
+1. https://lore.kernel.org/linux-mm/8eceffc0-01e8-2a55-6eb9-b26faa9e3caf@intel.com/t/
 
-#1 has three users, but two of those use hardcoded registers.
 
-  $ git grep register_address_increment | grep -v VCPU_REGS_
-  emulate.c:register_address_increment(struct x86_emulate_ctxt *ctxt, int reg, int inc)
-  emulate.c:	register_address_increment(ctxt, reg, df * op->bytes);
- 
-and that last one is string_addr_inc(), which is only called with RDI or RSI.
+Patch 1-3 clean up KVM APIC LVT logic in preparation to adding APIC_LVTCMCI.
 
-#2 can't overflow as the register can only be 0-3 (yay AH/BH/CH/DH operands).
+Patch 4 adds CMCI emulation to lapic.
 
-#3 is the !highbyte path of decode_register(), and is a bit messy, but modrm_reg
-is always sanitized.
+Patch 5 updates the allocation of mce_banks to use array allocation api.
 
-   $ git grep -E "decode_register\("
-   emulate.c:static void *decode_register(struct x86_emulate_ctxt *ctxt, u8 modrm_reg,
-a  emulate.c:      op->addr.reg = decode_register(ctxt, reg, ctxt->d & ByteOp);
-b  emulate.c:              op->addr.reg = decode_register(ctxt, ctxt->modrm_rm,
-c  emulate.c:                      ctxt->memop.addr.reg = decode_register(ctxt,
-                                                                          ctxt->modrm_rm, true);
+Patch 6 adds emulation for MSR_IA32_MCx_CTL2 registers that provide per
+bank control of CMCI signaling.
 
-For (b) and (c), modrm_reg == ctxt->modrm_rm, which is computed in one place and
-is bounded to 0-15:
+Patch 7 enables MCG_CMCI_P by default and handles injected UCNA errors.
 
-	base_reg = (ctxt->rex_prefix << 3) & 8; /* REX.B */
-	ctxt->modrm_rm = base_reg | (ctxt->modrm & 0x07);
+Patch 8 adds a KVM self test that exercises UCNA injection.
 
-For (a), "reg" is either modrm_reg or a register that is encoded in the opcode,
-both of which are again bounded to 0-15:
+v4 changes
+- Incorporate feedback from David Matlack <dmatlack@google.com>
+- Rewrite the change logs to be more descriptive.
+- Add a KVM self test.
 
-	unsigned reg = ctxt->modrm_reg;
+v3 changes
+- Incorporate feedback from Sean Christopherson <seanjc@google.com>
+- Split clean up to KVM APIC LVT logic to 3 patches.
+- Put the clean up of mce_array allocation in a separate patch.
+- Base the MCi_CTL2 register emulation on Sean's clean up and fix
+series [2]
+- Fix bugs around MCi_CTL2 register offset validation and the free of
+mci_ctl2_banks array.
+- Rewrite the change log with more details in architectural information
+about CMCI, UCNA and MCG_CMCI_P.
+- Fix various comments and wrapping style.
 
-	if (!(ctxt->d & ModRM))
-		reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
+2. https://lore.kernel.org/lkml/20220512222716.4112548-1-seanjc@google.com/T/
 
-and
 
-	ctxt->modrm_reg = ((ctxt->rex_prefix << 1) & 8); /* REX.R */
-	ctxt->modrm_reg |= (ctxt->modrm & 0x38) >> 3;
+v2 chanegs
+- Incorporate feedback from Sean Christopherson <seanjc@google.com>
+- Split the single patch into 4:
+  1). clean up KVM APIC LVT logic
+  2). add CMCI emulation to lapic
+  3). add emulation of MSR_IA32_MCx_CTL2
+  4). enable MCG_CMCI_P and handle injected UCNAs
+- Fix various style issues.
 
-#4 is em_popa() and is just funky hardcoding of popping RAX-RDI, minus RSP.
+Jue Wang (8):
+  KVM: x86: Make APIC_VERSION capture only the magic 0x14UL.
+  KVM: x86: Fill apic_lvt_mask with enums / explicit entries.
+  KVM: x86: Add APIC_LVTx() macro.
+  KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to
+    lapic.
+  KVM: x86: Use kcalloc to allocate the mce_banks array.
+  KVM: x86: Add emulation for MSR_IA32_MCx_CTL2 MSRs.
+  KVM: x86: Enable CMCI capability by default and handle injected UCNA
+    errors
+  KVM: x86: Add a self test for UCNA injection.
 
-I did the same exercise for reg_reg() and write_reg(), and the handful of
-non-hardcoded use are all bounded in similar ways.
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kvm/lapic.c                          |  58 +++-
+ arch/x86/kvm/lapic.h                          |  15 +-
+ arch/x86/kvm/vmx/vmx.c                        |   1 +
+ arch/x86/kvm/x86.c                            | 182 ++++++++---
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/apic.h       |   1 +
+ .../selftests/kvm/include/x86_64/mce.h        |  25 ++
+ .../selftests/kvm/include/x86_64/processor.h  |   1 +
+ .../selftests/kvm/lib/x86_64/processor.c      |   2 +-
+ .../kvm/x86_64/ucna_injection_test.c          | 287 ++++++++++++++++++
+ 12 files changed, 517 insertions(+), 58 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/mce.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
 
-> In function 'reg_read',
->     inlined from 'reg_rmw' at ../arch/x86/kvm/emulate.c:266:2:
+-- 
+2.36.1.124.g0e6072fb45-goog
 
-Is there more of the "stack" available?  I don't mind the WARN too much, but if
-there is a bug lurking I would much rather fix the bug.
-
-> ../arch/x86/kvm/emulate.c:254:27: warning: array subscript 32 is above array bounds of 'long unsigned int[17]' [-Warray-bounds]
->   254 |         return ctxt->_regs[nr];
->       |                ~~~~~~~~~~~^~~~
-> In file included from ../arch/x86/kvm/emulate.c:23:
-> ../arch/x86/kvm/kvm_emulate.h: In function 'reg_rmw':
-> ../arch/x86/kvm/kvm_emulate.h:366:23: note: while referencing '_regs'
->   366 |         unsigned long _regs[NR_VCPU_REGS];
->       |                       ^~~~~
