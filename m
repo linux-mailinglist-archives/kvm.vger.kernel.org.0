@@ -2,101 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3494F52E4F1
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 08:26:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A7B952E5F4
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 09:11:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345806AbiETGZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 02:25:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
+        id S1346348AbiETHLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 03:11:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232003AbiETGZ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 02:25:27 -0400
-X-Greylist: delayed 907 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 19 May 2022 23:25:25 PDT
-Received: from mail-m973.mail.163.com (mail-m973.mail.163.com [123.126.97.3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04ABA14C765;
-        Thu, 19 May 2022 23:25:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=EDLaB
-        jALBZshwxMN5oSHQMdP+5yMRSPM50LnskauBiI=; b=ZLThMmtfDaLxrmpAqjeXi
-        QH3+pNFbEKqCDU4f3pgmMJeYX5ijiaoqUaYPpxQ/dFMltEmFc6XgtnJZ2Q821gWS
-        ZHiFdmA6OSJpOmEgkvq/s4PxFrwxj+yFLqY11xzzxeKj0gsuoTOrygVLVPsgSglq
-        8evm833vcpAuKq2UhL5Ggs=
-Received: from localhost.localdomain (unknown [116.128.244.169])
-        by smtp3 (Coremail) with SMTP id G9xpCgA3TJyqMIdizyGuDg--.28397S2;
-        Fri, 20 May 2022 14:09:47 +0800 (CST)
-From:   Yun Lu <luyun_611@163.com>
-To:     pbonzini@redhat.com
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/mmu: optimizing the code in mmu_try_to_unsync_pages
-Date:   Fri, 20 May 2022 14:09:07 +0800
-Message-Id: <20220520060907.863136-1-luyun_611@163.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: G9xpCgA3TJyqMIdizyGuDg--.28397S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Aw1DXFWxAF18trWfKr43GFg_yoW8GrW7pr
-        ZrGrsIyr45GrsIq3s7Cw4kC347uws7KF48GryUWas8Zwn7K3s3ta4rKw4ftrs3XrWrGr1a
-        va1ruF43WF18Jw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UJ8nrUUUUU=
-X-Originating-IP: [116.128.244.169]
-X-CM-SenderInfo: pox130jbwriqqrwthudrp/1tbiMgwHzlWBzeFtBQAAsn
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S1346425AbiETHLm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 03:11:42 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8881D1C111
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 00:11:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653030700; x=1684566700;
+  h=from:to:cc:subject:date:message-id;
+  bh=uf7bQKdvNgjIJ75NdNzkRfUPgeKm6dafbA5aTQIT7TA=;
+  b=OZszUx00o6s6+2ocO8y4HNVwRkJI2x8+RiTpnCtFNahjjZhrsN+byxL+
+   SJ3UsZaaCXi11pGu9KkJRCkLDeV4dS6UI0OAEILMAdE5JKdMP+awRM4oj
+   58ceD4bRkuc4X78rN6bUTDGT45r0Sjw0IlFFscztyqEpdTki18iDYYUW9
+   PBtGFC6hKoMcgVXZ/kJ+YBQ/3hwvCyPQotAc5b58xE9W81OHnDWTiPLVO
+   ueMDMMnrvXUhYn91ycWi3xRp5cNMkz1JbAAoEFUvWGBhAU7SY6hRwJuW5
+   nJVUuAYALcsUtnyex2d9jvDRFRMySHXGlsp2QlcoO67Kv3tqi7+GrbLXv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10352"; a="272490052"
+X-IronPort-AV: E=Sophos;i="5.91,238,1647327600"; 
+   d="scan'208";a="272490052"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2022 00:11:35 -0700
+X-IronPort-AV: E=Sophos;i="5.91,238,1647327600"; 
+   d="scan'208";a="599062888"
+Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2022 00:11:32 -0700
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Gao Chao <chao.gao@intel.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [QEMU PATCH] x86: Set maximum APIC ID to KVM prior to vCPU creation
+Date:   Fri, 20 May 2022 14:39:28 +0800
+Message-Id: <20220520063928.23645-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is no need to check can_unsync and prefetch in the loop
-every time, just move this check before the loop.
+Specify maximum possible APIC ID assigned for current VM session prior to
+the creation of vCPUs. KVM need set up VM-scoped data structure indexed by
+the APIC ID, e.g. Posted-Interrupt Descriptor table to support Intel IPI
+virtualization.
 
-Signed-off-by: Yun Lu <luyun@kylinos.cn>
+It can be achieved by calling KVM_ENABLE_CAP for KVM_CAP_MAX_VCPU_ID
+capability once KVM has already enabled it. Otherwise, simply prompts
+that KVM doesn't support this capability yet.
+
+Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/i386/x86.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 311e4e1d7870..e51e7735adca 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2534,6 +2534,12 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 	if (kvm_slot_page_track_is_active(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
- 		return -EPERM;
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 4cf107baea..ff74492325 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -106,7 +106,7 @@ out:
  
-+	if (!can_unsync)
-+		return -EPERM;
+ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+ {
+-    int i;
++    int i, ret;
+     const CPUArchIdList *possible_cpus;
+     MachineState *ms = MACHINE(x86ms);
+     MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+@@ -123,6 +123,13 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+      */
+     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+                                                       ms->smp.max_cpus - 1) + 1;
 +
-+	if (prefetch)
-+		return -EEXIST;
++    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_MAX_VCPU_ID,
++                            0, x86ms->apic_id_limit);
++    if (ret < 0) {
++        error_report("kvm: Set max vcpu id not supported: %s", strerror(-ret));
++    }
 +
- 	/*
- 	 * The page is not write-tracked, mark existing shadow pages unsync
- 	 * unless KVM is synchronizing an unsync SP (can_unsync = false).  In
-@@ -2541,15 +2547,9 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 	 * allowing shadow pages to become unsync (writable by the guest).
- 	 */
- 	for_each_gfn_indirect_valid_sp(kvm, sp, gfn) {
--		if (!can_unsync)
--			return -EPERM;
--
- 		if (sp->unsync)
- 			continue;
- 
--		if (prefetch)
--			return -EEXIST;
--
- 		/*
- 		 * TDP MMU page faults require an additional spinlock as they
- 		 * run with mmu_lock held for read, not write, and the unsync
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < ms->smp.cpus; i++) {
+         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
 -- 
-2.25.1
-
-
-No virus found
-		Checked by Hillstone Network AntiVirus
+2.27.0
 
