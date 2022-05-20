@@ -2,121 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF4F452F020
-	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 18:10:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8C0752F065
+	for <lists+kvm@lfdr.de>; Fri, 20 May 2022 18:18:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351416AbiETQKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 May 2022 12:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33100 "EHLO
+        id S1351511AbiETQSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 May 2022 12:18:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351360AbiETQKB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 May 2022 12:10:01 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF90A17D39F
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 09:09:59 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id m1so7746488plx.3
-        for <kvm@vger.kernel.org>; Fri, 20 May 2022 09:09:59 -0700 (PDT)
+        with ESMTP id S232607AbiETQSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 May 2022 12:18:44 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0236D86A;
+        Fri, 20 May 2022 09:18:44 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id v10so8115729pgl.11;
+        Fri, 20 May 2022 09:18:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=andrew.cmu.edu; s=google-2021;
-        h=message-id:subject:from:to:date:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=CNoVtKkPqSs/sShSf0ZnKCfPCLTTVoCx3jJgzKTezLw=;
-        b=ClPA9QhvZy6svirmFvw1DS4oMKWGN8R0rRh2jc+Po1r/sZ3x9Ffe+mJDIm8TBZ/LDu
-         Z8jxeiHP7CfzFzGPfr8MKw3daW67FyafI9ZG8WZhe72smLZ4p18felwl2XW81abXgOhG
-         KCYxlNQ/2bcoT4bJvR9jOmYaWRtEA1mhBpDZFt3imr8jB2jQQGRhV6tMEQY9BCrsjISt
-         et7NDnl/W8FR18orhnercklTjqVQsxn/Fr6ftasxiP7ncRSWYmpw5bL99slPbtCFljVP
-         M0zKqXM+buwTbbZCmAnSMwK8QuF+yT9xxATIw5O3DPboIudfZFdKuxOgTG4X12eCsokF
-         SCOA==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sJkmL3cNNCMdY+tXxffweIx723JB3I+sakjvH9x5oPk=;
+        b=pKqLfq/DCIUJC4+qM7NiWzWHEvd6SrtREbZVUXsyCE/WXQz6k3GgmSapoKl75dVARm
+         DbiSfwlfIBtgrDKulb5CpFbtKpSkHN6f5nnd5qso6EHWyRCL/FqSYE1YV8/gLhAZBryA
+         oY2gKX7F82zdYn4EfMvajmTTI5ItAx/NUx9Udla5wndZ47Ky33OlQ22/uFJA9kvkUnlR
+         o0DVwt8vrrM2QUoPS2/u76YmC5xVNy3LV5hwY+r8Y/gyFVz0b87Q0y20zxyDZ6B6xVZL
+         0Mo4RGXMptD21gYHBroNYsA7W2lBPaZ0V7c9Yh6nEJ/jP++Fd8IjP97FF7cfBPtm7rtU
+         f3vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:date:user-agent
-         :mime-version:content-transfer-encoding;
-        bh=CNoVtKkPqSs/sShSf0ZnKCfPCLTTVoCx3jJgzKTezLw=;
-        b=UywJEJCECR62FU6gw1x6DcT1W90lIgQymTnVjiPENrOCVMusr+nifueEhhfPGvIVHh
-         /zXzqYbcFicpbQaFVxB5IDk+Gq7hCuk8ddAY6ivZ5N3TYHkM9+OrHWcjD8qFmua6bgHh
-         zQfiQlulcpt3Pi+lRL39ehfihinDWCQ6tW0wKe+p8SEMTztc3tstFUfYvmDMw36EFzQV
-         B5EemMf/Ku6K7Txfw0ifTNXx5xsMIT4oCekjIK7Bi/B7JuSkXGOHphe6dmVTSXXOU2h2
-         oH9uPfnCTWRAQuwmBeJaUyOY5IOWj4NRvZuNcKTTJ2BfTu1eElxbITcTadcX8lhS9FJ5
-         265g==
-X-Gm-Message-State: AOAM533Sgez9Dd9gRzjpMNFSEJPQDYOAo/oRR2ES98mAbX87WKOC5NF6
-        vTY5y2SWEnyWsDptO6cES10Hzyr194NXmCC1oUA69LsUlsSw6S9Go+Lkx4YO5ew30KFuNuKzvSF
-        tEBzxP7v5Z4VK5P3TQxynaIQkHd0V+8VL7a4HSufqoyTK3fRR3CFAoED37tHQ0Sw9QrAe
-X-Google-Smtp-Source: ABdhPJxTjndeL1fdXAJmpoVl6yOW8jWKWO6OugVzjt1MNY4alS4Z78MXV8mmbhZmqf0Mbuw4eVTi9w==
-X-Received: by 2002:a17:902:ee8d:b0:161:5c5c:d0e6 with SMTP id a13-20020a170902ee8d00b001615c5cd0e6mr10756080pld.32.1653062998818;
-        Fri, 20 May 2022 09:09:58 -0700 (PDT)
-Received: from ?IPv6:2601:646:8b81:2df0::af88? ([2601:646:8b81:2df0::af88])
-        by smtp.gmail.com with ESMTPSA id t10-20020a170902dcca00b001619fbb0e6dsm5722422pll.40.2022.05.20.09.09.57
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 May 2022 09:09:58 -0700 (PDT)
-Message-ID: <4d0f6a4124f1acd23abe9b4411d8c4b664490297.camel@andrew.cmu.edu>
-Subject: Unsure about whether 3 bugs are on KVM side or QEMU side
-From:   Eric Li <xiaoyili@andrew.cmu.edu>
-To:     kvm@vger.kernel.org
-Date:   Fri, 20 May 2022 09:09:56 -0700
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sJkmL3cNNCMdY+tXxffweIx723JB3I+sakjvH9x5oPk=;
+        b=cEdJTmQ1GtDApbN3fZuMOu3lugLXsTNN9mYu+flGgRO15E9mBqTO35YYDSkBxGEW+5
+         DEEmRHQgvV1jMKRZAWNj+znJziLJxLTPQvLtDYPm6oS6/aadU7yeRHyrJwMLw68ssrgk
+         ZhgXvibcbvZtx3S59yy4aUCml6WGnMJaW0UdQE91Qzu6sQdaIFtnKoVb8QYuDRtH4pDH
+         ITj4k1svPL9NcqlxBq0IOWHKZ2ONGwkabAhzgiaaJrXKMkMCfvKdt38YhKBSFCxCiJqa
+         e//ZCuIADW3TNbkzhVyAOseXORWczNX1AmzZbmCGqSW55Od4emRfdVFSjpo5LnJYgc6Q
+         erEg==
+X-Gm-Message-State: AOAM530yAn6j6WDSucM+cXh6qd7zZnTQ5sca0RDf2RWbeyeiZVMdqfvO
+        HruN2XWEMVNkFVRG5hqO9DmUyi9t+urGHFdyS5M=
+X-Google-Smtp-Source: ABdhPJx+qcYi6F2bg4WVAwh754TW7golfOR49ep220qUtfFvRzJQads+gxDHdltL7DRwree4z7Rg9gCYETyar8r/p2w=
+X-Received: by 2002:a65:694b:0:b0:3f5:f32a:3adc with SMTP id
+ w11-20020a65694b000000b003f5f32a3adcmr9069654pgq.541.1653063523816; Fri, 20
+ May 2022 09:18:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HK_RANDOM_ENVFROM,HK_RANDOM_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20220428205116.861003-1-yury.norov@gmail.com> <20220428205116.861003-4-yury.norov@gmail.com>
+ <20220519150929.GA3145933@roeck-us.net> <CAAH8bW8ju7XLkbYya1A1OtqGVGDUAk7dPyw01RsDzg+v7xihyQ@mail.gmail.com>
+ <872607af-5647-a255-83f2-3bf75b7f0df4@roeck-us.net>
+In-Reply-To: <872607af-5647-a255-83f2-3bf75b7f0df4@roeck-us.net>
+From:   Yury Norov <yury.norov@gmail.com>
+Date:   Fri, 20 May 2022 09:18:33 -0700
+Message-ID: <CAAH8bW9zdMCV_JJ7abC6jY=0W-oTK5g0refFgFHLYWCykVk5KA@mail.gmail.com>
+Subject: Re: [PATCH 3/5] lib/bitmap: add test for bitmap_{from,to}_arr64
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     linux-kernel@vger.kernel.org,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Thu, May 19, 2022 at 11:04 AM Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> On 5/19/22 09:01, Yury Norov wrote:
+> > On Thu, May 19, 2022 at 8:09 AM Guenter Roeck <linux@roeck-us.net> wrote:
+> >>
+> >> On Thu, Apr 28, 2022 at 01:51:14PM -0700, Yury Norov wrote:
+> >>> Test newly added bitmap_{from,to}_arr64() functions similarly to
+> >>> already existing bitmap_{from,to}_arr32() tests.
+> >>>
+> >>> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> >>
+> >> With this patch in linux-next (including next-20220519), I see lots of
+> >> bitmap test errors when booting 32-bit ppc images in qemu. Examples:
+> >>
+> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0", got "0,65"
+> >> ...
+> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128"
+> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-129"
+> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65", got "0,65,128-130"
+> >> ...
+> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-209"
+> >> test_bitmap: [lib/test_bitmap.c:600] bitmaps contents differ: expected "0,65,128-143", got "0,65,128-143,208-210"
+> >>
+> >> and so on. It only  gets worse from there, and ends with:
+> >>
+> >> test_bitmap: parselist: 14: input is '0-2047:128/256' OK, Time: 4274
+> >> test_bitmap: bitmap_print_to_pagebuf: input is '0-32767
+> >> ', Time: 127267
+> >> test_bitmap: failed 337 out of 3801 tests
+> >>
+> >> Other architectures and 64-bit ppc builds seem to be fine.
+> >
+> > Hi Guenter,
+> >
+> > Thanks for letting me know. It's really weird because it has already
+> > been for 2 weeks
+> > in next with no issues. But I tested it on mips32, not powerpc. I'll
+> > check what happens
+> > there.
+> >
+> Oh, I have seen the problem for a while, it is just that -next is in
+> such a bad shape that it is difficult to bisect individual problems.
+>
+> > Can you please share your config and qemu image if possible?
+> >
+>
+> First, you have to revert commit b033767848c411
+> ("powerpc/code-patching: Use jump_label for testing freed initmem")
+> to avoid a crash. After that, a recent version of qemu should work
+> with the following command line.
+>
+> qemu-system-ppc -kernel arch/powerpc/boot/uImage -M mpc8544ds \
+>         -m 256 -no-reboot -initrd rootfs.cpio \
+>         --append "rdinit=/sbin/init coherent_pool=512k mem=256M console=ttyS0" \
+>         -monitor none -nographic
+>
+> Configuration is mpc85xx_defconfig with CONFIG_TEST_BITMAP enabled.
+> I used the root file system (initrd) from
+> https://github.com/groeck/linux-build-test/blob/master/rootfs/ppc/rootfs.cpio.gz
 
-I found 3 bugs while developing a micro-hypervisor using QEMU + KVM on
-Linux. However, I am not sure whether I should report them to QEMU's
-bug tracker or KVM's. Following https://www.linux-kvm.org/page/Bugs , I
-am asking here.
+Yes, that helped a lot. Thanks, I was able to reproduce it. I'll take
+a look shortly.
 
-Originally I thought that the bugs are in KVM, so I filed 2 of them in
-KVM's bug tracker. But thanks to Jim Mattson's comment, I realized that
-these bugs may be in QEMU.
-
-Do you know whether the following bugs should be posted to QEMU or KVM?
-For bug 1 and bug 2, if they should be posted to QEMU, should I close
-these bugs in KVM and create a new bug in QEMU?
-
-Bug 1: filed in https://bugzilla.kernel.org/show_bug.cgi?id=216002 .
-This is an assertion error while debugging QEMU + KVM with GDB. The
-guest is running a hypervisor (i.e. nested virtualization).
-
-Bug 2: filed in https://bugzilla.kernel.org/show_bug.cgi?id=216003 .
-This is another assertion error while debugging QEMU + KVM with GDB.
-The guest is running Windows.
-
-Bug 3: not filed yet. When I run a hypervisor as the guest, and the
-hypervisor tries to boot Windows, I see the following error printed
-
-error: kvm run failed Input/output error
-EAX=00000020 EBX=0000ffff ECX=00000000 EDX=0000ffff
-ESI=00000000 EDI=00002300 EBP=00000000 ESP=00006d8c
-EIP=00000018 EFL=00000046 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =f000 000f0000 ffffffff 00809300
-CS =cb00 000cb000 ffffffff 00809b00
-SS =0000 00000000 ffffffff 00809300
-DS =0000 00000000 ffffffff 00809300
-FS =0000 00000000 ffffffff 00809300
-GS =0000 00000000 ffffffff 00809300
-LDT=0000 00000000 0000ffff 00008200
-TR =0000 00000000 0000ffff 00008b00
-GDT= 00000000 00000000
-IDT= 00000000 000003ff
-CR0=00000010 CR2=00000000 CR3=00000000 CR4=00000000
-DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000 
-DR6=ffff0ff0 DR7=00000400
-EFER=0000000000000000
-Code=0e 07 31 c0 b9 00 10 8d 3e 00 03 fc f3 ab 07 b8 20 00 e7 7e <cb>
-0f 1f 80 00 00 00 00 6b 76 6d 20 61 50 69 43 20 00 00 00 2d 02 00 00 d9
-02 00 00 00 03
-KVM_GET_PIT2 failed: Input/output error
-
-Thank you,
-Eric Li
-
+Thanks,
+Yury
