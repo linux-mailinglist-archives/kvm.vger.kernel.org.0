@@ -2,77 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C937F52F8E1
-	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 07:22:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B65E52F93C
+	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 08:31:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237850AbiEUFVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 May 2022 01:21:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34134 "EHLO
+        id S240195AbiEUGb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 May 2022 02:31:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbiEUFVk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 May 2022 01:21:40 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0CB2B197;
-        Fri, 20 May 2022 22:21:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653110497; x=1684646497;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AxY0/ZwmUN9083vJCm9KBOmh71p8D4zqbsXHhQnXUxI=;
-  b=jZ7dETym7jN8kKGOojoE8fgY3aXW97Fuxh/Pj8blEoMaYuZgWAINIa+H
-   6YhK2F8C5T8Hmx/6w1dULfv+S0FvHtvMPS+47lW2AI0xFHH+aD6M1y3Uz
-   jUJVqCzIJNOaDhA3mUAnDY7EgXH04qJoyOqjR6vmaxDdJBRJAYWfsN5x1
-   jemHL/MPk+MhOHBGpR5Ma0myWkLKkeAMONGPYfjU6JgulsaPoEwZ8oBnp
-   CiKm66Hqy0mwfFjE41E+6TvXZ1TtiqNpJlCmkFU+dtMyPr9BQlxG5XbBu
-   YltctikUbnckqIXNKX25Z2MQeVBMm+Wqj50IoT/4lW5SvC+BoBg9/taoD
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10353"; a="252695462"
-X-IronPort-AV: E=Sophos;i="5.91,240,1647327600"; 
-   d="scan'208";a="252695462"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2022 22:21:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,240,1647327600"; 
-   d="scan'208";a="547020986"
-Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 20 May 2022 22:21:30 -0700
-Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nsHYP-0005y2-TN;
-        Sat, 21 May 2022 05:21:29 +0000
-Date:   Sat, 21 May 2022 13:20:52 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Longpeng <longpeng2@huawei.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>, martinh@xilinx.com,
-        hanand@xilinx.com, Si-Wei Liu <si-wei.liu@oracle.com>,
-        dinang@xilinx.com, Eli Cohen <elic@nvidia.com>, lvivier@redhat.com,
-        pabloc@xilinx.com, gautam.dawar@amd.com,
-        Xie Yongji <xieyongji@bytedance.com>, habetsm.xilinx@gmail.com,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        tanuj.kamde@amd.com, eperezma@redhat.com,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        martinpo@xilinx.com, lulu@redhat.com, ecree.xilinx@gmail.com,
-        Parav Pandit <parav@nvidia.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Zhang Min <zhang.min9@zte.com.cn>
-Subject: Re: [PATCH 3/4] vhost-vdpa: uAPI to stop the device
-Message-ID: <202205211317.rqYkIW8B-lkp@intel.com>
-References: <20220520172325.980884-4-eperezma@redhat.com>
+        with ESMTP id S229786AbiEUGbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 May 2022 02:31:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F2041E3F1
+        for <kvm@vger.kernel.org>; Fri, 20 May 2022 23:31:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653114680;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=zHLMnhFySsFtf9jU9mylcGPoZOFPA7Ix+k7LYTrmjHI=;
+        b=e3rJPrSs7Khz90vA6cJprzQKninSKHt4WVB4joC6D/q2sFt8j0Gk0QKDcVsuJps4J7f+na
+        mFri2Hfg9W70UtrUZQQCo0yomLH1Z3NjoP4n0Pigz3gEmQHu/9yxha/G42MvooUp6yJWUN
+        HYei+/D+Vca4Xn5XyTXdhzmTuIWTTfs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-675-hHJXGTQPMC-bMqlWE_U8PQ-1; Sat, 21 May 2022 02:31:18 -0400
+X-MC-Unique: hHJXGTQPMC-bMqlWE_U8PQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 357DB185A79C;
+        Sat, 21 May 2022 06:31:18 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 19A417ADD;
+        Sat, 21 May 2022 06:31:18 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Final batch of KVM fixes for 5.18
+Date:   Sat, 21 May 2022 02:31:17 -0400
+Message-Id: <20220521063117.70051-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220520172325.980884-4-eperezma@redhat.com>
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,66 +54,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi "Eugenio,
+Linus,
 
-Thank you for the patch! Perhaps something to improve:
+The following changes since commit 053d2290c0307e3642e75e0185ddadf084dc36c1:
 
-[auto build test WARNING on mst-vhost/linux-next]
-[also build test WARNING on next-20220520]
-[cannot apply to horms-ipvs/master linus/master v5.18-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+  KVM: VMX: Exit to userspace if vCPU has injected exception and invalid state (2022-05-06 13:08:06 -0400)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eugenio-P-rez/Implement-vdpasim-stop-operation/20220521-012742
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-config: hexagon-randconfig-r041-20220519 (https://download.01.org/0day-ci/archive/20220521/202205211317.rqYkIW8B-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project e00cbbec06c08dc616a0d52a20f678b8fbd4e304)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/bd6562e0d85e8d689d30226bcc0f43246e27e4b5
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Eugenio-P-rez/Implement-vdpasim-stop-operation/20220521-012742
-        git checkout bd6562e0d85e8d689d30226bcc0f43246e27e4b5
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash drivers/vhost/
+are available in the Git repository at:
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-All warnings (new ones prefixed by >>):
+for you to fetch changes up to 9f46c187e2e680ecd9de7983e4d081c3391acc76:
 
->> drivers/vhost/vdpa.c:493:25: warning: variable 'stop' is uninitialized when used here [-Wuninitialized]
-           return ops->stop(vdpa, stop);
-                                  ^~~~
-   drivers/vhost/vdpa.c:485:10: note: initialize the variable 'stop' to silence this warning
-           int stop;
-                   ^
-                    = 0
-   1 warning generated.
+  KVM: x86/mmu: fix NULL pointer dereference on guest INVPCID (2022-05-20 13:49:52 -0400)
 
+Sorry for the relatively large change so close to the release, but in
+terms of lines added it's mostly selftests.
 
-vim +/stop +493 drivers/vhost/vdpa.c
+----------------------------------------------------------------
+ARM:
+* Correctly expose GICv3 support even if no irqchip is created
+  so that userspace doesn't observe it changing pointlessly
+  (fixing a regression with QEMU)
 
-   480	
-   481	static long vhost_vdpa_stop(struct vhost_vdpa *v, u32 __user *argp)
-   482	{
-   483		struct vdpa_device *vdpa = v->vdpa;
-   484		const struct vdpa_config_ops *ops = vdpa->config;
-   485		int stop;
-   486	
-   487		if (!ops->stop)
-   488			return -EOPNOTSUPP;
-   489	
-   490		if (copy_to_user(argp, &stop, sizeof(stop)))
-   491			return -EFAULT;
-   492	
- > 493		return ops->stop(vdpa, stop);
-   494	}
-   495	
+* Don't issue a hypercall to set the id-mapped vectors when
+  protected mode is enabled (fix for pKVM in combination with
+  CPUs affected by Spectre-v3a)
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+x86: Five oneliners, of which the most interesting two are:
+
+* a NULL pointer dereference on INVPCID executed with
+  paging disabled, but only if KVM is using shadow paging
+
+* an incorrect bsearch comparison function which could truncate
+  the result and apply PMU event filtering incorrectly.  This one
+  comes with a selftests update too.
+
+----------------------------------------------------------------
+Aaron Lewis (3):
+      kvm: x86/pmu: Fix the compare function used by the pmu event filter
+      selftests: kvm/x86: Add the helper function create_pmu_event_filter
+      selftests: kvm/x86: Verify the pmu event filter matches the correct event
+
+Marc Zyngier (1):
+      KVM: arm64: vgic-v3: Consistently populate ID_AA64PFR0_EL1.GIC
+
+Paolo Bonzini (2):
+      Merge tag 'kvmarm-fixes-5.18-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      KVM: x86/mmu: fix NULL pointer dereference on guest INVPCID
+
+Quentin Perret (1):
+      KVM: arm64: Don't hypercall before EL2 init
+
+Sean Christopherson (2):
+      KVM: x86/mmu: Update number of zapped pages even if page list is stable
+      KVM: Free new dirty bitmap if creating a new memslot fails
+
+Wanpeng Li (1):
+      KVM: eventfd: Fix false positive RCU usage warning
+
+Yury Norov (1):
+      KVM: x86: hyper-v: fix type of valid_bank_mask
+
+ arch/arm64/kvm/arm.c                               |  3 +-
+ arch/arm64/kvm/sys_regs.c                          |  3 +-
+ arch/x86/kvm/hyperv.c                              |  4 +--
+ arch/x86/kvm/mmu/mmu.c                             | 16 ++++++----
+ arch/x86/kvm/pmu.c                                 |  7 ++--
+ .../selftests/kvm/x86_64/pmu_event_filter_test.c   | 37 +++++++++++++++++++---
+ virt/kvm/eventfd.c                                 |  3 +-
+ virt/kvm/kvm_main.c                                |  2 +-
+ 8 files changed, 56 insertions(+), 19 deletions(-)
+
