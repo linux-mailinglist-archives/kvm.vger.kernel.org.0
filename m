@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77B8352FCBE
-	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 15:18:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E4C352FCC6
+	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 15:18:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355024AbiEUNRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 May 2022 09:17:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42642 "EHLO
+        id S1355051AbiEUNRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 May 2022 09:17:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355255AbiEUNRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 May 2022 09:17:17 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE234562D8;
-        Sat, 21 May 2022 06:16:48 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id n10so10175857pjh.5;
-        Sat, 21 May 2022 06:16:48 -0700 (PDT)
+        with ESMTP id S1355266AbiEUNRT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 May 2022 09:17:19 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED4E75675B;
+        Sat, 21 May 2022 06:16:51 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id s14so9416875plk.8;
+        Sat, 21 May 2022 06:16:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=l94TVW3wuVRtc3xT6nzOf4GkBXwrul2+5gv+PMml5Tg=;
-        b=ArJqDxgtQTfe25Ba0jETZGtU+VXR9BgSH7Z04f8rxW+4bhYdzcUJYYo1EtSTaRK2Zk
-         PLvf/Z3j0pJXXQz3Di7qAnGRCOypjwC0q6Nyf6PQNvuaVYv2qrh+1kgf3ortKP6LiL1f
-         5sAr5bBrAhU9Rs31y2I1RML3zC7cXS9rsBoQtaD4XPRDtMCDrObumxoMtoG6ahtA7Y7Z
-         0XlT4Fzemv+/PFTR7o3Lla+HC7vXXfl0WOl2sAWVZOoJyAUwM5JLZEjnHdNFav979NFh
-         jxlzNHIxcUQvjDYANYeC0AVEcz/S7wlqdMnjgPAKnyj3s/upQxz2SUtDa2PAWdVF41/8
-         QI3w==
+        bh=AOz0mmcwPMc1b3ipLhmnfSVEDUnpfpIWhOsFHZTCejQ=;
+        b=MHDMjiHPg9cFx3n8pExhMq7Uf0fuABChD6WsgKEXubgKkZKoeEHOi3u/9q0NRLrf/K
+         mkg03PBGQ0ETVn9lO7MCxdEWTDmJTtnhnFJqMuSctSRhRmpaA/4JsDVUYpqdSeo7wzQQ
+         MspPCxHCwmaqNacszOJvheKIwKZS8DsHMFUqUXUN6W57qUXf+RWLfyEPJZxzOFOdheFn
+         MNkzejHcp7JvbEsoU/EQCARUykfUTbDvr941sBdp3MgbukBaH/hXxVNeh2liqBPT0jpT
+         uk6V7fOCBzHpvBA6cOs3tCCCn9s9GNZ8j4o9u7PIJL8bTEezAEc9ABcoQuAtk/qzNrVG
+         ITvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=l94TVW3wuVRtc3xT6nzOf4GkBXwrul2+5gv+PMml5Tg=;
-        b=w8d3xsDwnPKePV+ymzqH1BY0LO47m4qx4wgWt5eRoDd9/nGGRw5rhH6GqZtFMc4/GO
-         uvC8gM+DVzyDP7krEl2AXMCsZ/DxS4pk50j45nAmOtxkuRnNlyEolSunHsdyf5+2NTY0
-         Lf4cjSizJfZNdgrlPkPOr8G6D5dxiT7UfNgEMeLbpqIAeZs3H/jTwb8DtOXmd2JdEtSX
-         SCCCqN8MMlUH8OvFPAQF6tQ5wArvfSLu20dGSeKABntbAp468gKyD0Cz9BBLCH5cOc2x
-         Ln87UPYIOVAaRCMRR+2Xj4ftDXUPXWx66ymw85QUxWF1kieZxOStvB9E1LwFyZJ8lmOE
-         Z4fg==
-X-Gm-Message-State: AOAM530BrH3RFcldL/dTTfeaoazlzo+JvgFBf7cxqQG6VQq4aY7isCuL
-        5A+5GyeVVoo7q9HgC16saSCAgkAVqAs=
-X-Google-Smtp-Source: ABdhPJxmJvyTReInu99O+pz45PFKkztmSo6JBB2Q4B3W6dOhNsqXS6QrnFKLL4MiKOfvE6K0Eh76rg==
-X-Received: by 2002:a17:902:d4d2:b0:161:b4f7:385b with SMTP id o18-20020a170902d4d200b00161b4f7385bmr14328082plg.5.1653138998291;
-        Sat, 21 May 2022 06:16:38 -0700 (PDT)
+        bh=AOz0mmcwPMc1b3ipLhmnfSVEDUnpfpIWhOsFHZTCejQ=;
+        b=hGEuRfgkkz0wKpb9VLqXIqapT4tjkXbrT3CbKczn3UkdTGCnRph/jwZJNCvbCUspXL
+         R9aFXSxYVRHdKnNPYbwrD3LK2vgBLu4JL7DbQ6FcKPVtW9DEkgcnjWb8M1CaFcih0FHW
+         psHBaVAIyBasvoOaw0F1d6kak8i2cpPoWEChJc/6mtMZAhmBcIYPwUOA/I1u/sORsmU9
+         h4x2+uxt/PwGWojRjNAdQ7Vb6xg8rmLwUIlbFFdZrC8gryem7wsg6wyXYBfCjcn7fBF3
+         Ta9kc93ykCWzOoPo6cvjxSh9Qkvip3/1oc6QRWEosFkkusWRLQiwZ7Gthe/KkfoXgzT/
+         9h5w==
+X-Gm-Message-State: AOAM532ul1+KyhKgzNJ/XrdyteMsuGSlSymOS8VRgQwNCyB7igpFU22+
+        AiZBkeNWoHMK5BqLbYgVjvIeYkm439g=
+X-Google-Smtp-Source: ABdhPJxviNdrc+pHZNkMhsNRanRHsHb1czV3atCcpVsj0z4FUpOoU2EiU2dqP8Dbop5wO6rA7/GzDw==
+X-Received: by 2002:a17:90b:48d1:b0:1df:4fc8:c2d7 with SMTP id li17-20020a17090b48d100b001df4fc8c2d7mr16259585pjb.45.1653139001990;
+        Sat, 21 May 2022 06:16:41 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id z10-20020a17090a170a00b001dc1e6db7c2sm3622346pjd.57.2022.05.21.06.16.37
+        by smtp.gmail.com with ESMTPSA id o24-20020aa79798000000b0050dc76281b9sm3730168pfp.147.2022.05.21.06.16.41
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 21 May 2022 06:16:38 -0700 (PDT)
+        Sat, 21 May 2022 06:16:41 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,9 +55,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         David Matlack <dmatlack@google.com>,
         Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: [PATCH V3 09/12] KVM: X86/MMU: Move the verifying of NPT's PDPTE in FNAME(fetch)
-Date:   Sat, 21 May 2022 21:16:57 +0800
-Message-Id: <20220521131700.3661-10-jiangshanlai@gmail.com>
+Subject: [PATCH V3 10/12] KVM: X86/MMU: Remove unused INVALID_PAE_ROOT and IS_VALID_PAE_ROOT
+Date:   Sat, 21 May 2022 21:16:58 +0800
+Message-Id: <20220521131700.3661-11-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20220521131700.3661-1-jiangshanlai@gmail.com>
 References: <20220521131700.3661-1-jiangshanlai@gmail.com>
@@ -75,122 +75,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-FNAME(page_fault) verifies PDPTE for nested NPT in PAE paging mode
-because nested_svm_get_tdp_pdptr() reads the guest NPT's PDPTE from
-memory unconditionally for each call.
-
-The verifying is complicated and it works only when mmu->pae_root
-is always used when the guest is PAE paging.
-
-Move the verifying code in FNAME(fetch) and simplify it since the local
-shadow page is used and it can be walked in FNAME(fetch) and unlinked
-from children via drop_spte().
-
-It also allows for mmu->pae_root NOT to be used when it is NOT required
-to be put in a 32bit CR3.
+They are unused and replaced with 0ull like other zero sptes and
+is_shadow_present_pte().
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/paging_tmpl.h | 72 ++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 39 deletions(-)
+ arch/x86/kvm/mmu/mmu_internal.h | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index cd6032e1947c..67c419bce1e5 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -659,6 +659,39 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 		clear_sp_write_flooding_count(it.sptep);
- 		drop_large_spte(vcpu, it.sptep);
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index bd2a26897b97..4feb1ac2742c 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -20,16 +20,6 @@ extern bool dbg;
+ #define MMU_WARN_ON(x) do { } while (0)
+ #endif
  
-+		/*
-+		 * When nested NPT enabled and L1 is PAE paging,
-+		 * mmu->get_pdptrs() which is nested_svm_get_tdp_pdptr() reads
-+		 * the guest NPT's PDPTE from memory unconditionally for each
-+		 * call.
-+		 *
-+		 * The guest PAE root page is not write-protected.
-+		 *
-+		 * The mmu->get_pdptrs() in FNAME(walk_addr_generic) might get
-+		 * a value different from previous calls or different from the
-+		 * return value of mmu->get_pdptrs() in mmu_alloc_shadow_roots().
-+		 *
-+		 * It will cause the following code installs the spte in a wrong
-+		 * sp or links a sp to a wrong parent if the return value of
-+		 * mmu->get_pdptrs() is not verified unchanged since
-+		 * FNAME(gpte_changed) can't check this kind of change.
-+		 *
-+		 * Verify the return value of mmu->get_pdptrs() (only the gfn
-+		 * in it needs to be checked) and drop the spte if the gfn isn't
-+		 * matched.
-+		 *
-+		 * Do the verifying unconditionally when the guest is PAE
-+		 * paging no matter whether it is nested NPT or not to avoid
-+		 * complicated code.
-+		 */
-+		if (vcpu->arch.mmu->cpu_role.base.level == PT32E_ROOT_LEVEL &&
-+		    it.level == PT32E_ROOT_LEVEL &&
-+		    is_shadow_present_pte(*it.sptep)) {
-+			sp = to_shadow_page(*it.sptep & PT64_BASE_ADDR_MASK);
-+			if (gw->table_gfn[it.level - 2] != sp->gfn)
-+				drop_spte(vcpu->kvm, it.sptep);
-+		}
-+
- 		sp = NULL;
- 		if (!is_shadow_present_pte(*it.sptep)) {
- 			table_gfn = gw->table_gfn[it.level - 2];
-@@ -886,44 +919,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (is_page_fault_stale(vcpu, fault, mmu_seq))
- 		goto out_unlock;
+-/*
+- * Unlike regular MMU roots, PAE "roots", a.k.a. PDPTEs/PDPTRs, have a PRESENT
+- * bit, and thus are guaranteed to be non-zero when valid.  And, when a guest
+- * PDPTR is !PRESENT, its corresponding PAE root cannot be set to INVALID_PAGE,
+- * as the CPU would treat that as PRESENT PDPTR with reserved bits set.  Use
+- * '0' instead of INVALID_PAGE to indicate an invalid PAE root.
+- */
+-#define INVALID_PAE_ROOT	0
+-#define IS_VALID_PAE_ROOT(x)	(!!(x))
+-
+ typedef u64 __rcu *tdp_ptep_t;
  
--	/*
--	 * When nested NPT enabled and L1 is PAE paging, mmu->get_pdptrs()
--	 * which is nested_svm_get_tdp_pdptr() reads the guest NPT's PDPTE
--	 * from memory unconditionally for each call.
--	 *
--	 * The guest PAE root page is not write-protected.
--	 *
--	 * The mmu->get_pdptrs() in FNAME(walk_addr_generic) might get a value
--	 * different from previous calls or different from the return value of
--	 * mmu->get_pdptrs() in mmu_alloc_shadow_roots().
--	 *
--	 * It will cause FNAME(fetch) installs the spte in a wrong sp or links
--	 * a sp to a wrong parent if the return value of mmu->get_pdptrs()
--	 * is not verified unchanged since FNAME(gpte_changed) can't check
--	 * this kind of change.
--	 *
--	 * Verify the return value of mmu->get_pdptrs() (only the gfn in it
--	 * needs to be checked) and do kvm_mmu_free_roots() like load_pdptr()
--	 * if the gfn isn't matched.
--	 *
--	 * Do the verifying unconditionally when the guest is PAE paging no
--	 * matter whether it is nested NPT or not to avoid complicated code.
--	 */
--	if (vcpu->arch.mmu->cpu_role.base.level == PT32E_ROOT_LEVEL) {
--		u64 pdpte = vcpu->arch.mmu->pae_root[(fault->addr >> 30) & 3];
--		struct kvm_mmu_page *sp = NULL;
--
--		if (IS_VALID_PAE_ROOT(pdpte))
--			sp = to_shadow_page(pdpte & PT64_BASE_ADDR_MASK);
--
--		if (!sp || walker.table_gfn[PT32E_ROOT_LEVEL - 2] != sp->gfn) {
--			write_unlock(&vcpu->kvm->mmu_lock);
--			kvm_mmu_free_roots(vcpu->kvm, vcpu->arch.mmu,
--					   KVM_MMU_ROOT_CURRENT);
--			goto release_clean;
--		}
--	}
--
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
- 		goto out_unlock;
-@@ -931,7 +926,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 
- out_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
--release_clean:
- 	kvm_release_pfn_clean(fault->pfn);
- 	return r;
- }
+ struct kvm_mmu_page {
 -- 
 2.19.1.6.gb485710b
 
