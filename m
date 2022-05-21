@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64F9552FCCB
-	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 15:18:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77B8352FCBE
+	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 15:18:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355250AbiEUNR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 May 2022 09:17:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39922 "EHLO
+        id S1355024AbiEUNRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 May 2022 09:17:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355181AbiEUNRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 May 2022 09:17:16 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C3A4BB9C;
-        Sat, 21 May 2022 06:16:45 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id y41so9856164pfw.12;
-        Sat, 21 May 2022 06:16:45 -0700 (PDT)
+        with ESMTP id S1355255AbiEUNRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 May 2022 09:17:17 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE234562D8;
+        Sat, 21 May 2022 06:16:48 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id n10so10175857pjh.5;
+        Sat, 21 May 2022 06:16:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=hnKZJ+lERgc4n/q9nnaVzYKEdHblpgWM0rWz+Lvu+Mc=;
-        b=QPsRUKAOR+ryfVPMvsudsn3ngPhDRRPdZl0GI9yJ+LF4O/Vv+movozqHk/1gAlhl6Y
-         bM73DVMLpI2J7LEwahTbQy4Sp+DqUFW11ozGhhOJUApAjjsHF5NByEBmDeJWeaZcdUZD
-         iJojaM1+yHM2jNxyDpconiP8+a/YBqVo76V3U/3oDl3DIxO9g9bBcwryaJh9xKzl/GnJ
-         wz+lqlBxvqptoq7TPTFL+9xGDvIJg6nI4iSXHcwuVJ9KnuYCYWo52bdMpBMSIn1FnQGx
-         QyGrXMEngTQWSeoY1zLHkd19AWdlo/qsLjR57LxYN+TZ38gvzyC2LJ/sUTQ/yM7dLRgi
-         pabg==
+        bh=l94TVW3wuVRtc3xT6nzOf4GkBXwrul2+5gv+PMml5Tg=;
+        b=ArJqDxgtQTfe25Ba0jETZGtU+VXR9BgSH7Z04f8rxW+4bhYdzcUJYYo1EtSTaRK2Zk
+         PLvf/Z3j0pJXXQz3Di7qAnGRCOypjwC0q6Nyf6PQNvuaVYv2qrh+1kgf3ortKP6LiL1f
+         5sAr5bBrAhU9Rs31y2I1RML3zC7cXS9rsBoQtaD4XPRDtMCDrObumxoMtoG6ahtA7Y7Z
+         0XlT4Fzemv+/PFTR7o3Lla+HC7vXXfl0WOl2sAWVZOoJyAUwM5JLZEjnHdNFav979NFh
+         jxlzNHIxcUQvjDYANYeC0AVEcz/S7wlqdMnjgPAKnyj3s/upQxz2SUtDa2PAWdVF41/8
+         QI3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hnKZJ+lERgc4n/q9nnaVzYKEdHblpgWM0rWz+Lvu+Mc=;
-        b=rP4ctB9m3CDvsjpvpJpJSzLJ8ry6+dId88f/k7u2Qhyce2p4pUuEr7vGAZ0Ptus2JL
-         kM0Wn/rqKukYZ7qBQuc+8bAsD5v+5OTpaWLuQebi+TvHjFTgT/FiVcsfKsKY0YYX472v
-         4XtXc1xVsmKZitAmX3hkpGXmcNgj2RFLDccAypoA1rmzX2+SlGwRYCc9DpbMuasTkl80
-         1mvk2UJ5LBUTYY0pviHMHs8/eKnKt24pfAtdzNTs3MEka2Yy+tKHSRa2WWJyq1TiO+rJ
-         x51U7njlKI3BwdfDSXTKgInV9OlME2Kfae0H5JMUruKejKbvi50/TCu3pNwa3dI5MJMH
-         D07w==
-X-Gm-Message-State: AOAM530+foDDkvREw7UPT4R5yQONWcCA0ph+G8MW2sHPkX+OBdcEaNHb
-        ge1ZySenapEo4ii5odCmG4PsMZSetCk=
-X-Google-Smtp-Source: ABdhPJyIpe53uFrbLytFOPNgD8/LCRbJTnt6w46nKP7pAPlITIBqWOjCJkrsE/mse7OjdcLnZfhR/g==
-X-Received: by 2002:a05:6a00:2311:b0:4e1:52bf:e466 with SMTP id h17-20020a056a00231100b004e152bfe466mr14767799pfh.77.1653138994662;
-        Sat, 21 May 2022 06:16:34 -0700 (PDT)
+        bh=l94TVW3wuVRtc3xT6nzOf4GkBXwrul2+5gv+PMml5Tg=;
+        b=w8d3xsDwnPKePV+ymzqH1BY0LO47m4qx4wgWt5eRoDd9/nGGRw5rhH6GqZtFMc4/GO
+         uvC8gM+DVzyDP7krEl2AXMCsZ/DxS4pk50j45nAmOtxkuRnNlyEolSunHsdyf5+2NTY0
+         Lf4cjSizJfZNdgrlPkPOr8G6D5dxiT7UfNgEMeLbpqIAeZs3H/jTwb8DtOXmd2JdEtSX
+         SCCCqN8MMlUH8OvFPAQF6tQ5wArvfSLu20dGSeKABntbAp468gKyD0Cz9BBLCH5cOc2x
+         Ln87UPYIOVAaRCMRR+2Xj4ftDXUPXWx66ymw85QUxWF1kieZxOStvB9E1LwFyZJ8lmOE
+         Z4fg==
+X-Gm-Message-State: AOAM530BrH3RFcldL/dTTfeaoazlzo+JvgFBf7cxqQG6VQq4aY7isCuL
+        5A+5GyeVVoo7q9HgC16saSCAgkAVqAs=
+X-Google-Smtp-Source: ABdhPJxmJvyTReInu99O+pz45PFKkztmSo6JBB2Q4B3W6dOhNsqXS6QrnFKLL4MiKOfvE6K0Eh76rg==
+X-Received: by 2002:a17:902:d4d2:b0:161:b4f7:385b with SMTP id o18-20020a170902d4d200b00161b4f7385bmr14328082plg.5.1653138998291;
+        Sat, 21 May 2022 06:16:38 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id n23-20020a056a00213700b0050dc762815esm3611551pfj.56.2022.05.21.06.16.33
+        by smtp.gmail.com with ESMTPSA id z10-20020a17090a170a00b001dc1e6db7c2sm3622346pjd.57.2022.05.21.06.16.37
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 21 May 2022 06:16:34 -0700 (PDT)
+        Sat, 21 May 2022 06:16:38 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,9 +55,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         David Matlack <dmatlack@google.com>,
         Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: [PATCH V3 08/12] KVM: X86/MMU: Allocate mmu->pae_root for PAE paging on-demand
-Date:   Sat, 21 May 2022 21:16:56 +0800
-Message-Id: <20220521131700.3661-9-jiangshanlai@gmail.com>
+Subject: [PATCH V3 09/12] KVM: X86/MMU: Move the verifying of NPT's PDPTE in FNAME(fetch)
+Date:   Sat, 21 May 2022 21:16:57 +0800
+Message-Id: <20220521131700.3661-10-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20220521131700.3661-1-jiangshanlai@gmail.com>
 References: <20220521131700.3661-1-jiangshanlai@gmail.com>
@@ -75,191 +75,122 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-mmu->pae_root for non-PAE paging is allocated on-demand, but
-mmu->pae_root for PAE paging is allocated early when struct kvm_mmu is
-being created.
+FNAME(page_fault) verifies PDPTE for nested NPT in PAE paging mode
+because nested_svm_get_tdp_pdptr() reads the guest NPT's PDPTE from
+memory unconditionally for each call.
 
-Simplify the code to allocate mmu->pae_root for PAE paging and make
-it on-demand.
+The verifying is complicated and it works only when mmu->pae_root
+is always used when the guest is PAE paging.
+
+Move the verifying code in FNAME(fetch) and simplify it since the local
+shadow page is used and it can be walked in FNAME(fetch) and unlinked
+from children via drop_spte().
+
+It also allows for mmu->pae_root NOT to be used when it is NOT required
+to be put in a 32bit CR3.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/include/asm/kvm_host.h |   2 +-
- arch/x86/kvm/mmu/mmu.c          | 101 +++++++++++++-------------------
- arch/x86/kvm/x86.c              |   4 +-
- 3 files changed, 44 insertions(+), 63 deletions(-)
+ arch/x86/kvm/mmu/paging_tmpl.h | 72 ++++++++++++++++------------------
+ 1 file changed, 33 insertions(+), 39 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9cdc5bbd721f..fb9751dfc1a7 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1615,7 +1615,7 @@ int kvm_mmu_vendor_module_init(void);
- void kvm_mmu_vendor_module_exit(void);
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index cd6032e1947c..67c419bce1e5 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -659,6 +659,39 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 		clear_sp_write_flooding_count(it.sptep);
+ 		drop_large_spte(vcpu, it.sptep);
  
- void kvm_mmu_destroy(struct kvm_vcpu *vcpu);
--int kvm_mmu_create(struct kvm_vcpu *vcpu);
-+void kvm_mmu_create(struct kvm_vcpu *vcpu);
- int kvm_mmu_init_vm(struct kvm *kvm);
- void kvm_mmu_uninit_vm(struct kvm *kvm);
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 90b715eefe6a..63c2b2c6122c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -668,6 +668,41 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+static int mmu_alloc_pae_root(struct kvm_vcpu *vcpu)
-+{
-+	struct page *page;
++		/*
++		 * When nested NPT enabled and L1 is PAE paging,
++		 * mmu->get_pdptrs() which is nested_svm_get_tdp_pdptr() reads
++		 * the guest NPT's PDPTE from memory unconditionally for each
++		 * call.
++		 *
++		 * The guest PAE root page is not write-protected.
++		 *
++		 * The mmu->get_pdptrs() in FNAME(walk_addr_generic) might get
++		 * a value different from previous calls or different from the
++		 * return value of mmu->get_pdptrs() in mmu_alloc_shadow_roots().
++		 *
++		 * It will cause the following code installs the spte in a wrong
++		 * sp or links a sp to a wrong parent if the return value of
++		 * mmu->get_pdptrs() is not verified unchanged since
++		 * FNAME(gpte_changed) can't check this kind of change.
++		 *
++		 * Verify the return value of mmu->get_pdptrs() (only the gfn
++		 * in it needs to be checked) and drop the spte if the gfn isn't
++		 * matched.
++		 *
++		 * Do the verifying unconditionally when the guest is PAE
++		 * paging no matter whether it is nested NPT or not to avoid
++		 * complicated code.
++		 */
++		if (vcpu->arch.mmu->cpu_role.base.level == PT32E_ROOT_LEVEL &&
++		    it.level == PT32E_ROOT_LEVEL &&
++		    is_shadow_present_pte(*it.sptep)) {
++			sp = to_shadow_page(*it.sptep & PT64_BASE_ADDR_MASK);
++			if (gw->table_gfn[it.level - 2] != sp->gfn)
++				drop_spte(vcpu->kvm, it.sptep);
++		}
 +
-+	if (vcpu->arch.mmu->root_role.level != PT32E_ROOT_LEVEL)
-+		return 0;
-+	if (vcpu->arch.mmu->pae_root)
-+		return 0;
-+
-+	/*
-+	 * Allocate a page to hold the four PDPTEs for PAE paging when emulating
-+	 * 32-bit mode.  CR3 is only 32 bits even on x86_64 in this case.
-+	 * Therefore we need to allocate the PDP table in the first 4GB of
-+	 * memory, which happens to fit the DMA32 zone.
-+	 */
-+	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | __GFP_DMA32);
-+	if (!page)
-+		return -ENOMEM;
-+	vcpu->arch.mmu->pae_root = page_address(page);
-+
-+	/*
-+	 * CR3 is only 32 bits when PAE paging is used, thus it's impossible to
-+	 * get the CPU to treat the PDPTEs as encrypted.  Decrypt the page so
-+	 * that KVM's writes and the CPU's reads get along.  Note, this is
-+	 * only necessary when using shadow paging, as 64-bit NPT can get at
-+	 * the C-bit even when shadowing 32-bit NPT, and SME isn't supported
-+	 * by 32-bit kernels (when KVM itself uses 32-bit NPT).
-+	 */
-+	if (!tdp_enabled)
-+		set_memory_decrypted((unsigned long)vcpu->arch.mmu->pae_root, 1);
-+	else
-+		WARN_ON_ONCE(shadow_me_value);
-+	return 0;
-+}
-+
- static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
- {
- 	int r;
-@@ -5127,6 +5162,9 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- 	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->root_role.direct);
- 	if (r)
- 		goto out;
-+	r = mmu_alloc_pae_root(vcpu);
-+	if (r)
-+		return r;
- 	r = mmu_alloc_special_roots(vcpu);
- 	if (r)
- 		goto out;
-@@ -5591,63 +5629,18 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
- 	free_page((unsigned long)mmu->pml5_root);
- }
+ 		sp = NULL;
+ 		if (!is_shadow_present_pte(*it.sptep)) {
+ 			table_gfn = gw->table_gfn[it.level - 2];
+@@ -886,44 +919,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	if (is_page_fault_stale(vcpu, fault, mmu_seq))
+ 		goto out_unlock;
  
--static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
-+static void __kvm_mmu_create(struct kvm_mmu *mmu)
- {
--	struct page *page;
- 	int i;
- 
- 	mmu->root.hpa = INVALID_PAGE;
- 	mmu->root.pgd = 0;
- 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
- 		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
--
--	/* vcpu->arch.guest_mmu isn't used when !tdp_enabled. */
--	if (!tdp_enabled && mmu == &vcpu->arch.guest_mmu)
--		return 0;
--
 -	/*
--	 * When using PAE paging, the four PDPTEs are treated as 'root' pages,
--	 * while the PDP table is a per-vCPU construct that's allocated at MMU
--	 * creation.  When emulating 32-bit mode, cr3 is only 32 bits even on
--	 * x86_64.  Therefore we need to allocate the PDP table in the first
--	 * 4GB of memory, which happens to fit the DMA32 zone.  TDP paging
--	 * generally doesn't use PAE paging and can skip allocating the PDP
--	 * table.  The main exception, handled here, is SVM's 32-bit NPT.  The
--	 * other exception is for shadowing L1's 32-bit or PAE NPT on 64-bit
--	 * KVM; that horror is handled on-demand by mmu_alloc_special_roots().
+-	 * When nested NPT enabled and L1 is PAE paging, mmu->get_pdptrs()
+-	 * which is nested_svm_get_tdp_pdptr() reads the guest NPT's PDPTE
+-	 * from memory unconditionally for each call.
+-	 *
+-	 * The guest PAE root page is not write-protected.
+-	 *
+-	 * The mmu->get_pdptrs() in FNAME(walk_addr_generic) might get a value
+-	 * different from previous calls or different from the return value of
+-	 * mmu->get_pdptrs() in mmu_alloc_shadow_roots().
+-	 *
+-	 * It will cause FNAME(fetch) installs the spte in a wrong sp or links
+-	 * a sp to a wrong parent if the return value of mmu->get_pdptrs()
+-	 * is not verified unchanged since FNAME(gpte_changed) can't check
+-	 * this kind of change.
+-	 *
+-	 * Verify the return value of mmu->get_pdptrs() (only the gfn in it
+-	 * needs to be checked) and do kvm_mmu_free_roots() like load_pdptr()
+-	 * if the gfn isn't matched.
+-	 *
+-	 * Do the verifying unconditionally when the guest is PAE paging no
+-	 * matter whether it is nested NPT or not to avoid complicated code.
 -	 */
--	if (tdp_enabled && kvm_mmu_get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
--		return 0;
+-	if (vcpu->arch.mmu->cpu_role.base.level == PT32E_ROOT_LEVEL) {
+-		u64 pdpte = vcpu->arch.mmu->pae_root[(fault->addr >> 30) & 3];
+-		struct kvm_mmu_page *sp = NULL;
 -
--	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_DMA32);
--	if (!page)
--		return -ENOMEM;
+-		if (IS_VALID_PAE_ROOT(pdpte))
+-			sp = to_shadow_page(pdpte & PT64_BASE_ADDR_MASK);
 -
--	mmu->pae_root = page_address(page);
+-		if (!sp || walker.table_gfn[PT32E_ROOT_LEVEL - 2] != sp->gfn) {
+-			write_unlock(&vcpu->kvm->mmu_lock);
+-			kvm_mmu_free_roots(vcpu->kvm, vcpu->arch.mmu,
+-					   KVM_MMU_ROOT_CURRENT);
+-			goto release_clean;
+-		}
+-	}
 -
--	/*
--	 * CR3 is only 32 bits when PAE paging is used, thus it's impossible to
--	 * get the CPU to treat the PDPTEs as encrypted.  Decrypt the page so
--	 * that KVM's writes and the CPU's reads get along.  Note, this is
--	 * only necessary when using shadow paging, as 64-bit NPT can get at
--	 * the C-bit even when shadowing 32-bit NPT, and SME isn't supported
--	 * by 32-bit kernels (when KVM itself uses 32-bit NPT).
--	 */
--	if (!tdp_enabled)
--		set_memory_decrypted((unsigned long)mmu->pae_root, 1);
--	else
--		WARN_ON_ONCE(shadow_me_value);
--
--	for (i = 0; i < 4; ++i)
--		mmu->pae_root[i] = INVALID_PAE_ROOT;
--
--	return 0;
+ 	r = make_mmu_pages_available(vcpu);
+ 	if (r)
+ 		goto out_unlock;
+@@ -931,7 +926,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 
+ out_unlock:
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+-release_clean:
+ 	kvm_release_pfn_clean(fault->pfn);
+ 	return r;
  }
- 
--int kvm_mmu_create(struct kvm_vcpu *vcpu)
-+void kvm_mmu_create(struct kvm_vcpu *vcpu)
- {
--	int ret;
--
- 	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
- 	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
- 
-@@ -5659,18 +5652,8 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
- 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
- 
--	ret = __kvm_mmu_create(vcpu, &vcpu->arch.guest_mmu);
--	if (ret)
--		return ret;
--
--	ret = __kvm_mmu_create(vcpu, &vcpu->arch.root_mmu);
--	if (ret)
--		goto fail_allocate_root;
--
--	return ret;
-- fail_allocate_root:
--	free_mmu_pages(&vcpu->arch.guest_mmu);
--	return ret;
-+	__kvm_mmu_create(&vcpu->arch.guest_mmu);
-+	__kvm_mmu_create(&vcpu->arch.root_mmu);
- }
- 
- #define BATCH_ZAP_PAGES	10
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 04812eaaf61b..064aecb188dc 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11285,9 +11285,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	else
- 		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
- 
--	r = kvm_mmu_create(vcpu);
--	if (r < 0)
--		return r;
-+	kvm_mmu_create(vcpu);
- 
- 	if (irqchip_in_kernel(vcpu->kvm)) {
- 		r = kvm_create_lapic(vcpu, lapic_timer_advance_ns);
 -- 
 2.19.1.6.gb485710b
 
