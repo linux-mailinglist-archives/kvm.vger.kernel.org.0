@@ -2,127 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AAAC52FAB7
-	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 12:45:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6983E52FCBA
+	for <lists+kvm@lfdr.de>; Sat, 21 May 2022 15:16:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233811AbiEUKpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 May 2022 06:45:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58506 "EHLO
+        id S1353180AbiEUNQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 May 2022 09:16:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiEUKpk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 May 2022 06:45:40 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C25967D32;
-        Sat, 21 May 2022 03:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653129939; x=1684665939;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=THS3frs05rhmQUjFPvgFuEIt/YVzc4/2LQdY6c296Ck=;
-  b=AplcfcTSj2an4x3oaZ197HSbQ2QF0qOoaM8dFj1oGn2xFiPiNaynXTAV
-   s/Ap4C9FLhFkSW/djYf+pyjd7BAZdQBmAcYRTqJlJqLqefvvHd0xqc6eR
-   pmKzAc5xxiN5i1NsdrlXsen5v1PvGhVRixku6NjD4G6LyHsgO8Vju0tWQ
-   hUTu99RvJldl9TAD54j2gTbNLoqx9b+QEurNTRtm5p6BHFUCn3mDs+rli
-   buTsr/3rBo7q/p0qqhvcZ/qigfd7UCyhMunTTsAD04hZkJndM6cDEFrCq
-   QRkk2aJC0l4/cxRtq2Y/X3iiGJgpvHbxDNCK+3Y+YqClbTnI8VBgR9rAO
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10353"; a="254888883"
-X-IronPort-AV: E=Sophos;i="5.91,242,1647327600"; 
-   d="scan'208";a="254888883"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2022 03:45:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,242,1647327600"; 
-   d="scan'208";a="571260401"
-Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 21 May 2022 03:45:36 -0700
-Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nsMc4-0006DG-3O;
-        Sat, 21 May 2022 10:45:36 +0000
-Date:   Sat, 21 May 2022 18:45:33 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Uros Bizjak <ubizjak@gmail.com>,
+        with ESMTP id S237249AbiEUNQH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 May 2022 09:16:07 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9A0315702;
+        Sat, 21 May 2022 06:16:05 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id a38so7044195pgl.9;
+        Sat, 21 May 2022 06:16:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LEcoGUtASg7L12J/ZwcGjQp6K0Il0IXJCxqacljc2XE=;
+        b=F/XYIRLnlSp6q9kjViACzlTmOXyNfxxBRaXBaJfrDrSJF0exs0vTnoguUQcHI44cf8
+         qNsHp/wpzIM3sCtgfsc1nDLE+zhQzwgSUjDtFUYYzs1E8ghymyuhjlZ3o4GcqLUgkYpi
+         2G2Ho7HnkD/XmvCY9ObRwSf7FANCntENwkSE6JkL44h+mJnvjYtPnHmWeZ3DoEcTEehZ
+         ftC8jTJAy3jPvJ63WB+FOsff9puMcUXkuP5D22ZA5nE+ByJigWG6v7QoeSph8YnFEXDP
+         aQtKIgBQO5fhl+JnZveSna6TOS0u/8EaWgGUgyyxG2aJmbWO0xW4byDCErvIN351pmos
+         vQ/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LEcoGUtASg7L12J/ZwcGjQp6K0Il0IXJCxqacljc2XE=;
+        b=g3f/Nr2T5dA+0gzV/vB1NZWV3DKOhB29BRH5+oDZ1l11Q2DeYA53o6e5CDFOjyhQzc
+         CFqrtm0robuNIgAeHbGisi3oLnLtz3sJbf4X6YsS/NWcD+MhLWAqi5Gj2vmHIyir8pBY
+         ebo6CBrzG4KxLmK1gUQuWuBr9p6opdpC60vdc9OqFI7vxRT2TG3pVSPii+M7N4WrDKdg
+         bJNDd4QJKKOikdngsFzJ9YKEhntKaMtYlBUh7Vq+Ls6BDvupoT0LyvINHQSaGS4zqYt5
+         M8K62YuvADug8I8MwG/PWUVcijS5Kocn+GvNUQGXZf/elfLAV3bsE/FWC9SR0QrZiS/5
+         zNTA==
+X-Gm-Message-State: AOAM530YZ+hV/8vUins8w6+g2MrNObkM26M/7WXxHUcxz+Qjsn6+/yHl
+        4+J5FQlv/qMUTzAEvIR/AaQ71yPZl9k=
+X-Google-Smtp-Source: ABdhPJxQwtF2Y9oNu+2nqdsMxFCQx49TTaJbOD96LAv1aRM3/HZYTsZ/3h9DElZ+pEoCFth9FoENFQ==
+X-Received: by 2002:a05:6a00:2187:b0:50c:ef4d:ef3b with SMTP id h7-20020a056a00218700b0050cef4def3bmr14538539pfi.83.1653138964817;
+        Sat, 21 May 2022 06:16:04 -0700 (PDT)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id o2-20020a170902d4c200b0016168e90f2csm1549877plg.208.2022.05.21.06.16.04
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 21 May 2022 06:16:04 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2] KVM: VMX: Use try_cmpxchg64 in pi_try_set_control
-Message-ID: <202205211837.X2KKIXbP-lkp@intel.com>
-References: <20220520143737.62513-1-ubizjak@gmail.com>
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Subject: [PATCH V3 00/12] KVM: X86/MMU: Use one-off local shadow page for special roots
+Date:   Sat, 21 May 2022 21:16:48 +0800
+Message-Id: <20220521131700.3661-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220520143737.62513-1-ubizjak@gmail.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Uros,
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-Thank you for the patch! Yet something to improve:
+Current code uses mmu->pae_root, mmu->pml4_root, and mmu->pml5_root to
+setup special roots.  The initialization code is complex and the roots
+are not associated with struct kvm_mmu_page which causes the code more
+complex.
 
-[auto build test ERROR on kvm/master]
-[also build test ERROR on mst-vhost/linux-next linux/master linus/master v5.18-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+So add new local shadow pages to simplify it.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Uros-Bizjak/KVM-VMX-Use-try_cmpxchg64-in-pi_try_set_control/20220520-223925
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20220521/202205211837.X2KKIXbP-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-1) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/84128ccce45cc3ece9b9f8d4df8afa81651547c9
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Uros-Bizjak/KVM-VMX-Use-try_cmpxchg64-in-pi_try_set_control/20220520-223925
-        git checkout 84128ccce45cc3ece9b9f8d4df8afa81651547c9
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+The local shadow pages are associated with struct kvm_mmu_page and
+VCPU-local.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+The local shadow pages are created and freed when the roots are
+changed (or one-off) which can be optimized but not in the patchset
+since the re-creating is light way (in normal case only the struct
+kvm_mmu_page needs to be re-allocated and sp->spt doens't, because
+it is likely to be mmu->pae_root)
 
-All errors (new ones prefixed by >>):
+The patchset also fixes a possible bug described in:
+https://lore.kernel.org/lkml/20220415103414.86555-1-jiangshanlai@gmail.com/
+as patch1.
 
-   arch/x86/kvm/vmx/posted_intr.c: In function 'pi_try_set_control':
->> arch/x86/kvm/vmx/posted_intr.c:45:14: error: implicit declaration of function 'try_cmpxchg64'; did you mean 'try_cmpxchg'? [-Werror=implicit-function-declaration]
-      45 |         if (!try_cmpxchg64(&pi_desc->control, &old, new))
-         |              ^~~~~~~~~~~~~
-         |              try_cmpxchg
-   cc1: some warnings being treated as errors
+And the fixing is simplifed in patch9 with the help of local shadow page.
+
+Note:
+using_local_root_page() can be implemented in two ways.
+
+static bool using_local_root_page(struct kvm_mmu *mmu)
+{
+	return mmu->root_role.level == PT32E_ROOT_LEVEL ||
+	       (!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL);
+}
+
+static bool using_local_root_page(struct kvm_mmu *mmu)
+{
+	if (mmu->root_role.direct)
+		return mmu->root_role.level == PT32E_ROOT_LEVEL;
+	else
+		return mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL;
+}
+
+I prefer the second way.  But when I wrote the documents for them.  I
+couldn't explain well enough for the second way.  Maybe I explained the
+second way in a wrong aspect or my English is not qualified to explain
+it.
+
+So I put the first way in patch 2 and the second way in patch3.
+Patch3 adds much more documents and changes the first way to the second
+way.  Patch3 can be discarded.
+
+Changed from v2:
+	Add document for using_local_root_page()
+	Update many documents
+	Address review comments
+	Add a patch that fix a possible bug (and split other patches for patch9)
+
+Changed from v1:
+	Rebase to newest kvm/queue. Slightly update patch4.
+
+[V2]: https://lore.kernel.org/lkml/20220503150735.32723-1-jiangshanlai@gmail.com/
+[V1]: https://lore.kernel.org/lkml/20220420132605.3813-1-jiangshanlai@gmail.com/
 
 
-vim +45 arch/x86/kvm/vmx/posted_intr.c
+Lai Jiangshan (12):
+  KVM: X86/MMU: Verify PDPTE for nested NPT in PAE paging mode when page
+    fault
+  KVM: X86/MMU: Add using_local_root_page()
+  KVM: X86/MMU: Reduce a check in using_local_root_page() for common
+    cases
+  KVM: X86/MMU: Add local shadow pages
+  KVM: X86/MMU: Link PAE root pagetable with its children
+  KVM: X86/MMU: Activate local shadow pages and remove old logic
+  KVM: X86/MMU: Remove the check of the return value of to_shadow_page()
+  KVM: X86/MMU: Allocate mmu->pae_root for PAE paging on-demand
+  KVM: X86/MMU: Move the verifying of NPT's PDPTE in FNAME(fetch)
+  KVM: X86/MMU: Remove unused INVALID_PAE_ROOT and IS_VALID_PAE_ROOT
+  KVM: X86/MMU: Don't use mmu->pae_root when shadowing PAE NPT in 64-bit
+    host
+  KVM: X86/MMU: Remove mmu_alloc_special_roots()
 
-    36	
-    37	static int pi_try_set_control(struct pi_desc *pi_desc, u64 old, u64 new)
-    38	{
-    39		/*
-    40		 * PID.ON can be set at any time by a different vCPU or by hardware,
-    41		 * e.g. a device.  PID.control must be written atomically, and the
-    42		 * update must be retried with a fresh snapshot an ON change causes
-    43		 * the cmpxchg to fail.
-    44		 */
-  > 45		if (!try_cmpxchg64(&pi_desc->control, &old, new))
-    46			return -EBUSY;
-    47	
-    48		return 0;
-    49	}
-    50	
+ arch/x86/include/asm/kvm_host.h |   5 +-
+ arch/x86/kvm/mmu/mmu.c          | 575 ++++++++++++++------------------
+ arch/x86/kvm/mmu/mmu_internal.h |  10 -
+ arch/x86/kvm/mmu/paging_tmpl.h  |  51 ++-
+ arch/x86/kvm/mmu/spte.c         |   7 +
+ arch/x86/kvm/mmu/spte.h         |   1 +
+ arch/x86/kvm/mmu/tdp_mmu.h      |   7 +-
+ arch/x86/kvm/x86.c              |   4 +-
+ 8 files changed, 303 insertions(+), 357 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.19.1.6.gb485710b
+
