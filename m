@@ -2,127 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB18F530262
-	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 12:23:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C22B53029D
+	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 13:19:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244167AbiEVKWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 May 2022 06:22:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36394 "EHLO
+        id S244619AbiEVLTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 May 2022 07:19:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244412AbiEVKWq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 May 2022 06:22:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 790AA37AA9
-        for <kvm@vger.kernel.org>; Sun, 22 May 2022 03:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653214954;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lsPbt2EDsFllYzK/7L7lTHe+KfYj5ghUR9vmWSox+jk=;
-        b=Num9gk3SUhLxllev69Q0hYGtG+BOS3HizZDVQXXEmEy/YW6KrmJFnHTCJ+DmEmGUtJy9LH
-        IA4JhSnQdHVkfebUW8Qeto+Av1c8vh64CQAbYWW9bjulP/ykZnbb1NsE+CM1OKnnpBXOiT
-        LNcWhwAp051cMkH0Tac+LVqcWlKG1Po=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-321-mGS1BWIbPBmSuVqrzBns2g-1; Sun, 22 May 2022 06:22:31 -0400
-X-MC-Unique: mGS1BWIbPBmSuVqrzBns2g-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A55E3804517;
-        Sun, 22 May 2022 10:22:29 +0000 (UTC)
-Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 00619492C14;
-        Sun, 22 May 2022 10:22:23 +0000 (UTC)
-Message-ID: <008e29b8acd3f6c5a8c7da461c3c92fc927c10bd.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 14/19] KVM: x86: rename
- .set_apic_access_page_addr to reload_apic_access_page
-From:   Maxim Levitsky <mlevitsk@redhat.com>
+        with ESMTP id S235232AbiEVLTY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 May 2022 07:19:24 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BAA3D1E1
+        for <kvm@vger.kernel.org>; Sun, 22 May 2022 04:19:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653218363; x=1684754363;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=RBvtOp331amrI+LJCcohOxzCxaubfml5IAhCas1dKJs=;
+  b=HrgGZAFFOIdg92PnjfV+o7AOd2IFO49s5A1WTriaRJ080JypiDQB1Ibu
+   II4NazsHlM8fhJbkr13Gi/Dg3/t1+pMyYpR68l1I6eCaUKbSt4a7meAQw
+   lcWAL5On0RzDLseZkTzATdhlu4kld2VZq+I77TdE8rh9QtYL58WpwmaUK
+   K7I4OrICd0qfvgkhtbJzLyROeMFwXrWEekwDP7ClObYuAYBtgISPakUwA
+   RpFGtV8aGrqXoSekZ7bhBjrswW+bRkjL0Ma5njitJHR5boi++FdtiWgfA
+   kD9FGTbQF2kzGGv5sPVhC8R729PhPXtOMuieIBd4BUzFM0rW2wMpedlM4
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10354"; a="272693844"
+X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
+   d="scan'208";a="272693844"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2022 04:19:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
+   d="scan'208";a="576938949"
+Received: from lkp-server01.sh.intel.com (HELO db63a1be7222) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 22 May 2022 04:19:21 -0700
+Received: from kbuild by db63a1be7222 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nsjcG-0000KH-E6;
+        Sun, 22 May 2022 11:19:20 +0000
+Date:   Sun, 22 May 2022 19:19:10 +0800
+From:   kernel test robot <lkp@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Date:   Sun, 22 May 2022 13:22:22 +0300
-In-Reply-To: <YoZ2dh+ZujErT5nk@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-15-mlevitsk@redhat.com>
-         <YoZ2dh+ZujErT5nk@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:queue 10/60] arch/x86/kernel/kvm.c:240:2-7: WARNING: NULL check
+ before some freeing functions is not needed.
+Message-ID: <202205221909.sMshQw0j-lkp@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-05-19 at 16:55 +0000, Sean Christopherson wrote:
-> On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> > This will be used on SVM to reload shadow page of the AVIC physid table
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index d2f73ce87a1e3..ad744ab99734c 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9949,12 +9949,12 @@ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
-> >  		kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD);
-> >  }
-> >  
-> > -static void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
-> > +static void kvm_vcpu_reload_apic_pages(struct kvm_vcpu *vcpu)
-> >  {
-> >  	if (!lapic_in_kernel(vcpu))
-> >  		return;
-> >  
-> > -	static_call_cond(kvm_x86_set_apic_access_page_addr)(vcpu);
-> > +	static_call_cond(kvm_x86_reload_apic_pages)(vcpu);
-> >  }
-> >  
-> >  void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
-> > @@ -10071,7 +10071,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-> >  		if (kvm_check_request(KVM_REQ_LOAD_EOI_EXITMAP, vcpu))
-> >  			vcpu_load_eoi_exitmap(vcpu);
-> >  		if (kvm_check_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu))
-> > -			kvm_vcpu_reload_apic_access_page(vcpu);
-> > +			kvm_vcpu_reload_apic_pages(vcpu);
-> 
-> My vote is to add a new request and new kvm_x86_ops hook instead of piggybacking
-> KVM_REQ_APIC_PAGE_RELOAD.  The usage in kvm_arch_mmu_notifier_invalidate_range()
-> very subtlies relies on the memslot and vma being allocated/controlled by KVM.
-> 
-> The use in avic_physid_shadow_table_flush_memslot() is too similar in that it
-> also deals with memslot changes, but at the same time is _very_ different in that
-> it's dealing with user controlled memslots.
-> 
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   3481c4e162be9b7af2323e64312b1c8542e8789b
+commit: ddd7ed842627ea54084522fb9bb8531bea3004c9 [10/60] x86/kvm: Alloc dummy async #PF token outside of raw spinlock
+config: x86_64-randconfig-c022 (https://download.01.org/0day-ci/archive/20220522/202205221909.sMshQw0j-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-1) 11.3.0
 
-No objections, will do.
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-Best regards,
-	Maxim Levitsky
 
+cocci warnings: (new ones prefixed by >>)
+>> arch/x86/kernel/kvm.c:240:2-7: WARNING: NULL check before some freeing functions is not needed.
+
+Please review and possibly fold the followup patch.
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
