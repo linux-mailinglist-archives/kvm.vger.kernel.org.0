@@ -2,149 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8974D530380
-	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 16:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9113653039C
+	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 16:52:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239031AbiEVOWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 May 2022 10:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39550 "EHLO
+        id S1347465AbiEVOrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 May 2022 10:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346654AbiEVOW3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 May 2022 10:22:29 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 544462AE08
-        for <kvm@vger.kernel.org>; Sun, 22 May 2022 07:22:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653229347; x=1684765347;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uB1ggbu/slRhJC6Uld62Wb80ZAEvtYljnNVAh039YKM=;
-  b=JIe+7DSg09h7a99VmMRrOqAgkTZp2H8uwFYTLs9rCNbQ6LYpN+imVY4G
-   V9Djnxs/H9aJ7XLGI3wMEZJFDjw+DlWNhoPYQ/MTWLwbWOsvxGjp3bASo
-   ZBg2oRW+fo+NSH6u6NcN1DAMne6XSBuymicR4FGCPzzldCh9PtM/+qUKt
-   H3qS2Grg7BG25BVuCUYHjOVh1eLekgH8X9HVlfSwvFoqXeXdUM7azpWy2
-   8oRGyzcSTkRFzYZuxOtuGDeXSxTcpqivgs3V5NjsZttGY0q8k80pGdzxE
-   wjqVM+ozKLXGW9atyv+uULRjqEb1wezsYrAL2X2+ZGhuS//glJDljI6Wj
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10355"; a="272984641"
-X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
-   d="scan'208";a="272984641"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2022 07:22:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
-   d="scan'208";a="702572572"
-Received: from lkp-server01.sh.intel.com (HELO db63a1be7222) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 22 May 2022 07:22:24 -0700
-Received: from kbuild by db63a1be7222 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nsmTP-0000PP-CN;
-        Sun, 22 May 2022 14:22:23 +0000
-Date:   Sun, 22 May 2022 22:21:37 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com, kvm@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, yishaih@nvidia.com, maorg@nvidia.com,
-        cohuck@redhat.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com, liulongfang@huawei.com
-Subject: Re: [PATCH] vfio: Split migration ops from main device ops
-Message-ID: <202205222209.5JkbCwDa-lkp@intel.com>
-References: <20220522094756.219881-1-yishaih@nvidia.com>
+        with ESMTP id S1347385AbiEVOrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 May 2022 10:47:20 -0400
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED323B56E
+        for <kvm@vger.kernel.org>; Sun, 22 May 2022 07:47:20 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id g13-20020a9d6b0d000000b0060b13026e0dso505737otp.8
+        for <kvm@vger.kernel.org>; Sun, 22 May 2022 07:47:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qs1N4izsogFrS0OZ7oEYOqsnkQJp8brscTXYKO0KODg=;
+        b=n0ri6GuuRPbaGra3hsQb2Sl6zVFxnndY7NXm+jezsIjAi4V4h/jKv9xmJpQ6I7DZQK
+         ZHC18L/3KL9VZJgQ3UfNemR7n6cUs6mvd17BoYNecLqeWeUFjNKHeVSSnWB/YiUuAmgw
+         EZzXPq2St3RSIT9ak9KXc22WLER/LuPj8/mD4wpKl+sHPqCFajKOTaaYZTpJo23HlQ9r
+         vIyOhlHUtzqZ5aYIbnufJQVr/JrVrKAosPQSbKWl+zRzow3xjiz60kshBliNTxbaiC02
+         kGLQWcLi0+eGJMPrnpoZIvQsTgg/DupstjpIz9uiHIMA9zs39gjnzw9bvrcBWJV/32Xn
+         I6rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qs1N4izsogFrS0OZ7oEYOqsnkQJp8brscTXYKO0KODg=;
+        b=JmsfF9j3Qjud1bOZ6E72+8iU9mJ0y4Uro/awVUcmcgI/8colYG7848Yv+zVMD0xibb
+         wrsfPUGJuXiJpcnb4mTyFMxbp+uMc0fTab8hleyVuIMoNS008ch+IqFw7cHmzEZ7pWrX
+         pHxcRs/+IJ12PC5YLIPyFbjeNQ5YVKxYo+USmr/H2sfRsF8bRZguq8Z5SBdW2mJx8VVh
+         7i4CFjgBodAI8O54SRciLL11miBYkRu/hNWFZCQkuK4NREV5stAw/D5Vdm27kBZSQnAV
+         krGZhle9x5yDRJrSUym5Xfp6btLWj7EFywCZK6/8LafnVFiOwmjCUvFYReFXtvKAu4w0
+         8nNQ==
+X-Gm-Message-State: AOAM531aVloNV5EQcIrQOhI6K1yMm7pJxW15MV21JS6wgA1MX+lRiUfG
+        5Qf5mJfevZx2SWTy8A8tWYqqh5GFyl6INOwOQuFVVw==
+X-Google-Smtp-Source: ABdhPJymhdAfrmIP3RTOY2pkVWLq6TJ5BXlS/aT4ewlndrVWFaHL6w8GFbXgU4aDVUAXyxz4+oecu/U8A24wK/Ylz1Q=
+X-Received: by 2002:a05:6830:280e:b0:606:ae45:6110 with SMTP id
+ w14-20020a056830280e00b00606ae456110mr6973637otu.14.1653230839109; Sun, 22
+ May 2022 07:47:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220522094756.219881-1-yishaih@nvidia.com>
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220427200314.276673-1-mlevitsk@redhat.com> <20220427200314.276673-3-mlevitsk@redhat.com>
+ <YoZrG3n5fgMp4LQl@google.com> <e32f6c904c92e9e9efabcc697917a232f5e88881.camel@redhat.com>
+In-Reply-To: <e32f6c904c92e9e9efabcc697917a232f5e88881.camel@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Sun, 22 May 2022 07:47:07 -0700
+Message-ID: <CALMp9eSVji2CPW1AjFoSbWZ_b-r3y67HyatgdqXEqSyUaD1_BQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the guest
+ and/or host changes apic id/base from the defaults.
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yishai,
+On Sun, May 22, 2022 at 2:03 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>
+> On Thu, 2022-05-19 at 16:06 +0000, Sean Christopherson wrote:
+> > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
+> > > Neither of these settings should be changed by the guest and it is
+> > > a burden to support it in the acceleration code, so just inhibit
+> > > it instead.
+> > >
+> > > Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
+> > >
+> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > ---
+> > > +           return;
+> > > +
+> > > +   pr_warn_once("APIC ID change is unsupported by KVM");
+> >
+> > It's supported (modulo x2APIC shenanigans), otherwise KVM wouldn't need to disable
+> > APICv.
+>
+> Here, as I said, it would be nice to see that warning if someone complains.
+> Fact is that AVIC code was totally broken in this regard, and there are probably more,
+> so it would be nice to see if anybody complains.
+>
+> If you insist, I'll remove this warning.
 
-I love your patch! Yet something to improve:
+This may be fine for a hobbyist, but it's a terrible API in an
+enterprise environment. To be honest, I have no way of propagating
+this warning from /var/log/messages on a particular host to a
+potentially impacted customer. Worse, if they're not the first
+impacted customer since the last host reboot, there's no warning to
+propagate. I suppose I could just tell every later customer, "Your VM
+was scheduled to run on a host that previously reported, 'APIC ID
+change is unsupported by KVM.' If you notice any unusual behavior,
+that might be the reason for it," but that isn't going to inspire
+confidence. I could schedule a drain and reboot of the host, but that
+defeats the whole point of the "_once" suffix.
 
-[auto build test ERROR on awilliam-vfio/next]
-[cannot apply to v5.18-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+I know that there's a long history of doing this in KVM, but I'd like
+to ask that we:
+a) stop piling on
+b) start fixing the existing uses
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/vfio-Split-migration-ops-from-main-device-ops/20220522-174959
-base:   https://github.com/awilliam/linux-vfio.git next
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20220522/202205222209.5JkbCwDa-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/f9fa522b20c805dbbb0907b0f90b2b7f1d260218
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Yishai-Hadas/vfio-Split-migration-ops-from-main-device-ops/20220522-174959
-        git checkout f9fa522b20c805dbbb0907b0f90b2b7f1d260218
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash
+If KVM cannot emulate a perfectly valid operation, an exit to
+userspace with KVM_EXIT_INTERNAL_ERROR is warranted. Perhaps for
+operations that we suspect KVM might get wrong, we should have a new
+userspace exit: KVM_EXIT_WARNING?
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c: In function 'hisi_acc_vfio_pci_open_device':
->> drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1188:27: error: 'const struct vfio_device_ops' has no member named 'migration_set_state'
-    1188 |         if (core_vdev->ops->migration_set_state) {
-         |                           ^~
-   At top level:
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1201:13: warning: 'hisi_acc_vfio_pci_close_device' defined but not used [-Wunused-function]
-    1201 | static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1138:13: warning: 'hisi_acc_vfio_pci_ioctl' defined but not used [-Wunused-function]
-    1138 | static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
-         |             ^~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1124:16: warning: 'hisi_acc_vfio_pci_read' defined but not used [-Wunused-function]
-    1124 | static ssize_t hisi_acc_vfio_pci_read(struct vfio_device *core_vdev,
-         |                ^~~~~~~~~~~~~~~~~~~~~~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1110:16: warning: 'hisi_acc_vfio_pci_write' defined but not used [-Wunused-function]
-    1110 | static ssize_t hisi_acc_vfio_pci_write(struct vfio_device *core_vdev,
-         |                ^~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c:1086:12: warning: 'hisi_acc_vfio_pci_mmap' defined but not used [-Wunused-function]
-    1086 | static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
-         |            ^~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +1188 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-
-6abdce51af1a21 Shameer Kolothum 2022-03-08  1176  
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1177  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1178  {
-b0eed085903e77 Longfang Liu     2022-03-08  1179  	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(core_vdev,
-b0eed085903e77 Longfang Liu     2022-03-08  1180  			struct hisi_acc_vf_core_device, core_device.vdev);
-b0eed085903e77 Longfang Liu     2022-03-08  1181  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1182  	int ret;
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1183  
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1184  	ret = vfio_pci_core_enable(vdev);
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1185  	if (ret)
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1186  		return ret;
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1187  
-b0eed085903e77 Longfang Liu     2022-03-08 @1188  	if (core_vdev->ops->migration_set_state) {
-b0eed085903e77 Longfang Liu     2022-03-08  1189  		ret = hisi_acc_vf_qm_init(hisi_acc_vdev);
-b0eed085903e77 Longfang Liu     2022-03-08  1190  		if (ret) {
-b0eed085903e77 Longfang Liu     2022-03-08  1191  			vfio_pci_core_disable(vdev);
-b0eed085903e77 Longfang Liu     2022-03-08  1192  			return ret;
-b0eed085903e77 Longfang Liu     2022-03-08  1193  		}
-b0eed085903e77 Longfang Liu     2022-03-08  1194  		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-b0eed085903e77 Longfang Liu     2022-03-08  1195  	}
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1196  
-b0eed085903e77 Longfang Liu     2022-03-08  1197  	vfio_pci_core_finish_enable(vdev);
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1198  	return 0;
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1199  }
-ee3a5b2359e0e5 Shameer Kolothum 2022-03-08  1200  
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+I'm not saying that you should remove the warning. I'm just asking
+that it be augmented with a direct signal to userspace that KVM may no
+longer be reliable.
