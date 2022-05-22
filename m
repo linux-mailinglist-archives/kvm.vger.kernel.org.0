@@ -2,328 +2,353 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9BBC5301FB
-	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 11:03:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68D3E530228
+	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 11:48:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242671AbiEVJD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 May 2022 05:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54354 "EHLO
+        id S243043AbiEVJse (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 May 2022 05:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242536AbiEVJDY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 May 2022 05:03:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 891D11CB2B
-        for <kvm@vger.kernel.org>; Sun, 22 May 2022 02:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653210201;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iZk3PNgU+m5QGZbYbM3Q/AYoB1xcu8VqIfJcE4Df1D8=;
-        b=RACHC0nP6DPi3/uyZgDoCdVipe1XEQ/ClFRxrYiRl1+N4BcoUmDdLSyypeudkzVMkB307c
-        smhqF+KEjtUo0leyUKNkquQBnoeKzv8RqX9ku3lj53kjvoLPBFop/Kg8U3U9qd5XuJqMdV
-        mFuiQhesixax4tZ1QDSZglW2nlL+Qlk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-619-lDNHqC-NPg6GqFVGjvEqjQ-1; Sun, 22 May 2022 05:03:18 -0400
-X-MC-Unique: lDNHqC-NPg6GqFVGjvEqjQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 29ECD811E7A;
-        Sun, 22 May 2022 09:03:17 +0000 (UTC)
-Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97593492C14;
-        Sun, 22 May 2022 09:03:11 +0000 (UTC)
-Message-ID: <e32f6c904c92e9e9efabcc697917a232f5e88881.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the
- guest and/or host changes apic id/base from the defaults.
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Date:   Sun, 22 May 2022 12:03:10 +0300
-In-Reply-To: <YoZrG3n5fgMp4LQl@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-3-mlevitsk@redhat.com> <YoZrG3n5fgMp4LQl@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S239763AbiEVJsd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 May 2022 05:48:33 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2049.outbound.protection.outlook.com [40.107.223.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA0783982B
+        for <kvm@vger.kernel.org>; Sun, 22 May 2022 02:48:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lCHpElw0tuEMaAPsioRyzFl/b6Wi4cTuUF8SYIVqbUBq6vWpWwUqgjpEKw6cYo2tmhEo8XUl3gk6HtCPIZW6OsqLlxDtL6N5h8X36EcYvwcNSBcn6nXi5w1n+JAe7ZiBwvHxTmIukiS4vGQQcnEVyKckyHGbO2xm0uqaqU2/1vo9L4qIpaYzY/mauMSYf+gCVoLmDtU8Q9XnTIIRC3PY6u0BSbznVjNtOW3hHcE4VTTJFQQmEcQzKh5x0/OMzFdb62w8OlYw/JWHXM9Rqc6/G/+bkNwrXmks17UPfXhmqqxPzUaRM4eLJtHqN58wIqSgoyPXC4PV8JMarfq9MB5wMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xckL2O8fVGz420TRn3RphWjYE45+NNqHWOFO0nAy6Rg=;
+ b=ZAl5f32QYK43zBB2TOxVpznKkS1OcPexitpHdd2K3wDx2InMm0vZmd+/P83VLvcPEkfhxhbOx0HUpdvzsgxB15YZkvYwFLiMVPFYbPpeHTNGEqYImMdc9nomrZ7dkyJxB4WhN44PzvKHPb4kFAOi7Iu4DG/+cR/7WfmElHBi57Q0aYnaekXVlTjT9TpLhZ95BHbkRQ+zkO6KHgtGG9oI7h+Ue6dBOJXqzkias7Djamp1g6P+nJr4q8ZVdubjx5zLNwjRsp2dUBeslgFU6e7LWcKlLZXfkImixKmVP8MRa2JWspDKHsmu8GCw1eOcm/7C3TqTWTpE+mYa6rmP/XKH+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.235) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
+ (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xckL2O8fVGz420TRn3RphWjYE45+NNqHWOFO0nAy6Rg=;
+ b=emNCxdZxCC0NHDWs9l5Qg6tyHL2gChijnlx3VIJpeuFpKYoOAMWwjTHcV09TCfHtO7cy+oZcU+KWPzf4DDDmH5wb2+mQNzhfOrwjnAffSNQS1tX/3aLyXybx74vEvI1jsIXZUWmpY8V6xQHlKMTsHALvfMeI78pPxmFbLn4rziWXxthnV55vrjH596NWuB/2Zu66uOgV5IWYkl1g+Qg0G+5oyHUY1wpv51tR5eorHoWidalJ25KslOeT19MVlWi53Uw2eETYfu55y+vGq884QrOy79TyKtSGyBFWkvv+COaPVxBo0uWA+S/oPi413mHRuhuIdGkRnOlq1r8rA7+pBA==
+Received: from MW4PR04CA0211.namprd04.prod.outlook.com (2603:10b6:303:87::6)
+ by BYAPR12MB4741.namprd12.prod.outlook.com (2603:10b6:a03:a2::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.16; Sun, 22 May
+ 2022 09:48:28 +0000
+Received: from CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:87:cafe::47) by MW4PR04CA0211.outlook.office365.com
+ (2603:10b6:303:87::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.15 via Frontend
+ Transport; Sun, 22 May 2022 09:48:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.235) by
+ CO1NAM11FT005.mail.protection.outlook.com (10.13.174.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5273.14 via Frontend Transport; Sun, 22 May 2022 09:48:27 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Sun, 22 May
+ 2022 09:48:27 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Sun, 22 May
+ 2022 02:48:26 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.986.22 via Frontend Transport; Sun, 22 May
+ 2022 02:48:21 -0700
+From:   Yishai Hadas <yishaih@nvidia.com>
+To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kvm@vger.kernel.org>
+CC:     <yishaih@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>,
+        <kevin.tian@intel.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <liulongfang@huawei.com>
+Subject: [PATCH] vfio: Split migration ops from main device ops
+Date:   Sun, 22 May 2022 12:47:56 +0300
+Message-ID: <20220522094756.219881-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 16992858-c5b1-4a14-cdb9-08da3bd838eb
+X-MS-TrafficTypeDiagnostic: BYAPR12MB4741:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB4741BB3A171DE47C1784095DC3D59@BYAPR12MB4741.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pzr9hhq7sFeCVa230mWhbkSVi5NJXOpIS0wTJ1ppppd5w2AvY+vtFmvWlgHeBaJJdBuT8zj5KGOmWyN2tlRMOkHsIlVUF8EQnBD6rlUQmrJu4C2oCLqvJ/G1zC+EV+aEN+c1aXAvIMx2gqF3hYGwZU+fQY7tEsxXxjCcp7MHloahtqXuk+jSNzoiPSMz7ttmXhoRy29RM0iv+MBxPKZ35iM5OdcQmJHNvZZPf+R4BkJAyzNbc8sWNUayW3HxhG7uLMTbYT8IYUQyDHlje3L/SOHVBBw7MzmBmlajKiJ4MGlpoBRFwsbRiX6Eua3EkYFa9JkR0pYQbpp4wjb3Udc4KM3Z0Fh39Ff2vQv1HNxVZzzq2pfWHGZkmdYRoRjmRSFYaw1uH8w3ngdGO6PGp1mZ4DohcKeNXvdYg6NAuZDh3y4aLdqEyJX8DwkW3UmsJu18Kzx3jhkDZazvzzD6LawOHOwYc9SVoaxL2JxritC1t2X4DA0tGBRLPywGSAE3yvBEB8qf4Vi2qAKO0iIJu1aVh1D5JgHYoBYdoeO+Rn4Fy94iXqwNZCyuyDJzUS6H8WwHPaFCpX/JMc6cOmLPxJSFEq9Am/fhfIyU2JfQwPY6lr+tNupUNVf3cv36thPEU30gk0wHEpfAmLt2M4fXrm9G0dga4jQojHyoHDJBPvBwHjl8kAWX94rFzOuufcwZMvERnjH4cVj3M+/wiC6t9hPjRA==
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(7696005)(6666004)(1076003)(36756003)(426003)(83380400001)(82310400005)(2616005)(47076005)(508600001)(26005)(36860700001)(2906002)(356005)(81166007)(8936002)(40460700003)(4326008)(5660300002)(110136005)(186003)(336012)(70206006)(70586007)(316002)(8676002)(86362001)(54906003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2022 09:48:27.8892
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 16992858-c5b1-4a14-cdb9-08da3bd838eb
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4741
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-05-19 at 16:06 +0000, Sean Christopherson wrote:
-> On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> > Neither of these settings should be changed by the guest and it is
-> > a burden to support it in the acceleration code, so just inhibit
-> > it instead.
-> > 
-> > Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  3 +++
-> >  arch/x86/kvm/lapic.c            | 25 ++++++++++++++++++++++---
-> >  arch/x86/kvm/lapic.h            |  8 ++++++++
-> >  3 files changed, 33 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 63eae00625bda..636df87542555 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1070,6 +1070,8 @@ enum kvm_apicv_inhibit {
-> >  	APICV_INHIBIT_REASON_ABSENT,
-> >  	/* AVIC is disabled because SEV doesn't support it */
-> >  	APICV_INHIBIT_REASON_SEV,
-> > +	/* APIC ID and/or APIC base was changed by the guest */
-> 
-> I don't see any reason to inhibit APICv if the APIC base is changed.  KVM has
-> never supported that, and disabling APICv won't "fix" anything.
+vfio core checks whether the driver sets some migration op (e.g.
+set_state/get_state) and accordingly calls its op.
 
-I kind of tacked the APIC base on the thing just to be a good citezen.
+However, currently mlx5 driver sets the above ops without regards to its
+migration caps.
 
-In theory currently if the guest changes the APIC base, neither APICv
-nor AVIC will even notice, so the guest will still be able to access the
-default APIC base and the new APIC base, which is kind of wrong.
+This might lead to unexpected usage/Oops if user space may call to the
+above ops even if the driver doesn't support migration. As for example,
+the migration state_mutex is not initialized in that case.
 
-Inhibiting APICv/AVIC in this case makes it better and it is very cheap to do.
+The cleanest way to manage that seems to split the migration ops from
+the main device ops, this will let the driver setting them separately
+from the main ops when it's applicable.
 
-If you still think that it shouln't be done, I'll remove it.
+As part of that, cleaned-up HISI driver to match this scheme.
 
+This scheme may enable down the road to come with some extra group of
+ops (e.g. DMA log) that can be set without regards to the other options
+based on driver caps.
 
-> 
-> Ignoring that is a minor simplification, but also allows for a more intuitive
-> name, e.g.
-> 
-> 	APICV_INHIBIT_REASON_APIC_ID_MODIFIED,
-> 
-> The inhibit also needs to be added avic_check_apicv_inhibit_reasons() and
-> vmx_check_apicv_inhibit_reasons().
-> 
-> > +	APICV_INHIBIT_REASON_RO_SETTINGS,
+Fixes: 6fadb021266d ("vfio/mlx5: Implement vfio_pci driver for mlx5 devices")
+Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+---
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 27 +++++--------------
+ drivers/vfio/pci/mlx5/cmd.c                   |  4 ++-
+ drivers/vfio/pci/mlx5/cmd.h                   |  3 ++-
+ drivers/vfio/pci/mlx5/main.c                  |  9 ++++---
+ drivers/vfio/vfio.c                           | 13 ++++-----
+ include/linux/vfio.h                          | 26 +++++++++++-------
+ 6 files changed, 40 insertions(+), 42 deletions(-)
 
-> >  };
-> >  
-> >  struct kvm_arch {
-> > @@ -1258,6 +1260,7 @@ struct kvm_arch {
-> >  	hpa_t	hv_root_tdp;
-> >  	spinlock_t hv_root_tdp_lock;
-> >  #endif
-> > +	bool apic_id_changed;
-> >  };
-> >  
-> >  struct kvm_vm_stat {
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 66b0eb0bda94e..8996675b3ef4c 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2038,6 +2038,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
-> >  	}
-> >  }
-> >  
-> > +static void kvm_lapic_check_initial_apic_id(struct kvm_lapic *apic)
-> 
-> The "check" part is misleading/confusing.  "check" helpers usually query and return
-> state.  I assume you avoided "changed" because the ID may or may not actually be
-> changing.  Maybe kvm_apic_id_updated()?  Ah, better idea.  What about
-> kvm_lapic_xapic_id_updated()?  See below for reasoning.
-
-This is a very good idea!
-
-> 
-> > +{
-> > +	if (kvm_apic_has_initial_apic_id(apic))
-> 
-> Rather than add a single-use helper, invoke the helper from kvm_apic_state_fixup()
-> in the !x2APIC path, then this can KVM_BUG_ON() x2APIC to help document that KVM
-> should never allow the ID to change for x2APIC.
-
-yes, but we do allow non default x2apic id via userspace api - I wasn't able to convience
-you to remove this :)
-
-> 
-> > +		return;
-> > +
-> > +	pr_warn_once("APIC ID change is unsupported by KVM");
-> 
-> It's supported (modulo x2APIC shenanigans), otherwise KVM wouldn't need to disable
-> APICv.
-
-Here, as I said, it would be nice to see that warning if someone complains.
-Fact is that AVIC code was totally broken in this regard, and there are probably more,
-so it would be nice to see if anybody complains.
-
-If you insist, I'll remove this warning.
-
-> 
-> > +	kvm_set_apicv_inhibit(apic->vcpu->kvm,
-> > +			APICV_INHIBIT_REASON_RO_SETTINGS);
-> > +
-> > +	apic->vcpu->kvm->arch.apic_id_changed = true;
-> > +}
-> > +
-> >  static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >  {
-> >  	int ret = 0;
-> > @@ -2046,9 +2059,11 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >  
-> >  	switch (reg) {
-> >  	case APIC_ID:		/* Local APIC ID */
-> > -		if (!apic_x2apic_mode(apic))
-> > +		if (!apic_x2apic_mode(apic)) {
-> > +
-> 
-> Spurious newline.
-Will fix.
-> 
-> >  			kvm_apic_set_xapic_id(apic, val >> 24);
-> > -		else
-> > +			kvm_lapic_check_initial_apic_id(apic);
-> > +		} else
-> 
-> Needs curly braces for both paths.
-Will fix.
-> 
-> >  			ret = 1;
-> >  		break;
-> >  
-> 
-> E.g.
-> 
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/lapic.c            | 21 +++++++++++++++++++--
->  arch/x86/kvm/svm/avic.c         |  3 ++-
->  arch/x86/kvm/vmx/vmx.c          |  3 ++-
->  4 files changed, 24 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d895d25c5b2f..d888fa1bae77 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1071,6 +1071,7 @@ enum kvm_apicv_inhibit {
->  	APICV_INHIBIT_REASON_BLOCKIRQ,
->  	APICV_INHIBIT_REASON_ABSENT,
->  	APICV_INHIBIT_REASON_SEV,
-> +	APICV_INHIBIT_REASON_APIC_ID_MODIFIED,
->  };
-> 
->  struct kvm_arch {
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 5fd678c90288..6fe8f20f03d8 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2039,6 +2039,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
->  	}
->  }
-> 
-> +static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
-> +{
-> +	struct kvm *kvm = apic->vcpu->kvm;
-> +
-> +	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
-> +		return;
-> +
-> +	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
-> +		return;
-> +
-> +	kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
-> +}
-> +
->  static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->  {
->  	int ret = 0;
-> @@ -2047,10 +2060,12 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> 
->  	switch (reg) {
->  	case APIC_ID:		/* Local APIC ID */
-> -		if (!apic_x2apic_mode(apic))
-> +		if (!apic_x2apic_mode(apic)) {
->  			kvm_apic_set_xapic_id(apic, val >> 24);
-> -		else
-> +			kvm_lapic_xapic_id_updated(apic);
-> +		} else {
->  			ret = 1;
-> +		}
->  		break;
-> 
->  	case APIC_TASKPRI:
-> @@ -2665,6 +2680,8 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
->  			icr = __kvm_lapic_get_reg64(s->regs, APIC_ICR);
->  			__kvm_lapic_set_reg(s->regs, APIC_ICR2, icr >> 32);
->  		}
-> +	} else {
-> +		kvm_lapic_xapic_id_updated(vcpu->arch.apic);
->  	}
-> 
->  	return 0;
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 54fe03714f8a..239c3e8b1f3f 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -910,7 +910,8 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
->  			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
->  			  BIT(APICV_INHIBIT_REASON_X2APIC) |
->  			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
-> -			  BIT(APICV_INHIBIT_REASON_SEV);
-> +			  BIT(APICV_INHIBIT_REASON_SEV) |
-> +			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
-> 
->  	return supported & BIT(reason);
->  }
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index b06eafa5884d..941adade21ea 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7818,7 +7818,8 @@ static bool vmx_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
->  	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
->  			  BIT(APICV_INHIBIT_REASON_ABSENT) |
->  			  BIT(APICV_INHIBIT_REASON_HYPERV) |
-> -			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
-> +			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
-> +			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
-> 
->  	return supported & BIT(reason);
->  }
-> 
-> base-commit: 6ab6e3842d18e4529fa524fb6c668ae8a8bf54f4
-
-
-
-Best regards,
-	Thanks for the review,
-		Maxim Levitsky
-> --
-> 
-
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index e92376837b29..cfe9c8925d68 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -1208,17 +1208,7 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+ 	vfio_pci_core_close_device(core_vdev);
+ }
+ 
+-static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
+-	.name = "hisi-acc-vfio-pci-migration",
+-	.open_device = hisi_acc_vfio_pci_open_device,
+-	.close_device = hisi_acc_vfio_pci_close_device,
+-	.ioctl = hisi_acc_vfio_pci_ioctl,
+-	.device_feature = vfio_pci_core_ioctl_feature,
+-	.read = hisi_acc_vfio_pci_read,
+-	.write = hisi_acc_vfio_pci_write,
+-	.mmap = hisi_acc_vfio_pci_mmap,
+-	.request = vfio_pci_core_request,
+-	.match = vfio_pci_core_match,
++static const struct vfio_migration_ops hisi_acc_vfio_pci_migrn_ops = {
+ 	.migration_set_state = hisi_acc_vfio_pci_set_device_state,
+ 	.migration_get_state = hisi_acc_vfio_pci_get_device_state,
+ };
+@@ -1266,20 +1256,15 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
+ 	if (!hisi_acc_vdev)
+ 		return -ENOMEM;
+ 
++	vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
++				  &hisi_acc_vfio_pci_ops);
+ 	pf_qm = hisi_acc_get_pf_qm(pdev);
+ 	if (pf_qm && pf_qm->ver >= QM_HW_V3) {
+ 		ret = hisi_acc_vfio_pci_migrn_init(hisi_acc_vdev, pdev, pf_qm);
+-		if (!ret) {
+-			vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
+-						  &hisi_acc_vfio_pci_migrn_ops);
+-		} else {
++		if (!ret)
++			hisi_acc_vdev->core_device.vdev.mig_ops = &hisi_acc_vfio_pci_migrn_ops;
++		else
+ 			pci_warn(pdev, "migration support failed, continue with generic interface\n");
+-			vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
+-						  &hisi_acc_vfio_pci_ops);
+-		}
+-	} else {
+-		vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
+-					  &hisi_acc_vfio_pci_ops);
+ 	}
+ 
+ 	dev_set_drvdata(&pdev->dev, &hisi_acc_vdev->core_device);
+diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
+index 9b9f33ca270a..334806c024b1 100644
+--- a/drivers/vfio/pci/mlx5/cmd.c
++++ b/drivers/vfio/pci/mlx5/cmd.c
+@@ -98,7 +98,8 @@ void mlx5vf_cmd_remove_migratable(struct mlx5vf_pci_core_device *mvdev)
+ 	destroy_workqueue(mvdev->cb_wq);
+ }
+ 
+-void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev)
++void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
++			       const struct vfio_migration_ops *mig_ops)
+ {
+ 	struct pci_dev *pdev = mvdev->core_device.pdev;
+ 	int ret;
+@@ -139,6 +140,7 @@ void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev)
+ 	mvdev->core_device.vdev.migration_flags =
+ 		VFIO_MIGRATION_STOP_COPY |
+ 		VFIO_MIGRATION_P2P;
++	mvdev->core_device.vdev.mig_ops = mig_ops;
+ 
+ end:
+ 	mlx5_vf_put_core_dev(mvdev->mdev);
+diff --git a/drivers/vfio/pci/mlx5/cmd.h b/drivers/vfio/pci/mlx5/cmd.h
+index 6c3112fdd8b1..7b9e3d56158e 100644
+--- a/drivers/vfio/pci/mlx5/cmd.h
++++ b/drivers/vfio/pci/mlx5/cmd.h
+@@ -62,7 +62,8 @@ int mlx5vf_cmd_suspend_vhca(struct mlx5vf_pci_core_device *mvdev, u16 op_mod);
+ int mlx5vf_cmd_resume_vhca(struct mlx5vf_pci_core_device *mvdev, u16 op_mod);
+ int mlx5vf_cmd_query_vhca_migration_state(struct mlx5vf_pci_core_device *mvdev,
+ 					  size_t *state_size);
+-void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev);
++void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
++			       const struct vfio_migration_ops *mig_ops);
+ void mlx5vf_cmd_remove_migratable(struct mlx5vf_pci_core_device *mvdev);
+ int mlx5vf_cmd_save_vhca_state(struct mlx5vf_pci_core_device *mvdev,
+ 			       struct mlx5_vf_migration_file *migf);
+diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+index dd1009b5ff9c..73998e4778c8 100644
+--- a/drivers/vfio/pci/mlx5/main.c
++++ b/drivers/vfio/pci/mlx5/main.c
+@@ -574,6 +574,11 @@ static void mlx5vf_pci_close_device(struct vfio_device *core_vdev)
+ 	vfio_pci_core_close_device(core_vdev);
+ }
+ 
++static const struct vfio_migration_ops mlx5vf_pci_mig_ops = {
++	.migration_set_state = mlx5vf_pci_set_device_state,
++	.migration_get_state = mlx5vf_pci_get_device_state,
++};
++
+ static const struct vfio_device_ops mlx5vf_pci_ops = {
+ 	.name = "mlx5-vfio-pci",
+ 	.open_device = mlx5vf_pci_open_device,
+@@ -585,8 +590,6 @@ static const struct vfio_device_ops mlx5vf_pci_ops = {
+ 	.mmap = vfio_pci_core_mmap,
+ 	.request = vfio_pci_core_request,
+ 	.match = vfio_pci_core_match,
+-	.migration_set_state = mlx5vf_pci_set_device_state,
+-	.migration_get_state = mlx5vf_pci_get_device_state,
+ };
+ 
+ static int mlx5vf_pci_probe(struct pci_dev *pdev,
+@@ -599,7 +602,7 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
+ 	if (!mvdev)
+ 		return -ENOMEM;
+ 	vfio_pci_core_init_device(&mvdev->core_device, pdev, &mlx5vf_pci_ops);
+-	mlx5vf_cmd_set_migratable(mvdev);
++	mlx5vf_cmd_set_migratable(mvdev, &mlx5vf_pci_mig_ops);
+ 	dev_set_drvdata(&pdev->dev, &mvdev->core_device);
+ 	ret = vfio_pci_core_register_device(&mvdev->core_device);
+ 	if (ret)
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index cfcff7764403..5bc678547f1f 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1510,8 +1510,8 @@ vfio_ioctl_device_feature_mig_device_state(struct vfio_device *device,
+ 	struct file *filp = NULL;
+ 	int ret;
+ 
+-	if (!device->ops->migration_set_state ||
+-	    !device->ops->migration_get_state)
++	if (!device->mig_ops->migration_set_state ||
++	    !device->mig_ops->migration_get_state)
+ 		return -ENOTTY;
+ 
+ 	ret = vfio_check_feature(flags, argsz,
+@@ -1527,7 +1527,8 @@ vfio_ioctl_device_feature_mig_device_state(struct vfio_device *device,
+ 	if (flags & VFIO_DEVICE_FEATURE_GET) {
+ 		enum vfio_device_mig_state curr_state;
+ 
+-		ret = device->ops->migration_get_state(device, &curr_state);
++		ret = device->mig_ops->migration_get_state(device,
++							   &curr_state);
+ 		if (ret)
+ 			return ret;
+ 		mig.device_state = curr_state;
+@@ -1535,7 +1536,7 @@ vfio_ioctl_device_feature_mig_device_state(struct vfio_device *device,
+ 	}
+ 
+ 	/* Handle the VFIO_DEVICE_FEATURE_SET */
+-	filp = device->ops->migration_set_state(device, mig.device_state);
++	filp = device->mig_ops->migration_set_state(device, mig.device_state);
+ 	if (IS_ERR(filp) || !filp)
+ 		goto out_copy;
+ 
+@@ -1558,8 +1559,8 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
+ 	};
+ 	int ret;
+ 
+-	if (!device->ops->migration_set_state ||
+-	    !device->ops->migration_get_state)
++	if (!device->mig_ops->migration_set_state ||
++	    !device->mig_ops->migration_get_state)
+ 		return -ENOTTY;
+ 
+ 	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 45b287826ce6..1a1f61803742 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -32,6 +32,7 @@ struct vfio_device_set {
+ struct vfio_device {
+ 	struct device *dev;
+ 	const struct vfio_device_ops *ops;
++	const struct vfio_migration_ops *mig_ops;
+ 	struct vfio_group *group;
+ 	struct vfio_device_set *dev_set;
+ 	struct list_head dev_set_list;
+@@ -59,16 +60,6 @@ struct vfio_device {
+  *         match, -errno for abort (ex. match with insufficient or incorrect
+  *         additional args)
+  * @device_feature: Optional, fill in the VFIO_DEVICE_FEATURE ioctl
+- * @migration_set_state: Optional callback to change the migration state for
+- *         devices that support migration. It's mandatory for
+- *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
+- *         The returned FD is used for data transfer according to the FSM
+- *         definition. The driver is responsible to ensure that FD reaches end
+- *         of stream or error whenever the migration FSM leaves a data transfer
+- *         state or before close_device() returns.
+- * @migration_get_state: Optional callback to get the migration state for
+- *         devices that support migration. It's mandatory for
+- *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
+  */
+ struct vfio_device_ops {
+ 	char	*name;
+@@ -85,6 +76,21 @@ struct vfio_device_ops {
+ 	int	(*match)(struct vfio_device *vdev, char *buf);
+ 	int	(*device_feature)(struct vfio_device *device, u32 flags,
+ 				  void __user *arg, size_t argsz);
++};
++
++/**
++ * @migration_set_state: Optional callback to change the migration state for
++ *         devices that support migration. It's mandatory for
++ *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
++ *         The returned FD is used for data transfer according to the FSM
++ *         definition. The driver is responsible to ensure that FD reaches end
++ *         of stream or error whenever the migration FSM leaves a data transfer
++ *         state or before close_device() returns.
++ * @migration_get_state: Optional callback to get the migration state for
++ *         devices that support migration. It's mandatory for
++ *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
++ */
++struct vfio_migration_ops {
+ 	struct file *(*migration_set_state)(
+ 		struct vfio_device *device,
+ 		enum vfio_device_mig_state new_state);
+-- 
+2.18.1
 
