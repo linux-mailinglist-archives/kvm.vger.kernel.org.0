@@ -2,44 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF66753025B
-	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 12:22:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFC4653025E
+	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 12:22:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243714AbiEVKWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 May 2022 06:22:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
+        id S243913AbiEVKWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 May 2022 06:22:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243752AbiEVKWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 May 2022 06:22:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3AAFB36B7B
-        for <kvm@vger.kernel.org>; Sun, 22 May 2022 03:22:14 -0700 (PDT)
+        with ESMTP id S244018AbiEVKWa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 May 2022 06:22:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A79837000
+        for <kvm@vger.kernel.org>; Sun, 22 May 2022 03:22:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653214934;
+        s=mimecast20190719; t=1653214947;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b/PRTGgzJSajLmASm1ImWykhYRAoLKce07yOgwd/E/o=;
-        b=bxD9S+8Ur6WXZDt6qo+yC/YTL7TnYDBoxjvy79aXi9BYsA1PsXp9Li9ylCb23WEJKW57pe
-        F7wCMkA0U8Sl681VDlC4joHIitUKpOoOZDX+Dh4U2pWq5c/TJV+P1jtTN1NZG6hIpsSSg6
-        v6sHkeMq7y52ryZ9Xm3/yTXFxmp2mUA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=MgC5JNYrsgqgs2qTUiLYfjxLufYrNUR4cj0BHzuGBF0=;
+        b=NO/wVBfoEq/wzcGI612y3hJmdg8hcWaAvcMEimVinsezXr0nAGM2TSu0DUOMpmM/hIdUbg
+        JH62sp0WTi01lDE181s1RqBOsWnk1ixHyH9S+fAIj2SODv4XZ67JRTtVQ3YT00mzAbmjMy
+        yBtIB+vBJQU2X1KphkDsI0ZFjzrF81I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-292-78527TvaMxCx363TuhOEMA-1; Sun, 22 May 2022 06:22:13 -0400
-X-MC-Unique: 78527TvaMxCx363TuhOEMA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-655-UAk-XDoQNkam0zGc1orlpg-1; Sun, 22 May 2022 06:22:22 -0400
+X-MC-Unique: UAk-XDoQNkam0zGc1orlpg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0ADC71C05AEF;
-        Sun, 22 May 2022 10:22:12 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9CE8C185A79C;
+        Sun, 22 May 2022 10:22:21 +0000 (UTC)
 Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7845340CFD00;
-        Sun, 22 May 2022 10:22:06 +0000 (UTC)
-Message-ID: <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 04/19] KVM: x86: mmu: allow to enable write
- tracking externally
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12FEE7C2A;
+        Sun, 22 May 2022 10:22:15 +0000 (UTC)
+Message-ID: <71290b6ab1a269b518214721fd233b03440ff636.camel@redhat.com>
+Subject: Re: [RFC PATCH v3 06/19] KVM: x86: mmu: add gfn_in_memslot helper
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
@@ -63,18 +62,18 @@ Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
         intel-gvt-dev@lists.freedesktop.org,
         dri-devel@lists.freedesktop.org
-Date:   Sun, 22 May 2022 13:22:05 +0300
-In-Reply-To: <YoZyWOh4NPA0uN5J@google.com>
+Date:   Sun, 22 May 2022 13:22:14 +0300
+In-Reply-To: <YoZzx6f1XBWL3i8F@google.com>
 References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-5-mlevitsk@redhat.com> <YoZyWOh4NPA0uN5J@google.com>
+         <20220427200314.276673-7-mlevitsk@redhat.com> <YoZzx6f1XBWL3i8F@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,34 +81,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-05-19 at 16:37 +0000, Sean Christopherson wrote:
+On Thu, 2022-05-19 at 16:43 +0000, Sean Christopherson wrote:
 > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> > @@ -5753,6 +5752,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
-> >  	node->track_write = kvm_mmu_pte_write;
-> >  	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
-> >  	kvm_page_track_register_notifier(kvm, node);
+> > This is a tiny refactoring, and can be useful to check
+> > if a GPA/GFN is within a memslot a bit more cleanly.
 > 
-> Can you add a patch to move this call to kvm_page_track_register_notifier() into
-> mmu_enable_write_tracking(), and simultaneously add a WARN in the register path
-> that page tracking is enabled?
+> This doesn't explain the actual motivation, which is to use the new helper from
+> arch code.
+I'll add this in the next version
 > 
-> Oh, actually, a better idea. Add an inner __kvm_page_track_register_notifier()
-> that is not exported and thus used only by KVM, invoke mmu_enable_write_tracking()
-> from the exported kvm_page_track_register_notifier(), and then do the above.
-> That will require modifying KVMGT and KVM in a single patch, but that's ok.
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  include/linux/kvm_host.h | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 252ee4a61b58b..12e261559070b 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1580,6 +1580,13 @@ int kvm_request_irq_source_id(struct kvm *kvm);
+> >  void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
+> >  bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+> >  
+> > +
+> > +static inline bool gfn_in_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+> > +{
+> > +	return (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages);
+> > +}
+> > +
 > 
-> That will avoid any possibility of an external user failing to enabling tracking
-> before registering its notifier, and also avoids bikeshedding over what to do with
-> the one-line wrapper to enable tracking.
+> Spurious newline.
 > 
+> > +
+> >  /*
+> >   * Returns a pointer to the memslot if it contains gfn.
+> >   * Otherwise returns NULL.
+> > @@ -1590,12 +1597,13 @@ try_get_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+> >  	if (!slot)
+> >  		return NULL;
+> >  
+> > -	if (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages)
+> > +	if (gfn_in_memslot(slot, gfn))
+> >  		return slot;
+> >  	else
+> >  		return NULL;
+> 
+> At this point, maybe:
 
-This is a good idea as well, especially looking at kvmgt and seeing that
-it registers the page track notifier, when the vGPU is opened.
+No objections.
 
-I'll do this in the next series.
-
-Thanks for the review!
+Thanks for the review.
 
 Best regards,
 	Maxim Levitsky
+
+> 
+> 	if (!slot || !gfn_in_memslot(slot, gfn))
+> 		return NULL;
+> 
+> 	return slot;
+> 
+> >  }
+> >  
+> > +
+> >  /*
+> >   * Returns a pointer to the memslot that contains gfn. Otherwise returns NULL.
+> >   *
+> > -- 
+> > 2.26.3
+> > 
+
 
