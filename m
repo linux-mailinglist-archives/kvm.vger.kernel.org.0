@@ -2,92 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D7D653024A
-	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 12:09:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C39E5302F6
+	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 14:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242884AbiEVKI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 May 2022 06:08:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37902 "EHLO
+        id S245270AbiEVMNR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 May 2022 08:13:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230244AbiEVKIz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 May 2022 06:08:55 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063683EB86;
-        Sun, 22 May 2022 03:08:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653214135; x=1684750135;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+ldVfAkI63e7T9H9+Tu6rkR3XDiV/+stA3qHNtz8ShU=;
-  b=fqMcbs48cA3u/tkSq0h0hOc/tsat7AIBWsHThBL2I3/Mte54HeMaXpXe
-   K+ovU99hntEQEHj50yvPvfSryz40huKAtsNRrSlbyT4HkfP3w1PLVpmTu
-   8FDIFop5Bltlh9FI2lSRA9djUsfzq7K3W2QfLrZNQRzUEZe5Uygm+W+P0
-   9IqRpo6uPsvSM+fcr5opM8HtiMD9XVknclTxM7/zDyyqFbgyC3elICCFZ
-   wjxLx59jCQKtaQw1bndoDnQsXqB6gbv/NBnsMe95aplRu6JL3U/yhCumX
-   EFzbb+B/yyzfZV8JiVzmqGiH4BOMSeHb6Z7zvNpJpPecfg1Cf+/58R6bh
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10354"; a="272956338"
-X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
-   d="scan'208";a="272956338"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2022 03:08:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
-   d="scan'208";a="628872786"
-Received: from q.bj.intel.com ([10.238.154.102])
-  by fmsmga008.fm.intel.com with ESMTP; 22 May 2022 03:08:50 -0700
-From:   shaoqin.huang@intel.com
-To:     pbonzini@redhat.com
-Cc:     Shaoqin Huang <shaoqin.huang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S235275AbiEVMNN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 May 2022 08:13:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F4BD38DBA
+        for <kvm@vger.kernel.org>; Sun, 22 May 2022 05:13:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653221591;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MgC5JNYrsgqgs2qTUiLYfjxLufYrNUR4cj0BHzuGBF0=;
+        b=SVZ+lwn0wz92NhbVqQjWcZtXUD+/dIvq6npk8kQ44DM2uh6UW8L+j/urnMCGLloKBoZVQQ
+        WcB3uIF1t08gfEBTpdclQAkMDAf2fu1TUqe6vlCukDkh1IEtJ78ZK4BPveMvq4B2SmVeFB
+        5s4sukDxazeE6KhmZ1DM655akyH1aDE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-381-iLoXoZYkOo6_1bgTYeSohw-1; Sun, 22 May 2022 08:13:05 -0400
+X-MC-Unique: iLoXoZYkOo6_1bgTYeSohw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6A6EF801210;
+        Sun, 22 May 2022 12:13:04 +0000 (UTC)
+Received: from starship (unknown [10.40.192.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F17F40D2821;
+        Sun, 22 May 2022 12:12:57 +0000 (UTC)
+Message-ID: <f7ef15598cf350f8c5ec8d58c8e2eb51b48c48df.camel@redhat.com>
+Subject: Re: [RFC PATCH v3 06/19] KVM: x86: mmu: add gfn_in_memslot helper
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Airlie <airlied@linux.ie>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/mmu: Check every prev_roots in __kvm_mmu_free_obsolete_roots()
-Date:   Sun, 22 May 2022 19:09:48 -0600
-Message-Id: <20220523010948.2018342-1-shaoqin.huang@intel.com>
-X-Mailer: git-send-email 2.30.2
+        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org
+Date:   Sun, 22 May 2022 15:12:56 +0300
+In-Reply-To: <YoZzx6f1XBWL3i8F@google.com>
+References: <20220427200314.276673-1-mlevitsk@redhat.com>
+         <20220427200314.276673-7-mlevitsk@redhat.com> <YoZzx6f1XBWL3i8F@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_12_24,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Shaoqin Huang <shaoqin.huang@intel.com>
+On Thu, 2022-05-19 at 16:43 +0000, Sean Christopherson wrote:
+> On Wed, Apr 27, 2022, Maxim Levitsky wrote:
+> > This is a tiny refactoring, and can be useful to check
+> > if a GPA/GFN is within a memslot a bit more cleanly.
+> 
+> This doesn't explain the actual motivation, which is to use the new helper from
+> arch code.
+I'll add this in the next version
+> 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  include/linux/kvm_host.h | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 252ee4a61b58b..12e261559070b 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1580,6 +1580,13 @@ int kvm_request_irq_source_id(struct kvm *kvm);
+> >  void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
+> >  bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+> >  
+> > +
+> > +static inline bool gfn_in_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+> > +{
+> > +	return (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages);
+> > +}
+> > +
+> 
+> Spurious newline.
+> 
+> > +
+> >  /*
+> >   * Returns a pointer to the memslot if it contains gfn.
+> >   * Otherwise returns NULL.
+> > @@ -1590,12 +1597,13 @@ try_get_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+> >  	if (!slot)
+> >  		return NULL;
+> >  
+> > -	if (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages)
+> > +	if (gfn_in_memslot(slot, gfn))
+> >  		return slot;
+> >  	else
+> >  		return NULL;
+> 
+> At this point, maybe:
 
-Iterate every prev_roots and only zap obsoleted roots.
+No objections.
 
-Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks for the review.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 45e1573f8f1d..22803916a609 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5168,7 +5168,7 @@ static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
- 		roots_to_free |= KVM_MMU_ROOT_CURRENT;
- 
- 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
--		if (is_obsolete_root(kvm, mmu->root.hpa))
-+		if (is_obsolete_root(kvm, mmu->prev_roots.hpa))
- 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
- 	}
- 
--- 
-2.30.2
+Best regards,
+	Maxim Levitsky
+
+> 
+> 	if (!slot || !gfn_in_memslot(slot, gfn))
+> 		return NULL;
+> 
+> 	return slot;
+> 
+> >  }
+> >  
+> > +
+> >  /*
+> >   * Returns a pointer to the memslot that contains gfn. Otherwise returns NULL.
+> >   *
+> > -- 
+> > 2.26.3
+> > 
+
 
