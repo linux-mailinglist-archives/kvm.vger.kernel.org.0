@@ -2,96 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D00325314D1
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:26:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B50285314D6
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:26:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237158AbiEWOm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 10:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60020 "EHLO
+        id S237385AbiEWOzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 10:55:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237143AbiEWOmy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 10:42:54 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32FFE25C42
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 07:42:53 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA1B8139F;
-        Mon, 23 May 2022 07:42:52 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 136693F70D;
-        Mon, 23 May 2022 07:42:51 -0700 (PDT)
-Date:   Mon, 23 May 2022 15:42:49 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvm@vger.kernel.org, Keir Fraser <keirf@google.com>,
-        catalin.marinas@arm.com, kernel-team@android.com,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>
-Subject: Re: [PATCH kvmtool 0/2] Fixes for virtio_balloon stats printing
-Message-ID: <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
-In-Reply-To: <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
-References: <20220520143706.550169-1-keirf@google.com>
-        <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        with ESMTP id S237309AbiEWOzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 10:55:47 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D29A5B3D2
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 07:55:46 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id w200so13914526pfc.10
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 07:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=JHZ+R8Y8nA8S+oeUM4/Av24R+MguK57xUegrXNCI6YY=;
+        b=NxGxg7NCKOGD3NgKeUyIl4/81JURx+DfN+SqGO7Hih0+trYAFwZKfWK2SpAqZhPb0G
+         UgGIr9LILMs5BpTWkUL2X0X3pjxnOpU6EQmBVRo6pH0w/vxJ64l+0iWKL3UooXkt89+p
+         q7ZWfIuzujEkkOmytgb5aCWpH6+z+I87bXJ408ubHX0cYDG4qlhsSIJcNUnI9tANlcTF
+         yfcSop4aGCPhqv6/No6omXgcCDwvrBecylukmAIETlu6LcIvg5bB52/XU/AM8R2AznAh
+         M0nkyypgkDEbjlnWm7jYLaazKNWHqe7BZlSXkeEzpRqHj2etiosdsTayXhE4VJklfV3l
+         2k5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JHZ+R8Y8nA8S+oeUM4/Av24R+MguK57xUegrXNCI6YY=;
+        b=YZP+2sTSFEUsPPjdGTaIb5pbYmuFHa54fzfYLGrXuG8fP3cTuFVoX497Y9GCUS+yl9
+         HHMYoHCaT6eq5sRHmUy0rNzGqU1FncZmWnzudjltKzh8qmCygJpd/88dKQkCCiSmwBP8
+         VAu4ojxEhEaKAAaAch8dg6oQu8LMkQ+fxwRUtAfdtpuF7ut1WBqLbJmZoSMhV/VlqYuy
+         DkvfZhyP7N2WRV14f6zVqnDSYihKFUNyXCVDt5dLxsSvzKINMQ9YEhVOin4iQgqtBFm9
+         HfHaCuPkZGAnyt87+YHJj01fah3g0U/yWJNNTwicWNg1My9OvpVIF5jddCjZIz7T8g/z
+         M/Jw==
+X-Gm-Message-State: AOAM530bsbRhQ4xJcyURqa4AeDBN7Ys4Tjp8To2yN7LDcEatdfUSj7+E
+        OjYebPNQ7OjqoMvSLvKWDSY=
+X-Google-Smtp-Source: ABdhPJwTZjM/QwGDJuy8asN+V0scGGfehl7ckOZ+uLX7DFgwp+yyy3GSF1eE8scscN2qlgorO/+Dvw==
+X-Received: by 2002:a05:6a00:1582:b0:518:7aa0:d6d8 with SMTP id u2-20020a056a00158200b005187aa0d6d8mr13817706pfk.27.1653317745584;
+        Mon, 23 May 2022 07:55:45 -0700 (PDT)
+Received: from localhost ([192.55.54.48])
+        by smtp.gmail.com with ESMTPSA id k12-20020a170902d58c00b00160d358a888sm5235975plh.32.2022.05.23.07.55.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 May 2022 07:55:45 -0700 (PDT)
+Date:   Mon, 23 May 2022 07:55:43 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com,
+        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 03/36] target/i386: Implement mc->kvm_type() to
+ get VM type
+Message-ID: <20220523145543.GA3095181@ls.amr.corp.intel.com>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-4-xiaoyao.li@intel.com>
+ <20220523083616.uqd5amzbkt627ari@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220523083616.uqd5amzbkt627ari@sirius.home.kraxel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 May 2022 21:51:07 +0100
-Will Deacon <will@kernel.org> wrote:
+On Mon, May 23, 2022 at 10:36:16AM +0200,
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-Hi,
-
-> On Fri, 20 May 2022 14:37:04 +0000, Keir Fraser wrote:
-> > While playing with kvmtool's virtio_balloon device I found a couple of
-> > niggling issues with the printing of memory stats. Please consider
-> > these fairly trivial fixes.
-
-Unfortunately patch 2/2 breaks compilation on userland with older kernel
-headers, like Ubuntu 18.04:
-...
-  CC       builtin-stat.o
-builtin-stat.c: In function 'do_memstat':
-builtin-stat.c:86:8: error: 'VIRTIO_BALLOON_S_HTLB_PGALLOC' undeclared (first use in this function); did you mean 'VIRTIO_BALLOON_S_AVAIL'?
-   case VIRTIO_BALLOON_S_HTLB_PGALLOC:
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        VIRTIO_BALLOON_S_AVAIL
-(repeated for VIRTIO_BALLOON_S_HTLB_PGFAIL and VIRTIO_BALLOON_S_CACHES).
-
-I don't quite remember what we did here in the past in those cases,
-conditionally redefine the symbols in a local header, or protect the
-new code with an #ifdef?
-
-I would lean towards the former (and hacking this in works), but then we
-would need to redefine VIRTIO_BALLOON_S_NR, to encompass the new symbols,
-which sounds fragile.
-
-Happy to send a patch if we agree on an approach.
-
-Cheers,
-Andre
-
-> > 
-> > Keir Fraser (2):
-> >   virtio/balloon: Fix a crash when collecting stats
-> >   stat: Add descriptions for new virtio_balloon stat types
-> > 
-> > [...]  
+>   Hi,
 > 
-> Applied to kvmtool (master), thanks!
+> > +    if (!(kvm_check_extension(KVM_STATE(ms->accelerator), KVM_CAP_VM_TYPES) & BIT(kvm_type))) {
+> > +        error_report("vm-type %s not supported by KVM", vm_type_name[kvm_type]);
+> > +        exit(1);
+> > +    }
 > 
-> [1/2] virtio/balloon: Fix a crash when collecting stats
->       https://git.kernel.org/will/kvmtool/c/3a13530ae99a
-> [2/2] stat: Add descriptions for new virtio_balloon stat types
->       https://git.kernel.org/will/kvmtool/c/bc77bf49df6e
-> 
-> Cheers,
+> Not sure why TDX needs a new vm type whereas sev doesn't.  But that's up
+> for debate in the kernel tdx patches, not here.  Assuming the kernel
+> interface actually merged will look like this the patch makes sense.
 
+Because VM operations, e.g. KVM_CREATE_VCPU, require TDX specific one in KVM
+side, we need to tell this VM is TD.
+Also it's for consistency.  It's common pattern to specify vm type with
+KVM_CREATE_VM when among other archs.  S390, PPC, MIPS, and ARM64.  Only SEV is
+an exception.  It makes default VM into confidential VM after KVM_CREATE_VM.
+
+Thanks,
+
+> 
+> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> 
+> take care,
+>   Gerd
+> 
+> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
