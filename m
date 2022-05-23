@@ -2,126 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 979FC531378
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9339D531440
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:25:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238130AbiEWPnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 11:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55048 "EHLO
+        id S238201AbiEWPti (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 11:49:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238094AbiEWPnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 11:43:19 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75AE925582
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:43:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653320598; x=1684856598;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Q+ZiO1z9B8ZfHHXuPMSjVYlMGYaRBpz3wImSx3yeLTc=;
-  b=k2nVTbmf79PuTq8ApfbCWQpsnz6rApUkYs5d6VTWhK8yf/XZ3GO41K5o
-   UPGh6COzRf48MoPQo7EFEsO8pBui7YXH3Bf3Vi3AhhYkWSZr5S7V2LZwk
-   c70fpP4nOUcucFGkwYOQHnJNIRwFBeZPfwivsnVZZNTmf5d/gEYgZ29IA
-   MDasnQf3uBOnQSoxy5u/xJcmNEzcDQLczIiWE6m4pPILbLkS8r/9RaFvf
-   qlk8CtliYDKva6kFXcGEoey/FW4HyybGqbYsrvA6ljzJ2sQ0USMs4yJOM
-   ieP1tsgGhm3BfvFpVrvCR46EqwNIdJ2CzoPj1Tsc/Bhaackyi9NBSt/tm
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="260865041"
-X-IronPort-AV: E=Sophos;i="5.91,246,1647327600"; 
-   d="scan'208";a="260865041"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 08:42:55 -0700
-X-IronPort-AV: E=Sophos;i="5.91,246,1647327600"; 
-   d="scan'208";a="600713440"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.171.127]) ([10.249.171.127])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 08:42:51 -0700
-Message-ID: <d3e967f3-917f-27ce-1367-2dba23e5c241@intel.com>
-Date:   Mon, 23 May 2022 23:42:47 +0800
+        with ESMTP id S238197AbiEWPtf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 11:49:35 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F41035269
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:49:33 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8846106F;
+        Mon, 23 May 2022 08:49:32 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DED93F73D;
+        Mon, 23 May 2022 08:49:31 -0700 (PDT)
+Date:   Mon, 23 May 2022 16:49:45 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Keir Fraser <keirf@google.com>, Will Deacon <will@kernel.org>,
+        kvm@vger.kernel.org, catalin.marinas@arm.com,
+        kernel-team@android.com
+Subject: Re: [PATCH kvmtool 0/2] Fixes for virtio_balloon stats printing
+Message-ID: <YoutGZHrgweh6pgm@monolith.localdoman>
+References: <20220520143706.550169-1-keirf@google.com>
+ <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
+ <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
+ <Youi7+T1+YG/6ed9@google.com>
+ <20220523161323.0e7df3d5@donnerap.cambridge.arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.9.0
-Subject: Re: [RFC PATCH v4 11/36] i386/tdx: Initialize TDX before creating TD
- vcpus
-Content-Language: en-US
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-12-xiaoyao.li@intel.com>
- <20220523092003.lm4vzfpfh4ezfcmy@sirius.home.kraxel.org>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220523092003.lm4vzfpfh4ezfcmy@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220523161323.0e7df3d5@donnerap.cambridge.arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/23/2022 5:20 PM, Gerd Hoffmann wrote:
->> +int tdx_pre_create_vcpu(CPUState *cpu)
->> +{
->> +    MachineState *ms = MACHINE(qdev_get_machine());
->> +    X86CPU *x86cpu = X86_CPU(cpu);
->> +    CPUX86State *env = &x86cpu->env;
->> +    struct kvm_tdx_init_vm init_vm;
->> +    int r = 0;
->> +
->> +    qemu_mutex_lock(&tdx_guest->lock);
->> +    if (tdx_guest->initialized) {
->> +        goto out;
->> +    }
->> +
->> +    memset(&init_vm, 0, sizeof(init_vm));
->> +    init_vm.cpuid.nent = kvm_x86_arch_cpuid(env, init_vm.entries, 0);
->> +
->> +    init_vm.attributes = tdx_guest->attributes;
->> +    init_vm.max_vcpus = ms->smp.cpus;
->> +
->> +    r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, &init_vm);
->> +    if (r < 0) {
->> +        error_report("KVM_TDX_INIT_VM failed %s", strerror(-r));
->> +        goto out;
->> +    }
->> +
->> +    tdx_guest->initialized = true;
->> +
->> +out:
->> +    qemu_mutex_unlock(&tdx_guest->lock);
->> +    return r;
->> +}
+Hi,
+
+On Mon, May 23, 2022 at 04:13:23PM +0100, Andre Przywara wrote:
+> On Mon, 23 May 2022 15:06:23 +0000
+> Keir Fraser <keirf@google.com> wrote:
 > 
-> Hmm, hooking *vm* initialization into *vcpu* creation looks wrong to me.
-
-That's because for TDX, it has to do VM-scope (feature) initialization 
-before creating vcpu. This is new to KVM and QEMU, that every feature is 
-vcpu-scope and configured per-vcpu before.
-
-To minimize the change to QEMU, we want to utilize @cpu and @cpu->env to 
-grab the configuration info. That's why it goes this way.
-
-Do you have any better idea on it?
-
-> take care,
->    Gerd
+> > On Mon, May 23, 2022 at 03:42:49PM +0100, Andre Przywara wrote:
+> > > On Fri, 20 May 2022 21:51:07 +0100
+> > > Will Deacon <will@kernel.org> wrote:
+> > > 
+> > > Hi,
+> > >   
+> > > > On Fri, 20 May 2022 14:37:04 +0000, Keir Fraser wrote:  
+> > > > > While playing with kvmtool's virtio_balloon device I found a couple of
+> > > > > niggling issues with the printing of memory stats. Please consider
+> > > > > these fairly trivial fixes.  
+> > > 
+> > > Unfortunately patch 2/2 breaks compilation on userland with older kernel
+> > > headers, like Ubuntu 18.04:
+> > > ...
+> > >   CC       builtin-stat.o
+> > > builtin-stat.c: In function 'do_memstat':
+> > > builtin-stat.c:86:8: error: 'VIRTIO_BALLOON_S_HTLB_PGALLOC' undeclared (first use in this function); did you mean 'VIRTIO_BALLOON_S_AVAIL'?
+> > >    case VIRTIO_BALLOON_S_HTLB_PGALLOC:
+> > >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > >         VIRTIO_BALLOON_S_AVAIL
+> > > (repeated for VIRTIO_BALLOON_S_HTLB_PGFAIL and VIRTIO_BALLOON_S_CACHES).
+> > > 
+> > > I don't quite remember what we did here in the past in those cases,
+> > > conditionally redefine the symbols in a local header, or protect the
+> > > new code with an #ifdef?  
+> > 
+> > For what it's worth, my opinion is that the sensible options are to:
+> > 1. Build against the latest stable, or a specified version of, kernel
+> > headers; or 2. Protect with ifdef'ery until new definitions are
+> > considered "common enough".
+> > 
+> > Supporting older headers by grafting or even modifying required newer
+> > definitions on top seems a horrid middle ground, albeit I can
+> > appreciate the pragmatism of it.
 > 
+> Fair enough, although I don't think option 1) is really viable for users,
+> as upgrading the distro provided kernel headers is often not an option for
+> the casual user. And even more versed users would probably shy away from
+> staining their /usr/include directory just for kvmtool.
+> 
+> Which just leaves option 2? If no one hollers, I will send a patch to that
+> regard.
 
+How about copying the required headers to kvmtool, under include/linux?
+That would remove any dependency on a specific kernel or distro version.
+
+Thanks,
+Alex
+
+> 
+> Cheers,
+> Andre
+> 
+> 
+> > 
+> >  Regards,
+> >  Keir
+> > 
+> > 
+> > > I would lean towards the former (and hacking this in works), but then we
+> > > would need to redefine VIRTIO_BALLOON_S_NR, to encompass the new symbols,
+> > > which sounds fragile.
+> > > 
+> > > Happy to send a patch if we agree on an approach.
+> > > 
+> > > Cheers,
+> > > Andre
+> > >   
+> > > > > 
+> > > > > Keir Fraser (2):
+> > > > >   virtio/balloon: Fix a crash when collecting stats
+> > > > >   stat: Add descriptions for new virtio_balloon stat types
+> > > > > 
+> > > > > [...]    
+> > > > 
+> > > > Applied to kvmtool (master), thanks!
+> > > > 
+> > > > [1/2] virtio/balloon: Fix a crash when collecting stats
+> > > >       https://git.kernel.org/will/kvmtool/c/3a13530ae99a
+> > > > [2/2] stat: Add descriptions for new virtio_balloon stat types
+> > > >       https://git.kernel.org/will/kvmtool/c/bc77bf49df6e
+> > > > 
+> > > > Cheers,  
+> > >   
+> 
