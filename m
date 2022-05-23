@@ -2,125 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F386A5302DE
-	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 13:57:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D7D653024A
+	for <lists+kvm@lfdr.de>; Sun, 22 May 2022 12:09:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343890AbiEVL5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 May 2022 07:57:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40356 "EHLO
+        id S242884AbiEVKI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 May 2022 06:08:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238067AbiEVL5F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 May 2022 07:57:05 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E723616E;
-        Sun, 22 May 2022 04:57:03 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id wh22so23306228ejb.7;
-        Sun, 22 May 2022 04:57:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DQtGOV8ehr9B0byuPgB/R0qAJIaG0/ZyE72cxpjHldY=;
-        b=qG3Kocdsq2oYYGDEOFNTT93XeYI9iYcUWVQ/xcuqMlQWR+ZjOVjzShfb129BRCBeZA
-         IbjnscCqLlyomggb5cyR9GpqqOBdpUuUo3+FbJYLbl0iiv4HCdnE6oUZAjMcMn8rI7k4
-         0hiscQzwOz5MmXbxTMw0aR1wARxwwUQ1FuY3GMHNU3MYRkf2+RKVREPc8am7/wzdyl9t
-         oIyX9zl9X57zupPpZORXrjsSN9N5PSh3n0Y67eW7PS38UKVmdPQe7ua4dEOBiXOcWWqU
-         BGUgHNpBaUTmrppJ4h/Xnpqc8TBObkcgTfQfATGh0SAgYKROqWnr/m2p+Lv8tSSupBQG
-         Eqog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DQtGOV8ehr9B0byuPgB/R0qAJIaG0/ZyE72cxpjHldY=;
-        b=nMGss4TQkRd7iwP621prHlcCMgN0H1xlWliiSUCNU6tovItVFm31XeJT6l3HAmMrVL
-         /FWLlipyGgKBwo5pxK6J6zrWPEbhjKwCgWXxKi2QgbYb1I6+wotgU9sIV9DLEDqnCEQV
-         pRO1HwGS/8rv253wV/MuXwFI5W3TpaCaMOLXEowIDZPcnSxJok2lOqCf4J9vR+VBA00P
-         9emmlRKMRU4aR/lP/n9dZooGQc1i/j+wseIAJWSBf2fkRN1r9ScuNYRX8MxiOQZ0xJTD
-         BJ9qSJuFMW4Xb8AWJ1GEExpTAx7ZpMG/XTdKLSFuxxfQeKwwft3OXfUW/Nym+marSfHa
-         zmeA==
-X-Gm-Message-State: AOAM532klAYEXOMBO2ASQuhTeuIEBBTJXFYWhkYJf5zLpb8FOjy6Hr/2
-        0mQfVMHr63g4NSDslb5ZlJg=
-X-Google-Smtp-Source: ABdhPJyUp97Woq4Tojt0R/LZFMRQbE+AliJIsobK1w7h8qb86kKoEvaA54Id06XPIzhUaW1XPVm0Cw==
-X-Received: by 2002:a17:907:7282:b0:6fa:9365:f922 with SMTP id dt2-20020a170907728200b006fa9365f922mr15297634ejc.262.1653220621612;
-        Sun, 22 May 2022 04:57:01 -0700 (PDT)
-Received: from mail (239.125-180-91.adsl-dyn.isp.belgacom.be. [91.180.125.239])
-        by smtp.gmail.com with ESMTPSA id jo14-20020a170906f6ce00b006feb5cae5f0sm2338997ejb.132.2022.05.22.04.57.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 May 2022 04:57:01 -0700 (PDT)
-Date:   Sun, 22 May 2022 13:57:00 +0200
-From:   Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        kernel test robot <lkp@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-staging@lists.linux.dev,
-        "open list:TI ETHERNET SWITCH DRIVER (CPSW)" 
-        <linux-omap@vger.kernel.org>, linux-nvme@lists.infradead.org,
-        linux-hwmon@vger.kernel.org,
-        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        linux-sparse@vger.kernel.org,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 736ee37e2e8eed7fe48d0a37ee5a709514d478b3
-Message-ID: <20220522115700.vg4hsytav74sy3x6@mail>
-References: <6285958d.+Z2aDZ4O1Y9eiazd%lkp@intel.com>
- <0530d502-1291-23f3-64ac-97bd38a26bd4@roeck-us.net>
- <CAMuHMdU3SYOwE5ftDwymQpVwWmpbC=1Ytyp0Y9GaeUS2i1cP+A@mail.gmail.com>
- <CAMuHMdVx7r-4TVV9uVJppT-7ZAriov01BUNk4ghU9Bs4uY28vQ@mail.gmail.com>
+        with ESMTP id S230244AbiEVKIz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 May 2022 06:08:55 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063683EB86;
+        Sun, 22 May 2022 03:08:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653214135; x=1684750135;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+ldVfAkI63e7T9H9+Tu6rkR3XDiV/+stA3qHNtz8ShU=;
+  b=fqMcbs48cA3u/tkSq0h0hOc/tsat7AIBWsHThBL2I3/Mte54HeMaXpXe
+   K+ovU99hntEQEHj50yvPvfSryz40huKAtsNRrSlbyT4HkfP3w1PLVpmTu
+   8FDIFop5Bltlh9FI2lSRA9djUsfzq7K3W2QfLrZNQRzUEZe5Uygm+W+P0
+   9IqRpo6uPsvSM+fcr5opM8HtiMD9XVknclTxM7/zDyyqFbgyC3elICCFZ
+   wjxLx59jCQKtaQw1bndoDnQsXqB6gbv/NBnsMe95aplRu6JL3U/yhCumX
+   EFzbb+B/yyzfZV8JiVzmqGiH4BOMSeHb6Z7zvNpJpPecfg1Cf+/58R6bh
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10354"; a="272956338"
+X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
+   d="scan'208";a="272956338"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2022 03:08:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,244,1647327600"; 
+   d="scan'208";a="628872786"
+Received: from q.bj.intel.com ([10.238.154.102])
+  by fmsmga008.fm.intel.com with ESMTP; 22 May 2022 03:08:50 -0700
+From:   shaoqin.huang@intel.com
+To:     pbonzini@redhat.com
+Cc:     Shaoqin Huang <shaoqin.huang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/mmu: Check every prev_roots in __kvm_mmu_free_obsolete_roots()
+Date:   Sun, 22 May 2022 19:09:48 -0600
+Message-Id: <20220523010948.2018342-1-shaoqin.huang@intel.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdVx7r-4TVV9uVJppT-7ZAriov01BUNk4ghU9Bs4uY28vQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_12_24,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022 at 02:46:20PM +0200, Geert Uytterhoeven wrote:
-> > The "(void)" makes sure there is no return value.
-> > Which matters if the result of a function returning void is propagated
-> > to another function returning void.
-> 
-> Which, FTR, sparse also doesn't like:
-> 
->     error: return expression in void function
+From: Shaoqin Huang <shaoqin.huang@intel.com>
 
+Iterate every prev_roots and only zap obsoleted roots.
 
-You should get this message only if the expression is itself not void.
-For example:
-	$ cat test.c
-	extern void fun(void);
-	
-	static void ko(int *ptr)
-	{
-		return *ptr;
-	}
-	
-	static void ok1(int *ptr)
-	{
-		return (void) *ptr;
-	}
-	
-	static void ok2(int *ptr)
-	{
-		return fun();
-	}
-	$ sparse test.c
-	test.c:5:16: error: return expression in void function
+Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-IOW, sparse warn only for the ko() but not for ok1() or ok2().
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 45e1573f8f1d..22803916a609 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5168,7 +5168,7 @@ static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+ 		roots_to_free |= KVM_MMU_ROOT_CURRENT;
+ 
+ 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
+-		if (is_obsolete_root(kvm, mmu->root.hpa))
++		if (is_obsolete_root(kvm, mmu->prev_roots.hpa))
+ 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+ 	}
+ 
+-- 
+2.30.2
 
-If you have a case whee it s not the case, please send me the
-pre-processed file and I'll be glad to investigate.
-
-Best regards,
--- Luc
