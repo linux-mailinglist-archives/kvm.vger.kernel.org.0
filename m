@@ -2,82 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C42C753145B
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:25:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FBF553129D
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:22:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237437AbiEWO7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 10:59:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36194 "EHLO
+        id S237609AbiEWPGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 11:06:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237309AbiEWO7s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 10:59:48 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92015B8B8
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 07:59:46 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 31so13897538pgp.8
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 07:59:46 -0700 (PDT)
+        with ESMTP id S237603AbiEWPGb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 11:06:31 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9A2C36B46
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:06:29 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id h14so21814039wrc.6
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:06:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=DFcYVXODv/uBzvDJHDbZg+Ml/E4lGZcMHzTQgnzw4EM=;
-        b=NwQWARYR4RZn2CAjQsYJadNYKaVW7MzIoN/nMg9jqwZlNBfbREqbdLtvZDoDO4Z2kK
-         frsixTGjYcfMSjEKLZrD2vdypr6UgcYPwluAhmygBe7J0iPQPRRpsxKMuCD2XDLMU5Fw
-         YKIk0kZtQaTotXXV0gEALpq61WUPMlRJ9s9udlSDwkyZ0fPDfCadLx/guzuApI5THQjy
-         kVJps1ZbRB1fgjk14rCp7iryt8xav4rO6OQDBi5GVJiXZ7FLYPXd4kEvJAx6VhVSOrDz
-         v/7LuT/Ze0wUPUT03WLrgJzZdIC9iRn6D+edqU24cB0Z510B9DqpPeLekOs55zxrqupz
-         JLnQ==
+        bh=jT91v2sdujiUrOeVFYLyjGU8hHIqKFVeJ1Zs0tfCEQo=;
+        b=U6BtzPGS4NtI0gXMXPikHkjVn0kaZYHXXvdRpOqIjC7VGMXRwwX3mCiDwGqU7iH4Yx
+         X1xaf1upK84Ri6Kio7rm+XrzhQ9pZEuPCOy8Qz4F0ne4+iMpBhW7o6f1M0ipanF1uczH
+         /ty/Ci2Bgr5HbId4F7Cc08CrPoHKXEFDHC1Ry36Bx0naLOFh4tvXhVxPG01KQsi2boa/
+         rcT4aTr4O1wKWHXDm+msmPGLXN1FXJ32+hRC3Gf6oqRl7maOE5DLGOThYCeyz4Mgb+85
+         RwxhnYFhvLew6AeisTtErC6EenH5eIaJMIxV1jt1ZZhBh1WwaTxvBoJkTdXfjPhCNmb7
+         YqqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=DFcYVXODv/uBzvDJHDbZg+Ml/E4lGZcMHzTQgnzw4EM=;
-        b=zdTbb49aX7Pp2xytCUFOYKVYUf5Fae/20jU+g/GWxMPgza7tT2ls6ld+7ly36iLHNX
-         FU0DA61A3zG3hIOg5MBJI0KVVoAgQIrr9AhaFJ5RWyk0rlzbtoIZzxHtA1eCO/Js5fOv
-         xIlJH7s1qvysTKSgjB0K6NlMkHFW6A3UPIoPUKg3TNJZsyvcD6uB3TNpUgwX3nkLHEXt
-         XCs6PwLyLdTXGRAj/LzD9DcCWNI6MQHCClEImTuomSQeFpy20uez+XJ62mTejEw//Prf
-         SDJ+cx4sDkqBa0J91Q1kiBFQjz9nG5qP3hkT7/coKCl4FhhzcKjTkjXIzbIvhejRPIai
-         oRfQ==
-X-Gm-Message-State: AOAM5324kuCUCHKdXdKyzC23O75qDLyB0vs6S0m9ovUvtuhH5zQHGocZ
-        oG/nrLb7Q22hrXE7KyyH3wQ=
-X-Google-Smtp-Source: ABdhPJzQGTfhJi9vv+DQqQOwi2a4+S5UgWmHwyMRqF95siRlqXEmNb/p7WKMlsk/F/iLSiOqPhXFmQ==
-X-Received: by 2002:a63:fc1d:0:b0:3fa:218e:1329 with SMTP id j29-20020a63fc1d000000b003fa218e1329mr7403816pgi.268.1653317986095;
-        Mon, 23 May 2022 07:59:46 -0700 (PDT)
-Received: from localhost ([192.55.54.48])
-        by smtp.gmail.com with ESMTPSA id h11-20020a170902f2cb00b0015f33717794sm5211722plc.42.2022.05.23.07.59.45
+        bh=jT91v2sdujiUrOeVFYLyjGU8hHIqKFVeJ1Zs0tfCEQo=;
+        b=U1GeUkIaia2SN6hQIstLY0BGR2fIB8Xm2ChSlA6q9yA5ijhxZa/2uKINv+vTHvt+cN
+         ilL7GgNUzxCPrMJ268+YXuxUR7fAXxliYDOVPspN/CZduqp3y2Pmg6G3JxuxrfWa+GFT
+         N7Xrbq1rONbCgSEqVRr7DUvnYWF6D5/kMzDvfq4BJPkmYG/eD7h23L4kEyrMfSDZKCyC
+         EGBuZTPJDGSGa6ya/JsEDya8C0vA7lEUznxWQ4QfOtk5XO6IqielG0K0W7xAcKuFQioX
+         L2equkxx3QTkNdOS3yrSB9S1nWqqyAu9PvWn3YDmRv2wTAHwhSqUVZnbNy2nN06OAMU4
+         2sKg==
+X-Gm-Message-State: AOAM5300LhpNnG0cFWGwTAptBf6T+DejfvYWBPdja2FR/FLChC+2682B
+        hKiX+Cl6oWkDoEUQ/YdJNRC0BA==
+X-Google-Smtp-Source: ABdhPJzFDlMtZlK9rm+u1HxkOgBSA7iN+UF6dTpLRLVW4VdMw0nnYn9icyGDn7eoEhuYl3bi0JTpNA==
+X-Received: by 2002:a5d:6da3:0:b0:20e:67a2:6779 with SMTP id u3-20020a5d6da3000000b0020e67a26779mr18524548wrs.418.1653318388082;
+        Mon, 23 May 2022 08:06:28 -0700 (PDT)
+Received: from google.com (88.140.78.34.bc.googleusercontent.com. [34.78.140.88])
+        by smtp.gmail.com with ESMTPSA id s1-20020adf8901000000b0020c5253d91asm10456623wrs.102.2022.05.23.08.06.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 May 2022 07:59:45 -0700 (PDT)
-Date:   Mon, 23 May 2022 07:59:44 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 07/36] i386/tdx: Introduce is_tdx_vm() helper and
- cache tdx_guest object
-Message-ID: <20220523145944.GB3095181@ls.amr.corp.intel.com>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-8-xiaoyao.li@intel.com>
- <20220523084817.ydle4f4acsoppbgr@sirius.home.kraxel.org>
+        Mon, 23 May 2022 08:06:27 -0700 (PDT)
+Date:   Mon, 23 May 2022 15:06:23 +0000
+From:   Keir Fraser <keirf@google.com>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
+        catalin.marinas@arm.com, kernel-team@android.com,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>
+Subject: Re: [PATCH kvmtool 0/2] Fixes for virtio_balloon stats printing
+Message-ID: <Youi7+T1+YG/6ed9@google.com>
+References: <20220520143706.550169-1-keirf@google.com>
+ <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
+ <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220523084817.ydle4f4acsoppbgr@sirius.home.kraxel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+In-Reply-To: <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,47 +73,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 23, 2022 at 10:48:17AM +0200,
-Gerd Hoffmann <kraxel@redhat.com> wrote:
-
-> > diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-> > index c8a23d95258d..4036ca2f3f99 100644
-> > --- a/target/i386/kvm/tdx.h
-> > +++ b/target/i386/kvm/tdx.h
-> > @@ -1,6 +1,10 @@
-> >  #ifndef QEMU_I386_TDX_H
-> >  #define QEMU_I386_TDX_H
-> >  
-> > +#ifndef CONFIG_USER_ONLY
-> > +#include CONFIG_DEVICES /* CONFIG_TDX */
-> > +#endif
-> > +
-> >  #include "exec/confidential-guest-support.h"
-> >  
-> >  #define TYPE_TDX_GUEST "tdx-guest"
-> > @@ -16,6 +20,12 @@ typedef struct TdxGuest {
-> >      uint64_t attributes;    /* TD attributes */
-> >  } TdxGuest;
-> >  
-> > +#ifdef CONFIG_TDX
-> > +bool is_tdx_vm(void);
-> > +#else
-> > +#define is_tdx_vm() 0
+On Mon, May 23, 2022 at 03:42:49PM +0100, Andre Przywara wrote:
+> On Fri, 20 May 2022 21:51:07 +0100
+> Will Deacon <will@kernel.org> wrote:
 > 
-> Just add that to the tdx-stubs.c file you already created in one of the
-> previous patches and drop this #ifdef mess ;)
+> Hi,
+> 
+> > On Fri, 20 May 2022 14:37:04 +0000, Keir Fraser wrote:
+> > > While playing with kvmtool's virtio_balloon device I found a couple of
+> > > niggling issues with the printing of memory stats. Please consider
+> > > these fairly trivial fixes.
+> 
+> Unfortunately patch 2/2 breaks compilation on userland with older kernel
+> headers, like Ubuntu 18.04:
+> ...
+>   CC       builtin-stat.o
+> builtin-stat.c: In function 'do_memstat':
+> builtin-stat.c:86:8: error: 'VIRTIO_BALLOON_S_HTLB_PGALLOC' undeclared (first use in this function); did you mean 'VIRTIO_BALLOON_S_AVAIL'?
+>    case VIRTIO_BALLOON_S_HTLB_PGALLOC:
+>         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>         VIRTIO_BALLOON_S_AVAIL
+> (repeated for VIRTIO_BALLOON_S_HTLB_PGFAIL and VIRTIO_BALLOON_S_CACHES).
+> 
+> I don't quite remember what we did here in the past in those cases,
+> conditionally redefine the symbols in a local header, or protect the
+> new code with an #ifdef?
 
-This is for consistency with SEV.  Anyway Either way is okay.
+For what it's worth, my opinion is that the sensible options are to:
+1. Build against the latest stable, or a specified version of, kernel
+headers; or 2. Protect with ifdef'ery until new definitions are
+considered "common enough".
 
-From target/i386/sev.h
-  ...
-  #ifdef CONFIG_SEV
-  bool sev_enabled(void);
-  bool sev_es_enabled(void);
-  #else
-  #define sev_enabled() 0
-  #define sev_es_enabled() 0
-  #endif
+Supporting older headers by grafting or even modifying required newer
+definitions on top seems a horrid middle ground, albeit I can
+appreciate the pragmatism of it.
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+ Regards,
+ Keir
+
+
+> I would lean towards the former (and hacking this in works), but then we
+> would need to redefine VIRTIO_BALLOON_S_NR, to encompass the new symbols,
+> which sounds fragile.
+> 
+> Happy to send a patch if we agree on an approach.
+> 
+> Cheers,
+> Andre
+> 
+> > > 
+> > > Keir Fraser (2):
+> > >   virtio/balloon: Fix a crash when collecting stats
+> > >   stat: Add descriptions for new virtio_balloon stat types
+> > > 
+> > > [...]  
+> > 
+> > Applied to kvmtool (master), thanks!
+> > 
+> > [1/2] virtio/balloon: Fix a crash when collecting stats
+> >       https://git.kernel.org/will/kvmtool/c/3a13530ae99a
+> > [2/2] stat: Add descriptions for new virtio_balloon stat types
+> >       https://git.kernel.org/will/kvmtool/c/bc77bf49df6e
+> > 
+> > Cheers,
+> 
