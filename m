@@ -2,72 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD608530B77
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 11:03:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83CC2530BF1
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 11:03:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232173AbiEWIs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 04:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53624 "EHLO
+        id S232191AbiEWIsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 04:48:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232147AbiEWIs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 04:48:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16F29E0D0
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 01:48:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653295705;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xOiLxPnnK9qxBRIU62qWPpWqxH5iMS1sd2+AtJmOVMQ=;
-        b=e6E0NENmDp1K/oxWAMEvtDTis0tcA+FEK0ZfQn2HzkyFaXEZBp0FzlSUW43aKKp50VElIf
-        Bye58Uxpp7auDsfg42gUii0XAYmBAAA2N5Wrd2p0jVGeKS5KnlhQBamrzbM8yFkJGLbX/Y
-        NK7vTEuESrzqmz5XDa0wRD18chn1ay4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-383-NJsENAIQM6W2x5QS8OHclg-1; Mon, 23 May 2022 04:48:20 -0400
-X-MC-Unique: NJsENAIQM6W2x5QS8OHclg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S232147AbiEWIsu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 04:48:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBD1101C3
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 01:48:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F37E5299E74C;
-        Mon, 23 May 2022 08:48:19 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DB7940E6A5F;
-        Mon, 23 May 2022 08:48:19 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id E36AF18000B4; Mon, 23 May 2022 10:48:17 +0200 (CEST)
-Date:   Mon, 23 May 2022 10:48:17 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 07/36] i386/tdx: Introduce is_tdx_vm() helper and
- cache tdx_guest object
-Message-ID: <20220523084817.ydle4f4acsoppbgr@sirius.home.kraxel.org>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-8-xiaoyao.li@intel.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C9E7360DDE
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:48:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AFBEC385AA
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:48:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653295727;
+        bh=Bx7Na5RqmYVQEB43OwJYQnbt7ja4ZwzGrpBmXqt/7r4=;
+        h=From:To:Subject:Date:From;
+        b=VtxNvtgSHae+XWT2N8CMlNhqFmAuXi47VVgm3MHmIUul61i+qqJ4UVw6cbT/T9G+a
+         q1/xf4u3rVdpDouJC+SSH++9f5wVENw1h6EBBafl0NDe5ghTdavvRhRS8LarVIuB21
+         +HK6vn4iuos6kkefA3//BXakGq+XljsMbjp5/Ci4paOzSl9FlQYueeTbIX/reMn0Yt
+         Y/mHt/iNDyOARcCxfaKe4IEu3iVwWjqZEiLFUNrzmgFjkhma3Is/EpheHi0+Eptk2q
+         5rGYm+XeiSeUeeB45aBFqfX9OJiLDLCYHyvT6qGpPs70R/i4XzaQfygBAKCqlmlCfm
+         WjMW7NgNF+AmQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 08A9DC05FD5; Mon, 23 May 2022 08:48:47 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216017] New: KVM: problem virtualization from kernel 5.17.9
+Date:   Mon, 23 May 2022 08:48:46 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: opw
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: ne-vlezay80@yandex.ru
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status keywords
+ bug_severity priority component assigned_to reporter cf_regression
+Message-ID: <bug-216017-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-8-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,33 +70,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-> index c8a23d95258d..4036ca2f3f99 100644
-> --- a/target/i386/kvm/tdx.h
-> +++ b/target/i386/kvm/tdx.h
-> @@ -1,6 +1,10 @@
->  #ifndef QEMU_I386_TDX_H
->  #define QEMU_I386_TDX_H
->  
-> +#ifndef CONFIG_USER_ONLY
-> +#include CONFIG_DEVICES /* CONFIG_TDX */
-> +#endif
-> +
->  #include "exec/confidential-guest-support.h"
->  
->  #define TYPE_TDX_GUEST "tdx-guest"
-> @@ -16,6 +20,12 @@ typedef struct TdxGuest {
->      uint64_t attributes;    /* TD attributes */
->  } TdxGuest;
->  
-> +#ifdef CONFIG_TDX
-> +bool is_tdx_vm(void);
-> +#else
-> +#define is_tdx_vm() 0
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216017
 
-Just add that to the tdx-stubs.c file you already created in one of the
-previous patches and drop this #ifdef mess ;)
+            Bug ID: 216017
+           Summary: KVM: problem virtualization from kernel 5.17.9
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.17.9-arch1-1
+          Hardware: AMD
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Keywords: opw
+          Severity: high
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: ne-vlezay80@yandex.ru
+        Regression: No
 
-take care,
-  Gerd
+Qemu periodically chaches width:
 
+[root@router ne-vlezay80]# qemu-system-x86_64 -enable-kvm
+qemu-system-x86_64: error: failed to set MSR 0xc0000104 to 0x100000000
+qemu-system-x86_64: ../qemu-7.0.0/target/i386/kvm/kvm.c:2996: kvm_buf_set_m=
+srs:
+Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+Aborted (core dumped)
+
+Also if running virtual pachine width type -cpu host, system is freezez from
+kernel panic.=20
+
+Kernel version: 5.17.9
+Distribution: Arch Linux
+QEMU: 7.0
+CPU: AMD Phenom X4
+Arch: x86_64
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
