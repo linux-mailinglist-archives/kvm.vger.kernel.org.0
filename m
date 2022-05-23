@@ -2,194 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4FF2531975
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:54:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E3685319A8
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:55:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241806AbiEWSJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 14:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45934 "EHLO
+        id S243018AbiEWSAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 14:00:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243800AbiEWSGC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 14:06:02 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 91017ED732
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 10:47:48 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E7E4ED1;
-        Mon, 23 May 2022 10:39:35 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 756753F73D;
-        Mon, 23 May 2022 10:39:34 -0700 (PDT)
-Date:   Mon, 23 May 2022 18:39:32 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Keir Fraser <keirf@google.com>, Will Deacon <will@kernel.org>,
-        kvm@vger.kernel.org, catalin.marinas@arm.com,
-        kernel-team@android.com
-Subject: Re: [PATCH kvmtool 0/2] Fixes for virtio_balloon stats printing
-Message-ID: <20220523183932.05d56517@donnerap.cambridge.arm.com>
-In-Reply-To: <You/XQP0hc5e9BJd@monolith.localdoman>
-References: <20220520143706.550169-1-keirf@google.com>
-        <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
-        <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
-        <Youi7+T1+YG/6ed9@google.com>
-        <20220523161323.0e7df3d5@donnerap.cambridge.arm.com>
-        <YoutGZHrgweh6pgm@monolith.localdoman>
-        <You30lZiaDIlTAsF@google.com>
-        <You/XQP0hc5e9BJd@monolith.localdoman>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        with ESMTP id S242823AbiEWR7z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 13:59:55 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 414B5689A2
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 10:46:12 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id q1so8414917ljb.5
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 10:46:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Lt+QmLRlAmSG7nATNb3de1rpq1KDptBx8X9RCMbUflw=;
+        b=Rr3FTbZSH6OEOK11OGjw8VhElwCyNuOyvzb6UGiQa0VN2z4nznXexLQevuNvWvmzge
+         CTYxbMdQDt/ABY+5MJUs3UQ9cjgZB5HpfDYKoRS1NjSjEXU07Em23YCDUfUVa0uX8nb/
+         9z73CqVXPwVsA8Daek73ky1cd2penETPszXb/oyC1JTxYrs3iF1+pny/UHRiTwvpdI8k
+         g8tK6SALO5ySpktT2RjFFNN6TQsPT7nll0EKnmQlStwKvKJ60ZHIYNM+jC9XU/fKERYw
+         C53AE92+J6jh3ctfSI6kiJseh3KT/sVgJBhffuZkOWwWVE+RPT6LvCRHczR7+R0zJEmT
+         JfYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Lt+QmLRlAmSG7nATNb3de1rpq1KDptBx8X9RCMbUflw=;
+        b=J1TxVITKxFKIXCbLtV2EdNKeyHulb/rgiNiwtsTSOIhvA8vzlCxTJkBwwpwkUWQWNs
+         AI6NbtYZXEU/Y45XPhC+Hv3njX2CEWtlDlBh4slUDVH8hZolu6ioyN3CGFT8jct9S8Qs
+         vx09lH6pE9D8Hcyh2GtJ07jYc21KfrMYytneYFYcud5k9SeHV9DdUYqzTwLLFK/dfsI/
+         9J6LvLRcxAGFbzJrnRZjce/UmkqYyk7AgNRqAbKncdO1iWBN8cvW1hQ8bja18J5YEPhT
+         oajztgV5Dff+iQv579cYc0I1854nF8XLom/6PGnlRy7FimG2dQ2KLiqdUtrEbQgSH4gs
+         H0Zg==
+X-Gm-Message-State: AOAM532IUkIEL1LIEDExne6AC4Cc/r4nwgBxRw1+aZCQnTLezpJ1rXDd
+        z9D9jlVvGLWD26WklAFiOi5dKkCbH+wRO/mzmW42Hw==
+X-Google-Smtp-Source: ABdhPJzDb1QQeQPt37UpqWbTLpFmjnccbcNhzyRtox2/Lhza8BwHrGwgro263+zixdfWhTwF6P7oNs645WQMXX3iLvE=
+X-Received: by 2002:a05:651c:b20:b0:253:f4ec:b7d0 with SMTP id
+ b32-20020a05651c0b2000b00253f4ecb7d0mr159601ljr.198.1653327872507; Mon, 23
+ May 2022 10:44:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220516232138.1783324-1-dmatlack@google.com> <20220516232138.1783324-22-dmatlack@google.com>
+ <CAL715WJ5DVM-A8EFND0iQ-MH9nAhE3rvWdYWaEgRTCJEVeegRg@mail.gmail.com> <YovGUDrYZMZ7PXeY@google.com>
+In-Reply-To: <YovGUDrYZMZ7PXeY@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 23 May 2022 10:44:05 -0700
+Message-ID: <CALzav=fUTYGjDuWQxJusH4CzkEwGja-4xAmpqEOZdUfBftYwYw@mail.gmail.com>
+Subject: Re: [PATCH v6 21/22] KVM: Allow for different capacities in
+ kvm_mmu_memory_cache structs
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 May 2022 18:07:41 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Mon, May 23, 2022 at 10:37 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, May 20, 2022, Mingwei Zhang wrote:
+> > On Mon, May 16, 2022 at 4:24 PM David Matlack <dmatlack@google.com> wrote:
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index e089db822c12..5e2e75014256 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -369,14 +369,31 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+> > >                 return (void *)__get_free_page(gfp_flags);
+> > >  }
+> > >
+> > > -int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> > > +static int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+> > >  {
+> > > +       gfp_t gfp = GFP_KERNEL_ACCOUNT;
+> > >         void *obj;
+> > >
+> > >         if (mc->nobjs >= min)
+> > >                 return 0;
+> > > -       while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+> > > -               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
+> > > +
+> > > +       if (unlikely(!mc->objects)) {
+> > > +               if (WARN_ON_ONCE(!capacity))
+> > > +                       return -EIO;
+> > > +
+> > > +               mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
+> > > +               if (!mc->objects)
+> > > +                       return -ENOMEM;
+> > > +
+> > > +               mc->capacity = capacity;
+> >
+> > Do we want to ensure the minimum value of the capacity? I think
+> > otherwise, we may more likely start using memory from GFP_ATOMIC if
+> > the capacity is less than, say 5? But the minimum value seems related
+> > to each cache type.
+>
+> Eh, if we specify a minimum, just make the arch default the minimum.  That way we
+> avoid adding even more magic/arbitrary numbers.  E.g. for whatever reason, MIPS's
+> default is '4'.
 
-> Hi,
-> 
-> On Mon, May 23, 2022 at 04:35:30PM +0000, Keir Fraser wrote:
-> > On Mon, May 23, 2022 at 04:49:45PM +0100, Alexandru Elisei wrote:  
-> > > Hi,
-> > > 
-> > > On Mon, May 23, 2022 at 04:13:23PM +0100, Andre Przywara wrote:  
-> > > > On Mon, 23 May 2022 15:06:23 +0000
-> > > > Keir Fraser <keirf@google.com> wrote:
-> > > >   
-> > > > > On Mon, May 23, 2022 at 03:42:49PM +0100, Andre Przywara wrote:  
-> > > > > > On Fri, 20 May 2022 21:51:07 +0100
-> > > > > > Will Deacon <will@kernel.org> wrote:
-> > > > > > 
-> > > > > > Hi,
-> > > > > >     
-> > > > > > > On Fri, 20 May 2022 14:37:04 +0000, Keir Fraser wrote:    
-> > > > > > > > While playing with kvmtool's virtio_balloon device I found a couple of
-> > > > > > > > niggling issues with the printing of memory stats. Please consider
-> > > > > > > > these fairly trivial fixes.    
-> > > > > > 
-> > > > > > Unfortunately patch 2/2 breaks compilation on userland with older kernel
-> > > > > > headers, like Ubuntu 18.04:
-> > > > > > ...
-> > > > > >   CC       builtin-stat.o
-> > > > > > builtin-stat.c: In function 'do_memstat':
-> > > > > > builtin-stat.c:86:8: error: 'VIRTIO_BALLOON_S_HTLB_PGALLOC' undeclared (first use in this function); did you mean 'VIRTIO_BALLOON_S_AVAIL'?
-> > > > > >    case VIRTIO_BALLOON_S_HTLB_PGALLOC:
-> > > > > >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > > > >         VIRTIO_BALLOON_S_AVAIL
-> > > > > > (repeated for VIRTIO_BALLOON_S_HTLB_PGFAIL and VIRTIO_BALLOON_S_CACHES).
-> > > > > > 
-> > > > > > I don't quite remember what we did here in the past in those cases,
-> > > > > > conditionally redefine the symbols in a local header, or protect the
-> > > > > > new code with an #ifdef?    
-> > > > > 
-> > > > > For what it's worth, my opinion is that the sensible options are to:
-> > > > > 1. Build against the latest stable, or a specified version of, kernel
-> > > > > headers; or 2. Protect with ifdef'ery until new definitions are
-> > > > > considered "common enough".
-> > > > > 
-> > > > > Supporting older headers by grafting or even modifying required newer
-> > > > > definitions on top seems a horrid middle ground, albeit I can
-> > > > > appreciate the pragmatism of it.  
-> > > > 
-> > > > Fair enough, although I don't think option 1) is really viable for users,
-> > > > as upgrading the distro provided kernel headers is often not an option for
-> > > > the casual user. And even more versed users would probably shy away from
-> > > > staining their /usr/include directory just for kvmtool.
-> > > > 
-> > > > Which just leaves option 2? If no one hollers, I will send a patch to that
-> > > > regard.  
-> > > 
-> > > How about copying the required headers to kvmtool, under include/linux?
-> > > That would remove any dependency on a specific kernel or distro version.  
-> > 
-> > Maintaining just the required headers sounds a bit of a pain. Getting  
-> 
-> Isn't the Linux mantra "don't break userspace"? So in that case, even if
-> kvmtool uses an older version of a header, that won't cause any issues,
-> right?
-
-It should work in either way, we just might end up ignoring new features,
-if we use older header files.
-
-> > it wrong ends up copying too many headers (and there's nearly 200kLOC  
-
-I feel we shouldn't go crazy here just because of some statistic feature.
-kvmtool is meant to be a lean and mean tool, compiling cleanly on as many
-systems as possible, as a pure user. So mandating header updates from
-innocent users sounds a bit over the top.
-
-> We could mandate that the kernel header file is copied only when new
-> features are added to kvmtool. I don't think there's any need to do it
-> retroactively.
-
-Just thinking: we do the header sync already for the KVM related
-headers, as we need them, and didn't want to wait for distros.
-Can't we just include some virtio headers in that list as well?
-
-Cheers,
-Andre
-
-> 
-> What do you think?
-> 
-> Thanks,
-> Alex
-> 
-> > of them) or a confusing split between copied and system-installed
-> > headers.
-> > 
-> > How about requiring headers at include/linux and if the required
-> > version tag isn't found there, download the kernel tree and "make
-> > headers_install" with customised INSTALL_HDR_PATH? The cost is a
-> > big(ish) download: time, bandwidth, disk space.
-> > 
-> >  -- Keir
-> >   
-> > > Thanks,
-> > > Alex
-> > >   
-> > > > 
-> > > > Cheers,
-> > > > Andre
-> > > > 
-> > > >   
-> > > > > 
-> > > > >  Regards,
-> > > > >  Keir
-> > > > > 
-> > > > >   
-> > > > > > I would lean towards the former (and hacking this in works), but then we
-> > > > > > would need to redefine VIRTIO_BALLOON_S_NR, to encompass the new symbols,
-> > > > > > which sounds fragile.
-> > > > > > 
-> > > > > > Happy to send a patch if we agree on an approach.
-> > > > > > 
-> > > > > > Cheers,
-> > > > > > Andre
-> > > > > >     
-> > > > > > > > 
-> > > > > > > > Keir Fraser (2):
-> > > > > > > >   virtio/balloon: Fix a crash when collecting stats
-> > > > > > > >   stat: Add descriptions for new virtio_balloon stat types
-> > > > > > > > 
-> > > > > > > > [...]      
-> > > > > > > 
-> > > > > > > Applied to kvmtool (master), thanks!
-> > > > > > > 
-> > > > > > > [1/2] virtio/balloon: Fix a crash when collecting stats
-> > > > > > >       https://git.kernel.org/will/kvmtool/c/3a13530ae99a
-> > > > > > > [2/2] stat: Add descriptions for new virtio_balloon stat types
-> > > > > > >       https://git.kernel.org/will/kvmtool/c/bc77bf49df6e
-> > > > > > > 
-> > > > > > > Cheers,    
-> > > > > >     
-> > > >   
-
+I'm not exactly sure what you had in mind Mingwei. But there is a bug
+in this code if min > capacity. This function will happily return 0
+after filling up the cache, even though it did not allocate min
+objects. The same bug existed before this patch if min >
+ARRAY_SIZE(mc->objects). I can include a separate patch to fix this
+bug (e.g. WARN and return -ENOMEM if min > capacity).
