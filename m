@@ -2,152 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2DBD5312D4
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:23:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42591531207
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:22:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238294AbiEWQEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 12:04:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59030 "EHLO
+        id S238718AbiEWQR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 12:17:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236504AbiEWQER (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 12:04:17 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E710962216
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:04:15 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id a13so2992182plh.6
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:04:15 -0700 (PDT)
+        with ESMTP id S238765AbiEWQRt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 12:17:49 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088CD66AFA
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:17:39 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id c22so14118212pgu.2
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:17:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jhSo+evTyBN+5x5Ja23QHpmtg9xuVErXLEhQ2yGFZ1w=;
-        b=EfHv5eDzephBQ/fnioZ8xttfvuDMWnkf46VvKVHmAjFv3/aYle7zk8t7NVn/+7Ae6F
-         1Z++54NjRHBRhWSx5xlifaWxLUwNPdp9i9kdsP9cahOVYLFx9w3zzHk6l6KoHvGgGifS
-         aX5AxrLDRUM+lc1woLxrD2iRiMigYXbLsu6JYOgoOBdEo9rud3u0c1mzSdrNp5BUbkVc
-         ifjit3gAtBuQ/ZhaldPyye1Z5uT5FIc1GA36AihmfpLJYO10n7rlwJ2N6yP2D/B07cQN
-         AAw4h82f96n/68UOTLQ89f2ZfjDIZj6toKY4cqMjzkCFlXvQU+QmOoKpfN7bGptkd5Jm
-         jvBQ==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=eNbcOsis/KpOazxwoapGqmAzQvleW1ZvCZVss5TACNY=;
+        b=PvlTBp13muG1TUI68g94aTQ/FiuK9qHmMCLEhGVjZ0ZOVhN6vz5vhhS+wmUP4+Lno7
+         7IlNEdS8L46cr3LPygXWejIC2R5nVJHYFz2RQibrrPusEsaLKGvIB9h6v7KfX7A7i0kB
+         v+P2h1gE9IKmT0G5rBzwpuio2B55DiAPk8drqySZQ6ng/a9/tF4skaP1vmmzJ5HO8Eae
+         PxGQp8Gqh3zX4GFCTSCnZ/kLWXYyzDQ0QstOp7r3CfZjsMSi22A3To/WeaVSCKJ0a/sA
+         PopRzqh3tQ/XAtcJTZ/asZNoRcRGEGNwG+tcYnQThEJqQPzA4Ro2opqfmf1ZUxg77Xkw
+         zo6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jhSo+evTyBN+5x5Ja23QHpmtg9xuVErXLEhQ2yGFZ1w=;
-        b=L3Q7lm4fvYgVKUxSjPZpe6X2f6roWNYdk/Gmt2NEeHVL2Fw6bQLaighbXPhW9XA90k
-         hgFe8Mf7sjFCOjWwGlNn7IbACup5D/TQ8REHzSRncqRJwwLFTf7B95/RVtzEEquXKE0W
-         7+53sVj6PCj+BfnE6rC2zknyx+vdf9RzpZwsvEXl7NggxJEEZJ2e4MfaOr+dn+71fIpp
-         Og6HOz2v2TLtlrzYNdj6d99ygwULe9vjAoaO4jE+SOnlHKDGJ7wiJZKKJleziHarZ4nU
-         aTFBMwtpHbLsOYFWvM+rWosQaN/471W/HL4cxqkXckkgkTG/Dmh6fZ/4lBo9NYXqqbw4
-         Wxzg==
-X-Gm-Message-State: AOAM532Nb6c3uv5st4FwYJtF6Q9UkRDmDTQyn8aWThWeHaJcDheE1+UF
-        m2Y0R8dtfqqbj9lAeregghW6+rPZWbgyit2RplcSJQ==
-X-Google-Smtp-Source: ABdhPJzwHc8W7czuXwrozEV0q7U1DaTIOt3SqCa/77tDCA4iQYAUyzkQaxVNYlr7yG3Qr1SNgck4S/1b6VlxyhUNVaQ=
-X-Received: by 2002:a17:903:192:b0:162:23b5:d207 with SMTP id
- z18-20020a170903019200b0016223b5d207mr5905022plg.87.1653321855377; Mon, 23
- May 2022 09:04:15 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=eNbcOsis/KpOazxwoapGqmAzQvleW1ZvCZVss5TACNY=;
+        b=Eapkp+F8xBn+L4ab38CZg9UWflcDZwJ8pZhYY/sPeSpTerA4EUGPPwCzuVT8/nUft2
+         nO8Wn3Yv/tJ1QrG7+CYodd68kx2fKFW1VQG+dhSn55b2+kJj3hNJ0MnLVbjiiUAoJMwb
+         kt95dVhAKQvsXmLq4+nTNZyYClnGKPP0wb1PFafARsaGB/znNr4RU5Yzw1JmoOG3ujGo
+         JeGRr4H5RnDtuSMhOL6roPpxRL1u67uh2PwGLeFLbp0jZ/URhd6ls2ANRFw3DCD7PggK
+         Q5fDMkCvgtAeYYoCaRlSVZNHgILcfThQ34Qxfetago9S85Ufe2+h6t/XZ78mEGcSv/T9
+         ujoA==
+X-Gm-Message-State: AOAM5329TGNRQuHOOW9LZUvOyADtMZNrIldDWewDp/cwEff3EAcS17Tb
+        /e0uEVKhpkcjwMggg6QX8c/w9A==
+X-Google-Smtp-Source: ABdhPJxjulk6DvCNQRz3GNKlx5A5+lWZ+jpdQDxApa+oqiYCn513L8CGqWxpc26B7Dlc/KO80E966g==
+X-Received: by 2002:a05:6a00:1511:b0:510:30d1:e8fd with SMTP id q17-20020a056a00151100b0051030d1e8fdmr24535196pfu.37.1653322658336;
+        Mon, 23 May 2022 09:17:38 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id e18-20020a170902f11200b00162017529easm5297369plb.167.2022.05.23.09.17.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 May 2022 09:17:37 -0700 (PDT)
+Date:   Mon, 23 May 2022 16:17:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     shaoqin.huang@intel.com
+Cc:     pbonzini@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/mmu: Check every prev_roots in
+ __kvm_mmu_free_obsolete_roots()
+Message-ID: <YouznrVYM7H5IoMK@google.com>
+References: <20220523010948.2018342-1-shaoqin.huang@intel.com>
 MIME-Version: 1.0
-References: <20220520180946.104214-1-daolu@rivosinc.com> <YotUdkD2LIKqhYKq@monolith.localdoman>
- <YotVCkpajnskhQm9@monolith.localdoman>
-In-Reply-To: <YotVCkpajnskhQm9@monolith.localdoman>
-From:   Dao Lu <daolu@rivosinc.com>
-Date:   Mon, 23 May 2022 09:04:04 -0700
-Message-ID: <CAKh7v-Rm3Mtid7KymrbSwwVRoC=S1J0f4CSCbpHXmi1SA45omA@mail.gmail.com>
-Subject: Re: [PATCH kvmtool] Fixes: 0febaae00bb6 ("Add asm/kernel.h for riscv")
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     will@kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220523010948.2018342-1-shaoqin.huang@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Sun, May 22, 2022, shaoqin.huang@intel.com wrote:
+> From: Shaoqin Huang <shaoqin.huang@intel.com>
+> 
+> Iterate every prev_roots and only zap obsoleted roots.
 
-Thanks for pointing that out - I wasn't sure where the number came
-from so I basically copied from the arm one just so the compilation
-can pass.
+Better would be something like:
 
-I am happy to fix up the number to 32 and add the compile error
-message to the commit message like you said - would something like
-this work?
--------
-Fixes the following compilation issue:
+  When freeing obsolete previous roots, check prev_roots as intended, not
+  the current root.
 
-include/linux/kernel.h:5:10: fatal error: asm/kernel.h: No such file
-or directory
-    5 | #include "asm/kernel.h"
--------
-Thanks,
-Dao
+Ugh, my bad.  This escaped into v5.18 :-(
 
-On Mon, May 23, 2022 at 2:33 AM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Adding the kvmtool maintainers, I just noticed that they were missing.
->
-> On Mon, May 23, 2022 at 10:31:34AM +0100, Alexandru Elisei wrote:
-> > Hi,
-> >
-> > When I started working on the heterogeneous PMU series, support for the
-> > riscv architecture wasn't merged in kvmtool, and after riscv was merged I
-> > missed adding the header file.
-> >
-> > This indeed fixes this compilation error:
-> >
-> > In file included from include/linux/rbtree.h:32,
-> >                  from include/kvm/devices.h:4,
-> >                  from include/kvm/pci.h:10,
-> >                  from include/kvm/vfio.h:6,
-> >                  from include/kvm/kvm-config.h:5,
-> >                  from include/kvm/kvm.h:6:
-> > include/linux/kernel.h:5:10: fatal error: asm/kernel.h: No such file or directory
-> >     5 | #include "asm/kernel.h"
-> >       |          ^~~~~~~~~~~~~~
-> > cc1: all warnings being treated as errors
-> > compilation terminated.
-> > make: *** [Makefile:484: builtin-balloon.o] Error 1
-> >
-> > Would be nice to include it in the commit message, so people googling for
-> > that exact error message can come across this commit.
-> >
-> > On Fri, May 20, 2022 at 11:09:46AM -0700, Dao Lu wrote:
-> > > Signed-off-by: Dao Lu <daolu@rivosinc.com>
-> > > ---
-> > >  riscv/include/asm/kernel.h | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > >  create mode 100644 riscv/include/asm/kernel.h
-> > >
-> > > diff --git a/riscv/include/asm/kernel.h b/riscv/include/asm/kernel.h
-> > > new file mode 100644
-> > > index 0000000..a2a8d9e
-> > > --- /dev/null
-> > > +++ b/riscv/include/asm/kernel.h
-> > > @@ -0,0 +1,8 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0 */
-> > > +
-> > > +#ifndef __ASM_KERNEL_H
-> > > +#define __ASM_KERNEL_H
-> > > +
-> > > +#define NR_CPUS    4096
-> >
-> > In arch/riscv/Kconfig I see this:
-> >
-> > config NR_CPUS
-> >       int "Maximum number of CPUs (2-32)"
-> >       range 2 32
-> >       depends on SMP
-> >       default "8"
-> >
-> > Would you mind explaining where the 4096 number of CPUs comes from?
-> >
-> > Thanks,
-> > Alex
-> >
-> > > +
-> > > +#endif /* __ASM_KERNEL_H */
-> > > --
-> > > 2.36.0
-> > >
+Fixes: 527d5cd7eece ("KVM: x86/mmu: Zap only obsolete roots if a root shadow page is zapped")
+Cc: stable@vger.kernel.org
+
+> 
+> Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 45e1573f8f1d..22803916a609 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5168,7 +5168,7 @@ static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+>  		roots_to_free |= KVM_MMU_ROOT_CURRENT;
+>  
+>  	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
+> -		if (is_obsolete_root(kvm, mmu->root.hpa))
+> +		if (is_obsolete_root(kvm, mmu->prev_roots.hpa))
+
+My version is bad, but at least it compiles ;-)
+
+arch/x86/kvm/mmu/mmu.c: In function ‘__kvm_mmu_free_obsolete_roots’:
+arch/x86/kvm/mmu/mmu.c:5182:58: error: ‘(struct kvm_mmu_root_info *)&mmu->prev_roots’ is a pointer; did you mean to use ‘->’?
+ 5182 |                 if (is_obsolete_root(kvm, mmu->prev_roots.hpa))
+      |                                                          ^
+      |                                                          ->
+
+
+		if (is_obsolete_root(kvm, mmu->prev_roots[i].hpa))
+		
+>  			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+>  	}
+>  
+> -- 
+> 2.30.2
+> 
