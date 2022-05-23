@@ -2,141 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F72C531E1D
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 23:41:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ED98531E28
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 23:48:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229847AbiEWVlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 17:41:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51514 "EHLO
+        id S229994AbiEWVsj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 17:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231134AbiEWVla (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 17:41:30 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEBC11C01
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 14:41:27 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id p16-20020a170902e75000b00161d96620c4so7303898plf.14
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 14:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=VU7bPAhX/r0weRFhbREr5P1IddEmW8HdNVHkdTEqOfQ=;
-        b=VfQ2pewNeOMr4hdqxSjZaEIgmjWUg4f1QwcxPet0P9N0rdzAIr2FWOkTHZl3kdhTpB
-         ssNfAxmaYNVYb4JZzQp4IGNQP+6p7yiRf4OSXD2NZn054zRj9F9j8h5TFljO9iFuw4Oc
-         rQYWtMRXv4zHY/Hk3mBepjwcgCq8oE3Bw1u0PoiZz62rrtaPvRexN8kf8IZ4wo3uHNAo
-         +q8CmfsSBwA0Ir9SB3JZSNob1wDfsnVv3aLB/vgY2pbQt9Xr7nf8IeQnjgnBo+IYNhJe
-         gZBMP93gy05HF4Se0wfUdlF23lOGNBTimPbl8r2qxfiWWbXxEvjaxmJGjp6czzsdrZsL
-         p22w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=VU7bPAhX/r0weRFhbREr5P1IddEmW8HdNVHkdTEqOfQ=;
-        b=MufgdO3GLtj5judRz6a68koWo/znP24H2TVGaUJNStOM4VPpZhPUASnCLsYaH8fFo7
-         QTGFFBQvXy/zjNElZ0pdM1b0snHWnEVia9izbw4qrLnu+IcnYTEas9w49w06uM0c9xZs
-         +qLQdiqZ9gyyWiuSCjbWri9R9eYjToWmy+IeEmS04zLduuz4tFELR5rBeXg4aohqsLHj
-         FbgOxw8H/nP8HeBjS10KyeJ4g6M9cdis8CsAyhGx4dftNrfCsli0n5Kc9FEsHNpSoz1Q
-         y93azGQCZIvIasKxEMdRakietP96INUYF14WYU44y5RjJaeoHeFQzAUyS8CdVSaR87kj
-         /9ig==
-X-Gm-Message-State: AOAM533XnlwnT9QvGQ6uwdm6NtMLnvmx2Ie0NH/nYNFO6N37vP0NKM+U
-        vYt72Ch9Eo6qsHEy4guNlFHLV4+ZXk1kjlOhead6VaQfWo7HWM+1DEldZJBQczwlIHFJjoh+zjF
-        8epb9anh2E7QGPLUiOBoWK/ERvJNYS+7xJ1jJSxv3DH6vlrhKOXV12rGAYF02L93fI/2H
-X-Google-Smtp-Source: ABdhPJyTclnu9AsQMaoDbrjzl42lyBFiCn1zKhVMpABiSVfpusyaxosLQF9YVgk3HGiEpQBpyGgKKYC97JmBfaWi
-X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a62:484:0:b0:50d:a020:88e5 with SMTP id
- 126-20020a620484000000b0050da02088e5mr25245954pfe.51.1653342086556; Mon, 23
- May 2022 14:41:26 -0700 (PDT)
-Date:   Mon, 23 May 2022 21:41:10 +0000
-In-Reply-To: <20220523214110.1282480-1-aaronlewis@google.com>
-Message-Id: <20220523214110.1282480-5-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20220523214110.1282480-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH 4/4] selftests: kvm/x86: Add testing for KVM_SET_PMU_EVENT_FILTER
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229473AbiEWVsh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 17:48:37 -0400
+Received: from mout-u-107.mailbox.org (mout-u-107.mailbox.org [IPv6:2001:67c:2050:101:465::107])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CC026C1
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 14:48:35 -0700 (PDT)
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-u-107.mailbox.org (Postfix) with ESMTPS id 4L6WDH2BNSz9sQh;
+        Mon, 23 May 2022 23:48:31 +0200 (CEST)
+X-Hashcash: 1:24:220523:seanjc@google.com::+pndUZwQNfsPbpzt:00000000000000000000000000000000000000000000vdKp
+X-Hashcash: 1:24:220523:kvm@vger.kernel.org::4wnOJU5MdZOWDpRT:000000000000000000000000000000000000000001dmmo
+X-Hashcash: 1:24:220523:lkujaw@member.fsf.org::5tXkkivReZur9+8H:00000000000000000000000000000000000000002pXQ
+References: <20220521081511.187388-1-lkujaw@member.fsf.org>
+ <You/kms+AnKE1t0L@google.com>
+From:   Lev Kujawski <lkujaw@member.fsf.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, lkujaw@member.fsf.org
+Subject: Re: [PATCH] KVM: set_msr_mce: Permit guests to ignore single-bit
+ ECC errors
+Message-ID: <874k1gnlre.fsf@iridium.uucp>
+In-reply-to: <You/kms+AnKE1t0L@google.com>
+X-PGP-Key: https://meta.sr.ht/~lkujaw.pgp
+X-PGP-Fingerprint: AC2ADB1BEE410BB0B791E393441828874091B824
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 4L6WDH2BNSz9sQh
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,MISSING_DATE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+Date:   Mon, 23 May 2022 17:48:37 -0400
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test that masked events are not using invalid bits, and if they are,
-ensure the pmu event filter is not accepted by KVM_SET_PMU_EVENT_FILTER.
-The only valid bits that can be used for masked events are set when
-using KVM_PMU_EVENT_ENCODE_MASKED_EVENT() with one caveat.  If any bits
-in the high nybble[1] of the eventsel for AMD are used on Intel setting
-the pmu event filter with KVM_SET_PMU_EVENT_FILTER will fail.
 
-Also, because no validation was being done on the event list prior to
-the introduction of masked events, verify that this continues for the
-original event type (flags == 0).  If invalid bits are set (bits other
-than eventsel+umask) the pmu event filter will be accepted by
-KVM_SET_PMU_EVENT_FILTER.
+Sean Christopherson writes:
 
-[1] bits 35:32 in the event and bits 11:8 in the eventsel.
+> "KVM: x86:" for the shortlog scope.
+>
+> On Sat, May 21, 2022, Lev Kujawski wrote:
+>> Certain guest operating systems (e.g., UNIXWARE) clear bit 0 of
+>> MC1_CTL to ignore single-bit ECC data errors.
+>
+> Not that it really matters, but is this behavior documented anywhere?  I've searched
+> a variety of SDMs, APMs, and PPRs, and can't find anything that documents this exact
+> behavior.  I totally believe that some CPUs behave this way, but it'd be nice to
+> document exactly which generations of whose CPUs allow clearing bit zero.
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- .../kvm/x86_64/pmu_event_filter_test.c        | 31 +++++++++++++++++++
- 1 file changed, 31 insertions(+)
+Intel's coverage of IA32_MC1_CTL appears to be proprietary (perhaps
+Appendix H material), but AMD helpfully documented it on page 204 of
+their BIOS and Kernel Developer's Guide:
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index 4071043bbe26..403143ee0b6d 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -550,6 +550,36 @@ static void test_masked_filters(struct kvm_vm *vm)
- 	run_masked_filter_tests(vm, masked_events, nmasked_events, event);
- }
- 
-+static void test_filter_ioctl(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f;
-+	uint64_t e = ~0ul;
-+	int r;
-+
-+	/*
-+	 * Unfortunately having invalid bits set in event data is expected to
-+	 * pass when flags == 0 (bits other than eventsel+umask).
-+	 */
-+	f = create_pmu_event_filter(&e, 1, KVM_PMU_EVENT_ALLOW, 0);
-+	r = _vm_ioctl(vm, KVM_SET_PMU_EVENT_FILTER, (void *)f);
-+	TEST_ASSERT(r == 0, "Valid PMU Event Filter is failing");
-+	free(f);
-+
-+	f = create_pmu_event_filter(&e, 1, KVM_PMU_EVENT_ALLOW,
-+				    KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
-+	r = _vm_ioctl(vm, KVM_SET_PMU_EVENT_FILTER, (void *)f);
-+	TEST_ASSERT(r != 0, "Invalid PMU Event Filter is expected to fail");
-+	free(f);
-+
-+	e = ENCODE_MASKED_EVENT(0xff, 0xff, 0xff, 0xf);
-+
-+	f = create_pmu_event_filter(&e, 1, KVM_PMU_EVENT_ALLOW,
-+				    KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
-+	r = _vm_ioctl(vm, KVM_SET_PMU_EVENT_FILTER, (void *)f);
-+	TEST_ASSERT(r == 0, "Valid PMU Event Filter is failing");
-+	free(f);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	void (*guest_code)(void) = NULL;
-@@ -595,6 +625,7 @@ int main(int argc, char *argv[])
- 	test_not_member_allow_list(vm);
- 
- 	test_masked_filters(vm);
-+	test_filter_ioctl(vm);
- 
- 	kvm_vm_free(vm);
- 
--- 
-2.36.1.124.g0e6072fb45-goog
+https://www.amd.com/system/files/TechDocs/26094.PDF
+
+I experimentally determined that UNIXWARE writes MC1_CTL on QEMU models
+"pentium2" or newer, but my guess is that this functionality was
+actually introduced with the Pentium Pro.
+
+>> Single-bit ECC data errors are always correctable and thus are safe to ignore
+>> because they are informational in nature rather than signaling a loss of data
+>> integrity.
+>> 
+>> Prior to this patch, these guests would crash upon writing MC1_CTL,
+>> with resultant error messages like the following:
+>> 
+>> error: kvm run failed Operation not permitted
+>> EAX=fffffffe EBX=fffffffe ECX=00000404 EDX=ffffffff
+>> ESI=ffffffff EDI=00000001 EBP=fffdaba4 ESP=fffdab20
+>> EIP=c01333a5 EFL=00000246 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
+>> ES =0108 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+>> CS =0100 00000000 ffffffff 00c09b00 DPL=0 CS32 [-RA]
+>> SS =0108 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+>> DS =0108 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+>> FS =0000 00000000 ffffffff 00c00000
+>> GS =0000 00000000 ffffffff 00c00000
+>> LDT=0118 c1026390 00000047 00008200 DPL=0 LDT
+>> TR =0110 ffff5af0 00000067 00008b00 DPL=0 TSS32-busy
+>> GDT=     ffff5020 000002cf
+>> IDT=     ffff52f0 000007ff
+>> CR0=8001003b CR2=00000000 CR3=0100a000 CR4=00000230
+>> DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
+>> DR6=ffff0ff0 DR7=00000400
+>> EFER=0000000000000000
+>> Code=08 89 01 89 51 04 c3 8b 4c 24 08 8b 01 8b 51 04 8b 4c 24 04 <0f>
+>> 30 c3 f7 05 a4 6d ff ff 10 00 00 00 74 03 0f 31 c3 33 c0 33 d2 c3 8d
+>> 74 26 00 0f 31 c3
+>> 
+>> Signed-off-by: Lev Kujawski <lkujaw@member.fsf.org>
+>> ---
+>>  arch/x86/kvm/x86.c | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 4790f0d7d40b..128dca4e7bb7 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -3215,10 +3215,13 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>  			/* only 0 or all 1s can be written to IA32_MCi_CTL
+>>  			 * some Linux kernels though clear bit 10 in bank 4 to
+>>  			 * workaround a BIOS/GART TBL issue on AMD K8s, ignore
+>> -			 * this to avoid an uncatched #GP in the guest
+>> +			 * this to avoid an uncatched #GP in the guest.
+>> +			 *
+>> +			 * UNIXWARE clears bit 0 of MC1_CTL to ignore
+>> +			 * correctable, single-bit ECC data errors.
+>>  			 */
+>>  			if ((offset & 0x3) == 0 &&
+>> -			    data != 0 && (data | (1 << 10)) != ~(u64)0)
+>> +			    data != 0 && (data | (1 << 10) | 1) != ~(u64)0)
+>>  				return -1;
+>
+> If KVM injects a #GP like it's supposed to[*], will UNIXWARE eat the #GP and continue
+> on, or will it explode?  If it continues on, I'd prefer to avoid more special casing in
+> KVM.
+>
+> If it explodes, I think my preference would be to just drop the MCi_CTL checks
+> entirely.  AFAICT, P4-based and P5-based Intel CPus, and all? AMD CPUs allow
+> setting/clearing arbitrary bits.  The checks really aren't buying us anything,
+> and it seems like Intel retroactively defined the "architectural" behavior of
+> only 0s/1s.
+>
+> [*] https://lore.kernel.org/all/20220512222716.4112548-2-seanjc@google.com
+
+Unfortunately, I cannot say if the UNIXWARE kernel would panic because
+QEMU enters a STOP state from which attempts to continue are met with
+"Error: Resetting the Virtual Machine is required."
+
+Thanks for the feedback, Lev
 
