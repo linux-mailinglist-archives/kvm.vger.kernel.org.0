@@ -2,148 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FD01530A90
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 10:01:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 821BF5309AF
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 08:56:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231146AbiEWH1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 03:27:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52488 "EHLO
+        id S229529AbiEWGyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 02:54:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230493AbiEWH0u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 03:26:50 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D9AB49A;
-        Mon, 23 May 2022 00:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653290567; x=1684826567;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KWflf9hZ4EEzO/3N36rfafAnRxhbr/9bpirmiokHGHo=;
-  b=hxQ++Y1zPePcU7OZpmvThaDATJ7bGaHDa3eHdYyasSI5Ewdt5MWchVlI
-   aS/ZfgeVwJYt0K7E2mkOuZ3RlF7y4QsrhHU5dVb7Ome31IHXaHeE2Wind
-   ANqc7pVAtb255NKu4L1phZnVYG5w5F7LJS+tsFQ3n08EeNLHQ3EVSdKxE
-   FNkOWdJFJGbL8+XPent1GT1opVEVING6avsiA7XU76UKDW4/2hOav/KHu
-   zwViYKKxKXvziqIXN3Mk4Q34jaPk3Hwpoxnp0DVySaIjpI9lYZ0FtGVhv
-   3/gNMsu1IkYbYncocvPmcIVB02mCIYzZcrJDNw02Qfa2HiCG+tGwmAECZ
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10355"; a="260727359"
-X-IronPort-AV: E=Sophos;i="5.91,245,1647327600"; 
-   d="scan'208";a="260727359"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2022 23:46:16 -0700
-X-IronPort-AV: E=Sophos;i="5.91,245,1647327600"; 
-   d="scan'208";a="600476753"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.249.175.93]) ([10.249.175.93])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2022 23:46:13 -0700
-Message-ID: <5c5a7597-d6e3-7a05-ead8-659c45aea222@intel.com>
-Date:   Mon, 23 May 2022 14:46:11 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.9.0
-Subject: Re: [PATCH v6 2/3] KVM: selftests: Add a test to get/set triple fault
- event
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S229437AbiEWGyu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 02:54:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6CC2454FA9
+        for <kvm@vger.kernel.org>; Sun, 22 May 2022 23:52:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653288640;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6or0LDEr8+Nq81Rkj47r4fBHy8teKoRGQNGc1avEiUw=;
+        b=Z23L5CX02ZkusNKCa8G7FcJkvF68aT8t2h630TguCnRAqfBfe8cIrNzvhEIyWPwnsJFBXq
+        Pe+GXwG2qUOC2rLPO6zsjBBtCPXx9T3KgcRNk64Uf38DtT0MY/HoeBkoCa193yTCuuTgwR
+        cDXfM9xcVubH+3+3BYgnFUQYZc50n8Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-509-eUJsIwmcNCqspPyOcQzEDw-1; Mon, 23 May 2022 02:50:33 -0400
+X-MC-Unique: eUJsIwmcNCqspPyOcQzEDw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 43A08801210;
+        Mon, 23 May 2022 06:50:32 +0000 (UTC)
+Received: from starship (unknown [10.40.192.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C58041047E8;
+        Mon, 23 May 2022 06:50:25 +0000 (UTC)
+Message-ID: <65991ac329a32cf4128400b643d5b5ccf3918cfe.camel@redhat.com>
+Subject: Re: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the
+ guest and/or host changes apic id/base from the defaults.
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220421072958.16375-1-chenyi.qiang@intel.com>
- <20220421072958.16375-3-chenyi.qiang@intel.com> <YoVHAIGcFgJit1qp@google.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <YoVHAIGcFgJit1qp@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org
+Date:   Mon, 23 May 2022 09:50:24 +0300
+In-Reply-To: <CALMp9eSVji2CPW1AjFoSbWZ_b-r3y67HyatgdqXEqSyUaD1_BQ@mail.gmail.com>
+References: <20220427200314.276673-1-mlevitsk@redhat.com>
+         <20220427200314.276673-3-mlevitsk@redhat.com> <YoZrG3n5fgMp4LQl@google.com>
+         <e32f6c904c92e9e9efabcc697917a232f5e88881.camel@redhat.com>
+         <CALMp9eSVji2CPW1AjFoSbWZ_b-r3y67HyatgdqXEqSyUaD1_BQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, 2022-05-22 at 07:47 -0700, Jim Mattson wrote:
+> On Sun, May 22, 2022 at 2:03 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > On Thu, 2022-05-19 at 16:06 +0000, Sean Christopherson wrote:
+> > > On Wed, Apr 27, 2022, Maxim Levitsky wrote:
+> > > > Neither of these settings should be changed by the guest and it is
+> > > > a burden to support it in the acceleration code, so just inhibit
+> > > > it instead.
+> > > > 
+> > > > Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
+> > > > 
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > > +           return;
+> > > > +
+> > > > +   pr_warn_once("APIC ID change is unsupported by KVM");
+> > > 
+> > > It's supported (modulo x2APIC shenanigans), otherwise KVM wouldn't need to disable
+> > > APICv.
+> > 
+> > Here, as I said, it would be nice to see that warning if someone complains.
+> > Fact is that AVIC code was totally broken in this regard, and there are probably more,
+> > so it would be nice to see if anybody complains.
+> > 
+> > If you insist, I'll remove this warning.
+> 
+> This may be fine for a hobbyist, but it's a terrible API in an
+> enterprise environment. To be honest, I have no way of propagating
+> this warning from /var/log/messages on a particular host to a
+> potentially impacted customer. Worse, if they're not the first
+> impacted customer since the last host reboot, there's no warning to
+> propagate. I suppose I could just tell every later customer, "Your VM
+> was scheduled to run on a host that previously reported, 'APIC ID
+> change is unsupported by KVM.' If you notice any unusual behavior,
+> that might be the reason for it," but that isn't going to inspire
+> confidence. I could schedule a drain and reboot of the host, but that
+> defeats the whole point of the "_once" suffix.
+
+Mostly agree, and I read alrady few discussions about exactly this,
+those warnings are mostly useless, but they are used in the
+cases where we don't have the courage to just exit with KVM_EXIT_INTERNAL_ERROR.
+
+I do not thing though that the warning is completely useless, 
+as we often have the kernel log of the target machine when things go wrong, 
+so *we* can notice it.
+In other words a kernel warning is mostly useless but better that nothing.
+
+About KVM_EXIT_WARNING, this is IMHO a very good idea, probably combined
+with some form of taint flag, which could be read by qemu and then shown
+over hmp/qmp interfaces.
+
+Best regards,
+	Maxim levitsky
 
 
-On 5/19/2022 3:20 AM, Sean Christopherson wrote:
-> On Thu, Apr 21, 2022, Chenyi Qiang wrote:
->> +#ifndef __x86_64__
->> +# error This test is 64-bit only
 > 
-> No need, all of KVM selftests are 64-bit only.
+> I know that there's a long history of doing this in KVM, but I'd like
+> to ask that we:
+> a) stop piling on
+> b) start fixing the existing uses
 > 
->> +#endif
->> +
->> +#define VCPU_ID			0
->> +#define ARBITRARY_IO_PORT	0x2000
->> +
->> +/* The virtual machine object. */
->> +static struct kvm_vm *vm;
->> +
->> +static void l2_guest_code(void)
->> +{
->> +	/*
->> +	 * Generate an exit to L0 userspace, i.e. main(), via I/O to an
->> +	 * arbitrary port.
->> +	 */
+> If KVM cannot emulate a perfectly valid operation, an exit to
+> userspace with KVM_EXIT_INTERNAL_ERROR is warranted. Perhaps for
+> operations that we suspect KVM might get wrong, we should have a new
+> userspace exit: KVM_EXIT_WARNING?
 > 
-> I think we can test a "real" triple fault without too much effort by abusing
-> vcpu->run->request_interrupt_window.  E.g. map the run struct into L2, clear
-> PIN_BASED_EXT_INTR_MASK in vmcs12, and then in l2_guest_code() do:
-> 
-> 	asm volatile("cli");
-> 
-> 	run->request_interrupt_window = true;
+> I'm not saying that you should remove the warning. I'm just asking
+> that it be augmented with a direct signal to userspace that KVM may no
+> longer be reliable.
 > 
 
-Maybe, A GUEST_SYNC to main() to change the request_interrupt_window 
-also works.
 
-> 	asm volatile("sti; ud2");
-> 
-
-How does the "real" triple fault occur here? Through UD2?
-
-> 	asm volatile("inb %%dx, %%al"
-> 		     : : [port] "d" (ARBITRARY_IO_PORT) : "rax"); 	
-> 
-> The STI shadow will block the IRQ-window VM-Exit until after the ud2, i.e. until
-> after the triple fault is pending.
-> 
-> And then main() can
-> 
->    1. verify it got KVM_EXIT_IRQ_WINDOW_OPEN with a pending triple fault
->    2. clear the triple fault and re-enter L1+l2
->    3. continue with the existing code, e.g. verify it got KVM_EXIT_IO, stuff a
->       pending triple fault, etc...
-> 
-> That said, typing that out makes me think we should technically handle/prevent this
-> in KVM since triple fault / shutdown is kinda sorta just a special exception.
-> 
-> Heh, and a potentially bad/crazy idea would be to use a reserved/magic vector in
-> kvm_vcpu_events.exception to save/restore triple fault, e.g. we could steal
-> NMI_VECTOR.
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f2d0ee9296b9..d58c0cfd3cd3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4743,7 +4743,8 @@ static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
->          return (kvm_arch_interrupt_allowed(vcpu) &&
->                  kvm_cpu_accept_dm_intr(vcpu) &&
->                  !kvm_event_needs_reinjection(vcpu) &&
-> -               !vcpu->arch.exception.pending);
-> +               !vcpu->arch.exception.pending &&
-> +               !kvm_test_request(KVM_REQ_TRIPLE_FAULT, vcpu));
->   }
-> 
->   static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
-> 
-> 
-> 
