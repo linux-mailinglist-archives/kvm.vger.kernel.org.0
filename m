@@ -2,73 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ACBD531C06
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:57:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6130A531CF8
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:57:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbiEWTUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 15:20:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39004 "EHLO
+        id S230221AbiEWTYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 15:24:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbiEWTUI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 15:20:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB098183AF
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 11:54:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653332081;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=LMXQGyLkmab4+K6qS2rgyR+Uck05Izn5Wc09E2bA7nse6Pe9I1jeiaMKCBdIEyTAEQtaIg
-        2Wd3oFTPFItwIjrZqcY3eopSAIT1G3cLNjx28PwWCZT1L+mgQNE5M1/4tFmlTwjgdj9a2l
-        coHgdOUZbcp18PXm9SZ6DNwVWu6wGaM=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-327-8qPZFKkGP1qxnt0Qb_A_hQ-1; Mon, 23 May 2022 14:54:40 -0400
-X-MC-Unique: 8qPZFKkGP1qxnt0Qb_A_hQ-1
-Received: by mail-ej1-f70.google.com with SMTP id gn26-20020a1709070d1a00b006f453043956so6475215ejc.15
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 11:54:40 -0700 (PDT)
+        with ESMTP id S229906AbiEWTYY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 15:24:24 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26CA716F361
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:03:32 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id b11so4121548qvv.4
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:03:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bitbyteword.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HHNIPUsJDbBFJZh22t/jyDNYIOXLs4DuR2SaQZ0oOdk=;
+        b=OHGWjxZ43RVGglH0ZBaek/zekCwJXQ2me+plJ95APbCUPJDRlsu/w2lrn8zTe4mHJv
+         TeX2VBxIgthP+O3K/6u3vFvFZL3kFGXQT0PePQ3yBvaoCsECP/6etaACqtkWm9m+yE/N
+         1pmilsdldoHfCzImdAfScR2AeKtXiX68NUU4XE0eMvp9L0p+UUdjctazUkl0Ud9FwMZT
+         L71eJv3qSP2F1gmdjI+8Lf9SPqVXWScvEgOQd6QA8o5hMM5YMtZaBUeQAismPhJ8BQ2V
+         P4IVMVLLUtrSNXp4zJgsaGSk849FwhVe/D+dVKnMG+oDEK+e7BNh5WsgeYn3WcMWHJuU
+         tJag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=XqZibzTVO4Wg6qKnBHfMJYDilSpv+voxuXzJKf+3/XliZzsZu404k3o/2GcIicbPR9
-         BX0x2EUoPF+brcqjkzGUtmKv+f26/wF5+WPFIcL1kLU+wlsiX+l4e6PdPwg3Z69jdjrF
-         mzTcP1Qc6cnlca7ALvT2PSQUWS8njkKRfobBbOnkS5OTh7BWKd5+CMP21XnuXNtYwvFG
-         VNaF8eyzHEBjFEs6xLwi2Ywc2MRXlTn+RoUBwcYIp3nqTKtovNdvwO7n9XTc27zxKrkg
-         cW2Lv5EFT4hkC6kFCv0qC3gnCREAAfa9BzL5WPGhUVwS624mMd7c7uMDGPbbi9alDpTJ
-         1dXg==
-X-Gm-Message-State: AOAM53265d6H7MrkKTcnNVjbLOhTjKdlYoyRbeOgO+RzpxF6uuVL1t6D
-        BRpRcA6STr80SSCZzpWbJkqn30hql7pJlmCjWcX1w5JdgXjRmYmNoEatPEjBQHh4XEfd1FLFAq4
-        CycXYcZ6lzkSi
-X-Received: by 2002:a50:fd95:0:b0:42a:b7ba:291a with SMTP id o21-20020a50fd95000000b0042ab7ba291amr25054011edt.247.1653332079451;
-        Mon, 23 May 2022 11:54:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzlP4vFpiuwfDgCgLY+SMHgDrnRZVTVsHalTH3Umr5xRZAxRyaflx9PhmieSCKcv6MGdUosqw==
-X-Received: by 2002:a50:fd95:0:b0:42a:b7ba:291a with SMTP id o21-20020a50fd95000000b0042ab7ba291amr25053997edt.247.1653332079232;
-        Mon, 23 May 2022 11:54:39 -0700 (PDT)
-Received: from goa-sendmail ([93.56.169.184])
-        by smtp.gmail.com with ESMTPSA id kl4-20020a170907994400b006feb6438264sm3645800ejc.93.2022.05.23.11.54.38
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HHNIPUsJDbBFJZh22t/jyDNYIOXLs4DuR2SaQZ0oOdk=;
+        b=Rxk2GCTsYq+Pm1GFTR6UNSJzOa6+fCaMzEVLhvVQ9cf6dwMx9pXAYzMOm6YCsQ9sX+
+         wQCcOis7QnIhn+fza2aLiaZVBlZ97cVmYbCUIKbDiax7ccUCcjkZKwfA0MFbPCoiyJWw
+         3YsF6UHcuO7cZemsYgIBl5TlLQpSDh4MVkN5emm+LJXHXKFBWWGz7rcwbp1DDJP53i6W
+         dAPQKb3AuGe3D5XbJ5Ta7Ebg2K9kxRRumIoptXJf/pJbwsXictIwTvPZG4nZ4HttrzC1
+         284otockV4b64Puw/Mq71d2vt9cOqXawxFP6dmtfTElxsZeht7KTMuiI7lZuGjauZyFN
+         JAZw==
+X-Gm-Message-State: AOAM531NUF8tCnt2K5gMgDBoC250DxB8mYd2USuDg9vr3ZgPx0CuyEWR
+        p62J9Cjjtc20DVPNNK7mhMUhfQ==
+X-Google-Smtp-Source: ABdhPJzrbeRCv6+La2EKTHMthFHEHjXyfkxe88T4A2iN93t6pEtPIwoIXBkf7PiAJy58E3o/eNlOXQ==
+X-Received: by 2002:a05:6214:ac3:b0:461:c492:d628 with SMTP id g3-20020a0562140ac300b00461c492d628mr18287853qvi.68.1653332611240;
+        Mon, 23 May 2022 12:03:31 -0700 (PDT)
+Received: from vinmini.lan (c-73-38-52-84.hsd1.vt.comcast.net. [73.38.52.84])
+        by smtp.gmail.com with ESMTPSA id q10-20020ac8450a000000b002f3ca56e6edsm4809279qtn.8.2022.05.23.12.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 May 2022 11:54:38 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org
-Subject: Re: [PATCH v2] target/i386/kvm: Fix disabling MPX on "-cpu host" with MPX-capable host
-Date:   Mon, 23 May 2022 20:54:37 +0200
-Message-Id: <20220523185437.364606-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.36.0
-In-Reply-To: <51aa2125c76363204cc23c27165e778097c33f0b.1653323077.git.maciej.szmigiero@oracle.com>
-References: 
+        Mon, 23 May 2022 12:03:30 -0700 (PDT)
+From:   "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Vineeth Pillai <vineeth@bitbyteword.org>,
+        linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>,
+        Joel Fernandes <joel@joelfernandes.org>
+Subject: [PATCH] KVM: debugfs: expose pid of vcpu threads
+Date:   Mon, 23 May 2022 15:03:27 -0400
+Message-Id: <20220523190327.2658-1-vineeth@bitbyteword.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,8 +68,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+From: Vineeth Pillai <vineeth@bitbyteword.org>
 
-Paolo
+Add a new debugfs file to expose the pid of each vcpu threads. This
+is very helpful for userland tools to get the vcpu pids without
+worrying about thread naming conventions of the VMM.
 
+Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
+---
+ include/linux/kvm_host.h |  2 ++
+ virt/kvm/kvm_main.c      | 15 +++++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 34eed5f85ed6..c2c86fce761c 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1434,6 +1434,8 @@ int kvm_arch_pm_notifier(struct kvm *kvm, unsigned long state);
+ 
+ #ifdef __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
++#else
++static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
+ #endif
+ 
+ int kvm_arch_hardware_enable(void);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5ab12214e18d..9bb1dbf51c90 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3723,9 +3723,18 @@ static int create_vcpu_fd(struct kvm_vcpu *vcpu)
+ 	return anon_inode_getfd(name, &kvm_vcpu_fops, vcpu, O_RDWR | O_CLOEXEC);
+ }
+ 
++#ifdef __KVM_HAVE_ARCH_VCPU_DEBUGFS
++static int vcpu_get_pid(void *data, u64 *val)
++{
++	struct kvm_vcpu *vcpu = (struct kvm_vcpu *) data;
++	*val = pid_nr(rcu_access_pointer(vcpu->pid));
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(vcpu_get_pid_fops, vcpu_get_pid, NULL, "%llu\n");
++
+ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+ {
+-#ifdef __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ 	struct dentry *debugfs_dentry;
+ 	char dir_name[ITOA_MAX_LEN * 2];
+ 
+@@ -3735,10 +3744,12 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+ 	snprintf(dir_name, sizeof(dir_name), "vcpu%d", vcpu->vcpu_id);
+ 	debugfs_dentry = debugfs_create_dir(dir_name,
+ 					    vcpu->kvm->debugfs_dentry);
++	debugfs_create_file("pid", 0444, debugfs_dentry, vcpu,
++			    &vcpu_get_pid_fops);
+ 
+ 	kvm_arch_create_vcpu_debugfs(vcpu, debugfs_dentry);
+-#endif
+ }
++#endif
+ 
+ /*
+  * Creates some virtual cpus.  Good luck creating more than one.
+-- 
+2.34.1
 
