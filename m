@@ -2,129 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D62E7531295
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:22:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90A9C53122F
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:22:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237624AbiEWPNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 11:13:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35986 "EHLO
+        id S237744AbiEWPWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 11:22:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237700AbiEWPNl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 11:13:41 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4B5EF5D1BC
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:13:27 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E45D139F;
-        Mon, 23 May 2022 08:13:27 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E364E3F73D;
-        Mon, 23 May 2022 08:13:25 -0700 (PDT)
-Date:   Mon, 23 May 2022 16:13:23 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Keir Fraser <keirf@google.com>
-Cc:     Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
-        catalin.marinas@arm.com, kernel-team@android.com,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>
-Subject: Re: [PATCH kvmtool 0/2] Fixes for virtio_balloon stats printing
-Message-ID: <20220523161323.0e7df3d5@donnerap.cambridge.arm.com>
-In-Reply-To: <Youi7+T1+YG/6ed9@google.com>
-References: <20220520143706.550169-1-keirf@google.com>
-        <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
-        <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
-        <Youi7+T1+YG/6ed9@google.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        with ESMTP id S237760AbiEWPWj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 11:22:39 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9918E5DBF1
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:22:37 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id nk9-20020a17090b194900b001df2fcdc165so17881033pjb.0
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 08:22:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=alhazuhH7tTd8Xd528vjQZhEVIVEKAWK4HCLXZDJ228=;
+        b=FY+eaeQn0QSUHoJZ1pIFqwwhEngjriob9gD9u/B6V7NGsK628vXfe9OaR7V+ivQcG7
+         oUq06I8eW7HBIntiAx8hVuSzVcI4o08UOO8rnlQzh+q3k/m/WbEVxbdOUyjyOCwOE937
+         A487RWEuR49BgO5YHvoZXJYj8YibiJbikPaMzwoJU6XjJBkkBT4zo6LA0wUkZ+xe+wVv
+         u/5J4TUl1BPNy5wFyQRJj+jpLzLFkAgws5kcfohn0eOOtgmxkfKFRb1vx4U7mxSjIxMa
+         n0m0TkhMSmH3C563bTiPkClwsxB2JnwTw2UxQ027A0jTP2RpKPm9+cBoqaLh2XhDQs3i
+         KbEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=alhazuhH7tTd8Xd528vjQZhEVIVEKAWK4HCLXZDJ228=;
+        b=WRVpKyntCXU86UqkjtvNqxgUYMazW8I9urZ9Ke4pZ9QIOCLPZjBW3SCOotjxJBJA/8
+         hZfJlb+i5wysqP7WU7PaVC5u8Xj8hhvFROOcrbgRVyDqYSK3dvRfmxS2MtR4yXXw7Y/E
+         TEBtjUPcBQqCK3hQCs5fbpkT8DrDZko2ZZpDp/i9yd0F6EvB5KT9JtwxPOXemYaAPZcW
+         p2LpnmZrmrrC4Wn1G5ZwPQS7U90EBSKmPrjbO73S11FTTGHVpHno/ltUrW0O3qbXiPjz
+         qRjFRUvv9Zti28ZuJbrJ06DlWNz5xsbXt7HtqUyfMCdIVDBCn7tD9KSeM8uD3aPy3Srx
+         0MUQ==
+X-Gm-Message-State: AOAM530qVLiAXybO7wexDnK4z0XViHFfbYpV06RrEbmBWc7q5zEKyBxs
+        CF5krGQJ5YDFTNvUZ7EDMHEPhA==
+X-Google-Smtp-Source: ABdhPJxMnuGcLeXNmgvjCrimkV9tdjgzm2jljb8i5xr1qPYZt2WYeIGCUhIkYo7TSWGZfmskKdgJKg==
+X-Received: by 2002:a17:90b:3884:b0:1df:db8a:1fcf with SMTP id mu4-20020a17090b388400b001dfdb8a1fcfmr24013896pjb.217.1653319356845;
+        Mon, 23 May 2022 08:22:36 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q22-20020a170902789600b0016230703ca3sm1655647pll.231.2022.05.23.08.22.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 May 2022 08:22:36 -0700 (PDT)
+Date:   Mon, 23 May 2022 15:22:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Andy Lutomirski <luto@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+Subject: Re: [PATCH v6 4/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <YoumuHUmgM6TH20S@google.com>
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <20220519153713.819591-5-chao.p.peng@linux.intel.com>
+ <8840b360-cdb2-244c-bfb6-9a0e7306c188@kernel.org>
+ <YofeZps9YXgtP3f1@google.com>
+ <20220523132154.GA947536@chaop.bj.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220523132154.GA947536@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 May 2022 15:06:23 +0000
-Keir Fraser <keirf@google.com> wrote:
-
-> On Mon, May 23, 2022 at 03:42:49PM +0100, Andre Przywara wrote:
-> > On Fri, 20 May 2022 21:51:07 +0100
-> > Will Deacon <will@kernel.org> wrote:
-> > 
-> > Hi,
-> >   
-> > > On Fri, 20 May 2022 14:37:04 +0000, Keir Fraser wrote:  
-> > > > While playing with kvmtool's virtio_balloon device I found a couple of
-> > > > niggling issues with the printing of memory stats. Please consider
-> > > > these fairly trivial fixes.  
-> > 
-> > Unfortunately patch 2/2 breaks compilation on userland with older kernel
-> > headers, like Ubuntu 18.04:
-> > ...
-> >   CC       builtin-stat.o
-> > builtin-stat.c: In function 'do_memstat':
-> > builtin-stat.c:86:8: error: 'VIRTIO_BALLOON_S_HTLB_PGALLOC' undeclared (first use in this function); did you mean 'VIRTIO_BALLOON_S_AVAIL'?
-> >    case VIRTIO_BALLOON_S_HTLB_PGALLOC:
-> >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >         VIRTIO_BALLOON_S_AVAIL
-> > (repeated for VIRTIO_BALLOON_S_HTLB_PGFAIL and VIRTIO_BALLOON_S_CACHES).
-> > 
-> > I don't quite remember what we did here in the past in those cases,
-> > conditionally redefine the symbols in a local header, or protect the
-> > new code with an #ifdef?  
-> 
-> For what it's worth, my opinion is that the sensible options are to:
-> 1. Build against the latest stable, or a specified version of, kernel
-> headers; or 2. Protect with ifdef'ery until new definitions are
-> considered "common enough".
-> 
-> Supporting older headers by grafting or even modifying required newer
-> definitions on top seems a horrid middle ground, albeit I can
-> appreciate the pragmatism of it.
-
-Fair enough, although I don't think option 1) is really viable for users,
-as upgrading the distro provided kernel headers is often not an option for
-the casual user. And even more versed users would probably shy away from
-staining their /usr/include directory just for kvmtool.
-
-Which just leaves option 2? If no one hollers, I will send a patch to that
-regard.
-
-Cheers,
-Andre
-
-
-> 
->  Regards,
->  Keir
-> 
-> 
-> > I would lean towards the former (and hacking this in works), but then we
-> > would need to redefine VIRTIO_BALLOON_S_NR, to encompass the new symbols,
-> > which sounds fragile.
-> > 
-> > Happy to send a patch if we agree on an approach.
-> > 
-> > Cheers,
-> > Andre
-> >   
-> > > > 
-> > > > Keir Fraser (2):
-> > > >   virtio/balloon: Fix a crash when collecting stats
-> > > >   stat: Add descriptions for new virtio_balloon stat types
-> > > > 
-> > > > [...]    
+On Mon, May 23, 2022, Chao Peng wrote:
+> On Fri, May 20, 2022 at 06:31:02PM +0000, Sean Christopherson wrote:
+> > On Fri, May 20, 2022, Andy Lutomirski wrote:
+> > > The alternative would be to have some kind of separate table or bitmap (part
+> > > of the memslot?) that tells KVM whether a GPA should map to the fd.
 > > > 
-> > > Applied to kvmtool (master), thanks!
-> > > 
-> > > [1/2] virtio/balloon: Fix a crash when collecting stats
-> > >       https://git.kernel.org/will/kvmtool/c/3a13530ae99a
-> > > [2/2] stat: Add descriptions for new virtio_balloon stat types
-> > >       https://git.kernel.org/will/kvmtool/c/bc77bf49df6e
-> > > 
-> > > Cheers,  
-> >   
+> > > What do you all think?
+> > 
+> > My original proposal was to have expolicit shared vs. private memslots, and punch
+> > holes in KVM's memslots on conversion, but due to the way KVM (and userspace)
+> > handle memslot updates, conversions would be painfully slow.  That's how we ended
+> > up with the current propsoal.
+> > 
+> > But a dedicated KVM ioctl() to add/remove shared ranges would be easy to implement
+> > and wouldn't necessarily even need to interact with the memslots.  It could be a
+> > consumer of memslots, e.g. if we wanted to disallow registering regions without an
+> > associated memslot, but I think we'd want to avoid even that because things will
+> > get messy during memslot updates, e.g. if dirty logging is toggled or a shared
+> > memory region is temporarily removed then we wouldn't want to destroy the tracking.
+> 
+> Even we don't tight that to memslots, that info can only be effective
+> for private memslot, right? Setting this ioctl to memory ranges defined
+> in a traditional non-private memslots just makes no sense, I guess we can
+> comment that in the API document.
 
+Hrm, applying it universally would be funky, e.g. emulated MMIO would need to be
+declared "shared".  But, applying it selectively would arguably be worse, e.g.
+letting userspace map memory into the guest as shared for a region that's registered
+as private...
+
+On option to that mess would be to make memory shared by default, and so userspace
+must declare regions that are private.  Then there's no weirdness with emulated MMIO
+or "legacy" memslots.
+
+On page fault, KVM does a lookup to see if the GPA is shared or private.  If the
+GPA is private, but there is no memslot or the memslot doesn't have a private fd,
+KVM exits to userspace.  If there's a memslot with a private fd, the shared/private
+flag is used to resolve the 
+
+And to handle the ioctl(), KVM can use kvm_zap_gfn_range(), which will bump the
+notifier sequence, i.e. force the page fault to retry if the GPA may have been
+(un)registered between checking the type and acquiring mmu_lock.
+
+> > I don't think we'd want to use a bitmap, e.g. for a well-behaved guest, XArray
+> > should be far more efficient.
+> 
+> What about the mis-behaved guest? I don't want to design for the worst
+> case, but people may raise concern on the attack from such guest.
+
+That's why cgroups exist.  E.g. a malicious/broken L1 can similarly abuse nested
+EPT/NPT to generate a large number of shadow page tables.
+
+> > One benefit to explicitly tracking this in KVM is that it might be useful for
+> > software-only protected VMs, e.g. KVM could mark a region in the XArray as "pending"
+> > based on guest hypercalls to share/unshare memory, and then complete the transaction
+> > when userspace invokes the ioctl() to complete the share/unshare.
+> 
+> OK, then this can be another field of states/flags/attributes. Let me
+> dig up certain level of details:
+> 
+> First, introduce below KVM ioctl
+> 
+> KVM_SET_MEMORY_ATTR
+
+Actually, if the semantics are that userspace declares memory as private, then we
+can reuse KVM_MEMORY_ENCRYPT_REG_REGION and KVM_MEMORY_ENCRYPT_UNREG_REGION.  It'd
+be a little gross because we'd need to slightly redefine the semantics for TDX, SNP,
+and software-protected VM types, e.g. the ioctls() currently require a pre-exisitng
+memslot.  But I think it'd work...
+
+I'll think more on this...
