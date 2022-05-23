@@ -2,39 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9F01530D4B
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:41:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F4AB530D05
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:41:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233187AbiEWJeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 05:34:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50274 "EHLO
+        id S233419AbiEWJjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 05:39:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233200AbiEWJd5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 05:33:57 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5932D483A7
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 02:33:49 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA02111FB;
-        Mon, 23 May 2022 02:33:48 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00E243F73D;
-        Mon, 23 May 2022 02:33:47 -0700 (PDT)
-Date:   Mon, 23 May 2022 10:34:02 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     will@kernel.org, kvm@vger.kernel.org
-Cc:     Dao Lu <daolu@rivosinc.com>
-Subject: Re: [PATCH kvmtool] Fixes: 0febaae00bb6 ("Add asm/kernel.h for
- riscv")
-Message-ID: <YotVCkpajnskhQm9@monolith.localdoman>
-References: <20220520180946.104214-1-daolu@rivosinc.com>
- <YotUdkD2LIKqhYKq@monolith.localdoman>
+        with ESMTP id S233453AbiEWJj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 05:39:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 798561154
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 02:39:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653298766;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+TxRfMkI29EpV9M74qsZWsccffjGup9UXF5ZlzJ8zeo=;
+        b=d4bqTLB+RXgQRrNDZIlCYMZW0gxy3lkfo1Z3NBkuyteScjt2oeFK+E9RhiXj35aYNO9enV
+        I36tyzj8EE6ZO439yLMTCAHSpnTct2o9tLuAtwVpe8gaZ9Xl+P6TF3DbDeb7Jxy+a30vlO
+        ftouE3wqOKf9FmEUxYl9dFLdurbLklo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-601-WfOSOmZxPpO2UKkF9D2zuw-1; Mon, 23 May 2022 05:39:22 -0400
+X-MC-Unique: WfOSOmZxPpO2UKkF9D2zuw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 197753C1022A;
+        Mon, 23 May 2022 09:39:22 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BFF322026D6A;
+        Mon, 23 May 2022 09:39:21 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id 0A69E18000B4; Mon, 23 May 2022 11:39:20 +0200 (CEST)
+Date:   Mon, 23 May 2022 11:39:20 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com,
+        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 13/36] i386/tdx: Validate TD attributes
+Message-ID: <20220523093920.o6pk5i7zig6enwnm@sirius.home.kraxel.org>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-14-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YotUdkD2LIKqhYKq@monolith.localdoman>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <20220512031803.3315890-14-xiaoyao.li@intel.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -42,68 +74,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adding the kvmtool maintainers, I just noticed that they were missing.
+> Validate TD attributes with tdx_caps that fixed-0 bits must be zero and
+> fixed-1 bits must be set.
 
-On Mon, May 23, 2022 at 10:31:34AM +0100, Alexandru Elisei wrote:
-> Hi,
-> 
-> When I started working on the heterogeneous PMU series, support for the
-> riscv architecture wasn't merged in kvmtool, and after riscv was merged I
-> missed adding the header file.
-> 
-> This indeed fixes this compilation error:
-> 
-> In file included from include/linux/rbtree.h:32,
->                  from include/kvm/devices.h:4,
->                  from include/kvm/pci.h:10,
->                  from include/kvm/vfio.h:6,
->                  from include/kvm/kvm-config.h:5,
->                  from include/kvm/kvm.h:6:
-> include/linux/kernel.h:5:10: fatal error: asm/kernel.h: No such file or directory
->     5 | #include "asm/kernel.h"
->       |          ^~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> compilation terminated.
-> make: *** [Makefile:484: builtin-balloon.o] Error 1
-> 
-> Would be nice to include it in the commit message, so people googling for
-> that exact error message can come across this commit.
-> 
-> On Fri, May 20, 2022 at 11:09:46AM -0700, Dao Lu wrote:
-> > Signed-off-by: Dao Lu <daolu@rivosinc.com>
-> > ---
-> >  riscv/include/asm/kernel.h | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >  create mode 100644 riscv/include/asm/kernel.h
-> > 
-> > diff --git a/riscv/include/asm/kernel.h b/riscv/include/asm/kernel.h
-> > new file mode 100644
-> > index 0000000..a2a8d9e
-> > --- /dev/null
-> > +++ b/riscv/include/asm/kernel.h
-> > @@ -0,0 +1,8 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +
-> > +#ifndef __ASM_KERNEL_H
-> > +#define __ASM_KERNEL_H
-> > +
-> > +#define NR_CPUS	4096
-> 
-> In arch/riscv/Kconfig I see this:
-> 
-> config NR_CPUS
-> 	int "Maximum number of CPUs (2-32)"
-> 	range 2 32
-> 	depends on SMP
-> 	default "8"
-> 
-> Would you mind explaining where the 4096 number of CPUs comes from?
-> 
-> Thanks,
-> Alex
-> 
-> > +
-> > +#endif /* __ASM_KERNEL_H */
-> > -- 
-> > 2.36.0
-> > 
+> -static void setup_td_guest_attributes(X86CPU *x86cpu)
+> +static int tdx_validate_attributes(TdxGuest *tdx)
+> +{
+> +    if (((tdx->attributes & tdx_caps->attrs_fixed0) | tdx_caps->attrs_fixed1) !=
+> +        tdx->attributes) {
+> +            error_report("Invalid attributes 0x%lx for TDX VM (fixed0 0x%llx, fixed1 0x%llx)",
+> +                          tdx->attributes, tdx_caps->attrs_fixed0, tdx_caps->attrs_fixed1);
+> +            return -EINVAL;
+> +    }
+
+So, how is this supposed to work?  Patch #2 introduces attributes as
+user-settable property.  So do users have to manually figure and pass
+the correct value, so the check passes?  Specifically the fixed1 check?
+
+I think 'attributes' should not be user-settable in the first place.
+Each feature-bit which is actually user-settable (and not already
+covered by another option like pmu) should be a separate attribute for
+tdx-object.  Then the tdx code can create attributes from hardware
+capabilities and user settings.
+
+When user-settable options might not be available depending on hardware
+capabilities best practice is to create them as OnOffAuto properties.
+
+  Auto == qemu can pick the value, typical behavior is to enable the
+          feature if the hardware supports it.
+  On == must enable, if it isn't possible throw an error and exit.
+  Off == must disable, if it isn't possible throw an error and exit. 
+
+take care,
+  Gerd
+
