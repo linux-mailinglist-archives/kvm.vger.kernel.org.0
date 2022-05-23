@@ -2,113 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2140530E0A
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:43:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11BE7530D4D
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:41:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232865AbiEWJUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 05:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39972 "EHLO
+        id S232884AbiEWJ2j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 05:28:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232840AbiEWJUL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 05:20:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3AFD47AD6
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 02:20:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653297609;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2WssiX03mpBVHdBN+acen/ASZgo748LXbRvBIixfV0I=;
-        b=Up9pi1ruF90HmStn4B5ujx9VQ0NmgaeqDYZ4q4hdfN4CXwTp4y7w8wsPjuv1hCCmT6mlVJ
-        mLbStFlUgYZp8TNNFBWbHVJjx3Ged3LujvgW+Kq0yux07hXnd+g6ktlmX7F8+ev30GVhGA
-        n3w7FkCV8xsNTe+Y73CyAnpJy2dvun0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-616-MYPFSuCOOGaWgaaAtYjTQQ-1; Mon, 23 May 2022 05:20:06 -0400
-X-MC-Unique: MYPFSuCOOGaWgaaAtYjTQQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 073D7101AA42;
-        Mon, 23 May 2022 09:20:06 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C7E55C27E97;
-        Mon, 23 May 2022 09:20:05 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id AE71418000B4; Mon, 23 May 2022 11:20:03 +0200 (CEST)
-Date:   Mon, 23 May 2022 11:20:03 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 11/36] i386/tdx: Initialize TDX before creating TD
- vcpus
-Message-ID: <20220523092003.lm4vzfpfh4ezfcmy@sirius.home.kraxel.org>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-12-xiaoyao.li@intel.com>
+        with ESMTP id S233119AbiEWJ2L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 05:28:11 -0400
+Received: from mail-m975.mail.163.com (mail-m975.mail.163.com [123.126.97.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 173104755C;
+        Mon, 23 May 2022 02:28:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=8lgLT
+        VHt5fsC5K0SV0wgHt+zhEuifJz0vyvqOUOw1zQ=; b=lmGEh22dqallu5hpjSUMw
+        7l2paGbeCgu94+rNkzWiAWkIT6iIAP2p6XL13zArOlZscjVz8vDpJVpCwT/AaQn+
+        9U7bxbTOwY5dOyxHoE+prRcNW/ypIIu6cVN2JLedXEnvMWnWpg2Nd9nh4boswiNU
+        jDsOYPrjEfNrmqF4C/kQgU=
+Received: from [172.20.109.18] (unknown [116.128.244.169])
+        by smtp5 (Coremail) with SMTP id HdxpCgAXlv2LU4timWBXDw--.1293S2;
+        Mon, 23 May 2022 17:27:40 +0800 (CST)
+Subject: Re: [PATCH] KVM: x86/mmu: optimizing the code in
+ mmu_try_to_unsync_pages
+To:     Sean Christopherson <seanjc@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220520060907.863136-1-luyun_611@163.com>
+ <20220520095428.bahy37jxkznqtwx5@yy-desk-7060> <YoeqB2KAN/wsHMpk@google.com>
+From:   Yun Lu <luyun_611@163.com>
+Message-ID: <02b0b2de-2dd1-3a18-a679-0e8199db1530@163.com>
+Date:   Mon, 23 May 2022 17:27:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-12-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <YoeqB2KAN/wsHMpk@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: HdxpCgAXlv2LU4timWBXDw--.1293S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ur1kur47CFWUJF4kCFy3Jwb_yoW5Jr13pr
+        W8GFs3AF4YqrW3G3s29w1DG3s7urs7tF4UZr98Kas5ZwnF9rnxtry8G3WY9r93JryfGF1S
+        va1Y9FW3uFn3JaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ur-B_UUUUU=
+X-Originating-IP: [116.128.244.169]
+X-CM-SenderInfo: pox130jbwriqqrwthudrp/1tbiMhsKzlWBziNRmQAAsc
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +int tdx_pre_create_vcpu(CPUState *cpu)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    X86CPU *x86cpu = X86_CPU(cpu);
-> +    CPUX86State *env = &x86cpu->env;
-> +    struct kvm_tdx_init_vm init_vm;
-> +    int r = 0;
-> +
-> +    qemu_mutex_lock(&tdx_guest->lock);
-> +    if (tdx_guest->initialized) {
-> +        goto out;
-> +    }
-> +
-> +    memset(&init_vm, 0, sizeof(init_vm));
-> +    init_vm.cpuid.nent = kvm_x86_arch_cpuid(env, init_vm.entries, 0);
-> +
-> +    init_vm.attributes = tdx_guest->attributes;
-> +    init_vm.max_vcpus = ms->smp.cpus;
-> +
-> +    r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, &init_vm);
-> +    if (r < 0) {
-> +        error_report("KVM_TDX_INIT_VM failed %s", strerror(-r));
-> +        goto out;
-> +    }
-> +
-> +    tdx_guest->initialized = true;
-> +
-> +out:
-> +    qemu_mutex_unlock(&tdx_guest->lock);
-> +    return r;
-> +}
+On 2022/5/20 下午10:47, Sean Christopherson wrote:
 
-Hmm, hooking *vm* initialization into *vcpu* creation looks wrong to me.
-
-take care,
-  Gerd
+> On Fri, May 20, 2022, Yuan Yao wrote:
+>> On Fri, May 20, 2022 at 02:09:07PM +0800, Yun Lu wrote:
+>>> There is no need to check can_unsync and prefetch in the loop
+>>> every time, just move this check before the loop.
+>>>
+>>> Signed-off-by: Yun Lu <luyun@kylinos.cn>
+>>> ---
+>>>   arch/x86/kvm/mmu/mmu.c | 12 ++++++------
+>>>   1 file changed, 6 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>>> index 311e4e1d7870..e51e7735adca 100644
+>>> --- a/arch/x86/kvm/mmu/mmu.c
+>>> +++ b/arch/x86/kvm/mmu/mmu.c
+>>> @@ -2534,6 +2534,12 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+>>>   	if (kvm_slot_page_track_is_active(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
+>>>   		return -EPERM;
+>>>
+>>> +	if (!can_unsync)
+>>> +		return -EPERM;
+>>> +
+>>> +	if (prefetch)
+>>> +		return -EEXIST;
+>>> +
+>>>   	/*
+>>>   	 * The page is not write-tracked, mark existing shadow pages unsync
+>>>   	 * unless KVM is synchronizing an unsync SP (can_unsync = false).  In
+>>> @@ -2541,15 +2547,9 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+>>>   	 * allowing shadow pages to become unsync (writable by the guest).
+>>>   	 */
+>>>   	for_each_gfn_indirect_valid_sp(kvm, sp, gfn) {
+>>> -		if (!can_unsync)
+>>> -			return -EPERM;
+>>> -
+>>>   		if (sp->unsync)
+>>>   			continue;
+>>>
+>>> -		if (prefetch)
+>>> -			return -EEXIST;
+>>> -
+>> Consider the case that for_each_gfn_indirect_valid_sp() loop is
+>> not triggered, means the gfn is not MMU page table page:
+>>
+>> The old behavior when : return 0;
+>> The new behavior with this change: returrn -EPERM / -EEXIST;
+>>
+>> It at least breaks FNAME(sync_page) -> make_spte(prefetch = true, can_unsync = false)
+>> which removes PT_WRITABLE_MASK from last level mapping unexpectedly.
+> Yep, the flags should be queried if and only if there's at least one valid, indirect
+> SP for th gfn.  And querying whether there's such a SP is quite expesnive and requires
+> looping over a list, so checking every iteration of the loop is far cheaper.  E.g. each
+> check is a single uop on modern CPUs as both gcc and clang are smart enough to stash
+> the flags in registers so that there's no reload from memory on each loop.  And that
+> also means the CPU can more than likely correctly predict subsequent iterations.
+OK, it's my mistake.  Thanks for your answers.
 
