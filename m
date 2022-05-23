@@ -2,95 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A305531B74
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61AA2531678
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:51:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbiEWTcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 15:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
+        id S230170AbiEWTdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 15:33:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230357AbiEWTbt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 15:31:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1FC99158B
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:15:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653333326;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k/0kz+ejxdczhCliiE6lC8QVlLMBxfRksui59KA65qM=;
-        b=dJ3d/4GgDguzJ4ExiVvqUixL9Neh/Fy2dFYComM/ZMEI9UXNqZ455sYNEam56KdEzBsTGP
-        bkEQMJ/YrBc+GRjmMUPoFncLBo149+HoCIx39fPuiQY6aXmhq838SeXnflUZJEnhjgC2bB
-        6tIrTgLIOnnrU9Mt3hT+cB3ZlwcbuBc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-61-d2-7KdFUMimpSNkN4RplEA-1; Mon, 23 May 2022 15:15:24 -0400
-X-MC-Unique: d2-7KdFUMimpSNkN4RplEA-1
-Received: by mail-ej1-f70.google.com with SMTP id n2-20020a170906724200b006fed87ccbb8so1594396ejk.7
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:15:24 -0700 (PDT)
+        with ESMTP id S230286AbiEWTci (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 15:32:38 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFD9E97
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:16:07 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id oe17-20020a17090b395100b001df77d29587so134827pjb.2
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:16:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=guOycbK5/EyRijM0ulwOqat9Oy7FIS9ZI2dZi62v/vs=;
+        b=RHm3uPKynTcMEh4y4WPUguw8GV9bETy8PME+jXAQ3Pw7JwXTFsDdw1ud+6hB8xInU/
+         6HUW8Lflph39tRBkjIkEK2HiZbflKGCqnZBnJ7ajL6LxtDbNJv7gJl13kkAHlnXG4chN
+         5sVtzVRP2RmaQqCLLE6MIMPWd1KKobB7QHNsQbR/3FqNg/qYta7mZh7KTySe+lVgF/JX
+         K2+77WRcOgnJrFTG1LL5Jz690KUry7nfwD31Gh8d2vyxv9w/x0Or+vs4Lmig+yHfsjyM
+         nKQQ8REwS/R62SYfpPmAUobQzFI+dqMkofURfDlXctmWveFKZZYfQoAeRHTl544uWVqo
+         euQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=k/0kz+ejxdczhCliiE6lC8QVlLMBxfRksui59KA65qM=;
-        b=SbrQSpHtBotoPkdxofzRhqmF/mtxXmZb2ftHPjAqjSOFq9INU9zbeXuHqVrvImOJd0
-         wsroXz1VJdbNiu4t9Hf5zmC+hSWsPFptkbcftkwYjpd7P5GOZRMnQWRSKos27c1YPGIV
-         pFYW5WRIUM7+uTI5SUilfkDAtdg+Mf+a0qQEpySMi8SqKkHLVZqUWcnkN1kTrGh+jp/w
-         W05aQocjwejHxPjxJQm9GMQE+GNL5tLfostqm447gUt104gsDfbdHgx7Ap8q8rX8kfF8
-         Qt2UPcbihBKdVy7mzrfwXyA3zPrf2K+fkX3jlxKIpUrtoTgqMwNy3yDDqfUrqLqsVu68
-         Qorw==
-X-Gm-Message-State: AOAM531rCi2ZlK9Xl8H4E23sZ0dsdqQ7zosk87nCiHYMrEYWUSwxDRlG
-        D7MdoZToOHy0rGpLGKLvBXanFps7c0ljjFNn1lF7lMISKYYFeAws/B+F5JRh0j4uLGqQEbA7qf8
-        lvvVBnzwVNdkL
-X-Received: by 2002:a17:907:6d15:b0:6fd:d985:889b with SMTP id sa21-20020a1709076d1500b006fdd985889bmr21549075ejc.753.1653333323221;
-        Mon, 23 May 2022 12:15:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxgkCPhcAB33EYPZ90yGnEhKwoYAq64BHcNEOKNWqNDyz59/iBOtrFdjzxw5hQFuZHG1dBu+g==
-X-Received: by 2002:a17:907:6d15:b0:6fd:d985:889b with SMTP id sa21-20020a1709076d1500b006fdd985889bmr21549058ejc.753.1653333323039;
-        Mon, 23 May 2022 12:15:23 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id c21-20020aa7c995000000b0042aaacd4edasm8624567edt.26.2022.05.23.12.15.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 May 2022 12:15:22 -0700 (PDT)
-Message-ID: <a1d7d9f9-bb9d-1b98-a073-85d835be0341@redhat.com>
-Date:   Mon, 23 May 2022 21:15:19 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=guOycbK5/EyRijM0ulwOqat9Oy7FIS9ZI2dZi62v/vs=;
+        b=w2JGG5f0WfmN+qGMqOOqLl5SaOwqz5DE/T9qEExL8hnzjWVT/X487qadycDboPEh0I
+         dGOVl1nBhuKg2RTBuJBoGHF/LH8b0GRjCbPBmcqbtBA+RMREBXng02VOk1tlT/LkA6bf
+         QO3MlMkhp5sisQ3LM2mgUFJMZdqITA9rQoLHIsIYrmHics3CGg6/tYiylHIGkws7bmAM
+         1RK0IqCCEaK76iurIpPxSqRD04kI5ZcHhW7IOp5KAMAIbIQu/Qg/MIhKa/iRUJVOSq6x
+         etw34/5BBgsjWPfrIH0Obv/0ie7oiSVPR1wxyDLfMdivQ9urJtcJQ5HZutwlosyM31QU
+         DmYg==
+X-Gm-Message-State: AOAM531DyN/Ig73kmn0OaWVAzJ7SnAc2/w1EqJloe1wFWyfL+G19c+t0
+        2FhxBY0bgGoyZwt0I1VxE0/ZX8x3UOzE9K+k/rjtrnyfGjvaeQ==
+X-Google-Smtp-Source: ABdhPJziLgGj5VfFstC/x/4r1OZxKVgz7eTKv/Akwjrsv5JDrl6ztM8krTiMjVO6Y5pHBV/MMJ2jni/EzKrB5W+53bw=
+X-Received: by 2002:a17:90b:1bd1:b0:1df:b6eb:2b20 with SMTP id
+ oa17-20020a17090b1bd100b001dfb6eb2b20mr468757pjb.221.1653333366595; Mon, 23
+ May 2022 12:16:06 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [GIT PULL 0/4] KVM: s390: Fix and feature for 5.19
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20220523095625.13913-1-borntraeger@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220523095625.13913-1-borntraeger@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20220520180946.104214-1-daolu@rivosinc.com> <YotUdkD2LIKqhYKq@monolith.localdoman>
+ <YotVCkpajnskhQm9@monolith.localdoman> <CAKh7v-Rm3Mtid7KymrbSwwVRoC=S1J0f4CSCbpHXmi1SA45omA@mail.gmail.com>
+ <You2EZ0xBWD29suJ@monolith.localdoman>
+In-Reply-To: <You2EZ0xBWD29suJ@monolith.localdoman>
+From:   Dao Lu <daolu@rivosinc.com>
+Date:   Mon, 23 May 2022 12:15:55 -0700
+Message-ID: <CAKh7v-Rnbs1uOGcDrB6a3+MFKbZX1_-4tgWJH-EKp_Wxd76D=Q@mail.gmail.com>
+Subject: Re: [PATCH kvmtool] Fixes: 0febaae00bb6 ("Add asm/kernel.h for riscv")
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     will@kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/23/22 11:56, Christian Borntraeger wrote:
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.19-1
+Hi Alex,
 
-Pulled, thanks.
+After talking with my colleague I have some additional questions about
+what number we want to put there, as of now there is already a patch
+that will increase the range in Kconfig to 2-512:
 
-Paolo
+https://lore.kernel.org/lkml/CAOnJCUJrN4frY_OdQzO-yr5CrDLvj=ge9KY2d=XnGvAF-uQNvQ@mail.gmail.com/T/
 
+It seems like a moving target and as riscv develops we kinda expect
+this number will grow further. Do you think it is ok for me to at
+least set it to 512, if not 4096 at this time?
+
+Thanks,
+Dao
+
+On Mon, May 23, 2022 at 9:27 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> On Mon, May 23, 2022 at 09:04:04AM -0700, Dao Lu wrote:
+> > Hi Alex,
+> >
+> > Thanks for pointing that out - I wasn't sure where the number came
+> > from so I basically copied from the arm one just so the compilation
+> > can pass.
+>
+> I see, I was worried that I was looking in the wrong place.
+>
+> >
+> > I am happy to fix up the number to 32 and add the compile error
+> > message to the commit message like you said - would something like
+> > this work?
+> > -------
+> > Fixes the following compilation issue:
+> >
+> > include/linux/kernel.h:5:10: fatal error: asm/kernel.h: No such file
+> > or directory
+> >     5 | #include "asm/kernel.h"
+> > -------
+>
+> Sounds good, thanks:
+> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>
+> With the error message added:
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>
+> Thanks,
+> Alex
+>
+> > Thanks,
+> > Dao
+> >
+> > On Mon, May 23, 2022 at 2:33 AM Alexandru Elisei
+> > <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Adding the kvmtool maintainers, I just noticed that they were missing.
+> > >
+> > > On Mon, May 23, 2022 at 10:31:34AM +0100, Alexandru Elisei wrote:
+> > > > Hi,
+> > > >
+> > > > When I started working on the heterogeneous PMU series, support for the
+> > > > riscv architecture wasn't merged in kvmtool, and after riscv was merged I
+> > > > missed adding the header file.
+> > > >
+> > > > This indeed fixes this compilation error:
+> > > >
+> > > > In file included from include/linux/rbtree.h:32,
+> > > >                  from include/kvm/devices.h:4,
+> > > >                  from include/kvm/pci.h:10,
+> > > >                  from include/kvm/vfio.h:6,
+> > > >                  from include/kvm/kvm-config.h:5,
+> > > >                  from include/kvm/kvm.h:6:
+> > > > include/linux/kernel.h:5:10: fatal error: asm/kernel.h: No such file or directory
+> > > >     5 | #include "asm/kernel.h"
+> > > >       |          ^~~~~~~~~~~~~~
+> > > > cc1: all warnings being treated as errors
+> > > > compilation terminated.
+> > > > make: *** [Makefile:484: builtin-balloon.o] Error 1
+> > > >
+> > > > Would be nice to include it in the commit message, so people googling for
+> > > > that exact error message can come across this commit.
+> > > >
+> > > > On Fri, May 20, 2022 at 11:09:46AM -0700, Dao Lu wrote:
+> > > > > Signed-off-by: Dao Lu <daolu@rivosinc.com>
+> > > > > ---
+> > > > >  riscv/include/asm/kernel.h | 8 ++++++++
+> > > > >  1 file changed, 8 insertions(+)
+> > > > >  create mode 100644 riscv/include/asm/kernel.h
+> > > > >
+> > > > > diff --git a/riscv/include/asm/kernel.h b/riscv/include/asm/kernel.h
+> > > > > new file mode 100644
+> > > > > index 0000000..a2a8d9e
+> > > > > --- /dev/null
+> > > > > +++ b/riscv/include/asm/kernel.h
+> > > > > @@ -0,0 +1,8 @@
+> > > > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > > > +
+> > > > > +#ifndef __ASM_KERNEL_H
+> > > > > +#define __ASM_KERNEL_H
+> > > > > +
+> > > > > +#define NR_CPUS    4096
+> > > >
+> > > > In arch/riscv/Kconfig I see this:
+> > > >
+> > > > config NR_CPUS
+> > > >       int "Maximum number of CPUs (2-32)"
+> > > >       range 2 32
+> > > >       depends on SMP
+> > > >       default "8"
+> > > >
+> > > > Would you mind explaining where the 4096 number of CPUs comes from?
+> > > >
+> > > > Thanks,
+> > > > Alex
+> > > >
+> > > > > +
+> > > > > +#endif /* __ASM_KERNEL_H */
+> > > > > --
+> > > > > 2.36.0
+> > > > >
