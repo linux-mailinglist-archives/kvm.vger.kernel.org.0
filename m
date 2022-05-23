@@ -2,73 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42591531207
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:22:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 183925314E4
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 18:26:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238718AbiEWQR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 12:17:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35060 "EHLO
+        id S238756AbiEWQYG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 12:24:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238765AbiEWQRt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 12:17:49 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088CD66AFA
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:17:39 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id c22so14118212pgu.2
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:17:39 -0700 (PDT)
+        with ESMTP id S238732AbiEWQXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 12:23:51 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A05B66832A
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:23:50 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id l14so14527908pjk.2
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:23:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=eNbcOsis/KpOazxwoapGqmAzQvleW1ZvCZVss5TACNY=;
-        b=PvlTBp13muG1TUI68g94aTQ/FiuK9qHmMCLEhGVjZ0ZOVhN6vz5vhhS+wmUP4+Lno7
-         7IlNEdS8L46cr3LPygXWejIC2R5nVJHYFz2RQibrrPusEsaLKGvIB9h6v7KfX7A7i0kB
-         v+P2h1gE9IKmT0G5rBzwpuio2B55DiAPk8drqySZQ6ng/a9/tF4skaP1vmmzJ5HO8Eae
-         PxGQp8Gqh3zX4GFCTSCnZ/kLWXYyzDQ0QstOp7r3CfZjsMSi22A3To/WeaVSCKJ0a/sA
-         PopRzqh3tQ/XAtcJTZ/asZNoRcRGEGNwG+tcYnQThEJqQPzA4Ro2opqfmf1ZUxg77Xkw
-         zo6A==
+         :content-disposition:in-reply-to;
+        bh=zjexXrGS7BxPzeGdf9fCf6kgZQFaox1zpS8kJ4DMpls=;
+        b=COW4CzMEUCXsynuc100zu1EoLrCfj0MekuJROwqYmgCFNGXfxSDg+KcKldwTEFn+Sa
+         Ua1T4qgyUJoePe96Y5fhHd8+QlrOg6noSDJhJEmtL7sBm04iHJuYZfoS4DTMaKWbQJHF
+         9jA4ZCZ6VNAvX29zI2pnOre0FcuXIgOuSPvq+yPNrVG7s9mq/PrGv4I4Fpoe+uCyzGRu
+         nNe363HwBbHnmLI+XvTbrNdeqlCytzUorGakLi3iMK3YerH4eRighb5cbRgebA+6LN73
+         u7u4cI/KXIZHTO/qZlyKCPRBozCBGlAASkVFfV1dcvEWMZ9/hWg5seRJFQ5O345pi+/n
+         QFXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=eNbcOsis/KpOazxwoapGqmAzQvleW1ZvCZVss5TACNY=;
-        b=Eapkp+F8xBn+L4ab38CZg9UWflcDZwJ8pZhYY/sPeSpTerA4EUGPPwCzuVT8/nUft2
-         nO8Wn3Yv/tJ1QrG7+CYodd68kx2fKFW1VQG+dhSn55b2+kJj3hNJ0MnLVbjiiUAoJMwb
-         kt95dVhAKQvsXmLq4+nTNZyYClnGKPP0wb1PFafARsaGB/znNr4RU5Yzw1JmoOG3ujGo
-         JeGRr4H5RnDtuSMhOL6roPpxRL1u67uh2PwGLeFLbp0jZ/URhd6ls2ANRFw3DCD7PggK
-         Q5fDMkCvgtAeYYoCaRlSVZNHgILcfThQ34Qxfetago9S85Ufe2+h6t/XZ78mEGcSv/T9
-         ujoA==
-X-Gm-Message-State: AOAM5329TGNRQuHOOW9LZUvOyADtMZNrIldDWewDp/cwEff3EAcS17Tb
-        /e0uEVKhpkcjwMggg6QX8c/w9A==
-X-Google-Smtp-Source: ABdhPJxjulk6DvCNQRz3GNKlx5A5+lWZ+jpdQDxApa+oqiYCn513L8CGqWxpc26B7Dlc/KO80E966g==
-X-Received: by 2002:a05:6a00:1511:b0:510:30d1:e8fd with SMTP id q17-20020a056a00151100b0051030d1e8fdmr24535196pfu.37.1653322658336;
-        Mon, 23 May 2022 09:17:38 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=zjexXrGS7BxPzeGdf9fCf6kgZQFaox1zpS8kJ4DMpls=;
+        b=GISrXclz4EkrHTTSz2cuQIOKRwm0LWoC1Bq59pNUgD3uk9tgqsdqTxy2OqtEHqMVIU
+         imxxd/Uc1UK7S2k3IZzxPXczfdLSV3zSTpLnzPxPdKIPllenppmWUw9ww5sKU58Esv0d
+         16i63l68qiusV9Ky4wbuUjGwr8P473OgzaZ0684DZurvwIjsVuJlF0404HJ/AQexbnMr
+         SWkwhxVEdVPm37y6QqR0OD4XslueoD1ds6+86dybRs/C2Gw2Wmb2k8xf/tCF28tuZEe9
+         /nFIttUkYTZuf0UHh6cd8HWck2knK9dS6o9rpjl4wkRrsEslZSdNGik9kH9gSiUwkEN3
+         XBpA==
+X-Gm-Message-State: AOAM531n05g9jlsVJN2aiNlhlnK4VBSc01RJRVQiGjFRgQg2W4hGGgc1
+        eDEpiKxZO2pBnTAa3VVhc6ppsw==
+X-Google-Smtp-Source: ABdhPJxiCIrt0CBgMKNVza4j0yYrc/SsaUFLLrGxTaqpj7e5byzn61qU00FPEv9zqJi+LE8Fzw1LSA==
+X-Received: by 2002:a17:902:f708:b0:153:839f:bf2c with SMTP id h8-20020a170902f70800b00153839fbf2cmr23430337plo.113.1653323029921;
+        Mon, 23 May 2022 09:23:49 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e18-20020a170902f11200b00162017529easm5297369plb.167.2022.05.23.09.17.37
+        by smtp.gmail.com with ESMTPSA id k3-20020aa79983000000b005181133ff2dsm7670428pfh.176.2022.05.23.09.23.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 May 2022 09:17:37 -0700 (PDT)
-Date:   Mon, 23 May 2022 16:17:34 +0000
+        Mon, 23 May 2022 09:23:49 -0700 (PDT)
+Date:   Mon, 23 May 2022 16:23:46 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     shaoqin.huang@intel.com
-Cc:     pbonzini@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/mmu: Check every prev_roots in
- __kvm_mmu_free_obsolete_roots()
-Message-ID: <YouznrVYM7H5IoMK@google.com>
-References: <20220523010948.2018342-1-shaoqin.huang@intel.com>
+Subject: Re: [PATCH v6 2/3] KVM: selftests: Add a test to get/set triple
+ fault event
+Message-ID: <You1Eq6fp8F3YF5Z@google.com>
+References: <20220421072958.16375-1-chenyi.qiang@intel.com>
+ <20220421072958.16375-3-chenyi.qiang@intel.com>
+ <YoVHAIGcFgJit1qp@google.com>
+ <5c5a7597-d6e3-7a05-ead8-659c45aea222@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220523010948.2018342-1-shaoqin.huang@intel.com>
+In-Reply-To: <5c5a7597-d6e3-7a05-ead8-659c45aea222@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -80,52 +79,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 22, 2022, shaoqin.huang@intel.com wrote:
-> From: Shaoqin Huang <shaoqin.huang@intel.com>
+On Mon, May 23, 2022, Chenyi Qiang wrote:
 > 
-> Iterate every prev_roots and only zap obsoleted roots.
-
-Better would be something like:
-
-  When freeing obsolete previous roots, check prev_roots as intended, not
-  the current root.
-
-Ugh, my bad.  This escaped into v5.18 :-(
-
-Fixes: 527d5cd7eece ("KVM: x86/mmu: Zap only obsolete roots if a root shadow page is zapped")
-Cc: stable@vger.kernel.org
-
 > 
-> Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 5/19/2022 3:20 AM, Sean Christopherson wrote:
+> > On Thu, Apr 21, 2022, Chenyi Qiang wrote:
+> > > +#ifndef __x86_64__
+> > > +# error This test is 64-bit only
+> > 
+> > No need, all of KVM selftests are 64-bit only.
+> > 
+> > > +#endif
+> > > +
+> > > +#define VCPU_ID			0
+> > > +#define ARBITRARY_IO_PORT	0x2000
+> > > +
+> > > +/* The virtual machine object. */
+> > > +static struct kvm_vm *vm;
+> > > +
+> > > +static void l2_guest_code(void)
+> > > +{
+> > > +	/*
+> > > +	 * Generate an exit to L0 userspace, i.e. main(), via I/O to an
+> > > +	 * arbitrary port.
+> > > +	 */
+> > 
+> > I think we can test a "real" triple fault without too much effort by abusing
+> > vcpu->run->request_interrupt_window.  E.g. map the run struct into L2, clear
+> > PIN_BASED_EXT_INTR_MASK in vmcs12, and then in l2_guest_code() do:
+> > 
+> > 	asm volatile("cli");
+> > 
+> > 	run->request_interrupt_window = true;
+> > 
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 45e1573f8f1d..22803916a609 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5168,7 +5168,7 @@ static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
->  		roots_to_free |= KVM_MMU_ROOT_CURRENT;
->  
->  	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-> -		if (is_obsolete_root(kvm, mmu->root.hpa))
-> +		if (is_obsolete_root(kvm, mmu->prev_roots.hpa))
+> Maybe, A GUEST_SYNC to main() to change the request_interrupt_window also
+> works.
 
-My version is bad, but at least it compiles ;-)
+Hmm, yes, that should work too.  Feel free to punt on writing this sub-test.  As
+mentioned below, KVM should treat a pending triple fault as a pending "exception",
+i.e. userspace shouldn't see KVM_EXIT_IRQ_WINDOW_OPEN with a pending triple fault,
+and so the test should actually assert that the triple fault occurs in L2.  But I
+can roll that test into the KVM fix if you'd like.
 
-arch/x86/kvm/mmu/mmu.c: In function ‘__kvm_mmu_free_obsolete_roots’:
-arch/x86/kvm/mmu/mmu.c:5182:58: error: ‘(struct kvm_mmu_root_info *)&mmu->prev_roots’ is a pointer; did you mean to use ‘->’?
- 5182 |                 if (is_obsolete_root(kvm, mmu->prev_roots.hpa))
-      |                                                          ^
-      |                                                          ->
-
-
-		if (is_obsolete_root(kvm, mmu->prev_roots[i].hpa))
-		
->  			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
->  	}
->  
-> -- 
-> 2.30.2
+> > 	asm volatile("sti; ud2");
+> > 
 > 
+> How does the "real" triple fault occur here? Through UD2?
+
+Yeah.  IIRC, by default L2 doesn't have a valid IDT, so any fault will escalate to
+a triple fault.
+
+> > 	asm volatile("inb %%dx, %%al"
+> > 		     : : [port] "d" (ARBITRARY_IO_PORT) : "rax"); 	
+> > 
+> > The STI shadow will block the IRQ-window VM-Exit until after the ud2, i.e. until
+> > after the triple fault is pending.
+> > 
+> > And then main() can
+> > 
+> >    1. verify it got KVM_EXIT_IRQ_WINDOW_OPEN with a pending triple fault
+> >    2. clear the triple fault and re-enter L1+l2
+> >    3. continue with the existing code, e.g. verify it got KVM_EXIT_IO, stuff a
+> >       pending triple fault, etc...
+> > 
+> > That said, typing that out makes me think we should technically handle/prevent this
+> > in KVM since triple fault / shutdown is kinda sorta just a special exception.
