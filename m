@@ -2,61 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E568F531630
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43A75531772
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 22:53:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbiEWTc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 15:32:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41402 "EHLO
+        id S231542AbiEWTfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 15:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230256AbiEWTcp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 15:32:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 96DD957989
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:17:22 -0700 (PDT)
+        with ESMTP id S231712AbiEWTeb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 15:34:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 94A2CED8ED
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:20:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653333441;
+        s=mimecast20190719; t=1653333652;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=Xbxt8BO+TWA/1lhu6wUP5Enwc4ZL2WYl2Uuv7Ip4Dto5wpqiPncVImvGhtAKfyrIU0E3n/
-        L9PX7wXKvrwStmZQLoolPK7t8VJAdiT8pD3Uu0BpgyjBtfbbqGxWpcsKoOJUgTKA0liXDK
-        Er/RnepUUQ3u6WpG6M+ZsIGU2qgi5NY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=zWR/65+oFrS++PJq66ZLNcU/040MXlKMFoYaFMveteY=;
+        b=SVgT4tJq6EuYxMqOni3bnCyQ8nE3rfJs9HYn9J5eVni97QqF2TmrtgY2iBAUhAgsX83TZ2
+        EdQEwPfDvIUmBLThKwXsxXD5PGiXt23BMzZfzm2AwjIvsobAlWgZozVPE+u6pC34yLnsQs
+        RAX8jPJJHxH24yRYFuOf88yZHQilTcA=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-492-HNoahCYpP1eiZ6wLD2RvEg-1; Mon, 23 May 2022 15:17:17 -0400
-X-MC-Unique: HNoahCYpP1eiZ6wLD2RvEg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9FE97382ECCE;
-        Mon, 23 May 2022 19:17:16 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 45CBD112131E;
-        Mon, 23 May 2022 19:17:16 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Zdenek Kaspar <zkaspar82@gmail.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] x86/fpu: KVM: Set the base guest FPU uABI size to sizeof(struct kvm_xsave)
-Date:   Mon, 23 May 2022 15:17:16 -0400
-Message-Id: <20220523191716.149206-1-pbonzini@redhat.com>
-In-Reply-To: <20220504001219.983513-1-seanjc@google.com>
-References: 
+ us-mta-511-0dHO6FZjMnCejLJCo83KvQ-1; Mon, 23 May 2022 15:20:51 -0400
+X-MC-Unique: 0dHO6FZjMnCejLJCo83KvQ-1
+Received: by mail-qt1-f197.google.com with SMTP id g3-20020ac81243000000b002f917ea21c5so8400355qtj.8
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 12:20:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=zWR/65+oFrS++PJq66ZLNcU/040MXlKMFoYaFMveteY=;
+        b=QBC/9hdKb3X7KA6dJn4rP1cUdA3fVL4rI140YeJfw663g52u5u6oB5oGvQ7P5t/xEJ
+         HrRtXDhBFx/uMw9Us8nKUwsxSKvKf3Xr+A1dN0kuv0eaqQlrNa7mvbCpZyA/98d0AYwb
+         nvU2OTp8DfkfiMVvggdGQuKVCYfOFT3fXHXtah3Oq35MLuYtAm2TkN/AeOuJMQMs5Qr5
+         59TxIdz8ZkXE826ubQSzc6yw1jlU4R9Pg4iF/v7rZ8Gi8NPqTSVLGUE/hRvRci2YqGsn
+         pV4QrTTvUJexxrz8HMkE7SNlc4XM4c+icvhCgtm0trKbJ6LqVLAaDHW3aN5wqPJMj1b7
+         YEyQ==
+X-Gm-Message-State: AOAM530BHgYKk0tzANyIr5FuptdF8Ugl//wUVV/S9pCFVmsvjYKv1Hzk
+        Tdd31rY6txHw1hOfAOK8WB3sobEdrDny1uzONAgvg3/jj1Y+ni1fvvbjeViuiHwvUV/k/ndrPWq
+        WiNDImLljQ+ryTOi4fl/EXWsewYq7
+X-Received: by 2002:a05:6214:400e:b0:462:5d6:5f47 with SMTP id kd14-20020a056214400e00b0046205d65f47mr15539459qvb.70.1653333650643;
+        Mon, 23 May 2022 12:20:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxFyoP5/0B3Uy836hFsQ5iz3pMKHomotpQ9pBk3F6XbfZPUBccGpKF4IoCu573jKQhm3W8E8iTgO2exVS/bklI=
+X-Received: by 2002:a05:6214:400e:b0:462:5d6:5f47 with SMTP id
+ kd14-20020a056214400e00b0046205d65f47mr15539444qvb.70.1653333650380; Mon, 23
+ May 2022 12:20:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+References: <20220520172325.980884-1-eperezma@redhat.com> <20220520172325.980884-2-eperezma@redhat.com>
+ <79089dc4-07c4-369b-826c-1c6e12edcaff@oracle.com>
+In-Reply-To: <79089dc4-07c4-369b-826c-1c6e12edcaff@oracle.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Mon, 23 May 2022 21:20:14 +0200
+Message-ID: <CAJaqyWd3BqZfmJv+eBYOGRwNz3OhNKjvHPiFOafSjzAnRMA_tQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] vdpa: Add stop operation
+To:     Si-Wei Liu <si-wei.liu@oracle.com>
+Cc:     virtualization <virtualization@lists.linux-foundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Longpeng <longpeng2@huawei.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>, dinang@xilinx.com,
+        Eli Cohen <elic@nvidia.com>,
+        Laurent Vivier <lvivier@redhat.com>, pabloc@xilinx.com,
+        "Dawar, Gautam" <gautam.dawar@amd.com>,
+        Xie Yongji <xieyongji@bytedance.com>, habetsm.xilinx@gmail.com,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        tanuj.kamde@amd.com, Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        martinpo@xilinx.com, Cindy Lu <lulu@redhat.com>,
+        ecree.xilinx@gmail.com, Parav Pandit <parav@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,8 +92,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Sat, May 21, 2022 at 12:13 PM Si-Wei Liu <si-wei.liu@oracle.com> wrote:
+>
+>
+>
+> On 5/20/2022 10:23 AM, Eugenio P=C3=A9rez wrote:
+> > This operation is optional: It it's not implemented, backend feature bi=
+t
+> > will not be exposed.
+> >
+> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > ---
+> >   include/linux/vdpa.h | 6 ++++++
+> >   1 file changed, 6 insertions(+)
+> >
+> > diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> > index 15af802d41c4..ddfebc4e1e01 100644
+> > --- a/include/linux/vdpa.h
+> > +++ b/include/linux/vdpa.h
+> > @@ -215,6 +215,11 @@ struct vdpa_map_file {
+> >    * @reset:                  Reset device
+> >    *                          @vdev: vdpa device
+> >    *                          Returns integer: success (0) or error (< =
+0)
+> > + * @stop:                    Stop or resume the device (optional, but =
+it must
+> > + *                           be implemented if require device stop)
+> > + *                           @vdev: vdpa device
+> > + *                           @stop: stop (true), not stop (false)
+> > + *                           Returns integer: success (0) or error (< =
+0)
+> Is this uAPI meant to address all use cases described in the full blown
+> _F_STOP virtio spec proposal, such as:
+>
+> --------------%<--------------
+>
+> ...... the device MUST finish any in flight
+> operations after the driver writes STOP.  Depending on the device, it
+> can do it
+> in many ways as long as the driver can recover its normal operation if it
+> resumes the device without the need of resetting it:
+>
+> - Drain and wait for the completion of all pending requests until a
+>    convenient avail descriptor. Ignore any other posterior descriptor.
+> - Return a device-specific failure for these descriptors, so the driver
+>    can choose to retry or to cancel them.
+> - Mark them as done even if they are not, if the kind of device can
+>    assume to lose them.
+> --------------%<--------------
+>
 
-Paolo
+Right, this is totally underspecified in this series.
 
+I'll expand on it in the next version, but that text proposed to
+virtio-comment was complicated and misleading. I find better to get
+the previous version description. Would the next description work?
+
+```
+After the return of ioctl, the device MUST finish any pending operations li=
+ke
+in flight requests. It must also preserve all the necessary state (the
+virtqueue vring base plus the possible device specific states) that is requ=
+ired
+for restoring in the future.
+
+In the future, we will provide features similar to VHOST_USER_GET_INFLIGHT_=
+FD
+so the device can save pending operations.
+```
+
+Thanks for pointing it out!
+
+
+
+
+
+> E.g. do I assume correctly all in flight requests are flushed after
+> return from this uAPI call? Or some of pending requests may be subject
+> to loss or failure? How does the caller/user specify these various
+> options (if there are) for device stop?
+>
+> BTW, it would be nice to add the corresponding support to vdpa_sim_blk
+> as well to demo the stop handling. To just show it on vdpa-sim-net IMHO
+> is perhaps not so convincing.
+>
+> -Siwei
+>
+> >    * @get_config_size:                Get the size of the configuration=
+ space includes
+> >    *                          fields that are conditional on feature bi=
+ts.
+> >    *                          @vdev: vdpa device
+> > @@ -316,6 +321,7 @@ struct vdpa_config_ops {
+> >       u8 (*get_status)(struct vdpa_device *vdev);
+> >       void (*set_status)(struct vdpa_device *vdev, u8 status);
+> >       int (*reset)(struct vdpa_device *vdev);
+> > +     int (*stop)(struct vdpa_device *vdev, bool stop);
+> >       size_t (*get_config_size)(struct vdpa_device *vdev);
+> >       void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
+> >                          void *buf, unsigned int len);
+>
 
