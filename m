@@ -2,67 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8F27530E36
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:43:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82C47530CB2
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:40:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232741AbiEWJJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 05:09:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50294 "EHLO
+        id S233437AbiEWJqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 05:46:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232718AbiEWJJv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 05:09:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463D046642
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 02:09:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 748B060FB7
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:09:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D8BBAC34116
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:09:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653296987;
-        bh=f2tc6Kak4lNO+PeNk7y6z0TCPxMfUVb788xshWm3kMQ=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=C0Eme0PMx787N0dRsVw1DI14kPZJp7nK+UWe4nLvT86CdfvcHp4GHn4NWHXgS2ei6
-         E5Xn+iRiTasthizpe1OooGudwkwG3aPGCaBpAXuVwcK+BCa3bJUWI4C8t4UKbObyX8
-         Nl9eQNZs8HERC1Jd6Wv3o8CvjCF2Q8AHAc4f2Cr+wNSiVq4Gw3unPlc3GflkjTKeez
-         8nxAokkiMmoHLHt+EcK0yC8sAiNWmKB1Xvb+AwWNhRehMqRoe0vNvOrRD8p4jjQrIh
-         JDBuQEG4QAApMoXDFuW+QrqpKnXg29Ya8V2iBjjokgM+AiZf7LG+kJm+am8e7Ae6jp
-         ht54LfCK84Plg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C3A30CC13B5; Mon, 23 May 2022 09:09:47 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216017] KVM: problem virtualization from kernel 5.17.9
-Date:   Mon, 23 May 2022 09:09:47 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: opw
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mlevitsk@redhat.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216017-28872-tFJMTfYsus@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216017-28872@https.bugzilla.kernel.org/>
-References: <bug-216017-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        with ESMTP id S233706AbiEWJox (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 05:44:53 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA88626D
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 02:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653299092; x=1684835092;
+  h=from:to:cc:subject:date:message-id;
+  bh=g+69TL0yWtedPp0wWzH3au9MmScHvimfXrzMzJNXrWI=;
+  b=Z7Ulxi6bOJiqVCbl67M4uxKzXFdCfUML2XiI3FuyzLxKKXoHu+2BuFog
+   30NWWLH04NOJjRGQ0RL0RNGYBGherq+RBl/rDDfUhGpWztjAN3ozcFlKW
+   DlA+51j86gOaAiuSCletkHyKA4PXOFcoM0GchnSJFW3dahu5HFHsmezU3
+   LzkGoo1K/7Wg8jYBwK0gOyRZLE+zvhvI++bQQ+u/796O/kQ27QKtHJXiP
+   hAF34GW/01lajgOYSlkNr94tGyFwbs2/H2opOOqZa4ZUgZj6W3gprq9QS
+   RnRU/0Zfh9Zt+j1mrButrMEXIVeYaGKy1uZhNDAGxk7nYiz8vjPBG8hUO
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10355"; a="270737452"
+X-IronPort-AV: E=Sophos;i="5.91,246,1647327600"; 
+   d="scan'208";a="270737452"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 02:44:52 -0700
+X-IronPort-AV: E=Sophos;i="5.91,246,1647327600"; 
+   d="scan'208";a="600553709"
+Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 02:44:49 -0700
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Gao Chao <chao.gao@intel.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [QEMU PATCH v2] x86: Set maximum APIC ID to KVM prior to vCPU creation
+Date:   Mon, 23 May 2022 17:12:39 +0800
+Message-Id: <20220523091239.7053-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
 X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,63 +59,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216017
+Specify maximum possible APIC ID assigned for current VM session to KVM
+prior to the creation of vCPUs. By this setting, KVM can set up VM-scoped
+data structure indexed by the APIC ID, e.g. Posted-Interrupt Descriptor
+table to support Intel IPI virtualization, with the most optimal memory
+footprint.
 
---- Comment #2 from mlevitsk@redhat.com ---
-On Mon, 2022-05-23 at 08:48 +0000, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D216017
->=20
->             Bug ID: 216017
->            Summary: KVM: problem virtualization from kernel 5.17.9
->            Product: Virtualization
->            Version: unspecified
->     Kernel Version: 5.17.9-arch1-1
->           Hardware: AMD
->                 OS: Linux
->               Tree: Mainline
->             Status: NEW
->           Keywords: opw
->           Severity: high
->           Priority: P1
->          Component: kvm
->           Assignee: virtualization_kvm@kernel-bugs.osdl.org
->           Reporter: ne-vlezay80@yandex.ru
->         Regression: No
->=20
-> Qemu periodically chaches width:
->=20
-> [root@router ne-vlezay80]# qemu-system-x86_64 -enable-kvm
-> qemu-system-x86_64: error: failed to set MSR 0xc0000104 to 0x100000000
-> qemu-system-x86_64: ../qemu-7.0.0/target/i386/kvm/kvm.c:2996:
-> kvm_buf_set_msrs:
-> Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-> Aborted (core dumped)
+It can be achieved by calling KVM_ENABLE_CAP for KVM_CAP_MAX_VCPU_ID
+capability once KVM has already enabled it. Ignoring the return error
+if KVM doesn't support this capability yet.
 
-This is my fault. You can either revert the commit you found in qemu,
-or update the kernel to 5.18.
+Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+---
+ hw/i386/x86.c              | 5 +++++
+ target/i386/kvm/kvm.c      | 5 +++++
+ target/i386/kvm/kvm_i386.h | 1 +
+ 3 files changed, 11 insertions(+)
 
->=20
-> Also if running virtual pachine width type -cpu host, system is freezez f=
-rom
-> kernel panic.=20
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 4cf107baea..a6ab406f85 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -123,6 +123,11 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+      */
+     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+                                                       ms->smp.max_cpus - 1) + 1;
++
++    if (kvm_enabled()) {
++        kvm_set_max_apic_id(x86ms->apic_id_limit);
++    }
++
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < ms->smp.cpus; i++) {
+         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 9cf8e03669..cb2fe39365 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -5251,3 +5251,8 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
+         mask &= ~BIT_ULL(bit);
+     }
+ }
++
++void kvm_set_max_apic_id(uint32_t max_apic_id)
++{
++    kvm_vm_enable_cap(kvm_state, KVM_CAP_MAX_VCPU_ID, 0, max_apic_id);
++}
+diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+index 4124912c20..c133b32a58 100644
+--- a/target/i386/kvm/kvm_i386.h
++++ b/target/i386/kvm/kvm_i386.h
+@@ -54,4 +54,5 @@ uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address);
+ bool kvm_enable_sgx_provisioning(KVMState *s);
+ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask);
+ 
++void kvm_set_max_apic_id(uint32_t max_apic_id);
+ #endif
+-- 
+2.27.0
 
-Can you check if this happens with 5.18 as well? If so, try to capture the
-panic message.
-
-
-Best regards,
-        Maxim Levitsky
-
->=20
-> Kernel version: 5.17.9
-> Distribution: Arch Linux
-> QEMU: 7.0
-> CPU: AMD Phenom X4
-> Arch: x86_64
->
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
