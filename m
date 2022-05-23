@@ -2,67 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17114530CBC
-	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:40:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19821530E44
+	for <lists+kvm@lfdr.de>; Mon, 23 May 2022 12:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232535AbiEWJFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 May 2022 05:05:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39906 "EHLO
+        id S232603AbiEWJHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 May 2022 05:07:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232588AbiEWJFs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 May 2022 05:05:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F111044A2B
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 02:05:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S232934AbiEWJGj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 May 2022 05:06:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C233324976
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 02:06:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653296795;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qZg53IBR8AfCf90VyG8/6MKIqqzJRH/xbpj5id+MOvw=;
+        b=jRAS19iTAsFZDRIASG7/p3cxVdXBKvNmbc8NEXgfgLnEvWL0NvJgE3Qohi8c+CMPGKDSu1
+        DuPca+nZrheGXkPZ/p5+Vxq0+ITPFDoO5vcPcY3fD8IiMm+X0FJJfOfdmCGcRGeLWhZvJn
+        SdJ6PAdroxsW6daMSPLe0Wm6e6SqLpM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-340-2QYcrr3BO8iGvLMfTa7uJw-1; Mon, 23 May 2022 05:06:32 -0400
+X-MC-Unique: 2QYcrr3BO8iGvLMfTa7uJw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8EEB560F7F
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:05:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EF76EC34116
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 09:05:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653296747;
-        bh=m0yQ6F7wSXYOIXNqBPRanSONOT17U8M9CLKp+JSvAhM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=V4Z+TrhyJCj1g6UQw8aoEF6fI/HF50tLv7kszLR/RxvdOLHwiHEGm8bTBBzQ0M95U
-         JdMOng+efMuEH542SL2VPU4f2LAtgXhMH2bC4gSAroHY/QH2Pt4W0wTo14eeST7Aep
-         c189lAP1BIfHNMnuBEpRTikwiynpTqC6IKVZWinSI1tn1dcsVFdnsSs6NIKIYsWefG
-         5nElAuw/h83hx5AQ5i+wnK9V6uMOn5GeFswmD73PsU7EmeIxL9uCnUL7hIaozyF8Qs
-         1EaNINqA+dhsktzB6GYYHnzMTsd66xHR8WkcsrzLWPfVAO0I14hVyTNy8Y7XM4MaLv
-         lwfCEbMLvBREA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D4F08CC13B4; Mon, 23 May 2022 09:05:46 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216017] KVM: problem virtualization from kernel 5.17.9
-Date:   Mon, 23 May 2022 09:05:46 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: opw
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: nutodafozo@freeweb.email
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-216017-28872-yfy0PCpVqG@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216017-28872@https.bugzilla.kernel.org/>
-References: <bug-216017-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EEF561857F0E;
+        Mon, 23 May 2022 09:06:31 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A0B592026D6A;
+        Mon, 23 May 2022 09:06:31 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id B276918000B4; Mon, 23 May 2022 11:06:29 +0200 (CEST)
+Date:   Mon, 23 May 2022 11:06:29 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
+        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 10/36] i386/kvm: Move architectural CPUID leaf
+ generation to separate helper
+Message-ID: <20220523090629.ggirqapc6jcn24nb@sirius.home.kraxel.org>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-11-xiaoyao.li@intel.com>
+ <20220512174814.GE2789321@ls.amr.corp.intel.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220512174814.GE2789321@ls.amr.corp.intel.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,22 +75,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216017
+On Thu, May 12, 2022 at 10:48:14AM -0700, Isaku Yamahata wrote:
+> On Thu, May 12, 2022 at 11:17:37AM +0800,
+> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+> 
+> > diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+> > index b434feaa6b1d..5c7972f617e8 100644
+> > --- a/target/i386/kvm/kvm_i386.h
+> > +++ b/target/i386/kvm/kvm_i386.h
+> > @@ -24,6 +24,10 @@
+> >  #define kvm_ioapic_in_kernel() \
+> >      (kvm_irqchip_in_kernel() && !kvm_irqchip_is_split())
+> >  
+> > +#define KVM_MAX_CPUID_ENTRIES  100
+> 
+> In Linux side, the value was bumped to 256.  Opportunistically let's make it
+> same.
 
-nutodafozo@freeweb.email changed:
+When doing so use a separate patch please.  A patch like this -- moving
+around code without functional changes -- should not be mixed with other
+changes.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |nutodafozo@freeweb.email
+take care,
+  Gerd
 
---- Comment #1 from nutodafozo@freeweb.email ---
-KVM: x86: nSVM: disallow userspace setting of MSR_AMD64_TSC_RATIO to non
-default value when tsc scaling disabled
-
-might have to do something with this commit
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
