@@ -2,97 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56482532470
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:52:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66DF3532493
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:58:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235396AbiEXHwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 03:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53998 "EHLO
+        id S234389AbiEXH6B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 03:58:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234011AbiEXHwN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 03:52:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 90B0240A24
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:52:10 -0700 (PDT)
+        with ESMTP id S235689AbiEXH4t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 03:56:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F43B24F22
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:56:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653378729;
+        s=mimecast20190719; t=1653378994;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eLiRBJigFuDJflEBL1yIFfpnc5pdYqpynwY7vvoEGYo=;
-        b=IE/9BcFiIGagO6t34yXM5AIaMaYECPX95rsyj6l7DHDK1Hg/lEk/EeRzciuTyyfdyIX1ku
-        O7qT54jXtuJi4N1rp0TnTJMXYvlXhFci3ZifeQ+Eyb7K63rg+FtQaHzsnuVXNzaCYVkdmM
-        iJJD3/9Wx8BJxlQY1G4hpzQ/TF43Tn4=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=o/4B6aNftnpN9z+S7/8G8n2JRdUMsTbUHlH2bCDBd1Y=;
+        b=JKpqoYIfLjdVSGdf5VTTiwwA//DWheZ75pG37Zdekpp9yFTy3O2BBoqe+EzYUkMlP5FbDd
+        nkBuopCdNpCfiW9LLXKbky1Dy5B2cy9HZYu2dtJaIalwP5RrkEsjzo4qFW6+CMi6Q8OL0U
+        WCUoPMsjqJrUcIIEgmQ+90SIrZScfdg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-638--1gdRvOfPA2Mbwql3I4PCQ-1; Tue, 24 May 2022 03:52:08 -0400
-X-MC-Unique: -1gdRvOfPA2Mbwql3I4PCQ-1
-Received: by mail-qk1-f200.google.com with SMTP id b1-20020a05620a118100b006a36dec1b16so5469593qkk.2
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:52:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=eLiRBJigFuDJflEBL1yIFfpnc5pdYqpynwY7vvoEGYo=;
-        b=sP2x7eqeFsruXA4DGW+XXa16Bd2CtEs+aKYROyzwc6GwIdBbR+Y5Ca7M82OdXoFJvI
-         aXI6vQx+rn4x8fMJ46Uns2mqsOwq2LmGlxmeMebTVzSj5tMQk3NOh8nBDbGLQuXfSneW
-         q9IVAy439xMWiUZE7YD5uEQ6n8rMuysyhSEhfzPby38OTV8/ofEI+AWanh78f/ofUOMu
-         MYzsI5Kw9gzVinCW1aT0psjK2T1gfNoD22AD3B9cAuOdW9mg3GkrFrZIuQH/d7MIsNe8
-         gQhguej7+qHDo+RoXutlThgPQEkvnXtkHLlJprqHeFPdj5MkiMASq1hBx4oIzlJ785a3
-         phgg==
-X-Gm-Message-State: AOAM533y9CCNtdcrcb5lja5gjdAU2jhUTutiak8oVR7Sj8nlJBPNmzd9
-        Pak015IK6J4CyIG4n7kYfO/DZwvRVSqcEF5R6u2usMvpfokeNJhsStRVWsowU41VFxuMTWdsY1R
-        YbVjDI3D7/EHj
-X-Received: by 2002:a05:622a:216:b0:2f9:30b3:45ee with SMTP id b22-20020a05622a021600b002f930b345eemr9051381qtx.397.1653378728043;
-        Tue, 24 May 2022 00:52:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzgFlPc9qJ1j1IzDb/M0V3FRtH4WCnJY0MqJ/BAD5tylD1UiTiBef3dxP0vV+Ovsmsho5ZXvA==
-X-Received: by 2002:a05:622a:216:b0:2f9:30b3:45ee with SMTP id b22-20020a05622a021600b002f930b345eemr9051362qtx.397.1653378727818;
-        Tue, 24 May 2022 00:52:07 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-16.business.telecomitalia.it. [87.12.25.16])
-        by smtp.gmail.com with ESMTPSA id o62-20020a37a541000000b006a34df5a9a9sm5288177qke.126.2022.05.24.00.52.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 00:52:07 -0700 (PDT)
-Date:   Tue, 24 May 2022 09:51:58 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     Si-Wei Liu <si-wei.liu@oracle.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Longpeng <longpeng2@huawei.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>, dinang@xilinx.com,
-        Eli Cohen <elic@nvidia.com>,
-        Laurent Vivier <lvivier@redhat.com>, pabloc@xilinx.com,
-        "Dawar, Gautam" <gautam.dawar@amd.com>,
-        Xie Yongji <xieyongji@bytedance.com>, habetsm.xilinx@gmail.com,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        tanuj.kamde@amd.com, Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        martinpo@xilinx.com, Cindy Lu <lulu@redhat.com>,
-        ecree.xilinx@gmail.com, Parav Pandit <parav@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Zhang Min <zhang.min9@zte.com.cn>
-Subject: Re: [PATCH 1/4] vdpa: Add stop operation
-Message-ID: <20220524075158.2vyuw7ga72xub7pp@sgarzare-redhat>
-References: <20220520172325.980884-1-eperezma@redhat.com>
- <20220520172325.980884-2-eperezma@redhat.com>
- <79089dc4-07c4-369b-826c-1c6e12edcaff@oracle.com>
- <CAJaqyWd3BqZfmJv+eBYOGRwNz3OhNKjvHPiFOafSjzAnRMA_tQ@mail.gmail.com>
- <20220524070900.ak7a5frwtezjhhrq@sgarzare-redhat>
- <CAJaqyWeiNWnWUzEUEo8HeuuF8XMPtKw9SapxLxLJECWJ0zNTUA@mail.gmail.com>
+ us-mta-167-f9P5wkjKOFuLZFttQdjeDg-1; Tue, 24 May 2022 03:56:29 -0400
+X-MC-Unique: f9P5wkjKOFuLZFttQdjeDg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5D61380673C;
+        Tue, 24 May 2022 07:56:28 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C5577AD8;
+        Tue, 24 May 2022 07:56:28 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id EAE8D1800393; Tue, 24 May 2022 09:56:26 +0200 (CEST)
+Date:   Tue, 24 May 2022 09:56:26 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com,
+        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 23/36] i386/tdx: Setup the TD HOB list
+Message-ID: <20220524075626.l7rgyjz3jhojhds2@sirius.home.kraxel.org>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-24-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJaqyWeiNWnWUzEUEo8HeuuF8XMPtKw9SapxLxLJECWJ0zNTUA@mail.gmail.com>
+In-Reply-To: <20220512031803.3315890-24-xiaoyao.li@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,98 +74,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 24, 2022 at 09:42:06AM +0200, Eugenio Perez Martin wrote:
->On Tue, May 24, 2022 at 9:09 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> On Mon, May 23, 2022 at 09:20:14PM +0200, Eugenio Perez Martin wrote:
->> >On Sat, May 21, 2022 at 12:13 PM Si-Wei Liu <si-wei.liu@oracle.com> wrote:
->> >>
->> >>
->> >>
->> >> On 5/20/2022 10:23 AM, Eugenio Pérez wrote:
->> >> > This operation is optional: It it's not implemented, backend feature bit
->> >> > will not be exposed.
->> >> >
->> >> > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
->> >> > ---
->> >> >   include/linux/vdpa.h | 6 ++++++
->> >> >   1 file changed, 6 insertions(+)
->> >> >
->> >> > diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
->> >> > index 15af802d41c4..ddfebc4e1e01 100644
->> >> > --- a/include/linux/vdpa.h
->> >> > +++ b/include/linux/vdpa.h
->> >> > @@ -215,6 +215,11 @@ struct vdpa_map_file {
->> >> >    * @reset:                  Reset device
->> >> >    *                          @vdev: vdpa device
->> >> >    *                          Returns integer: success (0) or error (< 0)
->> >> > + * @stop:                    Stop or resume the device (optional, but it must
->> >> > + *                           be implemented if require device stop)
->> >> > + *                           @vdev: vdpa device
->> >> > + *                           @stop: stop (true), not stop (false)
->> >> > + *                           Returns integer: success (0) or error (< 0)
->> >> Is this uAPI meant to address all use cases described in the full blown
->> >> _F_STOP virtio spec proposal, such as:
->> >>
->> >> --------------%<--------------
->> >>
->> >> ...... the device MUST finish any in flight
->> >> operations after the driver writes STOP.  Depending on the device, it
->> >> can do it
->> >> in many ways as long as the driver can recover its normal operation
->> >> if it
->> >> resumes the device without the need of resetting it:
->> >>
->> >> - Drain and wait for the completion of all pending requests until a
->> >>    convenient avail descriptor. Ignore any other posterior descriptor.
->> >> - Return a device-specific failure for these descriptors, so the driver
->> >>    can choose to retry or to cancel them.
->> >> - Mark them as done even if they are not, if the kind of device can
->> >>    assume to lose them.
->> >> --------------%<--------------
->> >>
->> >
->> >Right, this is totally underspecified in this series.
->> >
->> >I'll expand on it in the next version, but that text proposed to
->> >virtio-comment was complicated and misleading. I find better to get
->> >the previous version description. Would the next description work?
->> >
->> >```
->> >After the return of ioctl, the device MUST finish any pending operations like
->> >in flight requests. It must also preserve all the necessary state (the
->> >virtqueue vring base plus the possible device specific states) that is required
->> >for restoring in the future.
->>
->> For block devices wait for all in-flight requests could take several
->> time.
->>
->> Could this be a problem if the caller gets stuck on this ioctl?
->>
->> If it could be a problem, maybe we should use an eventfd to signal that
->> the device is successfully stopped.
->>
->
->For that particular problem I'd very much prefer to add directly an
->ioctl to get the inflight descriptors. We know for sure we will need
->them, and it will be cleaner in the long run.
+  Hi,
 
-Makes sense!
+> +static void tdvf_hob_add_mmio_resources(TdvfHob *hob)
+> +{
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +    X86MachineState *x86ms = X86_MACHINE(ms);
+> +    PCIHostState *pci_host;
+> +    uint64_t start, end;
+> +    uint64_t mcfg_base, mcfg_size;
+> +    Object *host;
+> +
+> +    /* Effectively PCI hole + other MMIO devices. */
+> +    tdvf_hob_add_mmio_resource(hob, x86ms->below_4g_mem_size,
+> +                               APIC_DEFAULT_ADDRESS);
+> +
+> +    /* Stolen from acpi_get_i386_pci_host(), there's gotta be an easier way. */
+> +    pci_host = OBJECT_CHECK(PCIHostState,
+> +                            object_resolve_path("/machine/i440fx", NULL),
+> +                            TYPE_PCI_HOST_BRIDGE);
+> +    if (!pci_host) {
+> +        pci_host = OBJECT_CHECK(PCIHostState,
+> +                                object_resolve_path("/machine/q35", NULL),
+> +                                TYPE_PCI_HOST_BRIDGE);
+> +    }
+> +    g_assert(pci_host);
+> +
+> +    host = OBJECT(pci_host);
+> +
+> +    /* PCI hole above 4gb. */
+> +    start = object_property_get_uint(host, PCI_HOST_PROP_PCI_HOLE64_START,
+> +                                     NULL);
+> +    end = object_property_get_uint(host, PCI_HOST_PROP_PCI_HOLE64_END, NULL);
+> +    tdvf_hob_add_mmio_resource(hob, start, end);
+> +
+> +    /* MMCFG region */
+> +    mcfg_base = object_property_get_uint(host, PCIE_HOST_MCFG_BASE, NULL);
+> +    mcfg_size = object_property_get_uint(host, PCIE_HOST_MCFG_SIZE, NULL);
+> +    if (mcfg_base && mcfg_base != PCIE_BASE_ADDR_UNMAPPED && mcfg_size) {
+> +        tdvf_hob_add_mmio_resource(hob, mcfg_base, mcfg_base + mcfg_size);
+> +    }
+> +}
 
->
->As I understand the vdpa block simulator, there is no need to return
->the inflight descriptors since all of the requests are processed in a
->synchronous way. So, for this iteration, we could offer the stop
->feature to qemu.
+That looks suspicious.  I think you need none of this, except for the
+first tdvf_hob_add_mmio_resource() call which adds the below-4G hole.
 
-Right, the simulator handles everything synchronously.
+It is the firmware which places the mmio resources into the address
+space by programming the pci config space of the devices.  qemu doesn't
+dictate any of this, and I doubt you get any useful values here.  The
+core runs before the firmware had the chance to do any setup here ...
 
->
->Other non-simulated devices would need it. Could it be delayed to
->future development?
+> new file mode 100644
+> index 000000000000..b15aba796156
+> --- /dev/null
+> +++ b/hw/i386/uefi.h
 
-Yep, sure, it sounds like you already have a plan, so no problem :-)
+Separate patch please.
 
-Thanks,
-Stefano
+Also this should probably go somewhere below
+include/standard-headers/
+
+take care,
+  Gerd
 
