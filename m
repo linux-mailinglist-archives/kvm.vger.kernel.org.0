@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CCD15323B3
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:09:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E414F5323C5
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:12:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234812AbiEXHJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 03:09:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34908 "EHLO
+        id S232070AbiEXHMI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 03:12:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234692AbiEXHJk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 03:09:40 -0400
+        with ESMTP id S231756AbiEXHMA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 03:12:00 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 522869398A
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:09:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BF52E52E4D
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653376178;
+        s=mimecast20190719; t=1653376317;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7cMb6EhnKinKDmFjIgB7i5PNIATEusLxg6O0npg8IXY=;
-        b=eO3KLa+hgXepcGfkv0BhPiHe+ZHOBj3D5yymQEuDLtGzRt5Bcwi8jQXPleLMp3KvWk4Vex
-        Rz4rKEY80HUjCthDT37TrfdR1cTUlH+V/sfEcy0gKoBMJPYb6ZW7FMlZxE+8d9kJGX6kkx
-        fQZINt7wjVOlzR8EwmOarUXXb4pMqFc=
+        bh=8Fsbl6R43fPIFA1GC5vANa8/YINK4Hrhp6J5Uy/+KOE=;
+        b=QmJX1XArT/XHRmthPPsSFKprCUo22T33uZ9V5nQT9qTS3KwHAkcJ0leVDAX5akFQdDmQ3Y
+        gpv15qt95329YgcJEF4iuGX5TDvil/Z3kGZxjl0jISuRTHpqo2FvtA6RzcZrUsA0VLbWJZ
+        AxiJx//E2ktSF+PL4PzORB8snskJN8g=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-zLObLhW-M9iJObWGthwNCg-1; Tue, 24 May 2022 03:09:35 -0400
-X-MC-Unique: zLObLhW-M9iJObWGthwNCg-1
+ us-mta-653-b1GPClzsNGyKzI2l9aBmGw-1; Tue, 24 May 2022 03:11:52 -0400
+X-MC-Unique: b1GPClzsNGyKzI2l9aBmGw-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA313380673F;
-        Tue, 24 May 2022 07:09:34 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DBCD41C05139;
+        Tue, 24 May 2022 07:11:51 +0000 (UTC)
 Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BAE0492C14;
-        Tue, 24 May 2022 07:09:34 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A6773492C14;
+        Tue, 24 May 2022 07:11:51 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id B9D501800393; Tue, 24 May 2022 09:09:32 +0200 (CEST)
-Date:   Tue, 24 May 2022 09:09:32 +0200
+        id F29E51800393; Tue, 24 May 2022 09:11:49 +0200 (CEST)
+Date:   Tue, 24 May 2022 09:11:49 +0200
 From:   Gerd Hoffmann <kraxel@redhat.com>
 To:     Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,15 +55,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Eric Blake <eblake@redhat.com>,
         Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 20/36] i386/tdx: Register a machine_init_done
- callback for TD
-Message-ID: <20220524070932.rmkmunar6q6brdbo@sirius.home.kraxel.org>
+Subject: Re: [RFC PATCH v4 21/36] i386/tdx: Track mem_ptr for each firmware
+ entry of TDVF
+Message-ID: <20220524071149.rs3hqhi5t5usdfv3@sirius.home.kraxel.org>
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-21-xiaoyao.li@intel.com>
+ <20220512031803.3315890-22-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-21-xiaoyao.li@intel.com>
+In-Reply-To: <20220512031803.3315890-22-xiaoyao.li@intel.com>
 X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
@@ -75,22 +75,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 11:17:47AM +0800, Xiaoyao Li wrote:
-> Before a TD can run, it needs to
->  - setup/configure TD HOB list;
->  - initialize TDVF into TD's private memory;
->  - initialize TD vcpu state;
+On Thu, May 12, 2022 at 11:17:48AM +0800, Xiaoyao Li wrote:
+> For each TDVF sections, QEMU needs to copy the content to guest
+> private memory via KVM API (KVM_TDX_INIT_MEM_REGION).
 > 
-> Register a machine_init_done callback to all those stuff.
+> Introduce a field @mem_ptr for TdxFirmwareEntry to track the memory
+> pointer of each TDVF sections. So that QEMU can add/copy them to guest
+> private memory later.
+> 
+> TDVF sections can be classified into two groups:
+>  - Firmware itself, e.g., BFV and CFV, that locates separated from guest
+>    RAM. It's memory pointer is the bios pointer.
+> 
+>  - Sections located at guest RAM, e.g., TEMP_MEM and TD_HOB.
+>    mmap a new memory range for them.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-> +static void tdx_finalize_vm(Notifier *notifier, void *unused)
-> +{
-> +    /* TODO */
-> +}
-
-I'd suggest to squash this into the patch actually implementing
-tdx_finalize_vm.
-
-take care,
-  Gerd
+Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 
