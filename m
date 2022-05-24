@@ -2,112 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D800C532889
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 13:11:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 790AE5328E1
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 13:24:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236512AbiEXLLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 07:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42642 "EHLO
+        id S236570AbiEXLYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 07:24:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232221AbiEXLKw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 07:10:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7B96D719D9
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:10:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653390650;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=27j6k2cZCDZNWXJr0tCIl5JL3x96MfpkYNoEKRGmf48=;
-        b=Ui573emDTxI18JMuLN5A4PGpedrKUowggg7bZjzyc0Ct1pK6YCc9k6uEFDR02Jgu4DEA/j
-        QyVMVeHUYVRhhi0i+XEkWH/Al/jZkS4W9O555tQpoBpCg9oixPJ+j4B+sbjKJ+eAT98VbN
-        hH+t0weXP6dcDIY/mEWif/28m/3T7H0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-665-KpT3JABOMaWJgt1deUtrAA-1; Tue, 24 May 2022 07:10:49 -0400
-X-MC-Unique: KpT3JABOMaWJgt1deUtrAA-1
-Received: by mail-wm1-f71.google.com with SMTP id o23-20020a05600c511700b0039743cd8093so1144641wms.6
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:10:49 -0700 (PDT)
+        with ESMTP id S229726AbiEXLYa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 07:24:30 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8FB79395
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:24:29 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id h19-20020a05600c351300b003975cedb52bso744001wmq.1
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:24:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yfCYl4aV74lIhtPwwS5Hj7a7JLAdHT5HtAXAEPKuxxw=;
+        b=SkEJCBhdLlFzmsU79CLKeBLhUBGc21SllCmNz5BJw0D+GbWUAg3Zor9zFl//oWG9OQ
+         1KqWUyp7inB2ZpNmoLokYAd8tGeJKSoR6AekxiFG2LEQatcPdWNKdIJWK29PLSmaZsB5
+         JxL1fWSOpTzkKylyxE3ZuvMWFMEstvhrZYDbUuNk/rZ5Zx4zngCqCIbqcQ6YH/vuBi20
+         VIks0/oZF9dqUp065iC0043Ymy+cQlQwBdgRz00WN4dOlxYm0cxnVAM5rVfDclmsh21e
+         3fWOrYqDrjvFiqnovynEsyG8xRnUrUKu6yIGDITpsgMjPaUn6Cg+Ts3d7vsLJrCJ2tZH
+         tHfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=27j6k2cZCDZNWXJr0tCIl5JL3x96MfpkYNoEKRGmf48=;
-        b=NDh1eoGmwGcP+Tdovi7Y09Ernu1d2FcuaWWqysd7gz/G/Iorh5rI0yVf/S2nNvra7+
-         iVBSHGspBA+b52N24HiQYBHAfwQMLZcx2l8kxoBU+23J62vALlceMFpxeyrKoCSwI+wH
-         qt+jXdD8SkEhi3ru1CAEeS5epWfEo/XrBOAYHw/SXgu5vjXMVkP3+hX6I7EjU68yJVg9
-         EVG1Sr46xXwlf0jAn91CGcsNwa8tmJfd+5zmJvys4wxVwVxFJjnx7BBE2QOTqF3nF2av
-         w2ekVworklQwj1e7qTHtUqBC+aUV5hPjzFS6P2wAKTRWcxmHcpTiXPuxxiZLPXA9JEGG
-         ov+w==
-X-Gm-Message-State: AOAM531207QwZp1fgQRwaWscKu/uV0S3AcniVXE5W69+Yjxi6KngnWzM
-        2RC2rrE11Gzx6OQEfYSBx7kAzOBCYmXsOit53O77hGP54J+pUgtydhzCe2Z2X9jtsPEE3wbjyEE
-        WS2JYZTx1ntrb
-X-Received: by 2002:a7b:cbda:0:b0:397:48d6:6c9f with SMTP id n26-20020a7bcbda000000b0039748d66c9fmr3283904wmi.10.1653390647673;
-        Tue, 24 May 2022 04:10:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFuRjqrd2lUrDP97pOCIWHVQ3Wg0Ph+eJi2dLo7cH1N3zJH+xRTY2kVQFxiQFrVE9wCVph6g==
-X-Received: by 2002:a7b:cbda:0:b0:397:48d6:6c9f with SMTP id n26-20020a7bcbda000000b0039748d66c9fmr3283886wmi.10.1653390647451;
-        Tue, 24 May 2022 04:10:47 -0700 (PDT)
-Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id s1-20020adf8901000000b0020c547f75easm12292388wrs.101.2022.05.24.04.10.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 May 2022 04:10:46 -0700 (PDT)
-Message-ID: <8110c080-b439-4ed8-ffc8-13323ba3790c@redhat.com>
-Date:   Tue, 24 May 2022 13:10:45 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yfCYl4aV74lIhtPwwS5Hj7a7JLAdHT5HtAXAEPKuxxw=;
+        b=PgJkVdvFRlwGGtJFCqPTniEpTgVgvLTHWGC3NpsAnnYzB5Pn6uxbEQOk9mu+OTj6Pq
+         1QMUvBXQaqboPGDmuqzFb2ocKke9Yl3qt1yuTvPS6VWGzWrtAJQW7IcC8C1FOcCkYsiE
+         WuFLXQjkdfdqfIcXR8U+k3F+mj5HtXH6MaBumfNng0GBpv2Hs/0X5aZ6nKTs6qjDPalB
+         6m/EWSFAa5GcD9KHWhUvBQVHu6THnVybHIy0JDaLq+PjU0a3Eh0SE8EN0zWrS4iHmfYr
+         N3eSOVmQWCNwADHPo8iGtO+OODXdAm1GXMX8YaW/Vz+RpObHMIu0jbqT+ezeU2JC6NKl
+         99iQ==
+X-Gm-Message-State: AOAM532sDA3EJsu5qP7EqhjyojU0dtj/cUJVhjs1dYNSkOmEEZRF8PXO
+        yC3WLgnvvzKiJzD2kTX0tk65Lz6JS+IPtDr4rwVFw+DBWT18pKJb
+X-Google-Smtp-Source: ABdhPJw17mFO2a4bDkcxbKfi5pHfVkge6/luoUZPssTZkTO6b1Ep89/x1yZbqkfqlaxo1Z8MUx6f2F8ncymnnSC1FM0=
+X-Received: by 2002:a05:600c:5112:b0:397:53f5:e15b with SMTP id
+ o18-20020a05600c511200b0039753f5e15bmr3292625wms.93.1653391468187; Tue, 24
+ May 2022 04:24:28 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, philmd@redhat.com,
-        eblake@redhat.com, armbru@redhat.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220420115745.13696-1-pmorel@linux.ibm.com>
- <20220420115745.13696-9-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v7 08/13] s390x: topology: Adding drawers to STSI
-In-Reply-To: <20220420115745.13696-9-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220426185245.281182-1-atishp@rivosinc.com> <20220426185245.281182-2-atishp@rivosinc.com>
+In-Reply-To: <20220426185245.281182-2-atishp@rivosinc.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 24 May 2022 16:54:16 +0530
+Message-ID: <CAAhSdy2Xco9wZrQ8tFfFNkNxkOcDksvi3EySdVNFtKGxVyceYQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] RISC-V: Add SSTC extension CSR details
+To:     Atish Patra <atishp@rivosinc.com>
+Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        DTML <devicetree@vger.kernel.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rob Herring <robh+dt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/04/2022 13.57, Pierre Morel wrote:
-> Let's add STSI support for the container level 4, drawers,
-> and provide the information back to the guest.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On Wed, Apr 27, 2022 at 12:23 AM Atish Patra <atishp@rivosinc.com> wrote:
+>
+> This patch just introduces the required CSR fields related to the
+> SSTC extension.
+>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+
+Looks good to me.
+
+Reviewed-by: Anup Patel <anup@brainfault.org>
+
+Regards,
+Anup
+
 > ---
-...
-> @@ -470,6 +520,69 @@ static const TypeInfo drawer_info = {
->           { }
->       }
->   };
+>  arch/riscv/include/asm/csr.h | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> index e935f27b10fd..10f4e1c36908 100644
+> --- a/arch/riscv/include/asm/csr.h
+> +++ b/arch/riscv/include/asm/csr.h
+> @@ -227,6 +227,9 @@
+>  #define CSR_SIP                        0x144
+>  #define CSR_SATP               0x180
+>
+> +#define CSR_STIMECMP           0x14D
+> +#define CSR_STIMECMPH          0x15D
 > +
-> +/* --- NODE Definitions --- */
+>  #define CSR_VSSTATUS           0x200
+>  #define CSR_VSIE               0x204
+>  #define CSR_VSTVEC             0x205
+> @@ -236,6 +239,8 @@
+>  #define CSR_VSTVAL             0x243
+>  #define CSR_VSIP               0x244
+>  #define CSR_VSATP              0x280
+> +#define CSR_VSTIMECMP          0x24D
+> +#define CSR_VSTIMECMPH         0x25D
+>
+>  #define CSR_HSTATUS            0x600
+>  #define CSR_HEDELEG            0x602
+> @@ -251,6 +256,8 @@
+>  #define CSR_HTINST             0x64a
+>  #define CSR_HGATP              0x680
+>  #define CSR_HGEIP              0xe12
+> +#define CSR_HENVCFG            0x60A
+> +#define CSR_HENVCFGH           0x61A
+>
+>  #define CSR_MSTATUS            0x300
+>  #define CSR_MISA               0x301
+> @@ -312,6 +319,10 @@
+>  #define IE_TIE         (_AC(0x1, UL) << RV_IRQ_TIMER)
+>  #define IE_EIE         (_AC(0x1, UL) << RV_IRQ_EXT)
+>
+> +/* ENVCFG related bits */
+> +#define HENVCFG_STCE   63
+> +#define HENVCFGH_STCE  31
 > +
-> +/*
-> + * Nodes are the first level of CPU topology we support
-> + * only one NODE for the moment.
-> + */
-> +static char *node_bus_get_dev_path(DeviceState *dev)
-> +{
-> +    return g_strdup_printf("00");
-> +}
-g_strdup("00") please.
-
-  Thomas
-
+>  #ifndef __ASSEMBLY__
+>
+>  #define csr_swap(csr, val)                                     \
+> --
+> 2.25.1
+>
