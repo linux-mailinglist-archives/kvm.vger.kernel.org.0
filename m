@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A07575330D2
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 20:59:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B7DE5330D3
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 20:59:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240554AbiEXS72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 14:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53120 "EHLO
+        id S240537AbiEXS7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 14:59:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240541AbiEXS7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 14:59:25 -0400
+        with ESMTP id S240544AbiEXS70 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 14:59:26 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7F35BE5E;
-        Tue, 24 May 2022 11:59:24 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24OIohsK024514;
-        Tue, 24 May 2022 18:59:20 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 508F15BD12;
+        Tue, 24 May 2022 11:59:25 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24OIIjUL015094;
+        Tue, 24 May 2022 18:59:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=ShNBro6g9YDFBfPnEFSuqAGYDfTXcS0GIMpWkrLl5DI=;
- b=rRWqAPCAk974NfeB9mZ5aHpTXL/Xe+RZDgtpUQYECW/hBNg1o2rVtcB37EdAM2vfJnNY
- gwcE1ANS1ugArb1HvG5namxcmX4ntLRsoGfnzdhr8d4N8o4qJMlwd0iB3ZXOCQeCbclK
- yh0/fqvj09kUlvLtFsah18uUwa+SImQuaqOvC0xaZUmPPQNMhD+BtjSSx+XP5NdSpuIa
- IQ/Ym5hOF0VoTjXdTpypUQJtCeQaad2Ez3W6u3ZOHGc/I9Zg0QeCoBVk+ATLX0E9HN8V
- PJdN6Y4XeYMnbzsmS/2+DpVnBXw9B+2WVGFJRj8FtlazppI0WO9mV8Wz50Sws4Ayjet1 aw== 
+ bh=H6p70Z1YMgrjJTkx+Yf17li7R+Rru0mRUfffXX/t7wc=;
+ b=qDPs61NPKQU7vWMivBFym6EVcKnYNa8R42HG3pkPwQf7bJmGaEIgqm4PkolWfH3I7rOB
+ Yogw52uaROO/M05VBjx0JLDarhn74v+iD/X7HHBmw2eTUSNB3eSGDZ8ZL2lg3Tl5loHE
+ Ryx4zOPR8+tzCnNFfgECFySZ/fFMlTC+Z0y31toORWtHkdpX8BUfWoORr2FfFDeZbFLn
+ RnuRsbTE/9juAuCNg19zWd3UqCHQEYmDoJfkgmiZrmqkoJy913YwH34VEVBnG2nnDPS5
+ Y60Ni+rUP8ruPkN4A6mYBTxz+vvElXwgkrRjJZ9Sw6OlqV7OFh+BJl0pre20Sp9UIuik Hw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g950g04n6-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94hggpus-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 18:59:19 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24OIpfBU026577;
-        Tue, 24 May 2022 18:59:19 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g950g04mt-1
+        Tue, 24 May 2022 18:59:22 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24OIupp4000629;
+        Tue, 24 May 2022 18:59:21 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94hggpug-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 18:59:19 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24OIsBgx023504;
-        Tue, 24 May 2022 18:59:17 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma02wdc.us.ibm.com with ESMTP id 3g93uw0hh8-1
+        Tue, 24 May 2022 18:59:21 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24OIs1ZU011383;
+        Tue, 24 May 2022 18:59:20 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma04dal.us.ibm.com with ESMTP id 3g93utrnuu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 18:59:17 +0000
+        Tue, 24 May 2022 18:59:20 +0000
 Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24OIxGCn31326684
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24OIxJFc31981830
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 May 2022 18:59:16 GMT
+        Tue, 24 May 2022 18:59:19 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB7E2BE058;
+        by IMSVA (Postfix) with ESMTP id 05630BE059;
+        Tue, 24 May 2022 18:59:19 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DFAAFBE051;
         Tue, 24 May 2022 18:59:16 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90D58BE053;
-        Tue, 24 May 2022 18:59:14 +0000 (GMT)
 Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.163.3.233])
         by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 24 May 2022 18:59:14 +0000 (GMT)
+        Tue, 24 May 2022 18:59:16 +0000 (GMT)
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
 To:     linux-s390@vger.kernel.org
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
@@ -69,24 +69,24 @@ Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
         pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
         jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: [PATCH v8 01/22] s390/sclp: detect the zPCI load/store interpretation facility
-Date:   Tue, 24 May 2022 14:58:46 -0400
-Message-Id: <20220524185907.140285-2-mjrosato@linux.ibm.com>
+Subject: [PATCH v8 02/22] s390/sclp: detect the AISII facility
+Date:   Tue, 24 May 2022 14:58:47 -0400
+Message-Id: <20220524185907.140285-3-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220524185907.140285-1-mjrosato@linux.ibm.com>
 References: <20220524185907.140285-1-mjrosato@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: rjcZ-egNZ2aPsIJejBRqffO7hEhqazKx
-X-Proofpoint-GUID: 7gHlDSsfUIBQOZJfKIp6ftmu5lFb6fuj
+X-Proofpoint-GUID: VaMIZHov76GRhZ4DJVYL3PSsOy1ZU3me
+X-Proofpoint-ORIG-GUID: HL2NmMTWxEvEG0dlPU9ZuEuE_AqIiWJC
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-24_09,2022-05-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 malwarescore=0 adultscore=0
- spamscore=0 impostorscore=0 mlxscore=0 clxscore=1015 mlxlogscore=906
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 mlxscore=0 suspectscore=0 adultscore=0
+ malwarescore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=742 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2204290000 definitions=main-2205240090
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -97,7 +97,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Detect the zPCI Load/Store Interpretation facility.
+Detect the Adapter Interruption Source ID Interpretation facility.
 
 Reviewed-by: Eric Farman <farman@linux.ibm.com>
 Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
@@ -109,29 +109,29 @@ Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
  2 files changed, 2 insertions(+)
 
 diff --git a/arch/s390/include/asm/sclp.h b/arch/s390/include/asm/sclp.h
-index 04cb1e7582a6..06c0b5eb8ef5 100644
+index 06c0b5eb8ef5..be14644fe113 100644
 --- a/arch/s390/include/asm/sclp.h
 +++ b/arch/s390/include/asm/sclp.h
-@@ -87,6 +87,7 @@ struct sclp_info {
- 	unsigned char has_diag318 : 1;
+@@ -88,6 +88,7 @@ struct sclp_info {
  	unsigned char has_sipl : 1;
  	unsigned char has_dirq : 1;
-+	unsigned char has_zpci_lsi : 1;
+ 	unsigned char has_zpci_lsi : 1;
++	unsigned char has_aisii : 1;
  	unsigned int ibc;
  	unsigned int mtid;
  	unsigned int mtid_cp;
 diff --git a/drivers/s390/char/sclp_early.c b/drivers/s390/char/sclp_early.c
-index e9943a86c361..b88dd0da1231 100644
+index b88dd0da1231..29fee179e197 100644
 --- a/drivers/s390/char/sclp_early.c
 +++ b/drivers/s390/char/sclp_early.c
 @@ -45,6 +45,7 @@ static void __init sclp_early_facilities_detect(void)
  	sclp.has_gisaf = !!(sccb->fac118 & 0x08);
  	sclp.has_hvs = !!(sccb->fac119 & 0x80);
  	sclp.has_kss = !!(sccb->fac98 & 0x01);
-+	sclp.has_zpci_lsi = !!(sccb->fac118 & 0x01);
++	sclp.has_aisii = !!(sccb->fac118 & 0x40);
+ 	sclp.has_zpci_lsi = !!(sccb->fac118 & 0x01);
  	if (sccb->fac85 & 0x02)
  		S390_lowcore.machine_flags |= MACHINE_FLAG_ESOP;
- 	if (sccb->fac91 & 0x40)
 -- 
 2.27.0
 
