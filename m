@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 187575324B2
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 10:00:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46DC45324BB
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 10:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233763AbiEXIAa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 04:00:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46566 "EHLO
+        id S235195AbiEXIBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 04:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232635AbiEXIA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 04:00:28 -0400
+        with ESMTP id S233041AbiEXIA7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 04:00:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 191A77628F
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 01:00:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EB4A5D1A2
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 01:00:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653379227;
+        s=mimecast20190719; t=1653379257;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Dxmtmp+YugjvDTDuqYei2bCuEkYm4yjkMTf0k4bzXIM=;
-        b=a8pW1ucuxFTfMPx3INLNQJlPQ6n10imclQj1b/SQu86zzr2upW5Sj1/wKFphmem2PNefLY
-        4iJGDnCMea284OH1CQCqaNqehEcTW7ThrAsVVMteHvw13Fj7Mh8/3a7u2Ef9IN0HetPGQk
-        tKnUmxakW8MtpFqSZfguk6jVjpqudTo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=AOoZr449YqzThRcjx+Rl1iz6U1KTRtdYfthkYn0NiKw=;
+        b=ICp8kjC5PuuD9S+0JJmjNXrEqklD6DO/CWRwRUyZIiAYAo6R9MQqKRRANsVhCc9Ru6OwX7
+        0rnplye5Zjqn8FIx1u1D2iDxFQj1wG9hbbQniXWYCtGIX/AN5lJG3wW5H0Re6TNMecez0E
+        MWJ1ZpDdZ0Rly6znVlnzEMNFAYHp7eU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-596--KOPGuv7PHaCglFni5-Wpg-1; Tue, 24 May 2022 04:00:23 -0400
-X-MC-Unique: -KOPGuv7PHaCglFni5-Wpg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-468-owIu62fAMGeyh-83zoGUXw-1; Tue, 24 May 2022 04:00:54 -0400
+X-MC-Unique: owIu62fAMGeyh-83zoGUXw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DA5E21C05138;
-        Tue, 24 May 2022 08:00:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D728285A5B5;
+        Tue, 24 May 2022 08:00:53 +0000 (UTC)
 Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80317C27E8E;
-        Tue, 24 May 2022 08:00:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 95C2C492C14;
+        Tue, 24 May 2022 08:00:53 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id D82B91800393; Tue, 24 May 2022 10:00:20 +0200 (CEST)
-Date:   Tue, 24 May 2022 10:00:20 +0200
+        id 550A51800393; Tue, 24 May 2022 10:00:52 +0200 (CEST)
+Date:   Tue, 24 May 2022 10:00:52 +0200
 From:   Gerd Hoffmann <kraxel@redhat.com>
 To:     Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,15 +55,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Eric Blake <eblake@redhat.com>,
         Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
         kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 27/36] i386/tdx: Disable SMM for TDX VMs
-Message-ID: <20220524080020.frxwwsd73lgqm4u5@sirius.home.kraxel.org>
+Subject: Re: [RFC PATCH v4 28/36] i386/tdx: Disable PIC for TDX VMs
+Message-ID: <20220524080052.ords5dz2oseacj3y@sirius.home.kraxel.org>
 References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-28-xiaoyao.li@intel.com>
+ <20220512031803.3315890-29-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-28-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+In-Reply-To: <20220512031803.3315890-29-xiaoyao.li@intel.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -74,11 +74,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 11:17:54AM +0800, Xiaoyao Li wrote:
-> TDX doesn't support SMM and VMM cannot emulate SMM for TDX VMs because
-> VMM cannot manipulate TDX VM's memory.
+On Thu, May 12, 2022 at 11:17:55AM +0800, Xiaoyao Li wrote:
+> Legacy PIC (8259) cannot be supported for TDX VMs since TDX module
+> doesn't allow directly interrupt injection.  Using posted interrupts
+> for the PIC is not a viable option as the guest BIOS/kernel will not
+> do EOI for PIC IRQs, i.e. will leave the vIRR bit set.
 > 
-> Disable SMM for TDX VMs and error out if user requests to enable SMM.
+> Hence disable PIC for TDX VMs and error out if user wants PIC.
 
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 
