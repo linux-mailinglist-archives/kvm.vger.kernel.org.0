@@ -2,96 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 973A75332AD
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 22:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F30145332B1
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 22:57:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241829AbiEXU4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 16:56:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33248 "EHLO
+        id S241788AbiEXU5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 16:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241765AbiEXU4A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 16:56:00 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5A2719C6
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 13:55:59 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id bo5so17477809pfb.4
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 13:55:59 -0700 (PDT)
+        with ESMTP id S241774AbiEXU5D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 16:57:03 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B55F63527E
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 13:57:01 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id c12-20020aa7880c000000b00518c9705941so1531486pfo.20
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 13:57:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MjBnehvEwPZLzs4+i+dSICYOgzejGL+XMwwqgLCtq0s=;
-        b=SnIB/h6p4zajI9jK5p01v04JiMknxosV5tXu1PwEktHSgnIWXEpfHyR2S3Be+3UG28
-         yFauwPfd3tTs/f4FbQIlgs5Jc9knP3OFyCbTFABsuQZS9m7EYwJxdjWpxt934TFKM2s+
-         bZ3aF3I/mWXhcVIStndN+jv7z6i33Y6690bwZoyixkHIHZncsG6ii3+2uyDk6dY5N3Lz
-         BvQ1dgVKgqBVM0SatIkNhVrtyAljHCdpDGp27xJ5S+qUlIw8PPxUEz6TmV9UTVo6XycR
-         xvt7S/XVXLWY+ETb8VsgspdHFvOf/5ZRPJIvUIbRrnQPf8pDaLDlvG35MiAwUZ3vT2v4
-         78gQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=HEeApo5ALymfLav8MKuppOv54aHzpbE0xFgatZAbaOI=;
+        b=kv0qmQnmNTU7x7HQl/EE7lkTLtRc9F7QeG5hYPIFCg7DoOswX6ZjqlRK2L5bLUzTJq
+         rmh1u/FAyYQ5xcZubP/gSjXLd8yenwWSBlpAZJli4lAa9w+k4BW57chK/Uu+LH9YXxY6
+         4yvJsFXJGxImE+cVVw4Fv5bqJsG9jFidqO/vrVqJ4sDfq2LIqV6ZL2tnO5rzLuaHlTj5
+         falYT0h/ngENNnyBIVR/7sxuZ7J61o/ZArK50y3skVrHvoie/eABFdeINJaL3D3/wHOM
+         5Y9ImSCkPczalysMqTzu8/WFixWASQnWYfvYaG7CJD2fJ2xaw3HJ5L9Has/SeubJpj/z
+         B5AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MjBnehvEwPZLzs4+i+dSICYOgzejGL+XMwwqgLCtq0s=;
-        b=zS5QBOOjWquXk6FnNJ91wflNmH2yRpRPltEhk3ZF+D3+6pk1DAyDJYvXVKk8uYLtb/
-         RpBWsPYHI11kbUrpH9IsWrorf+uOhTC7Xl0aXw18ju58ewH7l5gbUtNaXxxYlYUilgUf
-         M5mb6mxZec2Zz4BwgX2fma8NLPCHComeC50wQuVjdTK+RGB83lIWsku24QOvPrH47Ptw
-         Q/EFKbBiF+/tqreXqdPkeVEPKKQdb8zwKSUWJ/isOe6ZNlJA3p2F5kYK9QaltYFuoNP+
-         4mNgLQ1m9e37gOyTzyu3LtKvhZohN1LK6KhUvcNuugpXZAQ8qhzVMqwxVaHhwQOiTFby
-         OXtw==
-X-Gm-Message-State: AOAM532LERFfdkvGHxJBoS968ybB4IoOb4TXciO6A3WbfU/kX+M+q2fa
-        MxxCaliNQ27cg8CvavGkycCU3g==
-X-Google-Smtp-Source: ABdhPJyItd5TkRoDL/PBRi8x67lR4NgEpz+M4QMVvCsc5IPE1+rTorq3tadhk7sNyXDFG+M53CQ1ig==
-X-Received: by 2002:a05:6a00:2391:b0:50a:3ea9:e84d with SMTP id f17-20020a056a00239100b0050a3ea9e84dmr29943750pfc.21.1653425758967;
-        Tue, 24 May 2022 13:55:58 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z6-20020a170902708600b0015e8d4eb285sm561336plk.207.2022.05.24.13.55.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 13:55:58 -0700 (PDT)
-Date:   Tue, 24 May 2022 20:55:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lei Wang <lei4.wang@intel.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=HEeApo5ALymfLav8MKuppOv54aHzpbE0xFgatZAbaOI=;
+        b=1UbNextL1W65SwvZsHfbrmP2+8w1cySAUhXHF8UAO4aJcjSuYNHcp3jsjlHzx64J82
+         jOgyMpZuF3o4CHaBOcXbf99fkTHuAc7DhWCRwIr4J/my+GD4q9whao5SBlW1kwTRVsQW
+         7Xo9u9DRcjVdohKPWL8lZZhJ4IVjflQBXd6AbQ6/KV3Qngx6yUgn5sa0hzS01btiPRF3
+         HU62fLCRl4xnyrPEC6jPsVy8e67XSKJkSz+igfBgu2prqOjf/NxF25N8gNb/WyetIEOC
+         4lX3J3KBVopp2C4kJjV/5KVZh9v3oKl4LCAhXBLspnlYUEPNFwWYmxxldnKo5c/7C+dP
+         Irmg==
+X-Gm-Message-State: AOAM533acFoe4cuJhWqt/itzzCg+zqCAW0P4azPGuv+bpEpvYI3IW17M
+        VIIKoFZhFs7B87OUiE+jay+riGJmr1xdkRkG
+X-Google-Smtp-Source: ABdhPJxKXNWcvGU5h6fKtyB706UOewsJBMI8Pe35pY7Gpw9/aokAZ/4NW4rSKrVFi8BYUTcmnEz+3j7wQJk+8GxY
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:a05:6a00:1acb:b0:518:986c:a7c4 with
+ SMTP id f11-20020a056a001acb00b00518986ca7c4mr13256588pfv.2.1653425821110;
+ Tue, 24 May 2022 13:57:01 -0700 (PDT)
+Date:   Tue, 24 May 2022 20:56:43 +0000
+Message-Id: <20220524205646.1798325-1-vannapurve@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
+Subject: [RFC V1 PATCH 0/3] selftests: KVM: sev: selftests for fd-based
+ approach of supporting private memory
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
 Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, chenyi.qiang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 1/8] KVM: VMX: Introduce PKS VMCS fields
-Message-ID: <Yo1GW/7OuRooi3nT@google.com>
-References: <20220424101557.134102-1-lei4.wang@intel.com>
- <20220424101557.134102-2-lei4.wang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220424101557.134102-2-lei4.wang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, shuah@kernel.org, yang.zhong@intel.com,
+        drjones@redhat.com, ricarkol@google.com, aaronlewis@google.com,
+        wei.w.wang@intel.com, kirill.shutemov@linux.intel.com,
+        corbet@lwn.net, hughd@google.com, jlayton@kernel.org,
+        bfields@fieldses.org, akpm@linux-foundation.org,
+        chao.p.peng@linux.intel.com, yu.c.zhang@linux.intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com,
+        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
+        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
+        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
+        pgonda@google.com, nikunj@amd.com, seanjc@google.com,
+        diviness@google.com, maz@kernel.org, dmatlack@google.com,
+        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
+        mizhang@google.com, bgardon@google.com,
+        Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 24, 2022, Lei Wang wrote:
-> From: Chenyi Qiang <chenyi.qiang@intel.com>
-> 
-> PKS(Protection Keys for Supervisor Pages) is a feature that extends the
-> Protection Key architecture to support thread-specific permission
-> restrictions on supervisor pages.
-> 
-> A new PKS MSR(PKRS) is defined in kernel to support PKS, which holds a
-> set of permissions associated with each protection domain.
-> 
-> Two VMCS fields {HOST,GUEST}_IA32_PKRS are introduced in
-> {host,guest}-state area to store the respective values of PKRS.
-> 
-> Every VM exit saves PKRS into guest-state area.
+This series implements selftests targeting the feature floated by Chao
+via:
+https://lore.kernel.org/linux-mm/20220519153713.819591-1-chao.p.peng@linux.intel.com/
 
-Uber nit, PKRS isn't saved if VMX doesn't support the entry control.
+Below changes aim to test the fd based approach for guest private memory
+in context of SEV/SEV-ES VMs executing on AMD SEV/SEV-ES compatible
+platforms.
 
-  Every VM exit saves PKRS into guest-state area if VM_ENTRY_LOAD_IA32_PKRS
-  is supported by the CPU.
+This series has dependency on following patch series:
+1) V6 series patches from Chao mentioned above.
+2) https://lore.kernel.org/all/20211210164620.11636-1-michael.roth@amd.com/T/
+  - KVM: selftests: Add support for test-selectable ucall implementations
+    series by Michael Roth
+3) https://lore.kernel.org/kvm/20220104234129.dvpv3o3tihvzsqcr@amd.com/T/
+  - KVM: selftests: Add tests for SEV and SEV-ES guests series by Michael Roth
 
-With that tweak,
+And few additional patches:
+* https://github.com/vishals4gh/linux/commit/2cb215cb6b4dff7fdf703498165179626c0cdfc7
+  - Confidential platforms along with the confidentiality aware software stack
+    support a notion of private/shared accesses from the confidential VMs.
+    Generally, a bit in the GPA conveys the shared/private-ness of the access.
+    SEV/SEV-ES implementation doesn't expose the encryption bit information
+    via fault address to KVM and so this hack is still needed to signal
+    private/shared access ranges to the kvm.
+* https://github.com/vishals4gh/linux/commit/81a7d24231f6b8fb4174bbf97ed733688e8dbc0c
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Github link for the patches posted as part of this series:
+https://github.com/vishals4gh/linux/commits/sev_upm_selftests_rfc_v1
+
+sev_priv_memfd_test.c file adds a suite of selftests to access private memory
+from the SEV/SEV-ES guests via private/shared accesses and checking if the
+contents can be leaked to/accessed by vmm via shared memory view.
+
+To allow SEV/SEV-ES VMs to toggle the encryption bit during memory conversion,
+support is added for mapping guest pagetables to guest va ranges and passing
+the mapping information to guests via shared pages.
+
+Vishal Annapurve (3):
+  selftests: kvm: x86_64: Add support for pagetable tracking
+  selftests: kvm: sev: Handle hypercall exit
+  selftests: kvm: sev: Port UPM selftests onto SEV/SEV-ES VMs
+
+ tools/testing/selftests/kvm/.gitignore        |    1 +
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../selftests/kvm/include/kvm_util_base.h     |   98 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   81 +-
+ .../selftests/kvm/lib/kvm_util_internal.h     |    9 +
+ .../selftests/kvm/lib/x86_64/processor.c      |   36 +
+ .../selftests/kvm/lib/x86_64/sev_exitlib.c    |   39 +-
+ .../kvm/x86_64/sev_priv_memfd_test.c          | 1511 +++++++++++++++++
+ 8 files changed, 1770 insertions(+), 6 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_priv_memfd_test.c
+
+-- 
+2.36.1.124.g0e6072fb45-goog
+
