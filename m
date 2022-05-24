@@ -2,127 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 743155322D5
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 08:05:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A12953236D
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 08:42:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234692AbiEXGFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 02:05:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37192 "EHLO
+        id S233321AbiEXGmq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 02:42:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232516AbiEXGFF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 02:05:05 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0846213D
-        for <kvm@vger.kernel.org>; Mon, 23 May 2022 23:05:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653372303; x=1684908303;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=diIRvvDU2jAulewT+EJl4wwfpMtzfN2iUVgeHmuFZK0=;
-  b=irrlU/h/JEOgt9aGlFl4DgvmNuRHAliJhLt2XV/n8nss0Wnoqq9VGLje
-   VDdze0aT3m92qU5OofJXo60DKyUowbwZvaaAyn2itz7d5VadwIMSV/Rq+
-   PwRgTC2DKD3LRH1D7O+3AbM7BWBnHXRsOcNkpf5En6i5/EsHCptupXAbH
-   zcGdmWDNjTNdRZzkV9FQKG2P+YPYiWSsEzxZ2Rb/eGxoTL/jxEdWt1OvO
-   zXRLsEtBl2LtrkirWRRtexwkL8BWetZEiCOakOmjkKw5qluVokzuvseih
-   PQD2n2TBXuPDTTt17yUC2+xhoVUjwNtPJsB/PTG1du3IWV0aeiNYYN7K7
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="261047644"
-X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
-   d="scan'208";a="261047644"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 23:04:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
-   d="scan'208";a="703336777"
-Received: from lkp-server01.sh.intel.com (HELO db63a1be7222) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 23 May 2022 23:04:47 -0700
-Received: from kbuild by db63a1be7222 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1ntNew-0001n0-BV;
-        Tue, 24 May 2022 06:04:46 +0000
-Date:   Tue, 24 May 2022 14:04:36 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, pbonzini@redhat.com,
-        jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH 1/4] kvm: x86/pmu: Introduce masked events to the pmu
- event filter
-Message-ID: <202205241319.3YATdncf-lkp@intel.com>
-References: <20220523214110.1282480-2-aaronlewis@google.com>
+        with ESMTP id S229945AbiEXGmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 02:42:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A99866C567
+        for <kvm@vger.kernel.org>; Mon, 23 May 2022 23:42:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653374561;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZcCP2qAVtg+8ALVdH43HRFvkEtv7/fw48ULRdMeMgoY=;
+        b=Cn6AD9x04BgEgtyCvrhlbTCm2ZRVWBgpXWtutPaWGXBtFutaEkHF2CIKnKfWBc6ceQ7VJk
+        a4va/f3bnxLwuv4q1WhbaDc/TKXpglQSlCLaEKboPDaroFnbipgzojNN/OJK6gdgt+oIVR
+        NFDYeeadlvDUW3aTpS8qrmwPljP0agI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-493-kmOAKuvwPsGRXcKAgKCm5g-1; Tue, 24 May 2022 02:42:38 -0400
+X-MC-Unique: kmOAKuvwPsGRXcKAgKCm5g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5492811E75;
+        Tue, 24 May 2022 06:42:37 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 92B1540D1B98;
+        Tue, 24 May 2022 06:42:37 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id 1B6B81800393; Tue, 24 May 2022 08:42:36 +0200 (CEST)
+Date:   Tue, 24 May 2022 08:42:36 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@intel.com,
+        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 07/36] i386/tdx: Introduce is_tdx_vm() helper and
+ cache tdx_guest object
+Message-ID: <20220524064236.aptmlagzqgrexeka@sirius.home.kraxel.org>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-8-xiaoyao.li@intel.com>
+ <20220523084817.ydle4f4acsoppbgr@sirius.home.kraxel.org>
+ <20220523145944.GB3095181@ls.amr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220523214110.1282480-2-aaronlewis@google.com>
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220523145944.GB3095181@ls.amr.corp.intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Aaron,
+> > > +#ifdef CONFIG_TDX
+> > > +bool is_tdx_vm(void);
+> > > +#else
+> > > +#define is_tdx_vm() 0
+> > 
+> > Just add that to the tdx-stubs.c file you already created in one of the
+> > previous patches and drop this #ifdef mess ;)
+> 
+> This is for consistency with SEV.  Anyway Either way is okay.
 
-Thank you for the patch! Perhaps something to improve:
+> From target/i386/sev.h
+>   ...
+>   #ifdef CONFIG_SEV
+>   bool sev_enabled(void);
+>   bool sev_es_enabled(void);
+>   #else
+>   #define sev_enabled() 0
+>   #define sev_es_enabled() 0
+>   #endif
 
-[auto build test WARNING on kvm/master]
-[also build test WARNING on v5.18]
-[cannot apply to mst-vhost/linux-next next-20220523]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Hmm, not sure why sev did it this way.  One possible reason is that the
+compiler optimizer can see sev_enabled() evaluates to 0 and throw away
+the dead code branches then.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Aaron-Lewis/kvm-x86-pmu-Introduce-and-test-masked-events/20220524-054438
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
-config: i386-randconfig-a011 (https://download.01.org/0day-ci/archive/20220524/202205241319.3YATdncf-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 10c9ecce9f6096e18222a331c5e7d085bd813f75)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/f189a455a73825b7025d8feff486db18ebef171f
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Aaron-Lewis/kvm-x86-pmu-Introduce-and-test-masked-events/20220524-054438
-        git checkout f189a455a73825b7025d8feff486db18ebef171f
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kvm/
+So, yes, maybe it makes sense to stick to the #ifdef in this specific
+case.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+take care,
+  Gerd
 
-All warnings (new ones prefixed by >>):
-
->> arch/x86/kvm/pmu.c:633:5: warning: no previous prototype for function 'has_invalid_event' [-Wmissing-prototypes]
-   int has_invalid_event(struct kvm_pmu_event_filter *filter)
-       ^
-   arch/x86/kvm/pmu.c:633:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int has_invalid_event(struct kvm_pmu_event_filter *filter)
-   ^
-   static 
-   1 warning generated.
-
-
-vim +/has_invalid_event +633 arch/x86/kvm/pmu.c
-
-   632	
- > 633	int has_invalid_event(struct kvm_pmu_event_filter *filter)
-   634	{
-   635		u64 event_mask;
-   636		int i;
-   637	
-   638		event_mask = kvm_x86_ops.pmu_ops->get_event_mask(filter->flags);
-   639		for(i = 0; i < filter->nevents; i++)
-   640			if (filter->events[i] & ~event_mask)
-   641				return true;
-   642	
-   643		return false;
-   644	}
-   645	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
