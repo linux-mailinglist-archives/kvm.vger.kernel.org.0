@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41C5B5333DA
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 01:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B89B65333E5
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 01:28:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242591AbiEXXWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 19:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48258 "EHLO
+        id S242641AbiEXX2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 19:28:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242569AbiEXXWD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 19:22:03 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 210E82DAA6
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 16:21:58 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id q4so17106921plr.11
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 16:21:58 -0700 (PDT)
+        with ESMTP id S233692AbiEXX22 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 19:28:28 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4507537A9C
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 16:28:27 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id p8so17732170pfh.8
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 16:28:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=M6ibtN+tkzyjMGp3wPL66xycMPufdrhzmfDOY7iX60k=;
-        b=kt22Jdr99111DhfjKgHjr/LHKxyH1S9/yFGXXUNma4i2GW79ZUv6vwgVgBAz29Uu8Q
-         /uT1GYJittlWhqAVzwcZUwbEQCDnBMYiIOqWEHcPRwYmwM8UR3IuU0F/qwrHrPHqa5IG
-         C6/cjEnR4wioV4Wq23KaERGCaQYWw6AT5PmB0zDdNMz/clJa8Da69sanaGPJXQCIe3gY
-         HvQNN3E6kk9vrXwJvhLy73lgrBVCG6vk4671pBVvhjAHp23QNuzQABgyVDDZFC51hvqw
-         9NPsG0Nlfa5ElmGRIAyEZOgQ7SbcPGivBPa1DFeFzVDjvxNYDNVJduIubjjaYgPwo5pp
-         8kUg==
+        bh=fqBMuhHrx4UOoXhRLSuxGa/UGjLKCHhTuR3mJ3R2ZwY=;
+        b=JGmlcBggKq+pEAmQcRltp2+AtkVq5JNjau0NP+jVffAM3WGXEUHP+3H1SNK5Jmc78y
+         katXpprmCnQ+1hg+EGcKu5QMcGj5NsDt7ZUfOtWTcc6xZI4tgEZvfAdDElhzrLRY+yK3
+         O3WXoqR6fAT7VxGvnX3rede4M/zX1YGGfXEmZON1JLRWrQrwXcg8KMjS0fHWIRgAy4Gw
+         V2Z+YjcYI2jPSbI/iRo9lrpDmhm9/oBaFkTb3RELvk/cYtSQ9XWJcTVOIyhELP23Vz95
+         OF46uWUW5P2jmbYmuQ3VGaGmi7MFX7N6vJKGkV2kgcwi1Nm027oalVVp0e51dF4LpLlx
+         61JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=M6ibtN+tkzyjMGp3wPL66xycMPufdrhzmfDOY7iX60k=;
-        b=KeS39/L1pxayMmmMvGOmA+X2FAucpwxNGttSGFQk61HiM7jdajRr5IYCEwrcJdKynb
-         Obv5RDDwzJjjGq8qGXDNLu9sx2hP+bsgNyIGiJ19GE+0y9eUPqRPwUz7NG5xL0QERjFf
-         D18aFumYe0GXOJI7Zg2OXyaCwTf+1710pDMgAXH6ZjdKziMp1ys1AY/M7A5tBXmQqvDq
-         ZWGZ+Ucyegm7qL7d3eOzl7KuChcy6/sKoDjU6X6DqHrGZgQFzxtkc3XpDrOqZ6Z2ZYp5
-         1T9VDoaWxCvKhSGcFAsJS3Z8d8FHeD2445uPQf8mkFBJ1JSEY3tFwHNNzbMrQzFPpMJL
-         fsmA==
-X-Gm-Message-State: AOAM531GvL+7Jn1X/NawMiU15Gwk4nPnZzx4EmPkSV9xTknYa22NP5ZT
-        R5Wgmg17FwZNZbyrXG7v3kFeDdJmdXtV7Q==
-X-Google-Smtp-Source: ABdhPJzbpLoaUDt61YcqyxApz+8iQD3U4DO9atJPZZabEDleRRRIFHO93GAFnLI0B6ItqQ2t5gfNCQ==
-X-Received: by 2002:a17:90b:1b03:b0:1dc:a80b:8004 with SMTP id nu3-20020a17090b1b0300b001dca80b8004mr7044789pjb.182.1653434517536;
-        Tue, 24 May 2022 16:21:57 -0700 (PDT)
+        bh=fqBMuhHrx4UOoXhRLSuxGa/UGjLKCHhTuR3mJ3R2ZwY=;
+        b=TKWVonZHZV8T1Uo3wUWKNpEwIiVwK50eezcqGN+Vu3DAHs1e8vvaIDCRasCP5eZgO2
+         zp4zm14TI/a+zY1SVmguhOd4bNx4Gy03RL4gWv/OGmPGASXPrHWWL9R2Y1tq8ILizj+H
+         bq48OFj0bo3aeONK8BwgMkabT5Nb0WYiQtIQcrlsB2cMOXw472gLjypEkDMTGvErYOl9
+         pjRW9erEJ4IRuihIOfmk14B4n70r48j2vQV1fE9C9CaR/Ey4W0nra9/dGdEI88e5P9B0
+         sZoOTdtDIyeuRByNyAKk7oAu2vCkEPIzicNWRv4d4H6HSvWnCJ8aERIlMU7YkVs2nmY9
+         vPEg==
+X-Gm-Message-State: AOAM53254OvJOhFaEw1AtwFUca3lPjVPStmcgeY/YoGg2xzidp+vJvfk
+        OaWjY5l4fEsB/mWGvy6/H7+apQ==
+X-Google-Smtp-Source: ABdhPJwSlQCwnTZZpCmCaeDuJJh3cqRaXuaIMrZ2CsrKOCI91svuNsa7opFbxvUOKVisocymZ6r/VA==
+X-Received: by 2002:a63:5fcf:0:b0:3f6:298d:e2ea with SMTP id t198-20020a635fcf000000b003f6298de2eamr26753832pgb.561.1653434906513;
+        Tue, 24 May 2022 16:28:26 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i5-20020a170902eb4500b0015e8d4eb248sm4819049pli.146.2022.05.24.16.21.56
+        by smtp.gmail.com with ESMTPSA id y76-20020a62ce4f000000b004fa743ba3f9sm10020111pfg.2.2022.05.24.16.28.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 16:21:56 -0700 (PDT)
-Date:   Tue, 24 May 2022 23:21:53 +0000
+        Tue, 24 May 2022 16:28:26 -0700 (PDT)
+Date:   Tue, 24 May 2022 23:28:22 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Lei Wang <lei4.wang@intel.com>
 Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
         jmattson@google.com, joro@8bytes.org, chenyi.qiang@intel.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 5/8] KVM: MMU: Add helper function to get pkr bits
-Message-ID: <Yo1okaacf2kbvrxh@google.com>
+Subject: Re: [PATCH v7 6/8] KVM: MMU: Add support for PKS emulation
+Message-ID: <Yo1qFh8+0AVvwvd5@google.com>
 References: <20220424101557.134102-1-lei4.wang@intel.com>
- <20220424101557.134102-6-lei4.wang@intel.com>
+ <20220424101557.134102-7-lei4.wang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220424101557.134102-6-lei4.wang@intel.com>
+In-Reply-To: <20220424101557.134102-7-lei4.wang@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,123 +73,182 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Sun, Apr 24, 2022, Lei Wang wrote:
-> Extra the PKR stuff to a separate, non-inline helper, which is a
+> @@ -454,10 +455,11 @@ struct kvm_mmu {
+>  	u8 permissions[16];
+>  
+>  	/*
+> -	* The pkru_mask indicates if protection key checks are needed.  It
+> -	* consists of 16 domains indexed by page fault error code bits [4:1],
+> -	* with PFEC.RSVD replaced by ACC_USER_MASK from the page tables.
+> -	* Each domain has 2 bits which are ANDed with AD and WD from PKRU.
+> +	* The pkr_mask indicates if protection key checks are needed.
+> +	* It consists of 16 domains indexed by page fault error code
+> +	* bits[4:1] with PFEC.RSVD replaced by ACC_USER_MASK from the
+> +	* page tables. Each domain has 2 bits which are ANDed with AD
+> +	* and WD from PKRU/PKRS.
 
-s/Extra/Extract
+Same comments, align and wrap closer to 80 please.
 
-> preparation to introduce pks support.
-
-Please provide more justification.  The change is justified, by random readers of
-this patch/commit will be clueless.
-
-  Extract getting the effective PKR bits to a helper that lives in mmu.c
-  in order to keep the is_cr4_*() helpers contained to mmu.c.  Support for
-  PKRS (versus just PKRU) will require querying MMU state to see if the
-  relevant CR4 bit is enabled because pkr_mask will be non-zero if _either_
-  bit is enabled).
-
-  PKR{U,S} are exposed to the guest if and only if TDP is enabled, and
-  while permission_fault() is performance critical for ia32 shadow paging,
-  it's a rarely used path with TDP is enabled.  I.e. moving the PKR code
-  out-of-line is not a performance concern.
-
-> Signed-off-by: Lei Wang <lei4.wang@intel.com>
-> ---
->  arch/x86/kvm/mmu.h     | 20 +++++---------------
->  arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++++++++++
->  2 files changed, 26 insertions(+), 15 deletions(-)
-> 
+>  	*/
+>  	u32 pkr_mask;
+>  
 > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index cb3f07e63778..cea03053a153 100644
+> index cea03053a153..6963c641e6ce 100644
 > --- a/arch/x86/kvm/mmu.h
 > +++ b/arch/x86/kvm/mmu.h
-> @@ -204,6 +204,9 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	return vcpu->arch.mmu->page_fault(vcpu, &fault);
->  }
+> @@ -45,7 +45,8 @@
+>  #define PT32E_ROOT_LEVEL 3
 >  
-> +u32 kvm_mmu_pkr_bits(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-
-kvm_mmu_get_pkr_bits() so that there's a verb in there.
-
-> +		     unsigned pte_access, unsigned pte_pkey, unsigned int pfec);
-> +
->  /*
->   * Check if a given access (described through the I/D, W/R and U/S bits of a
->   * page fault error code pfec) causes a permission fault with the given PTE
-> @@ -240,21 +243,8 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  #define KVM_MMU_CR4_ROLE_BITS (X86_CR4_PSE | X86_CR4_PAE | X86_CR4_LA57 | \
+> -			       X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE)
+> +			       X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE | \
+> +			       X86_CR4_PKS)
 >  
->  	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
->  	if (unlikely(mmu->pkr_mask)) {
-> -		u32 pkr_bits, offset;
-> -
-> -		/*
-> -		* PKRU defines 32 bits, there are 16 domains and 2
-> -		* attribute bits per domain in pkru.  pte_pkey is the
-> -		* index of the protection domain, so pte_pkey * 2 is
-> -		* is the index of the first bit for the domain.
-> -		*/
-> -		pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
-> -
-> -		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
-> -		offset = (pfec & ~1) +
-> -			((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT - PT_USER_SHIFT));
-> -
-> -		pkr_bits &= mmu->pkr_mask >> offset;
-> +		u32 pkr_bits =
-> +			kvm_mmu_pkr_bits(vcpu, mmu, pte_access, pte_pkey, pfec);
-
-Nit, I prefer wrapping in the params, that way the first line shows the most
-important information, e.g. what variable is being set and how (by a function call).
-And then there won't be overflow with the longer helper name:
-
-		u32 pkr_bits = kvm_mmu_get_pkr_bits(vcpu, mmu, pte_access,
-						    pte_pkey, pfec);
-
->  		errcode |= -pkr_bits & PFERR_PK_MASK;
->  		fault |= (pkr_bits != 0);
->  	}
+>  #define KVM_MMU_CR0_ROLE_BITS (X86_CR0_PG | X86_CR0_WP)
+>  #define KVM_MMU_EFER_ROLE_BITS (EFER_LME | EFER_NX)
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index de665361548d..6d3276986102 100644
+> index 6d3276986102..a6cbc22d3312 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6477,3 +6477,24 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->  	if (kvm->arch.nx_lpage_recovery_thread)
->  		kthread_stop(kvm->arch.nx_lpage_recovery_thread);
+> @@ -209,6 +209,7 @@ BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, smep, X86_CR4_SMEP);
+>  BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, smap, X86_CR4_SMAP);
+>  BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pke, X86_CR4_PKE);
+>  BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, la57, X86_CR4_LA57);
+> +BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pks, X86_CR4_PKS);
+>  BUILD_MMU_ROLE_REGS_ACCESSOR(efer, nx, EFER_NX);
+>  BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
+>  
+> @@ -231,6 +232,7 @@ BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
+>  BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
+>  BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
+>  BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
+> +BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pks);
+>  BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
+>  
+>  static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
+> @@ -4608,37 +4610,58 @@ static void update_permission_bitmask(struct kvm_mmu *mmu, bool ept)
 >  }
-> +
-> +u32 kvm_mmu_pkr_bits(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-> +		     unsigned pte_access, unsigned pte_pkey, unsigned int pfec)
-> +{
-> +	u32 pkr_bits, offset;
-> +
-> +	/*
-> +	* PKRU defines 32 bits, there are 16 domains and 2
+>  
+>  /*
 
-Comment needs to be aligned, and it can be adjust to wrap at 80 chars (its
-indentation has changed).
+...
+
+> + * Protection Key Rights (PKR) is an additional mechanism by which data accesses
+> + * with 4-level or 5-level paging (EFER.LMA=1) may be disabled based on the
+> + * Protection Key Rights Userspace (PRKU) or Protection Key Rights Supervisor
+> + * (PKRS) registers.  The Protection Key (PK) used for an access is a 4-bit
+> + * value specified in bits 62:59 of the leaf PTE used to translate the address.
+> + *
+> + * PKRU and PKRS are 32-bit registers, with 16 2-bit entries consisting of an
+> + * access-disable (AD) and write-disable (WD) bit.  The PK from the leaf PTE is
+> + * used to index the approriate PKR (see below), e.g. PK=1 would consume bits
+
+s/approriate/appropriate
+
+> + * 3:2 (bit 3 == write-disable, bit 2 == access-disable).
+> + *
+> + * The PK register (PKRU vs. PKRS) indexed by the PK depends on the type of
+> + * _address_ (not access type!).  For a user-mode address, PKRU is used; for a
+> + * supervisor-mode address, PKRS is used.  An address is supervisor-mode if the
+> + * U/S flag (bit 2) is 0 in at least one of the paging-structure entries, i.e.
+> + * an address is user-mode if the U/S flag is 1 in _all_ entries.  Again, this
+> + * is the address type, not the the access type, e.g. a supervisor-mode _access_
+
+Double "the the" can be a single "the".
+
+> + * will consume PKRU if the _address_ is a user-mode address.
+> + *
+> + * As alluded to above, PKR checks are only performed for data accesses; code
+> + * fetches are not subject to PKR checks.  Terminal page faults (!PRESENT or
+> + * PFEC.RSVD=1) are also not subject to PKR checks.
+> + *
+> + * PKR write-disable checks for superivsor-mode _accesses_ are performed if and
+> + * only if CR0.WP=1 (though access-disable checks still apply).
+> + *
+> + * In summary, PKR checks are based on (a) EFER.LMA, (b) CR4.PKE or CR4.PKS,
+> + * (c) CR0.WP, (d) the PK in the leaf PTE, (e) two bits from the corresponding
+> + * PKR{S,U} entry, (f) the access type (derived from the other PFEC bits), and
+> + * (g) the address type (retrieved from the paging-structure entries).
+> + *
+> + * To avoid conditional branches in permission_fault(), the PKR bitmask caches
+> + * the above inputs, except for (e) the PKR{S,U} entry.  The FETCH, USER, and
+> + * WRITE bits of the PFEC and the effective value of the paging-structures' U/S
+> + * bit (slotted into the PFEC.RSVD position, bit 3) are used to index into the
+> + * PKR bitmask (similar to the 4-bit Protection Key itself).  The two bits of
+> + * the PKR bitmask "entry" are then extracted and ANDed with the two bits of
+> + * the PKR{S,U} register corresponding to the address type and protection key.
+> + *
+> + * E.g. for all values where PFEC.FETCH=1, the corresponding pkr_bitmask bits
+> + * will be 00b, thus masking away the AD and WD bits from the PKR{S,U} register
+> + * to suppress PKR checks on code fetches.
+> + */
+>  static void update_pkr_bitmask(struct kvm_mmu *mmu)
+>  {
+>  	unsigned bit;
+>  	bool wp;
+> -
+
+Please keep this newline, i.e. after the declaration of the cr4 booleans.  That
+helps isolate the clearing of mmu->pkr_mask, which makes the functional affect of
+the earlier return more obvious.
+
+Ah, and use reverse fir tree for the variable declarations, i.e.
+
+	bool cr4_pke = is_cr4_pke(mmu);
+	bool cr4_pks = is_cr4_pks(mmu);
+	unsigned bit;
+	bool wp;
+
+	mmu->pkr_mask = 0;
+
+	if (!cr4_pke && !cr4_pks)
+		return;
+
+> +	bool cr4_pke = is_cr4_pke(mmu);
+> +	bool cr4_pks = is_cr4_pks(mmu);
+>  	mmu->pkr_mask = 0;
+>  
+> -	if (!is_cr4_pke(mmu))
+> +	if (!cr4_pke && !cr4_pks)
+>  		return;
+>  
+>  	wp = is_cr0_wp(mmu);
+  
+
+  ...
+
+> @@ -6482,14 +6509,22 @@ u32 kvm_mmu_pkr_bits(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  		     unsigned pte_access, unsigned pte_pkey, unsigned int pfec)
+>  {
+>  	u32 pkr_bits, offset;
+> +	u32 pkr;
+>  
+>  	/*
+> -	* PKRU defines 32 bits, there are 16 domains and 2
+> -	* attribute bits per domain in pkru.  pte_pkey is the
+> -	* index of the protection domain, so pte_pkey * 2 is
+> -	* is the index of the first bit for the domain.
+> +	* PKRU and PKRS both define 32 bits. There are 16 domains
+> +	* and 2 attribute bits per domain in them. pte_key is the
+> +	* index of the protection domain, so pte_pkey * 2 is the
+> +	* index of the first bit for the domain. The use of PKRU
+> +	* versus PKRS is selected by the address type, as determined
+> +	* by the U/S bit in the paging-structure entries.
 
 
-	/*
-	 * PKRU and PKRS both define 32 bits. There are 16 domains and 2
-	 * attribute bits per domain in them. pte_key is the index of the
-	 * protection domain, so pte_pkey * 2 is the index of the first bit for
-	 * the domain. The use of PKRU versus PKRS is selected by the address
-	 * type, as determined by the U/S bit in the paging-structure entries.
-	 */
+Align and wrap closer to 80 please.
 
-> +	* attribute bits per domain in pkru.  pte_pkey is the
-> +	* index of the protection domain, so pte_pkey * 2 is
-> +	* is the index of the first bit for the domain.
-> +	*/
-> +	pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
+>  	*/
+> -	pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
+> +	if (pte_access & PT_USER_MASK)
+> +		pkr = is_cr4_pke(mmu) ? vcpu->arch.pkru : 0;
+> +	else
+> +		pkr = is_cr4_pks(mmu) ? kvm_read_pkrs(vcpu) : 0;
 > +
-> +	/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
-> +	offset = (pfec & ~1) + ((pte_access & PT_USER_MASK)
-> +				<< (PFERR_RSVD_BIT - PT_USER_SHIFT));
-> +
-> +	pkr_bits &= mmu->pkr_mask >> offset;
-> +	return pkr_bits;
-> +}
+> +	pkr_bits = (pkr >> pte_pkey * 2) & 3;
+>  
+>  	/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
+>  	offset = (pfec & ~1) + ((pte_access & PT_USER_MASK)
 > -- 
 > 2.25.1
 > 
