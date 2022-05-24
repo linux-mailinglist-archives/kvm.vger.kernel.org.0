@@ -2,72 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E414F5323C5
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:12:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5AA85323C7
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:12:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232070AbiEXHMI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 03:12:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40592 "EHLO
+        id S234491AbiEXHMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 03:12:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231756AbiEXHMA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 03:12:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BF52E52E4D
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:11:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653376317;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8Fsbl6R43fPIFA1GC5vANa8/YINK4Hrhp6J5Uy/+KOE=;
-        b=QmJX1XArT/XHRmthPPsSFKprCUo22T33uZ9V5nQT9qTS3KwHAkcJ0leVDAX5akFQdDmQ3Y
-        gpv15qt95329YgcJEF4iuGX5TDvil/Z3kGZxjl0jISuRTHpqo2FvtA6RzcZrUsA0VLbWJZ
-        AxiJx//E2ktSF+PL4PzORB8snskJN8g=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-653-b1GPClzsNGyKzI2l9aBmGw-1; Tue, 24 May 2022 03:11:52 -0400
-X-MC-Unique: b1GPClzsNGyKzI2l9aBmGw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S234721AbiEXHMF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 03:12:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E32A54F8F
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:12:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DBCD41C05139;
-        Tue, 24 May 2022 07:11:51 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A6773492C14;
-        Tue, 24 May 2022 07:11:51 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id F29E51800393; Tue, 24 May 2022 09:11:49 +0200 (CEST)
-Date:   Tue, 24 May 2022 09:11:49 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 21/36] i386/tdx: Track mem_ptr for each firmware
- entry of TDVF
-Message-ID: <20220524071149.rs3hqhi5t5usdfv3@sirius.home.kraxel.org>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-22-xiaoyao.li@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-22-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 42DBD61538
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 07:12:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 806A9C385AA;
+        Tue, 24 May 2022 07:12:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653376321;
+        bh=8B7bycy9bP10BkPe9UarbbG5/goCVnT+gGnduTdEGP8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=TIOhOaonsjYyCsipH3xhOHw1EAbmlTbAojh0Wp9qwnF+yJ5ePm5dSBsmhO0f65bFZ
+         9sVwuvzKif72aQHYDDzQtEJgRaU9H4H2FyA+hI4Bkx000mgLiiu3sgf7chQR7VPx07
+         keqaNEmPchT6yFxB3a12y34EnfH0EAZXseLwE0YK46JmKeLUDw0UYf6eD+lNr1HAAp
+         H36NshNjcIrMUbhc2rWC7rZzyel1x8dmdgH6+lpUWDVijaLP4QHZ9fWUkx3u7z4OkS
+         dum8dzB4/6nFyp4ErepQiXWIdPmKEvIys0gpCObXKarxqcPKnUztwEm4t5PFBVpN2E
+         6qL78dGU7wT5w==
+Received: from athedsl-362076.home.otenet.gr ([87.202.142.23] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1ntOhy-00DLRS-Mt; Tue, 24 May 2022 08:11:58 +0100
+Date:   Tue, 24 May 2022 08:11:56 +0100
+Message-ID: <87h75fmmkj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
+        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v4 1/4] KVM: Implement dirty quota-based throttling of vcpus
+In-Reply-To: <20220521202937.184189-2-shivam.kumar1@nutanix.com>
+References: <20220521202937.184189-1-shivam.kumar1@nutanix.com>
+        <20220521202937.184189-2-shivam.kumar1@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 87.202.142.23
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,22 +68,252 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 11:17:48AM +0800, Xiaoyao Li wrote:
-> For each TDVF sections, QEMU needs to copy the content to guest
-> private memory via KVM API (KVM_TDX_INIT_MEM_REGION).
+On Sat, 21 May 2022 21:29:36 +0100,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
 > 
-> Introduce a field @mem_ptr for TdxFirmwareEntry to track the memory
-> pointer of each TDVF sections. So that QEMU can add/copy them to guest
-> private memory later.
+> Define variables to track and throttle memory dirtying for every vcpu.
 > 
-> TDVF sections can be classified into two groups:
->  - Firmware itself, e.g., BFV and CFV, that locates separated from guest
->    RAM. It's memory pointer is the bios pointer.
+> dirty_count:    Number of pages the vcpu has dirtied since its creation,
+>                 while dirty logging is enabled.
+> dirty_quota:    Number of pages the vcpu is allowed to dirty. To dirty
+>                 more, it needs to request more quota by exiting to
+>                 userspace.
 > 
->  - Sections located at guest RAM, e.g., TEMP_MEM and TD_HOB.
->    mmap a new memory range for them.
+> Implement the flow for throttling based on dirty quota.
 > 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> i) Increment dirty_count for the vcpu whenever it dirties a page.
+> ii) Exit to userspace whenever the dirty quota is exhausted (i.e. dirty
+> count equals/exceeds dirty quota) to request more dirty quota.
+> 
+> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 32 ++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/mmu/spte.c        |  4 ++--
+>  arch/x86/kvm/vmx/vmx.c         |  3 +++
+>  arch/x86/kvm/x86.c             |  4 ++++
 
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+Please split the x86 support in its own patch.
 
+>  include/linux/kvm_host.h       | 15 +++++++++++++++
+>  include/linux/kvm_types.h      |  1 +
+>  include/uapi/linux/kvm.h       | 12 ++++++++++++
+>  virt/kvm/kvm_main.c            |  7 ++++++-
+>  8 files changed, 75 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9f3172376ec3..a9317ed31d06 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6125,6 +6125,24 @@ array field represents return values. The userspace should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>  
+> +::
+> +
+> +		/* KVM_EXIT_DIRTY_QUOTA_EXHAUSTED */
+> +		struct {
+> +			__u64 count;
+> +			__u64 quota;
+> +		} dirty_quota_exit;
+> +If exit reason is KVM_EXIT_DIRTY_QUOTA_EXHAUSTED, it indicates that the VCPU has
+> +exhausted its dirty quota. The 'dirty_quota_exit' member of kvm_run structure
+> +makes the following information available to the userspace:
+> +	'count' field: the current count of pages dirtied by the VCPU, can be
+> +        skewed based on the size of the pages accessed by each vCPU.
+> +	'quota' field: the observed dirty quota just before the exit to userspace.
+> +The userspace can design a strategy to allocate the overall scope of dirtying
+> +for the VM among the vcpus. Based on the strategy and the current state of dirty
+> +quota throttling, the userspace can make a decision to either update (increase)
+> +the quota or to put the VCPU to sleep for some time.
+> +
+>  ::
+>  
+>  		/* Fix the size of the union. */
+> @@ -6159,6 +6177,20 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+>  
+>  ::
+>  
+> +	/*
+> +	 * Number of pages the vCPU is allowed to have dirtied over its entire
+> +	 * lifetime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if the quota
+> +	 * is reached/exceeded.
+> +	 */
+> +	__u64 dirty_quota;
+> +Please note that enforcing the quota is best effort, as the guest may dirty
+> +multiple pages before KVM can recheck the quota.  However, unless KVM is using
+> +a hardware-based dirty ring buffer, e.g. Intel's Page Modification Logging,
+> +KVM will detect quota exhaustion within a handful of dirtied page.  If a
+> +hardware ring buffer is used, the overrun is bounded by the size of the buffer
+> +(512 entries for PML).
+> +
+> +::
+>    };
+>  
+>  
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 73cfe62fdad1..01f0d2a04796 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -182,9 +182,9 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  		  "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
+>  		  get_rsvd_bits(&vcpu->arch.mmu->shadow_zero_check, spte, level));
+>  
+> -	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
+> +	if (spte & PT_WRITABLE_MASK) {
+>  		/* Enforced by kvm_mmu_hugepage_adjust. */
+> -		WARN_ON(level > PG_LEVEL_4K);
+> +		WARN_ON(level > PG_LEVEL_4K && kvm_slot_dirty_track_enabled(slot));
+>  		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
+>  	}
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b730d799c26e..5cbe4992692a 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5507,6 +5507,9 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+>  		 */
+>  		if (__xfer_to_guest_mode_work_pending())
+>  			return 1;
+> +
+> +		if (!kvm_vcpu_check_dirty_quota(vcpu))
+> +			return 0;
+>  	}
+>  
+>  	return 1;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index eb4029660bd9..0b35b8cc0274 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10257,6 +10257,10 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.l1tf_flush_l1d = true;
+>  
+>  	for (;;) {
+> +		r = kvm_vcpu_check_dirty_quota(vcpu);
+
+I really wonder why this has to be checked on each and every run. Why
+isn't this a request set by the core code instead?
+
+> +		if (!r)
+> +			break;
+> +
+>  		if (kvm_vcpu_running(vcpu)) {
+>  			r = vcpu_enter_guest(vcpu);
+>  		} else {
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f11039944c08..ca1ac970a6cf 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -530,6 +530,21 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+>  	return cmpxchg(&vcpu->mode, IN_GUEST_MODE, EXITING_GUEST_MODE);
+>  }
+>  
+> +static inline int kvm_vcpu_check_dirty_quota(struct kvm_vcpu *vcpu)
+
+Why is this inline instead of a normal call?
+
+> +{
+> +	struct kvm_run *run = vcpu->run;
+> +	u64 dirty_quota = READ_ONCE(run->dirty_quota);
+> +	u64 pages_dirtied = vcpu->stat.generic.pages_dirtied;
+> +
+> +	if (!dirty_quota || (pages_dirtied < dirty_quota))
+> +		return 1;
+
+What happens when page_dirtied becomes large and dirty_quota has to
+wrap to allow further progress?
+
+> +
+> +	run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
+> +	run->dirty_quota_exit.count = pages_dirtied;
+> +	run->dirty_quota_exit.quota = dirty_quota;
+> +	return 0;
+> +}
+> +
+>  /*
+>   * Some of the bitops functions do not support too long bitmaps.
+>   * This number must be determined not to exceed such limits.
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index dceac12c1ce5..7f42486b0405 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -106,6 +106,7 @@ struct kvm_vcpu_stat_generic {
+>  	u64 halt_poll_fail_hist[HALT_POLL_HIST_COUNT];
+>  	u64 halt_wait_hist[HALT_POLL_HIST_COUNT];
+>  	u64 blocking;
+> +	u64 pages_dirtied;
+>  };
+>  
+>  #define KVM_STATS_NAME_SIZE	48
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 507ee1f2aa96..1d9531efe1fb 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -270,6 +270,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_X86_BUS_LOCK     33
+>  #define KVM_EXIT_XEN              34
+>  #define KVM_EXIT_RISCV_SBI        35
+> +#define KVM_EXIT_DIRTY_QUOTA_EXHAUSTED 36
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -487,6 +488,11 @@ struct kvm_run {
+>  			unsigned long args[6];
+>  			unsigned long ret[2];
+>  		} riscv_sbi;
+> +		/* KVM_EXIT_DIRTY_QUOTA_EXHAUSTED */
+> +		struct {
+> +			__u64 count;
+> +			__u64 quota;
+> +		} dirty_quota_exit;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -508,6 +514,12 @@ struct kvm_run {
+>  		struct kvm_sync_regs regs;
+>  		char padding[SYNC_REGS_SIZE_BYTES];
+>  	} s;
+> +	/*
+> +	 * Number of pages the vCPU is allowed to have dirtied over its entire
+> +	 * liftime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if the
+
+lifetime
+
+> +	 * quota is reached/exceeded.
+> +	 */
+> +	__u64 dirty_quota;
+
+How is the feature detected from userspace? I don't see how it can
+make use of it without knowing about it the first place.
+
+>  };
+>  
+>  /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 0afc016cc54d..041ab464405d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3163,7 +3163,12 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>  		return;
+>  #endif
+>  
+> -	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+> +	if (!memslot)
+> +		return;
+> +
+> +	vcpu->stat.generic.pages_dirtied++;
+> +
+> +	if (kvm_slot_dirty_track_enabled(memslot)) {
+>  		unsigned long rel_gfn = gfn - memslot->base_gfn;
+>  		u32 slot = (memslot->as_id << 16) | memslot->id;
+>  
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
