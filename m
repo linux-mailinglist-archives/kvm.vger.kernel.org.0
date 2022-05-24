@@ -2,72 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2F765324E8
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 10:06:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C647B5324F8
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 10:11:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230439AbiEXIGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 04:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58294 "EHLO
+        id S231334AbiEXILj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 04:11:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230170AbiEXIF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 04:05:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A4E9393468
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 01:05:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653379555;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p1ApjFFAVOLjqbDsOMVHTwr38YXUn42zoJ+sAI4Jjjk=;
-        b=V5TR15V0BVHW6Dco8wPkmKPvvAauPU3KZ1Z+F1vjPCL96XKzIazkC4Jcc5P9ZaPuT6YZ+a
-        7rYqyqgBBX97KcVNDmCilKxxAuQ1dBj10bL8yrTkkJa2J+7hYKyWuwbR2WSPZTsOaNz7V9
-        6KgB34BHmxHU7kxS5CzPWn5cm9KQmhE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-510-ReE-LsV8OZ-IX1gEC4soQA-1; Tue, 24 May 2022 04:05:52 -0400
-X-MC-Unique: ReE-LsV8OZ-IX1gEC4soQA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C2ECD8339A2;
-        Tue, 24 May 2022 08:05:51 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F7A0401E74;
-        Tue, 24 May 2022 08:05:51 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 1CEC81800393; Tue, 24 May 2022 10:05:50 +0200 (CEST)
-Date:   Tue, 24 May 2022 10:05:50 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 33/36] i386/tdx: Only configure MSR_IA32_UCODE_REV
- in kvm_init_msrs() for TDs
-Message-ID: <20220524080550.xe7ymb22jpdx23ee@sirius.home.kraxel.org>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-34-xiaoyao.li@intel.com>
+        with ESMTP id S231330AbiEXILh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 04:11:37 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1D19BDF25
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 01:11:36 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ADE131FB;
+        Tue, 24 May 2022 01:11:35 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CFC0D3F66F;
+        Tue, 24 May 2022 01:11:34 -0700 (PDT)
+Date:   Tue, 24 May 2022 09:11:50 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Dao Lu <daolu@rivosinc.com>
+Cc:     will@kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH kvmtool] Fixes: 0febaae00bb6 ("Add asm/kernel.h for
+ riscv")
+Message-ID: <YoyTRncQ2geRtMDn@monolith.localdoman>
+References: <20220520180946.104214-1-daolu@rivosinc.com>
+ <YotUdkD2LIKqhYKq@monolith.localdoman>
+ <YotVCkpajnskhQm9@monolith.localdoman>
+ <CAKh7v-Rm3Mtid7KymrbSwwVRoC=S1J0f4CSCbpHXmi1SA45omA@mail.gmail.com>
+ <You2EZ0xBWD29suJ@monolith.localdoman>
+ <CAKh7v-Rnbs1uOGcDrB6a3+MFKbZX1_-4tgWJH-EKp_Wxd76D=Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-34-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <CAKh7v-Rnbs1uOGcDrB6a3+MFKbZX1_-4tgWJH-EKp_Wxd76D=Q@mail.gmail.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,12 +46,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 12, 2022 at 11:18:00AM +0800, Xiaoyao Li wrote:
-> For TDs, only MSR_IA32_UCODE_REV in kvm_init_msrs() can be configured
-> by VMM, while the features enumerated/controlled by other MSRs except
-> MSR_IA32_UCODE_REV in kvm_init_msrs() are not under control of VMM.
+Hi,
+
+On Mon, May 23, 2022 at 12:15:55PM -0700, Dao Lu wrote:
+> Hi Alex,
 > 
-> Only configure MSR_IA32_UCODE_REV for TDs.
+> After talking with my colleague I have some additional questions about
+> what number we want to put there, as of now there is already a patch
+> that will increase the range in Kconfig to 2-512:
+> 
+> https://lore.kernel.org/lkml/CAOnJCUJrN4frY_OdQzO-yr5CrDLvj=ge9KY2d=XnGvAF-uQNvQ@mail.gmail.com/T/
+> 
+> It seems like a moving target and as riscv develops we kinda expect
+> this number will grow further. Do you think it is ok for me to at
+> least set it to 512, if not 4096 at this time?
 
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+It's up to you in the end, I'm not familiar with the riscv architecture.
 
+NR_CPUS is only used at the moment when creating a cpumask, where it
+represents the maximum number of bits in the bitmask (bits, not bytes). So
+NR_CPUS=512 means that the cpumask will contain 8 unsigned longs, while with
+4096 it will contain 64 unsigned longs.
+
+Cpumasks are only used by the arm64 code so far, so the value that you
+choose won't affect existing code.
+
+Thanks,
+Alex
+
+> 
+> Thanks,
+> Dao
+> 
+> On Mon, May 23, 2022 at 9:27 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi,
+> >
+> > On Mon, May 23, 2022 at 09:04:04AM -0700, Dao Lu wrote:
+> > > Hi Alex,
+> > >
+> > > Thanks for pointing that out - I wasn't sure where the number came
+> > > from so I basically copied from the arm one just so the compilation
+> > > can pass.
+> >
+> > I see, I was worried that I was looking in the wrong place.
+> >
+> > >
+> > > I am happy to fix up the number to 32 and add the compile error
+> > > message to the commit message like you said - would something like
+> > > this work?
+> > > -------
+> > > Fixes the following compilation issue:
+> > >
+> > > include/linux/kernel.h:5:10: fatal error: asm/kernel.h: No such file
+> > > or directory
+> > >     5 | #include "asm/kernel.h"
+> > > -------
+> >
+> > Sounds good, thanks:
+> > Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >
+> > With the error message added:
+> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >
+> > Thanks,
+> > Alex
+> >
+> > > Thanks,
+> > > Dao
+> > >
+> > > On Mon, May 23, 2022 at 2:33 AM Alexandru Elisei
+> > > <alexandru.elisei@arm.com> wrote:
+> > > >
+> > > > Adding the kvmtool maintainers, I just noticed that they were missing.
+> > > >
+> > > > On Mon, May 23, 2022 at 10:31:34AM +0100, Alexandru Elisei wrote:
+> > > > > Hi,
+> > > > >
+> > > > > When I started working on the heterogeneous PMU series, support for the
+> > > > > riscv architecture wasn't merged in kvmtool, and after riscv was merged I
+> > > > > missed adding the header file.
+> > > > >
+> > > > > This indeed fixes this compilation error:
+> > > > >
+> > > > > In file included from include/linux/rbtree.h:32,
+> > > > >                  from include/kvm/devices.h:4,
+> > > > >                  from include/kvm/pci.h:10,
+> > > > >                  from include/kvm/vfio.h:6,
+> > > > >                  from include/kvm/kvm-config.h:5,
+> > > > >                  from include/kvm/kvm.h:6:
+> > > > > include/linux/kernel.h:5:10: fatal error: asm/kernel.h: No such file or directory
+> > > > >     5 | #include "asm/kernel.h"
+> > > > >       |          ^~~~~~~~~~~~~~
+> > > > > cc1: all warnings being treated as errors
+> > > > > compilation terminated.
+> > > > > make: *** [Makefile:484: builtin-balloon.o] Error 1
+> > > > >
+> > > > > Would be nice to include it in the commit message, so people googling for
+> > > > > that exact error message can come across this commit.
+> > > > >
+> > > > > On Fri, May 20, 2022 at 11:09:46AM -0700, Dao Lu wrote:
+> > > > > > Signed-off-by: Dao Lu <daolu@rivosinc.com>
+> > > > > > ---
+> > > > > >  riscv/include/asm/kernel.h | 8 ++++++++
+> > > > > >  1 file changed, 8 insertions(+)
+> > > > > >  create mode 100644 riscv/include/asm/kernel.h
+> > > > > >
+> > > > > > diff --git a/riscv/include/asm/kernel.h b/riscv/include/asm/kernel.h
+> > > > > > new file mode 100644
+> > > > > > index 0000000..a2a8d9e
+> > > > > > --- /dev/null
+> > > > > > +++ b/riscv/include/asm/kernel.h
+> > > > > > @@ -0,0 +1,8 @@
+> > > > > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > > > > +
+> > > > > > +#ifndef __ASM_KERNEL_H
+> > > > > > +#define __ASM_KERNEL_H
+> > > > > > +
+> > > > > > +#define NR_CPUS    4096
+> > > > >
+> > > > > In arch/riscv/Kconfig I see this:
+> > > > >
+> > > > > config NR_CPUS
+> > > > >       int "Maximum number of CPUs (2-32)"
+> > > > >       range 2 32
+> > > > >       depends on SMP
+> > > > >       default "8"
+> > > > >
+> > > > > Would you mind explaining where the 4096 number of CPUs comes from?
+> > > > >
+> > > > > Thanks,
+> > > > > Alex
+> > > > >
+> > > > > > +
+> > > > > > +#endif /* __ASM_KERNEL_H */
+> > > > > > --
+> > > > > > 2.36.0
+> > > > > >
