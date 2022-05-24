@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CECD53313C
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 21:05:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9E4953313E
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 21:05:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240679AbiEXTFC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 15:05:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
+        id S240984AbiEXTFE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 15:05:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240839AbiEXTEn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S241002AbiEXTEn (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 24 May 2022 15:04:43 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90299ABF52
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 12:03:42 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24OIKmOJ032376;
-        Tue, 24 May 2022 19:03:23 GMT
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFC52ABF66
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 12:03:43 -0700 (PDT)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24OIotOB015922;
+        Tue, 24 May 2022 19:03:27 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=0jqkOkkguEuybqg8uTwOU8iOs46hSGO791UHSq2HPTw=;
- b=nZk4tz8J0+NyLjtRQI8/P4EKvwMYxpDSawoLgCij6wmCqZsBFTAxZ5JDT3zqgxSfVmAy
- QL68BwXSSbeDOD0Bw94/hparD/azJa25Sc9uPkjETOjvol9+hIcgvCfg0mP8guszshCc
- ESKhQ3GY9HhEAKRLHZtSTexN89AzBeFE8dlvZWwVH2bZyqA302pPpAcEUgnqDqqxTDYf
- Bi1EB8/qTp6rys9IcdU/SBsxhB8//3sKHKBLiLRndmyNYy7wz7uLLtrAp3YwNKpN10y1
- o4xpIkz6gATfR0PbZC8J9kJ0jMcV+GzLy644C690PXCSHpJB7+Hz1k6wrXGvoH+GQLjr aQ== 
+ bh=Hj+QDYKcD5HhNTVOhOc8oHAl3/ZVKIKF4QRNBFEWG8A=;
+ b=ryKxCeZwFsjUalaVeS2KayoWdzertZHSugaNjSX6Ib/Xq5y29e6/CbvU5iGuXk6zepHJ
+ iV+6q1vO/ces/I4CU9WhpZo3R2OmWUd2V+HH86UgDstgABg2s+JBDVCQnbLacTO4BCSt
+ 9nz6m+AuhybM3hDzUqKn9GApg4TINp8KIw27cG+yCzD5zz8bhSWTUHTNOv+8LsGididO
+ YPja3TQex1txQ320tpD82mt+/OQMAFz1W1CooZ3dG1IvOVnsEZK4qeFYq/Sj9fgfnMOe
+ oQ3HNfEhvM5cDxw9RQi8v4AEcTFhWpctJTJr2zWAHQc7pUGEavJD/di0fwyKNseDPsRI bw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94jf0qc9-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g950j07rf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:03:22 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24OIwZtw013437;
-        Tue, 24 May 2022 19:03:22 GMT
+        Tue, 24 May 2022 19:03:26 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24OIsc0r006577;
+        Tue, 24 May 2022 19:03:26 GMT
 Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94jf0qbx-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g950j07qy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:03:22 +0000
+        Tue, 24 May 2022 19:03:26 +0000
 Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24OJ2ug1015882;
-        Tue, 24 May 2022 19:03:21 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02dal.us.ibm.com with ESMTP id 3g93v80q4t-1
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24OJ2ug3015882;
+        Tue, 24 May 2022 19:03:25 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma02dal.us.ibm.com with ESMTP id 3g93v80q5c-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:03:21 +0000
+        Tue, 24 May 2022 19:03:25 +0000
 Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24OJ3KMZ21168510
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24OJ3NVF6226750
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 May 2022 19:03:20 GMT
+        Tue, 24 May 2022 19:03:23 GMT
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8263A124053;
+        by IMSVA (Postfix) with ESMTP id C1ED212405B;
+        Tue, 24 May 2022 19:03:23 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E603D124053;
         Tue, 24 May 2022 19:03:20 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6FF82124055;
-        Tue, 24 May 2022 19:03:17 +0000 (GMT)
 Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.163.3.233])
         by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 24 May 2022 19:03:17 +0000 (GMT)
+        Tue, 24 May 2022 19:03:20 +0000 (GMT)
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
@@ -65,25 +65,25 @@ Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
         david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
         mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
         kvm@vger.kernel.org
-Subject: [PATCH v6 1/8] Update linux headers
-Date:   Tue, 24 May 2022 15:02:58 -0400
-Message-Id: <20220524190305.140717-2-mjrosato@linux.ibm.com>
+Subject: [PATCH v6 2/8] target/s390x: add zpci-interp to cpu models
+Date:   Tue, 24 May 2022 15:02:59 -0400
+Message-Id: <20220524190305.140717-3-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220524190305.140717-1-mjrosato@linux.ibm.com>
 References: <20220524190305.140717-1-mjrosato@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: evwRM03yOggto93A9CJUu8nVoFiI7s7K
-X-Proofpoint-GUID: HO3yRDf9iwNKYOMTYakr2MBlrlUXMsjO
+X-Proofpoint-ORIG-GUID: XCLXCe5Q1CZH4dxGWh_l3m7KROLyetYR
+X-Proofpoint-GUID: YH3Hb8iop2MBNhX1Yp3xxTHpf79vlkTZ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-24_09,2022-05-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 spamscore=0 suspectscore=0 adultscore=0
- clxscore=1011 bulkscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2205240094
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1015 bulkscore=0 phishscore=0 adultscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=999 impostorscore=0
+ lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2204290000 definitions=main-2205240094
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -93,125 +93,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a placeholder that pulls in unmerged kernel changes
-required by this item.  A proper header sync can be done once the
-associated kernel code merges.
+The zpci-interp feature is used to specify whether zPCI interpretation is
+to be used for this guest.
 
 Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- linux-headers/asm-s390/kvm.h    |  1 +
- linux-headers/linux/kvm.h       | 32 ++++++++++++++++++++++++++++++++
- linux-headers/linux/vfio.h      |  4 ++--
- linux-headers/linux/vfio_zdev.h |  7 +++++++
- 4 files changed, 42 insertions(+), 2 deletions(-)
+ hw/s390x/s390-virtio-ccw.c          | 1 +
+ target/s390x/cpu_features_def.h.inc | 1 +
+ target/s390x/gen-features.c         | 2 ++
+ target/s390x/kvm/kvm.c              | 1 +
+ 4 files changed, 5 insertions(+)
 
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index f053b8304a..d8259ff9a1 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -130,6 +130,7 @@ struct kvm_s390_vm_cpu_machine {
- #define KVM_S390_VM_CPU_FEAT_PFMFI	11
- #define KVM_S390_VM_CPU_FEAT_SIGPIF	12
- #define KVM_S390_VM_CPU_FEAT_KSS	13
-+#define KVM_S390_VM_CPU_FEAT_ZPCI_INTERP 14
- struct kvm_s390_vm_cpu_feat {
- 	__u64 feat[16];
- };
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 0d05d02ee4..3013371078 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -1150,6 +1150,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_DISABLE_QUIRKS2 213
- /* #define KVM_CAP_VM_TSC_CONTROL 214 */
- #define KVM_CAP_SYSTEM_EVENT_DATA 215
-+#define KVM_CAP_S390_ZPCI_OP 216
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 047cca0487..b33310a135 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -806,6 +806,7 @@ static void ccw_machine_7_0_instance_options(MachineState *machine)
+     static const S390FeatInit qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V7_0 };
  
- #ifdef KVM_CAP_IRQ_ROUTING
+     ccw_machine_7_1_instance_options(machine);
++    s390_cpudef_featoff_greater(14, 1, S390_FEAT_ZPCI_INTERP);
+     s390_set_qemu_cpu_model(0x8561, 15, 1, qemu_cpu_feat);
+ }
  
-@@ -2066,4 +2067,35 @@ struct kvm_stats_desc {
- /* Available with KVM_CAP_XSAVE2 */
- #define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+diff --git a/target/s390x/cpu_features_def.h.inc b/target/s390x/cpu_features_def.h.inc
+index e86662bb3b..4ade3182aa 100644
+--- a/target/s390x/cpu_features_def.h.inc
++++ b/target/s390x/cpu_features_def.h.inc
+@@ -146,6 +146,7 @@ DEF_FEAT(SIE_CEI, "cei", SCLP_CPU, 43, "SIE: Conditional-external-interception f
+ DEF_FEAT(DAT_ENH_2, "dateh2", MISC, 0, "DAT-enhancement facility 2")
+ DEF_FEAT(CMM, "cmm", MISC, 0, "Collaborative-memory-management facility")
+ DEF_FEAT(AP, "ap", MISC, 0, "AP instructions installed")
++DEF_FEAT(ZPCI_INTERP, "zpci-interp", MISC, 0, "zPCI interpretation")
  
-+/* Available with KVM_CAP_S390_ZPCI_OP */
-+#define KVM_S390_ZPCI_OP         _IOW(KVMIO,  0xd0, struct kvm_s390_zpci_op)
-+
-+struct kvm_s390_zpci_op {
-+	/* in */
-+	__u32 fh;               /* target device */
-+	__u8  op;               /* operation to perform */
-+	__u8  pad[3];
-+	union {
-+		/* for KVM_S390_ZPCIOP_REG_AEN */
-+		struct {
-+			__u64 ibv;      /* Guest addr of interrupt bit vector */
-+			__u64 sb;       /* Guest addr of summary bit */
-+			__u32 flags;
-+			__u32 noi;      /* Number of interrupts */
-+			__u8 isc;       /* Guest interrupt subclass */
-+			__u8 sbo;       /* Offset of guest summary bit vector */
-+			__u16 pad;
-+		} reg_aen;
-+		__u64 reserved[8];
-+	} u;
-+};
-+
-+/* types for kvm_s390_zpci_op->op */
-+#define KVM_S390_ZPCIOP_REG_AEN                0
-+#define KVM_S390_ZPCIOP_DEREG_AEN      1
-+
-+/* flags for kvm_s390_zpci_op->u.reg_aen.flags */
-+#define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
-+
-+
- #endif /* __LINUX_KVM_H */
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index e9f7795c39..ede44b5572 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -643,7 +643,7 @@ enum {
+ /* Features exposed via the PLO instruction. */
+ DEF_FEAT(PLO_CL, "plo-cl", PLO, 0, "PLO Compare and load (32 bit in general registers)")
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index c03ec2c9a9..f991646c01 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -554,6 +554,7 @@ static uint16_t full_GEN14_GA1[] = {
+     S390_FEAT_HPMA2,
+     S390_FEAT_SIE_KSS,
+     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
++    S390_FEAT_ZPCI_INTERP,
  };
  
- /**
-- * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
-+ * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 12,
-  *					      struct vfio_pci_hot_reset_info)
-  *
-  * Return: 0 on success, -errno on failure:
-@@ -770,7 +770,7 @@ struct vfio_device_ioeventfd {
- #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
- 
- /**
-- * VFIO_DEVICE_FEATURE - _IORW(VFIO_TYPE, VFIO_BASE + 17,
-+ * VFIO_DEVICE_FEATURE - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
-  *			       struct vfio_device_feature)
-  *
-  * Get, set, or probe feature data of the device.  The feature is selected
-diff --git a/linux-headers/linux/vfio_zdev.h b/linux-headers/linux/vfio_zdev.h
-index b4309397b6..77f2aff1f2 100644
---- a/linux-headers/linux/vfio_zdev.h
-+++ b/linux-headers/linux/vfio_zdev.h
-@@ -29,6 +29,9 @@ struct vfio_device_info_cap_zpci_base {
- 	__u16 fmb_length;	/* Measurement Block Length (in bytes) */
- 	__u8 pft;		/* PCI Function Type */
- 	__u8 gid;		/* PCI function group ID */
-+	/* End of version 1 */
-+	__u32 fh;		/* PCI function handle */
-+	/* End of version 2 */
+ #define full_GEN14_GA2 EmptyFeat
+@@ -650,6 +651,7 @@ static uint16_t default_GEN14_GA1[] = {
+     S390_FEAT_GROUP_MSA_EXT_8,
+     S390_FEAT_MULTIPLE_EPOCH,
+     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
++    S390_FEAT_ZPCI_INTERP,
  };
  
- /**
-@@ -47,6 +50,10 @@ struct vfio_device_info_cap_zpci_group {
- 	__u16 noi;		/* Maximum number of MSIs */
- 	__u16 maxstbl;		/* Maximum Store Block Length */
- 	__u8 version;		/* Supported PCI Version */
-+	/* End of version 1 */
-+	__u8 reserved;
-+	__u16 imaxstbl;		/* Maximum Interpreted Store Block Length */
-+	/* End of version 2 */
+ #define default_GEN14_GA2 EmptyFeat
+diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+index 53098bf541..314b0a9039 100644
+--- a/target/s390x/kvm/kvm.c
++++ b/target/s390x/kvm/kvm.c
+@@ -2293,6 +2293,7 @@ static int kvm_to_feat[][2] = {
+     { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
+     { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
+     { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
++    { KVM_S390_VM_CPU_FEAT_ZPCI_INTERP, S390_FEAT_ZPCI_INTERP },
  };
  
- /**
+ static int query_cpu_feat(S390FeatBitmap features)
 -- 
 2.27.0
 
