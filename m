@@ -2,75 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0DFA53253C
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 10:29:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00262532586
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 10:40:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231444AbiEXI3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 04:29:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42592 "EHLO
+        id S231472AbiEXIkJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 04:40:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbiEXI3s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 04:29:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 90842692AA
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 01:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653380986;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GUSD90TGVdoNT6RamwsTuRQRaKIMXTvwDZ4IEGfDVx4=;
-        b=OYObpJXdwhNsWszu1C4pYE/Me6M7S9eCRq0rYQwNcHUI6J5iulZ3nMSbaecCCSus4K008T
-        6KLvrfhOXaD3LyzMq4knaeqeCrKkT6S1fhNis5Arl29miCU322uGOxO8pZkEYYgfM23YYW
-        QH4gpN4Gj1xdeU7rj+zvZDp5iMCwKWY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-636-zN8m4DqDPYKTeySmcf9URg-1; Tue, 24 May 2022 04:29:43 -0400
-X-MC-Unique: zN8m4DqDPYKTeySmcf9URg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0FEB385A5AA;
-        Tue, 24 May 2022 08:29:42 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 94ED2492CA3;
-        Tue, 24 May 2022 08:29:41 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 7E7B11800393; Tue, 24 May 2022 10:29:39 +0200 (CEST)
-Date:   Tue, 24 May 2022 10:29:39 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 13/36] i386/tdx: Validate TD attributes
-Message-ID: <20220524082939.2clruwficvkdwnzh@sirius.home.kraxel.org>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-14-xiaoyao.li@intel.com>
- <20220523093920.o6pk5i7zig6enwnm@sirius.home.kraxel.org>
- <1e0f0051-f7c1-ed3b-be02-d16f0cf9f25d@intel.com>
- <20220524065959.umzmlhwcspfwi7m2@sirius.home.kraxel.org>
- <89534991-1850-be09-8abd-6d29bef5958e@intel.com>
+        with ESMTP id S233768AbiEXIkA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 04:40:00 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 17FD984A2E
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 01:39:58 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A99B51FB;
+        Tue, 24 May 2022 01:39:57 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 943CD3F66F;
+        Tue, 24 May 2022 01:39:56 -0700 (PDT)
+Date:   Tue, 24 May 2022 09:40:11 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Keir Fraser <keirf@google.com>, Will Deacon <will@kernel.org>,
+        kvm@vger.kernel.org, catalin.marinas@arm.com,
+        kernel-team@android.com
+Subject: Re: [PATCH kvmtool 0/2] Fixes for virtio_balloon stats printing
+Message-ID: <YoyZ64D1/v6SBz8S@monolith.localdoman>
+References: <20220520143706.550169-1-keirf@google.com>
+ <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
+ <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
+ <Youi7+T1+YG/6ed9@google.com>
+ <20220523161323.0e7df3d5@donnerap.cambridge.arm.com>
+ <YoutGZHrgweh6pgm@monolith.localdoman>
+ <You30lZiaDIlTAsF@google.com>
+ <You/XQP0hc5e9BJd@monolith.localdoman>
+ <20220523183932.05d56517@donnerap.cambridge.arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <89534991-1850-be09-8abd-6d29bef5958e@intel.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <20220523183932.05d56517@donnerap.cambridge.arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,39 +50,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 24, 2022 at 04:11:56PM +0800, Xiaoyao Li wrote:
-> On 5/24/2022 2:59 PM, Gerd Hoffmann wrote:
-> > On Tue, May 24, 2022 at 12:19:51PM +0800, Xiaoyao Li wrote:
-> > > On 5/23/2022 5:39 PM, Gerd Hoffmann wrote:
-> > > > So, how is this supposed to work?  Patch #2 introduces attributes as
-> > > > user-settable property.  So do users have to manually figure and pass
-> > > > the correct value, so the check passes?  Specifically the fixed1 check?
-> > > > 
-> > > > I think 'attributes' should not be user-settable in the first place.
-> > > > Each feature-bit which is actually user-settable (and not already
-> > > > covered by another option like pmu) should be a separate attribute for
-> > > > tdx-object.  Then the tdx code can create attributes from hardware
-> > > > capabilities and user settings.
-> > > 
-> > > In patch #2, tdx-guest.attributes is defined as a field to hold a 64 bits
-> > > value of attributes but it doesn't provide any getter/setter for it. So it's
-> > > *not* user-settable.
-> > 
-> > Ok.  Why it is declared as object property in the first place then?
+Hi,
+
+On Mon, May 23, 2022 at 06:39:32PM +0100, Andre Przywara wrote:
+> On Mon, 23 May 2022 18:07:41 +0100
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Is there another way to define a member/field of object besides property?
+> > Hi,
+> > 
+> > On Mon, May 23, 2022 at 04:35:30PM +0000, Keir Fraser wrote:
+> > > On Mon, May 23, 2022 at 04:49:45PM +0100, Alexandru Elisei wrote:  
+> > > > Hi,
+> > > > 
+> > > > On Mon, May 23, 2022 at 04:13:23PM +0100, Andre Przywara wrote:  
+> > > > > On Mon, 23 May 2022 15:06:23 +0000
+> > > > > Keir Fraser <keirf@google.com> wrote:
+> > > > >   
+> > > > > > On Mon, May 23, 2022 at 03:42:49PM +0100, Andre Przywara wrote:  
+> > > > > > > On Fri, 20 May 2022 21:51:07 +0100
+> > > > > > > Will Deacon <will@kernel.org> wrote:
+> > > > > > > 
+> > > > > > > Hi,
+> > > > > > >     
+> > > > > > > > On Fri, 20 May 2022 14:37:04 +0000, Keir Fraser wrote:    
+> > > > > > > > > While playing with kvmtool's virtio_balloon device I found a couple of
+> > > > > > > > > niggling issues with the printing of memory stats. Please consider
+> > > > > > > > > these fairly trivial fixes.    
+> > > > > > > 
+> > > > > > > Unfortunately patch 2/2 breaks compilation on userland with older kernel
+> > > > > > > headers, like Ubuntu 18.04:
+> > > > > > > ...
+> > > > > > >   CC       builtin-stat.o
+> > > > > > > builtin-stat.c: In function 'do_memstat':
+> > > > > > > builtin-stat.c:86:8: error: 'VIRTIO_BALLOON_S_HTLB_PGALLOC' undeclared (first use in this function); did you mean 'VIRTIO_BALLOON_S_AVAIL'?
+> > > > > > >    case VIRTIO_BALLOON_S_HTLB_PGALLOC:
+> > > > > > >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > > > > >         VIRTIO_BALLOON_S_AVAIL
+> > > > > > > (repeated for VIRTIO_BALLOON_S_HTLB_PGFAIL and VIRTIO_BALLOON_S_CACHES).
+> > > > > > > 
+> > > > > > > I don't quite remember what we did here in the past in those cases,
+> > > > > > > conditionally redefine the symbols in a local header, or protect the
+> > > > > > > new code with an #ifdef?    
+> > > > > > 
+> > > > > > For what it's worth, my opinion is that the sensible options are to:
+> > > > > > 1. Build against the latest stable, or a specified version of, kernel
+> > > > > > headers; or 2. Protect with ifdef'ery until new definitions are
+> > > > > > considered "common enough".
+> > > > > > 
+> > > > > > Supporting older headers by grafting or even modifying required newer
+> > > > > > definitions on top seems a horrid middle ground, albeit I can
+> > > > > > appreciate the pragmatism of it.  
+> > > > > 
+> > > > > Fair enough, although I don't think option 1) is really viable for users,
+> > > > > as upgrading the distro provided kernel headers is often not an option for
+> > > > > the casual user. And even more versed users would probably shy away from
+> > > > > staining their /usr/include directory just for kvmtool.
+> > > > > 
+> > > > > Which just leaves option 2? If no one hollers, I will send a patch to that
+> > > > > regard.  
+> > > > 
+> > > > How about copying the required headers to kvmtool, under include/linux?
+> > > > That would remove any dependency on a specific kernel or distro version.  
+> > > 
+> > > Maintaining just the required headers sounds a bit of a pain. Getting  
+> > 
+> > Isn't the Linux mantra "don't break userspace"? So in that case, even if
+> > kvmtool uses an older version of a header, that won't cause any issues,
+> > right?
+> 
+> It should work in either way, we just might end up ignoring new features,
+> if we use older header files.
 
-Well, the C object struct is completely independent from the qapi
-struct.  Typically qapi-generated structs are added as struct fields.
-Look at ui/input-linux.c for example.
+I don't think that's a problem, whenever kvmtool gets support for a feature
+not in the existing headers, the headers can be updated, similar to the
+other KVM headers.
 
-struct InputLinux holds all the object state.  It has a GrabToggleKeys
-field, that is a qapi-generated enum (see qapi/common.json) and is
-user-configurable (there are getter and setter for it).
+> 
+> > > it wrong ends up copying too many headers (and there's nearly 200kLOC  
+> 
+> I feel we shouldn't go crazy here just because of some statistic feature.
+> kvmtool is meant to be a lean and mean tool, compiling cleanly on as many
+> systems as possible, as a pure user. So mandating header updates from
+> innocent users sounds a bit over the top.
+> 
+> > We could mandate that the kernel header file is copied only when new
+> > features are added to kvmtool. I don't think there's any need to do it
+> > retroactively.
+> 
+> Just thinking: we do the header sync already for the KVM related
+> headers, as we need them, and didn't want to wait for distros.
+> Can't we just include some virtio headers in that list as well?
 
-So, you can have a private 'attributes' struct field in your tdx class,
-but the field doesn't have to be in the qapi struct for that.
+I like this idea.
 
-HTH,
-  Gerd
+Thanks,
+Alex
 
+> 
+> Cheers,
+> Andre
+> 
+> > 
+> > What do you think?
+> > 
+> > Thanks,
+> > Alex
+> > 
+> > > of them) or a confusing split between copied and system-installed
+> > > headers.
+> > > 
+> > > How about requiring headers at include/linux and if the required
+> > > version tag isn't found there, download the kernel tree and "make
+> > > headers_install" with customised INSTALL_HDR_PATH? The cost is a
+> > > big(ish) download: time, bandwidth, disk space.
+> > > 
+> > >  -- Keir
+> > >   
+> > > > Thanks,
+> > > > Alex
+> > > >   
+> > > > > 
+> > > > > Cheers,
+> > > > > Andre
+> > > > > 
+> > > > >   
+> > > > > > 
+> > > > > >  Regards,
+> > > > > >  Keir
+> > > > > > 
+> > > > > >   
+> > > > > > > I would lean towards the former (and hacking this in works), but then we
+> > > > > > > would need to redefine VIRTIO_BALLOON_S_NR, to encompass the new symbols,
+> > > > > > > which sounds fragile.
+> > > > > > > 
+> > > > > > > Happy to send a patch if we agree on an approach.
+> > > > > > > 
+> > > > > > > Cheers,
+> > > > > > > Andre
+> > > > > > >     
+> > > > > > > > > 
+> > > > > > > > > Keir Fraser (2):
+> > > > > > > > >   virtio/balloon: Fix a crash when collecting stats
+> > > > > > > > >   stat: Add descriptions for new virtio_balloon stat types
+> > > > > > > > > 
+> > > > > > > > > [...]      
+> > > > > > > > 
+> > > > > > > > Applied to kvmtool (master), thanks!
+> > > > > > > > 
+> > > > > > > > [1/2] virtio/balloon: Fix a crash when collecting stats
+> > > > > > > >       https://git.kernel.org/will/kvmtool/c/3a13530ae99a
+> > > > > > > > [2/2] stat: Add descriptions for new virtio_balloon stat types
+> > > > > > > >       https://git.kernel.org/will/kvmtool/c/bc77bf49df6e
+> > > > > > > > 
+> > > > > > > > Cheers,    
+> > > > > > >     
+> > > > >   
+> 
