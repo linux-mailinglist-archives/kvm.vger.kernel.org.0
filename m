@@ -2,139 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81A8453314E
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 21:07:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E03953321A
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 22:02:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240871AbiEXTHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 15:07:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45372 "EHLO
+        id S241273AbiEXUCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 16:02:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240924AbiEXTHI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 15:07:08 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F08F24F21;
-        Tue, 24 May 2022 12:06:58 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24OIKlhL032304;
-        Tue, 24 May 2022 19:06:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=/ue2Poc0hILLV7gtJGwQlryK+rzWjYj8WhQTasPSWSM=;
- b=By9KAOmMy1AENiNfjW5u/RLLWS0NiO3voDsYf9omiM5V9l54ANArKdeb1Kez40M3FCjV
- C9Sw9Gs2nx4dHyinI36JCOj1rgE02MptYVFG8OtzUkGf9NHJIrf4qLJOHDpYxrL6Nkn5
- PZtN6GBBujBM+kWCoIU6FC4ZoYmUKMez2bRRzcmt6WbrmYzcOwe1rK/KAOGKfWEf/Ya6
- oMl/kQcV0n/PXt5CNNlyLt1SjnJnO3NSqz1hZdys0kNoPG/Ew3Ac0NFeDq/VLMZuSC2R
- F/FO3zkddxTc5Z9f5NLur9VswEf+qPYY0o+CikLMTi9HYvLvgvO3wKE3OIgiwUYl8G2K ag== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94jf0taq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:06:55 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24OIxNWm015551;
-        Tue, 24 May 2022 19:06:55 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94jf0taa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:06:55 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24OJ3BZe027630;
-        Tue, 24 May 2022 19:06:54 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma05wdc.us.ibm.com with ESMTP id 3g93vb8kms-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:06:54 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24OJ6rK140370546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 May 2022 19:06:53 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08B736A04F;
-        Tue, 24 May 2022 19:06:53 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C1ED86A04D;
-        Tue, 24 May 2022 19:06:50 +0000 (GMT)
-Received: from [9.163.3.233] (unknown [9.163.3.233])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 24 May 2022 19:06:50 +0000 (GMT)
-Message-ID: <59746b70-de0e-35ba-98e7-b30aed2c959f@linux.ibm.com>
-Date:   Tue, 24 May 2022 15:06:50 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v8 00/22] KVM: s390: enable zPCI for interpretive
- execution
-Content-Language: en-US
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220524185907.140285-1-mjrosato@linux.ibm.com>
-In-Reply-To: <20220524185907.140285-1-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: CdL2-EbQyPxa3yzWeIEN01TdyFEKb3DE
-X-Proofpoint-GUID: QCs9xGvigEgT5HLJTZmptPIDfgLAPqhv
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S241648AbiEXUCF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 16:02:05 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9504D4B1C1
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 13:02:03 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id 31so17161511pgp.8
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 13:02:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=nSiT78fs0rHNFCm859cSTYy8LHahN2ayvynS0BLCkQo=;
+        b=Ek+IULDg/rtui3HUMV+4eflNMofy5LIRYu59TPOuD04nwXw5H87sIFazc5+v9HExat
+         Wto/jog+Te98IVhL978Uh264+Plg5w4xkUcHaXdbxTIbVnq8SNcoPCu6wk6rPm13Hjq+
+         LuLitA653ZzKoAb9HLDLJ/V8FjKz39quQwhRg8c+rzRXwyKaWIf0jkQu+Xa4p85LuYlX
+         jiCxMZnQ702PM7zJRHk6JA8riQkyGbJHw7lwG9rm/p69EKT47GlSa83nQqRRC3OSBIRG
+         SEIYcqMNK+TWh+RzLsdLaxKX8zpxjRO2/yOik3vb4i7CAjE6o7ANby+XKKbQGYUAxoLf
+         Wq6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=nSiT78fs0rHNFCm859cSTYy8LHahN2ayvynS0BLCkQo=;
+        b=mzu0lu+0o5xx/y4yWf/UpeBc1c6Bn5nzlddEJk8YLmGs4ONtTiJ1u/oxQidENPeIJS
+         7LKvMZNFcXKUeh4Z6LlBP3tF4gB/TUsXR5bT+I74A5/9mRqCMY2Ej6P2tG992yrS6ByA
+         WxQ4LU1TOXIiVZ0GEHqZhPMaiaKbZ6DJbwu6NPmd4fLGBMsvZBK6wIWYLw83kIyaFJ2I
+         qONslUNimxpPe+E4EaoGakuikEmPazXJ1bVxeFNEgCXe6sIeKcksqDrjv2XAnIygXhPO
+         cwGn9n4kCkdVhcDnNwVesJyq1du93AKxrAWnn543/E7XdXS0/SvMS7N5JkXvbY71veSq
+         4cdg==
+X-Gm-Message-State: AOAM5334CQtFVylaSO5htMyHsIJRwzuGmV9DkZONBIIgvDqsehlKxOQB
+        xE9/osOwX2OvkaAwEVaP/ok+2g==
+X-Google-Smtp-Source: ABdhPJzC8/feTppnhxn35k8fZp8CY1rhtC7IgNahsC+W06ZS5CR1eDiLWUMYZnwc6bdaI1J4VLzBmQ==
+X-Received: by 2002:a05:6a00:1890:b0:518:91bc:fbde with SMTP id x16-20020a056a00189000b0051891bcfbdemr14851214pfh.66.1653422522741;
+        Tue, 24 May 2022 13:02:02 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id g14-20020a056a001a0e00b0050dc76281bdsm9824579pfv.151.2022.05.24.13.02.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 May 2022 13:02:02 -0700 (PDT)
+Date:   Tue, 24 May 2022 20:01:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH kernel] KVM: Don't null dereference ops->destroy
+Message-ID: <Yo05tuQZorCO/kc0@google.com>
+References: <20220524055208.1269279-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-24_09,2022-05-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=872
- priorityscore=1501 impostorscore=0 spamscore=0 suspectscore=0 adultscore=0
- clxscore=1015 bulkscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2205240094
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220524055208.1269279-1-aik@ozlabs.ru>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/24/22 2:58 PM, Matthew Rosato wrote:
-> Note: this version of the series is built on top of vfio -next:
-> https://github.com/awilliam/linux-vfio/tree/next
-> As it now depends on 'vfio: remove VFIO_GROUP_NOTIFY_SET_KVM' and its
-> prereqs.
-> Additionally, if you care to try testing this series on top of vfio -next
-> you'll also want to pick up this fix:
-> https://lore.kernel.org/kvm/20220519182929.581898-1-mjrosato@linux.ibm.com/
+On Tue, May 24, 2022, Alexey Kardashevskiy wrote:
+> There are 2 places calling kvm_device_ops::destroy():
+> 1) when creating a KVM device failed;
+> 2) when a VM is destroyed: kvm_destroy_devices() destroys all devices
+> from &kvm->devices.
 > 
+> All 3 Book3s's interrupt controller KVM devices (XICS, XIVE, XIVE-native)
+> do not define kvm_device_ops::destroy() and only define release() which
+> is normally fine as device fds are closed before KVM gets to 2) but
+> by then the &kvm->devices list is empty.
+> 
+> However Syzkaller manages to trigger 1).
+> 
+> This adds checks in 1) and 2).
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
 > 
-> Enable interpretive execution of zPCI instructions + adapter interruption
-> forwarding for s390x KVM vfio-pci.  This is done by triggering a routine
-> when the VFIO group is associated with the KVM guest, transmitting to
-> firmware a special token (GISA designation) to enable that specific guest
-> for interpretive execution on that zPCI device.  Load/store interpreation
-> enablement is then controlled by userspace (based upon whether or not a
-> SHM bit is placed in the virtual function handle).  Adapter Event
-> Notification interpretation is controlled from userspace via a new KVM
-> ioctl.
-> 
-> By allowing intepretation of zPCI instructions and firmware delivery of
-> interrupts to guests, we can reduce the frequency of guest SIE exits for
-> zPCI.
-> 
->  From the perspective of guest configuration, you passthrough zPCI devices
-> in the same manner as before, with intepretation support being used by
-> default if available in kernel+qemu.
-> 
-> Will follow up with a link an updated QEMU series.
-> 
+> I could define empty handlers for XICS/XIVE guys but
+> kvm_ioctl_create_device() already checks for ops->init() so I guess
+> kvm_device_ops are expected to not have certain handlers.
 
-QEMU v6 series:
-https://lore.kernel.org/kvm/20220524190305.140717-1-mjrosato@linux.ibm.com/
+Oof.  IMO, ->destroy() should be mandatory in order to pair with ->create().
+kvmppc_xive_create(), kvmppc_xics_create(), and kvmppc_core_destroy_vm() are doing
+some truly funky stuff to avoid leaking the device that's allocate in ->create().
+A nop/dummy ->destroy() would be a good place to further document those shenanigans.
+There's a comment at the end of the ->release() hooks, but that's still not very
+obvious.
 
+The comment above kvmppc_xive_get_device() strongly suggests that keeping the
+allocation is a hack to avoid having to audit all relevant code paths, i.e. isn't
+done for performance reasons.
