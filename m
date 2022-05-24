@@ -2,58 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B3F35327AD
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 12:30:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32068532841
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 12:54:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236199AbiEXKac (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 06:30:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57844 "EHLO
+        id S236397AbiEXKyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 06:54:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236138AbiEXKa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 06:30:27 -0400
-X-Greylist: delayed 714 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 24 May 2022 03:30:26 PDT
-Received: from oftenbest.adminbbserv.bond (adminbbserv.bond [213.108.199.214])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70678CCE4
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 03:30:26 -0700 (PDT)
-Received: from webmail.adminbbserv.bond (localhost.localdomain [IPv6:::1])
-        by oftenbest.adminbbserv.bond (Postfix) with ESMTPSA id B760F5D36;
-        Tue, 24 May 2022 06:16:01 -0400 (EDT)
-Authentication-Results: oftenbest.adminbbserv.bond;
-        spf=pass (sender IP is ::1) smtp.mailfrom=trade@adminbbserv.bond smtp.helo=webmail.adminbbserv.bond
-Received-SPF: pass (oftenbest.adminbbserv.bond: connection is authenticated)
+        with ESMTP id S236383AbiEXKyB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 06:54:01 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 665F4579BD;
+        Tue, 24 May 2022 03:53:59 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4L6rfX1zQrz4xbt;
+        Tue, 24 May 2022 20:53:56 +1000 (AEST)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>, linux-doc@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        stable@vger.kernel.org, Fabiano Rosas <farosas@linux.ibm.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        Suresh Warrier <warrier@linux.vnet.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        kvm@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        linuxppc-dev@lists.ozlabs.org
+In-Reply-To: <20220506070747.16309-1-bagasdotme@gmail.com>
+References: <20220506070747.16309-1-bagasdotme@gmail.com>
+Subject: Re: [PATCH RESEND] KVM: powerpc: remove extraneous asterisk from rm_host_ipi_action comment
+Message-Id: <165338950668.1711920.11760808136343682711.b4-ty@ellerman.id.au>
+Date:   Tue, 24 May 2022 20:51:46 +1000
 MIME-Version: 1.0
-Date:   Tue, 24 May 2022 11:16:01 +0100
-From:   HR <trade@adminbbserv.bond>
-To:     undisclosed-recipients:;
-Subject: Alkalmaz
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <d2d914d37eb74f828f9ac3779ecf08ee@adminbbserv.bond>
-X-Sender: trade@adminbbserv.bond
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_00,FORGED_SPF_HELO,
-        KHOP_HELO_FCRDNS,MIXED_ES,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 6 May 2022 14:07:47 +0700, Bagas Sanjaya wrote:
+> kernel test robot reported kernel-doc warning for rm_host_ipi_action():
+> 
+> >> arch/powerpc/kvm/book3s_hv_rm_xics.c:887: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+>     * Host Operations poked by RM KVM
+> 
+> Since the function is static, remove the extraneous (second) asterisk at
+> the head of function comment.
+> 
+> [...]
 
+Applied to powerpc/topic/ppc-kvm.
 
-Helló,
+[1/1] KVM: powerpc: remove extraneous asterisk from rm_host_ipi_action comment
+      https://git.kernel.org/powerpc/c/d53c36e6c83863fde4a2748411c31bc4853a0936
 
-Örömmel értesítjük Önt egy elérhető távmunka részmunkaidős ügyintézői 
-állásról, heti 500 eurós bérért. Ha az időbeosztása elég rugalmas ahhoz, 
-hogy betöltse ezt a pozíciót, kérjük, írjon az 
-"apply@blenheimbuildings.uk" címre a pozícióval kapcsolatos további 
-részletekért. Kérjük, jelentkezéskor tüntesse fel mobiltelefonszámát, 
-valamint a lakóhelyét. Figyelem: Ez a pozíció érkezési sorrendben 
-foglalható el.
-
-Üdvözlettel
-Bánkiné Józsa Mária
-HR vezető/tanácsadó
-Magyarországi Munkaügyi Hivatal.
+cheers
