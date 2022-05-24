@@ -2,75 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E42B532EA1
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 18:08:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD44F532F71
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 19:07:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239584AbiEXQIE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 12:08:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
+        id S239891AbiEXRHj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 13:07:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239715AbiEXQH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 12:07:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1480D77F38
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 09:07:50 -0700 (PDT)
+        with ESMTP id S239847AbiEXRHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 13:07:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F199D814AA
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 10:07:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653408470;
+        s=mimecast20190719; t=1653412054;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AjP5JPsp4sTeptQO7etKphezL1GL7XatlC7yllc+qq4=;
-        b=R0JjKqf6JfnwWgVFr+xbicGmTarFfaa1RRRWEXVrWATEstZdkJq+3h5QKSZqBcYCyl8MAr
-        mQbP7klx3ZE+Fdc52S09toukoJ5cOHHYhOyt2/ykWw5ARAcHr/hx6l1dcC7rXBJ3QJ96kI
-        9j4MMs0n9qOmuNIoCtLsnaNnMsgCyHY=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=GxIUBanOlo4kCZlBLy+vq6QBMWA1M+KHEcRWloPp9vs=;
+        b=g958wJAijkss5Ve2lE7XOnGdP02UdVHd4G4OirLdTncUuTP/9MWPvGKgJ9goQV8TyKz+FQ
+        b1Lw1fR1w3nbO0luTm4x1kCM22TSIvnbBfjWjXMcYiHzreSj/R8t1a3zrfZtKckOt245KR
+        RO083BS0+9IJMMEP4JrdvWS7y5Xj8zw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-620-ZiczhSSVPZmivVrTdGbP_g-1; Tue, 24 May 2022 12:07:48 -0400
-X-MC-Unique: ZiczhSSVPZmivVrTdGbP_g-1
-Received: by mail-il1-f198.google.com with SMTP id l8-20020a056e021aa800b002cf778c63caso11013575ilv.10
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 09:07:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=AjP5JPsp4sTeptQO7etKphezL1GL7XatlC7yllc+qq4=;
-        b=mJZ4gk7pLvdOk9c7aOt6YqUpW79VcCmOdw/YTnW+bJKRWxufgPsIOYl8zTffAC1wxe
-         Lx+jFhpiz/39vnJBjz5W5GOwJ8NAU+oVTaKqKVy7mW6xNGD7ZO2RGUE1vTnpqVSgksWB
-         XH7tmgtY6sOuz8zpTCw2oVGIy0/1rYZfxXFfQoze9Wj/gd1oLOF5pPhX7mGSkE4qQrsB
-         Qe5sean1SK0+MWnVoJUObiuJ8I1ppa2Jg8z7U/z6E9TMkOidAtb3HW9DQkWalf2cGUVT
-         JhPgc51IdW3hEdoygEAVinL3VOdE3gbXpl34JygO9Y7aktJSIkIiNIEEqgQAvegw33fy
-         hMdg==
-X-Gm-Message-State: AOAM532vQ0wKwxF+riwyv0RekJsNWWLDf66n6NqNnXmF7vrUUEq013YS
-        rYaciVwtVCaFBig/Hdakz/jkdsCUZ8Z1XDWcn4fDbKGEzaKGmLbSzpjN05+f1kV+d8e1um9VPjd
-        yXL7M0wLVKZaB
-X-Received: by 2002:a05:6e02:170a:b0:2d1:3f8b:ad75 with SMTP id u10-20020a056e02170a00b002d13f8bad75mr13606325ill.135.1653408467259;
-        Tue, 24 May 2022 09:07:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyDXCFqahhgZhF13j/01JuWAI9TkKwryMIBDz+Ojod8ivP2jLD7vfDSwtL6uq0vKB4eb0olaw==
-X-Received: by 2002:a05:6e02:170a:b0:2d1:3f8b:ad75 with SMTP id u10-20020a056e02170a00b002d13f8bad75mr13606312ill.135.1653408467062;
-        Tue, 24 May 2022 09:07:47 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id m15-20020a056e021c2f00b002cde6e352d5sm4628333ilh.31.2022.05.24.09.07.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 09:07:46 -0700 (PDT)
-Date:   Tue, 24 May 2022 10:07:45 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     jgg@nvidia.com, cohuck@redhat.com, borntraeger@linux.ibm.com,
-        jjherne@linux.ibm.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
-Message-ID: <20220524100745.006a3635.alex.williamson@redhat.com>
-In-Reply-To: <20220519183311.582380-1-mjrosato@linux.ibm.com>
-References: <20220519183311.582380-1-mjrosato@linux.ibm.com>
-Organization: Red Hat
+ us-mta-151-2xLvnYQCMHOtyYr0ccgPhw-1; Tue, 24 May 2022 13:06:18 -0400
+X-MC-Unique: 2xLvnYQCMHOtyYr0ccgPhw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F2692999B2D;
+        Tue, 24 May 2022 17:06:17 +0000 (UTC)
+Received: from eperezma.remote.csb (unknown [10.39.195.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EB7D2026D64;
+        Tue, 24 May 2022 17:06:12 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Parav Pandit <parav@nvidia.com>, Zhang Min <zhang.min9@zte.com.cn>,
+        hanand@xilinx.com, Zhu Lingshan <lingshan.zhu@intel.com>,
+        tanuj.kamde@amd.com, gautam.dawar@amd.com,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Xie Yongji <xieyongji@bytedance.com>, dinang@xilinx.com,
+        habetsm.xilinx@gmail.com, Eli Cohen <elic@nvidia.com>,
+        pabloc@xilinx.com, lvivier@redhat.com,
+        Dan Carpenter <dan.carpenter@oracle.com>, lulu@redhat.com,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        eperezma@redhat.com, ecree.xilinx@gmail.com,
+        Piotr.Uminski@intel.com, martinpo@xilinx.com,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Longpeng <longpeng2@huawei.com>, martinh@xilinx.com
+Subject: [PATCH v2 0/4] Implement vdpasim stop operation
+Date:   Tue, 24 May 2022 19:06:06 +0200
+Message-Id: <20220524170610.2255608-1-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -81,56 +72,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 May 2022 14:33:10 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-
-> As discussed in this thread:
-> 
-> https://lore.kernel.org/kvm/20220516172734.GE1343366@nvidia.com/
-> 
-> Let's remove VFIO_GROUP_NOTIFY_SET_KVM and instead assume the association
-> has already been established prior to device_open.  For the types today
-> that need a KVM (GVT, vfio-ap) these will fail if a KVM is not found.
-> Looking ahead, vfio-pci-zdev will optionally want the KVM association
-> (enable hardware assists) but it will not be a hard requirement (still
-> want to allow other, non-KVM userspace usage). 
-> 
-> This is built on top of vfio-next and tested with s390x-pci
-> (zdev-kvm series) and vfio-ap (GVT changes are compile-tested only)
-> 
-> Changes for v3:
-> - merge branches under if (device->open_count == 1) (Kevin)
-> - move device->open_count-- out from group_rwsem (Kevin)
-> - drop null KVM check (Christoph)
-> - remove extra kvm_{get,put}_kvm from vfio_ap_ops, it was already getting
->   a reference (Jason)
-> - Add comment about kvm reference in vfio.h (Jason)
-> - Return -EINVAL if !kvm for vfio-ap (Tony)
-> 
-> Changes for v2:
-> - gvt no longer needs release_work, get rid of it (Christoph)
-> - a few compile fixes for gvt
-> - update commit to mention fixes gvt oops (Jason)
-> - s/down_write/down_read/ in a few spots (Jason)
-> - avoid kvm build dependency by holding group read lock over device
->   open/close and put the onus on the driver to obtain a reference if
->   it will actually use the kvm pointer.  Document the requirement,
->   use lockdep_assert to ensure lock is held during register_notifer;
->   today all callers are from driver open_device. 
-> 
-> Matthew Rosato (1):
->   vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
-> 
->  drivers/gpu/drm/i915/gvt/gtt.c        |  4 +-
->  drivers/gpu/drm/i915/gvt/gvt.h        |  3 -
->  drivers/gpu/drm/i915/gvt/kvmgt.c      | 82 ++++++--------------------
->  drivers/s390/crypto/vfio_ap_ops.c     | 35 ++---------
->  drivers/s390/crypto/vfio_ap_private.h |  3 -
->  drivers/vfio/vfio.c                   | 83 ++++++++++-----------------
->  include/linux/vfio.h                  |  6 +-
->  7 files changed, 57 insertions(+), 159 deletions(-)
-
-Applied to vfio next branch for v5.19.  Thanks,
-
-Alex
+Implement stop operation for vdpa_sim devices, so vhost-vdpa will offer=0D
+that backend feature and userspace can effectively stop the device.=0D
+=0D
+This is a must before get virtqueue indexes (base) for live migration,=0D
+since the device could modify them after userland gets them. There are=0D
+individual ways to perform that action for some devices=0D
+(VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no=0D
+way to perform it for any vhost device (and, in particular, vhost-vdpa).=0D
+=0D
+After the return of ioctl with stop !=3D 0, the device MUST finish any=0D
+pending operations like in flight requests. It must also preserve all=0D
+the necessary state (the virtqueue vring base plus the possible device=0D
+specific states) that is required for restoring in the future. The=0D
+device must not change its configuration after that point.=0D
+=0D
+After the return of ioctl with stop =3D=3D 0, the device can continue=0D
+processing buffers as long as typical conditions are met (vq is enabled,=0D
+DRIVER_OK status bit is enabled, etc).=0D
+=0D
+In the future, we will provide features similar to VHOST_USER_GET_INFLIGHT_=
+FD=0D
+so the device can save pending operations.=0D
+=0D
+Comments are welcome.=0D
+=0D
+v2:=0D
+* Replace raw _F_STOP with BIT_ULL(_F_STOP).=0D
+* Fix obtaining of stop ioctl arg (it was not obtained but written).=0D
+* Add stop to vdpa_sim_blk.=0D
+=0D
+Eugenio P=C3=A9rez (4):=0D
+  vdpa: Add stop operation=0D
+  vhost-vdpa: introduce STOP backend feature bit=0D
+  vhost-vdpa: uAPI to stop the device=0D
+  vdpa_sim: Implement stop vdpa op=0D
+=0D
+ drivers/vdpa/vdpa_sim/vdpa_sim.c     | 21 +++++++++++++++++=0D
+ drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +=0D
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++=0D
+ drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++=0D
+ drivers/vhost/vdpa.c                 | 34 +++++++++++++++++++++++++++-=0D
+ include/linux/vdpa.h                 |  6 +++++=0D
+ include/uapi/linux/vhost.h           |  3 +++=0D
+ include/uapi/linux/vhost_types.h     |  2 ++=0D
+ 8 files changed, 72 insertions(+), 1 deletion(-)=0D
+=0D
+-- =0D
+2.27.0=0D
+=0D
 
