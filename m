@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0DC2532BC3
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 15:57:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C2F2532BC4
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 15:57:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236290AbiEXN4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 09:56:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57566 "EHLO
+        id S238034AbiEXN5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 09:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbiEXN4x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 09:56:53 -0400
+        with ESMTP id S236405AbiEXN5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 09:57:06 -0400
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0061B3465D
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 06:56:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E10C35843
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 06:56:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653400613; x=1684936613;
+  t=1653400618; x=1684936618;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=RrS6kepK7TXKuEYh/sgiRn166QnJLj40olbhHYklvg8=;
-  b=NeiE3X+JMUE8W8rd8+1PXU0ZhWyxLNDU+hePjEKp/batjIb5FpIgLGgj
-   l8MiPpYZAU0/010ODONh4CEY79OSmhxLSNlNBgdHYU9SUFRGwSU67eOsf
-   /7h9olyJVVjG/CjSyjfa0+XLMV70jG3b2zuHOMLsz97pbjM9f+zyktPrX
-   2LWkRJGU9R36ZqYFbMzc3pF0xHV9wLUw0BXItO+eervmKSUt9jpYHsmBZ
-   CNoXPqfS82+JrdQ2GTs2eEsy4gD7CJTXNE+LG+2jqne3BVnwMzLYAw0rO
-   PF/NSWg0i3dLMWm95VoMHtzw0BURTPtIJJJWZfmFn8Tfg1sqLOMegxbB4
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="273261473"
+  bh=pIg9Ocn5efaX7OdYWsm6Um5aagELN6npfFKsfQ3VSZU=;
+  b=NvK3IW6cyFPYQ0nNTge5w+XOljwGgVszHL7Nm6RXaGr0l7L7DtoQa3kk
+   8ajlJhoFYyws4/f/ALoXx/Q/ieNIwpY+RWtm0yA4K/fyJT4xSUgzhyVhC
+   F7JO8UQIr451xB2ohI26+xB9qY8YgJY3tG9tumgMelvE+A2DaDe7ulylA
+   yLaC7jC064AGrKimmdgYT+4EusPhcfQGYOLd2WRGbdNlBiVfVTP4K67DH
+   C623yEcGpADSyu+xgLkoU5Vgc86VWDxGUnl6zsJDeIPOdzgep499xu4tZ
+   eeHFladY9K68WYxI7sFBmatzT8gHYu4RjqoRsA/CWUn8TfrIbLpB1oM3m
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="273261483"
 X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
-   d="scan'208";a="273261473"
+   d="scan'208";a="273261483"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:56:52 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:56:55 -0700
 X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
-   d="scan'208";a="717179444"
+   d="scan'208";a="717179454"
 Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:56:50 -0700
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:56:52 -0700
 From:   Chenyi Qiang <chenyi.qiang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -45,9 +45,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
         kvm@vger.kernel.org
-Subject: [PATCH v4 2/3] i386: kvm: extend kvm_{get, put}_vcpu_events to support pending triple fault
-Date:   Tue, 24 May 2022 22:03:01 +0800
-Message-Id: <20220524140302.23272-3-chenyi.qiang@intel.com>
+Subject: [PATCH v4 3/3] i386: Add notify VM exit support
+Date:   Tue, 24 May 2022 22:03:02 +0800
+Message-Id: <20220524140302.23272-4-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220524140302.23272-1-chenyi.qiang@intel.com>
 References: <20220524140302.23272-1-chenyi.qiang@intel.com>
@@ -61,98 +61,242 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For the direct triple faults, i.e. hardware detected and KVM morphed
-to VM-Exit, KVM will never lose them. But for triple faults sythesized
-by KVM, e.g. the RSM path, if KVM exits to userspace before the request
-is serviced, userspace could migrate the VM and lose the triple fault.
+There are cases that malicious virtual machine can cause CPU stuck (due
+to event windows don't open up), e.g., infinite loop in microcode when
+nested #AC (CVE-2015-5307). No event window means no event (NMI, SMI and
+IRQ) can be delivered. It leads the CPU to be unavailable to host or
+other VMs. Notify VM exit is introduced to mitigate such kind of
+attacks, which will generate a VM exit if no event window occurs in VM
+non-root mode for a specified amount of time (notify window).
 
-A new flag KVM_VCPUEVENT_VALID_TRIPLE_FAULT is defined to signal that
-the event.triple_fault_pending field contains a valid state if the
-KVM_CAP_TRIPLE_FAULT_EVENT capability is enabled.
+A new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT is exposed to user space
+so that the user can query the capability and set the expected notify
+window when creating VMs. The format of the argument when enabling this
+capability is as follows:
+  Bit 63:32 - notify window specified in qemu command
+  Bit 31:0  - some flags (e.g. KVM_X86_NOTIFY_VMEXIT_ENABLED is set to
+              enable the feature.)
+
+Because there are some concerns, e.g. a notify VM exit may happen with
+VM_CONTEXT_INVALID set in exit qualification (no cases are anticipated
+that would set this bit), which means VM context is corrupted. To avoid
+the false positive and a well-behaved guest gets killed, make this
+feature disabled by default. Users can enable the feature by a new
+machine property:
+    qemu -machine notify_vmexit=on,notify_window=0 ...
+
+A new KVM exit reason KVM_EXIT_NOTIFY is defined for notify VM exit. If
+it happens with VM_INVALID_CONTEXT, hypervisor exits to user space to
+inform the fatal case. Then user space can inject a SHUTDOWN event to
+the target vcpu. This is implemented by injecting a sythesized triple
+fault event.
 
 Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 ---
- target/i386/cpu.c     |  1 +
- target/i386/cpu.h     |  1 +
- target/i386/kvm/kvm.c | 20 ++++++++++++++++++++
- 3 files changed, 22 insertions(+)
+ hw/i386/x86.c         | 45 +++++++++++++++++++++++++++++
+ include/hw/i386/x86.h |  5 ++++
+ target/i386/kvm/kvm.c | 66 ++++++++++++++++++++++++++++++-------------
+ 3 files changed, 96 insertions(+), 20 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index cb6b5467d0..276058d52e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5998,6 +5998,7 @@ static void x86_cpu_reset(DeviceState *dev)
-     env->exception_has_payload = false;
-     env->exception_payload = 0;
-     env->nmi_injected = false;
-+    env->triple_fault_pending = false;
- #if !defined(CONFIG_USER_ONLY)
-     /* We hard-wire the BSP to the first CPU. */
-     apic_designate_bsp(cpu->apic_state, s->cpu_index == 0);
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 982c532353..a2a9423747 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1701,6 +1701,7 @@ typedef struct CPUArchState {
-     uint8_t has_error_code;
-     uint8_t exception_has_payload;
-     uint64_t exception_payload;
-+    bool triple_fault_pending;
-     uint32_t ins_len;
-     uint32_t sipi_vector;
-     bool tsc_valid;
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 4cf107baea..a82f959cb9 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -1296,6 +1296,37 @@ static void machine_set_sgx_epc(Object *obj, Visitor *v, const char *name,
+     qapi_free_SgxEPCList(list);
+ }
+ 
++static bool x86_machine_get_notify_vmexit(Object *obj, Error **errp)
++{
++    X86MachineState *x86ms = X86_MACHINE(obj);
++
++    return x86ms->notify_vmexit;
++}
++
++static void x86_machine_set_notify_vmexit(Object *obj, bool value, Error **errp)
++{
++    X86MachineState *x86ms = X86_MACHINE(obj);
++
++    x86ms->notify_vmexit = value;
++}
++
++static void x86_machine_get_notify_window(Object *obj, Visitor *v,
++                                const char *name, void *opaque, Error **errp)
++{
++    X86MachineState *x86ms = X86_MACHINE(obj);
++    uint32_t notify_window = x86ms->notify_window;
++
++    visit_type_uint32(v, name, &notify_window, errp);
++}
++
++static void x86_machine_set_notify_window(Object *obj, Visitor *v,
++                               const char *name, void *opaque, Error **errp)
++{
++    X86MachineState *x86ms = X86_MACHINE(obj);
++
++    visit_type_uint32(v, name, &x86ms->notify_window, errp);
++}
++
+ static void x86_machine_initfn(Object *obj)
+ {
+     X86MachineState *x86ms = X86_MACHINE(obj);
+@@ -1306,6 +1337,8 @@ static void x86_machine_initfn(Object *obj)
+     x86ms->oem_id = g_strndup(ACPI_BUILD_APPNAME6, 6);
+     x86ms->oem_table_id = g_strndup(ACPI_BUILD_APPNAME8, 8);
+     x86ms->bus_lock_ratelimit = 0;
++    x86ms->notify_vmexit = false;
++    x86ms->notify_window = 0;
+ }
+ 
+ static void x86_machine_class_init(ObjectClass *oc, void *data)
+@@ -1361,6 +1394,18 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
+         NULL, NULL);
+     object_class_property_set_description(oc, "sgx-epc",
+         "SGX EPC device");
++
++    object_class_property_add(oc, X86_MACHINE_NOTIFY_WINDOW, "uint32_t",
++                              x86_machine_get_notify_window,
++                              x86_machine_set_notify_window, NULL, NULL);
++    object_class_property_set_description(oc, X86_MACHINE_NOTIFY_WINDOW,
++            "Set the notify window required by notify VM exit");
++
++    object_class_property_add_bool(oc, X86_MACHINE_NOTIFY_VMEXIT,
++                                   x86_machine_get_notify_vmexit,
++                                   x86_machine_set_notify_vmexit);
++    object_class_property_set_description(oc, X86_MACHINE_NOTIFY_VMEXIT,
++            "Enable notify VM exit");
+ }
+ 
+ static const TypeInfo x86_machine_info = {
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index 916cc325ee..571ee8b667 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -80,6 +80,9 @@ struct X86MachineState {
+      * which means no limitation on the guest's bus locks.
+      */
+     uint64_t bus_lock_ratelimit;
++
++    bool notify_vmexit;
++    uint32_t notify_window;
+ };
+ 
+ #define X86_MACHINE_SMM              "smm"
+@@ -87,6 +90,8 @@ struct X86MachineState {
+ #define X86_MACHINE_OEM_ID           "x-oem-id"
+ #define X86_MACHINE_OEM_TABLE_ID     "x-oem-table-id"
+ #define X86_MACHINE_BUS_LOCK_RATELIMIT  "bus-lock-ratelimit"
++#define X86_MACHINE_NOTIFY_VMEXIT     "notify-vmexit"
++#define X86_MACHINE_NOTIFY_WINDOW     "notify-window"
+ 
+ #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
+ OBJECT_DECLARE_TYPE(X86MachineState, X86MachineClass, X86_MACHINE)
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 9cf8e03669..2f2fc18b4f 100644
+index 2f2fc18b4f..6aaedf3412 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -129,6 +129,7 @@ static int has_xcrs;
- static int has_pit_state2;
- static int has_sregs2;
- static int has_exception_payload;
-+static int has_triple_fault_event;
+@@ -2345,6 +2345,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     int ret;
+     struct utsname utsname;
+     Error *local_err = NULL;
++    X86MachineState *x86ms;
++
++    assert(object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE));
++    x86ms = X86_MACHINE(ms);
  
- static bool has_msr_mcg_ext_ctl;
+     /*
+      * Initialize SEV context, if required
+@@ -2450,8 +2454,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     }
  
-@@ -2385,6 +2386,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
+-        object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE) &&
+-        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
++        x86_machine_is_smm_enabled(x86ms)) {
+         smram_machine_done.notify = register_smram_listener;
+         qemu_add_machine_init_done_notifier(&smram_machine_done);
+     }
+@@ -2479,25 +2482,34 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
          }
      }
  
-+    has_triple_fault_event = kvm_check_extension(s, KVM_CAP_TRIPLE_FAULT_EVENT);
-+    if (has_triple_fault_event) {
-+        ret = kvm_vm_enable_cap(s, KVM_CAP_TRIPLE_FAULT_EVENT, 0, true);
+-    if (object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE)) {
+-        X86MachineState *x86ms = X86_MACHINE(ms);
++    if (x86ms->bus_lock_ratelimit > 0) {
++        ret = kvm_check_extension(s, KVM_CAP_X86_BUS_LOCK_EXIT);
++        if (!(ret & KVM_BUS_LOCK_DETECTION_EXIT)) {
++            error_report("kvm: bus lock detection unsupported");
++            return -ENOTSUP;
++        }
++        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_BUS_LOCK_EXIT, 0,
++                                KVM_BUS_LOCK_DETECTION_EXIT);
 +        if (ret < 0) {
-+            error_report("kvm: Failed to enable triple fault event cap: %s",
++            error_report("kvm: Failed to enable bus lock detection cap: %s",
 +                         strerror(-ret));
 +            return ret;
 +        }
++        ratelimit_init(&bus_lock_ratelimit_ctrl);
++        ratelimit_set_speed(&bus_lock_ratelimit_ctrl,
++                            x86ms->bus_lock_ratelimit, BUS_LOCK_SLICE_TIME);
 +    }
-+
-     ret = kvm_get_supported_msrs(s);
-     if (ret < 0) {
-         return ret;
-@@ -4105,6 +4116,11 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+ 
+-        if (x86ms->bus_lock_ratelimit > 0) {
+-            ret = kvm_check_extension(s, KVM_CAP_X86_BUS_LOCK_EXIT);
+-            if (!(ret & KVM_BUS_LOCK_DETECTION_EXIT)) {
+-                error_report("kvm: bus lock detection unsupported");
+-                return -ENOTSUP;
+-            }
+-            ret = kvm_vm_enable_cap(s, KVM_CAP_X86_BUS_LOCK_EXIT, 0,
+-                                    KVM_BUS_LOCK_DETECTION_EXIT);
+-            if (ret < 0) {
+-                error_report("kvm: Failed to enable bus lock detection cap: %s",
+-                             strerror(-ret));
+-                return ret;
+-            }
+-            ratelimit_init(&bus_lock_ratelimit_ctrl);
+-            ratelimit_set_speed(&bus_lock_ratelimit_ctrl,
+-                                x86ms->bus_lock_ratelimit, BUS_LOCK_SLICE_TIME);
++    if (x86ms->notify_vmexit && kvm_check_extension(s, KVM_CAP_X86_NOTIFY_VMEXIT)) {
++        uint64_t notify_window_flags = ((uint64_t)x86ms->notify_window << 32) |
++                                        KVM_X86_NOTIFY_VMEXIT_ENABLED |
++                                        KVM_X86_NOTIFY_VMEXIT_USER;
++        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_NOTIFY_VMEXIT, 0,
++                                notify_window_flags);
++        if (ret < 0) {
++            error_report("kvm: Failed to enable notify vmexit cap: %s",
++                         strerror(-ret));
++            return ret;
          }
      }
  
-+    if (has_triple_fault_event) {
-+        events.flags |= KVM_VCPUEVENT_VALID_TRIPLE_FAULT;
-+        events.triple_fault.pending = env->triple_fault_pending;
-+    }
-+
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
- }
+@@ -4940,6 +4952,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+     X86CPU *cpu = X86_CPU(cs);
+     uint64_t code;
+     int ret;
++    struct kvm_vcpu_events events = {};
  
-@@ -4174,6 +4190,10 @@ static int kvm_get_vcpu_events(X86CPU *cpu)
-         }
-     }
- 
-+    if (events.flags & KVM_VCPUEVENT_VALID_TRIPLE_FAULT) {
-+        env->triple_fault_pending = events.triple_fault.pending;
-+    }
-+
-     env->sipi_vector = events.sipi_vector;
- 
-     return 0;
+     switch (run->exit_reason) {
+     case KVM_EXIT_HLT:
+@@ -4995,6 +5008,19 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+         /* already handled in kvm_arch_post_run */
+         ret = 0;
+         break;
++    case KVM_EXIT_NOTIFY:
++        ret = 0;
++        if (run->notify.flags & KVM_NOTIFY_CONTEXT_INVALID) {
++            warn_report("KVM: invalid context due to notify vmexit");
++            if (has_triple_fault_event) {
++                events.flags |= KVM_VCPUEVENT_VALID_TRIPLE_FAULT;
++                events.triple_fault.pending = true;
++                ret = kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
++            } else {
++                ret = -1;
++            }
++        }
++        break;
+     default:
+         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
+         ret = -1;
 -- 
 2.17.1
 
