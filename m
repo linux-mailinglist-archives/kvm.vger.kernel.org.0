@@ -2,147 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92AB953268A
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 11:36:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D5AB5326B1
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 11:43:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235703AbiEXJfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 05:35:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46358 "EHLO
+        id S235816AbiEXJmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 05:42:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232406AbiEXJfO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 05:35:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689755FF1E;
-        Tue, 24 May 2022 02:35:13 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24O8xbwE031056;
-        Tue, 24 May 2022 09:35:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GeuXmSddGhFNk54qmnZ0NNbHnhQzHI9QxtptciyCEXE=;
- b=fx48fS/RK7p6IPzLHkub6cN8qvLFs3HHauikbYRPrmWRu4UUkMtJVs+MbhlImRFJwMqZ
- YVpDOIIzebrC9xIS3IPAPIsHkeNfE0TfW2ZcOUFwR/YycCCF5jY8LeYftgBH00cOuZdB
- YF1BLOLCMKw26aqlIx9+jyT3fPvxnOtVJ2j8FwBEq0h3hjZ44GJ1QOlMU0gMlAQWHTRV
- IXCtAJVqdiE7LFKt6s1ajNlHoJ1Q+dQuzFRvWF40sCEdjUyY+L4QR66aRwO/26n3+ZB5
- bAz9LE4RgU23M3LnYeRwn3P9AwaPYPibJTWiPXXqKbhyPHsf7S6dsiWqTF2VkSg21uHF PA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g8vbdrnxy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 09:35:12 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24O9YO3b010598;
-        Tue, 24 May 2022 09:35:11 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3g8vbdrnxm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 09:35:11 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24O9CCBT009076;
-        Tue, 24 May 2022 09:35:10 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3g6qbjc6aa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 09:35:09 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24O9Z6l725231870
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 May 2022 09:35:06 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4758AE051;
-        Tue, 24 May 2022 09:35:06 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C411AE045;
-        Tue, 24 May 2022 09:35:06 +0000 (GMT)
-Received: from [9.155.196.57] (unknown [9.155.196.57])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 24 May 2022 09:35:06 +0000 (GMT)
-Message-ID: <7835de5b-59c6-aeb5-d737-6f56d1c81f05@linux.ibm.com>
-Date:   Tue, 24 May 2022 11:35:06 +0200
+        with ESMTP id S235811AbiEXJml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 05:42:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A421552E5F
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 02:42:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653385357;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zFo5wCOAm0pgrR3mlKlJ9zjKOLJ6nCkOz288AuApEU8=;
+        b=YKPymaG0bt/mBS8TN6pqG2EsXZNIQChdkglkTWt/cptvQTnSpDWicZQS+huQuqu9H5PnwL
+        DPQGEaVFfOifE1dk9UL15kUnUIxfuYqTGcvwiYOD7u1dFaB2rXcwzfyOPuaefU84Hr/9Ht
+        RNrs+khW7ezwXsQ1qAP1K0gldAWCHqA=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-593-aDqblJeGP06m4RU3qBlbsw-1; Tue, 24 May 2022 05:42:36 -0400
+X-MC-Unique: aDqblJeGP06m4RU3qBlbsw-1
+Received: by mail-ej1-f69.google.com with SMTP id lf18-20020a170906ae5200b006fec8de9f0cso2662208ejb.4
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 02:42:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=zFo5wCOAm0pgrR3mlKlJ9zjKOLJ6nCkOz288AuApEU8=;
+        b=vpqZV11m2ZHTJHh56YEEpEnVgloeXlM4q0peLxVMCzMrNkPUVt9Ak366XbbQRxAWPy
+         IP9OqEmVvDelwzlMRI/cmvtrMK4Wk/ptSTPid6WnKbPhUP0rjc8mYGyGjRppvw1JAeEq
+         DSE/k7ETgvW9yQZ2WD7AmPIUvlxv8uVWIYvNYg0cdnS7azQgYjKTEn3hktdbg/IEVhCW
+         Sn0BwbjKZ+3FtG40RwtP+t4LgjF/CdmlgvaGRsDmmmi+0NR0hc3uwOAh8WKrKlRs+UKo
+         CL9MV9Jblh1HUMsca9S5qu3TTw+IAOL6Q8k/2xT2B0T9siiYWk/M/69RGnjaMSwgrf0M
+         RUPg==
+X-Gm-Message-State: AOAM530yCtn00i5hru1n8fKcN9mONbHv5rqtNe1dN9dTQEi8nhypfDJa
+        BSCdCuclZi7PWOXLbi0H5a0ABA+4WC9L3OxZxNDtBbUXGdpc//QrB8bXQ2Oli23Kjjw1f2b+wyK
+        PWoFfdMsbEhBq
+X-Received: by 2002:a17:907:7b95:b0:6f4:ff03:981a with SMTP id ne21-20020a1709077b9500b006f4ff03981amr23817499ejc.653.1653385354823;
+        Tue, 24 May 2022 02:42:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyz1c8JZ5OgT7BSYJ7GMI1ZrbV0ucv3Jm2MDi5bXDEPX/pxgf5WI1Tr1nVK1/8YFWI1DdgwYw==
+X-Received: by 2002:a17:907:7b95:b0:6f4:ff03:981a with SMTP id ne21-20020a1709077b9500b006f4ff03981amr23817486ejc.653.1653385354641;
+        Tue, 24 May 2022 02:42:34 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id 16-20020a17090601d000b006f3ef214db3sm7086985ejj.25.2022.05.24.02.42.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 May 2022 02:42:33 -0700 (PDT)
+Message-ID: <43bba413-030e-578b-a7d0-e81aed4e67b4@redhat.com>
+Date:   Tue, 24 May 2022 11:42:32 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: Fix gcc 12 warning about
- array bounds
+Subject: Re: [PATCH] s390/uv_uapi: depend on CONFIG_S390
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220520140546.311193-1-scgl@linux.ibm.com>
- <20220520140546.311193-3-scgl@linux.ibm.com>
- <20220524093158.6404a633@p-imbrenda>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220524093158.6404a633@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 2uQjUJTvNO56RIp6jlLeCFrYjRv3ZF7k
-X-Proofpoint-ORIG-GUID: Dk7YrtbJekodJRPgf2oULiTFMtYF_3Ch
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-24_06,2022-05-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 mlxscore=0 adultscore=0 bulkscore=0 lowpriorityscore=0
- malwarescore=0 suspectscore=0 clxscore=1015 impostorscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205240047
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org
+References: <20220523192420.151184-1-pbonzini@redhat.com>
+ <78b9cc09-caef-94c7-8bff-30544098603f@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <78b9cc09-caef-94c7-8bff-30544098603f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/24/22 09:31, Claudio Imbrenda wrote:
-> On Fri, 20 May 2022 16:05:46 +0200
-> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-> 
->> gcc 12 warns about pointer constant <4k dereference.
->> Silence the warning by using the extern lowcore symbol to derive the
->> pointers. This way gcc cannot conclude that the pointer is <4k.
->>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+On 5/24/22 09:01, Christian Borntraeger wrote:
+> Am 23.05.22 um 21:24 schrieb Paolo Bonzini:
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 >> ---
->>  lib/s390x/asm/mem.h | 4 ++++
->>  s390x/emulator.c    | 5 +++--
->>  s390x/skey.c        | 2 +-
->>  3 files changed, 8 insertions(+), 3 deletions(-)
+>>   drivers/s390/char/Kconfig | 1 +
+>>   1 file changed, 1 insertion(+)
 >>
->> diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
->> index 845c00cc..e7901fe0 100644
->> --- a/lib/s390x/asm/mem.h
->> +++ b/lib/s390x/asm/mem.h
->> @@ -7,6 +7,10 @@
->>   */
->>  #ifndef _ASMS390X_MEM_H_
->>  #define _ASMS390X_MEM_H_
->> +#include <asm/arch_def.h>
->> +
->> +/* pointer to 0 used to avoid compiler warnings */
->> +uint8_t *mem_all = (uint8_t *)&lowcore;
+>> diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
+>> index ef8f41833c1a..108e8eb06249 100644
+>> --- a/drivers/s390/char/Kconfig
+>> +++ b/drivers/s390/char/Kconfig
+>> @@ -103,6 +103,7 @@ config SCLP_OFB
+>>   config S390_UV_UAPI
+>>       def_tristate m
+>>       prompt "Ultravisor userspace API"
+>> +        depends on S390
+>>       help
+>>         Selecting exposes parts of the UV interface to userspace
+>>         by providing a misc character device at /dev/uv.
 > 
-> this is defined in a .h, so maybe it's better to declare it static?
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > 
-> 
-> although maybe you can simply declare a macro like this:
-> 
-> #define MEM(x) ((void *)((uint8_t *)&lowcore + (x)))
-> 
-> and then just use MEM(x)...
-> 
-> (please find a less generic name for MEM, though)
+> with the whitespace as outlined.
 
-MEM_ALL
-MEM_ABS
-MEM_OPAQUE
-OPAQUE_PTR
+Yes, that needs to be a tab.
 
-Suggestions welcome, the last would be my favorite.
+> Can you pick it yourself?
 
-[...]
+Sure, thanks.
+
+Paolo
 
