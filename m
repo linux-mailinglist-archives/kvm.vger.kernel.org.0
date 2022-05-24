@@ -2,120 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B64E532418
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:31:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A0B253241A
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:32:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235054AbiEXHbP convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 24 May 2022 03:31:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43384 "EHLO
+        id S234988AbiEXHcL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 03:32:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235284AbiEXHbF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 03:31:05 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3D321CC
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:31:00 -0700 (PDT)
-Received: from kwepemi500024.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L6m8J27dgzDqNl;
-        Tue, 24 May 2022 15:30:56 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (7.193.23.189) by
- kwepemi500024.china.huawei.com (7.221.188.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 24 May 2022 15:30:58 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 24 May 2022 15:30:57 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2375.024; Tue, 24 May 2022 08:30:55 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Yishai Hadas <yishaih@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "maorg@nvidia.com" <maorg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        liulongfang <liulongfang@huawei.com>
-Subject: RE: [PATCH] vfio: Split migration ops from main device ops
-Thread-Topic: [PATCH] vfio: Split migration ops from main device ops
-Thread-Index: AQHYbcEbaYBIfiJZj0Om5FEMX9txd60sp8kAgABlhACAAJNZ4A==
-Date:   Tue, 24 May 2022 07:30:55 +0000
-Message-ID: <cdc5ea6bd40745d0ab86ef790a893ddf@huawei.com>
-References: <20220522094756.219881-1-yishaih@nvidia.com>
- <20220523112500.3a227814.alex.williamson@redhat.com>
- <20220523232820.GM1343366@nvidia.com>
-In-Reply-To: <20220523232820.GM1343366@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S234097AbiEXHcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 03:32:09 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F048427D8;
+        Tue, 24 May 2022 00:32:08 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24O7Qkj1026220;
+        Tue, 24 May 2022 07:32:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dbcco9b4afmBIadJtS0axk0Xbd+5kbnjUW/4xNsftKU=;
+ b=Q6gT7QqjBKqUmz0fkaOP2sYAvtMxomCJsAe1Tr1GKYu17G/dazCI6w7lDXxscbu4ldDG
+ X4P1slp7BQX2drSW0vSN2tEWJuxdbjLM7DO4kDN4rqeKru35pH3up8GGbFFf4PLmhLm9
+ v3qQTV72T1kIepdSFCW1tQ8OdLbk5p3O2pTPZAolliaJ1WU9P3OjJCUUaFtrbau86IYX
+ 1FLnmMT+g26bTYM+XfpXcFc0wrLkNE0vggwKEfvbv7k9Kuze8LyJDavtDtxG8D1NczGs
+ ayUjg2PGBXNTkTQSEGytaRisSLw0TE/FSygu4yDTRwkbetGCUxCaS1LZnyBK+62MKLJp Cw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g8tyvr2ww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 May 2022 07:32:07 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24O7UGng035706;
+        Tue, 24 May 2022 07:32:07 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g8tyvr2w4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 May 2022 07:32:07 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24O7VuMR011694;
+        Tue, 24 May 2022 07:32:05 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3g6qq9ba6h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 May 2022 07:32:04 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24O7W1RK51380546
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 May 2022 07:32:01 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A3AFA42042;
+        Tue, 24 May 2022 07:32:01 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37AE84203F;
+        Tue, 24 May 2022 07:32:01 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.1.98])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 24 May 2022 07:32:01 +0000 (GMT)
+Date:   Tue, 24 May 2022 09:31:58 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: Fix gcc 12 warning about
+ array bounds
+Message-ID: <20220524093158.6404a633@p-imbrenda>
+In-Reply-To: <20220520140546.311193-3-scgl@linux.ibm.com>
+References: <20220520140546.311193-1-scgl@linux.ibm.com>
+        <20220520140546.311193-3-scgl@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QT7VIH0tz3N8t-tw6U2kxi4Wz7iKA9Nw
+X-Proofpoint-ORIG-GUID: HQL8dFidxf-JOaanB2wILj8UQn91_Unj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-24_05,2022-05-23_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 mlxlogscore=999 adultscore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 impostorscore=0 phishscore=0 spamscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205240041
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 20 May 2022 16:05:46 +0200
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-
-> -----Original Message-----
-> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
-> Sent: 24 May 2022 00:28
-> To: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Yishai Hadas <yishaih@nvidia.com>; kvm@vger.kernel.org;
-> maorg@nvidia.com; cohuck@redhat.com; kevin.tian@intel.com; Shameerali
-> Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; liulongfang
-> <liulongfang@huawei.com>
-> Subject: Re: [PATCH] vfio: Split migration ops from main device ops
+> gcc 12 warns about pointer constant <4k dereference.
+> Silence the warning by using the extern lowcore symbol to derive the
+> pointers. This way gcc cannot conclude that the pointer is <4k.
 > 
-> On Mon, May 23, 2022 at 11:25:00AM -0600, Alex Williamson wrote:
-> > On Sun, 22 May 2022 12:47:56 +0300
-> > Yishai Hadas <yishaih@nvidia.com> wrote:
-> >
-> > > vfio core checks whether the driver sets some migration op (e.g.
-> > > set_state/get_state) and accordingly calls its op.
-> > >
-> > > However, currently mlx5 driver sets the above ops without regards to
-> > > its migration caps.
-> > >
-> > > This might lead to unexpected usage/Oops if user space may call to
-> > > the above ops even if the driver doesn't support migration. As for
-> > > example, the migration state_mutex is not initialized in that case.
-> > >
-> > > The cleanest way to manage that seems to split the migration ops
-> > > from the main device ops, this will let the driver setting them
-> > > separately from the main ops when it's applicable.
-> > >
-> > > As part of that, cleaned-up HISI driver to match this scheme.
-> > >
-> > > This scheme may enable down the road to come with some extra group
-> > > of ops (e.g. DMA log) that can be set without regards to the other
-> > > options based on driver caps.
-> >
-> > It seems like the hisi-acc driver already manages this by registering
-> > different structs based on the device migration capabilities, why is
-> > that not the default solution here?  Or of course the mlx5 driver
-> > could test the migration capabilities before running into the weeds.
-> > We also have vfio_device.migration_flags which could factor in here as well.
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+>  lib/s390x/asm/mem.h | 4 ++++
+>  s390x/emulator.c    | 5 +++--
+>  s390x/skey.c        | 2 +-
+>  3 files changed, 8 insertions(+), 3 deletions(-)
 > 
-> It starts to hit combinatoral explosion when the next patches add ops for dirty
-> logging that may be optional too. This is simpler and simpifies the hisi driver to
-> remove the 2nd ops too.
+> diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
+> index 845c00cc..e7901fe0 100644
+> --- a/lib/s390x/asm/mem.h
+> +++ b/lib/s390x/asm/mem.h
+> @@ -7,6 +7,10 @@
+>   */
+>  #ifndef _ASMS390X_MEM_H_
+>  #define _ASMS390X_MEM_H_
+> +#include <asm/arch_def.h>
+> +
+> +/* pointer to 0 used to avoid compiler warnings */
+> +uint8_t *mem_all = (uint8_t *)&lowcore;
 
-Hmm..but for hisi driver we still need to have those mmap/ioctl/read/write override 
-functions to restrict the BAR region exposure to Guest in case of migration support. So I
-am not sure we can get rid of two ops easily there(Though, we could add an explicit
-check for the migration support in those callbacks).
+this is defined in a .h, so maybe it's better to declare it static?
 
-Thanks,
-Shameer
 
+although maybe you can simply declare a macro like this:
+
+#define MEM(x) ((void *)((uint8_t *)&lowcore + (x)))
+
+and then just use MEM(x)...
+
+(please find a less generic name for MEM, though)
+
+>  
+>  #define SKEY_ACC	0xf0
+>  #define SKEY_FP		0x08
+> diff --git a/s390x/emulator.c b/s390x/emulator.c
+> index c9182ea4..afc3c213 100644
+> --- a/s390x/emulator.c
+> +++ b/s390x/emulator.c
+> @@ -12,6 +12,7 @@
+>  #include <asm/cpacf.h>
+>  #include <asm/interrupt.h>
+>  #include <asm/float.h>
+> +#include <asm/mem.h>
+>  #include <linux/compiler.h>
+>  
+>  static inline void __test_spm_ipm(uint8_t cc, uint8_t key)
+> @@ -138,7 +139,7 @@ static __always_inline void __test_cpacf_invalid_parm(unsigned int opcode)
+>  {
+>  	report_prefix_push("invalid parm address");
+>  	expect_pgm_int();
+> -	__cpacf_query(opcode, (void *) -1);
+> +	__cpacf_query(opcode, (cpacf_mask_t *)&mem_all[-1]);
+
+...for example here MEM(-1)
+
+>  	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+>  	report_prefix_pop();
+>  }
+> @@ -148,7 +149,7 @@ static __always_inline void __test_cpacf_protected_parm(unsigned int opcode)
+>  	report_prefix_push("protected parm address");
+>  	expect_pgm_int();
+>  	low_prot_enable();
+> -	__cpacf_query(opcode, (void *) 8);
+> +	__cpacf_query(opcode, (cpacf_mask_t *)&mem_all[8]);
+
+... MEM(8)
+
+>  	low_prot_disable();
+>  	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>  	report_prefix_pop();
+> diff --git a/s390x/skey.c b/s390x/skey.c
+> index 32bf1070..42bf598c 100644
+> --- a/s390x/skey.c
+> +++ b/s390x/skey.c
+> @@ -349,7 +349,7 @@ static void test_set_prefix(void)
+>  	set_storage_key(pagebuf, 0x28, 0);
+>  	expect_pgm_int();
+>  	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
+> -	set_prefix_key_1((uint32_t *)2048);
+> +	set_prefix_key_1((uint32_t *)&mem_all[2048]);
+
+... MEM(2048)
+
+>  	install_page(root, 0, 0);
+>  	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>  	report(get_prefix() == old_prefix, "did not set prefix");
 
