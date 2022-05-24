@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE6D1532BAF
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 15:52:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46A4D532BA4
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 15:52:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237981AbiEXNu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 09:50:29 -0400
+        id S237994AbiEXNub (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 09:50:31 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237965AbiEXNuY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 09:50:24 -0400
+        with ESMTP id S237970AbiEXNu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 09:50:26 -0400
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A862A95DCC;
-        Tue, 24 May 2022 06:50:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6459BACA;
+        Tue, 24 May 2022 06:50:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653400221; x=1684936221;
+  t=1653400224; x=1684936224;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=TLHEXnuMpPNECFXm0z6eEgxVBat2rDgHTpv4llLO6Xk=;
-  b=HGQjbcCulRnFnxjigssu2rbHJBuIbWRofmMiscvzSY82+FXQIHt7ARQg
-   pHZ+rAo3ELOF4J9qJgjai1u80McETT83Xr6/5aNx1zorwaKcY9VoK0qst
-   fiF6/rjukSKk2mRxXvLL28R/obt5xxbaENMI582zgNy28J2itLXPPkaNE
-   TM0q1F/v6iGoi+I4kPLppoP8GqySAGR7Tzx7Comi69l0piw/XhpeotTWz
-   STb0MzGez3+9ea3pXwNjyhYj38ZkmAjRb1SNa2c2LvcjN4q4OBLdV4A1+
-   DhoRdiNlqiV1/4Z2oMU1ccQd5zGmjiqgRrQrPctlgOOfg+J1zn1GGwTve
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="272351859"
+  bh=nHkj1C3j6HS9vlu3aTejWwUeS7XPFcIvaUY3hzW1O2M=;
+  b=R3KxhvlqC553L3roosbe1v21DNm06r5fzWuwZb/NLQXlrGpyprc7IF5u
+   WxRApfILLnkPoE8CwG/f3mj/L6LAB7vr1ryBA6qNVbKQnVU1DwQv8uPf/
+   F9YS/I2EYkC10S6dtX8OA2yGfZffVMszuTqKNkvV7NZTJAxuAtg9HIIIw
+   pnbBhwad5DfHnWy2TmZeM4anFI38W3pQuOFJmoRq+x8e/qrW4Pa35n09H
+   EfOy/pHxsI7vZONb2y1LOULV77a37WnHPxnTc2lfIOq4cJQ9TVpntKNAr
+   YaDw3tkP7NuqXrg1LSiT+/GcuscJr9zrjqS+IpfmTErA5NWK2+5kibGAV
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="272351868"
 X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
-   d="scan'208";a="272351859"
+   d="scan'208";a="272351868"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:50:21 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:50:24 -0700
 X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
-   d="scan'208";a="601312020"
+   d="scan'208";a="601312039"
 Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:50:18 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 06:50:21 -0700
 From:   Chenyi Qiang <chenyi.qiang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -44,10 +44,11 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v7 3/4] KVM: x86: Introduce "struct kvm_caps" to track misc caps/settings
-Date:   Tue, 24 May 2022 21:56:23 +0800
-Message-Id: <20220524135624.22988-4-chenyi.qiang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: [PATCH v7 4/4] KVM: VMX: Enable Notify VM exit
+Date:   Tue, 24 May 2022 21:56:24 +0800
+Message-Id: <20220524135624.22988-5-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220524135624.22988-1-chenyi.qiang@intel.com>
 References: <20220524135624.22988-1-chenyi.qiang@intel.com>
@@ -61,657 +62,485 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Tao Xu <tao3.xu@intel.com>
 
-Add kvm_caps to hold a variety of capabilites and defaults that aren't
-handled by kvm_cpu_caps because they aren't CPUID bits in order to reduce
-the amount of boilerplate code required to add a new feature.  The vast
-majority (all?) of the caps interact with vendor code and are written
-only during initialization, i.e. should be tagged __read_mostly, declared
-extern in x86.h, and exported.
+There are cases that malicious virtual machines can cause CPU stuck (due
+to event windows don't open up), e.g., infinite loop in microcode when
+nested #AC (CVE-2015-5307). No event window means no event (NMI, SMI and
+IRQ) can be delivered. It leads the CPU to be unavailable to host or
+other VMs.
 
-No functional change intended.
+VMM can enable notify VM exit that a VM exit generated if no event
+window occurs in VM non-root mode for a specified amount of time (notify
+window).
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Feature enabling:
+- The new vmcs field SECONDARY_EXEC_NOTIFY_VM_EXITING is introduced to
+  enable this feature. VMM can set NOTIFY_WINDOW vmcs field to adjust
+  the expected notify window.
+- Add a new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT so that user space
+  can query and enable this feature in per-VM scope. The argument is a
+  64bit value: bits 63:32 are used for notify window, and bits 31:0 are
+  for flags. Current supported flags:
+  - KVM_X86_NOTIFY_VMEXIT_ENABLED: enable the feature with the notify
+    window provided.
+  - KVM_X86_NOTIFY_VMEXIT_USER: exit to userspace once the exits happen.
+- It's safe to even set notify window to zero since an internal hardware
+  threshold is added to vmcs.notify_window.
+
+VM exit handling:
+- Introduce a vcpu state notify_window_exits to records the count of
+  notify VM exits and expose it through the debugfs.
+- Notify VM exit can happen incident to delivery of a vector event.
+  Allow it in KVM.
+- Exit to userspace unconditionally for handling when VM_CONTEXT_INVALID
+  bit is set.
+
+Nested handling
+- Nested notify VM exits are not supported yet. Keep the same notify
+  window control in vmcs02 as vmcs01, so that L1 can't escape the
+  restriction of notify VM exits through launching L2 VM.
+
+Notify VM exit is defined in latest Intel Architecture Instruction Set
+Extensions Programming Reference, chapter 9.2.
+
+Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Co-developed-by: Chenyi Qiang <chenyi.qiang@intel.com>
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 15 -----
- arch/x86/kvm/cpuid.c            |  8 +--
- arch/x86/kvm/debugfs.c          |  4 +-
- arch/x86/kvm/lapic.c            |  2 +-
- arch/x86/kvm/svm/nested.c       |  4 +-
- arch/x86/kvm/svm/svm.c          | 13 +++--
- arch/x86/kvm/vmx/nested.c       |  4 +-
- arch/x86/kvm/vmx/vmx.c          | 22 ++++----
- arch/x86/kvm/x86.c              | 97 ++++++++++++++-------------------
- arch/x86/kvm/x86.h              | 26 ++++++++-
- 10 files changed, 94 insertions(+), 101 deletions(-)
+ Documentation/virt/kvm/api.rst     | 49 ++++++++++++++++++++++++++++++
+ arch/x86/include/asm/kvm_host.h    |  7 +++++
+ arch/x86/include/asm/vmx.h         |  7 +++++
+ arch/x86/include/asm/vmxfeatures.h |  1 +
+ arch/x86/include/uapi/asm/vmx.h    |  4 ++-
+ arch/x86/kvm/vmx/capabilities.h    |  6 ++++
+ arch/x86/kvm/vmx/nested.c          |  8 +++++
+ arch/x86/kvm/vmx/vmx.c             | 40 ++++++++++++++++++++++--
+ arch/x86/kvm/x86.c                 | 22 +++++++++++++-
+ arch/x86/kvm/x86.h                 |  7 +++++
+ include/uapi/linux/kvm.h           | 10 ++++++
+ 11 files changed, 157 insertions(+), 4 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index d219523bdb70..1831ee0f7e96 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6325,6 +6325,26 @@ array field represents return values. The userspace should update the return
+ values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+ spec refer, https://github.com/riscv/riscv-sbi-doc.
+ 
++::
++
++    /* KVM_EXIT_NOTIFY */
++    struct {
++  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
++      __u32 flags;
++    } notify;
++
++Used on x86 systems. When the VM capability KVM_CAP_X86_NOTIFY_VMEXIT is
++enabled, a VM exit generated if no event window occurs in VM non-root mode
++for a specified amount of time. Once KVM_X86_NOTIFY_VMEXIT_USER is set when
++enabling the cap, it would exit to userspace with the exit reason
++KVM_EXIT_NOTIFY for further handling. The "flags" field contains more
++detailed info.
++
++The valid value for 'flags' is:
++
++  - KVM_NOTIFY_CONTEXT_INVALID -- the VM context is corrupted and not valid
++    in VMCS. It would run into unknown result if resume the target VM.
++
+ ::
+ 
+ 		/* Fix the size of the union. */
+@@ -7291,6 +7311,35 @@ if the value was set to zero or KVM_ENABLE_CAP was not invoked, KVM
+ uses the return value of KVM_CHECK_EXTENSION(KVM_CAP_MAX_VCPU_ID) as
+ the maximum APIC ID.
+ 
++7.33 KVM_CAP_X86_NOTIFY_VMEXIT
++------------------------------
++
++:Architectures: x86
++:Target: VM
++:Parameters: args[0] is the value of notify window as well as some flags
++:Returns: 0 on success, -EINVAL if args[0] contains invalid flags or notify
++          VM exit is unsupported.
++
++Bits 63:32 of args[0] are used for notify window.
++Bits 31:0 of args[0] are for some flags. Valid bits are::
++
++  #define KVM_X86_NOTIFY_VMEXIT_ENABLED    (1 << 0)
++  #define KVM_X86_NOTIFY_VMEXIT_USER       (1 << 1)
++
++This capability allows userspace to configure the notify VM exit on/off
++in per-VM scope during VM creation. Notify VM exit is disabled by default.
++When userspace sets KVM_X86_NOTIFY_VMEXIT_ENABLED bit in args[0], VMM will
++enable this feature with the notify window provided, which will generate
++a VM exit if no event window occurs in VM non-root mode for a specified of
++time (notify window).
++
++If KVM_X86_NOTIFY_VMEXIT_USER is set in args[0], upon notify VM exits happen,
++KVM would exit to userspace for handling.
++
++This capability is aimed to mitigate the threat that malicious VMs can
++cause CPU stuck (due to event windows don't open up) and make the CPU
++unavailable to host or other VMs.
++
+ 8. Other capabilities.
+ ======================
+ 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5b264a24652d..270460e9f3b1 100644
+index 270460e9f3b1..d4c0ea35efa3 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1663,21 +1663,6 @@ extern bool tdp_enabled;
+@@ -65,6 +65,9 @@
+ #define KVM_BUS_LOCK_DETECTION_VALID_MODE	(KVM_BUS_LOCK_DETECTION_OFF | \
+ 						 KVM_BUS_LOCK_DETECTION_EXIT)
  
- u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
++#define KVM_X86_NOTIFY_VMEXIT_VALID_BITS	(KVM_X86_NOTIFY_VMEXIT_ENABLED | \
++						 KVM_X86_NOTIFY_VMEXIT_USER)
++
+ /* x86-specific vcpu->requests bit members */
+ #define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_REQ(0)
+ #define KVM_REQ_REPORT_TPR_ACCESS	KVM_ARCH_REQ(1)
+@@ -1178,6 +1181,9 @@ struct kvm_arch {
  
--/* control of guest tsc rate supported? */
--extern bool kvm_has_tsc_control;
--/* maximum supported tsc_khz for guests */
--extern u32  kvm_max_guest_tsc_khz;
--/* number of bits of the fractional part of the TSC scaling ratio */
--extern u8   kvm_tsc_scaling_ratio_frac_bits;
--/* maximum allowed value of TSC scaling ratio */
--extern u64  kvm_max_tsc_scaling_ratio;
--/* 1ull << kvm_tsc_scaling_ratio_frac_bits */
--extern u64  kvm_default_tsc_scaling_ratio;
--/* bus lock detection supported? */
--extern bool kvm_has_bus_lock_exit;
--
--extern u64 kvm_mce_cap_supported;
--
+ 	bool bus_lock_detection_enabled;
+ 	bool enable_pmu;
++
++	u32 notify_window;
++	u32 notify_vmexit_flags;
+ 	/*
+ 	 * If exit_on_emulation_error is set, and the in-kernel instruction
+ 	 * emulator fails to emulate an instruction, allow userspace
+@@ -1325,6 +1331,7 @@ struct kvm_vcpu_stat {
+ 	u64 directed_yield_attempted;
+ 	u64 directed_yield_successful;
+ 	u64 guest_mode;
++	u64 notify_window_exits;
+ };
+ 
+ struct x86_instruction_info;
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 89d2172787c5..c371ef695fcc 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -75,6 +75,7 @@
+ #define SECONDARY_EXEC_TSC_SCALING              VMCS_CONTROL_BIT(TSC_SCALING)
+ #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
+ #define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
++#define SECONDARY_EXEC_NOTIFY_VM_EXITING	VMCS_CONTROL_BIT(NOTIFY_VM_EXITING)
+ 
  /*
-  * EMULTYPE_NO_DECODE - Set when re-emulating an instruction (after completing
-  *			userspace I/O) to indicate that the emulation context
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 8c1a3b2430a8..6822fc9ae86d 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -199,7 +199,7 @@ void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
+  * Definitions of Tertiary Processor-Based VM-Execution Controls.
+@@ -280,6 +281,7 @@ enum vmcs_field {
+ 	SECONDARY_VM_EXEC_CONTROL       = 0x0000401e,
+ 	PLE_GAP                         = 0x00004020,
+ 	PLE_WINDOW                      = 0x00004022,
++	NOTIFY_WINDOW                   = 0x00004024,
+ 	VM_INSTRUCTION_ERROR            = 0x00004400,
+ 	VM_EXIT_REASON                  = 0x00004402,
+ 	VM_EXIT_INTR_INFO               = 0x00004404,
+@@ -564,6 +566,11 @@ enum vm_entry_failure_code {
+ #define EPT_VIOLATION_GVA_IS_VALID	(1 << EPT_VIOLATION_GVA_IS_VALID_BIT)
+ #define EPT_VIOLATION_GVA_TRANSLATED	(1 << EPT_VIOLATION_GVA_TRANSLATED_BIT)
  
++/*
++ * Exit Qualifications for NOTIFY VM EXIT
++ */
++#define NOTIFY_VM_CONTEXT_INVALID     BIT(0)
++
  /*
-  * Calculate guest's supported XCR0 taking into account guest CPUID data and
-- * supported_xcr0 (comprised of host configuration and KVM_SUPPORTED_XCR0).
-+ * KVM's supported XCR0 (comprised of host's XCR0 and KVM_SUPPORTED_XCR0).
+  * VM-instruction error numbers
   */
- static u64 cpuid_get_supported_xcr0(struct kvm_cpuid_entry2 *entries, int nent)
- {
-@@ -209,7 +209,7 @@ static u64 cpuid_get_supported_xcr0(struct kvm_cpuid_entry2 *entries, int nent)
- 	if (!best)
- 		return 0;
+diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
+index 589608c157bf..c6a7eed03914 100644
+--- a/arch/x86/include/asm/vmxfeatures.h
++++ b/arch/x86/include/asm/vmxfeatures.h
+@@ -85,6 +85,7 @@
+ #define VMX_FEATURE_USR_WAIT_PAUSE	( 2*32+ 26) /* Enable TPAUSE, UMONITOR, UMWAIT in guest */
+ #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
+ #define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* "" VM-Exit when bus lock caused */
++#define VMX_FEATURE_NOTIFY_VM_EXITING	( 2*32+ 31) /* VM-Exit when no event windows after notify window */
  
--	return (best->eax | ((u64)best->edx << 32)) & supported_xcr0;
-+	return (best->eax | ((u64)best->edx << 32)) & kvm_caps.supported_xcr0;
+ /* Tertiary Processor-Based VM-Execution Controls, word 3 */
+ #define VMX_FEATURE_IPI_VIRT		( 3*32+  4) /* Enable IPI virtualization */
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index 946d761adbd3..a5faf6d88f1b 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -91,6 +91,7 @@
+ #define EXIT_REASON_UMWAIT              67
+ #define EXIT_REASON_TPAUSE              68
+ #define EXIT_REASON_BUS_LOCK            74
++#define EXIT_REASON_NOTIFY              75
+ 
+ #define VMX_EXIT_REASONS \
+ 	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
+@@ -153,7 +154,8 @@
+ 	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
+ 	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
+ 	{ EXIT_REASON_TPAUSE,                "TPAUSE" }, \
+-	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }
++	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }, \
++	{ EXIT_REASON_NOTIFY,                "NOTIFY" }
+ 
+ #define VMX_EXIT_REASON_FLAGS \
+ 	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index f14c4bef97e0..2d3f13b18714 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -436,4 +436,10 @@ static inline u64 vmx_supported_debugctl(void)
+ 	return debugctl;
  }
  
- static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
-@@ -927,8 +927,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		}
- 		break;
- 	case 0xd: {
--		u64 permitted_xcr0 = supported_xcr0 & xstate_get_guest_group_perm();
--		u64 permitted_xss = supported_xss;
-+		u64 permitted_xcr0 = kvm_caps.supported_xcr0 & xstate_get_guest_group_perm();
-+		u64 permitted_xss = kvm_caps.supported_xss;
- 
- 		entry->eax &= permitted_xcr0;
- 		entry->ebx = xstate_required_size(permitted_xcr0, false);
-diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-index 9240b3b7f8dd..cfed36aba2f7 100644
---- a/arch/x86/kvm/debugfs.c
-+++ b/arch/x86/kvm/debugfs.c
-@@ -48,7 +48,7 @@ DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL,
- 
- static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
- {
--	*val = kvm_tsc_scaling_ratio_frac_bits;
-+	*val = kvm_caps.tsc_scaling_ratio_frac_bits;
- 	return 0;
- }
- 
-@@ -66,7 +66,7 @@ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_
- 				    debugfs_dentry, vcpu,
- 				    &vcpu_timer_advance_ns_fops);
- 
--	if (kvm_has_tsc_control) {
-+	if (kvm_caps.has_tsc_control) {
- 		debugfs_create_file("tsc-scaling-ratio", 0444,
- 				    debugfs_dentry, vcpu,
- 				    &vcpu_tsc_scaling_fops);
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 21ab69db689b..5fd678c90288 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1602,7 +1602,7 @@ static inline void __wait_lapic_expire(struct kvm_vcpu *vcpu, u64 guest_cycles)
- 	 * that __delay() uses delay_tsc whenever the hardware has TSC, thus
- 	 * always for VMX enabled hardware.
- 	 */
--	if (vcpu->arch.tsc_scaling_ratio == kvm_default_tsc_scaling_ratio) {
-+	if (vcpu->arch.tsc_scaling_ratio == kvm_caps.default_tsc_scaling_ratio) {
- 		__delay(min(guest_cycles,
- 			nsec_to_cycles(vcpu, timer_advance_ns)));
- 	} else {
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index bed5e1692cef..d14370cec23a 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -648,7 +648,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
- 
- 	vmcb02->control.tsc_offset = vcpu->arch.tsc_offset;
- 
--	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
-+	if (svm->tsc_ratio_msr != kvm_caps.default_tsc_scaling_ratio) {
- 		WARN_ON(!svm->tsc_scaling_enabled);
- 		nested_svm_update_tsc_ratio_msr(vcpu);
- 	}
-@@ -979,7 +979,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 		vmcb_mark_dirty(vmcb01, VMCB_INTERCEPTS);
- 	}
- 
--	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
-+	if (svm->tsc_ratio_msr != kvm_caps.default_tsc_scaling_ratio) {
- 		WARN_ON(!svm->tsc_scaling_enabled);
- 		vcpu->arch.tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
- 		svm_write_tsc_multiplier(vcpu, vcpu->arch.tsc_scaling_ratio);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3b49337998ec..480eef001074 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1225,7 +1225,7 @@ static void __svm_vcpu_reset(struct kvm_vcpu *vcpu)
- 
- 	svm_init_osvw(vcpu);
- 	vcpu->arch.microcode_version = 0x01000065;
--	svm->tsc_ratio_msr = kvm_default_tsc_scaling_ratio;
-+	svm->tsc_ratio_msr = kvm_caps.default_tsc_scaling_ratio;
- 
- 	if (sev_es_guest(vcpu->kvm))
- 		sev_es_vcpu_reset(svm);
-@@ -4769,7 +4769,7 @@ static __init void svm_set_cpu_caps(void)
- {
- 	kvm_set_cpu_caps();
- 
--	supported_xss = 0;
-+	kvm_caps.supported_xss = 0;
- 
- 	/* CPUID 0x80000001 and 0x8000000A (SVM features) */
- 	if (nested) {
-@@ -4845,7 +4845,8 @@ static __init int svm_hardware_setup(void)
- 
- 	init_msrpm_offsets();
- 
--	supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
-+	kvm_caps.supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
-+				     XFEATURE_MASK_BNDCSR);
- 
- 	if (boot_cpu_has(X86_FEATURE_FXSR_OPT))
- 		kvm_enable_efer_bits(EFER_FFXSR);
-@@ -4855,11 +4856,11 @@ static __init int svm_hardware_setup(void)
- 			tsc_scaling = false;
- 		} else {
- 			pr_info("TSC scaling supported\n");
--			kvm_has_tsc_control = true;
-+			kvm_caps.has_tsc_control = true;
- 		}
- 	}
--	kvm_max_tsc_scaling_ratio = SVM_TSC_RATIO_MAX;
--	kvm_tsc_scaling_ratio_frac_bits = 32;
-+	kvm_caps.max_tsc_scaling_ratio = SVM_TSC_RATIO_MAX;
-+	kvm_caps.tsc_scaling_ratio_frac_bits = 32;
- 
- 	tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
- 
++static inline bool cpu_has_notify_vmexit(void)
++{
++	return vmcs_config.cpu_based_2nd_exec_ctrl &
++		SECONDARY_EXEC_NOTIFY_VM_EXITING;
++}
++
+ #endif /* __KVM_X86_VMX_CAPS_H */
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a6688663da4d..aab4745eb1ee 100644
+index aab4745eb1ee..8086db2ad73c 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -2548,7 +2548,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 			vmx_get_l2_tsc_multiplier(vcpu));
+@@ -2133,6 +2133,8 @@ static u64 nested_vmx_calc_efer(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
  
- 	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
+ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
+ {
++	struct kvm *kvm = vmx->vcpu.kvm;
++
+ 	/*
+ 	 * If vmcs02 hasn't been initialized, set the constant vmcs02 state
+ 	 * according to L0's settings (vmcs12 is irrelevant here).  Host
+@@ -2175,6 +2177,9 @@ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
+ 	if (cpu_has_vmx_encls_vmexit())
+ 		vmcs_write64(ENCLS_EXITING_BITMAP, INVALID_GPA);
  
- 	nested_vmx_transition_tlb_flush(vcpu, vmcs12, true);
-@@ -4610,7 +4610,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
- 	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
- 	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
- 
- 	if (vmx->nested.l1_tpr_threshold != -1)
++	if (kvm_notify_vmexit_enabled(kvm))
++		vmcs_write32(NOTIFY_WINDOW, kvm->arch.notify_window);
++
+ 	/*
+ 	 * Set the MSR load/store lists to match L0's settings.  Only the
+ 	 * addresses are constant (for vmcs02), the counts can change based
+@@ -6107,6 +6112,9 @@ static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu,
+ 			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE);
+ 	case EXIT_REASON_ENCLS:
+ 		return nested_vmx_exit_handled_encls(vcpu, vmcs12);
++	case EXIT_REASON_NOTIFY:
++		/* Notify VM exit is not exposed to L1 */
++		return false;
+ 	default:
+ 		return true;
+ 	}
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 8bbcf2071faf..b06eafa5884d 100644
+index b06eafa5884d..a86546921c2b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1715,7 +1715,7 @@ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
- 	    nested_cpu_has2(vmcs12, SECONDARY_EXEC_TSC_SCALING))
- 		return vmcs12->tsc_multiplier;
+@@ -2497,7 +2497,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 			SECONDARY_EXEC_PT_USE_GPA |
+ 			SECONDARY_EXEC_PT_CONCEAL_VMX |
+ 			SECONDARY_EXEC_ENABLE_VMFUNC |
+-			SECONDARY_EXEC_BUS_LOCK_DETECTION;
++			SECONDARY_EXEC_BUS_LOCK_DETECTION |
++			SECONDARY_EXEC_NOTIFY_VM_EXITING;
+ 		if (cpu_has_sgx())
+ 			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
+ 		if (adjust_vmx_controls(min2, opt2,
+@@ -4410,6 +4411,9 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	if (!vcpu->kvm->arch.bus_lock_detection_enabled)
+ 		exec_control &= ~SECONDARY_EXEC_BUS_LOCK_DETECTION;
  
--	return kvm_default_tsc_scaling_ratio;
-+	return kvm_caps.default_tsc_scaling_ratio;
++	if (!kvm_notify_vmexit_enabled(vcpu->kvm))
++		exec_control &= ~SECONDARY_EXEC_NOTIFY_VM_EXITING;
++
+ 	return exec_control;
  }
  
- static void vmx_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-@@ -7537,7 +7537,7 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
- 
- 	/* CPUID 0xD.1 */
--	supported_xss = 0;
-+	kvm_caps.supported_xss = 0;
- 	if (!cpu_has_vmx_xsaves())
- 		kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
- 
-@@ -7678,9 +7678,9 @@ static int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
- 		delta_tsc = 0;
- 
- 	/* Convert to host delta tsc if tsc scaling is enabled */
--	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_default_tsc_scaling_ratio &&
-+	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_caps.default_tsc_scaling_ratio &&
- 	    delta_tsc && u64_shl_div_u64(delta_tsc,
--				kvm_tsc_scaling_ratio_frac_bits,
-+				kvm_caps.tsc_scaling_ratio_frac_bits,
- 				vcpu->arch.l1_tsc_scaling_ratio, &delta_tsc))
- 		return -ERANGE;
- 
-@@ -8057,8 +8057,8 @@ static __init int hardware_setup(void)
+@@ -4491,6 +4495,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 		vmx->ple_window_dirty = true;
  	}
  
- 	if (!cpu_has_vmx_mpx())
--		supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
--				    XFEATURE_MASK_BNDCSR);
-+		kvm_caps.supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
-+					     XFEATURE_MASK_BNDCSR);
++	if (kvm_notify_vmexit_enabled(kvm))
++		vmcs_write32(NOTIFY_WINDOW, kvm->arch.notify_window);
++
+ 	vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
+ 	vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
+ 	vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
+@@ -5777,6 +5784,32 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
  
- 	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
- 	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
-@@ -8125,11 +8125,11 @@ static __init int hardware_setup(void)
- 		enable_ipiv = false;
++static int handle_notify(struct kvm_vcpu *vcpu)
++{
++	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
++	bool context_invalid = exit_qual & NOTIFY_VM_CONTEXT_INVALID;
++
++	++vcpu->stat.notify_window_exits;
++
++	/*
++	 * Notify VM exit happened while executing iret from NMI,
++	 * "blocked by NMI" bit has to be set before next VM entry.
++	 */
++	if (enable_vnmi && (exit_qual & INTR_INFO_UNBLOCK_NMI))
++		vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO,
++			      GUEST_INTR_STATE_NMI);
++
++	if (vcpu->kvm->arch.notify_vmexit_flags & KVM_X86_NOTIFY_VMEXIT_USER ||
++	    context_invalid) {
++		vcpu->run->exit_reason = KVM_EXIT_NOTIFY;
++		vcpu->run->notify.flags = context_invalid ?
++					  KVM_NOTIFY_CONTEXT_INVALID : 0;
++		return 0;
++	}
++
++	return 1;
++}
++
+ /*
+  * The exit handlers return 1 if the exit was handled fully and guest execution
+  * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+@@ -5834,6 +5867,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+ 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+ 	[EXIT_REASON_ENCLS]		      = handle_encls,
+ 	[EXIT_REASON_BUS_LOCK]                = handle_bus_lock_vmexit,
++	[EXIT_REASON_NOTIFY]		      = handle_notify,
+ };
  
- 	if (cpu_has_vmx_tsc_scaling())
--		kvm_has_tsc_control = true;
-+		kvm_caps.has_tsc_control = true;
+ static const int kvm_vmx_max_exit_handlers =
+@@ -6207,7 +6241,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	     exit_reason.basic != EXIT_REASON_EPT_VIOLATION &&
+ 	     exit_reason.basic != EXIT_REASON_PML_FULL &&
+ 	     exit_reason.basic != EXIT_REASON_APIC_ACCESS &&
+-	     exit_reason.basic != EXIT_REASON_TASK_SWITCH)) {
++	     exit_reason.basic != EXIT_REASON_TASK_SWITCH &&
++	     exit_reason.basic != EXIT_REASON_NOTIFY)) {
+ 		int ndata = 3;
  
--	kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
--	kvm_tsc_scaling_ratio_frac_bits = 48;
--	kvm_has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();
-+	kvm_caps.max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
-+	kvm_caps.tsc_scaling_ratio_frac_bits = 48;
-+	kvm_caps.has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();
+ 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+@@ -8130,6 +8165,7 @@ static __init int hardware_setup(void)
+ 	kvm_caps.max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
+ 	kvm_caps.tsc_scaling_ratio_frac_bits = 48;
+ 	kvm_caps.has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();
++	kvm_caps.has_notify_vmexit = cpu_has_notify_vmexit();
  
  	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
  
-@@ -8186,7 +8186,7 @@ static __init int hardware_setup(void)
- 		vmx_x86_ops.request_immediate_exit = __kvm_request_immediate_exit;
- 	}
- 
--	kvm_mce_cap_supported |= MCG_LMCE_P;
-+	kvm_caps.supported_mce_cap |= MCG_LMCE_P;
- 
- 	if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
- 		return -EINVAL;
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e27ccfc88d15..d745d87835e2 100644
+index d745d87835e2..9fb20e05a643 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -87,8 +87,11 @@
- 
- #define MAX_IO_MSRS 256
- #define KVM_MAX_MCE_BANKS 32
--u64 __read_mostly kvm_mce_cap_supported = MCG_CTL_P | MCG_SER_P;
--EXPORT_SYMBOL_GPL(kvm_mce_cap_supported);
-+
-+struct kvm_caps kvm_caps __read_mostly = {
-+	.supported_mce_cap = MCG_CTL_P | MCG_SER_P,
-+};
-+EXPORT_SYMBOL_GPL(kvm_caps);
- 
- #define  ERR_PTR_USR(e)  ((void __user *)ERR_PTR(e))
- 
-@@ -151,19 +154,6 @@ module_param(min_timer_period_us, uint, S_IRUGO | S_IWUSR);
- static bool __read_mostly kvmclock_periodic_sync = true;
- module_param(kvmclock_periodic_sync, bool, S_IRUGO);
- 
--bool __read_mostly kvm_has_tsc_control;
--EXPORT_SYMBOL_GPL(kvm_has_tsc_control);
--u32  __read_mostly kvm_max_guest_tsc_khz;
--EXPORT_SYMBOL_GPL(kvm_max_guest_tsc_khz);
--u8   __read_mostly kvm_tsc_scaling_ratio_frac_bits;
--EXPORT_SYMBOL_GPL(kvm_tsc_scaling_ratio_frac_bits);
--u64  __read_mostly kvm_max_tsc_scaling_ratio;
--EXPORT_SYMBOL_GPL(kvm_max_tsc_scaling_ratio);
--u64 __read_mostly kvm_default_tsc_scaling_ratio;
--EXPORT_SYMBOL_GPL(kvm_default_tsc_scaling_ratio);
--bool __read_mostly kvm_has_bus_lock_exit;
--EXPORT_SYMBOL_GPL(kvm_has_bus_lock_exit);
--
- /* tsc tolerance in parts per million - default to 1/2 of the NTP threshold */
- static u32 __read_mostly tsc_tolerance_ppm = 250;
- module_param(tsc_tolerance_ppm, uint, S_IRUGO | S_IWUSR);
-@@ -235,8 +225,6 @@ EXPORT_SYMBOL_GPL(enable_apicv);
- 
- u64 __read_mostly host_xss;
- EXPORT_SYMBOL_GPL(host_xss);
--u64 __read_mostly supported_xss;
--EXPORT_SYMBOL_GPL(supported_xss);
- 
- const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	KVM_GENERIC_VM_STATS(),
-@@ -309,8 +297,6 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
+@@ -284,7 +284,8 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+ 	STATS_DESC_COUNTER(VCPU, nested_run),
+ 	STATS_DESC_COUNTER(VCPU, directed_yield_attempted),
+ 	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
+-	STATS_DESC_ICOUNTER(VCPU, guest_mode)
++	STATS_DESC_ICOUNTER(VCPU, guest_mode),
++	STATS_DESC_COUNTER(VCPU, notify_window_exits),
  };
  
- u64 __read_mostly host_xcr0;
--u64 __read_mostly supported_xcr0;
--EXPORT_SYMBOL_GPL(supported_xcr0);
- 
- static struct kmem_cache *x86_emulator_cache;
- 
-@@ -2345,12 +2331,12 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
- 
- 	/* Guest TSC same frequency as host TSC? */
- 	if (!scale) {
--		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
-+		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_caps.default_tsc_scaling_ratio);
- 		return 0;
- 	}
- 
- 	/* TSC scaling supported? */
--	if (!kvm_has_tsc_control) {
-+	if (!kvm_caps.has_tsc_control) {
- 		if (user_tsc_khz > tsc_khz) {
- 			vcpu->arch.tsc_catchup = 1;
- 			vcpu->arch.tsc_always_catchup = 1;
-@@ -2362,10 +2348,10 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
- 	}
- 
- 	/* TSC scaling required  - calculate ratio */
--	ratio = mul_u64_u32_div(1ULL << kvm_tsc_scaling_ratio_frac_bits,
-+	ratio = mul_u64_u32_div(1ULL << kvm_caps.tsc_scaling_ratio_frac_bits,
- 				user_tsc_khz, tsc_khz);
- 
--	if (ratio == 0 || ratio >= kvm_max_tsc_scaling_ratio) {
-+	if (ratio == 0 || ratio >= kvm_caps.max_tsc_scaling_ratio) {
- 		pr_warn_ratelimited("Invalid TSC scaling ratio - virtual-tsc-khz=%u\n",
- 			            user_tsc_khz);
- 		return -1;
-@@ -2383,7 +2369,7 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
- 	/* tsc_khz can be zero if TSC calibration fails */
- 	if (user_tsc_khz == 0) {
- 		/* set tsc_scaling_ratio to a safe value */
--		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
-+		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_caps.default_tsc_scaling_ratio);
- 		return -1;
- 	}
- 
-@@ -2460,18 +2446,18 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
-  * (frac) represent the fractional part, ie. ratio represents a fixed
-  * point number (mult + frac * 2^(-N)).
-  *
-- * N equals to kvm_tsc_scaling_ratio_frac_bits.
-+ * N equals to kvm_caps.tsc_scaling_ratio_frac_bits.
-  */
- static inline u64 __scale_tsc(u64 ratio, u64 tsc)
- {
--	return mul_u64_u64_shr(tsc, ratio, kvm_tsc_scaling_ratio_frac_bits);
-+	return mul_u64_u64_shr(tsc, ratio, kvm_caps.tsc_scaling_ratio_frac_bits);
- }
- 
- u64 kvm_scale_tsc(u64 tsc, u64 ratio)
- {
- 	u64 _tsc = tsc;
- 
--	if (ratio != kvm_default_tsc_scaling_ratio)
-+	if (ratio != kvm_caps.default_tsc_scaling_ratio)
- 		_tsc = __scale_tsc(ratio, tsc);
- 
- 	return _tsc;
-@@ -2498,11 +2484,11 @@ u64 kvm_calc_nested_tsc_offset(u64 l1_offset, u64 l2_offset, u64 l2_multiplier)
- {
- 	u64 nested_offset;
- 
--	if (l2_multiplier == kvm_default_tsc_scaling_ratio)
-+	if (l2_multiplier == kvm_caps.default_tsc_scaling_ratio)
- 		nested_offset = l1_offset;
- 	else
- 		nested_offset = mul_s64_u64_shr((s64) l1_offset, l2_multiplier,
--						kvm_tsc_scaling_ratio_frac_bits);
-+						kvm_caps.tsc_scaling_ratio_frac_bits);
- 
- 	nested_offset += l2_offset;
- 	return nested_offset;
-@@ -2511,9 +2497,9 @@ EXPORT_SYMBOL_GPL(kvm_calc_nested_tsc_offset);
- 
- u64 kvm_calc_nested_tsc_multiplier(u64 l1_multiplier, u64 l2_multiplier)
- {
--	if (l2_multiplier != kvm_default_tsc_scaling_ratio)
-+	if (l2_multiplier != kvm_caps.default_tsc_scaling_ratio)
- 		return mul_u64_u64_shr(l1_multiplier, l2_multiplier,
--				       kvm_tsc_scaling_ratio_frac_bits);
-+				       kvm_caps.tsc_scaling_ratio_frac_bits);
- 
- 	return l1_multiplier;
- }
-@@ -2555,7 +2541,7 @@ static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 l1_multipli
- 	else
- 		vcpu->arch.tsc_scaling_ratio = l1_multiplier;
- 
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		static_call(kvm_x86_write_tsc_multiplier)(
- 			vcpu, vcpu->arch.tsc_scaling_ratio);
- }
-@@ -2691,7 +2677,7 @@ static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
- 
- static inline void adjust_tsc_offset_host(struct kvm_vcpu *vcpu, s64 adjustment)
- {
--	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_default_tsc_scaling_ratio)
-+	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_caps.default_tsc_scaling_ratio)
- 		WARN_ON(adjustment < 0);
- 	adjustment = kvm_scale_tsc((u64) adjustment,
- 				   vcpu->arch.l1_tsc_scaling_ratio);
-@@ -3104,7 +3090,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 
- 	/* With all the info we got, fill in the values */
- 
--	if (kvm_has_tsc_control)
-+	if (kvm_caps.has_tsc_control)
- 		tgt_tsc_khz = kvm_scale_tsc(tgt_tsc_khz,
- 					    v->arch.l1_tsc_scaling_ratio);
- 
-@@ -3610,7 +3596,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
- 		 * XSAVES/XRSTORS to save/restore PT MSRs.
- 		 */
--		if (data & ~supported_xss)
-+		if (data & ~kvm_caps.supported_xss)
- 			return 1;
- 		vcpu->arch.ia32_xss = data;
- 		kvm_update_cpuid_runtime(vcpu);
-@@ -4371,7 +4357,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ const struct kvm_stats_header kvm_vcpu_stats_header = {
+@@ -4399,6 +4400,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_DISABLE_QUIRKS2:
+ 		r = KVM_X86_VALID_QUIRKS;
  		break;
- 	case KVM_CAP_TSC_CONTROL:
- 	case KVM_CAP_VM_TSC_CONTROL:
--		r = kvm_has_tsc_control;
-+		r = kvm_caps.has_tsc_control;
- 		break;
- 	case KVM_CAP_X2APIC_API:
- 		r = KVM_X2APIC_API_VALID_FLAGS;
-@@ -4393,7 +4379,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = sched_info_on();
- 		break;
- 	case KVM_CAP_X86_BUS_LOCK_EXIT:
--		if (kvm_has_bus_lock_exit)
-+		if (kvm_caps.has_bus_lock_exit)
- 			r = KVM_BUS_LOCK_DETECTION_OFF |
- 			    KVM_BUS_LOCK_DETECTION_EXIT;
- 		else
-@@ -4402,7 +4388,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_XSAVE2: {
- 		u64 guest_perm = xstate_get_guest_group_perm();
- 
--		r = xstate_required_size(supported_xcr0 & guest_perm, false);
-+		r = xstate_required_size(kvm_caps.supported_xcr0 & guest_perm, false);
- 		if (r < sizeof(struct kvm_xsave))
- 			r = sizeof(struct kvm_xsave);
- 		break;
-@@ -4440,7 +4426,7 @@ static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
- 
- 	switch (attr->attr) {
- 	case KVM_X86_XCOMP_GUEST_SUPP:
--		if (put_user(supported_xcr0, uaddr))
-+		if (put_user(kvm_caps.supported_xcr0, uaddr))
- 			return -EFAULT;
- 		return 0;
++	case KVM_CAP_X86_NOTIFY_VMEXIT:
++		r = kvm_caps.has_notify_vmexit;
++		break;
  	default:
-@@ -4517,8 +4503,8 @@ long kvm_arch_dev_ioctl(struct file *filp,
- 	}
- 	case KVM_X86_GET_MCE_CAP_SUPPORTED:
- 		r = -EFAULT;
--		if (copy_to_user(argp, &kvm_mce_cap_supported,
--				 sizeof(kvm_mce_cap_supported)))
-+		if (copy_to_user(argp, &kvm_caps.supported_mce_cap,
-+				 sizeof(kvm_caps.supported_mce_cap)))
- 			goto out;
- 		r = 0;
  		break;
-@@ -4802,7 +4788,7 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
- 	r = -EINVAL;
- 	if (!bank_num || bank_num > KVM_MAX_MCE_BANKS)
- 		goto out;
--	if (mcg_cap & ~(kvm_mce_cap_supported | 0xff | 0xff0000))
-+	if (mcg_cap & ~(kvm_caps.supported_mce_cap | 0xff | 0xff0000))
- 		goto out;
- 	r = 0;
- 	vcpu->arch.mcg_cap = mcg_cap;
-@@ -5108,7 +5094,8 @@ static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
- 
- 	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu,
- 					      guest_xsave->region,
--					      supported_xcr0, &vcpu->arch.pkru);
-+					      kvm_caps.supported_xcr0,
-+					      &vcpu->arch.pkru);
- }
- 
- static void kvm_vcpu_ioctl_x86_get_xcrs(struct kvm_vcpu *vcpu,
-@@ -5613,8 +5600,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = -EINVAL;
- 		user_tsc_khz = (u32)arg;
- 
--		if (kvm_has_tsc_control &&
--		    user_tsc_khz >= kvm_max_guest_tsc_khz)
-+		if (kvm_caps.has_tsc_control &&
-+		    user_tsc_khz >= kvm_caps.max_guest_tsc_khz)
- 			goto out;
- 
- 		if (user_tsc_khz == 0)
-@@ -6058,7 +6045,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		    (cap->args[0] & KVM_BUS_LOCK_DETECTION_EXIT))
- 			break;
- 
--		if (kvm_has_bus_lock_exit &&
-+		if (kvm_caps.has_bus_lock_exit &&
- 		    cap->args[0] & KVM_BUS_LOCK_DETECTION_EXIT)
- 			kvm->arch.bus_lock_detection_enabled = true;
- 		r = 0;
-@@ -6607,8 +6594,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -EINVAL;
- 		user_tsc_khz = (u32)arg;
- 
--		if (kvm_has_tsc_control &&
--		    user_tsc_khz >= kvm_max_guest_tsc_khz)
-+		if (kvm_caps.has_tsc_control &&
-+		    user_tsc_khz >= kvm_caps.max_guest_tsc_khz)
- 			goto out;
- 
- 		if (user_tsc_khz == 0)
-@@ -8764,7 +8751,7 @@ static void kvm_hyperv_tsc_notifier(void)
- 	/* TSC frequency always matches when on Hyper-V */
- 	for_each_present_cpu(cpu)
- 		per_cpu(cpu_tsc_khz, cpu) = tsc_khz;
--	kvm_max_guest_tsc_khz = tsc_khz;
-+	kvm_caps.max_guest_tsc_khz = tsc_khz;
- 
- 	list_for_each_entry(kvm, &vm_list, vm_list) {
- 		__kvm_start_pvclock_update(kvm);
-@@ -9026,7 +9013,7 @@ int kvm_arch_init(void *opaque)
- 
- 	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
- 		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
--		supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
-+		kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
  	}
- 
- 	if (pi_inject_timer == -1)
-@@ -11722,13 +11709,13 @@ int kvm_arch_hardware_setup(void *opaque)
- 	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
- 
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
--		supported_xss = 0;
-+		kvm_caps.supported_xss = 0;
- 
- #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
- 	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
- #undef __kvm_cpu_cap_has
- 
--	if (kvm_has_tsc_control) {
-+	if (kvm_caps.has_tsc_control) {
- 		/*
- 		 * Make sure the user can only configure tsc_khz values that
- 		 * fit into a signed integer.
-@@ -11736,10 +11723,10 @@ int kvm_arch_hardware_setup(void *opaque)
- 		 * be 1 on all machines.
- 		 */
- 		u64 max = min(0x7fffffffULL,
--			      __scale_tsc(kvm_max_tsc_scaling_ratio, tsc_khz));
--		kvm_max_guest_tsc_khz = max;
-+			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
-+		kvm_caps.max_guest_tsc_khz = max;
- 	}
--	kvm_default_tsc_scaling_ratio = 1ULL << kvm_tsc_scaling_ratio_frac_bits;
-+	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
- 	kvm_init_msr_list();
- 	return 0;
- }
+@@ -6122,6 +6126,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		break;
++	case KVM_CAP_X86_NOTIFY_VMEXIT:
++		r = -EINVAL;
++		if ((u32)cap->args[0] & ~KVM_X86_NOTIFY_VMEXIT_VALID_BITS)
++			break;
++		if (!kvm_caps.has_notify_vmexit)
++			break;
++		if (!((u32)cap->args[0] & KVM_X86_NOTIFY_VMEXIT_ENABLED))
++			break;
++		mutex_lock(&kvm->lock);
++		if (!kvm->created_vcpus) {
++			kvm->arch.notify_window = cap->args[0] >> 32;
++			kvm->arch.notify_vmexit_flags = (u32)cap->args[0];
++			r = 0;
++		}
++		mutex_unlock(&kvm->lock);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
 diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 588792f00334..359d0454ad28 100644
+index 359d0454ad28..501b884b8cc4 100644
 --- a/arch/x86/kvm/x86.h
 +++ b/arch/x86/kvm/x86.h
-@@ -8,6 +8,25 @@
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
+@@ -21,6 +21,8 @@ struct kvm_caps {
+ 	u64  default_tsc_scaling_ratio;
+ 	/* bus lock detection supported? */
+ 	bool has_bus_lock_exit;
++	/* notify VM exit supported? */
++	bool has_notify_vmexit;
  
-+struct kvm_caps {
-+	/* control of guest tsc rate supported? */
-+	bool has_tsc_control;
-+	/* maximum supported tsc_khz for guests */
-+	u32  max_guest_tsc_khz;
-+	/* number of bits of the fractional part of the TSC scaling ratio */
-+	u8   tsc_scaling_ratio_frac_bits;
-+	/* maximum allowed value of TSC scaling ratio */
-+	u64  max_tsc_scaling_ratio;
-+	/* 1ull << kvm_caps.tsc_scaling_ratio_frac_bits */
-+	u64  default_tsc_scaling_ratio;
-+	/* bus lock detection supported? */
-+	bool has_bus_lock_exit;
-+
-+	u64 supported_mce_cap;
-+	u64 supported_xcr0;
-+	u64 supported_xss;
-+};
-+
- void kvm_spurious_fault(void);
- 
- #define KVM_NESTED_VMENTER_CONSISTENCY_CHECK(consistency_check)		\
-@@ -283,14 +302,15 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
- 
- extern u64 host_xcr0;
--extern u64 supported_xcr0;
- extern u64 host_xss;
--extern u64 supported_xss;
-+
-+extern struct kvm_caps kvm_caps;
-+
- extern bool enable_pmu;
- 
- static inline bool kvm_mpx_supported(void)
- {
--	return (supported_xcr0 & (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR))
-+	return (kvm_caps.supported_xcr0 & (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR))
- 		== (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
+ 	u64 supported_mce_cap;
+ 	u64 supported_xcr0;
+@@ -364,6 +366,11 @@ static inline bool kvm_cstate_in_guest(struct kvm *kvm)
+ 	return kvm->arch.cstate_in_guest;
  }
  
++static inline bool kvm_notify_vmexit_enabled(struct kvm *kvm)
++{
++	return kvm->arch.notify_vmexit_flags & KVM_X86_NOTIFY_VMEXIT_ENABLED;
++}
++
+ enum kvm_intr_type {
+ 	/* Values are arbitrary, but must be non-zero. */
+ 	KVM_HANDLING_IRQ = 1,
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index ec75b56229c7..e028d5246920 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -270,6 +270,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_X86_BUS_LOCK     33
+ #define KVM_EXIT_XEN              34
+ #define KVM_EXIT_RISCV_SBI        35
++#define KVM_EXIT_NOTIFY           36
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -494,6 +495,11 @@ struct kvm_run {
+ 			unsigned long args[6];
+ 			unsigned long ret[2];
+ 		} riscv_sbi;
++		/* KVM_EXIT_NOTIFY */
++		struct {
++#define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
++			__u32 flags;
++		} notify;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+@@ -1154,6 +1160,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_VM_TSC_CONTROL 214
+ #define KVM_CAP_SYSTEM_EVENT_DATA 215
+ #define KVM_CAP_TRIPLE_FAULT_EVENT 216
++#define KVM_CAP_X86_NOTIFY_VMEXIT 217
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -2115,4 +2122,7 @@ struct kvm_stats_desc {
+ /* Available with KVM_CAP_XSAVE2 */
+ #define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+ 
++#define KVM_X86_NOTIFY_VMEXIT_ENABLED		(1ULL << 0)
++#define KVM_X86_NOTIFY_VMEXIT_USER		(1ULL << 1)
++
+ #endif /* __LINUX_KVM_H */
 -- 
 2.17.1
 
