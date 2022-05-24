@@ -2,232 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3043C5328F3
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 13:27:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3733D532909
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 13:31:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236625AbiEXL1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 07:27:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48960 "EHLO
+        id S236660AbiEXLai (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 07:30:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232245AbiEXL1d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 07:27:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DDCB47B9D6
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:27:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653391650;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bhG5Ck13GAPrVJ8vbRNY/0IdFeWvv/sdaevWgalHSV0=;
-        b=FFYo3Iqv49VZjV4SKF8/4o9ukAOAIVWuvtRHPrRXoWbT9Z6pyqxwTsAnb1X/trcEYlKEBg
-        +gulMabIYtmN+Ngos30m6xUjFqGU10lNeWkxTfWQ2TklZaL8zQRH89O81BiXJzK71HUSjZ
-        avhCGYah/PgMzFi5qY1JDNvuPv7e3uY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-600-VAbKCdsdNXWUeOr04N6UrA-1; Tue, 24 May 2022 07:27:29 -0400
-X-MC-Unique: VAbKCdsdNXWUeOr04N6UrA-1
-Received: by mail-wm1-f70.google.com with SMTP id m9-20020a05600c4f4900b0039746692dc2so2925384wmq.6
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:27:29 -0700 (PDT)
+        with ESMTP id S236644AbiEXLaa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 07:30:30 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB72880C6
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:30:28 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id j25so835364wrb.6
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:30:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=N2TjPYBfTxyr+DNrjNs2M1CQcfw6+WY+gUO3SgZbUV8=;
+        b=CQm5UAeg1hkuSSsutDNG5mlSigGV02SDoqjU1pCYNr5ah4YevJSWr4AlQwCQwgTADA
+         Rzxq6t0CYWD0MFIzFIMr8eEcThDGPSsKmJB+J43x5VewBMw0wOPN2v2sStD1uD0CcV+5
+         lMhPO2CuOIiIyfabVPzeLQkFQw3i4iUfhB6CvZq0HgMiLGJ9R+khlNSwcUZoVI1v6JQR
+         fTaGOLJvyrOqKxqeBpyObRLnv8m9iFNcnorpjp5Mljh3Ks4i8eq6kH09cHJ7FGZCKoAC
+         lcYTWNKaE1FjnBW/gzO2bfzncP4dWIxk6CQQa0GO/H2gXyL+cEaFFy6ge2aJgxMRwU0h
+         e4Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=bhG5Ck13GAPrVJ8vbRNY/0IdFeWvv/sdaevWgalHSV0=;
-        b=xlOJHigaHnJSOwC9u0QePEulcs880XALxgKNtRfMXBczPfp5cmRyr9TTXJjrZVYIKO
-         Pnq4GhqQPD7zpJIGyqm8r23okrDTBmEFb3g0IQs8QTQsbipKgEEPJgTwlloyMJLo4h1+
-         XEqtx/ibtymMv3kfkRTn/cyXOXzA4DYEwrHxHU7CcXFaQcLI5naJfe530xEIASIooNeR
-         N9NTdIccFoQtabGGZYaPg/GYum9fSuHF3xeOQReOFSgm43F7zg1eyuHNTARfIm6bpvIJ
-         oKNM4rUY8Sf3APW12J3kFIQfNm5cI4JaGXSOY5AdeM7X125CG4gllf/xW+ZFl7PtcVN5
-         xDNA==
-X-Gm-Message-State: AOAM530oqfhY6F6vC7TBj+8TR4fUgd+mkpQFoJndbV6yCTMgrhTBVaA0
-        Acy+ETvWI0vdiBTWZ3FQ5unBlufTtSPvDY7HnqSpgoCoXk0c0MG04aVJJY4nmmoEbTuH3A/YVzq
-        yXs+bfIbW24Me
-X-Received: by 2002:a05:6000:1f0a:b0:20e:674a:ce2 with SMTP id bv10-20020a0560001f0a00b0020e674a0ce2mr22220262wrb.450.1653391648524;
-        Tue, 24 May 2022 04:27:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJypT0T4ipNG9nB+q5Xa3blcQoYRizXV4S+8aqy+n5YSEXzafFH9TBbGRIax40l9njwM0/vvXw==
-X-Received: by 2002:a05:6000:1f0a:b0:20e:674a:ce2 with SMTP id bv10-20020a0560001f0a00b0020e674a0ce2mr22220225wrb.450.1653391648250;
-        Tue, 24 May 2022 04:27:28 -0700 (PDT)
-Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id n1-20020a7bc5c1000000b003976525c38bsm95660wmk.3.2022.05.24.04.27.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 May 2022 04:27:27 -0700 (PDT)
-Message-ID: <87783273-6abd-f31e-f5f3-a5cf21b1594f@redhat.com>
-Date:   Tue, 24 May 2022 13:27:26 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=N2TjPYBfTxyr+DNrjNs2M1CQcfw6+WY+gUO3SgZbUV8=;
+        b=WR8ibcZDfBLzCz9fwcMrEmfKVxt/2RUMSghbvNoK5eog46cf4xrUGKlHeJRb3wfenX
+         k7opr0al0valzCu6FZrkq5h4x+BqbzdfwTLEUHvZqcwcL/wSYjZRD1QlO/kzEY6ARf1b
+         UuW1c1zKVI+dtzaSLRR9ONHGaFNhOQ30IsxkDhoxojDSg5FYoF0tdFOFYFmKdGRDb61A
+         3YI5xo0ZnpRlqWS/Bg+KuZT39+BhVaRWdyuMgr1vbAugwaTKVsLzB15M+safH3a+KZ3B
+         gLICf1TOS6YvGZdqLBXvR0C7WSErYdZHOt6HZl5Hr6SBShGuXnZXtuymVbUVJ8KnMQ1E
+         0bOw==
+X-Gm-Message-State: AOAM530xTY2MSF2Oa4/txqKmegyeCoKsGZ15jEFRSziEQCN/xUI8M24e
+        /MSYujUd3bFEnB5wB6dQirB35s6Xug5xzyEvdjQIOQ==
+X-Google-Smtp-Source: ABdhPJws54/M5QyP1Iw/wARcBHxmm+RAXDaP8SIQZviMCw/5pFWp7jBzGSkS9YpnQFEjlgFR7cqirFzWu6hfZyEmRI8=
+X-Received: by 2002:adf:f001:0:b0:20d:22b:183c with SMTP id
+ j1-20020adff001000000b0020d022b183cmr22457285wro.313.1653391826736; Tue, 24
+ May 2022 04:30:26 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v7 10/13] s390x: kvm: topology: interception of PTF
- instruction
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        frankja@linux.ibm.com
-References: <20220420115745.13696-1-pmorel@linux.ibm.com>
- <20220420115745.13696-11-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220420115745.13696-11-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220426185245.281182-1-atishp@rivosinc.com> <20220426185245.281182-4-atishp@rivosinc.com>
+In-Reply-To: <20220426185245.281182-4-atishp@rivosinc.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 24 May 2022 17:00:15 +0530
+Message-ID: <CAAhSdy0wbokRNZrXYcARKx=DpGfQ5gFGJ_1K26U0W99-jZcM5g@mail.gmail.com>
+Subject: Re: [PATCH v3 3/4] RISC-V: Prefer sstc extension if available
+To:     Atish Patra <atishp@rivosinc.com>
+Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        DTML <devicetree@vger.kernel.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rob Herring <robh+dt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/04/2022 13.57, Pierre Morel wrote:
-> When the host supports the CPU topology facility, the PTF
-> instruction with function code 2 is interpreted by the SIE,
-> provided that the userland hypervizor activates the interpretation
-> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
-> 
-> The PTF instructions with function code 0 and 1 are intercepted
-> and must be emulated by the userland hypervizor.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On Wed, Apr 27, 2022 at 12:23 AM Atish Patra <atishp@rivosinc.com> wrote:
+>
+> RISC-V ISA has sstc extension which allows updating the next clock event
+> via a CSR (stimecmp) instead of an SBI call. This should happen dynamically
+> if sstc extension is available. Otherwise, it will fallback to SBI call
+> to maintain backward compatibility.
+>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
 > ---
->   hw/s390x/s390-virtio-ccw.c         | 50 ++++++++++++++++++++++++++++++
->   include/hw/s390x/s390-virtio-ccw.h |  6 ++++
->   target/s390x/kvm/kvm.c             | 14 +++++++++
->   3 files changed, 70 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 93d1a43583..1ffaddebcc 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
+>  drivers/clocksource/timer-riscv.c | 21 ++++++++++++++++++++-
+>  1 file changed, 20 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/timer-riscv.c
+> index 1767f8bf2013..d9398ae84a20 100644
+> --- a/drivers/clocksource/timer-riscv.c
+> +++ b/drivers/clocksource/timer-riscv.c
+> @@ -23,11 +23,24 @@
 
-Why do you put this into s390-virtio-ccw.c and not into cpu_topology.c ?
+Add "#define pr_fmt(fmt)" here since you are using pr_info(...)
 
-> @@ -434,6 +434,56 @@ static void s390_pv_prepare_reset(S390CcwMachineState *ms)
->       s390_pv_prep_reset();
->   }
->   
-> +/*
-> + * s390_handle_ptf:
-> + *
-> + * @register 1: contains the function code
-> + *
-> + * Function codes 0 and 1 handle the CPU polarization.
-> + * We assume an horizontal topology, the only one supported currently
-> + * by Linux, consequently we answer to function code 0, requesting
-> + * horizontal polarization that it is already the current polarization
-> + * and reject vertical polarization request without further explanation.
-> + *
-> + * Function code 2 is handling topology changes and is interpreted
-> + * by the SIE.
-> + */
-> +int s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
-> +{
-> +    CPUS390XState *env = &cpu->env;
-> +    uint64_t reg = env->regs[r1];
-> +    uint8_t fc = reg & S390_TOPO_FC_MASK;
+>  #include <asm/sbi.h>
+>  #include <asm/timex.h>
+>
+> +static DEFINE_STATIC_KEY_FALSE(riscv_sstc_available);
 > +
-> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
-> +        s390_program_interrupt(env, PGM_OPERATION, ra);
-> +        return 0;
-> +    }
-> +
-> +    if (env->psw.mask & PSW_MASK_PSTATE) {
-> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
-> +        return 0;
-> +    }
-> +
-> +    if (reg & ~S390_TOPO_FC_MASK) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> +        return 0;
-> +    }
-> +
-> +    switch (fc) {
-> +    case 0:    /* Horizontal polarization is already set */
-> +        env->regs[r1] |= S390_PTF_REASON_DONE;
-> +        return 2;
-> +    case 1:    /* Vertical polarization is not supported */
-> +        env->regs[r1] |= S390_PTF_REASON_NONE;
-> +        return 2;
-> +    default:
-> +        /* Note that fc == 2 is interpreted by the SIE */
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->   static void s390_machine_reset(MachineState *machine)
->   {
->       S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-> index 3331990e02..ac4b4a92e7 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -30,6 +30,12 @@ struct S390CcwMachineState {
->       uint8_t loadparm[8];
->   };
->   
-> +#define S390_PTF_REASON_NONE (0x00 << 8)
-> +#define S390_PTF_REASON_DONE (0x01 << 8)
-> +#define S390_PTF_REASON_BUSY (0x02 << 8)
-> +#define S390_TOPO_FC_MASK 0xffUL
-> +int s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra);
-> +
->   struct S390CcwMachineClass {
->       /*< private >*/
->       MachineClass parent_class;
-> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> index 27b3fbfa09..e3792e52c2 100644
-> --- a/target/s390x/kvm/kvm.c
-> +++ b/target/s390x/kvm/kvm.c
-> @@ -98,6 +98,7 @@
->   
->   #define PRIV_B9_EQBS                    0x9c
->   #define PRIV_B9_CLP                     0xa0
-> +#define PRIV_B9_PTF                     0xa2
->   #define PRIV_B9_PCISTG                  0xd0
->   #define PRIV_B9_PCILG                   0xd2
->   #define PRIV_B9_RPCIT                   0xd3
-> @@ -1453,6 +1454,16 @@ static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
->       }
->   }
->   
-> +static int kvm_handle_ptf(S390CPU *cpu, struct kvm_run *run)
-> +{
-> +    uint8_t r1 = (run->s390_sieic.ipb >> 20) & 0x0f;
-> +    int ret;
-> +
-> +    ret = s390_handle_ptf(cpu, r1, RA_IGNORED);
-> +    setcc(cpu, ret);
+>  static int riscv_clock_next_event(unsigned long delta,
+>                 struct clock_event_device *ce)
+>  {
+> +       uint64_t next_tval = get_cycles64() + delta;
 
-So you're still setting the CC in case the s390_handle_ptf() function 
-injected a program interrupt? ... feels wrong. Maybe the CC should be set 
-within s390_handle_ptf() instead?
+Use "u64" here to be consistent with other parts of the kernel.
 
-  Thomas
-
-
-> +    return 0;
-> +}
 > +
->   static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
->   {
->       int r = 0;
-> @@ -1470,6 +1481,9 @@ static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
->       case PRIV_B9_RPCIT:
->           r = kvm_rpcit_service_call(cpu, run);
->           break;
-> +    case PRIV_B9_PTF:
-> +        r = kvm_handle_ptf(cpu, run);
-> +        break;
->       case PRIV_B9_EQBS:
->           /* just inject exception */
->           r = -1;
+>         csr_set(CSR_IE, IE_TIE);
+> -       sbi_set_timer(get_cycles64() + delta);
+> +       if (static_branch_likely(&riscv_sstc_available)) {
+> +#if __riscv_xlen == 32
 
+Use CONFIG_32BIT here.
+
+> +               csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
+> +               csr_write(CSR_STIMECMPH, next_tval >> 32);
+> +#else
+> +               csr_write(CSR_STIMECMP, next_tval);
+> +#endif
+> +       } else
+> +               sbi_set_timer(next_tval);
+> +
+>         return 0;
+>  }
+>
+> @@ -165,6 +178,12 @@ static int __init riscv_timer_init_dt(struct device_node *n)
+>         if (error)
+>                 pr_err("cpu hp setup state failed for RISCV timer [%d]\n",
+>                        error);
+> +
+> +       if (riscv_isa_extension_available(NULL, SSTC)) {
+> +               pr_info("Timer interrupt in S-mode is available via sstc extension\n");
+> +               static_branch_enable(&riscv_sstc_available);
+> +       }
+> +
+>         return error;
+>  }
+>
+> --
+> 2.25.1
+>
+
+Regards,
+Anup
