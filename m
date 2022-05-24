@@ -2,207 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00262532586
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 10:40:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95049533D2E
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 15:04:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231472AbiEXIkJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 04:40:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59208 "EHLO
+        id S243796AbiEYNEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 09:04:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233768AbiEXIkA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 04:40:00 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 17FD984A2E
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 01:39:58 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A99B51FB;
-        Tue, 24 May 2022 01:39:57 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 943CD3F66F;
-        Tue, 24 May 2022 01:39:56 -0700 (PDT)
-Date:   Tue, 24 May 2022 09:40:11 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Keir Fraser <keirf@google.com>, Will Deacon <will@kernel.org>,
-        kvm@vger.kernel.org, catalin.marinas@arm.com,
-        kernel-team@android.com
-Subject: Re: [PATCH kvmtool 0/2] Fixes for virtio_balloon stats printing
-Message-ID: <YoyZ64D1/v6SBz8S@monolith.localdoman>
-References: <20220520143706.550169-1-keirf@google.com>
- <165307799681.1660071.7738890533857118660.b4-ty@kernel.org>
- <20220523154249.2fa6db09@donnerap.cambridge.arm.com>
- <Youi7+T1+YG/6ed9@google.com>
- <20220523161323.0e7df3d5@donnerap.cambridge.arm.com>
- <YoutGZHrgweh6pgm@monolith.localdoman>
- <You30lZiaDIlTAsF@google.com>
- <You/XQP0hc5e9BJd@monolith.localdoman>
- <20220523183932.05d56517@donnerap.cambridge.arm.com>
+        with ESMTP id S243279AbiEYNEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 09:04:35 -0400
+X-Greylist: delayed 98658 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 25 May 2022 06:04:35 PDT
+Received: from box.indicandustries.com (hwsrv-970840.hostwindsdns.com [IPv6:2607:5501:3000:21a5::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729DCA5AA0
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 06:04:35 -0700 (PDT)
+Received: from authenticated-user (box.indicandustries.com [104.168.149.109])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by box.indicandustries.com (Postfix) with ESMTPSA id 068F3108011
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 03:24:21 -0600 (MDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=box.indicandustries.com; s=mail; t=1653384262;
+        bh=V6VCn7WEbqHjVVQ20/+SYu6rwS1WmTHcxX88g+j430s=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=pmbjrI5NP3Pi5hxf3NPer/h/24z9NdzOspx7sKHCQ6n8hAQ6fLyDrO/OtiBsI01in
+         SL3Bur7YjpGpMozfiHNwF2G19CIs5R772ol1eWzyYL6iJkfvXltMCV52oGBONdRHWN
+         2VHras+qF9xCVWJH3XsiALKhHNXHF6zIUYS6uMfwZJ8FzhD2IP+5DTo3Tu9nJZR4SJ
+         qlyBzlkdoszBtEH1T9rFkzQwwsvMeSibXHzykuhyFuQ5fbo/zp+CRzHunQZ1BJBJRy
+         ZWyZGQYbhSo8WbHSQIkMThTNMC1gvc2UJVwBN+KzPy5KfjcTfYACYG2j8wbQVdxdHp
+         nrfLvxymP6A7Q==
+Reply-To: amjalia90@gmail.com
+From:   amjad.ali@box.indicandustries.com
+To:     kvm@vger.kernel.org
+Subject: Hello Sir, I seek your urgent consideration.
+Date:   24 May 2022 11:24:20 +0200
+Message-ID: <20220524112420.1F9DB2A708AA6718@box.indicandustries.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220523183932.05d56517@donnerap.cambridge.arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=3.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_REPLYTO,
+        FREEMAIL_REPLYTO_END_DIGIT,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hello,
 
-On Mon, May 23, 2022 at 06:39:32PM +0100, Andre Przywara wrote:
-> On Mon, 23 May 2022 18:07:41 +0100
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> > Hi,
-> > 
-> > On Mon, May 23, 2022 at 04:35:30PM +0000, Keir Fraser wrote:
-> > > On Mon, May 23, 2022 at 04:49:45PM +0100, Alexandru Elisei wrote:  
-> > > > Hi,
-> > > > 
-> > > > On Mon, May 23, 2022 at 04:13:23PM +0100, Andre Przywara wrote:  
-> > > > > On Mon, 23 May 2022 15:06:23 +0000
-> > > > > Keir Fraser <keirf@google.com> wrote:
-> > > > >   
-> > > > > > On Mon, May 23, 2022 at 03:42:49PM +0100, Andre Przywara wrote:  
-> > > > > > > On Fri, 20 May 2022 21:51:07 +0100
-> > > > > > > Will Deacon <will@kernel.org> wrote:
-> > > > > > > 
-> > > > > > > Hi,
-> > > > > > >     
-> > > > > > > > On Fri, 20 May 2022 14:37:04 +0000, Keir Fraser wrote:    
-> > > > > > > > > While playing with kvmtool's virtio_balloon device I found a couple of
-> > > > > > > > > niggling issues with the printing of memory stats. Please consider
-> > > > > > > > > these fairly trivial fixes.    
-> > > > > > > 
-> > > > > > > Unfortunately patch 2/2 breaks compilation on userland with older kernel
-> > > > > > > headers, like Ubuntu 18.04:
-> > > > > > > ...
-> > > > > > >   CC       builtin-stat.o
-> > > > > > > builtin-stat.c: In function 'do_memstat':
-> > > > > > > builtin-stat.c:86:8: error: 'VIRTIO_BALLOON_S_HTLB_PGALLOC' undeclared (first use in this function); did you mean 'VIRTIO_BALLOON_S_AVAIL'?
-> > > > > > >    case VIRTIO_BALLOON_S_HTLB_PGALLOC:
-> > > > > > >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > > > > >         VIRTIO_BALLOON_S_AVAIL
-> > > > > > > (repeated for VIRTIO_BALLOON_S_HTLB_PGFAIL and VIRTIO_BALLOON_S_CACHES).
-> > > > > > > 
-> > > > > > > I don't quite remember what we did here in the past in those cases,
-> > > > > > > conditionally redefine the symbols in a local header, or protect the
-> > > > > > > new code with an #ifdef?    
-> > > > > > 
-> > > > > > For what it's worth, my opinion is that the sensible options are to:
-> > > > > > 1. Build against the latest stable, or a specified version of, kernel
-> > > > > > headers; or 2. Protect with ifdef'ery until new definitions are
-> > > > > > considered "common enough".
-> > > > > > 
-> > > > > > Supporting older headers by grafting or even modifying required newer
-> > > > > > definitions on top seems a horrid middle ground, albeit I can
-> > > > > > appreciate the pragmatism of it.  
-> > > > > 
-> > > > > Fair enough, although I don't think option 1) is really viable for users,
-> > > > > as upgrading the distro provided kernel headers is often not an option for
-> > > > > the casual user. And even more versed users would probably shy away from
-> > > > > staining their /usr/include directory just for kvmtool.
-> > > > > 
-> > > > > Which just leaves option 2? If no one hollers, I will send a patch to that
-> > > > > regard.  
-> > > > 
-> > > > How about copying the required headers to kvmtool, under include/linux?
-> > > > That would remove any dependency on a specific kernel or distro version.  
-> > > 
-> > > Maintaining just the required headers sounds a bit of a pain. Getting  
-> > 
-> > Isn't the Linux mantra "don't break userspace"? So in that case, even if
-> > kvmtool uses an older version of a header, that won't cause any issues,
-> > right?
-> 
-> It should work in either way, we just might end up ignoring new features,
-> if we use older header files.
+Greetings? I am Amjad. I work with a leading Bio Firm.  Due to=20
+the setbacks of the pandemic, my company has opened a bid in=20
+search of new suppliers for basic raw materials needed in=20
+production.
 
-I don't think that's a problem, whenever kvmtool gets support for a feature
-not in the existing headers, the headers can be updated, similar to the
-other KVM headers.
+I am seeking a representative=C2=A0as I am a staff, I can not be=20
+involved directly. It may not be your area of work but the=20
+profits are great and I will guide you through. I have already=20
+sourced a local supplier for this. I only need a reliable=20
+representative.
 
-> 
-> > > it wrong ends up copying too many headers (and there's nearly 200kLOC  
-> 
-> I feel we shouldn't go crazy here just because of some statistic feature.
-> kvmtool is meant to be a lean and mean tool, compiling cleanly on as many
-> systems as possible, as a pure user. So mandating header updates from
-> innocent users sounds a bit over the top.
-> 
-> > We could mandate that the kernel header file is copied only when new
-> > features are added to kvmtool. I don't think there's any need to do it
-> > retroactively.
-> 
-> Just thinking: we do the header sync already for the KVM related
-> headers, as we need them, and didn't want to wait for distros.
-> Can't we just include some virtio headers in that list as well?
+Please get back to me so I can explain this in full.
 
-I like this idea.
-
-Thanks,
-Alex
-
-> 
-> Cheers,
-> Andre
-> 
-> > 
-> > What do you think?
-> > 
-> > Thanks,
-> > Alex
-> > 
-> > > of them) or a confusing split between copied and system-installed
-> > > headers.
-> > > 
-> > > How about requiring headers at include/linux and if the required
-> > > version tag isn't found there, download the kernel tree and "make
-> > > headers_install" with customised INSTALL_HDR_PATH? The cost is a
-> > > big(ish) download: time, bandwidth, disk space.
-> > > 
-> > >  -- Keir
-> > >   
-> > > > Thanks,
-> > > > Alex
-> > > >   
-> > > > > 
-> > > > > Cheers,
-> > > > > Andre
-> > > > > 
-> > > > >   
-> > > > > > 
-> > > > > >  Regards,
-> > > > > >  Keir
-> > > > > > 
-> > > > > >   
-> > > > > > > I would lean towards the former (and hacking this in works), but then we
-> > > > > > > would need to redefine VIRTIO_BALLOON_S_NR, to encompass the new symbols,
-> > > > > > > which sounds fragile.
-> > > > > > > 
-> > > > > > > Happy to send a patch if we agree on an approach.
-> > > > > > > 
-> > > > > > > Cheers,
-> > > > > > > Andre
-> > > > > > >     
-> > > > > > > > > 
-> > > > > > > > > Keir Fraser (2):
-> > > > > > > > >   virtio/balloon: Fix a crash when collecting stats
-> > > > > > > > >   stat: Add descriptions for new virtio_balloon stat types
-> > > > > > > > > 
-> > > > > > > > > [...]      
-> > > > > > > > 
-> > > > > > > > Applied to kvmtool (master), thanks!
-> > > > > > > > 
-> > > > > > > > [1/2] virtio/balloon: Fix a crash when collecting stats
-> > > > > > > >       https://git.kernel.org/will/kvmtool/c/3a13530ae99a
-> > > > > > > > [2/2] stat: Add descriptions for new virtio_balloon stat types
-> > > > > > > >       https://git.kernel.org/will/kvmtool/c/bc77bf49df6e
-> > > > > > > > 
-> > > > > > > > Cheers,    
-> > > > > > >     
-> > > > >   
-> 
+Amjad
