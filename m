@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9E4953313E
+	by mail.lfdr.de (Postfix) with ESMTP id 9ECE853313D
 	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 21:05:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240984AbiEXTFE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 15:05:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55320 "EHLO
+        id S240809AbiEXTFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 15:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241002AbiEXTEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 15:04:43 -0400
+        with ESMTP id S241010AbiEXTEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 15:04:44 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFC52ABF66
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 12:03:43 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24OIotOB015922;
-        Tue, 24 May 2022 19:03:27 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC6F28998
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 12:03:45 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24OIIlr0015153;
+        Tue, 24 May 2022 19:03:30 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=Hj+QDYKcD5HhNTVOhOc8oHAl3/ZVKIKF4QRNBFEWG8A=;
- b=ryKxCeZwFsjUalaVeS2KayoWdzertZHSugaNjSX6Ib/Xq5y29e6/CbvU5iGuXk6zepHJ
- iV+6q1vO/ces/I4CU9WhpZo3R2OmWUd2V+HH86UgDstgABg2s+JBDVCQnbLacTO4BCSt
- 9nz6m+AuhybM3hDzUqKn9GApg4TINp8KIw27cG+yCzD5zz8bhSWTUHTNOv+8LsGididO
- YPja3TQex1txQ320tpD82mt+/OQMAFz1W1CooZ3dG1IvOVnsEZK4qeFYq/Sj9fgfnMOe
- oQ3HNfEhvM5cDxw9RQi8v4AEcTFhWpctJTJr2zWAHQc7pUGEavJD/di0fwyKNseDPsRI bw== 
+ bh=RmEBmyYM5Gz9ciSMbGWfakRuAQqPIc32fcku6p/KEm4=;
+ b=UOXzYg+y7J1Dh/QOZmeBFJDjC37mT1jWUsZKWRP4JBnr14MnlzCjeLhRnQvb42/MAx9o
+ yPtjrwEpnK+SPQU5k1RuebbAtioX4weKaLuJKixMZmNV0hujhKVnndZqJvWrzBRuO0F2
+ MAI+1WTgJu7LfRoylzoPEZ1NS7z0OgFJYG+fPDGW4S63+9CYbz+cbd5r9PV55HJZaS24
+ 0SZ1+FvD+LJdQiyPVGCA60e9P0iBvCSvMrdO6p63VsxL4rEZgX3BwrTkxdYf6r4bHTr1
+ QS2CZv09SYrhiHPEurPfNg66IqgVYdJR0UsiD+IFtXtbCWedwVrd+OpVk633ZcP92TzM jg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g950j07rf-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94hggsxe-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:03:26 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24OIsc0r006577;
-        Tue, 24 May 2022 19:03:26 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g950j07qy-1
+        Tue, 24 May 2022 19:03:29 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24OJ0SEg014407;
+        Tue, 24 May 2022 19:03:29 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g94hggswx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:03:26 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24OJ2ug3015882;
-        Tue, 24 May 2022 19:03:25 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02dal.us.ibm.com with ESMTP id 3g93v80q5c-1
+        Tue, 24 May 2022 19:03:29 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24OJ2vlr022736;
+        Tue, 24 May 2022 19:03:28 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma03wdc.us.ibm.com with ESMTP id 3g93v8rjea-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 May 2022 19:03:25 +0000
+        Tue, 24 May 2022 19:03:28 +0000
 Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24OJ3NVF6226750
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24OJ3RYM34013588
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 May 2022 19:03:23 GMT
+        Tue, 24 May 2022 19:03:27 GMT
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C1ED212405B;
-        Tue, 24 May 2022 19:03:23 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 36EC5124052;
+        Tue, 24 May 2022 19:03:27 +0000 (GMT)
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E603D124053;
-        Tue, 24 May 2022 19:03:20 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0F88A12405C;
+        Tue, 24 May 2022 19:03:24 +0000 (GMT)
 Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.163.3.233])
         by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 24 May 2022 19:03:20 +0000 (GMT)
+        Tue, 24 May 2022 19:03:23 +0000 (GMT)
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
@@ -65,25 +65,25 @@ Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
         david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
         mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
         kvm@vger.kernel.org
-Subject: [PATCH v6 2/8] target/s390x: add zpci-interp to cpu models
-Date:   Tue, 24 May 2022 15:02:59 -0400
-Message-Id: <20220524190305.140717-3-mjrosato@linux.ibm.com>
+Subject: [PATCH v6 3/8] s390x/pci: add routine to get host function handle from CLP info
+Date:   Tue, 24 May 2022 15:03:00 -0400
+Message-Id: <20220524190305.140717-4-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220524190305.140717-1-mjrosato@linux.ibm.com>
 References: <20220524190305.140717-1-mjrosato@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XCLXCe5Q1CZH4dxGWh_l3m7KROLyetYR
-X-Proofpoint-GUID: YH3Hb8iop2MBNhX1Yp3xxTHpf79vlkTZ
+X-Proofpoint-GUID: vNirbEE_E-ET7oT4TQFoMcuILWwMSTS4
+X-Proofpoint-ORIG-GUID: SONTvMC6o30Z4PlYWwOW0kQ7SZCm5sAw
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-24_09,2022-05-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 bulkscore=0 phishscore=0 adultscore=0 spamscore=0
- malwarescore=0 suspectscore=0 mlxlogscore=999 impostorscore=0
- lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2205240094
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 mlxscore=0 suspectscore=0 adultscore=0
+ malwarescore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=971 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205240094
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -93,73 +93,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The zpci-interp feature is used to specify whether zPCI interpretation is
-to be used for this guest.
+In order to interface with the underlying host zPCI device, we need
+to know it's function handle.  Add a routine to grab this from the
+vfio CLP capabilities chain.
 
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- hw/s390x/s390-virtio-ccw.c          | 1 +
- target/s390x/cpu_features_def.h.inc | 1 +
- target/s390x/gen-features.c         | 2 ++
- target/s390x/kvm/kvm.c              | 1 +
- 4 files changed, 5 insertions(+)
+ hw/s390x/s390-pci-vfio.c         | 83 ++++++++++++++++++++++++++------
+ include/hw/s390x/s390-pci-vfio.h |  5 ++
+ 2 files changed, 72 insertions(+), 16 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 047cca0487..b33310a135 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -806,6 +806,7 @@ static void ccw_machine_7_0_instance_options(MachineState *machine)
-     static const S390FeatInit qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V7_0 };
- 
-     ccw_machine_7_1_instance_options(machine);
-+    s390_cpudef_featoff_greater(14, 1, S390_FEAT_ZPCI_INTERP);
-     s390_set_qemu_cpu_model(0x8561, 15, 1, qemu_cpu_feat);
+diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+index 6f80a47e29..4bf0a7e22d 100644
+--- a/hw/s390x/s390-pci-vfio.c
++++ b/hw/s390x/s390-pci-vfio.c
+@@ -124,6 +124,27 @@ static void s390_pci_read_base(S390PCIBusDevice *pbdev,
+     pbdev->zpci_fn.pft = 0;
  }
  
-diff --git a/target/s390x/cpu_features_def.h.inc b/target/s390x/cpu_features_def.h.inc
-index e86662bb3b..4ade3182aa 100644
---- a/target/s390x/cpu_features_def.h.inc
-+++ b/target/s390x/cpu_features_def.h.inc
-@@ -146,6 +146,7 @@ DEF_FEAT(SIE_CEI, "cei", SCLP_CPU, 43, "SIE: Conditional-external-interception f
- DEF_FEAT(DAT_ENH_2, "dateh2", MISC, 0, "DAT-enhancement facility 2")
- DEF_FEAT(CMM, "cmm", MISC, 0, "Collaborative-memory-management facility")
- DEF_FEAT(AP, "ap", MISC, 0, "AP instructions installed")
-+DEF_FEAT(ZPCI_INTERP, "zpci-interp", MISC, 0, "zPCI interpretation")
++static bool get_host_fh(S390PCIBusDevice *pbdev, struct vfio_device_info *info,
++                        uint32_t *fh)
++{
++    struct vfio_info_cap_header *hdr;
++    struct vfio_device_info_cap_zpci_base *cap;
++    VFIOPCIDevice *vpci =  container_of(pbdev->pdev, VFIOPCIDevice, pdev);
++
++    hdr = vfio_get_device_info_cap(info, VFIO_DEVICE_INFO_CAP_ZPCI_BASE);
++
++    /* Can only get the host fh with version 2 or greater */
++    if (hdr == NULL || hdr->version < 2) {
++        trace_s390_pci_clp_cap(vpci->vbasedev.name,
++                               VFIO_DEVICE_INFO_CAP_ZPCI_BASE);
++        return false;
++    }
++    cap = (void *) hdr;
++
++    *fh = cap->fh;
++    return true;
++}
++
+ static void s390_pci_read_group(S390PCIBusDevice *pbdev,
+                                 struct vfio_device_info *info)
+ {
+@@ -217,25 +238,13 @@ static void s390_pci_read_pfip(S390PCIBusDevice *pbdev,
+     memcpy(pbdev->zpci_fn.pfip, cap->pfip, CLP_PFIP_NR_SEGMENTS);
+ }
  
- /* Features exposed via the PLO instruction. */
- DEF_FEAT(PLO_CL, "plo-cl", PLO, 0, "PLO Compare and load (32 bit in general registers)")
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index c03ec2c9a9..f991646c01 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -554,6 +554,7 @@ static uint16_t full_GEN14_GA1[] = {
-     S390_FEAT_HPMA2,
-     S390_FEAT_SIE_KSS,
-     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
-+    S390_FEAT_ZPCI_INTERP,
- };
+-/*
+- * This function will issue the VFIO_DEVICE_GET_INFO ioctl and look for
+- * capabilities that contain information about CLP features provided by the
+- * underlying host.
+- * On entry, defaults have already been placed into the guest CLP response
+- * buffers.  On exit, defaults will have been overwritten for any CLP features
+- * found in the capability chain; defaults will remain for any CLP features not
+- * found in the chain.
+- */
+-void s390_pci_get_clp_info(S390PCIBusDevice *pbdev)
++static struct vfio_device_info *get_device_info(S390PCIBusDevice *pbdev,
++                                                uint32_t argsz)
+ {
+-    g_autofree struct vfio_device_info *info = NULL;
++    struct vfio_device_info *info = g_malloc0(argsz);
+     VFIOPCIDevice *vfio_pci;
+-    uint32_t argsz;
+     int fd;
  
- #define full_GEN14_GA2 EmptyFeat
-@@ -650,6 +651,7 @@ static uint16_t default_GEN14_GA1[] = {
-     S390_FEAT_GROUP_MSA_EXT_8,
-     S390_FEAT_MULTIPLE_EPOCH,
-     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
-+    S390_FEAT_ZPCI_INTERP,
- };
+-    argsz = sizeof(*info);
+-    info = g_malloc0(argsz);
+-
+     vfio_pci = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
+     fd = vfio_pci->vbasedev.fd;
  
- #define default_GEN14_GA2 EmptyFeat
-diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-index 53098bf541..314b0a9039 100644
---- a/target/s390x/kvm/kvm.c
-+++ b/target/s390x/kvm/kvm.c
-@@ -2293,6 +2293,7 @@ static int kvm_to_feat[][2] = {
-     { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
-     { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
-     { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
-+    { KVM_S390_VM_CPU_FEAT_ZPCI_INTERP, S390_FEAT_ZPCI_INTERP },
- };
+@@ -250,7 +259,8 @@ retry:
  
- static int query_cpu_feat(S390FeatBitmap features)
+     if (ioctl(fd, VFIO_DEVICE_GET_INFO, info)) {
+         trace_s390_pci_clp_dev_info(vfio_pci->vbasedev.name);
+-        return;
++        free(info);
++        return NULL;
+     }
+ 
+     if (info->argsz > argsz) {
+@@ -259,6 +269,47 @@ retry:
+         goto retry;
+     }
+ 
++    return info;
++}
++
++/*
++ * Get the host function handle from the vfio CLP capabilities chain.  Returns
++ * true if a fh value was placed into the provided buffer.  Returns false
++ * if a fh could not be obtained (ioctl failed or capabilitiy version does
++ * not include the fh)
++ */
++bool s390_pci_get_host_fh(S390PCIBusDevice *pbdev, uint32_t *fh)
++{
++    g_autofree struct vfio_device_info *info = NULL;
++
++    assert(fh);
++
++    info = get_device_info(pbdev, sizeof(*info));
++    if (!info) {
++        return false;
++    }
++
++    return get_host_fh(pbdev, info, fh);
++}
++
++/*
++ * This function will issue the VFIO_DEVICE_GET_INFO ioctl and look for
++ * capabilities that contain information about CLP features provided by the
++ * underlying host.
++ * On entry, defaults have already been placed into the guest CLP response
++ * buffers.  On exit, defaults will have been overwritten for any CLP features
++ * found in the capability chain; defaults will remain for any CLP features not
++ * found in the chain.
++ */
++void s390_pci_get_clp_info(S390PCIBusDevice *pbdev)
++{
++    g_autofree struct vfio_device_info *info = NULL;
++
++    info = get_device_info(pbdev, sizeof(*info));
++    if (!info) {
++        return;
++    }
++
+     /*
+      * Find the CLP features provided and fill in the guest CLP responses.
+      * Always call s390_pci_read_base first as information from this could
+diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
+index ff708aef50..ae1b126ff7 100644
+--- a/include/hw/s390x/s390-pci-vfio.h
++++ b/include/hw/s390x/s390-pci-vfio.h
+@@ -20,6 +20,7 @@ bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
+ S390PCIDMACount *s390_pci_start_dma_count(S390pciState *s,
+                                           S390PCIBusDevice *pbdev);
+ void s390_pci_end_dma_count(S390pciState *s, S390PCIDMACount *cnt);
++bool s390_pci_get_host_fh(S390PCIBusDevice *pbdev, uint32_t *fh);
+ void s390_pci_get_clp_info(S390PCIBusDevice *pbdev);
+ #else
+ static inline bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
+@@ -33,6 +34,10 @@ static inline S390PCIDMACount *s390_pci_start_dma_count(S390pciState *s,
+ }
+ static inline void s390_pci_end_dma_count(S390pciState *s,
+                                           S390PCIDMACount *cnt) { }
++static inline bool s390_pci_get_host_fh(S390PCIBusDevice *pbdev, uint32_t *fh)
++{
++    return false;
++}
+ static inline void s390_pci_get_clp_info(S390PCIBusDevice *pbdev) { }
+ #endif
+ 
 -- 
 2.27.0
 
