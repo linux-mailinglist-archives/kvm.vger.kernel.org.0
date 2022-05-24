@@ -2,137 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AD165328E7
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 13:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3043C5328F3
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 13:27:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236604AbiEXLZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 07:25:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41628 "EHLO
+        id S236625AbiEXL1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 07:27:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232406AbiEXLZh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 07:25:37 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77DF17A45D
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:25:36 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id t6so25263980wra.4
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:25:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IrQKUMgGfJCg4Qp/wyG56UieXV8r90cWTrXiOz7LDck=;
-        b=Gy4q7CN99HFyXAicqG9X11IlQ+svRqwnN8b26/bIiFUYInmpSeZdUBS3liSbUIVsla
-         wWqnBTLpRQPJXp79wdo0TnrKGBjeXoH4SAS6hOlROajnfLUnMxqS9d1aBvJMrZpmBlmU
-         3w5uSFppAXGa1yK8Vd3H9oCbvZcA3UMQD1EBvSxo0HYq1UPQ92+AbDrlGLPE8klvrRTs
-         D0PRsfDlXTkRrjxnorF72umS/EPsYzL5y1oK0SJLDG+nwR3peuR7Rzkpfm12leFAYxpX
-         clNf3Yy0i28wX0quPqA3glr021cdnZGGrEnVORu8zgPSuMm/hbUSHkuiQJqq1MJNgfSh
-         1N/A==
+        with ESMTP id S232245AbiEXL1d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 07:27:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DDCB47B9D6
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:27:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653391650;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bhG5Ck13GAPrVJ8vbRNY/0IdFeWvv/sdaevWgalHSV0=;
+        b=FFYo3Iqv49VZjV4SKF8/4o9ukAOAIVWuvtRHPrRXoWbT9Z6pyqxwTsAnb1X/trcEYlKEBg
+        +gulMabIYtmN+Ngos30m6xUjFqGU10lNeWkxTfWQ2TklZaL8zQRH89O81BiXJzK71HUSjZ
+        avhCGYah/PgMzFi5qY1JDNvuPv7e3uY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-600-VAbKCdsdNXWUeOr04N6UrA-1; Tue, 24 May 2022 07:27:29 -0400
+X-MC-Unique: VAbKCdsdNXWUeOr04N6UrA-1
+Received: by mail-wm1-f70.google.com with SMTP id m9-20020a05600c4f4900b0039746692dc2so2925384wmq.6
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 04:27:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IrQKUMgGfJCg4Qp/wyG56UieXV8r90cWTrXiOz7LDck=;
-        b=Jk73VXo4NlF1Wf6mZIdZAKJT3sG5pNTuxuE7AHvVh+4+UWb/wAh371/XCx738C8Mxg
-         pgNuxwaFDLH/lzqeJ6XXkybf7fJQMY1Vux8IcpvLHNLiyN5HFST/z2euRLhn+bEWP4z0
-         ezq9cadPjguySxuD0rBZqPuYM4tD04gPMCt1eIsFoHZL7xxW/TXxUempej+CDegTQNeR
-         3kdDBO78CwD+/Ftc/GuSeYmV/zsVnKS6zkYq/xn7FQe4d4NC9CrpI6SovJieusExGe6s
-         5/E6gg6Jqd3Sr3lxQph8RBFK2D1nLhWJ8JW3PZB2Nc/LsvJM4muGGww604kBayxmVzSX
-         m/ng==
-X-Gm-Message-State: AOAM531hekP6+9UO458C3gtRzZu7+npFRcr7/IbCMQwp9Nvi6Z+aNNJk
-        odCfIU5P/3JkNdHM/8Q7ce8VqG1nF2qGM0k0y6HpNA==
-X-Google-Smtp-Source: ABdhPJxSztbMN+n2TmP0z6nr9DurWwl3+BCxash8ct2jbn4OvYv+CLh96rMCl3y/TYL6GZCHByl5uXayneQiJM2qHqo=
-X-Received: by 2002:a05:6000:1f18:b0:20f:e61b:520e with SMTP id
- bv24-20020a0560001f1800b0020fe61b520emr6372906wrb.214.1653391534839; Tue, 24
- May 2022 04:25:34 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=bhG5Ck13GAPrVJ8vbRNY/0IdFeWvv/sdaevWgalHSV0=;
+        b=xlOJHigaHnJSOwC9u0QePEulcs880XALxgKNtRfMXBczPfp5cmRyr9TTXJjrZVYIKO
+         Pnq4GhqQPD7zpJIGyqm8r23okrDTBmEFb3g0IQs8QTQsbipKgEEPJgTwlloyMJLo4h1+
+         XEqtx/ibtymMv3kfkRTn/cyXOXzA4DYEwrHxHU7CcXFaQcLI5naJfe530xEIASIooNeR
+         N9NTdIccFoQtabGGZYaPg/GYum9fSuHF3xeOQReOFSgm43F7zg1eyuHNTARfIm6bpvIJ
+         oKNM4rUY8Sf3APW12J3kFIQfNm5cI4JaGXSOY5AdeM7X125CG4gllf/xW+ZFl7PtcVN5
+         xDNA==
+X-Gm-Message-State: AOAM530oqfhY6F6vC7TBj+8TR4fUgd+mkpQFoJndbV6yCTMgrhTBVaA0
+        Acy+ETvWI0vdiBTWZ3FQ5unBlufTtSPvDY7HnqSpgoCoXk0c0MG04aVJJY4nmmoEbTuH3A/YVzq
+        yXs+bfIbW24Me
+X-Received: by 2002:a05:6000:1f0a:b0:20e:674a:ce2 with SMTP id bv10-20020a0560001f0a00b0020e674a0ce2mr22220262wrb.450.1653391648524;
+        Tue, 24 May 2022 04:27:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJypT0T4ipNG9nB+q5Xa3blcQoYRizXV4S+8aqy+n5YSEXzafFH9TBbGRIax40l9njwM0/vvXw==
+X-Received: by 2002:a05:6000:1f0a:b0:20e:674a:ce2 with SMTP id bv10-20020a0560001f0a00b0020e674a0ce2mr22220225wrb.450.1653391648250;
+        Tue, 24 May 2022 04:27:28 -0700 (PDT)
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id n1-20020a7bc5c1000000b003976525c38bsm95660wmk.3.2022.05.24.04.27.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 May 2022 04:27:27 -0700 (PDT)
+Message-ID: <87783273-6abd-f31e-f5f3-a5cf21b1594f@redhat.com>
+Date:   Tue, 24 May 2022 13:27:26 +0200
 MIME-Version: 1.0
-References: <20220426185245.281182-1-atishp@rivosinc.com> <20220426185245.281182-3-atishp@rivosinc.com>
-In-Reply-To: <20220426185245.281182-3-atishp@rivosinc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 24 May 2022 16:55:23 +0530
-Message-ID: <CAAhSdy1utVaeMBUYKRQeEPtXxD5gXAs3WCacoXYm9fmHx5yyVA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] RISC-V: Enable sstc extension parsing from DT
-To:     Atish Patra <atishp@rivosinc.com>
-Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        DTML <devicetree@vger.kernel.org>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Rob Herring <robh+dt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v7 10/13] s390x: kvm: topology: interception of PTF
+ instruction
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com
+References: <20220420115745.13696-1-pmorel@linux.ibm.com>
+ <20220420115745.13696-11-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220420115745.13696-11-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 12:23 AM Atish Patra <atishp@rivosinc.com> wrote:
->
-> The ISA extension framework now allows parsing any multi-letter
-> ISA extension.
->
-> Enable that for sstc extension.
->
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-
-Looks good to me.
-
-Reviewed-by: Anup Patel <anup@brainfault.org>
-
-Regards,
-Anup
-
+On 20/04/2022 13.57, Pierre Morel wrote:
+> When the host supports the CPU topology facility, the PTF
+> instruction with function code 2 is interpreted by the SIE,
+> provided that the userland hypervizor activates the interpretation
+> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
+> 
+> The PTF instructions with function code 0 and 1 are intercepted
+> and must be emulated by the userland hypervizor.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  arch/riscv/include/asm/hwcap.h | 1 +
->  arch/riscv/kernel/cpu.c        | 1 +
->  arch/riscv/kernel/cpufeature.c | 1 +
->  3 files changed, 3 insertions(+)
->
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index 0734e42f74f2..25915eb60d61 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -52,6 +52,7 @@ extern unsigned long elf_hwcap;
->   */
->  enum riscv_isa_ext_id {
->         RISCV_ISA_EXT_SSCOFPMF = RISCV_ISA_EXT_BASE,
-> +       RISCV_ISA_EXT_SSTC,
->         RISCV_ISA_EXT_ID_MAX = RISCV_ISA_EXT_MAX,
->  };
->
-> diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
-> index ccb617791e56..ca0e4c0db17e 100644
-> --- a/arch/riscv/kernel/cpu.c
-> +++ b/arch/riscv/kernel/cpu.c
-> @@ -88,6 +88,7 @@ int riscv_of_parent_hartid(struct device_node *node)
->   */
->  static struct riscv_isa_ext_data isa_ext_arr[] = {
->         __RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
-> +       __RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
->         __RISCV_ISA_EXT_DATA("", RISCV_ISA_EXT_MAX),
->  };
->
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> index 1b2d42d7f589..a214537c22f1 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -192,6 +192,7 @@ void __init riscv_fill_hwcap(void)
->                                 set_bit(*ext - 'a', this_isa);
->                         } else {
->                                 SET_ISA_EXT_MAP("sscofpmf", RISCV_ISA_EXT_SSCOFPMF);
-> +                               SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_SSTC);
->                         }
->  #undef SET_ISA_EXT_MAP
->                 }
-> --
-> 2.25.1
->
+>   hw/s390x/s390-virtio-ccw.c         | 50 ++++++++++++++++++++++++++++++
+>   include/hw/s390x/s390-virtio-ccw.h |  6 ++++
+>   target/s390x/kvm/kvm.c             | 14 +++++++++
+>   3 files changed, 70 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 93d1a43583..1ffaddebcc 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+
+Why do you put this into s390-virtio-ccw.c and not into cpu_topology.c ?
+
+> @@ -434,6 +434,56 @@ static void s390_pv_prepare_reset(S390CcwMachineState *ms)
+>       s390_pv_prep_reset();
+>   }
+>   
+> +/*
+> + * s390_handle_ptf:
+> + *
+> + * @register 1: contains the function code
+> + *
+> + * Function codes 0 and 1 handle the CPU polarization.
+> + * We assume an horizontal topology, the only one supported currently
+> + * by Linux, consequently we answer to function code 0, requesting
+> + * horizontal polarization that it is already the current polarization
+> + * and reject vertical polarization request without further explanation.
+> + *
+> + * Function code 2 is handling topology changes and is interpreted
+> + * by the SIE.
+> + */
+> +int s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
+> +{
+> +    CPUS390XState *env = &cpu->env;
+> +    uint64_t reg = env->regs[r1];
+> +    uint8_t fc = reg & S390_TOPO_FC_MASK;
+> +
+> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
+> +        s390_program_interrupt(env, PGM_OPERATION, ra);
+> +        return 0;
+> +    }
+> +
+> +    if (env->psw.mask & PSW_MASK_PSTATE) {
+> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
+> +        return 0;
+> +    }
+> +
+> +    if (reg & ~S390_TOPO_FC_MASK) {
+> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+> +        return 0;
+> +    }
+> +
+> +    switch (fc) {
+> +    case 0:    /* Horizontal polarization is already set */
+> +        env->regs[r1] |= S390_PTF_REASON_DONE;
+> +        return 2;
+> +    case 1:    /* Vertical polarization is not supported */
+> +        env->regs[r1] |= S390_PTF_REASON_NONE;
+> +        return 2;
+> +    default:
+> +        /* Note that fc == 2 is interpreted by the SIE */
+> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>   static void s390_machine_reset(MachineState *machine)
+>   {
+>       S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
+> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+> index 3331990e02..ac4b4a92e7 100644
+> --- a/include/hw/s390x/s390-virtio-ccw.h
+> +++ b/include/hw/s390x/s390-virtio-ccw.h
+> @@ -30,6 +30,12 @@ struct S390CcwMachineState {
+>       uint8_t loadparm[8];
+>   };
+>   
+> +#define S390_PTF_REASON_NONE (0x00 << 8)
+> +#define S390_PTF_REASON_DONE (0x01 << 8)
+> +#define S390_PTF_REASON_BUSY (0x02 << 8)
+> +#define S390_TOPO_FC_MASK 0xffUL
+> +int s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra);
+> +
+>   struct S390CcwMachineClass {
+>       /*< private >*/
+>       MachineClass parent_class;
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index 27b3fbfa09..e3792e52c2 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -98,6 +98,7 @@
+>   
+>   #define PRIV_B9_EQBS                    0x9c
+>   #define PRIV_B9_CLP                     0xa0
+> +#define PRIV_B9_PTF                     0xa2
+>   #define PRIV_B9_PCISTG                  0xd0
+>   #define PRIV_B9_PCILG                   0xd2
+>   #define PRIV_B9_RPCIT                   0xd3
+> @@ -1453,6 +1454,16 @@ static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
+>       }
+>   }
+>   
+> +static int kvm_handle_ptf(S390CPU *cpu, struct kvm_run *run)
+> +{
+> +    uint8_t r1 = (run->s390_sieic.ipb >> 20) & 0x0f;
+> +    int ret;
+> +
+> +    ret = s390_handle_ptf(cpu, r1, RA_IGNORED);
+> +    setcc(cpu, ret);
+
+So you're still setting the CC in case the s390_handle_ptf() function 
+injected a program interrupt? ... feels wrong. Maybe the CC should be set 
+within s390_handle_ptf() instead?
+
+  Thomas
+
+
+> +    return 0;
+> +}
+> +
+>   static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+>   {
+>       int r = 0;
+> @@ -1470,6 +1481,9 @@ static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+>       case PRIV_B9_RPCIT:
+>           r = kvm_rpcit_service_call(cpu, run);
+>           break;
+> +    case PRIV_B9_PTF:
+> +        r = kvm_handle_ptf(cpu, run);
+> +        break;
+>       case PRIV_B9_EQBS:
+>           /* just inject exception */
+>           r = -1;
+
