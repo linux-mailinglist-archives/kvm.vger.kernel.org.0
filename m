@@ -2,71 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20F0C532439
-	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:38:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D10F853243C
+	for <lists+kvm@lfdr.de>; Tue, 24 May 2022 09:39:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233019AbiEXHh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 03:37:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33410 "EHLO
+        id S235136AbiEXHiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 03:38:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbiEXHhi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 03:37:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8720673548
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:37:37 -0700 (PDT)
+        with ESMTP id S235358AbiEXHiv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 03:38:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D1166FD26
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:38:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653377856;
+        s=mimecast20190719; t=1653377929;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QSn0eq4Bvs2xTbrxH6SjZqtwFwJqFEDca7NJAzrGl1g=;
-        b=iG2CyS0CIwWxWhils1i0F3bLkRBCz3Qr0LNc0Gj6bklMDmb1bmXdR5qppoTeyP/Jm+LPpB
-        cK5dZPyRY/3Q2ZuCq1XBY+cEba0TUiquiZc922VkT4qZ54iuWbmYuNzgD5/vpTE99mZA77
-        9rA8S8/ESwNpmEGv1uucXnXPdT6MmNk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QCtPBPIHWWlpZdcdcmo4GB76JsscfPLgLkNx5XoQuuw=;
+        b=LpR3KfBcpB9NJabgjZZXd8DUz96jzZ0RicvlbBRqT28k885Ld/vJw5DS96MqYhQISV/yyR
+        dLqlXMU+WS5a2I3qK2p5OJpMqkjU21WN+egaXf6Y9t+6UyQcNgBzukmDlL7Mkvc/yWRehk
+        M9vpN3BekYV28rhyUm9ddF0MGNnD6Bo=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-515-09kSuQVyOh-UYVNkFCeBAQ-1; Tue, 24 May 2022 03:37:33 -0400
-X-MC-Unique: 09kSuQVyOh-UYVNkFCeBAQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDA04801E80;
-        Tue, 24 May 2022 07:37:32 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 976A91410DD5;
-        Tue, 24 May 2022 07:37:31 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id E8EEA1800393; Tue, 24 May 2022 09:37:29 +0200 (CEST)
-Date:   Tue, 24 May 2022 09:37:29 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 22/36] i386/tdx: Track RAM entries for TDX VM
-Message-ID: <20220524073729.xkk6s4tjkzm77wwz@sirius.home.kraxel.org>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-23-xiaoyao.li@intel.com>
+ us-mta-28-d2wYIQCLNRO3BbwRInc7iA-1; Tue, 24 May 2022 03:38:45 -0400
+X-MC-Unique: d2wYIQCLNRO3BbwRInc7iA-1
+Received: by mail-qt1-f199.google.com with SMTP id q13-20020a05622a04cd00b002f3c0e197afso13382465qtx.0
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 00:38:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=QCtPBPIHWWlpZdcdcmo4GB76JsscfPLgLkNx5XoQuuw=;
+        b=RZMkfEkcqABOYAD+4OejNqP7kcNM/+nCBYMOdaVM11yUFSswrjKd9Kvj7j8UrwkkSk
+         mxKTcL22Xe9VAExieW2ZOISkQJAl8wa7aZZ0U68jwLkdQdTgEH4Lbgl94w89wsJk7XPQ
+         EAUtS85EB3eN/ffWfQyLOVTNOnpPT+yxu/0SoEsp/FrjtO6YePnZwbrExCRIRTny5n3Y
+         TyDp2xC36MSKn2qvVCNi9F8nRIUU/7jpOWPa8N9RHA+1UI/zVFogHUMhCBsZOTAOtaQX
+         ysWGsQLUwfwgeSFmttx62dRvpkusCcMZoI6UeTiQkxKYMT2iaI/tniKPt7DPTVoPMXKP
+         kE9Q==
+X-Gm-Message-State: AOAM532uKa+PA00de+m4kk9bfTgwZlfF852eU4SfQarT3ZozMheZqRbF
+        /+t5mNJLVimrsOZ2E9sn2o8ho1CP5o2/AgqYOHQ2HBVWK7xIHJOTbtRX+bsw5vhvJG+oAK0g687
+        q5PQxyse2nNcG4sbuiLHl3QJws+sl
+X-Received: by 2002:a37:9e0f:0:b0:6a3:4918:d394 with SMTP id h15-20020a379e0f000000b006a34918d394mr12573668qke.764.1653377925444;
+        Tue, 24 May 2022 00:38:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyvLEC8WBeNxcj+5w81KoZxubVUBIj37yxEkBbiqOwDtiJ3FFUSRbB81+1KXQwyuvsiABHVbamICnl8FbeYvDM=
+X-Received: by 2002:a37:9e0f:0:b0:6a3:4918:d394 with SMTP id
+ h15-20020a379e0f000000b006a34918d394mr12573649qke.764.1653377925205; Tue, 24
+ May 2022 00:38:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220512031803.3315890-23-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+References: <20220520172325.980884-1-eperezma@redhat.com> <20220520172325.980884-2-eperezma@redhat.com>
+ <79089dc4-07c4-369b-826c-1c6e12edcaff@oracle.com> <CAJaqyWd3BqZfmJv+eBYOGRwNz3OhNKjvHPiFOafSjzAnRMA_tQ@mail.gmail.com>
+ <4de97962-cf7e-c334-5874-ba739270c705@oracle.com> <9f68802c-2692-7321-f916-670ee0abfc40@oracle.com>
+In-Reply-To: <9f68802c-2692-7321-f916-670ee0abfc40@oracle.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Tue, 24 May 2022 09:38:09 +0200
+Message-ID: <CAJaqyWfoBXfr1Njb4=ZyrKtR1PAzUS+kzs55CzHff9C1jGDk2w@mail.gmail.com>
+Subject: Re: [PATCH 1/4] vdpa: Add stop operation
+To:     Si-Wei Liu <si-wei.liu@oracle.com>
+Cc:     virtualization <virtualization@lists.linux-foundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Longpeng <longpeng2@huawei.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>, dinang@xilinx.com,
+        Eli Cohen <elic@nvidia.com>,
+        Laurent Vivier <lvivier@redhat.com>, pabloc@xilinx.com,
+        "Dawar, Gautam" <gautam.dawar@amd.com>,
+        Xie Yongji <xieyongji@bytedance.com>, habetsm.xilinx@gmail.com,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        tanuj.kamde@amd.com, Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        martinpo@xilinx.com, Cindy Lu <lulu@redhat.com>,
+        ecree.xilinx@gmail.com, Parav Pandit <parav@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,56 +93,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +static int tdx_accept_ram_range(uint64_t address, uint64_t length)
-> +{
-> +    TdxRamEntry *e;
-> +    int i;
-> +
-> +    for (i = 0; i < tdx_guest->nr_ram_entries; i++) {
-> +        e = &tdx_guest->ram_entries[i];
-> +
-> +        if (address + length < e->address ||
-> +            e->address + e->length < address) {
-> +                continue;
-> +        }
-> +
-> +        if (e->address > address ||
-> +            e->address + e->length < address + length) {
-> +            return -EINVAL;
-> +        }
+On Tue, May 24, 2022 at 2:01 AM Si-Wei Liu <si-wei.liu@oracle.com> wrote:
+>
+>
+>
+> On 5/23/2022 4:54 PM, Si-Wei Liu wrote:
+> >
+> >
+> > On 5/23/2022 12:20 PM, Eugenio Perez Martin wrote:
+> >> On Sat, May 21, 2022 at 12:13 PM Si-Wei Liu <si-wei.liu@oracle.com>
+> >> wrote:
+> >>>
+> >>>
+> >>> On 5/20/2022 10:23 AM, Eugenio P=C3=A9rez wrote:
+> >>>> This operation is optional: It it's not implemented, backend
+> >>>> feature bit
+> >>>> will not be exposed.
+> >>>>
+> >>>> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> >>>> ---
+> >>>>    include/linux/vdpa.h | 6 ++++++
+> >>>>    1 file changed, 6 insertions(+)
+> >>>>
+> >>>> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> >>>> index 15af802d41c4..ddfebc4e1e01 100644
+> >>>> --- a/include/linux/vdpa.h
+> >>>> +++ b/include/linux/vdpa.h
+> >>>> @@ -215,6 +215,11 @@ struct vdpa_map_file {
+> >>>>     * @reset:                  Reset device
+> >>>>     *                          @vdev: vdpa device
+> >>>>     *                          Returns integer: success (0) or
+> >>>> error (< 0)
+> >>>> + * @stop:                    Stop or resume the device (optional,
+> >>>> but it must
+> >>>> + *                           be implemented if require device stop)
+> >>>> + *                           @vdev: vdpa device
+> >>>> + *                           @stop: stop (true), not stop (false)
+> >>>> + *                           Returns integer: success (0) or error
+> >>>> (< 0)
+> >>> Is this uAPI meant to address all use cases described in the full blo=
+wn
+> >>> _F_STOP virtio spec proposal, such as:
+> >>>
+> >>> --------------%<--------------
+> >>>
+> >>> ...... the device MUST finish any in flight
+> >>> operations after the driver writes STOP.  Depending on the device, it
+> >>> can do it
+> >>> in many ways as long as the driver can recover its normal operation
+> >>> if it
+> >>> resumes the device without the need of resetting it:
+> >>>
+> >>> - Drain and wait for the completion of all pending requests until a
+> >>>     convenient avail descriptor. Ignore any other posterior descripto=
+r.
+> >>> - Return a device-specific failure for these descriptors, so the driv=
+er
+> >>>     can choose to retry or to cancel them.
+> >>> - Mark them as done even if they are not, if the kind of device can
+> >>>     assume to lose them.
+> >>> --------------%<--------------
+> >>>
+> >> Right, this is totally underspecified in this series.
+> >>
+> >> I'll expand on it in the next version, but that text proposed to
+> >> virtio-comment was complicated and misleading. I find better to get
+> >> the previous version description. Would the next description work?
+> >>
+> >> ```
+> >> After the return of ioctl, the device MUST finish any pending
+> >> operations like
+> >> in flight requests. It must also preserve all the necessary state (the
+> >> virtqueue vring base plus the possible device specific states)
+> > Hmmm, "possible device specific states" is a bit vague. Does it
+> > require the device to save any device internal state that is not
+> > defined in the virtio spec - such as any failed in-flight requests to
+> > resubmit upon resume?
 
-if (e->type == TDX_RAM_ADDED)
-	return -EINVAL
+I'd let that be device-specific. For example, the net simulator
+doesn't need to store them, since it cannot stop while processing
+buffers. Other net devices can also decide to simply drop or re-submit
+tx frames.
 
-> +        if (e->address == address && e->length == length) {
-> +            e->type = TDX_RAM_ADDED;
-> +        } else if (e->address == address) {
-> +            e->address += length;
-> +            e->length -= length;
-> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
-> +        } else if (e->address + e->length == address + length) {
-> +            e->length -= length;
-> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
-> +        } else {
-> +            TdxRamEntry tmp = {
-> +                .address = e->address,
-> +                .length = e->length,
-> +            };
-> +            e->length = address - tmp.address;
-> +
-> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
-> +            tdx_add_ram_entry(address + length,
-> +                              tmp.address + tmp.length - (address + length),
-> +                              TDX_RAM_UNACCEPTED);
-> +        }
+I can check for the block simulator if that's possible too. For
+hardware vdpa block devices, this should be combined with the future
+"get inflight buffers" call for sure.
 
-I think all this can be simplified, by
-  (1) Change the existing entry to cover the accepted ram range.
-  (2) If there is room before the accepted ram range add a
-      TDX_RAM_UNACCEPTED entry for that.
-  (3) If there is room after the accepted ram range add a
-      TDX_RAM_UNACCEPTED entry for that.
+> > Or you would lean on SVQ to intercept it in
+> > depth and save it with some other means? I think network device also
+> > has internal state such as flow steering state that needs bookkeeping
+> > as well.
 
-take care,
-  Gerd
+Yes, for state set by the control vq a permanent SVQ is used only for
+the cvq. For other things like config space vdpa already presents an
+emulated one to the guest, so we're safe in that regard.
+
+> Noted that I understand you may introduce additional feature call
+> similar to VHOST_USER_GET_INFLIGHT_FD for (failed) in-flight request,
+> but since that's is a get interface, I assume the actual state
+> preserving should still take place in this STOP call.
+>
+
+Right. I'll add all of this to the proposal.
+
+Thanks!
+
+> -Siwei
+>
+> >
+> > A follow-up question is what is the use of the `stop` argument of
+> > false, does it require the device to support resume? I seem to recall
+> > this is something to abandon in favor of device reset plus setting
+> > queue base/addr after. Or it's just a optional feature that may be
+> > device specific (if one can do so in simple way).
+> >
+> > -Siwei
+> >
+> >>   that is required
+> >> for restoring in the future.
+> >>
+> >> In the future, we will provide features similar to
+> >> VHOST_USER_GET_INFLIGHT_FD
+> >> so the device can save pending operations.
+> >> ```
+> >>
+> >> Thanks for pointing it out!
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>> E.g. do I assume correctly all in flight requests are flushed after
+> >>> return from this uAPI call? Or some of pending requests may be subjec=
+t
+> >>> to loss or failure? How does the caller/user specify these various
+> >>> options (if there are) for device stop?
+> >>>
+> >>> BTW, it would be nice to add the corresponding support to vdpa_sim_bl=
+k
+> >>> as well to demo the stop handling. To just show it on vdpa-sim-net IM=
+HO
+> >>> is perhaps not so convincing.
+> >>>
+> >>> -Siwei
+> >>>
+> >>>>     * @get_config_size: Get the size of the configuration space
+> >>>> includes
+> >>>>     *                          fields that are conditional on
+> >>>> feature bits.
+> >>>>     *                          @vdev: vdpa device
+> >>>> @@ -316,6 +321,7 @@ struct vdpa_config_ops {
+> >>>>        u8 (*get_status)(struct vdpa_device *vdev);
+> >>>>        void (*set_status)(struct vdpa_device *vdev, u8 status);
+> >>>>        int (*reset)(struct vdpa_device *vdev);
+> >>>> +     int (*stop)(struct vdpa_device *vdev, bool stop);
+> >>>>        size_t (*get_config_size)(struct vdpa_device *vdev);
+> >>>>        void (*get_config)(struct vdpa_device *vdev, unsigned int
+> >>>> offset,
+> >>>>                           void *buf, unsigned int len);
+> >
+>
 
