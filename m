@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D4ED533576
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 04:51:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A32E533585
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 04:54:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243688AbiEYCvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 22:51:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41628 "EHLO
+        id S243740AbiEYCyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 22:54:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241178AbiEYCvV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 22:51:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3753965AD
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 19:51:19 -0700 (PDT)
+        with ESMTP id S242338AbiEYCyg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 22:54:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A61537090F
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 19:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653447078;
+        s=mimecast20190719; t=1653447273;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2Tsl43vKOyakBAOjeNueNb9Uu0rxAb3Y9S+ROwk9uac=;
-        b=PxrpwnNMmca9THgj1LIGlBbMa9/SylzGtfPVuxlmItqJIDDGgl3Yy7u/BRdCHFVKKLidyj
-        osDzLMBVSyid6HfvIJxKibi2jbBgjcWdOn+I36NoU+/98VrCRz3PHs9DhhkxmdlmhpY4wr
-        0wSo8sjhZkIf54XXatQhSDupxxMUeis=
+        bh=L6n7+yQgn+nVFUYyJzAWXpzjroQrckSxh/1Ms4Uuyq4=;
+        b=QogKXykY8GRczE+uIg9F2Dpya0T9W5csFPscnI+jfJfxi9Mpht4VM1lGesHeD9SItio9jh
+        YJjUZ9A4fxt5aLwyaI85ddIpb7SEM8vXKxDOO7TKKTOIppNnoRdEQ1Ll0Bycj/nPcSqB3y
+        7pA2+gVnV33hG2+IC642QdHU1eRPLBo=
 Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
  [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-Xb08w3BWM7yPPpuH3C9U1A-1; Tue, 24 May 2022 22:51:16 -0400
-X-MC-Unique: Xb08w3BWM7yPPpuH3C9U1A-1
-Received: by mail-lf1-f72.google.com with SMTP id n3-20020ac242c3000000b00473d8af3a0cso10027269lfl.21
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 19:51:16 -0700 (PDT)
+ us-mta-212-cI7k_Kg1Nk6gWU1faSvu4w-1; Tue, 24 May 2022 22:54:32 -0400
+X-MC-Unique: cI7k_Kg1Nk6gWU1faSvu4w-1
+Received: by mail-lf1-f72.google.com with SMTP id bi27-20020a0565120e9b00b004786caccc7dso3940926lfb.11
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 19:54:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2Tsl43vKOyakBAOjeNueNb9Uu0rxAb3Y9S+ROwk9uac=;
-        b=BubtT+IznsnXseDtIg8vDLdzcaHwvRxbs9u2CUReeY3xE3HVNdTdOA8AZlgpAieHFz
-         TYs7QXLSe15Ni+66COPoFlf4EEw7m6MD7r0sGol4tfGlUIJeJPbS0/UTdJpEcqHyFPRY
-         TWOD49O/bSFwbMBArQ+iP3bCxrArcPkrr9bsDXwikFg8rpnlQUa/1/MY4lNLm2wnALEB
-         0GfhuT2quAjyjE2/EqhVAYZpW/kfQol2X4Yxlh1BZlfmm0HlSnEbfOIhfHIhy6Mbpitq
-         NTXVrAZ+HdFQ2JraaYi5k0AkSBV4oD3vIFAiLUhCKQUlaL4mYlidsJrT3psoUCIXbCjf
-         e5/Q==
-X-Gm-Message-State: AOAM532h7dEHixYdxNLKBpStVEO75suah76FJDWg8BRsAKlqzvHvgdA4
-        8tipuxMc1bSiGwA318gWMiwpZ9uwj5CtESu+fjiGOKzvqPCqABV5+CBCGkLkUg3csNskd/gQwl/
-        BWTvr9bWpWW2kr4B3ICxVbc3hDmZb
-X-Received: by 2002:a05:6512:1588:b0:477:a556:4ab2 with SMTP id bp8-20020a056512158800b00477a5564ab2mr21566053lfb.376.1653447075321;
-        Tue, 24 May 2022 19:51:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxtJSo05GNByny047zFBzRM80HBxjhYV4+wk4PnaZNHQVflRy1NntKSrmKYUijvKrR3IvcwS4VX7V20tGdl8fc=
-X-Received: by 2002:a05:6512:1588:b0:477:a556:4ab2 with SMTP id
- bp8-20020a056512158800b00477a5564ab2mr21566038lfb.376.1653447075136; Tue, 24
- May 2022 19:51:15 -0700 (PDT)
+        bh=L6n7+yQgn+nVFUYyJzAWXpzjroQrckSxh/1Ms4Uuyq4=;
+        b=VvmLYgYougkqfdP+pFn1ZlcXWzpLXnFsGPWwfP27nQstEuDwDJwKn7+AQMe19Cl6E1
+         Gdwp/f48VRaeIkze/IiNFY5z4iZ5mdeQxG6qYPODZpjjLE0a3nv3RzMlZU9IOQrklLpk
+         EpktU08O0SHe9ldefkUXMwR94NatTqJ/XdKGPJJdx49Z9vBljSCtqEb4tiXCyWODREmj
+         BoP2gQydAFMmYvOULNYAF+kHTu/Q5MR5pnVhhRoQl3YHy8pfDu8v0o0jNWZcDweCMJmM
+         78+/+u5FjJrEpygM1X1gjnidYBJxQY8fxLl1E38dsc4iM3AYRWZzZ67nHPs8exi+9+XS
+         5C4A==
+X-Gm-Message-State: AOAM531OocDsyVeATWLzS5zQ6MDLgkNpq7dJbNrZf4jKzi4M/WBzxqUr
+        5Hwgfy40wcNZ11t6qsVV8j+DafWhizvpexi1TJDd7Td8DYZxSUGZ4XMOWTqLpYdzwzISC3o8FNn
+        Cw295rkD6JXGSPzJ89BrOUgp1N4Qz
+X-Received: by 2002:a2e:1651:0:b0:253:d7ce:22df with SMTP id 17-20020a2e1651000000b00253d7ce22dfmr16348491ljw.315.1653447270767;
+        Tue, 24 May 2022 19:54:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwIeIyQFHdGFnE6GT5C+d47WqLD+jsGOmC4iPh7DCf0Fyx5p+BGfhhylBc3/GXzoRqdQbk+uILqUmEN70ocZiY=
+X-Received: by 2002:a2e:1651:0:b0:253:d7ce:22df with SMTP id
+ 17-20020a2e1651000000b00253d7ce22dfmr16348477ljw.315.1653447270564; Tue, 24
+ May 2022 19:54:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220524170610.2255608-1-eperezma@redhat.com> <20220524170610.2255608-4-eperezma@redhat.com>
-In-Reply-To: <20220524170610.2255608-4-eperezma@redhat.com>
+References: <20220524170610.2255608-1-eperezma@redhat.com> <20220524170610.2255608-5-eperezma@redhat.com>
+In-Reply-To: <20220524170610.2255608-5-eperezma@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 25 May 2022 10:51:04 +0800
-Message-ID: <CACGkMEsZSTgsgYkg5HhpJ62pKFTr6mtiNwYJa8E+r4RMTRuU8A@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] vhost-vdpa: uAPI to stop the device
+Date:   Wed, 25 May 2022 10:54:19 +0800
+Message-ID: <CACGkMEvCzxy+1BX2FMs5CvsvVvd9oedtgXmpiyAZWZECPypRig@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] vdpa_sim: Implement stop vdpa op
 To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
 Cc:     netdev <netdev@vger.kernel.org>,
         virtualization <virtualization@lists.linux-foundation.org>,
@@ -87,7 +87,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,71 +98,142 @@ X-Mailing-List: kvm@vger.kernel.org
 On Wed, May 25, 2022 at 1:06 AM Eugenio P=C3=A9rez <eperezma@redhat.com> wr=
 ote:
 >
-> The ioctl adds support for stop the device from userspace.
+> Implement stop operation for vdpa_sim devices, so vhost-vdpa will offer
+> that backend feature and userspace can effectively stop the device.
+>
+> This is a must before get virtqueue indexes (base) for live migration,
+> since the device could modify them after userland gets them. There are
+> individual ways to perform that action for some devices
+> (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
+> way to perform it for any vhost device (and, in particular, vhost-vdpa).
+>
+> After the return of ioctl with stop !=3D 0, the device MUST finish any
+> pending operations like in flight requests. It must also preserve all
+> the necessary state (the virtqueue vring base plus the possible device
+> specific states) that is required for restoring in the future. The
+> device must not change its configuration after that point.
+>
+> After the return of ioctl with stop =3D=3D 0, the device can continue
+> processing buffers as long as typical conditions are met (vq is enabled,
+> DRIVER_OK status bit is enabled, etc).
+>
+> In the future, we will provide features similar to
+> VHOST_USER_GET_INFLIGHT_FD so the device can save pending operations.
 >
 > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 > ---
->  drivers/vhost/vdpa.c       | 18 ++++++++++++++++++
->  include/uapi/linux/vhost.h |  3 +++
->  2 files changed, 21 insertions(+)
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 21 +++++++++++++++++++++
+>  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
+>  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++
+>  drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++
+>  4 files changed, 28 insertions(+)
 >
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 32713db5831d..a5d33bad92f9 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -478,6 +478,21 @@ static long vhost_vdpa_get_vqs_count(struct vhost_vd=
-pa *v, u32 __user *argp)
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdp=
+a_sim.c
+> index 50d721072beb..0515cf314bed 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -107,6 +107,7 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
+>         for (i =3D 0; i < vdpasim->dev_attr.nas; i++)
+>                 vhost_iotlb_reset(&vdpasim->iommu[i]);
+>
+> +       vdpasim->running =3D true;
+>         spin_unlock(&vdpasim->iommu_lock);
+>
+>         vdpasim->features =3D 0;
+> @@ -505,6 +506,24 @@ static int vdpasim_reset(struct vdpa_device *vdpa)
 >         return 0;
 >  }
 >
-> +static long vhost_vdpa_stop(struct vhost_vdpa *v, u32 __user *argp)
+> +static int vdpasim_stop(struct vdpa_device *vdpa, bool stop)
 > +{
-> +       struct vdpa_device *vdpa =3D v->vdpa;
-> +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> +       int stop;
+> +       struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
+> +       int i;
 > +
-> +       if (!ops->stop)
-> +               return -EOPNOTSUPP;
+> +       spin_lock(&vdpasim->lock);
+> +       vdpasim->running =3D !stop;
+> +       if (vdpasim->running) {
+> +               /* Check for missed buffers */
+> +               for (i =3D 0; i < vdpasim->dev_attr.nvqs; ++i)
+> +                       vdpasim_kick_vq(vdpa, i);
 > +
-> +       if (copy_from_user(&stop, argp, sizeof(stop)))
-> +               return -EFAULT;
+> +       }
+> +       spin_unlock(&vdpasim->lock);
 > +
-> +       return ops->stop(vdpa, stop);
+> +       return 0;
 > +}
 > +
->  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cm=
-d,
->                                    void __user *argp)
+>  static size_t vdpasim_get_config_size(struct vdpa_device *vdpa)
 >  {
-> @@ -650,6 +665,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *fi=
-lep,
->         case VHOST_VDPA_GET_VQS_COUNT:
->                 r =3D vhost_vdpa_get_vqs_count(v, argp);
->                 break;
-> +       case VHOST_STOP:
-> +               r =3D vhost_vdpa_stop(v, argp);
-> +               break;
->         default:
->                 r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
->                 if (r =3D=3D -ENOIOCTLCMD)
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index cab645d4a645..e7526968ab0c 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -171,4 +171,7 @@
->  #define VHOST_VDPA_SET_GROUP_ASID      _IOW(VHOST_VIRTIO, 0x7C, \
->                                              struct vhost_vring_state)
+>         struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
+> @@ -694,6 +713,7 @@ static const struct vdpa_config_ops vdpasim_config_op=
+s =3D {
+>         .get_status             =3D vdpasim_get_status,
+>         .set_status             =3D vdpasim_set_status,
+>         .reset                  =3D vdpasim_reset,
+> +       .stop                   =3D vdpasim_stop,
+>         .get_config_size        =3D vdpasim_get_config_size,
+>         .get_config             =3D vdpasim_get_config,
+>         .set_config             =3D vdpasim_set_config,
+> @@ -726,6 +746,7 @@ static const struct vdpa_config_ops vdpasim_batch_con=
+fig_ops =3D {
+>         .get_status             =3D vdpasim_get_status,
+>         .set_status             =3D vdpasim_set_status,
+>         .reset                  =3D vdpasim_reset,
+> +       .stop                   =3D vdpasim_stop,
+>         .get_config_size        =3D vdpasim_get_config_size,
+>         .get_config             =3D vdpasim_get_config,
+>         .set_config             =3D vdpasim_set_config,
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdp=
+a_sim.h
+> index 622782e92239..061986f30911 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> @@ -66,6 +66,7 @@ struct vdpasim {
+>         u32 generation;
+>         u64 features;
+>         u32 groups;
+> +       bool running;
+>         /* spinlock to synchronize iommu table */
+>         spinlock_t iommu_lock;
+>  };
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim=
+/vdpa_sim_blk.c
+> index 42d401d43911..bcdb1982c378 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> @@ -204,6 +204,9 @@ static void vdpasim_blk_work(struct work_struct *work=
+)
+>         if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
+>                 goto out;
 >
-> +/* Stop or resume a device so it does not process virtqueue requests any=
-more */
-> +#define VHOST_STOP                     _IOW(VHOST_VIRTIO, 0x7D, int)
+> +       if (!vdpasim->running)
+> +               goto out;
+> +
+>         for (i =3D 0; i < VDPASIM_BLK_VQ_NUM; i++) {
+>                 struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[i];
+>
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa_sim=
+/vdpa_sim_net.c
+> index 5125976a4df8..886449e88502 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+> @@ -154,6 +154,9 @@ static void vdpasim_net_work(struct work_struct *work=
+)
+>
+>         spin_lock(&vdpasim->lock);
+>
+> +       if (!vdpasim->running)
+> +               goto out;
 > +
 
-Unless we know it's a vhost general uAPI, let's use VHOST_VDPA_STOP here.
+Do we need to check vdpasim->running in vdpasim_kick_vq()?
 
 Thanks
 
->  #endif
+>         if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
+>                 goto out;
+>
 > --
 > 2.27.0
 >
