@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF3C4533642
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 06:47:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8DC2533649
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 06:57:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241873AbiEYErw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 00:47:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49772 "EHLO
+        id S242691AbiEYE5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 00:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbiEYErv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 00:47:51 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0F7771D81;
-        Tue, 24 May 2022 21:47:48 -0700 (PDT)
+        with ESMTP id S229653AbiEYE5m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 00:57:42 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ED9D6C540;
+        Tue, 24 May 2022 21:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653454068; x=1684990068;
+  t=1653454660; x=1684990660;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mQIssSDOaQfJIXR58jR52N3/AEio4webKzj6b0a2BUc=;
-  b=f/QLtz5KZoBMzJMFe+Nxy1j8syVhorF0fuAe0kGgIc2N/J2WVx8GGriY
-   uUy8hn4L+Xd34gg2nBmOtkdZkATV1lyN0XKe9FjhWoeJjnM8q3FYS3DY0
-   NX4ULDKqWCVUW3moxQhIKMmBS5hNN+yCXeVJEIjB8M8WXykgbxbxT79d7
-   l7hoazRJ+uGhaAAkJg2N06ssvwYcXlcADJAftZyqgwenpt6iwIQg96NtD
-   jgAp0r+yogo8A+lUYPzByVpMHOHcH+Djt/zvIIJOA1PioM7AvgIO/ukLG
-   Hx4q8AOFQgFj7zndpm+ZDsjL6hh3UHdIg7y+5QO0zmTdJfntSShUMKt7k
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10357"; a="336769404"
+  bh=EWA0K2J771t3RS3ay05cCgofn/C2Ovhrpn5ZmOcjugg=;
+  b=krT6Tg1lPm8cfRXWta19GPhxZbjWXes288zNFe6BK4Q0UP158ppRZDmE
+   SyF99NYE8O9JXfSqfwgdF9x5ciH0AW+2QPhnf+xS6R+L71cKkqdw/LZQt
+   PS8Rz/ZtusKOQ8oq6QSvfHx1H/RYjswrnmqFRWLb02EQNMklvU05fMBh9
+   8mXu4e+XX+6R3w8P+VmZcVzTKnon71c1V0OxSecfJ1k+m7ie98+8g4clV
+   WRupL2yGjX3ZVX5YFvx8hGr9PEmVGxoSzc7fEskTqxhPGwnPnZoDEd5QW
+   OBpPKwqS4L5Esc36eWjprJF3XD3Rb+lqf0rPLccOEY1+maZH5KcuYk6rG
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10357"; a="272535052"
 X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="336769404"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 21:47:48 -0700
+   d="scan'208";a="272535052"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 21:57:40 -0700
 X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="703747870"
+   d="scan'208";a="578186300"
 Received: from canagani-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.35.228])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 21:47:45 -0700
-Message-ID: <a6694c81b4e96a22557fd0af70a81bd2c2e4e3e7.camel@intel.com>
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 21:57:37 -0700
+Message-ID: <a47b12f762272540d7b8b691d863b60ddb0d246d.camel@intel.com>
 Subject: Re: [PATCH v3 09/21] x86/virt/tdx: Get information about TDX module
  and convertible memory
 From:   Kai Huang <kai.huang@intel.com>
@@ -49,8 +49,8 @@ Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
         isaku.yamahata@intel.com
-Date:   Wed, 25 May 2022 16:47:42 +1200
-In-Reply-To: <4aea41ea-211f-fbde-34e9-4c4467ebc848@intel.com>
+Date:   Wed, 25 May 2022 16:57:35 +1200
+In-Reply-To: <a6694c81b4e96a22557fd0af70a81bd2c2e4e3e7.camel@intel.com>
 References: <cover.1649219184.git.kai.huang@intel.com>
          <145620795852bf24ba2124a3f8234fd4aaac19d4.1649219184.git.kai.huang@intel.com>
          <f929fb7a-5bdc-2567-77aa-762a098c8513@intel.com>
@@ -58,6 +58,7 @@ References: <cover.1649219184.git.kai.huang@intel.com>
          <98f81eed-e532-75bc-d2d8-4e020517b634@intel.com>
          <be31134cf44a24d6d38fbf39e9e18ef223e216c6.camel@intel.com>
          <4aea41ea-211f-fbde-34e9-4c4467ebc848@intel.com>
+         <a6694c81b4e96a22557fd0af70a81bd2c2e4e3e7.camel@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
@@ -72,48 +73,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-04-29 at 10:47 -0700, Dave Hansen wrote:
-> On 4/28/22 16:14, Kai Huang wrote:
-> > On Thu, 2022-04-28 at 07:06 -0700, Dave Hansen wrote:
-> > > On 4/27/22 17:15, Kai Huang wrote:
-> > > > > Couldn't we get rid of that comment if you did something like:
+On Wed, 2022-05-25 at 16:47 +1200, Kai Huang wrote:
+> On Fri, 2022-04-29 at 10:47 -0700, Dave Hansen wrote:
+> > On 4/28/22 16:14, Kai Huang wrote:
+> > > On Thu, 2022-04-28 at 07:06 -0700, Dave Hansen wrote:
+> > > > On 4/27/22 17:15, Kai Huang wrote:
+> > > > > > Couldn't we get rid of that comment if you did something like:
+> > > > > > 
+> > > > > > 	ret = tdx_get_sysinfo(&tdx_cmr_array, &tdx_sysinfo);
 > > > > > 
-> > > > > 	ret = tdx_get_sysinfo(&tdx_cmr_array, &tdx_sysinfo);
+> > > > > Yes will do.
+> > > > > 
+> > > > > > and preferably make the variables function-local.
+> > > > > 
+> > > > > 'tdx_sysinfo' will be used by KVM too.
 > > > > 
-> > > > Yes will do.
+> > > > In other words, it's not a part of this series so I can't review whether
+> > > > this statement is correct or whether there's a better way to hand this
+> > > > information over to KVM.
 > > > > 
-> > > > > and preferably make the variables function-local.
-> > > > 
-> > > > 'tdx_sysinfo' will be used by KVM too.
+> > > > This (minor) nugget influencing the design also isn't even commented or
+> > > > addressed in the changelog.
 > > > 
-> > > In other words, it's not a part of this series so I can't review whether
-> > > this statement is correct or whether there's a better way to hand this
-> > > information over to KVM.
-> > > 
-> > > This (minor) nugget influencing the design also isn't even commented or
-> > > addressed in the changelog.
+> > > TDSYSINFO_STRUCT is 1024B and CMR array is 512B, so I don't think it should be
+> > > in the stack.  I can change to use dynamic allocation at the beginning and free
+> > > it at the end of the function.  KVM support patches can change it to static
+> > > variable in the file.
 > > 
-> > TDSYSINFO_STRUCT is 1024B and CMR array is 512B, so I don't think it should be
-> > in the stack.  I can change to use dynamic allocation at the beginning and free
-> > it at the end of the function.  KVM support patches can change it to static
-> > variable in the file.
+> > 2k of stack is big, but it isn't a deal breaker for something that's not
+> > nested anywhere and that's only called once in a pretty controlled
+> > setting and not in interrupt context.  I wouldn't cry about it.
 > 
-> 2k of stack is big, but it isn't a deal breaker for something that's not
-> nested anywhere and that's only called once in a pretty controlled
-> setting and not in interrupt context.  I wouldn't cry about it.
+> Hi Dave,
+> 
+> I got below complaining when I use local variable for TDSYSINFO_STRUCT and CMR
+> array:
+> 
+> arch/x86/virt/vmx/tdx/tdx.c:383:1: warning: the frame size of 3072 bytes is
+> larger than 1024 bytes [-Wframe-larger-than=]
+>   383 | }
+> 
+> So I don't think we can use local variable for them.  I'll still use static
+> variables to avoid dynamic allocation.  In the commit message, I'll explain they
+> are too big to put into the stack, and KVM will need to use TDSYSINFO_STRUCT
+> reported by TDX module anyway.
+> 
+> Let me know if you don't agree?
 
-Hi Dave,
+Btw, CMR array alone can be put into the stack.  It will never be used by KVM,
+so I'll put CMR array as local variable, but keep tdx_sysinfo as static
+variable.
 
-I got below complaining when I use local variable for TDSYSINFO_STRUCT and CMR
-array:
+-- 
+Thanks,
+-Kai
 
-arch/x86/virt/vmx/tdx/tdx.c:383:1: warning: the frame size of 3072 bytes is
-larger than 1024 bytes [-Wframe-larger-than=]
-  383 | }
 
-So I don't think we can use local variable for them.  I'll still use static
-variables to avoid dynamic allocation.  In the commit message, I'll explain they
-are too big to put into the stack, and KVM will need to use TDSYSINFO_STRUCT
-reported by TDX module anyway.
-
-Let me know if you don't agree?
