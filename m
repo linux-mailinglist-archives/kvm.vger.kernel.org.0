@@ -2,177 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC09C5336DC
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 08:44:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9383853378D
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 09:41:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244245AbiEYGo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 02:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59610 "EHLO
+        id S231877AbiEYHli (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 03:41:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244205AbiEYGoK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 02:44:10 -0400
+        with ESMTP id S230142AbiEYHlh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 03:41:37 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D8DDF5D657
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 23:44:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 806C240A28
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 00:41:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653461048;
+        s=mimecast20190719; t=1653464495;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=q0dTaNHuL4SUBlxpiPP30yUP0V2S131GhNnsHFSLPKs=;
-        b=f7fdt6WzRzKTkOX3gn3XuMNxI4qMnaKgZoBAVGovDi7N2QLfaK0czmQgicPXxn8goR6O7Q
-        AFX1lWOU2b6qSObgj5FSSkN+sicn9wVjrsbVJMfoMlPOIGTMt9/Nr3xGY1JNZNrhELI9JG
-        vU6X3th3yObS3D7SX0iU6G9Weg+gvj8=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=yDTXC0gnSBOVU41srsVBvW5WU8IbqJsBF/wjVa/MY7I=;
+        b=UfcYWcwvhGn2XricvMFlfgJwMj4bHB7SYH389pOYvfHrTh2Kjc+RdXPfEKD2ZlzkuhRgxP
+        DNQF7pBfVVA22OF6Que6+oHTHJrzO61f3fNchThzr0/31uJ9+cmna+KIFxGnOPqaIyHfn7
+        NSMi/lvZ/ofbcjaikn1U5YddJk11qDw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-124-Qln96s4NNJ6F0SRCxrb3Pg-1; Wed, 25 May 2022 02:44:04 -0400
-X-MC-Unique: Qln96s4NNJ6F0SRCxrb3Pg-1
-Received: by mail-qt1-f200.google.com with SMTP id m19-20020a05622a055300b002f940281f18so3645965qtx.22
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 23:44:04 -0700 (PDT)
+ us-mta-398-NBNipQj3NayvcPCEHtbdtg-1; Wed, 25 May 2022 03:41:34 -0400
+X-MC-Unique: NBNipQj3NayvcPCEHtbdtg-1
+Received: by mail-wm1-f72.google.com with SMTP id m9-20020a05600c4f4900b0039746692dc2so3991289wmq.6
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 00:41:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=q0dTaNHuL4SUBlxpiPP30yUP0V2S131GhNnsHFSLPKs=;
-        b=TZaz3MF1g6OkG22KOWmW2btSpsqNqOylcka8w/R7yseiC2Nmyi2Iyj8KrQHasc6anG
-         /NI+npIq1YC//bzTTOFzg2t7wKITG1TeKIL+zYra0njn6Aj1AIqlONgFeawq7ZJUh5Jo
-         yH7rLI9h5mz0XEXAs7g52sTzsH+vzUZCMA7q53Sy6IQcH5ghISu4gJeUYpsgtP9Ug3HF
-         Yqnz2Ui/ntuI8H6UMxosKzNFfD2BuETnluZ8f1EWZ1QVrMc4ubDEX+bY/ed9khHZv8Ra
-         QFPv1sYOkLBL3yxNVuDxc7TSsaFxDzm5wSFZrX1HO2y7QXpyczJ+O21eq3CXk9HYrEQP
-         2F/w==
-X-Gm-Message-State: AOAM530wPbolCmHFI0UZGxn11hQ8Ru5Nx1J6WDFxd/PFR35yzWc8Uc9p
-        gnu9n1vWaO3PwTjDEfEMJnr9d20dXmNjRg2gD/rjFTr8gywVWyaCnrM91b7uTRjdjv1k9YHCBv0
-        Rg7qwKWVBz3nXxixAXb51pVv8E3jS
-X-Received: by 2002:a05:620a:40c4:b0:6a2:e166:c7e3 with SMTP id g4-20020a05620a40c400b006a2e166c7e3mr20156523qko.486.1653461044001;
-        Tue, 24 May 2022 23:44:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxzBnli9BMJnOwkhuFIoRR7C+Xyp7bTitLcsl+I7WPStVvlJFXCRpVWtTCUfc3ivMsRtC2VLRXsg8ONEOvPReo=
-X-Received: by 2002:a05:620a:40c4:b0:6a2:e166:c7e3 with SMTP id
- g4-20020a05620a40c400b006a2e166c7e3mr20156497qko.486.1653461043733; Tue, 24
- May 2022 23:44:03 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=yDTXC0gnSBOVU41srsVBvW5WU8IbqJsBF/wjVa/MY7I=;
+        b=wrm02y5XcczahdZY3uONdbyBQ/aDMAle2OPEZKgXkZcwnO/7HFLUHaR0Rwx2NmUzY/
+         lUfQUlwyco0N8lIyoEF7DeqxbC+h5dK5Y/2SfX5EzmuIOA2j4ElnJouaaaxA7XWA2jXe
+         2UenKaxSfZ11lPcNCW3Ij4QToEXPozdZZJNnHN7mtoN6bRsVQJ8zFVj9BRSD37X72MpE
+         JdhmyX+1th8uzGx9q2F3/+bArY21LGa+SVsf9ChgkozaqXNaSZo5wbsN99SzmAPm54kQ
+         9ERkWl/QfxchX7BWXbIZ1NSWab9ntnLZSiyLKSoH0Oxez1DTvwaheHB7yf5IHGy18FPR
+         a2hw==
+X-Gm-Message-State: AOAM533+TS5HtCdpZkUWUJJ5VycLLwrWxuimzJUPTuavbfzDF3l7Utrl
+        1fYRFI010M5vgrwcW/LJptDo6DxaMTtq1JoG52TMOGbkr1SRx00CpQgvwQB6BKGCyxsQRG7VZi2
+        vCx8Q9NE4R6b/
+X-Received: by 2002:a05:600c:4f15:b0:394:8ea0:bb45 with SMTP id l21-20020a05600c4f1500b003948ea0bb45mr6891887wmq.206.1653464493212;
+        Wed, 25 May 2022 00:41:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyauLKDZK4OAR+SfVlqB47PwYS0V6SCTHPAoofye4Wsu/laN26/4tnh07bsTwz2Gf9LgakFbQ==
+X-Received: by 2002:a05:600c:4f15:b0:394:8ea0:bb45 with SMTP id l21-20020a05600c4f1500b003948ea0bb45mr6891871wmq.206.1653464493007;
+        Wed, 25 May 2022 00:41:33 -0700 (PDT)
+Received: from [192.168.0.2] (ip-109-43-179-69.web.vodafone.de. [109.43.179.69])
+        by smtp.gmail.com with ESMTPSA id r67-20020a1c2b46000000b0039482d95ab7sm1334578wmr.24.2022.05.25.00.41.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 May 2022 00:41:32 -0700 (PDT)
+Message-ID: <42929631-06eb-a8f9-5f9f-0fd1df0a05e8@redhat.com>
+Date:   Wed, 25 May 2022 09:41:30 +0200
 MIME-Version: 1.0
-References: <20220524170610.2255608-1-eperezma@redhat.com> <20220524170610.2255608-4-eperezma@redhat.com>
- <CACGkMEsZSTgsgYkg5HhpJ62pKFTr6mtiNwYJa8E+r4RMTRuU8A@mail.gmail.com>
-In-Reply-To: <CACGkMEsZSTgsgYkg5HhpJ62pKFTr6mtiNwYJa8E+r4RMTRuU8A@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 25 May 2022 08:43:27 +0200
-Message-ID: <CAJaqyWdxjmDVX4DQOdW90mkW_-MbP7AtK+Q_KdrsU0=nRdtGXQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] vhost-vdpa: uAPI to stop the device
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     netdev <netdev@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Parav Pandit <parav@nvidia.com>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>, tanuj.kamde@amd.com,
-        "Dawar, Gautam" <gautam.dawar@amd.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        habetsm.xilinx@gmail.com, Eli Cohen <elic@nvidia.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Cindy Lu <lulu@redhat.com>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        ecree.xilinx@gmail.com, "Uminski, Piotr" <Piotr.Uminski@intel.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Longpeng <longpeng2@huawei.com>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH 2/2] kvm-unit-tests: configure changes for illumos.
+Content-Language: en-US
+To:     Dan Cross <cross@oxidecomputer.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <Yn2ErGvi4XKJuQjI@google.com>
+ <20220513010740.8544-1-cross@oxidecomputer.com>
+ <20220513010740.8544-3-cross@oxidecomputer.com> <Yn5skgiL8SenOHWy@google.com>
+ <5d48ad3f-a93a-0989-3872-cdff0bc6eb92@redhat.com>
+ <CAA9fzEEYMGjPEUAZEzFHDkq3CRod7_eHeEBzD4JoTNL7TrUnjA@mail.gmail.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <CAA9fzEEYMGjPEUAZEzFHDkq3CRod7_eHeEBzD4JoTNL7TrUnjA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 25, 2022 at 4:51 AM Jason Wang <jasowang@redhat.com> wrote:
->
-> On Wed, May 25, 2022 at 1:06 AM Eugenio P=C3=A9rez <eperezma@redhat.com> =
-wrote:
-> >
-> > The ioctl adds support for stop the device from userspace.
-> >
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > ---
-> >  drivers/vhost/vdpa.c       | 18 ++++++++++++++++++
-> >  include/uapi/linux/vhost.h |  3 +++
-> >  2 files changed, 21 insertions(+)
-> >
-> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > index 32713db5831d..a5d33bad92f9 100644
-> > --- a/drivers/vhost/vdpa.c
-> > +++ b/drivers/vhost/vdpa.c
-> > @@ -478,6 +478,21 @@ static long vhost_vdpa_get_vqs_count(struct vhost_=
-vdpa *v, u32 __user *argp)
-> >         return 0;
-> >  }
-> >
-> > +static long vhost_vdpa_stop(struct vhost_vdpa *v, u32 __user *argp)
-> > +{
-> > +       struct vdpa_device *vdpa =3D v->vdpa;
-> > +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> > +       int stop;
-> > +
-> > +       if (!ops->stop)
-> > +               return -EOPNOTSUPP;
-> > +
-> > +       if (copy_from_user(&stop, argp, sizeof(stop)))
-> > +               return -EFAULT;
-> > +
-> > +       return ops->stop(vdpa, stop);
-> > +}
-> > +
-> >  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int =
-cmd,
-> >                                    void __user *argp)
-> >  {
-> > @@ -650,6 +665,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *=
-filep,
-> >         case VHOST_VDPA_GET_VQS_COUNT:
-> >                 r =3D vhost_vdpa_get_vqs_count(v, argp);
-> >                 break;
-> > +       case VHOST_STOP:
-> > +               r =3D vhost_vdpa_stop(v, argp);
-> > +               break;
-> >         default:
-> >                 r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
-> >                 if (r =3D=3D -ENOIOCTLCMD)
-> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > index cab645d4a645..e7526968ab0c 100644
-> > --- a/include/uapi/linux/vhost.h
-> > +++ b/include/uapi/linux/vhost.h
-> > @@ -171,4 +171,7 @@
-> >  #define VHOST_VDPA_SET_GROUP_ASID      _IOW(VHOST_VIRTIO, 0x7C, \
-> >                                              struct vhost_vring_state)
-> >
-> > +/* Stop or resume a device so it does not process virtqueue requests a=
-nymore */
-> > +#define VHOST_STOP                     _IOW(VHOST_VIRTIO, 0x7D, int)
-> > +
->
-> Unless we know it's a vhost general uAPI, let's use VHOST_VDPA_STOP here.
->
+On 24/05/2022 23.20, Dan Cross wrote:
+> On Thu, May 19, 2022 at 5:53 AM Thomas Huth <thuth@redhat.com> wrote:
+>> On 13/05/2022 16.34, Sean Christopherson wrote:
+>>> [snip]
+>>
+>> According to https://illumos.org/man/1/getopt :
+>>
+>>    NOTES
+>>
+>>          getopt will not be supported in the next major release.
+>>          ...
+>>
+>> So even if we apply this fix now, this will likely break soon again. Is
+>> there another solution to this problem?
+> 
+> I wouldn't put too much stock into that; that note came from Solaris
+> and has been in the man page for 30 years or more [*].
 
-Ok I'll rename.
+:-)
 
-Thanks!
+> I think there
+> are too many shell scripts in the wild using `getopt` for it to ever be
+> removed. Indeed, if anything this highlights something to clean up
+> on the illumos side by removing that from the man page.
 
-> Thanks
->
-> >  #endif
-> > --
-> > 2.27.0
-> >
->
+Yup, cleaning up that man page sounds like a good idea then, indeed.
+
+  Thomas
+
 
