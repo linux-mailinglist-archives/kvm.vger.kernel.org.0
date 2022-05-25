@@ -2,96 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF930533DB2
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 15:20:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57B34533DCF
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 15:23:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238005AbiEYNUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 09:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42506 "EHLO
+        id S240673AbiEYNXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 09:23:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244522AbiEYNTw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 09:19:52 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C341AF3D;
-        Wed, 25 May 2022 06:19:39 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24PD7pvt012789;
-        Wed, 25 May 2022 13:19:18 GMT
+        with ESMTP id S230038AbiEYNXd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 09:23:33 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F982A719;
+        Wed, 25 May 2022 06:23:31 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24PBRW1q004869;
+        Wed, 25 May 2022 13:23:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=5gThyaGaWA+mcR/Yr7gUjJjf5ptNc6JGxVkl7LE8FFM=;
- b=DjwvLQanquSEhZG5INJ3XXQ/oH9u7lm/zl+cCj9YPb0LUier2dm64Se3xL04iecENpvz
- p28n9koRrFRuS4s7xHoP9GDS65J1BvaKfs5AGY77Na4xrJ1FWA9izeQgnDFPW/DyMfOH
- bKl0RdzMH7xn1gFAouafN5rn/MsjXT0b9D4RKbIi/41HEW+AKW8fSP1i8Au3kXAqL47K
- 9hKnPSen50nbwE5dQV1sAupKlKX+zVIh+ahtIXlp2kfn4VPub2aLUCpSvzjv83OEThb4
- 3mxjrErT3b8jl6fw8b/2hNs1FiIzD2oer0s5WNlPH85lJ/oSeNncjNUQT4UbyNoGv2wB nw== 
+ bh=ldOwhqrdMrG+DfU+2aFY9eV2yzo9XQKZE0zxnYIWkkc=;
+ b=n8buIVW+eqo1LjqOVBNi5mAzHr3a8xitkxlcWRmbK0Gz/iHsAggkED+o/3IKhQZ9i7I+
+ uZNHu3Dek4vrZY9Ts6uHKdjDhzH5ePpizuM2OFvcfLzwluwgPhx+Hf91cQ9dNMwvXtEC
+ kbVj3Gq6slou9zvRQ/KiG3H+JNDhIsddMvbthnLoXRbNX1ME3EkyoR5E+4HdSUWU4Q0/
+ 4EZKWRbLSzwn4IDyIthTHbmbBFYZ+xvz2k47ygqP19jyXrsehnUN7Ji+ezfigAAUyCXh
+ KOw78Gz8Js7As/0zPSwSO8uesKUPC0teyr/PUpngLpydBoBNouYyEe9wNNpdqyS+NC6s JQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9fxjxn7c-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9kkq28c4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 13:19:18 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24PC66Ce008893;
-        Wed, 25 May 2022 13:19:18 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9fxjxn71-1
+        Wed, 25 May 2022 13:23:28 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24PCYG7n000740;
+        Wed, 25 May 2022 13:23:27 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9kkq28bs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 13:19:17 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24PDF68A009255;
-        Wed, 25 May 2022 13:19:16 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma01dal.us.ibm.com with ESMTP id 3g93v8qq0a-1
+        Wed, 25 May 2022 13:23:27 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24PDEwm1019283;
+        Wed, 25 May 2022 13:23:26 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02dal.us.ibm.com with ESMTP id 3g93v87rdk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 13:19:16 +0000
+        Wed, 25 May 2022 13:23:26 +0000
 Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24PDJFAB26607956
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24PDNP2d8126862
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 25 May 2022 13:19:15 GMT
+        Wed, 25 May 2022 13:23:25 GMT
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 648FFAE05C;
-        Wed, 25 May 2022 13:19:15 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 763BFAE064;
+        Wed, 25 May 2022 13:23:25 +0000 (GMT)
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0DE1DAE063;
-        Wed, 25 May 2022 13:19:09 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id BA5C3AE062;
+        Wed, 25 May 2022 13:23:20 +0000 (GMT)
 Received: from [9.163.3.233] (unknown [9.163.3.233])
         by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 25 May 2022 13:19:08 +0000 (GMT)
-Message-ID: <3b6bdde6-2a6d-4792-ff5c-86b6fc7a2dca@linux.ibm.com>
-Date:   Wed, 25 May 2022 09:19:08 -0400
+        Wed, 25 May 2022 13:23:20 +0000 (GMT)
+Message-ID: <f309313b-2bf0-f740-e372-06f20069e7e6@linux.ibm.com>
+Date:   Wed, 25 May 2022 09:23:19 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
-Subject: Re: [PATCH v8 11/22] KVM: s390: pci: add basic kvm_zdev structure
+Subject: Re: [PATCH v8 17/22] vfio-pci/zdev: add open/close device hooks
 Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
         oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
         pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org
 References: <20220524185907.140285-1-mjrosato@linux.ibm.com>
- <20220524185907.140285-12-mjrosato@linux.ibm.com>
- <20220524165046.69f0d84a.alex.williamson@redhat.com>
+ <20220524185907.140285-18-mjrosato@linux.ibm.com>
+ <20220524210815.GB1343366@nvidia.com>
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20220524165046.69f0d84a.alex.williamson@redhat.com>
+In-Reply-To: <20220524210815.GB1343366@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mm_PGQd2Z4_saabnBYfHgsrkmpzQDUjS
-X-Proofpoint-GUID: pmrdjbA_L2CZLW5FH0VHmC9vXHlcv2JY
+X-Proofpoint-ORIG-GUID: RsxTn6jmwLJMmhUPfitBq5PPdvvqlPmn
+X-Proofpoint-GUID: Vm__Pt-8jIcYsMuR8qMX_hkzbxUtc_zJ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-25_03,2022-05-25_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- priorityscore=1501 spamscore=0 suspectscore=0 adultscore=0 mlxscore=0
- malwarescore=0 impostorscore=0 lowpriorityscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ impostorscore=0 clxscore=1015 spamscore=0 adultscore=0 bulkscore=0
+ phishscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2204290000 definitions=main-2205250067
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
@@ -103,55 +103,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/24/22 6:50 PM, Alex Williamson wrote:
-> On Tue, 24 May 2022 14:58:56 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
->> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
->> new file mode 100644
->> index 000000000000..21c2be5c2713
->> --- /dev/null
->> +++ b/arch/s390/kvm/pci.c
->> @@ -0,0 +1,36 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * s390 kvm PCI passthrough support
->> + *
->> + * Copyright IBM Corp. 2022
->> + *
->> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
->> + */
+On 5/24/22 5:08 PM, Jason Gunthorpe wrote:
+> On Tue, May 24, 2022 at 02:59:02PM -0400, Matthew Rosato wrote:
+>> During vfio-pci open_device, pass the KVM associated with the vfio group
+>> (if one exists).  This is needed in order to pass a special indicator
+>> (GISA) to firmware to allow zPCI interpretation facilities to be used
+>> for only the specific KVM associated with the vfio-pci device.  During
+>> vfio-pci close_device, unregister the notifier.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>   arch/s390/include/asm/pci.h      |  2 ++
+>>   drivers/vfio/pci/vfio_pci_core.c | 11 ++++++++++-
+>>   drivers/vfio/pci/vfio_pci_zdev.c | 27 +++++++++++++++++++++++++++
+>>   include/linux/vfio_pci_core.h    | 12 ++++++++++++
+>>   4 files changed, 51 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+>> index 85eb0ef9d4c3..67fbce1ea0c9 100644
+>> +++ b/arch/s390/include/asm/pci.h
+>> @@ -5,6 +5,7 @@
+>>   #include <linux/pci.h>
+>>   #include <linux/mutex.h>
+>>   #include <linux/iommu.h>
+>> +#include <linux/notifier.h>
+>>   #include <linux/pci_hotplug.h>
+>>   #include <asm-generic/pci.h>
+>>   #include <asm/pci_clp.h>
+>> @@ -195,6 +196,7 @@ struct zpci_dev {
+>>   	struct s390_domain *s390_domain; /* s390 IOMMU domain data */
+>>   	struct kvm_zdev *kzdev;
+>>   	struct mutex kzdev_lock;
+>> +	struct notifier_block nb; /* vfio notifications */
+> 
+> This is obsolete now right? Same for the #include ?
+
+Of course, I forgot to remove them...  Will do
+
+> 
+>> @@ -418,6 +424,9 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
+>>   
+>>   	vdev->needs_reset = true;
+>>   
+>> +	if (vfio_pci_zdev_release(vdev))
+>> +		pci_info(pdev, "%s: Couldn't restore zPCI state\n", __func__);
 >> +
+>>   	/*
+>>   	 * If we have saved state, restore it.  If we can reset the device,
+>>   	 * even better.  Resetting with current state seems better than
+>> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+>> index ea4c0d2b0663..d0df85c8b204 100644
+>> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+>> @@ -11,6 +11,7 @@
+>>   #include <linux/uaccess.h>
+>>   #include <linux/vfio.h>
+>>   #include <linux/vfio_zdev.h>
 >> +#include <linux/kvm_host.h>
->> +#include <linux/pci.h>
->> +#include "pci.h"
+>>   #include <asm/pci_clp.h>
+>>   #include <asm/pci_io.h>
+>>   
+>> @@ -136,3 +137,29 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>>   
+>>   	return ret;
+>>   }
 >> +
->> +static int kvm_s390_pci_dev_open(struct zpci_dev *zdev)
+>> +int vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
 >> +{
->> +	struct kvm_zdev *kzdev;
+>> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
 >> +
->> +	kzdev = kzalloc(sizeof(struct kvm_zdev), GFP_KERNEL);
->> +	if (!kzdev)
->> +		return -ENOMEM;
+>> +	if (!zdev)
+>> +		return -ENODEV;
 >> +
->> +	kzdev->zdev = zdev;
->> +	zdev->kzdev = kzdev;
+>> +	if (!vdev->vdev.kvm)
+>> +		return 0;
 >> +
->> +	return 0;
+>> +	return kvm_s390_pci_register_kvm(zdev, vdev->vdev.kvm);
 >> +}
 >> +
->> +static void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
+>> +int vfio_pci_zdev_release(struct vfio_pci_core_device *vdev)
 >> +{
->> +	struct kvm_zdev *kzdev;
->> +
->> +	kzdev = zdev->kzdev;
->> +	WARN_ON(kzdev->zdev != zdev);
->> +	zdev->kzdev = 0;
+>> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
 > 
-> I imagine this should be s/0/NULL/, right?  I feel like there was a
-> recent similar discussion, but I can't think of any unique search terms
-> to sort it out of my inbox.  Thanks,
+> Keeping these functions named open_device/close_device wouuld probably
+> be clearer
+
+Agreed, will rename vfio_pci_zdev_{open,close}_device
+
+> 
+>> +	if (!zdev)
+>> +		return -ENODEV;
+>> +
+>> +	if (!vdev->vdev.kvm)
+>> +		return 0;
+>> +
+>> +	return kvm_s390_pci_unregister_kvm(zdev);
+>> +}
+> 
+> Again this cannot fail, you should make it return void, not ignore the
+> failure - or at least push the ignoring the failure down to the place
+> that is causing this.
+
+I'll move that handling into kvm_s390_pci_unregister_kvm and make 
+vfio_pci_zdev_close_device return void / will remove the check for the 
+rc in vfio_pci_core_disable.
+
+> 
+> Otherwise it looks fine to me, thanks
 > 
 
-Yup, I recall a similar comment on a prior version but I don't recall if 
-it was this particular patch or not -- anyway will change
+Thanks
 
