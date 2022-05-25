@@ -2,269 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB446533F4F
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 16:35:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B95F6533F62
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 16:40:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243083AbiEYOfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 10:35:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58530 "EHLO
+        id S234517AbiEYOko (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 10:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233606AbiEYOff (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 10:35:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86DFDA76F4
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 07:35:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653489332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=blExWzXbh/zvOBhUZ8Z2FT5bxTyHpnQEmh5Dkx3hZ4w=;
-        b=I1X96LqIjAv8iLsSFX3gAy0YElqgQweSKG4VxzHHx4ve71IoFhfIRGYhmNouq+k30C3ADf
-        YdZeDTb9iM3zUj8lAQ2hgf6870RYsVX2tPhfXOmRsKhOwFHqxqd5ItDHR59pM0VKWVFyXc
-        i2WyLtSKmMtKclxReIBW7wBI7ZyBKRw=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-488-sEPaT_uUMhuI4JCjWPKHpw-1; Wed, 25 May 2022 10:35:31 -0400
-X-MC-Unique: sEPaT_uUMhuI4JCjWPKHpw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D8BCD1C0782A
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 14:35:30 +0000 (UTC)
-Received: from starship (unknown [10.40.192.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DC18E1410DD5;
-        Wed, 25 May 2022 14:35:29 +0000 (UTC)
-Message-ID: <201c43722d7f0faffc9a2377fd25fd31f4565898.camel@redhat.com>
-Subject: FYI: hyperv_clock  selftest has random failures
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 25 May 2022 17:35:28 +0300
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S244820AbiEYOkj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 10:40:39 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 519AA986FE;
+        Wed, 25 May 2022 07:40:37 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24PDwkuv005307;
+        Wed, 25 May 2022 14:40:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=+ly6y3EWbftkMbv2r7OI/2BwAvsGa95a6deEFCesDEo=;
+ b=dr+ejCFEI0WepRoE/DE+rlXXqa4ke7MqVT2FdKHESa2ackEIXX6mwyIDEWw8AV+Mjsva
+ yTWL0sn2jt4Pfu6dQajEzPLkDRO0xuB7SiUcM4U8AFN6GzfN5H5ZhqZkBylErSn4BTDa
+ zesqF9yieSOYUQ8V2R0E8KF2wRUEmDVoYci0FK/T6AmpsV9wUBexk74sqD0uX+waWszr
+ MqPA3YWOPS7OmmgX+UK0pfpoa562p5f9OTuAlHGW2vJY8ZHvz2mym23+E3cojs4ahS7v
+ ExJD+8f4sVqDdgCCiXgw/V3aNA33vB4pNloTr2Xzdouam/TdTMqJORXTsl9g4U6GhZvz pg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9ntarx06-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 May 2022 14:40:36 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24PEYf51031976;
+        Wed, 25 May 2022 14:40:35 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9ntarwy8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 May 2022 14:40:35 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24PEWai3006627;
+        Wed, 25 May 2022 14:40:33 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3g93v01ahw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 May 2022 14:40:33 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24PEeT0C45941176
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 May 2022 14:40:29 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B0E094C046;
+        Wed, 25 May 2022 14:40:29 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F96E4C040;
+        Wed, 25 May 2022 14:40:29 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 25 May 2022 14:40:29 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 59C0BE7919; Wed, 25 May 2022 16:40:29 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH 0/1] Update s390 virtio-ccw
+Date:   Wed, 25 May 2022 16:40:27 +0200
+Message-Id: <20220525144028.2714489-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HZ-EUsv_YjW6HDAUzyGlKchHoXyOwNsf
+X-Proofpoint-ORIG-GUID: 6rMXd1kazjQiO6YCIGHzLNY3OgAsdubF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-25_04,2022-05-25_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ bulkscore=0 clxscore=1015 malwarescore=0 mlxlogscore=897 spamscore=0
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205250076
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just something I noticed today. Happens on both AMD and Intel, kvm/queue. 
+Hi Conny, Halil,
 
-Likely the test needs lower tolerancies.
+As we talked earlier this year about having some more eyeballs on
+userspace [1], perhaps it would be wise to do this on the kernel
+side of virtio-ccw as well?
 
-I'll investigate this later
+[1] QEMU commit 6a6d3dfd6e ("MAINTAINERS: Add myself to s390 I/O areas")
 
-This is on my AMD machine (3970X):
+Eric Farman (1):
+  MAINTAINERS: Update s390 virtio-ccw
 
-[mlevitsk@starship ~/Kernel/master/src/tools/testing/selftests/kvm]$while true ; do ./x86_64/hyperv_clock  ; done
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=66218 tid=66218 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f0f2822d55f: ?? ??:0
-     4	0x00007f0f2822d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=471600, TSC=461024)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=66269 tid=66269 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f296522d55f: ?? ??:0
-     4	0x00007f296522d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=460700, TSC=475361)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=66652 tid=66652 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007fdab782d55f: ?? ??:0
-     3	0x00007fdab782d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=67112 tid=67112 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f3095c2d55f: ?? ??:0
-     4	0x00007f3095c2d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=469600, TSC=484418)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=67146 tid=67146 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007f81b802d55f: ?? ??:0
-     3	0x00007f81b802d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=67179 tid=67179 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f1fb522d55f: ?? ??:0
-     4	0x00007f1fb522d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=470300, TSC=461134)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=67459 tid=67459 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007f330dc2d55f: ?? ??:0
-     3	0x00007f330dc2d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=67622 tid=67622 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007f9da422d55f: ?? ??:0
-     3	0x00007f9da422d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=68043 tid=68043 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f3ba2c2d55f: ?? ??:0
-     4	0x00007f3ba2c2d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=482900, TSC=468989)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=68118 tid=68118 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f25ef62d55f: ?? ??:0
-     4	0x00007f25ef62d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=362300, TSC=379772)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=68233 tid=68233 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007f7e94c2d55f: ?? ??:0
-     3	0x00007f7e94c2d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=68609 tid=68609 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f69a3a2d55f: ?? ??:0
-     4	0x00007f69a3a2d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=475800, TSC=466334)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-
-This is on my Intel machine:
-
-[mlevitsk@worklaptop ~/Kernel/master/src/tools/testing/selftests/kvm]$while true ; do ./x86_64/hyperv_clock  ; done
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=52204 tid=52204 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007fd2baa2d55f: ?? ??:0
-     3	0x00007fd2baa2d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=52517 tid=52517 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007f832a02d55f: ?? ??:0
-     3	0x00007f832a02d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=52598 tid=52598 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f52bd02d55f: ?? ??:0
-     4	0x00007f52bd02d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=263000, TSC=269964)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=52645 tid=52645 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f398d22d55f: ?? ??:0
-     4	0x00007f398d22d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=530300, TSC=521275)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=52762 tid=52762 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007fdaac62d55f: ?? ??:0
-     4	0x00007fdaac62d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=263800, TSC=267716)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=52787 tid=52787 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f029322d55f: ?? ??:0
-     4	0x00007f029322d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=342200, TSC=332493)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=52968 tid=52968 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007f133202d55f: ?? ??:0
-     3	0x00007f133202d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=53349 tid=53349 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f28fbc2d55f: ?? ??:0
-     4	0x00007f28fbc2d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=265300, TSC=257886)
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:234: false
-  pid=53460 tid=53460 errno=4 - Interrupted system call
-     1	0x00000000004026e7: main at hyperv_clock.c:234
-     2	0x00007f7a0542d55f: ?? ??:0
-     3	0x00007f7a0542d60b: ?? ??:0
-     4	0x0000000000402744: _start at ??:?
-  Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
-==== Test Assertion Failure ====
-  x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
-  pid=53847 tid=53847 errno=0 - Success
-     1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
-     2	 (inlined by) main at hyperv_clock.c:223
-     3	0x00007f7d53c2d55f: ?? ??:0
-     4	0x00007f7d53c2d60b: ?? ??:0
-     5	0x0000000000402744: _start at ??:?
-  Elapsed time does not match (MSR=578800, TSC=527827)
-
-
-
-Best regards,
-	Maxim Levitsky
+-- 
+2.32.0
 
