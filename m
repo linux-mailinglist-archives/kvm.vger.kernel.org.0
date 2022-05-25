@@ -2,136 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11CA8533840
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 10:19:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72E23533885
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 10:32:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231907AbiEYITm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 04:19:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
+        id S233941AbiEYIcq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 04:32:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232083AbiEYIT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 04:19:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915AF81998
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 01:19:28 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24P7wRiH018923;
-        Wed, 25 May 2022 08:19:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=NF766i3z15BznnjM0FGB0nFCopBSkoTnLXK7IWsNlXc=;
- b=C2AOOfWlejMAt+njGbn7lBozA7Y5ZFs3h7M8ObT01jojxWeWmTV8SeVoEDZT/+baiz82
- XKJlu/PL4Ut7K6ms0gnpJVXIYdjdWlo4/UqKhoumbjjNQT+Aa2yT2EIl1/mgZISDSrU6
- f6ktnBEe27WZBUYlNkN+wp7/J4a4TUKAwT8jr0BFWG6+/WEcxj8ojriNHfyFTEeMIJjq
- IYRRBHVPNSWHOJbBUkkQwVaQPUg7Dk2QJWzRslfn4RKognno5GDY3bczzzmROVZWX8cX
- JvU4EX9Rb4IF6nuuwj0OcyuDuLSp+dVSu9wEoOowBG0++XC8gspM6Q2F1iP83d5Dbrvl XQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9ghc8dx3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 08:19:20 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24P80VtE029810;
-        Wed, 25 May 2022 08:19:20 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9ghc8dwh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 08:19:19 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24P8Ie1o016920;
-        Wed, 25 May 2022 08:19:17 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3g93v00su3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 08:19:17 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24P856nT41091454
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 25 May 2022 08:05:06 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 68935A4051;
-        Wed, 25 May 2022 08:19:14 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6ADE6A4040;
-        Wed, 25 May 2022 08:19:13 +0000 (GMT)
-Received: from [9.171.31.97] (unknown [9.171.31.97])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 25 May 2022 08:19:13 +0000 (GMT)
-Message-ID: <098642a0-5518-49b7-69c1-2d6bea9885a5@linux.ibm.com>
-Date:   Wed, 25 May 2022 10:23:11 +0200
+        with ESMTP id S233563AbiEYIcm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 04:32:42 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E692DE9;
+        Wed, 25 May 2022 01:32:40 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id q4so17962817plr.11;
+        Wed, 25 May 2022 01:32:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=nKbOgKtlUjU3TGj1E+jXYf223t+SFYJQXWgcOdb/AMg=;
+        b=n7Mjzc9f3IEI3faWAlV1FuFa4TmAUdDDFlLD///+He05XLbfwfHgQH/vF4lkbnZgSN
+         FmJYpBeQCmvAOPU5kcLqD3GwQPNDX4juzR0CbEsL1JUprPlMIpDtW5d3HW/b8eLFOdJW
+         clRSMYSE3ZsEY1lPuEdgD70A0NvcWBbdFK0fS04oX4piIkMfRhUEtzjgytsXiSgilgU2
+         mNLiYY40a+7eoiEfg2lrpJDa4PAUHqIpI75qECJcF4Us5h65tBBnv/Hopt1B2BUZhMER
+         +jXNNC5vjmprIRltUdVqzrGKlnz8uNHcWVgyqQF7OUobid/5kjaX1SfNUWiB+2FitT1L
+         4UZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=nKbOgKtlUjU3TGj1E+jXYf223t+SFYJQXWgcOdb/AMg=;
+        b=PtXEYLmDO9y2t2WP6spbRurEktMU1guytcCbf1RpDWNjJ/a02929ohQgE6hXcQTi6g
+         Y3tgOYIw1VndyJUE6F9BseGl1Q9+V8c13z3JR78M+e6TUX7HMUHyCqm7J6TQShkggYfj
+         pp/bvRDEfq/EKFSCLVRHMLa5b9SuRJrGIISFzrWL43Y3QaWxi8WBDLH8a6GFnX4fm7AN
+         vl2csAQxMaD/BA5dvdc4uafC7BzU+zfDcu0jH5srLZRd0i+oeclQhe0KEcMg1dY7YgeS
+         2NJXQ/CPc8DAfFrTHZEY0vc2DKp2dOHtTz8C50mIsYjw49Wf82HBUP16m2mXRZesDcje
+         Ju1Q==
+X-Gm-Message-State: AOAM533Zhl7b7icRyvtU308covfGE0belKYzlfj2SV5rP6nCNlUx7UBB
+        mKU9wWz/KAoXJ5+PhPn55+0=
+X-Google-Smtp-Source: ABdhPJwfM0uTGjqXNWZmQHzYQEE9pEx5LovdMgqD8PxhrGrX/SmPs9dsoeuOxBUcNI1J3djQJ4nsxw==
+X-Received: by 2002:a17:902:8608:b0:158:c532:d8b2 with SMTP id f8-20020a170902860800b00158c532d8b2mr31610863plo.46.1653467560337;
+        Wed, 25 May 2022 01:32:40 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.80])
+        by smtp.gmail.com with ESMTPSA id b8-20020a6541c8000000b003f64036e699sm7894948pgq.24.2022.05.25.01.32.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 May 2022 01:32:40 -0700 (PDT)
+Message-ID: <289d0c88-36a0-afd4-4d47-f2db3fb63654@gmail.com>
+Date:   Wed, 25 May 2022 16:32:36 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v7 12/13] s390x: CPU topology: CPU topology migration
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH RESEND v12 00/17] KVM: x86/pmu: Add basic support to
+ enable guest PEBS via DS
 Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        frankja@linux.ibm.com
-References: <20220420115745.13696-1-pmorel@linux.ibm.com>
- <20220420115745.13696-13-pmorel@linux.ibm.com>
- <3d9badda-6939-9ea0-5554-ba15c0c0cb02@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <3d9badda-6939-9ea0-5554-ba15c0c0cb02@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20220411101946.20262-1-likexu@tencent.com>
+ <87fsl5u3bg.fsf@redhat.com> <e0b96ebd-00ee-ead4-cf35-af910e847ada@gmail.com>
+ <d7461fd4-f6ec-1a0b-6768-0008a3092add@gmail.com> <874k1ltw9y.fsf@redhat.com>
+ <f379a933-15b0-6858-eeef-5fbef6e5529c@gmail.com>
+ <0848a2da-c9cf-6973-c774-ff16c3e8a248@redhat.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <0848a2da-c9cf-6973-c774-ff16c3e8a248@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 0D21uRFN4bgoTsofKhWEWqyO_G6v7L5U
-X-Proofpoint-GUID: UjmHR5toyY5HKq37pPWaVw8GV80XvOlX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-25_02,2022-05-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 bulkscore=0 phishscore=0 mlxlogscore=999 clxscore=1015
- malwarescore=0 suspectscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2205250037
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/24/22 13:32, Thomas Huth wrote:
-> On 20/04/2022 13.57, Pierre Morel wrote:
->> To migrate the Multiple Topology Change report, MTCR, we
->> get it from KVM and save its state in the topology VM State
->> Description during the presave and restore it to KVM on the
->> destination during the postload.
+On 25/5/2022 4:14 pm, Paolo Bonzini wrote:
+> On 5/25/22 09:56, Like Xu wrote:
+>> Thanks for the clarification.
 >>
->> The migration state is needed whenever the CPU topology
->> feature is activated.
+>> Some kvm x86 selftests have been failing due to this issue even after the last 
+>> commit.
 >>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
-> ...
->> @@ -2592,22 +2594,57 @@ static void kvm_s390_set_mtr(uint64_t attr)
->>           .group = KVM_S390_VM_CPU_TOPOLOGY,
->>           .attr  = attr,
->>       };
->> +    int ret;
->> -    int ret = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attribute);
->> -
->> +    ret = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attribute);
+>> I blame myself for not passing the msr_info->host_initiated to the 
+>> intel_is_valid_msr(),
+>> meanwhile I pondered further whether we should check only the MSR addrs range in
+>> the kvm_pmu_is_valid_msr() and apply this kind of sanity check in the 
+>> pmu_set/get_msr().
+>>
+>> Vitaly && Paolo, any preference to move forward ?
 > 
-> Nit: Unnecessary code churn.
+> I'm not sure what I did wrong to not see the failure, so I'll fix it myself.
 
-yes thanks,
-Pierre
+More info, some Skylake hosts fail the tests like x86_64/state_test due to this 
+issue.
 
 > 
->   Thomas
-> 
+> But from now on, I'll have a hard rule of no new processor features enabled 
+> without KVM unit tests or selftests.  In fact, it would be nice if you wrote 
+> some for PEBS.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Great, my team (or at least me) is committed to contributing more tests on vPMU 
+features.
+
+We may update the process document to the 
+Documentation/virt/kvm/review-checklist.rst.
+
+> 
+> Paolo
+> 
