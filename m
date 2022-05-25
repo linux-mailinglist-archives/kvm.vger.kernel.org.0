@@ -2,116 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2725533F5C
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 16:40:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73C6C533FCC
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 17:00:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244850AbiEYOkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 10:40:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47260 "EHLO
+        id S244972AbiEYPAG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 11:00:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244356AbiEYOki (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 10:40:38 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF73326E5;
-        Wed, 25 May 2022 07:40:36 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24PCviI3027497;
-        Wed, 25 May 2022 14:40:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=LOjfOmlIzo06MRjwClmtDARWrWe2NyOJ++wkHJi3UJo=;
- b=pnX8nbyHxFDhRP6rZOXdTT/wlOar3L/Ope/LOeWWQzVnbEhe+xNieeLOiDlVlcv9wcYD
- I/Ibv+d5bEAAvEPEYiccc214qosylYBeGqjO3l2pVGUASNPdbTjtZr68P365eAxwjZmY
- qqurDRWRLfsD2IS5Md+MrUi9EJnPX1CzqNnrPdLqfEGieFzcYjrQKyDDfJFBatmTWwBh
- PV2K65GjvEL8XJ/d67ypJQTUnxsjdOIE2uqxF+0M5v+6RNcx3Y4wZyzulJ77f1bN+iLR
- 2/4LP5BczOhBUTtjXaOYujxN4r+tMFB/vgZwSl+ELfY/9W4JLpVx7BtePhHKIpRmr+yj 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9mx1ae20-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 14:40:35 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24PEIKOI030368;
-        Wed, 25 May 2022 14:40:35 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3g9mx1ae1a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 14:40:35 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24PEZV9m021968;
-        Wed, 25 May 2022 14:40:32 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 3g93wds23w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 May 2022 14:40:32 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24PEQLMH47317400
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 25 May 2022 14:26:21 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AFBA411C04C;
-        Wed, 25 May 2022 14:40:29 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9E8B711C04A;
-        Wed, 25 May 2022 14:40:29 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 25 May 2022 14:40:29 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 5B6B1E7925; Wed, 25 May 2022 16:40:29 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH 1/1] MAINTAINERS: Update s390 virtio-ccw
-Date:   Wed, 25 May 2022 16:40:28 +0200
-Message-Id: <20220525144028.2714489-2-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220525144028.2714489-1-farman@linux.ibm.com>
-References: <20220525144028.2714489-1-farman@linux.ibm.com>
+        with ESMTP id S245073AbiEYO7z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 10:59:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A4553AEE34
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 07:59:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653490778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=B9ZJreuQbgdzdiW1AG006ri3QhGpTbi1fLfNKi3VzLs=;
+        b=TU1mN04Gtjj6Z3FpPie28iGp+yszjECYnmsYnSuJWtQEB9JU/XbtL+8A1S6YeJH3SGZIbM
+        edk63e/MJt1F4c+souZ7cGt4U80MlVE0vnATAg8hHIKq1vp8pJd4MBLJobwfFoPlMDhydX
+        /8jdmhedBC/jCAO1W7XW1hB0haiScIk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-121-VNL5_74IOPCKZcJl8-geXQ-1; Wed, 25 May 2022 10:59:37 -0400
+X-MC-Unique: VNL5_74IOPCKZcJl8-geXQ-1
+Received: by mail-wm1-f70.google.com with SMTP id m9-20020a05600c4f4900b0039746692dc2so4452392wmq.6
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 07:59:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=B9ZJreuQbgdzdiW1AG006ri3QhGpTbi1fLfNKi3VzLs=;
+        b=YA/I8g8rIgkkm4GDkV9mM2D4gesWWwGdrbHL+ZEPnVZF1N6LLVwoFn/lG+wFLsHZt0
+         s1ggmEm103bvqqCFClQWyG9+QPpMrsQpnEC50tIl4KROgun/qA7aFiB/I5Fw5xSm+p4z
+         AVQqESOOAzPR7oYjITQ4dh9u54Oe6GBFXQpRxvTW8weCPbB7VAyaW+n7c2J5y0Uq34T2
+         RGecURcsQA5pSD8VjWmOOCPTLC8LEtUZX0JG9W//5szLv+dkDVpV0Sk3aNYGOTaza3sx
+         rSh9Obhgiql1vxJBwd/P06A+JZS4s2AmU46wrDBG6tRhr2a/3Pb3aqincKYz0HpBnN6Z
+         zITQ==
+X-Gm-Message-State: AOAM533l2yQc5uU+SDVtIBonAGXr1zcSjtNulFV1+lTe3XOtQQEif3fU
+        MUXRfI7NbttMmwXOTGJWu2YIhH+ULYG/M1ARTVlnaCbKqWBfVeTONzUt7ccELHR+5J8mqf9iDmE
+        NBw0eK4eTFVUFBWYu/lFfS1twsVdzPhNQ0xSSOG8PtPfx9m8Ryie4eB1VwdzOlYKR
+X-Received: by 2002:a5d:452c:0:b0:210:1f5:f7e4 with SMTP id j12-20020a5d452c000000b0021001f5f7e4mr2169032wra.184.1653490775928;
+        Wed, 25 May 2022 07:59:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw8LxrMmb3c/E17tAv28ak7DGswydUQmm54fa7N5L88qAXKPCM3cMpXUmjd011T8FtzcInIbA==
+X-Received: by 2002:a5d:452c:0:b0:210:1f5:f7e4 with SMTP id j12-20020a5d452c000000b0021001f5f7e4mr2169006wra.184.1653490775632;
+        Wed, 25 May 2022 07:59:35 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id r18-20020a05600c35d200b003942a244f53sm2316308wmq.44.2022.05.25.07.59.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 May 2022 07:59:35 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: FYI: hyperv_clock  selftest has random failures
+In-Reply-To: <201c43722d7f0faffc9a2377fd25fd31f4565898.camel@redhat.com>
+References: <201c43722d7f0faffc9a2377fd25fd31f4565898.camel@redhat.com>
+Date:   Wed, 25 May 2022 16:59:34 +0200
+Message-ID: <87zgj5r73d.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: o6Mbe76Rjvwvb6jlevt8QOWi3b4fD2qz
-X-Proofpoint-ORIG-GUID: 4p1QLHWs_vgEdWoBvm8n7p15Xjd0zGdS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-25_04,2022-05-25_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 clxscore=1011
- impostorscore=0 mlxlogscore=999 adultscore=0 mlxscore=0 malwarescore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2205250076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add myself to the kernel side of virtio-ccw
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+> Just something I noticed today. Happens on both AMD and Intel, kvm/queue. 
+>
+> Likely the test needs lower tolerancies.
+>
+> I'll investigate this later
+>
+> This is on my AMD machine (3970X):
+>
+> [mlevitsk@starship ~/Kernel/master/src/tools/testing/selftests/kvm]$while true ; do ./x86_64/hyperv_clock  ; done
+> ==== Test Assertion Failure ====
+>   x86_64/hyperv_clock.c:199: delta_ns * 100 < (t2 - t1) * 100
+>   pid=66218 tid=66218 errno=0 - Success
+>      1	0x000000000040255d: host_check_tsc_msr_rdtsc at hyperv_clock.c:199
+>      2	 (inlined by) main at hyperv_clock.c:223
+>      3	0x00007f0f2822d55f: ?? ??:0
+>      4	0x00007f0f2822d60b: ?? ??:0
+>      5	0x0000000000402744: _start at ??:?
+>   Elapsed time does not match (MSR=471600, TSC=461024)
+...
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6618e9b91b6c..1d2c6537b834 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20933,6 +20933,7 @@ F:	include/uapi/linux/virtio_crypto.h
- VIRTIO DRIVERS FOR S390
- M:	Cornelia Huck <cohuck@redhat.com>
- M:	Halil Pasic <pasic@linux.ibm.com>
-+M:	Eric Farman <farman@linux.ibm.com>
- L:	linux-s390@vger.kernel.org
- L:	virtualization@lists.linux-foundation.org
- L:	kvm@vger.kernel.org
+Here the test is:
+
+r1 = rdtsc()
+m1 = KVM_GET_MSRS (HV_X64_MSR_TIME_REF_COUNT)
+nop_loop()
+r2 = rdtsc()
+m2 = KVM_GET_MSRS (HV_X64_MSR_TIME_REF_COUNT)
+
+and then we compare the difference between rdtsc()-s and
+HV_X64_MSR_TIME_REF_COUNT changes with 1% tolerance (r2-r1 vs m2-m1).
+
+It would probably increase accuracy if we do
+
+r1_1 = rdtsc()
+KVM_GET_MSRS (HV_X64_MSR_TIME_REF_COUNT)
+r1_2 = rdtsc()
+nop_loop()
+r2_1 = rdtsc()
+KVM_GET_MSRS (HV_X64_MSR_TIME_REF_COUNT)
+r2_2 = rdtsc()
+
+and compare (r2_2 + r2_1)/2 - (r2_1 + r2_2)/2 vs m2-m1.
+
+and also increase tolerance to say 5%.
+
+> ==== Test Assertion Failure ====
+>   x86_64/hyperv_clock.c:234: false
+>   pid=66652 tid=66652 errno=4 - Interrupted system call
+>      1	0x00000000004026e7: main at hyperv_clock.c:234
+>      2	0x00007fdab782d55f: ?? ??:0
+>      3	0x00007fdab782d60b: ?? ??:0
+>      4	0x0000000000402744: _start at ??:?
+>   Failed guest assert: delta_ns * 100 < (t2 - t1) * 100 at x86_64/hyperv_clock.c:74
+
+Same story as above but from within the guest (rdmsr() istead of
+KVM_GET_MSRS). We can probably employ the same idea to increate the
+accuracy.
+
 -- 
-2.32.0
+Vitaly
 
