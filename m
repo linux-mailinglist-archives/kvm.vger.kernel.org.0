@@ -2,125 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA3825337AA
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 09:47:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69BE05337D6
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 09:56:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229854AbiEYHr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 03:47:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59982 "EHLO
+        id S231180AbiEYH4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 03:56:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiEYHr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 03:47:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6638BE86
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 00:47:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653464844;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=weQ+tr4ZIW33xmlyie2lq7CER5QpGlbJKLBC5/fkDIo=;
-        b=TE65l8+gUZ8LhQLqy8FCAVz6yb3bdfI1kTgpfVqc7/O+OgjxKZzjDO4U8aPiSgKSLWqGQW
-        4wmgojfiqnZwLHUfS+yn2KE70/4gwFoqzk4fvqPYJEVN994hH+V6MsX7Ezl28ROOycEvPG
-        my6npEboVAPeoxH7dTVkQ8OKi/szzAo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-622-94NPM2F0OBObfSKg5SyHiA-1; Wed, 25 May 2022 03:47:23 -0400
-X-MC-Unique: 94NPM2F0OBObfSKg5SyHiA-1
-Received: by mail-ej1-f70.google.com with SMTP id gr1-20020a170906e2c100b006fefea3ec0aso2919864ejb.14
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 00:47:22 -0700 (PDT)
+        with ESMTP id S229638AbiEYH4t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 03:56:49 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 333B17C147;
+        Wed, 25 May 2022 00:56:48 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id a38so15418198pgl.9;
+        Wed, 25 May 2022 00:56:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=Zm05XcXPghYiNpc+KlNS6PwBY4711oDaHig2XlH5SNk=;
+        b=XgQKOjE5xDeRr+2CajcBj588raMpn8m6GdSAt+OFHTXOfPoNWvdIRVIPXmRNpkQiwS
+         Dt+DTv+HG7Z/+bEa4XRpWKSRI+KGjlzrhUmHWAgIAm1EX+LlJV6UykNreQl74jSbOGcD
+         o+UzFwWRyEPaAX2c+2j6kmtZErdJnOWiCIOgrTt3FQsBrR/4GzTnAVML5L30b5PfTLDE
+         3tx4pwN5kYW7fomNAzkuFqXd+NKNz+4TsaXu1ivDie2xAjt+4IWmdYDxdvtlI7ndXdUt
+         e8jlVe5jW2Wj1oDVcZOky1w6ST/9JpJ6gIAghPQqghDBnFlJisIoYzZn4pmxhmZ6QeC9
+         9nRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=weQ+tr4ZIW33xmlyie2lq7CER5QpGlbJKLBC5/fkDIo=;
-        b=5nAYTXIADegeALsVgM6ssbYqsEKAzCEnz2L3J/cd4kx4HM9CED0i2IksWeHrUOks7w
-         LlRIQDxOYD/DSg2YxSXvpKtvF5kDKpZyUS//KqkrFKX82vYgbWeCFCrSSupt7JDFOpWo
-         tbtdMqJrDZx/y1lLj7IhiqJGvFVrIIjBgsaoAvZvGIV+lq31cybaeczi06v9How1TMZh
-         uifsjkg/Th86J6IjuTvzTbeXw5CqShMO3VthGwbNdV0VXHVtI9aPUzmQXGcWQNOAi/7O
-         3JW5vvTmDHHYV4Q1Pgywefjfokz0oXd0rN/BuiTCxgdeVvu6itxq6CV1186RrLrgBQ4Z
-         PESg==
-X-Gm-Message-State: AOAM532082Elbms2I16fiYpkOjtQoyQbWb6WviqcUQQ0bVh9f7KF3EgS
-        Nc7Ss6azDpERoK6d4sFM4Jm7+jiL59UYN/urRnzNeXv6xx2QocJSG/P0rHjptmRmkZlhvO1McE4
-        rZE658QNUUpfb
-X-Received: by 2002:a17:907:9626:b0:6fe:bae9:70bc with SMTP id gb38-20020a170907962600b006febae970bcmr18262771ejc.150.1653464841440;
-        Wed, 25 May 2022 00:47:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzjwVl+JlnNMeUnHXZpGc0oypUonMskZbMaAvtHu0B9VIKa+lK79/enkTX4OIesfF0BVtlNHA==
-X-Received: by 2002:a17:907:9626:b0:6fe:bae9:70bc with SMTP id gb38-20020a170907962600b006febae970bcmr18262748ejc.150.1653464841153;
-        Wed, 25 May 2022 00:47:21 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id 8-20020a170906020800b006fe8b3d8cb6sm7533165ejd.62.2022.05.25.00.47.19
+        bh=Zm05XcXPghYiNpc+KlNS6PwBY4711oDaHig2XlH5SNk=;
+        b=vPwcRWnZK9EuJjC6f7uS/KM9CoZWNVQfzEnrAIgZSZYhC4+tZIlAIjpnGkJE0B+1Sx
+         6XccGo40d6FVLbbElDnepLPXCrZhyMFBU1k8U/TEuVqnwQo+wY1YSvzE4B6dgzUfij02
+         eAjUFQxOdBbIYmxZlVC9rl3Rk31Afpj33PLalZqSOCTcKbrNJ39e2NYyrvESHX4ReQzP
+         iiHYpQNSKk1fbcjEyyxqq98031S8m9BM2yaiKdApY8LFvaDq0K011KAEgFqXZgBhIekH
+         hDOuY5NtTLOhdGLB+T2nTGA33aDzwNlksMLRD0TKwSgXelrvogubODlfAirB5ZkOHJj/
+         tQQw==
+X-Gm-Message-State: AOAM531OlMMk8/w+ZSs1D6pXDdqHh5C3+x8YyEaDIogMWlz/NjsbhaYi
+        ++2khy86eah8asZH+hDTuJo=
+X-Google-Smtp-Source: ABdhPJzfFjwZH3iuAagKE5QOGPydwSpjXz/cFak0YbMGZbDWoP8Xc12oso0ibWM7nQgQsvP1eXURFg==
+X-Received: by 2002:a65:60cf:0:b0:3fa:a259:a6fe with SMTP id r15-20020a6560cf000000b003faa259a6femr6625349pgv.222.1653465407633;
+        Wed, 25 May 2022 00:56:47 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.86])
+        by smtp.gmail.com with ESMTPSA id r5-20020a655085000000b003f60df4a5d5sm7855365pgp.54.2022.05.25.00.56.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 May 2022 00:47:20 -0700 (PDT)
-Message-ID: <4fdbe38d-0e7d-764f-beab-034a9f172137@redhat.com>
-Date:   Wed, 25 May 2022 09:47:19 +0200
+        Wed, 25 May 2022 00:56:46 -0700 (PDT)
+Message-ID: <f379a933-15b0-6858-eeef-5fbef6e5529c@gmail.com>
+Date:   Wed, 25 May 2022 15:56:42 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH kernel] KVM: Don't null dereference ops->destroy
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH RESEND v12 00/17] KVM: x86/pmu: Add basic support to
+ enable guest PEBS via DS
 Content-Language: en-US
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-References: <20220524055208.1269279-1-aik@ozlabs.ru>
- <Yo05tuQZorCO/kc0@google.com>
- <cc19c541-0b5b-423e-4323-493fd8dafdd8@ozlabs.ru>
- <6d291eba-1055-51c3-f015-d029a434b2c0@ozlabs.ru>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <6d291eba-1055-51c3-f015-d029a434b2c0@ozlabs.ru>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
+References: <20220411101946.20262-1-likexu@tencent.com>
+ <87fsl5u3bg.fsf@redhat.com> <e0b96ebd-00ee-ead4-cf35-af910e847ada@gmail.com>
+ <d7461fd4-f6ec-1a0b-6768-0008a3092add@gmail.com> <874k1ltw9y.fsf@redhat.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <874k1ltw9y.fsf@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/25/22 04:58, Alexey Kardashevskiy wrote:
+On 19/5/2022 10:46 pm, Vitaly Kuznetsov wrote:
+> Like Xu <like.xu.linux@gmail.com> writes:
+> 
+>> On 19/5/2022 9:31 pm, Like Xu wrote:
+>>> ==== Test Assertion Failure ====
+>>>      lib/x86_64/processor.c:1207: r == nmsrs
+>>>      pid=6702 tid=6702 errno=7 - Argument list too long
+>>>         1    0x000000000040da11: vcpu_save_state at processor.c:1207
+>>> (discriminator 4)
+>>>         2    0x00000000004024e5: main at state_test.c:209 (discriminator 6)
+>>>         3    0x00007f9f48c2d55f: ?? ??:0
+>>>         4    0x00007f9f48c2d60b: ?? ??:0
+>>>         5    0x00000000004026d4: _start at ??:?
+>>>      Unexpected result from KVM_GET_MSRS, r: 29 (failed MSR was 0x3f1)
 >>>
+>>> I don't think any of these failing tests care about MSR_IA32_PEBS_ENABLE
+>>> in particular, they're just trying to do KVM_GET_MSRS/KVM_SET_MSRS.
+>>
+>> One of the lessons I learned here is that the members of msrs_to_save_all[]
+>> are part of the KVM ABI. We don't add feature-related MSRs until the last
+>> step of the KVM exposure feature (in this case, adding MSR_IA32_PEBS_ENABLE,
+>> MSR_IA32_DS_AREA, MSR_PEBS_DATA_CFG to msrs_to_save_all[] should take
+>> effect along with exposing the CPUID bits).
 > 
+> AFAIR the basic rule here is that whatever gets returned with
+> KVM_GET_MSR_INDEX_LIST can be passed to KVM_GET_MSRS and read
+> successfully by the host (not necessarily by the guest) so my guess is
+> that MSR_IA32_PEBS_ENABLE is now returned in KVM_GET_MSR_INDEX_LIST but
+> can't be read with KVM_GET_MSRS. Later, the expectation is that what was
+> returned by KVM_GET_MSRS can be set successfully with KVM_SET_MSRS.
 > 
-> After reading
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2bde9b3ec8bdf60788e9e 
-> and neighboring commits, it sounds that each create() should be paired 
-> with either destroy() or release() but not necessarily both.
 
-I agree, if release() is implemented then destroy() will never be called 
-(except in error situations).
+Thanks for the clarification.
 
-kvm_destroy_devices() should not be touched, except to add a WARN_ON 
-perhaps.
+Some kvm x86 selftests have been failing due to this issue even after the last 
+commit.
 
-> So I'm really not sure dummy handlers is a good idea. Thanks,
+I blame myself for not passing the msr_info->host_initiated to the 
+intel_is_valid_msr(),
+meanwhile I pondered further whether we should check only the MSR addrs range in
+the kvm_pmu_is_valid_msr() and apply this kind of sanity check in the 
+pmu_set/get_msr().
 
-But in that case shouldn't kvm_ioctl_create_device also try 
-ops->release, i.e.
+Vitaly && Paolo, any preference to move forward ?
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6d971fb1b08d..f265e2738d46 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4299,8 +4299,11 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
-  		kvm_put_kvm_no_destroy(kvm);
-  		mutex_lock(&kvm->lock);
-  		list_del(&dev->vm_node);
-+		if (ops->release)
-+			ops->release(dev);
-  		mutex_unlock(&kvm->lock);
--		ops->destroy(dev);
-+		if (ops->destroy)
-+			ops->destroy(dev);
-  		return ret;
-  	}
-
-?
-
-Paolo
-
+Thanks,
+Like Xu
