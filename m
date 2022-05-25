@@ -2,64 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C908D5342FA
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 20:31:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B318534336
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 20:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239981AbiEYSbJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 14:31:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46096 "EHLO
+        id S242960AbiEYSmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 14:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231705AbiEYSbG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 14:31:06 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACFF1B0D36
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 11:31:04 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id a17so3228173plb.4
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 11:31:04 -0700 (PDT)
+        with ESMTP id S231151AbiEYSmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 14:42:40 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63122A186
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 11:42:39 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 31so19577238pgp.8
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 11:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=uKEKe+Ju9YvCv725rpneaqx+x5ujavGQB4X6lkKgo/0=;
-        b=cOUdrtWPdORQNfPkfg5tljXp1zxMyzR/pXl1JJVzhTE4kaJVif9+cF0sqI2vw7Dn2+
-         r2eEw357z974jOUUNAh/c0U+Y8SKE8gZv3V5fd9zLPSWBcGR6LAGtA+SsmXNzS5ZRh2h
-         YzMLNabwXsGJTQabDb558PeGgjHV0sDHCm5mLJuRZlnSUYdIb8hZ5tAGETZAnLnK4jwb
-         Trmwl1MK3AybGU7ufuKmqqCYH/vSSWNpmpV4l3KRkRQOMprnbf93FM1F3aS4KJZkjm27
-         WJ49nn32qT/q1yPdtpOpcGagud3iyI1+xu2BmIfcAbIFPRKrY5vZUKHav/uZb72JA4S9
-         r+iQ==
+        bh=q9rdEw4EiaN0h3XRnvbyQ5yD4IVKylGzvNFxDdbXbEg=;
+        b=MoWbhovX3aT7pTvWx1p4xM98j55ukFvcXkinxfJOhYUQ4eMHUU7mFu4Ju1h6srogw1
+         M5Ke0Ilftxg6UjyuvZP0o49a//6i/hpK6UiKQ2GfmQrAD10dOj5Tdiwa7l5nI3MzP6S0
+         lTNBukHBRbPPjlrS9Yqjgj8S3FhScsPCYJeBT4Y5mzr4iIqpiqwo5qYUjHx4U5PHz19G
+         zNPs9Hu6JTGPMvHEtbwjsbYiYmQg9X+xeo4O0FF6WIqssCwvOIlnUh8q2QMBe1w+XZSS
+         ODAYdhFFBVPOFqWq4/Q2ntmT0ldq84277baVgYnaeqBTjdM0fQxqRuXEnYBQ5GvG51I7
+         7ZMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=uKEKe+Ju9YvCv725rpneaqx+x5ujavGQB4X6lkKgo/0=;
-        b=evvux/IVkGAkjDmD1TeDM83KuviBYD5h9abWmfLhEZE8EMBN1Z/o+CkSNuHVgLB/ic
-         0KTvfFC39mHO3UJHGQYcmvtDOSNCs+YhJSTK77QxGQa7dPivFlpf0TOUj/0WeblaHgP7
-         bj3WwDB8hXDNBYMu/2EYCkS4519pANw6iWUlRN2+UdlXYC/KQedGl8ovVcWfsfw8zBaI
-         /ISAwHkRuagY3x2GLG5VDT0gxoywsZLE3wX4zJHXhVtG1m52Vi2uOXVCKyIQiBks5Yyw
-         MSXpkJUbXhjyymCdVDTHTOufT1Tikk286sfvh81D/I+AiMP+Ay4+Iu5EJUEDM2ROn1vo
-         R0yQ==
-X-Gm-Message-State: AOAM53186r/6pQqBfTtW1mGoJXh1vKDp0YVUx+bh2DSoFhbsV87IVH2H
-        zKdAviUtj99agzQfw/C69BbpGA==
-X-Google-Smtp-Source: ABdhPJw2EBa/qgrDqKwQullOHbOR3Kuypun6v7iK35/XF4cnLYBwP62MlX48Y4bGmI9FYVvm24KacQ==
-X-Received: by 2002:a17:902:9b93:b0:15f:17ce:3b97 with SMTP id y19-20020a1709029b9300b0015f17ce3b97mr34009600plp.174.1653503463763;
-        Wed, 25 May 2022 11:31:03 -0700 (PDT)
+        bh=q9rdEw4EiaN0h3XRnvbyQ5yD4IVKylGzvNFxDdbXbEg=;
+        b=3NqXrXSpoOs4Ewdfdml0yKMWrjJjEkszLR3m2Xj1MJLvtvDcFeZjQDNmDQxt/FgZyQ
+         cyvTROks+TtdgW56yXs4RH62qTSi+DyWBM+eUokODEGjTZ5FRaHXeFJrXqaHCLIuMepN
+         8YMj+yTSO9YAK4c1ijm3t25NRf9zcgw7u4uTZgGbuLLf+dHiE4bwDyBXIuEiIxvFx9An
+         T6IpXILG5lv/R5pYuznculB+/xSJ7I4lzTlaV7k7f148w9tz0IVeWA/zBeGgzcw2B4Dd
+         rrNNcmFk2TGX+1yvQwD7X584cOvt0PIGH8/DpREyMusnZEc7rga+XQGeUuuFpf2L+mDR
+         10vQ==
+X-Gm-Message-State: AOAM531H4ZtLenrE+b9KwvKKXJ7tePc3SsJfGUJuDCZziGDyAB+v77TZ
+        +1zR+QHEA7wpEi63emwobUGw2+Z4ymqszw==
+X-Google-Smtp-Source: ABdhPJy9v5v85XcGtTP2riFWS85jNSG/040f61d5az3Fl6w0qIbqK8AQUMu9/NeKkzMshBUBKpae/w==
+X-Received: by 2002:a63:7c4e:0:b0:380:8ae9:c975 with SMTP id l14-20020a637c4e000000b003808ae9c975mr30540800pgn.25.1653504158764;
+        Wed, 25 May 2022 11:42:38 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y14-20020a170902d64e00b001623b7bdd4asm4539088plh.10.2022.05.25.11.31.03
+        by smtp.gmail.com with ESMTPSA id b11-20020a62a10b000000b0050dc76281aesm11828625pff.136.2022.05.25.11.42.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 May 2022 11:31:03 -0700 (PDT)
-Date:   Wed, 25 May 2022 18:30:59 +0000
+        Wed, 25 May 2022 11:42:38 -0700 (PDT)
+Date:   Wed, 25 May 2022 18:42:35 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Venkatesh Srinivas <venkateshs@chromium.org>
 Cc:     kvm@vger.kernel.org, marcorr@google.com
-Subject: Re: [PATCH v2 2/2] KVM: Inject #GP on invalid writes to x2APIC
- registers
-Message-ID: <Yo5145jNvnlrjubM@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: Inject #GP on invalid write to APIC_SELF_IPI
+ register
+Message-ID: <Yo54m3UlJNImnepr@google.com>
 References: <20220525173933.1611076-1-venkateshs@chromium.org>
- <20220525173933.1611076-2-venkateshs@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220525173933.1611076-2-venkateshs@chromium.org>
+In-Reply-To: <20220525173933.1611076-1-venkateshs@chromium.org>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,52 +75,52 @@ On Wed, May 25, 2022, Venkatesh Srinivas wrote:
 > 
 > From: Venkatesh Srinivas <venkateshs@chromium.org>
 
-Heh, something is wonky in your setup, only Marc should get an explicit From:
+Only Marc should have an explicit From:.  git am processes only the first From:,
+e.g. your From: line ends up in the changelog.
 
-> The upper bytes of any x2APIC register are reserved. Inject a #GP
-> into the guest if any of these reserved bits are set.
+> The upper bytes of the x2APIC APIC_SELF_IPI register are reserved.
+
+Uber nit, please be more precise than "upper bytes".  The comment about "Bits 7:0"
+saved me from having to lookup up APIC_VECTOR_MASK, but it'd be nice to have that
+in the changelog.
+
+E.g.
+
+  Inject a #GP if the guest attempts to set reserved bits in the x2APIC-only
+  Self-IPI register.  Bits 7:0 hold the vector, all other bits are reserved.
+
+> Inject a #GP into the guest if any of these reserved bits are set.
 > 
 > Signed-off-by: Marc Orr <marcorr@google.com>
 > Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
 > ---
->  arch/x86/kvm/lapic.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  arch/x86/kvm/lapic.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 6f8522e8c492..617e4936c5cc 100644
+> index 21ab69db689b..6f8522e8c492 100644
 > --- a/arch/x86/kvm/lapic.c
 > +++ b/arch/x86/kvm/lapic.c
-> @@ -2907,6 +2907,8 @@ int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+> @@ -2169,10 +2169,16 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+>  		break;
 >  
->  	if (!lapic_in_kernel(vcpu) || !apic_x2apic_mode(apic))
->  		return 1;
-> +	else if (data >> 32)
-> +		return 1;
-
-This is incorrect, ICR is a 64-bit value.  Marc's changelog for the internal patch
-was wrong, although the code was correct.
-
-The correct upstream change is:
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 39b805666a18..54d0f350acdf 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2892,6 +2892,9 @@ static int kvm_lapic_msr_write(struct kvm_lapic *apic, u32 reg, u64 data)
-        if (reg == APIC_ICR)
-                return kvm_x2apic_icr_write(apic, data);
-
-+       if (data >> 32)
-+               return 1;
-+
-        return kvm_lapic_reg_write(apic, reg, (u32)data);
- }
-
-As penance for not testing, can you write a KUT testcase to hit all the registers?
-You could use e.g. SIPI to test that a 64-bit ICR value is _not_ rejected.
-
-One thought would be to base your testcase on top of similar changes to msr.c to
-blast all of the MCE MSRs, e.g. add a path/helper to enable x2APIC and iterate over
-all registers.
-
-[*] https://lore.kernel.org/all/20220512233045.4125471-1-seanjc@google.com
+>  	case APIC_SELF_IPI:
+> -		if (apic_x2apic_mode(apic))
+> -			kvm_apic_send_ipi(apic, APIC_DEST_SELF | (val & APIC_VECTOR_MASK), 0);
+> -		else
+> +		/*
+> +		 * Self-IPI exists only when x2APIC is enabled.  Bits 7:0 hold
+> +		 * the vector, everything else is reserved.
+> +		 */
+> +		if (!apic_x2apic_mode(apic) || (val & ~APIC_VECTOR_MASK)) {
+>  			ret = 1;
+> +			break;
+> +		}
+> +		kvm_lapic_reg_write(apic, APIC_ICR,
+> +				    APIC_DEST_SELF | (val & APIC_VECTOR_MASK));
+>  		break;
+>  	default:
+>  		ret = 1;
+> -- 
+> 2.36.1.124.g0e6072fb45-goog
+> 
