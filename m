@@ -2,61 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 862725334E9
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 03:47:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C683F53350D
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 03:52:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241848AbiEYBrz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 21:47:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55320 "EHLO
+        id S243436AbiEYBw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 21:52:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240652AbiEYBrx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 21:47:53 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FA915823
-        for <kvm@vger.kernel.org>; Tue, 24 May 2022 18:47:52 -0700 (PDT)
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4L7DTw0FX7z4xYN; Wed, 25 May 2022 11:47:48 +1000 (AEST)
+        with ESMTP id S243464AbiEYBwU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 21:52:20 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A4234D9FC
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 18:52:09 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id bo5so17965893pfb.4
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 18:52:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1653443268;
-        bh=EGg/NWkhqgS+TYzveXIrYzjI5grJ8CrjMPa5KXIW82M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UWqS+owz8XnLsimncATVeIZPrt+M5FSMuEOwndbyTqNU6V3m9T5RrOiUKdC6M8eJM
-         96kqlDkNFXOvl8bB75zPZ9bQQnTvg3JmgnjeNIMXE9aPnU5ZigbKTlI2dlqH7NDGdl
-         4vsah1OhKJGiAQF90Hs01kO2l/gCVEXNy1qBBjtY=
-Date:   Wed, 25 May 2022 11:39:39 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        iommu@lists.linux-foundation.org,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
-Message-ID: <Yo2I2zfDTEg8+PjE@yekko>
-References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <20220323165125.5efd5976.alex.williamson@redhat.com>
- <20220324003342.GV11336@nvidia.com>
- <20220324160403.42131028.alex.williamson@redhat.com>
- <YmqqXHsCTxVb2/Oa@yekko>
- <67692fa1-6539-3ec5-dcfe-c52dfd1e46b8@ozlabs.ru>
- <20220524132553.GR1343366@nvidia.com>
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=i0kR0Ce4v2WokO47YQlNMlHOMCtDXsJLHRKJYXEESG4=;
+        b=EIaUwYvdIXek/G6itJNjr91E+CWG5UHdbTPUuZN8/LMJ8JZw1HnCxG+yijW2pqyhyT
+         tpxdsj16+0CiFYQ9w/7cNSenKLxof/EODtBsXV7TsxAlnz+fdX88/tBQoyPF3K/APQFB
+         6DyEf+f9Kk/XR1OImpUsr7BtTpPMgx7QZ83VzN+6xGY556jMYQaoVxdaFn19/CtzqB5v
+         rlz8om/lm0W3JfD/tvtdtTiu7EZa8QIf4TDPGzsUXdyH05i7VWqmpsZwtEsyocXO1zlv
+         7WggbA92EUGFaCAcG1ZUHnTv6REKEk59wRo+LDH+fxrms5MA+oEKEWshBGpNg9SauTYU
+         9m7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=i0kR0Ce4v2WokO47YQlNMlHOMCtDXsJLHRKJYXEESG4=;
+        b=1u3m93OsuRXNgHfnh5PYuUh3oX5oxn0bA7rLrVXY9kc8Dqrj8YfWTPC5XsbZPKGA+H
+         NMA/LvS70d1/FAW1YJTj15M2nZwyVlDwdN/GYGkCVlgbL+3mrWOF8dLWa4j3lTQoV1l+
+         A3D2H09Sg4W8qDzUmBwPVCk9SZVcTtveaB4tX7CbVd2XCyeEUei3jow74HZzVYGFbIc2
+         9RES9NxwrEQTCZTLWNTjyFNvnhp21wyI9T+65EmL9ofOTCp+0zDf+6BBC6F32aMMzQl0
+         SNHT1Ufdn0+ttAb/6z7G/EATZxZGkO9rd5rpx/T++FwuvM3G2wCN5cqnhi9P1IbGCx0K
+         OHdQ==
+X-Gm-Message-State: AOAM531R17RYPpeaC58NcSYbrOSaOPnE8bqSN/Gj9JK8rV7nu0Y1gyxp
+        babS+HddhpqXg8EMIQLkucCulg==
+X-Google-Smtp-Source: ABdhPJxm8a5A8vCsS+KCBryIky2oAH/sUgcf8cm5IJaqFiiKYIHolgU0FmB6hRGxAZogNx894mmAEQ==
+X-Received: by 2002:a65:6852:0:b0:3fa:9371:9de with SMTP id q18-20020a656852000000b003fa937109demr7256558pgt.413.1653443528612;
+        Tue, 24 May 2022 18:52:08 -0700 (PDT)
+Received: from [10.61.2.177] (110-175-254-242.static.tpgi.com.au. [110.175.254.242])
+        by smtp.gmail.com with ESMTPSA id p19-20020a1709028a9300b00161a9df4de8sm7855230plo.145.2022.05.24.18.52.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 May 2022 18:52:07 -0700 (PDT)
+Message-ID: <cc19c541-0b5b-423e-4323-493fd8dafdd8@ozlabs.ru>
+Date:   Wed, 25 May 2022 11:52:03 +1000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="NTotmLiK/VZ5p5fr"
-Content-Disposition: inline
-In-Reply-To: <20220524132553.GR1343366@nvidia.com>
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:101.0) Gecko/20100101
+ Thunderbird/101.0
+Subject: Re: [PATCH kernel] KVM: Don't null dereference ops->destroy
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm-ppc@vger.kernel.org
+References: <20220524055208.1269279-1-aik@ozlabs.ru>
+ <Yo05tuQZorCO/kc0@google.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <Yo05tuQZorCO/kc0@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -64,56 +74,56 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---NTotmLiK/VZ5p5fr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 24, 2022 at 10:25:53AM -0300, Jason Gunthorpe wrote:
-> On Mon, May 23, 2022 at 04:02:22PM +1000, Alexey Kardashevskiy wrote:
->=20
-> > Which means the guest RAM does not need to be all mapped in that base I=
-OAS
-> > suggested down this thread as that would mean all memory is pinned and
-> > powervm won't be able to swap it out (yeah, it can do such thing now!).=
- Not
-> > sure if we really want to support this or stick to a simpler design.
->=20
-> Huh? How can it swap? Calling GUP is not optional. Either you call GUP
-> at the start and there is no swap, or you call GUP for each vIOMMU
-> hypercall.
->=20
-> Since everyone says PPC doesn't call GUP during the hypercall - how is
-> it working?
+On 5/25/22 06:01, Sean Christopherson wrote:
+> On Tue, May 24, 2022, Alexey Kardashevskiy wrote:
+>> There are 2 places calling kvm_device_ops::destroy():
+>> 1) when creating a KVM device failed;
+>> 2) when a VM is destroyed: kvm_destroy_devices() destroys all devices
+>> from &kvm->devices.
+>>
+>> All 3 Book3s's interrupt controller KVM devices (XICS, XIVE, XIVE-native)
+>> do not define kvm_device_ops::destroy() and only define release() which
+>> is normally fine as device fds are closed before KVM gets to 2) but
+>> by then the &kvm->devices list is empty.
+>>
+>> However Syzkaller manages to trigger 1).
+>>
+>> This adds checks in 1) and 2).
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>
+>> I could define empty handlers for XICS/XIVE guys but
+>> kvm_ioctl_create_device() already checks for ops->init() so I guess
+>> kvm_device_ops are expected to not have certain handlers.
+> 
+> Oof.  IMO, ->destroy() should be mandatory in order to pair with ->create().
+> kvmppc_xive_create(), kvmppc_xics_create(), and kvmppc_core_destroy_vm() are doing
+> some truly funky stuff to avoid leaking the device that's allocate in ->create().
 
-The current implementation does GUP during the pre-reserve.  I think
-Alexey's talking about a new PowerVM (IBM hypervisor) feature; I don't
-know how that works.
+Huh it used to be release() actually, nice:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5422e95103cf9663bc
 
---NTotmLiK/VZ5p5fr
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+> A nop/dummy ->destroy() would be a good place to further document those shenanigans.
+> There's a comment at the end of the ->release() hooks, but that's still not very
+> obvious.
 
-iQIzBAEBCAAdFiEEoULxWu4/Ws0dB+XtgypY4gEwYSIFAmKNiLQACgkQgypY4gEw
-YSLnFRAAhlmoBMol4J9baUS6tCTxZ0TBL5Vbqt8RKLryhFiIIQOrrB6kTU5uyYSX
-vdyI/V7+cC2vjYmEDwUM8hnFi3cTpW+BMj4TeQSxEgIPHJ4tWs0yGuuhboVKhuJV
-9h2iSi/SLdOc5ZELFwWZ5YTJc88EUzeDY+B+l3gL+PTxOW8WuBQmjQs+xw5Oaqhx
-YY24PAoLnL/nmSOJU9jmb+1opQoah0WmziyMp5H/eX+n09XrI+OieVcgAJSvlCQ8
-MJsuVokzY/cvJKJPtJRB+VKxrcavcivF6WWzcCz6e3tzkdcfOzWrEzKjfoo5pFM0
-bpk5iAs34G3n+m+OGQHEKgKpRa5cGTj92Wzdic1IDAA10PRScGwJVKynImWxozKT
-S1C4zjG87inJyYQ15DEYygNvRCrzNMEsbHm4NGlh4H9rTEwJ2s0DZyPUGmxOnf5E
-qG64BxrmR6HhoLvuAehIok7rfEZL0EWK7xLwP8w6Q/G33W/Tpc9PpZT06SdZoKOm
-tD7TFUqjjtIZwGDpggJLCiDZYF8xwaW4qnWwnpgms//pijFkaL41pxE0y/vS4lOA
-uS5ATgjrMtsvaIqvygQg8eUhhUtbn08sHseYoriwWMbCMzBt8KJEXyvQ3wWvUIYp
-K7DQMs+/yPDTXxFo86ZqBWwEFC8MCnVM4V8rs8Fti1k87TrZT3Y=
-=9VPE
------END PGP SIGNATURE-----
+I could probably borrow some docs from here:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6f868405faf067e8cfb
 
---NTotmLiK/VZ5p5fr--
+
+Thanks for the review! At very least I'll add the dummies.
+
+
+> The comment above kvmppc_xive_get_device() strongly suggests that keeping the
+> allocation is a hack to avoid having to audit all relevant code paths, i.e. isn't
+> done for performance reasons.
+
+
+
+
+-- 
+Alexey
