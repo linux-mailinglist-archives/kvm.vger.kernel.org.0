@@ -2,124 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12D51534672
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 00:26:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8A0F5346E8
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 01:09:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243533AbiEYW0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 18:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55306 "EHLO
+        id S1345214AbiEYXJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 19:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345403AbiEYW0V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 18:26:21 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09272266B
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 15:26:16 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2eb7d137101so190422587b3.12
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 15:26:15 -0700 (PDT)
+        with ESMTP id S230474AbiEYXJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 19:09:11 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0208D91546
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 16:09:09 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id u8-20020a656708000000b003f70a43fe1eso7494107pgf.3
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 16:09:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=sP4pft3yTMhXYmyTAUA9SDM5ympNXK0fw2aWJc3LaWM=;
-        b=nt8xIxammCWBKmuZkiAyG5Rfz8Wi+6snvbgkikf7esrJCQZz6kOdx+Day2vV2sO0s0
-         Cdb9tCPtVcRNZKt9tqyi+H5WzmOtP9vbdXPm2NDP6a8FFSA/gHxOYDC2wY6a9+Htd0e8
-         WG676KXqy6xskD362nmb8T+9mg3JeTqIe8sFrphUxixgMSIHs3djCBOpnx8fwJyY6dx/
-         6cZpOzp9DAkrASVkngVbSfTtsygFC8F1gfailABOosvp7tpqSETO9M9PnMf2HyPGPb5E
-         n4lzS3Q2DZJVTrUKbsyaZx/8wt3mfVyuMnZ1aemACgJSNb4mb3/SmPfPwnY/YRvAl9/E
-         no5w==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=YrjJHRFdS5VonxkVsAHBuBVkWew0ibSghSiVOFylo/0=;
+        b=gFfiWRVGugXdj5kNECaC63se48jXOxl37x3pQVu/GVdoyQAVtuM/EK0DWrxIz5eUqb
+         HBRcZZA/xAqyUbMfWJ13wlYg4NU2bBktbl2Oh4qqoJSR/gC6M6lpnAQhO84Z7ftzZVXF
+         RjE2gdia/87jx/S7lxbRW3lGpFw4BL/jqQ6NmyogTRAZpLfx26cza5BdYkGwzDcfmBBv
+         CWt2X3uKH3NZChj1746knGWBVJetjBjJ1hcqzxXAxRs3B0V00ZqLdeuaWczFVTmYf6vc
+         00RAmX0eOL3LR8LuFFB9GunMA6l/yWmQetsIsSxvOaKO0SxnO22FxhYc1GuihdOKPkof
+         poqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=sP4pft3yTMhXYmyTAUA9SDM5ympNXK0fw2aWJc3LaWM=;
-        b=uTpdJMO214yCu2cftfVWH9L92s03S1jZwG3+e97lmeDQ7dZWp5JcXD3Q8LqhksKCgF
-         d3OtTmZzccoJn07cPl7XmO4Xp+khc4uKc2wlbyMqnnaAb9IO5cZ9wOhjgrA4fEgCOgS7
-         JOTytxOB5rUqRYo7PTD5vm75aZj8sYuoAPslJK4PcX0Vo8MjUJKFLhf1S9vXx9M9zOXH
-         bBCrCWM3pG8nNtSrf38pY6Paf3bdO7iIrcHQNemQk/QG/LLfvT0f8R9XUJWyzmCYuZcB
-         dT3db78fSxMud1lod7S9ZLB3hRzKh7X4gZest4BkinvnjCcKXTR/6mB/JKcXyBVxHvcZ
-         FtBQ==
-X-Gm-Message-State: AOAM530V3mJh/RV5JZ/y3FI8oAWTZeejJBCmgnE+n8dH4XtN/SBCuE4o
-        1VlbuFD0pYVuGleT4NkRBckCGn4+ERw=
-X-Google-Smtp-Source: ABdhPJyJ4tmdcPftxWFkmif8ejJIr/nQV0DAemlOUfspDQk7AN8fRlvb33qyuKNBkQq4K+vySs4+bJ4qE7Q=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a25:cb17:0:b0:64f:5939:533 with SMTP id
- b23-20020a25cb17000000b0064f59390533mr27804829ybg.105.1653517575274; Wed, 25
- May 2022 15:26:15 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 25 May 2022 22:26:04 +0000
-In-Reply-To: <20220525222604.2810054-1-seanjc@google.com>
-Message-Id: <20220525222604.2810054-5-seanjc@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=YrjJHRFdS5VonxkVsAHBuBVkWew0ibSghSiVOFylo/0=;
+        b=Gtsly2ByCi5CW8t1cCgEEoUNUfFjdZETviwsH76Wbg9FfAIxQzSkPYE2MWMUFUj671
+         KAHNUsY0M/2fNfLJVPDZJB+j1mmGQL1qf1lKH1mpeW3S/M4r7skYEvtWDLf68Evfd4MX
+         ReaYB6yx8fY/kKxjwhUcnWkxKL9nA7RWwLgVMkquHfkl2sNrITsj10icq735GWL5CgYg
+         ocRyJSGSKgzgch5bUulz78V+0R5N/LHV4G/co/aVRqPEPGVaUmeZcYQbMt2oy0Q1z43l
+         YMvWEQbth2OdGswVlh3Wju1rf+8P9E8oa/HY2GHZtAtRDw4/LSXRzxP73zWgS1gavDFV
+         c6SQ==
+X-Gm-Message-State: AOAM533ELncES/anjCTRJHmwmx0aeOyRvVAwv6CGoZxcIySbjyYY7XmQ
+        lkWPHCDgcXZsrEPImTTgAnb1qQiPWAMXQR/Z9ZX6Hz9RO6X4cz8Tz3qO1HZgJNCFkEXmacKyoZZ
+        uBhEeNIyxevOSZdXlgXPkePPmafku8zE0TMLd4IbFNYJq6AVokmRzGiLCnYea
+X-Google-Smtp-Source: ABdhPJx37yu8A24ZMkoDUIBUi5tSrrE6OPryVyWVtHXumbOflxgrCjmDatYIZ+WQA1RdSDVx2Gn3EKpW5B/n
+X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
+ (user=bgardon job=sendgmr) by 2002:aa7:8081:0:b0:518:26c4:ea42 with SMTP id
+ v1-20020aa78081000000b0051826c4ea42mr29589288pff.7.1653520149143; Wed, 25 May
+ 2022 16:09:09 -0700 (PDT)
+Date:   Wed, 25 May 2022 23:09:04 +0000
+Message-Id: <20220525230904.1584480-1-bgardon@google.com>
 Mime-Version: 1.0
-References: <20220525222604.2810054-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH 4/4] KVM: x86: Use 16-bit fields to track dirty/valid emulator GPRs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+Subject: [PATCH] KVM: x86/MMU: Zap non-leaf SPTEs when disabling dirty logging
+From:   Ben Gardon <bgardon@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Robert Dinse <nanook@eskimo.com>,
-        Kees Cook <keescook@chromium.org>
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use a u16 instead of a u32 to track the dirty/valid status of GPRs in the
-emulator.  Unlike struct kvm_vcpu_arch, x86_emulate_ctxt tracks only the
-"true" GPRs, i.e. doesn't include RIP in its array, and so only needs to
-track 16 registers.
+When disabling dirty logging, zap non-leaf parent entries to allow
+replacement with huge pages instead of recursing and zapping all of the
+child, leaf entries. This reduces the number of TLB flushes required.
 
-Note, having 16 GPRs is a fundamental property of x86-64 and will not
-change barring a massive architecture update.  Legacy x86 ModRM and SIB
-encodings use 3 bits for GPRs, i.e. support 8 registers.  x86-64 uses a
-single bit in the REX prefix for each possible reference type to double
-the number of supported GPRs to 16 registers (4 bits).
+Currently disabling dirty logging with the TDP MMU is extremely slow.
+On a 96 vCPU / 96G VM backed with gigabyte pages, it takes ~200 seconds
+to disable dirty logging with the TDP MMU, as opposed to ~4 seconds with
+the shadow MMU. This patch reduces the disable dirty log time with the
+TDP MMU to ~3 seconds.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Testing:
+Ran KVM selftests and kvm-unit-tests on an Intel Haswell. This
+patch introduced no new failures.
+
+Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/emulate.c     | 3 +++
- arch/x86/kvm/kvm_emulate.h | 4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/tdp_iter.c |  9 +++++++++
+ arch/x86/kvm/mmu/tdp_iter.h |  1 +
+ arch/x86/kvm/mmu/tdp_mmu.c  | 38 +++++++++++++++++++++++++++++++------
+ 3 files changed, 42 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index dd1bf116a9ed..afb115b6a5a4 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -262,6 +262,9 @@ static ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned nr)
- 	if (WARN_ON_ONCE(nr >= NR_EMULATOR_GPRS))
- 		nr &= NR_EMULATOR_GPRS - 1;
+diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
+index 6d3b3e5a5533..ee4802d7b36c 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.c
++++ b/arch/x86/kvm/mmu/tdp_iter.c
+@@ -145,6 +145,15 @@ static bool try_step_up(struct tdp_iter *iter)
+ 	return true;
+ }
  
-+	BUILD_BUG_ON(sizeof(ctxt->regs_dirty) * BITS_PER_BYTE < NR_EMULATOR_GPRS);
-+	BUILD_BUG_ON(sizeof(ctxt->regs_valid) * BITS_PER_BYTE < NR_EMULATOR_GPRS);
++/*
++ * Step the iterator back up a level in the paging structure. Should only be
++ * used when the iterator is below the root level.
++ */
++void tdp_iter_step_up(struct tdp_iter *iter)
++{
++	WARN_ON(!try_step_up(iter));
++}
 +
- 	ctxt->regs_valid |= 1 << nr;
- 	ctxt->regs_dirty |= 1 << nr;
- 	return &ctxt->_regs[nr];
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index bdd4e9865ca9..fbe87ba78163 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -353,9 +353,9 @@ struct x86_emulate_ctxt {
- 	u8 lock_prefix;
- 	u8 rep_prefix;
- 	/* bitmaps of registers in _regs[] that can be read */
--	u32 regs_valid;
-+	u16 regs_valid;
- 	/* bitmaps of registers in _regs[] that have been written */
--	u32 regs_dirty;
-+	u16 regs_dirty;
- 	/* modrm */
- 	u8 modrm;
- 	u8 modrm_mod;
+ /*
+  * Step to the next SPTE in a pre-order traversal of the paging structure.
+  * To get to the next SPTE, the iterator either steps down towards the goal
+diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
+index f0af385c56e0..adfca0cf94d3 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.h
++++ b/arch/x86/kvm/mmu/tdp_iter.h
+@@ -114,5 +114,6 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
+ 		    int min_level, gfn_t next_last_level_gfn);
+ void tdp_iter_next(struct tdp_iter *iter);
+ void tdp_iter_restart(struct tdp_iter *iter);
++void tdp_iter_step_up(struct tdp_iter *iter);
+ 
+ #endif /* __KVM_X86_MMU_TDP_ITER_H */
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 841feaa48be5..7b9265d67131 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1742,12 +1742,12 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+ 	gfn_t start = slot->base_gfn;
+ 	gfn_t end = start + slot->npages;
+ 	struct tdp_iter iter;
++	int max_mapping_level;
+ 	kvm_pfn_t pfn;
+ 
+ 	rcu_read_lock();
+ 
+ 	tdp_root_for_each_pte(iter, root, start, end) {
+-retry:
+ 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+ 			continue;
+ 
+@@ -1755,15 +1755,41 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+ 		    !is_last_spte(iter.old_spte, iter.level))
+ 			continue;
+ 
++		/*
++		 * This is a leaf SPTE. Check if the PFN it maps can
++		 * be mapped at a higher level.
++		 */
+ 		pfn = spte_to_pfn(iter.old_spte);
+-		if (kvm_is_reserved_pfn(pfn) ||
+-		    iter.level >= kvm_mmu_max_mapping_level(kvm, slot, iter.gfn,
+-							    pfn, PG_LEVEL_NUM))
++
++		if (kvm_is_reserved_pfn(pfn))
+ 			continue;
+ 
++		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot,
++				iter.gfn, pfn, PG_LEVEL_NUM);
++
++		WARN_ON(max_mapping_level < iter.level);
++
++		/*
++		 * If this page is already mapped at the highest
++		 * viable level, there's nothing more to do.
++		 */
++		if (max_mapping_level == iter.level)
++			continue;
++
++		/*
++		 * The page can be remapped at a higher level, so step
++		 * up to zap the parent SPTE.
++		 */
++		while (max_mapping_level > iter.level)
++			tdp_iter_step_up(&iter);
++
+ 		/* Note, a successful atomic zap also does a remote TLB flush. */
+-		if (tdp_mmu_zap_spte_atomic(kvm, &iter))
+-			goto retry;
++		tdp_mmu_zap_spte_atomic(kvm, &iter);
++
++		/*
++		 * If the atomic zap fails, the iter will recurse back into
++		 * the same subtree to retry.
++		 */
+ 	}
+ 
+ 	rcu_read_unlock();
 -- 
 2.36.1.124.g0e6072fb45-goog
 
