@@ -2,113 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCEA853356B
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 04:41:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF39C533573
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 04:50:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242649AbiEYClP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 May 2022 22:41:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52940 "EHLO
+        id S243674AbiEYCt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 May 2022 22:49:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243620AbiEYClB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 May 2022 22:41:01 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B1E76F4B5;
-        Tue, 24 May 2022 19:41:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653446460; x=1684982460;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=EoglK7wI9wFrWezRsQe3Br0zDO3xeXDwJ23PuVxLiPA=;
-  b=F1MWyDkGsYyryrQWkUEZ9WW1qcuNNi100Dq/cUJG5awqxsUKN3XFaNkQ
-   yZ2uHb/98ahsN2+gjC50OClCDE7b7q0gKQ2lBowg2ibusFeOh/rYtMJka
-   AdiTMtJIRQxpgBbU3ztr6vx0zLEC9untcWYqzl8mexRn5DeO/bimHQRTi
-   c6yGHp6xcZGTUlG+FdPH6GWwIX+31yT3EDMV3tzWBVanHRqwRxTlkNIV0
-   KxWCBngBZn9rfaYvXepvaJ2oA9jeXWKLYjYILYX8D8sbSjigvjUwdMV2j
-   0j2Y32LcSOJUdI5DHhCgiPn2diyEmGARks8yxaFAs6zawe3VGt4xqR8LU
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10357"; a="253572689"
-X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="253572689"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 19:40:59 -0700
-X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="601612579"
-Received: from leiwang7-mobl.ccr.corp.intel.com (HELO [10.254.211.184]) ([10.254.211.184])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 19:40:56 -0700
-Message-ID: <9f675446-7028-6f45-7e06-1efde012afb4@intel.com>
-Date:   Wed, 25 May 2022 10:40:53 +0800
+        with ESMTP id S239740AbiEYCt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 May 2022 22:49:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 21386703CB
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 19:49:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653446995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ElTuX9jWxfL0CUwfGnyHCc3cXorhj0tUDVKXC9Pq5yE=;
+        b=SCsFvErvjB569gHhEv8qQXK/cvYp4munxTKrceCZ4ZonnBY+omeKA1L2/IcbPlL0EodUAc
+        H0FZf9Amkatu87aHrv8BlfZekH5SrTJSyeVQsfxd2AalOxnndN0IcpOFLNqja39HRkUMZS
+        /X03vhEpapmdK93QSD80fPkWw5KfQwc=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-395-NwjOcinANhuaryo-iEPGzw-1; Tue, 24 May 2022 22:49:53 -0400
+X-MC-Unique: NwjOcinANhuaryo-iEPGzw-1
+Received: by mail-lf1-f70.google.com with SMTP id x36-20020a056512132400b0044b07b24746so10015641lfu.8
+        for <kvm@vger.kernel.org>; Tue, 24 May 2022 19:49:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ElTuX9jWxfL0CUwfGnyHCc3cXorhj0tUDVKXC9Pq5yE=;
+        b=WlROko7tQoZP+heRexUp8vZRQHgsneVtCniVv+wOrV5LaYtuFps5rFeaKwlaYXNyY6
+         qTpUw5SINdLT3U7SQDtvNWOCxJz8IXPpb9glOstJEW6U644n2QSfXkkspqlabeof+a63
+         llX0EPnRafl7REprQNrp1gC6cp/6xigWUXNfj+mGsyjWCw5Owpjy6FdNuZA/qaPET85E
+         7PsO5Fji+Jl1vt9pqLynQHS6DelqlNbKjckNa/nABRlvOLpCrU/AQWNIhDRoogz8mbJF
+         K61dSAH7omc1nuGQEOIuqBu8TZWH50/Vpb4hy6IXjRTlEqYi0HqdmJWhYtSyY9vvbAET
+         +PZA==
+X-Gm-Message-State: AOAM532lJafALzTKRmdzyBPLqbgm9KgmJSrPaygKwj+pDLRc0FHNNP/z
+        fEC801d7W9Hh4nNM3Y1ahbiJVfWqP6vdsXfliEY613wKcmw34nWgAjSUoJa/3nwNaJc5tpH0elG
+        ToVfS0KI5KCVbQJstPYXD2bGCfCNd
+X-Received: by 2002:a2e:81c1:0:b0:24b:f44:3970 with SMTP id s1-20020a2e81c1000000b0024b0f443970mr17702603ljg.97.1653446992152;
+        Tue, 24 May 2022 19:49:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwaAlxsbkHduKZFbcUP9Q8h4gtKP25cQ1tcIPf8o5riuG1dRzo29yaMgKzd1IjazP5PKoJ9oIdwVR4fFRKu26Q=
+X-Received: by 2002:a2e:81c1:0:b0:24b:f44:3970 with SMTP id
+ s1-20020a2e81c1000000b0024b0f443970mr17702581ljg.97.1653446991974; Tue, 24
+ May 2022 19:49:51 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.9.1
-Subject: Re: [PATCH] KVM: VMX: Read BNDCFGS if not from_vmentry
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, chenyi.qiang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220421091331.11196-1-lei4.wang@intel.com>
- <YoaFknp7Swj0DdRw@google.com>
-From:   "Wang, Lei" <lei4.wang@intel.com>
-In-Reply-To: <YoaFknp7Swj0DdRw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220524170610.2255608-1-eperezma@redhat.com>
+In-Reply-To: <20220524170610.2255608-1-eperezma@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 25 May 2022 10:49:40 +0800
+Message-ID: <CACGkMEvHRL7a6njivA0+ae-+nXUB9Dng=oaQny0cHu-Ra+bcFg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] Implement vdpasim stop operation
+To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
+Cc:     netdev <netdev@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Parav Pandit <parav@nvidia.com>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>, tanuj.kamde@amd.com,
+        "Dawar, Gautam" <gautam.dawar@amd.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Dinan Gunawardena <dinang@xilinx.com>,
+        habetsm.xilinx@gmail.com, Eli Cohen <elic@nvidia.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Cindy Lu <lulu@redhat.com>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        ecree.xilinx@gmail.com, "Uminski, Piotr" <Piotr.Uminski@intel.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Longpeng <longpeng2@huawei.com>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/20/2022 1:59 AM, Sean Christopherson wrote:
-> On Thu, Apr 21, 2022, Lei Wang wrote:
->> In the migration case, if nested state is set after MSR state, the value
->> needs to come from the current MSR value.
->>
->> Signed-off-by: Lei Wang <lei4.wang@intel.com>
->> Reported-by: Sean Christopherson <seanjc@google.com>
->> ---
->>   arch/x86/kvm/vmx/nested.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index f18744f7ff82..58a1fa7defc9 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -3381,7 +3381,8 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->>   	if (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
->>   		vmx->nested.vmcs01_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
->>   	if (kvm_mpx_supported() &&
->> -		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
->> +	    (!from_vmentry ||
-> Gah, my bad, this isn't correct either.  The minor issue is that it should check
-> vmx->nested.nested_run_pending, not just from_vmentry.  If nested state is restored
-> and a VM-Entry is pending, then the MSRs that were saved+restore were L1's MSRs,
-> not L2's MSRs.
+On Wed, May 25, 2022 at 1:06 AM Eugenio P=C3=A9rez <eperezma@redhat.com> wr=
+ote:
 >
-> That won't cause problems because the consumption correctly checks nested_run_pending,
-> it's just confusing and an unnecessary VMREAD.
+> Implement stop operation for vdpa_sim devices, so vhost-vdpa will offer
+> that backend feature and userspace can effectively stop the device.
 >
-> But that's a moot point because vmcs01 will not hold the correct value in the SMM
-> case.  Luckily, BNDCFGS is easy to handle because it's unconditionally saved on
-> VM-Exit, which means that vmcs12 is guaranteed to hold the correct value for both
-> SMM and state restore (without pending entry) because the pseudo-VM-Exit for both
-> will always save vmcs02's value into vmcs12.
+> This is a must before get virtqueue indexes (base) for live migration,
+> since the device could modify them after userland gets them. There are
+> individual ways to perform that action for some devices
+> (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
+> way to perform it for any vhost device (and, in particular, vhost-vdpa).
 >
-> GUEST_IA32_DEBUGCTL is a much bigger pain because it's conditionally saved on
-> exit.   I think the least awful approach would be to save L2's value into
-> vmcs01_debugctl prior to the forced exit in vmx_enter_smm(), but that will require
-> more changes to the state restore flow.  Grr.
->
-> I'll send patches for both BNDCFGS and IA32_DEBUGCTL, and will take a careful look
-> at the PKS stuff too.  I'm guessing it should follow the BNDCFGS logic.
->
-> Sorry for the runaround.
+> After the return of ioctl with stop !=3D 0, the device MUST finish any
+> pending operations like in flight requests. It must also preserve all
+> the necessary state (the virtqueue vring base plus the possible device
+> specific states) that is required for restoring in the future. The
+> device must not change its configuration after that point.
 
-Thanks for your detailed reviewing, no need for sorry.
+I'd suggest documenting this in the code maybe around ops->stop()?
 
-Looking forward to your fix patches.
+Thanks
+
+>
+> After the return of ioctl with stop =3D=3D 0, the device can continue
+> processing buffers as long as typical conditions are met (vq is enabled,
+> DRIVER_OK status bit is enabled, etc).
+>
+> In the future, we will provide features similar to VHOST_USER_GET_INFLIGH=
+T_FD
+> so the device can save pending operations.
+>
+> Comments are welcome.
+>
+> v2:
+> * Replace raw _F_STOP with BIT_ULL(_F_STOP).
+> * Fix obtaining of stop ioctl arg (it was not obtained but written).
+> * Add stop to vdpa_sim_blk.
+>
+> Eugenio P=C3=A9rez (4):
+>   vdpa: Add stop operation
+>   vhost-vdpa: introduce STOP backend feature bit
+>   vhost-vdpa: uAPI to stop the device
+>   vdpa_sim: Implement stop vdpa op
+>
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 21 +++++++++++++++++
+>  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
+>  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++
+>  drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++
+>  drivers/vhost/vdpa.c                 | 34 +++++++++++++++++++++++++++-
+>  include/linux/vdpa.h                 |  6 +++++
+>  include/uapi/linux/vhost.h           |  3 +++
+>  include/uapi/linux/vhost_types.h     |  2 ++
+>  8 files changed, 72 insertions(+), 1 deletion(-)
+>
+> --
+> 2.27.0
+>
+>
 
