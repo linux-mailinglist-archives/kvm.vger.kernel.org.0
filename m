@@ -2,140 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 658E95340F7
-	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 18:03:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 733375341F5
+	for <lists+kvm@lfdr.de>; Wed, 25 May 2022 19:04:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241633AbiEYQD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 12:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56620 "EHLO
+        id S245556AbiEYREd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 13:04:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235695AbiEYQDY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 12:03:24 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE23B41D0;
-        Wed, 25 May 2022 09:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653494602; x=1685030602;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7NhX25SuGNORs55jhWR7pX5NAvt/ZOoud0zyj6OlrCQ=;
-  b=NS5JDpHnZ3yFPAxk3tY/YOp3ICFbFxBnJ7xnwWBRnwb3ez9tMd0DkxRG
-   NTEzjnUCXbPJhI+KixJDyB0RNtxKSB68CP70kYCwE/5O+zS6PZQp4eeSr
-   1kd8D+TaIgfe5JRrPGg+8Ux/qrNvGfHowrIeDYaeVFme32/qcWJN94QrO
-   oL0gUbkTELDv8vfqDJkZumG6P7l36SeIdP85gftuxFei0BXAq8F4yCJw6
-   TaBcpKrnmhmqYepVf1BGbyMPIL1bduXyN7rA2v4a69sh0hXKbQ3fQdO6B
-   0RVH7h81na2ZE4G20vD3ib+W1qCs64me9bImX5R/+DdJvRcUQYOpDRUar
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10358"; a="254351182"
-X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="254351182"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2022 09:00:56 -0700
-X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="573338858"
-Received: from canagani-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.35.228])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2022 09:00:52 -0700
-Message-ID: <6efb18e38a7812b62652ce5c403455811336f063.camel@intel.com>
-Subject: Re: [PATCH v3 09/21] x86/virt/tdx: Get information about TDX module
- and convertible memory
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Thu, 26 May 2022 04:00:49 +1200
-In-Reply-To: <a47b12f762272540d7b8b691d863b60ddb0d246d.camel@intel.com>
-References: <cover.1649219184.git.kai.huang@intel.com>
-         <145620795852bf24ba2124a3f8234fd4aaac19d4.1649219184.git.kai.huang@intel.com>
-         <f929fb7a-5bdc-2567-77aa-762a098c8513@intel.com>
-         <0bab7221179229317a11311386c968bd0d40e344.camel@intel.com>
-         <98f81eed-e532-75bc-d2d8-4e020517b634@intel.com>
-         <be31134cf44a24d6d38fbf39e9e18ef223e216c6.camel@intel.com>
-         <4aea41ea-211f-fbde-34e9-4c4467ebc848@intel.com>
-         <a6694c81b4e96a22557fd0af70a81bd2c2e4e3e7.camel@intel.com>
-         <a47b12f762272540d7b8b691d863b60ddb0d246d.camel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S234008AbiEYREa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 13:04:30 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BACD1A5AA5
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 10:04:29 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 137so19401659pgb.5
+        for <kvm@vger.kernel.org>; Wed, 25 May 2022 10:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VkDubMGG5SCRMuHuQsS5DenNW7uQ4digBzOq9qw78dU=;
+        b=IFiAsMCbtaaK4caxyL93pN5Zg7/qEiJ8IAhSaR8KOayM4ruJboictF39dqtBvUNN2R
+         +DWLV4c4JkSXjo0BSZpbKyu+d8sxIcozAez3/JrOcGg35ngql4dwQBSZtvdrR1MCvEUA
+         tw71zmbo/P12QACrbU7rS/QsDRi/RbuMyHNgLnO29m5KVMLtxwnBoXQ1sv7bciJH0wQ9
+         Y2TmOJEtjN8uRC4oGAvDIj5Y6o8fCraaPaComfg17q33Y+3lM/1qwhE+zHbDnGqidbtp
+         pqKXtT0bbAkG68gpAIq7P6xLsi2rJYpU3wJIVE4ZR26ay1R24a1g6ZVFYzUYwt8+Q29W
+         UqCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VkDubMGG5SCRMuHuQsS5DenNW7uQ4digBzOq9qw78dU=;
+        b=D49bSUe5n1jt7iYP9XXYVYfZe9s20+lDTVXeCJxuXmBfWGWnC+lNuZOpQrXxJTqTZG
+         LxtkEYVBLN8YgWjv+7acsJIY1TE7GN1KEWNCFC9Als7niVIxkZ9sUYYYazygCUEohN4C
+         2F0OYGTSZpdwyj0grRmI5l4Sxd9/Q1BrHpx6tKmU/oO0ruprsp7M4UwfBHE9p8JFAXKU
+         od6ahTf94KQIPJzKzp93FJiTn7DxLV/oMzAOq/Vspw8WjapeIpQGM4o4Vt5dOPXrnb0m
+         JyZ62C7OSuc8KxMfrRnlXEenQHb6Jl/Da1Iv/gHUm1QY/5ahFeMworWUVYkHW43ccu4w
+         V0UQ==
+X-Gm-Message-State: AOAM531weit4aEjE4UtHr2zZfxbLrkKWZtPYEs2qpvvdXX+bnjphzzPX
+        IZ3do6VG2jwfGyW4vC4/WbY73g==
+X-Google-Smtp-Source: ABdhPJzEn8wwx3OZB4S7CQBD3uuo9Aqp+I2lhgGC8u1pQXAaFVNKWAeVk1ybEkX3hf0O13RBwLCvvQ==
+X-Received: by 2002:a65:4506:0:b0:3db:48b1:9ff5 with SMTP id n6-20020a654506000000b003db48b19ff5mr30116781pgq.89.1653498269065;
+        Wed, 25 May 2022 10:04:29 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id mm23-20020a17090b359700b001cd4989fec6sm1861910pjb.18.2022.05.25.10.04.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 May 2022 10:04:28 -0700 (PDT)
+Date:   Wed, 25 May 2022 17:04:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Waiman Long <longman@redhat.com>,
+        Kees Cook <keescook@chromium.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: VMX: do not disable interception for
+ MSR_IA32_SPEC_CTRL on eIBRS
+Message-ID: <Yo5hmcdRvE1UrI4y@google.com>
+References: <20220520204115.67580-1-jon@nutanix.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220520204115.67580-1-jon@nutanix.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-05-25 at 16:57 +1200, Kai Huang wrote:
-> On Wed, 2022-05-25 at 16:47 +1200, Kai Huang wrote:
-> > On Fri, 2022-04-29 at 10:47 -0700, Dave Hansen wrote:
-> > > On 4/28/22 16:14, Kai Huang wrote:
-> > > > On Thu, 2022-04-28 at 07:06 -0700, Dave Hansen wrote:
-> > > > > On 4/27/22 17:15, Kai Huang wrote:
-> > > > > > > Couldn't we get rid of that comment if you did something like:
-> > > > > > > 
-> > > > > > > 	ret = tdx_get_sysinfo(&tdx_cmr_array, &tdx_sysinfo);
-> > > > > > 
-> > > > > > Yes will do.
-> > > > > > 
-> > > > > > > and preferably make the variables function-local.
-> > > > > > 
-> > > > > > 'tdx_sysinfo' will be used by KVM too.
-> > > > > 
-> > > > > In other words, it's not a part of this series so I can't review whether
-> > > > > this statement is correct or whether there's a better way to hand this
-> > > > > information over to KVM.
-> > > > > 
-> > > > > This (minor) nugget influencing the design also isn't even commented or
-> > > > > addressed in the changelog.
-> > > > 
-> > > > TDSYSINFO_STRUCT is 1024B and CMR array is 512B, so I don't think it should be
-> > > > in the stack.  I can change to use dynamic allocation at the beginning and free
-> > > > it at the end of the function.  KVM support patches can change it to static
-> > > > variable in the file.
-> > > 
-> > > 2k of stack is big, but it isn't a deal breaker for something that's not
-> > > nested anywhere and that's only called once in a pretty controlled
-> > > setting and not in interrupt context.  I wouldn't cry about it.
-> > 
-> > Hi Dave,
-> > 
-> > I got below complaining when I use local variable for TDSYSINFO_STRUCT and CMR
-> > array:
-> > 
-> > arch/x86/virt/vmx/tdx/tdx.c:383:1: warning: the frame size of 3072 bytes is
-> > larger than 1024 bytes [-Wframe-larger-than=]
-> >   383 | }
-> > 
-> > So I don't think we can use local variable for them.  I'll still use static
-> > variables to avoid dynamic allocation.  In the commit message, I'll explain they
-> > are too big to put into the stack, and KVM will need to use TDSYSINFO_STRUCT
-> > reported by TDX module anyway.
-> > 
-> > Let me know if you don't agree?
+On Fri, May 20, 2022, Jon Kohler wrote:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 610355b9ccce..1c725d17d984 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2057,20 +2057,32 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  			return 1;
 > 
-> Btw, CMR array alone can be put into the stack.  It will never be used by KVM,
-> so I'll put CMR array as local variable, but keep tdx_sysinfo as static
-> variable.
-> 
+>  		vmx->spec_ctrl = data;
+> -		if (!data)
+> +
+> +		/*
+> +		 * Disable interception on the first non-zero write, unless the
+> +		 * guest is hosted on an eIBRS system and setting only
 
-Sorry for multiple emails about this.  If I put CMR array to the stack, I still
-sometimes get the build warning.  So will use static variables.
+The "unless guest is hosted on an eIBRS system" blurb is wrong and doesn't match
+the code.  Again, it's all about whether eIBRS is advertised to the guest.  With
+some other minor tweaking to wrangle the comment to 80 chars...
 
-Also, constructing TDMRs internally needs to use tdx_sysinfo (max_tdmrs,
-pamt_entry_size, max_rsvd_per_tdmr), so with static variable they don't need to
-be passed around as function arguments.
+		/*
+                 * Disable interception on the first non-zero write, except if
+		 * eIBRS is advertised to the guest and the guest is enabling
+		 * _only_ IBRS.  On eIBRS systems, kernels typically set IBRS
+		 * once at boot and never touch it post-boot.  All other bits,
+		 * and IBRS on non-eIBRS systems, are often set on a per-task
+		 * basis, i.e. change frequently, so the benefit of avoiding
+		 * VM-exits during guest context switches outweighs the cost of
+		 * RDMSR on every VM-Exit to save the guest's value.
+		 */
 
--- 
-Thanks,
--Kai
+> +		 * SPEC_CTRL_IBRS, which is typically set once at boot and never
 
+Uber nit, when it makes sense, avoid regurgitating the code verbatim, e.g. refer
+to "setting SPEC_CTRL_IBRS" as "enabling IBRS".  That little bit of abstraction
+can sometimes help unfamiliar readers understand the effect of the code, whereas
+copy+pasting bits of the code doesn't provide any additional context.
 
+> +		 * touched again.  All other bits are often set on a per-task
+> +		 * basis, i.e. may change frequently, so the benefit of avoiding
+> +		 * VM-exits during guest context switches outweighs the cost of
+> +		 * RDMSR on every VM-Exit to save the guest's value.
+> +		 */
+> +		if (!data ||
+> +			(data == SPEC_CTRL_IBRS &&
+> +			 (vcpu->arch.arch_capabilities & ARCH_CAP_IBRS_ALL)))
+
+Align the two halves of the logical-OR, i.e.
+
+		if (!data ||
+		    (data == SPEC_CTRL_IBRS &&
+		     (vcpu->arch.arch_capabilities & ARCH_CAP_IBRS_ALL)))
+			break;
