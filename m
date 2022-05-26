@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73F3B534C58
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 11:12:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA9DB534C5E
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 11:15:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234223AbiEZJMl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 05:12:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34958 "EHLO
+        id S1344653AbiEZJP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 05:15:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240989AbiEZJMi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 05:12:38 -0400
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D9B6BFE7;
-        Thu, 26 May 2022 02:12:35 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-2ff7b90e635so8846647b3.5;
-        Thu, 26 May 2022 02:12:35 -0700 (PDT)
+        with ESMTP id S235707AbiEZJPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 05:15:25 -0400
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63785C6E4F;
+        Thu, 26 May 2022 02:15:24 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-2ff90e0937aso8950437b3.4;
+        Thu, 26 May 2022 02:15:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kxgT774Qxw4EYAS+7FY5ihsIiTdaohje5ogQP3Nlw3Y=;
-        b=IFoKDCnHMITS1rmf6GIDh0SET6EK6ERswWD44RknloIwWbnABxHBvG0ltlA/h/F20d
-         F1egXvDuPV3Rc+fQpE3hMRr8Lt1goyKzW/+xf77bFqmNQE7KOYDL4i1sbVZUV9d1iV5E
-         pCHEcVwRve02gBXrom4fW+zdOsWGJBZCiXyjjWixdHaGy4mLzn/vygrI/Y3Kzem/H7+C
-         pdwVCpbk2tewPP/dLwZM7CRWAoVm2aLbj9cuX0RG4CtZekIwJY9MiQMJGAZvoqzyZLJ1
-         m0etk1RqQSPdlDZBTzJcwfFdCLfZlDkELIzYCUxbl+NqxTUClYqNnpkiGJTTnqoZPM+f
-         lvHA==
+        bh=nuQuuCBVbrPqmTSYx6tUR7yIqqFNAWXTE4+uB81J2UE=;
+        b=fq/Q21s/iUO8ofTLAKo+TyWwAM0uPaQWr2DmHRxlMTOo6FtN9wf+Rgww1VeueHQhMp
+         5vfaZJlEkoEvcjBxpyR+U5SljFerjhyPOi3RIOuOjHsP5M7Im5QP+UMEkjzrzRD5eC3k
+         xiNYXeTXoJj8dm0AK1rW4jyOTBINck/t08WOeDuOI6g16GuVMZM3YWMNb+C2IbyiXDtF
+         RYb8LSgkpVczXfQ1KJRGRAJDo2Q/CGgqBVVhxShFzChmEycFNeYfWmsq1lOIhRTsxmUy
+         F5EMwGnP67ppXHDB+tt2lGAHI26HuKQQ3NHCMSyRNsC+QKrawpLc+nN8OF0FC5i+fY12
+         pNVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kxgT774Qxw4EYAS+7FY5ihsIiTdaohje5ogQP3Nlw3Y=;
-        b=r0Qdv3ZcLKrhzscEI5+hIeU+gViQmHLlYsif9tu/j8wxXuUTP0hMfkZSjN7g5Rm0ta
-         YJq2DF7U+R0VOCzVPy7fn24mj6EbzPgGZpJNiF7Cwy2booEsKtCRtMH0Dqzh9n1Ccyzn
-         L1HSVGgjSUcCDsHB/H9dOn1/hVM1Zt9v9Q0WmgAQ6DeVVu/GxkUOZal/co4Kk4BbkSq7
-         MZAW56fYBM7W5wROcLHDC79PkM0Yt0VDzg+vF42NIH9k8tz2EQYK0CPYVN5coskhSf87
-         GNHXd6HYS2/vHs7RdWtltaHr2wBOy3uvsPcj0f+rKXtnA3vlt1sWqASV84ZqCsO2Hdbn
-         Vn3A==
-X-Gm-Message-State: AOAM532Ml282B7pwhGEgsq9QRa4VwAmMPch0IPiR3WI4wzaddIZWKahN
-        WezH8VMDUqBIGf6VPhkfF9JeIoXdkYkmqZb5t00=
-X-Google-Smtp-Source: ABdhPJy5/1a9V5AeBTGx0W1Wv5fKBpBkkU+bJS9RIJdceCEJ1OcJacD4hkRJoVyVdHwwGlp+aFRcniMGq3m6nDgQHbw=
-X-Received: by 2002:a81:b80d:0:b0:2ff:db8b:333a with SMTP id
- v13-20020a81b80d000000b002ffdb8b333amr20453256ywe.17.1653556354906; Thu, 26
- May 2022 02:12:34 -0700 (PDT)
+        bh=nuQuuCBVbrPqmTSYx6tUR7yIqqFNAWXTE4+uB81J2UE=;
+        b=q5M3FQd/DyOpremlwlsZcrmxSf+qAKhiD78b9tvtmfLgYnqogQE25Qcf538BhRx8gn
+         qScR8d6J8TRC2GmCZk1YXM5GPns+OmvaHq+2XWgqHT2Oc7k9nBfXvkhib2C5F/aNUVSL
+         wvf2gmGjWYWzVF/6Ab2D2eIHVdqW7viUpDlAzA7omemPusT02TDSezEkV4IGEYJq70k0
+         yVmycuLNH3TVdJ8m1E7WSKr6HFI6VUZDCh3OhN820NmAB/Tx49BX3F79RGCHC5m3oMO0
+         Pk5iVC//0gKPa2V7WktWop/XEk5ttjK6iFh73rbrReqLE+4s8kZ3Kuz90+wpjNpxzNcJ
+         rc9g==
+X-Gm-Message-State: AOAM533+OlskOYISSN0fDvmtY27zYgUqZaKjGBdFGC2Ik4dx/i8R/B0C
+        JqClINqmlkUyFMfh5oz/aWt0zyeB0k9FK4106rw=
+X-Google-Smtp-Source: ABdhPJxTnuH6PXmLiJgLino0nmQUgEEUbKVZvCISw8inI/dpudyfKqigg2++US8rXs4cLnhTnHbCCfxrKCum5WliGHU=
+X-Received: by 2002:a0d:f743:0:b0:2fe:e466:a482 with SMTP id
+ h64-20020a0df743000000b002fee466a482mr38540814ywf.151.1653556523683; Thu, 26
+ May 2022 02:15:23 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220503150735.32723-1-jiangshanlai@gmail.com>
- <20220503150735.32723-4-jiangshanlai@gmail.com> <YoLlzcejEDh8VpoB@google.com>
- <CAJhGHyCKdxti0gDjDP27MDd=bK+0BecXqzExo5t-WAOQLO5WwA@mail.gmail.com> <YoPQV0wDIMBr3HKG@google.com>
-In-Reply-To: <YoPQV0wDIMBr3HKG@google.com>
+ <20220503150735.32723-5-jiangshanlai@gmail.com> <YoLpY9MFxNTBidqB@google.com>
+In-Reply-To: <YoLpY9MFxNTBidqB@google.com>
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Thu, 26 May 2022 17:12:23 +0800
-Message-ID: <CAJhGHyD0d_dpfKQ9F-Q7nThGYwzjKv_2gnphKUAVtEYZsDygUw@mail.gmail.com>
-Subject: Re: [PATCH V2 3/7] KVM: X86/MMU: Link PAE root pagetable with its children
+Date:   Thu, 26 May 2022 17:15:12 +0800
+Message-ID: <CAJhGHyDS0NXmcW99rtvxp3YTGFcD_eOxRs+_3caUN6ki6z1BuA@mail.gmail.com>
+Subject: Re: [PATCH V2 4/7] KVM: X86/MMU: Activate special shadow pages and
+ remove old logic
 To:     David Matlack <dmatlack@google.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
@@ -78,37 +78,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 18, 2022 at 12:42 AM David Matlack <dmatlack@google.com> wrote:
+On Tue, May 17, 2022 at 8:16 AM David Matlack <dmatlack@google.com> wrote:
 
 >
-> Ah of course. e.g. FNAME(fetch) will call is_shadow_present_pte() on PAE
-> PDPTEs.
+> This comment does not explain why FNAME(fetch) might pass these values
+> to allocate special shadow pages. How about adjust it to something like
+> this:
 >
-> Could you also update the comment above SPTE_MMU_PRESENT_MASK? Right now it
-> says: "Use bit 11, as it is ignored by all flavors of SPTEs and checking a low
-> bit often generates better code than for a high bit, e.g. 56+." I think it
-> would be helpful to also meniton that SPTE_MMU_PRESENT_MASK is also used in
-> PDPTEs which only ignore bits 11:9.
+>   /*
+>    * Initialize the guest walker with default values.  These values will
+>    * be used in cases where KVM shadows a guest page table structure
+>    * with more levels than what the guest. For example, KVM shadows
+>    * 2-level non-PAE guests with 3-level PAE paging.
+>    *
+>    * Note, the gfn is technically ignored for these special shadow
+>    * pages, but it's more consistent to always pass 0 to
+>    * kvm_mmu_get_page().
+>    */
+
+The comment is copied into V3 with slightly changed.
+
+>
+> > +     for (i = 2; i < PT_MAX_FULL_LEVELS; i++) {
+>
+> s/2/PT32_ROOT_LEVEL/
 >
 
-Hello
-
-Thank you for the review.
-
-I think using BUILD_BUG_ON() in the place that requires the constraint
-can avoid exploding comments in the definition since it is a build
-time check and there are not too many constraints.
-
-So I didn't change it in V3.
-
-Or better (still using build-time check rather than comments):
-
-#define PT_PTE_IGNORE_BITS xxxx
-#define PAE_PTE_IGNORE_BITS xxxx
-#define EPT_PTE_IGNORE_BITS xxxx
-
-static_assert(PT_PTE_IGNORE_BITS & PAE_PTE_IGNORE_BITS &
-              EPT_PTE_IGNORE_BITS & SPTE_MMU_PRESENT_MASK);
+Did in v3
 
 Thanks
 Lai
