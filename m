@@ -2,68 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3073D534987
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 05:54:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D64FA534AA8
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 09:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344928AbiEZDyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 23:54:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57722 "EHLO
+        id S240286AbiEZHMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 03:12:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344872AbiEZDy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 23:54:28 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54448BDA2A
-        for <kvm@vger.kernel.org>; Wed, 25 May 2022 20:54:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 192E7B81EDB
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 03:54:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C4E17C34116
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 03:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653537263;
-        bh=3MgDOKmjZcNbqsE5QzxqimmCMdVPHRC0E8qWwgoYNyA=;
-        h=From:To:Subject:Date:From;
-        b=F3jvwNVgEqFY/f0XHcNVDbCvySyQ8EJq7RcBgTQk2G2LVjrTEcvgK+xpFHYfTmbs1
-         eTpDuLqJAjsVHzl2hZTRwsgofYvxY9rfS+u4U7F71s9bG7BDv99bhpjvO93nd/O4/j
-         D78JqUrxmTk97tjjCKRK08RYxTbpt21uAOsR9tvtBFs336TKmcJ7YYVUx1xAE9Zd6Y
-         /w6qgsY1pLsX3CCbiw9Dve15JJVFwmtIwbQeIIef4YviXPsnUT/CQzwBR5IH16NQ/R
-         3Vn2oWmblB0Pdsv/pyLVK0c62U/7Nfn4rWP8Lmf0acqLBDaaSTqhiJhn6GOuiWM3op
-         llTvBQzdNZkIg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id AA768CC13AD; Thu, 26 May 2022 03:54:23 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216033] New: KVM VMX nested virtualization: VMXON does not
- check guest CR0 against IA32_VMX_CR0_FIXED0
-Date:   Thu, 26 May 2022 03:54:23 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ercli@ucdavis.edu
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-216033-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S237023AbiEZHMF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 03:12:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 63041D11E
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 00:12:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653549121;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6IE6DmRFD5lAvDdj5gW9QZ9aM2Cb8MlqNKqWVvkieD8=;
+        b=WfSDuknsKIt/z2rejX5PnXffRZc/QdxT1OOPx6K6QQCF9OYgYKFc/okQ6eu70WOAEpX1+q
+        zSt+Vo4dorpmRsqZ5+kwrHnnM1FCNXOZQggaHkwlnz3d6gFNJgl7O0qqMdDt80g2EYTSSs
+        ILoGT1Wu16KA/UqWk2i1KgDPt0EV50o=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-613-UZReonZlPwa5zWyO8COcHg-1; Thu, 26 May 2022 03:11:59 -0400
+X-MC-Unique: UZReonZlPwa5zWyO8COcHg-1
+Received: by mail-ed1-f69.google.com with SMTP id bc17-20020a056402205100b0042aa0e072d3so487753edb.17
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 00:11:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6IE6DmRFD5lAvDdj5gW9QZ9aM2Cb8MlqNKqWVvkieD8=;
+        b=CG3MWNQh/IIhHbkOa6cpy4FDix77+14r19Zt3dd6EjoKsz/goqPbTzsUoy66O7KBeO
+         ELQQDh0lvEtKeRHcHM7qwdDWNQ9UDtVf46GwSkm3sSsm7GYMBj1+GKr6WartCZbAgDU7
+         kjuH6pEUFoWLsFo9/W55hS5NNLwl87HvSDweYWY7OXLYomr2bQIYR9juu+Ux2Q+KEPVQ
+         3SB6nWvh3LFqaYpB8sUDgakl+xdDu6g+wUGR7buUE81E0/HDcV1EyYSYwoPjUTyemisy
+         s/l4CJMaeU1Thue8aTo3IM+Re+adDL2BJ3a6M1vWESNSL0fcxZ01ESN62NKi1ijAgEp/
+         4L/Q==
+X-Gm-Message-State: AOAM530ZUArb0QwVobWc9gt9U++7wJc56jlDbpp7SLMr4hD3ahkP3A10
+        ueQRCweWa5SvfC/olRByACyhRdu8sc8JaxgmhLujujZ/0AYFF7J1R0j3zE+w6IS1M/Ye388H3LG
+        X4MIrk7Efieuc
+X-Received: by 2002:a17:907:7b9d:b0:6f4:df04:affb with SMTP id ne29-20020a1709077b9d00b006f4df04affbmr32698505ejc.473.1653549118675;
+        Thu, 26 May 2022 00:11:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw/oQiHRMbznEoOQoHrgZ7MU0CD2s2BenPAiqSDCYho3vTAQs3BG35eBpAkDcu+rEhm33FE8w==
+X-Received: by 2002:a17:907:7b9d:b0:6f4:df04:affb with SMTP id ne29-20020a1709077b9d00b006f4df04affbmr32698486ejc.473.1653549118425;
+        Thu, 26 May 2022 00:11:58 -0700 (PDT)
+Received: from gator (cst2-175-76.cust.vodafone.cz. [31.30.175.76])
+        by smtp.gmail.com with ESMTPSA id qw16-20020a1709066a1000b006f3ef214e54sm229028ejc.186.2022.05.26.00.11.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 May 2022 00:11:57 -0700 (PDT)
+Date:   Thu, 26 May 2022 09:11:56 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Dan Cross <cross@oxidecomputer.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 2/2] kvm-unit-tests: configure changes for illumos.
+Message-ID: <20220526071156.yemqpnwey42nw7ue@gator>
+References: <Yn2ErGvi4XKJuQjI@google.com>
+ <20220513010740.8544-1-cross@oxidecomputer.com>
+ <20220513010740.8544-3-cross@oxidecomputer.com>
+ <Yn5skgiL8SenOHWy@google.com>
+ <CAA9fzEEjU9y7HdNOkWTjEtxPDNxTh_PDBWoREGKW2Y2aarZXbw@mail.gmail.com>
+ <3cbdf951-513a-7527-ece6-6f2593fbc94e@redhat.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3cbdf951-513a-7527-ece6-6f2593fbc94e@redhat.com>
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,100 +81,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216033
+On Wed, May 25, 2022 at 09:44:33AM +0200, Thomas Huth wrote:
+> On 24/05/2022 23.22, Dan Cross wrote:
+> > On Fri, May 13, 2022 at 10:35 AM Sean Christopherson <seanjc@google.com> wrote:
+> ...
+> > > > diff --git a/configure b/configure
+> > > > index 86c3095..7193811 100755
+> > > > --- a/configure
+> > > > +++ b/configure
+> > > > @@ -15,6 +15,7 @@ objdump=objdump
+> > > >   ar=ar
+> > > >   addr2line=addr2line
+> > > >   arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
+> > > > +os=$(uname -s)
+> > > >   host=$arch
+> > > >   cross_prefix=
+> > > >   endian=""
+> > > > @@ -317,9 +318,9 @@ EOF
+> > > >     rm -f lib-test.{o,S}
+> > > >   fi
+> > > > 
+> > > > -# require enhanced getopt
+> > > > +# require enhanced getopt everywhere except illumos
+> > > >   getopt -T > /dev/null
+> > > > -if [ $? -ne 4 ]; then
+> > > > +if [ $? -ne 4 ] && [ "$os" != "SunOS" ]; then
+> > > 
+> > > What does illumos return for `getopt -T`?
+> > 
+> > Sadly, it returns "0".  I was wrong in my earlier explorations
+> > because I did not realize that `configure` does not use `getopt`
+> > aside from that one check, which is repeated in `run_tests.sh`.
+> > 
+> > I would argue that the most straight-forward way to deal with
+> > this is to just remove the check for "getopt" from "configure",
+> > which doesn't otherwise use "getopt".  The only place it is
+> > used is in `run_tests.sh`, which is unlikely to be used directly
+> > for illumos, and repeats the check anyway.
+> 
+> Fine for me if we remove the check from configure, or turn it into a warning
+> instead ("Enhanced getopt is not available, you won't be able to use the
+> run_tests.sh script" or so).
+>
 
-            Bug ID: 216033
-           Summary: KVM VMX nested virtualization: VMXON does not check
-                    guest CR0 against IA32_VMX_CR0_FIXED0
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.17.8-200.fc35.x86_64
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: ercli@ucdavis.edu
-        Regression: No
+Ack for simply changing the configure error to a warning for now. Ideally
+we'd limit the dependencies this project has though. So maybe rewriting
+the run_tests.sh command line parser without getopt would be the better
+thing to do.
 
-Created attachment 301050
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D301050&action=3Dedit
-Guest hypervisor to reproduce this bug (xz compressed)
+Thanks,
+drew
 
-CPU model I am running: Intel(R) Core(TM) i7-4510U CPU @ 2.00GHz
-Host kernel version: 5.17.8-200.fc35.x86_64
-Host kernel arch: x86_64
-Guest: a hypervisor I wrote myself, 32-bits, compressed and attached as
-c.img.xz.
-QEMU command line: qemu-system-x86_64 -m 512M -smp 1 -cpu Haswell,vmx=3Dyes
--enable-kvm -serial stdio -drive media=3Ddisk,file=3Dc.img,index=3D1
-The problem does not go away if using -machine kernel_irqchip=3Doff
-Since the guest is a hypervisor, -accel tcg cannot be used (TCG does not
-support nested virtualization)
-
-Actual behavior: serial port shows:
-
-...
-CR0        =3D 0x0000000080000015
-CR0 fixed0 =3D 0x0000000080000021
-CR0 fixed1 =3D 0x00000000ffffffff
-VMXON succeeds
-
-Expected behaivor: serial port shows:
-
-...
-CR0        =3D 0x0000000080000015
-CR0 fixed0 =3D 0x0000000080000021
-CR0 fixed1 =3D 0x00000000ffffffff
-[00]: unhandled exception 13 (0xd), halting!
-[00]: error code: 0x00000000
-[00]: state dump follows...
-[00] CS:EIP ...
-...
-
-Explanation:
-
-When the guest hypervisor starts VMX using the VMXON instruction, the guest
-hypervisor's CR0 is not legal. IA32_VMX_CR0_FIXED0 =3D 0x0000000080000021. =
-The
-0x20 bit in this MSR is 1, which indicates that the 0x20 bit in CR0 must be=
- 1
-when executing VMXON. However, my hypervisor uses CR0 =3D 0x80000015 (the 0=
-x20
-bit is 0).
-
-According to SDM 29.3, if "the values of CR0 and CR4 are not supported in V=
-MX
-operation", then a general protection exception (#GP(0)) should be raised. =
-This
-happens on real hardware, but not on KVM.
-
-The relevant code in my hypervisor is:
-
-https://github.com/lxylxy123456/uberxmhf/blob/770bdaa7afce560b9f46348bee5a0=
-5e2c680de06/xmhf/src/xmhf-core/xmhf-runtime/xmhf-startup/lhv-vmx.c#L250
-
-The pseudo code is
-
-print the hypervisor's CR0 to serial port
-print MSR value IA32_VMX_CR0_FIXED0 to serial port
-print MSR value IA32_VMX_CR0_FIXED1 to serial port
-sleep for 3 seconds
-run VMXON instruction
-If succeed, write "VMXON succeeds" to serial port.
-If VMXON receives an exception, write exception details to serial port ("[0=
-0]:
-unhandled exception...")
-
-To fix this bug, handle_vmon() in arch/x86/kvm/vmx/nested.c needs to be
-updated. The check to CR0 and CR4 against IA32_VMX_CR0_FIXED0 etc need to be
-added.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
