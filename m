@@ -2,56 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A05E5355F3
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 00:05:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C528F53560B
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 00:17:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344977AbiEZWFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 18:05:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45188 "EHLO
+        id S237725AbiEZWRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 18:17:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349981AbiEZWEu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 18:04:50 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1FC62A0C;
-        Thu, 26 May 2022 15:04:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C2399B82219;
-        Thu, 26 May 2022 22:04:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BDE0C385A9;
-        Thu, 26 May 2022 22:04:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653602684;
-        bh=ECgkSFExHsqzKzy858DFNxfa09+NDtw4qUcJMjqu2Ek=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=EnrS6YwNzdjYkewbpKhw1g9QE3ZFqsCwTczBBaBFKbJOKexGx5ib2RJfW434+TT0t
-         TSqooSIoZ3hcaLf5Do7gsGZ3+cR1D7RrwqnUUzX7HaI3FvmFwnMfb/LvFjz47zzLp7
-         v2t3DhNzy1nXVhHWZnIHON+Av0NqceGBK1+PyAisRz1ZcJIK5h2j5gj+FBVuDmxIvN
-         pgO1G2hXVrNp3eKK5Juh/KUOav0odBUkGwDxHPA6z1qzAnb92KvfpCkE9vbSqLMLtz
-         bMjmZZ8yJYN8uhN5tMkfYcBR41iNr21DHsUPMZkvwm8aZSGz9RSrd1fW2LRMnn0TAJ
-         usx0o0LG1ZkrQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79541F03938;
-        Thu, 26 May 2022 22:04:44 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for Linux 5.19 merge window
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20220525152650.250776-1-pbonzini@redhat.com>
-References: <20220525152650.250776-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20220525152650.250776-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: ffd1925a596ce68bed7d81c61cb64bc35f788a9d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bf9095424d027e942e1d1ee74977e17b7df8e455
-Message-Id: <165360268449.24340.12208072038298092748.pr-tracker-bot@kernel.org>
-Date:   Thu, 26 May 2022 22:04:44 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        with ESMTP id S229604AbiEZWRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 18:17:46 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C072F003
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 15:17:45 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id i23so3166718ljb.4
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 15:17:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oxidecomputer.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ve55jdLtyGMUsoE3r/N5Ru2U4Bj7D7brSSEzNzzYQCA=;
+        b=DeacuQ2wYZgiAnvKnEvXxeR0ObwMZh+zs+H80DPF47YY8cgvRxbDxNkO6+Xj1rgxtp
+         ineRh2uOzxvupAzjTIm1JLwd41pJsLwHpUoly2YknobCsmyEK3Kr8Ckc9Qasz2SX5fQn
+         o0usoAOtpmEsc7BhDqrWrUbMMPVxKptOv6FUapAH+1Vo16OQ+bO5OmL+D8YtCn1EqvcP
+         wE4MUqu7IS44ZAjaDdnVaQvTfi+q0K2F9UeuDEdPjyakLPmIIoH51AI1G7vK585D46mp
+         Eo/qLtf8oXPMPharKnCpvjr/yCocq5S5ueIXHHLQZG4Deh0LY5/7rnZMM5OTPjjH316r
+         pfQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ve55jdLtyGMUsoE3r/N5Ru2U4Bj7D7brSSEzNzzYQCA=;
+        b=2UPNxWWN9kilQj65aHkPc7nkk8psbPPamCQBm+Rk3YEFcSqrFmDEMqWppDTEeEhLwT
+         Qnoh6OKdLgnXOA+sC+9DCT9IRzZOWGQCOkxi7vH1BDbaJepC23u+0yUikNgf/wOaCu8B
+         v82pBuTTyL3+GkBBnpthqbcvNf26BuLgwzQs3HuTRyWz891NxsR+GMSqq1bBB6tx9746
+         WpfGw1+IfEBTnuvG0IWTTbQCX/xeIrU7hffYUeqpsQ3wvtyjysffQEbEHvaKpBenPHIG
+         KPaVxu69/ZAQu8u6+33R9g9BIHId7VKGSRWPl6gjKIub4i+V4iajYpGBMcbBVT8W+D9u
+         deVg==
+X-Gm-Message-State: AOAM531X1rHxMXfUjKrqH3eM8UQ8K0gfVUNUGcCNux8WtGpoJU6Wm7bX
+        0Yn8xmeVDAeyk+K2+D43qhXwpY038P7RV6Gk1LfL+g==
+X-Google-Smtp-Source: ABdhPJw53rmP6kdpSBL2DdAeqhI0MEMHncbDXuuXMnf3T5rc2NO4zUh6engJ1zqXS9vdhQEi4H4C7U0Z2wjg3B7sWtY=
+X-Received: by 2002:a2e:7a0d:0:b0:253:decb:be0f with SMTP id
+ v13-20020a2e7a0d000000b00253decbbe0fmr18902815ljc.525.1653603463459; Thu, 26
+ May 2022 15:17:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220526071156.yemqpnwey42nw7ue@gator> <20220526173949.4851-1-cross@oxidecomputer.com>
+ <20220526173949.4851-3-cross@oxidecomputer.com> <Yo/v5tN8fKCb/ufB@google.com>
+In-Reply-To: <Yo/v5tN8fKCb/ufB@google.com>
+From:   Dan Cross <cross@oxidecomputer.com>
+Date:   Thu, 26 May 2022 18:17:32 -0400
+Message-ID: <CAA9fzEFF=fdfV7qE-PU5fMD+XyrskQjvxPbgZ1yyS4fRTeBO2g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kvm-unit-tests: configure changes for illumos.
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -60,15 +67,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Wed, 25 May 2022 11:26:50 -0400:
+On Thu, May 26, 2022 at 5:23 PM Sean Christopherson <seanjc@google.com> wrote:
+> In the future, please tag each new posting with a version number, e.g. no version
+> number for the first posting, than v2, v3, v4, etc... for each subsequent posting.
+> It took me a while to figure what was what.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Ah, sorry about that. Sure thing.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bf9095424d027e942e1d1ee74977e17b7df8e455
+> On Thu, May 26, 2022, Dan Cross wrote:
+> > Warn, don't fail, if the check for `getopt -T` fails in the `configure`
+> > script.
+> >
+> > Aside from this check, `configure` does not use `getopt`, so don't
+> > fail to run if `getopt -T` doesn't indicate support for  the extended
+> > Linux version.  Getopt is only used in `run_tests.sh`, which tests for
+> > extended getopt anyway, but emit a warning here.
+>
+> Why not simply move the check to run_tests.sh?  I can't imaging it's performance
+> sensitive, and I doubt I'm the only one that builds tests on one system and runs
+> them on a completely different system.
 
-Thank you!
+`run_tests.sh` already has the test. Changing it to a warning here
+was at the suggestion of Thomas and Drew.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+        - Dan C.
