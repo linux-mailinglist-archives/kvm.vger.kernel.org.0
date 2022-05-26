@@ -2,208 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49219534C15
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 10:57:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7597A534C17
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 10:58:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344577AbiEZI5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 04:57:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58916 "EHLO
+        id S1346740AbiEZI6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 04:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235914AbiEZI5n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 04:57:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9CD8FA8880
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 01:57:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653555461;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wZpmyj3OZQ3pBrXt/5TVuYqgh1eNpvGfVJnmbN2oiSY=;
-        b=dO5EkKVjhdhnkPqMNpleLatDOFu41WN94sXoC3WJAsKwL5N+vNbSYr0rrijIZIiDryOE7D
-        FbSez67kgYwyjNbCXVB4ftmC/zR5fnI+RbrtjOP8XIkt1LiGG+2Y0fTM6glr78sQcgvAMH
-        pEhGIwzqyzVCQC3PcRBX5wItuaZLkUM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-171-8DrYrtsTMJmAb4Kf3Vxeyw-1; Thu, 26 May 2022 04:57:40 -0400
-X-MC-Unique: 8DrYrtsTMJmAb4Kf3Vxeyw-1
-Received: by mail-qv1-f70.google.com with SMTP id g1-20020ad457a1000000b0046263ffb17dso1089426qvx.2
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 01:57:40 -0700 (PDT)
+        with ESMTP id S1346743AbiEZI6A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 04:58:00 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C24C5E71;
+        Thu, 26 May 2022 01:57:56 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id b5so916047plx.10;
+        Thu, 26 May 2022 01:57:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z/aK1HVjWaZDKT3C6HDZPJDX4pSdyTJAvLiL+3q+10I=;
+        b=fnCj85xWRNBNPLSX5Lfd59eeCOL9G6A0HsvjvjG9TEjrlvkEjVEafCo9oZrgtYmnlE
+         1hmS0o+RYbCCSrv6tiaB63enPQuDZqNCieG+OzXRbIz8eZA6okwO7oBZdeDz3af1hA8O
+         n7IDm8EmrYXa/Ht9YUh+XjpbeBE0Yw3fRNpE2+1ZsIA1SS0pYFf6JikdzjCXYnu3j762
+         vMQ072Jwyt1vQas29DPDjt/oSeFqV244vTCtyEX1tZ20uTM6KyKZEeDIIwRFRufvfbkB
+         v0sgdCJjzn2nqnoaIJc65tK8y9dCbsEqY4IWMptAJJDSKT+3rJcGik45r1IHhPEenxq2
+         NfyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wZpmyj3OZQ3pBrXt/5TVuYqgh1eNpvGfVJnmbN2oiSY=;
-        b=DXXK6sA5t8k9mq38/5IMCWlwIjjuEzKLqLw17cPMWFpa8YjpMX24QCIQssGvuuFHw2
-         fi7J9oE29L6ArgNMgtP6IN6KH3VvGI2enrkcM69mU6sf3pLDYpeBSTcAxT3MXnQkWa++
-         Sg/8OlyasBPJz6lrLBWr5tEIguLVlpw6Vvyteev462cOTPMR8vW9NxQVpqUymJO6KQpv
-         m7NQyXqpzzKJ+lnWwQRUgHz+5XhKR+jDuWtbkrk47VmF8gDq64VVljaE445r/ubaQWzl
-         JUGjGJ9o4YtU4xMawXg/Fl+SQz9IBMfFp728+wb6F7X+jxgJEizRyP40W/07yVgCgAY7
-         UOGQ==
-X-Gm-Message-State: AOAM531kFoMF4ScBeAf7xzy7XmkFC7FDsh7luTeE+c9/ekZu+qnTatCf
-        JxKTAxhERZ/BP7MBNHE/V6hS8irBHojMUQ8ctwbfLmvO5QjlH4qTBEqsxwvj0kiHjWwlnTCet1P
-        DiiKP/Uvz1ktBJU7on9RgamSeNNK7
-X-Received: by 2002:a05:622a:1899:b0:2f3:b09e:dbe9 with SMTP id v25-20020a05622a189900b002f3b09edbe9mr27814499qtc.199.1653555459668;
-        Thu, 26 May 2022 01:57:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwjIaLlyyFKyzCNM0eVOxdzZFqpQOposlyXO+xlUZBqq0LkEO+INJ4wUrqjhNoPeHr4YKiQ02LEvGSr1//hqf4=
-X-Received: by 2002:a05:622a:1899:b0:2f3:b09e:dbe9 with SMTP id
- v25-20020a05622a189900b002f3b09edbe9mr27814485qtc.199.1653555459453; Thu, 26
- May 2022 01:57:39 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z/aK1HVjWaZDKT3C6HDZPJDX4pSdyTJAvLiL+3q+10I=;
+        b=LCO6+L00fxI23cZCVL8IK7fuFlMCdoRsfr7ptopyHG6s7SgZCHKvF7PGu3ksTqsBgB
+         Oe6d/lt/CeIydZYLRWAVujFhnSLv1Np3U0+PZTpIXDlatd3eqUf2MXXmImzbTJ3Rc1iO
+         MNPsn/IRAgUAD+W0ixEsT7Pd0DeoJjNGaOMlrFJ6mWYSwVmavIS+tiqnhRlXS0RmcfgN
+         FjcToQ6L12gN5DsnE0WHP/4VD1YoH1CCivKZgL1aZ4hyfgct6gxXfQlzl8OCJz1M6d+b
+         hNJCTNhcJ80X1MYT1eVlINugLP0TAuI+sFqR5xIFFuScnHZhdyKMxeFowoMTlIQEIHnl
+         yk6A==
+X-Gm-Message-State: AOAM530zP8n5Kr8MgMd/3SeJ29SGK3EpmjCblVeElDYa5AbCE9Z5ayIr
+        sJjiILa7BfCFcMyitrrrw+c=
+X-Google-Smtp-Source: ABdhPJxaHm1sD3Pn9AyRjXJ/E271UjGHMu0ckZ3UGrSIEMkq3gA1c2JPGyBqJnkyw8p5PxLJQGltZA==
+X-Received: by 2002:a17:902:7c96:b0:162:3071:3266 with SMTP id y22-20020a1709027c9600b0016230713266mr16376584pll.119.1653555475792;
+        Thu, 26 May 2022 01:57:55 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.22])
+        by smtp.gmail.com with ESMTPSA id p1-20020a170902f08100b0015eb200cc00sm894378pla.138.2022.05.26.01.57.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 May 2022 01:57:55 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Yanfei Xu <yanfei.xu@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/pmu: Update pmu->pebs_enable_mask with actual counter_mask
+Date:   Thu, 26 May 2022 16:57:23 +0800
+Message-Id: <20220526085723.91292-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <20220525105922.2413991-1-eperezma@redhat.com> <20220525105922.2413991-3-eperezma@redhat.com>
- <BL1PR12MB582520CC9CE024149141327499D69@BL1PR12MB5825.namprd12.prod.outlook.com>
-In-Reply-To: <BL1PR12MB582520CC9CE024149141327499D69@BL1PR12MB5825.namprd12.prod.outlook.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 26 May 2022 10:57:03 +0200
-Message-ID: <CAJaqyWc9_ErCg4whLKrjNyP5z2DZno-LJm7PN=-9uk7PUT4fJw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] vhost-vdpa: introduce STOP backend feature bit
-To:     "Dawar, Gautam" <gautam.dawar@amd.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "martinh@xilinx.com" <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        "dinang@xilinx.com" <dinang@xilinx.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "martinpo@xilinx.com" <martinpo@xilinx.com>,
-        "pabloc@xilinx.com" <pabloc@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>,
-        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
-        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
-        "lvivier@redhat.com" <lvivier@redhat.com>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        "hanand@xilinx.com" <hanand@xilinx.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 25, 2022 at 1:23 PM Dawar, Gautam <gautam.dawar@amd.com> wrote:
->
-> [AMD Official Use Only - General]
->
-> -----Original Message-----
-> From: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> Sent: Wednesday, May 25, 2022 4:29 PM
-> To: Michael S. Tsirkin <mst@redhat.com>; netdev@vger.kernel.org; linux-ke=
-rnel@vger.kernel.org; kvm@vger.kernel.org; virtualization@lists.linux-found=
-ation.org; Jason Wang <jasowang@redhat.com>
-> Cc: Zhu Lingshan <lingshan.zhu@intel.com>; martinh@xilinx.com; Stefano Ga=
-rzarella <sgarzare@redhat.com>; ecree.xilinx@gmail.com; Eli Cohen <elic@nvi=
-dia.com>; Dan Carpenter <dan.carpenter@oracle.com>; Parav Pandit <parav@nvi=
-dia.com>; Wu Zongyong <wuzongyong@linux.alibaba.com>; dinang@xilinx.com; Ch=
-ristophe JAILLET <christophe.jaillet@wanadoo.fr>; Xie Yongji <xieyongji@byt=
-edance.com>; Dawar, Gautam <gautam.dawar@amd.com>; lulu@redhat.com; martinp=
-o@xilinx.com; pabloc@xilinx.com; Longpeng <longpeng2@huawei.com>; Piotr.Umi=
-nski@intel.com; Kamde, Tanuj <tanuj.kamde@amd.com>; Si-Wei Liu <si-wei.liu@=
-oracle.com>; habetsm.xilinx@gmail.com; lvivier@redhat.com; Zhang Min <zhang=
-.min9@zte.com.cn>; hanand@xilinx.com
-> Subject: [PATCH v3 2/4] vhost-vdpa: introduce STOP backend feature bit
->
-> [CAUTION: External Email]
->
-> Userland knows if it can stop the device or not by checking this feature =
-bit.
->
-> It's only offered if the vdpa driver backend implements the stop() operat=
-ion callback, and try to set it if the backend does not offer that callback=
- is an error.
->
-> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> ---
->  drivers/vhost/vdpa.c             | 16 +++++++++++++++-
->  include/uapi/linux/vhost_types.h |  2 ++
->  2 files changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c index 1f1d1c4255=
-73..32713db5831d 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -347,6 +347,14 @@ static long vhost_vdpa_set_config(struct vhost_vdpa =
-*v,
->         return 0;
->  }
->
-> +static bool vhost_vdpa_can_stop(const struct vhost_vdpa *v) {
-> +       struct vdpa_device *vdpa =3D v->vdpa;
-> +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> +
-> +       return ops->stop;
-> [GD>>] Would it be better to explicitly return a bool to match the return=
- type?
+From: Like Xu <likexu@tencent.com>
 
-I'm not sure about the kernel code style regarding that casting. Maybe
-it's better to return !!ops->stop here. The macros likely and unlikely
-do that.
+The blamed commit is posted before the PEBS merge in, but is applied after
+the latter is merged in. Fix dependency of pebs_enable_mask on
+a new reusable counter_mask instead of zero-initialized global_ctrl.
 
-Thanks!
+Fixes: 94e05293f839 ("KVM: x86/pmu: Don't overwrite the pmu->global_ctrl when refreshing")
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/vmx/pmu_intel.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-> +}
-> +
->  static long vhost_vdpa_get_features(struct vhost_vdpa *v, u64 __user *fe=
-aturep)  {
->         struct vdpa_device *vdpa =3D v->vdpa; @@ -575,7 +583,11 @@ static=
- long vhost_vdpa_unlocked_ioctl(struct file *filep,
->         if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
->                 if (copy_from_user(&features, featurep, sizeof(features))=
-)
->                         return -EFAULT;
-> -               if (features & ~VHOST_VDPA_BACKEND_FEATURES)
-> +               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
-> +                                BIT_ULL(VHOST_BACKEND_F_STOP)))
-> +                       return -EOPNOTSUPP;
-> +               if ((features & BIT_ULL(VHOST_BACKEND_F_STOP)) &&
-> +                    !vhost_vdpa_can_stop(v))
->                         return -EOPNOTSUPP;
->                 vhost_set_backend_features(&v->vdev, features);
->                 return 0;
-> @@ -624,6 +636,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *fi=
-lep,
->                 break;
->         case VHOST_GET_BACKEND_FEATURES:
->                 features =3D VHOST_VDPA_BACKEND_FEATURES;
-> +               if (vhost_vdpa_can_stop(v))
-> +                       features |=3D BIT_ULL(VHOST_BACKEND_F_STOP);
->                 if (copy_to_user(featurep, &features, sizeof(features)))
->                         r =3D -EFAULT;
->                 break;
-> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_=
-types.h
-> index 634cee485abb..2758e665791b 100644
-> --- a/include/uapi/linux/vhost_types.h
-> +++ b/include/uapi/linux/vhost_types.h
-> @@ -161,5 +161,7 @@ struct vhost_vdpa_iova_range {
->   * message
->   */
->  #define VHOST_BACKEND_F_IOTLB_ASID  0x3
-> +/* Stop device from processing virtqueue buffers */ #define
-> +VHOST_BACKEND_F_STOP  0x4
->
->  #endif
-> --
-> 2.27.0
->
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index ddf837130d1f..72bbcb3f9f8a 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -621,6 +621,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpuid_entry2 *entry;
+ 	union cpuid10_eax eax;
+ 	union cpuid10_edx edx;
++	u64 counter_mask;
+ 	int i;
+ 
+ 	pmu->nr_arch_gp_counters = 0;
+@@ -672,8 +673,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 
+ 	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
+ 		pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
+-	pmu->global_ctrl_mask = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
++	counter_mask = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
+ 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED));
++	pmu->global_ctrl_mask = counter_mask;
+ 	pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask
+ 			& ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF |
+ 			    MSR_CORE_PERF_GLOBAL_OVF_CTRL_COND_CHGD);
+@@ -713,7 +715,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+ 		vcpu->arch.ia32_misc_enable_msr &= ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+ 		if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
+-			pmu->pebs_enable_mask = ~pmu->global_ctrl;
++			pmu->pebs_enable_mask = counter_mask;
+ 			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+ 			for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+ 				pmu->fixed_ctr_ctrl_mask &=
+-- 
+2.36.1
 
