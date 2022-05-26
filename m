@@ -2,108 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FA3E534AAC
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 09:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 694FC534AD4
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 09:33:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345525AbiEZHOU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 03:14:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33288 "EHLO
+        id S240446AbiEZHdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 03:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235634AbiEZHOS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 03:14:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF15325E88
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 00:14:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653549256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oFiNE8GkAv+OfQPSUfTSRowfk0C3oYVYVFckBaStzik=;
-        b=F6TWG+CZIEaOpWRlQDH3Rn5n9LkDpX755QAlJhhrLONGAiZ/hsMwQqd+C4tpQDuvakCLDL
-        xtzfc6+2phIb+IJ/ZJp5oM5K4ygHyFQEr1ncdMh+sP1q1AKuWuXq4PslhNJQbABKUvPslM
-        SLCBamMLC8uXXzwluPbc0heCYxn1hfM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-348-JDRnpJazMwS5j03zAvhylA-1; Thu, 26 May 2022 03:14:14 -0400
-X-MC-Unique: JDRnpJazMwS5j03zAvhylA-1
-Received: by mail-ed1-f71.google.com with SMTP id v1-20020a056402348100b0042b4442b954so482144edc.22
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 00:14:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oFiNE8GkAv+OfQPSUfTSRowfk0C3oYVYVFckBaStzik=;
-        b=3NUozx4RRfInuhFLmXbEfOUapYr6w+gJTCZrccKeCYJ1U0YclHoxQSzRIn1ULqndxJ
-         2G5wcb6ATYGd4+MOoBjfwrFZibuCKZF5XEvlA/+mo4KxRqvPARphHQN8dePRTVYWXHfX
-         m1WFWLjk/38mhlRuaBjmp5IRrshBra/dUND2rwAGGBEs7kPK+hQrae0xh0C2kg2+e4sF
-         rI2uBSDuRGiw8ro8I0f33ApOSmTL/32NpH+3oxDRvy9MKYcZJfZ580DXDe2FUSgsaxEG
-         4HufoUPRn2l7PkZU/OllqBii4Yyytc5IUiwnf7WFuormoS6mfIQrf41d4qP8Ic4QmVjl
-         BDRA==
-X-Gm-Message-State: AOAM531NndgdKF7Iwgam+vB9sPGo9+yg57joGsLw1eBTY+inuQVBHhMq
-        3CanVI5Tjzuu5MnpGJsguoWuOyr7i8sm730D11tFXV5MjJqpKY+urkV2kxADitHW1uZ73aMn+OA
-        DfVdav+LX5VlF
-X-Received: by 2002:a05:6402:5289:b0:42b:9c88:e1db with SMTP id en9-20020a056402528900b0042b9c88e1dbmr10384845edb.284.1653549253144;
-        Thu, 26 May 2022 00:14:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwiou+m9PsbQma6uzExzjydPFEHufHg7Da/yHuWQt21R5l30UCB/9JqtRLFro7z8RTX1RzaaA==
-X-Received: by 2002:a05:6402:5289:b0:42b:9c88:e1db with SMTP id en9-20020a056402528900b0042b9c88e1dbmr10384836edb.284.1653549252995;
-        Thu, 26 May 2022 00:14:12 -0700 (PDT)
-Received: from gator (cst2-175-76.cust.vodafone.cz. [31.30.175.76])
-        by smtp.gmail.com with ESMTPSA id q14-20020a50c34e000000b0042bb015df6asm429688edb.6.2022.05.26.00.14.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 00:14:12 -0700 (PDT)
-Date:   Thu, 26 May 2022 09:14:10 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, nikos.nikoleris@arm.com
-Subject: Re: [PATCH kvm-unit-tests v2 2/2] lib: Add ctype.h and collect is*
- functions
-Message-ID: <20220526071410.y5n3y4umpciei62b@gator>
-References: <20220520132404.700626-1-drjones@redhat.com>
- <20220520132404.700626-3-drjones@redhat.com>
- <9b7b7b08-d66c-7412-8217-c3bbbafd73a0@redhat.com>
+        with ESMTP id S1346420AbiEZHdS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 03:33:18 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E2398085
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 00:33:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653550397; x=1685086397;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UlmE2CbAigQduNsC3UCgDYAE8v3FN2weR/9B9g11T8Q=;
+  b=GQuUyL1GeoP/Pv2Njj02uFm+cQcJ4117ZyXmo/ijPIhm2foUO7T603fS
+   E21qotLpJI1NbBqQAA7TdKpUWS0v7zB6oOl2uiTxu3rm/xDIpXs+IAmXH
+   u4/BWvEcOsgSMbkuV6SA8VefRT+xmwCGWSijyjq5l0MUaiEECmC6ZSi8j
+   QCabB+7q6wsWwVzsQdpm8AGmpiofPrqJt+L+sROo+KP3pzl4mmWRcuDfO
+   DYlikHXVQsEr7bHqLSt/sSCl9AwFY4vDVHs7XR79VI+w9AYylWRRWfQgb
+   nyTHXuP9HoCbKTI5uWx0Mnql2lY4NQX5LZUEbdVRyvibtk7e1WIq7kh5K
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10358"; a="334709444"
+X-IronPort-AV: E=Sophos;i="5.91,252,1647327600"; 
+   d="scan'208";a="334709444"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2022 00:33:16 -0700
+X-IronPort-AV: E=Sophos;i="5.91,252,1647327600"; 
+   d="scan'208";a="573742571"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.28.212]) ([10.255.28.212])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2022 00:33:12 -0700
+Message-ID: <5e457e0b-dc23-9e5b-de89-0b137e2baf7f@intel.com>
+Date:   Thu, 26 May 2022 15:33:10 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b7b7b08-d66c-7412-8217-c3bbbafd73a0@redhat.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.9.0
+Subject: Re: [RFC PATCH v4 22/36] i386/tdx: Track RAM entries for TDX VM
+Content-Language: en-US
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-23-xiaoyao.li@intel.com>
+ <20220524073729.xkk6s4tjkzm77wwz@sirius.home.kraxel.org>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20220524073729.xkk6s4tjkzm77wwz@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 24, 2022 at 02:21:40PM +0200, Thomas Huth wrote:
-> On 20/05/2022 15.24, Andrew Jones wrote:
-> > We've been slowly adding ctype functions to different files without
-> > even exporting them. Let's change that.
-> > 
-> > Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> ...
-> > diff --git a/lib/ctype.h b/lib/ctype.h
-> > new file mode 100644
-> > index 000000000000..0b43d626478a
-> > --- /dev/null
-> > +++ b/lib/ctype.h
-> > @@ -0,0 +1,40 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+On 5/24/2022 3:37 PM, Gerd Hoffmann wrote:
+>> +static int tdx_accept_ram_range(uint64_t address, uint64_t length)
+>> +{
+>> +    TdxRamEntry *e;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < tdx_guest->nr_ram_entries; i++) {
+>> +        e = &tdx_guest->ram_entries[i];
+>> +
+>> +        if (address + length < e->address ||
+>> +            e->address + e->length < address) {
+>> +                continue;
+>> +        }
+>> +
+>> +        if (e->address > address ||
+>> +            e->address + e->length < address + length) {
+>> +            return -EINVAL;
+>> +        }
 > 
-> Maybe we should use LGPL for the C library stuff? ... most other libc
-> related files use LGPL, too.
-
-Right. Will do.
-
+> if (e->type == TDX_RAM_ADDED)
+> 	return -EINVAL
 > 
-> Apart from that:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> +        if (e->address == address && e->length == length) {
+>> +            e->type = TDX_RAM_ADDED;
+>> +        } else if (e->address == address) {
+>> +            e->address += length;
+>> +            e->length -= length;
+>> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
+>> +        } else if (e->address + e->length == address + length) {
+>> +            e->length -= length;
+>> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
+>> +        } else {
+>> +            TdxRamEntry tmp = {
+>> +                .address = e->address,
+>> +                .length = e->length,
+>> +            };
+>> +            e->length = address - tmp.address;
+>> +
+>> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
+>> +            tdx_add_ram_entry(address + length,
+>> +                              tmp.address + tmp.length - (address + length),
+>> +                              TDX_RAM_UNACCEPTED);
+>> +        }
 > 
+> I think all this can be simplified, by
+>    (1) Change the existing entry to cover the accepted ram range.
+>    (2) If there is room before the accepted ram range add a
+>        TDX_RAM_UNACCEPTED entry for that.
+>    (3) If there is room after the accepted ram range add a
+>        TDX_RAM_UNACCEPTED entry for that.
 
-Thanks,
-drew
+I implement as below. Please help review.
+
++static int tdx_accept_ram_range(uint64_t address, uint64_t length)
++{
++    uint64_t head_start, tail_start, head_length, tail_length;
++    uint64_t tmp_address, tmp_length;
++    TdxRamEntry *e;
++    int i;
++
++    for (i = 0; i < tdx_guest->nr_ram_entries; i++) {
++        e = &tdx_guest->ram_entries[i];
++
++        if (address + length < e->address ||
++            e->address + e->length < address) {
++                continue;
++        }
++
++        /*
++         * The to-be-accepted ram range must be fully contained by one
++         * RAM entries
++         */
++        if (e->address > address ||
++            e->address + e->length < address + length) {
++            return -EINVAL;
++        }
++
++        if (e->type == TDX_RAM_ADDED) {
++            return -EINVAL;
++        }
++
++        tmp_address = e->address;
++        tmp_length = e->length;
++
++        e->address = address;
++        e->length = length;
++        e->type = TDX_RAM_ADDED;
++
++        head_length = address - tmp_address;
++        if (head_length > 0) {
++            head_start = e->address;
++            tdx_add_ram_entry(head_start, head_length, TDX_RAM_UNACCEPTED);
++        }
++
++        tail_start = address + length;
++        if (tail_start < tmp_address + tmp_length) {
++            tail_length = e->address + e->length - tail_start;
++            tdx_add_ram_entry(tail_start, tail_length, TDX_RAM_UNACCEPTED);
++        }
++
++        return 0;
++    }
++
++    return -1;
++}
+
+
+
+> take care,
+>    Gerd
+> 
 
