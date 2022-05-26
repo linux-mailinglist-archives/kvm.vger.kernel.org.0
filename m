@@ -2,212 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93922535089
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 16:25:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81EC453509E
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 16:28:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347048AbiEZOZ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 10:25:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57310 "EHLO
+        id S1347649AbiEZO2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 10:28:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346026AbiEZOZ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 10:25:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B877AC5E51
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 07:25:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653575120;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=REW5eBj0k51HdxwQT5MIo/NGzv21C0HdYvY4KP3ZBC8=;
-        b=M0jwer66FO1jKzkbZzMlpo8pK9DgFNN61BZ6GsTj69BhrHZ4iBQwEnsGYiQ4dPPU9/ghJs
-        xdC0HntxO9XqhGP0Oo/Lqas0XyN7+FMrPvlJ2INb2kF01tUD53B7YwTVf2kdlyVXOH1qnb
-        ygP/1Id78jKMkMkPQa6KXXj+9xPmIoQ=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-594-JCBz7N6BNbWAEpeU94ITAA-1; Thu, 26 May 2022 10:25:19 -0400
-X-MC-Unique: JCBz7N6BNbWAEpeU94ITAA-1
-Received: by mail-qk1-f198.google.com with SMTP id j12-20020ae9c20c000000b0069e8ac6b244so1495569qkg.1
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 07:25:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=REW5eBj0k51HdxwQT5MIo/NGzv21C0HdYvY4KP3ZBC8=;
-        b=IinL+jd4RXmafAyg02dXLlSrnuJfean6lsqkNz5ZzsrMERa4MWVFYH7UBb64C8SFJb
-         /Kr2d2yfJYFm2cFh75nS7Jo/FpghN2nwlRIJ5huiSFAbK91+T08ON7IiEbeAxq/GtKHQ
-         dOTWEi/IVBgqw0C2qV5xTRFGa9/edA0cybfJ/XFZNoVVtP+caNe+kXm0TLwsK4yp+WGk
-         L3SzP2C5gqdN/Ews0RpaStGzIdUFJNbU1y+Q0Ig0phGX+kDh+YueoyPaerK6X3a7bBF+
-         n9cEJ2gui2Nnn+I/jrwLxsZPEf+6iIgFUEG1cHGcuSIbWrcM79D4wZP26lTDVnxHOEUm
-         5zmQ==
-X-Gm-Message-State: AOAM533L26cNBx9RoAOCSfYewvqSMn7fvuhHDjeSSkxs1YE6t3ozqULX
-        A8BbvFLuPbk8RMZlWhFkUW/S+3s3ocVBAQUjN5zK4/j9mRmR3EWgqKwvdAQrjyN3SOBIfGzx+c3
-        BHa5XR8rMAh7P
-X-Received: by 2002:a05:6214:27cf:b0:462:6338:f19c with SMTP id ge15-20020a05621427cf00b004626338f19cmr7054559qvb.123.1653575115882;
-        Thu, 26 May 2022 07:25:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzx5+bYj+79D3UUpEhK5Xb40CENj+PWoMKEk6jIiMR1TuSf+fgweph1KuVE9X/p4pNnNr7Now==
-X-Received: by 2002:a05:6214:27cf:b0:462:6338:f19c with SMTP id ge15-20020a05621427cf00b004626338f19cmr7054515qvb.123.1653575115597;
-        Thu, 26 May 2022 07:25:15 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-16.business.telecomitalia.it. [87.12.25.16])
-        by smtp.gmail.com with ESMTPSA id z20-20020a05622a061400b002f39b99f6a2sm1112748qta.60.2022.05.26.07.25.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 07:25:14 -0700 (PDT)
-Date:   Thu, 26 May 2022 16:25:06 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        netdev@vger.kernel.org, martinh@xilinx.com, martinpo@xilinx.com,
-        lvivier@redhat.com, pabloc@xilinx.com,
-        Parav Pandit <parav@nvidia.com>, Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>, lulu@redhat.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>, Piotr.Uminski@intel.com,
-        Si-Wei Liu <si-wei.liu@oracle.com>, ecree.xilinx@gmail.com,
-        gautam.dawar@amd.com, habetsm.xilinx@gmail.com,
-        tanuj.kamde@amd.com, hanand@xilinx.com, dinang@xilinx.com,
-        Longpeng <longpeng2@huawei.com>
-Subject: Re: [PATCH v4 4/4] vdpa_sim: Implement stop vdpa op
-Message-ID: <20220526142506.4c2j2mguwu3ejg7i@sgarzare-redhat>
-References: <20220526124338.36247-1-eperezma@redhat.com>
- <20220526124338.36247-5-eperezma@redhat.com>
+        with ESMTP id S1347639AbiEZO2t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 10:28:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A2B2C6E6D;
+        Thu, 26 May 2022 07:28:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=k7apNoi1g1YhGHKMlKvo5ejDwWGQrfqPL3Ty5xTWm5Q=; b=jt2D3c7xgVZUKhGsBafhmm2sFE
+        7iHXpIRdAmkRqKCTrByt8vvIu4Y3EGktUCpnmPTFxq5LEtvIgLU7neTQ7C/IsI99LeEY7HaXKuYy7
+        5ZrEicxpMCl0i/enkPZwHxhNQ3wSCLz0PWMpopuxkJst9ua3Mey2ATEpeisJ/smtNzknhVcxsQdkT
+        dSKtJhfNJpH19fcWEk13NeBfTP6RD6LPE68nShdvuaPUklK12w19DAh/i1OVAzpUZ0A5rCLZKasUp
+        WeWqziAdu0JgzoPn8WlmbMtIWF1JBvKksSw7KZdNfdrklRu0O6zxydJrgJF+gvKG7sfmTWPCyIS6G
+        yc+jDrmg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nuETR-001JAt-Fo; Thu, 26 May 2022 14:28:25 +0000
+Date:   Thu, 26 May 2022 15:28:25 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jessica Clarke <jrtc27@jrtc27.com>,
+        kernel test robot <lkp@intel.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-riscv@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-omap@vger.kernel.org,
+        linux-mm@kvack.org, linux-fbdev@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, bpf@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, alsa-devel@alsa-project.org
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 8cb8311e95e3bb58bd84d6350365f14a718faa6d
+Message-ID: <Yo+OiR6abzVksVTM@casper.infradead.org>
+References: <628ea118.wJYf60YnZco0hs9o%lkp@intel.com>
+ <20220525145056.953631743a4c494aabf000dc@linux-foundation.org>
+ <F0E25DFF-8256-48FF-8B88-C0E3730A3E5E@jrtc27.com>
+ <20220525152006.e87d3fa50aca58fdc1b43b6a@linux-foundation.org>
+ <Yo7U8kglHlcvQ0Ri@casper.infradead.org>
+ <20220526084832.GC2146@kadam>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220526124338.36247-5-eperezma@redhat.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220526084832.GC2146@kadam>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 26, 2022 at 02:43:38PM +0200, Eugenio Pérez wrote:
->Implement stop operation for vdpa_sim devices, so vhost-vdpa will offer
->that backend feature and userspace can effectively stop the device.
->
->This is a must before get virtqueue indexes (base) for live migration,
->since the device could modify them after userland gets them. There are
->individual ways to perform that action for some devices
->(VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
->way to perform it for any vhost device (and, in particular, vhost-vdpa).
->
->Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
->---
-> drivers/vdpa/vdpa_sim/vdpa_sim.c     | 21 +++++++++++++++++++++
-> drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
-> drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++
-> drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++
-> 4 files changed, 28 insertions(+)
+On Thu, May 26, 2022 at 11:48:32AM +0300, Dan Carpenter wrote:
+> On Thu, May 26, 2022 at 02:16:34AM +0100, Matthew Wilcox wrote:
+> > Bizarre this started showing up now.  The recent patch was:
+> > 
+> > -       info->alloced += compound_nr(page);
+> > -       inode->i_blocks += BLOCKS_PER_PAGE << compound_order(page);
+> > +       info->alloced += folio_nr_pages(folio);
+> > +       inode->i_blocks += BLOCKS_PER_PAGE << folio_order(folio);
+> > 
+> > so it could tell that compound_order() was small, but folio_order()
+> > might be large?
+> 
+> The old code also generates a warning on my test system.  Smatch thinks
+> both compound_order() and folio_order() are 0-255.  I guess because of
+> the "unsigned char compound_order;" in the struct page.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->index 50d721072beb..0515cf314bed 100644
->--- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
->+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->@@ -107,6 +107,7 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
-> 	for (i = 0; i < vdpasim->dev_attr.nas; i++)
-> 		vhost_iotlb_reset(&vdpasim->iommu[i]);
->
->+	vdpasim->running = true;
-> 	spin_unlock(&vdpasim->iommu_lock);
->
-> 	vdpasim->features = 0;
->@@ -505,6 +506,24 @@ static int vdpasim_reset(struct vdpa_device *vdpa)
-> 	return 0;
-> }
->
->+static int vdpasim_stop(struct vdpa_device *vdpa, bool stop)
->+{
->+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
->+	int i;
->+
->+	spin_lock(&vdpasim->lock);
->+	vdpasim->running = !stop;
->+	if (vdpasim->running) {
->+		/* Check for missed buffers */
->+		for (i = 0; i < vdpasim->dev_attr.nvqs; ++i)
->+			vdpasim_kick_vq(vdpa, i);
->+
->+	}
->+	spin_unlock(&vdpasim->lock);
->+
->+	return 0;
->+}
->+
-> static size_t vdpasim_get_config_size(struct vdpa_device *vdpa)
-> {
-> 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
->@@ -694,6 +713,7 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
-> 	.get_status             = vdpasim_get_status,
-> 	.set_status             = vdpasim_set_status,
-> 	.reset			= vdpasim_reset,
->+	.stop			= vdpasim_stop,
-> 	.get_config_size        = vdpasim_get_config_size,
-> 	.get_config             = vdpasim_get_config,
-> 	.set_config             = vdpasim_set_config,
->@@ -726,6 +746,7 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
-> 	.get_status             = vdpasim_get_status,
-> 	.set_status             = vdpasim_set_status,
-> 	.reset			= vdpasim_reset,
->+	.stop			= vdpasim_stop,
-> 	.get_config_size        = vdpasim_get_config_size,
-> 	.get_config             = vdpasim_get_config,
-> 	.set_config             = vdpasim_set_config,
->diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
->index 622782e92239..061986f30911 100644
->--- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
->+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
->@@ -66,6 +66,7 @@ struct vdpasim {
-> 	u32 generation;
-> 	u64 features;
-> 	u32 groups;
->+	bool running;
-> 	/* spinlock to synchronize iommu table */
-> 	spinlock_t iommu_lock;
-> };
->diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
->index 42d401d43911..bcdb1982c378 100644
->--- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
->+++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
->@@ -204,6 +204,9 @@ static void vdpasim_blk_work(struct work_struct *work)
-> 	if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
-> 		goto out;
->
->+	if (!vdpasim->running)
->+		goto out;
->+
-> 	for (i = 0; i < VDPASIM_BLK_VQ_NUM; i++) {
-> 		struct vdpasim_virtqueue *vq = &vdpasim->vqs[i];
->
->diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
->index 5125976a4df8..886449e88502 100644
->--- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
->+++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
->@@ -154,6 +154,9 @@ static void vdpasim_net_work(struct work_struct *work)
->
-> 	spin_lock(&vdpasim->lock);
->
->+	if (!vdpasim->running)
->+		goto out;
->+
-> 	if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
-> 		goto out;
->
->-- 
->2.31.1
->
-
+It'd be nice if we could annotate that as "contains a value between
+1 and BITS_PER_LONG - PAGE_SHIFT".  Then be able to optionally enable
+a checker that ensures that's true on loads/stores.  Maybe we need a
+language that isn't C :-P  Ada can do this ... I don't think Rust can.
