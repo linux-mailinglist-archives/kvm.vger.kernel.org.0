@@ -2,90 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A1B8535561
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:24:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6B4A535578
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:29:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245289AbiEZVX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 17:23:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44198 "EHLO
+        id S239216AbiEZV27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 17:28:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbiEZVX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 17:23:57 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803254C7AA
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:23:55 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 137so2319290pgb.5
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:23:55 -0700 (PDT)
+        with ESMTP id S231351AbiEZV25 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 17:28:57 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49A83ABF49
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:28:56 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id d129so2313028pgc.9
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:28:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=vvPesztQ/q6dEXTjjwBXmVDKox8pNCXxacGyk70E8Dg=;
-        b=O4Suc8kizeWKRTVEj00AQ1ab9tKe753MhatLcEm4PLJvR7M2irU2Jhg3tvLufHtFe2
-         P372DMirqt4jci9WjNyvM9cItpc06Y1Oemg9rpCOMC1yhCL5UbaJKlCswW1LxyaJ2lcY
-         3K3ZfGy4ADMSjJTrr851Wi3IOdcM/LTiR3Fegd/SfSuO5F12Md1ZGbhUh02eR+JCSAP9
-         JxaYCZ/0rV2R84RitJ5hQIS9iQ5K0gdZ3+YEDqOtpzc+/itaW5VU/mX5uRK8eRCFmkTv
-         5JOapOgYyLDqHAnofnwQiy1nTThhruJcCMUh6UbmhnBjqTHwn+QsuSF3ZAmtz+axA0Td
-         qe7Q==
+        bh=n/dQumpwP7TjnB5SFXHOsq0ojlkNiebJVgxbXnsVWEw=;
+        b=UORJmqEl1ZcTStO8P44GY6cM5VBCI4XXU11RYFlagzJPjwgLYfR9fWKFey4MYWSAtR
+         v6ZMhIP8kBUlqH+CMgZgxU5WofSdJGzn19kuixH59EZk9g2tEAr7gbO8gPRgedJPOzMA
+         mPef4VS8XoKCVT/bJiD31KTs7du7pbYzTMDguk0MpNBwU9sfSBZr54e/ZpZaCcLHI/Rc
+         tzWGa3K74/Y+4F5nT3uc0RoUahIwXQMYu2QsQVtvXeOZEHl64ToezAaklWdfbsGv2fJT
+         nD6b3CuKWQnXjRwEDb878ABVSl5/lYkaTSRriEltMT5Pnw0eiJT1doQ4WE5HWlR72QnD
+         9fIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=vvPesztQ/q6dEXTjjwBXmVDKox8pNCXxacGyk70E8Dg=;
-        b=3p0TSQ9gEr2vVQrZdv9jaPQmjjIeJMQNVln2DHPMO+vDIr3YCbkCaAoiuBpElUYpVo
-         8kn7+GNGMF7LZF/T8UFvGEtpYIWFz+nq3uwfGwVKfMiBozjHbN/z+cnqk6KY5TvGP08L
-         gZUZ77nWz4KudExlMUpzGjbTdU3KunHmrObA1M/UrQMbzCyuvPfpspOpFQQ2zczZBajU
-         qr/YalLny8v4+QZ8e0LW8NAAH3Lq5ffdonA3ttm8NTXjaX7dZzqCKXOzAf2lLarKHYXC
-         ZM4QTDqngeG8QBhVI5dE7FcLYNQtDh1TH49Ahj4PHYzJdREJB8fkc8/uQhKn6Xy8EQsl
-         uiaw==
-X-Gm-Message-State: AOAM532cmyWuPbdxUv4sqAg3cVbveyydu3sBMxYQ5F4uKVX+e11ZJ24M
-        KgIDBkAF02u7ZxBdwybBp8tXQg==
-X-Google-Smtp-Source: ABdhPJz9Vr7FWCttsYRDC5bTCdZ3cRPMlWGSkHHLq+nHl5wH2QNI/o0qZvP8Ms2laDVTyIDnOXLgcA==
-X-Received: by 2002:a05:6a00:10cc:b0:506:e0:d6c3 with SMTP id d12-20020a056a0010cc00b0050600e0d6c3mr40747339pfu.33.1653600234842;
-        Thu, 26 May 2022 14:23:54 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o3-20020a654583000000b003fa5b550303sm1986625pgq.68.2022.05.26.14.23.54
+        bh=n/dQumpwP7TjnB5SFXHOsq0ojlkNiebJVgxbXnsVWEw=;
+        b=CHpOQ4uCMA92aDdMZb6BdwWoXaB8rMuniDPUh3mYPw/oqOaW6Mh58pzUn2yoGLFthc
+         R25ROIArLHW84f2eL6oSehhMRj5/SMw/qLrL+dIVWtr4sIjNtbis+xPhDQ6NH1YTK3nd
+         HA/78HhZdWCZOxpPHVPuSxm+dBOAN9ldXz9zfZcgj7GqEexp36ouxSiVHwNPrTwJ28c7
+         CZkTUhqYkvup7rGtBJLtRMdP89FcsChVoA+jO85zdz5I61xShI8D65vhEPHmVVHrMXfR
+         wf9KMKcPYxgw5JnS09dClt5Sp44VOSVw8RI5rRK8KbqzPltcPZXDC5v8bxLvkG1uywVJ
+         7XlQ==
+X-Gm-Message-State: AOAM5312/4zxCt3cr8nyOij3khlYP8snfiU1jodlfL/VNBFC4dR6T3Aa
+        MXhj5rL8FTMcUz6HyruxBaNR/4zTRjJv4A==
+X-Google-Smtp-Source: ABdhPJzlDei3c5LPTtjJF4767PxFoKhAc+XnedidW9jrARRoSw5p5T61izwk+1esqhopcAZjZotTBw==
+X-Received: by 2002:a63:7d3:0:b0:3f6:885:cd22 with SMTP id 202-20020a6307d3000000b003f60885cd22mr35097498pgh.143.1653600535500;
+        Thu, 26 May 2022 14:28:55 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id n24-20020a17090ac69800b001e26c391d28sm83742pjt.54.2022.05.26.14.28.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 14:23:54 -0700 (PDT)
-Date:   Thu, 26 May 2022 21:23:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dan Cross <cross@oxidecomputer.com>
-Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 2/2] kvm-unit-tests: configure changes for illumos.
-Message-ID: <Yo/v5tN8fKCb/ufB@google.com>
-References: <20220526071156.yemqpnwey42nw7ue@gator>
- <20220526173949.4851-1-cross@oxidecomputer.com>
- <20220526173949.4851-3-cross@oxidecomputer.com>
+        Thu, 26 May 2022 14:28:54 -0700 (PDT)
+Date:   Thu, 26 May 2022 21:28:50 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Subject: Re: [PATCH V3 02/12] KVM: X86/MMU: Add using_local_root_page()
+Message-ID: <Yo/xEirUJBLLQqCf@google.com>
+References: <20220521131700.3661-1-jiangshanlai@gmail.com>
+ <20220521131700.3661-3-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220526173949.4851-3-cross@oxidecomputer.com>
+In-Reply-To: <20220521131700.3661-3-jiangshanlai@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the future, please tag each new posting with a version number, e.g. no version
-number for the first posting, than v2, v3, v4, etc... for each subsequent posting.
-It took me a while to figure what was what.
-
-On Thu, May 26, 2022, Dan Cross wrote:
-> Warn, don't fail, if the check for `getopt -T` fails in the `configure`
-> script.
+On Sat, May 21, 2022 at 09:16:50PM +0800, Lai Jiangshan wrote:
+> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 > 
-> Aside from this check, `configure` does not use `getopt`, so don't
-> fail to run if `getopt -T` doesn't indicate support for  the extended
-> Linux version.  Getopt is only used in `run_tests.sh`, which tests for
-> extended getopt anyway, but emit a warning here.
+> In some cases, local root pages are used for MMU.  It is often using
+> to_shadow_page(mmu->root.hpa) to check if local root pages are used.
+> 
+> Add using_local_root_page() to directly check if local root pages are
+> used or needed to be used even mmu->root.hpa is not set.
+> 
+> Prepare for making to_shadow_page(mmu->root.hpa) returns non-NULL via
+> using local shadow [root] pages.
+> 
+> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 40 +++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 37 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index efe5a3dca1e0..624b6d2473f7 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1690,6 +1690,39 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+>  	mmu_spte_clear_no_track(parent_pte);
+>  }
+>  
+> +/*
+> + * KVM uses the VCPU's local root page (vcpu->mmu->pae_root) when either the
+> + * shadow pagetable is using PAE paging or the host is shadowing nested NPT for
+> + * 32bit L1 hypervisor.
 
-Why not simply move the check to run_tests.sh?  I can't imaging it's performance
-sensitive, and I doubt I'm the only one that builds tests on one system and runs
-them on a completely different system.
+How about using the terms "private" and "shared" instead of "local" and
+"non-local"? I think that more accurately conveys what is special about
+these pages: they are private to the vCPU using them. And then "shared"
+is more intuitive to understand than "non-local" (which is used
+elsewhere in this series).
+
+> + *
+> + * It includes cases:
+> + *	nonpaging when !tdp_enabled				(direct paging)
+> + *	shadow paging for 32 bit guest when !tdp_enabled	(shadow paging)
+> + *	NPT in 32bit host (not shadowing nested NPT)		(direct paging)
+> + *	shadow nested NPT for 32bit L1 hypervisor in 32bit host (shadow paging)
+> + *	shadow nested NPT for 32bit L1 hypervisor in 64bit host (shadow paging)
+> + *
+> + * For the first four cases, mmu->root_role.level is PT32E_ROOT_LEVEL and the
+> + * shadow pagetable is using PAE paging.
+> + *
+> + * For the last case, it is
+> + * 	mmu->root_role.level > PT32E_ROOT_LEVEL &&
+> + * 	!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL
+> + * And if this condition is true, it must be the last case.
+> + *
+> + * With the two conditions combined, the checking condition is:
+> + * 	mmu->root_role.level == PT32E_ROOT_LEVEL ||
+> + * 	(!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL)
+> + *
+> + * (There is no "mmu->root_role.level > PT32E_ROOT_LEVEL" here, because it is
+> + *  already ensured that mmu->root_role.level >= PT32E_ROOT_LEVEL)
+> + */
+> +static bool using_local_root_page(struct kvm_mmu *mmu)
+> +{
+> +	return mmu->root_role.level == PT32E_ROOT_LEVEL ||
+> +	       (!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL);
+> +}
+> +
+>  static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct)
+>  {
+>  	struct kvm_mmu_page *sp;
+> @@ -4252,10 +4285,11 @@ static bool fast_pgd_switch(struct kvm *kvm, struct kvm_mmu *mmu,
+>  {
+>  	/*
+>  	 * For now, limit the caching to 64-bit hosts+VMs in order to avoid
+> -	 * having to deal with PDPTEs. We may add support for 32-bit hosts/VMs
+> -	 * later if necessary.
+> +	 * having to deal with PDPTEs.  Local roots can not be put into
+> +	 * mmu->prev_roots[] because mmu->pae_root can not be shared for
+> +	 * different roots at the same time.
+
+This comment ends up being a little confusing by the end of this series
+because using_local_root_page() does not necessarily imply pae_root is
+in use. i.e. case 5 (shadow nested NPT for 32bit L1 hypervisor in 64bit
+host) does not use pae_root.
+
+How about rewording this commit to say something like:
+
+  If the vCPU is using a private root, it might be using pae_root, which
+  cannot be shared for different roots at the same time.
+
+>  	 */
+> -	if (VALID_PAGE(mmu->root.hpa) && !to_shadow_page(mmu->root.hpa))
+> +	if (unlikely(using_local_root_page(mmu)))
+>  		kvm_mmu_free_roots(kvm, mmu, KVM_MMU_ROOT_CURRENT);
+>  
+>  	if (VALID_PAGE(mmu->root.hpa))
+> -- 
+> 2.19.1.6.gb485710b
+> 
