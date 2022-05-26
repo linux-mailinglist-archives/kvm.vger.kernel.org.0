@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06A5B535562
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:24:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAA5D53556C
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:25:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348633AbiEZVYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 17:24:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44430 "EHLO
+        id S1349090AbiEZVYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 17:24:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348476AbiEZVYT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 17:24:19 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4142960069
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:19 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id g69-20020a625248000000b00519150d186bso1476940pfb.18
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:19 -0700 (PDT)
+        with ESMTP id S229835AbiEZVYV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 17:24:21 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 028974C7AA
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:21 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id b20-20020a62a114000000b0050a6280e374so1484521pff.13
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=qcb34r8lBkv1bGkFkoJYhaFMYHoFB0Pd8gzL2lqLpkQ=;
-        b=T2zruDflY/r2OIUodskEq7SMCOGDU5zIxLD6CKLlpC+X1tooGQxFlorAGyJySJiLcT
-         BcnQsYeLkficbXY1grZaMSOthPCBy2G7UlNRMgaw3Fki/sHXjUDSydOFdzfhioLz6vax
-         4gHW6WF6P1CeKQeh8tEypLoVOrZhs4imn/tnXHLtiJtPtiOHluXDiIrjkY2f4TIIprjj
-         YZQ+SkB3IFIn1h4C/asUwTVq0bKcWzu/4OEdoRTcStiO25m1gWa5ZjOfxfEhXAeSDusp
-         IKml40YTsbiAdMUFSg2RxerihFBAvv7pjgmFfk+SnKpam8IBWV1VQ9BNzawlaSa5Rw7p
-         SnbQ==
+        bh=Nj11sMCgQgDAP7C4SyDQj5semkrlbFX/aMEmua6TrWo=;
+        b=K72D1I+pKpn91nJKzkfGAnssAW78lSoqkoj7q0Fsy0PcP782i5+XHpwQ+31nJDR/F5
+         T2ZQrkYnsoBofCYqYLMmMnYXnzYYVAEb5GSsjU+RSn6T+yYyL5K5PGhP15hyJvwlxtuK
+         w3llFQUFkG5IomCwYNqArB0n3jnBFjQAsSzXClsbEumISzv2WFFx4zMofHOp8XqebpbP
+         sbTmErvnivyyYdMEsHKht9i8830EY5MELCPHvwaaEp2G952pkNy796Ct4leLH56qcQhJ
+         rBdNlJp6c/UI0ykSoDOUe4IdQBZkUQQhh8pRrSc2iBCwh40cRzGcB5O5BCQ0Jc0XMu52
+         tlBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=qcb34r8lBkv1bGkFkoJYhaFMYHoFB0Pd8gzL2lqLpkQ=;
-        b=YqcGoYkJF+M1Enf0rolaIODvJNkU4qbSpNtUso4E9RaGss5+IG1upGJCpFmxbhKwMR
-         7sJDYc61UmLyshfCfyP8lXsT46HLuM00H9TWJN+cbAy9ri3CjttfRtnNiHbjczLu87d5
-         8tgL/MDmELUbSj2Y/aMZNvkMAT8Jqzuax0hObXd2Z2V580FHVioWjKlHO0r3fnYySxjy
-         maQQqDKvNRGOH3jE9SC9osesTDh4Znn3INcJa6Z0X6t+uEVt+8PFrsHsm5IbH8HG2VFY
-         tvLY166EbbesC7BbmSvWD88/RnqxCPqSn6WTtx2JYdsl/GFmlXiU2xMeJJTs/wSwd+jB
-         xH8g==
-X-Gm-Message-State: AOAM532Xw2FQRpiY4iO6rUe2GSWFBfefMaF/XLe/+nFdreHpqpHHfopv
-        EOMaZUjdsuuzKpw0QzKZwzYG3OCu1gY=
-X-Google-Smtp-Source: ABdhPJxAeFvGXx51xtaRc6ldC7mkeitVeSpk0Q3pavUjwHjAZWr2uqsYLQND033oUCn3RqxKULma6C2BFAg=
+        bh=Nj11sMCgQgDAP7C4SyDQj5semkrlbFX/aMEmua6TrWo=;
+        b=gf53jdzKZf598vwC343H/0z19s6P4k9oaoBCqPKb5uww8nAOfLjtQNfAB6pPSluw03
+         BiC/NLS3mpsthgmt35CZBDfidDGODyG+iNe2xl41sNl4I9i+paqnE3WJWA6wF01G2Xeo
+         vY834d/8VwdfXYPJi3K762T/kn2eZcMJjXOpQVpNEDuAMe5TGDkgZTLNWSHdKG+DbdGM
+         v2m6ewDNFPkcz1rGNg6a2RIW8kilLnK+ztL16OZsDMzdx1H6uRyVFTwpCHevPRRHSNL4
+         vaYI+V4Jj2z8Zk0MVFw6XQhihvp1c8m4i8V/DJy9JmYiiqVL+6Nr1OSA0fE8sRwSAPYe
+         ZxIA==
+X-Gm-Message-State: AOAM5337FWOdtvFrzwnB51+COvA8qGBEOej1Y5W+a3rIKluxg2/6oBNR
+        UYFutqz/JC3YouYATDOGhQfwQBP1L+M=
+X-Google-Smtp-Source: ABdhPJxE9wmASbPgNq1RmxvCK1+awZBzuRGIk5dOXG8m86UEZH9YhpSnNSvR3YNCfYA8r7EWuS14TcECFl4=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a62:6dc3:0:b0:505:895a:d38b with SMTP id
- i186-20020a626dc3000000b00505895ad38bmr40875071pfc.7.1653600258711; Thu, 26
- May 2022 14:24:18 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:c612:b0:161:e095:8ff6 with SMTP id
+ r18-20020a170902c61200b00161e0958ff6mr37012728plr.145.1653600260466; Thu, 26
+ May 2022 14:24:20 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 26 May 2022 21:08:10 +0000
+Date:   Thu, 26 May 2022 21:08:11 +0000
 In-Reply-To: <20220526210817.3428868-1-seanjc@google.com>
-Message-Id: <20220526210817.3428868-2-seanjc@google.com>
+Message-Id: <20220526210817.3428868-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220526210817.3428868-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 1/8] KVM: x86: Grab regs_dirty in local 'unsigned long'
+Subject: [PATCH v2 2/8] KVM: x86: Harden _regs accesses to guard against buggy input
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,45 +66,77 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Capture ctxt->regs_dirty in a local 'unsigned long' instead of casting it
-to an 'unsigned long *' for use in for_each_set_bit().  The bitops helpers
-really do read the entire 'unsigned long', even though the walking of the
-read value is capped at the specified size.  I.e. 64-bit KVM is reading
-memory beyond ctxt->regs_dirty, which is a u32 and thus 4 bytes, whereas
-an unsigned long is 8 bytes.  Functionally it's not an issue because
-regs_dirty is in the middle of x86_emulate_ctxt, i.e. KVM is just reading
-its own memory, but relying on that coincidence is gross and unsafe.
+WARN and truncate the incoming GPR number/index when reading/writing GPRs
+in the emulator to guard against KVM bugs, e.g. to avoid out-of-bounds
+accesses to ctxt->_regs[] if KVM generates a bogus index.  Truncate the
+index instead of returning e.g. zero, as reg_write() returns a pointer
+to the register, i.e. returning zero would result in a NULL pointer
+dereference.  KVM could also force the index to any arbitrary GPR, but
+that's no better or worse, just different.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Open code the restriction to 16 registers; RIP is handled via _eip and
+should never be accessed through reg_read() or reg_write().  See the
+comments above the declarations of reg_read() and reg_write(), and the
+behavior of writeback_registers().  The horrific open coded mess will be
+cleaned up in a future commit.
+
+There are no such bugs known to exist in the emulator, but determining
+that KVM is bug-free is not at all simple and requires a deep dive into
+the emulator.  The code is so convoluted that GCC-12 with the recently
+enable -Warray-bounds spits out a false-positive due to a GCC bug:
+
+  arch/x86/kvm/emulate.c:254:27: warning: array subscript 32 is above array
+                                 bounds of 'long unsigned int[17]' [-Warray-bounds]
+    254 |         return ctxt->_regs[nr];
+        |                ~~~~~~~~~~~^~~~
+  In file included from arch/x86/kvm/emulate.c:23:
+  arch/x86/kvm/kvm_emulate.h: In function 'reg_rmw':
+  arch/x86/kvm/kvm_emulate.h:366:23: note: while referencing '_regs'
+    366 |         unsigned long _regs[NR_VCPU_REGS];
+        |                       ^~~~~
+
+Link: https://lore.kernel.org/all/YofQlBrlx18J7h9Y@google.com
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=216026
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105679
+Reported-and-tested-by: Robert Dinse <nanook@eskimo.com>
+Reported-by: Kees Cook <keescook@chromium.org>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/emulate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/emulate.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 89b11e7dca8a..7226a127ccb4 100644
+index 7226a127ccb4..c58366ae4da2 100644
 --- a/arch/x86/kvm/emulate.c
 +++ b/arch/x86/kvm/emulate.c
-@@ -269,9 +269,10 @@ static ulong *reg_rmw(struct x86_emulate_ctxt *ctxt, unsigned nr)
+@@ -247,6 +247,9 @@ enum x86_transfer_type {
  
- static void writeback_registers(struct x86_emulate_ctxt *ctxt)
+ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
  {
-+	unsigned long dirty = ctxt->regs_dirty;
- 	unsigned reg;
++	if (WARN_ON_ONCE(nr >= 16))
++		nr &= 16 - 1;
++
+ 	if (!(ctxt->regs_valid & (1 << nr))) {
+ 		ctxt->regs_valid |= 1 << nr;
+ 		ctxt->_regs[nr] = ctxt->ops->read_gpr(ctxt, nr);
+@@ -256,6 +259,9 @@ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
  
--	for_each_set_bit(reg, (ulong *)&ctxt->regs_dirty, 16)
-+	for_each_set_bit(reg, &dirty, 16)
- 		ctxt->ops->write_gpr(ctxt, reg, ctxt->_regs[reg]);
- }
- 
+ static ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned nr)
+ {
++	if (WARN_ON_ONCE(nr >= 16))
++		nr &= 16 - 1;
++
+ 	ctxt->regs_valid |= 1 << nr;
+ 	ctxt->regs_dirty |= 1 << nr;
+ 	return &ctxt->_regs[nr];
 -- 
 2.36.1.255.ge46751e96f-goog
 
