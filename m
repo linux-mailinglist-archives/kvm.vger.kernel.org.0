@@ -2,71 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9FDA53519C
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 17:44:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C18255351A2
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 17:47:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348014AbiEZPoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 11:44:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48626 "EHLO
+        id S241792AbiEZPrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 11:47:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242969AbiEZPoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 11:44:19 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01B15D808E
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 08:44:19 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id b135so1972977pfb.12
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 08:44:18 -0700 (PDT)
+        with ESMTP id S231396AbiEZPrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 11:47:19 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C6ECC169
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 08:47:18 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id n8so1776544plh.1
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 08:47:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=FjwbNPlaX7Gyu37oT3WUuGl7t7EIl/tWer4JTW1xkmY=;
-        b=TxLR0140fr8cr3Rhcx0XVtopJlCMmPcZZO0seYbfjPCu/UuicZOP2o10OUoZVf+Yvx
-         x2CW0Xzdiyx4LaM7oYO0HunymxwuE3Q+Dp9YKRLb/TCaplMdSlaQZXESwj3JQ5EwnQXm
-         j2VwTxoy+K3sXUVIH9FjN8HhtdaeAOymgXNunK/FK+7ujjkr9QeNb+t/1zBDnzwiqiAg
-         D+5ssb0XObhZmFCAEG5JYK2MB1CHs2u4KY49i6FwdGyMv3BOZxwVBmGR1FscH1AanpQj
-         dGfb/3u58anHDRPaxhegp2/rLpqOHwdMgwOpBZlNlkElmGDlEr1iTC2eJ2lVSKn4MXt3
-         NpSA==
+        bh=9Fx8vCzhWUjdFRzXfN9cU8/D8Ts/Rmfp/Gt6ZmJXtRo=;
+        b=CB+0U1qFaHdkAiyzSVkBLvbseHKjxoekSG8yydZzqm+OgjUSICeTSwkVGT6wn7qMiE
+         aGfE/0Nv5dGxpwoZASDkaKyn0OOMrg3GDIqOaNz8pTW15+yrK82YABD8WzC5ir6xymVt
+         i8UcyEEkHM60n0o3rlDBP6ZHoY+bB8dEKd6/DMkIJqhnxdsWLzQkFdznyGpmSaUhC1jF
+         6p47J2x4aLwGEi+99xM4Js9KimuTf3OZAO6/yG26jJd0APD88xJsRl7w0I0D0VSGNLmf
+         4labC065Q7AFEYd+zuSxqYtrC4rYToGhB/r+O2WtNP37K0GdgVuzJkV+u+1WCKJYsiag
+         kCCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=FjwbNPlaX7Gyu37oT3WUuGl7t7EIl/tWer4JTW1xkmY=;
-        b=cwnCfEjx3gFPQagPCQt8+X08DIoZqZIOzdZJ9nZFKZiQGJwHIET66Ze1DHI7L2WDRE
-         PQIH3qjArljOvknhc4wEMTgm14Ldgzz9dVFCQB/wwY17BIK0PIltJXOvgNh95DQJARvW
-         2uN5EYmUcRUJAD6IkL7BolVUiG/E4NAq8BEGzH3Soy4nt5vpnkUxw1ef+4J8g/mI9MwD
-         5dVdfmJyGGaUpFsnn2Kl/IF6aJ0qDIo9hA0Zu6RUrOeexur+GbupySUJIPEfTiT4CZpv
-         4lONtJWDkRehazfOZBEC0wpO6I0uANP1nNMECrMVkwC96qyk67whoozbH2bQx4pKP88s
-         PGMw==
-X-Gm-Message-State: AOAM531S+9yZDCqGbcAq7JdIcVyoVlcvUixQMn2+ExSI4/xG273RE903
-        fXasJH7LbPmFFADXFDEfVCeebA==
-X-Google-Smtp-Source: ABdhPJzTxz5kWhe+KvcHd/i8kumDC6CHY7eXMFydg2j4e0sOISTlnFFftwwwQVkq2mrYZ1mu9wlVpw==
-X-Received: by 2002:a05:6a00:14d4:b0:518:b918:fae4 with SMTP id w20-20020a056a0014d400b00518b918fae4mr17067267pfu.55.1653579858174;
-        Thu, 26 May 2022 08:44:18 -0700 (PDT)
+        bh=9Fx8vCzhWUjdFRzXfN9cU8/D8Ts/Rmfp/Gt6ZmJXtRo=;
+        b=t2iHBF1hxWeFU4QcvhXffNcFB+vEQ4eRGFmkK1f2f9VLmzAssxULAr3UZwK9rbFWVj
+         recXsrS7FRMK0Sk9G3XcRaykUNkdwPbitpLSxBsC8X5B+kR2RS0uiqMt57rMRdgLWTLu
+         uszbww+jAC/rOVERz84D7KwEp7djA3rz8pVHRV2RgRGgFWd4aIs8KQEzCDQ0SQWILr5v
+         Ke78rh0gjRAgOHLXZ9dJtzddIcEQkWpw2e5oVG7C5YlVk3Otck+FFP/c9xCaqIZtGcpo
+         eITKwHaQ6RHcdTABALu8F9kXdk3PPe7/tpoNJbH5BTbNVfxCp74u6xGEcKWjVtLnTFIc
+         s9aw==
+X-Gm-Message-State: AOAM533v6UCMT8qhOPAOerpK3CtgTcZv3PP4Ndu4q7grasiCKqrxfSBO
+        8g1flbXSIh8OSIM1H2hAvLvmCw==
+X-Google-Smtp-Source: ABdhPJzzSqMccL19vQokWCWc5+stt4j+6CDHwRflzasvHZksmMP/PorXV95hUMCn41xfVKhb6JAOVA==
+X-Received: by 2002:a17:902:f78d:b0:14d:522e:deb3 with SMTP id q13-20020a170902f78d00b0014d522edeb3mr38316902pln.173.1653580038116;
+        Thu, 26 May 2022 08:47:18 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q12-20020a170902eb8c00b0015e8d4eb1d7sm1680678plg.33.2022.05.26.08.44.17
+        by smtp.gmail.com with ESMTPSA id i10-20020a17090332ca00b0016156e0c3cbsm1803425plr.156.2022.05.26.08.47.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 08:44:17 -0700 (PDT)
-Date:   Thu, 26 May 2022 15:44:13 +0000
+        Thu, 26 May 2022 08:47:17 -0700 (PDT)
+Date:   Thu, 26 May 2022 15:47:14 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>, pbonzini@redhat.com,
-        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
-        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v4 1/4] KVM: Implement dirty quota-based throttling of
- vcpus
-Message-ID: <Yo+gTbo5uqqAMjjX@google.com>
-References: <20220521202937.184189-1-shivam.kumar1@nutanix.com>
- <20220521202937.184189-2-shivam.kumar1@nutanix.com>
- <87h75fmmkj.wl-maz@kernel.org>
- <bf24e007-23fd-2582-ec0c-5e79ab0c7d56@nutanix.com>
- <878rqomnfr.wl-maz@kernel.org>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kbuild-all@lists.01.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Robert Dinse <nanook@eskimo.com>,
+        Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 3/4] KVM: x86: Omit VCPU_REGS_RIP from emulator's _regs
+ array
+Message-ID: <Yo+hAtKdaCNhUx3Z@google.com>
+References: <20220525222604.2810054-4-seanjc@google.com>
+ <202205261040.m1luL6IW-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <878rqomnfr.wl-maz@kernel.org>
+In-Reply-To: <202205261040.m1luL6IW-lkp@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -78,39 +77,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 26, 2022, Marc Zyngier wrote:
-> > >> +{
-> > >> +	struct kvm_run *run = vcpu->run;
-> > >> +	u64 dirty_quota = READ_ONCE(run->dirty_quota);
-> > >> +	u64 pages_dirtied = vcpu->stat.generic.pages_dirtied;
-> > >> +
-> > >> +	if (!dirty_quota || (pages_dirtied < dirty_quota))
-> > >> +		return 1;
-> > > What happens when page_dirtied becomes large and dirty_quota has to
-> > > wrap to allow further progress?
-> > Every time the quota is exhausted, userspace is expected to set it to
-> > pages_dirtied + new quota. So, pages_dirtied will always follow dirty
-> > quota. I'll be sending the qemu patches soon. Thanks.
+On Thu, May 26, 2022, kernel test robot wrote:
+> Hi Sean,
 > 
-> Right, so let's assume that page_dirtied=0xffffffffffffffff (yes, I
-> have dirtied that many pages).
+> I love your patch! Yet something to improve:
+> 
+> [auto build test ERROR on 90bde5bea810d766e7046bf5884f2ccf76dd78e9]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Christopherson/KVM-x86-Emulator-_regs-fixes-and-cleanups/20220526-062734
+> base:   90bde5bea810d766e7046bf5884f2ccf76dd78e9
+> config: i386-debian-10.3-kselftests (https://download.01.org/0day-ci/archive/20220526/202205261040.m1luL6IW-lkp@intel.com/config)
 
-Really?  Written that many bytes from a guest?  Maybe.  But actually marked that
-many pages dirty in hardware, let alone in KVM?  And on a single CPU?
-
-By my back of the napkin math, a 4096 CPU system running at 16ghz with each CPU
-able to access one page of memory per cycle would take ~3 days to access 2^64
-pages.
-
-Assuming a ridiculously optimistic ~20 cycles to walk page tables, fetch the cache
-line from memory, insert into the TLB, and mark the PTE dirty, that's still ~60
-days to actually dirty that many pages in hardware.
-
-Let's again be comically optimistic and assume KVM can somehow propagate a dirty
-bit from hardware PTEs to the dirty bitmap/ring in another ~20 cycles.  That brings
-us to ~1200 days.
-
-But the stat is per vCPU, so that actually means it would take ~13.8k years for a
-single vCPU/CPU to dirty 2^64 pages... running at a ludicrous 16ghz on a CPU with
-latencies that are a likely an order of magnitude faster than anything that exists
-today.
+Doh, forgot to build and test 32-bit KVM.  For this patch, I think it makes sense
+to just hardcode the number of registers to 16.  But in a follow-up, that can be
+reduced to 8 for 32-bit KVM, and then rsm_load_state_32() can use NR_EMULATOR_GPRS
+too.
