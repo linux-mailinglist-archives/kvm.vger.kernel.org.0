@@ -2,132 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A1745351CA
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 18:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EED775351E8
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 18:16:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348076AbiEZQBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 12:01:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60184 "EHLO
+        id S243550AbiEZQQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 12:16:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348081AbiEZQBl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 12:01:41 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CB4D5D
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 09:01:37 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id j6so2007192pfe.13
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 09:01:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0wDwEbvj2W8EBJJzj5GYa4VDlivxhpjuZEM3P0GFWVg=;
-        b=rzbsOKPxkw1y3rvKMtPj+R0UaslkSSTYVLxXPfnfs4Bu3e0XjOK130UAYTzuBesWze
-         VUXl1FJqWiXGJTzuhhgU/9CRoEQDOI6lVFcdYxDheXj5suqK057rAE8MHMagjNMeE6py
-         enfQJK1lNKpLsbI/VmhivBKOHokHnNUgIp+ydK2pLrH46oU0056NNmHF69wASKmilxIY
-         6TCaQ7cJKCWxiDhLn7dhhJuFhJfkHN9hvG5rc2G5PzWwjDj8jWaTuab6n+xlI/WYVV7j
-         nmf0oceoaLaz0HIQjQkKGwd/66M1ph9If5YNxXevfwxcDY3O/CPHlifSG5rS0IVbhG1s
-         8XCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0wDwEbvj2W8EBJJzj5GYa4VDlivxhpjuZEM3P0GFWVg=;
-        b=k/P1UzVc2PU8G1aC7PTRvX0CCnXbDS3doTpN8e1KHNa7VMd7sDjDCotLEXUXt9RxJV
-         jPxo1ZRvGD3s1eiI+BB14HO3JuZiXm7IYDdilRRG04lOU2xN9yqVeVUngsHuenbc4YC2
-         I82kI562kt4ec9s9z+S9XmkAeG/42K5RiA6oG0nCsCiXAwXsUS6XXt8zH61Jojoybman
-         W9XRHJt+hbW6dvCKrDLwKDyYpAmHbck13CiXQtKwIgVSDTDQi+6VzNWdYmPLPTIUJ3f2
-         nVGFoNvdTzgBsU3Mx/FYXlWPBLYV0WmwOVIHBOm44SCTNO9btBj3TvFiQ5Qo1+7xwVeW
-         RkxA==
-X-Gm-Message-State: AOAM531eVJW9dmvSA9Dy0Yz+VNDclq9+ep1jHm8O2MBIFonDmbqqk+dO
-        edg+b3QmhRiNN7a8xT2qvvHTnw==
-X-Google-Smtp-Source: ABdhPJxWeVGhDADcS2EV6MDVYRLZdtTXEe7zHWZmcdKOxfk+OiR5C2jE3xk085AN9iyKigpitEm41g==
-X-Received: by 2002:a65:5601:0:b0:3fb:355:5f2f with SMTP id l1-20020a655601000000b003fb03555f2fmr4661946pgs.78.1653580896440;
-        Thu, 26 May 2022 09:01:36 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p9-20020a170902f08900b0015e8d4eb25fsm1706120pla.169.2022.05.26.09.01.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 09:01:35 -0700 (PDT)
-Date:   Thu, 26 May 2022 16:01:32 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Robert Dinse <nanook@eskimo.com>
-Subject: Re: [PATCH 2/4] KVM: x86: Harden _regs accesses to guard against
- buggy input
-Message-ID: <Yo+kXEKYAdduOAZX@google.com>
-References: <20220525222604.2810054-1-seanjc@google.com>
- <20220525222604.2810054-3-seanjc@google.com>
- <202205260835.9BC23703@keescook>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202205260835.9BC23703@keescook>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229780AbiEZQQS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 12:16:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0407564EA
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 09:16:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1979661CD9
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 16:16:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 693C1C385A9;
+        Thu, 26 May 2022 16:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653581773;
+        bh=NvgMiO11Ml38NMl50/XvcBk5n1mSGj6kShlQq46LLVc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PSvD7wAA/3rXmrSRQ8OK40OrnancbTtVd7gQlH8nr7D9K+A0003cldRL/2zKzBxWY
+         FnevSd8v3WYfUqd+u6AAXgNvRtkn0WP5jBaZrKL3YWij+O37aATvl4Yo3Q3KV45GaR
+         F9ID8dGGsB4TuAJzVIr1161PkEatQKm75iOF2/eBPoWn/cjWLLKf+vEPNpaCr95chX
+         I7fSJI/ctePN1zHDlhgLtIDy31gIUPPR6qZfhaSp0COJZuuNwjXA/ISVyJjwL20GW4
+         EPHxZ9GAZaedtHAuYYAaGB4ZHs4aDCzxb2BU2qnR3oi8vb+53Kxz7a8wsp1GHw8Lzs
+         aXge80GJ8/jBA==
+Received: from athedsl-4557779.home.otenet.gr ([94.70.87.219] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nuG9i-00Dt0c-OE; Thu, 26 May 2022 17:16:11 +0100
+Date:   Thu, 26 May 2022 17:16:08 +0100
+Message-ID: <877d68mfqv.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>, pbonzini@redhat.com,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v4 1/4] KVM: Implement dirty quota-based throttling of vcpus
+In-Reply-To: <Yo+gTbo5uqqAMjjX@google.com>
+References: <20220521202937.184189-1-shivam.kumar1@nutanix.com>
+        <20220521202937.184189-2-shivam.kumar1@nutanix.com>
+        <87h75fmmkj.wl-maz@kernel.org>
+        <bf24e007-23fd-2582-ec0c-5e79ab0c7d56@nutanix.com>
+        <878rqomnfr.wl-maz@kernel.org>
+        <Yo+gTbo5uqqAMjjX@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 94.70.87.219
+X-SA-Exim-Rcpt-To: seanjc@google.com, shivam.kumar1@nutanix.com, pbonzini@redhat.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 26, 2022, Kees Cook wrote:
-> On Wed, May 25, 2022 at 10:26:02PM +0000, Sean Christopherson wrote:
-> > Link: https://lore.kernel.org/all/YofQlBrlx18J7h9Y@google.com
-> > Cc: Robert Dinse <nanook@eskimo.com>
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/emulate.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
+On Thu, 26 May 2022 16:44:13 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Thu, May 26, 2022, Marc Zyngier wrote:
+> > > >> +{
+> > > >> +	struct kvm_run *run = vcpu->run;
+> > > >> +	u64 dirty_quota = READ_ONCE(run->dirty_quota);
+> > > >> +	u64 pages_dirtied = vcpu->stat.generic.pages_dirtied;
+> > > >> +
+> > > >> +	if (!dirty_quota || (pages_dirtied < dirty_quota))
+> > > >> +		return 1;
+> > > > What happens when page_dirtied becomes large and dirty_quota has to
+> > > > wrap to allow further progress?
+> > > Every time the quota is exhausted, userspace is expected to set it to
+> > > pages_dirtied + new quota. So, pages_dirtied will always follow dirty
+> > > quota. I'll be sending the qemu patches soon. Thanks.
 > > 
-> > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> > index 7226a127ccb4..c58366ae4da2 100644
-> > --- a/arch/x86/kvm/emulate.c
-> > +++ b/arch/x86/kvm/emulate.c
-> > @@ -247,6 +247,9 @@ enum x86_transfer_type {
-> >  
-> >  static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
-> >  {
-> > +	if (WARN_ON_ONCE(nr >= 16))
-> > +		nr &= 16 - 1;
+> > Right, so let's assume that page_dirtied=0xffffffffffffffff (yes, I
+> > have dirtied that many pages).
 > 
-> Instead of doing a modulo here, what about forcing it into an "unused"
-> slot?
+> Really?  Written that many bytes from a guest?  Maybe.  But actually
+> marked that many pages dirty in hardware, let alone in KVM?  And on
+> a single CPU?
+>
+> By my back of the napkin math, a 4096 CPU system running at 16ghz
+> with each CPU able to access one page of memory per cycle would take
+> ~3 days to access 2^64 pages.
 > 
-> i.e. define _regs as an array of [16 + 1], and:
+> Assuming a ridiculously optimistic ~20 cycles to walk page tables,
+> fetch the cache line from memory, insert into the TLB, and mark the
+> PTE dirty, that's still ~60 days to actually dirty that many pages
+> in hardware.
 > 
-> 	if (WARN_ON_ONCE(nr >= 16)
-> 		nr = 16;
+> Let's again be comically optimistic and assume KVM can somehow
+> propagate a dirty bit from hardware PTEs to the dirty bitmap/ring in
+> another ~20 cycles.  That brings us to ~1200 days.
 > 
-> Then there is both no out-of-bounds access, but also no weird "actual"
-> register indexed?
+> But the stat is per vCPU, so that actually means it would take
+> ~13.8k years for a single vCPU/CPU to dirty 2^64 pages... running at
+> a ludicrous 16ghz on a CPU with latencies that are a likely an order
+> of magnitude faster than anything that exists today.
 
-Eh, IMO it doesn't provide any meaningful value, and requires documenting why
-the emulator allocates an extra register.
+Congratulations, you can multiply! ;-)
 
-The guest is still going to experience data loss/corruption if KVM drops a write
-or reads zeros instead whatever register it was supposed to access.  I.e. the
-guest is equally hosed either way.
+It just shows that the proposed API is pretty bad, because instead of
+working as a credit, it works as a ceiling, based on a value that is
+dependent on the vpcu previous state (forcing userspace to recompute
+the next quota on each exit), and with undocumented, arbitrary limits
+as a bonus.
 
-One idea along the lines of Vitaly's idea of KVM_BUG_ON() would be to add an
-emulator hook to bug the VM, e.g.
+I don't like it, and probably won't like it in 13.8k years either.
 
-#define KVM_EMULATOR_BUG_ON(cond, ctxt)				\
-({								\
-	int __ret = (cond);					\
-								\
-	if (WARN_ON_ONCE(__ret))				\
-		ctxt->ops->vm_bugged(ctxt);			\
-	unlikely(__ret);					\
-})
+	M.
 
-to workaround not having access to the 'struct kvm_vcpu' in the emulator.  The
-bad access will still go through, but the VM will be killed before the vCPU can
-re-enter the guest and do more damage.
+-- 
+Without deviation from the norm, progress is not possible.
