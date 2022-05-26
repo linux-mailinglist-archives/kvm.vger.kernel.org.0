@@ -2,99 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9569053504A
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 15:59:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51984535056
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 16:04:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346526AbiEZN7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 09:59:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35158 "EHLO
+        id S1346417AbiEZOEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 10:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229922AbiEZN7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 09:59:31 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3A56C0FA
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 06:59:30 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id y141so2968212ybe.13
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 06:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=sKSXgk/nk/WSkPpE0LnWU5w6MMzn9hzZMkx/hz1110g=;
-        b=M3c9+kRn84mwhYAsCWctIT1IDSmYMwZmK3zeoIHPUCtjr51Pp1h94Rs0hX6EIMzSIO
-         K9AGkvjOhfjDgvwFunkRLGpfgtaeBPhSzfV93d0HSl2a8uFxWy3ql3Elfo04C1rMF1Z0
-         u399JQgS56srDhqL9IUYZytWY7u1C05G+A/b82r5XunDwWSPe274HIMtQ5IN5c/NHSNT
-         NFRuBN2clB8OK4VxFRB6oYoiXr4XtIQE67/By8etgwri52PsFQYracC/AkM2JvBfjw5c
-         APsBo9Vn5JPLLnYQfPhu3RMFCRnEVvmO+ZcHpt3Xu8YHxOhuxPrxmlI56/oeqVK6RsqI
-         oe+w==
+        with ESMTP id S229947AbiEZOEp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 10:04:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75D4B8CB2B
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 07:04:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653573881;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vXIDMXdbWn3CFwJPPtOALPFH0gfKO88GqGt6FTcIcL0=;
+        b=NJNtrj79mG1HJHf9pCYgtT40oqTcBWPFY9k/sW5BkfjeW89k6C+gLz3A+ucHsdsyPyNQnz
+        20y6HUgV0NzB4804vMZeVZEXyqvugfn8iqAfXHZesI79FEjnc+DnGcS2F8RwmnOyeUtDSE
+        GVeB/2rypVlsT0FwJ0sPjru1URNsDxc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-501-mWaQ2rXXOSaN-nt1SVLKVQ-1; Thu, 26 May 2022 10:04:40 -0400
+X-MC-Unique: mWaQ2rXXOSaN-nt1SVLKVQ-1
+Received: by mail-wr1-f71.google.com with SMTP id q10-20020adfcd8a000000b0020ff96b68c2so286822wrj.19
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 07:04:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=sKSXgk/nk/WSkPpE0LnWU5w6MMzn9hzZMkx/hz1110g=;
-        b=dU8pAorY6+2Mf8iPmYly+hJD0TVegTMuh2TT1iirJyINv46YTzsmE2wFutCVApKnfQ
-         FA0wJrdBhbAeqdZlZUVPKiyliKGvJ0cxx6O2tsNVwdp6WiWA0eYVAfhZFIUPDbCXtLLz
-         Dl++jjR6geEyobmnZVNC0aWZ1AL7gBS1rBYKK0LwSH+6R6to3IOxkLD/4tqT9kt6eXgG
-         XI+xHY/uEhL0uy+Y7WS6pZCw90gWRD7O38qpi/GwsxxzUdFIv8uD6xTLkk7E6agGz5rL
-         lOuvdaHKVLjzOn0YG4blOBoFjjwM/AK1qpvL/VjMmk69995HCcZLJycGNDu6IwUOFOOC
-         5ZaQ==
-X-Gm-Message-State: AOAM532xmu70Dc7j+B6zoWfgtwcOmxEnT7TSX56Z3foMepKX7Ypz5HV/
-        KNG+aW1rSeVQmem/BnYZqL0Bq24GHczOgZrkwyw=
-X-Google-Smtp-Source: ABdhPJykDwYykH1r34a482bpllF9aoIQM+YBDMDPLtrZBYW9aGnPPhX1bzjKd1ZPMWlRQfcVJhin9HSEKF7CbhIOnWc=
-X-Received: by 2002:a05:6902:102a:b0:64f:4132:9be with SMTP id
- x10-20020a056902102a00b0064f413209bemr33838335ybt.288.1653573569271; Thu, 26
- May 2022 06:59:29 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=vXIDMXdbWn3CFwJPPtOALPFH0gfKO88GqGt6FTcIcL0=;
+        b=WZHPnrQ3sdKn8Rtt+lshYN5PQLHkbgjC9zOJt741mEQjMzIYESdsxgWVPOi+6xLwMS
+         3q3vJKogPBfqBtdOOGzp+wJmsFMyhTabmDPwHu5KsZ/N2NksZfCLfT0GrEZeAgNMV1Qe
+         c0h96fZYVLgb4y9pcNkYBJMcQxD8jKwO6AVjaFbHdG8qZ2Z74wjDpWQAZX75Zj7O/GNm
+         7WISJNPk7dnj0FMGaTo4UtvxrfStln1aPHMqik9FsbhiUpNQZuIa7bDI9DM2v56DnJwq
+         JqOwunp2GN3PrOjgY6uwpoZEaiRqcJoUN1S/6r6snYurOrQkOErN9TF66BpVyTTckgDg
+         KqnA==
+X-Gm-Message-State: AOAM533VArChsQKsh0lyFomJZUa6/xlUEeTwPH05H6USgdeWkLAdeRqZ
+        WOtL17vHE8Q5uTu/iySr7drF3p2H4HAwnMtN1tEEvqmrP5og9VIduredLee9ujGO7pqsCM/Lzpi
+        pOxMvEdEHJ5/a
+X-Received: by 2002:a7b:c957:0:b0:397:3f4d:555c with SMTP id i23-20020a7bc957000000b003973f4d555cmr2533241wml.101.1653573879035;
+        Thu, 26 May 2022 07:04:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwsUkpmO+WEr+0K774juxAKra9bm1YWJFZ84phTC7DPfVnt0rczZU3R2XM2/lzjJ/CGKSGZBg==
+X-Received: by 2002:a7b:c957:0:b0:397:3f4d:555c with SMTP id i23-20020a7bc957000000b003973f4d555cmr2533207wml.101.1653573878757;
+        Thu, 26 May 2022 07:04:38 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id ay5-20020a05600c1e0500b003948f4e750fsm5721538wmb.23.2022.05.26.07.04.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 May 2022 07:04:38 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Robert Dinse <nanook@eskimo.com>,
+        Kees Cook <keescook@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: x86: Grab regs_dirty in local 'unsigned long'
+In-Reply-To: <20220525222604.2810054-2-seanjc@google.com>
+References: <20220525222604.2810054-1-seanjc@google.com>
+ <20220525222604.2810054-2-seanjc@google.com>
+Date:   Thu, 26 May 2022 16:04:37 +0200
+Message-ID: <87tu9cqtje.fsf@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a05:7010:2590:b0:2d2:296a:7286 with HTTP; Thu, 26 May 2022
- 06:59:28 -0700 (PDT)
-Reply-To: illuminatihome999world@gmail.com
-From:   Vic Naluzzi <naluzzivic49@gmail.com>
-Date:   Thu, 26 May 2022 06:59:28 -0700
-Message-ID: <CA+bhdZ37ExgDCfDSCsnuvHTt=ocKTP-c0VGeRFjocLL_6W9DTg@mail.gmail.com>
-Subject: ILLUMINATI
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.1 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,UNDISC_FREEM autolearn=no
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:b2b listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5025]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [naluzzivic49[at]gmail.com]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [naluzzivic49[at]gmail.com]
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  3.3 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <seanjc@google.com> writes:
+
+> Capture ctxt->regs_dirty in a local 'unsigned long' instead of casting
+> ctxt->regs_dirty to an 'unsigned long *' for use in for_each_set_bit().
+> The bitops helpers really do read the entire 'unsigned long', even though
+> the walking of the read value is capped at the specified size.  I.e. KVM
+> is reading memory beyond ctxt->regs_dirty.  Functionally it's not an
+> issue because regs_dirty is in the middle of x86_emulate_ctxt, i.e. KVM
+> is just reading its own memory, but relying on that coincidence is gross
+> and unsafe.
+
+Your nearly perfect description misses one important part: in 'struct
+x86_emulate_ctxt', 'regs_dirty' is actually 'u32' thus all this buzz :-)
+
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/emulate.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 89b11e7dca8a..7226a127ccb4 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -269,9 +269,10 @@ static ulong *reg_rmw(struct x86_emulate_ctxt *ctxt, unsigned nr)
+>  
+>  static void writeback_registers(struct x86_emulate_ctxt *ctxt)
+>  {
+> +	unsigned long dirty = ctxt->regs_dirty;
+>  	unsigned reg;
+>  
+> -	for_each_set_bit(reg, (ulong *)&ctxt->regs_dirty, 16)
+> +	for_each_set_bit(reg, &dirty, 16)
+>  		ctxt->ops->write_gpr(ctxt, reg, ctxt->_regs[reg]);
+>  }
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
 -- 
-WELCOME TO ILLUMINATI, The Club of the Rich and Famous; is the world
-oldest and largest fraternity made up of 5 Millions Members.We are one
-Family under one father who is the Supreme Being. In ILLUMINATI we
-believe that we were born in paradise and no member should struggle in
-this world. Hence all our new members are given Money Rewards once
-they join in order to upgrade their lifestyle.; interested members
-should contact us via Email: illuminatihome999world@gmail.com
+Vitaly
+
