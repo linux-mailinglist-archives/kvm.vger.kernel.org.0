@@ -2,66 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FC775347C7
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 03:04:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF8965347F4
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 03:17:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345396AbiEZBEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 May 2022 21:04:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46296 "EHLO
+        id S1343773AbiEZBRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 May 2022 21:17:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235621AbiEZBEb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 May 2022 21:04:31 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5E58D691;
-        Wed, 25 May 2022 18:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653527070; x=1685063070;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=o9Dut7uwRK4DimJ5k0okbFXL72hzra19bcCoT9j7B4s=;
-  b=mFNXTHGVSsEkel2jdOWQMP1UDW8ZO06zketPhX60ZAoPa6tsvBDHjc2Q
-   fia5l9ovVrukOwvqOaip8zVgOoVpxuSk+YOxbF6277DCqAgkslcqJ5C09
-   JO4RVKb3EUCa2XnCsHtmnV6bkH60mdSzyikyayuXY9eiKyV0gtqp6EKEo
-   qfeQYFjl/E30wfX1/+ZRguEaoQgdvuywb7+hAcidNhanI+tcPZlVs1pjA
-   fJvWEvMwGBlQxeXuyqtg5EX78RJ0KE/ELLDANn4w6ZgXW0Gs2sotyWdZc
-   WQRwySMVo3vJCcXwj1SsRmnfM7OULFjd+Vub1sxA1SXJ70dlU+H0td0a4
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10358"; a="253854254"
-X-IronPort-AV: E=Sophos;i="5.91,252,1647327600"; 
-   d="scan'208";a="253854254"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2022 18:04:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,252,1647327600"; 
-   d="scan'208";a="559940686"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga002.jf.intel.com with ESMTP; 25 May 2022 18:04:27 -0700
-Date:   Thu, 26 May 2022 09:04:26 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        Lei Wang <lei4.wang@intel.com>
-Subject: Re: [PATCH 1/2] KVM: VMX: Sanitize VM-Entry/VM-Exit control pairs at
- kvm_intel load time
-Message-ID: <20220526010426.aayo3qmgylatnkdt@yy-desk-7060>
-References: <20220525210447.2758436-1-seanjc@google.com>
- <20220525210447.2758436-2-seanjc@google.com>
- <20220525232744.e6g77merw7pita3s@yy-desk-7060>
- <Yo7M95ILNsHSBtqj@google.com>
+        with ESMTP id S1344426AbiEZBQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 May 2022 21:16:57 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4177B4FC5F;
+        Wed, 25 May 2022 18:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=qYg8IKyL/r8f2Vg1ESuYjuOnE5g2jafpU06hhSyNUpw=; b=FU/B4l/86GX2mfAVzdnOZlet7o
+        4YIMhkZpbCoSmgTvSZ+0srZ6BwOG40pWCCMj19qhaZ7LyhuSaw2+YdDV5a6+88avQFq2cWdQHfPWr
+        byuXc0vT/MGU7fDuPvzVefIP3U6jrYIpaAmCNdJioEzp88SsKae4gtRxxjsbwJwKjR30fWyrk6jS+
+        6N+w+qBIVJaEKMA2SIN/QJXQZdAFNIwoALKz9JWYzo9WKGMkqQ+rWdT359dIGkZ8Sy1ZcS2tNgQxZ
+        uFqnsZqHJyvAVlUVWnv0GfWFHqg8A7Yfpa485ULCi1tDMGcQd2T2bgnhjP4//0FFa8Q9P8q43x6cS
+        bXqNJBtA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nu278-000pxs-VA; Thu, 26 May 2022 01:16:35 +0000
+Date:   Thu, 26 May 2022 02:16:34 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Jessica Clarke <jrtc27@jrtc27.com>,
+        kernel test robot <lkp@intel.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-riscv@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-omap@vger.kernel.org,
+        linux-mm@kvack.org, linux-fbdev@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, bpf@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, alsa-devel@alsa-project.org
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 8cb8311e95e3bb58bd84d6350365f14a718faa6d
+Message-ID: <Yo7U8kglHlcvQ0Ri@casper.infradead.org>
+References: <628ea118.wJYf60YnZco0hs9o%lkp@intel.com>
+ <20220525145056.953631743a4c494aabf000dc@linux-foundation.org>
+ <F0E25DFF-8256-48FF-8B88-C0E3730A3E5E@jrtc27.com>
+ <20220525152006.e87d3fa50aca58fdc1b43b6a@linux-foundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yo7M95ILNsHSBtqj@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+In-Reply-To: <20220525152006.e87d3fa50aca58fdc1b43b6a@linux-foundation.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -70,32 +60,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 26, 2022 at 12:42:31AM +0000, Sean Christopherson wrote:
-> On Thu, May 26, 2022, Yuan Yao wrote:
-> > On Wed, May 25, 2022 at 09:04:46PM +0000, Sean Christopherson wrote:
-> > > @@ -2614,6 +2635,20 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-> > >  				&_vmentry_control) < 0)
-> > >  		return -EIO;
-> > >
-> > > +	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit_pairs); i++) {
-> > > +		u32 n_ctrl = vmcs_entry_exit_pairs[i].entry_control;
-> > > +		u32 x_ctrl = vmcs_entry_exit_pairs[i].exit_control;
-> > > +
-> > > +		if (!(_vmentry_control & n_ctrl) == !(_vmexit_control & x_ctrl))
-> > > +			continue;
-> > > +
-> > > +		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
-> > > +			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl);
-> >
-> > How about "n_ctrl, x_ctrl);" ? In 0/1 or 1/0 case this
-> > outputs all information of real inconsistent bits but not 0.
->
-> I thought about adding the stringified control name to the output (yay macros),
-> but opted for the simplest approach because this should be a very, very rare
-> event.  All the necessary info is there, it just takes a bit of leg work to get
-> from a single control bit to the related control name and finally to its pair.
->
-> I'm not totally against printing more info, but if we're going to bother doing so,
-> my vote is to print names instead of numbers.
+On Wed, May 25, 2022 at 03:20:06PM -0700, Andrew Morton wrote:
+> On Wed, 25 May 2022 23:07:35 +0100 Jessica Clarke <jrtc27@jrtc27.com> wrote:
+> 
+> > This is i386, so an unsigned long is 32-bit, but i_blocks is a blkcnt_t
+> > i.e. a u64, which makes the shift without a cast of the LHS fishy.
+> 
+> Ah, of course, thanks.  I remember 32 bits ;)
+> 
+> --- a/mm/shmem.c~mm-shmemc-suppress-shift-warning
+> +++ a/mm/shmem.c
+> @@ -1945,7 +1945,7 @@ alloc_nohuge:
+>  
+>  	spin_lock_irq(&info->lock);
+>  	info->alloced += folio_nr_pages(folio);
+> -	inode->i_blocks += BLOCKS_PER_PAGE << folio_order(folio);
+> +	inode->i_blocks += (blkcnt_t)BLOCKS_PER_PAGE << folio_order(folio);
 
-Agree for simplest approach because this should be rare event, thanks.
+Bizarre this started showing up now.  The recent patch was:
+
+-       info->alloced += compound_nr(page);
+-       inode->i_blocks += BLOCKS_PER_PAGE << compound_order(page);
++       info->alloced += folio_nr_pages(folio);
++       inode->i_blocks += BLOCKS_PER_PAGE << folio_order(folio);
+
+so it could tell that compound_order() was small, but folio_order()
+might be large?
+
+Silencing the warning is a good thing, but folio_order() can (at the
+moment) be at most 9 on i386, so it isn't actually going to be
+larger than 4096.
