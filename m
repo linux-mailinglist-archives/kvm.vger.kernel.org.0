@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 360B453556D
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:25:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE6A5535569
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:25:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235823AbiEZVYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 17:24:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44606 "EHLO
+        id S1349195AbiEZVYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 17:24:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239874AbiEZVY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 17:24:27 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180F99D06C
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:26 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id on14-20020a17090b1d0e00b001c7a548e4f7so3903584pjb.2
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:26 -0700 (PDT)
+        with ESMTP id S1349174AbiEZVYd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 17:24:33 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F79E731B
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:28 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2f7dbceab08so23185267b3.10
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:24:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=vRAWGApnZo9PQoKSv+ZEImJz7U3HwflIO0rVPe9gUZU=;
-        b=AuzYwvO+aFV3coHvl7K8KwGsYi6DGC0TkiEteCchpLesVODaU452xnHzHBJREb8Jbr
-         2aGV5xDy4pWsobXF7xO2yRHmoYLNtJKJHnYJ0V8UmMwip981d7pD4jNF5vhqtUmPkWr4
-         eANCrVZAUXZ7ZVOwzKTVdyHTRsMc12HjplmVvqUV46xFfqIlLNQ36TqSDqNAOBC9PlfQ
-         QAsOKQQYg6EuAwHZMGFY5tJ7OmiP18H5E5XVSklljJ8wBLIv1H3mddfjE5lAbGyBwIdA
-         lsJ2mXx4v/foETyFGjPDoN034bzZSwe+07TXR+9mvhmv0gVRQ6+3Pn9X5QkAeXGAFF5S
-         pelA==
+        bh=v3CqCwLu207sw0GXSofBe8WSdEvT1VmqfkxogyjcNu0=;
+        b=CROY8wgPYt/QN4wVpxCf+acAp5/1J2MFvYsgfk2a8xMRi00okIaGJrHRap54YmorIy
+         zIc4GGHJS9bzqlz98B5dUqDfN/aKPwesQgmWIDu/vKJfMoL8EQlZYsc/NSSVA+Hehi4r
+         9RVAi4eAeJiWr6p+EiC0AtRvSEG/Piqsb2bkYKULUJHdXE05q2O5qJ3U+QSJbXNJHZDW
+         YVh0GHIz35VhiOjP+aLn1t+6k2v594qyu3RPj2g9SjcRIRcvkzm9GmpBgLHOGtXViplO
+         X33SiVo/xTm753U5GmtpWqJmQndVyCxTNmHX1s6AcZOHsBrbQ65zhTGqHsQB2NfPxQod
+         dhPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=vRAWGApnZo9PQoKSv+ZEImJz7U3HwflIO0rVPe9gUZU=;
-        b=xqk9/QYCjmX6Tfa8D4atIi25Nu2Z83ap5D2GKl2dlrdE5PcejRMbAPLEA65+4uuIH+
-         DEYol3VpLDpQZern+17WyDYqBM3agnExZGPL0umOHp5qHjIKWqbuq2rNnQhcNbkXUENr
-         d/mYo17eBmAN9j7iv8GGQg6j+XIdwo/pylWw78FgRwDbMrZTtyIPfNQDG07Lqoh5Pmyv
-         GbIX14BV5MNuGsaihL7LLnigXO0KXUrakPosoeY6+9oRqTMQMjObyLS/5czdF0BqHnbB
-         oa+X5edyuoo64BpSJAAIuE0dTr2c080n7hJGajTx/8RK9IaiQEMZogVyViU+0tBe4R+a
-         iPOg==
-X-Gm-Message-State: AOAM5305rk/vefZb6wGqEpuS+8kWs6oxpl8u4Se9sBPRH1/mZRvHZZbI
-        JYHkJ0ehWK15YzpJV/aelnUssJsHxVI=
-X-Google-Smtp-Source: ABdhPJyvAr6xUQFYgm5WV3rKJQ4tk4S5ntWPyBHIlSXKk1BBeLTAu2f6WznnIhnvLiAHU4OPrsZPctfEhSM=
+        bh=v3CqCwLu207sw0GXSofBe8WSdEvT1VmqfkxogyjcNu0=;
+        b=I5muT66qRiQl7gDxHJcmwCHbeHWUHzznnTjqog7xMn7uNFqE36l8/y1L5z02H5Szfy
+         n67fSilLVTAaxIk0xAmhNzii/lhqu1F0bOjHmGUz+LhNKTPlghyMdoCwtIbF9VWfBhkt
+         Nn4INyEDPfmWMsqWhFrrkqJ+hV5Ri1HmwVP2GaDZn3d9NJb9NLt17nuTK8maeuelIz1o
+         vdXxYCQK42BqZ0LK2rsiXt8ncw0oXgWDjdLVpBYRGhDVvFFKW16t9jD68PFwZSVs0Tob
+         2ScxIl5OrSjOkYE44alEcNlo3ygt0BxRhpFejiOzIrcoTFrOf2i9XnuNd8jXvCNT33OG
+         k+GA==
+X-Gm-Message-State: AOAM531sonmpO2vEbdHJX52UN+D09rxmDZI8EESnE8biMxqhu92zdMb9
+        gm1e9qBG8haF5ynClc+ISRQn9hEuT2g=
+X-Google-Smtp-Source: ABdhPJzyOrxr5ivAn4As2fM0HXaXv+5iCh+M5Mi7bj9R/MWAkeKBLhyvHaMvSLhc2V0BxcDiao0TbwBrj+A=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a65:6bce:0:b0:3f2:5f88:6f7d with SMTP id
- e14-20020a656bce000000b003f25f886f7dmr34957881pgw.253.1653600265524; Thu, 26
- May 2022 14:24:25 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:4546:0:b0:655:845b:f3df with SMTP id
+ s67-20020a254546000000b00655845bf3dfmr11137880yba.624.1653600267235; Thu, 26
+ May 2022 14:24:27 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 26 May 2022 21:08:14 +0000
+Date:   Thu, 26 May 2022 21:08:15 +0000
 In-Reply-To: <20220526210817.3428868-1-seanjc@google.com>
-Message-Id: <20220526210817.3428868-6-seanjc@google.com>
+Message-Id: <20220526210817.3428868-7-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220526210817.3428868-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 5/8] KVM: x86: Reduce the number of emulator GPRs to '8'
- for 32-bit KVM
+Subject: [PATCH v2 6/8] KVM: x86: Bug the VM if the emulator accesses a
+ non-existent GPR
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -74,65 +74,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reduce the number of GPRs emulated by 32-bit KVM from 16 to 8.  KVM does
-not support emulating 64-bit mode on 32-bit host kernels, and so should
-never generate accesses to R8-15.
+Bug the VM, i.e. kill it, if the emulator accesses a non-existent GPR,
+i.e. generates an out-of-bounds GPR index.  Continuing on all but
+gaurantees some form of data corruption in the guest, e.g. even if KVM
+were to redirect to a dummy register, KVM would be incorrectly read zeros
+and drop writes.
 
-Opportunistically use NR_EMULATOR_GPRS in rsm_load_state_{32,64}() now
-that it is precise and accurate for both flavors.
-
-Wrap the definition with full #ifdef ugliness; sadly, IS_ENABLED()
-doesn't guarantee a compile-time constant as far as BUILD_BUG_ON() is
-concerned.
+Note, bugging the VM doesn't completely prevent data corruption, e.g. the
+current round of emulation will complete before the vCPU bails out to
+userspace.  But, the very act of killing the guest can also cause data
+corruption, e.g. due to lack of file writeback before termination, so
+taking on additional complexity to cleanly bail out of the emulator isn't
+justified, the goal is purely to stem the bleeding and alert userspace
+that something has gone horribly wrong, i.e. to avoid _silent_ data
+corruption.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/emulate.c     | 4 ++--
- arch/x86/kvm/kvm_emulate.h | 7 ++++---
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ arch/x86/kvm/emulate.c     |  4 ++--
+ arch/x86/kvm/kvm_emulate.h | 10 ++++++++++
+ arch/x86/kvm/x86.c         |  9 +++++++++
+ 3 files changed, 21 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 5aaf1d1200af..77161f57c8d3 100644
+index 77161f57c8d3..70a8e0cd9fdc 100644
 --- a/arch/x86/kvm/emulate.c
 +++ b/arch/x86/kvm/emulate.c
-@@ -2441,7 +2441,7 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
- 	ctxt->eflags =             GET_SMSTATE(u32, smstate, 0x7ff4) | X86_EFLAGS_FIXED;
- 	ctxt->_eip =               GET_SMSTATE(u32, smstate, 0x7ff0);
+@@ -247,7 +247,7 @@ enum x86_transfer_type {
  
--	for (i = 0; i < 8; i++)
-+	for (i = 0; i < NR_EMULATOR_GPRS; i++)
- 		*reg_write(ctxt, i) = GET_SMSTATE(u32, smstate, 0x7fd0 + i * 4);
+ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
+ {
+-	if (WARN_ON_ONCE(nr >= NR_EMULATOR_GPRS))
++	if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
+ 		nr &= NR_EMULATOR_GPRS - 1;
  
- 	val = GET_SMSTATE(u32, smstate, 0x7fcc);
-@@ -2498,7 +2498,7 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
- 	u16 selector;
- 	int i, r;
+ 	if (!(ctxt->regs_valid & (1 << nr))) {
+@@ -259,7 +259,7 @@ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
  
--	for (i = 0; i < 16; i++)
-+	for (i = 0; i < NR_EMULATOR_GPRS; i++)
- 		*reg_write(ctxt, i) = GET_SMSTATE(u64, smstate, 0x7ff8 - i * 8);
+ static ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned nr)
+ {
+-	if (WARN_ON_ONCE(nr >= NR_EMULATOR_GPRS))
++	if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
+ 		nr &= NR_EMULATOR_GPRS - 1;
  
- 	ctxt->_eip   = GET_SMSTATE(u64, smstate, 0x7f78);
+ 	BUILD_BUG_ON(sizeof(ctxt->regs_dirty) * BITS_PER_BYTE < NR_EMULATOR_GPRS);
 diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 3a65d6ea7fe6..034c845b3c63 100644
+index 034c845b3c63..89246446d6aa 100644
 --- a/arch/x86/kvm/kvm_emulate.h
 +++ b/arch/x86/kvm/kvm_emulate.h
-@@ -306,11 +306,12 @@ typedef void (*fastop_t)(struct fastop *);
-  * tracked/accessed via _eip, and except for RIP relative addressing, which
-  * also uses _eip, RIP cannot be a register operand nor can it be an operand in
-  * a ModRM or SIB byte.
-- *
-- * TODO: this is technically wrong for 32-bit KVM, which only supports 8 GPRs;
-- * R8-R15 don't exist.
-  */
-+#ifdef CONFIG_X86_64
- #define NR_EMULATOR_GPRS	16
-+#else
-+#define NR_EMULATOR_GPRS	8
-+#endif
+@@ -89,6 +89,7 @@ struct x86_instruction_info {
+ #define X86EMUL_INTERCEPTED     6 /* Intercepted by nested VMCB/VMCS */
  
- struct x86_emulate_ctxt {
- 	void *vcpu;
+ struct x86_emulate_ops {
++	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+ 	/*
+ 	 * read_gpr: read a general purpose register (rax - r15)
+ 	 *
+@@ -383,6 +384,15 @@ struct x86_emulate_ctxt {
+ 	bool is_branch;
+ };
+ 
++#define KVM_EMULATOR_BUG_ON(cond, ctxt)		\
++({						\
++	int __ret = (cond);			\
++						\
++	if (WARN_ON_ONCE(__ret))		\
++		ctxt->ops->vm_bugged(ctxt);	\
++	unlikely(__ret);			\
++})
++
+ /* Repeat String Operation Prefix */
+ #define REPE_PREFIX	0xf3
+ #define REPNE_PREFIX	0xf2
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7460b9a77d9a..e60badfbbc42 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7887,7 +7887,16 @@ static int emulator_set_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr)
+ 	return __kvm_set_xcr(emul_to_vcpu(ctxt), index, xcr);
+ }
+ 
++static void emulator_vm_bugged(struct x86_emulate_ctxt *ctxt)
++{
++	struct kvm *kvm = emul_to_vcpu(ctxt)->kvm;
++
++	if (!kvm->vm_bugged)
++		kvm_vm_bugged(kvm);
++}
++
+ static const struct x86_emulate_ops emulate_ops = {
++	.vm_bugged           = emulator_vm_bugged,
+ 	.read_gpr            = emulator_read_gpr,
+ 	.write_gpr           = emulator_write_gpr,
+ 	.read_std            = emulator_read_std,
 -- 
 2.36.1.255.ge46751e96f-goog
 
