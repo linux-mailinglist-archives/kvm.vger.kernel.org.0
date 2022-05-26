@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99E8D53555D
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:17:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A1B8535561
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:24:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241089AbiEZVRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 17:17:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41438 "EHLO
+        id S245289AbiEZVX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 17:23:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbiEZVRU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 17:17:20 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2F29D04E
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:17:19 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id q4so2455430plr.11
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:17:19 -0700 (PDT)
+        with ESMTP id S229835AbiEZVX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 17:23:57 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803254C7AA
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:23:55 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 137so2319290pgb.5
+        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:23:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=7WmKmhq7Co3oIFnUCAxcgs0ZItaJFPEI6tYE/o6LOyo=;
-        b=M4bpMFKrFU6q1UuWiroij5UU0lvQmOSpjQHGvQJjso9rEngC9n5a1N1ByUnLWtO4FJ
-         th9GKL4AQDwYpwXRTrZ5QJOfg8L0NOz5/2UAjhwIISd1z4oIZr/XPk5GSP08aWPtbBVd
-         yJiDKSf0NncO1Ar9j9rjphfzxFi8H6kEeD/UzOxs6Ciwgbotdjtq1O3et8WS/g9Uazin
-         2/TR88AHcN0jleqvCl1lJVkIUvfPxniUak+iWRY/HQMTmkbchLohWh8kt2xuWrxDu0pB
-         R56F6MbgKav/j3qlI9wux0aITJJPZCcDvwu2McJiZaqpnJFk96kIiLQC6+rNHS5mPNPj
-         0oyw==
+        bh=vvPesztQ/q6dEXTjjwBXmVDKox8pNCXxacGyk70E8Dg=;
+        b=O4Suc8kizeWKRTVEj00AQ1ab9tKe753MhatLcEm4PLJvR7M2irU2Jhg3tvLufHtFe2
+         P372DMirqt4jci9WjNyvM9cItpc06Y1Oemg9rpCOMC1yhCL5UbaJKlCswW1LxyaJ2lcY
+         3K3ZfGy4ADMSjJTrr851Wi3IOdcM/LTiR3Fegd/SfSuO5F12Md1ZGbhUh02eR+JCSAP9
+         JxaYCZ/0rV2R84RitJ5hQIS9iQ5K0gdZ3+YEDqOtpzc+/itaW5VU/mX5uRK8eRCFmkTv
+         5JOapOgYyLDqHAnofnwQiy1nTThhruJcCMUh6UbmhnBjqTHwn+QsuSF3ZAmtz+axA0Td
+         qe7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7WmKmhq7Co3oIFnUCAxcgs0ZItaJFPEI6tYE/o6LOyo=;
-        b=d1toZYbuFNN89UHxfus4rK1VnxRu5+/Yerfcmg6JmT4UbYR7wd5HeMzrSceOdfQa+F
-         OjgCoB9FUKv7ZRwsjYR1JjEG5U+9rTum39CO/28/0qqbhUXS1WdTkI5ct2cKgK2CiyvU
-         fm+L6QFLvCP3MhOeR9OYrADrzh+Z7mxozLc6GpOk81BLeGqwYfQolc5nySYrruzenQNc
-         mAr27LZbZQyNJIp0UeBiFnfbQnB/LQrUfYbJzCymJ6GKzf88Z2bNwf0M8TdgOmES2RUr
-         zhPLgXTKBGviCk+uzZjTBTjIHz5ADu4/BG4QYabSzYIH8rQZI5XAnUMnT+R1CX9IHvY3
-         YfIA==
-X-Gm-Message-State: AOAM5334+hCWQwY/CcvJDlO0n6pPsUubFzMyB9iF151hWdb0DFKcY2lQ
-        gi54QCaD7qzeq51GA9cOc8KGZA==
-X-Google-Smtp-Source: ABdhPJy5Q0xggTcxMnnpurpWdm6qGA8gAfHjS9puQnafoBHmIeRsTXs5GP6iNCkofZmEjV7/+4H+fg==
-X-Received: by 2002:a17:902:d54b:b0:161:8f46:8207 with SMTP id z11-20020a170902d54b00b001618f468207mr40317429plf.67.1653599838834;
-        Thu, 26 May 2022 14:17:18 -0700 (PDT)
+        bh=vvPesztQ/q6dEXTjjwBXmVDKox8pNCXxacGyk70E8Dg=;
+        b=3p0TSQ9gEr2vVQrZdv9jaPQmjjIeJMQNVln2DHPMO+vDIr3YCbkCaAoiuBpElUYpVo
+         8kn7+GNGMF7LZF/T8UFvGEtpYIWFz+nq3uwfGwVKfMiBozjHbN/z+cnqk6KY5TvGP08L
+         gZUZ77nWz4KudExlMUpzGjbTdU3KunHmrObA1M/UrQMbzCyuvPfpspOpFQQ2zczZBajU
+         qr/YalLny8v4+QZ8e0LW8NAAH3Lq5ffdonA3ttm8NTXjaX7dZzqCKXOzAf2lLarKHYXC
+         ZM4QTDqngeG8QBhVI5dE7FcLYNQtDh1TH49Ahj4PHYzJdREJB8fkc8/uQhKn6Xy8EQsl
+         uiaw==
+X-Gm-Message-State: AOAM532cmyWuPbdxUv4sqAg3cVbveyydu3sBMxYQ5F4uKVX+e11ZJ24M
+        KgIDBkAF02u7ZxBdwybBp8tXQg==
+X-Google-Smtp-Source: ABdhPJz9Vr7FWCttsYRDC5bTCdZ3cRPMlWGSkHHLq+nHl5wH2QNI/o0qZvP8Ms2laDVTyIDnOXLgcA==
+X-Received: by 2002:a05:6a00:10cc:b0:506:e0:d6c3 with SMTP id d12-20020a056a0010cc00b0050600e0d6c3mr40747339pfu.33.1653600234842;
+        Thu, 26 May 2022 14:23:54 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j13-20020a17090a588d00b001d9927ef1desm88159pji.34.2022.05.26.14.17.18
+        by smtp.gmail.com with ESMTPSA id o3-20020a654583000000b003fa5b550303sm1986625pgq.68.2022.05.26.14.23.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 14:17:18 -0700 (PDT)
-Date:   Thu, 26 May 2022 21:17:14 +0000
+        Thu, 26 May 2022 14:23:54 -0700 (PDT)
+Date:   Thu, 26 May 2022 21:23:50 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Dan Cross <cross@oxidecomputer.com>
 Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/2] kvm-unit-tests: invoke $LD explicitly in
-Message-ID: <Yo/uWpZg2qQniSTP@google.com>
+Subject: Re: [PATCH 2/2] kvm-unit-tests: configure changes for illumos.
+Message-ID: <Yo/v5tN8fKCb/ufB@google.com>
 References: <20220526071156.yemqpnwey42nw7ue@gator>
  <20220526173949.4851-1-cross@oxidecomputer.com>
- <20220526173949.4851-2-cross@oxidecomputer.com>
+ <20220526173949.4851-3-cross@oxidecomputer.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220526173949.4851-2-cross@oxidecomputer.com>
+In-Reply-To: <20220526173949.4851-3-cross@oxidecomputer.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,40 +73,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+In the future, please tag each new posting with a version number, e.g. no version
+number for the first posting, than v2, v3, v4, etc... for each subsequent posting.
+It took me a while to figure what was what.
+
 On Thu, May 26, 2022, Dan Cross wrote:
-> Change x86/Makefile.common to invoke the linker directly instead
-> of using the C compiler as a linker driver.
+> Warn, don't fail, if the check for `getopt -T` fails in the `configure`
+> script.
 > 
-> This supports building on illumos, allowing the user to use
-> gold instead of the Solaris linker.  Tested on Linux and illumos.
-> 
-> Signed-off-by: Dan Cross <cross@oxidecomputer.com>
-> ---
->  x86/Makefile.common | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index b903988..0a0f7b9 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -62,7 +62,7 @@ else
->  .PRECIOUS: %.elf %.o
->  
->  %.elf: %.o $(FLATLIBS) $(SRCDIR)/x86/flat.lds $(cstart.o)
-> -	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,$(SRCDIR)/x86/flat.lds \
-> +	$(LD) -T $(SRCDIR)/x86/flat.lds -nostdlib -o $@ \
->  		$(filter %.o, $^) $(FLATLIBS)
->  	@chmod a-x $@
->  
-> @@ -98,8 +98,8 @@ test_cases: $(tests-common) $(tests)
->  $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
->  
->  $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
-> -	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
-> -	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
-> +	$(LD) -m elf_i386 -nostdlib -o $@ \
-> +	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+> Aside from this check, `configure` does not use `getopt`, so don't
+> fail to run if `getopt -T` doesn't indicate support for  the extended
+> Linux version.  Getopt is only used in `run_tests.sh`, which tests for
+> extended getopt anyway, but emit a warning here.
 
-AFAICT, this is functionally a nop, and both 32-bit and 64-bit are happy, so,
-
-Reviewed-and-tested-by: Sean Christopherson <seanjc@google.com>
+Why not simply move the check to run_tests.sh?  I can't imaging it's performance
+sensitive, and I doubt I'm the only one that builds tests on one system and runs
+them on a completely different system.
