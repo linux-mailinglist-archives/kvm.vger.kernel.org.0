@@ -2,64 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 581EA534BEE
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 10:49:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05F00534C04
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 10:53:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346764AbiEZItX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 04:49:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53486 "EHLO
+        id S231205AbiEZIxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 04:53:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346758AbiEZItW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 04:49:22 -0400
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C761A888A;
-        Thu, 26 May 2022 01:49:21 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-300beab2b76so8068027b3.13;
-        Thu, 26 May 2022 01:49:21 -0700 (PDT)
+        with ESMTP id S236407AbiEZIxM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 04:53:12 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99230C3D28;
+        Thu, 26 May 2022 01:53:11 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id y141so1770767ybe.13;
+        Thu, 26 May 2022 01:53:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=lR+TDr5LsguOn0VlHOYnRCFxRx4+aXjTPws9yY6c9Ps=;
-        b=dePYxaYADwy99/kEkfatg9gM+WrqLQn8Y+9iUnBjSFPp+2Tie1Y91tr9I4Hhr1T//N
-         O8wmRHO23cRkZySp3l66x3VAYRl28qdPbYKZqVuGKqGHnbkcVB0EhFssTUB2+1j1f2xF
-         rhF09KcK/nbrUAMUCGK4BiKhZtvgCR7Z+cpHcE1yKouDwNHZa0DXI+PZvFXk0QSNZvkx
-         YvsKA0ALR5qS1zwW3Vw34gJ3o/InKGBkRQ7VvrST4pnXhgQteFJljhqe1jCJLpUuKI+0
-         JLQ1SfuGwp2p7vREmVgwFXiWZxxzpnrbXpJ1cquOmhFhuuZyk7IeY/8XFRKV83JgDr90
-         2cag==
+        bh=+NW67VtdRcZQ9Q2m5VakCrqBBwHKOENKxBYUs8sQ/yQ=;
+        b=Yrv1E+jB0uDVSsEI4SYF2D5OnGbc7IeA3DTCV5ZBpbhfdY9NLr8uQMr8raFjP6EAZ+
+         0i9SBhH2Un+uWOgoooUOHmp9P4wq0LtiE4yjA5KJujQayYaaNc+qeq+5d0TiJXwPYUfR
+         wvjQkt0hbO68HJBKGD+8OctEtZvgezcqam0uHOFrEhIZa+JJUas7pDVE3Kb/IZeAoh8M
+         AL1WbCTjXcLS8FXRysvNNp3gTOzuoN73Fi2rmzaWFEcAbN4ckzn6cZ2BJv9/nAbujvJ2
+         oJzCoYGNlf2r82VZT9HGuYsQYe5GiHGnf6zcgEDfp2tM8/U/O7GDTADlQ23sIRMAQ2E7
+         y9Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=lR+TDr5LsguOn0VlHOYnRCFxRx4+aXjTPws9yY6c9Ps=;
-        b=n52BjwyXH8iYW+XtFKr54XjZClQ99zjNkqTXR//4ttezigSwrRo3iDhggtSkfYY7wq
-         essqhlrIA7a7vW67rudT5MjK0GoJsjkGivPiceGj3G6EjyXKc5nTi0+muYr2tGR2VzE+
-         DrBxhq70Mbtje5a0tYtNKUnC4clD1d46yO6eAeFB9Ki+wkYygN4FRlQedGleq5ocdX8Q
-         ff+7a+alt08dlU0C77NUpMib9mX5vZwyne/BeiZjlyjb2fNFU9byw9IQPY9RgOpH3Dez
-         eBwxOKWUsMgO6iWGSJ1gdt6UE0bEUlXiuHAfNaTIEcAWOCU1PW8E9qtQT6vhuV2D086B
-         pj1Q==
-X-Gm-Message-State: AOAM532DaSh074UHMkl1ceIHSSkD//r4P00u7VfkyFRqnZD+YrmjS/SM
-        DXCw7hUkPx7nbOCJKer3EVbepuzVE6x5gkAZFP3VNSj1ZiE=
-X-Google-Smtp-Source: ABdhPJzialUr5kBtsF+rQDVp9AhSqEHOiDeC5+O03iQtIA8jRBZNf91Kul18LqL8NyuJNZ3koDIWcB8eaIBLTwG8bWU=
-X-Received: by 2002:a81:b80d:0:b0:2ff:db8b:333a with SMTP id
- v13-20020a81b80d000000b002ffdb8b333amr20379755ywe.17.1653554960598; Thu, 26
- May 2022 01:49:20 -0700 (PDT)
+        bh=+NW67VtdRcZQ9Q2m5VakCrqBBwHKOENKxBYUs8sQ/yQ=;
+        b=Sj5y+Ckcu+QyCYK5IUn6CE49NSDyVdy3P02BHvsZ23Ju5nWlxEheLAWbD7tXO7d7Qf
+         lNqa9RGLzyxzrPZ+MgMupx7y3j4OPZIX7EgSTyU0Ek6kmM0+1cgfd/L1cvrtuEduDb9N
+         6a2lfAFfsSZuM/eKXApI5m7o+S0U26XYBPZr1+PNO7HoyRBqoOyzz+LJBDnS+ZGVTarT
+         0RWli5yBrqM6zHgjJzINxvA5pep6dw8aC+0XEPmiwuWUdXPg4MTZ3/HTUwXws53IQx2Z
+         iQ02gWqGiXi3lXYgQ4omctO1/DszuLJH7nPVh62Q6puV+rKIZYpxQmeHJ4UC7NfDtKU1
+         v1KQ==
+X-Gm-Message-State: AOAM533HO7tmGIJQm7IbLUYapoW6g/thX8IdZ3ci3bXg4S3ni6iZXdxB
+        SkxE3KMXQrkLyOYSnnNCbtkKk4iZtcAMDKg7mns=
+X-Google-Smtp-Source: ABdhPJzNOyiJtihGftn/TLilOutjHqIOaGo4Zf/aO1amcxWp0qbGniRPVoLnPeDenWoYts6kVzYA/Wg8KGlGLGib/tI=
+X-Received: by 2002:a25:ba10:0:b0:656:e295:9aca with SMTP id
+ t16-20020a25ba10000000b00656e2959acamr2187310ybg.458.1653555190813; Thu, 26
+ May 2022 01:53:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220521131700.3661-1-jiangshanlai@gmail.com>
-In-Reply-To: <20220521131700.3661-1-jiangshanlai@gmail.com>
+References: <20220503150735.32723-1-jiangshanlai@gmail.com>
+ <20220503150735.32723-7-jiangshanlai@gmail.com> <YoPT6petoQUnF4vB@google.com>
+In-Reply-To: <YoPT6petoQUnF4vB@google.com>
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Thu, 26 May 2022 16:49:09 +0800
-Message-ID: <CAJhGHyDSxN5haa6bx+44jRXw3PBad6DcmZNc115g5Vfve=xLEA@mail.gmail.com>
-Subject: Re: [PATCH V3 00/12] KVM: X86/MMU: Use one-off local shadow page for
- special roots
-To:     LKML <linux-kernel@vger.kernel.org>,
+Date:   Thu, 26 May 2022 16:52:59 +0800
+Message-ID: <CAJhGHyAK7zNQ+XKjGJThtQwmhKAVVNa2+=PgOOOaWfgNg0YA-g@mail.gmail.com>
+Subject: Re: [PATCH V2 6/7] KVM: X86/MMU: Allocate mmu->pae_root for PAE
+ paging on-demand
+To:     David Matlack <dmatlack@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
         <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>
+        Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -71,38 +78,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 21, 2022 at 9:16 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->
-> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
->
-> Current code uses mmu->pae_root, mmu->pml4_root, and mmu->pml5_root to
-> setup special roots.  The initialization code is complex and the roots
-> are not associated with struct kvm_mmu_page which causes the code more
-> complex.
->
-> So add new local shadow pages to simplify it.
->
-> The local shadow pages are associated with struct kvm_mmu_page and
-> VCPU-local.
->
-> The local shadow pages are created and freed when the roots are
-> changed (or one-off) which can be optimized but not in the patchset
-> since the re-creating is light way (in normal case only the struct
-> kvm_mmu_page needs to be re-allocated and sp->spt doens't, because
-> it is likely to be mmu->pae_root)
->
-> The patchset also fixes a possible bug described in:
-> https://lore.kernel.org/lkml/20220415103414.86555-1-jiangshanlai@gmail.com/
-> as patch1.
->
+Hello
 
-Ping and please ignore patch1 and patch9. It would not cause any conflict
-without patch1 and patch9 if both are ignored together.
+Thank you for the review.
 
-The fix is wrong (see new discussion in the above link).  So the possible
-correct fix will not have any conflict with this patchset of one-off
-local shadow page.  I don't want to add extra stuff in this patchset
-anymore.
+On Wed, May 18, 2022 at 12:57 AM David Matlack <dmatlack@google.com> wrote:
+
+> >
+> > -static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+> > +static void __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+>
+> vcpu is now unused.
+
+Removed in V3.
+
+>
+> >  {
+> > -     struct page *page;
+> >       int i;
+> >
+> >       mmu->root.hpa = INVALID_PAGE;
+> >       mmu->root.pgd = 0;
+> >       for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> >               mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+>
+> optional: Consider open-coding this directly in kvm_mmu_create() and
+> drop __kvm_mmu_create().
+
+__kvm_mmu_create() is kept, and I don't want to duplicate this code.
+
+
+> >  }
+> >
+> >  int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>
+> kvm_mmu_create() could return void now too.
+
+Did in v3.
 
 Thanks
 Lai
