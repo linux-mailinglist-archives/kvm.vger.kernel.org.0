@@ -2,91 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA46D534BCC
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 10:32:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A39F534BDB
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 10:38:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346699AbiEZIcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 04:32:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45730 "EHLO
+        id S1345013AbiEZIiy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 04:38:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233597AbiEZIcq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 04:32:46 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03C6E40A01;
-        Thu, 26 May 2022 01:32:44 -0700 (PDT)
-Received: from mail-yw1-f177.google.com ([209.85.128.177]) by
- mrelayeu.kundenserver.de (mreue012 [213.165.67.97]) with ESMTPSA (Nemesis) id
- 1MREqy-1oF67j0SBw-00N8ei; Thu, 26 May 2022 10:32:43 +0200
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-2ff7b90e635so7972107b3.5;
-        Thu, 26 May 2022 01:32:42 -0700 (PDT)
-X-Gm-Message-State: AOAM532n56ZQxMFT91DplnjI4UlxvMLpwX5cJfGthcRkihp19TE1VFPf
-        WKymCUc/IyL8ZzF7Enfld3wx3kxFrVpsTOcxFJ4=
-X-Google-Smtp-Source: ABdhPJzd1Td84PUKl1aMompoBi/CI7Ij8UKcDh3J33F17cieCWlpkBhuvBB90C07npKSjm4gZ1dqj3OUo1L9/csGNzA=
-X-Received: by 2002:a81:488c:0:b0:302:549f:ffbc with SMTP id
- v134-20020a81488c000000b00302549fffbcmr1085051ywa.495.1653553961173; Thu, 26
- May 2022 01:32:41 -0700 (PDT)
+        with ESMTP id S230215AbiEZIix (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 04:38:53 -0400
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12FF8D697;
+        Thu, 26 May 2022 01:38:51 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-2fee010f509so7901007b3.11;
+        Thu, 26 May 2022 01:38:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fbUeYaGV2iiTmVNKTztnPLDzOTHifNaSgRvdrF1CxyU=;
+        b=P2WjARQ55FNQcr4R+gXEvuEn585KUkmWQRoOdXmP88i2dYu4kLI11R8f+Gr2nGcLFT
+         gc21wTZ5aHe0bYVXFD63LP1T7VsRxzZV0qDnRJ2Wj1ikRpdbebeMlUycBR6//c22lbla
+         M+7jhM5nUJi31rTZ6YAj1Cj4auqjGui3E3yJ+fwCpfhUaVWYW8zAFueJcjPEL/LNTM92
+         7q7ZVLHqfvyXMILM/oqc4rqQ3xOA9ntjlIy8XBkSeUKNcU1LB/5uTut+CVH+8QUSpBpQ
+         HoUTPgqdurtxnd0lcWd8OYgLjEUhkDRcdRmojM1giTPlildacj9nflpIpFyFEKPq5vyZ
+         8/mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fbUeYaGV2iiTmVNKTztnPLDzOTHifNaSgRvdrF1CxyU=;
+        b=Jg5uqPSYJKXtxazw3DH13kccMvd+gG5nhoI8omAzBhtdN3esvbCfGK9xGrQXQgOFdK
+         CGZm+svtt1MhPUIa7rjkm2e/BejuzII/TQDzK9K3//6ZaNUwN/ZR+ndOZQKmQ/QcKaWX
+         +v4iy8CCM5UJMwM3gvzpavlEm9CWP/lKmFErUvzHBpXWnm1rOQ0MqmdEZL6ILflW9F+K
+         7KFSIzF97aCDjilk0fMS+iyBSyebnv7gkCjNMeeSeVZfB/IKzmvC1PaLesGn6N3j+igU
+         0rPMyqwO0A6g4lFZ9hRPsvM4JkMP54TSGX5dEiCyABBEa+nLHmsWAIbcYyjpmx+Vg/wD
+         AAzQ==
+X-Gm-Message-State: AOAM532/nrKDvDKHsjlWV7o8mEA7i3cCTRelFz7kCTbiNpfELDPImYEm
+        W+bWXi+vyuuJ6rfvT4Op9Yk418Z+6EMrc0jI1M8=
+X-Google-Smtp-Source: ABdhPJzeUexWBR2EUkg6MWAag5FyAZsCS2FmgDFxl3d28/yHC0PXTjDtzEAQDiTbf2T94NoymPbmgVJH9skeqeDH0uA=
+X-Received: by 2002:a81:250c:0:b0:2ff:ee04:282e with SMTP id
+ l12-20020a81250c000000b002ffee04282emr19640772ywl.161.1653554331053; Thu, 26
+ May 2022 01:38:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <628ea118.wJYf60YnZco0hs9o%lkp@intel.com>
-In-Reply-To: <628ea118.wJYf60YnZco0hs9o%lkp@intel.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Thu, 26 May 2022 10:32:24 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a10aGYNr=nKZVzv+1n_DRibSCCkoCLuTDtmhZskBMWfyw@mail.gmail.com>
-Message-ID: <CAK8P3a10aGYNr=nKZVzv+1n_DRibSCCkoCLuTDtmhZskBMWfyw@mail.gmail.com>
-Subject: Re: [linux-next:master] BUILD REGRESSION 8cb8311e95e3bb58bd84d6350365f14a718faa6d
-To:     kernel test robot <lkp@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        "open list:DRM DRIVER FOR QEMU'S CIRRUS DEVICE" 
-        <virtualization@lists.linux-foundation.org>,
-        Networking <netdev@vger.kernel.org>,
-        linux-staging@lists.linux.dev,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        linux-parport@lists.infradead.org,
-        linux-omap <linux-omap@vger.kernel.org>,
-        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvm list <kvm@vger.kernel.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        bpf <bpf@vger.kernel.org>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Linux Memory Management List <linux-mm@kvack.org>
+References: <20220415103414.86555-1-jiangshanlai@gmail.com>
+ <YoK3zEVj+DuIBEs7@google.com> <CALzav=c_WfJ0hvHUFHkLH-+zrDXZSCzKsGHP6kPYd77adwHkUQ@mail.gmail.com>
+In-Reply-To: <CALzav=c_WfJ0hvHUFHkLH-+zrDXZSCzKsGHP6kPYd77adwHkUQ@mail.gmail.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Thu, 26 May 2022 16:38:40 +0800
+Message-ID: <CAJhGHyBtVwZ9G+Mv8FMwC4Uku_gK4-Ng7+x+FqykZLftANm0Yg@mail.gmail.com>
+Subject: Re: [PATCH] kvm: x86/svm/nested: Cache PDPTEs for nested NPT in PAE
+ paging mode
+To:     David Matlack <dmatlack@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Avi Kivity <avi@redhat.com>, kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:PCHqQe4zueVMpS9NgDF2gz9QeCCu3e6TGmy70qhxHLlI0l3tOil
- 3TFtRnaqRaEZG2VsxMRL/BwWZliZgBFMDmDiMT3VIGVV7w/27RA/2CRb4zSjCOlvy6iPqM+
- Ix8rIUqF6hC1so72stcjY0PS4GOuwl3eoiB7/wGEVVCCs6sLXUBtn7f33ehfn9C/4yk3dDp
- HkxtbWvMftl4TNJsT/kdw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:78dHAjsp8rs=:pc1R8fxbsnLyXZ+tRpGQOD
- uxA9TCI9qUoqcJMUd1AmSehehlkwp4lmW53FlY5vykKfLVp3l4Cy3SqmMT6B6mya5q5MRwxkf
- m7QZ+C8X14ZCcB5IxiTYJW206aHfgsPNJomi4dTa4Q0GBDu0G1YyyS+b444yzR6Ql+isnCXDE
- BaopH42n0dgogTvazQMff/ftjtr/9zyvzRmrYLJS4uFRWmD165Bs3C5cNRf1hJrB5k8ZzHeQy
- K1yMzV8yWnyEKKBtXjoiRqV8bMO7cAnNdGPS5fCO4ftcfO/cecWVCpVWndcEZ9x1nDJg1D8VE
- cvUIno1cSk0UgIfu2/5XqxpHIcXhPaLTHN/EmRDKT0KHfgLefREyf60nrRRa9uIuoGEMseFnY
- w7VUgrNB6qMgTvY207Bconmza5huJdYU/eYpERC/rZ5T0FCF5lwvGeIPKZ7ksIlc6ODVPg/ai
- tN+s/QUqu/oGnRgUX5rqVmFSDRC4Qymxdb5j7XnNsHNyvFnh3L8M/pVipBzZMit++nOOSwv8L
- lzke+HIGWue2uxhnXmS1o6EKaqH0QnE2h1YczeWOyQqNnaULvHKS9aTWf7jqBdaFw/sR9KtKO
- E5J/7/HBe64/yJ5lPlU61ObcoAwrtcuuQi3yvImA0w2+y5fJFLOqtRZmuu4Xx1oYJpap7uEYb
- fOwJXnqP6OLmpV1sQY574fdWBoCBdpIgasOipuT/zal3XqVMNt43wm8BNL4z+dJelXQ5B0e+6
- E9Ue+mya/1nF3I7PDdxpguLJHREPOu0X43OCAmh3V6MvGos2qozLOWy3Ak1zG17pRyum8eEOn
- G7OvNUUsj+nY1bIOD5ZJ0jYMjwxjBNBNkH6VJ8PZsuf1SZThl1aBB5NgcoDPH4OaSWZq215Ek
- FyaWh6mDmdGTBCUZfibUJlxkVMnc/NhNVZHsTg5L8=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 25, 2022 at 11:35 PM kernel test robot <lkp@intel.com> wrote:
-> .__mulsi3.o.cmd: No such file or directory
-> Makefile:686: arch/h8300/Makefile: No such file or directory
-> Makefile:765: arch/h8300/Makefile: No such file or directory
-> arch/Kconfig:10: can't open file "arch/h8300/Kconfig"
+On Thu, May 26, 2022 at 5:45 AM David Matlack <dmatlack@google.com> wrote:
+>
+> On Mon, May 16, 2022 at 2:06 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Fri, Apr 15, 2022, Lai Jiangshan wrote:
+> > > From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+> > >
+> > > When NPT enabled L1 is PAE paging, vcpu->arch.mmu->get_pdptrs() which
+> > > is nested_svm_get_tdp_pdptr() reads the guest NPT's PDPTE from memroy
+> > > unconditionally for each call.
+> > >
+> > > The guest PAE root page is not write-protected.
+> > >
+> > > The mmu->get_pdptrs() in FNAME(walk_addr_generic) might get different
+> > > values every time or it is different from the return value of
+> > > mmu->get_pdptrs() in mmu_alloc_shadow_roots().
+> > >
+> > > And it will cause FNAME(fetch) installs the spte in a wrong sp
+> > > or links a sp to a wrong parent since FNAME(gpte_changed) can't
+> > > check these kind of changes.
+> > >
+> > > Cache the PDPTEs and the problem is resolved.  The guest is responsible
+> > > to info the host if its PAE root page is updated which will cause
+> > > nested vmexit and the host updates the cache when next nested run.
+> >
+> > Hmm, no, the guest is responsible for invalidating translations that can be
+> > cached in the TLB, but the guest is not responsible for a full reload of PDPTEs.
+> > Per the APM, the PDPTEs can be cached like regular PTEs:
+> >
+> >   Under SVM, however, when the processor is in guest mode with PAE enabled, the
+> >   guest PDPT entries are not cached or validated at this point, but instead are
+> >   loaded and checked on demand in the normal course of address translation, just
+> >   like page directory and page table entries. Any reserved bit violations ared
+> >   etected at the point of use, and result in a page-fault (#PF) exception rather
+> >   than a general-protection (#GP) exception.
+>
+> This paragraph from the APM describes the behavior of CR3 loads while
+> in SVM guest-mode. But this patch is changing how KVM emulates SVM
+> host-mode (i.e. L1), right? It seems like AMD makes no guarantee
+> whether or not CR3 loads pre-load PDPTEs while in SVM host-mode.
+> (Although the APM does say that "modern processors" do not pre-load
+> PDPTEs.)
 
-Please stop building h8300  after the asm-generic tree is merged, the
-architecture is getting removed.
+Oh, I also missed the fact that L1 is the host when emulating it.
 
-        Arnd
+The code is for host-mode (L1)'s nested_cr3 which is using the
+traditional PAE PDPTEs loading and checking.
+
+So using caches is the only correct way, right?
+
+If so, I can update this patch only (not adding it to the patchset of
+one-off local shadow page) and add some checks to see if the loaded
+caches changed.
+
+Maybe I just ignore it since I'm not familiar with SVM enough.
+I hope it served as a bug report.
+
+Thanks
+Lai
