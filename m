@@ -2,173 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6B4A535578
-	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:29:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81C9A53557F
+	for <lists+kvm@lfdr.de>; Thu, 26 May 2022 23:30:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239216AbiEZV27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 17:28:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49120 "EHLO
+        id S229485AbiEZVao (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 17:30:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbiEZV25 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 17:28:57 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49A83ABF49
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:28:56 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id d129so2313028pgc.9
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 14:28:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=n/dQumpwP7TjnB5SFXHOsq0ojlkNiebJVgxbXnsVWEw=;
-        b=UORJmqEl1ZcTStO8P44GY6cM5VBCI4XXU11RYFlagzJPjwgLYfR9fWKFey4MYWSAtR
-         v6ZMhIP8kBUlqH+CMgZgxU5WofSdJGzn19kuixH59EZk9g2tEAr7gbO8gPRgedJPOzMA
-         mPef4VS8XoKCVT/bJiD31KTs7du7pbYzTMDguk0MpNBwU9sfSBZr54e/ZpZaCcLHI/Rc
-         tzWGa3K74/Y+4F5nT3uc0RoUahIwXQMYu2QsQVtvXeOZEHl64ToezAaklWdfbsGv2fJT
-         nD6b3CuKWQnXjRwEDb878ABVSl5/lYkaTSRriEltMT5Pnw0eiJT1doQ4WE5HWlR72QnD
-         9fIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=n/dQumpwP7TjnB5SFXHOsq0ojlkNiebJVgxbXnsVWEw=;
-        b=CHpOQ4uCMA92aDdMZb6BdwWoXaB8rMuniDPUh3mYPw/oqOaW6Mh58pzUn2yoGLFthc
-         R25ROIArLHW84f2eL6oSehhMRj5/SMw/qLrL+dIVWtr4sIjNtbis+xPhDQ6NH1YTK3nd
-         HA/78HhZdWCZOxpPHVPuSxm+dBOAN9ldXz9zfZcgj7GqEexp36ouxSiVHwNPrTwJ28c7
-         CZkTUhqYkvup7rGtBJLtRMdP89FcsChVoA+jO85zdz5I61xShI8D65vhEPHmVVHrMXfR
-         wf9KMKcPYxgw5JnS09dClt5Sp44VOSVw8RI5rRK8KbqzPltcPZXDC5v8bxLvkG1uywVJ
-         7XlQ==
-X-Gm-Message-State: AOAM5312/4zxCt3cr8nyOij3khlYP8snfiU1jodlfL/VNBFC4dR6T3Aa
-        MXhj5rL8FTMcUz6HyruxBaNR/4zTRjJv4A==
-X-Google-Smtp-Source: ABdhPJzlDei3c5LPTtjJF4767PxFoKhAc+XnedidW9jrARRoSw5p5T61izwk+1esqhopcAZjZotTBw==
-X-Received: by 2002:a63:7d3:0:b0:3f6:885:cd22 with SMTP id 202-20020a6307d3000000b003f60885cd22mr35097498pgh.143.1653600535500;
-        Thu, 26 May 2022 14:28:55 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id n24-20020a17090ac69800b001e26c391d28sm83742pjt.54.2022.05.26.14.28.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 14:28:54 -0700 (PDT)
-Date:   Thu, 26 May 2022 21:28:50 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S1345240AbiEZVak (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 17:30:40 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2049.outbound.protection.outlook.com [40.107.236.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F29BC1EC8;
+        Thu, 26 May 2022 14:30:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Kn2Ba7933YZ80lgOCsyjxmMa700bwddaTRmIPVjTaGZ4qBA/LErGTL7BkKKWzzLNgbCLmjlE5V1ClPXowKCI0elG/6bhur9DFNtl+kuKiaakSONtxNsonWHT7p7Tx5z2AGjRNIz/twEe1m8G76i1o3b8zpOsfwOKzs+6gXcXYrtw6+1NY7EVlXqkU5PVhkwHm7iMWEu2F7EV0LQU1mbi7JIYXS5HYJscZxbMWXs85jRsSjG6CnI54ySQUsQka65erGWxJu4myAAXYBT566RREfwPbOI72adHC21ReNfyJ1kCsMEj0vLj7eIpXuU2Uc5C+Njg+LDEO2d5n6+Gjjf9aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hjUfjbrXrZm0cbzh+Pu2PDdKDV4S5/XQQm8YBj2AEcc=;
+ b=Nmwu4MBD+uCutXZLafguYjYANl/qa+kzx8PAvHcIpcpu5lgWWNRojMg2sk5cSEVbWYJdRQPhCUXTIMorBUR9QUeGB0EegXkmNbYfkL3mmti1WWZnRstiaVYAzkfM2gAQMvWzG0AmozrZdnyg2jgo7dThGpQ19LvkEjNdfAjo5FzgbecU4NyFQnaXdRaMeLn4D/J7dVSgc3aOd4kw8QGtoMAf2EIYcLBx2hPA/0ilsabDWkH8xAy4IUo7YRwSFbeKJ0Gz+h4W94j4S49fHARY3l7I628y+yXdGGhbjUNxyBMTpK+INZ83JOihNqLiopBNwdgGLROD0fULSINSXSrXWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hjUfjbrXrZm0cbzh+Pu2PDdKDV4S5/XQQm8YBj2AEcc=;
+ b=32SPeSQSkKsKvpHmUHoeFQ8QxzKj18D8YQEs8+BMyY33TJBRzlMYBG6OQlAIfdgeJnsYJXoHJPfuSuuO+2hMe+2NZBqTxRh1zLjjthwKm+Musv0p0iGfkcmfnaJS773/CheqJQRrC27M2EHDvs89l/rtF7yE/fcsDQPJ+rn3DLg=
+Received: from BN9PR03CA0847.namprd03.prod.outlook.com (2603:10b6:408:13d::12)
+ by CH0PR12MB5266.namprd12.prod.outlook.com (2603:10b6:610:d1::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5293.13; Thu, 26 May
+ 2022 21:30:36 +0000
+Received: from BN8NAM11FT068.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13d:cafe::b7) by BN9PR03CA0847.outlook.office365.com
+ (2603:10b6:408:13d::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5293.13 via Frontend
+ Transport; Thu, 26 May 2022 21:30:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT068.mail.protection.outlook.com (10.13.177.69) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5293.13 via Frontend Transport; Thu, 26 May 2022 21:30:36 +0000
+Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 26 May
+ 2022 16:30:34 -0500
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     <mario.limonciello@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH V3 02/12] KVM: X86/MMU: Add using_local_root_page()
-Message-ID: <Yo/xEirUJBLLQqCf@google.com>
-References: <20220521131700.3661-1-jiangshanlai@gmail.com>
- <20220521131700.3661-3-jiangshanlai@gmail.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
+        <kvm@vger.kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] KVM: Only display message about bios support disabled once
+Date:   Thu, 26 May 2022 16:30:38 -0500
+Message-ID: <20220526213038.2027-1-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220521131700.3661-3-jiangshanlai@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 162c310c-06bd-4d44-8f58-08da3f5ef8e3
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5266:EE_
+X-Microsoft-Antispam-PRVS: <CH0PR12MB52662B913C4F41DA8E25603DE2D99@CH0PR12MB5266.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2tnJlQErOmYPYIzAozRUz/RMxOIt7TNdSa2vB9A2FxjpaIzqW9VzvDUVNuUsuNHCoVaxyahfLpN6iB8QosPXTzIE4qTjaWyc0t4MkjzUpjYu7efM15jR40TTwZ91PzT8bYbZ3L52jxdMX81p4SINQMYDrpRt9vI9sOMD7JCwinyDp0xaFhIua8f7gTrVlFtSjYXYqHYqiEvrrow5ejzr6jy/ikyHg1tivK9G0Rev36hJfdWaMR3X1SpZhJRkHUd6E7/SSp2OCC0zUe69tq5fNb+/Cnej8GcS9fXcqcbt7pqVpiv9k/oqytJv+6Zn+mIbia7xix1dDwKnYB3v3s/NeZsLIJE+pCBKK2jQzowwctKPCMyeLgRh5F6hzI5H+V2fdJnRsMbumU6WfyRsL9SDEWYKvwfujZb8y8KtGI59p/OxvzzDEDdhDWe7D3PVmQvrmaQVdD/eOmEcRja9rY2tHiKhLwGjfdho/niTr3TCQU9xT8o9s2Ob8R1YTkOX7efCLUFBZr4hNpx3aHc6SFxuwcp0x352YOilmCgXlkwh6Std7jkfLBlMpC+S3poFg10KPJHi7wqB/UDeX03G6gLTdwKvMraYjsejj/rjMXQxhhEJUd/prf6uUJVZYtq2OVM1UYezCMZu7Pi1JvSUhID9PJiRvA1gU8rkQK6BAQsen4osYO4+lkL5E5orMcfRHiBYaFJyKWktGm0B5hZnPUKYcIAN1tTnASAkNHNplZrByEpRVOfX7T2NdIPY6s8tZGXJVuiVjoUfX8ZEAvPtVLlTOQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(36840700001)(46966006)(36860700001)(5660300002)(8936002)(7416002)(316002)(921005)(82310400005)(86362001)(44832011)(4744005)(2906002)(356005)(81166007)(15650500001)(36756003)(7696005)(26005)(110136005)(47076005)(2616005)(508600001)(70586007)(70206006)(43170500006)(1076003)(83380400001)(16526019)(336012)(426003)(186003)(8676002)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2022 21:30:36.0703
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 162c310c-06bd-4d44-8f58-08da3f5ef8e3
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT068.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5266
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 21, 2022 at 09:16:50PM +0800, Lai Jiangshan wrote:
-> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-> 
-> In some cases, local root pages are used for MMU.  It is often using
-> to_shadow_page(mmu->root.hpa) to check if local root pages are used.
-> 
-> Add using_local_root_page() to directly check if local root pages are
-> used or needed to be used even mmu->root.hpa is not set.
-> 
-> Prepare for making to_shadow_page(mmu->root.hpa) returns non-NULL via
-> using local shadow [root] pages.
-> 
-> Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 40 +++++++++++++++++++++++++++++++++++++---
->  1 file changed, 37 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index efe5a3dca1e0..624b6d2473f7 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1690,6 +1690,39 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
->  	mmu_spte_clear_no_track(parent_pte);
->  }
->  
-> +/*
-> + * KVM uses the VCPU's local root page (vcpu->mmu->pae_root) when either the
-> + * shadow pagetable is using PAE paging or the host is shadowing nested NPT for
-> + * 32bit L1 hypervisor.
+On an OEM laptop I see the following message 10 times in my dmesg:
+"kvm: support for 'kvm_amd' disabled by bios"
 
-How about using the terms "private" and "shared" instead of "local" and
-"non-local"? I think that more accurately conveys what is special about
-these pages: they are private to the vCPU using them. And then "shared"
-is more intuitive to understand than "non-local" (which is used
-elsewhere in this series).
+This might be useful the first time, but there really isn't a point
+to showing the error 9 more times.  The BIOS still has it disabled.
+Change the message to only display one time.
 
-> + *
-> + * It includes cases:
-> + *	nonpaging when !tdp_enabled				(direct paging)
-> + *	shadow paging for 32 bit guest when !tdp_enabled	(shadow paging)
-> + *	NPT in 32bit host (not shadowing nested NPT)		(direct paging)
-> + *	shadow nested NPT for 32bit L1 hypervisor in 32bit host (shadow paging)
-> + *	shadow nested NPT for 32bit L1 hypervisor in 64bit host (shadow paging)
-> + *
-> + * For the first four cases, mmu->root_role.level is PT32E_ROOT_LEVEL and the
-> + * shadow pagetable is using PAE paging.
-> + *
-> + * For the last case, it is
-> + * 	mmu->root_role.level > PT32E_ROOT_LEVEL &&
-> + * 	!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL
-> + * And if this condition is true, it must be the last case.
-> + *
-> + * With the two conditions combined, the checking condition is:
-> + * 	mmu->root_role.level == PT32E_ROOT_LEVEL ||
-> + * 	(!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL)
-> + *
-> + * (There is no "mmu->root_role.level > PT32E_ROOT_LEVEL" here, because it is
-> + *  already ensured that mmu->root_role.level >= PT32E_ROOT_LEVEL)
-> + */
-> +static bool using_local_root_page(struct kvm_mmu *mmu)
-> +{
-> +	return mmu->root_role.level == PT32E_ROOT_LEVEL ||
-> +	       (!mmu->root_role.direct && mmu->cpu_role.base.level <= PT32E_ROOT_LEVEL);
-> +}
-> +
->  static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct)
->  {
->  	struct kvm_mmu_page *sp;
-> @@ -4252,10 +4285,11 @@ static bool fast_pgd_switch(struct kvm *kvm, struct kvm_mmu *mmu,
->  {
->  	/*
->  	 * For now, limit the caching to 64-bit hosts+VMs in order to avoid
-> -	 * having to deal with PDPTEs. We may add support for 32-bit hosts/VMs
-> -	 * later if necessary.
-> +	 * having to deal with PDPTEs.  Local roots can not be put into
-> +	 * mmu->prev_roots[] because mmu->pae_root can not be shared for
-> +	 * different roots at the same time.
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This comment ends up being a little confusing by the end of this series
-because using_local_root_page() does not necessarily imply pae_root is
-in use. i.e. case 5 (shadow nested NPT for 32bit L1 hypervisor in 64bit
-host) does not use pae_root.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4790f0d7d40b..80a8ea13f09a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8887,7 +8887,7 @@ int kvm_arch_init(void *opaque)
+ 		goto out;
+ 	}
+ 	if (ops->disabled_by_bios()) {
+-		pr_err_ratelimited("kvm: support for '%s' disabled by bios\n",
++		pr_err_once("kvm: support for '%s' disabled by bios\n",
+ 				   ops->runtime_ops->name);
+ 		r = -EOPNOTSUPP;
+ 		goto out;
+-- 
+2.34.1
 
-How about rewording this commit to say something like:
-
-  If the vCPU is using a private root, it might be using pae_root, which
-  cannot be shared for different roots at the same time.
-
->  	 */
-> -	if (VALID_PAGE(mmu->root.hpa) && !to_shadow_page(mmu->root.hpa))
-> +	if (unlikely(using_local_root_page(mmu)))
->  		kvm_mmu_free_roots(kvm, mmu, KVM_MMU_ROOT_CURRENT);
->  
->  	if (VALID_PAGE(mmu->root.hpa))
-> -- 
-> 2.19.1.6.gb485710b
-> 
