@@ -2,190 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01B36536572
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 17:59:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B5F35365B3
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 18:08:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353999AbiE0P6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 May 2022 11:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48770 "EHLO
+        id S1348987AbiE0QIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 May 2022 12:08:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354005AbiE0P5r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 May 2022 11:57:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 494B911993D
-        for <kvm@vger.kernel.org>; Fri, 27 May 2022 08:57:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653667055;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6i4ig/R8rMzs2AbGp9PmmaZ4npm6FEPMuif5WYyDsbY=;
-        b=ZsDsu/vqLAwf3QVg01kvnqx4q+u76XX8yoIIlqNAyyKMq5oZd5dJfbbbFyvOC6fA3N3rHt
-        UuQPZ7qtc6fiZ+kBhR2g4I/U2A2xSmulkoD7LZOyWfjWoevgvMJVQ0oErfvTGXhF8JU0PU
-        3sz2BLFH4CEBwdWYco8amojAc8XdeC0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-588-UYwIxpYfM0m8FMHUnnkmjw-1; Fri, 27 May 2022 11:57:32 -0400
-X-MC-Unique: UYwIxpYfM0m8FMHUnnkmjw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A68DA85A5BC;
-        Fri, 27 May 2022 15:57:31 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.192.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 455AB2166B26;
-        Fri, 27 May 2022 15:57:29 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+        with ESMTP id S244397AbiE0QIR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 May 2022 12:08:17 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF651498C1
+        for <kvm@vger.kernel.org>; Fri, 27 May 2022 09:08:16 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id gz24so4991728pjb.2
+        for <kvm@vger.kernel.org>; Fri, 27 May 2022 09:08:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=84jyFcXhy+7LS/4BL2qQwkaV7/d2/eHd1cRcTDWz3EI=;
+        b=QmoCCOzPCZXeGFX5CxM6xUDiY5xxA+rTy9f87DS8FUZKehOK7jj4/99vNCnYbkcfJr
+         dF/V4fITPoPzxDK+3WxS+PeU7HHbChP0uUK6b7iniYkYhpqBpXjxZy2m05AeC5DRW8wz
+         7RJubuU1csiLGslSaCj9hkDJ+Uj3by1iGoG8ikhy/9lyaS57pkfvTmTp+MvfhgFqz93W
+         gjF0Qb80xn0/bquGTnwg1C3dSUfhZV9crL6gcbTJdLfRHoeG0ZPDtWsL1QmpxkrnPL5/
+         4aJH5JoMTyRRu5UCLiVQnARlAZ9oMhPG9SFEIr1aJs+zr5lnDe7Rn0pk+0Y01hxGtuRV
+         RPxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=84jyFcXhy+7LS/4BL2qQwkaV7/d2/eHd1cRcTDWz3EI=;
+        b=Ifwt7SNlGksDotT65Hsk3Kp/U+4kFPlvKk6sikRsxNR3VejWIH+zDtvokFb+GYL6HN
+         8WOfUJY7fMlv3UHP2Qwc4raaeMP+7dQ+imNDnqSjQqnLotCbQgjjnHW7vv3q8ntFPEo+
+         E4C7Vs3KaEbCvBZRofrmIx2GxWxT0oBEZV7tgK+5Zak1dCeTOiv5aJ/refuQ6Krh8EwN
+         0DKkzO3rsP/ECAgiPt1TJeUpx+l5eoOg/iEPPh5kQ8Rkz0qKuMCE7NQae4xk28boNBGV
+         fOhOGaBrIOoNbdvQXHNt879FOU+c/VoxY96DUGllzEPl3k+e3PFgaKiF3N41zHgqSSdy
+         YLYw==
+X-Gm-Message-State: AOAM533xm+RJyA/JFCy/YEnI5QoJYCuzifK/Sol3z/D8Z6fydX04jlWy
+        QDAkXf9ojVE83bwrGv+ohGZTbQ==
+X-Google-Smtp-Source: ABdhPJxCYf8ECYcq48k6t4Rw29fmZa2p0+9eyg0bk1zPMkSRqOghqvhNkFmeNCYmK0xgHg8G4SGobg==
+X-Received: by 2002:a17:902:f548:b0:163:90d0:ada8 with SMTP id h8-20020a170902f54800b0016390d0ada8mr5215300plf.22.1653667695905;
+        Fri, 27 May 2022 09:08:15 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k12-20020a170902d58c00b0016366fbc155sm3798927plh.255.2022.05.27.09.08.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 May 2022 09:08:14 -0700 (PDT)
+Date:   Fri, 27 May 2022 16:08:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v5 37/37] KVM: selftests: hyperv_svm_test: Introduce L2 TLB flush test
-Date:   Fri, 27 May 2022 17:55:46 +0200
-Message-Id: <20220527155546.1528910-38-vkuznets@redhat.com>
-In-Reply-To: <20220527155546.1528910-1-vkuznets@redhat.com>
-References: <20220527155546.1528910-1-vkuznets@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
+        <kvm@vger.kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: Only display message about bios support disabled
+ once
+Message-ID: <YpD3a3wMbr9xIsub@google.com>
+References: <20220526213038.2027-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220526213038.2027-1-mario.limonciello@amd.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enable Hyper-V L2 TLB flush and check that Hyper-V TLB flush hypercalls
-from L2 don't exit to L1 unless 'TlbLockCount' is set in the Partition
-assist page.
+On Thu, May 26, 2022, Mario Limonciello wrote:
+> On an OEM laptop I see the following message 10 times in my dmesg:
+> "kvm: support for 'kvm_amd' disabled by bios"
+> 
+> This might be useful the first time, but there really isn't a point
+> to showing the error 9 more times.  The BIOS still has it disabled.
+> Change the message to only display one time.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../selftests/kvm/x86_64/hyperv_svm_test.c    | 54 +++++++++++++++++--
- 1 file changed, 50 insertions(+), 4 deletions(-)
+NAK, this has been discussed multiple times in the past[1][2], there are edge cases
+where logging multiple messages is desirable.  Even using a ratelimited printk is
+essentially a workaround for a systemd bug[3], which I'm guessing is the cuplrit here.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-index 994b33fd8724..2d938523ae27 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-@@ -42,6 +42,9 @@ struct hv_enlightenments {
-  */
- #define VMCB_HV_NESTED_ENLIGHTENMENTS (1U << 31)
- 
-+#define HV_SVM_EXITCODE_ENL 0xF0000000
-+#define HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH   (1)
-+
- void l2_guest_code(void)
- {
- 	GUEST_SYNC(3);
-@@ -57,11 +60,25 @@ void l2_guest_code(void)
- 
- 	GUEST_SYNC(5);
- 
-+	/* L2 TLB flush tests */
-+	hyperv_hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE |
-+			 HV_HYPERCALL_FAST_BIT, 0x0,
-+			 HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES |
-+			 HV_FLUSH_ALL_PROCESSORS);
-+	rdmsr(MSR_FS_BASE);
-+	hyperv_hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE |
-+			 HV_HYPERCALL_FAST_BIT, 0x0,
-+			 HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES |
-+			 HV_FLUSH_ALL_PROCESSORS);
-+	/* Make sure we're not issuing Hyper-V TLB flush call again */
-+	__asm__ __volatile__ ("mov $0xdeadbeef, %rcx");
-+
- 	/* Done, exit to L1 and never come back.  */
- 	vmmcall();
- }
- 
--static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
-+static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
-+						    vm_vaddr_t pgs_gpa)
- {
- 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
- 	struct vmcb *vmcb = svm->vmcb;
-@@ -70,13 +87,23 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
- 
- 	GUEST_SYNC(1);
- 
--	wrmsr(HV_X64_MSR_GUEST_OS_ID, (u64)0x8100 << 48);
-+	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
-+	wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
-+	enable_vp_assist(svm->vp_assist_gpa, svm->vp_assist);
- 
- 	GUEST_ASSERT(svm->vmcb_gpa);
- 	/* Prepare for L2 execution. */
- 	generic_svm_setup(svm, l2_guest_code,
- 			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
- 
-+	/* L2 TLB flush setup */
-+	hve->partition_assist_page = svm->partition_assist_gpa;
-+	hve->hv_enlightenments_control.nested_flush_hypercall = 1;
-+	hve->hv_vm_id = 1;
-+	hve->hv_vp_id = 1;
-+	current_vp_assist->nested_control.features.directhypercall = 1;
-+	*(u32 *)(svm->partition_assist) = 0;
-+
- 	GUEST_SYNC(2);
- 	run_guest(vmcb, svm->vmcb_gpa);
- 	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-@@ -111,6 +138,20 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
- 	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
- 	vmcb->save.rip += 2; /* rdmsr */
- 
-+
-+	/*
-+	 * L2 TLB flush test. First VMCALL should be handled directly by L0,
-+	 * no VMCALL exit expected.
-+	 */
-+	run_guest(vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
-+	vmcb->save.rip += 2; /* rdmsr */
-+	/* Enable synthetic vmexit */
-+	*(u32 *)(svm->partition_assist) = 1;
-+	run_guest(vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT(vmcb->control.exit_code == HV_SVM_EXITCODE_ENL);
-+	GUEST_ASSERT(vmcb->control.exit_info_1 == HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH);
-+
- 	run_guest(vmcb, svm->vmcb_gpa);
- 	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
- 	GUEST_SYNC(6);
-@@ -121,7 +162,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
- int main(int argc, char *argv[])
- {
- 	vm_vaddr_t nested_gva = 0;
--
-+	vm_vaddr_t hcall_page;
- 	struct kvm_vm *vm;
- 	struct kvm_run *run;
- 	struct ucall uc;
-@@ -136,7 +177,12 @@ int main(int argc, char *argv[])
- 	vcpu_set_hv_cpuid(vm, VCPU_ID);
- 	run = vcpu_state(vm, VCPU_ID);
- 	vcpu_alloc_svm(vm, &nested_gva);
--	vcpu_args_set(vm, VCPU_ID, 1, nested_gva);
-+
-+	hcall_page = vm_vaddr_alloc_pages(vm, 1);
-+	memset(addr_gva2hva(vm, hcall_page), 0x0,  getpagesize());
-+
-+	vcpu_args_set(vm, VCPU_ID, 2, nested_gva, addr_gva2gpa(vm, hcall_page));
-+	vcpu_set_msr(vm, VCPU_ID, HV_X64_MSR_VP_INDEX, VCPU_ID);
- 
- 	for (stage = 1;; stage++) {
- 		_vcpu_run(vm, VCPU_ID);
--- 
-2.35.3
-
+[1] https://lore.kernel.org/all/20190826182320.9089-1-tony.luck@intel.com
+[2] https://lore.kernel.org/all/20200214143035.607115-1-e.velu@criteo.com
+[3] https://github.com/systemd/systemd/issues/14906
