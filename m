@@ -2,230 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8757A535B8A
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 10:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2BA4535BA6
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 10:39:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349810AbiE0Ig4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 May 2022 04:36:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48004 "EHLO
+        id S230117AbiE0Ijj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 May 2022 04:39:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349806AbiE0Igc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 May 2022 04:36:32 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F1A104C92
-        for <kvm@vger.kernel.org>; Fri, 27 May 2022 01:36:09 -0700 (PDT)
+        with ESMTP id S229946AbiE0Ijh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 May 2022 04:39:37 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA6FCAB;
+        Fri, 27 May 2022 01:39:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653640569; x=1685176569;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=j+qDmfMloNVfY5RJn64MHRfjzIc6MOmQuO7M/jmSDS4=;
-  b=iy/syMzOlq+roDMVnmXflu3F8GhlIaEM5R6npMZ+nPOOHVlC2ms0f670
-   H72AL/bWvxG4oW4vwRESX5Zvb3FnwkHglCdHI08gkz30qQCs/pQFHGcw1
-   yv3DzPJeTpwp6fw1GzjnDaJAeTd45UeztiOi+oyhiWuS+aCgROgCXQK2X
-   8dPnatyg9zs55CaFE/U6rn3Litud1lE5w+Fqex9rxzWwCfJ1ZIUoo+uPm
-   zPtoePEx5AWCnUIkBfJnOjgvWUfobhT/6YvAdzxxAuvcW1OLHPClzjpRp
-   AqCkLnZjCp0eXdZrwNnDQWxVjY080+RZ+D+mEdmWsSKwH/azZDT2mxOsc
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10359"; a="254297069"
+  t=1653640774; x=1685176774;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nUtExxzslm+WHneUQWLHkDWMpNsTjMfZCy8Z14gS70o=;
+  b=nqk0AfCsq3cISUdzFsF4g0SWGWEr2+O9RSJuKFRn6wAOYRoCnd2kKMA9
+   4DxOsHq3re3UYrAWKTOw4NIoNMMxm1sOKNUTz1k+8CyAU73WzSL1dnrsw
+   FU9ps1c5qWG+tVDFSroAVI3gqbZd/wOeiScJ3ZTYnyoS9Ok2WgkEccD6N
+   AzxReF1aPFD3eqMZnB0xL6kXLh5HFpuxnVlNTP3odHNjCwbh9FjojJP7b
+   tdC5FlmVfo13P8yYBl8qSGat1uzoyImMBx3Yw7U5D62/ICfQnITVuePVi
+   Iq45TWKkulqFGt0ubnM+4EMmIM1VOUM+424TqC0TeKZsUI7352hJi/920
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10359"; a="274523414"
 X-IronPort-AV: E=Sophos;i="5.91,254,1647327600"; 
-   d="scan'208";a="254297069"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 01:36:07 -0700
+   d="scan'208";a="274523414"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 01:39:34 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,254,1647327600"; 
-   d="scan'208";a="574443778"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.28.41]) ([10.255.28.41])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 01:36:02 -0700
-Message-ID: <322922f2-53d5-ef4a-e0db-1f5636f9dea5@intel.com>
-Date:   Fri, 27 May 2022 16:36:00 +0800
+   d="scan'208";a="560647894"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga002.jf.intel.com with ESMTP; 27 May 2022 01:39:31 -0700
+Date:   Fri, 27 May 2022 16:39:30 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 05/37] KVM: x86: hyper-v: Handle
+ HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently
+Message-ID: <20220527083930.okdenkvxephom5wq@yy-desk-7060>
+References: <20220525090133.1264239-1-vkuznets@redhat.com>
+ <20220525090133.1264239-6-vkuznets@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.9.0
-Subject: Re: [RFC PATCH v4 22/36] i386/tdx: Track RAM entries for TDX VM
-Content-Language: en-US
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-23-xiaoyao.li@intel.com>
- <20220524073729.xkk6s4tjkzm77wwz@sirius.home.kraxel.org>
- <5e457e0b-dc23-9e5b-de89-0b137e2baf7f@intel.com>
-In-Reply-To: <5e457e0b-dc23-9e5b-de89-0b137e2baf7f@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220525090133.1264239-6-vkuznets@redhat.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/26/2022 3:33 PM, Xiaoyao Li wrote:
-> On 5/24/2022 3:37 PM, Gerd Hoffmann wrote:
-
->>> +        if (e->address == address && e->length == length) {
->>> +            e->type = TDX_RAM_ADDED;
->>> +        } else if (e->address == address) {
->>> +            e->address += length;
->>> +            e->length -= length;
->>> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
->>> +        } else if (e->address + e->length == address + length) {
->>> +            e->length -= length;
->>> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
->>> +        } else {
->>> +            TdxRamEntry tmp = {
->>> +                .address = e->address,
->>> +                .length = e->length,
->>> +            };
->>> +            e->length = address - tmp.address;
->>> +
->>> +            tdx_add_ram_entry(address, length, TDX_RAM_ADDED);
->>> +            tdx_add_ram_entry(address + length,
->>> +                              tmp.address + tmp.length - (address + 
->>> length),
->>> +                              TDX_RAM_UNACCEPTED);
->>> +        }
->>
->> I think all this can be simplified, by
->>    (1) Change the existing entry to cover the accepted ram range.
->>    (2) If there is room before the accepted ram range add a
->>        TDX_RAM_UNACCEPTED entry for that.
->>    (3) If there is room after the accepted ram range add a
->>        TDX_RAM_UNACCEPTED entry for that.
-> 
-> I implement as below. Please help review.
-> 
-> +static int tdx_accept_ram_range(uint64_t address, uint64_t length)
+On Wed, May 25, 2022 at 11:01:01AM +0200, Vitaly Kuznetsov wrote:
+> Currently, HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls are handled
+> the exact same way as HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE{,EX}: by
+> flushing the whole VPID and this is sub-optimal. Switch to handling
+> these requests with 'flush_tlb_gva()' hooks instead. Use the newly
+> introduced TLB flush fifo to queue the requests.
+>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/hyperv.c | 102 +++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 90 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 762b0b699fdf..576749973727 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1806,32 +1806,84 @@ static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
+>  				  sparse_banks, consumed_xmm_halves, offset);
+>  }
+>
+> -static void hv_tlb_flush_enqueue(struct kvm_vcpu *vcpu)
+> +static int kvm_hv_get_tlb_flush_entries(struct kvm *kvm, struct kvm_hv_hcall *hc, u64 entries[],
+> +					int consumed_xmm_halves, gpa_t offset)
 > +{
-> +    uint64_t head_start, tail_start, head_length, tail_length;
-> +    uint64_t tmp_address, tmp_length;
-> +    TdxRamEntry *e;
-> +    int i;
-> +
-> +    for (i = 0; i < tdx_guest->nr_ram_entries; i++) {
-> +        e = &tdx_guest->ram_entries[i];
-> +
-> +        if (address + length < e->address ||
-> +            e->address + e->length < address) {
-> +                continue;
-> +        }
-> +
-> +        /*
-> +         * The to-be-accepted ram range must be fully contained by one
-> +         * RAM entries
-> +         */
-> +        if (e->address > address ||
-> +            e->address + e->length < address + length) {
-> +            return -EINVAL;
-> +        }
-> +
-> +        if (e->type == TDX_RAM_ADDED) {
-> +            return -EINVAL;
-> +        }
-> +
-> +        tmp_address = e->address;
-> +        tmp_length = e->length;
-> +
-> +        e->address = address;
-> +        e->length = length;
-> +        e->type = TDX_RAM_ADDED;
-> +
-> +        head_length = address - tmp_address;
-> +        if (head_length > 0) {
-> +            head_start = e->address;
-> +            tdx_add_ram_entry(head_start, head_length, 
-> TDX_RAM_UNACCEPTED);
-> +        }
-> +
-> +        tail_start = address + length;
-> +        if (tail_start < tmp_address + tmp_length) {
-> +            tail_length = e->address + e->length - tail_start;
-> +            tdx_add_ram_entry(tail_start, tail_length, 
-> TDX_RAM_UNACCEPTED);
-> +        }
-> +
-> +        return 0;
-> +    }
-> +
-> +    return -1;
+> +	return kvm_hv_get_hc_data(kvm, hc, hc->rep_cnt, hc->rep_cnt,
+> +				  entries, consumed_xmm_halves, offset);
 > +}
+> +
+> +static void hv_tlb_flush_enqueue(struct kvm_vcpu *vcpu, u64 *entries, int count)
+>  {
+>  	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>  	u64 entry = KVM_HV_TLB_FLUSHALL_ENTRY;
+> +	unsigned long flags;
+>
+>  	if (!hv_vcpu)
+>  		return;
+>
+>  	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
+>
+> -	kfifo_in_spinlocked(&tlb_flush_fifo->entries, &entry, 1, &tlb_flush_fifo->write_lock);
+> +	spin_lock_irqsave(&tlb_flush_fifo->write_lock, flags);
+> +
+> +	/*
+> +	 * All entries should fit on the fifo leaving one free for 'flush all'
+> +	 * entry in case another request comes in. In case there's not enough
+> +	 * space, just put 'flush all' entry there.
+> +	 */
+> +	if (count && entries && count < kfifo_avail(&tlb_flush_fifo->entries)) {
+> +		WARN_ON(kfifo_in(&tlb_flush_fifo->entries, entries, count) != count);
+> +		goto out_unlock;
+> +	}
+> +
+> +	/*
+> +	 * Note: full fifo always contains 'flush all' entry, no need to check the
+> +	 * return value.
+> +	 */
+> +	kfifo_in(&tlb_flush_fifo->entries, &entry, 1);
+> +
+> +out_unlock:
+> +	spin_unlock_irqrestore(&tlb_flush_fifo->write_lock, flags);
+>  }
+>
+>  void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
 
-above is incorrect. I implement fixed one:
+Where's the caller to this kvm_hv_vcpu_flush_tlb() ?
+I didn't see th caller in patch 1-22 and remains are
+self-testing patches, any thing I missed ?
 
-+static int tdx_accept_ram_range(uint64_t address, uint64_t length)
-+{
-+    uint64_t head_start, tail_start, head_length, tail_length;
-+    uint64_t tmp_address, tmp_length;
-+    TdxRamEntry *e;
-+    int i;
-+
-+    for (i = 0; i < tdx_guest->nr_ram_entries; i++) {
-+        e = &tdx_guest->ram_entries[i];
-+
-+        if (address + length < e->address ||
-+            e->address + e->length < address) {
-+                continue;
-+        }
-+
-+        /*
-+         * The to-be-accepted ram range must be fully contained by one
-+         * RAM entries
-+         */
-+        if (e->address > address ||
-+            e->address + e->length < address + length) {
-+            return -EINVAL;
-+        }
-+
-+        if (e->type == TDX_RAM_ADDED) {
-+            return -EINVAL;
-+        }
-+
-+        tmp_address = e->address;
-+        tmp_length = e->length;
-+
-+        e->address = address;
-+        e->length = length;
-+        e->type = TDX_RAM_ADDED;
-+
-+        head_length = address - tmp_address;
-+        if (head_length > 0) {
-+            head_start = tmp_address;
-+            tdx_add_ram_entry(head_start, head_length, TDX_RAM_UNACCEPTED);
-+        }
-+
-+        tail_start = address + length;
-+        if (tail_start < tmp_address + tmp_length) {
-+            tail_length = tmp_address + tmp_length - tail_start;
-+            tdx_add_ram_entry(tail_start, tail_length, TDX_RAM_UNACCEPTED);
-+        }
-+
-+        return 0;
-+    }
-+
-+    return -1;
-+}
-
-
-> 
-> 
->> take care,
->>    Gerd
->>
-> 
-
+>  {
+>  	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> +	u64 entries[KVM_HV_TLB_FLUSH_FIFO_SIZE];
+> +	int i, j, count;
+> +	gva_t gva;
+>
+> -	kvm_vcpu_flush_tlb_guest(vcpu);
+> -
+> -	if (!hv_vcpu)
+> +	if (!tdp_enabled || !hv_vcpu) {
+> +		kvm_vcpu_flush_tlb_guest(vcpu);
+>  		return;
+> +	}
+>
+>  	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
+>
+> +	count = kfifo_out(&tlb_flush_fifo->entries, entries, KVM_HV_TLB_FLUSH_FIFO_SIZE);
+> +
+> +	for (i = 0; i < count; i++) {
+> +		if (entries[i] == KVM_HV_TLB_FLUSHALL_ENTRY)
+> +			goto out_flush_all;
+> +
+> +		/*
+> +		 * Lower 12 bits of 'address' encode the number of additional
+> +		 * pages to flush.
+> +		 */
+> +		gva = entries[i] & PAGE_MASK;
+> +		for (j = 0; j < (entries[i] & ~PAGE_MASK) + 1; j++)
+> +			static_call(kvm_x86_flush_tlb_gva)(vcpu, gva + j * PAGE_SIZE);
+> +
+> +		++vcpu->stat.tlb_flush;
+> +	}
+> +	goto out_empty_ring;
+> +
+> +out_flush_all:
+> +	kvm_vcpu_flush_tlb_guest(vcpu);
+> +
+> +out_empty_ring:
+>  	kfifo_reset_out(&tlb_flush_fifo->entries);
+>  }
+>
+> @@ -1841,11 +1893,21 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  	struct hv_tlb_flush_ex flush_ex;
+>  	struct hv_tlb_flush flush;
+>  	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
+> +	/*
+> +	 * Normally, there can be no more than 'KVM_HV_TLB_FLUSH_FIFO_SIZE'
+> +	 * entries on the TLB flush fifo. The last entry, however, needs to be
+> +	 * always left free for 'flush all' entry which gets placed when
+> +	 * there is not enough space to put all the requested entries.
+> +	 */
+> +	u64 __tlb_flush_entries[KVM_HV_TLB_FLUSH_FIFO_SIZE - 1];
+> +	u64 *tlb_flush_entries;
+>  	u64 valid_bank_mask;
+>  	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+>  	struct kvm_vcpu *v;
+>  	unsigned long i;
+>  	bool all_cpus;
+> +	int consumed_xmm_halves = 0;
+> +	gpa_t data_offset;
+>
+>  	/*
+>  	 * The Hyper-V TLFS doesn't allow more than 64 sparse banks, e.g. the
+> @@ -1861,10 +1923,12 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  			flush.address_space = hc->ingpa;
+>  			flush.flags = hc->outgpa;
+>  			flush.processor_mask = sse128_lo(hc->xmm[0]);
+> +			consumed_xmm_halves = 1;
+>  		} else {
+>  			if (unlikely(kvm_read_guest(kvm, hc->ingpa,
+>  						    &flush, sizeof(flush))))
+>  				return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> +			data_offset = sizeof(flush);
+>  		}
+>
+>  		trace_kvm_hv_flush_tlb(flush.processor_mask,
+> @@ -1888,10 +1952,12 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  			flush_ex.flags = hc->outgpa;
+>  			memcpy(&flush_ex.hv_vp_set,
+>  			       &hc->xmm[0], sizeof(hc->xmm[0]));
+> +			consumed_xmm_halves = 2;
+>  		} else {
+>  			if (unlikely(kvm_read_guest(kvm, hc->ingpa, &flush_ex,
+>  						    sizeof(flush_ex))))
+>  				return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> +			data_offset = sizeof(flush_ex);
+>  		}
+>
+>  		trace_kvm_hv_flush_tlb_ex(flush_ex.hv_vp_set.valid_bank_mask,
+> @@ -1907,25 +1973,37 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+>
+>  		if (all_cpus)
+> -			goto do_flush;
+> +			goto read_flush_entries;
+>
+>  		if (!hc->var_cnt)
+>  			goto ret_success;
+>
+> -		if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks, 2,
+> -					  offsetof(struct hv_tlb_flush_ex,
+> -						   hv_vp_set.bank_contents)))
+> +		if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks, consumed_xmm_halves,
+> +					  data_offset))
+> +			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> +		data_offset += hc->var_cnt * sizeof(sparse_banks[0]);
+> +		consumed_xmm_halves += hc->var_cnt;
+> +	}
+> +
+> +read_flush_entries:
+> +	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE ||
+> +	    hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX ||
+> +	    hc->rep_cnt > ARRAY_SIZE(__tlb_flush_entries)) {
+> +		tlb_flush_entries = NULL;
+> +	} else {
+> +		if (kvm_hv_get_tlb_flush_entries(kvm, hc, __tlb_flush_entries,
+> +						consumed_xmm_halves, data_offset))
+>  			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> +		tlb_flush_entries = __tlb_flush_entries;
+>  	}
+>
+> -do_flush:
+>  	/*
+>  	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
+>  	 * analyze it here, flush TLB regardless of the specified address space.
+>  	 */
+>  	if (all_cpus) {
+>  		kvm_for_each_vcpu(i, v, kvm)
+> -			hv_tlb_flush_enqueue(v);
+> +			hv_tlb_flush_enqueue(v, tlb_flush_entries, hc->rep_cnt);
+>
+>  		kvm_make_all_cpus_request(kvm, KVM_REQ_HV_TLB_FLUSH);
+>  	} else {
+> @@ -1935,7 +2013,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  			v = kvm_get_vcpu(kvm, i);
+>  			if (!v)
+>  				continue;
+> -			hv_tlb_flush_enqueue(v);
+> +			hv_tlb_flush_enqueue(v, tlb_flush_entries, hc->rep_cnt);
+>  		}
+>
+>  		kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH, vcpu_mask);
+> --
+> 2.35.3
+>
