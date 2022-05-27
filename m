@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5015B53652E
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 17:57:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C17D536544
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 17:57:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354078AbiE0P53 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 May 2022 11:57:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45440 "EHLO
+        id S1353906AbiE0P5Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 May 2022 11:57:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353876AbiE0P4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 May 2022 11:56:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 697EB3700E
+        with ESMTP id S1353847AbiE0P4p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 May 2022 11:56:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BE05E33EB9
         for <kvm@vger.kernel.org>; Fri, 27 May 2022 08:56:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1653666989;
@@ -20,23 +20,23 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UNtXd5IU8I7D5BZcVyLNEC1kwvzaoU+RpiQfYBndK40=;
-        b=iGQSQmKweYY+hzk1tnJa4CQQrsQGS0FdjZX9ajuPzjoinxA+BrjN/GzwuaMTP9GJQQTaXS
-        Kpcn6HOM82lgb0mOwyuBzJKZXHlWR9jOXP6LCHpbt9CzhMs9qUqQqR1s2FVqseUP0aoUpB
-        bulKFP7peQQ89fyRHKrfYyYMlM8CAsE=
+        bh=2/rTcaqTmlzfmui0ZlZlp5EgRX7xZjqFpH2VkaIbdbk=;
+        b=Qlqnz63wLlKg9gMwzzJvdExKnI88nsIx996jdGeeKjbe+dbaEuXENjF1Ptej16oyV5vAT5
+        ppEVJ7xLdR9srnTOUQpmnApJW37lWn8CHCZQRtPG/m78mAb8RaHVlXXqf2kxx7t51Iy/7E
+        sRoBP8TRVpaNO59WA2GhE+UBLC8lNJc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-207-6ybC1HkJOLO5qz9GZyR7-w-1; Fri, 27 May 2022 11:56:25 -0400
-X-MC-Unique: 6ybC1HkJOLO5qz9GZyR7-w-1
+ us-mta-610-A8ic-Y-aOx6oAcPnP5iVwQ-1; Fri, 27 May 2022 11:56:28 -0400
+X-MC-Unique: A8ic-Y-aOx6oAcPnP5iVwQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 02A8880088A;
-        Fri, 27 May 2022 15:56:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C59B8811E76;
+        Fri, 27 May 2022 15:56:27 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.192.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AB0D32166B26;
-        Fri, 27 May 2022 15:56:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45A592166B26;
+        Fri, 27 May 2022 15:56:25 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -47,9 +47,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v5 13/37] KVM: nVMX: Keep track of hv_vm_id/hv_vp_id when eVMCS is in use
-Date:   Fri, 27 May 2022 17:55:22 +0200
-Message-Id: <20220527155546.1528910-14-vkuznets@redhat.com>
+Subject: [PATCH v5 14/37] KVM: nSVM: Keep track of Hyper-V hv_vm_id/hv_vp_id
+Date:   Fri, 27 May 2022 17:55:23 +0200
+Message-Id: <20220527155546.1528910-15-vkuznets@redhat.com>
 In-Reply-To: <20220527155546.1528910-1-vkuznets@redhat.com>
 References: <20220527155546.1528910-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -58,7 +58,7 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,79 +66,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To handle L2 TLB flush requests, KVM needs to keep track of L2's VM_ID/
-VP_IDs which are set by L1 hypervisor. 'Partition assist page' address is
-also needed to handle post-flush exit to L1 upon request.
+Similar to nSVM, KVM needs to know L2's VM_ID/VP_ID and Partition
+assist page address to handle L2 TLB flush requests.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  6 ++++++
- arch/x86/kvm/vmx/nested.c       | 15 +++++++++++++++
- 2 files changed, 21 insertions(+)
+ arch/x86/kvm/svm/hyperv.h | 16 ++++++++++++++++
+ arch/x86/kvm/svm/nested.c |  2 ++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index dfbf6917ed43..46a04bc8cd50 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -648,6 +648,12 @@ struct kvm_vcpu_hv {
+diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+index 7d6d97968fb9..8cf702fed7e5 100644
+--- a/arch/x86/kvm/svm/hyperv.h
++++ b/arch/x86/kvm/svm/hyperv.h
+@@ -9,6 +9,7 @@
+ #include <asm/mshyperv.h>
  
- 	/* Preallocated buffer for handling hypercalls passing sparse vCPU set */
- 	u64 sparse_banks[HV_MAX_SPARSE_VCPU_BANKS];
-+
-+	struct {
-+		u64 pa_page_gpa;
-+		u64 vm_id;
-+		u32 vp_id;
-+	} nested;
- };
+ #include "../hyperv.h"
++#include "svm.h"
  
- /* Xen HVM per vcpu emulation context */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e4062134ddf4..3a8a5881b609 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -225,6 +225,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
+ /*
+  * Hyper-V uses the software reserved 32 bytes in VMCB
+@@ -32,4 +33,19 @@ struct hv_enlightenments {
+  */
+ #define VMCB_HV_NESTED_ENLIGHTENMENTS VMCB_SW
  
- static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
- {
++static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct hv_enlightenments *hve =
++		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
 +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
- 	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-@@ -233,6 +234,12 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
- 	}
- 
- 	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
 +
-+	if (hv_vcpu) {
-+		hv_vcpu->nested.pa_page_gpa = INVALID_GPA;
-+		hv_vcpu->nested.vm_id = 0;
-+		hv_vcpu->nested.vp_id = 0;
-+	}
++	if (!hv_vcpu)
++		return;
++
++	hv_vcpu->nested.pa_page_gpa = hve->partition_assist_page;
++	hv_vcpu->nested.vm_id = hve->hv_vm_id;
++	hv_vcpu->nested.vp_id = hve->hv_vp_id;
++}
++
+ #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 2cf92c12706a..7bf35f3345c2 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -811,6 +811,8 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 	if (kvm_vcpu_apicv_active(vcpu))
+ 		kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
+ 
++	nested_svm_hv_update_vm_vp_ids(vcpu);
++
+ 	return 0;
  }
  
- static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
-@@ -1591,11 +1598,19 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
- {
- 	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
- 	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
-+	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(&vmx->vcpu);
- 
- 	/* HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE */
- 	vmcs12->tpr_threshold = evmcs->tpr_threshold;
- 	vmcs12->guest_rip = evmcs->guest_rip;
- 
-+	if (unlikely(!(hv_clean_fields &
-+		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_ENLIGHTENMENTSCONTROL))) {
-+		hv_vcpu->nested.pa_page_gpa = evmcs->partition_assist_page;
-+		hv_vcpu->nested.vm_id = evmcs->hv_vm_id;
-+		hv_vcpu->nested.vp_id = evmcs->hv_vp_id;
-+	}
-+
- 	if (unlikely(!(hv_clean_fields &
- 		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC))) {
- 		vmcs12->guest_rsp = evmcs->guest_rsp;
 -- 
 2.35.3
 
