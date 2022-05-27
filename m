@@ -2,168 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65F0E53578D
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 04:27:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E13645357FD
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 05:00:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234961AbiE0C04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 May 2022 22:26:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51492 "EHLO
+        id S237881AbiE0DAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 May 2022 23:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbiE0C0w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 May 2022 22:26:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 82452D6829
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 19:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653618410;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oaDAshEcGYeYhJ5+Zo99OPfgNFs1k3b7zVlzbxHYNl0=;
-        b=MsoZxVsdQq/zRH23U6ED0gdtz1Yg9cjvDnfEgPZDQ9N4Pxa5/ps8AN/SXeYjIzQ8J3gkWe
-        P41sW5r71Ndz4fOchno3wy7tBk1UAVTCV75BTmjC3vn/FZRYi+5Yfb+qPfhvbKGVcig60P
-        iUfbLulsOda9qOalJHCsQ+ZwzDfk68o=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-117-bjF9TT7DNJOqSCrfOUM7tw-1; Thu, 26 May 2022 22:26:49 -0400
-X-MC-Unique: bjF9TT7DNJOqSCrfOUM7tw-1
-Received: by mail-lf1-f72.google.com with SMTP id bi27-20020a0565120e9b00b004786caccc7dso1353440lfb.11
-        for <kvm@vger.kernel.org>; Thu, 26 May 2022 19:26:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=oaDAshEcGYeYhJ5+Zo99OPfgNFs1k3b7zVlzbxHYNl0=;
-        b=AH2qByxTgW49rlZY+AHW6RuXNfI6CthCuGgeKVfLjsuAY8zXhQJASp2wvZQaYl1U8i
-         ZjHXSeO4Z7EhOvRyWlrMSBXMCg/RmcZAYPn/fUuLySw7S6Ikp2j2KYdv5WeIwAj77fq+
-         OfN1dMdTY+qMQXIQpn7Mnz3vTniJcGmtkk+zSiUg+awgJ+/wCG3YyqbHKMQ6h8JKiRNP
-         l2Zfx8svuHszJVds1mTCtgIqRq9d/b9OM8jkUQOpLzZjOh14/uFpnKnyjwxsgkDaUjn1
-         axYunxbi1qEMaeDwiVDgOvCsmiSdmAEreo5FOzdghuy1KrCyDlHzERNyJKs5BHRCr5mz
-         oQUQ==
-X-Gm-Message-State: AOAM5331Wut3D0rbP9y9oJhvdJqTS3hfSLFavmcQaUKFzczwQaBV3C3e
-        odkGCUiCsz4Is2vrcRNcnKrlENEB826ODjFzybkTr2Vivg3VtonJDKbawNlgYFPSc/q2AFfN+J+
-        u/Hzc1sChhTUm2arKHeJfRaqLzxU4
-X-Received: by 2002:a2e:954c:0:b0:253:d9bf:9f55 with SMTP id t12-20020a2e954c000000b00253d9bf9f55mr21308451ljh.300.1653618407806;
-        Thu, 26 May 2022 19:26:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzHcqEOz1xk1ptv4/JAwcVxyXOZtbrjI3QyKwE3Rw+KFfhLBm5gZOZJQQUeuqyIULlx21HHjnfaD0MAV67KrFc=
-X-Received: by 2002:a2e:954c:0:b0:253:d9bf:9f55 with SMTP id
- t12-20020a2e954c000000b00253d9bf9f55mr21308435ljh.300.1653618407570; Thu, 26
- May 2022 19:26:47 -0700 (PDT)
+        with ESMTP id S235641AbiE0DAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 May 2022 23:00:16 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A133352532;
+        Thu, 26 May 2022 20:00:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653620415; x=1685156415;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=y1f7TyXlnUDOQ7rphuzrQfvrJQvroyl/QHEjX2HTuLQ=;
+  b=C3gWp1GtagrRArb3wqsJVnMzx9r59niXYBh0E14EWNsyhz7c9ArJi9XX
+   y0gag+1eh+xgScBHVuWrPtzhU77Ql2CBnF0GATGZmOnCV0rnsnM3im2sR
+   DVFQoG/oj4NIFX1hriLC+0eCF8UnGzZvrDLO7hgKprPwFU+AWte4Iw5J2
+   fB4IT19rYv++WJ1SqVoR/GRqeCgR4nfYiLdrnYVGIn1wBy/3azdVyEu2L
+   OFYBM3al1nM+xKJzMtrCpXuHPhr6HIA+V3IPZTuD/1PqFjif8EDGHCBnd
+   ezXhHk2SWl7/yHDFb7SMn8bmEBarCjSGJoJIm/pG5dxoUTS3yl/toZx5g
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10359"; a="254235823"
+X-IronPort-AV: E=Sophos;i="5.91,254,1647327600"; 
+   d="scan'208";a="254235823"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2022 20:00:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,254,1647327600"; 
+   d="scan'208";a="560516946"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga002.jf.intel.com with ESMTP; 26 May 2022 20:00:12 -0700
+Date:   Fri, 27 May 2022 11:00:11 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 02/37] KVM: x86: hyper-v: Resurrect dedicated
+ KVM_REQ_HV_TLB_FLUSH flag
+Message-ID: <20220527030011.akn43rpmususefs3@yy-desk-7060>
+References: <20220525090133.1264239-1-vkuznets@redhat.com>
+ <20220525090133.1264239-3-vkuznets@redhat.com>
 MIME-Version: 1.0
-References: <20220526124338.36247-1-eperezma@redhat.com> <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
-In-Reply-To: <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 27 May 2022 10:26:35 +0800
-Message-ID: <CACGkMEu1YenjBHAssP=FvKX6WxDQ5Aa50r-BsnkfR4zqNTk6hg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
-To:     Parav Pandit <parav@nvidia.com>
-Cc:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "martinh@xilinx.com" <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "martinpo@xilinx.com" <martinpo@xilinx.com>,
-        "lvivier@redhat.com" <lvivier@redhat.com>,
-        "pabloc@xilinx.com" <pabloc@xilinx.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-        "gautam.dawar@amd.com" <gautam.dawar@amd.com>,
-        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
-        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "dinang@xilinx.com" <dinang@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220525090133.1264239-3-vkuznets@redhat.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 26, 2022 at 8:54 PM Parav Pandit <parav@nvidia.com> wrote:
+On Wed, May 25, 2022 at 11:00:58AM +0200, Vitaly Kuznetsov wrote:
+> In preparation to implementing fine-grained Hyper-V TLB flush and
+> L2 TLB flush, resurrect dedicated KVM_REQ_HV_TLB_FLUSH request bit. As
+> KVM_REQ_TLB_FLUSH_GUEST/KVM_REQ_TLB_FLUSH_GUEST/KVM_REQ_TLB_FLUSH_CURRENT
+
+Duplicated KVM_REQ_TLB_FLUSH_GUEST here ?
+
+> are stronger operations, clear KVM_REQ_HV_TLB_FLUSH request in
+> kvm_service_local_tlb_flush_requests() when any of these were also
+> requested.
 >
+> No (real) functional change intended.
 >
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 ++
+>  arch/x86/kvm/hyperv.c           |  4 ++--
+>  arch/x86/kvm/x86.c              | 10 ++++++++--
+>  3 files changed, 12 insertions(+), 4 deletions(-)
 >
-> > From: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > Sent: Thursday, May 26, 2022 8:44 AM
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 151880cfab9e..92509ee6ae1b 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -105,6 +105,8 @@
+>  	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_MMU_FREE_OBSOLETE_ROOTS \
+>  	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> +#define KVM_REQ_HV_TLB_FLUSH \
+> +	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
 >
-> > Implement stop operation for vdpa_sim devices, so vhost-vdpa will offer
-> >
-> > that backend feature and userspace can effectively stop the device.
-> >
-> >
-> >
-> > This is a must before get virtqueue indexes (base) for live migration,
-> >
-> > since the device could modify them after userland gets them. There are
-> >
-> > individual ways to perform that action for some devices
-> >
-> > (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there
-> > was no
-> >
-> > way to perform it for any vhost device (and, in particular, vhost-vdpa)=
-.
-> >
-> >
-> >
-> > After the return of ioctl with stop !=3D 0, the device MUST finish any
-> >
-> > pending operations like in flight requests. It must also preserve all
-> >
-> > the necessary state (the virtqueue vring base plus the possible device
-> >
-> > specific states) that is required for restoring in the future. The
-> >
-> > device must not change its configuration after that point.
-> >
-> >
-> >
-> > After the return of ioctl with stop =3D=3D 0, the device can continue
-> >
-> > processing buffers as long as typical conditions are met (vq is enabled=
-,
-> >
-> > DRIVER_OK status bit is enabled, etc).
+>  #define CR0_RESERVED_BITS                                               \
+>  	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 46f9dfb60469..b402ad059eb9 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1876,11 +1876,11 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  	 * analyze it here, flush TLB regardless of the specified address space.
+>  	 */
+>  	if (all_cpus) {
+> -		kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH_GUEST);
+> +		kvm_make_all_cpus_request(kvm, KVM_REQ_HV_TLB_FLUSH);
+>  	} else {
+>  		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
 >
-> Just to be clear, we are adding vdpa level new ioctl() that doesn=E2=80=
-=99t map to any mechanism in the virtio spec.
-
-We try to provide forward compatibility to VIRTIO_CONFIG_S_STOP. That
-means it is expected to implement at least a subset of
-VIRTIO_CONFIG_S_STOP.
-
+> -		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST, vcpu_mask);
+> +		kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH, vcpu_mask);
+>  	}
 >
-> Why can't we use this ioctl() to indicate driver to start/stop the device=
- instead of driving it through the driver_ok?
-
-So the idea is to add capability that does not exist in the spec. Then
-came the stop/resume which can't be done via DRIVER_OK. I think we
-should only allow the stop/resume to succeed after DRIVER_OK is set.
-
-> This is in the context of other discussion we had in the LM series.
-
-Do you see any issue that blocks the live migration?
-
-Thanks
-
+>  ret_success:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 891507b2eca5..f98503431f8d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3363,11 +3363,17 @@ static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+> +	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu)) {
+>  		kvm_vcpu_flush_tlb_current(vcpu);
+> +		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
+> +	}
+>
+> -	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu))
+> +	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu)) {
+> +		kvm_vcpu_flush_tlb_guest(vcpu);
+> +		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
+> +	} else if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu)) {
+>  		kvm_vcpu_flush_tlb_guest(vcpu);
+> +	}
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_service_local_tlb_flush_requests);
+>
+> --
+> 2.35.3
+>
