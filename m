@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C043536656
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 19:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3DA1536658
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 19:08:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354163AbiE0RHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 May 2022 13:07:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34422 "EHLO
+        id S1354197AbiE0RHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 May 2022 13:07:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346544AbiE0RHE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 May 2022 13:07:04 -0400
+        with ESMTP id S243342AbiE0RHF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 May 2022 13:07:05 -0400
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4515A6D849
-        for <kvm@vger.kernel.org>; Fri, 27 May 2022 10:07:03 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id l14-20020a170902f68e00b001633979d821so3163373plg.9
-        for <kvm@vger.kernel.org>; Fri, 27 May 2022 10:07:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BC676281
+        for <kvm@vger.kernel.org>; Fri, 27 May 2022 10:07:05 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id h13-20020a170902f70d00b0015f4cc5d19aso3140396plo.18
+        for <kvm@vger.kernel.org>; Fri, 27 May 2022 10:07:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=XII5Q10d7IHsakcWieNQERcqnrzaW3r3Psj82Eh20aM=;
-        b=aoLBo78gEFsnTeaEtyl/yOVL8Nlif46gSYrgLxN+AxYSm6eLmAHzRamQ52sLcjj4gP
-         7+Busc3BGlBQjxG2BxGhT/bt5YyxaX25hVC1F1PEe37LR/wTZllnnlkaU8ET66WXGciz
-         t+UfNNWyiZGvQawZCzNfpaNeInXdzdZS96Uu5FjDPGgJrlmS9q+z8leELQzFhyLY2aES
-         OPVe4QU6oaq1wXBKgI5+ckIW9pP5BAoIPJ0EdUztR9MYwUXAjyzGtKlgu+P2S/iLBPPn
-         VcrHzkcyLm4wLyH3598hDlUDcU4pOUqnYwkDSQRt0SAiDA5RuFyceNt9Bp8v0M5B8gFl
-         be8w==
+        bh=/UYpE3ORfUWUOgObAVh8AEEShSSgV4nNzE6TIkUvoL4=;
+        b=TQeHEjgzosI03XNozW4xpCMZ9JxfuOpyVuGRddKE0ma/DiCtuvES/HGw8OCoLGaaVm
+         FXr+UDQOUghyc8ovjUi+J/5fUG4E0TqoRGE/9BDUmv18uG0XVW6ciqTSD7yuQGrJ1i0l
+         BquCrdDen83aMQ+FJvy9BKijtWgUXWD2EPsSFLBIfBYPEqrmYwQ1FaIfGNp7j/5x+UyJ
+         +hjb1NRq/OEPbEbdJUuE51nrckFUuH40hY48qbAzp2dXxzwk7KyEdrjQW5GYVvfz40Lu
+         GcR4kFxEv3iQeJqee+8IPGGcOJOBgs4XH6rP8EmOJ9H/JnrNZwpRuQSyVG5y0Mpqmhrj
+         ks0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=XII5Q10d7IHsakcWieNQERcqnrzaW3r3Psj82Eh20aM=;
-        b=1K9fc9Dh/4LOQYPwxqx7SZjyHXf3NWVgWAhxxXDKxni36FEzlhosa1ti3cktS80VsD
-         hop3Jv+ydilEcYlXdsjze5yRdRrupqSFAdoIrqx/cks7xdaaG06ENYlP5rpjJFYgSbJe
-         wRT9pa23OTgSOt3tDf/s4GDXuiCFNcHTot8qlOteuAy/Q13WXu4OZGi21CoRHtB6Ln5v
-         a3tqa7VWOF5hIEAU1Yu6/TUxz+W0A0MRXBnTC8w4ICu4AFJUvz6SE623p5eISs+Fn8V9
-         MB4Yfpm/EX6Kbm/WEpVXIGPXGidYJ+xWuHSj76LdgMPGI3uH7I+dxKDpt9D2CSVbaBCX
-         3JTA==
-X-Gm-Message-State: AOAM5339EkhOR0W3CgvpaCbKfddDlgTVW8YIFefbQtTWMquzIjbQA9jG
-        FI27njy5/Sjiz44/ZHNIw2w7ed0Ajlk=
-X-Google-Smtp-Source: ABdhPJxqoqZZBsn67a+/tmIpuPg4SlJS7NvBnjiLn5lus3F6VCY441LbmBbN2C6gA0x5Q95LyQVEGob22Nw=
+        bh=/UYpE3ORfUWUOgObAVh8AEEShSSgV4nNzE6TIkUvoL4=;
+        b=j/0PZi7NpBZuBCAlA5RcnNSu3gF/fsi0r430AZVY77yDY3uEpxkA597SDdzhxawasF
+         qSIemlyJwV/GFP6ddvsXuyvNR6GU3Kn5beQ5gAkxmyyEiiXIRKHgRY5A/Z/OyFMvwbIE
+         7nM9+l+ClnAOeCKsK1gLsbPdNJflCCN9hLKyoEdcvaHBtgm7gGHHmR6FJhGiesd1x/JD
+         NpO6Eyhg2WQhArJfz7bKshGQx4WJaETUlAF/0zfDc/24oIwzPXZgiFe6yT8XzEKCfXSW
+         kLe2sAl7FA42BopIR/GODsA+lx7n7Rap5GjoKIWhkMh67MZ06Mvk+z5zvohytq/jU0Rc
+         1DaQ==
+X-Gm-Message-State: AOAM532UIOXGoqF6ObXbaYlU8MnDbqqCdjQsrTXQWnzOwotAFHNEJjcF
+        flRNXYgy4Ciq2yreMp165jZGU0gRb8w=
+X-Google-Smtp-Source: ABdhPJzKD8foVyPbZhCsSXtLbePPpsaS3Oi+ipHHra/WbFzZbW5aDHKJGWu55k2n9gGuWs4O+81BestqKnA=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:8608:b0:158:c532:d8b2 with SMTP id
- f8-20020a170902860800b00158c532d8b2mr43964184plo.46.1653671222592; Fri, 27
- May 2022 10:07:02 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:bb90:b0:158:a031:2ff2 with SMTP id
+ m16-20020a170902bb9000b00158a0312ff2mr43681179pls.117.1653671224527; Fri, 27
+ May 2022 10:07:04 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 27 May 2022 17:06:57 +0000
+Date:   Fri, 27 May 2022 17:06:58 +0000
 In-Reply-To: <20220527170658.3571367-1-seanjc@google.com>
-Message-Id: <20220527170658.3571367-2-seanjc@google.com>
+Message-Id: <20220527170658.3571367-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220527170658.3571367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 1/2] KVM: VMX: Sanitize VM-Entry/VM-Exit control pairs at
- kvm_intel load time
+Subject: [PATCH v2 2/2] KVM: VMX: Reject kvm_intel if an inconsistent VMCS
+ config is detected
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -75,123 +75,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sanitize the VM-Entry/VM-Exit control pairs (load+load or load+clear)
-during setup instead of checking both controls in a pair at runtime.  If
-only one control is supported, KVM will report the associated feature as
-not available, but will leave the supported control bit set in the VMCS
-config, which could lead to corruption of host state.  E.g. if only the
-VM-Entry control is supported and the feature is not dynamically toggled,
-KVM will set the control in all VMCSes and load zeros without restoring
-host state.
+Add an on-by-default module param, error_on_inconsistent_vmcs_config, to
+allow rejecting the load of kvm_intel if an inconsistent VMCS config is
+detected.  Continuing on with an inconsistent, degraded config is
+undesirable in the vast majority of use cases, e.g. may result in a
+misconfigured VM, poor performance due to lack of fast MSR switching, or
+even security issues in the unlikely event the guest is relying on MPX.
 
-Note, while this is technically a bug fix, practically speaking no sane
-CPU or VMM would support only one control.  KVM's behavior of checking
-both controls is mostly pedantry.
+Practically speaking, an inconsistent VMCS config should never be
+encountered in a production quality environment, e.g. on bare metal it
+indicates a silicon defect (or a disturbing lack of validation by the
+hardware vendor), and in a virtualized machine (KVM as L1) it indicates a
+buggy/misconfigured L0 VMM/hypervisor.
 
-Cc: Chenyi Qiang <chenyi.qiang@intel.com>
-Cc: Lei Wang <lei4.wang@intel.com>
+Provide a module param to override the behavior for testing purposes, or
+in the unlikely scenario that KVM is deployed on a flawed-but-usable CPU
+or virtual machine.
+
+Note, what is or isn't an inconsistency is somewhat subjective, e.g. one
+might argue that LOAD_EFER without SAVE_EFER is an inconsistency.  KVM's
+unofficial guideline for an "inconsistency" is either scenarios that are
+completely nonsensical, e.g. the existing checks on having EPT/VPID knobs
+without EPT/VPID, and/or scenarios that prevent KVM from virtualizing or
+utilizing a feature, e.g. the unpaired entry/exit controls checks.  Other
+checks that fall into one or both of the covered scenarios could be added
+in the future, e.g. asserting that a VMCS control exists available if and
+only if the associated feature is supported in bare metal.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/capabilities.h | 13 ++++---------
- arch/x86/kvm/vmx/vmx.c          | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 9 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index dc2cb8a16e76..464bf39e4835 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -97,20 +97,17 @@ static inline bool cpu_has_vmx_posted_intr(void)
- 
- static inline bool cpu_has_load_ia32_efer(void)
- {
--	return (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_EFER) &&
--	       (vmcs_config.vmexit_ctrl & VM_EXIT_LOAD_IA32_EFER);
-+	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_EFER;
- }
- 
- static inline bool cpu_has_load_perf_global_ctrl(void)
- {
--	return (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
--	       (vmcs_config.vmexit_ctrl & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL);
-+	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
- }
- 
- static inline bool cpu_has_vmx_mpx(void)
- {
--	return (vmcs_config.vmexit_ctrl & VM_EXIT_CLEAR_BNDCFGS) &&
--		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_BNDCFGS);
-+	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_BNDCFGS;
- }
- 
- static inline bool cpu_has_vmx_tpr_shadow(void)
-@@ -377,7 +374,6 @@ static inline bool cpu_has_vmx_intel_pt(void)
- 	rdmsrl(MSR_IA32_VMX_MISC, vmx_msr);
- 	return (vmx_msr & MSR_IA32_VMX_MISC_INTEL_PT) &&
- 		(vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_PT_USE_GPA) &&
--		(vmcs_config.vmexit_ctrl & VM_EXIT_CLEAR_IA32_RTIT_CTL) &&
- 		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_RTIT_CTL);
- }
- 
-@@ -406,8 +402,7 @@ static inline bool vmx_pebs_supported(void)
- 
- static inline bool cpu_has_vmx_arch_lbr(void)
- {
--	return (vmcs_config.vmexit_ctrl & VM_EXIT_CLEAR_IA32_LBR_CTL) &&
--		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_LBR_CTL);
-+	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_LBR_CTL;
- }
- 
- static inline u64 vmx_get_perf_capabilities(void)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6927f6e8ec31..a592b424fbbc 100644
+index a592b424fbbc..74202512f861 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2473,6 +2473,24 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	u64 _cpu_based_3rd_exec_control = 0;
- 	u32 _vmexit_control = 0;
- 	u32 _vmentry_control = 0;
-+	int i;
-+
-+	/*
-+	 * LOAD/SAVE_DEBUG_CONTROLS are absent because both are mandatory.
-+	 * SAVE_IA32_PAT and SAVE_IA32_EFER are absent because KVM always
-+	 * intercepts writes to PAT and EFER, i.e. never enables those controls.
-+	 */
-+	struct {
-+		u32 entry_control;
-+		u32 exit_control;
-+	} const vmcs_entry_exit_pairs[] = {
-+		{ VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,	VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL },
-+		{ VM_ENTRY_LOAD_IA32_PAT,		VM_EXIT_LOAD_IA32_PAT },
-+		{ VM_ENTRY_LOAD_IA32_EFER,		VM_EXIT_LOAD_IA32_EFER },
-+		{ VM_ENTRY_LOAD_BNDCFGS,		VM_EXIT_CLEAR_BNDCFGS },
-+		{ VM_ENTRY_LOAD_IA32_RTIT_CTL,		VM_EXIT_CLEAR_IA32_RTIT_CTL },
-+		{ VM_ENTRY_LOAD_IA32_LBR_CTL,		VM_EXIT_CLEAR_IA32_LBR_CTL },
-+	};
+@@ -119,6 +119,9 @@ module_param(nested, bool, S_IRUGO);
+ bool __read_mostly enable_pml = 1;
+ module_param_named(pml, enable_pml, bool, S_IRUGO);
  
- 	memset(vmcs_conf, 0, sizeof(*vmcs_conf));
- 	min = CPU_BASED_HLT_EXITING |
-@@ -2614,6 +2632,20 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 				&_vmentry_control) < 0)
- 		return -EIO;
++static bool __read_mostly error_on_inconsistent_vmcs_config = true;
++module_param(error_on_inconsistent_vmcs_config, bool, 0444);
++
+ static bool __read_mostly dump_invalid_vmcs = 0;
+ module_param(dump_invalid_vmcs, bool, 0644);
  
-+	for (i = 0; i < ARRAY_SIZE(vmcs_entry_exit_pairs); i++) {
-+		u32 n_ctrl = vmcs_entry_exit_pairs[i].entry_control;
-+		u32 x_ctrl = vmcs_entry_exit_pairs[i].exit_control;
+@@ -2574,15 +2577,23 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 					     CPU_BASED_CR3_STORE_EXITING |
+ 					     CPU_BASED_INVLPG_EXITING);
+ 	} else if (vmx_cap->ept) {
+-		vmx_cap->ept = 0;
+ 		pr_warn_once("EPT CAP should not exist if not support "
+ 				"1-setting enable EPT VM-execution control\n");
 +
-+		if (!(_vmentry_control & n_ctrl) == !(_vmexit_control & x_ctrl))
-+			continue;
++		if (error_on_inconsistent_vmcs_config)
++			return -EIO;
 +
-+		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
-+			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl);
++		vmx_cap->ept = 0;
+ 	}
+ 	if (!(_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_VPID) &&
+-		vmx_cap->vpid) {
+-		vmx_cap->vpid = 0;
++	    vmx_cap->vpid) {
+ 		pr_warn_once("VPID CAP should not exist if not support "
+ 				"1-setting enable VPID VM-execution control\n");
 +
-+		_vmentry_control &= ~n_ctrl;
-+		_vmexit_control &= ~x_ctrl;
-+	}
++		if (error_on_inconsistent_vmcs_config)
++			return -EIO;
 +
- 	/*
- 	 * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
- 	 * can't be used due to an errata where VM Exit may incorrectly clear
++		vmx_cap->vpid = 0;
+ 	}
+ 
+ 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
+@@ -2642,6 +2653,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
+ 			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl);
+ 
++		if (error_on_inconsistent_vmcs_config)
++			return -EIO;
++
+ 		_vmentry_control &= ~n_ctrl;
+ 		_vmexit_control &= ~x_ctrl;
+ 	}
 -- 
 2.36.1.255.ge46751e96f-goog
 
