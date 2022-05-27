@@ -2,60 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44715535D88
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 11:42:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1759535D8D
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 11:44:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350657AbiE0JmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 May 2022 05:42:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50698 "EHLO
+        id S1350663AbiE0Joc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 May 2022 05:44:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235152AbiE0JmL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 May 2022 05:42:11 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13CA3E5EE;
-        Fri, 27 May 2022 02:42:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653644529; x=1685180529;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=dbtnMI3UHVoIrRQqCtwR7FgwcIVnGGpefctdsCFMNWY=;
-  b=iaa+qDmZgWlPfunctFq2ZrO6skAC979t2Twv+qQSGsoGAgEu3noRlPM+
-   7nEsoKzr+j8/KhuNmFBQz6W5OvBx261aUT4YU3/rXJJlx0JTpOujR7IkL
-   LMSB4Lvjb1PR+DfChMAcA0ayGQN9LKrYvuHVJd59+0pBqyBCU0g5eZj/O
-   tPQCOd/f7zU1lX89xlaZcnGNqr40zCAhx8/kali6sDpHdILdeqdvj0k90
-   v9Q1/P1rEMK8tQnBSQr2LWbX0NcMeeNriVlbGg6oIEXAfvZI7IwJ6nXk4
-   z5yGeM2xiKm4zc2jcLH0YtwYfHY9GtjnDsUY7+iKyRdsRgXcL2El6dtbV
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10359"; a="360822039"
-X-IronPort-AV: E=Sophos;i="5.91,255,1647327600"; 
-   d="scan'208";a="360822039"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 02:42:09 -0700
-X-IronPort-AV: E=Sophos;i="5.91,255,1647327600"; 
-   d="scan'208";a="705045135"
-Received: from leiwang7-mobl.ccr.corp.intel.com (HELO [10.254.211.236]) ([10.254.211.236])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 02:42:06 -0700
-Message-ID: <e751ff56-5e0d-e842-78ed-b9c7e9069a26@intel.com>
-Date:   Fri, 27 May 2022 17:42:04 +0800
+        with ESMTP id S232406AbiE0Joa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 May 2022 05:44:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C2E86F6893
+        for <kvm@vger.kernel.org>; Fri, 27 May 2022 02:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653644668;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CyHN16US1gOOvkQvNTRd1rg4BKz//ilGPdW5uJvWU+A=;
+        b=hQX2eEh8yBtD2/D85d0kZpWkJO93KuoJUyN+dEoCuDEXklCPtRGkDEorOC+XlHx7OYbIpE
+        wyxllS0pgmLg4WsvJ6ympt5MHPOeDtAFRTiakRUJR7lrcklMbimHNcSBvNyzw7MDSspn2y
+        fmzpwqMqguTSyf0uNNMEQ0LTz+z3yj0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-81-tC2UqRo-PQqKrtvTmujEcg-1; Fri, 27 May 2022 05:44:27 -0400
+X-MC-Unique: tC2UqRo-PQqKrtvTmujEcg-1
+Received: by mail-wr1-f69.google.com with SMTP id s18-20020a5d6a92000000b0020ffa2781beso699048wru.20
+        for <kvm@vger.kernel.org>; Fri, 27 May 2022 02:44:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=CyHN16US1gOOvkQvNTRd1rg4BKz//ilGPdW5uJvWU+A=;
+        b=7xkYcZQ3TJsSGZA9bXPzGonm1lswksqUBmqKfPpJyyDu2JORISvvj4GQlyGsWLshdv
+         haLiHY2yfNiBF4eA4DKC/euoDXZteKlvt/0BpbzmDQvj1K0QFOYNSmdfBHsK7BudloYj
+         AxPNIhyzTGon1Ud2CMzbonP7pMy20YM07Lno1zJOnmwiMC2DiZyVzzp4FzmxN/W/FVV9
+         UGpgeaavioonqXX6nJ4m7NOQm3c69ZTE1HXoOsUHbMFgKhvpXFerVHZxxT0K1cayCywo
+         LIroLSVcmrqMhk4MSVeWT9ZTJhmegyCAIg++iZ2F7kp5jpJZhUuWCSS977fh2/Ti7ylL
+         h4dQ==
+X-Gm-Message-State: AOAM530tRx4uBjUC68iTeq+0hfHgjYHN1fo1qlF52U8BaZ/2mFX8OD9z
+        TCiyW8hrI2MH3wTRhXqhLsYAZIsYfMaw6cOz9xWky68Vveyd6aRusTQjs/68BKyAeUyZTlNGW8A
+        e78sUv9EMFXa5
+X-Received: by 2002:a5d:47a7:0:b0:20f:f216:bc81 with SMTP id 7-20020a5d47a7000000b0020ff216bc81mr13931986wrb.56.1653644666121;
+        Fri, 27 May 2022 02:44:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxdWm2UQJhUeUPnBRWhvnzcZTyb9BIA/EIMgGo6ATGOZHv9VC8ScWm7IHBya7VsquyWgt/O7A==
+X-Received: by 2002:a5d:47a7:0:b0:20f:f216:bc81 with SMTP id 7-20020a5d47a7000000b0020ff216bc81mr13931961wrb.56.1653644665775;
+        Fri, 27 May 2022 02:44:25 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:e3ec:5559:7c5c:1928? ([2001:b07:6468:f312:e3ec:5559:7c5c:1928])
+        by smtp.googlemail.com with ESMTPSA id x15-20020a1c7c0f000000b0039756cdc8e1sm1573927wmc.37.2022.05.27.02.44.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 May 2022 02:44:25 -0700 (PDT)
+Message-ID: <97b4d324-9f74-0490-5d6c-c5b40acfc457@redhat.com>
+Date:   Fri, 27 May 2022 11:44:23 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.9.1
-Subject: Re: [PATCH v7 7/8] KVM: VMX: Expose PKS to guest
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 1/2] KVM: VMX: Sanitize VM-Entry/VM-Exit control pairs at
+ kvm_intel load time
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, chenyi.qiang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220424101557.134102-1-lei4.wang@intel.com>
- <20220424101557.134102-8-lei4.wang@intel.com> <Yo1rfrnV5nObIHJK@google.com>
-From:   "Wang, Lei" <lei4.wang@intel.com>
-In-Reply-To: <Yo1rfrnV5nObIHJK@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        Lei Wang <lei4.wang@intel.com>
+References: <20220525210447.2758436-1-seanjc@google.com>
+ <20220525210447.2758436-2-seanjc@google.com>
+ <8baca98e-63d6-f7dd-067b-05f8e0dc381f@redhat.com>
+ <Yo/yhiVl++FTSa3S@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Yo/yhiVl++FTSa3S@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,27 +89,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/25/2022 7:34 AM, Sean Christopherson wrote:
-> On Sun, Apr 24, 2022, Lei Wang wrote:
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 9d0588e85410..cbcb0d7b47a4 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -3250,7 +3250,7 @@ void vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->>   		}
->>   
->>   		/*
->> -		 * SMEP/SMAP/PKU is disabled if CPU is in non-paging mode in
->> +		 * SMEP/SMAP/PKU/PKS is disabled if CPU is in non-paging mode in
->>   		 * hardware.  To emulate this behavior, SMEP/SMAP/PKU needs
-> Heh, missed one ;-)  Let's reduce future pain and reword this whole comment:
->
-> 		/*
-> 		 * SMEP/SMAP/PKU/PKS are effectively disabled if the CPU is in
-> 		 * non-paging mode in hardware.  To emulate this behavior,
-> 		 * clear them in the hardware CR4 when the guest switches to
-> 		 * non-paging mode and unrestricted guest is disabled, as KVM
-> 		 * must run the guest with hardware CR0.PG=1.
-> 		 */
->
-Nice catch, will fix it ;-)
+On 5/26/22 23:35, Sean Christopherson wrote:
+> It's not for clarity, it's to prevent plopping an EXIT control into the ENTRY
+> slot and vice versa.  I have a hell of a time trying to visually differentiate
+> those, and a buggy pair isn't guaranteed to be detected at runtime, e.g. if both
+> are swapped, all bets are off, and if one is duplicated, odds the warn may or may
+> not show up unless hardware actually supports at least one of the controls, if not
+> both.
+
+Make the lines longer than 80 characters and align each element so that 
+you have a line of VM_ENTRY_ and VM_EXIT_.  (It would not work if they 
+were the same length, but they aren't).
+
+Paolo
+
