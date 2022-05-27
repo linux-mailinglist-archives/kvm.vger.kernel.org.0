@@ -2,148 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 873105366F4
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 20:34:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A1175368EF
+	for <lists+kvm@lfdr.de>; Sat, 28 May 2022 00:43:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354037AbiE0SeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 May 2022 14:34:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57744 "EHLO
+        id S1354877AbiE0WmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 May 2022 18:42:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234279AbiE0SeH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 May 2022 14:34:07 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BAB5715B
-        for <kvm@vger.kernel.org>; Fri, 27 May 2022 11:34:05 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id v17so2688465wrv.2
-        for <kvm@vger.kernel.org>; Fri, 27 May 2022 11:34:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZMRaR78nxxjwROTv5Xv0uCrlGpUNKsmrgGJVBdvr8Ow=;
-        b=MkzqrGgvYlJnACcMhuImZMacQWLHV1sfIdXNuvsTHnrOm/OtJW/K9hyD3QxlczsLoT
-         y8wk264wphMEIWY/RDJ7JWPjvXefBQcB7eVBOUBhZ+RsMwz/xaX7hq5oPUFVoNm6gk+9
-         ECC8TXoBKcjMQzd/Lx+VaeiZUjV0ikBmp5ZprAw/qhOBi6WaPZolyclGk7kbaG4wUmNU
-         +mIFZCiGrm+cA09ar5e2i9xVloL7GuFnwLMsoJoJXN3aAZ1DbrqnVYdqcioLJkScP577
-         ZEsHAj7/WcJolt2zrK/cc8Q5BlFMYbDm2Oga3A+8NHOYgCiMkGz8pf41smTE0Irti5Jf
-         eM3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZMRaR78nxxjwROTv5Xv0uCrlGpUNKsmrgGJVBdvr8Ow=;
-        b=enX+Uz89gwXnTuCOBntmUzgHvuwrQoZBsiyYwOza4P2JE8JnqoYIQTWTTMjbf6RvRu
-         gSvltGkOdCYAxa/CWCMXhHZsSB8Hlgp1dZFw0FpShTJ82R0bVPFPRNfue1X0M3l/Hqzr
-         tJKPh5qJRLW7tOipdGWs2dxwi58bkqqoqP+4468Rvx2wMaHFwfU25SErGr2idwK/OhKQ
-         d8erkX/MRm5EOjraJDUUa9uuFcf3AHQIY1AMmQdtgOgiYCSP/ggTBcoph+nFHiDK/IpO
-         h0vqKwdtRbGdD2BTiNQIYXXKUf4AuJNV7SwnsaVZc01gX5xzOFd+fTsgjx5D7kbwKg0+
-         2dbQ==
-X-Gm-Message-State: AOAM5328feNv9x4vlj2w2Ile8D6VTPn2QMhouVuJ/fzWHYkZKfqX55aY
-        oH0d0FuOKZW8C9XvulI0NF/2LVQVk8vOeBjbAr5v2w==
-X-Google-Smtp-Source: ABdhPJxUkKLq8UKhcdaeqCHY4EBxsrPSLnU5/L22u7NUw4uGgA00AplmrdnobCWk7FoVQrgXmXTGsKhVFFO9PCXmQT8=
-X-Received: by 2002:a05:6000:544:b0:20f:ca41:cc4c with SMTP id
- b4-20020a056000054400b0020fca41cc4cmr26548956wrf.582.1653676444165; Fri, 27
- May 2022 11:34:04 -0700 (PDT)
+        with ESMTP id S235014AbiE0WmE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 May 2022 18:42:04 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5DB5B8A7;
+        Fri, 27 May 2022 15:42:03 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24RM0k7T003448;
+        Fri, 27 May 2022 22:42:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=pxidKfGt+g7zv2vqG5JLl2ETdA1ZwJVfb57zs1kpF7M=;
+ b=XA35w4Nit5sOEMEYFHWyXNVQ2DppWETJTVbqYVHYS8/sEt1dEeXEaei3TgRYD6dqompZ
+ vLsOLdphs2B4QYerX5UjJn/zFMHTMHkfGeeUDZ77fYfwyvsaRWWkTHQyOiQ1jvop7SjB
+ GarsyRmLTaIoSG1TFkgd10TD8F+izEFBQ896XhfiHbLnvHZEZZWEE43zE/pru74qbC36
+ KiOwVwfGUukP4Y7QC4i25Io4Nh3J8bFcSTgU0IO9mZ9jk5Nhj8iU6ZIs6Cafeq9FUwB7
+ BVJPDLU2vTkAi9V8duZLlLxnf3LAnNml2TQYurX7YARItwc8if7f2XMfV3dfhto3oCr0 Wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gb72crjyk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 May 2022 22:42:02 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24RMaxQ5024984;
+        Fri, 27 May 2022 22:42:01 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gb72crjya-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 May 2022 22:42:01 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24RMaO5a031234;
+        Fri, 27 May 2022 22:42:00 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3gb61xr2q6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 May 2022 22:41:59 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24RMfukD27918674
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 May 2022 22:41:56 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B6E4B42042;
+        Fri, 27 May 2022 22:41:56 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4880E42041;
+        Fri, 27 May 2022 22:41:56 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.67.241])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Fri, 27 May 2022 22:41:56 +0000 (GMT)
+Date:   Sat, 28 May 2022 00:41:53 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 1/1] MAINTAINERS: Update s390 virtio-ccw
+Message-ID: <20220528004153.2646d6e0.pasic@linux.ibm.com>
+In-Reply-To: <20220525144028.2714489-2-farman@linux.ibm.com>
+References: <20220525144028.2714489-1-farman@linux.ibm.com>
+        <20220525144028.2714489-2-farman@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
- <Yn2TGJ4vZ/fst+CY@cmpxchg.org> <Yn2YYl98Vhh/UL0w@google.com>
- <Yn5+OtZSSUZZgTQj@cmpxchg.org> <Yn6DeEGLyR4Q0cDp@google.com>
- <CALvZod6nERq4j=L0V+pc-rd5+QKi4yb_23tWV-1MF53xL5KE6Q@mail.gmail.com>
- <CAJD7tka-5+XRkthNV4qCg8woPCpjcwynQoRBame-3GP1L8y+WQ@mail.gmail.com>
- <YoeoLJNQTam5fJSu@cmpxchg.org> <CAJD7tkYjcmwBeUx-=MTQeUf78uqFDvfpy7OuKy4OvoS7HiVO1Q@mail.gmail.com>
- <Yo4Ze+DZrLqn0PeU@cmpxchg.org> <Yo7MHA2aUaprvgl8@google.com>
-In-Reply-To: <Yo7MHA2aUaprvgl8@google.com>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Fri, 27 May 2022 11:33:27 -0700
-Message-ID: <CAJD7tkYoz=rYvBV3tcp4aLgiyEtr-sBwbncFduZsOq+c8wk5sA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>,
-        Shakeel Butt <shakeelb@google.com>,
-        Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Oliver Upton <oupton@google.com>,
-        Cgroups <cgroups@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bLocytusjxht59ujZCGENDjs3OQLiFum
+X-Proofpoint-GUID: 5AiYX3XK5QcQFBbY-0MqwBljtbcvEJ77
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-27_07,2022-05-27_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ adultscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501
+ malwarescore=0 bulkscore=0 clxscore=1011 mlxlogscore=999 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205270109
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 25, 2022 at 5:39 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 25, 2022, Johannes Weiner wrote:
-> > On Tue, May 24, 2022 at 03:31:52PM -0700, Yosry Ahmed wrote:
-> > > I don't have enough context to say whether we should piggyback KVM MMU
-> > > pages to the existing NR_PAGETABLE item, but from a high level it
-> > > seems like it would be more helpful if they are a separate stat.
-> > > Anyway, I am willing to go with whatever Sean thinks is best.
-> >
-> > Somebody should work this out and put it into a changelog. It's
-> > permanent ABI.
->
-> After a lot of waffling, my vote is to add a dedicated NR_SECONDARY_PAGETABLE.
->
-> It's somewhat redundant from a KVM perspective, as NR_SECONDARY_PAGETABLE will
-> scale with KVM's per-VM pages_{4k,2m,1g} stats unless the guest is doing something
-> bizarre, e.g. accessing only 4kb chunks of 2mb pages so that KVM is forced to
-> allocate a large number of page tables even though the guest isn't accessing that
-> much memory.
->
-> But, someone would need to either understand how KVM works to make that connection,
-> or know (or be told) to go look at KVM's stats if they're running VMs to better
-> decipher the stats.
->
-> And even in the little bit of time I played with this, I found having
-> nr_page_table_pages side-by-side with nr_secondary_page_table_pages to be very
-> informative.  E.g. when backing a VM with THP versus HugeTLB,
-> nr_secondary_page_table_pages is roughly the same, but nr_page_table_pages is an
-> order of a magnitude higher with THP.  I'm guessing the THP behavior is due to
-> something triggering DoubleMap, but now I want to find out why that's happening.
->
-> So while I'm pretty sure a clever user could glean the same info by cross-referencing
-> NR_PAGETABLE stats with KVM stats, I think having NR_SECONDARY_PAGETABLE will at the
-> very least prove to be helpful for understanding tradeoffs between VM backing types,
-> and likely even steer folks towards potential optimizations.
->
-> Baseline:
->   # grep page_table /proc/vmstat
->   nr_page_table_pages 2830
->   nr_secondary_page_table_pages 0
->
-> THP:
->   # grep page_table /proc/vmstat
->   nr_page_table_pages 7584
->   nr_secondary_page_table_pages 140
->
-> HugeTLB:
->   # grep page_table /proc/vmstat
->   nr_page_table_pages 3153
->   nr_secondary_page_table_pages 153
->
+On Wed, 25 May 2022 16:40:28 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Interesting findings! Thanks for taking the time to look into this, Sean!
-I will refresh this patchset and summarize the discussion in the
-commit message, and also fix some nits on the KVM side. Does this
-sound good to everyone?
+> Add myself to the kernel side of virtio-ccw
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+
+Thanks for joining the team!
+
+:) 
+
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 6618e9b91b6c..1d2c6537b834 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -20933,6 +20933,7 @@ F:	include/uapi/linux/virtio_crypto.h
+>  VIRTIO DRIVERS FOR S390
+>  M:	Cornelia Huck <cohuck@redhat.com>
+>  M:	Halil Pasic <pasic@linux.ibm.com>
+> +M:	Eric Farman <farman@linux.ibm.com>
+>  L:	linux-s390@vger.kernel.org
+>  L:	virtualization@lists.linux-foundation.org
+>  L:	kvm@vger.kernel.org
+
