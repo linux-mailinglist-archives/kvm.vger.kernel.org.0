@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8496E535D20
-	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 11:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B6AE535D66
+	for <lists+kvm@lfdr.de>; Fri, 27 May 2022 11:31:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350272AbiE0JV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 May 2022 05:21:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42690 "EHLO
+        id S1350570AbiE0J2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 May 2022 05:28:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350060AbiE0JVZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 May 2022 05:21:25 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5209BE8;
-        Fri, 27 May 2022 02:21:21 -0700 (PDT)
+        with ESMTP id S1350555AbiE0J2R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 May 2022 05:28:17 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 028FDDFE9;
+        Fri, 27 May 2022 02:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653643283; x=1685179283;
+  t=1653643696; x=1685179696;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=zHXAnmnNFh6AJbxJIi8Vnul7mXoMJj9XvJp1nZaLWoc=;
-  b=EqfoVQ8n1kjP0IexoRqMt8RxiNu8WV584qX9r6EkONnhihWBvjWY1sBh
-   /4NTYOFwrb1bu2DenDqTMQuNapwzZphfVGzvyiOYfqmdnHW5KefXbJLmU
-   ESUM/jHBKsdxEDnAOfMd2RMXYyY7CoWfh0wYIWPH2/DAPglJNUrqmwsM8
-   I4gqt+GrNsI6UilpQevS6lGp1LRrAC0U+dXUkmDCuU0VzQZVXXqyWVZ+i
-   yRYko+nYsgq7mNLmWHKpKxa5WfSTIXgHm+s6eC3uDDDQIA+5bkf5RDkKw
-   L4biu57q4WryGRZzup96OxKsrGvGOsLjautOL270KcHRRLPUyXZpJ11oM
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10359"; a="337477593"
+  bh=efyypdxFtKwj98j5J7dnwyYqKUsUcxzC2VXnwZlhrMk=;
+  b=YQa4NODRyXIeoG2SUk7VC9fA+F5Kyo0XaVoL0yj+0pVqJOjUvS1RSMdc
+   qzvkvJMdPWhGI4Z6FAe6NMkBXq3N6NWbrsF8UQY5xIOdNvoCGfoTLXHON
+   roJk7BeGPt1RZpm6+z5UnoNrzhJdJkJ8knarrhbd44bYPY4Ftoz3KfEK1
+   EyCliRg+SWTlqpJ45S5OMfW+0hOtkSwwTMMwGO6jxHI81YJSNL3o/7kxq
+   o5SfvTC0lNsJ5i/rYc7rXE7ITpFvku3q2QErQx2JaPKGpu4+HOEszxyd/
+   DAli142EQEDXXUs6Xl4xIHYBT9zkeiJ3+9nEPWEpIagSelxkUelrJ5eaR
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10359"; a="360819280"
 X-IronPort-AV: E=Sophos;i="5.91,255,1647327600"; 
-   d="scan'208";a="337477593"
+   d="scan'208";a="360819280"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 02:21:20 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 02:28:15 -0700
 X-IronPort-AV: E=Sophos;i="5.91,255,1647327600"; 
-   d="scan'208";a="705039012"
+   d="scan'208";a="705040963"
 Received: from leiwang7-mobl.ccr.corp.intel.com (HELO [10.254.211.236]) ([10.254.211.236])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 02:21:18 -0700
-Message-ID: <4750f3e3-e5f4-245e-8a98-8b35dc447293@intel.com>
-Date:   Fri, 27 May 2022 17:21:16 +0800
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 02:28:13 -0700
+Message-ID: <1bab5e74-70b9-64b0-b4e0-645ba832c3a9@intel.com>
+Date:   Fri, 27 May 2022 17:28:10 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Firefox/91.0 Thunderbird/91.9.1
-Subject: Re: [PATCH v7 3/8] KVM: X86: Expose IA32_PKRS MSR
+Subject: Re: [PATCH v7 5/8] KVM: MMU: Add helper function to get pkr bits
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
         jmattson@google.com, joro@8bytes.org, chenyi.qiang@intel.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20220424101557.134102-1-lei4.wang@intel.com>
- <20220424101557.134102-4-lei4.wang@intel.com> <Yo1YKoUOPOLpZnqn@google.com>
+ <20220424101557.134102-6-lei4.wang@intel.com> <Yo1okaacf2kbvrxh@google.com>
 From:   "Wang, Lei" <lei4.wang@intel.com>
-In-Reply-To: <Yo1YKoUOPOLpZnqn@google.com>
+In-Reply-To: <Yo1okaacf2kbvrxh@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -63,117 +63,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/25/2022 6:11 AM, Sean Christopherson wrote:
-> Nit, something like:
->
->    KVM: X86: Virtualize and pass-through IA32_PKRS MSR when supported
->
-> because "expose" doesn't precisely cover the pass-through behavior
+On 5/25/2022 7:21 AM, Sean Christopherson wrote:
+> On Sun, Apr 24, 2022, Lei Wang wrote:
+>> Extra the PKR stuff to a separate, non-inline helper, which is a
+> s/Extra/Extract
 
-Will change it.
+My mistake, will fix it.
 
-> Eh, I don't think this comment adds anything.  And practically speaking, whether
-> or not X86_FEATURE_PKS is reported by kvm_cpu_cap_has() and/or guest_cpuid_has()
-> is irrelevant.  If KVM is loading PKRS on exit, then the VMCS needs to hold an
-> up-to-date value.  E.g. if for some reason KVM enables the control even if PKS
-> isn't exposed to the guest (see below), this code still needs to refresh the value.
-Will remove the irrelevant statement, just left the "Update the host 
-pkrs vmcs field before vcpu runs."
+>> preparation to introduce pks support.
+> Please provide more justification.  The change is justified, by random readers of
+> this patch/commit will be clueless.
+>
+>    Extract getting the effective PKR bits to a helper that lives in mmu.c
+>    in order to keep the is_cr4_*() helpers contained to mmu.c.  Support for
+>    PKRS (versus just PKRU) will require querying MMU state to see if the
+>    relevant CR4 bit is enabled because pkr_mask will be non-zero if _either_
+>    bit is enabled).
+>
+>    PKR{U,S} are exposed to the guest if and only if TDP is enabled, and
+>    while permission_fault() is performance critical for ia32 shadow paging,
+>    it's a rarely used path with TDP is enabled.  I.e. moving the PKR code
+>    out-of-line is not a performance concern.
 
-> No need for an intermediate host_pkrs.  I.e. this can simply be:
->
-> 	if (vm_exit_controls_get(vmx) & VM_EXIT_LOAD_IA32_PKRS)
-> 		vmx_set_host_pkrs(host_state, get_current_pkrs());
-OK, will write the code in one line.
+Will add more justification to make it clearer to random readers.
 
-> Nit, please align the lines that are inside a pair of parantheses, i.e.
-My mistake, will align the lines.
+>> Signed-off-by: Lei Wang <lei4.wang@intel.com>
+>> ---
+>>   arch/x86/kvm/mmu.h     | 20 +++++---------------
+>>   arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++++++++++
+>>   2 files changed, 26 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+>> index cb3f07e63778..cea03053a153 100644
+>> --- a/arch/x86/kvm/mmu.h
+>> +++ b/arch/x86/kvm/mmu.h
+>> @@ -204,6 +204,9 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>>   	return vcpu->arch.mmu->page_fault(vcpu, &fault);
+>>   }
+>>   
+>> +u32 kvm_mmu_pkr_bits(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+> kvm_mmu_get_pkr_bits() so that there's a verb in there.
 
-> A comment on the caching patch, please use kvm_pkrs_read() to follow the GPR, RIP,
-> PDPTR, etc... terminology (CR0/3/4 got grandfathered in).
-Will rename the function.
+Will fix it.
 
-> Nit, please move this to after the capability checks.  Does not affect functionality
-> at all, but logically it doesn't make sense to check for a valid value of a register
-> that doesn't exist.
-Make sense, will move it.
+>> +		     unsigned pte_access, unsigned pte_pkey, unsigned int pfec);
+>> +
+>>   /*
+>>    * Check if a given access (described through the I/D, W/R and U/S bits of a
+>>    * page fault error code pfec) causes a permission fault with the given PTE
+>> @@ -240,21 +243,8 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>>   
+>>   	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
+>>   	if (unlikely(mmu->pkr_mask)) {
+>> -		u32 pkr_bits, offset;
+>> -
+>> -		/*
+>> -		* PKRU defines 32 bits, there are 16 domains and 2
+>> -		* attribute bits per domain in pkru.  pte_pkey is the
+>> -		* index of the protection domain, so pte_pkey * 2 is
+>> -		* is the index of the first bit for the domain.
+>> -		*/
+>> -		pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
+>> -
+>> -		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
+>> -		offset = (pfec & ~1) +
+>> -			((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT - PT_USER_SHIFT));
+>> -
+>> -		pkr_bits &= mmu->pkr_mask >> offset;
+>> +		u32 pkr_bits =
+>> +			kvm_mmu_pkr_bits(vcpu, mmu, pte_access, pte_pkey, pfec);
+> Nit, I prefer wrapping in the params, that way the first line shows the most
+> important information, e.g. what variable is being set and how (by a function call).
+> And then there won't be overflow with the longer helper name:
+>
+> 		u32 pkr_bits = kvm_mmu_get_pkr_bits(vcpu, mmu, pte_access,
+> 						    pte_pkey, pfec);
 
-> The caching patch should add kvm_write_pkrs().  And in there, I think I'd vote for
-> a WARN_ON_ONCE() that the incoming value doesn't set bits 63:32.  It's redundant
-> with kvm_pkrs_valid()
-Will add a new function at the caching patch.
+Make sense, will make the wrapping more reasonable.
 
-> Ugh, toggling the entry/exit controls here won't do the correct thing if L2 is
-> active.  The MSR intercept logic works because it always operates on vmcs01's bitmap.
+> Comment needs to be aligned, and it can be adjust to wrap at 80 chars (its
+> indentation has changed).
 >
-> Let's keep this as simple as possible and set the controls if they're supported.
-> KVM will waste a few cycles on entry/exit if PKS is supported in the host but not
-> exposed to the guest, but that's not the end of the world.  If we want to optimize
-> that, then we can do that in the future and in a more generic way.
->
-> So this becomes:
->
-> 	if (kvm_cpu_cap_has(X86_FEATURE_PKS))
-> 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PKRS, MSR_TYPE_RW,
-> 					  !guest_cpuid_has(vcpu, X86_FEATURE_PKS));
->
-> And please hoist that up to be next to the handling of X86_FEATURE_XFD to try and
-> bunch together code that does similar things.
->
-> The last edge case to deal with is if only one of the controls is supported, e.g. if
-> an L0 hypervisor is being evil.  Big surprise, BNDCFGS doesn't get this right and
-> needs a bug fix patch, e.g. it could retain the guest's value after exit, or host's
-> value after entry.  It's a silly case because it basically requires broken host
-> "hardware", but it'd be nice to get it right in KVM.  And that'd also be a good
-> opportunity to handle all of the pairs, i.e. clear the bits during setup_vmcs_config()
-> instead of checking both the entry and exit flags in cpu_has_load_*().
->
-> So for this series, optimistically assume my idea will pan out and a
-> adjust_vm_entry_exit_pair() helper will exit by the time this is fully baked.
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 6927f6e8ec31..53e12e6006af 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2434,6 +2434,16 @@ static bool cpu_has_sgx(void)
->          return cpuid_eax(0) >= 0x12 && (cpuid_eax(0x12) & BIT(0));
->   }
->
-> +static __init void adjust_vm_entry_exit_pair(u32 *entry_controls, u32 entry_bit,
-> +                                            u32 *exit_controls, u32 exit_bit)
-> +{
-> +       if ((*entry_controls & entry_bit) && (*exit_controls & exit_bit))
-> +               return;
-> +
-> +       *entry_controls &= ~entry_bit;
-> +       *exit_controls &= ~exit_bit;
-> +}
-> +
->   static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
->                                        u32 msr, u32 *result)
->   {
-> @@ -2614,6 +2624,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->                                  &_vmentry_control) < 0)
->                  return -EIO;
->
-> +       adjust_vm_entry_exit_pair(&_vmentry_control, VM_ENTRY_LOAD_IA32_PKRS,
-> +                                 &_vmexit_control, VM_EXIT_LOAD_IA32_PKRS);
-> +
->          /*
->           * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
->           * can't be used due to an errata where VM Exit may incorrectly clear
-> @@ -7536,6 +7549,9 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->                  vmx_set_intercept_for_msr(vcpu, MSR_IA32_XFD_ERR, MSR_TYPE_R,
->                                            !guest_cpuid_has(vcpu, X86_FEATURE_XFD));
->
-> +       if (kvm_cpu_cap_has(X86_FEATURE_PKS))
-> +               vmx_set_intercept_for_msr(vcpu, MSR_IA32_PKRS, MSR_TYPE_RW,
-> +                                         !guest_cpuid_has(vcpu, X86_FEATURE_PKS));
->
->          set_cr4_guest_host_mask(vmx);
-Thanks for your suggestions, will try your helper.
-
-> Please put this with the other !init_event stuff, e.g. look for MSR_IA32_XSS.
-Will do it.
-
-
+> 	/*
+> 	 * PKRU and PKRS both define 32 bits. There are 16 domains and 2
+> 	 * attribute bits per domain in them. pte_key is the index of the
+> 	 * protection domain, so pte_pkey * 2 is the index of the first bit for
+> 	 * the domain. The use of PKRU versus PKRS is selected by the address
+> 	 * type, as determined by the U/S bit in the paging-structure entries.
+> 	 */
+Will align and adjust it.
