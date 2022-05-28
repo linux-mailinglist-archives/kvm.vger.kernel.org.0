@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21172536CAC
-	for <lists+kvm@lfdr.de>; Sat, 28 May 2022 13:50:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34880536CA9
+	for <lists+kvm@lfdr.de>; Sat, 28 May 2022 13:50:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354955AbiE1LuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 May 2022 07:50:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43998 "EHLO
+        id S234763AbiE1Lty (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 May 2022 07:49:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355838AbiE1LuD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 May 2022 07:50:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4007D63F2
-        for <kvm@vger.kernel.org>; Sat, 28 May 2022 04:50:02 -0700 (PDT)
+        with ESMTP id S234641AbiE1Ltx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 May 2022 07:49:53 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84F5DFF
+        for <kvm@vger.kernel.org>; Sat, 28 May 2022 04:49:52 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C540160EA3
-        for <kvm@vger.kernel.org>; Sat, 28 May 2022 11:50:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BB4EC34118;
-        Sat, 28 May 2022 11:50:01 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 22413B816FE
+        for <kvm@vger.kernel.org>; Sat, 28 May 2022 11:49:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC160C34100;
+        Sat, 28 May 2022 11:49:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653738601;
-        bh=yyB4hR+igLzaHP7EAyqgeD9ghacZPHl0R9Sq6ANIVOE=;
+        s=k20201202; t=1653738589;
+        bh=OvbuqjCsYRsACHJmFHA5RtdLvj3YPOeVzGbn+ZzrKrQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=d3vYl542YFv3IJ9osmVM4WSi2218X2VpMsUOjpQIk6V//UZCY3OyLyTE89mS2HWij
-         xjQEi4/vXRFLY0Uzc4kquuaK9PHcgPcQd235V5DlQ1zsPBKJBOjQyCGN2r++BZQ4Hy
-         vv/k+M1zNA9cWp7lQBDOYcjkAnH2oUk/zR2EERAKCmL1q7S3vrlSyY8gUns3KDYcKL
-         wygZU3xYRzy2Qdej5T/fM/NuiA42DLJJUdVlfxnjLR5HraWuGUB8bCEgf/9kWZJWUb
-         aavW18bnw9JXPyqYa3o0sKOGwM2kcy54nWICEH6tPKFUyvIQHxFYpma3Qp3LDnUEbJ
-         yVHW8JysbIuLA==
+        b=eu3l4UaY7mnC7O9DPaOKnbpHQYefi9Fjlv+v3XUB5+VGlJmIAJ/35hbiqkPtfQCbS
+         Z61gRVAPd+I8n3H5IKXZcVYU1s58VdwEDqCcgviY2jy4YyIPcUZ+RmvlTN7iCocT/8
+         qOoaAaof17sAZ9HubdVKWW1JiviiF+B41nb88IQZzRTUFMG6YwbGYgnAOnFzg20PC5
+         2RsCsIkw/vzCvoGEFHpbyOKKhpKzvX3fyvgBvESEfOuUcXM2a51+GoPULhE3mJxJlL
+         uhMhbl9dOPNsxFA8mVFkzM86fcGkjX9Pn0yCwrebkf54jUFW5yxa/8pRIWzwzoTq+9
+         Z9nAx1FEpdgkw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nuumD-00EEGh-DD; Sat, 28 May 2022 12:38:37 +0100
+        id 1nuumD-00EEGh-LB; Sat, 28 May 2022 12:38:37 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
         Quentin Perret <qperret@google.com>,
         Mark Brown <broonie@kernel.org>, kernel-team@android.com
-Subject: [PATCH 16/18] KVM: arm64: Add build-time sanity checks for flags
-Date:   Sat, 28 May 2022 12:38:26 +0100
-Message-Id: <20220528113829.1043361-17-maz@kernel.org>
+Subject: [PATCH 17/18] KVM: arm64: Reduce the size of the vcpu flag members
+Date:   Sat, 28 May 2022 12:38:27 +0100
+Message-Id: <20220528113829.1043361-18-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220528113829.1043361-1-maz@kernel.org>
 References: <20220528113829.1043361-1-maz@kernel.org>
@@ -68,62 +68,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Flags are great, but flags can also be dangerous: it is easy
-to encode a flag that is bigger than its container (unless the
-container is a u64), and it is easy to construct a flag value
-that doesn't fit in the mask that is associated with it.
+Now that we can detect flags overflowing their container, reduce
+the size of all flag set members in the vcpu struct, turning them
+into 8bit quantities.
 
-Add a couple of build-time sanity checks that ensure we catch
-these two cases.
+Even with the FP state enum occupying 32bit, the whole of the state
+that was represented by flags is smaller by one byte. Profit!
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4073a33af17c..70931231f0cb 100644
+index 70931231f0cb..83f3dae4333a 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -420,8 +420,20 @@ struct kvm_vcpu_arch {
- 	} steal;
- };
+@@ -336,13 +336,13 @@ struct kvm_vcpu_arch {
+ 	} fp_state;
  
-+#define __build_check_flag(v, flagset, f, m)			\
-+	do {							\
-+		typeof(v->arch.flagset) *_fset;			\
-+								\
-+		/* Check that the flags fit in the mask */	\
-+		BUILD_BUG_ON(HWEIGHT(m) != HWEIGHT((f) | (m)));	\
-+		/* Check that the flags fit in the type */	\
-+		BUILD_BUG_ON((sizeof(*_fset) * 8) <= __fls(m));	\
-+	} while (0)
-+
- #define __vcpu_get_flag(v, flagset, f, m)			\
- 	({							\
-+		__build_check_flag(v, flagset, f, m);		\
-+								\
- 		v->arch.flagset & (m);				\
- 	})
+ 	/* Configuration flags */
+-	u64 cflags;
++	u8 cflags;
  
-@@ -429,6 +441,8 @@ struct kvm_vcpu_arch {
- 	do {							\
- 		typeof(v->arch.flagset) *fset;			\
- 								\
-+		__build_check_flag(v, flagset, f, m);		\
-+								\
- 		fset = &v->arch.flagset;			\
- 		if (HWEIGHT(m) > 1)				\
- 			*fset &= ~(m);				\
-@@ -439,6 +453,8 @@ struct kvm_vcpu_arch {
- 	do {							\
- 		typeof(v->arch.flagset) *fset;			\
- 								\
-+		__build_check_flag(v, flagset, f, m);		\
-+								\
- 		fset = &v->arch.flagset;			\
- 		*fset &= ~(m);					\
- 	} while (0)
+ 	/* Input flags to the hypervisor code */
+-	u64 iflags;
++	u8 iflags;
+ 
+ 	/* State flags, unused by the hypervisor code */
+-	u64 sflags;
++	u8 sflags;
+ 
+ 	/*
+ 	 * We maintain more than a single set of debug registers to support
 -- 
 2.34.1
 
