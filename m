@@ -2,60 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0DE0537285
-	for <lists+kvm@lfdr.de>; Sun, 29 May 2022 22:28:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ACEF53729D
+	for <lists+kvm@lfdr.de>; Sun, 29 May 2022 22:49:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231684AbiE2U2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 May 2022 16:28:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
+        id S231586AbiE2UtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 May 2022 16:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229999AbiE2U2I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 29 May 2022 16:28:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFE366C8C
-        for <kvm@vger.kernel.org>; Sun, 29 May 2022 13:28:07 -0700 (PDT)
+        with ESMTP id S230326AbiE2UtS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 29 May 2022 16:49:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859D05E779
+        for <kvm@vger.kernel.org>; Sun, 29 May 2022 13:49:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C7EBF60F18
-        for <kvm@vger.kernel.org>; Sun, 29 May 2022 20:28:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2818AC3411D
-        for <kvm@vger.kernel.org>; Sun, 29 May 2022 20:28:06 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1FA0D60F9B
+        for <kvm@vger.kernel.org>; Sun, 29 May 2022 20:49:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C2B6C3411E
+        for <kvm@vger.kernel.org>; Sun, 29 May 2022 20:49:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653856086;
-        bh=c4gsgB8gt4zqc+DMlJgfRMkp21PQuu7jcisB9IWBcb0=;
+        s=k20201202; t=1653857356;
+        bh=pXsDyVksR1bt6kyIIT1v+1NhbOgpkR+QScBk4oaaLAk=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=IkNUuUkcYBoEIyMd6ZSQOAOuhdV6tjxgHrbeL/ZqarZYkdyc+yCBmRFXC3ZfsHIMn
-         8C0ZikGyzxF5AkZ97q/5C6kp6m5iWprefgAxnSNBzCwhOKJfRdHk9HEf/1gtYhFlXJ
-         KPycYl2343UN6xezm+frGu2IgzUbcAUhszEn47SA9RlXTvewQ1XqZmlQlqtmzqKsGc
-         FxuN0IciYch7lOdE+RAEVE36nKQq3xODYRAjUYw8u0CyRcppgGlsVcP8H6JfyFRtjA
-         zLPBLZPp6u3W6/1JhI8JWLOc6ZR34pTimSstkNwfCAY7K+WCBlkDf4CtxLmY4O6MFe
-         66EXbIoragtDA==
+        b=ekvqi9MKG/scLCxlsMak6zgReMJU1IgToPkRQoh6l+y2sglBQj6qL4dvDZZnFdHhq
+         wMqZMEzXFnAker+iQBlnIJN3VPw5tpAwp94rIARokS08wR4QgBHz/sRRboy+GMKCFE
+         zTurBvDx9XQs96Vr2h5v2/EQH/ow3nnrQmZXwJd1LT7PDBnVcgeP25xpJvAQ5GnawX
+         5rwtkfG8+7MvpZ5hUZeo06o7U+KuoSvnB0UPqXDH7LykltAaZ2BjGUAP7SDfYl8H4U
+         yJPbUwCYT6RqM+XT2oC2Zwdggom6Dhwo+YfnTKQS2X9staS0ifHTxIGB9/jP14V2uH
+         iqkreALQwPMaw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 0FFA6CC13B2; Sun, 29 May 2022 20:28:06 +0000 (UTC)
+        id 66921CC13B4; Sun, 29 May 2022 20:49:16 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
-Subject: [Bug 216003] Single stepping Windows 7 bootloader results in
- Assertion `ret < cpu->num_ases && ret >= 0' failed.
-Date:   Sun, 29 May 2022 20:28:05 +0000
+Subject: [Bug 216017] KVM: problem virtualization from kernel 5.17.9/5.18
+Date:   Sun, 29 May 2022 20:49:16 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Product: Virtualization
 X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ercli@ucdavis.edu
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: MOVED
+X-Bugzilla-Keywords: opw
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: ne-vlezay80@yandex.ru
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-216003-28872-hBRJt95u78@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216003-28872@https.bugzilla.kernel.org/>
-References: <bug-216003-28872@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: short_desc
+Message-ID: <bug-216017-28872-lbe399DaqY@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216017-28872@https.bugzilla.kernel.org/>
+References: <bug-216017-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -71,20 +70,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216003
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216017
 
-Eric Li (ercli@ucdavis.edu) changed:
+Alexey Boldyrev (ne-vlezay80@yandex.ru) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |MOVED
-
---- Comment #1 from Eric Li (ercli@ucdavis.edu) ---
-I think this is more likely a QEMU bug. I have filed
-https://gitlab.com/qemu-project/qemu/-/issues/1047 . I am marking this bug =
-as
-resolved now.
+            Summary|KVM: problem virtualization |KVM: problem virtualization
+                   |from kernel 5.17.9          |from kernel 5.17.9/5.18
 
 --=20
 You may reply to this email to add a comment.
