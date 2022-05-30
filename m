@@ -2,52 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 965F1537847
-	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 12:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CEFF537807
+	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 12:06:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234332AbiE3JPf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 May 2022 05:15:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42226 "EHLO
+        id S234650AbiE3J11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 May 2022 05:27:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233294AbiE3JPc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 May 2022 05:15:32 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99BE679391
-        for <kvm@vger.kernel.org>; Mon, 30 May 2022 02:15:29 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id r65so8218707oia.9
-        for <kvm@vger.kernel.org>; Mon, 30 May 2022 02:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=stonybrook.edu; s=sbu-gmail;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=JMYsR2Kv//YaZ7QShXeZBhZQwYsMq/3jlmc79DNtU6I=;
-        b=r5usHSRYiwNNYTwmkD2OFG3o4xlTabCtnLviftTDB2lrQxLpTOfnMLrGRx+VJYP0Ra
-         dkBXSu//8oTVuZvlzjYBFxSLrlzQTBicM9yLtF6ZlsISIVYG+jh2siYnEjNYAgPg1QH4
-         G9882CBZYFtekWWqDMaXffH6bHKaF/OVcV/wQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=JMYsR2Kv//YaZ7QShXeZBhZQwYsMq/3jlmc79DNtU6I=;
-        b=7jDWciPkEetMYlxMTRQve0NnGNZasM9MZ+i/MBL6M1DhOU8YT+eaZn+nD45G5lE+/X
-         bMCpPkhOOVJHtoinuL3xfrr7A+wz2agzWK3pjW6HM8mrViVIkQzNmvfWmsgEianwoIzi
-         Y9J3/S8gd6OQkFU3sVkGpQMSvZrau/h+iQDTbM/VWdpXXoCTj2fBXkwVVANfygR42imw
-         F/qcXJ1nH0lZ5TLJmuRb6TzjFA3TfqdW/0YGgEld5DB46WF+zlquzkjTQe7CmPWhy02o
-         TZDtmOjls4sLVR4xzzlFFugngTTUSHOjllC7N/OG6u5gP8R5RyvEpd7c5L4L+wrLz7w+
-         /O1g==
-X-Gm-Message-State: AOAM533YEsfvahIMLw6hm+6SSd4SvZwBefHvu/2+JcT1jUwwz4PuxcjG
-        UQmN/u0cShdFsFxl/7nl43QwB0HlUiAQbFg/zAKd1Z54QZ0=
-X-Google-Smtp-Source: ABdhPJwVaJTrWGMMIAYb7bwD+kQVwSv5HXtRyOFuq0eTm8607qQGuhBKXAXbELFOQbgRlqJM8cjGjb0uXDZnLbo+yc8=
-X-Received: by 2002:a05:6808:1288:b0:32b:9b72:e9b2 with SMTP id
- a8-20020a056808128800b0032b9b72e9b2mr9450101oiw.37.1653902128840; Mon, 30 May
- 2022 02:15:28 -0700 (PDT)
+        with ESMTP id S234588AbiE3J1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 May 2022 05:27:16 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ACC7641F;
+        Mon, 30 May 2022 02:27:13 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24U7gMG6005584;
+        Mon, 30 May 2022 09:27:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=wDj44lerMcMAJdLsjLd54yBBsxX5D9/jE0xYlYMLmzY=;
+ b=MEbMDfT8ukgTS2VyBa2yQ1fSgtt2uNu0Eiickd6K5TnTHnNPOip2EuxnFZf//1/yjIWX
+ JIk/f/GdL6O9rX1WmRVq6TX0dCWX+85ePZGRGACND65M+UA6unKTMs4sKVp4QkDMwvfv
+ 5YvCiKIgJiNjZl1K0aQwLsAroEPizHJkbrSwA8Jfkcrif0hLcZ9mfXSGQulNloKYJ4Rh
+ +5+o3xoKtjvXOmIqZOFK5u8WGJUUls5pX8MChfkz9aw1Xi3dapOJPc0A0auheB9ur4Au
+ fRLXphrguRwVT4zbsOvNxhZqSke/VvHpN7s5WLyYMFkFcYIXyQJ1X+VMTT/Q/Qp3Vz4A VA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcsrw21sf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 09:27:13 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24U9GDdO024569;
+        Mon, 30 May 2022 09:27:12 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcsrw21ru-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 09:27:12 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24U9M46h021962;
+        Mon, 30 May 2022 09:27:10 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 3gbcb7hua2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 09:27:10 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24U9ClIm49938918
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 May 2022 09:12:47 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1901211C050;
+        Mon, 30 May 2022 09:27:07 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 06EEB11C04C;
+        Mon, 30 May 2022 09:27:07 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 30 May 2022 09:27:06 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id C29FEE13C2; Mon, 30 May 2022 11:27:06 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     KVM <kvm@vger.kernel.org>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Subject: [PATCH 0/2] s390/gmap/pgtable improve handling of keyed KVM guests
+Date:   Mon, 30 May 2022 11:27:04 +0200
+Message-Id: <20220530092706.11637-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Date:   Mon, 30 May 2022 14:45:17 +0530
-Message-ID: <CAJGDS+Ep4NVQtPT5p4jwciYOQW=yiw=pHd9+FJ7gQC6aSMu4sg@mail.gmail.com>
-Subject: Discrepancy in vmexits due to kprobe #BP in a KVM environment
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _sRyGeoO0Pz-WEk8H8X-pgnD3QKlVy_n
+X-Proofpoint-ORIG-GUID: ysDSVcSpzZeMC47SAPw7N98g-oM706KU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-30_03,2022-05-27_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 mlxlogscore=753 spamscore=0 adultscore=0 malwarescore=0
+ phishscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205300044
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -55,38 +96,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello all,
+These two patches try to address stalls/timeouts that we have seen when
+switching many guests to enable storage keys.
 
-Thank you for answering my previous question where I had tried to
-cause a VMEXIT as a result of #BP interrupts arising out of a kprobe
-hit.
+Christian Borntraeger (2):
+  s390/gmap: voluntarily schedule during key setting
+  s390/pgtable: use non-quiescing sske for KVM switch to keyed
 
-I am now able to record VMEXITs of type KVM_EXIT_DEBUG and I also see
-that the userspace program (QEMU) is automatically taking care of
-injecting the #BP into the guest. I do not update the RIP any more. As
-a result of this, the guest execution continues successfully.
+ arch/s390/mm/gmap.c    | 14 ++++++++++++++
+ arch/s390/mm/pgtable.c |  2 +-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-I am now trying to set kretprobes and trying to record KVM_EXIT_DEBUG
-again. I am having trouble reliably getting the VMEXITs. For example,
-if I set a return probe on the function "native_safe_halt", I seem to
-get VMEXITs of type KVM_EXIT_DEBUG reliably continuously. If I try to
-set a return probe on the function "unix_stream_read_generic" however,
-I get VMEXITs right at the time the kernel module is loaded, after
-which the VMEXITs stop coming altogether. The same observation is seen
-when I set a kretprobe on the function "free_one_page" or
-"free_compound_page". Why is this behavior so unpredictable?
+-- 
+2.35.1
 
-It seems like some of these VMEXIT events are "caught by a lock" and
-they are released only when the kernel module is loaded/unloaded.
-
-I am using the kretprobe example from a read-only repository on Github
-(spotify/linux).
-
-Why do VMEXITs stop coming and how is it dependent on the probed
-function? Can the behavior of return probes change depending on the
-function being probed?
-
-Thank you very much.
-
-Best Regards,
-Arnabjyoti Kalita
