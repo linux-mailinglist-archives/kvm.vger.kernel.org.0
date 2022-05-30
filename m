@@ -2,96 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80EA2537751
-	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 10:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 965F1537847
+	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 12:06:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234468AbiE3Ivc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 May 2022 04:51:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38208 "EHLO
+        id S234332AbiE3JPf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 May 2022 05:15:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234384AbiE3IvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 May 2022 04:51:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AA65778ED2
-        for <kvm@vger.kernel.org>; Mon, 30 May 2022 01:51:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653900659;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yKtdU5vxewPnOdOWNNLgSNOUnSAAIYi1vfN6EO9YdFk=;
-        b=R5SVOYsDxFyQ11QDLzl1iPRHg4fPSPus/6MPuzwgDFZyqtQLRJQKDQByAvYLa7lXeywW5o
-        eylUWRBXyrp5ubvEVxCzms0efFQ8UXejLNOZ8R96rcFdO1hdxqk74SWKIIM6QjIZ+rc2ye
-        syiyybXzYR+I8sFl43JS7v33o0I3Wl8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-68-eDQB5Cx-OC2kcv7cACYsXg-1; Mon, 30 May 2022 04:50:52 -0400
-X-MC-Unique: eDQB5Cx-OC2kcv7cACYsXg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5BD66181E07C;
-        Mon, 30 May 2022 08:50:39 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DC65C23DC1;
-        Mon, 30 May 2022 08:50:38 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 1/1] MAINTAINERS: Update s390 virtio-ccw
-In-Reply-To: <20220525144028.2714489-2-farman@linux.ibm.com>
-Organization: Red Hat GmbH
-References: <20220525144028.2714489-1-farman@linux.ibm.com>
- <20220525144028.2714489-2-farman@linux.ibm.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Mon, 30 May 2022 10:50:37 +0200
-Message-ID: <874k17v1ya.fsf@redhat.com>
+        with ESMTP id S233294AbiE3JPc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 May 2022 05:15:32 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99BE679391
+        for <kvm@vger.kernel.org>; Mon, 30 May 2022 02:15:29 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id r65so8218707oia.9
+        for <kvm@vger.kernel.org>; Mon, 30 May 2022 02:15:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=stonybrook.edu; s=sbu-gmail;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=JMYsR2Kv//YaZ7QShXeZBhZQwYsMq/3jlmc79DNtU6I=;
+        b=r5usHSRYiwNNYTwmkD2OFG3o4xlTabCtnLviftTDB2lrQxLpTOfnMLrGRx+VJYP0Ra
+         dkBXSu//8oTVuZvlzjYBFxSLrlzQTBicM9yLtF6ZlsISIVYG+jh2siYnEjNYAgPg1QH4
+         G9882CBZYFtekWWqDMaXffH6bHKaF/OVcV/wQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=JMYsR2Kv//YaZ7QShXeZBhZQwYsMq/3jlmc79DNtU6I=;
+        b=7jDWciPkEetMYlxMTRQve0NnGNZasM9MZ+i/MBL6M1DhOU8YT+eaZn+nD45G5lE+/X
+         bMCpPkhOOVJHtoinuL3xfrr7A+wz2agzWK3pjW6HM8mrViVIkQzNmvfWmsgEianwoIzi
+         Y9J3/S8gd6OQkFU3sVkGpQMSvZrau/h+iQDTbM/VWdpXXoCTj2fBXkwVVANfygR42imw
+         F/qcXJ1nH0lZ5TLJmuRb6TzjFA3TfqdW/0YGgEld5DB46WF+zlquzkjTQe7CmPWhy02o
+         TZDtmOjls4sLVR4xzzlFFugngTTUSHOjllC7N/OG6u5gP8R5RyvEpd7c5L4L+wrLz7w+
+         /O1g==
+X-Gm-Message-State: AOAM533YEsfvahIMLw6hm+6SSd4SvZwBefHvu/2+JcT1jUwwz4PuxcjG
+        UQmN/u0cShdFsFxl/7nl43QwB0HlUiAQbFg/zAKd1Z54QZ0=
+X-Google-Smtp-Source: ABdhPJwVaJTrWGMMIAYb7bwD+kQVwSv5HXtRyOFuq0eTm8607qQGuhBKXAXbELFOQbgRlqJM8cjGjb0uXDZnLbo+yc8=
+X-Received: by 2002:a05:6808:1288:b0:32b:9b72:e9b2 with SMTP id
+ a8-20020a056808128800b0032b9b72e9b2mr9450101oiw.37.1653902128840; Mon, 30 May
+ 2022 02:15:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
+Date:   Mon, 30 May 2022 14:45:17 +0530
+Message-ID: <CAJGDS+Ep4NVQtPT5p4jwciYOQW=yiw=pHd9+FJ7gQC6aSMu4sg@mail.gmail.com>
+Subject: Discrepancy in vmexits due to kprobe #BP in a KVM environment
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 25 2022, Eric Farman <farman@linux.ibm.com> wrote:
+Hello all,
 
-> Add myself to the kernel side of virtio-ccw
+Thank you for answering my previous question where I had tried to
+cause a VMEXIT as a result of #BP interrupts arising out of a kprobe
+hit.
 
-Thanks a lot!
+I am now able to record VMEXITs of type KVM_EXIT_DEBUG and I also see
+that the userspace program (QEMU) is automatically taking care of
+injecting the #BP into the guest. I do not update the RIP any more. As
+a result of this, the guest execution continues successfully.
 
->
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 6618e9b91b6c..1d2c6537b834 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20933,6 +20933,7 @@ F:	include/uapi/linux/virtio_crypto.h
->  VIRTIO DRIVERS FOR S390
->  M:	Cornelia Huck <cohuck@redhat.com>
->  M:	Halil Pasic <pasic@linux.ibm.com>
-> +M:	Eric Farman <farman@linux.ibm.com>
->  L:	linux-s390@vger.kernel.org
->  L:	virtualization@lists.linux-foundation.org
->  L:	kvm@vger.kernel.org
+I am now trying to set kretprobes and trying to record KVM_EXIT_DEBUG
+again. I am having trouble reliably getting the VMEXITs. For example,
+if I set a return probe on the function "native_safe_halt", I seem to
+get VMEXITs of type KVM_EXIT_DEBUG reliably continuously. If I try to
+set a return probe on the function "unix_stream_read_generic" however,
+I get VMEXITs right at the time the kernel module is loaded, after
+which the VMEXITs stop coming altogether. The same observation is seen
+when I set a kretprobe on the function "free_one_page" or
+"free_compound_page". Why is this behavior so unpredictable?
 
-...anyone feel like picking this up directly? It feels a bit silly to do
-a pull request for a one-liner.
+It seems like some of these VMEXIT events are "caught by a lock" and
+they are released only when the kernel module is loaded/unloaded.
 
-In any case,
+I am using the kretprobe example from a read-only repository on Github
+(spotify/linux).
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Why do VMEXITs stop coming and how is it dependent on the probed
+function? Can the behavior of return probes change depending on the
+function being probed?
 
+Thank you very much.
+
+Best Regards,
+Arnabjyoti Kalita
