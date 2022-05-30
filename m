@@ -2,140 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18D345379A2
-	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 13:17:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DF94537A29
+	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 13:50:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235608AbiE3LRF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 May 2022 07:17:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34156 "EHLO
+        id S235805AbiE3Lux (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 May 2022 07:50:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233351AbiE3LRC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 May 2022 07:17:02 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2CC2BFF;
-        Mon, 30 May 2022 04:17:01 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24U9hhWq012309;
-        Mon, 30 May 2022 11:17:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=P9AVFZWf0HG36drg4odsdhvueQ9fVsxMlv3iuTAcDH8=;
- b=lU/ONV7vXcmpFyNn60Vl2GVk7hUd+M1fEVl6YB2ow2u9spcxAAszb7NDyCYkkdR8p7FZ
- 8tQur4sCOHD1bGCPsx3/yOvrQsN8maoLMYXnhiOZdYMzQB62rFCL2cJSLFkgJu3bu0LS
- 8TJ8rL8AC4q6Q3E+2sXvhiWmXWngNSANptWZpHiW4TMj4Pm1VuWdgux2524EJ0RyE0oM
- yZTwUHG+hmAy6kG6srctmZCai7QSdFfMb9eYliNGfwRl/3FaWoBHpZUPGvmLFNuY0x+5
- t6DmRDCDYxqB+Sf9r+oK1DOG7qqqlWBpP9iJ05k3ogLLbwo914Pr5IVkoInJum152AKt Mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcuhw9jpm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 May 2022 11:17:00 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24UB9EqO012053;
-        Mon, 30 May 2022 11:17:00 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcuhw9jpb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 May 2022 11:17:00 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24UB4cZf031661;
-        Mon, 30 May 2022 11:16:58 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gbc7h2m8m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 May 2022 11:16:58 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24UBGtLU20775282
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 May 2022 11:16:55 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 12BB2A405C;
-        Mon, 30 May 2022 11:16:55 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D40EA4054;
-        Mon, 30 May 2022 11:16:54 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.12.149])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 30 May 2022 11:16:54 +0000 (GMT)
-Date:   Mon, 30 May 2022 13:16:52 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        scgl@linux.ibm.com, mimu@linux.ibm.com
-Subject: Re: [PATCH v10 18/19] KVM: s390: pv: avoid export before import if
- possible
-Message-ID: <20220530131652.4a0b0057@p-imbrenda>
-In-Reply-To: <d76e875c360c53d6bd03c3f2767c90dcc4ca6df9.camel@linux.ibm.com>
-References: <20220414080311.1084834-1-imbrenda@linux.ibm.com>
-        <20220414080311.1084834-19-imbrenda@linux.ibm.com>
-        <d76e875c360c53d6bd03c3f2767c90dcc4ca6df9.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S235985AbiE3LtR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 May 2022 07:49:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 441F16B7C7
+        for <kvm@vger.kernel.org>; Mon, 30 May 2022 04:49:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653911351;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1jBLgUxgHH8kcMeU83Uqv8BeFNU4gu6zKWN29kUJs70=;
+        b=UmpZqp6Jf69R6diML4pTUwRuIIJ6G3fc5oqooJhgEzgwuKgg8d3eSOEn+oLEuilbV4xGte
+        w4UoYqh4Hass6nj+bgo2e9KsqmzxqGNp9u9XwDfQ2G9SE9Q2yJntJhISjz7G1UwFQbZcsu
+        EcB6nxn8uPd54qNOLmiNQf4AN8UMI5Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-375-2pVTSCIONnyhIaPVCzKfUA-1; Mon, 30 May 2022 07:49:06 -0400
+X-MC-Unique: 2pVTSCIONnyhIaPVCzKfUA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 208D7811E75;
+        Mon, 30 May 2022 11:49:06 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B9387492CA2;
+        Mon, 30 May 2022 11:49:05 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id 2AD82180039F; Mon, 30 May 2022 13:49:04 +0200 (CEST)
+Date:   Mon, 30 May 2022 13:49:04 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 18/36] i386/tdx: Skip BIOS shadowing setup
+Message-ID: <20220530114904.242xqql3xfugy2a7@sirius.home.kraxel.org>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-19-xiaoyao.li@intel.com>
+ <20220524070804.tcrsg7cwlnbkzhjz@sirius.home.kraxel.org>
+ <b294af31-fe92-f251-5d3e-0e439a59ee1e@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1EpXGJDaZm9b2eG_pQWvgVLYvfbeKl79
-X-Proofpoint-GUID: IHiGLOAV--jpkv7lrNu626JPF5eRkpEX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-30_03,2022-05-30_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 spamscore=0 priorityscore=1501
- bulkscore=0 mlxscore=0 impostorscore=0 adultscore=0 mlxlogscore=999
- suspectscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2205300058
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b294af31-fe92-f251-5d3e-0e439a59ee1e@intel.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 30 May 2022 12:07:43 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Thu, May 26, 2022 at 10:48:56AM +0800, Xiaoyao Li wrote:
+> On 5/24/2022 3:08 PM, Gerd Hoffmann wrote:
+> > On Thu, May 12, 2022 at 11:17:45AM +0800, Xiaoyao Li wrote:
+> > > TDX guest cannot go to real mode, so just skip the setup of isa-bios.
+> > 
+> > Does isa-bios setup cause any actual problems?
+> > (same question for patch #19).
+> 
+> It causes mem_region split and mem_slot deletion on KVM.
+> 
+> TDVF marks pages starting from 0x800000 as TEMP_MEM and TD_HOB, which are
+> TD's private memory and are TDH_MEM_PAGE_ADD'ed to TD via
+> KVM_TDX_INIT_MEM_REGION
+> 
+> However, if isa-bios and pc.rom are not skipped, the memory_region
+> initialization of them is after KVM_TDX_INIT_MEM_REGION in
+> tdx_machine_done_notify(). (I didn't figure out why this order though)
+> 
+> And the it causes memory region split that splits
+> 	[0, ram_below_4g)
+> to
+> 	[0, 0xc0 000),
+> 	[0xc0 000, 0xe0 000),
+> 	[0xe0 000, 0x100 000),
+> 	[0x100 000, ram_below_4g)
+> 
+> which causes mem_slot deletion on KVM. On KVM side, we lose the page content
+> when mem_slot deletion.  Thus, the we lose the content of TD HOB.
 
-> On Thu, 2022-04-14 at 10:03 +0200, Claudio Imbrenda wrote:
->=20
-> > diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> > index e358b8bd864b..43393568f844 100644
-> > --- a/arch/s390/kernel/uv.c
-> > +++ b/arch/s390/kernel/uv.c
-> > @@ -236,7 +236,8 @@ static int make_secure_pte(pte_t *ptep, unsigned
-> > long addr,
-> > =C2=A0
-> > =C2=A0static bool should_export_before_import(struct uv_cb_header *uvcb,
-> > struct mm_struct *mm)
-> > =C2=A0{
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return uvcb->cmd !=3D UVC_CM=
-D_UNPIN_PAGE_SHARED &&
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return !test_bit_inv(BIT_UV_=
-FEAT_MISC,
-> > &uv_info.uv_feature_indications) &&
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0uvcb->cmd !=3D UVC_CMD_UNPIN_PAGE_SHARED &&
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0atomic_read(&mm->context.protected_count) > 1; =
-=20
->=20
-> This might be nicer to read like this:
->=20
-> if (test_bit_inv(BIT_UV_FEAT_MISC, &uv_info.uv_feature_indications))
->   return false;
->=20
-> if (uvcb->cmd =3D=3D UVC_CMD_UNPIN_PAGE_SHARED)
->   return false;
->=20
-> return atomic_read(&mm->context.protected_count) > 1;
+Hmm, removing and re-creating memory slots shouldn't cause page content
+go away.   I'm wondering what the *real* problem is?  Maybe you loose
+tdx-specific state, i.e. this removes TDH_MEM_PAGE_ADD changes?
 
-fair enough
+> Yes, the better solution seems to be ensure KVM_TDX_INIT_MEM_REGION is
+> called after all the mem region is settled down.
 
-then I'll also fix patch 6 in a similar way, the function is first
-introduced there
+Yes, especially if tdx can't tolerate memory slots coming and going.
 
+> But I haven't figured out the reason why the isa-bios and pc.rom
+> initialization happens after machine_init_done_notifier
 
+Probably happens when a flatview is created from the address space.
+
+Maybe that is delayed somehow for machine creation, so all the address
+space updates caused by device creation don't lead to lots of flatviews
+being created and thrown away.
+
+> on the other hand, to keep isa-bios and pc.rom, we need additional work to
+> copy the content from the end_of_4G to end_of_1M.
+
+There is no need for copying, end_of_1M is a alias memory region for
+end_of_4G, so the backing storage is the same.
+
+> I'm not sure if isa-bios and pc.rom are needed from people on TD guest, so I
+> just skip them for simplicity,
+
+Given that TDX guests start in 32bit mode not in real mode everything
+should work fine without isa-bios.
+
+I'd prefer to avoid creating a special case for tdx though.  Should make
+long-term maintenance a bit easier when this is not needed.
+
+take care,
+  Gerd
 
