@@ -2,155 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD7695378D6
-	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 12:07:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 897495377DE
+	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 12:05:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234898AbiE3JrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 May 2022 05:47:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57890 "EHLO
+        id S234916AbiE3JsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 May 2022 05:48:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234893AbiE3JrJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 May 2022 05:47:09 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB2FA38B4
-        for <kvm@vger.kernel.org>; Mon, 30 May 2022 02:47:07 -0700 (PDT)
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 10DB03FBEF
-        for <kvm@vger.kernel.org>; Mon, 30 May 2022 09:47:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1653904025;
-        bh=0UZymv9RVAChspHI58gTmQkqQr5ViPWxsQqyFUaGwGI=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-        b=MlIRlTGna75DELC952I/iXncR8JeqwoAu4qWNXAQJ6YDkbXA0Mhvq6ltdPJMyJVZ+
-         3nSTe444srfuSvqQS6uMpe5GZNsAofXaE67pkdTOeZQyRq/NbmXHRwwXPRcHEqsvn8
-         vh8IPUHNLo+1qjKmPn5RAIv2s3NQ57q0UkiZIsW+/JqZOhYiOMFYhLyuY2jWC3sUPl
-         W39oSw41A0ZkC06YYvM90LcZUCD0XzUeWgmPhUu7GvfnekCO7fScHcAidA2+bOgcK8
-         fNblBrm8nTwlw4qbt5aeiL902gCYhR819eIoRNrjeNlLRrU9kMIXQzMxQm8Yoqu+P5
-         4K+WTZzWCDiYQ==
-Received: by mail-wr1-f70.google.com with SMTP id t8-20020adff048000000b002102a5877d5so533937wro.21
-        for <kvm@vger.kernel.org>; Mon, 30 May 2022 02:47:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0UZymv9RVAChspHI58gTmQkqQr5ViPWxsQqyFUaGwGI=;
-        b=4bePjBIgWfUc7v0LDa+P8glzwkkBYiA/WSfpqEEss6YfoAxqEQSugqpqynZaE/UwO5
-         i1HCzlrwM/XN07tRq75A7c02CV6hpszAnmZ45W1sbYQfz92yklQAdhGV3anpfUSY8HTH
-         xXmm5xLcPejSly9VYWOfoMZGgiF7c1Rc1id+PaEfk499jjFe/y3G8QTiSkiohnlB1//p
-         iW8irVaDfm8/38pCCxn/kMSy9iyeljV+wDA4Ad1s2CzIbeI/5tsEHAebD0/Q3nlrhP2A
-         JVftkULz9V2urGgDD3omXy717bGUWsWOpYYtFms9GU+zkUeTI3C5bSpXOnvhi+XT9+xe
-         o9ow==
-X-Gm-Message-State: AOAM5332PfwqMnw9RjPFiT7I5DbMEj6do4eKYUGfYDNtwJCN+Jt+Iu6p
-        b9E1q2DRK0YbZpNltS1dAVaOdKRTSeqvUi4ly1WtqvklSBBKbW4XwRYXm01FG+HPkW2VeTP+9dU
-        2REo3O6KLdHjnyK15e+gfGSsjbk/KOw==
-X-Received: by 2002:a05:600c:501f:b0:397:74e2:caa1 with SMTP id n31-20020a05600c501f00b0039774e2caa1mr18326898wmr.89.1653904023960;
-        Mon, 30 May 2022 02:47:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxcIRFrZmFoHMctcwJfjIoXZM+fuLzFmiVCBZ3hBYIMDRUovPi+iGVmBjDvXX5Wh2a1poEgFA==
-X-Received: by 2002:a05:600c:501f:b0:397:74e2:caa1 with SMTP id n31-20020a05600c501f00b0039774e2caa1mr18326883wmr.89.1653904023811;
-        Mon, 30 May 2022 02:47:03 -0700 (PDT)
-Received: from alex.home (lfbn-gre-1-146-29.w90-112.abo.wanadoo.fr. [90.112.113.29])
-        by smtp.gmail.com with ESMTPSA id f12-20020a05600c154c00b003942a244f30sm13897640wmg.9.2022.05.30.02.47.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 May 2022 02:47:03 -0700 (PDT)
-From:   Alexandre Ghiti <alexandre.ghiti@canonical.com>
-To:     =?UTF-8?q?Heiko=20St=C3=BCbner?= <heiko@sntech.de>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Cc:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
-Subject: [PATCH -for-next] riscv: Fix missing PAGE_PFN_MASK
-Date:   Mon, 30 May 2022 11:47:01 +0200
-Message-Id: <20220530094701.2891404-1-alexandre.ghiti@canonical.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S234834AbiE3JsD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 May 2022 05:48:03 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A7F26119;
+        Mon, 30 May 2022 02:48:01 -0700 (PDT)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24U9XuLY013204;
+        Mon, 30 May 2022 09:48:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Hzm8c5/8EdQNvMJmMuq7BOHj90yRQFACoXyiplHq1Vc=;
+ b=ZWQrjlBVZPlsZebsw/18WEh4xr0GUd0vNeH8T9MLRhxrblIsriZRmuljjTg+yXGIVOJI
+ OgVqD0dA8s771JUG43V/jul+1HhXTih08UZWuf1yPLfnF20cL8CDhGTHJ8xsvzToQPFD
+ 4GtjoKua98Z70VJtKYS5HfVRIwSfMj0iv99bCC1Iw625yyPBR8DGZGWCrdZYEqF+7YSs
+ EwOiEzL6AUgC/RVNSile7SqfD173NfVUKAZFHGU3vXm1s3UdwM0/q41OJ97O1gjqaOED
+ L2KX9Sx6J/3ghYdE+wQpwsBSbb9gxgbdf2j7nmogOftSj9wSN1EMccpMAgNd9Vtm4ARY mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcudgg7pc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 09:48:00 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24U9dHsL030107;
+        Mon, 30 May 2022 09:47:59 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcudgg7p1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 09:47:59 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24U9cvvk006956;
+        Mon, 30 May 2022 09:47:58 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3gbbynjgqp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 09:47:57 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24U9kqfD32702770
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 May 2022 09:46:52 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 034C2A4054;
+        Mon, 30 May 2022 09:47:55 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7DDFAA405B;
+        Mon, 30 May 2022 09:47:54 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.70.209])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 30 May 2022 09:47:54 +0000 (GMT)
+Message-ID: <3a02e7f632de52a2d6dcb63a5b8a17f92336c3ab.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 16/19] KVM: s390: pv: api documentation for
+ asynchronous destroy
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com
+Date:   Mon, 30 May 2022 11:47:54 +0200
+In-Reply-To: <20220414080311.1084834-17-imbrenda@linux.ibm.com>
+References: <20220414080311.1084834-1-imbrenda@linux.ibm.com>
+         <20220414080311.1084834-17-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.1 (3.44.1-1.fc36) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hbu-QZdWyNhqF1raQcJI76uWCXGpYGGj
+X-Proofpoint-ORIG-GUID: 33Oha-7OFQBKJl0XvaEfaYD7JnaFSPow
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-30_03,2022-05-27_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ spamscore=0 mlxscore=0 priorityscore=1501 clxscore=1015 phishscore=0
+ lowpriorityscore=0 impostorscore=0 mlxlogscore=861 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205300050
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are a bunch of functions that use the PFN from a page table entry
-that end up with the svpbmt upper-bits because they are missing the newly
-introduced PAGE_PFN_MASK which leads to wrong addresses conversions and
-then crash: fix this by adding this mask.
+On Thu, 2022-04-14 at 10:03 +0200, Claudio Imbrenda wrote:
+> Add documentation for the new commands added to the
+> KVM_S390_PV_COMMAND
+> ioctl.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Fixes: 100631b48ded ("riscv: Fix accessing pfn bits in PTEs for non-32bit variants")
-Signed-off-by: Alexandre Ghiti <alexandre.ghiti@canonical.com>
----
- arch/riscv/include/asm/pgtable-64.h | 4 ++--
- arch/riscv/include/asm/pgtable.h    | 4 ++--
- arch/riscv/kvm/mmu.c                | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/riscv/include/asm/pgtable-64.h b/arch/riscv/include/asm/pgtable-64.h
-index 6d59e4695200..0e57bf1e25e9 100644
---- a/arch/riscv/include/asm/pgtable-64.h
-+++ b/arch/riscv/include/asm/pgtable-64.h
-@@ -153,7 +153,7 @@ static inline pud_t pfn_pud(unsigned long pfn, pgprot_t prot)
- 
- static inline unsigned long _pud_pfn(pud_t pud)
- {
--	return pud_val(pud) >> _PAGE_PFN_SHIFT;
-+	return (pud_val(pud) & _PAGE_PFN_MASK) >> _PAGE_PFN_SHIFT;
- }
- 
- static inline pmd_t *pud_pgtable(pud_t pud)
-@@ -240,7 +240,7 @@ static inline void p4d_clear(p4d_t *p4d)
- static inline pud_t *p4d_pgtable(p4d_t p4d)
- {
- 	if (pgtable_l4_enabled)
--		return (pud_t *)pfn_to_virt(p4d_val(p4d) >> _PAGE_PFN_SHIFT);
-+		return (pud_t *)pfn_to_virt((p4d_val(p4d) & _PAGE_PFN_MASK) >> _PAGE_PFN_SHIFT);
- 
- 	return (pud_t *)pud_pgtable((pud_t) { p4d_val(p4d) });
- }
-diff --git a/arch/riscv/include/asm/pgtable.h b/arch/riscv/include/asm/pgtable.h
-index e2658a25f06d..43064025f4b0 100644
---- a/arch/riscv/include/asm/pgtable.h
-+++ b/arch/riscv/include/asm/pgtable.h
-@@ -255,7 +255,7 @@ static inline pgd_t pfn_pgd(unsigned long pfn, pgprot_t prot)
- 
- static inline unsigned long _pgd_pfn(pgd_t pgd)
- {
--	return pgd_val(pgd) >> _PAGE_PFN_SHIFT;
-+	return (pgd_val(pgd) & _PAGE_PFN_MASK) >> _PAGE_PFN_SHIFT;
- }
- 
- static inline struct page *pmd_page(pmd_t pmd)
-@@ -568,7 +568,7 @@ static inline pmd_t pmd_mkinvalid(pmd_t pmd)
- 	return __pmd(pmd_val(pmd) & ~(_PAGE_PRESENT|_PAGE_PROT_NONE));
- }
- 
--#define __pmd_to_phys(pmd)  (pmd_val(pmd) >> _PAGE_PFN_SHIFT << PAGE_SHIFT)
-+#define __pmd_to_phys(pmd)  ((pmd_val(pmd) & _PAGE_PFN_MASK) >> _PAGE_PFN_SHIFT << PAGE_SHIFT)
- 
- static inline unsigned long pmd_pfn(pmd_t pmd)
- {
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index f80a34fbf102..db03c5a29d4c 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -55,7 +55,7 @@ static inline unsigned long stage2_pte_index(gpa_t addr, u32 level)
- 
- static inline unsigned long stage2_pte_page_vaddr(pte_t pte)
- {
--	return (unsigned long)pfn_to_virt(pte_val(pte) >> _PAGE_PFN_SHIFT);
-+	return (unsigned long)pfn_to_virt((pte_val(pte) & _PAGE_PFN_MASK) >> _PAGE_PFN_SHIFT);
- }
- 
- static int stage2_page_size_to_level(unsigned long page_size, u32 *out_level)
--- 
-2.34.1
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
