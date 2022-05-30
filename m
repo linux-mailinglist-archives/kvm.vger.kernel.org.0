@@ -2,306 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AE625374BE
-	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 09:23:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35CC353758F
+	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 09:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232870AbiE3Gsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 May 2022 02:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41900 "EHLO
+        id S233342AbiE3HiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 May 2022 03:38:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231933AbiE3Gsj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 May 2022 02:48:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5E3254ECD6
-        for <kvm@vger.kernel.org>; Sun, 29 May 2022 23:48:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653893316;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=6/2+mw5wOTszB5ngQLGSvBZ5dsDI9mRue3prVUj4clU=;
-        b=DAI+g9qRzIPf5C1mQ95FzVI0UJk8KtGoHJUFhnL4OyrCP0+eCw3CMLecclmKZjEKSyN+jz
-        jgAQwBT+UxUnRP1Pvu7xq57bJ3Ly33h5enxUiltV04Bukm+TrTrbwZs8XlWFSYnjxoP+J5
-        FP5DLkt4X00eeoWtNBGHWCohif7oxSo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-351-zccNl2AIM0SOndchrcswvA-1; Mon, 30 May 2022 02:48:34 -0400
-X-MC-Unique: zccNl2AIM0SOndchrcswvA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 09301101AA46
-        for <kvm@vger.kernel.org>; Mon, 30 May 2022 06:48:34 +0000 (UTC)
-Received: from thuth.com (unknown [10.39.192.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 626EC1410DDB;
-        Mon, 30 May 2022 06:48:33 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH] x86: Fix typos
-Date:   Mon, 30 May 2022 08:48:31 +0200
-Message-Id: <20220530064831.8828-1-thuth@redhat.com>
+        with ESMTP id S233680AbiE3Hhw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 May 2022 03:37:52 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A36ED71DB4;
+        Mon, 30 May 2022 00:37:44 -0700 (PDT)
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24U6GHaG026664;
+        Mon, 30 May 2022 07:37:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=2x1TC/lV7sFdGeMYAlrgQ/GiPxyjwkcnYZuJEIQYjCw=;
+ b=K9V67GwPy/X/WBnScG9C3Cv15dCDT3gWQPOq3AzpHFVr3NNdymniBTb5HYz1Fyf4Lqd+
+ kiVYAwQuSHUqBsrb0UuYqbLVjL2wyMEJPwsTn7ok8mFW3cOpmdC/awQAwT4B7o8WPaK2
+ qMCt9TrCQYnkm5oGJwZbq38jgVmPeirmNhH6QQfQX4AbV9VzrMsa3YWgioeh9j3T6Tkf
+ 5J0jaz4Re1440FkcRqQShTjn/ja7DEE9vlotBZB3KZOKyBWPo/ijgNy4rhC4cK7IQ2xN
+ 4rZ7P8gzrQzLIfc5hHfSrOXlwYxYDHlMRxlqAEL9BgJHYKH8YHAw0cOr8VU2tqVUk+4Z aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcrgpscw1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 07:37:43 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24U7XrmX020012;
+        Mon, 30 May 2022 07:37:43 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gcrgpscvp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 07:37:43 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24U7J5Pg002807;
+        Mon, 30 May 2022 07:37:41 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3gbbynjb4e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 May 2022 07:37:41 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24U7bcpn16318822
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 May 2022 07:37:38 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3845642045;
+        Mon, 30 May 2022 07:37:38 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BCBF742042;
+        Mon, 30 May 2022 07:37:37 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.70.209])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 30 May 2022 07:37:37 +0000 (GMT)
+Message-ID: <96ee2d8c2c64b4968529b78bd7ad8a042542d353.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 13/19] KVM: s390: pv: destroy the configuration
+ before its memory
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com
+Date:   Mon, 30 May 2022 09:37:37 +0200
+In-Reply-To: <20220414080311.1084834-14-imbrenda@linux.ibm.com>
+References: <20220414080311.1084834-1-imbrenda@linux.ibm.com>
+         <20220414080311.1084834-14-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.1 (3.44.1-1.fc36) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: u_qdatLNA22tl79AEDvPCMrYuF3ry-qx
+X-Proofpoint-ORIG-GUID: GkGTbdCm_0xTLqL3EMHUcTxQx43sy4RC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-30_02,2022-05-27_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=999 spamscore=0 clxscore=1011 bulkscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205300039
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Correct typos which were discovered with the "codespell" utility.
+On Thu, 2022-04-14 at 10:03 +0200, Claudio Imbrenda wrote:
+> Move the Destroy Secure Configuration UVC before the loop to destroy
+> the memory. If the protected VM has memory, it will be cleaned up and
+> made accessible by the Destroy Secure Configuraion UVC. The struct
+> page for the relevant pages will still have the protected bit set, so
+> the loop is still needed to clean that up.
+>=20
+> Switching the order of those two operations does not change the
+> outcome, but it is significantly faster.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- I thought I had sent this out a while ago already, but I can't find this in
- the archives ... so I likely missed to hit the "send" button, or it didn't
- go through the mail server... Anyway, sorry if you got this twice.
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
- x86/access.c      | 10 +++++-----
- x86/cet.c         |  2 +-
- x86/eventinj.c    |  6 +++---
- x86/kvmclock.c    |  4 ++--
- x86/svm.c         |  2 +-
- x86/svm_tests.c   |  4 ++--
- x86/taskswitch2.c | 12 ++++++------
- x86/vmx.c         |  2 +-
- x86/vmx_tests.c   |  8 ++++----
- 9 files changed, 25 insertions(+), 25 deletions(-)
+See one tiny thing below.
 
-diff --git a/x86/access.c b/x86/access.c
-index 21b4d74..3832e2e 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -894,10 +894,10 @@ static void ac_test_show(ac_test_t *at)
- }
- 
- /*
-- * This test case is used to triger the bug which is fixed by
-+ * This test case is used to trigger the bug which is fixed by
-  * commit e09e90a5 in the kvm tree
-  */
--static int corrupt_hugepage_triger(ac_pt_env_t *pt_env)
-+static int corrupt_hugepage_trigger(ac_pt_env_t *pt_env)
- {
- 	ac_test_t at1, at2;
- 
-@@ -927,12 +927,12 @@ static int corrupt_hugepage_triger(ac_pt_env_t *pt_env)
- 	return 1;
- 
- err:
--	printf("corrupt_hugepage_triger test fail\n");
-+	printf("corrupt_hugepage_trigger test fail\n");
- 	return 0;
- }
- 
- /*
-- * This test case is used to triger the bug which is fixed by
-+ * This test case is used to trigger the bug which is fixed by
-  * commit 3ddf6c06e13e in the kvm tree
-  */
- static int check_pfec_on_prefetch_pte(ac_pt_env_t *pt_env)
-@@ -1149,7 +1149,7 @@ static int ac_test_exec(ac_test_t *at, ac_pt_env_t *pt_env)
- typedef int (*ac_test_fn)(ac_pt_env_t *pt_env);
- const ac_test_fn ac_test_cases[] =
- {
--	corrupt_hugepage_triger,
-+	corrupt_hugepage_trigger,
- 	check_pfec_on_prefetch_pte,
- 	check_large_pte_dirty_for_nowp,
- 	check_smep_andnot_wp,
-diff --git a/x86/cet.c b/x86/cet.c
-index ed8616a..c01dd89 100644
---- a/x86/cet.c
-+++ b/x86/cet.c
-@@ -37,7 +37,7 @@ static u64 cet_shstk_func(void)
- static u64 cet_ibt_func(void)
- {
- 	/*
--	 * In below assembly code, the first instruction at lable 2 is not
-+	 * In below assembly code, the first instruction at label 2 is not
- 	 * endbr64, it'll trigger #CP with error code 0x3, and the execution
- 	 * is terminated when HW detects the violation.
- 	 */
-diff --git a/x86/eventinj.c b/x86/eventinj.c
-index 3c0db56..3031c04 100644
---- a/x86/eventinj.c
-+++ b/x86/eventinj.c
-@@ -286,7 +286,7 @@ int main(void)
- 	printf("After int $33\n");
- 	report(test_count == 1, "int $33");
- 
--	/* Inject two HW interrupt than open iterrupt windows. Both interrupt
-+	/* Inject two HW interrupt than open interrupt windows. Both interrupt
- 	   will fault on IDT access */
- 	test_count = 0;
- 	flush_idt_page();
-@@ -302,8 +302,8 @@ int main(void)
- 
- 
- 	/* Inject HW interrupt, do sti and than (while in irq shadow) inject
--	   soft interrupt. Fault during soft interrupt. Soft interrup shoud be
--	   handled before HW interrupt */
-+	   soft interrupt. Fault during soft interrupt. Soft interrupt should
-+	   be handled before HW interrupt */
- 	test_count = 0;
- 	flush_idt_page();
- 	printf("Sending vec 32 and int $33\n");
-diff --git a/x86/kvmclock.c b/x86/kvmclock.c
-index de30a5e..f190048 100644
---- a/x86/kvmclock.c
-+++ b/x86/kvmclock.c
-@@ -201,8 +201,8 @@ static cycle_t pvclock_clocksource_read(struct pvclock_vcpu_time_info *src)
- 	/*
- 	 * Assumption here is that last_value, a global accumulator, always goes
- 	 * forward. If we are less than that, we should not be much smaller.
--	 * We assume there is an error marging we're inside, and then the correction
--	 * does not sacrifice accuracy.
-+	 * We assume there is an error margin we're inside, and then the
-+	 * correction does not sacrifice accuracy.
- 	 *
- 	 * For reads: global may have changed between test and return,
- 	 * but this means someone else updated poked the clock at a later time.
-diff --git a/x86/svm.c b/x86/svm.c
-index f6896f0..93794fd 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -409,7 +409,7 @@ int main(int ac, char **av)
- 	__setup_vm(&opt_mask);
- 
- 	if (!this_cpu_has(X86_FEATURE_SVM)) {
--		printf("SVM not availble\n");
-+		printf("SVM not available\n");
- 		return report_summary();
- 	}
- 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 6a9b03b..1bd4d3b 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -397,7 +397,7 @@ static bool msr_intercept_finished(struct svm_test *test)
-         }
- 
-         /*
--         * Warn that #GP exception occured instead.
-+         * Warn that #GP exception occurred instead.
-          * RCX holds the MSR index.
-          */
-         printf("%s 0x%lx #GP exception\n",
-@@ -3208,7 +3208,7 @@ static void svm_nm_test(void)
- 
-     vmcb->save.cr0 = vmcb->save.cr0 & ~(X86_CR0_TS | X86_CR0_EM);
-     report(svm_vmrun() == SVM_EXIT_VMMCALL && nm_test_counter == 2,
--        "fnop with CR0.TS and CR0.EM unset no #NM excpetion");
-+        "fnop with CR0.TS and CR0.EM unset no #NM exception");
- }
- 
- 
-diff --git a/x86/taskswitch2.c b/x86/taskswitch2.c
-index 3c9af4c..db69f07 100644
---- a/x86/taskswitch2.c
-+++ b/x86/taskswitch2.c
-@@ -148,13 +148,13 @@ static void test_kernel_mode_int(void)
- 
- 	/* test that HW exception triggesr task gate */
- 	set_intr_task_gate(0, de_tss);
--	printf("Try to devide by 0\n");
-+	printf("Try to divide by 0\n");
- 	asm volatile ("divl %3": "=a"(res)
- 		      : "d"(0), "a"(1500), "m"(test_divider));
- 	printf("Result is %d\n", res);
--	report(res == 150, "DE exeption");
-+	report(res == 150, "DE exception");
- 
--	/* test if call HW exeption DE by int $0 triggers task gate */
-+	/* test if call HW exception DE by int $0 triggers task gate */
- 	test_count = 0;
- 	set_intr_task_gate(0, de_tss);
- 	printf("Call int 0\n");
-@@ -168,7 +168,7 @@ static void test_kernel_mode_int(void)
- 	printf("Call into\n");
- 	asm volatile ("addb $127, %b0\ninto"::"a"(127));
- 	printf("Return from into\n");
--	report(test_count, "OF exeption");
-+	report(test_count, "OF exception");
- 
- 	/* test if HW exception BP triggers task gate */
- 	test_count = 0;
-@@ -176,7 +176,7 @@ static void test_kernel_mode_int(void)
- 	printf("Call int 3\n");
- 	asm volatile ("int $3");
- 	printf("Return from int 3\n");
--	report(test_count == 1, "BP exeption");
-+	report(test_count == 1, "BP exception");
- 
- 	/*
- 	 * test that PF triggers task gate and error code is placed on
-@@ -189,7 +189,7 @@ static void test_kernel_mode_int(void)
- 	printf("Access unmapped page\n");
- 	*fault_addr = 0;
- 	printf("Return from pf tss\n");
--	report(test_count == 1, "PF exeption");
-+	report(test_count == 1, "PF exception");
- }
- 
- static void test_gdt_task_gate(void)
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 093da5e..c024298 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -1477,7 +1477,7 @@ static int test_vmxon(void)
- 		goto out;
- 	}
- 
--	/* invalid revision indentifier */
-+	/* invalid revision identifier */
- 	*bsp_vmxon_region = 0xba9da9;
- 	ret1 = vmx_on();
- 	report(ret1, "test vmxon with invalid revision identifier");
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index df93198..4d581e7 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -459,7 +459,7 @@ static void cr_shadowing_main(void)
- 	vmx_set_test_stage(2);
- 	write_cr0(guest_cr0);
- 	if (vmx_get_test_stage() == 3)
--		report_fail("Write throuth CR0");
-+		report_fail("Write through CR0");
- 	else
- 		vmcall();
- 	vmx_set_test_stage(3);
-@@ -2549,7 +2549,7 @@ static void ept_access_paddr(unsigned long ept_access, unsigned long pte_ad,
- 	 * constructed our test such that those other 511 PTEs aren't used by
- 	 * the guest: data->gva is at the beginning of a 1G huge page, thus the
- 	 * PTE we're modifying is at the beginning of a 4K page and the
--	 * following 511 entires are also under our control (and not touched by
-+	 * following 511 entries are also under our control (and not touched by
- 	 * the guest).
- 	 */
- 	gpa = virt_to_phys(ptep);
-@@ -4063,7 +4063,7 @@ static void test_posted_intr(void)
- 	report_prefix_pop();
- 
- 	/*
--	 * Test posted-interrupt descriptor addresss
-+	 * Test posted-interrupt descriptor address
- 	 */
- 	for (i = 0; i < 6; i++) {
- 		test_pi_desc_addr(1ul << i, false);
-@@ -10499,7 +10499,7 @@ static void atomic_switch_msrs_test(int count)
-         struct vmx_msr_entry *vm_exit_store;
- 	int max_allowed = max_msr_list_size();
- 	int byte_capacity = 1ul << (msr_list_page_order + PAGE_SHIFT);
--	/* Exceeding the max MSR list size at exit trigers KVM to abort. */
-+	/* Exceeding the max MSR list size at exit triggers KVM to abort. */
- 	int exit_count = count > max_allowed ? max_allowed : count;
- 	int cleanup_count = count > max_allowed ? 2 : 1;
- 	int i;
--- 
-2.27.0
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index be3b467f8feb..bd850be08c86 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+[...]
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cc =3D uv_cmd_nodata(kvm_s390_=
+pv_get_handle(kvm),
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 UVC_CMD_DESTROY_SEC_CONF, rc, rrc);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WRITE_ONCE(kvm->arch.gmap=
+->guest_handle, 0);
+
+Maybe it makes sense to also move the WRITE_ONCE up.
 
