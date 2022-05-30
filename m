@@ -2,61 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DFF6538506
-	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 17:36:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6004538523
+	for <lists+kvm@lfdr.de>; Mon, 30 May 2022 17:42:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241764AbiE3Pf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 May 2022 11:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39684 "EHLO
+        id S237788AbiE3PmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 May 2022 11:42:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242708AbiE3PfW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 May 2022 11:35:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4941F14916C;
-        Mon, 30 May 2022 07:41:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D77A860EA6;
-        Mon, 30 May 2022 14:41:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5CCEC385B8;
-        Mon, 30 May 2022 14:41:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653921717;
-        bh=8abrn0+fyaPOA35f7xmWZpHOHqa414fCZZbKmkVupjM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pqwLJQyttHeCPer1sfDH0foSp8e/arMMnFrMmAru9XrZ6jm7g/ajrEcIvpf4/sGG8
-         j+mEfsV8h2gk7WZptLWACzxOAyIyN2p8t5LHZluCv/mpLj+mKbccprao57jsNMQgcn
-         FKnAHaVnVyGHF05wiz5jDb2dm4jpMxLWhZX4mwr8OjIXrsErRQIZobH/VG6z6E33sl
-         eSFuyCLMbqKiHRCj5NUnbmS7KTlV9tKcZqIlEKX2ldQ9IEAo8XtAivLXb7Uzn19oUF
-         7gL9/wR8KRd9D24wVXGUQLmuu7LICcpmWXyk7qDp+lD3dUMcZkhyXK1y3YoUuHEYi5
-         gurOAs1LGl21w==
-Date:   Mon, 30 May 2022 16:41:54 +0200
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-        Quentin Perret <qperret@google.com>, kernel-team@android.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 01/18] KVM: arm64: Always start with clearing SVE flag on
- load
-Message-ID: <YpTXsgd1MPpJEjUJ@sirena.org.uk>
-References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-2-maz@kernel.org>
+        with ESMTP id S240606AbiE3PmA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 May 2022 11:42:00 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27C0320FC52;
+        Mon, 30 May 2022 07:49:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653922155; x=1685458155;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xcOydMoGrTfPeiG4u/paPT/YoYgwMhUeig4F7gxUuY8=;
+  b=FaeC9TU5m0T/THcYrKB83tAtu4e4BsAoVcupO0N7oA99fEh0eSEpkmhu
+   hXv7XYAwsusuL2uvzaLWWpr7qajI+XLzR0TuHb6Ofe/ax8jQtYthpSQWN
+   3AOYMcFEKxqVYobTOkayQYJpPxugCyHQ4krQZa5353Cuyg1aHGEGXyD46
+   xOKql8LzQHZqR1t8b/33kQcJgD0NWa8b29sBDhr5+vCDFrEfQBQbSvhAH
+   JHZoRzxiepALimJZz5N2VnWIDrUZtE0dgDa+J+gipx3EamxjLr8Mstcnf
+   0hyo2GQPr4uug2NAO9fBnUsOPQ83VoEQ6WGw2JlLmU65WcYAwsI7WwLbE
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10363"; a="361394724"
+X-IronPort-AV: E=Sophos;i="5.91,263,1647327600"; 
+   d="scan'208";a="361394724"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2022 07:49:01 -0700
+X-IronPort-AV: E=Sophos;i="5.91,263,1647327600"; 
+   d="scan'208";a="903585639"
+Received: from embargo.jf.intel.com ([10.165.9.183])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2022 07:49:01 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     like.xu.linux@gmail.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH] KVM: x86: Bypass cpuid check for empty arch-lbr leaf
+Date:   Mon, 30 May 2022 10:48:29 -0400
+Message-Id: <20220530144829.39714-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="ttQtBwibfUEMVFH9"
-Content-Disposition: inline
-In-Reply-To: <20220528113829.1043361-2-maz@kernel.org>
-X-Cookie: May your camel be as swift as the wind.
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,49 +56,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On arch-lbr capable platforms, cpuid(0x1c,0) returns meaningful
+arch-lbr supported values, in this case, eax[7:0] = lbr depth mask.
+Whereas on legacy platforms(non-arch-lbr), cpuid(0x1c,0) returns
+with eax/ebx/ecx/edx zeroed out.
 
---ttQtBwibfUEMVFH9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On legacy platforms, during selftests app startup, it first gets
+supported cpuids by KVM_GET_SUPPORTED_CPUID then sets the returned
+data with KVM_SET_CPUID2, this leads to empty cpuid leaf(0x1c,0)
+written to KVM and makes the check fail, app finally ends up with
+below error message when run selftest:
 
-On Sat, May 28, 2022 at 12:38:11PM +0100, Marc Zyngier wrote:
-> On each vcpu load, we set the KVM_ARM64_HOST_SVE_ENABLED
-> flag if SVE is enabled for EL0 on the host. This is used to restore
-> the correct state on vpcu put.
->=20
-> However, it appears that nothing ever clears this flag. Once
-> set, it will stick until the vcpu is destroyed, which has the
-> potential to spuriously enable SVE for userspace.
+ KVM_SET_CPUID2 failed, rc: -1 errno: 22
 
-Oh dear.
+So check the validity of the leaf(0x1c,0) before validate lbr
+depth value.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+QEMU filters out empty CPUID leaves before calls KVM_SET_CPUID2,
+so this is not a problem.
 
-> We probably never saw the issue because no VMM uses SVE, but
-> that's still pretty bad. Unconditionally clearing the flag
-> on vcpu load addresses the issue.
+Fixes: 4b73207592: ("KVM: x86/cpuid: Advertise Arch LBR feature in CPUID")
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+---
+ arch/x86/kvm/cpuid.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Unless I'm missing something since we currently always disable
-SVE on syscall even if the VMM were using SVE for some reason
-(SVE memcpy()?) we should already have disabled SVE for EL0 in
-sve_user_discard() during kernel entry so EL0 access to SVE
-should be disabled in the system register by the time we get
-here.
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 9c107b5cc88f..c2eab1a73aab 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -103,13 +103,14 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+ 			return -EINVAL;
+ 	}
+ 	best = cpuid_entry2_find(entries, nent, 0x1c, 0);
+-	if (best) {
++	if (best && best->eax) {
+ 		unsigned int eax, ebx, ecx, edx;
+ 
+ 		/* Reject user-space CPUID if depth is different from host's.*/
+ 		cpuid_count(0x1c, 0, &eax, &ebx, &ecx, &edx);
+ 
+-		if ((best->eax & 0xff) != BIT(fls(eax & 0xff) - 1))
++		if ((eax & 0xff) &&
++		    (best->eax & 0xff) != BIT(fls(eax & 0xff) - 1))
+ 			return -EINVAL;
+ 	}
+ 
+-- 
+2.27.0
 
---ttQtBwibfUEMVFH9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKU17EACgkQJNaLcl1U
-h9Bxzgf/W2VmJBtB0a4vcrBCgfX7ollA3ex5VNB6egRZO8MINJrGPpI+Jv5J21sA
-1ouYS/mgLxtq0X8ACQX1wcCv4SHFzZ+fOj0D7PM85BvUxWWF4AYlyjZ9dfpx0t4X
-BQykcxau0Ep3Gj27LAkCQxvAe/X5QEuymskYptEMrIigKy2Af+LwdwJNy03Pw/M7
-BJBGRk6DKpX9GBCnNx/zVjAp3wkpW50q67c2S+A35z2VzD5Fpk7zQWtwQGCp+X/D
-/UZr74rJl6izdLI+ycIFUr41Lq95C7cl4/mHC1h4S9i9ceklOthnl1BgxOY0c/FT
-zsZnSWRL7SBHTEnNr46EjfpsiId3Cg==
-=aTTw
------END PGP SIGNATURE-----
-
---ttQtBwibfUEMVFH9--
