@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 136575395DB
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 20:06:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 650255395DD
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 20:06:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346826AbiEaSGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 14:06:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36342 "EHLO
+        id S1346834AbiEaSGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 14:06:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346816AbiEaSGP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 14:06:15 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8394E8AE68
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:06:13 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id d12-20020a17090abf8c00b001e2eb431ce4so3030198pjs.1
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:06:13 -0700 (PDT)
+        with ESMTP id S1346816AbiEaSGS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 14:06:18 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8369BAF7
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:06:17 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id w2-20020a17090ac98200b001e0519fe5a8so3024605pjt.4
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:06:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=mFu6iMX87nna7NvQ1h70DyFL3gjd//hWF9G4LDYdoKs=;
-        b=RZAbhvi9Ma8iWYYK9n4vIXolgsgsZPb5tw01NgsKFiYFs7NbUw6S443+JZIGG3wU5i
-         rfekncIjPCRwfh4SnjOPfNpZk6vJUb3ERPj49044AgyZ9eRHI35DylfjsJ48sFciCwWz
-         zTELrC9m1nH6M7CM/BDzXXXGhEx1Od4DEMBXE=
+        bh=U8KygP5HX4ANbWdbvL1PVBHCmW/9zwhKWrTofJUHJ8g=;
+        b=KpPTUTlHGzyq7z5TXtGgnCLsz3TsaVTwnC4R9n6g0KBCtTdRfC2tR5xORvaoaLa8zh
+         09JbbaBhFlQfDHE5Fj8AzFo66zQtsoCo92UplQ4sBBRovj11j68IW/cDcnFkkALLfQkI
+         pvNwSTgedSrgMdoDINic6e3UhJLDzHxkj4xno=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=mFu6iMX87nna7NvQ1h70DyFL3gjd//hWF9G4LDYdoKs=;
-        b=rljm0mIxCO+MHDg5w/RsgjV+qd8qLE37zvR4eLbSjqUxvPWmMZknomZPenL3nDGphb
-         F7oJtm8GiUbvMhl0ezvNol2Eo6aUuYtiQMRiFZeFmE5ESOgc7nExpBNV2HqsXLjfsmNc
-         JFS6V+bFrt6AJS8fv3krCznZdjbHmYumTKulhKfnr0yDoTfN/k/3zsa6WcXI9j7xlRe8
-         nFlLGRdyAVf4gy8HHoErgPDYIihzqWpKgBi0k4pf95kFSwLQgFVACG83j6QAKkz/I+cZ
-         A6WTomn1ruxLMQi2BcJx8ZNK/vLDoV8BbtBeKCw+GgzVLChJL1fj8W9+nV6f35A29xAF
-         Ub3g==
-X-Gm-Message-State: AOAM533Z/tdtKgKKHEFQWhZbyhClVdUNVdx7Wy978BHTUiYqdrDj8b6Y
-        rxbLEQZQB1qda9kJu2iCVoPCRQ==
-X-Google-Smtp-Source: ABdhPJyvFP8ou6y6xiqGQWiMDZgSy3ovDYL5wv8GVhEXDUTiJKqTaPzPagdh0u4rf/FrKL2VAwb8tg==
-X-Received: by 2002:a17:903:2287:b0:164:83cf:bb15 with SMTP id b7-20020a170903228700b0016483cfbb15mr574939plh.49.1654020373077;
-        Tue, 31 May 2022 11:06:13 -0700 (PDT)
+        bh=U8KygP5HX4ANbWdbvL1PVBHCmW/9zwhKWrTofJUHJ8g=;
+        b=CuGrI/Tz+67Ga80eLN/dWMOdA3oYqkTLLhXzcldqThcbSVKPddYw9W4+57B9A0PSER
+         aLVnYiIUuVJluLWidHT1WGsvnG3OwUeqErPLw2QdnVllu8N9yFsx4cZR9FiXUXJvVnWs
+         cISfpL7jiihhwYq18D/NcnWI3vec+BWf3xQ+CmnbG2ZDlpN+acqDWiTFAAZ9PpL9Le57
+         uTNz39yeKc16RR5QRTtGwcj3jVBstmT/N9InqCcCve8kIcB8+MtlCAqu0JoYWZ1hzn31
+         gBT/L8DRbzp0lUT1Ak7B+2qORUsWojd6U2drdTcrbOQliyPLPzNobSiwBW3uu0uAmWgC
+         Yhqg==
+X-Gm-Message-State: AOAM530Y0W0hj2TCigW0votwbEyL/qUNVuC/DgBySkb5mfrGerhd/0pw
+        Udr5n1+LYtdZ6mGs9eba4Y6lyA==
+X-Google-Smtp-Source: ABdhPJxk0k0IE5MQ41zL5Wf8a/XJyLVLt7RJkuxqWxrzaxR2uwDa6Fx1or0jb5xUH07KYscnYdZ2Rw==
+X-Received: by 2002:a17:90a:2e83:b0:1da:3273:53ab with SMTP id r3-20020a17090a2e8300b001da327353abmr30031100pjd.14.1654020376713;
+        Tue, 31 May 2022 11:06:16 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id s22-20020a170902a51600b00161823de53csm11471517plq.282.2022.05.31.11.06.12
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902f54600b0016170bb6528sm11559540plf.113.2022.05.31.11.06.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 May 2022 11:06:12 -0700 (PDT)
-Date:   Tue, 31 May 2022 11:06:12 -0700
+        Tue, 31 May 2022 11:06:16 -0700 (PDT)
+Date:   Tue, 31 May 2022 11:06:15 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -53,15 +53,14 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Robert Dinse <nanook@eskimo.com>
-Subject: Re: [PATCH v2 7/8] KVM: x86: Bug the VM if the emulator generates a
- bogus exception vector
-Message-ID: <202205311106.58FC5B61@keescook>
+Subject: Re: [PATCH v2 8/8] KVM: x86: Bug the VM on an out-of-bounds data read
+Message-ID: <202205311106.76479DB1E6@keescook>
 References: <20220526210817.3428868-1-seanjc@google.com>
- <20220526210817.3428868-8-seanjc@google.com>
+ <20220526210817.3428868-9-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220526210817.3428868-8-seanjc@google.com>
+In-Reply-To: <20220526210817.3428868-9-seanjc@google.com>
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -72,21 +71,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 26, 2022 at 09:08:16PM +0000, Sean Christopherson wrote:
-> Bug the VM if KVM's emulator attempts to inject a bogus exception vector.
-> The guest is likely doomed even if KVM continues on, and propagating a
-> bad vector to the rest of KVM runs the risk of breaking other assumptions
-> in KVM and thus triggering a more egregious bug.
-> 
-> All existing users of emulate_exception() have hardcoded vector numbers
-> (__load_segment_descriptor() uses a few different vectors, but they're
-> all hardcoded), and future users are likely to follow suit, i.e. the
-> change to emulate_exception() is a glorified nop.
-> 
-> As for the ctxt->exception.vector check in x86_emulate_insn(), the few
-> known times the WARN has been triggered in the past is when the field was
-> not set when synthesizing a fault, i.e. for all intents and purposes the
-> check protects against consumption of uninitialized data.
+On Thu, May 26, 2022 at 09:08:17PM +0000, Sean Christopherson wrote:
+> Bug the VM and terminate emulation if an out-of-bounds read into the
+> emulator's data cache occurs.  Knowingly contuining on all but guarantees
+> that KVM will overwrite random kernel data, which is far, far worse than
+> killing the VM.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
