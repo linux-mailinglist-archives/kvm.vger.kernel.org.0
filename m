@@ -2,96 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63B4653903E
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 14:02:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2BCF539063
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 14:14:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344072AbiEaMCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 08:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34762 "EHLO
+        id S1344105AbiEaMOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 08:14:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233781AbiEaMCu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 08:02:50 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EACBE5BE6C;
-        Tue, 31 May 2022 05:02:48 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VADr19008901;
-        Tue, 31 May 2022 12:02:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=HAMbekByJXG5Ra0WnTNf1/wCwfvbw7mnCQYVB8/zg7I=;
- b=ch5uC3X18zYSIQJhIlGnzraA87txyYPEp/1fqLub7wsd0AbQ6/RIyFonXP1CUk/kMdrc
- jQaEJci7lVKFWTsPSMniRztpWON7B6ESfybB//S5Q8TwhrHowdX1s7LOPBbDrdR8Q5/f
- BtR9UJOX2lBCoZQna1+dB6EI2WUw82gKC1gjIY+/OXJNJYAY1ZG8ZkGFIFvC4bdOjD/O
- 46YJ5PJiP4EABgO5OP5N0Xqs+B2cAwvKrfQdNP5y2kMnE/Hxkv2BuS2w60pa3tOqlyTZ
- fgq+E8hiCum8F9mNNgvcC6ETSY0ovaGeTVTmG+61hhctQmego/19NwZ6S8eRLd7qzQHI kQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh311wcc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 12:02:45 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24VBu7HH022666;
-        Tue, 31 May 2022 12:02:45 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh311wc4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 12:02:45 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24VBno77002044;
-        Tue, 31 May 2022 12:02:44 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02wdc.us.ibm.com with ESMTP id 3gbc92kude-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 12:02:44 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24VC2gDh12517744
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 May 2022 12:02:43 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DFA14AC05B;
-        Tue, 31 May 2022 12:02:42 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 37540AC060;
-        Tue, 31 May 2022 12:02:42 +0000 (GMT)
-Received: from [9.160.37.241] (unknown [9.160.37.241])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 31 May 2022 12:02:42 +0000 (GMT)
-Message-ID: <7e561de8-be73-4b62-ea7c-36e659d87788@linux.ibm.com>
-Date:   Tue, 31 May 2022 08:02:41 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v19 11/20] s390/vfio-ap: prepare for dynamic update of
- guest's APCB on queue probe/remove
+        with ESMTP id S233776AbiEaMO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 08:14:28 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam08on2050.outbound.protection.outlook.com [40.107.100.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB60986EB;
+        Tue, 31 May 2022 05:14:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ya9/DVqeewT/cSqSk08kRBqp00S7E8zMpBSWQI40/HBgZLOmCU0wjV3UNjhL5OufedmjulGeOWtX+dT/uWW8BhxkDfKYhAN81QJetpccK4r6+frrCqnBL0r3vgVGgt2DObb267gVugRBdlArL+Ww7e896dAQQfS93G8gtrI7OKwhfEEkbZ4Yum6XuLwjjDrW5era3njnQlBPkJsOMgk5DfGqRpmY+qa1Cejs8pjb6Q12PwYs6Gq38QSiioVRRXpTiwL/hrjHS+KF2EiWdse6iBlmZ/0+7ztQ39u2+RIh4DlX9JXWeIKSV1vmRAh57bMqspT/dHj23R26eL+kOjh92Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DlWaG+n2ocJe9g5um+6DjnLMnUKEBajrxod8iliTn4o=;
+ b=T63cvpxtPMjEyADeTPt3UsHjIMCqk5Cy7lyQeCpLH4dRpff1Z9Qp3XZb2nI142cMF1vavHsY9xsJ4blFV9SPlaoH7rRqxuMaztklllV5y/BcrmCaAnoiroW1FMr6UtVHaLuQD5OEYXekyWNzPRD90GwcZCAgO8O7pkc9uggpke+lLphuSCl36XjbTTrW7DE7JWd09eQUJYWHW1T7OoSEXrtxYJKPh/nsM3+Zm8ukvl/ZhZWTRsnk1tnxz6C6vW/fv5XxFFQUlnokn/PHtdSwCAazZFt6YfnNnz8OSFFU8bvCJfQoHszEnAZ7b1B8L0SZyeCaYUWAva4MdMc1BVOntA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DlWaG+n2ocJe9g5um+6DjnLMnUKEBajrxod8iliTn4o=;
+ b=Hmdjq44C502j88zC08D8NTG7AVENCjWvKBoMkUifA7Fjv9Ygn+Cgz6AQXOyaDwNWTOBOzc5jwIPbhbd1a0zvR4vCTwI/Kw5z51TgBqQ8xCQLUGRmXezglH+b/xzoLMDfYKycDYMHQ+5o8c8zTNDpYplrRbqRX1n7MQnO/tjPwN4DZozEvf5WtyNTcdDZuMb2gRzeLGVQZTXm5tQIL9B4WbzwkI9UK5LUhpqFhc/V1nW0aI+9b/BQnR82oIRSFSI8Jynby0kjY1tIqVRbFU3k50g22wPGo67xSEGcxONl5jLr90r784X/YlsdqRO422k/2T3aIIxYetqtrqKzOc4SoA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13)
+ by MN0PR12MB6174.namprd12.prod.outlook.com (2603:10b6:208:3c5::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5293.19; Tue, 31 May
+ 2022 12:14:25 +0000
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::b844:73a2:d4b8:c057]) by BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::b844:73a2:d4b8:c057%4]) with mapi id 15.20.5314.012; Tue, 31 May 2022
+ 12:14:25 +0000
+Message-ID: <c73d537b-a653-bf79-68cd-ddc8f0f62a25@nvidia.com>
+Date:   Tue, 31 May 2022 17:44:11 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v3 8/8] vfio/pci: Add the support for PCI D3cold state
 Content-Language: en-US
-To:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
- <20220404221039.1272245-12-akrowiak@linux.ibm.com>
- <4d05a8f4-d2e9-bc54-3e9b-6becc3281f0f@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <4d05a8f4-d2e9-bc54-3e9b-6becc3281f0f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20220425092615.10133-1-abhsahu@nvidia.com>
+ <20220425092615.10133-9-abhsahu@nvidia.com>
+ <20220504134551.70d71bf0.alex.williamson@redhat.com>
+ <9e44e9cc-a500-ab0d-4785-5ae26874b3eb@nvidia.com>
+ <20220509154844.79e4915b.alex.williamson@redhat.com>
+ <68463d9b-98ee-b9ec-1a3e-1375e50a2ad2@nvidia.com>
+ <42518bd5-da8b-554f-2612-80278b527bf5@nvidia.com>
+ <20220530122546.GZ1343366@nvidia.com>
+X-Nvconfidentiality: public
+From:   Abhishek Sahu <abhsahu@nvidia.com>
+In-Reply-To: <20220530122546.GZ1343366@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qY9zYATb8vh31k9OrCgD9mM1I9RIuhIX
-X-Proofpoint-GUID: ThUaaHt6ccLpvV0JtGLDKGRRWsKZF58c
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-05-31_04,2022-05-30_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- malwarescore=0 mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0
- impostorscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2205310063
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+X-ClientProxiedBy: MA0PR01CA0009.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:80::20) To BL1PR12MB5304.namprd12.prod.outlook.com
+ (2603:10b6:208:314::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5e89bb19-9c02-44f7-4d32-08da42ff196b
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6174:EE_
+X-Microsoft-Antispam-PRVS: <MN0PR12MB6174C730B4915D1065E09614CCDC9@MN0PR12MB6174.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: j6BPzinjwu/swHNXth12ZqV8PyB5YPPGZgnyu6be6qRgvKLY6rgMveInQpKSnHX7kz5K/OWqZarnvqX0OUbsQ3Y7CVOFTuulwbBngJjr5wnVjDL3NjaNj9d3AROr+y9KzsrMmMeYnFHmfEiLm4stNxPTbE2sczzm/PizwoRbvU50LRqSj09YyudvtDVfoY36cd0jdFEgydBBiVzqB5O+4QCy0vQ7SFm45yyFf2OpcJ1JRQ2dOs7LSS6SYP5iwFDEfQ690Xfv5FUpWbNssmURTaODf6gsZusJpQZF9ZdCnfeLSlk5Y+gfEurQyrhip7AH69aWKzqe2aks+TyaFQtMkJpYTe6YvxYZTUx/CHFZvJnNELn7Q/uIWQIR6jEBy+npe/8vTTppg4us7+Cap5wpK2Wym8TUvsvOB8R82jdEEPxTSMSnECKlOWzBUE2GWrbNl8dZUUHk8VmjJueTMBMHQA4dJlxnU6dM7Lql0/myvd/8RTgrgJLJclRLtpjQylulYBN3n8hw6SopDb1EjJZ+KxvwA4YjoD1Ytbqs7YKd/McvcpkHL9+gbPS4EG+jPKQDqA1nWvolRoV57NPz9eAsGHtx/VEriulBzyPo/7s2Lx376qtiRZze7gWWGlTqft6WmGcidsed6rRXUtWW9ZwxKVLU0KNF2Ar6ZqbfSIb5nJVNg8prT42ChIQY6FjGqpFm83O+nfKwW26ktPqIU57OqVvK7HWSfmEu2k8t3fcpGphb2AZaI6raWFIDSlvULRzwsBIXWLMJM/i0MHwN0wKqqw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5304.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66476007)(66556008)(2616005)(5660300002)(55236004)(6862004)(2906002)(4326008)(86362001)(31696002)(8676002)(66946007)(186003)(36756003)(7416002)(6666004)(31686004)(53546011)(6506007)(6512007)(83380400001)(26005)(508600001)(8936002)(6486002)(316002)(38100700002)(54906003)(6636002)(37006003)(32563001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MzRDeVlOTWtxQnpKVHRnTkkyTDJObWNEd1h2TTdrU0srVUhsbkhrckoySFBk?=
+ =?utf-8?B?YjQybVZFbVJXWVBPZ2xOd29UMW9WUUNOMkIzWkpoZEt6ZS92aU5wdnNPRm1n?=
+ =?utf-8?B?ekVHZTNqYnNlZTdRUTJzdlVkc05IdVEzU0ZvZGNIOVBrMjZZSWVPVWVYb0RB?=
+ =?utf-8?B?MFpRbm9WNEhtVnNkR0xpQm10eEVCSlI5RVJSVlF6MlFsMU1ySEVUTXBnL2ta?=
+ =?utf-8?B?TUl5cU9QdTFROGVaZDZNTThhWlNUQisyYjNlTC96bjloMzVTZGY4ZkhWYXBB?=
+ =?utf-8?B?NEg0TVR6MDluMW5aSUgzSjhuakVBRmhmZnpHejROUytqYW9Mc2x5bmtmVWdv?=
+ =?utf-8?B?Zmtyb2dyWDJETk5HWTNFSlIvTERFZmE3NE56RkswejQ0L1VBb2IxcWpENGdn?=
+ =?utf-8?B?NGtVSWRoTUFVR2xFWEptQStkc282dW1semdxV1E5cG82bEVDYnREcGh5Tnhy?=
+ =?utf-8?B?MzUwalVIWFExaFZFNUE2eUVCeTJLNVlRQzBPd3poMWxkeXlBcGNwZXlaWVhk?=
+ =?utf-8?B?VHp4b0huTHB2YTJTc3ptUnpsVUlORmsyOXhLZWp0Vzh1OUJVUkZVNk5LVnVI?=
+ =?utf-8?B?dCtSMVIrR09EbmgweDNzVTkxb3pVOC9tb0wzeUkxanBRMzY3MDNRbHdsM1Rk?=
+ =?utf-8?B?ZXlkMTNGQkV5cytGWnpRQ2pqVU5ONE1LUi9IUG9uVkcyNnNDenBjbHloRTV1?=
+ =?utf-8?B?RnN2aTYrVFFYNVZxZkEwTm45Sy9PNGJqNkJGWndnUllCcG1reVNKQ01USE1h?=
+ =?utf-8?B?eTVrSERFS2NkVGdldGEra1RJU1EwWVpkNlprU3F5VjJNdXVlbGdyV2JibXJj?=
+ =?utf-8?B?eis0SVQwbnNnVm0wU1IwQmhzSlBLOFY4WWlCRDNQdzZBYW81TGt2akUxTmxP?=
+ =?utf-8?B?VVdQaEpuNWQ0S2FwcHJYbEpwOE55MkxMVFZ4cm54a1NzOVpBemlqaHpjQUxP?=
+ =?utf-8?B?cnRmc2lVU3dyazZxUnQ2VlpyWVQvU0dBNGhkL09BS0MxZzlHTE5ZUUgyZU1n?=
+ =?utf-8?B?ZWFCb2liRlIrSm9NR2h5M0kyMUs0OTBQWTA1N2FtS0xIcHl6UGFvSWk3VTUw?=
+ =?utf-8?B?MHpsa08vWjBvb2IvemtoOEtaa0s5OVdKMFJaSC9UZXlQdlRLT1dsRGl6Z3ZO?=
+ =?utf-8?B?d1FXUVlNcFJ3bWk0QTllMGMyMWhkSExIbG0yRm4yZ1g0a3NNQS9MejJHZGFQ?=
+ =?utf-8?B?RG1POUYwUnlvYmVidUJmMVRwL2Z3WVRJSW1DNmJGLzd0ZEcwaERITmtrSitL?=
+ =?utf-8?B?MDZ2RXRHcmowaE1MMksyNjJ0clo1a1JoMXdsMm9VT0J3SUkxMUptdG5GbFRo?=
+ =?utf-8?B?azRZVWpQcWNaUUUyZld0OGVZaUJsc3QybWpDR0hjWFo3SWtFcmc0WGExa20v?=
+ =?utf-8?B?bFB6WHVKVThldFV4a2dpSjFDMkh3R01uVzAxNXVSckFnKzJZdTVBK1NxM3RD?=
+ =?utf-8?B?a3hMWE9IekZPN3h1S09lSFdlVDc5T3oyckFGUDFtb0RZTzd4R3FUN0luak9L?=
+ =?utf-8?B?Y3prY0d0Ky9HMnJqdEIwb3FENUU3RHBhNzdDWnpzZ3N6ZTBSQTlHcitvblF3?=
+ =?utf-8?B?WUhzVnl0RG5qSmxzWGpoTG5jNUxMYWpBd2NkV3J4L0NJUnJUcFY2NW9nSURv?=
+ =?utf-8?B?NENlRlc4WlVRYmNXRTIvYnphNlQ4bWNlR3NYbG1FSzJGc08zMHEwR2M3NW5t?=
+ =?utf-8?B?Q2JXczRZRWpLQmNjdnY2dTVNYXAyZG41alFyZGZTd21kbC9uR1Y2Wnlub3lB?=
+ =?utf-8?B?UGJFcGFkQkNJMmZ3dzBMNlkvd05SZ2Q3dUJKSnZoMXduZWs2dG01KzFHTFRa?=
+ =?utf-8?B?NEM2MTVNK3hkdmUvZ1JBSFhCdFVWN2NaZHlHckYvYkczZ0ZidGhJWFFxLytn?=
+ =?utf-8?B?eEw1dXpsa2RtVkVyc0dKbjBRRHNreXMwcmJrWVcwUzNsRzk4UURjODBpRENI?=
+ =?utf-8?B?SGlOeVhWYUI0ZzJJd1VXVlVDMWFPOXdobVRzbExIVVJ1Vk5ES0pWUEs5SDBO?=
+ =?utf-8?B?WnFRZUpocDR6TW8vOVF0czg5WnZqRitBK3dWR05DKzVOWGRnTVdCbGJyUlBs?=
+ =?utf-8?B?bnBuOWtZZWZwamg3QmVVVjRtY1JFSUtlVUwxTkd3NThOWjdDa3NBMDdDV2RJ?=
+ =?utf-8?B?WEdhREdMWWlpUEdCczBnTnc4VzJpdXNxY081clhHZGxrek5EQ3Z5Um5rZEtl?=
+ =?utf-8?B?dW9PRjZmNlpIUXJTU3lyZE5iZDNIcVVPWGo0MnIvNlMxR1U0cENHekhQMlZG?=
+ =?utf-8?B?ZDB2WmJWVVdVM3c0ZzA4bXh1MzZGTzZ2ZVVua0dvVklhcGZCSmRpM281SUlN?=
+ =?utf-8?B?cHNybWJMUWpBYXcraVRkT0MzeWZUeVBNbjRjU2VRQisxeHJMQlBvQT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e89bb19-9c02-44f7-4d32-08da42ff196b
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5304.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2022 12:14:25.0518
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iXOR0awGacOt5zl710zhyyRb8r094mCQhOGpQeL0f5qgqQx6rDnhRtyiseDwfP/Zg6R3PhHulp682zBY2ih9ZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6174
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -99,284 +145,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 5/30/2022 5:55 PM, Jason Gunthorpe wrote:
+> On Mon, May 30, 2022 at 04:45:59PM +0530, Abhishek Sahu wrote:
+> 
+>>  1. In real use case, config or any other ioctl should not come along
+>>     with VFIO_DEVICE_FEATURE_POWER_MANAGEMENT ioctl request.
+>>  
+>>  2. Maintain some 'access_count' which will be incremented when we
+>>     do any config space access or ioctl.
+> 
+> Please don't open code locks - if you need a lock then write a proper
+> lock. You can use the 'try' variants to bail out in cases where that
+> is appropriate.
+> 
+> Jason
 
+ Thanks Jason for providing your inputs.
 
-On 5/27/22 9:50 AM, Jason J. Herne wrote:
-> On 4/4/22 18:10, Tony Krowiak wrote:
->> The callback functions for probing and removing a queue device must take
->> and release the locks required to perform a dynamic update of a guest's
->> APCB in the proper order.
->>
->> The proper order for taking the locks is:
->>
->>          matrix_dev->guests_lock => kvm->lock => matrix_dev->mdevs_lock
->>
->> The proper order for releasing the locks is:
->>
->>          matrix_dev->mdevs_lock => kvm->lock => matrix_dev->guests_lock
->>
->> A new helper function is introduced to be used by the probe callback to
->> acquire the required locks. Since the probe callback only has
->> access to a queue device when it is called, the helper function will 
->> find
->> the ap_matrix_mdev object to which the queue device's APQN is 
->> assigned and
->> return it so the KVM guest to which the mdev is attached can be 
->> dynamically
->> updated.
->>
->> Note that in order to find the ap_matrix_mdev (matrix_mdev) object, 
->> it is
->> necessary to search the matrix_dev->mdev_list. This presents a
->> locking order dilemma because the matrix_dev->mdevs_lock can't be 
->> taken to
->> protect against changes to the list while searching for the 
->> matrix_mdev to
->> which a queue device's APQN is assigned. This is due to the fact that 
->> the
->> proper locking order requires that the matrix_dev->mdevs_lock be taken
->> after both the matrix_mdev->kvm->lock and the matrix_dev->mdevs_lock.
->> Consequently, the matrix_dev->guests_lock will be used to protect 
->> against
->> removal of a matrix_mdev object from the list while a queue device is
->> being probed. This necessitates changes to the mdev probe/remove
->> callback functions to take the matrix_dev->guests_lock prior to removing
->> a matrix_mdev object from the list.
->>
->> A new macro is also introduced to acquire the locks required to 
->> dynamically
->> update the guest's APCB in the proper order when a queue device is
->> removed.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 126 +++++++++++++++++++++---------
->>   1 file changed, 88 insertions(+), 38 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index 2219b1069ceb..080a733f7cd2 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -116,6 +116,74 @@ static const struct vfio_device_ops 
->> vfio_ap_matrix_dev_ops;
->>       mutex_unlock(&matrix_dev->guests_lock);        \
->>   })
->>   +/**
->> + * vfio_ap_mdev_get_update_locks_for_apqn: retrieve the matrix mdev 
->> to which an
->> + *                       APQN is assigned and acquire the
->> + *                       locks required to update the APCB of
->> + *                       the KVM guest to which the mdev is
->> + *                       attached.
->> + *
->> + * @apqn: the APQN of a queue device.
->> + *
->> + * The proper locking order is:
->> + * 1. matrix_dev->guests_lock: required to use the KVM pointer to 
->> update a KVM
->> + *                   guest's APCB.
->> + * 2. matrix_mdev->kvm->lock:  required to update a guest's APCB
->> + * 3. matrix_dev->mdevs_lock:  required to access data stored in a 
->> matrix_mdev
->> + *
->> + * Note: If @apqn is not assigned to a matrix_mdev, the 
->> matrix_mdev->kvm->lock
->> + *     will not be taken.
->> + *
->> + * Return: the ap_matrix_mdev object to which @apqn is assigned or 
->> NULL if @apqn
->> + *       is not assigned to an ap_matrix_mdev.
->> + */
->> +static struct ap_matrix_mdev 
->> *vfio_ap_mdev_get_update_locks_for_apqn(int apqn)
->> +{
->> +    struct ap_matrix_mdev *matrix_mdev;
->> +
->> +    mutex_lock(&matrix_dev->guests_lock);
->> +
->> +    list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
->> +        if (test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm) &&
->> +            test_bit_inv(AP_QID_QUEUE(apqn), 
->> matrix_mdev->matrix.aqm)) {
->> +            if (matrix_mdev->kvm)
->> +                mutex_lock(&matrix_mdev->kvm->lock);
->> +
->> +            mutex_lock(&matrix_dev->mdevs_lock);
->> +
->> +            return matrix_mdev;
->> +        }
->> +    }
->> +
->> +    mutex_lock(&matrix_dev->mdevs_lock);
->> +
->> +    return NULL;
->> +}
->> +
->> +/**
->> + * get_update_locks_for_queue: get the locks required to update the 
->> APCB of the
->> + *                   KVM guest to which the matrix mdev linked to a
->> + *                   vfio_ap_queue object is attached.
->> + *
->> + * @queue: a pointer to a vfio_ap_queue object.
->> + *
->> + * The proper locking order is:
->> + * 1. matrix_dev->guests_lock: required to use the KVM pointer to 
->> update a KVM
->> + *                guest's APCB.
->> + * 2. queue->matrix_mdev->kvm->lock: required to update a guest's APCB
->> + * 3. matrix_dev->mdevs_lock:    required to access data stored in a 
->> matrix_mdev
->> + *
->> + * Note: if @queue is not linked to an ap_matrix_mdev object, the 
->> KVM lock
->> + *      will not be taken.
->> + */
->> +#define get_update_locks_for_queue(queue) ({            \
->> +    struct ap_matrix_mdev *matrix_mdev = q->matrix_mdev; \
->> +    mutex_lock(&matrix_dev->guests_lock);            \
->> +    if (matrix_mdev && matrix_mdev->kvm) \
->> +        mutex_lock(&matrix_mdev->kvm->lock);        \
->> +    mutex_lock(&matrix_dev->mdevs_lock);            \
->> +})
->> +
->
->
-> One more comment I forgot to include before:
-> This macro is far too similar to existing macro, 
-> get_update_locks_for_mdev. And it is only called in one place. Let's 
-> remove this and replace the single invocation with:
->
-> get_update_locks_for_mdev(q->matrix_mdev);
+ In that case, should I introduce new rw_semaphore (For example
+ power_lock) and move ‘platform_pm_engaged’ under ‘power_lock’ ?
+ 
+ I was mainly concerned about locking rules w.r.t. existing
+ ‘memory_lock’ and the code present in
+ vfio_pci_zap_and_down_write_memory_lock() which is internally taking
+ ‘mmap_lock’ and ‘vma_lock’. But from the initial analysis, it seems
+ this should not cause any issue since we should not need ‘power_lock’
+ in the mmap fault handler or any read/write functions. We can
+ maintain following locking order
+ 
+   power_lock => memory_lock
+ 
+ 1. At the beginning of config space access or ioctl, we can take the
+    lock
+ 
+     down_read(&vdev->power_lock);
+     if (vdev->platform_pm_engaged) {
+         up_read(&vdev->power_lock);
+         return -EIO;
+     }
+ 
+    And before returning from config or ioctl, we can release the lock.
+ 
+ 2.  Now ‘platform_pm_engaged’ is not protected with memory_lock and we
+     need to support the case where VFIO_DEVICE_FEATURE_POWER_MANAGEMENT
+     can be called without putting the device into D3hot explicitly.
+     So, I need to introduce a second variable which tracks the memory
+     disablement (like power_state_d3 in this patch) and will be
+     protected with 'memory_lock'. It will be set for both the cases,
+     where users change the power state to D3hot by config
+     write or user makes this ioctl. Inside vfio_pci_core_feature_pm(), now
+     the code will become
+    
+         down_write(&vdev->power_lock);
+         ...
+         switch (vfio_pm.low_power_state) {
+         case VFIO_DEVICE_LOW_POWER_STATE_ENTER:
+                 ...
+                         vfio_pci_zap_and_down_write_memory_lock(vdev);
+                         vdev->power_state_d3 = true;
+                         up_write(&vdev->memory_lock);
 
-Yikes, I see another flaw in this macro! Either the input parameter 
-needs to be renamed to 'q' or the q->matrix_mdev needs to be changed to 
-queue->matrix_mdev. I think I'll go with the former since vfio_ap_queue 
-is referred to as 'q' everywhere else.
+         ...
+         up_write(&vdev->power_lock);
+ 
+ 3.  Inside __vfio_pci_memory_enabled(), we can check
+     vdev->power_state_d3 instead of current_state.
+ 
+ 4.  For ioctl access, as mentioned previously I need to add two
+     callbacks functions (one for start and one for end) in the struct
+     vfio_device_ops and call the same at start and end of ioctl from
+     vfio_device_fops_unl_ioctl().
 
->
->
->>   /**
->>    * vfio_ap_mdev_get_queue - retrieve a queue with a specific APQN 
->> from a
->>    *                hash table of queues assigned to a matrix mdev
->> @@ -615,21 +683,18 @@ static int vfio_ap_mdev_probe(struct 
->> mdev_device *mdev)
->>       matrix_mdev->pqap_hook = handle_pqap;
->>       vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_apcb);
->>       hash_init(matrix_mdev->qtable.queues);
->> -    mdev_set_drvdata(mdev, matrix_mdev);
->> -    mutex_lock(&matrix_dev->mdevs_lock);
->> -    list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
->> -    mutex_unlock(&matrix_dev->mdevs_lock);
->>         ret = vfio_register_emulated_iommu_dev(&matrix_mdev->vdev);
->>       if (ret)
->>           goto err_list;
->> +    mdev_set_drvdata(mdev, matrix_mdev);
->> +    mutex_lock(&matrix_dev->mdevs_lock);
->> +    list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
->> +    mutex_unlock(&matrix_dev->mdevs_lock);
->>       dev_set_drvdata(&mdev->dev, matrix_mdev);
->>       return 0;
->>     err_list:
->> -    mutex_lock(&matrix_dev->mdevs_lock);
->> -    list_del(&matrix_mdev->node);
->> -    mutex_unlock(&matrix_dev->mdevs_lock);
->>       vfio_uninit_group_dev(&matrix_mdev->vdev);
->>       kfree(matrix_mdev);
->>   err_dec_available:
->> @@ -692,11 +757,13 @@ static void vfio_ap_mdev_remove(struct 
->> mdev_device *mdev)
->>         vfio_unregister_group_dev(&matrix_mdev->vdev);
->>   +    mutex_lock(&matrix_dev->guests_lock);
->>       mutex_lock(&matrix_dev->mdevs_lock);
->>       vfio_ap_mdev_reset_queues(matrix_mdev);
->>       vfio_ap_mdev_unlink_fr_queues(matrix_mdev);
->>       list_del(&matrix_mdev->node);
->>       mutex_unlock(&matrix_dev->mdevs_lock);
->> +    mutex_unlock(&matrix_dev->guests_lock);
->>       vfio_uninit_group_dev(&matrix_mdev->vdev);
->>       kfree(matrix_mdev);
->>       atomic_inc(&matrix_dev->available_instances);
->> @@ -1665,49 +1732,30 @@ void vfio_ap_mdev_unregister(void)
->>       mdev_unregister_driver(&vfio_ap_matrix_driver);
->>   }
->>   -/*
->> - * vfio_ap_queue_link_mdev
->> - *
->> - * @q: The queue to link with the matrix mdev.
->> - *
->> - * Links @q with the matrix mdev to which the queue's APQN is assigned.
->> - */
->> -static void vfio_ap_queue_link_mdev(struct vfio_ap_queue *q)
->> -{
->> -    unsigned long apid = AP_QID_CARD(q->apqn);
->> -    unsigned long apqi = AP_QID_QUEUE(q->apqn);
->> -    struct ap_matrix_mdev *matrix_mdev;
->> -
->> -    list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
->> -        if (test_bit_inv(apid, matrix_mdev->matrix.apm) &&
->> -            test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
->> -            vfio_ap_mdev_link_queue(matrix_mdev, q);
->> -            break;
->> -        }
->> -    }
->> -}
->> -
->>   int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
->>   {
->>       struct vfio_ap_queue *q;
->> +    struct ap_matrix_mdev *matrix_mdev;
->>       DECLARE_BITMAP(apm_delta, AP_DEVICES);
->>         q = kzalloc(sizeof(*q), GFP_KERNEL);
->>       if (!q)
->>           return -ENOMEM;
->> -    mutex_lock(&matrix_dev->mdevs_lock);
->>       q->apqn = to_ap_queue(&apdev->device)->qid;
->>       q->saved_isc = VFIO_AP_ISC_INVALID;
->> -    vfio_ap_queue_link_mdev(q);
->> -    if (q->matrix_mdev) {
->> +
->> +    matrix_mdev = vfio_ap_mdev_get_update_locks_for_apqn(q->apqn);
->> +
->> +    if (matrix_mdev) {
->> +        vfio_ap_mdev_link_queue(matrix_mdev, q);
->>           memset(apm_delta, 0, sizeof(apm_delta));
->>           set_bit_inv(AP_QID_CARD(q->apqn), apm_delta);
->>           vfio_ap_mdev_filter_matrix(apm_delta,
->> -                       q->matrix_mdev->matrix.aqm,
->> -                       q->matrix_mdev);
->> +                       matrix_mdev->matrix.aqm,
->> +                       matrix_mdev);
->>       }
->>       dev_set_drvdata(&apdev->device, q);
->> -    mutex_unlock(&matrix_dev->mdevs_lock);
->> +    release_update_locks_for_mdev(matrix_mdev);
->>         return 0;
->>   }
->> @@ -1716,11 +1764,13 @@ void vfio_ap_mdev_remove_queue(struct 
->> ap_device *apdev)
->>   {
->>       unsigned long apid;
->>       struct vfio_ap_queue *q;
->> +    struct ap_matrix_mdev *matrix_mdev;
->>   -    mutex_lock(&matrix_dev->mdevs_lock);
->>       q = dev_get_drvdata(&apdev->device);
->> +    get_update_locks_for_queue(q);
->> +    matrix_mdev = q->matrix_mdev;
->>   -    if (q->matrix_mdev) {
->> +    if (matrix_mdev) {
->>           vfio_ap_unlink_queue_fr_mdev(q);
->>             apid = AP_QID_CARD(q->apqn);
->> @@ -1731,5 +1781,5 @@ void vfio_ap_mdev_remove_queue(struct ap_device 
->> *apdev)
->>       vfio_ap_mdev_reset_queue(q, 1);
->>       dev_set_drvdata(&apdev->device, NULL);
->>       kfree(q);
->> -    mutex_unlock(&matrix_dev->mdevs_lock);
->> +    release_update_locks_for_mdev(matrix_mdev);
->>   }
->
->
-
+ Thanks,
+ Abhishek
