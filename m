@@ -2,139 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D394B538D70
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 11:07:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BD9B538D9D
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 11:23:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245085AbiEaJHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 05:07:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44050 "EHLO
+        id S245140AbiEaJXa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 05:23:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245068AbiEaJHE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 05:07:04 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C431CB01;
-        Tue, 31 May 2022 02:06:58 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24V6xGdr024794;
-        Tue, 31 May 2022 09:06:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=fAHU2rGOL5A9cKDCCU+65wK9t9lX0odo/5gNkrL7RrE=;
- b=d7T4kbhPCvKczmXNb9Oyn6xkcQco5OZB0YFf37LeYzCPb/RzH21kv0bTeB/cjGtnyMsp
- cfyjwmrjS7kDi73gBz4lbiGP0bZ5vpzB2kxV32Ac5YNBYRlJbPLClXsz9fUJPtoJXROc
- hDccOi6bz2fd8ApjR3B3V9IxymKIAaJle+/xnC5oYOiAboB/5qzj7DprGwVXV6rxlOt6
- NnjY7ndf3vv8XVCTGZien0cUg6TQ4KoR/cGMdzZ7W8Kl/kZ9i+GdOmgOdTKSBTGCYo/G
- jFqdPIoNMDgbzgQsHwOgUfC8rHzQvQ3xe6erjakWaA49c/KEYggQ9JSnBH+vXWhKdC8G Uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gda53e9ge-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 09:06:55 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24V8Zh5M030807;
-        Tue, 31 May 2022 09:06:55 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gda53e9fb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 09:06:55 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24V8rHbh015563;
-        Tue, 31 May 2022 09:06:52 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3gbcae3ub3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 09:06:52 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24V95i3G29491500
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 May 2022 09:05:44 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8274AA404D;
-        Tue, 31 May 2022 09:06:49 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5B34A4040;
-        Tue, 31 May 2022 09:06:48 +0000 (GMT)
-Received: from [9.171.6.109] (unknown [9.171.6.109])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 31 May 2022 09:06:48 +0000 (GMT)
-Message-ID: <9b3c88f2-ca23-df23-4a5b-d86b0b38a6aa@linux.ibm.com>
-Date:   Tue, 31 May 2022 11:06:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v3 0/4] KVM: s390: selftests: Provide TAP output in tests
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        linux-s390@vger.kernel.org
-References: <20220429063724.480919-1-thuth@redhat.com>
- <e39149e0-e6c4-f850-cd0f-cbdb453ee0c2@redhat.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <e39149e0-e6c4-f850-cd0f-cbdb453ee0c2@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jao7N3FvW6AykUFcVV3MtLJT33K9lNIY
-X-Proofpoint-ORIG-GUID: OgBash_X-XnBTBGxkmjQJ6Hhj_Rwpo9A
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S245136AbiEaJX3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 05:23:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4737085ECC
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 02:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653989006;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R1t1NBmkNMBO5DYdEINGWFlHVzMhXZpx3lk8YtT0vEg=;
+        b=W6wc+5ouBAahyhZbpUPawAdMewMw2yGzFt6g41+AbVnREWipdHvpP7tGGLzDbhAxjXd4cU
+        /wanc2jL5QP0MdOwgnUyM/78HjtcUWNlcvpKjqd61o2+iZ3vjoy7C4eJLFfua9nbne4/zA
+        YQ4AasMqpHBVEBDnXb4MvgBh18vf4Xg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-1-o15jETQ_P9yppSp-ciVy0w-1; Tue, 31 May 2022 05:23:24 -0400
+X-MC-Unique: o15jETQ_P9yppSp-ciVy0w-1
+Received: by mail-wm1-f70.google.com with SMTP id o23-20020a05600c511700b0039743cd8093so983993wms.6
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 02:23:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=R1t1NBmkNMBO5DYdEINGWFlHVzMhXZpx3lk8YtT0vEg=;
+        b=AGOdxW5RCBAvzAyAGL3RvwfQuxOQlLg6Vj8Jyxyfp3kKE2EF99dTE0/HSk6K60TQMH
+         ngJysJ3L4VlcecQKqKTGYFLjjrNUlMZEWNCklej61w0/YT/4ZJbZZ9148DjY5xPiGlB/
+         4iAU3YQQbKlRkPH6cxFZir2/yb6D0SyGNE0CrGLFhHwOgiYdeki9vLxX8jP1jUeuYfwQ
+         EOTun/bduHLRcUryDV93xbSMbfJ7Hjv+1wk9rFv2VX5LpybUaeQ50rPTuhb+oUgx7RCl
+         AJXcxz90T3USNz3Bq0h99DD7ZVGX3X3CP0DSICJ0wNvdtYqPFCRGxuR5LB4FkbmOIJyR
+         F57g==
+X-Gm-Message-State: AOAM5305SbON2WI3QLKXVI2xakI4U8CUJ5nuDRCGrWz6MnvkhSJUH+Gg
+        xcsPFCffsgH6/1YZDW9Y1mFw8VdX2oZzNrBnGur1USqtRk/jzVpJw/TJsskqNoK/L/8gWAvrK9x
+        Ak1AIj9OHFnGx
+X-Received: by 2002:adf:fb0d:0:b0:20d:97e:17ce with SMTP id c13-20020adffb0d000000b0020d097e17cemr50794558wrr.585.1653989003673;
+        Tue, 31 May 2022 02:23:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxzXciEmGxzFbd78RU5NlgInASiXlfG+r9fWr3h5yZzU+8WJoDJl/m3AngyKgTZnA+DlsQGmQ==
+X-Received: by 2002:adf:fb0d:0:b0:20d:97e:17ce with SMTP id c13-20020adffb0d000000b0020d097e17cemr50794524wrr.585.1653989003358;
+        Tue, 31 May 2022 02:23:23 -0700 (PDT)
+Received: from redhat.com ([2.52.157.68])
+        by smtp.gmail.com with ESMTPSA id k66-20020a1ca145000000b0039c15861001sm1605939wme.21.2022.05.31.02.23.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 May 2022 02:23:22 -0700 (PDT)
+Date:   Tue, 31 May 2022 05:23:14 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        Parav Pandit <parav@nvidia.com>, Eli Cohen <elic@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Cindy Lu <lulu@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>, ecree.xilinx@gmail.com,
+        "Dawar, Gautam" <gautam.dawar@amd.com>, habetsm.xilinx@gmail.com,
+        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Dinan Gunawardena <dinang@xilinx.com>,
+        Longpeng <longpeng2@huawei.com>
+Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
+Message-ID: <20220531052240-mutt-send-email-mst@kernel.org>
+References: <20220526124338.36247-1-eperezma@redhat.com>
+ <20220531014108-mutt-send-email-mst@kernel.org>
+ <CAJaqyWfRSD6xiS8DROkPvjJ4Y4dotOPWqUzaQeM3X=q_XgABdw@mail.gmail.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-05-31_03,2022-05-30_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1011
- impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2205310047
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJaqyWfRSD6xiS8DROkPvjJ4Y4dotOPWqUzaQeM3X=q_XgABdw@mail.gmail.com>
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, May 31, 2022 at 09:13:38AM +0200, Eugenio Perez Martin wrote:
+> On Tue, May 31, 2022 at 7:42 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Thu, May 26, 2022 at 02:43:34PM +0200, Eugenio P�rez wrote:
+> > > Implement stop operation for vdpa_sim devices, so vhost-vdpa will offer
+> > > that backend feature and userspace can effectively stop the device.
+> > >
+> > > This is a must before get virtqueue indexes (base) for live migration,
+> > > since the device could modify them after userland gets them. There are
+> > > individual ways to perform that action for some devices
+> > > (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
+> > > way to perform it for any vhost device (and, in particular, vhost-vdpa).
+> > >
+> > > After the return of ioctl with stop != 0, the device MUST finish any
+> > > pending operations like in flight requests. It must also preserve all
+> > > the necessary state (the virtqueue vring base plus the possible device
+> > > specific states) that is required for restoring in the future. The
+> > > device must not change its configuration after that point.
+> > >
+> > > After the return of ioctl with stop == 0, the device can continue
+> > > processing buffers as long as typical conditions are met (vq is enabled,
+> > > DRIVER_OK status bit is enabled, etc).
+> > >
+> > > In the future, we will provide features similar to VHOST_USER_GET_INFLIGHT_FD
+> > > so the device can save pending operations.
+> > >
+> > > Comments are welcome.
+> >
+> >
+> > So given this is just for simulator and affects UAPI I think it's fine
+> > to make it wait for the next merge window, until there's a consensus.
+> > Right?
+> >
+> 
+> While the change is only implemented in the simulator at this moment,
+> it's just the very last missing piece in the kernel to implement
+> complete live migration for net devices with cvq :). All vendor
+> drivers can implement this call with current code, just a little bit
+> of plumbing is needed. And it was accepted in previous meetings.
+> 
+> If it proves it works for every configuration (nested, etc), the
+> implementation can forward the call to the admin vq for example. At
+> the moment, it follows the proposed stop status bit sematic to stop
+> the device, which POC has been tested in these circumstances.
+> 
+> Thanks!
 
+Oh absolutely, but I am guessing this plumbing won't
+be ready for this merge window.
 
-Am 31.05.22 um 10:02 schrieb Thomas Huth:
-> On 29/04/2022 08.37, Thomas Huth wrote:
->> This patch series is motivated by Shuah's suggestion here:
->>
->>   https://lore.kernel.org/kvm/d576d8f7-980f-3bc6-87ad-5a6ae45609b8@linuxfoundation.org/
->>
->> Many s390x KVM selftests do not output any information about which
->> tests have been run, so it's hard to say whether a test binary
->> contains a certain sub-test or not. To improve this situation let's
->> add some TAP output via the kselftest.h interface to these tests,
->> so that it easier to understand what has been executed or not.
->>
->> v3:
->>   - Added comments / fixed cosmetics according to Janosch's and
->>     Janis' reviews of the v2 series
->>   - Added Reviewed-by tags from the v2 series
->>
->> v2:
->>   - Reworked the extension checking in the first patch
->>   - Make sure to always print the TAP 13 header in the second patch
->>   - Reworked the SKIP printing in the third patch
->>
->> Thomas Huth (4):
->>    KVM: s390: selftests: Use TAP interface in the memop test
->>    KVM: s390: selftests: Use TAP interface in the sync_regs test
->>    KVM: s390: selftests: Use TAP interface in the tprot test
->>    KVM: s390: selftests: Use TAP interface in the reset test
->>
->>   tools/testing/selftests/kvm/s390x/memop.c     | 90 +++++++++++++++----
->>   tools/testing/selftests/kvm/s390x/resets.c    | 38 ++++++--
->>   .../selftests/kvm/s390x/sync_regs_test.c      | 87 +++++++++++++-----
->>   tools/testing/selftests/kvm/s390x/tprot.c     | 29 ++++--
->>   4 files changed, 193 insertions(+), 51 deletions(-)
+> > > v4:
+> > > * Replace VHOST_STOP to VHOST_VDPA_STOP in vhost ioctl switch case too.
+> > >
+> > > v3:
+> > > * s/VHOST_STOP/VHOST_VDPA_STOP/
+> > > * Add documentation and requirements of the ioctl above its definition.
+> > >
+> > > v2:
+> > > * Replace raw _F_STOP with BIT_ULL(_F_STOP).
+> > > * Fix obtaining of stop ioctl arg (it was not obtained but written).
+> > > * Add stop to vdpa_sim_blk.
+> > >
+> > > Eugenio P�rez (4):
+> > >   vdpa: Add stop operation
+> > >   vhost-vdpa: introduce STOP backend feature bit
+> > >   vhost-vdpa: uAPI to stop the device
+> > >   vdpa_sim: Implement stop vdpa op
+> > >
+> > >  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 21 +++++++++++++++++
+> > >  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
+> > >  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++
+> > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++
+> > >  drivers/vhost/vdpa.c                 | 34 +++++++++++++++++++++++++++-
+> > >  include/linux/vdpa.h                 |  6 +++++
+> > >  include/uapi/linux/vhost.h           | 14 ++++++++++++
+> > >  include/uapi/linux/vhost_types.h     |  2 ++
+> > >  8 files changed, 83 insertions(+), 1 deletion(-)
+> > >
+> > > --
+> > > 2.31.1
+> > >
+> >
 
-Can you refresh against latest linus master? I will apply then
