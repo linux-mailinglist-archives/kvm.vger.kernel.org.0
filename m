@@ -2,84 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 650255395DD
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 20:06:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EC625395E8
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 20:11:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346834AbiEaSGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 14:06:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
+        id S1346839AbiEaSLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 14:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346816AbiEaSGS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 14:06:18 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8369BAF7
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:06:17 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id w2-20020a17090ac98200b001e0519fe5a8so3024605pjt.4
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=U8KygP5HX4ANbWdbvL1PVBHCmW/9zwhKWrTofJUHJ8g=;
-        b=KpPTUTlHGzyq7z5TXtGgnCLsz3TsaVTwnC4R9n6g0KBCtTdRfC2tR5xORvaoaLa8zh
-         09JbbaBhFlQfDHE5Fj8AzFo66zQtsoCo92UplQ4sBBRovj11j68IW/cDcnFkkALLfQkI
-         pvNwSTgedSrgMdoDINic6e3UhJLDzHxkj4xno=
+        with ESMTP id S238714AbiEaSLm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 14:11:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 200561E4
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:11:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654020697;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XMQEK/kjTo0pUfkHM6FfBJm4lgYJdNQsWtCnnztaaGk=;
+        b=BNS63wpLlparUVduVTLujt35aVtR9gOce2QU0DXrz3CezDeXSEIUlI0mHCrcQjIJCmh2nW
+        BoyRyrqY8LXX6OvJvyfK93/9zOLIm/qZJlD/ZMjC5bSvh3uxOI2FFkBdXKZmlE4L32Thn+
+        Oo+TOJ0UOGv2WJrN79rOt0tPfmZ5qFM=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-675-ciU5NXLuPgq4ZZQOd_NTfw-1; Tue, 31 May 2022 14:11:36 -0400
+X-MC-Unique: ciU5NXLuPgq4ZZQOd_NTfw-1
+Received: by mail-ed1-f70.google.com with SMTP id q29-20020a056402249d00b0042d90fd98deso7520586eda.12
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 11:11:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=U8KygP5HX4ANbWdbvL1PVBHCmW/9zwhKWrTofJUHJ8g=;
-        b=CuGrI/Tz+67Ga80eLN/dWMOdA3oYqkTLLhXzcldqThcbSVKPddYw9W4+57B9A0PSER
-         aLVnYiIUuVJluLWidHT1WGsvnG3OwUeqErPLw2QdnVllu8N9yFsx4cZR9FiXUXJvVnWs
-         cISfpL7jiihhwYq18D/NcnWI3vec+BWf3xQ+CmnbG2ZDlpN+acqDWiTFAAZ9PpL9Le57
-         uTNz39yeKc16RR5QRTtGwcj3jVBstmT/N9InqCcCve8kIcB8+MtlCAqu0JoYWZ1hzn31
-         gBT/L8DRbzp0lUT1Ak7B+2qORUsWojd6U2drdTcrbOQliyPLPzNobSiwBW3uu0uAmWgC
-         Yhqg==
-X-Gm-Message-State: AOAM530Y0W0hj2TCigW0votwbEyL/qUNVuC/DgBySkb5mfrGerhd/0pw
-        Udr5n1+LYtdZ6mGs9eba4Y6lyA==
-X-Google-Smtp-Source: ABdhPJxk0k0IE5MQ41zL5Wf8a/XJyLVLt7RJkuxqWxrzaxR2uwDa6Fx1or0jb5xUH07KYscnYdZ2Rw==
-X-Received: by 2002:a17:90a:2e83:b0:1da:3273:53ab with SMTP id r3-20020a17090a2e8300b001da327353abmr30031100pjd.14.1654020376713;
-        Tue, 31 May 2022 11:06:16 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902f54600b0016170bb6528sm11559540plf.113.2022.05.31.11.06.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 May 2022 11:06:16 -0700 (PDT)
-Date:   Tue, 31 May 2022 11:06:15 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Robert Dinse <nanook@eskimo.com>
-Subject: Re: [PATCH v2 8/8] KVM: x86: Bug the VM on an out-of-bounds data read
-Message-ID: <202205311106.76479DB1E6@keescook>
-References: <20220526210817.3428868-1-seanjc@google.com>
- <20220526210817.3428868-9-seanjc@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=XMQEK/kjTo0pUfkHM6FfBJm4lgYJdNQsWtCnnztaaGk=;
+        b=8Og5GTARuder4Y+mZIK7QRlbYTHOc6BiIxbp0qwyfIf1jPBY6ck/SPbdH3XAmrU6kl
+         N50exXsZWdjyQdVywuDHRS8bMwAWjgdalLFPFD3ZzVUHUJR5GjKGaSwqgxMHlvAR+VbB
+         K6KXvtKDZIJRQs2ZQAG0MMDPe4jaHuKA75w4/9WXfAt/bLaPZ9P/Hb/mF6C52EBFR37D
+         ZE4/JUCOCZkNMNBKbzhwB40ne1cdGGo6xeNERf5NlMCjy7DUmgYOJ7QErDj+DHCQQ2xX
+         AHiGdPTO4ghLIbcBaErbuavmtRj8LAutclHT0VTHi08FzwhSptBcLSRl/a4DrAxAgieE
+         9VWw==
+X-Gm-Message-State: AOAM530rzu5c9fGx09whCZ9UUXPTePhV9Yy2djcOHqY7lHxqgq8A2YHA
+        mEHzZ/atFqjfKLFr4O/bgSDeEaVdQvsbrW6HzqGdwThJcqFMCbAnKVECscgRwk6f9AefIddd0st
+        fis35quF4zyXx
+X-Received: by 2002:a17:906:6a0d:b0:6ff:15a8:acbf with SMTP id qw13-20020a1709066a0d00b006ff15a8acbfmr27459131ejc.143.1654020695318;
+        Tue, 31 May 2022 11:11:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy1ff2p+ikBQ55Lof6tEFQQIwQKvq0MZaz2IlORv4sb3mJO9fUCPL0TZ2jkvbnDaJnhq6pOwA==
+X-Received: by 2002:a17:906:6a0d:b0:6ff:15a8:acbf with SMTP id qw13-20020a1709066a0d00b006ff15a8acbfmr27459105ejc.143.1654020695066;
+        Tue, 31 May 2022 11:11:35 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id z5-20020a1709060ac500b00702d8b37a03sm740362ejf.17.2022.05.31.11.11.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 May 2022 11:11:34 -0700 (PDT)
+Message-ID: <0194b22a-38a1-08a1-a576-de6463389ce4@redhat.com>
+Date:   Tue, 31 May 2022 20:11:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220526210817.3428868-9-seanjc@google.com>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Metin Kaya <metikaya@amazon.co.uk>, jalliste@amazon.com
+Cc:     bp@alien8.de, diapop@amazon.co.uk, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+References: <20220531105925.27676-1-jalliste@amazon.com>
+ <20220531114333.29153-1-metikaya@amazon.co.uk>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: VMX: CPU frequency scaling for intel x86_64 KVM
+ guests
+In-Reply-To: <20220531114333.29153-1-metikaya@amazon.co.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 26, 2022 at 09:08:17PM +0000, Sean Christopherson wrote:
-> Bug the VM and terminate emulation if an out-of-bounds read into the
-> emulator's data cache occurs.  Knowingly contuining on all but guarantees
-> that KVM will overwrite random kernel data, which is far, far worse than
-> killing the VM.
+On 5/31/22 13:43, Metin Kaya wrote:
+> Thanks, Jack.
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Metin Kaya <metikaya@amazon.co.uk>
+> 
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Please try a bit harder.  "Reviewed-by" is neither "this matches what's 
+been forever in the Amazon kernel" nor "I guarantee that Jack is a nice 
+guy and doesn't screw up".  I'm sure he is but everybody screws up, and 
+in this case the patch:
 
--- 
-Kees Cook
+- does not even *apply* to the upstream kernel, because it uses 
+(presumably Amazon-specific) CAP numbers above 10000
+
+- does not work if the vCPU is moved from one physical CPU to another
+
+- does not work if the intel_pstate driver writes to MSR_HWP_REQUEST
+
+- does not include documentation for the new capability
+
+- does not include a selftest
+
+- is unacceptable anyway because, as mentioned in the cover letter, it 
+isn't undone when the process exits
+
+Jack, please understand that I am not really blaming you in any way, and 
+ask some of your colleagues with upstream kernel experience (Alex Graf, 
+David Woodhouse, Filippo Sironi, Jan Schoenherr, Amit Shah are the ones 
+I know) which patches could be good targets for including upstream.
+
+Paolo
+
