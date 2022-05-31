@@ -2,58 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CF72538FC1
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:21:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC023538FF7
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:45:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242369AbiEaLVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 07:21:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48488 "EHLO
+        id S1343854AbiEaLm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 07:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343870AbiEaLUx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 07:20:53 -0400
+        with ESMTP id S234157AbiEaLmz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 07:42:55 -0400
 Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49EDE9CC80;
-        Tue, 31 May 2022 04:20:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 214038217E;
+        Tue, 31 May 2022 04:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1653996039; x=1685532039;
+  t=1653997375; x=1685533375;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
   bh=1AvcBprIOSQItFD8cn3+FAqAk16pR3Q+CjOoSzkn5lI=;
-  b=Bdoj1DaD51xFWm0sFBO6RbLLXj37THLg9PRqc+TIX467m8YkoaOuTXuE
-   pWM9mUdV9SnYEdjHZJ6ftup+w3RrOAjcyO6WxsMNrL+yAzjRwVaHDCOCX
-   f7+ZEozYlxwWEFBuaWkmFESS7FVIvN4jF6Lz3V/Y+gL8bkPcYyVw9c24O
-   c=;
+  b=TPMFPHA26zEXg8TTMvNSGpKDwAhK4+z4DEFDhzcvYDmnuii6VlnF6DdQ
+   e+/BFM5TjiPUAH80bhkdJ8lahiO2UnZfEfeJRP1+3PcAc2qAK6OrJtrqn
+   C9Zk8yFLAhi09WU7NwWXUh1eCd1eR/Ny9cYGJ++ljSOcrmYnTAa8i4IB0
+   s=;
 X-IronPort-AV: E=Sophos;i="5.91,265,1647302400"; 
-   d="scan'208";a="93329158"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-ca048aa0.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 31 May 2022 10:59:36 +0000
-Received: from EX13D33EUC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1d-ca048aa0.us-east-1.amazon.com (Postfix) with ESMTPS id CF7D38121F;
-        Tue, 31 May 2022 10:59:30 +0000 (UTC)
-Received: from EX13MTAUEE002.ant.amazon.com (10.43.62.24) by
- EX13D33EUC002.ant.amazon.com (10.43.164.234) with Microsoft SMTP Server (TLS)
- id 15.0.1497.36; Tue, 31 May 2022 10:59:29 +0000
+   d="scan'208";a="93334418"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-7a21ed79.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 31 May 2022 11:17:00 +0000
+Received: from EX13MTAUEE002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-7a21ed79.us-east-1.amazon.com (Postfix) with ESMTPS id 14946220F3F;
+        Tue, 31 May 2022 11:16:55 +0000 (UTC)
+Received: from EX13D08UEE002.ant.amazon.com (10.43.62.92) by
+ EX13MTAUEE002.ant.amazon.com (10.43.62.24) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.36; Tue, 31 May 2022 11:16:55 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (10.43.162.135) by
+ EX13D08UEE002.ant.amazon.com (10.43.62.92) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.36; Tue, 31 May 2022 11:16:54 +0000
 Received: from dev-dsk-jalliste-1c-387c3ddf.eu-west-1.amazon.com
- (10.13.250.64) by mail-relay.amazon.com (10.43.62.224) with Microsoft SMTP
+ (10.13.250.64) by mail-relay.amazon.com (10.43.162.232) with Microsoft SMTP
  Server (TLS) id 15.0.1497.36 via Frontend Transport; Tue, 31 May 2022
- 10:59:27 +0000
+ 11:16:51 +0000
 From:   Jack Allister <jalliste@amazon.com>
-CC:     <jalliste@amazon.com>, <diapop@amazon.co.uk>,
-        <metikaya@amazon.co.uk>, Paolo Bonzini <pbonzini@redhat.com>,
+To:     <pbonzini@redhat.com>, <kvm@vger.kernel.org>
+CC:     <jalliste@amazon.com>, <dwmw@amazon.co.uk>, <diapop@amazon.co.uk>,
+        <metikaya@amazon.co.uk>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        "Sean Christopherson" <sean.j.christopherson@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, <x86@kernel.org>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Borislav Petkov" <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>
 Subject: [PATCH] KVM: VMX: CPU frequency scaling for intel x86_64 KVM guests
-Date:   Tue, 31 May 2022 10:59:25 +0000
-Message-ID: <20220531105925.27676-1-jalliste@amazon.com>
+Date:   Tue, 31 May 2022 11:16:44 +0000
+Message-ID: <20220531111644.41128-1-jalliste@amazon.com>
 X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,7 +68,6 @@ X-Spam-Status: No, score=-12.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
