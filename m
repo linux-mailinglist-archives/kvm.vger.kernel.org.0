@@ -2,220 +2,279 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C462538F30
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 12:44:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CF72538FC1
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343543AbiEaKoy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 06:44:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39872 "EHLO
+        id S242369AbiEaLVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 07:21:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233804AbiEaKow (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 06:44:52 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A90E18DDED;
-        Tue, 31 May 2022 03:44:51 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VASouu007641;
-        Tue, 31 May 2022 10:44:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=0jJlzKzm/DxDvXINYNTGWbXmbG9ORhCTY/VSBeTfRMs=;
- b=gj5NIORWcil2TaNGaofRhfsU4tCbhqSm3oYJCsgAsdAMn9ptMSxyLekrZFlgZAXgXDr/
- RDgfFPg/c7e9ohHm68zaSl1Js78sR16HUvhtKIBSVgS9q4AhdXCj3fQ7mGZ4CQ4En0su
- LSqADtEGdZPOowbAZzGDUjkBYsmlrT0KZF/X87MRCykV4RLTReGJJrOFj3Qb7nELPyMS
- zM128m/mTH9avGy91ihVCNe3f798rsh7+AV752CrEfm80Zok3wf4K9EHCV0NSK87j6vY
- 7LQFgijWtAirdgnDb2q5VWnzTrOx+T60ozzBjC9Kkg/33yhORrp97cmsWsxp16nobwW0 Rw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdeedv0ax-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 10:44:49 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24V9bC1x006276;
-        Tue, 31 May 2022 10:44:49 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdeedv0am-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 10:44:49 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24VAZiMj026283;
-        Tue, 31 May 2022 10:44:48 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma01dal.us.ibm.com with ESMTP id 3gcxt57cjs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 10:44:48 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24VAilZ026673446
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 May 2022 10:44:47 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0A575AC062;
-        Tue, 31 May 2022 10:44:47 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 70BA8AC065;
-        Tue, 31 May 2022 10:44:46 +0000 (GMT)
-Received: from [9.160.37.241] (unknown [9.160.37.241])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 31 May 2022 10:44:46 +0000 (GMT)
-Message-ID: <f838f274-ff4d-496d-2393-14423117ff7e@linux.ibm.com>
-Date:   Tue, 31 May 2022 06:44:46 -0400
+        with ESMTP id S1343870AbiEaLUx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 07:20:53 -0400
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49EDE9CC80;
+        Tue, 31 May 2022 04:20:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1653996039; x=1685532039;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1AvcBprIOSQItFD8cn3+FAqAk16pR3Q+CjOoSzkn5lI=;
+  b=Bdoj1DaD51xFWm0sFBO6RbLLXj37THLg9PRqc+TIX467m8YkoaOuTXuE
+   pWM9mUdV9SnYEdjHZJ6ftup+w3RrOAjcyO6WxsMNrL+yAzjRwVaHDCOCX
+   f7+ZEozYlxwWEFBuaWkmFESS7FVIvN4jF6Lz3V/Y+gL8bkPcYyVw9c24O
+   c=;
+X-IronPort-AV: E=Sophos;i="5.91,265,1647302400"; 
+   d="scan'208";a="93329158"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-ca048aa0.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 31 May 2022 10:59:36 +0000
+Received: from EX13D33EUC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1d-ca048aa0.us-east-1.amazon.com (Postfix) with ESMTPS id CF7D38121F;
+        Tue, 31 May 2022 10:59:30 +0000 (UTC)
+Received: from EX13MTAUEE002.ant.amazon.com (10.43.62.24) by
+ EX13D33EUC002.ant.amazon.com (10.43.164.234) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.36; Tue, 31 May 2022 10:59:29 +0000
+Received: from dev-dsk-jalliste-1c-387c3ddf.eu-west-1.amazon.com
+ (10.13.250.64) by mail-relay.amazon.com (10.43.62.224) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.36 via Frontend Transport; Tue, 31 May 2022
+ 10:59:27 +0000
+From:   Jack Allister <jalliste@amazon.com>
+CC:     <jalliste@amazon.com>, <diapop@amazon.co.uk>,
+        <metikaya@amazon.co.uk>, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        "Sean Christopherson" <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, <x86@kernel.org>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] KVM: VMX: CPU frequency scaling for intel x86_64 KVM guests
+Date:   Tue, 31 May 2022 10:59:25 +0000
+Message-ID: <20220531105925.27676-1-jalliste@amazon.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v19 11/20] s390/vfio-ap: prepare for dynamic update of
- guest's APCB on queue probe/remove
-Content-Language: en-US
-To:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
- <20220404221039.1272245-12-akrowiak@linux.ibm.com>
- <9364a1b7-9060-20aa-b0d6-88c41a30e7d4@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <9364a1b7-9060-20aa-b0d6-88c41a30e7d4@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cVNAkKZarVS-7jTW77s3SoJLqpV2_3Ev
-X-Proofpoint-ORIG-GUID: xMKK5ck2dwLiHNrfC5uBN9An8Ouf6PIr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-05-31_03,2022-05-30_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- impostorscore=0 priorityscore=1501 mlxlogscore=999 malwarescore=0
- spamscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0 suspectscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2205310054
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-12.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+A VMM can control a vCPU's CPU frequency by interfacing with KVM via
+the vCPU file descriptor to enable/set CPU frequency scaling for a
+guest. Instead of creating a separate IOCTL to this this, KVM capabil-
+ities are extended to include a capability called
+KVM_CAP_CPU_FREQ_SCALING.
 
+A generic set_cpu_freq interface is added to kvm_x86_ops
+to allow for architecture (AMD/Intel) independent CPU frequency
+scaling setting.
 
-On 5/27/22 9:36 AM, Jason J. Herne wrote:
-> On 4/4/22 18:10, Tony Krowiak wrote:
->> The callback functions for probing and removing a queue device must take
->> and release the locks required to perform a dynamic update of a guest's
->> APCB in the proper order.
->>
->> The proper order for taking the locks is:
->>
->>          matrix_dev->guests_lock => kvm->lock => matrix_dev->mdevs_lock
->>
->> The proper order for releasing the locks is:
->>
->>          matrix_dev->mdevs_lock => kvm->lock => matrix_dev->guests_lock
->>
->> A new helper function is introduced to be used by the probe callback to
->> acquire the required locks. Since the probe callback only has
->> access to a queue device when it is called, the helper function will 
->> find
->> the ap_matrix_mdev object to which the queue device's APQN is 
->> assigned and
->> return it so the KVM guest to which the mdev is attached can be 
->> dynamically
->> updated.
->>
->> Note that in order to find the ap_matrix_mdev (matrix_mdev) object, 
->> it is
->> necessary to search the matrix_dev->mdev_list. This presents a
->> locking order dilemma because the matrix_dev->mdevs_lock can't be 
->> taken to
->> protect against changes to the list while searching for the 
->> matrix_mdev to
->> which a queue device's APQN is assigned. This is due to the fact that 
->> the
->> proper locking order requires that the matrix_dev->mdevs_lock be taken
->> after both the matrix_mdev->kvm->lock and the matrix_dev->mdevs_lock.
->> Consequently, the matrix_dev->guests_lock will be used to protect 
->> against
->> removal of a matrix_mdev object from the list while a queue device is
->> being probed. This necessitates changes to the mdev probe/remove
->> callback functions to take the matrix_dev->guests_lock prior to removing
->> a matrix_mdev object from the list.
->>
->> A new macro is also introduced to acquire the locks required to 
->> dynamically
->> update the guest's APCB in the proper order when a queue device is
->> removed.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 126 +++++++++++++++++++++---------
->>   1 file changed, 88 insertions(+), 38 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index 2219b1069ceb..080a733f7cd2 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -116,6 +116,74 @@ static const struct vfio_device_ops 
->> vfio_ap_matrix_dev_ops;
->>       mutex_unlock(&matrix_dev->guests_lock);        \
->>   })
->>   +/**
->> + * vfio_ap_mdev_get_update_locks_for_apqn: retrieve the matrix mdev 
->> to which an
->> + *                       APQN is assigned and acquire the
->> + *                       locks required to update the APCB of
->> + *                       the KVM guest to which the mdev is
->> + *                       attached.
->> + *
->> + * @apqn: the APQN of a queue device.
->> + *
->> + * The proper locking order is:
->> + * 1. matrix_dev->guests_lock: required to use the KVM pointer to 
->> update a KVM
->> + *                   guest's APCB.
->> + * 2. matrix_mdev->kvm->lock:  required to update a guest's APCB
->> + * 3. matrix_dev->mdevs_lock:  required to access data stored in a 
->> matrix_mdev
->> + *
->> + * Note: If @apqn is not assigned to a matrix_mdev, the 
->> matrix_mdev->kvm->lock
->> + *     will not be taken.
->> + *
->> + * Return: the ap_matrix_mdev object to which @apqn is assigned or 
->> NULL if @apqn
->> + *       is not assigned to an ap_matrix_mdev.
->> + */
->> +static struct ap_matrix_mdev 
->> *vfio_ap_mdev_get_update_locks_for_apqn(int apqn)
->
-> vfio_ap_mdev_get_update_locks_for_apqn is "crazy long".
-> How about:
->   get_mdev_for_apqn()
->
-> This function is static and the terms mdev and apqn are specific 
-> enough that I
-> don't think it needs to start with vfio_ap. And there is no need to 
-> state in
-> the function name that locks are acquired. That point will be obvious 
-> to anyone
-> reading the prologue or the code.
+For Intel platforms, Hardware-Controlled Performance States (HWP) are
+used to implement CPU scaling within the guest. Further information on
+this mechanism can be seen in Intel SDM Vol 3B (section 14.4). The CPU
+frequency is set as soon as this function is called and is kept running
+until explicitly reset or set again.
 
-The primary purpose of the function is to acquire the locks in the 
-proper order, so
-I think the name should state that purpose. It may be obvious to someone 
-reading
-the prologue or this function, but not so obvious in the context of the 
-calling function.
-Having said that, I will shorten the name to:
+Currently the AMD frequency setting interface is left unimplemented.
 
-     get_update_locks_for_apqn
+Please note that CPU frequency scaling will have an effect on host
+processing in it's current form. To change back to full performance
+when running in host context an IOCTL with a frequency value of 0
+is needed to run back at uncapped speed.
 
+Signed-off-by: Jack Allister <jalliste@amazon.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +
+ arch/x86/kvm/vmx/vmx.c          | 91 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c              | 16 ++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 4 files changed, 110 insertions(+)
 
-
->
-> Aside from that, Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
->
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ae220f88f00d..d2efc2ce624f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1169,6 +1169,8 @@ struct kvm_x86_ops {
+ 	bool (*rdtscp_supported)(void);
+ 	bool (*invpcid_supported)(void);
+ 
++	int (*set_cpu_freq_scaling)(struct kvm_vcpu *vcpu, u8 freq_100mhz);
++
+ 	void (*set_tdp_cr3)(struct kvm_vcpu *vcpu, unsigned long cr3);
+ 
+ 	void (*set_supported_cpuid)(u32 func, struct kvm_cpuid_entry2 *entry);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6499f371de58..beee39b57b13 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1699,6 +1699,95 @@ static bool vmx_invpcid_supported(void)
+ 	return cpu_has_vmx_invpcid();
+ }
+ 
++static int vmx_query_cpu_freq_valid_freq(u8 freq)
++{
++#define MASK_PERF 0xFF
++#define CAP_HIGHEST_SHIFT 0
++#define CAP_LOWEST_SHIFT 24
++#define CAP_HIGHEST_MASK (MASK_PERF << CAP_HIGHEST_SHIFT)
++#define CAP_LOWEST_MASK (MASK_PERF << CAP_LOWEST_SHIFT)
++	u64 cap_msr;
++	u8 highest, lowest;
++
++	/* Query highest and lowest supported scaling. */
++	rdmsrl(MSR_HWP_CAPABILITIES, cap_msr);
++	highest = (u8)(cap_msr & CAP_HIGHEST_MASK);
++	lowest = (u8)((cap_msr & CAP_LOWEST_MASK) >> CAP_LOWEST_SHIFT);
++
++	if (freq < lowest || freq > highest)
++		return -EINVAL;
++
++	return 0;
++}
++
++static void vmx_set_cpu_freq_uncapped(void)
++{
++#define SHIFT_DESIRED_PERF 16
++#define SHIFT_MAX_PERF 8
++#define SHIFT_MIN_PERF 0
++
++	u64 cap_msr, req_msr;
++	u8 highest, lowest;
++
++	/* Query the capabilities. */
++	rdmsrl(MSR_HWP_CAPABILITIES, cap_msr);
++	highest = (u8)(cap_msr & CAP_HIGHEST_MASK);
++	lowest = (u8)((cap_msr & CAP_LOWEST_MASK) >> CAP_LOWEST_SHIFT);
++
++	/* Set the desired to highest performance. */
++	req_msr = ((highest & MASK_PERF) << SHIFT_DESIRED_PERF) |
++		((highest & MASK_PERF) << SHIFT_MAX_PERF) |
++		((lowest & MASK_PERF) << SHIFT_MIN_PERF);
++	wrmsrl(MSR_HWP_REQUEST, req_msr);
++}
++
++static void vmx_set_cpu_freq_capped(u8 freq_100mhz)
++{
++	u64 req_msr;
++
++	/* Populate the variable used for setting the HWP request. */
++	req_msr = ((freq_100mhz & MASK_PERF) << SHIFT_DESIRED_PERF) |
++		((freq_100mhz & MASK_PERF) << SHIFT_MAX_PERF) |
++		((freq_100mhz & MASK_PERF) << SHIFT_MIN_PERF);
++
++	wrmsrl(MSR_HWP_REQUEST, req_msr);
++}
++
++static int vmx_set_cpu_freq_scaling(struct kvm_vcpu *vcpu, u8 freq_100mhz)
++{
++	struct kvm *kvm = vcpu->kvm;
++	u64 pm_before, req_msr;
++	int rc;
++
++	/* Is HWP scaling supported? */
++	if (!this_cpu_has(X86_FEATURE_HWP))
++		return -ENODEV;
++
++	/*
++	 * HWP needs to be enabled to query & use capabilities.
++	 * This bit is W1Once so cannot be cleared after.
++	 */
++	rdmsrl(MSR_PM_ENABLE, pm_before);
++	if ((pm_before & 1) == 0)
++		wrmsrl(MSR_PM_ENABLE, pm_before | 1);
++
++	/*
++	 * Check if setting to a specific value, if being set
++	 * to zero this means return to uncapped frequency.
++	 */
++	if (freq_100mhz) {
++		rc = vmx_query_cpu_freq_valid_freq(freq_100mhz);
++
++		if (rc)
++			return rc;
++
++		vmx_set_cpu_freq_capped(freq_100mhz);
++	} else
++		vmx_set_cpu_freq_uncapped();
++
++	return 0;
++}
++
+ /*
+  * Swap MSR entry in host/guest MSR entry array.
+  */
+@@ -8124,6 +8213,8 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+ 	.rdtscp_supported = vmx_rdtscp_supported,
+ 	.invpcid_supported = vmx_invpcid_supported,
+ 
++	.set_cpu_freq_scaling = vmx_set_cpu_freq_scaling,
++
+ 	.set_supported_cpuid = vmx_set_supported_cpuid,
+ 
+ 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c33423a1a13d..9ae2ab102e01 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3669,6 +3669,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_VAR_MTRR_COUNT:
+ 	case KVM_CAP_X86_USER_SPACE_MSR:
+ 	case KVM_CAP_X86_MSR_FILTER:
++	case KVM_CAP_CPU_FREQ_SCALING:
+ 		r = 1;
+ 		break;
+ #ifdef CONFIG_KVM_XEN
+@@ -4499,6 +4500,19 @@ static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
+ 	return r;
+ }
+ 
++static int kvm_cap_set_cpu_freq(struct kvm_vcpu *vcpu,
++				       struct kvm_enable_cap *cap)
++{
++	u8 freq = (u8)cap->args[0];
++
++	/* Query whether this platform (Intel or AMD) support setting. */
++	if (!kvm_x86_ops.set_cpu_freq_scaling)
++		return -ENODEV;
++
++	/* Attempt to set to the frequency specified. */
++	return kvm_x86_ops.set_cpu_freq_scaling(vcpu, freq);
++}
++
+ /*
+  * kvm_set_guest_paused() indicates to the guest kernel that it has been
+  * stopped by the hypervisor.  This function will be called from the host only.
+@@ -4553,6 +4567,8 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 		return kvm_x86_ops.enable_direct_tlbflush(vcpu);
+ 	case KVM_CAP_SET_VAR_MTRR_COUNT:
+ 		return kvm_mtrr_set_var_mtrr_count(vcpu, cap->args[0]);
++	case KVM_CAP_CPU_FREQ_SCALING:
++		return kvm_cap_set_cpu_freq(vcpu, cap);
+ 
+ 	default:
+ 		return -EINVAL;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 831be0d2d5e4..273a3ab5590e 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -874,6 +874,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_NO_POLL_ON_HLT 100003
+ #define KVM_CAP_MMU_USE_VMA_CAPMEM 100004
+ #define KVM_CAP_MMU_SUPPORT_DYNAMIC_CAPMEM 100005
++#define KVM_CAP_CPU_FREQ_SCALING 100006
+ 
+ #define KVM_CAP_IRQCHIP	  0
+ #define KVM_CAP_HLT	  1
+-- 
+2.32.0
 
