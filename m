@@ -2,179 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19946538BDD
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 09:14:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B595538BEA
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 09:23:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244459AbiEaHOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 03:14:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56774 "EHLO
+        id S244467AbiEaHXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 03:23:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244448AbiEaHOT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 03:14:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 20E27915B5
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 00:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653981257;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=33Q+kZ3exxiCIGxTXejuFhcm2TRKe5xhqodtK0AziM4=;
-        b=KCEEKl3GXEmz3ruD79j2/X3BRFeQj3yLqJCUny6x63GQ2Xy1kIitu7qQJ+GbGvmJtIpIsK
-        AJGIqwZy+fpEGLa4Gb4CH/JDyXL4oD/WdE4hnVTpAEPt8D2FmNq2LjV3JIPug8YTLn+o3t
-        8s6cm1s3kX5iKhYJgwud+Te3TBHPqkg=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-235-YGYuJgSTOQ2VV7WQGbrRNQ-1; Tue, 31 May 2022 03:14:15 -0400
-X-MC-Unique: YGYuJgSTOQ2VV7WQGbrRNQ-1
-Received: by mail-qv1-f71.google.com with SMTP id o99-20020a0c906c000000b00456332167ffso9539453qvo.13
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 00:14:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=33Q+kZ3exxiCIGxTXejuFhcm2TRKe5xhqodtK0AziM4=;
-        b=dgq63x+zq0KZG447/OWhBgSNSPtwbhc86EKPC03AHh28jn/v1mTcRP1Zi6s7M/gRdm
-         wVzmDKHd9+vhJIfRS5Fwdz9FrAHbl60z2Oa7gwYZDBuvnw44Yh4OqANXKvsvLg/MqL2N
-         c6DLnuzId0EQGmERjAua5LOmr/iLPUDNFZi7U2DrsfNw7KVBZYhAMNCjSHkX+wu1DJ6u
-         ZAoOSBrWoiJI/xhwO3LSJUgkFkWo4Wx8RAOjp0vC2P7RhhHdlx80JvUbkuRG4NA+NAgD
-         dFQjMXpbeS+OEbPXATHtSjLcly98xi2ZH2IXUasJFdDmukmKWcNdcADa5tL5CrweRv2N
-         Cp6A==
-X-Gm-Message-State: AOAM530VaVD5mP080lhmilTHvjRU/zRC4h7lORzWRzXd6vsvCw5KT9F4
-        iU0q2Xen3c4euNEpQt9glrITRxplcd9/k1cSackWL7TW7ffQaVUQ/u6vtB+ZWl0oVcMj/CzStYn
-        m3+S0kW+MdPt7wVXWdC/UtSF7F8WD
-X-Received: by 2002:ac8:5ad0:0:b0:2f3:e37a:e768 with SMTP id d16-20020ac85ad0000000b002f3e37ae768mr45957237qtd.592.1653981254773;
-        Tue, 31 May 2022 00:14:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfsK62AT66aNNUrpiRT8Q1h/z0vwoFAfZ6ojK+Cso5QwGPLczuZn5KrJtMDcQKDAqYGqbzNtxijjj7ElUmbMA=
-X-Received: by 2002:ac8:5ad0:0:b0:2f3:e37a:e768 with SMTP id
- d16-20020ac85ad0000000b002f3e37ae768mr45957224qtd.592.1653981254525; Tue, 31
- May 2022 00:14:14 -0700 (PDT)
+        with ESMTP id S232586AbiEaHXr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 03:23:47 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C392692D09;
+        Tue, 31 May 2022 00:23:45 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24V6KnBg020552;
+        Tue, 31 May 2022 07:23:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=RDJ15Sp2JTOkhL1E4/+9ipHSf987zp1fzYxAAV5iqow=;
+ b=J2sUQwIq8MfRh+HDM4NY69hJ5wHkt/CJfLzA59MBDTgpvW/95a7Q0c3VPE/GPIUQu0Av
+ oPwJMAuxqaWcpVY9OBB2NltmcYFJX8dzAJ940c0HInIAz5gqOCf55ifnwisjD87pmQyR
+ Ikm9yEzEg0JnzqiYr3V73jvlbxSqZnepSMfX5vGNZQ0RPrLyctgO2Gm5xlm73uLUUZHX
+ ZVxY9PTmHYj3mVOL60MQzjCE88LLUc9SmQ+WMagNSs31O3SbG9wg2ObpCHAbm4nhz6co
+ RY9Y8vW6KJC5l/cP1IHr/sQl3NVjyfs6jy5TO0ZjNzjvxeOfMDCNv/3LSjZzHChvIvaV ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gddnxh0xk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 07:23:44 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24V7CKnA001206;
+        Tue, 31 May 2022 07:23:44 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gddnxh0x6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 07:23:44 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24V7M5sR015901;
+        Tue, 31 May 2022 07:23:42 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3gbcb7jsnk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 07:23:42 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24V7NcoT49873354
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 May 2022 07:23:38 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 960244C046;
+        Tue, 31 May 2022 07:23:38 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E86E4C044;
+        Tue, 31 May 2022 07:23:38 +0000 (GMT)
+Received: from li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com (unknown [9.145.165.145])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 31 May 2022 07:23:37 +0000 (GMT)
+Date:   Tue, 31 May 2022 09:23:36 +0200
+From:   Alexander Gordeev <agordeev@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Subject: Re: [PATCH 1/2] s390/gmap: voluntarily schedule during key setting
+Message-ID: <YpXCeNF9qQMUb/pi@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+References: <20220530092706.11637-1-borntraeger@linux.ibm.com>
+ <20220530092706.11637-2-borntraeger@linux.ibm.com>
 MIME-Version: 1.0
-References: <20220526124338.36247-1-eperezma@redhat.com> <20220531014108-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220531014108-mutt-send-email-mst@kernel.org>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Tue, 31 May 2022 09:13:38 +0200
-Message-ID: <CAJaqyWfRSD6xiS8DROkPvjJ4Y4dotOPWqUzaQeM3X=q_XgABdw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        netdev <netdev@vger.kernel.org>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        Parav Pandit <parav@nvidia.com>, Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        Cindy Lu <lulu@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>, ecree.xilinx@gmail.com,
-        "Dawar, Gautam" <gautam.dawar@amd.com>, habetsm.xilinx@gmail.com,
-        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220530092706.11637-2-borntraeger@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PZG7l5PwC4BhZxfK0ksrzU8nC8-UHP_E
+X-Proofpoint-GUID: PX9AByVKxw1xSiyGdP9SrvglvHWjRrnd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-05-31_02,2022-05-30_03,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ mlxlogscore=999 phishscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1011 bulkscore=0 impostorscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205310036
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 31, 2022 at 7:42 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Thu, May 26, 2022 at 02:43:34PM +0200, Eugenio P=C3=A9rez wrote:
-> > Implement stop operation for vdpa_sim devices, so vhost-vdpa will offer
-> > that backend feature and userspace can effectively stop the device.
-> >
-> > This is a must before get virtqueue indexes (base) for live migration,
-> > since the device could modify them after userland gets them. There are
-> > individual ways to perform that action for some devices
-> > (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
-> > way to perform it for any vhost device (and, in particular, vhost-vdpa)=
-.
-> >
-> > After the return of ioctl with stop !=3D 0, the device MUST finish any
-> > pending operations like in flight requests. It must also preserve all
-> > the necessary state (the virtqueue vring base plus the possible device
-> > specific states) that is required for restoring in the future. The
-> > device must not change its configuration after that point.
-> >
-> > After the return of ioctl with stop =3D=3D 0, the device can continue
-> > processing buffers as long as typical conditions are met (vq is enabled=
-,
-> > DRIVER_OK status bit is enabled, etc).
-> >
-> > In the future, we will provide features similar to VHOST_USER_GET_INFLI=
-GHT_FD
-> > so the device can save pending operations.
-> >
-> > Comments are welcome.
->
->
-> So given this is just for simulator and affects UAPI I think it's fine
-> to make it wait for the next merge window, until there's a consensus.
-> Right?
->
+On Mon, May 30, 2022 at 11:27:05AM +0200, Christian Borntraeger wrote:
+> With large and many guest with storage keys it is possible to create
+> large latencies or stalls during initial key setting:
+> 
+> rcu: INFO: rcu_sched self-detected stall on CPU
+> rcu:   18-....: (2099 ticks this GP) idle=54e/1/0x4000000000000002 softirq=35598716/35598716 fqs=998
+>        (t=2100 jiffies g=155867385 q=20879)
+> Task dump for CPU 18:
+> CPU 1/KVM       R  running task        0 1030947 256019 0x06000004
+> Call Trace:
+> sched_show_task
+> rcu_dump_cpu_stacks
+> rcu_sched_clock_irq
+> update_process_times
+> tick_sched_handle
+> tick_sched_timer
+> __hrtimer_run_queues
+> hrtimer_interrupt
+> do_IRQ
+> ext_int_handler
+> ptep_zap_key
+> 
+> The mmap lock is held during the page walking but since this is a
+> semaphore scheduling is still possible. Same for the kvm srcu.
+> To minimize overhead do this on every segment table entry or large page.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-While the change is only implemented in the simulator at this moment,
-it's just the very last missing piece in the kernel to implement
-complete live migration for net devices with cvq :). All vendor
-drivers can implement this call with current code, just a little bit
-of plumbing is needed. And it was accepted in previous meetings.
+Reviewed-by: Alexander Gordeev <agordeev@linux.ibm.com>
 
-If it proves it works for every configuration (nested, etc), the
-implementation can forward the call to the admin vq for example. At
-the moment, it follows the proposed stop status bit sematic to stop
-the device, which POC has been tested in these circumstances.
-
-Thanks!
-
-> > v4:
-> > * Replace VHOST_STOP to VHOST_VDPA_STOP in vhost ioctl switch case too.
-> >
-> > v3:
-> > * s/VHOST_STOP/VHOST_VDPA_STOP/
-> > * Add documentation and requirements of the ioctl above its definition.
-> >
-> > v2:
-> > * Replace raw _F_STOP with BIT_ULL(_F_STOP).
-> > * Fix obtaining of stop ioctl arg (it was not obtained but written).
-> > * Add stop to vdpa_sim_blk.
-> >
-> > Eugenio P=C3=A9rez (4):
-> >   vdpa: Add stop operation
-> >   vhost-vdpa: introduce STOP backend feature bit
-> >   vhost-vdpa: uAPI to stop the device
-> >   vdpa_sim: Implement stop vdpa op
-> >
-> >  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 21 +++++++++++++++++
-> >  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
-> >  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++
-> >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++
-> >  drivers/vhost/vdpa.c                 | 34 +++++++++++++++++++++++++++-
-> >  include/linux/vdpa.h                 |  6 +++++
-> >  include/uapi/linux/vhost.h           | 14 ++++++++++++
-> >  include/uapi/linux/vhost_types.h     |  2 ++
-> >  8 files changed, 83 insertions(+), 1 deletion(-)
-> >
-> > --
-> > 2.31.1
-> >
->
-
+> ---
+>  arch/s390/mm/gmap.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 1ac73917a8d3..b8ae4a4aa2ba 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -2608,6 +2608,18 @@ static int __s390_enable_skey_pte(pte_t *pte, unsigned long addr,
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Give a chance to schedule after setting a key to 256 pages.
+> + * We only hold the mm lock, which is a rwsem and the kvm srcu.
+> + * Both can sleep.
+> + */
+> +static int __s390_enable_skey_pmd(pmd_t *pmd, unsigned long addr,
+> +				  unsigned long next, struct mm_walk *walk)
+> +{
+> +	cond_resched();
+> +	return 0;
+> +}
+> +
+>  static int __s390_enable_skey_hugetlb(pte_t *pte, unsigned long addr,
+>  				      unsigned long hmask, unsigned long next,
+>  				      struct mm_walk *walk)
+> @@ -2630,12 +2642,14 @@ static int __s390_enable_skey_hugetlb(pte_t *pte, unsigned long addr,
+>  	end = start + HPAGE_SIZE - 1;
+>  	__storage_key_init_range(start, end);
+>  	set_bit(PG_arch_1, &page->flags);
+> +	cond_resched();
+>  	return 0;
+>  }
+>  
+>  static const struct mm_walk_ops enable_skey_walk_ops = {
+>  	.hugetlb_entry		= __s390_enable_skey_hugetlb,
+>  	.pte_entry		= __s390_enable_skey_pte,
+> +	.pmd_entry		= __s390_enable_skey_pmd,
+>  };
+>  
+>  int s390_enable_skey(void)
+> -- 
+> 2.35.1
+> 
