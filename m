@@ -2,178 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC4B05399D5
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 00:52:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E58CF5399DC
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 01:00:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348583AbiEaWwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 18:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
+        id S1348592AbiEaXAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 19:00:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245087AbiEaWwP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 18:52:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EE9D72AE2D
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 15:52:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654037532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9q9k+C5RGQU4qKgmWFkXDcgQ25M6UKH1DBXC6+yr110=;
-        b=E8E9R7zmtGGFSoCgN1WEBfttrIFe142RHCIs3N/J7k/laNcpKXQcjeOVw8WsgBIc56QPhH
-        NPE9SExht5T5qy3SHxf0Qgo90E2oHpsNZXJiNnKmvg5Yu3GItknp9kJ78Nd7R0PzucS3Li
-        yyslTAj5nF5PajyfZ3LAuuD8bekEiwI=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-382-AWfrvt7GMGSBdbh2u-wa3A-1; Tue, 31 May 2022 18:52:11 -0400
-X-MC-Unique: AWfrvt7GMGSBdbh2u-wa3A-1
-Received: by mail-io1-f71.google.com with SMTP id ay41-20020a5d9da9000000b006685ce50214so5121454iob.22
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 15:52:11 -0700 (PDT)
+        with ESMTP id S1346457AbiEaXAn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 19:00:43 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D7588D698
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 16:00:42 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id t144so385424oie.7
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 16:00:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eJ24BACjbDHvthbMgm4XcuH4zJHXMsFnkczDnEhJpgc=;
+        b=UBtRp3WpXKuh4/WKxp0nVJHD5gvhgnq+eNJ/fO3ud3ddLXWLPFRQrRoVXxcE2KueBX
+         L6nSzzB3fkj9/C/O/j2Sv7bm8uTC+mQJGv+JB0Ye6L5sLj3CpCZWllcZC4iDwX111HSZ
+         BsVyQDcpMNXUviN/JvhMefXXABPdZoN29CjAcx81JI8xUzeIyJd12Cv02tHku5BmZD+n
+         m84JkHnhJfZnx9ObxGjcAyupvI12SYYw44mctqa3zoL+yKb9YiQcOKK2lCRqttVWD2qU
+         9pPZ+Xev5NJQHl6NGIG9bk8hTaXduAfsT8b4ktpdL+BYug+9dTdKDNNHZQTubz809+Cd
+         etvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=9q9k+C5RGQU4qKgmWFkXDcgQ25M6UKH1DBXC6+yr110=;
-        b=bDW5foyRRPBAkHghk7BSGeqCLCwbwueiBTl4xC/KADG8Ptr1ECuqJIdFTTTZm0mxG2
-         hSWlefZdXC9EKfm29BqEyzpGxtv4CxQZcv9QJWqMqkInO9jIW7MzcdG9ujGX47/XeqbH
-         0NZm/eaSETa05IwmPwE/nVwip0QyqD4A309HwJ2NjUb33cutjSbOVqASWksyO7sQ1vBD
-         0isOrp8TdE9lCGb0/Rig5KHdJIFFqOOskzGJ+NKEZeWVeDygez3rCyfz4iefnWv9F3nV
-         UHCn41AE9tmUYOq+iLVg93h1/sdZXh4rpckRIRzYSyp8kpGAmXR9+sP1ODQjtJleZDBR
-         W7eg==
-X-Gm-Message-State: AOAM530JGnv+Bu39J8NwCHLA0JOnj5lKcuAc3SZ3NZW++WhILuF0WHyl
-        9VzUQB/XqGTHhvwQlRM4Vw9anivOTnDIKFUE5LtBUFNF+gJ+/xHl0MhuB6/9lqa3fZshG7XGWsd
-        cJY8Zpu4a4zmN
-X-Received: by 2002:a05:6638:dc6:b0:32e:e2d7:8261 with SMTP id m6-20020a0566380dc600b0032ee2d78261mr21306058jaj.152.1654037531001;
-        Tue, 31 May 2022 15:52:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFaz/Zncf57CZD055l8ggcPaldX2dVcDSiNf2yikAtVetyU+4sMp+QQR12XvYG/vo4kFwZKA==
-X-Received: by 2002:a05:6638:dc6:b0:32e:e2d7:8261 with SMTP id m6-20020a0566380dc600b0032ee2d78261mr21306045jaj.152.1654037530793;
-        Tue, 31 May 2022 15:52:10 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c18-20020a92c8d2000000b002cde6e352ffsm33236ilq.73.2022.05.31.15.52.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 May 2022 15:52:10 -0700 (PDT)
-Date:   Tue, 31 May 2022 16:52:09 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Abhishek Sahu <abhsahu@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v3 8/8] vfio/pci: Add the support for PCI D3cold state
-Message-ID: <20220531165209.1c18854f.alex.williamson@redhat.com>
-In-Reply-To: <20220531194304.GN1343366@nvidia.com>
-References: <20220425092615.10133-1-abhsahu@nvidia.com>
-        <20220425092615.10133-9-abhsahu@nvidia.com>
-        <20220504134551.70d71bf0.alex.williamson@redhat.com>
-        <9e44e9cc-a500-ab0d-4785-5ae26874b3eb@nvidia.com>
-        <20220509154844.79e4915b.alex.williamson@redhat.com>
-        <68463d9b-98ee-b9ec-1a3e-1375e50a2ad2@nvidia.com>
-        <42518bd5-da8b-554f-2612-80278b527bf5@nvidia.com>
-        <20220530122546.GZ1343366@nvidia.com>
-        <c73d537b-a653-bf79-68cd-ddc8f0f62a25@nvidia.com>
-        <20220531194304.GN1343366@nvidia.com>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eJ24BACjbDHvthbMgm4XcuH4zJHXMsFnkczDnEhJpgc=;
+        b=pwDujYMMXQwTgajJ3D/szmRgH60ABAS2x2ank+6DER4sKsNmCErYAPInbasY/6kk3x
+         b4FrjOSRUSeI1TBhklk6zvb8DHurAhT556l2CNHeOTC1by6SZKPlS6zrYLp1VENfUOjk
+         Xx6IXtItVJ2lnJhkKQ9QPve3g65H/m+c5ucajYsObZRH9oj+klAjltpPNVGflucosaBc
+         OdhEXLuzpZXu0Q6mOAzMIx5tRyDtCHpzdsXaEI1NMAmYhQt/boQI+bUjXEMba3Sgnj7h
+         knBT9SbFd9CX8fgHJOMN7yeuZB514Bo7Y+qqLaUtIOEmfmvqD/6vTdZXZWJA5Y0zJf16
+         0IRA==
+X-Gm-Message-State: AOAM532+wx+FrcF+EaGWQrr6bspoAEF2HINLrCS6AtVHwoS66GWGa1Hb
+        aqxvqPpSCOERyeb6aP/eJyVIhWA9Zdvm6IgSwgOLVQ==
+X-Google-Smtp-Source: ABdhPJzTTWc73ximZkQFkN2gkYfd+ahEmzA7PN27k5b+sHnaNFd+LGh12QSDr90VunGkhbmdoDFJIc3CGa9vr961AdQ=
+X-Received: by 2002:a05:6808:13c4:b0:32a:f1cb:fc12 with SMTP id
+ d4-20020a05680813c400b0032af1cbfc12mr13896481oiw.13.1654038041657; Tue, 31
+ May 2022 16:00:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <CAGG=3QXUfFksVLF=gzU3EYkyf7RQKvr5_FU6Ea5enf39vinY3A@mail.gmail.com>
+In-Reply-To: <CAGG=3QXUfFksVLF=gzU3EYkyf7RQKvr5_FU6Ea5enf39vinY3A@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 31 May 2022 16:00:30 -0700
+Message-ID: <CALMp9eQNmxscE1iMCV=ibF9zQ5E+CYGbfjV6vYtL-ddOECrDXw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests RFC] Inlining in PMU Test
+To:     Bill Wendling <morbo@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Greg Thelen <gthelen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 31 May 2022 16:43:04 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, May 26, 2022 at 6:32 PM Bill Wendling <morbo@google.com> wrote:
+>
+> I'm into an issue when I compile kvm-unit-tests with a new-ish Clang
+> version. It results in a failure similar to this:
+>
+> Serial contents after VMM exited:
+> SeaBIOS (version 1.8.2-20160510_123855-google)
+> Total RAM Size = 0x0000000100000000 = 4096 MiB
+> CPU Mhz=2000
+> CPUs found: 1     Max CPUs supported: 1
+> Booting from ROM...
+> enabling apic
+> paging enabled
+> cr0 = 80010011
+> cr3 = bfefc000
+> cr4 = 20
+> PMU version:         4
+> GP counters:         3
+> GP counter width:    48
+> Mask length:         7
+> Fixed counters:      3
+> Fixed counter width: 48
+>  ---8<---
+> PASS: all counters
+> FAIL: overflow: cntr-0
+> PASS: overflow: status-0
+> PASS: overflow: status clear-0
+> PASS: overflow: irq-0
+> FAIL: overflow: cntr-1
+> PASS: overflow: status-1
+> PASS: overflow: status clear-1
+> PASS: overflow: irq-1
+> FAIL: overflow: cntr-2
+> PASS: overflow: status-2
+> PASS: overflow: status clear-2
+> PASS: overflow: irq-2
+> FAIL: overflow: cntr-3
+> PASS: overflow: status-3
+> PASS: overflow: status clear-3
+> PASS: overflow: irq-3
+>  ---8<---
+>
+> It turns out that newer Clangs are much more aggressive at inlining
+> than GCC. I could replicate this failure with GCC with the patch
+> below[1] (the patch probably isn't minimal). If I add the "noinline"
+> attribute "measure()" in the patch below, the test passes.
+>
+> Is there a subtle assumption being made by the test that breaks with
+> aggressive inlining? If so, is adding the "noinline" attribute to
+> "measure()" the correct fix, or should the test be made more robust?
 
-> On Tue, May 31, 2022 at 05:44:11PM +0530, Abhishek Sahu wrote:
-> > On 5/30/2022 5:55 PM, Jason Gunthorpe wrote: =20
-> > > On Mon, May 30, 2022 at 04:45:59PM +0530, Abhishek Sahu wrote:
-> > >  =20
-> > >>  1. In real use case, config or any other ioctl should not come along
-> > >>     with VFIO_DEVICE_FEATURE_POWER_MANAGEMENT ioctl request.
-> > >> =20
-> > >>  2. Maintain some 'access_count' which will be incremented when we
-> > >>     do any config space access or ioctl. =20
-> > >=20
-> > > Please don't open code locks - if you need a lock then write a proper
-> > > lock. You can use the 'try' variants to bail out in cases where that
-> > > is appropriate.
-> > >=20
-> > > Jason =20
-> >=20
-> >  Thanks Jason for providing your inputs.
-> >=20
-> >  In that case, should I introduce new rw_semaphore (For example
-> >  power_lock) and move =E2=80=98platform_pm_engaged=E2=80=99 under =E2=
-=80=98power_lock=E2=80=99 ? =20
->=20
-> Possibly, this is better than an atomic at least
->=20
-> >  1. At the beginning of config space access or ioctl, we can take the
-> >     lock
-> > =20
-> >      down_read(&vdev->power_lock); =20
->=20
-> You can also do down_read_trylock() here and bail out as you were
-> suggesting with the atomic.
->=20
-> trylock doesn't have lock odering rules because it can't sleep so it
-> gives a bit more flexability when designing the lock ordering.
->=20
-> Though userspace has to be able to tolerate the failure, or never make
-> the request.
->=20
-> >          down_write(&vdev->power_lock);
-> >          ...
-> >          switch (vfio_pm.low_power_state) {
-> >          case VFIO_DEVICE_LOW_POWER_STATE_ENTER:
-> >                  ...
-> >                          vfio_pci_zap_and_down_write_memory_lock(vdev);
-> >                          vdev->power_state_d3 =3D true;
-> >                          up_write(&vdev->memory_lock);
-> >=20
-> >          ...
-> >          up_write(&vdev->power_lock); =20
->=20
-> And something checks the power lock before allowing the memor to be
-> re-enabled?
->=20
-> >  4.  For ioctl access, as mentioned previously I need to add two
-> >      callbacks functions (one for start and one for end) in the struct
-> >      vfio_device_ops and call the same at start and end of ioctl from
-> >      vfio_device_fops_unl_ioctl(). =20
->=20
-> Not sure I followed this..
+It's not all that subtle. :-)
 
-I'm kinda lost here too.  A couple replies back there was some concern
-about race scenarios with multiple user threads accessing the device.
-The ones concerning non-deterministic behavior if a user is
-concurrently changing power state and performing other accesses are a
-non-issue, imo.  I think our goal is only to expand the current
-memory_lock to block accesses, including config space, while the device
-is in low power, or some approximation bounded by the entry/exit ioctl.
+The test assumes that every invocation of measure() will retire the
+same number of instructions over the part of measure() where a PMC is
+programmed to count instructions retired.
 
-I think the remaining issues is how to do that relative to the fact
-that config space access can change the memory enable state and would
-therefore need to upgrade the memory_lock read-lock to a write-lock.
-For that I think we can simply drop the read-lock, acquire the
-write-lock, and re-test the low power state.  If it has changed, that
-suggests the user has again raced changing power state with another
-access and we can simply drop the lock and return -EIO.
+To set up PMC overflow, check_counter_overflow() first records the
+number of instructions retired in an invocation of measure(). That
+value is stored in 'count.' Then, it initializes a PMC to (1 - count),
+and it invokes measure() again. It expects that 'count' instructions
+will have been retired, and the PMC will now have the value '1.'
 
-If I'm still misunderstanding, please let me know.  Thanks,
+If the first measure() and the second measure() are different code
+sequences, this doesn't work.
 
-Alex
-
+Adding 'noinline' to measure() is probably the right thing to do.
