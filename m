@@ -2,107 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1244B538CF8
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 10:37:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0E25538CFF
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 10:37:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239278AbiEaIgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 04:36:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56314 "EHLO
+        id S244795AbiEaIhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 04:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244912AbiEaIgi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 04:36:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C92196F4BE
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 01:36:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653986195;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=OJosmadwaZrcCAyKiBccF3XJ30hJPvrl748luVxs2H0=;
-        b=OnzhBRPDDQNvwC3hmi9F/UA49xqSBn0P3IkPSs8f5KmZcGBO030B4GlpAZje6c3EjOhEgC
-        uXKfgGcXXT2bgMXMCUg9f5XTLerqbOp3j7WcEPJ4QhAYdsTCaXomGGeXr1nXOcMVnXCkm7
-        2ukh19soEQE8Gq6yRKuG/4EWD0pRZTc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-3dNthMNZPriXltj7lRZsRQ-1; Tue, 31 May 2022 04:36:30 -0400
-X-MC-Unique: 3dNthMNZPriXltj7lRZsRQ-1
-Received: by mail-wr1-f71.google.com with SMTP id e7-20020adfa747000000b0020fe61b0c62so1889521wrd.22
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 01:36:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references
-         :user-agent:reply-to:date:message-id:mime-version;
-        bh=OJosmadwaZrcCAyKiBccF3XJ30hJPvrl748luVxs2H0=;
-        b=h8284FhrQdJJ3dqwZVtreTy/sbyvA6vIX1aRXhgpkMR420K2jfyfybLmHBSJlupuYL
-         gw1DB2ytAav3iyRl2paJMxrcrnMteeOmQmTx47QEBRAmNP6VfWeZI1yHEGdBE2ooaUEE
-         gbg63C+kCWrjQ/dgvRk5h0Ued/+/8eyAMPvQNVvVQ2Uesg7oSvZAPZx251C1q+28wR7p
-         M8ckgv40L88GTAm5xbhscKQH1KreDqawAlQhIWcX97lc13ch7mKNhmKlY6OPvhYw4j1u
-         Yfm07Aq1b/7EJKVNqIEHsjbzSPdtNu2/nyceZpE28PkpA1BChwrSEV9nOldxK7fdpt+I
-         5Bcg==
-X-Gm-Message-State: AOAM5334ryjoE8X4EFlR5bkNrVkV7v4lLTmBq9bo+Cvvy4yobYhVUwLF
-        bzmgN99P/zzM8HfhKIQ23n20IMrOQtm69X54V5ypUDwkyvXFZ5Y9+lP8N95rh0PQI9kkfYO6whk
-        ze5ZLTUJsycbt9LheSG+HRHSzR1gpGMluvPayEAPYDZCnrc3a1C46wEVy0mJWPFNQ
-X-Received: by 2002:a05:600c:42c1:b0:397:4154:ec9b with SMTP id j1-20020a05600c42c100b003974154ec9bmr22445525wme.18.1653986189500;
-        Tue, 31 May 2022 01:36:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTsytkhZMytk+HH7vMuQ5rFSiX1wuM3O43Ah29Gk7Z56c9c1wx/DhipdMIGetj7FutBKbz6g==
-X-Received: by 2002:a05:600c:42c1:b0:397:4154:ec9b with SMTP id j1-20020a05600c42c100b003974154ec9bmr22445508wme.18.1653986189254;
-        Tue, 31 May 2022 01:36:29 -0700 (PDT)
-Received: from localhost (static-88-175-6-89.ipcom.comunitel.net. [89.6.175.88])
-        by smtp.gmail.com with ESMTPSA id i7-20020a5d5847000000b002101ed6e70fsm10236900wrf.37.2022.05.31.01.36.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 May 2022 01:36:28 -0700 (PDT)
-From:   Juan Quintela <quintela@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>
-Cc:     qemu-devel@nongnu.org
-Subject: Re: KVM call for 2022-05-31
-In-Reply-To: <87v8toxuel.fsf@secure.mitica> (Juan Quintela's message of "Sun,
-        29 May 2022 16:53:06 +0200")
-References: <87v8toxuel.fsf@secure.mitica>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Tue, 31 May 2022 10:36:28 +0200
-Message-ID: <87czfup08j.fsf@secure.mitica>
+        with ESMTP id S241386AbiEaIhX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 04:37:23 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70313522FA;
+        Tue, 31 May 2022 01:37:20 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24V5g18X001311;
+        Tue, 31 May 2022 08:37:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=XC7zduPNmSfRtyt3S9GB+uoHsgq1u4k82CI3w6NYzu8=;
+ b=LOxNcqAGeknPU8fTdZ6nWBaoSJZ8hyT2CUUewfsqusQGB4bTxnEkp5/Bu0VEdBvyGjbJ
+ GDsJBxXVCuGhxvapLRKQYRMvj0ue0FW545tDMpTwOsPolSxad6rGVbbwuOSXNuPdOgko
+ vbRKCTjCwjJOVB1SlSxR8lKzuYbPsMv1zCea87lI1+x9Bv3ipEXTL26zQw5SISuPoEaL
+ j6CTJzR0a9qKHJv2aNR+2z/Ixy06PxRiOjnyRfPfb805EuPOQNKAjcC+2R1SD/AcL2S/
+ 7qr53/N1NOeFel6yh2UsIa7Jjvt60GZmTcDqZW2S+KiU8g7j8GBE54s+OhrEfXfQoWG4 aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdd3mu3hc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 08:37:19 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24V6wxU1009429;
+        Tue, 31 May 2022 08:37:19 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdd3mu3fp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 08:37:19 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24V8ZDVe003289;
+        Tue, 31 May 2022 08:37:17 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 3gbc8yjvms-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 08:37:16 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24V8bDmE22020568
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 May 2022 08:37:13 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CDCCE11C04C;
+        Tue, 31 May 2022 08:37:13 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 879C411C04A;
+        Tue, 31 May 2022 08:37:13 +0000 (GMT)
+Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 31 May 2022 08:37:13 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        scgl@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v3 0/1] s390x: add migration test for storage keys
+Date:   Tue, 31 May 2022 10:37:12 +0200
+Message-Id: <20220531083713.48534-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Y9XEBG_SPWtxFxocKttjOia-2fPtn54x
+X-Proofpoint-GUID: kLnl5f4lEqXctvhMCeP4dueIIclA4BGX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-05-31_03,2022-05-30_03,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ adultscore=0 lowpriorityscore=0 suspectscore=0 priorityscore=1501
+ bulkscore=0 mlxscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ mlxlogscore=882 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205310041
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Juan Quintela <quintela@redhat.com> wrote:
-> Hi
+v2->v3:
+----
+* remove some useless variables, style suggestions, improve commit description
+  (thanks Janis)
+* reverse christmas tree (thanks Claudio)
 
-Hi
+v1->v2:
+----
+* As per discussion with Janis and Claudio, remove the actual access check from
+  the test. This also allows us to remove the check_pgm_int_code_xfail() patch.
+* Typos/Style suggestions (thanks Janis)
 
-As there are no topics on the agenda, call  gets cancelled.
+Upon migration, we expect storage keys set by the guest to be preserved,
+so add a test for it.
 
-Happy hacking, Juan.
+We keep 128 pages and set predictable storage keys. Then, we migrate and check
+they can be read back.
 
-> Please, send any topic that you are interested in covering.
->
-> At the end of Monday I will send an email with the agenda or the
-> cancellation of the call, so hurry up.
->
-> After discussions on the QEMU Summit, we are going to have always open a
-> KVM call where you can add topics.
->
->  Call details:
->
-> By popular demand, a google calendar public entry with it
->
->   https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
->
-> (Let me know if you have any problems with the calendar entry.  I just
-> gave up about getting right at the same time CEST, CET, EDT and DST).
->
-> If you need phone number details,  contact me privately
->
-> Thanks, Juan.
+Nico Boehr (1):
+  s390x: add migration test for storage keys
+
+ s390x/Makefile         |  1 +
+ s390x/migration-skey.c | 76 ++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg    |  4 +++
+ 3 files changed, 81 insertions(+)
+ create mode 100644 s390x/migration-skey.c
+
+-- 
+2.36.1
 
