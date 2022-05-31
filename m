@@ -2,140 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96D04538FD9
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:29:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB76C538FED
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:35:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343817AbiEaL3e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 07:29:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33442 "EHLO
+        id S236138AbiEaLfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 07:35:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235213AbiEaL3c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 07:29:32 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4815956FBE;
-        Tue, 31 May 2022 04:29:31 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VADnwf008819;
-        Tue, 31 May 2022 11:29:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=MWJNEvmLnQ7b1SoYG+r2ZoWJVqcH6a53P8JH4dFdcvg=;
- b=EeAI+GU2aeitzyymDENs4vP/E/C4Xlo5EPydGcBJk90GDkYafGNJJuMYb8nMweaCw6JR
- 8neJFL/fLusTwUuM0O2ZT3fhQ7GmJg8ivkHkKJB1nZINz6gQzx5cFHkv9zggGdQzXCf/
- ZWQDyb4rTPfSNataZpij8/qPNmiA3AupVErHFKoNtuuJGvaxv0n3XHbMYRYESQf84ICL
- xUwVlJgiRv9Iw5JJEXRkgDt8apgRqMNfPfEi2t4ATUlukhh8zLxuKguGjiXLvGn7WYwd
- EeY6TWsvm0VNCYY8g31OBkXPkecz17AXtJgGN5hDggPx2xI7ONRS/9d7gQqy4tyNq98U tg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh3118up-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 11:29:28 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24VAFmgE018942;
-        Tue, 31 May 2022 11:29:27 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh3118u9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 11:29:27 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24VBLkol022481;
-        Tue, 31 May 2022 11:29:25 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06fra.de.ibm.com with ESMTP id 3gbcb7k1xn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 11:29:25 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24VBTMXb47644982
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 May 2022 11:29:22 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 24280A405B;
-        Tue, 31 May 2022 11:29:22 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 87F3EA4054;
-        Tue, 31 May 2022 11:29:21 +0000 (GMT)
-Received: from [9.171.36.152] (unknown [9.171.36.152])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 31 May 2022 11:29:21 +0000 (GMT)
-Message-ID: <a1b60913-c261-f8f0-d8bc-a536dcb64c52@linux.ibm.com>
-Date:   Tue, 31 May 2022 13:29:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v4 0/4] KVM: s390: selftests: Provide TAP output in tests
+        with ESMTP id S232076AbiEaLew (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 07:34:52 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam08on2064.outbound.protection.outlook.com [40.107.102.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41DF984A03
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 04:34:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JmMKKgPxrbS13fw/T1jUUKCPd/v1fkbe3f2b+P9uUAMdrRI9tG0YEhBY1vlqzrE/w1T0IWwQ09pZCtE9v9uwhJekSqFNS72ijdSxOQRvlfjawAlHdv5+hdnij+Hz8F28np3YoepgZSMQYLkhwgxp75PdJcf+7XfSy0TC0MNhI5Jjgsw+57WQh1P/Mj7wQf3D3tITFAiWhKwu828dMJ3ErR7jFQ/NJlPS/7UVybpZIfsfSv3NAIBD3W5YfyfMKdOPcOV5Re2THD1CUBN2xUjyoGmF/u44tgw2fJW33qcU0xOqVBW8p06ETxSMVBDcZNPB1GXmcXl114VDSnykBj8Qeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8eUf6vOp6I+nnVncWd4Fs1FFcZcdG5/kYdEnvCS/sE8=;
+ b=fXwO6PbT7UNn7mhq3Mb0gWuDLQxrCuVMlbx/eXJQaBy4cX6Wcw2Z/jiLk8AU3Ifq/evKlF8eCzWF3m9OYgIRp9j2ADXDmgb3w2u9YiFVZNU5WFK081lsdWtkxkpxuVzDjx35gXqLhpVlk5gh2/LPRyEytQQmx0yjdzlT2p3c7+AcjHY8gNQTUqMtg7BfXA93QAYJUCiVHAsb/CBqcfv99Xad9c19sWLAgfXedUDu5wVg/26+UmqYT8ofNKZt3vE5G/j5ScC1eMoitgA7VYGJpKIUfpRjHNGcV5gQX+dC+6VXvSOoXp3zNTXHiEBKCbeAof6HHxL447jcZqsc+xUKYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8eUf6vOp6I+nnVncWd4Fs1FFcZcdG5/kYdEnvCS/sE8=;
+ b=dPeeMP7B85vc7+JlcB9DcsQiJoe+KP6UhPIXEUxw7kvL0efCy/8eJlNXnu9xwDdBh6nGfJr6gIIOVgMV4rlL1WGx/yjyWmeH5hM7dPVKytA0kZ7zRPYJzmBSDtO3tzkpjeloOCFbYUTvSCr4QicaFwEY6YXqMHugbM5lMG0OfYM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
+ PH0PR12MB5484.namprd12.prod.outlook.com (2603:10b6:510:eb::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5293.13; Tue, 31 May 2022 11:34:48 +0000
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::8c27:b470:84f9:82b8]) by DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::8c27:b470:84f9:82b8%7]) with mapi id 15.20.5293.019; Tue, 31 May 2022
+ 11:34:48 +0000
+Message-ID: <efd6a8ac-413c-f39e-e566-bb317ed77ac4@amd.com>
+Date:   Tue, 31 May 2022 18:34:34 +0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH RFC 09/19] iommu/amd: Access/Dirty bit support in IOPTEs
 Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        linux-s390@vger.kernel.org
-References: <20220531101554.36844-1-thuth@redhat.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220531101554.36844-1-thuth@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+References: <20220428210933.3583-1-joao.m.martins@oracle.com>
+ <20220428210933.3583-10-joao.m.martins@oracle.com>
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+In-Reply-To: <20220428210933.3583-10-joao.m.martins@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: j5mIJ4VbVYQWbpKnQvweuT8s-MBOBH7c
-X-Proofpoint-GUID: 9YIdFaTq2U7r2UXf7Hy5Ab5caIFuWj2i
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+X-ClientProxiedBy: SGAP274CA0006.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::18)
+ To DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-05-31_04,2022-05-30_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- malwarescore=0 mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0
- impostorscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2205310058
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4d95b8c1-231d-4eab-3e02-08da42f990ee
+X-MS-TrafficTypeDiagnostic: PH0PR12MB5484:EE_
+X-Microsoft-Antispam-PRVS: <PH0PR12MB5484CE28B9E2FCED8EDBEBE4F3DC9@PH0PR12MB5484.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tGJJgiEJ5ZF++AemzWAyAq11/BeuKBX3DA+OvR/TQ3FkANC23SWo3cl24bnmC95+4guP/72O0oMRGZ6++Uk4ZSf3SIb1QbKgWUaXMGaHSg47QEGH9aaJYX3jStq0keN9xbcMbvjMvLpTcIceGniBUi0x4lhVejhPfd42dozWoIc1bdXMolvI9850moVBG9jpILjE5upefEN/YmIpH3IVjivGsBPrsHEtFvAHkB/luso2LAOA06+Y7CkLEsy1oi/93SgW8pp3g7nNmT3+EPIhMxvQJOxXFq/5fxZFw/AA7663NN6MarSQwpoDtG9mOcpLN3EpYjk2jW+RLHc6f6DM9had8ZgzKH+54dm7AA9rpbwBh+WAc7nTLXg4QDD/ImuWMBwaQg5+z2mbydMaED0fQ4PxFF0z3irTgDJbdKNikkBLv0as1y8VE8i8HVaREsrdmEBW6bKe9hvlc+9ib0+mABhYiyqU0I/Ra7VB+3C5K/DYjLUWfKbnhvLht7/mnBoPWfXyT353w5HLKMBeYcb/bVuFZ4Hh5g15u2RI5KZfIVKdwl/aKylckGkv5xScL+SoLJBnyi+saS1jVs0xp/4ysRra8PwOK7yARXuww22TN1LQ3iilhkKU8s02a3YT404pu4xCKlFVHFEG0JgqBgVJPuuBJYTfm8HKGuCG6231/EpArZRzpWteJJQ2VrXkPhePQgpMIufpWrjRmedWZ3kXVeClv5QwQZZLslxqZWrC9RG7Gt2MCmgwCdbJzNF3utwJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6666004)(2906002)(508600001)(8936002)(7416002)(5660300002)(2616005)(44832011)(6486002)(6512007)(86362001)(31696002)(4326008)(66476007)(6506007)(66946007)(53546011)(66556008)(8676002)(54906003)(83380400001)(316002)(38100700002)(36756003)(186003)(31686004)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UVRWNWVtYktXM0N6UGt2cmJQS040Z0FEeGorOFpZOEpHMGpVQUxScUFRVlY4?=
+ =?utf-8?B?aFNwUVM4UFRyN2RZakhGSjFsajBqcStCVTVSZkdDV0p5TU8rRFJTdnhGM1dH?=
+ =?utf-8?B?c3lzQnVTMlhtNjJrTzZvbWgrR29GOXZ0WitYbDhsOGxhWCtNTHBuUzJ0L1hV?=
+ =?utf-8?B?M1AvbWUyTm9KN3VObW4xYXg0NUhrM1hGamVBMStDM1J0RnJwcVg0QW9jbjZJ?=
+ =?utf-8?B?a0hUVnFqb0k0NGkvcCs4U2liMjVUc29RVVRxVnNMbUpZMTk3N2JVcDRaNThH?=
+ =?utf-8?B?ZTh1aHhRR2s2NlRNUGdPNFU3b1pUWFd3aXdTKzYrSTIyYVFqd3RtaUtxaWtK?=
+ =?utf-8?B?eXdKdExXSWhDeFpYSGk3NmdVa3daUVNWR2VEQndPd3grZ3NaaktDaG5nZnAz?=
+ =?utf-8?B?VTBOeDR0QkV0dEY5TkxlOWxDaDBSVy9mbWp0aEJ4N1JWRXFLRmhFUnlBR3pz?=
+ =?utf-8?B?NUpoZjZKck1zcVl2N0FQRHlVaG9Vbms1d2FwNkQ3MTN4SG00V0hjUUZ4My9v?=
+ =?utf-8?B?dkhacjdCWWxXc085Qk9heEpBTHVTdWk4ckN4VDhCMWlMQTRZYXFIQ1R1aXZa?=
+ =?utf-8?B?TFF3WndJakZKWmRDNzF0c0JzVEZGSVhWZ3dCRVB5OVZCQXFoK0l6cmxybGVa?=
+ =?utf-8?B?YW9ScncrVHlyZHJZY3dPdUl1QnU3bU1RK080NW9DM0xJSVY3RkVzMy9HYkpV?=
+ =?utf-8?B?ckRZdUhLVmZTS3ZrSkNrVmZEYmNsanFBNzlMRDF5QkdKWE4ya2V5eFRlc2FL?=
+ =?utf-8?B?bDZWbC9uVy80bzZsMnlZUmNFRTZOUDF4a0FtVUN1T3NHZTlCaHd4dlpmTlRm?=
+ =?utf-8?B?cGdTYzBITDlJS2MrZDMyMnRmRUx1VmpnRUIyT0VzdXRyY2xudGNCY3lOYnA3?=
+ =?utf-8?B?SXI2NTFRQVNoR0pYWHJ3NGZCeUJGckFvMS9HZSsxZlVOK2g3dWFpTEp4NmJH?=
+ =?utf-8?B?YTNPNk85d2dMRGVpRUtkRWhtL1Vtd3E5V1pPQ0VWUHE4dkcwaXM3R3o4YlNH?=
+ =?utf-8?B?WWR3MHkxckt1NGsvb3VmN1FlSUlFcEtsY0JOSmphZFFJMmk1SVJtWHBVdGMr?=
+ =?utf-8?B?SXA5TGdDbEs2ZGxubXZndzBrVUthUTBIUWViSmFUUWZqeUVEc2Voby9lYzlU?=
+ =?utf-8?B?anBhS0hYSHNwdXBQRWo1NlRIWkJpSDdyQmYxTFpUY2IzekE2UWRpbXBOSVNQ?=
+ =?utf-8?B?cGZ2Vk1IUTdFZ0FpK1BFeC9MN0xWdkZqQ05LOFhCMy9GOUxRc2NwbS9rNkhm?=
+ =?utf-8?B?clhtSHZCaXZqZEp2cEQ4M1NGdmxZVG52VUFTNjRNWXUvcnhpZGluVWRMUUg1?=
+ =?utf-8?B?UGEzUUdva200YzZkVEFDWGhqSm9LWk5SVDdyWTUwa0lXbjAwdHdTY0hPSDVY?=
+ =?utf-8?B?bVN1TjhMWnM1T0NwRFNTVjRNcEREMTUxdnkybWxoZC9yaEtYcithOTRiWnVF?=
+ =?utf-8?B?VHI5aGpLSkN2ZThWR2lrRFd4d2d5RU5MN1NxSmhtRElmL254aHFjR0puTUw3?=
+ =?utf-8?B?U21nYWhiUG5zUWUrcjdzM2lORFlLeDdhZnFDWE55bUt6a0dVeDU4WDk4MmtT?=
+ =?utf-8?B?b1hndFh1aDdrSStEK3NiYTZCSmg4Wm90dGlFRU1BNjNrU01uN0JPTnl4RXpo?=
+ =?utf-8?B?MnBRck1qc1JxY2wzQkpudkhqMU9ZR3d5SEg3aTlpOWZBRXAvS1hlTzA5aFgy?=
+ =?utf-8?B?Sjc2RzIxeCtERG9QNWVSem9GYmFWOEd2cUNUYTFSMWZyNzVFN3hHRnJXWE9Z?=
+ =?utf-8?B?RUpyUkgrZ0NiODN3TU9STGJVbjRyQnF2VHh1QjZzVU0yK2JhQXl4anN5S1Vj?=
+ =?utf-8?B?OHpyVHQyV2FEWFRzcDZMQW1nQmc5cjQ2T0tGejRweVluN21iSCs2TDZ0UzlJ?=
+ =?utf-8?B?ams2eTNzUUxOY20zaDNQdWc5WG41ckpjUDBxSHlwaXlzWElrU0g4L3ptRkJO?=
+ =?utf-8?B?Y2NvVnUwcGlUMXZiekNMU0pPTms3cTgyMHh1ZTRaOUJidkFCYU9HdTNWUzhy?=
+ =?utf-8?B?SjBVU2pJM25pdGk0dkphTmRYTHN4NC9EK3YrOTNudW8wZnFZc25OYjl1QTFr?=
+ =?utf-8?B?Y1JtMDNFWndGZzJodUdBdEh3L0lwcG11bTBQQWo5NlJyRFhmZzF6UWprYzlp?=
+ =?utf-8?B?WVhJbUtISUo1QVVMSmZmcmRyNmNPbmpLaTNnamxiVldLTCthcldZMytCMDhF?=
+ =?utf-8?B?Rm84ei84MytmUEppaSsxRFRqMC81ZXFKa2liTm1YRy9kZ29TeDVwejVKTk5i?=
+ =?utf-8?B?UkdqcHJTWmdwMzZRZ3hUVERVNnYzOUtldk5VNGxaREtlV1ZKQXdCbkV5ejMw?=
+ =?utf-8?B?OW14Q0YxcnQ0Nm9LSFFGQ2Y0T0M3SjJjeDBVNTVvN25pOFR6Mk5PK0tTdFNr?=
+ =?utf-8?Q?qXmpe+w60iO5oExdaL5lcBO9T9jtOI+2B64FL1ZCjf6VF?=
+X-MS-Exchange-AntiSpam-MessageData-1: Y9KhjB5cBKM4jw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d95b8c1-231d-4eab-3e02-08da42f990ee
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2022 11:34:48.1087
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C1kzZ3CF/OgC18ZYXIzbxjZ4D/WUpGUhTs7Er9Vv5KUtFsyCa3757jXqibRrBTbQ+01+HP2Y7w+9pdHYO8oj4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5484
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 31.05.22 um 12:15 schrieb Thomas Huth:
-> This patch series is motivated by Shuah's suggestion here:
-> 
->   https://lore.kernel.org/kvm/d576d8f7-980f-3bc6-87ad-5a6ae45609b8@linuxfoundation.org/
-> 
-> Many s390x KVM selftests do not output any information about which
-> tests have been run, so it's hard to say whether a test binary
-> contains a certain sub-test or not. To improve this situation let's
-> add some TAP output via the kselftest.h interface to these tests,
-> so that it easier to understand what has been executed or not.
-> 
-> v4:
->   - Rebased to include test_termination() now in the memop test
->   - Reworked the extension capability check in the memop test
-> 
-> v3:
->   - Added comments / fixed cosmetics according to Janosch's and
->     Janis' reviews of the v2 series
->   - Added Reviewed-by tags from the v2 series
-> 
-> v2:
->   - Reworked the extension checking in the first patch
->   - Make sure to always print the TAP 13 header in the second patch
->   - Reworked the SKIP printing in the third patch
-> 
-> Thomas Huth (4):
->    KVM: s390: selftests: Use TAP interface in the memop test
->    KVM: s390: selftests: Use TAP interface in the sync_regs test
->    KVM: s390: selftests: Use TAP interface in the tprot test
->    KVM: s390: selftests: Use TAP interface in the reset test
-> 
->   tools/testing/selftests/kvm/s390x/memop.c     | 95 +++++++++++++++----
->   tools/testing/selftests/kvm/s390x/resets.c    | 38 ++++++--
->   .../selftests/kvm/s390x/sync_regs_test.c      | 87 +++++++++++++----
->   tools/testing/selftests/kvm/s390x/tprot.c     | 29 +++++-
->   4 files changed, 197 insertions(+), 52 deletions(-)
-> 
+Joao,
 
-Thanks applied and queued.
+On 4/29/22 4:09 AM, Joao Martins wrote:
+> .....
+> +static int amd_iommu_set_dirty_tracking(struct iommu_domain *domain,
+> +					bool enable)
+> +{
+> +	struct protection_domain *pdomain = to_pdomain(domain);
+> +	struct iommu_dev_data *dev_data;
+> +	bool dom_flush = false;
+> +
+> +	if (!amd_iommu_had_support)
+> +		return -EOPNOTSUPP;
+> +
+> +	list_for_each_entry(dev_data, &pdomain->dev_list, list) {
+
+Since we iterate through device list for the domain, we would need to
+call spin_lock_irqsave(&pdomain->lock, flags) here.
+
+> +		struct amd_iommu *iommu;
+> +		u64 pte_root;
+> +
+> +		iommu = amd_iommu_rlookup_table[dev_data->devid];
+> +		pte_root = amd_iommu_dev_table[dev_data->devid].data[0];
+> +
+> +		/* No change? */
+> +		if (!(enable ^ !!(pte_root & DTE_FLAG_HAD)))
+> +			continue;
+> +
+> +		pte_root = (enable ?
+> +			pte_root | DTE_FLAG_HAD : pte_root & ~DTE_FLAG_HAD);
+> +
+> +		/* Flush device DTE */
+> +		amd_iommu_dev_table[dev_data->devid].data[0] = pte_root;
+> +		device_flush_dte(dev_data);
+> +		dom_flush = true;
+> +	}
+> +
+> +	/* Flush IOTLB to mark IOPTE dirty on the next translation(s) */
+> +	if (dom_flush) {
+> +		unsigned long flags;
+> +
+> +		spin_lock_irqsave(&pdomain->lock, flags);
+> +		amd_iommu_domain_flush_tlb_pde(pdomain);
+> +		amd_iommu_domain_flush_complete(pdomain);
+> +		spin_unlock_irqrestore(&pdomain->lock, flags);
+> +	}
+
+And call spin_unlock_irqrestore(&pdomain->lock, flags); here.
+> +
+> +	return 0;
+> +}
+> +
+> +static bool amd_iommu_get_dirty_tracking(struct iommu_domain *domain)
+> +{
+> +	struct protection_domain *pdomain = to_pdomain(domain);
+> +	struct iommu_dev_data *dev_data;
+> +	u64 dte;
+> +
+
+Also call spin_lock_irqsave(&pdomain->lock, flags) here
+
+> +	list_for_each_entry(dev_data, &pdomain->dev_list, list) {
+> +		dte = amd_iommu_dev_table[dev_data->devid].data[0];
+> +		if (!(dte & DTE_FLAG_HAD))
+> +			return false;
+> +	}
+> +
+
+And call spin_unlock_irqsave(&pdomain->lock, flags) here
+
+> +	return true;
+> +}
+> +
+> +static int amd_iommu_read_and_clear_dirty(struct iommu_domain *domain,
+> +					  unsigned long iova, size_t size,
+> +					  struct iommu_dirty_bitmap *dirty)
+> +{
+> +	struct protection_domain *pdomain = to_pdomain(domain);
+> +	struct io_pgtable_ops *ops = &pdomain->iop.iop.ops;
+> +
+> +	if (!amd_iommu_get_dirty_tracking(domain))
+> +		return -EOPNOTSUPP;
+> +
+> +	if (!ops || !ops->read_and_clear_dirty)
+> +		return -ENODEV;
+
+We move this check before the amd_iommu_get_dirty_tracking().
+
+Best Regards,
+Suravee
+
+> +
+> +	return ops->read_and_clear_dirty(ops, iova, size, dirty);
+> +}
+> +
+> +
+>   static void amd_iommu_get_resv_regions(struct device *dev,
+>   				       struct list_head *head)
+>   {
+> @@ -2293,6 +2368,8 @@ const struct iommu_ops amd_iommu_ops = {
+>   		.flush_iotlb_all = amd_iommu_flush_iotlb_all,
+>   		.iotlb_sync	= amd_iommu_iotlb_sync,
+>   		.free		= amd_iommu_domain_free,
+> +		.set_dirty_tracking = amd_iommu_set_dirty_tracking,
+> +		.read_and_clear_dirty = amd_iommu_read_and_clear_dirty,
+>   	}
+>   };
+>   
