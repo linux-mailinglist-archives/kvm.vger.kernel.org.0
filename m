@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5935538E9D
+	by mail.lfdr.de (Postfix) with ESMTP id 6AA72538E9C
 	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 12:16:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245574AbiEaKQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 06:16:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50080 "EHLO
+        id S245576AbiEaKQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 06:16:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237217AbiEaKQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 06:16:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9478C654A
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 03:16:05 -0700 (PDT)
+        with ESMTP id S245552AbiEaKQF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 06:16:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A82945D5DA
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 03:16:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653992164;
+        s=mimecast20190719; t=1653992163;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=M1kB8ZZo8rCb8OUyXMF5UTU/yK+Hwc81SWjBycNX2aY=;
-        b=GNHvxxFuDrz0Oa0Ldj6TJ8v5GGXXSPEZ94I31mlvFkS3lYOp1gQTmC4w8mmjm3oZWdP9eP
-        LbWKkGGpeIfY+hQcgZQQvwOtHOibjcJ+YCLVbTrsM7P5va7U9KFq0/b0NkgXuyZfpY2z4d
-        NXHaCasSd6fA2EV8JL0oklp4d30Ep5w=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+eqQIjrNlHJOcLkQsUPlo/HbW1azwXf20gj+oHMA0xo=;
+        b=MPkN87EWsHhtXssuS8hGpYMAjT69Ix3COX8PoKGAW/EoZqnv1RJx+nynKU177DSkohwH3d
+        C+74KSdH0Ne6j8aSTAbXzrCYbfLBqZFJhr5WQ/FPI+pv8WpB4pXlLVgPINziSlr2e+8MNQ
+        1i2YJL3M57Eq51SygU1bxKm3xyHT4FQ=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615-Ej3U1626PNedjkFLRq1Vcg-1; Tue, 31 May 2022 06:15:59 -0400
-X-MC-Unique: Ej3U1626PNedjkFLRq1Vcg-1
+ us-mta-304-tFvQzzpTMj-hW37mndqTtA-1; Tue, 31 May 2022 06:16:02 -0400
+X-MC-Unique: tFvQzzpTMj-hW37mndqTtA-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC9C0811E81;
-        Tue, 31 May 2022 10:15:58 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CD884802803;
+        Tue, 31 May 2022 10:16:01 +0000 (UTC)
 Received: from thuth.com (unknown [10.39.194.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B226492C3B;
-        Tue, 31 May 2022 10:15:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0D020492C3B;
+        Tue, 31 May 2022 10:15:58 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
 To:     kvm@vger.kernel.org,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -47,15 +48,17 @@ Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
         Shuah Khan <shuah@kernel.org>,
         Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         linux-s390@vger.kernel.org
-Subject: [PATCH v4 0/4] KVM: s390: selftests: Provide TAP output in tests
-Date:   Tue, 31 May 2022 12:15:50 +0200
-Message-Id: <20220531101554.36844-1-thuth@redhat.com>
+Subject: [PATCH v4 1/4] KVM: s390: selftests: Use TAP interface in the memop test
+Date:   Tue, 31 May 2022 12:15:51 +0200
+Message-Id: <20220531101554.36844-2-thuth@redhat.com>
+In-Reply-To: <20220531101554.36844-1-thuth@redhat.com>
+References: <20220531101554.36844-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,42 +66,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series is motivated by Shuah's suggestion here:
+The memop test currently does not have any output (unless one of the
+TEST_ASSERT statement fails), so it's hard to say for a user whether
+a certain new sub-test has been included in the binary or not. Let's
+make this a little bit more user-friendly and include some TAP output
+via the kselftests.h interface.
 
- https://lore.kernel.org/kvm/d576d8f7-980f-3bc6-87ad-5a6ae45609b8@linuxfoundation.org/
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tools/testing/selftests/kvm/s390x/memop.c | 95 ++++++++++++++++++-----
+ 1 file changed, 77 insertions(+), 18 deletions(-)
 
-Many s390x KVM selftests do not output any information about which
-tests have been run, so it's hard to say whether a test binary
-contains a certain sub-test or not. To improve this situation let's
-add some TAP output via the kselftest.h interface to these tests,
-so that it easier to understand what has been executed or not.
-
-v4:
- - Rebased to include test_termination() now in the memop test
- - Reworked the extension capability check in the memop test
-
-v3:
- - Added comments / fixed cosmetics according to Janosch's and
-   Janis' reviews of the v2 series
- - Added Reviewed-by tags from the v2 series
-
-v2:
- - Reworked the extension checking in the first patch
- - Make sure to always print the TAP 13 header in the second patch
- - Reworked the SKIP printing in the third patch
-
-Thomas Huth (4):
-  KVM: s390: selftests: Use TAP interface in the memop test
-  KVM: s390: selftests: Use TAP interface in the sync_regs test
-  KVM: s390: selftests: Use TAP interface in the tprot test
-  KVM: s390: selftests: Use TAP interface in the reset test
-
- tools/testing/selftests/kvm/s390x/memop.c     | 95 +++++++++++++++----
- tools/testing/selftests/kvm/s390x/resets.c    | 38 ++++++--
- .../selftests/kvm/s390x/sync_regs_test.c      | 87 +++++++++++++----
- tools/testing/selftests/kvm/s390x/tprot.c     | 29 +++++-
- 4 files changed, 197 insertions(+), 52 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+index 49f26f544127..e704c6fa5758 100644
+--- a/tools/testing/selftests/kvm/s390x/memop.c
++++ b/tools/testing/selftests/kvm/s390x/memop.c
+@@ -14,6 +14,7 @@
+ 
+ #include "test_util.h"
+ #include "kvm_util.h"
++#include "kselftest.h"
+ 
+ enum mop_target {
+ 	LOGICAL,
+@@ -691,34 +692,92 @@ static void test_errors(void)
+ 	kvm_vm_free(t.kvm_vm);
+ }
+ 
++struct testdef {
++	const char *name;
++	void (*test)(void);
++	int extension;
++} testlist[] = {
++	{
++		.name = "simple copy",
++		.test = test_copy,
++	},
++	{
++		.name = "generic error checks",
++		.test = test_errors,
++	},
++	{
++		.name = "copy with storage keys",
++		.test = test_copy_key,
++		.extension = 1,
++	},
++	{
++		.name = "copy with key storage protection override",
++		.test = test_copy_key_storage_prot_override,
++		.extension = 1,
++	},
++	{
++		.name = "copy with key fetch protection",
++		.test = test_copy_key_fetch_prot,
++		.extension = 1,
++	},
++	{
++		.name = "copy with key fetch protection override",
++		.test = test_copy_key_fetch_prot_override,
++		.extension = 1,
++	},
++	{
++		.name = "error checks with key",
++		.test = test_errors_key,
++		.extension = 1,
++	},
++	{
++		.name = "termination",
++		.test = test_termination,
++		.extension = 1,
++	},
++	{
++		.name = "error checks with key storage protection override",
++		.test = test_errors_key_storage_prot_override,
++		.extension = 1,
++	},
++	{
++		.name = "error checks without key fetch prot override",
++		.test = test_errors_key_fetch_prot_override_not_enabled,
++		.extension = 1,
++	},
++	{
++		.name = "error checks with key fetch prot override",
++		.test = test_errors_key_fetch_prot_override_enabled,
++		.extension = 1,
++	},
++};
++
+ int main(int argc, char *argv[])
+ {
+-	int memop_cap, extension_cap;
++	int memop_cap, extension_cap, idx;
+ 
+ 	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
+ 
++	ksft_print_header();
++
+ 	memop_cap = kvm_check_cap(KVM_CAP_S390_MEM_OP);
+ 	extension_cap = kvm_check_cap(KVM_CAP_S390_MEM_OP_EXTENSION);
+ 	if (!memop_cap) {
+-		print_skip("CAP_S390_MEM_OP not supported");
+-		exit(KSFT_SKIP);
++		ksft_exit_skip("CAP_S390_MEM_OP not supported.\n");
+ 	}
+ 
+-	test_copy();
+-	if (extension_cap > 0) {
+-		test_copy_key();
+-		test_copy_key_storage_prot_override();
+-		test_copy_key_fetch_prot();
+-		test_copy_key_fetch_prot_override();
+-		test_errors_key();
+-		test_termination();
+-		test_errors_key_storage_prot_override();
+-		test_errors_key_fetch_prot_override_not_enabled();
+-		test_errors_key_fetch_prot_override_enabled();
+-	} else {
+-		print_skip("storage key memop extension not supported");
++	ksft_set_plan(ARRAY_SIZE(testlist));
++
++	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
++		if (testlist[idx].extension >= extension_cap) {
++			testlist[idx].test();
++			ksft_test_result_pass("%s\n", testlist[idx].name);
++		} else {
++			ksft_test_result_skip("%s - extension level %d not supported\n",
++					      testlist[idx].name,
++					      testlist[idx].extension);
++		}
+ 	}
+-	test_errors();
+ 
+-	return 0;
++	ksft_finished();	/* Print results and exit() accordingly */
+ }
 -- 
 2.31.1
 
