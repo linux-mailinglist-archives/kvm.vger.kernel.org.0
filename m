@@ -2,144 +2,375 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F0FC539711
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 21:39:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10155539714
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 21:40:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347308AbiEaTjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 15:39:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36562 "EHLO
+        id S1347323AbiEaTkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 15:40:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345150AbiEaTj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 15:39:29 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 250CF562EB
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 12:39:28 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id w2-20020a17090ac98200b001e0519fe5a8so3251593pjt.4
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 12:39:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0mQPcYFy8mM+96zbgJ+oQhNhKHCc0LNt7c679Q5oveg=;
-        b=HVim7kJ0YdygiWIjmmBICcaMPf5sAua4KnHtdR/fKxfJngYaVKGxyI+LDLMkk3MTHr
-         XPkZyJu+/wzaX7gmgaON5ize1deoGJHKWzC3VrTmb4T9SufHiFrT038Js7qWlRR0kV21
-         xSQ58JOF9ciO2+oJznly9TQheRsRDuXG37YbYl18nwsuDOPG4IpDRwNylr/goahNyqWP
-         wUsRH8Aqe8bUrVnAia0hne2T4ZklAva/+mnAHwM+pHXY3McsEwDa5ROuhlhsLxdoRfCV
-         NcKA7Y3Sw9CIL0GAUMEF7oc+okKGxfm12ZIp0fFTGHXTlDYhRtiJGIR1DeG4915oE9HZ
-         89YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0mQPcYFy8mM+96zbgJ+oQhNhKHCc0LNt7c679Q5oveg=;
-        b=wP1eS3byhzn2YemjmNBi0FCCTHWCZsLMFD5SmDqjP5HvQr9Tt8HD84hN1tT6X4ODdZ
-         8xapNN5aKrVo9IMACusiYw6ZZoPS75jPjoZMTSOQxQjbWqS8fQ5dC7GZYl8+IGUFihM8
-         CJwMvQdWVqTSo9JZw1UbTZ1OTqPvnNEvWWYi6zPHhleNFpbE8YsXQa9fsLxu/QiYzP0c
-         kV9hH3G7QQBTKU9UErLx70vTZsVUSHvqEinZAm1EeQekznEvbFTpWNFxMPC6TjoBu1Wl
-         E0xVlmp55ssovfHOleBY79AtJuv8kaO34VZeznEmr3rr0QifFjyV4+HX7Li8KkmAzMZO
-         87ew==
-X-Gm-Message-State: AOAM533KOmr9LmgCpgf4sOz8BuvDY61XL9SI91ppzQz0f3razG7OeuNV
-        fVclMlcQc5cKc/uZJweXl+oG/g==
-X-Google-Smtp-Source: ABdhPJxTZAcl7iQWstjSWF0N/wRDRXCsUc7sWdacq43Z0jno5vV7U/WPDqtvq3gvSrI/vtWY97E04w==
-X-Received: by 2002:a17:90a:ba11:b0:1df:2d09:1308 with SMTP id s17-20020a17090aba1100b001df2d091308mr29797604pjr.184.1654025967457;
-        Tue, 31 May 2022 12:39:27 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l26-20020a635b5a000000b003fc2411d5adsm4041184pgm.70.2022.05.31.12.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 May 2022 12:39:27 -0700 (PDT)
-Date:   Tue, 31 May 2022 19:39:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: Adjust the return type of
- kvm_vm_ioctl_check_extension_generic()
-Message-ID: <YpZu6/k+8EydfBKf@google.com>
-References: <20220531075540.14242-1-thuth@redhat.com>
+        with ESMTP id S1347316AbiEaTkB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 15:40:01 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C57B4BFCC;
+        Tue, 31 May 2022 12:40:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654026000; x=1685562000;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=sTUslxQuQ8h/Rz/Sy6+CnvYlrc9iE2midJMHJpUuoxI=;
+  b=OOWK0JqMnUDUa0/eJNBZmqUxWVYMh4/gu7XW00emZ2eC7C6We9/JkZBC
+   Nmgus0nxdOofWolojqkgwfib9edCs/edsaxP18cj7xDJQbwMtWfJazM+C
+   xALh9RrfqIyEzd48V9jUL6nLCkeU3bPVkt6xQELptjaN6MCtUNjOFVgb1
+   DNNtkLaJIUdjq0QNuinkNnK3RCQAfBjCxKS4jcTH/339oPL+sIWbIWZmF
+   EZaHuaEOO/XSBOhDIFKk+8vQGY/EncjoVe6cbgk7in+8cgk6KbRY7UlKm
+   1x6zzvgoVmObI0Aije3AssuBfmxlqyEEAC3jSD/inD3jeTEjxB3bZug7l
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10364"; a="272934999"
+X-IronPort-AV: E=Sophos;i="5.91,266,1647327600"; 
+   d="scan'208";a="272934999"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2022 12:40:00 -0700
+X-IronPort-AV: E=Sophos;i="5.91,266,1647327600"; 
+   d="scan'208";a="645164119"
+Received: from maciejwo-mobl1.ger.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.36.207])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2022 12:39:57 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
+        len.brown@intel.com, tony.luck@intel.com,
+        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
+        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com, kai.huang@intel.com
+Subject: [PATCH v4 01/22] x86/virt/tdx: Detect TDX during kernel boot
+Date:   Wed,  1 Jun 2022 07:39:24 +1200
+Message-Id: <062075b36150b119bf2d0a1262de973b0a2b11a7.1654025431.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.35.3
+In-Reply-To: <cover.1654025430.git.kai.huang@intel.com>
+References: <cover.1654025430.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220531075540.14242-1-thuth@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 31, 2022, Thomas Huth wrote:
-> kvm_vm_ioctl_check_extension_generic() either returns small constant
-> numbers or the result of kvm_vm_ioctl_check_extension() which is of type
-> "int". Looking at the callers of kvm_vm_ioctl_check_extension_generic(),
-> one stores the result in "int r", the other one in "long r", so the
-> result has to fit in the smaller "int" in any case. Thus let's adjust
-> the return value to "int" here so we have one less transition from
-> "int" -> "long" -> "int" in case of the kvm_vm_ioctl() ->
-> kvm_vm_ioctl_check_extension_generic() -> kvm_vm_ioctl_check_extension()
-> call chain.
+Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+host and certain physical attacks.  TDX introduces a new CPU mode called
+Secure Arbitration Mode (SEAM) and a new isolated range pointed by the
+SEAM Ranger Register (SEAMRR).  A CPU-attested software module called
+'the TDX module' runs inside the new isolated range to implement the
+functionalities to manage and run protected VMs.
 
-LOL, I was going to play devil's advocate and say that it would be just as easy
-to adjust kvm_vm_ioctl() to use "long r", but there's actually lurking bug, sort
-of.
+Pre-TDX Intel hardware has support for a memory encryption architecture
+called MKTME.  The memory encryption hardware underpinning MKTME is also
+used for Intel TDX.  TDX ends up "stealing" some of the physical address
+space from the MKTME architecture for crypto-protection to VMs.  BIOS is
+responsible for partitioning the "KeyID" space between legacy MKTME and
+TDX.  The KeyIDs reserved for TDX are called 'TDX private KeyIDs' or
+'TDX KeyIDs' for short.
 
-KVM_GET_NR_MMU_PAGES => kvm_vm_ioctl_get_nr_mmu_pages() returns an "unsigned long",
-and it very much can be a value larger than an "int" because KVM_SET_NR_MMU_PAGES
-allows setting an arbitrary value (it may also be possible for KVM's default to
-be that large, but I don't feel like doing math).
+To enable TDX, BIOS needs to configure SEAMRR (core-scope) and TDX
+private KeyIDs (package-scope) consistently for all packages.  TDX
+doesn't trust BIOS.  TDX ensures all BIOS configurations are correct,
+and if not, refuses to enable SEAMRR on any core.  This means detecting
+SEAMRR alone on BSP is enough to check whether TDX has been enabled by
+BIOS.
 
-But, the very original commit 82ce2c96831f ("KVM: Allow dynamic allocation of the
-mmu shadow cache size") only tracked and returned an "unsigned int".  It was the
-relatively recent commit bc8a3d8925a8 ("kvm: mmu: Fix overflow on kvm mmu page
-limit calculation") that bumped the internal tracking to "unsigned long" and
-overlooked the long/int mess.
+To start to support TDX, create a new arch/x86/virt/vmx/tdx/tdx.c for
+TDX host kernel support.  Add a new Kconfig option CONFIG_INTEL_TDX_HOST
+to opt-in TDX host kernel support (to distinguish with TDX guest kernel
+support).  So far only KVM is the only user of TDX.  Make the new config
+option depend on KVM_INTEL.
 
-Looking at other architectures, kvm_vm_ioctl_create_spapr_tce() also returns a
-"long", but that's unnecessary as it only returns -errno or propagates "int" returns.
+Use early_initcall() to detect whether TDX is enabled by BIOS during
+kernel boot, and add a function to report that.  Use a function instead
+of a new CPU feature bit.  This is because the TDX module needs to be
+initialized before it can be used to run any TDX guests, and the TDX
+module is initialized at runtime by the caller who wants to use TDX.
 
-Ditto for kvm_arch_vm_ioctl_hv(), kvm_arch_vm_ioctl_pr(), and
-kvm_vm_ioctl_mte_copy_tags().
+Explicitly detect SEAMRR but not just only detect TDX private KeyIDs.
+Theoretically, a misconfiguration of TDX private KeyIDs can result in
+SEAMRR being disabled, but the BSP can still report the correct TDX
+KeyIDs.  Such BIOS bug can be caught when initializing the TDX module,
+but it's better to do more detection during boot to provide a more
+accurate result.
 
-Ignoring KVM_GET_NR_MMU_PAGES for the moment, I like the change, but would rather
-phrase the justification along the lines of:
+Also detect the TDX KeyIDs.  This allows userspace to know how many TDX
+guests the platform can run w/o needing to wait until TDX is fully
+functional.
 
-  KVM uses "long" return values for functions that are wired up to
-  "struct file_operations", but otherwise uses "int" return values for
-  functions that can return 0/-errno in order to avoid unintentional
-  divergences between 32-bit and 64-bit kernels.
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+ arch/x86/Kconfig               |  13 ++++
+ arch/x86/Makefile              |   2 +
+ arch/x86/include/asm/tdx.h     |   7 +++
+ arch/x86/virt/Makefile         |   2 +
+ arch/x86/virt/vmx/Makefile     |   2 +
+ arch/x86/virt/vmx/tdx/Makefile |   2 +
+ arch/x86/virt/vmx/tdx/tdx.c    | 109 +++++++++++++++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.h    |  47 ++++++++++++++
+ 8 files changed, 184 insertions(+)
+ create mode 100644 arch/x86/virt/Makefile
+ create mode 100644 arch/x86/virt/vmx/Makefile
+ create mode 100644 arch/x86/virt/vmx/tdx/Makefile
+ create mode 100644 arch/x86/virt/vmx/tdx/tdx.c
+ create mode 100644 arch/x86/virt/vmx/tdx/tdx.h
 
-and then make the same change to kvm_arch_vm_ioctl() and all its subordinates.
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 7021ec725dd3..23f21aa3a5c4 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1967,6 +1967,19 @@ config X86_SGX
+ 
+ 	  If unsure, say N.
+ 
++config INTEL_TDX_HOST
++	bool "Intel Trust Domain Extensions (TDX) host support"
++	default n
++	depends on CPU_SUP_INTEL
++	depends on X86_64
++	depends on KVM_INTEL
++	help
++	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
++	  host and certain physical attacks.  This option enables necessary TDX
++	  support in host kernel to run protected VMs.
++
++	  If unsure, say N.
++
+ config EFI
+ 	bool "EFI runtime service support"
+ 	depends on ACPI
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 63d50f65b828..2ca3a2a36dc5 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -234,6 +234,8 @@ head-y += arch/x86/kernel/platform-quirks.o
+ 
+ libs-y  += arch/x86/lib/
+ 
++core-y += arch/x86/virt/
++
+ # drivers-y are linked after core-y
+ drivers-$(CONFIG_MATH_EMULATION) += arch/x86/math-emu/
+ drivers-$(CONFIG_PCI)            += arch/x86/pci/
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 020c81a7c729..97511b76c1ac 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -87,5 +87,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
+ 	return -ENODEV;
+ }
+ #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
++
++#ifdef CONFIG_INTEL_TDX_HOST
++bool platform_tdx_enabled(void);
++#else	/* !CONFIG_INTEL_TDX_HOST */
++static inline bool platform_tdx_enabled(void) { return false; }
++#endif	/* CONFIG_INTEL_TDX_HOST */
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASM_X86_TDX_H */
+diff --git a/arch/x86/virt/Makefile b/arch/x86/virt/Makefile
+new file mode 100644
+index 000000000000..1e36502cd738
+--- /dev/null
++++ b/arch/x86/virt/Makefile
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++obj-y	+= vmx/
+diff --git a/arch/x86/virt/vmx/Makefile b/arch/x86/virt/vmx/Makefile
+new file mode 100644
+index 000000000000..feebda21d793
+--- /dev/null
++++ b/arch/x86/virt/vmx/Makefile
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_INTEL_TDX_HOST)	+= tdx/
+diff --git a/arch/x86/virt/vmx/tdx/Makefile b/arch/x86/virt/vmx/tdx/Makefile
+new file mode 100644
+index 000000000000..1bd688684716
+--- /dev/null
++++ b/arch/x86/virt/vmx/tdx/Makefile
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_INTEL_TDX_HOST)	+= tdx.o
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+new file mode 100644
+index 000000000000..8275007702e6
+--- /dev/null
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -0,0 +1,109 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright(c) 2022 Intel Corporation.
++ *
++ * Intel Trusted Domain Extensions (TDX) support
++ */
++
++#define pr_fmt(fmt)	"tdx: " fmt
++
++#include <linux/types.h>
++#include <linux/init.h>
++#include <linux/printk.h>
++#include <asm/cpufeatures.h>
++#include <asm/cpufeature.h>
++#include <asm/msr-index.h>
++#include <asm/msr.h>
++#include <asm/tdx.h>
++#include "tdx.h"
++
++static u32 tdx_keyid_start __ro_after_init;
++static u32 tdx_keyid_num __ro_after_init;
++
++/* Detect whether CPU supports SEAM */
++static int detect_seam(void)
++{
++	u64 mtrrcap, mask;
++
++	/* SEAMRR is reported via MTRRcap */
++	if (!boot_cpu_has(X86_FEATURE_MTRR))
++		return -ENODEV;
++
++	rdmsrl(MSR_MTRRcap, mtrrcap);
++	if (!(mtrrcap & MTRR_CAP_SEAMRR))
++		return -ENODEV;
++
++	/* The MASK MSR reports whether SEAMRR is enabled */
++	rdmsrl(MSR_IA32_SEAMRR_PHYS_MASK, mask);
++	if ((mask & SEAMRR_ENABLED_BITS) != SEAMRR_ENABLED_BITS)
++		return -ENODEV;
++
++	pr_info("SEAMRR enabled.\n");
++	return 0;
++}
++
++static int detect_tdx_keyids(void)
++{
++	u64 keyid_part;
++
++	rdmsrl(MSR_IA32_MKTME_KEYID_PARTITIONING, keyid_part);
++
++	tdx_keyid_num = TDX_KEYID_NUM(keyid_part);
++	tdx_keyid_start = TDX_KEYID_START(keyid_part);
++
++	pr_info("TDX private KeyID range: [%u, %u).\n",
++			tdx_keyid_start, tdx_keyid_start + tdx_keyid_num);
++
++	/*
++	 * TDX guarantees at least two TDX KeyIDs are configured by
++	 * BIOS, otherwise SEAMRR is disabled.  Invalid TDX private
++	 * range means kernel bug (TDX is broken).
++	 */
++	if (WARN_ON(!tdx_keyid_start || tdx_keyid_num < 2)) {
++		tdx_keyid_start = tdx_keyid_num = 0;
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++/*
++ * Detect TDX via detecting SEAMRR during kernel boot.
++ *
++ * To enable TDX, BIOS must configure SEAMRR consistently across all
++ * CPU cores.  TDX doesn't trust BIOS.  Instead, MCHECK verifies all
++ * configurations from BIOS are correct, and if not, it disables TDX
++ * (SEAMRR is disabled on all cores).  This means detecting SEAMRR on
++ * BSP is enough to determine whether TDX has been enabled by BIOS.
++ */
++static int __init tdx_early_detect(void)
++{
++	int ret;
++
++	ret = detect_seam();
++	if (ret)
++		return ret;
++
++	/*
++	 * TDX private KeyIDs is only accessible by SEAM software.
++	 * Only detect TDX KeyIDs when SEAMRR is enabled.
++	 */
++	ret = detect_tdx_keyids();
++	if (ret)
++		return ret;
++
++	pr_info("TDX enabled by BIOS.\n");
++	return 0;
++}
++early_initcall(tdx_early_detect);
++
++/**
++ * platform_tdx_enabled() - Return whether BIOS has enabled TDX
++ *
++ * Return whether BIOS has enabled TDX regardless whether the TDX module
++ * has been loaded or not.
++ */
++bool platform_tdx_enabled(void)
++{
++	return tdx_keyid_num >= 2;
++}
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+new file mode 100644
+index 000000000000..f16055cc25f4
+--- /dev/null
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -0,0 +1,47 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _X86_VIRT_TDX_H
++#define _X86_VIRT_TDX_H
++
++#include <linux/bits.h>
++
++/*
++ * This file contains both macros and data structures defined by the TDX
++ * architecture and Linux defined software data structures and functions.
++ * The two should not be mixed together for better readability.  The
++ * architectural definitions come first.
++ */
++
++/*
++ * Intel Trusted Domain CPU Architecture Extension spec:
++ *
++ * IA32_MTRRCAP:
++ *   Bit 15:	The support of SEAMRR
++ *
++ * IA32_SEAMRR_PHYS_MASK (core-scope):
++ *   Bit 10:	Lock bit
++ *   Bit 11:	Enable bit
++ */
++#define MTRR_CAP_SEAMRR			BIT_ULL(15)
++
++#define MSR_IA32_SEAMRR_PHYS_MASK	0x00001401
++
++#define SEAMRR_PHYS_MASK_ENABLED	BIT_ULL(11)
++#define SEAMRR_PHYS_MASK_LOCKED		BIT_ULL(10)
++#define SEAMRR_ENABLED_BITS	\
++	(SEAMRR_PHYS_MASK_ENABLED | SEAMRR_PHYS_MASK_LOCKED)
++
++/*
++ * IA32_MKTME_KEYID_PARTIONING:
++ *   Bit [31:0]:	Number of MKTME KeyIDs.
++ *   Bit [63:32]:	Number of TDX private KeyIDs.
++ *
++ * MKTME KeyIDs start from KeyID 1. TDX private KeyIDs start
++ * after the last MKTME KeyID.
++ */
++#define MSR_IA32_MKTME_KEYID_PARTITIONING	0x00000087
++
++#define TDX_KEYID_START(_keyid_part)	\
++		((u32)(((_keyid_part) & 0xffffffffull) + 1))
++#define TDX_KEYID_NUM(_keyid_part)	((u32)((_keyid_part) >> 32))
++
++#endif
+-- 
+2.35.3
 
-As for KVM_GET_NR_MMU_PAGES, my vote would be just sweep it under the rug with a
-comment and blurb in the documentation that it's broken.  I highly doubt any VMM
-actually uses the ioctl() in any meaningful way as it was largely made obsolete by
-two-dimensional paging, e.g. neither QEMU nor our VMM use it.
-
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  This patch is of very low importance - if you don't like it, please just
->  ignore. I just came across this nit while looking through the code and
->  thought that it might be somewhat nicer this way.
-> 
->  virt/kvm/kvm_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 64ec2222a196..e911331fc620 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4309,7 +4309,7 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
->  	return 0;
->  }
->  
-> -static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
-> +static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->  {
->  	switch (arg) {
->  	case KVM_CAP_USER_MEMORY:
-> -- 
-> 2.31.1
-> 
