@@ -2,59 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C81D3538DBA
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 11:29:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5935538E9D
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 12:16:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245255AbiEaJ3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 05:29:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47206 "EHLO
+        id S245574AbiEaKQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 06:16:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245301AbiEaJ3N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 05:29:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3A7B985A9
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 02:29:07 -0700 (PDT)
+        with ESMTP id S237217AbiEaKQG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 06:16:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9478C654A
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 03:16:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653989346;
+        s=mimecast20190719; t=1653992164;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/KsrAlA+cUzyY84FVZIvJ6NG3hfTuJ4yXZoPL+B3/xg=;
-        b=FImTBorSvsowGD8lkkt7N8Ii1BG9+5LNIAROA9PDMfIUY9rT6LMX9OD4n/uDUbPPpiYjsK
-        TCM3gDGjyvmtVLtm6vaWlLeAtHla1L6hHrBbf4PC/+jVpfq0pcezFB1XxnZCTe8ytZlbu0
-        Q+bn79qRaQitBDBOinyk5u6dFu0GJPs=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=M1kB8ZZo8rCb8OUyXMF5UTU/yK+Hwc81SWjBycNX2aY=;
+        b=GNHvxxFuDrz0Oa0Ldj6TJ8v5GGXXSPEZ94I31mlvFkS3lYOp1gQTmC4w8mmjm3oZWdP9eP
+        LbWKkGGpeIfY+hQcgZQQvwOtHOibjcJ+YCLVbTrsM7P5va7U9KFq0/b0NkgXuyZfpY2z4d
+        NXHaCasSd6fA2EV8JL0oklp4d30Ep5w=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-502-uqqkWcxkPGCZX_7_NZKlZQ-1; Tue, 31 May 2022 05:29:05 -0400
-X-MC-Unique: uqqkWcxkPGCZX_7_NZKlZQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-615-Ej3U1626PNedjkFLRq1Vcg-1; Tue, 31 May 2022 06:15:59 -0400
+X-MC-Unique: Ej3U1626PNedjkFLRq1Vcg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 388A1811E7A;
-        Tue, 31 May 2022 09:29:04 +0000 (UTC)
-Received: from localhost (dhcp-192-194.str.redhat.com [10.33.192.194])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F40672166B2B;
-        Tue, 31 May 2022 09:29:03 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC 0/2] arm: enable MTE for QEMU + kvm
-In-Reply-To: <20220512131146.78457-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
-References: <20220512131146.78457-1-cohuck@redhat.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Tue, 31 May 2022 11:29:02 +0200
-Message-ID: <871qwacaox.fsf@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC9C0811E81;
+        Tue, 31 May 2022 10:15:58 +0000 (UTC)
+Received: from thuth.com (unknown [10.39.194.45])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B226492C3B;
+        Tue, 31 May 2022 10:15:56 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v4 0/4] KVM: s390: selftests: Provide TAP output in tests
+Date:   Tue, 31 May 2022 12:15:50 +0200
+Message-Id: <20220531101554.36844-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,49 +63,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Friendly ping :)
+This patch series is motivated by Shuah's suggestion here:
 
-On Thu, May 12 2022, Cornelia Huck <cohuck@redhat.com> wrote:
+ https://lore.kernel.org/kvm/d576d8f7-980f-3bc6-87ad-5a6ae45609b8@linuxfoundation.org/
 
-> This series enables MTE for kvm guests, if the kernel supports it.
-> Lightly tested while running under the simulator (the arm64/mte/
-> kselftests pass... if you wait patiently :)
->
-> A new cpu property "mte" (defaulting to on if possible) is introduced;
-> for tcg, you still need to enable mte at the machine as well.
->
-> I've hacked up some very basic qtests; not entirely sure if I'm going
-> about it the right way.
->
-> Some things to look out for:
-> - Migration is not (yet) supported. I added a migration blocker if we
->   enable mte in the kvm case. AFAIK, there isn't any hardware available
->   yet that allows mte + kvm to be used (I think the latest Gravitons
->   implement mte, but no bare metal instances seem to be available), so
->   that should not have any impact on real world usage.
-> - I'm not at all sure about the interaction between the virt machine 'mte'
->   prop and the cpu 'mte' prop. To keep things working with tcg as before,
->   a not-specified mte for the cpu should simply give us a guest without
->   mte if it wasn't specified for the machine. However, mte on the cpu
->   without mte on the machine should probably generate an error, but I'm not
->   sure how to detect that without breaking the silent downgrade to preserve
->   existing behaviour.
-> - As I'm still new to arm, please don't assume that I know what I'm doing :)
->
->
-> Cornelia Huck (2):
->   arm/kvm: enable MTE if available
->   qtests/arm: add some mte tests
->
->  target/arm/cpu.c               | 18 +++-----
->  target/arm/cpu.h               |  4 ++
->  target/arm/cpu64.c             | 78 ++++++++++++++++++++++++++++++++++
->  target/arm/kvm64.c             |  5 +++
->  target/arm/kvm_arm.h           | 12 ++++++
->  target/arm/monitor.c           |  1 +
->  tests/qtest/arm-cpu-features.c | 31 ++++++++++++++
->  7 files changed, 137 insertions(+), 12 deletions(-)
->
-> -- 
-> 2.34.3
+Many s390x KVM selftests do not output any information about which
+tests have been run, so it's hard to say whether a test binary
+contains a certain sub-test or not. To improve this situation let's
+add some TAP output via the kselftest.h interface to these tests,
+so that it easier to understand what has been executed or not.
+
+v4:
+ - Rebased to include test_termination() now in the memop test
+ - Reworked the extension capability check in the memop test
+
+v3:
+ - Added comments / fixed cosmetics according to Janosch's and
+   Janis' reviews of the v2 series
+ - Added Reviewed-by tags from the v2 series
+
+v2:
+ - Reworked the extension checking in the first patch
+ - Make sure to always print the TAP 13 header in the second patch
+ - Reworked the SKIP printing in the third patch
+
+Thomas Huth (4):
+  KVM: s390: selftests: Use TAP interface in the memop test
+  KVM: s390: selftests: Use TAP interface in the sync_regs test
+  KVM: s390: selftests: Use TAP interface in the tprot test
+  KVM: s390: selftests: Use TAP interface in the reset test
+
+ tools/testing/selftests/kvm/s390x/memop.c     | 95 +++++++++++++++----
+ tools/testing/selftests/kvm/s390x/resets.c    | 38 ++++++--
+ .../selftests/kvm/s390x/sync_regs_test.c      | 87 +++++++++++++----
+ tools/testing/selftests/kvm/s390x/tprot.c     | 29 +++++-
+ 4 files changed, 197 insertions(+), 52 deletions(-)
+
+-- 
+2.31.1
 
