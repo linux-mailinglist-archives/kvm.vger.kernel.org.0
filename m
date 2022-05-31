@@ -2,59 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28FDE539857
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 22:56:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC4B05399D5
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 00:52:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347809AbiEaU4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 16:56:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53868 "EHLO
+        id S1348583AbiEaWwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 18:52:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243326AbiEaU4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 16:56:31 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB2279CF75;
-        Tue, 31 May 2022 13:56:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654030588; x=1685566588;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=KmOBMBNjMDvpHex0XEgSTh2uGSxfl8GV13MikE3newM=;
-  b=MHoDQ0HOQskKGu5ovr5S7czoNjWNvtm/RRusmxN9w6vAVxpErzBn0qgk
-   NgaMYgh8eGYd3d9yY70NrMFDBeG0wF1KvB63Y68hXLb6BarAQ0af4sLBM
-   wcCfN6SRUvyAQadMp6WoC5RDDUhshJwNVKbYUzR6vVijOQ8UnhUptHV3X
-   fIYDPTZAfjRmgnTgXyN6LKpAIEvVstVkGYAk35YiXIaDpeZ4Vd9NCltHY
-   nZ3Ei71nS4b7Ya7iXaE+mCkIn8733KJ5G0v18LUwtkpa0Dl2YJdzXBg27
-   a/4Z/U6O6CsBQQzamdISCaLnr+T8oeI+uvhlsGWoPIoeECnNXAjJHabOW
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10364"; a="274185873"
-X-IronPort-AV: E=Sophos;i="5.91,266,1647327600"; 
-   d="scan'208";a="274185873"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2022 13:56:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,266,1647327600"; 
-   d="scan'208";a="706748538"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 31 May 2022 13:56:26 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nw8uf-00034W-Ih;
-        Tue, 31 May 2022 20:56:25 +0000
-Date:   Wed, 1 Jun 2022 04:55:49 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Bo Liu <liubo03@inspur.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [mst-vhost:vhost 62/65] drivers/virtio/virtio_ring.c:1783:9: error:
- use of undeclared identifier 'vq'
-Message-ID: <202206010444.EGBXgPMJ-lkp@intel.com>
+        with ESMTP id S245087AbiEaWwP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 18:52:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EE9D72AE2D
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 15:52:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654037532;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9q9k+C5RGQU4qKgmWFkXDcgQ25M6UKH1DBXC6+yr110=;
+        b=E8E9R7zmtGGFSoCgN1WEBfttrIFe142RHCIs3N/J7k/laNcpKXQcjeOVw8WsgBIc56QPhH
+        NPE9SExht5T5qy3SHxf0Qgo90E2oHpsNZXJiNnKmvg5Yu3GItknp9kJ78Nd7R0PzucS3Li
+        yyslTAj5nF5PajyfZ3LAuuD8bekEiwI=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-382-AWfrvt7GMGSBdbh2u-wa3A-1; Tue, 31 May 2022 18:52:11 -0400
+X-MC-Unique: AWfrvt7GMGSBdbh2u-wa3A-1
+Received: by mail-io1-f71.google.com with SMTP id ay41-20020a5d9da9000000b006685ce50214so5121454iob.22
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 15:52:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=9q9k+C5RGQU4qKgmWFkXDcgQ25M6UKH1DBXC6+yr110=;
+        b=bDW5foyRRPBAkHghk7BSGeqCLCwbwueiBTl4xC/KADG8Ptr1ECuqJIdFTTTZm0mxG2
+         hSWlefZdXC9EKfm29BqEyzpGxtv4CxQZcv9QJWqMqkInO9jIW7MzcdG9ujGX47/XeqbH
+         0NZm/eaSETa05IwmPwE/nVwip0QyqD4A309HwJ2NjUb33cutjSbOVqASWksyO7sQ1vBD
+         0isOrp8TdE9lCGb0/Rig5KHdJIFFqOOskzGJ+NKEZeWVeDygez3rCyfz4iefnWv9F3nV
+         UHCn41AE9tmUYOq+iLVg93h1/sdZXh4rpckRIRzYSyp8kpGAmXR9+sP1ODQjtJleZDBR
+         W7eg==
+X-Gm-Message-State: AOAM530JGnv+Bu39J8NwCHLA0JOnj5lKcuAc3SZ3NZW++WhILuF0WHyl
+        9VzUQB/XqGTHhvwQlRM4Vw9anivOTnDIKFUE5LtBUFNF+gJ+/xHl0MhuB6/9lqa3fZshG7XGWsd
+        cJY8Zpu4a4zmN
+X-Received: by 2002:a05:6638:dc6:b0:32e:e2d7:8261 with SMTP id m6-20020a0566380dc600b0032ee2d78261mr21306058jaj.152.1654037531001;
+        Tue, 31 May 2022 15:52:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyFaz/Zncf57CZD055l8ggcPaldX2dVcDSiNf2yikAtVetyU+4sMp+QQR12XvYG/vo4kFwZKA==
+X-Received: by 2002:a05:6638:dc6:b0:32e:e2d7:8261 with SMTP id m6-20020a0566380dc600b0032ee2d78261mr21306045jaj.152.1654037530793;
+        Tue, 31 May 2022 15:52:10 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c18-20020a92c8d2000000b002cde6e352ffsm33236ilq.73.2022.05.31.15.52.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 May 2022 15:52:10 -0700 (PDT)
+Date:   Tue, 31 May 2022 16:52:09 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Abhishek Sahu <abhsahu@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v3 8/8] vfio/pci: Add the support for PCI D3cold state
+Message-ID: <20220531165209.1c18854f.alex.williamson@redhat.com>
+In-Reply-To: <20220531194304.GN1343366@nvidia.com>
+References: <20220425092615.10133-1-abhsahu@nvidia.com>
+        <20220425092615.10133-9-abhsahu@nvidia.com>
+        <20220504134551.70d71bf0.alex.williamson@redhat.com>
+        <9e44e9cc-a500-ab0d-4785-5ae26874b3eb@nvidia.com>
+        <20220509154844.79e4915b.alex.williamson@redhat.com>
+        <68463d9b-98ee-b9ec-1a3e-1375e50a2ad2@nvidia.com>
+        <42518bd5-da8b-554f-2612-80278b527bf5@nvidia.com>
+        <20220530122546.GZ1343366@nvidia.com>
+        <c73d537b-a653-bf79-68cd-ddc8f0f62a25@nvidia.com>
+        <20220531194304.GN1343366@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,65 +94,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-head:   5e83df49b4993a11b01399f6ce402f775940f965
-commit: a50f09346a341984d34ff41f03dbd14dea6f20fe [62/65] virtio_ring: remove unused variable in virtqueue_add()
-config: mips-randconfig-c004-20220531 (https://download.01.org/0day-ci/archive/20220601/202206010444.EGBXgPMJ-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project c825abd6b0198fb088d9752f556a70705bc99dfd)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install mips cross compiling tool for clang build
-        # apt-get install binutils-mipsel-linux-gnu
-        # https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=a50f09346a341984d34ff41f03dbd14dea6f20fe
-        git remote add mst-vhost https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
-        git fetch --no-tags mst-vhost vhost
-        git checkout a50f09346a341984d34ff41f03dbd14dea6f20fe
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=mips SHELL=/bin/bash drivers/virtio/
+On Tue, 31 May 2022 16:43:04 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+> On Tue, May 31, 2022 at 05:44:11PM +0530, Abhishek Sahu wrote:
+> > On 5/30/2022 5:55 PM, Jason Gunthorpe wrote: =20
+> > > On Mon, May 30, 2022 at 04:45:59PM +0530, Abhishek Sahu wrote:
+> > >  =20
+> > >>  1. In real use case, config or any other ioctl should not come along
+> > >>     with VFIO_DEVICE_FEATURE_POWER_MANAGEMENT ioctl request.
+> > >> =20
+> > >>  2. Maintain some 'access_count' which will be incremented when we
+> > >>     do any config space access or ioctl. =20
+> > >=20
+> > > Please don't open code locks - if you need a lock then write a proper
+> > > lock. You can use the 'try' variants to bail out in cases where that
+> > > is appropriate.
+> > >=20
+> > > Jason =20
+> >=20
+> >  Thanks Jason for providing your inputs.
+> >=20
+> >  In that case, should I introduce new rw_semaphore (For example
+> >  power_lock) and move =E2=80=98platform_pm_engaged=E2=80=99 under =E2=
+=80=98power_lock=E2=80=99 ? =20
+>=20
+> Possibly, this is better than an atomic at least
+>=20
+> >  1. At the beginning of config space access or ioctl, we can take the
+> >     lock
+> > =20
+> >      down_read(&vdev->power_lock); =20
+>=20
+> You can also do down_read_trylock() here and bail out as you were
+> suggesting with the atomic.
+>=20
+> trylock doesn't have lock odering rules because it can't sleep so it
+> gives a bit more flexability when designing the lock ordering.
+>=20
+> Though userspace has to be able to tolerate the failure, or never make
+> the request.
+>=20
+> >          down_write(&vdev->power_lock);
+> >          ...
+> >          switch (vfio_pm.low_power_state) {
+> >          case VFIO_DEVICE_LOW_POWER_STATE_ENTER:
+> >                  ...
+> >                          vfio_pci_zap_and_down_write_memory_lock(vdev);
+> >                          vdev->power_state_d3 =3D true;
+> >                          up_write(&vdev->memory_lock);
+> >=20
+> >          ...
+> >          up_write(&vdev->power_lock); =20
+>=20
+> And something checks the power lock before allowing the memor to be
+> re-enabled?
+>=20
+> >  4.  For ioctl access, as mentioned previously I need to add two
+> >      callbacks functions (one for start and one for end) in the struct
+> >      vfio_device_ops and call the same at start and end of ioctl from
+> >      vfio_device_fops_unl_ioctl(). =20
+>=20
+> Not sure I followed this..
 
-All errors (new ones prefixed by >>):
+I'm kinda lost here too.  A couple replies back there was some concern
+about race scenarios with multiple user threads accessing the device.
+The ones concerning non-deterministic behavior if a user is
+concurrently changing power state and performing other accesses are a
+non-issue, imo.  I think our goal is only to expand the current
+memory_lock to block accesses, including config space, while the device
+is in low power, or some approximation bounded by the entry/exit ioctl.
 
->> drivers/virtio/virtio_ring.c:1783:9: error: use of undeclared identifier 'vq'
-           return vq->packed_ring ? virtqueue_add_packed(_vq, sgs, total_sg,
-                  ^
-   1 error generated.
+I think the remaining issues is how to do that relative to the fact
+that config space access can change the memory enable state and would
+therefore need to upgrade the memory_lock read-lock to a write-lock.
+For that I think we can simply drop the read-lock, acquire the
+write-lock, and re-test the low power state.  If it has changed, that
+suggests the user has again raced changing power state with another
+access and we can simply drop the lock and return -EIO.
 
+If I'm still misunderstanding, please let me know.  Thanks,
 
-vim +/vq +1783 drivers/virtio/virtio_ring.c
+Alex
 
-1ce9e6055fa0a9 Tiwei Bie 2018-11-21  1768  
-1ce9e6055fa0a9 Tiwei Bie 2018-11-21  1769  
-e6f633e5beab65 Tiwei Bie 2018-11-21  1770  /*
-e6f633e5beab65 Tiwei Bie 2018-11-21  1771   * Generic functions and exported symbols.
-e6f633e5beab65 Tiwei Bie 2018-11-21  1772   */
-e6f633e5beab65 Tiwei Bie 2018-11-21  1773  
-e6f633e5beab65 Tiwei Bie 2018-11-21  1774  static inline int virtqueue_add(struct virtqueue *_vq,
-e6f633e5beab65 Tiwei Bie 2018-11-21  1775  				struct scatterlist *sgs[],
-e6f633e5beab65 Tiwei Bie 2018-11-21  1776  				unsigned int total_sg,
-e6f633e5beab65 Tiwei Bie 2018-11-21  1777  				unsigned int out_sgs,
-e6f633e5beab65 Tiwei Bie 2018-11-21  1778  				unsigned int in_sgs,
-e6f633e5beab65 Tiwei Bie 2018-11-21  1779  				void *data,
-e6f633e5beab65 Tiwei Bie 2018-11-21  1780  				void *ctx,
-e6f633e5beab65 Tiwei Bie 2018-11-21  1781  				gfp_t gfp)
-e6f633e5beab65 Tiwei Bie 2018-11-21  1782  {
-1ce9e6055fa0a9 Tiwei Bie 2018-11-21 @1783  	return vq->packed_ring ? virtqueue_add_packed(_vq, sgs, total_sg,
-1ce9e6055fa0a9 Tiwei Bie 2018-11-21  1784  					out_sgs, in_sgs, data, ctx, gfp) :
-1ce9e6055fa0a9 Tiwei Bie 2018-11-21  1785  				 virtqueue_add_split(_vq, sgs, total_sg,
-e6f633e5beab65 Tiwei Bie 2018-11-21  1786  					out_sgs, in_sgs, data, ctx, gfp);
-e6f633e5beab65 Tiwei Bie 2018-11-21  1787  }
-e6f633e5beab65 Tiwei Bie 2018-11-21  1788  
-
-:::::: The code at line 1783 was first introduced by commit
-:::::: 1ce9e6055fa0a9043405c5604cf19169ec5379ff virtio_ring: introduce packed ring support
-
-:::::: TO: Tiwei Bie <tiwei.bie@intel.com>
-:::::: CC: David S. Miller <davem@davemloft.net>
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
