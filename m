@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93649539736
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 21:43:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F2C0539732
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 21:43:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347559AbiEaTmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 15:42:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39406 "EHLO
+        id S1347397AbiEaTmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 15:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347546AbiEaTmG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 15:42:06 -0400
+        with ESMTP id S1347570AbiEaTmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 15:42:09 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5240E3B4;
-        Tue, 31 May 2022 12:41:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004F62F387;
+        Tue, 31 May 2022 12:41:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654026100; x=1685562100;
+  t=1654026102; x=1685562102;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WPRrxoxL43+8moAbr4TYSZMvvLUkYwL9yUoXOyZiIOY=;
-  b=SlCGA3Bme5XCgVYMKYFoGcDeQo9b8IZPWh7H7h3uMhw7IYNLqDSCyKeq
-   J+Lfya1Jh2YsFQIrP0GcgyGZbCd64Ng67Q8uZ+RbgV4IQJJ5hf8ZgpbPR
-   eTvaqKw7Q92AUHNdz4dL4PeLhACfWv2J4Dy6q1sc0kKCQ/McbViP+0niQ
-   aPCSwtvDHmGLbP5yGpmvM1cKKXTInluw61FSKnbvIRFoEO7XIv/soBd0Z
-   Ch14dnh957hPkAdwp0zyD8Et+rX3oWh5ZEI8f5k+fL9UWMiz77NnGG5YD
-   Gi5BrfEjiBAhXYTjbMxrghhUVZlF7UaLv9RxWjmcq/pNcco3Fwm7SgVUo
+  bh=LRvpKY8V/pZZVmnXiTrrOQbWEaVzxMy5EVzrOvbbdO4=;
+  b=ExnB/ATzUbnYvQ6x3lutDRESEmlSsFC/Amdx8bQQDpASREqybRdXlYRS
+   TpfHm1ZyvW1gZdV3ADOnUydOByzId2AV1tnH4B8n97IhtPxNKifRP+yaH
+   /TZDy0ebUCQlW1srFBHpOfTYzxp1Za/lNVAUBgdmfej0NVOWs+6CVDKIh
+   3Je+77xOVdy6kyNe3mFuri/pbWLRukzY2l+Czcdkd3+DWFW9Hq9M+oqsa
+   SiIu5M0hkrru4uwXkPajxlDu34qtmGTYarB3FMx2YQU0w3qitxUyAt5dD
+   XnSb9fXKLi69JBiH9drDzuvrhkXNQW4MGF3ZbDTrwgExHBrIBqRsS6OMQ
    A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10364"; a="272935297"
+X-IronPort-AV: E=McAfee;i="6400,9594,10364"; a="272935305"
 X-IronPort-AV: E=Sophos;i="5.91,266,1647327600"; 
-   d="scan'208";a="272935297"
+   d="scan'208";a="272935305"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2022 12:41:02 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2022 12:41:05 -0700
 X-IronPort-AV: E=Sophos;i="5.91,266,1647327600"; 
-   d="scan'208";a="645164766"
+   d="scan'208";a="645164796"
 Received: from maciejwo-mobl1.ger.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.36.207])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2022 12:40:59 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2022 12:41:02 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
@@ -45,9 +45,9 @@ Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
         isaku.yamahata@intel.com, kai.huang@intel.com
-Subject: [PATCH v4 20/22] x86/virt/tdx: Initialize all TDMRs
-Date:   Wed,  1 Jun 2022 07:39:43 +1200
-Message-Id: <5690e2cd4fd005d269be79423cfc6e839d73bb82.1654025431.git.kai.huang@intel.com>
+Subject: [PATCH v4 21/22] x86/virt/tdx: Support kexec()
+Date:   Wed,  1 Jun 2022 07:39:44 +1200
+Message-Id: <0d0f416433033db578a125d1518f0dfcafe5d2d2.1654025431.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <cover.1654025430.git.kai.huang@intel.com>
 References: <cover.1654025430.git.kai.huang@intel.com>
@@ -63,132 +63,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Initialize TDMRs via TDH.SYS.TDMR.INIT as the last step to complete the
-TDX initialization.
+To support kexec(), if the TDX module is ever initialized, the kernel
+needs to flush all dirty cachelines associated with any TDX private
+KeyID, otherwise they may slightly corrupt the new kernel.
 
-All TDMRs need to be initialized using TDH.SYS.TDMR.INIT SEAMCALL before
-the memory pages can be used by the TDX module.  The time to initialize
-TDMR is proportional to the size of the TDMR because TDH.SYS.TDMR.INIT
-internally initializes the PAMT entries using the global KeyID.
+Following SME support, use wbinvd() to flush cache in stop_this_cpu().
+Theoretically, cache flush is only needed when the TDX module has been
+initialized.  However initializing the TDX module is done on demand at
+runtime, and it takes a mutex to read the module status.  Just check
+whether TDX is enabled by BIOS instead to flush cache.
 
-To avoid long latency caused in one SEAMCALL, TDH.SYS.TDMR.INIT only
-initializes an (implementation-specific) subset of PAMT entries of one
-TDMR in one invocation.  The caller needs to call TDH.SYS.TDMR.INIT
-iteratively until all PAMT entries of the given TDMR are initialized.
+The current TDX module architecture doesn't play nicely with kexec().
+The TDX module can only be initialized once during its lifetime, and
+there is no SEAMCALL to reset the module to give a new clean slate to
+the new kernel.  Therefore, ideally, if the module is ever initialized,
+it's better to shut down the module.  The new kernel won't be able to
+use TDX anyway (as it needs to go through the TDX module initialization
+process which will fail immediately at the first step).
 
-TDH.SYS.TDMR.INITs can run concurrently on multiple CPUs as long as they
-are initializing different TDMRs.  To keep it simple, just initialize
-all TDMRs one by one.  On a 2-socket machine with 2.2G CPUs and 64GB
-memory, each TDH.SYS.TDMR.INIT roughly takes ~7us on average, and it
-takes roughly ~100ms to complete initializing all TDMRs while system is
-idle.
+However, there's no guarantee CPU is in VMX operation during kexec().
+This means it's impractical to shut down the module.  Just do nothing
+but leave the module open.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 70 ++++++++++++++++++++++++++++++++++---
- arch/x86/virt/vmx/tdx/tdx.h |  1 +
- 2 files changed, 66 insertions(+), 5 deletions(-)
+ arch/x86/kernel/process.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 0a59b196787a..1363998ce1a9 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1025,6 +1025,65 @@ static int config_global_keyid(void)
- 	return seamcall_on_each_package_serialized(&sc);
- }
- 
-+/* Initialize one TDMR */
-+static int init_tdmr(struct tdmr_info *tdmr)
-+{
-+	u64 next;
-+
-+	/*
-+	 * Initializing PAMT entries might be time-consuming (in
-+	 * proportion to the size of the requested TDMR).  To avoid long
-+	 * latency in one SEAMCALL, TDH.SYS.TDMR.INIT only initializes
-+	 * an (implementation-defined) subset of PAMT entries in one
-+	 * invocation.
+diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
+index dbaf12c43fe1..ff5449c23522 100644
+--- a/arch/x86/kernel/process.c
++++ b/arch/x86/kernel/process.c
+@@ -769,8 +769,15 @@ void __noreturn stop_this_cpu(void *dummy)
+ 	 *
+ 	 * Test the CPUID bit directly because the machine might've cleared
+ 	 * X86_FEATURE_SME due to cmdline options.
 +	 *
-+	 * Call TDH.SYS.TDMR.INIT iteratively until all PAMT entries
-+	 * of the requested TDMR are initialized (if next-to-initialize
-+	 * address matches the end address of the TDMR).
-+	 */
-+	do {
-+		struct tdx_module_output out;
-+		u64 ret;
-+
-+		ret = seamcall(TDH_SYS_TDMR_INIT, tdmr->base, 0, 0, 0, &out);
-+		if (ret)
-+			return -EFAULT;
-+		/*
-+		 * RDX contains 'next-to-initialize' address if
-+		 * TDH.SYS.TDMR.INT succeeded.
-+		 */
-+		next = out.rdx;
-+		/* Allow scheduling when needed */
-+		if (need_resched())
-+			cond_resched();
-+	} while (next < tdmr->base + tdmr->size);
-+
-+	return 0;
-+}
-+
-+/* Initialize all TDMRs */
-+static int init_tdmrs(struct tdmr_info *tdmr_array, int tdmr_num)
-+{
-+	int i;
-+
-+	/*
-+	 * Initialize TDMRs one-by-one for simplicity, though the TDX
-+	 * architecture does allow different TDMRs to be initialized in
-+	 * parallel on multiple CPUs.  Parallel initialization could
-+	 * be added later when the time spent in the serialized scheme
-+	 * becomes a real concern.
-+	 */
-+	for (i = 0; i < tdmr_num; i++) {
-+		int ret;
-+
-+		ret = init_tdmr(tdmr_array_entry(tdmr_array, i));
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * Detect and initialize the TDX module.
-  *
-@@ -1115,11 +1174,12 @@ static int init_tdx_module(void)
- 	if (ret)
- 		goto out_free_pamts;
- 
--	/*
--	 * Return -EINVAL until all steps of TDX module initialization
--	 * process are done.
--	 */
--	ret = -EINVAL;
-+	/* Initialize TDMRs to complete the TDX module initialization */
-+	ret = init_tdmrs(tdmr_array, tdmr_num);
-+	if (ret)
-+		goto out_free_pamts;
-+
-+	tdx_module_status = TDX_MODULE_INITIALIZED;
- out_free_pamts:
- 	if (ret) {
++	 * Similar to SME, if the TDX module is ever initialized, the
++	 * cachelines associated with any TDX private KeyID must be
++	 * flushed before transiting to the new kernel.  The TDX module
++	 * is initialized on demand, and it takes the mutex to read it's
++	 * status.  Just check whether TDX is enabled by BIOS instead to
++	 * flush cache.
+ 	 */
+-	if (cpuid_eax(0x8000001f) & BIT(0))
++	if (cpuid_eax(0x8000001f) & BIT(0) || platform_tdx_enabled())
+ 		native_wbinvd();
+ 	for (;;) {
  		/*
-diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 2d25a93b89ef..e0309558be13 100644
---- a/arch/x86/virt/vmx/tdx/tdx.h
-+++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -53,6 +53,7 @@
- #define TDH_SYS_INFO		32
- #define TDH_SYS_INIT		33
- #define TDH_SYS_LP_INIT		35
-+#define TDH_SYS_TDMR_INIT	36
- #define TDH_SYS_LP_SHUTDOWN	44
- #define TDH_SYS_CONFIG		45
- 
 -- 
 2.35.3
 
