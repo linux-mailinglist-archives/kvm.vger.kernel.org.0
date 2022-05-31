@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CBAD539025
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:57:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63B4653903E
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 14:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344014AbiEaL5U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 07:57:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45230 "EHLO
+        id S1344072AbiEaMCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 08:02:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344007AbiEaL5T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 07:57:19 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1902E4B876;
-        Tue, 31 May 2022 04:57:18 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VBppq6011599;
-        Tue, 31 May 2022 11:57:15 GMT
+        with ESMTP id S233781AbiEaMCu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 08:02:50 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EACBE5BE6C;
+        Tue, 31 May 2022 05:02:48 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VADr19008901;
+        Tue, 31 May 2022 12:02:46 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=LcHvDtuzSOoYi69LTPtt0nknitn1CcYrAug2wTyiYyE=;
- b=OFgK9YxogZOzzoD2I4C2Ww3mR3YcCc71AhIHRcC6gxe7y5ZEz9Ec5cMpWX3z8S2/Gzvk
- FyIxj/FCHMk6n7wBzj9Cd9460SiqyvPC7w/73mcKWrSpTUGF/ST0NAP1fh7U9bju7Hjp
- zgc7JEfAM5eMGbRTGDrKTvIzSVJr641YOPR7CP3FGlWERkTu7GTv1QyD/7PcuN6gXwix
- t1NtS95vHfPyoha1qLw8AtqC7ppOb2kAYdlQCg/nIFdzmhr3IXl259OcDasxq+K96Hrc
- Ecq9MVJsyzxnPPUYMEzCd5TTaihWqVkKYtFF8GXOWWpdO65FkRkIetJARP++du2Qnej9 jw== 
+ bh=HAMbekByJXG5Ra0WnTNf1/wCwfvbw7mnCQYVB8/zg7I=;
+ b=ch5uC3X18zYSIQJhIlGnzraA87txyYPEp/1fqLub7wsd0AbQ6/RIyFonXP1CUk/kMdrc
+ jQaEJci7lVKFWTsPSMniRztpWON7B6ESfybB//S5Q8TwhrHowdX1s7LOPBbDrdR8Q5/f
+ BtR9UJOX2lBCoZQna1+dB6EI2WUw82gKC1gjIY+/OXJNJYAY1ZG8ZkGFIFvC4bdOjD/O
+ 46YJ5PJiP4EABgO5OP5N0Xqs+B2cAwvKrfQdNP5y2kMnE/Hxkv2BuS2w60pa3tOqlyTZ
+ fgq+E8hiCum8F9mNNgvcC6ETSY0ovaGeTVTmG+61hhctQmego/19NwZ6S8eRLd7qzQHI kQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdjh3833u-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh311wcc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 11:57:15 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24VBtOp3031431;
-        Tue, 31 May 2022 11:57:15 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdjh3833b-1
+        Tue, 31 May 2022 12:02:45 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24VBu7HH022666;
+        Tue, 31 May 2022 12:02:45 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh311wc4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 11:57:15 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24VBoJYx004415;
-        Tue, 31 May 2022 11:57:14 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma03dal.us.ibm.com with ESMTP id 3gd3ymdjn1-1
+        Tue, 31 May 2022 12:02:45 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24VBno77002044;
+        Tue, 31 May 2022 12:02:44 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma02wdc.us.ibm.com with ESMTP id 3gbc92kude-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 May 2022 11:57:14 +0000
+        Tue, 31 May 2022 12:02:44 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24VBvCls21299652
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24VC2gDh12517744
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 May 2022 11:57:13 GMT
+        Tue, 31 May 2022 12:02:43 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DF1D5AC062;
-        Tue, 31 May 2022 11:57:12 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id DFA14AC05B;
+        Tue, 31 May 2022 12:02:42 +0000 (GMT)
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 345EBAC05E;
-        Tue, 31 May 2022 11:57:12 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 37540AC060;
+        Tue, 31 May 2022 12:02:42 +0000 (GMT)
 Received: from [9.160.37.241] (unknown [9.160.37.241])
         by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 31 May 2022 11:57:12 +0000 (GMT)
-Message-ID: <24c17cf2-81d3-5f8b-27ba-2d6ba3bcdafe@linux.ibm.com>
-Date:   Tue, 31 May 2022 07:57:11 -0400
+        Tue, 31 May 2022 12:02:42 +0000 (GMT)
+Message-ID: <7e561de8-be73-4b62-ea7c-36e659d87788@linux.ibm.com>
+Date:   Tue, 31 May 2022 08:02:41 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
@@ -79,16 +79,16 @@ In-Reply-To: <4d05a8f4-d2e9-bc54-3e9b-6becc3281f0f@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: btlDVI6rc-7YZGobPTNgTVDAA-gu6FQA
-X-Proofpoint-GUID: XneMzIm36VFxHELjD_kqCAvh2V0WRPMi
+X-Proofpoint-ORIG-GUID: qY9zYATb8vh31k9OrCgD9mM1I9RIuhIX
+X-Proofpoint-GUID: ThUaaHt6ccLpvV0JtGLDKGRRWsKZF58c
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-05-31_04,2022-05-30_03,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- adultscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
- mlxlogscore=999 phishscore=0 mlxscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2205310059
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205310063
 X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -250,16 +250,10 @@ On 5/27/22 9:50 AM, Jason J. Herne wrote:
 >
 > get_update_locks_for_mdev(q->matrix_mdev);
 
-We can't do that, but your comment does point out a flaw in this macro; 
-namely, we must take the matrix_dev->guests_lock before attempting to 
-access q->matrix_mdev.
-
-An ap_matrix_mdev can be unlinked from a vfio_ap_queue (and vice versa) 
-when the queue is removed, but it also can be unlinked when an adapter 
-or domain is unassigned from an ap_matrix_mdev. In order to ensure that 
-the q->matrix_mdev is not in the process of being nullified (unlinked), 
-we must be holding the guests_lock which is also held when an adapter or 
-domain is unassigned.
+Yikes, I see another flaw in this macro! Either the input parameter 
+needs to be renamed to 'q' or the q->matrix_mdev needs to be changed to 
+queue->matrix_mdev. I think I'll go with the former since vfio_ap_queue 
+is referred to as 'q' everywhere else.
 
 >
 >
