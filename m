@@ -2,282 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC023538FF7
-	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:45:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96D04538FD9
+	for <lists+kvm@lfdr.de>; Tue, 31 May 2022 13:29:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343854AbiEaLm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 07:42:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49128 "EHLO
+        id S1343817AbiEaL3e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 07:29:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234157AbiEaLmz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 07:42:55 -0400
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 214038217E;
-        Tue, 31 May 2022 04:42:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1653997375; x=1685533375;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1AvcBprIOSQItFD8cn3+FAqAk16pR3Q+CjOoSzkn5lI=;
-  b=TPMFPHA26zEXg8TTMvNSGpKDwAhK4+z4DEFDhzcvYDmnuii6VlnF6DdQ
-   e+/BFM5TjiPUAH80bhkdJ8lahiO2UnZfEfeJRP1+3PcAc2qAK6OrJtrqn
-   C9Zk8yFLAhi09WU7NwWXUh1eCd1eR/Ny9cYGJ++ljSOcrmYnTAa8i4IB0
-   s=;
-X-IronPort-AV: E=Sophos;i="5.91,265,1647302400"; 
-   d="scan'208";a="93334418"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-7a21ed79.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 31 May 2022 11:17:00 +0000
-Received: from EX13MTAUEE002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1d-7a21ed79.us-east-1.amazon.com (Postfix) with ESMTPS id 14946220F3F;
-        Tue, 31 May 2022 11:16:55 +0000 (UTC)
-Received: from EX13D08UEE002.ant.amazon.com (10.43.62.92) by
- EX13MTAUEE002.ant.amazon.com (10.43.62.24) with Microsoft SMTP Server (TLS)
- id 15.0.1497.36; Tue, 31 May 2022 11:16:55 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (10.43.162.135) by
- EX13D08UEE002.ant.amazon.com (10.43.62.92) with Microsoft SMTP Server (TLS)
- id 15.0.1497.36; Tue, 31 May 2022 11:16:54 +0000
-Received: from dev-dsk-jalliste-1c-387c3ddf.eu-west-1.amazon.com
- (10.13.250.64) by mail-relay.amazon.com (10.43.162.232) with Microsoft SMTP
- Server (TLS) id 15.0.1497.36 via Frontend Transport; Tue, 31 May 2022
- 11:16:51 +0000
-From:   Jack Allister <jalliste@amazon.com>
-To:     <pbonzini@redhat.com>, <kvm@vger.kernel.org>
-CC:     <jalliste@amazon.com>, <dwmw@amazon.co.uk>, <diapop@amazon.co.uk>,
-        <metikaya@amazon.co.uk>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "Borislav Petkov" <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: VMX: CPU frequency scaling for intel x86_64 KVM guests
-Date:   Tue, 31 May 2022 11:16:44 +0000
-Message-ID: <20220531111644.41128-1-jalliste@amazon.com>
-X-Mailer: git-send-email 2.32.0
+        with ESMTP id S235213AbiEaL3c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 07:29:32 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4815956FBE;
+        Tue, 31 May 2022 04:29:31 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VADnwf008819;
+        Tue, 31 May 2022 11:29:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=MWJNEvmLnQ7b1SoYG+r2ZoWJVqcH6a53P8JH4dFdcvg=;
+ b=EeAI+GU2aeitzyymDENs4vP/E/C4Xlo5EPydGcBJk90GDkYafGNJJuMYb8nMweaCw6JR
+ 8neJFL/fLusTwUuM0O2ZT3fhQ7GmJg8ivkHkKJB1nZINz6gQzx5cFHkv9zggGdQzXCf/
+ ZWQDyb4rTPfSNataZpij8/qPNmiA3AupVErHFKoNtuuJGvaxv0n3XHbMYRYESQf84ICL
+ xUwVlJgiRv9Iw5JJEXRkgDt8apgRqMNfPfEi2t4ATUlukhh8zLxuKguGjiXLvGn7WYwd
+ EeY6TWsvm0VNCYY8g31OBkXPkecz17AXtJgGN5hDggPx2xI7ONRS/9d7gQqy4tyNq98U tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh3118up-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 11:29:28 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24VAFmgE018942;
+        Tue, 31 May 2022 11:29:27 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gdh3118u9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 11:29:27 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24VBLkol022481;
+        Tue, 31 May 2022 11:29:25 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06fra.de.ibm.com with ESMTP id 3gbcb7k1xn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 May 2022 11:29:25 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24VBTMXb47644982
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 May 2022 11:29:22 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 24280A405B;
+        Tue, 31 May 2022 11:29:22 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87F3EA4054;
+        Tue, 31 May 2022 11:29:21 +0000 (GMT)
+Received: from [9.171.36.152] (unknown [9.171.36.152])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 31 May 2022 11:29:21 +0000 (GMT)
+Message-ID: <a1b60913-c261-f8f0-d8bc-a536dcb64c52@linux.ibm.com>
+Date:   Tue, 31 May 2022 13:29:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v4 0/4] KVM: s390: selftests: Provide TAP output in tests
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+References: <20220531101554.36844-1-thuth@redhat.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20220531101554.36844-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: j5mIJ4VbVYQWbpKnQvweuT8s-MBOBH7c
+X-Proofpoint-GUID: 9YIdFaTq2U7r2UXf7Hy5Ab5caIFuWj2i
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-12.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-05-31_04,2022-05-30_03,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2205310058
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A VMM can control a vCPU's CPU frequency by interfacing with KVM via
-the vCPU file descriptor to enable/set CPU frequency scaling for a
-guest. Instead of creating a separate IOCTL to this this, KVM capabil-
-ities are extended to include a capability called
-KVM_CAP_CPU_FREQ_SCALING.
+Am 31.05.22 um 12:15 schrieb Thomas Huth:
+> This patch series is motivated by Shuah's suggestion here:
+> 
+>   https://lore.kernel.org/kvm/d576d8f7-980f-3bc6-87ad-5a6ae45609b8@linuxfoundation.org/
+> 
+> Many s390x KVM selftests do not output any information about which
+> tests have been run, so it's hard to say whether a test binary
+> contains a certain sub-test or not. To improve this situation let's
+> add some TAP output via the kselftest.h interface to these tests,
+> so that it easier to understand what has been executed or not.
+> 
+> v4:
+>   - Rebased to include test_termination() now in the memop test
+>   - Reworked the extension capability check in the memop test
+> 
+> v3:
+>   - Added comments / fixed cosmetics according to Janosch's and
+>     Janis' reviews of the v2 series
+>   - Added Reviewed-by tags from the v2 series
+> 
+> v2:
+>   - Reworked the extension checking in the first patch
+>   - Make sure to always print the TAP 13 header in the second patch
+>   - Reworked the SKIP printing in the third patch
+> 
+> Thomas Huth (4):
+>    KVM: s390: selftests: Use TAP interface in the memop test
+>    KVM: s390: selftests: Use TAP interface in the sync_regs test
+>    KVM: s390: selftests: Use TAP interface in the tprot test
+>    KVM: s390: selftests: Use TAP interface in the reset test
+> 
+>   tools/testing/selftests/kvm/s390x/memop.c     | 95 +++++++++++++++----
+>   tools/testing/selftests/kvm/s390x/resets.c    | 38 ++++++--
+>   .../selftests/kvm/s390x/sync_regs_test.c      | 87 +++++++++++++----
+>   tools/testing/selftests/kvm/s390x/tprot.c     | 29 +++++-
+>   4 files changed, 197 insertions(+), 52 deletions(-)
+> 
 
-A generic set_cpu_freq interface is added to kvm_x86_ops
-to allow for architecture (AMD/Intel) independent CPU frequency
-scaling setting.
-
-For Intel platforms, Hardware-Controlled Performance States (HWP) are
-used to implement CPU scaling within the guest. Further information on
-this mechanism can be seen in Intel SDM Vol 3B (section 14.4). The CPU
-frequency is set as soon as this function is called and is kept running
-until explicitly reset or set again.
-
-Currently the AMD frequency setting interface is left unimplemented.
-
-Please note that CPU frequency scaling will have an effect on host
-processing in it's current form. To change back to full performance
-when running in host context an IOCTL with a frequency value of 0
-is needed to run back at uncapped speed.
-
-Signed-off-by: Jack Allister <jalliste@amazon.com>
----
- arch/x86/include/asm/kvm_host.h |  2 +
- arch/x86/kvm/vmx/vmx.c          | 91 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c              | 16 ++++++
- include/uapi/linux/kvm.h        |  1 +
- 4 files changed, 110 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ae220f88f00d..d2efc2ce624f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1169,6 +1169,8 @@ struct kvm_x86_ops {
- 	bool (*rdtscp_supported)(void);
- 	bool (*invpcid_supported)(void);
- 
-+	int (*set_cpu_freq_scaling)(struct kvm_vcpu *vcpu, u8 freq_100mhz);
-+
- 	void (*set_tdp_cr3)(struct kvm_vcpu *vcpu, unsigned long cr3);
- 
- 	void (*set_supported_cpuid)(u32 func, struct kvm_cpuid_entry2 *entry);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6499f371de58..beee39b57b13 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1699,6 +1699,95 @@ static bool vmx_invpcid_supported(void)
- 	return cpu_has_vmx_invpcid();
- }
- 
-+static int vmx_query_cpu_freq_valid_freq(u8 freq)
-+{
-+#define MASK_PERF 0xFF
-+#define CAP_HIGHEST_SHIFT 0
-+#define CAP_LOWEST_SHIFT 24
-+#define CAP_HIGHEST_MASK (MASK_PERF << CAP_HIGHEST_SHIFT)
-+#define CAP_LOWEST_MASK (MASK_PERF << CAP_LOWEST_SHIFT)
-+	u64 cap_msr;
-+	u8 highest, lowest;
-+
-+	/* Query highest and lowest supported scaling. */
-+	rdmsrl(MSR_HWP_CAPABILITIES, cap_msr);
-+	highest = (u8)(cap_msr & CAP_HIGHEST_MASK);
-+	lowest = (u8)((cap_msr & CAP_LOWEST_MASK) >> CAP_LOWEST_SHIFT);
-+
-+	if (freq < lowest || freq > highest)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static void vmx_set_cpu_freq_uncapped(void)
-+{
-+#define SHIFT_DESIRED_PERF 16
-+#define SHIFT_MAX_PERF 8
-+#define SHIFT_MIN_PERF 0
-+
-+	u64 cap_msr, req_msr;
-+	u8 highest, lowest;
-+
-+	/* Query the capabilities. */
-+	rdmsrl(MSR_HWP_CAPABILITIES, cap_msr);
-+	highest = (u8)(cap_msr & CAP_HIGHEST_MASK);
-+	lowest = (u8)((cap_msr & CAP_LOWEST_MASK) >> CAP_LOWEST_SHIFT);
-+
-+	/* Set the desired to highest performance. */
-+	req_msr = ((highest & MASK_PERF) << SHIFT_DESIRED_PERF) |
-+		((highest & MASK_PERF) << SHIFT_MAX_PERF) |
-+		((lowest & MASK_PERF) << SHIFT_MIN_PERF);
-+	wrmsrl(MSR_HWP_REQUEST, req_msr);
-+}
-+
-+static void vmx_set_cpu_freq_capped(u8 freq_100mhz)
-+{
-+	u64 req_msr;
-+
-+	/* Populate the variable used for setting the HWP request. */
-+	req_msr = ((freq_100mhz & MASK_PERF) << SHIFT_DESIRED_PERF) |
-+		((freq_100mhz & MASK_PERF) << SHIFT_MAX_PERF) |
-+		((freq_100mhz & MASK_PERF) << SHIFT_MIN_PERF);
-+
-+	wrmsrl(MSR_HWP_REQUEST, req_msr);
-+}
-+
-+static int vmx_set_cpu_freq_scaling(struct kvm_vcpu *vcpu, u8 freq_100mhz)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	u64 pm_before, req_msr;
-+	int rc;
-+
-+	/* Is HWP scaling supported? */
-+	if (!this_cpu_has(X86_FEATURE_HWP))
-+		return -ENODEV;
-+
-+	/*
-+	 * HWP needs to be enabled to query & use capabilities.
-+	 * This bit is W1Once so cannot be cleared after.
-+	 */
-+	rdmsrl(MSR_PM_ENABLE, pm_before);
-+	if ((pm_before & 1) == 0)
-+		wrmsrl(MSR_PM_ENABLE, pm_before | 1);
-+
-+	/*
-+	 * Check if setting to a specific value, if being set
-+	 * to zero this means return to uncapped frequency.
-+	 */
-+	if (freq_100mhz) {
-+		rc = vmx_query_cpu_freq_valid_freq(freq_100mhz);
-+
-+		if (rc)
-+			return rc;
-+
-+		vmx_set_cpu_freq_capped(freq_100mhz);
-+	} else
-+		vmx_set_cpu_freq_uncapped();
-+
-+	return 0;
-+}
-+
- /*
-  * Swap MSR entry in host/guest MSR entry array.
-  */
-@@ -8124,6 +8213,8 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 	.rdtscp_supported = vmx_rdtscp_supported,
- 	.invpcid_supported = vmx_invpcid_supported,
- 
-+	.set_cpu_freq_scaling = vmx_set_cpu_freq_scaling,
-+
- 	.set_supported_cpuid = vmx_set_supported_cpuid,
- 
- 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c33423a1a13d..9ae2ab102e01 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3669,6 +3669,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_VAR_MTRR_COUNT:
- 	case KVM_CAP_X86_USER_SPACE_MSR:
- 	case KVM_CAP_X86_MSR_FILTER:
-+	case KVM_CAP_CPU_FREQ_SCALING:
- 		r = 1;
- 		break;
- #ifdef CONFIG_KVM_XEN
-@@ -4499,6 +4500,19 @@ static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
- 	return r;
- }
- 
-+static int kvm_cap_set_cpu_freq(struct kvm_vcpu *vcpu,
-+				       struct kvm_enable_cap *cap)
-+{
-+	u8 freq = (u8)cap->args[0];
-+
-+	/* Query whether this platform (Intel or AMD) support setting. */
-+	if (!kvm_x86_ops.set_cpu_freq_scaling)
-+		return -ENODEV;
-+
-+	/* Attempt to set to the frequency specified. */
-+	return kvm_x86_ops.set_cpu_freq_scaling(vcpu, freq);
-+}
-+
- /*
-  * kvm_set_guest_paused() indicates to the guest kernel that it has been
-  * stopped by the hypervisor.  This function will be called from the host only.
-@@ -4553,6 +4567,8 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
- 		return kvm_x86_ops.enable_direct_tlbflush(vcpu);
- 	case KVM_CAP_SET_VAR_MTRR_COUNT:
- 		return kvm_mtrr_set_var_mtrr_count(vcpu, cap->args[0]);
-+	case KVM_CAP_CPU_FREQ_SCALING:
-+		return kvm_cap_set_cpu_freq(vcpu, cap);
- 
- 	default:
- 		return -EINVAL;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 831be0d2d5e4..273a3ab5590e 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -874,6 +874,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_NO_POLL_ON_HLT 100003
- #define KVM_CAP_MMU_USE_VMA_CAPMEM 100004
- #define KVM_CAP_MMU_SUPPORT_DYNAMIC_CAPMEM 100005
-+#define KVM_CAP_CPU_FREQ_SCALING 100006
- 
- #define KVM_CAP_IRQCHIP	  0
- #define KVM_CAP_HLT	  1
--- 
-2.32.0
-
+Thanks applied and queued.
