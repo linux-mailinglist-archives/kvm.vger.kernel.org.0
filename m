@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E36553AFE7
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 00:51:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ABB053B030
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 00:51:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232062AbiFAV6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 17:58:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57540 "EHLO
+        id S232064AbiFAV6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 17:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232069AbiFAV6l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 17:58:41 -0400
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EE965E8
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 14:58:38 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id r84so2396534qke.10
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 14:58:38 -0700 (PDT)
+        with ESMTP id S232067AbiFAV6n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 17:58:43 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4CAB6431
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 14:58:40 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id b200so2399794qkc.7
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 14:58:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=oxidecomputer.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=mbxxMsKBxXTW+LHqS3uItjaVkQr6WN103MI4C6b0TXg=;
-        b=FRW8+dpsGB4l97C7Mgdbxvgl8AAPoldqUMyBPP//RAApq4GHcoDyBvSUVRT0YkUInu
-         2gVFxYzAhKUVGwz+Gz2SlSBJN1Pd0ePMeRGKbNvkhvvV/TDDpPbRnv+6ZK+XERaUoa2m
-         tKHI6cKNGsYgrmpXsRuWHdQ2Gi655ApRuLEAmEV38qU8Wn7BYtaJwAOVDxqOQNDXA+Jb
-         XEcz9zp+EhAlOlznvvRjPpHmwTdsMsQowT/keGqB48ZGXNpWhXItjsC1TSCPknnJaHtI
-         yeB1FIsSZs/0dXzogxNmVqXaMUWmjAUq3OjemEtdy1L7ayidTByohRkazstEYSvpwoem
-         cTng==
+        bh=tgjb0daVcZ+IxzK5+K8hAdNIPu4d7hC8GnrZOqSwoN0=;
+        b=Ghuj/TACltxgQ/qpUet331XfuJgaB6Z2YkEYiMiwuB8fdhAo3c1Of00hejwmjkqALQ
+         BbSIg9Tk4/maD4I7llZbk2FzzVly6GcWkQDI46+Ym/X1Zla8D60RPqUGctWysqzkYu7C
+         KEUON7wLZn9UIFBegU1uNnirC/AaKqXHLoqq8MN+UJAJKTX0Qf4a70bzPmCzxij9Getu
+         d3xLhYnZZ2347q5ZArFrPCxiMpqZQUHuIkHJiVnTUqnN09MKgC9QfH7oZ7PhyZklLK4x
+         bgBlqWKiSvmyT93ce0YuWr4NyOiRhFsfvXeOJio6MXct/o68Y/kshXWlMWS0gwzjwFgH
+         or8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=mbxxMsKBxXTW+LHqS3uItjaVkQr6WN103MI4C6b0TXg=;
-        b=j5V1K0cjlCujqWIyVVB1D8RgLZp6r3b+aekm8AYqE3I6DGMKdKsNuZxaputXC5ydRx
-         o/rY9pxWYcGBB6tpe2p1gi6x/VUT5yqy6XFbEAlgAKN8fTBtpVFI72qyqNgvu+t8gHvj
-         kZ59Ci+EFCMWUmfJp4SdguY3ZSwBNSkYFPfYivhXpESggp3hq2culkfi+3EzFZaRKwip
-         4oXzHJcTdNcMR+A1shq6MgiataNoNBhkhCa3wX6cAMF6VnZLSCEYLL9WsT3jdiEbE9Vp
-         gXS2g/BAjtYN/lMMKNYx8ZrsdVuYQrWskpqCwQT1m4hNj3FkEk5IqI1bFeWVD9HDy514
-         xfHA==
-X-Gm-Message-State: AOAM533SXWsG/fKgQJC8VgdpubDBP7bwr5RrMZaxYAQuZ96JW8zaZpTF
-        7ecOl8+HWiuML+xdgaTY90HEFmmGSWCmgA==
-X-Google-Smtp-Source: ABdhPJw51K3BbmrVqN6x48brdBSrGvhiq8mIHVQUlzOC5NdjoHNZluFiFY6NcBSsP2VMiEygPQWhAg==
-X-Received: by 2002:a05:620a:4415:b0:6a5:895d:f254 with SMTP id v21-20020a05620a441500b006a5895df254mr1167161qkp.517.1654120717683;
-        Wed, 01 Jun 2022 14:58:37 -0700 (PDT)
+        bh=tgjb0daVcZ+IxzK5+K8hAdNIPu4d7hC8GnrZOqSwoN0=;
+        b=icMhoff/qCuJGB5c+EMQrohOuDtuldZjhfn4FkJKQU0CV/rs+jVjc2EWrIekytbUlD
+         yS+42q6yF3E2qPlmK5np5iXnq8ptLYaEuvA0Y4jPwuaBl+Osjw2fFBHcc/W++j5CR3rJ
+         dRI+5c110BZUqTzlVFjaZeyAgU09SPulW8QzXPCane/NNklq2LyyBnbOl4CC57m5fTA7
+         BCCy1ImiyHvX9ErEt/H6QgNH7L9MATOWUG+DKD4N+zPmrUFNbDizermTf3XmsZ8zrW41
+         b6y/i8wUXk50NrX21UvMkFgN1qDSGd+paQ3psuxPXzTYhjdExkqw08mVxcl900otIpCF
+         82Bg==
+X-Gm-Message-State: AOAM530lzejLGv75Ml53Q9JARBL0LdGfLGMH6bDcui/Z+yH5cG/jYrCJ
+        Yg9vtQ9rInko/2UiIa/dhauWV4Unt1BCwg==
+X-Google-Smtp-Source: ABdhPJzpDjOwijipiuI/dRL4sl6GmrzzfbzfbVSAnb6rSW2RU7fJD7j54ClEMPw83qrQDKuMmJ5HSQ==
+X-Received: by 2002:a37:2c41:0:b0:6a6:4022:728d with SMTP id s62-20020a372c41000000b006a64022728dmr1526642qkh.150.1654120719408;
+        Wed, 01 Jun 2022 14:58:39 -0700 (PDT)
 Received: from igor.oxide.gajendra.net ([2603:3005:b04:8100:f692:bfff:fe8b:cf8e])
-        by smtp.gmail.com with ESMTPSA id f4-20020a05620a20c400b006a659ce9821sm1823611qka.63.2022.06.01.14.58.36
+        by smtp.gmail.com with ESMTPSA id f4-20020a05620a20c400b006a659ce9821sm1823611qka.63.2022.06.01.14.58.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 14:58:37 -0700 (PDT)
+        Wed, 01 Jun 2022 14:58:38 -0700 (PDT)
 From:   Dan Cross <cross@oxidecomputer.com>
 To:     kvm@vger.kernel.org
 Cc:     Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Dan Cross <cross@oxidecomputer.com>
-Subject: [PATCH v4 1/2] kvm-unit-tests: configure changes for illumos.
-Date:   Wed,  1 Jun 2022 21:57:48 +0000
-Message-Id: <20220601215749.30223-2-cross@oxidecomputer.com>
+Subject: [PATCH v4 2/2] kvm-unit-tests: invoke $LD explicitly
+Date:   Wed,  1 Jun 2022 21:57:49 +0000
+Message-Id: <20220601215749.30223-3-cross@oxidecomputer.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220601215749.30223-1-cross@oxidecomputer.com>
 References: <CAA9fzEHQ49hsCMKG_=R_6R6wN8V8fDDibLJee1a1xLCcrkom-Q@mail.gmail.com>
@@ -72,38 +72,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Warn, don't fail, if the check for `getopt -T` fails in the `configure`
-script.
+Change x86/Makefile.common to invoke the linker directly instead
+of using the C compiler as a linker driver.  Plumb LDFLAGS through
+to the linker.
 
-Aside from this check, `configure` does not use `getopt`, so don't
-fail to run if `getopt -T` doesn't indicate support for  the extended
-Linux version.  Getopt is only used in `run_tests.sh`, which tests for
-extended getopt anyway, but emit a warning here.
+This supports building on illumos, allowing the user to use
+gold instead of the Solaris linker.  Tested on Linux and illumos.
 
 Signed-off-by: Dan Cross <cross@oxidecomputer.com>
 ---
- configure | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ x86/Makefile.common | 9 +++++----
+ x86/Makefile.i386   | 1 +
+ x86/Makefile.x86_64 | 2 ++
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/configure b/configure
-index 23085da..5b7daac 100755
---- a/configure
-+++ b/configure
-@@ -318,11 +318,11 @@ EOF
-   rm -f lib-test.{o,S}
- fi
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index b903988..a600c72 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -30,7 +30,7 @@ endif
  
--# require enhanced getopt
-+# warn if enhanced getopt is unavailable
- getopt -T > /dev/null
- if [ $? -ne 4 ]; then
--    echo "Enhanced getopt is not available, add it to your PATH?"
--    exit 1
-+    echo "Without enhanced getopt you won't be able to use run_tests.sh."
-+    echo "Add it to your PATH?"
- fi
+ OBJDIRS += lib/x86
  
- # Are we in a separate build tree? If so, link the Makefile
+-$(libcflat): LDFLAGS += -nostdlib
++$(libcflat): LDFLAGS += -nostdlib $(arch_LDFLAGS)
+ $(libcflat): CFLAGS += -ffreestanding -I $(SRCDIR)/lib -I lib
+ 
+ COMMON_CFLAGS += -m$(bits)
+@@ -61,8 +61,9 @@ else
+ # We want to keep intermediate file: %.elf and %.o
+ .PRECIOUS: %.elf %.o
+ 
++%.elf: LDFLAGS = -nostdlib $(arch_LDFLAGS)
+ %.elf: %.o $(FLATLIBS) $(SRCDIR)/x86/flat.lds $(cstart.o)
+-	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,$(SRCDIR)/x86/flat.lds \
++	$(LD) $(LDFLAGS) -T $(SRCDIR)/x86/flat.lds -o $@ \
+ 		$(filter %.o, $^) $(FLATLIBS)
+ 	@chmod a-x $@
+ 
+@@ -98,8 +99,8 @@ test_cases: $(tests-common) $(tests)
+ $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
+ 
+ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
+-	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
+-	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
++	$(LD) -m elf_i386 -nostdlib -o $@ \
++	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+ 
+ $(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
+ 
+diff --git a/x86/Makefile.i386 b/x86/Makefile.i386
+index 7d19d55..0a845e6 100644
+--- a/x86/Makefile.i386
++++ b/x86/Makefile.i386
+@@ -4,6 +4,7 @@ ldarch = elf32-i386
+ exe = flat
+ bin = elf
+ COMMON_CFLAGS += -mno-sse -mno-sse2
++arch_LDFLAGS = -m elf_i386
+ 
+ cflatobjs += lib/x86/setjmp32.o lib/ldiv32.o
+ 
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index f18c1e2..e19284a 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -6,9 +6,11 @@ exe = efi
+ bin = so
+ FORMAT = efi-app-x86_64
+ cstart.o = $(TEST_DIR)/efi/efistart64.o
++arch_LDFLAGS = ''
+ else
+ exe = flat
+ bin = elf
++arch_LDFLAGS = -m elf_x86_64
+ endif
+ 
+ fcf_protection_full := $(call cc-option, -fcf-protection=full,)
 -- 
 2.36.1
 
