@@ -2,84 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4ED0539FE2
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:55:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D36A539FE3
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:55:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350939AbiFAIyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 04:54:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60332 "EHLO
+        id S1350917AbiFAIyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 04:54:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350940AbiFAIy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 04:54:28 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792F365406;
-        Wed,  1 Jun 2022 01:54:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1654073667; x=1685609667;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=eajaxf7iBpp2vMrvyiSKrSeUPTOtK30onKdBAX1DOds=;
-  b=ofcZMYVrje0HBFvDkl37QIB3JzaAezrC/VPCFTvPzHlCA418i9UjGaY3
-   j6QmpckXXVQREshXnJ2CT0OW6cAVggmqjzXjtdQr8afMuqxBdEKSYVe/K
-   j2P0JRhg2CgLTH4Rib9hWojh1jIdF7pgsT+X5dDjdpGlEsBvk02oSPk2S
-   Q=;
-X-IronPort-AV: E=Sophos;i="5.91,266,1647302400"; 
-   d="scan'208";a="93761336"
-Subject: RE: ...\n
-Thread-Topic: ...\n
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-7d0c7241.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 01 Jun 2022 08:54:11 +0000
-Received: from EX13D33EUC004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2c-7d0c7241.us-west-2.amazon.com (Postfix) with ESMTPS id CE82042870;
-        Wed,  1 Jun 2022 08:54:10 +0000 (UTC)
-Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
- EX13D33EUC004.ant.amazon.com (10.43.164.63) with Microsoft SMTP Server (TLS)
- id 15.0.1497.36; Wed, 1 Jun 2022 08:54:09 +0000
-Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
- EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1497.036;
- Wed, 1 Jun 2022 08:54:09 +0000
-From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-CC:     "Allister, Jack" <jalliste@amazon.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "diapop@amazon.co.uk" <diapop@amazon.co.uk>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "metikaya@amazon.co.uk" <metikaya@amazon.co.uk>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "x86@kernel.org" <x86@kernel.org>
-Thread-Index: AQHYdPhkNX+wk5QumkS6hY2ybmOpva05D+WAgAABcbCAAQ0lgIAAE6AAgAALn5A=
-Date:   Wed, 1 Jun 2022 08:54:08 +0000
-Message-ID: <48edf12807254a2b86e339b26873bf00@EX13D32EUC003.ant.amazon.com>
-References: <YpYaYK7a28DFT5Ne@hirez.programming.kicks-ass.net>
- <20220531140236.1435-1-jalliste@amazon.com>
- <YpYpxzt4rmG+LFy9@hirez.programming.kicks-ass.net>
- <059ab3327ac440479ecfdf49fa054347@EX13D32EUC003.ant.amazon.com>
- <YpcMw2TgNWzrcoRm@worktop.programming.kicks-ass.net>
- <87r148olol.fsf@redhat.com>
-In-Reply-To: <87r148olol.fsf@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.164.66]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S237064AbiFAIyS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 04:54:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A499365406
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:54:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654073656;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LOlu3mepJdx7Wf6vk2GNDsoaWQTiVkUMcr9IDdeUKvQ=;
+        b=St02Dl7TuC1Zqihg8F4tjZSQ1xjY8fH316r6AXsVY0OKbzp7+tfNvpDersJbIaKkyAgrqp
+        lBQBw/3pkKtA5fD8Se6QcbEX7n/MxfLHwV29w7i3XgZg2kj/ndbmirxTMRYRgIh5e/cNPt
+        h0Qb7V6cPVjOa2IsrV4NBX8lBmARwWs=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-513-ohDdA4zPNcKxf-lon0Fcow-1; Wed, 01 Jun 2022 04:54:15 -0400
+X-MC-Unique: ohDdA4zPNcKxf-lon0Fcow-1
+Received: by mail-ej1-f70.google.com with SMTP id gs6-20020a170906f18600b006fe7a9ffacbso604884ejb.3
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:54:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=LOlu3mepJdx7Wf6vk2GNDsoaWQTiVkUMcr9IDdeUKvQ=;
+        b=5X5xFh0Sp3SsX2ywLfpcw6bHEx6EqqRBr2S+p5KlsEoU5QHlRO2KnE0pelGvzqU+gl
+         qgPHoNFcK/a2aUyPMTMgC/qIRGuJif+UXKU+qodZPDDrPdlqv6GzHv5/TWoXK4zoFIv+
+         qz76sArt4C1s1fFh8H0vBxrhqoreIpoindMDNKJ8MtGdLfdyAgGzrmNO+4cMtEHY5qmi
+         EBr2WxIYIc4zhbB6BqZNibSf6X11bQKeXbPh4zc5HC4VG+BkBlHVCHM0rtD36bPgvoBP
+         bAt8HWMV3BARGLpMkhtOPnqAfhOeS4H1JYRl4iLxeHxvOp6TA5F2W9NF48WdBTlpptuG
+         8vGA==
+X-Gm-Message-State: AOAM5305RcS+08qLL2pnhyA3tA+/vK+ATUlmjv9hR+E25nX4j7bRcfEr
+        GX2A+hEr0fRa4lm9il7u1pNNyrnnEHx5Alfn+kIgXy5wAdhDUN4YpODVEzEmEoZ1zvBQqpFU5mW
+        xGfSH2JDvNgJ0
+X-Received: by 2002:a17:907:162a:b0:6fe:c691:47f5 with SMTP id hb42-20020a170907162a00b006fec69147f5mr5234902ejc.289.1654073654326;
+        Wed, 01 Jun 2022 01:54:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzUd8lcyszMcB8ocabW8xLa9jXoH+xjNMpG4v9dw6i4KceyMi+eG7g0nhlauX9AQpKgumjrwg==
+X-Received: by 2002:a17:907:162a:b0:6fe:c691:47f5 with SMTP id hb42-20020a170907162a00b006fec69147f5mr5234888ejc.289.1654073654108;
+        Wed, 01 Jun 2022 01:54:14 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id g23-20020a170906595700b006f3ef214d9fsm456978ejr.5.2022.06.01.01.54.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jun 2022 01:54:13 -0700 (PDT)
+Message-ID: <4b59b1c0-112b-5e07-e613-607220c3b597@redhat.com>
+Date:   Wed, 1 Jun 2022 10:54:11 +0200
 MIME-Version: 1.0
-X-Spam-Status: No, score=-12.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 1/2] KVM: vmx, pmu: accept 0 for absent MSRs when
+ host-initiated
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        likexu@tencent.com, Yang Weijiang <weijiang.yang@intel.com>
+References: <20220531175450.295552-1-pbonzini@redhat.com>
+ <20220531175450.295552-2-pbonzini@redhat.com> <YpZgU+vfjkRuHZZR@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YpZgU+vfjkRuHZZR@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,35 +82,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> -----Original Message-----
-[snip]
-> >>
-> >> I'll bite... What's ludicrous about wanting to run a guest at a lower
-> >> CPU freq to minimize observable change in whatever workload it is
-> >> running?
-> >
-> > *why* would you want to do that? Everybody wants their stuff done
-> > faster.
-> >
->=20
-> FWIW, I can see a valid use-case: imagine you're running some software
-> which calibrates itself in the beginning to run at some desired real
-> time speed but then the VM running it has to be migrated to a host with
-> faster (newer) CPUs. I don't have a real world examples out of top of my
-> head but I remember some old DOS era games were impossible to play on
-> newer CPUs because everything was happenning too fast. Maybe that's the
-> case :-)
->=20
+On 5/31/22 20:37, Sean Christopherson wrote:
+>> +
+>>   		/*
+>>   		 * Writing depth MSR from guest could either setting the
+>>   		 * MSR or resetting the LBR records with the side-effect.
+>> @@ -535,6 +542,8 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>   	case MSR_ARCH_LBR_CTL:
+>>   		if (!arch_lbr_ctl_is_valid(vcpu, data))
+>>   			break;
+>> +		if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+>> +			return 0;
+> 
+> Similar bug here.
+> 
+> Can we just punt this out of kvm/queue until its been properly reviewed?
 
-That is exactly the case. This is not 'some hare-brained money scheme'; the=
-re is genuine concern that moving a VM from old h/w to new h/w may cause it=
- to run 'too fast', breaking any such calibration done by the guest OS/appl=
-ication. I also don't have any real-world examples, but bugs may well be re=
-ported and having a lever to address them is IMO a good idea.
-However, I also agree with Paolo that KVM doesn't really need to be doing t=
-his when the VMM could do the job using cpufreq, so we'll pursue that optio=
-n instead. (FWIW the reason for involving KVM was to do the freq adjustment=
- right before entering the guest and then remove the cap right after VMEXIT=
-).
+Yes, I agree.  I have started making some changes and pushed the result 
+to kvm/arch-lbr-for-weijiang.
 
-  Paul
+Most of the MSR handling is rewritten (and untested).
+
+The nested VMX handling was also completely broken so I just removed it. 
+  Instead, KVM should be adjusted so that it does not whine.
+
+Paolo
+
