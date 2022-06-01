@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A99C53B011
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 00:51:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E36553AFE7
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 00:51:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232065AbiFAV6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 17:58:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57344 "EHLO
+        id S232062AbiFAV6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 17:58:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232049AbiFAV6j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 17:58:39 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B516455
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 14:58:35 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id q74so915910qke.12
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 14:58:35 -0700 (PDT)
+        with ESMTP id S232069AbiFAV6l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 17:58:41 -0400
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EE965E8
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 14:58:38 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id r84so2396534qke.10
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 14:58:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=oxidecomputer.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=GqneKf1ZagN95/3RdG4s49E5y9AiNaX5bKX0//hJ/E4=;
-        b=Z6jSIMVU7qhb+I8TUddY5L2Nw30ek1TLL8Vt6yveJOwxxXAJfws23U4PyKoQ65BTDD
-         x6qDuZZAKDE3lbxXNI8pFnKQMVyHT8kNBZK8dtD3tw1LMTyaGUXtlDx6AV+oU1eRj4uN
-         Yg3YCdXkufi/cvlRkQRTg/Q1PeS6ptS0tFKG85YAudjNDk0aNhzpnXhWcqfvjOddMUZ9
-         kflrGow7ES0rbcF7r5ijQrjN/3X524PYpANG7BX+Wk/XAJBaB6QS2DsiH2N4Cu94KE9d
-         nFQi9JoRzzn3OkXvy1K4b0n8QzfDPbGkWjHeJjaAu7At01Vn+mTBO7sX//r2ynW7y2fU
-         YQlA==
+        bh=mbxxMsKBxXTW+LHqS3uItjaVkQr6WN103MI4C6b0TXg=;
+        b=FRW8+dpsGB4l97C7Mgdbxvgl8AAPoldqUMyBPP//RAApq4GHcoDyBvSUVRT0YkUInu
+         2gVFxYzAhKUVGwz+Gz2SlSBJN1Pd0ePMeRGKbNvkhvvV/TDDpPbRnv+6ZK+XERaUoa2m
+         tKHI6cKNGsYgrmpXsRuWHdQ2Gi655ApRuLEAmEV38qU8Wn7BYtaJwAOVDxqOQNDXA+Jb
+         XEcz9zp+EhAlOlznvvRjPpHmwTdsMsQowT/keGqB48ZGXNpWhXItjsC1TSCPknnJaHtI
+         yeB1FIsSZs/0dXzogxNmVqXaMUWmjAUq3OjemEtdy1L7ayidTByohRkazstEYSvpwoem
+         cTng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=GqneKf1ZagN95/3RdG4s49E5y9AiNaX5bKX0//hJ/E4=;
-        b=EgMOFUgH2YWFNxKMZZ+VlNYBNqgrSUx/m/uyWlMw5/CozMgkXl7vZlcXt1O8lJTAMn
-         kHXt6pKNskVxGmk5kNrxe+8IaBDeY2OB4kgF/4/I0GNZlsmrGGrHTgDqoOrJGEfvVqzt
-         aiq+WCUCBvkQWKU/EKiMg+OlsRkU+P2upPLk3HWxbG+32ueHH/F+qAbFQ9S0wWmmMTXW
-         I+/qj52tyDeGDdUfP95ZnfLYAMPM7TOgSM18ep8NBW7IPa4/rdef+f8tMmhviMYvEtgT
-         RrDFG3xMBhsMI/BPUrmDUkjr0epWPFAuE75Si8fDVF6LQC6K4kIGlMdbZBdt4UD+G8pL
-         fqyg==
-X-Gm-Message-State: AOAM530mOxBnQO8XLNbxaGLlPqSTeGmcG3HsJ4R0ORM/PhEcjk0N9W1U
-        1AbUn0vca4kwkYdkdJ1cpRhKWnVmNZMG4ev3
-X-Google-Smtp-Source: ABdhPJwmzZBKGHShtcu6k6XLd7m/do4xKjTYzmMmJJYLIL7PR4eEgWKDX7HaIORV3GAmpIlswChdaw==
-X-Received: by 2002:a05:620a:1a14:b0:69e:9090:a7ba with SMTP id bk20-20020a05620a1a1400b0069e9090a7bamr1244841qkb.582.1654120714205;
-        Wed, 01 Jun 2022 14:58:34 -0700 (PDT)
+        bh=mbxxMsKBxXTW+LHqS3uItjaVkQr6WN103MI4C6b0TXg=;
+        b=j5V1K0cjlCujqWIyVVB1D8RgLZp6r3b+aekm8AYqE3I6DGMKdKsNuZxaputXC5ydRx
+         o/rY9pxWYcGBB6tpe2p1gi6x/VUT5yqy6XFbEAlgAKN8fTBtpVFI72qyqNgvu+t8gHvj
+         kZ59Ci+EFCMWUmfJp4SdguY3ZSwBNSkYFPfYivhXpESggp3hq2culkfi+3EzFZaRKwip
+         4oXzHJcTdNcMR+A1shq6MgiataNoNBhkhCa3wX6cAMF6VnZLSCEYLL9WsT3jdiEbE9Vp
+         gXS2g/BAjtYN/lMMKNYx8ZrsdVuYQrWskpqCwQT1m4hNj3FkEk5IqI1bFeWVD9HDy514
+         xfHA==
+X-Gm-Message-State: AOAM533SXWsG/fKgQJC8VgdpubDBP7bwr5RrMZaxYAQuZ96JW8zaZpTF
+        7ecOl8+HWiuML+xdgaTY90HEFmmGSWCmgA==
+X-Google-Smtp-Source: ABdhPJw51K3BbmrVqN6x48brdBSrGvhiq8mIHVQUlzOC5NdjoHNZluFiFY6NcBSsP2VMiEygPQWhAg==
+X-Received: by 2002:a05:620a:4415:b0:6a5:895d:f254 with SMTP id v21-20020a05620a441500b006a5895df254mr1167161qkp.517.1654120717683;
+        Wed, 01 Jun 2022 14:58:37 -0700 (PDT)
 Received: from igor.oxide.gajendra.net ([2603:3005:b04:8100:f692:bfff:fe8b:cf8e])
-        by smtp.gmail.com with ESMTPSA id f4-20020a05620a20c400b006a659ce9821sm1823611qka.63.2022.06.01.14.58.33
+        by smtp.gmail.com with ESMTPSA id f4-20020a05620a20c400b006a659ce9821sm1823611qka.63.2022.06.01.14.58.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 14:58:33 -0700 (PDT)
+        Wed, 01 Jun 2022 14:58:37 -0700 (PDT)
 From:   Dan Cross <cross@oxidecomputer.com>
 To:     kvm@vger.kernel.org
 Cc:     Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Dan Cross <cross@oxidecomputer.com>
-Subject: [PATCH v4 0/2] kvm-unit-tests: Build changes to support illumos.
-Date:   Wed,  1 Jun 2022 21:57:47 +0000
-Message-Id: <20220601215749.30223-1-cross@oxidecomputer.com>
+Subject: [PATCH v4 1/2] kvm-unit-tests: configure changes for illumos.
+Date:   Wed,  1 Jun 2022 21:57:48 +0000
+Message-Id: <20220601215749.30223-2-cross@oxidecomputer.com>
 X-Mailer: git-send-email 2.36.1
-In-Reply-To: <CAA9fzEHQ49hsCMKG_=R_6R6wN8V8fDDibLJee1a1xLCcrkom-Q@mail.gmail.com>
+In-Reply-To: <20220601215749.30223-1-cross@oxidecomputer.com>
 References: <CAA9fzEHQ49hsCMKG_=R_6R6wN8V8fDDibLJee1a1xLCcrkom-Q@mail.gmail.com>
+ <20220601215749.30223-1-cross@oxidecomputer.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -71,26 +72,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have begun using kvm-unit-tests to test Bhyve under
-illumos.  We started by cross-compiling the tests on Linux
-and transfering the binary artifacts to illumos machines,
-but it proved more convenient to build them directly on
-illumos.
+Warn, don't fail, if the check for `getopt -T` fails in the `configure`
+script.
 
-This patch series modifies the build infrastructure to allow
-building on illumos; the changes were minimal.  I have also
-tested these changes on Linux to ensure no regressions.
+Aside from this check, `configure` does not use `getopt`, so don't
+fail to run if `getopt -T` doesn't indicate support for  the extended
+Linux version.  Getopt is only used in `run_tests.sh`, which tests for
+extended getopt anyway, but emit a warning here.
 
-Dan Cross (2):
-  kvm-unit-tests: configure changes for illumos.
-  kvm-unit-tests: invoke $LD explicitly
+Signed-off-by: Dan Cross <cross@oxidecomputer.com>
+---
+ configure | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
- configure           | 6 +++---
- x86/Makefile.common | 9 +++++----
- x86/Makefile.i386   | 1 +
- x86/Makefile.x86_64 | 2 ++
- 4 files changed, 11 insertions(+), 7 deletions(-)
-
+diff --git a/configure b/configure
+index 23085da..5b7daac 100755
+--- a/configure
++++ b/configure
+@@ -318,11 +318,11 @@ EOF
+   rm -f lib-test.{o,S}
+ fi
+ 
+-# require enhanced getopt
++# warn if enhanced getopt is unavailable
+ getopt -T > /dev/null
+ if [ $? -ne 4 ]; then
+-    echo "Enhanced getopt is not available, add it to your PATH?"
+-    exit 1
++    echo "Without enhanced getopt you won't be able to use run_tests.sh."
++    echo "Add it to your PATH?"
+ fi
+ 
+ # Are we in a separate build tree? If so, link the Makefile
 -- 
 2.36.1
 
