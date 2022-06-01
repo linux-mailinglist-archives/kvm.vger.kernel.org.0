@@ -2,71 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C23AF539FEF
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:58:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D37BF539FF8
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:59:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243255AbiFAI53 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 04:57:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36814 "EHLO
+        id S245063AbiFAI73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 04:59:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348187AbiFAI52 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 04:57:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F03E50004
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:57:27 -0700 (PDT)
+        with ESMTP id S1346074AbiFAI71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 04:59:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7076B6BFC1
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:59:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654073846;
+        s=mimecast20190719; t=1654073965;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oTXq3UeABBYSaGV3RAS/AH+/JRNDT9mOMSr/5zH7Hs0=;
-        b=h8eMeN6QzDHKazOBDXu8HsSB/dseUh4ETKI5f9K9tPsig5mebMzAW367RoDLP4cN/Z4M5l
-        YHFlhRb8VTBXcw7YuNitlE4bFibEQQSabWt7QWCb4vEjUItyRegP/85J0jgv42+yjjMjEH
-        N5wVGD/kRsJTiibGgi7C5oA5G+rnn/c=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=uzxCOihBBp2MvYCnWOOgAbyz9Dw1/OZ2iZqah66p3+o=;
+        b=EXOjlnKQirydQ4DGET0xbN2cNa7Z4L70epX6LmNKhu9loYdD15pyTETP25xHGuxCuJVG7A
+        4XIiqBTwMdBcx6IAxe/0BSkmgiMyA/pS5eAPF2CpRmbuhi14SWtJYPqCZ4ZByJjpE7lVF2
+        nQE8rwCdnsiYKtQWG2S6MN5nYYfmGvw=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-JjZcR8VNPGGdIkhEJiyfVQ-1; Wed, 01 Jun 2022 04:57:25 -0400
-X-MC-Unique: JjZcR8VNPGGdIkhEJiyfVQ-1
-Received: by mail-ej1-f69.google.com with SMTP id gf24-20020a170906e21800b006fe8e7f8783so611694ejb.2
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:57:25 -0700 (PDT)
+ us-mta-520-8putw-8SNg-A-YCsYOJUMg-1; Wed, 01 Jun 2022 04:59:24 -0400
+X-MC-Unique: 8putw-8SNg-A-YCsYOJUMg-1
+Received: by mail-ej1-f71.google.com with SMTP id v13-20020a170906b00d00b006f51e289f7cso593032ejy.19
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:59:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=oTXq3UeABBYSaGV3RAS/AH+/JRNDT9mOMSr/5zH7Hs0=;
-        b=MADQnnAPtY+nCMuddyGGwdRu2ZQAFEr9Y/5X7hDIQtNBfHTjtrel12cN5/1+O2t6gI
-         A3ZsDGDvGaUzCM+Oz0dNQPZ3dEkENBzvgV/rAkTdwAii0A7n7fWgra/XI/JwX8HFGBZB
-         w4g4HvPwVpyZie4qagv2EJuNYJzqI6og5jIsmR/qT0JdOOx1QDuWTHEngmRTyFhBPUor
-         GGzhwsHcEBmd2MItUp7DPEVxRSJDxzR+j2rVxt+xLmH6G4hgxEek0voiTRdHaVPz/FxX
-         JkC2i4DT6uJNgsBE/XA+fugNAot19d5Gg2rstfzzc9el18iKTUFrC2B2oj5+8A5S49YY
-         /moQ==
-X-Gm-Message-State: AOAM531KEVMVQ/r98lxOSoVI8u+pX8tdsNZhx3GORLAbfZwUTWdL7m+J
-        z7gpp/gZjct1vNmhKIT/KTT5eSCtWnnAXA9mgxoqO5AyeqE66NCq/IGHnZT2sihhxifpX17IDYe
-        NeRsQMmEqead2
-X-Received: by 2002:a17:907:7f88:b0:6fe:c708:198f with SMTP id qk8-20020a1709077f8800b006fec708198fmr43587487ejc.342.1654073843807;
-        Wed, 01 Jun 2022 01:57:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzspdGAJ1tvlmp1pj2tAMQKYUyYFKr+aKmQzllLi1ycv3BYCEiI5u5Vw68OUVvqmMxRgWCtNA==
-X-Received: by 2002:a17:907:7f88:b0:6fe:c708:198f with SMTP id qk8-20020a1709077f8800b006fec708198fmr43587459ejc.342.1654073843578;
-        Wed, 01 Jun 2022 01:57:23 -0700 (PDT)
+        bh=uzxCOihBBp2MvYCnWOOgAbyz9Dw1/OZ2iZqah66p3+o=;
+        b=KoxIY6nUaeHJajl+CatbooeswFfPocudeXbZJT53ctK0GWL5d22/eXjUVqNK/gPYxL
+         u9HtQ+A7u78rEQ9/49Hjr34dELvl+wZnXGs0I/jsX6WI1ZwpxoStIJujeJQAkSWVTevS
+         r3roM5GepO16TCp7aYKxOZTOZGJxQp5Qfy+/G1SQIx/fW/CAxnAy1SS5LiRtxa2iK728
+         sx8XFvNMGta9vHYTAu3gutB/PUMONT7fxYsF8qTomQ/xJiszApIhDX4CTOEsOU7uey60
+         EIcByqRHJzHeYpJfTkANZTaqqV68ATEVpnK3CaZa/cR0Wru27sN9wLFIqtsimMkPWWc+
+         uU1g==
+X-Gm-Message-State: AOAM532wRod/rNDdDcK6ZIOJPleNVQ5Ujue5EsKRw922322zZQt8DvCO
+        0kCuV72Nh2KogDALZfD0lPvYGsg0v9xcR3a1tUFqQEn+q6MlyKfPnnByRfJX3vynzdYyOAEhNTg
+        azo2M0xRDe7jg
+X-Received: by 2002:a50:ea8b:0:b0:428:7d05:eb7e with SMTP id d11-20020a50ea8b000000b004287d05eb7emr66994813edo.185.1654073963162;
+        Wed, 01 Jun 2022 01:59:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzcZzdAmqTqAOV48EeckvF3+BiTMXPZ6japnr184Gq8Eqzb54YOTFyRdX28qRg+QRUvnZvVOA==
+X-Received: by 2002:a50:ea8b:0:b0:428:7d05:eb7e with SMTP id d11-20020a50ea8b000000b004287d05eb7emr66994790edo.185.1654073962970;
+        Wed, 01 Jun 2022 01:59:22 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id t6-20020a170906948600b006fed062c68esm448279ejx.182.2022.06.01.01.57.22
+        by smtp.googlemail.com with ESMTPSA id cx12-20020a05640222ac00b0042bd6630a14sm644395edb.87.2022.06.01.01.59.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jun 2022 01:57:22 -0700 (PDT)
-Message-ID: <2bdfde74-da27-667d-d1c4-3b17147cecce@redhat.com>
-Date:   Wed, 1 Jun 2022 10:57:21 +0200
+        Wed, 01 Jun 2022 01:59:22 -0700 (PDT)
+Message-ID: <b9238c07-68a7-31fa-c654-d8111a1e2d4b@redhat.com>
+Date:   Wed, 1 Jun 2022 10:59:17 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
 Subject: Re: ...\n
 Content-Language: en-US
-To:     "Durrant, Paul" <pdurrant@amazon.co.uk>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     "Allister, Jack" <jalliste@amazon.com>,
-        "bp@alien8.de" <bp@alien8.de>,
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Durrant, Paul" <pdurrant@amazon.co.uk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Allister, Jack" <jalliste@amazon.com>
+Cc:     "bp@alien8.de" <bp@alien8.de>,
         "diapop@amazon.co.uk" <diapop@amazon.co.uk>,
         "hpa@zytor.com" <hpa@zytor.com>,
         "jmattson@google.com" <jmattson@google.com>,
@@ -84,11 +84,9 @@ References: <YpYaYK7a28DFT5Ne@hirez.programming.kicks-ass.net>
  <20220531140236.1435-1-jalliste@amazon.com>
  <YpYpxzt4rmG+LFy9@hirez.programming.kicks-ass.net>
  <059ab3327ac440479ecfdf49fa054347@EX13D32EUC003.ant.amazon.com>
- <YpcMw2TgNWzrcoRm@worktop.programming.kicks-ass.net>
- <87r148olol.fsf@redhat.com>
- <48edf12807254a2b86e339b26873bf00@EX13D32EUC003.ant.amazon.com>
+ <307f19cc-322e-c900-2894-22bdee1e248a@redhat.com> <87tu94olyd.fsf@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <48edf12807254a2b86e339b26873bf00@EX13D32EUC003.ant.amazon.com>
+In-Reply-To: <87tu94olyd.fsf@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -101,22 +99,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/1/22 10:54, Durrant, Paul wrote:
-> That is exactly the case. This is not 'some hare-brained money
-> scheme'; there is genuine concern that moving a VM from old h/w to
-> new h/w may cause it to run 'too fast', breaking any such calibration
-> done by the guest OS/application. I also don't have any real-world
-> examples, but bugs may well be reported and having a lever to address
-> them is IMO a good idea. However, I also agree with Paolo that KVM
-> doesn't really need to be doing this when the VMM could do the job
-> using cpufreq, so we'll pursue that option instead. (FWIW the reason
-> for involving KVM was to do the freq adjustment right before entering
-> the guest and then remove the cap right after VMEXIT).
+On 6/1/22 09:57, Vitaly Kuznetsov wrote:
+>>> I'll bite... What's ludicrous about wanting to run a guest at a lower CPU freq to minimize observable change in whatever workload it is running?
+>> Well, the right API is cpufreq, there's no need to make it a KVM
+>> functionality.
+> KVM may probably use the cpufreq API to run each vCPU at the desired
+> frequency: I don't quite see how this can be done with a VMM today when
+> it's not a 1-vCPU-per-1-pCPU setup.
 
-But if so, you still would submit the full feature, wouldn't you?
+True, but then there's also a policy issue, in that KVM shouldn't be 
+allowed to *bump* the frequency if userspace would ordinarily not have 
+access to the cpufreq files in sysfs.
 
-Paul, thanks for chiming in, and sorry for leaving you out of the list 
-of people that can help Jack with his upstreaming efforts.  :)
+All in all, I think it's simpler to let privileged userspace (which 
+knows when it has a 1:1 mapping of vCPU to pCPU) handle it with cpufreq.
 
 Paolo
 
