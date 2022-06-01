@@ -2,68 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76C73539B2E
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 04:21:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CA65539B53
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 04:44:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349129AbiFACUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 May 2022 22:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37390 "EHLO
+        id S234485AbiFACme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 May 2022 22:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240621AbiFACUy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 May 2022 22:20:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0AB6AA46
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 19:20:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CBB4660B10
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 02:20:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 338F8C34114
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 02:20:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654050052;
-        bh=KgWqwKTpRttfVDkHucGWOFq4PvG3LJpk7EhV/mr5L2k=;
-        h=From:To:Subject:Date:From;
-        b=N6/UwWScgQBkSSUk5DpvVwVptfBay8Pjx/TxXNzE+q2eFGNIWm7m4mD6MyzkU/5te
-         L9csZRs9JHPNhy1l0Mpn+cgp2WWYF6+kMZchfUZZKkZaqclKRPvbJMygGtCFnXrr7S
-         C5BZHfkzH5Ms6mMz1F0R0HinQ9dhF1ZcQPd4JAlmDrhwjuzNGooVrNKQjRXZW/b+1g
-         VxT5gmqhwArEBUNKNqsuGVwNotGuBhWvsc8USY3+JEg8HZAbM8IQxjB4fUMlgAtaWC
-         H/zBBUKiT2hCcmAWHdsjv9lQBY3kSHINndX1Og0LNqWN7VmfGSsjrYgBQuM43b3J7G
-         p47VDBjj5qqFA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 1932CC05FD5; Wed,  1 Jun 2022 02:20:52 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216056] New: Kernel Fails to compile with GCC 12.1 different
- errors than 18.0
-Date:   Wed, 01 Jun 2022 02:20:51 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: nanook@eskimo.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-216056-28872@https.bugzilla.kernel.org/>
+        with ESMTP id S231981AbiFACmb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 May 2022 22:42:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B19B35A599
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 19:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654051347;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WB1eoNVPIkOVFlU558AybWrSuZCEkhfGeXbR5VK67Ks=;
+        b=AWlNX4LhLYqUwPgskBtBXhiBbSdGvfEq6u+ZTBGUkaniYqhUfuC+taymKMIjRdTe/UIJ3E
+        0p8HXx0+gIXExxpghcmxtJQ2newOGqpc7znyLnaV7es9JQGNiOnXk7m0IAyPIqlcXKYU9v
+        QNbe1P+RdR5gn3eKXJv7skb7kph88J0=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-192-BiCYyscjNMy0D6gHJTY25g-1; Tue, 31 May 2022 22:42:25 -0400
+X-MC-Unique: BiCYyscjNMy0D6gHJTY25g-1
+Received: by mail-lf1-f72.google.com with SMTP id u13-20020a05651206cd00b00477c7503103so203423lff.15
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 19:42:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WB1eoNVPIkOVFlU558AybWrSuZCEkhfGeXbR5VK67Ks=;
+        b=5c+lt2NDG4uUWz9KxwzWlIiqPRQ40Qp3S/0OZI+QxmWMIjCiZSEdSjmQG75DO1DoWi
+         r28671nchpeAI6LxBFVmB+LGbhLzgOCzjuraSvsCHYOjeQx+bm/IVigFIh3ZrbAy5k4R
+         HaRY2csZVs3o11TTTx0Xn0t7mmYO1LfGnuY4YeP1oNaF2BklDPYU8LZoMxmpSMqFrWd+
+         FjJlBObYmGLnRlG8EU3SEMZ8u5SAPabB8uMPf0z+iInHw/PNvrx48OKxL6deQlFWRZbd
+         1UHZtzUsXpH9N33Kvp5n42ik95RSIriL8GdD0tyLrllJ1HMAUt77BApPCMn5pa5usPOu
+         wY8w==
+X-Gm-Message-State: AOAM533EiQ/3xZ7lRHDPrTwDAhJUaKBnxAz4e1Z2xRk5Noe2E46+Me0N
+        UETp+fVdnXjGEus3XzFGsa6lTTbKfhYBGIEJfLBMYtqIs8SjqqNL27auWBes71ZxBVw6o/Gj1Jx
+        /A3tlbt2A1bD13gsjxAzXOim+Tt7v
+X-Received: by 2002:a05:6512:c0e:b0:478:5a91:20bb with SMTP id z14-20020a0565120c0e00b004785a9120bbmr39100841lfu.587.1654051344051;
+        Tue, 31 May 2022 19:42:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxmBp820NSJHDcSD2dOZzrKRPNlKlD6GwXH3X8zApWh8utE/CuOZMV9CsZAbAB4NHKmtcInCEEIporstHBP+gc=
+X-Received: by 2002:a05:6512:c0e:b0:478:5a91:20bb with SMTP id
+ z14-20020a0565120c0e00b004785a9120bbmr39100798lfu.587.1654051343791; Tue, 31
+ May 2022 19:42:23 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220526124338.36247-1-eperezma@redhat.com> <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <20220527065442-mutt-send-email-mst@kernel.org> <CACGkMEubfv_OJOsJ_ROgei41Qx4mPO0Xz8rMVnO8aPFiEqr8rA@mail.gmail.com>
+ <PH0PR12MB5481695930E7548BAAF1B0D9DCDC9@PH0PR12MB5481.namprd12.prod.outlook.com>
+In-Reply-To: <PH0PR12MB5481695930E7548BAAF1B0D9DCDC9@PH0PR12MB5481.namprd12.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 1 Jun 2022 10:42:12 +0800
+Message-ID: <CACGkMEsSKF_MyLgFdzVROptS3PCcp1y865znLWgnzq9L7CpFVQ@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
+To:     Parav Pandit <parav@nvidia.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "martinh@xilinx.com" <martinh@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "martinpo@xilinx.com" <martinpo@xilinx.com>,
+        "lvivier@redhat.com" <lvivier@redhat.com>,
+        "pabloc@xilinx.com" <pabloc@xilinx.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
+        "gautam.dawar@amd.com" <gautam.dawar@amd.com>,
+        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
+        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "dinang@xilinx.com" <dinang@xilinx.com>,
+        Longpeng <longpeng2@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,60 +102,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216056
+On Wed, Jun 1, 2022 at 4:19 AM Parav Pandit <parav@nvidia.com> wrote:
+>
+>
+> > From: Jason Wang <jasowang@redhat.com>
+> > Sent: Sunday, May 29, 2022 11:39 PM
+> >
+> > On Fri, May 27, 2022 at 6:56 PM Michael S. Tsirkin <mst@redhat.com> wro=
+te:
+> > >
+> > > On Thu, May 26, 2022 at 12:54:32PM +0000, Parav Pandit wrote:
+> > > >
+> > > >
+> > > > > From: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > > Sent: Thursday, May 26, 2022 8:44 AM
+> > > >
+> > > > > Implement stop operation for vdpa_sim devices, so vhost-vdpa will
+> > > > > offer
+> > > > >
+> > > > > that backend feature and userspace can effectively stop the devic=
+e.
+> > > > >
+> > > > >
+> > > > >
+> > > > > This is a must before get virtqueue indexes (base) for live
+> > > > > migration,
+> > > > >
+> > > > > since the device could modify them after userland gets them. Ther=
+e
+> > > > > are
+> > > > >
+> > > > > individual ways to perform that action for some devices
+> > > > >
+> > > > > (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but
+> > there
+> > > > > was no
+> > > > >
+> > > > > way to perform it for any vhost device (and, in particular, vhost=
+-vdpa).
+> > > > >
+> > > > >
+> > > > >
+> > > > > After the return of ioctl with stop !=3D 0, the device MUST finis=
+h
+> > > > > any
+> > > > >
+> > > > > pending operations like in flight requests. It must also preserve
+> > > > > all
+> > > > >
+> > > > > the necessary state (the virtqueue vring base plus the possible
+> > > > > device
+> > > > >
+> > > > > specific states) that is required for restoring in the future. Th=
+e
+> > > > >
+> > > > > device must not change its configuration after that point.
+> > > > >
+> > > > >
+> > > > >
+> > > > > After the return of ioctl with stop =3D=3D 0, the device can cont=
+inue
+> > > > >
+> > > > > processing buffers as long as typical conditions are met (vq is
+> > > > > enabled,
+> > > > >
+> > > > > DRIVER_OK status bit is enabled, etc).
+> > > >
+> > > > Just to be clear, we are adding vdpa level new ioctl() that doesn=
+=E2=80=99t map to
+> > any mechanism in the virtio spec.
+> > > >
+> > > > Why can't we use this ioctl() to indicate driver to start/stop the =
+device
+> > instead of driving it through the driver_ok?
+> > > > This is in the context of other discussion we had in the LM series.
+> > >
+> > > If there's something in the spec that does this then let's use that.
+> >
+> > Actually, we try to propose a independent feature here:
+> >
+> > https://lists.oasis-open.org/archives/virtio-dev/202111/msg00020.html
+> >
+> This will stop the device for all the operations.
 
-            Bug ID: 216056
-           Summary: Kernel Fails to compile with GCC 12.1 different errors
-                    than 18.0
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 18.1
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: nanook@eskimo.com
-        Regression: No
+Well, the ability to query the virtqueue state was proposed as another
+feature (Eugenio, please correct me). This should be sufficient for
+making virtio-net to be live migrated.
 
-Created attachment 301084
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D301084&action=3Dedit
-.config renamed as "config" because stupid browser wouldn't show dot files.
+https://lists.oasis-open.org/archives/virtio-comment/202103/msg00008.html
 
-dpkg-source --before-build .
- debian/rules binary
-In function =E2=80=98reg_read=E2=80=99,
-    inlined from =E2=80=98reg_rmw=E2=80=99 at arch/x86/kvm/emulate.c:266:2:
-arch/x86/kvm/emulate.c:254:27: error: array subscript 32 is above array bou=
-nds
-of =E2=80=98long unsigned int[17]=E2=80=99 [-Werror=3Darray-bounds]
-  254 |         return ctxt->_regs[nr];
-      |                ~~~~~~~~~~~^~~~
-In file included from arch/x86/kvm/emulate.c:23:
-arch/x86/kvm/kvm_emulate.h: In function =E2=80=98reg_rmw=E2=80=99:
-arch/x86/kvm/kvm_emulate.h:366:23: note: while referencing =E2=80=98_regs=
-=E2=80=99
-  366 |         unsigned long _regs[NR_VCPU_REGS];
-      |                       ^~~~~
-cc1: all warnings being treated as errors
-make[5]: *** [scripts/Makefile.build:288: arch/x86/kvm/emulate.o] Error 1
-make[4]: *** [scripts/Makefile.build:550: arch/x86/kvm] Error 2
-make[3]: *** [Makefile:1834: arch/x86] Error 2
-make[3]: *** Waiting for unfinished jobs....
-make[2]: *** [debian/rules:7: build-arch] Error 2
-dpkg-buildpackage: error: debian/rules binary subprocess returned exit stat=
-us 2
-make[1]: *** [scripts/Makefile.package:83: bindeb-pkg] Error 2
-make: *** [Makefile:1542: bindeb-pkg] Error 2
+> Once the device is stopped, its state cannot be queried further as device=
+ won't respond.
+> It has limited use case.
+> What we need is to stop non admin queue related portion of the device.
 
-This is the error channel from make bindeb-pkg
-Similar error happens with makerpm-pkg
+See above.
 
---=20
-You may reply to this email to add a comment.
+Thanks
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+>
+> > Does it make sense to you?
+> >
+> > Thanks
+> >
+> > > Unfortunately the LM series seems to be stuck on moving bits around
+> > > with the admin virtqueue ...
+> > >
+> > > --
+> > > MST
+> > >
+>
+
