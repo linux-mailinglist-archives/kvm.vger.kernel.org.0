@@ -2,65 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0C7153AAB4
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 18:07:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E590A53AAB5
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 18:08:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355985AbiFAQGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 12:06:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35758 "EHLO
+        id S1354560AbiFAQI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 12:08:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355217AbiFAQGu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 12:06:50 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D25DDB83
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 09:06:48 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 137so2313713pgb.5
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 09:06:48 -0700 (PDT)
+        with ESMTP id S1349714AbiFAQI0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 12:08:26 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A5353701
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 09:08:24 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id v15so2294650pgk.11
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 09:08:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OdU8nswDqDsvPFeghxy5VOQMyKFYGDaAch2jfB9635E=;
-        b=sqkBQ+oelmeycGTEbBFn+nTTkjaGRqBXEUQSTvOpgbteOU/ZsWp7opfi0R5ILLB/jR
-         Nq5d3RQ4Jq1U1qiV4YM21+5/uMmLydBeus0f5ruqm9nl6UW74s2+4K5aBBkIBO/HWx/Y
-         q2BNayFfm5vz6v4Lo2yafvtHwTgfx4QR0DdxmKJ3QXLhMJPYUDyfWsxfO1f2Uf3um8ba
-         /O6zT936csRbleUVGGpnW1AYJ35ZSJknk/RsxKus9ftd4t3X+43mKlFLvMFpSe0CJ8e9
-         ZfLZnzVDEYVCyC6YAISmJ37SNDP6BJBIP9L0X3cPTMejLr3LwU+s5CQtCfc8JuCdFwXr
-         b7og==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3m41qQszlJy+6huC2ZWNrXqyv86XkYWKUUXx90k39RU=;
+        b=aVt2F3Z5W4wUKsppS8k/UKeq8jgaAtVZLMoT0jbucWhB2X/VUSz+ByWAs6NDn+kzgm
+         R/dlvt378yWxLAoRS0G1sYKS+eXDXkl30PR3oTulgHz0i4d7l+XLFAF4GcZ4B6PWX+2x
+         IiNfUCXA+9c+5wwlqQK69qbsuf3Ns7lX8lS1CYIgDO1p2rtZvq9ZmI7cAbQTIbR5FUVS
+         zc2GfH2IMCdCBgNaY/y2bgVVzwdM7TkQYi96eFCVqvF4pGnomFiRsf5MtCkFEKG4Ta36
+         Dx7zg3M3W6cN1YSytcfNjSY4u9PTh/iVal7t91smHBPHc1gkevdodw47asiqkECWzBlj
+         KyNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OdU8nswDqDsvPFeghxy5VOQMyKFYGDaAch2jfB9635E=;
-        b=A44ADD0glAKsfR8Bl3gycsLwcelwlcMuIuTMMmUDhoG0vEGoKRrxK5zK5k5EAx+ZqI
-         A9qJ+d1kA3at4RrWw15XSJx7ANXae7Fzq7y/i7OvY3nu6Uu5G7FzVMr6e4N5s6IEY1t6
-         Rdu8d5V8O8R2p2BIMaV3aeXdNCgEroQ2+IyujUMsE633x4YIvwFY1PgqQz0xcufGHtjQ
-         XjdgIfieX5M4zfqNjsiU2osKsMT3LWCkbLJSJDUz+ys88NwjNsBM/Jam1gGX6RL+TZvx
-         qmCrNIoaAOgYCqz+ucbGoj0wO6VM+CrsqrOJgXRVYlYG45Ew+aahDDaLnM3W+SsEVzVj
-         VoNw==
-X-Gm-Message-State: AOAM533xbDxxZhb2dxbcVTyJtB5K63bwOs5PRdJoMoa9XZUgvlZSDWP6
-        N2/yg0b5yX8+1sVQae8us6Rm0g==
-X-Google-Smtp-Source: ABdhPJxm9QXDQf89uXG4X2gE7qX9VgeOpxAulz1ZoiDWF1W7ncnlBKoSdAQeSXV0+j+jimhhEeXzjA==
-X-Received: by 2002:a63:6aca:0:b0:3ab:a56:126a with SMTP id f193-20020a636aca000000b003ab0a56126amr120286pgc.576.1654099608158;
-        Wed, 01 Jun 2022 09:06:48 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q12-20020a170902e30c00b00163f1831ddfsm1713143plc.40.2022.06.01.09.06.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 09:06:47 -0700 (PDT)
-Date:   Wed, 1 Jun 2022 16:06:43 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Make hyperv_clock selftest more stable
-Message-ID: <YpeOkx0gkINeKFuz@google.com>
-References: <20220601144322.1968742-1-vkuznets@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3m41qQszlJy+6huC2ZWNrXqyv86XkYWKUUXx90k39RU=;
+        b=f6aMbP3vHnz47yDQNaa0KAu/mVPpGwLjwPWxWHhYcjn3Pna67oXay65sfZLMbiHcsG
+         x9Kc4H5o+ui2LUyysAfBGjfGKwtbBXrCm89XNCKvVSAI+i/Lq55apnhb6Ob9e85XqEbq
+         cPssn8XUZpUKtMlQpjI5x67Rgym+FEh/DbxocEBqIqPPSdypd7kbqjR0oedluy6dp9nd
+         RR2KMEUPIkzH1xG1G6N6i4tcK/AUYaUD+uIYRqHtgVGww83u4GjS66Z1dbm5b50f1Y+4
+         4DRf9PxFc9gQwEPoCBCgqhRfgmfDi45S/EW2A87xzUX9aJRru2ub/hsu4bGNbcnG1AD5
+         /OdA==
+X-Gm-Message-State: AOAM531oty7YJX9yYZCh4KoYNRgQY+tOf7OP+w+KuqA0rdPe6Eli5SpO
+        ezuiEHEkmUSYHpDoMb3wjxDC0crImYLhhct8dmqJ/dCmoQ==
+X-Google-Smtp-Source: ABdhPJzbU8gBaZ/bpxCejzqg/d7eF7PvDLE4U8BX3j1teWxG/HGOt23xqH8aQLZ+iQTYdyOXtjzfihcSUANPSbfRoXk=
+X-Received: by 2002:a05:6a00:1683:b0:4f7:e497:6a55 with SMTP id
+ k3-20020a056a00168300b004f7e4976a55mr278008pfc.21.1654099703372; Wed, 01 Jun
+ 2022 09:08:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220601144322.1968742-1-vkuznets@redhat.com>
+References: <CAGG=3QXUfFksVLF=gzU3EYkyf7RQKvr5_FU6Ea5enf39vinY3A@mail.gmail.com>
+ <CALMp9eQNmxscE1iMCV=ibF9zQ5E+CYGbfjV6vYtL-ddOECrDXw@mail.gmail.com>
+In-Reply-To: <CALMp9eQNmxscE1iMCV=ibF9zQ5E+CYGbfjV6vYtL-ddOECrDXw@mail.gmail.com>
+From:   Bill Wendling <morbo@google.com>
+Date:   Wed, 1 Jun 2022 09:08:11 -0700
+Message-ID: <CAGG=3QUs2KvDiwRvQZf7zUFWsFybn7mJFd7Ky2SHfiswN1oY_w@mail.gmail.com>
+Subject: Re: [kvm-unit-tests RFC] Inlining in PMU Test
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Greg Thelen <gthelen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,16 +69,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 01, 2022, Vitaly Kuznetsov wrote:
-> hyperv_clock doesn't always give a stable test result, especially with
-> AMD CPUs. The test compares Hyper-V MSR clocksource (acquired either
-> with rdmsr() from within the guest or KVM_GET_MSRS from the host)
-> against rdtsc(). To increase the accuracy, increase the measured delay
-> (done with nop loop) by two orders of magnitude and take the mean rdtsc()
-> value before and after rdmsr()/KVM_GET_MSRS.
+On Tue, May 31, 2022 at 4:00 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Thu, May 26, 2022 at 6:32 PM Bill Wendling <morbo@google.com> wrote:
+> >
+> > I'm into an issue when I compile kvm-unit-tests with a new-ish Clang
+> > version. It results in a failure similar to this:
+> >
+> > Serial contents after VMM exited:
+> > SeaBIOS (version 1.8.2-20160510_123855-google)
+> > Total RAM Size = 0x0000000100000000 = 4096 MiB
+> > CPU Mhz=2000
+> > CPUs found: 1     Max CPUs supported: 1
+> > Booting from ROM...
+> > enabling apic
+> > paging enabled
+> > cr0 = 80010011
+> > cr3 = bfefc000
+> > cr4 = 20
+> > PMU version:         4
+> > GP counters:         3
+> > GP counter width:    48
+> > Mask length:         7
+> > Fixed counters:      3
+> > Fixed counter width: 48
+> >  ---8<---
+> > PASS: all counters
+> > FAIL: overflow: cntr-0
+> > PASS: overflow: status-0
+> > PASS: overflow: status clear-0
+> > PASS: overflow: irq-0
+> > FAIL: overflow: cntr-1
+> > PASS: overflow: status-1
+> > PASS: overflow: status clear-1
+> > PASS: overflow: irq-1
+> > FAIL: overflow: cntr-2
+> > PASS: overflow: status-2
+> > PASS: overflow: status clear-2
+> > PASS: overflow: irq-2
+> > FAIL: overflow: cntr-3
+> > PASS: overflow: status-3
+> > PASS: overflow: status clear-3
+> > PASS: overflow: irq-3
+> >  ---8<---
+> >
+> > It turns out that newer Clangs are much more aggressive at inlining
+> > than GCC. I could replicate this failure with GCC with the patch
+> > below[1] (the patch probably isn't minimal). If I add the "noinline"
+> > attribute "measure()" in the patch below, the test passes.
+> >
+> > Is there a subtle assumption being made by the test that breaks with
+> > aggressive inlining? If so, is adding the "noinline" attribute to
+> > "measure()" the correct fix, or should the test be made more robust?
+>
+> It's not all that subtle. :-)
+>
+> The test assumes that every invocation of measure() will retire the
+> same number of instructions over the part of measure() where a PMC is
+> programmed to count instructions retired.
+>
+> To set up PMC overflow, check_counter_overflow() first records the
+> number of instructions retired in an invocation of measure(). That
+> value is stored in 'count.' Then, it initializes a PMC to (1 - count),
+> and it invokes measure() again. It expects that 'count' instructions
+> will have been retired, and the PMC will now have the value '1.'
+>
+> If the first measure() and the second measure() are different code
+> sequences, this doesn't work.
+>
+> Adding 'noinline' to measure() is probably the right thing to do.
 
-Rather than "fixing" the test by reducing the impact of noise, can we first try
-to reduce the noise itself?  E.g. pin the test to a single CPU, redo the measurement
-if the test is interrupted (/proc/interrupts?), etc...  Bonus points if that can
-be implemented as a helper or pair of helpers so that other tests that want to
-measure latency/time don't need to reinvent the wheel.
+Woo! Thanks. :-)
+
+-bw
