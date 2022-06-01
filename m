@@ -2,121 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02A2953A396
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 13:08:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFBB253A3AE
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 13:16:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352493AbiFALIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 07:08:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60448 "EHLO
+        id S1352585AbiFALPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 07:15:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352486AbiFALIM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 07:08:12 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA7387A1C;
-        Wed,  1 Jun 2022 04:08:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=n2Sxt1LsbbmYzOd9zbBmcIleJm+O56cbx5JKEChxuKo=; b=P4ht6QkPLQI0A3+22aIZ/FRtmc
-        wh+9jvIvULdQB2BOg4JxVu5zB788hW5qQI8OURFofkfDAcazQOhvb76dkvLop3Z0wCmMmuXi5Jkrq
-        Oo0USUtCczKW4pszpzTr9/BUqfup8aEgN2ntlCkEtDapdFeA1+3SaGgzy+xQN1wL/PT5RXIIV92cK
-        d5DXIVe69mkF5lIhTV9M62D7EPwzrvZusg5mdhe0cV/st6q+d58hjmzP7gJZg9/OJhS146c3Y7lX6
-        zR6z5RODBZgauY9AJ7Jg/lU2HHYv3XelwFafSmuj6aNuTIZuh7OQhjhLBp7G77mCEZlPhbmzuhHxP
-        cOoMbR2w==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwMCb-003krB-3i; Wed, 01 Jun 2022 11:07:49 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 5687D98137D; Wed,  1 Jun 2022 13:07:46 +0200 (CEST)
-Date:   Wed, 1 Jun 2022 13:07:46 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        Like Xu <likexu@tencent.com>
-Subject: Re: [PATCH] x86: events: Do not return bogus capabilities if PMU is
- broken
-Message-ID: <YpdIgm8c5YEFLCCH@worktop.programming.kicks-ass.net>
-References: <20220601094256.362047-1-pbonzini@redhat.com>
+        with ESMTP id S1352540AbiFALPs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 07:15:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8236DA2057
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 04:15:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654082146;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a0kzdEPVlsKUsss8CVBPt526beqGmW7esjoGk5RxzSg=;
+        b=SjEuwRO1xFqIZd2kfZBOdVn+iv+OGTKtarunwNA17+EIyB5+Kg7IILFlajIW2+RLHtYunj
+        1tyJZp5xDQf262ntyAMOc4f028pvvtjv3hvsPhOc77UBD7i25h07Lor3KykMBYISImsKHT
+        bA/iprimTGygek/OnyXvJpBZX6DQlRs=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-341-Hf72FU_yPhWdkq8AZqBvsw-1; Wed, 01 Jun 2022 07:15:45 -0400
+X-MC-Unique: Hf72FU_yPhWdkq8AZqBvsw-1
+Received: by mail-qt1-f200.google.com with SMTP id m18-20020a05622a119200b00304b4e57cbfso1012957qtk.18
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 04:15:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=a0kzdEPVlsKUsss8CVBPt526beqGmW7esjoGk5RxzSg=;
+        b=eXNhxOAWWbGTXRq4BSb2mW3CIlwat8ZDq2qfbo06/5n1FefRUGwZyNtXqS0TnUbtrb
+         zs8P47oWSYbIt/Uz07Yu9HIknRXxISDpser2iWtLWns++O7N4t+Tphu21fB4yfxQGx0A
+         QqxNloXpr06Sh8lxdS6cmuhskcLj98PkYT5eYXN18QdmGWonJJ4+XYfPYzxHoime5YR4
+         C1+9wS4yVK293Pqgj2Ui6mZA6Mx5R/r9J2xxU1JctrxHcwKX495t/kXCfxv1Lw3WLVyD
+         o+XSpZt6UdyMbt1tOnVG4yO9nsqK8VkisT8hdmC3pSxv0oxvEARbLHzXPe5lxGue34HE
+         ZsjQ==
+X-Gm-Message-State: AOAM530/WU6XXhhgucx9e91uZDE6YjBR44ivodRmvfoxSb37RjwNEPtQ
+        XVRcXsuJDrJURpai2D8o9UioPf40ApImpjWKyDXprESAtLk3vnoHbvWi4QAbUsGce8DMjSlvSx9
+        VzX++1HaXHh+ITmj0J9XASIsWed6X
+X-Received: by 2002:a05:620a:2804:b0:67d:1e7b:b528 with SMTP id f4-20020a05620a280400b0067d1e7bb528mr44009335qkp.193.1654082145009;
+        Wed, 01 Jun 2022 04:15:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxFXMZXLVyFwTyYq6IDOWeXu8G9b4pZz4jhyq32PX89m0mCaVF+Znn3KVg7Aol3B6sxVE+47vjCI0GRB17nZ18=
+X-Received: by 2002:a05:620a:2804:b0:67d:1e7b:b528 with SMTP id
+ f4-20020a05620a280400b0067d1e7bb528mr44009313qkp.193.1654082144729; Wed, 01
+ Jun 2022 04:15:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220601094256.362047-1-pbonzini@redhat.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220526124338.36247-1-eperezma@redhat.com> <20220526124338.36247-4-eperezma@redhat.com>
+ <20220601070303-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220601070303-mutt-send-email-mst@kernel.org>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 1 Jun 2022 13:15:08 +0200
+Message-ID: <CAJaqyWcK7CwWLr5unxXr=FDbuufeA38X0eAboJy8yKLcsdiPow@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] vhost-vdpa: uAPI to stop the device
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        Parav Pandit <parav@nvidia.com>, Eli Cohen <elic@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Cindy Lu <lulu@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>, ecree.xilinx@gmail.com,
+        "Dawar, Gautam" <gautam.dawar@amd.com>, habetsm.xilinx@gmail.com,
+        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Dinan Gunawardena <dinang@xilinx.com>,
+        Longpeng <longpeng2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 01, 2022 at 05:42:56AM -0400, Paolo Bonzini wrote:
-> From: Like Xu <likexu@tencent.com>
-> 
-> If the PMU is broken due to firmware issues, check_hw_exists() will return
-> false but perf_get_x86_pmu_capability() will still return data from x86_pmu.
-> Likewise if some of the hotplug callbacks cannot be installed the contents
-> of x86_pmu will not be reverted.
-> 
-> Handle the failure in both cases by clearing x86_pmu if init_hw_perf_events()
-> or reverts to software events only.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Wed, Jun 1, 2022 at 1:03 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, May 26, 2022 at 02:43:37PM +0200, Eugenio P=C3=A9rez wrote:
+> > The ioctl adds support for stop the device from userspace.
+> >
+> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > ---
+> >  drivers/vhost/vdpa.c       | 18 ++++++++++++++++++
+> >  include/uapi/linux/vhost.h | 14 ++++++++++++++
+> >  2 files changed, 32 insertions(+)
+> >
+> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > index 32713db5831d..d1d19555c4b7 100644
+> > --- a/drivers/vhost/vdpa.c
+> > +++ b/drivers/vhost/vdpa.c
+> > @@ -478,6 +478,21 @@ static long vhost_vdpa_get_vqs_count(struct vhost_=
+vdpa *v, u32 __user *argp)
+> >       return 0;
+> >  }
+> >
+> > +static long vhost_vdpa_stop(struct vhost_vdpa *v, u32 __user *argp)
+> > +{
+> > +     struct vdpa_device *vdpa =3D v->vdpa;
+> > +     const struct vdpa_config_ops *ops =3D vdpa->config;
+> > +     int stop;
+> > +
+> > +     if (!ops->stop)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     if (copy_from_user(&stop, argp, sizeof(stop)))
+> > +             return -EFAULT;
+> > +
+> > +     return ops->stop(vdpa, stop);
+> > +}
+> > +
+> >  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int =
+cmd,
+> >                                  void __user *argp)
+> >  {
+> > @@ -650,6 +665,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *=
+filep,
+> >       case VHOST_VDPA_GET_VQS_COUNT:
+> >               r =3D vhost_vdpa_get_vqs_count(v, argp);
+> >               break;
+> > +     case VHOST_VDPA_STOP:
+> > +             r =3D vhost_vdpa_stop(v, argp);
+> > +             break;
+> >       default:
+> >               r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
+> >               if (r =3D=3D -ENOIOCTLCMD)
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index cab645d4a645..c7e47b29bf61 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -171,4 +171,18 @@
+> >  #define VHOST_VDPA_SET_GROUP_ASID    _IOW(VHOST_VIRTIO, 0x7C, \
+> >                                            struct vhost_vring_state)
+> >
+> > +/* Stop or resume a device so it does not process virtqueue requests a=
+nymore
+> > + *
+> > + * After the return of ioctl with stop !=3D 0, the device must finish =
+any
+> > + * pending operations like in flight requests. It must also preserve a=
+ll
+> > + * the necessary state (the virtqueue vring base plus the possible dev=
+ice
+> > + * specific states) that is required for restoring in the future. The
+> > + * device must not change its configuration after that point.
+> > + *
+> > + * After the return of ioctl with stop =3D=3D 0, the device can contin=
+ue
+> > + * processing buffers as long as typical conditions are met (vq is ena=
+bled,
+> > + * DRIVER_OK status bit is enabled, etc).
+> > + */
+> > +#define VHOST_VDPA_STOP                      _IOW(VHOST_VIRTIO, 0x7D, =
+int)
+> > +
+> >  #endif
+>
+> I wonder how does this interact with the admin vq idea.
+> I.e. if we stop all VQs then apparently admin vq can't
+> work either ...
+> Thoughts?
+>
 
-No SoB from Like,
+Copying here the answer to Parav, feel free to answer to any thread or
+highlight if I missed something :). Using the admin vq proposal
+terminology of "device group".
 
-> ---
->  arch/x86/events/core.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index 99cf67d63cf3..d23f3821daf5 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -2095,14 +2095,15 @@ static int __init init_hw_perf_events(void)
->  	}
->  	if (err != 0) {
->  		pr_cont("no PMU driver, software events only.\n");
-> -		return 0;
-> +		err = 0;
-> +		goto out_bad_pmu;
->  	}
->  
->  	pmu_check_apic();
->  
->  	/* sanity check that the hardware exists or is emulated */
->  	if (!check_hw_exists(&pmu, x86_pmu.num_counters, x86_pmu.num_counters_fixed))
-> -		return 0;
-> +		goto out_bad_pmu;
->  
->  	pr_cont("%s PMU driver.\n", x86_pmu.name);
->  
-> @@ -2211,6 +2212,8 @@ static int __init init_hw_perf_events(void)
->  	cpuhp_remove_state(CPUHP_AP_PERF_X86_STARTING);
->  out:
->  	cpuhp_remove_state(CPUHP_PERF_X86_PREPARE);
-> +out_bad_pmu:
-> +	memset(&x86_pmu, 0, sizeof(x86_pmu));
->  	return err;
->  }
->  early_initcall(init_hw_perf_events);
-> @@ -2982,6 +2985,11 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
->  
->  void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
->  {
-> +	if (!x86_pmu.name) {
+--
+This would stop a device of a device
+group, but not the whole virtqueue group. If the admin VQ is offered
+by the PF (since it's not exposed to the guest), it will continue
+accepting requests as normal. If it's exposed in the VF, I think the
+best bet is to shadow it, since guest and host requests could
+conflict.
 
-We have x86_pmu_initialized(), the implementation is a bit daft, but
-might as well use it here too, no?
+Since this is offered through vdpa, the device backend driver can
+route it to whatever method works better for the hardware. For
+example, to send an admin vq command to the PF. That's why it's
+important to keep the feature as self-contained and orthogonal to
+others as possible.
+--
 
-> +		memset(cap, 0, sizeof(*cap));
-> +		return;
-> +	}
-> +
->  	cap->version		= x86_pmu.version;
->  	/*
->  	 * KVM doesn't support the hybrid PMU yet.
+> > --
+> > 2.31.1
+>
 
-Otherwise seems fine I suppose.
