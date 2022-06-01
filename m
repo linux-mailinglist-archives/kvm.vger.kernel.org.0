@@ -2,49 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA16B53A58C
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 14:57:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F13F753A5BE
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 15:15:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351149AbiFAMz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 08:55:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59122 "EHLO
+        id S1353179AbiFANPi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 09:15:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232460AbiFAMzz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 08:55:55 -0400
+        with ESMTP id S1350825AbiFANPh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 09:15:37 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB75E6FD26;
-        Wed,  1 Jun 2022 05:55:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8270E3D1F1;
+        Wed,  1 Jun 2022 06:15:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=PvnY4f6raeIKuCN1PO950argpuur0vlG5YTm23/TIyo=; b=NtvTkl0wA87gBtf6ObEy5+OutY
-        QXVNfiTR6FVh7QIWlw2R2wiaQhuRUGtHQJ+o6Z4ZxXmtaN+rzn+st5P4o6nqvvhIDUjfINcfN0YKS
-        HqpvSpOcgZ53YHJjXNhSlULkbCY541ucARH5Bnj8MM+CBqGZWijSws+Q4fzKNtQjr0/kK/zBkFB4+
-        KJ78ia2fC3zhwwjrHviCMIVxMgkO0BwzBJQhcWxBg92rb7iRUOVKa7ueHKw/qt3leaan1aRCs0xBL
-        GkMkblBguF/p94QrgkOwxRtIEK25SV4HEIfec3UfGPucbSgJlOD1IPU0f6vMSZvY8IME0k6RERl+J
-        Fp/jeMgA==;
+        bh=Sxu1crI2xY+FurszXEJFvDBT6NYM4kuK5UDK7SSjyjk=; b=YFxXyuStV5QSs5mcSk4651He0B
+        KniZ6FMIMHLZZvIzC+EVoaW2Juk68aPT2esOM0Jr+ubSDUNPxEXy0hgYlHA2jM343B2ZbUGpM3nZ3
+        aRadQVbANmNRb9vp8D5UaVIF1iaAagHGJGmBiJImz/aBF3WiXVDwbx5hcBfXDNj9o3OqTrbvm60gG
+        THexhzEnyx4Re4LoQgPppywFIRQy7dhwjnqUTjhjC3+3V6I9gKZFCGUnZIHl7+fP5IZIvuvyQh07D
+        qM2owPzYiNZT8/zR0NC39ocxFSBRjZ2N4SzyaRNJx6Vct7YM1equ9k4gSVKm+NVhX49yspWk8XM+U
+        E46itdHQ==;
 Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
         by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwNsU-003mZr-20; Wed, 01 Jun 2022 12:55:10 +0000
-Message-ID: <7a030232a8002a31520e1c435034f2c9b2f8a858.camel@infradead.org>
-Subject: Re: [PATCH] KVM: VMX: CPU frequency scaling for intel x86_64 KVM
- guests
+        id 1nwOBf-003mu4-MM; Wed, 01 Jun 2022 13:15:00 +0000
+Message-ID: <cb5c7c4f1c403d0cdb9c95f8a258ee2d402d8314.camel@infradead.org>
+Subject: Re: ...\n
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Metin Kaya <metikaya@amazon.co.uk>, jalliste@amazon.com
-Cc:     bp@alien8.de, diapop@amazon.co.uk, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Date:   Wed, 01 Jun 2022 13:55:07 +0100
-In-Reply-To: <0194b22a-38a1-08a1-a576-de6463389ce4@redhat.com>
-References: <20220531105925.27676-1-jalliste@amazon.com>
-         <20220531114333.29153-1-metikaya@amazon.co.uk>
-         <0194b22a-38a1-08a1-a576-de6463389ce4@redhat.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        "Durrant, Paul" <pdurrant@amazon.co.uk>
+Cc:     "Allister, Jack" <jalliste@amazon.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "diapop@amazon.co.uk" <diapop@amazon.co.uk>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "metikaya@amazon.co.uk" <metikaya@amazon.co.uk>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "x86@kernel.org" <x86@kernel.org>
+Date:   Wed, 01 Jun 2022 14:14:42 +0100
+In-Reply-To: <YpcMw2TgNWzrcoRm@worktop.programming.kicks-ass.net>
+References: <YpYaYK7a28DFT5Ne@hirez.programming.kicks-ass.net>
+         <20220531140236.1435-1-jalliste@amazon.com>
+         <YpYpxzt4rmG+LFy9@hirez.programming.kicks-ass.net>
+         <059ab3327ac440479ecfdf49fa054347@EX13D32EUC003.ant.amazon.com>
+         <YpcMw2TgNWzrcoRm@worktop.programming.kicks-ass.net>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-2fY5x4KN15+eABK7O71C"
+        boundary="=-dVqdz6VBRx/yb4VxIlvK"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
@@ -59,68 +72,66 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-2fY5x4KN15+eABK7O71C
+--=-dVqdz6VBRx/yb4VxIlvK
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2022-05-31 at 20:11 +0200, Paolo Bonzini wrote:
-> On 5/31/22 13:43, Metin Kaya wrote:
-> > Thanks, Jack.
+On Wed, 2022-06-01 at 08:52 +0200, Peter Zijlstra wrote:
+> On Tue, May 31, 2022 at 02:52:04PM +0000, Durrant, Paul wrote:
+> > > On Tue, May 31, 2022 at 02:02:36PM +0000, Jack Allister wrote:
+> > > > The reasoning behind this is that you may want to run a guest at a
+> > > > lower CPU frequency for the purposes of trying to match performance
+> > > > parity between a host of an older CPU type to a newer faster one.
+> > >=20
+> > > That's quite ludicrus. Also, then it should be the host enforcing the
+> > > cpufreq, not the guest.
 > >=20
-> > Reviewed-by: Metin Kaya <metikaya@amazon.co.uk>
-> >=20
+> > I'll bite... What's ludicrous about wanting to run a guest at a lower
+> > CPU freq to minimize observable change in whatever workload it is
+> > running?
 >=20
-> Please try a bit harder.  "Reviewed-by" is neither "this matches what's=
-=20
-> been forever in the Amazon kernel"=20
-
-Oh, it hasn't made it to the Amazon kernel yet. I have started
-threatening to *eat* people who even submit stuff to the internal
-kernel for review without first posting it upstream.
-
-That does mean you get to see it sooner, which is a mixed blessing :)
-
-> - does not even *apply* to the upstream kernel, because it uses=20
-> (presumably Amazon-specific) CAP numbers above 10000
+> *why* would you want to do that? Everybody wants their stuff done
+> faster.
 >=20
-> - does not work if the vCPU is moved from one physical CPU to another
->=20
-> - does not work if the intel_pstate driver writes to MSR_HWP_REQUEST
->=20
-> - does not include documentation for the new capability
->=20
-> - does not include a selftest
->=20
-> - is unacceptable anyway because, as mentioned in the cover letter, it=
-=20
-> isn't undone when the process exits
 
-That's a useful summary; thank you. I think we should definitely focus
-on integrating with cpufreq too.
+Nah, lots of customers have existing workloads and they want them to
+run the *same*. They don't want them to run *faster* because that could
+expose existing bugs and race conditions in guest code that has worked
+perfectly fine for years. They don't want us to stress-test it when it
+was working fine before.
 
-Is this even a KVM thing?
+Hell, we are implementing guest transparent live migration to KVM from
+*actual* Xen in order to let stuff "just continue to run as it did
+before", when for many it would "just" be a case of rebuilding their
+guest with new NVMe and network drivers.
 
-I don't think we really want to do the change on every vmexit/enter. We
-could *maybe* make a case for doing it on entry and then removing the
-limit when either returning to *userspace* or scheduling?
+> If this is some hare-brained money scheme; must not give them if they
+> didn't pay up then I really don't care.
 
-But I think even that probably isn't needed. Just let the VMM run at
-the same frequency too, as a per-process setting.
+It's actually the other way round. The older instance types were more
+expensive; prices generally went down over time, especially $/perf.
 
-> Jack, please understand that I am not really blaming you in any way, and=
-=20
-> ask some of your colleagues with upstream kernel experience (Alex Graf,=
-=20
-> David Woodhouse, Filippo Sironi, Jan Schoenherr, Amit Shah are the ones=
-=20
-> I know) which patches could be good targets for including upstream.
+None of that eliminates customer inertia.
 
-Indeed. As a straw man there are worse ways to start the discussion.
-Thanks, Jack.
+> On top of that, you can't hide uarch differences with cpufreq capping.
+
+No, but you can bring the performance envelope within spitting
+distance. This isn't about hiding the fact that they are now running on
+Linux and on newer CPUs; it's about not *breaking* things too much.
+
+> Also, it is probably more power efficient to let it run faster and idle
+> more, so you're not being environmental either.
+
+Not sure about that. I thought I saw analysis that something like the
+last 5% of turbo performance cost 30% of the power budget in practice.
+
+And running these Xen guests even scaled down on modern hardware is
+still much more power efficient than running them on the original
+hardware that we're migrating them from.
 
 
 
---=-2fY5x4KN15+eABK7O71C
+--=-dVqdz6VBRx/yb4VxIlvK
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -212,25 +223,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwNjAxMTI1NTA3WjAvBgkqhkiG9w0BCQQxIgQgD30ju4Z5
-JV3ZuhNBTSCLLeS7JuXWy+b9flXFtZZPuMQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwNjAxMTMxNDQyWjAvBgkqhkiG9w0BCQQxIgQgA/AoKx69
+jo/THmz9Jx2AyYFiMY4PPBTLPPfnboNskxYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgADamyky+Cxgj3LKejGhU9n9FeQd4Ha/12f
-UMfctjKeZHfXBURmVtJgotKX+Nrj/fpheifIp7XSmL/EbLHfONQ2eiA7dATVjCBbus7kp5qRHz1M
-AYWvSg0yZ6g2mnZN6qX4irXW8CrUyDZzwY5RxAEhdH/U96Rk7ANJ/l6aHSPtvoFnmmQQ5bcf/ui0
-9BRsmmZBauV+DdqTvKFC8SWF1xUI/+ayFL8kgJe4BDp1spa4rOyfOBVvKMaICOVblp8LPKJ8/iU9
-0zNehSXeYM9IzReK8zeJn242Ho8tNzR+bHqOJbyM4U3CVViee5Kmy3oaWXl7U9UUjh/87kUrGmQL
-o+1WjgJ2SLoJznZqX7wOzmYlw/JLFX4H8Yr3cu5AX8/UrR96becRUiIHCkZFJheuuHjk/9s33U4/
-hYzOMkB77DNIu0BxjXBUuPBI7F1sRy7Ws05aCBlqUSMJwS0hd4FMi06fEix4PhURCnQg9YhQGlpB
-SRLC5UaD/7kYvBpQCivtHhJKCwmhlJdxyBIBGFe3GFyVzFd3MkTaN3v4df5c8m+fXqD+U2vPH44b
-zfMdg2dZj9dOsqG9BjGsfnXey+Klk6+w37ZqK0WwXIjZ3EhfaboZvqPGpQysGhflOZLF3bVd9dxt
-zoaPNskSS1L9F4XsqVFyeE8cQrYcGTJccnW7MaGWlQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBpcYG5m7dBUDDfoH/HYAvhVVWGcYD7snP+
+ruNFXf+2TGdVCpYLb5OoR12WFZ/djCG0rQPGWlhu2ouq/+ru3n/ai45OBKZOLzxx0ErC/Fit4j5+
+U7t2q2xZQTUv80Pq+O4ogN55PBmgpmk5YHZ3DdLJXRIs/9J3V0GulBpsKVp/ZQTz0itlXUsnqzNk
+emyFJKfSqLR9uSraDoIEbxLQrlHK3KXhRc02mmqXVo5NWJxEkW1nWUmqEbHZAm89Nuk+5hnoScJv
+3udmtlTFbxqt6lySJgSw/hDGbe8XcSjUczaABBT8DtwppUT0ZoZNbfRXit4nHPQsOe/NNBiV1+2X
+CSvnIseB+oqmy5i6lW4N7LIJYF7Nn4vVZIJRwu861IhhXG1NXWiLlUj0AWcq2JZhPpl+pZIjhY5h
+HEREGvQCj7Zncan99pX5B+HV79WbUyFC47sh89VGHyoiInALNMxXd/WkXSWIpGDQzbzJJUK5kq84
+oroQMcUsQkseqacAFWg3Z3c3lK9Dx6k83FSis3X9JLeyFpLWW/F99Fl+VtCB5Aef9ufxFuJGDNM+
+zrC4xu337M9wi9zCf+J2loiUU4wSYCxWJO1VGT8lmUBn4IdCnNmv1tCqhTFQTpF9ocj7O0pgkmph
+Lic6UwpB9tJLAaI6CVDtRszudKRzimBvs5ODmf4VlgAAAAAAAA==
 
 
---=-2fY5x4KN15+eABK7O71C--
+--=-dVqdz6VBRx/yb4VxIlvK--
 
