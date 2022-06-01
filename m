@@ -2,93 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 443A2539F68
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:25:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 335F1539F81
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:30:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350690AbiFAIZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 04:25:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39152 "EHLO
+        id S242377AbiFAI3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 04:29:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350764AbiFAIZJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 04:25:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 546BA2AE3
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:25:08 -0700 (PDT)
+        with ESMTP id S1350764AbiFAI3g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 04:29:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EBC194BFE4
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:29:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654071907;
+        s=mimecast20190719; t=1654072174;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9PuqWSM1RqEiAAMMqRkf0RREiczy16fCzdCz4SZ9Yh8=;
-        b=a3X3DM8Q450FYyesFUrHPF2J/QSKCH5+ZUisxb+Kbv+QX7wyMo398Ra6iaImtmW0AacKrV
-        XM+xLz9Ds80MpETIpazRnyC8VSLUxSizGfbQMVStbTVa0VvutwAV2mqZyC6YxRV24huX4s
-        yhrHFJnR8/d5YiAgA1IUVZvwC+Umh6I=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=eYHc8MFYSzdCoe/K1c8WWYjHXxoxdvsTfd+zWYaMPWE=;
+        b=LtOhIhBARSk3wWJotrgvh8x4/oELkA0tsj2rjPA/rSwEIU3b6Jo6JA73vncTdfpUTekyoF
+        cZ9aNGxoudPU05FH1huJXb2+1oM6/9qRAwZ7GEU01ifEb3U69y57kHPnCJZdCC5d0stG57
+        IuPGJ58vNm9QpsvbH5JGoNcbpFAmiDo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-84-cKVynqtrOVODGBfNlraXHg-1; Wed, 01 Jun 2022 04:25:06 -0400
-X-MC-Unique: cKVynqtrOVODGBfNlraXHg-1
-Received: by mail-wm1-f72.google.com with SMTP id l31-20020a05600c1d1f00b003974df9b91cso2966124wms.8
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:25:06 -0700 (PDT)
+ us-mta-155-5J5bnSfuM0yIOUpu8VS_cw-1; Wed, 01 Jun 2022 04:29:32 -0400
+X-MC-Unique: 5J5bnSfuM0yIOUpu8VS_cw-1
+Received: by mail-ej1-f69.google.com with SMTP id au8-20020a170907092800b00707784fd7e0so444784ejc.22
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:29:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=9PuqWSM1RqEiAAMMqRkf0RREiczy16fCzdCz4SZ9Yh8=;
-        b=aD6fdX8qNiW0xHZKvWU4chOjkXf1LEKsa7NrmHJJuIyzXH5qyplvqLQhPY8UBYg3Gz
-         HxcckmKY9vw9Qpu4IOQTTZObRZnDh3iT2dz92TfdThr7R9B1g0FhgzXkty8ZzlkrmAiV
-         DVeG5ARrz7ei0sZXic/yNIoLIP6OWOLUvb5D90HXdRlZ/96/hhI35H4Pu/V+l86TMZ0f
-         ADSdZHIH1B1lJI/gI6v0/qM8d/Q2s5dyHNagEe82C88sXFTKiQ/CJ3WxC6Yj7SCXBuBb
-         QRfp5UKlFliEBj2MA3XAEEPUAw4rfJYG0ynWuGJRrT25+/Pt1Lh6C05Qs+I/rZa30xDM
-         qzNA==
-X-Gm-Message-State: AOAM530m6oyagxfdKhsmEK+gRK1Dalunab2zd2OrzU6bBColyMep0G6t
-        pxQzCKMQomt2KBVin6RZhjFCmJOh5waBPXXDlb2brfBsqbDYwx6E6TYCO23Gswa642Yq4j/8nxJ
-        GT4m8qs+ruk+Z
-X-Received: by 2002:adf:fb46:0:b0:210:2316:dd02 with SMTP id c6-20020adffb46000000b002102316dd02mr17673876wrs.557.1654071905004;
-        Wed, 01 Jun 2022 01:25:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyRD/IRDpVLqPBmdGC0pIb4xFXUChVcdXWE70cLKfJv6Nh+TFUtXKaRUjy4B0vznzkaEH6ugw==
-X-Received: by 2002:adf:fb46:0:b0:210:2316:dd02 with SMTP id c6-20020adffb46000000b002102316dd02mr17673852wrs.557.1654071904613;
-        Wed, 01 Jun 2022 01:25:04 -0700 (PDT)
-Received: from smtpclient.apple ([2a01:e0a:834:5aa0:2c2a:4832:6517:63a])
-        by smtp.gmail.com with ESMTPSA id p15-20020a05600c358f00b003973ea7e725sm6337978wmq.0.2022.06.01.01.25.03
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 01 Jun 2022 01:25:04 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: ...\n
-From:   Christophe de Dinechin <dinechin@redhat.com>
-In-Reply-To: <87r148olol.fsf@redhat.com>
-Date:   Wed, 1 Jun 2022 10:25:01 +0200
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        "Durrant, Paul" <pdurrant@amazon.co.uk>,
-        "Allister, Jack" <jalliste@amazon.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "diapop@amazon.co.uk" <diapop@amazon.co.uk>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "metikaya@amazon.co.uk" <metikaya@amazon.co.uk>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "x86@kernel.org" <x86@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F662DF4F-930A-486E-86FB-97D54E535114@redhat.com>
-References: <YpYaYK7a28DFT5Ne@hirez.programming.kicks-ass.net>
- <20220531140236.1435-1-jalliste@amazon.com>
- <YpYpxzt4rmG+LFy9@hirez.programming.kicks-ass.net>
- <059ab3327ac440479ecfdf49fa054347@EX13D32EUC003.ant.amazon.com>
- <YpcMw2TgNWzrcoRm@worktop.programming.kicks-ass.net>
- <87r148olol.fsf@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=eYHc8MFYSzdCoe/K1c8WWYjHXxoxdvsTfd+zWYaMPWE=;
+        b=zsmPqBgPVCnmzlZNrWVPEErEJZtFXtySDH6FtuhhuGA8UyxsDAaVhOSpo45VcqtAta
+         iBgickX5fB0/UnHdTH4ugGFXlP+ajP4yQEux8VIuMyRjPWJORWSTDcXfwEjN8GL8zrTs
+         vVi3RFh2DMqdRI+ZZgTS9giQRwdASp8TSq09wt6HKAQQ4PhFGhVd6OZMFw5QqyQL39WW
+         J+e/DlGborMzZwV76XVALbC5UneHJInEh2OdUCoJZtDKZqlb1XQKxKBAx1/37cQmNLDD
+         H8W5BDjhCSlV2VVI+z/pV9NVpzaktiHT4ieJ0frWoqhZfmJ2My9WfkAxc34YaXmPsKJu
+         oaSg==
+X-Gm-Message-State: AOAM5322WAohgNt9AS9lZiP27uxxrXJy/EJZCt3il6BVAO0lV5/qH+mM
+        Z31pErepCUCofrT2A/Et2PduzZDqpopN7RCmhNRqbUgwYU6Zd5WqoO5ejZVw8YNI/5XQP23CWmV
+        C+N7jb/DaTjb3
+X-Received: by 2002:a05:6402:500a:b0:42d:d109:b7da with SMTP id p10-20020a056402500a00b0042dd109b7damr16226314eda.289.1654072171794;
+        Wed, 01 Jun 2022 01:29:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyD6nPqYLx+Nc693yDBowHp2HcbQByU14BxAf1JV4Xeqyk+5VgxXIcx8URHxJNllz9jSMIj8g==
+X-Received: by 2002:a05:6402:500a:b0:42d:d109:b7da with SMTP id p10-20020a056402500a00b0042dd109b7damr16226300eda.289.1654072171560;
+        Wed, 01 Jun 2022 01:29:31 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id j22-20020a1709066dd600b006fea2705d18sm403105ejt.210.2022.06.01.01.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jun 2022 01:29:31 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Robert Dinse <nanook@eskimo.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 6/8] KVM: x86: Bug the VM if the emulator accesses a
+ non-existent GPR
+In-Reply-To: <20220526210817.3428868-7-seanjc@google.com>
+References: <20220526210817.3428868-1-seanjc@google.com>
+ <20220526210817.3428868-7-seanjc@google.com>
+Date:   Wed, 01 Jun 2022 10:29:30 +0200
+Message-ID: <87o7zcokgl.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -99,50 +80,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <seanjc@google.com> writes:
 
+> Bug the VM, i.e. kill it, if the emulator accesses a non-existent GPR,
+> i.e. generates an out-of-bounds GPR index.  Continuing on all but
+> gaurantees some form of data corruption in the guest, e.g. even if KVM
+> were to redirect to a dummy register, KVM would be incorrectly read zeros
+> and drop writes.
+>
+> Note, bugging the VM doesn't completely prevent data corruption, e.g. the
+> current round of emulation will complete before the vCPU bails out to
+> userspace.  But, the very act of killing the guest can also cause data
+> corruption, e.g. due to lack of file writeback before termination, so
+> taking on additional complexity to cleanly bail out of the emulator isn't
+> justified, the goal is purely to stem the bleeding and alert userspace
+> that something has gone horribly wrong, i.e. to avoid _silent_ data
+> corruption.
 
-> On 1 Jun 2022, at 10:03, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->=20
-> Peter Zijlstra <peterz@infradead.org> writes:
->=20
->> On Tue, May 31, 2022 at 02:52:04PM +0000, Durrant, Paul wrote:
->=20
-> ...
->=20
->>>=20
->>> I'll bite... What's ludicrous about wanting to run a guest at a =
-lower
->>> CPU freq to minimize observable change in whatever workload it is
->>> running?
->>=20
->> *why* would you want to do that? Everybody wants their stuff done
->> faster.
->>=20
->=20
-> FWIW, I can see a valid use-case: imagine you're running some software
-> which calibrates itself in the beginning to run at some desired real
-> time speed but then the VM running it has to be migrated to a host =
-with
-> faster (newer) CPUs. I don't have a real world examples out of top of =
-my
-> head but I remember some old DOS era games were impossible to play on
-> newer CPUs because everything was happenning too fast. Maybe that's =
-the
-> case :-)
+Thanks, I agree wholeheartedly :-)
 
-The PC version of Alpha Waves was such an example, but Frederick Raynal,
-who did the port, said it was the last time he made the mistake. That =
-was 1990 :-)
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/emulate.c     |  4 ++--
+>  arch/x86/kvm/kvm_emulate.h | 10 ++++++++++
+>  arch/x86/kvm/x86.c         |  9 +++++++++
+>  3 files changed, 21 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 77161f57c8d3..70a8e0cd9fdc 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -247,7 +247,7 @@ enum x86_transfer_type {
+>  
+>  static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
+>  {
+> -	if (WARN_ON_ONCE(nr >= NR_EMULATOR_GPRS))
+> +	if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
+>  		nr &= NR_EMULATOR_GPRS - 1;
+>  
+>  	if (!(ctxt->regs_valid & (1 << nr))) {
+> @@ -259,7 +259,7 @@ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
+>  
+>  static ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned nr)
+>  {
+> -	if (WARN_ON_ONCE(nr >= NR_EMULATOR_GPRS))
+> +	if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
+>  		nr &= NR_EMULATOR_GPRS - 1;
+>  
+>  	BUILD_BUG_ON(sizeof(ctxt->regs_dirty) * BITS_PER_BYTE < NR_EMULATOR_GPRS);
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index 034c845b3c63..89246446d6aa 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -89,6 +89,7 @@ struct x86_instruction_info {
+>  #define X86EMUL_INTERCEPTED     6 /* Intercepted by nested VMCB/VMCS */
+>  
+>  struct x86_emulate_ops {
+> +	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+>  	/*
+>  	 * read_gpr: read a general purpose register (rax - r15)
+>  	 *
+> @@ -383,6 +384,15 @@ struct x86_emulate_ctxt {
+>  	bool is_branch;
+>  };
+>  
+> +#define KVM_EMULATOR_BUG_ON(cond, ctxt)		\
+> +({						\
+> +	int __ret = (cond);			\
+> +						\
+> +	if (WARN_ON_ONCE(__ret))		\
+> +		ctxt->ops->vm_bugged(ctxt);	\
+> +	unlikely(__ret);			\
+> +})
+> +
+>  /* Repeat String Operation Prefix */
+>  #define REPE_PREFIX	0xf3
+>  #define REPNE_PREFIX	0xf2
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7460b9a77d9a..e60badfbbc42 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7887,7 +7887,16 @@ static int emulator_set_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr)
+>  	return __kvm_set_xcr(emul_to_vcpu(ctxt), index, xcr);
+>  }
+>  
+> +static void emulator_vm_bugged(struct x86_emulate_ctxt *ctxt)
+> +{
+> +	struct kvm *kvm = emul_to_vcpu(ctxt)->kvm;
+> +
+> +	if (!kvm->vm_bugged)
+> +		kvm_vm_bugged(kvm);
+> +}
+> +
+>  static const struct x86_emulate_ops emulate_ops = {
+> +	.vm_bugged           = emulator_vm_bugged,
+>  	.read_gpr            = emulator_read_gpr,
+>  	.write_gpr           = emulator_write_gpr,
+>  	.read_std            = emulator_read_std,
 
-More seriously, what about mitigating timing-based remote attacks by
-arbitrarily changing the CPU frequency and injecting noise in the =
-timing?
-That could be a valid use case, no? Although I can think of about a
-million other ways of doing this more efficiently=E2=80=A6
+Is it actually "vm_bugged" or "kvm_bugged"? :-)
 
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
->=20
-> --=20
-> Vitaly
->=20
+-- 
+Vitaly
 
