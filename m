@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5064539D9A
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 08:56:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C3DC539DA6
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 08:59:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350022AbiFAG4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 02:56:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32944 "EHLO
+        id S1349826AbiFAG7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 02:59:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347983AbiFAG43 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 02:56:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D4ED57B10
-        for <kvm@vger.kernel.org>; Tue, 31 May 2022 23:56:28 -0700 (PDT)
+        with ESMTP id S243981AbiFAG7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 02:59:40 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557E66543B
+        for <kvm@vger.kernel.org>; Tue, 31 May 2022 23:59:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D8D65B8182D
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 06:56:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A190C385B8
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 06:56:25 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 07AAEB8182E
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 06:59:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9D0FEC385B8
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 06:59:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654066585;
-        bh=xZljNS9HOeHkpDE+d2u16/pthmDNrxZSdXNVns99WR4=;
+        s=k20201202; t=1654066776;
+        bh=6cffWFoMtdnaChQqJ4B5m3zEg6X07XMj2pV08yKUIl4=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=SCDNp3xB0qLvx54jMHOLI+GErAwWCHCYgJ0E0am+5rgPOxPffh7fU/0GA9foIZZO/
-         mhjni03Xy8EWdymeST7PcROOubRbH8qigYxdOA2qq7D4P7+dowyv1sxWNCx4vV2gGB
-         Jhjtq4tUbPKIh42zDfAg/H97JSq1x1y3+QWv3JQ2Gp71zmtKuEtLQGxej+VrLiXaxq
-         oJmM+QmzRatufqaWG7cMBF3vVW0A0lTeqCKwGB4AH+HeFFqTP0C0p7A0z2Ogf3lwtD
-         mlbYqRT7dG6WliLuWDz3UlUGfbgGxJ0UyI35+3MW2LIrZweHePF0DTzJ9RfxzH4s+J
-         c+imELB07gtdg==
+        b=p8vT4tTNF6zzJ6tYyJKJx7KvSUOJLVfTP0FECuxxiFao1YtYc0KEhoURqEOckbL9K
+         MHWLwD+1TcBMLLdBk6R79N4K8ZFQCcfU51GTk8JtE+REDcqF81vLxGAwRWpdrA5tbz
+         IAfvSzJjSZCiNfl8nIsITboGfTXzB+LKm98Sr+uJZxM0jKYkRhQ2b7gnIr8W7H4d81
+         AhzwRzbe/qfCzMKOZD4wQsqKr03jNF5I/mPBNqcdHv15WVhvRPHTVR8xIavhdtADf1
+         Ayq6JLaINk5XDFVb7NWbKk/zijkk3iNrvMDLI1bAccdyMuUOcqpR1NEzwhI2+4r1v3
+         APN87eS/SmwCQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 5D113CC13B0; Wed,  1 Jun 2022 06:56:25 +0000 (UTC)
+        id 83237CC13B0; Wed,  1 Jun 2022 06:59:36 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
 Subject: [Bug 216056] Kernel Fails to compile with GCC 12.1 different errors
  than 18.0
-Date:   Wed, 01 Jun 2022 06:56:25 +0000
+Date:   Wed, 01 Jun 2022 06:59:36 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -46,14 +46,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Who: nanook@eskimo.com
 X-Bugzilla-Status: RESOLVED
 X-Bugzilla-Resolution: DUPLICATE
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status cf_kernel_version resolution
-Message-ID: <bug-216056-28872-RFHuystLrj@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216056-28872-Ridz4DUqAQ@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-216056-28872@https.bugzilla.kernel.org/>
 References: <bug-216056-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -73,18 +73,12 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216056
 
-Artem S. Tashkinov (aros@gmx.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-     Kernel Version|18.1                        |5.18.1
-         Resolution|---                         |DUPLICATE
-
---- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
-
-
-*** This bug has been marked as a duplicate of bug 216026 ***
+--- Comment #2 from Robert Dinse (nanook@eskimo.com) ---
+Not a duplicate, that bug report was on 5.18.0, which supposedly patches to=
+ fix
+were going to be committed to but apparently weren't as it is still broken =
+in
+5.18.1.
 
 --=20
 You may reply to this email to add a comment.
