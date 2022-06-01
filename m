@@ -2,187 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 335F1539F81
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:30:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6F2F539F86
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:31:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242377AbiFAI3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 04:29:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49136 "EHLO
+        id S1350798AbiFAIa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 04:30:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350764AbiFAI3g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 04:29:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EBC194BFE4
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:29:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654072174;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eYHc8MFYSzdCoe/K1c8WWYjHXxoxdvsTfd+zWYaMPWE=;
-        b=LtOhIhBARSk3wWJotrgvh8x4/oELkA0tsj2rjPA/rSwEIU3b6Jo6JA73vncTdfpUTekyoF
-        cZ9aNGxoudPU05FH1huJXb2+1oM6/9qRAwZ7GEU01ifEb3U69y57kHPnCJZdCC5d0stG57
-        IuPGJ58vNm9QpsvbH5JGoNcbpFAmiDo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-155-5J5bnSfuM0yIOUpu8VS_cw-1; Wed, 01 Jun 2022 04:29:32 -0400
-X-MC-Unique: 5J5bnSfuM0yIOUpu8VS_cw-1
-Received: by mail-ej1-f69.google.com with SMTP id au8-20020a170907092800b00707784fd7e0so444784ejc.22
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:29:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=eYHc8MFYSzdCoe/K1c8WWYjHXxoxdvsTfd+zWYaMPWE=;
-        b=zsmPqBgPVCnmzlZNrWVPEErEJZtFXtySDH6FtuhhuGA8UyxsDAaVhOSpo45VcqtAta
-         iBgickX5fB0/UnHdTH4ugGFXlP+ajP4yQEux8VIuMyRjPWJORWSTDcXfwEjN8GL8zrTs
-         vVi3RFh2DMqdRI+ZZgTS9giQRwdASp8TSq09wt6HKAQQ4PhFGhVd6OZMFw5QqyQL39WW
-         J+e/DlGborMzZwV76XVALbC5UneHJInEh2OdUCoJZtDKZqlb1XQKxKBAx1/37cQmNLDD
-         H8W5BDjhCSlV2VVI+z/pV9NVpzaktiHT4ieJ0frWoqhZfmJ2My9WfkAxc34YaXmPsKJu
-         oaSg==
-X-Gm-Message-State: AOAM5322WAohgNt9AS9lZiP27uxxrXJy/EJZCt3il6BVAO0lV5/qH+mM
-        Z31pErepCUCofrT2A/Et2PduzZDqpopN7RCmhNRqbUgwYU6Zd5WqoO5ejZVw8YNI/5XQP23CWmV
-        C+N7jb/DaTjb3
-X-Received: by 2002:a05:6402:500a:b0:42d:d109:b7da with SMTP id p10-20020a056402500a00b0042dd109b7damr16226314eda.289.1654072171794;
-        Wed, 01 Jun 2022 01:29:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyD6nPqYLx+Nc693yDBowHp2HcbQByU14BxAf1JV4Xeqyk+5VgxXIcx8URHxJNllz9jSMIj8g==
-X-Received: by 2002:a05:6402:500a:b0:42d:d109:b7da with SMTP id p10-20020a056402500a00b0042dd109b7damr16226300eda.289.1654072171560;
-        Wed, 01 Jun 2022 01:29:31 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id j22-20020a1709066dd600b006fea2705d18sm403105ejt.210.2022.06.01.01.29.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 01:29:31 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        Robert Dinse <nanook@eskimo.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 6/8] KVM: x86: Bug the VM if the emulator accesses a
- non-existent GPR
-In-Reply-To: <20220526210817.3428868-7-seanjc@google.com>
-References: <20220526210817.3428868-1-seanjc@google.com>
- <20220526210817.3428868-7-seanjc@google.com>
-Date:   Wed, 01 Jun 2022 10:29:30 +0200
-Message-ID: <87o7zcokgl.fsf@redhat.com>
+        with ESMTP id S1350799AbiFAIa4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 04:30:56 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26DED4BFE3;
+        Wed,  1 Jun 2022 01:30:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=TYbqJkNuVGdCIJmzx6a2mcBLU+AsBRNKfTExhXCvMxE=; b=FUScCHMiAqXbjjG1Y1uHP/gRAj
+        YuGxiKWLDVbtwq1x5u8dbgNG8HY56oSwkf1uO3/fp+2eLF01MmFs0k5r+3ZV1LGbgkKmdIJe2J4Nk
+        N4bisFr4plscm5gX/NViopP+eO69SqZJzlTysszGHzct6u2uPcjRVKOkoUNIHErVjQm7yJfwCcDCO
+        /8S6LZW2MAiijTcAk5kZFSvCGJN4aXNXjmt2OpxBynsCPO8M8oS53hpUaxDIAb9+dPOPuE4aAuaGw
+        y41NnkgauYs7qm9K9PONHdOOpXaMhwO2XEYukIuI33zKqbHcvNX8OfOlVlkrBaERu3yBklrLQdJoU
+        R7Q8GoKQ==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nwJju-003ibE-Jj; Wed, 01 Jun 2022 08:30:03 +0000
+Message-ID: <bc3f2b1332c4bb77558df8aa36493a55542fe5b9.camel@infradead.org>
+Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Tom Lendacky <thomas.lendacky@amd.com>, Mimoja <mimoja@mimoja.de>,
+        Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, hewenliang4@huawei.com, hushiyuan@huawei.com,
+        luolongjun@huawei.com, hejingxian@huawei.com
+Date:   Wed, 01 Jun 2022 09:30:00 +0100
+In-Reply-To: <1f644aac-3fae-ca1b-76f8-dd3bd34bcef3@amd.com>
+References: <20211215145633.5238-1-dwmw2@infradead.org>
+         <9a47b5ec-f2d1-94d9-3a48-9b326c88cfcb@molgen.mpg.de>
+         <ab28d2ce-4a9c-387d-9eda-558045a0c35b@molgen.mpg.de>
+         <3bfacf45d2d0f3dfa3789ff5a2dcb46744aacff7.camel@infradead.org>
+         <ea433e41-0038-554d-3348-70aa98aff9e1@molgen.mpg.de>
+         <efbe0d3d92e6c279e3a6d7a4191ca7470bc4beec.camel@infradead.org>
+         <74d2302f-88fc-c75c-6d2d-4aece1a515bb@molgen.mpg.de>
+         <e3ef8236-344d-e840-575c-a5fb1450a13b@mimoja.de>
+         <1f644aac-3fae-ca1b-76f8-dd3bd34bcef3@amd.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-cLI35JCnFNNXhW94uv+U"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> Bug the VM, i.e. kill it, if the emulator accesses a non-existent GPR,
-> i.e. generates an out-of-bounds GPR index.  Continuing on all but
-> gaurantees some form of data corruption in the guest, e.g. even if KVM
-> were to redirect to a dummy register, KVM would be incorrectly read zeros
-> and drop writes.
->
-> Note, bugging the VM doesn't completely prevent data corruption, e.g. the
-> current round of emulation will complete before the vCPU bails out to
-> userspace.  But, the very act of killing the guest can also cause data
-> corruption, e.g. due to lack of file writeback before termination, so
-> taking on additional complexity to cleanly bail out of the emulator isn't
-> justified, the goal is purely to stem the bleeding and alert userspace
-> that something has gone horribly wrong, i.e. to avoid _silent_ data
-> corruption.
+--=-cLI35JCnFNNXhW94uv+U
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, I agree wholeheartedly :-)
+On Fri, 2022-04-22 at 16:19 -0500, Tom Lendacky wrote:
+> On 4/21/22 05:00, Mimoja wrote:
+> > Dear Paul,
+> >=20
+> > > Sorry for replying so late. I saw your v4 patches, and tried commit=
+=20
+> > > 5e3524d21d2a () from your branch `parallel-5.17-part1`. Unfortunately=
+,=20
+> > > the boot problem still persists on an AMD Ryzen 3 2200 g system, I=
+=20
+> > > tested with. Please tell, where I should report these results too (he=
+re=20
+> > > or posted v4 patches).
+> >=20
+> > We have confirmed the issue on multiple AMD CPUs from multiple=20
+> > generations, leading to the guess that only Zen and Zen+ CPU seem affec=
+ted=20
+> > with Zen3 and Zen2 (only tested ulv) working fine. Tho we struggled to =
+get=20
+> > any output as the failing machines just go silent.
+> >=20
+> > Not working:
+> >=20
+> > Ryzen 5 Pro 2500u and 7 2700U
+> > Ryzen 3 2300G
+> >=20
+> > while e.g.
+> >=20
+> > Ryzen 7 Pro 4750U
+> > Ryzen 9 5950X
+> >=20
+> > both work fine. We will continue to investigate the issue but are=20
+> > currently a bit pulled into other topics.
+> >=20
+> > Thomas, could please maybe help us identify which CPUs and MC-Versions =
+are=20
+> > worth looking at? David suggested you might have a good overview here.
+>=20
+> Sorry, but not knowing what the actual reason for the boot problem, I=20
+> really couldn't give you an idea as to which CPUs and/or MC versions are=
+=20
+> appropriate to look at.
 
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/emulate.c     |  4 ++--
->  arch/x86/kvm/kvm_emulate.h | 10 ++++++++++
->  arch/x86/kvm/x86.c         |  9 +++++++++
->  3 files changed, 21 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 77161f57c8d3..70a8e0cd9fdc 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -247,7 +247,7 @@ enum x86_transfer_type {
->  
->  static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
->  {
-> -	if (WARN_ON_ONCE(nr >= NR_EMULATOR_GPRS))
-> +	if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
->  		nr &= NR_EMULATOR_GPRS - 1;
->  
->  	if (!(ctxt->regs_valid & (1 << nr))) {
-> @@ -259,7 +259,7 @@ static ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned nr)
->  
->  static ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned nr)
->  {
-> -	if (WARN_ON_ONCE(nr >= NR_EMULATOR_GPRS))
-> +	if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
->  		nr &= NR_EMULATOR_GPRS - 1;
->  
->  	BUILD_BUG_ON(sizeof(ctxt->regs_dirty) * BITS_PER_BYTE < NR_EMULATOR_GPRS);
-> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-> index 034c845b3c63..89246446d6aa 100644
-> --- a/arch/x86/kvm/kvm_emulate.h
-> +++ b/arch/x86/kvm/kvm_emulate.h
-> @@ -89,6 +89,7 @@ struct x86_instruction_info {
->  #define X86EMUL_INTERCEPTED     6 /* Intercepted by nested VMCB/VMCS */
->  
->  struct x86_emulate_ops {
-> +	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
->  	/*
->  	 * read_gpr: read a general purpose register (rax - r15)
->  	 *
-> @@ -383,6 +384,15 @@ struct x86_emulate_ctxt {
->  	bool is_branch;
->  };
->  
-> +#define KVM_EMULATOR_BUG_ON(cond, ctxt)		\
-> +({						\
-> +	int __ret = (cond);			\
-> +						\
-> +	if (WARN_ON_ONCE(__ret))		\
-> +		ctxt->ops->vm_bugged(ctxt);	\
-> +	unlikely(__ret);			\
-> +})
-> +
->  /* Repeat String Operation Prefix */
->  #define REPE_PREFIX	0xf3
->  #define REPNE_PREFIX	0xf2
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7460b9a77d9a..e60badfbbc42 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7887,7 +7887,16 @@ static int emulator_set_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr)
->  	return __kvm_set_xcr(emul_to_vcpu(ctxt), index, xcr);
->  }
->  
-> +static void emulator_vm_bugged(struct x86_emulate_ctxt *ctxt)
-> +{
-> +	struct kvm *kvm = emul_to_vcpu(ctxt)->kvm;
-> +
-> +	if (!kvm->vm_bugged)
-> +		kvm_vm_bugged(kvm);
-> +}
-> +
->  static const struct x86_emulate_ops emulate_ops = {
-> +	.vm_bugged           = emulator_vm_bugged,
->  	.read_gpr            = emulator_read_gpr,
->  	.write_gpr           = emulator_write_gpr,
->  	.read_std            = emulator_read_std,
 
-Is it actually "vm_bugged" or "kvm_bugged"? :-)
+Well, that's kind of the point... we don't *know* what the problem is.
+We think we've eliminated the software concurrency issues, and it seems
+like the hardware just dies if you happen to bring up the CPUs 'too
+fast'.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+If we could get you to reproduce it in a lab and help  work out what's
+going on, it would be much appreciated!
 
--- 
-Vitaly
+
+--=-cLI35JCnFNNXhW94uv+U
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwNjAxMDgzMDAwWjAvBgkqhkiG9w0BCQQxIgQgPsv8lojH
+bU+lIvR/9t7YeRvQkTgIK5s878n+Gl5alqUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBuCGtoTtdpnCas4Kn0uiARH47lip10U/yV
+QfBIn4PfthX6jxX+hRvbW9RjSDlidYbZWJupPLwmoI0NiKBgpPHHM2lkYBKfVw6AXTbHT41Nsn/3
+VBCPuNCgdyK4eaOHknGMynGH4L5ApoytYSH2H6pHwDWUq/1gkrT7sTaFmmCWK2Lp6rmmNA3FWuFy
+/AOw5N9HEfj6Df/YbPgWqzE43Kk3znvxIrL7TpL+ZF16Zf76mjGAOsOaT3ujMNOhqTLonjfSv+wR
+HNfC7/THxmkXEYEPSo1qBnEwiycwAZwipzeUcV1NTGMZNotiFOIDDtBemkxcfLuQGBo0RiTXzS5L
+Sn9iuAYqXjHGiDmXKIK+1D0qGmETH/0j/8QQsYS2KyOfLBkuL0LH4TSN5/+dBEwwgmt2VPTj76x8
+0/oCyVIv4Z2rvP+Sw9kT4QKHA9yp0jZ8VrIKJpjQ8MV5JyDb0ipebL853URnTexhqi2kSHa4MQZ8
+CSnm79vUkx3pARrI3sTqpA3imGa8WQVw6uzL/2q0EV8tfu/WuNcVDCCws56epCRfsX8rHGQxsMCx
+YANtuOldw8bg27ma9LJcdT96d3wA8MZ0SY8+S6KD64gqhVN674kKIY/Xp95hycY2ERkhpR+Qbm2u
+if8FoSPW7nybUPcGAEfv1CsSi9UM2fLfVqxpATNnwQAAAAAAAA==
+
+
+--=-cLI35JCnFNNXhW94uv+U--
 
