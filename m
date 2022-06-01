@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07DD2539F8A
-	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:32:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06BEA539FAD
+	for <lists+kvm@lfdr.de>; Wed,  1 Jun 2022 10:39:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350820AbiFAIcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 04:32:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52212 "EHLO
+        id S1350908AbiFAIjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jun 2022 04:39:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349408AbiFAIb4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 04:31:56 -0400
+        with ESMTP id S1350906AbiFAIjS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jun 2022 04:39:18 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F9042FE51
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:31:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6700D5E174
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 01:39:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654072313;
+        s=mimecast20190719; t=1654072754;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=BRjRy4QuDv/Sqz+aOic6CcbjAuVweriyEvX/LgyeBJs=;
-        b=IiM7frZFMjNnG0Z4up9XPhLOcPSVGzVYxYF2rqi52C3KIn47hRbrAn1VV5XKXOTQyGqvOh
-        ASzp1IOFtoB/Ai9FTLkanTT5F2WmLIBht0KTRZmIezb803EG7nDhYYkasM+1ayRDfyZHos
-        RwjsC0RnDifvOv0Nna1khWGzIdJiEVs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QtIf3KbY9OaafutQhHCVWaTK0LuvjzCiWKGIzW1Y3vY=;
+        b=UjJUulTZm8o21zv/0is5KT/XgBXiiMJWv/PY4oq76y6eF8FDZCL0YoiRkDM7sUP5fMGsS1
+        t1vToAxtTKOltm8PuIE7ojmzrPhcfVqjx8BeJOsKKrMfc7k4DB2NNVnaT98V1LVHjcriXd
+        0qdvEvw4w+gfr4H1LX7oomtHNgg+ZSg=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-177-J3xqC7zJPy2Zn_-LJwA0Vg-1; Wed, 01 Jun 2022 04:31:52 -0400
-X-MC-Unique: J3xqC7zJPy2Zn_-LJwA0Vg-1
-Received: by mail-ed1-f70.google.com with SMTP id cy18-20020a0564021c9200b0042dc7b4f36fso764583edb.4
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:31:52 -0700 (PDT)
+ us-mta-561-6GTWMFV7MsqHqXUGX83EQg-1; Wed, 01 Jun 2022 04:39:13 -0400
+X-MC-Unique: 6GTWMFV7MsqHqXUGX83EQg-1
+Received: by mail-ed1-f69.google.com with SMTP id cy18-20020a0564021c9200b0042dc7b4f36fso778330edb.4
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 01:39:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=BRjRy4QuDv/Sqz+aOic6CcbjAuVweriyEvX/LgyeBJs=;
-        b=bJrK3bgmQu76p5yQD5SO42oJG3ZFt9uaDVXNtncfAL2KHdYBVJvWSdpQ29Sr2Ujt1k
-         cgV5vLjgTEPkycAGGjJMhjwqSC1Y9B+hYsR0geoXqC16/2EKnfPEKwyZkMa7I6S0d4xr
-         GuwJ+GkFAl74Dyy1gYL1weSbBlLIU/XYfVN9zLkcu1+sBld8MIEjPIGd8YzZdcL4fl7j
-         lAEWhGefrdBQ1HOuc2K+ANkTHz7hN+BarZ6YJ4w9mKycxlziu1WLyQHsGURyzXIh7+iX
-         TzllLhVEePfH1wd0ueu5e0D/NOqh2+gcW2VRqu+qJRXgxdcGpE7UPxpHBTQYQuTailKQ
-         Gjag==
-X-Gm-Message-State: AOAM5320mCgsN6bZ42izXXlfT5C517ICCY2IKWEyq2qAr5RioIaqSTyY
-        Z8nzaVqIwaYsdsD4UqCOT6qohAqTsdjPZadVWBgkW1XjF6tflzwlsXpMN5NvmRg6CgUw1+Zyfh/
-        HBJJ5B+3ITJiK
-X-Received: by 2002:a17:907:3e84:b0:6fe:8c5f:d552 with SMTP id hs4-20020a1709073e8400b006fe8c5fd552mr55954430ejc.710.1654072311202;
-        Wed, 01 Jun 2022 01:31:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw9DVJ6FqBpWGxY5tywdmZKsQoJj4ojxDb7NQ24EnoFYJieuekNxE7gt4GgF856Cxw6TXTg4g==
-X-Received: by 2002:a17:907:3e84:b0:6fe:8c5f:d552 with SMTP id hs4-20020a1709073e8400b006fe8c5fd552mr55954411ejc.710.1654072310968;
-        Wed, 01 Jun 2022 01:31:50 -0700 (PDT)
+        bh=QtIf3KbY9OaafutQhHCVWaTK0LuvjzCiWKGIzW1Y3vY=;
+        b=DPUjeSQHszX8kQvA7cDbDNlnP5XHEKNWKvvyV9QDaL9hY0A6H5CaxbyXvtVhchBa4D
+         fWIsvzjeEK6ypA3/liB7ERX4/78d3xxhCdktZvP5ntBUhc01512IisrKkJOvRT1nsLim
+         4zf6npsgl5BSIiLPnmdAWMQOMiIFOrRjshjqLTHjD4ljCtAuAHfBspUmrOhCJ2Qvu+8l
+         f+7VP5JhAnZ2Dl/rBUbJZCpKJwInOiy3kWAw1ouZWcPSRYfnZ+gXIubifaB/lQvrIpYk
+         5cDP/+eZFlYc95Xa687ipNVUXIYnkqBHn39zHOSF2h2ntqx4CsyEtEFtDV2syLgGBO3t
+         gwXg==
+X-Gm-Message-State: AOAM530B3y/cCNPklmTWaZmxwFzWL6NFSHtztVoimWeRRbtLl5NcSvZD
+        u2xjd3UgRY76YZrrWE1FEUI16l9dv476s/DlJt9Z6m0PhAv0L8mEcUIIjBESGtbBTU0SFQEL4oS
+        TrHwPKUqMTEsS
+X-Received: by 2002:a17:907:8a01:b0:6ff:3eab:9dfa with SMTP id sc1-20020a1709078a0100b006ff3eab9dfamr20580697ejc.467.1654072752024;
+        Wed, 01 Jun 2022 01:39:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjUDvptsflZlmEnATV7LNhRKIXP6t0S1OgAvGO5fU2wwcWAFOoBLNlq3tKHCuMQEw6dGIqkA==
+X-Received: by 2002:a17:907:8a01:b0:6ff:3eab:9dfa with SMTP id sc1-20020a1709078a0100b006ff3eab9dfamr20580681ejc.467.1654072751795;
+        Wed, 01 Jun 2022 01:39:11 -0700 (PDT)
 Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 4-20020a170906310400b00705976bcd01sm415340ejx.206.2022.06.01.01.31.50
+        by smtp.gmail.com with ESMTPSA id cq16-20020a056402221000b0042dd022787esm594062edb.6.2022.06.01.01.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 01:31:50 -0700 (PDT)
+        Wed, 01 Jun 2022 01:39:11 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Wanpeng Li <wanpengli@tencent.com>,
@@ -61,13 +61,12 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
         Robert Dinse <nanook@eskimo.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 7/8] KVM: x86: Bug the VM if the emulator generates a
- bogus exception vector
-In-Reply-To: <20220526210817.3428868-8-seanjc@google.com>
+Subject: Re: [PATCH v2 8/8] KVM: x86: Bug the VM on an out-of-bounds data read
+In-Reply-To: <20220526210817.3428868-9-seanjc@google.com>
 References: <20220526210817.3428868-1-seanjc@google.com>
- <20220526210817.3428868-8-seanjc@google.com>
-Date:   Wed, 01 Jun 2022 10:31:49 +0200
-Message-ID: <87leugokcq.fsf@redhat.com>
+ <20220526210817.3428868-9-seanjc@google.com>
+Date:   Wed, 01 Jun 2022 10:39:10 +0200
+Message-ID: <87ilpkok0h.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -82,51 +81,32 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Sean Christopherson <seanjc@google.com> writes:
 
-> Bug the VM if KVM's emulator attempts to inject a bogus exception vector.
-> The guest is likely doomed even if KVM continues on, and propagating a
-> bad vector to the rest of KVM runs the risk of breaking other assumptions
-> in KVM and thus triggering a more egregious bug.
->
-> All existing users of emulate_exception() have hardcoded vector numbers
-> (__load_segment_descriptor() uses a few different vectors, but they're
-> all hardcoded), and future users are likely to follow suit, i.e. the
-> change to emulate_exception() is a glorified nop.
->
-> As for the ctxt->exception.vector check in x86_emulate_insn(), the few
-> known times the WARN has been triggered in the past is when the field was
-> not set when synthesizing a fault, i.e. for all intents and purposes the
-> check protects against consumption of uninitialized data.
+> Bug the VM and terminate emulation if an out-of-bounds read into the
+> emulator's data cache occurs.  Knowingly contuining on all but guarantees
+> that KVM will overwrite random kernel data, which is far, far worse than
+> killing the VM.
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/emulate.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/emulate.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
 > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 70a8e0cd9fdc..2aa17462a9ac 100644
+> index 2aa17462a9ac..39ea9138224c 100644
 > --- a/arch/x86/kvm/emulate.c
 > +++ b/arch/x86/kvm/emulate.c
-> @@ -624,7 +624,9 @@ static unsigned long seg_base(struct x86_emulate_ctxt *ctxt, int seg)
->  static int emulate_exception(struct x86_emulate_ctxt *ctxt, int vec,
->  			     u32 error, bool valid)
->  {
-> -	WARN_ON(vec > 0x1f);
-> +	if (KVM_EMULATOR_BUG_ON(vec > 0x1f, ctxt))
-> +		return X86EMUL_UNHANDLEABLE;
-> +
->  	ctxt->exception.vector = vec;
->  	ctxt->exception.error_code = error;
->  	ctxt->exception.error_code_valid = valid;
-> @@ -5728,7 +5730,8 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
+> @@ -1373,7 +1373,8 @@ static int read_emulated(struct x86_emulate_ctxt *ctxt,
+>  	if (mc->pos < mc->end)
+>  		goto read_cached;
 >  
->  done:
->  	if (rc == X86EMUL_PROPAGATE_FAULT) {
-> -		WARN_ON(ctxt->exception.vector > 0x1f);
-> +		if (KVM_EMULATOR_BUG_ON(ctxt->exception.vector > 0x1f, ctxt))
-> +			return EMULATION_FAILED;
->  		ctxt->have_exception = true;
->  	}
->  	if (rc == X86EMUL_INTERCEPTED)
+> -	WARN_ON((mc->end + size) >= sizeof(mc->data));
+> +	if (KVM_EMULATOR_BUG_ON((mc->end + size) >= sizeof(mc->data), ctxt))
+> +		return X86EMUL_UNHANDLEABLE;
+>  
+>  	rc = ctxt->ops->read_emulated(ctxt, addr, mc->data + mc->end, size,
+>  				      &ctxt->exception);
+
+The last WARN_ON() is gone, cool)
 
 Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
