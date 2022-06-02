@@ -2,191 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CC4C53B252
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 05:54:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 569B853B2B7
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 06:27:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbiFBDx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jun 2022 23:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53500 "EHLO
+        id S229784AbiFBE0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 00:26:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbiFBDx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jun 2022 23:53:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 28D6F24F21
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 20:53:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654142033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3nhZSbN+Ew1mV2HyhEGIhPum4yYB0PCOS8RQvOZHGfg=;
-        b=EbueC4Ek4SCHEGKpbe9TcZm+cERk+MjUTz5qx/k68szCuMilSg+eJiApbVfxBpfvW26F57
-        uonwI+lctnkHvExVgLTJRTExWqPXcuJT7GXnHvX2bDV/dHvNZuEW4NuAN5ZAD8ue/UD1ue
-        SG+KaQeDk50O1G8n3dbJ9uOx2Ji4tMk=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-589-CjwwZCOhPGqeKGx0ziQNDA-1; Wed, 01 Jun 2022 23:53:52 -0400
-X-MC-Unique: CjwwZCOhPGqeKGx0ziQNDA-1
-Received: by mail-lf1-f70.google.com with SMTP id s12-20020a056512202c00b00478f00fcb3dso1891409lfs.7
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 20:53:51 -0700 (PDT)
+        with ESMTP id S229621AbiFBE0m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 00:26:42 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5554D259CD7
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 21:26:41 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id nn3-20020a17090b38c300b001e0e091cf03so5118557pjb.1
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 21:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
+        h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+         :content-transfer-encoding;
+        bh=07OKdl+NR+lEY+BPv6L1IZEtN57lA0Mz6uUlDluxQyE=;
+        b=Qrmeo5c948/IdijZouKusOBj8+3ApTb48cCYu5OOEdxGq7X+xEraJzHzO9puKeByBf
+         P13j9MpgJWHCXk9eZQ/Diw53LN4YtWN5svBN4a9aApyyPK6fDxbGdSzss6G4Sehyr+59
+         BUw/GFmNdhx3Kzr6rUp8kzFfFiNcvOfmhKJ8c9TgACi0J8q944ZjJd18oJiAzOctnRcA
+         b61rR7COJEsB/u2FtIwsne+MVvw/eetYgYmIfsCLlR9rlHHKDF59TtMqmXa2bV/338Yg
+         9xKys9CoZ+t+obTEHMx4ZaG8nWD5Qd6+iSnehoCUS+7x7BQqN3RlGJZaqCs0yR7ZFVMz
+         wA9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3nhZSbN+Ew1mV2HyhEGIhPum4yYB0PCOS8RQvOZHGfg=;
-        b=A3aw0FeFCx3u6GjFbyfuUWl0M78I4NBS9ujwOsNcsklJbHaVBbi9/X/gJ2qf/Q97Ab
-         32WNJdId/0v6kIoVtvwyfwmPr5v0dF/qOanXXMykUS/s2FHXrHHwymSYB8diXvWpj7Gh
-         NXZx49ZnjQgRGc/K0iNNNayBKFaCi5W0bx0Om/B6OJj7dYHW7okOB80hbviL4g1HU+k/
-         G9KEiP+3mGmFCSXZG5Ss16oRAlDq7oFjuAhizOdlpiycWBU56AQsOO781jBABLbIrFYd
-         DyZ8dTlfrpCx8e+uTEM/0abTLzUH48GigLyKVEdO7jR+Q15iCldNbvWepejI31h7gNxJ
-         fBog==
-X-Gm-Message-State: AOAM532EvjC76K3aJoN0BYYBM23pNu2H0o9No9QPf1imeFoAEZpjQAiZ
-        ZZddmSyD3w8WgqpIEPLBzy5jEu4PmK3pPrbSw+rrjPjl0RtZXkbKzDotbvoLn7ywM1rwoAuML2G
-        JTT58YZnFHCYEOp5pt68j4dKljZi0
-X-Received: by 2002:a2e:910e:0:b0:255:4a7e:b42e with SMTP id m14-20020a2e910e000000b002554a7eb42emr13517235ljg.492.1654142030614;
-        Wed, 01 Jun 2022 20:53:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJM9qe1ZzH7Y7RYWXggUuk3BevCy6i+Cbv2/YzP3wdLzlzwEekNr9HqR9L31QhUD0/KMuoWmCNycyMXglwQmk=
-X-Received: by 2002:a2e:910e:0:b0:255:4a7e:b42e with SMTP id
- m14-20020a2e910e000000b002554a7eb42emr13517199ljg.492.1654142030349; Wed, 01
- Jun 2022 20:53:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220526124338.36247-1-eperezma@redhat.com> <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20220527065442-mutt-send-email-mst@kernel.org> <CACGkMEubfv_OJOsJ_ROgei41Qx4mPO0Xz8rMVnO8aPFiEqr8rA@mail.gmail.com>
- <PH0PR12MB5481695930E7548BAAF1B0D9DCDC9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEsSKF_MyLgFdzVROptS3PCcp1y865znLWgnzq9L7CpFVQ@mail.gmail.com>
- <PH0PR12MB5481CAA3F57892FF7F05B004DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEsJJL34iUYQMxHguOV2cQ7rts+hRG5Gp3XKCGuqNdnNQg@mail.gmail.com> <PH0PR12MB5481D099A324C91DAF01259BDCDE9@PH0PR12MB5481.namprd12.prod.outlook.com>
-In-Reply-To: <PH0PR12MB5481D099A324C91DAF01259BDCDE9@PH0PR12MB5481.namprd12.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 2 Jun 2022 11:53:39 +0800
-Message-ID: <CACGkMEueG76L8H+F70D=T5kjK_+J68ARNQmQQo51rq3CfcOdRA@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
-To:     Parav Pandit <parav@nvidia.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "martinh@xilinx.com" <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "martinpo@xilinx.com" <martinpo@xilinx.com>,
-        "lvivier@redhat.com" <lvivier@redhat.com>,
-        "pabloc@xilinx.com" <pabloc@xilinx.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-        "gautam.dawar@amd.com" <gautam.dawar@amd.com>,
-        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
-        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "dinang@xilinx.com" <dinang@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+         :mime-version:content-transfer-encoding;
+        bh=07OKdl+NR+lEY+BPv6L1IZEtN57lA0Mz6uUlDluxQyE=;
+        b=eBGClHh9+tDtHojFJluGEDvmz4PNlBax/36WdVTWHum45ZH6MgvYxf/G0L5Ka0MqtI
+         HuN1CqwsggwxlTj9P20BUnpfYTXyqlEZAJ3+Oz+DJoa4T24mu1VjuGALoeO3cUaMXFMQ
+         /QQrKg/IN6DBchOfKOiOJ8YCJkiFsMbGkNg3hpad0wIxooZJIRvxezWTeMdASZhzku6g
+         7wsxOuAoweBBLUPe0EKtK+xf6E1QLABkAO+etqOovAYqhjYdg7gMSYwxsJxMz6a+USua
+         fn8ucn4o96lAwxp+z6655QbArsAueB9TsrTqCEUw0QBFVpo6wXnxsIg1atS73ijfjjZS
+         KGMg==
+X-Gm-Message-State: AOAM531C78uphw7eIr495bwoT88cbN0cuNiiu6Axd9+nEYMVjQuJKZW5
+        qsTOUFE0Jh3De4RGt5BOzGle/+ICFBnSyw==
+X-Google-Smtp-Source: ABdhPJxJZEw2/wu1mLFm7uXm2h9zayuqLLNGNyNu5dUcwkEWMsKxztPJejEVkOOycK4a8cW19zPQeA==
+X-Received: by 2002:a17:90a:aa8c:b0:1df:359a:1452 with SMTP id l12-20020a17090aaa8c00b001df359a1452mr3057296pjq.75.1654144000765;
+        Wed, 01 Jun 2022 21:26:40 -0700 (PDT)
+Received: from localhost ([12.3.194.138])
+        by smtp.gmail.com with ESMTPSA id 137-20020a63018f000000b003fbfd5e4ddcsm2218899pgb.75.2022.06.01.21.26.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jun 2022 21:26:40 -0700 (PDT)
+Date:   Wed, 01 Jun 2022 21:26:40 -0700 (PDT)
+X-Google-Original-Date: Wed, 01 Jun 2022 21:26:06 PDT (-0700)
+Subject:     (RISC-V KVM) Re: [PATCH] RISC-V: fix typos in comments
+In-Reply-To: <20220430191122.8667-6-Julia.Lawall@inria.fr>
+CC:     kernel-janitors@vger.kernel.org, atishp@atishpatra.org,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     Julia.Lawall@inria.fr, anup@brainfault.org
+Message-ID: <mhng-523319d8-fda9-4737-9c43-d54bcfd7a7f2@palmer-ri-x1c9>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 2, 2022 at 10:59 AM Parav Pandit <parav@nvidia.com> wrote:
+On Sat, 30 Apr 2022 12:11:20 PDT (-0700), Julia.Lawall@inria.fr wrote:
+> Various spelling mistakes in comments.
+> Detected with the help of Coccinelle.
 >
+> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 >
-> > From: Jason Wang <jasowang@redhat.com>
-> > Sent: Wednesday, June 1, 2022 10:00 PM
-> >
-> > On Thu, Jun 2, 2022 at 2:58 AM Parav Pandit <parav@nvidia.com> wrote:
-> > >
-> > >
-> > > > From: Jason Wang <jasowang@redhat.com>
-> > > > Sent: Tuesday, May 31, 2022 10:42 PM
-> > > >
-> > > > Well, the ability to query the virtqueue state was proposed as
-> > > > another feature (Eugenio, please correct me). This should be
-> > > > sufficient for making virtio-net to be live migrated.
-> > > >
-> > > The device is stopped, it won't answer to this special vq config done here.
-> >
-> > This depends on the definition of the stop. Any query to the device state
-> > should be allowed otherwise it's meaningless for us.
-> >
-> > > Programming all of these using cfg registers doesn't scale for on-chip
-> > memory and for the speed.
-> >
-> > Well, they are orthogonal and what I want to say is, we should first define
-> > the semantics of stop and state of the virtqueue.
-> >
-> > Such a facility could be accessed by either transport specific method or admin
-> > virtqueue, it totally depends on the hardware architecture of the vendor.
-> >
-> I find it hard to believe that a vendor can implement a CVQ but not AQ and chose to expose tens of hundreds of registers.
-> But maybe, it fits some specific hw.
-
-You can have a look at the ifcvf dpdk driver as an example.
-
-But another thing that is unrelated to hardware architecture is the
-nesting support. Having admin virtqueue in a nesting environment looks
-like an overkill. Presenting a register in L1 and map it to L0's admin
-should be good enough.
-
+> ---
+>  arch/riscv/kvm/vmid.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> I like to learn the advantages of such method other than simplicity.
->
-> We can clearly that we are shifting away from such PCI registers with SIOV, IMS and other scalable solutions.
-> virtio drifting in reverse direction by introducing more registers as transport.
-> I expect it to an optional transport like AQ.
+> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+> index 2fa4f7b1813d..4a2178c60b5d 100644
+> --- a/arch/riscv/kvm/vmid.c
+> +++ b/arch/riscv/kvm/vmid.c
+> @@ -92,7 +92,7 @@ void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu)
+>  		 * We ran out of VMIDs so we increment vmid_version and
+>  		 * start assigning VMIDs from 1.
+>  		 *
+> -		 * This also means existing VMIDs assignement to all Guest
+> +		 * This also means existing VMIDs assignment to all Guest
+>  		 * instances is invalid and we have force VMID re-assignement
+>  		 * for all Guest instances. The Guest instances that were not
+>  		 * running will automatically pick-up new VMIDs because will
 
-Actually, I had a proposal of using admin virtqueue as a transport,
-it's designed to be SIOV/IMS capable. And it's not hard to extend it
-with the state/stop support etc.
+Anup: I'm guessing you didn't see this because it didn't have KVM in the 
+subject?
 
->
-> > >
-> > > Next would be to program hundreds of statistics of the 64 VQs through a
-> > giant PCI config space register in some busy polling scheme.
-> >
-> > We don't need giant config space, and this method has been implemented
-> > by some vDPA vendors.
-> >
-> There are tens of 64-bit counters per VQs. These needs to programmed on destination side.
-> Programming these via registers requires exposing them on the registers.
-> In one of the proposals, I see them being queried via CVQ from the device.
+Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
 
-I didn't see a proposal like this. And I don't think querying general
-virtio state like idx with a device specific CVQ is a good design.
-
->
-> Programming them via cfg registers requires large cfg space or synchronous programming until receiving ACK from it.
-> This means one entry at a time...
->
-> Programming them via CVQ needs replicate and align cmd values etc on all device types. All duplicate and hard to maintain.
->
->
-> > >
-> > > I can clearly see how all these are inefficient for faster LM.
-> > > We need an efficient AQ to proceed with at minimum.
-> >
-> > I'm fine with admin virtqueue, but the stop and state are orthogonal to that.
-> > And using admin virtqueue for stop/state will be more natural if we use
-> > admin virtqueue as a transport.
-> Ok.
-> We should have defined it bit earlier that all vendors can use. :(
-
-I agree.
-
-Thanks
-
+if that helps any, I don't see in anywhere but not sure if I'm just 
+missing it.
