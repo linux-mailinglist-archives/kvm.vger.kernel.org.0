@@ -2,87 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 228FC53BD2F
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 19:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C8CA53BD3B
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 19:20:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237481AbiFBRUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 13:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56244 "EHLO
+        id S237507AbiFBRU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 13:20:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237440AbiFBRUB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 13:20:01 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BDB020E6DD;
-        Thu,  2 Jun 2022 10:20:00 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 252HA1GN018327;
+        with ESMTP id S237466AbiFBRUG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 13:20:06 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25B6120ED5E;
+        Thu,  2 Jun 2022 10:20:05 -0700 (PDT)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 252FFKx2015514;
         Thu, 2 Jun 2022 17:19:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=hQS2awytVaLrRcLwusX4Naj8p/4VeHtYBOnKSbkHHsI=;
- b=LtU3Hid+oe9opKVcALAkgc3pk69G43jjPiqjZGq02bYRbabwcQF9qj9SxUu4QnFEzEv6
- B98xUyGMZ8r6XC708xnDS5Gtoqmo6AiCuYP6OtQrpVBKVaiyravf3Qbo8R0SDuyGIyAh
- iEPhbD1EzDpG+9ZwoVwHmQoj6XGMnsCNnj6jfmALb0RJfdiEnbPfAtz3IAhRdEN/cW5m
- YHggwLhqPBvfzNmAivcaGzGTlAfcnlapSgKNcS4v7NXEd4d7wtoqzyZx+DKDPShM3pom
- qoBfxUUJRHjWdWxThZPfK3wF3uWuHZC0ipgi8zvUJYRAa4q+thGhUd2cVbX4OvSLKVt0 MQ== 
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=hUfScC0g2XWH5ZvTkbfOIeWuDqLh6nYqV7Yx2EeH6jg=;
+ b=jvtpUyvrLYANw7X+1WCDYBpAV5U+/l8cNFZTGHptq7EDvgVjOT+1hqJlTd6DK75walYg
+ zacdxkoowOaD5pNXgtQIzEfaJVvi5MwNauFkoyQ4rtrEkW/JrfQjRh/LCPbFIddA0Vsu
+ 7cWseJ0dwmBv6855ihrMrLLSiDAXc2PV6fqxFl5+B28qb6xs6sYDAib8iocICYIz1P7e
+ bIv3QhiD3ZnWGKkZ8LefQ1wClptHjSN8yqRqvjUaSguUx++eDHV5CXEKh4qzH6SIVnaG
+ aQQWrVXU80iVp5wBgTnaoMrZ8n/Q97pTogX8pyXltvAvOuuJBShWk854bORUo6AgJJNl Yg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gewxgcm54-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3geypha6e5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 02 Jun 2022 17:19:57 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 252GdJXe003520;
-        Thu, 2 Jun 2022 17:19:57 GMT
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 252H59MD024779;
+        Thu, 2 Jun 2022 17:19:56 GMT
 Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gewxgcm4g-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3geypha6dk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 02 Jun 2022 17:19:56 +0000
 Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 252H5d4I023584;
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 252H53jK023144;
         Thu, 2 Jun 2022 17:19:54 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gbc7h7bxx-1
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3gbc7h7by2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 02 Jun 2022 17:19:54 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 252HJpQZ47645124
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 252HJpAX24052202
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 2 Jun 2022 17:19:51 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66299A405B;
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65DEDA404D;
         Thu,  2 Jun 2022 17:19:51 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44BDAA4054;
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47034A4040;
         Thu,  2 Jun 2022 17:19:51 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Thu,  2 Jun 2022 17:19:51 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id C82B3E126F; Thu,  2 Jun 2022 19:19:50 +0200 (CEST)
+        id CB7B9E1277; Thu,  2 Jun 2022 19:19:50 +0200 (CEST)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Matthew Rosato <mjrosato@linux.ibm.com>
 Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Liu Yi L <yi.l.liu@intel.com>,
         Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v1 12/18] vfio/ccw: Move FSM open/close to MDEV open/close
-Date:   Thu,  2 Jun 2022 19:19:42 +0200
-Message-Id: <20220602171948.2790690-13-farman@linux.ibm.com>
+        linux-s390@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH v1 13/18] vfio/mdev: Consolidate all the device_api sysfs into the core code
+Date:   Thu,  2 Jun 2022 19:19:43 +0200
+Message-Id: <20220602171948.2790690-14-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220602171948.2790690-1-farman@linux.ibm.com>
 References: <20220602171948.2790690-1-farman@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wA4MyaEvka9TgKXV_z80D8hKyB5zwbRZ
-X-Proofpoint-ORIG-GUID: uK8p1cvV1vu5KFntpJKJtPVePrv9EbnH
+X-Proofpoint-ORIG-GUID: vw6u-7JXTdHmerovcXcg5SH6o7rR-c6Y
+X-Proofpoint-GUID: ne-zoUtARXpi_QZ2SS2bK4qVMdgMplAs
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-02_05,2022-06-02_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- suspectscore=0 mlxlogscore=999 lowpriorityscore=0 adultscore=0 mlxscore=0
- spamscore=0 bulkscore=0 malwarescore=0 priorityscore=1501 clxscore=1015
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ impostorscore=0 clxscore=1011 lowpriorityscore=0 spamscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
  definitions=main-2206020071
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -94,238 +101,348 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Part of the confusion that has existed is the FSM lifecycle of
-subchannels between the common CSS driver and the vfio-ccw driver.
-During configuration, the FSM state goes from NOT_OPER to STANDBY
-to IDLE, but then back to NOT_OPER. For example:
+From: Jason Gunthorpe <jgg@nvidia.com>
 
-	vfio_ccw_sch_probe:		VFIO_CCW_STATE_NOT_OPER
-	vfio_ccw_sch_probe:		VFIO_CCW_STATE_STANDBY
-	vfio_ccw_mdev_probe:		VFIO_CCW_STATE_IDLE
-	vfio_ccw_mdev_remove:		VFIO_CCW_STATE_NOT_OPER
-	vfio_ccw_sch_remove:		VFIO_CCW_STATE_NOT_OPER
-	vfio_ccw_sch_shutdown:		VFIO_CCW_STATE_NOT_OPER
+Every driver just emits a static string, simply feed it through the ops
+and provide a standard sysfs show function.
 
-Rearrange the open/close events to align with the mdev open/close,
-to better manage the memory and state of the devices as time
-progresses. Specifically, make mdev_open() perform the FSM open,
-and mdev_close() perform the FSM close instead of reset (which is
-both close and open).
-
-This makes the NOT_OPER state a dead-end path, indicating the
-device is probably not recoverable without fully probing and
-re-configuring the device.
-
-This has the nice side-effect of removing a number of special-cases
-where the FSM state is managed outside of the FSM itself (such as
-the aforementioned mdev_close() routine).
-
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: Zhi Wang <zhi.a.wang@intel.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Jason Herne <jjherne@linux.ibm.com>
+Cc: intel-gvt-dev@lists.freedesktop.org
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Link: https://lore.kernel.org/r/6-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com/
+[farman: added Cc: tags]
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_drv.c | 11 +++--------
- drivers/s390/cio/vfio_ccw_fsm.c | 30 ++++++++++++++++++++++--------
- drivers/s390/cio/vfio_ccw_ops.c | 26 +++++++++++---------------
- 3 files changed, 36 insertions(+), 31 deletions(-)
+ .../driver-api/vfio-mediated-device.rst       |  4 ++-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  9 +------
+ drivers/s390/cio/vfio_ccw_ops.c               |  9 +------
+ drivers/s390/crypto/vfio_ap_ops.c             |  9 +------
+ drivers/vfio/mdev/mdev_core.c                 |  2 +-
+ drivers/vfio/mdev/mdev_sysfs.c                | 27 ++++++++++++++++---
+ include/linux/mdev.h                          |  7 ++---
+ samples/vfio-mdev/mbochs.c                    |  9 +------
+ samples/vfio-mdev/mdpy.c                      |  9 +------
+ samples/vfio-mdev/mtty.c                      | 10 +------
+ 10 files changed, 36 insertions(+), 59 deletions(-)
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 34995ad00332..e4b285953a45 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -143,7 +143,7 @@ static struct vfio_ccw_private *vfio_ccw_alloc_private(struct subchannel *sch)
+diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+index 9f26079cacae..f410a1cd98bb 100644
+--- a/Documentation/driver-api/vfio-mediated-device.rst
++++ b/Documentation/driver-api/vfio-mediated-device.rst
+@@ -137,6 +137,7 @@ The structures in the mdev_parent_ops structure are as follows:
+ * mdev_attr_groups: attributes of the mediated device
+ * supported_config: attributes to define supported configurations
+ * device_driver: device driver to bind for mediated device instances
++* device_api: String to pass through the sysfs file below
  
- 	private->sch = sch;
- 	mutex_init(&private->io_mutex);
--	private->state = VFIO_CCW_STATE_NOT_OPER;
-+	private->state = VFIO_CCW_STATE_STANDBY;
- 	INIT_LIST_HEAD(&private->crw);
- 	INIT_WORK(&private->io_work, vfio_ccw_sch_io_todo);
- 	INIT_WORK(&private->crw_work, vfio_ccw_crw_todo);
-@@ -227,21 +227,15 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ The mdev_parent_ops also still has various functions pointers.  Theses exist
+ for historical reasons only and shall not be used for new drivers.
+@@ -225,7 +226,8 @@ Directories and files under the sysfs for Each Physical Device
+ * device_api
  
- 	dev_set_drvdata(&sch->dev, private);
+   This attribute should show which device API is being created, for example,
+-  "vfio-pci" for a PCI device.
++  "vfio-pci" for a PCI device. The core code maintins this sysfs using the
++  device_api member of mdev_parent_ops.
  
--	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
--	if (private->state == VFIO_CCW_STATE_NOT_OPER)
--		goto out_free;
+ * available_instances
+ 
+diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+index 057ec4490104..752d7a1211e6 100644
+--- a/drivers/gpu/drm/i915/gvt/kvmgt.c
++++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+@@ -163,12 +163,6 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+ 	return sprintf(buf, "%u\n", num);
+ }
+ 
+-static ssize_t device_api_show(struct mdev_type *mtype,
+-			       struct mdev_type_attribute *attr, char *buf)
+-{
+-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+-}
 -
- 	ret = mdev_register_device(&sch->dev, &vfio_ccw_mdev_ops);
- 	if (ret)
--		goto out_disable;
-+		goto out_free;
- 
- 	VFIO_CCW_MSG_EVENT(4, "bound to subchannel %x.%x.%04x\n",
- 			   sch->schid.cssid, sch->schid.ssid,
- 			   sch->schid.sch_no);
- 	return 0;
- 
--out_disable:
--	cio_disable_subchannel(sch);
- out_free:
- 	dev_set_drvdata(&sch->dev, NULL);
- 	vfio_ccw_free_private(private);
-@@ -275,6 +269,7 @@ static void vfio_ccw_sch_shutdown(struct subchannel *sch)
- 		return;
- 
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
+ static ssize_t description_show(struct mdev_type *mtype,
+ 				struct mdev_type_attribute *attr, char *buf)
+ {
+@@ -202,13 +196,11 @@ static ssize_t name_show(struct mdev_type *mtype,
  }
  
- /**
-diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-index 926ae618c3fa..7ec64c1e076c 100644
---- a/drivers/s390/cio/vfio_ccw_fsm.c
-+++ b/drivers/s390/cio/vfio_ccw_fsm.c
-@@ -171,6 +171,7 @@ static void fsm_notoper(struct vfio_ccw_private *private,
- 	 */
- 	css_sched_sch_todo(sch, SCH_TODO_UNREG);
- 	private->state = VFIO_CCW_STATE_NOT_OPER;
-+	cp_free(&private->cp);
- }
+ static MDEV_TYPE_ATTR_RO(available_instances);
+-static MDEV_TYPE_ATTR_RO(device_api);
+ static MDEV_TYPE_ATTR_RO(description);
+ static MDEV_TYPE_ATTR_RO(name);
  
- /*
-@@ -376,9 +377,16 @@ static void fsm_open(struct vfio_ccw_private *private,
- 	spin_lock_irq(sch->lock);
- 	sch->isc = VFIO_CCW_ISC;
- 	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
--	if (!ret)
--		private->state = VFIO_CCW_STATE_STANDBY;
-+	if (ret)
-+		goto err_unlock;
-+
-+	private->state = VFIO_CCW_STATE_IDLE;
- 	spin_unlock_irq(sch->lock);
-+	return;
-+
-+err_unlock:
-+	spin_unlock_irq(sch->lock);
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
- }
+ static struct attribute *gvt_type_attrs[] = {
+ 	&mdev_type_attr_available_instances.attr,
+-	&mdev_type_attr_device_api.attr,
+ 	&mdev_type_attr_description.attr,
+ 	&mdev_type_attr_name.attr,
+ 	NULL,
+@@ -1767,6 +1759,7 @@ static const struct attribute_group *intel_vgpu_groups[] = {
  
- static void fsm_close(struct vfio_ccw_private *private,
-@@ -390,16 +398,22 @@ static void fsm_close(struct vfio_ccw_private *private,
- 	spin_lock_irq(sch->lock);
+ static struct mdev_parent_ops intel_vgpu_ops = {
+ 	.mdev_attr_groups       = intel_vgpu_groups,
++	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+ 	.create			= intel_vgpu_create,
+ 	.remove			= intel_vgpu_remove,
  
- 	if (!sch->schib.pmcw.ena)
--		goto out_unlock;
-+		goto err_unlock;
- 
- 	ret = cio_disable_subchannel(sch);
- 	if (ret == -EBUSY)
- 		vfio_ccw_sch_quiesce(sch);
-+	if (ret)
-+		goto err_unlock;
- 
--out_unlock:
--	private->state = VFIO_CCW_STATE_NOT_OPER;
-+	private->state = VFIO_CCW_STATE_STANDBY;
- 	spin_unlock_irq(sch->lock);
- 	cp_free(&private->cp);
-+	return;
-+
-+err_unlock:
-+	spin_unlock_irq(sch->lock);
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
- }
- 
- /*
-@@ -411,15 +425,15 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
- 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
- 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
- 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
--		[VFIO_CCW_EVENT_OPEN]		= fsm_open,
-+		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
- 		[VFIO_CCW_EVENT_CLOSE]		= fsm_nop,
- 	},
- 	[VFIO_CCW_STATE_STANDBY] = {
- 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
- 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
- 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
--		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
--		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
-+		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
-+		[VFIO_CCW_EVENT_OPEN]		= fsm_open,
- 		[VFIO_CCW_EVENT_CLOSE]		= fsm_notoper,
- 	},
- 	[VFIO_CCW_STATE_IDLE] = {
 diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 386eb74ce219..2afb8f13739f 100644
+index 2afb8f13739f..6793c8b3c58b 100644
 --- a/drivers/s390/cio/vfio_ccw_ops.c
 +++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -24,17 +24,12 @@ static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
- 	/*
- 	 * If the FSM state is seen as Not Operational after closing
- 	 * and re-opening the mdev, return an error.
--	 *
--	 * Otherwise, change the FSM from STANDBY to IDLE which is
--	 * normally done by vfio_ccw_mdev_probe() in current lifecycle.
- 	 */
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
- 	if (private->state == VFIO_CCW_STATE_NOT_OPER)
+@@ -66,13 +66,6 @@ static ssize_t name_show(struct mdev_type *mtype,
+ }
+ static MDEV_TYPE_ATTR_RO(name);
+ 
+-static ssize_t device_api_show(struct mdev_type *mtype,
+-			       struct mdev_type_attribute *attr, char *buf)
+-{
+-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_CCW_STRING);
+-}
+-static MDEV_TYPE_ATTR_RO(device_api);
+-
+ static ssize_t available_instances_show(struct mdev_type *mtype,
+ 					struct mdev_type_attribute *attr,
+ 					char *buf)
+@@ -86,7 +79,6 @@ static MDEV_TYPE_ATTR_RO(available_instances);
+ 
+ static struct attribute *mdev_types_attrs[] = {
+ 	&mdev_type_attr_name.attr,
+-	&mdev_type_attr_device_api.attr,
+ 	&mdev_type_attr_available_instances.attr,
+ 	NULL,
+ };
+@@ -644,5 +636,6 @@ struct mdev_driver vfio_ccw_mdev_driver = {
+ const struct mdev_parent_ops vfio_ccw_mdev_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.device_driver		= &vfio_ccw_mdev_driver,
++	.device_api		= VFIO_DEVICE_API_CCW_STRING,
+ 	.supported_type_groups  = mdev_type_groups,
+ };
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 6e08d04b605d..838b1a3eac8a 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -530,17 +530,9 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+ 
+ static MDEV_TYPE_ATTR_RO(available_instances);
+ 
+-static ssize_t device_api_show(struct mdev_type *mtype,
+-			       struct mdev_type_attribute *attr, char *buf)
+-{
+-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_AP_STRING);
+-}
+-
+-static MDEV_TYPE_ATTR_RO(device_api);
+ 
+ static struct attribute *vfio_ap_mdev_type_attrs[] = {
+ 	&mdev_type_attr_name.attr,
+-	&mdev_type_attr_device_api.attr,
+ 	&mdev_type_attr_available_instances.attr,
+ 	NULL,
+ };
+@@ -1501,6 +1493,7 @@ static struct mdev_driver vfio_ap_matrix_driver = {
+ static const struct mdev_parent_ops vfio_ap_matrix_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.device_driver		= &vfio_ap_matrix_driver,
++	.device_api		= VFIO_DEVICE_API_AP_STRING,
+ 	.supported_type_groups	= vfio_ap_mdev_type_groups,
+ };
+ 
+diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+index b314101237fe..c3018e8e6d32 100644
+--- a/drivers/vfio/mdev/mdev_core.c
++++ b/drivers/vfio/mdev/mdev_core.c
+@@ -129,7 +129,7 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+ 	char *envp[] = { env_string, NULL };
+ 
+ 	/* check for mandatory ops */
+-	if (!ops || !ops->supported_type_groups)
++	if (!ops || !ops->supported_type_groups || !ops->device_api)
  		return -EINVAL;
+ 	if (!ops->device_driver && (!ops->create || !ops->remove))
+ 		return -EINVAL;
+diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
+index f5cf1931c54e..d4b99440d19e 100644
+--- a/drivers/vfio/mdev/mdev_sysfs.c
++++ b/drivers/vfio/mdev/mdev_sysfs.c
+@@ -74,9 +74,30 @@ static ssize_t create_store(struct mdev_type *mtype,
  
--	private->state = VFIO_CCW_STATE_IDLE;
--
- 	return 0;
+ 	return count;
  }
- 
-@@ -121,8 +116,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- 	vfio_init_group_dev(&private->vdev, &mdev->dev,
- 			    &vfio_ccw_dev_ops);
- 
--	private->state = VFIO_CCW_STATE_IDLE;
 -
- 	VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: create\n",
- 			   private->sch->schid.cssid,
- 			   private->sch->schid.ssid,
-@@ -137,7 +130,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- err_atomic:
- 	vfio_uninit_group_dev(&private->vdev);
- 	atomic_inc(&private->avail);
--	private->state = VFIO_CCW_STATE_STANDBY;
- 	return ret;
- }
+ static MDEV_TYPE_ATTR_WO(create);
  
-@@ -169,6 +161,10 @@ static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
- 	unsigned long events = VFIO_IOMMU_NOTIFY_DMA_UNMAP;
- 	int ret;
- 
-+	/* Device cannot simply be opened again from this state */
-+	if (private->state == VFIO_CCW_STATE_NOT_OPER)
-+		return -EINVAL;
++static ssize_t device_api_show(struct mdev_type *mtype,
++			       struct mdev_type_attribute *attr, char *buf)
++{
++	return sysfs_emit(buf, "%s\n", mtype->parent->ops->device_api);
++}
++static MDEV_TYPE_ATTR_RO(device_api);
 +
- 	private->nb.notifier_call = vfio_ccw_mdev_notifier;
++static struct attribute *mdev_types_std_attrs[] = {
++	&mdev_type_attr_create.attr,
++	&mdev_type_attr_device_api.attr,
++	NULL,
++};
++
++static struct attribute_group mdev_type_std_group = {
++	.attrs = mdev_types_std_attrs,
++};
++
++static const struct attribute_group *mdev_type_groups[] = {
++	&mdev_type_std_group,
++	NULL,
++};
++
+ static void mdev_type_release(struct kobject *kobj)
+ {
+ 	struct mdev_type *type = to_mdev_type(kobj);
+@@ -123,7 +144,7 @@ static struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
+ 		return ERR_PTR(ret);
+ 	}
  
- 	ret = vfio_register_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
-@@ -188,6 +184,12 @@ static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
+-	ret = sysfs_create_file(&type->kobj, &mdev_type_attr_create.attr);
++	ret = sysfs_create_groups(&type->kobj, mdev_type_groups);
  	if (ret)
- 		goto out_unregister;
+ 		goto attr_create_failed;
  
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
-+	if (private->state == VFIO_CCW_STATE_NOT_OPER) {
-+		ret = -EINVAL;
-+		goto out_unregister;
-+	}
-+
- 	return ret;
+@@ -144,7 +165,7 @@ static struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
+ attrs_failed:
+ 	kobject_put(type->devices_kobj);
+ attr_devices_failed:
+-	sysfs_remove_file(&type->kobj, &mdev_type_attr_create.attr);
++	sysfs_remove_groups(&type->kobj, mdev_type_groups);
+ attr_create_failed:
+ 	kobject_del(&type->kobj);
+ 	kobject_put(&type->kobj);
+diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+index a5788f592817..14655215417b 100644
+--- a/include/linux/mdev.h
++++ b/include/linux/mdev.h
+@@ -36,6 +36,7 @@ struct device *mtype_get_parent_dev(struct mdev_type *mtype);
+  *
+  * @owner:		The module owner.
+  * @device_driver:	Which device driver to probe() on newly created devices
++ * @device_api:		String to return for the device_api sysfs
+  * @dev_attr_groups:	Attributes of the parent device.
+  * @mdev_attr_groups:	Attributes of the mediated device.
+  * @supported_type_groups: Attributes to define supported types. It is mandatory
+@@ -80,6 +81,7 @@ struct device *mtype_get_parent_dev(struct mdev_type *mtype);
+ struct mdev_parent_ops {
+ 	struct module   *owner;
+ 	struct mdev_driver *device_driver;
++	const char *device_api;
+ 	const struct attribute_group **dev_attr_groups;
+ 	const struct attribute_group **mdev_attr_groups;
+ 	struct attribute_group **supported_type_groups;
+@@ -108,11 +110,6 @@ struct mdev_type_attribute {
+ 			 size_t count);
+ };
  
- out_unregister:
-@@ -202,13 +204,7 @@ static void vfio_ccw_mdev_close_device(struct vfio_device *vdev)
- 	struct vfio_ccw_private *private =
- 		container_of(vdev, struct vfio_ccw_private, vdev);
- 
--	if ((private->state != VFIO_CCW_STATE_NOT_OPER) &&
--	    (private->state != VFIO_CCW_STATE_STANDBY)) {
--		if (!vfio_ccw_mdev_reset(private))
--			private->state = VFIO_CCW_STATE_STANDBY;
--		/* The state will be NOT_OPER on error. */
--	}
--
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
- 	vfio_ccw_unregister_dev_regions(private);
- 	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY, &private->nb);
+-#define MDEV_TYPE_ATTR(_name, _mode, _show, _store)		\
+-struct mdev_type_attribute mdev_type_attr_##_name =		\
+-	__ATTR(_name, _mode, _show, _store)
+-#define MDEV_TYPE_ATTR_RW(_name) \
+-	struct mdev_type_attribute mdev_type_attr_##_name = __ATTR_RW(_name)
+ #define MDEV_TYPE_ATTR_RO(_name) \
+ 	struct mdev_type_attribute mdev_type_attr_##_name = __ATTR_RO(_name)
+ #define MDEV_TYPE_ATTR_WO(_name) \
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index e90c8552cc31..8d3ae97d9d6e 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -1358,17 +1358,9 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
  }
+ static MDEV_TYPE_ATTR_RO(available_instances);
+ 
+-static ssize_t device_api_show(struct mdev_type *mtype,
+-			       struct mdev_type_attribute *attr, char *buf)
+-{
+-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+-}
+-static MDEV_TYPE_ATTR_RO(device_api);
+-
+ static struct attribute *mdev_types_attrs[] = {
+ 	&mdev_type_attr_name.attr,
+ 	&mdev_type_attr_description.attr,
+-	&mdev_type_attr_device_api.attr,
+ 	&mdev_type_attr_available_instances.attr,
+ 	NULL,
+ };
+@@ -1417,6 +1409,7 @@ static struct mdev_driver mbochs_driver = {
+ static const struct mdev_parent_ops mdev_fops = {
+ 	.owner			= THIS_MODULE,
+ 	.device_driver		= &mbochs_driver,
++	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+ 	.supported_type_groups	= mdev_type_groups,
+ };
+ 
+diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+index fe5d43e797b6..402a7ebe6563 100644
+--- a/samples/vfio-mdev/mdpy.c
++++ b/samples/vfio-mdev/mdpy.c
+@@ -670,17 +670,9 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+ }
+ static MDEV_TYPE_ATTR_RO(available_instances);
+ 
+-static ssize_t device_api_show(struct mdev_type *mtype,
+-			       struct mdev_type_attribute *attr, char *buf)
+-{
+-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+-}
+-static MDEV_TYPE_ATTR_RO(device_api);
+-
+ static struct attribute *mdev_types_attrs[] = {
+ 	&mdev_type_attr_name.attr,
+ 	&mdev_type_attr_description.attr,
+-	&mdev_type_attr_device_api.attr,
+ 	&mdev_type_attr_available_instances.attr,
+ 	NULL,
+ };
+@@ -728,6 +720,7 @@ static struct mdev_driver mdpy_driver = {
+ static const struct mdev_parent_ops mdev_fops = {
+ 	.owner			= THIS_MODULE,
+ 	.device_driver          = &mdpy_driver,
++	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+ 	.supported_type_groups	= mdev_type_groups,
+ };
+ 
+diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+index a0e1a469bd47..5dc1b6a4c02c 100644
+--- a/samples/vfio-mdev/mtty.c
++++ b/samples/vfio-mdev/mtty.c
+@@ -1281,17 +1281,8 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+ 
+ static MDEV_TYPE_ATTR_RO(available_instances);
+ 
+-static ssize_t device_api_show(struct mdev_type *mtype,
+-			       struct mdev_type_attribute *attr, char *buf)
+-{
+-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+-}
+-
+-static MDEV_TYPE_ATTR_RO(device_api);
+-
+ static struct attribute *mdev_types_attrs[] = {
+ 	&mdev_type_attr_name.attr,
+-	&mdev_type_attr_device_api.attr,
+ 	&mdev_type_attr_available_instances.attr,
+ 	NULL,
+ };
+@@ -1333,6 +1324,7 @@ static struct mdev_driver mtty_driver = {
+ static const struct mdev_parent_ops mdev_fops = {
+ 	.owner                  = THIS_MODULE,
+ 	.device_driver		= &mtty_driver,
++	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+ 	.dev_attr_groups        = mtty_dev_groups,
+ 	.supported_type_groups  = mdev_type_groups,
+ };
 -- 
 2.32.0
 
