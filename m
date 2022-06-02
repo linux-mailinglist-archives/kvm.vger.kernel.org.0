@@ -2,424 +2,399 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9699653BD7A
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 19:44:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4450053BDD1
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 20:16:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235859AbiFBRoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 13:44:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47656 "EHLO
+        id S237902AbiFBSQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 14:16:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237639AbiFBRoU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 13:44:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 74A802A25F5
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 10:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654191857;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/6UqmnV8PYOKktTtr/SW/qXHBXvWDrNhaPzVkWUdV24=;
-        b=c8/E7HA6z3sZ3jRMvEra7zeS/vGI0uCJhRcYRqFvpp2xKDe+5MUmLuJgl8qKZwYPcbk4Iz
-        IfsGheccUxC1BKtVLOrl9vZRa46Wa8ojgBgGctezGvVayE6Br4ZAjOve95fZ0wO3zILXr+
-        1YOW/ZxqlUJar4ekJqASAENKV08N3IE=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-198-qBNThGWYMxy_QUJR0xSc5Q-1; Thu, 02 Jun 2022 13:44:15 -0400
-X-MC-Unique: qBNThGWYMxy_QUJR0xSc5Q-1
-Received: by mail-il1-f200.google.com with SMTP id x5-20020a923005000000b002d1a91c4d13so3742075ile.4
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 10:44:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=/6UqmnV8PYOKktTtr/SW/qXHBXvWDrNhaPzVkWUdV24=;
-        b=Kwn5Ht2U2hwu8vxGrrtuGfAslK0Dpt9cEjWyBb+d7z/YYNpqSi4S6zym6v5c0Kw3eO
-         IT4WEBwRKLEh25XVmOo41X6BaBDPTu3X7r8W+pbtnzhZHvSLxSibyMScUoDlSlPaODIV
-         V/JarMhb/reRpmojQoO86+zAL05HvdfO2s2zrYVBQrlmc3HRS+LCpwjYg3kC6XObb8uV
-         8dnU57GgMqXxR8JLVjtGbvMLsTmn0ZdcYCQPjjD6VA9Qbf5Bdl5wEyc2yKQT5/SMS6fd
-         7GnEOtpFDHkTZNLgc+O1t1SceVO8ZooqLVWv9FrblJLADCURDq/+s0ZEwLxbykO4v2QV
-         GMTw==
-X-Gm-Message-State: AOAM531LZggJK0uUuKTbhnA3cWmX3G8Br0vqatZA/nsbooDPDdwEwyRb
-        Bkaxhhn50OoOi9guewvaFey+clnP9r3fAVlR+6mK4HwidBR1aetPA+thetNcEiVg2mP3hrcbVdG
-        dcy8iG9/PVyO/
-X-Received: by 2002:a05:6e02:1c06:b0:2d1:b240:736f with SMTP id l6-20020a056e021c0600b002d1b240736fmr3856100ilh.133.1654191854846;
-        Thu, 02 Jun 2022 10:44:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYAFRuSriDG5abcuJrli+rZhU6ZkEVhwGfBS9otADEOeHJzJ3vpm/0IW18EoJuFTedtaEjWA==
-X-Received: by 2002:a05:6e02:1c06:b0:2d1:b240:736f with SMTP id l6-20020a056e021c0600b002d1b240736fmr3856088ilh.133.1654191854447;
-        Thu, 02 Jun 2022 10:44:14 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v6-20020a02cba6000000b0033173a25c73sm177383jap.87.2022.06.02.10.44.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jun 2022 10:44:13 -0700 (PDT)
-Date:   Thu, 2 Jun 2022 11:44:12 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Abhishek Sahu <abhsahu@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v3 8/8] vfio/pci: Add the support for PCI D3cold state
-Message-ID: <20220602114412.55d1e2c8.alex.williamson@redhat.com>
-In-Reply-To: <088c7896-d888-556e-59d7-a21c05c6d808@nvidia.com>
-References: <20220425092615.10133-1-abhsahu@nvidia.com>
-        <20220425092615.10133-9-abhsahu@nvidia.com>
-        <20220504134551.70d71bf0.alex.williamson@redhat.com>
-        <9e44e9cc-a500-ab0d-4785-5ae26874b3eb@nvidia.com>
-        <20220509154844.79e4915b.alex.williamson@redhat.com>
-        <68463d9b-98ee-b9ec-1a3e-1375e50a2ad2@nvidia.com>
-        <42518bd5-da8b-554f-2612-80278b527bf5@nvidia.com>
-        <20220530122546.GZ1343366@nvidia.com>
-        <c73d537b-a653-bf79-68cd-ddc8f0f62a25@nvidia.com>
-        <20220531194304.GN1343366@nvidia.com>
-        <20220531165209.1c18854f.alex.williamson@redhat.com>
-        <00b6e380-ecf4-1eaf-f950-2c418bdb6cac@nvidia.com>
-        <20220601102151.75445f6a.alex.williamson@redhat.com>
-        <088c7896-d888-556e-59d7-a21c05c6d808@nvidia.com>
-Organization: Red Hat
+        with ESMTP id S234302AbiFBSQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 14:16:36 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6313B13F94;
+        Thu,  2 Jun 2022 11:16:32 -0700 (PDT)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 252FFNCT015597;
+        Thu, 2 Jun 2022 18:16:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : reply-to : subject : to : cc : references : from :
+ in-reply-to : content-type : content-transfer-encoding; s=pp1;
+ bh=x4CHhe4oknN8i7Mz6K5UbGv8XshiwFwMdSGvV+3mR2A=;
+ b=fqqiDmLad1YC2D5CTsT8CoQBCSRl05jvwXEMyTgilUb3lqTiZPAq0gyfmkyhkYuqQvQk
+ 31Am0mgqeWAlyqBsfh20tRBhOpKRfmcziZtKmbqEPXEPNv1/MbE0/nCfywVshYiWBZgi
+ TVt9nINyM46crWEydeNK369xyBAswxIur5ygNGixHPFh49VgErfVLy3rQlDMR4jp64Eo
+ WqGLFh1mInhYcza38rRP9HnZbjnDSa1E/eiahcPA3DthUYQMcm64Nn2ffGPLNh8lHto/
+ junnR8owlXoT5mWeyBWJra0pQpgOhxeMkTJEUJgEhpzK4U7p7Nqk8CobEPHPSLRR9/AF Ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3geyphb5cp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Jun 2022 18:16:30 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 252I3BXI002706;
+        Thu, 2 Jun 2022 18:16:29 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3geyphb5cg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Jun 2022 18:16:29 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 252I648A028737;
+        Thu, 2 Jun 2022 18:16:28 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma01dal.us.ibm.com with ESMTP id 3gcxt5v94m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Jun 2022 18:16:27 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 252IGQCH38011148
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Jun 2022 18:16:26 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 784BB6A054;
+        Thu,  2 Jun 2022 18:16:26 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A03496A04D;
+        Thu,  2 Jun 2022 18:16:25 +0000 (GMT)
+Received: from [9.60.75.219] (unknown [9.60.75.219])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Jun 2022 18:16:25 +0000 (GMT)
+Message-ID: <6a574d7e-c390-3764-a57c-23c7653f2f69@linux.ibm.com>
+Date:   Thu, 2 Jun 2022 14:16:25 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Reply-To: jjherne@linux.ibm.com
+Subject: Re: [PATCH v19 15/20] s390/vfio-ap: implement in-use callback for
+ vfio_ap driver
+Content-Language: en-US
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
+ <20220404221039.1272245-16-akrowiak@linux.ibm.com>
+From:   "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220404221039.1272245-16-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: KKF915Jc-mH4WGPiW8P4dg_MHFTB1_1o
+X-Proofpoint-GUID: 59rMyBdY21xqROeL0Xj8XtLtWERSAoQ-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-02_05,2022-06-02_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ impostorscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206020076
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2 Jun 2022 17:22:03 +0530
-Abhishek Sahu <abhsahu@nvidia.com> wrote:
+On 4/4/22 18:10, Tony Krowiak wrote:
+> Let's implement the callback to indicate when an APQN
+> is in use by the vfio_ap device driver. The callback is
+> invoked whenever a change to the apmask or aqmask would
+> result in one or more queue devices being removed from the driver. The
+> vfio_ap device driver will indicate a resource is in use
+> if the APQN of any of the queue devices to be removed are assigned to
+> any of the matrix mdevs under the driver's control.
+> 
+> There is potential for a deadlock condition between the
+> matrix_dev->guests_lock used to lock the guest during assignment of
+> adapters and domains and the ap_perms_mutex locked by the AP bus when
+> changes are made to the sysfs apmask/aqmask attributes.
+> 
+> The AP Perms lock controls access to the objects that store the adapter
+> numbers (ap_perms) and domain numbers (aq_perms) for the sysfs
+> /sys/bus/ap/apmask and /sys/bus/ap/aqmask attributes. These attributes
+> identify which queues are reserved for the zcrypt default device drivers.
+> Before allowing a bit to be removed from either mask, the AP bus must check
+> with the vfio_ap device driver to verify that none of the queues are
+> assigned to any of its mediated devices.
+> 
+> The apmask/aqmask attributes can be written or read at any time from
+> userspace, so care must be taken to prevent a deadlock with asynchronous
+> operations that might be taking place in the vfio_ap device driver. For
+> example, consider the following:
+> 
+> 1. A system administrator assigns an adapter to a mediated device under the
+>     control of the vfio_ap device driver. The driver will need to first take
+>     the matrix_dev->guests_lock to potentially hot plug the adapter into
+>     the KVM guest.
+> 2. At the same time, a system administrator sets a bit in the sysfs
+>     /sys/bus/ap/ap_mask attribute. To complete the operation, the AP bus
+>     must:
+>     a. Take the ap_perms_mutex lock to update the object storing the values
+>        for the /sys/bus/ap/ap_mask attribute.
+>     b. Call the vfio_ap device driver's in-use callback to verify that the
+>        queues now being reserved for the default zcrypt drivers are not
+>        assigned to a mediated device owned by the vfio_ap device driver. To
+>        do the verification, the in-use callback function takes the
+>        matrix_dev->guests_lock, but has to wait because it is already held
+>        by the operation in 1 above.
+> 3. The vfio_ap device driver calls an AP bus function to verify that the
+>     new queues resulting from the assignment of the adapter in step 1 are
+>     not reserved for the default zcrypt device driver. This AP bus function
+>     tries to take the ap_perms_mutex lock but gets stuck waiting for the
+>     waiting for the lock due to step 2a above.
+> 
+> Consequently, we have the following deadlock situation:
+> 
+> matrix_dev->guests_lock locked (1)
+> ap_perms_mutex lock locked (2a)
+> Waiting for matrix_dev->gusts_lock (2b) which is currently held (1)
+> Waiting for ap_perms_mutex lock (3) which is currently held (2a)
+> 
+> To prevent this deadlock scenario, the function called in step 3 will no
+> longer take the ap_perms_mutex lock and require the caller to take the
+> lock. The lock will be the first taken by the adapter/domain assignment
+> functions in the vfio_ap device driver to maintain the proper locking
+> order.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>   drivers/s390/crypto/ap_bus.c          | 31 ++++++++----
+>   drivers/s390/crypto/vfio_ap_drv.c     |  1 +
+>   drivers/s390/crypto/vfio_ap_ops.c     | 68 +++++++++++++++++++++++++++
+>   drivers/s390/crypto/vfio_ap_private.h |  2 +
+>   4 files changed, 94 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
+> index fdf16cb70881..f48552e900a2 100644
+> --- a/drivers/s390/crypto/ap_bus.c
+> +++ b/drivers/s390/crypto/ap_bus.c
+> @@ -817,6 +817,17 @@ static void ap_bus_revise_bindings(void)
+>   	bus_for_each_dev(&ap_bus_type, NULL, NULL, __ap_revise_reserved);
+>   }
+>   
+> +/**
+> + * ap_apqn_in_matrix_owned_by_def_drv: indicates whether an APQN c is reserved
+> + *				       for the host drivers or not.
+> + * @card: the APID of the adapter card to check
+> + * @queue: the APQI of the queue to check
+> + *
+> + * Note: the ap_perms_mutex must be locked by the caller of this function.
+> + *
+> + * Return: an int specifying whether the APQN is reserved for the host (1) or
+> + *	   not (0)
+> + */
 
-> On 6/1/2022 9:51 PM, Alex Williamson wrote:
-> > On Wed, 1 Jun 2022 15:19:07 +0530
-> > Abhishek Sahu <abhsahu@nvidia.com> wrote:
-> >  =20
-> >> On 6/1/2022 4:22 AM, Alex Williamson wrote: =20
-> >>> On Tue, 31 May 2022 16:43:04 -0300
-> >>> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >>>    =20
-> >>>> On Tue, May 31, 2022 at 05:44:11PM +0530, Abhishek Sahu wrote:   =20
-> >>>>> On 5/30/2022 5:55 PM, Jason Gunthorpe wrote:     =20
-> >>>>>> On Mon, May 30, 2022 at 04:45:59PM +0530, Abhishek Sahu wrote:
-> >>>>>>      =20
-> >>>>>>>  1. In real use case, config or any other ioctl should not come a=
-long
-> >>>>>>>     with VFIO_DEVICE_FEATURE_POWER_MANAGEMENT ioctl request.
-> >>>>>>> =20
-> >>>>>>>  2. Maintain some 'access_count' which will be incremented when we
-> >>>>>>>     do any config space access or ioctl.     =20
-> >>>>>>
-> >>>>>> Please don't open code locks - if you need a lock then write a pro=
-per
-> >>>>>> lock. You can use the 'try' variants to bail out in cases where th=
-at
-> >>>>>> is appropriate.
-> >>>>>>
-> >>>>>> Jason     =20
-> >>>>>
-> >>>>>  Thanks Jason for providing your inputs.
-> >>>>>
-> >>>>>  In that case, should I introduce new rw_semaphore (For example
-> >>>>>  power_lock) and move =E2=80=98platform_pm_engaged=E2=80=99 under =
-=E2=80=98power_lock=E2=80=99 ?     =20
-> >>>>
-> >>>> Possibly, this is better than an atomic at least
-> >>>>   =20
-> >>>>>  1. At the beginning of config space access or ioctl, we can take t=
-he
-> >>>>>     lock
-> >>>>> =20
-> >>>>>      down_read(&vdev->power_lock);     =20
-> >>>>
-> >>>> You can also do down_read_trylock() here and bail out as you were
-> >>>> suggesting with the atomic.
-> >>>>
-> >>>> trylock doesn't have lock odering rules because it can't sleep so it
-> >>>> gives a bit more flexability when designing the lock ordering.
-> >>>>
-> >>>> Though userspace has to be able to tolerate the failure, or never ma=
-ke
-> >>>> the request.
-> >>>>   =20
-> >>
-> >>  Thanks Alex and Jason for providing your inputs.
-> >>
-> >>  Using down_read_trylock() along with Alex suggestion seems fine.
-> >>  In real use case, config space access should not happen when the
-> >>  device is in low power state so returning error should not
-> >>  cause any issue in this case.
-> >> =20
-> >>>>>          down_write(&vdev->power_lock);
-> >>>>>          ...
-> >>>>>          switch (vfio_pm.low_power_state) {
-> >>>>>          case VFIO_DEVICE_LOW_POWER_STATE_ENTER:
-> >>>>>                  ...
-> >>>>>                          vfio_pci_zap_and_down_write_memory_lock(vd=
-ev);
-> >>>>>                          vdev->power_state_d3 =3D true;
-> >>>>>                          up_write(&vdev->memory_lock);
-> >>>>>
-> >>>>>          ...
-> >>>>>          up_write(&vdev->power_lock);     =20
-> >>>>
-> >>>> And something checks the power lock before allowing the memor to be
-> >>>> re-enabled?
-> >>>>   =20
-> >>>>>  4.  For ioctl access, as mentioned previously I need to add two
-> >>>>>      callbacks functions (one for start and one for end) in the str=
-uct
-> >>>>>      vfio_device_ops and call the same at start and end of ioctl fr=
-om
-> >>>>>      vfio_device_fops_unl_ioctl().     =20
-> >>>>
-> >>>> Not sure I followed this..   =20
-> >>>
-> >>> I'm kinda lost here too.   =20
-> >>
-> >>
-> >>  I have summarized the things below
-> >>
-> >>  1. In the current patch (v3 8/8), if config space access or ioctl was
-> >>     being made by the user when the device is already in low power sta=
-te,
-> >>     then it was waking the device. This wake up was happening with
-> >>     pm_runtime_resume_and_get() API in vfio_pci_config_rw() and
-> >>     vfio_device_fops_unl_ioctl() (with patch v3 7/8 in this patch seri=
-es).
-> >>
-> >>  2. Now, it has been decided to return error instead of waking the
-> >>     device if the device is already in low power state.
-> >>
-> >>  3. Initially I thought to add following code in config space path
-> >>     (and similar in ioctl)
-> >>
-> >>         vfio_pci_config_rw() {
-> >>             ...
-> >>             down_read(&vdev->memory_lock);
-> >>             if (vdev->platform_pm_engaged)
-> >>             {
-> >>                 up_read(&vdev->memory_lock);
-> >>                 return -EIO;
-> >>             }
-> >>             ...
-> >>         }
-> >>
-> >>      And then there was a possibility that the physical config happens
-> >>      when the device in D3cold in case of race condition.
-> >>
-> >>  4.  So, I wanted to add some mechanism so that the low power entry
-> >>      ioctl will be serialized with other ioctl or config space. With t=
-his
-> >>      if low power entry gets scheduled first then config/other ioctls =
-will
-> >>      get failure, otherwise low power entry will wait.
-> >>
-> >>  5.  For serializing this access, I need to ensure that lock is held
-> >>      throughout the operation. For config space I can add the code in
-> >>      vfio_pci_config_rw(). But for ioctls, I was not sure what is the =
-best
-> >>      way since few ioctls (VFIO_DEVICE_FEATURE_MIGRATION,
-> >>      VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE etc.) are being handled in t=
-he
-> >>      vfio core layer itself.
-> >>
-> >>  The memory_lock and the variables to track low power in specific to
-> >>  vfio-pci so I need some mechanism by which I add low power check for
-> >>  each ioctl. For serialization, I need to call function implemented in
-> >>  vfio-pci before vfio core layer makes the actual ioctl to grab the
-> >>  locks. Similarly, I need to release the lock once vfio core layer
-> >>  finished the actual ioctl. I have mentioned about this problem in the
-> >>  above point (point 4 in my earlier mail).
-> >> =20
-> >>> A couple replies back there was some concern
-> >>> about race scenarios with multiple user threads accessing the device.
-> >>> The ones concerning non-deterministic behavior if a user is
-> >>> concurrently changing power state and performing other accesses are a
-> >>> non-issue, imo.     =20
-> >>
-> >>  What does non-deterministic behavior here mean.
-> >>  Is it for user side that user will see different result
-> >>  (failure or success) during race condition or in the kernel side
-> >>  (as explained in point 3 above where physical config access
-> >>  happens when the device in D3cold) ? My concern here is for later
-> >>  part where this config space access in D3cold can cause fatal error
-> >>  on the system side as we have seen for memory disablement. =20
-> >=20
-> > Yes, our only concern should be to prevent such an access.  The user
-> > seeing non-deterministic behavior, such as during concurrent power
-> > control and config space access, all combinations of success/failure
-> > are possible, is par for the course when we decide to block accesses
-> > across the life of the low power state.
-> >   =20
-> >>> I think our goal is only to expand the current
-> >>> memory_lock to block accesses, including config space, while the devi=
-ce
-> >>> is in low power, or some approximation bounded by the entry/exit ioct=
-l.
-> >>>
-> >>> I think the remaining issues is how to do that relative to the fact
-> >>> that config space access can change the memory enable state and would
-> >>> therefore need to upgrade the memory_lock read-lock to a write-lock.
-> >>> For that I think we can simply drop the read-lock, acquire the
-> >>> write-lock, and re-test the low power state.  If it has changed, that
-> >>> suggests the user has again raced changing power state with another
-> >>> access and we can simply drop the lock and return -EIO.
-> >>>    =20
-> >>
-> >>  Yes. This looks better option. So, just to confirm, I can take the
-> >>  memory_lock read-lock at the starting of vfio_pci_config_rw() and
-> >>  release it just before returning from vfio_pci_config_rw() and
-> >>  for memory related config access, we will release this lock and
-> >>  re-aquiring again write version of this. Once memory write happens,
-> >>  then we can downgrade this write lock to read lock ? =20
-> >=20
-> > We only need to lock for the device access, so if you've finished that
-> > access after acquiring the write-lock, there'd be no point to then
-> > downgrade that to a read-lock.  The access should be finished by that
-> > point.
-> > =20
->=20
->  I was planning to take memory_lock read-lock at the beginning of
->  vfio_pci_config_rw() and release the same just before returning from
->  this function. If I don't downgrade it back to read-lock, then the
->  release in the end will be called for the lock which has not taken.
->  Also, user can specify count to any number of bytes and then the
->  vfio_config_do_rw() will be invoked multiple times and then in
->  the second call, it will be without lock.
+Comment's function name does not match real function name. Also APQN "c", from
+description does not appear to exist.
 
-Ok, yes, I can imagine how it might result in a cleaner exit path to do
-a downgrade_write().
 
-> >>  Also, what about IOCTLs. How can I take and release memory_lock for
-> >>  ioctl. is it okay to go with Patch 7 where we call
-> >>  pm_runtime_resume_and_get() before each ioctl or we need to do the
-> >>  same low power check for ioctl also ?
-> >>  In Later case, I am not sure how should I do the implementation so
-> >>  that all other ioctl are covered from vfio core layer itself. =20
-> >=20
-> > Some ioctls clearly cannot occur while the device is in low power, such
-> > as resets and interrupt control, but even less obvious things like
-> > getting region info require device access.  Migration also provides a
-> > channel to device access.  Do we want to manage a list of ioctls that
-> > are allowed in low power, or do we only want to allow the ioctl to exit
-> > low power?
-> >  =20
->=20
->  In previous version of this patch, you mentioned that maintaining the
->  safe ioctl list will be tough to maintain. So, currently we wanted to
->  allow the ioctl for low power exit.
+>   int ap_owned_by_def_drv(int card, int queue)
+>   {
+>   	int rc = 0;
+> @@ -824,25 +835,31 @@ int ap_owned_by_def_drv(int card, int queue)
+>   	if (card < 0 || card >= AP_DEVICES || queue < 0 || queue >= AP_DOMAINS)
+>   		return -EINVAL;
+>   
+> -	mutex_lock(&ap_perms_mutex);
+> -
+>   	if (test_bit_inv(card, ap_perms.apm)
+>   	    && test_bit_inv(queue, ap_perms.aqm))
+>   		rc = 1;
+>   
+> -	mutex_unlock(&ap_perms_mutex);
+> -
+>   	return rc;
+>   }
+>   EXPORT_SYMBOL(ap_owned_by_def_drv);
+>   
+> +/**
+> + * ap_apqn_in_matrix_owned_by_def_drv: indicates whether every APQN contained in
+> + *				       a set is reserved for the host drivers
+> + *				       or not.
+> + * @apm: a bitmap specifying a set of APIDs comprising the APQNs to check
+> + * @aqm: a bitmap specifying a set of APQIs comprising the APQNs to check
+> + *
+> + * Note: the ap_perms_mutex must be locked by the caller of this function.
+> + *
+> + * Return: an int specifying whether each APQN is reserved for the host (1) or
+> + *	   not (0)
+> + */
+>   int ap_apqn_in_matrix_owned_by_def_drv(unsigned long *apm,
+>   				       unsigned long *aqm)
+>   {
+>   	int card, queue, rc = 0;
+>   
+> -	mutex_lock(&ap_perms_mutex);
+> -
+>   	for (card = 0; !rc && card < AP_DEVICES; card++)
+>   		if (test_bit_inv(card, apm) &&
+>   		    test_bit_inv(card, ap_perms.apm))
+> @@ -851,8 +868,6 @@ int ap_apqn_in_matrix_owned_by_def_drv(unsigned long *apm,
+>   				    test_bit_inv(queue, ap_perms.aqm))
+>   					rc = 1;
+>   
+> -	mutex_unlock(&ap_perms_mutex);
+> -
+>   	return rc;
+>   }
+>   EXPORT_SYMBOL(ap_apqn_in_matrix_owned_by_def_drv);
+> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> index c258e5f7fdfc..2c3084589347 100644
+> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> @@ -107,6 +107,7 @@ static const struct attribute_group vfio_queue_attr_group = {
+>   static struct ap_driver vfio_ap_drv = {
+>   	.probe = vfio_ap_mdev_probe_queue,
+>   	.remove = vfio_ap_mdev_remove_queue,
+> +	.in_use = vfio_ap_mdev_resource_in_use,
+>   	.ids = ap_queue_ids,
+>   };
+>   
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 49ed54dc9e05..3ece2cd9f1e7 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -902,6 +902,21 @@ static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
+>   	return 0;
+>   }
+>   
+> +/**
+> + * vfio_ap_mdev_validate_masks - verify that the APQNs assigned to the mdev are
+> + *				 not reserved for the default zcrypt driver and
+> + *				 are not assigned to another mdev.
+> + *
+> + * @matrix_mdev: the mdev to which the APQNs being validated are assigned.
+> + *
+> + * Return: One of the following values:
+> + * o the error returned from the ap_apqn_in_matrix_owned_by_def_drv() function,
+> + *   most likely -EBUSY indicating the ap_perms_mutex lock is already held.
+> + * o EADDRNOTAVAIL if an APQN assigned to @matrix_mdev is reserved for the
+> + *		   zcrypt default driver.
+> + * o EADDRINUSE if an APQN assigned to @matrix_mdev is assigned to another mdev
+> + * o A zero indicating validation succeeded.
+> + */
+>   static int vfio_ap_mdev_validate_masks(struct ap_matrix_mdev *matrix_mdev)
+>   {
+>   	if (ap_apqn_in_matrix_owned_by_def_drv(matrix_mdev->matrix.apm,
+> @@ -951,6 +966,10 @@ static void vfio_ap_mdev_link_adapter(struct ap_matrix_mdev *matrix_mdev,
+>    *	   An APQN derived from the cross product of the APID being assigned
+>    *	   and the APQIs previously assigned is being used by another mediated
+>    *	   matrix device
+> + *
+> + *	5. -EAGAIN
+> + *	   A lock required to validate the mdev's AP configuration could not
+> + *	   be obtained.
+>    */
+>   static ssize_t assign_adapter_store(struct device *dev,
+>   				    struct device_attribute *attr,
+> @@ -961,6 +980,7 @@ static ssize_t assign_adapter_store(struct device *dev,
+>   	DECLARE_BITMAP(apm_delta, AP_DEVICES);
+>   	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(dev);
+>   
+> +	mutex_lock(&ap_perms_mutex);
+>   	get_update_locks_for_mdev(matrix_mdev);
+>   
+>   	ret = kstrtoul(buf, 0, &apid);
+> @@ -991,6 +1011,7 @@ static ssize_t assign_adapter_store(struct device *dev,
+>   	ret = count;
+>   done:
+>   	release_update_locks_for_mdev(matrix_mdev);
+> +	mutex_unlock(&ap_perms_mutex);
+>   
+>   	return ret;
+>   }
+> @@ -1144,6 +1165,10 @@ static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
+>    *	   An APQN derived from the cross product of the APQI being assigned
+>    *	   and the APIDs previously assigned is being used by another mediated
+>    *	   matrix device
+> + *
+> + *	5. -EAGAIN
+> + *	   The lock required to validate the mdev's AP configuration could not
+> + *	   be obtained.
+>    */
+>   static ssize_t assign_domain_store(struct device *dev,
+>   				   struct device_attribute *attr,
+> @@ -1154,6 +1179,7 @@ static ssize_t assign_domain_store(struct device *dev,
+>   	DECLARE_BITMAP(aqm_delta, AP_DOMAINS);
+>   	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(dev);
+>   
+> +	mutex_lock(&ap_perms_mutex);
+>   	get_update_locks_for_mdev(matrix_mdev);
+>   
+>   	ret = kstrtoul(buf, 0, &apqi);
+> @@ -1184,6 +1210,7 @@ static ssize_t assign_domain_store(struct device *dev,
+>   	ret = count;
+>   done:
+>   	release_update_locks_for_mdev(matrix_mdev);
+> +	mutex_unlock(&ap_perms_mutex);
+>   
+>   	return ret;
+>   }
+> @@ -1868,3 +1895,44 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+>   	kfree(q);
+>   	release_update_locks_for_mdev(matrix_mdev);
+>   }
+> +
+> +/**
+> + * vfio_ap_mdev_resource_in_use: check whether any of a set of APQNs is
+> + *				 assigned to a mediated device under the control
+> + *				 of the vfio_ap device driver.
+> + *
+> + * @apm: a bitmap specifying a set of APIDs comprising the APQNs to check.
+> + * @aqm: a bitmap specifying a set of APQIs comprising the APQNs to check.
+> + *
+> + * This function is invoked by the AP bus when changes to the apmask/aqmask
+> + * attributes will result in giving control of the queue devices specified via
+> + * @apm and @aqm to the default zcrypt device driver. Prior to calling this
+> + * function, the AP bus locks the ap_perms_mutex. If this function is called
+> + * while an adapter or domain is being assigned to a mediated device, the
+> + * assignment operations will take the matrix_dev->guests_lock and
+> + * matrix_dev->mdevs_lock then call the ap_apqn_in_matrix_owned_by_def_drv
+> + * function, which also locks the ap_perms_mutex. This could result in a
+> + * deadlock.
+> + *
+> + * To avoid a deadlock, this function will verify that the
+> + * matrix_dev->guests_lock and matrix_dev->mdevs_lock are not currently held and
+> + * will return -EBUSY if the locks can not be obtained.
 
-Yes, I'm still conflicted in how that would work.
-=20
-> > I'm also still curious how we're going to handle devices that cannot
-> > return to low power such as the self-refresh mode on the GPU.  We can
-> > potentially prevent any wake-ups from the vfio device interface, but
-> > that doesn't preclude a wake-up via an external lspci.  I think we need
-> > to understand how we're going to handle such devices before we can
-> > really complete the design.  AIUI, we cannot disable the self-refresh
-> > sleep mode without imposing unreasonable latency and memory
-> > requirements on the guest and we cannot retrigger the self-refresh
-> > low-power mode without non-trivial device specific code.  Thanks,
-> >=20
-> > Alex
-> >  =20
->=20
->  I am working on adding support to notify guest through virtual PME
->  whenever there is any wake-up triggered by the host and the guest has
->  already put the device into runtime suspended state. This virtual PME
->  will be similar to physical PME. Normally, if PCI device need power
->  management transition, then it sends PME event which will be
->  ultimately handled by host OS. In virtual PME case, if host need power
->  management transition, then it sends event to guest and then guest OS
->  handles these virtual PME events. Following is summary:
->=20
->  1. Add the support for one more event like VFIO_PCI_ERR_IRQ_INDEX
->     named VFIO_PCI_PME_IRQ_INDEX and add the required code for this
->     virtual PME event.
->=20
->  2. From the guest side, when the PME_IRQ is enabled then we will
->     set event_fd for PME.
->=20
->  3. In the vfio driver, the PME support bits are already
->     virtualized and currently set to 0. We can set PME capability support
->     for D3cold so that in guest, it looks like
->=20
->      Capabilities: [60] Power Management version 3
->      Flags: PMEClk- DSI- D1- D2- AuxCurrent=3D0mA
->             PME(D0-,D1-,D2-,D3hot-,D3cold+)
->=20
->  4. From the guest side, it can do PME enable (PME_En bit in Power
->     Management Control/Status Register) which will be again virtualized.
->=20
->  5. When host gets request for resuming the device other than from
->     low power ioctl, then device pm usage count will be incremented, the
->     PME status (PME_Status bit in Power Management Control/Status Registe=
-r)
->     will be set and then we can do the event_fd signal.
->=20
->  6. In the PCIe, the PME events will be handled by root port. For
->     using low power D3cold feature, it is required to create virtual root
->     port in hypervisor side and when hypervisor receives this PME event,
->     then it can send virtual interrupt to root port.
->=20
->  7. If we take example of Linux kernel, then pcie_pme_irq() will
->     handle this and then do the runtime resume on the guest side. Also, it
->     will clear the PME status bit here. Then guest can put the device
->     again into suspended state.
->=20
->  8. I did prototype changes in QEMU for above logic and was getting wake-=
-up
->     in the guest whenever I do lspci on the host side.
->=20
->  9. Since currently only nvidia GPU has this limitation to require
->     driver interaction each time before going into D3cold so we can allow
->     the reentry for other device. We can have nvidia vendor (along with
->     VGA/3D controller class code). In future, if any other device also has
->     similar requirement then we can update this list. For other device
->     host can put the device into D3cold in case of any wake-up.
->=20
->  10. In the vfio driver, we can put all these restriction for
->      enabling PME and return error if user tries to make low power entry
->      ioctl without enabling the PME related things.
->=20
->  11. The virtual PME can help in handling physical PME also for all
->      the devices. The PME logic is not dependent upon nvidia GPU
->      restriction. If virtual PME is enabled by hypervisor, then when
->      physical PME wakes the device, then it will resume on the guest side
->      also.
+This part of the comment does not seem to match reality. Unless I'm missing
+something? Did you mean to call mutex_trylock? Or is the comment stale?
 
-So if host accesses through things like lspci are going to wake the
-device and we can't prevent that, and the solution to that is to notify
-the guest to put the device back to low power, then it seems a lot less
-important to try to prevent the user from waking the device through
-random accesses.  In that context, maybe we do simply wrap all accesses
-with pm_runtime_get/put() put calls, which eliminates the problem of
-maintaining a list of safe ioctls in low power.
+> + * Return:
+> + *	* -EBUSY if the locks required by this function are already locked.
+> + *	* -EADDRINUSE if one or more of the APQNs specified via @apm/@aqm are
+> + *	  assigned to a mediated device under the control of the vfio_ap
+> + *	  device driver.
+> + */
+> +int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
+> +{
+> +	int ret;
+> +
+> +	mutex_lock(&matrix_dev->guests_lock);
+> +	mutex_lock(&matrix_dev->mdevs_lock);
+> +	ret = vfio_ap_mdev_verify_no_sharing(apm, aqm);
+> +	mutex_unlock(&matrix_dev->mdevs_lock);
+> +	mutex_unlock(&matrix_dev->guests_lock);
+> +
+> +	return ret;
+> +}
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index 6d4ca39f783b..cbffa0bd01da 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -147,4 +147,6 @@ void vfio_ap_mdev_unregister(void);
+>   int vfio_ap_mdev_probe_queue(struct ap_device *queue);
+>   void vfio_ap_mdev_remove_queue(struct ap_device *queue);
+>   
+> +int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm);
+> +
+>   #endif /* _VFIO_AP_PRIVATE_H_ */
 
-I'd probably argue that whether to allow the kernel to put the device
-back to low power directly is a policy decision and should therefore be
-directed by userspace.  For example the low power entry ioctl would
-have a flag to indicate the desired behavior and QEMU might have an
-on/off/[auto] vfio-pci device option which allows configuration of that
-behavior.  The default auto policy might direct for automatic low-power
-re-entry except for NVIDIA VGA/3D class codes and other devices we
-discover that need it.  This lets us have an immediate workaround for
-devices requiring guest support without a new kernel.
 
-This PME notification to the guest is really something that needs to be
-part of the base specification for user managed low power access due to
-these sorts of design decisions.  Thanks,
-
-Alex
-
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
