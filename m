@@ -2,146 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF89153B6A7
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 12:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E871353B789
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 12:53:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233428AbiFBKLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 06:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42440 "EHLO
+        id S233941AbiFBKxQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 06:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230406AbiFBKLN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 06:11:13 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED7D2AD5C2;
-        Thu,  2 Jun 2022 03:11:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654164672; x=1685700672;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=da86tUUULUVat8HuHmdIwGDy5StYU/aEj+aL1ESVKiM=;
-  b=fHDYKqgFDHVQviH6ChjxYfgt1oORIuPN7lRKfUdcYRYt40abOD/amhhf
-   C5eF6K4qDsSlNQIHbJ87jbtAbaEDOf3T0ifprAkgruf8hhUI7tOT2H6Rt
-   nwk9Pm6SEFSQnfsSEFX/2Q9i1O3ZtiB5TmYPM3fPmpCQdHP03GLUMYO+z
-   SYdKNyzIVd22JepgAltlTJ8wS5cBW3NUVY5kBQoAEgpQfdqvEql9Rqau/
-   Yyn7PIgh9sOTldkumprPtotX0p6oeKVLQZiBQVDG/2qSdYYhBnp2zMRAC
-   WGFg9t80LwiWeCvx91frsgzmYOHucZqd6ZeU2s+jrIhoAIYa0R+b0oaYm
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10365"; a="336560321"
-X-IronPort-AV: E=Sophos;i="5.91,270,1647327600"; 
-   d="scan'208";a="336560321"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2022 03:11:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,270,1647327600"; 
-   d="scan'208";a="721237238"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by fmsmga001.fm.intel.com with ESMTP; 02 Jun 2022 03:10:58 -0700
-Date:   Thu, 2 Jun 2022 18:07:33 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Subject: Re: [PATCH v6 3/8] mm/memfd: Introduce MFD_INACCESSIBLE flag
-Message-ID: <20220602100733.GA1296997@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <20220519153713.819591-4-chao.p.peng@linux.intel.com>
- <CAGtprH8EMsPMMoOEzjRu0SMVKT0RqmkLk=n+6uXkBA6-wiRtUA@mail.gmail.com>
- <20220601101747.GA1255243@chaop.bj.intel.com>
- <1f1b17e8-a16d-c029-88e0-01f522cc077a@amd.com>
+        with ESMTP id S231843AbiFBKxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 06:53:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 50812131F3F
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 03:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654167193;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OjqpVh3lm31oZf7mBPFt7qggokjq9T2QJT/DfHShU/g=;
+        b=NzYVs4bd8eXHoHVoTvIl4DY7rHXmuIR2b0EpzasWJk8Y+CBwcKBvmCLWsbF6mq3ldtJX4F
+        N34PadggZDQgNxT8xNLR4f2ELV/uTB0wCAz8ceoqDTC16yGUTqy3iitAMqYKP0zEZs95AO
+        9yTxPbLXLsJB1LsI5TpkxUElOOhs6u8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-67-9K-qKx8CPvO8HMjQGt-pBA-1; Thu, 02 Jun 2022 06:53:10 -0400
+X-MC-Unique: 9K-qKx8CPvO8HMjQGt-pBA-1
+Received: by mail-wm1-f72.google.com with SMTP id c125-20020a1c3583000000b003978decffedso4964730wma.5
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 03:53:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=OjqpVh3lm31oZf7mBPFt7qggokjq9T2QJT/DfHShU/g=;
+        b=4Vgbr9BaPKWhrkrkus19365HPo6bLJoQsOgiYiNRqJeJfos3kfwMujgJSZ6/3cARmQ
+         2pjaprJap4dtioZnQsIs3ZF7V/oBteHa4Xs0gKsY7KX8ZZDdFScyRqB491jyYlK6lNmx
+         750sBvEgv1c6p6NXB11/o3Cx5MKh6yyy3EXg4P+rS3D4zjbS8MkE/j7oq4nTvVqIg5MQ
+         3yE1DWqgVchkZ42RXMEwDFyUOAJpzoycEnLIybePr6o8imV4/iNeDOXkXK5viO2mSOPs
+         3pZu0/ar2qcQPkC8dxfFBRONf+GldEwzzIpo+YpjkwQzJ8pqP54+/EdkQdEDpL0Ckor4
+         /EIg==
+X-Gm-Message-State: AOAM531G1iRffcVIv5k9AcWhvrlkFygeQyNN6zG1sqDEdsHh5xb+CTB1
+        qYJrqsMs6RtlY0x8YxIF7mRb9dgKASAqIvhR8t+6OZq7c07/Q8vujh4/ISGJRprRD09LFskN9eM
+        Dyxb0MzgNxufk
+X-Received: by 2002:adf:d1af:0:b0:210:2a6d:ca99 with SMTP id w15-20020adfd1af000000b002102a6dca99mr2992266wrc.575.1654167189252;
+        Thu, 02 Jun 2022 03:53:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJze4agD0gjR/EYbwlzEYeVnsLJPtYcAMPst1XT87KADdbndqzjNCPT6CthG1+MXYuXTj121qA==
+X-Received: by 2002:adf:d1af:0:b0:210:2a6d:ca99 with SMTP id w15-20020adfd1af000000b002102a6dca99mr2992250wrc.575.1654167189015;
+        Thu, 02 Jun 2022 03:53:09 -0700 (PDT)
+Received: from [192.168.0.2] (ip-109-43-179-51.web.vodafone.de. [109.43.179.51])
+        by smtp.gmail.com with ESMTPSA id i6-20020a05600c290600b00397470a8226sm4673725wmd.15.2022.06.02.03.53.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jun 2022 03:53:08 -0700 (PDT)
+Message-ID: <c34ea319-2493-724d-460c-490881ac34b6@redhat.com>
+Date:   Thu, 2 Jun 2022 12:53:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f1b17e8-a16d-c029-88e0-01f522cc077a@amd.com>
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v4 0/2] kvm-unit-tests: Build changes to support illumos.
+Content-Language: en-US
+To:     Dan Cross <cross@oxidecomputer.com>, kvm@vger.kernel.org
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <CAA9fzEHQ49hsCMKG_=R_6R6wN8V8fDDibLJee1a1xLCcrkom-Q@mail.gmail.com>
+ <20220601215749.30223-1-cross@oxidecomputer.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220601215749.30223-1-cross@oxidecomputer.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 01, 2022 at 02:11:42PM +0200, Gupta, Pankaj wrote:
+On 01/06/2022 23.57, Dan Cross wrote:
+> We have begun using kvm-unit-tests to test Bhyve under
+> illumos.  We started by cross-compiling the tests on Linux
+> and transfering the binary artifacts to illumos machines,
+> but it proved more convenient to build them directly on
+> illumos.
 > 
-> > > > Introduce a new memfd_create() flag indicating the content of the
-> > > > created memfd is inaccessible from userspace through ordinary MMU
-> > > > access (e.g., read/write/mmap). However, the file content can be
-> > > > accessed via a different mechanism (e.g. KVM MMU) indirectly.
-> > > > 
-> > > 
-> > > SEV, TDX, pkvm and software-only VMs seem to have usecases to set up
-> > > initial guest boot memory with the needed blobs.
-> > > TDX already supports a KVM IOCTL to transfer contents to private
-> > > memory using the TDX module but rest of the implementations will need
-> > > to invent
-> > > a way to do this.
-> > 
-> > There are some discussions in https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flkml.org%2Flkml%2F2022%2F5%2F9%2F1292&amp;data=05%7C01%7Cpankaj.gupta%40amd.com%7Cb81ef334e2dd44c6143308da43b87d17%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637896756895977587%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=oQbM2Hj7GlhJTwnTM%2FPnwsfJlmTL7JR9ULBysAqm6V8%3D&amp;reserved=0
-> > already. I somehow agree with Sean. TDX is using an dedicated ioctl to
-> > copy guest boot memory to private fd so the rest can do that similarly.
-> > The concern is the performance (extra memcpy) but it's trivial since the
-> > initial guest payload is usually optimized in size.
-> > 
-> > > 
-> > > Is there a plan to support a common implementation for either allowing
-> > > initial write access from userspace to private fd or adding a KVM
-> > > IOCTL to transfer contents to such a file,
-> > > as part of this series through future revisions?
-> > 
-> > Indeed, adding pre-boot private memory populating on current design
-> > isn't impossible, but there are still some opens, e.g. how to expose
-> > private fd to userspace for access, pKVM and CC usages may have
-> > different requirements. Before that's well-studied I would tend to not
-> > add that and instead use an ioctl to copy. Whether we need a generic
-> > ioctl or feature-specific ioctl, I don't have strong opinion here.
-> > Current TDX uses a feature-specific ioctl so it's not covered in this
-> > series.
-> 
-> Common function or ioctl to populate preboot private memory actually makes
-> sense.
-> 
-> Sorry, did not follow much of TDX code yet, Is it possible to filter out
-> the current TDX specific ioctl to common function so that it can be used by
-> other technologies?
+> This patch series modifies the build infrastructure to allow
+> building on illumos; the changes were minimal.  I have also
+> tested these changes on Linux to ensure no regressions.
 
-TDX code is here:
-https://patchwork.kernel.org/project/kvm/patch/70ed041fd47c1f7571aa259450b3f9244edda48d.1651774250.git.isaku.yamahata@intel.com/
+Thanks, this version survived the CI, so I've applied it now.
 
-AFAICS It might be possible to filter that out to a common function. But
-would like to hear from Paolo/Sean for their opinion.
+  Thomas
 
-Chao
-> 
-> Thanks,
-> Pankaj
+
