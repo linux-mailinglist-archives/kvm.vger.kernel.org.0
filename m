@@ -2,66 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 569B853B2B7
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 06:27:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 213D553B2D3
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 06:55:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbiFBE0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 00:26:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35524 "EHLO
+        id S229759AbiFBEzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 00:55:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbiFBE0m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 00:26:42 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5554D259CD7
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 21:26:41 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id nn3-20020a17090b38c300b001e0e091cf03so5118557pjb.1
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 21:26:41 -0700 (PDT)
+        with ESMTP id S229539AbiFBEzA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 00:55:00 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8C1DE332
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 21:54:59 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id n28so4741020edb.9
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 21:54:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
-        h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
-         :content-transfer-encoding;
-        bh=07OKdl+NR+lEY+BPv6L1IZEtN57lA0Mz6uUlDluxQyE=;
-        b=Qrmeo5c948/IdijZouKusOBj8+3ApTb48cCYu5OOEdxGq7X+xEraJzHzO9puKeByBf
-         P13j9MpgJWHCXk9eZQ/Diw53LN4YtWN5svBN4a9aApyyPK6fDxbGdSzss6G4Sehyr+59
-         BUw/GFmNdhx3Kzr6rUp8kzFfFiNcvOfmhKJ8c9TgACi0J8q944ZjJd18oJiAzOctnRcA
-         b61rR7COJEsB/u2FtIwsne+MVvw/eetYgYmIfsCLlR9rlHHKDF59TtMqmXa2bV/338Yg
-         9xKys9CoZ+t+obTEHMx4ZaG8nWD5Qd6+iSnehoCUS+7x7BQqN3RlGJZaqCs0yR7ZFVMz
-         wA9g==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CT5U1CNgwxidSdv3BAoIuCkc8N49tG8Y3S2gxdkEwQc=;
+        b=qFLx03JiHRMRBF2tUKlivLscBJuszLtEorC4CphQhJPIYRPWkbUsJaf6JKz4cXlBsI
+         RbuJqveOOZTmtYVWoBNRBBZYsxyWXOfnIv1PyKojemfoXaaMFEnbR4RkvZ6e2MlITMgz
+         xndE4Kp0Ph9+YZleH3O20DAsAto/bZYRwYX0uCXA6HVMLpG09rxZFUdqJXRHw58CqO76
+         CLDUc56DRzvxBmzGGg7xrhd42BPOSWqJHh4OU84ygOVOD6lJFfRC8pkHxq31cvodvxm2
+         vuJRSMDlEWxawFB2Hm7bXeMKkDyioPuFWfxCITD7i2XBeB1OE4A56Evf28OvuPvi1i/H
+         wzgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
-         :mime-version:content-transfer-encoding;
-        bh=07OKdl+NR+lEY+BPv6L1IZEtN57lA0Mz6uUlDluxQyE=;
-        b=eBGClHh9+tDtHojFJluGEDvmz4PNlBax/36WdVTWHum45ZH6MgvYxf/G0L5Ka0MqtI
-         HuN1CqwsggwxlTj9P20BUnpfYTXyqlEZAJ3+Oz+DJoa4T24mu1VjuGALoeO3cUaMXFMQ
-         /QQrKg/IN6DBchOfKOiOJ8YCJkiFsMbGkNg3hpad0wIxooZJIRvxezWTeMdASZhzku6g
-         7wsxOuAoweBBLUPe0EKtK+xf6E1QLABkAO+etqOovAYqhjYdg7gMSYwxsJxMz6a+USua
-         fn8ucn4o96lAwxp+z6655QbArsAueB9TsrTqCEUw0QBFVpo6wXnxsIg1atS73ijfjjZS
-         KGMg==
-X-Gm-Message-State: AOAM531C78uphw7eIr495bwoT88cbN0cuNiiu6Axd9+nEYMVjQuJKZW5
-        qsTOUFE0Jh3De4RGt5BOzGle/+ICFBnSyw==
-X-Google-Smtp-Source: ABdhPJxJZEw2/wu1mLFm7uXm2h9zayuqLLNGNyNu5dUcwkEWMsKxztPJejEVkOOycK4a8cW19zPQeA==
-X-Received: by 2002:a17:90a:aa8c:b0:1df:359a:1452 with SMTP id l12-20020a17090aaa8c00b001df359a1452mr3057296pjq.75.1654144000765;
-        Wed, 01 Jun 2022 21:26:40 -0700 (PDT)
-Received: from localhost ([12.3.194.138])
-        by smtp.gmail.com with ESMTPSA id 137-20020a63018f000000b003fbfd5e4ddcsm2218899pgb.75.2022.06.01.21.26.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 21:26:40 -0700 (PDT)
-Date:   Wed, 01 Jun 2022 21:26:40 -0700 (PDT)
-X-Google-Original-Date: Wed, 01 Jun 2022 21:26:06 PDT (-0700)
-Subject:     (RISC-V KVM) Re: [PATCH] RISC-V: fix typos in comments
-In-Reply-To: <20220430191122.8667-6-Julia.Lawall@inria.fr>
-CC:     kernel-janitors@vger.kernel.org, atishp@atishpatra.org,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     Julia.Lawall@inria.fr, anup@brainfault.org
-Message-ID: <mhng-523319d8-fda9-4737-9c43-d54bcfd7a7f2@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CT5U1CNgwxidSdv3BAoIuCkc8N49tG8Y3S2gxdkEwQc=;
+        b=ttuil0QleOiGWIw9V1/F4/XwQV+Sl5876uJ4CPX2ZAuM+GQWVqbTSNJTogxYpgLRqF
+         y/6KobB7CT9jEIGXyXqKzVFDgMtzf++Cm95tE9AfEHpVlUU6RZvrM9mFIAMf5rTTqkNj
+         bakaHTWeGoAp/Gt6QtgOrRTV13tj4GCJuod8wvIo37Z56ArmhptGa+xJmW8abA7TiOPz
+         e9QoX2vvse+1lMnh4R3saYIy9QL5QS9TWL8K2eOJuhEueAcYFCB85K3XBM5dCx87fjOX
+         8mqdNmthkoqxBhgwO1GFmiIR0IAOjGZ7luIKNu111/iN8nQrjl/azxQduaLP6g585Xpr
+         QK2g==
+X-Gm-Message-State: AOAM533RuoQP9vg/46RkRfrZkkhY2r9Fv0C1xKHYjUaHof1r8+NcQM4O
+        XQmO9wVnC/xnMWet6u4eY/owT2ai/flk9g43IY78
+X-Google-Smtp-Source: ABdhPJy2nzbxpIUDhQw/9Q2i5yD2iJuGOy+CCGclsFLoGzrVa/htZh2BxqdApawF1bsXoBkus+DOa+5Pxk2GC8LRS2w=
+X-Received: by 2002:a05:6402:254e:b0:42b:4633:e53e with SMTP id
+ l14-20020a056402254e00b0042b4633e53emr3354727edb.314.1654145697926; Wed, 01
+ Jun 2022 21:54:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220505100910.137-1-xieyongji@bytedance.com> <CACGkMEv3Ofbu7OOTB9vN2Lt85TD44LipjoPm26KEq3RiKJU0Yw@mail.gmail.com>
+ <CACycT3uakPB_JeXb11hrBaPjcdqign3FmuQd3FXgFR7orO_Eaw@mail.gmail.com> <CACGkMEu72zPKyZXWvyeMsNwjKohXHEMu_hp1dwPVF_2RF5ezPA@mail.gmail.com>
+In-Reply-To: <CACGkMEu72zPKyZXWvyeMsNwjKohXHEMu_hp1dwPVF_2RF5ezPA@mail.gmail.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 2 Jun 2022 12:55:50 +0800
+Message-ID: <CACycT3v8bo=6YHmb-F3fEjVSCsJdWSLwLy4RTz6hCW39FAZZPA@mail.gmail.com>
+Subject: Re: [PATCH v2] vringh: Fix loop descriptors check in the indirect cases
+To:     mst <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc:     rusty <rusty@rustcorp.com.au>, fam.zheng@bytedance.com,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -71,35 +66,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 30 Apr 2022 12:11:20 PDT (-0700), Julia.Lawall@inria.fr wrote:
-> Various spelling mistakes in comments.
-> Detected with the help of Coccinelle.
->
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
->
-> ---
->  arch/riscv/kvm/vmid.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
-> index 2fa4f7b1813d..4a2178c60b5d 100644
-> --- a/arch/riscv/kvm/vmid.c
-> +++ b/arch/riscv/kvm/vmid.c
-> @@ -92,7 +92,7 @@ void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu)
->  		 * We ran out of VMIDs so we increment vmid_version and
->  		 * start assigning VMIDs from 1.
->  		 *
-> -		 * This also means existing VMIDs assignement to all Guest
-> +		 * This also means existing VMIDs assignment to all Guest
->  		 * instances is invalid and we have force VMID re-assignement
->  		 * for all Guest instances. The Guest instances that were not
->  		 * running will automatically pick-up new VMIDs because will
+Ping.
 
-Anup: I'm guessing you didn't see this because it didn't have KVM in the 
-subject?
-
-Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
-Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
-
-if that helps any, I don't see in anywhere but not sure if I'm just 
-missing it.
+On Tue, May 10, 2022 at 3:56 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+> On Tue, May 10, 2022 at 3:54 PM Yongji Xie <xieyongji@bytedance.com> wrote:
+> >
+> > On Tue, May 10, 2022 at 3:44 PM Jason Wang <jasowang@redhat.com> wrote:
+> > >
+> > > On Thu, May 5, 2022 at 6:08 PM Xie Yongji <xieyongji@bytedance.com> wrote:
+> > > >
+> > > > We should use size of descriptor chain to test loop condition
+> > > > in the indirect case. And another statistical count is also introduced
+> > > > for indirect descriptors to avoid conflict with the statistical count
+> > > > of direct descriptors.
+> > > >
+> > > > Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
+> > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > > > Signed-off-by: Fam Zheng <fam.zheng@bytedance.com>
+> > > > ---
+> > > >  drivers/vhost/vringh.c | 10 ++++++++--
+> > > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > > > index 14e2043d7685..eab55accf381 100644
+> > > > --- a/drivers/vhost/vringh.c
+> > > > +++ b/drivers/vhost/vringh.c
+> > > > @@ -292,7 +292,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
+> > > >              int (*copy)(const struct vringh *vrh,
+> > > >                          void *dst, const void *src, size_t len))
+> > > >  {
+> > > > -       int err, count = 0, up_next, desc_max;
+> > > > +       int err, count = 0, indirect_count = 0, up_next, desc_max;
+> > > >         struct vring_desc desc, *descs;
+> > > >         struct vringh_range range = { -1ULL, 0 }, slowrange;
+> > > >         bool slow = false;
+> > > > @@ -349,7 +349,12 @@ __vringh_iov(struct vringh *vrh, u16 i,
+> > > >                         continue;
+> > > >                 }
+> > > >
+> > > > -               if (count++ == vrh->vring.num) {
+> > > > +               if (up_next == -1)
+> > > > +                       count++;
+> > > > +               else
+> > > > +                       indirect_count++;
+> > > > +
+> > > > +               if (count > vrh->vring.num || indirect_count > desc_max) {
+> > > >                         vringh_bad("Descriptor loop in %p", descs);
+> > > >                         err = -ELOOP;
+> > > >                         goto fail;
+> > > > @@ -411,6 +416,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
+> > > >                                 i = return_from_indirect(vrh, &up_next,
+> > > >                                                          &descs, &desc_max);
+> > > >                                 slow = false;
+> > > > +                               indirect_count = 0;
+> > >
+> > > Do we need to reset up_next to -1 here?
+> > >
+> >
+> > It will be reset to -1 in return_from_indirect().
+>
+> Right. Then
+>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+>
+> Thanks
+>
+> >
+> > Thanks,
+> > Yongji
+> >
+>
