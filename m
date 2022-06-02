@@ -2,147 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D48D053B60B
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 11:27:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54E3353B662
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 11:52:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233067AbiFBJ1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 05:27:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36612 "EHLO
+        id S233231AbiFBJwC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 05:52:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233070AbiFBJ1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 05:27:16 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD7A62AB225
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 02:27:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654162033; x=1685698033;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=N6PpjBk4nvg7Ou/iJNU4Gw3B97lPMNDnS0Fdgi2ltQk=;
-  b=g7SObWM+KYOmWTvyp54fn5jYNyftFW61gS/HaeER7rQEqO3re/XeCWsT
-   qW9dY8h2jac1zlskynbbyEVdQ4tdripIIGQ7fNBzoIoe0rR3RIQeLV2KV
-   SoEE2GsZ1yRhiS3zUqX2RqPuCM0i5ZpdBetOHzcbwSHNyAbWqjp7b14gl
-   5FjW66tyRpLehfH4/fCcdVn5DItnJ7P9+g81dH8/Ub18oee4K+UgrHFoK
-   Dxkb6eQUqM63I2kNCR93vvk/B2c4RN75NDZMpZ4hez4XnqIwxlYxwvZT7
-   doUMRxy+zUrfXGJa/GKyQ54qYE7yTuOD2Do2ss3Z5hYs061np9e7MK4e5
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10365"; a="336549227"
-X-IronPort-AV: E=Sophos;i="5.91,270,1647327600"; 
-   d="scan'208";a="336549227"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2022 02:27:13 -0700
-X-IronPort-AV: E=Sophos;i="5.91,270,1647327600"; 
-   d="scan'208";a="606752208"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.171.226]) ([10.249.171.226])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2022 02:27:08 -0700
-Message-ID: <115674c7-8316-0d13-5dc0-ab680590c59b@intel.com>
-Date:   Thu, 2 Jun 2022 17:27:06 +0800
+        with ESMTP id S233014AbiFBJwB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 05:52:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9A5C512ADC
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 02:51:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654163519;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=95fjZ/B3kpsPbz5qD+HTWPkRB4J4HKCIftwEN6akcmc=;
+        b=QMa0PBWp+kdBPUQgqSPpfCMzuMkcQMsiJhX5Nijf4HIc4dh/35VKdFEy/PA2gMk3T2tdQx
+        r6ewvHByKA1d4xkkQv7F2d4BnFUllzsmBdJs8F44vEa9uhC2WtenqYNalYrU4YlJraXAPO
+        IsNebcE4XQHpex+cIGFLglu+BvYPiCw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-390-sQRHP6K8OSe5fptATcjx2A-1; Thu, 02 Jun 2022 05:51:57 -0400
+X-MC-Unique: sQRHP6K8OSe5fptATcjx2A-1
+Received: by mail-wm1-f71.google.com with SMTP id i1-20020a05600c354100b003976fc71579so2568972wmq.8
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 02:51:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=95fjZ/B3kpsPbz5qD+HTWPkRB4J4HKCIftwEN6akcmc=;
+        b=0+crfzZpVIEddzwpmt0wE+JH13ntJ3zJNQy3lIjeUWXlXUtYPjE+IVuUvAUUkhWAzw
+         mdWfA1wEJQlPGtqV8ioupa4Na0VBxkz2ZSanwB3Lj4jYoc9yhd/n9KsXfbZDJBH3w6y/
+         0msEcING1CcjaAtzDXjy3E1y9znW2nCESoLls9HaS8Xt0Qb+QbEoVLhHRxWCfy5cxqgH
+         cz442+YPPy8HCmpoVoali25snEgsF9PS8fShyEWbIxDkfk/XgMNGGWgZ4UJS+8bTQCUg
+         wDJ7VLur9ktZWkKeHTn9HRIFaQQMagcSc9pFXBdr0NiSafgmt10mWgKl98uHGUj98y6c
+         efmA==
+X-Gm-Message-State: AOAM530sPOkAlrP3o4Xqx7CKBl3FHojfLwnnAHgjLPdkFvW3SS4JvjQi
+        ZQ9kQwU5VXnJOR7SGsq9atGUUF0WNQZClA2EOWxkNJJyBjpUvGBQqwaFJfE644+3gh8A65C5nJr
+        1Ib3BEyTInAxi
+X-Received: by 2002:a05:600c:4fcd:b0:398:e5d2:bfc7 with SMTP id o13-20020a05600c4fcd00b00398e5d2bfc7mr24335355wmq.60.1654163516718;
+        Thu, 02 Jun 2022 02:51:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxerGLbgaKfeaVA7rraLsd7mgR0u9TWI3iGl43SD0tSzx9IQc+Lqm5RcOZz7zZy+hjkwc3juA==
+X-Received: by 2002:a05:600c:4fcd:b0:398:e5d2:bfc7 with SMTP id o13-20020a05600c4fcd00b00398e5d2bfc7mr24335336wmq.60.1654163516509;
+        Thu, 02 Jun 2022 02:51:56 -0700 (PDT)
+Received: from redhat.com ([2.52.157.68])
+        by smtp.gmail.com with ESMTPSA id u18-20020a5d5152000000b0020cdcb0efa2sm3791739wrt.34.2022.06.02.02.51.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jun 2022 02:51:55 -0700 (PDT)
+Date:   Thu, 2 Jun 2022 05:51:52 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Jason Wang <jasowang@redhat.com>, rusty <rusty@rustcorp.com.au>,
+        fam.zheng@bytedance.com, kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH v2] vringh: Fix loop descriptors check in the indirect
+ cases
+Message-ID: <20220602055133-mutt-send-email-mst@kernel.org>
+References: <20220505100910.137-1-xieyongji@bytedance.com>
+ <CACGkMEv3Ofbu7OOTB9vN2Lt85TD44LipjoPm26KEq3RiKJU0Yw@mail.gmail.com>
+ <CACycT3uakPB_JeXb11hrBaPjcdqign3FmuQd3FXgFR7orO_Eaw@mail.gmail.com>
+ <CACGkMEu72zPKyZXWvyeMsNwjKohXHEMu_hp1dwPVF_2RF5ezPA@mail.gmail.com>
+ <CACycT3v8bo=6YHmb-F3fEjVSCsJdWSLwLy4RTz6hCW39FAZZPA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.9.0
-Subject: Re: [RFC PATCH v4 23/36] i386/tdx: Setup the TD HOB list
-Content-Language: en-US
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com,
-        "Xu, Min M" <min.m.xu@intel.com>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-24-xiaoyao.li@intel.com>
- <20220524075626.l7rgyjz3jhojhds2@sirius.home.kraxel.org>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220524075626.l7rgyjz3jhojhds2@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACycT3v8bo=6YHmb-F3fEjVSCsJdWSLwLy4RTz6hCW39FAZZPA@mail.gmail.com>
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/24/2022 3:56 PM, Gerd Hoffmann wrote:
->    Hi,
-> 
->> +static void tdvf_hob_add_mmio_resources(TdvfHob *hob)
->> +{
->> +    MachineState *ms = MACHINE(qdev_get_machine());
->> +    X86MachineState *x86ms = X86_MACHINE(ms);
->> +    PCIHostState *pci_host;
->> +    uint64_t start, end;
->> +    uint64_t mcfg_base, mcfg_size;
->> +    Object *host;
->> +
->> +    /* Effectively PCI hole + other MMIO devices. */
->> +    tdvf_hob_add_mmio_resource(hob, x86ms->below_4g_mem_size,
->> +                               APIC_DEFAULT_ADDRESS);
->> +
->> +    /* Stolen from acpi_get_i386_pci_host(), there's gotta be an easier way. */
->> +    pci_host = OBJECT_CHECK(PCIHostState,
->> +                            object_resolve_path("/machine/i440fx", NULL),
->> +                            TYPE_PCI_HOST_BRIDGE);
->> +    if (!pci_host) {
->> +        pci_host = OBJECT_CHECK(PCIHostState,
->> +                                object_resolve_path("/machine/q35", NULL),
->> +                                TYPE_PCI_HOST_BRIDGE);
->> +    }
->> +    g_assert(pci_host);
->> +
->> +    host = OBJECT(pci_host);
->> +
->> +    /* PCI hole above 4gb. */
->> +    start = object_property_get_uint(host, PCI_HOST_PROP_PCI_HOLE64_START,
->> +                                     NULL);
->> +    end = object_property_get_uint(host, PCI_HOST_PROP_PCI_HOLE64_END, NULL);
->> +    tdvf_hob_add_mmio_resource(hob, start, end);
->> +
->> +    /* MMCFG region */
->> +    mcfg_base = object_property_get_uint(host, PCIE_HOST_MCFG_BASE, NULL);
->> +    mcfg_size = object_property_get_uint(host, PCIE_HOST_MCFG_SIZE, NULL);
->> +    if (mcfg_base && mcfg_base != PCIE_BASE_ADDR_UNMAPPED && mcfg_size) {
->> +        tdvf_hob_add_mmio_resource(hob, mcfg_base, mcfg_base + mcfg_size);
->> +    }
->> +}
-> 
-> That looks suspicious.  I think you need none of this, except for the
-> first tdvf_hob_add_mmio_resource() call which adds the below-4G hole.
+On Thu, Jun 02, 2022 at 12:55:50PM +0800, Yongji Xie wrote:
+> Ping.
 
-for below-4G hole, it seems can be removed as well since I notice that 
-OVMF will prepare that mmio hob for TD, in OVMF. Is it correct?
 
-> It is the firmware which places the mmio resources into the address
-> space by programming the pci config space of the devices.  qemu doesn't
-> dictate any of this, and I doubt you get any useful values here.  The
-> core runs before the firmware had the chance to do any setup here ...
-> 
->> new file mode 100644
->> index 000000000000..b15aba796156
->> --- /dev/null
->> +++ b/hw/i386/uefi.h
-> 
-> Separate patch please.
-> 
-> Also this should probably go somewhere below
-> include/standard-headers/
+Thanks for the reminder!
+Will queue for rc2, rc1 has too much stuff already.
 
-I will do it in next post.
-
-> take care,
->    Gerd
-> 
+> On Tue, May 10, 2022 at 3:56 PM Jason Wang <jasowang@redhat.com> wrote:
+> >
+> > On Tue, May 10, 2022 at 3:54 PM Yongji Xie <xieyongji@bytedance.com> wrote:
+> > >
+> > > On Tue, May 10, 2022 at 3:44 PM Jason Wang <jasowang@redhat.com> wrote:
+> > > >
+> > > > On Thu, May 5, 2022 at 6:08 PM Xie Yongji <xieyongji@bytedance.com> wrote:
+> > > > >
+> > > > > We should use size of descriptor chain to test loop condition
+> > > > > in the indirect case. And another statistical count is also introduced
+> > > > > for indirect descriptors to avoid conflict with the statistical count
+> > > > > of direct descriptors.
+> > > > >
+> > > > > Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
+> > > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > > > > Signed-off-by: Fam Zheng <fam.zheng@bytedance.com>
+> > > > > ---
+> > > > >  drivers/vhost/vringh.c | 10 ++++++++--
+> > > > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > > > > index 14e2043d7685..eab55accf381 100644
+> > > > > --- a/drivers/vhost/vringh.c
+> > > > > +++ b/drivers/vhost/vringh.c
+> > > > > @@ -292,7 +292,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
+> > > > >              int (*copy)(const struct vringh *vrh,
+> > > > >                          void *dst, const void *src, size_t len))
+> > > > >  {
+> > > > > -       int err, count = 0, up_next, desc_max;
+> > > > > +       int err, count = 0, indirect_count = 0, up_next, desc_max;
+> > > > >         struct vring_desc desc, *descs;
+> > > > >         struct vringh_range range = { -1ULL, 0 }, slowrange;
+> > > > >         bool slow = false;
+> > > > > @@ -349,7 +349,12 @@ __vringh_iov(struct vringh *vrh, u16 i,
+> > > > >                         continue;
+> > > > >                 }
+> > > > >
+> > > > > -               if (count++ == vrh->vring.num) {
+> > > > > +               if (up_next == -1)
+> > > > > +                       count++;
+> > > > > +               else
+> > > > > +                       indirect_count++;
+> > > > > +
+> > > > > +               if (count > vrh->vring.num || indirect_count > desc_max) {
+> > > > >                         vringh_bad("Descriptor loop in %p", descs);
+> > > > >                         err = -ELOOP;
+> > > > >                         goto fail;
+> > > > > @@ -411,6 +416,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
+> > > > >                                 i = return_from_indirect(vrh, &up_next,
+> > > > >                                                          &descs, &desc_max);
+> > > > >                                 slow = false;
+> > > > > +                               indirect_count = 0;
+> > > >
+> > > > Do we need to reset up_next to -1 here?
+> > > >
+> > >
+> > > It will be reset to -1 in return_from_indirect().
+> >
+> > Right. Then
+> >
+> > Acked-by: Jason Wang <jasowang@redhat.com>
+> >
+> > Thanks
+> >
+> > >
+> > > Thanks,
+> > > Yongji
+> > >
+> >
 
