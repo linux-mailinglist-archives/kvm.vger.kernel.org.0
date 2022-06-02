@@ -2,399 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4450053BDD1
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 20:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75F3653BE3F
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 20:56:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237902AbiFBSQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 14:16:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40212 "EHLO
+        id S238279AbiFBSzn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 14:55:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234302AbiFBSQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 14:16:36 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6313B13F94;
-        Thu,  2 Jun 2022 11:16:32 -0700 (PDT)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 252FFNCT015597;
-        Thu, 2 Jun 2022 18:16:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=x4CHhe4oknN8i7Mz6K5UbGv8XshiwFwMdSGvV+3mR2A=;
- b=fqqiDmLad1YC2D5CTsT8CoQBCSRl05jvwXEMyTgilUb3lqTiZPAq0gyfmkyhkYuqQvQk
- 31Am0mgqeWAlyqBsfh20tRBhOpKRfmcziZtKmbqEPXEPNv1/MbE0/nCfywVshYiWBZgi
- TVt9nINyM46crWEydeNK369xyBAswxIur5ygNGixHPFh49VgErfVLy3rQlDMR4jp64Eo
- WqGLFh1mInhYcza38rRP9HnZbjnDSa1E/eiahcPA3DthUYQMcm64Nn2ffGPLNh8lHto/
- junnR8owlXoT5mWeyBWJra0pQpgOhxeMkTJEUJgEhpzK4U7p7Nqk8CobEPHPSLRR9/AF Ag== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3geyphb5cp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jun 2022 18:16:30 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 252I3BXI002706;
-        Thu, 2 Jun 2022 18:16:29 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3geyphb5cg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jun 2022 18:16:29 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 252I648A028737;
-        Thu, 2 Jun 2022 18:16:28 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma01dal.us.ibm.com with ESMTP id 3gcxt5v94m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jun 2022 18:16:27 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 252IGQCH38011148
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Jun 2022 18:16:26 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 784BB6A054;
-        Thu,  2 Jun 2022 18:16:26 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A03496A04D;
-        Thu,  2 Jun 2022 18:16:25 +0000 (GMT)
-Received: from [9.60.75.219] (unknown [9.60.75.219])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Jun 2022 18:16:25 +0000 (GMT)
-Message-ID: <6a574d7e-c390-3764-a57c-23c7653f2f69@linux.ibm.com>
-Date:   Thu, 2 Jun 2022 14:16:25 -0400
+        with ESMTP id S236523AbiFBSzl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 14:55:41 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2044.outbound.protection.outlook.com [40.107.92.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFE4228F61;
+        Thu,  2 Jun 2022 11:55:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ABwYvxGJ9ZRLP7LCYHx8l9nwhvTl9nmRkdA1mKnxdmGQr+hnXsOdxWGOo0nQm20XyZt4tbTmiHhfJJWiwTUTYMEwSXpmqSfSLEmrjNH2mSWruy5AyHOGscDjfD0YxbNwZbzBWSx8OsFQVp4d4jjpuY5Ckw6HT1NWmnqzm0/5Nze2n/Xr9Mc3krYh3HZzD65cZaDYUDDggPzsqw1PakzNfjYUL0l+szG9cxWaBkOMC4FZouuy8XOrgqtmh+Up/dH7UUMF3xGqc2kt59WU03xCpjw79tH8XQYOruC0LumbyPFp3dTHMTMgin6zGEfnUk647MNMcX+s32cACdVYKPcQ0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Mzo8xggRku4R5PhLoM+Ud/EkQix263EeKuq3UaGeQcU=;
+ b=lrbG440yVTljTuE+ni36kZI/OmIYCbTgen/8T2dOinRNWdcoJnGec+fVo+rruWmoSBO9ytSUVRTyfQ9CaSkRkH2/MVt+8ZWyMuP8Ojx4k+FXpsFUyJcKHJBiYIUj1P+gH351u8KYt2gyPTKBQNSNPE/m+g48Xfz2sOZnRxHPcsFW4wiGj9GROwB7aCrBA6g4knhL5ws39gHLdJuqF347V4dTg9X1qT0+9Q1MrxPp3J8MoAvFsE6GFAKksBUTyyTZWadc3LURT1JYSnCwZSUaZQ8UNp92VTJln+sHlYuXVjlHJoC9mImdBhsi3Mz3Be586mC9qRITU1UuA3PCsMHeXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mzo8xggRku4R5PhLoM+Ud/EkQix263EeKuq3UaGeQcU=;
+ b=btOO1PrPKVpKDNYsBoptAuppPS3obsbIeZPEGUmluSH6WGI1FytgAa1eBRGbDrSwlGTbc7lMEkGTR91L4IN5ZbmxnIB5OwZBK+zRjtFL9JQnkVrKuFAnCnO3eRx1QvxSMFZcpcwqRcp1hdyGEUV7AviEBYaa2yVyLY1C18eEjbXldOeo/WEysBXaFNnhFdHcrJ2yD8h6ndsv+rj09jZ60cJiyHl4xyXYLfRz6o4JRcSUBLpUTyahz1fwmTI37pb/hTw2MfmGX8Pubb/wn2nMJWNItxn+5Cly+OA/UIMcvEYWKXyAYzk3Xfb0cg8iSxMb8yYQbBnHhDUmewwVPeAvhA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN6PR1201MB2499.namprd12.prod.outlook.com (2603:10b6:404:b2::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.12; Thu, 2 Jun
+ 2022 18:55:37 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::2484:51da:d56f:f1a5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::2484:51da:d56f:f1a5%9]) with mapi id 15.20.5314.015; Thu, 2 Jun 2022
+ 18:55:37 +0000
+Date:   Thu, 2 Jun 2022 15:55:36 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Michael Kawano <mkawano@linux.ibm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v1 01/18] vfio/ccw: Remove UUID from s390 debug log
+Message-ID: <20220602185536.GY1343366@nvidia.com>
+References: <20220602171948.2790690-1-farman@linux.ibm.com>
+ <20220602171948.2790690-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220602171948.2790690-2-farman@linux.ibm.com>
+X-ClientProxiedBy: MN2PR02CA0018.namprd02.prod.outlook.com
+ (2603:10b6:208:fc::31) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH v19 15/20] s390/vfio-ap: implement in-use callback for
- vfio_ap driver
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
- <20220404221039.1272245-16-akrowiak@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220404221039.1272245-16-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: KKF915Jc-mH4WGPiW8P4dg_MHFTB1_1o
-X-Proofpoint-GUID: 59rMyBdY21xqROeL0Xj8XtLtWERSAoQ-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-02_05,2022-06-02_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- impostorscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 bulkscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206020076
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b9c80352-2bd6-46bd-c854-08da44c97b13
+X-MS-TrafficTypeDiagnostic: BN6PR1201MB2499:EE_
+X-Microsoft-Antispam-PRVS: <BN6PR1201MB2499890506B9CDDA80E3CC2EC2DE9@BN6PR1201MB2499.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Nnfmf7SHGwUZ0A8j/Rs8oVbKOU+DatPqr/a9jCkvCu+DIhApUU5zIfDV6EbVo8NupO56fiqQodgbDHFrTYhBIunc5C8gBTYV4ihnSuSsATB518EIDABuxRc9qF6Ke6GHGGyqEQuksq3LQg0kFyvJmvBMLaYoy+yRRatpKr9/d2izPSNzi4iNFcbICYCd2hmbuWDQqOP9jSmYO/OcQAF6+YXcUC0LirbjrdV08rNc5NY7gtPO1fiP+4OwOatkWJF6+BdguH+R3LQinBVxHTIZNWh9hDx+Ig3uIw0dJipHt6iWWzI8PsJ37dkZ2tjtXtoJPP9tJxZozzOGkuC9b9Xc0Et9Qt4//6TZ+O4L9xWSNk6+hTn0s6BSPJ0PEteTJGV7tF5CMePPH/kkn6Zm+gU1/gQLIp2qFTlQ614bOLX1LN+mrVC7nvmTXyeqfiyeNlfXOPW9C80rKp0meL+D1SF6gOfiI631h1/W6zcLYAcPN1HEyWW50DjaISaXdzGK0Gh9Ml9eLDAYFz8MeBxU7fvAjhaBPgOXPcd5A5PSnKyhPTn0txr9Bv+jTiKOlIOUeW52EqoyqmzwvGuX+IDf8A6quZ9xZoyv2xv0z8PGabFqxdm76xwaq75LaxOXCKNTCqayZwwkNLNb1pxWWzRGLt8OWA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(1076003)(6486002)(8936002)(2616005)(83380400001)(66946007)(4326008)(33656002)(66476007)(66556008)(316002)(86362001)(107886003)(26005)(8676002)(6506007)(38100700002)(6512007)(186003)(5660300002)(2906002)(4744005)(508600001)(36756003)(54906003)(6916009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GRv4kjATKV6KRwq7ivM0ulpyp0//oABS6coc4HNPYljgLE4XKRX0JvSgd5is?=
+ =?us-ascii?Q?iOl/S+7KS6rVkzLTePvjQdJB7VrKzipI+lHUQ9ri8fyctndXMrPgEIUpQkLH?=
+ =?us-ascii?Q?7mkHQnNI2E7k+eY6vmsex165ip1dY3bu1qjLwF4DOekA8NqDzPDW4LdnYYJY?=
+ =?us-ascii?Q?kuxYZfgsagwBZuGzDh4RfRzBxN5I3CcWleSCtQyLGgBxMgjDgEO9NKW8tyKa?=
+ =?us-ascii?Q?L52riOSey5xRgecgYIwaQpgPuFrg/FJpeMww0g1eQuyykUFmrXJYQjHUG38Q?=
+ =?us-ascii?Q?pCxKoC7kwxa5rf5x8M8Nt6CGaLnhzbHv7IODsKaDgNOrV8YrwCc1KuKrAVuu?=
+ =?us-ascii?Q?mj1saMF6U6KpeSMjkrWB+v1Wv36CBQrXzowsFg8wrW7nBvzMqHxPRhUauEEw?=
+ =?us-ascii?Q?+e5IEzJSB4qMtSObXXW9Zw9DJdI52nQbVFYQoAART6JaZmiEkRkTAc5CEDci?=
+ =?us-ascii?Q?d/7YWheBXUeHVbtDvetqRFO226K2y5My+2oxYRv+q5bSKJW+5mvbix5BVJvb?=
+ =?us-ascii?Q?mIki70KakrEdzWGgRoxdujXwJ4NL7TpXJxRooI/qDwSMtUWptg5ZSc8LZv6A?=
+ =?us-ascii?Q?DT5G69fws8jKVyvgSpg6Xt02hE5q/ksqLv5FukOVGvU4GeHwcISQ+e4tHjl2?=
+ =?us-ascii?Q?MSC4ZiMBTaqKceI7TTpY5lsAxveMPiWPuDOW0dyX4iBqcJNCPDmFkIGwdZNL?=
+ =?us-ascii?Q?XCxjsRgzNOi6QAzDG2DMNJKSgQ1arNU1jzcfLzh4vgRK4TXSbnUAFb461Ne2?=
+ =?us-ascii?Q?1XLhU9V9FKJ+xVKjP+SmBiKs0KakSPSBFA5wFFG7dE+EX2+fIN77Ixea9B6o?=
+ =?us-ascii?Q?nlg+0sreSWUsJkM2kom83h6bKGZGzvZTWjIZVFR6exlyUiPFXatpZvIEwWCr?=
+ =?us-ascii?Q?YmJjk9EU7NQwxBa3Lfq0SZ1Nvvb0jBi/0aJq+uIRRssd3YNsnC/gjucmr/K1?=
+ =?us-ascii?Q?lzNn4B0tBotDo/CUBmW5bxqja1FTiZwjkoiBgKb12/Ot7Gak78AGkbG7Y7LP?=
+ =?us-ascii?Q?cmDyYo3yUjw+NffIImAT1qU9oiRJvGmL0IiPWlW3AKtfIYBb2fdSxEomx9/8?=
+ =?us-ascii?Q?NKUwSqx/7DS5POi5jTY8LTxRfPR9P0uL6u7fRSN+XLcr7uFShyzTtZwM2yKp?=
+ =?us-ascii?Q?gszxA3tte2RroBr7hnjMwSpyZjt0WYX14CVn8pTvEChjkjjDwivys98jbU3r?=
+ =?us-ascii?Q?tmzkNtunA2VSvjVoC5zz50PZnPNF/7LbdY8zJzgnJ8KSnSIFy0DUtHJ4HKHu?=
+ =?us-ascii?Q?i/JStGiPu4HCUYAOxq5e8ZX4vLD24OoGHtLzFmR2liutx1fOk12AHeIsbu4t?=
+ =?us-ascii?Q?ItEAKjRNDPSkTHHht6p3hLcTMuJqdMxHI04Xz4yGJTsLA1mIOV6xGQdka3vf?=
+ =?us-ascii?Q?nJBzJsnk0uWmUKxtb6WBNBss8n8Ktwug7rEZ/jV/brmZwYYQbLUC+78m95DZ?=
+ =?us-ascii?Q?tsZNTadJRvTMLQ87MOUBKYdhEJWhtXCHKvr15/IivyDYZQ1pyNcYCT85D47i?=
+ =?us-ascii?Q?hEYwXzvbCAebhSOrJBK4SAhj3c6eMs7e/gREs3hBQw7EkrT81aZth8/P2OKr?=
+ =?us-ascii?Q?p5mKfSEzhXjHSZJDA5JYCM3d/zDGt5F5A0ecuiXYJH6XziOsrV6SJo3xCRUg?=
+ =?us-ascii?Q?cPROGnUpxDqCFMiF/80N505EAp5mJAbYHiWDtRKSv9GC+ppJhAliaNDrsYcz?=
+ =?us-ascii?Q?bjPfYc2XF1snDcOWaJo572a5Q2zAp+3DgCxMzj20MfpB9dmSjMt9G5R0pxM+?=
+ =?us-ascii?Q?Z704ApiPDQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9c80352-2bd6-46bd-c854-08da44c97b13
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2022 18:55:37.1449
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3VCqPlRyEOQ59r/a3seT6/McayBGGxOb47Xlvce0Yd/pZWpN9KTWThUWR94Mlt9u
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB2499
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/4/22 18:10, Tony Krowiak wrote:
-> Let's implement the callback to indicate when an APQN
-> is in use by the vfio_ap device driver. The callback is
-> invoked whenever a change to the apmask or aqmask would
-> result in one or more queue devices being removed from the driver. The
-> vfio_ap device driver will indicate a resource is in use
-> if the APQN of any of the queue devices to be removed are assigned to
-> any of the matrix mdevs under the driver's control.
+On Thu, Jun 02, 2022 at 07:19:31PM +0200, Eric Farman wrote:
+> From: Michael Kawano <mkawano@linux.ibm.com>
 > 
-> There is potential for a deadlock condition between the
-> matrix_dev->guests_lock used to lock the guest during assignment of
-> adapters and domains and the ap_perms_mutex locked by the AP bus when
-> changes are made to the sysfs apmask/aqmask attributes.
+> As vfio-ccw devices are created/destroyed, the uuid of the associated
+> mdevs that are recorded in $S390DBF/vfio_ccw_msg/sprintf get lost as
+> they are created using pointers passed by reference.
 > 
-> The AP Perms lock controls access to the objects that store the adapter
-> numbers (ap_perms) and domain numbers (aq_perms) for the sysfs
-> /sys/bus/ap/apmask and /sys/bus/ap/aqmask attributes. These attributes
-> identify which queues are reserved for the zcrypt default device drivers.
-> Before allowing a bit to be removed from either mask, the AP bus must check
-> with the vfio_ap device driver to verify that none of the queues are
-> assigned to any of its mediated devices.
-> 
-> The apmask/aqmask attributes can be written or read at any time from
-> userspace, so care must be taken to prevent a deadlock with asynchronous
-> operations that might be taking place in the vfio_ap device driver. For
-> example, consider the following:
-> 
-> 1. A system administrator assigns an adapter to a mediated device under the
->     control of the vfio_ap device driver. The driver will need to first take
->     the matrix_dev->guests_lock to potentially hot plug the adapter into
->     the KVM guest.
-> 2. At the same time, a system administrator sets a bit in the sysfs
->     /sys/bus/ap/ap_mask attribute. To complete the operation, the AP bus
->     must:
->     a. Take the ap_perms_mutex lock to update the object storing the values
->        for the /sys/bus/ap/ap_mask attribute.
->     b. Call the vfio_ap device driver's in-use callback to verify that the
->        queues now being reserved for the default zcrypt drivers are not
->        assigned to a mediated device owned by the vfio_ap device driver. To
->        do the verification, the in-use callback function takes the
->        matrix_dev->guests_lock, but has to wait because it is already held
->        by the operation in 1 above.
-> 3. The vfio_ap device driver calls an AP bus function to verify that the
->     new queues resulting from the assignment of the adapter in step 1 are
->     not reserved for the default zcrypt device driver. This AP bus function
->     tries to take the ap_perms_mutex lock but gets stuck waiting for the
->     waiting for the lock due to step 2a above.
-> 
-> Consequently, we have the following deadlock situation:
-> 
-> matrix_dev->guests_lock locked (1)
-> ap_perms_mutex lock locked (2a)
-> Waiting for matrix_dev->gusts_lock (2b) which is currently held (1)
-> Waiting for ap_perms_mutex lock (3) which is currently held (2a)
-> 
-> To prevent this deadlock scenario, the function called in step 3 will no
-> longer take the ap_perms_mutex lock and require the caller to take the
-> lock. The lock will be the first taken by the adapter/domain assignment
-> functions in the vfio_ap device driver to maintain the proper locking
-> order.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->   drivers/s390/crypto/ap_bus.c          | 31 ++++++++----
->   drivers/s390/crypto/vfio_ap_drv.c     |  1 +
->   drivers/s390/crypto/vfio_ap_ops.c     | 68 +++++++++++++++++++++++++++
->   drivers/s390/crypto/vfio_ap_private.h |  2 +
->   4 files changed, 94 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
-> index fdf16cb70881..f48552e900a2 100644
-> --- a/drivers/s390/crypto/ap_bus.c
-> +++ b/drivers/s390/crypto/ap_bus.c
-> @@ -817,6 +817,17 @@ static void ap_bus_revise_bindings(void)
->   	bus_for_each_dev(&ap_bus_type, NULL, NULL, __ap_revise_reserved);
->   }
->   
-> +/**
-> + * ap_apqn_in_matrix_owned_by_def_drv: indicates whether an APQN c is reserved
-> + *				       for the host drivers or not.
-> + * @card: the APID of the adapter card to check
-> + * @queue: the APQI of the queue to check
-> + *
-> + * Note: the ap_perms_mutex must be locked by the caller of this function.
-> + *
-> + * Return: an int specifying whether the APQN is reserved for the host (1) or
-> + *	   not (0)
-> + */
+> This is a deliberate design point of s390dbf, but it leaves the uuid
+> in these traces less than useful. Since the subchannels are more
+> constant, and are mapped 1:1 with the mdevs, the associated mdev can
+> be discerned by looking at the device configuration (e.g., mdevctl)
+> and places, such as kernel messages, where it is statically stored.
 
-Comment's function name does not match real function name. Also APQN "c", from
-description does not appear to exist.
+I don't quite understand these two paragraphs, but the change looks OK
 
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
->   int ap_owned_by_def_drv(int card, int queue)
->   {
->   	int rc = 0;
-> @@ -824,25 +835,31 @@ int ap_owned_by_def_drv(int card, int queue)
->   	if (card < 0 || card >= AP_DEVICES || queue < 0 || queue >= AP_DOMAINS)
->   		return -EINVAL;
->   
-> -	mutex_lock(&ap_perms_mutex);
-> -
->   	if (test_bit_inv(card, ap_perms.apm)
->   	    && test_bit_inv(queue, ap_perms.aqm))
->   		rc = 1;
->   
-> -	mutex_unlock(&ap_perms_mutex);
-> -
->   	return rc;
->   }
->   EXPORT_SYMBOL(ap_owned_by_def_drv);
->   
-> +/**
-> + * ap_apqn_in_matrix_owned_by_def_drv: indicates whether every APQN contained in
-> + *				       a set is reserved for the host drivers
-> + *				       or not.
-> + * @apm: a bitmap specifying a set of APIDs comprising the APQNs to check
-> + * @aqm: a bitmap specifying a set of APQIs comprising the APQNs to check
-> + *
-> + * Note: the ap_perms_mutex must be locked by the caller of this function.
-> + *
-> + * Return: an int specifying whether each APQN is reserved for the host (1) or
-> + *	   not (0)
-> + */
->   int ap_apqn_in_matrix_owned_by_def_drv(unsigned long *apm,
->   				       unsigned long *aqm)
->   {
->   	int card, queue, rc = 0;
->   
-> -	mutex_lock(&ap_perms_mutex);
-> -
->   	for (card = 0; !rc && card < AP_DEVICES; card++)
->   		if (test_bit_inv(card, apm) &&
->   		    test_bit_inv(card, ap_perms.apm))
-> @@ -851,8 +868,6 @@ int ap_apqn_in_matrix_owned_by_def_drv(unsigned long *apm,
->   				    test_bit_inv(queue, ap_perms.aqm))
->   					rc = 1;
->   
-> -	mutex_unlock(&ap_perms_mutex);
-> -
->   	return rc;
->   }
->   EXPORT_SYMBOL(ap_apqn_in_matrix_owned_by_def_drv);
-> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
-> index c258e5f7fdfc..2c3084589347 100644
-> --- a/drivers/s390/crypto/vfio_ap_drv.c
-> +++ b/drivers/s390/crypto/vfio_ap_drv.c
-> @@ -107,6 +107,7 @@ static const struct attribute_group vfio_queue_attr_group = {
->   static struct ap_driver vfio_ap_drv = {
->   	.probe = vfio_ap_mdev_probe_queue,
->   	.remove = vfio_ap_mdev_remove_queue,
-> +	.in_use = vfio_ap_mdev_resource_in_use,
->   	.ids = ap_queue_ids,
->   };
->   
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 49ed54dc9e05..3ece2cd9f1e7 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -902,6 +902,21 @@ static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
->   	return 0;
->   }
->   
-> +/**
-> + * vfio_ap_mdev_validate_masks - verify that the APQNs assigned to the mdev are
-> + *				 not reserved for the default zcrypt driver and
-> + *				 are not assigned to another mdev.
-> + *
-> + * @matrix_mdev: the mdev to which the APQNs being validated are assigned.
-> + *
-> + * Return: One of the following values:
-> + * o the error returned from the ap_apqn_in_matrix_owned_by_def_drv() function,
-> + *   most likely -EBUSY indicating the ap_perms_mutex lock is already held.
-> + * o EADDRNOTAVAIL if an APQN assigned to @matrix_mdev is reserved for the
-> + *		   zcrypt default driver.
-> + * o EADDRINUSE if an APQN assigned to @matrix_mdev is assigned to another mdev
-> + * o A zero indicating validation succeeded.
-> + */
->   static int vfio_ap_mdev_validate_masks(struct ap_matrix_mdev *matrix_mdev)
->   {
->   	if (ap_apqn_in_matrix_owned_by_def_drv(matrix_mdev->matrix.apm,
-> @@ -951,6 +966,10 @@ static void vfio_ap_mdev_link_adapter(struct ap_matrix_mdev *matrix_mdev,
->    *	   An APQN derived from the cross product of the APID being assigned
->    *	   and the APQIs previously assigned is being used by another mediated
->    *	   matrix device
-> + *
-> + *	5. -EAGAIN
-> + *	   A lock required to validate the mdev's AP configuration could not
-> + *	   be obtained.
->    */
->   static ssize_t assign_adapter_store(struct device *dev,
->   				    struct device_attribute *attr,
-> @@ -961,6 +980,7 @@ static ssize_t assign_adapter_store(struct device *dev,
->   	DECLARE_BITMAP(apm_delta, AP_DEVICES);
->   	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(dev);
->   
-> +	mutex_lock(&ap_perms_mutex);
->   	get_update_locks_for_mdev(matrix_mdev);
->   
->   	ret = kstrtoul(buf, 0, &apid);
-> @@ -991,6 +1011,7 @@ static ssize_t assign_adapter_store(struct device *dev,
->   	ret = count;
->   done:
->   	release_update_locks_for_mdev(matrix_mdev);
-> +	mutex_unlock(&ap_perms_mutex);
->   
->   	return ret;
->   }
-> @@ -1144,6 +1165,10 @@ static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
->    *	   An APQN derived from the cross product of the APQI being assigned
->    *	   and the APIDs previously assigned is being used by another mediated
->    *	   matrix device
-> + *
-> + *	5. -EAGAIN
-> + *	   The lock required to validate the mdev's AP configuration could not
-> + *	   be obtained.
->    */
->   static ssize_t assign_domain_store(struct device *dev,
->   				   struct device_attribute *attr,
-> @@ -1154,6 +1179,7 @@ static ssize_t assign_domain_store(struct device *dev,
->   	DECLARE_BITMAP(aqm_delta, AP_DOMAINS);
->   	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(dev);
->   
-> +	mutex_lock(&ap_perms_mutex);
->   	get_update_locks_for_mdev(matrix_mdev);
->   
->   	ret = kstrtoul(buf, 0, &apqi);
-> @@ -1184,6 +1210,7 @@ static ssize_t assign_domain_store(struct device *dev,
->   	ret = count;
->   done:
->   	release_update_locks_for_mdev(matrix_mdev);
-> +	mutex_unlock(&ap_perms_mutex);
->   
->   	return ret;
->   }
-> @@ -1868,3 +1895,44 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
->   	kfree(q);
->   	release_update_locks_for_mdev(matrix_mdev);
->   }
-> +
-> +/**
-> + * vfio_ap_mdev_resource_in_use: check whether any of a set of APQNs is
-> + *				 assigned to a mediated device under the control
-> + *				 of the vfio_ap device driver.
-> + *
-> + * @apm: a bitmap specifying a set of APIDs comprising the APQNs to check.
-> + * @aqm: a bitmap specifying a set of APQIs comprising the APQNs to check.
-> + *
-> + * This function is invoked by the AP bus when changes to the apmask/aqmask
-> + * attributes will result in giving control of the queue devices specified via
-> + * @apm and @aqm to the default zcrypt device driver. Prior to calling this
-> + * function, the AP bus locks the ap_perms_mutex. If this function is called
-> + * while an adapter or domain is being assigned to a mediated device, the
-> + * assignment operations will take the matrix_dev->guests_lock and
-> + * matrix_dev->mdevs_lock then call the ap_apqn_in_matrix_owned_by_def_drv
-> + * function, which also locks the ap_perms_mutex. This could result in a
-> + * deadlock.
-> + *
-> + * To avoid a deadlock, this function will verify that the
-> + * matrix_dev->guests_lock and matrix_dev->mdevs_lock are not currently held and
-> + * will return -EBUSY if the locks can not be obtained.
-
-This part of the comment does not seem to match reality. Unless I'm missing
-something? Did you mean to call mutex_trylock? Or is the comment stale?
-
-> + * Return:
-> + *	* -EBUSY if the locks required by this function are already locked.
-> + *	* -EADDRINUSE if one or more of the APQNs specified via @apm/@aqm are
-> + *	  assigned to a mediated device under the control of the vfio_ap
-> + *	  device driver.
-> + */
-> +int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
-> +{
-> +	int ret;
-> +
-> +	mutex_lock(&matrix_dev->guests_lock);
-> +	mutex_lock(&matrix_dev->mdevs_lock);
-> +	ret = vfio_ap_mdev_verify_no_sharing(apm, aqm);
-> +	mutex_unlock(&matrix_dev->mdevs_lock);
-> +	mutex_unlock(&matrix_dev->guests_lock);
-> +
-> +	return ret;
-> +}
-> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-> index 6d4ca39f783b..cbffa0bd01da 100644
-> --- a/drivers/s390/crypto/vfio_ap_private.h
-> +++ b/drivers/s390/crypto/vfio_ap_private.h
-> @@ -147,4 +147,6 @@ void vfio_ap_mdev_unregister(void);
->   int vfio_ap_mdev_probe_queue(struct ap_device *queue);
->   void vfio_ap_mdev_remove_queue(struct ap_device *queue);
->   
-> +int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm);
-> +
->   #endif /* _VFIO_AP_PRIVATE_H_ */
-
-
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+Jason
