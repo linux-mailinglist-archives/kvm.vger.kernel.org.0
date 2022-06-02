@@ -2,85 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29B1153B7D7
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 13:32:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E770C53B807
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 13:49:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234240AbiFBLc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 07:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33094 "EHLO
+        id S233488AbiFBLtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 07:49:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231533AbiFBLcZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 07:32:25 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D3020B7DE
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 04:32:23 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id m26so4964474ljb.0
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 04:32:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oxidecomputer.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6NrMVnhhkWK9lvKSxoiWwnnt6uTIPLWYoEs5odYNLnk=;
-        b=cdVOSpd4IlnPRrSP6NNxkOOuqjjc6I6OSyU6+/EN2VByZHtDRRUfKhgm+T/vY8PCWR
-         Y0w8nAqspDLc0IjumwRD2pK0paN4Lgz4snsXdTteQ0cCgvxmSLDduDD5lzmJOHfrcOis
-         VNInMTQf65lRgTf99Z0yTWukQETQ9v7FfWM2bB5ToJbtQm6Z2O6pWwMymBxsQjdV5ylK
-         9+rUiV/4vr9LwK8Y+juCoat1OyaGcF0bZPhW48qIHt7J98FgrbChBU/S45PiZfKk3jHQ
-         HBcHEylD7j8Ipr/Jj3daHfCCux5RvMtaB8D4/lS2/O+74p4U8PRr3upys5NWoLnWCKru
-         z1sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6NrMVnhhkWK9lvKSxoiWwnnt6uTIPLWYoEs5odYNLnk=;
-        b=pKItnRb5oLe0l3FdCo+tgP6gLSyGw38dlFORrDvDnDw/qhFCL3wiwXptuICjBwtEND
-         IF2EgrNMeYXpMCOqMpb3oh17s6LjvE398hBAo0z8r82fwIk/oxCm109+7iB+JCfRIhUP
-         DeI6Wu+aNlsoKu7L9/sKisxObKeywUdPp945k5u1+IFphuFdBQE5hTES0+qWetC8AVVA
-         5QwbhZvRovt7HSxlA+OgkBu/Mt99D997CTiP9KRkXvpcBkrFZtjp0O/jCr8Cizi2WwHl
-         lewyzHV/D5mpPpYDdaaGhTTrmuaNhVD7rs83Nbke8tSvALBw3s7ZV+D9RMmL8WMu19JB
-         +BjQ==
-X-Gm-Message-State: AOAM531Cv50RQ+pnm+cS13nE0rkiCvwlL2ERcXDLYJPJufWyuKukGYAW
-        IlaN588qUbOtpgC+YNN3GeUhW/nHW60pkLCbXVP+uw==
-X-Google-Smtp-Source: ABdhPJw5+KrGyS6TH++a2E0YmjhMQbmcERNIXVcHsh+BCamfGfwalbimTk2PIbMsAZfArp1hniEhkUrPdBrR0U32qJQ=
-X-Received: by 2002:a2e:a593:0:b0:253:e61d:b681 with SMTP id
- m19-20020a2ea593000000b00253e61db681mr34512762ljp.484.1654169542124; Thu, 02
- Jun 2022 04:32:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAA9fzEHQ49hsCMKG_=R_6R6wN8V8fDDibLJee1a1xLCcrkom-Q@mail.gmail.com>
- <20220601215749.30223-1-cross@oxidecomputer.com> <c34ea319-2493-724d-460c-490881ac34b6@redhat.com>
-In-Reply-To: <c34ea319-2493-724d-460c-490881ac34b6@redhat.com>
-From:   Dan Cross <cross@oxidecomputer.com>
-Date:   Thu, 2 Jun 2022 07:32:11 -0400
-Message-ID: <CAA9fzEGdtwvM6+9mooQVZxnNhyQHp-+dbM2QrJbscM+iVXmg1Q@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] kvm-unit-tests: Build changes to support illumos.
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        with ESMTP id S233722AbiFBLs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 07:48:57 -0400
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 358212B1D42;
+        Thu,  2 Jun 2022 04:48:54 -0700 (PDT)
+Received: from localhost (91-154-92-55.elisa-laajakaista.fi [91.154.92.55])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: sakkinen)
+        by meesny.iki.fi (Postfix) with ESMTPSA id B102C20050;
+        Thu,  2 Jun 2022 14:48:51 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1654170531;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tl5Jw+UulbKqEMtgUT3K2V354kKV5SSHEf74OZxYd5E=;
+        b=gVIvyyFheZVOW68udFbl3Qpp9M7jjcbWm9FiuKuldUA0wBr/wcvKOh6oKSlm0FoFCrGc0G
+        lsOlYPhv+Htk32XWaDLY8BMfz1Jnnqwv08tgZW6pNc7J1LCWEyUaQoUcrTB+nmUKwkfWEj
+        JxvXIkollSXLISgj1FALNvEyep0VQpE=
+Date:   Thu, 2 Jun 2022 14:47:02 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@iki.fi>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 04/40] x86/sev: Add the host SEV-SNP
+ initialization support
+Message-ID: <YpijNgA9ZJFOwF8k@kernel.org>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-5-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707183616.5620-5-brijesh.singh@amd.com>
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1654170531;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tl5Jw+UulbKqEMtgUT3K2V354kKV5SSHEf74OZxYd5E=;
+        b=ePgDehaSBHMbAUeRp95u13p4p8R22l6vqZ0Y7PeMjozqI0sCl7tMMSg7fa+Rj8EsK12Dq9
+        Q7NAMreqVW2DSqoiku0beXey8bOa/CKisFZf3su1o1Em6zHYFfxJIU+ZuM+wjtgiMaLuei
+        EBgApVVinLsgcmdA6hz+r0XtTmGpcfw=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=sakkinen smtp.mailfrom=jarkko.sakkinen@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1654170531; a=rsa-sha256; cv=none;
+        b=LC1JwZgfmfj/q89WJnmLomXZ9I33E8D3pncYsBCxYXrtbfkGKulazshKvHVgPXgYyOeUvZ
+        oWMRAL0kUm5nnedlv5afvZAt1bUMzvZNHXZE7+RfG1jmq5cNNtqWJfwl2OhNbt7c2V12yD
+        aaXkQguiVODIdoopJVtYpj7pyRE7tp8=
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 2, 2022 at 6:53 AM Thomas Huth <thuth@redhat.com> wrote:
-> On 01/06/2022 23.57, Dan Cross wrote:
-> > We have begun using kvm-unit-tests to test Bhyve under
-> > illumos.  We started by cross-compiling the tests on Linux
-> > and transfering the binary artifacts to illumos machines,
-> > but it proved more convenient to build them directly on
-> > illumos.
-> >
-> > This patch series modifies the build infrastructure to allow
-> > building on illumos; the changes were minimal.  I have also
-> > tested these changes on Linux to ensure no regressions.
->
-> Thanks, this version survived the CI, so I've applied it now.
+On Wed, Jul 07, 2021 at 01:35:40PM -0500, Brijesh Singh wrote:
+> The memory integrity guarantees of SEV-SNP are enforced through a new
+> structure called the Reverse Map Table (RMP). The RMP is a single data
+> structure shared across the system that contains one entry for every 4K
+> page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
+> track the owner of each page of memory. Pages of memory can be owned by
+> the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
+> section 15.36.3 for more detail on RMP.
+> 
+> The RMP table is used to enforce access control to memory. The table itself
+> is not directly writable by the software. New CPU instructions (RMPUPDATE,
+> PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
 
-Thank you very much!
+What's the point of throwing out a set of opcodes, if there's
+no explanation what they do?
 
-        - Dan C.
+BR, Jarkko
