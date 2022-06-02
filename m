@@ -2,64 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84F1953B52A
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 10:31:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E55B653B586
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 10:59:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232428AbiFBIaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 04:30:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37220 "EHLO
+        id S232643AbiFBI6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 04:58:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232421AbiFBIak (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 04:30:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91D8D9A
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 01:30:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 28E73B81EE8
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 08:30:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE15DC3411D;
-        Thu,  2 Jun 2022 08:30:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654158635;
-        bh=haGu+jI7bthU49uBnWUYZDqFo4eo6P3HlxDw/iKv+bg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OoyfVgdGWh8QTZLWKeBSKcxkFIirLp5xe3j7V5r2WxMNbDdnhrk/Ko5L48eQhRUoI
-         0V1HnqR6lRKJWYMRPOh28MQ4dArtnypScXYhp+Un6xK33q+E+/3X8NMSZGs6RqFD/b
-         2wcWISq6TwYnTTAAgyLChmLVU1dK9OSYNYfd3gcYPrqe4JBv6IJLxJ1V18Ensi1kcA
-         ozBh8bNVFXn61deaBDnRTzNlwh//OnQiJiGwB01W2L65Ek9Lb1TJA9sMR+JPtWSkv/
-         fElVFC6PRZW8/evhKrLepQaxNX3w5kp5aRgdPiySH/ha55Pxx25W9YutgjvVJ3S7ej
-         TKGROVgwqUmKA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nwgDx-00F9Sj-FB; Thu, 02 Jun 2022 09:30:33 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org
-Cc:     Eric Auger <eauger@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oupton@google.com>, kernel-team@android.com
-Subject: [PATCH 3/3] KVM: arm64: Warn if accessing timer pending state outside of vcpu context
-Date:   Thu,  2 Jun 2022 09:30:25 +0100
-Message-Id: <20220602083025.1110433-4-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220602083025.1110433-1-maz@kernel.org>
-References: <20220602083025.1110433-1-maz@kernel.org>
+        with ESMTP id S232642AbiFBI6W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 04:58:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6FDB91F1BFB
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 01:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654160300;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EA4sjAo0s1UJhwaoiLkeLMjmAdZWjnEWcCJT8pCAuaE=;
+        b=fIjSgMY9CNqSJwSskJwSv5bPvCdAjvwYapZku0k4pZNnIKIxN9hYJNytyFno7TqORW8RpX
+        9VJ+mA1iebuD1VkAZC9IsuCp96QAfkor/7V+4NPJtQuwhM63Hi3pRanzkbaeVsr5mY3xnr
+        uFHobasZBHdbKDA8VVdMbq1XBNPNppA=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-213-XMtABwopNPmUUUwFBwMPCw-1; Thu, 02 Jun 2022 04:58:19 -0400
+X-MC-Unique: XMtABwopNPmUUUwFBwMPCw-1
+Received: by mail-qk1-f198.google.com with SMTP id v14-20020a05620a0f0e00b00699f4ea852cso3227651qkl.9
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 01:58:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EA4sjAo0s1UJhwaoiLkeLMjmAdZWjnEWcCJT8pCAuaE=;
+        b=nwtykdUfiNK5yxhAparVWq6tdZFRwuiHCh6B4adUbFLRc69BD8th071myEdOsWlhDa
+         ja//uiuM83Y6QrpGgnOcjvx53Z4myL6onW9gU3zM02AQIScCNaiyAcj5HSZOgzpqKQEy
+         7kdbEpxi5DNmpMGf8BLiD1kZ9TZQvvSNAo3KT1+sIv2J9aLY/QoHmAaynUa5t8F7Jj8A
+         mJoEfkDpoR7idYEgZMyxxSsIAD7lNz8x5FUPWaI3p0FmgVYyATMXcGO1aVMBveXazscQ
+         aGhvGVzG5RUGGtY7L4rM2tlphW1FZikFtTv5X3FX72KuTWRD2QMAbowYE93phVhhv3Mc
+         A42g==
+X-Gm-Message-State: AOAM532VHhegu8pQA/EkvbfGkwasp1XEyzxSB38XlhYV+pnw4CC5JZh2
+        wfKg6Guxk8NHSXES07Yj2ULnmeaC59yps+b7C+NxnMDSyJTquh/vAF34Zuskrlf3PoCYyJPDMpS
+        6ff+1gUlEL2uuffRjHS2ZO4sjEtZE
+X-Received: by 2002:a05:620a:1a07:b0:6a5:dac2:6703 with SMTP id bk7-20020a05620a1a0700b006a5dac26703mr2393915qkb.522.1654160299007;
+        Thu, 02 Jun 2022 01:58:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwAbj14F2a0s/ukphMQnuAJbi7nfAYfJ691JlPmplBlmLbS6ZLZsowsOZJyyZbccM3oVxpWmpjcPAFKx4b2sdQ=
+X-Received: by 2002:a05:620a:1a07:b0:6a5:dac2:6703 with SMTP id
+ bk7-20020a05620a1a0700b006a5dac26703mr2393906qkb.522.1654160298779; Thu, 02
+ Jun 2022 01:58:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, eauger@redhat.com, ricarkol@google.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+References: <20220526124338.36247-1-eperezma@redhat.com> <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <20220527065442-mutt-send-email-mst@kernel.org> <CACGkMEubfv_OJOsJ_ROgei41Qx4mPO0Xz8rMVnO8aPFiEqr8rA@mail.gmail.com>
+ <PH0PR12MB5481695930E7548BAAF1B0D9DCDC9@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEsSKF_MyLgFdzVROptS3PCcp1y865znLWgnzq9L7CpFVQ@mail.gmail.com>
+ <PH0PR12MB5481CAA3F57892FF7F05B004DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEsJJL34iUYQMxHguOV2cQ7rts+hRG5Gp3XKCGuqNdnNQg@mail.gmail.com> <PH0PR12MB5481D099A324C91DAF01259BDCDE9@PH0PR12MB5481.namprd12.prod.outlook.com>
+In-Reply-To: <PH0PR12MB5481D099A324C91DAF01259BDCDE9@PH0PR12MB5481.namprd12.prod.outlook.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Thu, 2 Jun 2022 10:57:42 +0200
+Message-ID: <CAJaqyWfNZa2XTXaiohbPreZ6-wbEmOC6P2cHrw_3ms-JNDbGmw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
+To:     Parav Pandit <parav@nvidia.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "martinh@xilinx.com" <martinh@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "martinpo@xilinx.com" <martinpo@xilinx.com>,
+        "lvivier@redhat.com" <lvivier@redhat.com>,
+        "pabloc@xilinx.com" <pabloc@xilinx.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
+        "gautam.dawar@amd.com" <gautam.dawar@amd.com>,
+        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
+        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "dinang@xilinx.com" <dinang@xilinx.com>,
+        Longpeng <longpeng2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,35 +103,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A recurrent bug in the KVM/arm64 code base consists in trying to
-access the timer pending state outside of the vcpu context, which
-makes zero sense (the pending state only exists when the vcpu
-is loaded).
+On Thu, Jun 2, 2022 at 4:59 AM Parav Pandit <parav@nvidia.com> wrote:
+>
+>
+> > From: Jason Wang <jasowang@redhat.com>
+> > Sent: Wednesday, June 1, 2022 10:00 PM
+> >
+> > On Thu, Jun 2, 2022 at 2:58 AM Parav Pandit <parav@nvidia.com> wrote:
+> > >
+> > >
+> > > > From: Jason Wang <jasowang@redhat.com>
+> > > > Sent: Tuesday, May 31, 2022 10:42 PM
+> > > >
+> > > > Well, the ability to query the virtqueue state was proposed as
+> > > > another feature (Eugenio, please correct me). This should be
+> > > > sufficient for making virtio-net to be live migrated.
+> > > >
+> > > The device is stopped, it won't answer to this special vq config done here.
+> >
+> > This depends on the definition of the stop. Any query to the device state
+> > should be allowed otherwise it's meaningless for us.
+> >
+> > > Programming all of these using cfg registers doesn't scale for on-chip
+> > memory and for the speed.
+> >
+> > Well, they are orthogonal and what I want to say is, we should first define
+> > the semantics of stop and state of the virtqueue.
+> >
+> > Such a facility could be accessed by either transport specific method or admin
+> > virtqueue, it totally depends on the hardware architecture of the vendor.
+> >
+> I find it hard to believe that a vendor can implement a CVQ but not AQ and chose to expose tens of hundreds of registers.
+> But maybe, it fits some specific hw.
+>
+> I like to learn the advantages of such method other than simplicity.
+>
+> We can clearly that we are shifting away from such PCI registers with SIOV, IMS and other scalable solutions.
+> virtio drifting in reverse direction by introducing more registers as transport.
+> I expect it to an optional transport like AQ.
+>
+> > >
+> > > Next would be to program hundreds of statistics of the 64 VQs through a
+> > giant PCI config space register in some busy polling scheme.
+> >
+> > We don't need giant config space, and this method has been implemented
+> > by some vDPA vendors.
+> >
+> There are tens of 64-bit counters per VQs. These needs to programmed on destination side.
+> Programming these via registers requires exposing them on the registers.
+> In one of the proposals, I see them being queried via CVQ from the device.
+>
+> Programming them via cfg registers requires large cfg space or synchronous programming until receiving ACK from it.
+> This means one entry at a time...
+>
+> Programming them via CVQ needs replicate and align cmd values etc on all device types. All duplicate and hard to maintain.
+>
 
-In order to avoid more embarassing crashes and catch the offenders
-red-handed, add a warning to kvm_arch_timer_get_input_level() and
-return the state as non-pending. This avoids taking the system down,
-and still helps tracking down silly bugs.
+I think this discussion should be moved to the proposals on
+virtio-comment. In the vdpa context, they should be covered.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arch_timer.c | 3 +++
- 1 file changed, 3 insertions(+)
+This one is about exposing the basic facility of stopping and resuming
+a device to userland, and it fits equally well if the device
+implements it via cfg registers, via admin vq, via channel I/O, or via
+whatever transport the vdpa backend prefers. To ask for the state is
+already covered in the vhost layer, and this proposal does not affect
+it.
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 5290ca5db663..bb24a76b4224 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1230,6 +1230,9 @@ bool kvm_arch_timer_get_input_level(int vintid)
- 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
- 	struct arch_timer_context *timer;
- 
-+	if (WARN(!vcpu, "No vcpu context!\n"))
-+		return false;
-+
- 	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
- 		timer = vcpu_vtimer(vcpu);
- 	else if (vintid == vcpu_ptimer(vcpu)->irq.irq)
--- 
-2.34.1
+Given the flexibility of vdpa, we can even ask vq state using
+backend-specific methods, cache it (knowing that there will be no
+change of them until resume or DRIVER_OK), and expose them to qemu
+using config space interface or any other batch method. Same as with
+the enable_vq problem. And the same applies to stats. And we maintain
+compatibility with all vendor-specific control plane.
+
+Would that work for devices that cannot or does not want to expose
+them via config space?
+
+Thanks!
+
+>
+> > >
+> > > I can clearly see how all these are inefficient for faster LM.
+> > > We need an efficient AQ to proceed with at minimum.
+> >
+> > I'm fine with admin virtqueue, but the stop and state are orthogonal to that.
+> > And using admin virtqueue for stop/state will be more natural if we use
+> > admin virtqueue as a transport.
+> Ok.
+> We should have defined it bit earlier that all vendors can use. :(
 
