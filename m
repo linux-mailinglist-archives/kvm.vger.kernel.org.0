@@ -2,138 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 213D553B2D3
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 06:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA09753B378
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 08:23:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229759AbiFBEzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 00:55:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51680 "EHLO
+        id S230462AbiFBGWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 02:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbiFBEzA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 00:55:00 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8C1DE332
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 21:54:59 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id n28so4741020edb.9
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 21:54:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CT5U1CNgwxidSdv3BAoIuCkc8N49tG8Y3S2gxdkEwQc=;
-        b=qFLx03JiHRMRBF2tUKlivLscBJuszLtEorC4CphQhJPIYRPWkbUsJaf6JKz4cXlBsI
-         RbuJqveOOZTmtYVWoBNRBBZYsxyWXOfnIv1PyKojemfoXaaMFEnbR4RkvZ6e2MlITMgz
-         xndE4Kp0Ph9+YZleH3O20DAsAto/bZYRwYX0uCXA6HVMLpG09rxZFUdqJXRHw58CqO76
-         CLDUc56DRzvxBmzGGg7xrhd42BPOSWqJHh4OU84ygOVOD6lJFfRC8pkHxq31cvodvxm2
-         vuJRSMDlEWxawFB2Hm7bXeMKkDyioPuFWfxCITD7i2XBeB1OE4A56Evf28OvuPvi1i/H
-         wzgw==
+        with ESMTP id S230487AbiFBGWl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 02:22:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5EC203CFCE
+        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 23:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654150955;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dftoX5xxTZB/c8O5WA81vrlQezqU2CDPcAxmSZhNEc4=;
+        b=Hxp3PweVceqPY9q0omzQ4eKyLu/maXeie1mURY0XlG/gN9FWUHFdPVV/A6q/lZNwDvzWhQ
+        QpEGRV0FWauwoJCi/T0YG9VfQ/grfR0nwfZrN1yorRRFR3cAfRGW0FoAOThmhdIXVQXSMD
+        Yut10gLONjr3+n/DQjmEQPYkhrxQPBQ=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-417-XdIJS269MrWbVGDuvWUkzA-1; Thu, 02 Jun 2022 02:22:32 -0400
+X-MC-Unique: XdIJS269MrWbVGDuvWUkzA-1
+Received: by mail-qv1-f70.google.com with SMTP id bv14-20020ad4488e000000b004646673e80bso2845923qvb.23
+        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 23:22:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CT5U1CNgwxidSdv3BAoIuCkc8N49tG8Y3S2gxdkEwQc=;
-        b=ttuil0QleOiGWIw9V1/F4/XwQV+Sl5876uJ4CPX2ZAuM+GQWVqbTSNJTogxYpgLRqF
-         y/6KobB7CT9jEIGXyXqKzVFDgMtzf++Cm95tE9AfEHpVlUU6RZvrM9mFIAMf5rTTqkNj
-         bakaHTWeGoAp/Gt6QtgOrRTV13tj4GCJuod8wvIo37Z56ArmhptGa+xJmW8abA7TiOPz
-         e9QoX2vvse+1lMnh4R3saYIy9QL5QS9TWL8K2eOJuhEueAcYFCB85K3XBM5dCx87fjOX
-         8mqdNmthkoqxBhgwO1GFmiIR0IAOjGZ7luIKNu111/iN8nQrjl/azxQduaLP6g585Xpr
-         QK2g==
-X-Gm-Message-State: AOAM533RuoQP9vg/46RkRfrZkkhY2r9Fv0C1xKHYjUaHof1r8+NcQM4O
-        XQmO9wVnC/xnMWet6u4eY/owT2ai/flk9g43IY78
-X-Google-Smtp-Source: ABdhPJy2nzbxpIUDhQw/9Q2i5yD2iJuGOy+CCGclsFLoGzrVa/htZh2BxqdApawF1bsXoBkus+DOa+5Pxk2GC8LRS2w=
-X-Received: by 2002:a05:6402:254e:b0:42b:4633:e53e with SMTP id
- l14-20020a056402254e00b0042b4633e53emr3354727edb.314.1654145697926; Wed, 01
- Jun 2022 21:54:57 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=dftoX5xxTZB/c8O5WA81vrlQezqU2CDPcAxmSZhNEc4=;
+        b=6V5VhH6sWh+ZpXG9nyUSP8mmMtEwwo+C+2R7d/M1N4O9+0RpxZt+ftZGS5TB/c1mAk
+         uXBxrhbDMviE+4ef2ATEAfEqotrLfeCY9iM1oXnbZZ3vX+U86erloLb843wEvJ5eDIiZ
+         /I1BAr6uuXAXsa4deud5NhRGCyT7HtfMKM1HDhpid+ZR/iuWm2qF+z0CvuV5sumvD6FO
+         +yHMs0YeNuhkycA2t3o5XvAnPOmMjGrf29T2gUS2RwLoU/5ky0bjJBOhTvCXCwr0UHis
+         QpqCPiC0h7O4ni9MGFSWBQHZ6sXLkXbA/F4TKya0Tt29Sa1rpJreyUYpXnPJC0jPHkmG
+         hvHw==
+X-Gm-Message-State: AOAM531s+6ASlj3PlCPLrRCgHW62bXoodwyBDdhNeKcUic8AtTiPtcan
+        77JoDgcDfK6l7/WduNaPYmgq/BUUw4HoEXdmLhwyKFWRw/1kOqwJ885hZsbehbTfNvM7Nf+6K3i
+        Rifo8xqYC9YsOYnoWY3sA4EWNNwoU
+X-Received: by 2002:a0c:e702:0:b0:467:538e:ebba with SMTP id d2-20020a0ce702000000b00467538eebbamr2217016qvn.2.1654150951934;
+        Wed, 01 Jun 2022 23:22:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz0WJo9DePlOEq7IsA8BZdRFxkhg64PwaZaZWcafFZW35XH5PUzPmmmXhlP8oswWj9PLLjDa3nyytbYkOLb1wI=
+X-Received: by 2002:a0c:e702:0:b0:467:538e:ebba with SMTP id
+ d2-20020a0ce702000000b00467538eebbamr2216984qvn.2.1654150951730; Wed, 01 Jun
+ 2022 23:22:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220505100910.137-1-xieyongji@bytedance.com> <CACGkMEv3Ofbu7OOTB9vN2Lt85TD44LipjoPm26KEq3RiKJU0Yw@mail.gmail.com>
- <CACycT3uakPB_JeXb11hrBaPjcdqign3FmuQd3FXgFR7orO_Eaw@mail.gmail.com> <CACGkMEu72zPKyZXWvyeMsNwjKohXHEMu_hp1dwPVF_2RF5ezPA@mail.gmail.com>
-In-Reply-To: <CACGkMEu72zPKyZXWvyeMsNwjKohXHEMu_hp1dwPVF_2RF5ezPA@mail.gmail.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 2 Jun 2022 12:55:50 +0800
-Message-ID: <CACycT3v8bo=6YHmb-F3fEjVSCsJdWSLwLy4RTz6hCW39FAZZPA@mail.gmail.com>
-Subject: Re: [PATCH v2] vringh: Fix loop descriptors check in the indirect cases
-To:     mst <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc:     rusty <rusty@rustcorp.com.au>, fam.zheng@bytedance.com,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>
+References: <20220526124338.36247-1-eperezma@redhat.com> <20220526124338.36247-4-eperezma@redhat.com>
+ <20220601070303-mutt-send-email-mst@kernel.org> <CAJaqyWcK7CwWLr5unxXr=FDbuufeA38X0eAboJy8yKLcsdiPow@mail.gmail.com>
+ <PH0PR12MB54819A5DC204CED360C3BA86DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
+In-Reply-To: <PH0PR12MB54819A5DC204CED360C3BA86DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Thu, 2 Jun 2022 08:21:55 +0200
+Message-ID: <CAJaqyWfJVDj+u0UVXGkJFriRJ5Lo5os6FWq02Q7av+NYG2JB9w@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] vhost-vdpa: uAPI to stop the device
+To:     Parav Pandit <parav@nvidia.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Martin Porter <martinpo@xilinx.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Cindy Lu <lulu@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
+        "Dawar, Gautam" <gautam.dawar@amd.com>,
+        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
+        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Dinan Gunawardena <dinang@xilinx.com>,
+        Longpeng <longpeng2@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ping.
-
-On Tue, May 10, 2022 at 3:56 PM Jason Wang <jasowang@redhat.com> wrote:
+On Wed, Jun 1, 2022 at 9:13 PM Parav Pandit <parav@nvidia.com> wrote:
 >
-> On Tue, May 10, 2022 at 3:54 PM Yongji Xie <xieyongji@bytedance.com> wrote:
+>
+>
+> > From: Eugenio Perez Martin <eperezma@redhat.com>
+> > Sent: Wednesday, June 1, 2022 7:15 AM
 > >
-> > On Tue, May 10, 2022 at 3:44 PM Jason Wang <jasowang@redhat.com> wrote:
+> > On Wed, Jun 1, 2022 at 1:03 PM Michael S. Tsirkin <mst@redhat.com> wrot=
+e:
 > > >
-> > > On Thu, May 5, 2022 at 6:08 PM Xie Yongji <xieyongji@bytedance.com> wrote:
+> > > On Thu, May 26, 2022 at 02:43:37PM +0200, Eugenio P=C3=A9rez wrote:
+> > > > The ioctl adds support for stop the device from userspace.
 > > > >
-> > > > We should use size of descriptor chain to test loop condition
-> > > > in the indirect case. And another statistical count is also introduced
-> > > > for indirect descriptors to avoid conflict with the statistical count
-> > > > of direct descriptors.
-> > > >
-> > > > Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
-> > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > > > Signed-off-by: Fam Zheng <fam.zheng@bytedance.com>
+> > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 > > > > ---
-> > > >  drivers/vhost/vringh.c | 10 ++++++++--
-> > > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > > >  drivers/vhost/vdpa.c       | 18 ++++++++++++++++++
+> > > >  include/uapi/linux/vhost.h | 14 ++++++++++++++
+> > > >  2 files changed, 32 insertions(+)
 > > > >
-> > > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> > > > index 14e2043d7685..eab55accf381 100644
-> > > > --- a/drivers/vhost/vringh.c
-> > > > +++ b/drivers/vhost/vringh.c
-> > > > @@ -292,7 +292,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
-> > > >              int (*copy)(const struct vringh *vrh,
-> > > >                          void *dst, const void *src, size_t len))
-> > > >  {
-> > > > -       int err, count = 0, up_next, desc_max;
-> > > > +       int err, count = 0, indirect_count = 0, up_next, desc_max;
-> > > >         struct vring_desc desc, *descs;
-> > > >         struct vringh_range range = { -1ULL, 0 }, slowrange;
-> > > >         bool slow = false;
-> > > > @@ -349,7 +349,12 @@ __vringh_iov(struct vringh *vrh, u16 i,
-> > > >                         continue;
-> > > >                 }
+> > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c index
+> > > > 32713db5831d..d1d19555c4b7 100644
+> > > > --- a/drivers/vhost/vdpa.c
+> > > > +++ b/drivers/vhost/vdpa.c
+> > > > @@ -478,6 +478,21 @@ static long vhost_vdpa_get_vqs_count(struct
+> > vhost_vdpa *v, u32 __user *argp)
+> > > >       return 0;
+> > > >  }
 > > > >
-> > > > -               if (count++ == vrh->vring.num) {
-> > > > +               if (up_next == -1)
-> > > > +                       count++;
-> > > > +               else
-> > > > +                       indirect_count++;
+> > > > +static long vhost_vdpa_stop(struct vhost_vdpa *v, u32 __user *argp=
+)
+> > > > +{
+> > > > +     struct vdpa_device *vdpa =3D v->vdpa;
+> > > > +     const struct vdpa_config_ops *ops =3D vdpa->config;
+> > > > +     int stop;
 > > > > +
-> > > > +               if (count > vrh->vring.num || indirect_count > desc_max) {
-> > > >                         vringh_bad("Descriptor loop in %p", descs);
-> > > >                         err = -ELOOP;
-> > > >                         goto fail;
-> > > > @@ -411,6 +416,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
-> > > >                                 i = return_from_indirect(vrh, &up_next,
-> > > >                                                          &descs, &desc_max);
-> > > >                                 slow = false;
-> > > > +                               indirect_count = 0;
+> > > > +     if (!ops->stop)
+> > > > +             return -EOPNOTSUPP;
+> > > > +
+> > > > +     if (copy_from_user(&stop, argp, sizeof(stop)))
+> > > > +             return -EFAULT;
+> > > > +
+> > > > +     return ops->stop(vdpa, stop);
+> > > > +}
+> > > > +
+> > > >  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned =
+int
+> > cmd,
+> > > >                                  void __user *argp)  { @@ -650,6
+> > > > +665,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+> > > >       case VHOST_VDPA_GET_VQS_COUNT:
+> > > >               r =3D vhost_vdpa_get_vqs_count(v, argp);
+> > > >               break;
+> > > > +     case VHOST_VDPA_STOP:
+> > > > +             r =3D vhost_vdpa_stop(v, argp);
+> > > > +             break;
+> > > >       default:
+> > > >               r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
+> > > >               if (r =3D=3D -ENOIOCTLCMD) diff --git
+> > > > a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h index
+> > > > cab645d4a645..c7e47b29bf61 100644
+> > > > --- a/include/uapi/linux/vhost.h
+> > > > +++ b/include/uapi/linux/vhost.h
+> > > > @@ -171,4 +171,18 @@
+> > > >  #define VHOST_VDPA_SET_GROUP_ASID    _IOW(VHOST_VIRTIO, 0x7C,
+> > \
+> > > >                                            struct vhost_vring_state=
+)
+> > > >
+> > > > +/* Stop or resume a device so it does not process virtqueue
+> > > > +requests anymore
+> > > > + *
+> > > > + * After the return of ioctl with stop !=3D 0, the device must fin=
+ish
+> > > > +any
+> > > > + * pending operations like in flight requests. It must also
+> > > > +preserve all
+> > > > + * the necessary state (the virtqueue vring base plus the possible
+> > > > +device
+> > > > + * specific states) that is required for restoring in the future.
+> > > > +The
+> > > > + * device must not change its configuration after that point.
+> > > > + *
+> > > > + * After the return of ioctl with stop =3D=3D 0, the device can
+> > > > +continue
+> > > > + * processing buffers as long as typical conditions are met (vq is
+> > > > +enabled,
+> > > > + * DRIVER_OK status bit is enabled, etc).
+> > > > + */
+> > > > +#define VHOST_VDPA_STOP                      _IOW(VHOST_VIRTIO, 0x=
+7D, int)
+> > > > +
+> A better name is VHOST_VDPA_SET_STATE
+> State =3D stop/suspend
+> State =3D start/resume
+>
+> Suspend/resume seems more logical, as opposed start/stop, because it more=
+ clearly indicates that the resume (start) is from some programmed beginnin=
+g (and not first boot).
+>
+
+It's fine to move to that nomenclature in my opinion.
+
+> > > >  #endif
 > > >
-> > > Do we need to reset up_next to -1 here?
+> > > I wonder how does this interact with the admin vq idea.
+> > > I.e. if we stop all VQs then apparently admin vq can't work either ..=
+.
+> > > Thoughts?
 > > >
 > >
-> > It will be reset to -1 in return_from_indirect().
->
-> Right. Then
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> Thanks
->
+> > Copying here the answer to Parav, feel free to answer to any thread or
+> > highlight if I missed something :). Using the admin vq proposal termino=
+logy of
+> > "device group".
 > >
-> > Thanks,
-> > Yongji
+> > --
+> > This would stop a device of a device
+> > group, but not the whole virtqueue group. If the admin VQ is offered by=
+ the
+> > PF (since it's not exposed to the guest), it will continue accepting re=
+quests as
+> > normal. If it's exposed in the VF, I think the best bet is to shadow it=
+, since
+> > guest and host requests could conflict.
 > >
 >
+> vhost-vdpa device is exposed for a VF through vp-vdpa driver to user land=
+.
+> Now vp-vdpa driver will have to choose between using config register vs u=
+sing AQ to suspend/resume the device.
+>
+
+vp_vdpa cannot choose if the virtio device has an admin vq or any
+other feature, it just wraps the virtio device. If that virtio device
+does not expose AQ, vp_vdpa cannot expose it.
+
+> Why not always begin with more superior interface of AQ that address mult=
+iple of these needs for LM case?
+>
+
+Because it doesn't address valid use cases like vp_vdpa with no AQ,
+devices that are not VF, or nested virtualization.
+
+VHOST_VDPA_STOP / VHOST_VDPA_SET_STATE does not replace AQ commands:
+It's just the way vhost-vdpa exposes that capability to qemu. vdpa
+backend is free to choose whatever methods it finds better to
+implement it.
+
+> For LM case, more you explore, we realize that either VF relying on PF's =
+AQ for query/config/setup/restore makes more sense or have its own dedicate=
+d AQ.
+>
+
+This ioctl does not mandate that the device cannot implement it
+through AQ, or that the device has to be a VF.
+
+Thanks!
+
+> VM's suspend/resume operation can be handled through the shadow Q.
+>
+> > Since this is offered through vdpa, the device backend driver can route=
+ it to
+> > whatever method works better for the hardware. For example, to send an
+> > admin vq command to the PF. That's why it's important to keep the featu=
+re
+> > as self-contained and orthogonal to others as possible.
+> > --
+> >
+> > > > --
+> > > > 2.31.1
+> > >
+>
+
