@@ -2,163 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECAAB53BB63
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 17:09:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8187853BC0B
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 18:01:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236398AbiFBPJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 11:09:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35206 "EHLO
+        id S236715AbiFBQBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 12:01:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236405AbiFBPJS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 11:09:18 -0400
-Received: from smarthost1.sentex.ca (smarthost1.sentex.ca [IPv6:2607:f3e0:0:1::12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 684CD201FC8
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 08:09:15 -0700 (PDT)
-Received: from pyroxene2a.sentex.ca (pyroxene19.sentex.ca [199.212.134.19])
-        by smarthost1.sentex.ca (8.16.1/8.16.1) with ESMTPS id 252F9B6R087959
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 2 Jun 2022 11:09:11 -0400 (EDT)
-        (envelope-from mike@sentex.net)
-Received: from [IPV6:2607:f3e0:0:4:5de0:5d15:a6e7:845e] ([IPv6:2607:f3e0:0:4:5de0:5d15:a6e7:845e])
-        by pyroxene2a.sentex.ca (8.16.1/8.15.2) with ESMTPS id 252F9B2A011515
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Thu, 2 Jun 2022 11:09:11 -0400 (EDT)
-        (envelope-from mike@sentex.net)
-Message-ID: <489ddcdf-e38f-ea51-6f90-8c17358da61d@sentex.net>
-Date:   Thu, 2 Jun 2022 11:09:11 -0400
+        with ESMTP id S234778AbiFBQBb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 12:01:31 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA32F2A8928
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 09:01:30 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id v11-20020a17090a4ecb00b001e2c5b837ccso9798979pjl.3
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 09:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FBRJMzvAGkJGILGKDbXoB8GLtDkkWNL+J8Ai62jsA+Q=;
+        b=LhSseVAFwzWc/U+GtdQ+rNb9khcuSQv817u+uRBRcRw+c1lr5UkuGwWphoEVkRJju0
+         +tIhZb39WMVHD5ZhtSUIP3kWxE3u/c4nvYQPz/w0QN0n5qE0gf7m/8QnnpvljBxz5IW1
+         Il34Ze/l9MNa848R8LhloC0klP5/0Qig5LjbH0Z2ODIZ66c/VZ7q7vs70cVICYLuHxEM
+         +mxI7MDFfUnr6SfELj/1bIqipbprfpYCdDEZkAYcZg7zDuBEcsQfwWPZGQ48yJrj4Wgl
+         OQ18YYCroOU+oBwthmEboLwX4a7y49QuaO/M4Gd2XtIGmHc5lGxqoi1mDzgdtP8R5Sar
+         xK9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FBRJMzvAGkJGILGKDbXoB8GLtDkkWNL+J8Ai62jsA+Q=;
+        b=JM5hJkP+0s7N9AkDj3pasA2u1Hhxl+sAyda9MQTMzT+hE2ZifWzmoDam7PLxW32GO5
+         vMHzUqbE8pV3joPXYn556CZPOiuW+e+PzFG4xStEoZ56G13IzgZjLGkhxTzm1OGbqWvl
+         JoFvb2Lh4LVB2K5c7gip8vcsVuRr8eT++7RnI3o8HpLK0oN//6g6Z2g0u7O5niJrvHMy
+         sLF4Ux41p2PzAAhXc4E+c7zWKbI5uBk7JrO6eeCOni62CCUen38HpyahvRIDKuC4S14o
+         p6g7v+XhX09cUGsTbsHGx4j34nit/AeH64ZZIkgvkshC5adugSwWftsBrEGQE7l0yj5a
+         oeQw==
+X-Gm-Message-State: AOAM533oSVrNEaMI0AqjuwCgoq1GseafLcFkBomTbffEeVed1L/oBWa+
+        Q4qzwkvYbkL0QJrC1FOWoadhoA==
+X-Google-Smtp-Source: ABdhPJz2IAfCKOE9RlomIcAKq3CSGTE1uFkWqYXOJ7w0xR/St7BpuaqLXukIggRC2picMNq2mluBgA==
+X-Received: by 2002:a17:90a:aa8a:b0:1c9:bfd8:9a90 with SMTP id l10-20020a17090aaa8a00b001c9bfd89a90mr6083378pjq.118.1654185690041;
+        Thu, 02 Jun 2022 09:01:30 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id iz3-20020a170902ef8300b0015edc07dcf3sm3741600plb.21.2022.06.02.09.01.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jun 2022 09:01:29 -0700 (PDT)
+Date:   Thu, 2 Jun 2022 16:01:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Robert Dinse <nanook@eskimo.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 6/8] KVM: x86: Bug the VM if the emulator accesses a
+ non-existent GPR
+Message-ID: <Ypje1evt/iNB2+MH@google.com>
+References: <20220526210817.3428868-1-seanjc@google.com>
+ <20220526210817.3428868-7-seanjc@google.com>
+ <87o7zcokgl.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: Guest migration between different Ryzen CPU generations
-Content-Language: en-US
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     kvm@vger.kernel.org, Leonardo Bras <leobras@redhat.com>
-References: <48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net>
- <20220602144200.1228b7bb@redhat.com>
-From:   mike tancsa <mike@sentex.net>
-In-Reply-To: <20220602144200.1228b7bb@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 64.7.153.18
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o7zcokgl.fsf@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/2/2022 8:42 AM, Igor Mammedov wrote:
-> On Tue, 31 May 2022 13:00:07 -0400
-> mike tancsa <mike@sentex.net> wrote:
->
->> Hello,
->>
->>       I have been using kvm since the Ubuntu 18 and 20.x LTS series of
->> kernels and distributions without any issues on a whole range of Guests
->> up until now. Recently, we spun up an Ubuntu LTS 22 hypervisor to add to
->> the mix and eventually upgrade to. Hardware is a series of Ryzen 7 CPUs
->> (3700x).  Migrations back and forth without issue for Ubuntu 20.x
->> kernels.  The first Ubuntu 22 machine was on identical hardware and all
->> was good with that too. The second Ubuntu 22 based machine was spun up
->> with a newer gen Ryzen, a 5800x.  On the initial kernel version that
->> came with that release back in April, migrations worked as expected
->> between hardware as well as different kernel versions and qemu / KVM
->> versions that come default with the distribution. Not sure if migrations
->> between kernel and KVM versions "accidentally" worked all these years,
->> but they did.  However, we ran into an issue with the kernel
->> 5.15.0-33-generic (possibly with 5.15.0-30 as well) thats part of
->> Ubuntu.  Migrations no longer worked to older generation CPUs.  I could
->> send a guest TO the box and all was fine, but upon sending the guest to
->> another hypervisor, the sender would see it as successfully migrated,
->> but the VM would typically just hang, with 100% CPU utilization, or
->> sometimes crash.  I tried a 5.18 kernel from May 22nd and again the
->> behavior is different. If I specify the CPU as EPYC or EPYC-IBPB, I can
->> migrate back and forth.
-> perhaps you are hitting issue fixed by:
-> https://lore.kernel.org/lkml/CAJ6HWG66HZ7raAa+YK0UOGLF+4O3JnzbZ+a-0j8GNixOhLk9dA@mail.gmail.com/T/
->
-Thanks for the response. I am not sure. That patch is from Feb. Would 
-the bug have been introduced sometime in May to the 5.15 kernel than 
-Ubuntu 22 would have tracked ?
+On Wed, Jun 01, 2022, Vitaly Kuznetsov wrote:
+> >  static const struct x86_emulate_ops emulate_ops = {
+> > +	.vm_bugged           = emulator_vm_bugged,
+> >  	.read_gpr            = emulator_read_gpr,
+> >  	.write_gpr           = emulator_write_gpr,
+> >  	.read_std            = emulator_read_std,
+> 
+> Is it actually "vm_bugged" or "kvm_bugged"? :-)
 
-Looking at the CPU flags diff between the 5800 and the 3700,
-
-diff -u 3700x 5800x
---- 3700x       2022-06-02 14:57:00.331309878 +0000
-+++ 5800x       2022-06-02 14:56:52.403340136 +0000
-@@ -77,6 +77,7 @@
-  hw_pstate
-  ssbd
-  mba
-+ibrs
-  ibpb
-  stibp
-  vmmcall
-@@ -85,6 +86,8 @@
-  avx2
-  smep
-  bmi2
-+erms
-+invpcid
-  cqm
-  rdt_a
-  rdseed
-@@ -122,13 +125,15 @@
-  vgif
-  v_spec_ctrl
-  umip
-+pku
-+ospke
-+vaes
-+vpclmulqdq
-  rdpid
-  overflow_recov
-  succor
-  smca
--sme
--sev
--sev_es
-+fsrm
-  bugs
-  sysret_ss_attrs
-  spectre_v1
-
-
-
->> Quick summary
->>
->> On Ubuntu 20.04 LTS with latest Ubuntu updates, I can migrate VMs back
->> and forth between a 3700x and a 5800x without issue. Guests are a mix of
->> Ubuntu, Fedora and FreeBSD
->> On Ubuntu 22 LTS, with the original kernel from release day, I can
->> migrate VMs back and forth between a 3700x and a 5800x without issue
->> On Ubuntu 22 LTS with everything up to date as of mid May 2022, I can
->> migrate from the 3700X to the 5800x without issue. But going from the
->> 5800x to the 3700x results in a migrated VM that either crashes inside
->> the VM or has the CPU pegged at 100% spinning its wheels with the guest
->> frozen and needing a hard reset. This is with --live or without and with
->> --unsafe or without. The crash / hang happens once the VM is fully
->> migrated with the sender thinking it was successfully sent and the
->> receiver thinking it successfully arrived in.
->> On stock Ubuntu 22 (5.15.0-33-generic) I can migrate back and forth to
->> Ubuntu 20 as long as the hardware / cpu is identical (in this case, 3700x)
->> On Ubuntu 22 LTS with everything up to date as of mid May 2022 with
->> 5.18.0-051800-generic #202205222030 SMP PREEMPT_DYNAMIC Sun May 22. I
->> can migrate VMs back and forth that have as its CPU def EPYC or
->> EPYC-IBPB. If the def (in my one test case anyways) is Nehalem then I
->> get a frozen VM on migration back to the 3700X.
->>
->> Some more details at
->>
->> https://ubuntuforums.org/showthread.php?t=2475399
->>
->> Is this a bug ? Expected behavior ?  Is there a better place to ask
->> these questions ?
->>
->> Thanks in advance!
->>
->>       ---Mike
->>
->
+vm_bugged.  KVM_BUG_ON() because it's a KVM bug on the condition, but the invididual
+VM is what's bugged/dead, i.e. other VMs and thus KVM itself get to live on. :-)
