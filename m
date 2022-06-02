@@ -2,98 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA09753B378
-	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 08:23:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF96A53B52B
+	for <lists+kvm@lfdr.de>; Thu,  2 Jun 2022 10:31:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230462AbiFBGWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 02:22:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45188 "EHLO
+        id S232432AbiFBIan (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 04:30:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230487AbiFBGWl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 02:22:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5EC203CFCE
-        for <kvm@vger.kernel.org>; Wed,  1 Jun 2022 23:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654150955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dftoX5xxTZB/c8O5WA81vrlQezqU2CDPcAxmSZhNEc4=;
-        b=Hxp3PweVceqPY9q0omzQ4eKyLu/maXeie1mURY0XlG/gN9FWUHFdPVV/A6q/lZNwDvzWhQ
-        QpEGRV0FWauwoJCi/T0YG9VfQ/grfR0nwfZrN1yorRRFR3cAfRGW0FoAOThmhdIXVQXSMD
-        Yut10gLONjr3+n/DQjmEQPYkhrxQPBQ=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-417-XdIJS269MrWbVGDuvWUkzA-1; Thu, 02 Jun 2022 02:22:32 -0400
-X-MC-Unique: XdIJS269MrWbVGDuvWUkzA-1
-Received: by mail-qv1-f70.google.com with SMTP id bv14-20020ad4488e000000b004646673e80bso2845923qvb.23
-        for <kvm@vger.kernel.org>; Wed, 01 Jun 2022 23:22:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=dftoX5xxTZB/c8O5WA81vrlQezqU2CDPcAxmSZhNEc4=;
-        b=6V5VhH6sWh+ZpXG9nyUSP8mmMtEwwo+C+2R7d/M1N4O9+0RpxZt+ftZGS5TB/c1mAk
-         uXBxrhbDMviE+4ef2ATEAfEqotrLfeCY9iM1oXnbZZ3vX+U86erloLb843wEvJ5eDIiZ
-         /I1BAr6uuXAXsa4deud5NhRGCyT7HtfMKM1HDhpid+ZR/iuWm2qF+z0CvuV5sumvD6FO
-         +yHMs0YeNuhkycA2t3o5XvAnPOmMjGrf29T2gUS2RwLoU/5ky0bjJBOhTvCXCwr0UHis
-         QpqCPiC0h7O4ni9MGFSWBQHZ6sXLkXbA/F4TKya0Tt29Sa1rpJreyUYpXnPJC0jPHkmG
-         hvHw==
-X-Gm-Message-State: AOAM531s+6ASlj3PlCPLrRCgHW62bXoodwyBDdhNeKcUic8AtTiPtcan
-        77JoDgcDfK6l7/WduNaPYmgq/BUUw4HoEXdmLhwyKFWRw/1kOqwJ885hZsbehbTfNvM7Nf+6K3i
-        Rifo8xqYC9YsOYnoWY3sA4EWNNwoU
-X-Received: by 2002:a0c:e702:0:b0:467:538e:ebba with SMTP id d2-20020a0ce702000000b00467538eebbamr2217016qvn.2.1654150951934;
-        Wed, 01 Jun 2022 23:22:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz0WJo9DePlOEq7IsA8BZdRFxkhg64PwaZaZWcafFZW35XH5PUzPmmmXhlP8oswWj9PLLjDa3nyytbYkOLb1wI=
-X-Received: by 2002:a0c:e702:0:b0:467:538e:ebba with SMTP id
- d2-20020a0ce702000000b00467538eebbamr2216984qvn.2.1654150951730; Wed, 01 Jun
- 2022 23:22:31 -0700 (PDT)
+        with ESMTP id S232420AbiFBIaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 04:30:39 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 938AEE9B
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 01:30:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3FF2EB81EE7
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 08:30:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1B74C3411C;
+        Thu,  2 Jun 2022 08:30:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654158635;
+        bh=vzY+G8+ASqCckXvQ6YmgGfQtJZDGIWLvqqnwao/JorY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=FKrKjZIJXf8NSwXpdMQplv+lflcmI/vGdP15boyX6V9G8I3IBsENIov1YcxVs4rmG
+         15ij0D6YDHrxvT22FpmGegYXwGYFNGvYP8Rq/K1dOBuufxKXuTbGc8HiGuHHaVegWg
+         qQZsJ5Kf5gExnHzrNRNJGqF+IBiHBmVb/H2AZnSeTJEBuUr8dVaHDn+IzI+/pcOTS1
+         1yhQ7blxRs/OXdDADdtwUP5sFj/9MfnCzSXEmHwRF9bUYfFePoqb1UCpStwhfktcyX
+         22Ottjkzq2nguarEhDjHKG6YsEj7C6KVuSFZi4MBJTdJS/sDN35ftP+H8dCb+k6oro
+         eHIaCw/vDv62A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nwgDw-00F9Sj-Op; Thu, 02 Jun 2022 09:30:32 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     Eric Auger <eauger@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>, kernel-team@android.com
+Subject: [PATCH 0/3] KVM: arm64: Fix userspace access to HW pending state
+Date:   Thu,  2 Jun 2022 09:30:22 +0100
+Message-Id: <20220602083025.1110433-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20220526124338.36247-1-eperezma@redhat.com> <20220526124338.36247-4-eperezma@redhat.com>
- <20220601070303-mutt-send-email-mst@kernel.org> <CAJaqyWcK7CwWLr5unxXr=FDbuufeA38X0eAboJy8yKLcsdiPow@mail.gmail.com>
- <PH0PR12MB54819A5DC204CED360C3BA86DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
-In-Reply-To: <PH0PR12MB54819A5DC204CED360C3BA86DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 2 Jun 2022 08:21:55 +0200
-Message-ID: <CAJaqyWfJVDj+u0UVXGkJFriRJ5Lo5os6FWq02Q7av+NYG2JB9w@mail.gmail.com>
-Subject: Re: [PATCH v4 3/4] vhost-vdpa: uAPI to stop the device
-To:     Parav Pandit <parav@nvidia.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        netdev <netdev@vger.kernel.org>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        Cindy Lu <lulu@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-        "Dawar, Gautam" <gautam.dawar@amd.com>,
-        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
-        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, eauger@redhat.com, ricarkol@google.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,176 +65,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 1, 2022 at 9:13 PM Parav Pandit <parav@nvidia.com> wrote:
->
->
->
-> > From: Eugenio Perez Martin <eperezma@redhat.com>
-> > Sent: Wednesday, June 1, 2022 7:15 AM
-> >
-> > On Wed, Jun 1, 2022 at 1:03 PM Michael S. Tsirkin <mst@redhat.com> wrot=
-e:
-> > >
-> > > On Thu, May 26, 2022 at 02:43:37PM +0200, Eugenio P=C3=A9rez wrote:
-> > > > The ioctl adds support for stop the device from userspace.
-> > > >
-> > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > > ---
-> > > >  drivers/vhost/vdpa.c       | 18 ++++++++++++++++++
-> > > >  include/uapi/linux/vhost.h | 14 ++++++++++++++
-> > > >  2 files changed, 32 insertions(+)
-> > > >
-> > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c index
-> > > > 32713db5831d..d1d19555c4b7 100644
-> > > > --- a/drivers/vhost/vdpa.c
-> > > > +++ b/drivers/vhost/vdpa.c
-> > > > @@ -478,6 +478,21 @@ static long vhost_vdpa_get_vqs_count(struct
-> > vhost_vdpa *v, u32 __user *argp)
-> > > >       return 0;
-> > > >  }
-> > > >
-> > > > +static long vhost_vdpa_stop(struct vhost_vdpa *v, u32 __user *argp=
-)
-> > > > +{
-> > > > +     struct vdpa_device *vdpa =3D v->vdpa;
-> > > > +     const struct vdpa_config_ops *ops =3D vdpa->config;
-> > > > +     int stop;
-> > > > +
-> > > > +     if (!ops->stop)
-> > > > +             return -EOPNOTSUPP;
-> > > > +
-> > > > +     if (copy_from_user(&stop, argp, sizeof(stop)))
-> > > > +             return -EFAULT;
-> > > > +
-> > > > +     return ops->stop(vdpa, stop);
-> > > > +}
-> > > > +
-> > > >  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned =
-int
-> > cmd,
-> > > >                                  void __user *argp)  { @@ -650,6
-> > > > +665,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
-> > > >       case VHOST_VDPA_GET_VQS_COUNT:
-> > > >               r =3D vhost_vdpa_get_vqs_count(v, argp);
-> > > >               break;
-> > > > +     case VHOST_VDPA_STOP:
-> > > > +             r =3D vhost_vdpa_stop(v, argp);
-> > > > +             break;
-> > > >       default:
-> > > >               r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
-> > > >               if (r =3D=3D -ENOIOCTLCMD) diff --git
-> > > > a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h index
-> > > > cab645d4a645..c7e47b29bf61 100644
-> > > > --- a/include/uapi/linux/vhost.h
-> > > > +++ b/include/uapi/linux/vhost.h
-> > > > @@ -171,4 +171,18 @@
-> > > >  #define VHOST_VDPA_SET_GROUP_ASID    _IOW(VHOST_VIRTIO, 0x7C,
-> > \
-> > > >                                            struct vhost_vring_state=
-)
-> > > >
-> > > > +/* Stop or resume a device so it does not process virtqueue
-> > > > +requests anymore
-> > > > + *
-> > > > + * After the return of ioctl with stop !=3D 0, the device must fin=
-ish
-> > > > +any
-> > > > + * pending operations like in flight requests. It must also
-> > > > +preserve all
-> > > > + * the necessary state (the virtqueue vring base plus the possible
-> > > > +device
-> > > > + * specific states) that is required for restoring in the future.
-> > > > +The
-> > > > + * device must not change its configuration after that point.
-> > > > + *
-> > > > + * After the return of ioctl with stop =3D=3D 0, the device can
-> > > > +continue
-> > > > + * processing buffers as long as typical conditions are met (vq is
-> > > > +enabled,
-> > > > + * DRIVER_OK status bit is enabled, etc).
-> > > > + */
-> > > > +#define VHOST_VDPA_STOP                      _IOW(VHOST_VIRTIO, 0x=
-7D, int)
-> > > > +
-> A better name is VHOST_VDPA_SET_STATE
-> State =3D stop/suspend
-> State =3D start/resume
->
-> Suspend/resume seems more logical, as opposed start/stop, because it more=
- clearly indicates that the resume (start) is from some programmed beginnin=
-g (and not first boot).
->
+Eric reported that a Seattle system was pretty unhappy about VM
+migration, and the trace pointed to a glaring bug in the way the GICv2
+emulation code reported the interrupt pending state to userspace for
+HW interrupts, specially if the interrupt state is per-CPU, as this is
+the case for the timer...
 
-It's fine to move to that nomenclature in my opinion.
+Fixing this actually results in a minor cleanup, followed by a bit of
+extra hardening so that we can catch further issues in this area
+without completely taking the system down.
 
-> > > >  #endif
-> > >
-> > > I wonder how does this interact with the admin vq idea.
-> > > I.e. if we stop all VQs then apparently admin vq can't work either ..=
-.
-> > > Thoughts?
-> > >
-> >
-> > Copying here the answer to Parav, feel free to answer to any thread or
-> > highlight if I missed something :). Using the admin vq proposal termino=
-logy of
-> > "device group".
-> >
-> > --
-> > This would stop a device of a device
-> > group, but not the whole virtqueue group. If the admin VQ is offered by=
- the
-> > PF (since it's not exposed to the guest), it will continue accepting re=
-quests as
-> > normal. If it's exposed in the VF, I think the best bet is to shadow it=
-, since
-> > guest and host requests could conflict.
-> >
->
-> vhost-vdpa device is exposed for a VF through vp-vdpa driver to user land=
-.
-> Now vp-vdpa driver will have to choose between using config register vs u=
-sing AQ to suspend/resume the device.
->
+Unless someone screams, I plan to take these in as fixes as quickly as
+possible, with the first patch being an obvious stable candidate. I'd
+appreciate it if people could verify that VM migration still works
+correctly for both GICv2 and GICv3.
 
-vp_vdpa cannot choose if the virtio device has an admin vq or any
-other feature, it just wraps the virtio device. If that virtio device
-does not expose AQ, vp_vdpa cannot expose it.
+Thanks,
 
-> Why not always begin with more superior interface of AQ that address mult=
-iple of these needs for LM case?
->
+	M.
 
-Because it doesn't address valid use cases like vp_vdpa with no AQ,
-devices that are not VF, or nested virtualization.
+Marc Zyngier (3):
+  KVM: arm64: Don't read a HW interrupt pending state in user context
+  KVM: arm64: Replace vgic_v3_uaccess_read_pending with
+    vgic_uaccess_read_pending
+  KVM: arm64: Warn if accessing timer pending state outside of vcpu
+    context
 
-VHOST_VDPA_STOP / VHOST_VDPA_SET_STATE does not replace AQ commands:
-It's just the way vhost-vdpa exposes that capability to qemu. vdpa
-backend is free to choose whatever methods it finds better to
-implement it.
+ arch/arm64/kvm/arch_timer.c        |  3 +++
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c |  4 +--
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 40 ++----------------------------
+ arch/arm64/kvm/vgic/vgic-mmio.c    | 19 +++++++++++---
+ arch/arm64/kvm/vgic/vgic-mmio.h    |  3 +++
+ 5 files changed, 26 insertions(+), 43 deletions(-)
 
-> For LM case, more you explore, we realize that either VF relying on PF's =
-AQ for query/config/setup/restore makes more sense or have its own dedicate=
-d AQ.
->
-
-This ioctl does not mandate that the device cannot implement it
-through AQ, or that the device has to be a VF.
-
-Thanks!
-
-> VM's suspend/resume operation can be handled through the shadow Q.
->
-> > Since this is offered through vdpa, the device backend driver can route=
- it to
-> > whatever method works better for the hardware. For example, to send an
-> > admin vq command to the PF. That's why it's important to keep the featu=
-re
-> > as self-contained and orthogonal to others as possible.
-> > --
-> >
-> > > > --
-> > > > 2.31.1
-> > >
->
-
+-- 
+2.34.1
