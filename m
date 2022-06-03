@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 230DA53C2FF
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:13:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93E3B53C323
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:13:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240607AbiFCAtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:49:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
+        id S240875AbiFCAuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 20:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240493AbiFCArQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 20:47:16 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27FF637BC2
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:46:24 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id ob5-20020a17090b390500b001e2f03294a7so6393711pjb.8
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:46:24 -0700 (PDT)
+        with ESMTP id S240503AbiFCArR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 20:47:17 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 740FB37BCC
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:46:25 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id f9-20020a636a09000000b003c61848e622so3069445pgc.0
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:46:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=tGuVl6tntArh2tnG7FnL2hXy/yuRZwiGeL9ZM9ylpR0=;
-        b=kY0iuNBBiBxX/R5KFQAmMyvcdrQryiVuHG5Vgb1KP+hN1UZ2Y82vCLyrpAYQyEP1W0
-         uOWn6c9NKDISCL270I5EFeLw6oI7/dig3TJVoSD89xIBfFHI0tBoqcHX7Rlu7gvzxhR8
-         J4QlzLbGjFc/ty/QA5VQmtDs4meo/WuprMNCQCT4hOLo/zIlOueBVhRIi7U/nUwOZlGV
-         9UpFX1O+jIYwbSJI8dnzrch6sIusTBA9ge9AFbXycJS6mEvF5Kg2aUfqCKIRW9c63+kt
-         1Z0oLus0MUC5D+5xIzBUO9UfCTJlVAsuXAa1liDPVEFWkE2FxqMLQdcrbbo8/2VrtY7P
-         5Q5g==
+        bh=dFTXZyKLCe2rmfpw6djiOtrp0qdJVfykNhEs/JKdN3Y=;
+        b=fluQjYwJvqacnX9HyUJcT+kV2bAKhgIxjfZXnsXL2G2O7umYOTa4Xk2f9cnSjB3M/S
+         YBvAx7JunIlPwktx1ms+Lr1C/K8b0XvoJRdGADwJmytuXgP8l1WhPwxfhg3bPGAOfAdG
+         mi54x1FAKC8CJ6/Gkt2N9tgybWOf7AH0IgcRH7fStk7PuxdrOXEU90d4W44E1Kd1fYJD
+         ZuxDzQ4+t4wWakbMxH8aSLsqvc7nKR1q6CDTLZAlcQjSGMW3sIyqETQSBXxPUmQGuETp
+         tgRQzhA5mcDUiBIW58kN2z4fYrdBZO6+GJ+0BGhQlU8REFIPsySjfNUIfewfV5cVlJP5
+         r2Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=tGuVl6tntArh2tnG7FnL2hXy/yuRZwiGeL9ZM9ylpR0=;
-        b=eNWaL51aNt7K5ty/ksLSufQB43MrFhpCPjeJ2w3f7WLNBrsGb/6bKjPJ0KCyklcq+H
-         os63b+Jnu9By3BEEbb5IiddlChd01nxhDRxO3AD6Dt6g0aqejoFUbX1WmrJZ9etOHW8f
-         X/1+dYguB2uazEYt8304fFvYzvuD+u8yefCQCJDy6EPV9QH4OLIzdJl6nzfEuLgoF/4i
-         leO5lOwzOj/aY7tOX9CWIVrLFvDueF1xVd3X4ExC+DgtSr+aAIBm8oNnEz2EpKwRorDE
-         pQeuWKdPaQV+yuY2ByYIwEy2tT+FuXNXqBHYZqaMRoiQ69p5iRrSKl/ZAK5ZZZPHotSF
-         YOmA==
-X-Gm-Message-State: AOAM53275xKh6BnuYAH3Ttvh+aubkur7B6YTttQe2URXxULzykLXVji9
-        HsTrDfEptZkFN8KivCWp0tuH+neMsek=
-X-Google-Smtp-Source: ABdhPJxz82JgSIO4gwDa7BZPvKzVGqA7M4Jd00ovnGR5lwwWg3Kryf0NBbRF85uJ6Kv0OfWIMAbU8El8R3E=
+        bh=dFTXZyKLCe2rmfpw6djiOtrp0qdJVfykNhEs/JKdN3Y=;
+        b=Mo4Li3w9wU73oNI0peqNr7P1fV0NymuiRJKh0vB0Id3Is2KGhR9udcwav+6zyJ1n4N
+         76WpXUbgTt4vKZ71QZHT6dcTrCxaeePmKq7hnwkR0wOsZZkopp10fMEY1Bbc+XRGfjEM
+         qhvjrdUAAWtBcnfqhpQxLVcbzCPFwtNi7lPJ/VHlgVWSGr8FwJ3It081g3NT9H9Jqmh5
+         gH0Gmbgz5UODSMmGv0Gid4V3V24p8U4/9RRueNSKzJWGAenRKzVWDQuVmeIH8Zodg+/A
+         /Vi3VJ809Dq+ZZN6pL/JQeB6kQ27nRDoPxmWqMNnCNfjWn1C/WLUgeERCY/Z8+X5p9yk
+         3JUw==
+X-Gm-Message-State: AOAM532MKHC3fmZI+LNNDBJS6d6v0iDAu61EQ05BJmoY7K8jZ2PXLut7
+        u6yT0R8hd+2rMZRb1RhrsA9xiYcmAtU=
+X-Google-Smtp-Source: ABdhPJxv5mzLQA4WNtxhe7cYClH7VsUnf7TK1tSZ9vb0b3ZITWviuXePFmF04G/vp96nBrHEAIgX/gPfTV4=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:6505:b0:163:b040:829b with SMTP id
- b5-20020a170902650500b00163b040829bmr7499907plk.173.1654217183604; Thu, 02
- Jun 2022 17:46:23 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:6390:b0:1e0:a47b:a57a with SMTP id
+ f16-20020a17090a639000b001e0a47ba57amr42517476pjj.115.1654217185119; Thu, 02
+ Jun 2022 17:46:25 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:42:39 +0000
+Date:   Fri,  3 Jun 2022 00:42:40 +0000
 In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-93-seanjc@google.com>
+Message-Id: <20220603004331.1523888-94-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220603004331.1523888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 092/144] KVM: selftests: Convert system_counter_offset_test
- away from VCPU_ID
+Subject: [PATCH v2 093/144] KVM: selftests: Track kvm_vcpu object in tsc_scaling_sync
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -72,101 +71,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert system_counter_offset_test to use vm_create_with_one_vcpu() and
-pass around a 'struct kvm_vcpu' object instead of using a global VCPU_ID.
+Track the added 'struct kvm_vcpu' object in tsc_scaling_sync instead of
+relying purely on the VM + vcpu_id combination.  Ideally, the test
+wouldn't need to manually manage vCPUs, but the need to invoke a per-VM
+ioctl before creating vCPUs is not handled by the selftests framework,
+at least not yet...
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../kvm/system_counter_offset_test.c          | 28 +++++++++----------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ .../selftests/kvm/x86_64/tsc_scaling_sync.c     | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
-index 5dd9d28efb97..0690ce0ae4fa 100644
---- a/tools/testing/selftests/kvm/system_counter_offset_test.c
-+++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
-@@ -14,8 +14,6 @@
- #include "kvm_util.h"
- #include "processor.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
+index f0083d8cfe98..b7cd5c47fc53 100644
+--- a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
++++ b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
+@@ -46,38 +46,41 @@ static void guest_code(void)
  
--#define VCPU_ID 0
--
- #ifdef __x86_64__
- 
- struct test_case {
-@@ -28,18 +26,19 @@ static struct test_case test_cases[] = {
- 	{ -180 * NSEC_PER_SEC },
- };
- 
--static void check_preconditions(struct kvm_vm *vm)
-+static void check_preconditions(struct kvm_vcpu *vcpu)
+ static void *run_vcpu(void *_cpu_nr)
  {
--	if (!__vcpu_has_device_attr(vm, VCPU_ID, KVM_VCPU_TSC_CTRL, KVM_VCPU_TSC_OFFSET))
-+	if (!__vcpu_has_device_attr(vcpu->vm, vcpu->id, KVM_VCPU_TSC_CTRL,
-+				    KVM_VCPU_TSC_OFFSET))
- 		return;
- 
- 	print_skip("KVM_VCPU_TSC_OFFSET not supported; skipping test");
- 	exit(KSFT_SKIP);
- }
- 
--static void setup_system_counter(struct kvm_vm *vm, struct test_case *test)
-+static void setup_system_counter(struct kvm_vcpu *vcpu, struct test_case *test)
- {
--	vcpu_device_attr_set(vm, VCPU_ID, KVM_VCPU_TSC_CTRL,
-+	vcpu_device_attr_set(vcpu->vm, vcpu->id, KVM_VCPU_TSC_CTRL,
- 			     KVM_VCPU_TSC_OFFSET, &test->tsc_offset);
- }
- 
-@@ -91,7 +90,7 @@ static void handle_abort(struct ucall *uc)
- 		  __FILE__, uc->args[1]);
- }
- 
--static void enter_guest(struct kvm_vm *vm)
-+static void enter_guest(struct kvm_vcpu *vcpu)
- {
- 	uint64_t start, end;
- 	struct ucall uc;
-@@ -100,12 +99,12 @@ static void enter_guest(struct kvm_vm *vm)
- 	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
- 		struct test_case *test = &test_cases[i];
- 
--		setup_system_counter(vm, test);
-+		setup_system_counter(vcpu, test);
- 		start = host_read_guest_system_counter(test);
--		vcpu_run(vm, VCPU_ID);
-+		vcpu_run(vcpu->vm, vcpu->id);
- 		end = host_read_guest_system_counter(test);
- 
--		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		switch (get_ucall(vcpu->vm, vcpu->id, &uc)) {
- 		case UCALL_SYNC:
- 			handle_sync(&uc, start, end);
- 			break;
-@@ -114,19 +113,20 @@ static void enter_guest(struct kvm_vm *vm)
- 			return;
- 		default:
- 			TEST_ASSERT(0, "unhandled ucall %ld\n",
--				    get_ucall(vm, VCPU_ID, &uc));
-+				    get_ucall(vcpu->vm, vcpu->id, &uc));
- 		}
- 	}
- }
- 
- int main(void)
- {
+-	unsigned long cpu = (unsigned long)_cpu_nr;
++	unsigned long vcpu_id = (unsigned long)_cpu_nr;
+ 	unsigned long failures = 0;
+ 	static bool first_cpu_done;
 +	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
  
--	vm = vm_create_default(VCPU_ID, 0, guest_main);
--	check_preconditions(vm);
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
-+	check_preconditions(vcpu);
- 	ucall_init(vm, NULL);
+ 	/* The kernel is fine, but vm_vcpu_add_default() needs locking */
+ 	pthread_spin_lock(&create_lock);
  
--	enter_guest(vm);
-+	enter_guest(vcpu);
- 	kvm_vm_free(vm);
- }
+-	vm_vcpu_add_default(vm, cpu, guest_code);
++	vm_vcpu_add_default(vm, vcpu_id, guest_code);
++	vcpu = vcpu_get(vm, vcpu_id);
+ 
+ 	if (!first_cpu_done) {
+ 		first_cpu_done = true;
+-		vcpu_set_msr(vm, cpu, MSR_IA32_TSC, TEST_TSC_OFFSET);
++		vcpu_set_msr(vm, vcpu->id, MSR_IA32_TSC, TEST_TSC_OFFSET);
+ 	}
+ 
+ 	pthread_spin_unlock(&create_lock);
+ 
+ 	for (;;) {
+-		volatile struct kvm_run *run = vcpu_state(vm, cpu);
++		volatile struct kvm_run *run = vcpu->run;
+                 struct ucall uc;
+ 
+-                vcpu_run(vm, cpu);
++		vcpu_run(vm, vcpu->id);
+                 TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+                             "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
+                             run->exit_reason,
+                             exit_reason_str(run->exit_reason));
+ 
+-                switch (get_ucall(vm, cpu, &uc)) {
++		switch (get_ucall(vm, vcpu->id, &uc)) {
+                 case UCALL_DONE:
+ 			goto out;
+ 
+                 case UCALL_SYNC:
+-			printf("Guest %ld sync %lx %lx %ld\n", cpu, uc.args[2], uc.args[3], uc.args[2] - uc.args[3]);
++			printf("Guest %d sync %lx %lx %ld\n", vcpu->id,
++			       uc.args[2], uc.args[3], uc.args[2] - uc.args[3]);
+ 			failures++;
+ 			break;
+ 
 -- 
 2.36.1.255.ge46751e96f-goog
 
