@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C61E053C560
+	by mail.lfdr.de (Postfix) with ESMTP id 7A57F53C55F
 	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:58:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242052AbiFCG6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 02:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33504 "EHLO
+        id S234778AbiFCG6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 02:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241799AbiFCG5F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 02:57:05 -0400
+        with ESMTP id S241819AbiFCG5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 02:57:06 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B942636;
-        Thu,  2 Jun 2022 23:57:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CB7CFB;
+        Thu,  2 Jun 2022 23:57:01 -0700 (PDT)
 Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2534UFlQ020330;
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2534co80020370;
         Fri, 3 Jun 2022 06:57:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=a1FfIqEq86WPjYux93SJuyzGMRCvf0ZxUQ3Z6CIRwnE=;
- b=W5wp2Dopju1MRA3KqVx7EgXfLNxW3idYFmDGP59nDGMIukHo3pkeTjwdyVZtWNYrqcBl
- WPkyPF/6nril6vTeSYLIieaulpDnJBoP8LlGrue79G/TcnbSl3ILronEP9gWCfbeY8YB
- 6u7fI2dlqTihjM+Prp5VL58re+kvUcvIWm2d8kgGH96Kh8laA8KUKDdxuc39PdEVMKez
- o0AB28yoqPqJNMNI3BEnpyo4ZmnIXOmSCm/qbUrPQIXuOESTDGEm/ZYUh6lMXaZd/qto
- QRrlGxK1si6hOGiYl8E+2BioOytAzOmgubdtVrsEroaoUHUOuT9/msfXRGiyAJkIkQpg 0g== 
+ bh=cJ7447g1r0ADseFA7ON1BZUkqjA1yVilvJCiZaskV88=;
+ b=O3btotN31TceF/46enNiIqjWyPhyqtRm9l0bgHEznbdRPCCc6A4KliUAZFYz2c0JyPfI
+ yGtnxOQQccJ0pGq6aLSe4Z4Ww3838cXzgy3/KQ0bI2nyAHER81vD73yzrwP0JpKXWMUg
+ 94CYSDPr2IsHmgAq/g6XNKq/lZgRqMyC31dGlcxlXPsO4yX9slAoDzorpP5L8Opu6iE+
+ StrmlZTYdG2Ug5atUtRyXcFJmFhRvkKEmJqYtYmgx3WSDnoV1TM1g9MOy1vOdsS3vm/N
+ PduFQHxdP1Sw2H918AiOg59+42emTbMnKb0Z60ui/S1wxHy0+XHaqvPPg2zmAvrh6EEB 7A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gf6t3wy5y-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gf6t3wy64-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 06:56:59 +0000
+        Fri, 03 Jun 2022 06:57:00 +0000
 Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2536pxak027854;
-        Fri, 3 Jun 2022 06:56:59 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gf6t3wy5e-1
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2536oDmt023910;
+        Fri, 3 Jun 2022 06:57:00 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gf6t3wy5m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 03 Jun 2022 06:56:59 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2536oOes029519;
-        Fri, 3 Jun 2022 06:56:56 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3gbc97x3r2-1
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2536pG1Q011239;
+        Fri, 3 Jun 2022 06:56:57 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 3gbc97e36b-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 06:56:56 +0000
+        Fri, 03 Jun 2022 06:56:57 +0000
 Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2536urvO33751414
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2536us5K15729002
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Jun 2022 06:56:53 GMT
+        Fri, 3 Jun 2022 06:56:54 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A9BAA42042;
-        Fri,  3 Jun 2022 06:56:53 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 174EE4203F;
+        Fri,  3 Jun 2022 06:56:54 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51CBC42045;
+        by IMSVA (Postfix) with ESMTP id B76A342047;
         Fri,  3 Jun 2022 06:56:53 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.40])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -63,17 +63,17 @@ Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
         pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
         mimu@linux.ibm.com, nrb@linux.ibm.com
-Subject: [PATCH v11 18/19] KVM: s390: pv: avoid export before import if possible
-Date:   Fri,  3 Jun 2022 08:56:44 +0200
-Message-Id: <20220603065645.10019-19-imbrenda@linux.ibm.com>
+Subject: [PATCH v11 19/19] KVM: s390: pv: support for Destroy fast UVC
+Date:   Fri,  3 Jun 2022 08:56:45 +0200
+Message-Id: <20220603065645.10019-20-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220603065645.10019-1-imbrenda@linux.ibm.com>
 References: <20220603065645.10019-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Tac4p_wv0c3cPCfLnc9d0mlDpWVCRIv-
-X-Proofpoint-ORIG-GUID: wywXJNPEQIBPgxAJXJp4Ha7oerr9OYNd
+X-Proofpoint-GUID: OR4ehtCFSuRSbhFyDH9J_Z0AsF_iMk__
+X-Proofpoint-ORIG-GUID: DG4Wq1No05bJqTxsSsylHTaEQnSimJZI
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-03_01,2022-06-02_01,2022-02-23_01
@@ -91,27 +91,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the appropriate UV feature bit is set, there is no need to perform
-an export before import.
+Add support for the Destroy Secure Configuration Fast Ultravisor call,
+and take advantage of it for asynchronous destroy.
+
+When supported, the protected guest is destroyed immediately using the
+new UVC, leaving only the memory to be cleaned up asynchronously.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- arch/s390/kernel/uv.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/s390/include/asm/uv.h | 10 +++++++
+ arch/s390/kvm/pv.c         | 58 ++++++++++++++++++++++++++++++++------
+ 2 files changed, 59 insertions(+), 9 deletions(-)
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 02aca3c5dce1..c18c3d6a4314 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -249,6 +249,8 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
-  */
- static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
+diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+index ba64e0be03bb..8b255d26c5a7 100644
+--- a/arch/s390/include/asm/uv.h
++++ b/arch/s390/include/asm/uv.h
+@@ -34,6 +34,7 @@
+ #define UVC_CMD_INIT_UV			0x000f
+ #define UVC_CMD_CREATE_SEC_CONF		0x0100
+ #define UVC_CMD_DESTROY_SEC_CONF	0x0101
++#define UVC_CMD_DESTROY_SEC_CONF_FAST	0x0102
+ #define UVC_CMD_CREATE_SEC_CPU		0x0120
+ #define UVC_CMD_DESTROY_SEC_CPU		0x0121
+ #define UVC_CMD_CONV_TO_SEC_STOR	0x0200
+@@ -77,6 +78,7 @@ enum uv_cmds_inst {
+ 	BIT_UVC_CMD_UNSHARE_ALL = 20,
+ 	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
+ 	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
++	BIT_UVC_CMD_DESTROY_SEC_CONF_FAST = 23,
+ 	BIT_UVC_CMD_RETR_ATTEST = 28,
+ };
+ 
+@@ -213,6 +215,14 @@ struct uv_cb_nodata {
+ 	u64 reserved20[4];
+ } __packed __aligned(8);
+ 
++/* Destroy Configuration Fast */
++struct uv_cb_destroy_fast {
++	struct uv_cb_header header;
++	u64 reserved08[2];
++	u64 handle;
++	u64 reserved20[5];
++} __packed __aligned(8);
++
+ /* Set Shared Access */
+ struct uv_cb_share {
+ 	struct uv_cb_header header;
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index ab06fa366e49..51c35df41a83 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -188,6 +188,9 @@ static int kvm_s390_pv_dispose_one_leftover(struct kvm *kvm, struct leftover_pv_
  {
-+	if (test_bit_inv(BIT_UV_FEAT_MISC, &uv_info.uv_feature_indications))
-+		return false;
- 	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
- 		return false;
- 	return atomic_read(&mm->context.protected_count) > 1;
+ 	int cc;
+ 
++	/* It used the destroy-fast UVC, nothing left to do here */
++	if (!leftover->handle)
++		goto done_fast;
+ 	cc = uv_cmd_nodata(leftover->handle, UVC_CMD_DESTROY_SEC_CONF, rc, rrc);
+ 	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY LEFTOVER VM: rc %x rrc %x", *rc, *rrc);
+ 	WARN_ONCE(cc, "protvirt destroy leftover vm failed rc %x rrc %x", *rc, *rrc);
+@@ -202,6 +205,7 @@ static int kvm_s390_pv_dispose_one_leftover(struct kvm *kvm, struct leftover_pv_
+ 	free_pages(leftover->stor_base, get_order(uv_info.guest_base_stor_len));
+ 	free_pages(leftover->old_gmap_table, CRST_ALLOC_ORDER);
+ 	vfree(leftover->stor_var);
++done_fast:
+ 	atomic_dec(&kvm->mm->context.protected_count);
+ 	return 0;
+ }
+@@ -310,6 +314,32 @@ static void kvm_s390_destroy_lower_2g(struct kvm *kvm)
+ 	srcu_read_unlock(&kvm->srcu, srcu_idx);
+ }
+ 
++static int kvm_s390_pv_deinit_vm_fast(struct kvm *kvm, u16 *rc, u16 *rrc)
++{
++	struct uv_cb_destroy_fast uvcb = {
++		.header.cmd = UVC_CMD_DESTROY_SEC_CONF_FAST,
++		.header.len = sizeof(uvcb),
++		.handle = kvm_s390_pv_get_handle(kvm),
++	};
++	int cc;
++
++	cc = uv_call_sched(0, (u64)&uvcb);
++	*rc = uvcb.header.rc;
++	*rrc = uvcb.header.rrc;
++	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
++	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM FAST: rc %x rrc %x", *rc, *rrc);
++	WARN_ONCE(cc, "protvirt destroy vm fast failed rc %x rrc %x", *rc, *rrc);
++	/* Inteded memory leak on "impossible" error */
++	if (!cc)
++		kvm_s390_pv_dealloc_vm(kvm);
++	return cc ? -EIO : 0;
++}
++
++static inline bool is_destroy_fast_available(void)
++{
++	return test_bit_inv(BIT_UVC_CMD_DESTROY_SEC_CONF_FAST, uv_info.inst_calls_list);
++}
++
+ /**
+  * kvm_s390_pv_deinit_vm_async_prepare - Prepare a protected VM for
+  * asynchronous teardown.
+@@ -331,6 +361,7 @@ static void kvm_s390_destroy_lower_2g(struct kvm *kvm)
+ int kvm_s390_pv_deinit_vm_async_prepare(struct kvm *kvm, u16 *rc, u16 *rrc)
+ {
+ 	struct leftover_pv_vm *priv;
++	int res;
+ 
+ 	/*
+ 	 * If an asynchronous deinitialization is already pending, refuse.
+@@ -342,14 +373,20 @@ int kvm_s390_pv_deinit_vm_async_prepare(struct kvm *kvm, u16 *rc, u16 *rrc)
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
+-	priv->stor_var = kvm->arch.pv.stor_var;
+-	priv->stor_base = kvm->arch.pv.stor_base;
+-	priv->handle = kvm_s390_pv_get_handle(kvm);
+-	priv->old_gmap_table = (unsigned long)kvm->arch.gmap->table;
+-	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
+-	if (s390_replace_asce(kvm->arch.gmap)) {
+-		kfree(priv);
+-		return -ENOMEM;
++	if (is_destroy_fast_available()) {
++		res = kvm_s390_pv_deinit_vm_fast(kvm, rc, rrc);
++		if (res)
++			return res;
++	} else {
++		priv->stor_var = kvm->arch.pv.stor_var;
++		priv->stor_base = kvm->arch.pv.stor_base;
++		priv->handle = kvm_s390_pv_get_handle(kvm);
++		priv->old_gmap_table = (unsigned long)kvm->arch.gmap->table;
++		WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
++		if (s390_replace_asce(kvm->arch.gmap)) {
++			kfree(priv);
++			return -ENOMEM;
++		}
+ 	}
+ 
+ 	kvm_s390_destroy_lower_2g(kvm);
+@@ -415,6 +452,7 @@ static void kvm_s390_pv_mmu_notifier_release(struct mmu_notifier *subscription,
+ {
+ 	struct kvm *kvm = container_of(subscription, struct kvm, arch.pv.mmu_notifier);
+ 	u16 dummy;
++	int r;
+ 
+ 	/*
+ 	 * No locking is needed since this is the last thread of the last user of this
+@@ -423,7 +461,9 @@ static void kvm_s390_pv_mmu_notifier_release(struct mmu_notifier *subscription,
+ 	 * unregistered. This means that if this notifier runs, then the
+ 	 * struct kvm is still valid.
+ 	 */
+-	kvm_s390_cpus_from_pv(kvm, &dummy, &dummy);
++	r = kvm_s390_cpus_from_pv(kvm, &dummy, &dummy);
++	if (!r && is_destroy_fast_available())
++		kvm_s390_pv_deinit_vm_fast(kvm, &dummy, &dummy);
+ }
+ 
+ static const struct mmu_notifier_ops kvm_s390_pv_mmu_notifier_ops = {
 -- 
 2.36.1
 
