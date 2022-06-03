@@ -2,69 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1889753C2E2
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:13:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D1CC53C35C
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 05:00:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234734AbiFCA4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:56:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51824 "EHLO
+        id S238363AbiFCDAj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 23:00:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241445AbiFCAvG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 20:51:06 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D6137AB8
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:47:56 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id c4-20020a170902c2c400b0015f16fb4a54so3469038pla.22
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:47:56 -0700 (PDT)
+        with ESMTP id S229494AbiFCDAi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 23:00:38 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5F4A2B186
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 20:00:36 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id q123so6240077pgq.6
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 20:00:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=JWFE/jjOXHS1mFvFYygFdMopCxVjk77rB6nYuDplK34=;
-        b=aUM4pGmPqNHYIGZyunuBfnVyKE/+oQ1ITUTUXye1SmORNwFqYZX7NHMUBNgzFWdToc
-         3E4oWJ4BBNPfvz1wBle+5PXlz1/UNk+8ehuHKSPznbHskPeqSYzkczUgQw82NCaILca7
-         g2FXzqxBZYzfgj5yy+4vJ8ymST2txyLXTrOHR+KqGZOHDgvGFUsyV9IGLnWQ44AvMkf0
-         0obyQBX1owuDLKvrrHyWj5bWnHij6SgS1pQreu+Tkge7wnGzGjJ7Q4GN9foOlzp5KStn
-         SOoeX+tWpZxXp0dA4T2Y/7CgoYMnzkKKFjKSrRyD7QY1EqCA6ekh8kDCC/aQVMJN+/HY
-         2hcA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=RwFDZoCKq6fRLpZhunBY9Ur7VEe8OCcwwcPl9yDvt18=;
+        b=QPWow0hQecnmpFGS7YMEdI7KwxvdgX9AsYIbJdi8dH7ZC5xhb+d9ItKtCT9jTHTuBS
+         dBHD+IwKfuP8omTmLlp+cDtSQ8WSup1UWi6QZEJdHwh4ouZIk2COzym7AxHRTfx4OVMs
+         czR4VHmG4mHYvIfqtQ6Z4kK7GrHUeqr+lI7tOZsDQyEJJ3X5yLFCA+IVxyKRkGwYqbAO
+         +8gvILQFJxskBB8dPwmDouG+VxgS+40HzpnwYCOTd6ShOYSuiEkvMj9ZsxP0HoNrcZyk
+         LWLv3lYqFdn/HO84j7VFUw/qapYdaDIHY9wHo+A8AiPgXiEfFLEcRWUphndn5y/N8J9d
+         b2GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=JWFE/jjOXHS1mFvFYygFdMopCxVjk77rB6nYuDplK34=;
-        b=u8NDSRlxbb9/BrzFT0Fbggs28qMwotSHTU3BEk0FRRPoYbyxw4rfEk/0jyOKNRD+YI
-         d3XW1RvgVzEYkUKbM3/CkFu9DR1Pq0CHBNmNGACfhEWKltSVHtoCGVT2XyP2JllB4LXK
-         urdKmpBfOcdSBHd9itq0m09c/gmo3zlcZ2apEQKtZFyxbWn10tDJ8GSa7ahmF9l8WVp7
-         y6U1TryR9ZU5m3KJTgbfQmTenv37JsGU1Z/FmeSBNz/QQRjqVaRCDDdx55oMIK6rDpWI
-         v5+EXTmflA3d65QlZMqDaOZVTP37DO+ujNVKk9SnekcgQ/Y8Hfdm0KL4ohikQQH3Md/P
-         Z5vg==
-X-Gm-Message-State: AOAM532Wzvi8XnelyEFVmhtn3AWibfscjgN59E2rcwnrWToh189O3z1l
-        KfxGoxtuqawTy/eVCAAYIWKa1eUcR9I=
-X-Google-Smtp-Source: ABdhPJxhm+WJm0+KtPscOsIcz90Ey/7Ta5KlCastPuv974OLtLpiVNimkyfuc6Zay1MDTyERZWvWtB+4oe0=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:8f86:b0:162:22ff:496b with SMTP id
- z6-20020a1709028f8600b0016222ff496bmr7288600plo.105.1654217275704; Thu, 02
- Jun 2022 17:47:55 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:43:31 +0000
-In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-145-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220603004331.1523888-1-seanjc@google.com>
-X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 144/144] KVM: selftests: Sanity check input to ioctls() at
- build time
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=RwFDZoCKq6fRLpZhunBY9Ur7VEe8OCcwwcPl9yDvt18=;
+        b=kOu2GK0/Tzqno+hZlz69zgfj4wmctubCxzNBhr1FaQ3ghe0BKIKuuwJPr8K29v8P7v
+         Rd/UFedB0S+yEp/9GkxaWddnuxN7f5Y4xql5oU8d2T8CZBMQLIluzcmiFUf6Wm0REGVN
+         jwZZIktKCtuETaAUWS6mM+fJDoD+IZz3NefCuVgxyuWyidDrE56WeV6ck43/kVI/TQ4L
+         L/pdiO4eskHp+sQOChSfntbhUQRz+QVvXBkN1nBlD3RCFvs26o1R5bqteKJsHrWHKfXo
+         jUQ1XEMHQjgWlDWpfZAG/e8oOqLuyVC50mgOMuGlnG3I87I8dR2o9MOglL7x1FjS+qU2
+         xfuA==
+X-Gm-Message-State: AOAM533JVR76sCbvRBmjIzlgQhhJj54iqL46coFyHuF8x0UYjjp+ytfz
+        7J87dzC/gBSbliyk2V+v/eSzGQ==
+X-Google-Smtp-Source: ABdhPJxxk/mfZYwb8WfRHHkXp7YCcWVr4qixNf3FOqBTH/6gN8fx0bmdVeZo61Yw9D7FBRcNy8HjZA==
+X-Received: by 2002:a65:6b8a:0:b0:3db:7dc5:fec2 with SMTP id d10-20020a656b8a000000b003db7dc5fec2mr6697410pgw.223.1654225235675;
+        Thu, 02 Jun 2022 20:00:35 -0700 (PDT)
+Received: from google.com ([2620:15c:2ce:200:c7ef:20a0:cd88:8a86])
+        by smtp.gmail.com with ESMTPSA id t19-20020a63dd13000000b003c14af50617sm4086524pgg.47.2022.06.02.20.00.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jun 2022 20:00:34 -0700 (PDT)
+Date:   Thu, 2 Jun 2022 20:00:29 -0700
+From:   Peter Collingbourne <pcc@google.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
+Message-ID: <Ypl5TdMN3J/tttNe@google.com>
+References: <20220519134204.5379-1-will@kernel.org>
+ <20220519134204.5379-60-will@kernel.org>
+ <CAMn1gO4_d75_88fg5hcnBqx+tdu-9pG7atzt-qUD1nhUNs5TyQ@mail.gmail.com>
+ <CA+EHjTx328na4FDfKU-cdLX+SV4MmKfMKKrTHo5H0=iB2GTQ+A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+EHjTx328na4FDfKU-cdLX+SV4MmKfMKKrTHo5H0=iB2GTQ+A@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,286 +89,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a static assert to the KVM/VM/vCPU ioctl() helpers to verify that the
-size of the argument provided matches the expected size of the IOCTL.
-Because ioctl() ultimately takes a "void *", it's all too easy to pass in
-garbage and not detect the error until runtime.  E.g. while working on a
-CPUID rework, selftests happily compiled when vcpu_set_cpuid()
-unintentionally passed the cpuid() function as the parameter to ioctl()
-(a local "cpuid" parameter was removed, but its use was not replaced with
-"vcpu->cpuid" as intended).
+Hi Fuad,
 
-Tweak a variety of benign issues that aren't compatible with the sanity
-check, e.g. passing a non-pointer for ioctls().
+On Fri, May 27, 2022 at 08:55:42AM +0100, Fuad Tabba wrote:
+> Hi Peter,
+> 
+> On Thu, May 26, 2022 at 9:08 PM Peter Collingbourne <pcc@google.com> wrote:
+> >
+> > On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
+> > >
+> > > From: Fuad Tabba <tabba@google.com>
+> > >
+> > > Return an error (-EINVAL) if trying to enable MTE on a protected
+> > > vm.
+> >
+> > I think this commit message needs more explanation as to why MTE is
+> > not currently supported in protected VMs.
+> 
+> Yes, we need to explain this more. Basically this is an extension of
+> restricting features for protected VMs done earlier [*].
+> 
+> Various VM feature configurations are allowed in KVM/arm64, each requiring
+> specific handling logic to deal with traps, context-switching and potentially
+> emulation. Achieving feature parity in pKVM therefore requires either elevating
+> this logic to EL2 (and substantially increasing the TCB) or continuing to trust
+> the host handlers at EL1. Since neither of these options are especially
+> appealing, pKVM instead limits the CPU features exposed to a guest to a fixed
+> configuration based on the underlying hardware and which can mostly be provided
+> straightforwardly by EL2.
+> 
+> This of course can change in the future and we can support more
+> features for protected VMs as needed. We'll expand on this commit
+> message when we respin.
+> 
+> Also note that this only applies to protected VMs. Non-protected VMs
+> in protected mode support MTE.
 
-Note, static_assert() requires a string on older versions of GCC.  Feed
-it an empty string to make the compiler happy.
+I see. In this case unless I'm missing something the EL2 side seems
+quite trivial though (flipping some bits in HCR_EL2). The patch below
+(in place of this one) seems to make MTE work in my test environment
+(patched [1] crosvm on Android in MTE-enabled QEMU).
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+[1] https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm/+/3689015
+
+From c87965cd14515586d487872486e7670874209113 Mon Sep 17 00:00:00 2001
+From: Peter Collingbourne <pcc@google.com>
+Date: Thu, 2 Jun 2022 19:16:02 -0700
+Subject: [PATCH] arm64: support MTE in protected VMs
+
+Enable HCR_EL2.ATA while running a vCPU with MTE enabled.
+
+To avoid exposing MTE tags from the host to protected VMs, sanitize
+tags before donating pages.
+
+Signed-off-by: Peter Collingbourne <pcc@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     | 61 +++++++++++++------
- .../selftests/kvm/lib/aarch64/processor.c     |  2 +-
- tools/testing/selftests/kvm/lib/guest_modes.c |  2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +--------
- tools/testing/selftests/kvm/s390x/resets.c    |  6 +-
- .../selftests/kvm/x86_64/mmio_warning_test.c  |  2 +-
- .../kvm/x86_64/pmu_event_filter_test.c        |  2 +-
- .../selftests/kvm/x86_64/xen_shinfo_test.c    |  6 +-
- 8 files changed, 56 insertions(+), 54 deletions(-)
+ arch/arm64/include/asm/kvm_pkvm.h | 4 +++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c    | 6 +++---
+ arch/arm64/kvm/mmu.c              | 4 +++-
+ 3 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 04ddab322b6b..0eaf0c9b7612 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -180,29 +180,56 @@ static inline bool kvm_has_cap(long cap)
- #define __KVM_IOCTL_ERROR(_name, _ret)	__KVM_SYSCALL_ERROR(_name, _ret)
- #define KVM_IOCTL_ERROR(_ioctl, _ret) __KVM_IOCTL_ERROR(#_ioctl, _ret)
- 
--#define __kvm_ioctl(kvm_fd, cmd, arg) \
--	ioctl(kvm_fd, cmd, arg)
-+#define kvm_do_ioctl(fd, cmd, arg)						\
-+({										\
-+	static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) == _IOC_SIZE(cmd), "");	\
-+	ioctl(fd, cmd, arg);							\
-+})
- 
--static inline void _kvm_ioctl(int kvm_fd, unsigned long cmd, const char *name,
--			      void *arg)
--{
--	int ret = __kvm_ioctl(kvm_fd, cmd, arg);
-+#define __kvm_ioctl(kvm_fd, cmd, arg)						\
-+	kvm_do_ioctl(kvm_fd, cmd, arg)
- 
--	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));
--}
-+
-+#define _kvm_ioctl(kvm_fd, cmd, name, arg)					\
-+({										\
-+	int ret = __kvm_ioctl(kvm_fd, cmd, arg);				\
-+										\
-+	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));			\
-+})
- 
- #define kvm_ioctl(kvm_fd, cmd, arg) \
- 	_kvm_ioctl(kvm_fd, cmd, #cmd, arg)
- 
--int __vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg);
--void _vm_ioctl(struct kvm_vm *vm, unsigned long cmd, const char *name, void *arg);
--#define vm_ioctl(vm, cmd, arg) _vm_ioctl(vm, cmd, #cmd, arg)
--
--int __vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long cmd,
--		 void *arg);
--void _vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long cmd,
--		 const char *name, void *arg);
--#define vcpu_ioctl(vcpu, cmd, arg) \
-+#define __vm_ioctl(vm, cmd, arg)						\
-+({										\
-+	static_assert(sizeof(*(vm)) == sizeof(struct kvm_vm), "");		\
-+	kvm_do_ioctl((vm)->fd, cmd, arg);					\
-+})
-+
-+#define _vm_ioctl(vcpu, cmd, name, arg)						\
-+({										\
-+	int ret = __vm_ioctl(vcpu, cmd, arg);					\
-+										\
-+	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));			\
-+})
-+
-+#define vm_ioctl(vm, cmd, arg)							\
-+	_vm_ioctl(vm, cmd, #cmd, arg)
-+
-+#define __vcpu_ioctl(vcpu, cmd, arg)						\
-+({										\
-+	static_assert(sizeof(*(vcpu)) == sizeof(struct kvm_vcpu), "");		\
-+	kvm_do_ioctl((vcpu)->fd, cmd, arg);					\
-+})
-+
-+#define _vcpu_ioctl(vcpu, cmd, name, arg)					\
-+({										\
-+	int ret = __vcpu_ioctl(vcpu, cmd, arg);					\
-+										\
-+	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));			\
-+})
-+
-+#define vcpu_ioctl(vcpu, cmd, arg)						\
- 	_vcpu_ioctl(vcpu, cmd, #cmd, arg)
- 
- /*
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 6bd27782f00c..6f5551368944 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -472,7 +472,7 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
- 	};
- 
- 	kvm_fd = open_kvm_dev_path_or_exit();
--	vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, ipa);
-+	vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, (void *)(unsigned long)ipa);
- 	TEST_ASSERT(vm_fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, vm_fd));
- 
- 	vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
-diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index 0be56c63aed6..99a575bbbc52 100644
---- a/tools/testing/selftests/kvm/lib/guest_modes.c
-+++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -65,7 +65,7 @@ void guest_modes_append_default(void)
- 		struct kvm_s390_vm_cpu_processor info;
- 
- 		kvm_fd = open_kvm_dev_path_or_exit();
--		vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, 0);
-+		vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, NULL);
- 		kvm_device_attr_get(vm_fd, KVM_S390_VM_CPU_MODEL,
- 				    KVM_S390_VM_CPU_PROCESSOR, &info);
- 		close(vm_fd);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 603a6d529357..f0300767df16 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -72,7 +72,7 @@ unsigned int kvm_check_cap(long cap)
- 	int kvm_fd;
- 
- 	kvm_fd = open_kvm_dev_path_or_exit();
--	ret = __kvm_ioctl(kvm_fd, KVM_CHECK_EXTENSION, cap);
-+	ret = __kvm_ioctl(kvm_fd, KVM_CHECK_EXTENSION, (void *)cap);
- 	TEST_ASSERT(ret >= 0, KVM_IOCTL_ERROR(KVM_CHECK_EXTENSION, ret));
- 
- 	close(kvm_fd);
-@@ -92,7 +92,7 @@ static void vm_open(struct kvm_vm *vm)
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_IMMEDIATE_EXIT));
- 
--	vm->fd = __kvm_ioctl(vm->kvm_fd, KVM_CREATE_VM, vm->type);
-+	vm->fd = __kvm_ioctl(vm->kvm_fd, KVM_CREATE_VM, (void *)vm->type);
- 	TEST_ASSERT(vm->fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, vm->fd));
- }
- 
-@@ -1449,19 +1449,6 @@ struct kvm_reg_list *vcpu_get_reg_list(struct kvm_vcpu *vcpu)
- 	return reg_list;
- }
- 
--int __vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long cmd, void *arg)
--{
--	return ioctl(vcpu->fd, cmd, arg);
--}
--
--void _vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long cmd, const char *name,
--		 void *arg)
--{
--	int ret = __vcpu_ioctl(vcpu, cmd, arg);
--
--	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));
--}
--
- void *vcpu_map_dirty_ring(struct kvm_vcpu *vcpu)
- {
- 	uint32_t page_size = vcpu->vm->page_size;
-@@ -1491,18 +1478,6 @@ void *vcpu_map_dirty_ring(struct kvm_vcpu *vcpu)
- 	return vcpu->dirty_gfns;
- }
- 
--int __vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
--{
--	return ioctl(vm->fd, cmd, arg);
--}
--
--void _vm_ioctl(struct kvm_vm *vm, unsigned long cmd, const char *name, void *arg)
--{
--	int ret = __vm_ioctl(vm, cmd, arg);
--
--	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));
--}
--
- /*
-  * Device Ioctl
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 952e3c3fa32d..9ca9296f2a25 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -73,10 +73,12 @@ void kvm_shadow_destroy(struct kvm *kvm);
+  * Allow for protected VMs:
+  * - Branch Target Identification
+  * - Speculative Store Bypassing
++ * - Memory Tagging Extension
   */
-diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
-index 4ba866047401..359fd18f473b 100644
---- a/tools/testing/selftests/kvm/s390x/resets.c
-+++ b/tools/testing/selftests/kvm/s390x/resets.c
-@@ -224,7 +224,7 @@ static void test_normal(void)
+ #define PVM_ID_AA64PFR1_ALLOW (\
+ 	ARM64_FEATURE_MASK(ID_AA64PFR1_BT) | \
+-	ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) \
++	ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) | \
++	ARM64_FEATURE_MASK(ID_AA64PFR1_MTE) \
+ 	)
  
- 	inject_irq(vcpu);
+ /*
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index e33ba9067d7b..46ddd9093ac7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -88,7 +88,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
+ 	/* Memory Tagging: Trap and Treat as Untagged if not supported. */
+ 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), feature_ids)) {
+ 		hcr_set |= HCR_TID5;
+-		hcr_clear |= HCR_DCT | HCR_ATA;
++		hcr_clear |= HCR_ATA;
+ 	}
  
--	vcpu_ioctl(vcpu, KVM_S390_NORMAL_RESET, 0);
-+	vcpu_ioctl(vcpu, KVM_S390_NORMAL_RESET, NULL);
+ 	vcpu->arch.hcr_el2 |= hcr_set;
+@@ -179,8 +179,8 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
+ 	 * - Feature id registers: to control features exposed to guests
+ 	 * - Implementation-defined features
+ 	 */
+-	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS |
+-			     HCR_TID3 | HCR_TACR | HCR_TIDCP | HCR_TID1;
++	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS | HCR_TID3 | HCR_TACR | HCR_TIDCP |
++			     HCR_TID1 | HCR_ATA;
  
- 	/* must clears */
- 	assert_normal(vcpu);
-@@ -247,7 +247,7 @@ static void test_initial(void)
+ 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
+ 		/* route synchronous external abort exceptions to EL2 */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 392ff7b2362d..f513852357f7 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1206,8 +1206,10 @@ static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		goto dec_account;
+ 	}
  
- 	inject_irq(vcpu);
- 
--	vcpu_ioctl(vcpu, KVM_S390_INITIAL_RESET, 0);
-+	vcpu_ioctl(vcpu, KVM_S390_INITIAL_RESET, NULL);
- 
- 	/* must clears */
- 	assert_normal(vcpu);
-@@ -270,7 +270,7 @@ static void test_clear(void)
- 
- 	inject_irq(vcpu);
- 
--	vcpu_ioctl(vcpu, KVM_S390_CLEAR_RESET, 0);
-+	vcpu_ioctl(vcpu, KVM_S390_CLEAR_RESET, NULL);
- 
- 	/* must clears */
- 	assert_normal(vcpu);
-diff --git a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-index 0e4590afd0e1..fb02581953a3 100644
---- a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-@@ -59,7 +59,7 @@ void test(void)
- 
- 	kvm = open("/dev/kvm", O_RDWR);
- 	TEST_ASSERT(kvm != -1, "failed to open /dev/kvm");
--	kvmvm = __kvm_ioctl(kvm, KVM_CREATE_VM, 0);
-+	kvmvm = __kvm_ioctl(kvm, KVM_CREATE_VM, NULL);
- 	TEST_ASSERT(kvmvm > 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, kvmvm));
- 	kvmcpu = ioctl(kvmvm, KVM_CREATE_VCPU, 0);
- 	TEST_ASSERT(kvmcpu != -1, KVM_IOCTL_ERROR(KVM_CREATE_VCPU, kvmcpu));
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index de9ee00d84cf..66930384ef97 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -266,7 +266,7 @@ static void test_without_filter(struct kvm_vcpu *vcpu)
- static uint64_t test_with_filter(struct kvm_vcpu *vcpu,
- 				 struct kvm_pmu_event_filter *f)
- {
--	vm_ioctl(vcpu->vm, KVM_SET_PMU_EVENT_FILTER, (void *)f);
-+	vm_ioctl(vcpu->vm, KVM_SET_PMU_EVENT_FILTER, f);
- 	return run_vcpu_to_sync(vcpu);
- }
- 
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index bdcb28186ccc..a4a78637c35a 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -472,7 +472,7 @@ int main(int argc, char *argv[])
- 		irq_routes.entries[1].u.xen_evtchn.vcpu = vcpu->id;
- 		irq_routes.entries[1].u.xen_evtchn.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL;
- 
--		vm_ioctl(vm, KVM_SET_GSI_ROUTING, &irq_routes);
-+		vm_ioctl(vm, KVM_SET_GSI_ROUTING, &irq_routes.info);
- 
- 		struct kvm_irqfd ifd = { };
- 
-@@ -716,7 +716,7 @@ int main(int argc, char *argv[])
- 				if (verbose)
- 					printf("Testing restored oneshot timer\n");
- 
--				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000,
-+				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000;
- 				vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &tmr);
- 				evtchn_irq_expected = true;
- 				alarm(1);
-@@ -743,7 +743,7 @@ int main(int argc, char *argv[])
- 				if (verbose)
- 					printf("Testing SCHEDOP_poll wake on masked event\n");
- 
--				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000,
-+				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000;
- 				vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &tmr);
- 				alarm(1);
- 				break;
+-	write_lock(&kvm->mmu_lock);
+ 	pfn = page_to_pfn(page);
++	sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
++
++	write_lock(&kvm->mmu_lock);
+ 	ret = pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT);
+ 	if (ret) {
+ 		if (ret == -EAGAIN)
 -- 
 2.36.1.255.ge46751e96f-goog
-
