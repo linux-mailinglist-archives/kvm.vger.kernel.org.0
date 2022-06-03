@@ -2,85 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C883453C978
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 13:36:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5DB853C9E8
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 14:24:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244050AbiFCLeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 07:34:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60620 "EHLO
+        id S236861AbiFCMVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 08:21:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244064AbiFCLeN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 07:34:13 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F093C71B
-        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 04:34:12 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id q7so10044005wrg.5
-        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 04:34:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=PaEzrm9U0WjJMxkE+zbw8yGRv0uhjcRl9sFl9vmbKpk=;
-        b=b8PcN/ccGkJ0/ZtydlJUDDo2g+lpmectIjukuRMfQW4HME26sHrEMEldrBwTeDxIUK
-         M/HpWJF562WK9qVdrpCBJhBn3EH8JWTSNWEIvGzo81rv8mzXBv0u7x9hSMCYZPhqnInj
-         yYoQilE9IET90q3m2/BKMNkec21Uox4Wvfbx4j/8ohtmIBprKbq4+f0GAVtPB9ki0n6U
-         f9dFCgaQJ/2EcaP6arBEpWRWSEvozhvL0MNvjekjeOhoTJZLh8scSBPq0JvdMiyAdrE5
-         3VNpg3kxdlwQrTTOzxnX6nFDfHdqkRjj1389X5/QI/uYDrcAYBccqWSXafc3BEd+4tq0
-         g1mQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=PaEzrm9U0WjJMxkE+zbw8yGRv0uhjcRl9sFl9vmbKpk=;
-        b=sqRHSVgaUBqxahr94gTHby/tusIwbiNUsGjNkv0Z1X0aoX52yqRryDPqcl/PdXuO0L
-         jTS4UbWg6C3V26TBDst49jRQv0Y9mv4DUf8I1DkKgsX49/ydVeUb6Ucsmv1tCwhm2LJy
-         hoJMOkUFVmoJrK0EsRxpkNaDFTnGvsHtuNgTrnvK3CtqsaBrNLmzTFb9+PQNT6gnKJzH
-         zkW8goN+wlMdN06mXABG2dEO04R49ALPuQLfdNDtZKxfo8E3IcoUebfAQWDPDLEqbQ37
-         Kp1mTyv9kes5B0TqFe6rE5MHgRlRySEAsr8to369Y+Ex71ytCx2q8VOGF5FlagUd7AZd
-         cXHA==
-X-Gm-Message-State: AOAM5336/ztZj36DcHaclPgF17ieyk+Rh/PE7dDtBKvMfVe/4ftaZsUI
-        q1WRlyv58ijXqiNKgdXdko4wI0KN2RhLblRLK2s=
-X-Google-Smtp-Source: ABdhPJwmTXTua7i0Y2LyV9FIbaOq5RZxyPLulK59izB6wsCMXx4ntZI5kVTjHTquDpHG7BXlxWK+ocKjKWDAzXVWp4E=
-X-Received: by 2002:adf:d1e9:0:b0:211:7ef1:5ace with SMTP id
- g9-20020adfd1e9000000b002117ef15acemr8151369wrd.282.1654256050572; Fri, 03
- Jun 2022 04:34:10 -0700 (PDT)
+        with ESMTP id S230159AbiFCMVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 08:21:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0103C275C0
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 05:21:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654258875;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DsaFPT0eC1zcjYMKyqe8kEslz7AwD0aYXafQi/mWjJU=;
+        b=N52yscxGJin1zC9tBEduZRorNKMToLNh/ceV0oxF7CE5IvlaWTe2a9EcX3rAyl5JGHfsY1
+        2Cila6bkv0k5itRp3mc+yHvwsaowRVZTOHvu9YfVlagV4zbRQ0FEUxPhq+6mr6G8ToAmuR
+        cJGn2LvTc+T5KUWoUIZJ8brdS55/gxE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-Aw0dw0LQOgWTzyuU0Pb7NA-1; Fri, 03 Jun 2022 08:21:12 -0400
+X-MC-Unique: Aw0dw0LQOgWTzyuU0Pb7NA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A11BA8001EA;
+        Fri,  3 Jun 2022 12:21:11 +0000 (UTC)
+Received: from localhost (dhcp-192-194.str.redhat.com [10.33.192.194])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 548292026D07;
+        Fri,  3 Jun 2022 12:21:11 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     nikos.nikoleris@arm.com, alex.bennee@linaro.org
+Subject: Re: [PATCH kvm-unit-tests] arm64: TCG: Use max cpu type
+In-Reply-To: <20220603111356.1480720-1-drjones@redhat.com>
+Organization: Red Hat GmbH
+References: <20220603111356.1480720-1-drjones@redhat.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date:   Fri, 03 Jun 2022 14:21:10 +0200
+Message-ID: <87v8ti7xah.fsf@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a5d:64ed:0:0:0:0:0 with HTTP; Fri, 3 Jun 2022 04:34:10 -0700 (PDT)
-Reply-To: markwillima00@gmail.com
-From:   Mark <mariamabdul888@gmail.com>
-Date:   Fri, 3 Jun 2022 04:34:10 -0700
-Message-ID: <CAP9xyD3H3sQKBUvb981jmegURGpPGFk+yaCkjZWvgJxJVKcBMg@mail.gmail.com>
-Subject: Re: Greetings!
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Fri, Jun 03 2022, Andrew Jones <drjones@redhat.com> wrote:
 
-Good day,
+> The max cpu type is a better default cpu type for running tests
+> with TCG as it provides the maximum possible feature set. Also,
+> the max cpu type was introduced in QEMU v2.12, so we should be
+> safe to switch to it at this point.
+>
+> There's also a 32-bit arm max cpu type, but we leave the default
+> as cortex-a15, because compilation requires we specify for which
+> processor we want to compile and there's no such thing as a 'max'.
+>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/configure b/configure
+> index 5b7daac3c6e8..1474dde2c70d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -223,7 +223,7 @@ fi
+>  [ -z "$processor" ] && processor="$arch"
+>  
+>  if [ "$processor" = "arm64" ]; then
+> -    processor="cortex-a57"
+> +    processor="max"
+>  elif [ "$processor" = "arm" ]; then
+>      processor="cortex-a15"
+>  fi
 
-The HSBC Bank is a financial institution in United Kingdom. We
-promotes long-term,sustainable and broad-based economic growth in
-developing and emerging countries by providing financial support like
-loans and investment to large, small and
-medium-sized companies (SMEs) as well as fast-growing enterprises
-which in turn helps to create secure and permanent jobs and reduce
-poverty.
+This looks correct, but the "processor" usage is confusing, as it seems
+to cover two different things:
 
-If you need fund to promotes your business, project(Project Funding),
-Loan, planning, budgeting and expansion of your business(s) , do not
-hesitate to indicate your interest as we are here to serve you better
-by granting your request.
+- what processor to compile for; this is what configure help claims
+  "processor" is used for, but it only seems to have that effect on
+  32-bit arm
+- which cpu model to use for tcg on 32-bit and 64-bit arm (other archs
+  don't seem to care)
 
+So, I wonder whether it would be less confusing to drop setting
+"processor" for arm64, and set the cpu models for tcg in arm/run (if
+none have been specified)?
 
-Thank you
-Mr:Mark
