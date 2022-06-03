@@ -2,86 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23C7453C571
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:58:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43A7353C56B
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:58:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241894AbiFCG5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 02:57:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33506 "EHLO
+        id S241861AbiFCG5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 02:57:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241766AbiFCG5D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S241769AbiFCG5D (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 3 Jun 2022 02:57:03 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4728F34;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4804F36;
         Thu,  2 Jun 2022 23:56:54 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2535N30J007676;
-        Fri, 3 Jun 2022 06:56:53 GMT
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2536hlGw031177;
+        Fri, 3 Jun 2022 06:56:54 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=0/QKYQHPie2iKJSCUm+DxIyeYJF6uq+B+LdsgQ/p/eE=;
- b=Re3yAfahUz8xhRT0cUdRtlvKkMbHI1CuvzdILWZr8oVbL80TUVR9c8KPh2W6sWjYsi9B
- y1lT8z3BwjtuCb134V4zLqbdkPsdP5Rmp7fA9M56OXr07lb9izo6UneMXLafShmTR0rP
- jxC6OaVuNIKHB66XaWpZdI2LgNy2hEleLO+F7f7US0xP0OE0TtXA3UM0w8WK+MtEYtFz
- OZlKEUQdBBmAKw4AOyZr8djRTVLQutqTvdm3v5FgpcIFHLtPWxSMSXj+DVSiz8ZBRY9j
- IYxBj/uqlVl/TFDTFSBP4ZYE0vktGS/zvbdMOUrFuTQcqownw5zJCdwylaZhm2Q9gpRl zw== 
+ bh=B76ii6aGW9eLNBNEMMOE6K6NRx7mIr3K+oSU22gMg14=;
+ b=WQS2cPWRULH0Ur4dSh9pR7YslD1YnkNdIg7vDg5OHASGcGUoCqVsOBEu1B8xSg1e9/SB
+ Yc9fD9otcsLT7sNsmr3MO/a6409ChvBXbxWgd4PofmeiHBAEgVXfd8Un9YO8vAfWZHcF
+ 9+/xiyeczjiZmxh6oJzHOky9c3VcHpLx0f36AHy8Zw7k+/dX0p4EISQrGk2VSttZq7LV
+ 63tE5qBItdtVApcCt96LgrnEFepsgoBsO9BcEkIQfk2NeNg02bIBKJSIDH72yISWnVQK
+ FP8OYQwmXB52Ubn4pBeHgawkn2MHCMlTVtZ0W8js6cK096QqtM0kGDwNm3n4gfX319EL IQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfc3usf2u-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfd9r85rb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 03 Jun 2022 06:56:53 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2536WFXl011132;
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2536kDxx009902;
         Fri, 3 Jun 2022 06:56:53 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfc3usf2a-1
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfd9r85qp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 06:56:52 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2536pDXO022964;
+        Fri, 03 Jun 2022 06:56:53 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2536pKca027181;
         Fri, 3 Jun 2022 06:56:50 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 3gbc8yp3p7-1
+        by ppma02fra.de.ibm.com with ESMTP id 3gbcc6e3wh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 03 Jun 2022 06:56:50 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2536ultJ22282496
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2536ulHo22282500
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 3 Jun 2022 06:56:47 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D1774203F;
+        by IMSVA (Postfix) with ESMTP id 7E9A14203F;
         Fri,  3 Jun 2022 06:56:47 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BEA5442047;
-        Fri,  3 Jun 2022 06:56:46 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2B58642042;
+        Fri,  3 Jun 2022 06:56:47 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.40])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Jun 2022 06:56:46 +0000 (GMT)
+        Fri,  3 Jun 2022 06:56:47 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
         pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
         mimu@linux.ibm.com, nrb@linux.ibm.com
-Subject: [PATCH v11 02/19] KVM: s390: pv: handle secure storage violations for protected guests
-Date:   Fri,  3 Jun 2022 08:56:28 +0200
-Message-Id: <20220603065645.10019-3-imbrenda@linux.ibm.com>
+Subject: [PATCH v11 03/19] KVM: s390: pv: handle secure storage exceptions for normal guests
+Date:   Fri,  3 Jun 2022 08:56:29 +0200
+Message-Id: <20220603065645.10019-4-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220603065645.10019-1-imbrenda@linux.ibm.com>
 References: <20220603065645.10019-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ZwtUd-7-Z759qXThVCSTOPSH6RcuQEJ-
-X-Proofpoint-GUID: cgeeTaGU7I1_13zR3f5QJfG7yWoUOVq5
+X-Proofpoint-ORIG-GUID: qOPRGrEGTBTXrJU88kpjD_gblkSc-GB_
+X-Proofpoint-GUID: 7-ZEXGxjAF--eAykZlV6mjS-Ldj0T7s4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-03_01,2022-06-02_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=792
- priorityscore=1501 spamscore=0 bulkscore=0 suspectscore=0 phishscore=0
- mlxscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206030027
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=497
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 clxscore=1015
+ malwarescore=0 phishscore=0 spamscore=0 bulkscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206030027
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -91,140 +91,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A secure storage violation is triggered when a protected guest tries to
-access secure memory that has been mapped erroneously, or that belongs
-to a different protected guest or to the ultravisor.
+With upcoming patches, normal guests might touch secure pages.
 
-With upcoming patches, protected guests will be able to trigger secure
-storage violations in normal operation. This happens for example if a
-protected guest is rebooted with deferred destroy enabled and the new
-guest is also protected.
+This patch extends the existing exception handler to convert the pages
+to non secure also when the exception is triggered by a normal guest.
 
-When the new protected guest touches pages that have not yet been
-destroyed, and thus are accounted to the previous protected guest, a
-secure storage violation is raised.
+This can happen for example when a secure guest reboots; the first
+stage of a secure guest is non secure, and in general a secure guest
+can reboot into non-secure mode.
 
-This patch adds handling of secure storage violations for protected
-guests.
+If the secure memory of the previous boot has not been cleared up
+completely yet (which will be allowed to happen in an upcoming patch),
+a non-secure guest might touch secure memory, which will need to be
+handled properly.
 
-This exception is handled by first trying to destroy the page, because
-it is expected to belong to a defunct protected guest where a destroy
-should be possible. Note that a secure page can only be destroyed if
-its protected VM does not have any CPUs, which only happens when the
-protected VM is being terminated. If that fails, a normal export of
-the page is attempted.
-
-This means that pages that trigger the exception will be made
-non-secure (in one way or another) before attempting to use them again
-for a different secure guest.
+This means that gmap faults must be handled and not cause termination
+of the process. The handling is the same as userspace accesses, it's
+enough to translate the gmap address to a user address and then let the
+normal user fault code handle it.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- arch/s390/include/asm/uv.h |  1 +
- arch/s390/kernel/uv.c      | 55 ++++++++++++++++++++++++++++++++++++++
- arch/s390/mm/fault.c       | 10 +++++++
- 3 files changed, 66 insertions(+)
+ arch/s390/mm/fault.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index cfea7b77a5b8..ba64e0be03bb 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -378,6 +378,7 @@ static inline int is_prot_virt_host(void)
- }
- 
- int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb);
-+int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr);
- int uv_destroy_owned_page(unsigned long paddr);
- int uv_convert_from_secure(unsigned long paddr);
- int uv_convert_owned_from_secure(unsigned long paddr);
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index a5425075dd25..2754471cc789 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -334,6 +334,61 @@ int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr)
- }
- EXPORT_SYMBOL_GPL(gmap_convert_to_secure);
- 
-+/**
-+ * gmap_destroy_page - Destroy a guest page.
-+ * @gmap the gmap of the guest
-+ * @gaddr the guest address to destroy
-+ *
-+ * An attempt will be made to destroy the given guest page. If the attempt
-+ * fails, an attempt is made to export the page. If both attempts fail, an
-+ * appropriate error is returned.
-+ */
-+int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
-+{
-+	struct vm_area_struct *vma;
-+	unsigned long uaddr;
-+	struct page *page;
-+	int rc;
-+
-+	rc = -EFAULT;
-+	mmap_read_lock(gmap->mm);
-+
-+	uaddr = __gmap_translate(gmap, gaddr);
-+	if (IS_ERR_VALUE(uaddr))
-+		goto out;
-+	vma = vma_lookup(gmap->mm, uaddr);
-+	if (!vma)
-+		goto out;
-+	/*
-+	 * Huge pages should not be able to become secure
-+	 */
-+	if (is_vm_hugetlb_page(vma))
-+		goto out;
-+
-+	rc = 0;
-+	/* we take an extra reference here */
-+	page = follow_page(vma, uaddr, FOLL_WRITE | FOLL_GET);
-+	if (IS_ERR_OR_NULL(page))
-+		goto out;
-+	rc = uv_destroy_owned_page(page_to_phys(page));
-+	/*
-+	 * Fault handlers can race; it is possible that two CPUs will fault
-+	 * on the same secure page. One CPU can destroy the page, reboot,
-+	 * re-enter secure mode and import it, while the second CPU was
-+	 * stuck at the beginning of the handler. At some point the second
-+	 * CPU will be able to progress, and it will not be able to destroy
-+	 * the page. In that case we do not want to terminate the process,
-+	 * we instead try to export the page.
-+	 */
-+	if (rc)
-+		rc = uv_convert_owned_from_secure(page_to_phys(page));
-+	put_page(page);
-+out:
-+	mmap_read_unlock(gmap->mm);
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(gmap_destroy_page);
-+
- /*
-  * To be called with the page locked or with an extra reference! This will
-  * prevent gmap_make_secure from touching the page concurrently. Having 2
 diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-index e173b6187ad5..af1ac49168fb 100644
+index af1ac49168fb..ee7871f770fb 100644
 --- a/arch/s390/mm/fault.c
 +++ b/arch/s390/mm/fault.c
-@@ -837,6 +837,16 @@ NOKPROBE_SYMBOL(do_non_secure_storage_access);
+@@ -754,6 +754,7 @@ void do_secure_storage_access(struct pt_regs *regs)
+ 	struct vm_area_struct *vma;
+ 	struct mm_struct *mm;
+ 	struct page *page;
++	struct gmap *gmap;
+ 	int rc;
  
- void do_secure_storage_violation(struct pt_regs *regs)
- {
-+	unsigned long gaddr = regs->int_parm_long & __FAIL_ADDR_MASK;
-+	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
-+
-+	/*
-+	 * If the VM has been rebooted, its address space might still contain
-+	 * secure pages from the previous boot.
-+	 * Clear the page so it can be reused.
-+	 */
-+	if (!gmap_destroy_page(gmap, gaddr))
-+		return;
  	/*
- 	 * Either KVM messed up the secure guest mapping or the same
- 	 * page is mapped into multiple secure guests.
+@@ -783,6 +784,17 @@ void do_secure_storage_access(struct pt_regs *regs)
+ 	}
+ 
+ 	switch (get_fault_type(regs)) {
++	case GMAP_FAULT:
++		mm = current->mm;
++		gmap = (struct gmap *)S390_lowcore.gmap;
++		mmap_read_lock(mm);
++		addr = __gmap_translate(gmap, addr);
++		mmap_read_unlock(mm);
++		if (IS_ERR_VALUE(addr)) {
++			do_fault_error(regs, VM_ACCESS_FLAGS, VM_FAULT_BADMAP);
++			break;
++		}
++		fallthrough;
+ 	case USER_FAULT:
+ 		mm = current->mm;
+ 		mmap_read_lock(mm);
+@@ -811,7 +823,6 @@ void do_secure_storage_access(struct pt_regs *regs)
+ 		if (rc)
+ 			BUG();
+ 		break;
+-	case GMAP_FAULT:
+ 	default:
+ 		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+ 		WARN_ON_ONCE(1);
 -- 
 2.36.1
 
