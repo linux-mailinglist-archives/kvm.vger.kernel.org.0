@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD3A253C4F6
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 730D453C4FB
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:34:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241517AbiFCGdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 02:33:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34332 "EHLO
+        id S241533AbiFCGd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 02:33:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241498AbiFCGdu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 02:33:50 -0400
+        with ESMTP id S241519AbiFCGdy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 02:33:54 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A6C2BFB;
-        Thu,  2 Jun 2022 23:33:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 751C56152;
+        Thu,  2 Jun 2022 23:33:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=vl3AAzeMI7BX2u/O8kPSzZJJV5eD7Q+Y9ihN+xpp9yg=; b=CsHm8to1EmyLTpAfY85bRBD2Fs
-        1aW45wyOFtxDv3FRvHCuMQqIwQzpkB0OMVIa6IA8gt3SWx9s6iLQvCqKijS8GSglca6BboBYVLkaR
-        OHwXTpn3u2cMEhiC4KgccEWxL0nCRZbhUihE3OndKfZMDdrDsDRv87gpfuMo/ksIuoo9zfBRGNi8b
-        SnxD5AgNIvRiRpeTQOCcUXVGQUrD0wQGvVLmiqVJ8iOLKBj+NxBQHY45ut8kDM3gi0gPhuANrERVb
-        mQA9at7o2Y8kdKmlijG8KmGJjI7j+g7jxf520CCfjCKlyzFk5l3nBAH5MjZpiyLWgvCio/3AZOk/k
-        fp6p+uAQ==;
+        bh=sIeqtTACFgi4lijjqlCq2evxEsTljhdEQuQfW516b88=; b=hmxRgHqun9L2tSj5lJ3K33sVKX
+        /5RAhQxgt/HzmY2bWmxqVfxSUIfoN3iounTQDTOfiayczhpQ91ZjqJ3Kc3kXp7Mf16mi/mOiR8Aol
+        CwBLzXPTRyvyFvw7oNWCoe0hY8fRx/bico2SsHSILXPshc7CIuoYVtEXN0G1yiWfBt6u5ywIPnpWA
+        CMse77d3LhIt7SIXx1WgtjQBTEKiMQXleD6Uz03LWuwYqDqp0c6G51Bz1nWX46Jmj/d4T9mwlTpy2
+        UcGtf8VFkZOW/VfojXljLP/5CRsGnRZwiAO2pNKNFhX6C3dJY/fENE731Uwh/M1YpEZ6pCCMs4bEG
+        8S5fs69w==;
 Received: from [2001:4bb8:185:a81e:b29a:8b56:eb9a:ca3b] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nx0sV-00614B-91; Fri, 03 Jun 2022 06:33:47 +0000
+        id 1nx0sY-00615N-2u; Fri, 03 Jun 2022 06:33:50 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -39,9 +39,9 @@ To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         intel-gvt-dev@lists.freedesktop.org
-Subject: [PATCH 6/8] vfio/mdev: unexport mdev_bus_type
-Date:   Fri,  3 Jun 2022 08:33:26 +0200
-Message-Id: <20220603063328.3715-7-hch@lst.de>
+Subject: [PATCH 7/8] vfio/mdev: remove mdev_parent_dev
+Date:   Fri,  3 Jun 2022 08:33:27 +0200
+Message-Id: <20220603063328.3715-8-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220603063328.3715-1-hch@lst.de>
 References: <20220603063328.3715-1-hch@lst.de>
@@ -58,52 +58,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-mdev_bus_type is only used in mdev.ko now, so unexport it.
+Just open code the dereferences in the only user.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/vfio/mdev/mdev_driver.c  | 1 -
- drivers/vfio/mdev/mdev_private.h | 1 +
- include/linux/mdev.h             | 2 --
- 3 files changed, 1 insertion(+), 3 deletions(-)
+ Documentation/driver-api/vfio-mediated-device.rst | 3 ---
+ drivers/gpu/drm/i915/gvt/kvmgt.c                  | 2 +-
+ drivers/vfio/mdev/mdev_core.c                     | 6 ------
+ include/linux/mdev.h                              | 1 -
+ 4 files changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_driver.c b/drivers/vfio/mdev/mdev_driver.c
-index 9c2af59809e2e..dde6adf23b1db 100644
---- a/drivers/vfio/mdev/mdev_driver.c
-+++ b/drivers/vfio/mdev/mdev_driver.c
-@@ -47,7 +47,6 @@ struct bus_type mdev_bus_type = {
- 	.remove		= mdev_remove,
- 	.match		= mdev_match,
- };
--EXPORT_SYMBOL_GPL(mdev_bus_type);
+diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+index 8ff463aa9e2be..0d74ac2a218f2 100644
+--- a/Documentation/driver-api/vfio-mediated-device.rst
++++ b/Documentation/driver-api/vfio-mediated-device.rst
+@@ -201,9 +201,6 @@ Directories and files under the sysfs for Each Physical Device
  
- /**
-  * mdev_register_driver - register a new MDEV driver
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 277819f1ebed8..3ecd6ae1dfa7c 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -13,6 +13,7 @@
- int  mdev_bus_register(void);
- void mdev_bus_unregister(void);
+ 	sprintf(buf, "%s-%s", dev_driver_string(parent->dev), group->name);
  
-+extern struct bus_type mdev_bus_type;
- extern const struct attribute_group *mdev_device_groups[];
+-  (or using mdev_parent_dev(mdev) to arrive at the parent device outside
+-  of the core mdev code)
+-
+ * device_api
  
- #define to_mdev_type_attr(_attr)	\
+   This attribute should show which device API is being created, for example,
+diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+index 06b8acc6a995d..f3c4ce475ce86 100644
+--- a/drivers/gpu/drm/i915/gvt/kvmgt.c
++++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+@@ -1554,7 +1554,7 @@ static const struct vfio_device_ops intel_vgpu_dev_ops = {
+ 
+ static int intel_vgpu_probe(struct mdev_device *mdev)
+ {
+-	struct device *pdev = mdev_parent_dev(mdev);
++	struct device *pdev = mdev->type->parent->dev;
+ 	struct intel_gvt *gvt = kdev_to_i915(pdev)->gvt;
+ 	struct intel_vgpu_type *type =
+ 		container_of(mdev->type, struct intel_vgpu_type, type);
+diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+index 3575e893b5e43..3bdea77d506d9 100644
+--- a/drivers/vfio/mdev/mdev_core.c
++++ b/drivers/vfio/mdev/mdev_core.c
+@@ -25,12 +25,6 @@ static struct class_compat *mdev_bus_compat_class;
+ static LIST_HEAD(mdev_list);
+ static DEFINE_MUTEX(mdev_list_lock);
+ 
+-struct device *mdev_parent_dev(struct mdev_device *mdev)
+-{
+-	return mdev->type->parent->dev;
+-}
+-EXPORT_SYMBOL(mdev_parent_dev);
+-
+ /*
+  * Used in mdev_type_attribute sysfs functions to return the parent struct
+  * device
 diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index 5811b5a52a511..f92b4d8edf0e8 100644
+index f92b4d8edf0e8..6d0a9b45a9eb6 100644
 --- a/include/linux/mdev.h
 +++ b/include/linux/mdev.h
-@@ -88,8 +88,6 @@ static inline const guid_t *mdev_uuid(struct mdev_device *mdev)
- 	return &mdev->uuid;
- }
+@@ -95,7 +95,6 @@ void mdev_unregister_parent(struct mdev_parent *parent);
+ int mdev_register_driver(struct mdev_driver *drv);
+ void mdev_unregister_driver(struct mdev_driver *drv);
  
--extern struct bus_type mdev_bus_type;
--
- int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
- 		struct mdev_driver *mdev_driver);
- void mdev_unregister_parent(struct mdev_parent *parent);
+-struct device *mdev_parent_dev(struct mdev_device *mdev);
+ static inline struct device *mdev_dev(struct mdev_device *mdev)
+ {
+ 	return &mdev->dev;
 -- 
 2.30.2
 
