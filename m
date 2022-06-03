@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5780B53C1AF
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ECDF53C22F
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240434AbiFCArO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:47:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48168 "EHLO
+        id S235824AbiFCAq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 20:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234615AbiFCApK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 20:45:10 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B5B344E0
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:45:08 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id s9-20020a634509000000b003fc7de146d4so3055225pga.3
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:45:08 -0700 (PDT)
+        with ESMTP id S240024AbiFCApL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 20:45:11 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE6F233887
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:45:10 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-30c2f3431b4so55446327b3.21
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:45:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=ImUYRPXrpM1plNN02DbUHhAlHRJfyxKRglg4HYhksiU=;
-        b=rLGkzSTEiBmX8DheRgluIn9ngL9d2mPzwC/9MWUv4DXekXRYlxDyJlZUgN/OkuTwKr
-         gmvs+5ewXmwGhyDswBOzeLPksYy6XM313P8IOZskIU/XgJQARdot+DNnfDN495znc/nc
-         x8icSZSMF/UkjIEpaQR1+nCFOleNR7j23JL98fqX0+3ocMExHAax3rnotmDaOL7DjlCs
-         GXnpQg5/mw9gJRlBgG5Gxw4CIbpZ2cE3Eu8/wtfyLuyGLFoKaiYQfktpkungUABT/wIL
-         kKzW1MzsX6is/UkRQVJVVe1h8o76wwpyV7lDhAbvpBYDHb7wlYKb2dAYzQ5h8CuRnJGV
-         zdGg==
+        bh=VZMwLmFqO453NHprqwEEDpT8gC6YhxFhEoVIqaq5qNQ=;
+        b=RZPO/BZvQ6+tlf6F61RdUXEyZo2pt9UgbKBDaKQgoXVaf2hQLnCU2GdNQb4etp5S0S
+         Fa8wHOP3EVbG9DN0mTOH8dfq7SJ6w789/YYFTuaj5gojST8OV/5QnMEqhQ/ZYeEV0Xdc
+         ndoTyLDWjU7TgfR03lt6NtZcIOW4w8jYuxoO/CGsMc29pCDcrEylQKQvsHGQ6iodLR1W
+         BXoqVzLF47Qp2sqhw71NHmgcpaR/tWgN3MACsorJYA3PQOEBFSV0xNTRkSIUhI77quex
+         9OyTWuf8e7VtNvKcYIR5U+PrxHRtvY3+p1v6RwGu2KXX3cQelYGT5velWWtiYi968+Bi
+         Io2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=ImUYRPXrpM1plNN02DbUHhAlHRJfyxKRglg4HYhksiU=;
-        b=qo+QuUVrXaQqMPZiTrd+M9xZAOcsb32G63JTwgCBBxjgx6ZfO2RpubzBfIAi0rwFSl
-         aqzeyMhn7YljK9jNU8jjRgygkXZEQyycGQOvQAa43agMYcekTlV3Jn7o7SGTr1teEWhv
-         o1s7n8rSou4sASe6fYWgsYJxw4gxiXvtrzPooKUR9DVPJxs9XCGXGxv5Y2FHbDaOrxF/
-         C/UVT3FIENERu4VqJmqQAIa+lO4xAyu1VIKraXEoSaxuD7frrz8xkDT9YBJ522m3bT/d
-         zUmenyW3jel2bBMW2f+Yc8tji7hXto9DQqqtGfC7p96QBE5Bv2a5Bp8vgA6QhrcG4oeF
-         LTxA==
-X-Gm-Message-State: AOAM533Mpx2wBwk7eeAC1piqpb3RYMjhVTSc7pp1ggqO4sVXHevVmNvW
-        qn3e0TXxChsNdkJKBLVYWTrJX0SBHbk=
-X-Google-Smtp-Source: ABdhPJxghim9FfFS29i9ptKPF1cZ7m55pgtvMhYOM7sqLtoXhxCJA1N1zETg5dr/YKyHNlB8sB4TxD43s3w=
+        bh=VZMwLmFqO453NHprqwEEDpT8gC6YhxFhEoVIqaq5qNQ=;
+        b=hBtVE9YSlU+gxj+4Dzrq2+OurgWOAfKUZFvCLI/qzAZY3eSmhU+fj/osCt88l+9VX+
+         XIYqJt9FiWuWNrRX/ZGXnVHjuL7Z1BPIqjZW7PvbwT/aA31qD3RD9DJXb0G/VXm8Bjdo
+         RBxR4h7qQfOFYQIPoblGjEtFVyc9GfzUkhp2p+2e9gklZacm82S84npohJdPyeo+98Cb
+         ud5Zv1T7kh1tokEfz+c5o5EiU+vAX5ZUci4WxMqNfjeI4uoTTgoKem993PArNZlKjqNY
+         7E7dgSGAN98rzrzyWzfdq4GdrkmFT9sPphj9ynADsl3eWyJ4Xcv7MXjKvSbec+GPTZ7a
+         wwOQ==
+X-Gm-Message-State: AOAM5331VusA6TwJdSE+LacyUwo9L5DdSKVI63gFyj51OlGpYTzU3pDO
+        qKsDaFB7WI1r4fnYaiVdTcIXnxr6R1o=
+X-Google-Smtp-Source: ABdhPJyvo+2ll/p2OR5AVovkndzYR4mFDAyHaQ/X8PTogoLDLjktOHVeFdF1jZS4k4FVf+f5jQQMa1G4HWw=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:f552:b0:163:f64a:6154 with SMTP id
- h18-20020a170902f55200b00163f64a6154mr7656473plf.147.1654217108218; Thu, 02
- Jun 2022 17:45:08 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:7308:0:b0:65b:eb8b:de95 with SMTP id
+ o8-20020a257308000000b0065beb8bde95mr8527850ybc.195.1654217110100; Thu, 02
+ Jun 2022 17:45:10 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:41:57 +0000
+Date:   Fri,  3 Jun 2022 00:41:58 +0000
 In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-51-seanjc@google.com>
+Message-Id: <20220603004331.1523888-52-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220603004331.1523888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 050/144] KVM: selftests: Convert memslot_perf_test away
- from VCPU_ID
+Subject: [PATCH v2 051/144] KVM: selftests: Convert rseq_test away from VCPU_ID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -65,110 +64,60 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert memslot_perf_test to use __vm_create_with_one_vcpu() and pass
-around a 'struct kvm_vcpu' object instead of using a global VCPU_ID.
-This is the first of many, many steps towards eliminating VCPU_ID from
-all KVM selftests, and towards eventually purging the VM+vcpu_id mess.
+Convert rseq_test to use vm_create_with_one_vcpu() and pass around a
+'struct kvm_vcpu' object instead of using a global VCPU_ID.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/memslot_perf_test.c | 28 +++++++++----------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ tools/testing/selftests/kvm/rseq_test.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index 1727f75e0c2c..009eb19b28af 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -25,8 +25,6 @@
- #include <kvm_util.h>
- #include <processor.h>
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 4158da0da2bb..fd754de0b74c 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -20,8 +20,6 @@
+ #include "processor.h"
+ #include "test_util.h"
  
 -#define VCPU_ID 0
 -
- #define MEM_SIZE		((512U << 20) + 4096)
- #define MEM_SIZE_PAGES		(MEM_SIZE / 4096)
- #define MEM_GPA		0x10000000UL
-@@ -90,6 +88,7 @@ static_assert(MEM_TEST_MOVE_SIZE <= MEM_TEST_SIZE,
- 
- struct vm_data {
+ static __thread volatile struct rseq __rseq = {
+ 	.cpu_id = RSEQ_CPU_ID_UNINITIALIZED,
+ };
+@@ -207,6 +205,7 @@ int main(int argc, char *argv[])
+ {
+ 	int r, i, snapshot;
  	struct kvm_vm *vm;
 +	struct kvm_vcpu *vcpu;
- 	pthread_t vcpu_thread;
- 	uint32_t nslots;
- 	uint64_t npages;
-@@ -127,29 +126,29 @@ static bool verbose;
- 			pr_info(__VA_ARGS__);	\
- 	} while (0)
+ 	u32 cpu, rseq_cpu;
  
--static void check_mmio_access(struct vm_data *vm, struct kvm_run *run)
-+static void check_mmio_access(struct vm_data *data, struct kvm_run *run)
- {
--	TEST_ASSERT(vm->mmio_ok, "Unexpected mmio exit");
-+	TEST_ASSERT(data->mmio_ok, "Unexpected mmio exit");
- 	TEST_ASSERT(run->mmio.is_write, "Unexpected mmio read");
- 	TEST_ASSERT(run->mmio.len == 8,
- 		    "Unexpected exit mmio size = %u", run->mmio.len);
--	TEST_ASSERT(run->mmio.phys_addr >= vm->mmio_gpa_min &&
--		    run->mmio.phys_addr <= vm->mmio_gpa_max,
-+	TEST_ASSERT(run->mmio.phys_addr >= data->mmio_gpa_min &&
-+		    run->mmio.phys_addr <= data->mmio_gpa_max,
- 		    "Unexpected exit mmio address = 0x%llx",
- 		    run->mmio.phys_addr);
- }
+ 	/* Tell stdout not to buffer its content */
+@@ -228,14 +227,14 @@ int main(int argc, char *argv[])
+ 	 * GUEST_SYNC, while concurrently migrating the process by setting its
+ 	 * CPU affinity.
+ 	 */
+-	vm = vm_create_default(VCPU_ID, 0, guest_code);
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 	ucall_init(vm, NULL);
  
--static void *vcpu_worker(void *data)
-+static void *vcpu_worker(void *__data)
- {
--	struct vm_data *vm = data;
--	struct kvm_run *run;
-+	struct vm_data *data = __data;
-+	struct kvm_vcpu *vcpu = data->vcpu;
-+	struct kvm_run *run = vcpu->run;
- 	struct ucall uc;
+ 	pthread_create(&migration_thread, NULL, migration_worker, 0);
  
--	run = vcpu_state(vm->vm, VCPU_ID);
- 	while (1) {
--		vcpu_run(vm->vm, VCPU_ID);
-+		vcpu_run(data->vm, vcpu->id);
+ 	for (i = 0; !done; i++) {
+-		vcpu_run(vm, VCPU_ID);
+-		TEST_ASSERT(get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC,
++		vcpu_run(vm, vcpu->id);
++		TEST_ASSERT(get_ucall(vm, vcpu->id, NULL) == UCALL_SYNC,
+ 			    "Guest failed?");
  
--		switch (get_ucall(vm->vm, VCPU_ID, &uc)) {
-+		switch (get_ucall(data->vm, vcpu->id, &uc)) {
- 		case UCALL_SYNC:
- 			TEST_ASSERT(uc.args[1] == 0,
- 				"Unexpected sync ucall, got %lx",
-@@ -158,7 +157,7 @@ static void *vcpu_worker(void *data)
- 			continue;
- 		case UCALL_NONE:
- 			if (run->exit_reason == KVM_EXIT_MMIO)
--				check_mmio_access(vm, run);
-+				check_mmio_access(data, run);
- 			else
- 				goto done;
- 			break;
-@@ -238,6 +237,7 @@ static struct vm_data *alloc_vm(void)
- 	TEST_ASSERT(data, "malloc(vmdata) failed");
- 
- 	data->vm = NULL;
-+	data->vcpu = NULL;
- 	data->hva_slots = NULL;
- 
- 	return data;
-@@ -278,7 +278,7 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
- 	TEST_ASSERT(data->hva_slots, "malloc() fail");
- 
--	data->vm = vm_create_default(VCPU_ID, mempages, guest_code);
-+	data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
- 	ucall_init(data->vm, NULL);
- 
- 	pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
+ 		/*
 -- 
 2.36.1.255.ge46751e96f-goog
 
