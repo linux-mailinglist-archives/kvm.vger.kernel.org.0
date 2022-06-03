@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 780E753C4E3
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8191D53C4F8
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:34:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241486AbiFCGdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 02:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33620 "EHLO
+        id S241497AbiFCGdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 02:33:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiFCGdn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 02:33:43 -0400
+        with ESMTP id S241484AbiFCGdo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 02:33:44 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38CCC2BF0;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 394012BFB;
         Thu,  2 Jun 2022 23:33:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=0uBGXCRA3EENtOnIKbDFlPVB4jKOIAxPBU76Buv3j3M=; b=0uZvK/8SNHCMvpPoFLkj53nN3+
-        on6+1wVinmHTEwU8iFXGZsvS45VQesZ1BC9SskcKA9OHVctRAkH34d0/eRGRNo5V0rjZt20S3Jm6P
-        fqR+yzS6IkS0UJu8Ohw3L9sWuQNAmwKgy79VlG/SUzp/UDhTjGhZANIE/u91dw6lAoQX3GmQUPs2p
-        ShzotAkNYZ92+BhGJhwUA+1IGESFeGtv0Kd3u+AGa0FuP8CxX7g7LzftH9pFFNuw996IBZq+XC6DC
-        1/tmQ3oXJ0fejwn2Zv5hwCz14Hh5R+kb4Sv4w73Vc4zQ64Lr7hjohArPpbakH8BQi6mnuLkyr93CE
-        bx33cVbw==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=ZkozTzAKPEHeRhQeRr7+xxJPoFvm4mWSXSylHIvm9tc=; b=RkBbkQptfuCODrqIbUTe0CVdvi
+        Q2F/ReiVrC8APZ9oHIWgeqoNL7p0Jr8k8/gLm+KqsihXxScNrD0qHaEjqZr5mgZ8GPX4VVXfJJ+4f
+        qIYuLHRSh3jHgxX5Ipb8Vkcqjy/Wo0p9ALdtmFUraAcJFB/lguJGDgWUoDBmsirVmzvcruSjmgvto
+        lHbYKbIiz+aeDKrmcsdhrEm0T6NzxQfJaI+wELLy7TdJ6BS2j/AaMPX3VlignQNX5XAfXxbeEgrVL
+        /wKktbQUWEBCNf/+SZKLkCMk2s//F3xHOImDI9ralSV61lvWnepXVxcGmGjDA3c7bGpy6S+9gUOeg
+        9yhf7axw==;
 Received: from [2001:4bb8:185:a81e:b29a:8b56:eb9a:ca3b] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nx0sE-00610C-7L; Fri, 03 Jun 2022 06:33:30 +0000
+        id 1nx0sH-00610e-1b; Fri, 03 Jun 2022 06:33:33 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -39,10 +39,12 @@ To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         intel-gvt-dev@lists.freedesktop.org
-Subject: simplify the mdev interface
-Date:   Fri,  3 Jun 2022 08:33:20 +0200
-Message-Id: <20220603063328.3715-1-hch@lst.de>
+Subject: [PATCH 1/8] vfio/mdev: make mdev.h standalone includable
+Date:   Fri,  3 Jun 2022 08:33:21 +0200
+Message-Id: <20220603063328.3715-2-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220603063328.3715-1-hch@lst.de>
+References: <20220603063328.3715-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -56,28 +58,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+Include <linux/device.h> and <linux/uuid.h> so that users of this headers
+don't need to do that.
 
-this series signigicantly simplies the mdev driver interface by following
-the patterns for device model interaction used elsewhere in the kernel.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/mdev.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Diffstat:
- Documentation/driver-api/vfio-mediated-device.rst |   16 -
- Documentation/s390/vfio-ap.rst                    |    2 
- Documentation/s390/vfio-ccw.rst                   |    2 
- drivers/gpu/drm/i915/gvt/gvt.h                    |    1 
- drivers/gpu/drm/i915/gvt/kvmgt.c                  |  116 ++++----------
- drivers/gpu/drm/i915/i915_drv.h                   |    2 
- drivers/s390/cio/cio.h                            |    3 
- drivers/s390/cio/vfio_ccw_ops.c                   |   32 +--
- drivers/s390/crypto/vfio_ap_ops.c                 |   25 +--
- drivers/s390/crypto/vfio_ap_private.h             |    2 
- drivers/vfio/mdev/mdev_core.c                     |  181 ++++------------------
- drivers/vfio/mdev/mdev_driver.c                   |    1 
- drivers/vfio/mdev/mdev_private.h                  |   38 ----
- drivers/vfio/mdev/mdev_sysfs.c                    |  145 ++---------------
- include/linux/mdev.h                              |   40 +++-
- samples/vfio-mdev/mbochs.c                        |   69 ++++----
- samples/vfio-mdev/mdpy.c                          |   61 +++----
- samples/vfio-mdev/mtty.c                          |   77 +++++----
- 18 files changed, 258 insertions(+), 555 deletions(-)
+diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+index bb539794f54a8..555c1d015b5f0 100644
+--- a/include/linux/mdev.h
++++ b/include/linux/mdev.h
+@@ -10,6 +10,9 @@
+ #ifndef MDEV_H
+ #define MDEV_H
+ 
++#include <linux/device.h>
++#include <linux/uuid.h>
++
+ struct mdev_type;
+ 
+ struct mdev_device {
+-- 
+2.30.2
+
