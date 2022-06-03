@@ -2,179 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 442AC53D241
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 21:12:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2961953D2CD
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 22:27:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348827AbiFCTMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 15:12:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43210 "EHLO
+        id S1348160AbiFCU1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 16:27:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348904AbiFCTMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 15:12:21 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6292F3AA48;
-        Fri,  3 Jun 2022 12:12:15 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 253IWFUN002119;
-        Fri, 3 Jun 2022 19:12:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=5uy+2inrLr7F2p3V/aW6SXrjjTDJzx6rvENl5VZAHXY=;
- b=T2onpo2lBBDlBfL0uZme+bza4XTpt1hC4ZFTVAYsGB7nSJPN+Be04JZKTzVBhgrq4rMt
- Jw89PANq+LFCn329ndnHvhTppk9WlTiJFQJnImBrF0a5SwjZnppOFBTiKnSU78uDPOwr
- A9GoSyLwXOqQZoKhaPhvho3jw1aL9ITpCHuZNfPviYHClTmVmSbmwlLUxGxtTOjmh9DK
- bAt32gXWEgAClJ10ip/jJpqwbkVt/EdygCpwHtMKAGmoSx2du4zJQnhhNB3llGpEHyP9
- hbQUbYgNfTEWzy6jEL2G1o1yq29Pgx9m8SITSqRQTxx2Jnz9KJu4iE97IG5Y8JAhUNsS 3Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfqntgnfq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 19:12:10 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 253IteBt028214;
-        Fri, 3 Jun 2022 19:12:09 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfqntgnfh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 19:12:09 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 253J60JJ012992;
-        Fri, 3 Jun 2022 19:12:09 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma03wdc.us.ibm.com with ESMTP id 3gbc9w3ap7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 19:12:09 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 253JC8Rm22544804
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Jun 2022 19:12:08 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F1138136059;
-        Fri,  3 Jun 2022 19:12:07 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1FF58136055;
-        Fri,  3 Jun 2022 19:12:07 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.94.47])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Jun 2022 19:12:07 +0000 (GMT)
-Message-ID: <f60647cde44658a4f09b399bd2406bcd6ef31c3e.camel@linux.ibm.com>
-Subject: Re: [PATCH v1 02/18] vfio/ccw: Fix FSM state if mdev probe fails
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Fri, 03 Jun 2022 15:12:06 -0400
-In-Reply-To: <65e84b02-6cd3-a230-f1e0-d22e2e70024d@linux.ibm.com>
-References: <20220602171948.2790690-1-farman@linux.ibm.com>
-         <20220602171948.2790690-3-farman@linux.ibm.com>
-         <65e84b02-6cd3-a230-f1e0-d22e2e70024d@linux.ibm.com>
+        with ESMTP id S240215AbiFCU1F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 16:27:05 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756E2DE8
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 13:26:53 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id o15so9573954ljp.10
+        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 13:26:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kcvcGCdo3atSRleIEYn8GV8DF1zjVp9ue+AGaGOprF4=;
+        b=Oo0XXSGXmARxDF0URIr3txJLZa5wrCUfaQoFU/qqiDxoBYA+DFuZUp3b5BWfIfNVrR
+         wK50IWSX0CYXoqZYvh/8AqncjOskImCOrqD0C6AQVoE2R+/rJys9IS0ydHCFycHms4H2
+         RntAYu64/5X9EiIY9xkExeHtJ7vny6Q7HnxH9d7Bjt8rACfswCjYeG/8GdCsuUTsTMnZ
+         FazBqbSL303HRocJOxBMXp3Sz/qVHfkhdobCtkpyUAf/B6ckNPpeaEENqeMl40SUJblt
+         1KWIz4sMGZ0fbA2cymhwJVdyviTG1gOl0fdJH+VsRkzOp+iyiW3wWOtOQ/zHhMbU0/Vb
+         l7Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kcvcGCdo3atSRleIEYn8GV8DF1zjVp9ue+AGaGOprF4=;
+        b=uhvVS6QBk0N/NgPlsMmsFx4D6CtoXejQw/zMXYISCVv+mYgWu3F5JR8fTb5X+UswRU
+         E3+eGd9hs82XjcCZtV/gC8peqoy2h2/ilc2x8pmbBMDoIbV1qUdJpyrjploTapMHsmEJ
+         5xN/82vcetZRKqaplKSXO9Jn4QOi7GRpT8J/lQOB6cH1md848YspnVRRWaUffxKKUwC3
+         gVxaqxuqGr4cV9NkykgBrbibpqlMQiCjzWkaWIUFphIhUQ65X7SF9gwiA+lP2He2dY4W
+         eojabrnmMrz5bGEBCahIaPNvpN1vYse/j4MHe3qfPl1hq/fhkUorzNOS+yAFyMpicxR7
+         eBVw==
+X-Gm-Message-State: AOAM531mSHe8L6RPNWNaEhu/BOfageM8OMkFirrP8O3qxOhw67TZjbwp
+        l1ERejpwbmAlq2wL54U8I9CEx+7bosvUJPRZ0byEmg==
+X-Google-Smtp-Source: ABdhPJzz3vZrda2FwtR2nRxz6Ky3Tu0QRIh9pBOdemXRavpGtSDe7Jzx+1mi8XmH2tJBcPQKsq2nVy6ON1Pz7L3AG9s=
+X-Received: by 2002:a2e:84cd:0:b0:255:4f69:db36 with SMTP id
+ q13-20020a2e84cd000000b002554f69db36mr15354080ljh.223.1654288011373; Fri, 03
+ Jun 2022 13:26:51 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220520173638.94324-1-juew@google.com> <20220520173638.94324-5-juew@google.com>
+In-Reply-To: <20220520173638.94324-5-juew@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 3 Jun 2022 13:26:24 -0700
+Message-ID: <CALzav=eUWqzxp9OhXXuPUbGErZxCUf3ZZKfMkgSCanDyMsJGdA@mail.gmail.com>
+Subject: Re: [PATCH v4 4/8] KVM: x86: Add Corrected Machine Check Interrupt
+ (CMCI) emulation to lapic.
+To:     Jue Wang <juew@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Greg Thelen <gthelen@google.com>,
+        Jiaqi Yan <jiaqiyan@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: I45_t51AGOaPHgOZo1X5OqlRYO2X39Fk
-X-Proofpoint-ORIG-GUID: 0vRPxXItOihXdn88d4T9_jqqCfHPaE7q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-03_06,2022-06-03_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 spamscore=0 clxscore=1015 mlxscore=0 impostorscore=0
- suspectscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2206030076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-06-03 at 09:21 -0400, Matthew Rosato wrote:
-> On 6/2/22 1:19 PM, Eric Farman wrote:
-> > The FSM is in STANDBY state when arriving in vfio_ccw_mdev_probe(),
-> > and this routine converts it to IDLE as part of its processing.
-> > The error exit sets it to IDLE (again) but clears the private->mdev
-> > pointer.
-> > 
-> > The FSM should of course be managing the state itself, but the
-> > correct thing for vfio_ccw_mdev_probe() to do would be to put
-> > the state back the way it found it.
-> > 
-> > The corresponding check of private->mdev in vfio_ccw_sch_io_todo()
-> > can be removed, since the distinction is unnecessary at this point.
-> > 
-> > Fixes: 3bf1311f351ef ("vfio/ccw: Convert to use
-> > vfio_register_emulated_iommu_dev()")
-> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> > ---
-> >   drivers/s390/cio/vfio_ccw_drv.c | 2 +-
-> >   drivers/s390/cio/vfio_ccw_ops.c | 2 +-
-> >   2 files changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/s390/cio/vfio_ccw_drv.c
-> > b/drivers/s390/cio/vfio_ccw_drv.c
-> > index 35055eb94115..b18b4582bc8b 100644
-> > --- a/drivers/s390/cio/vfio_ccw_drv.c
-> > +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> > @@ -108,7 +108,7 @@ static void vfio_ccw_sch_io_todo(struct
-> > work_struct *work)
-> >   	 * has finished. Do not overwrite a possible processing
-> >   	 * state if the final interrupt was for HSCH or CSCH.
-> >   	 */
-> > -	if (private->mdev && cp_is_finished)
-> > +	if (cp_is_finished)
-> >   		private->state = VFIO_CCW_STATE_IDLE;
-> 
-> Took me a bit to convince myself this was OK
+On Fri, May 20, 2022 at 10:36 AM Jue Wang <juew@google.com> wrote:
+>
+> This patch adds the handling of APIC_LVTCMCI, conditioned on whether the
+> vCPU has set MCG_CMCI_P in MCG_CAP register.
+>
+> Signed-off-by: Jue Wang <juew@google.com>
+> ---
+>  arch/x86/kvm/lapic.c | 40 +++++++++++++++++++++++++++++++++-------
+>  arch/x86/kvm/lapic.h |  3 ++-
+>  2 files changed, 35 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index db12d2ef1aef..e2186a7c0eed 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -27,6 +27,7 @@
+>  #include <linux/math64.h>
+>  #include <linux/slab.h>
+>  #include <asm/processor.h>
+> +#include <asm/mce.h>
+>  #include <asm/msr.h>
+>  #include <asm/page.h>
+>  #include <asm/current.h>
+> @@ -398,14 +399,26 @@ static inline int apic_lvt_nmi_mode(u32 lvt_val)
+>         return (lvt_val & (APIC_MODE_MASK | APIC_LVT_MASKED)) == APIC_DM_NMI;
+>  }
+>
+> +static inline bool kvm_is_cmci_supported(struct kvm_vcpu *vcpu)
+> +{
+> +       return vcpu->arch.mcg_cap & MCG_CMCI_P;
+> +}
+> +
+> +static inline int kvm_apic_get_nr_lvt_entries(struct kvm_lapic *apic)
+> +{
+> +       return KVM_APIC_MAX_NR_LVT_ENTRIES - !kvm_is_cmci_supported(apic->vcpu);
+> +}
 
-Me too. :)
+Suggesting computing the number of LVT entries once as part of
+KVM_X86_SETUP_MCE and storing it in struct kvm_lapic (e.g.
+apic->nr_lvt_entries).
 
-> , mainly because AFAICT 
-> despite the change below the fsm jumptable would still allow you to 
-> reach this code when in STANDBY.  But, it should only be possible for
-> an 
-> unsolicited interrupt (e.g. unsolicited implies !cp_is_finished) so
-> we 
-> would still avoid a STANDBY->IDLE transition on accident.
-> 
-> Maybe work unsolicited interrupt into the comment block above along
-> with 
-> HSCH/CSCH?
+I would also suggest replacing kvm_is_cmci_supported() with
+kvm_lapic_lvt_cmci_supported(), which checks if the local APIC
+supports the LVT CMCI register, rather than looking at mcg_cap. I
+think that will result in more readable code because it more directly
+checks that the local APIC supports the LVT entry we care about.
 
-Good idea. How about:
+> +
+>  void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm_lapic *apic = vcpu->arch.apic;
+> -       u32 v = APIC_VERSION | ((KVM_APIC_MAX_NR_LVT_ENTRIES - 1) << 16);
+> +       u32 v = 0;
+>
+>         if (!lapic_in_kernel(vcpu))
+>                 return;
+>
+> +       v = APIC_VERSION | ((kvm_apic_get_nr_lvt_entries(apic) - 1) << 16);
+> +
+>         /*
+>          * KVM emulates 82093AA datasheet (with in-kernel IOAPIC implementation)
+>          * which doesn't have EOI register; Some buggy OSes (e.g. Windows with
+> @@ -425,7 +438,8 @@ static const unsigned int apic_lvt_mask[KVM_APIC_MAX_NR_LVT_ENTRIES] = {
+>         [LVT_PERFORMANCE_COUNTER] = LVT_MASK | APIC_MODE_MASK,
+>         [LVT_LINT0] = LINT_MASK,
+>         [LVT_LINT1] = LINT_MASK,
+> -       [LVT_ERROR] = LVT_MASK
+> +       [LVT_ERROR] = LVT_MASK,
+> +       [LVT_CMCI] = LVT_MASK | APIC_MODE_MASK
+>  };
+>
+>  static int find_highest_vector(void *bitmap)
+> @@ -1445,6 +1459,9 @@ static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+>                 APIC_REG_MASK(APIC_TMCCT) |
+>                 APIC_REG_MASK(APIC_TDCR);
+>
+> +       if (kvm_is_cmci_supported(apic->vcpu))
+> +               valid_reg_mask |= APIC_REG_MASK(APIC_LVTCMCI);
+> +
+>         /*
+>          * ARBPRI and ICR2 are not valid in x2APIC mode.  WARN if KVM reads ICR
+>          * in x2APIC mode as it's an 8-byte register in x2APIC and needs to be
+> @@ -2083,12 +2100,10 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+>                 apic_set_spiv(apic, val & mask);
+>                 if (!(val & APIC_SPIV_APIC_ENABLED)) {
+>                         int i;
+> -                       u32 lvt_val;
+>
+> -                       for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++) {
+> -                               lvt_val = kvm_lapic_get_reg(apic, APIC_LVTx(i));
+> +                       for (i = 0; i < kvm_apic_get_nr_lvt_entries(apic); i++) {
+>                                 kvm_lapic_set_reg(apic, APIC_LVTx(i),
+> -                                            lvt_val | APIC_LVT_MASKED);
+> +                                       kvm_lapic_get_reg(apic, APIC_LVTx(i)) | APIC_LVT_MASKED);
+>                         }
+>                         apic_update_lvtt(apic);
+>                         atomic_set(&apic->lapic_timer.pending, 0);
+> @@ -2140,6 +2155,17 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+>                 apic_update_lvtt(apic);
+>                 break;
+>
+> +       case APIC_LVTCMCI:
+> +               if (!kvm_is_cmci_supported(apic->vcpu)) {
+> +                       ret = 1;
+> +                       break;
+> +               }
+> +               if (!kvm_apic_sw_enabled(apic))
+> +                       val |= APIC_LVT_MASKED;
+> +               val &= apic_lvt_mask[LVT_CMCI];
+> +               kvm_lapic_set_reg(apic, APIC_LVTCMCI, val);
 
-        /*
-         * Reset to IDLE only if
-processing of a channel program
-         * has finished. Do not
-overwrite a possible processing
-         * state if the interrupt was
-unsolicited, or if the final
-         * interrupt was for HSCH or CSCH.
- 
-        */
+This should be folded into the handling of the other LVT registers.
+The code is basically the same. Then you can also drop the
+kvm_is_cmci_supported() and replace it with a more generic check that
+checks if the LVT entry is supported.
 
-> 
-> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> 
-> >   
-> >   	if (private->io_trigger)
-> > diff --git a/drivers/s390/cio/vfio_ccw_ops.c
-> > b/drivers/s390/cio/vfio_ccw_ops.c
-> > index bebae21228aa..a403d059a4e6 100644
-> > --- a/drivers/s390/cio/vfio_ccw_ops.c
-> > +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> > @@ -146,7 +146,7 @@ static int vfio_ccw_mdev_probe(struct
-> > mdev_device *mdev)
-> >   	vfio_uninit_group_dev(&private->vdev);
-> >   	atomic_inc(&private->avail);
-> >   	private->mdev = NULL;
-> > -	private->state = VFIO_CCW_STATE_IDLE;
-> > +	private->state = VFIO_CCW_STATE_STANDBY;
-
+> +               break;
+> +
+>         case APIC_TMICT:
+>                 if (apic_lvtt_tscdeadline(apic))
+>                         break;
+> @@ -2383,7 +2409,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+>                 kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
+>         kvm_apic_set_version(apic->vcpu);
+>
+> -       for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++)
+> +       for (i = 0; i < kvm_apic_get_nr_lvt_entries(apic); i++)
+>                 kvm_lapic_set_reg(apic, APIC_LVTx(i), APIC_LVT_MASKED);
+>         apic_update_lvtt(apic);
+>         if (kvm_vcpu_is_reset_bsp(vcpu) &&
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 2d197ed0b8ce..16298bcb2abf 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -35,11 +35,12 @@ enum lapic_lvt_entry {
+>         LVT_LINT0,
+>         LVT_LINT1,
+>         LVT_ERROR,
+> +       LVT_CMCI,
+>
+>         KVM_APIC_MAX_NR_LVT_ENTRIES,
+>  };
+>
+> -#define APIC_LVTx(x) (APIC_LVTT + 0x10 * (x))
+> +#define APIC_LVTx(x) ((x) == LVT_CMCI ? APIC_LVTCMCI : APIC_LVTT + 0x10 * (x))
+>
+>  struct kvm_timer {
+>         struct hrtimer timer;
+> --
+> 2.36.1.124.g0e6072fb45-goog
+>
