@@ -2,158 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79FE253CD5F
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 18:42:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4D0953D01A
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 20:01:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343839AbiFCQmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 12:42:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35308 "EHLO
+        id S1346231AbiFCSAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 14:00:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242741AbiFCQmU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 12:42:20 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B27FB1EC62
-        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 09:42:18 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id x65so6400565qke.2
-        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 09:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=pZiq+DaP0uIJbqmhpHEQocGuha+dXUbZZZqTwIB2IaE=;
-        b=rrQxT3vbT7GMAWiBE8NKh82hTKWmXoBOIgjSoB8gWHlxJCtpicQfJi6YHcKEu0Skmg
-         abttTcfRqmTOcz4L3ohQC6WWhlA31fuHxoEfeuJpbUAg7kX6/vtplGcJ9j4IrzJVxD9O
-         vdLoYfObodGls9T269h7hJyDm997n4snH1eyk5q8lGm0DuwzVfKoDQFEQSeKxajjX2Yz
-         5TiL9zM/J27+HT1KqOA1cB9necDYn5jb3A6o3ARG7LxeA2ES2j5uBkLAZdLyHaiO4lvt
-         ER/oF7LY8Hxyq/pFtt8IclZxYPm5bLZuRep0Ojk6gIJnuU/og9qHiw7H4aRy54/0OtvI
-         pIJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pZiq+DaP0uIJbqmhpHEQocGuha+dXUbZZZqTwIB2IaE=;
-        b=7Z3gpl/mx62TlJDbVfCZCPjwXp7k9k9fy+/aH97M94piJ1sDzPTLdx/bBKJH0K7jO0
-         PeahqvkW+AfDbYmmuL4b2XvtMKcAXqYEBDds5F3NMlLB2IHEy676fM8CWiNvzJBA81mN
-         vBHYfrfAuGJH0vBdxn/PBF1rHcchQ2Oy7Kor+YvhS3ZsFp8dcHvEnZppfYKxAdllU7PM
-         iwo0T27j+OznbW+2JI80bJz+LwrMrYe0AQM8MAcEcny83Ne5kB/Pk0nhJSXQRbVcxa6U
-         gtqtVeaLnHvDLecniZ3vcjFz1IxyAllM/7eBCSjQYrN2qAkwoQnQ/g6t53I75VBQg7fp
-         Q9eQ==
-X-Gm-Message-State: AOAM532/EWGkFkGMPPtssW/U8SRnbcBurefsdfXRIC3rkyZT/Fn6/x6Z
-        jXrfkgrzFcSXKR7UxzFLSgtF6Q==
-X-Google-Smtp-Source: ABdhPJwD1IT8PgvyiFpaFJ0oQgGHCzkg9tknn5j7X5fVKzbiMKtPXk1vgrTU2p+vhNcLbOMRztlAVw==
-X-Received: by 2002:a05:620a:2845:b0:6a3:646f:9ba8 with SMTP id h5-20020a05620a284500b006a3646f9ba8mr7509475qkp.56.1654274537770;
-        Fri, 03 Jun 2022 09:42:17 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:1d66])
-        by smtp.gmail.com with ESMTPSA id w184-20020a3794c1000000b006a098381abcsm5550650qkd.114.2022.06.03.09.42.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jun 2022 09:42:17 -0700 (PDT)
-Date:   Fri, 3 Jun 2022 12:42:15 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Oliver Upton <oupton@google.com>,
-        Cgroups <cgroups@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
-Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-Message-ID: <Ypo550pGxmnJnGBe@cmpxchg.org>
-References: <Yn2YYl98Vhh/UL0w@google.com>
- <Yn5+OtZSSUZZgTQj@cmpxchg.org>
- <Yn6DeEGLyR4Q0cDp@google.com>
- <CALvZod6nERq4j=L0V+pc-rd5+QKi4yb_23tWV-1MF53xL5KE6Q@mail.gmail.com>
- <CAJD7tka-5+XRkthNV4qCg8woPCpjcwynQoRBame-3GP1L8y+WQ@mail.gmail.com>
- <YoeoLJNQTam5fJSu@cmpxchg.org>
- <CAJD7tkYjcmwBeUx-=MTQeUf78uqFDvfpy7OuKy4OvoS7HiVO1Q@mail.gmail.com>
- <Yo4Ze+DZrLqn0PeU@cmpxchg.org>
- <Yo7MHA2aUaprvgl8@google.com>
- <CAJD7tkYoz=rYvBV3tcp4aLgiyEtr-sBwbncFduZsOq+c8wk5sA@mail.gmail.com>
+        with ESMTP id S1346136AbiFCR7S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 13:59:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F30C580E1;
+        Fri,  3 Jun 2022 10:55:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DFE9B60F3B;
+        Fri,  3 Jun 2022 17:55:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDFA7C385B8;
+        Fri,  3 Jun 2022 17:55:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1654278914;
+        bh=4s/qfcd7m36IGhRpyGgRTOHB6EW2VRul4AL6adni7zI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=sFNgrqn51QsTSKdLgxhYJXk5fVsdrjGFUXOoRIPM2XsAa2T/1lgrtuM6TZBeFbXBx
+         9MME6Yf4ai+ePJmkvckHI3Kzl+racSXgza3CBc2CEMAgL3QP/f6JNh0TKK/0pJy/i6
+         +DKVMZk+LbIwwxs424Btqfl4xo9BvFSQNYcjz9JE=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Zdenek Kaspar <zkaspar82@gmail.com>,
+        "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Subject: [PATCH 5.17 27/75] x86/fpu: KVM: Set the base guest FPU uABI size to sizeof(struct kvm_xsave)
+Date:   Fri,  3 Jun 2022 19:43:11 +0200
+Message-Id: <20220603173822.519255815@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220603173821.749019262@linuxfoundation.org>
+References: <20220603173821.749019262@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJD7tkYoz=rYvBV3tcp4aLgiyEtr-sBwbncFduZsOq+c8wk5sA@mail.gmail.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 27, 2022 at 11:33:27AM -0700, Yosry Ahmed wrote:
-> On Wed, May 25, 2022 at 5:39 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Wed, May 25, 2022, Johannes Weiner wrote:
-> > > On Tue, May 24, 2022 at 03:31:52PM -0700, Yosry Ahmed wrote:
-> > > > I don't have enough context to say whether we should piggyback KVM MMU
-> > > > pages to the existing NR_PAGETABLE item, but from a high level it
-> > > > seems like it would be more helpful if they are a separate stat.
-> > > > Anyway, I am willing to go with whatever Sean thinks is best.
-> > >
-> > > Somebody should work this out and put it into a changelog. It's
-> > > permanent ABI.
-> >
-> > After a lot of waffling, my vote is to add a dedicated NR_SECONDARY_PAGETABLE.
-> >
-> > It's somewhat redundant from a KVM perspective, as NR_SECONDARY_PAGETABLE will
-> > scale with KVM's per-VM pages_{4k,2m,1g} stats unless the guest is doing something
-> > bizarre, e.g. accessing only 4kb chunks of 2mb pages so that KVM is forced to
-> > allocate a large number of page tables even though the guest isn't accessing that
-> > much memory.
-> >
-> > But, someone would need to either understand how KVM works to make that connection,
-> > or know (or be told) to go look at KVM's stats if they're running VMs to better
-> > decipher the stats.
-> >
-> > And even in the little bit of time I played with this, I found having
-> > nr_page_table_pages side-by-side with nr_secondary_page_table_pages to be very
-> > informative.  E.g. when backing a VM with THP versus HugeTLB,
-> > nr_secondary_page_table_pages is roughly the same, but nr_page_table_pages is an
-> > order of a magnitude higher with THP.  I'm guessing the THP behavior is due to
-> > something triggering DoubleMap, but now I want to find out why that's happening.
-> >
-> > So while I'm pretty sure a clever user could glean the same info by cross-referencing
-> > NR_PAGETABLE stats with KVM stats, I think having NR_SECONDARY_PAGETABLE will at the
-> > very least prove to be helpful for understanding tradeoffs between VM backing types,
-> > and likely even steer folks towards potential optimizations.
-> >
-> > Baseline:
-> >   # grep page_table /proc/vmstat
-> >   nr_page_table_pages 2830
-> >   nr_secondary_page_table_pages 0
-> >
-> > THP:
-> >   # grep page_table /proc/vmstat
-> >   nr_page_table_pages 7584
-> >   nr_secondary_page_table_pages 140
-> >
-> > HugeTLB:
-> >   # grep page_table /proc/vmstat
-> >   nr_page_table_pages 3153
-> >   nr_secondary_page_table_pages 153
-> >
-> 
-> Interesting findings! Thanks for taking the time to look into this, Sean!
-> I will refresh this patchset and summarize the discussion in the
-> commit message, and also fix some nits on the KVM side. Does this
-> sound good to everyone?
+From: Sean Christopherson <seanjc@google.com>
 
-Yes, thanks for summarizing this. Sounds good to me!
+commit d187ba5312307d51818beafaad87d28a7d939adf upstream.
+
+Set the starting uABI size of KVM's guest FPU to 'struct kvm_xsave',
+i.e. to KVM's historical uABI size.  When saving FPU state for usersapce,
+KVM (well, now the FPU) sets the FP+SSE bits in the XSAVE header even if
+the host doesn't support XSAVE.  Setting the XSAVE header allows the VM
+to be migrated to a host that does support XSAVE without the new host
+having to handle FPU state that may or may not be compatible with XSAVE.
+
+Setting the uABI size to the host's default size results in out-of-bounds
+writes (setting the FP+SSE bits) and data corruption (that is thankfully
+caught by KASAN) when running on hosts without XSAVE, e.g. on Core2 CPUs.
+
+WARN if the default size is larger than KVM's historical uABI size; all
+features that can push the FPU size beyond the historical size must be
+opt-in.
+
+  ==================================================================
+  BUG: KASAN: slab-out-of-bounds in fpu_copy_uabi_to_guest_fpstate+0x86/0x130
+  Read of size 8 at addr ffff888011e33a00 by task qemu-build/681
+  CPU: 1 PID: 681 Comm: qemu-build Not tainted 5.18.0-rc5-KASAN-amd64 #1
+  Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426 01/13/2010
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x34/0x45
+   print_report.cold+0x45/0x575
+   kasan_report+0x9b/0xd0
+   fpu_copy_uabi_to_guest_fpstate+0x86/0x130
+   kvm_arch_vcpu_ioctl+0x72a/0x1c50 [kvm]
+   kvm_vcpu_ioctl+0x47f/0x7b0 [kvm]
+   __x64_sys_ioctl+0x5de/0xc90
+   do_syscall_64+0x31/0x50
+   entry_SYSCALL_64_after_hwframe+0x44/0xae
+   </TASK>
+  Allocated by task 0:
+  (stack is not available)
+  The buggy address belongs to the object at ffff888011e33800
+   which belongs to the cache kmalloc-512 of size 512
+  The buggy address is located 0 bytes to the right of
+   512-byte region [ffff888011e33800, ffff888011e33a00)
+  The buggy address belongs to the physical page:
+  page:0000000089cd4adb refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x11e30
+  head:0000000089cd4adb order:2 compound_mapcount:0 compound_pincount:0
+  flags: 0x4000000000010200(slab|head|zone=1)
+  raw: 4000000000010200 dead000000000100 dead000000000122 ffff888001041c80
+  raw: 0000000000000000 0000000080100010 00000001ffffffff 0000000000000000
+  page dumped because: kasan: bad access detected
+  Memory state around the buggy address:
+   ffff888011e33900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+   ffff888011e33980: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  >ffff888011e33a00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                     ^
+   ffff888011e33a80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+   ffff888011e33b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+  ==================================================================
+  Disabling lock debugging due to kernel taint
+
+Fixes: be50b2065dfa ("kvm: x86: Add support for getting/setting expanded xstate buffer")
+Fixes: c60427dd50ba ("x86/fpu: Add uabi_size to guest_fpu")
+Reported-by: Zdenek Kaspar <zkaspar82@gmail.com>
+Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Tested-by: Zdenek Kaspar <zkaspar82@gmail.com>
+Message-Id: <20220504001219.983513-1-seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/x86/kernel/fpu/core.c |   17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -14,6 +14,8 @@
+ #include <asm/traps.h>
+ #include <asm/irq_regs.h>
+ 
++#include <uapi/asm/kvm.h>
++
+ #include <linux/hardirq.h>
+ #include <linux/pkeys.h>
+ #include <linux/vmalloc.h>
+@@ -232,7 +234,20 @@ bool fpu_alloc_guest_fpstate(struct fpu_
+ 	gfpu->fpstate		= fpstate;
+ 	gfpu->xfeatures		= fpu_user_cfg.default_features;
+ 	gfpu->perm		= fpu_user_cfg.default_features;
+-	gfpu->uabi_size		= fpu_user_cfg.default_size;
++
++	/*
++	 * KVM sets the FP+SSE bits in the XSAVE header when copying FPU state
++	 * to userspace, even when XSAVE is unsupported, so that restoring FPU
++	 * state on a different CPU that does support XSAVE can cleanly load
++	 * the incoming state using its natural XSAVE.  In other words, KVM's
++	 * uABI size may be larger than this host's default size.  Conversely,
++	 * the default size should never be larger than KVM's base uABI size;
++	 * all features that can expand the uABI size must be opt-in.
++	 */
++	gfpu->uabi_size		= sizeof(struct kvm_xsave);
++	if (WARN_ON_ONCE(fpu_user_cfg.default_size > gfpu->uabi_size))
++		gfpu->uabi_size = fpu_user_cfg.default_size;
++
+ 	fpu_init_guest_permissions(gfpu);
+ 
+ 	return true;
+
 
