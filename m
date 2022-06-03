@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98EAA53C313
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:13:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9BE453C1C0
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240608AbiFCAra (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:47:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48764 "EHLO
+        id S240582AbiFCAro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 20:47:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240104AbiFCApl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 20:45:41 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D306344F6
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:45:27 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id j15-20020a17090a738f00b001e345e429d2so3540461pjg.0
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:45:27 -0700 (PDT)
+        with ESMTP id S240248AbiFCApm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 20:45:42 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065C634640
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:45:29 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id x18-20020a62fb12000000b0051bab667811so3499606pfm.5
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=3+V17MeEPjvQg09WlN2EBYPY536bBdHzqlWlFeq99WM=;
-        b=kVfh+vPHcGM1lNaIV0EGYJvz0D25wwuiua+OEiHcKV3KObeTffpxHa8OBQO/Bfvkvc
-         YzziWeYKgfK6ltmIYp74F81H6q+y0Mj4nSOk8D67J70bx/dFA9aEHAmsFfbYJaK+ylpq
-         sABxIuIK6LMLTAg8XylgHeurvSZwZQ9+X08FFv8lWsrxpiv6E+pL8xn7V3lqTRqbXpZ2
-         Wm7lpWHOSVpbKUTm8SIMutG98dLlUMD1nhqaQG81c7ymhxTH8yWA2h4nxyagj1dLZXic
-         9FYCO2gPgzqkg94EXDVvKvM7gHFGoADItYh1HTd6tP7qLb0d4ekTlxN/AGf2OEYOz2MM
-         AnhA==
+        bh=gf/3WhosbDQbquEXufiQCNkkI21LPU8IPD8LLf4fW2Y=;
+        b=lo4OOYCvQW7cm2iGxp4LKBtoa08BgZBY0m19rWQAblk7OGnGy2jl08abC4D1pP7FG/
+         p+WcbDfg9bDRNs/C4IssiE34ZkhnMPoTLv0tzr5xHv8deuRyM+lJYhWvf3GGgcEDxMfC
+         Va0ZCv04BSeArHdcHwa6Excv4+f33n7lxC+dCCGWod/Y7cikTUT/5XlgLQZLIiPFdluW
+         UxodvfQSv6oi7HOVM5aAx0Xbe8hq3+u1ox8gxiBe0rhFF5qDibtUyQETreTOWwCrBByK
+         6L9Yv+83y/3Xy1KHjbcjZr0KRO6R6pJ+APXfO99q4SA+AhR4EYJnyOBjquOJbWn2ljUJ
+         G/wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=3+V17MeEPjvQg09WlN2EBYPY536bBdHzqlWlFeq99WM=;
-        b=AY18rLCez8jYwJruiBHvGV4FSO2Of1wtPMOlQxV+dH9k09zk1QHfDAzCA2cD4KhimO
-         16/k2Wjkq3nGJKHHkMDYD/yzcL6Fl3v6Jk4/p1AT4/hKyrfZwyXY+aAxiC+0mjCYg0Il
-         +QDNblMeCQ8LJ1lMTZJeDC+GBtbYdiLU3jBf+fJ96zCi2ZpxF9bS+hbpAR6NQxGsE+/m
-         DrmEZC0nxLlHD47lRg7l+7r2lrcM9RCfAF7uLsUNIz4Y29luBMJRGjjMWShL/Ky7EWUq
-         fKVFgYRj+nh6yIXgjz1Nkt5W/Bh4QdHkN/qbZ3Yq/eUtUMXmyErEEFh3GjN/wKxJddO/
-         1RmQ==
-X-Gm-Message-State: AOAM530ibjlShpLG5EqkXOIqrzBC5gATKpoxcrz9kjszSfUKPmINPYjh
-        po6btx5PyxiVOjcmgq+5KX60y1DMC28=
-X-Google-Smtp-Source: ABdhPJw4kln2CObNdfF++iT6Gp4BzDVa0eaG40S1Zj/G7HIetNH3tHqf3rRmZXs3DQz04oj6BdR5MG+fZr4=
+        bh=gf/3WhosbDQbquEXufiQCNkkI21LPU8IPD8LLf4fW2Y=;
+        b=5NGHaLo+2uXw/d24PqD+9cqRdPKSomiOT7SP4fFLnV71Ofe4lqmtCYm1tvLZglRjwn
+         pZEYp+uFDWoOAocSzqrjkdX8LrLftNwMO47MlQgFD+blrlyuu0o2KmKlaaRd313Fj1mH
+         Ym3rQ9x3TLQEq0q/uLb0WJBDOwMXzwDbxm02lFLTRcJhv966ipd5Jh4KJNPNqmFyK4ri
+         0OgB09Mg+d1IkiLvu7XLmi4YvJ6HlVEcmAGJu4hYLIcIIXgJYnF3B2WHYtLT0/DcvTZF
+         9RMoUylsplFh5i600bfXumHs8bSRjfrpE2ENGpvWChzB2TU+zNm10XSGgqxbkqZ5T39d
+         gbqw==
+X-Gm-Message-State: AOAM532BF9UpzNJ1FyodUExK2XVcOMjFClND6M37Ocls5pD53bmvmSVK
+        KboIfrLPCPHwatdy57Nludjadvz1eAI=
+X-Google-Smtp-Source: ABdhPJw1/eDHJ15wxdmCPCvmG7oAvpHelnw0d7hSZRApBhMwLuP/pDmmgEO2WoL0xcIIJmAfrSUuc5+jWCY=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1ad2:b0:51b:c63b:95f0 with SMTP id
- f18-20020a056a001ad200b0051bc63b95f0mr6460313pfv.16.1654217126547; Thu, 02
- Jun 2022 17:45:26 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:44b:0:b0:3fc:cd1c:49e8 with SMTP id
+ 72-20020a63044b000000b003fccd1c49e8mr6628197pge.172.1654217128469; Thu, 02
+ Jun 2022 17:45:28 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:42:07 +0000
+Date:   Fri,  3 Jun 2022 00:42:08 +0000
 In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-61-seanjc@google.com>
+Message-Id: <20220603004331.1523888-62-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220603004331.1523888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 060/144] KVM: selftests: Convert state_test away from VCPU_ID
+Subject: [PATCH v2 061/144] KVM: selftests: Convert svm_int_ctl_test away from VCPU_ID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -71,107 +71,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert state_test to use vm_create_with_one_vcpu() and
-vm_recreate_with_one_vcpu(), and pass around a 'struct kvm_vcpu' object
-instead of using a global VCPU_ID.  Note, this is a "functional" change
-in the sense that the test now creates a vCPU with vcpu_id==0 instead of
-vcpu_id==5.  The non-zero VCPU_ID was 100% arbitrary and added little to
-no validation coverage.  If testing non-zero vCPU IDs is desirable for
-generic tests, that can be done in the future by tweaking the VM creation
-helpers.
+Convert svm_int_ctl_test to use vm_create_with_one_vcpu() and pass around
+a 'struct kvm_vcpu' object instead of using a global VCPU_ID.
 
-Opportunistically use vcpu_run() instead of _vcpu_run(), the test expects
-KVM_RUN to succeed.
+Opportunistically make the "vm" variable a local function variable, there
+are no users outside of main().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/x86_64/state_test.c | 29 +++++++++----------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   | 21 +++++++++----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
-index 41f7faaef2ac..b7869efad22a 100644
---- a/tools/testing/selftests/kvm/x86_64/state_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/state_test.c
-@@ -20,7 +20,6 @@
- #include "vmx.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c b/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c
+index 30a81038df46..8e90e463895a 100644
+--- a/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c
++++ b/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c
+@@ -13,10 +13,6 @@
  #include "svm_util.h"
+ #include "apic.h"
  
--#define VCPU_ID		5
- #define L2_GUEST_STACK_SIZE 256
+-#define VCPU_ID		0
+-
+-static struct kvm_vm *vm;
+-
+ bool vintr_irq_called;
+ bool intr_irq_called;
  
- void svm_l2_guest_code(void)
-@@ -157,6 +156,7 @@ int main(int argc, char *argv[])
- 	vm_vaddr_t nested_gva = 0;
+@@ -88,31 +84,34 @@ static void l1_guest_code(struct svm_test_data *svm)
  
- 	struct kvm_regs regs1, regs2;
+ int main(int argc, char *argv[])
+ {
 +	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
- 	struct kvm_run *run;
- 	struct kvm_x86_state *state;
-@@ -164,10 +164,10 @@ int main(int argc, char *argv[])
- 	int stage;
++	struct kvm_run *run;
+ 	vm_vaddr_t svm_gva;
++	struct kvm_vm *vm;
++	struct ucall uc;
  
- 	/* Create VM */
--	vm = vm_create_default(VCPU_ID, 0, guest_code);
--	run = vcpu_state(vm, VCPU_ID);
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 	nested_svm_check_supported();
+ 
+-	vm = vm_create_default(VCPU_ID, 0, (void *) l1_guest_code);
++	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
+ 
+ 	vm_init_descriptor_tables(vm);
+-	vcpu_init_descriptor_tables(vm, VCPU_ID);
++	vcpu_init_descriptor_tables(vm, vcpu->id);
+ 
+ 	vm_install_exception_handler(vm, VINTR_IRQ_NUMBER, vintr_irq_handler);
+ 	vm_install_exception_handler(vm, INTR_IRQ_NUMBER, intr_irq_handler);
+ 
+ 	vcpu_alloc_svm(vm, &svm_gva);
+-	vcpu_args_set(vm, VCPU_ID, 1, svm_gva);
++	vcpu_args_set(vm, vcpu->id, 1, svm_gva);
+ 
+-	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
+-	struct ucall uc;
 +	run = vcpu->run;
  
--	vcpu_regs_get(vm, VCPU_ID, &regs1);
-+	vcpu_regs_get(vm, vcpu->id, &regs1);
+-	vcpu_run(vm, VCPU_ID);
++	vcpu_run(vm, vcpu->id);
+ 	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+ 		    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
+ 		    run->exit_reason,
+ 		    exit_reason_str(run->exit_reason));
  
- 	if (kvm_check_cap(KVM_CAP_NESTED_STATE)) {
- 		if (nested_svm_supported())
-@@ -179,16 +179,16 @@ int main(int argc, char *argv[])
- 	if (!nested_gva)
- 		pr_info("will skip nested state checks\n");
- 
--	vcpu_args_set(vm, VCPU_ID, 1, nested_gva);
-+	vcpu_args_set(vm, vcpu->id, 1, nested_gva);
- 
- 	for (stage = 1;; stage++) {
--		_vcpu_run(vm, VCPU_ID);
-+		vcpu_run(vm, vcpu->id);
- 		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 			    "Stage %d: unexpected exit reason: %u (%s),\n",
- 			    stage, run->exit_reason,
- 			    exit_reason_str(run->exit_reason));
- 
--		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		switch (get_ucall(vm, vcpu->id, &uc)) {
- 		case UCALL_ABORT:
- 			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
- 			       	  __FILE__, uc.args[1]);
-@@ -206,22 +206,21 @@ int main(int argc, char *argv[])
- 			    uc.args[1] == stage, "Stage %d: Unexpected register values vmexit, got %lx",
- 			    stage, (ulong)uc.args[1]);
- 
--		state = vcpu_save_state(vm, VCPU_ID);
-+		state = vcpu_save_state(vm, vcpu->id);
- 		memset(&regs1, 0, sizeof(regs1));
--		vcpu_regs_get(vm, VCPU_ID, &regs1);
-+		vcpu_regs_get(vm, vcpu->id, &regs1);
- 
- 		kvm_vm_release(vm);
- 
- 		/* Restore state in a new VM.  */
--		kvm_vm_restart(vm);
--		vm_vcpu_add(vm, VCPU_ID);
--		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
--		vcpu_load_state(vm, VCPU_ID, state);
--		run = vcpu_state(vm, VCPU_ID);
-+		vcpu = vm_recreate_with_one_vcpu(vm);
-+		vcpu_set_cpuid(vm, vcpu->id, kvm_get_supported_cpuid());
-+		vcpu_load_state(vm, vcpu->id, state);
-+		run = vcpu->run;
- 		kvm_x86_state_cleanup(state);
- 
- 		memset(&regs2, 0, sizeof(regs2));
--		vcpu_regs_get(vm, VCPU_ID, &regs2);
-+		vcpu_regs_get(vm, vcpu->id, &regs2);
- 		TEST_ASSERT(!memcmp(&regs1, &regs2, sizeof(regs2)),
- 			    "Unexpected register values after vcpu_load_state; rdi: %lx rsi: %lx",
- 			    (ulong) regs2.rdi, (ulong) regs2.rsi);
+-	switch (get_ucall(vm, VCPU_ID, &uc)) {
++	switch (get_ucall(vm, vcpu->id, &uc)) {
+ 	case UCALL_ABORT:
+ 		TEST_FAIL("%s", (const char *)uc.args[0]);
+ 		break;
 -- 
 2.36.1.255.ge46751e96f-goog
 
