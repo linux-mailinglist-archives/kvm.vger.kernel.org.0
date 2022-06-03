@@ -2,194 +2,342 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB3D853D2E1
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 22:38:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F99353D2E5
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 22:42:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242546AbiFCUiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 16:38:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39066 "EHLO
+        id S1346758AbiFCUl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 16:41:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbiFCUix (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 16:38:53 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F50B562C7;
-        Fri,  3 Jun 2022 13:38:53 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 253KYJYU017994;
-        Fri, 3 Jun 2022 20:38:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=SSJ0+aztQ1Mynd0YrGQzjAK4VUW5ebVnfqkQw23wd1o=;
- b=GtV16EZ7FDYyHOMVqL5NwkUWGdsORQMj3rJ3di+0Xt/efhiRrhb+Mc72WhRr1KenprlA
- f+sAt1EGfL1bzkAk1CYLzLhaVhPA4tfyrW1Q3oVEQ5zPu+Pe4qEsYnRRYjp/jYGZZdtV
- eDSpHkkf4jsKk7xblgUECELwa44+jKO2V8tv2anHEdGhSSqvAE6i7T55Bf2WxRivJHDW
- Vsb40uLjRqCS6BgnbqpU1OK0YgHo2DTAZtM5LwVDUNFloMzd3takPwrY6x4O33kppEPp
- 9obU+Jd9VrJ9mVXY6ZgQ81vGBEsEkY+WzgWgJ9vObiCyl293Ai0ikZAZkjijcp4L3wpH tQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfgg8k402-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 20:38:49 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 253KCLaP032740;
-        Fri, 3 Jun 2022 20:38:49 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfgg8k3yf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 20:38:49 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 253KK1tJ026300;
-        Fri, 3 Jun 2022 20:38:48 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma03wdc.us.ibm.com with ESMTP id 3gbc9w3r17-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 20:38:48 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 253Kcl284063926
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Jun 2022 20:38:47 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5B8D3AC060;
-        Fri,  3 Jun 2022 20:38:47 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F6C3AC05B;
-        Fri,  3 Jun 2022 20:38:45 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.94.47])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Jun 2022 20:38:45 +0000 (GMT)
-Message-ID: <60c94024db45dde89e46d1a5f5020355c4bf5a85.camel@linux.ibm.com>
-Subject: Re: [PATCH v1 07/18] vfio/ccw: Flatten MDEV device (un)register
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Fri, 03 Jun 2022 16:38:44 -0400
-In-Reply-To: <22bf0a16-9949-ff8d-955a-4b97cfb37207@linux.ibm.com>
-References: <20220602171948.2790690-1-farman@linux.ibm.com>
-         <20220602171948.2790690-8-farman@linux.ibm.com>
-         <22bf0a16-9949-ff8d-955a-4b97cfb37207@linux.ibm.com>
+        with ESMTP id S230012AbiFCUl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 16:41:57 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345C85FD7
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 13:41:55 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id t13so9625280ljd.6
+        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 13:41:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=G9gqzzsOeaAK/vKy9SrBb8UViIhfoan7EPHaJrvYp1Y=;
+        b=EcKAzpzk24UtkB9O7DaZeYynHX8ZCuO6c5RkQnCPpbjZRYf5nPJ2pfElDZRI3YY9IH
+         /lnoY7A+Cx0oYveFup7zJKHe095MGCifkBhgDJPif4fX21Mrcgd6FOgsuyCgFyHAqP5S
+         ic4Dn92I765VW20Cuz/W/VQTGMDF6alJMutFjxtDBu6wYbSS5bqjGu9z2Vustix3wdqr
+         DW2fvJW/7Ef1i0eHCgtqHPn8HPwjFkIdbVPIKti1akm5c/Jp/EFaOdF3ToakQZIGvvum
+         zX4byrcA/CHVHtF3dWhlkQv+XIfcKpqncF9wp8hfZVbrvrJgAa8WXZjM1d8XKoUkNUj+
+         fdbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=G9gqzzsOeaAK/vKy9SrBb8UViIhfoan7EPHaJrvYp1Y=;
+        b=DB3ezMvPKFmzqXKKLreild1vlhHHFgsuZUYpA4RScM5C71O+Bx5Bzr+iABO1hm86lF
+         eEqKXWTui+vnmloHfZd2mtIytjSiAIi8kaG+rpi6aT+ZAzOh1vip+BWK43rYvIqJerGx
+         9HeDNS/Oyj28yDBrp0NnWIgC+FdnwC7Gpr4Bz/t1BtVxQuCh01KspFOpICIW7f5hMq+l
+         epJdHLvYfsfAXR+M6gSdHHA+bIOqXvso22O2TEZgJeicdDOCcQNHycsAP7cIkZwsziDL
+         V53dqz2nmOEMpebB/z7hODhRZBbtF1QRhcVS44onIJRzNQ4hNRF/Qhu+hHOP/N/EGwCH
+         Ytbw==
+X-Gm-Message-State: AOAM533gHDxIfHr+Q/woXT+sptxGOoDLvgZyYXn9S7bwCBJ60RX6AUoI
+        e4UW7pxWqkFD69xcEc3BcehlO7ck5UuQdK1yrxZb4g==
+X-Google-Smtp-Source: ABdhPJxClzcIp3mRBKRCMOQ/IMo7ywcGSIvwPyf/Q85klBZSHjPvGd8rmbLLoxJV0JHWucCyYMyfJc1YGaNih8bI+jo=
+X-Received: by 2002:a05:651c:179f:b0:24b:1406:5f55 with SMTP id
+ bn31-20020a05651c179f00b0024b14065f55mr44953026ljb.361.1654288913190; Fri, 03
+ Jun 2022 13:41:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220520173638.94324-1-juew@google.com> <20220520173638.94324-7-juew@google.com>
+In-Reply-To: <20220520173638.94324-7-juew@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 3 Jun 2022 13:41:26 -0700
+Message-ID: <CALzav=dmrAf9c8PK07xgDO2CcvfTEyLM8GBxrtvfRjtJE=x4iA@mail.gmail.com>
+Subject: Re: [PATCH v4 6/8] KVM: x86: Add emulation for MSR_IA32_MCx_CTL2 MSRs.
+To:     Jue Wang <juew@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Greg Thelen <gthelen@google.com>,
+        Jiaqi Yan <jiaqiyan@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ki-OXnNtSoxJ2pUJCkDQbC-odsOnR1h1
-X-Proofpoint-GUID: lwoPF7e2iSvzKT8QBUXwGjqtQQNHTz6T
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-03_07,2022-06-03_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 impostorscore=0 lowpriorityscore=0 malwarescore=0
- bulkscore=0 mlxlogscore=999 mlxscore=0 adultscore=0 phishscore=0
- suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206030080
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-06-02 at 15:14 -0400, Matthew Rosato wrote:
-> On 6/2/22 1:19 PM, Eric Farman wrote:
-> > The vfio_ccw_mdev_(un)reg routines are merely vfio-ccw routines
-> > that
-> > pass control to mdev_(un)register_device. Since there's only one
-> > caller of each, let's just call the mdev routines directly.
-> 
-> I'd reword slightly to reference the ops extern
-> 
-> ".. caller of each, externalize vfio_ccw_mdev_ops and call..."
+On Fri, May 20, 2022 at 10:36 AM Jue Wang <juew@google.com> wrote:
+>
+> Corrected Machine Check Interrupt (CMCI) can be configured via the per
+> Machine Check bank registers: IA32_MCi_CTL2. This patch adds the
+> emulation of IA32_MCi_CTL2 registers to KVM. A separate mci_ctl2_banks
+> array is used to keep the existing mce_banks register layout intact.
+>
+> In Machine Check Architecture (MCA), MCG_CMCI_P (bit 10 of MCG_CAP) is
+> the corrected MC error counting/signaling extension present flag. When
+> this bit is set, it does not imply CMCI reported corrected error or UCNA
+> error is supported across all MCA banks. Software should check on a bank
+> by bank basis (i.e. if bit 30 in each IA32_MCi_CTL2 register is set).
+>
+> Signed-off-by: Jue Wang <juew@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |   1 +
+>  arch/x86/kvm/x86.c              | 130 ++++++++++++++++++++++----------
+>  2 files changed, 92 insertions(+), 39 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4ff36610af6a..178b7e01bf8f 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -806,6 +806,7 @@ struct kvm_vcpu_arch {
+>         u64 mcg_ctl;
+>         u64 mcg_ext_ctl;
+>         u64 *mce_banks;
+> +       u64 *mci_ctl2_banks;
+>
+>         /* Cache MMIO info */
+>         u64 mmio_gva;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0e839077ce52..f8ab592f519b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3174,6 +3174,16 @@ static void kvmclock_sync_fn(struct work_struct *work)
+>                                         KVMCLOCK_SYNC_PERIOD);
+>  }
+>
+> +/* These helpers are safe iff @msr is known to be an MCx bank MSR. */
+> +static bool is_mci_control_msr(u32 msr)
+> +{
+> +       return (msr & 3) == 0;
+> +}
+> +static bool is_mci_status_msr(u32 msr)
+> +{
+> +       return (msr & 3) == 1;
+> +}
+> +
+>  /*
+>   * On AMD, HWCR[McStatusWrEn] controls whether setting MCi_STATUS results in #GP.
+>   */
+> @@ -3192,6 +3202,7 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>         unsigned bank_num = mcg_cap & 0xff;
+>         u32 msr = msr_info->index;
+>         u64 data = msr_info->data;
+> +       u32 offset, last_msr;
+>
+>         switch (msr) {
+>         case MSR_IA32_MCG_STATUS:
+> @@ -3205,32 +3216,50 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>                         return 1;
+>                 vcpu->arch.mcg_ctl = data;
+>                 break;
+> -       default:
+> -               if (msr >= MSR_IA32_MC0_CTL &&
+> -                   msr < MSR_IA32_MCx_CTL(bank_num)) {
+> -                       u32 offset = array_index_nospec(
+> -                               msr - MSR_IA32_MC0_CTL,
+> -                               MSR_IA32_MCx_CTL(bank_num) - MSR_IA32_MC0_CTL);
+> -
+> -                       /* only 0 or all 1s can be written to IA32_MCi_CTL
+> -                        * some Linux kernels though clear bit 10 in bank 4 to
+> -                        * workaround a BIOS/GART TBL issue on AMD K8s, ignore
+> -                        * this to avoid an uncatched #GP in the guest
+> -                        */
+> -                       if ((offset & 0x3) == 0 &&
+> -                           data != 0 && (data | (1 << 10)) != ~(u64)0)
+> -                               return -1;
+> -
+> -                       /* MCi_STATUS */
+> -                       if (!msr_info->host_initiated &&
+> -                           (offset & 0x3) == 1 && data != 0) {
+> -                               if (!can_set_mci_status(vcpu))
+> -                                       return -1;
+> -                       }
+> +       case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+> +               last_msr = MSR_IA32_MCx_CTL2(bank_num) - 1;
+> +               if (msr > last_msr)
+> +                       return 1;
+>
+> -                       vcpu->arch.mce_banks[offset] = data;
+> -                       break;
+> -               }
+> +               if (!(mcg_cap & MCG_CMCI_P) && (data || !msr_info->host_initiated))
+> +                       return 1;
+> +               /* An attempt to write a 1 to a reserved bit raises #GP */
+> +               if (data & ~(MCI_CTL2_CMCI_EN | MCI_CTL2_CMCI_THRESHOLD_MASK))
+> +                       return 1;
+> +               offset = array_index_nospec(msr - MSR_IA32_MC0_CTL2,
+> +                                           last_msr + 1 - MSR_IA32_MC0_CTL2);
+> +               vcpu->arch.mci_ctl2_banks[offset] = data;
 
-Of course vfio_ccw_mdev_ops was removed in 5.19 via commit 6b42f491e17c
-("vfio/mdev: Remove mdev_parent_ops"), so the extern doesn't happen
-now.
+There's a lot of emulation in this commit that would be great to have
+test coverage for. e.g. Testing that writing to MSR_IA32_MC0_CTL2 when
+mcg_cap.MCG_CMCI_P=0 results in a #GP, writing to reserved bits, etc.
 
-> 
-> regardless,
-> 
-> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> 
-> > Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> > ---
-> >   drivers/s390/cio/vfio_ccw_drv.c     |  4 ++--
-> >   drivers/s390/cio/vfio_ccw_ops.c     | 12 +-----------
-> >   drivers/s390/cio/vfio_ccw_private.h |  4 +---
-> >   3 files changed, 4 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/drivers/s390/cio/vfio_ccw_drv.c
-> > b/drivers/s390/cio/vfio_ccw_drv.c
-> > index 9d817aa2f1c4..3784eb4cda85 100644
-> > --- a/drivers/s390/cio/vfio_ccw_drv.c
-> > +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> > @@ -239,7 +239,7 @@ static int vfio_ccw_sch_probe(struct subchannel
-> > *sch)
-> >   
-> >   	private->state = VFIO_CCW_STATE_STANDBY;
-> >   
-> > -	ret = vfio_ccw_mdev_reg(sch);
-> > +	ret = mdev_register_device(&sch->dev, &vfio_ccw_mdev_ops);
-> >   	if (ret)
-> >   		goto out_disable;
-> >   
-> > @@ -261,7 +261,7 @@ static void vfio_ccw_sch_remove(struct
-> > subchannel *sch)
-> >   	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
-> >   
-> >   	vfio_ccw_sch_quiesce(sch);
-> > -	vfio_ccw_mdev_unreg(sch);
-> > +	mdev_unregister_device(&sch->dev);
-> >   
-> >   	dev_set_drvdata(&sch->dev, NULL);
-> >   
-> > diff --git a/drivers/s390/cio/vfio_ccw_ops.c
-> > b/drivers/s390/cio/vfio_ccw_ops.c
-> > index 4a64c176facb..497e1b7ffd61 100644
-> > --- a/drivers/s390/cio/vfio_ccw_ops.c
-> > +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> > @@ -656,18 +656,8 @@ struct mdev_driver vfio_ccw_mdev_driver = {
-> >   	.remove = vfio_ccw_mdev_remove,
-> >   };
-> >   
-> > -static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
-> > +const struct mdev_parent_ops vfio_ccw_mdev_ops = {
-> >   	.owner			= THIS_MODULE,
-> >   	.device_driver		= &vfio_ccw_mdev_driver,
-> >   	.supported_type_groups  = mdev_type_groups,
-> >   };
-> > -
-> > -int vfio_ccw_mdev_reg(struct subchannel *sch)
-> > -{
-> > -	return mdev_register_device(&sch->dev, &vfio_ccw_mdev_ops);
-> > -}
-> > -
-> > -void vfio_ccw_mdev_unreg(struct subchannel *sch)
-> > -{
-> > -	mdev_unregister_device(&sch->dev);
-> > -}
-> > diff --git a/drivers/s390/cio/vfio_ccw_private.h
-> > b/drivers/s390/cio/vfio_ccw_private.h
-> > index 5c128eec596b..2e0744ac6492 100644
-> > --- a/drivers/s390/cio/vfio_ccw_private.h
-> > +++ b/drivers/s390/cio/vfio_ccw_private.h
-> > @@ -117,12 +117,10 @@ struct vfio_ccw_private {
-> >   	struct work_struct	crw_work;
-> >   } __aligned(8);
-> >   
-> > -extern int vfio_ccw_mdev_reg(struct subchannel *sch);
-> > -extern void vfio_ccw_mdev_unreg(struct subchannel *sch);
-> > -
-> >   extern int vfio_ccw_sch_quiesce(struct subchannel *sch);
-> >   
-> >   extern struct mdev_driver vfio_ccw_mdev_driver;
-> > +extern const struct mdev_parent_ops vfio_ccw_mdev_ops;
-> >   
-> >   /*
-> >    * States of the device statemachine.
-
+> +               break;
+> +       case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+> +               last_msr = MSR_IA32_MCx_CTL(bank_num) - 1;
+> +               if (msr > last_msr)
+> +                       return 1;
+> +
+> +               /*
+> +                * Only 0 or all 1s can be written to IA32_MCi_CTL, all other
+> +                * values are architecturally undefined.  But, some Linux
+> +                * kernels clear bit 10 in bank 4 to workaround a BIOS/GART TLB
+> +                * issue on AMD K8s, allow bit 10 to be clear when setting all
+> +                * other bits in order to avoid an uncaught #GP in the guest.
+> +                */
+> +               if (is_mci_control_msr(msr) &&
+> +                   data != 0 && (data | (1 << 10)) != ~(u64)0)
+> +                       return 1;
+> +
+> +               /*
+> +                * All CPUs allow writing 0 to MCi_STATUS MSRs to clear the MSR.
+> +                * AMD-based CPUs allow non-zero values, but if and only if
+> +                * HWCR[McStatusWrEn] is set.
+> +                */
+> +               if (!msr_info->host_initiated && is_mci_status_msr(msr) &&
+> +                   data != 0 && !can_set_mci_status(vcpu))
+> +                       return 1;
+> +
+> +               offset = array_index_nospec(msr - MSR_IA32_MC0_CTL,
+> +                                           last_msr + 1 - MSR_IA32_MC0_CTL);
+> +               vcpu->arch.mce_banks[offset] = data;
+> +               break;
+> +       default:
+>                 return 1;
+>         }
+>         return 0;
+> @@ -3514,7 +3543,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>                         return 1;
+>                 }
+>                 break;
+> -       case 0x200 ... 0x2ff:
+> +       case 0x200 ... MSR_IA32_MC0_CTL2 - 1:
+> +       case MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) ... 0x2ff:
+>                 return kvm_mtrr_set_msr(vcpu, msr, data);
+>         case MSR_IA32_APICBASE:
+>                 return kvm_set_apic_base(vcpu, msr_info);
+> @@ -3671,6 +3701,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>         case MSR_IA32_MCG_CTL:
+>         case MSR_IA32_MCG_STATUS:
+>         case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+> +       case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+>                 return set_msr_mce(vcpu, msr_info);
+>
+>         case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
+> @@ -3775,6 +3806,7 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
+>         u64 data;
+>         u64 mcg_cap = vcpu->arch.mcg_cap;
+>         unsigned bank_num = mcg_cap & 0xff;
+> +       u32 offset, last_msr;
+>
+>         switch (msr) {
+>         case MSR_IA32_P5_MC_ADDR:
+> @@ -3792,16 +3824,27 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
+>         case MSR_IA32_MCG_STATUS:
+>                 data = vcpu->arch.mcg_status;
+>                 break;
+> -       default:
+> -               if (msr >= MSR_IA32_MC0_CTL &&
+> -                   msr < MSR_IA32_MCx_CTL(bank_num)) {
+> -                       u32 offset = array_index_nospec(
+> -                               msr - MSR_IA32_MC0_CTL,
+> -                               MSR_IA32_MCx_CTL(bank_num) - MSR_IA32_MC0_CTL);
+> +       case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+> +               last_msr = MSR_IA32_MCx_CTL2(bank_num) - 1;
+> +               if (msr > last_msr)
+> +                       return 1;
+>
+> -                       data = vcpu->arch.mce_banks[offset];
+> -                       break;
+> -               }
+> +               if (!(mcg_cap & MCG_CMCI_P) && !host)
+> +                       return 1;
+> +               offset = array_index_nospec(msr - MSR_IA32_MC0_CTL2,
+> +                                           last_msr + 1 - MSR_IA32_MC0_CTL2);
+> +               data = vcpu->arch.mci_ctl2_banks[offset];
+> +               break;
+> +       case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+> +               last_msr = MSR_IA32_MCx_CTL(bank_num) - 1;
+> +               if (msr > last_msr)
+> +                       return 1;
+> +
+> +               offset = array_index_nospec(msr - MSR_IA32_MC0_CTL,
+> +                                           last_msr + 1 - MSR_IA32_MC0_CTL);
+> +               data = vcpu->arch.mce_banks[offset];
+> +               break;
+> +       default:
+>                 return 1;
+>         }
+>         *pdata = data;
+> @@ -3898,7 +3941,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>                 break;
+>         }
+>         case MSR_MTRRcap:
+> -       case 0x200 ... 0x2ff:
+> +       case 0x200 ... MSR_IA32_MC0_CTL2 - 1:
+> +       case MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) ... 0x2ff:
+>                 return kvm_mtrr_get_msr(vcpu, msr_info->index, &msr_info->data);
+>         case 0xcd: /* fsb frequency */
+>                 msr_info->data = 3;
+> @@ -4014,6 +4058,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>         case MSR_IA32_MCG_CTL:
+>         case MSR_IA32_MCG_STATUS:
+>         case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+> +       case MSR_IA32_MC0_CTL2 ... MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) - 1:
+>                 return get_msr_mce(vcpu, msr_info->index, &msr_info->data,
+>                                    msr_info->host_initiated);
+>         case MSR_IA32_XSS:
+> @@ -4769,9 +4814,12 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+>         /* Init IA32_MCG_CTL to all 1s */
+>         if (mcg_cap & MCG_CTL_P)
+>                 vcpu->arch.mcg_ctl = ~(u64)0;
+> -       /* Init IA32_MCi_CTL to all 1s */
+> -       for (bank = 0; bank < bank_num; bank++)
+> +       /* Init IA32_MCi_CTL to all 1s, IA32_MCi_CTL2 to all 0s */
+> +       for (bank = 0; bank < bank_num; bank++) {
+>                 vcpu->arch.mce_banks[bank*4] = ~(u64)0;
+> +               if (mcg_cap & MCG_CMCI_P)
+> +                       vcpu->arch.mci_ctl2_banks[bank] = 0;
+> +       }
+>
+>         static_call(kvm_x86_setup_mce)(vcpu);
+>  out:
+> @@ -11226,7 +11274,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>
+>         vcpu->arch.mce_banks = kcalloc(KVM_MAX_MCE_BANKS * 4, sizeof(u64),
+>                                        GFP_KERNEL_ACCOUNT);
+> -       if (!vcpu->arch.mce_banks)
+> +       vcpu->arch.mci_ctl2_banks = kcalloc(KVM_MAX_MCE_BANKS, sizeof(u64),
+> +                                           GFP_KERNEL_ACCOUNT);
+> +       if (!vcpu->arch.mce_banks || !vcpu->arch.mci_ctl2_banks)
+>                 goto fail_free_pio_data;
+>         vcpu->arch.mcg_cap = KVM_MAX_MCE_BANKS;
+>
+> @@ -11279,6 +11329,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>         free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
+>  fail_free_mce_banks:
+>         kfree(vcpu->arch.mce_banks);
+> +       kfree(vcpu->arch.mci_ctl2_banks);
+>  fail_free_pio_data:
+>         free_page((unsigned long)vcpu->arch.pio_data);
+>  fail_free_lapic:
+> @@ -11323,6 +11374,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>         kvm_hv_vcpu_uninit(vcpu);
+>         kvm_pmu_destroy(vcpu);
+>         kfree(vcpu->arch.mce_banks);
+> +       kfree(vcpu->arch.mci_ctl2_banks);
+>         kvm_free_lapic(vcpu);
+>         idx = srcu_read_lock(&vcpu->kvm->srcu);
+>         kvm_mmu_destroy(vcpu);
+> --
+> 2.36.1.124.g0e6072fb45-goog
+>
