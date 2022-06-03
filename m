@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77C9653C2F0
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:13:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B85C053C1C3
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240234AbiFCAp1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:45:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46958 "EHLO
+        id S240079AbiFCAof (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 20:44:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240009AbiFCAoD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 20:44:03 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0EBC33887
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:44:01 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id l2-20020a17090a72c200b001e325e14e3eso3515446pjk.7
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:44:01 -0700 (PDT)
+        with ESMTP id S239940AbiFCAoE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 20:44:04 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCA1344D9
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:44:03 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id v3-20020a1709028d8300b00163fc70a4dbso3462925plo.19
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:44:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=tpsyQW12jmAgv3in7dKrEx0XzJmqC8wtaaXcKs50cw0=;
-        b=fQ3b+dCpSd9d5Qeu1Scb2/xil7v+BDCrJI9u3G4vYHLuSNhmtHuKvh8/0TF0rP6AUx
-         UPnAQw1Wnqy/xL3ylPKMieyu0itC2wpq5v3sRgmiwdv1PtZISEYl/CWn+cavurHPwwRx
-         tgjHd996wYOKElB47oCugsWAVLZ1aa0MBQ6TNZwfmmwMT51AWtyKhFYq4Q9BcboKLm5X
-         W7QShrvXiMae6hAfk/jmUr2l8RgGz74JWfkfocGy7Oy+kMkye+zAayN5hqABRGNYKTNn
-         eunYG181Zk0GZ6YHiR4d4x7GkpiPB2+Fq359+XXX7KBgEGwQ1OAk+9gfQbB6ZLEo0GpY
-         6dYQ==
+        bh=36XEOpYEohNCR+Q01vTzoi5csXjLmHgWiPTQjP0f6so=;
+        b=DPkxiw2UxFi8eI9M47WQApqgocwHJV3aKzzdUq70auJn5gJ2hNpfwD46/NLb0EpB++
+         lRbsjiWihAy9Iw+Ij5xFss7Zpy6qqf5HuIdHL4jg6YE6ipxBRe5iCKK0DmniMFY7a+6i
+         eNGT2D7WbjM98RplHYgTuPU93X1F5K02mJojLc4hmWULxIpMGollFkG90litawmtIU9U
+         iC0+YN60QmQap5LyZSmjItpYZFJJ9oIAfLqQw/bvhf0ppZW/GOxls5xS8wMTcq361Khf
+         LAFBw4FqIEmHmOgXjWli9hbXdLOhSEM+6RMdduLnIyId6p1Ut2rURktkTNyPAabWM1Vi
+         Xw4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=tpsyQW12jmAgv3in7dKrEx0XzJmqC8wtaaXcKs50cw0=;
-        b=1mVcyjUSQj2qDhSvdW3me3U+ZBCJZ69AgXPEDN7BeaUwsmjZTztW/KVqCNv3iIIMBT
-         NtPw4f0k3zOMYfOn2r4oMFtX+nukDlvqjqDhwSUuziqLFsd3aYUpffWGSuP6CNwrl6Xc
-         yYnvKQGzzBFFR2Asbg0RouHblzY0xhRPgA0rxomILczmm/grWGcZgl4/EapB76Z0pH6S
-         v+8lgK3v3dyobYoVNaMwJ4hgkukHo2ddn2AXnxGZExU3C8OQCfWtoVuGhRZLrf10G64H
-         RR6hZ4mjH3TE4jxKkv2OGFVS9F0SSBzMCb2IxHIqQM8pWZRxQ55uCBH9AHFtvJKeqyyC
-         iRBQ==
-X-Gm-Message-State: AOAM530NkSWdTkk6q9yrILj7T1sMyOO1pfxi0IRkWmdTkDxc4XPGr0hh
-        zvgnGh4pvUb7Yne9C/GqWgc6lHUYGB8=
-X-Google-Smtp-Source: ABdhPJyLqYJ2WLLGQ8O6uIZlykZ8FpE+phkMnOc8VQueTLSJ5VfdpIfcezoHmp3eE4IwOaPLJuDMCIA850c=
+        bh=36XEOpYEohNCR+Q01vTzoi5csXjLmHgWiPTQjP0f6so=;
+        b=IaGO/PCZhfU+sy/YJ0pACtrZXXtx3QmacHbwe1TOwrWrZ367xvOxw3Y9MHU/z+YpXx
+         51nlZdGAQMsVF1ZyL+XOyUhDOcWFWwgJS1B5hQIp3psBuPJ9HdmGwcHkywlufDtCRYeJ
+         9RTcg6+BkDMX2Q6XWRcciwWJrutqQwg1VIho+b0zmAnkuPXNIN7qD5abz8oB9WlQIC7a
+         K5pIuTY7Q8XeYj2LvkzZF4IfnEEnEiXJh+7BaowVbXwlABhkjp5lf7tXJ/k8tcwF2hKM
+         +Bdd7Djmbqhh9ABzN+U9d16NvjsAvjf+X2NXKUrNzjFHq3hwT5h1LCUxBjRgpWuZdvdW
+         JREA==
+X-Gm-Message-State: AOAM531zfGJAAxxCBR8M+CxkdiO1UCBEFfhhID4GMCKAwXcXQvNFRx42
+        H0xY7Ny8enXZGybOm5/qHWn2tgHzwe4=
+X-Google-Smtp-Source: ABdhPJzdGSeC0T86+jtLCBMRqiGhNV3/FHNY2wGn3K9xEccz0doOK8gB6KaZW9JbCCwx6YGNr20uXQ0Oukg=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
  (user=seanjc job=sendgmr) by 2002:a05:6a00:9a2:b0:505:974f:9fd6 with SMTP id
- u34-20020a056a0009a200b00505974f9fd6mr7734217pfg.12.1654217041266; Thu, 02
- Jun 2022 17:44:01 -0700 (PDT)
+ u34-20020a056a0009a200b00505974f9fd6mr7734316pfg.12.1654217043072; Thu, 02
+ Jun 2022 17:44:03 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:41:21 +0000
+Date:   Fri,  3 Jun 2022 00:41:22 +0000
 In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-15-seanjc@google.com>
+Message-Id: <20220603004331.1523888-16-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220603004331.1523888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 014/144] KVM: selftests: Add vcpu_get() to retrieve and
- assert on vCPU existence
+Subject: [PATCH v2 015/144] KVM: selftests: Make vm_ioctl() a wrapper to
+ pretty print ioctl name
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -72,191 +72,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add vcpu_get() to wrap vcpu_find() and deduplicate a pile of code that
-asserts the requested vCPU exists.
+Make vm_ioctl() a macro wrapper and print the _name_ of the ioctl on
+failure instead of the number.
+
+Deliberately do not use __stringify(), as that will expand the ioctl all
+the way down to its numerical sequence.  Again the intent is to print the
+name of the macro.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c    | 56 ++++++-------------
- .../selftests/kvm/lib/kvm_util_internal.h     |  2 +-
- .../selftests/kvm/lib/s390x/processor.c       |  5 +-
- .../selftests/kvm/lib/x86_64/processor.c      |  4 +-
- 4 files changed, 20 insertions(+), 47 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     | 38 ++++++++++---------
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 28 ++++----------
+ 2 files changed, 28 insertions(+), 38 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index c2dfc4341b31..39e1971e5d65 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -105,6 +105,27 @@ int open_kvm_dev_path_or_exit(void);
+ int kvm_check_cap(long cap);
+ int vm_check_cap(struct kvm_vm *vm, long cap);
+ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
++
++#define __KVM_SYSCALL_ERROR(_name, _ret) \
++	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
++
++#define __KVM_IOCTL_ERROR(_name, _ret)	__KVM_SYSCALL_ERROR(_name, _ret)
++#define KVM_IOCTL_ERROR(_ioctl, _ret) __KVM_IOCTL_ERROR(#_ioctl, _ret)
++
++int __kvm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg);
++void kvm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg);
++
++int __vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg);
++void _vm_ioctl(struct kvm_vm *vm, unsigned long cmd, const char *name, void *arg);
++#define vm_ioctl(vm, cmd, arg) _vm_ioctl(vm, cmd, #cmd, arg)
++
++int __vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long cmd,
++		 void *arg);
++void _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long cmd,
++		 const char *name, void *arg);
++#define vcpu_ioctl(vm, vcpuid, cmd, arg) \
++	_vcpu_ioctl(vm, vcpuid, cmd, #cmd, arg)
++
+ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
+ const char *vm_guest_mode_string(uint32_t i);
+ 
+@@ -156,23 +177,6 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+ 	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+ 	uint32_t flags);
+ 
+-#define __KVM_SYSCALL_ERROR(_name, _ret) \
+-	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
+-
+-#define __KVM_IOCTL_ERROR(_name, _ret)	__KVM_SYSCALL_ERROR(_name, _ret)
+-#define KVM_IOCTL_ERROR(_ioctl, _ret) __KVM_IOCTL_ERROR(#_ioctl, _ret)
+-
+-void _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
+-		 const char *name, void *arg);
+-int __vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
+-		 void *arg);
+-#define vcpu_ioctl(vm, vcpuid, ioctl, arg) \
+-	_vcpu_ioctl(vm, vcpuid, ioctl, #ioctl, arg)
+-
+-void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+-int __vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg);
+-void kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+-int __kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
+ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 73123b9d9625..940decfaa633 100644
+index 940decfaa633..7eedd9ff20fa 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -561,23 +561,7 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
- 	return &region->region;
+@@ -1690,32 +1690,18 @@ void *vcpu_map_dirty_ring(struct kvm_vm *vm, uint32_t vcpuid)
+ 	return vcpu->dirty_gfns;
  }
  
 -/*
-- * VCPU Find
+- * VM Ioctl
 - *
 - * Input Args:
 - *   vm - Virtual Machine
-- *   vcpuid - VCPU ID
+- *   cmd - Ioctl number
+- *   arg - Argument to pass to the ioctl
 - *
-- * Output Args: None
+- * Return: None
 - *
-- * Return:
-- *   Pointer to VCPU structure
-- *
-- * Locates a vcpu structure that describes the VCPU specified by vcpuid and
-- * returns a pointer to it.  Returns NULL if the VM doesn't contain a VCPU
-- * for the specified vcpuid.
+- * Issues an arbitrary ioctl on a VM fd.
 - */
--struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
-+static struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
+-void vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
+-{
+-	int ret;
+-
+-	ret = __vm_ioctl(vm, cmd, arg);
+-	TEST_ASSERT(ret == 0, "vm ioctl %lu failed, rc: %i errno: %i (%s)",
+-		cmd, ret, errno, strerror(errno));
+-}
+-
+ int __vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
  {
- 	struct vcpu *vcpu;
- 
-@@ -589,6 +573,14 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
- 	return NULL;
+ 	return ioctl(vm->fd, cmd, arg);
  }
  
-+struct vcpu *vcpu_get(struct kvm_vm *vm, uint32_t vcpuid)
++void _vm_ioctl(struct kvm_vm *vm, unsigned long cmd, const char *name, void *arg)
 +{
-+	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
++	int ret = __vm_ioctl(vm, cmd, arg);
 +
-+	TEST_ASSERT(vcpu, "vCPU %d does not exist", vcpuid);
-+	return vcpu;
++	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));
 +}
 +
  /*
-  * VM VCPU Remove
+  * KVM system ioctl
   *
-@@ -1568,8 +1560,7 @@ void vm_create_irqchip(struct kvm_vm *vm)
-  */
- struct kvm_run *vcpu_state(struct kvm_vm *vm, uint32_t vcpuid)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
--	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 
- 	return vcpu->state;
- }
-@@ -1610,11 +1601,9 @@ int _vcpu_run(struct kvm_vm *vm, uint32_t vcpuid)
- 
- void vcpu_run_complete_io(struct kvm_vm *vm, uint32_t vcpuid)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 	int ret;
- 
--	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
--
- 	vcpu->state->immediate_exit = 1;
- 	ret = __vcpu_run(vm, vcpuid);
- 	vcpu->state->immediate_exit = 0;
-@@ -1656,14 +1645,9 @@ struct kvm_reg_list *vcpu_get_reg_list(struct kvm_vm *vm, uint32_t vcpuid)
- int __vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid,
- 		 unsigned long cmd, void *arg)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
--	int ret;
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 
--	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
--
--	ret = ioctl(vcpu->fd, cmd, arg);
--
--	return ret;
-+	return ioctl(vcpu->fd, cmd, arg);
- }
- 
- void _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long cmd,
-@@ -1676,15 +1660,11 @@ void _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long cmd,
- 
- void *vcpu_map_dirty_ring(struct kvm_vm *vm, uint32_t vcpuid)
- {
--	struct vcpu *vcpu;
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 	uint32_t size = vm->dirty_ring_size;
- 
- 	TEST_ASSERT(size > 0, "Should enable dirty ring first");
- 
--	vcpu = vcpu_find(vm, vcpuid);
--
--	TEST_ASSERT(vcpu, "Cannot find vcpu %u", vcpuid);
--
- 	if (!vcpu->dirty_gfns) {
- 		void *addr;
- 
-@@ -1840,9 +1820,7 @@ int kvm_device_access(int dev_fd, uint32_t group, uint64_t attr,
- int _vcpu_has_device_attr(struct kvm_vm *vm, uint32_t vcpuid, uint32_t group,
- 			  uint64_t attr)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
--
--	TEST_ASSERT(vcpu, "nonexistent vcpu id: %d", vcpuid);
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 
- 	return _kvm_device_check_attr(vcpu->fd, group, attr);
- }
-@@ -1859,9 +1837,7 @@ int vcpu_has_device_attr(struct kvm_vm *vm, uint32_t vcpuid, uint32_t group,
- int _vcpu_access_device_attr(struct kvm_vm *vm, uint32_t vcpuid, uint32_t group,
- 			     uint64_t attr, void *val, bool write)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
--
--	TEST_ASSERT(vcpu, "nonexistent vcpu id: %d", vcpuid);
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 
- 	return _kvm_device_access(vcpu->fd, group, attr, val, write);
- }
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-index a03febc24ba6..0c7c44499129 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-+++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-@@ -69,7 +69,7 @@ struct kvm_vm {
- 	uint32_t dirty_ring_size;
- };
- 
--struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid);
-+struct vcpu *vcpu_get(struct kvm_vm *vm, uint32_t vcpuid);
- 
- /*
-  * Virtual Translation Tables Dump
-diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-index f87c7137598e..7cc1051c4b71 100644
---- a/tools/testing/selftests/kvm/lib/s390x/processor.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-@@ -208,10 +208,7 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
- 
- void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
--
--	if (!vcpu)
--		return;
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 
- 	fprintf(stream, "%*spstate: psw: 0x%.16llx:0x%.16llx\n",
- 		indent, "", vcpu->state->psw_mask, vcpu->state->psw_addr);
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 27c40b5ab01d..bd9d1b63b848 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -996,7 +996,7 @@ static int vcpu_save_xsave_state(struct kvm_vm *vm, struct vcpu *vcpu,
- 
- struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 	struct kvm_msr_list *list;
- 	struct kvm_x86_state *state;
- 	int nmsrs, r, i;
-@@ -1079,7 +1079,7 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
- 
- void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *state)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-+	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
- 	int r;
- 
- 	r = ioctl(vcpu->fd, KVM_SET_SREGS, &state->sregs);
 -- 
 2.36.1.255.ge46751e96f-goog
 
