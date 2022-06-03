@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91F2A53C4EF
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:34:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD3A253C4F6
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:34:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241521AbiFCGdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 02:33:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34330 "EHLO
+        id S241517AbiFCGdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 02:33:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241502AbiFCGdu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S241498AbiFCGdu (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 3 Jun 2022 02:33:50 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D3E2BF3;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A6C2BFB;
         Thu,  2 Jun 2022 23:33:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=hL0qdlLPGNQz2kcCUdvTM+8nVVuLUSOHVZ6rpwpj6XQ=; b=cx8RDfp916tlLF3pTFkj5FrxxT
-        x4mU0pdjLgE9NDq/gNV9kW4C7Sl5ymhOhYci8q56Y0Abq1fX/ugAweHbdLhHEEMxwBiCjn4X1Vnac
-        nWfThUw5aV83/kwdEILRoXV04JStwiNsoS7EiEQO/FIh5nAhA5ZLvitrs9t1Vabeo2zt/HdYFJbWf
-        SEAPqz1E7vstMdzPdyqSAnwS6WeRoZkeHwHHV7SRoIzSJVaH1lKD5RE+Z39O5gJdIxDMUbLA12hHM
-        omr/SgPFD/QD4xm/Z9XuFPkigPAGaYIYeuR+f3guiuHKBssELETv+f7Q4EVaOdsPaQRNu0O6cafnl
-        WH4hdGrQ==;
+        bh=vl3AAzeMI7BX2u/O8kPSzZJJV5eD7Q+Y9ihN+xpp9yg=; b=CsHm8to1EmyLTpAfY85bRBD2Fs
+        1aW45wyOFtxDv3FRvHCuMQqIwQzpkB0OMVIa6IA8gt3SWx9s6iLQvCqKijS8GSglca6BboBYVLkaR
+        OHwXTpn3u2cMEhiC4KgccEWxL0nCRZbhUihE3OndKfZMDdrDsDRv87gpfuMo/ksIuoo9zfBRGNi8b
+        SnxD5AgNIvRiRpeTQOCcUXVGQUrD0wQGvVLmiqVJ8iOLKBj+NxBQHY45ut8kDM3gi0gPhuANrERVb
+        mQA9at7o2Y8kdKmlijG8KmGJjI7j+g7jxf520CCfjCKlyzFk5l3nBAH5MjZpiyLWgvCio/3AZOk/k
+        fp6p+uAQ==;
 Received: from [2001:4bb8:185:a81e:b29a:8b56:eb9a:ca3b] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nx0sS-00612w-G3; Fri, 03 Jun 2022 06:33:45 +0000
+        id 1nx0sV-00614B-91; Fri, 03 Jun 2022 06:33:47 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -39,9 +39,9 @@ To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         intel-gvt-dev@lists.freedesktop.org
-Subject: [PATCH 5/8] vfio/mdev: remove mdev_from_dev
-Date:   Fri,  3 Jun 2022 08:33:25 +0200
-Message-Id: <20220603063328.3715-6-hch@lst.de>
+Subject: [PATCH 6/8] vfio/mdev: unexport mdev_bus_type
+Date:   Fri,  3 Jun 2022 08:33:26 +0200
+Message-Id: <20220603063328.3715-7-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220603063328.3715-1-hch@lst.de>
 References: <20220603063328.3715-1-hch@lst.de>
@@ -58,45 +58,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just open code it in the only caller.
+mdev_bus_type is only used in mdev.ko now, so unexport it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/vfio/mdev/mdev_core.c | 6 ++----
- include/linux/mdev.h          | 4 ----
- 2 files changed, 2 insertions(+), 8 deletions(-)
+ drivers/vfio/mdev/mdev_driver.c  | 1 -
+ drivers/vfio/mdev/mdev_private.h | 1 +
+ include/linux/mdev.h             | 2 --
+ 3 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 34b01d45cfe9f..3575e893b5e43 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -56,10 +56,8 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
+diff --git a/drivers/vfio/mdev/mdev_driver.c b/drivers/vfio/mdev/mdev_driver.c
+index 9c2af59809e2e..dde6adf23b1db 100644
+--- a/drivers/vfio/mdev/mdev_driver.c
++++ b/drivers/vfio/mdev/mdev_driver.c
+@@ -47,7 +47,6 @@ struct bus_type mdev_bus_type = {
+ 	.remove		= mdev_remove,
+ 	.match		= mdev_match,
+ };
+-EXPORT_SYMBOL_GPL(mdev_bus_type);
  
- static int mdev_device_remove_cb(struct device *dev, void *data)
- {
--	struct mdev_device *mdev = mdev_from_dev(dev);
--
--	if (mdev)
--		mdev_device_remove_common(mdev);
-+	if (dev->bus == &mdev_bus_type)
-+		mdev_device_remove_common(to_mdev_device(dev));
- 	return 0;
- }
+ /**
+  * mdev_register_driver - register a new MDEV driver
+diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
+index 277819f1ebed8..3ecd6ae1dfa7c 100644
+--- a/drivers/vfio/mdev/mdev_private.h
++++ b/drivers/vfio/mdev/mdev_private.h
+@@ -13,6 +13,7 @@
+ int  mdev_bus_register(void);
+ void mdev_bus_unregister(void);
  
++extern struct bus_type mdev_bus_type;
+ extern const struct attribute_group *mdev_device_groups[];
+ 
+ #define to_mdev_type_attr(_attr)	\
 diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index cbb53dcd20d9d..5811b5a52a511 100644
+index 5811b5a52a511..f92b4d8edf0e8 100644
 --- a/include/linux/mdev.h
 +++ b/include/linux/mdev.h
-@@ -102,9 +102,5 @@ static inline struct device *mdev_dev(struct mdev_device *mdev)
- {
- 	return &mdev->dev;
+@@ -88,8 +88,6 @@ static inline const guid_t *mdev_uuid(struct mdev_device *mdev)
+ 	return &mdev->uuid;
  }
--static inline struct mdev_device *mdev_from_dev(struct device *dev)
--{
--	return dev->bus == &mdev_bus_type ? to_mdev_device(dev) : NULL;
--}
  
- #endif /* MDEV_H */
+-extern struct bus_type mdev_bus_type;
+-
+ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
+ 		struct mdev_driver *mdev_driver);
+ void mdev_unregister_parent(struct mdev_parent *parent);
 -- 
 2.30.2
 
