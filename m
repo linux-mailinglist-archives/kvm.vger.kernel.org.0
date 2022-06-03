@@ -2,73 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF2E353CA88
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 15:16:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1352053CA8A
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 15:18:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244570AbiFCNQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 09:16:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33654 "EHLO
+        id S244574AbiFCNSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 09:18:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240900AbiFCNQE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 09:16:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ED5CB2DABE
-        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 06:16:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654262162;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MH2scvBBwX2fuow843mcd5jaHPxh8wTpF/D08FcZ/58=;
-        b=Ehg/8kGSxcW5joG5Q8HaqYzgmWRk1KlxFmenbuOTt34YjjWOeNluqjJAIZ5Mz16z3rubzB
-        zZT7kvcn03dzRpi2ezbOIeoyIj5IGPa6EXM5SfZFNkycoswii17LulC66Vz8Y1rhLqLA0r
-        Mij0GSyVrb4sKiQgsAYkX43xzkJF1PM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-497-eFARp6-rNZCZ_GoXroFwmQ-1; Fri, 03 Jun 2022 09:16:00 -0400
-X-MC-Unique: eFARp6-rNZCZ_GoXroFwmQ-1
-Received: by mail-ed1-f71.google.com with SMTP id g3-20020a056402320300b0042dc956d80eso5429574eda.14
-        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 06:16:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MH2scvBBwX2fuow843mcd5jaHPxh8wTpF/D08FcZ/58=;
-        b=aubFzQ4lRA+gWKrutsTfo7mUq8xj45AUjzYmB1Yk3hmuUDu8NDSQ7LsvybO+CNkWih
-         JeuBf2eGY/xf4IhX11ZqjaMRkdjbnnWy4gWvGJBlwfh4lQx2LR8cooQQwzYTnSWC2Dew
-         x47YTMupejAL4twHTVIXBs9BXNCxGWiPPghGjuTEugeqgIZsXwvxl+DcZVyTu5dl53+H
-         jFZPObi+ENFcWz5j0wzjaGuPipTK6o9TUrMiOkPeZYiiqmR/oLhKnfq+7nyh14q3uyT7
-         vJJSuQ1eXDRpjQ8uQmMomlaetg3Yam0bmNwRgueBn2qqHgHxYztkeEIiRqa3IRoNEkUD
-         dTog==
-X-Gm-Message-State: AOAM5319vM5iCuXTqhzpzty3XmfavH/erzucU9zEVLIw1bAYoV9nGRJ6
-        O/Uku9j18w3/FPF7zHpxyHRb8Vx954P5dkEAayTrB2KsdfG+mD1v7XN8PqF9mAuSOi1fVxaJ6P6
-        20MVGdYj7N/Qw
-X-Received: by 2002:a17:906:7309:b0:6f5:ea1:afa with SMTP id di9-20020a170906730900b006f50ea10afamr8534163ejc.170.1654262159837;
-        Fri, 03 Jun 2022 06:15:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz79ueKCiWsLFOON/G0BcUne2EIFwbuu9JFxJApJ4p5WvovOxGiq9XIOe53FbkqghLv6bJ7lA==
-X-Received: by 2002:a17:906:7309:b0:6f5:ea1:afa with SMTP id di9-20020a170906730900b006f50ea10afamr8534151ejc.170.1654262159651;
-        Fri, 03 Jun 2022 06:15:59 -0700 (PDT)
-Received: from gator (cst2-175-76.cust.vodafone.cz. [31.30.175.76])
-        by smtp.gmail.com with ESMTPSA id g9-20020aa7c849000000b0042a2d9af0f8sm3848539edt.79.2022.06.03.06.15.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jun 2022 06:15:59 -0700 (PDT)
-Date:   Fri, 3 Jun 2022 15:15:57 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
-        alex.bennee@linaro.org
-Subject: Re: [PATCH kvm-unit-tests] arm64: TCG: Use max cpu type
-Message-ID: <20220603131557.onhq5h5tt4f57vfn@gator>
-References: <20220603111356.1480720-1-drjones@redhat.com>
- <87v8ti7xah.fsf@redhat.com>
+        with ESMTP id S240900AbiFCNSM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 09:18:12 -0400
+Received: from smarthost1.sentex.ca (smarthost1.sentex.ca [IPv6:2607:f3e0:0:1::12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA3D913F7C
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 06:18:10 -0700 (PDT)
+Received: from pyroxene2a.sentex.ca (pyroxene19.sentex.ca [199.212.134.19])
+        by smarthost1.sentex.ca (8.16.1/8.16.1) with ESMTPS id 253DI6Iw017522
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 3 Jun 2022 09:18:07 -0400 (EDT)
+        (envelope-from mike@sentex.net)
+Received: from [IPV6:2607:f3e0:0:4:f415:e14:2b55:3cca] ([IPv6:2607:f3e0:0:4:f415:e14:2b55:3cca])
+        by pyroxene2a.sentex.ca (8.16.1/8.15.2) with ESMTPS id 253DI64J011942
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Fri, 3 Jun 2022 09:18:06 -0400 (EDT)
+        (envelope-from mike@sentex.net)
+Message-ID: <ce81de90-3dd1-1e8a-6a8f-b1c18310cb08@sentex.net>
+Date:   Fri, 3 Jun 2022 09:18:07 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v8ti7xah.fsf@redhat.com>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: Guest migration between different Ryzen CPU generations
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
+        Leonardo Bras <leobras@redhat.com>
+References: <48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net>
+ <20220602144200.1228b7bb@redhat.com>
+ <489ddcdf-e38f-ea51-6f90-8c17358da61d@sentex.net>
+ <Ypkvu6l5sxyuP6iM@google.com>
+From:   mike tancsa <mike@sentex.net>
+In-Reply-To: <Ypkvu6l5sxyuP6iM@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 64.7.153.18
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,56 +52,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 03, 2022 at 02:21:10PM +0200, Cornelia Huck wrote:
-> On Fri, Jun 03 2022, Andrew Jones <drjones@redhat.com> wrote:
-> 
-> > The max cpu type is a better default cpu type for running tests
-> > with TCG as it provides the maximum possible feature set. Also,
-> > the max cpu type was introduced in QEMU v2.12, so we should be
-> > safe to switch to it at this point.
-> >
-> > There's also a 32-bit arm max cpu type, but we leave the default
-> > as cortex-a15, because compilation requires we specify for which
-> > processor we want to compile and there's no such thing as a 'max'.
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  configure | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/configure b/configure
-> > index 5b7daac3c6e8..1474dde2c70d 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -223,7 +223,7 @@ fi
-> >  [ -z "$processor" ] && processor="$arch"
-> >  
-> >  if [ "$processor" = "arm64" ]; then
-> > -    processor="cortex-a57"
-> > +    processor="max"
-> >  elif [ "$processor" = "arm" ]; then
-> >      processor="cortex-a15"
-> >  fi
-> 
-> This looks correct, but the "processor" usage is confusing, as it seems
-> to cover two different things:
-> 
-> - what processor to compile for; this is what configure help claims
->   "processor" is used for, but it only seems to have that effect on
->   32-bit arm
-> - which cpu model to use for tcg on 32-bit and 64-bit arm (other archs
->   don't seem to care)
-> 
-> So, I wonder whether it would be less confusing to drop setting
-> "processor" for arm64, and set the cpu models for tcg in arm/run (if
-> none have been specified)?
+On 6/2/2022 5:46 PM, Sean Christopherson wrote:
+> On Thu, Jun 02, 2022, mike tancsa wrote:
+>> On 6/2/2022 8:42 AM, Igor Mammedov wrote:
+>>> On Tue, 31 May 2022 13:00:07 -0400
+>>> mike tancsa <mike@sentex.net> wrote:
+>>>
+>>>> Hello,
+>>>>
+>>>>        I have been using kvm since the Ubuntu 18 and 20.x LTS series of
+>>>> kernels and distributions without any issues on a whole range of Guests
+>>>> up until now. Recently, we spun up an Ubuntu LTS 22 hypervisor to add to
+>>>> the mix and eventually upgrade to. Hardware is a series of Ryzen 7 CPUs
+>>>> (3700x).  Migrations back and forth without issue for Ubuntu 20.x
+>>>> kernels.  The first Ubuntu 22 machine was on identical hardware and all
+>>>> was good with that too. The second Ubuntu 22 based machine was spun up
+>>>> with a newer gen Ryzen, a 5800x.  On the initial kernel version that
+>>>> came with that release back in April, migrations worked as expected
+>>>> between hardware as well as different kernel versions and qemu / KVM
+>>>> versions that come default with the distribution. Not sure if migrations
+>>>> between kernel and KVM versions "accidentally" worked all these years,
+>>>> but they did.  However, we ran into an issue with the kernel
+>>>> 5.15.0-33-generic (possibly with 5.15.0-30 as well) thats part of
+>>>> Ubuntu.  Migrations no longer worked to older generation CPUs.  I could
+>>>> send a guest TO the box and all was fine, but upon sending the guest to
+>>>> another hypervisor, the sender would see it as successfully migrated,
+>>>> but the VM would typically just hang, with 100% CPU utilization, or
+>>>> sometimes crash.  I tried a 5.18 kernel from May 22nd and again the
+>>>> behavior is different. If I specify the CPU as EPYC or EPYC-IBPB, I can
+>>>> migrate back and forth.
+>>> perhaps you are hitting issue fixed by:
+>>> https://lore.kernel.org/lkml/CAJ6HWG66HZ7raAa+YK0UOGLF+4O3JnzbZ+a-0j8GNixOhLk9dA@mail.gmail.com/T/
+>>>
+>> Thanks for the response. I am not sure.
+> I suspect Igor is right.  PKRU/PKU, the offending XSAVE feature in that bug, is
+> in the "new in 5800" list below, and that bug fix went into v5.17, i.e. should
+> also be fixed in v5.18.
 >
+> Unfortunately, there's no Fixes: provided and I'm having a hell of a time trying
+> to figure out when the bug was actually introduced.  The v5.15 code base is quite
+> different due to a rather massive FPU rework in v5.16.  That fix definitely would
+> not apply cleanly, but it doesn't mean that the underlying root cause is different,
+> e.g. the buggy code could easily have been lurking for multiple kernel versions
+> before the rework in v5.16.
+>> That patch is from Feb. Would the bug have been introduced sometime in May to
+>> the 5.15 kernel than Ubuntu 22 would have tracked ?
+> Dates don't necessarily mean a whole lot when it comes to stable kernels, e.g.
+> it's not uncommon for a change to be backported to a stable kernel weeks/months
+> after it initially landed in the upstream tree.
+>
+> Is moving to v5.17 or later an option for you?  If not, what was the "original"
+> Ubuntu 22 kernel version that worked?  Ideally, assuming it's the same FPU/PKU bug,
+> the fix would be backported to v5.15, but that's likely going to be quite difficult,
+> especially without knowing exactly which commit introduced the bug.
 
-Good observation, Conny. So, I should probably leave configure alone,
-cortex-a57 is a reasonable processor to compile for, max is based off
-that. Then, I can select max in arm/run for both arm and arm64 tests
-instead of using processor there.
+Thanks Sean, I can, but it just means adjusting our work flow a bit. For 
+our hypervisors we like to just track LTS and be conservative in what 
+software we install and stick with apps and kernels designed 
+specifically to work with that release / distribution. The Ubuntu 22 
+kernel that worked back in April was 5.15.0-25-generic.  TBH, if I am 
+told we were just lucky things worked with different hardware and 
+different kernels and KVM versions (ie. migrating bidirectionally from 
+ubuntu 20.x to 22.x) I would be fine with that too.  But I was a little 
+surprised that a kernel version bump from 5.15 would break what was working.
 
-Thanks,
-drew
+     ---Mike
 
