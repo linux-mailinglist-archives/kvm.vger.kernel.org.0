@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 034A753C245
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A827553C1F4
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240541AbiFCAtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51978 "EHLO
+        id S236093AbiFCAtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 20:49:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240540AbiFCArS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S240554AbiFCArS (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 2 Jun 2022 20:47:18 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29A537BE4
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:46:37 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id d12-20020a17090a628c00b001dcd2efca39so3409457pjj.2
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:46:37 -0700 (PDT)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7CAB37BEA
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:46:39 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-30c2aa26ebfso56182247b3.4
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:46:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=xV0OiLRCHqudRNEysLkkO2A2dnBTdPUxCAZlFyVIwps=;
-        b=dEnAKM7xLzaZZVb2euUZW7T1W7QtJ+y3oL0XwsfKifi7vRFVpm+WI+vj58SRZaKjjg
-         RRYB68BvOPoSJnuNcTu/iALbsCgLufgUCBP0F04IABAIETTkkTfGxmHmhyIIsVxlItSY
-         RKyaT2PwunfBlJ37KvTSpYcpUcBatajiJHE12r672csUqBxcCcl2tbYrXNSBZAl6v6dd
-         8BNDcyLdWgK5l/uoZqntWYvxA6uKj1lEnnOXhCNBkX74sQiniRuUZ98oJ9PkbIkjXQDL
-         JzIhpVsQGbj43N9nyOOE6WNDKPTXk9Hy6bVxCNqGUhSJX3aAxm1gtx78haMs211Rf8PA
-         Pdjg==
+        bh=nwpIHFQX6bIx9Rx7ondeFtBzA5WapdNNWqy57e0aKA8=;
+        b=FyIlQRwPfmqKsqrE7quDcR8awWT3UmsUImPooyFlHvhqVsIaqTGDl0Gh980dbCxf1Z
+         Ctu/k13cV9PWMYw9MUHgipu2xMt1LBxP6Jt6hW274F7I+956ZJYEweceVqSCTJn+WyQv
+         ZdlW5EsdlEI7zFjwBhgpBzzc1R8TygaA/JQC+0O2wwun3FddRmjq+PR+OohoL7stax5T
+         dZVCG5pHSRCzdMd5lPDlh0FSH3+bFzsk/VQijf+532vtwsfzkEtrzepnzM2AHHsK8N2p
+         k9UCiyJcQx0PMB7YqQ2D1MIhJ7Ba9jH3wYnZba8HwKyhwPRUUFz5KE5B3SPYKTInGA5W
+         olkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=xV0OiLRCHqudRNEysLkkO2A2dnBTdPUxCAZlFyVIwps=;
-        b=53uEitBKm2AYMtiWKbOqY2/r1/F4z5l8PyvM4kUM7i6ZQ1cYI33PArh9qWKth04OPV
-         5PCcnok2gNGhAwV88s5zfZphB+4yDPlWKoYhqYTSthoOi3mryghx3FB7q4PoRV+16VHp
-         CXU5bhGAr1lyLzSrVPXymwT+3UfEMp5t3JkPr+z1Muu1IjvOUXalADy9xXyYNTymUGPt
-         Ld4E8uRqzhj6utw4Ae0q71jZTw/cNp/i79sSyP1q4NUAt25rVZsGWGfbkFOg9Vs7WrCW
-         AE0OBGYItk4n3KGbGbu4atPPgahoYn1khx6EPtT2ziDCcNSyEMFILAmXpVA85w9Wt3tf
-         Uo3g==
-X-Gm-Message-State: AOAM532TAL3UzClSSbH59tWuBn4HfdUCKnt/e98mVO49fZXOFCgcNKcI
-        D39so1Ouznm1KssTmpY8NIMCNt06Q7I=
-X-Google-Smtp-Source: ABdhPJxoPo7NyZsR9Ehgz3xRJi4kvK0cVqDPzT9MsPPKWvSY8AKEzWIErjzCR+wJ+QSU76O9YDwXlaAyExs=
+        bh=nwpIHFQX6bIx9Rx7ondeFtBzA5WapdNNWqy57e0aKA8=;
+        b=SykURh7Snjr2jyIPi+qywIHh28Qv4JDu/9y/IvXiSp7UVPyQPLi50TyN1mQ658w8U/
+         2bCUOcKDhXbIlGX/yFoywKvGqgR6sAJPS2cnV1+4PuFXYLP6L2QoFms8NEx6/5g5NX/4
+         GiPzupcEhFgSCHp377xTs0aUUzz6t84iuo6lC/Bh+i4wkfpOdimcdEXTbHxyjsUSIF3/
+         G4OB1SPv59UbD+2p+WFPnUwBzNDAo2LiG1bk6JriZUpBAovAZzE+PwsZMaamTFJ05kDl
+         wP6iI7ezRoQD7rZTVgszOLLpOr0hBKDQJNyrOyrZMgVRzTpP0bwcwZ9JNNRYI6KL9SWb
+         ys4w==
+X-Gm-Message-State: AOAM532hDi/dYbFYK/A5iV/UbyhllPNMINMuxmuMT0izP9qRlnH0JiSM
+        4KV+DyiioXj6xbEAeXgvpy+PWK65G4Q=
+X-Google-Smtp-Source: ABdhPJwbX/4lLeY45UQYNLQdpSJFtAZ4e2m/6f5C1L1zlcmlgPsqQIPsB7anu1wZK3xwZiOZmvMlPIwoah0=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:aa7:864b:0:b0:518:796a:f9bb with SMTP id
- a11-20020aa7864b000000b00518796af9bbmr7764802pfo.9.1654217197246; Thu, 02 Jun
- 2022 17:46:37 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1285:b0:649:ae47:176a with SMTP id
+ i5-20020a056902128500b00649ae47176amr8447218ybu.40.1654217199104; Thu, 02 Jun
+ 2022 17:46:39 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:42:47 +0000
+Date:   Fri,  3 Jun 2022 00:42:48 +0000
 In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-101-seanjc@google.com>
+Message-Id: <20220603004331.1523888-102-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220603004331.1523888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 100/144] KVM: selftests: Add "arch" to common utils that
- have arch implementations
+Subject: [PATCH v2 101/144] KVM: selftests: Return created vcpu from vm_vcpu_add_default()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -65,501 +64,297 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add "arch" into the name of utility functions that are declared in common
-code, but (surprise!) have arch-specific implementations.  Shuffle code
-around so that all such helpers' declarations are bundled together.
+Return the created 'struct kvm_vcpu' object from vm_vcpu_add_default(),
+which cleans up a few tests and will eventually allow removing vcpu_get()
+entirely.
+
+Opportunistically rename @vcpuid to @vcpu_id to follow preferred kernel
+style.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     | 200 ++++++++++--------
- .../selftests/kvm/lib/aarch64/processor.c     |  12 +-
- .../selftests/kvm/lib/riscv/processor.c       |  12 +-
- .../selftests/kvm/lib/s390x/processor.c       |  12 +-
- .../selftests/kvm/lib/x86_64/processor.c      |  12 +-
- 5 files changed, 141 insertions(+), 107 deletions(-)
+ .../selftests/kvm/include/aarch64/processor.h |  5 +++--
+ .../selftests/kvm/include/kvm_util_base.h     | 10 ++++++----
+ .../selftests/kvm/lib/aarch64/processor.c     | 20 +++++++++++--------
+ .../selftests/kvm/lib/riscv/processor.c       | 20 +++++++++++--------
+ .../selftests/kvm/lib/s390x/processor.c       | 18 ++++++++++-------
+ .../selftests/kvm/lib/x86_64/processor.c      | 20 +++++++++++--------
+ .../kvm/x86_64/pmu_event_filter_test.c        |  4 +---
+ .../selftests/kvm/x86_64/tsc_scaling_sync.c   |  3 +--
+ 8 files changed, 58 insertions(+), 42 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 4d2d474b6874..9dad391b4fec 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -64,8 +64,9 @@ static inline void set_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t id, uint
+ }
+ 
+ void aarch64_vcpu_setup(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_vcpu_init *init);
+-void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
+-			      struct kvm_vcpu_init *init, void *guest_code);
++struct kvm_vcpu *aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpu_id,
++					  struct kvm_vcpu_init *init,
++					  void *guest_code);
+ 
+ struct ex_regs {
+ 	u64 regs[31];
 diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 5426de96e169..c7abe48d07cb 100644
+index c7abe48d07cb..622b09ec23dd 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -95,23 +95,6 @@ struct kvm_vm {
+@@ -656,12 +656,14 @@ static inline void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid,
+  *   vcpuid - The id of the VCPU to add to the VM.
+  *   guest_code - The vCPU's entry point
+  */
+-void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code);
++struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
++				  void *guest_code);
  
- struct kvm_vcpu *vcpu_get(struct kvm_vm *vm, uint32_t vcpuid);
- 
--/*
-- * Virtual Translation Tables Dump
-- *
-- * Input Args:
-- *   stream - Output FILE stream
-- *   vm     - Virtual Machine
-- *   indent - Left margin indent amount
-- *
-- * Output Args: None
-- *
-- * Return: None
-- *
-- * Dumps to the FILE stream given by @stream, the contents of all the
-- * virtual translation tables for the VM given by @vm.
-- */
--void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent);
--
- struct userspace_mem_region *
- memslot2region(struct kvm_vm *vm, uint32_t memslot);
- 
-@@ -291,25 +274,6 @@ static inline int vm_get_stats_fd(struct kvm_vm *vm)
- 	return fd;
+-static inline void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
+-				       void *guest_code)
++static inline struct kvm_vcpu *vm_vcpu_add_default(struct kvm_vm *vm,
++						   uint32_t vcpu_id,
++						   void *guest_code)
+ {
+-	vm_arch_vcpu_add(vm, vcpuid, guest_code);
++	return vm_arch_vcpu_add(vm, vcpu_id, guest_code);
  }
  
--/*
-- * VM VCPU Dump
-- *
-- * Input Args:
-- *   stream - Output FILE stream
-- *   vm     - Virtual Machine
-- *   vcpuid - VCPU ID
-- *   indent - Left margin indent amount
-- *
-- * Output Args: None
-- *
-- * Return: None
-- *
-- * Dumps the current state of the VCPU specified by @vcpuid, within the VM
-- * given by @vm, to the FILE stream given by @stream.
-- */
--void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid,
--	       uint8_t indent);
--
- void vm_create_irqchip(struct kvm_vm *vm);
- 
- void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
-@@ -336,23 +300,6 @@ void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
- vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
- void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa);
- 
--/*
-- * Address Guest Virtual to Guest Physical
-- *
-- * Input Args:
-- *   vm - Virtual Machine
-- *   gva - VM virtual address
-- *
-- * Output Args: None
-- *
-- * Return:
-- *   Equivalent VM physical address
-- *
-- * Returns the VM physical address of the translated VM virtual
-- * address given by @gva.
-- */
--vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva);
--
- struct kvm_run *vcpu_state(struct kvm_vm *vm, uint32_t vcpuid);
- void vcpu_run(struct kvm_vm *vm, uint32_t vcpuid);
- int _vcpu_run(struct kvm_vm *vm, uint32_t vcpuid);
-@@ -569,26 +516,6 @@ void kvm_gsi_routing_write(struct kvm_vm *vm, struct kvm_irq_routing *routing);
- 
- const char *exit_reason_str(unsigned int exit_reason);
- 
--void virt_pgd_alloc(struct kvm_vm *vm);
--
--/*
-- * VM Virtual Page Map
-- *
-- * Input Args:
-- *   vm - Virtual Machine
-- *   vaddr - VM Virtual Address
-- *   paddr - VM Physical Address
-- *   memslot - Memory region slot for new virtual translation tables
-- *
-- * Output Args: None
-- *
-- * Return: None
-- *
-- * Within @vm, creates a virtual translation for the page starting
-- * at @vaddr to the page starting at @paddr.
-- */
--void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr);
--
- vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
- 			     uint32_t memslot);
- vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-@@ -657,16 +584,6 @@ static inline struct kvm_vm *vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
- 
- struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
- 
--/*
-- * Adds a vCPU with reasonable defaults (e.g. a stack)
-- *
-- * Input Args:
-- *   vm - Virtual Machine
-- *   vcpuid - The id of the VCPU to add to the VM.
-- *   guest_code - The vCPU's entry point
-- */
--void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code);
--
- unsigned int vm_get_page_size(struct kvm_vm *vm);
- unsigned int vm_get_page_shift(struct kvm_vm *vm);
- unsigned long vm_compute_max_gfn(struct kvm_vm *vm);
-@@ -705,4 +622,121 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
- 
- void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid);
- 
-+/*
-+ * VM VCPU Dump
-+ *
-+ * Input Args:
-+ *   stream - Output FILE stream
-+ *   vm     - Virtual Machine
-+ *   vcpuid - VCPU ID
-+ *   indent - Left margin indent amount
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Dumps the current state of the VCPU specified by @vcpuid, within the VM
-+ * given by @vm, to the FILE stream given by @stream.
-+ */
-+
-+void vcpu_arch_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid,
-+		    uint8_t indent);
-+
-+static inline void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid,
-+			     uint8_t indent)
-+{
-+	vcpu_arch_dump(stream, vm, vcpuid, indent);
-+}
-+
-+/*
-+ * Adds a vCPU with reasonable defaults (e.g. a stack)
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   vcpuid - The id of the VCPU to add to the VM.
-+ *   guest_code - The vCPU's entry point
-+ */
-+void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code);
-+
-+static inline void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
-+				       void *guest_code)
-+{
-+	vm_arch_vcpu_add(vm, vcpuid, guest_code);
-+}
-+
-+void virt_arch_pgd_alloc(struct kvm_vm *vm);
-+
-+static inline void virt_pgd_alloc(struct kvm_vm *vm)
-+{
-+	virt_arch_pgd_alloc(vm);
-+}
-+
-+/*
-+ * VM Virtual Page Map
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   vaddr - VM Virtual Address
-+ *   paddr - VM Physical Address
-+ *   memslot - Memory region slot for new virtual translation tables
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Within @vm, creates a virtual translation for the page starting
-+ * at @vaddr to the page starting at @paddr.
-+ */
-+void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr);
-+
-+static inline void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-+{
-+	virt_arch_pg_map(vm, vaddr, paddr);
-+}
-+
-+
-+/*
-+ * Address Guest Virtual to Guest Physical
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   gva - VM virtual address
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   Equivalent VM physical address
-+ *
-+ * Returns the VM physical address of the translated VM virtual
-+ * address given by @gva.
-+ */
-+vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva);
-+
-+static inline vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+{
-+	return addr_arch_gva2gpa(vm, gva);
-+}
-+
-+/*
-+ * Virtual Translation Tables Dump
-+ *
-+ * Input Args:
-+ *   stream - Output FILE stream
-+ *   vm     - Virtual Machine
-+ *   indent - Left margin indent amount
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Dumps to the FILE stream given by @stream, the contents of all the
-+ * virtual translation tables for the VM given by @vm.
-+ */
-+void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent);
-+
-+static inline void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-+{
-+	virt_arch_dump(stream, vm, indent);
-+}
-+
- #endif /* SELFTEST_KVM_UTIL_BASE_H */
+ void virt_arch_pgd_alloc(struct kvm_vm *vm);
 diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 2e73853f485e..d14579176e52 100644
+index d14579176e52..2b169b4ec29e 100644
 --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -74,7 +74,7 @@ static uint64_t __maybe_unused ptrs_per_pte(struct kvm_vm *vm)
- 	return 1 << (vm->page_shift - 3);
+@@ -314,25 +314,29 @@ void vcpu_arch_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t in
+ 		indent, "", pstate, pc);
  }
  
--void virt_pgd_alloc(struct kvm_vm *vm)
-+void virt_arch_pgd_alloc(struct kvm_vm *vm)
+-void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
+-			      struct kvm_vcpu_init *init, void *guest_code)
++struct kvm_vcpu *aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpu_id,
++					  struct kvm_vcpu_init *init,
++					  void *guest_code)
  {
- 	if (!vm->pgd_created) {
- 		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
-@@ -131,14 +131,14 @@ static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 	*ptep |= (attr_idx << 2) | (1 << 10) /* Access Flag */;
+ 	size_t stack_size = vm->page_size == 4096 ?
+ 					DEFAULT_STACK_PGS * vm->page_size :
+ 					vm->page_size;
+ 	uint64_t stack_vaddr = vm_vaddr_alloc(vm, stack_size,
+ 					      DEFAULT_ARM64_GUEST_STACK_VADDR_MIN);
++	struct kvm_vcpu *vcpu = vm_vcpu_add(vm, vcpu_id);
+ 
+-	vm_vcpu_add(vm, vcpuid);
+-	aarch64_vcpu_setup(vm, vcpuid, init);
++	aarch64_vcpu_setup(vm, vcpu_id, init);
+ 
+-	set_reg(vm, vcpuid, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
+-	set_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
++	set_reg(vm, vcpu_id, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
++	set_reg(vm, vcpu_id, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
++
++	return vcpu;
  }
  
--void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-+void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+-void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
++struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
++				  void *guest_code)
  {
- 	uint64_t attr_idx = 4; /* NORMAL (See DEFAULT_MAIR_EL1) */
- 
- 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
+-	aarch64_vcpu_add_default(vm, vcpuid, NULL, guest_code);
++	return aarch64_vcpu_add_default(vm, vcpu_id, NULL, guest_code);
  }
  
--vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- {
- 	uint64_t *ptep;
- 
-@@ -195,7 +195,7 @@ static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent, uint64_t p
- #endif
- }
- 
--void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-+void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- {
- 	int level = 4 - (vm->pgtable_levels - 1);
- 	uint64_t pgd, *ptep;
-@@ -303,7 +303,7 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_vcpu_init
- 	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpuid);
- }
- 
--void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-+void vcpu_arch_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
- {
- 	uint64_t pstate, pc;
- 
-@@ -330,7 +330,7 @@ void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
- 	set_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
- }
- 
--void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
-+void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
- {
- 	aarch64_vcpu_add_default(vm, vcpuid, NULL, guest_code);
- }
+ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
 diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-index 5ee8250dd74c..d70d5a4c5ad6 100644
+index d70d5a4c5ad6..5946101144eb 100644
 --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
 +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-@@ -53,7 +53,7 @@ static uint64_t pte_index(struct kvm_vm *vm, vm_vaddr_t gva, int level)
- 	return (gva & pte_index_mask[level]) >> pte_index_shift[level];
- }
- 
--void virt_pgd_alloc(struct kvm_vm *vm)
-+void virt_arch_pgd_alloc(struct kvm_vm *vm)
- {
- 	if (!vm->pgd_created) {
- 		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
-@@ -64,7 +64,7 @@ void virt_pgd_alloc(struct kvm_vm *vm)
- 	}
- }
- 
--void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-+void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- {
- 	uint64_t *ptep, next_ppn;
- 	int level = vm->pgtable_levels - 1;
-@@ -108,7 +108,7 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- 		PGTBL_PTE_PERM_MASK | PGTBL_PTE_VALID_MASK;
- }
- 
--vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- {
- 	uint64_t *ptep;
- 	int level = vm->pgtable_levels - 1;
-@@ -159,7 +159,7 @@ static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent,
- #endif
- }
- 
--void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-+void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- {
- 	int level = vm->pgtable_levels - 1;
- 	uint64_t pgd, *ptep;
-@@ -201,7 +201,7 @@ void riscv_vcpu_mmu_setup(struct kvm_vm *vm, int vcpuid)
- 	set_reg(vm, vcpuid, RISCV_CSR_REG(satp), satp);
- }
- 
--void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-+void vcpu_arch_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
- {
- 	struct kvm_riscv_core core;
- 
-@@ -274,7 +274,7 @@ static void __aligned(16) guest_unexp_trap(void)
+@@ -274,7 +274,8 @@ static void __aligned(16) guest_unexp_trap(void)
  		  0, 0, 0, 0, 0, 0);
  }
  
--void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
-+void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+-void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
++struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
++				  void *guest_code)
  {
  	int r;
  	size_t stack_size = vm->page_size == 4096 ?
+@@ -284,9 +285,10 @@ void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+ 					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN);
+ 	unsigned long current_gp = 0;
+ 	struct kvm_mp_state mps;
++	struct kvm_vcpu *vcpu;
+ 
+-	vm_vcpu_add(vm, vcpuid);
+-	riscv_vcpu_mmu_setup(vm, vcpuid);
++	vcpu = vm_vcpu_add(vm, vcpu_id);
++	riscv_vcpu_mmu_setup(vm, vcpu_id);
+ 
+ 	/*
+ 	 * With SBI HSM support in KVM RISC-V, all secondary VCPUs are
+@@ -294,23 +296,25 @@ void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+ 	 * are powered-on using KVM_SET_MP_STATE ioctl().
+ 	 */
+ 	mps.mp_state = KVM_MP_STATE_RUNNABLE;
+-	r = __vcpu_ioctl(vm, vcpuid, KVM_SET_MP_STATE, &mps);
++	r = __vcpu_ioctl(vm, vcpu_id, KVM_SET_MP_STATE, &mps);
+ 	TEST_ASSERT(!r, "IOCTL KVM_SET_MP_STATE failed (error %d)", r);
+ 
+ 	/* Setup global pointer of guest to be same as the host */
+ 	asm volatile (
+ 		"add %0, gp, zero" : "=r" (current_gp) : : "memory");
+-	set_reg(vm, vcpuid, RISCV_CORE_REG(regs.gp), current_gp);
++	set_reg(vm, vcpu_id, RISCV_CORE_REG(regs.gp), current_gp);
+ 
+ 	/* Setup stack pointer and program counter of guest */
+-	set_reg(vm, vcpuid, RISCV_CORE_REG(regs.sp),
++	set_reg(vm, vcpu_id, RISCV_CORE_REG(regs.sp),
+ 		stack_vaddr + stack_size);
+-	set_reg(vm, vcpuid, RISCV_CORE_REG(regs.pc),
++	set_reg(vm, vcpu_id, RISCV_CORE_REG(regs.pc),
+ 		(unsigned long)guest_code);
+ 
+ 	/* Setup default exception vector of guest */
+-	set_reg(vm, vcpuid, RISCV_CSR_REG(stvec),
++	set_reg(vm, vcpu_id, RISCV_CSR_REG(stvec),
+ 		(unsigned long)guest_unexp_trap);
++
++	return vcpu;
+ }
+ 
+ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
 diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-index aec15ca9d887..c2fe56a3fb74 100644
+index c2fe56a3fb74..cf759844b226 100644
 --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
 +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-@@ -10,7 +10,7 @@
- 
- #define PAGES_PER_REGION 4
- 
--void virt_pgd_alloc(struct kvm_vm *vm)
-+void virt_arch_pgd_alloc(struct kvm_vm *vm)
- {
- 	vm_paddr_t paddr;
- 
-@@ -46,7 +46,7 @@ static uint64_t virt_alloc_region(struct kvm_vm *vm, int ri)
- 		| ((ri < 4 ? (PAGES_PER_REGION - 1) : 0) & REGION_ENTRY_LENGTH);
- }
- 
--void virt_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
-+void virt_arch_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
- {
- 	int ri, idx;
- 	uint64_t *entry;
-@@ -85,7 +85,7 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
- 	entry[idx] = gpa;
- }
- 
--vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- {
- 	int ri, idx;
- 	uint64_t *entry;
-@@ -146,7 +146,7 @@ static void virt_dump_region(FILE *stream, struct kvm_vm *vm, uint8_t indent,
- 	}
- }
- 
--void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-+void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- {
- 	if (!vm->pgd_created)
- 		return;
-@@ -154,7 +154,7 @@ void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+@@ -154,12 +154,14 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
  	virt_dump_region(stream, vm, indent, vm->pgd);
  }
  
--void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
-+void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+-void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
++struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
++				  void *guest_code)
  {
  	size_t stack_size =  DEFAULT_STACK_PGS * getpagesize();
  	uint64_t stack_vaddr;
-@@ -205,7 +205,7 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
- 	va_end(ap);
+ 	struct kvm_regs regs;
+ 	struct kvm_sregs sregs;
++	struct kvm_vcpu *vcpu;
+ 	struct kvm_run *run;
+ 
+ 	TEST_ASSERT(vm->page_size == 4096, "Unsupported page size: 0x%x",
+@@ -168,21 +170,23 @@ void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+ 	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
+ 				     DEFAULT_GUEST_STACK_VADDR_MIN);
+ 
+-	vm_vcpu_add(vm, vcpuid);
++	vcpu = vm_vcpu_add(vm, vcpu_id);
+ 
+ 	/* Setup guest registers */
+-	vcpu_regs_get(vm, vcpuid, &regs);
++	vcpu_regs_get(vm, vcpu_id, &regs);
+ 	regs.gprs[15] = stack_vaddr + (DEFAULT_STACK_PGS * getpagesize()) - 160;
+-	vcpu_regs_set(vm, vcpuid, &regs);
++	vcpu_regs_set(vm, vcpu_id, &regs);
+ 
+-	vcpu_sregs_get(vm, vcpuid, &sregs);
++	vcpu_sregs_get(vm, vcpu_id, &sregs);
+ 	sregs.crs[0] |= 0x00040000;		/* Enable floating point regs */
+ 	sregs.crs[1] = vm->pgd | 0xf;		/* Primary region table */
+-	vcpu_sregs_set(vm, vcpuid, &sregs);
++	vcpu_sregs_set(vm, vcpu_id, &sregs);
+ 
+-	run = vcpu_state(vm, vcpuid);
++	run = vcpu_state(vm, vcpu_id);
+ 	run->psw_mask = 0x0400000180000000ULL;  /* DAT enabled + 64 bit mode */
+ 	run->psw_addr = (uintptr_t)guest_code;
++
++	return vcpu;
  }
  
--void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-+void vcpu_arch_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
- {
- 	struct kvm_vcpu *vcpu = vcpu_get(vm, vcpuid);
- 
+ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 67b9fb604594..b9201760a662 100644
+index b9201760a662..8255042de0d0 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -109,7 +109,7 @@ static void sregs_dump(FILE *stream, struct kvm_sregs *sregs, uint8_t indent)
- 	}
- }
- 
--void virt_pgd_alloc(struct kvm_vm *vm)
-+void virt_arch_pgd_alloc(struct kvm_vm *vm)
- {
- 	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
- 		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-@@ -208,7 +208,7 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
- }
- 
--void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-+void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- {
- 	__virt_pg_map(vm, vaddr, paddr, X86_PAGE_SIZE_4K);
- }
-@@ -303,7 +303,7 @@ void vm_set_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr,
- 	*(uint64_t *)new_pte = pte;
- }
- 
--void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-+void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- {
- 	uint64_t *pml4e, *pml4e_start;
- 	uint64_t *pdpe, *pdpe_start;
-@@ -484,7 +484,7 @@ static void kvm_seg_set_kernel_data_64bit(struct kvm_vm *vm, uint16_t selector,
- 		kvm_seg_fill_gdt_64bit(vm, segp);
- }
- 
--vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- {
- 	uint16_t index[4];
- 	uint64_t *pml4e, *pdpe, *pde;
-@@ -633,7 +633,7 @@ void vm_xsave_req_perm(int bit)
+@@ -633,29 +633,33 @@ void vm_xsave_req_perm(int bit)
  		    bitmask);
  }
  
--void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
-+void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+-void vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
++struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
++				  void *guest_code)
  {
  	struct kvm_mp_state mp_state;
  	struct kvm_regs regs;
-@@ -874,7 +874,7 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
- 	va_end(ap);
+ 	vm_vaddr_t stack_vaddr;
++	struct kvm_vcpu *vcpu;
++
+ 	stack_vaddr = vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
+ 				     DEFAULT_GUEST_STACK_VADDR_MIN);
+ 
+-	/* Create VCPU */
+-	vm_vcpu_add(vm, vcpuid);
+-	vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
+-	vcpu_setup(vm, vcpuid);
++	vcpu = vm_vcpu_add(vm, vcpu_id);
++	vcpu_set_cpuid(vm, vcpu_id, kvm_get_supported_cpuid());
++	vcpu_setup(vm, vcpu_id);
+ 
+ 	/* Setup guest general purpose registers */
+-	vcpu_regs_get(vm, vcpuid, &regs);
++	vcpu_regs_get(vm, vcpu_id, &regs);
+ 	regs.rflags = regs.rflags | 0x2;
+ 	regs.rsp = stack_vaddr + (DEFAULT_STACK_PGS * getpagesize());
+ 	regs.rip = (unsigned long) guest_code;
+-	vcpu_regs_set(vm, vcpuid, &regs);
++	vcpu_regs_set(vm, vcpu_id, &regs);
+ 
+ 	/* Setup the MP state */
+ 	mp_state.mp_state = 0;
+-	vcpu_mp_state_set(vm, vcpuid, &mp_state);
++	vcpu_mp_state_set(vm, vcpu_id, &mp_state);
++
++	return vcpu;
  }
  
--void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-+void vcpu_arch_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
- {
- 	struct kvm_regs regs;
- 	struct kvm_sregs sregs;
+ /*
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+index 96455ec6ea48..8b034a8617e1 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+@@ -343,10 +343,8 @@ static void test_pmu_config_disable(void (*guest_code)(void))
+ 
+ 	vm_enable_cap(vm, KVM_CAP_PMU_CAPABILITY, KVM_PMU_CAP_DISABLE);
+ 
+-	vm_vcpu_add_default(vm, 0, guest_code);
++	vcpu = vm_vcpu_add_default(vm, 0, guest_code);
+ 	vm_init_descriptor_tables(vm);
+-
+-	vcpu = vcpu_get(vm, 0);
+ 	vcpu_init_descriptor_tables(vm, vcpu->id);
+ 
+ 	TEST_ASSERT(!sanity_check_pmu(vcpu),
+diff --git a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
+index b7cd5c47fc53..ea70ca2e63c3 100644
+--- a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
++++ b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
+@@ -54,8 +54,7 @@ static void *run_vcpu(void *_cpu_nr)
+ 	/* The kernel is fine, but vm_vcpu_add_default() needs locking */
+ 	pthread_spin_lock(&create_lock);
+ 
+-	vm_vcpu_add_default(vm, vcpu_id, guest_code);
+-	vcpu = vcpu_get(vm, vcpu_id);
++	vcpu = vm_vcpu_add_default(vm, vcpu_id, guest_code);
+ 
+ 	if (!first_cpu_done) {
+ 		first_cpu_done = true;
 -- 
 2.36.1.255.ge46751e96f-goog
 
