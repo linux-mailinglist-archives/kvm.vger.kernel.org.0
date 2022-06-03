@@ -2,249 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7261A53CC6F
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 17:40:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79FE253CD5F
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 18:42:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245600AbiFCPkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 11:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38422 "EHLO
+        id S1343839AbiFCQmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 12:42:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245591AbiFCPkq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 11:40:46 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871AD4ECEB;
-        Fri,  3 Jun 2022 08:40:45 -0700 (PDT)
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 253E0xgI018207;
-        Fri, 3 Jun 2022 15:40:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=xmUh/pJg//vim7uApb3IC5UNDtvBCtkHhCvO9Xglk88=;
- b=fbRQk9hvrLIla7fQmbL7CB/zjT7AWIFPiUR1ZLiE6SBzBH5gONX1JqS/f7/6MyoQF/Qx
- fPJBvmQ9QsBrNzJ1VfzCeVk1aiMB3wTix3VUsHMbt8Xa9NyRW92KVldvPG+4mX4evXIx
- DZAwfta9VR9xHQUnTYOvQUhfCEh3ERPhPzQUk0AfjkPP4B7fWSeNVjCJCIQ8yYopC6Qz
- JN0oOAqA3g6XLe4GvWRJRhxSHki1KbEXQozX6gkzfp80df1B1PqmpOPpcDKjIapNHOAm
- GYFyARuqZo6txaWn1OnqeGdbZ5ozv2MnUSquavZ+Sex0rG+m6ibn47o+B53j8JStT7L+ FA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfhftcqkx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 15:40:45 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 253Fd16L008811;
-        Fri, 3 Jun 2022 15:40:44 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfhftcqjy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 15:40:44 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 253FbncB009631;
-        Fri, 3 Jun 2022 15:40:42 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 3gbc97xjrv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Jun 2022 15:40:42 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 253Fecfi21496260
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Jun 2022 15:40:38 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D3060A4040;
-        Fri,  3 Jun 2022 15:40:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 909BEA4053;
-        Fri,  3 Jun 2022 15:40:38 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.40])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Jun 2022 15:40:38 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        scgl@linux.ibm.com, pmorel@linux.ibm.com, nrb@linux.ibm.com,
-        thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v1 2/2] lib: s390x: better smp interrupt checks
-Date:   Fri,  3 Jun 2022 17:40:37 +0200
-Message-Id: <20220603154037.103733-3-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220603154037.103733-1-imbrenda@linux.ibm.com>
-References: <20220603154037.103733-1-imbrenda@linux.ibm.com>
+        with ESMTP id S242741AbiFCQmU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 12:42:20 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B27FB1EC62
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 09:42:18 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id x65so6400565qke.2
+        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 09:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=pZiq+DaP0uIJbqmhpHEQocGuha+dXUbZZZqTwIB2IaE=;
+        b=rrQxT3vbT7GMAWiBE8NKh82hTKWmXoBOIgjSoB8gWHlxJCtpicQfJi6YHcKEu0Skmg
+         abttTcfRqmTOcz4L3ohQC6WWhlA31fuHxoEfeuJpbUAg7kX6/vtplGcJ9j4IrzJVxD9O
+         vdLoYfObodGls9T269h7hJyDm997n4snH1eyk5q8lGm0DuwzVfKoDQFEQSeKxajjX2Yz
+         5TiL9zM/J27+HT1KqOA1cB9necDYn5jb3A6o3ARG7LxeA2ES2j5uBkLAZdLyHaiO4lvt
+         ER/oF7LY8Hxyq/pFtt8IclZxYPm5bLZuRep0Ojk6gIJnuU/og9qHiw7H4aRy54/0OtvI
+         pIJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=pZiq+DaP0uIJbqmhpHEQocGuha+dXUbZZZqTwIB2IaE=;
+        b=7Z3gpl/mx62TlJDbVfCZCPjwXp7k9k9fy+/aH97M94piJ1sDzPTLdx/bBKJH0K7jO0
+         PeahqvkW+AfDbYmmuL4b2XvtMKcAXqYEBDds5F3NMlLB2IHEy676fM8CWiNvzJBA81mN
+         vBHYfrfAuGJH0vBdxn/PBF1rHcchQ2Oy7Kor+YvhS3ZsFp8dcHvEnZppfYKxAdllU7PM
+         iwo0T27j+OznbW+2JI80bJz+LwrMrYe0AQM8MAcEcny83Ne5kB/Pk0nhJSXQRbVcxa6U
+         gtqtVeaLnHvDLecniZ3vcjFz1IxyAllM/7eBCSjQYrN2qAkwoQnQ/g6t53I75VBQg7fp
+         Q9eQ==
+X-Gm-Message-State: AOAM532/EWGkFkGMPPtssW/U8SRnbcBurefsdfXRIC3rkyZT/Fn6/x6Z
+        jXrfkgrzFcSXKR7UxzFLSgtF6Q==
+X-Google-Smtp-Source: ABdhPJwD1IT8PgvyiFpaFJ0oQgGHCzkg9tknn5j7X5fVKzbiMKtPXk1vgrTU2p+vhNcLbOMRztlAVw==
+X-Received: by 2002:a05:620a:2845:b0:6a3:646f:9ba8 with SMTP id h5-20020a05620a284500b006a3646f9ba8mr7509475qkp.56.1654274537770;
+        Fri, 03 Jun 2022 09:42:17 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:1d66])
+        by smtp.gmail.com with ESMTPSA id w184-20020a3794c1000000b006a098381abcsm5550650qkd.114.2022.06.03.09.42.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jun 2022 09:42:17 -0700 (PDT)
+Date:   Fri, 3 Jun 2022 12:42:15 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Oliver Upton <oupton@google.com>,
+        Cgroups <cgroups@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
+Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
+ page table uses.
+Message-ID: <Ypo550pGxmnJnGBe@cmpxchg.org>
+References: <Yn2YYl98Vhh/UL0w@google.com>
+ <Yn5+OtZSSUZZgTQj@cmpxchg.org>
+ <Yn6DeEGLyR4Q0cDp@google.com>
+ <CALvZod6nERq4j=L0V+pc-rd5+QKi4yb_23tWV-1MF53xL5KE6Q@mail.gmail.com>
+ <CAJD7tka-5+XRkthNV4qCg8woPCpjcwynQoRBame-3GP1L8y+WQ@mail.gmail.com>
+ <YoeoLJNQTam5fJSu@cmpxchg.org>
+ <CAJD7tkYjcmwBeUx-=MTQeUf78uqFDvfpy7OuKy4OvoS7HiVO1Q@mail.gmail.com>
+ <Yo4Ze+DZrLqn0PeU@cmpxchg.org>
+ <Yo7MHA2aUaprvgl8@google.com>
+ <CAJD7tkYoz=rYvBV3tcp4aLgiyEtr-sBwbncFduZsOq+c8wk5sA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NaVwaCnqrV1Q8nnjsC_tku4amHTAmxMU
-X-Proofpoint-ORIG-GUID: SCpsUPIbGMHd71a8N7e-Vev7UJnueLbs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-03_05,2022-06-03_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 adultscore=0 suspectscore=0 clxscore=1015
- mlxlogscore=651 malwarescore=0 impostorscore=0 spamscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206030068
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJD7tkYoz=rYvBV3tcp4aLgiyEtr-sBwbncFduZsOq+c8wk5sA@mail.gmail.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use per-CPU flags and callbacks for Program, Extern, and I/O interrupts
-instead of global variables.
+On Fri, May 27, 2022 at 11:33:27AM -0700, Yosry Ahmed wrote:
+> On Wed, May 25, 2022 at 5:39 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Wed, May 25, 2022, Johannes Weiner wrote:
+> > > On Tue, May 24, 2022 at 03:31:52PM -0700, Yosry Ahmed wrote:
+> > > > I don't have enough context to say whether we should piggyback KVM MMU
+> > > > pages to the existing NR_PAGETABLE item, but from a high level it
+> > > > seems like it would be more helpful if they are a separate stat.
+> > > > Anyway, I am willing to go with whatever Sean thinks is best.
+> > >
+> > > Somebody should work this out and put it into a changelog. It's
+> > > permanent ABI.
+> >
+> > After a lot of waffling, my vote is to add a dedicated NR_SECONDARY_PAGETABLE.
+> >
+> > It's somewhat redundant from a KVM perspective, as NR_SECONDARY_PAGETABLE will
+> > scale with KVM's per-VM pages_{4k,2m,1g} stats unless the guest is doing something
+> > bizarre, e.g. accessing only 4kb chunks of 2mb pages so that KVM is forced to
+> > allocate a large number of page tables even though the guest isn't accessing that
+> > much memory.
+> >
+> > But, someone would need to either understand how KVM works to make that connection,
+> > or know (or be told) to go look at KVM's stats if they're running VMs to better
+> > decipher the stats.
+> >
+> > And even in the little bit of time I played with this, I found having
+> > nr_page_table_pages side-by-side with nr_secondary_page_table_pages to be very
+> > informative.  E.g. when backing a VM with THP versus HugeTLB,
+> > nr_secondary_page_table_pages is roughly the same, but nr_page_table_pages is an
+> > order of a magnitude higher with THP.  I'm guessing the THP behavior is due to
+> > something triggering DoubleMap, but now I want to find out why that's happening.
+> >
+> > So while I'm pretty sure a clever user could glean the same info by cross-referencing
+> > NR_PAGETABLE stats with KVM stats, I think having NR_SECONDARY_PAGETABLE will at the
+> > very least prove to be helpful for understanding tradeoffs between VM backing types,
+> > and likely even steer folks towards potential optimizations.
+> >
+> > Baseline:
+> >   # grep page_table /proc/vmstat
+> >   nr_page_table_pages 2830
+> >   nr_secondary_page_table_pages 0
+> >
+> > THP:
+> >   # grep page_table /proc/vmstat
+> >   nr_page_table_pages 7584
+> >   nr_secondary_page_table_pages 140
+> >
+> > HugeTLB:
+> >   # grep page_table /proc/vmstat
+> >   nr_page_table_pages 3153
+> >   nr_secondary_page_table_pages 153
+> >
+> 
+> Interesting findings! Thanks for taking the time to look into this, Sean!
+> I will refresh this patchset and summarize the discussion in the
+> commit message, and also fix some nits on the KVM side. Does this
+> sound good to everyone?
 
-This allows for more accurate error handling; a CPU waiting for an
-interrupt will not have it "stolen" by a different CPU that was not
-supposed to wait for one, and now two CPUs can wait for interrupts at
-the same time.
-
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- lib/s390x/asm/arch_def.h |  7 ++++++-
- lib/s390x/interrupt.c    | 38 ++++++++++++++++----------------------
- 2 files changed, 22 insertions(+), 23 deletions(-)
-
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 72553819..3a0d9c43 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -124,7 +124,12 @@ struct lowcore {
- 	uint8_t		pad_0x0280[0x0308 - 0x0280];	/* 0x0280 */
- 	uint64_t	sw_int_crs[16];			/* 0x0308 */
- 	struct psw	sw_int_psw;			/* 0x0388 */
--	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
-+	uint32_t	pgm_int_expected;		/* 0x0398 */
-+	uint32_t	ext_int_expected;		/* 0x039c */
-+	void		(*pgm_cleanup_func)(void);	/* 0x03a0 */
-+	void		(*ext_cleanup_func)(void);	/* 0x03a8 */
-+	void		(*io_int_func)(void);		/* 0x03b0 */
-+	uint8_t		pad_0x03b8[0x11b0 - 0x03b8];	/* 0x03b8 */
- 	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
- 	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
- 	uint64_t	fprs_sa[16];			/* 0x1200 */
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index 27d3b767..e57946f0 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -15,14 +15,11 @@
- #include <fault.h>
- #include <asm/page.h>
- 
--static bool pgm_int_expected;
--static bool ext_int_expected;
--static void (*pgm_cleanup_func)(void);
- static struct lowcore *lc;
- 
- void expect_pgm_int(void)
- {
--	pgm_int_expected = true;
-+	lc->pgm_int_expected = 1;
- 	lc->pgm_int_code = 0;
- 	lc->trans_exc_id = 0;
- 	mb();
-@@ -30,7 +27,7 @@ void expect_pgm_int(void)
- 
- void expect_ext_int(void)
- {
--	ext_int_expected = true;
-+	lc->ext_int_expected = 1;
- 	lc->ext_int_code = 0;
- 	mb();
- }
-@@ -43,7 +40,7 @@ uint16_t clear_pgm_int(void)
- 	code = lc->pgm_int_code;
- 	lc->pgm_int_code = 0;
- 	lc->trans_exc_id = 0;
--	pgm_int_expected = false;
-+	lc->pgm_int_expected = 0;
- 	return code;
- }
- 
-@@ -57,7 +54,7 @@ void check_pgm_int_code(uint16_t code)
- 
- void register_pgm_cleanup_func(void (*f)(void))
- {
--	pgm_cleanup_func = f;
-+	lc->pgm_cleanup_func = f;
- }
- 
- static void fixup_pgm_int(struct stack_frame_int *stack)
-@@ -184,24 +181,23 @@ static void print_pgm_info(struct stack_frame_int *stack)
- 
- void handle_pgm_int(struct stack_frame_int *stack)
- {
--	if (!pgm_int_expected) {
-+	if (!lc->pgm_int_expected) {
- 		/* Force sclp_busy to false, otherwise we will loop forever */
- 		sclp_handle_ext();
- 		print_pgm_info(stack);
- 	}
- 
--	pgm_int_expected = false;
-+	lc->pgm_int_expected = 0;
- 
--	if (pgm_cleanup_func)
--		(*pgm_cleanup_func)();
-+	if (lc->pgm_cleanup_func)
-+		(*lc->pgm_cleanup_func)();
- 	else
- 		fixup_pgm_int(stack);
- }
- 
- void handle_ext_int(struct stack_frame_int *stack)
- {
--	if (!ext_int_expected &&
--	    lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
-+	if (!lc->ext_int_expected && lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
- 		report_abort("Unexpected external call interrupt (code %#x): on cpu %d at %#lx",
- 			     lc->ext_int_code, stap(), lc->ext_old_psw.addr);
- 		return;
-@@ -211,7 +207,7 @@ void handle_ext_int(struct stack_frame_int *stack)
- 		stack->crs[0] &= ~(1UL << 9);
- 		sclp_handle_ext();
- 	} else {
--		ext_int_expected = false;
-+		lc->ext_int_expected = 0;
- 	}
- 
- 	if (!(stack->crs[0] & CR0_EXTM_MASK))
-@@ -224,12 +220,10 @@ void handle_mcck_int(void)
- 		     stap(), lc->mcck_old_psw.addr);
- }
- 
--static void (*io_int_func)(void);
--
- void handle_io_int(void)
- {
--	if (io_int_func)
--		return io_int_func();
-+	if (lc->io_int_func)
-+		return lc->io_int_func();
- 
- 	report_abort("Unexpected io interrupt: on cpu %d at %#lx",
- 		     stap(), lc->io_old_psw.addr);
-@@ -237,17 +231,17 @@ void handle_io_int(void)
- 
- int register_io_int_func(void (*f)(void))
- {
--	if (io_int_func)
-+	if (lc->io_int_func)
- 		return -1;
--	io_int_func = f;
-+	lc->io_int_func = f;
- 	return 0;
- }
- 
- int unregister_io_int_func(void (*f)(void))
- {
--	if (io_int_func != f)
-+	if (lc->io_int_func != f)
- 		return -1;
--	io_int_func = NULL;
-+	lc->io_int_func = NULL;
- 	return 0;
- }
- 
--- 
-2.36.1
+Yes, thanks for summarizing this. Sounds good to me!
 
