@@ -2,45 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6706453D027
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 20:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4A5953CFD1
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 19:57:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243277AbiFCSBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 14:01:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47812 "EHLO
+        id S1345843AbiFCR45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 13:56:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346435AbiFCSAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 14:00:17 -0400
+        with ESMTP id S1345821AbiFCR4W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 13:56:22 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 125B558E55;
-        Fri,  3 Jun 2022 10:56:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280AE5674D;
+        Fri,  3 Jun 2022 10:53:47 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 863906147E;
-        Fri,  3 Jun 2022 17:56:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 760DDC385B8;
-        Fri,  3 Jun 2022 17:56:24 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A9E5A6147E;
+        Fri,  3 Jun 2022 17:53:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B66B0C3411C;
+        Fri,  3 Jun 2022 17:53:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1654278984;
-        bh=4s/qfcd7m36IGhRpyGgRTOHB6EW2VRul4AL6adni7zI=;
+        s=korg; t=1654278826;
+        bh=9h2Ia9UMLLLrz40r159dqMLmt2Y+I7MDiyxSYUSFbSY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=g8rKOks9ARihWwoIMGzT0Av5nQilYwO0tVw4of3hBJuqqHrsNP8mpcxcrZncuTRrd
-         iusKVatUolkK+/ErrjgMjNa6MwybGH0JHVD8eq8TTitYfMkqZHmL6risbqnrHHz0b1
-         JPVUvFNhOwZv70X39d9ezSFBrV1uSN9GkinDgPow=
+        b=gSYiTFTU7yd3SxrgdQE/yaAB56rLF7QQM8BV9qryPBojI0dTtJq3h3S19l3tR4RAz
+         3aIwf34Oxbn928JEplmbY0+tKQgS3xUJT7NITulCQgL4JyBHZxEWM95uFxU7qP4WCq
+         VqYhhTyUL4yM6ZYfIGu+QnQ6FH5CqOFk2hYr3gKg=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Zdenek Kaspar <zkaspar82@gmail.com>,
-        "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Subject: [PATCH 5.18 16/67] x86/fpu: KVM: Set the base guest FPU uABI size to sizeof(struct kvm_xsave)
-Date:   Fri,  3 Jun 2022 19:43:17 +0200
-Message-Id: <20220603173821.199192719@linuxfoundation.org>
+        stable@vger.kernel.org, Andy Nguyen <theflow@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 5.17 39/75] KVM: SVM: Use kzalloc for sev ioctl interfaces to prevent kernel data leak
+Date:   Fri,  3 Jun 2022 19:43:23 +0200
+Message-Id: <20220603173822.854269922@linuxfoundation.org>
 X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220603173820.731531504@linuxfoundation.org>
-References: <20220603173820.731531504@linuxfoundation.org>
+In-Reply-To: <20220603173821.749019262@linuxfoundation.org>
+References: <20220603173821.749019262@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -55,113 +56,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-commit d187ba5312307d51818beafaad87d28a7d939adf upstream.
+commit d22d2474e3953996f03528b84b7f52cc26a39403 upstream.
 
-Set the starting uABI size of KVM's guest FPU to 'struct kvm_xsave',
-i.e. to KVM's historical uABI size.  When saving FPU state for usersapce,
-KVM (well, now the FPU) sets the FP+SSE bits in the XSAVE header even if
-the host doesn't support XSAVE.  Setting the XSAVE header allows the VM
-to be migrated to a host that does support XSAVE without the new host
-having to handle FPU state that may or may not be compatible with XSAVE.
+For some sev ioctl interfaces, the length parameter that is passed maybe
+less than or equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data
+that PSP firmware returns. In this case, kmalloc will allocate memory
+that is the size of the input rather than the size of the data.
+Since PSP firmware doesn't fully overwrite the allocated buffer, these
+sev ioctl interface may return uninitialized kernel slab memory.
 
-Setting the uABI size to the host's default size results in out-of-bounds
-writes (setting the FP+SSE bits) and data corruption (that is thankfully
-caught by KASAN) when running on hosts without XSAVE, e.g. on Core2 CPUs.
-
-WARN if the default size is larger than KVM's historical uABI size; all
-features that can push the FPU size beyond the historical size must be
-opt-in.
-
-  ==================================================================
-  BUG: KASAN: slab-out-of-bounds in fpu_copy_uabi_to_guest_fpstate+0x86/0x130
-  Read of size 8 at addr ffff888011e33a00 by task qemu-build/681
-  CPU: 1 PID: 681 Comm: qemu-build Not tainted 5.18.0-rc5-KASAN-amd64 #1
-  Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426 01/13/2010
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x34/0x45
-   print_report.cold+0x45/0x575
-   kasan_report+0x9b/0xd0
-   fpu_copy_uabi_to_guest_fpstate+0x86/0x130
-   kvm_arch_vcpu_ioctl+0x72a/0x1c50 [kvm]
-   kvm_vcpu_ioctl+0x47f/0x7b0 [kvm]
-   __x64_sys_ioctl+0x5de/0xc90
-   do_syscall_64+0x31/0x50
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-   </TASK>
-  Allocated by task 0:
-  (stack is not available)
-  The buggy address belongs to the object at ffff888011e33800
-   which belongs to the cache kmalloc-512 of size 512
-  The buggy address is located 0 bytes to the right of
-   512-byte region [ffff888011e33800, ffff888011e33a00)
-  The buggy address belongs to the physical page:
-  page:0000000089cd4adb refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x11e30
-  head:0000000089cd4adb order:2 compound_mapcount:0 compound_pincount:0
-  flags: 0x4000000000010200(slab|head|zone=1)
-  raw: 4000000000010200 dead000000000100 dead000000000122 ffff888001041c80
-  raw: 0000000000000000 0000000080100010 00000001ffffffff 0000000000000000
-  page dumped because: kasan: bad access detected
-  Memory state around the buggy address:
-   ffff888011e33900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-   ffff888011e33980: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  >ffff888011e33a00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-                     ^
-   ffff888011e33a80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-   ffff888011e33b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-  ==================================================================
-  Disabling lock debugging due to kernel taint
-
-Fixes: be50b2065dfa ("kvm: x86: Add support for getting/setting expanded xstate buffer")
-Fixes: c60427dd50ba ("x86/fpu: Add uabi_size to guest_fpu")
-Reported-by: Zdenek Kaspar <zkaspar82@gmail.com>
-Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: David Rientjes <rientjes@google.com>
+Suggested-by: Peter Gonda <pgonda@google.com>
 Cc: kvm@vger.kernel.org
 Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Tested-by: Zdenek Kaspar <zkaspar82@gmail.com>
-Message-Id: <20220504001219.983513-1-seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org
+Fixes: eaf78265a4ab3 ("KVM: SVM: Move SEV code to separate file")
+Fixes: 2c07ded06427d ("KVM: SVM: add support for SEV attestation command")
+Fixes: 4cfdd47d6d95a ("KVM: SVM: Add KVM_SEV SEND_START command")
+Fixes: d3d1af85e2c75 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
+Fixes: eba04b20e4861 ("KVM: x86: Account a variety of miscellaneous allocations")
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+Reviewed-by: Peter Gonda <pgonda@google.com>
+Message-Id: <20220516154310.3685678-1-Ashish.Kalra@amd.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/x86/kernel/fpu/core.c |   17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/sev.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -14,6 +14,8 @@
- #include <asm/traps.h>
- #include <asm/irq_regs.h>
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -684,7 +684,7 @@ static int sev_launch_measure(struct kvm
+ 		if (params.len > SEV_FW_BLOB_MAX_SIZE)
+ 			return -EINVAL;
  
-+#include <uapi/asm/kvm.h>
-+
- #include <linux/hardirq.h>
- #include <linux/pkeys.h>
- #include <linux/vmalloc.h>
-@@ -232,7 +234,20 @@ bool fpu_alloc_guest_fpstate(struct fpu_
- 	gfpu->fpstate		= fpstate;
- 	gfpu->xfeatures		= fpu_user_cfg.default_features;
- 	gfpu->perm		= fpu_user_cfg.default_features;
--	gfpu->uabi_size		= fpu_user_cfg.default_size;
-+
-+	/*
-+	 * KVM sets the FP+SSE bits in the XSAVE header when copying FPU state
-+	 * to userspace, even when XSAVE is unsupported, so that restoring FPU
-+	 * state on a different CPU that does support XSAVE can cleanly load
-+	 * the incoming state using its natural XSAVE.  In other words, KVM's
-+	 * uABI size may be larger than this host's default size.  Conversely,
-+	 * the default size should never be larger than KVM's base uABI size;
-+	 * all features that can expand the uABI size must be opt-in.
-+	 */
-+	gfpu->uabi_size		= sizeof(struct kvm_xsave);
-+	if (WARN_ON_ONCE(fpu_user_cfg.default_size > gfpu->uabi_size))
-+		gfpu->uabi_size = fpu_user_cfg.default_size;
-+
- 	fpu_init_guest_permissions(gfpu);
+-		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
++		blob = kzalloc(params.len, GFP_KERNEL_ACCOUNT);
+ 		if (!blob)
+ 			return -ENOMEM;
  
- 	return true;
+@@ -804,7 +804,7 @@ static int __sev_dbg_decrypt_user(struct
+ 	if (!IS_ALIGNED(dst_paddr, 16) ||
+ 	    !IS_ALIGNED(paddr,     16) ||
+ 	    !IS_ALIGNED(size,      16)) {
+-		tpage = (void *)alloc_page(GFP_KERNEL);
++		tpage = (void *)alloc_page(GFP_KERNEL | __GFP_ZERO);
+ 		if (!tpage)
+ 			return -ENOMEM;
+ 
+@@ -1090,7 +1090,7 @@ static int sev_get_attestation_report(st
+ 		if (params.len > SEV_FW_BLOB_MAX_SIZE)
+ 			return -EINVAL;
+ 
+-		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
++		blob = kzalloc(params.len, GFP_KERNEL_ACCOUNT);
+ 		if (!blob)
+ 			return -ENOMEM;
+ 
+@@ -1172,7 +1172,7 @@ static int sev_send_start(struct kvm *kv
+ 		return -EINVAL;
+ 
+ 	/* allocate the memory to hold the session data blob */
+-	session_data = kmalloc(params.session_len, GFP_KERNEL_ACCOUNT);
++	session_data = kzalloc(params.session_len, GFP_KERNEL_ACCOUNT);
+ 	if (!session_data)
+ 		return -ENOMEM;
+ 
+@@ -1296,11 +1296,11 @@ static int sev_send_update_data(struct k
+ 
+ 	/* allocate memory for header and transport buffer */
+ 	ret = -ENOMEM;
+-	hdr = kmalloc(params.hdr_len, GFP_KERNEL_ACCOUNT);
++	hdr = kzalloc(params.hdr_len, GFP_KERNEL_ACCOUNT);
+ 	if (!hdr)
+ 		goto e_unpin;
+ 
+-	trans_data = kmalloc(params.trans_len, GFP_KERNEL_ACCOUNT);
++	trans_data = kzalloc(params.trans_len, GFP_KERNEL_ACCOUNT);
+ 	if (!trans_data)
+ 		goto e_free_hdr;
+ 
 
 
