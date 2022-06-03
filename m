@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6155C53C2A5
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:13:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4CE953C24E
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240688AbiFCA5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:57:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51876 "EHLO
+        id S240656AbiFCA50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 20:57:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240759AbiFCAuH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 20:50:07 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B209D2458B
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:47:08 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id m5-20020a17090a4d8500b001e0cfe135c7so3411641pjh.3
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:47:08 -0700 (PDT)
+        with ESMTP id S240825AbiFCAuL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 20:50:11 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70659248F5
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:47:10 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id j10-20020aa783ca000000b00518265c7cacso3508469pfn.3
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:47:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=SUSBvq+yOLMaxNvGnQWV114iFEv+Mzc/vwuqUVp/f1w=;
-        b=SiWy0tDdCzYtE/3vy+MHM3jxSD2HfYrrWSZ4ct5jdxuWjbBNMTNpQMk9Bff2jMXG/s
-         SBzHimlCB8bKCqp4/nTUuYGhpDfIVG2OESdiiXSOE2R5MdzznLw88/imQNpgAiu5dT6L
-         Z5ICsE8ucbL4ogOUQ+JBT4AIbqAc3HT9nuHSVFSRD3eyP5CTeRG/apxoz3E1stJm/d9X
-         E8NNGkOqXjzbxMLdxhLPL4xWCREcEyZDLPmf+fnz3wWsWtiKAt37eb660Xn9pMfyKnft
-         MjoMYVPBlUqPF+1PIk6XeJIaDiBPH3XVIGbuVFlmD5Yvh3/mb8CGj/E9qAqtD37hkKkt
-         h7lg==
+        bh=3sXZVFdjdjPOWfOq6qfd8QMObItU0tLqpjHp9hxxyGI=;
+        b=cx/LCUCw5HvQFQi3Jpm3E6ICMsKJX1uZO9G/yAp6Daaqgxi9qQlNnOuB1Kqm31oSTl
+         cuAP4BVKnlNXjKkXV/jt7HkMt7j+4aSAFxuKJofYxOobAvKe2vnA7KscGNpL++9x3jXA
+         zrsdr/KahNuqMNbXTUhwSNQbwfrGx/RJMg9FZPHgCfOZJgfw5t/uwCa+vdo9hQiA22pm
+         MEy7Oy8OBnqnlgxMVKqQr/hlCNkyCkWYAP7e8qjo2dDncAISG6IBIXhW5LfDGCIxXjo6
+         0UVZOAquPjYtE9wV12+RKpXwcQtfkpbTtPe5pmm22y6hbcZKxysR/ocEGqn4T9jVyGSY
+         1AXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=SUSBvq+yOLMaxNvGnQWV114iFEv+Mzc/vwuqUVp/f1w=;
-        b=AfsRaCBwKX5MXhswQl/eXXNKC9dMkQglu7kXrqAmfyg7J1DXV5J1J1U8ZhfBHMrgqu
-         QplCQn8okaJAON6EA7rzvmPbcT3Nupwe93JSVOcyNFI9hNapJlDs4YxTRsyzYQXqSc4w
-         kl43EtizMMBad+wUYC1O0YfpG03zcy0tOkXU9r+MMBs8sDTHCh6+6Yt3MNuBCCY86JWT
-         Q2zF9b4m/1uWbExVpjgNn/xeNFXn7XcLGXBRtDIwTGdcBL2TsrBplkoMC9U9FV7KC/DD
-         GhQZ1OrexH4KpbmMFO/45THCZcTJOUQvFNAnkf9vSSEylJBAAhSM41E6L6Y/X6qSGjLQ
-         90yA==
-X-Gm-Message-State: AOAM531EFrZl8WXkLA4gU/0kneALOzhiJSjh+s5kldJ8d3NrvSWUnydL
-        97ndCROrSBue81Ja+2ZeXQbYa2I/AMk=
-X-Google-Smtp-Source: ABdhPJySs/uBwgb/u9A64yPk/ISneqKw1+cdikIpTTTUATJUs88xlMgcihxZ5bcMsIK13hBtPu1dMwZ8lh8=
+        bh=3sXZVFdjdjPOWfOq6qfd8QMObItU0tLqpjHp9hxxyGI=;
+        b=c8RglluO2dBCDMU2EII9UWcF0o5dHM77dokpjybDXeDe3i9wufGSctnEtFFROJJjVx
+         3Ff/sxcM9OdR0mU1KWuxNzC38GKzw0+Efz6YMEpB9XuwVhk3WTJyXGxgbnra5JoNDLbi
+         sqARwpAfZAA9fmsNZMHcD+FthMg2k7Kkm7HN8I5MbQkNZxoUzbRUg/EEqWGCBqhXDrcZ
+         Qw7G4qg2qvVhIlYK5Eiy2HLvwHJnn7lj5WwoQofwUE9Hx46kHO3H6G+/mdL1E5962bOG
+         vWK9MTOLYetrYQasKpn1eZS0MuUJWPRYJGqYsdr+XtQKkJKXPlvHSF4TDiaYmvWcAVy0
+         2XLw==
+X-Gm-Message-State: AOAM530HTdXmqlHEcA+hAR8HwB0WLqBSrcmNrWp2+0Stcwoe2tUUbkAg
+        N7grm54IN6thzbfI3AynXKidjG6Y1rw=
+X-Google-Smtp-Source: ABdhPJyUCxypeGv866RLpUKxu59d6jfAc05aVk13puCksMyS+Kkt/f1q6/JBweoOZ8Fv1oUfk1UQYW7Ec4c=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
- t9-20020a17090a024900b001e0a8a33c6cmr307326pje.0.1654217227378; Thu, 02 Jun
- 2022 17:47:07 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2188:b0:50d:b093:12a2 with SMTP id
+ h8-20020a056a00218800b0050db09312a2mr7686221pfi.84.1654217229371; Thu, 02 Jun
+ 2022 17:47:09 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:43:04 +0000
+Date:   Fri,  3 Jun 2022 00:43:05 +0000
 In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-118-seanjc@google.com>
+Message-Id: <20220603004331.1523888-119-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220603004331.1523888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 117/144] KVM: selftests: Convert s390's "resets" test away
- from VCPU_ID
+Subject: [PATCH v2 118/144] KVM: selftests: Convert memop away from VCPU_ID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -72,289 +71,222 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pass around a 'struct kvm_vcpu' object in the "resets" test instead of
-referencing the vCPU by the global VCPU_ID.  Rename the #define for the
-vCPU's ID to ARBITRARY_NON_ZERO_VCPU_ID to make it more obvious that (a)
-the value matters but (b) is otherwise arbitrary.
+Pass around a 'struct kvm_vcpu' object instead of a vCPU ID in s390's
+memop test.  Pass NULL for the vCPU instead of a magic '-1' ID to
+indicate that an ioctl/test should be done at VM scope.
+
+Rename "struct test_vcpu vcpu" to "struct test_info info" in order to
+avoid naming collisions (this is the bulk of the diff :-( ).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/s390x/resets.c | 137 ++++++++++++---------
- 1 file changed, 77 insertions(+), 60 deletions(-)
+ tools/testing/selftests/kvm/s390x/memop.c | 82 ++++++++++++-----------
+ 1 file changed, 42 insertions(+), 40 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
-index a62de5351d7b..f7b938f9f2c6 100644
---- a/tools/testing/selftests/kvm/s390x/resets.c
-+++ b/tools/testing/selftests/kvm/s390x/resets.c
-@@ -13,14 +13,12 @@
- #include "test_util.h"
- #include "kvm_util.h"
+diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+index 206ebc2df2d3..d79796e1034d 100644
+--- a/tools/testing/selftests/kvm/s390x/memop.c
++++ b/tools/testing/selftests/kvm/s390x/memop.c
+@@ -98,21 +98,18 @@ static struct kvm_s390_mem_op ksmo_from_desc(struct mop_desc desc)
+ 	return ksmo;
+ }
  
--#define VCPU_ID 3
- #define LOCAL_IRQS 32
+-/* vcpu dummy id signifying that vm instead of vcpu ioctl is to occur */
+-const uint32_t VM_VCPU_ID = (uint32_t)-1;
+-
+-struct test_vcpu {
++struct test_info {
+ 	struct kvm_vm *vm;
+-	uint32_t id;
++	struct kvm_vcpu *vcpu;
+ };
  
--struct kvm_s390_irq buf[VCPU_ID + LOCAL_IRQS];
-+#define ARBITRARY_NON_ZERO_VCPU_ID 3
+ #define PRINT_MEMOP false
+-static void print_memop(uint32_t vcpu_id, const struct kvm_s390_mem_op *ksmo)
++static void print_memop(struct kvm_vcpu *vcpu, const struct kvm_s390_mem_op *ksmo)
+ {
+ 	if (!PRINT_MEMOP)
+ 		return;
+ 
+-	if (vcpu_id == VM_VCPU_ID)
++	if (!vcpu)
+ 		printf("vm memop(");
+ 	else
+ 		printf("vcpu memop(");
+@@ -147,25 +144,29 @@ static void print_memop(uint32_t vcpu_id, const struct kvm_s390_mem_op *ksmo)
+ 	puts(")");
+ }
+ 
+-static void memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
++static void memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
+ {
+-	if (vcpu.id == VM_VCPU_ID)
+-		vm_ioctl(vcpu.vm, KVM_S390_MEM_OP, ksmo);
++	struct kvm_vcpu *vcpu = info.vcpu;
 +
-+struct kvm_s390_irq buf[ARBITRARY_NON_ZERO_VCPU_ID + LOCAL_IRQS];
- 
--struct kvm_vm *vm;
--struct kvm_run *run;
--struct kvm_sync_regs *sync_regs;
- static uint8_t regs_null[512];
- 
- static void guest_code_initial(void)
-@@ -58,22 +56,22 @@ static void guest_code_initial(void)
- 		);
++	if (!vcpu)
++		vm_ioctl(info.vm, KVM_S390_MEM_OP, ksmo);
+ 	else
+-		vcpu_ioctl(vcpu.vm, vcpu.id, KVM_S390_MEM_OP, ksmo);
++		vcpu_ioctl(vcpu->vm, vcpu->id, KVM_S390_MEM_OP, ksmo);
  }
  
--static void test_one_reg(uint64_t id, uint64_t value)
-+static void test_one_reg(struct kvm_vcpu *vcpu, uint64_t id, uint64_t value)
+-static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
++static int err_memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
  {
- 	uint64_t eval_reg;
- 
--	vcpu_get_reg(vm, VCPU_ID, id, &eval_reg);
-+	vcpu_get_reg(vcpu->vm, vcpu->id, id, &eval_reg);
- 	TEST_ASSERT(eval_reg == value, "value == 0x%lx", value);
- }
- 
--static void assert_noirq(void)
-+static void assert_noirq(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_s390_irq_state irq_state;
- 	int irqs;
- 
- 	irq_state.len = sizeof(buf);
- 	irq_state.buf = (unsigned long)buf;
--	irqs = __vcpu_ioctl(vm, VCPU_ID, KVM_S390_GET_IRQ_STATE, &irq_state);
-+	irqs = __vcpu_ioctl(vcpu->vm, vcpu->id, KVM_S390_GET_IRQ_STATE, &irq_state);
- 	/*
- 	 * irqs contains the number of retrieved interrupts. Any interrupt
- 	 * (notably, the emergency call interrupt we have injected) should
-@@ -83,19 +81,20 @@ static void assert_noirq(void)
- 	TEST_ASSERT(!irqs, "IRQ pending");
- }
- 
--static void assert_clear(void)
-+static void assert_clear(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_sync_regs *sync_regs = &vcpu->run->s.regs;
- 	struct kvm_sregs sregs;
- 	struct kvm_regs regs;
- 	struct kvm_fpu fpu;
- 
--	vcpu_regs_get(vm, VCPU_ID, &regs);
-+	vcpu_regs_get(vcpu->vm, vcpu->id, &regs);
- 	TEST_ASSERT(!memcmp(&regs.gprs, regs_null, sizeof(regs.gprs)), "grs == 0");
- 
--	vcpu_sregs_get(vm, VCPU_ID, &sregs);
-+	vcpu_sregs_get(vcpu->vm, vcpu->id, &sregs);
- 	TEST_ASSERT(!memcmp(&sregs.acrs, regs_null, sizeof(sregs.acrs)), "acrs == 0");
- 
--	vcpu_fpu_get(vm, VCPU_ID, &fpu);
-+	vcpu_fpu_get(vcpu->vm, vcpu->id, &fpu);
- 	TEST_ASSERT(!memcmp(&fpu.fprs, regs_null, sizeof(fpu.fprs)), "fprs == 0");
- 
- 	/* sync regs */
-@@ -109,8 +108,10 @@ static void assert_clear(void)
- 		    "vrs0-15 == 0 (sync_regs)");
- }
- 
--static void assert_initial_noclear(void)
-+static void assert_initial_noclear(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_sync_regs *sync_regs = &vcpu->run->s.regs;
+-	if (vcpu.id == VM_VCPU_ID)
+-		return __vm_ioctl(vcpu.vm, KVM_S390_MEM_OP, ksmo);
++	struct kvm_vcpu *vcpu = info.vcpu;
 +
- 	TEST_ASSERT(sync_regs->gprs[0] == 0xffff000000000000UL,
- 		    "gpr0 == 0xffff000000000000 (sync_regs)");
- 	TEST_ASSERT(sync_regs->gprs[1] == 0x0000555500000000UL,
-@@ -124,13 +125,14 @@ static void assert_initial_noclear(void)
- 	TEST_ASSERT(sync_regs->acrs[9] == 1, "ar9 == 1 (sync_regs)");
++	if (!vcpu)
++		return __vm_ioctl(info.vm, KVM_S390_MEM_OP, ksmo);
+ 	else
+-		return __vcpu_ioctl(vcpu.vm, vcpu.id, KVM_S390_MEM_OP, ksmo);
++		return __vcpu_ioctl(vcpu->vm, vcpu->id, KVM_S390_MEM_OP, ksmo);
  }
  
--static void assert_initial(void)
-+static void assert_initial(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_sync_regs *sync_regs = &vcpu->run->s.regs;
- 	struct kvm_sregs sregs;
- 	struct kvm_fpu fpu;
+-#define MEMOP(err, vcpu_p, mop_target_p, access_mode_p, buf_p, size_p, ...)	\
++#define MEMOP(err, info_p, mop_target_p, access_mode_p, buf_p, size_p, ...)	\
+ ({										\
+-	struct test_vcpu __vcpu = (vcpu_p);					\
++	struct test_info __info = (info_p);					\
+ 	struct mop_desc __desc = {						\
+ 		.target = (mop_target_p),					\
+ 		.mode = (access_mode_p),					\
+@@ -177,13 +178,13 @@ static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
+ 										\
+ 	if (__desc._gaddr_v) {							\
+ 		if (__desc.target == ABSOLUTE)					\
+-			__desc.gaddr = addr_gva2gpa(__vcpu.vm, __desc.gaddr_v);	\
++			__desc.gaddr = addr_gva2gpa(__info.vm, __desc.gaddr_v);	\
+ 		else								\
+ 			__desc.gaddr = __desc.gaddr_v;				\
+ 	}									\
+ 	__ksmo = ksmo_from_desc(__desc);					\
+-	print_memop(__vcpu.id, &__ksmo);					\
+-	err##memop_ioctl(__vcpu, &__ksmo);					\
++	print_memop(__info.vcpu, &__ksmo);					\
++	err##memop_ioctl(__info, &__ksmo);					\
+ })
  
- 	/* KVM_GET_SREGS */
--	vcpu_sregs_get(vm, VCPU_ID, &sregs);
-+	vcpu_sregs_get(vcpu->vm, vcpu->id, &sregs);
- 	TEST_ASSERT(sregs.crs[0] == 0xE0UL, "cr0 == 0xE0 (KVM_GET_SREGS)");
- 	TEST_ASSERT(sregs.crs[14] == 0xC2000000UL,
- 		    "cr14 == 0xC2000000 (KVM_GET_SREGS)");
-@@ -153,36 +155,38 @@ static void assert_initial(void)
- 	TEST_ASSERT(sync_regs->gbea == 1, "gbea == 1 (sync_regs)");
+ #define MOP(...) MEMOP(, __VA_ARGS__)
+@@ -200,7 +201,6 @@ static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
  
- 	/* kvm_run */
--	TEST_ASSERT(run->psw_addr == 0, "psw_addr == 0 (kvm_run)");
--	TEST_ASSERT(run->psw_mask == 0, "psw_mask == 0 (kvm_run)");
-+	TEST_ASSERT(vcpu->run->psw_addr == 0, "psw_addr == 0 (kvm_run)");
-+	TEST_ASSERT(vcpu->run->psw_mask == 0, "psw_mask == 0 (kvm_run)");
+ #define CHECK_N_DO(f, ...) ({ f(__VA_ARGS__, CHECK_ONLY); f(__VA_ARGS__); })
  
--	vcpu_fpu_get(vm, VCPU_ID, &fpu);
-+	vcpu_fpu_get(vcpu->vm, vcpu->id, &fpu);
- 	TEST_ASSERT(!fpu.fpc, "fpc == 0");
+-#define VCPU_ID 1
+ #define PAGE_SHIFT 12
+ #define PAGE_SIZE (1ULL << PAGE_SHIFT)
+ #define PAGE_MASK (~(PAGE_SIZE - 1))
+@@ -212,21 +212,22 @@ static uint8_t mem2[65536];
  
--	test_one_reg(KVM_REG_S390_GBEA, 1);
--	test_one_reg(KVM_REG_S390_PP, 0);
--	test_one_reg(KVM_REG_S390_TODPR, 0);
--	test_one_reg(KVM_REG_S390_CPU_TIMER, 0);
--	test_one_reg(KVM_REG_S390_CLOCK_COMP, 0);
-+	test_one_reg(vcpu, KVM_REG_S390_GBEA, 1);
-+	test_one_reg(vcpu, KVM_REG_S390_PP, 0);
-+	test_one_reg(vcpu, KVM_REG_S390_TODPR, 0);
-+	test_one_reg(vcpu, KVM_REG_S390_CPU_TIMER, 0);
-+	test_one_reg(vcpu, KVM_REG_S390_CLOCK_COMP, 0);
- }
+ struct test_default {
+ 	struct kvm_vm *kvm_vm;
+-	struct test_vcpu vm;
+-	struct test_vcpu vcpu;
++	struct test_info vm;
++	struct test_info vcpu;
+ 	struct kvm_run *run;
+ 	int size;
+ };
  
--static void assert_normal_noclear(void)
-+static void assert_normal_noclear(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_sync_regs *sync_regs = &vcpu->run->s.regs;
-+
- 	TEST_ASSERT(sync_regs->crs[2] == 0x10, "cr2 == 10 (sync_regs)");
- 	TEST_ASSERT(sync_regs->crs[8] == 1, "cr10 == 1 (sync_regs)");
- 	TEST_ASSERT(sync_regs->crs[10] == 1, "cr10 == 1 (sync_regs)");
- 	TEST_ASSERT(sync_regs->crs[11] == -1, "cr11 == -1 (sync_regs)");
- }
- 
--static void assert_normal(void)
-+static void assert_normal(struct kvm_vcpu *vcpu)
- {
--	test_one_reg(KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
--	TEST_ASSERT(sync_regs->pft == KVM_S390_PFAULT_TOKEN_INVALID,
-+	test_one_reg(vcpu, KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
-+	TEST_ASSERT(vcpu->run->s.regs.pft == KVM_S390_PFAULT_TOKEN_INVALID,
- 			"pft == 0xff.....  (sync_regs)");
--	assert_noirq();
-+	assert_noirq(vcpu);
- }
- 
--static void inject_irq(int cpu_id)
-+static void inject_irq(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_s390_irq_state irq_state;
- 	struct kvm_s390_irq *irq = &buf[0];
-@@ -192,73 +196,86 @@ static void inject_irq(int cpu_id)
- 	irq_state.len = sizeof(struct kvm_s390_irq);
- 	irq_state.buf = (unsigned long)buf;
- 	irq->type = KVM_S390_INT_EMERGENCY;
--	irq->u.emerg.code = cpu_id;
--	irqs = __vcpu_ioctl(vm, cpu_id, KVM_S390_SET_IRQ_STATE, &irq_state);
-+	irq->u.emerg.code = vcpu->id;
-+	irqs = __vcpu_ioctl(vcpu->vm, vcpu->id, KVM_S390_SET_IRQ_STATE, &irq_state);
- 	TEST_ASSERT(irqs >= 0, "Error injecting EMERGENCY IRQ errno %d\n", errno);
- }
- 
-+static struct kvm_vm *create_vm(struct kvm_vcpu **vcpu)
-+{
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create(DEFAULT_GUEST_PHY_PAGES);
-+
-+	*vcpu = vm_vcpu_add(vm, ARBITRARY_NON_ZERO_VCPU_ID, guest_code_initial);
-+
-+	return vm;
-+}
-+
- static void test_normal(void)
+ static struct test_default test_default_init(void *guest_code)
  {
 +	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
- 	pr_info("Testing normal reset\n");
--	/* Create VM */
--	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
--	run = vcpu_state(vm, VCPU_ID);
--	sync_regs = &run->s.regs;
-+	vm = create_vm(&vcpu);
+ 	struct test_default t;
  
--	vcpu_run(vm, VCPU_ID);
-+	vcpu_run(vm, vcpu->id);
- 
--	inject_irq(VCPU_ID);
-+	inject_irq(vcpu);
- 
--	vcpu_ioctl(vm, VCPU_ID, KVM_S390_NORMAL_RESET, 0);
-+	vcpu_ioctl(vm, vcpu->id, KVM_S390_NORMAL_RESET, 0);
- 
- 	/* must clears */
--	assert_normal();
-+	assert_normal(vcpu);
- 	/* must not clears */
--	assert_normal_noclear();
--	assert_initial_noclear();
-+	assert_normal_noclear(vcpu);
-+	assert_initial_noclear(vcpu);
- 
- 	kvm_vm_free(vm);
+ 	t.size = min((size_t)kvm_check_cap(KVM_CAP_S390_MEM_OP), sizeof(mem1));
+-	t.kvm_vm = vm_create_default(VCPU_ID, 0, guest_code);
+-	t.vm = (struct test_vcpu) { t.kvm_vm, VM_VCPU_ID };
+-	t.vcpu = (struct test_vcpu) { t.kvm_vm, VCPU_ID };
+-	t.run = vcpu_state(t.kvm_vm, VCPU_ID);
++	t.kvm_vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	t.vm = (struct test_info) { t.kvm_vm, NULL };
++	t.vcpu = (struct test_info) { t.kvm_vm, vcpu };
++	t.run = vcpu->run;
+ 	return t;
  }
  
- static void test_initial(void)
+@@ -241,14 +242,15 @@ enum stage {
+ 	STAGE_COPIED,
+ };
+ 
+-#define HOST_SYNC(vcpu_p, stage)					\
++#define HOST_SYNC(info_p, stage)					\
+ ({									\
+-	struct test_vcpu __vcpu = (vcpu_p);				\
++	struct test_info __info = (info_p);				\
++	struct kvm_vcpu *__vcpu = __info.vcpu;				\
+ 	struct ucall uc;						\
+ 	int __stage = (stage);						\
+ 									\
+-	vcpu_run(__vcpu.vm, __vcpu.id);					\
+-	get_ucall(__vcpu.vm, __vcpu.id, &uc);				\
++	vcpu_run(__vcpu->vm, __vcpu->id);				\
++	get_ucall(__vcpu->vm, __vcpu->id, &uc);				\
+ 	ASSERT_EQ(uc.cmd, UCALL_SYNC);					\
+ 	ASSERT_EQ(uc.args[1], __stage);					\
+ })									\
+@@ -267,7 +269,7 @@ static void prepare_mem12(void)
+ 
+ #define DEFAULT_WRITE_READ(copy_cpu, mop_cpu, mop_target_p, size, ...)		\
+ ({										\
+-	struct test_vcpu __copy_cpu = (copy_cpu), __mop_cpu = (mop_cpu);	\
++	struct test_info __copy_cpu = (copy_cpu), __mop_cpu = (mop_cpu);	\
+ 	enum mop_target __target = (mop_target_p);				\
+ 	uint32_t __size = (size);						\
+ 										\
+@@ -282,7 +284,7 @@ static void prepare_mem12(void)
+ 
+ #define DEFAULT_READ(copy_cpu, mop_cpu, mop_target_p, size, ...)		\
+ ({										\
+-	struct test_vcpu __copy_cpu = (copy_cpu), __mop_cpu = (mop_cpu);	\
++	struct test_info __copy_cpu = (copy_cpu), __mop_cpu = (mop_cpu);	\
+ 	enum mop_target __target = (mop_target_p);				\
+ 	uint32_t __size = (size);						\
+ 										\
+@@ -623,34 +625,34 @@ static void guest_idle(void)
+ 		GUEST_SYNC(STAGE_IDLED);
+ }
+ 
+-static void _test_errors_common(struct test_vcpu vcpu, enum mop_target target, int size)
++static void _test_errors_common(struct test_info info, enum mop_target target, int size)
  {
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
- 	pr_info("Testing initial reset\n");
--	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
--	run = vcpu_state(vm, VCPU_ID);
--	sync_regs = &run->s.regs;
-+	vm = create_vm(&vcpu);
+ 	int rv;
  
--	vcpu_run(vm, VCPU_ID);
-+	vcpu_run(vm, vcpu->id);
+ 	/* Bad size: */
+-	rv = ERR_MOP(vcpu, target, WRITE, mem1, -1, GADDR_V(mem1));
++	rv = ERR_MOP(info, target, WRITE, mem1, -1, GADDR_V(mem1));
+ 	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
  
--	inject_irq(VCPU_ID);
-+	inject_irq(vcpu);
+ 	/* Zero size: */
+-	rv = ERR_MOP(vcpu, target, WRITE, mem1, 0, GADDR_V(mem1));
++	rv = ERR_MOP(info, target, WRITE, mem1, 0, GADDR_V(mem1));
+ 	TEST_ASSERT(rv == -1 && (errno == EINVAL || errno == ENOMEM),
+ 		    "ioctl allows 0 as size");
  
--	vcpu_ioctl(vm, VCPU_ID, KVM_S390_INITIAL_RESET, 0);
-+	vcpu_ioctl(vm, vcpu->id, KVM_S390_INITIAL_RESET, 0);
+ 	/* Bad flags: */
+-	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR_V(mem1), SET_FLAGS(-1));
++	rv = ERR_MOP(info, target, WRITE, mem1, size, GADDR_V(mem1), SET_FLAGS(-1));
+ 	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags");
  
- 	/* must clears */
--	assert_normal();
--	assert_initial();
-+	assert_normal(vcpu);
-+	assert_initial(vcpu);
- 	/* must not clears */
--	assert_initial_noclear();
-+	assert_initial_noclear(vcpu);
+ 	/* Bad guest address: */
+-	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR((void *)~0xfffUL), CHECK_ONLY);
++	rv = ERR_MOP(info, target, WRITE, mem1, size, GADDR((void *)~0xfffUL), CHECK_ONLY);
+ 	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
  
- 	kvm_vm_free(vm);
+ 	/* Bad host address: */
+-	rv = ERR_MOP(vcpu, target, WRITE, 0, size, GADDR_V(mem1));
++	rv = ERR_MOP(info, target, WRITE, 0, size, GADDR_V(mem1));
+ 	TEST_ASSERT(rv == -1 && errno == EFAULT,
+ 		    "ioctl does not report bad host memory address");
+ 
+ 	/* Bad key: */
+-	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR_V(mem1), KEY(17));
++	rv = ERR_MOP(info, target, WRITE, mem1, size, GADDR_V(mem1), KEY(17));
+ 	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows invalid key");
  }
  
- static void test_clear(void)
- {
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
- 	pr_info("Testing clear reset\n");
--	vm = vm_create_default(VCPU_ID, 0, guest_code_initial);
--	run = vcpu_state(vm, VCPU_ID);
--	sync_regs = &run->s.regs;
-+	vm = create_vm(&vcpu);
- 
--	vcpu_run(vm, VCPU_ID);
-+	vcpu_run(vm, vcpu->id);
- 
--	inject_irq(VCPU_ID);
-+	inject_irq(vcpu);
- 
--	vcpu_ioctl(vm, VCPU_ID, KVM_S390_CLEAR_RESET, 0);
-+	vcpu_ioctl(vm, vcpu->id, KVM_S390_CLEAR_RESET, 0);
- 
- 	/* must clears */
--	assert_normal();
--	assert_initial();
--	assert_clear();
-+	assert_normal(vcpu);
-+	assert_initial(vcpu);
-+	assert_clear(vcpu);
- 
- 	kvm_vm_free(vm);
- }
 -- 
 2.36.1.255.ge46751e96f-goog
 
