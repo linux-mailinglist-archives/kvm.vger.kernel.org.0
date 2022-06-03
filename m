@@ -2,62 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0294553C687
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 09:46:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DC8553C742
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 11:10:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242505AbiFCHqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 03:46:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56558 "EHLO
+        id S242508AbiFCJJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 05:09:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242483AbiFCHqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 03:46:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ACBC837A35
-        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 00:46:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654242403;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qAxyKscgi+dU7C+Fjo9DBbGFN6Cbs/bD1XqARJsuc3s=;
-        b=O+D56IIoFAqc/nb2p9WH9zMzuak2wWDPWUEPsCgB/N1RfLX61FaT+y0uNWPSCz6BG2kNIT
-        c86JWx81JqWBuQHWPHgji5v0HfQXD5abz4xkMdtYmBN1wR/2+vH27ls7CfveAw//jVNmQC
-        Neiz7YVyHNYH+16WIjH1g0+46VBt6iU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-663-GDXPLIM2MbSZkIAklTIg6Q-1; Fri, 03 Jun 2022 03:46:42 -0400
-X-MC-Unique: GDXPLIM2MbSZkIAklTIg6Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S242953AbiFCJJ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 05:09:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6BBE082
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 02:09:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07750811E76;
-        Fri,  3 Jun 2022 07:46:42 +0000 (UTC)
-Received: from localhost (dhcp-192-194.str.redhat.com [10.33.192.194])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BC1992166B26;
-        Fri,  3 Jun 2022 07:46:41 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v1 17/18] vfio: Export vfio_device_try_get()
-In-Reply-To: <20220602171948.2790690-18-farman@linux.ibm.com>
-Organization: Red Hat GmbH
-References: <20220602171948.2790690-1-farman@linux.ibm.com>
- <20220602171948.2790690-18-farman@linux.ibm.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Fri, 03 Jun 2022 09:46:40 +0200
-Message-ID: <874k129okf.fsf@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 28D76618A6
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 09:09:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D524C34114;
+        Fri,  3 Jun 2022 09:09:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654247394;
+        bh=ThbjYz1VPOOCZfSoMHKCJNv4joGtIlV2WQb/q8/byg4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Wap4azFylQ7sCs9bHodMhU5wB5uu7VhLym04W5LB2XPgE73S4hLf0udyQbXdbqlEF
+         FilarPxtS83HopuDpZjr+LRLtPdFsx3Czz+heE8chmikDy0xsoqVR9DsmvljYAgCBs
+         l6y6keqAMCLG6oI3LAVD7c+QxFHbwjL3DUef/iQbjo8w2ILNG8qFxo8GZyJzi53Tm5
+         EvSBl3JGsvX5/zuWWOW7dBl6nTtuhy2MzJZ4w+Cqpk7axIPjIny4ce59dFFx7W0ypq
+         fyDNQEV21kiGLwL5OeFy9Zipojo6q/mkzWOKOi0lZEo6PlHtOO5vmYHrok3xVNiAdG
+         C2fb6v2oPKQlQ==
+Date:   Fri, 3 Jun 2022 11:09:51 +0200
+From:   Mark Brown <broonie@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Quentin Perret <qperret@google.com>, kernel-team@android.com
+Subject: Re: [PATCH 03/18] KVM: arm64: Drop FP_FOREIGN_STATE from the
+ hypervisor code
+Message-ID: <YpnP35rl40rDakgb@sirena.org.uk>
+References: <20220528113829.1043361-1-maz@kernel.org>
+ <20220528113829.1043361-4-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="MU9Z6LR9WcUWlxk3"
+Content-Disposition: inline
+In-Reply-To: <20220528113829.1043361-4-maz@kernel.org>
+X-Cookie: May your camel be as swift as the wind.
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,22 +63,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 02 2022, Eric Farman <farman@linux.ibm.com> wrote:
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
->
-> vfio_ccw will need it.
->
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Link: https://lore.kernel.org/r/9-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com/
-> [farman: added Cc: tags]
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->  drivers/vfio/vfio.c  | 3 ++-
->  include/linux/vfio.h | 1 +
->  2 files changed, 3 insertions(+), 1 deletion(-)
+--MU9Z6LR9WcUWlxk3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+On Sat, May 28, 2022 at 12:38:13PM +0100, Marc Zyngier wrote:
+> The vcpu KVM_ARM64_FP_FOREIGN_FPSTATE flag tracks the thread's own
+> TIF_FOREIGN_FPSTATE so that we can evaluate just before running
+> the vcpu whether it the FP regs contain something that is owned
+> by the vcpu or not by updating the rest of the FP flags.
 
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+--MU9Z6LR9WcUWlxk3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKZz98ACgkQJNaLcl1U
+h9DAAwgAgtdvhf759AQPe2iS/1hVc6SW/WgwQC00F9zMxyXtlXa85GYzI4HO0P+w
+ndPvA6eGVF3vnN53rzjUdHWhej2h6JOEHFigz5/hLCQrm64n8JpCRH82ijtP9MN+
+Xl6uKP7M17DRCzicD5Gr/lbVPQDIpuyLuiaoWfulT3e5piXWdNoNB3z8FHLMUhMW
++1PAc1xPv7+kZl7W8k6InJCfQT46niP1JJ6YBI3FSJifFZUSV5CuxlyvWsfOsB54
+zqK1wUgbjzV8cbZvlkOIe0d5pIWG2e3YOic4Zumyqak06cwgaayUP9lPep5C35vY
+Kyheo2OW0eqx+5mIlY8y61BFeimR+Q==
+=amiN
+-----END PGP SIGNATURE-----
+
+--MU9Z6LR9WcUWlxk3--
