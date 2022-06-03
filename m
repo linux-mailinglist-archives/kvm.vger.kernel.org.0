@@ -2,187 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E6B253D2FA
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 22:55:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECDB053D324
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 23:20:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347094AbiFCUyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 16:54:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60342 "EHLO
+        id S1346482AbiFCVUU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 17:20:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230306AbiFCUyw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 16:54:52 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F5F30F71
-        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 13:54:50 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id t25so14391595lfg.7
-        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 13:54:50 -0700 (PDT)
+        with ESMTP id S231826AbiFCVUS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 17:20:18 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22C8F28734
+        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 14:20:17 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id g205so8015449pfb.11
+        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 14:20:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qNZZxsWjFD4c6PyC0A80dpLKqSoXJxfufqC0DpcPbGg=;
-        b=bdH60gL6Tlru9/88opK0AzZDuOZWHXp4jkbi8XFAiMqvL4PkH8zhNcSZ2J+7fHhlnF
-         qWo2USukfg5NYATnhHuRutpvsYJfy0ZOObvj1hYNkOi7KhslsiXrXhq8BXiKYww86K5d
-         gwmzQOcZJKJwEfAMUKV3Gd3n+aToGcBxTkV9iGBiSVSrm4t+Fv1ULMTnwUgoP5+fuELg
-         1lyyF7cR5cTZD1M/lZb/0j3Gcop0BX1Gu/4NSS0EMAzPxTR6utNfsIPktQg2FJ4CXsUX
-         IuybykxLC7MNkaNFZytv2Ey6WRZKYEy8e7jxiSj1jfhAg17iwPqbQs6bQmm0ZO8cbru0
-         GTSg==
+        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
+        h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aSL7ZHMXz3P5XlI8cikK9k/wBwL3m4ZnnGzl4LDbF5w=;
+        b=yNAzb0ajq75+NUTWQ6F/Imkp+LkAOvWyjvIEZ9Ah9mLyIFvXVmZByYLwWgzXGPugJH
+         MZUuBsPksKXivdKiY3wf5wMtR12nIaXA6IVFdxR7/USFhYToEqM8KTUL5jdj/vHXeGh1
+         olb4yI9AOqG/8V8wmwUW2Z91bj9n5R+WM0//+OmgWylvnq0NhEYoGaqWJTLkAmL0QNAr
+         60jA9p5eud68gO4TkVyG1Ac1+bCKirNYFckPPkX5eCbAhOZoOiMj2Vx3YgEZfVI03H/s
+         agkeGuWvGhFYWY5Qbj+wNfabulM2TXDfn6iB7RnlIACHBFT6laOahv13Vh2nn13Z53gQ
+         ZLBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qNZZxsWjFD4c6PyC0A80dpLKqSoXJxfufqC0DpcPbGg=;
-        b=XHl7AI34FtyJ80N/kVBf+1O+JduXtqQam2Y1YZG+gsQmuiD/AFYTD2cuzkaUi9zbYe
-         AtE8AxX4scCS2y6HBR4hNkXJ8w1nvAEk2gO6/bvGVDGVU5n4dsQDCVJf5lGwlNJBFZww
-         WlojWP3mB14kM75pvuKL1vxVEPUyv6Vc9Ez333ygrv/w3hyNc+8StRg4eyA4ntGtOw+y
-         Lr6rpgLoHscDw+l60xShxDj6fPd7dxf8vRAvnH7/inb7ibk47ezOwwnoAhLuEFAAjcuE
-         0Bc4km6VhZ49h1wxc4vcCcj23FoXCxj2yVVHt9oJu+PxZ35r0GtYetsdMT/Ii45TAOCe
-         ABYA==
-X-Gm-Message-State: AOAM5305WOFZ4E0UmUuVKR0Gnifqn3qeerQLfZO6M2EqfzRkC5KdhkY+
-        CbhF+ZSTQJ06R1YCC0oJ+YjDhnekvBRPZ+V/8iMyow==
-X-Google-Smtp-Source: ABdhPJyc6dEglhu0gzDyQ7n310Ck6t6RjULKa8Rcl1GgttW/dspLXr2I3lgT/qh9YPhdlLLmWuHOyHPPv/9pBHhv2hM=
-X-Received: by 2002:a19:dc18:0:b0:478:b167:4e80 with SMTP id
- t24-20020a19dc18000000b00478b1674e80mr7955815lfg.250.1654289688928; Fri, 03
- Jun 2022 13:54:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220520173638.94324-1-juew@google.com> <20220520173638.94324-8-juew@google.com>
-In-Reply-To: <20220520173638.94324-8-juew@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 3 Jun 2022 13:54:22 -0700
-Message-ID: <CALzav=fa7dZ7qT761sxh3dCyj9VUvPGC32Gwo5+1+Aegd6sQ1A@mail.gmail.com>
-Subject: Re: [PATCH v4 7/8] KVM: x86: Enable CMCI capability by default and
- handle injected UCNA errors
-To:     Jue Wang <juew@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Greg Thelen <gthelen@google.com>,
-        Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+         :mime-version:content-transfer-encoding;
+        bh=aSL7ZHMXz3P5XlI8cikK9k/wBwL3m4ZnnGzl4LDbF5w=;
+        b=Oxqk1VEG96P1XKuF3zP5HLTTD5h469HM5T944YVz0bLIdB19MiVPk0PlxoKUh2FJdk
+         fF5sNrvEh9BftNhc5dhpPHa0/PYsQOuZ/4nF588VVXcB1l523aNlxjXsFMMElMiEyYwq
+         K4cPO8Afnzh7rulBKlu3RkbVyyIY1mAFbMTihSeeRnMf1ttkMLWhnlPYoTZHursRPFg+
+         NshICnAa+spPDJ7QrzlLWxTPqVWSUGAznsPVORkw265D+dcMGvBPHuPmWMAgTG3R2Vm5
+         uNdLxn65M50kCIyw/+KUjVrJEACZwnxlBEpdngm23VgtopaRR3YLA4FGXihlP/rVKWjJ
+         FEVA==
+X-Gm-Message-State: AOAM531f+DMRm+DTHL+aMny/mI+1y4GqNrQ7VJVT/cCNISdls/IhS5Li
+        KzyZerC8tL/CAMhFTJe92QDbxw==
+X-Google-Smtp-Source: ABdhPJy74UdT1UAYK7NS4BOTDuipUyhVJ4Wcq5kgiiy/hpj0AmjWPiOSYCycussqXvJh6aPittlOqQ==
+X-Received: by 2002:a63:b57:0:b0:3fb:a948:6d96 with SMTP id a23-20020a630b57000000b003fba9486d96mr10378007pgl.596.1654291216494;
+        Fri, 03 Jun 2022 14:20:16 -0700 (PDT)
+Received: from localhost ([12.3.194.138])
+        by smtp.gmail.com with ESMTPSA id t10-20020a17090a950a00b001e28e80a8d6sm5604411pjo.38.2022.06.03.14.20.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jun 2022 14:20:15 -0700 (PDT)
+Date:   Fri, 03 Jun 2022 14:20:15 -0700 (PDT)
+X-Google-Original-Date: Fri, 03 Jun 2022 14:20:14 PDT (-0700)
+Subject:     Re: (RISC-V KVM) Re: [PATCH] RISC-V: fix typos in comments
+In-Reply-To: <CAAhSdy3+imWabbArUAg0Bki3qvD1PGVB-L-xY5CvNa_YBu80aA@mail.gmail.com>
+CC:     Julia.Lawall@inria.fr, kernel-janitors@vger.kernel.org,
+        atishp@atishpatra.org, Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     anup@brainfault.org
+Message-ID: <mhng-90fa273a-b4b0-4078-887b-5e4f58986006@palmer-ri-x1c9>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022 at 10:37 AM Jue Wang <juew@google.com> wrote:
+On Thu, 02 Jun 2022 21:33:00 PDT (-0700), anup@brainfault.org wrote:
+> On Thu, Jun 2, 2022 at 9:56 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
+>>
+>> On Sat, 30 Apr 2022 12:11:20 PDT (-0700), Julia.Lawall@inria.fr wrote:
+>> > Various spelling mistakes in comments.
+>> > Detected with the help of Coccinelle.
+>> >
+>> > Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+>> >
+>> > ---
+>> >  arch/riscv/kvm/vmid.c |    2 +-
+>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >
+>> > diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+>> > index 2fa4f7b1813d..4a2178c60b5d 100644
+>> > --- a/arch/riscv/kvm/vmid.c
+>> > +++ b/arch/riscv/kvm/vmid.c
+>> > @@ -92,7 +92,7 @@ void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu)
+>> >                * We ran out of VMIDs so we increment vmid_version and
+>> >                * start assigning VMIDs from 1.
+>> >                *
+>> > -              * This also means existing VMIDs assignement to all Guest
+>> > +              * This also means existing VMIDs assignment to all Guest
+>> >                * instances is invalid and we have force VMID re-assignement
+>> >                * for all Guest instances. The Guest instances that were not
+>> >                * running will automatically pick-up new VMIDs because will
+>>
+>> Anup: I'm guessing you didn't see this because it didn't have KVM in the
+>> subject?
+>>
+>> Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+>> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+>>
+>> if that helps any, I don't see in anywhere but not sure if I'm just
+>> missing it.
 >
-> Make KVM support the CMCI capability by default by adding MCG_CMCI_P to
-> kvm_mce_cap_supported. A vCPU can request for this capability via
-> KVM_X86_SETUP_MCE. Uncorrectable Error No Action required (UCNA) injection
-> reuses the MCE injection ioctl KVM_X86_SET_MCE.
->
-> Neither of the CMCI and UCNA emulations depends on hardware.
->
-> Signed-off-by: Jue Wang <juew@google.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c |  1 +
->  arch/x86/kvm/x86.c     | 50 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 51 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 610355b9ccce..1aed964ee4ee 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -8037,6 +8037,7 @@ static __init int hardware_setup(void)
->         }
->
->         kvm_mce_cap_supported |= MCG_LMCE_P;
-> +       kvm_mce_cap_supported |= MCG_CMCI_P;
->
->         if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
->                 return -EINVAL;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f8ab592f519b..d0b1bb6e5e4a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4826,6 +4826,52 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
->         return r;
->  }
->
-> +/*
-> + * Validate this is an UCNA error by checking the MCG_STATUS and MCi_STATUS
-> + * registers that none of the bits for Machine Check Exceptions are set and
-> + * both the VAL (valid) and UC (uncorrectable) bits are set.
-> + * UCNA - UnCorrectable No Action required
-> + * SRAR - Software Recoverable Action Required
-> + * MCI_STATUS_PCC - Processor Context Corrupted
-> + * MCI_STATUS_S - Signaled as a Machine Check Exception
-> + * MCI_STATUS_AR - This MCE is "software recoverable action required"
-> + */
-> +static bool is_ucna(struct kvm_x86_mce *mce)
-> +{
-> +       return  !mce->mcg_status &&
-> +               !(mce->status & (MCI_STATUS_PCC | MCI_STATUS_S | MCI_STATUS_AR)) &&
-> +               (mce->status & MCI_STATUS_VAL) &&
-> +               (mce->status & MCI_STATUS_UC);
-> +}
-> +
-> +static int kvm_vcpu_x86_set_ucna(struct kvm_vcpu *vcpu, struct kvm_x86_mce *mce)
-> +{
-> +       u64 mcg_cap = vcpu->arch.mcg_cap;
-> +       unsigned int bank_num = mcg_cap & 0xff;
-> +       u64 *banks = vcpu->arch.mce_banks;
-> +
-> +       if (mce->bank >= bank_num)
-> +               return -EINVAL;
+> Thanks Palmer, I had already planned to pick this as a RC fix for 5.19
+> but I forgot to reply here.
 
-Drop this check. The caller already checks it.
-
-> +
-> +       if (!is_ucna(mce))
-> +               return -EINVAL;
-
-Drop this check. The only caller of this function already checks is_ucna().
-
-> +
-> +       banks += 4 * mce->bank;
-
-The caller also computes banks. Perhaps just pass that in rather that
-re-calculating it here?
-
-Also, calculating banks should probably use array_index_nospec() since
-the index is untrusted (coming from userspace).
-
-> +       banks[1] = mce->status;
-> +       banks[2] = mce->addr;
-> +       banks[3] = mce->misc;
-> +       vcpu->arch.mcg_status = mce->mcg_status;
-> +
-> +       if (!(mcg_cap & MCG_CMCI_P) ||
-> +           !(vcpu->arch.mci_ctl2_banks[mce->bank] & MCI_CTL2_CMCI_EN))
-> +               return 0;
-> +
-> +       if (lapic_in_kernel(vcpu))
-> +               kvm_apic_local_deliver(vcpu->arch.apic, APIC_LVTCMCI);
-> +
-> +       return 0;
-> +}
-> +
->  static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
->                                       struct kvm_x86_mce *mce)
->  {
-> @@ -4835,6 +4881,10 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
->
->         if (mce->bank >= bank_num || !(mce->status & MCI_STATUS_VAL))
->                 return -EINVAL;
-> +
-> +       if (is_ucna(mce))
-> +               return kvm_vcpu_x86_set_ucna(vcpu, mce);
-> +
->         /*
->          * if IA32_MCG_CTL is not all 1s, the uncorrected error
->          * reporting is disabled
-> --
-> 2.36.1.124.g0e6072fb45-goog
->
+OK, no worries.  I was't going to do anything with it as it's 
+arch/riscv/kvm, so no rush on my end.
