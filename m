@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4577A53C4EE
+	by mail.lfdr.de (Postfix) with ESMTP id 91F2A53C4EF
 	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 08:34:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241500AbiFCGdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 02:33:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33814 "EHLO
+        id S241521AbiFCGdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 02:33:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241492AbiFCGdp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 02:33:45 -0400
+        with ESMTP id S241502AbiFCGdu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 02:33:50 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4942BFB;
-        Thu,  2 Jun 2022 23:33:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D3E2BF3;
+        Thu,  2 Jun 2022 23:33:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=mnrk1WExxM7qb8QUyANfKl3ANS7CKD+PXwkAz7UwVFk=; b=SOBawjmC5dRkuONKmVo2gnK+NB
-        fSzjHqRlvBXgytKF/NFsWnD1SSSR2S4RIKAdTEgVH+lK58M+NFgix4mwiSH/sNJuYdYyFO7Fu9gUs
-        +F3c54I21KHATmPEvyrD8MbF9fgqErvPXNwXqIpRYWBlrnqOcPdSotoFrGg6EJNnya2f4mHXWUq+r
-        rNi+rMZel7V5Jlh4hKj09e/zVJpBVoTU3WiTsbJRccYLWjgXgYLohlEZGId1/dgq7RzhtIYHebexa
-        BovW3IKTr5CTu7babUlVrlGwjjPPS01ZQb0ObRu1FcxHFzII1PA/kmu7xdISW66D/5XFJvqlWZaSS
-        I5L1s0Og==;
+        bh=hL0qdlLPGNQz2kcCUdvTM+8nVVuLUSOHVZ6rpwpj6XQ=; b=cx8RDfp916tlLF3pTFkj5FrxxT
+        x4mU0pdjLgE9NDq/gNV9kW4C7Sl5ymhOhYci8q56Y0Abq1fX/ugAweHbdLhHEEMxwBiCjn4X1Vnac
+        nWfThUw5aV83/kwdEILRoXV04JStwiNsoS7EiEQO/FIh5nAhA5ZLvitrs9t1Vabeo2zt/HdYFJbWf
+        SEAPqz1E7vstMdzPdyqSAnwS6WeRoZkeHwHHV7SRoIzSJVaH1lKD5RE+Z39O5gJdIxDMUbLA12hHM
+        omr/SgPFD/QD4xm/Z9XuFPkigPAGaYIYeuR+f3guiuHKBssELETv+f7Q4EVaOdsPaQRNu0O6cafnl
+        WH4hdGrQ==;
 Received: from [2001:4bb8:185:a81e:b29a:8b56:eb9a:ca3b] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nx0sP-00612N-LX; Fri, 03 Jun 2022 06:33:42 +0000
+        id 1nx0sS-00612w-G3; Fri, 03 Jun 2022 06:33:45 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -39,9 +39,9 @@ To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         intel-gvt-dev@lists.freedesktop.org
-Subject: [PATCH 4/8] vfio/mdev: remove mdev_{create,remove}_sysfs_files
-Date:   Fri,  3 Jun 2022 08:33:24 +0200
-Message-Id: <20220603063328.3715-5-hch@lst.de>
+Subject: [PATCH 5/8] vfio/mdev: remove mdev_from_dev
+Date:   Fri,  3 Jun 2022 08:33:25 +0200
+Message-Id: <20220603063328.3715-6-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220603063328.3715-1-hch@lst.de>
 References: <20220603063328.3715-1-hch@lst.de>
@@ -58,104 +58,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just fold these two trivial helpers into their only callers.
+Just open code it in the only caller.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/vfio/mdev/mdev_core.c    | 12 ++++++++++--
- drivers/vfio/mdev/mdev_private.h |  3 ---
- drivers/vfio/mdev/mdev_sysfs.c   | 28 ----------------------------
- 3 files changed, 10 insertions(+), 33 deletions(-)
+ drivers/vfio/mdev/mdev_core.c | 6 ++----
+ include/linux/mdev.h          | 4 ----
+ 2 files changed, 2 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index ff38c9549a55e..34b01d45cfe9f 100644
+index 34b01d45cfe9f..3575e893b5e43 100644
 --- a/drivers/vfio/mdev/mdev_core.c
 +++ b/drivers/vfio/mdev/mdev_core.c
-@@ -46,7 +46,8 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
+@@ -56,10 +56,8 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
+ 
+ static int mdev_device_remove_cb(struct device *dev, void *data)
  {
- 	struct mdev_parent *parent = mdev->type->parent;
- 
--	mdev_remove_sysfs_files(mdev);
-+	sysfs_remove_link(&mdev->dev.kobj, "mdev_type");
-+	sysfs_remove_link(mdev->type->devices_kobj, dev_name(&mdev->dev));
- 	device_del(&mdev->dev);
- 	lockdep_assert_held(&parent->unreg_sem);
- 	/* Balances with device_initialize() */
-@@ -193,16 +194,23 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
- 	if (ret)
- 		goto out_del;
- 
--	ret = mdev_create_sysfs_files(mdev);
-+	ret = sysfs_create_link(type->devices_kobj, &mdev->dev.kobj,
-+				dev_name(&mdev->dev));
- 	if (ret)
- 		goto out_del;
- 
-+	ret = sysfs_create_link(&mdev->dev.kobj, &type->kobj, "mdev_type");
-+	if (ret)
-+		goto out_remove_type_link;
-+
- 	mdev->active = true;
- 	dev_dbg(&mdev->dev, "MDEV: created\n");
- 	up_read(&parent->unreg_sem);
- 
+-	struct mdev_device *mdev = mdev_from_dev(dev);
+-
+-	if (mdev)
+-		mdev_device_remove_common(mdev);
++	if (dev->bus == &mdev_bus_type)
++		mdev_device_remove_common(to_mdev_device(dev));
  	return 0;
+ }
  
-+out_remove_type_link:
-+	sysfs_remove_link(mdev->type->devices_kobj, dev_name(&mdev->dev));
- out_del:
- 	device_del(&mdev->dev);
- out_unlock:
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 476cc0379ede0..277819f1ebed8 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -20,9 +20,6 @@ extern const struct attribute_group *mdev_device_groups[];
- #define to_mdev_type(_kobj)		\
- 	container_of(_kobj, struct mdev_type, kobj)
- 
--int  mdev_create_sysfs_files(struct mdev_device *mdev);
--void mdev_remove_sysfs_files(struct mdev_device *mdev);
--
- int mdev_device_create(struct mdev_type *kobj, const guid_t *uuid);
- int  mdev_device_remove(struct mdev_device *dev);
- 
-diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
-index fb058755d85b8..b6bc623487f06 100644
---- a/drivers/vfio/mdev/mdev_sysfs.c
-+++ b/drivers/vfio/mdev/mdev_sysfs.c
-@@ -176,31 +176,3 @@ const struct attribute_group *mdev_device_groups[] = {
- 	&mdev_device_group,
- 	NULL
- };
--
--int mdev_create_sysfs_files(struct mdev_device *mdev)
+diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+index cbb53dcd20d9d..5811b5a52a511 100644
+--- a/include/linux/mdev.h
++++ b/include/linux/mdev.h
+@@ -102,9 +102,5 @@ static inline struct device *mdev_dev(struct mdev_device *mdev)
+ {
+ 	return &mdev->dev;
+ }
+-static inline struct mdev_device *mdev_from_dev(struct device *dev)
 -{
--	struct mdev_type *type = mdev->type;
--	struct kobject *kobj = &mdev->dev.kobj;
--	int ret;
--
--	ret = sysfs_create_link(type->devices_kobj, kobj, dev_name(&mdev->dev));
--	if (ret)
--		return ret;
--
--	ret = sysfs_create_link(kobj, &type->kobj, "mdev_type");
--	if (ret)
--		goto type_link_failed;
--	return ret;
--
--type_link_failed:
--	sysfs_remove_link(mdev->type->devices_kobj, dev_name(&mdev->dev));
--	return ret;
+-	return dev->bus == &mdev_bus_type ? to_mdev_device(dev) : NULL;
 -}
--
--void mdev_remove_sysfs_files(struct mdev_device *mdev)
--{
--	struct kobject *kobj = &mdev->dev.kobj;
--
--	sysfs_remove_link(kobj, "mdev_type");
--	sysfs_remove_link(mdev->type->devices_kobj, dev_name(&mdev->dev));
--}
+ 
+ #endif /* MDEV_H */
 -- 
 2.30.2
 
