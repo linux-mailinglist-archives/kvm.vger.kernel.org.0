@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1E8353C1FB
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:12:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D0EC53C30C
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 04:13:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238805AbiFCA4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jun 2022 20:56:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52002 "EHLO
+        id S240163AbiFCAyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jun 2022 20:54:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241048AbiFCAuW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jun 2022 20:50:22 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505092DAB3
-        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:47:34 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id u1-20020a17090a2b8100b001d9325a862fso3520601pjd.6
-        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:47:33 -0700 (PDT)
+        with ESMTP id S241101AbiFCAuY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jun 2022 20:50:24 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10D3F2ED42
+        for <kvm@vger.kernel.org>; Thu,  2 Jun 2022 17:47:37 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id u5-20020a17090341c500b0016648422072so1285417ple.8
+        for <kvm@vger.kernel.org>; Thu, 02 Jun 2022 17:47:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=8JeyZOJgqRFYgLmKXkBPXYw3glS3GBy+qObYYGBlkn8=;
-        b=jIg9k4fyVnKA6hURXpd1DSloJ62tqnK/jZ+j2XJWkPiBVxFvgAf1iN1Ek2x9LWibN3
-         BycqhT3Q5AuEyjt8d1cwnCCSWJx+5SF/MjNTUvRP1y+R7wS+vQ0YEVR4tW7SOq1dD3oF
-         +5dA2AClwovvzyfG9yjYyrdr65dQmcG3dw8h3MIub5QkPDm5VLaxTtlq6krhyRKqqT5U
-         J48DsF4JDHgKyuWT13xeplJFmVs2p72nhZMj/4E1pb9xMLh1bMEjGb1lKWIFaPa5LKQd
-         gdgoqLqXRgeoSL5roHagtkCg8kqxnG8wgH1NDPR/5Tq+AHn30wZvwWAz1+OraG8G4YhF
-         OaWQ==
+        bh=BrjMyn6UOGwtIz7DDGBy5Pr7ixuSSx4pzqxP/WjUvpg=;
+        b=ls4moDLUsT44nSRyZwv+GbGgLQmDufXHa/fMAqmFfeHCkhU3T63EaZq6nq+SGpeAPD
+         3FQImgJFIEGzWuCAKYdLLJ/or38qceUZn22OzSBotbLwLtAb1q9IQXZ2AAl0kVe4w/9I
+         Wgdj6AGpYV6xg60tABhHeC4pUiI9UJCsaS7PC5rzJtwBlZHUg8vrymN2rWgTY+YilXG2
+         iAPQXuXvrd2fyf4hDOcVmtYcSVoIKldxC73ODI8kpbWMFbKBCYdtlFypraHtFZHWhCrg
+         sLlgFXVc4+ZnDLSYhen7uGiViE5RknfYM5mjocDmAROxYL2H5bgUYvLssw+zzTMMqhYc
+         s1LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=8JeyZOJgqRFYgLmKXkBPXYw3glS3GBy+qObYYGBlkn8=;
-        b=ASVfVTC+Z8nw5IJtCb0r7hSiC/hmx5IooldlFkI1ggOe6HS6lqYK3dB12BZq7m+v72
-         k50yS8LbVAUMFSvepRvwm0ryP7hVznk80Z4h2NpzMQcOigcCrCf0uazogpu8yny/V+X0
-         Yu/cCFr1CBDxQWNjwO4sFqGJgBCbUs/W0M+Cycgnyv65rqR3cNiuWWeuJcipVOPejHZ2
-         vcuPNJYqRPfNXXlCzQ+Z2wBewdMa6+EI7O/NoamF4dlIKlCfKYSmy1Fl7SZIPyfvuK5m
-         a06qoE/6yaHLjraGAt94awm0PzPzix3i1pLpi3sZqJkDw2EpO6jFsGU9V8K0ZcLmH1Me
-         eKKQ==
-X-Gm-Message-State: AOAM531qhOJeeg9i8fNFjOxt/o6t/YWjNmq5gXr9Wgz6R1ByEgD2bFD7
-        Es7En7FD6iMQfjL+B2FoQSrsi9dF+pc=
-X-Google-Smtp-Source: ABdhPJz12WyKDUQSxgUUJgQEaIGlyjnUyF5u7Z+2RR/3K9Oji+MjLkhAJ6QaZojY1ryHer+I3qHJ7w1Wmfs=
+        bh=BrjMyn6UOGwtIz7DDGBy5Pr7ixuSSx4pzqxP/WjUvpg=;
+        b=Hi882M4n8WnPGA6j0NEmkPfWoRlKpLw3n3gmAoaUGtXcGenXiAz/bXGG1b221t+7ee
+         kyxFbA6dUmAdfPA7SJVvb15nEzpozYtx/+GN2GcXMTWIN6AlB0Igghjrmg7qzKdfNPgr
+         axpLp1/45mpnj5nTah7OzbBJggcKr1QOp9wX76RublTEyMG2imHEftOfZtaXW0CUToh2
+         2QgmDHVlekhf6OAb/Q7AiKGuhMeY0MUKV+L3Jak8Uhz6ktZHxBWwtBBwuV1HjibpBgde
+         z+GrQ8zfyv6dRM1arwLi4rZVKurEq3OeUb3JJ9kOOE/JMr/yIt/1or6Y41dkYdY1dRZg
+         Z7fQ==
+X-Gm-Message-State: AOAM533qwdcSNCmTK2DB/gplWYyvnqLPm+x/5iTMrQbeRCywTIB/NzUS
+        H5tzTgKqFSkT6p0g7yMP+vvRCUbABTg=
+X-Google-Smtp-Source: ABdhPJz4fBpNAWEDph89ezfjs34+rAvq9PrcFCLjqp23S+Xf4PXagSLiQP9GrUfjN/n9pHc475T1OJvN8Qo=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a62:be14:0:b0:505:a43b:cf6e with SMTP id
- l20-20020a62be14000000b00505a43bcf6emr74919345pff.33.1654217253233; Thu, 02
- Jun 2022 17:47:33 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
+ t9-20020a17090a024900b001e0a8a33c6cmr307332pje.0.1654217256913; Thu, 02 Jun
+ 2022 17:47:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  3 Jun 2022 00:43:18 +0000
+Date:   Fri,  3 Jun 2022 00:43:20 +0000
 In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-Message-Id: <20220603004331.1523888-132-seanjc@google.com>
+Message-Id: <20220603004331.1523888-134-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220603004331.1523888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2 131/144] KVM: selftests: Require vCPU output array when
- creating VM with vCPUs
+Subject: [PATCH v2 133/144] KVM: selftests: Drop vcpu_get(), rename
+ vcpu_find() => vcpu_exists()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -72,49 +72,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Require the caller of __vm_create_with_vcpus() to provide a non-NULL
-array of vCPUs now that all callers do so.  It's extremely unlikely a
-test will have a legitimate use case for creating a VM with vCPUs without
-wanting to do something with those vCPUs, and if there is such a use case,
-requiring that one-off test to provide a dummy array is a minor
-annoyance.
+Drop vcpu_get() and rename vcpu_find() to vcpu_exists() to make it that
+much harder for a test to give meaning to a vCPU ID.  I.e. force tests to
+capture a vCPU when the vCPU is created.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     |  2 --
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 34 +++++++------------
+ 2 files changed, 13 insertions(+), 23 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 640634bdba9a..2da9db060378 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -93,8 +93,6 @@ struct kvm_vm {
+ 			continue;			\
+ 		else
+ 
+-struct kvm_vcpu *vcpu_get(struct kvm_vm *vm, uint32_t vcpu_id);
+-
+ struct userspace_mem_region *
+ memslot2region(struct kvm_vm *vm, uint32_t memslot);
+ 
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 6ba28018e723..36992bace6c0 100644
+index e08e89174610..8775d7ab39c8 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -302,10 +302,11 @@ struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus
- 				      struct kvm_vcpu *vcpus[])
- {
- 	uint64_t vcpu_pages, extra_pg_pages, pages;
--	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
- 	int i;
- 
-+	TEST_ASSERT(!nr_vcpus || vcpus, "Must provide vCPU array");
-+
- 	/* Force slot0 memory size not small than DEFAULT_GUEST_PHY_PAGES */
- 	if (slot0_mem_pages < DEFAULT_GUEST_PHY_PAGES)
- 		slot0_mem_pages = DEFAULT_GUEST_PHY_PAGES;
-@@ -326,11 +327,8 @@ struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus
- 
- 	vm = __vm_create(mode, pages);
- 
--	for (i = 0; i < nr_vcpus; ++i) {
--		vcpu = vm_vcpu_add(vm, i, guest_code);
--		if (vcpus)
--			vcpus[i] = vcpu;
--	}
-+	for (i = 0; i < nr_vcpus; ++i)
-+		vcpus[i] = vm_vcpu_add(vm, i, guest_code);
- 
- 	return vm;
+@@ -459,26 +459,6 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+ 	return &region->region;
  }
+ 
+-static struct kvm_vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpu_id)
+-{
+-	struct kvm_vcpu *vcpu;
+-
+-	list_for_each_entry(vcpu, &vm->vcpus, list) {
+-		if (vcpu->id == vcpu_id)
+-			return vcpu;
+-	}
+-
+-	return NULL;
+-}
+-
+-struct kvm_vcpu *vcpu_get(struct kvm_vm *vm, uint32_t vcpu_id)
+-{
+-	struct kvm_vcpu *vcpu = vcpu_find(vm, vcpu_id);
+-
+-	TEST_ASSERT(vcpu, "vCPU %d does not exist", vcpu_id);
+-	return vcpu;
+-}
+-
+ /*
+  * VM VCPU Remove
+  *
+@@ -1049,6 +1029,18 @@ static int vcpu_mmap_sz(void)
+ 	return ret;
+ }
+ 
++static bool vcpu_exists(struct kvm_vm *vm, uint32_t vcpu_id)
++{
++	struct kvm_vcpu *vcpu;
++
++	list_for_each_entry(vcpu, &vm->vcpus, list) {
++		if (vcpu->id == vcpu_id)
++			return true;
++	}
++
++	return false;
++}
++
+ /*
+  * Adds a virtual CPU to the VM specified by vm with the ID given by vcpu_id.
+  * No additional vCPU setup is done.  Returns the vCPU.
+@@ -1058,7 +1050,7 @@ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+ 	struct kvm_vcpu *vcpu;
+ 
+ 	/* Confirm a vcpu with the specified id doesn't already exist. */
+-	TEST_ASSERT(!vcpu_find(vm, vcpu_id), "vCPU%d already exists\n", vcpu_id);
++	TEST_ASSERT(!vcpu_exists(vm, vcpu_id), "vCPU%d already exists\n", vcpu_id);
+ 
+ 	/* Allocate and initialize new vcpu structure. */
+ 	vcpu = calloc(1, sizeof(*vcpu));
 -- 
 2.36.1.255.ge46751e96f-goog
 
