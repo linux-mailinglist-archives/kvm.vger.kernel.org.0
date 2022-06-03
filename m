@@ -2,133 +2,341 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AA8E53D207
-	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 20:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CDD453D214
+	for <lists+kvm@lfdr.de>; Fri,  3 Jun 2022 21:03:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348569AbiFCS7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 14:59:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47648 "EHLO
+        id S1347932AbiFCTDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jun 2022 15:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348563AbiFCS67 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 14:58:59 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44BB129833
-        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 11:58:55 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id j10so13956585lfe.12
-        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 11:58:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gm5mbmHmoECW7c12FiuJF3otTUB9zEgeXgaU7VmCclQ=;
-        b=e+sSycWzmy+BMeBOgW+Ka5JJgg8aBNRrvuT78lYCM78Pmx4m7eE6sTTzJAYHb5ecej
-         z5f/++s3iS4907X9WxwARxX3BOj3toLWcdE0ljDJNSObnHGICoNV9PoGK47RIDKBEZPA
-         dsFE91SnjOsr+vPhA1OQ7nSI0LtpWlO1LZVcLJ4htBg5CCPhArUv1t2zURMl/QvtvFZL
-         lllBGGQhwgalqjJxp1LVrgy3UrzFqIsxGr19TFqrOBanzONNjgzTVimawXSIBaSvLVmd
-         NV2CDaW9//5X/ZtFpTjZyZJIxHruzJzgkGITnHkNHEa9i5LEHJw4dLtPS6OcMG4JPkRr
-         0+oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gm5mbmHmoECW7c12FiuJF3otTUB9zEgeXgaU7VmCclQ=;
-        b=6TBf3kV8rwqMAMiHacUYauSwwkLKS6od/FpujBCUxxJWqctYxVMIQ1qZskSCIGLrnx
-         MXodlzNVZDDg5hWab5Gl57COXzNsr99quVvDrA7IqZr4vOUNaqhvcESkJpztKhcoILDc
-         oga6WOm1dSPe98hWAXj2lBs5IG7hSMN3goOZ8pTDt6PP5P1zXK99Q0xrSnSfdwLocmyo
-         FWS4YtkLiIPQodRRKg5tOAZelapnJfMvshin9PAfFVEZkqaZgtRfn3p+dVg/EzU9pEra
-         p7gyWae5pYaMR/EBl887DCr21Srt/I3jQ3K1dodSy3G37EeHu85NAR/8yl6t7lU5GjFl
-         ieoQ==
-X-Gm-Message-State: AOAM531q0Sdz2hr6zMS+LpGJg+biJbxzDthWVzhUA8ijDBuWRZA6olRE
-        piQiP6Jxp5ppBZJHL0B94MiJBosI9kYqZVfPTwPK0A==
-X-Google-Smtp-Source: ABdhPJwI7cAmlHsKpvBQTz7yj44nnuOT1Ef1iPktriz747fP7Nj3J9DzjcCf9uNUg43r9g73WZpykH9OQ9jyL3/shHU=
-X-Received: by 2002:a05:6512:2803:b0:479:b8f:2cde with SMTP id
- cf3-20020a056512280300b004790b8f2cdemr7531200lfb.235.1654282733329; Fri, 03
- Jun 2022 11:58:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220520173638.94324-1-juew@google.com> <20220520173638.94324-2-juew@google.com>
-In-Reply-To: <20220520173638.94324-2-juew@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 3 Jun 2022 11:58:26 -0700
-Message-ID: <CALzav=c9wmDSNP9=RAGsFKob9D+iR4kTXwhpGuQEXuBDCDg5UA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/8] KVM: x86: Make APIC_VERSION capture only the magic 0x14UL.
-To:     Jue Wang <juew@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Greg Thelen <gthelen@google.com>,
-        Jiaqi Yan <jiaqiyan@google.com>
+        with ESMTP id S1346017AbiFCTDN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jun 2022 15:03:13 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E76C130F53;
+        Fri,  3 Jun 2022 12:03:10 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 253Go841010916;
+        Fri, 3 Jun 2022 19:03:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=PgxYIG8PJJLALUpiAGKfgFkESXEXvrlas7ZMyunsupc=;
+ b=RWeun5R6Ojfnt1ojIi3+PG+hT9SUvhzsRWuHHkBl1rwRQq7IbqwHDOuPWMNTGHYY+D9M
+ BqCm6y1wsTE4lrcddBEoRwChcp/zuX1C6hbgS60GLgRi51j+WZCj25/IcHxMkVSl1uKD
+ qEUuYeuNjE26lVV7drWMW5ec/IkfugNWbkUOeY2XB3MARCenLpY0z/yuSh3t2B8e/xme
+ ao8eyjz08DaQamianmjmIkuczNNEL07f9Pr2r6ctUX6/m8s5i6XzPlq05o9t1w97jGd6
+ ImUpX8dvKMW2MPM7DUYMEoErriK74rrY0heQ+4kFdsmrr5YpqAPC/FIDZLlUYh+ZdA3n mA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfgu78pur-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Jun 2022 19:03:08 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 253J1i4G014750;
+        Fri, 3 Jun 2022 19:03:07 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gfgu78pu5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Jun 2022 19:03:07 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 253IaE7d016411;
+        Fri, 3 Jun 2022 19:03:06 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma01dal.us.ibm.com with ESMTP id 3gcxt652rg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Jun 2022 19:03:06 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 253J355E34537838
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 3 Jun 2022 19:03:05 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 316F9C605D;
+        Fri,  3 Jun 2022 19:03:05 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 31DA1C6057;
+        Fri,  3 Jun 2022 19:03:04 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.211.94.47])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri,  3 Jun 2022 19:03:04 +0000 (GMT)
+Message-ID: <a9ff5850a4964fe0238261c35591c3c18a4a8df3.camel@linux.ibm.com>
+Subject: Re: [PATCH v1 01/18] vfio/ccw: Remove UUID from s390 debug log
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Michael Kawano <mkawano@linux.ibm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Date:   Fri, 03 Jun 2022 15:03:02 -0400
+In-Reply-To: <715c1356-b700-f529-f7a8-bb917c8d95d5@linux.ibm.com>
+References: <20220602171948.2790690-1-farman@linux.ibm.com>
+         <20220602171948.2790690-2-farman@linux.ibm.com>
+         <715c1356-b700-f529-f7a8-bb917c8d95d5@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RLhEcyZeta-WO1VooYtfL2nZ3Kbchc1R
+X-Proofpoint-GUID: JMfMq6xaRFN1vq2XLWrcMFBBKk5KEhww
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-03_06,2022-06-03_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ phishscore=0 mlxlogscore=999 suspectscore=0 spamscore=0 impostorscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206030076
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022 at 10:36 AM Jue Wang <juew@google.com> wrote:
->
-> To implement Corrected Machine Check Interrupt (CMCI) as another
-> LVT vector, the APIC LVT logic needs to be able to handle an additional
-> LVT vector conditioned on whether MCG_CMCI_P is enabled on the vCPU,
-> this is because CMCI signaling can only be enabled when the CPU's
-> MCG_CMCI_P bit is set (Intel SDM, section 15.3.1.1).
->
-> This patch factors out the dependency on KVM_APIC_LVT_NUM from the
-> APIC_VERSION macro. In later patches, KVM_APIC_LVT_NUM will be replaced
-> with a helper kvm_apic_get_nr_lvt_entries that reports different LVT
-> number conditioned on whether MCG_CMCI_P is enabled on the vCPU.
+On Thu, 2022-06-02 at 15:51 -0400, Matthew Rosato wrote:
+> On 6/2/22 1:19 PM, Eric Farman wrote:
+> > From: Michael Kawano <mkawano@linux.ibm.com>
+> > 
+> > As vfio-ccw devices are created/destroyed, the uuid of the
+> > associated
+> > mdevs that are recorded in $S390DBF/vfio_ccw_msg/sprintf get lost
+> > as
+> > they are created using pointers passed by reference.
+> > 
+> > This is a deliberate design point of s390dbf, but it leaves the
+> > uuid
+> 
+> This wording is confusing, maybe some re-wording would help here.
+> 
+> Basically, s390dbf doesn't support values passed by reference today 
+> (e.g. %pUl), it will just store that pointer (e.g. &mdev->uuid) and
+> not 
+> its contents -- so a subsequent viewing of the s390dbf log at any
+> point 
+> in the future will go peek at that referenced memory -- which might
+> have 
+> been freed (e.g. mdev was removed).  So this change will fix
+> potential 
+> garbage data viewed from the log or worse an oops when viewing the
+> log 
+> -- the latter of which should probably be mentioned in the commit
+> message.
+> 
+> I'm not sure if it was a deliberate design decision of s390dbf or
+> just a 
+> feature that was never implemented, so I'd omit that altogether --
+> but 
+> it IS pointed out in the s390dbf documentation as a limitation
+> anyway.
 
-Prefer to state what the patch does first, then explain why. Also
-please to use more precise language, especially when referring to
-architectural concepts. For example, I don't believe there is any such
-thing as an "LVT vector".
+@Jason, @Matt...  All fair, I obviously got too verbose in whatever I
+was writing at the time. I've changed this to:
 
-Putting that together, how about something like this:
+As vfio-ccw devices are created/destroyed, the uuid of the associated
+mdevs that are recorded in $S390DBF/vfio_ccw_msg/sprintf get lost.
+This is because a pointer to the UUID is stored instead of the UUID
+itself, and that memory may have been repurposed if/when the logs are
+examined. The result is usually garbage UUID data in the logs, though
+there is an outside chance of an oops happening here.
 
-Refactor APIC_VERSION so that the maximum number of LVT entries is
-inserted at runtime rather than compile time. This will be used in a
-subsequent commit to expose the LVT CMCI Register to VMs that support
-Corrected Machine Check error counting/signaling
-(IA32_MCG_CAP.MCG_CMCI_P=1).
+Simply remove the UUID from the traces, as the subchannel number will
+provide useful configuration information for problem determination,
+and is stored directly into the log instead of a pointer.
 
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Jue Wang <juew@google.com>
-> ---
->  arch/x86/kvm/lapic.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 66b0eb0bda94..a5caa77e279f 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -54,7 +54,7 @@
->  #define PRIo64 "o"
->
->  /* 14 is the version for Xeon and Pentium 8.4.8*/
-> -#define APIC_VERSION                   (0x14UL | ((KVM_APIC_LVT_NUM - 1) << 16))
-> +#define APIC_VERSION                   0x14UL
->  #define LAPIC_MMIO_LENGTH              (1 << 12)
->  /* followed define is not in apicdef.h */
->  #define MAX_APIC_VECTOR                        256
-> @@ -401,7 +401,7 @@ static inline int apic_lvt_nmi_mode(u32 lvt_val)
->  void kvm_apic_set_version(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_lapic *apic = vcpu->arch.apic;
-> -       u32 v = APIC_VERSION;
-> +       u32 v = APIC_VERSION | ((KVM_APIC_LVT_NUM - 1) << 16);
->
->         if (!lapic_in_kernel(vcpu))
->                 return;
-> --
-> 2.36.1.124.g0e6072fb45-goog
->
+As we were the only consumer of mdev_uuid(), remove that too.
+
+> 
+> The code itself is fine:
+> 
+> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> 
+> > in these traces less than useful. Since the subchannels are more
+> > constant, and are mapped 1:1 with the mdevs, the associated mdev
+> > can
+> > be discerned by looking at the device configuration (e.g., mdevctl)
+> > and places, such as kernel messages, where it is statically stored.
+> > 
+> > Thus, let's just remove the uuid from s390dbf traces. As we were
+> > the only consumer of mdev_uuid(), remove that too.
+> > 
+> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> > Signed-off-by: Michael Kawano <mkawano@linux.ibm.com>
+> > Fixes: 60e05d1cf0875 ("vfio-ccw: add some logging")
+> > Fixes: b7701dfbf9832 ("vfio-ccw: Register a chp_event callback for
+> > vfio-ccw")
+> > [farman: reworded commit message, added Fixes: tags]
+> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> > ---
+> >   drivers/s390/cio/vfio_ccw_drv.c |  5 ++---
+> >   drivers/s390/cio/vfio_ccw_fsm.c | 24 ++++++++++++------------
+> >   drivers/s390/cio/vfio_ccw_ops.c |  8 ++++----
+> >   include/linux/mdev.h            |  4 ----
+> >   4 files changed, 18 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/drivers/s390/cio/vfio_ccw_drv.c
+> > b/drivers/s390/cio/vfio_ccw_drv.c
+> > index ee182cfb467d..35055eb94115 100644
+> > --- a/drivers/s390/cio/vfio_ccw_drv.c
+> > +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> > @@ -14,7 +14,6 @@
+> >   #include <linux/init.h>
+> >   #include <linux/device.h>
+> >   #include <linux/slab.h>
+> > -#include <linux/uuid.h>
+> >   #include <linux/mdev.h>
+> >   
+> >   #include <asm/isc.h>
+> > @@ -358,8 +357,8 @@ static int vfio_ccw_chp_event(struct subchannel
+> > *sch,
+> >   		return 0;
+> >   
+> >   	trace_vfio_ccw_chp_event(private->sch->schid, mask, event);
+> > -	VFIO_CCW_MSG_EVENT(2, "%pUl (%x.%x.%04x): mask=0x%x
+> > event=%d\n",
+> > -			   mdev_uuid(private->mdev), sch->schid.cssid,
+> > +	VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: mask=0x%x event=%d\n",
+> > +			   sch->schid.cssid,
+> >   			   sch->schid.ssid, sch->schid.sch_no,
+> >   			   mask, event);
+> >   
+> > diff --git a/drivers/s390/cio/vfio_ccw_fsm.c
+> > b/drivers/s390/cio/vfio_ccw_fsm.c
+> > index e435a9cd92da..86b23732d899 100644
+> > --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> > +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> > @@ -256,8 +256,8 @@ static void fsm_io_request(struct
+> > vfio_ccw_private *private,
+> >   		if (orb->tm.b) {
+> >   			io_region->ret_code = -EOPNOTSUPP;
+> >   			VFIO_CCW_MSG_EVENT(2,
+> > -					   "%pUl (%x.%x.%04x):
+> > transport mode\n",
+> > -					   mdev_uuid(mdev),
+> > schid.cssid,
+> > +					   "sch %x.%x.%04x: transport
+> > mode\n",
+> > +					   schid.cssid,
+> >   					   schid.ssid, schid.sch_no);
+> >   			errstr = "transport mode";
+> >   			goto err_out;
+> > @@ -266,8 +266,8 @@ static void fsm_io_request(struct
+> > vfio_ccw_private *private,
+> >   					      orb);
+> >   		if (io_region->ret_code) {
+> >   			VFIO_CCW_MSG_EVENT(2,
+> > -					   "%pUl (%x.%x.%04x):
+> > cp_init=%d\n",
+> > -					   mdev_uuid(mdev),
+> > schid.cssid,
+> > +					   "sch %x.%x.%04x:
+> > cp_init=%d\n",
+> > +					   schid.cssid,
+> >   					   schid.ssid, schid.sch_no,
+> >   					   io_region->ret_code);
+> >   			errstr = "cp init";
+> > @@ -277,8 +277,8 @@ static void fsm_io_request(struct
+> > vfio_ccw_private *private,
+> >   		io_region->ret_code = cp_prefetch(&private->cp);
+> >   		if (io_region->ret_code) {
+> >   			VFIO_CCW_MSG_EVENT(2,
+> > -					   "%pUl (%x.%x.%04x):
+> > cp_prefetch=%d\n",
+> > -					   mdev_uuid(mdev),
+> > schid.cssid,
+> > +					   "sch %x.%x.%04x:
+> > cp_prefetch=%d\n",
+> > +					   schid.cssid,
+> >   					   schid.ssid, schid.sch_no,
+> >   					   io_region->ret_code);
+> >   			errstr = "cp prefetch";
+> > @@ -290,8 +290,8 @@ static void fsm_io_request(struct
+> > vfio_ccw_private *private,
+> >   		io_region->ret_code = fsm_io_helper(private);
+> >   		if (io_region->ret_code) {
+> >   			VFIO_CCW_MSG_EVENT(2,
+> > -					   "%pUl (%x.%x.%04x):
+> > fsm_io_helper=%d\n",
+> > -					   mdev_uuid(mdev),
+> > schid.cssid,
+> > +					   "sch %x.%x.%04x:
+> > fsm_io_helper=%d\n",
+> > +					   schid.cssid,
+> >   					   schid.ssid, schid.sch_no,
+> >   					   io_region->ret_code);
+> >   			errstr = "cp fsm_io_helper";
+> > @@ -301,16 +301,16 @@ static void fsm_io_request(struct
+> > vfio_ccw_private *private,
+> >   		return;
+> >   	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
+> >   		VFIO_CCW_MSG_EVENT(2,
+> > -				   "%pUl (%x.%x.%04x): halt on
+> > io_region\n",
+> > -				   mdev_uuid(mdev), schid.cssid,
+> > +				   "sch %x.%x.%04x: halt on
+> > io_region\n",
+> > +				   schid.cssid,
+> >   				   schid.ssid, schid.sch_no);
+> >   		/* halt is handled via the async cmd region */
+> >   		io_region->ret_code = -EOPNOTSUPP;
+> >   		goto err_out;
+> >   	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
+> >   		VFIO_CCW_MSG_EVENT(2,
+> > -				   "%pUl (%x.%x.%04x): clear on
+> > io_region\n",
+> > -				   mdev_uuid(mdev), schid.cssid,
+> > +				   "sch %x.%x.%04x: clear on
+> > io_region\n",
+> > +				   schid.cssid,
+> >   				   schid.ssid, schid.sch_no);
+> >   		/* clear is handled via the async cmd region */
+> >   		io_region->ret_code = -EOPNOTSUPP;
+> > diff --git a/drivers/s390/cio/vfio_ccw_ops.c
+> > b/drivers/s390/cio/vfio_ccw_ops.c
+> > index d8589afac272..bebae21228aa 100644
+> > --- a/drivers/s390/cio/vfio_ccw_ops.c
+> > +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> > @@ -131,8 +131,8 @@ static int vfio_ccw_mdev_probe(struct
+> > mdev_device *mdev)
+> >   	private->mdev = mdev;
+> >   	private->state = VFIO_CCW_STATE_IDLE;
+> >   
+> > -	VFIO_CCW_MSG_EVENT(2, "mdev %pUl, sch %x.%x.%04x: create\n",
+> > -			   mdev_uuid(mdev), private->sch->schid.cssid,
+> > +	VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: create\n",
+> > +			   private->sch->schid.cssid,
+> >   			   private->sch->schid.ssid,
+> >   			   private->sch->schid.sch_no);
+> >   
+> > @@ -154,8 +154,8 @@ static void vfio_ccw_mdev_remove(struct
+> > mdev_device *mdev)
+> >   {
+> >   	struct vfio_ccw_private *private = dev_get_drvdata(mdev-
+> > >dev.parent);
+> >   
+> > -	VFIO_CCW_MSG_EVENT(2, "mdev %pUl, sch %x.%x.%04x: remove\n",
+> > -			   mdev_uuid(mdev), private->sch->schid.cssid,
+> > +	VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: remove\n",
+> > +			   private->sch->schid.cssid,
+> >   			   private->sch->schid.ssid,
+> >   			   private->sch->schid.sch_no);
+> >   
+> > diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> > index 15d03f6532d0..a5788f592817 100644
+> > --- a/include/linux/mdev.h
+> > +++ b/include/linux/mdev.h
+> > @@ -139,10 +139,6 @@ static inline void mdev_set_drvdata(struct
+> > mdev_device *mdev, void *data)
+> >   {
+> >   	mdev->driver_data = data;
+> >   }
+> > -static inline const guid_t *mdev_uuid(struct mdev_device *mdev)
+> > -{
+> > -	return &mdev->uuid;
+> > -}
+> >   
+> >   extern struct bus_type mdev_bus_type;
+> >   
+
