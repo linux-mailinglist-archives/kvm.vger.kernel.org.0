@@ -2,107 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1517E53D507
-	for <lists+kvm@lfdr.de>; Sat,  4 Jun 2022 05:12:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73FE253D60E
+	for <lists+kvm@lfdr.de>; Sat,  4 Jun 2022 10:10:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350379AbiFDDMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jun 2022 23:12:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50358 "EHLO
+        id S233427AbiFDIKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jun 2022 04:10:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245608AbiFDDMA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jun 2022 23:12:00 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D1832BCC
-        for <kvm@vger.kernel.org>; Fri,  3 Jun 2022 20:11:57 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id k11so12674285oia.12
-        for <kvm@vger.kernel.org>; Fri, 03 Jun 2022 20:11:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=DRI9cKAgY3QVATHOoo0D04BM6oqFmuon1T3veMdSR+0=;
-        b=Y5dr4A3Zl+CHMSVikGZoL33DFqP1Ta6+bUVZhRlZ3PCaU7C5m+936veqa7BiGx4IYs
-         XzWM4ttXOp/WcBfO+0ZTVUYO5MXeljq3tDJgcRi/QarbLc3xzgFjCzsp3n35icBn4Z+M
-         nFV/A/TShU6j2UkfIZje8i7UlzIiLT0xr2T7GrtyOPTiZgyZnSVU/jZ9XdnV03pMjGui
-         /euJyDBkQeDxSUj3VvCuoL01Tt+8mlkrJQF628C45Uyq4myYludKKSqCsLOh4gS4b/DI
-         MvEYSere7DJG9lohEwLusPnJJ0FUrhhgX9hdrycc79QSa2SdNs0HD3vw9zIC3jTUGkiY
-         CV7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=DRI9cKAgY3QVATHOoo0D04BM6oqFmuon1T3veMdSR+0=;
-        b=g/NcEaZViqpvu6Mw4DCdErUbQr9kh1WI9BfFFwPnSH1pvnYUCZl64pYNVUzJQARpW5
-         KY0QQgXhD6qKIdzh8q32GQnmwrJoSzGVTUAboE937+ZMA1Wrqlu0Zki7W1XXoAFgZoh/
-         JDPaNSHvNzFgA92Rpn4tviev713D5tShK5m5I2d6exHodFQXCvQ0VWozvlKp9GJ+l63X
-         X9n9FvbxhtOlbzUSYIO2hVVExjcLVvR9amnMKVLOhADnB6ZfgUXYJEP0yilqnwmlSMUr
-         DajBfCfhRqX33NbU25feiCPdfenxV51WDWaxuTWHvco+Ifpd2oeaQDiSOBFLqFC6PwTS
-         Un4Q==
-X-Gm-Message-State: AOAM530O17CVe2CSFP1hAe1nodf4iJFn5HLLjX3WIWji9nkzcomaBrTa
-        dM+KalmzH4CC0PJeEUBdfiYnBGXIc8bXts60SLjvtA==
-X-Google-Smtp-Source: ABdhPJw7zRKTlpwlxLwwTmj2JLF92ACw1tSW3xIFPtPTlzb57s1gXYD8rM9t7Jt6Cmnk6x3nWFfDtJn8cKz5DQEeDWs=
-X-Received: by 2002:a05:6808:1189:b0:32b:7fb5:f443 with SMTP id
- j9-20020a056808118900b0032b7fb5f443mr23865041oil.269.1654312316075; Fri, 03
- Jun 2022 20:11:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <161188083424.28787.9510741752032213167.stgit@bmoger-ubuntu> <161188100955.28787.11816849358413330720.stgit@bmoger-ubuntu>
-In-Reply-To: <161188100955.28787.11816849358413330720.stgit@bmoger-ubuntu>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 3 Jun 2022 20:11:45 -0700
-Message-ID: <CALMp9eTU5h4juDyGePnuDN39FudYUqyAnnQdALZM8KfiMo93YA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] KVM: SVM: Add support for Virtual SPEC_CTRL
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, fenghua.yu@intel.com, tony.luck@intel.com,
-        wanpengli@tencent.com, kvm@vger.kernel.org,
-        thomas.lendacky@amd.com, peterz@infradead.org, seanjc@google.com,
-        joro@8bytes.org, x86@kernel.org, kyung.min.park@intel.com,
-        linux-kernel@vger.kernel.org, krish.sadhukhan@oracle.com,
-        hpa@zytor.com, mgross@linux.intel.com, vkuznets@redhat.com,
-        kim.phillips@amd.com, wei.huang2@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S232057AbiFDIKF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jun 2022 04:10:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B204F38BC7
+        for <kvm@vger.kernel.org>; Sat,  4 Jun 2022 01:10:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4896D60EFE
+        for <kvm@vger.kernel.org>; Sat,  4 Jun 2022 08:10:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E542C385B8;
+        Sat,  4 Jun 2022 08:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654330203;
+        bh=m8atLHg10uMBvCwOiHa5NmvHe5U3T9fGavEysDs06ig=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Q9nlSQlgUQgHhKqQFNcJP6QyRIINosbrtee16VhRS28GulZOE6Zr5VX3bgY/2WlQX
+         qDnxxS5a8pNadnxIjsd5djKy4ZgLqFEF2Q8ZelmcbXCQoiVsLvWjXqx7mnBvnv/1LP
+         4hcgzJz6J4Jltq2l84AQXdHTn3Hni3LDvjkDN4PKdgSl5uSdM2ctNE9dHvUzABidzc
+         sRDIBLH6I4QiKl0T3Ji1VGVhrXnwVRDxrspVTV8n9rR6/DwzEYLShSpCRF1tE/iSfg
+         66YtvfdUsPY5spZnoHFo63QS4ZQoOHFr0+i++7aFpMY+0BviulRytghzdLSLJfWQiv
+         gWLTakk/pwEtQ==
+Received: from host217-45-173-31.in-addr.btopenworld.com ([217.45.173.31] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nxOrB-00FaF6-44; Sat, 04 Jun 2022 09:10:01 +0100
+Date:   Sat, 04 Jun 2022 09:10:01 +0100
+Message-ID: <87wndwluhy.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kernel-team@android.com, Will Deacon <will@kernel.org>,
+        Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 03/18] KVM: arm64: Drop FP_FOREIGN_STATE from the hypervisor code
+In-Reply-To: <CAAeT=FxmD4Nsrodr-FCjpNghAormCg4P+R7hF3+g_wfQ5T12Rg@mail.gmail.com>
+References: <20220528113829.1043361-1-maz@kernel.org>
+        <20220528113829.1043361-4-maz@kernel.org>
+        <CAAeT=FxmD4Nsrodr-FCjpNghAormCg4P+R7hF3+g_wfQ5T12Rg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 217.45.173.31
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com, will@kernel.org, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 28, 2021 at 4:43 PM Babu Moger <babu.moger@amd.com> wrote:
+On Fri, 03 Jun 2022 06:23:25 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > The vcpu KVM_ARM64_FP_FOREIGN_FPSTATE flag tracks the thread's own
+> > TIF_FOREIGN_FPSTATE so that we can evaluate just before running
+> > the vcpu whether it the FP regs contain something that is owned
+> > by the vcpu or not by updating the rest of the FP flags.
+> >
+> > We do this in the hypervisor code in order to make sure we're
+> > in a context where we are not interruptible. But we already
+> > have a hook in the run loop to generate this flag. We may as
+> > well update the FP flags directly and save the pointless flag
+> > tracking.
+> >
+> > Whilst we're at it, rename update_fp_enabled() to guest_owns_fp_regs()
+> > to indicate what the leftover of this helper actually do.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> 
+> 
+> > --- a/arch/arm64/kvm/fpsimd.c
+> > +++ b/arch/arm64/kvm/fpsimd.c
+> > @@ -107,16 +107,19 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+> >  }
+> >
+> >  /*
+> > - * Called just before entering the guest once we are no longer
+> > - * preemptable. Syncs the host's TIF_FOREIGN_FPSTATE with the KVM
+> > - * mirror of the flag used by the hypervisor.
+> > + * Called just before entering the guest once we are no longer preemptable
+> > + * and interrupts are disabled. If we have managed to run anything using
+> > + * FP while we were preemptible (such as off the back of an interrupt),
+> > + * then neither the host nor the guest own the FP hardware (and it was the
+> > + * responsibility of the code that used FP to save the existing state).
+> > + *
+> > + * Note that not supporting FP is basically the same thing as far as the
+> > + * hypervisor is concerned (nothing to save).
+> >   */
+> >  void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
+> >  {
+> > -       if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+> > -               vcpu->arch.flags |= KVM_ARM64_FP_FOREIGN_FPSTATE;
+> > -       else
+> > -               vcpu->arch.flags &= ~KVM_ARM64_FP_FOREIGN_FPSTATE;
+> > +       if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
+> > +               vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_FP_HOST);
+> >  }
+> 
+> Although kvm_arch_vcpu_load_fp() unconditionally sets KVM_ARM64_FP_HOST,
+> perhaps having kvm_arch_vcpu_load_fp() set KVM_ARM64_FP_HOST only when
+> FP is supported might be more consistent?
+> Then, checking system_supports_fpsimd() is unnecessary here.
+> (KVM_ARM64_FP_ENABLED is not set when FP is not supported)
 
-> This support also fixes an issue where a guest may sometimes see an
-> inconsistent value for the SPEC_CTRL MSR on processors that support
-> this feature. With the current SPEC_CTRL support, the first write to
-> SPEC_CTRL is intercepted and the virtualized version of the SPEC_CTRL
-> MSR is not updated. When the guest reads back the SPEC_CTRL MSR, it
-> will be 0x0, instead of the actual expected value. There isn=E2=80=99t a
-> security concern here, because the host SPEC_CTRL value is or=E2=80=99ed =
-with
-> the Guest SPEC_CTRL value to generate the effective SPEC_CTRL value.
-> KVM writes with the guest's virtualized SPEC_CTRL value to SPEC_CTRL
-> MSR just before the VMRUN, so it will always have the actual value
-> even though it doesn=E2=80=99t appear that way in the guest. The guest wi=
-ll
-> only see the proper value for the SPEC_CTRL register if the guest was
-> to write to the SPEC_CTRL register again. With Virtual SPEC_CTRL
-> support, the save area spec_ctrl is properly saved and restored.
-> So, the guest will always see the proper value when it is read back.
+That's indeed a possibility. But I'm trying not to change the logic
+here, only to move it to a place that provides the same semantic
+without the need for an extra flag.
 
-Note that there are actually two significant problems with the way the
-new feature interacts with the KVM code before this patch:
-1) All bits set by the first non-zero write become sticky until the
-vCPU is reset (because svm->spec_ctrl is never modified after the
-first non-zero write).
-2) The current guest IA32_SPEC_CTRL value isn't actually known to the
-hypervisor. It thinks that there are no writes to the MSR after the
-first non-zero write, so that sticky value will be returned to
-KVM_GET_MSRS. This breaks live migration.
+I'm happy to stack an extra patch on top of this series though.
 
-Basically, an always-on V_SPEC_CTRL breaks existing hypervisors. It
-must, therefore, default to off. However, I see that our Rome and
-Milan CPUs already report the existence of this feature.
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
