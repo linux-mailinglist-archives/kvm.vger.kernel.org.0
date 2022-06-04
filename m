@@ -2,268 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66CF653D616
-	for <lists+kvm@lfdr.de>; Sat,  4 Jun 2022 10:17:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBBBB53D61A
+	for <lists+kvm@lfdr.de>; Sat,  4 Jun 2022 10:26:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233644AbiFDIRH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jun 2022 04:17:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44472 "EHLO
+        id S232870AbiFDI0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jun 2022 04:26:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233655AbiFDIRE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jun 2022 04:17:04 -0400
-Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78C6ADF2F
-        for <kvm@vger.kernel.org>; Sat,  4 Jun 2022 01:17:01 -0700 (PDT)
-Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-edeb6c3642so13395599fac.3
-        for <kvm@vger.kernel.org>; Sat, 04 Jun 2022 01:17:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JAv6TmeB/u+Xmiczcgk77PHsW0AKopWiHZR3bN+6WWo=;
-        b=M2i5/m2y8SBIk1XawfgwbGjnzKF5iqpsFo0gVRl4hoWm3HJWShIV36J61ZZXI6Hb6k
-         tJMhSILd8lqsF6kxLAq+82P5CSQIt+58DhjM8/YQp0Kxdc/vJzgatosbUhOqUklxNMRQ
-         ghkBW27SljC/1wwxFJ3UsTOTPvST2A3zePI/Je7Pf/GhGGHSBfuy88GIGu2NtImtTOmx
-         kiFNGAQiWiYoVXVPfevFgjk2le3NwbL3ssvKTRyeu/ZfF0jePQuXBvzHfZ618Wc8hXeO
-         gb+lKg9CnT/R0TcGtQGW6Xu5nyJ4uE30eZfUnMqN1e+xfvUDTm8THV5oeLk4gtsQumh6
-         sNJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JAv6TmeB/u+Xmiczcgk77PHsW0AKopWiHZR3bN+6WWo=;
-        b=PdDnmXjxREdI0mMuoS9mF2OaArLbc4nHYpptOE+a/9u/XuQG3hYF9gtiyEkwV60aj6
-         b7f4l8sKXct+J1K2iRZ/MmVsdedugh/29OSNygGUKKVea8TprOaWkyhYJ5/8k38zVch+
-         Le4MszPEofQmjTissLJPksk31CHzvoIBU8CZKX45Nr2iqwEJgtwp93TcC9N1kDKBgofE
-         Tavj77kK28zGmjGnn3ASnXcAakPx2au7oH2OOQ3BvWk/fZvLLFoF7sUZAMI7aACLbMW1
-         v+YSE/7kitDW1iDfgerlWnvyom1WVvcFP9JJNY4XcoE1xqS5ealJQxCQhnEWVe5rEoCb
-         RIUg==
-X-Gm-Message-State: AOAM533E9G35Wcq8ZVwBsnuOxPWQflBtA7vaGfLcicfDvOjCi+CpH4pH
-        +5NzVuaDqj5zo7kJvKde1W3m2ZqjxTXwG2HhQ5VNyg==
-X-Google-Smtp-Source: ABdhPJz3J9U5bFSoVT1FbkGyokU7Wc8fWQkvlFKPPR3FH53hgcZ0JvbgSYQ82dNI9J+tIbbpVyEr0P8KZpqslowVvjs=
-X-Received: by 2002:a05:6870:304b:b0:f2:d164:5c85 with SMTP id
- u11-20020a056870304b00b000f2d1645c85mr24850626oau.107.1654330620608; Sat, 04
- Jun 2022 01:17:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220528113829.1043361-1-maz@kernel.org> <20220528113829.1043361-5-maz@kernel.org>
-In-Reply-To: <20220528113829.1043361-5-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sat, 4 Jun 2022 01:16:44 -0700
-Message-ID: <CAAeT=FydqQFoUcawxeR4wFD3=AJusYe16fSWhEWpQmkm8yPZTw@mail.gmail.com>
-Subject: Re: [PATCH 04/18] KVM: arm64: Move FP state ownership from flag to a tristate
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kernel-team@android.com, Will Deacon <will@kernel.org>,
-        Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S231295AbiFDI0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jun 2022 04:26:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AF0562E3
+        for <kvm@vger.kernel.org>; Sat,  4 Jun 2022 01:26:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 46B5360F0F
+        for <kvm@vger.kernel.org>; Sat,  4 Jun 2022 08:26:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80187C385B8;
+        Sat,  4 Jun 2022 08:26:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654331176;
+        bh=XB9XNCUnz60TeYIewtZ/Z+5jYs1vpZbLifBhN25MVEE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=BOKrKDdE3n6ydBKz5NZgm9MaI+P7AVSsruHomByISL45xwrgTca665UeLaiELINLR
+         E6r3L6zyIYO/GLBA/4rF1CSwoq1B92Vowh3y7IwK8y6ZyluSueD/CL+AyAbSpc6Pb8
+         q3B1m4BulIZ8du5AE7QE1El4Bw3xj3qK1dQBBAz5MR6Bv6VZa078wMVrfH11UtTSK/
+         gcC+wXsBe6QSBJqT5uE6wWd72AX6GDOSrSzkgkv11fn+lMyr3piWK3kv6aMNPJ/Lmq
+         gTGEfj7ey4H5QKR7uVLXLcGS6Qq2rXE/hlavHMA6XOUx0ShGR+ILIWVf5h9Mgc1d8t
+         14rSqcTJ5v2ug==
+Received: from host217-45-173-31.in-addr.btopenworld.com ([217.45.173.31] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nxP6s-00FaKq-0z; Sat, 04 Jun 2022 09:26:14 +0100
+Date:   Sat, 04 Jun 2022 09:26:13 +0100
+Message-ID: <87v8tgltqy.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Collingbourne <pcc@google.com>
+Cc:     Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
+        kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oupton@google.com>, kernel-team@android.com,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
+In-Reply-To: <Ypl5TdMN3J/tttNe@google.com>
+References: <20220519134204.5379-1-will@kernel.org>
+        <20220519134204.5379-60-will@kernel.org>
+        <CAMn1gO4_d75_88fg5hcnBqx+tdu-9pG7atzt-qUD1nhUNs5TyQ@mail.gmail.com>
+        <CA+EHjTx328na4FDfKU-cdLX+SV4MmKfMKKrTHo5H0=iB2GTQ+A@mail.gmail.com>
+        <Ypl5TdMN3J/tttNe@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 217.45.173.31
+X-SA-Exim-Rcpt-To: pcc@google.com, tabba@google.com, will@kernel.org, kvmarm@lists.cs.columbia.edu, ardb@kernel.org, seanjc@google.com, alexandru.elisei@arm.com, luto@amacapital.net, catalin.marinas@arm.com, james.morse@arm.com, chao.p.peng@linux.intel.com, qperret@google.com, suzuki.poulose@arm.com, michael.roth@amd.com, mark.rutland@arm.com, oupton@google.com, kernel-team@android.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> The KVM FP code uses a pair of flags to denote three states:
->
-> - FP_ENABLED set: the guest owns the FP state
-> - FP_HOST set: the host owns the FP state
-> - FP_ENABLED and FP_HOST clear: nobody owns the FP state at all
->
-> and both flags set is an illegal state, which nothing ever checks
-> for...
->
-> As it turns out, this isn't really a good match for flags, and
-> we'd be better off if this was a simpler tristate, each state
-> having a name that actually reflect the state:
->
-> - FP_STATE_CLEAN
-> - FP_STATE_HOST_DIRTY
-> - FP_STATE_GUEST_DIRTY
->
-> Kill the two flags, and move over to an enum encoding these
-> three states. This results in less confusing code, and less risk of
-> ending up in the uncharted territory of a 4th state if we forget
-> to clear one of the two flags.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Fri, 03 Jun 2022 04:00:29 +0100,
+Peter Collingbourne <pcc@google.com> wrote:
+>=20
+> Hi Fuad,
+>=20
+> On Fri, May 27, 2022 at 08:55:42AM +0100, Fuad Tabba wrote:
+> > Hi Peter,
+> >=20
+> > On Thu, May 26, 2022 at 9:08 PM Peter Collingbourne <pcc@google.com> wr=
+ote:
+> > >
+> > > On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
+> > > >
+> > > > From: Fuad Tabba <tabba@google.com>
+> > > >
+> > > > Return an error (-EINVAL) if trying to enable MTE on a protected
+> > > > vm.
+> > >
+> > > I think this commit message needs more explanation as to why MTE is
+> > > not currently supported in protected VMs.
+> >=20
+> > Yes, we need to explain this more. Basically this is an extension of
+> > restricting features for protected VMs done earlier [*].
+> >=20
+> > Various VM feature configurations are allowed in KVM/arm64, each requir=
+ing
+> > specific handling logic to deal with traps, context-switching and poten=
+tially
+> > emulation. Achieving feature parity in pKVM therefore requires either e=
+levating
+> > this logic to EL2 (and substantially increasing the TCB) or continuing =
+to trust
+> > the host handlers at EL1. Since neither of these options are especially
+> > appealing, pKVM instead limits the CPU features exposed to a guest to a=
+ fixed
+> > configuration based on the underlying hardware and which can mostly be =
+provided
+> > straightforwardly by EL2.
+> >=20
+> > This of course can change in the future and we can support more
+> > features for protected VMs as needed. We'll expand on this commit
+> > message when we respin.
+> >=20
+> > Also note that this only applies to protected VMs. Non-protected VMs
+> > in protected mode support MTE.
+>=20
+> I see. In this case unless I'm missing something the=C2=A0EL2 side seems
+> quite trivial though (flipping some bits in HCR_EL2). The patch below
+> (in place of this one) seems to make MTE work in my test environment
+> (patched [1] crosvm on Android in MTE-enabled QEMU).
+>=20
+> [1] https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm=
+/+/3689015
+>=20
+> From c87965cd14515586d487872486e7670874209113 Mon Sep 17 00:00:00 2001
+> From: Peter Collingbourne <pcc@google.com>
+> Date: Thu, 2 Jun 2022 19:16:02 -0700
+> Subject: [PATCH] arm64: support MTE in protected VMs
+>=20
+> Enable HCR_EL2.ATA while running a vCPU with MTE enabled.
+>=20
+> To avoid exposing MTE tags from the host to protected VMs, sanitize
+> tags before donating pages.
+>=20
+> Signed-off-by: Peter Collingbourne <pcc@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pkvm.h | 4 +++-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 6 +++---
+>  arch/arm64/kvm/mmu.c              | 4 +++-
+>  3 files changed, 9 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/k=
+vm_pkvm.h
+> index 952e3c3fa32d..9ca9296f2a25 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -73,10 +73,12 @@ void kvm_shadow_destroy(struct kvm *kvm);
+>   * Allow for protected VMs:
+>   * - Branch Target Identification
+>   * - Speculative Store Bypassing
+> + * - Memory Tagging Extension
+>   */
+>  #define PVM_ID_AA64PFR1_ALLOW (\
+>  	ARM64_FEATURE_MASK(ID_AA64PFR1_BT) | \
+> -	ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) \
+> +	ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) | \
+> +	ARM64_FEATURE_MASK(ID_AA64PFR1_MTE) \
+>  	)
+> =20
+>  /*
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
+m.c
+> index e33ba9067d7b..46ddd9093ac7 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -88,7 +88,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vc=
+pu)
+>  	/* Memory Tagging: Trap and Treat as Untagged if not supported. */
+>  	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), feature_ids)) {
+>  		hcr_set |=3D HCR_TID5;
+> -		hcr_clear |=3D HCR_DCT | HCR_ATA;
+> +		hcr_clear |=3D HCR_ATA;
+>  	}
+> =20
+>  	vcpu->arch.hcr_el2 |=3D hcr_set;
+> @@ -179,8 +179,8 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
+>  	 * - Feature id registers: to control features exposed to guests
+>  	 * - Implementation-defined features
+>  	 */
+> -	vcpu->arch.hcr_el2 =3D HCR_GUEST_FLAGS |
+> -			     HCR_TID3 | HCR_TACR | HCR_TIDCP | HCR_TID1;
+> +	vcpu->arch.hcr_el2 =3D HCR_GUEST_FLAGS | HCR_TID3 | HCR_TACR | HCR_TIDC=
+P |
+> +			     HCR_TID1 | HCR_ATA;
+> =20
+>  	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
+>  		/* route synchronous external abort exceptions to EL2 */
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 392ff7b2362d..f513852357f7 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1206,8 +1206,10 @@ static int pkvm_mem_abort(struct kvm_vcpu *vcpu, p=
+hys_addr_t fault_ipa,
+>  		goto dec_account;
+>  	}
+> =20
+> -	write_lock(&kvm->mmu_lock);
+>  	pfn =3D page_to_pfn(page);
+> +	sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
+> +
+> +	write_lock(&kvm->mmu_lock);
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Is it really safe to rely on the host to clear the tags? My guts
+feeling says that it isn't. If it is required, we cannot leave this
+responsibility to the host, and this logic must be moved to EL2. And
+if it isn't, then we should drop it.
 
-I have the same comment as I have for the patch-3 though.
-(i.e. I think having kvm_arch_vcpu_load_fp() set vcpu->arch.fp_state to
-FP_STATE_DIRTY_HOST only when FP is supported would be more consistent.)
+>  	ret =3D pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT);
+>  	if (ret) {
+>  		if (ret =3D=3D -EAGAIN)
+
+But the bigger picture here is what ensures that the host cannot mess
+with the guest tags? I don't think we have a any mechanism to
+guarantee that, specially on systems where the tags are only a memory
+carve-out, which the host could map and change at will.
+
+In any case, this isn't the time to pile new features on top of
+pKVM. The current plan is to not support MTE at all, and only do it
+once we have a definitive story on page donation (which as you may
+have noticed, is pretty hacky). I don't see any compelling reason to
+add MTE to the mix until this is solved.
 
 Thanks,
-Reiji
 
-> ---
->  arch/arm64/include/asm/kvm_host.h       |  9 +++++++--
->  arch/arm64/kvm/fpsimd.c                 | 11 +++++------
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  8 +++-----
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  4 ++--
->  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
->  5 files changed, 18 insertions(+), 16 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 9252d71b4ac5..a46f952b97f6 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -328,6 +328,13 @@ struct kvm_vcpu_arch {
->         /* Exception Information */
->         struct kvm_vcpu_fault_info fault;
->
-> +       /* Ownership of the FP regs */
-> +       enum {
-> +               FP_STATE_CLEAN,
-> +               FP_STATE_DIRTY_HOST,
-> +               FP_STATE_DIRTY_GUEST,
-> +       } fp_state;
-> +
->         /* Miscellaneous vcpu state flags */
->         u64 flags;
->
-> @@ -433,8 +440,6 @@ struct kvm_vcpu_arch {
->
->  /* vcpu_arch flags field values: */
->  #define KVM_ARM64_DEBUG_DIRTY          (1 << 0)
-> -#define KVM_ARM64_FP_ENABLED           (1 << 1) /* guest FP regs loaded */
-> -#define KVM_ARM64_FP_HOST              (1 << 2) /* host FP regs loaded */
->  #define KVM_ARM64_HOST_SVE_ENABLED     (1 << 4) /* SVE enabled for EL0 */
->  #define KVM_ARM64_GUEST_HAS_SVE                (1 << 5) /* SVE exposed to guest */
->  #define KVM_ARM64_VCPU_SVE_FINALIZED   (1 << 6) /* SVE config completed */
-> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> index 9ebd89541281..0d82f6c5b110 100644
-> --- a/arch/arm64/kvm/fpsimd.c
-> +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -77,8 +77,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
->         BUG_ON(!current->mm);
->         BUG_ON(test_thread_flag(TIF_SVE));
->
-> -       vcpu->arch.flags &= ~KVM_ARM64_FP_ENABLED;
-> -       vcpu->arch.flags |= KVM_ARM64_FP_HOST;
-> +       vcpu->arch.fp_state = FP_STATE_DIRTY_HOST;
+	M.
 
-
-
->
->         vcpu->arch.flags &= ~KVM_ARM64_HOST_SVE_ENABLED;
->         if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
-> @@ -100,7 +99,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
->
->                 if (read_sysreg_s(SYS_SVCR_EL0) &
->                     (SYS_SVCR_EL0_SM_MASK | SYS_SVCR_EL0_ZA_MASK)) {
-> -                       vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
-> +                       vcpu->arch.fp_state = FP_STATE_CLEAN;
->                         fpsimd_save_and_flush_cpu_state();
->                 }
->         }
-> @@ -119,7 +118,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
->  void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
->  {
->         if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
-> -               vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_FP_HOST);
-> +               vcpu->arch.fp_state = FP_STATE_CLEAN;
->  }
->
->  /*
-> @@ -133,7 +132,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
->  {
->         WARN_ON_ONCE(!irqs_disabled());
->
-> -       if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-> +       if (vcpu->arch.fp_state == FP_STATE_DIRTY_GUEST) {
->                 /*
->                  * Currently we do not support SME guests so SVCR is
->                  * always 0 and we just need a variable to point to.
-> @@ -176,7 +175,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
->                                          CPACR_EL1_SMEN_EL1EN);
->         }
->
-> -       if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-> +       if (vcpu->arch.fp_state == FP_STATE_DIRTY_GUEST) {
->                 if (vcpu_has_sve(vcpu)) {
->                         __vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
->
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 1209248d2a3d..b22378abfb57 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -40,7 +40,7 @@ extern struct kvm_exception_table_entry __stop___kvm_ex_table;
->  /* Check whether the FP regs are owned by the guest */
->  static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
->  {
-> -       return !!(vcpu->arch.flags & KVM_ARM64_FP_ENABLED);
-> +       return vcpu->arch.fp_state == FP_STATE_DIRTY_GUEST;
->  }
->
->  /* Save the 32-bit only FPSIMD system register state */
-> @@ -179,10 +179,8 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
->         isb();
->
->         /* Write out the host state if it's in the registers */
-> -       if (vcpu->arch.flags & KVM_ARM64_FP_HOST) {
-> +       if (vcpu->arch.fp_state == FP_STATE_DIRTY_HOST)
->                 __fpsimd_save_state(vcpu->arch.host_fpsimd_state);
-> -               vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
-> -       }
->
->         /* Restore the guest state */
->         if (sve_guest)
-> @@ -194,7 +192,7 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
->         if (!(read_sysreg(hcr_el2) & HCR_RW))
->                 write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
->
-> -       vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
-> +       vcpu->arch.fp_state = FP_STATE_DIRTY_GUEST;
->
->         return true;
->  }
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index a6b9f1186577..89e0f88c9006 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -123,7 +123,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
->         }
->
->         cptr = CPTR_EL2_DEFAULT;
-> -       if (vcpu_has_sve(vcpu) && (vcpu->arch.flags & KVM_ARM64_FP_ENABLED))
-> +       if (vcpu_has_sve(vcpu) && (vcpu->arch.fp_state == FP_STATE_DIRTY_GUEST))
->                 cptr |= CPTR_EL2_TZ;
->         if (cpus_have_final_cap(ARM64_SME))
->                 cptr &= ~CPTR_EL2_TSM;
-> @@ -335,7 +335,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->
->         __sysreg_restore_state_nvhe(host_ctxt);
->
-> -       if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
-> +       if (vcpu->arch.fp_state == FP_STATE_DIRTY_GUEST)
->                 __fpsimd_save_fpexc32(vcpu);
->
->         __debug_switch_to_host(vcpu);
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 46f365254e9f..258e87325c95 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -175,7 +175,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->
->         sysreg_restore_host_state_vhe(host_ctxt);
->
-> -       if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
-> +       if (vcpu->arch.fp_state == FP_STATE_DIRTY_GUEST)
->                 __fpsimd_save_fpexc32(vcpu);
->
->         __debug_switch_to_host(vcpu);
-> --
-> 2.34.1
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+--=20
+Without deviation from the norm, progress is not possible.
