@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84C6D53DA74
-	for <lists+kvm@lfdr.de>; Sun,  5 Jun 2022 08:43:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7AFB53DA7B
+	for <lists+kvm@lfdr.de>; Sun,  5 Jun 2022 08:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244245AbiFEGnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Jun 2022 02:43:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35020 "EHLO
+        id S244302AbiFEGnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Jun 2022 02:43:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243547AbiFEGnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S243907AbiFEGnA (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 5 Jun 2022 02:43:00 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69C5363D1;
-        Sat,  4 Jun 2022 23:42:52 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id o17so9851011pla.6;
-        Sat, 04 Jun 2022 23:42:52 -0700 (PDT)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EFBE29805;
+        Sat,  4 Jun 2022 23:42:56 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id x4so1768343pfj.10;
+        Sat, 04 Jun 2022 23:42:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hHrG+8g/+cCdW5LjmoH+wCD9PYTReZVDi2xHgaOhftU=;
-        b=WIKcI9O3ojEclt+VX5vNSC4mC86qquiPp+Ridyb1bNhoDgbqSmWl+m1DYgc96SCja5
-         RbxIWRToZjU+ul9tr03RJ/y0cqaJbOYMMxpVqLMrcCOi2DSH45TWFYH8Q9t3IY2K/21f
-         MZEpuYeg4ZoGyNBzocBMGyBZ0RD3ws6qvqBpaIKAzwdk1OgIY0mpnqPx37zcA7yhFvyG
-         VuJ8D9/A9mTsEpFWTHMsF6UEFJnExmGWBqIAzlNtcO4MddOh4BhY8eQ9G6cqaUjGVGfx
-         EaaubWETwxCMzHMAZTpv8ocl4FC330IPX/WPhCFStZo5wIncLXBo0rSzsEbZtHMDMuDW
-         ZtZw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=KM1oikz+Ia9mBiSM3+pw9WjtCt1EQ9hMQl48+WeL5cM=;
+        b=HX8EfDf5WIq4AlYOacnyiqpv687wfE7clq7qblX2gZCKD/SJjyRVEpsfdmEE5hN/dx
+         GRa3nOiWAHG1Qg50NUnkvf+jgvHXyiCvP0j/toJmLOfbbYTw7KMI4aXADgSZZ0EMPGLS
+         8K+s0TrmN5QbiuPEMix7EiyfHFT0yCqcfEbup9cp87hzCUUUcSXdDlVyZt1owQIKruug
+         sTslzmaP3akqW43NdPrGlxKHheK0Jpmn7Qt4SEPMo+VvW6wqtpgE34ClnOjzCuWYPEyB
+         8iXFKONQFTKMCnGoBTScxRc+yLVPgUIY4QTQh0Zyh/rHoKwyyfJnYLS/q5VVJbejr9+E
+         KFmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hHrG+8g/+cCdW5LjmoH+wCD9PYTReZVDi2xHgaOhftU=;
-        b=V3j1vHvvb6gW309uFRlKqNor5JoTpRTZm71ChKeoBg6KkpTKXBFh3dVNOd+eFft5je
-         PGnqECx92CiqYJF/ODLEtxwxCnHJ/9YGYdskh4ivUApLteu3fYtpS5AiVSOzgU9WzADx
-         0pRrwYBEg2GOEh4Pj5X6npMwxBH5LttbzDywlYrQ2O51obUGgwsdVZ42AwPX/8e3HWVu
-         6U8Vqnnb6U/8qvhRTFkFXuddsdrV8bBC3BNSuDTODUzatbiO3dKD0l/4YxXpcDTm/dsy
-         hNYDmYPJAgqnDUW3S5umEMeH6t031ZNmoug9e9A4DT0Ng567kUzaPoVcq0NFMvvUGE8G
-         GjFw==
-X-Gm-Message-State: AOAM532BTUMEhUkwq2HelcIStvzLctNXDyAIWQ5pQnIGsw6gyZ7yv04A
-        58Go/r/TEHGm6lWgfZ/via0cNMJgQT4=
-X-Google-Smtp-Source: ABdhPJwf+7H8oNSuT1793ocfEsdkHmtVRwjx6soGsjfx4qIWTs91QTDOs6GVHi4FYqQb03DCT0w9QQ==
-X-Received: by 2002:a17:902:7e01:b0:15e:caea:d6 with SMTP id b1-20020a1709027e0100b0015ecaea00d6mr18212182plm.33.1654411371626;
-        Sat, 04 Jun 2022 23:42:51 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=KM1oikz+Ia9mBiSM3+pw9WjtCt1EQ9hMQl48+WeL5cM=;
+        b=GKT+8sPSbgFk1ZYdLa8mWZmEqvqFzRddqrqKTwDq8CtB68+6k63fwtNuEoOby1dFGa
+         Lyfso9Z2tR4uFDTZ621009YaBxMyf9gO6edFVBkUzCeeBWreru9SocP969jvnoSDgpX3
+         t/D9a+qKDGWtwWfki2Eq3AM7pxdGQ3WVpOjqAP25JIbJzMaYhA6PYZlqEXTou2TwVZ1k
+         buJkRjIPb95fMaJusL+ACq2VQOCULrtnWU3ziImAiYOoWtDy28xdmcWeAiHvlsZbAjek
+         +nqHAQP8AnRf2l/mrOz1DbV+0YB0vexrWjWRbDERPnJe58pDKc2ZDoEN++ZFO3vUkpn/
+         z/gg==
+X-Gm-Message-State: AOAM5318vT9O0Q1R4sJ2D/dbKItX2RytAO+QTCcqp2ffxeVrn/TeTOWp
+        JMvYSEMKIsr8zXZzcymRkaEFb0LLXwk=
+X-Google-Smtp-Source: ABdhPJxydESjX02nx0dTvWq2uEG82KGX3cWEuD45WHQtRyWrMfukHWuo2zgk70Nmo57dm2nNQYCXVA==
+X-Received: by 2002:a05:6a00:2293:b0:51b:f02e:de32 with SMTP id f19-20020a056a00229300b0051bf02ede32mr7524558pfe.17.1654411375583;
+        Sat, 04 Jun 2022 23:42:55 -0700 (PDT)
 Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id g7-20020a636b07000000b003fd3a3db089sm3483496pgc.11.2022.06.04.23.42.50
+        by smtp.gmail.com with ESMTPSA id q15-20020a170902eb8f00b0015e8d4eb25asm8059385plg.164.2022.06.04.23.42.54
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 04 Jun 2022 23:42:51 -0700 (PDT)
+        Sat, 04 Jun 2022 23:42:55 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -54,10 +54,12 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: [PATCH 00/12] KVM: X86/MMU: Simpliy mmu_unsync_walk()
-Date:   Sun,  5 Jun 2022 14:43:30 +0800
-Message-Id: <20220605064342.309219-1-jiangshanlai@gmail.com>
+Subject: [PATCH 01/12] KVM: X86/MMU: Warn if sp->unsync_children > 0 in link_shadow_page()
+Date:   Sun,  5 Jun 2022 14:43:31 +0800
+Message-Id: <20220605064342.309219-2-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20220605064342.309219-1-jiangshanlai@gmail.com>
+References: <20220605064342.309219-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -72,30 +74,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-mmu_pages_clear_parents() is not really required (see patch4).
+The check for sp->unsync_children in link_shadow_page() can be removed
+since FNAME(fetch) ensures it is zero.  (@sp is direct when
+link_shadow_page() is called from other places, which also means
+sp->unsync_children is zero.)
 
-mmu_unsync_walk() can be simplified when the function is removed.
+link_shadow_page() is not a fast path, check it and warn instead.
 
-Lai Jiangshan (12):
-  KVM: X86/MMU: Warn if sp->unsync_children > 0 in link_shadow_page()
-  KVM: X86/MMU: Rename kvm_unlink_unsync_page() to
-    kvm_mmu_page_clear_unsync()
-  KVM: X86/MMU: Split a part of kvm_unsync_page() as
-    kvm_mmu_page_mark_unsync()
-  KVM: X86/MMU: Remove mmu_pages_clear_parents()
-  KVM: X86/MMU: Clear unsync bit directly in __mmu_unsync_walk()
-  KVM: X86/MMU: Rename mmu_unsync_walk() to mmu_unsync_walk_and_clear()
-  KVM: X86/MMU: Remove the useless struct mmu_page_path
-  KVM: X86/MMU: Remove the useless idx from struct kvm_mmu_pages
-  KVM: X86/MMU: Unfold struct mmu_page_and_offset in struct
-    kvm_mmu_pages
-  KVM: X86/MMU: Don't add parents to struct kvm_mmu_pages
-  KVM: X86/MMU: Remove mmu_pages_first() and mmu_pages_next()
-  KVM: X86/MMU: Rename struct kvm_mmu_pages to struct kvm_mmu_page_vec
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
- arch/x86/kvm/mmu/mmu.c | 173 ++++++++++++-----------------------------
- 1 file changed, 51 insertions(+), 122 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 086f32dffdbe..f61416818116 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2197,7 +2197,13 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+ 
+ 	mmu_page_add_parent_pte(vcpu, sp, sptep);
+ 
+-	if (sp->unsync_children || sp->unsync)
++	/*
++	 * Propagate the unsync bit when sp->unsync.
++	 *
++	 * The caller ensures the sp is synced when it has unsync children,
++	 * so sp->unsync_children must be zero.  See FNAME(fetch).
++	 */
++	if (sp->unsync || WARN_ON_ONCE(sp->unsync_children))
+ 		mark_unsync(sptep);
+ }
+ 
 -- 
 2.19.1.6.gb485710b
 
