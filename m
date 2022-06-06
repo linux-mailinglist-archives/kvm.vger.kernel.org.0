@@ -2,134 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 067E153EE87
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 21:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF8E053EED0
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 21:44:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232265AbiFFTXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 15:23:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35314 "EHLO
+        id S232251AbiFFToC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 15:44:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232342AbiFFTXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 15:23:09 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2047.outbound.protection.outlook.com [40.107.100.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20622A43A;
-        Mon,  6 Jun 2022 12:23:05 -0700 (PDT)
+        with ESMTP id S232917AbiFFTnz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 15:43:55 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2082.outbound.protection.outlook.com [40.107.100.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CAB0181;
+        Mon,  6 Jun 2022 12:43:50 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=guh9O6X7YyU3n3FrqKieoTjj/ne1azo+5yiaNX2dKlkXFCq0Sni9IoAmqJhyzS7u8gIL4TdDWDsIKF97LdNzqzEiyFmmQGz73ysB6WAFnwuXJRj04Yf0Ibuv8U5kJA1MVflBhVY7+oBtCZHQGD9ygNc9Z+wPU3rZOuwamsDBameJMKSSWZW0gpxhTH/6MXYJRu8RdDraGK0MV4g3QaSymE7IDWIBmednJU+iuxnrBkx/cBbav0+h7Iu1K/G0cEW6qh42KyF5fHJtyIZb/8fMuwIO1ADuxqFRCuD21aaxSTwMClPyaY8NNmaxEPkZQeTo5u8gQTGppZMide87RxF4Tg==
+ b=QQ9z9Vi8yvM3nh8K+U/fQCRWV3f9grTCJrJ9bQMfYqXGRzE6D7Q2kyH844TjfeF1nv27M5krwppHn7Fw37Y3geH5ZCjXnYA2jbQ8A40mt86inlTh0s2OxSIWKifAq+ZDF38SFD9V1Lo+e+urbG2hJSkdI8OnkDAfDi2oWpbFp9jeOMemXv8V/Osof4CJRZJx/6dpAWo+voivTMbKn60WNqifZ+1gFK8KQgDE4vPX4Ao0Ai524F+TgM3TfOAPlAKBZN2BV/8ar6NhmYKFMF0bpjI2/EQ8hBmmW369pnndOlkOdFc3vPY2RR9Afx85+qo7hIrHJwgu9mnotJcmkZ37Tw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WuehLuSIzv1IKiuH0dgMSz2OTTQZj0pl2HOVTxklgOk=;
- b=hd91MZdrmQ4xYjqS+6Nu2VB6JoCwg+aNDBoh1p770Cc8oKms9tRATeI0qYuxBQnSSVTYnHGo/FG13Q3MjVFbDsUO9Zrm+M2req2WUcKqXK3kcGT5bxSOhBk9x98u07OS+hsvxBEuVJbEMe7Mpj8aQCmyFSuvzxmjlGWD23ZiHBO7rGFclxpO5p05TB7OCSzIdnw22rtQ7IhRl8FJ5/sV56k2M66k0Akble8L9AhW6NYBbaCAFtx/Pz7EqUGKWVUq1NTDw36/cUVgqQkkpVqS42B8k7+ciYWik+WgI+EyZLcleMERKCy6QlvlXzf6yEOfpNgJ5RNX8qaeGkyzRUjDzQ==
+ bh=MCeocr8XW4ejpuP8yXb+pOh49Qf9wcWXxlFQenSMiRs=;
+ b=j1qfivBdAtjm6WukCaDau2xOw720auHAlouq6s5kkDhbEXb26Jy+QJOwocXzXPBsf+URtc81Z9+ZusvfPHN4DJ1BcVYkpuEFyfVpEDdUmawvBWyzLUcj7SyMspd70cz3AozB2WHxaeA1kitiAt7kh21cQdNQuPibzMPHzQFfQ9M2OmpXz/+DMdiq4hEbIzDdXm0nvCR5AboVaaq14MFlgT6T2IEmkVWDYVhKoFtazDZdsE1zSzPnaSM+1/W5MkGtfPt+VwmOXZnJFWtsw52Elq6RC464/qEa5rsp5LBfXbnKoQIRt9TA5EXeRqSgJP8wIWIA75ZxgM168j/X6FHU+w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WuehLuSIzv1IKiuH0dgMSz2OTTQZj0pl2HOVTxklgOk=;
- b=obpCcP1IFarClXX8IJ/52PbZR1O3NVVZA8ysnDnKlt4IPBnlLSqTIsn5adoguBUiRT0cZEhVickypxUR+CbNbPN8ioNoTKEcsUKQdoR8klrtSDI7hoA5mmFu56bvRdayPMLwJV22cFOpYUu5npIAb7+mYTII1LVM7FPd4PlnwBABOfk2LHn7gWHiKMU9xx1Qz0RIeR88/Jj33LfYVID/n1m08WnTAZ9YSIoeAc8zmbi3uFGR4ZyxGnJvliqpd6rj+Fp4FEadiUHncbgnwp9JcQKRscNILYJBJ50aoABWXN9PB2Ncxx05X00sg7HZOWkipUZdtGewjACV1esOOnx1Kw==
+ bh=MCeocr8XW4ejpuP8yXb+pOh49Qf9wcWXxlFQenSMiRs=;
+ b=P+6sGRAyEuIbaLnMsiPab0PlmNzC1CU1YGBIk/c3+lH44J2kj5vvlWbz5tAIa8qR0pWAk7oN158bfP6cEAVlkK+ofvtXoHoH/VRIRX5j0Hh/zSTrAE8KoQV4YuQSdh8He8ZfwMjSrB8j7kg0/XT05XnQ9pcbCV3Gx6L4Y54uUx2UuRK/hRfJF4oXd62RZxLUGPlHM7jaZOPGrFwrVxoIuBPglur6VYLLn5RPf0uQaextZW0X5dHoA/88VTno/HiyPnH6PsbGjUE1EbPVNphP+KZKufFVsaqQnztag0wvbRLpxkwmk3d45ic7rx9Amup5WyWe6PAPsUrJ0t5OnJBSZQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from MN2PR12MB4206.namprd12.prod.outlook.com (2603:10b6:208:1d5::18)
- by SN1PR12MB2381.namprd12.prod.outlook.com (2603:10b6:802:2f::13) with
+ by DM6PR12MB2889.namprd12.prod.outlook.com (2603:10b6:5:18a::26) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13; Mon, 6 Jun
- 2022 19:23:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.12; Mon, 6 Jun
+ 2022 19:43:47 +0000
 Received: from MN2PR12MB4206.namprd12.prod.outlook.com
  ([fe80::d5df:ac97:8e92:fc14]) by MN2PR12MB4206.namprd12.prod.outlook.com
  ([fe80::d5df:ac97:8e92:fc14%6]) with mapi id 15.20.5314.019; Mon, 6 Jun 2022
- 19:23:03 +0000
-Message-ID: <86df429e-9f01-7a91-c420-bb1130b4d343@nvidia.com>
-Date:   Tue, 7 Jun 2022 00:52:49 +0530
+ 19:43:47 +0000
+Message-ID: <6a8e7d00-0e7b-dc0c-2662-8aadd3930d8c@nvidia.com>
+Date:   Tue, 7 Jun 2022 01:13:34 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.1
-Subject: Re: [PATCH 3/8] vfio/mdev: simplify mdev_type handling
+Subject: Re: [PATCH v1 13/18] vfio/mdev: Consolidate all the device_api sysfs
+ into the core code
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
+To:     Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
         Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org, Neo Jia <cjia@nvidia.com>,
-        Dheeraj Nigam <dnigam@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-References: <20220603063328.3715-1-hch@lst.de>
- <20220603063328.3715-4-hch@lst.de>
-X-Nvconfidentiality: public
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        intel-gvt-dev@lists.freedesktop.org
+References: <20220602171948.2790690-1-farman@linux.ibm.com>
+ <20220602171948.2790690-14-farman@linux.ibm.com>
+X-Nvconfidentiality: Public
 From:   Kirti Wankhede <kwankhede@nvidia.com>
-In-Reply-To: <20220603063328.3715-4-hch@lst.de>
+In-Reply-To: <20220602171948.2790690-14-farman@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0066.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:ad::8) To MN2PR12MB4206.namprd12.prod.outlook.com
+X-ClientProxiedBy: MA0PR01CA0074.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:ad::7) To MN2PR12MB4206.namprd12.prod.outlook.com
  (2603:10b6:208:1d5::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 78b52d75-0c08-47e8-5296-08da47f1f9e9
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2381:EE_
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2381D74C04FBA1DA91828CE4DCA29@SN1PR12MB2381.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: abf6be6a-5397-48d3-eebd-08da47f4df8a
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2889:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB2889F50994A6C6232E0B5305DCA29@DM6PR12MB2889.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DZORSSzi/aOA5tTEjzqIey39Rw+dJZL00WHUU/uReUoL//lVHqyWH4ZZC6p217HuIEoiddaDFw3MRU2jIDr+VLAxenY87HH5IWRUcU3ucu+RDTMT9n62pb+DCgRm/wkJzUPjoL1erGsjb1/aMJwP2veP9lOvFmg81E/mo6T/airjaOdsyrEwDcvFn8OtNOh1jNmUhpaiZ8MCH3WhO3GDnr+y/yYexhiL30SCml8LltglLaawdG0Fb9Kik4Wcnw4FUKJ+2GeK0ZNzxP037C/G/egk6bIICQty8j9Q/9TpUX2iHe2kel28wND4r9B9yO/XtbHH2yZyS8HPVwE2k4LsgmSO2r2kbr9tOy6DWfIR4LhiqE91FvUH7y1iXK1XrWf2pD6BYQqvVnO3i1Ul+yhmAWZJxA3POljNSen1Ma+2HnY33xKXMBOSoD2jHO8rlONsVfL3JpbBrLyd7zjzhkF0bkfh0R1Egwwz5Z9JcWBq2P5dBGonQ04eyc+q1ZBnPp9ijIcU7sX1LzQqmPNmyiFpgV5wHDHt+eDh4iEIEUX2/k973UwA/ykBQnGp6EfpF9vz1lUe8vxTtVqCSTzmwuMXPz8wok50TF2/ejMTuB52RBBtLCRXb2QqfdfvkC4m0DAlKKrhGQbh1ZyKiWkPpsOMBpEHIbjPph3kRVCAqMEx84DSpeJPjD3KkhyPKZdbMvqpUn0OStSk8rQcohAlLxln1ILvvBGk+xjkidgxBRA9/bY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4206.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(38100700002)(316002)(6666004)(26005)(8676002)(2616005)(107886003)(7416002)(5660300002)(31696002)(86362001)(55236004)(4326008)(186003)(8936002)(6512007)(66476007)(66946007)(66556008)(6486002)(83380400001)(30864003)(2906002)(31686004)(54906003)(36756003)(110136005)(508600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 79srm63ELDUu8YnOVzRxFY/7qGuFAuWj8AgKaU9VIMUnfQIzyGMOPeUIPA2Hxc+IJb0pORbFAO70WBaM394ZnkHdTFFVE5EQiTbrLrKDEZnVfTvmgBSNx82DkcQZE+Fa63pIIqnojw6lvi6kH50NHjlvLRlDB9dfR1tngN3QfNGfBemZSmZjYYgTlEtyltoVVc78pAPby91nSveQM5M32K2cypbpOgjL/fsHsQ+CifsSuRW+9gCqLQAHG+cfsUIebk68Q8ekm69msYRL40jDLQWlThhzrUpdIhmKA/UIqKv0RdwHUjdYKvL1PzK58t0XQ8s+Qb05aNADA6XiXseUIB8G7wJAka+q25hxl5IfNJZA5NjVq9ELUW/22y3mzc5ynuFIV4JtMX96qur//qr/OGGN2jswZoZ34Tf0uDud9P9695UsQ4Hbz2eVLCUZcfdFnt/uGkgl0R5/MaqK0q0LkLcm1oVu41m6Or9YTjmC+VNG3cvgiLCoCvOwGKo6weoMWaPpqZX2ue5FgH2H5ImJthip/MCOK4P9dpxIPIBsd7cfjNe4bI8R7KG9PVdpBPyegfiK6VWppaQ+8bDfAC/2ErJn4ixEJOSxfh7AP1K3AtCE803bstFnTA+tSF07TaDY4Iqx+0+75FDPyjoZIvgqWoXcxrqlJ5fRTjU0HxuNSTS4Qvky4IRqjyNWvHN+bxJGJplnqT9tE7ru6gWEVMKoBzde5kQuDejV3GSFM6Ht1mTSJywLR8qT0m70c0s7JmaUWU2+5BmkBABQtIADErHrP6DtYUvKwzYauopYQ/do/EEVc6YqBLYCupFexUmI11Gi
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4206.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(31696002)(38100700002)(83380400001)(6666004)(86362001)(966005)(508600001)(6486002)(2906002)(316002)(2616005)(186003)(110136005)(53546011)(54906003)(55236004)(6512007)(26005)(6506007)(5660300002)(36756003)(30864003)(8676002)(8936002)(4326008)(66946007)(66476007)(66556008)(31686004)(7416002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SVhHVjdyQ0d2b1RSWjZkOG1NVXRLZWtINGwyeGs0VnF1UmcyOHR1WlFPSWNa?=
- =?utf-8?B?ZGg0RzE2cGFoaFo2VFZTZ0hGc1JLSGN6ODlQdDhsa3BLWG1NNG80TDl0bDhv?=
- =?utf-8?B?TVl1VmdrNzFnajhnWWtZdGJuWVEybXYrRTZOaFNLNjNZL1FqMHJVU3AwNkxw?=
- =?utf-8?B?Tm9kekVOWUJKTk9zc241NDF0MExPdnJRdWlnMUZESS9hMitaLzNIR2Y3K01X?=
- =?utf-8?B?UDdLb2JaYk5pMEFSdnQxbDdYdHhwVmtuUkx2OTZZcEZ3NW1EQ0hqREI3cFQr?=
- =?utf-8?B?TmNWSndJL1I1RmduQ1R1Z1pteU4yZTZXSXJXNkFSbk9oN0xkYUYzeStHQU5i?=
- =?utf-8?B?QVRlN3MvMmJKT0grQXlnNndqcm4xUERFb1FPbjgxSmoraHRZUFlZeWNWbUFK?=
- =?utf-8?B?TCtVMFEzeFh1bnJic3VjMHp0VnA4clh4QTdCaVlvVFprWFBEenk0YWUySnE3?=
- =?utf-8?B?N0lNTzB0dTBtRnBMaTVXVFo0K3Y5M2hiQ2IxZEZQSFQyTmRtdDFOTm9pcGxj?=
- =?utf-8?B?WGZmSERLbGN5WVZZTTBJQm1zSi95WFh3bitjRktmUE9QaWUxbnNMNVEzRHFm?=
- =?utf-8?B?cml1RE1pWTIwL3BJTTRiRVBnVjdoNGY0d2JKbEhGSEtRRGR3bTlVcEZGSFpM?=
- =?utf-8?B?MGxKTE9oUi96dGNQY3RWNlVoZ1M3UGxGdTdEa2pHdldiS0NWN2NoUDBKWjRa?=
- =?utf-8?B?YmRoWHBOOVV0YUVLWVgwUTZWd0NXVlk2YzR1T1FydDdwSk9wZlMyaFcrM0NV?=
- =?utf-8?B?VEVVL1pyWGNrYURiazhISk50TEQ4OTBNQU9QemlRVWdTM2E0U0w4VXpZZFBh?=
- =?utf-8?B?dHA5Tk9PRHdwUDM3NG96c0JCKzZpa0h0UlVHNEQ5M2ZnZ0piWVlCL3I4N3JQ?=
- =?utf-8?B?MHo4MGpYQloyTjBGbjF4eFRFMGhRajVjZGxoa3Z1Y3dGeWZCMFg3UFpKMndk?=
- =?utf-8?B?d08waU56QkNaSFhld3pYallPWVl0ZEJWNnBXTmdnaVdHSzBmKy90S1puOFNm?=
- =?utf-8?B?WjNzbVV6WGJrVGl5LzBjMU9yM2tZNkNVeDB4Q0lVTkpjYit2OGJRcVN2MGVX?=
- =?utf-8?B?VjlBZjdyVlNmd3lpWTdFNS9VSS9mVVRqRVNTNXgzcE8wSGtnUGliNWVzOEdh?=
- =?utf-8?B?cjhYcHR1NXNGR2V2QVZIbkR6VTM1a2ZmNXhCR1J1ZWlwK1hJNGNBV3VCa1RG?=
- =?utf-8?B?bnV6SkoxcHdVa0VhUXpFVDhWdm1PK2U4dVVzMGVRWEFZeXhsYUV2MUgrR0JX?=
- =?utf-8?B?RDhRYzB0RnNFM0NFOURiU2w0Q3dWYjJVaUpHa2hib0FDN05ydGROeWJpMW9O?=
- =?utf-8?B?djdnamdRL1BqYU1jd1R3UEZrczFzdWNhdlNjTHo1RnE4a3dDejF5bW1KVnNh?=
- =?utf-8?B?bDdDWGsyRFZPeUw5VHdvYWNJaWlPTmN2dUl0eEN3SnBNTUlXSVdTRnZwa29m?=
- =?utf-8?B?MnJHOUtMNXJLb1JWZnBqMG9PdzR5RGFKNmxjR2VONXNOcnFKRmxVdGI1cHdz?=
- =?utf-8?B?TDkzTC9mbGhYb24wdFBFc1BPWHpKMjNlVWU1Z1hjN0VvNXVEYnF6angzeit6?=
- =?utf-8?B?UWptMXJSODB3WUJqNHNmcGRidXdpaDhuelVSdmFkSjF5VHJya0tTa2FHV2lY?=
- =?utf-8?B?K3FXaEFvMlJHemZJTjVMSVMzT2RQczErbzd6UWk4ZnQ4UTQrOXliTlBJdS92?=
- =?utf-8?B?U2VhUjdKbjBFR251dFA5ZStlTHZib2hsNTF3c2ZRRzkzN29oTWQ2aWFZMXo3?=
- =?utf-8?B?RWI3dmo3elovMGxoeEU4V21jWWZkY1dXWlhaUlJlZXdZMWNQeGhJTkZCZkhw?=
- =?utf-8?B?R2RWMHd0K0hBcVJWSDRMT3JOWHlYZWhwRmRKSEZMMDRQeGxTZ0ZqRWxTeFph?=
- =?utf-8?B?Qi9HVkUyeFpIVmg2TjFGVzBIVnFJSlZxNVdDZjRnNVlqY0w0cFJyd2NIeENm?=
- =?utf-8?B?MUdJdkt4UlYwYVg4YmFwdjIvMWprWXI3YXBBMVpCZk9Zckpta0pvNW5iYXBJ?=
- =?utf-8?B?c2ppUlc0VjczUndaMFFsNWRFdjFHUDFwS3JHSnZqVEthTlpCUFlkY2ViZFFy?=
- =?utf-8?B?TjdVU05ndmVWbTZLa2VLdnNNUWhzVWd1ckR5TElONlBGampRYTlWamxIb25u?=
- =?utf-8?B?TXFBTGpNYloya0srK0xjRGtZTm1oQ3NtMzViWVlyakVvbVZZWHErRHJkdGg2?=
- =?utf-8?B?OURRem5acGMxN1VSdWhIZ0V3aFAwdHZPWUk5WENpTGNlZkNOK0tVVTc2U0RX?=
- =?utf-8?B?aDd2eHBkN0F5U3I5RDFJcE1lZmFoTDlHMW5wbUQwNjNQK2Jqb0JtbTNXaGF6?=
- =?utf-8?B?dnlOVUNBMmlKdFNpUXhwTWxhQmZrMjBXREtEVm9yeVpEUWVYTjNhUT09?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Zk1FZWxRTE5EZHpHVlBxRHd2WmtkQUJHQzU1V1FTMDNSREtoT01uK2p2Skpx?=
+ =?utf-8?B?MWZDVERubzdNekRYT2UxQVlxeGxuQ2xGYjRyUkhzVHhkblBKdXF0eFNLZnJm?=
+ =?utf-8?B?WkpWUWJ0UUNDZW1rclV6Sjh4K3BUMnpOWTRheFFoN3lLSUFySFQ3UnNzdmJO?=
+ =?utf-8?B?ak92Sm4zK0YwSkZkdWJ0SWQ0bkZWYW9vWjVpUkhEbzEydkxSc056dTZBKzBF?=
+ =?utf-8?B?SjNuNG9JYzBJZ1p0cmx6SjBCdUcxdStnNnJlZWlCTXVvckwxU09Ia29HVVR0?=
+ =?utf-8?B?S3ZucGQ1N2NCMi9WN0pOT1JrSVlhUklsMmE0OEVnbkcvaEswYytDL1lGbXl1?=
+ =?utf-8?B?VXhDaHpNTUxvM1RITUlzYktCajc1YkNSTll3QStReEZDZWJYdzBlcUdoaFpj?=
+ =?utf-8?B?WG5HRk9KRzJOZUtCOFpGek14NHpidHZQRkx5MjZBWUp0T2JZaE0yaEZTanlp?=
+ =?utf-8?B?ZHRHUFpkbnJKQTNEL1dkN2REY2ZwKzZDcjE3ZGlJN0Vpc2FQQ2dvYU9uaGMv?=
+ =?utf-8?B?dUNCbnFRWmhZS0J1UnMxaFlkVldZZUxQTWJTUkFWa2xTb05FZmwyT2VaZC80?=
+ =?utf-8?B?SFhRS0ZMZXRFeGUrTnN4WEpzRVcwdUV5WlFxYUt3ZFE5NjZtcTNIbEUzcnZB?=
+ =?utf-8?B?VVdGQWlrU0hPMDVZbFVBZ0NwYnlkV1BPS1pmYnh3dHdtS2lxcDJMSFVMSjhr?=
+ =?utf-8?B?TnM1ODNHdGpMS1puVisydlRLaTNwTEVJR0JqU1JwTzkrcVllcDRmNEhDQnYx?=
+ =?utf-8?B?WFRXL3QzdEhjbmVCd3VaVmpPSkZWTU1hNWZvUDJyakRScmdjRWdUN3ZSalJ3?=
+ =?utf-8?B?c2FuNGR2OE9UeElJZFdvamg4dHB3WHBwdjRvTkgyWmNBWXBFYmorN2RndUxI?=
+ =?utf-8?B?dGRkWFVhdFZIdTN4RW5KZlZRTmM0Y29sS0pQWmVxUFZvdjBqRzdDUE5LNDVi?=
+ =?utf-8?B?UEl1eUc5dWNqamhjRU9lUEFVMGF2UEtiTEhaa2JxSnd6eldPOWhjZGVBVFlQ?=
+ =?utf-8?B?ZGt2ei9iZTZGVE5ySjFPcENUTU1xb09RbCtwVU92V2VWYytvYkRHZXVjWVc3?=
+ =?utf-8?B?VDl6Ym10ZmlIRmYxM3JtMDNiRG5pOW5Zb2NkUlQwT2NiclV5a2FOYmxGbzhD?=
+ =?utf-8?B?MFoxN05IWjE1RkVTL2ZGbmtRaFd1Z1lsOStaY0l3YlZBWTljeXprM3BFamhk?=
+ =?utf-8?B?OVFIZmhJNGlub2tsOWF1REtTOThOMnB2cEdTdGdpY1d6TldDY3NuYW9oQndr?=
+ =?utf-8?B?QktFMXVwTkxFUEt0SXRiVWRhYnRGeEdod1lPdmdpYkVTZ1RaLzhWQnNQZGFU?=
+ =?utf-8?B?eldibGhJU2luWkUrREtWcmJuYlNBSnYwUWkyQ1FXZlhxSkl0Q0JGVHBIS1JR?=
+ =?utf-8?B?TUpETU1aU2RLRWVPREZEVXY0M1Q2czZhVHl5Z09qazkvVU1jdnFoT0llc3Nz?=
+ =?utf-8?B?WEhiWkhUVXdYUXk2TzhzQzNscThudEtTK0Y5eHV0MkNOT0hFRHduOG9DU1cr?=
+ =?utf-8?B?Tzc0SmsyZ0dFcndISDFqKytON0w5RWl2dDd4Ti96ZkR6ejVRRFdzSjkrZzdE?=
+ =?utf-8?B?a3NJVjBla2Z5YkowNXIwRWN2WmhpRXpybUVORmEvdXBUQUJBcUhxazkyU0Ji?=
+ =?utf-8?B?R0tSZjNtVkJJcDdRNS93MVdEQ0dwdktXYzBrSHFlUzdyS2lYc1VFeHo1YnBJ?=
+ =?utf-8?B?Y3MzREsvYkwyUUZSeWhrcmIrd0Y1MCtiNHJuSk9udXAwanFOZlJzazY1M285?=
+ =?utf-8?B?WFc2cERIT0FEeE5TMEZVWWRzYzBsSmx1eitVWjdaMUNXUTV4aXNDck9KNXZX?=
+ =?utf-8?B?Q05RUVRSd2pwV3JFY1RyaFl4VU1YdUNUa2NmaU9PODRraGhKdXRRaUliSWZi?=
+ =?utf-8?B?d1M1RlltOWlHSEdiZFFBUjh3amlSZlhGMFNhZklHY0YzcXBDZ296NzZuMEox?=
+ =?utf-8?B?TjhHaStESjQ1bXNQdFp6OWI3WUxUcnZaYU91WHdSN09NcDhQdlA2MHhjdE9E?=
+ =?utf-8?B?UU0vNERLOUF5VjVHTFE4VjdnNHNRSUlxQUhveC9HWGRGWWVEcUpSZ3o4RzFs?=
+ =?utf-8?B?WjUvYkRkMFI2c1pzc2l0bi81SEZIMVpJMnNSM2R3NHlOZkhDUzhYd0hDVWdy?=
+ =?utf-8?B?VW80SXhFc1JPYzV5dS8rSGNmcUNYZFFBTWs2UUVybENZVFBEbk5FbC8vN3BZ?=
+ =?utf-8?B?UDdCdXlBdGRiQVczc0pSN2k1dGdHR2crMkROTUcveVRYS2U0N3pFcXVBQTdF?=
+ =?utf-8?B?U1QwSkFFZE5FejBmeFZ3Z1pwZ1B2WmdMamlwSlhrY0dnZWN6Y1hGSXpUbUYr?=
+ =?utf-8?B?UFR5OWlvTGRpd1lWV0ZXVGllSmFVWU1La3N6TUFsa3hiWjdIWnltZz09?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78b52d75-0c08-47e8-5296-08da47f1f9e9
+X-MS-Exchange-CrossTenant-Network-Message-Id: abf6be6a-5397-48d3-eebd-08da47f4df8a
 X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4206.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2022 19:23:03.3095
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2022 19:43:47.7487
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YS/UKygOA2FvK7LF+KNppXo0nc8Oiez1E078oqlhhJ/OMHW/lGzaio2cRgJuXiaGLru9PzneOsHJc8j5va/Q4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2381
+X-MS-Exchange-CrossTenant-UserPrincipalName: KxuExR9h2liqCjQSf4u3X/f5qbkQjJrzIYq7QbTBUpkrpokp6WI7ZheHvkgWwYO/AXWaimdbN9Orzxqst+G6wA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2889
 X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
@@ -141,567 +141,349 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-<snip...>
 
->   static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
->   			    const char *buf, size_t count)
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index 327ce3e5c6b5f..cbb53dcd20d9d 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -23,12 +23,17 @@ struct mdev_device {
->   	bool active;
->   };
+Reviewed By: Kirti Wankhede <kwankhede@nvidia.com>
+
+On 6/2/2022 10:49 PM, Eric Farman wrote:
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> 
+> Every driver just emits a static string, simply feed it through the ops
+> and provide a standard sysfs show function.
+> 
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Cc: Zhi Wang <zhi.a.wang@intel.com>
+> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+> Cc: Jason Herne <jjherne@linux.ibm.com>
+> Cc: intel-gvt-dev@lists.freedesktop.org
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Link: https://lore.kernel.org/r/6-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com/
+> [farman: added Cc: tags]
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>   .../driver-api/vfio-mediated-device.rst       |  4 ++-
+>   drivers/gpu/drm/i915/gvt/kvmgt.c              |  9 +------
+>   drivers/s390/cio/vfio_ccw_ops.c               |  9 +------
+>   drivers/s390/crypto/vfio_ap_ops.c             |  9 +------
+>   drivers/vfio/mdev/mdev_core.c                 |  2 +-
+>   drivers/vfio/mdev/mdev_sysfs.c                | 27 ++++++++++++++++---
+>   include/linux/mdev.h                          |  7 ++---
+>   samples/vfio-mdev/mbochs.c                    |  9 +------
+>   samples/vfio-mdev/mdpy.c                      |  9 +------
+>   samples/vfio-mdev/mtty.c                      | 10 +------
+>   10 files changed, 36 insertions(+), 59 deletions(-)
+> 
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+> index 9f26079cacae..f410a1cd98bb 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -137,6 +137,7 @@ The structures in the mdev_parent_ops structure are as follows:
+>   * mdev_attr_groups: attributes of the mediated device
+>   * supported_config: attributes to define supported configurations
+>   * device_driver: device driver to bind for mediated device instances
+> +* device_api: String to pass through the sysfs file below
 >   
-> +struct mdev_type {
-> +	struct kobject kobj;
-> +	struct kobject *devices_kobj;
-> +	struct mdev_parent *parent;
-> +};
-> +
->   /* embedded into the struct device that the mdev devices hang off */
->   struct mdev_parent {
->   	struct device *dev;
->   	struct mdev_driver *mdev_driver;
->   	struct kset *mdev_types_kset;
-> -	struct list_head type_list;
->   	/* Synchronize device creation/removal with parent unregistration */
->   	struct rw_semaphore unreg_sem;
->   };
-> @@ -38,8 +43,11 @@ static inline struct mdev_device *to_mdev_device(struct device *dev)
->   	return container_of(dev, struct mdev_device, dev);
+>   The mdev_parent_ops also still has various functions pointers.  Theses exist
+>   for historical reasons only and shall not be used for new drivers.
+> @@ -225,7 +226,8 @@ Directories and files under the sysfs for Each Physical Device
+>   * device_api
+>   
+>     This attribute should show which device API is being created, for example,
+> -  "vfio-pci" for a PCI device.
+> +  "vfio-pci" for a PCI device. The core code maintins this sysfs using the
+> +  device_api member of mdev_parent_ops.
+>   
+>   * available_instances
+>   
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 057ec4490104..752d7a1211e6 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -163,12 +163,6 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+>   	return sprintf(buf, "%u\n", num);
 >   }
 >   
-> -unsigned int mdev_get_type_group_id(struct mdev_device *mdev);
-> -unsigned int mtype_get_type_group_id(struct mdev_type *mtype);
-> +int mdev_type_add(struct mdev_parent *parent, struct mdev_type *type,
-> +		const char *name, const struct attribute * const *attrs);
-> +void mdev_type_remove(struct mdev_type *type,
-> +		const struct attribute * const *attrs);
-> +
->   struct device *mtype_get_parent_dev(struct mdev_type *mtype);
->   
->   /* interface for exporting mdev supported type attributes */
-> @@ -66,15 +74,12 @@ struct mdev_type_attribute mdev_type_attr_##_name =		\
->    * struct mdev_driver - Mediated device driver
->    * @probe: called when new device created
->    * @remove: called when device removed
-> - * @supported_type_groups: Attributes to define supported types. It is mandatory
-> - *			to provide supported types.
->    * @driver: device driver structure
->    *
->    **/
->   struct mdev_driver {
->   	int (*probe)(struct mdev_device *dev);
->   	void (*remove)(struct mdev_device *dev);
-> -	struct attribute_group **supported_type_groups;
->   	struct device_driver driver;
->   };
-
-mdev_type should be part of mdev_parent, separating it from mdev_parent 
-could result in more errors while using mdev framework. Similarly it 
-should be added as part of mdev_register_device. Below adding types is 
-separated from mdev_register_device which is more error prone. What if 
-driver registering to mdev doesn't add mdev_types? - mdev framework is 
-un-usable in that case. We had kept it together with mdev registration 
-so that mdev_types should be mandatory to be defined by driver during 
-registration. How would you mandate mdev_type by such separation?
-
-Thanks,
-Kirti
-
-
->   
-> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-> index f0967a81eabe7..32fd6f385fafd 100644
-> --- a/samples/vfio-mdev/mbochs.c
-> +++ b/samples/vfio-mdev/mbochs.c
-> @@ -100,23 +100,28 @@ MODULE_PARM_DESC(mem, "megabytes available to " MBOCHS_NAME " devices");
->   #define MBOCHS_TYPE_2 "medium"
->   #define MBOCHS_TYPE_3 "large"
->   
-> -static const struct mbochs_type {
-> +static struct mbochs_type {
-> +	struct mdev_type type;
-> +	const char *fname;
->   	const char *name;
->   	u32 mbytes;
->   	u32 max_x;
->   	u32 max_y;
->   } mbochs_types[] = {
->   	{
-> +		.fname	= MBOCHS_TYPE_1,
->   		.name	= MBOCHS_CLASS_NAME "-" MBOCHS_TYPE_1,
->   		.mbytes = 4,
->   		.max_x  = 800,
->   		.max_y  = 600,
->   	}, {
-> +		.fname	= MBOCHS_TYPE_2,
->   		.name	= MBOCHS_CLASS_NAME "-" MBOCHS_TYPE_2,
->   		.mbytes = 16,
->   		.max_x  = 1920,
->   		.max_y  = 1440,
->   	}, {
-> +		.fname	= MBOCHS_TYPE_3,
->   		.name	= MBOCHS_CLASS_NAME "-" MBOCHS_TYPE_3,
->   		.mbytes = 64,
->   		.max_x  = 0,
-> @@ -509,8 +514,8 @@ static int mbochs_reset(struct mdev_state *mdev_state)
->   static int mbochs_probe(struct mdev_device *mdev)
->   {
->   	int avail_mbytes = atomic_read(&mbochs_avail_mbytes);
-> -	const struct mbochs_type *type =
-> -		&mbochs_types[mdev_get_type_group_id(mdev)];
-> +	struct mbochs_type *type =
-> +		container_of(mdev->type, struct mbochs_type, type);
->   	struct device *dev = mdev_dev(mdev);
->   	struct mdev_state *mdev_state;
->   	int ret = -ENOMEM;
-> @@ -1329,8 +1334,8 @@ static const struct attribute_group *mdev_dev_groups[] = {
->   static ssize_t name_show(struct mdev_type *mtype,
->   			 struct mdev_type_attribute *attr, char *buf)
->   {
-> -	const struct mbochs_type *type =
-> -		&mbochs_types[mtype_get_type_group_id(mtype)];
-> +	struct mbochs_type *type =
-> +		container_of(mtype, struct mbochs_type, type);
->   
->   	return sprintf(buf, "%s\n", type->name);
->   }
-> @@ -1339,8 +1344,8 @@ static MDEV_TYPE_ATTR_RO(name);
+> -static ssize_t device_api_show(struct mdev_type *mtype,
+> -			       struct mdev_type_attribute *attr, char *buf)
+> -{
+> -	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+> -}
+> -
 >   static ssize_t description_show(struct mdev_type *mtype,
 >   				struct mdev_type_attribute *attr, char *buf)
 >   {
-> -	const struct mbochs_type *type =
-> -		&mbochs_types[mtype_get_type_group_id(mtype)];
-> +	struct mbochs_type *type =
-> +		container_of(mtype, struct mbochs_type, type);
->   
->   	return sprintf(buf, "virtual display, %d MB video memory\n",
->   		       type ? type->mbytes  : 0);
-> @@ -1351,8 +1356,8 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
->   					struct mdev_type_attribute *attr,
->   					char *buf)
->   {
-> -	const struct mbochs_type *type =
-> -		&mbochs_types[mtype_get_type_group_id(mtype)];
-> +	struct mbochs_type *type =
-> +		container_of(mtype, struct mbochs_type, type);
->   	int count = atomic_read(&mbochs_avail_mbytes) / type->mbytes;
->   
->   	return sprintf(buf, "%d\n", count);
-> @@ -1366,7 +1371,7 @@ static ssize_t device_api_show(struct mdev_type *mtype,
->   }
->   static MDEV_TYPE_ATTR_RO(device_api);
->   
-> -static struct attribute *mdev_types_attrs[] = {
-> +static const struct attribute *mdev_types_attrs[] = {
->   	&mdev_type_attr_name.attr,
->   	&mdev_type_attr_description.attr,
->   	&mdev_type_attr_device_api.attr,
-> @@ -1374,28 +1379,6 @@ static struct attribute *mdev_types_attrs[] = {
->   	NULL,
->   };
->   
-> -static struct attribute_group mdev_type_group1 = {
-> -	.name  = MBOCHS_TYPE_1,
-> -	.attrs = mdev_types_attrs,
-> -};
-> -
-> -static struct attribute_group mdev_type_group2 = {
-> -	.name  = MBOCHS_TYPE_2,
-> -	.attrs = mdev_types_attrs,
-> -};
-> -
-> -static struct attribute_group mdev_type_group3 = {
-> -	.name  = MBOCHS_TYPE_3,
-> -	.attrs = mdev_types_attrs,
-> -};
-> -
-> -static struct attribute_group *mdev_type_groups[] = {
-> -	&mdev_type_group1,
-> -	&mdev_type_group2,
-> -	&mdev_type_group3,
-> -	NULL,
-> -};
-> -
->   static const struct vfio_device_ops mbochs_dev_ops = {
->   	.close_device = mbochs_close_device,
->   	.read = mbochs_read,
-> @@ -1413,7 +1396,6 @@ static struct mdev_driver mbochs_driver = {
->   	},
->   	.probe = mbochs_probe,
->   	.remove	= mbochs_remove,
-> -	.supported_type_groups = mdev_type_groups,
->   };
->   
->   static const struct file_operations vd_fops = {
-> @@ -1427,7 +1409,7 @@ static void mbochs_device_release(struct device *dev)
->   
->   static int __init mbochs_dev_init(void)
->   {
-> -	int ret = 0;
-> +	int i, ret = 0;
->   
->   	atomic_set(&mbochs_avail_mbytes, max_mbytes);
->   
-> @@ -1461,9 +1443,19 @@ static int __init mbochs_dev_init(void)
->   	ret = mdev_register_parent(&mbochs_parent, &mbochs_dev, &mbochs_driver);
->   	if (ret)
->   		goto err_device;
-> +	for (i = 0; i < ARRAY_SIZE(mbochs_types); i++) {
-> +		ret = mdev_type_add(&mbochs_parent, &mbochs_types[i].type,
-> +				    mbochs_types[i].fname, mdev_types_attrs);
-> +		if (ret)
-> +			goto err_types;
-> +	}
->   
->   	return 0;
->   
-> +err_types:
-> +	while (--i >= 0)
-> +		mdev_type_remove(&mbochs_types[i].type, mdev_types_attrs);
-> +	mdev_unregister_parent(&mbochs_parent);
->   err_device:
->   	device_unregister(&mbochs_dev);
->   err_class:
-> @@ -1478,7 +1470,11 @@ static int __init mbochs_dev_init(void)
->   
->   static void __exit mbochs_dev_exit(void)
->   {
-> +	int i;
-> +
->   	mbochs_dev.bus = NULL;
-> +	for (i = 0; i < ARRAY_SIZE(mbochs_types); i++)
-> +		mdev_type_remove(&mbochs_types[i].type, mdev_types_attrs);
->   	mdev_unregister_parent(&mbochs_parent);
->   
->   	device_unregister(&mbochs_dev);
-> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-> index 8ab88a1d149cb..a6aa7f6f97095 100644
-> --- a/samples/vfio-mdev/mdpy.c
-> +++ b/samples/vfio-mdev/mdpy.c
-> @@ -52,7 +52,9 @@ MODULE_PARM_DESC(count, "number of " MDPY_NAME " devices");
->   #define MDPY_TYPE_2 "xga"
->   #define MDPY_TYPE_3 "hd"
->   
-> -static const struct mdpy_type {
-> +static struct mdpy_type {
-> +	struct mdev_type type;
-> +	const char *fname;
->   	const char *name;
->   	u32 format;
->   	u32 bytepp;
-> @@ -60,18 +62,21 @@ static const struct mdpy_type {
->   	u32 height;
->   } mdpy_types[] = {
->   	{
-> +		.fname 	= MDPY_TYPE_1,
->   		.name	= MDPY_CLASS_NAME "-" MDPY_TYPE_1,
->   		.format = DRM_FORMAT_XRGB8888,
->   		.bytepp = 4,
->   		.width	= 640,
->   		.height = 480,
->   	}, {
-> +		.fname 	= MDPY_TYPE_2,
->   		.name	= MDPY_CLASS_NAME "-" MDPY_TYPE_2,
->   		.format = DRM_FORMAT_XRGB8888,
->   		.bytepp = 4,
->   		.width	= 1024,
->   		.height = 768,
->   	}, {
-> +		.fname 	= MDPY_TYPE_3,
->   		.name	= MDPY_CLASS_NAME "-" MDPY_TYPE_3,
->   		.format = DRM_FORMAT_XRGB8888,
->   		.bytepp = 4,
-> @@ -220,7 +225,7 @@ static int mdpy_reset(struct mdev_state *mdev_state)
->   static int mdpy_probe(struct mdev_device *mdev)
->   {
->   	const struct mdpy_type *type =
-> -		&mdpy_types[mdev_get_type_group_id(mdev)];
-> +		container_of(mdev->type, struct mdpy_type, type);
->   	struct device *dev = mdev_dev(mdev);
->   	struct mdev_state *mdev_state;
->   	u32 fbsize;
-> @@ -645,8 +650,7 @@ static const struct attribute_group *mdev_dev_groups[] = {
->   static ssize_t name_show(struct mdev_type *mtype,
->   			 struct mdev_type_attribute *attr, char *buf)
->   {
-> -	const struct mdpy_type *type =
-> -		&mdpy_types[mtype_get_type_group_id(mtype)];
-> +	struct mdpy_type *type = container_of(mtype, struct mdpy_type, type);
->   
->   	return sprintf(buf, "%s\n", type->name);
->   }
-> @@ -655,8 +659,7 @@ static MDEV_TYPE_ATTR_RO(name);
->   static ssize_t description_show(struct mdev_type *mtype,
->   				struct mdev_type_attribute *attr, char *buf)
->   {
-> -	const struct mdpy_type *type =
-> -		&mdpy_types[mtype_get_type_group_id(mtype)];
-> +	struct mdpy_type *type = container_of(mtype, struct mdpy_type, type);
->   
->   	return sprintf(buf, "virtual display, %dx%d framebuffer\n",
->   		       type->width, type->height);
-> @@ -678,7 +681,7 @@ static ssize_t device_api_show(struct mdev_type *mtype,
->   }
->   static MDEV_TYPE_ATTR_RO(device_api);
->   
-> -static struct attribute *mdev_types_attrs[] = {
-> +static const struct attribute *mdev_types_attrs[] = {
->   	&mdev_type_attr_name.attr,
->   	&mdev_type_attr_description.attr,
->   	&mdev_type_attr_device_api.attr,
-> @@ -686,28 +689,6 @@ static struct attribute *mdev_types_attrs[] = {
->   	NULL,
->   };
->   
-> -static struct attribute_group mdev_type_group1 = {
-> -	.name  = MDPY_TYPE_1,
-> -	.attrs = mdev_types_attrs,
-> -};
-> -
-> -static struct attribute_group mdev_type_group2 = {
-> -	.name  = MDPY_TYPE_2,
-> -	.attrs = mdev_types_attrs,
-> -};
-> -
-> -static struct attribute_group mdev_type_group3 = {
-> -	.name  = MDPY_TYPE_3,
-> -	.attrs = mdev_types_attrs,
-> -};
-> -
-> -static struct attribute_group *mdev_type_groups[] = {
-> -	&mdev_type_group1,
-> -	&mdev_type_group2,
-> -	&mdev_type_group3,
-> -	NULL,
-> -};
-> -
->   static const struct vfio_device_ops mdpy_dev_ops = {
->   	.read = mdpy_read,
->   	.write = mdpy_write,
-> @@ -724,7 +705,6 @@ static struct mdev_driver mdpy_driver = {
->   	},
->   	.probe = mdpy_probe,
->   	.remove	= mdpy_remove,
-> -	.supported_type_groups = mdev_type_groups,
->   };
->   
->   static const struct file_operations vd_fops = {
-> @@ -738,7 +718,7 @@ static void mdpy_device_release(struct device *dev)
->   
->   static int __init mdpy_dev_init(void)
->   {
-> -	int ret = 0;
-> +	int i, ret = 0;
->   
->   	ret = alloc_chrdev_region(&mdpy_devt, 0, MINORMASK + 1, MDPY_NAME);
->   	if (ret < 0) {
-> @@ -770,9 +750,19 @@ static int __init mdpy_dev_init(void)
->   	ret = mdev_register_parent(&mdpy_parent, &mdpy_dev, &mdpy_driver);
->   	if (ret)
->   		goto err_device;
-> +	for (i = 0; i < ARRAY_SIZE(mdpy_types); i++) {
-> +		ret = mdev_type_add(&mdpy_parent, &mdpy_types[i].type,
-> +				    mdpy_types[i].fname, mdev_types_attrs);
-> +		if (ret)
-> +			goto err_types;
-> +	}
->   
->   	return 0;
->   
-> +err_types:
-> +	while (--i >= 0)
-> +		mdev_type_remove(&mdpy_types[i].type, mdev_types_attrs);
-> +	mdev_unregister_parent(&mdpy_parent);
->   err_device:
->   	device_unregister(&mdpy_dev);
->   err_class:
-> @@ -787,7 +777,11 @@ static int __init mdpy_dev_init(void)
->   
->   static void __exit mdpy_dev_exit(void)
->   {
-> +	int i;
-> +
->   	mdpy_dev.bus = NULL;
-> +	for (i = 0; i < ARRAY_SIZE(mdpy_types); i++)
-> +		mdev_type_remove(&mdpy_types[i].type, mdev_types_attrs);
->   	mdev_unregister_parent(&mdpy_parent);
->   
->   	device_unregister(&mdpy_dev);
-> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-> index 20136def93fdb..28c0811cf2312 100644
-> --- a/samples/vfio-mdev/mtty.c
-> +++ b/samples/vfio-mdev/mtty.c
-> @@ -145,6 +145,16 @@ struct mdev_state {
->   	int nr_ports;
->   };
->   
-> +static struct mtty_type {
-> +	struct mdev_type type;
-> +	int nr_ports;
-> +	const char *fname;
-> +	const char *name;
-> +} mtty_types[2] = {
-> +	{ .nr_ports = 1, .fname = "1", .name = "Single port serial" },
-> +	{ .nr_ports = 2, .fname = "2", .name = "Dual port serial" },
-> +};
-> +
->   static atomic_t mdev_avail_ports = ATOMIC_INIT(MAX_MTTYS);
->   
->   static const struct file_operations vd_fops = {
-> @@ -706,16 +716,18 @@ static ssize_t mdev_access(struct mdev_state *mdev_state, u8 *buf, size_t count,
->   
->   static int mtty_probe(struct mdev_device *mdev)
->   {
-> +	struct mtty_type *type =
-> +		container_of(mdev->type, struct mtty_type, type);
->   	struct mdev_state *mdev_state;
-> -	int nr_ports = mdev_get_type_group_id(mdev) + 1;
->   	int avail_ports = atomic_read(&mdev_avail_ports);
->   	int ret;
->   
->   	do {
-> -		if (avail_ports < nr_ports)
-> +		if (avail_ports < type->nr_ports)
->   			return -ENOSPC;
->   	} while (!atomic_try_cmpxchg(&mdev_avail_ports,
-> -				     &avail_ports, avail_ports - nr_ports));
-> +				     &avail_ports,
-> +				     avail_ports - type->nr_ports));
->   
->   	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
->   	if (mdev_state == NULL) {
-> @@ -725,13 +737,13 @@ static int mtty_probe(struct mdev_device *mdev)
->   
->   	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mtty_dev_ops);
->   
-> -	mdev_state->nr_ports = nr_ports;
-> +	mdev_state->nr_ports = type->nr_ports;
->   	mdev_state->irq_index = -1;
->   	mdev_state->s[0].max_fifo_size = MAX_FIFO_SIZE;
->   	mdev_state->s[1].max_fifo_size = MAX_FIFO_SIZE;
->   	mutex_init(&mdev_state->rxtx_lock);
-> -	mdev_state->vconfig = kzalloc(MTTY_CONFIG_SPACE_SIZE, GFP_KERNEL);
->   
-> +	mdev_state->vconfig = kzalloc(MTTY_CONFIG_SPACE_SIZE, GFP_KERNEL);
->   	if (mdev_state->vconfig == NULL) {
->   		ret = -ENOMEM;
->   		goto err_state;
-> @@ -754,7 +766,7 @@ static int mtty_probe(struct mdev_device *mdev)
->   	vfio_uninit_group_dev(&mdev_state->vdev);
->   	kfree(mdev_state);
->   err_nr_ports:
-> -	atomic_add(nr_ports, &mdev_avail_ports);
-> +	atomic_add(type->nr_ports, &mdev_avail_ports);
->   	return ret;
->   }
->   
-> @@ -1235,11 +1247,9 @@ static const struct attribute_group *mdev_dev_groups[] = {
->   static ssize_t name_show(struct mdev_type *mtype,
->   			 struct mdev_type_attribute *attr, char *buf)
->   {
-> -	static const char *name_str[2] = { "Single port serial",
-> -					   "Dual port serial" };
-> +	struct mtty_type *type = container_of(mtype, struct mtty_type, type);
->   
-> -	return sysfs_emit(buf, "%s\n",
-> -			  name_str[mtype_get_type_group_id(mtype)]);
-> +	return sysfs_emit(buf, "%s\n", type->name);
->   }
->   
->   static MDEV_TYPE_ATTR_RO(name);
-> @@ -1248,9 +1258,10 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
->   					struct mdev_type_attribute *attr,
->   					char *buf)
->   {
-> -	unsigned int ports = mtype_get_type_group_id(mtype) + 1;
-> +	struct mtty_type *type = container_of(mtype, struct mtty_type, type);
->   
-> -	return sprintf(buf, "%d\n", atomic_read(&mdev_avail_ports) / ports);
-> +	return sprintf(buf, "%d\n", atomic_read(&mdev_avail_ports) /
-> +			type->nr_ports);
+> @@ -202,13 +196,11 @@ static ssize_t name_show(struct mdev_type *mtype,
 >   }
 >   
 >   static MDEV_TYPE_ATTR_RO(available_instances);
-> @@ -1263,29 +1274,13 @@ static ssize_t device_api_show(struct mdev_type *mtype,
+> -static MDEV_TYPE_ATTR_RO(device_api);
+>   static MDEV_TYPE_ATTR_RO(description);
+>   static MDEV_TYPE_ATTR_RO(name);
 >   
->   static MDEV_TYPE_ATTR_RO(device_api);
->   
-> -static struct attribute *mdev_types_attrs[] = {
-> +static const struct attribute *mdev_types_attrs[] = {
+>   static struct attribute *gvt_type_attrs[] = {
+>   	&mdev_type_attr_available_instances.attr,
+> -	&mdev_type_attr_device_api.attr,
+>   	&mdev_type_attr_description.attr,
 >   	&mdev_type_attr_name.attr,
->   	&mdev_type_attr_device_api.attr,
+>   	NULL,
+> @@ -1767,6 +1759,7 @@ static const struct attribute_group *intel_vgpu_groups[] = {
+>   
+>   static struct mdev_parent_ops intel_vgpu_ops = {
+>   	.mdev_attr_groups       = intel_vgpu_groups,
+> +	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+>   	.create			= intel_vgpu_create,
+>   	.remove			= intel_vgpu_remove,
+>   
+> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+> index 2afb8f13739f..6793c8b3c58b 100644
+> --- a/drivers/s390/cio/vfio_ccw_ops.c
+> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> @@ -66,13 +66,6 @@ static ssize_t name_show(struct mdev_type *mtype,
+>   }
+>   static MDEV_TYPE_ATTR_RO(name);
+>   
+> -static ssize_t device_api_show(struct mdev_type *mtype,
+> -			       struct mdev_type_attribute *attr, char *buf)
+> -{
+> -	return sprintf(buf, "%s\n", VFIO_DEVICE_API_CCW_STRING);
+> -}
+> -static MDEV_TYPE_ATTR_RO(device_api);
+> -
+>   static ssize_t available_instances_show(struct mdev_type *mtype,
+>   					struct mdev_type_attribute *attr,
+>   					char *buf)
+> @@ -86,7 +79,6 @@ static MDEV_TYPE_ATTR_RO(available_instances);
+>   
+>   static struct attribute *mdev_types_attrs[] = {
+>   	&mdev_type_attr_name.attr,
+> -	&mdev_type_attr_device_api.attr,
 >   	&mdev_type_attr_available_instances.attr,
 >   	NULL,
 >   };
+> @@ -644,5 +636,6 @@ struct mdev_driver vfio_ccw_mdev_driver = {
+>   const struct mdev_parent_ops vfio_ccw_mdev_ops = {
+>   	.owner			= THIS_MODULE,
+>   	.device_driver		= &vfio_ccw_mdev_driver,
+> +	.device_api		= VFIO_DEVICE_API_CCW_STRING,
+>   	.supported_type_groups  = mdev_type_groups,
+>   };
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 6e08d04b605d..838b1a3eac8a 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -530,17 +530,9 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
 >   
-> -static struct attribute_group mdev_type_group1 = {
-> -	.name  = "1",
-> -	.attrs = mdev_types_attrs,
-> -};
+>   static MDEV_TYPE_ATTR_RO(available_instances);
+>   
+> -static ssize_t device_api_show(struct mdev_type *mtype,
+> -			       struct mdev_type_attribute *attr, char *buf)
+> -{
+> -	return sprintf(buf, "%s\n", VFIO_DEVICE_API_AP_STRING);
+> -}
 > -
-> -static struct attribute_group mdev_type_group2 = {
-> -	.name  = "2",
-> -	.attrs = mdev_types_attrs,
-> -};
-> -
-> -static struct attribute_group *mdev_type_groups[] = {
-> -	&mdev_type_group1,
-> -	&mdev_type_group2,
-> -	NULL,
-> -};
-> -
->   static const struct vfio_device_ops mtty_dev_ops = {
->   	.name = "vfio-mtty",
->   	.read = mtty_read,
-> @@ -1302,7 +1297,6 @@ static struct mdev_driver mtty_driver = {
->   	},
->   	.probe = mtty_probe,
->   	.remove	= mtty_remove,
-> -	.supported_type_groups = mdev_type_groups,
+> -static MDEV_TYPE_ATTR_RO(device_api);
+>   
+>   static struct attribute *vfio_ap_mdev_type_attrs[] = {
+>   	&mdev_type_attr_name.attr,
+> -	&mdev_type_attr_device_api.attr,
+>   	&mdev_type_attr_available_instances.attr,
+>   	NULL,
+>   };
+> @@ -1501,6 +1493,7 @@ static struct mdev_driver vfio_ap_matrix_driver = {
+>   static const struct mdev_parent_ops vfio_ap_matrix_ops = {
+>   	.owner			= THIS_MODULE,
+>   	.device_driver		= &vfio_ap_matrix_driver,
+> +	.device_api		= VFIO_DEVICE_API_AP_STRING,
+>   	.supported_type_groups	= vfio_ap_mdev_type_groups,
 >   };
 >   
->   static void mtty_device_release(struct device *dev)
-> @@ -1312,7 +1306,7 @@ static void mtty_device_release(struct device *dev)
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index b314101237fe..c3018e8e6d32 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -129,7 +129,7 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>   	char *envp[] = { env_string, NULL };
 >   
->   static int __init mtty_dev_init(void)
+>   	/* check for mandatory ops */
+> -	if (!ops || !ops->supported_type_groups)
+> +	if (!ops || !ops->supported_type_groups || !ops->device_api)
+>   		return -EINVAL;
+>   	if (!ops->device_driver && (!ops->create || !ops->remove))
+>   		return -EINVAL;
+> diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
+> index f5cf1931c54e..d4b99440d19e 100644
+> --- a/drivers/vfio/mdev/mdev_sysfs.c
+> +++ b/drivers/vfio/mdev/mdev_sysfs.c
+> @@ -74,9 +74,30 @@ static ssize_t create_store(struct mdev_type *mtype,
+>   
+>   	return count;
+>   }
+> -
+>   static MDEV_TYPE_ATTR_WO(create);
+>   
+> +static ssize_t device_api_show(struct mdev_type *mtype,
+> +			       struct mdev_type_attribute *attr, char *buf)
+> +{
+> +	return sysfs_emit(buf, "%s\n", mtype->parent->ops->device_api);
+> +}
+> +static MDEV_TYPE_ATTR_RO(device_api);
+> +
+> +static struct attribute *mdev_types_std_attrs[] = {
+> +	&mdev_type_attr_create.attr,
+> +	&mdev_type_attr_device_api.attr,
+> +	NULL,
+> +};
+> +
+> +static struct attribute_group mdev_type_std_group = {
+> +	.attrs = mdev_types_std_attrs,
+> +};
+> +
+> +static const struct attribute_group *mdev_type_groups[] = {
+> +	&mdev_type_std_group,
+> +	NULL,
+> +};
+> +
+>   static void mdev_type_release(struct kobject *kobj)
 >   {
-> -	int ret = 0;
-> +	int i, ret = 0;
+>   	struct mdev_type *type = to_mdev_type(kobj);
+> @@ -123,7 +144,7 @@ static struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
+>   		return ERR_PTR(ret);
+>   	}
 >   
->   	pr_info("mtty_dev: %s\n", __func__);
->   
-> @@ -1357,8 +1351,19 @@ static int __init mtty_dev_init(void)
->   				   &mtty_driver);
+> -	ret = sysfs_create_file(&type->kobj, &mdev_type_attr_create.attr);
+> +	ret = sysfs_create_groups(&type->kobj, mdev_type_groups);
 >   	if (ret)
->   		goto err_device;
-> +	for (i = 0; i < ARRAY_SIZE(mtty_types); i++) {
-> +		ret = mdev_type_add(&mtty_dev.parent, &mtty_types[i].type,
-> +				    mtty_types[i].fname, mdev_types_attrs);
-> +		if (ret)
-> +			goto err_types;
-> +	}
-> +
->   	return 0;
+>   		goto attr_create_failed;
 >   
-> +err_types:
-> +	while (--i >= 0)
-> +		mdev_type_remove(&mtty_types[i].type, mdev_types_attrs);
-> +	mdev_unregister_parent(&mtty_dev.parent);
->   err_device:
->   	device_unregister(&mtty_dev.dev);
->   err_class:
-> @@ -1373,7 +1378,11 @@ static int __init mtty_dev_init(void)
+> @@ -144,7 +165,7 @@ static struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
+>   attrs_failed:
+>   	kobject_put(type->devices_kobj);
+>   attr_devices_failed:
+> -	sysfs_remove_file(&type->kobj, &mdev_type_attr_create.attr);
+> +	sysfs_remove_groups(&type->kobj, mdev_type_groups);
+>   attr_create_failed:
+>   	kobject_del(&type->kobj);
+>   	kobject_put(&type->kobj);
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index a5788f592817..14655215417b 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -36,6 +36,7 @@ struct device *mtype_get_parent_dev(struct mdev_type *mtype);
+>    *
+>    * @owner:		The module owner.
+>    * @device_driver:	Which device driver to probe() on newly created devices
+> + * @device_api:		String to return for the device_api sysfs
+>    * @dev_attr_groups:	Attributes of the parent device.
+>    * @mdev_attr_groups:	Attributes of the mediated device.
+>    * @supported_type_groups: Attributes to define supported types. It is mandatory
+> @@ -80,6 +81,7 @@ struct device *mtype_get_parent_dev(struct mdev_type *mtype);
+>   struct mdev_parent_ops {
+>   	struct module   *owner;
+>   	struct mdev_driver *device_driver;
+> +	const char *device_api;
+>   	const struct attribute_group **dev_attr_groups;
+>   	const struct attribute_group **mdev_attr_groups;
+>   	struct attribute_group **supported_type_groups;
+> @@ -108,11 +110,6 @@ struct mdev_type_attribute {
+>   			 size_t count);
+>   };
 >   
->   static void __exit mtty_dev_exit(void)
->   {
-> +	int i;
-> +
->   	mtty_dev.dev.bus = NULL;
-> +	for (i = 0; i < ARRAY_SIZE(mtty_types); i++)
-> +		mdev_type_remove(&mtty_types[i].type, mdev_types_attrs);
->   	mdev_unregister_parent(&mtty_dev.parent);
+> -#define MDEV_TYPE_ATTR(_name, _mode, _show, _store)		\
+> -struct mdev_type_attribute mdev_type_attr_##_name =		\
+> -	__ATTR(_name, _mode, _show, _store)
+> -#define MDEV_TYPE_ATTR_RW(_name) \
+> -	struct mdev_type_attribute mdev_type_attr_##_name = __ATTR_RW(_name)
+>   #define MDEV_TYPE_ATTR_RO(_name) \
+>   	struct mdev_type_attribute mdev_type_attr_##_name = __ATTR_RO(_name)
+>   #define MDEV_TYPE_ATTR_WO(_name) \
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index e90c8552cc31..8d3ae97d9d6e 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -1358,17 +1358,9 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+>   }
+>   static MDEV_TYPE_ATTR_RO(available_instances);
 >   
->   	device_unregister(&mtty_dev.dev);
+> -static ssize_t device_api_show(struct mdev_type *mtype,
+> -			       struct mdev_type_attribute *attr, char *buf)
+> -{
+> -	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+> -}
+> -static MDEV_TYPE_ATTR_RO(device_api);
+> -
+>   static struct attribute *mdev_types_attrs[] = {
+>   	&mdev_type_attr_name.attr,
+>   	&mdev_type_attr_description.attr,
+> -	&mdev_type_attr_device_api.attr,
+>   	&mdev_type_attr_available_instances.attr,
+>   	NULL,
+>   };
+> @@ -1417,6 +1409,7 @@ static struct mdev_driver mbochs_driver = {
+>   static const struct mdev_parent_ops mdev_fops = {
+>   	.owner			= THIS_MODULE,
+>   	.device_driver		= &mbochs_driver,
+> +	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+>   	.supported_type_groups	= mdev_type_groups,
+>   };
+>   
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index fe5d43e797b6..402a7ebe6563 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -670,17 +670,9 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+>   }
+>   static MDEV_TYPE_ATTR_RO(available_instances);
+>   
+> -static ssize_t device_api_show(struct mdev_type *mtype,
+> -			       struct mdev_type_attribute *attr, char *buf)
+> -{
+> -	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+> -}
+> -static MDEV_TYPE_ATTR_RO(device_api);
+> -
+>   static struct attribute *mdev_types_attrs[] = {
+>   	&mdev_type_attr_name.attr,
+>   	&mdev_type_attr_description.attr,
+> -	&mdev_type_attr_device_api.attr,
+>   	&mdev_type_attr_available_instances.attr,
+>   	NULL,
+>   };
+> @@ -728,6 +720,7 @@ static struct mdev_driver mdpy_driver = {
+>   static const struct mdev_parent_ops mdev_fops = {
+>   	.owner			= THIS_MODULE,
+>   	.device_driver          = &mdpy_driver,
+> +	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+>   	.supported_type_groups	= mdev_type_groups,
+>   };
+>   
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index a0e1a469bd47..5dc1b6a4c02c 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -1281,17 +1281,8 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+>   
+>   static MDEV_TYPE_ATTR_RO(available_instances);
+>   
+> -static ssize_t device_api_show(struct mdev_type *mtype,
+> -			       struct mdev_type_attribute *attr, char *buf)
+> -{
+> -	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
+> -}
+> -
+> -static MDEV_TYPE_ATTR_RO(device_api);
+> -
+>   static struct attribute *mdev_types_attrs[] = {
+>   	&mdev_type_attr_name.attr,
+> -	&mdev_type_attr_device_api.attr,
+>   	&mdev_type_attr_available_instances.attr,
+>   	NULL,
+>   };
+> @@ -1333,6 +1324,7 @@ static struct mdev_driver mtty_driver = {
+>   static const struct mdev_parent_ops mdev_fops = {
+>   	.owner                  = THIS_MODULE,
+>   	.device_driver		= &mtty_driver,
+> +	.device_api		= VFIO_DEVICE_API_PCI_STRING,
+>   	.dev_attr_groups        = mtty_dev_groups,
+>   	.supported_type_groups  = mdev_type_groups,
+>   };
