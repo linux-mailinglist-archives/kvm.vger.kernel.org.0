@@ -2,55 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F288353EB76
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8FFA53E889
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:08:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240150AbiFFO55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 10:57:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55902 "EHLO
+        id S240686AbiFFP0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 11:26:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240137AbiFFO5z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 10:57:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 072D12FE61A
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 07:57:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654527473;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=oEg/BxrxwpIVrTIgkNOexZzCDMRvekqGaXNned4YxC8=;
-        b=a3h6T0XrFJFRTpBSeHHtk2MdtC74VzEMjUKQ4llOHyGw7u/KerHVG0u780I2RjAh+viu5L
-        V2Fst/70VSKmCgcNnSN5Z5/dt4xrjwW5YavnquNdjcReIx//OBOJJjqK2GEvBzVgaLC1Qk
-        9P9TA5wVGQ2Ta32LPJ6Ej3Kb0pn5tr8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-259-CxbHyxR_P92L9-eFDrIRXg-1; Mon, 06 Jun 2022 10:57:50 -0400
-X-MC-Unique: CxbHyxR_P92L9-eFDrIRXg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S240584AbiFFPZw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 11:25:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BADE1CD350;
+        Mon,  6 Jun 2022 08:25:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 806A929ABA35;
-        Mon,  6 Jun 2022 14:57:49 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.91])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F36CA2026D64;
-        Mon,  6 Jun 2022 14:57:48 +0000 (UTC)
-Date:   Mon, 6 Jun 2022 15:57:47 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Cc:     qemu-devel@nongnu.org, jag.raman@oracle.com,
-        john.g.johnson@oracle.com, john.levon@nutanix.com, mst@redhat.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: ioregionfd with io_uring IORING_OP_URING_CMD
-Message-ID: <Yp4V61lfTTN3QsT4@stefanha-x1.localdomain>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 97A6761532;
+        Mon,  6 Jun 2022 15:25:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F9A7C341DE;
+        Mon,  6 Jun 2022 15:25:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654529149;
+        bh=JJt0IO+HD16nKaMzBkekejjxzH6zJTBr5QCuFRGczGE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=FQvjxVAjYkRkMlnXeUbGK/ffXS9EGiIGJB6czmy41m7BUi+gGlw+X1Vu+xVWhr8kL
+         VZmd7RutDKDJkQ6+PNC2k4EBuWcMiwehnWLeUgcaztEFymFfTpyADom9iKEZ2r0U6R
+         8QTKxcO8tqR2nN17KQ7uaYrNw3fG0aG82GOK9/YW0npuVqsyv4lNhNtBEPuUTmVVIT
+         XOE4wPosVqLjYqBNBMuGPxA5PXF0QCAYswfnxGdyJu5zTk6VkYY/y8ZNnVzT895FLj
+         P6YX/uUQeJAT8yJ01In++Ksk7XfTNpL0aA6OZ6qjgQfLIhLB4De2E2AivHQOnNJprR
+         rbUcjc+xUJibQ==
+Received: from mchehab by mail.kernel.org with local (Exim 4.95)
+        (envelope-from <mchehab@kernel.org>)
+        id 1nyEby-0012On-0x;
+        Mon, 06 Jun 2022 16:25:46 +0100
+From:   Mauro Carvalho Chehab <mchehab@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Federico Vaga <federico.vaga@vaga.pv.it>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Markus Mayer <mmayer@broadcom.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        alsa-devel@alsa-project.org, devicetree@vger.kernel.org,
+        keyrings@vger.kernel.org, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-cachefs@redhat.com,
+        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-m68k@lists.linux-m68k.org, linux-mmc@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+        x86@kernel.org
+Subject: [PATCH 00/23] Update Documentation/ cross-references
+Date:   Mon,  6 Jun 2022 16:25:22 +0100
+Message-Id: <cover.1654529011.git.mchehab@kernel.org>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="NmJ6ra3KB8tnU5hE"
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,62 +84,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi John,
 
---NmJ6ra3KB8tnU5hE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+There were a number of DT binding conversions and other docs change that
+were not updated. Address them, in order to keep the cross-references on
+a sane state.
 
-Hi,
-During Elena Afanasova's Outreachy project we discussed whether
-ioregionfd should be a custom struct file_operations (anon inode) or a
-userspace-provided file (socketpair, UNIX domain socket, etc).
+Patch series is against v5.19-rc1 (and applies cleanly on the top of
+today's -next).
 
-Back then it seemed more flexible and simpler to let userspace provide
-the file. It may be worth revisiting this decision in light of the
-recent io_uring IORING_OP_URING_CMD feature, which fits for this
-performance-critical interface.
+Mauro Carvalho Chehab (23):
+  dt-bindings: mfd: bd9571mwv: update rohm,bd9571mwv.yaml reference
+  dt-bindings: interrupt-controller: update brcm,l2-intc.yaml reference
+  dt-bindings: arm: update vexpress-config.yaml references
+  dt-bindings: reset: update st,stih407-powerdown.yaml references
+  dt-bindings: mfd: rk808: update rockchip,rk808.yaml reference
+  dt-bindings: mmc: exynos-dw-mshc: update samsung,pinctrl.yaml
+    reference
+  docs: netdev: update maintainer-netdev.rst reference
+  docs: filesystems: update netfs-api.rst reference
+  Documentation: update watch_queue.rst references
+  Documentation: KVM: update s390-pv.rst reference
+  Documentation: KVM: update amd-memory-encryption.rst references
+  Documentation: KVM: update msr.rst reference
+  Documentation: KVM: update s390-diag.rst reference
+  MAINTAINERS: update arm,hdlcd.yaml reference
+  MAINTAINERS: update arm,komeda.yaml reference
+  MAINTAINERS: update arm,malidp.yaml reference
+  MAINTAINERS: update cortina,gemini-ethernet.yaml reference
+  MAINTAINERS: update dongwoon,dw9807-vcm.yaml reference
+  MAINTAINERS: update maxim,max77693.yaml reference
+  MAINTAINERS: update snps,axs10x-reset.yaml reference
+  objtool: update objtool.txt references
+  ASoC: wm8731: update wlf,wm8731.yaml reference
+  arch: m68k: q40: README: drop references to IDE driver
 
-IORING_OP_URING_CMD involves a new struct file_operations->uring_cmd()
-callback. It's a flexible userspace interface like ioctl(2) but designed
-to be asynchronous. ioregionfd can provide a uring_cmd() that reads a
-ioregionfd response from userspace and then writes the next ioregionfd
-request to userspace.
+ .../ABI/testing/sysfs-driver-bd9571mwv-regulator   |  2 +-
+ Documentation/admin-guide/kernel-parameters.txt    |  2 +-
+ .../bindings/cpufreq/brcm,stb-avs-cpu-freq.txt     |  2 +-
+ .../devicetree/bindings/hwmon/vexpress.txt         |  2 +-
+ .../devicetree/bindings/mmc/exynos-dw-mshc.txt     |  2 +-
+ .../devicetree/bindings/phy/phy-stih407-usb.txt    |  2 +-
+ .../devicetree/bindings/pinctrl/pinctrl-rk805.txt  |  2 +-
+ .../devicetree/bindings/regulator/vexpress.txt     |  2 +-
+ .../bindings/sound/atmel-sam9x5-wm8731-audio.txt   |  2 +-
+ Documentation/devicetree/bindings/usb/dwc3-st.txt  |  2 +-
+ Documentation/devicetree/bindings/usb/ehci-st.txt  |  2 +-
+ Documentation/devicetree/bindings/usb/ohci-st.txt  |  2 +-
+ Documentation/security/keys/core.rst               |  2 +-
+ Documentation/security/secrets/coco.rst            |  2 +-
+ .../translations/it_IT/networking/netdev-FAQ.rst   |  2 +-
+ Documentation/virt/kvm/api.rst                     |  4 ++--
+ Documentation/virt/kvm/s390/s390-pv-boot.rst       |  2 +-
+ Documentation/virt/kvm/x86/hypercalls.rst          |  2 +-
+ Documentation/x86/orc-unwinder.rst                 |  2 +-
+ MAINTAINERS                                        | 14 +++++++-------
+ arch/m68k/q40/README                               |  4 +---
+ include/linux/fscache.h                            |  2 +-
+ include/linux/objtool.h                            |  2 +-
+ include/linux/watch_queue.h                        |  2 +-
+ init/Kconfig                                       |  2 +-
+ kernel/watch_queue.c                               |  2 +-
+ lib/Kconfig.debug                                  |  2 +-
+ tools/include/linux/objtool.h                      |  2 +-
+ tools/objtool/check.c                              |  2 +-
+ 29 files changed, 36 insertions(+), 38 deletions(-)
 
-This single operation merges the request/response so only 1 syscall is
-necessary per KVM MMIO/PIO exit instead of a read() + write(). Bypassing
-the net/socket infrastructure is likely to help too.
+-- 
+2.36.1
 
-It would be interesting to benchmark this and compare it against the
-existing userspace-provided file approach. Although it's not the same
-scenario, results for the Linux NVMe driver using ->uring_cmd() are
-promising:
-https://www.snia.org/educational-library/enabling-asynchronous-i-o-passthru-nvme-native-applications-2021
-
-The downside is it requires more code than general purpose I/O. In
-addition to ->uring_cmd(), it's also worth implementing struct
-file_operations read/write/poll so traditional file I/O syscalls work
-for simple applications that don't want to use io_uring.
-
-It's possible to add ->uring_cmd() later but as a userspace developer I
-would prefer the ->uring_cmd() approach, so I'm not sure it's worth
-committing to the existing userspace-provided file approach?
-
-Stefan
-
---NmJ6ra3KB8tnU5hE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmKeFesACgkQnKSrs4Gr
-c8hW6gf6Ax8Kb1dAPiFcem5nK7bYZToPIS5yL03lRrOaVh6bIxS28nct3RZM9Z7v
-RhlJfDY8xSFQdlocOZVeKJjUMu34RyDCi26BbBKjUgvbFHDsGvIi0gje/43VUQuI
-CNVE/GLA0s6q0DUMY+Dl9h+v0tttVMaKJA9aGAbOuSAhRMidg1WvmBdVW7ZBmtsz
-FmZrretiXj8jBUl+kdfUSnHJJWLJz3y9RfOHIwYOH7bKzZyJxOSqcXo1zKm3OXO9
-WKCgl6jGrL1laYdpjZGPdFLewLav9yr1kdr823vfnDT/f9jcD/liHzvSF8NmmIGa
-GcUS4sPyc6XaRQU1GI9G9+RVe+3cZw==
-=hUCX
------END PGP SIGNATURE-----
-
---NmJ6ra3KB8tnU5hE--
 
