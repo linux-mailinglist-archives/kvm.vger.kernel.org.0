@@ -2,230 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0DFB53F00B
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 22:40:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E90C53F06C
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 22:46:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234149AbiFFUkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 16:40:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52338 "EHLO
+        id S230164AbiFFUq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 16:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234103AbiFFUkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 16:40:25 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 892E41105F6
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 13:36:59 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 256KXYa5001956;
-        Mon, 6 Jun 2022 20:36:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=QT59XG4yFEdaUJP8CL+P9u/550+JpgHD6CVebJvzSEc=;
- b=Y9/uR17lM2s+pefCuKPBH9pwafjgsY9zr744eoqT9ArHY8UModa++iosOoMbcwExI3bH
- VIlSzJ8Q3Bt8990L+z97VfsCJkOAMzrjeBUBIXdFf8uQNg2NDtAz529ZkvbPDg8KXEBL
- lrmmMR0t0tVEKdgcSG72qH08/whYOntuYC+W4/Pkzl4qO3zungLi255yx+M/VCnacuag
- ScIxK7E+BZ4NgeouZ7Lb3QEYk8Q/w8teGjfArMie9uYvALd/5Zzog6MllYTaeZzY+EkE
- 1qvuJW7j2+5nX1Bs78+pCcqnjHvf12gwiyK76OeOupaiVzJVCBjHyjmxygTUL+2q8t0w bA== 
+        with ESMTP id S234556AbiFFUpD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 16:45:03 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71CB2B0A46;
+        Mon,  6 Jun 2022 13:39:45 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 256KUtXX038478;
+        Mon, 6 Jun 2022 20:37:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=td1VMGMGm9prnYY2BFNKGCmnqq4ZYbreIcwsQdN4RX8=;
+ b=hBEBMJnrPie3R3fNe7QKP40DvCkA3siVFdLLWG6YL6VUJ08qgzA0Pr7dIF6y9GuO0OvE
+ HuyWndt34C1MtwsX6nY5ydzhxAGOhFGm3AENWoYebIuH8bhK8u98YlkIOYORiXOPRGCB
+ wzCnkE1ONX7LZtk23SjWZhNkmtPNlgjz9yMCALemtDrlnqgALOPlQ9moewEtPSOAOJ8W
+ aKXu9Zb8Dss7L8UKg0quItYnz5kmE7YNEFUU8lHqMwplN03+Rr19Q0yFfejz2UiqBTSv
+ SBUjbXebBhe2JrR+5I8xxcI5ESRN3kf9yxWR9G3FG88SoirKtJFmceImpC7iT5RztpW1 EA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghqj1h9d9-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghqs6152q-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 20:36:55 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 256KXcGe002483;
-        Mon, 6 Jun 2022 20:36:55 GMT
+        Mon, 06 Jun 2022 20:37:38 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 256KVPqw040433;
+        Mon, 6 Jun 2022 20:37:37 GMT
 Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghqj1h9d2-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghqs6152e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 20:36:55 +0000
+        Mon, 06 Jun 2022 20:37:37 +0000
 Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 256KLO5b007310;
-        Mon, 6 Jun 2022 20:36:54 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02dal.us.ibm.com with ESMTP id 3gfy1abrqt-1
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 256KLI5w007267;
+        Mon, 6 Jun 2022 20:37:36 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02dal.us.ibm.com with ESMTP id 3gfy1abrua-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 20:36:54 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 256Karqa8847618
+        Mon, 06 Jun 2022 20:37:36 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 256KbZQi31261020
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Jun 2022 20:36:53 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5051328059;
-        Mon,  6 Jun 2022 20:36:53 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 797C828058;
-        Mon,  6 Jun 2022 20:36:50 +0000 (GMT)
-Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.163.20.188])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Jun 2022 20:36:50 +0000 (GMT)
+        Mon, 6 Jun 2022 20:37:35 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 317846A047;
+        Mon,  6 Jun 2022 20:37:35 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C33D46A04D;
+        Mon,  6 Jun 2022 20:37:33 +0000 (GMT)
+Received: from [9.163.20.188] (unknown [9.163.20.188])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon,  6 Jun 2022 20:37:33 +0000 (GMT)
+Message-ID: <14f7d1a0-ebe6-c8b5-827b-4cb6d4c3f1bc@linux.ibm.com>
+Date:   Mon, 6 Jun 2022 16:37:32 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v1 14/18] vfio/mdev: Add mdev available instance checking
+ to the core
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>, Neo Jia <cjia@nvidia.com>,
+        Dheeraj Nigam <dnigam@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <20220602171948.2790690-1-farman@linux.ibm.com>
+ <20220602171948.2790690-15-farman@linux.ibm.com>
+ <63a87e1e-7d99-b091-4c6b-fa25dd7c5211@nvidia.com>
+ <c818e1ef24c466a3b1d14d4ab10163d5e349a3b4.camel@linux.ibm.com>
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, richard.henderson@linaro.org,
-        david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
-        mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: [PATCH v7 8/8] s390x/s390-virtio-ccw: add zpcii-disable machine property
-Date:   Mon,  6 Jun 2022 16:36:14 -0400
-Message-Id: <20220606203614.110928-9-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220606203614.110928-1-mjrosato@linux.ibm.com>
-References: <20220606203614.110928-1-mjrosato@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <c818e1ef24c466a3b1d14d4ab10163d5e349a3b4.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RqrgQHz1AakKiU08n6mHz-c9-atM2Bk2
-X-Proofpoint-GUID: sMrpFmRQ60iCiPPu6ur9SZCM-FRZRXJJ
+X-Proofpoint-ORIG-GUID: -bq0nodvXUjtZZ_wnNklHY1T1Bq-8VsA
+X-Proofpoint-GUID: HykemnhgA4_SAbdofqMswThuHLHtmpMU
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-06_06,2022-06-03_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- adultscore=0 suspectscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
- bulkscore=0 clxscore=1015 spamscore=0 malwarescore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206060081
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 mlxlogscore=999 impostorscore=0
+ priorityscore=1501 clxscore=1011 spamscore=0 mlxscore=0 phishscore=0
+ bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206060081
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The zpcii-disable machine property can be used to force-disable the use
-of zPCI interpretation facilities for a VM.  By default, this setting
-will be off for machine 7.1 and newer.
+On 6/6/22 4:23 PM, Eric Farman wrote:
+> On Tue, 2022-06-07 at 01:32 +0530, Kirti Wankhede wrote:
+>>
+>> On 6/2/2022 10:49 PM, Eric Farman wrote:
+>>> From: Jason Gunthorpe <jgg@nvidia.com>
+>>>
+>>> Many of the mdev drivers use a simple counter for keeping track of
+>>> the
+>>> available instances. Move this code to the core code and store the
+>>> counter
+>>> in the mdev_type. Implement it using correct locking, fixing mdpy.
+>>>
+>>> Drivers provide a get_available() callback to set the number of
+>>> available
+>>> instances for their mtypes which is fixed at registration time. The
+>>> core
+>>> provides a standard sysfs attribute to return the
+>>> available_instances.
+>>>
+>>> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+>>> Cc: Jonathan Corbet <corbet@lwn.net>
+>>> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> Cc: Jason Herne <jjherne@linux.ibm.com>
+>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>>> Link:
+>>> https://lore.kernel.org/r/7-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com/
+>>> [farman: added Cc: tags]
+>>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>>> ---
+>>>    .../driver-api/vfio-mediated-device.rst       |  4 +-
+>>>    drivers/s390/cio/vfio_ccw_drv.c               |  1 -
+>>>    drivers/s390/cio/vfio_ccw_ops.c               | 26 ++++---------
+>>>    drivers/s390/cio/vfio_ccw_private.h           |  2 -
+>>>    drivers/s390/crypto/vfio_ap_ops.c             | 32 ++++--------
+>>> ----
+>>>    drivers/s390/crypto/vfio_ap_private.h         |  2 -
+>>>    drivers/vfio/mdev/mdev_core.c                 | 11 +++++-
+>>>    drivers/vfio/mdev/mdev_private.h              |  2 +
+>>>    drivers/vfio/mdev/mdev_sysfs.c                | 37
+>>> +++++++++++++++++++
+>>>    include/linux/mdev.h                          |  2 +
+>>>    samples/vfio-mdev/mdpy.c                      | 22 +++--------
+>>>    11 files changed, 76 insertions(+), 65 deletions(-)
+>>>
+>>> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
+>>> b/Documentation/driver-api/vfio-mediated-device.rst
+>>> index f410a1cd98bb..a4f7f1362fa8 100644
+>>> --- a/Documentation/driver-api/vfio-mediated-device.rst
+>>> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+>>> @@ -106,6 +106,7 @@ structure to represent a mediated device's
+>>> driver::
+>>>    	     int  (*probe)  (struct mdev_device *dev);
+>>>    	     void (*remove) (struct mdev_device *dev);
+>>>    	     struct device_driver    driver;
+>>> +	     unsigned int (*get_available)(struct mdev_type *mtype);
+>>>         };
+>>>
+>>
+>> This patch conflicts with Christoph Hellwig's patch. I see
+>> 'supported_type_groups' is not is above structure, I beleive that
+>> your
+>> patch is applied on top of Christoph's patch series.
+>>
+>> but then in below part of code, 'add_mdev_supported_type' has also
+>> being
+>> removed in Christoph's patch. So this patch would not get applied
+>> cleanly.
+> 
+> Apologies. This series was fit to 5.18 as the merge window progressed.
+> Both this patch and the previous one have to adjust to the removal of
+> mdev_parent_ops that came about from
+> 
+> commit 6b42f491e17ce13f5ff7f2d1f49c73a0f4c47b20
+> Author: Jason Gunthorpe <jgg@ziepe.ca>
+> Date:   Mon Apr 11 16:14:01 2022 +0200
+> 
+>      vfio/mdev: Remove mdev_parent_ops
+> 
+> I have this rebased for v2.
+> 
+> Eric
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- hw/s390x/s390-pci-kvm.c            |  4 +++-
- hw/s390x/s390-virtio-ccw.c         | 24 ++++++++++++++++++++++++
- include/hw/s390x/s390-virtio-ccw.h |  1 +
- qemu-options.hx                    |  8 +++++++-
- util/qemu-config.c                 |  4 ++++
- 5 files changed, 39 insertions(+), 2 deletions(-)
-
-diff --git a/hw/s390x/s390-pci-kvm.c b/hw/s390x/s390-pci-kvm.c
-index 9134fe185f..5eb7fd12e2 100644
---- a/hw/s390x/s390-pci-kvm.c
-+++ b/hw/s390x/s390-pci-kvm.c
-@@ -22,7 +22,9 @@
- 
- bool s390_pci_kvm_interp_allowed(void)
- {
--    return kvm_s390_get_zpci_op() && !s390_is_pv();
-+    return (kvm_s390_get_zpci_op() && !s390_is_pv() &&
-+            !object_property_get_bool(OBJECT(qdev_get_machine()),
-+                                      "zpcii-disable", NULL));
- }
- 
- int s390_pci_kvm_aif_enable(S390PCIBusDevice *pbdev, ZpciFib *fib, bool assist)
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index cc3097bfee..70229b102b 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -645,6 +645,21 @@ static inline void machine_set_dea_key_wrap(Object *obj, bool value,
-     ms->dea_key_wrap = value;
- }
- 
-+static inline bool machine_get_zpcii_disable(Object *obj, Error **errp)
-+{
-+    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-+
-+    return ms->zpcii_disable;
-+}
-+
-+static inline void machine_set_zpcii_disable(Object *obj, bool value,
-+                                             Error **errp)
-+{
-+    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-+
-+    ms->zpcii_disable = value;
-+}
-+
- static S390CcwMachineClass *current_mc;
- 
- /*
-@@ -740,6 +755,13 @@ static inline void s390_machine_initfn(Object *obj)
-             "Up to 8 chars in set of [A-Za-z0-9. ] (lower case chars converted"
-             " to upper case) to pass to machine loader, boot manager,"
-             " and guest kernel");
-+
-+    object_property_add_bool(obj, "zpcii-disable",
-+                             machine_get_zpcii_disable,
-+                             machine_set_zpcii_disable);
-+    object_property_set_description(obj, "zpcii-disable",
-+            "disable zPCI interpretation facilties");
-+    object_property_set_bool(obj, "zpcii-disable", false, NULL);
- }
- 
- static const TypeInfo ccw_machine_info = {
-@@ -804,9 +826,11 @@ DEFINE_CCW_MACHINE(7_1, "7.1", true);
- static void ccw_machine_7_0_instance_options(MachineState *machine)
- {
-     static const S390FeatInit qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V7_0 };
-+    S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
- 
-     ccw_machine_7_1_instance_options(machine);
-     s390_set_qemu_cpu_model(0x8561, 15, 1, qemu_cpu_feat);
-+    ms->zpcii_disable = true;
- }
- 
- static void ccw_machine_7_0_class_options(MachineClass *mc)
-diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-index 3331990e02..8a0090a071 100644
---- a/include/hw/s390x/s390-virtio-ccw.h
-+++ b/include/hw/s390x/s390-virtio-ccw.h
-@@ -27,6 +27,7 @@ struct S390CcwMachineState {
-     bool aes_key_wrap;
-     bool dea_key_wrap;
-     bool pv;
-+    bool zpcii_disable;
-     uint8_t loadparm[8];
- };
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 60cf188da4..fafe335b4a 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -36,7 +36,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                nvdimm=on|off controls NVDIMM support (default=off)\n"
-     "                memory-encryption=@var{} memory encryption object to use (default=none)\n"
-     "                hmat=on|off controls ACPI HMAT support (default=off)\n"
--    "                memory-backend='backend-id' specifies explicitly provided backend for main RAM (default=none)\n",
-+    "                memory-backend='backend-id' specifies explicitly provided backend for main RAM (default=none)\n"
-+    "                zpcii-disable=on|off disables zPCI interpretation facilities (default=off)\n",
-     QEMU_ARCH_ALL)
- SRST
- ``-machine [type=]name[,prop=value[,...]]``
-@@ -124,6 +125,11 @@ SRST
-             -object memory-backend-ram,id=pc.ram,size=512M,x-use-canonical-path-for-ramblock-id=off
-             -machine memory-backend=pc.ram
-             -m 512M
-+
-+    ``zpcii-disable=on|off``
-+        Disables zPCI interpretation facilties on s390-ccw hosts.
-+        This feature can be used to disable hardware virtual assists
-+        related to zPCI devices. The default is off.
- ERST
- 
- DEF("M", HAS_ARG, QEMU_OPTION_M,
-diff --git a/util/qemu-config.c b/util/qemu-config.c
-index 433488aa56..5325f6bf80 100644
---- a/util/qemu-config.c
-+++ b/util/qemu-config.c
-@@ -236,6 +236,10 @@ static QemuOptsList machine_opts = {
-             .help = "Up to 8 chars in set of [A-Za-z0-9. ](lower case chars"
-                     " converted to upper case) to pass to machine"
-                     " loader, boot manager, and guest kernel",
-+        },{
-+            .name = "zpcii-disable",
-+            .type = QEMU_OPT_BOOL,
-+            .help = "disable zPCI interpretation facilities",
-         },
-         { /* End of list */ }
-     }
--- 
-2.27.0
+Thanks Eric -- FYI, I'm planning to review the entire series but will 
+likely hold off until v2 on a number of patches at this point as there 
+are a few other collisions with 5.19
 
