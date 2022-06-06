@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8E3353F2A2
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 01:38:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0681153F2A5
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 01:38:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230441AbiFFXiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 19:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38224 "EHLO
+        id S234001AbiFFXia (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 19:38:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiFFXiM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 19:38:12 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2596AF310
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 16:38:10 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id az35so4880049qkb.3
-        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 16:38:10 -0700 (PDT)
+        with ESMTP id S235302AbiFFXi3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 19:38:29 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA689B0412
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 16:38:27 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id d128so4231492qkg.8
+        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 16:38:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=ewFcKPOa+2x6RXhVIR+v/VURcDtYVPRav4oUF2Rq3Fg=;
-        b=hI01O5N11a+OWG1HisFkBQQWBXV1w6StkkZG9lXxvx7pzAsflSoBkrnnIt8qVcLeZX
-         QpKb+uW+AUIFqqFs5Jzomqg/B47cQ2LYJKT5bdMgCXEwoaqctUc4IqQnw3yh6zgZ7X28
-         lo23+1PCLig/vrVM3kbEbK48GIF2JeDaLiu6FPpw95BYJw9qp8jpZB8Gy0kRx0dYfNib
-         2ML1mQIuoBQnZ1b45+il30LtIeeOScKxr8Kri0+EXFkLswIqeAjulzgb21a0KaJMtIdn
-         7gLl7d9IzgsEjbMk3wgL151ZaHyv57BO9K1jI6BZLt8PBeVkRuh/iIsIzmWNTqq/7E6W
-         hRPQ==
+        bh=SU1Bpkz24VutH49VA7lUe4kyWhTSzOg82FW0ZiHgnzQ=;
+        b=WUJN3PF98AmhnA9EnEIdGSfQ5ddQCk1y/4KLpggWx8LwpBQi4LI4gzsx6iazkzR8PZ
+         cEfJk//4+Lnkx7Mko3HcmLj6+pnY/fOX7GfVZGwcM9We0Zc6O6MtTUsRjz6d10a/dk0j
+         5A1rEl7jBhWHvzx4R7XAkT/NianJ6tYTcRYGSkN0RBiJVzefXBSVFUNLCPnmM+cAaEhy
+         L7zMeGOack3Dn6a7dqz6pg8urZjq0mve71gJxnafaNfgNPJGtTCKQi2F93fG2N2L5VRo
+         y/P3npTUwVoVAd2aPR78f0TyInxB0HJ1H0/vAhR6M0nAXppHqovFRhUMa2qfhtTKnOE6
+         MxYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=ewFcKPOa+2x6RXhVIR+v/VURcDtYVPRav4oUF2Rq3Fg=;
-        b=XtagV1TNdbWtfXmHa6kEYn3dHY62VkBRAQO9/2BHpi9LXqY+FsHgktBF5TfYSaZeJy
-         Pl1BV0NCw+Cl53QPrwc6zXEx3v2kep0AEe4TLuFPtFdctTnv7B/WfE+lW8nRm/xO0kZc
-         QDrdlLqu06h/HBY3ki7xlmrIRLETnt8bGYYYZ16mfGvze0CPbt2gT4xvnaOFtxw/JE5G
-         Xnxcr+l+3V2pafIbxaPIuJKRQ3/wE+dyP6iPHegQN8vgZkIIV+w6gPmBxnE0Y5KjbOqa
-         5NF5mRdFlhIUin7A+ympSWiH3U2t8kTuwFeTBs2mjcjxP3rmMeEFFta8Rru9qAXto9CE
-         /eLg==
-X-Gm-Message-State: AOAM5313DPHoH4oood93NnCgWa9NQMj5vVTUufdkSl17htm5fPgGJnJu
-        ChsRrA5VOOwE/LsaS9Fai10knvSqwRnwOw==
-X-Google-Smtp-Source: ABdhPJzf37dz4Rqa77kSjV+oZpBSb6XWF30qEzih0C5uqAelmaT+JRLEKFfxjiPEZKYVgGEeLV8wig==
-X-Received: by 2002:a05:620a:370f:b0:6a6:d7c3:a7f2 with SMTP id de15-20020a05620a370f00b006a6d7c3a7f2mr178760qkb.644.1654558689919;
-        Mon, 06 Jun 2022 16:38:09 -0700 (PDT)
+        bh=SU1Bpkz24VutH49VA7lUe4kyWhTSzOg82FW0ZiHgnzQ=;
+        b=nevRiIPz0RxvigGg+B2amr+VcsOMumAvm8xixGiMj1s0Et63V7Oo04iMqBDukctYOQ
+         lFu2EEBCee5p60QJovlOAVm4ar00u1gL8mRFHDQm6YIhNYXRIj7erNmae8xIZfx2LRqW
+         NGB5qCpfnO93BF4GRv36Y6V3dT9otdv4UPYPYKF0Xqx8CDUShmTyiiql3ZkO2kM0q1va
+         wsRkwGfBM0p0uTJptsK++pRUBxfOBCDg6rt3xrXOfHxMc0W1JHo+SLXFs9AHXbpk+LYo
+         7/yZZ5vJzj4oRs6a+OowKcVQtzm9RKaVy4tKYAZZ4P5Q94V4ZwXzKm/tgo86irHE/o80
+         tNgw==
+X-Gm-Message-State: AOAM5320mG0DgYl74CHUest2u0kZglzOcOIOFyQPnJiZ4PQk3SLs77lQ
+        cTsRJX0Tb0o7UDElzDTlkU8low==
+X-Google-Smtp-Source: ABdhPJzNb5TbcgQHOD4e1Y+ahg3esfZR81+kv/1bIwhxqm8jBZqA+IHLjSD8w4ADYCCosG/B97s89w==
+X-Received: by 2002:a05:620a:25cb:b0:6a1:136:a7ed with SMTP id y11-20020a05620a25cb00b006a10136a7edmr17667931qko.531.1654558706881;
+        Mon, 06 Jun 2022 16:38:26 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id a25-20020ac87219000000b00304eaca5e5csm3784236qtp.73.2022.06.06.16.38.09
+        by smtp.gmail.com with ESMTPSA id n79-20020a374052000000b0069fc13ce23dsm12539098qka.110.2022.06.06.16.38.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jun 2022 16:38:09 -0700 (PDT)
+        Mon, 06 Jun 2022 16:38:26 -0700 (PDT)
 Received: from jgg by mlx with local (Exim 4.94)
         (envelope-from <jgg@ziepe.ca>)
-        id 1nyMIS-002prR-Pq; Mon, 06 Jun 2022 20:38:08 -0300
-Date:   Mon, 6 Jun 2022 20:38:08 -0300
+        id 1nyMIj-002ps2-KS; Mon, 06 Jun 2022 20:38:25 -0300
+Date:   Mon, 6 Jun 2022 20:38:25 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
@@ -64,14 +64,14 @@ Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         intel-gvt-dev@lists.freedesktop.org
-Subject: Re: [PATCH 3/8] vfio/mdev: simplify mdev_type handling
-Message-ID: <20220606233808.GD3932382@ziepe.ca>
+Subject: Re: [PATCH 4/8] vfio/mdev: remove mdev_{create,remove}_sysfs_files
+Message-ID: <20220606233825.GE3932382@ziepe.ca>
 References: <20220603063328.3715-1-hch@lst.de>
- <20220603063328.3715-4-hch@lst.de>
+ <20220603063328.3715-5-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220603063328.3715-4-hch@lst.de>
+In-Reply-To: <20220603063328.3715-5-hch@lst.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -82,37 +82,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 03, 2022 at 08:33:23AM +0200, Christoph Hellwig wrote:
+On Fri, Jun 03, 2022 at 08:33:24AM +0200, Christoph Hellwig wrote:
+> Just fold these two trivial helpers into their only callers.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/vfio/mdev/mdev_core.c    | 12 ++++++++++--
+>  drivers/vfio/mdev/mdev_private.h |  3 ---
+>  drivers/vfio/mdev/mdev_sysfs.c   | 28 ----------------------------
+>  3 files changed, 10 insertions(+), 33 deletions(-)
 
-> @@ -112,9 +88,10 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
->  			return -ENOMEM;
->  	}
->  
-> -	ret = parent_create_sysfs_files(parent);
-> -	if (ret)
-> -		return ret;
-> +	parent->mdev_types_kset = kset_create_and_add("mdev_supported_types",
-> +					       NULL, &parent->dev->kobj);
-> +	if (!parent->mdev_types_kset)
-> +		return -ENOMEM;
->  
->  	ret = class_compat_create_link(mdev_bus_compat_class, dev, NULL);
->  	if (ret)
-[..]
-	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
-
-This changes the ordering with respect to this udev event, now the
-mdev_supported_types directory is created but the directory is empty,
-then the driver fills it after the KOBJ_CHANGE event is triggered.
-
-Granted this whole abusing some other struct device's sysfs thing is
-inherently wrong - I'm not really sure what impact this has. Though at
-least someone seemed to care since their is this uevent here...
-
-Maybe we need a 'finish register' call to trigger the uevent? Or
-perhaps trigger the uevent when each add_type is done?
-
-Everything else looks fine though, I looked at this for a while a long
-time ago and didn't see this nice final arrangement :\
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
 Jason
