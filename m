@@ -2,63 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 492D953E8FC
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:08:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 444C753E6AE
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236589AbiFFMRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 08:17:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38902 "EHLO
+        id S239482AbiFFOOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 10:14:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236579AbiFFMQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 08:16:59 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0291E293814;
-        Mon,  6 Jun 2022 05:16:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 61DBCCE1A93;
-        Mon,  6 Jun 2022 12:16:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE360C34119;
-        Mon,  6 Jun 2022 12:16:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654517814;
-        bh=DbMgnzFRDeClTcRHZKl9h6of7GFtoGX1BaOdzUKuVpM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=B7z7FHJhSOsxG0qlrZKrOsoSS0uQvLJlGQZEVqpzl9lgWj/QKHPYxDbBXCkm4m7vN
-         3UPBWK5UUxcCS9dIdcVwFkn1w66aFkXyQVjUHTJQvU4VRheyvpMZ3yOnNGThcpMCXD
-         CqBoIe+Lg8zvxsW2Zh4v06JNQUgtrdcUQkMlzp9PE6CYNeL5loiRQCMzD2M0isBP7b
-         qbCpIv6eP3tzuJ1LA+citjUdU8c2lAHs98cf30MTjA/hsijoZPHXx3mr9RBMDPU4z2
-         5QK6wKQkbFOmY9S3XZ2aDkyIA2MUaw+8LLcD8dnpxwN7VIqVHjj73B896O/GS8f9ih
-         l3GfBYwo+i8hQ==
-Date:   Mon, 6 Jun 2022 13:16:48 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-        Quentin Perret <qperret@google.com>, kernel-team@android.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 01/18] KVM: arm64: Always start with clearing SVE flag on
- load
-Message-ID: <Yp3wMETNdDWtNhaY@sirena.org.uk>
-References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-2-maz@kernel.org>
- <YpTXsgd1MPpJEjUJ@sirena.org.uk>
- <87y1ya3uan.wl-maz@kernel.org>
+        with ESMTP id S239453AbiFFOOC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 10:14:02 -0400
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BE2E2C64E
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 07:14:00 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-f2a4c51c45so19267813fac.9
+        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 07:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3cP+WhjIMFd4Hbfsr5/ENvdSuimZ1mS+1KHrF7Liuqc=;
+        b=XGYmsxg14M+lK4OHA1hxciUhwAJ4vbhy5fXTMvSsLxpIJjqmBx7/hRJYO1yMWYugvc
+         dAFXKnRxXPCYSHFLunMNMaAUun8iauYkL8M7BQyzkaaP13kHA0dr500XDDeSwe9Eax1s
+         efplhlinjoA7rk4ZAYsJ1mN8Sg+T/HXX0ej60=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3cP+WhjIMFd4Hbfsr5/ENvdSuimZ1mS+1KHrF7Liuqc=;
+        b=C3XzwGg8Gs33ZLECywMKOKPas7FVVv6NJ2Bq2rtB4Z7Zb4FAy8QWf1nLAUfaXifDw8
+         wEwsgolr/qQJMIqZgbQcDQTuCyLvIYEVn1u3KdsZooisM5EIeo7PbMfiILeeDGFHgnLf
+         1PQWNk1xqigqihQpUQj9/p6O0iOHNyD3+t8bhhKCdT+HsWoDU2KC21ZQBUYENKJkWNbX
+         RlWTaW/n/vjXU6zbthVDaHw45xIe31Sv+ejWcErDuKHeh2qbLvTlB6+aG+jNA5wCZz/f
+         yNUWNuVuiEOI9iXEjjhxCq4IVaAkNpZ42hxNlmRtE1Aoig/6KuTakI6eh/7lQ7pA8Icr
+         9Owg==
+X-Gm-Message-State: AOAM533sdxVWLKnbBYHnptHcT48pwZujH1R1HZy+OwWYi29c1jJYQ/Jm
+        kmuDMPGpC1vAjQY792omiTdGSQ==
+X-Google-Smtp-Source: ABdhPJwLDiM99Fj8vzlM1sfE4CsjrhkLwScaAI2kR8dCZ0qI9jd/XAFsLz6CevfLJnhSXzNCmlp1PA==
+X-Received: by 2002:a05:6870:d192:b0:de:691:81ad with SMTP id a18-20020a056870d19200b000de069181admr30881237oac.165.1654524839943;
+        Mon, 06 Jun 2022 07:13:59 -0700 (PDT)
+Received: from localhost ([2605:a601:ac0f:820:cc11:d018:c11b:3321])
+        by smtp.gmail.com with ESMTPSA id c11-20020a056830000b00b0060bec21ffcdsm3348053otp.22.2022.06.06.07.13.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jun 2022 07:13:59 -0700 (PDT)
+Date:   Mon, 6 Jun 2022 09:13:58 -0500
+From:   Seth Forshee <sforshee@digitalocean.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        live-patching@vger.kernel.org, kvm@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>
+Subject: Re: [PATCH] entry/kvm: Exit to user mode when TIF_NOTIFY_SIGNAL is
+ set
+Message-ID: <Yp4LpgBHjvBEbyeS@do-x1extreme>
+References: <20220504180840.2907296-1-sforshee@digitalocean.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="B+OWqsOhQgqxaqa/"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87y1ya3uan.wl-maz@kernel.org>
-X-Cookie: Bedfellows make strange politicians.
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <20220504180840.2907296-1-sforshee@digitalocean.com>
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,62 +76,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, May 04, 2022 at 01:08:40PM -0500, Seth Forshee wrote:
+> A livepatch transition may stall indefinitely when a kvm vCPU is heavily
+> loaded. To the host, the vCPU task is a user thread which is spending a
+> very long time in the ioctl(KVM_RUN) syscall. During livepatch
+> transition, set_notify_signal() will be called on such tasks to
+> interrupt the syscall so that the task can be transitioned. This
+> interrupts guest execution, but when xfer_to_guest_mode_work() sees that
+> TIF_NOTIFY_SIGNAL is set but not TIF_SIGPENDING it concludes that an
+> exit to user mode is unnecessary, and guest execution is resumed without
+> transitioning the task for the livepatch.
+> 
+> This handling of TIF_NOTIFY_SIGNAL is incorrect, as set_notify_signal()
+> is expected to break tasks out of interruptible kernel loops and cause
+> them to return to userspace. Change xfer_to_guest_mode_work() to handle
+> TIF_NOTIFY_SIGNAL the same as TIF_SIGPENDING, signaling to the vCPU run
+> loop that an exit to userpsace is needed. Any pending task_work will be
+> run when get_signal() is called from exit_to_user_mode_loop(), so there
+> is no longer any need to run task work from xfer_to_guest_mode_work().
+> 
+> Suggested-by: "Eric W. Biederman" <ebiederm@xmission.com>
+> Cc: Petr Mladek <pmladek@suse.com>
+> Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
 
---B+OWqsOhQgqxaqa/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Friendly reminder as it seems like this patch may have been forgotten.
 
-On Mon, Jun 06, 2022 at 12:28:32PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Sat, May 28, 2022 at 12:38:11PM +0100, Marc Zyngier wrote:
+Thanks,
+Seth
 
-> > > We probably never saw the issue because no VMM uses SVE, but
-> > > that's still pretty bad. Unconditionally clearing the flag
-> > > on vcpu load addresses the issue.
-
-> > Unless I'm missing something since we currently always disable
-> > SVE on syscall even if the VMM were using SVE for some reason
-> > (SVE memcpy()?) we should already have disabled SVE for EL0 in
-> > sve_user_discard() during kernel entry so EL0 access to SVE
-> > should be disabled in the system register by the time we get
-> > here.
-
-> Indeed. And this begs the question: what is this code actually doing?
-> Is there any way we can end-up running a guest with any valid host SVE
-> state?
-
-> I remember being >this< close to removing that code some time ago, and
-> only stopped because I vaguely remembered Dave Martin convincing me at
-> some point that it was necessary. I'm unable to piece the argument
-> together again though.
-
-I've stared at that code a few times as well, I think I'd ended up
-assuming it was some path to do with preempting and context switching
-but in that case I've never been clear why there'd be anything left that
-we'd need to preserve, or if we do why we don't just force a
-fpsimd_save().  It's possible this was from some earlier stage in review
-where the ABI didn't allow us to discard the SVE register state, or that
-it's there as defensive programming so for future work where we don't
-just disable on entry.
-
-Conicidentally I am going to post some patches later today or tomorrow
-which leave SVE enabled on syscall, they still have the hook for
-disabling it when entering KVM though so we'd still not need to save the
-EL0 state and the above should still apply.
-
---B+OWqsOhQgqxaqa/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKd8C8ACgkQJNaLcl1U
-h9AuDQf/VtGwAYDRDXwCU0D9tcpQJP64CtZ/QTytBLvoK2LGjER1sF9NO52CsDv2
-LKMCVNLg64qR5K+eB9ruX6ER3XOtEP1ttwQNvNVkZxmx7uHi2zZA/8FVdy+5RHYH
-651Hye9Gxe0Pq/dUj5H0Ij4eauwvOYahcpvoI+XDHNyM5DGjayLuqJX2BOFhfMvp
-bSYpgzr63deaSi/Hm7d+zD/EFupGNoMcKJ2aYFbRx29AUeriEe+q2yR7wAiwXhbG
-ZB6s+YX23A75vW7S1G3ujaPKAVenINEhfg8hGZ2G9GeJUw8iT6ckCm2CYAp6hurz
-b8rnsx2vN0U9BYAo+aQrx24rn8sz0Q==
-=8N3B
------END PGP SIGNATURE-----
-
---B+OWqsOhQgqxaqa/--
+> ---
+>  kernel/entry/kvm.c | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
+> index 9d09f489b60e..2e0f75bcb7fd 100644
+> --- a/kernel/entry/kvm.c
+> +++ b/kernel/entry/kvm.c
+> @@ -9,12 +9,6 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
+>  		int ret;
+>  
+>  		if (ti_work & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL)) {
+> -			clear_notify_signal();
+> -			if (task_work_pending(current))
+> -				task_work_run();
+> -		}
+> -
+> -		if (ti_work & _TIF_SIGPENDING) {
+>  			kvm_handle_signal_exit(vcpu);
+>  			return -EINTR;
+>  		}
+> -- 
+> 2.32.0
+> 
