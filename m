@@ -2,151 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B64953EB4A
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:09:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A755C53E6BE
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:07:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241702AbiFFQUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 12:20:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59978 "EHLO
+        id S235593AbiFFQvn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 12:51:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241669AbiFFQUr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 12:20:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7073A296300
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 09:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654532442;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SiJ9xom7N9pKMOdzxnCK3+PJOWSLJd7EA3DjmLBi34c=;
-        b=b0drvRjlRNgZBMVsZAyhXBQLudyiok2rzZJLTNDYO3cyDQCmZfParihErmhIn7r2+JY0uD
-        zja/nSHoYKozpj7laJPcKYlu3K7yGW92NQMalK3u8GWRAKsDS2H8cxQduRiVQ9xHdTV8hW
-        yHi1H/hBmSWe+tDpecNWvviGWa+uvMA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-118-RQjddTfzMgqdqKwP7ZdarA-1; Mon, 06 Jun 2022 12:20:40 -0400
-X-MC-Unique: RQjddTfzMgqdqKwP7ZdarA-1
-Received: by mail-wr1-f70.google.com with SMTP id c11-20020adffb4b000000b0020ff998391dso2965831wrs.8
-        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 09:20:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=SiJ9xom7N9pKMOdzxnCK3+PJOWSLJd7EA3DjmLBi34c=;
-        b=hhZ6d07npz3gbrqhXAjDgBDTv3ODMw0dt1YuutI5u01J4hhW9OY+jp8z+VU6RsWDdU
-         aVZLQcGGPBB30OcuRvIRf3qY4IZyO2I8IER6Pa8Gpu1Hw6uy5CVeB7qyd104HzmapdVN
-         FBalPR+quMz0NCt48jSeIh81O+eUGxR+Q2CyT53na90ptKWXiyzxSmXoUJjsaDvlEGgK
-         Bd7FvJ1XBFDh/7mwA/PcAsP9QW7GplycXBONXDWMGrCCgWQ9ZXTOC/FdewyrkVV+PNIt
-         8U6WtUV6xZe8Ilo13CHasV3hNW4Z3uH7mGaR2Q2WTkzBkFp+qPkQiNp0FwzXSKH1xtZH
-         vNgA==
-X-Gm-Message-State: AOAM5331MID9QU2jg2oRZIub0/1T3PAV94GfkJsu9gDV0NUi4C7eKAm+
-        fSitncR4t9RMEAjZx8bzEyGkKvn/+2HbdYQusw6GE6G4m4p4UC9U6WhLJ6WgUGX/c1NkwHU1Gfo
-        +lFGW8Df1lgQe
-X-Received: by 2002:a05:6000:1c0d:b0:216:c9f4:2b83 with SMTP id ba13-20020a0560001c0d00b00216c9f42b83mr11271678wrb.405.1654532439233;
-        Mon, 06 Jun 2022 09:20:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzRaTzbA0QBQEva/7Bqtk+6R9scH/Yt15vQFFNyrQgBRo85G9w3nue1vJbR7yVabCwRBl1RyQ==
-X-Received: by 2002:a05:6000:1c0d:b0:216:c9f4:2b83 with SMTP id ba13-20020a0560001c0d00b00216c9f42b83mr11271648wrb.405.1654532438966;
-        Mon, 06 Jun 2022 09:20:38 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id k5-20020adff285000000b002101ed6e70fsm11539684wro.37.2022.06.06.09.20.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jun 2022 09:20:38 -0700 (PDT)
-Message-ID: <bf1d4cd1-d902-6efc-a954-58a11d85d9ac@redhat.com>
-Date:   Mon, 6 Jun 2022 18:20:35 +0200
+        with ESMTP id S230519AbiFFQv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 12:51:28 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2045.outbound.protection.outlook.com [40.107.237.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012AB2FEF5E;
+        Mon,  6 Jun 2022 09:51:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZtCVqcRIucmWe+mEk+B3YnXBnrlz+9qnSrH8iVZTDtvd0VTCn4XBS16Jj4i+CC0Ib0UlDpPUqznN4xqTvgcjiKzrPcf8OW+jf0FDIsOfVU4S3HoXcGN5YxKzZf9oL5wtXA16PPoDdXREussQMUuLV9VGdCiwh2h4Zpn3wJwbgM9s+REx9ZU94EvW8FObem6+yE8gC3GztMWco/qWT+YiupyTgNu8RXlG4JYafewoba58waiRBgA7EzM0C6UyERPOF88tMZWnlKjD3J03AaMNmuP2mKiN8+Rc+o+oHxOZXJ4evkmCQzbgVBsJJPK6/jQvy1WjP3a6d7BVz6xK1yLqSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4Hdvzb/DdjhHYGSNy9UQ2o7bsQj6hNcDtAAubHjVpQM=;
+ b=aIVy/0SEWiKvqh7NZ1beFDMKXxakSWNdsDvrtFm3mVrK6YrY03IphbTFebujbQVZBwhlVa89tNUXeiO22PabjsbT3SUiOHdXUgCjnKDhN+tciKrbQrOLVUatqbcPgXjRRYvwo+7E9fs7WPBZpjljDxv3EzBZvubi6zFmQ+NEWGCo8ZOA6qS2/Z1S5AOj0okZqCKLkojNleS2DNd+r7OpHgESqB0vxRSvjm+XMj7NaWtFWd0PDQ8IXDvzNDoURoBR/Ct63S3/mVb1OhYeBRfhLu4c7DV7Hm1syRqBfMlcFbntraraFL0gahLoO6z0nali78ZYDtFcDIAsB07TEVXBVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.238) smtp.rcpttodomain=samsung.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4Hdvzb/DdjhHYGSNy9UQ2o7bsQj6hNcDtAAubHjVpQM=;
+ b=JqjHf+zW8Wx5v048GenopBuqJQY0XhFW5XtPUZlM2SQqZzd695+e+afR9Vp7DWp/ltsIfHwivK1FwvejtYEE7ayW0uhcTInnzXIu1l+3j0BwMEdKvIO4zXnFJz5oR0AlSSVFWp7s4wMNGJrYpGZ7cOkxLDZbqLFzZAIZRb9kIhBIkrv961StBfkDrDZQ9mXACBwpGrssWL4YCqBdCXGwhI0mKtIaKLbadiv5+8BUoMFfegHsDEsf0hYjLHu7EwcoSPmqeupzS++fTr9d7JBJD9yCQT/f1B2OpgL3quodGO9RBlS3Er6RUiqiQbW/0v5rnGNzGUue0+v+DXhitc9xqw==
+Received: from DM5PR19CA0059.namprd19.prod.outlook.com (2603:10b6:3:116::21)
+ by CH2PR12MB5530.namprd12.prod.outlook.com (2603:10b6:610:35::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13; Mon, 6 Jun
+ 2022 16:51:25 +0000
+Received: from DM6NAM11FT012.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:116:cafe::e1) by DM5PR19CA0059.outlook.office365.com
+ (2603:10b6:3:116::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.19 via Frontend
+ Transport; Mon, 6 Jun 2022 16:51:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.238) by
+ DM6NAM11FT012.mail.protection.outlook.com (10.13.173.109) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5314.12 via Frontend Transport; Mon, 6 Jun 2022 16:51:24 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.32; Mon, 6 Jun 2022 16:51:23 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Mon, 6 Jun 2022 09:51:23 -0700
+Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22 via Frontend
+ Transport; Mon, 6 Jun 2022 09:51:21 -0700
+Date:   Mon, 6 Jun 2022 09:51:20 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+CC:     <jgg@nvidia.com>, <joro@8bytes.org>, <will@kernel.org>,
+        <marcan@marcan.st>, <sven@svenpeter.dev>, <robdclark@gmail.com>,
+        <m.szyprowski@samsung.com>, <krzysztof.kozlowski@linaro.org>,
+        <baolu.lu@linux.intel.com>, <agross@kernel.org>,
+        <bjorn.andersson@linaro.org>, <matthias.bgg@gmail.com>,
+        <heiko@sntech.de>, <orsonzhai@gmail.com>, <baolin.wang7@gmail.com>,
+        <zhang.lyra@gmail.com>, <wens@csie.org>,
+        <jernej.skrabec@gmail.com>, <samuel@sholland.org>,
+        <jean-philippe@linaro.org>, <alex.williamson@redhat.com>,
+        <suravee.suthikulpanit@amd.com>, <alyssa@rosenzweig.io>,
+        <alim.akhtar@samsung.com>, <dwmw2@infradead.org>,
+        <yong.wu@mediatek.com>, <mjrosato@linux.ibm.com>,
+        <gerald.schaefer@linux.ibm.com>, <thierry.reding@gmail.com>,
+        <vdumpa@nvidia.com>, <jonathanh@nvidia.com>, <cohuck@redhat.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-samsung-soc@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-rockchip@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+        <linux-sunxi@lists.linux.dev>, <linux-tegra@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH 2/5] iommu: Ensure device has the same iommu_ops as the
+ domain
+Message-ID: <Yp4wiJZWxoCLY8tm@Asurada-Nvidia>
+References: <20220606061927.26049-1-nicolinc@nvidia.com>
+ <20220606061927.26049-3-nicolinc@nvidia.com>
+ <1e0e5403-1e65-db9a-c8e7-34e316bfda8e@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] entry/kvm: Exit to user mode when TIF_NOTIFY_SIGNAL is
- set
-Content-Language: en-US
-To:     Seth Forshee <sforshee@digitalocean.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org, kvm@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>
-References: <20220504180840.2907296-1-sforshee@digitalocean.com>
- <Yp4LpgBHjvBEbyeS@do-x1extreme>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yp4LpgBHjvBEbyeS@do-x1extreme>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1e0e5403-1e65-db9a-c8e7-34e316bfda8e@arm.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a451f386-62ff-4630-c883-08da47dccab5
+X-MS-TrafficTypeDiagnostic: CH2PR12MB5530:EE_
+X-Microsoft-Antispam-PRVS: <CH2PR12MB5530383D1535572BE22B389BABA29@CH2PR12MB5530.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pZiq+ND8CO2amXmNIxVaMtKaraIW4f8vTJiY9NgKkJZULPQnAn0NN9dDhRfW4kJ7TbWHwmqIS1l8JpoBweBdDwTxB4OmTkH31biKB1MsIsCGDS1+df29XGZSdNh9kFTIZulZJkONV88r3aUljC6cKCgXN+dWEp2n6cZQuYOQGzqJjMrLEdZe6x8i1d3BaU+pqMWdgRdvfAlJ0CF3lXU+ZoNH37t+N6Ih+7G617MvEwTU7DQijmGcuJSVC7HC4IA8skZgfk9NCut7ZA1JqChuITMXcKHw0sncB1dOOz3rwdGYulhmqAY/CCEoRxsgjDJppllnOEtc0Aj0GRvlbyz+PFisVwJGiw7YJ2cJLUN3qJDXQrqPtlQzC5hkIYjl+CNRrzwt0EMrzqrBBcrbitaT4YErGYYj9lVfcVL34LHkgA2VIwoWyKy+z6l0W//UjdUWCpPBsWfGO2DdeuEVtvZkCFvyTzyNbE1tre3z2Ot0MlqFsO8MuLeQWdsoLtZSL3cVTyJ1kYQUkX/Lj6mk82MaV5Gqp4l2A0CfeopHBKHsknX/F4uuK18v6KaJlqVNTq/pfxx5qRGx7Tw0SVYDEw4ig/Sq9Er0kOBb3rJTLro4bxcTD4WHZq2a8XTazHVCPws847GwkiNJ3MTCUUFZqrR4ZRmOyo0+ChwLcq38gQ5tpaKbSg9SvzNvnq+n6/YkcCRM0aKY2uJaDBHFvQvnVWCatQ==
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(356005)(26005)(55016003)(2906002)(6916009)(40460700003)(81166007)(426003)(47076005)(9686003)(54906003)(53546011)(316002)(86362001)(36860700001)(83380400001)(336012)(7406005)(8676002)(4326008)(7416002)(33716001)(70586007)(70206006)(5660300002)(186003)(508600001)(82310400005)(8936002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2022 16:51:24.4541
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a451f386-62ff-4630-c883-08da47dccab5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT012.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5530
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/6/22 16:13, Seth Forshee wrote:
-> On Wed, May 04, 2022 at 01:08:40PM -0500, Seth Forshee wrote:
->> A livepatch transition may stall indefinitely when a kvm vCPU is heavily
->> loaded. To the host, the vCPU task is a user thread which is spending a
->> very long time in the ioctl(KVM_RUN) syscall. During livepatch
->> transition, set_notify_signal() will be called on such tasks to
->> interrupt the syscall so that the task can be transitioned. This
->> interrupts guest execution, but when xfer_to_guest_mode_work() sees that
->> TIF_NOTIFY_SIGNAL is set but not TIF_SIGPENDING it concludes that an
->> exit to user mode is unnecessary, and guest execution is resumed without
->> transitioning the task for the livepatch.
->>
->> This handling of TIF_NOTIFY_SIGNAL is incorrect, as set_notify_signal()
->> is expected to break tasks out of interruptible kernel loops and cause
->> them to return to userspace. Change xfer_to_guest_mode_work() to handle
->> TIF_NOTIFY_SIGNAL the same as TIF_SIGPENDING, signaling to the vCPU run
->> loop that an exit to userpsace is needed. Any pending task_work will be
->> run when get_signal() is called from exit_to_user_mode_loop(), so there
->> is no longer any need to run task work from xfer_to_guest_mode_work().
->>
->> Suggested-by: "Eric W. Biederman" <ebiederm@xmission.com>
->> Cc: Petr Mladek <pmladek@suse.com>
->> Signed-off-by: Seth Forshee <sforshee@digitalocean.com>
+Hi Robin,
+
+On Mon, Jun 06, 2022 at 03:33:42PM +0100, Robin Murphy wrote:
+> On 2022-06-06 07:19, Nicolin Chen wrote:
+> > The core code should not call an iommu driver op with a struct device
+> > parameter unless it knows that the dev_iommu_priv_get() for that struct
+> > device was setup by the same driver. Otherwise in a mixed driver system
+> > the iommu_priv could be casted to the wrong type.
 > 
-> Friendly reminder as it seems like this patch may have been forgotten.
+> We don't have mixed-driver systems, and there are plenty more
+> significant problems than this one to solve before we can (but thanks
+> for pointing it out - I hadn't got as far as auditing the public
+> interfaces yet). Once domains are allocated via a particular device's
+> IOMMU instance in the first place, there will be ample opportunity for
+> the core to stash suitable identifying information in the domain for
+> itself. TBH even the current code could do it without needing the
+> weirdly invasive changes here.
 
-Probably AB-BA maintainer deadlock.  I have queued it now.
+Do you have an alternative and less invasive solution in mind?
 
-Paolo
-
-> Thanks,
-> Seth
+> > Store the iommu_ops pointer in the iommu_domain and use it as a check to
+> > validate that the struct device is correct before invoking any domain op
+> > that accepts a struct device.
 > 
->> ---
->>   kernel/entry/kvm.c | 6 ------
->>   1 file changed, 6 deletions(-)
->>
->> diff --git a/kernel/entry/kvm.c b/kernel/entry/kvm.c
->> index 9d09f489b60e..2e0f75bcb7fd 100644
->> --- a/kernel/entry/kvm.c
->> +++ b/kernel/entry/kvm.c
->> @@ -9,12 +9,6 @@ static int xfer_to_guest_mode_work(struct kvm_vcpu *vcpu, unsigned long ti_work)
->>   		int ret;
->>   
->>   		if (ti_work & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL)) {
->> -			clear_notify_signal();
->> -			if (task_work_pending(current))
->> -				task_work_run();
->> -		}
->> -
->> -		if (ti_work & _TIF_SIGPENDING) {
->>   			kvm_handle_signal_exit(vcpu);
->>   			return -EINTR;
->>   		}
->> -- 
->> 2.32.0
->>
-> 
+> In fact this even describes exactly that - "Store the iommu_ops pointer
+> in the iommu_domain", vs. the "Store the iommu_ops pointer in the
+> iommu_domain_ops" which the patch is actually doing :/
 
+Will fix that.
+
+> [...]
+> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > index 19cf28d40ebe..8a1f437a51f2 100644
+> > --- a/drivers/iommu/iommu.c
+> > +++ b/drivers/iommu/iommu.c
+> > @@ -1963,6 +1963,10 @@ static int __iommu_attach_device(struct iommu_domain *domain,
+> >   {
+> >       int ret;
+> > 
+> > +     /* Ensure the device was probe'd onto the same driver as the domain */
+> > +     if (dev->bus->iommu_ops != domain->ops->iommu_ops)
+> 
+> Nope, dev_iommu_ops(dev) please. Furthermore I think the logical place
+> to put this is in iommu_group_do_attach_device(), since that's the
+> gateway for the public interfaces - we shouldn't need to second-guess
+> ourselves for internal default-domain-related calls.
+
+Will move to iommu_group_do_attach_device and change to dev_iommu_ops.
+
+Thanks!
+Nic
