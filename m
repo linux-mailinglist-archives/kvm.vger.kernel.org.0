@@ -2,127 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ABF253ECEB
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:19:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EE1953ED31
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:50:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230011AbiFFRTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 13:19:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37644 "EHLO
+        id S230126AbiFFRut (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 13:50:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbiFFRSy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 13:18:54 -0400
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9672A5130C;
-        Mon,  6 Jun 2022 10:17:53 -0700 (PDT)
-Received: by mail-il1-f172.google.com with SMTP id d6so1584259ilm.4;
-        Mon, 06 Jun 2022 10:17:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HOgnxEn2ntmtyghL8kOb8yKeTcYGElnyCDEZZ25iRQw=;
-        b=4Rh+2Oy1eY+bYftHCMJntZLu8WUck5porKU754FT8zR6Zrc1ge8btPSGostMVvL3OV
-         SnatfcmfJPoHw7VIetGqvBuSKTKPotPkorQG4RXog3r5KyneQybFCNA9fqODyOKRq3cu
-         JkaTE/OFn4WPIjCWenuUfzjbasK2sDP1uqtUW/40cuMglBuofp7f/Oia3KkhOuYBhBs1
-         zDb4DZfYV+MsuQ3edePHr3aP1Esoi6MOLB2QkKXTxM7QsCyoF5MMBvITQaP0EV0aXodl
-         RetlcCfUZYhfHhYAog1vp4KXM6Gzb+sf29gK7B1QzTvRWwHn+wWbjU7x264uiR/Kwrn1
-         9X9A==
-X-Gm-Message-State: AOAM530qDiQ4MgwcvCqSG0y8EZVSl3dzi7fzsuYTm8MTuU14l6VTbLCZ
-        6jqA5yTXnzCXGGmZPA2C0A==
-X-Google-Smtp-Source: ABdhPJxXRz8rpxHVMQETrBoM9cb8XJJozkw5PJACTm4qK/vhBn8tviwY3PyY58j2eoaPB/u3qpK33w==
-X-Received: by 2002:a05:6e02:184f:b0:2d3:d0c2:d56a with SMTP id b15-20020a056e02184f00b002d3d0c2d56amr13953839ilv.174.1654535872910;
-        Mon, 06 Jun 2022 10:17:52 -0700 (PDT)
-Received: from robh.at.kernel.org ([64.188.179.251])
-        by smtp.gmail.com with ESMTPSA id t17-20020a92c0d1000000b002d3da8e4af5sm6121750ilf.23.2022.06.06.10.17.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jun 2022 10:17:52 -0700 (PDT)
-Received: (nullmailer pid 911134 invoked by uid 1000);
-        Mon, 06 Jun 2022 17:17:47 -0000
-Date:   Mon, 6 Jun 2022 12:17:47 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Broadcom internal kernel review list 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Federico Vaga <federico.vaga@vaga.pv.it>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jean Delvare <jdelvare@suse.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Markus Mayer <mmayer@broadcom.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        alsa-devel@alsa-project.org, devicetree@vger.kernel.org,
-        keyrings@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-cachefs@redhat.com,
-        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-m68k@lists.linux-m68k.org, linux-mmc@vger.kernel.org,
-        linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
-        x86@kernel.org
-Subject: Re: [PATCH 00/23] Update Documentation/ cross-references
-Message-ID: <20220606171747.GB899329-robh@kernel.org>
-References: <cover.1654529011.git.mchehab@kernel.org>
+        with ESMTP id S230026AbiFFRur (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 13:50:47 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 405B56B7D4;
+        Mon,  6 Jun 2022 10:50:45 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8FE65165C;
+        Mon,  6 Jun 2022 10:50:45 -0700 (PDT)
+Received: from [10.57.81.38] (unknown [10.57.81.38])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 344483F66F;
+        Mon,  6 Jun 2022 10:50:38 -0700 (PDT)
+Message-ID: <6575de6d-94ba-c427-5b1e-967750ddff23@arm.com>
+Date:   Mon, 6 Jun 2022 18:50:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1654529011.git.mchehab@kernel.org>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 2/5] iommu: Ensure device has the same iommu_ops as the
+ domain
+Content-Language: en-GB
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     jgg@nvidia.com, joro@8bytes.org, will@kernel.org, marcan@marcan.st,
+        sven@svenpeter.dev, robdclark@gmail.com, m.szyprowski@samsung.com,
+        krzysztof.kozlowski@linaro.org, baolu.lu@linux.intel.com,
+        agross@kernel.org, bjorn.andersson@linaro.org,
+        matthias.bgg@gmail.com, heiko@sntech.de, orsonzhai@gmail.com,
+        baolin.wang7@gmail.com, zhang.lyra@gmail.com, wens@csie.org,
+        jernej.skrabec@gmail.com, samuel@sholland.org,
+        jean-philippe@linaro.org, alex.williamson@redhat.com,
+        suravee.suthikulpanit@amd.com, alyssa@rosenzweig.io,
+        alim.akhtar@samsung.com, dwmw2@infradead.org, yong.wu@mediatek.com,
+        mjrosato@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        thierry.reding@gmail.com, vdumpa@nvidia.com, jonathanh@nvidia.com,
+        cohuck@redhat.com, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+References: <20220606061927.26049-1-nicolinc@nvidia.com>
+ <20220606061927.26049-3-nicolinc@nvidia.com>
+ <1e0e5403-1e65-db9a-c8e7-34e316bfda8e@arm.com>
+ <Yp4wiJZWxoCLY8tm@Asurada-Nvidia>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <Yp4wiJZWxoCLY8tm@Asurada-Nvidia>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-9.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 06, 2022 at 04:25:22PM +0100, Mauro Carvalho Chehab wrote:
-> Hi John,
+On 2022-06-06 17:51, Nicolin Chen wrote:
+> Hi Robin,
 > 
-> There were a number of DT binding conversions and other docs change that
-> were not updated. Address them, in order to keep the cross-references on
-> a sane state.
+> On Mon, Jun 06, 2022 at 03:33:42PM +0100, Robin Murphy wrote:
+>> On 2022-06-06 07:19, Nicolin Chen wrote:
+>>> The core code should not call an iommu driver op with a struct device
+>>> parameter unless it knows that the dev_iommu_priv_get() for that struct
+>>> device was setup by the same driver. Otherwise in a mixed driver system
+>>> the iommu_priv could be casted to the wrong type.
+>>
+>> We don't have mixed-driver systems, and there are plenty more
+>> significant problems than this one to solve before we can (but thanks
+>> for pointing it out - I hadn't got as far as auditing the public
+>> interfaces yet). Once domains are allocated via a particular device's
+>> IOMMU instance in the first place, there will be ample opportunity for
+>> the core to stash suitable identifying information in the domain for
+>> itself. TBH even the current code could do it without needing the
+>> weirdly invasive changes here.
 > 
-> Patch series is against v5.19-rc1 (and applies cleanly on the top of
-> today's -next).
+> Do you have an alternative and less invasive solution in mind?
 > 
-> Mauro Carvalho Chehab (23):
->   dt-bindings: mfd: bd9571mwv: update rohm,bd9571mwv.yaml reference
->   dt-bindings: interrupt-controller: update brcm,l2-intc.yaml reference
->   dt-bindings: arm: update vexpress-config.yaml references
->   dt-bindings: reset: update st,stih407-powerdown.yaml references
->   dt-bindings: mfd: rk808: update rockchip,rk808.yaml reference
->   dt-bindings: mmc: exynos-dw-mshc: update samsung,pinctrl.yaml
->     reference
->   docs: netdev: update maintainer-netdev.rst reference
->   docs: filesystems: update netfs-api.rst reference
->   Documentation: update watch_queue.rst references
->   Documentation: KVM: update s390-pv.rst reference
->   Documentation: KVM: update amd-memory-encryption.rst references
->   Documentation: KVM: update msr.rst reference
->   Documentation: KVM: update s390-diag.rst reference
->   MAINTAINERS: update arm,hdlcd.yaml reference
->   MAINTAINERS: update arm,komeda.yaml reference
->   MAINTAINERS: update arm,malidp.yaml reference
->   MAINTAINERS: update cortina,gemini-ethernet.yaml reference
->   MAINTAINERS: update dongwoon,dw9807-vcm.yaml reference
->   MAINTAINERS: update maxim,max77693.yaml reference
->   MAINTAINERS: update snps,axs10x-reset.yaml reference
->   objtool: update objtool.txt references
->   ASoC: wm8731: update wlf,wm8731.yaml reference
->   arch: m68k: q40: README: drop references to IDE driver
+>>> Store the iommu_ops pointer in the iommu_domain and use it as a check to
+>>> validate that the struct device is correct before invoking any domain op
+>>> that accepts a struct device.
+>>
+>> In fact this even describes exactly that - "Store the iommu_ops pointer
+>> in the iommu_domain", vs. the "Store the iommu_ops pointer in the
+>> iommu_domain_ops" which the patch is actually doing :/
+> 
+> Will fix that.
 
-Applied patches 1-5,17,18,20
+Well, as before I'd prefer to make the code match the commit message - 
+if I really need to spell it out, see below - since I can't imagine that 
+we should ever have need to identify a set of iommu_domain_ops in 
+isolation, therefore I think it's considerably clearer to use the 
+iommu_domain itself. However, either way we really don't need this yet, 
+so we may as well just go ahead and remove the redundant test from VFIO 
+anyway, and I can add some form of this patch to my dev branch for now.
+
+Thanks,
+Robin.
+
+----->8-----
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index cde2e1d6ab9b..72990edc9314 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1902,6 +1902,7 @@ static struct iommu_domain 
+*__iommu_domain_alloc(struct device *dev,
+  	domain->type = type;
+  	/* Assume all sizes by default; the driver may override this later */
+  	domain->pgsize_bitmap = ops->pgsize_bitmap;
++	domain->owner = ops;
+  	if (!domain->ops)
+  		domain->ops = ops->default_domain_ops;
+
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 6f64cbbc6721..79e557207f53 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -89,6 +89,7 @@ struct iommu_domain_geometry {
+
+  struct iommu_domain {
+  	unsigned type;
++	const struct iommu_ops *owner; /* Who allocated this domain */
+  	const struct iommu_domain_ops *ops;
+  	unsigned long pgsize_bitmap;	/* Bitmap of page sizes in use */
+  	iommu_fault_handler_t handler;
