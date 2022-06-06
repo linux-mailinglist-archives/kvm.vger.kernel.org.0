@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 384F853F004
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 22:40:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0A0453F005
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 22:40:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234186AbiFFUjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 16:39:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54888 "EHLO
+        id S233972AbiFFUkU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 16:40:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234209AbiFFUjf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 16:39:35 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C11ABB0D13
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 13:36:32 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 256KUtFN038532;
-        Mon, 6 Jun 2022 20:36:26 GMT
+        with ESMTP id S234145AbiFFUjl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 16:39:41 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34D11BA99C
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 13:36:37 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 256KTphC018690;
+        Mon, 6 Jun 2022 20:36:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=CC6JtraPwaG1BaPQbsXEnimCvQdPEEqWr8I+1T+e0TE=;
- b=lVCjHXgwA369hZMaaLF8A4Uc9PlgrFBA+lgiuWwep0SapewZILqTLYlbPRfg0qacRjdF
- 4BEfCho+H9i8i20E0VUDHUuFdzWL2s0vKCSWa+xuenh3aYchXnuLB+V77WKPrBJL1z/Q
- zj8jU5YSH7SX2SZw5d8WYXaM2k0kwYj6KPhj8Oe+r6HdG4s0dndIAtN4Q/a4+PykE0fY
- wpOTLTPkuH+VnCqaaQTIO/oh8r7Vbuf7jk/8clSym205ugQOGgvjN8rG9kjUa5phkV4y
- YXmm6ngTX36dYwrbctoNaVfXD2r9K7A3JQa0RGFhfryGeoCYeYPf35uroy3FGlHEXuRB Yw== 
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=HeQOrBdgVTx+QO3+10bFs0nnzTwgvfkdM0zbe5cvrVY=;
+ b=n3GoX36WCX8EpGvDQ4cPj57fCa/8wqKoxlCSloI6YAFiApuwJFwwSVxo3o4AS/yfGOTl
+ gcOFPc47T7zrhF56CH29TdAylZZTkngMqucnB8RnXUO804z3QgAb978ar76Yfl6B3hbR
+ 1mrlCtvVb2MrfoJQKdKRy1Lxlds+fmoZhYmyVF3vOBZU0vmIDbFgY1sKHc4D4FW+yVo7
+ m00kYBP/kRPW2vLxAfw50MBqEck2Tm596sIDiRbX6IyKslBo66AZQ/kfzMPN9gqB/VF9
+ S9aWmOspil+2kOTnoPoHZGQoxgjdMSGaKEqr9ISUoa+gLoQOfWjgYA5byShBqRYSnc+f Ug== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghqs614h8-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghrew8b9u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 20:36:25 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 256KVKkd039825;
-        Mon, 6 Jun 2022 20:36:25 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghqs614h0-1
+        Mon, 06 Jun 2022 20:36:30 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 256KVrOS023597;
+        Mon, 6 Jun 2022 20:36:30 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ghrew8b9m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 20:36:25 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 256KKNw5006013;
-        Mon, 6 Jun 2022 20:36:24 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02wdc.us.ibm.com with ESMTP id 3gfy19ftuc-1
+        Mon, 06 Jun 2022 20:36:30 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 256KKDp2030461;
+        Mon, 6 Jun 2022 20:36:29 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03wdc.us.ibm.com with ESMTP id 3gfy19fvxx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 20:36:24 +0000
+        Mon, 06 Jun 2022 20:36:29 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 256KaNt622479290
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 256KaSpM37093780
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Jun 2022 20:36:24 GMT
+        Mon, 6 Jun 2022 20:36:28 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC5752805C;
-        Mon,  6 Jun 2022 20:36:23 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 34CD628059;
+        Mon,  6 Jun 2022 20:36:28 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 489FD28058;
-        Mon,  6 Jun 2022 20:36:20 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 39AAF28058;
+        Mon,  6 Jun 2022 20:36:24 +0000 (GMT)
 Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.163.20.188])
         by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Jun 2022 20:36:20 +0000 (GMT)
+        Mon,  6 Jun 2022 20:36:24 +0000 (GMT)
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
@@ -64,23 +64,25 @@ Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
         david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
         mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
         kvm@vger.kernel.org
-Subject: [PATCH v7 0/8] s390x/pci: zPCI interpretation support                
-Date:   Mon,  6 Jun 2022 16:36:06 -0400
-Message-Id: <20220606203614.110928-1-mjrosato@linux.ibm.com>
+Subject: [PATCH v7 1/8] Update linux headers
+Date:   Mon,  6 Jun 2022 16:36:07 -0400
+Message-Id: <20220606203614.110928-2-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20220606203614.110928-1-mjrosato@linux.ibm.com>
+References: <20220606203614.110928-1-mjrosato@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: v2xkGrF6LlBfedhNUcgX8o6RscFVfsDE
-X-Proofpoint-GUID: xNYFqqktEf4OuBhrjTxwbfw2Gl2sXPc8
+X-Proofpoint-ORIG-GUID: aa9sAObT1MX9dZIFsy5OEqYUx-oynsc-
+X-Proofpoint-GUID: ZDeDW7R-GYBQ2faOa5_U3Ml_aWPg03ih
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-06_06,2022-06-03_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 mlxlogscore=711 impostorscore=0
- priorityscore=1501 clxscore=1015 spamscore=0 mlxscore=0 phishscore=0
- bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ mlxlogscore=999 spamscore=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 mlxscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2204290000 definitions=main-2206060081
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -91,95 +93,691 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For QEMU, the majority of the work in enabling instruction interpretation
-is handled via SHM bit settings (to indicate to firmware whether or not
-interpretive execution facilities are to be used) + a new KVM ioctl is
-used to setup firmware-interpreted forwarding of Adapter Event
-Notifications.
+This is a placeholder that pulls in 5.19-rc1 + unmerged kernel changes
+required by this item.  A proper header sync can be done once the
+associated kernel code merges.
 
-This series also adds a new, optional 'interpret' parameter to zpci which
-can be used to disable interpretation support (interpret=off) as well as
-an 'forwarding_assist' parameter to determine whether or not the firmware
-assist will be used for adapter event delivery (default when
-interpretation is in use) or whether the host will be responsible for
-delivering all adapter event notifications (forwarding_assist=off).
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+---
+ include/standard-headers/asm-x86/bootparam.h |  1 +
+ include/standard-headers/drm/drm_fourcc.h    | 69 ++++++++++++++++
+ include/standard-headers/linux/ethtool.h     |  1 +
+ include/standard-headers/linux/input.h       |  1 +
+ include/standard-headers/linux/pci_regs.h    |  1 +
+ include/standard-headers/linux/vhost_types.h | 11 ++-
+ include/standard-headers/linux/virtio_ids.h  | 14 ++--
+ linux-headers/asm-arm64/kvm.h                | 27 +++++++
+ linux-headers/asm-generic/unistd.h           |  4 +-
+ linux-headers/asm-riscv/kvm.h                | 20 +++++
+ linux-headers/asm-riscv/unistd.h             |  3 +-
+ linux-headers/asm-x86/kvm.h                  | 11 +--
+ linux-headers/asm-x86/mman.h                 | 14 ----
+ linux-headers/linux/kvm.h                    | 85 +++++++++++++++++++-
+ linux-headers/linux/userfaultfd.h            | 10 ++-
+ linux-headers/linux/vfio.h                   |  4 +-
+ linux-headers/linux/vfio_zdev.h              |  7 ++
+ linux-headers/linux/vhost.h                  | 26 ++++--
+ 18 files changed, 267 insertions(+), 42 deletions(-)
 
-The zpcii-disable machine property is added to allow disabling use of
-zPCI interpretation facilities for a guest. This property is set to on
-for older (pre-7.1 compat machines), but defaults to off for 7.1 and
-newer. This allows newer machines to use interpretation by default if
-the necessary kernel interfaces and hardware facilities are available,
-but also provides a mechanism for disabling interpretation completely
-for debug purposes.
-
-As a consequence of implementing zPCI interpretation, ISM devices now
-become eligible for passthrough (but only when zPCI interpretation is
-available).
-
-From the perspective of guest configuration, you passthrough zPCI devices
-in the same manner as before, with intepretation support being used by
-default if available in kernel+qemu.
-
-Associated kernel series:
-https://lore.kernel.org/kvm/20220606203325.110625-1-mjrosato@linux.ibm.com/
-
-Changelog v6->v7:
-- update linux header sync to 5.19-rc1 + latest kernel series
-- Drop 'target/s390x: add zpci-interp to cpu models' (David)
-- Add a new patch that adds the zpcii-disable machine property.
-  zpcii-disable=on can be used to force interpretation facilities off
-  for the guest.  With this series, 7.1 machine and newer will default
-  this to off, meaning interpretation will be allowed if available by
-  default.  7.0 and older machines will default to zpcii-disable=on.
-  zPCI interpretation will only be used when the underlying kernel
-  supports it, hardware facilties are available and zpcii-disable=off.
-
-Matthew Rosato (8):
-  Update linux headers
-  s390x/pci: add routine to get host function handle from CLP info
-  s390x/pci: enable for load/store intepretation
-  s390x/pci: don't fence interpreted devices without MSI-X
-  s390x/pci: enable adapter event notification for interpreted devices
-  s390x/pci: let intercept devices have separate PCI groups
-  s390x/pci: reflect proper maxstbl for groups of interpreted devices
-  s390x/s390-virtio-ccw: add zpcii-disable machine property
-
- hw/s390x/meson.build                         |   1 +
- hw/s390x/s390-pci-bus.c                      | 111 +++++++++++++++-
- hw/s390x/s390-pci-inst.c                     |  56 +++++++-
- hw/s390x/s390-pci-kvm.c                      |  54 ++++++++
- hw/s390x/s390-pci-vfio.c                     | 129 ++++++++++++++++---
- hw/s390x/s390-virtio-ccw.c                   |  24 ++++
- include/hw/s390x/s390-pci-bus.h              |   8 +-
- include/hw/s390x/s390-pci-kvm.h              |  38 ++++++
- include/hw/s390x/s390-pci-vfio.h             |   5 +
- include/hw/s390x/s390-virtio-ccw.h           |   1 +
- include/standard-headers/asm-x86/bootparam.h |   1 +
- include/standard-headers/drm/drm_fourcc.h    |  69 ++++++++++
- include/standard-headers/linux/ethtool.h     |   1 +
- include/standard-headers/linux/input.h       |   1 +
- include/standard-headers/linux/pci_regs.h    |   1 +
- include/standard-headers/linux/vhost_types.h |  11 +-
- include/standard-headers/linux/virtio_ids.h  |  14 +-
- linux-headers/asm-arm64/kvm.h                |  27 ++++
- linux-headers/asm-generic/unistd.h           |   4 +-
- linux-headers/asm-riscv/kvm.h                |  20 +++
- linux-headers/asm-riscv/unistd.h             |   3 +-
- linux-headers/asm-x86/kvm.h                  |  11 +-
- linux-headers/asm-x86/mman.h                 |  14 --
- linux-headers/linux/kvm.h                    |  85 +++++++++++-
- linux-headers/linux/userfaultfd.h            |  10 +-
- linux-headers/linux/vfio.h                   |   4 +-
- linux-headers/linux/vfio_zdev.h              |   7 +
- linux-headers/linux/vhost.h                  |  26 +++-
- qemu-options.hx                              |   8 +-
- target/s390x/kvm/kvm.c                       |   7 +
- target/s390x/kvm/kvm_s390x.h                 |   1 +
- util/qemu-config.c                           |   4 +
- 32 files changed, 683 insertions(+), 73 deletions(-)
- create mode 100644 hw/s390x/s390-pci-kvm.c
- create mode 100644 include/hw/s390x/s390-pci-kvm.h
-
+diff --git a/include/standard-headers/asm-x86/bootparam.h b/include/standard-headers/asm-x86/bootparam.h
+index 072e2ed546..09811d90cf 100644
+--- a/include/standard-headers/asm-x86/bootparam.h
++++ b/include/standard-headers/asm-x86/bootparam.h
+@@ -10,6 +10,7 @@
+ #define SETUP_EFI			4
+ #define SETUP_APPLE_PROPERTIES		5
+ #define SETUP_JAILHOUSE			6
++#define SETUP_CC_BLOB			7
+ 
+ #define SETUP_INDIRECT			(1<<31)
+ 
+diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
+index 4888f85f69..0b051545d3 100644
+--- a/include/standard-headers/drm/drm_fourcc.h
++++ b/include/standard-headers/drm/drm_fourcc.h
+@@ -571,6 +571,53 @@ extern "C" {
+  */
+ #define I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS_CC fourcc_mod_code(INTEL, 8)
+ 
++/*
++ * Intel Tile 4 layout
++ *
++ * This is a tiled layout using 4KB tiles in a row-major layout. It has the same
++ * shape as Tile Y at two granularities: 4KB (128B x 32) and 64B (16B x 4). It
++ * only differs from Tile Y at the 256B granularity in between. At this
++ * granularity, Tile Y has a shape of 16B x 32 rows, but this tiling has a shape
++ * of 64B x 8 rows.
++ */
++#define I915_FORMAT_MOD_4_TILED         fourcc_mod_code(INTEL, 9)
++
++/*
++ * Intel color control surfaces (CCS) for DG2 render compression.
++ *
++ * The main surface is Tile 4 and at plane index 0. The CCS data is stored
++ * outside of the GEM object in a reserved memory area dedicated for the
++ * storage of the CCS data for all RC/RC_CC/MC compressible GEM objects. The
++ * main surface pitch is required to be a multiple of four Tile 4 widths.
++ */
++#define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS fourcc_mod_code(INTEL, 10)
++
++/*
++ * Intel color control surfaces (CCS) for DG2 media compression.
++ *
++ * The main surface is Tile 4 and at plane index 0. For semi-planar formats
++ * like NV12, the Y and UV planes are Tile 4 and are located at plane indices
++ * 0 and 1, respectively. The CCS for all planes are stored outside of the
++ * GEM object in a reserved memory area dedicated for the storage of the
++ * CCS data for all RC/RC_CC/MC compressible GEM objects. The main surface
++ * pitch is required to be a multiple of four Tile 4 widths.
++ */
++#define I915_FORMAT_MOD_4_TILED_DG2_MC_CCS fourcc_mod_code(INTEL, 11)
++
++/*
++ * Intel Color Control Surface with Clear Color (CCS) for DG2 render compression.
++ *
++ * The main surface is Tile 4 and at plane index 0. The CCS data is stored
++ * outside of the GEM object in a reserved memory area dedicated for the
++ * storage of the CCS data for all RC/RC_CC/MC compressible GEM objects. The
++ * main surface pitch is required to be a multiple of four Tile 4 widths. The
++ * clear color is stored at plane index 1 and the pitch should be ignored. The
++ * format of the 256 bits of clear color data matches the one used for the
++ * I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS_CC modifier, see its description
++ * for details.
++ */
++#define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS_CC fourcc_mod_code(INTEL, 12)
++
+ /*
+  * Tiled, NV12MT, grouped in 64 (pixels) x 32 (lines) -sized macroblocks
+  *
+@@ -608,6 +655,28 @@ extern "C" {
+  */
+ #define DRM_FORMAT_MOD_QCOM_COMPRESSED	fourcc_mod_code(QCOM, 1)
+ 
++/*
++ * Qualcomm Tiled Format
++ *
++ * Similar to DRM_FORMAT_MOD_QCOM_COMPRESSED but not compressed.
++ * Implementation may be platform and base-format specific.
++ *
++ * Each macrotile consists of m x n (mostly 4 x 4) tiles.
++ * Pixel data pitch/stride is aligned with macrotile width.
++ * Pixel data height is aligned with macrotile height.
++ * Entire pixel data buffer is aligned with 4k(bytes).
++ */
++#define DRM_FORMAT_MOD_QCOM_TILED3	fourcc_mod_code(QCOM, 3)
++
++/*
++ * Qualcomm Alternate Tiled Format
++ *
++ * Alternate tiled format typically only used within GMEM.
++ * Implementation may be platform and base-format specific.
++ */
++#define DRM_FORMAT_MOD_QCOM_TILED2	fourcc_mod_code(QCOM, 2)
++
++
+ /* Vivante framebuffer modifiers */
+ 
+ /*
+diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
+index 38d5a4cd6e..5a99f13471 100644
+--- a/include/standard-headers/linux/ethtool.h
++++ b/include/standard-headers/linux/ethtool.h
+@@ -1691,6 +1691,7 @@ enum ethtool_link_mode_bit_indices {
+ 	ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT	 = 89,
+ 	ETHTOOL_LINK_MODE_100baseFX_Half_BIT		 = 90,
+ 	ETHTOOL_LINK_MODE_100baseFX_Full_BIT		 = 91,
++	ETHTOOL_LINK_MODE_10baseT1L_Full_BIT		 = 92,
+ 	/* must be last entry */
+ 	__ETHTOOL_LINK_MODE_MASK_NBITS
+ };
+diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
+index 7822c24178..e69c41b0ed 100644
+--- a/include/standard-headers/linux/input.h
++++ b/include/standard-headers/linux/input.h
+@@ -268,6 +268,7 @@ struct input_mask {
+ #define BUS_RMI			0x1D
+ #define BUS_CEC			0x1E
+ #define BUS_INTEL_ISHTP		0x1F
++#define BUS_AMD_SFH		0x20
+ 
+ /*
+  * MT_TOOL types
+diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+index bee1a9ed6e..108f8523fa 100644
+--- a/include/standard-headers/linux/pci_regs.h
++++ b/include/standard-headers/linux/pci_regs.h
+@@ -616,6 +616,7 @@
+ #define  PCI_EXP_SLTCTL_PWR_OFF        0x0400 /* Power Off */
+ #define  PCI_EXP_SLTCTL_EIC	0x0800	/* Electromechanical Interlock Control */
+ #define  PCI_EXP_SLTCTL_DLLSCE	0x1000	/* Data Link Layer State Changed Enable */
++#define  PCI_EXP_SLTCTL_ASPL_DISABLE	0x2000 /* Auto Slot Power Limit Disable */
+ #define  PCI_EXP_SLTCTL_IBPD_DISABLE	0x4000 /* In-band PD disable */
+ #define PCI_EXP_SLTSTA		0x1a	/* Slot Status */
+ #define  PCI_EXP_SLTSTA_ABP	0x0001	/* Attention Button Pressed */
+diff --git a/include/standard-headers/linux/vhost_types.h b/include/standard-headers/linux/vhost_types.h
+index 0bd2684a2a..ce78551b0f 100644
+--- a/include/standard-headers/linux/vhost_types.h
++++ b/include/standard-headers/linux/vhost_types.h
+@@ -87,7 +87,7 @@ struct vhost_msg {
+ 
+ struct vhost_msg_v2 {
+ 	uint32_t type;
+-	uint32_t reserved;
++	uint32_t asid;
+ 	union {
+ 		struct vhost_iotlb_msg iotlb;
+ 		uint8_t padding[64];
+@@ -153,4 +153,13 @@ struct vhost_vdpa_iova_range {
+ /* vhost-net should add virtio_net_hdr for RX, and strip for TX packets. */
+ #define VHOST_NET_F_VIRTIO_NET_HDR 27
+ 
++/* Use message type V2 */
++#define VHOST_BACKEND_F_IOTLB_MSG_V2 0x1
++/* IOTLB can accept batching hints */
++#define VHOST_BACKEND_F_IOTLB_BATCH  0x2
++/* IOTLB can accept address space identifier through V2 type of IOTLB
++ * message
++ */
++#define VHOST_BACKEND_F_IOTLB_ASID  0x3
++
+ #endif
+diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
+index 80d76b75bc..7aa2eb7662 100644
+--- a/include/standard-headers/linux/virtio_ids.h
++++ b/include/standard-headers/linux/virtio_ids.h
+@@ -73,12 +73,12 @@
+  * Virtio Transitional IDs
+  */
+ 
+-#define VIRTIO_TRANS_ID_NET		1000 /* transitional virtio net */
+-#define VIRTIO_TRANS_ID_BLOCK		1001 /* transitional virtio block */
+-#define VIRTIO_TRANS_ID_BALLOON		1002 /* transitional virtio balloon */
+-#define VIRTIO_TRANS_ID_CONSOLE		1003 /* transitional virtio console */
+-#define VIRTIO_TRANS_ID_SCSI		1004 /* transitional virtio SCSI */
+-#define VIRTIO_TRANS_ID_RNG		1005 /* transitional virtio rng */
+-#define VIRTIO_TRANS_ID_9P		1009 /* transitional virtio 9p console */
++#define VIRTIO_TRANS_ID_NET		0x1000 /* transitional virtio net */
++#define VIRTIO_TRANS_ID_BLOCK		0x1001 /* transitional virtio block */
++#define VIRTIO_TRANS_ID_BALLOON		0x1002 /* transitional virtio balloon */
++#define VIRTIO_TRANS_ID_CONSOLE		0x1003 /* transitional virtio console */
++#define VIRTIO_TRANS_ID_SCSI		0x1004 /* transitional virtio SCSI */
++#define VIRTIO_TRANS_ID_RNG		0x1005 /* transitional virtio rng */
++#define VIRTIO_TRANS_ID_9P		0x1009 /* transitional virtio 9p console */
+ 
+ #endif /* _LINUX_VIRTIO_IDS_H */
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index 5c28a9737a..286668285f 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -139,8 +139,10 @@ struct kvm_guest_debug_arch {
+ 	__u64 dbg_wvr[KVM_ARM_MAX_DBG_REGS];
+ };
+ 
++#define KVM_DEBUG_ARCH_HSR_HIGH_VALID	(1 << 0)
+ struct kvm_debug_exit_arch {
+ 	__u32 hsr;
++	__u32 hsr_high;	/* ESR_EL2[61:32] */
+ 	__u64 far;	/* used for watchpoints */
+ };
+ 
+@@ -332,6 +334,31 @@ struct kvm_arm_copy_mte_tags {
+ #define KVM_ARM64_SVE_VLS_WORDS	\
+ 	((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
+ 
++/* Bitmap feature firmware registers */
++#define KVM_REG_ARM_FW_FEAT_BMAP		(0x0016 << KVM_REG_ARM_COPROC_SHIFT)
++#define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)		(KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
++						KVM_REG_ARM_FW_FEAT_BMAP |	\
++						((r) & 0xffff))
++
++#define KVM_REG_ARM_STD_BMAP			KVM_REG_ARM_FW_FEAT_BMAP_REG(0)
++
++enum {
++	KVM_REG_ARM_STD_BIT_TRNG_V1_0	= 0,
++};
++
++#define KVM_REG_ARM_STD_HYP_BMAP		KVM_REG_ARM_FW_FEAT_BMAP_REG(1)
++
++enum {
++	KVM_REG_ARM_STD_HYP_BIT_PV_TIME	= 0,
++};
++
++#define KVM_REG_ARM_VENDOR_HYP_BMAP		KVM_REG_ARM_FW_FEAT_BMAP_REG(2)
++
++enum {
++	KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT	= 0,
++	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
++};
++
+ /* Device Control API: ARM VGIC */
+ #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+ #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+diff --git a/linux-headers/asm-generic/unistd.h b/linux-headers/asm-generic/unistd.h
+index 1c48b0ae3b..45fa180cc5 100644
+--- a/linux-headers/asm-generic/unistd.h
++++ b/linux-headers/asm-generic/unistd.h
+@@ -383,7 +383,7 @@ __SYSCALL(__NR_syslog, sys_syslog)
+ 
+ /* kernel/ptrace.c */
+ #define __NR_ptrace 117
+-__SYSCALL(__NR_ptrace, sys_ptrace)
++__SC_COMP(__NR_ptrace, sys_ptrace, compat_sys_ptrace)
+ 
+ /* kernel/sched/core.c */
+ #define __NR_sched_setparam 118
+@@ -779,7 +779,7 @@ __SYSCALL(__NR_rseq, sys_rseq)
+ #define __NR_kexec_file_load 294
+ __SYSCALL(__NR_kexec_file_load,     sys_kexec_file_load)
+ /* 295 through 402 are unassigned to sync up with generic numbers, don't use */
+-#if __BITS_PER_LONG == 32
++#if defined(__SYSCALL_COMPAT) || __BITS_PER_LONG == 32
+ #define __NR_clock_gettime64 403
+ __SYSCALL(__NR_clock_gettime64, sys_clock_gettime)
+ #define __NR_clock_settime64 404
+diff --git a/linux-headers/asm-riscv/kvm.h b/linux-headers/asm-riscv/kvm.h
+index f808ad1ce5..6119368ba6 100644
+--- a/linux-headers/asm-riscv/kvm.h
++++ b/linux-headers/asm-riscv/kvm.h
+@@ -82,6 +82,23 @@ struct kvm_riscv_timer {
+ 	__u64 state;
+ };
+ 
++/*
++ * ISA extension IDs specific to KVM. This is not the same as the host ISA
++ * extension IDs as that is internal to the host and should not be exposed
++ * to the guest. This should always be contiguous to keep the mapping simple
++ * in KVM implementation.
++ */
++enum KVM_RISCV_ISA_EXT_ID {
++	KVM_RISCV_ISA_EXT_A = 0,
++	KVM_RISCV_ISA_EXT_C,
++	KVM_RISCV_ISA_EXT_D,
++	KVM_RISCV_ISA_EXT_F,
++	KVM_RISCV_ISA_EXT_H,
++	KVM_RISCV_ISA_EXT_I,
++	KVM_RISCV_ISA_EXT_M,
++	KVM_RISCV_ISA_EXT_MAX,
++};
++
+ /* Possible states for kvm_riscv_timer */
+ #define KVM_RISCV_TIMER_STATE_OFF	0
+ #define KVM_RISCV_TIMER_STATE_ON	1
+@@ -123,6 +140,9 @@ struct kvm_riscv_timer {
+ #define KVM_REG_RISCV_FP_D_REG(name)	\
+ 		(offsetof(struct __riscv_d_ext_state, name) / sizeof(__u64))
+ 
++/* ISA Extension registers are mapped as type 7 */
++#define KVM_REG_RISCV_ISA_EXT		(0x07 << KVM_REG_RISCV_TYPE_SHIFT)
++
+ #endif
+ 
+ #endif /* __LINUX_KVM_RISCV_H */
+diff --git a/linux-headers/asm-riscv/unistd.h b/linux-headers/asm-riscv/unistd.h
+index 8062996c2d..73d7cdd2ec 100644
+--- a/linux-headers/asm-riscv/unistd.h
++++ b/linux-headers/asm-riscv/unistd.h
+@@ -15,12 +15,13 @@
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+-#ifdef __LP64__
++#if defined(__LP64__) && !defined(__SYSCALL_COMPAT)
+ #define __ARCH_WANT_NEW_STAT
+ #define __ARCH_WANT_SET_GET_RLIMIT
+ #endif /* __LP64__ */
+ 
+ #define __ARCH_WANT_SYS_CLONE3
++#define __ARCH_WANT_MEMFD_SECRET
+ 
+ #include <asm-generic/unistd.h>
+ 
+diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+index bf6e96011d..21614807a2 100644
+--- a/linux-headers/asm-x86/kvm.h
++++ b/linux-headers/asm-x86/kvm.h
+@@ -428,11 +428,12 @@ struct kvm_sync_regs {
+ 	struct kvm_vcpu_events events;
+ };
+ 
+-#define KVM_X86_QUIRK_LINT0_REENABLED	   (1 << 0)
+-#define KVM_X86_QUIRK_CD_NW_CLEARED	   (1 << 1)
+-#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	   (1 << 2)
+-#define KVM_X86_QUIRK_OUT_7E_INC_RIP	   (1 << 3)
+-#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
++#define KVM_X86_QUIRK_LINT0_REENABLED		(1 << 0)
++#define KVM_X86_QUIRK_CD_NW_CLEARED		(1 << 1)
++#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE		(1 << 2)
++#define KVM_X86_QUIRK_OUT_7E_INC_RIP		(1 << 3)
++#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT	(1 << 4)
++#define KVM_X86_QUIRK_FIX_HYPERCALL_INSN	(1 << 5)
+ 
+ #define KVM_STATE_NESTED_FORMAT_VMX	0
+ #define KVM_STATE_NESTED_FORMAT_SVM	1
+diff --git a/linux-headers/asm-x86/mman.h b/linux-headers/asm-x86/mman.h
+index d4a8d0424b..775dbd3aff 100644
+--- a/linux-headers/asm-x86/mman.h
++++ b/linux-headers/asm-x86/mman.h
+@@ -5,20 +5,6 @@
+ #define MAP_32BIT	0x40		/* only give out 32bit addresses */
+ 
+ #ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS
+-/*
+- * Take the 4 protection key bits out of the vma->vm_flags
+- * value and turn them in to the bits that we can put in
+- * to a pte.
+- *
+- * Only override these if Protection Keys are available
+- * (which is only on 64-bit).
+- */
+-#define arch_vm_get_page_prot(vm_flags)	__pgprot(	\
+-		((vm_flags) & VM_PKEY_BIT0 ? _PAGE_PKEY_BIT0 : 0) |	\
+-		((vm_flags) & VM_PKEY_BIT1 ? _PAGE_PKEY_BIT1 : 0) |	\
+-		((vm_flags) & VM_PKEY_BIT2 ? _PAGE_PKEY_BIT2 : 0) |	\
+-		((vm_flags) & VM_PKEY_BIT3 ? _PAGE_PKEY_BIT3 : 0))
+-
+ #define arch_calc_vm_prot_bits(prot, key) (		\
+ 		((key) & 0x1 ? VM_PKEY_BIT0 : 0) |      \
+ 		((key) & 0x2 ? VM_PKEY_BIT1 : 0) |      \
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 0d05d02ee4..a558ab30cc 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -444,6 +444,9 @@ struct kvm_run {
+ #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+ #define KVM_SYSTEM_EVENT_RESET          2
+ #define KVM_SYSTEM_EVENT_CRASH          3
++#define KVM_SYSTEM_EVENT_WAKEUP         4
++#define KVM_SYSTEM_EVENT_SUSPEND        5
++#define KVM_SYSTEM_EVENT_SEV_TERM       6
+ 			__u32 type;
+ 			__u32 ndata;
+ 			union {
+@@ -644,6 +647,7 @@ struct kvm_vapic_addr {
+ #define KVM_MP_STATE_OPERATING         7
+ #define KVM_MP_STATE_LOAD              8
+ #define KVM_MP_STATE_AP_RESET_HOLD     9
++#define KVM_MP_STATE_SUSPENDED         10
+ 
+ struct kvm_mp_state {
+ 	__u32 mp_state;
+@@ -1148,8 +1152,10 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_MEM_OP_EXTENSION 211
+ #define KVM_CAP_PMU_CAPABILITY 212
+ #define KVM_CAP_DISABLE_QUIRKS2 213
+-/* #define KVM_CAP_VM_TSC_CONTROL 214 */
++#define KVM_CAP_VM_TSC_CONTROL 214
+ #define KVM_CAP_SYSTEM_EVENT_DATA 215
++#define KVM_CAP_ARM_SYSTEM_SUSPEND 216
++#define KVM_CAP_S390_ZPCI_OP 217
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1238,6 +1244,7 @@ struct kvm_x86_mce {
+ #define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
+ #define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 3)
+ #define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
++#define KVM_XEN_HVM_CONFIG_EVTCHN_SEND		(1 << 5)
+ 
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
+@@ -1476,7 +1483,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_SET_PIT2              _IOW(KVMIO,  0xa0, struct kvm_pit_state2)
+ /* Available with KVM_CAP_PPC_GET_PVINFO */
+ #define KVM_PPC_GET_PVINFO	  _IOW(KVMIO,  0xa1, struct kvm_ppc_pvinfo)
+-/* Available with KVM_CAP_TSC_CONTROL */
++/* Available with KVM_CAP_TSC_CONTROL for a vCPU, or with
++*  KVM_CAP_VM_TSC_CONTROL to set defaults for a VM */
+ #define KVM_SET_TSC_KHZ           _IO(KVMIO,  0xa2)
+ #define KVM_GET_TSC_KHZ           _IO(KVMIO,  0xa3)
+ /* Available with KVM_CAP_PCI_2_3 */
+@@ -1692,6 +1700,32 @@ struct kvm_xen_hvm_attr {
+ 		struct {
+ 			__u64 gfn;
+ 		} shared_info;
++		struct {
++			__u32 send_port;
++			__u32 type; /* EVTCHNSTAT_ipi / EVTCHNSTAT_interdomain */
++			__u32 flags;
++#define KVM_XEN_EVTCHN_DEASSIGN		(1 << 0)
++#define KVM_XEN_EVTCHN_UPDATE		(1 << 1)
++#define KVM_XEN_EVTCHN_RESET		(1 << 2)
++			/*
++			 * Events sent by the guest are either looped back to
++			 * the guest itself (potentially on a different port#)
++			 * or signalled via an eventfd.
++			 */
++			union {
++				struct {
++					__u32 port;
++					__u32 vcpu;
++					__u32 priority;
++				} port;
++				struct {
++					__u32 port; /* Zero for eventfd */
++					__s32 fd;
++				} eventfd;
++				__u32 padding[4];
++			} deliver;
++		} evtchn;
++		__u32 xen_version;
+ 		__u64 pad[8];
+ 	} u;
+ };
+@@ -1700,11 +1734,17 @@ struct kvm_xen_hvm_attr {
+ #define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
+ #define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
+ #define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR		0x2
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_EVTCHN_SEND */
++#define KVM_XEN_ATTR_TYPE_EVTCHN		0x3
++#define KVM_XEN_ATTR_TYPE_XEN_VERSION		0x4
+ 
+ /* Per-vCPU Xen attributes */
+ #define KVM_XEN_VCPU_GET_ATTR	_IOWR(KVMIO, 0xca, struct kvm_xen_vcpu_attr)
+ #define KVM_XEN_VCPU_SET_ATTR	_IOW(KVMIO,  0xcb, struct kvm_xen_vcpu_attr)
+ 
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_EVTCHN_SEND */
++#define KVM_XEN_HVM_EVTCHN_SEND	_IOW(KVMIO,  0xd0, struct kvm_irq_routing_xen_evtchn)
++
+ #define KVM_GET_SREGS2             _IOR(KVMIO,  0xcc, struct kvm_sregs2)
+ #define KVM_SET_SREGS2             _IOW(KVMIO,  0xcd, struct kvm_sregs2)
+ 
+@@ -1722,6 +1762,13 @@ struct kvm_xen_vcpu_attr {
+ 			__u64 time_blocked;
+ 			__u64 time_offline;
+ 		} runstate;
++		__u32 vcpu_id;
++		struct {
++			__u32 port;
++			__u32 priority;
++			__u64 expires_ns;
++		} timer;
++		__u8 vector;
+ 	} u;
+ };
+ 
+@@ -1732,6 +1779,10 @@ struct kvm_xen_vcpu_attr {
+ #define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_CURRENT	0x3
+ #define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_DATA	0x4
+ #define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST	0x5
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_EVTCHN_SEND */
++#define KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID		0x6
++#define KVM_XEN_VCPU_ATTR_TYPE_TIMER		0x7
++#define KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR	0x8
+ 
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+@@ -2066,4 +2117,34 @@ struct kvm_stats_desc {
+ /* Available with KVM_CAP_XSAVE2 */
+ #define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+ 
++/* Available with KVM_CAP_S390_ZPCI_OP */
++#define KVM_S390_ZPCI_OP         _IOW(KVMIO,  0xd1, struct kvm_s390_zpci_op)
++
++struct kvm_s390_zpci_op {
++	/* in */
++	__u32 fh;               /* target device */
++	__u8  op;               /* operation to perform */
++	__u8  pad[3];
++	union {
++		/* for KVM_S390_ZPCIOP_REG_AEN */
++		struct {
++			__u64 ibv;      /* Guest addr of interrupt bit vector */
++			__u64 sb;       /* Guest addr of summary bit */
++			__u32 flags;
++			__u32 noi;      /* Number of interrupts */
++			__u8 isc;       /* Guest interrupt subclass */
++			__u8 sbo;       /* Offset of guest summary bit vector */
++			__u16 pad;
++		} reg_aen;
++		__u64 reserved[8];
++	} u;
++};
++
++/* types for kvm_s390_zpci_op->op */
++#define KVM_S390_ZPCIOP_REG_AEN                0
++#define KVM_S390_ZPCIOP_DEREG_AEN      1
++
++/* flags for kvm_s390_zpci_op->u.reg_aen.flags */
++#define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
++
+ #endif /* __LINUX_KVM_H */
+diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
+index 769b8379e4..a3a377cd44 100644
+--- a/linux-headers/linux/userfaultfd.h
++++ b/linux-headers/linux/userfaultfd.h
+@@ -33,7 +33,8 @@
+ 			   UFFD_FEATURE_THREAD_ID |		\
+ 			   UFFD_FEATURE_MINOR_HUGETLBFS |	\
+ 			   UFFD_FEATURE_MINOR_SHMEM |		\
+-			   UFFD_FEATURE_EXACT_ADDRESS)
++			   UFFD_FEATURE_EXACT_ADDRESS |		\
++			   UFFD_FEATURE_WP_HUGETLBFS_SHMEM)
+ #define UFFD_API_IOCTLS				\
+ 	((__u64)1 << _UFFDIO_REGISTER |		\
+ 	 (__u64)1 << _UFFDIO_UNREGISTER |	\
+@@ -47,7 +48,8 @@
+ #define UFFD_API_RANGE_IOCTLS_BASIC		\
+ 	((__u64)1 << _UFFDIO_WAKE |		\
+ 	 (__u64)1 << _UFFDIO_COPY |		\
+-	 (__u64)1 << _UFFDIO_CONTINUE)
++	 (__u64)1 << _UFFDIO_CONTINUE |		\
++	 (__u64)1 << _UFFDIO_WRITEPROTECT)
+ 
+ /*
+  * Valid ioctl command number range with this API is from 0x00 to
+@@ -194,6 +196,9 @@ struct uffdio_api {
+ 	 * UFFD_FEATURE_EXACT_ADDRESS indicates that the exact address of page
+ 	 * faults would be provided and the offset within the page would not be
+ 	 * masked.
++	 *
++	 * UFFD_FEATURE_WP_HUGETLBFS_SHMEM indicates that userfaultfd
++	 * write-protection mode is supported on both shmem and hugetlbfs.
+ 	 */
+ #define UFFD_FEATURE_PAGEFAULT_FLAG_WP		(1<<0)
+ #define UFFD_FEATURE_EVENT_FORK			(1<<1)
+@@ -207,6 +212,7 @@ struct uffdio_api {
+ #define UFFD_FEATURE_MINOR_HUGETLBFS		(1<<9)
+ #define UFFD_FEATURE_MINOR_SHMEM		(1<<10)
+ #define UFFD_FEATURE_EXACT_ADDRESS		(1<<11)
++#define UFFD_FEATURE_WP_HUGETLBFS_SHMEM		(1<<12)
+ 	__u64 features;
+ 
+ 	__u64 ioctls;
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index e9f7795c39..ede44b5572 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -643,7 +643,7 @@ enum {
+ };
+ 
+ /**
+- * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
++ * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 12,
+  *					      struct vfio_pci_hot_reset_info)
+  *
+  * Return: 0 on success, -errno on failure:
+@@ -770,7 +770,7 @@ struct vfio_device_ioeventfd {
+ #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
+ /**
+- * VFIO_DEVICE_FEATURE - _IORW(VFIO_TYPE, VFIO_BASE + 17,
++ * VFIO_DEVICE_FEATURE - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
+  *			       struct vfio_device_feature)
+  *
+  * Get, set, or probe feature data of the device.  The feature is selected
+diff --git a/linux-headers/linux/vfio_zdev.h b/linux-headers/linux/vfio_zdev.h
+index b4309397b6..77f2aff1f2 100644
+--- a/linux-headers/linux/vfio_zdev.h
++++ b/linux-headers/linux/vfio_zdev.h
+@@ -29,6 +29,9 @@ struct vfio_device_info_cap_zpci_base {
+ 	__u16 fmb_length;	/* Measurement Block Length (in bytes) */
+ 	__u8 pft;		/* PCI Function Type */
+ 	__u8 gid;		/* PCI function group ID */
++	/* End of version 1 */
++	__u32 fh;		/* PCI function handle */
++	/* End of version 2 */
+ };
+ 
+ /**
+@@ -47,6 +50,10 @@ struct vfio_device_info_cap_zpci_group {
+ 	__u16 noi;		/* Maximum number of MSIs */
+ 	__u16 maxstbl;		/* Maximum Store Block Length */
+ 	__u8 version;		/* Supported PCI Version */
++	/* End of version 1 */
++	__u8 reserved;
++	__u16 imaxstbl;		/* Maximum Interpreted Store Block Length */
++	/* End of version 2 */
+ };
+ 
+ /**
+diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
+index 5d99e7c242..cab645d4a6 100644
+--- a/linux-headers/linux/vhost.h
++++ b/linux-headers/linux/vhost.h
+@@ -89,11 +89,6 @@
+ 
+ /* Set or get vhost backend capability */
+ 
+-/* Use message type V2 */
+-#define VHOST_BACKEND_F_IOTLB_MSG_V2 0x1
+-/* IOTLB can accept batching hints */
+-#define VHOST_BACKEND_F_IOTLB_BATCH  0x2
+-
+ #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
+ #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
+ 
+@@ -150,11 +145,30 @@
+ /* Get the valid iova range */
+ #define VHOST_VDPA_GET_IOVA_RANGE	_IOR(VHOST_VIRTIO, 0x78, \
+ 					     struct vhost_vdpa_iova_range)
+-
+ /* Get the config size */
+ #define VHOST_VDPA_GET_CONFIG_SIZE	_IOR(VHOST_VIRTIO, 0x79, __u32)
+ 
+ /* Get the count of all virtqueues */
+ #define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
+ 
++/* Get the number of virtqueue groups. */
++#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
++
++/* Get the number of address spaces. */
++#define VHOST_VDPA_GET_AS_NUM		_IOR(VHOST_VIRTIO, 0x7A, unsigned int)
++
++/* Get the group for a virtqueue: read index, write group in num,
++ * The virtqueue index is stored in the index field of
++ * vhost_vring_state. The group for this specific virtqueue is
++ * returned via num field of vhost_vring_state.
++ */
++#define VHOST_VDPA_GET_VRING_GROUP	_IOWR(VHOST_VIRTIO, 0x7B,	\
++					      struct vhost_vring_state)
++/* Set the ASID for a virtqueue group. The group index is stored in
++ * the index field of vhost_vring_state, the ASID associated with this
++ * group is stored at num field of vhost_vring_state.
++ */
++#define VHOST_VDPA_SET_GROUP_ASID	_IOW(VHOST_VIRTIO, 0x7C, \
++					     struct vhost_vring_state)
++
+ #endif
 -- 
 2.27.0
 
