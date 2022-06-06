@@ -2,67 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2310053E87A
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2C3353EBF8
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:09:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232958AbiFFJsm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 05:48:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37986 "EHLO
+        id S233934AbiFFKbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 06:31:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232850AbiFFJsk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 05:48:40 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D926FB438
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 02:48:38 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-fb6b4da1dfso534116fac.4
-        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 02:48:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=DCTOHlnn9bgmau2O5B11dgpXKkwCcv7DNwv92J7STCs=;
-        b=Zci2T29tpQddMU1sXXYczf+wTYogXwBhsuQpZZXjZmKYuBApqrBZV4dVT3oxiiHFHd
-         gCpZYfVyvoMA97096YUXQ3IsBnOfVsNsY+9WRSTWl0cIRnj5URx+e2sHwqCzP2GwzanG
-         fxbTRFQP3d/OvYKPWB2tfyYOKakspAc0tzZ/iHdaLq5///zSVUBLkhBHXUku0pk6a76V
-         AjAqtOkTgb5wWXPhb4d4Yznoh9CIGXErPacZj84Q9/HjqqLg6SweVa6lFoFcSCtIl1sB
-         sk3jq1rOWOxkhwjGEp+4neo8/EtKi5hUhfFFOpQC7Y3IHIz6De5MWjunXxC87j049PV4
-         HPiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=DCTOHlnn9bgmau2O5B11dgpXKkwCcv7DNwv92J7STCs=;
-        b=jZGCySGMoNsFNmXyLw7RIZ4uAe5lUlxTaTbhLXd4kWjAyinph6j0mf4t1PVNLS8y7e
-         Aunht6IzZgknEAmwJK2G7dgyScCWgmc2yvOe5lSw/qM41etPXqGNOgHpmeEYfjrSBMbb
-         9d07LWEvQ7Uh7X6VrZH6tqmIbF0oRzvpY7WvHl9ZHR3LOILYBjAembccHQRX73FDFIsJ
-         6iRBV78FUJO/QJFpblD6UNyEX934qo5m/ewPVyU0p8ZH1jXc6sX74Wq/6BJfeMLfmF7V
-         w+5m7iYdFa7QFN7BU7x0hvttU5XX8F7bkD2hJ03mvsSCZ/FUHKH5b1V3G1vv2ALJEbaS
-         X8nw==
-X-Gm-Message-State: AOAM530v6w/0jSS3iXGjYCiVwgAqSRkTEjYC4R5HqMWBBpr8mIzev9zQ
-        sBKrkQM8Q6UNUem4+pMXOZ/92WrCzGu6S7PWPm8=
-X-Google-Smtp-Source: ABdhPJy7SQLoQNE2sfY0vXYWdnc1ZYzh1a/RXzoL48RtiujZSe5GdIeGSZrmfUo6/6rX3wW7uBUf77cd7sM5UVnVJtE=
-X-Received: by 2002:a05:6870:c092:b0:f1:efd3:ef9e with SMTP id
- c18-20020a056870c09200b000f1efd3ef9emr28940342oad.92.1654508917867; Mon, 06
- Jun 2022 02:48:37 -0700 (PDT)
+        with ESMTP id S233871AbiFFKbN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 06:31:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F315E980A8
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 03:31:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E8D160E88
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 10:31:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FABFC385A9;
+        Mon,  6 Jun 2022 10:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654511471;
+        bh=RzOj554rH8+MebtKLp8kUafMWsaG9Hef1Y0se144nuw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=M2jerxXte/nWPfN9/KLPlfIsFVhxt5fA7IR9FDTE2ociPH8vepgnv3VAfdROdbYj7
+         QTxN2T3uUXtilsAJg3CscfyiCPQZ5OWbHuX28b5u0nlRFtcHAe01YbErEk/v01jNSf
+         sdkO7ca5lxhgBI648V0bNh/s+ikQn0fgraephBuSfkVGgFI7d3qocR7o8HhhwSczOI
+         sWKDCsO+9TUmVDDuVeajhUgQZt4XRgs7RkoDg1zusidQKjlNINIfU1H4nUlRZmB7hk
+         0D+/rMolPsbj/o3wRUnSBlaZBbUnlUB3RPoJmOtEf1HhIeBqRxaQhhAES+SKdNkMmq
+         SwMf1zd+AgAmw==
+Date:   Mon, 6 Jun 2022 11:31:05 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Quentin Perret <qperret@google.com>, kernel-team@android.com
+Subject: Re: [PATCH 04/18] KVM: arm64: Move FP state ownership from flag to a
+ tristate
+Message-ID: <Yp3XaeZFnlNOIE7t@sirena.org.uk>
+References: <20220528113829.1043361-1-maz@kernel.org>
+ <20220528113829.1043361-5-maz@kernel.org>
+ <YpnQ43WaGH96MxyY@sirena.org.uk>
+ <874k0y5gkv.wl-maz@kernel.org>
 MIME-Version: 1.0
-Sender: avriharry612@gmail.com
-Received: by 2002:a05:6830:249a:0:0:0:0 with HTTP; Mon, 6 Jun 2022 02:48:37
- -0700 (PDT)
-From:   Kayla Manthey <sgtkaylamanthey612@gmail.com>
-Date:   Mon, 6 Jun 2022 09:48:37 +0000
-X-Google-Sender-Auth: gJPRzt7rckG-BHlehY6FLrzxQqU
-Message-ID: <CALnSw1M2r6W+tD7Am84CaZu6GGcYYbwjFe5Lb7ams9tsFwRNBQ@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="rQudSunjvuay9MSf"
+Content-Disposition: inline
+In-Reply-To: <874k0y5gkv.wl-maz@kernel.org>
+X-Cookie: Bedfellows make strange politicians.
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, how have you been? I'm yet to receive a reply from you in regards
-to my two previous emails, please check and get back to me.
+
+--rQudSunjvuay9MSf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Mon, Jun 06, 2022 at 09:41:52AM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Sat, May 28, 2022 at 12:38:14PM +0100, Marc Zyngier wrote:
+
+> > > - FP_STATE_CLEAN
+> > > - FP_STATE_HOST_DIRTY
+> > > - FP_STATE_GUEST_DIRTY
+
+> > I had to think a bit more than I liked about the _DIRTY in the
+> > names of the host and guest flags, but that's really just
+> > bikeshedding and not a meaningful issue.
+
+> Another option was:
+
+> - FP_STATE_FREE
+> - FP_STATE_HOST_OWNED
+> - FP_STATE_GUEST_OWNED
+
+> I don't mind wither way.
+
+I think I do prefer that option, but like I say it's bikeshedding.
+
+--rQudSunjvuay9MSf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKd12kACgkQJNaLcl1U
+h9AVGgf/dlk9EDtEzQer5KaGtvG5vJiwknDihIt6gs7N2qOR6G8a4oZMsGZRbjke
+2fRtcpAeFmhvRB70c7YTQ5YWy7tQLlCDvuC2wKYren2Z3bj3tnX6SQXiwPD37yAI
+fS9sZrICl7Cy4H65S2fX/Lc0g1aec5uIMmFLhtTXoswUeMpNUqHBPp162VS10bGT
+dhBD7IuuZqnYHzxLaMX87xG1NRR8IMmaDO+3Lgy2cHUoZ+z/2S+1lKLFA9BolVEA
+cWzvrkbLq4kwH4/FRnc6sR/67DAD3yrrjELW5OL7vokRgdlYQ5XZ5gK92R15KTPD
+Tx84jFJFDqsZYgJWsiDRldwbWFGwOQ==
+=yN1j
+-----END PGP SIGNATURE-----
+
+--rQudSunjvuay9MSf--
