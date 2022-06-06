@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D585253ED3E
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:53:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0DA453ED8E
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 20:08:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiFFRxh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 13:53:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56040 "EHLO
+        id S231139AbiFFSIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 14:08:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230222AbiFFRxg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 13:53:36 -0400
+        with ESMTP id S230218AbiFFSIl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 14:08:41 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 59B8E1455A1
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 10:53:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 37D721FCC7
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 11:08:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654538014;
+        s=mimecast20190719; t=1654538919;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iA2aAWueYemnyJQ4dmqeSAUKTpTcIZlRBOZbhOhKWRA=;
-        b=guYsIe++XFuq7A24hHyytvk12J5hpGeMbxG7wtD8UZR4yA41/XL3UqAeigOvMGtdaoIlek
-        w3yht5Cfv/qoZdwfMkpSAF/WLYtI1mKgGvMQ2EZ93rilihuXsZtLYPf+IfoxLfUlNROJmW
-        6Or+592ps+rLjDixtVBLlFUiUVdlaIo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=U+KgFftnN6DMnXXkePugl57yvd3ZUVGOjzbkB2GcSPM=;
+        b=ddAqL2JONNqzd0weJ3hw/r5YpsBuW7IFaSGsd6NsEcK32IWRMNtiLDogzT8fZ/SdthCAHG
+        JZElrGtj+RJUzaDk9UNWfCBFqIWGtQRJnfU8ZgtPYvbMgRzarCIfFGB0Uvm2HAM0ddiPcm
+        Z6tpbfd0MpCjvjMpBJdlZ1dpZpT2hoc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-86-wQ4XU06yNX2snpDddsb96g-1; Mon, 06 Jun 2022 13:53:30 -0400
-X-MC-Unique: wQ4XU06yNX2snpDddsb96g-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-252-_oL6_bKdNkef3f4x6Cg3LA-1; Mon, 06 Jun 2022 14:08:35 -0400
+X-MC-Unique: _oL6_bKdNkef3f4x6Cg3LA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C32573979680;
-        Mon,  6 Jun 2022 17:53:29 +0000 (UTC)
-Received: from [172.30.41.16] (unknown [10.22.35.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 139F840336E;
-        Mon,  6 Jun 2022 17:53:29 +0000 (UTC)
-Subject: [PATCH 2/2] vfio/pci: Remove console drivers
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch
-Cc:     Laszlo Ersek <lersek@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Date:   Mon, 06 Jun 2022 11:53:28 -0600
-Message-ID: <165453800875.3592816.12944011921352366695.stgit@omen>
-In-Reply-To: <165453797543.3592816.6381793341352595461.stgit@omen>
-References: <165453797543.3592816.6381793341352595461.stgit@omen>
-User-Agent: StGit/1.5.dev2+g9ce680a52bd9
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 888B8858EFF;
+        Mon,  6 Jun 2022 18:08:34 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BBC331121314;
+        Mon,  6 Jun 2022 18:08:30 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 0/7] KVM: x86: AVIC/APICv patch queue
+Date:   Mon,  6 Jun 2022 21:08:22 +0300
+Message-Id: <20220606180829.102503-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,61 +67,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Console drivers can create conflicts with PCI resources resulting in
-userspace getting mmap failures to memory BARs.  This is especially evident
-when trying to re-use the system primary console for userspace drivers.
-Attempt to remove all nature of conflicting drivers as part of our VGA
-initialization.
-
-Reported-by: Laszlo Ersek <lersek@redhat.com>
-Tested-by: Laszlo Ersek <lersek@redhat.com>
-Suggested-by: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci_core.c |   17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index a0d69ddaf90d..e0cbcbc2aee1 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -13,6 +13,7 @@
- #include <linux/device.h>
- #include <linux/eventfd.h>
- #include <linux/file.h>
-+#include <linux/fb.h>
- #include <linux/interrupt.h>
- #include <linux/iommu.h>
- #include <linux/module.h>
-@@ -29,6 +30,8 @@
- 
- #include <linux/vfio_pci_core.h>
- 
-+#include <drm/drm_aperture.h>
-+
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
- #define DRIVER_DESC "core driver for VFIO based PCI devices"
- 
-@@ -1793,6 +1796,20 @@ static int vfio_pci_vga_init(struct vfio_pci_core_device *vdev)
- 	if (!vfio_pci_is_vga(pdev))
- 		return 0;
- 
-+#if IS_REACHABLE(CONFIG_DRM)
-+	drm_aperture_detach_platform_drivers(pdev);
-+#endif
-+
-+#if IS_REACHABLE(CONFIG_FB)
-+	ret = remove_conflicting_pci_framebuffers(pdev, vdev->vdev.ops->name);
-+	if (ret)
-+		return ret;
-+#endif
-+
-+	ret = vga_remove_vgacon(pdev);
-+	if (ret)
-+		return ret;
-+
- 	ret = vga_client_register(pdev, vfio_pci_set_decode);
- 	if (ret)
- 		return ret;
-
+This patch series contains a few fixes that I worked on=0D
+recently.=0D
+=0D
+Also included another attempt to add inhibit=0D
+when the guest had changed apic id and/or apic base.=0D
+=0D
+I also tested AVIC with full preemption and=0D
+found few bugs, which are now hopefully fixed.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (7):=0D
+  KVM: x86: document AVIC/APICv inhibit reasons=0D
+  KVM: x86: inhibit APICv/AVIC when the guest and/or host changes either=0D
+    apic id or the apic base from their default values.=0D
+  KVM: x86: SVM: remove avic's broken code that updated APIC ID=0D
+  KVM: x86: SVM: fix avic_kick_target_vcpus_fast=0D
+  KVM: x86: disable preemption while updating apicv inhibition=0D
+  KVM: x86: disable preemption around the call to=0D
+    kvm_arch_vcpu_{un|}blocking=0D
+  KVM: x86: SVM: there is no need for preempt safe wrappers for=0D
+    avic_vcpu_load/put=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |  68 ++++++++++++-=0D
+ arch/x86/kvm/lapic.c            |  27 ++++-=0D
+ arch/x86/kvm/svm/avic.c         | 171 ++++++++++++++------------------=0D
+ arch/x86/kvm/svm/svm.c          |   4 +-=0D
+ arch/x86/kvm/svm/svm.h          |   4 +-=0D
+ arch/x86/kvm/vmx/vmx.c          |   4 +-=0D
+ arch/x86/kvm/x86.c              |   2 +=0D
+ virt/kvm/kvm_main.c             |   8 +-=0D
+ 8 files changed, 180 insertions(+), 108 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
