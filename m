@@ -2,145 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B92253ED36
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:51:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B13FC53ED41
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:53:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbiFFRvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 13:51:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44980 "EHLO
+        id S230254AbiFFRxo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 13:53:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230148AbiFFRvJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 13:51:09 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDABA0D13;
-        Mon,  6 Jun 2022 10:51:05 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 256GAfCm008425;
-        Mon, 6 Jun 2022 17:51:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=ZoxujMhshSDi4Aq2l7teX+bW6zGck4zo3WJkXOK+auY=;
- b=MpXjc2psJtkGdHMi/YkXSZvEo3+FHEjL38mOgxrOvxzo8cG986ZZrVQiks1ezowva1CW
- 2HXhwZMChuMfhfDCNBUGmovQI4voKmq0AayF612S0n+NlqjBd6jhKu6pVcfosqVWSTDf
- B1GiPobKYXmJth89lenkx24+CMZQT8C93xba/NDcfH2TDlC/Bj2XjKGWaHw4+i16BKLL
- HDRNNxR/9nY4kiq/vvTaKCzI2RjntdZarD9kDueFr1Q+xtLmbuHkAj+CK5ri0GGcoDVR
- d+zO9kHfvt3sEBIwAg5ADOHkAKYadpPWQPmF+dDCFjQbkZODX2RZb/3aIqhd5qTSyR/+ Ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ggh6sntcb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 17:51:01 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 256HEP9L002567;
-        Mon, 6 Jun 2022 17:51:00 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ggh6sntby-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 17:51:00 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 256HoKWA007774;
-        Mon, 6 Jun 2022 17:50:59 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma02wdc.us.ibm.com with ESMTP id 3gfy19f1wr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Jun 2022 17:50:59 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 256Howbb16843158
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Jun 2022 17:50:58 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE799124054;
-        Mon,  6 Jun 2022 17:50:58 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C376124052;
-        Mon,  6 Jun 2022 17:50:58 +0000 (GMT)
-Received: from [9.60.75.219] (unknown [9.60.75.219])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Jun 2022 17:50:58 +0000 (GMT)
-Message-ID: <a04005af-8f5b-80f9-cf80-80aeb0814d57@linux.ibm.com>
-Date:   Mon, 6 Jun 2022 13:50:58 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH v19 17/20] s390/vfio-ap: handle config changed and scan
- complete notification
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
- <20220404221039.1272245-18-akrowiak@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220404221039.1272245-18-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jH1odn8p6mVC1WcrgZzh_9DkP3NWyLUY
-X-Proofpoint-ORIG-GUID: k076Vk9vUDdYvdeMxyTX4RJfi_Eq_1KH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-06_05,2022-06-03_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- impostorscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206060074
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S230261AbiFFRxl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 13:53:41 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED2F614640D
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 10:53:39 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id x128-20020a628686000000b0051bbf64668cso6954505pfd.23
+        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 10:53:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=4auT6wLIBZL5tFbfEv7oXjy+Lji/X1yRo01RkLY/J9o=;
+        b=pxmLVNW5ddfoLYYzpVB0mF1mbR8HaO9dIGFFEWNVVrPYTegZciXWRRnoHWiuEbOVen
+         ClI+pCrC0nHiD1EepmIJaIhrl7iouUvGXbSnluXCSw92srshsAK3sU1lfwrNC/eDLhm7
+         rsRV8DF6LAXUTfv8J8a8ZzYd4zI2ZGbS2up1lj1bs0HQohpgzHyp8F/B9alM2MiX+hA7
+         QcFTrVXoWNU1qnDzkmOSAFhEcLwx8PiwhPzOogzKQgPyqjE6egCy6mu341s4D4+rJVVH
+         q1XhDlhJrkMpdyL+TcBUyqrJ/mkZ9Vpe3KSDr1vRXTUXjADxyIjKMBhle2NGjF9GzYNv
+         hRjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=4auT6wLIBZL5tFbfEv7oXjy+Lji/X1yRo01RkLY/J9o=;
+        b=hSRUcz4WREPJZhbtdtVSAT1pKvOZZ6PURlYCdGRCugs8Re1Bv61oK2qM2620qlvIId
+         ZGLfzcZNYbyYemiKdZ/gWOzCzUPTGMPiEwII49DvdGYuxLB93F34heQKPRXz2V3AEXPR
+         vg7W9VReDSCFeG9Pzsvy7QNKlT+O/qz2sRDiXhQJC++Ywi3F5zKcQVEhr5dC0FujNSC8
+         Ghpo1xFB0Rrr+INky0mKubUJWcUQkMT8HCIjgxcos9N6ma0/LmEiW2VZ755qMNvTPg+u
+         h7XCSSpwk/nKgdaAqgNPAXCYWWUPTdqJgyVIY1CIxakz/cXCDmv+puxB58bURNShj2Oq
+         4aAw==
+X-Gm-Message-State: AOAM5306AAWLxF2WqWDyAkl9lpHVRomQHSoZbkkznuEQnPnDW1XzuZK/
+        rb1MdcIx+yWErNYssNVFbUepnBkBl9IZAxwMGJ4u3H+Lzym6iya12ibvW+5csMqMRwuoh1grWv6
+        P83TNjwE+SIEA2umy72y9yCDRMFwKGtlY6gErBdl4CsCxRZM3WiBzk7uDpWbeHzkqmau4
+X-Google-Smtp-Source: ABdhPJz7tAVwtpKx5FHDiSCklgvBsIZ2KfNp6yr0wqJNYgfPj0dT9hyTa5mfHvl7PLFVciSZHIgO+6KPUI9KgG2u
+X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
+ (user=aaronlewis job=sendgmr) by 2002:a17:90b:4b0f:b0:1e8:53ac:ec51 with SMTP
+ id lx15-20020a17090b4b0f00b001e853acec51mr14860194pjb.78.1654538019291; Mon,
+ 06 Jun 2022 10:53:39 -0700 (PDT)
+Date:   Mon,  6 Jun 2022 17:52:45 +0000
+Message-Id: <20220606175248.1884041-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
+Subject: [PATCH v2 0/4] kvm: x86/pmu: Introduce and test masked events
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/4/22 18:10, Tony Krowiak wrote:
-> This patch implements two new AP driver callbacks:
-> 
-> void (*on_config_changed)(struct ap_config_info *new_config_info,
->                    struct ap_config_info *old_config_info);
-> 
-> void (*on_scan_complete)(struct ap_config_info *new_config_info,
->                   struct ap_config_info *old_config_info);
-> 
-> The on_config_changed callback is invoked at the start of the AP bus scan
-> function when it determines that the host AP configuration information
-> has changed since the previous scan.
-> 
-> The vfio_ap device driver registers a callback function for this callback
-> that performs the following operations:
-> 
-> 1. Unplugs the adapters, domains and control domains removed from the
-> host's AP configuration from the guests to which they are
-> assigned in a single operation.
-> 
-> 2. Stores bitmaps identifying the adapters, domains and control domains
-> added to the host's AP configuration with the structure representing
-> the mediated device. When the vfio_ap device driver's probe callback is
-> subsequently invoked, the probe function will recognize that the
-> queue is being probed due to a change in the host's AP configuration
-> and the plugging of the queue into the guest will be bypassed.
-> 
-> The on_scan_complete callback is invoked after the ap bus scan is
-> completed if the host AP configuration data has changed. The vfio_ap
-> device driver registers a callback function for this callback that hot
-> plugs each queue and control domain added to the AP configuration for each
-> guest using them in a single hot plug operation.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->   drivers/s390/crypto/vfio_ap_drv.c     |   2 +
->   drivers/s390/crypto/vfio_ap_ops.c     | 270 +++++++++++++++++++++++++-
->   drivers/s390/crypto/vfio_ap_private.h |  12 ++
->   3 files changed, 279 insertions(+), 5 deletions(-)
-> 
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+This series introduces the concept of masked events to the pmu event
+filter. Masked events can help reduce the number of events needed in the
+events field of a pmu_event_filter by allowing a more generic matching
+method to be used for the unit mask when filtering guest events in the
+pmu.  With masked events, if an eventsel should be restricted from the
+guest, instead of having to add a new eventsel for every unit mask, one
+encoded event can be added that matches all possible unit masks.
+
+v1 -> v2
+ - Made has_invalid_event() static to fix warning.
+ - Fixed checkpatch.pl errors and warnings.
+ - Updated to account for KVM_X86_PMU_OP().
+
+Aaron Lewis (4):
+  kvm: x86/pmu: Introduce masked events to the pmu event filter
+  selftests: kvm/x86: Add flags when creating a pmu event filter
+  selftests: kvm/x86: Add testing for masked events
+  selftests: kvm/x86: Add testing for KVM_SET_PMU_EVENT_FILTER
+
+ Documentation/virt/kvm/api.rst                |  46 +++++-
+ arch/x86/include/asm/kvm-x86-pmu-ops.h        |   1 +
+ arch/x86/include/uapi/asm/kvm.h               |   8 +
+ arch/x86/kvm/pmu.c                            | 128 +++++++++++++--
+ arch/x86/kvm/pmu.h                            |   1 +
+ arch/x86/kvm/svm/pmu.c                        |  12 ++
+ arch/x86/kvm/vmx/pmu_intel.c                  |  12 ++
+ .../kvm/x86_64/pmu_event_filter_test.c        | 147 +++++++++++++++++-
+ 8 files changed, 333 insertions(+), 22 deletions(-)
 
 -- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+2.36.1.255.ge46751e96f-goog
+
