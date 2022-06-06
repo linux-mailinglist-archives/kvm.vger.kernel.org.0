@@ -2,38 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2C3353EBF8
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:09:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C40A053E616
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:06:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233934AbiFFKbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 06:31:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42766 "EHLO
+        id S235328AbiFFL2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 07:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233871AbiFFKbN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 06:31:13 -0400
+        with ESMTP id S235313AbiFFL2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 07:28:36 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F315E980A8
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 03:31:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158711C285B;
+        Mon,  6 Jun 2022 04:28:36 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E8D160E88
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 10:31:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FABFC385A9;
-        Mon,  6 Jun 2022 10:31:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A416D60F68;
+        Mon,  6 Jun 2022 11:28:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D41CC3411C;
+        Mon,  6 Jun 2022 11:28:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654511471;
-        bh=RzOj554rH8+MebtKLp8kUafMWsaG9Hef1Y0se144nuw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=M2jerxXte/nWPfN9/KLPlfIsFVhxt5fA7IR9FDTE2ociPH8vepgnv3VAfdROdbYj7
-         QTxN2T3uUXtilsAJg3CscfyiCPQZ5OWbHuX28b5u0nlRFtcHAe01YbErEk/v01jNSf
-         sdkO7ca5lxhgBI648V0bNh/s+ikQn0fgraephBuSfkVGgFI7d3qocR7o8HhhwSczOI
-         sWKDCsO+9TUmVDDuVeajhUgQZt4XRgs7RkoDg1zusidQKjlNINIfU1H4nUlRZmB7hk
-         0D+/rMolPsbj/o3wRUnSBlaZBbUnlUB3RPoJmOtEf1HhIeBqRxaQhhAES+SKdNkMmq
-         SwMf1zd+AgAmw==
-Date:   Mon, 6 Jun 2022 11:31:05 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
+        s=k20201202; t=1654514915;
+        bh=HSh91ZCaHITLmr5CLlS3fmJvhr48sqOQOlQ7C/p/ovo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Dvw7wTF9FyzkRSe9OpuincqtO0+GGsyTHD5SbKOeaWsNUQyeZ15YjhoTxtE4AatCq
+         L2+C6gDa633fgc7vNN+YB0tIepMpmuhGOYRRyCMahqmUpg8lfuuUjsMeTHFrA6JICu
+         OWNLqx1dN2+0fmV5uw4cDRFpQmD1csMI1WXJ+kUTo+2piteHQT1sCfMcAMI+8B7tPU
+         oYYazMeoJlXQKF2G5jjj+fA7FSgn37rwXzqEfC72bKimq5zAYmJsua2WwZtFlq22KN
+         CYI0iebzkXuRpZ/Wy8RTk368AS72nhWmVIzQL+hiukbdfK8w2WCDQyLtDJaa1hPSep
+         G4mWSMNmm99dg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nyAuO-00Fsyh-Ha; Mon, 06 Jun 2022 12:28:32 +0100
+Date:   Mon, 06 Jun 2022 12:28:32 +0100
+Message-ID: <87y1ya3uan.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Mark Brown <broonie@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
@@ -41,20 +47,22 @@ Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oupton@google.com>,
         Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-        Quentin Perret <qperret@google.com>, kernel-team@android.com
-Subject: Re: [PATCH 04/18] KVM: arm64: Move FP state ownership from flag to a
- tristate
-Message-ID: <Yp3XaeZFnlNOIE7t@sirena.org.uk>
+        Quentin Perret <qperret@google.com>, kernel-team@android.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 01/18] KVM: arm64: Always start with clearing SVE flag on load
+In-Reply-To: <YpTXsgd1MPpJEjUJ@sirena.org.uk>
 References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-5-maz@kernel.org>
- <YpnQ43WaGH96MxyY@sirena.org.uk>
- <874k0y5gkv.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="rQudSunjvuay9MSf"
-Content-Disposition: inline
-In-Reply-To: <874k0y5gkv.wl-maz@kernel.org>
-X-Cookie: Bedfellows make strange politicians.
+        <20220528113829.1043361-2-maz@kernel.org>
+        <YpTXsgd1MPpJEjUJ@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, will@kernel.org, tabba@google.com, qperret@google.com, kernel-team@android.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -65,46 +73,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 30 May 2022 15:41:54 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Sat, May 28, 2022 at 12:38:11PM +0100, Marc Zyngier wrote:
+> > On each vcpu load, we set the KVM_ARM64_HOST_SVE_ENABLED
+> > flag if SVE is enabled for EL0 on the host. This is used to restore
+> > the correct state on vpcu put.
+> > 
+> > However, it appears that nothing ever clears this flag. Once
+> > set, it will stick until the vcpu is destroyed, which has the
+> > potential to spuriously enable SVE for userspace.
+> 
+> Oh dear.
+> 
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> 
+> > We probably never saw the issue because no VMM uses SVE, but
+> > that's still pretty bad. Unconditionally clearing the flag
+> > on vcpu load addresses the issue.
+> 
+> Unless I'm missing something since we currently always disable
+> SVE on syscall even if the VMM were using SVE for some reason
+> (SVE memcpy()?) we should already have disabled SVE for EL0 in
+> sve_user_discard() during kernel entry so EL0 access to SVE
+> should be disabled in the system register by the time we get
+> here.
 
---rQudSunjvuay9MSf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Indeed. And this begs the question: what is this code actually doing?
+Is there any way we can end-up running a guest with any valid host SVE
+state?
 
-On Mon, Jun 06, 2022 at 09:41:52AM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Sat, May 28, 2022 at 12:38:14PM +0100, Marc Zyngier wrote:
+I remember being >this< close to removing that code some time ago, and
+only stopped because I vaguely remembered Dave Martin convincing me at
+some point that it was necessary. I'm unable to piece the argument
+together again though.
 
-> > > - FP_STATE_CLEAN
-> > > - FP_STATE_HOST_DIRTY
-> > > - FP_STATE_GUEST_DIRTY
+	M.
 
-> > I had to think a bit more than I liked about the _DIRTY in the
-> > names of the host and guest flags, but that's really just
-> > bikeshedding and not a meaningful issue.
-
-> Another option was:
-
-> - FP_STATE_FREE
-> - FP_STATE_HOST_OWNED
-> - FP_STATE_GUEST_OWNED
-
-> I don't mind wither way.
-
-I think I do prefer that option, but like I say it's bikeshedding.
-
---rQudSunjvuay9MSf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKd12kACgkQJNaLcl1U
-h9AVGgf/dlk9EDtEzQer5KaGtvG5vJiwknDihIt6gs7N2qOR6G8a4oZMsGZRbjke
-2fRtcpAeFmhvRB70c7YTQ5YWy7tQLlCDvuC2wKYren2Z3bj3tnX6SQXiwPD37yAI
-fS9sZrICl7Cy4H65S2fX/Lc0g1aec5uIMmFLhtTXoswUeMpNUqHBPp162VS10bGT
-dhBD7IuuZqnYHzxLaMX87xG1NRR8IMmaDO+3Lgy2cHUoZ+z/2S+1lKLFA9BolVEA
-cWzvrkbLq4kwH4/FRnc6sR/67DAD3yrrjELW5OL7vokRgdlYQ5XZ5gK92R15KTPD
-Tx84jFJFDqsZYgJWsiDRldwbWFGwOQ==
-=yN1j
------END PGP SIGNATURE-----
-
---rQudSunjvuay9MSf--
+-- 
+Without deviation from the norm, progress is not possible.
