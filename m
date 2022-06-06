@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D914053E3B3
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 10:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E82BA53E251
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 10:54:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231966AbiFFIho (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 04:37:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34876 "EHLO
+        id S232034AbiFFIh7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 04:37:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231937AbiFFIhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 04:37:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3191AE6F
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 01:37:23 -0700 (PDT)
+        with ESMTP id S231958AbiFFIhc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 04:37:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 076CC1EADB
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 01:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654504642;
+        s=mimecast20190719; t=1654504649;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1qI/FHY/T1HazJ0T9yjqCenNeZJbi2H7HBUgnno5W+A=;
-        b=A+0cIbJuHqGOcEO0JbFrhTOzD5IPnVAwdhpYZEtYbRxRgSw3oYExtIn9MJm+i1RWPr75i7
-        8PNIl4KjdODimHdNj75yzOD6eoIJRGvct9fwJgSXpcTuqMy5XYShyvJMPnI4flKvu8VloV
-        JB11n0YigykZ8yVMH7KV84NDqApf2/s=
+        bh=6EbOQEM4KSVA9gLlPa9QlR/SHY818DTJV2naZEjUXSk=;
+        b=Xd0wvejAbEPzUGviihuva98tgX0CtaR0Ep8mb9YQcMmDx3GI2CbLUFa/6MYVlrIiMazhph
+        pTjdSNrf0ny5UOOKp1J8X0LAHiE+q90MandJtCJYC9l2K05KHGZod0rEKD51LdSC7z+Uvp
+        MC/VNOhm+lwHMOm5vtGUVBUsKzmBy6A=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-250-PsusY7kwOv67vxA4jw8iYA-1; Mon, 06 Jun 2022 04:37:19 -0400
-X-MC-Unique: PsusY7kwOv67vxA4jw8iYA-1
+ us-mta-549-ywz5UZUEOZmluqHa3N9zwg-1; Mon, 06 Jun 2022 04:37:21 -0400
+X-MC-Unique: ywz5UZUEOZmluqHa3N9zwg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A2D7129ABA24;
-        Mon,  6 Jun 2022 08:37:18 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 12D3B1C16B42;
+        Mon,  6 Jun 2022 08:37:21 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.193.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BE3731121314;
-        Mon,  6 Jun 2022 08:37:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EBACA1121314;
+        Mon,  6 Jun 2022 08:37:18 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -47,9 +47,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 08/38] x86/hyperv: Introduce HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK constants
-Date:   Mon,  6 Jun 2022 10:36:25 +0200
-Message-Id: <20220606083655.2014609-9-vkuznets@redhat.com>
+Subject: [PATCH v6 09/38] KVM: x86: hyper-v: Use HV_MAX_SPARSE_VCPU_BANKS/HV_VCPUS_PER_SPARSE_BANK instead of raw '64'
+Date:   Mon,  6 Jun 2022 10:36:26 +0200
+Message-Id: <20220606083655.2014609-10-vkuznets@redhat.com>
 In-Reply-To: <20220606083655.2014609-1-vkuznets@redhat.com>
 References: <20220606083655.2014609-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -66,73 +66,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It may not come clear from where the magical '64' value used in
-__cpumask_to_vpset() come from. Moreover, '64' means both the maximum
-sparse bank number as well as the number of vCPUs per bank. Add defines
-to make things clear. These defines are also going to be used by KVM.
+It may not be clear from where the '64' limit for the maximum sparse
+bank number comes from, use HV_MAX_SPARSE_VCPU_BANKS define instead.
+Use HV_VCPUS_PER_SPARSE_BANK in KVM_HV_MAX_SPARSE_VCPU_SET_BITS's
+definition. Opportunistically adjust the comment around BUILD_BUG_ON().
 
 No functional change.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- include/asm-generic/hyperv-tlfs.h |  5 +++++
- include/asm-generic/mshyperv.h    | 11 ++++++-----
- 2 files changed, 11 insertions(+), 5 deletions(-)
+ arch/x86/kvm/hyperv.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
-index fdce7a4cfc6f..020ca9bdbb79 100644
---- a/include/asm-generic/hyperv-tlfs.h
-+++ b/include/asm-generic/hyperv-tlfs.h
-@@ -399,6 +399,11 @@ struct hv_vpset {
- 	u64 bank_contents[];
- } __packed;
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 992972e0f5de..c43355cb60bc 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -43,7 +43,7 @@
+ /* "Hv#1" signature */
+ #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
  
-+/* The maximum number of sparse vCPU banks which can be encoded by 'struct hv_vpset' */
-+#define HV_MAX_SPARSE_VCPU_BANKS (64)
-+/* The number of vCPUs in one sparse bank */
-+#define HV_VCPUS_PER_SPARSE_BANK (64)
-+
- /* HvCallSendSyntheticClusterIpi hypercall */
- struct hv_send_ipi {
- 	u32 vector;
-diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyperv.h
-index c05d2ce9b6cd..89a529093042 100644
---- a/include/asm-generic/mshyperv.h
-+++ b/include/asm-generic/mshyperv.h
-@@ -214,9 +214,10 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
+-#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, 64)
++#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, HV_VCPUS_PER_SPARSE_BANK)
+ 
+ static void stimer_mark_pending(struct kvm_vcpu_hv_stimer *stimer,
+ 				bool vcpu_kick);
+@@ -1799,7 +1799,7 @@ static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
+ 				 u64 *sparse_banks, int consumed_xmm_halves,
+ 				 gpa_t offset)
  {
- 	int cpu, vcpu, vcpu_bank, vcpu_offset, nr_bank = 1;
- 	int this_cpu = smp_processor_id();
-+	int max_vcpu_bank = hv_max_vp_index / HV_VCPUS_PER_SPARSE_BANK;
+-	if (hc->var_cnt > 64)
++	if (hc->var_cnt > HV_MAX_SPARSE_VCPU_BANKS)
+ 		return -EINVAL;
  
--	/* valid_bank_mask can represent up to 64 banks */
--	if (hv_max_vp_index / 64 >= 64)
-+	/* vpset.valid_bank_mask can represent up to HV_MAX_SPARSE_VCPU_BANKS banks */
-+	if (max_vcpu_bank >= HV_MAX_SPARSE_VCPU_BANKS)
- 		return 0;
+ 	/* Cap var_cnt to ignore banks that cannot contain a legal VP index. */
+@@ -1909,12 +1909,11 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	gpa_t data_offset;
  
  	/*
-@@ -224,7 +225,7 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
- 	 * structs are not cleared between calls, we risk flushing unneeded
- 	 * vCPUs otherwise.
+-	 * The Hyper-V TLFS doesn't allow more than 64 sparse banks, e.g. the
+-	 * valid mask is a u64.  Fail the build if KVM's max allowed number of
+-	 * vCPUs (>4096) would exceed this limit, KVM will additional changes
+-	 * for Hyper-V support to avoid setting the guest up to fail.
++	 * The Hyper-V TLFS doesn't allow more than HV_MAX_SPARSE_VCPU_BANKS
++	 * sparse banks. Fail the build if KVM's max allowed number of
++	 * vCPUs (>4096) exceeds this limit.
  	 */
--	for (vcpu_bank = 0; vcpu_bank <= hv_max_vp_index / 64; vcpu_bank++)
-+	for (vcpu_bank = 0; vcpu_bank <= max_vcpu_bank; vcpu_bank++)
- 		vpset->bank_contents[vcpu_bank] = 0;
+-	BUILD_BUG_ON(KVM_HV_MAX_SPARSE_VCPU_SET_BITS > 64);
++	BUILD_BUG_ON(KVM_HV_MAX_SPARSE_VCPU_SET_BITS > HV_MAX_SPARSE_VCPU_BANKS);
  
- 	/*
-@@ -236,8 +237,8 @@ static inline int __cpumask_to_vpset(struct hv_vpset *vpset,
- 		vcpu = hv_cpu_number_to_vp_number(cpu);
- 		if (vcpu == VP_INVAL)
- 			return -1;
--		vcpu_bank = vcpu / 64;
--		vcpu_offset = vcpu % 64;
-+		vcpu_bank = vcpu / HV_VCPUS_PER_SPARSE_BANK;
-+		vcpu_offset = vcpu % HV_VCPUS_PER_SPARSE_BANK;
- 		__set_bit(vcpu_offset, (unsigned long *)
- 			  &vpset->bank_contents[vcpu_bank]);
- 		if (vcpu_bank >= nr_bank)
+ 	if (!hc->fast && is_guest_mode(vcpu)) {
+ 		hc->ingpa = translate_nested_gpa(vcpu, hc->ingpa, 0, NULL);
 -- 
 2.35.3
 
