@@ -2,111 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A718753E7F0
-	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:08:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F288353EB76
+	for <lists+kvm@lfdr.de>; Mon,  6 Jun 2022 19:09:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239796AbiFFOd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 10:33:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54452 "EHLO
+        id S240150AbiFFO55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 10:57:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239732AbiFFOd5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 10:33:57 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5D0D2C13F;
-        Mon,  6 Jun 2022 07:33:55 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CACF15DB;
-        Mon,  6 Jun 2022 07:33:55 -0700 (PDT)
-Received: from [10.57.81.38] (unknown [10.57.81.38])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 555903F73B;
-        Mon,  6 Jun 2022 07:33:48 -0700 (PDT)
-Message-ID: <1e0e5403-1e65-db9a-c8e7-34e316bfda8e@arm.com>
-Date:   Mon, 6 Jun 2022 15:33:42 +0100
+        with ESMTP id S240137AbiFFO5z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 10:57:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 072D12FE61A
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 07:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654527473;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=oEg/BxrxwpIVrTIgkNOexZzCDMRvekqGaXNned4YxC8=;
+        b=a3h6T0XrFJFRTpBSeHHtk2MdtC74VzEMjUKQ4llOHyGw7u/KerHVG0u780I2RjAh+viu5L
+        V2Fst/70VSKmCgcNnSN5Z5/dt4xrjwW5YavnquNdjcReIx//OBOJJjqK2GEvBzVgaLC1Qk
+        9P9TA5wVGQ2Ta32LPJ6Ej3Kb0pn5tr8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-259-CxbHyxR_P92L9-eFDrIRXg-1; Mon, 06 Jun 2022 10:57:50 -0400
+X-MC-Unique: CxbHyxR_P92L9-eFDrIRXg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 806A929ABA35;
+        Mon,  6 Jun 2022 14:57:49 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.91])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F36CA2026D64;
+        Mon,  6 Jun 2022 14:57:48 +0000 (UTC)
+Date:   Mon, 6 Jun 2022 15:57:47 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Cc:     qemu-devel@nongnu.org, jag.raman@oracle.com,
+        john.g.johnson@oracle.com, john.levon@nutanix.com, mst@redhat.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: ioregionfd with io_uring IORING_OP_URING_CMD
+Message-ID: <Yp4V61lfTTN3QsT4@stefanha-x1.localdomain>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 2/5] iommu: Ensure device has the same iommu_ops as the
- domain
-Content-Language: en-GB
-To:     Nicolin Chen <nicolinc@nvidia.com>, jgg@nvidia.com,
-        joro@8bytes.org, will@kernel.org, marcan@marcan.st,
-        sven@svenpeter.dev, robdclark@gmail.com, m.szyprowski@samsung.com,
-        krzysztof.kozlowski@linaro.org, baolu.lu@linux.intel.com,
-        agross@kernel.org, bjorn.andersson@linaro.org,
-        matthias.bgg@gmail.com, heiko@sntech.de, orsonzhai@gmail.com,
-        baolin.wang7@gmail.com, zhang.lyra@gmail.com, wens@csie.org,
-        jernej.skrabec@gmail.com, samuel@sholland.org,
-        jean-philippe@linaro.org, alex.williamson@redhat.com
-Cc:     suravee.suthikulpanit@amd.com, alyssa@rosenzweig.io,
-        alim.akhtar@samsung.com, dwmw2@infradead.org, yong.wu@mediatek.com,
-        mjrosato@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        thierry.reding@gmail.com, vdumpa@nvidia.com, jonathanh@nvidia.com,
-        cohuck@redhat.com, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-References: <20220606061927.26049-1-nicolinc@nvidia.com>
- <20220606061927.26049-3-nicolinc@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20220606061927.26049-3-nicolinc@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="NmJ6ra3KB8tnU5hE"
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-06-06 07:19, Nicolin Chen wrote:
-> The core code should not call an iommu driver op with a struct device
-> parameter unless it knows that the dev_iommu_priv_get() for that struct
-> device was setup by the same driver. Otherwise in a mixed driver system
-> the iommu_priv could be casted to the wrong type.
 
-We don't have mixed-driver systems, and there are plenty more 
-significant problems than this one to solve before we can (but thanks 
-for pointing it out - I hadn't got as far as auditing the public 
-interfaces yet). Once domains are allocated via a particular device's 
-IOMMU instance in the first place, there will be ample opportunity for 
-the core to stash suitable identifying information in the domain for 
-itself. TBH even the current code could do it without needing the 
-weirdly invasive changes here.
+--NmJ6ra3KB8tnU5hE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Store the iommu_ops pointer in the iommu_domain and use it as a check to
-> validate that the struct device is correct before invoking any domain op
-> that accepts a struct device.
+Hi,
+During Elena Afanasova's Outreachy project we discussed whether
+ioregionfd should be a custom struct file_operations (anon inode) or a
+userspace-provided file (socketpair, UNIX domain socket, etc).
 
-In fact this even describes exactly that - "Store the iommu_ops pointer 
-in the iommu_domain", vs. the "Store the iommu_ops pointer in the 
-iommu_domain_ops" which the patch is actually doing :/
+Back then it seemed more flexible and simpler to let userspace provide
+the file. It may be worth revisiting this decision in light of the
+recent io_uring IORING_OP_URING_CMD feature, which fits for this
+performance-critical interface.
 
-[...]
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 19cf28d40ebe..8a1f437a51f2 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -1963,6 +1963,10 @@ static int __iommu_attach_device(struct iommu_domain *domain,
->   {
->   	int ret;
->   
-> +	/* Ensure the device was probe'd onto the same driver as the domain */
-> +	if (dev->bus->iommu_ops != domain->ops->iommu_ops)
+IORING_OP_URING_CMD involves a new struct file_operations->uring_cmd()
+callback. It's a flexible userspace interface like ioctl(2) but designed
+to be asynchronous. ioregionfd can provide a uring_cmd() that reads a
+ioregionfd response from userspace and then writes the next ioregionfd
+request to userspace.
 
-Nope, dev_iommu_ops(dev) please. Furthermore I think the logical place 
-to put this is in iommu_group_do_attach_device(), since that's the 
-gateway for the public interfaces - we shouldn't need to second-guess 
-ourselves for internal default-domain-related calls.
+This single operation merges the request/response so only 1 syscall is
+necessary per KVM MMIO/PIO exit instead of a read() + write(). Bypassing
+the net/socket infrastructure is likely to help too.
 
-Thanks,
-Robin.
+It would be interesting to benchmark this and compare it against the
+existing userspace-provided file approach. Although it's not the same
+scenario, results for the Linux NVMe driver using ->uring_cmd() are
+promising:
+https://www.snia.org/educational-library/enabling-asynchronous-i-o-passthru-nvme-native-applications-2021
 
-> +		return -EMEDIUMTYPE;
-> +
->   	if (unlikely(domain->ops->attach_dev == NULL))
->   		return -ENODEV;
+The downside is it requires more code than general purpose I/O. In
+addition to ->uring_cmd(), it's also worth implementing struct
+file_operations read/write/poll so traditional file I/O syscalls work
+for simple applications that don't want to use io_uring.
+
+It's possible to add ->uring_cmd() later but as a userspace developer I
+would prefer the ->uring_cmd() approach, so I'm not sure it's worth
+committing to the existing userspace-provided file approach?
+
+Stefan
+
+--NmJ6ra3KB8tnU5hE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmKeFesACgkQnKSrs4Gr
+c8hW6gf6Ax8Kb1dAPiFcem5nK7bYZToPIS5yL03lRrOaVh6bIxS28nct3RZM9Z7v
+RhlJfDY8xSFQdlocOZVeKJjUMu34RyDCi26BbBKjUgvbFHDsGvIi0gje/43VUQuI
+CNVE/GLA0s6q0DUMY+Dl9h+v0tttVMaKJA9aGAbOuSAhRMidg1WvmBdVW7ZBmtsz
+FmZrretiXj8jBUl+kdfUSnHJJWLJz3y9RfOHIwYOH7bKzZyJxOSqcXo1zKm3OXO9
+WKCgl6jGrL1laYdpjZGPdFLewLav9yr1kdr823vfnDT/f9jcD/liHzvSF8NmmIGa
+GcUS4sPyc6XaRQU1GI9G9+RVe+3cZw==
+=hUCX
+-----END PGP SIGNATURE-----
+
+--NmJ6ra3KB8tnU5hE--
+
