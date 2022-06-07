@@ -2,56 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8024540D49
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 20:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00F43541250
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 21:46:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353796AbiFGSsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 14:48:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53896 "EHLO
+        id S1347044AbiFGTqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 15:46:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354478AbiFGSrE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 14:47:04 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285DE6898D;
-        Tue,  7 Jun 2022 11:01:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DC0F4B82239;
-        Tue,  7 Jun 2022 18:01:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34C27C34115;
-        Tue,  7 Jun 2022 18:01:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654624887;
-        bh=WYtg6yUY6yiewaqifDNtJ9l3eq/l+7QgrMV3SgSnmtw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BrcKxJLKAI3jXkFS13VL3Vb2rrFXudMZ1jFf2gy/kAIctNckzYa7G362dv54fi8fR
-         lKigeisufoY8TXfI+C1FcxY/GzRaI/IaOyB7f98WYKK24NxoBISoxq+cXX2b1XjCsU
-         w34KsOHZ7eg7DcoCzNMOx5yTNore0LWXWkPf/dVguz6QxF3uQwAt7V6YhovBQUi4IG
-         X4Ee7EQ3Ett7GAQD5BXtTdZdE+TXTVFihOM+uTXm85OKSxUrRakehJV6LSL2kAy3On
-         QLhR8595DMv08O5DOAoIQpS9HEznMnJs57LwRM7flxBFeWT0VR9/AwiQ4fPOSFCSG4
-         BxE6gD4FgbE5w==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, frankja@linux.ibm.com,
-        gor@linux.ibm.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 32/34] s390/gmap: voluntarily schedule during key setting
-Date:   Tue,  7 Jun 2022 14:00:07 -0400
-Message-Id: <20220607180011.481266-32-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220607180011.481266-1-sashal@kernel.org>
-References: <20220607180011.481266-1-sashal@kernel.org>
+        with ESMTP id S1355933AbiFGTnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 15:43:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B149F37A32
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 11:18:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654625879;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=j3lpgWA7svbHLWKqRID/rVg39qDI+lSSGg7Fd1qcSWA=;
+        b=HX337rafDRTQ40tPfGzLBm+OFRzCstT5rSuQRIdkfDNaZtP5lq48MgdiyXEEXj+sKQJ3ER
+        TLhMf6ZecaY0XkG1CC9sqRBNrA0AbYusyWsDaP3bBsUqT4nB/ZHB/Ip+NtX5bNqfUQjx4Z
+        sMLb2wBS1OdaJpHemI3cK0TyVWxyQDg=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-382-jCaEkvKcMmS3e_86EIRPAQ-1; Tue, 07 Jun 2022 14:17:58 -0400
+X-MC-Unique: jCaEkvKcMmS3e_86EIRPAQ-1
+Received: by mail-io1-f70.google.com with SMTP id r17-20020a0566022b9100b00654b99e71dbso8466463iov.3
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 11:17:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=j3lpgWA7svbHLWKqRID/rVg39qDI+lSSGg7Fd1qcSWA=;
+        b=q0beUYtbRftemRVcbkE9aUoG4J6DRaMBj0l9ZY6nWlt3H0tckwLI6NFkc7jdacD1PU
+         rPkutkXH7pD1Rdn3tsSPlkOAsGm9A0ITfAsNWIbZvFikXrapcIeQCzm3WIEXDOKbZ/GS
+         GWBTIqzKxAVJu2CUFra5rUxch5lWgb7hU9hSrbWreZfXfjsK6dOJwXQC7ek/0xQB6bXP
+         dlM5wwpTA57mYC9/swE2j9xUxueAsapuNRGfZvCXKtKeS11l2VBtFE/6EJbja7zCTqO3
+         l7EugCW0/BUj/YNTxN61zwqmBmyVe8HbyMIQvQjvefXh/28BvZm04Bc7iXc7Why/KKsG
+         nGcA==
+X-Gm-Message-State: AOAM5324mx716Zs5uF4RnCGUMEXS1CW7AatXHxCVHMLcNiDN5TAdIDQM
+        3TiAsxxDXhKPvygl9Uw689/51ZtAgDgq1pwDdKdJve62oY8Z+dgNlk0LtLnMLC/FnOPrAmX81xC
+        bQzBN9T9zH0yA
+X-Received: by 2002:a05:6602:2e8d:b0:64f:b683:c70d with SMTP id m13-20020a0566022e8d00b0064fb683c70dmr14718158iow.62.1654625877414;
+        Tue, 07 Jun 2022 11:17:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwaKAIwnS/XY4Pi1zuB62rXBWlJN49R3Ls7V+1ZJ6xQfMRWtnLx/TIpsFMW6h2gDggBIhCYmA==
+X-Received: by 2002:a05:6602:2e8d:b0:64f:b683:c70d with SMTP id m13-20020a0566022e8d00b0064fb683c70dmr14718146iow.62.1654625877100;
+        Tue, 07 Jun 2022 11:17:57 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id x8-20020a92d648000000b002d517c65c51sm4060827ilp.88.2022.06.07.11.17.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jun 2022 11:17:56 -0700 (PDT)
+Date:   Tue, 7 Jun 2022 14:17:54 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Leonardo Bras <leobras@redhat.com>,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org,
+        chang.seok.bae@intel.com, luto@kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
+ user_xfeatures to supported bits of XCR0
+Message-ID: <Yp+WUoA+6x7ZpsaM@xz-m1.local>
+References: <20220301201344.18191-1-sashal@kernel.org>
+ <20220301201344.18191-7-sashal@kernel.org>
+ <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
+ <YppVupW+IWsm7Osr@xz-m1.local>
+ <2d9ba70b-ac18-a461-7a57-22df2c0165c6@redhat.com>
+ <Yp5xSi6P3q187+A+@xz-m1.local>
+ <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
+ <Yp9o+y0NcRW/0puA@google.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Yp9o+y0NcRW/0puA@google.com>
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,84 +87,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
+On Tue, Jun 07, 2022 at 03:04:27PM +0000, Sean Christopherson wrote:
+> On Tue, Jun 07, 2022, Paolo Bonzini wrote:
+> > On 6/6/22 23:27, Peter Xu wrote:
+> > > On Mon, Jun 06, 2022 at 06:18:12PM +0200, Paolo Bonzini wrote:
+> > > > > However there seems to be something missing at least to me, on why it'll
+> > > > > fail a migration from 5.15 (without this patch) to 5.18 (with this patch).
+> > > > > In my test case, user_xfeatures will be 0x7 (FP|SSE|YMM) if without this
+> > > > > patch, but 0x0 if with it.
+> > > > 
+> > > > What CPU model are you using for the VM?
+> > > 
+> > > I didn't specify it, assuming it's qemu64 with no extra parameters.
+> > 
+> > Ok, so indeed it lacks AVX and this patch can have an effect.
+> > 
+> > > > For example, if the source lacks this patch but the destination has it,
+> > > > the source will transmit YMM registers, but the destination will fail to
+> > > > set them if they are not available for the selected CPU model.
+> > > > 
+> > > > See the commit message: "As a bonus, it will also fail if userspace tries to
+> > > > set fpu features (with the KVM_SET_XSAVE ioctl) that are not compatible to
+> > > > the guest configuration.  Such features will never be returned by
+> > > > KVM_GET_XSAVE or KVM_GET_XSAVE2."
+> > > 
+> > > IIUC you meant we should have failed KVM_SET_XSAVE when they're not aligned
+> > > (probably by failing validate_user_xstate_header when checking against the
+> > > user_xfeatures on dest host). But that's probably not my case, because here
+> > > KVM_SET_XSAVE succeeded, it's just that the guest gets a double fault after
+> > > the precopy migration completes (or for postcopy when the switchover is
+> > > done).
+> > 
+> > Difficult to say what's happening without seeing at least the guest code
+> > around the double fault (above you said "fail a migration" and I thought
+> > that was a different scenario than the double fault), and possibly which was
+> > the first exception that contributed to the double fault.
+> 
+> Regardless of why the guest explodes in the way it does, is someone planning on
+> bisecting this (if necessary?) and sending a backport to v5.15?  There's another
+> bug report that is more than likely hitting the same bug.
 
-[ Upstream commit 6d5946274df1fff539a7eece458a43be733d1db8 ]
+What's the bisection you mentioned?  I actually did a bisection and I also
+checked reverting Leo's change can also fix this issue.  Or do you mean
+something else?
 
-With large and many guest with storage keys it is possible to create
-large latencies or stalls during initial key setting:
+> 
+> https://lore.kernel.org/all/48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net
 
-rcu: INFO: rcu_sched self-detected stall on CPU
-rcu:   18-....: (2099 ticks this GP) idle=54e/1/0x4000000000000002 softirq=35598716/35598716 fqs=998
-       (t=2100 jiffies g=155867385 q=20879)
-Task dump for CPU 18:
-CPU 1/KVM       R  running task        0 1030947 256019 0x06000004
-Call Trace:
-sched_show_task
-rcu_dump_cpu_stacks
-rcu_sched_clock_irq
-update_process_times
-tick_sched_handle
-tick_sched_timer
-__hrtimer_run_queues
-hrtimer_interrupt
-do_IRQ
-ext_int_handler
-ptep_zap_key
+That is kvm64, and I agree it could be the same problem since both qemu64
+and kvm64 models do not have any xsave feature bit declared in cpuid 0xd,
+so potentially we could be migrating some fpu states to it even with
+user_xfeatures==0 on dest host.
 
-The mmap lock is held during the page walking but since this is a
-semaphore scheduling is still possible. Same for the kvm srcu.
-To minimize overhead do this on every segment table entry or large page.
+So today I continued the investigation, and I think what's really missing
+is qemu seems to be ignoring the user_xfeatures check for KVM_SET_XSAVE and
+continues even if it returns -EINVAL.  IOW, I'm wondering whether we should
+fail properly and start to check kvm_arch_put_registers() retcode.  But
+that'll be a QEMU fix, and it'll at least not causing random faults
+(e.g. double faults) in guest but we should fail the migration gracefully.
 
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Reviewed-by: Alexander Gordeev <agordeev@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Link: https://lore.kernel.org/r/20220530092706.11637-2-borntraeger@linux.ibm.com
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/s390/mm/gmap.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Sean: a side note is that I can also easily trigger one WARN_ON_ONCE() in
+your commit 98c25ead5eda5 in kvm_arch_vcpu_ioctl_run():
 
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 5e5a4e1f0e6c..19ee8355b2a7 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -2579,6 +2579,18 @@ static int __s390_enable_skey_pte(pte_t *pte, unsigned long addr,
- 	return 0;
- }
- 
-+/*
-+ * Give a chance to schedule after setting a key to 256 pages.
-+ * We only hold the mm lock, which is a rwsem and the kvm srcu.
-+ * Both can sleep.
-+ */
-+static int __s390_enable_skey_pmd(pmd_t *pmd, unsigned long addr,
-+				  unsigned long next, struct mm_walk *walk)
-+{
-+	cond_resched();
-+	return 0;
-+}
-+
- static int __s390_enable_skey_hugetlb(pte_t *pte, unsigned long addr,
- 				      unsigned long hmask, unsigned long next,
- 				      struct mm_walk *walk)
-@@ -2601,12 +2613,14 @@ static int __s390_enable_skey_hugetlb(pte_t *pte, unsigned long addr,
- 	end = start + HPAGE_SIZE - 1;
- 	__storage_key_init_range(start, end);
- 	set_bit(PG_arch_1, &page->flags);
-+	cond_resched();
- 	return 0;
- }
- 
- static const struct mm_walk_ops enable_skey_walk_ops = {
- 	.hugetlb_entry		= __s390_enable_skey_hugetlb,
- 	.pte_entry		= __s390_enable_skey_pte,
-+	.pmd_entry		= __s390_enable_skey_pmd,
- };
- 
- int s390_enable_skey(void)
+	WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
+
+It'll be great if you'd like to check that up.
+
+Thanks,
+
 -- 
-2.35.1
+Peter Xu
 
