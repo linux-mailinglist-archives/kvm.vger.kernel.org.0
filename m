@@ -2,242 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0894D53FA81
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 11:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FAE153FAAF
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 12:01:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240307AbiFGJ4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 05:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39856 "EHLO
+        id S239830AbiFGKBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 06:01:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240182AbiFGJ4L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 05:56:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D80F2E731A
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 02:56:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654595769;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hPcrVbGSfC2d9bGnlJDvNet18sRYkg2g/ox43s88aXY=;
-        b=KJDxhWLv9LesYR6dgar5CgDkULrbejMC4MB1enSdX7fr/oxZlCGChUAx8i2TqNsJ/+WR0/
-        cGdnu4Rg7A7h/0lGtxTuxG7mtHzxXTMb5b1jwPNskGy/4dLBnR7X5LQnq079S1ox70Jgjq
-        yy+pFJtoZfMf3aSjIzR/CLfPw6CQxH8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-49-jcaghEbNPTSDI8rfkcCg0w-1; Tue, 07 Jun 2022 05:56:08 -0400
-X-MC-Unique: jcaghEbNPTSDI8rfkcCg0w-1
-Received: by mail-qk1-f197.google.com with SMTP id c8-20020a05620a268800b0069c0f1b3206so13698099qkp.18
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 02:56:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=hPcrVbGSfC2d9bGnlJDvNet18sRYkg2g/ox43s88aXY=;
-        b=ufgnUF0C1HixyWGsisAUfRR9jS/AGzrPRD64rmNbnmW+6aVyW2P+rBBi9dN0EHoETC
-         P9qnPaeM1g257pRmZ1Xrg9c5ntnetKnSioxTeuWJtDjRx9t29NmdshGiTQJq8gkC3rop
-         NtPcAoWI1TVzKl6U5GOtEI7ZDJROmI3csEfKHl6+m/+oVHSe/EBQlVOficPy01e5wYn/
-         UHQDQ9ZpY2fvl8K2Egom9/H0YlyWhexjgp174ZSmAp+V/1Zjx2zymAUZ7/fFYM4CPzLt
-         mIeycNnnmlx4lVIbyVwoxf9da0hNrXfE4dJaNEwleuE6aCm5NSiwKDCo1+BrUy+eWimk
-         MMIA==
-X-Gm-Message-State: AOAM5323kjOih/8UICaaxhNfZJ/SWs2vPkwUJtSOq1tv41o9GPtGZYDB
-        lF9WBhNaOIkOUCl1XaNsKJafNtEyU9hn6MtUNw3Pb1mK7lW/p4MsYc+Ba14d5x8EzdrQLUKWHzJ
-        Ef1+WcqQ6l5yf
-X-Received: by 2002:a37:917:0:b0:6a6:9a14:b542 with SMTP id 23-20020a370917000000b006a69a14b542mr14626089qkj.562.1654595767102;
-        Tue, 07 Jun 2022 02:56:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxGn1pnO3L/l5/swG8TZlg+GJyHc7lm8NxVbWhcbgeMs61jMxFKA3z/PBHvttTea5vJ/1bMlQ==
-X-Received: by 2002:a37:917:0:b0:6a6:9a14:b542 with SMTP id 23-20020a370917000000b006a69a14b542mr14626069qkj.562.1654595766859;
-        Tue, 07 Jun 2022 02:56:06 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id d127-20020a37b485000000b0069fc13ce257sm12793643qkf.136.2022.06.07.02.56.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 02:56:06 -0700 (PDT)
-Message-ID: <e249bd60cef49706e39cc619876e26c90d88ecb0.camel@redhat.com>
-Subject: Re: [PATCH v6 20/38] KVM: nVMX: hyper-v: Cache VP assist page in
- 'struct kvm_vcpu_hv'
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 07 Jun 2022 12:56:02 +0300
-In-Reply-To: <20220606083655.2014609-21-vkuznets@redhat.com>
-References: <20220606083655.2014609-1-vkuznets@redhat.com>
-         <20220606083655.2014609-21-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        with ESMTP id S231598AbiFGKBU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 06:01:20 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 176A8813EF;
+        Tue,  7 Jun 2022 03:01:19 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2579rveZ009486;
+        Tue, 7 Jun 2022 10:01:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=DdXnFoDyvEZvRsgOCHS0FTqAN71Ch9Da1EZHst0fpM0=;
+ b=hVizCYHfuov5uAi0zCo8XmIoMYtDZ95m9e4PcvYvmlzo2fTfQogRnMNDLiUpQwpcJp2Q
+ 12KXiembdW4Ro1+L95uceXRLiehMrpx+q819VKpc+MgmylIWMqjmQi2HDykgJzd7Ebd/
+ HpS7Yv0mR4fjqUrVyU6qF8m1wJnGskGvA7UmTBlmuCrkf9psI8mXu8BBI2CX4DfIlS21
+ 6AGjrF9akqOQ0Ua+XEh2bM/uC2ypbT2s8zeWQYG4pZXocj8h+K1nvCr+UE4/YPmrD7Ib
+ 666i+SM8ynV+V5mbnCo3Kmt2cImHBdfW8VNqkjPVd12x+f06MPGjx3PSJx/Y8iqOxrmV JQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gj4evg3nk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Jun 2022 10:01:18 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2579tbbo020641;
+        Tue, 7 Jun 2022 10:01:18 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gj4evg3ms-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Jun 2022 10:01:18 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2579q9d0003980;
+        Tue, 7 Jun 2022 10:01:15 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 3gfy19asuj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Jun 2022 10:01:15 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 257A1Cr718678070
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Jun 2022 10:01:12 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E8C1A405B;
+        Tue,  7 Jun 2022 10:01:12 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 149CCA405C;
+        Tue,  7 Jun 2022 10:01:12 +0000 (GMT)
+Received: from [9.171.6.132] (unknown [9.171.6.132])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Jun 2022 10:01:11 +0000 (GMT)
+Message-ID: <5552dc4a-4c1f-2f01-eaa7-fa42042d4455@linux.ibm.com>
+Date:   Tue, 7 Jun 2022 12:01:11 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] lib: s390x: better smp interrupt
+ checks
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        pmorel@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com
+References: <20220603154037.103733-1-imbrenda@linux.ibm.com>
+ <20220603154037.103733-3-imbrenda@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <20220603154037.103733-3-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5CQa5OpdGeNyiYxlHUiHNHJXUl6eBpE4
+X-Proofpoint-GUID: l7VD2XkYZ83-rmERvhxMBKt6LxAgjq97
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-07_03,2022-06-03_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 adultscore=0 mlxscore=0 suspectscore=0
+ lowpriorityscore=0 spamscore=0 phishscore=0 bulkscore=0 malwarescore=0
+ impostorscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2204290000 definitions=main-2206070039
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-06-06 at 10:36 +0200, Vitaly Kuznetsov wrote:
-> In preparation to enabling L2 TLB flush, cache VP assist page in
-> 'struct kvm_vcpu_hv'. While on it, rename nested_enlightened_vmentry()
-> to nested_get_evmptr() and make it return eVMCS GPA directly.
+On 6/3/22 17:40, Claudio Imbrenda wrote:
+> Use per-CPU flags and callbacks for Program, Extern, and I/O interrupts
+> instead of global variables.
 > 
-> No functional change intended.
+> This allows for more accurate error handling; a CPU waiting for an
+> interrupt will not have it "stolen" by a different CPU that was not
+> supposed to wait for one, and now two CPUs can wait for interrupts at
+> the same time.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  2 ++
->  arch/x86/kvm/hyperv.c           | 10 ++++++----
->  arch/x86/kvm/hyperv.h           |  3 +--
->  arch/x86/kvm/vmx/evmcs.c        | 21 +++++++--------------
->  arch/x86/kvm/vmx/evmcs.h        |  2 +-
->  arch/x86/kvm/vmx/nested.c       |  6 +++---
->  6 files changed, 20 insertions(+), 24 deletions(-)
+>  lib/s390x/asm/arch_def.h |  7 ++++++-
+>  lib/s390x/interrupt.c    | 38 ++++++++++++++++----------------------
+>  2 files changed, 22 insertions(+), 23 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index f9a34af0a5cc..e62db76c8d37 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -650,6 +650,8 @@ struct kvm_vcpu_hv {
->         /* Preallocated buffer for handling hypercalls passing sparse vCPU set */
->         u64 sparse_banks[HV_MAX_SPARSE_VCPU_BANKS];
->  
-> +       struct hv_vp_assist_page vp_assist_page;
-> +
->         struct {
->                 u64 pa_page_gpa;
->                 u64 vm_id;
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 4396d75588d8..91310774c0b9 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -903,13 +903,15 @@ bool kvm_hv_assist_page_enabled(struct kvm_vcpu *vcpu)
->  }
->  EXPORT_SYMBOL_GPL(kvm_hv_assist_page_enabled);
->  
-> -bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu,
-> -                           struct hv_vp_assist_page *assist_page)
-> +bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu)
->  {
-> -       if (!kvm_hv_assist_page_enabled(vcpu))
-> +       struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> +
-> +       if (!hv_vcpu || !kvm_hv_assist_page_enabled(vcpu))
->                 return false;
-> +
->         return !kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_eoi.data,
-> -                                     assist_page, sizeof(*assist_page));
-> +                                     &hv_vcpu->vp_assist_page, sizeof(struct hv_vp_assist_page));
->  }
->  EXPORT_SYMBOL_GPL(kvm_hv_get_assist_page);
->  
-> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> index 2aa6fb7fc599..139beb55b781 100644
-> --- a/arch/x86/kvm/hyperv.h
-> +++ b/arch/x86/kvm/hyperv.h
-> @@ -105,8 +105,7 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages);
->  void kvm_hv_vcpu_uninit(struct kvm_vcpu *vcpu);
->  
->  bool kvm_hv_assist_page_enabled(struct kvm_vcpu *vcpu);
-> -bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu,
-> -                           struct hv_vp_assist_page *assist_page);
-> +bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu);
->  
->  static inline struct kvm_vcpu_hv_stimer *to_hv_stimer(struct kvm_vcpu *vcpu,
->                                                       int timer_index)
-> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> index 805afc170b5b..7cd7b16942c6 100644
-> --- a/arch/x86/kvm/vmx/evmcs.c
-> +++ b/arch/x86/kvm/vmx/evmcs.c
-> @@ -307,24 +307,17 @@ __init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
->  }
->  #endif
->  
-> -bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa)
-> +u64 nested_get_evmptr(struct kvm_vcpu *vcpu)
->  {
-> -       struct hv_vp_assist_page assist_page;
-> +       struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
->  
-> -       *evmcs_gpa = -1ull;
-> +       if (unlikely(!kvm_hv_get_assist_page(vcpu)))
-> +               return EVMPTR_INVALID;
->  
-> -       if (unlikely(!kvm_hv_get_assist_page(vcpu, &assist_page)))
-> -               return false;
-> +       if (unlikely(!hv_vcpu->vp_assist_page.enlighten_vmentry))
-> +               return EVMPTR_INVALID;
->  
-> -       if (unlikely(!assist_page.enlighten_vmentry))
-> -               return false;
-> -
-> -       if (unlikely(!evmptr_is_valid(assist_page.current_nested_vmcs)))
-> -               return false;
-> -
-> -       *evmcs_gpa = assist_page.current_nested_vmcs;
-> -
-> -       return true;
-> +       return hv_vcpu->vp_assist_page.current_nested_vmcs;
->  }
->  
->  uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-> index 584741b85eb6..22d238b36238 100644
-> --- a/arch/x86/kvm/vmx/evmcs.h
-> +++ b/arch/x86/kvm/vmx/evmcs.h
-> @@ -239,7 +239,7 @@ enum nested_evmptrld_status {
->         EVMPTRLD_ERROR,
->  };
->  
-> -bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa);
-> +u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
->  uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
->  int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->                         uint16_t *vmcs_version);
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 4a827b3d929a..87bff81f7f3e 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1995,7 +1995,8 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
->         if (likely(!vmx->nested.enlightened_vmcs_enabled))
->                 return EVMPTRLD_DISABLED;
->  
-> -       if (!nested_enlightened_vmentry(vcpu, &evmcs_gpa)) {
-> +       evmcs_gpa = nested_get_evmptr(vcpu);
-> +       if (!evmptr_is_valid(evmcs_gpa)) {
->                 nested_release_evmcs(vcpu);
->                 return EVMPTRLD_DISABLED;
->         }
-> @@ -5084,7 +5085,6 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
->         struct vcpu_vmx *vmx = to_vmx(vcpu);
->         u32 zero = 0;
->         gpa_t vmptr;
-> -       u64 evmcs_gpa;
->         int r;
->  
->         if (!nested_vmx_check_permission(vcpu))
-> @@ -5110,7 +5110,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
->          * vmx->nested.hv_evmcs but this shouldn't be a problem.
->          */
->         if (likely(!vmx->nested.enlightened_vmcs_enabled ||
-> -                  !nested_enlightened_vmentry(vcpu, &evmcs_gpa))) {
-> +                  !evmptr_is_valid(nested_get_evmptr(vcpu)))) {
->                 if (vmptr == vmx->nested.current_vmptr)
->                         nested_release_vmcs12(vcpu);
->  
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 72553819..3a0d9c43 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -124,7 +124,12 @@ struct lowcore {
+>  	uint8_t		pad_0x0280[0x0308 - 0x0280];	/* 0x0280 */
+>  	uint64_t	sw_int_crs[16];			/* 0x0308 */
+>  	struct psw	sw_int_psw;			/* 0x0388 */
+> -	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
+> +	uint32_t	pgm_int_expected;		/* 0x0398 */
+> +	uint32_t	ext_int_expected;		/* 0x039c */
+> +	void		(*pgm_cleanup_func)(void);	/* 0x03a0 */
+> +	void		(*ext_cleanup_func)(void);	/* 0x03a8 */
+> +	void		(*io_int_func)(void);		/* 0x03b0 */
 
+If you switch the function pointers and the *_expected around,
+you can use bools for the latter, right?
+I think, since they're names suggest that they're bools, they should
+be. Additionally I prefer true/false over 1/0, since the latter raises
+the questions if other values are also used.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> +	uint8_t		pad_0x03b8[0x11b0 - 0x03b8];	/* 0x03b8 */
+>  	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
+>  	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
+>  	uint64_t	fprs_sa[16];			/* 0x1200 */
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 27d3b767..e57946f0 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -15,14 +15,11 @@
+>  #include <fault.h>
+>  #include <asm/page.h>
+>  
+> -static bool pgm_int_expected;
+> -static bool ext_int_expected;
+> -static void (*pgm_cleanup_func)(void);
+>  static struct lowcore *lc;
+>  
+>  void expect_pgm_int(void)
+>  {
+> -	pgm_int_expected = true;
+> +	lc->pgm_int_expected = 1;
+>  	lc->pgm_int_code = 0;
+>  	lc->trans_exc_id = 0;
+>  	mb();
 
-Best regards,
-	Maxim Levitsky
+[...]
 
+>  void handle_pgm_int(struct stack_frame_int *stack)
+>  {
+> -	if (!pgm_int_expected) {
+> +	if (!lc->pgm_int_expected) {
+>  		/* Force sclp_busy to false, otherwise we will loop forever */
+>  		sclp_handle_ext();
+>  		print_pgm_info(stack);
+>  	}
+>  
+> -	pgm_int_expected = false;
+> +	lc->pgm_int_expected = 0;
+>  
+> -	if (pgm_cleanup_func)
+> -		(*pgm_cleanup_func)();
+> +	if (lc->pgm_cleanup_func)
+> +		(*lc->pgm_cleanup_func)();
+
+[...]
+
+> +	if (lc->io_int_func)
+> +		return lc->io_int_func();
+Why is a difference between the function pointer usages here?
 
