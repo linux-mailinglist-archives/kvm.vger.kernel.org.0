@@ -2,131 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FC9053FD37
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 13:17:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8C9853FE19
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 13:57:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242737AbiFGLRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 07:17:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57982 "EHLO
+        id S243280AbiFGL5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 07:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242735AbiFGLRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 07:17:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2AE79396B2
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 04:16:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654600617;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=s6D+tDPL1+VIqSmAaw2F3EdpteVx9cYLBbOFIaNeFvc=;
-        b=RwRUhrUsC9i2jpnApM4zKbrOcQ3ia66jY94VoPgCY2y8FnA8wZH8g8Qm2Y1A7vEP6GaHvi
-        CBmsPis0GiecZAuaPi5xPateYwX/mGFwLa6X9nM/y+vTQa0K3ASpEy0cgH5CafqZMuYQc2
-        4d25sj00zrj9JvehATBPIw0VEQ7zUnk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-235-TQfqeU4POKqoplHVLhA46g-1; Tue, 07 Jun 2022 07:16:54 -0400
-X-MC-Unique: TQfqeU4POKqoplHVLhA46g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4C89101A54E;
-        Tue,  7 Jun 2022 11:16:53 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 953CA82882;
-        Tue,  7 Jun 2022 11:16:53 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id AB5141800081; Tue,  7 Jun 2022 13:16:51 +0200 (CEST)
-Date:   Tue, 7 Jun 2022 13:16:51 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        isaku.yamahata@intel.com,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        with ESMTP id S243258AbiFGL5H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 07:57:07 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F40656403;
+        Tue,  7 Jun 2022 04:57:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z5bkzeFfz7hku6BLNt1DVLefLYtPWrVlLBLOQj6Tl1AhBc+B2pG7FW0lrTunLQ22McFKjnDJUubMwJLA9seBqepovxJM/N0+JrGz+W/Z0MhmHozJrY9SiDoD5oz8PNka3D4vxlru23BvrMQeLEKqqE/jRua2MOp9AC3tg9D1UoEhI8D/VnBMMjVdpksQ1WKaL5KtD8zdJ8+8kraSeIqI2/O0s4YPlcNI+49WRLCxCSb+EOljpQ4B2YBOks/JV+T5iC/38Okbt8VlaaOLO7oc9GeLVFmmt/QzSJj/0VzdUt5kIjGg8OIA9opcp62bWTR8SuYQn/DGnqQIZPDrQSw/Mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ex6m5qwnMkAXTA9LrGpCxi+Okw3ZZAIb0c5X6u+40Dc=;
+ b=SJVj0oOcZeQp7Eo5eoGOnC/2CKeUqrq/i/sglGbnlZCGFTFOtjNyxuRSUaeKUen59GXk5momKv+hmWLia4PFxCEw7+OGE269YmfQ4ISA4naenrdEVMM5hvoL+TM0K9x5z0V5psMairIsBwV/eFm11soMQwAD+VdgjYVSXXjvBqHVSJv7MvXhaPACdcUeQ4IRfLxOY6+tK3P0nGoaA2RHshvKrbz24WaCBYP8f4C4h3NQ1B41gcxjzlUHa2Fywp0h3eGoL2Ky88t6sYehKVEbaT1w9hTaPa3KhetOeExykVUBF+Wp5aFhFjnM4jMDK8Z9SnlcQ7HPbmvM1jw+a0a62g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ex6m5qwnMkAXTA9LrGpCxi+Okw3ZZAIb0c5X6u+40Dc=;
+ b=IVyqJfnT8PR9xoyVKwn6WvZvJlmWMnZc6kMM43xzNAKoVRdbNkB11Lz8t491SLWIT9lCQEXcUv5FbAXDo4JgJ9xq3EdLIEAEEWTnDb5+Dcctywpolop54WSxLeCtfP6IlNUZCJTLdL0jEXf9pWxRr50VEZr/ds8VSERUoB3r8J+1rHLB+hRYU9ItiDZaVhfD98rz55zLAo3QtdJx3l9p+ee8xyqQp4vfwTcbdtLGMop5LJhyzfnMMua2Co5ub1fbA8Bowh9n7m54LCXeFdgkF9WpC8dqUyJVfOaE2Ty31U6y1NHBNFRGDy51o3za9uAeX+3TymVD0pdf332ZPogj3w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MWHPR12MB1182.namprd12.prod.outlook.com (2603:10b6:300:b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13; Tue, 7 Jun
+ 2022 11:57:04 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::2484:51da:d56f:f1a5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::2484:51da:d56f:f1a5%9]) with mapi id 15.20.5314.019; Tue, 7 Jun 2022
+ 11:57:04 +0000
+Date:   Tue, 7 Jun 2022 08:57:02 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-Subject: Re: [RFC PATCH v4 11/36] i386/tdx: Initialize TDX before creating TD
- vcpus
-Message-ID: <20220607111651.2zjm7mx2gz3irqxo@sirius.home.kraxel.org>
-References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
- <20220512031803.3315890-12-xiaoyao.li@intel.com>
- <20220523092003.lm4vzfpfh4ezfcmy@sirius.home.kraxel.org>
- <d3e967f3-917f-27ce-1367-2dba23e5c241@intel.com>
- <20220524065719.wyyoba2ke73tx3nc@sirius.home.kraxel.org>
- <39341481-67b6-aba4-a25a-10abb398bec4@intel.com>
- <20220601075453.7qyd5z22ejgp37iz@sirius.home.kraxel.org>
- <9d00fd58-b957-3b8e-22ab-12214dcbbe97@intel.com>
-MIME-Version: 1.0
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Subject: Re: [PATCH 2/2] vfio: Replace the iommu notifier with a device list
+Message-ID: <20220607115702.GF1343366@nvidia.com>
+References: <0-v1-896844109f36+a-vfio_unmap_notif_jgg@nvidia.com>
+ <2-v1-896844109f36+a-vfio_unmap_notif_jgg@nvidia.com>
+ <20220607054437.GB8508@lst.de>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9d00fd58-b957-3b8e-22ab-12214dcbbe97@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220607054437.GB8508@lst.de>
+X-ClientProxiedBy: MN2PR06CA0019.namprd06.prod.outlook.com
+ (2603:10b6:208:23d::24) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 784a0f29-8ad3-45c6-c3f9-08da487cd684
+X-MS-TrafficTypeDiagnostic: MWHPR12MB1182:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR12MB118278472E4CCA4146781467C2A59@MWHPR12MB1182.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WLZDnnu0sAcUiIrdVv4uMUkO2fI1Dc0eXrcGcyruBM6C4rckIrgxsVyXdpN60rLc7VnX8acOf7AM/2NFCk+GebalW9ys18HL/OFxQJ1GkmcbzLVH3GppT4gBgQuUXsUztPyUWyRr+XQ3k40xP+Opsd4dL2SgFWZ6AYU0a0OgJlAIsxNg0Lrrs77k9ewz4ei0BZFOse7PJCk//d/7C5Uio3mJxRfeSks9xqSE2g7IKcNsOWUJCx/HxO+HAJpxJdqsw93y0BT01ZST8Kthid+Qt+jGAQZeEuyWnCOpfG1r9x69kdxeKnGHxswztDwIgYu6MUOhHzS+qtQKkz7QMtm5Kndp7Qe5lr8DUBnIpYM8VRDTiPaasIS3nu81KrVnsWSnqULV8jk2pdTCk+bhcqP2QYunfOB963wX1XqAS8B8JzyvzBIqp6RIljDct2WpW+WEPyFNhhhb6Qqv1tDHI3O+85jchINUFEsZy6abE0B59gx5fj8iGaTM0ZUvaRrUzWm5Cpr8whD7tsLLyh/PTdb0bakoUmeTskvwW4ETn5XPjW2ciV5TyYMWupKPl5qCVn9991y0nXUfFoOZ0uG+1+XKSsfhV+XdFDCSC3wKXiNjmowOAWEzUsUgFDGVD1x2lnFcij0xzr1iEEBiAd0RkrdGVA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(33656002)(5660300002)(36756003)(316002)(8676002)(2906002)(8936002)(7416002)(6506007)(4326008)(2616005)(66946007)(66556008)(66476007)(83380400001)(186003)(54906003)(38100700002)(6512007)(26005)(6916009)(86362001)(6486002)(508600001)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SmnLqpJWFVk93G5c/OMO9jtx+NymIaJf0JUmXrM6xE1A/U33+F1dEq3vUDS6?=
+ =?us-ascii?Q?fpPg8GAAtuAFphEIJ/fw+PlMrNQgoDtI9nhED/6Evo/XwmtbfCjDtlzvSEHF?=
+ =?us-ascii?Q?qImJmWCxMLsTfdWZNJQkJyEih+aCJfW+uA5uCNXyIx//Au3YB/nTcTkt4suR?=
+ =?us-ascii?Q?/Ui/O7rfBV4rujK6PInED3HVrgrwLgiFYf1H/3TIZM87mXcVCl9HkD7eL2Xz?=
+ =?us-ascii?Q?pp3eEue1TfX1Oq1Uq475k5qmczOdmrv3rnd44ef/kDdu9k03JP86vBALvywj?=
+ =?us-ascii?Q?o1JWWDsgN+g/9f4JlydUSqYVbsCDIwLgeXY7HFLZnMUFXI+k/qAM4zPmQspC?=
+ =?us-ascii?Q?1w4tfmKelkjSeuaO1M53C3iMzciDXo9viGCJugn1Wl4i2pSTe/WgvwPmbXL+?=
+ =?us-ascii?Q?SPUpz1pZnwtqnENLbClsOaP18x/bRjeYiCePACNQRPf1zp36Ud3RIzSkHYBe?=
+ =?us-ascii?Q?WiLM3NeHUm8l7FbpUXrq3fxlza6/GKYoIeW+MGHvE3YudkK5I3tQGa3isDFS?=
+ =?us-ascii?Q?hGFktZc97ZpoFSQb296ETT1vKrfhyChAsSwa4bs8eXABg2J6TK9OH14bTzk4?=
+ =?us-ascii?Q?TIfaWBvJ31unXyj4tAuQHmfV0GmZhQSD12MvN/MHf0xkdXdxVm49G4Yrv3LM?=
+ =?us-ascii?Q?lBgPVDiuXeNdxtV2IDoz4nmRI/wbX9ttcbJoo0PfgXkjSbBK8aLP97VCmm3x?=
+ =?us-ascii?Q?xNt0IBCVJJS6661JlhlP3fOCcXFylhRWABYM8bUIaTN3PSkO00v2C1lLrv7F?=
+ =?us-ascii?Q?DYMSwMUvobGsBGFzGYbmATXPQousOXkPoxqWyz6ylEV48P9W+eb/Rvzsj/63?=
+ =?us-ascii?Q?WiTF8G/5vhxtVaPORl7Hu1lQJ7bO1mdtTS1RG6EPlQzW6Yp8WRRjCWFnVhEe?=
+ =?us-ascii?Q?TTQ8lo143iFblpJjH6QV6Kkpa5BJZKvzXqdiM1a4kuLfvTOOeMmLoeouHvKI?=
+ =?us-ascii?Q?DwMbIxKNQxTe1MzsQjmYfDOure9x66u1RMa4fRdT76otnfPxWT80laFc4ARJ?=
+ =?us-ascii?Q?HOAh70optvzraAbBgpVXyfUWB4mu0ZALvMYpcIenyiKqi+tf0rmG9dlSPDC6?=
+ =?us-ascii?Q?3j8M47+SyFRikq9NfuiuXnrSonPx80UQyZLX5niski2hg7K81Dov7uCsPsoP?=
+ =?us-ascii?Q?JC2iC9zBSLaqtcFaCrVfUBa5X1GEA5ktfS0EfJtcMJpp0r5hutHjqtnB4C2t?=
+ =?us-ascii?Q?JUVqGw7/jQGYsvsUCX3CHYaFbdzpjGp4B49XO4GMA+3fJf83nLaI00eyLowc?=
+ =?us-ascii?Q?+y8yOWbcwr12pxh0OF8m3peFZTGjLd8IaId8m5Jy9u+v+CC9SGqxVbmc1fCY?=
+ =?us-ascii?Q?D/595ICEdN+gHFyq+hPVmyGWB6zYZMm9+Srx1TigXZfGg88ksRZm6zhLwoBS?=
+ =?us-ascii?Q?DRkpB3+Cv5o4EGG9vbGa1t2XSVLMFOUTlTJ/wVN7pnmanZNegnYYv/1pv5rS?=
+ =?us-ascii?Q?LS4IwwjOy8iIe0vbLcelBuDPN/P3etrCL9nRMPFd8rbwBB+K0GrUh3OiW5UF?=
+ =?us-ascii?Q?njQqgT0/+7wuF+OUqjU9ARxhzoelu26YSau2qoW5f5PDUEXFx5kvP1Rvnym2?=
+ =?us-ascii?Q?QoJpQhMWHDF0FoT1+OGm2EKKyxPWAz6YhXdmS71xenBSRL5G/szBbgUMxff4?=
+ =?us-ascii?Q?qiNnU1u14ZVbIdTzcbbNg+ekUAM8rUjcn+h1x52mkJJLF3+Ot5e4vyv68Np7?=
+ =?us-ascii?Q?hFWOjWBEu2Nb4xNn0/Vf7Ni+vMjGPMzkyxGKqp6fV1AC2chg5XDGRwroohmD?=
+ =?us-ascii?Q?BkQcDQIowg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 784a0f29-8ad3-45c6-c3f9-08da487cd684
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2022 11:57:04.0703
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 30zKiZMto7nL9sKpURc/8dI42Vk6JK0LfizLVynMuMhO9EvQOBvT5tHWd8JYjJFV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1182
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
+On Tue, Jun 07, 2022 at 07:44:37AM +0200, Christoph Hellwig wrote:
+> On Mon, Jun 06, 2022 at 09:34:36PM -0300, Jason Gunthorpe wrote:
+> > +			if (!list_empty(&iommu->device_list)) {
+> > +				mutex_lock(&iommu->device_list_lock);
+> > +				mutex_unlock(&iommu->lock);
+> > +
+> > +				list_for_each_entry(device,
+> > +						    &iommu->device_list,
+> > +						    iommu_entry)
+> > +					device->ops->dma_unmap(
+> > +						device, dma->iova, dma->size);
+> > +
+> > +				mutex_unlock(&iommu->device_list_lock);
+> > +				mutex_lock(&iommu->lock);
+> > +			}
+> 
+> I wonder if factoring this into a little helper instead of the
+> very deep indentation might be a bit better for readability.
+> 
+> > +static void vfio_iommu_type1_register_device(void *iommu_data,
+> > +					     struct vfio_device *vdev)
+> >  {
+> >  	struct vfio_iommu *iommu = iommu_data;
+> >  
+> > +	if (!vdev->ops->dma_unmap)
+> > +		return;
+> >  
+> > +	mutex_lock(&iommu->lock);
+> > +	mutex_lock(&iommu->device_list_lock);
+> > +	list_add(&vdev->iommu_entry, &iommu->device_list);
+> > +	mutex_unlock(&iommu->device_list_lock);
+> > +	mutex_unlock(&iommu->lock);
+> 
+> Why do we need both iommu->lock and the device_list_lock everywhere?
 
-> > I guess it could be helpful for the discussion when you can outine the
-> > 'big picture' for tdx initialization.  How does kvm accel setup look
-> > like without TDX, and what additional actions are needed for TDX?  What
-> > ordering requirements and other constrains exist?
-> 
-> To boot a TDX VM, it requires several changes/additional steps in the flow:
-> 
->  1. specify the vm type KVM_X86_TDX_VM when creating VM with
->     IOCTL(KVM_CREATE_VM);
-> 	- When initializing KVM accel
-> 
->  2. initialize VM scope configuration before creating any VCPU;
-> 
->  3. initialize VCPU scope configuration;
-> 	- done inside machine_init_done_notifier;
-> 
->  4. initialize virtual firmware in guest private memory before vcpu running;
-> 	- done inside machine_init_done_notifier;
-> 
->  5. finalize the TD's measurement;
-> 	- done inside machine init_done_notifier;
-> 
-> 
-> And we are discussing where to do step 2).
-> 
-> We can find from the code of tdx_pre_create_vcpu(), that it needs
-> cpuid entries[] and attributes as input to KVM.
-> 
->   cpuid entries[] is set up by kvm_x86_arch_cpuid() mainly based on
->   'CPUX86State *env'
-> 
->   attributes.pks is retrieved from env->features[]
->   and attributes.pmu is retrieved from x86cpu->enable_pmu
-> 
-> to make VM-socpe data is consistent with VCPU data, we do choose the point
-> late enough to ensure all the info/configurations from VCPU are settle down,
-> that just before calling KVM API to do VCPU-scope configuration.
+Not everwhere, all the readers are using only one of the locks.  The
+list empty calls that were previously unlocked are done under the
+iommu->lock and only the list iteration was done under the
+device_list.
 
-So essentially tdx defines (some) vcpu properties at vm scope?  Given
-that all vcpus typically identical (and maybe tdx even enforces this)
-this makes sense.
+> Maybe explain the locking scheme somewhere so that people don't have
+> to guess, because it seems to me that just using iommu->lock would
+> be enough right now.
 
-A comment in the source code explaining this would be good.
+The expectation is that the dma_umap callback will re-enter the type1
+driver via vfio_unpin_pages calls and this will recurse back onto the
+iommu->lock - so it must be dropped before invoking the callback.
 
-thanks,
-  Gerd
+I'll add a note
 
+Jason
