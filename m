@@ -2,96 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1515C53F2BE
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 01:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5861353F2E9
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 02:21:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231345AbiFFXql (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 19:46:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55150 "EHLO
+        id S235432AbiFGAUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 20:20:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235335AbiFFXqj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 19:46:39 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF98C03A9
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 16:46:39 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id x16so8254661qtw.12
-        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 16:46:39 -0700 (PDT)
+        with ESMTP id S230023AbiFGAUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 20:20:54 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7374DC5DBC
+        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 17:20:52 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id q7so21884031wrg.5
+        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 17:20:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=j1H7IqILsLgN2CLXPDKK6acRAfuZh56Xcw12qco3jXo=;
-        b=bc9kiCl7t9BZtFVHNxzFELos2shypIE0YUTZCngM0Yp7jg9XtY9c6eUzlTZP2E1Jk5
-         AXxKO4dl1Ci4IwS1k/Sh25q55jcee0jvpBKkK95nwry1tJxmgXCek/f5NPaXEhFIuWw+
-         4ppyLgdp95IsMou+3NZPE4LClKvKT/DTg56fW9rT9uxjn/L9KpsViEA+dYagM/H74iqz
-         PSm9+uW7uTYReIf6JlsHjyweJ0+MaCdVncu97/sSvSqrDeNIudGRAYg5bXmOFBfW8INF
-         g/haibEx0ibK72fG0Oi2l0qAsZXAPcwu+MjNxjQpYDlwYQc1j6SktB/0rZzAb4vMeQSa
-         QmEg==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DMGzLGJzBT5T5b9r1J4zZuri0cLPViU0feoULeNGdLY=;
+        b=oKDGVKm9F8zo/W+3dYhfwstlQfxZhRht93GrC1XCeJloml8fDQgLoynuKZfjGe+tse
+         mrQEuAvRAuXVFbvfjbfFXwPCREHvKyfDEsXPxcRDaSIUyEc/5ks90/LxV9p/1f7vTLXN
+         0qTOOaWD1SVMuLZAYzZbMSjLGylotunMJTEBR82Kzn5QxTi/DkBJ/kuxW5xnOKo295Bf
+         iQ0wGcNuyYi/KtFbmVLnKNyC+hbDsaG5+1Xdp61+UQD43pSFREdTcC9V6mUoooaEuxyo
+         hUx53uwhPBcoBIsK6PEmzc9pxijDzb6xC9qR4cNUsNoV9GtRlKG59ybKoCqgfFyRgPob
+         6ETg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=j1H7IqILsLgN2CLXPDKK6acRAfuZh56Xcw12qco3jXo=;
-        b=usBIOZ4K1NIjWnFjJuXDSgLnGskBGevjoN6IWGP+lEFZn9maaOwrnZEASpkrEYGg6m
-         Bftd4VINJ5nQM6PNAk5G8ih3fQ9y5Nhoa3DJ7jYBw6iCKymozIljqhWd3j1Yvx/aw+Zy
-         FcGmv7m+Rf8XfkhmCquV2gGTJ4WrlubO9E/KyTBF+Z5cgoCGXYyRo2M6UGH8/BU/ZTE4
-         aRfiWk0XKykQlEjs1Nsc7PyExVPWj5DQFkk7wMR+ytzM70AZ8sRBLexImSgEBQMglvmX
-         trTj69vrqeINVgQ3TmYawU/ynwywUJbQZWfWfIKqqs0BwvXMHJWnKnNFo2mS4hdW+xbq
-         H68Q==
-X-Gm-Message-State: AOAM532Xg+pEmMD4TOtFVNsGTKqhey8OBpM8q+69Wpx2nLU347tLHFEp
-        Zn49IsAD65HgLDrauklCj3HPEg==
-X-Google-Smtp-Source: ABdhPJz68POlk+9eI9qP8Z7p2wfePXMmY+ovCyRTsxy5OMhFkzf6KgrRPgaa4PQPV7u/FDrTKaAJuA==
-X-Received: by 2002:ac8:5f0b:0:b0:2f9:3e0c:b569 with SMTP id x11-20020ac85f0b000000b002f93e0cb569mr20105545qta.663.1654559198226;
-        Mon, 06 Jun 2022 16:46:38 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id cb24-20020a05622a1f9800b002fc8a2c14c0sm11031129qtb.66.2022.06.06.16.46.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jun 2022 16:46:37 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1nyMQf-002q3r-3h; Mon, 06 Jun 2022 20:46:37 -0300
-Date:   Mon, 6 Jun 2022 20:46:37 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org
-Subject: Re: [PATCH 8/8] vfio/mdev: remove mtype_get_parent_dev
-Message-ID: <20220606234637.GI3932382@ziepe.ca>
-References: <20220603063328.3715-1-hch@lst.de>
- <20220603063328.3715-9-hch@lst.de>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DMGzLGJzBT5T5b9r1J4zZuri0cLPViU0feoULeNGdLY=;
+        b=P9AB+pACDSSIPzR83NbEnfaji68bZKej1D1/M7iF1PIuImX0tmFdqc8W/EmZHov8pE
+         Rl81akgSH03P4sN/3ozAmKKXQDm21b+B3ddANCbojqcxq9jERQXFXRYfDl2ZuOIX6SHn
+         W23CdJ9hQLlnmj4rKi9ytUZDdpweRUrAeHtF3GY/IjoT6yCiPjQaK7mper0bFF3/m485
+         IyFbpK6S0uuKJ4m1pXs4mCDt21NN7pf+7hA/y/06SN8683oyRDuhdDpWVJHuy0k1gBQ5
+         1ZbO88EPXPWcDoZADM+DuXatmn57dI+sYojkXjpBA1RwX/mrVkm9k8JKRxhQvYknQMsp
+         giHA==
+X-Gm-Message-State: AOAM532K5dbHTKPdJ8FWdncQ3tICtZOKTUxuMwiPRD70bOwbIfSYreWt
+        2H2JKkOq4vUmg5QJ5fCwQ8Hkhj58IQVyBcvJU8mYig==
+X-Google-Smtp-Source: ABdhPJx+8X8hTzr3xVfvuroF0RVItmgqlm+YewhrD+ZiGchKPEilEhhxIlhTvdnxLo0na+sWqpTBG04Oqv1fgRtR+aY=
+X-Received: by 2002:a5d:4b10:0:b0:213:5e0:2c6c with SMTP id
+ v16-20020a5d4b10000000b0021305e02c6cmr23716926wrq.126.1654561250805; Mon, 06
+ Jun 2022 17:20:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220603063328.3715-9-hch@lst.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220519134204.5379-1-will@kernel.org> <20220519134204.5379-60-will@kernel.org>
+ <CAMn1gO4_d75_88fg5hcnBqx+tdu-9pG7atzt-qUD1nhUNs5TyQ@mail.gmail.com>
+ <CA+EHjTx328na4FDfKU-cdLX+SV4MmKfMKKrTHo5H0=iB2GTQ+A@mail.gmail.com>
+ <Ypl5TdMN3J/tttNe@google.com> <87v8tgltqy.wl-maz@kernel.org>
+In-Reply-To: <87v8tgltqy.wl-maz@kernel.org>
+From:   Peter Collingbourne <pcc@google.com>
+Date:   Mon, 6 Jun 2022 17:20:39 -0700
+Message-ID: <CAMn1gO7mP_QTb+fkfvc6qQoN0aU6TwkExU-Wj+VR6rjBsmhs1g@mail.gmail.com>
+Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
+        kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oupton@google.com>, kernel-team@android.com,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 03, 2022 at 08:33:28AM +0200, Christoph Hellwig wrote:
-> Just open code the dereferences in the only user.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/s390/cio/vfio_ccw_ops.c |  3 +--
->  drivers/vfio/mdev/mdev_core.c   | 10 ----------
->  include/linux/mdev.h            |  2 --
->  3 files changed, 1 insertion(+), 14 deletions(-)
+On Sat, Jun 4, 2022 at 1:26 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 03 Jun 2022 04:00:29 +0100,
+> Peter Collingbourne <pcc@google.com> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Fri, May 27, 2022 at 08:55:42AM +0100, Fuad Tabba wrote:
+> > > Hi Peter,
+> > >
+> > > On Thu, May 26, 2022 at 9:08 PM Peter Collingbourne <pcc@google.com> wrote:
+> > > >
+> > > > On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
+> > > > >
+> > > > > From: Fuad Tabba <tabba@google.com>
+> > > > >
+> > > > > Return an error (-EINVAL) if trying to enable MTE on a protected
+> > > > > vm.
+> > > >
+> > > > I think this commit message needs more explanation as to why MTE is
+> > > > not currently supported in protected VMs.
+> > >
+> > > Yes, we need to explain this more. Basically this is an extension of
+> > > restricting features for protected VMs done earlier [*].
+> > >
+> > > Various VM feature configurations are allowed in KVM/arm64, each requiring
+> > > specific handling logic to deal with traps, context-switching and potentially
+> > > emulation. Achieving feature parity in pKVM therefore requires either elevating
+> > > this logic to EL2 (and substantially increasing the TCB) or continuing to trust
+> > > the host handlers at EL1. Since neither of these options are especially
+> > > appealing, pKVM instead limits the CPU features exposed to a guest to a fixed
+> > > configuration based on the underlying hardware and which can mostly be provided
+> > > straightforwardly by EL2.
+> > >
+> > > This of course can change in the future and we can support more
+> > > features for protected VMs as needed. We'll expand on this commit
+> > > message when we respin.
+> > >
+> > > Also note that this only applies to protected VMs. Non-protected VMs
+> > > in protected mode support MTE.
+> >
+> > I see. In this case unless I'm missing something the EL2 side seems
+> > quite trivial though (flipping some bits in HCR_EL2). The patch below
+> > (in place of this one) seems to make MTE work in my test environment
+> > (patched [1] crosvm on Android in MTE-enabled QEMU).
+> >
+> > [1] https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm/+/3689015
+> >
+> > From c87965cd14515586d487872486e7670874209113 Mon Sep 17 00:00:00 2001
+> > From: Peter Collingbourne <pcc@google.com>
+> > Date: Thu, 2 Jun 2022 19:16:02 -0700
+> > Subject: [PATCH] arm64: support MTE in protected VMs
+> >
+> > Enable HCR_EL2.ATA while running a vCPU with MTE enabled.
+> >
+> > To avoid exposing MTE tags from the host to protected VMs, sanitize
+> > tags before donating pages.
+> >
+> > Signed-off-by: Peter Collingbourne <pcc@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pkvm.h | 4 +++-
+> >  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 6 +++---
+> >  arch/arm64/kvm/mmu.c              | 4 +++-
+> >  3 files changed, 9 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > index 952e3c3fa32d..9ca9296f2a25 100644
+> > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > @@ -73,10 +73,12 @@ void kvm_shadow_destroy(struct kvm *kvm);
+> >   * Allow for protected VMs:
+> >   * - Branch Target Identification
+> >   * - Speculative Store Bypassing
+> > + * - Memory Tagging Extension
+> >   */
+> >  #define PVM_ID_AA64PFR1_ALLOW (\
+> >       ARM64_FEATURE_MASK(ID_AA64PFR1_BT) | \
+> > -     ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) \
+> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) | \
+> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_MTE) \
+> >       )
+> >
+> >  /*
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index e33ba9067d7b..46ddd9093ac7 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > @@ -88,7 +88,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
+> >       /* Memory Tagging: Trap and Treat as Untagged if not supported. */
+> >       if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), feature_ids)) {
+> >               hcr_set |= HCR_TID5;
+> > -             hcr_clear |= HCR_DCT | HCR_ATA;
+> > +             hcr_clear |= HCR_ATA;
+> >       }
+> >
+> >       vcpu->arch.hcr_el2 |= hcr_set;
+> > @@ -179,8 +179,8 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
+> >        * - Feature id registers: to control features exposed to guests
+> >        * - Implementation-defined features
+> >        */
+> > -     vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS |
+> > -                          HCR_TID3 | HCR_TACR | HCR_TIDCP | HCR_TID1;
+> > +     vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS | HCR_TID3 | HCR_TACR | HCR_TIDCP |
+> > +                          HCR_TID1 | HCR_ATA;
+> >
+> >       if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
+> >               /* route synchronous external abort exceptions to EL2 */
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 392ff7b2362d..f513852357f7 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1206,8 +1206,10 @@ static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >               goto dec_account;
+> >       }
+> >
+> > -     write_lock(&kvm->mmu_lock);
+> >       pfn = page_to_pfn(page);
+> > +     sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
+> > +
+> > +     write_lock(&kvm->mmu_lock);
+>
+> Is it really safe to rely on the host to clear the tags? My guts
+> feeling says that it isn't. If it is required, we cannot leave this
+> responsibility to the host, and this logic must be moved to EL2. And
+> if it isn't, then we should drop it.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+The goal here isn't to protect the guest. It's already the case that
+whatever the page contents are when the page is donated (from the
+perspective of the KVM client), that's what the guest sees. That
+applies to both data and (in non-protected VMs) tags.
 
-Jason
+The code that I added here is for solving a different problem, which
+is to avoid exposing stale host state to the guest, which the KVM
+client may not even be aware of. We sanitize pages before exposing
+them in non-protected VMs for the same reason.
+
+> >       ret = pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT);
+> >       if (ret) {
+> >               if (ret == -EAGAIN)
+>
+> But the bigger picture here is what ensures that the host cannot mess
+> with the guest tags? I don't think we have a any mechanism to
+> guarantee that, specially on systems where the tags are only a memory
+> carve-out, which the host could map and change at will.
+
+Right, I forgot about that. We probably only want to expose MTE to
+guests if we have some indication (through the device tree or ACPI) of
+how to protect the guest tag storage.
+
+> In any case, this isn't the time to pile new features on top of
+> pKVM. The current plan is to not support MTE at all, and only do it
+> once we have a definitive story on page donation (which as you may
+> have noticed, is pretty hacky). I don't see any compelling reason to
+> add MTE to the mix until this is solved.
+
+It sounds reasonable to land a basic set of features to begin with and
+add MTE later. I'll develop my MTE-in-pKVM patch series as a followup
+on top of this series.
+
+Peter
