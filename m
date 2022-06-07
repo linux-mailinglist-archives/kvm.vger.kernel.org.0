@@ -2,182 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEB61541362
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 21:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 443A5541746
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 23:03:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357899AbiFGT7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 15:59:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
+        id S1377504AbiFGVCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 17:02:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357941AbiFGT7C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 15:59:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 312081BBACE
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 11:24:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654626234;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P4f3wHn7jIrIURtw341a5ADfTmzk5i8t59cyMFQz5Qc=;
-        b=Xw4HHWK9BFohqfbyqXsndyNgX19ayI7Gri9nvVyAhnDSAS69b3VGCx5V+2JkJo2Pm6n78f
-        eOdI75AOMO6uAafiZiDTCndifelG6JaNCAf8WoiJt5UZ9yJRsS5kMvG62DbTJNUVKqbBy3
-        1S7frUjuyDro36D10+XguV9r3j4lLVc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-86--1rTJZggMOC_Em0mQJ-ZVQ-1; Tue, 07 Jun 2022 14:23:53 -0400
-X-MC-Unique: -1rTJZggMOC_Em0mQJ-ZVQ-1
-Received: by mail-wr1-f71.google.com with SMTP id p10-20020adfaa0a000000b0020c4829af5fso4197681wrd.16
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 11:23:53 -0700 (PDT)
+        with ESMTP id S1379337AbiFGVCW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 17:02:22 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539A663BFF
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 11:47:46 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id i1so15550719plg.7
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 11:47:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Bq3CtL8r5GfIJRMEMuTZRaNrH6+E6V3L1A1y/G7x4zc=;
+        b=sDU6k8EIeE4SYgNY6ZlLksQCk0G6UMR2ghuXPDr+ezKXYMLOJy1JV6bqlaYICD6A+f
+         szfP31/juK1NYkXSgNCUF3MVDOBERVY7OFSo5FGzrJJlFXN3QtrwVpPrQuheoGPrgJ2n
+         8oMOx3z/d/tA/M2cwPP+6RbIDju8wuuUXjaMPRxO5hH4D4sKETHImRROElbe//aaOtpO
+         OogLtnIuwKN+DcCAPGyJlFax0yhmAoZ+rpZadMYHcKoPtZu+IxTNJ5IzBobLLH7anQe5
+         BJyo82k0NfaW8Na1TZ9yPTtPgjrfAAq8oZFwBN6K9DQIZ2j1A5DMsvm5naVtimv1XKxj
+         9K4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=P4f3wHn7jIrIURtw341a5ADfTmzk5i8t59cyMFQz5Qc=;
-        b=0MIIOYWd+RqVPxY6em/28yEYi1fnMIFJX8gn24sCeO1gp8Pu1vkj0s8ImQNlEgIgDH
-         Gfd04KB/lHbRbbBJLSObHjjgudkYJs6DjQEtrwWzur3fK2jhfZCMCXc8dJxLNXzmLaq0
-         mK9fDW5IILNocDwMgtElv28kpYsa0CEe6RI0ks+CJWhOACedIaNMRoDYkUV7xAbFu7Mx
-         Mz2NdpRR4mKPebJWzZwgD5vkB/x6gf1UOQXXOjmthbzzfT/NwOs8IpNRyikdjuOJjznr
-         GA6GUC41t2VjG+ow76wtws6JqV/JPVX6HceEGu1ryxtrTwQw0uIzaatj+R5uDIajZKVA
-         L0QA==
-X-Gm-Message-State: AOAM5311srSdxfmzV5qtIGYW/WnrQz86XJjjeT5XUR3lVd8DOIDfqnsi
-        p7Nq0aerdC+Mk7mItxXVCLx09EDEs2cAC3YQzJeTW4iKs5R9xN6NTpJ7aQbY8Z0NmvHMZa5s/l3
-        OlzhpwrD4pkzh
-X-Received: by 2002:a05:6000:711:b0:217:371e:b7ff with SMTP id bs17-20020a056000071100b00217371eb7ffmr16261824wrb.127.1654626232063;
-        Tue, 07 Jun 2022 11:23:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/N4WjMmddIXMJgSScZ/qUGCGSnIp6UQDq474dS3NmqfffRft8Ws4ePchj9FzlpDpPJ0DOSA==
-X-Received: by 2002:a05:6000:711:b0:217:371e:b7ff with SMTP id bs17-20020a056000071100b00217371eb7ffmr16261787wrb.127.1654626231742;
-        Tue, 07 Jun 2022 11:23:51 -0700 (PDT)
-Received: from minerva.home (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
-        by smtp.gmail.com with ESMTPSA id m8-20020a05600c4f4800b003942a244f51sm28267502wmq.42.2022.06.07.11.23.50
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Bq3CtL8r5GfIJRMEMuTZRaNrH6+E6V3L1A1y/G7x4zc=;
+        b=AM67/ra9bZuPb30YJ3MSXZmpdAd1zUKdeqrbap7Qo64ItC7DZByLMNB7AFb3NEkMVk
+         yUp1NjX2Wz5ZCN9lGIxGjc/5+E8SKslKaN26o06d6kp3y58n1K/6O4TwjzLeqozeLwey
+         x02Cnxe9AIZy6L+Gm0CvopI2e1yR6RgQemUra0jHeLO8y4ZjSWtiEYnZvc3QwzD9GdDL
+         5iTXUor56/vpliwOvRhW8YgPbW7GAgWK0db5UMu2lVMyYQh3t6yGrDhYalQWdjxRpa8m
+         yeoZgQv/cHuHxlQxNM2KgTTPj4m2WPUYR3SrKM0yBfY6A0hcXdGP5osuZlIOfxvjvdto
+         LWkQ==
+X-Gm-Message-State: AOAM5322Ma8sXKOylKbnniQdULFBkyvkmd08EwUpaaVY4s03uZwE7QhY
+        KGfeJuKrg98gdHw7sGjFa3VrAw==
+X-Google-Smtp-Source: ABdhPJw2TQiN59DdW/xnGa/aGBjV90W4P/iGe+cof3kKAjRB7iSLHq2N5nUHqvDvem8J6DBDZYGOGg==
+X-Received: by 2002:a17:903:3296:b0:164:13db:509 with SMTP id jh22-20020a170903329600b0016413db0509mr30245225plb.128.1654627665924;
+        Tue, 07 Jun 2022 11:47:45 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k130-20020a628488000000b0051c03229a2bsm6037107pfd.21.2022.06.07.11.47.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 11:23:51 -0700 (PDT)
-From:   Javier Martinez Canillas <javierm@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     dri-devel@lists.freedesktop.org,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        kernel test robot <lkp@intel.com>,
-        Jens Frederich <jfrederich@gmail.com>,
-        Jon Nettleton <jon.nettleton@gmail.com>,
-        linux-staging@lists.linux.dev,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Javier Martinez Canillas <javierm@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Helge Deller <deller@gmx.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Sam Ravnborg <sam@ravnborg.org>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Zhen Lei <thunder.leizhen@huawei.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Xiyu Yang <xiyuyang19@fudan.edu.cn>,
-        linux-fbdev@vger.kernel.org, Zheyu Ma <zheyuma97@gmail.com>,
-        Guenter Roeck <linux@roeck-us.net>
-Subject: [PATCH v6 5/5] fbdev: Make registered_fb[] private to fbmem.c
-Date:   Tue,  7 Jun 2022 20:23:38 +0200
-Message-Id: <20220607182338.344270-6-javierm@redhat.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220607182338.344270-1-javierm@redhat.com>
-References: <20220607182338.344270-1-javierm@redhat.com>
+        Tue, 07 Jun 2022 11:47:45 -0700 (PDT)
+Date:   Tue, 7 Jun 2022 18:47:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Leonardo Bras <leobras@redhat.com>,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org,
+        chang.seok.bae@intel.com, luto@kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
+ user_xfeatures to supported bits of XCR0
+Message-ID: <Yp+dTU4NOaIELJh8@google.com>
+References: <20220301201344.18191-1-sashal@kernel.org>
+ <20220301201344.18191-7-sashal@kernel.org>
+ <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
+ <YppVupW+IWsm7Osr@xz-m1.local>
+ <2d9ba70b-ac18-a461-7a57-22df2c0165c6@redhat.com>
+ <Yp5xSi6P3q187+A+@xz-m1.local>
+ <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
+ <Yp9o+y0NcRW/0puA@google.com>
+ <Yp+WUoA+6x7ZpsaM@xz-m1.local>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yp+WUoA+6x7ZpsaM@xz-m1.local>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Daniel Vetter <daniel.vetter@ffwll.ch>
+On Tue, Jun 07, 2022, Peter Xu wrote:
+> On Tue, Jun 07, 2022 at 03:04:27PM +0000, Sean Christopherson wrote:
+> > On Tue, Jun 07, 2022, Paolo Bonzini wrote:
+> > > On 6/6/22 23:27, Peter Xu wrote:
+> > > > On Mon, Jun 06, 2022 at 06:18:12PM +0200, Paolo Bonzini wrote:
+> > > > > > However there seems to be something missing at least to me, on why it'll
+> > > > > > fail a migration from 5.15 (without this patch) to 5.18 (with this patch).
+> > > > > > In my test case, user_xfeatures will be 0x7 (FP|SSE|YMM) if without this
+> > > > > > patch, but 0x0 if with it.
+> > > > > 
+> > > > > What CPU model are you using for the VM?
+> > > > 
+> > > > I didn't specify it, assuming it's qemu64 with no extra parameters.
+> > > 
+> > > Ok, so indeed it lacks AVX and this patch can have an effect.
+> > > 
+> > > > > For example, if the source lacks this patch but the destination has it,
+> > > > > the source will transmit YMM registers, but the destination will fail to
+> > > > > set them if they are not available for the selected CPU model.
+> > > > > 
+> > > > > See the commit message: "As a bonus, it will also fail if userspace tries to
+> > > > > set fpu features (with the KVM_SET_XSAVE ioctl) that are not compatible to
+> > > > > the guest configuration.  Such features will never be returned by
+> > > > > KVM_GET_XSAVE or KVM_GET_XSAVE2."
+> > > > 
+> > > > IIUC you meant we should have failed KVM_SET_XSAVE when they're not aligned
+> > > > (probably by failing validate_user_xstate_header when checking against the
+> > > > user_xfeatures on dest host). But that's probably not my case, because here
+> > > > KVM_SET_XSAVE succeeded, it's just that the guest gets a double fault after
+> > > > the precopy migration completes (or for postcopy when the switchover is
+> > > > done).
+> > > 
+> > > Difficult to say what's happening without seeing at least the guest code
+> > > around the double fault (above you said "fail a migration" and I thought
+> > > that was a different scenario than the double fault), and possibly which was
+> > > the first exception that contributed to the double fault.
+> > 
+> > Regardless of why the guest explodes in the way it does, is someone planning on
+> > bisecting this (if necessary?) and sending a backport to v5.15?  There's another
+> > bug report that is more than likely hitting the same bug.
+> 
+> What's the bisection you mentioned?  I actually did a bisection and I also
+> checked reverting Leo's change can also fix this issue.  Or do you mean
+> something else?
 
-Well except when the olpc dcon fbdev driver is enabled, that thing
-digs around in there in rather unfixable ways.
+Oooooh, sorry!  I got completely turned around.  You ran into a bug with the
+fix.  I thought that you were hitting the same issues as Mike where migrating
+between hosts with different capabilities is broken in v5.15, but works in v5.18.
 
-Cc oldc_dcon maintainers as fyi.
+> > https://lore.kernel.org/all/48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net
+> 
+> That is kvm64, and I agree it could be the same problem since both qemu64
+> and kvm64 models do not have any xsave feature bit declared in cpuid 0xd,
+> so potentially we could be migrating some fpu states to it even with
+> user_xfeatures==0 on dest host.
+> 
+> So today I continued the investigation, and I think what's really missing
+> is qemu seems to be ignoring the user_xfeatures check for KVM_SET_XSAVE and
+> continues even if it returns -EINVAL.  IOW, I'm wondering whether we should
+> fail properly and start to check kvm_arch_put_registers() retcode.  But
+> that'll be a QEMU fix, and it'll at least not causing random faults
+> (e.g. double faults) in guest but we should fail the migration gracefully.
+> 
+> Sean: a side note is that I can also easily trigger one WARN_ON_ONCE() in
+> your commit 98c25ead5eda5 in kvm_arch_vcpu_ioctl_run():
+> 
+> 	WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
+> 
+> It'll be great if you'd like to check that up.
 
-v2: I typoed the config name (0day)
+Ugh, userspace can force KVM_MP_STATE_UNINITIALIZED via KVM_SET_MP_STATE.  Looks
+like QEMU does that when emulating RESET.
 
-Cc: kernel test robot <lkp@intel.com>
-Cc: Jens Frederich <jfrederich@gmail.com>
-Cc: Jon Nettleton <jon.nettleton@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-staging@lists.linux.dev
-Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-Reviewed-by: Javier Martinez Canillas <javierm@redhat.com>
-Cc: Daniel Vetter <daniel@ffwll.ch>
-Cc: Helge Deller <deller@gmx.de>
-Cc: Matthew Wilcox <willy@infradead.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Zhen Lei <thunder.leizhen@huawei.com>
-Cc: Alex Deucher <alexander.deucher@amd.com>
-Cc: Xiyu Yang <xiyuyang19@fudan.edu.cn>
-Cc: linux-fbdev@vger.kernel.org
-Cc: Zheyu Ma <zheyuma97@gmail.com>
-Cc: Guenter Roeck <linux@roeck-us.net>
-Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
----
+Logically, a full RESET of the xAPIC seems like the right thing to do.  I think
+we can get away with that without breaking ABI?  And kvm_lapic_reset() has a
+related bug where it stops the HR timer but not doesn't handle the HV timer :-/
 
-(no changes since v1)
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index e69b83708f05..948aba894245 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2395,7 +2395,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+                return;
 
- drivers/video/fbdev/core/fbmem.c | 8 ++++++--
- include/linux/fb.h               | 7 +++----
- 2 files changed, 9 insertions(+), 6 deletions(-)
+        /* Stop the timer in case it's a reset to an active apic */
+-       hrtimer_cancel(&apic->lapic_timer.timer);
++       cancel_apic_timer(&apic->lapic_timer.timer);
 
-diff --git a/drivers/video/fbdev/core/fbmem.c b/drivers/video/fbdev/core/fbmem.c
-index e0720fef0ee6..bdb08b665b43 100644
---- a/drivers/video/fbdev/core/fbmem.c
-+++ b/drivers/video/fbdev/core/fbmem.c
-@@ -50,10 +50,14 @@
- static DEFINE_MUTEX(registration_lock);
- 
- struct fb_info *registered_fb[FB_MAX] __read_mostly;
--EXPORT_SYMBOL(registered_fb);
--
- int num_registered_fb __read_mostly;
-+#if IS_ENABLED(CONFIG_FB_OLPC_DCON)
-+EXPORT_SYMBOL(registered_fb);
- EXPORT_SYMBOL(num_registered_fb);
-+#endif
-+#define for_each_registered_fb(i)		\
-+	for (i = 0; i < FB_MAX; i++)		\
-+		if (!registered_fb[i]) {} else
- 
- bool fb_center_logo __read_mostly;
- 
-diff --git a/include/linux/fb.h b/include/linux/fb.h
-index bbe1e4571899..c563e24b6293 100644
---- a/include/linux/fb.h
-+++ b/include/linux/fb.h
-@@ -632,16 +632,15 @@ extern int fb_get_color_depth(struct fb_var_screeninfo *var,
- extern int fb_get_options(const char *name, char **option);
- extern int fb_new_modelist(struct fb_info *info);
- 
-+#if IS_ENABLED(CONFIG_FB_OLPC_DCON)
- extern struct fb_info *registered_fb[FB_MAX];
+        /* The xAPIC ID is set at RESET even if the APIC was already enabled. */
+        if (!init_event)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 540651cd28d7..ed2c7cb1642d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10912,6 +10912,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+             mp_state->mp_state == KVM_MP_STATE_INIT_RECEIVED))
+                goto out;
+
++       if (mp_state->mp_state == KVM_MP_STATE_UNINITIALIZED)
++               kvm_lapic_reset(vcpu, false);
 +
- extern int num_registered_fb;
-+#endif
- extern bool fb_center_logo;
- extern int fb_logo_count;
- extern struct class *fb_class;
- 
--#define for_each_registered_fb(i)		\
--	for (i = 0; i < FB_MAX; i++)		\
--		if (!registered_fb[i]) {} else
--
- static inline void lock_fb_info(struct fb_info *info)
- {
- 	mutex_lock(&info->lock);
--- 
-2.36.1
-
+        if (mp_state->mp_state == KVM_MP_STATE_SIPI_RECEIVED) {
+                vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
+                set_bit(KVM_APIC_SIPI, &vcpu->arch.apic->pending_events);
