@@ -2,54 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 443A5541746
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 23:03:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FE185418F2
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 23:18:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377504AbiFGVCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 17:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49394 "EHLO
+        id S1359827AbiFGVSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 17:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379337AbiFGVCW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 17:02:22 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539A663BFF
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 11:47:46 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id i1so15550719plg.7
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 11:47:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Bq3CtL8r5GfIJRMEMuTZRaNrH6+E6V3L1A1y/G7x4zc=;
-        b=sDU6k8EIeE4SYgNY6ZlLksQCk0G6UMR2ghuXPDr+ezKXYMLOJy1JV6bqlaYICD6A+f
-         szfP31/juK1NYkXSgNCUF3MVDOBERVY7OFSo5FGzrJJlFXN3QtrwVpPrQuheoGPrgJ2n
-         8oMOx3z/d/tA/M2cwPP+6RbIDju8wuuUXjaMPRxO5hH4D4sKETHImRROElbe//aaOtpO
-         OogLtnIuwKN+DcCAPGyJlFax0yhmAoZ+rpZadMYHcKoPtZu+IxTNJ5IzBobLLH7anQe5
-         BJyo82k0NfaW8Na1TZ9yPTtPgjrfAAq8oZFwBN6K9DQIZ2j1A5DMsvm5naVtimv1XKxj
-         9K4A==
+        with ESMTP id S1380456AbiFGVQU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 17:16:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39B5D21D3CC
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 11:55:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654628105;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=c3aEghlIFYXizBn7fhAGiu6GPETp/GU2W/Dl4rLj3u8=;
+        b=ENOADYxcN+DRtiEGUKXWpGVTWOvrJ+YACtCDSzviA0f45R8wahAhVSUTEH9G43nAb88HzB
+        gd2SIbyk9PZw6G3rDT8dEMn5qS0GKaEcfPKIamgxEmgi2EW48DRcMyM1k++ktatj6ScUzX
+        pE2wqWCMf+QdhsAi6VTd+GgKWG/UHZs=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-374-1ree7-1fPg-BvfSfYJcKYA-1; Tue, 07 Jun 2022 14:55:05 -0400
+X-MC-Unique: 1ree7-1fPg-BvfSfYJcKYA-1
+Received: by mail-io1-f72.google.com with SMTP id i126-20020a6bb884000000b006691e030971so6049834iof.15
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 11:55:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Bq3CtL8r5GfIJRMEMuTZRaNrH6+E6V3L1A1y/G7x4zc=;
-        b=AM67/ra9bZuPb30YJ3MSXZmpdAd1zUKdeqrbap7Qo64ItC7DZByLMNB7AFb3NEkMVk
-         yUp1NjX2Wz5ZCN9lGIxGjc/5+E8SKslKaN26o06d6kp3y58n1K/6O4TwjzLeqozeLwey
-         x02Cnxe9AIZy6L+Gm0CvopI2e1yR6RgQemUra0jHeLO8y4ZjSWtiEYnZvc3QwzD9GdDL
-         5iTXUor56/vpliwOvRhW8YgPbW7GAgWK0db5UMu2lVMyYQh3t6yGrDhYalQWdjxRpa8m
-         yeoZgQv/cHuHxlQxNM2KgTTPj4m2WPUYR3SrKM0yBfY6A0hcXdGP5osuZlIOfxvjvdto
-         LWkQ==
-X-Gm-Message-State: AOAM5322Ma8sXKOylKbnniQdULFBkyvkmd08EwUpaaVY4s03uZwE7QhY
-        KGfeJuKrg98gdHw7sGjFa3VrAw==
-X-Google-Smtp-Source: ABdhPJw2TQiN59DdW/xnGa/aGBjV90W4P/iGe+cof3kKAjRB7iSLHq2N5nUHqvDvem8J6DBDZYGOGg==
-X-Received: by 2002:a17:903:3296:b0:164:13db:509 with SMTP id jh22-20020a170903329600b0016413db0509mr30245225plb.128.1654627665924;
-        Tue, 07 Jun 2022 11:47:45 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k130-20020a628488000000b0051c03229a2bsm6037107pfd.21.2022.06.07.11.47.45
+        bh=c3aEghlIFYXizBn7fhAGiu6GPETp/GU2W/Dl4rLj3u8=;
+        b=SBR/2gI2UzSIKm/uta4htw2o26fLxb5Sqvi8M4d4PtGTDtUMgRiSqGPlmM5lq/3C60
+         Cfi7qyTtQPUmTuZcNQLJsLBXUuqfHc8jalTTraXIo1O0Og9cwn8W9vxMa4MaUj1+Th8v
+         GHrSJ3z0daZNX7iRYXnzqh3u0HUgSir1tXCHWQtyCJtHlf4vflx7k/WwWJSmVJSH6Llg
+         xMtvdmPrNzqu1+5ATlBD0HaNWZ2Z7sLacECxHk5ZF9pCHBAb1R4PModkRzGbz1rBT8GX
+         0W1i6UBQzS+ZZdphWU6p4mlWANV7axoltvwWNoAO13ABsJDdZI9WuzKecpZuvMXmtDhI
+         BHkQ==
+X-Gm-Message-State: AOAM533k+YKlf88Mvi1iOog+ZgA35OW/rbIhFbv5+9vtxrHvPB/tPI7L
+        tSfu2IQNmiUx/l1RNVakoRf33vbyrl/CFtVOjoE8QbbG3oHFqvlekYiLT6IxNOE0YTnl/FNBI2X
+        aEU5rInNFIJJa
+X-Received: by 2002:a92:c891:0:b0:2d3:a221:ad70 with SMTP id w17-20020a92c891000000b002d3a221ad70mr17415291ilo.99.1654628104168;
+        Tue, 07 Jun 2022 11:55:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwAWiMxiIah55qjWrBgtZJoBW5mBNKo/lw5sPFyB6V+3oGTBURSejh1hzG6kMrqhY/vmksCkg==
+X-Received: by 2002:a92:c891:0:b0:2d3:a221:ad70 with SMTP id w17-20020a92c891000000b002d3a221ad70mr17415270ilo.99.1654628103881;
+        Tue, 07 Jun 2022 11:55:03 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id k14-20020a928e4e000000b002d54d827007sm1580963ilh.17.2022.06.07.11.55.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 11:47:45 -0700 (PDT)
-Date:   Tue, 7 Jun 2022 18:47:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
+        Tue, 07 Jun 2022 11:55:03 -0700 (PDT)
+Date:   Tue, 7 Jun 2022 14:55:01 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org, Leonardo Bras <leobras@redhat.com>,
@@ -58,7 +64,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         chang.seok.bae@intel.com, luto@kernel.org, kvm@vger.kernel.org
 Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
  user_xfeatures to supported bits of XCR0
-Message-ID: <Yp+dTU4NOaIELJh8@google.com>
+Message-ID: <Yp+fBeyf7TjI1qgo@xz-m1.local>
 References: <20220301201344.18191-1-sashal@kernel.org>
  <20220301201344.18191-7-sashal@kernel.org>
  <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
@@ -69,21 +75,20 @@ References: <20220301201344.18191-1-sashal@kernel.org>
  <Yp9o+y0NcRW/0puA@google.com>
  <Yp+WUoA+6x7ZpsaM@xz-m1.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <Yp+WUoA+6x7ZpsaM@xz-m1.local>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 07, 2022, Peter Xu wrote:
+On Tue, Jun 07, 2022 at 02:17:54PM -0400, Peter Xu wrote:
 > On Tue, Jun 07, 2022 at 03:04:27PM +0000, Sean Christopherson wrote:
 > > On Tue, Jun 07, 2022, Paolo Bonzini wrote:
 > > > On 6/6/22 23:27, Peter Xu wrote:
@@ -128,10 +133,19 @@ On Tue, Jun 07, 2022, Peter Xu wrote:
 > checked reverting Leo's change can also fix this issue.  Or do you mean
 > something else?
 
-Oooooh, sorry!  I got completely turned around.  You ran into a bug with the
-fix.  I thought that you were hitting the same issues as Mike where migrating
-between hosts with different capabilities is broken in v5.15, but works in v5.18.
+Ah, I forgot to mention on the "stable tree decisions": IIUC it also means
+we should apply Leo's patch to all the stable trees if possible, then
+migrations between them won't trigger the misterous faults anymore,
+including when migrating to the latest Linux versions.
 
+However there's the delimma that other kernels (any kernel that does not
+have Leo's patch) will start to fail migrations to the stable branches that
+apply Leo's patch too..  So that's kind of a slight pity.  It's just IIUC
+the stable trees are more important, because it should have a broader
+audience (most Linux distros)?
+
+> 
+> > 
 > > https://lore.kernel.org/all/48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net
 > 
 > That is kvm64, and I agree it could be the same problem since both qemu64
@@ -152,38 +166,12 @@ between hosts with different capabilities is broken in v5.15, but works in v5.18
 > 	WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
 > 
 > It'll be great if you'd like to check that up.
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
 
-Ugh, userspace can force KVM_MP_STATE_UNINITIALIZED via KVM_SET_MP_STATE.  Looks
-like QEMU does that when emulating RESET.
+-- 
+Peter Xu
 
-Logically, a full RESET of the xAPIC seems like the right thing to do.  I think
-we can get away with that without breaking ABI?  And kvm_lapic_reset() has a
-related bug where it stops the HR timer but not doesn't handle the HV timer :-/
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index e69b83708f05..948aba894245 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2395,7 +2395,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
-                return;
-
-        /* Stop the timer in case it's a reset to an active apic */
--       hrtimer_cancel(&apic->lapic_timer.timer);
-+       cancel_apic_timer(&apic->lapic_timer.timer);
-
-        /* The xAPIC ID is set at RESET even if the APIC was already enabled. */
-        if (!init_event)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 540651cd28d7..ed2c7cb1642d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10912,6 +10912,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-             mp_state->mp_state == KVM_MP_STATE_INIT_RECEIVED))
-                goto out;
-
-+       if (mp_state->mp_state == KVM_MP_STATE_UNINITIALIZED)
-+               kvm_lapic_reset(vcpu, false);
-+
-        if (mp_state->mp_state == KVM_MP_STATE_SIPI_RECEIVED) {
-                vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
-                set_bit(KVM_APIC_SIPI, &vcpu->arch.apic->pending_events);
