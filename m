@@ -2,80 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06D125402A3
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 17:41:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6B0354036A
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 18:10:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344254AbiFGPlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 11:41:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49652 "EHLO
+        id S1344805AbiFGQKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 12:10:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236490AbiFGPlN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 11:41:13 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9971C8BF3
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 08:41:11 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id y32so28941820lfa.6
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 08:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=PyInHAnePUrsCxyRN1yOwviYIqmmuD9NRK8P3yQO+gY=;
-        b=i0cuCz1EwZX74hgzgGSpudaN625aWEw7hvYzRzN7kBGECAxOAYVPPGUf4I8oXurMIJ
-         v4XKc/ZNXkeSqpLorSFuU4pjyKhdNR+dLja0Xg8O3xL+eTTo9xyzGSnVfcR+9/Z7nnyo
-         Up6C4Kr1LkBcXArBSIaSSsPDGzYRRpGA/K+XIwx06Zi4zb7lk6rz8GbOs+XeX34O62S0
-         4abSdW5u5/caJn3kq47QPf9TqLTr3G/RME7GQV1Nh9GkwGIjG8S9VBJ9Xhx/t9LEE1B2
-         mvp2UaqZlBPrkHeuBGvFXy62dWBa6u9mqR73uJhH2B5DnK363jbBn1ndGHn5Fm4Qonmo
-         yMqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=PyInHAnePUrsCxyRN1yOwviYIqmmuD9NRK8P3yQO+gY=;
-        b=RgNgXHR9mxzP+1aE76MmiV8oPn6RJTBvL/y+rxnXZ6T7XF5qhWRC0mXBpbVYcaNDT5
-         aG3HxzxS7tOoDO2ZZsNf2Lc8+H8KYmXOX9lOb8Scy/vdUvzWHManxgHTIcEJj1urrC1l
-         ETC27dXUvT1hawkBf/SaHXABqhRfM2pA6DU2mleRSugkLBP0IMMZLIyfHM3AESMNMKHM
-         lxHRIoBZPdYwCGxky8uNLoKh5cXBnZpYht0dxM5TxO8E9ct+C0v4+ki3bOGWM7IpIh7w
-         CmIc5hZZhy0MpbRZLJLJQocrb5a9CPzoH0XbvSwkUq9fWQI+81wD7ORIlDjml+7Av7Es
-         nz5Q==
-X-Gm-Message-State: AOAM532KDtmDc4PRxRnyoDPxJE03ljMLCKwUigk5aDNOlALlRFgKmuZJ
-        qNDYNcsC9k8glqDjlfdOHX2srTmguGMPwHcB3vs=
-X-Google-Smtp-Source: ABdhPJzHFEXYz4E5v0tMn+FCJz/wdo6U5goK/KQpLvjUHtCdwybLAJVaZlFkjcckU1kkfLjl7//ausXGWlvn4VxLEpw=
-X-Received: by 2002:a05:6512:3d94:b0:479:560e:ce5c with SMTP id
- k20-20020a0565123d9400b00479560ece5cmr5017203lfv.506.1654616470090; Tue, 07
- Jun 2022 08:41:10 -0700 (PDT)
-MIME-Version: 1.0
-Sender: ericnony02@gmail.com
-Received: by 2002:a05:6504:40d5:0:0:0:0 with HTTP; Tue, 7 Jun 2022 08:41:08
- -0700 (PDT)
-From:   "Mrs. Rachael Bednar" <rachaelbednar.55@gmail.com>
-Date:   Tue, 7 Jun 2022 08:41:08 -0700
-X-Google-Sender-Auth: 4Sr3sTp6aIuBaYuvENf78WbLB24
-Message-ID: <CAGscK4G2stz0hX-ARdN-dHyeUGjau9wVwtUg1p0sOfO5BKVy=w@mail.gmail.com>
-Subject: PLEASE INDICATE YOUR INTEREST FOR MORE DETAILS TO PROCEED.
-To:     undisclosed-recipients:;
+        with ESMTP id S1343591AbiFGQKe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 12:10:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06FFB85EC6
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 09:10:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9FDED61680
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 16:10:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0B52AC34115
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 16:10:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654618232;
+        bh=oSC7hYeX0k1hTm6leyJdXL1vtGLe/BJq61/xjgcTJh8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=GXRgjF+GV8gUyihky1+OtB+GgTD9WXKHi4rrxRs1RN/XueCeBIxVACoAa625nYnXT
+         nBAhp3up9Qa7glRt1CcdoeD/T51CqE2q+1lF0pJ8v1hH35X3drfUv3K9QwWfeD+Tbs
+         RjWpNqSHDZsp1mhM8wq8AD8aiH+J6fHcu9DG9RXb5R6yM6pVYerd3I4pFSR/rPYojW
+         7GUrU7ZntLN+rYssrPEVJW/iEglJ+lWlbwzrCoxzI6Pc8/Z7J1SInL/QhCQjTqdVOT
+         R3eqSLlFKlQM7PqGs16jMMCf87cbItWs1A2HQVJNDxGvNMFYNygxNXLcZfwyCzRq3c
+         1T0sci4gH2orQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id E0A7CC05FD4; Tue,  7 Jun 2022 16:10:31 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216091] KVM nested virtualization does not support VMX fields
+ that should always be supported
+Date:   Tue, 07 Jun 2022 16:10:31 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: seanjc@google.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216091-28872-wCqK3efPFz@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216091-28872@https.bugzilla.kernel.org/>
+References: <bug-216091-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=1.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,LOTS_OF_MONEY,MILLION_HUNDRED,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,T_HK_NAME_FM_MR_MRS,
-        T_SCC_BODY_TEXT_LINE,UNDISC_MONEY autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Level: *
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings my beloved,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216091
 
-My name is Mrs. Rachael Bednar, am 67 years old from the Czech
-Republic, I am a widow suffering from long-time Cancer and Annual
-Pustular sickness. I have some funds I inherited from my late husband,
-the sum of (5.2 Million Euro) Five Million Two Hundred Thousand Euro,
-and I needed a very honest and God-fearing person who will use this
-money for charity work. I mean to help the poor and less privileged
-people in society. So please do respond for more information.
+Sean Christopherson (seanjc@google.com) changed:
 
-God bless you,
-Mrs. Rachael Bednar.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |seanjc@google.com
+
+--- Comment #1 from Sean Christopherson (seanjc@google.com) ---
+The CR3-target values are clear cut, "A.6 MISCELLANEOUS DATA" in the SDM
+explicitly calls out '0' as a legal value for the number of CR3-target valu=
+es:
+
+  Bits 24:16 indicate the number of CR3-target values supported by the
+processor.
+  This number is a value between 0 and 256, inclusive (bit 24 is set if and
+only
+  if bits 23:16 are clear).
+
+For the other fields ("Executive-VMCS pointer", "Guest SMBASE", and "I/O R*=
+X",
+I would argue that the lack of a footnote is an SDM bug, as those fields sh=
+ould
+exist if and only if the CPU enumerates support for an SMM-transfer monitor=
+ in
+MSR_IA32_VMX_BASIC, and KVM never sets that bit (49).  The I/O fields "are =
+used
+only for VM exits due to SMIs ...", and SMIs are not true VM-Exits when not
+using STM.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
