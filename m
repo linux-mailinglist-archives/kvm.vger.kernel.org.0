@@ -2,175 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A786542558
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1B2A54218B
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:44:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1443915AbiFHBBJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 21:01:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51946 "EHLO
+        id S1443682AbiFHBAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 21:00:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1452778AbiFGXOd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 19:14:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BC3136C540
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 14:01:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654635717;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DmWx/HtcjqYi7JTMOK9VA2Mvf2gZ14LWzJ8rqY3sV7Y=;
-        b=RUvReRTytOBAfyk1O6OgGQrfqdJxPoZNjRW+GdZO6yeEV+u9fg/i3CSR0Gr1Z4HHXfYcFD
-        W2rkZS6NYz9kWLkz0y9bBOhZuQAmEsdEBihkcQRwtEecDdMAUN5QKVSEO+HEWHH88CAGeH
-        VgdG8dOPB40aAI8SX/2+871AfZxE7T4=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-590-SyCHLjOOOTqeYZIq-CBB5g-1; Tue, 07 Jun 2022 17:01:54 -0400
-X-MC-Unique: SyCHLjOOOTqeYZIq-CBB5g-1
-Received: by mail-io1-f70.google.com with SMTP id n19-20020a056602341300b0066850b49e09so8664117ioz.12
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 14:01:54 -0700 (PDT)
+        with ESMTP id S1574444AbiFGXZo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 19:25:44 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E13F522DFBE
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 14:36:17 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id o8-20020a17090a9f8800b001dc9f554c7fso9801851pjp.4
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 14:36:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=nx+NHoagUTMXpTWLS6nBCzRagrM6AprX1ic8KXLR0FQ=;
+        b=KtYNddCXipsCxfZPlYIrROqzMf4VfQUpQ7W4eTiQczc1T53T4h7qOXhIIs89QqOWNG
+         LPjzPOO5PTOHfPz22rVbKMRnf7mGiTZwlhzfEvI6mbtzGEkgLSGkO2LEPDtBerkLBOjh
+         D6/zW73UmBBCZyxNHxzie9fQQX0K35UHpIQybHBcF+0WhIlueyc6Fruq6HHXLsxfBCx9
+         EvHgOUKPotMcnYQdIqVG0FBm3EvFSVpg7lOn2sAQFPzXgAtckDr8NltPQcn7LO6JVZM7
+         QyYHMq5pHplrLaksdi0Wp0I8qRyKtJp8r6wWD91qOZP54TuSTe5uS4eiPZSEDNk+/o6e
+         ItqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=DmWx/HtcjqYi7JTMOK9VA2Mvf2gZ14LWzJ8rqY3sV7Y=;
-        b=oqKtfsjrybLI3brEIA4GD1bzwQKi4bJ+rJsFr78c1N6nFnPN34UrQk8j5b9OCpwBwH
-         xST9x0IrMtEddCt6wEGi2WNQuMsHqo3zfY7UB/5KQICB6aNEAaE0Wbu+tSSZjv9QuHog
-         B7+eSr8fI9ZoSsPSasNpqvwe4C6i0uJ4WdAgdm7buuoWqRgl8xEX1XIjR6wEQoVrv5Xg
-         0qCUJfuXwTT2Cnz/BTlCXOAqR7N5WUWRMOd0boz/GZgV9vdvBkR1pykI3fKFwImVIQP+
-         +lL6aIJcr+yqGzPaIqaM2gX5YOUVE57QT2pm6zCpz1JCW+SMGpA+rGQIONBVDPifrWo3
-         vP0w==
-X-Gm-Message-State: AOAM533h/ImNuMqPfROKtEWlaE09IeDb62ClO0PdNMk1IYWZ207UGXFt
-        KAiLwvGrv2H+O+oKz7FkRdHeIWqLNQs3ZZj4l0G0ddLlI1dQLYhEnfqvoCDcXXzkjY01uAolkbt
-        Fcy0nBkrsZNw3
-X-Received: by 2002:a05:6638:2404:b0:331:48f:bac0 with SMTP id z4-20020a056638240400b00331048fbac0mr15750901jat.306.1654635713366;
-        Tue, 07 Jun 2022 14:01:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzz8j3m6BGhMI89N/Xkj0XEQSk7cnDz7RN7p+Q2qYByc9Z8m7/k4hnjD+DhU7yc8TOyDhvgxg==
-X-Received: by 2002:a05:6638:2404:b0:331:48f:bac0 with SMTP id z4-20020a056638240400b00331048fbac0mr15750891jat.306.1654635713144;
-        Tue, 07 Jun 2022 14:01:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id b38-20020a0295a9000000b0032e271a558csm7025990jai.168.2022.06.07.14.01.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 14:01:52 -0700 (PDT)
-Date:   Tue, 7 Jun 2022 15:01:51 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Javier Martinez Canillas <javierm@redhat.com>
-Cc:     maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
-        kvm@vger.kernel.org, Laszlo Ersek <lersek@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] Improve vfio-pci primary GPU assignment behavior
-Message-ID: <20220607150151.11c7d2f6.alex.williamson@redhat.com>
-In-Reply-To: <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
-References: <165453797543.3592816.6381793341352595461.stgit@omen>
-        <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=nx+NHoagUTMXpTWLS6nBCzRagrM6AprX1ic8KXLR0FQ=;
+        b=nV3td+o+5LjvzHziIMfpvb3Z9U3CqQT1hAsAQ5UN8qsMSXlW9gb+EEjcZxLiOKnoQO
+         /45hGEwWZkwpzT6y27meyc5Up+55T3Jbct6pbtPmzLf7UPnLKmO2qvSlxipPRlCDuHof
+         dfqUtZdj2ikBLzLI3yA75DYZWwMF90w9bb7GRs/1XllCc0s3tu5CtWyoQnQb7ayiQJPn
+         Wf+r5fTLdsXy+Ze5NN9FbY4mgKks7vyR2EMdWqJU32xXo9zbV8RKM3KNjPpCJ1IYP0d6
+         S3V7xYfipalEVLZ9uJLCTuhAZ0nU2sYqxUjTG9yTRBoZs1a0B6yPUvojeTsjPnRrnLU9
+         y2lw==
+X-Gm-Message-State: AOAM530/FIto/9fPnf0111bgQO2F3GdBFcYjllAsz6Ao+s6LqFrBQBWt
+        DS9HlTjqQ2GQ6h8Bw30EiwmpgO/BSYQ=
+X-Google-Smtp-Source: ABdhPJzvgfJQivUwNYRvpJCgJfIE60FoBiPf/9jOB7Bo9q3ATZQV+PwKPdSQTp+PMSSeTAfz8mfc6MiODKU=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a63:89c2:0:b0:3fc:8bd2:aa5a with SMTP id
+ v185-20020a6389c2000000b003fc8bd2aa5amr26943571pgd.362.1654637777287; Tue, 07
+ Jun 2022 14:36:17 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue,  7 Jun 2022 21:35:49 +0000
+Message-Id: <20220607213604.3346000-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
+Subject: [PATCH v5 00/15]  KVM: nVMX: VMX MSR quirk+fixes, CR4 fixes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Eric Li <ercli@ucdavis.edu>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Jun 2022 19:40:40 +0200
-Javier Martinez Canillas <javierm@redhat.com> wrote:
+Resurrecting Oliver's series to quirk nVMX's manipulation of the VMX MSRs.
 
-> Hello Alex,
-> 
-> On 6/6/22 19:53, Alex Williamson wrote:
-> > Users attempting to enable vfio PCI device assignment with a GPU will
-> > often block the default PCI driver from the device to avoid conflicts
-> > with the device initialization or release path.  This means that
-> > vfio-pci is sometimes the first PCI driver to bind to the device.  In 
-> > the case of assigning the primary graphics device, low-level console
-> > drivers may still generate resource conflicts.  Users often employ
-> > kernel command line arguments to disable conflicting drivers or
-> > perform unbinding in userspace to avoid this, but the actual solution
-> > is often distribution/kernel config specific based on the included
-> > drivers.
-> > 
-> > We can instead allow vfio-pci to copy the behavior of
-> > drm_aperture_remove_conflicting_pci_framebuffers() in order to remove
-> > these low-level drivers with conflicting resources.  vfio-pci is not
-> > however a DRM driver, nor does vfio-pci depend on DRM config options,
-> > thus we split out and export the necessary DRM apterture support and
-> > mirror the framebuffer and VGA support.
-> > 
-> > I'd be happy to pull this series in through the vfio branch if
-> > approved by the DRM maintainers.  Thanks,
-> >  
-> 
-> I understand your issue but I really don't think that using this helper
-> is the correct thing to do. We already have some races with the current
-> aperture infrastructure As an example you can look at [0].
-> 
-> The agreement on the mentioned thread is that we want to unify the fbdev
-> and DRM drivers apertures into a single list, and ideally moving all to
-> the Linux device model to handle the removal of conflicting devices.
-> 
-> That's why I don't feel that leaking the DRM aperture helper to another
-> is desirable since it would make even harder to cleanup this later.
+KVM has a quirk where nVMX overwrites select VMX MSR bits in response to
+CPUID updates.  Specifically, KVM forces CR{0,4}_FIXED1 bits and the
+VM-Entry/VM-Exit control bits for BNDCFGS and PERF_GLOBAL_CTRL to align
+with the guest vCPU model.  Add a quirk to (a) allow userspace to opt out
+of the existing behavior and (b) make it clear the the existing behavior
+should not be propagated to new features.
 
-OTOH, this doesn't really make the problem worse and it identifies
-another stakeholder to a full solution.
- 
-> But also, this issue isn't something that only affects graphic devices,
-> right? AFAIU from [1] and [2], the same issue happens if a PCI device
-> has to be bound to vfio-pci but already was bound to a host driver.
+Patches 0-4 are tangentially related fixes for correctly handling CR4
+checks on nested VMXON and VM-Enter.  They are included here because there
+is a subtle dependency created by the fix in patch 02, as it changes the
+resulting behavior of patch 10, "Extend VMX MSRs quirk to CR0/4 fixed1 bits".
 
-When we're shuffling between PCI drivers, we expect the unbind of the
-previous driver to have released all the claimed resources.  If there
-were a previously attached PCI graphics driver, then the code added in
-patch 2/ is simply redundant since that PCI graphics driver must have
-already performed similar actions.  The primary use case of this series
-is where there is no previous PCI graphics driver and we have no
-visibility to platform drivers carving chunks of the PCI resources into
-different subsystems.  AFAIK, this is unique to graphics devices.
+Patch 05 fixes a bug where KVM forces incoming VMX MSR values to be a
+subset of _current_ value, not of KVM's support valu.  E.g. if userspace
+clears an allowed-1 bit, it can never set that bit back to the original
+value.
 
-> The fact that DRM happens to have some infrastructure to remove devices
-> that conflict with an aperture is just a coincidence. Since this is used
-> to remove devices bound to drivers that make use of the firmware-provided
-> system framebuffer.
+Patch 06, "Keep KVM updates to BNDCFGS ctrl bits across MSR write", fixes
+a related bug where KVM's original quirky behavior kept the VMX MSRs
+up-to-date (almost) all the time.
 
-It seems not so much a coincidence as an artifact of the exact problem
-both PCI graphics drivers and now vfio-pci face.  We've created
-platform devices to manage sub-ranges of resources, where the actual
-parent of those resources is only discovered later and we don't
-automatically resolve the resource conflict between that parent device
-and these platform devices when binding the parent driver.
- 
-> The series [0] mentioned above, adds a sysfb_disable() that disables the
-> Generic System Framebuffer logic that is what registers the framebuffer
-> devices that are bound to these generic video drivers. On disable, the
-> devices registered by sysfb are also unregistered.
-> 
-> Would be enough for your use case to use that helper function if it lands
-> or do you really need to look at the apertures? That is, do you want to
-> remove the {vesa,efi,simple}fb and simpledrm drivers or is there a need
-> to also remove real fbdev and DRM drivers?
+This series is technically based on my selftests overhaul[*], but practically
+speaking that only affects the selftests.  The KVM should apply cleanly on
+kvm/queue, 55371f1d0c01 ("KVM: x86/pmu: Update global ...")
 
-It's not clear to me how this helps.  I infer that sysfb_disable() is
-intended to be used by, for example, a PCI console driver which would be
-taking over the console and can therefore make a clear decision to end
-sysfb support.  The vfio-pci driver is not a console driver so we can't
-make any sort of blind assertion regarding sysfb.  We might be binding
-to a secondary graphics card which has no sysfb drivers attached.  I'm
-a lot more comfortable wielding an interface that intends to disable
-drivers/devices relative to the resources of a given device rather than
-a blanket means to disable a subsystem.
+I have a KUT test for patch 3 (VMXON fixes) that I'l post separately (yet
+more cleanup involved, ugh).  I spot tested patch 2 by fudging PKU in guest
+CPUID, but I'm not planning on submitting an official test anywhere (though
+it could be done without too much pain in selftests).
 
-I wonder if the race issues aren't better solved by avoiding to create
-platform devices exposing resource conflicts with known devices,
-especially when those existing devices have drivers attached.  Thanks,
+v5:
+ - Rebase (see above).
+ - Fix "CR4 valid for nVMX" bugs.
+ - Modify PERF_GLOBAL_CTRL bits iff the MSR exists.
+ - Fix a bug where KVM doesn't allow userspace to restore VMX MSRs to
+   _KVM's_ allowed values.
+ - Fix the UMIP emulation goof.
+ - Extend the quirk to CR0/4_FIXED1 MSRs.
+ - Add a helper to identify if the vCPU has a vPMU.
+ - Rewrote the selftests to more exhaustively test combos, and to test
+   the aforementioned bugs fixed in v5.
 
-Alex
+v4:
+ - https://lore.kernel.org/all/20220301060351.442881-1-oupton@google.com
+ - Rebased to kvm/queue. Avoids conflicts with new CAPs and commit
+   0bcd556e15f9 ("KVM: nVMX: Refactor PMU refresh to avoid referencing
+   kvm_x86_ops.pmu_ops") on kvm/queue.
+ - Grabbed KVM_CAP_DISABLE_QUIRKS2 patch, since this series also
+   introduces a quirk.
+ - Fix typo in KVM_CAP_DISABLE_QUIRKS2 documentation (Sean)
+ - Eliminated the need to refresh 'load IA32_PGC' bits from PMU refresh.
+ - Use consistent formatting to make test cases more easily readable
+   (David Dunn)
+ - Use correct 'Fixes: ' tag and correct a typo in Patch 2 changelog.
+
+Oliver Upton (4):
+  KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits across MSR write
+  KVM: nVMX: Keep KVM updates to PERF_GLOBAL_CTRL ctrl bits across MSR
+    write
+  KVM: nVMX: Drop nested_vmx_pmu_refresh()
+  KVM: nVMX: Add a quirk for KVM tweaks to VMX MSRs
+
+Sean Christopherson (11):
+  KVM: x86: Split kvm_is_valid_cr4() and export only the non-vendor bits
+  KVM: nVMX: Account for KVM reserved CR4 bits in consistency checks
+  KVM: nVMX: Inject #UD if VMXON is attempted with incompatible CR0/CR4
+  KVM: nVMX: Rename handle_vm{on,off}() to handle_vmx{on,off}()
+  KVM: nVMX: Let userspace set nVMX MSR to any _host_ supported value
+  KVM: VMX: Add helper to check if the guest PMU has PERF_GLOBAL_CTRL
+  KVM: nVMX: Set UMIP bit CR4_FIXED1 MSR when emulating UMIP
+  KVM: nVMX: Extend VMX MSRs quirk to CR0/4 fixed1 bits
+  KVM: selftests: Add test to verify KVM's VMX MSRs quirk for controls
+  KVM: selftests: Extend VMX MSRs test to cover CR4_FIXED1 (and its
+    quirks)
+  KVM: selftests: Verify VMX MSRs can be restored to KVM-supported
+    values
+
+ Documentation/virt/kvm/api.rst                |  29 ++
+ arch/x86/include/asm/kvm_host.h               |   3 +-
+ arch/x86/include/uapi/asm/kvm.h               |   1 +
+ arch/x86/kvm/svm/nested.c                     |   3 +-
+ arch/x86/kvm/vmx/nested.c                     | 199 ++++++------
+ arch/x86/kvm/vmx/nested.h                     |   5 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |   7 +-
+ arch/x86/kvm/vmx/vmx.c                        |  23 +-
+ arch/x86/kvm/vmx/vmx.h                        |  14 +
+ arch/x86/kvm/x86.c                            |  12 +-
+ arch/x86/kvm/x86.h                            |   2 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/processor.h  |   8 +
+ .../selftests/kvm/include/x86_64/vmx.h        |   2 +
+ .../selftests/kvm/x86_64/vmx_msrs_test.c      | 287 ++++++++++++++++++
+ 16 files changed, 493 insertions(+), 104 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c
+
+
+base-commit: 081ad4bbae8d503c79fae45f463766d28b2f3241
+-- 
+2.36.1.255.ge46751e96f-goog
 
