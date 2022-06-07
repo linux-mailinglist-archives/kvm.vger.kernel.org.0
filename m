@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26FF253FFCB
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 15:14:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57B3253FFCA
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 15:14:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240700AbiFGNOs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 09:14:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46876 "EHLO
+        id S244516AbiFGNOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 09:14:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244484AbiFGNOi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S243394AbiFGNOi (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 7 Jun 2022 09:14:38 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9665EAD1E
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 06:14:35 -0700 (PDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36186EAD2C
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 06:14:36 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8E430B81D5B
+        by ams.source.kernel.org (Postfix) with ESMTPS id B6FEDB81C97
         for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 13:14:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37455C34115;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64881C34119;
         Tue,  7 Jun 2022 13:14:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1654607673;
-        bh=2ZyRR7tBSN/2EJrlNxB3h2/WkG/0rsIykzhySwBTGsI=;
+        bh=TTE/lFsUWXZm8bsrdr8eA3j90NFk9vlsa4mEv7DpU/s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UR8KJu1PR0JK5SDRg/mgf8pPbAloJt4zJe5lbA6WOWxvKjMCWKjJ3X8RltzNx2L74
-         tstWo6d/WZZhhSC6VsU0GJ3gvIESuWXBJDMwQX0dgAzPZXSVd4HnxeFsvpfPXZaVAm
-         A9Bd5qTQH8xXJ7xRtOcxKm/HEC3Y902HK6M/srhNKIntrp3KGdRIMZIAyoVppqvA2j
-         bVAnhQ6fbxO/P7ohcf5GZ4ED2KF+uBLZ/OfB6KdoZ0ClzSM7CVIfEt91oS4WuiphiE
-         8Cg949e1nQE2f4y+gSwfixnAZcQhpwqtRSPyevMREC1FVzJoJ6Vkb+Vy4plrP31iF0
-         XtCF5APJTQjKQ==
+        b=L6rGwJJgLu7ndf2E6JWX/VpfexTtFr68njiTklItKMx+7VMwfEj+AXIRCJ7Y3IDGf
+         Y8G2IVIgv0fIogwruxjgoLZrqXuRs7KDMNxF4BVg695UN+WsvOVAse5HQlxr6xTjv8
+         BdsTOfaEj0l/ekRsWlGbfEXBnjqAT4WZYCh8phjROvp7LUtaVOjpA6dkt3lOVdA7qf
+         M/R6S2Ml6ouBx90Jbot4dKfftLr77ZZwPSWUzXah+tmcEt1HJRZm1nFSIhQQqE4tB6
+         nBMh0VhUL9AHkys9g2HUjwSy2zmToWFNGXj6I5H++odXD0H0JQDntkeMmmJa21ZHhF
+         12uH4f5pG8Zkg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nyZ2U-00GBUI-SZ; Tue, 07 Jun 2022 14:14:30 +0100
+        id 1nyZ2V-00GBUI-3N; Tue, 07 Jun 2022 14:14:31 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         kvm@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     Eric Auger <eric.auger@redhat.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oupton@google.com>, kernel-team@android.com
-Subject: [PATCH v2 1/3] KVM: arm64: Don't read a HW interrupt pending state in user context
-Date:   Tue,  7 Jun 2022 14:14:25 +0100
-Message-Id: <20220607131427.1164881-2-maz@kernel.org>
+Subject: [PATCH v2 2/3] KVM: arm64: Replace vgic_v3_uaccess_read_pending with vgic_uaccess_read_pending
+Date:   Tue,  7 Jun 2022 14:14:26 +0100
+Message-Id: <20220607131427.1164881-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220607131427.1164881-1-maz@kernel.org>
 References: <20220607131427.1164881-1-maz@kernel.org>
@@ -67,106 +67,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state
-from the HW"), we're able to source the pending bit for an interrupt
-that is stored either on the physical distributor or on a device.
+Now that GICv2 has a proper userspace accessor for the pending state,
+switch GICv3 over to it, dropping the local version, moving over the
+specific behaviours that CGIv3 requires (such as the distinction
+between pending latch and line level which were never enforced
+with GICv2).
 
-However, this state is only available when the vcpu is loaded,
-and is not intended to be accessed from userspace. Unfortunately,
-the GICv2 emulation doesn't provide specific userspace accessors,
-and we fallback with the ones that are intended for the guest,
-with fatal consequences.
+We also gain extra locking that isn't really necessary for userspace,
+but that's a small price to pay for getting rid of superfluous code.
 
-Add a new vgic_uaccess_read_pending() accessor for userspace
-to use, build on top of the existing vgic_mmio_read_pending().
-
-Reported-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Fixes: 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state from the HW")
 ---
- arch/arm64/kvm/vgic/vgic-mmio-v2.c |  4 ++--
- arch/arm64/kvm/vgic/vgic-mmio.c    | 19 ++++++++++++++++---
- arch/arm64/kvm/vgic/vgic-mmio.h    |  3 +++
- 3 files changed, 21 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 40 ++----------------------------
+ arch/arm64/kvm/vgic/vgic-mmio.c    | 21 +++++++++++++++-
+ 2 files changed, 22 insertions(+), 39 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index 77a67e9d3d14..e070cda86e12 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -429,11 +429,11 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
- 		vgic_mmio_read_pending, vgic_mmio_write_spending,
--		NULL, vgic_uaccess_write_spending, 1,
-+		vgic_uaccess_read_pending, vgic_uaccess_write_spending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
- 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
--		NULL, vgic_uaccess_write_cpending, 1,
-+		vgic_uaccess_read_pending, vgic_uaccess_write_cpending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
- 		vgic_mmio_read_active, vgic_mmio_write_sactive,
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index 49837d3a3ef5..dc8c52487e47 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -226,8 +226,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index f7aa7bcd6fb8..f15e29cc63ce 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -353,42 +353,6 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
  	return 0;
  }
  
--unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
--				     gpa_t addr, unsigned int len)
-+static unsigned long __read_pending(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    bool is_user)
- {
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	u32 value = 0;
-@@ -248,7 +249,7 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 						    IRQCHIP_STATE_PENDING,
- 						    &val);
- 			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
--		} else if (vgic_irq_is_mapped_level(irq)) {
-+		} else if (!is_user && vgic_irq_is_mapped_level(irq)) {
+-static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+-						  gpa_t addr, unsigned int len)
+-{
+-	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+-	u32 value = 0;
+-	int i;
+-
+-	/*
+-	 * pending state of interrupt is latched in pending_latch variable.
+-	 * Userspace will save and restore pending state and line_level
+-	 * separately.
+-	 * Refer to Documentation/virt/kvm/devices/arm-vgic-v3.rst
+-	 * for handling of ISPENDR and ICPENDR.
+-	 */
+-	for (i = 0; i < len * 8; i++) {
+-		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+-		bool state = irq->pending_latch;
+-
+-		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+-			int err;
+-
+-			err = irq_get_irqchip_state(irq->host_irq,
+-						    IRQCHIP_STATE_PENDING,
+-						    &state);
+-			WARN_ON(err);
+-		}
+-
+-		if (state)
+-			value |= (1U << i);
+-
+-		vgic_put_irq(vcpu->kvm, irq);
+-	}
+-
+-	return value;
+-}
+-
+ static int vgic_v3_uaccess_write_pending(struct kvm_vcpu *vcpu,
+ 					 gpa_t addr, unsigned int len,
+ 					 unsigned long val)
+@@ -666,7 +630,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
+ 		vgic_mmio_read_pending, vgic_mmio_write_spending,
+-		vgic_v3_uaccess_read_pending, vgic_v3_uaccess_write_pending, 1,
++		vgic_uaccess_read_pending, vgic_v3_uaccess_write_pending, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR,
+ 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
+@@ -750,7 +714,7 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISPENDR0,
+ 		vgic_mmio_read_pending, vgic_mmio_write_spending,
+-		vgic_v3_uaccess_read_pending, vgic_v3_uaccess_write_pending, 4,
++		vgic_uaccess_read_pending, vgic_v3_uaccess_write_pending, 4,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ICPENDR0,
+ 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index dc8c52487e47..997d0fce2088 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -240,6 +240,15 @@ static unsigned long __read_pending(struct kvm_vcpu *vcpu,
+ 		unsigned long flags;
+ 		bool val;
+ 
++		/*
++		 * When used from userspace with a GICv3 model:
++		 *
++		 * Pending state of interrupt is latched in pending_latch
++		 * variable.  Userspace will save and restore pending state
++		 * and line_level separately.
++		 * Refer to Documentation/virt/kvm/devices/arm-vgic-v3.rst
++		 * for handling of ISPENDR and ICPENDR.
++		 */
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+ 			int err;
+@@ -252,7 +261,17 @@ static unsigned long __read_pending(struct kvm_vcpu *vcpu,
+ 		} else if (!is_user && vgic_irq_is_mapped_level(irq)) {
  			val = vgic_get_phys_line_level(irq);
  		} else {
- 			val = irq_is_pending(irq);
-@@ -263,6 +264,18 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 	return value;
- }
+-			val = irq_is_pending(irq);
++			switch (vcpu->kvm->arch.vgic.vgic_model) {
++			case KVM_DEV_TYPE_ARM_VGIC_V3:
++				if (is_user) {
++					val = irq->pending_latch;
++					break;
++				}
++				fallthrough;
++			default:
++				val = irq_is_pending(irq);
++				break;
++			}
+ 		}
  
-+unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
-+				     gpa_t addr, unsigned int len)
-+{
-+	return __read_pending(vcpu, addr, len, false);
-+}
-+
-+unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-+					gpa_t addr, unsigned int len)
-+{
-+	return __read_pending(vcpu, addr, len, true);
-+}
-+
- static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
- {
- 	return (vgic_irq_is_sgi(irq->intid) &&
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
-index 3fa696f198a3..6082d4b66d39 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.h
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.h
-@@ -149,6 +149,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
- unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 				     gpa_t addr, unsigned int len);
- 
-+unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-+					gpa_t addr, unsigned int len);
-+
- void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val);
+ 		value |= ((u32)val << i);
 -- 
 2.34.1
 
