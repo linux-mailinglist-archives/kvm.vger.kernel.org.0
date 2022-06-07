@@ -2,115 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3EB454010E
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 16:18:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 444E1540138
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 16:23:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243646AbiFGOS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 10:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48000 "EHLO
+        id S245388AbiFGOXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 10:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244279AbiFGOSV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 10:18:21 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18773663D1
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 07:18:16 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E080143D;
-        Tue,  7 Jun 2022 07:18:16 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 02D5B3F66F;
-        Tue,  7 Jun 2022 07:18:15 -0700 (PDT)
-Date:   Tue, 7 Jun 2022 15:18:13 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH kvmtool 2/4] virtio/mmio: access header members normally
-Message-ID: <20220607151813.3ea2febb@donnerap.cambridge.arm.com>
-In-Reply-To: <20220607103658.GA32508@willie-the-truck>
-References: <20220601165138.3135246-1-andre.przywara@arm.com>
-        <20220601165138.3135246-3-andre.przywara@arm.com>
-        <20220607103658.GA32508@willie-the-truck>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        with ESMTP id S245380AbiFGOXT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 10:23:19 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 400075A091;
+        Tue,  7 Jun 2022 07:23:18 -0700 (PDT)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 257Dr8f2006111;
+        Tue, 7 Jun 2022 14:23:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=yyBuU5YebloTWbv6i5QyUgAuCFdDkL9ZIsLwtXarbIQ=;
+ b=dN/29BSlEK4+O8wM1QXS+gUZ5APgImigJ51g9aFUQ6cHx2NemF6W440nksfnpa9JZYl1
+ YeTkx8Z0KLhTdBe4bbmC1YjlP9LZV2j1eHxeZ01v1IOgsLr2ePlk5suJE7BEkgyBQBk9
+ SRkLXzkqJkQKMyIySjV+mIWwWXPKC+CjG4lwOcc9z8XE+iwlfM62bjOcsH5jdjfES4e1
+ Dbdt1HoQ/i1Mj3+qtvMebJdzzWuaBzF9XL/HAVNduo0NijvygXzR8fN1+g/wG4f6zDRK
+ /q8H+pJkq1adB2aSbQFAV+uhbE7Y6md2ElmoZn+dvYTFI/x1T9bUro8UylXEcQ2Jfdt7 Ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gj7xy0rsm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Jun 2022 14:23:17 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 257DsPvf012512;
+        Tue, 7 Jun 2022 14:23:17 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gj7xy0rs1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Jun 2022 14:23:17 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 257EM3OO024054;
+        Tue, 7 Jun 2022 14:23:14 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3gfy19bvq0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Jun 2022 14:23:14 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 257ENBWP7733538
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Jun 2022 14:23:11 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91D194C058;
+        Tue,  7 Jun 2022 14:23:11 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3FACB4C046;
+        Tue,  7 Jun 2022 14:23:11 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1 (unknown [9.171.69.129])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Tue,  7 Jun 2022 14:23:11 +0000 (GMT)
+Date:   Tue, 7 Jun 2022 16:23:09 +0200
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, scgl@linux.ibm.com, pmorel@linux.ibm.com,
+        thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] lib: s390x: better smp interrupt
+ checks
+Message-ID: <20220607162309.25e97913@li-ca45c2cc-336f-11b2-a85c-c6e71de567f1>
+In-Reply-To: <20220603154037.103733-3-imbrenda@linux.ibm.com>
+References: <20220603154037.103733-1-imbrenda@linux.ibm.com>
+        <20220603154037.103733-3-imbrenda@linux.ibm.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hawrk6Kynz4l0M8zyKNpL7PjnAevNPmo
+X-Proofpoint-ORIG-GUID: p91CScdacpmrMWQykeNmSjzy6OT3kYLV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-07_06,2022-06-07_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ spamscore=0 mlxlogscore=823 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 mlxscore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206070057
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Jun 2022 11:36:58 +0100
-Will Deacon <will@kernel.org> wrote:
+On Fri,  3 Jun 2022 17:40:37 +0200
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-Hi Will,
+> 0x1200 */ diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 27d3b767..e57946f0 100644
+[...]
+> @@ -30,7 +27,7 @@ void expect_pgm_int(void)
+>  
+>  void expect_ext_int(void)
+>  {
+> -	ext_int_expected = true;
+> +	lc->ext_int_expected = 1;
 
-> On Wed, Jun 01, 2022 at 05:51:36PM +0100, Andre Przywara wrote:
-> > The handlers for accessing the virtio-mmio header tried to be very
-> > clever, by modelling the internal data structure to look exactly like
-> > the protocol header, so that address offsets can "reused".
-> > 
-> > This requires using a packed structure, which creates other problems,
-> > and seems to be totally unnecessary in this case.
-> > 
-> > Replace the offset-based access hacks to the structure with proper
-> > compiler visible accesses, to avoid unaligned accesses and make the code
-> > more robust.
-> > 
-> > This fixes UBSAN complaints about unaligned accesses.
-> > 
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  include/kvm/virtio-mmio.h |  2 +-
-> >  virtio/mmio.c             | 19 +++++++++++++++----
-> >  2 files changed, 16 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/include/kvm/virtio-mmio.h b/include/kvm/virtio-mmio.h
-> > index 13dcccb6..aa4cab3c 100644
-> > --- a/include/kvm/virtio-mmio.h
-> > +++ b/include/kvm/virtio-mmio.h
-> > @@ -39,7 +39,7 @@ struct virtio_mmio_hdr {
-> >  	u32	interrupt_ack;
-> >  	u32	reserved_5[2];
-> >  	u32	status;
-> > -} __attribute__((packed));
-> > +};  
-> 
-> Does this mean that the previous patch is no longer required?
+External Interrupts can be floating; so if I am not mistaken it could be delivered to a different CPU which didn't expect it.
 
-To some degree patch 1/4 is the quick fix. But I think ordering
-struct members in an efficient way is never a bad idea, so that patch
-still has some use.
+[...]
+> @@ -237,17 +231,17 @@ void handle_io_int(void)
+>  
+>  int register_io_int_func(void (*f)(void))
+>  {
+> -	if (io_int_func)
+> +	if (lc->io_int_func)
+>  		return -1;
 
-> >  struct virtio_mmio {
-> >  	u32			addr;
-> > diff --git a/virtio/mmio.c b/virtio/mmio.c
-> > index 3782d55a..c9ad8ee7 100644
-> > --- a/virtio/mmio.c
-> > +++ b/virtio/mmio.c
-> > @@ -135,12 +135,22 @@ static void virtio_mmio_config_in(struct kvm_cpu *vcpu,
-> >  
-> >  	switch (addr) {
-> >  	case VIRTIO_MMIO_MAGIC_VALUE:
-> > +		memcpy(data, &vmmio->hdr.magic, sizeof(vmmio->hdr.magic));  
-> 
-> Hmm, this is a semantic change as we used to treat the magic as a u32 by
-> passing it to ioport__write32(), which would in turn do the swab for
-> big-endian machines.
-
-Ah, it's big endian testing time again (is it already that time of the
-year?)
-
-> 
-> I don't think we should be using raw memcpy() here.
-
-I will check, thanks for having a look!
-
-Cheers,
-Andre
+IO interrupts also are floating. Same concern as for the external interrupts.
