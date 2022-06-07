@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E07CE542302
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:51:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB9E854272E
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:59:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1444102AbiFHBB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 21:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49614 "EHLO
+        id S1443735AbiFHBAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 21:00:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1835817AbiFGX5C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1835819AbiFGX5C (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 7 Jun 2022 19:57:02 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A71CF819B4
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 16:23:58 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id n6-20020a654886000000b003fda8768883so4161037pgs.14
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 16:23:58 -0700 (PDT)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B6E67B9F9
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 16:24:00 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id e18-20020a170902ef5200b0016153d857a6so10116600plx.5
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 16:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=7BEMJCReDvWYRKLhlInIZ1OFpFjx1quNIbfK5hEhej4=;
-        b=NkgordnQuuAVc31UeJpYQYToToDAsNS1qL4WUn+TkIFlIEfUpGIbU4rTmpOmS9Rkyn
-         H5jZdL7P9KCG+61Cs3FRM1mEWhyKhkOl4hKqQqA29qa8+hs3jVTGALzrQ9QQyG68gjhA
-         5XesWEK1k1vi3J+iWPZxg0MeELXLa1RIFxMSuN0EIKPP/HSD1MPBVoaTwhMA6pKBeRGp
-         pTz+Js9Q3laKX18zRENswO6LLmTOnQ5zETw82uIktLilDZ8f0IUqk4g2pFMJj+cG2a9o
-         04PIUH/iUhjVIiSCaL1lxwaLD4PWvykFJHrbLN3ZtTJAs4neY5ahOTpKYXsO0a+FaKzn
-         AdHg==
+        bh=HzWsVgdFm2oYqm1OPj6CBRtZTI++je2WpE9vsT9Q4dE=;
+        b=qfNZPl0DGpAwisczdNca9pITU2U9zMEzWm3BrXjbGd897plb5bXbxmk9W2/2Rvcw5k
+         yv28W4H+7VJu/PtlIgHIZsV47WgaPwW1qtt3M3gOa9pyxg8/sVDWna3mdIEK8WrIjPLf
+         Utgnt+Iy2tBPuYKAJ4WriOfIiJ27Ra12p+CcwljmCA0RcV6d/3WcWADFnwy21L3IOS05
+         c+ZNT425BSZ5rPfQZK7AvtaHBI3KS4HB8ZUBIp4vzhG8UEN8qU6qbdxnhFsQRriUP2J4
+         XLftzFfLaunpJp5g4sP5m4m1Cl6SAnJ4MCUNAXqNfkYYuGFR23mIZh1g4c0RrCBW4Qjf
+         LF5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=7BEMJCReDvWYRKLhlInIZ1OFpFjx1quNIbfK5hEhej4=;
-        b=DvusDQgN0mKDucJUsU/py4WxoljbHSUogQy9oPDL1DtsDto7n2BXty2vfOCxDVVy/D
-         9OHnvIY81b7uZ3oT0JcrDlmDuYn6xHWDpZQ0sOm8PueNIf33xaqm3fcK3Szsda56n+/W
-         sX/ag5rPYJGkB12e8yu7Z19MaexhPVro+o9JPc0DXqICKGasDNmBHVOE3qbym6Mm9E0+
-         isXU/BP7JdJy9W9j8ozPChTdRU5l1sJ2xzm69FFmpQ2Ts/FjRUUP1tMoJaY9unvN6Dtk
-         fegN/zHxYvd4XwCNMctV339ebHQF0+Qe5JNJyzEuwFY8nZZQMzcjHlFShKXA7u/APeJO
-         tfDA==
-X-Gm-Message-State: AOAM532L5IRtvrae6kMLlHGTou9kpVs88jchBYpKnwX7hkg6dH1EZqYk
-        V4ANSFXAZy7pMMJizVph7D4YeSCsmKY=
-X-Google-Smtp-Source: ABdhPJwKUS2rXe4ZMRGjiGGfUOn8NT8M/vx1ChFdkFHaTIAOt6gmH867C8Af6ZFHbfa0UQNuE8DP+0nAHVo=
+        bh=HzWsVgdFm2oYqm1OPj6CBRtZTI++je2WpE9vsT9Q4dE=;
+        b=fPp97s2mjOqFynvnOfJ1MfpB5Ba3kFgdHpCgqn0Tb/pAF1Kxc3HFnDZBzr1EFMCZ0F
+         U653/EV4ulzZ7X0k8d96q5/Ms2CMDYryKHUJecMlhczD9lzLnDCkHvvMdz30pUeppBme
+         l4/Ewta1+s1YxIZKXCzwdHOKVzzCUxBraj9E9WOn4zxDlg9X/oLHDxxvXhw0KShtuSvz
+         4402WFkt4LO5cb7moXi5EvrPj/FWt2Lz6Q/tesEBPf3h0zlZu1sn/L1pU9tttkzbEsHi
+         FBexg/qdfMItzsMoum2Ol1AEfOW+o1ejxCBQdSuOX9P8wI014XHY/xkzn9/47axriwf4
+         FQqw==
+X-Gm-Message-State: AOAM531pWt98mJ6svDpzD5jPkENBAXneKcQn3HnMlppGw0IC8t/Uy4wq
+        OTfRGGMl+cOA+1EFrIz7WGxzGRD6A98=
+X-Google-Smtp-Source: ABdhPJwW+RRDZoQq7Au7i9xNoeOWMcVvfwUqmH7KW55H9yWzXC5KnkE0nQyEfRlvmk0fFjuflWIQaM47J68=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:903:234b:b0:166:4459:c43a with SMTP id
- c11-20020a170903234b00b001664459c43amr28857631plh.35.1654644238156; Tue, 07
- Jun 2022 16:23:58 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1688:b0:517:cf7b:9293 with SMTP id
+ k8-20020a056a00168800b00517cf7b9293mr99735795pfc.7.1654644239818; Tue, 07 Jun
+ 2022 16:23:59 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  7 Jun 2022 23:23:51 +0000
+Date:   Tue,  7 Jun 2022 23:23:52 +0000
 In-Reply-To: <20220607232353.3375324-1-seanjc@google.com>
-Message-Id: <20220607232353.3375324-2-seanjc@google.com>
+Message-Id: <20220607232353.3375324-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220607232353.3375324-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH 1/3] KVM: VMX: Allow userspace to set all supported
- FEATURE_CONTROL bits
+Subject: [PATCH 2/3] KVM: VMX: Move MSR_IA32_FEAT_CTL.LOCKED check into "is
+ valid" helper
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -73,72 +73,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow userspace to set all supported bits in MSR IA32_FEATURE_CONTROL
-irrespective of the guest CPUID model, e.g. via KVM_SET_MSRS.  KVM's ABI
-is that userspace is allowed to set MSRs before CPUID, i.e. can set MSRs
-to values that would fault according to the guest CPUID model.
+Move the check on IA32_FEATURE_CONTROL being locked, i.e. read-only from
+the guest, into the helper to check the overall validity of the incoming
+value.  Opportunistically rename the helper to make it clear that it
+returns a bool.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 36 +++++++++++++++++++++++++++++++-----
- 1 file changed, 31 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fd2e707faf2b..8e83e12373c5 100644
+index 8e83e12373c5..eb4cd66055f8 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1741,12 +1741,38 @@ bool nested_vmx_allowed(struct kvm_vcpu *vcpu)
- 	return nested && guest_cpuid_has(vcpu, X86_FEATURE_VMX);
- }
+@@ -1755,8 +1755,8 @@ bool nested_vmx_allowed(struct kvm_vcpu *vcpu)
+ 					FEAT_CTL_SGX_ENABLED		 | \
+ 					FEAT_CTL_LMCE_ENABLED)
  
--static inline bool vmx_feature_control_msr_valid(struct kvm_vcpu *vcpu,
--						 uint64_t val)
-+/*
-+ * Userspace is allowed to set any supported IA32_FEATURE_CONTROL regardless of
-+ * guest CPUID.  Note, KVM allows userspace to set "VMX in SMX" to maintain
-+ * backwards compatibility even though KVM doesn't support emulating SMX.  And
-+ * because userspace set "VMX in SMX", the guest must also be allowed to set it,
-+ * e.g. if the MSR is left unlocked and the guest does a RMW operation.
-+ */
-+#define KVM_SUPPORTED_FEATURE_CONTROL  (FEAT_CTL_LOCKED			 | \
-+					FEAT_CTL_VMX_ENABLED_INSIDE_SMX	 | \
-+					FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX | \
-+					FEAT_CTL_SGX_LC_ENABLED		 | \
-+					FEAT_CTL_SGX_ENABLED		 | \
-+					FEAT_CTL_LMCE_ENABLED)
-+
-+static inline bool vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
-+						 struct msr_data *msr)
+-static inline bool vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
+-						 struct msr_data *msr)
++static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
++						    struct msr_data *msr)
  {
--	uint64_t valid_bits = to_vmx(vcpu)->msr_ia32_feature_control_valid_bits;
-+	uint64_t valid_bits;
+ 	uint64_t valid_bits;
  
--	return !(val & ~valid_bits);
-+	/*
-+	 * Ensure KVM_SUPPORTED_FEATURE_CONTROL is updated when new bits are
-+	 * exposed to the guest.
-+	 */
-+	WARN_ON_ONCE(vmx->msr_ia32_feature_control_valid_bits &
-+		     ~KVM_SUPPORTED_FEATURE_CONTROL);
-+
-+	if (msr->host_initiated)
-+		valid_bits = KVM_SUPPORTED_FEATURE_CONTROL;
-+	else
-+		valid_bits = vmx->msr_ia32_feature_control_valid_bits;
-+
-+	return !(msr->data & ~valid_bits);
- }
+@@ -1767,6 +1767,10 @@ static inline bool vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
+ 	WARN_ON_ONCE(vmx->msr_ia32_feature_control_valid_bits &
+ 		     ~KVM_SUPPORTED_FEATURE_CONTROL);
  
- static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
-@@ -2139,7 +2165,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++	if (!msr->host_initiated &&
++	    (vmx->msr_ia32_feature_control & FEAT_CTL_LOCKED))
++		return false;
++
+ 	if (msr->host_initiated)
+ 		valid_bits = KVM_SUPPORTED_FEATURE_CONTROL;
+ 	else
+@@ -2165,10 +2169,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
  		vcpu->arch.mcg_ext_ctl = data;
  		break;
  	case MSR_IA32_FEAT_CTL:
--		if (!vmx_feature_control_msr_valid(vcpu, data) ||
-+		if (!vmx_feature_control_msr_valid(vmx, msr_info) ||
- 		    (to_vmx(vcpu)->msr_ia32_feature_control &
- 		     FEAT_CTL_LOCKED && !msr_info->host_initiated))
+-		if (!vmx_feature_control_msr_valid(vmx, msr_info) ||
+-		    (to_vmx(vcpu)->msr_ia32_feature_control &
+-		     FEAT_CTL_LOCKED && !msr_info->host_initiated))
++		if (!is_vmx_feature_control_msr_valid(vmx, msr_info))
  			return 1;
++
+ 		vmx->msr_ia32_feature_control = data;
+ 		if (msr_info->host_initiated && data == 0)
+ 			vmx_leave_nested(vcpu);
 -- 
 2.36.1.255.ge46751e96f-goog
 
