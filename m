@@ -2,100 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45B7553FF2A
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 14:42:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 142C653FF79
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 14:55:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244060AbiFGMmw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 08:42:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49244 "EHLO
+        id S244294AbiFGMzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 08:55:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244075AbiFGMms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 08:42:48 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41229248EB;
-        Tue,  7 Jun 2022 05:42:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654605766; x=1686141766;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7CnaOaKftZFuU6zS5ejOPSw/a0TRQ7MfLEcH+ST55pI=;
-  b=npA/EwVLm80RPrCVVatUyQvh9x9gm5H6ghJ6dgiol7bnt46yPC4MAeIP
-   hodIq74n82eCvLkbY6D4n1U5g+cmclFLiS1lWHbglspj33Yx0VXhpW1xu
-   XXW9UHZ96K+9IXY9b2Fj6DgEmQ3WeVzrXk0/t33U8iB4Eu56WDtZMlNUm
-   pxMK+4gZexYxZYaxfCiELvhZ9RnU5kjk71ZGLbc98m1622I3PzO/VRn3x
-   XFvHXiaR2OZx8kR0okSiNW3ZGnzZm376te9757QJrrGqkayUVpgzKPh+f
-   935LMOkD4M2Ww6r8zdK9pommUkbicGZ9Jd72qeSG0NnIawB8Rb10j8+x0
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10370"; a="259493235"
-X-IronPort-AV: E=Sophos;i="5.91,283,1647327600"; 
-   d="scan'208";a="259493235"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2022 05:42:44 -0700
-X-IronPort-AV: E=Sophos;i="5.91,283,1647327600"; 
-   d="scan'208";a="584184405"
-Received: from zwang64-mobl1.ccr.corp.intel.com (HELO [10.249.174.202]) ([10.249.174.202])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2022 05:42:34 -0700
-Message-ID: <3d0b2863-bb4f-31e1-d54e-09ddf4762d43@linux.intel.com>
-Date:   Tue, 7 Jun 2022 20:42:32 +0800
+        with ESMTP id S244265AbiFGMzE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 08:55:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A4DC378918
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 05:55:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654606501;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PikFI8IuFGilq0ztM72f7JxwavOO8rV8L+cu0/Iu4x8=;
+        b=EtyB1LWhWNfL63MlIGdNjX7xkKZh6WdCCsqcT1FhR6nbBrzqwI7jA/wQ061S55QEmUqJlM
+        ME6XiAPavt1U6eQjEnVpklA1DWoy/tSmKkiFA89EsdtrPhPvhpcE4GaFt1QynKfhlENZA/
+        /vLDx8E8zee/wo7xHV8+De7ZrsLyAsU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-99-5HXQDpn1PY2w6KVMOusg9A-1; Tue, 07 Jun 2022 08:54:21 -0400
+X-MC-Unique: 5HXQDpn1PY2w6KVMOusg9A-1
+Received: by mail-wr1-f72.google.com with SMTP id bv8-20020a0560001f0800b002183c5d5c26so1740816wrb.20
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 05:54:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=PikFI8IuFGilq0ztM72f7JxwavOO8rV8L+cu0/Iu4x8=;
+        b=n+Y3L7MVTsWMfFaW0fW6c2HmJPTCMF7a285mtDU93fVP79Mm48JKosp5dZid2gI1cR
+         dAPMPaLLf6eQl/lmjJPF/79RQrooLBlR97ULCP8iu4Q1+isl6zNvtXpyy6dkxryL/cxd
+         t/t+5v2ortnt5nH6Xnm2uWxVONlcvJvUQn4HSQcnQDycml5vz/o9WWsFZB+n/z8ZTsUB
+         4XdML1Nib/OO9RM3QSBPu8Da0BRgEnnW6XmInwXCLN4SPLKE9g2m3FloVOglU3mJmNeS
+         nI6u9C3dGDB2POVOQ9ipBVz3d0lUCo2k+FvKnSCMDgkpRvm2Gl7odW1EKMVbndEJWYVa
+         bzFA==
+X-Gm-Message-State: AOAM531emheQ8xlo2vDjJ6Ltdh0vtzK3E7f4H15usx7KnDiWDNDk1PQg
+        VxB0ZyMUsVmJwYX1KiG8FoPAXLIe1HoGaMMOMvrM17JaE16VSzH/JyXJ5SPFsDcWxV1N2DLB7nm
+        IdlYI/BbHedMR
+X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr29011214wmi.90.1654606459916;
+        Tue, 07 Jun 2022 05:54:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwJa9Ztgs/feNXwUUZcblGX2ZWB3NuTx5Hif1QltOBA4EuHQl1hdGlGjZxUtoDL/Nv8LMki0A==
+X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr29011177wmi.90.1654606459567;
+        Tue, 07 Jun 2022 05:54:19 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id g6-20020a056000118600b002183fabc53csm5233442wrx.17.2022.06.07.05.54.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jun 2022 05:54:18 -0700 (PDT)
+Message-ID: <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
+Date:   Tue, 7 Jun 2022 14:54:14 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Cc:     baolu.lu@linux.intel.com, Nicolin Chen <nicolinc@nvidia.com>,
-        joro@8bytes.org, will@kernel.org, marcan@marcan.st,
-        sven@svenpeter.dev, robin.murphy@arm.com, robdclark@gmail.com,
-        m.szyprowski@samsung.com, krzysztof.kozlowski@linaro.org,
-        agross@kernel.org, bjorn.andersson@linaro.org,
-        matthias.bgg@gmail.com, heiko@sntech.de, orsonzhai@gmail.com,
-        baolin.wang7@gmail.com, zhang.lyra@gmail.com, wens@csie.org,
-        jernej.skrabec@gmail.com, samuel@sholland.org,
-        jean-philippe@linaro.org, alex.williamson@redhat.com,
-        suravee.suthikulpanit@amd.com, alyssa@rosenzweig.io,
-        alim.akhtar@samsung.com, dwmw2@infradead.org, yong.wu@mediatek.com,
-        mjrosato@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        thierry.reding@gmail.com, vdumpa@nvidia.com, jonathanh@nvidia.com,
-        cohuck@redhat.com, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 0/5] Simplify vfio_iommu_type1 attach/detach routine
+ Thunderbird/91.8.0
+Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
+ user_xfeatures to supported bits of XCR0
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-References: <20220606061927.26049-1-nicolinc@nvidia.com>
- <d357966b-7abd-f8f3-3ca7-3c99f5e075b9@linux.intel.com>
- <20220607115820.GH1343366@nvidia.com>
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20220607115820.GH1343366@nvidia.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Leonardo Bras <leobras@redhat.com>,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org,
+        chang.seok.bae@intel.com, luto@kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+References: <20220301201344.18191-1-sashal@kernel.org>
+ <20220301201344.18191-7-sashal@kernel.org>
+ <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
+ <YppVupW+IWsm7Osr@xz-m1.local>
+ <2d9ba70b-ac18-a461-7a57-22df2c0165c6@redhat.com>
+ <Yp5xSi6P3q187+A+@xz-m1.local>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Yp5xSi6P3q187+A+@xz-m1.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022/6/7 19:58, Jason Gunthorpe wrote:
-> On Tue, Jun 07, 2022 at 03:44:43PM +0800, Baolu Lu wrote:
->> On 2022/6/6 14:19, Nicolin Chen wrote:
->>> Worths mentioning the exact match for enforce_cache_coherency is removed
->>> with this series, since there's very less value in doing that since KVM
->>> won't be able to take advantage of it -- this just wastes domain memory.
->>> Instead, we rely on Intel IOMMU driver taking care of that internally.
+On 6/6/22 23:27, Peter Xu wrote:
+> On Mon, Jun 06, 2022 at 06:18:12PM +0200, Paolo Bonzini wrote:
+>>> However there seems to be something missing at least to me, on why it'll
+>>> fail a migration from 5.15 (without this patch) to 5.18 (with this patch).
+>>> In my test case, user_xfeatures will be 0x7 (FP|SSE|YMM) if without this
+>>> patch, but 0x0 if with it.
 >>
->> After reading this series, I don't see that Intel IOMMU driver needs any
->> further change to support the new scheme. Did I miss anything?
+>> What CPU model are you using for the VM?
 > 
-> You already did it :)
+> I didn't specify it, assuming it's qemu64 with no extra parameters.
 
-Just as I thought. Thank you!
+Ok, so indeed it lacks AVX and this patch can have an effect.
 
-Best regards,
-baolu
+>> For example, if the source lacks this patch but the destination has it,
+>> the source will transmit YMM registers, but the destination will fail to
+>> set them if they are not available for the selected CPU model.
+>>
+>> See the commit message: "As a bonus, it will also fail if userspace tries to
+>> set fpu features (with the KVM_SET_XSAVE ioctl) that are not compatible to
+>> the guest configuration.  Such features will never be returned by
+>> KVM_GET_XSAVE or KVM_GET_XSAVE2."
+> 
+> IIUC you meant we should have failed KVM_SET_XSAVE when they're not aligned
+> (probably by failing validate_user_xstate_header when checking against the
+> user_xfeatures on dest host). But that's probably not my case, because here
+> KVM_SET_XSAVE succeeded, it's just that the guest gets a double fault after
+> the precopy migration completes (or for postcopy when the switchover is
+> done).
+
+Difficult to say what's happening without seeing at least the guest code 
+around the double fault (above you said "fail a migration" and I thought 
+that was a different scenario than the double fault), and possibly which 
+was the first exception that contributed to the double fault.
+
+Paolo
 
