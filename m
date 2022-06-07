@@ -2,127 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 142C653FF79
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 14:55:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39D8853FF7C
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 14:55:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244294AbiFGMzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 08:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54620 "EHLO
+        id S244299AbiFGMzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 08:55:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244265AbiFGMzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 08:55:04 -0400
+        with ESMTP id S244295AbiFGMzY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 08:55:24 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A4DC378918
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 05:55:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A0C17891F
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 05:55:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654606501;
+        s=mimecast20190719; t=1654606522;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PikFI8IuFGilq0ztM72f7JxwavOO8rV8L+cu0/Iu4x8=;
-        b=EtyB1LWhWNfL63MlIGdNjX7xkKZh6WdCCsqcT1FhR6nbBrzqwI7jA/wQ061S55QEmUqJlM
-        ME6XiAPavt1U6eQjEnVpklA1DWoy/tSmKkiFA89EsdtrPhPvhpcE4GaFt1QynKfhlENZA/
-        /vLDx8E8zee/wo7xHV8+De7ZrsLyAsU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=qG1T4zsfTidOx53P9EPIRzFit5r/L5xPw3Mz6Kd2ais=;
+        b=PngynVR5n3DbRVfREsXpBHcsiaQl2d9X+rfqfYBurxT64QsedaqyKR2KfIVT1YlBQx/xGN
+        OHQQnf15Xv2mtQoZE6QC2O7unqgtya4bzuMpALfOd8PtkWTMVuKJT6AW9m4T7C/9tgcGYM
+        PFVn86+odASJtaKROZyjrbCfbrV1DIQ=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-99-5HXQDpn1PY2w6KVMOusg9A-1; Tue, 07 Jun 2022 08:54:21 -0400
-X-MC-Unique: 5HXQDpn1PY2w6KVMOusg9A-1
-Received: by mail-wr1-f72.google.com with SMTP id bv8-20020a0560001f0800b002183c5d5c26so1740816wrb.20
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 05:54:21 -0700 (PDT)
+ us-mta-50-OoEco6hsOX259p5vvJWCqQ-1; Tue, 07 Jun 2022 08:55:21 -0400
+X-MC-Unique: OoEco6hsOX259p5vvJWCqQ-1
+Received: by mail-qk1-f198.google.com with SMTP id q7-20020a05620a0d8700b006a6b5428cb1so5575067qkl.2
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 05:55:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=PikFI8IuFGilq0ztM72f7JxwavOO8rV8L+cu0/Iu4x8=;
-        b=n+Y3L7MVTsWMfFaW0fW6c2HmJPTCMF7a285mtDU93fVP79Mm48JKosp5dZid2gI1cR
-         dAPMPaLLf6eQl/lmjJPF/79RQrooLBlR97ULCP8iu4Q1+isl6zNvtXpyy6dkxryL/cxd
-         t/t+5v2ortnt5nH6Xnm2uWxVONlcvJvUQn4HSQcnQDycml5vz/o9WWsFZB+n/z8ZTsUB
-         4XdML1Nib/OO9RM3QSBPu8Da0BRgEnnW6XmInwXCLN4SPLKE9g2m3FloVOglU3mJmNeS
-         nI6u9C3dGDB2POVOQ9ipBVz3d0lUCo2k+FvKnSCMDgkpRvm2Gl7odW1EKMVbndEJWYVa
-         bzFA==
-X-Gm-Message-State: AOAM531emheQ8xlo2vDjJ6Ltdh0vtzK3E7f4H15usx7KnDiWDNDk1PQg
-        VxB0ZyMUsVmJwYX1KiG8FoPAXLIe1HoGaMMOMvrM17JaE16VSzH/JyXJ5SPFsDcWxV1N2DLB7nm
-        IdlYI/BbHedMR
-X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr29011214wmi.90.1654606459916;
-        Tue, 07 Jun 2022 05:54:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJa9Ztgs/feNXwUUZcblGX2ZWB3NuTx5Hif1QltOBA4EuHQl1hdGlGjZxUtoDL/Nv8LMki0A==
-X-Received: by 2002:a7b:c401:0:b0:397:26fb:ebf7 with SMTP id k1-20020a7bc401000000b0039726fbebf7mr29011177wmi.90.1654606459567;
-        Tue, 07 Jun 2022 05:54:19 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id g6-20020a056000118600b002183fabc53csm5233442wrx.17.2022.06.07.05.54.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jun 2022 05:54:18 -0700 (PDT)
-Message-ID: <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
-Date:   Tue, 7 Jun 2022 14:54:14 +0200
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=qG1T4zsfTidOx53P9EPIRzFit5r/L5xPw3Mz6Kd2ais=;
+        b=AM12iq5WwzkWE9FZlqPRxqU1g48Dybyc6cpa3/xgVKjUZ3BtL2vyysD88c46bHaQFQ
+         BsksOV99/ZLgGP6nawO5Jx3gW7kWTq272oDvOJGMltl24Cvcga36jed5Qp3r2NHVF9vj
+         NoCpsMPjAKsDExmTZPLZiwqvb5S7bfUOdaI0N86OqrjMvHxhh/w/47oh7QD7aEYkYj0x
+         404S8Z+tG7O02lBLAlWJBD20GdL6pPVPW4D39HnEj1GbjIQnPOfAA8Qo7apHF6u3fMyY
+         UHkJB+ac90i0rmhWabh3ndDNli/9vRTGRILfobmW7HaI5St20SBOgx7Hc4kFYfVBlkZH
+         6t0A==
+X-Gm-Message-State: AOAM532G3sN04LHzBjxC8IlriL/VegrjkbCB87ZZ6pt8ZHlnmnnAE4vC
+        VBpRMtY2owGPj4TT68EiRVpS/bhPOK1B7inSlLWBx1Ovi7mu+pr2GK94TqrMG2+3AWRysNHXheF
+        Jt/86WoyqjVW1
+X-Received: by 2002:a05:622a:118f:b0:2f9:2187:c9d with SMTP id m15-20020a05622a118f00b002f921870c9dmr22115270qtk.538.1654606520013;
+        Tue, 07 Jun 2022 05:55:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqKW5iienKp1AJiTofdmOtQYfOb1M+Hur/7jdaJH2YwOdpWmxr16oLKzulfG7rbWL5uiBXgQ==
+X-Received: by 2002:a05:622a:118f:b0:2f9:2187:c9d with SMTP id m15-20020a05622a118f00b002f921870c9dmr22115234qtk.538.1654606519648;
+        Tue, 07 Jun 2022 05:55:19 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id bp13-20020a05620a458d00b006a6bfcd6df5sm4645554qkb.37.2022.06.07.05.55.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jun 2022 05:55:18 -0700 (PDT)
+Message-ID: <bd37180680b3e3ecec85b5151742092b9f1ce9ff.camel@redhat.com>
+Subject: Re: [PATCH 2/7] KVM: SVM: Add VNMI bit definition
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Santosh Shukla <santosh.shukla@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Tue, 07 Jun 2022 15:55:15 +0300
+In-Reply-To: <20220602142620.3196-3-santosh.shukla@amd.com>
+References: <20220602142620.3196-1-santosh.shukla@amd.com>
+         <20220602142620.3196-3-santosh.shukla@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
- user_xfeatures to supported bits of XCR0
-Content-Language: en-US
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Leonardo Bras <leobras@redhat.com>,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org,
-        chang.seok.bae@intel.com, luto@kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-References: <20220301201344.18191-1-sashal@kernel.org>
- <20220301201344.18191-7-sashal@kernel.org>
- <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
- <YppVupW+IWsm7Osr@xz-m1.local>
- <2d9ba70b-ac18-a461-7a57-22df2c0165c6@redhat.com>
- <Yp5xSi6P3q187+A+@xz-m1.local>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yp5xSi6P3q187+A+@xz-m1.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/6/22 23:27, Peter Xu wrote:
-> On Mon, Jun 06, 2022 at 06:18:12PM +0200, Paolo Bonzini wrote:
->>> However there seems to be something missing at least to me, on why it'll
->>> fail a migration from 5.15 (without this patch) to 5.18 (with this patch).
->>> In my test case, user_xfeatures will be 0x7 (FP|SSE|YMM) if without this
->>> patch, but 0x0 if with it.
->>
->> What CPU model are you using for the VM?
+On Thu, 2022-06-02 at 19:56 +0530, Santosh Shukla wrote:
+> VNMI exposes 3 capability bits (V_NMI, V_NMI_MASK, and V_NMI_ENABLE) to
+> virtualize NMI and NMI_MASK, Those capability bits are part of
+> VMCB::intr_ctrl -
+> V_NMI(11) - Indicates whether a virtual NMI is pending in the guest.
+So this is like bit in IRR
+
+> V_NMI_MASK(12) - Indicates whether virtual NMI is masked in the guest.
+And that is like bit in ISR.
+
+Question: what are the interactions with GIF/vGIF and this feature?
+
+> V_NMI_ENABLE(26) - Enables the NMI virtualization feature for the guest.
 > 
-> I didn't specify it, assuming it's qemu64 with no extra parameters.
-
-Ok, so indeed it lacks AVX and this patch can have an effect.
-
->> For example, if the source lacks this patch but the destination has it,
->> the source will transmit YMM registers, but the destination will fail to
->> set them if they are not available for the selected CPU model.
->>
->> See the commit message: "As a bonus, it will also fail if userspace tries to
->> set fpu features (with the KVM_SET_XSAVE ioctl) that are not compatible to
->> the guest configuration.  Such features will never be returned by
->> KVM_GET_XSAVE or KVM_GET_XSAVE2."
+> When Hypervisor wants to inject NMI, it will set V_NMI bit, Processor
+> will clear the V_NMI bit and Set the V_NMI_MASK which means the Guest is
+> handling NMI, After the guest handled the NMI, The processor will clear
+> the V_NMI_MASK on the successful completion of IRET instruction Or if
+> VMEXIT occurs while delivering the virtual NMI.
 > 
-> IIUC you meant we should have failed KVM_SET_XSAVE when they're not aligned
-> (probably by failing validate_user_xstate_header when checking against the
-> user_xfeatures on dest host). But that's probably not my case, because here
-> KVM_SET_XSAVE succeeded, it's just that the guest gets a double fault after
-> the precopy migration completes (or for postcopy when the switchover is
-> done).
+> To enable the VNMI capability, Hypervisor need to program
+> V_NMI_ENABLE bit 1.
+> 
+> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+> ---
+>  arch/x86/include/asm/svm.h | 7 +++++++
+>  arch/x86/kvm/svm/svm.c     | 6 ++++++
+>  2 files changed, 13 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 1b07fba11704..22d918555df0 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -195,6 +195,13 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>  #define AVIC_ENABLE_SHIFT 31
+>  #define AVIC_ENABLE_MASK (1 << AVIC_ENABLE_SHIFT)
+>  
+> +#define V_NMI_PENDING_SHIFT 11
+> +#define V_NMI_PENDING (1 << V_NMI_PENDING_SHIFT)
+> +#define V_NMI_MASK_SHIFT 12
+> +#define V_NMI_MASK (1 << V_NMI_MASK_SHIFT)
+> +#define V_NMI_ENABLE_SHIFT 26
+> +#define V_NMI_ENABLE (1 << V_NMI_ENABLE_SHIFT)
+> +
+>  #define LBR_CTL_ENABLE_MASK BIT_ULL(0)
+>  #define VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK BIT_ULL(1)
+>  
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 200045f71df0..860f28c668bd 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -198,6 +198,8 @@ module_param(dump_invalid_vmcb, bool, 0644);
+>  bool intercept_smi = true;
+>  module_param(intercept_smi, bool, 0444);
+>  
+> +static bool vnmi;
+> +module_param(vnmi, bool, 0444);
+>  
+>  static bool svm_gp_erratum_intercept = true;
+>  
+> @@ -4930,6 +4932,10 @@ static __init int svm_hardware_setup(void)
+>                 svm_x86_ops.vcpu_get_apicv_inhibit_reasons = NULL;
+>         }
+>  
+> +       vnmi = vnmi && boot_cpu_has(X86_FEATURE_V_NMI);
+> +       if (vnmi)
+> +               pr_info("V_NMI enabled\n");
+> +
+>         if (vls) {
+>                 if (!npt_enabled ||
+>                     !boot_cpu_has(X86_FEATURE_V_VMSAVE_VMLOAD) ||
 
-Difficult to say what's happening without seeing at least the guest code 
-around the double fault (above you said "fail a migration" and I thought 
-that was a different scenario than the double fault), and possibly which 
-was the first exception that contributed to the double fault.
 
-Paolo
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
