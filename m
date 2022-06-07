@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0884D54248C
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:52:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D49CF54270A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:58:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1390064AbiFHBAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 21:00:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60186 "EHLO
+        id S1384395AbiFHA7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 20:59:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382840AbiFGXjF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 19:39:05 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8AD422EFDB
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 14:36:39 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id a68-20020a25ca47000000b006605f788ff1so12671360ybg.16
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 14:36:39 -0700 (PDT)
+        with ESMTP id S1578998AbiFGXjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 19:39:09 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BCFD40078A
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 14:36:41 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id k92-20020a17090a4ce500b001e69e8a98a4so7215442pjh.3
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 14:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=liucOeq+i8wBW37ckX9CitJW/au6CJxD8EZtE2Dscgc=;
-        b=IN4fgLOAlV1KfJqGAahoaf3ef2R61NuhCc8Zcuigfom73c04gZoF4gqmTlUtsMkVpC
-         JJjG5PLhtp0idJcE3GQZIUcLYjAFyliljLpmJEtskP/d9vDA+SUVMTiFr2hP1UxPLYHS
-         l6qT8pIGPWE5c8PmBss+TQAa+aDolxVsk5hpUIWrgBd/eOL+Ni75YM8tBNHcv5KC2108
-         hX4vi4h52X6J7ztyPP6LvuYeEc4Q8rr/3H40NyyOkO82MsQgFndVerbRD480mQnmy87g
-         d0+G/e3Pf8MNkO8RgEMH0iZYVzv21SEneAUSiIpjkqmdtoD+EB3MUXh+XkggzrR2H7DJ
-         wsyQ==
+        bh=A1QzBL/Nmqz2F6BNd27eYTxcbJ/pZ61eqO0oiIixNDI=;
+        b=Db1SvxBIb2DsUy46A0dAj6+ZmFkSPF27w+9DEhO6qhsgUf1mF7uhTxBpIVMqodwop5
+         hl59ox8ukdMh6gqTO+TVRsOjuVyydSw2Ch1+iQ/51z02ULBPNGGCVBXCXHZBJORabQQr
+         yAzTWmdbP0G9QqrpoF3qp/mF7nwOdbY42N40ypztvPYkD0GmhkGpohsNNbVO+nOi+Oln
+         DH17NxAMQLpue4YNQP5sL5WKI1253rM1qQXwoXI0lpgbsV+h1fwSAqzsZvx7NIVn/rAP
+         An5btIOpDLEhQZH4+DjuuhfSi82Ddfcgkmptvjtp3mAMupEcgw9OenMvw78lId0WAxkl
+         42mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=liucOeq+i8wBW37ckX9CitJW/au6CJxD8EZtE2Dscgc=;
-        b=8Qs2KINAO3rcPsp0fFGcK4TY+sg4vdwZHtW/Mp04sAyNTqO6sVRteDB9Ms2+bNV2Tx
-         7oovEKPbJVftIYqvBXKrjpDRUasTzt9k68sSx7FGbLllE5bI24FyYGxArRiLtSxv9YbB
-         JggUw2AOa3koqcEVqKXrqrr+XDPUSs9XmfmF+5GmhTPuJQ1QDK+11tIZFS5bFkPZ8q/i
-         7auy2KgIZ1VFR04JfMtetZwx5uptlpLhvKHfscCb2C71zpynXAucfSlLLPiXeJ/7YdYd
-         MehJyLIuckvc1yD3QHrA0daK23NAKelD1vffYwnPMiGLjCyGtkgnf6aU28Ilpr18qpjE
-         1Okg==
-X-Gm-Message-State: AOAM533nSlHIQLyd3P3rSo5VcezsmSB1y2mRaJDJ9CYfCTOIbhtkRiVo
-        mKMT8LEiN+PVZaG/RZexHs5Ev4I0eOI=
-X-Google-Smtp-Source: ABdhPJwaMXUoyu3EtfXs0KZLcGC4hnzNLLKfYxjZfrDEVK3xRQ3CoJWyKoyj8BCWfKvB0yvC4Lb3ZojZyZM=
+        bh=A1QzBL/Nmqz2F6BNd27eYTxcbJ/pZ61eqO0oiIixNDI=;
+        b=K50+kj8vuOADbVTPWX4rgCV5ZGdEunzEKtp+sX1ra0CopkyovCTISZGGsN40RBIwdK
+         ueiwtxnhDMCvNlPOgDia9WoramIJz1gB7v79JHXMV5GBpjTmsmgTPQH11NmspUa6sXfy
+         4KZOd/i44QE5q3LU3dAENSDlNlAqlmGl+hDi3zYW/T9aDGqJWzr15yzXJoMiXcjmOCw6
+         zkYlDUxeQOw+QT8l7dUgGiZZ0epD50Mvz7dVlCSElajW5SbB7HrHcNf/+ssFjF1CmPHG
+         l99jT64P/GwBNSHSc87e4nCJk523PuuUm5Q9IgIBopOQGsQ33xIroIjYAIHdbvugg3Tk
+         Ll7Q==
+X-Gm-Message-State: AOAM5306H/VWYNMu09WmVytrBsOn8piI+b666+KZ/5Kx+aFiuIyQJrEo
+        jwwEC0hODKD2vODdipz3fIzotR8qb90=
+X-Google-Smtp-Source: ABdhPJy3l2yd61SiPhtcX+F+gl5mfqfQO84DcbbvRYxt/Y/zuLGXuz0A4cZ3aBAfXillFcWAGIViKSVWEhM=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a81:9d5:0:b0:2f4:dd93:4513 with SMTP id
- 204-20020a8109d5000000b002f4dd934513mr33067623ywj.54.1654637798700; Tue, 07
- Jun 2022 14:36:38 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1a8f:b0:51c:2f82:cdba with SMTP id
+ e15-20020a056a001a8f00b0051c2f82cdbamr7674725pfv.85.1654637800483; Tue, 07
+ Jun 2022 14:36:40 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  7 Jun 2022 21:36:01 +0000
+Date:   Tue,  7 Jun 2022 21:36:02 +0000
 In-Reply-To: <20220607213604.3346000-1-seanjc@google.com>
-Message-Id: <20220607213604.3346000-13-seanjc@google.com>
+Message-Id: <20220607213604.3346000-14-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220607213604.3346000-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v5 12/15] KVM: nVMX: Extend VMX MSRs quirk to CR0/4 fixed1 bits
+Subject: [PATCH v5 13/15] KVM: selftests: Add test to verify KVM's VMX MSRs
+ quirk for controls
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -74,118 +75,251 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Extend the VMX MSRs quirk to the CR0/4_FIXED1 MSRs, i.e. when the quirk
-is disabled, allow userspace to set the MSRs and do not rewrite the MSRs
-during CPUID updates.  The bits that the guest (L2 in this case) is
-allowed to set are not directly tied to CPUID.  Enumerating to L1 that it
-can set reserved CR0/4 bits is nonsensical and will ultimately result in
-a failed nested VM-Entry (KVM enforces guest reserved CR4 bits on top of
-the VMX MSRs), but KVM typically doesn't police the vCPU model except
-when doing so is necessary to protect the host kernel.
+Add a test to verify KVM's established ABI with respect to the entry/exit
+controls for PERF_GLOBAL_CTRL and BNDCFGS.  KVM has a quirk where KVM
+updates the VMX "true" entry/exit control MSRs to force PERF_GLOBAL_CTRL
+and BNDCFGS to follow the guest CPUID model, i.e. set when supported,
+clear when not, even though the MSR values are not strictly associated
+with CPUID.  Note, KVM's ABI is that its modifications to the MSRs are
+preserved even when userspace explicitly writes the MSRs.
 
-Further restricting CR4 bits is however a reasonable thing to do, e.g. to
-work around a bug in nested virtualization, in which case exposing a
-feature to L1 is ok, but letting L2 use the feature is not.  Of course,
-whether or not the L1 hypervisor will actually _check_ the FIXED1 bits is
-another matter entirely, e.g. KVM currently assumes all bits that can be
-set in the host can also be set in the guest.
+Verify that KVM correctly tweaks the MSRs When the quirk is enabled (the
+default behavior), and does not touch them when the quirk is disabled.
 
+Suggested-by: Oliver Upton <oupton@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- Documentation/virt/kvm/api.rst |  8 ++++++++
- arch/x86/kvm/vmx/nested.c      | 33 ++++++++++++++++++++++++++++++---
- arch/x86/kvm/vmx/vmx.c         |  6 +++---
- 3 files changed, 41 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/processor.h  |   1 +
+ .../selftests/kvm/include/x86_64/vmx.h        |   2 +
+ .../selftests/kvm/x86_64/vmx_msrs_test.c      | 161 ++++++++++++++++++
+ 5 files changed, 166 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 1095692ddab7..88d1bbae031e 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7391,6 +7391,14 @@ The valid bits in cap.args[0] are:
-                                       IA32_VMX_TRUE_EXIT_CTLS[bit 44]
-                                       ('load IA32_PERF_GLOBAL_CTRL'). Otherwise,
-                                       these corresponding MSR bits are cleared.
-+                                    - MSR_IA32_VMX_CR0_FIXED1 is unconditionally
-+                                      set to 0xffffffff
-+                                    - CR4.PCE is unconditionally set in
-+                                      MSR_IA32_VMX_CR4_FIXED1.
-+                                    - All CR4 bits with an associated CPUID
-+                                      feature flag are set in
-+                                      MSR_IA32_VMX_CR4_FIXED1 if the feature is
-+                                      reported as supported in guest CPUID.
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 0ab0e255d292..5893804b5196 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -47,6 +47,7 @@
+ /x86_64/vmx_dirty_log_test
+ /x86_64/vmx_exception_with_invalid_guest_state
+ /x86_64/vmx_invalid_nested_guest_state
++/x86_64/vmx_msrs_test
+ /x86_64/vmx_preemption_timer_test
+ /x86_64/vmx_set_nested_state_test
+ /x86_64/vmx_tsc_adjust_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 9a256c1f1bdf..2ee2dc55c100 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -74,6 +74,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_apic_access_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_exception_with_invalid_guest_state
++TEST_GEN_PROGS_x86_64 += x86_64/vmx_msrs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_invalid_nested_guest_state
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 3fd3d58148c2..51cab9b080f7 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -98,6 +98,7 @@ struct kvm_x86_cpu_feature {
+ #define	X86_FEATURE_SMEP	        KVM_X86_CPU_FEATURE(0x7, 0, EBX, 7)
+ #define	X86_FEATURE_INVPCID		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 10)
+ #define	X86_FEATURE_RTM			KVM_X86_CPU_FEATURE(0x7, 0, EBX, 11)
++#define	X86_FEATURE_MPX			KVM_X86_CPU_FEATURE(0x7, 0, EBX, 14)
+ #define	X86_FEATURE_SMAP		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 20)
+ #define	X86_FEATURE_PCOMMIT		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 22)
+ #define	X86_FEATURE_CLFLUSHOPT		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 23)
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index fe0ebb790b49..5a6002b34d2b 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -80,6 +80,7 @@
+ #define VM_EXIT_SAVE_IA32_EFER			0x00100000
+ #define VM_EXIT_LOAD_IA32_EFER			0x00200000
+ #define VM_EXIT_SAVE_VMX_PREEMPTION_TIMER	0x00400000
++#define VM_EXIT_CLEAR_BNDCFGS			0x00800000
  
-                                     When this quirk is disabled, KVM will not
-                                     change the values of the aformentioned VMX
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 5533c2474128..abce74cfefc9 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1385,6 +1385,30 @@ static int vmx_restore_fixed0_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
- 	return 0;
- }
+ #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
  
-+static u64 *vmx_get_fixed1_msr(struct nested_vmx_msrs *msrs, u32 msr_index)
-+{
-+	switch (msr_index) {
-+	case MSR_IA32_VMX_CR0_FIXED1:
-+		return &msrs->cr0_fixed1;
-+	case MSR_IA32_VMX_CR4_FIXED1:
-+		return &msrs->cr4_fixed1;
-+	default:
-+		BUG();
+@@ -90,6 +91,7 @@
+ #define VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL	0x00002000
+ #define VM_ENTRY_LOAD_IA32_PAT			0x00004000
+ #define VM_ENTRY_LOAD_IA32_EFER			0x00008000
++#define VM_ENTRY_LOAD_BNDCFGS			0x00010000
+ 
+ #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c
+new file mode 100644
+index 000000000000..9be2c2e3acf1
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c
+@@ -0,0 +1,161 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * VMX control MSR test
++ *
++ * Copyright (C) 2022 Google LLC.
++ *
++ * Tests for KVM ownership of bits in the VMX entry/exit control MSRs. Checks
++ * that KVM will set owned bits where appropriate, and will not if
++ * KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS is disabled.
++ */
++
++#include "kvm_util.h"
++#include "vmx.h"
++
++#define SUBTEST_REQUIRE(f)					\
++	if (!(f)) {						\
++		print_skip("Requirement not met: %s", #f);	\
++		return;						\
 +	}
-+}
 +
-+static int vmx_restore_fixed1_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
++static bool vmx_has_ctrl(struct kvm_vcpu *vcpu, uint32_t msr, uint32_t ctrl_mask)
 +{
-+	const u64 *msr = vmx_get_fixed1_msr(&vmcs_config.nested, msr_index);
-+
-+	/* Bits that "must-be-0" must not be set in the restored value. */
-+	if (!is_bitwise_subset(*msr, data, -1ULL))
-+		return -EINVAL;
-+
-+	*vmx_get_fixed1_msr(&vmx->nested.msrs, msr_index) = data;
-+	return 0;
++	return (vcpu_get_msr(vcpu, msr) >> 32) & ctrl_mask;
 +}
 +
- /*
-  * Called when userspace is restoring VMX MSRs.
-  *
-@@ -1432,10 +1456,13 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
- 	case MSR_IA32_VMX_CR0_FIXED1:
- 	case MSR_IA32_VMX_CR4_FIXED1:
- 		/*
--		 * These MSRs are generated based on the vCPU's CPUID, so we
--		 * do not support restoring them directly.
-+		 * These MSRs are generated based on the vCPU's CPUID when KVM
-+		 * "owns" the VMX MSRs, do not allow restoring them directly.
- 		 */
--		return -EINVAL;
-+		if (kvm_check_has_quirk(vmx->vcpu.kvm, KVM_X86_QUIRK_TWEAK_VMX_MSRS))
-+			return -EINVAL;
++static void test_vmx_ctrl_msr(struct kvm_vcpu *vcpu,
++			      uint32_t msr, uint64_t ctrl_mask,
++			      bool quirk_enabled, bool feature_enabled)
++{
++	uint64_t ctrl_allowed1 = ctrl_mask << 32;
++	uint64_t val = vcpu_get_msr(vcpu, msr);
 +
-+		return vmx_restore_fixed1_msr(vmx, msr_index, data);
- 	case MSR_IA32_VMX_EPT_VPID_CAP:
- 		return vmx_restore_vmx_ept_vpid_cap(vmx, data);
- 	case MSR_IA32_VMX_VMCS_ENUM:
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4c31c8f24329..139f365ca6bb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7520,10 +7520,10 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 			~(FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
- 			  FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX);
- 
--	if (nested_vmx_allowed(vcpu)) {
-+	if (nested_vmx_allowed(vcpu) &&
-+	    kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_MSRS)) {
- 		nested_vmx_cr_fixed1_bits_update(vcpu);
--		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_MSRS))
--			nested_vmx_entry_exit_ctls_update(vcpu);
-+		nested_vmx_entry_exit_ctls_update(vcpu);
- 	}
- 
- 	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
++	/*
++	 * If the quirk is enabled, KVM should have modified the MSR when the
++	 * guest's CPUID was set.  Don't assert anything when the quirk is
++	 * disabled, the value of the MSR is not known (it could be made known,
++	 * but it gets messy and the added value is minimal).
++	 */
++	TEST_ASSERT(!quirk_enabled || (!!(val & ctrl_allowed1) == feature_enabled),
++		    "KVM owns the ctrl when the quirk is enabled, want 0x%lx, got 0x%lx",
++		    feature_enabled ? ctrl_allowed1 : 0, val & ctrl_allowed1);
++
++	val |= ctrl_allowed1;
++	vcpu_set_msr(vcpu, msr, val);
++
++	val = vcpu_get_msr(vcpu, msr);
++	if (quirk_enabled)
++		TEST_ASSERT(!!(val & ctrl_allowed1) == feature_enabled,
++			    "KVM owns the ctrl when the quirk is enabled, want 0x%lx, got 0x%lx",
++			    feature_enabled ? ctrl_allowed1 : 0, val & ctrl_allowed1);
++	else
++		TEST_ASSERT(val & ctrl_allowed1,
++			    "KVM shouldn't clear the ctrl when the quirk is disabled");
++
++	val &= ~ctrl_allowed1;
++	vcpu_set_msr(vcpu, msr, val);
++
++	val = vcpu_get_msr(vcpu, msr);
++	if (quirk_enabled)
++		TEST_ASSERT(!!(val & ctrl_allowed1) == feature_enabled,
++			    "KVM owns the ctrl when the quirk is enabled, want 0x%lx, got 0x%lx",
++			    feature_enabled ? ctrl_allowed1 : 0, val & ctrl_allowed1);
++	else
++		TEST_ASSERT(!(val & ctrl_allowed1),
++			    "KVM shouldn't set the ctrl when the quirk is disabled");
++}
++
++static void test_vmx_ctrl_msrs_pair(struct kvm_vcpu *vcpu,
++				    bool quirk_enabled, bool feature_enabled,
++				    uint32_t entry_msr, uint64_t entry_mask,
++				    uint32_t exit_msr, uint64_t exit_mask)
++{
++	test_vmx_ctrl_msr(vcpu, entry_msr, entry_mask, quirk_enabled, feature_enabled);
++	test_vmx_ctrl_msr(vcpu, exit_msr, exit_mask, quirk_enabled, feature_enabled);
++}
++
++static void test_vmx_ctrls(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
++			   uint64_t entry_ctrl, uint64_t exit_ctrl)
++{
++	/*
++	 * KVM's quirky behavior only exists for PERF_GLOBAL_CTRL and BNDCFGS,
++	 * any attempt to extend KVM's quirky behavior must be met with fierce
++	 * resistance!
++	 */
++	TEST_ASSERT(entry_ctrl == VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL ||
++		    entry_ctrl == VM_ENTRY_LOAD_BNDCFGS,
++		    "Don't let KVM expand its quirk beyond PERF_GLOBAL_CTRL and BNDCFSG");
++
++	SUBTEST_REQUIRE(vmx_has_ctrl(vcpu, MSR_IA32_VMX_TRUE_ENTRY_CTLS, entry_ctrl));
++	SUBTEST_REQUIRE(vmx_has_ctrl(vcpu, MSR_IA32_VMX_TRUE_EXIT_CTLS, exit_ctrl));
++
++	/*
++	 * Test that, when the quirk is enabled, KVM sets/clears the VMX MSR
++	 * bits based on whether or not the feature is exposed to the guest.
++	 */
++	test_vmx_ctrl_msrs_pair(vcpu, true, true,
++				MSR_IA32_VMX_TRUE_ENTRY_CTLS, entry_ctrl,
++				MSR_IA32_VMX_TRUE_EXIT_CTLS, exit_ctrl);
++
++	/* Hide the feature in CPUID. */
++	if (entry_ctrl == VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
++		vcpu_clear_cpuid_entry(vcpu, 0xa);
++	else
++		vcpu_clear_cpuid_feature(vcpu, X86_FEATURE_MPX);
++
++	test_vmx_ctrl_msrs_pair(vcpu, true, false,
++				MSR_IA32_VMX_TRUE_ENTRY_CTLS, entry_ctrl,
++				MSR_IA32_VMX_TRUE_EXIT_CTLS, exit_ctrl);
++
++	/*
++	 * Disable the quirk, giving userspace control of the VMX MSRs.  KVM
++	 * should not touch the MSR, i.e. should allow hiding the control when
++	 * a vPMU is supported, and should allow exposing the control when a
++	 * vPMU is not supported.
++	 */
++	vm_enable_cap(vm, KVM_CAP_DISABLE_QUIRKS2, KVM_X86_QUIRK_TWEAK_VMX_MSRS);
++
++	test_vmx_ctrl_msrs_pair(vcpu, false, false,
++				MSR_IA32_VMX_TRUE_ENTRY_CTLS, entry_ctrl,
++				MSR_IA32_VMX_TRUE_EXIT_CTLS, exit_ctrl);
++
++	/* Restore the full CPUID to expose the feature to the guest. */
++	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
++	test_vmx_ctrl_msrs_pair(vcpu, false, true,
++				MSR_IA32_VMX_TRUE_ENTRY_CTLS, entry_ctrl,
++				MSR_IA32_VMX_TRUE_EXIT_CTLS, exit_ctrl);
++
++	vm_enable_cap(vm, KVM_CAP_DISABLE_QUIRKS2, 0);
++}
++
++static void load_perf_global_ctrl_test(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++	SUBTEST_REQUIRE(kvm_get_cpuid_max_basic() >= 0xa);
++
++	test_vmx_ctrls(vm, vcpu, VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
++		       VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL);
++}
++
++static void load_and_clear_bndcfgs_test(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++	SUBTEST_REQUIRE(kvm_cpu_has(X86_FEATURE_MPX));
++
++	test_vmx_ctrls(vm, vcpu, VM_ENTRY_LOAD_BNDCFGS, VM_EXIT_CLEAR_BNDCFGS);
++}
++
++int main(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_DISABLE_QUIRKS2));
++	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
++
++	/* No need to actually do KVM_RUN, thus no guest code. */
++	vm = vm_create_with_one_vcpu(&vcpu, NULL);
++
++	load_perf_global_ctrl_test(vm, vcpu);
++	load_and_clear_bndcfgs_test(vm, vcpu);
++
++	kvm_vm_free(vm);
++}
 -- 
 2.36.1.255.ge46751e96f-goog
 
