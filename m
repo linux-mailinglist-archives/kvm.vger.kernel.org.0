@@ -2,80 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFF7253FFCC
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 15:15:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26FF253FFCB
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 15:14:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244524AbiFGNOv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 09:14:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47488 "EHLO
+        id S240700AbiFGNOs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 09:14:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244522AbiFGNOp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 09:14:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1EFBEED70D
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 06:14:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654607682;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gWbb5e6DINc80HZlfiRRtC5Qhh83jixUJLVThVqcPiI=;
-        b=NJJ6huYO7paBu7BcnRcx5NOtcdktK9ZcjYQo1X3Qe5SdkMOjkS2dB+vzneilzlARh3+NBg
-        8CMpL1YKH7fo4GMcmZXvFRz1PTvlJmmYC1ILOgUVjwPVuH/WzoEfCCsxctEE/A52etK3Lo
-        S2fDl3QmF/D8SkNT9Ht77r+LUkWjXZ4=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-381-BR_-s4KfM8igXJmOdypvpA-1; Tue, 07 Jun 2022 09:14:30 -0400
-X-MC-Unique: BR_-s4KfM8igXJmOdypvpA-1
-Received: by mail-qk1-f197.google.com with SMTP id de30-20020a05620a371e00b006a6a4ae9049so8703132qkb.12
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 06:14:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=gWbb5e6DINc80HZlfiRRtC5Qhh83jixUJLVThVqcPiI=;
-        b=XLooO96LXMOLnn9KHX6pG2kGcVV8D9s62HFsl20U1gTLhcfjshRMTRZ9MQo+CX3F87
-         GKYsodrvyxGmHDuKdeVnd9EBKHD63nc6ZeSIp0emVzdcGjTFoR0+yqnz4N2tw5bwR1Sy
-         dF5V3X8HwbTmatgggB7q/b8k7YwB1hhnnAhsESWJIdiI7DDM1P8OzlkWLPadmTj09r/D
-         egM31K5Yc2m1hXf4Ynp5TZjcFp+413FUWrcpYaEs2Y5/6Jv64/aV8AAp1lrMKp5g+eq7
-         d0CrIUZJ6AVbRgBwc3cM1xU7D8pjIhLge5AKZq+0flEQVQFuCZ8lcOc7vo+5w0VlqWeC
-         ORJA==
-X-Gm-Message-State: AOAM532Ak7+ZKaDSP0mwzS7AXsoXmE+M8Ufb9LALq67TrcgjsjvncF+r
-        2NyRgtPZIdBThIqD4eleDIE1mDAWmyAaLeQ6ATA6y2UwBtblFugJ5AKpU1VDdf+xZDJ+tP3GPdc
-        7EKjDjnFvHB9h
-X-Received: by 2002:a05:620a:2681:b0:67e:908f:b513 with SMTP id c1-20020a05620a268100b0067e908fb513mr19163272qkp.204.1654607669450;
-        Tue, 07 Jun 2022 06:14:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy7GyR9E1ooUC6ELZKjGzbfSFYLtfzFDD1HrOtAZ3FEraHGhNfOgxCk3LNhu8JSAf5glHVqKQ==
-X-Received: by 2002:a05:620a:2681:b0:67e:908f:b513 with SMTP id c1-20020a05620a268100b0067e908fb513mr19163238qkp.204.1654607669115;
-        Tue, 07 Jun 2022 06:14:29 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id z5-20020a05622a124500b00304efba3d84sm3204646qtx.25.2022.06.07.06.14.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 06:14:28 -0700 (PDT)
-Message-ID: <dfc2ce68a10181b1ac6c07ca3927d474e13ca973.camel@redhat.com>
-Subject: Re: [PATCH 5/7] KVM: SVM: Add VNMI support in inject_nmi
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Santosh Shukla <santosh.shukla@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Tue, 07 Jun 2022 16:14:25 +0300
-In-Reply-To: <20220602142620.3196-6-santosh.shukla@amd.com>
-References: <20220602142620.3196-1-santosh.shukla@amd.com>
-         <20220602142620.3196-6-santosh.shukla@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        with ESMTP id S244484AbiFGNOi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 09:14:38 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9665EAD1E
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 06:14:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8E430B81D5B
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 13:14:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37455C34115;
+        Tue,  7 Jun 2022 13:14:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654607673;
+        bh=2ZyRR7tBSN/2EJrlNxB3h2/WkG/0rsIykzhySwBTGsI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=UR8KJu1PR0JK5SDRg/mgf8pPbAloJt4zJe5lbA6WOWxvKjMCWKjJ3X8RltzNx2L74
+         tstWo6d/WZZhhSC6VsU0GJ3gvIESuWXBJDMwQX0dgAzPZXSVd4HnxeFsvpfPXZaVAm
+         A9Bd5qTQH8xXJ7xRtOcxKm/HEC3Y902HK6M/srhNKIntrp3KGdRIMZIAyoVppqvA2j
+         bVAnhQ6fbxO/P7ohcf5GZ4ED2KF+uBLZ/OfB6KdoZ0ClzSM7CVIfEt91oS4WuiphiE
+         8Cg949e1nQE2f4y+gSwfixnAZcQhpwqtRSPyevMREC1FVzJoJ6Vkb+Vy4plrP31iF0
+         XtCF5APJTQjKQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nyZ2U-00GBUI-SZ; Tue, 07 Jun 2022 14:14:30 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>, kernel-team@android.com
+Subject: [PATCH v2 1/3] KVM: arm64: Don't read a HW interrupt pending state in user context
+Date:   Tue,  7 Jun 2022 14:14:25 +0100
+Message-Id: <20220607131427.1164881-2-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220607131427.1164881-1-maz@kernel.org>
+References: <20220607131427.1164881-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, eric.auger@redhat.com, ricarkol@google.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,46 +67,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-06-02 at 19:56 +0530, Santosh Shukla wrote:
-> Inject the NMI by setting V_NMI in the VMCB interrupt control. processor
-> will clear V_NMI to acknowledge processing has started and will keep the
-> V_NMI_MASK set until the processor is done with processing the NMI event.
-> 
-> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index a405e414cae4..200f979169e0 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3385,11 +3385,16 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
->  {
->         struct vcpu_svm *svm = to_svm(vcpu);
->  
-> +       ++vcpu->stat.nmi_injections;
-> +       if (is_vnmi_enabled(svm->vmcb)) {
-> +               svm->vmcb->control.int_ctl |= V_NMI_PENDING;
-> +               return;
-> +       }
-Here I would advice to have a warning to check if vNMI is already pending.
+Since 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state
+from the HW"), we're able to source the pending bit for an interrupt
+that is stored either on the physical distributor or on a device.
 
-Also we need to check what happens if we make vNMI pending and get #SMI,
-while in #NMI handler, or if #NMI is blocked due to interrupt window.
+However, this state is only available when the vcpu is loaded,
+and is not intended to be accessed from userspace. Unfortunately,
+the GICv2 emulation doesn't provide specific userspace accessors,
+and we fallback with the ones that are intended for the guest,
+with fatal consequences.
 
-Best regards,
-	Maxim Levitsky
+Add a new vgic_uaccess_read_pending() accessor for userspace
+to use, build on top of the existing vgic_mmio_read_pending().
 
+Reported-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Fixes: 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state from the HW")
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c |  4 ++--
+ arch/arm64/kvm/vgic/vgic-mmio.c    | 19 ++++++++++++++++---
+ arch/arm64/kvm/vgic/vgic-mmio.h    |  3 +++
+ 3 files changed, 21 insertions(+), 5 deletions(-)
 
-> +
->         svm->vmcb->control.event_inj = SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_NMI;
->         vcpu->arch.hflags |= HF_NMI_MASK;
->         if (!sev_es_guest(vcpu->kvm))
->                 svm_set_intercept(svm, INTERCEPT_IRET);
-> -       ++vcpu->stat.nmi_injections;
->  }
->  
->  static void svm_inject_irq(struct kvm_vcpu *vcpu)
-
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+index 77a67e9d3d14..e070cda86e12 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+@@ -429,11 +429,11 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
+ 		vgic_mmio_read_pending, vgic_mmio_write_spending,
+-		NULL, vgic_uaccess_write_spending, 1,
++		vgic_uaccess_read_pending, vgic_uaccess_write_spending, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
+ 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
+-		NULL, vgic_uaccess_write_cpending, 1,
++		vgic_uaccess_read_pending, vgic_uaccess_write_cpending, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
+ 		vgic_mmio_read_active, vgic_mmio_write_sactive,
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index 49837d3a3ef5..dc8c52487e47 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -226,8 +226,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+-				     gpa_t addr, unsigned int len)
++static unsigned long __read_pending(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len,
++				    bool is_user)
+ {
+ 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+ 	u32 value = 0;
+@@ -248,7 +249,7 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 						    IRQCHIP_STATE_PENDING,
+ 						    &val);
+ 			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
+-		} else if (vgic_irq_is_mapped_level(irq)) {
++		} else if (!is_user && vgic_irq_is_mapped_level(irq)) {
+ 			val = vgic_get_phys_line_level(irq);
+ 		} else {
+ 			val = irq_is_pending(irq);
+@@ -263,6 +264,18 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 	return value;
+ }
+ 
++unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
++				     gpa_t addr, unsigned int len)
++{
++	return __read_pending(vcpu, addr, len, false);
++}
++
++unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
++					gpa_t addr, unsigned int len)
++{
++	return __read_pending(vcpu, addr, len, true);
++}
++
+ static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
+ {
+ 	return (vgic_irq_is_sgi(irq->intid) &&
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
+index 3fa696f198a3..6082d4b66d39 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.h
++++ b/arch/arm64/kvm/vgic/vgic-mmio.h
+@@ -149,6 +149,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
+ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 				     gpa_t addr, unsigned int len);
+ 
++unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
++					gpa_t addr, unsigned int len);
++
+ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+ 			      gpa_t addr, unsigned int len,
+ 			      unsigned long val);
+-- 
+2.34.1
 
