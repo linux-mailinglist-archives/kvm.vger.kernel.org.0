@@ -2,122 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C6AD540211
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 17:04:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01D2F540234
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 17:15:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343839AbiFGPEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 11:04:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46488 "EHLO
+        id S1343893AbiFGPPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 11:15:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343826AbiFGPEe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 11:04:34 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 806BDA2054
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 08:04:32 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id o6so9963104plg.2
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 08:04:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=N/YUmVnmYsthzzaFQZZ4Bst/fMXvdLUPht7fpreWouI=;
-        b=ZWsnbDvjYqPuMsq3/+SzQYIG6tiYq/zVkPHdiuBZZxSJwNB6JoW+oQCkbqtOWfN/c/
-         2Qt1mQyJcugaeBuOnRYyZA5bWpw/0SrLKVwae6rOgTUQlrPmL05EESL+V/KdULhrdIhF
-         0SnFsteseOP5yUfCP0gLNmvt1zj0cOaegcpNkGQ1L12PsATkjYKLkXJ/5gLf9R+zGnEg
-         mvMLP8+fe1uip/BqwdoDBDHeXxhsu5gNSqW725GWVO4DbKrLz+BwuBBLvdJOJbMNv6cA
-         iTwvAPI1GbU4ShwcLpoIMd4LwnmWAN+g0eCJb14FIr1Hv0G0yPAZ+xF4gWX7wBm7raOL
-         3KmA==
+        with ESMTP id S1343901AbiFGPPA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 11:15:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADE271EAD6
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 08:14:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654614893;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6/ubDDYUq7JsSD5y7BKE6Pnt9grBbg8NpCvbzWDfuGc=;
+        b=NQbWoUFv7cezwYTHlXbqmgDo9GuspCEaimV5dfKlug6uukNyh07LnyHaqKRfWA/9EoJQir
+        PKbRuHk+mNSAtviVM4YV7dIYm7GJR7nGadYNLh9jOsoGby5H1yZ0PzUZPJUBNRBkBpPuo8
+        j7AvACs7U7fncK/+HtKC9rSE9roWWrk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-170-ZKTk2AhPOPit1npjl4Ux-Q-1; Tue, 07 Jun 2022 11:14:52 -0400
+X-MC-Unique: ZKTk2AhPOPit1npjl4Ux-Q-1
+Received: by mail-wr1-f71.google.com with SMTP id m18-20020adff392000000b0021848a78a53so1492031wro.19
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 08:14:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=N/YUmVnmYsthzzaFQZZ4Bst/fMXvdLUPht7fpreWouI=;
-        b=jtSpNc/IIPl5yC0rM1nv/+PpcHbzTzfvWlmUmaAMyg0J9a79a6sjonF1se4BmkqiY5
-         MCjF89eUqowJDgllFVxUKS9GapIPJquEqSQcFkF9OmXub8S0qELs9cjxl26/btDsyPl7
-         UVjLITPZY/Wlmv0kzLrxrNB7efdbI5PjoHtDxVFDxCa0rRFEIHlx11yz+KiBKzgF4glS
-         v/e425JaQ7Rf9NZRp92T8/k8bJbGjH8MPfMK054Bi8w6VN0cnw+cqe/cPAYpzcYYu/en
-         Ij+XAVYYW9lr8xAUprzOY1h6g8EbKTSPWrPcnuOv1I4e3QQw/XvUJhf7gNtP5Cs8nAyk
-         2ETw==
-X-Gm-Message-State: AOAM532jK2Z9/2axUkY5JQy/FAAxzIPpS9FUQJMp9+8k7ltqByEFCfUF
-        9RJOzeNVA7wZ4BblHMROb+gsFA==
-X-Google-Smtp-Source: ABdhPJxg54fVmTgrN+w4bEorvIgskZph27oXJaV0Nn517UuJgkzofnAIF8b11bN77fiEAvhWptpJfQ==
-X-Received: by 2002:a17:903:25c1:b0:167:93c0:ce04 with SMTP id jc1-20020a17090325c100b0016793c0ce04mr3884430plb.171.1654614271610;
-        Tue, 07 Jun 2022 08:04:31 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k17-20020a170902d59100b0016242b71e9fsm12577479plh.158.2022.06.07.08.04.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 08:04:30 -0700 (PDT)
-Date:   Tue, 7 Jun 2022 15:04:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, Sasha Levin <sashal@kernel.org>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Leonardo Bras <leobras@redhat.com>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, chang.seok.bae@intel.com, luto@kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
- user_xfeatures to supported bits of XCR0
-Message-ID: <Yp9o+y0NcRW/0puA@google.com>
-References: <20220301201344.18191-1-sashal@kernel.org>
- <20220301201344.18191-7-sashal@kernel.org>
- <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
- <YppVupW+IWsm7Osr@xz-m1.local>
- <2d9ba70b-ac18-a461-7a57-22df2c0165c6@redhat.com>
- <Yp5xSi6P3q187+A+@xz-m1.local>
- <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=6/ubDDYUq7JsSD5y7BKE6Pnt9grBbg8NpCvbzWDfuGc=;
+        b=UTjtOpX1bbVdFnSeWszOjwrKZycCms9PL56QBqw/qQqRDcjM9poywncAGZzLIb6kk0
+         YCv5ocHNFRzFktVpkvoqeK1D+KIZ06UjO0zYCtZLcrylmLKHJLUYtVqKQfe4rUz2dEjL
+         kNyUlEqXBbTU4ulIXJb/kDc3E9jYXMZNPTKHJOJN5MlSae9D8oVvtnZ/+FyfpDHhV9bB
+         fXkZaXKquCBwMXgQFPsX1VlB2uXTLHaZhaVBZ6otLoQixTWbHATQU0gbNG92VgsKgBoP
+         tqss4Hn4iw6jmpiPKyouz3q9Isi7sZQLPSRb1wBSTD4aY7BEZ7/o5nW2TENZpj3y2l7g
+         iIwA==
+X-Gm-Message-State: AOAM531LrdpnkziD4rWjC+hqoMoIBq7YncaF+dpvR0wijIWoRLNwEsVk
+        VhkeLdM7rNT9CfjindeO5QK0EQqAXLmZpwzpCHT7GI2kC+XL6B0PcmufLZNKY0Q9b4ZgHAf9ofq
+        qqSXImtqOCVi6
+X-Received: by 2002:a7b:c341:0:b0:37b:ed90:7dad with SMTP id l1-20020a7bc341000000b0037bed907dadmr28506803wmj.138.1654614891006;
+        Tue, 07 Jun 2022 08:14:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzUdbpCo/MOt8IWw71ZrXkaFebf2wItJLgp9HKWhrVYS9665oEGQ/r6dzZuLlTCgCgb4RxP8g==
+X-Received: by 2002:a7b:c341:0:b0:37b:ed90:7dad with SMTP id l1-20020a7bc341000000b0037bed907dadmr28506758wmj.138.1654614890592;
+        Tue, 07 Jun 2022 08:14:50 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id u10-20020adfdd4a000000b002102cc4d63asm21428082wrm.81.2022.06.07.08.14.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jun 2022 08:14:49 -0700 (PDT)
+Message-ID: <97789f9e-a33e-bb8d-d5b1-9be31232b64a@redhat.com>
+Date:   Tue, 7 Jun 2022 17:14:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2] KVM: x86/mmu: Check every prev_roots in
+ __kvm_mmu_free_obsolete_roots()
+Content-Language: en-US
+To:     shaoqin.huang@intel.com
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Ben Gardon <bgardon@google.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220607005905.2933378-1-shaoqin.huang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220607005905.2933378-1-shaoqin.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 07, 2022, Paolo Bonzini wrote:
-> On 6/6/22 23:27, Peter Xu wrote:
-> > On Mon, Jun 06, 2022 at 06:18:12PM +0200, Paolo Bonzini wrote:
-> > > > However there seems to be something missing at least to me, on why it'll
-> > > > fail a migration from 5.15 (without this patch) to 5.18 (with this patch).
-> > > > In my test case, user_xfeatures will be 0x7 (FP|SSE|YMM) if without this
-> > > > patch, but 0x0 if with it.
-> > > 
-> > > What CPU model are you using for the VM?
-> > 
-> > I didn't specify it, assuming it's qemu64 with no extra parameters.
+On 6/7/22 02:59, shaoqin.huang@intel.com wrote:
+> From: Shaoqin Huang <shaoqin.huang@intel.com>
 > 
-> Ok, so indeed it lacks AVX and this patch can have an effect.
+> When freeing obsolete previous roots, check prev_roots as intended, not
+> the current root.
 > 
-> > > For example, if the source lacks this patch but the destination has it,
-> > > the source will transmit YMM registers, but the destination will fail to
-> > > set them if they are not available for the selected CPU model.
-> > > 
-> > > See the commit message: "As a bonus, it will also fail if userspace tries to
-> > > set fpu features (with the KVM_SET_XSAVE ioctl) that are not compatible to
-> > > the guest configuration.  Such features will never be returned by
-> > > KVM_GET_XSAVE or KVM_GET_XSAVE2."
-> > 
-> > IIUC you meant we should have failed KVM_SET_XSAVE when they're not aligned
-> > (probably by failing validate_user_xstate_header when checking against the
-> > user_xfeatures on dest host). But that's probably not my case, because here
-> > KVM_SET_XSAVE succeeded, it's just that the guest gets a double fault after
-> > the precopy migration completes (or for postcopy when the switchover is
-> > done).
+> Signed-off-by: Shaoqin Huang <shaoqin.huang@intel.com>
+> Fixes: 527d5cd7eece ("KVM: x86/mmu: Zap only obsolete roots if a root shadow page is zapped")
+> ---
+> Changes in v2:
+>    - Make the commit message more clearer.
+>    - Fixed the missing idx.
 > 
-> Difficult to say what's happening without seeing at least the guest code
-> around the double fault (above you said "fail a migration" and I thought
-> that was a different scenario than the double fault), and possibly which was
-> the first exception that contributed to the double fault.
+>   arch/x86/kvm/mmu/mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index f4653688fa6d..e826ee9138fa 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5179,7 +5179,7 @@ static void __kvm_mmu_free_obsolete_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+>   		roots_to_free |= KVM_MMU_ROOT_CURRENT;
+>   
+>   	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
+> -		if (is_obsolete_root(kvm, mmu->root.hpa))
+> +		if (is_obsolete_root(kvm, mmu->prev_roots[i].hpa))
+>   			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+>   	}
+>   
 
-Regardless of why the guest explodes in the way it does, is someone planning on
-bisecting this (if necessary?) and sending a backport to v5.15?  There's another
-bug report that is more than likely hitting the same bug.
+Queued, thanks.
 
-https://lore.kernel.org/all/48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net
+Paolo
+
