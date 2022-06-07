@@ -2,86 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5383E54234B
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:51:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A786542558
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:54:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1444181AbiFHBBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 21:01:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52756 "EHLO
+        id S1443915AbiFHBBJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 21:01:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1452851AbiFGXOi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 19:14:38 -0400
+        with ESMTP id S1452778AbiFGXOd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 19:14:33 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9BED020C6CE
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 14:01:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BC3136C540
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 14:01:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654635709;
+        s=mimecast20190719; t=1654635717;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zMQUJ6VpnePS1F8wqFGjy68aQ9DDcdIV369uxqQKcZA=;
-        b=H2DFyZhygZ3WFaq5PGAtyhq1MlQ0vlCpFuXbo4YSDhHi/4kur6FTVTaMBfOsjHhjarBgiT
-        zSfwg5kLb4nHSJYViMbbGeXiFolvRe6m5pGMyx/yoSl7VOc7Im91vdi7yE4docV7+XQXKx
-        8KOHb92hL2Tq0f752s+HPXfJ/5EuySQ=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=DmWx/HtcjqYi7JTMOK9VA2Mvf2gZ14LWzJ8rqY3sV7Y=;
+        b=RUvReRTytOBAfyk1O6OgGQrfqdJxPoZNjRW+GdZO6yeEV+u9fg/i3CSR0Gr1Z4HHXfYcFD
+        W2rkZS6NYz9kWLkz0y9bBOhZuQAmEsdEBihkcQRwtEecDdMAUN5QKVSEO+HEWHH88CAGeH
+        VgdG8dOPB40aAI8SX/2+871AfZxE7T4=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-138-3OjprbEEP5WBS3es30baGw-1; Tue, 07 Jun 2022 17:01:47 -0400
-X-MC-Unique: 3OjprbEEP5WBS3es30baGw-1
-Received: by mail-io1-f69.google.com with SMTP id u7-20020a05660229a700b006657df613cbso8680274ios.14
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 14:01:47 -0700 (PDT)
+ us-mta-590-SyCHLjOOOTqeYZIq-CBB5g-1; Tue, 07 Jun 2022 17:01:54 -0400
+X-MC-Unique: SyCHLjOOOTqeYZIq-CBB5g-1
+Received: by mail-io1-f70.google.com with SMTP id n19-20020a056602341300b0066850b49e09so8664117ioz.12
+        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 14:01:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zMQUJ6VpnePS1F8wqFGjy68aQ9DDcdIV369uxqQKcZA=;
-        b=DUYovlDVHspTncW42aAKphGTdGyYVuJMoQQswM+uYi9a1av8fQmw57z2hwYxB/VeKu
-         wXF6t8+hkj7BlKFN8JPTkbzjLj3GaiSjszqcPAskOOc7hvadBptqi98zsN/YFXsQiXrG
-         jl1t60xIg5Htg9WTgjykJO1vVMYjPIt0JFjaLk5hyck/RF9hndwyUIXW/Ed+qGOQ9hP2
-         vIeNKHef3ncxUEPyQy/XLhf8j6DSZcA9iGTqLnVShwkDzUtLipgC3KYggBaWKjNVqX4S
-         4WHUJjvkpfxlnO90hl9F0K6pIGnY7k+KdmPMmZxa2XDRRYdlYHq44ghuL0eDLQv+eKgB
-         dvyQ==
-X-Gm-Message-State: AOAM533hpQK46mgtt/3i6zryCTv8HZs4KKGXOWWE7bQ2qsjkF+KsHQEQ
-        PnqM/roxqgsKdNQjh7fUx4/7Z+IPcc0kVOyOxP0/uhVnNqkRS9aTxSgK56QWmVLetz00djaUqPC
-        lkTes9lBv4G19
-X-Received: by 2002:a05:6602:1409:b0:5e7:487:133c with SMTP id t9-20020a056602140900b005e70487133cmr14460060iov.196.1654635706169;
-        Tue, 07 Jun 2022 14:01:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwqMxm0HPA4ioMPd0WVFUe/3BPbKwjOS/Yp7gvqjTrpfq71Xz0vKW4J0DAiDTeXf0UgcTTX6Q==
-X-Received: by 2002:a05:6602:1409:b0:5e7:487:133c with SMTP id t9-20020a056602140900b005e70487133cmr14460043iov.196.1654635705911;
-        Tue, 07 Jun 2022 14:01:45 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id ca12-20020a0566381c0c00b0032eabb4d87dsm6956527jab.111.2022.06.07.14.01.44
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=DmWx/HtcjqYi7JTMOK9VA2Mvf2gZ14LWzJ8rqY3sV7Y=;
+        b=oqKtfsjrybLI3brEIA4GD1bzwQKi4bJ+rJsFr78c1N6nFnPN34UrQk8j5b9OCpwBwH
+         xST9x0IrMtEddCt6wEGi2WNQuMsHqo3zfY7UB/5KQICB6aNEAaE0Wbu+tSSZjv9QuHog
+         B7+eSr8fI9ZoSsPSasNpqvwe4C6i0uJ4WdAgdm7buuoWqRgl8xEX1XIjR6wEQoVrv5Xg
+         0qCUJfuXwTT2Cnz/BTlCXOAqR7N5WUWRMOd0boz/GZgV9vdvBkR1pykI3fKFwImVIQP+
+         +lL6aIJcr+yqGzPaIqaM2gX5YOUVE57QT2pm6zCpz1JCW+SMGpA+rGQIONBVDPifrWo3
+         vP0w==
+X-Gm-Message-State: AOAM533h/ImNuMqPfROKtEWlaE09IeDb62ClO0PdNMk1IYWZ207UGXFt
+        KAiLwvGrv2H+O+oKz7FkRdHeIWqLNQs3ZZj4l0G0ddLlI1dQLYhEnfqvoCDcXXzkjY01uAolkbt
+        Fcy0nBkrsZNw3
+X-Received: by 2002:a05:6638:2404:b0:331:48f:bac0 with SMTP id z4-20020a056638240400b00331048fbac0mr15750901jat.306.1654635713366;
+        Tue, 07 Jun 2022 14:01:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzz8j3m6BGhMI89N/Xkj0XEQSk7cnDz7RN7p+Q2qYByc9Z8m7/k4hnjD+DhU7yc8TOyDhvgxg==
+X-Received: by 2002:a05:6638:2404:b0:331:48f:bac0 with SMTP id z4-20020a056638240400b00331048fbac0mr15750891jat.306.1654635713144;
+        Tue, 07 Jun 2022 14:01:53 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id b38-20020a0295a9000000b0032e271a558csm7025990jai.168.2022.06.07.14.01.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 14:01:45 -0700 (PDT)
-Date:   Tue, 7 Jun 2022 17:01:43 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Leonardo Bras <leobras@redhat.com>,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org,
-        chang.seok.bae@intel.com, luto@kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
- user_xfeatures to supported bits of XCR0
-Message-ID: <Yp+8t7vEcwj2KhX5@xz-m1.local>
-References: <20220301201344.18191-1-sashal@kernel.org>
- <20220301201344.18191-7-sashal@kernel.org>
- <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
- <YppVupW+IWsm7Osr@xz-m1.local>
- <2d9ba70b-ac18-a461-7a57-22df2c0165c6@redhat.com>
- <Yp5xSi6P3q187+A+@xz-m1.local>
- <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
- <Yp9o+y0NcRW/0puA@google.com>
- <Yp+WUoA+6x7ZpsaM@xz-m1.local>
- <Yp+dTU4NOaIELJh8@google.com>
+        Tue, 07 Jun 2022 14:01:52 -0700 (PDT)
+Date:   Tue, 7 Jun 2022 15:01:51 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Javier Martinez Canillas <javierm@redhat.com>
+Cc:     maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
+        kvm@vger.kernel.org, Laszlo Ersek <lersek@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] Improve vfio-pci primary GPU assignment behavior
+Message-ID: <20220607150151.11c7d2f6.alex.williamson@redhat.com>
+In-Reply-To: <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
+References: <165453797543.3592816.6381793341352595461.stgit@omen>
+        <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Yp+dTU4NOaIELJh8@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,124 +81,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 07, 2022 at 06:47:41PM +0000, Sean Christopherson wrote:
-> On Tue, Jun 07, 2022, Peter Xu wrote:
-> > On Tue, Jun 07, 2022 at 03:04:27PM +0000, Sean Christopherson wrote:
-> > > On Tue, Jun 07, 2022, Paolo Bonzini wrote:
-> > > > On 6/6/22 23:27, Peter Xu wrote:
-> > > > > On Mon, Jun 06, 2022 at 06:18:12PM +0200, Paolo Bonzini wrote:
-> > > > > > > However there seems to be something missing at least to me, on why it'll
-> > > > > > > fail a migration from 5.15 (without this patch) to 5.18 (with this patch).
-> > > > > > > In my test case, user_xfeatures will be 0x7 (FP|SSE|YMM) if without this
-> > > > > > > patch, but 0x0 if with it.
-> > > > > > 
-> > > > > > What CPU model are you using for the VM?
-> > > > > 
-> > > > > I didn't specify it, assuming it's qemu64 with no extra parameters.
-> > > > 
-> > > > Ok, so indeed it lacks AVX and this patch can have an effect.
-> > > > 
-> > > > > > For example, if the source lacks this patch but the destination has it,
-> > > > > > the source will transmit YMM registers, but the destination will fail to
-> > > > > > set them if they are not available for the selected CPU model.
-> > > > > > 
-> > > > > > See the commit message: "As a bonus, it will also fail if userspace tries to
-> > > > > > set fpu features (with the KVM_SET_XSAVE ioctl) that are not compatible to
-> > > > > > the guest configuration.  Such features will never be returned by
-> > > > > > KVM_GET_XSAVE or KVM_GET_XSAVE2."
-> > > > > 
-> > > > > IIUC you meant we should have failed KVM_SET_XSAVE when they're not aligned
-> > > > > (probably by failing validate_user_xstate_header when checking against the
-> > > > > user_xfeatures on dest host). But that's probably not my case, because here
-> > > > > KVM_SET_XSAVE succeeded, it's just that the guest gets a double fault after
-> > > > > the precopy migration completes (or for postcopy when the switchover is
-> > > > > done).
-> > > > 
-> > > > Difficult to say what's happening without seeing at least the guest code
-> > > > around the double fault (above you said "fail a migration" and I thought
-> > > > that was a different scenario than the double fault), and possibly which was
-> > > > the first exception that contributed to the double fault.
-> > > 
-> > > Regardless of why the guest explodes in the way it does, is someone planning on
-> > > bisecting this (if necessary?) and sending a backport to v5.15?  There's another
-> > > bug report that is more than likely hitting the same bug.
+On Tue, 7 Jun 2022 19:40:40 +0200
+Javier Martinez Canillas <javierm@redhat.com> wrote:
+
+> Hello Alex,
+> 
+> On 6/6/22 19:53, Alex Williamson wrote:
+> > Users attempting to enable vfio PCI device assignment with a GPU will
+> > often block the default PCI driver from the device to avoid conflicts
+> > with the device initialization or release path.  This means that
+> > vfio-pci is sometimes the first PCI driver to bind to the device.  In 
+> > the case of assigning the primary graphics device, low-level console
+> > drivers may still generate resource conflicts.  Users often employ
+> > kernel command line arguments to disable conflicting drivers or
+> > perform unbinding in userspace to avoid this, but the actual solution
+> > is often distribution/kernel config specific based on the included
+> > drivers.
 > > 
-> > What's the bisection you mentioned?  I actually did a bisection and I also
-> > checked reverting Leo's change can also fix this issue.  Or do you mean
-> > something else?
-> 
-> Oooooh, sorry!  I got completely turned around.  You ran into a bug with the
-> fix.  I thought that you were hitting the same issues as Mike where migrating
-> between hosts with different capabilities is broken in v5.15, but works in v5.18.
-
-Aha, no worry.
-
-> 
-> > > https://lore.kernel.org/all/48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net
+> > We can instead allow vfio-pci to copy the behavior of
+> > drm_aperture_remove_conflicting_pci_framebuffers() in order to remove
+> > these low-level drivers with conflicting resources.  vfio-pci is not
+> > however a DRM driver, nor does vfio-pci depend on DRM config options,
+> > thus we split out and export the necessary DRM apterture support and
+> > mirror the framebuffer and VGA support.
 > > 
-> > That is kvm64, and I agree it could be the same problem since both qemu64
-> > and kvm64 models do not have any xsave feature bit declared in cpuid 0xd,
-> > so potentially we could be migrating some fpu states to it even with
-> > user_xfeatures==0 on dest host.
-> > 
-> > So today I continued the investigation, and I think what's really missing
-> > is qemu seems to be ignoring the user_xfeatures check for KVM_SET_XSAVE and
-> > continues even if it returns -EINVAL.  IOW, I'm wondering whether we should
-> > fail properly and start to check kvm_arch_put_registers() retcode.  But
-> > that'll be a QEMU fix, and it'll at least not causing random faults
-> > (e.g. double faults) in guest but we should fail the migration gracefully.
-> > 
-> > Sean: a side note is that I can also easily trigger one WARN_ON_ONCE() in
-> > your commit 98c25ead5eda5 in kvm_arch_vcpu_ioctl_run():
-> > 
-> > 	WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
-> > 
-> > It'll be great if you'd like to check that up.
+> > I'd be happy to pull this series in through the vfio branch if
+> > approved by the DRM maintainers.  Thanks,
+> >  
 > 
-> Ugh, userspace can force KVM_MP_STATE_UNINITIALIZED via KVM_SET_MP_STATE.  Looks
-> like QEMU does that when emulating RESET.
+> I understand your issue but I really don't think that using this helper
+> is the correct thing to do. We already have some races with the current
+> aperture infrastructure As an example you can look at [0].
 > 
-> Logically, a full RESET of the xAPIC seems like the right thing to do.  I think
-> we can get away with that without breaking ABI?  And kvm_lapic_reset() has a
-> related bug where it stops the HR timer but not doesn't handle the HV timer :-/
+> The agreement on the mentioned thread is that we want to unify the fbdev
+> and DRM drivers apertures into a single list, and ideally moving all to
+> the Linux device model to handle the removal of conflicting devices.
 > 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index e69b83708f05..948aba894245 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2395,7 +2395,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
->                 return;
-> 
->         /* Stop the timer in case it's a reset to an active apic */
-> -       hrtimer_cancel(&apic->lapic_timer.timer);
-> +       cancel_apic_timer(&apic->lapic_timer.timer);
+> That's why I don't feel that leaking the DRM aperture helper to another
+> is desirable since it would make even harder to cleanup this later.
 
-Needs to be:
+OTOH, this doesn't really make the problem worse and it identifies
+another stakeholder to a full solution.
+ 
+> But also, this issue isn't something that only affects graphic devices,
+> right? AFAIU from [1] and [2], the same issue happens if a PCI device
+> has to be bound to vfio-pci but already was bound to a host driver.
 
-  +       cancel_apic_timer(apic);
+When we're shuffling between PCI drivers, we expect the unbind of the
+previous driver to have released all the claimed resources.  If there
+were a previously attached PCI graphics driver, then the code added in
+patch 2/ is simply redundant since that PCI graphics driver must have
+already performed similar actions.  The primary use case of this series
+is where there is no previous PCI graphics driver and we have no
+visibility to platform drivers carving chunks of the PCI resources into
+different subsystems.  AFAIK, this is unique to graphics devices.
 
+> The fact that DRM happens to have some infrastructure to remove devices
+> that conflict with an aperture is just a coincidence. Since this is used
+> to remove devices bound to drivers that make use of the firmware-provided
+> system framebuffer.
+
+It seems not so much a coincidence as an artifact of the exact problem
+both PCI graphics drivers and now vfio-pci face.  We've created
+platform devices to manage sub-ranges of resources, where the actual
+parent of those resources is only discovered later and we don't
+automatically resolve the resource conflict between that parent device
+and these platform devices when binding the parent driver.
+ 
+> The series [0] mentioned above, adds a sysfb_disable() that disables the
+> Generic System Framebuffer logic that is what registers the framebuffer
+> devices that are bound to these generic video drivers. On disable, the
+> devices registered by sysfb are also unregistered.
 > 
->         /* The xAPIC ID is set at RESET even if the APIC was already enabled. */
->         if (!init_event)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 540651cd28d7..ed2c7cb1642d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10912,6 +10912,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
->              mp_state->mp_state == KVM_MP_STATE_INIT_RECEIVED))
->                 goto out;
-> 
-> +       if (mp_state->mp_state == KVM_MP_STATE_UNINITIALIZED)
-> +               kvm_lapic_reset(vcpu, false);
-> +
->         if (mp_state->mp_state == KVM_MP_STATE_SIPI_RECEIVED) {
->                 vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
->                 set_bit(KVM_APIC_SIPI, &vcpu->arch.apic->pending_events);
-> 
+> Would be enough for your use case to use that helper function if it lands
+> or do you really need to look at the apertures? That is, do you want to
+> remove the {vesa,efi,simple}fb and simpledrm drivers or is there a need
+> to also remove real fbdev and DRM drivers?
 
-The change looks reasonable, but sadly I did a quick run and it still
-triggers.. :-/ So there seems to be something else missing.
+It's not clear to me how this helps.  I infer that sysfb_disable() is
+intended to be used by, for example, a PCI console driver which would be
+taking over the console and can therefore make a clear decision to end
+sysfb support.  The vfio-pci driver is not a console driver so we can't
+make any sort of blind assertion regarding sysfb.  We might be binding
+to a secondary graphics card which has no sysfb drivers attached.  I'm
+a lot more comfortable wielding an interface that intends to disable
+drivers/devices relative to the resources of a given device rather than
+a blanket means to disable a subsystem.
 
--- 
-Peter Xu
+I wonder if the race issues aren't better solved by avoiding to create
+platform devices exposing resource conflicts with known devices,
+especially when those existing devices have drivers attached.  Thanks,
+
+Alex
 
