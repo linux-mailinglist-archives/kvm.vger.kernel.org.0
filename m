@@ -2,243 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5861353F2E9
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 02:21:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C630053F2F4
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 02:34:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235432AbiFGAUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jun 2022 20:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48766 "EHLO
+        id S235468AbiFGAem (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jun 2022 20:34:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230023AbiFGAUy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jun 2022 20:20:54 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7374DC5DBC
-        for <kvm@vger.kernel.org>; Mon,  6 Jun 2022 17:20:52 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id q7so21884031wrg.5
-        for <kvm@vger.kernel.org>; Mon, 06 Jun 2022 17:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DMGzLGJzBT5T5b9r1J4zZuri0cLPViU0feoULeNGdLY=;
-        b=oKDGVKm9F8zo/W+3dYhfwstlQfxZhRht93GrC1XCeJloml8fDQgLoynuKZfjGe+tse
-         mrQEuAvRAuXVFbvfjbfFXwPCREHvKyfDEsXPxcRDaSIUyEc/5ks90/LxV9p/1f7vTLXN
-         0qTOOaWD1SVMuLZAYzZbMSjLGylotunMJTEBR82Kzn5QxTi/DkBJ/kuxW5xnOKo295Bf
-         iQ0wGcNuyYi/KtFbmVLnKNyC+hbDsaG5+1Xdp61+UQD43pSFREdTcC9V6mUoooaEuxyo
-         hUx53uwhPBcoBIsK6PEmzc9pxijDzb6xC9qR4cNUsNoV9GtRlKG59ybKoCqgfFyRgPob
-         6ETg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DMGzLGJzBT5T5b9r1J4zZuri0cLPViU0feoULeNGdLY=;
-        b=P9AB+pACDSSIPzR83NbEnfaji68bZKej1D1/M7iF1PIuImX0tmFdqc8W/EmZHov8pE
-         Rl81akgSH03P4sN/3ozAmKKXQDm21b+B3ddANCbojqcxq9jERQXFXRYfDl2ZuOIX6SHn
-         W23CdJ9hQLlnmj4rKi9ytUZDdpweRUrAeHtF3GY/IjoT6yCiPjQaK7mper0bFF3/m485
-         IyFbpK6S0uuKJ4m1pXs4mCDt21NN7pf+7hA/y/06SN8683oyRDuhdDpWVJHuy0k1gBQ5
-         1ZbO88EPXPWcDoZADM+DuXatmn57dI+sYojkXjpBA1RwX/mrVkm9k8JKRxhQvYknQMsp
-         giHA==
-X-Gm-Message-State: AOAM532K5dbHTKPdJ8FWdncQ3tICtZOKTUxuMwiPRD70bOwbIfSYreWt
-        2H2JKkOq4vUmg5QJ5fCwQ8Hkhj58IQVyBcvJU8mYig==
-X-Google-Smtp-Source: ABdhPJx+8X8hTzr3xVfvuroF0RVItmgqlm+YewhrD+ZiGchKPEilEhhxIlhTvdnxLo0na+sWqpTBG04Oqv1fgRtR+aY=
-X-Received: by 2002:a5d:4b10:0:b0:213:5e0:2c6c with SMTP id
- v16-20020a5d4b10000000b0021305e02c6cmr23716926wrq.126.1654561250805; Mon, 06
- Jun 2022 17:20:50 -0700 (PDT)
+        with ESMTP id S235397AbiFGAel (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jun 2022 20:34:41 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2068.outbound.protection.outlook.com [40.107.96.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504DC703FD;
+        Mon,  6 Jun 2022 17:34:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g+Z54o0zdRsJZjATTuZKvBShyA+3ruwhK5nyCC9oGrk+/2gZjpcWmL8bvHWKiIBKfkMcEcmVCXIosB59c0eiieJkwg6QP3rg+2TgcnzZM/VMV6iT0G+x0NbZrIrFdK8Vejs6nLKeEofeceh+2WnRoM15bubcsKgyydDUmkDCTTMrmoNzIW3CK+bcF0uPF8c9CneN+/+cyBM9Sg8RZtpEz8pQ7qgni2/Vwgx4NEJgT4SUwLMNEgjHqEEf+kwgoNjuW+nAW4/HiESsvXsxrNo2APEFjbJO0dYoDdsVVbVt/692xAPhBbOgnrIVHXTMrTkzF83GqaZKQNDxBU+uAv6gzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fQqEc6nM5xp+6xCi2Xyhw/OjF2OVsdqPbxK5t1gmAnU=;
+ b=buyDZVY3jNSb7x2SOFHrRqOlNQqiDvKfOKyucPXw1u+AqRv0tPWKowlT5qwTd8OXqxe/2lx/HxMCZNp7aFxxij3olGRaCfgUVWktL/YcGhKdUqjAeTdJX5rmpMdQGpgu47mtCPfATdHT4LEwgycKytJtLn+w53plVD0HJFnWBSlYyBqqJiVcZdBMJYecPkYgoYBPmjqQd5bPJMLC6KXZTzLnKkP+LXSSaWQOEhiVKFf7JxMkZHcr/oNxFao+iGxDoQbgSoMa23FMEwIxzQonJU+lTnIsbli11TNRtW/RAL6CnWsGWvaQ0/NltWVcEXVvwaW4lO7Qt7HuoTOH8gAs2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fQqEc6nM5xp+6xCi2Xyhw/OjF2OVsdqPbxK5t1gmAnU=;
+ b=dM6Iod4EqXMaBs/WNm7SawKMzlprDb77D/bt2bM+bsbkp1/5FxzM1rLJnzM4MKUiilabtH47fLZytjSSFdiHy4Wjlw07E2E9GIPwIBU47Y5+xFW1fUXylCyIregDU2vK2S4eDKi5TykrdiEgNmIJ8CDoDchXE8AyAjI4EQ1R6X19a1K4y+pMxRBI3hU9sNDdJ7noKXoEgTkaabGwaM8klRz3GRvG6LzfLTWG5AgVLWuzTvipATDzC7YrN+jFAs0heudWmZsdr5//p696Md8thVWWxBJXQQzGBlnscuxE6y/OEqd803NjD6u0j8niqefWcd5YgIey6nAFHrTBOZ+Ofg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MN2PR12MB3758.namprd12.prod.outlook.com (2603:10b6:208:169::28) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13; Tue, 7 Jun
+ 2022 00:34:37 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::2484:51da:d56f:f1a5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::2484:51da:d56f:f1a5%9]) with mapi id 15.20.5314.019; Tue, 7 Jun 2022
+ 00:34:37 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 0/2] Remove the VFIO_IOMMU_NOTIFY_DMA_UNMAP notifier
+Date:   Mon,  6 Jun 2022 21:34:34 -0300
+Message-Id: <0-v1-896844109f36+a-vfio_unmap_notif_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR12CA0023.namprd12.prod.outlook.com
+ (2603:10b6:208:a8::36) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <20220519134204.5379-1-will@kernel.org> <20220519134204.5379-60-will@kernel.org>
- <CAMn1gO4_d75_88fg5hcnBqx+tdu-9pG7atzt-qUD1nhUNs5TyQ@mail.gmail.com>
- <CA+EHjTx328na4FDfKU-cdLX+SV4MmKfMKKrTHo5H0=iB2GTQ+A@mail.gmail.com>
- <Ypl5TdMN3J/tttNe@google.com> <87v8tgltqy.wl-maz@kernel.org>
-In-Reply-To: <87v8tgltqy.wl-maz@kernel.org>
-From:   Peter Collingbourne <pcc@google.com>
-Date:   Mon, 6 Jun 2022 17:20:39 -0700
-Message-ID: <CAMn1gO7mP_QTb+fkfvc6qQoN0aU6TwkExU-Wj+VR6rjBsmhs1g@mail.gmail.com>
-Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
-        kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oupton@google.com>, kernel-team@android.com,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 21dc3d71-e826-4aef-4d65-08da481d8080
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3758:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB3758A40D3EE2C58503A6EA8CC2A59@MN2PR12MB3758.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gP+Le57U62IRvKajsMbpU1palgqLlNTgJ2iebM8JGoQe/0MfvDBAUGALRjpqwHQkwzuJpDZu07juRZOVWBUO0qeatJ9xIt1GVwKNFIfdqrSPEvOGbUpu6OuauFI5OIbcGQcznfjACNYD8DgWnEGSyt2B/pWyybVsi7vThnwUaMtjvvvMWnUd+yJd6ow0nc5vg9BNu6KcdxKhZJlgw/YPpnAXr1f2yVoz5Ixn/UAFWGwlzgWH4kENJ0CJqlQiaqRZKzovINCDztqjUCYam8TBgLkDx71Rq2sJSVCs06PDQZOA0gVfp++4mG3PbkPg1j1qt+R94Z/a8x0Y6/4geeXuSFAsLTviMhAqcyjGhVFI87g8lfpUn5en1BSMyIaggPDdMonHa5dOt9nJqQKybw9Dl3LYWbx5U7v9IkfwOiFKEjQiWemTQWu9OpCRb2Q+xKWV6zsAFGyIHkfTn2v/JpzLJF4znvwQN1oNfS5GYSwIw/vvxYqH1H5SlFO5vW+LChLoVp/xutVS9HmrK5y3owsR8i5bxElvN847UfszSSCOIxGRc51yjVCgRwJirQIZ5JeE14xQJMpK5EWGXI9U25TI5fnSufxNBl+HSqE36uZOI5fZ49kNpMF9hgylOFu2L8hOW5IDlap/UwiuWgATFSjzwdRfB5im+Ob/8gc3uGkUJtUpqPi+eqTu7svDzChuWkwO9W0QJAHOAGfOoDmLmQK8fQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(66476007)(38100700002)(66946007)(86362001)(6666004)(6486002)(4326008)(4744005)(8676002)(7416002)(2616005)(186003)(8936002)(36756003)(2906002)(5660300002)(66556008)(508600001)(83380400001)(6512007)(110136005)(316002)(26005)(921005)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?q18sCw3AGsm9bbawIyaS7crP1H8ZecjVPc+/8kzSE4eX+rl9ID9aChTZpgRo?=
+ =?us-ascii?Q?2Fo40I67mAytGRHVJkZ7dbHBAp2EbbXinADaSbpag+znl5e/ZC8eNriGkcfT?=
+ =?us-ascii?Q?/xr26JGMz75Nt1IYzJ6GfaFuATdEGDPJsgxd6/rnuKoqGEJza6JdhxCd4aCJ?=
+ =?us-ascii?Q?5N9glJ+GVnir4DkUnxC4xDhYt5xTa2Cfwm0gF71l2rN8j4B/kmXWueN8F9J1?=
+ =?us-ascii?Q?j9U6sOfkst55wk5kpiUnDF24ecfDuM2RzdhA/sXCd2VDrcjWz8V1KgOIBBJW?=
+ =?us-ascii?Q?u+yYKMjgrW3tfaQ7Oo2uce9py+AwVLWapD7b5M9vapHF9ERksefYLXCLsHrI?=
+ =?us-ascii?Q?5YcV4m/LtbInA+cbZWPYPFRxaX/Ea+EDIs/BUStODj5Z/G5+v0FJneoqH+TO?=
+ =?us-ascii?Q?M7KmPKKuGLdWphDRMYdNOedp1ON9hJogAlSmhScQi2pcUzxne93FAGgZbP4q?=
+ =?us-ascii?Q?P1bCyZsNwjom3uWrql3NVmg4wRWxMYECqYS1ulDrOUNN0vEjgZ0DsY3CZQQE?=
+ =?us-ascii?Q?poaw/tEa9+OrTqaO2PhthNjDBZpmzCufrZvYMOlZj7UrxItbWe+7lXLLkRyy?=
+ =?us-ascii?Q?ss1xnN5QwzxZrcU9+2LZpnDeu81I6YjlSd9/7PlEznzX5aCSJb8DUdrwQ34n?=
+ =?us-ascii?Q?xhJCJ/YgUIMxUo7J05cLtKOXxj9yvKObEmtl3HPDxkpRMi2SnoSa9QfrQT4N?=
+ =?us-ascii?Q?/dmZtzuKcjiPkZ77WpwdCvqPQZAhnVKMgQjU9lpjgB8AbV/XQmhbQgKU+tEK?=
+ =?us-ascii?Q?myjNGoW2g++I8f9X5yedUF9fWJhpBEbTzP7cd4BXqKm2kz8ghJhBLoTuNmGX?=
+ =?us-ascii?Q?Psz6g82tIHmKXNyjdRUqV/bQ+3hx9ALXQTHIolIoFqbDgGkHC9Xz31Y1Sgs8?=
+ =?us-ascii?Q?HpGYoNzgelBzNYB/UEF0D5iMTjfOJ1Q4Z2Ptmj8BaIxz8a2Km0OrSDLV4lwz?=
+ =?us-ascii?Q?qVIYyC2y4Z3YsAqUUxAO82FitywkcjW7zfRzsT/czWwAQudeTEwjYqWmofSN?=
+ =?us-ascii?Q?TRBw/B3HSjerbujOlPCrpSXwy1SFymq9Lyyk1BD4RVLOlpX0aCB/J02mAU6z?=
+ =?us-ascii?Q?a6KXsS158x3mn2wf/DRxKe6PPpCgzHK3vorMgdE26ujCeOwQaiyWgI9eIi6h?=
+ =?us-ascii?Q?IEJSUQa9RD4ennwc7vVqsvwX4D9IPLoNW+l/YXtCMxj2OT21nQ+D9tjXlCfm?=
+ =?us-ascii?Q?k2VIWMkeP6cgPvClAyPdp/RMLlpBi1DGQmj+kuXEv5XT4E0I9tFYT1ahJ4CP?=
+ =?us-ascii?Q?h9mgZd2wD470jSwVWGqLrvCXqeDKXHw5DIu9lR8NYZoknbW5NwVx7zs7KP12?=
+ =?us-ascii?Q?9i/JqnW3cYgiAU+2sHXiwsUTuTif48SbAiRC9pBaFb0f9WRXQvxE76pjNIe3?=
+ =?us-ascii?Q?oLJLJMuHk/2aavyxwSwdVLO5/vX5yozG341hLWMyVGGtfGWA/ByR48SoZu5t?=
+ =?us-ascii?Q?c4DVvIxGrk3GyiWWbIJyO2M8rh55rlQA4CuaR/OOffA6c5hdEdsYd7iYlKz8?=
+ =?us-ascii?Q?Yg6XeuWRNiQlH2SMWEOrBR4yeuXkqpZzCxRvjKZ8OJZIinZLthvy8AaK4Odt?=
+ =?us-ascii?Q?VTUwNSg7eBPES4vjuzx5iFgwwdV6w06aM3j7QkoS7idvboHjdpM+zsP5Gewg?=
+ =?us-ascii?Q?meQXR8RsEsAGQ81s2ukcZ4y9HKcebKs8Cr7423M6dMEi5fvILg108WcxvPns?=
+ =?us-ascii?Q?ZStzejBFGoegLtUPbH/4RFFJR76hb9dDZ93lz+5ARs9KoO+sLoaKjVRanGbh?=
+ =?us-ascii?Q?GNQOmI1c/w=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21dc3d71-e826-4aef-4d65-08da481d8080
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2022 00:34:37.5664
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xinQoV0f/caouJ4hoZgw7/MEBpnfrrVsnbuqBIGYmxUCzLVTGPXEmRIrXWQrOfop
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3758
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 4, 2022 at 1:26 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 03 Jun 2022 04:00:29 +0100,
-> Peter Collingbourne <pcc@google.com> wrote:
-> >
-> > Hi Fuad,
-> >
-> > On Fri, May 27, 2022 at 08:55:42AM +0100, Fuad Tabba wrote:
-> > > Hi Peter,
-> > >
-> > > On Thu, May 26, 2022 at 9:08 PM Peter Collingbourne <pcc@google.com> wrote:
-> > > >
-> > > > On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
-> > > > >
-> > > > > From: Fuad Tabba <tabba@google.com>
-> > > > >
-> > > > > Return an error (-EINVAL) if trying to enable MTE on a protected
-> > > > > vm.
-> > > >
-> > > > I think this commit message needs more explanation as to why MTE is
-> > > > not currently supported in protected VMs.
-> > >
-> > > Yes, we need to explain this more. Basically this is an extension of
-> > > restricting features for protected VMs done earlier [*].
-> > >
-> > > Various VM feature configurations are allowed in KVM/arm64, each requiring
-> > > specific handling logic to deal with traps, context-switching and potentially
-> > > emulation. Achieving feature parity in pKVM therefore requires either elevating
-> > > this logic to EL2 (and substantially increasing the TCB) or continuing to trust
-> > > the host handlers at EL1. Since neither of these options are especially
-> > > appealing, pKVM instead limits the CPU features exposed to a guest to a fixed
-> > > configuration based on the underlying hardware and which can mostly be provided
-> > > straightforwardly by EL2.
-> > >
-> > > This of course can change in the future and we can support more
-> > > features for protected VMs as needed. We'll expand on this commit
-> > > message when we respin.
-> > >
-> > > Also note that this only applies to protected VMs. Non-protected VMs
-> > > in protected mode support MTE.
-> >
-> > I see. In this case unless I'm missing something the EL2 side seems
-> > quite trivial though (flipping some bits in HCR_EL2). The patch below
-> > (in place of this one) seems to make MTE work in my test environment
-> > (patched [1] crosvm on Android in MTE-enabled QEMU).
-> >
-> > [1] https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm/+/3689015
-> >
-> > From c87965cd14515586d487872486e7670874209113 Mon Sep 17 00:00:00 2001
-> > From: Peter Collingbourne <pcc@google.com>
-> > Date: Thu, 2 Jun 2022 19:16:02 -0700
-> > Subject: [PATCH] arm64: support MTE in protected VMs
-> >
-> > Enable HCR_EL2.ATA while running a vCPU with MTE enabled.
-> >
-> > To avoid exposing MTE tags from the host to protected VMs, sanitize
-> > tags before donating pages.
-> >
-> > Signed-off-by: Peter Collingbourne <pcc@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pkvm.h | 4 +++-
-> >  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 6 +++---
-> >  arch/arm64/kvm/mmu.c              | 4 +++-
-> >  3 files changed, 9 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > index 952e3c3fa32d..9ca9296f2a25 100644
-> > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > @@ -73,10 +73,12 @@ void kvm_shadow_destroy(struct kvm *kvm);
-> >   * Allow for protected VMs:
-> >   * - Branch Target Identification
-> >   * - Speculative Store Bypassing
-> > + * - Memory Tagging Extension
-> >   */
-> >  #define PVM_ID_AA64PFR1_ALLOW (\
-> >       ARM64_FEATURE_MASK(ID_AA64PFR1_BT) | \
-> > -     ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) \
-> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_MTE) \
-> >       )
-> >
-> >  /*
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > index e33ba9067d7b..46ddd9093ac7 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > @@ -88,7 +88,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
-> >       /* Memory Tagging: Trap and Treat as Untagged if not supported. */
-> >       if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), feature_ids)) {
-> >               hcr_set |= HCR_TID5;
-> > -             hcr_clear |= HCR_DCT | HCR_ATA;
-> > +             hcr_clear |= HCR_ATA;
-> >       }
-> >
-> >       vcpu->arch.hcr_el2 |= hcr_set;
-> > @@ -179,8 +179,8 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
-> >        * - Feature id registers: to control features exposed to guests
-> >        * - Implementation-defined features
-> >        */
-> > -     vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS |
-> > -                          HCR_TID3 | HCR_TACR | HCR_TIDCP | HCR_TID1;
-> > +     vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS | HCR_TID3 | HCR_TACR | HCR_TIDCP |
-> > +                          HCR_TID1 | HCR_ATA;
-> >
-> >       if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
-> >               /* route synchronous external abort exceptions to EL2 */
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 392ff7b2362d..f513852357f7 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1206,8 +1206,10 @@ static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >               goto dec_account;
-> >       }
-> >
-> > -     write_lock(&kvm->mmu_lock);
-> >       pfn = page_to_pfn(page);
-> > +     sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
-> > +
-> > +     write_lock(&kvm->mmu_lock);
->
-> Is it really safe to rely on the host to clear the tags? My guts
-> feeling says that it isn't. If it is required, we cannot leave this
-> responsibility to the host, and this logic must be moved to EL2. And
-> if it isn't, then we should drop it.
+This is the last notifier toward the drivers, replace it with a simple op
+callback in the vfio_device_ops.
 
-The goal here isn't to protect the guest. It's already the case that
-whatever the page contents are when the page is donated (from the
-perspective of the KVM client), that's what the guest sees. That
-applies to both data and (in non-protected VMs) tags.
+Jason Gunthorpe (2):
+  vfio: Replace the DMA unmapping notifier with a callback
+  vfio: Replace the iommu notifier with a device list
 
-The code that I added here is for solving a different problem, which
-is to avoid exposing stale host state to the guest, which the KVM
-client may not even be aware of. We sanitize pages before exposing
-them in non-protected VMs for the same reason.
+ drivers/gpu/drm/i915/gvt/gvt.h        |   1 -
+ drivers/gpu/drm/i915/gvt/kvmgt.c      |  75 +++++-------------
+ drivers/s390/cio/vfio_ccw_ops.c       |  41 +++-------
+ drivers/s390/cio/vfio_ccw_private.h   |   1 -
+ drivers/s390/crypto/vfio_ap_ops.c     |  54 +++----------
+ drivers/s390/crypto/vfio_ap_private.h |   3 -
+ drivers/vfio/vfio.c                   | 105 +++++---------------------
+ drivers/vfio/vfio.h                   |   9 +--
+ drivers/vfio/vfio_iommu_type1.c       |  74 ++++++++++--------
+ include/linux/vfio.h                  |  21 +-----
+ 10 files changed, 114 insertions(+), 270 deletions(-)
 
-> >       ret = pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT);
-> >       if (ret) {
-> >               if (ret == -EAGAIN)
->
-> But the bigger picture here is what ensures that the host cannot mess
-> with the guest tags? I don't think we have a any mechanism to
-> guarantee that, specially on systems where the tags are only a memory
-> carve-out, which the host could map and change at will.
 
-Right, I forgot about that. We probably only want to expose MTE to
-guests if we have some indication (through the device tree or ACPI) of
-how to protect the guest tag storage.
+base-commit: f2906aa863381afb0015a9eb7fefad885d4e5a56
+-- 
+2.36.1
 
-> In any case, this isn't the time to pile new features on top of
-> pKVM. The current plan is to not support MTE at all, and only do it
-> once we have a definitive story on page donation (which as you may
-> have noticed, is pretty hacky). I don't see any compelling reason to
-> add MTE to the mix until this is solved.
-
-It sounds reasonable to land a basic set of features to begin with and
-add MTE later. I'll develop my MTE-in-pKVM patch series as a followup
-on top of this series.
-
-Peter
