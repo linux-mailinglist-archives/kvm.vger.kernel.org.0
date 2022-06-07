@@ -2,67 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 225F853FD09
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 13:11:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FC9053FD37
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 13:17:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242566AbiFGLL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 07:11:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57858 "EHLO
+        id S242737AbiFGLRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 07:17:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243276AbiFGLK7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 07:10:59 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F124D2CCB7
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 04:10:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S242735AbiFGLRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 07:17:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2AE79396B2
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 04:16:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654600617;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=s6D+tDPL1+VIqSmAaw2F3EdpteVx9cYLBbOFIaNeFvc=;
+        b=RwRUhrUsC9i2jpnApM4zKbrOcQ3ia66jY94VoPgCY2y8FnA8wZH8g8Qm2Y1A7vEP6GaHvi
+        CBmsPis0GiecZAuaPi5xPateYwX/mGFwLa6X9nM/y+vTQa0K3ASpEy0cgH5CafqZMuYQc2
+        4d25sj00zrj9JvehATBPIw0VEQ7zUnk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-235-TQfqeU4POKqoplHVLhA46g-1; Tue, 07 Jun 2022 07:16:54 -0400
+X-MC-Unique: TQfqeU4POKqoplHVLhA46g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A6998B81F68
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 11:10:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D84C3411E;
-        Tue,  7 Jun 2022 11:10:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654600203;
-        bh=R2D2hJEP5JgQDMYQbg0Fl0dl1LkzciDzBEY9SRq7c1c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=THyWb10w1rnF84vWcJNWA1Dbj89EqkODqKBH5FwGgSBcVGxkZA9DP9gJGQT2DKm9m
-         JVBbdlObYEMgyo+pINhd4hMOlfngyEQjyH6BF6QVnQL7AA0jmZNShwZoYwYXY9UwzE
-         gwEFoGRvjrOanwF6T+NEfmoLnKwB1UD9zWfjg6oZ8qQOrh89wJiw55QzfmHbC2oMqs
-         dctHxKq5JxV5AIZChXVDRd+5acZ95VAPYTPSi0oKVHl+FjaAe7XxzycyTN0sPk8vv5
-         /RoUMcFE0PmxGhDw28VLVh64w1ZAp9liuNmlfk6LdXCYnuaJB/ZgqTZRgcZZyosLta
-         5YyHr9KkWKMOw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nyX61-00G9dT-3P; Tue, 07 Jun 2022 12:10:01 +0100
-Date:   Tue, 07 Jun 2022 12:10:00 +0100
-Message-ID: <87mteo4tmf.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Eric Auger <eauger@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oupton@google.com>, kernel-team@android.com
-Subject: Re: [PATCH 2/3] KVM: arm64: Replace vgic_v3_uaccess_read_pending with vgic_uaccess_read_pending
-In-Reply-To: <168da62b-51c0-b883-0912-15139f24d31f@redhat.com>
-References: <20220602083025.1110433-1-maz@kernel.org>
-        <20220602083025.1110433-3-maz@kernel.org>
-        <168da62b-51c0-b883-0912-15139f24d31f@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, ricarkol@google.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4C89101A54E;
+        Tue,  7 Jun 2022 11:16:53 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 953CA82882;
+        Tue,  7 Jun 2022 11:16:53 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id AB5141800081; Tue,  7 Jun 2022 13:16:51 +0200 (CEST)
+Date:   Tue, 7 Jun 2022 13:16:51 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+Subject: Re: [RFC PATCH v4 11/36] i386/tdx: Initialize TDX before creating TD
+ vcpus
+Message-ID: <20220607111651.2zjm7mx2gz3irqxo@sirius.home.kraxel.org>
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-12-xiaoyao.li@intel.com>
+ <20220523092003.lm4vzfpfh4ezfcmy@sirius.home.kraxel.org>
+ <d3e967f3-917f-27ce-1367-2dba23e5c241@intel.com>
+ <20220524065719.wyyoba2ke73tx3nc@sirius.home.kraxel.org>
+ <39341481-67b6-aba4-a25a-10abb398bec4@intel.com>
+ <20220601075453.7qyd5z22ejgp37iz@sirius.home.kraxel.org>
+ <9d00fd58-b957-3b8e-22ab-12214dcbbe97@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d00fd58-b957-3b8e-22ab-12214dcbbe97@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,82 +81,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 02 Jun 2022 21:06:42 +0100,
-Eric Auger <eauger@redhat.com> wrote:
+  Hi,
+
+> > I guess it could be helpful for the discussion when you can outine the
+> > 'big picture' for tdx initialization.  How does kvm accel setup look
+> > like without TDX, and what additional actions are needed for TDX?  What
+> > ordering requirements and other constrains exist?
 > 
-> Hi Marc,
-> On 6/2/22 10:30, Marc Zyngier wrote:
-> > Now that GICv2 has a proper userspace accessor for the pending state,
-> > switch GICv3 over to it, dropping the local version.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 40 ++----------------------------
-> >  1 file changed, 2 insertions(+), 38 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > index f7aa7bcd6fb8..f15e29cc63ce 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > @@ -353,42 +353,6 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
-> >  	return 0;
-> >  }
-> >  
-> > -static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> > -						  gpa_t addr, unsigned int len)
-> > -{
-> > -	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> > -	u32 value = 0;
-> > -	int i;
+> To boot a TDX VM, it requires several changes/additional steps in the flow:
 > 
-> > -
-> > -	/*
-> > -	 * pending state of interrupt is latched in pending_latch variable.
-> > -	 * Userspace will save and restore pending state and line_level
-> > -	 * separately.
-> > -	 * Refer to Documentation/virt/kvm/devices/arm-vgic-v3.rst
-> > -	 * for handling of ISPENDR and ICPENDR.
-> Don't know if you want a derivative of this comment in
-> vgic_uaccess_read_pending()?
+>  1. specify the vm type KVM_X86_TDX_VM when creating VM with
+>     IOCTL(KVM_CREATE_VM);
+> 	- When initializing KVM accel
+> 
+>  2. initialize VM scope configuration before creating any VCPU;
+> 
+>  3. initialize VCPU scope configuration;
+> 	- done inside machine_init_done_notifier;
+> 
+>  4. initialize virtual firmware in guest private memory before vcpu running;
+> 	- done inside machine_init_done_notifier;
+> 
+>  5. finalize the TD's measurement;
+> 	- done inside machine init_done_notifier;
+> 
+> 
+> And we are discussing where to do step 2).
+> 
+> We can find from the code of tdx_pre_create_vcpu(), that it needs
+> cpuid entries[] and attributes as input to KVM.
+> 
+>   cpuid entries[] is set up by kvm_x86_arch_cpuid() mainly based on
+>   'CPUX86State *env'
+> 
+>   attributes.pks is retrieved from env->features[]
+>   and attributes.pmu is retrieved from x86cpu->enable_pmu
+> 
+> to make VM-socpe data is consistent with VCPU data, we do choose the point
+> late enough to ensure all the info/configurations from VCPU are settle down,
+> that just before calling KVM API to do VCPU-scope configuration.
 
-I don't find it specially helpful, but at the same time, it doesn't
-hurt to move it around.
+So essentially tdx defines (some) vcpu properties at vm scope?  Given
+that all vcpus typically identical (and maybe tdx even enforces this)
+this makes sense.
 
-> > -	 */
-> > -	for (i = 0; i < len * 8; i++) {
-> > -		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> > -		bool state = irq->pending_latch;
-> > -
-> > -		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> > -			int err;
-> > -
-> in __read_pending(), irq->irq_lock is hold which looks safer at 1st
-> sight. If potentially fixing something this can be documented in the
-> commit msg.
+A comment in the source code explaining this would be good.
 
-I don't think it fixes anything. The idea is that if you are
-accessing the state from userspace, you already have stopped the VM,
-and thus there is no concurrent modifications if the state.
+thanks,
+  Gerd
 
-> > -			err = irq_get_irqchip_state(irq->host_irq,
-> > -						    IRQCHIP_STATE_PENDING,
-> > -						    &state);
-> > -			WARN_ON(err);
-> > -		}
-> > -
-> in __read_pending(), irq_is_pending(irq) is used instead of
-> irq->pending_latch. for level sensitive IRQ this is not identical. This
-> may also deserve some comment. The nuance may be related to the above
-> comment.
-
-That is a good point, and we should unify the userspace behaviours
-between GICv2 and v3.
-
-I'll respin the series shortly.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
