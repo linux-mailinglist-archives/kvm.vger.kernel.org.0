@@ -2,110 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBEEA540403
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 18:44:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E742054043D
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 19:03:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345159AbiFGQoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 12:44:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52754 "EHLO
+        id S1344477AbiFGRDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 13:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243262AbiFGQoD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 12:44:03 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BC8D4101;
-        Tue,  7 Jun 2022 09:44:01 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 257Gfhfo004738;
-        Tue, 7 Jun 2022 16:44:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=2iwjdWduqgK3lsZmbb5wJE2YzlVqWQhPV9hFXiQaQBs=;
- b=e8v3xAhd8KufW1WOUiiqbKopQ3qUPiBJH0enMR8JYcVfvoenr5PLAQ4r8NHB2/8mPIVy
- ylvAeVeLzoWCSVTi26iIAd8kshsaxgj18MdqnzBXIx77JxX+XWHWTNz6aT6erA2V511e
- 7xxhdqW7z4wZgWYY2Yn88B5kgKq22jA2u7b+WtyZGXHTGg597IJm4EgCbW6W4H4PkWN4
- LJhmivA+SGfOktzXaIbySbav5T4GCvmP/bmuSl73GjGrY5BmlP0VwHc7QmCvzHtbqGu8
- dCCPBAhxvJN7uDkAsIk+hRK24JnYE2wbowHD/N7zUbQCKlYfPp7rmYbyaSGitbUElclU qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjadxg10h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jun 2022 16:44:01 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 257GghsM012497;
-        Tue, 7 Jun 2022 16:44:01 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjadxg0yv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jun 2022 16:44:01 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 257GMsV9030399;
-        Tue, 7 Jun 2022 16:43:58 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3gfxnhv2gj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jun 2022 16:43:58 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 257Ght2i15204772
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Jun 2022 16:43:56 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E091311C04C;
-        Tue,  7 Jun 2022 16:43:55 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0E0D11C04A;
-        Tue,  7 Jun 2022 16:43:55 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Jun 2022 16:43:55 +0000 (GMT)
-Date:   Tue, 7 Jun 2022 18:43:54 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, scgl@linux.ibm.com, pmorel@linux.ibm.com,
-        thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] lib: s390x: better smp interrupt
- checks
-Message-ID: <20220607184354.06582d6a@p-imbrenda>
-In-Reply-To: <20220607164857.53dac498@li-ca45c2cc-336f-11b2-a85c-c6e71de567f1>
-References: <20220603154037.103733-1-imbrenda@linux.ibm.com>
-        <20220603154037.103733-3-imbrenda@linux.ibm.com>
-        <20220607162309.25e97913@li-ca45c2cc-336f-11b2-a85c-c6e71de567f1>
-        <20220607164113.5d51f37d@p-imbrenda>
-        <20220607164857.53dac498@li-ca45c2cc-336f-11b2-a85c-c6e71de567f1>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S237327AbiFGRDO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 13:03:14 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22B25FF585
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 10:03:12 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AAB86143D;
+        Tue,  7 Jun 2022 10:03:12 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 489B13F66F;
+        Tue,  7 Jun 2022 10:03:11 -0700 (PDT)
+From:   Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+To:     will@kernel.org
+Cc:     andre.przywara@arm.com, alexandru.elisei@arm.com,
+        kvm@vger.kernel.org, suzuki.poulose@arm.com,
+        sasha.levin@oracle.com, jean-philippe@linaro.org
+Subject: [PATCH kvmtool 00/24] Virtio v1 support
+Date:   Tue,  7 Jun 2022 18:02:15 +0100
+Message-Id: <20220607170239.120084-1-jean-philippe.brucker@arm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wVPM5eoko8uH4OaZBfPrhf1LcuBNcTpN
-X-Proofpoint-ORIG-GUID: -_YQ_SXaPJau3IJU02Ky1uBn0bXLpDD0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-07_07,2022-06-07_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 spamscore=0 clxscore=1015 bulkscore=0 phishscore=0
- adultscore=0 priorityscore=1501 impostorscore=0 mlxscore=0 mlxlogscore=877
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206070067
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Jun 2022 16:48:57 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Add support for version 1 of the virtio transport to kvmtool. Based on a
+RFC by Sasha Levin [1], I've been trying to complete it here and there.
+It's long overdue and is quite painful to rebase, so let's get it
+merged.
 
-> On Tue, 7 Jun 2022 16:41:13 +0200
-> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
-> 
-> > yes I have considered that (maybe I should add this in the patch
-> > description)  
-> 
-> Yes, and not just that; maybe rename expect_ext_int to expect_ext_int_on_this_cpu, same for register_io_int_func.
+Several reasons why the legacy transport needs to be replaced:
 
-fair enough
+* Only 32 feature bits are supported. Most importantly
+  VIRTIO_F_ACCESS_PLATFORM, which forces a Linux guest to use the DMA
+  API, cannot be enabled. So we can't support private guests that
+  decrypt or share only their DMA memory with the host.
+
+* Legacy virtqueue address is a 32-bit pfn, aligned on 4kB. Since Linux
+  guests bypass the DMA API they can't support large GPAs.
+
+* New devices types (iommu, crypto, memory, etc) and new features cannot
+  be supported.
+
+* New guests won't implement the legacy transport. Existing guests will
+  eventually drop legacy support.
+
+Support for modern transport becomes the default and legacy is enabled
+with --virtio-legacy.
+
+I only tested what I could: vsock, scsi and vhost-net are currently
+broken and can be fixed later (they have issues with mem regions and
+feature mask, among other things). I also haven't tested big-endian.
+
+Find the series at https://jpbrucker.net/git/kvmtool/ virtio/devel
+
+[1] https://lore.kernel.org/all/1447823472-17047-1-git-send-email-sasha.levin@oracle.com/
+    The SOB was kept in patch 21
+
+Jean-Philippe Brucker (24):
+  virtio: Add NEEDS_RESET to the status mask
+  virtio: Remove redundant test
+  virtio/vsock: Remove redundant state tracking
+  virtio: Factor virtqueue initialization
+  virtio: Support modern virtqueue addresses
+  virtio: Add config access helpers
+  virtio: Fix device-specific config endianness
+  virtio/console: Remove unused callback
+  virtio: Remove set_guest_features() device op
+  Add memcpy_fromiovec_safe
+  virtio/net: Offload vnet header endianness conversion to tap
+  virtio/net: Prepare for modern virtio
+  virtio/net: Implement VIRTIO_F_ANY_LAYOUT feature
+  virtio/console: Add VIRTIO_F_ANY_LAYOUT feature
+  virtio/blk: Implement VIRTIO_F_ANY_LAYOUT feature
+  virtio/pci: Factor MSI route creation
+  virtio/pci: Delete MSI routes
+  virtio: Extract init_vq() for PCI and MMIO
+  virtio/pci: Make doorbell offset dynamic
+  virtio: Move PCI transport to pci-legacy
+  virtio: Add support for modern virtio-pci
+  virtio: Move MMIO transport to mmio-legacy
+  virtio: Add support for modern virtio-mmio
+  virtio/pci: Initialize all vectors to VIRTIO_MSI_NO_VECTOR
+
+ Makefile                          |   4 +
+ arm/include/arm-common/kvm-arch.h |   6 +-
+ include/kvm/disk-image.h          |   3 +-
+ include/kvm/iovec.h               |   2 +
+ include/kvm/kvm-config.h          |   1 +
+ include/kvm/kvm.h                 |   6 +
+ include/kvm/pci.h                 |  11 +
+ include/kvm/virtio-9p.h           |   2 +-
+ include/kvm/virtio-mmio.h         |  29 ++-
+ include/kvm/virtio-pci-dev.h      |   4 +
+ include/kvm/virtio-pci.h          |  48 +++-
+ include/kvm/virtio.h              |  52 ++--
+ mips/include/kvm/kvm-arch.h       |   2 -
+ powerpc/include/kvm/kvm-arch.h    |   2 -
+ x86/include/kvm/kvm-arch.h        |   2 -
+ builtin-run.c                     |   2 +
+ disk/core.c                       |  26 +-
+ net/uip/core.c                    |  71 ++++--
+ util/iovec.c                      |  31 +++
+ virtio/9p.c                       |  27 +--
+ virtio/balloon.c                  |  46 ++--
+ virtio/blk.c                      | 102 ++++----
+ virtio/console.c                  |  33 +--
+ virtio/core.c                     |  82 ++++++-
+ virtio/mmio-legacy.c              | 150 ++++++++++++
+ virtio/mmio-modern.c              | 157 ++++++++++++
+ virtio/mmio.c                     | 202 ++--------------
+ virtio/net.c                      | 122 +++++-----
+ virtio/pci-legacy.c               | 205 ++++++++++++++++
+ virtio/pci-modern.c               | 386 ++++++++++++++++++++++++++++++
+ virtio/pci.c                      | 361 ++++++----------------------
+ virtio/rng.c                      |  15 +-
+ virtio/scsi.c                     |  44 ++--
+ virtio/vsock.c                    |  39 ++-
+ 34 files changed, 1490 insertions(+), 785 deletions(-)
+ create mode 100644 virtio/mmio-legacy.c
+ create mode 100644 virtio/mmio-modern.c
+ create mode 100644 virtio/pci-legacy.c
+ create mode 100644 virtio/pci-modern.c
+
+-- 
+2.36.1
+
