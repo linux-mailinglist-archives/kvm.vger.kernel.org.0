@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6935540BD3
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 20:32:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC9EF540CD1
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 20:41:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351191AbiFGSb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 14:31:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35230 "EHLO
+        id S1352360AbiFGSll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 14:41:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351579AbiFGSaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 14:30:10 -0400
+        with ESMTP id S1352647AbiFGSjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 14:39:04 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C816817B85B;
-        Tue,  7 Jun 2022 10:55:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A63184863;
+        Tue,  7 Jun 2022 10:58:28 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6A059B82370;
-        Tue,  7 Jun 2022 17:55:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E23E0C341C5;
-        Tue,  7 Jun 2022 17:55:34 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 255CEB81F38;
+        Tue,  7 Jun 2022 17:58:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E30EC36AFE;
+        Tue,  7 Jun 2022 17:58:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654624536;
-        bh=reSh3o33ZqNq0NqYioUu+8w+hd6FEd7K/Cf3BqMB9N8=;
+        s=k20201202; t=1654624699;
+        bh=WjlPiW19crEYmsn/usMNLrHWV8DmX3Lja2fcB7x66uQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Yyp3XO9lLG8PDkjm6oHJrzY+j9nDVAjwZRIrs0a5GrJdii72ofS3KTB8A82pH9RVN
-         NCKyZ8QdUHxR+68D1uCxx5PapObMJ0sr1/8A3G9nWL3KbchYQUdDP/0b421I15aD0R
-         DCppTRSLOZrO5Qh0i5JCx2UefmyC+AESenCI2XjVERO8H2fAIJt3YdRtKTLhT5WgxO
-         V22IKKIjH5iFuSAt3jqpCE9f9fdzRMKUEvXV+WxWqWSvzTLkASKVpXCyauyINWlSJD
-         Xfn0Y2JOAChdGPhjgMPA8PR1tiODdtT6vij1gLI2KWIb6o+UAd0wvxlNe3HCKz9+/u
-         f05G/tVnsFfsQ==
+        b=l1lxFBtXd9M5LJtVJ882+sbE++xBs+pTst6un4fpc8cFy6nsdZ41pFIPzjjn/2Jaj
+         KDUi6bZyEvUlh9GD9dhoaRxEJeZguRMVmx5lyouThdHpxXBRgseDGZcZjMzNaUTNf+
+         LLLOgVp0++Lg2hKZ61+MvN0Vokb+l6lEGoyw0l2f29el5b1SDw1GK+PcSnmycZQRhj
+         JZ5ctQsjsIBs2Je3ZbOq1iPoGQOzROrfPTdHDFEeI7MZuhYUfn4SmEyVO9MzklqDiT
+         BTumA2sH5Yk4D8D63/816hY5UKAs7uPNh4TpuZbsamNbFkqqtAZE3ADSGo2OPy0MSi
+         22B9xqVMIe2vQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -39,12 +39,12 @@ Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
         Heiko Carstens <hca@linux.ibm.com>,
         Sasha Levin <sashal@kernel.org>, frankja@linux.ibm.com,
         gor@linux.ibm.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 57/60] s390/gmap: voluntarily schedule during key setting
-Date:   Tue,  7 Jun 2022 13:52:54 -0400
-Message-Id: <20220607175259.478835-57-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 48/51] s390/gmap: voluntarily schedule during key setting
+Date:   Tue,  7 Jun 2022 13:55:47 -0400
+Message-Id: <20220607175552.479948-48-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220607175259.478835-1-sashal@kernel.org>
-References: <20220607175259.478835-1-sashal@kernel.org>
+In-Reply-To: <20220607175552.479948-1-sashal@kernel.org>
+References: <20220607175552.479948-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -100,7 +100,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 14 insertions(+)
 
 diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index dfee0ebb2fac..88f6d923ee45 100644
+index d63c0ccc5ccd..4ce3a2f01c91 100644
 --- a/arch/s390/mm/gmap.c
 +++ b/arch/s390/mm/gmap.c
 @@ -2601,6 +2601,18 @@ static int __s390_enable_skey_pte(pte_t *pte, unsigned long addr,
