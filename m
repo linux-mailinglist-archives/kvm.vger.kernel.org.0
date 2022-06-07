@@ -2,194 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80C4B53FD0C
-	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 13:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 225F853FD09
+	for <lists+kvm@lfdr.de>; Tue,  7 Jun 2022 13:11:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242615AbiFGLLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 07:11:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33958 "EHLO
+        id S242566AbiFGLL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jun 2022 07:11:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243075AbiFGLKi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 07:10:38 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B30986D0;
-        Tue,  7 Jun 2022 04:09:06 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 257A0G2h012945;
-        Tue, 7 Jun 2022 11:09:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=QMmAXMc3VpP+QXpAwauYdGXx9BAL9Qwb9B7xZ1fJumo=;
- b=s/I6bjF40Jil1/eBUh7LFXcGy4H/qIxLcW1NTKAuDREunDifdH038gpDObV2o+ej8wUW
- Y/V2qTALczMygMeFu7rZIewv8buFqFQU4HEfpScCOT1A6mud7K2ZwZi0db7lqxVLHQ/C
- pClB2v/37hQG6OT1BQ+3p/B+GtwqcoZZojPGwl5pQ3B/9pOLIzXHrG60VOoJqa8EA7NQ
- z24J9niiTyrH5YttrURkOJ72AXL3apYpnkdvAJMUvvPpLOv/DljIvi1GF4u5TwsqqKnW
- /I54QCdnG1AqFtOm4qKtVRDAtOXQwncw/nm0azTwM30dY9nobStFJ/AFnsEYm4WIiK/j Rg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gj4hu183f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jun 2022 11:09:05 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 257AmBHI013102;
-        Tue, 7 Jun 2022 11:09:05 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gj4hu1830-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jun 2022 11:09:05 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 257B7wxH022528;
-        Tue, 7 Jun 2022 11:09:03 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3gfy19bne9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jun 2022 11:09:03 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 257B90EF22348140
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Jun 2022 11:09:00 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 345A3AE05A;
-        Tue,  7 Jun 2022 11:09:00 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ECBFDAE057;
-        Tue,  7 Jun 2022 11:08:59 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Jun 2022 11:08:59 +0000 (GMT)
-Date:   Tue, 7 Jun 2022 13:08:57 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, pmorel@linux.ibm.com, nrb@linux.ibm.com,
-        thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] lib: s390x: better smp interrupt
- checks
-Message-ID: <20220607130857.391ddfc6@p-imbrenda>
-In-Reply-To: <5552dc4a-4c1f-2f01-eaa7-fa42042d4455@linux.ibm.com>
-References: <20220603154037.103733-1-imbrenda@linux.ibm.com>
-        <20220603154037.103733-3-imbrenda@linux.ibm.com>
-        <5552dc4a-4c1f-2f01-eaa7-fa42042d4455@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
+        with ESMTP id S243276AbiFGLK7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jun 2022 07:10:59 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F124D2CCB7
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 04:10:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A6998B81F68
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 11:10:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D84C3411E;
+        Tue,  7 Jun 2022 11:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654600203;
+        bh=R2D2hJEP5JgQDMYQbg0Fl0dl1LkzciDzBEY9SRq7c1c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=THyWb10w1rnF84vWcJNWA1Dbj89EqkODqKBH5FwGgSBcVGxkZA9DP9gJGQT2DKm9m
+         JVBbdlObYEMgyo+pINhd4hMOlfngyEQjyH6BF6QVnQL7AA0jmZNShwZoYwYXY9UwzE
+         gwEFoGRvjrOanwF6T+NEfmoLnKwB1UD9zWfjg6oZ8qQOrh89wJiw55QzfmHbC2oMqs
+         dctHxKq5JxV5AIZChXVDRd+5acZ95VAPYTPSi0oKVHl+FjaAe7XxzycyTN0sPk8vv5
+         /RoUMcFE0PmxGhDw28VLVh64w1ZAp9liuNmlfk6LdXCYnuaJB/ZgqTZRgcZZyosLta
+         5YyHr9KkWKMOw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nyX61-00G9dT-3P; Tue, 07 Jun 2022 12:10:01 +0100
+Date:   Tue, 07 Jun 2022 12:10:00 +0100
+Message-ID: <87mteo4tmf.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Eric Auger <eauger@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>, kernel-team@android.com
+Subject: Re: [PATCH 2/3] KVM: arm64: Replace vgic_v3_uaccess_read_pending with vgic_uaccess_read_pending
+In-Reply-To: <168da62b-51c0-b883-0912-15139f24d31f@redhat.com>
+References: <20220602083025.1110433-1-maz@kernel.org>
+        <20220602083025.1110433-3-maz@kernel.org>
+        <168da62b-51c0-b883-0912-15139f24d31f@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -anTONY1mqwWQDWF5ElwxLjqL0tKtiUz
-X-Proofpoint-GUID: ZBzMvsa_Qx18YYZfo0T1KP26WmseXc3n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-07_04,2022-06-07_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 bulkscore=0 malwarescore=0 mlxscore=0 spamscore=0
- mlxlogscore=999 phishscore=0 suspectscore=0 adultscore=0
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2206070044
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, ricarkol@google.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Jun 2022 12:01:11 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-
-> On 6/3/22 17:40, Claudio Imbrenda wrote:
-> > Use per-CPU flags and callbacks for Program, Extern, and I/O interrupts
-> > instead of global variables.
+On Thu, 02 Jun 2022 21:06:42 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Marc,
+> On 6/2/22 10:30, Marc Zyngier wrote:
+> > Now that GICv2 has a proper userspace accessor for the pending state,
+> > switch GICv3 over to it, dropping the local version.
 > > 
-> > This allows for more accurate error handling; a CPU waiting for an
-> > interrupt will not have it "stolen" by a different CPU that was not
-> > supposed to wait for one, and now two CPUs can wait for interrupts at
-> > the same time.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  lib/s390x/asm/arch_def.h |  7 ++++++-
-> >  lib/s390x/interrupt.c    | 38 ++++++++++++++++----------------------
-> >  2 files changed, 22 insertions(+), 23 deletions(-)
+> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 40 ++----------------------------
+> >  1 file changed, 2 insertions(+), 38 deletions(-)
 > > 
-> > diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> > index 72553819..3a0d9c43 100644
-> > --- a/lib/s390x/asm/arch_def.h
-> > +++ b/lib/s390x/asm/arch_def.h
-> > @@ -124,7 +124,12 @@ struct lowcore {
-> >  	uint8_t		pad_0x0280[0x0308 - 0x0280];	/* 0x0280 */
-> >  	uint64_t	sw_int_crs[16];			/* 0x0308 */
-> >  	struct psw	sw_int_psw;			/* 0x0388 */
-> > -	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
-> > +	uint32_t	pgm_int_expected;		/* 0x0398 */
-> > +	uint32_t	ext_int_expected;		/* 0x039c */
-> > +	void		(*pgm_cleanup_func)(void);	/* 0x03a0 */
-> > +	void		(*ext_cleanup_func)(void);	/* 0x03a8 */
-> > +	void		(*io_int_func)(void);		/* 0x03b0 */  
-> 
-> If you switch the function pointers and the *_expected around,
-> you can use bools for the latter, right?
-> I think, since they're names suggest that they're bools, they should
-> be. Additionally I prefer true/false over 1/0, since the latter raises
-> the questions if other values are also used.
-
-that's exactly what I wanted to avoid. uint32_t can easily be accessed
-atomically and/or compare-and-swapped if needed.
-
-I don't like using true/false for things that are not bools
-
-> 
-> > +	uint8_t		pad_0x03b8[0x11b0 - 0x03b8];	/* 0x03b8 */
-> >  	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
-> >  	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
-> >  	uint64_t	fprs_sa[16];			/* 0x1200 */
-> > diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> > index 27d3b767..e57946f0 100644
-> > --- a/lib/s390x/interrupt.c
-> > +++ b/lib/s390x/interrupt.c
-> > @@ -15,14 +15,11 @@
-> >  #include <fault.h>
-> >  #include <asm/page.h>
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > index f7aa7bcd6fb8..f15e29cc63ce 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -353,42 +353,6 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
+> >  	return 0;
+> >  }
 > >  
-> > -static bool pgm_int_expected;
-> > -static bool ext_int_expected;
-> > -static void (*pgm_cleanup_func)(void);
-> >  static struct lowcore *lc;
-> >  
-> >  void expect_pgm_int(void)
-> >  {
-> > -	pgm_int_expected = true;
-> > +	lc->pgm_int_expected = 1;
-> >  	lc->pgm_int_code = 0;
-> >  	lc->trans_exc_id = 0;
-> >  	mb();  
+> > -static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+> > -						  gpa_t addr, unsigned int len)
+> > -{
+> > -	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> > -	u32 value = 0;
+> > -	int i;
 > 
-> [...]
-> 
-> >  void handle_pgm_int(struct stack_frame_int *stack)
-> >  {
-> > -	if (!pgm_int_expected) {
-> > +	if (!lc->pgm_int_expected) {
-> >  		/* Force sclp_busy to false, otherwise we will loop forever */
-> >  		sclp_handle_ext();
-> >  		print_pgm_info(stack);
-> >  	}
-> >  
-> > -	pgm_int_expected = false;
-> > +	lc->pgm_int_expected = 0;
-> >  
-> > -	if (pgm_cleanup_func)
-> > -		(*pgm_cleanup_func)();
-> > +	if (lc->pgm_cleanup_func)
-> > +		(*lc->pgm_cleanup_func)();  
-> 
-> [...]
-> 
-> > +	if (lc->io_int_func)
-> > +		return lc->io_int_func();  
-> Why is a difference between the function pointer usages here?
-> 
+> > -
+> > -	/*
+> > -	 * pending state of interrupt is latched in pending_latch variable.
+> > -	 * Userspace will save and restore pending state and line_level
+> > -	 * separately.
+> > -	 * Refer to Documentation/virt/kvm/devices/arm-vgic-v3.rst
+> > -	 * for handling of ISPENDR and ICPENDR.
+> Don't know if you want a derivative of this comment in
+> vgic_uaccess_read_pending()?
 
-because that is how it was before; both have the same semantics anyway
+I don't find it specially helpful, but at the same time, it doesn't
+hurt to move it around.
 
+> > -	 */
+> > -	for (i = 0; i < len * 8; i++) {
+> > -		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> > -		bool state = irq->pending_latch;
+> > -
+> > -		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+> > -			int err;
+> > -
+> in __read_pending(), irq->irq_lock is hold which looks safer at 1st
+> sight. If potentially fixing something this can be documented in the
+> commit msg.
+
+I don't think it fixes anything. The idea is that if you are
+accessing the state from userspace, you already have stopped the VM,
+and thus there is no concurrent modifications if the state.
+
+> > -			err = irq_get_irqchip_state(irq->host_irq,
+> > -						    IRQCHIP_STATE_PENDING,
+> > -						    &state);
+> > -			WARN_ON(err);
+> > -		}
+> > -
+> in __read_pending(), irq_is_pending(irq) is used instead of
+> irq->pending_latch. for level sensitive IRQ this is not identical. This
+> may also deserve some comment. The nuance may be related to the above
+> comment.
+
+That is a good point, and we should unify the userspace behaviours
+between GICv2 and v3.
+
+I'll respin the series shortly.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
