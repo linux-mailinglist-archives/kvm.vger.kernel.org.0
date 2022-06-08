@@ -2,102 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67C58543D22
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 21:53:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01342543D26
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 21:57:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235695AbiFHTxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 15:53:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59452 "EHLO
+        id S235723AbiFHT5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 15:57:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232406AbiFHTxC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 15:53:02 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2178660B9C
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 12:53:01 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id w2-20020a17090ac98200b001e0519fe5a8so19257723pjt.4
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 12:53:01 -0700 (PDT)
+        with ESMTP id S232223AbiFHT5w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 15:57:52 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586513FBC0
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 12:57:51 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id o6so13479336plg.2
+        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 12:57:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=CrK6nuHPCK0ai5XnfNscYvGQzujrncbP+EE8Tg1jqVY=;
-        b=oz74sLOu1cI/PGZ+9XsXfKfDziDDz9IGD0+aDbA7yqOAHS4MmH2vo+kv9XzWRXZ871
-         GmQH4SQsiuLItvHTyX7vUC/OgfoLBsXPlmyyGzoLlT/u74G1Zi3X4eD82L+JQTOVkwnd
-         tAhTj28kDkFB/Ekzvhd96nJVKFlMHOf82w07VxVclGShdZMKQ/KmP4OSgNGf6sUn1Omy
-         4DxWegvKWXAfOJneXddCGZmHdJvA7Ny+ZUUbSnXnsmfGPVREqteA0+WXDHf1HWFltfvV
-         0eey0fM+hW+XPTWG335n987Z4eVSFB83UTTfT/4JleM4qXOdIwqpzexeDPOJrbV/F8Ww
-         CRpQ==
+        bh=KCcIdF4bqdmfr8ubKRfkXyFIonUIza6ThNxpED8m3mo=;
+        b=EOXfKPxvRILHWhdHwsHEIz0IgPWoErm0CvypbNn+YmMYE1wCIOPFYQLM5Pjk0r5j0U
+         7DrOiTQ6TZhE6eK6wCbVnTHJtVCvCSUXWFSyv81DNZrUaFNqIJysBDGR36/AQmBX7E3G
+         Hl019QYZtmfuD77J90sL9H6QrAHCb0CaQPp9M1MNrjF5UfnRLIxbj/hCs0VRSpHP07wk
+         d51WaCUhggbI59F99DCRy6t0iH2OGmoau9fUJp4sWnj+b1qN1xA1ZAPhTI3p+EnLSvQW
+         DnTo1Aox2U8y8UuHD8AhXUre45jrt46WN9rUhy+NIceq3Lq6KFII62VO8LTRhy324N/I
+         Zzpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=CrK6nuHPCK0ai5XnfNscYvGQzujrncbP+EE8Tg1jqVY=;
-        b=UDXn2pk+IFkwxxtVCm1+85NNPkPk3i8u/LqMRcNxbvWGs8WiDid6YXtQNUNCkRgQ4e
-         O+FeMHBG1AiF/1EGSHS2Q2oJ0+uodfjy+8y1kR2N5rdwWF8Et94LItoINmt94k+xyNZj
-         2hyuveBpW4dbbSHZQY0M07FxW0prsb7FQOXvME3y/KXQ2jXmE4iXJlQ7YXUI7xsQym6A
-         FLZ48X92DEn8S7nPu2LlC1OTZsBBttehSFyPwLBLXjXiaIwvBW2zmHY0/tkXpY1ZldUl
-         CqBhuMeYJW6qF1RvvpuyfM3kUHQrO2cnQI6dZIV+RLb7B5FEsvOZi3amjynysurm1WG4
-         rWSw==
-X-Gm-Message-State: AOAM530Pr4wHjvfVMxFoNW35HHdqPjfAa9dOb3Ufz+ePdD2ataJIH4ry
-        gAXoKaqvou9k+gA9Gephm2zM0w==
-X-Google-Smtp-Source: ABdhPJyuyxAZZRxXxEcZjymKkii0h0h5xyEvOsrt+cO8go7KgSQU5KqQ4jlX7YthEbQAfqqtKqeuVA==
-X-Received: by 2002:a17:903:1c8:b0:167:67ff:323d with SMTP id e8-20020a17090301c800b0016767ff323dmr21867638plh.22.1654717980268;
-        Wed, 08 Jun 2022 12:53:00 -0700 (PDT)
+        bh=KCcIdF4bqdmfr8ubKRfkXyFIonUIza6ThNxpED8m3mo=;
+        b=pX02VX3VuKjW4AygEsNt+/SFEm+S9od9cT+x9Z+WMS9eIA3Q4JUjn/Xodp1XYxoPcu
+         KqpnNva+JpoAa5wv49LKACXyBmrZ1cb0tetK+Bcph8whF3KDPho4hSHjWRo7ucwoLgvd
+         hzuJJ1pxurS9EVOVXS0SRmcJTsvZ1gopkpdP/46Ee3Iv6Ib5eXIl7yDavZtEF3Tep10l
+         SVkQXQCTebdHqmaah9Lkuk+cu3bf3wheqJT49tAZme6ddDXDJxsddnd7cUmgP2uTFAIm
+         lNvz0ek0Dklrrgu/NDiEk+ug/5VDLjcDvVjSp2Hz/rI3NBE2F/P/MMyWJef1+a346rzz
+         +Yfw==
+X-Gm-Message-State: AOAM5306fsR+N4fve5WGUAGboO7hO7Kk+VxBWmA0miiGA5IlcX6y60Mg
+        k4C5N1GfGpSdJpxePJh4LZ2/4A==
+X-Google-Smtp-Source: ABdhPJzme/8tg/Dp9s2wqqCOyNvtCvz6tGbPMASz1ZpKobwC+W6OShIKP4aG0TVY5OF8A9rtobE7Lw==
+X-Received: by 2002:a17:90b:180b:b0:1e3:2844:5f63 with SMTP id lw11-20020a17090b180b00b001e328445f63mr883477pjb.164.1654718270681;
+        Wed, 08 Jun 2022 12:57:50 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d9-20020a656b89000000b003fd7e217686sm7635036pgw.57.2022.06.08.12.52.59
+        by smtp.gmail.com with ESMTPSA id gq20-20020a17090b105400b001e26da0d28csm14332578pjb.32.2022.06.08.12.57.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jun 2022 12:52:59 -0700 (PDT)
-Date:   Wed, 8 Jun 2022 19:52:55 +0000
+        Wed, 08 Jun 2022 12:57:49 -0700 (PDT)
+Date:   Wed, 8 Jun 2022 19:57:45 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 041/144] KVM: selftests: Use vm_create_without_vcpus()
- in hardware_disable_test
-Message-ID: <YqD+F5z67aN7b1JQ@google.com>
-References: <20220603004331.1523888-1-seanjc@google.com>
- <20220603004331.1523888-42-seanjc@google.com>
- <20220608144332.a5syqvj5ttb2zarw@gator>
+To:     Vasant Karasulli <vkarasulli@suse.de>
+Cc:     linux-kernel@vger.kernel.org, jroedel@suse.de, kvm@vger.kernel.org,
+        bp@alien8.de, x86@kernel.org, thomas.lendacky@amd.com
+Subject: Re: [PATCH v6 2/4] x86/tests: Add tests for AMD SEV-ES #VC handling
+ Add KUnit based tests to validate Linux's VC handling for instructions cpuid
+ and wbinvd. These tests: 1. install a kretprobe on the #VC handler
+ (sev_es_ghcb_hv_call, to access GHCB before/after the resulting VMGEXIT). 2.
+ trigger an NAE by executing either cpuid or wbinvd. 3. check that the
+ kretprobe was hit with the right exit_code available in GHCB.
+Message-ID: <YqD/ObG9ae9YQVNy@google.com>
+References: <20220318094532.7023-1-vkarasulli@suse.de>
+ <20220318094532.7023-3-vkarasulli@suse.de>
+ <Ykzrb1uyPZ2AKWos@google.com>
+ <YqBivtMl74FGmz7r@vasant-suse>
+ <YqCzy5Kngj+OgD2h@google.com>
+ <YqDD/0IWnoMXEAWg@vasant-suse>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220608144332.a5syqvj5ttb2zarw@gator>
+In-Reply-To: <YqDD/0IWnoMXEAWg@vasant-suse>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08, 2022, Andrew Jones wrote:
-> On Fri, Jun 03, 2022 at 12:41:48AM +0000, Sean Christopherson wrote:
-> > Use vm_create_without_vcpus() instead of open coding a rough equivalent
-> > in hardware_disable_test.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/hardware_disable_test.c | 4 +---
-> >  1 file changed, 1 insertion(+), 3 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
-> > index 81ba8645772a..32837207fe4e 100644
-> > --- a/tools/testing/selftests/kvm/hardware_disable_test.c
-> > +++ b/tools/testing/selftests/kvm/hardware_disable_test.c
-> > @@ -104,9 +104,7 @@ static void run_test(uint32_t run)
-> >  	for (i = 0; i < VCPU_NUM; i++)
-> >  		CPU_SET(i, &cpu_set);
-> >  
-> > -	vm = vm_create(DEFAULT_GUEST_PHY_PAGES);
-> > -	kvm_vm_elf_load(vm, program_invocation_name);
-> > -	vm_create_irqchip(vm);
-> > +	vm  = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
-> nit:       ^ extra space
+On Wed, Jun 08, 2022, Vasant Karasulli wrote:
+> On Mi 08-06-22 14:35:55, Sean Christopherson wrote:
+> > On Wed, Jun 08, 2022, Vasant Karasulli wrote:
+> > > On Mi 06-04-22 01:22:55, Sean Christopherson wrote:
+> > > > > +	if (ret) {
+> > > > > +		kunit_info(test, "Could not register kretprobe. Skipping.");
+> > > > > +		goto out;
+> > > > > +	}
+> > > > > +
+> > > > > +	test->priv = kunit_kzalloc(test, sizeof(u64), GFP_KERNEL);
+> > > >
+> > > > Allocating 8 bytes and storing the pointer an 8-byte field is rather pointless :-)
+> > > >
+> > >
+> > > Actually it's necessary to allocate memory to test->priv before using according to
+> > > https://www.kernel.org/doc/html/latest/dev-tools/kunit/tips.html
+> >
+> > If priv points at structure of some form, sure, but you're storing a simple value.
+> 
+> Yes, I agree. The reason it was done this way I guess is that type of priv is a
+> void pointer and storing a u64 value results in a compiler warning:
+> cast from pointer to integer of different size [-Wpointer-to-int-cast].
 
-Heh, and I managed to carry that to the end of the series.  At least I'm consistent?
+An intermediate cast to "unsigned long" should make that go away.
