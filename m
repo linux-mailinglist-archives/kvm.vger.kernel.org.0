@@ -2,59 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3593B542917
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 10:16:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D959542947
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 10:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbiFHIPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 04:15:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59000 "EHLO
+        id S229986AbiFHIV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 04:21:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231584AbiFHIO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 04:14:26 -0400
+        with ESMTP id S230352AbiFHIUT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 04:20:19 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 982D33223AD
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 00:43:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C3D2D39FD5D
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 00:47:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654674194;
+        s=mimecast20190719; t=1654674445;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=AH2f+hvLt6o5Ulhr8X9RVVcxLh1vpT+51fFKDTk13/I=;
-        b=aN2Z9Satxw//fpC2b1syoYP7euJ/4D9Bynrw0JljKzc+J0SxPs8ov0t7Md1BWS/b5a0I3Y
-        AUStd2sx//41502//5G7sDqIOvNSvDHPYYeaWXJ/zDfQ37wEC2Gv3BNVQRzc4lOy9viddk
-        F9BhQe5TSJ6pgMEb1hyBXGeOA222g+I=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NllZgEM9+Xgx+C0OKxvAQxMq/QfRXHmPWsigKuRrfkU=;
+        b=VaivpsyaMJHF9/JV7zW5ZoJOCZzJoLC1/OJHrWZ5D8h4kGAEKbSP0IbeZXzAkBG7Z1R7W6
+        dDdTDhy8jWYGl2hnM9pNpj8cSv9zLH+zfZUKAUEnhttbb0Fx6Ced8zwNaBBktZfp1aGSH2
+        v1pInSQy74rowHazc3ssG1k/hCkImrQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-298-1GjcdoIZO0eu-TsxarhuMw-1; Wed, 08 Jun 2022 03:43:09 -0400
-X-MC-Unique: 1GjcdoIZO0eu-TsxarhuMw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00FB1800971;
-        Wed,  8 Jun 2022 07:43:09 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A2D67400F3FF;
-        Wed,  8 Jun 2022 07:43:08 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id C8C3E18003AA; Wed,  8 Jun 2022 09:43:06 +0200 (CEST)
-Date:   Wed, 8 Jun 2022 09:43:06 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Javier Martinez Canillas <javierm@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
-        kvm@vger.kernel.org, Laszlo Ersek <lersek@redhat.com>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] Improve vfio-pci primary GPU assignment behavior
-Message-ID: <20220608074306.wyav3oerq5crdk6c@sirius.home.kraxel.org>
-References: <165453797543.3592816.6381793341352595461.stgit@omen>
- <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
+ us-mta-462-bgRnLPXKNCuIc58MjiYohg-1; Wed, 08 Jun 2022 03:47:22 -0400
+X-MC-Unique: bgRnLPXKNCuIc58MjiYohg-1
+Received: by mail-ed1-f70.google.com with SMTP id y4-20020aa7ccc4000000b0042df06d83bcso14316949edt.22
+        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 00:47:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=NllZgEM9+Xgx+C0OKxvAQxMq/QfRXHmPWsigKuRrfkU=;
+        b=OuWSPBxkUBfPz7hPw+BMGHh/jg3SuDD7wBW+Rq9dWTcDCa6Wyb7E3xa/pFdDZ0eTFs
+         UKZgI4PRHy551VqB3JvrQhlcNQfiptP21uVCIGMfX3ApWOdsjoIH7zeWaCiM+VbqGQka
+         vXvDRFXlMQDmMquB4W/V40kiRb2cC/uT+G7lLbk49KCRRvnGt97Hu77YxrAbw5PxK6be
+         AGeyrtLHCgfseuErMDIOO3QPZ4IS311wDzNVUHLy8lAow7AlTiy4fkQi7vC/ijUNts9E
+         DNarvHgjrGgDqwOs0MXrFDcoJO4Pjl8OLVgtkobIT9vSxJC7xkGKFTsZjATBTTwcDl2w
+         iq7A==
+X-Gm-Message-State: AOAM532e5FePI3gp31M5JX8tu9fi4n9CxwJWy7YlkxZ8L+0LvRK1xUX2
+        hjIV4WR+J2SLpLYXsmINJeKppaa6I1LM2W9oozga+3qEDLbFOrVmh5SypYbW3GjGe41DDB2QiZy
+        jBYqzULmCqSTU
+X-Received: by 2002:a05:6402:1c91:b0:42d:c9b6:506b with SMTP id cy17-20020a0564021c9100b0042dc9b6506bmr37157639edb.166.1654674441645;
+        Wed, 08 Jun 2022 00:47:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyJ6zCbgAByK4tcMjAhyVE5Ffevs0gRLanA9Oj8rlcZDVQlPs1lvb3eSpEaGo0jBy/TWir7Tw==
+X-Received: by 2002:a05:6402:1c91:b0:42d:c9b6:506b with SMTP id cy17-20020a0564021c9100b0042dc9b6506bmr37157626edb.166.1654674441430;
+        Wed, 08 Jun 2022 00:47:21 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h4-20020a1709067cc400b006f3ef214ddbsm8815010ejp.65.2022.06.08.00.47.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jun 2022 00:47:20 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v6 03/38] KVM: x86: hyper-v: Introduce TLB flush fifo
+In-Reply-To: <4be614689a902303cef1e5e1889564f965e63baa.camel@redhat.com>
+References: <20220606083655.2014609-1-vkuznets@redhat.com>
+ <20220606083655.2014609-4-vkuznets@redhat.com>
+ <4be614689a902303cef1e5e1889564f965e63baa.camel@redhat.com>
+Date:   Wed, 08 Jun 2022 09:47:19 +0200
+Message-ID: <87bkv3mwag.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Content-Type: text/plain
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -65,37 +82,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-> But also, this issue isn't something that only affects graphic devices,
-> right? AFAIU from [1] and [2], the same issue happens if a PCI device
-> has to be bound to vfio-pci but already was bound to a host driver.
+> On Mon, 2022-06-06 at 10:36 +0200, Vitaly Kuznetsov wrote:
+>> To allow flushing individual GVAs instead of always flushing the
+>> whole
+>> VPID a per-vCPU structure to pass the requests is needed. Use
+>> standard
+>> 'kfifo' to queue two types of entries: individual GVA (GFN + up to
+>> 4095
+>> following GFNs in the lower 12 bits) and 'flush all'.
+>
+> Honestly I still don't think I understand why we can't just
+> raise KVM_REQ_TLB_FLUSH_GUEST when the guest uses this interface
+> to flush everthing, and then we won't need to touch the ring
+> at all.
 
-Nope.  There is a standard procedure to bind and unbind pci drivers via
-sysfs, using /sys/bus/pci/drivers/$name/{bind,unbind}.
+The main reason is that we need to know what to flush: L1 or
+L2. E.g. for VMX, KVM_REQ_TLB_FLUSH_GUEST is basically
 
-> The fact that DRM happens to have some infrastructure to remove devices
-> that conflict with an aperture is just a coincidence.
+vpid_sync_context(vmx_get_current_vpid(vcpu));
 
-No.  It's a consequence of firmware framebuffers not being linked to the
-pci device actually backing them, so some other way is needed to find
-and solve conflicts.
+which means that if the target vCPU transitions from L1 to L2 or vice
+versa before KVM_REQ_TLB_FLUSH_GUEST gets processed we will flush the
+wrong VPID. And actually the writer (the vCPU which processes the TLB
+flush hypercall) is not anyhow synchronized with the reader (the vCPU
+whose TLB needs to be flushed) here so we can't even know if the target
+vCPU is in guest more or not.
 
-> The series [0] mentioned above, adds a sysfb_disable() that disables the
-> Generic System Framebuffer logic that is what registers the framebuffer
-> devices that are bound to these generic video drivers. On disable, the
-> devices registered by sysfb are also unregistered.
+With the newly added KVM_REQ_HV_TLB_FLUSH, we always look at the
+corresponding FIFO and process 'flush all' accordingly. In case the vCPU
+switches between modes, we always raise KVM_REQ_HV_TLB_FLUSH request to
+make sure we check. Note: we can't be raising KVM_REQ_TLB_FLUSH_GUEST
+instead as it always means 'full tlb flush' and we certainly don't want
+that.
 
-As Alex already mentioned this might not have the desired effect on
-systems with multiple GPUs (I think even without considering vfio-pci).
-
-> That is, do you want to remove the {vesa,efi,simple}fb and simpledrm
-> drivers or is there a need to also remove real fbdev and DRM drivers?
-
-Boot framebuffers are the problem because they are neither visible nor
-manageable in /sys/bus/pci.  For real fbdev/drm drivers the standard pci
-unbind can be used.
-
-take care,
-  Gerd
+-- 
+Vitaly
 
