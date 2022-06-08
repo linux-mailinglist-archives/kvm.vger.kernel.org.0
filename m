@@ -2,135 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 616DD54313A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 15:21:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BE3554315F
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 15:32:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240040AbiFHNVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 09:21:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39890 "EHLO
+        id S240121AbiFHNb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 09:31:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239983AbiFHNVw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 09:21:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 46DEE44761
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 06:21:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654694509;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SkCtRFwTpix6cqqR0vaJf3gcR2UPvZl1kedDkrrQHQk=;
-        b=OgtL/Ljqiolk0q8qO208H90TlbLU29C79a/uFYjFgXXJ853Pa2xq77M96L1gVpvUZ07ne7
-        s1kj6bbrCAYLHTpai88euN6nf2WyLfzmWyTsZqEFYmH/SD++MwX7o9kjht/pb9yzyTvJnK
-        Zj9X8sb/wCp6cjOnZsTa5nVs/B7topE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-433-mjis4WYhOUi6_N9GaO6CjQ-1; Wed, 08 Jun 2022 09:21:47 -0400
-X-MC-Unique: mjis4WYhOUi6_N9GaO6CjQ-1
-Received: by mail-wm1-f71.google.com with SMTP id ay28-20020a05600c1e1c00b0039c5cbe76c1so2007639wmb.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 06:21:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=SkCtRFwTpix6cqqR0vaJf3gcR2UPvZl1kedDkrrQHQk=;
-        b=xOMzzB5NigJXeMlu0lcnguNm4N2nvHIWSsySQR4cg5ritfjtg92R8whAOmO8siU2dv
-         ghrihAiyBkxt5HEVXPyKrFqPhZ6ACqndXs5VM5vhNNtwO89JtdwzDLquL8IJn1xdvJ/O
-         ESgSSANfC/7W80ta4R5rhEBZ0GZ9n7oPLomQ4petTG3MFu6jjOM4/GpIZpyHUHiKT41S
-         EYnY+7cO80aQ2o8PK/8FamLl80CDfWnxSeMpPs0oeh8CvkeYnqYQJlBVVF/TSpwWzAuK
-         6fM/pXy/7KDTsogRo53izbWUNxtTikSVbkBiXOChpi5Aytk38ONHG1D7vJz7z69VkqRt
-         6eBQ==
-X-Gm-Message-State: AOAM533MAaHsI9yjcOA3pQoB4n9+kowDfKiUoK+ZrcQOmqgTuHqu+Q6R
-        aVwIoblrXxpdbIGf8H3FdFxhzgDG9vfSXOMjWDNC31xMTQJ5WLYAs3kRJ1p55Xttvntd3VdVlMO
-        7Ve/gXl9bbBs5
-X-Received: by 2002:adf:f20d:0:b0:214:c726:ce76 with SMTP id p13-20020adff20d000000b00214c726ce76mr26699127wro.649.1654694506287;
-        Wed, 08 Jun 2022 06:21:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyaA7jNNnJGWGxSZi3mS5Ma8c5boc4zfZ2u1LoRf9h9fTXyTDTHq18tyu2dPMjTs6YP00xiHA==
-X-Received: by 2002:adf:f20d:0:b0:214:c726:ce76 with SMTP id p13-20020adff20d000000b00214c726ce76mr26699096wro.649.1654694506013;
-        Wed, 08 Jun 2022 06:21:46 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id c14-20020adffb0e000000b00213465d202esm18742388wrr.46.2022.06.08.06.21.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jun 2022 06:21:45 -0700 (PDT)
-Message-ID: <c7fb78e2-2650-f9a2-3062-5d5ecc34332b@redhat.com>
-Date:   Wed, 8 Jun 2022 15:21:42 +0200
+        with ESMTP id S239983AbiFHNbz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 09:31:55 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F664C9EC0;
+        Wed,  8 Jun 2022 06:31:53 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258CqAet018265;
+        Wed, 8 Jun 2022 13:31:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tbUoJADDfy69tOLB5oIBIp2mPffNhGp0fJvy4h43UCM=;
+ b=eCd5WUFsd3ynHYKoY28p32KjL3IK+IWshKurZpMZLW2R3aT7Q7/w66f+i80MhmnL2KPt
+ ayBNp4kxYLsBSjaeOQd0S0EDsFlfKg08m76hPPUQjpOi8JLILrf6IphlVIgOVb7yyZey
+ iicvw6vzE4gYnh+Afxal17C3LD/0StM89V6g5IbqS1S1Rk0/ZwRiNMflbb+OQ/CVDIkn
+ UwAPGAUH/6ID0DSBjMlR0PZEHZl6aJdSkZ4y9EuBt0yXp9KZD6C2ClVFY/uxah1w5vQA
+ 2t7EzN7z0oNvZgyqrY9d2Sy6ilEJvckAp60R92hTfp1GvwJZw4rOMjoYwWNJ/BYqRxrd jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjv5cgxf9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 13:31:50 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258DPw01016869;
+        Wed, 8 Jun 2022 13:31:50 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjv5cgxeq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 13:31:49 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258DKMJ7006054;
+        Wed, 8 Jun 2022 13:31:48 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma03wdc.us.ibm.com with ESMTP id 3gfy19uhua-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 13:31:48 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258DVlt830736866
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Jun 2022 13:31:47 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 86748BE053;
+        Wed,  8 Jun 2022 13:31:47 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 857F6BE04F;
+        Wed,  8 Jun 2022 13:31:46 +0000 (GMT)
+Received: from [9.160.55.57] (unknown [9.160.55.57])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Jun 2022 13:31:46 +0000 (GMT)
+Message-ID: <db3bc9c5-8f65-0507-2453-ccee41e10127@linux.ibm.com>
+Date:   Wed, 8 Jun 2022 09:31:46 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 4/7] KVM: x86: SVM: fix avic_kick_target_vcpus_fast
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v19 11/20] s390/vfio-ap: prepare for dynamic update of
+ guest's APCB on queue probe/remove
 Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        stable@vger.kernel.org
-References: <20220606180829.102503-1-mlevitsk@redhat.com>
- <20220606180829.102503-5-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220606180829.102503-5-mlevitsk@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com
+References: <20220404221039.1272245-1-akrowiak@linux.ibm.com>
+ <20220404221039.1272245-12-akrowiak@linux.ibm.com>
+ <9364a1b7-9060-20aa-b0d6-88c41a30e7d4@linux.ibm.com>
+ <f838f274-ff4d-496d-2393-14423117ff7e@linux.ibm.com>
+ <20220607140544.32d33f3d.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20220607140544.32d33f3d.pasic@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xOfdXdbKMTdautt6Ps_qr1bprHaB9I8i
+X-Proofpoint-ORIG-GUID: ELQ7UXCaAOPiI9u170yr3ccxVjU7AFxA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-08_04,2022-06-07_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ lowpriorityscore=0 impostorscore=0 malwarescore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206080058
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/6/22 20:08, Maxim Levitsky wrote:
-> There are two issues in avic_kick_target_vcpus_fast
-> 
-> 1. It is legal to issue an IPI request with APIC_DEST_NOSHORT
->     and a physical destination of 0xFF (or 0xFFFFFFFF in case of x2apic),
->     which must be treated as a broadcast destination.
-> 
->     Fix this by explicitly checking for it.
->     Also don’t use ‘index’ in this case as it gives no new information.
-> 
-> 2. It is legal to issue a logical IPI request to more than one target.
->     Index field only provides index in physical id table of first
->     such target and therefore can't be used before we are sure
->     that only a single target was addressed.
-> 
->     Instead, parse the ICRL/ICRH, double check that a unicast interrupt
->     was requested, and use that info to figure out the physical id
->     of the target vCPU.
->     At that point there is no need to use the index field as well.
-> 
-> 
-> In addition to fixing the above	issues,	also skip the call to
-> kvm_apic_match_dest.
-> 
-> It is possible to do this now, because now as long as AVIC is not
-> inhibited, it is guaranteed that none of the vCPUs changed their
-> apic id from its default value.
-> 
-> 
-> This fixes boot of windows guest with AVIC enabled because it uses
-> IPI with 0xFF destination and no destination shorthand.
-> 
-> Fixes: 7223fd2d5338 ("KVM: SVM: Use target APIC ID to complete AVIC IRQs when possible")
-> Cc: stable@vger.kernel.org
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Is it possible to use kvm_intr_is_single_vcpu_fast, or am I missing 
-something?
 
-Series queued, thanks.
+On 6/7/22 8:05 AM, Halil Pasic wrote:
+> On Tue, 31 May 2022 06:44:46 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>>> vfio_ap_mdev_get_update_locks_for_apqn is "crazy long".
+>>> How about:
+>>>    get_mdev_for_apqn()
+>>>
+>>> This function is static and the terms mdev and apqn are specific
+>>> enough that I
+>>> don't think it needs to start with vfio_ap. And there is no need to
+>>> state in
+>>> the function name that locks are acquired. That point will be obvious
+>>> to anyone
+>>> reading the prologue or the code.
+>> The primary purpose of the function is to acquire the locks in the
+>> proper order, so
+>> I think the name should state that purpose. It may be obvious to someone
+>> reading
+>> the prologue or this function, but not so obvious in the context of the
+>> calling function.
+> I agree with Tony. To me get_mdev_for_apqn() sounds like getting a
+> reference to a matrix_mdev object (and incrementing its refcount) or
+> something similar. BTW some more bike shedding: I prefer by_apqn instead
+> of for_apqn, because the set of locks we need to take is determined _by_
+> the apqn parameter, but it ain't semantically the set of locks we need
+> to perform an update operation on the apqn or on the queue associated
+> with the apqn. No strong opinion though -- I'm no native speaker and
+> prepositions are difficult for me.
 
-Paolo
+I am a native speaker and I had to review prepositions. I learned
+grammar in elementary school (grades 1-6) and have forgotten
+much of the terminology as it relates to sentence structure. Anyway,
+I digress. I'm okay with 'by_apqn'.
+
+>
+> Regards,
+> Halil
 
