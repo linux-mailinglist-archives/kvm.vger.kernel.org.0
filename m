@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A28AE542808
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 09:48:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACE73542805
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 09:48:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232738AbiFHHHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 03:07:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56804 "EHLO
+        id S236676AbiFHHGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 03:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354811AbiFHGTq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1354813AbiFHGTq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 Jun 2022 02:19:46 -0400
-X-Greylist: delayed 94 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Jun 2022 23:16:20 PDT
-Received: from ssh249.corpemail.net (ssh249.corpemail.net [210.51.61.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2B01E3E3;
-        Tue,  7 Jun 2022 23:16:17 -0700 (PDT)
+Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B3F1E3F0;
+        Tue,  7 Jun 2022 23:16:48 -0700 (PDT)
 Received: from ([60.208.111.195])
-        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id CCQ00146;
-        Wed, 08 Jun 2022 14:08:46 +0800
+        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id CCW00038;
+        Wed, 08 Jun 2022 14:14:38 +0800
 Received: from localhost.localdomain (10.200.104.82) by
  jtjnmail201612.home.langchao.com (10.100.2.12) with Microsoft SMTP Server id
- 15.1.2308.27; Wed, 8 Jun 2022 14:08:47 +0800
+ 15.1.2308.27; Wed, 8 Jun 2022 14:14:39 +0800
 From:   Deming Wang <wangdeming@inspur.com>
 To:     <mst@redhat.com>, <jasowang@redhat.com>
 CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Deming Wang <wangdeming@inspur.com>
 Subject: [PATCH] virtio: Directly use ida_alloc_range()/ida_free()
-Date:   Wed, 8 Jun 2022 02:08:26 -0400
-Message-ID: <20220608060826.1681-1-wangdeming@inspur.com>
+Date:   Wed, 8 Jun 2022 02:14:04 -0400
+Message-ID: <20220608061404.1798-1-wangdeming@inspur.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
 X-Originating-IP: [10.200.104.82]
-tUid:   2022608140846640643a74332369a4aa4a55b1bfc3fae
+tUid:   20226081414388f8eafe72e821916eb91f499fd7d720a
 X-Abuse-Reports-To: service@corp-email.com
 Abuse-Reports-To: service@corp-email.com
 X-Complaints-To: service@corp-email.com
