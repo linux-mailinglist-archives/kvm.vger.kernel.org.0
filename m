@@ -2,52 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43D29543747
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 17:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87ED9543756
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 17:26:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244683AbiFHPZB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 11:25:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41170 "EHLO
+        id S244363AbiFHP0j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 11:26:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244385AbiFHPYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 11:24:23 -0400
+        with ESMTP id S244025AbiFHP0F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 11:26:05 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 59FE1264
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 08:20:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2396612F372
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 08:22:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654701613;
+        s=mimecast20190719; t=1654701737;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=oI7iLpKGOzsaKuECmyGzbvgD7svr83STRun8kjdiZxg=;
-        b=H09ltKUJ8qQ5vdj2V/oAka5Bql+gUaSLBg7RvmQooYus33UJ2Mf6yzmjT9qcY9/MfMg+eg
-        nqp/8p7bulvi8GXroUwpfxbsgpKab3IppkeYHwDcYBGIm6L6Ady+/QsE7a75oTmN6pJ8n+
-        LdtNmG/pgtOp7CZmCY3tjKaHrGvMtsg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NyDm9mJkVzWDvK67KOw2wVt/yPUnzdXp5ZRYjgzzgOM=;
+        b=LG8MiH6iDGr3eI8Se/81iMUfPGgs65eMMQmzwvsFUcSbEgFVj9eA1pEMIoVUXD/TIuiTRI
+        8XUGKU0trXPez1VBrilrGXBvajXl7JUTVW/KamFPjobxZ1AoBW4GbPYX8P7plxANO43uAN
+        U3O1/3G2xQpgzjyM8B5aAHWgb2fA/Bg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-595-gkXZE3VIPcuEZBg54Z3j_A-1; Wed, 08 Jun 2022 11:20:10 -0400
-X-MC-Unique: gkXZE3VIPcuEZBg54Z3j_A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1239385A584;
-        Wed,  8 Jun 2022 15:20:10 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E89C718EA5;
-        Wed,  8 Jun 2022 15:20:09 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 5.19-rc2
-Date:   Wed,  8 Jun 2022 11:20:09 -0400
-Message-Id: <20220608152009.893314-1-pbonzini@redhat.com>
+ us-mta-171-YwRbGY0lPBSww0lJwNaj5g-1; Wed, 08 Jun 2022 11:22:16 -0400
+X-MC-Unique: YwRbGY0lPBSww0lJwNaj5g-1
+Received: by mail-wm1-f72.google.com with SMTP id bg40-20020a05600c3ca800b00394779649b1so14534540wmb.3
+        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 08:22:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NyDm9mJkVzWDvK67KOw2wVt/yPUnzdXp5ZRYjgzzgOM=;
+        b=SPHNliQEYEmN5/VjXr5w3z7hWmgUBZDmVtcrID6S4lwOFw1feCN/XluU6Zl2DJklZA
+         2+W5Arah8ScS2RCG+KNws7HcaTkbmRTFn/IOrx2rz47RkZKuFpLaThCPGAXUIJdZfPR3
+         9pdZA/tj+EpcIXBBEx3dzjnM9jIm4Wct7y2KqVdSqoYOXAtaADSTfIpZoQr+l0N3EGsa
+         oLPTxjmxPSXoQcBZvAjlyRliRY2A8odD4FijDIYs6Z0VUHkL1WWu5p3fq5LqjmaDxQNO
+         +Gelinpng9S2fcCF6jxyg7KXnfg/x+KBbk21YrOxqFkx4/JY/uDd+7xyyiHg9MdUetxx
+         pUiQ==
+X-Gm-Message-State: AOAM530NS2Smjvwkj3tdJeLOf37CeFWLVuguQk/Jj9l4yRhLPVVJLQct
+        vggTtsukauzjYyewM6j43/YyjYX68BjKKs3J1K0Gh8+hfRSrJ/MqpMpcG4dmARmYH0WfNkxCXgE
+        Up5BTpV5Lnuxk
+X-Received: by 2002:a05:6000:1e0a:b0:210:32e1:3b03 with SMTP id bj10-20020a0560001e0a00b0021032e13b03mr34460809wrb.642.1654701734988;
+        Wed, 08 Jun 2022 08:22:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwz1NacuKsD9Aiuiwfgs4mtvzYjxoK6GpJ+CUOQV9DQmdpxl+FGkRyQYBzIs2H+7wWliDQAsA==
+X-Received: by 2002:a05:6000:1e0a:b0:210:32e1:3b03 with SMTP id bj10-20020a0560001e0a00b0021032e13b03mr34460796wrb.642.1654701734835;
+        Wed, 08 Jun 2022 08:22:14 -0700 (PDT)
+Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
+        by smtp.gmail.com with ESMTPSA id l9-20020a7bc349000000b0039746638d6esm23908334wmj.33.2022.06.08.08.22.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jun 2022 08:22:14 -0700 (PDT)
+Date:   Wed, 8 Jun 2022 17:22:12 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 049/144] KVM: selftests: Return the created vCPU from
+ vm_vcpu_add()
+Message-ID: <20220608152212.fzaijzuxypbmn5pa@gator>
+References: <20220603004331.1523888-1-seanjc@google.com>
+ <20220603004331.1523888-50-seanjc@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220603004331.1523888-50-seanjc@google.com>
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -55,69 +80,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Fri, Jun 03, 2022 at 12:41:56AM +0000, Sean Christopherson wrote:
+> Return the created vCPU from vm_vcpu_add() so that callers don't need to
+> manually retrieve the vCPU that was just added.  Opportunistically drop
+> the "heavy" function comment, it adds a lot of lines of "code" but not
+> much value, e.g. it's pretty obvious that @vm is a virtual machine...
 
-The following changes since commit ffd1925a596ce68bed7d81c61cb64bc35f788a9d:
+I agree and would like to see all the heavy function comments reduced.
+Maybe you do that somewhere in next 100 patches :-)
 
-  KVM: x86: Fix the intel_pt PMI handling wrongly considered from guest (2022-05-25 05:18:27 -0400)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 6cd88243c7e03845a450795e134b488fc2afb736:
-
-  KVM: x86: do not report a vCPU as preempted outside instruction boundaries (2022-06-08 04:21:07 -0400)
-
-----------------------------------------------------------------
-* Fix syzkaller NULL pointer dereference
-* Fix TDP MMU performance issue with disabling dirty logging
-* Fix 5.14 regression with SVM TSC scaling
-* Fix indefinite stall on applying live patches
-* Fix unstable selftest
-* Fix memory leak from wrong copy-and-paste
-* Fix missed PV TLB flush when racing with emulation
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      KVM: Don't null dereference ops->destroy
-
-Ben Gardon (1):
-      KVM: x86/MMU: Zap non-leaf SPTEs when disabling dirty logging
-
-Jan Beulich (1):
-      x86: drop bogus "cc" clobber from __try_cmpxchg_user_asm()
-
-Maxim Levitsky (1):
-      KVM: SVM: fix tsc scaling cache logic
-
-Paolo Bonzini (2):
-      KVM: x86: do not set st->preempted when going back to user space
-      KVM: x86: do not report a vCPU as preempted outside instruction boundaries
-
-Seth Forshee (1):
-      entry/kvm: Exit to user mode when TIF_NOTIFY_SIGNAL is set
-
-Shaoqin Huang (1):
-      KVM: x86/mmu: Check every prev_roots in __kvm_mmu_free_obsolete_roots()
-
-Vitaly Kuznetsov (1):
-      KVM: selftests: Make hyperv_clock selftest more stable
-
- arch/x86/include/asm/kvm_host.h                   |  3 ++
- arch/x86/include/asm/uaccess.h                    |  2 +-
- arch/x86/kvm/mmu/mmu.c                            |  2 +-
- arch/x86/kvm/mmu/tdp_iter.c                       |  9 +++++
- arch/x86/kvm/mmu/tdp_iter.h                       |  1 +
- arch/x86/kvm/mmu/tdp_mmu.c                        | 38 +++++++++++++++---
- arch/x86/kvm/svm/nested.c                         |  4 +-
- arch/x86/kvm/svm/svm.c                            | 34 ++++++++++------
- arch/x86/kvm/svm/svm.h                            |  2 +-
- arch/x86/kvm/vmx/vmx.c                            |  1 +
- arch/x86/kvm/x86.c                                | 48 +++++++++++++++++------
- arch/x86/kvm/xen.h                                |  6 ++-
- kernel/entry/kvm.c                                |  6 ---
- tools/testing/selftests/kvm/x86_64/hyperv_clock.c | 10 +++--
- virt/kvm/kvm_main.c                               |  5 ++-
- 15 files changed, 124 insertions(+), 47 deletions(-)
+Thanks,
+drew
 
