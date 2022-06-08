@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB40F543070
+	by mail.lfdr.de (Postfix) with ESMTP id 23C2D54306E
 	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 14:32:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239356AbiFHMcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 08:32:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40256 "EHLO
+        id S239361AbiFHMcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 08:32:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239310AbiFHMbx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 08:31:53 -0400
+        with ESMTP id S239333AbiFHMby (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 08:31:54 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88017254444
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88DC9254460
         for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 05:31:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1654691510; x=1686227510;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=jAyo3pwMPZQg0heMxXYQSaTslfVs+jhdT9vHrNmEINw=;
-  b=ckDsNzA9G7ZfmRi+13i48GMQaWsZ2VMOLaLBLC0vAuZkEOLn/AY67EeG
-   7hl6XIlUeBZ1/svC0Up1bbzTtpo5uqQaVR76WL9mMZ9E1NbDPpkYMlXOV
-   P3nZymYDRccO3GLCSJnJOf7zKX1Mi7E0TBWc+Y16awoIuR8wqssdnRiM9
-   YD8wJd8bb6LyZupRyKcmv6QANf/vXDZOyaZMyDbHbAbtLkkSxW+Q7S0pV
-   zNm6B7RGb/XpZo1B8h++ta5Dfot3if9ijZYG0YK0SpmA2eKjcHmBxWpmD
-   MptXuEDJg9SefqeliY5MtezKWfD+l+67EAj9KIu54tbDH0C21SAVQ5GwG
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="302238087"
+  bh=QOWvCiC5xeNIhozB8NOdNSZTOHuvSql4zTaZ4nNSoFA=;
+  b=bnrjW0UtR/yrezOWQy1XrEo+QLQ7YV/DkM6gEfZpyupRGqG7SnP0Y/A0
+   jAgTB47tSHMw1RsMg3VfZmolpF+jfdt3xm1n4zbmqa6FAJGrXN+Gemh/s
+   Utjmwr8a8f6k/ieRWC5MnijzIDxS3/KvBGDz7mXg+kn6f6fKYato8PM0f
+   oBT89dZg5qKwMjmHQx0wfo1WTHUjYvDjrpn1Qs/N7fox7iYOZhGUvyRvb
+   HpC2jQZZFX5CXt7PdNAjEro43NnT4XvSpif9SXg/t3EaGjZPCYN+yYTPB
+   esUaTOgJJSxayhboMvXLT6QSR0q6bTCYhOuZRD49w6NOJ2aXlQoqPYV5j
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="302238091"
 X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
-   d="scan'208";a="302238087"
+   d="scan'208";a="302238091"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2022 05:31:49 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2022 05:31:50 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
-   d="scan'208";a="670529889"
+   d="scan'208";a="670529900"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by FMSMGA003.fm.intel.com with ESMTP; 08 Jun 2022 05:31:48 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 08 Jun 2022 05:31:49 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, cohuck@redhat.com,
         qemu-devel@nongnu.org
@@ -49,9 +49,9 @@ Cc:     david@gibson.dropbear.id.au, thuth@redhat.com,
         chao.p.peng@intel.com, yi.y.sun@intel.com, peterx@redhat.com,
         shameerali.kolothum.thodi@huawei.com, zhangfei.gao@linaro.org,
         berrange@redhat.com
-Subject: [RFC v2 13/15] vfio/iommufd: Implement the iommufd backend
-Date:   Wed,  8 Jun 2022 05:31:37 -0700
-Message-Id: <20220608123139.19356-14-yi.l.liu@intel.com>
+Subject: [RFC v2 14/15] vfio/iommufd: Add IOAS_COPY_DMA support
+Date:   Wed,  8 Jun 2022 05:31:38 -0700
+Message-Id: <20220608123139.19356-15-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220608123139.19356-1-yi.l.liu@intel.com>
 References: <20220608123139.19356-1-yi.l.liu@intel.com>
@@ -67,684 +67,509 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the iommufd backend. The IOMMUFD container class is implemented
-based on the new /dev/iommu user API. This backend obviously depends
-on CONFIG_IOMMUFD.
+Compared with legacy vfio container BE, one of the benefits provided by
+iommufd is to reduce the redundant page pinning on kernel side through
+the usage of IOAS_COPY_DMA. For iommufd containers within the same address
+space, IOVA mappings can be copied from a source container to destination
+container.
 
-So far, the iommufd backend doesn't support live migration and
-cache coherency yet due to missing support in the host kernel meaning
-that only a subset of the container class callbacks is implemented.
+To achieve this, move the vfio_memory_listener to be per address space.
+In the memory listener callbacks, all the containers within the address
+space will be looped. For the iommufd containers, QEMU uses IOAS_MAP_DMA
+on the first one, and then uses IOAS_COPY_DMA to copy the IOVA mappings
+from the first iommufd container to other iommufd containers within the
+address space. For legacy containers, IOVA mapping is done by
+VFIO_IOMMU_MAP_DMA.
 
-Co-authored-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
-v1 -> v2:
-- arbitrarily set bcontainer->pgsizes to 4K to fix interoperability
-  with virtio-iommu (Nicolin)
-- add tear down in iommufd_attach_device error path
-- use cdev open for /dev/vfio/devices/vfioX open
----
- hw/vfio/as.c                  |   2 +-
- hw/vfio/iommufd.c             | 517 ++++++++++++++++++++++++++++++++++
- hw/vfio/meson.build           |   3 +
- hw/vfio/pci.c                 |  10 +
- hw/vfio/trace-events          |  11 +
- include/hw/vfio/vfio-common.h |  22 ++
- 6 files changed, 564 insertions(+), 1 deletion(-)
- create mode 100644 hw/vfio/iommufd.c
+ hw/vfio/as.c                          | 117 ++++++++++++++++++++++----
+ hw/vfio/container-base.c              |  13 ++-
+ hw/vfio/container.c                   |  19 ++---
+ hw/vfio/iommufd.c                     |  47 +++++++++--
+ include/hw/vfio/vfio-common.h         |   5 +-
+ include/hw/vfio/vfio-container-base.h |   8 +-
+ 6 files changed, 167 insertions(+), 42 deletions(-)
 
 diff --git a/hw/vfio/as.c b/hw/vfio/as.c
-index 1a3ceb5e62..3ff9d4215f 100644
+index 3ff9d4215f..56485f9299 100644
 --- a/hw/vfio/as.c
 +++ b/hw/vfio/as.c
-@@ -42,7 +42,7 @@
- #include "migration/migration.h"
- #include "sysemu/tpm.h"
+@@ -405,16 +405,16 @@ static bool vfio_known_safe_misalignment(MemoryRegionSection *section)
+     return true;
+ }
  
--static QLIST_HEAD(, VFIOAddressSpace) vfio_address_spaces =
-+VFIOAddressSpaceList vfio_address_spaces =
-     QLIST_HEAD_INITIALIZER(vfio_address_spaces);
+-static void vfio_listener_region_add(MemoryListener *listener,
+-                                     MemoryRegionSection *section)
++static void vfio_container_region_add(VFIOContainer *container,
++                                      VFIOContainer **src_container,
++                                      MemoryRegionSection *section)
+ {
+-    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
+     hwaddr iova, end;
+     Int128 llend, llsize;
+     void *vaddr;
+     int ret;
+     VFIOHostDMAWindow *hostwin;
+-    bool hostwin_found;
++    bool hostwin_found, copy_dma_supported = false;
+     Error *err = NULL;
  
- void vfio_host_win_add(VFIOContainer *container,
-diff --git a/hw/vfio/iommufd.c b/hw/vfio/iommufd.c
-new file mode 100644
-index 0000000000..7417c6ce44
---- /dev/null
-+++ b/hw/vfio/iommufd.c
-@@ -0,0 +1,517 @@
-+/*
-+ * iommufd container backend
-+ *
-+ * Copyright (C) 2022 Intel Corporation.
-+ * Copyright Red Hat, Inc. 2022
-+ *
-+ * Authors: Yi Liu <yi.l.liu@intel.com>
-+ *          Eric Auger <eric.auger@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <sys/ioctl.h>
-+#include <linux/vfio.h>
-+
-+#include "hw/vfio/vfio-common.h"
-+#include "qemu/error-report.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+#include "sysemu/iommufd.h"
-+#include "hw/qdev-core.h"
-+#include "sysemu/reset.h"
-+#include "qemu/cutils.h"
-+#include "qemu/char_dev.h"
-+
-+static bool iommufd_check_extension(VFIOContainer *bcontainer,
-+                                    VFIOContainerFeature feat)
-+{
-+    switch (feat) {
-+    default:
-+        return false;
-+    };
-+}
-+
-+static int iommufd_map(VFIOContainer *bcontainer, hwaddr iova,
-+                       ram_addr_t size, void *vaddr, bool readonly)
-+{
-+    VFIOIOMMUFDContainer *container = container_of(bcontainer,
-+                                                   VFIOIOMMUFDContainer, bcontainer);
-+
-+    return iommufd_backend_map_dma(container->be,
-+                                   container->ioas_id,
-+                                   iova, size, vaddr, readonly);
-+}
-+
-+static int iommufd_unmap(VFIOContainer *bcontainer,
-+                         hwaddr iova, ram_addr_t size,
-+                         IOMMUTLBEntry *iotlb)
-+{
-+    VFIOIOMMUFDContainer *container = container_of(bcontainer,
-+                                                   VFIOIOMMUFDContainer, bcontainer);
-+
-+    /* TODO: Handle dma_unmap_bitmap with iotlb args (migration) */
-+    return iommufd_backend_unmap_dma(container->be,
-+                                     container->ioas_id, iova, size);
-+}
-+
-+static int vfio_get_devicefd(const char *sysfs_path, Error **errp)
-+{
-+    long int ret = -ENOTTY;
-+    char *path, *vfio_dev_path = NULL, *vfio_path = NULL;
-+    DIR *dir;
-+    struct dirent *dent;
-+    gchar *contents;
-+    struct stat st;
-+    gsize length;
-+    int major, minor;
-+    dev_t vfio_devt;
-+
-+    path = g_strdup_printf("%s/vfio-device", sysfs_path);
-+    if (stat(path, &st) < 0) {
-+        error_setg_errno(errp, errno, "no such host device");
-+        goto out_free_path;
-+    }
-+
-+    dir = opendir(path);
-+    if (!dir) {
-+        error_setg_errno(errp, errno, "couldn't open dirrectory %s", path);
-+        goto out_free_path;
-+    }
-+
-+    while ((dent = readdir(dir))) {
-+        if (!strncmp(dent->d_name, "vfio", 4)) {
-+            vfio_dev_path = g_strdup_printf("%s/%s/dev", path, dent->d_name);
-+            break;
-+        }
-+    }
-+
-+    if (!vfio_dev_path) {
-+        error_setg(errp, "failed to find vfio-device/vfioX/dev");
-+        goto out_free_path;
-+    }
-+
-+    if (!g_file_get_contents(vfio_dev_path, &contents, &length, NULL)) {
-+        error_setg(errp, "failed to load \"%s\"", vfio_dev_path);
-+        goto out_free_dev_path;
-+    }
-+
-+    if (sscanf(contents, "%d:%d", &major, &minor) != 2) {
-+        error_setg(errp, "failed to get major:mino for \"%s\"", vfio_dev_path);
-+        goto out_free_dev_path;
-+    }
-+    g_free(contents);
-+    vfio_devt = makedev(major, minor);
-+
-+    vfio_path = g_strdup_printf("/dev/vfio/devices/%s", dent->d_name);
-+    ret = open_cdev(vfio_path, vfio_devt);
-+    if (ret < 0) {
-+        error_setg(errp, "Failed to open %s", vfio_path);
-+    }
-+
-+    trace_vfio_iommufd_get_devicefd(vfio_path, ret);
-+    g_free(vfio_path);
-+
-+out_free_dev_path:
-+    g_free(vfio_dev_path);
-+out_free_path:
-+    g_free(path);
-+
-+    if (*errp) {
-+        error_prepend(errp, VFIO_MSG_PREFIX, path);
-+    }
-+    return ret;
-+}
-+
-+static VFIOIOASHwpt *vfio_container_get_hwpt(VFIOIOMMUFDContainer *container,
-+                                             uint32_t hwpt_id)
-+{
-+    VFIOIOASHwpt *hwpt;
-+
-+    QLIST_FOREACH(hwpt, &container->hwpt_list, next) {
-+        if (hwpt->hwpt_id == hwpt_id) {
-+            return hwpt;
-+        }
-+    }
-+
-+    hwpt = g_malloc0(sizeof(*hwpt));
-+
-+    hwpt->hwpt_id = hwpt_id;
-+    QLIST_INIT(&hwpt->device_list);
-+    QLIST_INSERT_HEAD(&container->hwpt_list, hwpt, next);
-+
-+    return hwpt;
-+}
-+
-+static void vfio_container_put_hwpt(VFIOIOASHwpt *hwpt)
-+{
-+    if (!QLIST_EMPTY(&hwpt->device_list)) {
-+        g_assert_not_reached();
-+    }
-+    QLIST_REMOVE(hwpt, next);
-+    g_free(hwpt);
-+}
-+
-+static VFIOIOASHwpt *vfio_find_hwpt_for_dev(VFIOIOMMUFDContainer *container,
-+                                            VFIODevice *vbasedev)
-+{
-+    VFIOIOASHwpt *hwpt;
-+    VFIODevice *vbasedev_iter;
-+
-+    QLIST_FOREACH(hwpt, &container->hwpt_list, next) {
-+        QLIST_FOREACH(vbasedev_iter, &hwpt->device_list, hwpt_next) {
-+            if (vbasedev_iter == vbasedev) {
-+                return hwpt;
-+            }
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void
-+__vfio_device_detach_container(VFIODevice *vbasedev,
-+                               VFIOIOMMUFDContainer *container, Error **errp)
-+{
-+    struct vfio_device_detach_ioas detach_data = {
-+        .argsz = sizeof(detach_data),
-+        .flags = 0,
-+        .iommufd = container->be->fd,
-+        .ioas_id = container->ioas_id,
-+    };
-+
-+    if (ioctl(vbasedev->fd, VFIO_DEVICE_DETACH_IOAS, &detach_data)) {
-+        error_setg_errno(errp, errno, "detach %s from ioas id=%d failed",
-+                         vbasedev->name, container->ioas_id);
-+    }
-+    trace_vfio_iommufd_detach_device(container->be->fd, vbasedev->name,
-+                                     container->ioas_id);
-+
-+    /* iommufd unbind is done per device fd close */
-+}
-+
-+static void vfio_device_detach_container(VFIODevice *vbasedev,
-+                                         VFIOIOMMUFDContainer *container,
-+                                         Error **errp)
-+{
-+    VFIOIOASHwpt *hwpt;
-+
-+    hwpt = vfio_find_hwpt_for_dev(container, vbasedev);
-+    if (hwpt) {
-+        QLIST_REMOVE(vbasedev, hwpt_next);
-+        if (QLIST_EMPTY(&hwpt->device_list)) {
-+            vfio_container_put_hwpt(hwpt);
-+        }
-+    }
-+
-+    __vfio_device_detach_container(vbasedev, container, errp);
-+}
-+
-+static int vfio_device_attach_container(VFIODevice *vbasedev,
-+                                        VFIOIOMMUFDContainer *container,
-+                                        Error **errp)
-+{
-+    struct vfio_device_bind_iommufd bind = {
-+        .argsz = sizeof(bind),
-+        .flags = 0,
-+        .iommufd = container->be->fd,
-+        .dev_cookie = (uint64_t)vbasedev,
-+    };
-+    struct vfio_device_attach_ioas attach_data = {
-+        .argsz = sizeof(attach_data),
-+        .flags = 0,
-+        .iommufd = container->be->fd,
-+        .ioas_id = container->ioas_id,
-+    };
-+    VFIOIOASHwpt *hwpt;
-+    int ret;
-+
-+    /* Bind device to iommufd */
-+    ret = ioctl(vbasedev->fd, VFIO_DEVICE_BIND_IOMMUFD, &bind);
-+    if (ret) {
-+        error_setg_errno(errp, errno, "error bind device fd=%d to iommufd=%d",
-+                         vbasedev->fd, bind.iommufd);
-+        return ret;
-+    }
-+
-+    vbasedev->devid = bind.out_devid;
-+    trace_vfio_iommufd_bind_device(bind.iommufd, vbasedev->name,
-+                                   vbasedev->fd, vbasedev->devid);
-+
-+    /* Attach device to an ioas within iommufd */
-+    ret = ioctl(vbasedev->fd, VFIO_DEVICE_ATTACH_IOAS, &attach_data);
-+    if (ret) {
-+        error_setg_errno(errp, errno,
-+                         "[iommufd=%d] error attach %s (%d) to ioasid=%d",
-+                         container->be->fd, vbasedev->name, vbasedev->fd,
-+                         attach_data.ioas_id);
-+        return ret;
-+
-+    }
-+    trace_vfio_iommufd_attach_device(bind.iommufd, vbasedev->name,
-+                                     vbasedev->fd, container->ioas_id,
-+                                     attach_data.out_hwpt_id);
-+
-+    hwpt = vfio_container_get_hwpt(container, attach_data.out_hwpt_id);
-+
-+    QLIST_INSERT_HEAD(&hwpt->device_list, vbasedev, hwpt_next);
-+    return 0;
-+}
-+
-+static int vfio_device_reset(VFIODevice *vbasedev)
-+{
-+    if (vbasedev->dev->realized) {
-+        vbasedev->ops->vfio_compute_needs_reset(vbasedev);
-+        if (vbasedev->needs_reset) {
-+            return vbasedev->ops->vfio_hot_reset_multi(vbasedev);
-+        }
-+    }
-+    return 0;
-+}
-+
-+static int vfio_iommufd_container_reset(VFIOContainer *bcontainer)
-+{
-+    VFIOIOMMUFDContainer *container;
-+    int ret, final_ret = 0;
-+    VFIODevice *vbasedev;
-+    VFIOIOASHwpt *hwpt;
-+
-+    container = container_of(bcontainer, VFIOIOMMUFDContainer, bcontainer);
-+
-+    QLIST_FOREACH(hwpt, &container->hwpt_list, next) {
-+        QLIST_FOREACH(vbasedev, &hwpt->device_list, hwpt_next) {
-+            ret = vfio_device_reset(vbasedev);
-+            if (ret) {
-+                error_report("failed to reset %s (%d)", vbasedev->name, ret);
-+                final_ret = ret;
-+            } else {
-+                trace_vfio_iommufd_container_reset(vbasedev->name);
-+            }
-+        }
-+    }
-+    return final_ret;
-+}
-+
-+static void vfio_iommufd_container_destroy(VFIOIOMMUFDContainer *container)
-+{
-+    vfio_container_destroy(&container->bcontainer);
-+    g_free(container);
-+}
-+
-+static int vfio_ram_block_discard_disable(bool state)
-+{
-+    /*
-+     * We support coordinated discarding of RAM via the RamDiscardManager.
-+     */
-+    return ram_block_uncoordinated_discard_disable(state);
-+}
-+
-+static void iommufd_detach_device(VFIODevice *vbasedev);
-+
-+static int iommufd_attach_device(VFIODevice *vbasedev, AddressSpace *as,
-+                                 Error **errp)
-+{
-+    VFIOContainer *bcontainer;
-+    VFIOIOMMUFDContainer *container;
-+    VFIOAddressSpace *space;
-+    struct vfio_device_info dev_info = { .argsz = sizeof(dev_info) };
-+    int ret, devfd;
-+    uint32_t ioas_id;
-+    Error *err = NULL;
-+
-+    devfd = vfio_get_devicefd(vbasedev->sysfsdev, errp);
-+    if (devfd < 0) {
-+        return devfd;
-+    }
-+    vbasedev->fd = devfd;
-+
-+    space = vfio_get_address_space(as);
-+
-+    /* try to attach to an existing container in this space */
-+    QLIST_FOREACH(bcontainer, &space->containers, next) {
-+        if (bcontainer->ops != &iommufd_container_ops) {
-+            continue;
-+        }
-+        container = container_of(bcontainer, VFIOIOMMUFDContainer, bcontainer);
-+        if (vfio_device_attach_container(vbasedev, container, &err)) {
-+            const char *msg = error_get_pretty(err);
-+
-+            trace_vfio_iommufd_fail_attach_existing_container(msg);
-+            error_free(err);
-+            err = NULL;
-+        } else {
-+            ret = vfio_ram_block_discard_disable(true);
-+            if (ret) {
-+                vfio_device_detach_container(vbasedev, container, &err);
-+                error_propagate(errp, err);
-+                vfio_put_address_space(space);
-+                close(vbasedev->fd);
-+                error_prepend(errp,
-+                              "Cannot set discarding of RAM broken (%d)", ret);
-+                return ret;
-+            }
-+            goto out;
-+        }
-+    }
-+
-+    /* Need to allocate a new dedicated container */
-+    ret = iommufd_backend_get_ioas(vbasedev->iommufd, &ioas_id);
-+    if (ret < 0) {
-+        vfio_put_address_space(space);
-+        close(vbasedev->fd);
-+        error_report("Failed to alloc ioas (%s)", strerror(errno));
-+        return ret;
-+    }
-+
-+    trace_vfio_iommufd_alloc_ioas(vbasedev->iommufd->fd, ioas_id);
-+
-+    container = g_malloc0(sizeof(*container));
-+    container->be = vbasedev->iommufd;
-+    container->ioas_id = ioas_id;
-+    QLIST_INIT(&container->hwpt_list);
-+
-+    bcontainer = &container->bcontainer;
-+    vfio_container_init(bcontainer, space, &iommufd_container_ops);
-+
-+    ret = vfio_device_attach_container(vbasedev, container, &err);
-+    if (ret) {
-+        /* todo check if any other thing to do */
-+        error_propagate(errp, err);
-+        vfio_iommufd_container_destroy(container);
-+        iommufd_backend_put_ioas(vbasedev->iommufd, ioas_id);
-+        vfio_put_address_space(space);
-+        close(vbasedev->fd);
-+        return ret;
-+    }
-+
-+    ret = vfio_ram_block_discard_disable(true);
-+    if (ret) {
-+        goto error;
-+    }
-+
-+    /*
-+     * TODO: for now iommufd BE is on par with vfio iommu type1, so it's
-+     * fine to add the whole range as window. For SPAPR, below code
-+     * should be updated.
-+     */
-+    vfio_host_win_add(bcontainer, 0, (hwaddr)-1, 4096);
-+    bcontainer->pgsizes = 4096;
-+
-+    /*
-+     * TODO: kvmgroup, unable to do it before the protocol done
-+     * between iommufd and kvm.
-+     */
-+
-+    QLIST_INSERT_HEAD(&space->containers, bcontainer, next);
-+
-+    bcontainer->listener = vfio_memory_listener;
-+
-+    memory_listener_register(&bcontainer->listener, bcontainer->space->as);
-+
-+    bcontainer->initialized = true;
-+
-+out:
-+    vbasedev->container = bcontainer;
-+
-+    /*
-+     * TODO: examine RAM_BLOCK_DISCARD stuff, should we do group level
-+     * for discarding incompatibility check as well?
-+     */
-+    if (vbasedev->ram_block_discard_allowed) {
-+        vfio_ram_block_discard_disable(false);
-+    }
-+
-+    ret = ioctl(devfd, VFIO_DEVICE_GET_INFO, &dev_info);
-+    if (ret) {
-+        error_setg_errno(errp, errno, "error getting device info");
-+        memory_listener_unregister(&bcontainer->listener);
-+        QLIST_SAFE_REMOVE(bcontainer, next);
-+        goto error;
-+    }
-+
-+    vbasedev->group = 0;
-+    vbasedev->num_irqs = dev_info.num_irqs;
-+    vbasedev->num_regions = dev_info.num_regions;
-+    vbasedev->flags = dev_info.flags;
-+    vbasedev->reset_works = !!(dev_info.flags & VFIO_DEVICE_FLAGS_RESET);
-+
-+    trace_vfio_iommufd_device_info(vbasedev->name, devfd, vbasedev->num_irqs,
-+                                   vbasedev->num_regions, vbasedev->flags);
-+    return 0;
-+error:
-+    vfio_device_detach_container(vbasedev, container, &err);
-+    error_propagate(errp, err);
-+    vfio_iommufd_container_destroy(container);
-+    iommufd_backend_put_ioas(vbasedev->iommufd, ioas_id);
-+    vfio_put_address_space(space);
-+    close(vbasedev->fd);
-+    return ret;
-+}
-+
-+static void iommufd_detach_device(VFIODevice *vbasedev)
-+{
-+    VFIOContainer *bcontainer = vbasedev->container;
-+    VFIOIOMMUFDContainer *container;
-+    VFIODevice *vbasedev_iter;
-+    VFIOIOASHwpt *hwpt;
-+    Error *err = NULL;
-+
-+    if (!bcontainer) {
-+        goto out;
-+    }
-+
-+    if (!vbasedev->ram_block_discard_allowed) {
-+        vfio_ram_block_discard_disable(false);
-+    }
-+
-+    container = container_of(bcontainer, VFIOIOMMUFDContainer, bcontainer);
-+    QLIST_FOREACH(hwpt, &container->hwpt_list, next) {
-+        QLIST_FOREACH(vbasedev_iter, &hwpt->device_list, hwpt_next) {
-+            if (vbasedev_iter == vbasedev) {
-+                goto found;
-+            }
-+        }
-+    }
-+    g_assert_not_reached();
-+found:
-+    QLIST_REMOVE(vbasedev, hwpt_next);
-+    if (QLIST_EMPTY(&hwpt->device_list)) {
-+        vfio_container_put_hwpt(hwpt);
-+    }
-+
-+    __vfio_device_detach_container(vbasedev, container, &err);
-+    if (err) {
-+        error_report_err(err);
-+    }
-+    if (QLIST_EMPTY(&container->hwpt_list)) {
-+        VFIOAddressSpace *space = bcontainer->space;
-+
-+        iommufd_backend_put_ioas(container->be, container->ioas_id);
-+        vfio_iommufd_container_destroy(container);
-+        vfio_put_address_space(space);
-+    }
-+    vbasedev->container = NULL;
-+out:
-+    close(vbasedev->fd);
-+    g_free(vbasedev->name);
-+}
-+
-+const VFIOContainerOps iommufd_container_ops = {
-+    .check_extension = iommufd_check_extension,
-+    .dma_map = iommufd_map,
-+    .dma_unmap = iommufd_unmap,
-+    .attach_device = iommufd_attach_device,
-+    .detach_device = iommufd_detach_device,
-+    .reset = vfio_iommufd_container_reset,
-+};
-diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
-index 067c3c3c5f..50e370a409 100644
---- a/hw/vfio/meson.build
-+++ b/hw/vfio/meson.build
-@@ -7,6 +7,9 @@ vfio_ss.add(files(
-   'spapr.c',
-   'migration.c',
- ))
-+vfio_ss.add(when: 'CONFIG_IOMMUFD', if_true: files(
-+  'iommufd.c',
-+))
- vfio_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
-   'display.c',
-   'pci-quirks.c',
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 07361a6fcd..6d10e86331 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3191,6 +3191,16 @@ static void vfio_pci_reset(DeviceState *dev)
-         goto post_reset;
+     if (vfio_listener_skipped_section(section)) {
+@@ -558,12 +558,25 @@ static void vfio_listener_region_add(MemoryListener *listener,
+         }
      }
  
-+    /*
-+     * This is a temporary check, long term iommufd should
-+     * support hot reset as well
-+     */
-+    if (vdev->vbasedev.be == VFIO_IOMMU_BACKEND_TYPE_IOMMUFD) {
-+        error_report("Dangerous: iommufd BE doesn't support hot "
-+                     "reset, please stop the VM");
-+        goto post_reset;
++    copy_dma_supported = vfio_container_check_extension(container,
++                                                        VFIO_FEAT_DMA_COPY);
++
++    if (copy_dma_supported && *src_container) {
++        if (!vfio_container_dma_copy(*src_container, container,
++                                     iova, int128_get64(llsize),
++                                     section->readonly)) {
++            return;
++        } else {
++            info_report("IOAS copy failed try map for container: %p", container);
++        }
 +    }
 +
-     /* See if we can do our own bus reset */
-     if (!vfio_pci_hot_reset_one(vdev)) {
-         goto post_reset;
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 582882db91..68675c6f8f 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -166,3 +166,14 @@ vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t dat
- vfio_load_cleanup(const char *name) " (%s)"
- vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bitmap_size, uint64_t start) "container fd=%d, iova=0x%"PRIx64" size= 0x%"PRIx64" bitmap_size=0x%"PRIx64" start=0x%"PRIx64
- vfio_iommu_map_dirty_notify(uint64_t iova_start, uint64_t iova_end) "iommu dirty @ 0x%"PRIx64" - 0x%"PRIx64
+     ret = vfio_container_dma_map(container, iova, int128_get64(llsize),
+                                  vaddr, section->readonly);
+     if (ret) {
+-        error_setg(&err, "vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+-                   "0x%"HWADDR_PRIx", %p) = %d (%m)",
+-                   container, iova, int128_get64(llsize), vaddr, ret);
++        error_setg(&err, "vfio_container_dma_map(%p, 0x%"HWADDR_PRIx", "
++                   "0x%"HWADDR_PRIx", %p) = %d (%m)", container, iova,
++                   int128_get64(llsize), vaddr, ret);
+         if (memory_region_is_ram_device(section->mr)) {
+             /* Allow unexpected mappings not to be fatal for RAM devices */
+             error_report_err(err);
+@@ -572,6 +585,9 @@ static void vfio_listener_region_add(MemoryListener *listener,
+         goto fail;
+     }
+ 
++    if (copy_dma_supported) {
++        *src_container = container;
++    }
+     return;
+ 
+ fail:
+@@ -598,10 +614,22 @@ fail:
+     }
+ }
+ 
+-static void vfio_listener_region_del(MemoryListener *listener,
++static void vfio_listener_region_add(MemoryListener *listener,
+                                      MemoryRegionSection *section)
+ {
+-    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
++    VFIOAddressSpace *space = container_of(listener,
++                                           VFIOAddressSpace, listener);
++    VFIOContainer *container, *src_container;
 +
-+#iommufd.c
++    src_container = NULL;
++    QLIST_FOREACH(container, &space->containers, next) {
++        vfio_container_region_add(container, &src_container, section);
++    }
++}
 +
-+vfio_iommufd_get_devicefd(const char *dev, int devfd) " %s (fd=%d)"
-+vfio_iommufd_bind_device(int iommufd, const char *name, int devfd, int devid) " [iommufd=%d] Succesfully bound device %s (fd=%d): output devid=%d"
-+vfio_iommufd_attach_device(int iommufd, const char *name, int devfd, int ioasid, int hwptid) " [iommufd=%d] Succesfully attached device %s (%d) to ioasid=%d: output hwptd=%d"
-+vfio_iommufd_detach_device(int iommufd, const char *name, int ioasid) " [iommufd=%d] Detached %s from ioasid=%d"
-+vfio_iommufd_alloc_ioas(int iommufd, int ioas_id) " [iommufd=%d] new IOMMUFD container with ioasid=%d"
-+vfio_iommufd_device_info(char *name, int devfd, int num_irqs, int num_regions, int flags) " %s (%d) num_irqs=%d num_regions=%d flags=%d"
-+vfio_iommufd_fail_attach_existing_container(const char *msg) " %s"
-+vfio_iommufd_container_reset(char *name) " Successfully reset %s"
++static void vfio_container_region_del(VFIOContainer *container,
++                                      MemoryRegionSection *section)
++{
+     hwaddr iova, end;
+     Int128 llend, llsize;
+     int ret;
+@@ -707,18 +735,38 @@ static void vfio_listener_region_del(MemoryListener *listener,
+     vfio_container_del_section_window(container, section);
+ }
+ 
++static void vfio_listener_region_del(MemoryListener *listener,
++                                     MemoryRegionSection *section)
++{
++    VFIOAddressSpace *space = container_of(listener,
++                                           VFIOAddressSpace, listener);
++    VFIOContainer *container;
++
++    QLIST_FOREACH(container, &space->containers, next) {
++        vfio_container_region_del(container, section);
++    }
++}
++
+ static void vfio_listener_log_global_start(MemoryListener *listener)
+ {
+-    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
++    VFIOAddressSpace *space = container_of(listener,
++                                           VFIOAddressSpace, listener);
++    VFIOContainer *container;
+ 
+-    vfio_container_set_dirty_page_tracking(container, true);
++    QLIST_FOREACH(container, &space->containers, next) {
++        vfio_container_set_dirty_page_tracking(container, true);
++    }
+ }
+ 
+ static void vfio_listener_log_global_stop(MemoryListener *listener)
+ {
+-    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
++    VFIOAddressSpace *space = container_of(listener,
++                                           VFIOAddressSpace, listener);
++    VFIOContainer *container;
+ 
+-    vfio_container_set_dirty_page_tracking(container, false);
++    QLIST_FOREACH(container, &space->containers, next) {
++        vfio_container_set_dirty_page_tracking(container, false);
++    }
+ }
+ 
+ typedef struct {
+@@ -848,11 +896,9 @@ static int vfio_sync_dirty_bitmap(VFIOContainer *container,
+                    int128_get64(section->size), ram_addr);
+ }
+ 
+-static void vfio_listener_log_sync(MemoryListener *listener,
+-        MemoryRegionSection *section)
++static void vfio_container_log_sync(VFIOContainer *container,
++                                    MemoryRegionSection *section)
+ {
+-    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
+-
+     if (vfio_listener_skipped_section(section) ||
+         !container->dirty_pages_supported) {
+         return;
+@@ -863,6 +909,18 @@ static void vfio_listener_log_sync(MemoryListener *listener,
+     }
+ }
+ 
++static void vfio_listener_log_sync(MemoryListener *listener,
++                                   MemoryRegionSection *section)
++{
++    VFIOAddressSpace *space = container_of(listener,
++                                           VFIOAddressSpace, listener);
++    VFIOContainer *container;
++
++    QLIST_FOREACH(container, &space->containers, next) {
++        vfio_container_log_sync(container, section);
++    }
++}
++
+ const MemoryListener vfio_memory_listener = {
+     .name = "vfio",
+     .region_add = vfio_listener_region_add,
+@@ -907,6 +965,31 @@ VFIOAddressSpace *vfio_get_address_space(AddressSpace *as)
+     return space;
+ }
+ 
++void vfio_as_add_container(VFIOAddressSpace *space,
++                           VFIOContainer *container)
++{
++    if (space->listener_initialized) {
++        memory_listener_unregister(&space->listener);
++    }
++
++    QLIST_INSERT_HEAD(&space->containers, container, next);
++
++    /* Unregistration happen in vfio_as_del_container() */
++    space->listener = vfio_memory_listener;
++    memory_listener_register(&space->listener, space->as);
++    space->listener_initialized = true;
++}
++
++void vfio_as_del_container(VFIOAddressSpace *space,
++                           VFIOContainer *container)
++{
++    QLIST_SAFE_REMOVE(container, next);
++
++    if (QLIST_EMPTY(&space->containers)) {
++        memory_listener_unregister(&space->listener);
++    }
++}
++
+ void vfio_put_address_space(VFIOAddressSpace *space)
+ {
+     if (QLIST_EMPTY(&space->containers)) {
+diff --git a/hw/vfio/container-base.c b/hw/vfio/container-base.c
+index a9f28e4b9d..0a6bc31686 100644
+--- a/hw/vfio/container-base.c
++++ b/hw/vfio/container-base.c
+@@ -47,6 +47,17 @@ int vfio_container_dma_map(VFIOContainer *container,
+     return container->ops->dma_map(container, iova, size, vaddr, readonly);
+ }
+ 
++int vfio_container_dma_copy(VFIOContainer *src, VFIOContainer *dst,
++                            hwaddr iova, ram_addr_t size, bool readonly)
++{
++    if (!src->ops->dma_copy || src->ops->dma_copy != dst->ops->dma_copy) {
++        error_report("Incompatible container: unable to copy dma");
++        return -EINVAL;
++    }
++
++    return src->ops->dma_copy(src, dst, iova, size, readonly);
++}
++
+ int vfio_container_dma_unmap(VFIOContainer *container,
+                              hwaddr iova, ram_addr_t size,
+                              IOMMUTLBEntry *iotlb)
+@@ -137,8 +148,6 @@ void vfio_container_destroy(VFIOContainer *container)
+     VFIOGuestIOMMU *giommu, *tmp;
+     VFIOHostDMAWindow *hostwin, *next;
+ 
+-    QLIST_SAFE_REMOVE(container, next);
+-
+     QLIST_FOREACH_SAFE(vrdl, &container->vrdl_list, next, vrdl_tmp) {
+         RamDiscardManager *rdm;
+ 
+diff --git a/hw/vfio/container.c b/hw/vfio/container.c
+index 2d9704bc1a..760ba56da4 100644
+--- a/hw/vfio/container.c
++++ b/hw/vfio/container.c
+@@ -362,9 +362,6 @@ err_out:
+ 
+ static void vfio_listener_release(VFIOLegacyContainer *container)
+ {
+-    VFIOContainer *bcontainer = &container->bcontainer;
+-
+-    memory_listener_unregister(&bcontainer->listener);
+     if (container->iommu_type == VFIO_SPAPR_TCE_v2_IOMMU) {
+         memory_listener_unregister(&container->prereg_listener);
+     }
+@@ -894,14 +891,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     vfio_kvm_device_add_group(group);
+ 
+     QLIST_INIT(&container->group_list);
+-    QLIST_INSERT_HEAD(&space->containers, bcontainer, next);
+ 
+     group->container = container;
+     QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+ 
+-    bcontainer->listener = vfio_memory_listener;
+-
+-    memory_listener_register(&bcontainer->listener, bcontainer->space->as);
++    vfio_as_add_container(space, bcontainer);
+ 
+     if (bcontainer->error) {
+         ret = -1;
+@@ -914,8 +908,8 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+ 
+     return 0;
+ listener_release_exit:
++    vfio_as_del_container(space, bcontainer);
+     QLIST_REMOVE(group, container_next);
+-    QLIST_REMOVE(bcontainer, next);
+     vfio_kvm_device_del_group(group);
+     vfio_listener_release(container);
+ 
+@@ -938,6 +932,7 @@ static void vfio_disconnect_container(VFIOGroup *group)
+ {
+     VFIOLegacyContainer *container = group->container;
+     VFIOContainer *bcontainer = &container->bcontainer;
++    VFIOAddressSpace *space = bcontainer->space;
+ 
+     QLIST_REMOVE(group, container_next);
+     group->container = NULL;
+@@ -945,10 +940,12 @@ static void vfio_disconnect_container(VFIOGroup *group)
+     /*
+      * Explicitly release the listener first before unset container,
+      * since unset may destroy the backend container if it's the last
+-     * group.
++     * group. By removing container from the list, container is disconnected
++     * with address space memory listener.
+      */
+     if (QLIST_EMPTY(&container->group_list)) {
+         vfio_listener_release(container);
++        vfio_as_del_container(space, bcontainer);
+     }
+ 
+     if (ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER, &container->fd)) {
+@@ -957,10 +954,8 @@ static void vfio_disconnect_container(VFIOGroup *group)
+     }
+ 
+     if (QLIST_EMPTY(&container->group_list)) {
+-        VFIOAddressSpace *space = bcontainer->space;
+-
+-        vfio_container_destroy(bcontainer);
+         trace_vfio_disconnect_container(container->fd);
++        vfio_container_destroy(bcontainer);
+         close(container->fd);
+         g_free(container);
+ 
+diff --git a/hw/vfio/iommufd.c b/hw/vfio/iommufd.c
+index 7417c6ce44..75f43345f0 100644
+--- a/hw/vfio/iommufd.c
++++ b/hw/vfio/iommufd.c
+@@ -39,6 +39,8 @@ static bool iommufd_check_extension(VFIOContainer *bcontainer,
+                                     VFIOContainerFeature feat)
+ {
+     switch (feat) {
++    case VFIO_FEAT_DMA_COPY:
++        return true;
+     default:
+         return false;
+     };
+@@ -55,6 +57,20 @@ static int iommufd_map(VFIOContainer *bcontainer, hwaddr iova,
+                                    iova, size, vaddr, readonly);
+ }
+ 
++static int iommufd_copy(VFIOContainer *src, VFIOContainer *dst,
++                        hwaddr iova, ram_addr_t size, bool readonly)
++{
++    VFIOIOMMUFDContainer *container_src = container_of(src,
++                                             VFIOIOMMUFDContainer, bcontainer);
++    VFIOIOMMUFDContainer *container_dst = container_of(dst,
++                                             VFIOIOMMUFDContainer, bcontainer);
++
++    assert(container_src->be->fd == container_dst->be->fd);
++
++    return iommufd_backend_copy_dma(container_src->be, container_src->ioas_id,
++                                    container_dst->ioas_id, iova, size, readonly);
++}
++
+ static int iommufd_unmap(VFIOContainer *bcontainer,
+                          hwaddr iova, ram_addr_t size,
+                          IOMMUTLBEntry *iotlb)
+@@ -413,12 +429,14 @@ static int iommufd_attach_device(VFIODevice *vbasedev, AddressSpace *as,
+      * between iommufd and kvm.
+      */
+ 
+-    QLIST_INSERT_HEAD(&space->containers, bcontainer, next);
+-
+-    bcontainer->listener = vfio_memory_listener;
+-
+-    memory_listener_register(&bcontainer->listener, bcontainer->space->as);
++    vfio_as_add_container(space, bcontainer);
+ 
++    if (bcontainer->error) {
++        ret = -1;
++        error_propagate_prepend(errp, bcontainer->error,
++            "memory listener initialization failed: ");
++        goto error;
++    }
+     bcontainer->initialized = true;
+ 
+ out:
+@@ -435,8 +453,7 @@ out:
+     ret = ioctl(devfd, VFIO_DEVICE_GET_INFO, &dev_info);
+     if (ret) {
+         error_setg_errno(errp, errno, "error getting device info");
+-        memory_listener_unregister(&bcontainer->listener);
+-        QLIST_SAFE_REMOVE(bcontainer, next);
++        vfio_as_del_container(space, bcontainer);
+         goto error;
+     }
+ 
+@@ -465,6 +482,7 @@ static void iommufd_detach_device(VFIODevice *vbasedev)
+     VFIOIOMMUFDContainer *container;
+     VFIODevice *vbasedev_iter;
+     VFIOIOASHwpt *hwpt;
++    VFIOAddressSpace *space;
+     Error *err = NULL;
+ 
+     if (!bcontainer) {
+@@ -490,15 +508,25 @@ found:
+         vfio_container_put_hwpt(hwpt);
+     }
+ 
++    space = bcontainer->space;
++    /*
++     * Needs to remove the bcontainer from space->containers list before
++     * detach container. Otherwise, detach container may destroy the
++     * container if it's the last device. By removing bcontainer from the
++     * list, container is disconnected with address space memory listener.
++     */
++    if (QLIST_EMPTY(&container->hwpt_list)) {
++        vfio_as_del_container(space, bcontainer);
++    }
+     __vfio_device_detach_container(vbasedev, container, &err);
+     if (err) {
+         error_report_err(err);
+     }
+     if (QLIST_EMPTY(&container->hwpt_list)) {
+-        VFIOAddressSpace *space = bcontainer->space;
++        uint32_t ioas_id = container->ioas_id;
+ 
+-        iommufd_backend_put_ioas(container->be, container->ioas_id);
+         vfio_iommufd_container_destroy(container);
++        iommufd_backend_put_ioas(vbasedev->iommufd, ioas_id);
+         vfio_put_address_space(space);
+     }
+     vbasedev->container = NULL;
+@@ -510,6 +538,7 @@ out:
+ const VFIOContainerOps iommufd_container_ops = {
+     .check_extension = iommufd_check_extension,
+     .dma_map = iommufd_map,
++    .dma_copy = iommufd_copy,
+     .dma_unmap = iommufd_unmap,
+     .attach_device = iommufd_attach_device,
+     .detach_device = iommufd_detach_device,
 diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 635397d391..2470b6d58a 100644
+index 2470b6d58a..6269672712 100644
 --- a/include/hw/vfio/vfio-common.h
 +++ b/include/hw/vfio/vfio-common.h
-@@ -36,6 +36,7 @@
+@@ -34,7 +34,6 @@
  
- extern const MemoryListener vfio_memory_listener;
+ #define VFIO_MSG_PREFIX "vfio %s: "
+ 
+-extern const MemoryListener vfio_memory_listener;
  extern const VFIOContainerOps legacy_container_ops;
-+extern const VFIOContainerOps iommufd_container_ops;
+ extern const VFIOContainerOps iommufd_container_ops;
  
- enum {
-     VFIO_DEVICE_TYPE_PCI = 0,
-@@ -82,6 +83,24 @@ typedef struct VFIOLegacyContainer {
-     QLIST_HEAD(, VFIOGroup) group_list;
- } VFIOLegacyContainer;
+@@ -186,6 +185,10 @@ void vfio_host_win_add(VFIOContainer *bcontainer,
+ int vfio_host_win_del(VFIOContainer *bcontainer, hwaddr min_iova,
+                       hwaddr max_iova);
+ VFIOAddressSpace *vfio_get_address_space(AddressSpace *as);
++void vfio_as_add_container(VFIOAddressSpace *space,
++                           VFIOContainer *bcontainer);
++void vfio_as_del_container(VFIOAddressSpace *space,
++                           VFIOContainer *container);
+ void vfio_put_address_space(VFIOAddressSpace *space);
  
-+typedef struct VFIOIOASHwpt {
-+    uint32_t hwpt_id;
-+    QLIST_HEAD(, VFIODevice) device_list;
-+    QLIST_ENTRY(VFIOIOASHwpt) next;
-+} VFIOIOASHwpt;
-+
-+typedef struct IOMMUFDBackend IOMMUFDBackend;
-+
-+typedef struct VFIOIOMMUFDContainer {
-+    VFIOContainer bcontainer;
-+    IOMMUFDBackend *be;
-+    uint32_t ioas_id;
-+    QLIST_HEAD(, VFIOIOASHwpt) hwpt_list;
-+} VFIOIOMMUFDContainer;
-+
-+typedef QLIST_HEAD(VFIOAddressSpaceList, VFIOAddressSpace) VFIOAddressSpaceList;
-+extern VFIOAddressSpaceList vfio_address_spaces;
-+
- typedef struct VFIODeviceOps VFIODeviceOps;
+ void vfio_put_base_device(VFIODevice *vbasedev);
+diff --git a/include/hw/vfio/vfio-container-base.h b/include/hw/vfio/vfio-container-base.h
+index f9fb8b6af7..27ed29e081 100644
+--- a/include/hw/vfio/vfio-container-base.h
++++ b/include/hw/vfio/vfio-container-base.h
+@@ -31,12 +31,15 @@
  
- typedef enum VFIOIOMMUBackendType {
-@@ -91,6 +110,7 @@ typedef enum VFIOIOMMUBackendType {
+ typedef enum VFIOContainerFeature {
+     VFIO_FEAT_LIVE_MIGRATION,
++    VFIO_FEAT_DMA_COPY,
+ } VFIOContainerFeature;
  
- typedef struct VFIODevice {
-     QLIST_ENTRY(VFIODevice) next;
-+    QLIST_ENTRY(VFIODevice) hwpt_next;
-     struct VFIOGroup *group;
-     VFIOContainer *container;
-     char *sysfsdev;
-@@ -98,6 +118,7 @@ typedef struct VFIODevice {
-     DeviceState *dev;
-     int fd;
-     int type;
-+    int devid;
-     bool reset_works;
-     bool needs_reset;
-     bool no_mmap;
-@@ -111,6 +132,7 @@ typedef struct VFIODevice {
-     VFIOMigration *migration;
-     Error *migration_blocker;
-     OnOffAuto pre_copy_dirty_page_tracking;
-+    IOMMUFDBackend *iommufd;
- } VFIODevice;
+ typedef struct VFIOContainer VFIOContainer;
  
- struct VFIODeviceOps {
+ typedef struct VFIOAddressSpace {
+     AddressSpace *as;
++    MemoryListener listener;
++    bool listener_initialized;
+     QLIST_HEAD(, VFIOContainer) containers;
+     QLIST_ENTRY(VFIOAddressSpace) list;
+ } VFIOAddressSpace;
+@@ -75,6 +78,8 @@ typedef struct VFIOContainerOps {
+     int (*dma_map)(VFIOContainer *container,
+                    hwaddr iova, ram_addr_t size,
+                    void *vaddr, bool readonly);
++    int (*dma_copy)(VFIOContainer *src, VFIOContainer *dst,
++                    hwaddr iova, ram_addr_t size, bool readonly);
+     int (*dma_unmap)(VFIOContainer *container,
+                      hwaddr iova, ram_addr_t size,
+                      IOMMUTLBEntry *iotlb);
+@@ -101,7 +106,6 @@ typedef struct VFIOContainerOps {
+ struct VFIOContainer {
+     const VFIOContainerOps *ops;
+     VFIOAddressSpace *space;
+-    MemoryListener listener;
+     Error *error;
+     bool initialized;
+     bool dirty_pages_supported;
+@@ -120,6 +124,8 @@ bool vfio_container_check_extension(VFIOContainer *container,
+ int vfio_container_dma_map(VFIOContainer *container,
+                            hwaddr iova, ram_addr_t size,
+                            void *vaddr, bool readonly);
++int vfio_container_dma_copy(VFIOContainer *src, VFIOContainer *dst,
++                            hwaddr iova, ram_addr_t size, bool readonly);
+ int vfio_container_dma_unmap(VFIOContainer *container,
+                              hwaddr iova, ram_addr_t size,
+                              IOMMUTLBEntry *iotlb);
 -- 
 2.27.0
 
