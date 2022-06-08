@@ -2,194 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D51DB543947
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 18:41:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DA7A54394D
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 18:43:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245344AbiFHQkr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 12:40:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34382 "EHLO
+        id S245607AbiFHQmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 12:42:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240244AbiFHQkp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 12:40:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E87622C2EC;
-        Wed,  8 Jun 2022 09:40:42 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258FBdLr032608;
-        Wed, 8 Jun 2022 16:40:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=EQdZ6SdAFQVF7NZKnxywfL2ol2y7+FlkIJ28zJGufqk=;
- b=oabyeIym9COHO30GckBBgGYZbjXO6dymQE7PwjYu1p4qLfkIW4Ij97Ey2AeuWW7RjAnN
- fv6bj/S4IfccrtbsFDSDbHqgfSdynYhYwi5Ortyz7i761FUO2OkPtgP2ki4pfiMCx3od
- 3KuWXq1dfFgXzohfryXZtN3byjP6U2L1FR1jXTW/XnyxXgJfQiI6yzmMjp92VoNyJSHR
- 8HJLR/sZKqqsLkd1KBsZdz8hGMFZSjAD2B3I6z8EUylnXcqjKnRSAhykFv1gLmM4r4hG
- cvuKdyG3pSizLmtzUOk0sPWS5R5EirTTwGfDd4O3hldg1COXetMBYQFfoWlXLbi/dxYu EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjx6p1w6k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 16:40:41 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258GbhH3001164;
-        Wed, 8 Jun 2022 16:40:41 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjx6p1w67-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 16:40:41 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258GMKRo020301;
-        Wed, 8 Jun 2022 16:40:38 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3gfxnhwqcs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 16:40:38 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258GeIcb22741296
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Jun 2022 16:40:18 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C20CD5204F;
-        Wed,  8 Jun 2022 16:40:35 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.40])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8DFDD5204E;
-        Wed,  8 Jun 2022 16:40:35 +0000 (GMT)
-Date:   Wed, 8 Jun 2022 18:40:33 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: Rework TEID decoding and
- usage
-Message-ID: <20220608184033.6959c4e2@p-imbrenda>
-In-Reply-To: <6ed956e7-81e0-cb09-85ea-383af9d4446e@linux.ibm.com>
-References: <20220608133303.1532166-1-scgl@linux.ibm.com>
-        <20220608133303.1532166-4-scgl@linux.ibm.com>
-        <20220608160357.4fa94ecc@p-imbrenda>
-        <6ed956e7-81e0-cb09-85ea-383af9d4446e@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
+        with ESMTP id S245582AbiFHQmS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 12:42:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009762CE22
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 09:42:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AB2DFB8229C
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 16:42:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 501F4C34116;
+        Wed,  8 Jun 2022 16:42:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654706534;
+        bh=lJgUM8GOBIZ/XpsvzLcQSc3ckUaWGitjs+t1n/9XY24=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=rrItJ2rwFonOwxdPvvc0pXC7XD7UusALImPpjOUHeJAKo5PBvgwfYKjd1eggKhjcR
+         /HPPDq6UUeaShJRdddnBjZXLbaiQC9YHrjGnMFNVSBcZNCo1ZCZ/ugF6puNGsIoeGg
+         syjVpcPjkK4js73Mk0z6U0shldBy8HTFoVd0Z5ffxatM9w4NYwatCcCaFCt+OCAdU8
+         jzP1wNq7zOr2Uvf5FZK1459gq9nrZvpw3qHvwLXAUANafupIIvwg9rW+hSL9m0ZKeo
+         1LCqstNIOUV2FtnSzmkJxR2rqNW29q+2MZyBxOAJt4WdccUkRcaodTLJqYeNs5WTDG
+         RXos3xpuzKZpQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nyyl1-00GfTt-Rb; Wed, 08 Jun 2022 17:42:11 +0100
+Date:   Wed, 08 Jun 2022 17:42:11 +0100
+Message-ID: <87h74v3y58.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Mark Brown <broonie@kernel.org>, kernel-team@android.com
+Subject: Re: [PATCH 15/18] KVM: arm64: Warn when PENDING_EXCEPTION and INCREMENT_PC are set together
+In-Reply-To: <CA+EHjTyW62HaJdH_L1RMBzQpzkNbFBAYpXQ-y_Wg4u1a2eVJwA@mail.gmail.com>
+References: <20220528113829.1043361-1-maz@kernel.org>
+        <20220528113829.1043361-16-maz@kernel.org>
+        <CA+EHjTyW62HaJdH_L1RMBzQpzkNbFBAYpXQ-y_Wg4u1a2eVJwA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vdfHZkq8LxajJBOfN9ub_pbT4tzlK4Pv
-X-Proofpoint-GUID: sIy4jxiMAp6UfdseGe2owQbV9GkbPmMe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-08_05,2022-06-07_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- spamscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015 priorityscore=1501
- mlxscore=0 malwarescore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206080067
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, will@kernel.org, qperret@google.com, broonie@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Jun 2022 17:55:08 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-
-> On 6/8/22 16:03, Claudio Imbrenda wrote:
-> > On Wed,  8 Jun 2022 15:33:03 +0200
-> > Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-> >   
-> >> The translation-exception identification (TEID) contains information to
-> >> identify the cause of certain program exceptions, including translation
-> >> exceptions occurring during dynamic address translation, as well as
-> >> protection exceptions.
-> >> The meaning of fields in the TEID is complex, depending on the exception
-> >> occurring and various potentially installed facilities.
-> >>
-> >> Rework the type describing the TEID, in order to ease decoding.
-> >> Change the existing code interpreting the TEID and extend it to take the
-> >> installed suppression-on-protection facility into account.
-> >>
-> >> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> >> ---
-> >>  lib/s390x/asm/interrupt.h | 61 +++++++++++++++++++++++++++---------
-> >>  lib/s390x/fault.h         | 30 +++++-------------
-> >>  lib/s390x/fault.c         | 65 ++++++++++++++++++++++++++-------------
-> >>  lib/s390x/interrupt.c     |  2 +-
-> >>  s390x/edat.c              | 26 ++++++++++------
-> >>  5 files changed, 115 insertions(+), 69 deletions(-)
-> >>
-> >> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
-> >> index d9ab0bd7..3ca6bf76 100644
-> >> --- a/lib/s390x/asm/interrupt.h
-> >> +++ b/lib/s390x/asm/interrupt.h
-> >> @@ -20,23 +20,56 @@
-> >>    
+On Wed, 08 Jun 2022 16:16:55 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> [...]
+> Hi Marc,
 > 
-> >>  
-> >> +enum prot_code {
-> >> +	PROT_KEY_LAP,
-> >> +	PROT_DAT,
-> >> +	PROT_KEY,
-> >> +	PROT_ACC_LIST,
-> >> +	PROT_LAP,
-> >> +	PROT_IEP,  
-> > 
-> > add:
-> > 	PROT_CODE_SIZE,	/* Must always be the last one */
-> > 
-> > [...]
-> >   
-> >> +	case SOP_ENHANCED_2: {
-> >> +		static const char * const prot_str[] = {  
-> > 
-> > static const char * const prot_str[PROT_CODE_SIZE] = {
-> > 
-> > so you have the guarantee that this has the right size, and you will
-> > get a compile error if a new value is added to the enum but not here  
+> On Sat, May 28, 2022 at 12:49 PM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > We really don't want PENDING_EXCEPTION and INCREMENT_PC to ever be
+> > set at the same time, as they are mutually exclusive. Add checks
+> > that will generate a warning should this ever happen.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h | 1 +
+> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c   | 2 ++
+> >  arch/arm64/kvm/inject_fault.c        | 8 ++++++++
+> >  3 files changed, 11 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 46e631cd8d9e..861fa0b24a7f 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -473,6 +473,7 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+> >
+> >  static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
+> >  {
+> > +       WARN_ON(vcpu_get_flag(vcpu, PENDING_EXCEPTION));
+> >         vcpu_set_flag(vcpu, INCREMENT_PC);
+> >  }
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > index 2841a2d447a1..04973984b6db 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > @@ -38,6 +38,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+> >         *vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+> >         *vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+> >
+> > +       WARN_ON(vcpu_get_flag(vcpu, INCREMENT_PC));
+> > +
+> >         vcpu_set_flag(vcpu, PENDING_EXCEPTION);
+> >         vcpu_set_flag(vcpu, EXCEPT_AA64_EL1_SYNC);
+> >
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index a9a7b513f3b0..2f4b9afc16ec 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -20,6 +20,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+> >         bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+> >         u32 esr = 0;
+> >
+> > +       WARN_ON(vcpu_get_flag(vcpu, INCREMENT_PC));
+> > +
 > 
-> Will I? It would just initialize missing elements with NULL, no?
+> Minor nit: While we're at it, should we just create a helper for
+> setting PENDING_EXCEPTION, same as we have for INCREMENT_PC? That
+> might make the code clearer and save us from the hassle of having this
+> WARN_ON before every instance of setting PENDING_EXCEPTION?
 
-hmm makes sense, somehow I was convinced you would at least get a
-warning, probably a case of -ENOCOFFEE
+Good point. I ended up with this:
 
-in any case, if you add the "SIZE" element at the end (and especially
-if you also move the array right after the enum) there should be no
-issues to keep the two in sync.
+#define kvm_pend_exception(v, e)					\
+	do {								\
+		WARN_ON(vcpu_get_flag((v), INCREMENT_PC));		\
+		vcpu_set_flag((v), PENDING_EXCEPTION);			\
+		vcpu_set_flag((v), e);					\
+	} while (0)
 
-even better, you can put a
-_Static_assert(ARRAY_SIZE(prot_str) == PROT_CODE_SIZE);
+It has to be a macro in order to deal with the flag expansion, but is
+otherwise a welcome cleanup.
 
-> > 
-> > and at this point I think it might make more sense to move this right
-> > after the enum itself
-> >   
-> >> +			"KEY or LAP",
-> >> +			"DAT",
-> >> +			"KEY",
-> >> +			"ACC",
-> >> +			"LAP",
-> >> +			"IEP",
-> >> +		};
-> >> +		int prot_code = teid_esop2_prot_code(teid);  
-> > 
-> > enum prot_code prot_code = teid_esop2_prot_code(teid)>   
-> >>  
-> >> -	if (prot_is_datp(teid)) {
-> >> -		printf("Type: DAT\n");
-> >> -		return;
-> >> +		assert(0 <= prot_code && prot_code < ARRAY_SIZE(prot_str));  
-> > 
-> > then you can remove this assert ^
-> >   
-> >> +		printf("Type: %s\n", prot_str[prot_code]);
-> >> +		}
-> >>  	}
-> >>  }
-> >>    
-> [...]
+Thanks,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
