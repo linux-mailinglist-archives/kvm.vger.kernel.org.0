@@ -2,120 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4841542507
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:54:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C69254221D
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:46:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231876AbiFHEGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 00:06:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58942 "EHLO
+        id S231548AbiFHE3x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 00:29:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234825AbiFHEFB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 00:05:01 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B459D280B38;
-        Tue,  7 Jun 2022 18:20:42 -0700 (PDT)
+        with ESMTP id S235127AbiFHEZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 00:25:28 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A45F368F86
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 18:51:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654651243; x=1686187243;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XP965/7Bk9hC69Vm9y/5UnoOjQlNM4Qp3cNQ0BDnpE8=;
-  b=eUIaB1UNX+L9I6uT7S5Grk5YVBFPUMvyirJ8Am0QbbbnTsWYiDKPc2tA
-   OIAcaIbcHEUvqgoe4AOiAOBwHBp3X8a6G2xPaMSAVjRa+zKPTGpv7zghS
-   3p+JUhODnBvADLmw1ecw8hX6YNeXwpWgzgHEKKRA/BZEnyezSpWP38kwj
-   /aA2fjpU7zemKFk+4xPAx+SksRC8cx5mQaYi4gvgvL9tju0LM2v+lz6Xw
-   O73RtpsyDdy9nrtua9ATxRTj0q1oZhcLIBuHOKYqhl2w0iPnQid+HiyQb
-   wmcJ2AsZ9f196ok2Ba3mXiyJXlL3ud74C/b6Kgb95fKxLfscn2fKj3V6q
+  t=1654653097; x=1686189097;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2nQ38fddFLZDd8gkGjJtsrfacBKUhyjbYVezamAfui8=;
+  b=RaWngcdmRPMGiT3lm4wf6BG5pKrnxaVq5LK9Z8F7f3f4N4/YEkq8pxpb
+   lAExvUTyi/9WxmmI2eo/S1vhKfc9Ex5kZKjvvq7IyTD8yrXshbkCbLcRZ
+   o7QdYY+0HFK89GeVW07I5UjzrnKkIWr4a++aFMpr5hX84stHMLbvaqNTb
+   TvgavzAS3hg1aORtr93MG7iiPgrtSAFNQyWxgdhvKwUfYMmrk901IxS3j
+   1dRole7lVoFeIeaN0hCr6iXhALfX1EFoFkQ+5R4Ifpf9FKrNiw5kgQhjW
+   JJTYBomanfJQ57THZFpMVW2MmoYH+DoD3mo6Lpg5frmkRYdMBGlWrpAws
    A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="259837820"
+X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="340800262"
 X-IronPort-AV: E=Sophos;i="5.91,284,1647327600"; 
-   d="scan'208";a="259837820"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2022 18:20:26 -0700
+   d="scan'208";a="340800262"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2022 18:50:49 -0700
 X-IronPort-AV: E=Sophos;i="5.91,284,1647327600"; 
-   d="scan'208";a="648333474"
-Received: from sqa-gate.sh.intel.com (HELO embargo.tsp.org) ([10.239.48.212])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2022 18:20:24 -0700
-From:   Yuan Yao <yuan.yao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kai Huang <kai.huang@intel.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>
-Subject: [PATCH 1/1] KVM: x86/mmu: Set memory encryption "value", not "mask", in shadow PDPTRs
-Date:   Wed,  8 Jun 2022 09:20:15 +0800
-Message-Id: <20220608012015.19566-1-yuan.yao@intel.com>
-X-Mailer: git-send-email 2.27.0
+   d="scan'208";a="636468942"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.31.211]) ([10.255.31.211])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2022 18:50:44 -0700
+Message-ID: <83f56255-f15d-f36b-4897-06d8f954061c@intel.com>
+Date:   Wed, 8 Jun 2022 09:50:42 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.9.0
+Subject: Re: [RFC PATCH v4 11/36] i386/tdx: Initialize TDX before creating TD
+ vcpus
+Content-Language: en-US
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+References: <20220512031803.3315890-1-xiaoyao.li@intel.com>
+ <20220512031803.3315890-12-xiaoyao.li@intel.com>
+ <20220523092003.lm4vzfpfh4ezfcmy@sirius.home.kraxel.org>
+ <d3e967f3-917f-27ce-1367-2dba23e5c241@intel.com>
+ <20220524065719.wyyoba2ke73tx3nc@sirius.home.kraxel.org>
+ <39341481-67b6-aba4-a25a-10abb398bec4@intel.com>
+ <20220601075453.7qyd5z22ejgp37iz@sirius.home.kraxel.org>
+ <9d00fd58-b957-3b8e-22ab-12214dcbbe97@intel.com>
+ <20220607111651.2zjm7mx2gz3irqxo@sirius.home.kraxel.org>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20220607111651.2zjm7mx2gz3irqxo@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assign shadow_me_value, not shadow_me_mask, to PAE root entries,
-a.k.a. shadow PDPTRs, when host memory encryption is supported.  The
-"mask" is the set of all possible memory encryption bits, e.g. MKTME
-KeyIDs, whereas "value" holds the actual value that needs to be
-stuffed into host page tables.
+On 6/7/2022 7:16 PM, Gerd Hoffmann wrote:
+>    Hi,
+> 
+>>> I guess it could be helpful for the discussion when you can outine the
+>>> 'big picture' for tdx initialization.  How does kvm accel setup look
+>>> like without TDX, and what additional actions are needed for TDX?  What
+>>> ordering requirements and other constrains exist?
+>>
+>> To boot a TDX VM, it requires several changes/additional steps in the flow:
+>>
+>>   1. specify the vm type KVM_X86_TDX_VM when creating VM with
+>>      IOCTL(KVM_CREATE_VM);
+>> 	- When initializing KVM accel
+>>
+>>   2. initialize VM scope configuration before creating any VCPU;
+>>
+>>   3. initialize VCPU scope configuration;
+>> 	- done inside machine_init_done_notifier;
+>>
+>>   4. initialize virtual firmware in guest private memory before vcpu running;
+>> 	- done inside machine_init_done_notifier;
+>>
+>>   5. finalize the TD's measurement;
+>> 	- done inside machine init_done_notifier;
+>>
+>>
+>> And we are discussing where to do step 2).
+>>
+>> We can find from the code of tdx_pre_create_vcpu(), that it needs
+>> cpuid entries[] and attributes as input to KVM.
+>>
+>>    cpuid entries[] is set up by kvm_x86_arch_cpuid() mainly based on
+>>    'CPUX86State *env'
+>>
+>>    attributes.pks is retrieved from env->features[]
+>>    and attributes.pmu is retrieved from x86cpu->enable_pmu
+>>
+>> to make VM-socpe data is consistent with VCPU data, we do choose the point
+>> late enough to ensure all the info/configurations from VCPU are settle down,
+>> that just before calling KVM API to do VCPU-scope configuration.
+> 
+> So essentially tdx defines (some) vcpu properties at vm scope?  
 
-Using shadow_me_mask results in a failed VM-Entry due to setting
-reserved PA bits in the PDPTRs, and ultimately causes an OOPS due to
-physical addresses with non-zero MKTME bits sending to_shadow_page()
-into the weeds:
+Not TDX, but QEMU. Most of the CPU features are configrued by "-cpu" 
+option not "-machine" option.
 
-set kvm_intel.dump_invalid_vmcs=1 to dump internal KVM state.
-BUG: unable to handle page fault for address: ffd43f00063049e8
-PGD 86dfd8067 P4D 0
-Oops: 0000 [#1] PREEMPT SMP
-RIP: 0010:mmu_free_root_page+0x3c/0x90 [kvm]
- kvm_mmu_free_roots+0xd1/0x200 [kvm]
- __kvm_mmu_unload+0x29/0x70 [kvm]
- kvm_mmu_unload+0x13/0x20 [kvm]
- kvm_arch_destroy_vm+0x8a/0x190 [kvm]
- kvm_put_kvm+0x197/0x2d0 [kvm]
- kvm_vm_release+0x21/0x30 [kvm]
- __fput+0x8e/0x260
- ____fput+0xe/0x10
- task_work_run+0x6f/0xb0
- do_exit+0x327/0xa90
- do_group_exit+0x35/0xa0
- get_signal+0x911/0x930
- arch_do_signal_or_restart+0x37/0x720
- exit_to_user_mode_prepare+0xb2/0x140
- syscall_exit_to_user_mode+0x16/0x30
- do_syscall_64+0x4e/0x90
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Fixes: e54f1ff244ac ("KVM: x86/mmu: Add shadow_me_value and repurpose shadow_me_mask")
-Signed-off-by: Yuan Yao <yuan.yao@intel.com>
-Reviewed-by: Kai Huang <kai.huang@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index efe5a3dca1e0..6bd144f1e60c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3411,7 +3411,7 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
- 			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
- 					      i << 30, PT32_ROOT_LEVEL, true);
- 			mmu->pae_root[i] = root | PT_PRESENT_MASK |
--					   shadow_me_mask;
-+					   shadow_me_value;
- 		}
- 		mmu->root.hpa = __pa(mmu->pae_root);
- 	} else {
--- 
-2.27.0
+> Given
+> that all vcpus typically identical (and maybe tdx even enforces this)
+> this makes sense.
+> 
+> A comment in the source code explaining this would be good.
+> 
+> thanks,
+>    Gerd
+> 
 
