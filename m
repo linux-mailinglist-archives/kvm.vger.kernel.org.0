@@ -2,146 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57143543A41
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 19:24:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 609BC543AA1
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 19:38:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231865AbiFHRYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 13:24:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58768 "EHLO
+        id S232463AbiFHRih (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 13:38:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231526AbiFHRYZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 13:24:25 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0251320F7B
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 10:18:24 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id n28so28008132edb.9
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 10:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=EmmOifA39ddfj3f9gDa9mInclaPvipW5hKFXKyzUZCQ=;
-        b=g7DDl8mJV7RxN1ferZZXa6aRiQPAiyCsmDH3rHp1Qpe2TqkYfOhI9TDw05QuVHUhQ4
-         r17vee5rxn3gJiQpPhnEITaSoFkYLwIPtrWtglU3jvabOPJUmTPwuQAo9CB7ycT+9cwD
-         Ccz0HxeHcCFKaZrm0KPJYQNbHd3KhRWtyfylsnLRzKssgo8yP3iJd9hGLR4P8U/FgC5P
-         p8urNjlo1aAfvYr0DegmN2lbL7Z/DhlMkN45GMzgVzHB5TWL0EBL461Vdmj6ZlR1lb5B
-         C4VQvg7wg44pQkHHW9fAjSpFIm3LuA5mPv4lHTUF5koRTFjiZEShYML30BNVXUf0c7/V
-         O5cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=EmmOifA39ddfj3f9gDa9mInclaPvipW5hKFXKyzUZCQ=;
-        b=5lijvKkkeViIndWLQE1/P7+4WSFQj0Mu2ZvRSEx5y6k0zG5+d00xjY+tmV04KZAIiy
-         5UTuz2NT6cza/rk+A+tiIk66HsJhvq+gZZ9khKsk/hVRl4xIGKMn3UvjkrBfYi0Y6lRJ
-         0bni525LjdOXDrkwGIdzillCRkbcQgjxsoB/7yL8sVEN2ZY4wlBAshwfzBSHP7ACR0kn
-         BS9rxTw3nSNYZXIpOKhvcEpLvWyqmPH6gwm7ZiZ3KZ7ao2fnmgFz9uK8GJejQ4npdFp+
-         084OUa12l0s5ATUy44Z/jrKLrFsfYZWAir3eg13unA9jCCdMeNrp77KpBRzKue/0O/mK
-         p5zg==
-X-Gm-Message-State: AOAM531UMRz6Zdeh5knq+OBnHF7LKVq3HOt1sCptp1igBYKKLhN0AAgf
-        6nGRZCihGavak48b8ANWJW8=
-X-Google-Smtp-Source: ABdhPJynAx+4zQbfMzEu0vj3W0Uo+hvSl5Cria4THrFUa9gealLjE++7uUK7o/gf0QoJc+5uymIFlg==
-X-Received: by 2002:aa7:d8d8:0:b0:42d:dbb0:f05b with SMTP id k24-20020aa7d8d8000000b0042ddbb0f05bmr40399440eds.82.1654708702514;
-        Wed, 08 Jun 2022 10:18:22 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id l24-20020a17090612d800b006feb6438264sm9495555ejb.93.2022.06.08.10.18.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jun 2022 10:18:21 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <12e3c408-6848-ad75-12ee-6110a3ba13c4@redhat.com>
-Date:   Wed, 8 Jun 2022 19:18:20 +0200
+        with ESMTP id S232400AbiFHRid (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 13:38:33 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2088.outbound.protection.outlook.com [40.107.93.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27901C111;
+        Wed,  8 Jun 2022 10:38:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N1BWX6K1R+uLPaOiwyQ9CAxmozpYz6cKBgk25ktapsJ3+BOzZQV1eHpJgXBPUIopwZ6yvJqbGC59twiaOhuel+6IZHLxecFxfamKSC0eG6SHCN2EBK1TY2TPdikY1yRZnOwxDb68TI47USZ1Q35yDt5Eqx3fF7K050TrE16f8EN2CcghyUPFdwfM6l7OYD2YtWtjvRvicLP20LwqmO7buLaoXc5V/zm8ME029Tk+nKkKx5KJwMpOzDt6DT88qtHRCoQQDTV0zi9ZCaDxFuDtx8CNRek7/4WntA7qo0l69JyTo6rQ89jH3iZW25cSQvnFhrNrDeOxX8+9qYmFN5RRhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G9m+KiG0SZtRd5/u4ThC8jMJtZr/Nc4RKd2A3eyR1tE=;
+ b=cAp0T4zAhRB7IvLzE6o6Zr6y0MU8U5BvLEPDckUlqPRnyq6DDOPc+xRRIqsER0DwHc+p2WWXQJNjOcLfYa0gs4q5mdOk4oZ+E3lFcHO0sjOfJ1iR8uFWCfU5hZd69HbXWQ3Ncr24YYcrjnXIQqWLNM79dbixS4VnR03o5Ot0d4WeImC/y0qmPMz7w0NSlGUwCWc8gpIM2M8v4oL3D+wNE34XZLSB54nmEGcBQHrPrzJreO+b5BfZhyG4FnAxKIMAlVvX3ILQpbZEsGqO1Bqjo7UAPfHtC+k/swwcCMWq5Ms3SD+mF2XQY3r+hvMrOMJFB9C3CULk4qqt92Yt5/CFPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.236) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
+ (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G9m+KiG0SZtRd5/u4ThC8jMJtZr/Nc4RKd2A3eyR1tE=;
+ b=QsvXkpEIO2Ehdu2QUvSm8aj+wyNi7aNFH8Iqjd/Twq0uxjJvXeyRa6Nrwx6/jbfF3JaWpEzdKgu76TpVp+x1gF/XLAMVDuAEee+gS9H0cTHPwhbFY7VfRxmmzutzxFrd4AUbK/xNuoS1cYZB/PjnRlOUSNHoxVndqfgxTT34LIr1hbD6SmukH7cWr2tpf5C2xhNZ04Iot/OLzxrTY/DoTOvZIif7Uz3O2MpKSIq5BKmqh+7k5o3mu2mtXzgZQaIOG7SiPbNzGP593HtpXp5m6epQsV8qkKV0HgbkxnCEBzHJIX4L55+hITRNBAaFzekVscy/RDGye+hKcPqfR0HD9Q==
+Received: from DS7P222CA0022.NAMP222.PROD.OUTLOOK.COM (2603:10b6:8:2e::25) by
+ DM6PR12MB3817.namprd12.prod.outlook.com (2603:10b6:5:1c9::27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5314.13; Wed, 8 Jun 2022 17:38:29 +0000
+Received: from DM6NAM11FT057.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:2e:cafe::2f) by DS7P222CA0022.outlook.office365.com
+ (2603:10b6:8:2e::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13 via Frontend
+ Transport; Wed, 8 Jun 2022 17:38:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.236; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.236) by
+ DM6NAM11FT057.mail.protection.outlook.com (10.13.172.252) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5332.12 via Frontend Transport; Wed, 8 Jun 2022 17:38:29 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by DRHQMAIL109.nvidia.com
+ (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 8 Jun
+ 2022 17:38:28 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Wed, 8 Jun 2022
+ 10:38:28 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22 via Frontend
+ Transport; Wed, 8 Jun 2022 10:38:25 -0700
+Date:   Wed, 8 Jun 2022 10:38:24 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "marcan@marcan.st" <marcan@marcan.st>,
+        "sven@svenpeter.dev" <sven@svenpeter.dev>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "robdclark@gmail.com" <robdclark@gmail.com>,
+        "m.szyprowski@samsung.com" <m.szyprowski@samsung.com>,
+        "krzysztof.kozlowski@linaro.org" <krzysztof.kozlowski@linaro.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "agross@kernel.org" <agross@kernel.org>,
+        "bjorn.andersson@linaro.org" <bjorn.andersson@linaro.org>,
+        "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+        "heiko@sntech.de" <heiko@sntech.de>,
+        "orsonzhai@gmail.com" <orsonzhai@gmail.com>,
+        "baolin.wang7@gmail.com" <baolin.wang7@gmail.com>,
+        "zhang.lyra@gmail.com" <zhang.lyra@gmail.com>,
+        "wens@csie.org" <wens@csie.org>,
+        "jernej.skrabec@gmail.com" <jernej.skrabec@gmail.com>,
+        "samuel@sholland.org" <samuel@sholland.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
+        "alim.akhtar@samsung.com" <alim.akhtar@samsung.com>,
+        "alyssa@rosenzweig.io" <alyssa@rosenzweig.io>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-samsung-soc@vger.kernel.org" 
+        <linux-samsung-soc@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jonathanh@nvidia.com" <jonathanh@nvidia.com>,
+        "linux-rockchip@lists.infradead.org" 
+        <linux-rockchip@lists.infradead.org>,
+        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
+        "linux-sunxi@lists.linux.dev" <linux-sunxi@lists.linux.dev>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>
+Subject: Re: [PATCH 1/5] iommu: Return -EMEDIUMTYPE for incompatible domain
+ and device/group
+Message-ID: <YqDekEqGV0SXWgmL@Asurada-Nvidia>
+References: <20220606061927.26049-1-nicolinc@nvidia.com>
+ <20220606061927.26049-2-nicolinc@nvidia.com>
+ <BN9PR11MB52763602BBEEEF580C3B360E8CA49@BN9PR11MB5276.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v4 00/11] KVM: selftests: Add nested support to
- dirty_log_perf_test
-Content-Language: en-US
-To:     David Matlack <dmatlack@google.com>
-Cc:     Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>, Peter Xu <peterx@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-References: <20220520233249.3776001-1-dmatlack@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220520233249.3776001-1-dmatlack@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52763602BBEEEF580C3B360E8CA49@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f3a5ea2a-f976-46d7-b11e-08da4975b335
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3817:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3817CD67B892FAAFFB7B32A4ABA49@DM6PR12MB3817.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UTuUaEidQiWyq/qNlzH8v5WGUimEdNqfSxfGKylYYXiqjlw4B1Gjyy1s4p3W4k3yDa8t7UoT53/PaYdak4dbB2Lt+aa+PD4NtHNuEjdjXI/fS6NCZ75VYHg3UcaiNynCwiOvFtNK8lTZxcP3ov8NojJjozjShXHOInS5sEXloaohwRfDVRBr9IWDce3Yx1Mdbh6cuRRF0FUgijBp5eTZgCRljLobuT9Kh93Sb/rXKFNfQXmusshV0LGeShINpGmQBBD1f+jdCNXflp1fFbDY934siMXKL7aizsP4C/SGApoTZT6ej7lwciIcbPsFvXykmFCl6M4M0RgoE8B+fyEyjWfmeUb6T72cooBQOMg+0RtQkU4v21Jhm8Fhle+C+za7FloTTqLCUI0rE0bBtfso2jWI3sjyslJtS4IGmnWgn2wlgIq571iMTeG6axWO+rZVWvhjU1bS9zCiI0/m8Z1ANJP170fIGjFxACzUwt/Mb1tmfTehVX8S61T8kQXf70W+svGYx4LadvLlhkPt3pz/ah+zikqnML6s4QkrBeMzbrlZwrvf2q7O1ZkHiDzRD95QC6yDHMzch5f5SMRB+Goyowa3ZG2NmM8800IA7XLcpn66mchSWDcoSqYPa0YiA3v2SUJmPuhVtzjdMtiB0b24y5chII5/gmqnvibh6gGxRiuMl5ghH+WzK0ccgB6D6Y5bSmDqJqs/P5Mzl1ERR2Quew==
+X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(46966006)(40470700004)(82310400005)(83380400001)(426003)(186003)(336012)(7406005)(70206006)(36860700001)(5660300002)(8936002)(508600001)(40460700003)(47076005)(86362001)(2906002)(33716001)(26005)(356005)(9686003)(7416002)(316002)(81166007)(54906003)(4326008)(8676002)(6916009)(70586007)(55016003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2022 17:38:29.1738
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3a5ea2a-f976-46d7-b11e-08da4975b335
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT057.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3817
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/21/22 01:32, David Matlack wrote:
-> This series adds support for taking any perf_test_util-based test and
-> configuring it to run vCPUs in L2 instead of L1, and adds an option to
-> dirty_log_perf_test to enable it.
-> 
-> This series was used to collect the performance data for eager page
-> spliting for nested MMUs [1].
-> 
-> [1] https://lore.kernel.org/kvm/20220422210546.458943-1-dmatlack@google.com/
-> 
-> v4:
->   - Add patch 11 to support for hosts with MAXPHYADDR > 48 [Sean]
-> 
-> v3: https://lore.kernel.org/kvm/20220520215723.3270205-1-dmatlack@google.com/
->   - Only identity map a subset of the nGPA space [Sean, Peter]
->   - Fail if nested_paddr contains more than 48 bits [me]
->   - Move patch to delete all rule earlier [Peter]
-> 
-> v2: https://lore.kernel.org/kvm/20220517190524.2202762-1-dmatlack@google.com/
->   - Collect R-b tags from Peter.
->   - Use level macros instead of raw numbers [Peter]
->   - Remove "upper" from function name [Peter]
->   - Bring back setting the A/D bits on EPT PTEs [Peter]
->   - Drop "all" rule from Makefile [Peter]
->   - Reserve memory for EPT pages [Peter]
->   - Fix off-by-one error in nested_map_all_1g() [me]
-> 
-> v1: https://lore.kernel.org/kvm/20220429183935.1094599-1-dmatlack@google.com/
-> 
-> 
-> David Matlack (11):
->    KVM: selftests: Replace x86_page_size with PG_LEVEL_XX
->    KVM: selftests: Add option to create 2M and 1G EPT mappings
->    KVM: selftests: Drop stale function parameter comment for nested_map()
->    KVM: selftests: Refactor nested_map() to specify target level
->    KVM: selftests: Move VMX_EPT_VPID_CAP_AD_BITS to vmx.h
->    KVM: selftests: Add a helper to check EPT/VPID capabilities
->    KVM: selftests: Drop unnecessary rule for STATIC_LIBS
->    KVM: selftests: Link selftests directly with lib object files
->    KVM: selftests: Clean up LIBKVM files in Makefile
->    KVM: selftests: Add option to run dirty_log_perf_test vCPUs in L2
->    KVM: selftests: Restrict test region to 48-bit physical addresses when
->      using nested
-> 
->   tools/testing/selftests/kvm/Makefile          |  49 ++++--
->   .../selftests/kvm/dirty_log_perf_test.c       |  10 +-
->   .../selftests/kvm/include/perf_test_util.h    |   9 ++
->   .../selftests/kvm/include/x86_64/processor.h  |  25 +--
->   .../selftests/kvm/include/x86_64/vmx.h        |   6 +
->   .../selftests/kvm/lib/perf_test_util.c        |  53 ++++++-
->   .../selftests/kvm/lib/x86_64/perf_test_util.c | 112 +++++++++++++
->   .../selftests/kvm/lib/x86_64/processor.c      |  33 ++--
->   tools/testing/selftests/kvm/lib/x86_64/vmx.c  | 149 +++++++++++-------
->   .../selftests/kvm/max_guest_memory_test.c     |   2 +-
->   .../selftests/kvm/x86_64/mmu_role_test.c      |   2 +-
->   11 files changed, 343 insertions(+), 107 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
-> 
-> 
-> base-commit: a3808d88461270c71d3fece5e51cc486ecdac7d0
+Hi Kevin,
 
-Queued, thanks!  (It will be in either -rc2 or -rc3).
+On Wed, Jun 08, 2022 at 07:49:10AM +0000, Tian, Kevin wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> > From: Nicolin Chen
+> > Sent: Monday, June 6, 2022 2:19 PM
+> >
+> > Cases like VFIO wish to attach a device to an existing domain that was
+> > not allocated specifically from the device. This raises a condition
+> > where the IOMMU driver can fail the domain attach because the domain and
+> > device are incompatible with each other.
+> >
+> > This is a soft failure that can be resolved by using a different domain.
+> >
+> > Provide a dedicated errno from the IOMMU driver during attach that the
+> > reason attached failed is because of domain incompatability. EMEDIUMTYPE
+> > is chosen because it is never used within the iommu subsystem today and
+> > evokes a sense that the 'medium' aka the domain is incompatible.
+> >
+> > VFIO can use this to know attach is a soft failure and it should continue
+> > searching. Otherwise the attach will be a hard failure and VFIO will
+> > return the code to userspace.
+> >
+> > Update all drivers to return EMEDIUMTYPE in their failure paths that are
+> > related to domain incompatability.
+> 
+> Seems not all drivers are converted, e.g.:
 
-Paolo
+Thank you for going through all of them!
+
+> mtk_iommu_v1_attach_device():
+>         /* Only allow the domain created internally. */
+>         mtk_mapping = data->mapping;
+>         if (mtk_mapping->domain != domain)
+>                 return 0;
+> ** the current code sounds incorrect which should return an error
+
+I agree.
+ 
+> s390_iommu_attach_device():
+>         /* Allow only devices with identical DMA range limits */
+>         } else if (domain->geometry.aperture_start != zdev->start_dma ||
+>                 domain->geometry.aperture_end != zdev->end_dma) {
+>                 rc = -EINVAL;
+>
+> sprd_iommu_attach_device():
+>         if (dom->sdev) {
+>                 pr_err("There's already a device attached to this domain.\n");
+>                 return -EINVAL;
+>         }
+> 
+> 
+> gart_iommu_attach_dev():
+>         if (gart->active_domain && gart->active_domain != domain) {
+>                 ret = -EBUSY;
+
+Will add these.
+
+> arm_smmu_attach_dev():
+>         if (!fwspec || fwspec->ops != &arm_smmu_ops) {
+>                 dev_err(dev, "cannot attach to SMMU, is it on the same bus?\n");
+>                 return -ENXIO;
+>         }
+> **probably this check can be covered by next patch which moves bus ops
+> check into iommu core?
+
+I was thinking that it could be covered. Yet, we are about to drop
+that ops check, as Robin pointed out that we don't need that ops
+sanity for we don't have mixed-driver systems yet. So perhaps this
+would be a different ops check and should return -EMEDIUMTYPE too,
+I think.
+
+Thanks
+Nic
