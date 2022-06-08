@@ -2,114 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3220542B87
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 11:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC5CE542B7A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 11:27:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235163AbiFHJZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 05:25:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46786 "EHLO
+        id S235050AbiFHJ0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 05:26:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234457AbiFHJZM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 05:25:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2C8623A
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 01:47:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654678021;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ILDvM8TSVfNQxAMgKdb/afVduGh6PmUKef1ZkWVk22c=;
-        b=P/BvmWq6qpzrDAPopt4AHbaGHnmD348My+VJpd9TODAwSwpouGbR+JKDCZynYv1idMwjDd
-        A2a80pFCf+OXrE7NoVzIJHf0KtiRvzuTB+mqr6aAVqgSwI8o3MUaiPCJjPMxKlvxfjiAq1
-        mVmJZv++pBe3bjTThDOuFtvr/INfEpo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-124-DDN_aOWrNC-OANtkarqC3A-1; Wed, 08 Jun 2022 04:47:00 -0400
-X-MC-Unique: DDN_aOWrNC-OANtkarqC3A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S235167AbiFHJZi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 05:25:38 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6736ED79A;
+        Wed,  8 Jun 2022 01:50:09 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE4EC18A6522;
-        Wed,  8 Jun 2022 08:46:59 +0000 (UTC)
-Received: from starship (unknown [10.40.194.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 137652026D64;
-        Wed,  8 Jun 2022 08:46:56 +0000 (UTC)
-Message-ID: <2f21ab3ed17c9b2b2d4996bc04c65672b005d8a5.camel@redhat.com>
-Subject: Re: [PATCH v6 03/38] KVM: x86: hyper-v: Introduce TLB flush fifo
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 08 Jun 2022 11:46:56 +0300
-In-Reply-To: <87bkv3mwag.fsf@redhat.com>
-References: <20220606083655.2014609-1-vkuznets@redhat.com>
-         <20220606083655.2014609-4-vkuznets@redhat.com>
-         <4be614689a902303cef1e5e1889564f965e63baa.camel@redhat.com>
-         <87bkv3mwag.fsf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 47E961F8B5;
+        Wed,  8 Jun 2022 08:50:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1654678208; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1xQpYTHdUzGHRsbIMiCm0hyjXxogHxF1cpWBqpO7kAM=;
+        b=CE63Xf60s3EEG2UNMGVXQdb41nu7OUJuEwSbsnbkMRyGg/FTwAabDZDkcHd/v2saZam2Ho
+        hQXkIuwaOiQvDpAiqvAR5+RSM0Yk0sMwQBJnRLxQfEI4py8yGPojsvP9ije2VtO75URIjW
+        x4cvLxMdnSej59HGi041MbxG+vjxsWw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1654678208;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1xQpYTHdUzGHRsbIMiCm0hyjXxogHxF1cpWBqpO7kAM=;
+        b=ODgkIreevZKOXnL2gqmZJNWfiFmH5heOhtoQjLDarKVZ446lglgitbxLS6zSQUw5Ms4++6
+        v55DFY9vzZwv6dDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F2EBF13AD9;
+        Wed,  8 Jun 2022 08:50:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id XmnDOb9ioGLASwAAMHmgww
+        (envelope-from <vkarasulli@suse.de>); Wed, 08 Jun 2022 08:50:07 +0000
+Date:   Wed, 8 Jun 2022 10:50:06 +0200
+From:   Vasant Karasulli <vkarasulli@suse.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, jroedel@suse.de, kvm@vger.kernel.org,
+        bp@alien8.de, x86@kernel.org, thomas.lendacky@amd.com
+Subject: Re: [PATCH v6 2/4] x86/tests: Add tests for AMD SEV-ES #VC handling
+ Add KUnit based tests to validate Linux's VC handling for instructions cpuid
+ and wbinvd. These tests: 1. install a kretprobe on the #VC handler
+ (sev_es_ghcb_hv_call, to access GHCB before/after the resulting VMGEXIT). 2.
+ trigger an NAE by executing either cpuid or wbinvd. 3. check that the
+ kretprobe was hit with the right exit_code available in GHCB.
+Message-ID: <YqBivtMl74FGmz7r@vasant-suse>
+References: <20220318094532.7023-1-vkarasulli@suse.de>
+ <20220318094532.7023-3-vkarasulli@suse.de>
+ <Ykzrb1uyPZ2AKWos@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ykzrb1uyPZ2AKWos@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-06-08 at 09:47 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > On Mon, 2022-06-06 at 10:36 +0200, Vitaly Kuznetsov wrote:
-> > > To allow flushing individual GVAs instead of always flushing the
-> > > whole
-> > > VPID a per-vCPU structure to pass the requests is needed. Use
-> > > standard
-> > > 'kfifo' to queue two types of entries: individual GVA (GFN + up to
-> > > 4095
-> > > following GFNs in the lower 12 bits) and 'flush all'.
-> > 
-> > Honestly I still don't think I understand why we can't just
-> > raise KVM_REQ_TLB_FLUSH_GUEST when the guest uses this interface
-> > to flush everthing, and then we won't need to touch the ring
-> > at all.
-> 
-> The main reason is that we need to know what to flush: L1 or
-> L2. E.g. for VMX, KVM_REQ_TLB_FLUSH_GUEST is basically
-> 
-> vpid_sync_context(vmx_get_current_vpid(vcpu));
-> 
-> which means that if the target vCPU transitions from L1 to L2 or vice
-> versa before KVM_REQ_TLB_FLUSH_GUEST gets processed we will flush the
-> wrong VPID. And actually the writer (the vCPU which processes the TLB
-> flush hypercall) is not anyhow synchronized with the reader (the vCPU
-> whose TLB needs to be flushed) here so we can't even know if the target
-> vCPU is in guest more or not.
-> 
-> With the newly added KVM_REQ_HV_TLB_FLUSH, we always look at the
-> corresponding FIFO and process 'flush all' accordingly. In case the vCPU
-> switches between modes, we always raise KVM_REQ_HV_TLB_FLUSH request to
-> make sure we check. Note: we can't be raising KVM_REQ_TLB_FLUSH_GUEST
-> instead as it always means 'full tlb flush' and we certainly don't want
-> that.
-> 
+On Mi 06-04-22 01:22:55, Sean Christopherson wrote:
+> > +	if (ret) {
+> > +		kunit_info(test, "Could not register kretprobe. Skipping.");
+> > +		goto out;
+> > +	}
+> > +
+> > +	test->priv = kunit_kzalloc(test, sizeof(u64), GFP_KERNEL);
+>
+> Allocating 8 bytes and storing the pointer an 8-byte field is rather pointless :-)
+>
 
+Actually it's necessary to allocate memory to test->priv before using according to
+https://www.kernel.org/doc/html/latest/dev-tools/kunit/tips.html
 
-OK, that makes sense! Let it be then.
+> > +	if (!test->priv) {
+> > +		ret = -ENOMEM;
+> > +		kunit_info(test, "Could not allocate. Skipping.");
+> > +		goto out;
+> > +	}
+> > +
 
-Best regards,
-	Maxim Levitsky
+--
+Vasant Karasulli
+Kernel generalist
+www.suse.com<http://www.suse.com>
+[https://www.suse.com/assets/img/social-platforms-suse-logo.png]<http://www.suse.com/>
+SUSE - Open Source Solutions for Enterprise Servers & Cloud<http://www.suse.com/>
+Modernize your infrastructure with SUSE Linux Enterprise servers, cloud technology for IaaS, and SUSE's software-defined storage.
+www.suse.com
 
