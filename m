@@ -2,187 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 994095421B5
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:44:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19CBE542654
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 08:57:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231506AbiFHDqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jun 2022 23:46:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36376 "EHLO
+        id S230431AbiFHEwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 00:52:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235078AbiFHDpW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jun 2022 23:45:22 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EBC622D675
-        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 17:56:04 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id h188so26195058oia.2
-        for <kvm@vger.kernel.org>; Tue, 07 Jun 2022 17:56:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wFH16JpjBRikHN1IAO48ehtoxfzCGCzN3oM9EiMa6X8=;
-        b=l4i+k+6Abr5HeudzU075zO0r/BLzbacv0V6STNZIEAEBluaeTcRvx1TChTOuxyCASs
-         uAUgVwmDgoEyG6k0dhZ8NFmw5OEbd2l74yvSxXxWA53CBaw9OoBV3iEq26EPYk4y+7IT
-         qKn9JDYz2OP806c9cvPpDahmxZAZDvrVhTSIayulr7dYNanhmDiOChse+RJNE6HykCsj
-         9xuaaLmPGA8/BJDWN8cpUzOPbGbAyNe0shOzPx2NRgDBxX7ug5Bu5rZe5CkKdYsGZDwp
-         RBwBbso17/gWhg2hEdQ9VBPL7L2J3NplhFzwna8YW9Inmvn2hE+jo34OGkRp4w12iAUj
-         sThA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wFH16JpjBRikHN1IAO48ehtoxfzCGCzN3oM9EiMa6X8=;
-        b=n7FPPsnskn2Zv5RC3F8ekTJC2G6UL1Qdid4Qr3sLDmAn1L7yW2RH0j7qU6RUhf8uAl
-         k5/lqX+sJDj3QC5KUyRgOQM4qxRGNXM2xw21LqKPqHSr+mxurSs1OqhNRFMT5n7RLnon
-         IuM+IJjW/k68ecZojXardUtGh6USlJPDYkAfKRDO/A9ivm3iGCWJfPrlqXZdJMZ+e6+r
-         Oe2E07ipGqGxpmkONxuP+5QpcRHL501NvfgyaDK39WswJXj+LRn4mc85W25PUqO1u9/O
-         mtboiZjkAf/buZ5SVVlAbpJjsftJKMzURQkEbZmvLyMbG+yHqoQaL9bCRz5xlnv2GsOQ
-         LvVQ==
-X-Gm-Message-State: AOAM532igN8Y0uzz/ajMYpEi4Dwf7JXbhfEjTRvqisb3KTKEy7FiERdd
-        yQ3tvzyIXWUmayGDb19Ab++cLd90BX87YI/ZvjimvB6xxPN2Y0sM
-X-Google-Smtp-Source: ABdhPJwjBSZgp55zoUZOFIm3kjCTD4NqCF0p7muhSr/F2gMJemxqIIRloSiqM46aTGwoS/mB8l6y90gRDZltreZ8pZ8=
-X-Received: by 2002:a05:6808:bd3:b0:32e:400d:1eb1 with SMTP id
- o19-20020a0568080bd300b0032e400d1eb1mr1047136oik.110.1654649757116; Tue, 07
- Jun 2022 17:55:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <CAGtprH_83CEC0U-cBR2FzHsxbwbGn0QJ87WFNOEet8sineOcbQ@mail.gmail.com> <20220607065749.GA1513445@chaop.bj.intel.com>
-In-Reply-To: <20220607065749.GA1513445@chaop.bj.intel.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Tue, 7 Jun 2022 17:55:46 -0700
-Message-ID: <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
+        with ESMTP id S232054AbiFHEvl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 00:51:41 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D07EE26180C
+        for <kvm@vger.kernel.org>; Tue,  7 Jun 2022 18:17:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654651032; x=1686187032;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=oZ2EvwfH9u4aA2qQnO28HqE9EhdiVd2zUzQoDMGpoGo=;
+  b=I5bbnl7uMVg2InPaAZo4rj2z5LAfIBySKdx6dN2D3vP6Cc9MzTqs39+h
+   Z8fF7WEGb5fcFjQlmfCgGxH7xFQqE7MnW2ibQC8FT/sHto25YNySS0ld5
+   q7GuAmJaqgD6qBMPIxjVF+MtF5tuD48y/vkEAI1uBBmokPCtHVB8vBb8N
+   yP8zd51yMRRIByo1JrK1jx5BXsS+tKCnP8YPGkKNaClXdPZOGhRkcP/Sl
+   tz0rh1JTA/AtHI0rN4TsceVBBtyEn02Rjw3xPXJh+ePKUCntLJlyQFNrY
+   0d5UE+LHpBTnQ4uM3vJ4A6B4+Lni0i5Tbf4X5pN1WW2T3N66CBhDVJ2o1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="277517761"
+X-IronPort-AV: E=Sophos;i="5.91,284,1647327600"; 
+   d="scan'208";a="277517761"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2022 18:17:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,284,1647327600"; 
+   d="scan'208";a="579838318"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by orsmga007.jf.intel.com with ESMTP; 07 Jun 2022 18:17:12 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Tue, 7 Jun 2022 18:17:11 -0700
+Received: from orsmsx605.amr.corp.intel.com (10.22.229.18) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Tue, 7 Jun 2022 18:17:11 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Tue, 7 Jun 2022 18:17:11 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.104)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Tue, 7 Jun 2022 18:17:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HFZ2+db7CFuOQ+iOzWd59a/NkJc05Utmd4jnCgbWvUxzQremnCB3BQl4OuvglVEns4Lg9CovcQ7mT45aDuqNo69zyStAbVT2HfkKYB6s7Roo1iU/1FwYVYcfvIdZJYgJS5MSVJp0Q0x9yfI8kuJ6AHbsJq0wi9+ZT3mg2I6EIYIwa/14wZQqOa+xJNED8WxYDy7RukolC2laKoQ84Z8zRNbnhJd3Wal7yRw6ooq7LugQBT0zKdbBd21vqiH9CDbE3wesO7LEAZo5N13GMTyVHD7BfLVrKpQzgOoFz3uCXYc1TYZGwrDo3p2NnSP3L22X0Z6CTXMSffpAd1vAgXKTlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AHt2t1RQUmPiw5HwaH3FICqR2k0Zeq1ynrP0ZABEW7E=;
+ b=mwJLhb46RYZL/vAwC5S6DsqeoWm3B7N4Jcf3jvNYJ+0a7Y2RqsBo55m4nnEvTgOhcqETivzMD67j9xLSpggFpoqklzdbK76OJ3Weqce8mqn2nFsxZwgpzFPDS7CTy37eMixjbwKvhsA1A1jJYALaOyoXJ5qPEvvNFXZQIz87VRruLLR7QBNLK6MPxfM7HNoyP0+SsbxfobZTJBn0McL0NVrQIOxu3Nmr1jw9eeS//IZfIHqH5ziPYyza7+A+lDe1gx7g4dcICjyDzUPxn7TgfWXii83G7lL3C/LNQAg1UtLZpvQDy/jTWalJDnR4ilqNl9u5XTq5KLCfwnZISdoauQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN2PR11MB3870.namprd11.prod.outlook.com (2603:10b6:208:152::11)
+ by PH0PR11MB4773.namprd11.prod.outlook.com (2603:10b6:510:33::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13; Wed, 8 Jun
+ 2022 01:17:09 +0000
+Received: from MN2PR11MB3870.namprd11.prod.outlook.com
+ ([fe80::e819:fb65:2ca3:567b]) by MN2PR11MB3870.namprd11.prod.outlook.com
+ ([fe80::e819:fb65:2ca3:567b%6]) with mapi id 15.20.5314.019; Wed, 8 Jun 2022
+ 01:17:09 +0000
+Message-ID: <bf7dffb8-55d2-22cb-2944-b90e6117e810@intel.com>
+Date:   Wed, 8 Jun 2022 09:16:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.10.0
+Subject: Re: [PATCH 33/89] KVM: arm64: Handle guest stage-2 page-tables
+ entirely at EL2
+Content-Language: en-US
+To:     Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+CC:     <kvmarm@lists.cs.columbia.edu>, Ard Biesheuvel <ardb@kernel.org>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
         Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Marc Zyngier <maz@kernel.org>, <kernel-team@android.com>,
+        <kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20220519134204.5379-1-will@kernel.org>
+ <20220519134204.5379-34-will@kernel.org>
+ <Yoe70WC0wJg0Vcon@monolith.localdoman>
+ <20220531164550.GA25631@willie-the-truck>
+From:   "Huang, Shaoqin" <shaoqin.huang@intel.com>
+In-Reply-To: <20220531164550.GA25631@willie-the-truck>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR04CA0152.apcprd04.prod.outlook.com (2603:1096:4::14)
+ To MN2PR11MB3870.namprd11.prod.outlook.com (2603:10b6:208:152::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 438d3a32-cd3d-4964-db8f-08da48ec9bc9
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4773:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-Microsoft-Antispam-PRVS: <PH0PR11MB4773411296A55461943155BDF7A49@PH0PR11MB4773.namprd11.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PQnie/QeDonSdFTmxixyHvNQUAP70L5RiTs8+ymvsq4NK406XZbxMmCl5vQApjW05bAGLGIvmIU3XKS42tOJ7eQltu8nTNyIuFpv7cAHmE7Uy68JhLyNKvOSPiX16m9O9GcB+OsdFP0FPtyWD3n2/jBjW2v37iq9pMi1DzeBLcfzuuZzgRFqiPEmYXhVb8ZTiEpF4c6o5S7udQFSY57xr+LZrXhQgjV2e/RezuBa+3Q6x/XUQ9VHl+nSNv+UlRC1Ec927wO2tNj94qP3AQZkyNtgHJgko1u3vzmNteqnxXieNcA6w/A2k5ccPEd0JT+X//KH9SQ+HmmtULUTz8YTXdQyDze6ybBKiJOjRgtweomGBzh/Rtpx5bLiQhTBv0lK4Njzk2jUD03w4d59XV7pVqfC9mR2cOc2pdydj7PbBddZ+8JnTzGaSr9gU0SwK1mrUKwDXZ7p/Bbh4dEj5ezybkJ7n04wXRblCeERXlkdIaAlKVfuDHOL+opbinR2wFI9vjmfFz224qsgqzbgJSuNrnhWq0/cFssciEZCbv6AQkhuUona3ZhF4vanLE+K6V+kA+E+kGREDl/yWrGZlzF9ceZH9UsZ2NekXCWJG09W1Cbvw0xoZAeVMG247x2lru+Ep/7jW+gpjuZOsaBq4TBgGiY3XD58vqjf6wnmPAEyeC4OJxtBGe0lBMzXnWoonobr8yjheV/qa7KkAguoFwYdLzwNHY3yphdtSJQXAJKj2NA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR11MB3870.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(8936002)(66946007)(4326008)(2906002)(6666004)(83380400001)(2616005)(6512007)(26005)(110136005)(54906003)(316002)(6506007)(186003)(53546011)(31696002)(5660300002)(66476007)(508600001)(82960400001)(8676002)(38100700002)(7416002)(36756003)(66556008)(6486002)(31686004)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cHo0SWFYbllqWXBGQXNTMGwzZ3FCSnhwaDZ0ZWZJUU44MElTZWlqUzBzR3hy?=
+ =?utf-8?B?U0RxRGhtbVhvT0tCTFZmZGtEWkZEZ2pZeEdBeEtEOC8veU5YbytvM3NXS1dP?=
+ =?utf-8?B?RWE1RzZoeXJvWkFHVk1sL2VnNnkyY0N1dVRlMFB4a3hibVVWcFgxelMyMVZn?=
+ =?utf-8?B?RmxzTG5xYWxWOW9CSmNWZ1NLaUVUcG50ZzEvOFU4ZEpudXZqcG9yVHhqcnVI?=
+ =?utf-8?B?clNtOUd2bzB2ZHRzRVBiMEVSbmdzTkNKd082Zkg1K2xnRjluQ0hFbVVGdnRN?=
+ =?utf-8?B?OWx3UUJvc3RSYUxXamtZZnllTXF6N082Q01ZMVpMUlhObkpVZVFqRE9HaGN3?=
+ =?utf-8?B?MVowbkRpNWQzUzdJUFpSbGFuYzRUQlFJL0RYMnhvL3lsTHVLUVo5WXNCc24x?=
+ =?utf-8?B?UVovWlJQeWVyS3lmUXZhSjREbjhZYm12TmRGYktIWElkUk01RUM5OHNTSzVv?=
+ =?utf-8?B?M1BrdHkwaG5hc3IvZmhUZ2ppQjVnaGVzMEtiYWNjeGo1TDVOSTVyQnN3RXlB?=
+ =?utf-8?B?WUVMcmw5aGU4U1lMTUJKcmpPaGhsTXp0aDJDUFFWdFBFQUZxNXRyT3AzK3dK?=
+ =?utf-8?B?eUxLT1VFeVRCMVFSSFJyYXVZeUpUS1crekI1NmJRTjdMU3ltbVpJdGVxNjRW?=
+ =?utf-8?B?ZVA5UGFkK2I5QnJsbUZwQ01oOFA1VmpQbEJzNGdvZUdQRlVHK0xzenljdm5m?=
+ =?utf-8?B?cmQ2TlMra2hzbHh6Znl5TXh6SWtad1lSOEFEUlYzWU5mek1SWVhOQnRvbG9E?=
+ =?utf-8?B?SkFUK0ZsRXBHRElzSGFOQkpLbWhNU2I4bEgxZzdvdGw1OE9ScjNWakNBb01x?=
+ =?utf-8?B?YXdLckM4aGtxc254dnlJMG51SmxhRE1UUUhBbmEveko3RUdQQjZablN0cGhs?=
+ =?utf-8?B?dFAvSnQ0TzFyeDZaS3pQeDZyenN1K3EybExYTzNqSzMyU1dJU09vaVNOVERz?=
+ =?utf-8?B?SGFCaExseTJibE85L2tCUHZjN0ZxTndJK3N6NisyTVVYU2poR0QzZjU3M3hY?=
+ =?utf-8?B?M3VPMUN0cFU0cm1LalJHWXR3VjBoZ0pRMVFLT01UdDR5WWxDQ05OQ1F3Zlds?=
+ =?utf-8?B?ejd6TmswS0VQWExZemsraFhydmNPM2JjQWVCbEJwUXB6Y2VQSEhRak1UMFF0?=
+ =?utf-8?B?cXcyek96YVMzakpPY3lTR2wrNDNHU2FmRVdrRnNnWTJxL3M2cTdock1ZU2VN?=
+ =?utf-8?B?a1ZWaUIzRmdnL3BsNUNxN2w0VWtmME5Vd0NrNzZ6T3JJY2lRMkZuWUkwYU9I?=
+ =?utf-8?B?WDViUFp1Ky9SbVpRZXlhSFV4U1p3d0d4UytBa2Zzcm80ekJIRnZSZTZTbWdL?=
+ =?utf-8?B?U3c5YkswZWV4UEM1dTl6bVhIK08vVFZxWEZvN3FHWlFSODVrS2JjVzhzdjVO?=
+ =?utf-8?B?Tm84OHVFMFJTeFNuamo5clk4UUF2NktLSm10d2pOYTAvc3ZCUDR1eFZxSndp?=
+ =?utf-8?B?b1lxRHdpOEdHVWkxQ1JaSkhBS1FBdDd2OGF5YWpLa3JidkpXMG5QS2JqR0JY?=
+ =?utf-8?B?RW9LSnNQS0lTK0V4NWZRbCsrL0FiL0RPNmlLMkFaUXMxcXdKaDlyN1pZYzNJ?=
+ =?utf-8?B?S2FvcEg1Q0RrWU5JMldoTGdCU3E2Snc0ZE1uby8rOTNSR0IvSjhzSzZaMDlo?=
+ =?utf-8?B?UlR6SjE3OW0vU1NtOGVybXQyZGFCWTJzSmxOcHZqQnN3WWlKWmVENC8rMk1z?=
+ =?utf-8?B?cDFabXBObG4yc2FTOVpSR0FEQUpFVnF5dkF0SGJEZElTT2JPc3BXSWVkYmpS?=
+ =?utf-8?B?ai84VG9KTFlEOC9TdVAvSU9OekFnOXBtbUlvL2o4MXZGNWxwUzB0SFAxcDhH?=
+ =?utf-8?B?blBVb1JTZkFKaFZOdDB0enZUNUtRTEQ0akZHcVM0YW5QZEtCRk5aYkRpTW9y?=
+ =?utf-8?B?WUozVGdOd1lxZHpYa1YwK21hN2c0QXBrU1VTNlFrdERtTjFmZVhJYTlNZkhZ?=
+ =?utf-8?B?SVBER01KQWh0WUUxanBCZ2Nkc3ppVDVxc1JXTlFPNWJ5N0t3aXdFRlRiVWgv?=
+ =?utf-8?B?djl4ZmZHbCs3U3h6aTluWWhvOFpoLzJyMmdHdUFoVVBNYzdiRys1d2FqWVAv?=
+ =?utf-8?B?SWVid2VkQkNSOXZPSjVTLzFic2dPbWFNL3d2RTU5MFlFUzc2MDFVdHFZeENM?=
+ =?utf-8?B?YzR0TGYvcEtacG5iL0tDSGd2QnhpdnAwZlhyVktOczdmM2lET1krdU9vdnAw?=
+ =?utf-8?B?Z0lCZWRJOGptU0VWNmNnZGFSVGx2bU9qUzNsZUdpRkVXcDZCQjQ1TDQ5c0ll?=
+ =?utf-8?B?WE5zcTNDY2ZhaC9QcmtoZld2SHlyWXp6U25YQ05ISkhWQUZhRy9kR1VvSzJT?=
+ =?utf-8?B?QUUxU3M4QzFZeG9SbWtqZldxcWR3M1dwVlJWQXRZUWJObmdkcWgxRXpLNlRw?=
+ =?utf-8?Q?WOrHcbX2gR9UzAG8=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 438d3a32-cd3d-4964-db8f-08da48ec9bc9
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR11MB3870.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2022 01:17:09.4056
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qUOe2XgZTA7VNMaCEz3/ADcD/dJ1pschZdCQ9Qln2gqO+mS7iFVz2Zhk1bllgGxpPe/Tyyo+0pQDdxTDJH2t5Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4773
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 7, 2022 at 12:01 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
->
-> On Mon, Jun 06, 2022 at 01:09:50PM -0700, Vishal Annapurve wrote:
-> > >
-> > > Private memory map/unmap and conversion
-> > > ---------------------------------------
-> > > Userspace's map/unmap operations are done by fallocate() ioctl on the
-> > > backing store fd.
-> > >   - map: default fallocate() with mode=0.
-> > >   - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
-> > > The map/unmap will trigger above memfile_notifier_ops to let KVM map/unmap
-> > > secondary MMU page tables.
-> > >
-> > ....
-> > >    QEMU: https://github.com/chao-p/qemu/tree/privmem-v6
-> > >
-> > > An example QEMU command line for TDX test:
-> > > -object tdx-guest,id=tdx \
-> > > -object memory-backend-memfd-private,id=ram1,size=2G \
-> > > -machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
-> > >
-> >
-> > There should be more discussion around double allocation scenarios
-> > when using the private fd approach. A malicious guest or buggy
-> > userspace VMM can cause physical memory getting allocated for both
-> > shared (memory accessible from host) and private fds backing the guest
-> > memory.
-> > Userspace VMM will need to unback the shared guest memory while
-> > handling the conversion from shared to private in order to prevent
-> > double allocation even with malicious guests or bugs in userspace VMM.
->
-> I don't know how malicious guest can cause that. The initial design of
-> this serie is to put the private/shared memory into two different
-> address spaces and gives usersapce VMM the flexibility to convert
-> between the two. It can choose respect the guest conversion request or
-> not.
 
-For example, the guest could maliciously give a device driver a
-private page so that a host-side virtual device will blindly write the
-private page.
+On 6/1/2022 12:45 AM, Will Deacon wrote:
+> On Fri, May 20, 2022 at 05:03:29PM +0100, Alexandru Elisei wrote:
+>> On Thu, May 19, 2022 at 02:41:08PM +0100, Will Deacon wrote:
+>>> Now that EL2 is able to manage guest stage-2 page-tables, avoid
+>>> allocating a separate MMU structure in the host and instead introduce a
+>>> new fault handler which responds to guest stage-2 faults by sharing
+>>> GUP-pinned pages with the guest via a hypercall. These pages are
+>>> recovered (and unpinned) on guest teardown via the page reclaim
+>>> hypercall.
+>>>
+>>> Signed-off-by: Will Deacon <will@kernel.org>
+>>> ---
+>> [..]
+>>> +static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>> +			  unsigned long hva)
+>>> +{
+>>> +	struct kvm_hyp_memcache *hyp_memcache = &vcpu->arch.pkvm_memcache;
+>>> +	struct mm_struct *mm = current->mm;
+>>> +	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
+>>> +	struct kvm_pinned_page *ppage;
+>>> +	struct kvm *kvm = vcpu->kvm;
+>>> +	struct page *page;
+>>> +	u64 pfn;
+>>> +	int ret;
+>>> +
+>>> +	ret = topup_hyp_memcache(hyp_memcache, kvm_mmu_cache_min_pages(kvm));
+>>> +	if (ret)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	ppage = kmalloc(sizeof(*ppage), GFP_KERNEL_ACCOUNT);
+>>> +	if (!ppage)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	ret = account_locked_vm(mm, 1, true);
+>>> +	if (ret)
+>>> +		goto free_ppage;
+>>> +
+>>> +	mmap_read_lock(mm);
+>>> +	ret = pin_user_pages(hva, 1, flags, &page, NULL);
+>>
+>> When I implemented memory pinning via GUP for the KVM SPE series, I
+>> discovered that the pages were regularly unmapped at stage 2 because of
+>> automatic numa balancing, as change_prot_numa() ends up calling
+>> mmu_notifier_invalidate_range_start().
+>>
+>> I was curious how you managed to avoid that, I don't know my way around
+>> pKVM and can't seem to find where that's implemented.
+> 
+> With this series, we don't take any notice of the MMU notifiers at EL2
+> so the stage-2 remains intact. The GUP pin will prevent the page from
+> being migrated as the rmap walker won't be able to drop the mapcount.
+> 
+> It's functional, but we'd definitely like to do better in the long term.
+> The fd-based approach that I mentioned in the cover letter gets us some of
+> the way there for protected guests ("private memory"), but non-protected
+> guests running under pKVM are proving to be pretty challenging (we need to
+> deal with things like sharing the zero page...).
+> 
+> Will
 
-> It's possible for a usrspace VMM to cause double allocation if it fails
-> to call the unback operation during the conversion, this may be a bug
-> or not. Double allocation may not be a wrong thing, even in conception.
-> At least TDX allows you to use half shared half private in guest, means
-> both shared/private can be effective. Unbacking the memory is just the
-> current QEMU implementation choice.
-
-Right. But the idea is that this patch series should accommodate all
-of the CVM architectures. Or at least that's what I know was
-envisioned last time we discussed this topic for SNP [*].
-
-Regardless, it's important to ensure that the VM respects its memory
-budget. For example, within Google, we run VMs inside of containers.
-So if we double allocate we're going to OOM. This seems acceptable for
-an early version of CVMs. But ultimately, I think we need a more
-robust way to ensure that the VM operates within its memory container.
-Otherwise, the OOM is going to be hard to diagnose and distinguish
-from a real OOM.
-
-[*] https://lore.kernel.org/all/20210820155918.7518-1-brijesh.singh@amd.com/
-
->
-> Chao
-> >
-> > Options to unback shared guest memory seem to be:
-> > 1) madvise(.., MADV_DONTNEED/MADV_REMOVE) - This option won't stop
-> > kernel from backing the shared memory on subsequent write accesses
-> > 2) fallocate(..., FALLOC_FL_PUNCH_HOLE...) - For file backed shared
-> > guest memory, this option still is similar to madvice since this would
-> > still allow shared memory to get backed on write accesses
-> > 3) munmap - This would give away the contiguous virtual memory region
-> > reservation with holes in the guest backing memory, which might make
-> > guest memory management difficult.
-> > 4) mprotect(... PROT_NONE) - This would keep the virtual memory
-> > address range backing the guest memory preserved
-> >
-> > ram_block_discard_range_fd from reference implementation:
-> > https://github.com/chao-p/qemu/tree/privmem-v6 seems to be relying on
-> > fallocate/madvise.
-> >
-> > Any thoughts/suggestions around better ways to unback the shared
-> > memory in order to avoid double allocation scenarios?
-
-I agree with Vishal. I think this patch set is making great progress.
-But the double allocation scenario seems like a high-level design
-issue that warrants more discussion.
+My understanding is that with the pin_user_pages, the page that used by 
+guests (both protected and non-protected) will stay for a long time, and 
+the page will not be swapped or migrated. So no need to care about the 
+MMU notifiers. Is it right?
