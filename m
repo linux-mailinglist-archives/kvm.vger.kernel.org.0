@@ -2,121 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3CAC542902
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 10:14:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3593B542917
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 10:16:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbiFHIMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 04:12:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49912 "EHLO
+        id S229933AbiFHIPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 04:15:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230205AbiFHIMG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 04:12:06 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2B62132AE
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 00:40:51 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-fe023ab520so2995445fac.10
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 00:40:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4C+HR3kdGNMQU0VniOy6D2TLr5OZWg8RJ6oE98/dwoc=;
-        b=lniF6SLwf2sUXG4L0oxq7Wvjkomm8JSVVcdy9UzJDPuqG9mEJpDr1yJXXD8UEn8ubM
-         DP7YyQB0975e/YbQSSGUijeh7xrN31/yqUtCCrcEaxk6ysdAfEnEG42VefCFXo/ua0BH
-         CjN+8JiKVCb0pxnVxMjrz4HvhAu28Lujp3EqMXIp+bS6ugnqNVvRhLBpwUrL4M4P4od0
-         mow1rtEcXV2IdS5nu9EyuXgjt7u/n2/BqItaCrd9FbYugktvOlRupZv7BJw7MHAv02aS
-         dfsm6fuod9FPKaaXXLOjjoPcHvKi1Pft/nRpXH2+T0MqaqVEoMMoHdcT9vSNZn3+FX4D
-         SvGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4C+HR3kdGNMQU0VniOy6D2TLr5OZWg8RJ6oE98/dwoc=;
-        b=XP6IUXvija13hXo64OAg7+yuhMLZZycOmcC2M5/NoJ9Atec5jTrpVAHnseJiXxZ2Fe
-         jgYHNOOxGosPjmFpDmRnYDqLD8oYSEwHEd3o/Az285XuXbwr0F9n3jxNlLO+HsprVSGo
-         9ar8RAurKxHpIt6BqXX+xHjpzzua92i+5p687PkmkIyUtV4yItCRynnSw97o3T0xlgVJ
-         mneemb6QnJiX2dBFa3froQvAI9Jni4+naiELZ5XSkjebqajtFTy5y+mORUeC5sLvYbJk
-         reV7VMA4L/eo1bnYmfMoSEHGD64718x+zvleFRpAYfxnk5vmrB6YtffOfRlirAP1cpIA
-         tQEQ==
-X-Gm-Message-State: AOAM530HCqL2CWpaESDmgdrmi6J5h/v9mdGeyFlYgf01zla2O0lkF7Lj
-        sLuEM5ltSFNCoqgTp+Tq46bqXEOm6a2PT9SoRmy1Ww==
-X-Google-Smtp-Source: ABdhPJxJU2tr9O9BGDzNE7cjJh/nBawaDlGq2ZFiX9T3Jx1K4j1sILs6YF386g05D+iAgS/6fcxJ3SXP4KDchr+cHKE=
-X-Received: by 2002:a05:6870:961b:b0:e2:ffb9:f526 with SMTP id
- d27-20020a056870961b00b000e2ffb9f526mr1662882oaq.146.1654674050672; Wed, 08
- Jun 2022 00:40:50 -0700 (PDT)
+        with ESMTP id S231584AbiFHIO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 04:14:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 982D33223AD
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 00:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654674194;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AH2f+hvLt6o5Ulhr8X9RVVcxLh1vpT+51fFKDTk13/I=;
+        b=aN2Z9Satxw//fpC2b1syoYP7euJ/4D9Bynrw0JljKzc+J0SxPs8ov0t7Md1BWS/b5a0I3Y
+        AUStd2sx//41502//5G7sDqIOvNSvDHPYYeaWXJ/zDfQ37wEC2Gv3BNVQRzc4lOy9viddk
+        F9BhQe5TSJ6pgMEb1hyBXGeOA222g+I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-298-1GjcdoIZO0eu-TsxarhuMw-1; Wed, 08 Jun 2022 03:43:09 -0400
+X-MC-Unique: 1GjcdoIZO0eu-TsxarhuMw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00FB1800971;
+        Wed,  8 Jun 2022 07:43:09 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A2D67400F3FF;
+        Wed,  8 Jun 2022 07:43:08 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id C8C3E18003AA; Wed,  8 Jun 2022 09:43:06 +0200 (CEST)
+Date:   Wed, 8 Jun 2022 09:43:06 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Javier Martinez Canillas <javierm@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
+        kvm@vger.kernel.org, Laszlo Ersek <lersek@redhat.com>,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] Improve vfio-pci primary GPU assignment behavior
+Message-ID: <20220608074306.wyav3oerq5crdk6c@sirius.home.kraxel.org>
+References: <165453797543.3592816.6381793341352595461.stgit@omen>
+ <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
 MIME-Version: 1.0
-References: <20220519134204.5379-1-will@kernel.org> <20220519134204.5379-60-will@kernel.org>
- <CAMn1gO7Gs8YUEv9Gx8qakedGNwFVgt9i+X+rjw50uc7YGMhpEQ@mail.gmail.com>
-In-Reply-To: <CAMn1gO7Gs8YUEv9Gx8qakedGNwFVgt9i+X+rjw50uc7YGMhpEQ@mail.gmail.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Wed, 8 Jun 2022 08:40:14 +0100
-Message-ID: <CA+EHjTxa8mhiEykjTTgB0J6aFpRqDiRzLKOWOd3hFsSrL+d=5g@mail.gmail.com>
-Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
-To:     Peter Collingbourne <pcc@google.com>
-Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <badc8e91-f843-2c96-9c02-4fbb59accdc4@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+  Hi,
 
-On Tue, Jun 7, 2022 at 1:42 AM Peter Collingbourne <pcc@google.com> wrote:
->
-> On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
-> >
-> > From: Fuad Tabba <tabba@google.com>
-> >
-> > Return an error (-EINVAL) if trying to enable MTE on a protected
-> > vm.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/arm.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 10e036bf06e3..8a1b4ba1dfa7 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -90,7 +90,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >                 break;
-> >         case KVM_CAP_ARM_MTE:
-> >                 mutex_lock(&kvm->lock);
-> > -               if (!system_supports_mte() || kvm->created_vcpus) {
-> > +               if (!system_supports_mte() ||
-> > +                   kvm_vm_is_protected(kvm) ||
->
-> Should this check be added to kvm_vm_ioctl_check_extension() as well?
+> But also, this issue isn't something that only affects graphic devices,
+> right? AFAIU from [1] and [2], the same issue happens if a PCI device
+> has to be bound to vfio-pci but already was bound to a host driver.
 
-No need. kvm_vm_ioctl_check_extension() calls pkvm_check_extension()
-for protected vms, which functions as an allow list rather than a
-block list.
+Nope.  There is a standard procedure to bind and unbind pci drivers via
+sysfs, using /sys/bus/pci/drivers/$name/{bind,unbind}.
 
-Cheers,
-/fuad
+> The fact that DRM happens to have some infrastructure to remove devices
+> that conflict with an aperture is just a coincidence.
 
+No.  It's a consequence of firmware framebuffers not being linked to the
+pci device actually backing them, so some other way is needed to find
+and solve conflicts.
 
-> Peter
+> The series [0] mentioned above, adds a sysfb_disable() that disables the
+> Generic System Framebuffer logic that is what registers the framebuffer
+> devices that are bound to these generic video drivers. On disable, the
+> devices registered by sysfb are also unregistered.
+
+As Alex already mentioned this might not have the desired effect on
+systems with multiple GPUs (I think even without considering vfio-pci).
+
+> That is, do you want to remove the {vesa,efi,simple}fb and simpledrm
+> drivers or is there a need to also remove real fbdev and DRM drivers?
+
+Boot framebuffers are the problem because they are neither visible nor
+manageable in /sys/bus/pci.  For real fbdev/drm drivers the standard pci
+unbind can be used.
+
+take care,
+  Gerd
+
