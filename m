@@ -2,86 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F84D543051
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 14:30:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46EA4543077
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 14:32:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239001AbiFHMaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 08:30:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59324 "EHLO
+        id S239251AbiFHMbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 08:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238771AbiFHMaD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 08:30:03 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 406E623A00E;
-        Wed,  8 Jun 2022 05:30:03 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258Br1xg015423;
-        Wed, 8 Jun 2022 12:30:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=eSH98TmMGhhg8cU9XJApdKkccly2s6uJO58NOQIU3sw=;
- b=CTR44qmcgmHITlHZL6vNZQOTIMtoyPtH+jnhhiLvQrKWJwMbR3xGiR/K4CYz6vr/PHQ4
- zDckv0CWGDs1TWlFblDhRmtxVrFCFbT463vf8iJSH6fH6alhOrj46omHZH9rz/SJMW/R
- ffhSe4iGsG93st0lxT0klAIvai4GaFRSjxCI9QPxvifgTyK9Rj6tHQpZqcP9JjEcnGOt
- FNeXR9Pn5xXv7kerSq1YiLfnJzH38mv6Tj7Kyf52Crx96ejh7hPR7Oc0g6kbuGo/KkVg
- CqxrZaDUClmCNQI3zyYuqapADjyN+aW2rAVY5JgTVzyaoCm5rR7lQqozl2g+gwQNaUS1 xQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gju9jrvvs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 12:30:01 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258Br6BQ015696;
-        Wed, 8 Jun 2022 12:30:01 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gju9jrvu4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 12:30:01 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258CLkw9031644;
-        Wed, 8 Jun 2022 12:29:59 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gfy19d6gx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 12:29:59 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258CTuat19726820
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Jun 2022 12:29:56 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A58735204F;
-        Wed,  8 Jun 2022 12:29:56 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6D8D752052;
-        Wed,  8 Jun 2022 12:29:56 +0000 (GMT)
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 2/2] s390x: Fix gcc 12 warning about array bounds
-Date:   Wed,  8 Jun 2022 14:29:53 +0200
-Message-Id: <20220608122953.1051952-3-scgl@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220608122953.1051952-1-scgl@linux.ibm.com>
-References: <20220608122953.1051952-1-scgl@linux.ibm.com>
+        with ESMTP id S239083AbiFHMbl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 08:31:41 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 853232298E0
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 05:31:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654691500; x=1686227500;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eHS+JL4cj7/6WeX/rU+t1brg6yvWYoTBHmJixIizj3g=;
+  b=jsIPxvkyGYN51X15q6RkvTyOabWawYfXGw7WWB0SZtIFOL1fBU62Xl6s
+   +Go41xU38sxyNAeLkD0ssF19SwIWojjQ99vI0+CIA2ZvyJq1LpZbaK7C4
+   1U2WyOf8gD7RG9rkqrSLJslibYdbOmjWW8zUq4rPwMzDBnEoJM+eWG9CA
+   eZH7STqkZqxQqKMTrH7I0YNW/0zBv4ruhLLDCfN5uuwlfea4GV8+du5yV
+   lHCcVYxnE/UZnTrwTr/xbI7TSL/GWEjpniT1WAToCIBXmW1DH66s0IG2l
+   3ql90X39WW4nj8yOwrLrYCxOtVNI15u8cjVSj/8fTtpG3U0xz0OfQ3quz
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="302237977"
+X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
+   d="scan'208";a="302237977"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2022 05:31:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
+   d="scan'208";a="670529676"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by FMSMGA003.fm.intel.com with ESMTP; 08 Jun 2022 05:31:39 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, cohuck@redhat.com,
+        qemu-devel@nongnu.org
+Cc:     david@gibson.dropbear.id.au, thuth@redhat.com,
+        farman@linux.ibm.com, mjrosato@linux.ibm.com,
+        akrowiak@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        jasowang@redhat.com, kvm@vger.kernel.org, jgg@nvidia.com,
+        nicolinc@nvidia.com, eric.auger@redhat.com,
+        eric.auger.pro@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+        chao.p.peng@intel.com, yi.y.sun@intel.com, peterx@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, zhangfei.gao@linaro.org,
+        berrange@redhat.com
+Subject: [RFC v2 00/15] vfio: Adopt iommufd
+Date:   Wed,  8 Jun 2022 05:31:24 -0700
+Message-Id: <20220608123139.19356-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: aa7VuLXad5gMKGAYtyyerOrtOAmj1_r3
-X-Proofpoint-GUID: YsW3z0tPN6kOvAt7ECgfcY2bqyCcuZnO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-08_04,2022-06-07_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- suspectscore=0 clxscore=1015 bulkscore=0 adultscore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 impostorscore=0 mlxlogscore=954
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206080052
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,75 +66,222 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-gcc 12 warns about pointer constant <4k dereference.
-Silence the warning by using the extern lowcore symbol to derive the
-pointers. This way gcc cannot conclude that the pointer is <4k.
+With the introduction of iommufd[1], the Linux kernel provides a generic
+interface for userspace drivers to propagate their DMA mappings to kernel
+for assigned devices. This series does the porting of the VFIO devices
+onto the /dev/iommu uapi and let it coexist with the legacy implementation.
+Other devices like vpda, vfio mdev and etc. are not considered yet.
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
----
- lib/s390x/asm/mem.h | 4 ++++
- s390x/emulator.c    | 5 +++--
- s390x/skey.c        | 2 +-
- 3 files changed, 8 insertions(+), 3 deletions(-)
+At QEMU level, interactions with the /dev/iommu are abstracted by a new
+iommufd object (compiled in with the CONFIG_IOMMUFD option).
 
-diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
-index 845c00cc..64ef59b5 100644
---- a/lib/s390x/asm/mem.h
-+++ b/lib/s390x/asm/mem.h
-@@ -7,6 +7,10 @@
-  */
- #ifndef _ASMS390X_MEM_H_
- #define _ASMS390X_MEM_H_
-+#include <asm/arch_def.h>
-+
-+/* create pointer while avoiding compiler warnings */
-+#define OPAQUE_PTR(x) ((void *)(((uint64_t)&lowcore) + (x)))
- 
- #define SKEY_ACC	0xf0
- #define SKEY_FP		0x08
-diff --git a/s390x/emulator.c b/s390x/emulator.c
-index c9182ea4..2c42f96f 100644
---- a/s390x/emulator.c
-+++ b/s390x/emulator.c
-@@ -12,6 +12,7 @@
- #include <asm/cpacf.h>
- #include <asm/interrupt.h>
- #include <asm/float.h>
-+#include <asm/mem.h>
- #include <linux/compiler.h>
- 
- static inline void __test_spm_ipm(uint8_t cc, uint8_t key)
-@@ -138,7 +139,7 @@ static __always_inline void __test_cpacf_invalid_parm(unsigned int opcode)
- {
- 	report_prefix_push("invalid parm address");
- 	expect_pgm_int();
--	__cpacf_query(opcode, (void *) -1);
-+	__cpacf_query(opcode, OPAQUE_PTR(-1));
- 	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
- 	report_prefix_pop();
- }
-@@ -148,7 +149,7 @@ static __always_inline void __test_cpacf_protected_parm(unsigned int opcode)
- 	report_prefix_push("protected parm address");
- 	expect_pgm_int();
- 	low_prot_enable();
--	__cpacf_query(opcode, (void *) 8);
-+	__cpacf_query(opcode, OPAQUE_PTR(8));
- 	low_prot_disable();
- 	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
- 	report_prefix_pop();
-diff --git a/s390x/skey.c b/s390x/skey.c
-index 32bf1070..445476a0 100644
---- a/s390x/skey.c
-+++ b/s390x/skey.c
-@@ -349,7 +349,7 @@ static void test_set_prefix(void)
- 	set_storage_key(pagebuf, 0x28, 0);
- 	expect_pgm_int();
- 	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
--	set_prefix_key_1((uint32_t *)2048);
-+	set_prefix_key_1(OPAQUE_PTR(2048));
- 	install_page(root, 0, 0);
- 	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
- 	report(get_prefix() == old_prefix, "did not set prefix");
+Any QEMU device (e.g. vfio device) wishing to use /dev/iommu must be
+linked with an iommufd object. In this series, the vfio-pci device is
+granted with such capability:
+
+It gets a new optional parameter named iommufd which allows to pass
+an iommufd object:
+
+    -object iommufd,id=iommufd0
+    -device vfio-pci,host=0000:02:00.0,iommufd=iommufd0
+
+Note the /dev/iommu can be externally opened by a management layer.
+In such a case the fd is passed along with the iommufd object:
+
+    -object iommufd,id=iommufd0,fd=22
+    -device vfio-pci,host=0000:02:00.0,iommufd=iommufd0
+
+If the fd parameter is not passed, the fd (/dev/iommu) is opened by QEMU.
+
+If no iommufd option is passed to the vfio-pci device, iommufd is not
+used and the end-user gets the behavior based on the legacy vfio iommu
+interfaces:
+
+    -device vfio-pci,host=0000:02:00.0
+
+While the legacy kernel interface is group-centric, the new iommufd
+interface is device-centric, relying on device fd and iommufd.
+
+To support both interfaces in the QEMU VFIO device we reworked the vfio
+container abstraction so that the generic VFIO code can use either
+backend.
+
+The VFIOContainer object becomes a base object derived into
+a) the legacy VFIO container and
+b) the new iommufd based container.
+
+The base object implements generic code such as code related to
+memory_listener and address space management whereas the derived
+objects implement callbacks specific to either BE, legacy and
+iommufd. Indeed each backend has its own way to setup secure context
+and dma management interface. The below diagram shows how it looks
+like with both BEs.
+
+                    VFIO                           AddressSpace/Memory
+    +-------+  +----------+  +-----+  +-----+
+    |  pci  |  | platform |  |  ap |  | ccw |
+    +---+---+  +----+-----+  +--+--+  +--+--+     +----------------------+
+        |           |           |        |        |   AddressSpace       |
+        |           |           |        |        +------------+---------+
+    +---V-----------V-----------V--------V----+               /
+    |           VFIOAddressSpace              | <------------+
+    |                  |                      |  MemoryListener
+    |          VFIOContainer list             |
+    +-------+----------------------------+----+
+            |                            |
+            |                            |
+    +-------V------+            +--------V----------+
+    |   iommufd    |            |    vfio legacy    |
+    |  container   |            |     container     |
+    +-------+------+            +--------+----------+
+            |                            |
+            | /dev/iommu                 | /dev/vfio/vfio
+            | /dev/vfio/devices/vfioX    | /dev/vfio/$group_id
+Userspace  |                            |
+===========+============================+================================
+Kernel     |  device fd                 |
+            +---------------+            | group/container fd
+            | (BIND_IOMMUFD |            | (SET_CONTAINER/SET_IOMMU)
+            |  ATTACH_IOAS) |            | device fd
+            |               |            |
+            |       +-------V------------V-----------------+
+    iommufd |       |                vfio                  |
+(map/unmap  |       +---------+--------------------+-------+
+ioas_copy) |                 |                    | map/unmap
+            |                 |                    |
+     +------V------+    +-----V------+      +------V--------+
+     | iommfd core |    |  device    |      |  vfio iommu   |
+     +-------------+    +------------+      +---------------+
+
+[Secure Context setup]
+- iommufd BE: uses device fd and iommufd to setup secure context
+              (bind_iommufd, attach_ioas)
+- vfio legacy BE: uses group fd and container fd to setup secure context
+                  (set_container, set_iommu)
+[Device access]
+- iommufd BE: device fd is opened through /dev/vfio/devices/vfioX
+- vfio legacy BE: device fd is retrieved from group fd ioctl
+[DMA Mapping flow]
+- VFIOAddressSpace receives MemoryRegion add/del via MemoryListener
+- VFIO populates DMA map/unmap via the container BEs
+  *) iommufd BE: uses iommufd
+  *) vfio legacy BE: uses container fd
+
+Test done:
+- PCI and Platform device were tested
+- ccw and ap were only compile-tested
+- limited device hotplug test
+- vIOMMU test run for both legacy and iommufd backends (limited tests)
+
+This series was co-developed by Eric Auger and me based on the iommufd exploration
+kernel (https://github.com/luxis1999/iommufd/tree/iommufd-v5.17-rc6) which encompasses:
+- Jason’s IOMMUFD Generic interface series
+  <https://lore.kernel.org/kvm/0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com/>
+- Jason's vfio ccw life circle cleanup (Eric Farman has renewed it recently)
+  <https://lore.kernel.org/all/0-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com/
+   https://lore.kernel.org/kvm/20220602171948.2790690-1-farman@linux.ibm.com/>
+- Yi's move vfio_device allo/free into vfio core (not pushed to upstream yet)
+- Yi's vfio device cdev (introduces device-centric interface, not pushed to upstream yet)
+- Nicolin's vfio iommufd compat code (not pushed to upstream yet)
+
+This QEMU series can be fount at https://github.com/luxis1999/qemu/tree/qemu-for-5.17-rc6-vm-rfcv2.
+
+As iommufd kernel is in the early step (only iommufd generic interface is
+in mailing list), so this series hasn't made the iommufd backend fully on
+par with legacy backend w.r.t. features like:
+- p2p mappings
+- coherency tracking
+- live migration
+- vfio pci device hot reset
+- and etc.
+
+Only vfio-pci device supports iommufd BE, other types of devices still uses legacy BE.
+
+TODOs:
+- Add DMA alias check for iommufd BE (group level)
+- Make pci.c to be BE agnostic. Needs kernel change as well to fix the
+  VFIO_DEVICE_PCI_HOT_RESET gap
+- Cleanup the VFIODevice fields as it's used in both backends
+- Add device fd parameter to vfio-device in case the iommufd option is used
+- Add locks
+- Replace list with g_tree
+- More tests
+
+Change log:
+v2:
+- remove the first three patches of rfcv1
+- add open cdev helper suggested by Jason
+- remove the QOMification of the VFIOContainer and simply use standard ops (David)
+- add "-object iommufd" suggested by Alex
+
+v1: https://lore.kernel.org/qemu-devel/20220414104710.28534-1-yi.l.liu@intel.com/
+
+Thanks,
+Yi & Eric
+
+Eric Auger (10):
+  scripts/update-linux-headers: Add iommufd.h
+  linux-headers: Import latest vfio.h and iommufd.h
+  vfio/container: Introduce vfio_[attach/detach]_device
+  vfio/platform: Use vfio_[attach/detach]_device
+  vfio/ap: Use vfio_[attach/detach]_device
+  vfio/ccw: Use vfio_[attach/detach]_device
+  vfio/container-base: Introduce [attach/detach]_device container
+    callbacks
+  vfio/container-base: Introduce VFIOContainer reset callback
+  backends/iommufd: Introduce the iommufd object
+  vfio/as: Allow the selection of a given iommu backend
+
+Yi Liu (5):
+  vfio/common: Split common.c into common.c, container.c and as.c
+  vfio: Add base container
+  util/char_dev: Add open_cdev()
+  vfio/iommufd: Implement the iommufd backend
+  vfio/iommufd: Add IOAS_COPY_DMA support
+
+ MAINTAINERS                           |   13 +
+ backends/Kconfig                      |    5 +
+ backends/iommufd.c                    |  265 +++
+ backends/meson.build                  |    1 +
+ backends/trace-events                 |   12 +
+ hw/vfio/ap.c                          |   62 +-
+ hw/vfio/as.c                          | 1035 +++++++++++
+ hw/vfio/ccw.c                         |  118 +-
+ hw/vfio/common.c                      | 2365 ++-----------------------
+ hw/vfio/container-base.c              |  172 ++
+ hw/vfio/container.c                   | 1298 ++++++++++++++
+ hw/vfio/iommufd.c                     |  546 ++++++
+ hw/vfio/meson.build                   |    6 +
+ hw/vfio/migration.c                   |    5 +-
+ hw/vfio/pci.c                         |   83 +-
+ hw/vfio/platform.c                    |   42 +-
+ hw/vfio/spapr.c                       |   22 +-
+ hw/vfio/trace-events                  |   11 +
+ include/hw/vfio/vfio-common.h         |  101 +-
+ include/hw/vfio/vfio-container-base.h |  148 ++
+ include/qemu/char_dev.h               |   16 +
+ include/sysemu/iommufd.h              |   47 +
+ linux-headers/linux/iommufd.h         |  223 +++
+ linux-headers/linux/vfio.h            |   84 +
+ qapi/qom.json                         |   16 +-
+ qemu-options.hx                       |   12 +
+ scripts/update-linux-headers.sh       |    2 +-
+ util/chardev_open.c                   |   58 +
+ util/meson.build                      |    1 +
+ 29 files changed, 4291 insertions(+), 2478 deletions(-)
+ create mode 100644 backends/iommufd.c
+ create mode 100644 hw/vfio/as.c
+ create mode 100644 hw/vfio/container-base.c
+ create mode 100644 hw/vfio/container.c
+ create mode 100644 hw/vfio/iommufd.c
+ create mode 100644 include/hw/vfio/vfio-container-base.h
+ create mode 100644 include/qemu/char_dev.h
+ create mode 100644 include/sysemu/iommufd.h
+ create mode 100644 linux-headers/linux/iommufd.h
+ create mode 100644 util/chardev_open.c
+
+Base commit: 9b1f58854959c5a9bdb347e3e04c252ab7fc9ef5
+
 -- 
-2.33.1
+2.27.0
 
