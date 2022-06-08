@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BAC2544026
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 01:53:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE23E544027
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 01:53:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235386AbiFHXvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 19:51:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
+        id S235288AbiFHXvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 19:51:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235223AbiFHXvB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 19:51:01 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 918DF17CC8A
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 16:52:52 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id f9-20020a636a09000000b003c61848e622so10854473pgc.0
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 16:52:52 -0700 (PDT)
+        with ESMTP id S235215AbiFHXvE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 19:51:04 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1498E170657
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 16:52:54 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id y1-20020a17090a390100b001e66bb0fcefso13189385pjb.0
+        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 16:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=J7R1gSo+oUH/FTeZkdyYxLvII4iVrvsMjS0mB5HmK2A=;
-        b=J1wuA4A4vAQX0vW+3XjgludLEUgCY58xEYEryhLkGRvjVT3y/W0pxzlU/M/LTdZk3R
-         K+gOB3NliyXVn7UTNnxPu2dRMSXfL9kP+H9ZsFa8tzMk36pw0LCdC/N7bsuYsLDbv7Iz
-         OErKNARgGLlJzghAOpdKF4D41mcFlgT+UvAf3/De0XkdkaHordk49iJbzOeMSe8U2eEN
-         GBM/QMsarOgmCd6l2yg62BInXXZoChEgpPg/Cqh4EZJ6KZlcCAuFm0VlzpoFe/4Ml9E1
-         /Mpt+pZA2vAPPuh4LqJcGqG1ksJBXdD/xSs81zbvnNQWXTEu2AM1PnscsyErDpO2cOrj
-         OZ5g==
+        bh=7LTxZeQDL+PveA5Flm8SP++va5dkWw0A5QbQb5Z5aLg=;
+        b=sgx4UGl8T6yyy/hQhoqkFGwZRFbwSuDe1Fb3+5VAmE72F3Gs/PfjVQ8iERBcbuY8wO
+         ToI/pDLJ3+x8oC+KGBhnpVY88Wj4xuEKMI41akGhfxu7YBxDyzXrYU3m/JTfixHGbqTV
+         S8Y2LPZRMHgI17+ET+RxPS7a1Ki01hYNuBXd2PBa5HZsVPB0IlhJJ+ZU/FzwnB/kNTcc
+         EnGHXThAnOV1fxyrzwGoNEMixrlozPsnh0IDU6C2DprTkYJma4557nYLjAHLBxZOrMkY
+         TaczqR50g0uiTq+g+lVaYmIbvefJH4BcMhNK7zNJRKJSPNBh/wxrwNm9Y4XvO+WejuzD
+         zEcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=J7R1gSo+oUH/FTeZkdyYxLvII4iVrvsMjS0mB5HmK2A=;
-        b=sDNjWD1kcPxaXniwlyCD+JHrvostUda/4qrZ+bgYbLRxrfisEV4dW3cQLBiMKDf97l
-         k2A2rR65i+B0GNi1DW+c6wfOXoDYR6w764ASS1ec9YVaIGR/g96A4kqlB7vmhIE6CfLU
-         dLVGfmLgTcZWrZzukswWPfm0c2FvdKOSy7luF1NqWvTPVa6Et2MgY5zQJBS1abc7eRqp
-         Go0vDTsjtRuRe1BZrNMa06qhaUmv2FrgRV7ag2TLkpblU6jtH2pEsH5afRSvKNyQxelY
-         2Xr/BjLH7yraK94ByQQ+m9+Fv0iXO8etUtGWMFXx5QfxKVgj4lzniltAzVPVrGCvkmfb
-         gPDA==
-X-Gm-Message-State: AOAM531VRvXoYSCQFW4M82e76Tik+QL0PVcX+ddhheaChAyVFnO3bqvp
-        HScg+cmS0IiagAdu9WrMnwSgR6uEbLE=
-X-Google-Smtp-Source: ABdhPJwCJg73RZSBczqpeg3KJ2bnQfkVq7vc0s7VvpgnwBBZ6ufPli5RNMgM71chOmIOlf65aAOnLw5s3yc=
+        bh=7LTxZeQDL+PveA5Flm8SP++va5dkWw0A5QbQb5Z5aLg=;
+        b=Dju/BbcqV8DsCkgNUmyZ1HGGX+nwAxE4heznZkmrWSX7ToRDBdHXn3yl8dkoIO3EET
+         LwwkoqwF9v/lAzi95cuCuH2VxySsoGkGZjp/DRPOw9UBtx2NLNURQgILlHeZLJVGNMNI
+         fX/PgjkdRp1iVX9QEc47lcu80KJcAYCD1YTnLiYBURyfQIdKeuLbT2gqn7It5wnEX3ve
+         iwwYXLR933hlWmpbz4SvsjjREJDwxBr7zsb9w8Btdn8aSanDez+z4OTVX6LFCVRqoE77
+         6N8ufBaANblnpzRMatYdKekkBBNptYYD2q3dQbGnAUO1LM+h/C4eFlva7hQj1aeCM3hA
+         QqUg==
+X-Gm-Message-State: AOAM530khfEfcN2jm4E9aXx1/cfhTTjwqk9aaSZf98JhCFwTvoS4mON0
+        SCuOAWGaaxYefzAuoEN0il16U4jjbGo=
+X-Google-Smtp-Source: ABdhPJzsfm6JupJq9uvR3g68ekQSya0a4tio7PthHgyUyeHsafhd5/ckMJWpDs7zyJjo9ZElIKo9V/3HBU0=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:aa7:9217:0:b0:518:367d:fa85 with SMTP id
- 23-20020aa79217000000b00518367dfa85mr103397587pfo.9.1654732371967; Wed, 08
- Jun 2022 16:52:51 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1c02:b0:1e3:4b6d:4269 with SMTP id
+ oc2-20020a17090b1c0200b001e34b6d4269mr469077pjb.57.1654732373607; Wed, 08 Jun
+ 2022 16:52:53 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  8 Jun 2022 23:52:34 +0000
+Date:   Wed,  8 Jun 2022 23:52:35 +0000
 In-Reply-To: <20220608235238.3881916-1-seanjc@google.com>
-Message-Id: <20220608235238.3881916-7-seanjc@google.com>
+Message-Id: <20220608235238.3881916-8-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220608235238.3881916-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [kvm-unit-tests PATCH 06/10] nVMX: Check the results of VMXON/VMXOFF
- in feature control test
+Subject: [kvm-unit-tests PATCH 07/10] nVMX: Check result of VMXON in INIT/SIPI tests
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -68,30 +67,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assert that VMXON and VMXOFF succeed in the feature control test.
-Despite a lack of "safe" or underscores, vmx_on() and vmx_off() do not
-guarantee success.
+Assert that VMXON succeeds in the INIT/SIPI tests, _vmx_on() doesn't
+check the result, i.e. doesn't guarantee success.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ x86/vmx_tests.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 65305238..8475bf3b 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -1401,8 +1401,8 @@ static void init_bsp_vmx(void)
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 1b277cfb..4c963b96 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -9695,7 +9695,7 @@ static void init_signal_test_thread(void *data)
+ 	u64 *ap_vmxon_region = alloc_page();
+ 	enable_vmx();
+ 	init_vmx(ap_vmxon_region);
+-	_vmx_on(ap_vmxon_region);
++	TEST_ASSERT(!_vmx_on(ap_vmxon_region));
  
- static void do_vmxon_off(void *data)
- {
--	vmx_on();
--	vmx_off();
-+	TEST_ASSERT(!vmx_on());
-+	TEST_ASSERT(!vmx_off());
- }
+ 	/* Signal CPU have entered VMX operation */
+ 	vmx_set_test_stage(1);
+@@ -9743,7 +9743,7 @@ static void init_signal_test_thread(void *data)
+ 	while (vmx_get_test_stage() != 8)
+ 		;
+ 	/* Enter VMX operation (i.e. exec VMXON) */
+-	_vmx_on(ap_vmxon_region);
++	TEST_ASSERT(!_vmx_on(ap_vmxon_region));
+ 	/* Signal to BSP we are in VMX operation */
+ 	vmx_set_test_stage(9);
  
- static void do_write_feature_control(void *data)
+@@ -9920,7 +9920,7 @@ static void sipi_test_ap_thread(void *data)
+ 	ap_vmxon_region = alloc_page();
+ 	enable_vmx();
+ 	init_vmx(ap_vmxon_region);
+-	_vmx_on(ap_vmxon_region);
++	TEST_ASSERT(!_vmx_on(ap_vmxon_region));
+ 	init_vmcs(&ap_vmcs);
+ 	make_vmcs_current(ap_vmcs);
+ 
 -- 
 2.36.1.255.ge46751e96f-goog
 
