@@ -2,93 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60B6D543792
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 17:38:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1E045437D2
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 17:46:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244404AbiFHPiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 11:38:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52304 "EHLO
+        id S244633AbiFHPpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 11:45:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244098AbiFHPh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 11:37:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4CC43144BD1
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 08:37:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654702675;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jxVgCrklswpT7+9OTco4k57y0oY6Ie2TEna3/n27Pv0=;
-        b=EfWgQuBJRmd85MPGOna8ERjDS16DgomFKJs3YZWeZw0KYcQnUD22gKQQi6MeZeBBlNaTBc
-        fwy9kIG9APSFDUt8/AJbIxOAcLhpasFWIwCOBpabFk9CQ9/yC/jpHTaw9tQR50H6w5+BFe
-        uISe3gMyY4+23q5xCys5+dMfYHFKrZE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-1N_yXshMOpCapjyVnQXy2A-1; Wed, 08 Jun 2022 11:37:51 -0400
-X-MC-Unique: 1N_yXshMOpCapjyVnQXy2A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S244597AbiFHPpH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 11:45:07 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC32E1090;
+        Wed,  8 Jun 2022 08:45:06 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A7D3A801755;
-        Wed,  8 Jun 2022 15:37:49 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F2111121314;
-        Wed,  8 Jun 2022 15:37:49 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 6FB4818003AA; Wed,  8 Jun 2022 17:37:47 +0200 (CEST)
-Date:   Wed, 8 Jun 2022 17:37:47 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Thomas Zimmermann <tzimmermann@suse.de>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        airlied@linux.ie, daniel@ffwll.ch, kvm@vger.kernel.org,
-        Laszlo Ersek <lersek@redhat.com>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
-Message-ID: <20220608153747.5d5h446vzbteqzwb@sirius.home.kraxel.org>
-References: <165453797543.3592816.6381793341352595461.stgit@omen>
- <165453800875.3592816.12944011921352366695.stgit@omen>
- <0c45183c-cdb8-4578-e346-bc4855be038f@suse.de>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 57B2B1F91D;
+        Wed,  8 Jun 2022 15:45:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1654703105; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tu0OsjwZa4ludPA2tEG1vc59ARA2J6I+UUbwvpkgDZk=;
+        b=tNSyCECuRzHYHJR8lJlXwRk7JkJpmfPk/TzfmwPcSZUX3Lv3H3lAC436XtYmRpOzCTqrfV
+        HTgTER8aFgp44Q1zP1ptLJVxXGOc6gYI0Ci4eTYHB9WZsg/Y2ic4AxaU105FXNvU0vHo2b
+        fvbkK7gcFyHWQ/JrVzlBnhL85ZWJ1c4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1654703105;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tu0OsjwZa4ludPA2tEG1vc59ARA2J6I+UUbwvpkgDZk=;
+        b=5AJ2uA3fTrMStKdHoVjBCvvLp+nQHPjUtIw7c6uoujcEnEShTH58YeCwX1YD+ZKsATrLq6
+        eaP+Az5Z9+ymlzBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1749713AD9;
+        Wed,  8 Jun 2022 15:45:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id jQlvBAHEoGLlGgAAMHmgww
+        (envelope-from <vkarasulli@suse.de>); Wed, 08 Jun 2022 15:45:05 +0000
+Date:   Wed, 8 Jun 2022 17:45:03 +0200
+From:   Vasant Karasulli <vkarasulli@suse.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, jroedel@suse.de, kvm@vger.kernel.org,
+        bp@alien8.de, x86@kernel.org, thomas.lendacky@amd.com
+Subject: Re: [PATCH v6 2/4] x86/tests: Add tests for AMD SEV-ES #VC handling
+ Add KUnit based tests to validate Linux's VC handling for instructions cpuid
+ and wbinvd. These tests: 1. install a kretprobe on the #VC handler
+ (sev_es_ghcb_hv_call, to access GHCB before/after the resulting VMGEXIT). 2.
+ trigger an NAE by executing either cpuid or wbinvd. 3. check that the
+ kretprobe was hit with the right exit_code available in GHCB.
+Message-ID: <YqDD/0IWnoMXEAWg@vasant-suse>
+References: <20220318094532.7023-1-vkarasulli@suse.de>
+ <20220318094532.7023-3-vkarasulli@suse.de>
+ <Ykzrb1uyPZ2AKWos@google.com>
+ <YqBivtMl74FGmz7r@vasant-suse>
+ <YqCzy5Kngj+OgD2h@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0c45183c-cdb8-4578-e346-bc4855be038f@suse.de>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <YqCzy5Kngj+OgD2h@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
+On Mi 08-06-22 14:35:55, Sean Christopherson wrote:
+> On Wed, Jun 08, 2022, Vasant Karasulli wrote:
+> > On Mi 06-04-22 01:22:55, Sean Christopherson wrote:
+> > > > +	if (ret) {
+> > > > +		kunit_info(test, "Could not register kretprobe. Skipping.");
+> > > > +		goto out;
+> > > > +	}
+> > > > +
+> > > > +	test->priv = kunit_kzalloc(test, sizeof(u64), GFP_KERNEL);
+> > >
+> > > Allocating 8 bytes and storing the pointer an 8-byte field is rather pointless :-)
+> > >
+> >
+> > Actually it's necessary to allocate memory to test->priv before using according to
+> > https://www.kernel.org/doc/html/latest/dev-tools/kunit/tips.html
+>
+> If priv points at structure of some form, sure, but you're storing a simple value.
 
-> You shouldn't have to copy any of the implementation of the aperture
-> helpers.
+Yes, I agree. The reason it was done this way I guess is that type of priv is a
+void pointer and storing a u64 value results in a compiler warning:
+cast from pointer to integer of different size [-Wpointer-to-int-cast].
 
-That comes from the aperture helpers being part of drm ...
-
-> For patch 2, the most trivial workaround is to instanciate struct drm_driver
-> here and set the name field to 'vdev->vdev.ops->name'. In the longer term,
-> the aperture helpers will be moved out of DRM and into a more prominent
-> location. That workaround will be cleaned up then.
-
-... but if the long-term plan is to clean that up properly anyway I
-don't see the point in bike shedding too much on the details of some
-temporary solution.
-
-> Alternatively, drm_aperture_remove_conflicting_pci_framebuffers() could be
-> changed to accept the name string as second argument, but that's quite a bit
-> of churn within the DRM code.
-
-Also pointless churn because you'll have the very same churn again when
-moving the aperture helpers out of drm.
-
-take care,
-  Gerd
+Thanks,
+Vasant Karasulli
+Kernel generalist
+www.suse.com<http://www.suse.com>
+[https://www.suse.com/assets/img/social-platforms-suse-logo.png]<http://www.suse.com/>
+SUSE - Open Source Solutions for Enterprise Servers & Cloud<http://www.suse.com/>
+Modernize your infrastructure with SUSE Linux Enterprise servers, cloud technology for IaaS, and SUSE's software-defined storage.
+www.suse.com
 
