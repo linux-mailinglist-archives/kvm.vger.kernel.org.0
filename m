@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04782543053
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 14:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DA0054304A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 14:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239032AbiFHMaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 08:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
+        id S239035AbiFHMaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 08:30:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238751AbiFHMaD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 08:30:03 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA03410D5E8;
-        Wed,  8 Jun 2022 05:30:02 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258Br8E2017785;
+        with ESMTP id S239010AbiFHMaF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 08:30:05 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F092504E5;
+        Wed,  8 Jun 2022 05:30:03 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258CGBXk025476;
         Wed, 8 Jun 2022 12:30:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=q0ToaJvSdgcgYy1Z//haNbvuiFuMxkZ5+y2ltatOdpA=;
- b=XfiJR6+4MzRUwCfYNFK9cooCSjPr8svN5KVz1EvIFX9w+gaUKRAJCNd1SAqg0qXkd+py
- KZoUUnOSkcAwRftj1N0ycJb5l2UCwKX9TraJUhtqV+EPYZIIZGgg0MeWrGqQng7Ju2gK
- krB+VScvj0a8Tqqf2r6M2Thg8ThpRpH27niD0x2A3y8zI+q/4lXhhcitbqlhn/SR7J4Z
- 1lt4pLA13FSAiIZBRqUhbbztRHfDJb4weR/8l8YAl4qKt0Jk/V/y2364/U86IBYD3tj0
- vPuOkyN8dbbzaybkKS7XMYjqQGmb4R3ONYhXhmt0KhVEYC5VFhbEqhYK70EWXiFeze6z 8g== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=H7Qi+r8Ek3A58uLzALPtqLiYNtGxP7APPCPrvMe5kSE=;
+ b=oekmGoYCdKtNFTAymB8S82qcrmE/VGwzJslfBsd+ZR7KI9+xdrumvlP+V/02aNA/9heL
+ +EHPNQg6xbrJ7/wiU0zJfOyi2I7H2YKeJxukyQ3/2Cmi89J1iDGORgLnHbXCxH677qxb
+ WblTvlqzgMh6iYF+pYJ5HyIuh1/WtL/6obVWXXLf6Vjp42IotN2TDgNFepH1GohYRd3w
+ 4YB3MDSJYvx+4LAAgFWhsOAiLtBy9oAwzuh2lMrNL/DJygrLOczSLPxbkNIDFA0C/iIO
+ 8bk1NkrScodm4DS3Iho+l+P4EhASKznbHFXcnRL4jAR54ary586kHbV7glFbJwIME+rl Vw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjrj6m7t2-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjum989ek-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 12:30:01 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258CEvtA009261;
+        Wed, 08 Jun 2022 12:30:02 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258CH0RS032239;
         Wed, 8 Jun 2022 12:30:01 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjrj6m7rr-1
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjum989d9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 08 Jun 2022 12:30:01 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258CK0AN030470;
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258CLtox002649;
         Wed, 8 Jun 2022 12:29:59 GMT
 Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 3gfy19c2rb-1
+        by ppma06ams.nl.ibm.com with ESMTP id 3gfxnhw7wt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 08 Jun 2022 12:29:59 +0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258CTuEL19726814
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258CTuB719726816
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 8 Jun 2022 12:29:56 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 155585204F;
+        by IMSVA (Postfix) with ESMTP id 5E3F15204F;
         Wed,  8 Jun 2022 12:29:56 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D10CA52051;
-        Wed,  8 Jun 2022 12:29:55 +0000 (GMT)
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2601F52050;
+        Wed,  8 Jun 2022 12:29:56 +0000 (GMT)
 From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 To:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
@@ -60,21 +61,23 @@ To:     Thomas Huth <thuth@redhat.com>,
 Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 0/2] s390x: Avoid gcc 12 warnings
-Date:   Wed,  8 Jun 2022 14:29:51 +0200
-Message-Id: <20220608122953.1051952-1-scgl@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v3 1/2] s390x: Introduce symbol for lowcore and use it
+Date:   Wed,  8 Jun 2022 14:29:52 +0200
+Message-Id: <20220608122953.1051952-2-scgl@linux.ibm.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220608122953.1051952-1-scgl@linux.ibm.com>
+References: <20220608122953.1051952-1-scgl@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: B_dEmeMr2YmX9zfUv4TSX52nviiBVIrC
-X-Proofpoint-GUID: b_QIDeq50y_EterYOiluOyT4WJux1hKK
+X-Proofpoint-GUID: A81H1FDvAedWaaPUEKKnSnTLswOFfIhl
+X-Proofpoint-ORIG-GUID: j8DBgYs2ZU7Z2Y_SVCpIZ5wSHcsrfoGP
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-08_04,2022-06-07_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- bulkscore=0 impostorscore=0 adultscore=0 mlxlogscore=999 malwarescore=0
- phishscore=0 priorityscore=1501 mlxscore=0 spamscore=0 lowpriorityscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ mlxlogscore=999 priorityscore=1501 spamscore=0 clxscore=1015 bulkscore=0
+ malwarescore=0 impostorscore=0 lowpriorityscore=0 adultscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
  definitions=main-2206080049
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -86,40 +89,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-gcc 12 warns if a memory operand to inline asm points to memory in the
-first 4k bytes. However, in our case, these operands are fine, either
-because we actually want to use that memory, or expect and handle the
-resulting exception.
+This gets rid of bunch of pointers pointing to the lowcore used in
+various places and replaces it with a unified way of addressing the
+lowcore.
+The new symbol is not a pointer. While this will lead to worse code
+generation (cannot use register 0 for addressing), that should not
+matter too much for kvm unit tests.
+Since the lowcore is located per definition at address 0, the symbol is
+defined via the linker scripts.
+The symbol also will be used to create pointers that the compiler cannot
+warn about as being outside the bounds of an array.
 
-v2 -> v3
- * extend commit msg
- * pick up r-b
- * use macro instead of pointer to address memory
-
-v1 -> v2
- * replace mechanism, don't use pragmas, instead use an extern symbol so
-   gcc cannot conclude that the pointer is <4k
-
-   This new extern symbol refers to the lowcore. As a result, code
-   generation for lowcore accesses becomes worse.
-
-   Alternatives:
-    * Don't use extern symbol for lowcore, just for problematic pointers
-    * Hide value from gcc via inline asm
-    * Disable the warning globally
-    * Use memory clobber instead of memory output
-      Use address in register input instead of memory input
-          (may require WRITE_ONCE)
-    * Don't use gcc 12.0, with newer versions --param=min-pagesize=0 might
-      avoid the problem
-
-Janis Schoetterl-Glausch (2):
-  s390x: Introduce symbol for lowcore and use it
-  s390x: Fix gcc 12 warning about array bounds
-
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
  lib/s390x/asm/arch_def.h   |  2 ++
  lib/s390x/asm/facility.h   |  4 +--
- lib/s390x/asm/mem.h        |  4 +++
  lib/s390x/css.h            |  2 --
  lib/s390x/css_lib.c        | 12 ++++----
  lib/s390x/fault.c          | 10 +++----
@@ -130,72 +115,684 @@ Janis Schoetterl-Glausch (2):
  s390x/css.c                |  4 +--
  s390x/diag288.c            |  4 +--
  s390x/edat.c               |  5 ++--
- s390x/emulator.c           | 15 +++++-----
+ s390x/emulator.c           | 10 +++----
  s390x/mvpg.c               |  7 ++---
  s390x/sclp.c               |  3 +-
- s390x/skey.c               |  2 +-
  s390x/skrf.c               | 11 +++----
  s390x/smp.c                | 23 +++++++-------
  s390x/snippets/c/spec_ex.c |  5 ++--
- 20 files changed, 83 insertions(+), 96 deletions(-)
+ 18 files changed, 75 insertions(+), 93 deletions(-)
 
-Range-diff against v2:
-1:  412a9962 ! 1:  44b10d41 s390x: Introduce symbol for lowcore and use it
-    @@ Commit message
-         The new symbol is not a pointer. While this will lead to worse code
-         generation (cannot use register 0 for addressing), that should not
-         matter too much for kvm unit tests.
-    +    Since the lowcore is located per definition at address 0, the symbol is
-    +    defined via the linker scripts.
-         The symbol also will be used to create pointers that the compiler cannot
-         warn about as being outside the bounds of an array.
-     
-         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-    +    Reviewed-by: Thomas Huth <thuth@redhat.com>
-     
-      ## lib/s390x/asm/arch_def.h ##
-     @@ lib/s390x/asm/arch_def.h: struct lowcore {
-2:  9b2eeee3 ! 2:  e9e88996 s390x: Fix gcc 12 warning about array bounds
-    @@ lib/s390x/asm/mem.h
-      #define _ASMS390X_MEM_H_
-     +#include <asm/arch_def.h>
-     +
-    -+/* pointer to 0 used to avoid compiler warnings */
-    -+uint8_t *mem_all = (uint8_t *)&lowcore;
-    ++/* create pointer while avoiding compiler warnings */
-    ++#define OPAQUE_PTR(x) ((void *)(((uint64_t)&lowcore) + (x)))
-      
-      #define SKEY_ACC	0xf0
-      #define SKEY_FP		0x08
-    @@ s390x/emulator.c: static __always_inline void __test_cpacf_invalid_parm(unsigned
-      	report_prefix_push("invalid parm address");
-      	expect_pgm_int();
-     -	__cpacf_query(opcode, (void *) -1);
-    -+	__cpacf_query(opcode, (cpacf_mask_t *)&mem_all[-1]);
-    ++	__cpacf_query(opcode, OPAQUE_PTR(-1));
-      	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
-      	report_prefix_pop();
-      }
-    @@ s390x/emulator.c: static __always_inline void __test_cpacf_protected_parm(unsign
-      	expect_pgm_int();
-      	low_prot_enable();
-     -	__cpacf_query(opcode, (void *) 8);
-    -+	__cpacf_query(opcode, (cpacf_mask_t *)&mem_all[8]);
-    ++	__cpacf_query(opcode, OPAQUE_PTR(8));
-      	low_prot_disable();
-      	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-      	report_prefix_pop();
-    @@ s390x/skey.c: static void test_set_prefix(void)
-      	expect_pgm_int();
-      	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-     -	set_prefix_key_1((uint32_t *)2048);
-    -+	set_prefix_key_1((uint32_t *)&mem_all[2048]);
-    ++	set_prefix_key_1(OPAQUE_PTR(2048));
-      	install_page(root, 0, 0);
-      	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-      	report(get_prefix() == old_prefix, "did not set prefix");
-
-base-commit: 2eed0bf1096077144cc3a0dd9974689487f9511a
+diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+index 72553819..78b257b7 100644
+--- a/lib/s390x/asm/arch_def.h
++++ b/lib/s390x/asm/arch_def.h
+@@ -145,6 +145,8 @@ struct lowcore {
+ } __attribute__ ((__packed__));
+ _Static_assert(sizeof(struct lowcore) == 0x1900, "Lowcore size");
+ 
++extern struct lowcore lowcore;
++
+ #define PGM_INT_CODE_OPERATION			0x01
+ #define PGM_INT_CODE_PRIVILEGED_OPERATION	0x02
+ #define PGM_INT_CODE_EXECUTE			0x03
+diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
+index ef0fd037..49380203 100644
+--- a/lib/s390x/asm/facility.h
++++ b/lib/s390x/asm/facility.h
+@@ -36,10 +36,8 @@ static inline void stfle(uint64_t *fac, unsigned int nb_doublewords)
+ 
+ static inline void setup_facilities(void)
+ {
+-	struct lowcore *lc = NULL;
+-
+ 	stfl();
+-	memcpy(stfl_doublewords, &lc->stfl, sizeof(lc->stfl));
++	memcpy(stfl_doublewords, &lowcore.stfl, sizeof(lowcore.stfl));
+ 	if (test_facility(7))
+ 		stfle(stfl_doublewords, NB_STFL_DOUBLEWORDS);
+ }
+diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+index a6a68577..0a19324b 100644
+--- a/lib/s390x/css.h
++++ b/lib/s390x/css.h
+@@ -9,8 +9,6 @@
+ #ifndef _S390X_CSS_H_
+ #define _S390X_CSS_H_
+ 
+-#define lowcore_ptr ((struct lowcore *)0x0)
+-
+ /* subchannel ID bit 16 must always be one */
+ #define SCHID_ONE	0x00010000
+ 
+diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+index a9f5097f..b4d1f086 100644
+--- a/lib/s390x/css_lib.c
++++ b/lib/s390x/css_lib.c
+@@ -357,11 +357,11 @@ void css_irq_io(void)
+ 	int sid;
+ 
+ 	report_prefix_push("Interrupt");
+-	sid = lowcore_ptr->subsys_id_word;
++	sid = lowcore.subsys_id_word;
+ 	/* Lowlevel set the SID as interrupt parameter. */
+-	if (lowcore_ptr->io_int_param != sid) {
++	if (lowcore.io_int_param != sid) {
+ 		report_fail("io_int_param: %x differs from subsys_id_word: %x",
+-			    lowcore_ptr->io_int_param, sid);
++			    lowcore.io_int_param, sid);
+ 		goto pop;
+ 	}
+ 	report_prefix_pop();
+@@ -387,7 +387,7 @@ void css_irq_io(void)
+ 	}
+ pop:
+ 	report_prefix_pop();
+-	lowcore_ptr->io_old_psw.mask &= ~PSW_MASK_WAIT;
++	lowcore.io_old_psw.mask &= ~PSW_MASK_WAIT;
+ }
+ 
+ int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
+@@ -432,9 +432,9 @@ int wait_and_check_io_completion(int schid)
+ 
+ 	report_prefix_push("check I/O completion");
+ 
+-	if (lowcore_ptr->io_int_param != schid) {
++	if (lowcore.io_int_param != schid) {
+ 		report_fail("interrupt parameter: expected %08x got %08x",
+-			    schid, lowcore_ptr->io_int_param);
++			    schid, lowcore.io_int_param);
+ 		ret = -1;
+ 		goto end;
+ 	}
+diff --git a/lib/s390x/fault.c b/lib/s390x/fault.c
+index d3ef00e4..efa62fcb 100644
+--- a/lib/s390x/fault.c
++++ b/lib/s390x/fault.c
+@@ -13,8 +13,6 @@
+ #include <asm/page.h>
+ #include <fault.h>
+ 
+-static struct lowcore *lc = (struct lowcore *)0x0;
+-
+ /* Decodes the protection exceptions we'll most likely see */
+ static void print_decode_pgm_prot(uint64_t teid)
+ {
+@@ -37,7 +35,7 @@ static void print_decode_pgm_prot(uint64_t teid)
+ void print_decode_teid(uint64_t teid)
+ {
+ 	int asce_id = teid & 3;
+-	bool dat = lc->pgm_old_psw.mask & PSW_MASK_DAT;
++	bool dat = lowcore.pgm_old_psw.mask & PSW_MASK_DAT;
+ 
+ 	printf("Memory exception information:\n");
+ 	printf("DAT: %s\n", dat ? "on" : "off");
+@@ -58,15 +56,15 @@ void print_decode_teid(uint64_t teid)
+ 		break;
+ 	}
+ 
+-	if (lc->pgm_int_code == PGM_INT_CODE_PROTECTION)
++	if (lowcore.pgm_int_code == PGM_INT_CODE_PROTECTION)
+ 		print_decode_pgm_prot(teid);
+ 
+ 	/*
+ 	 * If teid bit 61 is off for these two exception the reported
+ 	 * address is unpredictable.
+ 	 */
+-	if ((lc->pgm_int_code == PGM_INT_CODE_SECURE_STOR_ACCESS ||
+-	     lc->pgm_int_code == PGM_INT_CODE_SECURE_STOR_VIOLATION) &&
++	if ((lowcore.pgm_int_code == PGM_INT_CODE_SECURE_STOR_ACCESS ||
++	     lowcore.pgm_int_code == PGM_INT_CODE_SECURE_STOR_VIOLATION) &&
+ 	    !test_bit_inv(61, &teid)) {
+ 		printf("Address: %lx, unpredictable\n ", teid & PAGE_MASK);
+ 		return;
+diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+index 27d3b767..6da20c44 100644
+--- a/lib/s390x/interrupt.c
++++ b/lib/s390x/interrupt.c
+@@ -18,20 +18,19 @@
+ static bool pgm_int_expected;
+ static bool ext_int_expected;
+ static void (*pgm_cleanup_func)(void);
+-static struct lowcore *lc;
+ 
+ void expect_pgm_int(void)
+ {
+ 	pgm_int_expected = true;
+-	lc->pgm_int_code = 0;
+-	lc->trans_exc_id = 0;
++	lowcore.pgm_int_code = 0;
++	lowcore.trans_exc_id = 0;
+ 	mb();
+ }
+ 
+ void expect_ext_int(void)
+ {
+ 	ext_int_expected = true;
+-	lc->ext_int_code = 0;
++	lowcore.ext_int_code = 0;
+ 	mb();
+ }
+ 
+@@ -40,9 +39,9 @@ uint16_t clear_pgm_int(void)
+ 	uint16_t code;
+ 
+ 	mb();
+-	code = lc->pgm_int_code;
+-	lc->pgm_int_code = 0;
+-	lc->trans_exc_id = 0;
++	code = lowcore.pgm_int_code;
++	lowcore.pgm_int_code = 0;
++	lowcore.trans_exc_id = 0;
+ 	pgm_int_expected = false;
+ 	return code;
+ }
+@@ -50,9 +49,9 @@ uint16_t clear_pgm_int(void)
+ void check_pgm_int_code(uint16_t code)
+ {
+ 	mb();
+-	report(code == lc->pgm_int_code,
++	report(code == lowcore.pgm_int_code,
+ 	       "Program interrupt: expected(%d) == received(%d)", code,
+-	       lc->pgm_int_code);
++	       lowcore.pgm_int_code);
+ }
+ 
+ void register_pgm_cleanup_func(void (*f)(void))
+@@ -63,29 +62,29 @@ void register_pgm_cleanup_func(void (*f)(void))
+ static void fixup_pgm_int(struct stack_frame_int *stack)
+ {
+ 	/* If we have an error on SIE we directly move to sie_exit */
+-	if (lc->pgm_old_psw.addr >= (uint64_t)&sie_entry &&
+-	    lc->pgm_old_psw.addr <= (uint64_t)&sie_exit) {
+-		lc->pgm_old_psw.addr = (uint64_t)&sie_exit;
++	if (lowcore.pgm_old_psw.addr >= (uint64_t)&sie_entry &&
++	    lowcore.pgm_old_psw.addr <= (uint64_t)&sie_exit) {
++		lowcore.pgm_old_psw.addr = (uint64_t)&sie_exit;
+ 	}
+ 
+-	switch (lc->pgm_int_code) {
++	switch (lowcore.pgm_int_code) {
+ 	case PGM_INT_CODE_PRIVILEGED_OPERATION:
+ 		/* Normal operation is in supervisor state, so this exception
+ 		 * was produced intentionally and we should return to the
+ 		 * supervisor state.
+ 		 */
+-		lc->pgm_old_psw.mask &= ~PSW_MASK_PSTATE;
++		lowcore.pgm_old_psw.mask &= ~PSW_MASK_PSTATE;
+ 		break;
+ 	case PGM_INT_CODE_PROTECTION:
+ 		/* Handling for iep.c test case. */
+-		if (prot_is_iep(lc->trans_exc_id))
++		if (prot_is_iep(lowcore.trans_exc_id))
+ 			/*
+ 			 * We branched to the instruction that caused
+ 			 * the exception so we can use the return
+ 			 * address in GR14 to jump back and continue
+ 			 * executing test code.
+ 			 */
+-			lc->pgm_old_psw.addr = stack->grs0[12];
++			lowcore.pgm_old_psw.addr = stack->grs0[12];
+ 		break;
+ 	case PGM_INT_CODE_SEGMENT_TRANSLATION:
+ 	case PGM_INT_CODE_PAGE_TRANSLATION:
+@@ -122,14 +121,14 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
+ 		/* The interrupt was nullified, the old PSW points at the
+ 		 * responsible instruction. Forward the PSW so we don't loop.
+ 		 */
+-		lc->pgm_old_psw.addr += lc->pgm_int_id;
++		lowcore.pgm_old_psw.addr += lowcore.pgm_int_id;
+ 	}
+ 	/* suppressed/terminated/completed point already at the next address */
+ }
+ 
+ static void print_storage_exception_information(void)
+ {
+-	switch (lc->pgm_int_code) {
++	switch (lowcore.pgm_int_code) {
+ 	case PGM_INT_CODE_PROTECTION:
+ 	case PGM_INT_CODE_PAGE_TRANSLATION:
+ 	case PGM_INT_CODE_SEGMENT_TRANSLATION:
+@@ -140,7 +139,7 @@ static void print_storage_exception_information(void)
+ 	case PGM_INT_CODE_SECURE_STOR_ACCESS:
+ 	case PGM_INT_CODE_NON_SECURE_STOR_ACCESS:
+ 	case PGM_INT_CODE_SECURE_STOR_VIOLATION:
+-		print_decode_teid(lc->trans_exc_id);
++		print_decode_teid(lowcore.trans_exc_id);
+ 		break;
+ 	}
+ }
+@@ -165,13 +164,13 @@ static void print_pgm_info(struct stack_frame_int *stack)
+ {
+ 	bool in_sie;
+ 
+-	in_sie = (lc->pgm_old_psw.addr >= (uintptr_t)sie_entry &&
+-		  lc->pgm_old_psw.addr <= (uintptr_t)sie_exit);
++	in_sie = (lowcore.pgm_old_psw.addr >= (uintptr_t)sie_entry &&
++		  lowcore.pgm_old_psw.addr <= (uintptr_t)sie_exit);
+ 
+ 	printf("\n");
+ 	printf("Unexpected program interrupt %s: %#x on cpu %d at %#lx, ilen %d\n",
+ 	       in_sie ? "in SIE" : "",
+-	       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr, lc->pgm_int_id);
++	       lowcore.pgm_int_code, stap(), lowcore.pgm_old_psw.addr, lowcore.pgm_int_id);
+ 	print_int_regs(stack);
+ 	dump_stack();
+ 
+@@ -201,13 +200,13 @@ void handle_pgm_int(struct stack_frame_int *stack)
+ void handle_ext_int(struct stack_frame_int *stack)
+ {
+ 	if (!ext_int_expected &&
+-	    lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
++	    lowcore.ext_int_code != EXT_IRQ_SERVICE_SIG) {
+ 		report_abort("Unexpected external call interrupt (code %#x): on cpu %d at %#lx",
+-			     lc->ext_int_code, stap(), lc->ext_old_psw.addr);
++			     lowcore.ext_int_code, stap(), lowcore.ext_old_psw.addr);
+ 		return;
+ 	}
+ 
+-	if (lc->ext_int_code == EXT_IRQ_SERVICE_SIG) {
++	if (lowcore.ext_int_code == EXT_IRQ_SERVICE_SIG) {
+ 		stack->crs[0] &= ~(1UL << 9);
+ 		sclp_handle_ext();
+ 	} else {
+@@ -215,13 +214,13 @@ void handle_ext_int(struct stack_frame_int *stack)
+ 	}
+ 
+ 	if (!(stack->crs[0] & CR0_EXTM_MASK))
+-		lc->ext_old_psw.mask &= ~PSW_MASK_EXT;
++		lowcore.ext_old_psw.mask &= ~PSW_MASK_EXT;
+ }
+ 
+ void handle_mcck_int(void)
+ {
+ 	report_abort("Unexpected machine check interrupt: on cpu %d at %#lx",
+-		     stap(), lc->mcck_old_psw.addr);
++		     stap(), lowcore.mcck_old_psw.addr);
+ }
+ 
+ static void (*io_int_func)(void);
+@@ -232,7 +231,7 @@ void handle_io_int(void)
+ 		return io_int_func();
+ 
+ 	report_abort("Unexpected io interrupt: on cpu %d at %#lx",
+-		     stap(), lc->io_old_psw.addr);
++		     stap(), lowcore.io_old_psw.addr);
+ }
+ 
+ int register_io_int_func(void (*f)(void))
+@@ -253,14 +252,14 @@ int unregister_io_int_func(void (*f)(void))
+ 
+ void handle_svc_int(void)
+ {
+-	uint16_t code = lc->svc_int_code;
++	uint16_t code = lowcore.svc_int_code;
+ 
+ 	switch (code) {
+ 	case SVC_LEAVE_PSTATE:
+-		lc->svc_old_psw.mask &= ~PSW_MASK_PSTATE;
++		lowcore.svc_old_psw.mask &= ~PSW_MASK_PSTATE;
+ 		break;
+ 	default:
+ 		report_abort("Unexpected supervisor call interrupt: code %#x on cpu %d at %#lx",
+-			      code, stap(), lc->svc_old_psw.addr);
++			      code, stap(), lowcore.svc_old_psw.addr);
+ 	}
+ }
+diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
+index 6f9e6502..c9f8754c 100644
+--- a/lib/s390x/mmu.c
++++ b/lib/s390x/mmu.c
+@@ -43,7 +43,6 @@ void configure_dat(int enable)
+ 
+ static void mmu_enable(pgd_t *pgtable)
+ {
+-	struct lowcore *lc = NULL;
+ 	const uint64_t asce = __pa(pgtable) | ASCE_DT_REGION1 |
+ 			      REGION_TABLE_LENGTH;
+ 
+@@ -55,7 +54,7 @@ static void mmu_enable(pgd_t *pgtable)
+ 	configure_dat(1);
+ 
+ 	/* we can now also use DAT unconditionally in our PGM handler */
+-	lc->pgm_new_psw.mask |= PSW_MASK_DAT;
++	lowcore.pgm_new_psw.mask |= PSW_MASK_DAT;
+ }
+ 
+ /*
+diff --git a/s390x/flat.lds b/s390x/flat.lds
+index 86dffacd..de9da1a8 100644
+--- a/s390x/flat.lds
++++ b/s390x/flat.lds
+@@ -7,6 +7,7 @@ SECTIONS
+ 		 * address 0x10000 (cstart64.S .init).
+ 		 */
+ 		. = 0;
++		lowcore = .;
+ 		 LONG(0x00080000)
+ 		 LONG(0x80010000)
+ 		 /* Restart new PSW for booting via PSW restart. */
+diff --git a/s390x/snippets/c/flat.lds b/s390x/snippets/c/flat.lds
+index 59974b38..260ab1c4 100644
+--- a/s390x/snippets/c/flat.lds
++++ b/s390x/snippets/c/flat.lds
+@@ -7,6 +7,7 @@ SECTIONS
+ 		 * address 0x4000 (cstart.S .init).
+ 		 */
+ 		. = 0;
++		lowcore = .;
+ 		 LONG(0x00080000)
+ 		 LONG(0x80004000)
+ 		 /* Restart new PSW for booting via PSW restart. */
+diff --git a/s390x/css.c b/s390x/css.c
+index fabe5237..4b6e31b3 100644
+--- a/s390x/css.c
++++ b/s390x/css.c
+@@ -74,7 +74,7 @@ static void test_sense(void)
+ 		return;
+ 	}
+ 
+-	lowcore_ptr->io_int_param = 0;
++	lowcore.io_int_param = 0;
+ 
+ 	senseid = alloc_io_mem(sizeof(*senseid), 0);
+ 	if (!senseid) {
+@@ -143,7 +143,7 @@ static void sense_id(void)
+ static void css_init(void)
+ {
+ 	assert(register_io_int_func(css_irq_io) == 0);
+-	lowcore_ptr->io_int_param = 0;
++	lowcore.io_int_param = 0;
+ 
+ 	report(get_chsc_scsc(), "Store Channel Characteristics");
+ }
+diff --git a/s390x/diag288.c b/s390x/diag288.c
+index 072c04a5..e414865b 100644
+--- a/s390x/diag288.c
++++ b/s390x/diag288.c
+@@ -12,8 +12,6 @@
+ #include <asm/asm-offsets.h>
+ #include <asm/interrupt.h>
+ 
+-struct lowcore *lc = (struct lowcore *)0x0;
+-
+ #define CODE_INIT	0
+ #define CODE_CHANGE	1
+ #define CODE_CANCEL	2
+@@ -92,7 +90,7 @@ static void test_bite(void)
+ 	load_psw_mask(mask);
+ 
+ 	/* Arm watchdog */
+-	lc->restart_new_psw.mask = extract_psw_mask() & ~PSW_MASK_EXT;
++	lowcore.restart_new_psw.mask = extract_psw_mask() & ~PSW_MASK_EXT;
+ 	diag288(CODE_INIT, 15, ACTION_RESTART);
+ 	asm volatile("		larl	%r0, 1f\n"
+ 		     "		stg	%r0, 424\n"
+diff --git a/s390x/edat.c b/s390x/edat.c
+index c3bee0c8..c6c25042 100644
+--- a/s390x/edat.c
++++ b/s390x/edat.c
+@@ -23,7 +23,6 @@
+ static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
+ static unsigned int tmp[1024] __attribute__((aligned(PAGE_SIZE)));
+ static void *root, *mem, *m;
+-static struct lowcore *lc;
+ volatile unsigned int *p;
+ 
+ /*
+@@ -34,10 +33,10 @@ static bool check_pgm_prot(void *ptr)
+ {
+ 	union teid teid;
+ 
+-	if (lc->pgm_int_code != PGM_INT_CODE_PROTECTION)
++	if (lowcore.pgm_int_code != PGM_INT_CODE_PROTECTION)
+ 		return false;
+ 
+-	teid.val = lc->trans_exc_id;
++	teid.val = lowcore.trans_exc_id;
+ 
+ 	/*
+ 	 * depending on the presence of the ESOP feature, the rest of the
+diff --git a/s390x/emulator.c b/s390x/emulator.c
+index b2787a55..c9182ea4 100644
+--- a/s390x/emulator.c
++++ b/s390x/emulator.c
+@@ -14,8 +14,6 @@
+ #include <asm/float.h>
+ #include <linux/compiler.h>
+ 
+-struct lowcore *lc = NULL;
+-
+ static inline void __test_spm_ipm(uint8_t cc, uint8_t key)
+ {
+ 	uint64_t in = (cc << 28) | (key << 24);
+@@ -262,7 +260,7 @@ static void test_prno(void)
+ static void test_dxc(void)
+ {
+ 	/* DXC (0xff) is to be stored in LC and FPC on a trap (CRT) with AFP */
+-	lc->dxc_vxc = 0x12345678;
++	lowcore.dxc_vxc = 0x12345678;
+ 	set_fpc_dxc(0);
+ 
+ 	report_prefix_push("afp");
+@@ -271,12 +269,12 @@ static void test_dxc(void)
+ 		     : : "r"(0) : "memory");
+ 	check_pgm_int_code(PGM_INT_CODE_DATA);
+ 
+-	report(lc->dxc_vxc == 0xff, "dxc in LC");
++	report(lowcore.dxc_vxc == 0xff, "dxc in LC");
+ 	report(get_fpc_dxc() == 0xff, "dxc in FPC");
+ 	report_prefix_pop();
+ 
+ 	/* DXC (0xff) is to be stored in LC only on a trap (CRT) without AFP */
+-	lc->dxc_vxc = 0x12345678;
++	lowcore.dxc_vxc = 0x12345678;
+ 	set_fpc_dxc(0);
+ 
+ 	report_prefix_push("no-afp");
+@@ -288,7 +286,7 @@ static void test_dxc(void)
+ 	afp_enable();
+ 	check_pgm_int_code(PGM_INT_CODE_DATA);
+ 
+-	report(lc->dxc_vxc == 0xff, "dxc in LC");
++	report(lowcore.dxc_vxc == 0xff, "dxc in LC");
+ 	report(get_fpc_dxc() == 0, "dxc not in FPC");
+ 	report_prefix_pop();
+ }
+diff --git a/s390x/mvpg.c b/s390x/mvpg.c
+index 04e5218f..296338d4 100644
+--- a/s390x/mvpg.c
++++ b/s390x/mvpg.c
+@@ -33,7 +33,6 @@
+ 
+ static uint8_t source[PAGE_SIZE]  __attribute__((aligned(PAGE_SIZE)));
+ static uint8_t buffer[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+-static struct lowcore * const lc;
+ 
+ /* Keep track of fresh memory */
+ static uint8_t *fresh;
+@@ -87,7 +86,7 @@ static int page_ok(const uint8_t *p)
+  */
+ static inline bool check_oai(void)
+ {
+-	return *(uint8_t *)(lc->pgm_old_psw.addr - 1) == lc->op_acc_id;
++	return *(uint8_t *)(lowcore.pgm_old_psw.addr - 1) == lowcore.op_acc_id;
+ }
+ 
+ static void test_exceptions(void)
+@@ -216,7 +215,7 @@ static void test_mmu_prot(void)
+ 
+ 	report_prefix_push("source invalid");
+ 	protect_page(source, PAGE_ENTRY_I);
+-	lc->op_acc_id = 0;
++	lowcore.op_acc_id = 0;
+ 	expect_pgm_int();
+ 	mvpg(0, fresh, source);
+ 	report(clear_pgm_int() == PGM_INT_CODE_PAGE_TRANSLATION, "exception");
+@@ -227,7 +226,7 @@ static void test_mmu_prot(void)
+ 
+ 	report_prefix_push("destination invalid");
+ 	protect_page(fresh, PAGE_ENTRY_I);
+-	lc->op_acc_id = 0;
++	lowcore.op_acc_id = 0;
+ 	expect_pgm_int();
+ 	mvpg(0, fresh, source);
+ 	report(clear_pgm_int() == PGM_INT_CODE_PAGE_TRANSLATION, "exception");
+diff --git a/s390x/sclp.c b/s390x/sclp.c
+index 73d722fb..1abb9029 100644
+--- a/s390x/sclp.c
++++ b/s390x/sclp.c
+@@ -31,7 +31,6 @@ static union {
+ 	WriteEventData data;
+ } sccb_template;
+ static uint32_t valid_code;						/* valid command code for READ SCP INFO */
+-static struct lowcore *lc;
+ 
+ /**
+  * Perform one service call, handling exceptions and interrupts.
+@@ -43,7 +42,7 @@ static int sclp_service_call_test(unsigned int command, void *sccb)
+ 	sclp_mark_busy();
+ 	sclp_setup_int();
+ 	cc = servc(command, __pa(sccb));
+-	if (lc->pgm_int_code) {
++	if (lowcore.pgm_int_code) {
+ 		sclp_handle_ext();
+ 		return 0;
+ 	}
+diff --git a/s390x/skrf.c b/s390x/skrf.c
+index b9a2e902..1a811894 100644
+--- a/s390x/skrf.c
++++ b/s390x/skrf.c
+@@ -123,17 +123,15 @@ static void set_flag(int val)
+ 
+ static void ecall_cleanup(void)
+ {
+-	struct lowcore *lc = (void *)0x0;
+-
+-	lc->ext_new_psw.mask = PSW_MASK_64;
+-	lc->sw_int_crs[0] = BIT_ULL(CTL0_AFP);
++	lowcore.ext_new_psw.mask = PSW_MASK_64;
++	lowcore.sw_int_crs[0] = BIT_ULL(CTL0_AFP);
+ 
+ 	/*
+ 	 * PGM old contains the ext new PSW, we need to clean it up,
+ 	 * so we don't get a special operation exception on the lpswe
+ 	 * of pgm old.
+ 	 */
+-	lc->pgm_old_psw.mask = PSW_MASK_64;
++	lowcore.pgm_old_psw.mask = PSW_MASK_64;
+ 
+ 	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+ 	set_flag(1);
+@@ -142,13 +140,12 @@ static void ecall_cleanup(void)
+ /* Set a key into the external new psw mask and open external call masks */
+ static void ecall_setup(void)
+ {
+-	struct lowcore *lc = (void *)0x0;
+ 	uint64_t mask;
+ 
+ 	register_pgm_cleanup_func(ecall_cleanup);
+ 	expect_pgm_int();
+ 	/* Put a skey into the ext new psw */
+-	lc->ext_new_psw.mask = 0x00F0000000000000UL | PSW_MASK_64;
++	lowcore.ext_new_psw.mask = 0x00F0000000000000UL | PSW_MASK_64;
+ 	/* Open up ext masks */
+ 	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
+ 	mask = extract_psw_mask();
+diff --git a/s390x/smp.c b/s390x/smp.c
+index de3aba71..6d474d0d 100644
+--- a/s390x/smp.c
++++ b/s390x/smp.c
+@@ -155,28 +155,27 @@ static void test_stop(void)
+ static void test_stop_store_status(void)
+ {
+ 	struct cpu *cpu = smp_cpu_from_idx(1);
+-	struct lowcore *lc = (void *)0x0;
+ 
+ 	report_prefix_push("stop store status");
+ 	report_prefix_push("running");
+ 	smp_cpu_restart(1);
+-	lc->prefix_sa = 0;
+-	lc->grs_sa[15] = 0;
++	lowcore.prefix_sa = 0;
++	lowcore.grs_sa[15] = 0;
+ 	smp_cpu_stop_store_status(1);
+ 	mb();
+ 	report(smp_cpu_stopped(1), "cpu stopped");
+-	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
+-	report(lc->grs_sa[15], "stack");
++	report(lowcore.prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
++	report(lowcore.grs_sa[15], "stack");
+ 	report_prefix_pop();
+ 
+ 	report_prefix_push("stopped");
+-	lc->prefix_sa = 0;
+-	lc->grs_sa[15] = 0;
++	lowcore.prefix_sa = 0;
++	lowcore.grs_sa[15] = 0;
+ 	smp_cpu_stop_store_status(1);
+ 	mb();
+ 	report(smp_cpu_stopped(1), "cpu stopped");
+-	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
+-	report(lc->grs_sa[15], "stack");
++	report(lowcore.prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
++	report(lowcore.grs_sa[15], "stack");
+ 	report_prefix_pop();
+ 
+ 	report_prefix_pop();
+@@ -290,7 +289,6 @@ static void test_set_prefix(void)
+ static void ecall(void)
+ {
+ 	unsigned long mask;
+-	struct lowcore *lc = (void *)0x0;
+ 
+ 	expect_ext_int();
+ 	ctl_set_bit(0, CTL0_EXTERNAL_CALL);
+@@ -298,7 +296,7 @@ static void ecall(void)
+ 	mask |= PSW_MASK_EXT;
+ 	load_psw_mask(mask);
+ 	set_flag(1);
+-	while (lc->ext_int_code != 0x1202) { mb(); }
++	while (lowcore.ext_int_code != 0x1202) { mb(); }
+ 	report_pass("received");
+ 	set_flag(1);
+ }
+@@ -324,7 +322,6 @@ static void test_ecall(void)
+ static void emcall(void)
+ {
+ 	unsigned long mask;
+-	struct lowcore *lc = (void *)0x0;
+ 
+ 	expect_ext_int();
+ 	ctl_set_bit(0, CTL0_EMERGENCY_SIGNAL);
+@@ -332,7 +329,7 @@ static void emcall(void)
+ 	mask |= PSW_MASK_EXT;
+ 	load_psw_mask(mask);
+ 	set_flag(1);
+-	while (lc->ext_int_code != 0x1201) { mb(); }
++	while (lowcore.ext_int_code != 0x1201) { mb(); }
+ 	report_pass("received");
+ 	set_flag(1);
+ }
+diff --git a/s390x/snippets/c/spec_ex.c b/s390x/snippets/c/spec_ex.c
+index 71655ddb..40c170e6 100644
+--- a/s390x/snippets/c/spec_ex.c
++++ b/s390x/snippets/c/spec_ex.c
+@@ -10,12 +10,11 @@
+ 
+ __attribute__((section(".text"))) int main(void)
+ {
+-	struct lowcore *lowcore = (struct lowcore *) 0;
+ 	uint64_t bad_psw = 0;
+ 
+ 	/* PSW bit 12 has no name or meaning and must be 0 */
+-	lowcore->pgm_new_psw.mask = BIT(63 - 12);
+-	lowcore->pgm_new_psw.addr = 0xdeadbeee;
++	lowcore.pgm_new_psw.mask = BIT(63 - 12);
++	lowcore.pgm_new_psw.addr = 0xdeadbeee;
+ 	asm volatile ("lpsw %0" :: "Q"(bad_psw));
+ 	return 0;
+ }
 -- 
 2.33.1
 
