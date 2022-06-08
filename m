@@ -2,183 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81297543DEA
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 22:54:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6E69543F15
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 00:22:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233812AbiFHUxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 16:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43412 "EHLO
+        id S236571AbiFHWWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 18:22:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234012AbiFHUxO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 16:53:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 71A1D1D08A7
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 13:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654721589;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vMqOytVP+gk8AwC7a473qnQFRe9VfwTYdUh9Vb7sypY=;
-        b=cSApQ/+TtfcBEPOX4DtkvB8gA7h0SQe4HjnRaf/FUlFOasnu0G/2HJ9nBLZk1VZK+lOoLz
-        w4bqOkuNCy5KbodPetJ4d5XmKJZ6lKRF/Vfbnvi7VrHNoFfWMoKEI29v+CsaB5KyJgKkHV
-        2njqDlB4sl+hDntMjxUp7SoKAT5dBUc=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-639-NusKupvwO5i2Sj4c8We0aQ-1; Wed, 08 Jun 2022 16:53:08 -0400
-X-MC-Unique: NusKupvwO5i2Sj4c8We0aQ-1
-Received: by mail-io1-f70.google.com with SMTP id q5-20020a6b2a05000000b006696f97731aso4252935ioq.8
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 13:53:08 -0700 (PDT)
+        with ESMTP id S229837AbiFHWWt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 18:22:49 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D374529CB5
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 15:22:47 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id y196so19524493pfb.6
+        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 15:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hV9CZl1vmV5FpGJFtmBowLl6tofEOt5xbuFmkjxS6PY=;
+        b=FQfOQ8x9oTcvOtuHi0eHy18Ww0jN7ukkvtMoS8l0B+Yy4cvyfJRSjgrceDmgNhbUnL
+         xfL1f4UhxFB4yKfNjn05Zx6bshWnbZF3e+9xyxOQUvelyb4AND6bj8truWw3SOgyPj/r
+         fW5R4+Kepw+gpmmv6lsXhXNpGTAk7d0mNSRfAI1KRpRrgjLg0uEKWBg6Dhg4KesEz7jL
+         Va+AVwp/dEPNZKlg3lL93UNuXG3qtHbb9lLTe+5p1zpEwRJYMS4jjqRNg6z7CZUJrjNh
+         rT3iCj7GI8U/IGdvGg5PqSWsorNak97BqLhYIxroUvz9EgmVTcSIPQI92vrEpGsowNnD
+         gtmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=vMqOytVP+gk8AwC7a473qnQFRe9VfwTYdUh9Vb7sypY=;
-        b=wA0k6XoEN/dGdIByf7RGfYpsfizX5zl5bULV9MLQyxYpB6mphkVY/UzHQ4ALS0VABA
-         yQ3KmJlrggMqqrGaipODtPdnTqI67uWQutHboNS4kGJKABKyyzH2hrQho0vg07y5gdY6
-         UO2FN4bq3WwkOrCQi0mXSsI6TILJAK4X4/SBKO/YQ/6xodhGNyRJESpDb5EGW/FauBKe
-         tGRLOim4qxWnBujOCx2tdGsoCLLDERpURHPupaZoArW+j/OoDXETzkobaeHTMg8iqT8I
-         WHO0ZpnjpZvJV1TyksSca4DtyVxg/dsxqQr5phlxcCPeGPk9MWeBA37UFiHdkCQmki/Y
-         uHjg==
-X-Gm-Message-State: AOAM5308qfWeRsQiklb9qt3PkbEoonStV6T4zLkU86cA2FynkAx8nbEc
-        eS4mQaPwzoZyQDPVZjT7UuofCBnEchvm+xlrkLR/rpppiydvzAWdfgjfLJSHK8Tv6+RSMKKONDG
-        waqV2gvkQFDiD
-X-Received: by 2002:a6b:4013:0:b0:668:825b:1ceb with SMTP id k19-20020a6b4013000000b00668825b1cebmr17742755ioa.180.1654721587553;
-        Wed, 08 Jun 2022 13:53:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxopWnsYF95s4welx4WWFq4NLuJEHYDQQYm2nwC+zbK37ryM5m2m4qZkMSC2JRt/hkCY79T6w==
-X-Received: by 2002:a6b:4013:0:b0:668:825b:1ceb with SMTP id k19-20020a6b4013000000b00668825b1cebmr17742737ioa.180.1654721587236;
-        Wed, 08 Jun 2022 13:53:07 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id a13-20020a92d34d000000b002d3de4c1ecbsm8918633ilh.68.2022.06.08.13.53.05
+        bh=hV9CZl1vmV5FpGJFtmBowLl6tofEOt5xbuFmkjxS6PY=;
+        b=ilVdNYcGPrB5ZC5aiSF61IF/OIro21cBVdf3Dl9iHiRU3uIe2r6xv1WparMtLKPyA+
+         POx4vjL74n5R9FrNkX31nt7T2wBs5w83qLqYaY3qrdHwYvKVtWlhHG50EjvW8pkXD6C9
+         StOWjt5eA9SE2bqkqqvjW7bacSq5/fdB/wjWzA3uw7QS9FALIUYbTbgnPmAn0imQrNmn
+         tn90LO2QZUiUJioYk6818cPPQjjMCeds8PDN/xW88KW0xajXS8kaHRzIhRP15vhFDP4a
+         KwbDALVVFwYkht8B7PFpr+bGEnGZw/QXbADw/FLJJbzqm57p3L+tCOVgbM4BQST27W6W
+         3o7w==
+X-Gm-Message-State: AOAM5339UFpYYgRh8GcTAudhrnbUAGXkpKli4p/RhQBSmfWfE8/vbZA+
+        xxUfcEykDWcxVR5KVpM9ab2HqQ==
+X-Google-Smtp-Source: ABdhPJwPM4EsvlNxmcyTfRvkMb+/8M7At1A7hBEdBL/j0X7RoGt+d38G9+zoEsJLqPDwLHM0MzsnPA==
+X-Received: by 2002:a63:ec48:0:b0:3fe:44a3:bf4d with SMTP id r8-20020a63ec48000000b003fe44a3bf4dmr2914113pgj.610.1654726967180;
+        Wed, 08 Jun 2022 15:22:47 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id e22-20020a17090a4a1600b001e345c579d5sm14405982pjh.26.2022.06.08.15.22.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jun 2022 13:53:06 -0700 (PDT)
-Date:   Wed, 8 Jun 2022 16:53:04 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Leonardo Bras Soares Passos <leobras@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Andy Lutomirski <luto@kernel.org>, kvm@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.16 07/28] x86/kvm/fpu: Limit guest
- user_xfeatures to supported bits of XCR0
-Message-ID: <YqEMMOPwc/ctL26P@xz-m1.local>
-References: <20220301201344.18191-7-sashal@kernel.org>
- <5f2b7b93-d4c9-1d59-14df-6e8b2366ca8a@redhat.com>
- <YppVupW+IWsm7Osr@xz-m1.local>
- <2d9ba70b-ac18-a461-7a57-22df2c0165c6@redhat.com>
- <Yp5xSi6P3q187+A+@xz-m1.local>
- <9d336622-6964-454a-605f-1ca90b902836@redhat.com>
- <Yp9o+y0NcRW/0puA@google.com>
- <Yp+WUoA+6x7ZpsaM@xz-m1.local>
- <Yp+fBeyf7TjI1qgo@xz-m1.local>
- <CAJ6HWG7x_VA3JAsopojCq+t2-MDZ-rn4DXZqt0SoXEDxTzrRMQ@mail.gmail.com>
+        Wed, 08 Jun 2022 15:22:46 -0700 (PDT)
+Date:   Wed, 8 Jun 2022 22:22:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        likexu@tencent.com
+Subject: Re: [PATCH 2/2] KVM: x86: always allow host-initiated writes to PMU
+ MSRs
+Message-ID: <YqEhMxlPxzP+CPSR@google.com>
+References: <20220531175450.295552-1-pbonzini@redhat.com>
+ <20220531175450.295552-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJ6HWG7x_VA3JAsopojCq+t2-MDZ-rn4DXZqt0SoXEDxTzrRMQ@mail.gmail.com>
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220531175450.295552-3-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08, 2022 at 05:34:18PM -0300, Leonardo Bras Soares Passos wrote:
-> Hello Peter,
-> 
-> On Tue, Jun 7, 2022 at 5:07 PM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > On Tue, Jun 07, 2022 at 02:17:54PM -0400, Peter Xu wrote:
-> > > On Tue, Jun 07, 2022 at 03:04:27PM +0000, Sean Christopherson wrote:
-> > > > On Tue, Jun 07, 2022, Paolo Bonzini wrote:
-> > > > > On 6/6/22 23:27, Peter Xu wrote:
-> > > > > > On Mon, Jun 06, 2022 at 06:18:12PM +0200, Paolo Bonzini wrote:
-> > > > > > > > However there seems to be something missing at least to me, on why it'll
-> > > > > > > > fail a migration from 5.15 (without this patch) to 5.18 (with this patch).
-> > > > > > > > In my test case, user_xfeatures will be 0x7 (FP|SSE|YMM) if without this
-> > > > > > > > patch, but 0x0 if with it.
-> > > > > > >
-> > > > > > > What CPU model are you using for the VM?
-> > > > > >
-> > > > > > I didn't specify it, assuming it's qemu64 with no extra parameters.
-> > > > >
-> > > > > Ok, so indeed it lacks AVX and this patch can have an effect.
-> > > > >
-> > > > > > > For example, if the source lacks this patch but the destination has it,
-> > > > > > > the source will transmit YMM registers, but the destination will fail to
-> > > > > > > set them if they are not available for the selected CPU model.
-> > > > > > >
-> > > > > > > See the commit message: "As a bonus, it will also fail if userspace tries to
-> > > > > > > set fpu features (with the KVM_SET_XSAVE ioctl) that are not compatible to
-> > > > > > > the guest configuration.  Such features will never be returned by
-> > > > > > > KVM_GET_XSAVE or KVM_GET_XSAVE2."
-> > > > > >
-> > > > > > IIUC you meant we should have failed KVM_SET_XSAVE when they're not aligned
-> > > > > > (probably by failing validate_user_xstate_header when checking against the
-> > > > > > user_xfeatures on dest host). But that's probably not my case, because here
-> > > > > > KVM_SET_XSAVE succeeded, it's just that the guest gets a double fault after
-> > > > > > the precopy migration completes (or for postcopy when the switchover is
-> > > > > > done).
-> > > > >
-> > > > > Difficult to say what's happening without seeing at least the guest code
-> > > > > around the double fault (above you said "fail a migration" and I thought
-> > > > > that was a different scenario than the double fault), and possibly which was
-> > > > > the first exception that contributed to the double fault.
-> > > >
-> > > > Regardless of why the guest explodes in the way it does, is someone planning on
-> > > > bisecting this (if necessary?) and sending a backport to v5.15?  There's another
-> > > > bug report that is more than likely hitting the same bug.
-> > >
-> > > What's the bisection you mentioned?  I actually did a bisection and I also
-> > > checked reverting Leo's change can also fix this issue.  Or do you mean
-> > > something else?
-> >
-> > Ah, I forgot to mention on the "stable tree decisions": IIUC it also means
-> > we should apply Leo's patch to all the stable trees if possible, then
-> > migrations between them won't trigger the misterous faults anymore,
-> > including when migrating to the latest Linux versions.
-> >
-> > However there's the delimma that other kernels (any kernel that does not
-> > have Leo's patch) will start to fail migrations to the stable branches that
-> > apply Leo's patch too..
-> 
-> IIUC, you commented before that the migration issue should be solved with a
-> QEMU fix, is that correct? That would mean something like 'QEMU is relying on a
-> kernel bug to work', and should be no blocker for fixing the kernel.
+On Tue, May 31, 2022, Paolo Bonzini wrote:
+> Whenever an MSR is part of KVM_GET_MSR_INDEX_LIST, it has to be always
+> retrievable and settable with KVM_GET_MSR and KVM_SET_MSR.  Accept
+> the PMU MSRs unconditionally in intel_is_valid_msr, if the access was
+> host-initiated.
 
-The QEMU fix (that I posted [1]) is not a real fix, only the kernel fix is.
+...so that userspace can explode in intel_get_msr() or intel_set_msr().  Selftests
+that regurgitate MSRs are still failing.  The below "fixes" the issue, but I don't
+know that it's actually a good idea.  I also haven't tried AMD.
 
-The QEMU patchset only allows the migration to fail early, the kernel patch
-allows the migration to go through with no problem as long as both sides
-are applied with the fix (or both are not..).  So there're two issues we're
-tackling with and IMHO we should fix both.
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 515ab6594333..fcb5224028a6 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -401,7 +401,7 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+                        return 0;
+        }
 
-[1] https://lore.kernel.org/qemu-devel/20220607230645.53950-1-peterx@redhat.com/
+-       return 1;
++       return !msr_info->host_initiated;
+ }
 
-> 
-> If that's the case, I think we should apply the fix to every supported
-> stable branch that
-> have the fpku issue, and in parallel come with a qemu fix for that.
-> 
-> What do you think about it?
+ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -497,7 +497,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+                        return 0;
+        }
 
-Yes I mostly agree with you. I think your patch still does the right thing
-by not migrating anything the guest doesn't even support, and that seems to
-be the only way to fix the pksu-like issue on migrations between hosts with
-different processor configurations.  But it'll also bring other unwanted
-side effects, that's why IMHO we need some careful thoughts and I hope I
-didn't miss anything important.
+-       return 1;
++       return !msr_info->host_initiated;
+ }
 
-Thanks,
-
--- 
-Peter Xu
-
+ static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
