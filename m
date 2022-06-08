@@ -2,109 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1E045437D2
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 17:46:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92671543814
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 17:52:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244633AbiFHPpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 11:45:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54738 "EHLO
+        id S244405AbiFHPvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 11:51:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244597AbiFHPpH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 11:45:07 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC32E1090;
-        Wed,  8 Jun 2022 08:45:06 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 57B2B1F91D;
-        Wed,  8 Jun 2022 15:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1654703105; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tu0OsjwZa4ludPA2tEG1vc59ARA2J6I+UUbwvpkgDZk=;
-        b=tNSyCECuRzHYHJR8lJlXwRk7JkJpmfPk/TzfmwPcSZUX3Lv3H3lAC436XtYmRpOzCTqrfV
-        HTgTER8aFgp44Q1zP1ptLJVxXGOc6gYI0Ci4eTYHB9WZsg/Y2ic4AxaU105FXNvU0vHo2b
-        fvbkK7gcFyHWQ/JrVzlBnhL85ZWJ1c4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1654703105;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tu0OsjwZa4ludPA2tEG1vc59ARA2J6I+UUbwvpkgDZk=;
-        b=5AJ2uA3fTrMStKdHoVjBCvvLp+nQHPjUtIw7c6uoujcEnEShTH58YeCwX1YD+ZKsATrLq6
-        eaP+Az5Z9+ymlzBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1749713AD9;
-        Wed,  8 Jun 2022 15:45:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id jQlvBAHEoGLlGgAAMHmgww
-        (envelope-from <vkarasulli@suse.de>); Wed, 08 Jun 2022 15:45:05 +0000
-Date:   Wed, 8 Jun 2022 17:45:03 +0200
-From:   Vasant Karasulli <vkarasulli@suse.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, jroedel@suse.de, kvm@vger.kernel.org,
-        bp@alien8.de, x86@kernel.org, thomas.lendacky@amd.com
-Subject: Re: [PATCH v6 2/4] x86/tests: Add tests for AMD SEV-ES #VC handling
- Add KUnit based tests to validate Linux's VC handling for instructions cpuid
- and wbinvd. These tests: 1. install a kretprobe on the #VC handler
- (sev_es_ghcb_hv_call, to access GHCB before/after the resulting VMGEXIT). 2.
- trigger an NAE by executing either cpuid or wbinvd. 3. check that the
- kretprobe was hit with the right exit_code available in GHCB.
-Message-ID: <YqDD/0IWnoMXEAWg@vasant-suse>
-References: <20220318094532.7023-1-vkarasulli@suse.de>
- <20220318094532.7023-3-vkarasulli@suse.de>
- <Ykzrb1uyPZ2AKWos@google.com>
- <YqBivtMl74FGmz7r@vasant-suse>
- <YqCzy5Kngj+OgD2h@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YqCzy5Kngj+OgD2h@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S239819AbiFHPvs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 11:51:48 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942BF1F740B;
+        Wed,  8 Jun 2022 08:51:47 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258Ee8Pd017857;
+        Wed, 8 Jun 2022 15:50:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=Lk0It611U/P8w0OoOgtqUslrDxiX8rH2mlYcAYsbsS0=;
+ b=DBmOimV5vskk/4O0H+ASMGsNH63DhJtNCLTnFgqZRUTK+X7zMc3lzDikf4MIzRHvOo+n
+ CVuXtMEUwvjuCMOsUvQCLxzvDPxq7MQJe7nH+QxMrKvnDdWtXb8oyiJThMyDSNmQyxD3
+ ijL4l1DZuEndT6CwVj7RjePrrfdNownPuIdFcAe2iz7z67jgpwlpo6+o3tw5AN4Gu+24
+ pg+OxytyddKWHjnLb8mNA5mmg0dpDiOFrVNo/85Pv/lEsOcOUlXsqNxyxX9Z1qi04T0N
+ kBV8kNOLpxfageJqTysUeV/gNjQBlwj1yN5Oz04VInZCZj3AJdqMbvLCgosERRxiDkCE ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjum6cr0a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 15:50:38 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258E4HP3023930;
+        Wed, 8 Jun 2022 15:50:37 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjum6cr01-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 15:50:37 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258FoSB1013311;
+        Wed, 8 Jun 2022 15:50:36 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma02wdc.us.ibm.com with ESMTP id 3gfy19v6w2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 15:50:36 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258FoZtr41419236
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Jun 2022 15:50:35 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 346DC6A04D;
+        Wed,  8 Jun 2022 15:50:35 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A70566A054;
+        Wed,  8 Jun 2022 15:50:32 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.211.94.47])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Jun 2022 15:50:32 +0000 (GMT)
+Message-ID: <1ae0abaaa4fc7959ba25cf59b3ef0da39bfc7f36.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 1/2] vfio: Replace the DMA unmapping notifier with a
+ callback
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>
+Date:   Wed, 08 Jun 2022 11:50:31 -0400
+In-Reply-To: <1-v2-80aa110d03ce+24b-vfio_unmap_notif_jgg@nvidia.com>
+References: <1-v2-80aa110d03ce+24b-vfio_unmap_notif_jgg@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: c5zZRiJ_GxhZY7_iHg0OAYza3tR4OGQ2
+X-Proofpoint-ORIG-GUID: Etbix-epMN6oZyGKbVGn0eVZ0GN7YlSS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-08_05,2022-06-07_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
+ mlxlogscore=999 spamscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ mlxscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206080065
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mi 08-06-22 14:35:55, Sean Christopherson wrote:
-> On Wed, Jun 08, 2022, Vasant Karasulli wrote:
-> > On Mi 06-04-22 01:22:55, Sean Christopherson wrote:
-> > > > +	if (ret) {
-> > > > +		kunit_info(test, "Could not register kretprobe. Skipping.");
-> > > > +		goto out;
-> > > > +	}
-> > > > +
-> > > > +	test->priv = kunit_kzalloc(test, sizeof(u64), GFP_KERNEL);
-> > >
-> > > Allocating 8 bytes and storing the pointer an 8-byte field is rather pointless :-)
-> > >
-> >
-> > Actually it's necessary to allocate memory to test->priv before using according to
-> > https://www.kernel.org/doc/html/latest/dev-tools/kunit/tips.html
->
-> If priv points at structure of some form, sure, but you're storing a simple value.
+On Tue, 2022-06-07 at 20:02 -0300, Jason Gunthorpe wrote:
+> Instead of having drivers register the notifier with explicit code
+> just
+> have them provide a dma_unmap callback op in their driver ops and
+> rely on
+> the core code to wire it up.
+> 
+> Suggested-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/gvt.h        |   1 -
+>  drivers/gpu/drm/i915/gvt/kvmgt.c      |  75 ++++-----------
+>  drivers/s390/cio/vfio_ccw_ops.c       |  41 ++-------
+>  drivers/s390/cio/vfio_ccw_private.h   |   1 -
+>  drivers/s390/crypto/vfio_ap_ops.c     |  53 ++---------
+>  drivers/s390/crypto/vfio_ap_private.h |   3 -
+>  drivers/vfio/vfio.c                   | 126 +++++++++---------------
+> --
+>  drivers/vfio/vfio.h                   |   5 +
+>  include/linux/vfio.h                  |  21 +----
+>  9 files changed, 87 insertions(+), 239 deletions(-)
+> 
+> 
 
-Yes, I agree. The reason it was done this way I guess is that type of priv is a
-void pointer and storing a u64 value results in a compiler warning:
-cast from pointer to integer of different size [-Wpointer-to-int-cast].
+...snip...
 
-Thanks,
-Vasant Karasulli
-Kernel generalist
-www.suse.com<http://www.suse.com>
-[https://www.suse.com/assets/img/social-platforms-suse-logo.png]<http://www.suse.com/>
-SUSE - Open Source Solutions for Enterprise Servers & Cloud<http://www.suse.com/>
-Modernize your infrastructure with SUSE Linux Enterprise servers, cloud technology for IaaS, and SUSE's software-defined storage.
-www.suse.com
+> diff --git a/drivers/s390/cio/vfio_ccw_private.h
+> b/drivers/s390/cio/vfio_ccw_private.h
+> index 7272eb78861244..2627791c9006d4 100644
+> --- a/drivers/s390/cio/vfio_ccw_private.h
+> +++ b/drivers/s390/cio/vfio_ccw_private.h
+> @@ -98,7 +98,6 @@ struct vfio_ccw_private {
+>  	struct completion	*completion;
+>  	atomic_t		avail;
+>  	struct mdev_device	*mdev;
+> -	struct notifier_block	nb;
+
+Could you also remove this from the comment block above the struct?
+Besides that, this is fine for -ccw.
+
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+
+>  	struct ccw_io_region	*io_region;
+>  	struct mutex		io_mutex;
+>  	struct vfio_ccw_region *region;
+> 
+
+...snip...
 
