@@ -2,209 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A4B3543127
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 15:14:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0D0554312B
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 15:16:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239851AbiFHNNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 09:13:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34148 "EHLO
+        id S239971AbiFHNQB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 09:16:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239815AbiFHNNk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 09:13:40 -0400
+        with ESMTP id S239852AbiFHNP6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 09:15:58 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CA120EE8B;
-        Wed,  8 Jun 2022 06:13:35 -0700 (PDT)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258BrCDl005807;
-        Wed, 8 Jun 2022 13:13:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=5szdYVGGzu9ogUKniT0NOcZ7tMOc2nrywishGwUJzS8=;
- b=G5r5Wa4T5GQdpGLhZ9aDWbu9ayTuS11H0ynwJZu9y8X8lsGeDftEbk5kUHMDh/xj5rEk
- ckBwIL7vQRPuRcKs6XkAcqT1Yqhh+VRfnPdCBr15jBDjnTF8/aeex8/KzFg+GbdM6diK
- wPORDWhWx+VaGHt2ue0jRPPksSOl3bYBk+5vKfgqgyI6BZcniT0R2sEzkxsMUIBZbovG
- 6Y4hHVxHLqGYp1IvBE+7v/uyAe+J0+wD5p2wVq/ZGR4Ez3WwteJhsteAiMbj0ZdUPX+D
- qclF4HE4p8DYNNL3HaqzwGz+rU7DJ4Y2ga2xJoSQwGMncdn3UMBcqxj2GxKTlExp30nO Xw== 
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DDD6220C5;
+        Wed,  8 Jun 2022 06:15:57 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258CFwq2017941;
+        Wed, 8 Jun 2022 13:15:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=yxIq4JKxKZh9YG+pXpusvvjdP7ynYnDFZXORb16tXik=;
+ b=lIOhuNeYHniLCDjW9Tl9xLm4qL1QohBVqgdnbvDZ+4sKavNZXgA+1KUk47bR+qR5+pFb
+ Gnmg/HIT1xjqE814MDZSEgl7rY+iDMAgIgEAePjD/tvmETke/gZf67MwK/5yNHuz5FzB
+ XOQKznqYQJgjEDBnUe35kQlTS9BcbIPfF+7SX7j07+eW0XyP1egJLiBI1RpbqyhO5F7c
+ yCQT9Rz7GlheYZgISgm7WKMloatmfo3FhVeZk8gub5FwdzqfXqr/9r/P6bbaWgxCUQ4S
+ 1dGHnxOpkPHYvYlQSyuoWQ+ROM8MmMfVRYLYPpzW1AgFAMdrfCh859hDt8G0mXz/eueS VQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjsmbux6y-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjum699yd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 13:13:34 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258DBC0k015771;
-        Wed, 8 Jun 2022 13:13:34 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjsmbux6f-1
+        Wed, 08 Jun 2022 13:15:52 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258CGn13019849;
+        Wed, 8 Jun 2022 13:15:52 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjum699y2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 13:13:34 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258D5M8n006966;
-        Wed, 8 Jun 2022 13:13:32 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3gfy18v4xg-1
+        Wed, 08 Jun 2022 13:15:51 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258D5Nrr006325;
+        Wed, 8 Jun 2022 13:15:51 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02dal.us.ibm.com with ESMTP id 3gfy1at693-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jun 2022 13:13:32 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258DDViP24576430
+        Wed, 08 Jun 2022 13:15:51 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258DFnZx32244096
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Jun 2022 13:13:31 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47AE25204F;
-        Wed,  8 Jun 2022 13:13:29 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 145F052057;
-        Wed,  8 Jun 2022 13:13:29 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        scgl@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v4 1/1] s390x: add migration test for storage keys
-Date:   Wed,  8 Jun 2022 15:13:28 +0200
-Message-Id: <20220608131328.6519-2-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220608131328.6519-1-nrb@linux.ibm.com>
-References: <20220608131328.6519-1-nrb@linux.ibm.com>
+        Wed, 8 Jun 2022 13:15:49 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B5539BE051;
+        Wed,  8 Jun 2022 13:15:49 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC503BE04F;
+        Wed,  8 Jun 2022 13:15:47 +0000 (GMT)
+Received: from [9.163.20.188] (unknown [9.163.20.188])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Jun 2022 13:15:47 +0000 (GMT)
+Message-ID: <ac5cd90a-c92b-1bad-fbec-d1ca6287e826@linux.ibm.com>
+Date:   Wed, 8 Jun 2022 09:15:46 -0400
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v9 10/21] vfio/pci: introduce CONFIG_VFIO_PCI_ZDEV_KVM
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, pasic@linux.ibm.com,
+        pbonzini@redhat.com, corbet@lwn.net, jgg@nvidia.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
+ <20220606203325.110625-11-mjrosato@linux.ibm.com>
+ <025699e6-b870-2648-d4a4-ffbc5fff22e8@redhat.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <025699e6-b870-2648-d4a4-ffbc5fff22e8@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: SoaeKnzzRnVD2GmrMAtiHs4KqeQ9E-uW
-X-Proofpoint-GUID: 66isviZoMHbOQU1_tAVVTOJKOLUe1qM6
+X-Proofpoint-GUID: v-6SOwnMCNAsHTL-AduCL7y1U5-h_YeS
+X-Proofpoint-ORIG-GUID: 8HuHCNlCigvg6ddKUBqWfahKcMburMh-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-08_04,2022-06-07_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
- phishscore=0 adultscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 suspectscore=0 clxscore=1015 impostorscore=0 mlxscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ mlxlogscore=999 spamscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ mlxscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
  definitions=main-2206080056
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upon migration, we expect storage keys set by the guest to be preserved, so add
-a test for it.
+On 6/8/22 2:19 AM, Thomas Huth wrote:
+> On 06/06/2022 22.33, Matthew Rosato wrote:
+>> The current contents of vfio-pci-zdev are today only useful in a KVM
+>> environment; let's tie everything currently under vfio-pci-zdev to
+>> this Kconfig statement and require KVM in this case, reducing complexity
+>> (e.g. symbol lookups).
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   drivers/vfio/pci/Kconfig      | 11 +++++++++++
+>>   drivers/vfio/pci/Makefile     |  2 +-
+>>   include/linux/vfio_pci_core.h |  2 +-
+>>   3 files changed, 13 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+>> index 4da1914425e1..f9d0c908e738 100644
+>> --- a/drivers/vfio/pci/Kconfig
+>> +++ b/drivers/vfio/pci/Kconfig
+>> @@ -44,6 +44,17 @@ config VFIO_PCI_IGD
+>>         To enable Intel IGD assignment through vfio-pci, say Y.
+>>   endif
+>> +config VFIO_PCI_ZDEV_KVM
+>> +    bool "VFIO PCI extensions for s390x KVM passthrough"
+>> +    depends on S390 && KVM
+>> +    default y
+>> +    help
+>> +      Support s390x-specific extensions to enable support for 
+>> enhancements
+>> +      to KVM passthrough capabilities, such as interpretive execution of
+>> +      zPCI instructions.
+>> +
+>> +      To enable s390x KVM vfio-pci extensions, say Y.
+> 
+> Is it still possible to disable CONFIG_VFIO_PCI_ZDEV_KVM ? Looking at 
+> the later patches (e.g. 20/21 where you call kvm_s390_pci_zpci_op() from 
+> kvm-s390.c), it rather seems to me that it currently cannot be disabled 
+> independently (as long as KVM is enabled).
 
-We keep 128 pages and set predictable storage keys. Then, we migrate and check
-that they can be read back and match the value originally set.
+Yes, you can build with, for example, CONFIG_VFIO_PCI_ZDEV_KVM=n and 
+CONFIG_KVM=m -- I tested it again just now.  The result is kvm and 
+vfio-pci are built and vfio-pci works, but none of the vfio-pci-zdev 
+extensions are available (including zPCI interpretation).
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- s390x/Makefile         |  1 +
- s390x/migration-skey.c | 73 ++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg    |  4 +++
- 3 files changed, 78 insertions(+)
- create mode 100644 s390x/migration-skey.c
+This is accomplished via the placement of some IS_ENABLED checks.  Some 
+calls (e.g. AEN init) are fenced by 
+IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM).  There are also some areas that 
+are fenced off via a call to kvm_s390_pci_interp_allowed() which also 
+includes an IS_ENABLED check along with checks for facility and cpu id.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 25802428fa13..94fc5c1a3527 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -33,6 +33,7 @@ tests += $(TEST_DIR)/adtl-status.elf
- tests += $(TEST_DIR)/migration.elf
- tests += $(TEST_DIR)/pv-attest.elf
- tests += $(TEST_DIR)/migration-cmm.elf
-+tests += $(TEST_DIR)/migration-skey.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-new file mode 100644
-index 000000000000..323aa83202bb
---- /dev/null
-+++ b/s390x/migration-skey.c
-@@ -0,0 +1,73 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Storage Key migration tests
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/facility.h>
-+#include <asm/page.h>
-+#include <asm/mem.h>
-+#include <asm/interrupt.h>
-+#include <hardware.h>
-+
-+#define NUM_PAGES 128
-+static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-+
-+static void test_migration(void)
-+{
-+	union skey expected_key, actual_key;
-+	int i, key_to_set;
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		/*
-+		 * Storage keys are 7 bit, lowest bit is always returned as zero
-+		 * by iske
-+		 */
-+		key_to_set = i * 2;
-+		set_storage_key(pagebuf[i], key_to_set, 1);
-+	}
-+
-+	puts("Please migrate me, then press return\n");
-+	(void)getchar();
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		report_prefix_pushf("page %d", i);
-+
-+		actual_key.val = get_storage_key(pagebuf[i]);
-+		expected_key.val = i * 2;
-+
-+		/* ignore reference bit */
-+		actual_key.str.rf = 0;
-+		expected_key.str.rf = 0;
-+
-+		report(actual_key.val == expected_key.val, "expected_key=0x%x actual_key=0x%x", expected_key.val, actual_key.val);
-+
-+		report_prefix_pop();
-+	}
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("migration-skey");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+
-+		/*
-+		 * If we just exit and don't ask migrate_cmd to migrate us, it
-+		 * will just hang forever. Hence, also ask for migration when we
-+		 * skip this test altogether.
-+		 */
-+		puts("Please migrate me, then press return\n");
-+		(void)getchar();
-+	} else {
-+		test_migration();
-+	}
-+
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 9b97d0471bcf..8e52f560bb1e 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -180,3 +180,7 @@ smp = 2
- [migration-cmm]
- file = migration-cmm.elf
- groups = migration
-+
-+[migration-skey]
-+file = migration-skey.elf
-+groups = migration
--- 
-2.36.1
+Using patch 20 as an example, KVM_CAP_S390_ZPCI_OP will always be 
+reported as unavailable to userspace if CONFIG_VFIO_PCI_ZDEV_KVM=n due 
+to the call to kvm_s390_pci_interp_allowed().  If userspace sends us the 
+ioctl anyway, we will return -EINVAL because there is again a 
+IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) check before we read the ioctl args 
+from userspace.
+
+> 
+> So if you want to make this selectable by the user, I think you have to 
+> put some more #ifdefs in the following patches.
+> But if this was not meant to be selectable by the user, I think it 
+> should not get a help text and rather be selected by the KVM switch in 
+> arch/s390/kvm/Kconfig instead of having a "default y".
+> 
+>   Thomas
+> 
 
