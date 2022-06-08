@@ -2,128 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0633543AAB
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 19:39:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E05F5543ABF
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 19:45:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232587AbiFHRjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 13:39:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41468 "EHLO
+        id S232893AbiFHRpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 13:45:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232609AbiFHRjd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 13:39:33 -0400
-Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9ED446653
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 10:39:29 -0700 (PDT)
-Received: by mail-vs1-xe2b.google.com with SMTP id x187so20403130vsb.0
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 10:39:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YMlVWKWFWg+nhbnd5V57+qJ+IXhci7VV/Jgt/zHgEZ0=;
-        b=j3J+tWdGuDnMmzW4G3/e2Yrhr9b9g3Ixir6vg/ocyLbpDgCQnabw633VQz6gVt/Clq
-         d6sT+N9Jhqbyc//8NN1Kpz7bE3GnUXthlUddzx6GVNOqAYWs2ys7dH/k52qs6ZR9Rh5N
-         wYh0MQPu0tIzB1L3mrF28BVdB1JDjrnssIasa6WvL8hA5ICtUnV+hPkeFOZxF2clN1+g
-         xoCjHxrkFFsG5YEHV6qSO9Jky2BqWQKskCRD1Smx6E2RuSggMQBft86f5VfN3oUdvNl+
-         dA6IFRBsAkMqdTgjgyDDOAfcNA1oKJk5Gdjt1TQV9Gd5xf/yl6adfEct3gEyArl7EvAU
-         PArg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YMlVWKWFWg+nhbnd5V57+qJ+IXhci7VV/Jgt/zHgEZ0=;
-        b=XUgl2oMjw6L75HNwT0JX9o8TVSkkqCcEvYtHd+q1gsOynBkWjmNagpoV5V68G6CcJr
-         +gs+1CCEvQrWXGo1xT+RDC2FPOQPMn95ieehsDkD6LfjctSE/DZCrrqtHO3NTlPAOpjj
-         YAp4Jxm0yXlnrnwbCZ4TKH4uwj8CiW72PK7x6xC0onMFcB749xWzICCCwzI5qmpSk8Sm
-         xVWJgExLr0oajTrHWK0dlq59YuNbYsqvNaOFlIsR5q/S+kODaS2va7fAhUtvK8i1oO4W
-         DMxMCaGgz09l2ww7r79NwKn0SzJ/M23+etznVnufQTNyE+aV1527BVzon4W6x90UtvkP
-         n2mA==
-X-Gm-Message-State: AOAM532jz/Eb/J6UwbrrYzxEVBuwkn2vrGVsiIRdJms3PMMa2kiq4dMe
-        ypknsBqSMp2HrkAX7iLj4qqH8JB450Rg84O5GxPxZg==
-X-Google-Smtp-Source: ABdhPJwIIsHt0xzWM00HLFl0l6aL+x8xCN7jsifDlcALw0DFomqzVq6S0bhgX6CLu/L4ldhqPBDIwXZNDYBF05IHKrM=
-X-Received: by 2002:a67:d30d:0:b0:34a:8d6c:1be6 with SMTP id
- a13-20020a67d30d000000b0034a8d6c1be6mr14582002vsj.74.1654709968634; Wed, 08
- Jun 2022 10:39:28 -0700 (PDT)
+        with ESMTP id S232760AbiFHRpq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 13:45:46 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BBFC182BAC;
+        Wed,  8 Jun 2022 10:45:45 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 258HCfDI027744;
+        Wed, 8 Jun 2022 17:45:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=NWQi55GTIztdgzkO2fHsF15xzXrt9EmqDwq1OwLpZjs=;
+ b=O/dPLjkY5aCgVt0OwtNpVAivwN24BaSwwrSs5J+FVimsoYswQAgAiPO0jzRVOWBMu0Nf
+ qhFFWzymCIJUqdNbelUfGU7adqi1MHhbQo7JSfO1lN/L91W8AYKPIJ0DMKSjjAuXV7VV
+ Ujznmq3K1YbiW5fM1RHyoymc+f7ZU4WBuKmR9uDxTQNDaG9V7Vy/jrTTfNzvbn+lUi8F
+ 3rHEtR2qTbU9JdElQNQpq73N0N2S8SdxlSJqoxborHeYXENXegcgaCRZWUEwN0X9pVqb
+ P0IrIDB/qnC7tDrDIHr6Rg7slEkmD6ATW8hsOZTx4qsYpy+0kTpntRS0IpJ1E1SkCftp 8w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjyy30p6y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 17:45:44 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 258HVct5025823;
+        Wed, 8 Jun 2022 17:45:44 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gjyy30p6a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 17:45:44 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 258HKaan012898;
+        Wed, 8 Jun 2022 17:45:41 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3gfy18vjsq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Jun 2022 17:45:41 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 258Hjc0K55247344
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Jun 2022 17:45:38 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2421D11C04C;
+        Wed,  8 Jun 2022 17:45:38 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE1E611C04A;
+        Wed,  8 Jun 2022 17:45:37 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Jun 2022 17:45:37 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v4 0/4] More skey instr. emulation test
+Date:   Wed,  8 Jun 2022 19:45:33 +0200
+Message-Id: <20220608174536.1700357-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Y8j3lSQVtAfK27ogWbBzA9zAg9HknbrB
+X-Proofpoint-ORIG-GUID: Kht8gKcjhO0hpYLH6R75x0iqpII4UmM8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <20220519134204.5379-1-will@kernel.org> <20220519134204.5379-60-will@kernel.org>
- <CAMn1gO7Gs8YUEv9Gx8qakedGNwFVgt9i+X+rjw50uc7YGMhpEQ@mail.gmail.com> <CA+EHjTxa8mhiEykjTTgB0J6aFpRqDiRzLKOWOd3hFsSrL+d=5g@mail.gmail.com>
-In-Reply-To: <CA+EHjTxa8mhiEykjTTgB0J6aFpRqDiRzLKOWOd3hFsSrL+d=5g@mail.gmail.com>
-From:   Peter Collingbourne <pcc@google.com>
-Date:   Wed, 8 Jun 2022 10:39:14 -0700
-Message-ID: <CAMn1gO5gDiL=HE6H2AhxM2hQZ9fnJCAi8n+1NF7bhZDnS+jOyg@mail.gmail.com>
-Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
-To:     Fuad Tabba <tabba@google.com>
-Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-08_05,2022-06-07_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ impostorscore=0 clxscore=1015 bulkscore=0 priorityscore=1501
+ mlxlogscore=999 malwarescore=0 adultscore=0 mlxscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206080070
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 8, 2022 at 12:40 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Peter,
->
-> On Tue, Jun 7, 2022 at 1:42 AM Peter Collingbourne <pcc@google.com> wrote:
-> >
-> > On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
-> > >
-> > > From: Fuad Tabba <tabba@google.com>
-> > >
-> > > Return an error (-EINVAL) if trying to enable MTE on a protected
-> > > vm.
-> > >
-> > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > ---
-> > >  arch/arm64/kvm/arm.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 10e036bf06e3..8a1b4ba1dfa7 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -90,7 +90,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > >                 break;
-> > >         case KVM_CAP_ARM_MTE:
-> > >                 mutex_lock(&kvm->lock);
-> > > -               if (!system_supports_mte() || kvm->created_vcpus) {
-> > > +               if (!system_supports_mte() ||
-> > > +                   kvm_vm_is_protected(kvm) ||
-> >
-> > Should this check be added to kvm_vm_ioctl_check_extension() as well?
->
-> No need. kvm_vm_ioctl_check_extension() calls pkvm_check_extension()
-> for protected vms, which functions as an allow list rather than a
-> block list.
+Add test cases similar to those testing the effect of storage keys on
+instructions emulated by KVM, but test instructions emulated by user
+space/qemu instead.
+Test that DIAG 308 is not subject to key protection.
+Additionally, check the transaction exception identification on
+protection exceptions.
 
-I see. I guess I got confused when reading the code because I saw this
-in kvm_check_extension():
+This series is based on v2 of s390x: Rework TEID decoding and usage .
+https://lore.kernel.org/kvm/20220608133303.1532166-1-scgl@linux.ibm.com/
 
-        case KVM_CAP_ARM_NISV_TO_USER:
-                r = !kvm || !kvm_vm_is_protected(kvm);
-                break;
+v3 -> v4
+ * rebase on newest TEID decoding series
+ * pick up r-b's (Thanks Claudio)
+ * add check for protection code validity in case of basic SOP
 
-This can probably be simplified to "r = 1;".
+v2 -> v3
+ * move sclp patch and part of TEID test to series
+       s390x: Rework TEID decoding and usage
+ * make use of reworked TEID union in skey TEID test
+ * get rid of pointer to array for diag 308 test
+ * use lowcore symbol and mem_all
+ * don't reset intparm when expecting exception in msch test
 
-Peter
+v1 -> v2
+ * don't mixup sclp fix with new bits for the TEID patch
+ * address feedback
+       * cosmetic changes, i.e. shortening identifiers
+       * remove unconditional report_info
+ * add DIAG 308 test
+
+Janis Schoetterl-Glausch (3):
+  s390x: Test TEID values in storage key test
+  s390x: Test effect of storage keys on some more instructions
+  s390x: Test effect of storage keys on diag 308
+
+ s390x/skey.c        | 381 +++++++++++++++++++++++++++++++++++++++++++-
+ s390x/unittests.cfg |   1 +
+ 2 files changed, 376 insertions(+), 6 deletions(-)
+
+Range-diff against v3:
+1:  073ffb3c ! 1:  fbfd7e3b s390x: Test TEID values in storage key test
+    @@ s390x/skey.c: static void test_test_protection(void)
+     +{
+     +	union teid teid;
+     +	int access_code;
+    ++	bool dat;
+     +
+     +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+     +	report_prefix_push("TEID");
+     +	teid.val = lowcore.trans_exc_id;
+     +	switch (get_supp_on_prot_facility()) {
+     +	case SOP_NONE:
+    ++		break;
+     +	case SOP_BASIC:
+    ++		dat = extract_psw_mask() & PSW_MASK_DAT;
+    ++		report(!teid.sop_teid_predictable || !dat || !teid.sop_acc_list,
+    ++		       "valid protection code");
+     +		break;
+     +	case SOP_ENHANCED_1:
+    -+		report(!teid.esop1_acc_list_or_dat, "valid protection code");
+    ++		report(!teid.sop_teid_predictable, "valid protection code");
+     +		break;
+     +	case SOP_ENHANCED_2:
+     +		switch (teid_esop2_prot_code(teid)) {
+    @@ s390x/skey.c: static void test_set_prefix(void)
+      
+     @@ s390x/skey.c: static void test_set_prefix(void)
+      	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
+    - 	set_prefix_key_1((uint32_t *)&mem_all[2048]);
+    + 	set_prefix_key_1(OPAQUE_PTR(2048));
+      	install_page(root, 0, 0);
+     -	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+     +	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+2:  9f300b87 ! 2:  868bb863 s390x: Test effect of storage keys on some more instructions
+    @@ Commit message
+         fetch protection override.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+    +    Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+     
+      ## s390x/skey.c ##
+     @@
+    @@ s390x/skey.c: static void test_set_prefix(void)
+     +		set_storage_key(pagebuf, 0x28, 0);
+     +		expect_pgm_int();
+     +		install_page(root, virt_to_pte_phys(root, pagebuf), 0);
+    -+		modify_subchannel_key_1(test_device_sid, (struct schib *)&mem_all[2048]);
+    ++		modify_subchannel_key_1(test_device_sid, OPAQUE_PTR(2048));
+     +		install_page(root, 0, 0);
+     +		check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+     +		cc = stsch(test_device_sid, schib);
+3:  c4ca0619 ! 3:  d49934c0 s390x: Test effect of storage keys on diag 308
+    @@ Commit message
+         Test that key-controlled protection does not apply to diag 308.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+    +    Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+     
+      ## s390x/skey.c ##
+     @@ s390x/skey.c: static void test_store_cpu_address(void)
+
+base-commit: 2eed0bf1096077144cc3a0dd9974689487f9511a
+prerequisite-patch-id: aa682f50e4eba0e9b6cacd245d568f5bcca05e0f
+prerequisite-patch-id: 79a88ac3faff3ae2ef214bf4a90de7463e2fdc8a
+prerequisite-patch-id: bebbc71ca3cc8d085e36a049466dba5a420c9c75
+prerequisite-patch-id: d38a4fc7bc1fa6e352502f294cb9413f0b738b99
+prerequisite-patch-id: 181e4127db838f3a98fd2b27ea4f23c53da908d7
+-- 
+2.33.1
+
