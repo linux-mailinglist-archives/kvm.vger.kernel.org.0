@@ -2,95 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3612543C62
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 21:07:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AC13543CFE
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 21:37:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234646AbiFHTHf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 15:07:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40362 "EHLO
+        id S231971AbiFHThj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 15:37:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235370AbiFHTH3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 15:07:29 -0400
-Received: from smtp.smtpout.orange.fr (smtp07.smtpout.orange.fr [80.12.242.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 944433FDAD
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 12:06:07 -0700 (PDT)
-Received: from [192.168.1.18] ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id z10FnxNJJOOQ1z10FnBYWW; Wed, 08 Jun 2022 21:06:05 +0200
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Wed, 08 Jun 2022 21:06:05 +0200
-X-ME-IP: 90.11.190.129
-Message-ID: <66584227-9688-b738-1300-4b379ea0689c@wanadoo.fr>
-Date:   Wed, 8 Jun 2022 21:06:03 +0200
+        with ESMTP id S235621AbiFHThf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 15:37:35 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A252347D9
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 12:37:29 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id h1so18488271plf.11
+        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 12:37:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wh6/XuxZPZUDwyzy5Eh7VeXfArKnNs6YeEjpbWE+j5g=;
+        b=ZAG/K6D48l0KrmmRn1p2FTmiQngI/15yOkQ8MG3uOIp2K2v36XwQ2z8ZERlay6GUnj
+         f6Sg6s8FFS/vw4GmKlcbDU92NrHn2K9bSARE4ICPUYhAVS3ymvr75ETolLgVKsl3A513
+         oscCyM1WP/DK5242tikPCpr2E/rKOv00sX5olq99qElwq471NkYsjKcAWArALuZx2UmC
+         CgiqYG3dwPpKqe4lLXhreFySMsEDe8d4kPNvglQIKziVC1KrNkNXJk21EPdQMbqcRvJ6
+         v8IdnFTEPtFo6VDq8R+YkUgfipwAH1spS4CjC2hG/IiGlAv6nPBHFnuhil0CZaWyp+5b
+         sSXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wh6/XuxZPZUDwyzy5Eh7VeXfArKnNs6YeEjpbWE+j5g=;
+        b=E48McGO0hMp4GIJ71IEMBBNjnEUmqJtPstBJIkSyqV1BY2yIJw6VmsFNN+rE0ROweC
+         2vCrUlI7yw4lU8cMN6QFEneM2HNGrhuaEkJ+8X7l106w56Al+zgbpHHP25epUh41WS75
+         S4pETH/jMA9fhmMXEBDXJyq+eBj0Yx5X+e5tBs+9XcVnK842LBTIaEoI78H63GesbR8s
+         oHhe4orcAVOM//A7zffBdBlu3odOXTNWKdu25fj0A/v5hquWy2H1W6vrJYW0z5CkRFai
+         EZFal2nRHD0BMe8Tm0p3YE3E/o4XFj4f2babZsfpOHVCBm/18ajg/Gy+n7FFU727b7tE
+         x2gg==
+X-Gm-Message-State: AOAM533RiwTMBYCXywkl9mdQelVVkRyGxhhsW7atpkQzHrlZt8M+9NLh
+        C6aFjmVQ/0zHSbS+lqkvKDFLmeUUPsGIK9WFxTHL4A==
+X-Google-Smtp-Source: ABdhPJyfhv1kDe3gJcgewOBnTs26+Uc6YFkqzaIMBY+Sas+MZKd5jC6EwNSmICRKaXBZxv4CUZaYAZlNhfXBPpTEGHU=
+X-Received: by 2002:a17:902:f710:b0:15f:165f:b50b with SMTP id
+ h16-20020a170902f71000b0015f165fb50bmr36739481plo.158.1654717048302; Wed, 08
+ Jun 2022 12:37:28 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH] virtio: Directly use ida_alloc_range()/ida_free()
-Content-Language: en-US
-To:     Deming Wang <wangdeming@inspur.com>, mst@redhat.com,
-        jasowang@redhat.com
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220608060826.1681-1-wangdeming@inspur.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20220608060826.1681-1-wangdeming@inspur.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <CAGtprH_83CEC0U-cBR2FzHsxbwbGn0QJ87WFNOEet8sineOcbQ@mail.gmail.com>
+ <20220607065749.GA1513445@chaop.bj.intel.com> <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
+ <20220608021820.GA1548172@chaop.bj.intel.com>
+In-Reply-To: <20220608021820.GA1548172@chaop.bj.intel.com>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Wed, 8 Jun 2022 12:37:17 -0700
+Message-ID: <CAGtprH8xyf07jMN7ubTC__BvDj+z41uVGRiCJ7Rc5cv3KWg03w@mail.gmail.com>
+Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+...
+> With this patch series, it's actually even not possible for userspace VMM
+> to allocate private page by a direct write, it's basically unmapped from
+> there. If it really wants to, it should so something special, by intention,
+> that's basically the conversion, which we should allow.
+>
 
-Le 08/06/2022 à 08:08, Deming Wang a écrit :
-> Use ida_alloc_range()/ida_free() instead of deprecated
-> ida_simple_get()/ida_simple_remove() .
-> 
-> Signed-off-by: Deming Wang <wangdeming@inspur.com>
-> ---
->   drivers/vhost/vdpa.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 935a1d0ddb97..384049cfca8d 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -1293,7 +1293,7 @@ static void vhost_vdpa_release_dev(struct device *device)
->   	struct vhost_vdpa *v =
->   	       container_of(device, struct vhost_vdpa, dev);
->   
-> -	ida_simple_remove(&vhost_vdpa_ida, v->minor);
-> +	ida_free(&vhost_vdpa_ida, v->minor);
->   	kfree(v->vqs);
->   	kfree(v);
->   }
-> @@ -1316,8 +1316,7 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->   	if (!v)
->   		return -ENOMEM;
->   
-> -	minor = ida_simple_get(&vhost_vdpa_ida, 0,
-> -			       VHOST_VDPA_DEV_MAX, GFP_KERNEL);
-> +	minor = ida_alloc_range(&vhost_vdpa_ida, 0, VHOST_VDPA_DEV_MAX - 1, GFP_KERNEL);
+A VM can pass GPA backed by private pages to userspace VMM and when
+Userspace VMM accesses the backing hva there will be pages allocated
+to back the shared fd causing 2 sets of pages backing the same guest
+memory range.
 
-ida_alloc_max() would be better here. It is less verbose.
+> Thanks for bringing this up. But in my mind I still think userspace VMM
+> can do and it's its responsibility to guarantee that, if that is hard
+> required. By design, userspace VMM is the decision-maker for page
+> conversion and has all the necessary information to know which page is
+> shared/private. It also has the necessary knobs to allocate/free the
+> physical pages for guest memory. Definitely, we should make userspace
+> VMM more robust.
 
-An explanation in the commit log of why the -1 is needed would also help 
-reviewer/maintainer, IMHO.
+Making Userspace VMM more robust to avoid double allocation can get
+complex, it will have to keep track of all in-use (by Userspace VMM)
+shared fd memory to disallow conversion from shared to private and
+will have to ensure that all guest supplied addresses belong to shared
+GPA ranges.
+A coarser but simpler alternative could be to always allow shared to
+private conversion with unbacking the memory from shared fd and exit
+if the VMM runs in double allocation scenarios. In either cases,
+unbacking shared fd memory ideally should prevent memory allocation on
+subsequent write accesses to ensure double allocation scenarios are
+caught early.
 
-It IS correct, but it is not that obvious without looking at 
-ida_simple_get() and ida_alloc_range().
-
-CJ
-
-
->   	if (minor < 0) {
->   		kfree(v);
->   		return minor;
-
+Regards,
+Vishal
