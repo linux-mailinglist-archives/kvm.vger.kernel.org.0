@@ -2,283 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8488F542DC1
-	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 12:31:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6550542EE1
+	for <lists+kvm@lfdr.de>; Wed,  8 Jun 2022 13:13:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236778AbiFHKaY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 06:30:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56674 "EHLO
+        id S238289AbiFHLM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 07:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237793AbiFHK3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 06:29:25 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A12A01124EF;
-        Wed,  8 Jun 2022 03:18:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654683531; x=1686219531;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=t2q+I3pDJULoFU8AFqNT7du+oxRO3aTwmN+fPHX/1To=;
-  b=D06QJIqC4TnTbBR5LH2LK+lHva9ilw6YNUWQ/0NXhtuqtCK08UPXzxzg
-   8GmXVXIqU7MpzkqYIAQNe2d2jEYdxopQ6mABTOquN5w2qyUk//YQRDI4p
-   Q7jD3guIntPYarAQpSz4DN/cZM89OvEqPsgwlVAwpcmf4x+DbjsPVSol0
-   YQS8LBOnZc0LqAyFQTWtlSgC005Y0AqUrvdC0d/WcgCWQ+prIrKaz9K8E
-   +pd71M/VYQxl3Z1KrCpnh3+3p7mZAYF/mNtG4B2GoDjRFsdm/1R4oB/im
-   D45RqcSp2LUbIBwZMiVHBRwmgBn9UylLlXTiMzX/iSLvQimOvnn9Xs8cJ
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="338637617"
-X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
-   d="scan'208";a="338637617"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2022 03:18:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
-   d="scan'208";a="636733628"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga008.fm.intel.com with ESMTP; 08 Jun 2022 03:18:47 -0700
-Date:   Wed, 8 Jun 2022 18:18:47 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 05/38] KVM: x86: hyper-v: Handle
- HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently
-Message-ID: <20220608101847.63xavwsgfdprpaes@yy-desk-7060>
-References: <20220606083655.2014609-1-vkuznets@redhat.com>
- <20220606083655.2014609-6-vkuznets@redhat.com>
+        with ESMTP id S238092AbiFHLMR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 07:12:17 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD33123C669;
+        Wed,  8 Jun 2022 04:11:25 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D8B651F45B;
+        Wed,  8 Jun 2022 11:11:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1654686682; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DzkXLFii6Lzd4vFsVvb/Wv8MqSqwg25Cm/LqRcSLJMU=;
+        b=ZMBCvYQT55MY1yhIhT7KQeyuFvjN9ZK9wLwj78teR9I1jgfeqSGNqWfSHqujrsmQX4zAw/
+        BmcETWKm9XSwTjcINv1k6eUYKZ+YwF/GVooYq+SeBDy6og2GLDnbIU2+dN8iHHqRd9JrPv
+        xAu/QnvPCS2FpebWQVrMhUeYblIAWuE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1654686682;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DzkXLFii6Lzd4vFsVvb/Wv8MqSqwg25Cm/LqRcSLJMU=;
+        b=V3m+TWAoMoCDm2UqwvX93rW5dqdoSWq+HmYLCMPyAHiS40NRWAKFi8zC817hSsFjtWQoJ9
+        P0uf576Mxt+hRpDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A9BFC13AD9;
+        Wed,  8 Jun 2022 11:11:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vI5AKNqDoGKxFwAAMHmgww
+        (envelope-from <tzimmermann@suse.de>); Wed, 08 Jun 2022 11:11:22 +0000
+Message-ID: <0c45183c-cdb8-4578-e346-bc4855be038f@suse.de>
+Date:   Wed, 8 Jun 2022 13:11:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220606083655.2014609-6-vkuznets@redhat.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        airlied@linux.ie, daniel@ffwll.ch
+Cc:     kvm@vger.kernel.org, Laszlo Ersek <lersek@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+References: <165453797543.3592816.6381793341352595461.stgit@omen>
+ <165453800875.3592816.12944011921352366695.stgit@omen>
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+In-Reply-To: <165453800875.3592816.12944011921352366695.stgit@omen>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------tliJen0oz07WPohuNiKYlJYQ"
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 06, 2022 at 10:36:22AM +0200, Vitaly Kuznetsov wrote:
-> Currently, HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls are handled
-> the exact same way as HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE{,EX}: by
-> flushing the whole VPID and this is sub-optimal. Switch to handling
-> these requests with 'flush_tlb_gva()' hooks instead. Use the newly
-> introduced TLB flush fifo to queue the requests.
->
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/hyperv.c | 100 +++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 88 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 762b0b699fdf..956072592e2f 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1806,32 +1806,82 @@ static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
->  				  sparse_banks, consumed_xmm_halves, offset);
->  }
->
-> -static void hv_tlb_flush_enqueue(struct kvm_vcpu *vcpu)
-> +static int kvm_hv_get_tlb_flush_entries(struct kvm *kvm, struct kvm_hv_hcall *hc, u64 entries[],
-> +					int consumed_xmm_halves, gpa_t offset)
-> +{
-> +	return kvm_hv_get_hc_data(kvm, hc, hc->rep_cnt, hc->rep_cnt,
-> +				  entries, consumed_xmm_halves, offset);
-> +}
-> +
-> +static void hv_tlb_flush_enqueue(struct kvm_vcpu *vcpu, u64 *entries, int count)
->  {
->  	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
->  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
->  	u64 entry = KVM_HV_TLB_FLUSHALL_ENTRY;
-> +	unsigned long flags;
->
->  	if (!hv_vcpu)
->  		return;
->
->  	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
->
-> -	kfifo_in_spinlocked(&tlb_flush_fifo->entries, &entry, 1, &tlb_flush_fifo->write_lock);
-> +	spin_lock_irqsave(&tlb_flush_fifo->write_lock, flags);
-> +
-> +	/*
-> +	 * All entries should fit on the fifo leaving one free for 'flush all'
-> +	 * entry in case another request comes in. In case there's not enough
-> +	 * space, just put 'flush all' entry there.
-> +	 */
-> +	if (count && entries && count < kfifo_avail(&tlb_flush_fifo->entries)) {
-> +		WARN_ON(kfifo_in(&tlb_flush_fifo->entries, entries, count) != count);
-> +		goto out_unlock;
-> +	}
-> +
-> +	/*
-> +	 * Note: full fifo always contains 'flush all' entry, no need to check the
-> +	 * return value.
-> +	 */
-> +	kfifo_in(&tlb_flush_fifo->entries, &entry, 1);
-> +
-> +out_unlock:
-> +	spin_unlock_irqrestore(&tlb_flush_fifo->write_lock, flags);
->  }
->
->  void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
->  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> +	u64 entries[KVM_HV_TLB_FLUSH_FIFO_SIZE];
-> +	int i, j, count;
-> +	gva_t gva;
->
-> -	kvm_vcpu_flush_tlb_guest(vcpu);
-> -
-> -	if (!hv_vcpu)
-> +	if (!tdp_enabled || !hv_vcpu) {
-> +		kvm_vcpu_flush_tlb_guest(vcpu);
->  		return;
-> +	}
->
->  	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
->
-> +	count = kfifo_out(&tlb_flush_fifo->entries, entries, KVM_HV_TLB_FLUSH_FIFO_SIZE);
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------tliJen0oz07WPohuNiKYlJYQ
+Content-Type: multipart/mixed; boundary="------------8TfJUIQWUEA0lruZrkU3Iboj";
+ protected-headers="v1"
+From: Thomas Zimmermann <tzimmermann@suse.de>
+To: Alex Williamson <alex.williamson@redhat.com>,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, airlied@linux.ie,
+ daniel@ffwll.ch
+Cc: kvm@vger.kernel.org, Laszlo Ersek <lersek@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <0c45183c-cdb8-4578-e346-bc4855be038f@suse.de>
+Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
+References: <165453797543.3592816.6381793341352595461.stgit@omen>
+ <165453800875.3592816.12944011921352366695.stgit@omen>
+In-Reply-To: <165453800875.3592816.12944011921352366695.stgit@omen>
 
-Writers are protected by the fifo lock so only 1 writer VS 1 reader on
-this kfifo (at least so far), it shuold be safe but I'm not sure
-whether some unexpected cases there, e.g. KVM flushs another VCPU's
-kfifo while that VCPU is doing same thing for itself yet.
+--------------8TfJUIQWUEA0lruZrkU3Iboj
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-> +
-> +	for (i = 0; i < count; i++) {
-> +		if (entries[i] == KVM_HV_TLB_FLUSHALL_ENTRY)
-> +			goto out_flush_all;
-> +
-> +		/*
-> +		 * Lower 12 bits of 'address' encode the number of additional
-> +		 * pages to flush.
-> +		 */
-> +		gva = entries[i] & PAGE_MASK;
-> +		for (j = 0; j < (entries[i] & ~PAGE_MASK) + 1; j++)
-> +			static_call(kvm_x86_flush_tlb_gva)(vcpu, gva + j * PAGE_SIZE);
-> +
-> +		++vcpu->stat.tlb_flush;
-> +	}
-> +	return;
-> +
-> +out_flush_all:
-> +	kvm_vcpu_flush_tlb_guest(vcpu);
->  	kfifo_reset_out(&tlb_flush_fifo->entries);
->  }
->
-> @@ -1841,11 +1891,21 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  	struct hv_tlb_flush_ex flush_ex;
->  	struct hv_tlb_flush flush;
->  	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
-> +	/*
-> +	 * Normally, there can be no more than 'KVM_HV_TLB_FLUSH_FIFO_SIZE'
-> +	 * entries on the TLB flush fifo. The last entry, however, needs to be
-> +	 * always left free for 'flush all' entry which gets placed when
-> +	 * there is not enough space to put all the requested entries.
-> +	 */
-> +	u64 __tlb_flush_entries[KVM_HV_TLB_FLUSH_FIFO_SIZE - 1];
-> +	u64 *tlb_flush_entries;
->  	u64 valid_bank_mask;
->  	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
->  	struct kvm_vcpu *v;
->  	unsigned long i;
->  	bool all_cpus;
-> +	int consumed_xmm_halves = 0;
-> +	gpa_t data_offset;
->
->  	/*
->  	 * The Hyper-V TLFS doesn't allow more than 64 sparse banks, e.g. the
-> @@ -1861,10 +1921,12 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  			flush.address_space = hc->ingpa;
->  			flush.flags = hc->outgpa;
->  			flush.processor_mask = sse128_lo(hc->xmm[0]);
-> +			consumed_xmm_halves = 1;
->  		} else {
->  			if (unlikely(kvm_read_guest(kvm, hc->ingpa,
->  						    &flush, sizeof(flush))))
->  				return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +			data_offset = sizeof(flush);
->  		}
->
->  		trace_kvm_hv_flush_tlb(flush.processor_mask,
-> @@ -1888,10 +1950,12 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  			flush_ex.flags = hc->outgpa;
->  			memcpy(&flush_ex.hv_vp_set,
->  			       &hc->xmm[0], sizeof(hc->xmm[0]));
-> +			consumed_xmm_halves = 2;
->  		} else {
->  			if (unlikely(kvm_read_guest(kvm, hc->ingpa, &flush_ex,
->  						    sizeof(flush_ex))))
->  				return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +			data_offset = sizeof(flush_ex);
->  		}
->
->  		trace_kvm_hv_flush_tlb_ex(flush_ex.hv_vp_set.valid_bank_mask,
-> @@ -1907,25 +1971,37 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  			return HV_STATUS_INVALID_HYPERCALL_INPUT;
->
->  		if (all_cpus)
-> -			goto do_flush;
-> +			goto read_flush_entries;
->
->  		if (!hc->var_cnt)
->  			goto ret_success;
->
-> -		if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks, 2,
-> -					  offsetof(struct hv_tlb_flush_ex,
-> -						   hv_vp_set.bank_contents)))
-> +		if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks, consumed_xmm_halves,
-> +					  data_offset))
-> +			return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +		data_offset += hc->var_cnt * sizeof(sparse_banks[0]);
-> +		consumed_xmm_halves += hc->var_cnt;
-> +	}
-> +
-> +read_flush_entries:
-> +	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE ||
-> +	    hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX ||
-> +	    hc->rep_cnt > ARRAY_SIZE(__tlb_flush_entries)) {
-> +		tlb_flush_entries = NULL;
-> +	} else {
-> +		if (kvm_hv_get_tlb_flush_entries(kvm, hc, __tlb_flush_entries,
-> +						consumed_xmm_halves, data_offset))
->  			return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +		tlb_flush_entries = __tlb_flush_entries;
->  	}
->
-> -do_flush:
->  	/*
->  	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
->  	 * analyze it here, flush TLB regardless of the specified address space.
->  	 */
->  	if (all_cpus) {
->  		kvm_for_each_vcpu(i, v, kvm)
-> -			hv_tlb_flush_enqueue(v);
-> +			hv_tlb_flush_enqueue(v, tlb_flush_entries, hc->rep_cnt);
->
->  		kvm_make_all_cpus_request(kvm, KVM_REQ_HV_TLB_FLUSH);
->  	} else {
-> @@ -1935,7 +2011,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  			v = kvm_get_vcpu(kvm, i);
->  			if (!v)
->  				continue;
-> -			hv_tlb_flush_enqueue(v);
-> +			hv_tlb_flush_enqueue(v, tlb_flush_entries, hc->rep_cnt);
->  		}
->
->  		kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH, vcpu_mask);
-> --
-> 2.35.3
->
+SGkgQWxleA0KDQpBbSAwNi4wNi4yMiB1bSAxOTo1MyBzY2hyaWViIEFsZXggV2lsbGlhbXNv
+bjoNCj4gQ29uc29sZSBkcml2ZXJzIGNhbiBjcmVhdGUgY29uZmxpY3RzIHdpdGggUENJIHJl
+c291cmNlcyByZXN1bHRpbmcgaW4NCj4gdXNlcnNwYWNlIGdldHRpbmcgbW1hcCBmYWlsdXJl
+cyB0byBtZW1vcnkgQkFScy4gIFRoaXMgaXMgZXNwZWNpYWxseSBldmlkZW50DQo+IHdoZW4g
+dHJ5aW5nIHRvIHJlLXVzZSB0aGUgc3lzdGVtIHByaW1hcnkgY29uc29sZSBmb3IgdXNlcnNw
+YWNlIGRyaXZlcnMuDQo+IEF0dGVtcHQgdG8gcmVtb3ZlIGFsbCBuYXR1cmUgb2YgY29uZmxp
+Y3RpbmcgZHJpdmVycyBhcyBwYXJ0IG9mIG91ciBWR0ENCj4gaW5pdGlhbGl6YXRpb24uDQoN
+CkZpcnN0IGEgZHVtYiBxdWVzdGlvbiBhYm91dCB5b3VyIHVzZSBjYXNlLiAgWW91IHdhbnQg
+dG8gYXNzaWduIGEgUENJIA0KZ3JhcGhpY3MgY2FyZCB0byBhIHZpcnR1YWwgbWFjaGluZSBh
+bmQgbmVlZCB0byByZW1vdmUgdGhlIGdlbmVyaWMgZHJpdmVyIA0KZnJvbSB0aGUgZnJhbWVi
+dWZmZXI/DQoNCj4gDQo+IFJlcG9ydGVkLWJ5OiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRo
+YXQuY29tPg0KPiBUZXN0ZWQtYnk6IExhc3psbyBFcnNlayA8bGVyc2VrQHJlZGhhdC5jb20+
+DQo+IFN1Z2dlc3RlZC1ieTogR2VyZCBIb2ZmbWFubiA8a3JheGVsQHJlZGhhdC5jb20+DQo+
+IFNpZ25lZC1vZmYtYnk6IEFsZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhh
+dC5jb20+DQo+IC0tLQ0KPiAgIGRyaXZlcnMvdmZpby9wY2kvdmZpb19wY2lfY29yZS5jIHwg
+ICAxNyArKysrKysrKysrKysrKysrKw0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxNyBpbnNlcnRp
+b25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9j
+b3JlLmMgYi9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2NvcmUuYw0KPiBpbmRleCBhMGQ2
+OWRkYWY5MGQuLmUwY2JjYmMyYWVlMSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy92ZmlvL3Bj
+aS92ZmlvX3BjaV9jb3JlLmMNCj4gKysrIGIvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9j
+b3JlLmMNCj4gQEAgLTEzLDYgKzEzLDcgQEANCj4gICAjaW5jbHVkZSA8bGludXgvZGV2aWNl
+Lmg+DQo+ICAgI2luY2x1ZGUgPGxpbnV4L2V2ZW50ZmQuaD4NCj4gICAjaW5jbHVkZSA8bGlu
+dXgvZmlsZS5oPg0KPiArI2luY2x1ZGUgPGxpbnV4L2ZiLmg+DQo+ICAgI2luY2x1ZGUgPGxp
+bnV4L2ludGVycnVwdC5oPg0KPiAgICNpbmNsdWRlIDxsaW51eC9pb21tdS5oPg0KPiAgICNp
+bmNsdWRlIDxsaW51eC9tb2R1bGUuaD4NCj4gQEAgLTI5LDYgKzMwLDggQEANCj4gICANCj4g
+ICAjaW5jbHVkZSA8bGludXgvdmZpb19wY2lfY29yZS5oPg0KPiAgIA0KPiArI2luY2x1ZGUg
+PGRybS9kcm1fYXBlcnR1cmUuaD4NCj4gKw0KPiAgICNkZWZpbmUgRFJJVkVSX0FVVEhPUiAg
+ICJBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPiINCj4gICAj
+ZGVmaW5lIERSSVZFUl9ERVNDICJjb3JlIGRyaXZlciBmb3IgVkZJTyBiYXNlZCBQQ0kgZGV2
+aWNlcyINCj4gICANCj4gQEAgLTE3OTMsNiArMTc5NiwyMCBAQCBzdGF0aWMgaW50IHZmaW9f
+cGNpX3ZnYV9pbml0KHN0cnVjdCB2ZmlvX3BjaV9jb3JlX2RldmljZSAqdmRldikNCj4gICAJ
+aWYgKCF2ZmlvX3BjaV9pc192Z2EocGRldikpDQo+ICAgCQlyZXR1cm4gMDsNCj4gICANCj4g
+KyNpZiBJU19SRUFDSEFCTEUoQ09ORklHX0RSTSkNCj4gKwlkcm1fYXBlcnR1cmVfZGV0YWNo
+X3BsYXRmb3JtX2RyaXZlcnMocGRldik7DQo+ICsjZW5kaWYNCj4gKw0KPiArI2lmIElTX1JF
+QUNIQUJMRShDT05GSUdfRkIpDQo+ICsJcmV0ID0gcmVtb3ZlX2NvbmZsaWN0aW5nX3BjaV9m
+cmFtZWJ1ZmZlcnMocGRldiwgdmRldi0+dmRldi5vcHMtPm5hbWUpOw0KPiArCWlmIChyZXQp
+DQo+ICsJCXJldHVybiByZXQ7DQo+ICsjZW5kaWYNCj4gKw0KPiArCXJldCA9IHZnYV9yZW1v
+dmVfdmdhY29uKHBkZXYpOw0KPiArCWlmIChyZXQpDQo+ICsJCXJldHVybiByZXQ7DQo+ICsN
+Cg0KWW91IHNob3VsZG4ndCBoYXZlIHRvIGNvcHkgYW55IG9mIHRoZSBpbXBsZW1lbnRhdGlv
+biBvZiB0aGUgYXBlcnR1cmUgDQpoZWxwZXJzLg0KDQpJZiB5b3UgY2FsbCBkcm1fYXBlcnR1
+cmVfcmVtb3ZlX2NvbmZsaWN0aW5nX3BjaV9mcmFtZWJ1ZmZlcnMoKSBpdCBzaG91bGQgDQp3
+b3JrIGNvcnJlY3RseS4gVGhlIG9ubHkgcmVhc29uIHdoeSBpdCByZXF1aXJlcyBhIERSTSBk
+cml2ZXIgc3RydWN0dXJlIA0KYXMgc2Vjb25kIGFyZ3VtZW50IGlzIGZvciB0aGUgZHJpdmVy
+J3MgbmFtZS4gWzFdIEFuZCB0aGF0IG5hbWUgaXMgb25seSANCnVzZWQgZm9yIHByaW50aW5n
+IGFuIGluZm8gbWVzc2FnZS4gWzJdDQoNClRoZSBwbGFuIGZvcndhcmQgd291bGQgYmUgdG8g
+ZHJvcCBwYXRjaCAxIGVudGlyZWx5Lg0KDQpGb3IgcGF0Y2ggMiwgdGhlIG1vc3QgdHJpdmlh
+bCB3b3JrYXJvdW5kIGlzIHRvIGluc3RhbmNpYXRlIHN0cnVjdCANCmRybV9kcml2ZXIgaGVy
+ZSBhbmQgc2V0IHRoZSBuYW1lIGZpZWxkIHRvICd2ZGV2LT52ZGV2Lm9wcy0+bmFtZScuIElu
+IHRoZSANCmxvbmdlciB0ZXJtLCB0aGUgYXBlcnR1cmUgaGVscGVycyB3aWxsIGJlIG1vdmVk
+IG91dCBvZiBEUk0gYW5kIGludG8gYSANCm1vcmUgcHJvbWluZW50IGxvY2F0aW9uLiBUaGF0
+IHdvcmthcm91bmQgd2lsbCBiZSBjbGVhbmVkIHVwIHRoZW4uDQoNCkFsdGVybmF0aXZlbHks
+IGRybV9hcGVydHVyZV9yZW1vdmVfY29uZmxpY3RpbmdfcGNpX2ZyYW1lYnVmZmVycygpIGNv
+dWxkIA0KYmUgY2hhbmdlZCB0byBhY2NlcHQgdGhlIG5hbWUgc3RyaW5nIGFzIHNlY29uZCBh
+cmd1bWVudCwgYnV0IHRoYXQncyANCnF1aXRlIGEgYml0IG9mIGNodXJuIHdpdGhpbiB0aGUg
+RFJNIGNvZGUuDQoNCkJlc3QgcmVnYXJkcw0KVGhvbWFzDQoNClsxXSANCmh0dHBzOi8vZWxp
+eGlyLmJvb3RsaW4uY29tL2xpbnV4L3Y1LjE4LjIvc291cmNlL2RyaXZlcnMvZ3B1L2RybS9k
+cm1fYXBlcnR1cmUuYyNMMzQ3DQpbMl0gDQpodHRwczovL2VsaXhpci5ib290bGluLmNvbS9s
+aW51eC92NS4xOC4yL3NvdXJjZS9kcml2ZXJzL3ZpZGVvL2ZiZGV2L2NvcmUvZmJtZW0uYyNM
+MTU3MA0KDQoNCj4gICAJcmV0ID0gdmdhX2NsaWVudF9yZWdpc3RlcihwZGV2LCB2ZmlvX3Bj
+aV9zZXRfZGVjb2RlKTsNCj4gICAJaWYgKHJldCkNCj4gICAJCXJldHVybiByZXQ7DQo+IA0K
+PiANCg0KLS0gDQpUaG9tYXMgWmltbWVybWFubg0KR3JhcGhpY3MgRHJpdmVyIERldmVsb3Bl
+cg0KU1VTRSBTb2Z0d2FyZSBTb2x1dGlvbnMgR2VybWFueSBHbWJIDQpNYXhmZWxkc3RyLiA1
+LCA5MDQwOSBOw7xybmJlcmcsIEdlcm1hbnkNCihIUkIgMzY4MDksIEFHIE7DvHJuYmVyZykN
+Ckdlc2Now6RmdHNmw7xocmVyOiBJdm8gVG90ZXYNCg==
+
+--------------8TfJUIQWUEA0lruZrkU3Iboj--
+
+--------------tliJen0oz07WPohuNiKYlJYQ
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmKgg9kFAwAAAAAACgkQlh/E3EQov+DJ
+oQ//YxjGxWaKR12QjJh6WmuB2ccoNkBbXVm9U2rZ+RseANh+7TR8YeYsI8FnySRUmwqGEjG5JB1z
+X4axBCNNFa+cQ0E7JpUtWw8A1iKCx4Z5PQ2VBHP9BgL3O9MwPCLfYqY9NE2I/+IfcdFQIAYJV1YA
+7ZWe/sSStCceuOoe/yzgLyhrnchNDbEpnswe/GSYFU/BE837smdi7RTf54mJv45nt0L4jKkxOHFt
+Ar0UEwC5ltOh57nuIy/xg5lPpIaMya1NeJuyOEaJSXNaJO/W+pYfokebIoExz+TUNMQA4FCg/IU/
+1o+yhK47vBaNYj377mWz4TpNGFq1SBTkUfTHcO7Z6bpm2R8inSnC0PgCMs8wJ5BtbNpdKwWoPU0V
+2ROiypiOXs8TseZhZ4jVPp9pAyaFty6XpryBm9SCRM9V3MU0qfle0BbxtrUSUlAHNRWAQAqKtuC1
+5ay88sFosIZhG8TbWEsdCIbUharV5x76ENUG8aszQe9H+WM2JYuqf8LvGCJlU5rxrjmiwcU510QL
+5zSQNh6PJE3MnRp8XLeX96A8pGbaJo5mFWd6+4I+6lYQieYJAuVLAsG2qRoH8i6LBEQCs+J2IgKN
+BCr+Wr7XwzcoAjbEaWzLfA9Wcp4YYc+9y6UsauO8kuqXEQgI13jdOF0O5GxCguxjLjTi+n0zV+S2
+g5g=
+=L6Rp
+-----END PGP SIGNATURE-----
+
+--------------tliJen0oz07WPohuNiKYlJYQ--
