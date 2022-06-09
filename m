@@ -2,59 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7E0A54455B
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:10:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26CD354456E
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:13:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234862AbiFIIKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 04:10:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41168 "EHLO
+        id S239122AbiFIINg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 04:13:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229836AbiFIIKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:10:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 19B8D1775DE
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:10:16 -0700 (PDT)
+        with ESMTP id S240578AbiFIINa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 04:13:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 519895EDD8
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:13:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654762215;
+        s=mimecast20190719; t=1654762408;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tiLrsl9taTyGSrJjDKI7N8ule2WbsgbzAGcFN4T087E=;
-        b=QnDZ/zpnoBPIfL0ChLL/ZgP3gW/8rD45bOJfgopwGME7wZ+WCRJ/kYIh9AgEqLC/7cqCDb
-        Ej+347IIPXnO8BULK9RHc8epaghFw7/SYgeau/H6iO30NSSgXBZkDQS6Q3eSdqZux6irWk
-        LnduEw1eX2kfmAfkzSVwTTVG30ZLUaE=
+        bh=0UBhD5YEWFNp4aDc/ahVKPUNtBuVUhhYKUmhLtmUs50=;
+        b=LhXp7zrEl9+ReQFdw3iG8KP+6xBzlA45OHahSv9S+UnbYDVLpHoooXnfRvgyHvfHlU51P+
+        qQXOTihOyLNv0KNcn8zM+GSLo3ttSSR65TxEszx6xBjUVdC4EV0/+nxX5TvkjmEYeUvaPs
+        MxdhL+WPTe6n1jSx88L0WgMF0fnF9Qc=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-562-sFd4YcckPoi0xEo8ZlBU9g-1; Thu, 09 Jun 2022 04:10:14 -0400
-X-MC-Unique: sFd4YcckPoi0xEo8ZlBU9g-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-637-LSqcigi8OVWcf-rDwFRfYQ-1; Thu, 09 Jun 2022 04:13:27 -0400
+X-MC-Unique: LSqcigi8OVWcf-rDwFRfYQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A7AB3C0E216;
-        Thu,  9 Jun 2022 08:10:13 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B475492C3B;
-        Thu,  9 Jun 2022 08:10:12 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        alex.williamson@redhat.com
-Cc:     kwankhede@nvidia.com, farman@linux.ibm.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, diana.craciun@oss.nxp.com,
-        eric.auger@redhat.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, jgg@nvidia.com, yishaih@nvidia.com,
-        hch@lst.de
-Subject: Re: [PATCH] vfio: de-extern-ify function prototypes
-In-Reply-To: <165471414407.203056.474032786990662279.stgit@omen>
-Organization: Red Hat GmbH
-References: <165471414407.203056.474032786990662279.stgit@omen>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Thu, 09 Jun 2022 10:10:11 +0200
-Message-ID: <87tu8u9s0s.fsf@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AEF381C004E9;
+        Thu,  9 Jun 2022 08:13:26 +0000 (UTC)
+Received: from starship (unknown [10.40.194.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C72111121315;
+        Thu,  9 Jun 2022 08:13:22 +0000 (UTC)
+Message-ID: <909920fcfb5a614861fbc2654b3e8c1f0240bb51.camel@redhat.com>
+Subject: Re: [PATCH 4/7] KVM: x86: SVM: fix avic_kick_target_vcpus_fast
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        stable@vger.kernel.org
+Date:   Thu, 09 Jun 2022 11:13:21 +0300
+In-Reply-To: <c7fb78e2-2650-f9a2-3062-5d5ecc34332b@redhat.com>
+References: <20220606180829.102503-1-mlevitsk@redhat.com>
+         <20220606180829.102503-5-mlevitsk@redhat.com>
+         <c7fb78e2-2650-f9a2-3062-5d5ecc34332b@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -65,30 +72,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08 2022, Alex Williamson <alex.williamson@redhat.com> wrote:
+On Wed, 2022-06-08 at 15:21 +0200, Paolo Bonzini wrote:
+> On 6/6/22 20:08, Maxim Levitsky wrote:
+> > There are two issues in avic_kick_target_vcpus_fast
+> > 
+> > 1. It is legal to issue an IPI request with APIC_DEST_NOSHORT
+> >     and a physical destination of 0xFF (or 0xFFFFFFFF in case of x2apic),
+> >     which must be treated as a broadcast destination.
+> > 
+> >     Fix this by explicitly checking for it.
+> >     Also don’t use ‘index’ in this case as it gives no new information.
+> > 
+> > 2. It is legal to issue a logical IPI request to more than one target.
+> >     Index field only provides index in physical id table of first
+> >     such target and therefore can't be used before we are sure
+> >     that only a single target was addressed.
+> > 
+> >     Instead, parse the ICRL/ICRH, double check that a unicast interrupt
+> >     was requested, and use that info to figure out the physical id
+> >     of the target vCPU.
+> >     At that point there is no need to use the index field as well.
+> > 
+> > 
+> > In addition to fixing the above	issues,	also skip the call to
+> > kvm_apic_match_dest.
+> > 
+> > It is possible to do this now, because now as long as AVIC is not
+> > inhibited, it is guaranteed that none of the vCPUs changed their
+> > apic id from its default value.
+> > 
+> > 
+> > This fixes boot of windows guest with AVIC enabled because it uses
+> > IPI with 0xFF destination and no destination shorthand.
+> > 
+> > Fixes: 7223fd2d5338 ("KVM: SVM: Use target APIC ID to complete AVIC IRQs when possible")
+> > Cc: stable@vger.kernel.org
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Is it possible to use kvm_intr_is_single_vcpu_fast, or am I missing 
+> something?
 
-> The use of 'extern' in function prototypes has been disrecommended in
-> the kernel coding style for several years now, remove them from all vfio
-> related files so contributors no longer need to decide between style and
-> consistency.
->
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->
-> A patch in the same vein was proposed about a year ago, but tied to an ill
-> fated series and forgotten.  Now that we're at the beginning of a new
-> development cycle, I'd like to propose kicking off the v5.20 vfio next
-> branch with this patch and would kindly ask anyone with pending respins or
-> significant conflicts to rebase on top of this patch.  Thanks!
->
->  Documentation/driver-api/vfio-mediated-device.rst |   10 ++-
->  drivers/s390/cio/vfio_ccw_cp.h                    |   12 ++--
->  drivers/s390/cio/vfio_ccw_private.h               |    6 +-
->  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h         |    2 -
->  drivers/vfio/platform/vfio_platform_private.h     |   21 +++---
->  include/linux/vfio.h                              |   70 ++++++++++-----------
->  include/linux/vfio_pci_core.h                     |   65 ++++++++++----------
->  7 files changed, 91 insertions(+), 95 deletions(-)
+Yes, except that it needs 'struct kvm_lapic_irq' which we won't have when
+we emulate guest<->guest interrupts, and also it goes over apic map and such,
+which can be be skipped.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+It also does more unneeded things like dealing with low priority mode for example,
+which thankfully AVIC doenst' support and if attempted will still VM exit
+with 'incomplete IPI' but with AVIC_IPI_FAILURE_INVALID_INT_TYPE subreason,
+which goes through full APIC register emulation.
+
+I do think about the fact that ICRL/H parsing in the case of logical ID,
+(which depends on cluser mode and x2apic mode) can be moved to some common
+code, but I wasn't able yet to find a clean way to do it.
+
+BTW: there is another case where AVIC must be inhibited: in xapic mode,
+logical ids, don't have to have a single bit set in the mask area of the logical id, 
+(low 4 bits in cluster mode and all 8 bits in flat mode)
+and neither there is a guarnantee that multilple CPUs don't share these bits.
+
+AVIC however has a logical ID table which maps each (bit x cluster value) to a physical id,
+and therefore a single vCPU, so tha later is not possible to support with AVIC.
+
+I haven't studied the code that is responsible for this, I will do this soon.
+
+
+Thankfully IPIv only supports physical IPI mode (this is what I heard, don't know for sure).
+
+I also will write a unit test for this very soon, to test various logical id
+IPIs, messing with logical id registers, etc, etc.
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+> Series queued, thanks.
+> 
+> Paolo
+> 
+
 
