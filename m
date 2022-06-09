@@ -2,144 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45DA2545780
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 00:37:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2043A54578B
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 00:42:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345751AbiFIWhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 18:37:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50154 "EHLO
+        id S1345776AbiFIWmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 18:42:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237368AbiFIWhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 18:37:31 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C20E15A3E7
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 15:37:30 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id f9so10902554plg.0
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 15:37:30 -0700 (PDT)
+        with ESMTP id S232459AbiFIWmE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 18:42:04 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC9AF163286
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 15:42:02 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id y16so19763148ili.13
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 15:42:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=O60y2iE37MzESN5fyK5JC5FyF2KHeNE/DgjyVicySlo=;
-        b=AW/oLjImNaQ93ApSb/VwDfB/JMThSpZdXz4G6I9Kmug/CW1fN5Ofh6f7AqImTcjWbT
-         XRc334gnAiSghVMop5nN80ajx3J/8dxZ3UbOyQoR64xBK6MasouOqt8djHfDMxxMy2A0
-         q919u3Dq5g4190v4Dph0OltAqZQzHX5v2WXeuYv9wukWkAoru2SQJ7KWIHCUJ1hwBnAL
-         WeBLLI6mpxEi+ovPG8XSSgcU+lpfmFe/D4INqw41J4Lio9pZzbr8kHDDXDQtKB/k3sfU
-         DSlSQsdOtu8YxMddopbAzSYVUsNguTQcEXiiqeLFFXUph5Zif665rjLNSrcKV/KtD+MG
-         47Bg==
+        d=gmail.com; s=20210112;
+        h=mime-version:sender:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=/FRQdMUJFk/jNgSEtRr45RURpkqhM+6c+D2uuhvjBdA=;
+        b=F1qS4l61NvQIYpWebJAGv78hw7aPsRYLCh3mE58G7/Ec4aOo3LrCtJs0CjLaGUtWJR
+         HbHll4Vxu5pJfCti//ZoSU55atT3fGYdUPS7Eop91RNIfNFxyul2ajc6R6ZbwCqhWOA0
+         M316HOJEXr02WadyV1yXbRaROpSr3L+X6W23KHeK5wb0uoMKZKMYAH08avnwJnTv7OjO
+         ZPdR688JsZGrO7ENGSCIzqPN35AKWfR5jk38dqIutTgTAYLMIlK0ETIKPQJhdazjTY7Z
+         W9zYk5UZQOKAsNsvYMGjbR1f29oZE7TNcka9AaDErsTuV4QVC1Ep8mXH7Qms/ElkjOHB
+         nCgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=O60y2iE37MzESN5fyK5JC5FyF2KHeNE/DgjyVicySlo=;
-        b=LfZ4wK8acstEl4S3Q0/8XqWWvSfi2M9Cra3mb2Ni3P5T7KhTB8btWO4YyUU13z9Jd/
-         MAIIz3qhrupZtP2BAWbDTD41OfCsUYaetwMXh9lzsZilxwlru2fQEyooP/AWUPmf9i8t
-         drwofDyRHD6A7GTf/zg4CWwVPBQkezJuyFzyzAEGdWb7fdKTDnqOyU9ghlJQJdJG4Bhf
-         2q42nDdlkUWf2/k70yAXJLynwEt02+f3CMtsQ7y0I0XFVwdP9R+olL4gBjnQBeEJeee9
-         Zx2f6pxlvetfE1f+de82wPZyk1wh/Hz90TfTitQiQCuNMAEnJ9NuyeLhBa/SAHuH4aHf
-         dlkw==
-X-Gm-Message-State: AOAM531IcQ8IJKpRwVmSJWSyNwloUgJvj+F/b1Pm6qnE6eXGC6XNSaoz
-        YTQnxZ71eOdKmEo3hpQI9H6q5jjCVuTZTA==
-X-Google-Smtp-Source: ABdhPJwo/v0ZKJpb/P+0jZkE1vgqE+a69844IFj0uV7g6Hn280R7QSYuDhhqVQ4ES+f0eKtm/BWb0A==
-X-Received: by 2002:a17:90b:1e04:b0:1e8:4a47:966d with SMTP id pg4-20020a17090b1e0400b001e84a47966dmr5503214pjb.51.1654814249861;
-        Thu, 09 Jun 2022 15:37:29 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id bq6-20020a056a000e0600b0051bd9568140sm14547851pfb.109.2022.06.09.15.37.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 15:37:29 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 22:37:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 4/6] KVM: x86: wean fast IN from emulator_pio_in
-Message-ID: <YqJ2JgVxZ44VzRe1@google.com>
-References: <20220608121253.867333-1-pbonzini@redhat.com>
- <20220608121253.867333-5-pbonzini@redhat.com>
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to:content-transfer-encoding;
+        bh=/FRQdMUJFk/jNgSEtRr45RURpkqhM+6c+D2uuhvjBdA=;
+        b=b385JxJtZ1Ju2DW0Fg1LIrfwafhym5z6+UBzYTFmSM7KbiIIANdds/n7QCTow4v9W9
+         TEpN7I04tEA9OjxT4qNCDgaNSsaREK7m5gL4s+9EvkDyQyrNzcz4BYw0Z/rlb3+FnfwP
+         5l5JRxWjH8vqHT7jkemhOeCQo6b8jg8WXhsszUZk9Bq5eX+sNYDwWBRlIyTfVmFSDakX
+         x82+6K4yUMuuIczyxLLdq+zBAcIo1KPLCsdVaZOGZcO9fqvbk6seSsvApcZsyhHn6qQA
+         torxlGwpFmx6Z9+UhN7yzkYSk8pKO394HZ3+i1Wuq+K1etgE+AHfwrd6Yh0ToJ1RXwZD
+         nqvg==
+X-Gm-Message-State: AOAM531IgqoGItVbYS3ZcvD8mS3VBjxJGU2x/hHEq4G38QY903/Af3L5
+        CmWFBgS+ENKWqmn8wKeyitexDfZG9mLDlzHmYF4=
+X-Google-Smtp-Source: ABdhPJzgRr8Pkh3rIo3j118PVjZxW1ewQ3UP9ivmfHw7OBub/6Qeinf8Q12OoIs6jOyTL/Sq3j638J69f/kzX8hlZ3g=
+X-Received: by 2002:a05:6e02:4a1:b0:2d3:a778:f0f1 with SMTP id
+ e1-20020a056e0204a100b002d3a778f0f1mr23627282ils.212.1654814521989; Thu, 09
+ Jun 2022 15:42:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220608121253.867333-5-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Sender: mrs.christiana.and.sons@gmail.com
+Received: by 2002:a05:6e04:183:0:0:0:0 with HTTP; Thu, 9 Jun 2022 15:42:01
+ -0700 (PDT)
+From:   Jackie James <jackiejames614@gmail.com>
+Date:   Thu, 9 Jun 2022 10:42:01 -1200
+X-Google-Sender-Auth: 9lFhKWeef4HIRwiHUkfOjPxEbQg
+Message-ID: <CANV73fB3N8Zat5qWFaMV1au93RFXbq8HLzxTfDh7X1LVUE71Uw@mail.gmail.com>
+Subject: Greethings my beloved
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=4.2 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
+        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FREEMAIL_FROM,LOTS_OF_MONEY,MONEY_FRAUD_8,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08, 2022, Paolo Bonzini wrote:
-> Now that __emulator_pio_in already fills "val" for in-kernel PIO, it
+Hello my beloved,
 
-For some reason the "already" confused the heck out of me.  I thought it was
-referring to a previous patch, which it kind of is, but then I couldn't figure
-out the relevance to this patch.
+  I sent this mail praying it will get to you in a good condition of
+health, since I myself are in a very critical health condition in
+which I sleep every night without knowing if I may be alive to see the
+next day. I bring peace and love to you. It is by the grace of God, I
+had no choice than to do what is lawful and right in the sight of God
+for eternal life and in the sight of man, for witness of God=E2=80=99s merc=
+y
+and glory upon my life,I am Mrs,James Jackie.a widow,I am suffering
+from a long time brain tumor, It has defiled all forms of medical
+treatment, and right now I have about a few months to leave, according
+to medical experts.
 
-Ah, I know why I got confused, the in-kernel PIO case has nothing to do with the
-usage in complete_fast_pio_in(), e.g. complete_fast_pio_in() could be modified to
-call complete_emulator_pio_in() directly even without the previous cleanup in
-this series.
+   The situation has gotten complicated recently with my inability to
+hear proper, am communicating with you with the help of the chief
+nurse herein the hospital, from all indication my conditions is really
+deteriorating and it is quite obvious that, according to my doctors
+they have advised me that I may not live too long, Because this
+illness has gotten to a very bad stage. I plead that you will not
+expose or betray this trust and confidence that I am about to repose
+on you for the mutual benefit of the orphans and the less privilege. I
+have some funds I inherited from my late husband, the sum of
+($11,500,000.00 Dollars).Having known my condition, I decided to
+donate this fund to you believing that you will utilize it the way i
+am going to instruct herein.
 
-Can you split this patch in two?  It's comically trivial, but it makes the
-changelogs much easier to understand.
-
-  Use __emulator_pio_in() directly for fast PIO instead of bouncing through
-  emulator_pio_in() now that __emulator_pio_in() fills "val" when handling
-  in-kernel PIO.  vcpu->arch.pio.count is guaranteed to be '0', so this a
-  pure nop.
-
-  No functional change intended.
-
-and
-
-  Use complete_emulator_pio_in() directly when completing fast PIO, there's
-  no need to bounce through emulator_pio_in() as the comment about ECX
-  changing doesn't apply to fast PIO, which isn't used for string I/O.
-
-  No functional change intended.
-
-> is both simpler and clearer not to use emulator_pio_in.
-> Use the appropriate function in kvm_fast_pio_in and complete_fast_pio_in,
-> respectively __emulator_pio_in and complete_emulator_pio_in.
-> 
-> emulator_pio_in_emulated is now the last caller of emulator_pio_in.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3b641cd2ff6f..aefcc71a7040 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8692,11 +8692,7 @@ static int complete_fast_pio_in(struct kvm_vcpu *vcpu)
->  	/* For size less than 4 we merge, else we zero extend */
->  	val = (vcpu->arch.pio.size < 4) ? kvm_rax_read(vcpu) : 0;
->  
-> -	/*
-> -	 * Since vcpu->arch.pio.count == 1 let emulator_pio_in perform
-> -	 * the copy and tracing
-> -	 */
-> -	emulator_pio_in(vcpu, vcpu->arch.pio.size, vcpu->arch.pio.port, &val, 1);
-> +	complete_emulator_pio_in(vcpu, &val);
->  	kvm_rax_write(vcpu, val);
->  
->  	return kvm_skip_emulated_instruction(vcpu);
-> @@ -8711,7 +8707,7 @@ static int kvm_fast_pio_in(struct kvm_vcpu *vcpu, int size,
->  	/* For size less than 4 we merge, else we zero extend */
->  	val = (size < 4) ? kvm_rax_read(vcpu) : 0;
->  
-> -	ret = emulator_pio_in(vcpu, size, port, &val, 1);
-> +	ret = __emulator_pio_in(vcpu, size, port, &val, 1);
->  	if (ret) {
->  		kvm_rax_write(vcpu, val);
->  		return ret;
-> -- 
-> 2.31.1
-> 
-> 
+   I need you to assist me and reclaim this money and use it for
+Charity works, for orphanages and gives justice and help to the poor,
+needy and widows says The Lord." Jeremiah 22:15-16.=E2=80=9C and also build
+schools for less privilege that will be named after my late husband if
+possible and to promote the word of God and the effort that the house
+of God is maintained. I do not want a situation where this money will
+be used in an ungodly manner. That's why I'm taking this decision. I'm
+not afraid of death, so I know where I'm going. I accept this decision
+because I do not have any child who will inherit this money after I
+die. Please I want your sincerely and urgent answer to know if you
+will be able to execute this project for the glory of God, and I will
+give you more information on how the fund will be transferred to your
+bank account. May the grace, peace, love and the truth in the Word of
+God be with you and all those that you love and care for.
+I'm waiting for your immediate reply,
+Faithfully.
+Mrs,James Jackie.
+Writting From the hospital.
+May God Bless you.
