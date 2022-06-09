@@ -2,104 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 482A7544E31
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 15:57:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08369544E51
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 16:01:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245190AbiFIN4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 09:56:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
+        id S238960AbiFIOBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 10:01:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245507AbiFINzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 09:55:54 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8AB83527E
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 06:55:51 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id e66so21875983pgc.8
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 06:55:51 -0700 (PDT)
+        with ESMTP id S231908AbiFIOBp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 10:01:45 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A58C21E24
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 07:01:43 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id y19so47682141ejq.6
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 07:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2tLHzK+mawqr5s4YQ6aG7zolZuEOi6xg/YnpIdOHgKA=;
-        b=NyQLoPCJ3Fw1Rd/RGxC+T32bhwep+nu9XPymI+sdFXniE5ncki+AyZjF1fI9FAvhg4
-         Sd5BckuKevSoBcFbK6aZaFh8Kzat3G+uSAqRhBR4WBWpOOcVKlaExzWaHMw367fik5B9
-         3QbcbwmyQOcwBpBwlGFrgxkQD4/1mx7ahCEJDokNSmGRdu6VIgTBZXbkPU8DcwkwnDT9
-         qZudTLrtNMJP2US4cdNk6i+6HSIexRMbVZADyrgdK3UyFHn7roMgdruLGog8dPIjB/9u
-         LSbl7vBuXu11RixFHrtp9Q82e7uJJt36zylh1BLV6lJuO5LLowub7Yiy0TwWHwrAbVPs
-         188A==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=QRShvbstHeC9lEE+ew+EW0zDtUnb73H372nphW0FCy8=;
+        b=BIv1WxeKMdUSnma1KeL3SuvuMmxsrYUUL9DlG6Wo4y8xbrc0nnoCJpwb+tmW9acy7L
+         KBtGtRPqkYZdWK1cCPrX1pqkOzPCeVL9s4Id3H+ES7KTVwh2aKG0tvUoR8toN8cv1sEG
+         +Eu51y4ykAfQI0wZ80DeF52TlrIxAAdhbypnGpmFjOXpQbbYmzredVAT8SmSfMSJIXhp
+         wjSJgUCWCdifOoIgIqrbh1LBcoddftuywNeLUakT0y4ACsVSRlfQwSLNf2cjviuHnJTP
+         SEbLQSzqtKnuSsVZHbuJyiZk5me84pgZTCdnKe/MYTMRkdKeaXT/xdKk8VOnRzb2vf5T
+         F8TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2tLHzK+mawqr5s4YQ6aG7zolZuEOi6xg/YnpIdOHgKA=;
-        b=hn9TpKVaCKso8Yjo34cye9FOvDxFbGX1viBehTLWjYhqIjUf7IOmWMhwvcHmxHQnIn
-         FF4U1oxaH5fqpWm/swKa9rpEUCPCD696wePcxL+2lw1ucVqjoS5MNAOgbNFW2mvuuZNc
-         ZESsdo4siKUnvc8vuU2hVK9lXqHHxtp3OcnC2zQNUxUZ2A1Ss73ly3IRFs8BKCUz9Xf9
-         D4l6D7Qf8iprxRDT9aPgio3+DNTVYGWsE250Rm4evJ7kkGZRGuuSaK01o2Rmqs1uR1N+
-         aVcBY8PjC5Qkimy2KkFFX4UAP4QVloX8s9uNdDz24g9mKELguD86QNrzYJSqfJGlBUlq
-         /jAw==
-X-Gm-Message-State: AOAM5301Gl2VjaL/SS4hsauga0zsq+i6mTectIpXQXoR51BsTnw707nM
-        yKkEZkqxTwNn26QaJkJQ+PBhjg==
-X-Google-Smtp-Source: ABdhPJw3Ip8vO/1+HSILbK6hPsf2Tnb1VWLRa9LQz5MYHsS2lwxwBEZCQ0c7Omj0EJ7aXxIunxnCsQ==
-X-Received: by 2002:a63:40c3:0:b0:3fd:12b8:3207 with SMTP id n186-20020a6340c3000000b003fd12b83207mr30674164pga.57.1654782951047;
-        Thu, 09 Jun 2022 06:55:51 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f10-20020a17090ace0a00b001e31803540fsm16034735pju.6.2022.06.09.06.55.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 06:55:50 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 13:55:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5/5] KVM: selftests: Add MONITOR/MWAIT quirk test
-Message-ID: <YqH74glDW88oZBzi@google.com>
-References: <20220608224516.3788274-1-seanjc@google.com>
- <20220608224516.3788274-6-seanjc@google.com>
- <20220609063720.wf4famdgoucbglnq@yy-desk-7060>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=QRShvbstHeC9lEE+ew+EW0zDtUnb73H372nphW0FCy8=;
+        b=xC1GqI97nCi9aio87DexM781cv66NB58otaJstk3bqRrPx12h1hXK9xaZdYQuk9DlM
+         7CwZASaIpv9L6hzZ6r1JJJT5zH3qScSK/1uhIQwkRHH/1+OrUk3R4DGYSsy6PgebQKcp
+         L3+b6F64eYh77LBgH8j+6AKV5w6VJ+DqBbNEVnVXKPolda9htQggorV9ai3uF63LJebF
+         k0wypXBMLXHbEkyrr4dtXQXiwdYAfJBQfXVMoDEmlhciA/RNRAaffOc0RtEHBUayxC9M
+         YiFZnurvYkXZrEg7tXLov8NdhsOY4+l3/1SVQryN4IU8w+ZNjIrxh/6rboxi0uj06F2B
+         UPPA==
+X-Gm-Message-State: AOAM5326ukkEvTDry++zbGsxWeCfi/fL6SyU39HtLTqF0U5/egOCqUfL
+        UybUwKqayazg85xEPrdxjZCgghLCKKA=
+X-Google-Smtp-Source: ABdhPJxf91zmiKS4f4NeWsxgcMEU4nceApWZzHl2EIGLPEkWGPjZ9Lj2n8bLArMqd+orOXSwYuVXJA==
+X-Received: by 2002:a17:906:f51:b0:6fe:cf1c:cdbf with SMTP id h17-20020a1709060f5100b006fecf1ccdbfmr35734092ejj.695.1654783301697;
+        Thu, 09 Jun 2022 07:01:41 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id k16-20020a1709061c1000b00705cdfec71esm10537621ejg.7.2022.06.09.07.01.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jun 2022 07:01:41 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <0fa08623-22c3-d6c6-d068-4582bd8d2424@redhat.com>
+Date:   Thu, 9 Jun 2022 16:01:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220609063720.wf4famdgoucbglnq@yy-desk-7060>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: Guest migration between different Ryzen CPU generations
+Content-Language: en-US
+To:     mike tancsa <mike@sentex.net>, kvm@vger.kernel.org
+References: <48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <48353e0d-e771-8a97-21d4-c65ff3bc4192@sentex.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 09, 2022, Yuan Yao wrote:
-> On Wed, Jun 08, 2022 at 10:45:16PM +0000, Sean Christopherson wrote:
-> > +static void guest_monitor_wait(int testcase)
-> > +{
-> > +	/*
-> > +	 * If both MWAIT and its quirk are disabled, MONITOR/MWAIT should #UD,
-> > +	 * in all other scenarios KVM should emulate them as nops.
-> > +	 */
-> > +	bool fault_wanted = (testcase & MWAIT_QUIRK_DISABLED) &&
-> > +			    (testcase & MWAIT_DISABLED);
-> > +	u8 vector;
-> > +
-> > +	GUEST_SYNC(testcase);
-> > +
-> > +	vector = kvm_asm_safe("monitor");
-> > +	if (fault_wanted)
-> > +		GUEST_ASSERT_2(vector == UD_VECTOR, testcase, vector);
-> > +	else
-> > +		GUEST_ASSERT_2(!vector, testcase, vector);
-> > +
-> > +	vector = kvm_asm_safe("monitor");
-> 
-> emmm... should one of the "monitor" be "mwait" ?
+On 5/31/22 19:00, mike tancsa wrote:
+> On Ubuntu 22 LTS, with the original kernel from release day, I can 
+> migrate VMs back and forth between a 3700x and a 5800x without issue
+> On Ubuntu 22 LTS with everything up to date as of mid May 2022, I can 
+> migrate from the 3700X to the 5800x without issue. But going from the 
+> 5800x to the 3700x results in a migrated VM that either crashes inside 
+> the VM or has the CPU pegged at 100% spinning its wheels with the guest 
+> frozen and needing a hard reset. This is with --live or without and with 
+> --unsafe or without. The crash / hang happens once the VM is fully 
+> migrated with the sender thinking it was successfully sent and the 
+> receiver thinking it successfully arrived in.
+> On stock Ubuntu 22 (5.15.0-33-generic) I can migrate back and forth to 
+> Ubuntu 20 as long as the hardware / cpu is identical (in this case, 3700x)
+> On Ubuntu 22 LTS with everything up to date as of mid May 2022 with 
+> 5.18.0-051800-generic #202205222030 SMP PREEMPT_DYNAMIC Sun May 22. I 
+> can migrate VMs back and forth that have as its CPU def EPYC or 
+> EPYC-IBPB. If the def (in my one test case anyways) is Nehalem then I 
+> get a frozen VM on migration back to the 3700X.
+Hi, this is probably related to the patch at 
+https://www.spinics.net/lists/stable/msg538630.html, which needs a 
+backport to 5.15 however.
 
-/facepalm
+Note that using Intel definitions on AMD or vice versa is not going to 
+always work, though in this case it seems to be a regression.
 
-Thanks for catching my copy+paste fail!
+Paolo
