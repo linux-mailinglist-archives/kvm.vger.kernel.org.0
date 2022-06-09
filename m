@@ -2,132 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF51154463B
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F347E5446A9
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:57:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242157AbiFIIqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 04:46:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40484 "EHLO
+        id S242786AbiFII4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 04:56:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242902AbiFIIoI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:44:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E7FC649261
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:42:37 -0700 (PDT)
+        with ESMTP id S234348AbiFII4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 04:56:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EF1247552
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:54:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654764155;
+        s=mimecast20190719; t=1654764877;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EUXb3OtLQfesjMR2aTZtn/nYj0py51rPllhsatp6KLg=;
-        b=Vx/8PbWuzhXIc55WjwXD4v/zgO8uZQ+ZQ/e8BqHOtxX+hLPEa4jtGqlDG+AXnR0N4BYBhc
-        PyOa6TPkHsg2gbDdzpcHDH9XGf6sLFoQhqM2Q3rBYhc4Cn/Ad4N4csRxOI6TGCt+mmujRH
-        DDq48vrWXreSXvzZBelzw74tWVSGqfo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=tvWtgkYBzt9DbATf2rlAmzgDtHttB4fvGNf4mSgVDKk=;
+        b=DolXWM56kIehFrHaLgs76bgGZnaMv8sSSvBg01nrtGtckY6aUZzfdLttAQnIwIKg/9Uoil
+        9bk+zR9JGyJe0HAWF8dfsqgfpXp0napFQMQlcGoTEmK5In8/NgaJcEtYgfI6k4CQ3VePqG
+        rpSxg7uKi4GxbOwsqB4JulyMQJ1f8yM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-636-53TI-bCiMjmdUhvhZVMsfg-1; Thu, 09 Jun 2022 04:42:34 -0400
-X-MC-Unique: 53TI-bCiMjmdUhvhZVMsfg-1
-Received: by mail-wr1-f69.google.com with SMTP id u18-20020adfb212000000b0021855847651so1741629wra.6
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 01:42:34 -0700 (PDT)
+ us-mta-187-zY3IqGYYNKW_2mdkQFqBmw-1; Thu, 09 Jun 2022 04:54:36 -0400
+X-MC-Unique: zY3IqGYYNKW_2mdkQFqBmw-1
+Received: by mail-wm1-f71.google.com with SMTP id c125-20020a1c3583000000b003978decffedso15699048wma.5
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 01:54:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:references:cc:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=EUXb3OtLQfesjMR2aTZtn/nYj0py51rPllhsatp6KLg=;
-        b=ixtsq661rk5tNmvWkN7T0kNxXOYK5s8gZR2TcIGkW34yy842AVUSl5xeiSlXhZWW7M
-         leGLUjBY1XsuWYW2zDXJfMbyrH+tPJbXjK1HifKNjhGaOsPgBD8DKPLZwMVEoxpM3rSW
-         rRiLFpW7IyObulyGArm+42v74RhLa5AZHddgHQ8FmBQc0yq/KtfZSsWLlLH5gxjA1XfU
-         SMoiV2tfmksXl5+9Y8VWi1srP2IBser/ydH33Zs/NizZm7ZE4tFVzT94Q6zmL1MtZ0Bq
-         hxZ0pELnK0yGV5oWEmdJ/AGuDHZRpiO9NQha5P1rNxSZYxw1vEUIiluv1nS9UYkcjcWO
-         dJlw==
-X-Gm-Message-State: AOAM532htBLFkFf855RX1kDbsU7Evl6S7rsWtNtPmo7U64FRsV8Jv34j
-        LmTez+l0mJ2UT4rJWGc9AFH1eF7bSPuHhM7JBxA+JK8g8nFpJrBCnpU7gmmxlXhSHGjExHNYpCc
-        B4IfwMyM0S5Id
-X-Received: by 2002:a5d:6a92:0:b0:210:3387:23ec with SMTP id s18-20020a5d6a92000000b00210338723ecmr36882999wru.102.1654764152230;
-        Thu, 09 Jun 2022 01:42:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwX9SiYs8CeGshCq+oyK5c43j3U3DoJlGXVyZq/2+VB9rKnOKT+FGzdzTsJffnB4AR11tXK4Q==
-X-Received: by 2002:a5d:6a92:0:b0:210:3387:23ec with SMTP id s18-20020a5d6a92000000b00210338723ecmr36882976wru.102.1654764152035;
-        Thu, 09 Jun 2022 01:42:32 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-42-115-130.web.vodafone.de. [109.42.115.130])
-        by smtp.gmail.com with ESMTPSA id k7-20020a7bc407000000b00397402ae674sm9284836wmi.11.2022.06.09.01.42.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jun 2022 01:42:31 -0700 (PDT)
-Message-ID: <14fd32f1-1eb8-8eb3-972a-c1858ee6fdb7@redhat.com>
-Date:   Thu, 9 Jun 2022 10:42:30 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tvWtgkYBzt9DbATf2rlAmzgDtHttB4fvGNf4mSgVDKk=;
+        b=VVDMB41iZOf5myb9j6CkMDLabM8Vl7JSCq5zMoTOGJHujBV7oH+3WdHIVYYDIRT1Hq
+         NKLPT8MBGwSsqxCyJaVGsiMo7Dus/0kFKQDvl+4GKiON+dGnJ9yGMZBVVOBLCob+/+ZZ
+         lcnjWKjpfaRRYbcMnCgl2PvimGw8jgWpgbTcpX44T4h8LiTiQycOpedCDjoFjlWm9/yP
+         JVjRgtoGNJg6JGSJkVtz4uPSv2/Eu2gJp0595DYIYvO3PQnDP6EkpnIHOFvYKMd0kEXK
+         WPHcgEG0TO0wmAJS8ig6DT5RPk4vfE58pA86xJM5DiQwh7NMt88oKo1DLoizrJr7D+zR
+         OEXg==
+X-Gm-Message-State: AOAM530r05t6JVZyaqibO0So+DyehQSYNy5nn5SSqwlgF+e7VzKdt67d
+        bY5OWai7+GpJjrjC1tXkWmoI+0CsEaowNMkVSFNqtTQ2bVc66BXUkYkMdk6QaUw3l1Q28Lc1nhJ
+        PHekyAWV0xda8
+X-Received: by 2002:adf:e5d0:0:b0:210:313a:e4dc with SMTP id a16-20020adfe5d0000000b00210313ae4dcmr36674911wrn.152.1654764875098;
+        Thu, 09 Jun 2022 01:54:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzR7k/vdtBFj/GYt/MtBX7xF11gJz7ChUoPOTqELw1aa5VvOp+SIRJBSOhp8lJfnJDnuWfn3g==
+X-Received: by 2002:adf:e5d0:0:b0:210:313a:e4dc with SMTP id a16-20020adfe5d0000000b00210313ae4dcmr36674875wrn.152.1654764874842;
+        Thu, 09 Jun 2022 01:54:34 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
+        by smtp.gmail.com with ESMTPSA id s19-20020a1cf213000000b0039c4945c753sm15291073wmc.39.2022.06.09.01.54.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 01:54:33 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 10:54:28 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>,
+        Krasnov Arseniy <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v2 0/8] virtio/vsock: experimental zerocopy receive
+Message-ID: <20220609085428.idi4qzydhdpzszzw@sgarzare-redhat>
+References: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-References: <20220603004331.1523888-1-seanjc@google.com>
- <87wndr9qef.fsf@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [Sean Christopherson] [PATCH v2 000/144] KVM: selftests: Overhaul
- APIs, purge VCPU_ID
-In-Reply-To: <87wndr9qef.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3 Jun 2022 00:41, Sean Christopherson wrote:
-> 
-> Overhaul KVM's selftest APIs to get selftests to a state where adding new
-> features and writing tests is less painful/disgusting.
-> 
-> Patches 1 fixes a goof in kvm/queue and should be squashed.
-> 
-> I would really, really, really like to get this queued up sooner than
-> later, or maybe just thrown into a separate selftests-specific branch that
-> folks can develop against.  Rebasing is tedious, frustrating, and time
-> consuming.  And spoiler alert, there's another 42 x86-centric patches
-> inbound that builds on this series to clean up CPUID related crud...
-> 
-> The primary theme is to stop treating tests like second class citizens.
-> Stop hiding vcpu, kvm_vm, etc...  There's no sensitive data/constructs, and
-> the encapsulation has led to really, really bad and difficult to maintain
-> code.  E.g. having to pass around the VM just to call a vCPU ioctl(),
-> arbitrary non-zero vCPU IDs, tests having to care about the vCPU ID in the
-> first place, etc...
-> 
-> The other theme in the rework is to deduplicate code and try to set us
-> up for success in the future.  E.g. provide macros/helpers instead of
-> spamming CTRL-C => CTRL-V (see the -1k LoC), structure the VM creation
-> APIs to build on one another, etc...
-> 
-> The absurd patch count (as opposed to just ridiculous) is due to converting
-> each test away from using hardcoded vCPU IDs in a separate patch.  The vast
-> majority of those patches probably aren't worth reviewing in depth, the
-> changes are mostly mechanical in nature.
-> 
-> However, _running_ non-x86 tests (or tests that have unique non-x86
-> behavior) would be extremely valuable.  All patches have been compile tested
-> on x86, arm, risc-v, and s390, but I've only run the tests on x86.  Based on
-> my track record for the x86+common tests, I will be very, very surprised if
-> I didn't break any of the non-x86 tests, e.g. pthread_create()'s 'void *'
-> param tripped me up multiple times.
+Hi Arseniy,
+I left some comments in the patches, and I'm adding something also here:
 
-  Hi,
+On Fri, Jun 03, 2022 at 05:27:56AM +0000, Arseniy Krasnov wrote:
+>                              INTRODUCTION
+>
+>	Hello, this is experimental implementation of virtio vsock zerocopy
+>receive. It was inspired by TCP zerocopy receive by Eric Dumazet. This API uses
+>same idea: call 'mmap()' on socket's descriptor, then every 'getsockopt()' will
+>fill provided vma area with pages of virtio RX buffers. After received data was
+>processed by user, pages must be freed by 'madvise()'  call with MADV_DONTNEED
+>flag set(if user won't call 'madvise()', next 'getsockopt()' will 
+>fail).
 
-I just checked your series on s390x, and as far as I can see, the tests 
-still work fine with the patches applied. Thus:
+If it is not too time-consuming, can we have a table/list to compare this 
+and the TCP zerocopy?
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+>
+>                                 DETAILS
+>
+>	Here is how mapping with mapped pages looks exactly: first page mapping
+>contains array of trimmed virtio vsock packet headers (in contains only length
+>of data on the corresponding page and 'flags' field):
+>
+>	struct virtio_vsock_usr_hdr {
+>		uint32_t length;
+>		uint32_t flags;
+>		uint32_t copy_len;
+>	};
+>
+>Field  'length' allows user to know exact size of payload within each sequence
+>of pages and 'flags' allows user to handle SOCK_SEQPACKET flags(such as message
+>bounds or record bounds). Field 'copy_len' is described below in 'v1->v2' part.
+>All other pages are data pages from RX queue.
+>
+>             Page 0      Page 1      Page N
+>
+>	[ hdr1 .. hdrN ][ data ] .. [ data ]
+>           |        |       ^           ^
+>           |        |       |           |
+>           |        *-------------------*
+>           |                |
+>           |                |
+>           *----------------*
+>
+>	Of course, single header could represent array of pages (when packet's
+>buffer is bigger than one page).So here is example of detailed mapping layout
+>for some set of packages. Lets consider that we have the following sequence  of
+>packages: 56 bytes, 4096 bytes and 8200 bytes. All pages: 0,1,2,3,4 and 5 will
+>be inserted to user's vma(vma is large enough).
+
+In order to have a "userspace polling-friendly approach" and reduce 
+number of syscall, can we allow for example the userspace to mmap at 
+least the first header before packets arrive.
+Then the userspace can poll a flag or other fields in the header to 
+understand that there are new packets.
+
+That would be cool, but in the meantime it would be nice to behave 
+similarly to TCP, which is why the comparison table I mentioned earlier 
+would be useful.
+
+>
+>	Page 0: [[ hdr0 ][ hdr 1 ][ hdr 2 ][ hdr 3 ] ... ]
+>	Page 1: [ 56 ]
+>	Page 2: [ 4096 ]
+>	Page 3: [ 4096 ]
+>	Page 4: [ 4096 ]
+>	Page 5: [ 8 ]
+>
+>	Page 0 contains only array of headers:
+>	'hdr0' has 56 in length field.
+>	'hdr1' has 4096 in length field.
+>	'hdr2' has 8200 in length field.
+>	'hdr3' has 0 in length field(this is end of data marker).
+>
+>	Page 1 corresponds to 'hdr0' and has only 56 bytes of data.
+>	Page 2 corresponds to 'hdr1' and filled with data.
+>	Page 3 corresponds to 'hdr2' and filled with data.
+>	Page 4 corresponds to 'hdr2' and filled with data.
+>	Page 5 corresponds to 'hdr2' and has only 8 bytes of data.
+>
+>	This patchset also changes packets allocation way: today implementation
+>uses only 'kmalloc()' to create data buffer. Problem happens when we try to map
+>such buffers to user's vma - kernel forbids to map slab pages to user's vma(as
+>pages of "not large" 'kmalloc()' allocations are marked with PageSlab flag and
+>"not large" could be bigger than one page). So to avoid this, data buffers now
+>allocated using 'alloc_pages()' call.
+>
+>                                   TESTS
+>
+>	This patchset updates 'vsock_test' utility: two tests for new feature
+>were added. First test covers invalid cases. Second checks valid transmission
+>case.
+>
+>                                BENCHMARKING
+>
+>	For benchmakring I've added small utility 'rx_zerocopy'. It works in
+>client/server mode. When client connects to server, server starts sending exact
+>amount of data to client(amount is set as input argument).Client reads data and
+>waits for next portion of it. Client works in two modes: copy and zero-copy. In
+>copy mode client uses 'read()' call while in zerocopy mode sequence of 'mmap()'
+>/'getsockopt()'/'madvise()' are used. Smaller amount of time for transmission
+>is better. For server, we can set size of tx buffer and for client we can set
+>size of rx buffer or rx mapping size(in zerocopy mode). Usage of this utility
+>is quiet simple:
+>
+>For client mode:
+>
+>./rx_zerocopy --mode client [--zerocopy] [--rx]
+>
+>For server mode:
+>
+>./rx_zerocopy --mode server [--mb] [--tx]
+>
+>[--mb] sets number of megabytes to transfer.
+>[--rx] sets size of receive buffer/mapping in pages.
+>[--tx] sets size of transmit buffer in pages.
+>
+>I checked for transmission of 4000mb of data. Here are some results:
+>
+>                           size of rx/tx buffers in pages
+>               *---------------------------------------------------*
+>               |    8   |    32    |    64   |   256    |   512    |
+>*--------------*--------*----------*---------*----------*----------*
+>|   zerocopy   |   24   |   10.6   |  12.2   |   23.6   |    21    | secs to
+>*--------------*---------------------------------------------------- process
+>| non-zerocopy |   13   |   16.4   |  24.7   |   27.2   |   23.9   | 4000 mb
+>*--------------*----------------------------------------------------
+>
+>Result in first column(where non-zerocopy works better than zerocopy) happens
+>because time, spent in 'read()' system call is smaller that time in 'getsockopt'
+>+ 'madvise'. I've checked that.
+>
+>I think, that results are not so impressive, but at least it is not worse than
+>copy mode and there is no need to allocate memory for processing date.
+>
+>                                 PROBLEMS
+>
+>	Updated packet's allocation logic creates some problem: when host gets
+>data from guest(in vhost-vsock), it allocates at least one page for each packet
+>(even if packet has 1 byte payload). I think this could be resolved in several
+>ways:
+>	1) Make zerocopy rx mode disabled by default, so if user didn't enable
+>it, current 'kmalloc()' way will be used. <<<<<<< (IMPLEMENTED IN V2)
+
+Yep, but I think we should not allow to change it while we are connected 
+(see comments in the patches.)
+
+>	2) Use 'kmalloc()' for "small" packets, else call page allocator. But
+>in this case, we have mix of packets, allocated in two different ways thus
+>during zerocopying to user(e.g. mapping pages to vma), such small packets will
+>be handled in some stupid way: we need to allocate one page for user, copy data
+>to it and then insert page to user's vma.
+>
+>v1 -> v2:
+> 1) Zerocopy receive mode could be enabled/disabled(disabled by default). I
+>    didn't use generic SO_ZEROCOPY flag, because in virtio-vsock case this
+>    feature depends on transport support. Instead of SO_ZEROCOPY, AF_VSOCK
+>    layer flag was added: SO_VM_SOCKETS_ZEROCOPY, while previous meaning of
+>    SO_VM_SOCKETS_ZEROCOPY(insert receive buffers to user's vm area) now
+>    renamed to SO_VM_SOCKETS_MAP_RX.
+> 2) Packet header which is exported to user now get new field: 'copy_len'.
+>    This field handles special case:  user reads data from socket in non
+>    zerocopy way(with disabled zerocopy) and then enables zerocopy feature.
+>    In this case vhost part will switch data buffer allocation logic from
+>    'kmalloc()' to direct calls for buddy allocator. But, there could be
+>    some pending 'kmalloc()' allocated packets in socket's rx list, and then
+>    user tries to read such packets in zerocopy way, dequeue will fail,
+>    because SLAB pages could not be inserted to user's vm area. So when such
+>    packet is found during zerocopy dequeue, dequeue loop will break and
+>    'copy_len' will show size of such "bad" packet. After user detects this
+>    case, it must use 'read()/recv()' calls to dequeue such packet.
+> 3) Also may be move this features under config option?
+
+Do you mean a build config like CONFIG_VSOCK_ZERO_COPY?
+
+I'm not sure it's needed.
+
+Thanks,
+Stefano
 
