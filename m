@@ -2,67 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A68B544C4E
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 14:41:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED5B0544CA7
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 14:53:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245692AbiFIMlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 08:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57804 "EHLO
+        id S238680AbiFIMxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 08:53:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238255AbiFIMlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 08:41:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB71F23BCD
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 05:41:01 -0700 (PDT)
+        with ESMTP id S245357AbiFIMvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 08:51:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3550612E319
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 05:51:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 47F866190B
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 12:41:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49FE4C34114;
-        Thu,  9 Jun 2022 12:40:59 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E5C2BB82D5A
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 12:51:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD5B0C34114;
+        Thu,  9 Jun 2022 12:51:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654778460;
-        bh=j8B8hPmt38j0C4H2NjDL9HXsvH1BP9tDr35zQVZQDeo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Wy62YLdkwbSTgrC2KoqLMdWxjR4m+oFIU2ID+adE6PXBCVJRxdreZYbusnKTjJhpu
-         wH2FwQw8r6xT3JI+h6iJ84x1/dxL8XHfxrMCYi+UFJzQgNoLDUOtN0MlZZw9CkUB7l
-         KvwERqaBNDbMmZzwOMTIB66PnLW2XiwNL2BoAyuaCjmantXhZEc+AIddG9sTtl5Ioq
-         7i0khdCVypX+/n/yK74f7+LQGcz/r7mu4cVPFxkbAYsnW1Bpndmj7hFGCKZ+0QwCGd
-         76vNZO+u4lT6Rx1lf04/5XCSZfZNT2AECc1JzYAadXSefNGc9HXP89fNmM1WWlyarM
-         e55y7Lz2CZ00Q==
-Date:   Thu, 9 Jun 2022 13:40:55 +0100
+        s=k20201202; t=1654779064;
+        bh=KcXCacENiLY05COpMRC0EgZmHs5czwzNjYj3kckHBDM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XFH5Gwz0qFQ0ZSych/T6Q9cGv50WbBaICD9TgxaG3z5racvRnqo+d3wqIgdZdS2wh
+         XvRCxaqizJG3COga4eV/SaMtluOrXO5Y1TH7Mr5z5a8iTPjBi+bxdKNEP1VsrSlXXG
+         K9xFbF4TIfVNdh5r1zj7opdS6oS4jIA/HVmX8iYZKmpwp8cV+DkJVjk4LQuglkxaz9
+         aydt71SgKal69cUrtYqzahsIW/zVXDdgCK7VQOCObN73HxKUNOuu6Cw/HA1KoNJw6q
+         gsTbt5yL+RzNv8iHZdG2e9FRM0N+lxP7uHMaPijcNx/cQl4fIDEprCe37ipiGnix3C
+         ALBexvDi4lh6Q==
 From:   Will Deacon <will@kernel.org>
 To:     Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc:     andre.przywara@arm.com, alexandru.elisei@arm.com,
-        kvm@vger.kernel.org, suzuki.poulose@arm.com,
-        sasha.levin@oracle.com, jean-philippe@linaro.org
-Subject: Re: [PATCH kvmtool 17/24] virtio/pci: Delete MSI routes
-Message-ID: <20220609124054.GB2599@willie-the-truck>
+Cc:     catalin.marinas@arm.com, kernel-team@android.com,
+        Will Deacon <will@kernel.org>, sasha.levin@oracle.com,
+        suzuki.poulose@arm.com, kvm@vger.kernel.org,
+        jean-philippe@linaro.org, alexandru.elisei@arm.com,
+        andre.przywara@arm.com
+Subject: Re: [PATCH kvmtool 00/24] Virtio v1 support
+Date:   Thu,  9 Jun 2022 13:50:57 +0100
+Message-Id: <165477865658.606093.3606622024437424791.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20220607170239.120084-1-jean-philippe.brucker@arm.com>
 References: <20220607170239.120084-1-jean-philippe.brucker@arm.com>
- <20220607170239.120084-18-jean-philippe.brucker@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220607170239.120084-18-jean-philippe.brucker@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 07, 2022 at 06:02:32PM +0100, Jean-Philippe Brucker wrote:
-> On exit_vq() and device reset, remove the MSI routes that were set up at
-> runtime.
+On Tue, 7 Jun 2022 18:02:15 +0100, Jean-Philippe Brucker wrote:
+> Add support for version 1 of the virtio transport to kvmtool. Based on a
+> RFC by Sasha Levin [1], I've been trying to complete it here and there.
+> It's long overdue and is quite painful to rebase, so let's get it
+> merged.
 > 
-> TODO: make irq__add_msix_route reuse those deleted routes. Currently, new
-> ones will be created after reset.
+> Several reasons why the legacy transport needs to be replaced:
+> 
+> [...]
 
-Please don't leave the TODO in here
+Applied patches 1-16 to kvmtool (master), thanks!
 
+[01/24] virtio: Add NEEDS_RESET to the status mask
+        https://git.kernel.org/will/kvmtool/c/7efc2622d5ee
+[02/24] virtio: Remove redundant test
+        https://git.kernel.org/will/kvmtool/c/3a1e36e4bf49
+[03/24] virtio/vsock: Remove redundant state tracking
+        https://git.kernel.org/will/kvmtool/c/a8e397bb9dd9
+[04/24] virtio: Factor virtqueue initialization
+        https://git.kernel.org/will/kvmtool/c/fd41cde06617
+[05/24] virtio: Support modern virtqueue addresses
+        https://git.kernel.org/will/kvmtool/c/609ee9066879
+[06/24] virtio: Add config access helpers
+        https://git.kernel.org/will/kvmtool/c/15e6c4e74d06
+[07/24] virtio: Fix device-specific config endianness
+        https://git.kernel.org/will/kvmtool/c/867b15ccd7da
+[08/24] virtio/console: Remove unused callback
+        https://git.kernel.org/will/kvmtool/c/17ad9fd6ce37
+[09/24] virtio: Remove set_guest_features() device op
+        https://git.kernel.org/will/kvmtool/c/902a8ecb3877
+[10/24] Add memcpy_fromiovec_safe
+        https://git.kernel.org/will/kvmtool/c/c492534f3ac9
+[11/24] virtio/net: Offload vnet header endianness conversion to tap
+        https://git.kernel.org/will/kvmtool/c/8b27bcff44fd
+[12/24] virtio/net: Prepare for modern virtio
+        https://git.kernel.org/will/kvmtool/c/b231683c3361
+[13/24] virtio/net: Implement VIRTIO_F_ANY_LAYOUT feature
+        https://git.kernel.org/will/kvmtool/c/6daffe57762c
+[14/24] virtio/console: Add VIRTIO_F_ANY_LAYOUT feature
+        https://git.kernel.org/will/kvmtool/c/e74b56e1495c
+[15/24] virtio/blk: Implement VIRTIO_F_ANY_LAYOUT feature
+        https://git.kernel.org/will/kvmtool/c/484278913807
+[16/24] virtio/pci: Factor MSI route creation
+        https://git.kernel.org/will/kvmtool/c/f44af23e3a62
+
+Cheers,
+-- 
 Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
