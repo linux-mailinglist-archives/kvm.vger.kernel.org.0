@@ -2,62 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 140815452E1
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 19:25:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3D5C5452EC
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 19:26:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344753AbiFIRY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 13:24:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60376 "EHLO
+        id S1344967AbiFIR02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 13:26:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245457AbiFIRY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 13:24:57 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966B127B25
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 10:24:56 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id c3-20020a9d6843000000b0060c2c63c337so732457oto.5
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 10:24:56 -0700 (PDT)
+        with ESMTP id S239112AbiFIR00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 13:26:26 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1054952B13
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 10:26:24 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id e66so22426366pgc.8
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 10:26:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+BsytC55p1uk/DN+lXBnGi/b/CJPb11S2aPURFUdMH0=;
-        b=F8G+2xSU9+LS3+gruh9t36AQRGmeTGGZwcPMINt+vREwjujSNCz/ecGqPTwcUD8vvt
-         jRBhFRZzDP1RABS+N+QfHvMZ3CAkzeDKvpbhNwmimc18igatudjVbYiXGbn1qRzkpNH/
-         gLPvwqioZYlQTzIPZomlvO3B+28kQrKtxHhR9eP6NbHuBEZF7U1/DiLS1O9rqssCnU8E
-         4LdIfiEnkFAogcyP+Z6dncM5AhychyWQ1P7ed4zQTHWngKTuUqdx7A/4Lf1Ekqmx+UwD
-         B9VFqX8rD3e7ftJG2nf0rCIbT7KM+M4hxEoKpK0/JadEFZd92dPT9UUQvmUaXju0riLp
-         bTIg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=l1RuhhV6V3rfp5Bg8hx1s4i266VbTUWDrdyJUQ4dZ/s=;
+        b=K/m8QIRv7PzfZ8gR37Iz3JTnF8ld3GeHoJ+AlQsO4o4ny8OmIyTH+saZtzNDu00ypt
+         iL+jEyTxfiPvuy54Z/rgCKnf0Yhan0vb3U+hrpkPtvOL/w2QQdJ/nCRa008IGHM+ZNYo
+         2FgeO3hIrQxGimQO/tFnhsQTsVV3Bk6AU5D1CKLoYFvxnAvMqk7qIgDv5mq7Q960ISPF
+         iGonQgP4DZR5mY4g6oAXp3Rtnmacb1KUBPXXmfXkgUGiAOkqwiy/VhSjNbkynULYnqtt
+         1BgYc6No+/RhgJGwVhpu5Z7uTCfDFaq4U0RRKJPqjcfP/uIyvvCn6BDOdjrKyhyIkUpv
+         77FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+BsytC55p1uk/DN+lXBnGi/b/CJPb11S2aPURFUdMH0=;
-        b=TfuTlnY9YeHAUwuK1AurJP3evKqQj67JRnHqA+47llrLF6iYeVx8uWLFD+PwtNLZZY
-         ak5zXiqnBf5jIy6HSFqCmcJXnA5cPl0aMJYTF674wYhMBu9dk+uymI8Q9uzHRt4EbwBc
-         tDJezprc5LEyQNCD6gLldn9lXBpnpstfDS1fMt/mlCdMqRzDGG3aP146N+FfkUBhhoLL
-         /3iIEL2PS8KYl4fWyLJXeXw14QJjMRVQpDpx0Eu9lZ5QotreZ+m9c2ciBkU/bmxpi+x9
-         DwXl9+FIEUhg/VQPD+qjJCsVQDbGPQYUbHfyroXfCYQ+/7MfQkjOu4D8UgV3v0yXFUCo
-         /ozg==
-X-Gm-Message-State: AOAM532jyuHUUzlwpQCEBD+TVryX+lhJGnfwkNxOq1Mpg/jtarplf/FK
-        66R/M/sX28uQE1f8mNqtHAYMvMgw6bf6EaQoWkDJ9n5GG2zbVQ==
-X-Google-Smtp-Source: ABdhPJzAEY5Siu4Rp3xtx8yNN6n6u1qCejxChcZ1iqiG3vgy9D5BfpAY23LvF8c70/yvWTQMW4NGmd1YgUyK/PP+AZ8=
-X-Received: by 2002:a05:6830:2a01:b0:606:d153:1ba0 with SMTP id
- y1-20020a0568302a0100b00606d1531ba0mr17837813otu.35.1654795495703; Thu, 09
- Jun 2022 10:24:55 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=l1RuhhV6V3rfp5Bg8hx1s4i266VbTUWDrdyJUQ4dZ/s=;
+        b=j+Xx3JC669n38489Kt6ZmhRO2Ev6MjgAlNCawQItSgRSgqinq/iHcjuLeOpxWVDhPM
+         qld5f7GuhTmycdg/L1o6QRdTz4IK2Gts6Gt2fhWHZL4TRW0ukbspolLBYLs94yYUX03O
+         yHdKjTcET4vhi+tOGqSQSeaYtNY+32MLwP8y0k4j+W69QEEQPuI5BYBkd2zOGKzlaWfH
+         fqzFcfxgOr9ncNbemX21Axs3g4UfqyJ6XMtcLQ3x9Ufh1rg/ElbQx5GmwzCMaK1DzaQ9
+         UdY/cjcqYbifAlY1x2VUNOpCU7famdz4zwnV5ZlE0DFctQajZb6AEP2THl67u94s1WtA
+         ZhoA==
+X-Gm-Message-State: AOAM5329b3zwQwLYNuaKZjyiNVRGj9gM2agk2MwKN5dj8bkk+GAfUJQg
+        4cKxLOkMVaqqy9FPPzstGk6L2A==
+X-Google-Smtp-Source: ABdhPJzhgeXbiz+ywNavrbxguD36Vhl0D4w/oHsd0RbaLIihA0Go1kYM5LbdRl1SJZDOasHJa/wasw==
+X-Received: by 2002:a63:5:0:b0:3fe:2558:677 with SMTP id 5-20020a630005000000b003fe25580677mr9928929pga.113.1654795584274;
+        Thu, 09 Jun 2022 10:26:24 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id g24-20020a1709029f9800b0015e8d4eb242sm17127418plq.140.2022.06.09.10.26.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 10:26:23 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 17:26:19 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org,
+        anup@brainfault.org, Raghavendra Rao Ananta <rananta@google.com>,
+        eric.auger@redhat.com
+Subject: Re: [PATCH v2 000/144] KVM: selftests: Overhaul APIs, purge VCPU_ID
+Message-ID: <YqItO2cbsGDSyxD8@google.com>
+References: <20220603004331.1523888-1-seanjc@google.com>
+ <21570ac1-e684-7983-be00-ba8b3f43a9ee@redhat.com>
+ <93b87b7b5a599c1dfa47ee025f0ae9c4@kernel.org>
+ <YqEupumS/m5IArTj@google.com>
+ <20220609074027.fntbvcgac4nroy35@gator>
+ <YqIPYP0gKIoU7JLG@google.com>
 MIME-Version: 1.0
-References: <20220528113829.1043361-1-maz@kernel.org> <20220528113829.1043361-7-maz@kernel.org>
- <CAAeT=FzXWDfkR5ck0vpiRLKi0nU9e5Ua=yg=3Rj--Gq+aBaVUg@mail.gmail.com> <87fske46tp.wl-maz@kernel.org>
-In-Reply-To: <87fske46tp.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 9 Jun 2022 10:24:39 -0700
-Message-ID: <CAAeT=FxH_rK9HT+-QLkbH9hn0LhObwCCTrbdqt0x--BgqtaK_g@mail.gmail.com>
-Subject: Re: [PATCH 06/18] KVM: arm64: Add three sets of flags to the vcpu state
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kernel-team@android.com, Will Deacon <will@kernel.org>,
-        Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YqIPYP0gKIoU7JLG@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -69,102 +80,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 9, 2022 at 12:47 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 09 Jun 2022 07:10:14 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > It so appears that each of the vcpu flags is really belonging to
-> > > one of three categories:
-> > >
-> > > - a configuration flag, set once and for all
-> > > - an input flag generated by the kernel for the hypervisor to use
-> > > - a state flag that is only for the kernel's own bookkeeping
-> > >
-> > > As we are going to split all the existing flags into these three
-> > > sets, introduce all three in one go.
-> > >
-> > > No functional change other than a bit of bloat...
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
-> > >  1 file changed, 9 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 5eb6791df608..c9dd0d4e22f2 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -338,6 +338,15 @@ struct kvm_vcpu_arch {
-> > >         /* Miscellaneous vcpu state flags */
-> > >         u64 flags;
-> > >
-> > > +       /* Configuration flags */
-> > > +       u64 cflags;
-> > > +
-> > > +       /* Input flags to the hypervisor code */
-> > > +       u64 iflags;
-> > > +
-> > > +       /* State flags, unused by the hypervisor code */
-> > > +       u64 sflags;
-> >
-> > Although I think VCPU_SVE_FINALIZED could be considered "state" rather
-> > than "configuration", I assume the reason why it is handled by cflags
-> > in the following patches is because VCPU_SVE_FINALIZED is set once
-> > for all. If my assumption is correct, it would be clearer to add
-> > "set once and for all" in the comment for cflags.
->
-> Yes, that's indeed the reason for this categorisation. In general,
-> these flags are, as you put it, set once and for all extremely early
-> (before the vcpu can run), and are never cleared. I'll update the
-> comment accordingly.
->
-> > Also, if we end up using VCPU_SVE_FINALIZED in hypervisor code later,
-> > then should it be handled by iflags instead of cflags ?
->
-> That'd be my expectation if they ended up changing state at some
-> point. My view is that the cflags are immutable once the vcpu has
-> run, and flags that can change state over the life if the vcpu
-> shouldn't be in that category.
->
-> >
-> > My understanding of how those flags should be used is as follows.
-> > Is my understanding correct ?
-> >
-> >  iflags: flags that are used by hypervisor code
->
-> Yes. Crucially, they are used as an input to the hypervisor code: it
-> either consumes these flags (INCREMENT_PC, PENDING_EXCEPTION), or
-> consult them to decide what to do.
->
-> >  cflags: flags that are set once for all and unused by hypervisor code
->
-> Yes.
+On Thu, Jun 09, 2022, Sean Christopherson wrote:
+> On Thu, Jun 09, 2022, Andrew Jones wrote:
+> > On Wed, Jun 08, 2022 at 11:20:06PM +0000, Sean Christopherson wrote:
+> > > diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > > index b3116c151d1c..17f7ef975d5c 100644
+> > > --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > > +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > > @@ -419,7 +419,7 @@ static void run_test(struct vcpu_config *c)
+> > > 
+> > >         check_supported(c);
+> > > 
+> > > -       vm = vm_create_barebones();
+> > > +       vm = vm_create(1);
+> > 
+> > Hmm, looks like something, somewhere for AArch64 needs improving to avoid
+> > strangeness like this. I'll look into it after we get this series merged.
+> 
+> Huh, you're right, that is odd.  Ah, duh, aarch64_vcpu_add() allocates a stack
+> for the vCPU, and that will fail if there's no memslot from which to allocate
+> guest memory.
+> 
+> So, this is my goof in
+> 
+>   KVM: selftests: Rename vm_create() => vm_create_barebones(), drop param
+> 
+> get-reg-list should first be converted to vm_create_without_vcpus().  I'll also
+> add a comment explaining that vm_create_barebones() can be used with __vm_vcpu_add(),
+> but not the "full" vm_vcpu_add() or vm_arch_vcpu_add() variants.
 
-Thank you so much for the clarification.
+Actually, I agree with your assessment.  A better solution is to open code the
+calls to add and setup the vCPU.  It's a small amount of code duplication, but I
+actually like the end result because it better documents the test's dependencies.
 
-I've just realized that GUEST_HAS_PTRAUTH (cflags) is used by
-hypervisor code (kvm_hyp_handle_ptrauth and get_pvm_id_aa64isar{1,2}).
-Shouldn't GUEST_HAS_PTRAUTH be handled as iflags ?
-Or, in choosing one of these three for a flag, is immutability (once
-the vcpu has run) the highest priority, followed by whether or not
-it is used by hypervisor code ?
+Assuming it actually works, i.e. the stack setup is truly unnecessary, I'll add a
+patch like so before the barebones change.
 
->
-> >  sflags: flags that could be set/cleared more than once and unused
-> >          by hypervisor code
->
-> Yes. They are really bookkeeping flags for the kernel code.
->
-> I'll try to incorporate some of that in the comments before reposting
-> the series.
+diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+index ecfb773ec41e..7bba365b1522 100644
+--- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+@@ -418,7 +418,8 @@ static void run_test(struct vcpu_config *c)
 
-Thank you, that would be great since I was a bit concerned that
-those flags might get mixed up in the future.
+        vm = vm_create(DEFAULT_GUEST_PHY_PAGES);
+        prepare_vcpu_init(c, &init);
+-       aarch64_vcpu_add_default(vm, 0, &init, NULL);
++       vm_vcpu_add(vm, vcpuid);
++       aarch64_vcpu_setup(vm, 0, &init);
+        finalize_vcpu(vm, 0, c);
 
-Regards,
-Reiji
+        reg_list = vcpu_get_reg_list(vm, 0);
+
