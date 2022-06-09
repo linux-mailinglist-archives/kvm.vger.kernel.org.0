@@ -2,172 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 834165455A0
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 22:29:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86CE9545681
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 23:33:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344645AbiFIU3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 16:29:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50190 "EHLO
+        id S239526AbiFIVdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 17:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344304AbiFIU3N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 16:29:13 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D6026E396
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 13:29:12 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id q12-20020a17090a304c00b001e2d4fb0eb4so352417pjl.4
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 13:29:12 -0700 (PDT)
+        with ESMTP id S229862AbiFIVdi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 17:33:38 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2ACEE1147
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 14:33:34 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id o6so16174057plg.2
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 14:33:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=C4/yJYyLya7rE6Jieokr56CujDpfPfuLcGNiEECS+QU=;
-        b=CjppovKB2YLi+/umkUgs7TGbUGFHqjbhz+/vuQpURnYcTn7Y/XOYbzw0Ykj8khDf1D
-         lU6118PzbLcDnYEohwwuQpWRqLnFFor88HMkhxJnTWzVFPYmlDCWI4t25w0FcOY9LsJ3
-         Xx+fRvY97K5Q4b9fyl2wIJsNDu8BFxuzsJC2MBkEM8rOua9Xl2avo9S7S1w8ygcb6WQp
-         l07wjz7O+ipoSddpByuvOEx8LLG0at/WFa44rE+IaodvVFqdep6gbL1AbyDvvOmSNBeS
-         GcNHdTH1imkTwWGYIM5B+u73KBCppBXzzkigAH/N4DrtNRxqLpENGyWxu6onk+j5isHM
-         5lXw==
+        bh=m7ycA4UvCRcWR4yKEUVYS54WeWG49dg/6jDxIB9tTNA=;
+        b=Jqq2qaUmztHXYlLC5OtDZ1kjE3J4zkrncd42dGrvID2KbEKbAY9YGGZYNNdpgSsi17
+         LVCDdST/dYjbt6pTf+bnRXMgQM4hHqzJLOyHwtqChyrmT6E2+mlWn5hIF2V0TZSXd6yt
+         tVMowv8ZPTS/p62/qff/4OAqw4onqe01bLt8JukOqng8pdaIBh7P0ZeFKNL9ggilP8vk
+         5LxStOh07fwcYGt8ioBMcXY0DG9zd6FfQyvQKMf0TjX0iv11uUTujpxVcY4APAA0AWAO
+         YqnYYpPyAl71U0a8/FIrW8jkdfNmx0BdSLrmQttJMQoo9xzBZXmfFbTJdG+/jUdJJ56l
+         IKXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=C4/yJYyLya7rE6Jieokr56CujDpfPfuLcGNiEECS+QU=;
-        b=mVlpMf0/Gmy3479bbFoUDOM2fQqEy6WAX3Ba3f5Y9s12ZqfnKNF3rZ1Xm8jLL3Q0HP
-         DCR9TqjzyEoNnitO8rPTCoUaKtCMWngmg6T4R/WJbUVfBwop1Xp+QFGWUuWfrxlIJgM2
-         UK5dhSoIDb42AR8zz84/p+n92F0gXWlHaLITzymBVtTu+kZipXCFMwUjL1/8JyeQRGNy
-         awqRZ4vmFwk/CiL3bTYFwR97V3feVEFHS3ILc5XtQCGGIzFp+qMiMZqKDqmR66z3J3XJ
-         hDfUs4/8EnM7ImibUX/NO2pjhdVjjHY6QR44XILd+ZBKo0mzT1G4B2SIqU2suGV9MJxr
-         Fj5g==
-X-Gm-Message-State: AOAM533FQTQPoXhzwZelHSZ18DZRR/6VsIFPAz1Tczm2CSTSgpTPqC7F
-        FeNl3DshNom9kSHKtAS8ydcw8Q==
-X-Google-Smtp-Source: ABdhPJx0nBU6Y+TUh04OO6/IROXMWJ7hUc76Ud455mDwfSNlb8nAgIObkwH4NgXB0NSx9cPem36m4g==
-X-Received: by 2002:a17:90a:b284:b0:1e3:826b:d11d with SMTP id c4-20020a17090ab28400b001e3826bd11dmr5147277pjr.79.1654806551448;
-        Thu, 09 Jun 2022 13:29:11 -0700 (PDT)
+        bh=m7ycA4UvCRcWR4yKEUVYS54WeWG49dg/6jDxIB9tTNA=;
+        b=zGobQefxCQrQBZvSnx0DcVy7EcleyLR7/eK+bBDwMTvNTY9HwKtiuv5hfwfI15hUXG
+         A93CdG8FDHjlkI0zWYv7ORldJuFS6R1a8iFNnPV4EqnreiP5wyVocOtO9Ntzte9bH5iR
+         NqtEX8be5z7S7kNvoB2DaIFSNqUUJk/f8kpw+TFt3cR8kvWWnRh3mL2sdezoqj8FNynb
+         Nm3w2dd3oLKbLMY46ix3Tlcb+8t3kb50Lkp1+MLQBTOB8gqsVUjnQMzdYcn34oT1BZhX
+         bwNi6JJofMeVn8ilRMtPFQTzoESlEtBPoIXT178sa61NVmswN5nlCizBQuZ6gyDoVEJK
+         GT+Q==
+X-Gm-Message-State: AOAM530IeFffOHob0oIjuiNcwkElGtbHLCIhJrvpGlMy7N9l0JM7kSZK
+        /hzWTir+nAF9AI/3Rn2TlHfJRI9o5pG3dA==
+X-Google-Smtp-Source: ABdhPJyMFtULqK6xP7o6ODg72mXgOYMUfRbFIM45qO5zRVZM10jyMpfcu73oXSgj7e4Wxz96JFuhfg==
+X-Received: by 2002:a17:903:2312:b0:163:daf7:83a9 with SMTP id d18-20020a170903231200b00163daf783a9mr41587405plh.160.1654810414111;
+        Thu, 09 Jun 2022 14:33:34 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e3-20020a17090301c300b0016511314b94sm17748369plh.159.2022.06.09.13.29.10
+        by smtp.gmail.com with ESMTPSA id h11-20020a62830b000000b0050dc7628150sm17761006pfe.42.2022.06.09.14.33.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 13:29:10 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 20:29:06 +0000
+        Thu, 09 Jun 2022 14:33:32 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 21:33:29 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YqJYEheLiGI4KqXF@google.com>
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <CAGtprH_83CEC0U-cBR2FzHsxbwbGn0QJ87WFNOEet8sineOcbQ@mail.gmail.com>
- <20220607065749.GA1513445@chaop.bj.intel.com>
- <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
- <20220608021820.GA1548172@chaop.bj.intel.com>
- <CAGtprH8xyf07jMN7ubTC__BvDj+z41uVGRiCJ7Rc5cv3KWg03w@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/6] KVM: x86: inline kernel_pio into its sole caller
+Message-ID: <YqJnKSpnPFZ5VsnL@google.com>
+References: <20220608121253.867333-1-pbonzini@redhat.com>
+ <20220608121253.867333-2-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGtprH8xyf07jMN7ubTC__BvDj+z41uVGRiCJ7Rc5cv3KWg03w@mail.gmail.com>
+In-Reply-To: <20220608121253.867333-2-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08, 2022, Vishal Annapurve wrote:
-> ...
-> > With this patch series, it's actually even not possible for userspace VMM
-> > to allocate private page by a direct write, it's basically unmapped from
-> > there. If it really wants to, it should so something special, by intention,
-> > that's basically the conversion, which we should allow.
-> >
+On Wed, Jun 08, 2022, Paolo Bonzini wrote:
+> The caller of kernel_pio already has arguments for most of what kernel_pio
+> fishes out of vcpu->arch.pio.  This is the first step towards ensuring that
+> vcpu->arch.pio.* is only used when exiting to userspace.
 > 
-> A VM can pass GPA backed by private pages to userspace VMM and when
-> Userspace VMM accesses the backing hva there will be pages allocated
-> to back the shared fd causing 2 sets of pages backing the same guest
-> memory range.
+> We can now also WARN if emulated PIO performs successful in-kernel iterations
+> before having to fall back to userspace.  The code is not ready for that, and
+> it should never happen.
+
+Please avoid pronouns and state what patch does, not what "can" be done.  It's not
+clear without reading the actual code whether "The code is not ready for that" means
+"KVM is not ready to WARN" or "KVM is not ready to fall back to exiting userspace
+if a
+
+E.g.
+
+  WARN if emulated PIO falls back to userspace after successfully handling
+  one or more in-kernel iterations.  The port, size, and access type do not
+  change, and KVM so it should be impossible for in-kernel PIO to fail on
+  subsequent iterations.
+
+That said, I don't think the above statement is true.  KVM is running with SRCU
+protection, but the synchronize_srcu_expedited() in kvm_io_bus_unregister_dev()
+only protects against use-after-free, it does not prevent two calls to
+kvm_io_bus_read() from seeing different incarnations of kvm->buses.
+
+And if I'm right, that could be exploited to create a buffer overrun due to doing
+this memcpy with "data = <original data> + i * size".
+
+	else
+		memcpy(vcpu->arch.pio_data, data, size * count);
+
+The existing code is arguably wrong too in that it will result in replaying PIO
+accesses, but IMO userspace gets to keep the pieces if it unregisters a device
+while vCPUs are running.
+ 
+> No functional change intended.
 > 
-> > Thanks for bringing this up. But in my mind I still think userspace VMM
-> > can do and it's its responsibility to guarantee that, if that is hard
-> > required.
-
-That was my initial reaction too, but there are unfortunate side effects to punting
-this to userspace. 
-
-> By design, userspace VMM is the decision-maker for page
-> > conversion and has all the necessary information to know which page is
-> > shared/private. It also has the necessary knobs to allocate/free the
-> > physical pages for guest memory. Definitely, we should make userspace
-> > VMM more robust.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 39 +++++++++++++++++----------------------
+>  1 file changed, 17 insertions(+), 22 deletions(-)
 > 
-> Making Userspace VMM more robust to avoid double allocation can get
-> complex, it will have to keep track of all in-use (by Userspace VMM)
-> shared fd memory to disallow conversion from shared to private and
-> will have to ensure that all guest supplied addresses belong to shared
-> GPA ranges.
-
-IMO, the complexity argument isn't sufficient justfication for introducing new
-kernel functionality.  If multiple processes are accessing guest memory then there
-already needs to be some amount of coordination, i.e. it can't be _that_ complex.
-
-My concern with forcing userspace to fully handle unmapping shared memory is that
-it may lead to additional performance overhead and/or noisy neighbor issues, even
-if all guests are well-behaved.
-
-Unnmapping arbitrary ranges will fragment the virtual address space and consume
-more memory for all the result VMAs.  The extra memory consumption isn't that big
-of a deal, and it will be self-healing to some extent as VMAs will get merged when
-the holes are filled back in (if the guest converts back to shared), but it's still
-less than desirable.
-
-More concerning is having to take mmap_lock for write for every conversion, which
-is very problematic for configurations where a single userspace process maps memory
-belong to multiple VMs.  Unmapping and remapping on every conversion will create a
-bottleneck, especially if a VM has sub-optimal behavior and is converting pages at
-a high rate.
-
-One argument is that userspace can simply rely on cgroups to detect misbehaving
-guests, but (a) those types of OOMs will be a nightmare to debug and (b) an OOM
-kill from the host is typically considered a _host_ issue and will be treated as
-a missed SLO.
-
-An idea for handling this in the kernel without too much complexity would be to
-add F_SEAL_FAULT_ALLOCATIONS (terrible name) that would prevent page faults from
-allocating pages, i.e. holes can only be filled by an explicit fallocate().  Minor
-faults, e.g. due to NUMA balancing stupidity, and major faults due to swap would
-still work, but writes to previously unreserved/unallocated memory would get a
-SIGSEGV on something it has mapped.  That would allow the userspace VMM to prevent
-unintentional allocations without having to coordinate unmapping/remapping across
-multiple processes.
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 79efdc19b4c8..2f9100f2564e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7415,37 +7415,32 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+>  	return emulator_write_emulated(ctxt, addr, new, bytes, exception);
+>  }
+>  
+> -static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
+> -{
+> -	int r = 0, i;
+> -
+> -	for (i = 0; i < vcpu->arch.pio.count; i++) {
+> -		if (vcpu->arch.pio.in)
+> -			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, vcpu->arch.pio.port,
+> -					    vcpu->arch.pio.size, pd);
+> -		else
+> -			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS,
+> -					     vcpu->arch.pio.port, vcpu->arch.pio.size,
+> -					     pd);
+> -		if (r)
+> -			break;
+> -		pd += vcpu->arch.pio.size;
+> -	}
+> -	return r;
+> -}
+> -
+>  static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
+>  			       unsigned short port,
+>  			       unsigned int count, bool in)
+>  {
+> +	void *data = vcpu->arch.pio_data;
+> +	unsigned i;
+> +	int r;
+> +
+>  	vcpu->arch.pio.port = port;
+>  	vcpu->arch.pio.in = in;
+> -	vcpu->arch.pio.count  = count;
+> +	vcpu->arch.pio.count = count;
+>  	vcpu->arch.pio.size = size;
+>  
+> -	if (!kernel_pio(vcpu, vcpu->arch.pio_data))
+> -		return 1;
+> +	for (i = 0; i < count; i++) {
+> +		if (in)
+> +			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, port, size, data);
+> +		else
+> +			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS, port, size, data);
+> +		if (r)
+> +			goto userspace_io;
+> +		data += size;
+> +	}
+> +	return 1;
+>  
+> +userspace_io:
+> +	WARN_ON(i != 0);
+>  	vcpu->run->exit_reason = KVM_EXIT_IO;
+>  	vcpu->run->io.direction = in ? KVM_EXIT_IO_IN : KVM_EXIT_IO_OUT;
+>  	vcpu->run->io.size = size;
+> -- 
+> 2.31.1
+> 
+> 
