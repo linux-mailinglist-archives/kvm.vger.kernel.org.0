@@ -2,146 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7959F5452E0
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 19:24:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 140815452E1
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 19:25:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344631AbiFIRYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 13:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59414 "EHLO
+        id S1344753AbiFIRY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 13:24:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245457AbiFIRYi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 13:24:38 -0400
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 09 Jun 2022 10:24:37 PDT
-Received: from mailrelay1-1.pub.mailoutpod1-cph3.one.com (mailrelay1-1.pub.mailoutpod1-cph3.one.com [46.30.210.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FD7927B25
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 10:24:37 -0700 (PDT)
+        with ESMTP id S245457AbiFIRY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 13:24:57 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966B127B25
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 10:24:56 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id c3-20020a9d6843000000b0060c2c63c337so732457oto.5
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 10:24:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ravnborg.org; s=rsa1;
-        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-         from:date:from;
-        bh=wNOUiBw/rJTSYauDyEhMfXMRlRrqLZQh50hYSmQWq+w=;
-        b=h03dH+2IzhirOaSl9zx/tKAOAkC/lbsNkbuqFgMq3C5lLkr/gxxqZwLR44Erz+gNZy4kbJLuDmGew
-         W+cPbunM+Y5Sfl0oXhDpHQJBjdkt0Qp6fUpCR5CX7kaCESRdub5RSh48rU2dQ4F6LMxzln4q+jl3Fn
-         /LsLQ372w6ohuZ65PCsAZF7Uvk3rDEVE/7poQn+NNkm46FhZ9WGm8J1KlnEBep58BVc9sEX/j7xgcI
-         INDaYdJeY9Qs+PGcAXmA5rq5W3ZAkBVaZ/F94UmjlaVId1Nd0bXyysacJFGOKGy/n6cKjtxRjxs2G1
-         DsBVtN9IGIldkT3Y1RmvdQITFTKLZfw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
-        d=ravnborg.org; s=ed1;
-        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-         from:date:from;
-        bh=wNOUiBw/rJTSYauDyEhMfXMRlRrqLZQh50hYSmQWq+w=;
-        b=fo2mWotsx0uFkMRqN2XFQ1cnTjbBQHaQfHLt/uBrj6cCvJ1Wj8s/PWRcuZVP+MsTfNIKBoPkPAtpv
-         PpRwURcAA==
-X-HalOne-Cookie: 3ddab91af89094ee70c34864cd093f29a661beea
-X-HalOne-ID: e1a5637b-e818-11ec-a6bf-d0431ea8a283
-Received: from mailproxy1.cst.dirpod4-cph3.one.com (80-162-45-141-cable.dk.customer.tdc.net [80.162.45.141])
-        by mailrelay1.pub.mailoutpod1-cph3.one.com (Halon) with ESMTPSA
-        id e1a5637b-e818-11ec-a6bf-d0431ea8a283;
-        Thu, 09 Jun 2022 17:23:31 +0000 (UTC)
-Date:   Thu, 9 Jun 2022 19:23:28 +0200
-From:   Sam Ravnborg <sam@ravnborg.org>
-To:     Javier Martinez Canillas <javierm@redhat.com>,
-        Jerry Lin <wahahab11@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Thomas Zimmermann <tzimmermann@suse.de>,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Laszlo Ersek <lersek@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        kernel test robot <lkp@intel.com>,
-        Jens Frederich <jfrederich@gmail.com>,
-        Jon Nettleton <jon.nettleton@gmail.com>,
-        linux-staging@lists.linux.dev,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Helge Deller <deller@gmx.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Zhen Lei <thunder.leizhen@huawei.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Xiyu Yang <xiyuyang19@fudan.edu.cn>,
-        linux-fbdev@vger.kernel.org, Zheyu Ma <zheyuma97@gmail.com>,
-        Guenter Roeck <linux@roeck-us.net>
-Subject: Mark olpc_dcon BROKEN [Was: [PATCH v6 5/5] fbdev: Make
- registered_fb[] private to fbmem.c]
-Message-ID: <YqIskEjUvJo4y4cb@ravnborg.org>
-References: <20220607182338.344270-1-javierm@redhat.com>
- <20220607182338.344270-6-javierm@redhat.com>
- <3ebac271-1276-8132-6175-ca95a26cfcbb@suse.de>
- <69d8ad0e-efc6-f37d-9aa7-d06f8de16a6a@redhat.com>
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+BsytC55p1uk/DN+lXBnGi/b/CJPb11S2aPURFUdMH0=;
+        b=F8G+2xSU9+LS3+gruh9t36AQRGmeTGGZwcPMINt+vREwjujSNCz/ecGqPTwcUD8vvt
+         jRBhFRZzDP1RABS+N+QfHvMZ3CAkzeDKvpbhNwmimc18igatudjVbYiXGbn1qRzkpNH/
+         gLPvwqioZYlQTzIPZomlvO3B+28kQrKtxHhR9eP6NbHuBEZF7U1/DiLS1O9rqssCnU8E
+         4LdIfiEnkFAogcyP+Z6dncM5AhychyWQ1P7ed4zQTHWngKTuUqdx7A/4Lf1Ekqmx+UwD
+         B9VFqX8rD3e7ftJG2nf0rCIbT7KM+M4hxEoKpK0/JadEFZd92dPT9UUQvmUaXju0riLp
+         bTIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+BsytC55p1uk/DN+lXBnGi/b/CJPb11S2aPURFUdMH0=;
+        b=TfuTlnY9YeHAUwuK1AurJP3evKqQj67JRnHqA+47llrLF6iYeVx8uWLFD+PwtNLZZY
+         ak5zXiqnBf5jIy6HSFqCmcJXnA5cPl0aMJYTF674wYhMBu9dk+uymI8Q9uzHRt4EbwBc
+         tDJezprc5LEyQNCD6gLldn9lXBpnpstfDS1fMt/mlCdMqRzDGG3aP146N+FfkUBhhoLL
+         /3iIEL2PS8KYl4fWyLJXeXw14QJjMRVQpDpx0Eu9lZ5QotreZ+m9c2ciBkU/bmxpi+x9
+         DwXl9+FIEUhg/VQPD+qjJCsVQDbGPQYUbHfyroXfCYQ+/7MfQkjOu4D8UgV3v0yXFUCo
+         /ozg==
+X-Gm-Message-State: AOAM532jyuHUUzlwpQCEBD+TVryX+lhJGnfwkNxOq1Mpg/jtarplf/FK
+        66R/M/sX28uQE1f8mNqtHAYMvMgw6bf6EaQoWkDJ9n5GG2zbVQ==
+X-Google-Smtp-Source: ABdhPJzAEY5Siu4Rp3xtx8yNN6n6u1qCejxChcZ1iqiG3vgy9D5BfpAY23LvF8c70/yvWTQMW4NGmd1YgUyK/PP+AZ8=
+X-Received: by 2002:a05:6830:2a01:b0:606:d153:1ba0 with SMTP id
+ y1-20020a0568302a0100b00606d1531ba0mr17837813otu.35.1654795495703; Thu, 09
+ Jun 2022 10:24:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69d8ad0e-efc6-f37d-9aa7-d06f8de16a6a@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20220528113829.1043361-1-maz@kernel.org> <20220528113829.1043361-7-maz@kernel.org>
+ <CAAeT=FzXWDfkR5ck0vpiRLKi0nU9e5Ua=yg=3Rj--Gq+aBaVUg@mail.gmail.com> <87fske46tp.wl-maz@kernel.org>
+In-Reply-To: <87fske46tp.wl-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Thu, 9 Jun 2022 10:24:39 -0700
+Message-ID: <CAAeT=FxH_rK9HT+-QLkbH9hn0LhObwCCTrbdqt0x--BgqtaK_g@mail.gmail.com>
+Subject: Re: [PATCH 06/18] KVM: arm64: Add three sets of flags to the vcpu state
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kernel-team@android.com, Will Deacon <will@kernel.org>,
+        Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Javier.
+On Thu, Jun 9, 2022 at 12:47 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Thu, 09 Jun 2022 07:10:14 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > It so appears that each of the vcpu flags is really belonging to
+> > > one of three categories:
+> > >
+> > > - a configuration flag, set once and for all
+> > > - an input flag generated by the kernel for the hypervisor to use
+> > > - a state flag that is only for the kernel's own bookkeeping
+> > >
+> > > As we are going to split all the existing flags into these three
+> > > sets, introduce all three in one go.
+> > >
+> > > No functional change other than a bit of bloat...
+> > >
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
+> > >  1 file changed, 9 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 5eb6791df608..c9dd0d4e22f2 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -338,6 +338,15 @@ struct kvm_vcpu_arch {
+> > >         /* Miscellaneous vcpu state flags */
+> > >         u64 flags;
+> > >
+> > > +       /* Configuration flags */
+> > > +       u64 cflags;
+> > > +
+> > > +       /* Input flags to the hypervisor code */
+> > > +       u64 iflags;
+> > > +
+> > > +       /* State flags, unused by the hypervisor code */
+> > > +       u64 sflags;
+> >
+> > Although I think VCPU_SVE_FINALIZED could be considered "state" rather
+> > than "configuration", I assume the reason why it is handled by cflags
+> > in the following patches is because VCPU_SVE_FINALIZED is set once
+> > for all. If my assumption is correct, it would be clearer to add
+> > "set once and for all" in the comment for cflags.
+>
+> Yes, that's indeed the reason for this categorisation. In general,
+> these flags are, as you put it, set once and for all extremely early
+> (before the vcpu can run), and are never cleared. I'll update the
+> comment accordingly.
+>
+> > Also, if we end up using VCPU_SVE_FINALIZED in hypervisor code later,
+> > then should it be handled by iflags instead of cflags ?
+>
+> That'd be my expectation if they ended up changing state at some
+> point. My view is that the cflags are immutable once the vcpu has
+> run, and flags that can change state over the life if the vcpu
+> shouldn't be in that category.
+>
+> >
+> > My understanding of how those flags should be used is as follows.
+> > Is my understanding correct ?
+> >
+> >  iflags: flags that are used by hypervisor code
+>
+> Yes. Crucially, they are used as an input to the hypervisor code: it
+> either consumes these flags (INCREMENT_PC, PENDING_EXCEPTION), or
+> consult them to decide what to do.
+>
+> >  cflags: flags that are set once for all and unused by hypervisor code
+>
+> Yes.
 
-On Thu, Jun 09, 2022 at 03:09:21PM +0200, Javier Martinez Canillas wrote:
-> Hello Thomas,
-> 
-> On 6/9/22 13:49, Thomas Zimmermann wrote:
-> > Hi Javier
-> > 
-> > Am 07.06.22 um 20:23 schrieb Javier Martinez Canillas:
-> >> From: Daniel Vetter <daniel.vetter@ffwll.ch>
-> >>
-> >> Well except when the olpc dcon fbdev driver is enabled, that thing
-> >> digs around in there in rather unfixable ways.
-> > 
-> > There is fb_client_register() to set up a 'client' on top of an fbdev. 
-> > The client would then get messages about modesetting, blanks, removals, 
-> > etc. But you'd probably need an OLPC to convert dcon, and the mechanism 
-> > itself is somewhat unloved these days.
-> > 
-> > Your patch complicates the fbdev code AFAICT. So I'd either drop it or, 
-> > even better, build a nicer interface for dcon.
-> > 
-> > The dcon driver appears to look only at the first entry. Maybe add 
-> > fb_info_get_by_index() and fb_info_put() and export those. They would be 
-> > trivial wrappers somewhere in fbmem.c:
-> > 
-> > #if IS_ENABLED(CONFIG_FB_OLPC_DCON)
-> > struct fb_info *fb_info_get_by_index(unsigned int index)
-> > {
-> > 	return get_fb_info(index);
-> > }
-> > EXPORT_SYMBOL()
-> > void fb_info_put(struct fb_info *fb_info)
-> > {
-> > 	put_fb_info(fb_info);
-> > }
-> > EXPORT_SYMBOL()
-> > #endif
-> > 
-> > In dcon itself, using the new interfaces will actually acquire a 
-> > reference to keep the display alive. The code at [1] could be replaced. 
-> > And a call to fb_info_put() needs to go into dcon_remove(). [2]
-> > 
-> 
-> Thanks for your suggestions, that makes sense to me. I'll drop this
-> patch from the set and post as a follow-up a different approach as
-> you suggested.
+Thank you so much for the clarification.
 
-To repeat myself from irc.
-olpc_dcon is a staging driver and we should avoid inventing anything in
-core code for to make staging drivers works.
-Geert suggested EXPORT_SYMPBOL_NS_GPL() that could work and narrow it
-down to olpc_dcon.
-The better approach is to mark said driver BROKEN and then someone can
-fix it it there is anyone who cares.
-Last commit to olpc_dcon was in 2019: e40219d5e4b2177bfd4d885e7b64e3b236af40ac
-and maybe Jerry Lin cares enough to fix it.
+I've just realized that GUEST_HAS_PTRAUTH (cflags) is used by
+hypervisor code (kvm_hyp_handle_ptrauth and get_pvm_id_aa64isar{1,2}).
+Shouldn't GUEST_HAS_PTRAUTH be handled as iflags ?
+Or, in choosing one of these three for a flag, is immutability (once
+the vcpu has run) the highest priority, followed by whether or not
+it is used by hypervisor code ?
 
-Added Jerry and Greg to the mail.
+>
+> >  sflags: flags that could be set/cleared more than once and unused
+> >          by hypervisor code
+>
+> Yes. They are really bookkeeping flags for the kernel code.
+>
+> I'll try to incorporate some of that in the comments before reposting
+> the series.
 
-	Sam
+Thank you, that would be great since I was a bit concerned that
+those flags might get mixed up in the future.
+
+Regards,
+Reiji
