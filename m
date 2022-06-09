@@ -2,80 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F347E5446A9
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:57:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A20445446FC
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 11:13:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242786AbiFII4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 04:56:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35314 "EHLO
+        id S233827AbiFIJNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 05:13:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234348AbiFII4O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:56:14 -0400
+        with ESMTP id S232236AbiFIJN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 05:13:28 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EF1247552
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:54:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1DEB514085
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 02:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654764877;
+        s=mimecast20190719; t=1654766006;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=tvWtgkYBzt9DbATf2rlAmzgDtHttB4fvGNf4mSgVDKk=;
-        b=DolXWM56kIehFrHaLgs76bgGZnaMv8sSSvBg01nrtGtckY6aUZzfdLttAQnIwIKg/9Uoil
-        9bk+zR9JGyJe0HAWF8dfsqgfpXp0napFQMQlcGoTEmK5In8/NgaJcEtYgfI6k4CQ3VePqG
-        rpSxg7uKi4GxbOwsqB4JulyMQJ1f8yM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=SZw+ycfYF9t98F3LaguYuBwfxvvxqsS7Jsc/OX/XJJk=;
+        b=bEpzTYvplZhdM8jUHSUQ5/c6x+zOuhvB3ROyiPryGhUckoRzGIz4UpPHe10jbWo97Ral6W
+        YdAjoyuIpW57FkSx3MD5SKbK76DZkk6/GE+lRTR6GSdiGqa+SUUYmorn+lrKEvyREr4UeB
+        iUGfewqI3K8oI/BjKars0Gx91H5D0o0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-187-zY3IqGYYNKW_2mdkQFqBmw-1; Thu, 09 Jun 2022 04:54:36 -0400
-X-MC-Unique: zY3IqGYYNKW_2mdkQFqBmw-1
-Received: by mail-wm1-f71.google.com with SMTP id c125-20020a1c3583000000b003978decffedso15699048wma.5
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 01:54:36 -0700 (PDT)
+ us-mta-633-_qvreb5tP7epUBq-mGMP-A-1; Thu, 09 Jun 2022 05:13:25 -0400
+X-MC-Unique: _qvreb5tP7epUBq-mGMP-A-1
+Received: by mail-wm1-f70.google.com with SMTP id 130-20020a1c0288000000b0039c6608296dso1591843wmc.4
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 02:13:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tvWtgkYBzt9DbATf2rlAmzgDtHttB4fvGNf4mSgVDKk=;
-        b=VVDMB41iZOf5myb9j6CkMDLabM8Vl7JSCq5zMoTOGJHujBV7oH+3WdHIVYYDIRT1Hq
-         NKLPT8MBGwSsqxCyJaVGsiMo7Dus/0kFKQDvl+4GKiON+dGnJ9yGMZBVVOBLCob+/+ZZ
-         lcnjWKjpfaRRYbcMnCgl2PvimGw8jgWpgbTcpX44T4h8LiTiQycOpedCDjoFjlWm9/yP
-         JVjRgtoGNJg6JGSJkVtz4uPSv2/Eu2gJp0595DYIYvO3PQnDP6EkpnIHOFvYKMd0kEXK
-         WPHcgEG0TO0wmAJS8ig6DT5RPk4vfE58pA86xJM5DiQwh7NMt88oKo1DLoizrJr7D+zR
-         OEXg==
-X-Gm-Message-State: AOAM530r05t6JVZyaqibO0So+DyehQSYNy5nn5SSqwlgF+e7VzKdt67d
-        bY5OWai7+GpJjrjC1tXkWmoI+0CsEaowNMkVSFNqtTQ2bVc66BXUkYkMdk6QaUw3l1Q28Lc1nhJ
-        PHekyAWV0xda8
-X-Received: by 2002:adf:e5d0:0:b0:210:313a:e4dc with SMTP id a16-20020adfe5d0000000b00210313ae4dcmr36674911wrn.152.1654764875098;
-        Thu, 09 Jun 2022 01:54:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzR7k/vdtBFj/GYt/MtBX7xF11gJz7ChUoPOTqELw1aa5VvOp+SIRJBSOhp8lJfnJDnuWfn3g==
-X-Received: by 2002:adf:e5d0:0:b0:210:313a:e4dc with SMTP id a16-20020adfe5d0000000b00210313ae4dcmr36674875wrn.152.1654764874842;
-        Thu, 09 Jun 2022 01:54:34 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
-        by smtp.gmail.com with ESMTPSA id s19-20020a1cf213000000b0039c4945c753sm15291073wmc.39.2022.06.09.01.54.33
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=SZw+ycfYF9t98F3LaguYuBwfxvvxqsS7Jsc/OX/XJJk=;
+        b=KfUShN5Hlaw3p4dtxviIhnD95CmoxGdYLzfPfvy3edIQW1OYVBwplyBtbIsHA6nGdc
+         Mg0jWBs/sd3KaQSDuLAOew1CKjMcW9K4/VIZFtv03u2PQ57R6DKUG++LbEW3gwb/GXmC
+         pn+LcJklVOAGvXEPJ7xq04/QnGC7RCOm+SHMjdQR6g0wGmnq11CxCEsN8Z99RGfoeicb
+         YMkSv+1WfpwhEJK7CPAGzX5CkNJRocJImmV1ioGihg3DC9RearqExMR6XW11OXdZp5lA
+         CskB+gFcZdy0TWfNie4DO5lUGGNt85l6zNVoR3m+fvxRkYtwLSl5gsVwfg04pXxknD4E
+         LQwA==
+X-Gm-Message-State: AOAM531BCL/KvAjSDTjqGyt8BBrRRaWrT1E7lOoO0lvmgN5jKJzOYLJ5
+        vX3zuRoenDyWwRgYVorFES0LBu7S9wre4+zVKnpdHg19lSSJkRsYCrSti2HlPiPVjFt/teA4673
+        Iw16svurgGHSV
+X-Received: by 2002:a5d:59ae:0:b0:217:2519:8a0f with SMTP id p14-20020a5d59ae000000b0021725198a0fmr24488068wrr.383.1654766003828;
+        Thu, 09 Jun 2022 02:13:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzcUBuhoKwLjJ6mWqe98WIBEEI8GOuoODhLbQKu8EN525WWKpyuiTaaM6te1qxMrPbqqr4EMg==
+X-Received: by 2002:a5d:59ae:0:b0:217:2519:8a0f with SMTP id p14-20020a5d59ae000000b0021725198a0fmr24488042wrr.383.1654766003547;
+        Thu, 09 Jun 2022 02:13:23 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n20-20020a7bc5d4000000b0039aef592ca0sm26677815wmk.35.2022.06.09.02.13.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 01:54:33 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 10:54:28 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        Krasnov Arseniy <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v2 0/8] virtio/vsock: experimental zerocopy receive
-Message-ID: <20220609085428.idi4qzydhdpzszzw@sgarzare-redhat>
-References: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
+        Thu, 09 Jun 2022 02:13:22 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 05/38] KVM: x86: hyper-v: Handle
+ HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently
+In-Reply-To: <20220608101847.63xavwsgfdprpaes@yy-desk-7060>
+References: <20220606083655.2014609-1-vkuznets@redhat.com>
+ <20220606083655.2014609-6-vkuznets@redhat.com>
+ <20220608101847.63xavwsgfdprpaes@yy-desk-7060>
+Date:   Thu, 09 Jun 2022 11:13:22 +0200
+Message-ID: <87o7z2kxn1.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
+Content-Type: text/plain
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -86,184 +83,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Arseniy,
-I left some comments in the patches, and I'm adding something also here:
+Yuan Yao <yuan.yao@linux.intel.com> writes:
 
-On Fri, Jun 03, 2022 at 05:27:56AM +0000, Arseniy Krasnov wrote:
->                              INTRODUCTION
+> On Mon, Jun 06, 2022 at 10:36:22AM +0200, Vitaly Kuznetsov wrote:
+>> Currently, HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls are handled
+>> the exact same way as HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE{,EX}: by
+>> flushing the whole VPID and this is sub-optimal. Switch to handling
+>> these requests with 'flush_tlb_gva()' hooks instead. Use the newly
+>> introduced TLB flush fifo to queue the requests.
+>>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/hyperv.c | 100 +++++++++++++++++++++++++++++++++++++-----
+>>  1 file changed, 88 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> index 762b0b699fdf..956072592e2f 100644
+>> --- a/arch/x86/kvm/hyperv.c
+>> +++ b/arch/x86/kvm/hyperv.c
+>> @@ -1806,32 +1806,82 @@ static u64 kvm_get_sparse_vp_set(struct kvm *kvm, struct kvm_hv_hcall *hc,
+>>  				  sparse_banks, consumed_xmm_halves, offset);
+>>  }
+>>
+>> -static void hv_tlb_flush_enqueue(struct kvm_vcpu *vcpu)
+>> +static int kvm_hv_get_tlb_flush_entries(struct kvm *kvm, struct kvm_hv_hcall *hc, u64 entries[],
+>> +					int consumed_xmm_halves, gpa_t offset)
+>> +{
+>> +	return kvm_hv_get_hc_data(kvm, hc, hc->rep_cnt, hc->rep_cnt,
+>> +				  entries, consumed_xmm_halves, offset);
+>> +}
+>> +
+>> +static void hv_tlb_flush_enqueue(struct kvm_vcpu *vcpu, u64 *entries, int count)
+>>  {
+>>  	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
+>>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>>  	u64 entry = KVM_HV_TLB_FLUSHALL_ENTRY;
+>> +	unsigned long flags;
+>>
+>>  	if (!hv_vcpu)
+>>  		return;
+>>
+>>  	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
+>>
+>> -	kfifo_in_spinlocked(&tlb_flush_fifo->entries, &entry, 1, &tlb_flush_fifo->write_lock);
+>> +	spin_lock_irqsave(&tlb_flush_fifo->write_lock, flags);
+>> +
+>> +	/*
+>> +	 * All entries should fit on the fifo leaving one free for 'flush all'
+>> +	 * entry in case another request comes in. In case there's not enough
+>> +	 * space, just put 'flush all' entry there.
+>> +	 */
+>> +	if (count && entries && count < kfifo_avail(&tlb_flush_fifo->entries)) {
+>> +		WARN_ON(kfifo_in(&tlb_flush_fifo->entries, entries, count) != count);
+>> +		goto out_unlock;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Note: full fifo always contains 'flush all' entry, no need to check the
+>> +	 * return value.
+>> +	 */
+>> +	kfifo_in(&tlb_flush_fifo->entries, &entry, 1);
+>> +
+>> +out_unlock:
+>> +	spin_unlock_irqrestore(&tlb_flush_fifo->write_lock, flags);
+>>  }
+>>
+>>  void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
+>>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>> +	u64 entries[KVM_HV_TLB_FLUSH_FIFO_SIZE];
+>> +	int i, j, count;
+>> +	gva_t gva;
+>>
+>> -	kvm_vcpu_flush_tlb_guest(vcpu);
+>> -
+>> -	if (!hv_vcpu)
+>> +	if (!tdp_enabled || !hv_vcpu) {
+>> +		kvm_vcpu_flush_tlb_guest(vcpu);
+>>  		return;
+>> +	}
+>>
+>>  	tlb_flush_fifo = &hv_vcpu->tlb_flush_fifo;
+>>
+>> +	count = kfifo_out(&tlb_flush_fifo->entries, entries, KVM_HV_TLB_FLUSH_FIFO_SIZE);
 >
->	Hello, this is experimental implementation of virtio vsock zerocopy
->receive. It was inspired by TCP zerocopy receive by Eric Dumazet. This API uses
->same idea: call 'mmap()' on socket's descriptor, then every 'getsockopt()' will
->fill provided vma area with pages of virtio RX buffers. After received data was
->processed by user, pages must be freed by 'madvise()'  call with MADV_DONTNEED
->flag set(if user won't call 'madvise()', next 'getsockopt()' will 
->fail).
+> Writers are protected by the fifo lock so only 1 writer VS 1 reader on
+> this kfifo (at least so far), it shuold be safe but I'm not sure
+> whether some unexpected cases there, e.g. KVM flushs another VCPU's
+> kfifo while that VCPU is doing same thing for itself yet.
+>
 
-If it is not too time-consuming, can we have a table/list to compare this 
-and the TCP zerocopy?
+TLB is always flushed by the vCPU itself, here we just queue for it to
+do so. Over-flushing is possible of course (e.g. the vCPU just flushed
+and didn't even enter the guest but we're going to queue flush work for
+it from other vCPUs), but that's nothing new even with the current
+'dumb' implementation which always flushes everything.
 
->
->                                 DETAILS
->
->	Here is how mapping with mapped pages looks exactly: first page mapping
->contains array of trimmed virtio vsock packet headers (in contains only length
->of data on the corresponding page and 'flags' field):
->
->	struct virtio_vsock_usr_hdr {
->		uint32_t length;
->		uint32_t flags;
->		uint32_t copy_len;
->	};
->
->Field  'length' allows user to know exact size of payload within each sequence
->of pages and 'flags' allows user to handle SOCK_SEQPACKET flags(such as message
->bounds or record bounds). Field 'copy_len' is described below in 'v1->v2' part.
->All other pages are data pages from RX queue.
->
->             Page 0      Page 1      Page N
->
->	[ hdr1 .. hdrN ][ data ] .. [ data ]
->           |        |       ^           ^
->           |        |       |           |
->           |        *-------------------*
->           |                |
->           |                |
->           *----------------*
->
->	Of course, single header could represent array of pages (when packet's
->buffer is bigger than one page).So here is example of detailed mapping layout
->for some set of packages. Lets consider that we have the following sequence  of
->packages: 56 bytes, 4096 bytes and 8200 bytes. All pages: 0,1,2,3,4 and 5 will
->be inserted to user's vma(vma is large enough).
+The main concern should be that we never under-flush, i.e. return to the
+caller while TLB on some target vCPUs was not flushed *and* target vCPUs
+are running the guest.
 
-In order to have a "userspace polling-friendly approach" and reduce 
-number of syscall, can we allow for example the userspace to mmap at 
-least the first header before packets arrive.
-Then the userspace can poll a flag or other fields in the header to 
-understand that there are new packets.
-
-That would be cool, but in the meantime it would be nice to behave 
-similarly to TCP, which is why the comparison table I mentioned earlier 
-would be useful.
-
->
->	Page 0: [[ hdr0 ][ hdr 1 ][ hdr 2 ][ hdr 3 ] ... ]
->	Page 1: [ 56 ]
->	Page 2: [ 4096 ]
->	Page 3: [ 4096 ]
->	Page 4: [ 4096 ]
->	Page 5: [ 8 ]
->
->	Page 0 contains only array of headers:
->	'hdr0' has 56 in length field.
->	'hdr1' has 4096 in length field.
->	'hdr2' has 8200 in length field.
->	'hdr3' has 0 in length field(this is end of data marker).
->
->	Page 1 corresponds to 'hdr0' and has only 56 bytes of data.
->	Page 2 corresponds to 'hdr1' and filled with data.
->	Page 3 corresponds to 'hdr2' and filled with data.
->	Page 4 corresponds to 'hdr2' and filled with data.
->	Page 5 corresponds to 'hdr2' and has only 8 bytes of data.
->
->	This patchset also changes packets allocation way: today implementation
->uses only 'kmalloc()' to create data buffer. Problem happens when we try to map
->such buffers to user's vma - kernel forbids to map slab pages to user's vma(as
->pages of "not large" 'kmalloc()' allocations are marked with PageSlab flag and
->"not large" could be bigger than one page). So to avoid this, data buffers now
->allocated using 'alloc_pages()' call.
->
->                                   TESTS
->
->	This patchset updates 'vsock_test' utility: two tests for new feature
->were added. First test covers invalid cases. Second checks valid transmission
->case.
->
->                                BENCHMARKING
->
->	For benchmakring I've added small utility 'rx_zerocopy'. It works in
->client/server mode. When client connects to server, server starts sending exact
->amount of data to client(amount is set as input argument).Client reads data and
->waits for next portion of it. Client works in two modes: copy and zero-copy. In
->copy mode client uses 'read()' call while in zerocopy mode sequence of 'mmap()'
->/'getsockopt()'/'madvise()' are used. Smaller amount of time for transmission
->is better. For server, we can set size of tx buffer and for client we can set
->size of rx buffer or rx mapping size(in zerocopy mode). Usage of this utility
->is quiet simple:
->
->For client mode:
->
->./rx_zerocopy --mode client [--zerocopy] [--rx]
->
->For server mode:
->
->./rx_zerocopy --mode server [--mb] [--tx]
->
->[--mb] sets number of megabytes to transfer.
->[--rx] sets size of receive buffer/mapping in pages.
->[--tx] sets size of transmit buffer in pages.
->
->I checked for transmission of 4000mb of data. Here are some results:
->
->                           size of rx/tx buffers in pages
->               *---------------------------------------------------*
->               |    8   |    32    |    64   |   256    |   512    |
->*--------------*--------*----------*---------*----------*----------*
->|   zerocopy   |   24   |   10.6   |  12.2   |   23.6   |    21    | secs to
->*--------------*---------------------------------------------------- process
->| non-zerocopy |   13   |   16.4   |  24.7   |   27.2   |   23.9   | 4000 mb
->*--------------*----------------------------------------------------
->
->Result in first column(where non-zerocopy works better than zerocopy) happens
->because time, spent in 'read()' system call is smaller that time in 'getsockopt'
->+ 'madvise'. I've checked that.
->
->I think, that results are not so impressive, but at least it is not worse than
->copy mode and there is no need to allocate memory for processing date.
->
->                                 PROBLEMS
->
->	Updated packet's allocation logic creates some problem: when host gets
->data from guest(in vhost-vsock), it allocates at least one page for each packet
->(even if packet has 1 byte payload). I think this could be resolved in several
->ways:
->	1) Make zerocopy rx mode disabled by default, so if user didn't enable
->it, current 'kmalloc()' way will be used. <<<<<<< (IMPLEMENTED IN V2)
-
-Yep, but I think we should not allow to change it while we are connected 
-(see comments in the patches.)
-
->	2) Use 'kmalloc()' for "small" packets, else call page allocator. But
->in this case, we have mix of packets, allocated in two different ways thus
->during zerocopying to user(e.g. mapping pages to vma), such small packets will
->be handled in some stupid way: we need to allocate one page for user, copy data
->to it and then insert page to user's vma.
->
->v1 -> v2:
-> 1) Zerocopy receive mode could be enabled/disabled(disabled by default). I
->    didn't use generic SO_ZEROCOPY flag, because in virtio-vsock case this
->    feature depends on transport support. Instead of SO_ZEROCOPY, AF_VSOCK
->    layer flag was added: SO_VM_SOCKETS_ZEROCOPY, while previous meaning of
->    SO_VM_SOCKETS_ZEROCOPY(insert receive buffers to user's vm area) now
->    renamed to SO_VM_SOCKETS_MAP_RX.
-> 2) Packet header which is exported to user now get new field: 'copy_len'.
->    This field handles special case:  user reads data from socket in non
->    zerocopy way(with disabled zerocopy) and then enables zerocopy feature.
->    In this case vhost part will switch data buffer allocation logic from
->    'kmalloc()' to direct calls for buddy allocator. But, there could be
->    some pending 'kmalloc()' allocated packets in socket's rx list, and then
->    user tries to read such packets in zerocopy way, dequeue will fail,
->    because SLAB pages could not be inserted to user's vm area. So when such
->    packet is found during zerocopy dequeue, dequeue loop will break and
->    'copy_len' will show size of such "bad" packet. After user detects this
->    case, it must use 'read()/recv()' calls to dequeue such packet.
-> 3) Also may be move this features under config option?
-
-Do you mean a build config like CONFIG_VSOCK_ZERO_COPY?
-
-I'm not sure it's needed.
-
-Thanks,
-Stefano
+-- 
+Vitaly
 
