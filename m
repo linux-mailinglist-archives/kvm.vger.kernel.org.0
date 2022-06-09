@@ -2,161 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B8E2544507
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 09:45:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96DB1544511
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 09:48:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239183AbiFIHoy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 03:44:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38084 "EHLO
+        id S239293AbiFIHrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 03:47:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233114AbiFIHox (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 03:44:53 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 714591F2DE;
-        Thu,  9 Jun 2022 00:44:51 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2596iOSO005945;
-        Thu, 9 Jun 2022 07:44:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=IV3ZNYmjhwzHflxHbEfNGCjnBLNowyX0Pmlit7EAFno=;
- b=G15wwBU8ckeIM7S4aBZqdFnt6oUMIg8hGzWYj+Zl55zB1uzfS2fmAtRaeJB5kQCNQns6
- 4lMocLeTivils1fS2wSKQay1opwqF4JgUdK6kSXjZR1Ua4zwYUIXU1WH2pJfogQG8PmM
- P7PmwoL5vcG8vXlKGFqxO8bJdKYKbgQa/Zyzzxd70lbeWaPCxYhKiBxkvovkRmUZRGT1
- yhbE4GvwUMb6xqD4ps+exZmBg63ytV3SmHKekaDXkss4lxdouB13Pg/FkZqYWqR8In8p
- sr1lFXBx0cULVTrQjgJ31NL95BF9vQtkSfF/qc8KoX9ARFJ2YkWe5UF0KWuc3suCUugK /g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gkbv013qb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jun 2022 07:44:50 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 259710rH013165;
-        Thu, 9 Jun 2022 07:44:50 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gkbv013py-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jun 2022 07:44:50 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2597KNm5024326;
-        Thu, 9 Jun 2022 07:44:48 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3gfy19ej9g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jun 2022 07:44:48 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2597iiY818284824
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Jun 2022 07:44:45 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E2E674C046;
-        Thu,  9 Jun 2022 07:44:44 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 92EA14C044;
-        Thu,  9 Jun 2022 07:44:44 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.15.52])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Jun 2022 07:44:44 +0000 (GMT)
-Date:   Thu, 9 Jun 2022 09:44:41 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 1/3] s390x: Test TEID values in
- storage key test
-Message-ID: <20220609094441.282f0cb9@p-imbrenda>
-In-Reply-To: <a6d1dfe0f9163650c8b3bb80065e12a1b190f97b.camel@linux.ibm.com>
-References: <20220523132406.1820550-1-scgl@linux.ibm.com>
-        <20220523132406.1820550-2-scgl@linux.ibm.com>
-        <20220524170927.46fbd24a@p-imbrenda>
-        <a6d1dfe0f9163650c8b3bb80065e12a1b190f97b.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
+        with ESMTP id S232338AbiFIHrF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 03:47:05 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B493B2B6
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 00:47:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6D690B82C46
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 07:47:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13BBFC34114;
+        Thu,  9 Jun 2022 07:47:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654760822;
+        bh=CJyPKTOUlEe0lsgm1DOf0I3KC1tRhvJ3KvupKv8Oa5w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=EddcOaiNAZ2ytT+bjF5TQImCbSPTN6O58hPfs0KTLPNrCnFHJBFsilS/8FN4JXf9A
+         Z3qF1GxMpVvgn8FsB38mgFwzBW+R8lc5E4d751a3Jsm3rimsZmuNo9Nx67tGanIhEA
+         3dqNSL4CHpewLNpvBYO7JECWJsBeKzOq6FXoHeZYr+hLYcbA+y7/RR4xJtnkPXxPLQ
+         HYMg0/dQMR015ChiAzYw6nfLoehlO8KkD/bj/2++IL5zTTTQAH/gmKVg9Z2Tt33xvN
+         cy8nyn3Cpnbm1TeEkRhxEsDb+KEaHxACAMbOSOzLEijd+MA2zTamq3S8k/w7O/sa9A
+         rAabgQ3HlkjLw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nzCsc-00GnT7-L4; Thu, 09 Jun 2022 08:46:58 +0100
+Date:   Thu, 09 Jun 2022 08:46:58 +0100
+Message-ID: <87fske46tp.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kernel-team@android.com, Will Deacon <will@kernel.org>,
+        Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 06/18] KVM: arm64: Add three sets of flags to the vcpu state
+In-Reply-To: <CAAeT=FzXWDfkR5ck0vpiRLKi0nU9e5Ua=yg=3Rj--Gq+aBaVUg@mail.gmail.com>
+References: <20220528113829.1043361-1-maz@kernel.org>
+        <20220528113829.1043361-7-maz@kernel.org>
+        <CAAeT=FzXWDfkR5ck0vpiRLKi0nU9e5Ua=yg=3Rj--Gq+aBaVUg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 6x7weEedKAuWpL_-2C3pGbUbZuw8-MKT
-X-Proofpoint-GUID: RCLuyV2AgzyMPuJFJd0JJQqV_Bs6IWFK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-09_07,2022-06-07_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- impostorscore=0 suspectscore=0 adultscore=0 priorityscore=1501
- phishscore=0 mlxscore=0 bulkscore=0 clxscore=1015 malwarescore=0
- spamscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2206090029
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com, will@kernel.org, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 08 Jun 2022 19:03:23 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-
-[...]
-
-> > > +		break;
-> > > +	case SOP_ENHANCED_2:
-> > > +		switch (teid_esop2_prot_code(teid)) {
-> > > +		case PROT_KEY:
-> > > +			access_code = teid.acc_exc_f_s;  
-> > 
-> > is the f/s feature guaranteed to be present when we have esop2?  
+On Thu, 09 Jun 2022 07:10:14 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> That's how I understand it. For esop1 the PoP explicitly states that
-> the facility is a prerequisite, for esop2 it doesn't.
-> > 
-> > can the f/s feature be present with esop1 or basic sop?  
+> Hi Marc,
 > 
-> esop1: yes, basic: no.
-> The way I read it, in the case of esop1 the bits are only meaningful
-> for DAT and access list exceptions, i.e. when the TEID is not
-> unpredictable.
-
-I see, makes sense
-
-maybe add a comment :)
-
-> >   
-> > > +
-> > > +			switch (access_code) {
-> > > +			case 0:
-> > > +				report_pass("valid access code");
-> > > +				break;
-> > > +			case 1:
-> > > +			case 2:
-> > > +				report((access & access_code) && (prot & access_code),
-> > > +				       "valid access code");
-> > > +				break;
-> > > +			case 3:
-> > > +				/*
-> > > +				 * This is incorrect in that reserved values
-> > > +				 * should be ignored, but kvm should not return
-> > > +				 * a reserved value and having a test for that
-> > > +				 * is more valuable.
-> > > +				 */
-> > > +				report_fail("valid access code");
-> > > +				break;
-> > > +			}
-> > > +			/* fallthrough */
-> > > +		case PROT_KEY_LAP:
-> > > +			report_pass("valid protection code");
-> > > +			break;
-> > > +		default:
-> > > +			report_fail("valid protection code");
-> > > +		}
-> > > +		break;
-> > > +	}
-> > > +	report_prefix_pop();
-> > > +}
-> > > +  
+> On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > It so appears that each of the vcpu flags is really belonging to
+> > one of three categories:
+> >
+> > - a configuration flag, set once and for all
+> > - an input flag generated by the kernel for the hypervisor to use
+> > - a state flag that is only for the kernel's own bookkeeping
+> >
+> > As we are going to split all the existing flags into these three
+> > sets, introduce all three in one go.
+> >
+> > No functional change other than a bit of bloat...
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 5eb6791df608..c9dd0d4e22f2 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -338,6 +338,15 @@ struct kvm_vcpu_arch {
+> >         /* Miscellaneous vcpu state flags */
+> >         u64 flags;
+> >
+> > +       /* Configuration flags */
+> > +       u64 cflags;
+> > +
+> > +       /* Input flags to the hypervisor code */
+> > +       u64 iflags;
+> > +
+> > +       /* State flags, unused by the hypervisor code */
+> > +       u64 sflags;
 > 
-> [...]
+> Although I think VCPU_SVE_FINALIZED could be considered "state" rather
+> than "configuration", I assume the reason why it is handled by cflags
+> in the following patches is because VCPU_SVE_FINALIZED is set once
+> for all. If my assumption is correct, it would be clearer to add
+> "set once and for all" in the comment for cflags.
 
+Yes, that's indeed the reason for this categorisation. In general,
+these flags are, as you put it, set once and for all extremely early
+(before the vcpu can run), and are never cleared. I'll update the
+comment accordingly.
+
+> Also, if we end up using VCPU_SVE_FINALIZED in hypervisor code later,
+> then should it be handled by iflags instead of cflags ?
+
+That'd be my expectation if they ended up changing state at some
+point. My view is that the cflags are immutable once the vcpu has
+run, and flags that can change state over the life if the vcpu
+shouldn't be in that category.
+
+> 
+> My understanding of how those flags should be used is as follows.
+> Is my understanding correct ?
+> 
+>  iflags: flags that are used by hypervisor code
+
+Yes. Crucially, they are used as an input to the hypervisor code: it
+either consumes these flags (INCREMENT_PC, PENDING_EXCEPTION), or
+consult them to decide what to do.
+
+>  cflags: flags that are set once for all and unused by hypervisor code
+
+Yes.
+
+>  sflags: flags that could be set/cleared more than once and unused
+>          by hypervisor code
+
+Yes. They are really bookkeeping flags for the kernel code.
+
+I'll try to incorporate some of that in the comments before reposting
+the series.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
