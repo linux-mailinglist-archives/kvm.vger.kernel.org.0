@@ -2,289 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBB285449AE
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 13:04:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E69E544AFC
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 13:50:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243463AbiFILEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 07:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44612 "EHLO
+        id S243215AbiFILtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 07:49:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243460AbiFILEV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 07:04:21 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537F63CFEC
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 04:04:19 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id w20so15756050lfa.11
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 04:04:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=cDvzOjc/sBh8FPM+6m1a79tMWnQrhKoIX1IIc2qqN5M=;
-        b=sJ9087X728vXXXcsD3UnUg0LsTORnlo3ZgGnNuJxX+nelG/jNqA8xZCueHMFTUrVAy
-         1BdJ7dbLidC4ZlYaHGc15eHzPwI5mbeeDQ8mhi2o9WszmUF+pCdmBGSxjGwE3ulEDvNJ
-         h49qEddIFxngaF/MHWdIFngyf7ZYGuGyNJi4wCOwIE34vH+12C+0rnHr49c14gUzuLvf
-         qAlHaoisfVpm6gOWocZXm94KsxKcIGhbuxzFWaVvJ5li72yW3oBeSzU0bwzJc4JirICc
-         VSYYS0MdscAEARJDhREutPMdMwZWda2ZnkvFWHS6mDRcidiUGWS5kelxV5/bXaqPeA3R
-         Sqdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=cDvzOjc/sBh8FPM+6m1a79tMWnQrhKoIX1IIc2qqN5M=;
-        b=GDP9iRqTYfmo6TQBRiUqShTrnjHeR5CVrs2xnL8JdLUmb4US+ATp9Ur8vJW57j/4Br
-         WgMDsjRv0i/rxVa73UbxmngXjkyuVU0LpXETsf5K8BNfW5X0e4m8EPH6MAcgEWpL0wzK
-         VJ73qGEB8n/M8tGvlksR36XEMKXNn8KMIRsIRijyEQxMr/lb+5P9w6SNWylbuFCsJ6IU
-         NIi1GsUREHZyQgixSP+4EAcV9mvCax+09B2NfIbqCjwnNEBqQ4c0TqwflM3q5KjCxP6K
-         HAHTaPmOgKz6GSknLiygIwzA8MmSlmHwB6gu5zSVQTpZYaOBsnNDgQvPWncAdBMgY4PW
-         hFBw==
-X-Gm-Message-State: AOAM533O0aAplQS7XlCDOeY1VFU3kh0Utrxqmh7GCiizrMSQm/4ggrEW
-        xkeffKhsDkO6LNtKvFVnxjmcng==
-X-Google-Smtp-Source: ABdhPJz6twGPG+sTdT7x6V5wwPxuL8uCuYaPA6LLDxrsywOqZ1Nq82Xsy8XrzUhiX8bwptIpALd6QA==
-X-Received: by 2002:a05:6512:31c5:b0:479:47a1:2024 with SMTP id j5-20020a05651231c500b0047947a12024mr12854038lfe.420.1654772657327;
-        Thu, 09 Jun 2022 04:04:17 -0700 (PDT)
-Received: from jazctssd.c.googlers.com.com (138.58.228.35.bc.googleusercontent.com. [35.228.58.138])
-        by smtp.gmail.com with ESMTPSA id a10-20020a194f4a000000b004793605e59dsm2116674lfk.245.2022.06.09.04.04.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 04:04:16 -0700 (PDT)
-From:   Grzegorz Jaszczyk <jaz@semihalf.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     jaz@semihalf.com, dmy@semihalf.com,
-        Zide Chen <zide.chen@intel.corp-partner.google.com>,
-        Peter Fang <peter.fang@intel.corp-partner.google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Steve Rutherford <srutherford@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Sachi King <nakato@nakato.io>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
-        linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-        linux-acpi@vger.kernel.org (open list:ACPI),
-        linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software Suspend,
-        aka swsusp))
-Subject: [PATCH 2/2] KVM: x86: notify user space about guest entering s2idle
-Date:   Thu,  9 Jun 2022 11:03:28 +0000
-Message-Id: <20220609110337.1238762-3-jaz@semihalf.com>
-X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-In-Reply-To: <20220609110337.1238762-1-jaz@semihalf.com>
-References: <20220609110337.1238762-1-jaz@semihalf.com>
+        with ESMTP id S244534AbiFILtt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 07:49:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233C5205F85;
+        Thu,  9 Jun 2022 04:49:47 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D0D8821E5B;
+        Thu,  9 Jun 2022 11:49:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1654775385; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4zbRtkE6dAO1ZfKxMLV0aLoDrahVJhhxRZHHv+/+QQo=;
+        b=WjL8N9ziPcndNW76Xkkh/1HnbwzX6liqZ4tr5FjqW2UJh6/0XnSRiOJgWqPBogCZicpWqW
+        Y2JNgeDWmXhpWX+R+AAOcLE2gMwtiLPyksATXion1YP5Y/rtM67H1pxLu01JZTZVCwtdxS
+        3gzxwYlqRndhiY7iexWVZdAYK7rrIFc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1654775385;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4zbRtkE6dAO1ZfKxMLV0aLoDrahVJhhxRZHHv+/+QQo=;
+        b=o/YXtQPpkC/4TWvchhCPjfhw9uEv+Y0wW4xcg/7fDnnxHD2/NTS7KNRlyNHwUXqUut9paw
+        V5A2emynYGcupFBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A00613456;
+        Thu,  9 Jun 2022 11:49:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id B3ncGFneoWL/KgAAMHmgww
+        (envelope-from <tzimmermann@suse.de>); Thu, 09 Jun 2022 11:49:45 +0000
+Message-ID: <3ebac271-1276-8132-6175-ca95a26cfcbb@suse.de>
+Date:   Thu, 9 Jun 2022 13:49:45 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v6 5/5] fbdev: Make registered_fb[] private to fbmem.c
+Content-Language: en-US
+To:     Javier Martinez Canillas <javierm@redhat.com>,
+        linux-kernel@vger.kernel.org
+Cc:     dri-devel@lists.freedesktop.org, Laszlo Ersek <lersek@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        kernel test robot <lkp@intel.com>,
+        Jens Frederich <jfrederich@gmail.com>,
+        Jon Nettleton <jon.nettleton@gmail.com>,
+        linux-staging@lists.linux.dev,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Helge Deller <deller@gmx.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Sam Ravnborg <sam@ravnborg.org>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Zhen Lei <thunder.leizhen@huawei.com>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Xiyu Yang <xiyuyang19@fudan.edu.cn>,
+        linux-fbdev@vger.kernel.org, Zheyu Ma <zheyuma97@gmail.com>,
+        Guenter Roeck <linux@roeck-us.net>
+References: <20220607182338.344270-1-javierm@redhat.com>
+ <20220607182338.344270-6-javierm@redhat.com>
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+In-Reply-To: <20220607182338.344270-6-javierm@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------h30n2Gk0k6j807HynOJysoNe"
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zide Chen <zide.chen@intel.corp-partner.google.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------h30n2Gk0k6j807HynOJysoNe
+Content-Type: multipart/mixed; boundary="------------b0PKtb0polToSaY7LNTtKx9u";
+ protected-headers="v1"
+From: Thomas Zimmermann <tzimmermann@suse.de>
+To: Javier Martinez Canillas <javierm@redhat.com>,
+ linux-kernel@vger.kernel.org
+Cc: dri-devel@lists.freedesktop.org, Laszlo Ersek <lersek@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, kernel test robot <lkp@intel.com>,
+ Jens Frederich <jfrederich@gmail.com>,
+ Jon Nettleton <jon.nettleton@gmail.com>, linux-staging@lists.linux.dev,
+ Daniel Vetter <daniel.vetter@intel.com>, Daniel Vetter <daniel@ffwll.ch>,
+ Helge Deller <deller@gmx.de>, Matthew Wilcox <willy@infradead.org>,
+ Sam Ravnborg <sam@ravnborg.org>,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+ Zhen Lei <thunder.leizhen@huawei.com>,
+ Alex Deucher <alexander.deucher@amd.com>, Xiyu Yang
+ <xiyuyang19@fudan.edu.cn>, linux-fbdev@vger.kernel.org,
+ Zheyu Ma <zheyuma97@gmail.com>, Guenter Roeck <linux@roeck-us.net>
+Message-ID: <3ebac271-1276-8132-6175-ca95a26cfcbb@suse.de>
+Subject: Re: [PATCH v6 5/5] fbdev: Make registered_fb[] private to fbmem.c
+References: <20220607182338.344270-1-javierm@redhat.com>
+ <20220607182338.344270-6-javierm@redhat.com>
+In-Reply-To: <20220607182338.344270-6-javierm@redhat.com>
 
-Upon exiting to user space, the kvm_run structure contains system_event
-with type KVM_SYSTEM_EVENT_S2IDLE to notify about guest entering s2idle
-suspend state.
+--------------b0PKtb0polToSaY7LNTtKx9u
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Userspace can choose to:
-- ignore it
-- start the suspend flow in host (if notified from privileged VM,
-  capable of suspending the host machine)
-- take advantage of this event to make sure that the VM is suspended
+SGkgSmF2aWVyDQoNCkFtIDA3LjA2LjIyIHVtIDIwOjIzIHNjaHJpZWIgSmF2aWVyIE1hcnRp
+bmV6IENhbmlsbGFzOg0KPiBGcm9tOiBEYW5pZWwgVmV0dGVyIDxkYW5pZWwudmV0dGVyQGZm
+d2xsLmNoPg0KPiANCj4gV2VsbCBleGNlcHQgd2hlbiB0aGUgb2xwYyBkY29uIGZiZGV2IGRy
+aXZlciBpcyBlbmFibGVkLCB0aGF0IHRoaW5nDQo+IGRpZ3MgYXJvdW5kIGluIHRoZXJlIGlu
+IHJhdGhlciB1bmZpeGFibGUgd2F5cy4NCg0KVGhlcmUgaXMgZmJfY2xpZW50X3JlZ2lzdGVy
+KCkgdG8gc2V0IHVwIGEgJ2NsaWVudCcgb24gdG9wIG9mIGFuIGZiZGV2LiANClRoZSBjbGll
+bnQgd291bGQgdGhlbiBnZXQgbWVzc2FnZXMgYWJvdXQgbW9kZXNldHRpbmcsIGJsYW5rcywg
+cmVtb3ZhbHMsIA0KZXRjLiBCdXQgeW91J2QgcHJvYmFibHkgbmVlZCBhbiBPTFBDIHRvIGNv
+bnZlcnQgZGNvbiwgYW5kIHRoZSBtZWNoYW5pc20gDQppdHNlbGYgaXMgc29tZXdoYXQgdW5s
+b3ZlZCB0aGVzZSBkYXlzLg0KDQpZb3VyIHBhdGNoIGNvbXBsaWNhdGVzIHRoZSBmYmRldiBj
+b2RlIEFGQUlDVC4gU28gSSdkIGVpdGhlciBkcm9wIGl0IG9yLCANCmV2ZW4gYmV0dGVyLCBi
+dWlsZCBhIG5pY2VyIGludGVyZmFjZSBmb3IgZGNvbi4NCg0KVGhlIGRjb24gZHJpdmVyIGFw
+cGVhcnMgdG8gbG9vayBvbmx5IGF0IHRoZSBmaXJzdCBlbnRyeS4gTWF5YmUgYWRkIA0KZmJf
+aW5mb19nZXRfYnlfaW5kZXgoKSBhbmQgZmJfaW5mb19wdXQoKSBhbmQgZXhwb3J0IHRob3Nl
+LiBUaGV5IHdvdWxkIGJlIA0KdHJpdmlhbCB3cmFwcGVycyBzb21ld2hlcmUgaW4gZmJtZW0u
+YzoNCg0KI2lmIElTX0VOQUJMRUQoQ09ORklHX0ZCX09MUENfRENPTikNCnN0cnVjdCBmYl9p
+bmZvICpmYl9pbmZvX2dldF9ieV9pbmRleCh1bnNpZ25lZCBpbnQgaW5kZXgpDQp7DQoJcmV0
+dXJuIGdldF9mYl9pbmZvKGluZGV4KTsNCn0NCkVYUE9SVF9TWU1CT0woKQ0Kdm9pZCBmYl9p
+bmZvX3B1dChzdHJ1Y3QgZmJfaW5mbyAqZmJfaW5mbykNCnsNCglwdXRfZmJfaW5mbyhmYl9p
+bmZvKTsNCn0NCkVYUE9SVF9TWU1CT0woKQ0KI2VuZGlmDQoNCkluIGRjb24gaXRzZWxmLCB1
+c2luZyB0aGUgbmV3IGludGVyZmFjZXMgd2lsbCBhY3R1YWxseSBhY3F1aXJlIGEgDQpyZWZl
+cmVuY2UgdG8ga2VlcCB0aGUgZGlzcGxheSBhbGl2ZS4gVGhlIGNvZGUgYXQgWzFdIGNvdWxk
+IGJlIHJlcGxhY2VkLiANCkFuZCBhIGNhbGwgdG8gZmJfaW5mb19wdXQoKSBuZWVkcyB0byBn
+byBpbnRvIGRjb25fcmVtb3ZlKCkuIFsyXQ0KDQpCZXN0IHJlZ2FyZHMNClRob21hcw0KDQpb
+MV0gDQpodHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51eC92NS4xOC4yL3NvdXJjZS9k
+cml2ZXJzL3N0YWdpbmcvb2xwY19kY29uL29scGNfZGNvbi5jI0w2MDUNClsyXSANCmh0dHBz
+Oi8vZWxpeGlyLmJvb3RsaW4uY29tL2xpbnV4L3Y1LjE4LjIvc291cmNlL2RyaXZlcnMvc3Rh
+Z2luZy9vbHBjX2Rjb24vb2xwY19kY29uLmMjTDY4OA0KDQo+IA0KPiBDYyBvbGRjX2Rjb24g
+bWFpbnRhaW5lcnMgYXMgZnlpLg0KPiANCj4gdjI6IEkgdHlwb2VkIHRoZSBjb25maWcgbmFt
+ZSAoMGRheSkNCj4gDQo+IENjOiBrZXJuZWwgdGVzdCByb2JvdCA8bGtwQGludGVsLmNvbT4N
+Cj4gQ2M6IEplbnMgRnJlZGVyaWNoIDxqZnJlZGVyaWNoQGdtYWlsLmNvbT4NCj4gQ2M6IEpv
+biBOZXR0bGV0b24gPGpvbi5uZXR0bGV0b25AZ21haWwuY29tPg0KPiBDYzogR3JlZyBLcm9h
+aC1IYXJ0bWFuIDxncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZz4NCj4gQ2M6IGxpbnV4LXN0
+YWdpbmdAbGlzdHMubGludXguZGV2DQo+IFNpZ25lZC1vZmYtYnk6IERhbmllbCBWZXR0ZXIg
+PGRhbmllbC52ZXR0ZXJAaW50ZWwuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgVmV0
+dGVyIDxkYW5pZWwudmV0dGVyQGZmd2xsLmNoPg0KPiBSZXZpZXdlZC1ieTogSmF2aWVyIE1h
+cnRpbmV6IENhbmlsbGFzIDxqYXZpZXJtQHJlZGhhdC5jb20+DQo+IENjOiBEYW5pZWwgVmV0
+dGVyIDxkYW5pZWxAZmZ3bGwuY2g+DQo+IENjOiBIZWxnZSBEZWxsZXIgPGRlbGxlckBnbXgu
+ZGU+DQo+IENjOiBNYXR0aGV3IFdpbGNveCA8d2lsbHlAaW5mcmFkZWFkLm9yZz4NCj4gQ2M6
+IFNhbSBSYXZuYm9yZyA8c2FtQHJhdm5ib3JnLm9yZz4NCj4gQ2M6IFRldHN1byBIYW5kYSA8
+cGVuZ3Vpbi1rZXJuZWxAaS1sb3ZlLnNha3VyYS5uZS5qcD4NCj4gQ2M6IFpoZW4gTGVpIDx0
+aHVuZGVyLmxlaXpoZW5AaHVhd2VpLmNvbT4NCj4gQ2M6IEFsZXggRGV1Y2hlciA8YWxleGFu
+ZGVyLmRldWNoZXJAYW1kLmNvbT4NCj4gQ2M6IFhpeXUgWWFuZyA8eGl5dXlhbmcxOUBmdWRh
+bi5lZHUuY24+DQo+IENjOiBsaW51eC1mYmRldkB2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IFpo
+ZXl1IE1hIDx6aGV5dW1hOTdAZ21haWwuY29tPg0KPiBDYzogR3VlbnRlciBSb2VjayA8bGlu
+dXhAcm9lY2stdXMubmV0Pg0KPiBTaWduZWQtb2ZmLWJ5OiBKYXZpZXIgTWFydGluZXogQ2Fu
+aWxsYXMgPGphdmllcm1AcmVkaGF0LmNvbT4NCj4gLS0tDQo+IA0KPiAobm8gY2hhbmdlcyBz
+aW5jZSB2MSkNCj4gDQo+ICAgZHJpdmVycy92aWRlby9mYmRldi9jb3JlL2ZibWVtLmMgfCA4
+ICsrKysrKy0tDQo+ICAgaW5jbHVkZS9saW51eC9mYi5oICAgICAgICAgICAgICAgfCA3ICsr
+Ky0tLS0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlv
+bnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpZGVvL2ZiZGV2L2NvcmUvZmJt
+ZW0uYyBiL2RyaXZlcnMvdmlkZW8vZmJkZXYvY29yZS9mYm1lbS5jDQo+IGluZGV4IGUwNzIw
+ZmVmMGVlNi4uYmRiMDhiNjY1YjQzIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL3ZpZGVvL2Zi
+ZGV2L2NvcmUvZmJtZW0uYw0KPiArKysgYi9kcml2ZXJzL3ZpZGVvL2ZiZGV2L2NvcmUvZmJt
+ZW0uYw0KPiBAQCAtNTAsMTAgKzUwLDE0IEBADQo+ICAgc3RhdGljIERFRklORV9NVVRFWChy
+ZWdpc3RyYXRpb25fbG9jayk7DQo+ICAgDQo+ICAgc3RydWN0IGZiX2luZm8gKnJlZ2lzdGVy
+ZWRfZmJbRkJfTUFYXSBfX3JlYWRfbW9zdGx5Ow0KPiAtRVhQT1JUX1NZTUJPTChyZWdpc3Rl
+cmVkX2ZiKTsNCj4gLQ0KPiAgIGludCBudW1fcmVnaXN0ZXJlZF9mYiBfX3JlYWRfbW9zdGx5
+Ow0KPiArI2lmIElTX0VOQUJMRUQoQ09ORklHX0ZCX09MUENfRENPTikNCj4gK0VYUE9SVF9T
+WU1CT0wocmVnaXN0ZXJlZF9mYik7DQo+ICAgRVhQT1JUX1NZTUJPTChudW1fcmVnaXN0ZXJl
+ZF9mYik7DQo+ICsjZW5kaWYNCj4gKyNkZWZpbmUgZm9yX2VhY2hfcmVnaXN0ZXJlZF9mYihp
+KQkJXA0KPiArCWZvciAoaSA9IDA7IGkgPCBGQl9NQVg7IGkrKykJCVwNCj4gKwkJaWYgKCFy
+ZWdpc3RlcmVkX2ZiW2ldKSB7fSBlbHNlDQo+ICAgDQo+ICAgYm9vbCBmYl9jZW50ZXJfbG9n
+byBfX3JlYWRfbW9zdGx5Ow0KPiAgIA0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9m
+Yi5oIGIvaW5jbHVkZS9saW51eC9mYi5oDQo+IGluZGV4IGJiZTFlNDU3MTg5OS4uYzU2M2Uy
+NGI2MjkzIDEwMDY0NA0KPiAtLS0gYS9pbmNsdWRlL2xpbnV4L2ZiLmgNCj4gKysrIGIvaW5j
+bHVkZS9saW51eC9mYi5oDQo+IEBAIC02MzIsMTYgKzYzMiwxNSBAQCBleHRlcm4gaW50IGZi
+X2dldF9jb2xvcl9kZXB0aChzdHJ1Y3QgZmJfdmFyX3NjcmVlbmluZm8gKnZhciwNCj4gICBl
+eHRlcm4gaW50IGZiX2dldF9vcHRpb25zKGNvbnN0IGNoYXIgKm5hbWUsIGNoYXIgKipvcHRp
+b24pOw0KPiAgIGV4dGVybiBpbnQgZmJfbmV3X21vZGVsaXN0KHN0cnVjdCBmYl9pbmZvICpp
+bmZvKTsNCj4gICANCj4gKyNpZiBJU19FTkFCTEVEKENPTkZJR19GQl9PTFBDX0RDT04pDQo+
+ICAgZXh0ZXJuIHN0cnVjdCBmYl9pbmZvICpyZWdpc3RlcmVkX2ZiW0ZCX01BWF07DQo+ICsN
+Cj4gICBleHRlcm4gaW50IG51bV9yZWdpc3RlcmVkX2ZiOw0KPiArI2VuZGlmDQo+ICAgZXh0
+ZXJuIGJvb2wgZmJfY2VudGVyX2xvZ287DQo+ICAgZXh0ZXJuIGludCBmYl9sb2dvX2NvdW50
+Ow0KPiAgIGV4dGVybiBzdHJ1Y3QgY2xhc3MgKmZiX2NsYXNzOw0KPiAgIA0KPiAtI2RlZmlu
+ZSBmb3JfZWFjaF9yZWdpc3RlcmVkX2ZiKGkpCQlcDQo+IC0JZm9yIChpID0gMDsgaSA8IEZC
+X01BWDsgaSsrKQkJXA0KPiAtCQlpZiAoIXJlZ2lzdGVyZWRfZmJbaV0pIHt9IGVsc2UNCj4g
+LQ0KPiAgIHN0YXRpYyBpbmxpbmUgdm9pZCBsb2NrX2ZiX2luZm8oc3RydWN0IGZiX2luZm8g
+KmluZm8pDQo+ICAgew0KPiAgIAltdXRleF9sb2NrKCZpbmZvLT5sb2NrKTsNCg0KLS0gDQpU
+aG9tYXMgWmltbWVybWFubg0KR3JhcGhpY3MgRHJpdmVyIERldmVsb3Blcg0KU1VTRSBTb2Z0
+d2FyZSBTb2x1dGlvbnMgR2VybWFueSBHbWJIDQpNYXhmZWxkc3RyLiA1LCA5MDQwOSBOw7xy
+bmJlcmcsIEdlcm1hbnkNCihIUkIgMzY4MDksIEFHIE7DvHJuYmVyZykNCkdlc2Now6RmdHNm
+w7xocmVyOiBJdm8gVG90ZXYNCg==
 
-The last one is especially useful for cases where some devices are
-pass-through to the VM and to perform full system suspension, the guest
-needs to finish with it's own suspension process first (e.g. calling
-suspend hooks for given driver/subsystem which resides on the guest).
-In such case host user-space power daemon (e.g. powerd) could first
-notify VMM about suspension imminent. Next the VMM could trigger
-suspension process on the guest VM and block till receiving
-KVM_SYSTEM_EVENT_S2IDLE notification, after which the suspension of the
-host can continue.
+--------------b0PKtb0polToSaY7LNTtKx9u--
 
-Additionally to not introduce regression on existing VMM which doesn't
-support KVM_SYSTEM_EVENT_S2IDLE exits, allow to enable it through
-KVM_CAP_X86_SYSTEM_S2IDLE VM capability.
+--------------h30n2Gk0k6j807HynOJysoNe
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
-Co-developed-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
-Signed-off-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
-Signed-off-by: Zide Chen <zide.chen@intel.corp-partner.google.com>
-Co-developed-by: Grzegorz Jaszczyk <jaz@semihalf.com>
-Signed-off-by: Grzegorz Jaszczyk <jaz@semihalf.com>
----
- Documentation/virt/kvm/api.rst  | 21 +++++++++++++++++++++
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/x86.c              | 15 +++++++++++++++
- include/uapi/linux/kvm.h        |  2 ++
- tools/include/uapi/linux/kvm.h  |  1 +
- 5 files changed, 41 insertions(+)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 11e00a46c610..670dada87f50 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6146,6 +6146,8 @@ should put the acknowledged interrupt vector into the 'epr' field.
-   #define KVM_SYSTEM_EVENT_WAKEUP         4
-   #define KVM_SYSTEM_EVENT_SUSPEND        5
-   #define KVM_SYSTEM_EVENT_SEV_TERM       6
-+  #define KVM_SYSTEM_EVENT_S2IDLE         7
-+
- 			__u32 type;
-                         __u32 ndata;
-                         __u64 data[16];
-@@ -6177,6 +6179,15 @@ Valid values for 'type' are:
-    marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
-  - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested a suspension of
-    the VM.
-+ - KVM_SYSTEM_EVENT_S2IDLE -- the guest has notified about entering s2idle
-+   state. Userspace can choose to:
-+   - ignore it
-+   - start the suspend flow in host (if notified from a privileged VM, capable
-+     of suspending the host machine)
-+   - take advantage of this event to make sure that the VM is suspended - used
-+     for full system suspension, where the host waits for guest suspension
-+     before continues with it's own, host suspension process.
-+   This is available on x86 only.
- 
- If KVM_CAP_SYSTEM_EVENT_DATA is present, the 'data' field can contain
- architecture specific information for the system-level event.  Only
-@@ -7956,6 +7967,16 @@ should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
- When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
- type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
- 
-+8.37 KVM_CAP_X86_SYSTEM_S2IDLE
-+-------------------------------
-+
-+:Capability: KVM_CAP_X86_SYSTEM_S2IDLE
-+:Architectures: x86
-+:Type: vm
-+
-+When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
-+type KVM_SYSTEM_EVENT_S2IDLE to process the guest s2idle notification.
-+
- 9. Known KVM API problems
- =========================
- 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 959d66b9be94..85966da56c75 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -105,6 +105,7 @@
- 	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_MMU_FREE_OBSOLETE_ROOTS \
- 	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_HV_S2IDLE		KVM_ARCH_REQ(32)
- 
- #define CR0_RESERVED_BITS                                               \
- 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-@@ -1160,6 +1161,7 @@ struct kvm_arch {
- 
- 	bool bus_lock_detection_enabled;
- 	bool enable_pmu;
-+	bool s2idle_notification;
- 	/*
- 	 * If exit_on_emulation_error is set, and the in-kernel instruction
- 	 * emulator fails to emulate an instruction, allow userspace
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6ed4bd6e762b..651ebac025c1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4291,6 +4291,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SYS_ATTRIBUTES:
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
-+	case KVM_CAP_X86_SYSTEM_S2IDLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
-@@ -6084,6 +6085,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		}
- 		mutex_unlock(&kvm->lock);
- 		break;
-+	case KVM_CAP_X86_SYSTEM_S2IDLE:
-+		kvm->arch.s2idle_notification = true;
-+		r = 0;
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -9307,6 +9312,10 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		return 0;
- 	}
- 	case KVM_HC_SYSTEM_S2IDLE:
-+		if (!vcpu->kvm->arch.s2idle_notification)
-+			break;
-+
-+		kvm_make_request(KVM_REQ_HV_S2IDLE, vcpu);
- 		ret = 0;
- 		break;
- 	default:
-@@ -10114,6 +10123,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			r = 0;
- 			goto out;
- 		}
-+		if (kvm_check_request(KVM_REQ_HV_S2IDLE, vcpu)) {
-+			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-+			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_S2IDLE;
-+			r = 0;
-+			goto out;
-+		}
- 
- 		/*
- 		 * KVM_REQ_HV_STIMER has to be processed after
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 5088bd9f1922..dd71ccf8fce4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -447,6 +447,7 @@ struct kvm_run {
- #define KVM_SYSTEM_EVENT_WAKEUP         4
- #define KVM_SYSTEM_EVENT_SUSPEND        5
- #define KVM_SYSTEM_EVENT_SEV_TERM       6
-+#define KVM_SYSTEM_EVENT_S2IDLE         7
- 			__u32 type;
- 			__u32 ndata;
- 			union {
-@@ -1157,6 +1158,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_VM_TSC_CONTROL 214
- #define KVM_CAP_SYSTEM_EVENT_DATA 215
- #define KVM_CAP_ARM_SYSTEM_SUSPEND 216
-+#define KVM_CAP_X86_SYSTEM_S2IDLE 217
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 6a184d260c7f..f8db91439c41 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -444,6 +444,7 @@ struct kvm_run {
- #define KVM_SYSTEM_EVENT_SHUTDOWN       1
- #define KVM_SYSTEM_EVENT_RESET          2
- #define KVM_SYSTEM_EVENT_CRASH          3
-+#define KVM_SYSTEM_EVENT_S2IDLE         7
- 			__u32 type;
- 			__u32 ndata;
- 			union {
--- 
-2.36.1.476.g0c4daa206d-goog
+wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmKh3lkFAwAAAAAACgkQlh/E3EQov+CH
+Cg/+LG8G+Sqre6B/3IxpugSeLVF+deiH3nTqW8e52kdjrArS2PqvV9mNkGPArjXn303q3qGYufIs
+qMAdCHdKada5GSTeVIeTeI/ax7o3bzTA34LNAxqawfLzZociPYfqrOWMcmNdHkXwUgw5WLd0kV6A
+O1bldekvYeVaK5E9/9UTft4UsS7AEsY73uzZ6VLuPh2q0tWe5R3wJ8yCAsq+iizxAlKa/esvqmdQ
+K/l9KnKlWoCfqZ451mLSpt3NmIsmlBK+WVjAUVDvB1PQZbV9lMKbl9Jqz3CALnrGh3d8MONsaPna
+0MYf/aoNZAlN3aumxxztbs0/2VRUYiyyHgSv/xK+jAdTIJWUtdMQSpwQ8bKNIoTzZJLOPF4g14v2
+lxhINJFdKyZgMZAAUJkxXpHYk1Ts9QFuYVmAr/SjjM5nshpdVpKS5HpGO9oKCCvvurx8MtnkbiTZ
+Z7QdAXetm9wWPq0DXrEC1CUX/dQmVRIWdNPxGl95hBjyFjBAnIK4KXQb0VO6J9rCLMtJvZsv9kVP
+IzG2E7SBfZHrc/hEb+UKDP+1Dl+QK8amMyqLBwuL3oCteGe8YKM3Tv8w6LMaTCP61x1iwYUu35bL
+qlVHDWSwHCqL0/IPO6Swcvm87UYCNb6UDlAa+pFc4H9BSNnrSchuVfW8PJ932mROIvkQqcvbFzsD
+H40=
+=NKus
+-----END PGP SIGNATURE-----
 
+--------------h30n2Gk0k6j807HynOJysoNe--
