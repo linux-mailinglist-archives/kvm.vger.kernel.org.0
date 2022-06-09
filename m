@@ -2,118 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDFCD54409A
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 02:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D7B85440A3
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 02:44:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230486AbiFIAd0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jun 2022 20:33:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58716 "EHLO
+        id S234870AbiFIAoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jun 2022 20:44:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231710AbiFIAdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jun 2022 20:33:25 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4D611A28;
-        Wed,  8 Jun 2022 17:33:19 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4LJQ6z0bVRz4xXD;
-        Thu,  9 Jun 2022 10:33:15 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1654734795;
-        bh=yGik6OUtan7WWJyZq3UlVKhKyLFGDZiTq/DnPBlfoEM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=ZasjAYD+Y4Oa11tuMoTPulV4bmIYtWrYftkXI3VOzy8fRuZfuBEBCfeYGxBxN3KrT
-         HL70cKLyoq8Dl6SVNpmMpS+m0gyP2GL9URvIXpiaActaMhsil856EFVSazKn0EIIBn
-         bJB7UC0Gc7oKX3f+ND9J0pX7SmP98HzYMJC+N7xTY+O1LkOsq7SIbKqbp0QO4wvcMZ
-         y5FEQWuxyvgteTO7aK70iwRwUbBDVUqH1W5puioa0tptf5jwbzrQEO+ryjHFEW/q7w
-         acX/Sm4CznZahwOMtyYDjxpwig61R8ZdjLDG1V2SE5jh8vZxC/vZ22tlBxV345HABg
-         ri43BsAFsNcbQ==
-Date:   Thu, 9 Jun 2022 10:33:13 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Tao Xu <tao3.xu@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: linux-next: manual merge of the kvm tree with Linus' tree
-Message-ID: <20220609103313.0f05e4b5@canb.auug.org.au>
+        with ESMTP id S229556AbiFIAoW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jun 2022 20:44:22 -0400
+X-Greylist: delayed 122 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Jun 2022 17:44:18 PDT
+Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97275D571C;
+        Wed,  8 Jun 2022 17:44:18 -0700 (PDT)
+Received: from ([60.208.111.195])
+        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id DWZ00012;
+        Thu, 09 Jun 2022 08:42:12 +0800
+Received: from jtjnmail201620.home.langchao.com (10.100.2.20) by
+ jtjnmail201624.home.langchao.com (10.100.2.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Thu, 9 Jun 2022 08:42:11 +0800
+Received: from jtjnmail201620.home.langchao.com ([fe80::24f6:b8e5:a824:6a6b])
+ by jtjnmail201620.home.langchao.com ([fe80::24f6:b8e5:a824:6a6b%9]) with mapi
+ id 15.01.2308.027; Thu, 9 Jun 2022 08:42:11 +0800
+From:   =?utf-8?B?dG9tb3Jyb3cgV2FuZyAo546L5b635piOKQ==?= 
+        <wangdeming@inspur.com>
+To:     "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] virtio: Directly use ida_alloc_range()/ida_free()
+Thread-Topic: [PATCH] virtio: Directly use ida_alloc_range()/ida_free()
+Thread-Index: Adh7mb9eZpqq33w2TJqw0eKPxw85VQ==
+Date:   Thu, 9 Jun 2022 00:42:11 +0000
+Message-ID: <aff7bba2680b49fab6a14694e33fd41d@inspur.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.200.104.82]
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+        micalg=SHA1; boundary="----=_NextPart_000_0000_01D87BDC.CEDC3830"
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/KdtGegsGOUrQOwgR3MG0I2N";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+tUid:   20226090842122a7f7fdd4e8e961b0d4b71845f6bf44e
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/KdtGegsGOUrQOwgR3MG0I2N
-Content-Type: text/plain; charset=US-ASCII
+------=_NextPart_000_0000_01D87BDC.CEDC3830
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+Hi,
+> Hi,
+>=20
+> Le 08/06/2022 =C3=A0 08:08, Deming Wang a =C3=A9crit :
+> > Use ida_alloc_range()/ida_free() instead of deprecated
+> > ida_simple_get()/ida_simple_remove() .
+> >
+> > Signed-off-by: Deming Wang <wangdeming@inspur.com>
+> > ---
+> >   drivers/vhost/vdpa.c | 5 ++---
+> >   1 file changed, 2 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c index
+> > 935a1d0ddb97..384049cfca8d 100644
+> > --- a/drivers/vhost/vdpa.c
+> > +++ b/drivers/vhost/vdpa.c
+> > @@ -1293,7 +1293,7 @@ static void vhost_vdpa_release_dev(struct =
+device
+> *device)
+> >   	struct vhost_vdpa *v =3D
+> >   	       container_of(device, struct vhost_vdpa, dev);
+> >
+> > -	ida_simple_remove(&vhost_vdpa_ida, v->minor);
+> > +	ida_free(&vhost_vdpa_ida, v->minor);
+> >   	kfree(v->vqs);
+> >   	kfree(v);
+> >   }
+> > @@ -1316,8 +1316,7 @@ static int vhost_vdpa_probe(struct vdpa_device
+> *vdpa)
+> >   	if (!v)
+> >   		return -ENOMEM;
+> >
+> > -	minor =3D ida_simple_get(&vhost_vdpa_ida, 0,
+> > -			       VHOST_VDPA_DEV_MAX, GFP_KERNEL);
+> > +	minor =3D ida_alloc_range(&vhost_vdpa_ida, 0, VHOST_VDPA_DEV_MAX -
+> 1,
+> > +GFP_KERNEL);
+>=20
+> ida_alloc_max() would be better here. It is less verbose.
+>=20
+> An explanation in the commit log of why the -1 is needed would also =
+help
+> reviewer/maintainer, IMHO.
+>=20
+> It IS correct, but it is not that obvious without looking at
+> ida_simple_get() and ida_alloc_range().
+>=20
+> CJ
+>=20
+>=20
+> >   	if (minor < 0) {
+> >   		kfree(v);
+> >   		return minor;
 
-Today's linux-next merge of the kvm tree got a conflict in:
 
-  arch/x86/kvm/x86.c
+can I mention one patch about repair ida_free  for this.
 
-between commit:
 
-  6cd88243c7e0 ("KVM: x86: do not report a vCPU as preempted outside instru=
-ction boundaries")
 
-from Linus' tree and commit:
 
-  2f4073e08f4c ("KVM: VMX: Enable Notify VM exit")
 
-from the kvm tree.
+------=_NextPart_000_0000_01D87BDC.CEDC3830
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+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
+AgICAIAwDgYIKoZIhvcNAwQCAgCAMAcGBSsOAwIHMAoGCCqGSIb3DQMHMB0GA1UdDgQWBBT2m8+B
+pv3zOH+FCDvTbpfMkvPbAzAfBgNVHSMEGDAWgBReWQOmtExYYJFO9h61pTmmMsE1ajCCAQ8GA1Ud
+HwSCAQYwggECMIH/oIH8oIH5hoG6bGRhcDovLy9DTj1JTlNQVVItQ0EsQ049SlRDQTIwMTIsQ049
+Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRp
+b24sREM9aG9tZSxEQz1sYW5nY2hhbyxEQz1jb20/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9i
+YXNlP29iamVjdENsYXNzPWNSTERpc3RyaWJ1dGlvblBvaW50hjpodHRwOi8vSlRDQTIwMTIuaG9t
+ZS5sYW5nY2hhby5jb20vQ2VydEVucm9sbC9JTlNQVVItQ0EuY3JsMIIBKQYIKwYBBQUHAQEEggEb
+MIIBFzCBsQYIKwYBBQUHMAKGgaRsZGFwOi8vL0NOPUlOU1BVUi1DQSxDTj1BSUEsQ049UHVibGlj
+JTIwS2V5JTIwU2VydmljZXMsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1ob21lLERD
+PWxhbmdjaGFvLERDPWNvbT9jQUNlcnRpZmljYXRlP2Jhc2U/b2JqZWN0Q2xhc3M9Y2VydGlmaWNh
+dGlvbkF1dGhvcml0eTBhBggrBgEFBQcwAoZVaHR0cDovL0pUQ0EyMDEyLmhvbWUubGFuZ2NoYW8u
+Y29tL0NlcnRFbnJvbGwvSlRDQTIwMTIuaG9tZS5sYW5nY2hhby5jb21fSU5TUFVSLUNBLmNydDBH
+BgNVHREEQDA+oCUGCisGAQQBgjcUAgOgFwwVd2FuZ2RlbWluZ0BpbnNwdXIuY29tgRV3YW5nZGVt
+aW5nQGluc3B1ci5jb20wDQYJKoZIhvcNAQELBQADggEBAKD6Oh0Yu1g2xXDIaczYlx8WZiYqTi7t
+bFCmsNT5DmNUfLaJre5UDyaWjgwW6Z/KN1X19Piy6oS8ex93gaeF4siDuQimREZoKxePJyUeyFs5
+oC6kpsw95f/0RM5zhHb4I8L4AgplfwySCGAeMRr74rThzkYWfoU1AM+c8cBtViIispknx6KxJFo2
+b533lCx168UKeNRb1n7pUANxFYd+1jjdRKCPrszdJcJddFmnLBetcnD4DG0ID62hnw+/g0KoAlfd
+ORikFVBLobsDNy+NQ++5ZYgx1ahEQ6BESIjeWxut+2Zqis6Zbwd5ZsBhm892l5EdzJCuYe5xDEZw
+0Z0bGvUxggOTMIIDjwIBATBwMFkxEzARBgoJkiaJk/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZ
+FghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkWBGhvbWUxEjAQBgNVBAMTCUlOU1BVUi1DQQITfgAA
+1tjc3okYpZWK7QAAAADW2DAJBgUrDgMCGgUAoIIB+DAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcB
+MBwGCSqGSIb3DQEJBTEPFw0yMjA2MDkwMDQyMTBaMCMGCSqGSIb3DQEJBDEWBBQSXfJFjwYfXihF
+ATmEqDUeJAftwzB/BgkrBgEEAYI3EAQxcjBwMFkxEzARBgoJkiaJk/IsZAEZFgNjb20xGDAWBgoJ
+kiaJk/IsZAEZFghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkWBGhvbWUxEjAQBgNVBAMTCUlOU1BV
+Ui1DQQITfgAA1tjc3okYpZWK7QAAAADW2DCBgQYLKoZIhvcNAQkQAgsxcqBwMFkxEzARBgoJkiaJ
+k/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZFghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkWBGhv
+bWUxEjAQBgNVBAMTCUlOU1BVUi1DQQITfgAA1tjc3okYpZWK7QAAAADW2DCBkwYJKoZIhvcNAQkP
+MYGFMIGCMAoGCCqGSIb3DQMHMAsGCWCGSAFlAwQBKjALBglghkgBZQMEARYwCwYJYIZIAWUDBAEC
+MA4GCCqGSIb3DQMCAgIAgDANBggqhkiG9w0DAgIBQDAHBgUrDgMCGjALBglghkgBZQMEAgMwCwYJ
+YIZIAWUDBAICMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC5guG5hJQTHJKG4/c3I74H
+4rkIrbjacytPy6bhtVvLHwmXYKok1jDtcMKLGp+e8m3aCYFRRnM0D3op+Mg/sNmxVxrXFVVdmy1x
+ZcZZzw1HHh2cc/SC/f0cNFbafxzjDQceMOoIj7TQwD/Ehrjwk1D2pMlT4ThlztqDevKfpf+BPVgF
+stVcxzPAKkok9Ec85JpucfCuB5yaRyqPZ0WckpE3ivjJVdYIZoPg1LIAbYLKybl2XWwCaMLYdzaW
+2Af06+X+rLV/337lClu+Tc62j0RVPinF7lwahRA3za5ndlETRv0h1ILpFFty4JfQW0Vvf6lh5LYZ
+kf9JUQDkoUfgYDZhAAAAAAAA
 
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/x86/kvm/x86.c
-index 2ec6a110ec6c,79efdc19b4c8..000000000000
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@@ -296,9 -284,8 +284,10 @@@ const struct _kvm_stats_desc kvm_vcpu_s
-  	STATS_DESC_COUNTER(VCPU, nested_run),
-  	STATS_DESC_COUNTER(VCPU, directed_yield_attempted),
-  	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
- +	STATS_DESC_COUNTER(VCPU, preemption_reported),
- +	STATS_DESC_COUNTER(VCPU, preemption_other),
-- 	STATS_DESC_ICOUNTER(VCPU, guest_mode)
-+ 	STATS_DESC_ICOUNTER(VCPU, guest_mode),
-+ 	STATS_DESC_COUNTER(VCPU, notify_window_exits),
-  };
- =20
-  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-
---Sig_/KdtGegsGOUrQOwgR3MG0I2N
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmKhP8oACgkQAVBC80lX
-0GyBYwf/Xl33nd4uOU7Nvnaj3aMg+lsBjcTKAHwL6MIcLM/8DnaJVdERZG0B6pGL
-ZlrqDjc2V6HKq0bhaQXCPyfS/9yOU6a3BamJ4OF970TiLcck7GAUrfpd+eeF8G+o
-1/hng47aDuBYajtV/K1mqh5u3n8xUJtc4HmbddGE9d0zZ40FBTx72AwcqYLT6l+K
-rSXAXdY6f2NUi+QWLagFP0IFA61U3ODV3Fgf65GteeU88IoQ7QmxrBxfa1T3defj
-41qIz4DzpNqtDCDSBGviFpVhnj80FnyVaX4IxsCka5Tm0o4vGc0wq8NpMtO9NKTB
-Nkt52IFDkH3Ntwsc19YSUuhZJ0SeBQ==
-=neXc
------END PGP SIGNATURE-----
-
---Sig_/KdtGegsGOUrQOwgR3MG0I2N--
+------=_NextPart_000_0000_01D87BDC.CEDC3830--
