@@ -2,65 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96DB1544511
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 09:48:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7E0A54455B
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:10:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239293AbiFIHrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 03:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48902 "EHLO
+        id S234862AbiFIIKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 04:10:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232338AbiFIHrF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 03:47:05 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B493B2B6
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 00:47:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229836AbiFIIKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 04:10:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 19B8D1775DE
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:10:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654762215;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tiLrsl9taTyGSrJjDKI7N8ule2WbsgbzAGcFN4T087E=;
+        b=QnDZ/zpnoBPIfL0ChLL/ZgP3gW/8rD45bOJfgopwGME7wZ+WCRJ/kYIh9AgEqLC/7cqCDb
+        Ej+347IIPXnO8BULK9RHc8epaghFw7/SYgeau/H6iO30NSSgXBZkDQS6Q3eSdqZux6irWk
+        LnduEw1eX2kfmAfkzSVwTTVG30ZLUaE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-562-sFd4YcckPoi0xEo8ZlBU9g-1; Thu, 09 Jun 2022 04:10:14 -0400
+X-MC-Unique: sFd4YcckPoi0xEo8ZlBU9g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6D690B82C46
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 07:47:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13BBFC34114;
-        Thu,  9 Jun 2022 07:47:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654760822;
-        bh=CJyPKTOUlEe0lsgm1DOf0I3KC1tRhvJ3KvupKv8Oa5w=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=EddcOaiNAZ2ytT+bjF5TQImCbSPTN6O58hPfs0KTLPNrCnFHJBFsilS/8FN4JXf9A
-         Z3qF1GxMpVvgn8FsB38mgFwzBW+R8lc5E4d751a3Jsm3rimsZmuNo9Nx67tGanIhEA
-         3dqNSL4CHpewLNpvBYO7JECWJsBeKzOq6FXoHeZYr+hLYcbA+y7/RR4xJtnkPXxPLQ
-         HYMg0/dQMR015ChiAzYw6nfLoehlO8KkD/bj/2++IL5zTTTQAH/gmKVg9Z2Tt33xvN
-         cy8nyn3Cpnbm1TeEkRhxEsDb+KEaHxACAMbOSOzLEijd+MA2zTamq3S8k/w7O/sa9A
-         rAabgQ3HlkjLw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nzCsc-00GnT7-L4; Thu, 09 Jun 2022 08:46:58 +0100
-Date:   Thu, 09 Jun 2022 08:46:58 +0100
-Message-ID: <87fske46tp.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kernel-team@android.com, Will Deacon <will@kernel.org>,
-        Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 06/18] KVM: arm64: Add three sets of flags to the vcpu state
-In-Reply-To: <CAAeT=FzXWDfkR5ck0vpiRLKi0nU9e5Ua=yg=3Rj--Gq+aBaVUg@mail.gmail.com>
-References: <20220528113829.1043361-1-maz@kernel.org>
-        <20220528113829.1043361-7-maz@kernel.org>
-        <CAAeT=FzXWDfkR5ck0vpiRLKi0nU9e5Ua=yg=3Rj--Gq+aBaVUg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com, will@kernel.org, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A7AB3C0E216;
+        Thu,  9 Jun 2022 08:10:13 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B475492C3B;
+        Thu,  9 Jun 2022 08:10:12 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        alex.williamson@redhat.com
+Cc:     kwankhede@nvidia.com, farman@linux.ibm.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, diana.craciun@oss.nxp.com,
+        eric.auger@redhat.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, jgg@nvidia.com, yishaih@nvidia.com,
+        hch@lst.de
+Subject: Re: [PATCH] vfio: de-extern-ify function prototypes
+In-Reply-To: <165471414407.203056.474032786990662279.stgit@omen>
+Organization: Red Hat GmbH
+References: <165471414407.203056.474032786990662279.stgit@omen>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date:   Thu, 09 Jun 2022 10:10:11 +0200
+Message-ID: <87tu8u9s0s.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,91 +65,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 09 Jun 2022 07:10:14 +0100,
-Reiji Watanabe <reijiw@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > It so appears that each of the vcpu flags is really belonging to
-> > one of three categories:
-> >
-> > - a configuration flag, set once and for all
-> > - an input flag generated by the kernel for the hypervisor to use
-> > - a state flag that is only for the kernel's own bookkeeping
-> >
-> > As we are going to split all the existing flags into these three
-> > sets, introduce all three in one go.
-> >
-> > No functional change other than a bit of bloat...
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 5eb6791df608..c9dd0d4e22f2 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -338,6 +338,15 @@ struct kvm_vcpu_arch {
-> >         /* Miscellaneous vcpu state flags */
-> >         u64 flags;
-> >
-> > +       /* Configuration flags */
-> > +       u64 cflags;
-> > +
-> > +       /* Input flags to the hypervisor code */
-> > +       u64 iflags;
-> > +
-> > +       /* State flags, unused by the hypervisor code */
-> > +       u64 sflags;
-> 
-> Although I think VCPU_SVE_FINALIZED could be considered "state" rather
-> than "configuration", I assume the reason why it is handled by cflags
-> in the following patches is because VCPU_SVE_FINALIZED is set once
-> for all. If my assumption is correct, it would be clearer to add
-> "set once and for all" in the comment for cflags.
+On Wed, Jun 08 2022, Alex Williamson <alex.williamson@redhat.com> wrote:
 
-Yes, that's indeed the reason for this categorisation. In general,
-these flags are, as you put it, set once and for all extremely early
-(before the vcpu can run), and are never cleared. I'll update the
-comment accordingly.
+> The use of 'extern' in function prototypes has been disrecommended in
+> the kernel coding style for several years now, remove them from all vfio
+> related files so contributors no longer need to decide between style and
+> consistency.
+>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>
+> A patch in the same vein was proposed about a year ago, but tied to an ill
+> fated series and forgotten.  Now that we're at the beginning of a new
+> development cycle, I'd like to propose kicking off the v5.20 vfio next
+> branch with this patch and would kindly ask anyone with pending respins or
+> significant conflicts to rebase on top of this patch.  Thanks!
+>
+>  Documentation/driver-api/vfio-mediated-device.rst |   10 ++-
+>  drivers/s390/cio/vfio_ccw_cp.h                    |   12 ++--
+>  drivers/s390/cio/vfio_ccw_private.h               |    6 +-
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h         |    2 -
+>  drivers/vfio/platform/vfio_platform_private.h     |   21 +++---
+>  include/linux/vfio.h                              |   70 ++++++++++-----------
+>  include/linux/vfio_pci_core.h                     |   65 ++++++++++----------
+>  7 files changed, 91 insertions(+), 95 deletions(-)
 
-> Also, if we end up using VCPU_SVE_FINALIZED in hypervisor code later,
-> then should it be handled by iflags instead of cflags ?
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-That'd be my expectation if they ended up changing state at some
-point. My view is that the cflags are immutable once the vcpu has
-run, and flags that can change state over the life if the vcpu
-shouldn't be in that category.
-
-> 
-> My understanding of how those flags should be used is as follows.
-> Is my understanding correct ?
-> 
->  iflags: flags that are used by hypervisor code
-
-Yes. Crucially, they are used as an input to the hypervisor code: it
-either consumes these flags (INCREMENT_PC, PENDING_EXCEPTION), or
-consult them to decide what to do.
-
->  cflags: flags that are set once for all and unused by hypervisor code
-
-Yes.
-
->  sflags: flags that could be set/cleared more than once and unused
->          by hypervisor code
-
-Yes. They are really bookkeeping flags for the kernel code.
-
-I'll try to incorporate some of that in the comments before reposting
-the series.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
