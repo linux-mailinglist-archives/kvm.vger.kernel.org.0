@@ -2,223 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E831C54460D
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FBC3544656
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:48:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241818AbiFIIiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 04:38:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34028 "EHLO
+        id S242012AbiFIIlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 04:41:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241742AbiFIIiU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:38:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E9E03BC
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:38:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654763898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HgVXSci/QOseQPVoykiPl1OOcwRCzNz17MjAcM9uq8w=;
-        b=MVDdO0/XvBuOf5LNQzbevhlryw2thU4FF7YFO6m/UNNt7dlGOydoYOEIGc4McWU0K7evfw
-        fpmgPp83nbIR1Zradoyk/FC2RQqRHwzp88vazTQnY0WaHLAaM5RPUyC/CVi2YWTBe/csBb
-        bdbuVqafejpIEpY9KZ7ph/p/qeYno+U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-43-21Fl8jWMNB63c51dAo-cbQ-1; Thu, 09 Jun 2022 04:38:17 -0400
-X-MC-Unique: 21Fl8jWMNB63c51dAo-cbQ-1
-Received: by mail-wm1-f71.google.com with SMTP id m22-20020a7bcb96000000b0039c4f6ade4dso3358477wmi.8
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 01:38:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HgVXSci/QOseQPVoykiPl1OOcwRCzNz17MjAcM9uq8w=;
-        b=hTzfo7PzYBYbQCZZI1HvGGtwcnOA7xBw9EGeI3OeVEq4vcq4LGkuuiZ4kBDJqjyS5w
-         XgIuh9/Khu5QsGFY5AdGzgnQNvp3Jvm8tdUxwADm3+6haQRC2qCCnM9TQSSnGIqT2kEP
-         5Z6ZENJiqcIu3wjJGS8XRgdb4eA3g+J1eroIM4mKfKjyeS2mUzefnWd7oN4Q2qu8eeHr
-         8T5NZc9D4Y8rSN0VcYMACwLpSBbrgQym7lyV/uCyaegbYYlnV2CN1nIJU3FX/6t5Lqg/
-         pNIwMCSghwwmndFrWbcw/Jr3kywRAkym475xGupw5n2JTSlvdB+/mQyN0Gb8Ii8kJXke
-         29lQ==
-X-Gm-Message-State: AOAM532oj7iINvzDMqtMlqJoYp28QP/ZuzLFU36NSLAfx4FJNan05OHO
-        /3EderM8JjbX1lGdtuJHJCgyLu8b8VPXDROk+iXrheWTzJedI925Fsw7WYxNRUjCyd0cSVJ3qsz
-        7MOn8h6zHRhCK
-X-Received: by 2002:a5d:5046:0:b0:210:20ba:843b with SMTP id h6-20020a5d5046000000b0021020ba843bmr36990355wrt.447.1654763896051;
-        Thu, 09 Jun 2022 01:38:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz2I/pxTFn4lag98n3atuyy6yg43sEFm9gDOXjfWj6fo6AxS/nQEcBo9Zu5aQvJUCNQyNASrw==
-X-Received: by 2002:a5d:5046:0:b0:210:20ba:843b with SMTP id h6-20020a5d5046000000b0021020ba843bmr36990340wrt.447.1654763895841;
-        Thu, 09 Jun 2022 01:38:15 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
-        by smtp.gmail.com with ESMTPSA id h7-20020a05600c350700b0039c3b05540fsm25002292wmq.27.2022.06.09.01.38.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 01:38:15 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 10:38:12 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        Krasnov Arseniy <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v2 2/8] vhost/vsock: rework packet allocation logic
-Message-ID: <20220609083812.kfsmteh6cm5v3ag2@sgarzare-redhat>
-References: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
- <72ae7f76-ffee-3e64-d445-7a0f4261d891@sberdevices.ru>
+        with ESMTP id S242265AbiFIIk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 04:40:58 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DA89A45A
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:39:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654763992; x=1686299992;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wfp7Dysy3aMLlL3dcHfdfzKluLdCDrMv0Qk8NSN23Nc=;
+  b=IpJOqbI/e8ZZ/rcjMGfK04QC38VQ5c/eWKFd+sOS5qEuQeHGkA/JJl7n
+   RTwnFMZjVBVCraaODdnAlhY5rkEGKMJsbufCF3rg9NEj2VImPu9rUr/8o
+   1SWiCEih7LpsDFuSMYtBTOZz15+SjSuE2dgParH/Lti0dav1Q8NK5POEs
+   LquXX4o7Qb9L4otb8iAhF86/6bQg7WGaSuVLWeVamGiCbjuduKCIr/dxE
+   iuAuCG45KzJHlAICraT41vy7UsO22cz3gJre3c8duJyF2pGzpQKAvCkt7
+   M8p7/lbLy2zDrmAvH60547ZaDw/m5emUccADnPTm8rDWU5hwY1n62+2F2
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10372"; a="278355502"
+X-IronPort-AV: E=Sophos;i="5.91,287,1647327600"; 
+   d="scan'208";a="278355502"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 01:39:51 -0700
+X-IronPort-AV: E=Sophos;i="5.91,287,1647327600"; 
+   d="scan'208";a="580475503"
+Received: from embargo.jf.intel.com ([10.165.9.183])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 01:39:51 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [kvm-unit-tests PATCH 0/3] Fix up test failures induced by !enable_pmu
+Date:   Thu,  9 Jun 2022 04:39:13 -0400
+Message-Id: <20220609083916.36658-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <72ae7f76-ffee-3e64-d445-7a0f4261d891@sberdevices.ru>
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 03, 2022 at 05:33:04AM +0000, Arseniy Krasnov wrote:
->For packets received from virtio RX queue, use buddy
->allocator instead of 'kmalloc()' to be able to insert
->such pages to user provided vma. Single call to
->'copy_from_iter()' replaced with per-page loop.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> drivers/vhost/vsock.c | 81 ++++++++++++++++++++++++++++++++++++-------
-> 1 file changed, 69 insertions(+), 12 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index e6c9d41db1de..0dc2229f18f7 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -58,6 +58,7 @@ struct vhost_vsock {
->
-> 	u32 guest_cid;
-> 	bool seqpacket_allow;
->+	bool zerocopy_rx_on;
+When pmu is disabled via enable_pmu=0, some perf related MSRs or instructions
+are not available to VM, this results into some test failures, fix them in
+this series.
 
-This is per-device, so a single socket can change the behaviour of all 
-the sockets of this device.
+Patches were tested with below config:
 
-Can we do something better?
+kernel:
+kvm/queue, commit 5e9402ac128b371635478fd2bb04342d4dbf0d74
 
-Maybe we can allocate the header, copy it, find the socket and check if 
-zero-copy is enabled or not for that socket.
+qemu:
+master, commit 9b1f58854959c5a9bdb347e3e04c252ab7fc9ef5
 
-Of course we should change or extend virtio_transport_recv_pkt() to 
-avoid to find the socket again.
+platform:
+Skylake/Sapphire Rapids
+
+Yang Weijiang (3):
+  x86: Remove perf enable bit from default config
+  x86: Skip running test when pmu is disabled
+  x86: Skip perf related tests when pmu is disabled
+
+ x86/msr.c       |  4 +++-
+ x86/pmu_lbr.c   |  4 +++-
+ x86/vmx_tests.c | 24 ++++++++++++++++++++++++
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
 
-> };
->
-> static u32 vhost_transport_get_local_cid(void)
->@@ -357,6 +358,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
-> 		      unsigned int out, unsigned int in)
-> {
-> 	struct virtio_vsock_pkt *pkt;
->+	struct vhost_vsock *vsock;
-> 	struct iov_iter iov_iter;
-> 	size_t nbytes;
-> 	size_t len;
->@@ -393,20 +395,75 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
-> 		return NULL;
-> 	}
->
->-	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
->-	if (!pkt->buf) {
->-		kfree(pkt);
->-		return NULL;
->-	}
->-
-> 	pkt->buf_len = pkt->len;
->+	vsock = container_of(vq->dev, struct vhost_vsock, dev);
->
->-	nbytes = copy_from_iter(pkt->buf, pkt->len, &iov_iter);
->-	if (nbytes != pkt->len) {
->-		vq_err(vq, "Expected %u byte payload, got %zu bytes\n",
->-		       pkt->len, nbytes);
->-		virtio_transport_free_pkt(pkt);
->-		return NULL;
->+	if (!vsock->zerocopy_rx_on) {
->+		pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
->+
->+		if (!pkt->buf) {
->+			kfree(pkt);
->+			return NULL;
->+		}
->+
->+		pkt->slab_buf = true;
->+		nbytes = copy_from_iter(pkt->buf, pkt->len, &iov_iter);
->+		if (nbytes != pkt->len) {
->+			vq_err(vq, "Expected %u byte payload, got %zu bytes\n",
->+				pkt->len, nbytes);
->+			virtio_transport_free_pkt(pkt);
->+			return NULL;
->+		}
->+	} else {
->+		struct page *buf_page;
->+		ssize_t pkt_len;
->+		int page_idx;
->+
->+		/* This creates memory overrun, as we allocate
->+		 * at least one page for each packet.
->+		 */
->+		buf_page = alloc_pages(GFP_KERNEL, get_order(pkt->len));
->+
->+		if (buf_page == NULL) {
->+			kfree(pkt);
->+			return NULL;
->+		}
->+
->+		pkt->buf = page_to_virt(buf_page);
->+
->+		page_idx = 0;
->+		pkt_len = pkt->len;
->+
->+		/* As allocated pages are not mapped, process
->+		 * pages one by one.
->+		 */
->+		while (pkt_len > 0) {
->+			void *mapped;
->+			size_t to_copy;
->+
->+			mapped = kmap(buf_page + page_idx);
->+
->+			if (mapped == NULL) {
->+				virtio_transport_free_pkt(pkt);
->+				return NULL;
->+			}
->+
->+			to_copy = min(pkt_len, ((ssize_t)PAGE_SIZE));
->+
->+			nbytes = copy_from_iter(mapped, to_copy, &iov_iter);
->+			if (nbytes != to_copy) {
->+				vq_err(vq, "Expected %zu byte payload, got %zu bytes\n",
->+				       to_copy, nbytes);
->+				kunmap(mapped);
->+				virtio_transport_free_pkt(pkt);
->+				return NULL;
->+			}
->+
->+			kunmap(mapped);
->+
->+			pkt_len -= to_copy;
->+			page_idx++;
->+		}
-> 	}
->
-> 	return pkt;
->-- 
->2.25.1
+base-commit: 2eed0bf1096077144cc3a0dd9974689487f9511a
+-- 
+2.31.1
 
