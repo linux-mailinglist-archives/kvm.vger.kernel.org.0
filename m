@@ -2,88 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86EB4544DFE
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 15:45:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 482A7544E31
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 15:57:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243807AbiFINpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 09:45:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55072 "EHLO
+        id S245190AbiFIN4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 09:56:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239293AbiFINpM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 09:45:12 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453344C7B9
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 06:45:11 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id o10so31247134edi.1
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 06:45:11 -0700 (PDT)
+        with ESMTP id S245507AbiFINzy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 09:55:54 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8AB83527E
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 06:55:51 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id e66so21875983pgc.8
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 06:55:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ed6/oIZCLllEojis+iQsosuh/kXkv+SP578fE3DPXKc=;
-        b=oimkxnZsl+L678UoQNfGSY5vTDcO4GHYZr4f1zTfDw7pVZ5liF8VzGqIaI9GCBvZTO
-         3CTuWlLirXeBgEdpymjMjv1bQ7UchExgUVS9iIweAKNTDeliTvryCXvARLPZzEiqDxro
-         Od5R72VRP/73S4QlrvpRFqZ0vTXE3uMI1UNsC7cWHcc87PFZKvDCDThfX1e5QnaLlEjK
-         fa5fb6ApVwyMFS69ceOd8h8LnOII4uOzudBpCjV1Js0H3ZgqZGtkPibOJZU8H2SdEqg2
-         5BC7nfMXOZubAn7ORlzGQflYVA81d9UVBb8CAKDS67YZnuxx5IAVl9K1T0gde6S8vtZz
-         6I5A==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2tLHzK+mawqr5s4YQ6aG7zolZuEOi6xg/YnpIdOHgKA=;
+        b=NyQLoPCJ3Fw1Rd/RGxC+T32bhwep+nu9XPymI+sdFXniE5ncki+AyZjF1fI9FAvhg4
+         Sd5BckuKevSoBcFbK6aZaFh8Kzat3G+uSAqRhBR4WBWpOOcVKlaExzWaHMw367fik5B9
+         3QbcbwmyQOcwBpBwlGFrgxkQD4/1mx7ahCEJDokNSmGRdu6VIgTBZXbkPU8DcwkwnDT9
+         qZudTLrtNMJP2US4cdNk6i+6HSIexRMbVZADyrgdK3UyFHn7roMgdruLGog8dPIjB/9u
+         LSbl7vBuXu11RixFHrtp9Q82e7uJJt36zylh1BLV6lJuO5LLowub7Yiy0TwWHwrAbVPs
+         188A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ed6/oIZCLllEojis+iQsosuh/kXkv+SP578fE3DPXKc=;
-        b=Z8TurjMejy1NWXlIIOL6A8Fjs5U3hCZkpdrn4MgGZotiN23dKteiKRCsxieSojqVOT
-         kAnpxfuQx4mel5Vy9I/niv2ch27su0iLd6OJ/5hDJ4Xs0ZIPwvyLbkOld/QqDvh2mH9E
-         VH8PrwF2jFhzCQbS1Af8MsZYoReNSPSHZRmp9o9JVOxZxDkQlCrvSZ3+Zm8d8/z1AC/Q
-         WrgDJIyR5GnXUipCfHtHBCBI7JMHdIavrFTa6oWL3mmBv6qTmH+QHqlI/srvcvUJzYIG
-         jrH0v9IUY4FT5XacDjbHCH8JMF0aMOZR3zfscoOuP9sa6hmcWVcO5RQQsv+zkzOtGc8b
-         ubwg==
-X-Gm-Message-State: AOAM531urrDOrN80ryzWKekbNNIeYcowFv2Ip3DIiO3ZHBUpkWxsWh0Z
-        /0Cm4uWA1eYq/w1s/WIrEzM=
-X-Google-Smtp-Source: ABdhPJx9ekJg5XWvJL71onmwGgY7rgp9FgDEi17noWoYgoWaYImu1aqMVr7t8uZjEolISiOGV+ntDQ==
-X-Received: by 2002:a05:6402:518d:b0:431:5487:9606 with SMTP id q13-20020a056402518d00b0043154879606mr25879763edd.177.1654782309488;
-        Thu, 09 Jun 2022 06:45:09 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id t26-20020a17090605da00b006fe7d269db8sm10618584ejt.104.2022.06.09.06.45.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jun 2022 06:45:08 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <480dec7c-ccc1-c226-928d-eb16c2a09eaa@redhat.com>
-Date:   Thu, 9 Jun 2022 15:45:05 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2tLHzK+mawqr5s4YQ6aG7zolZuEOi6xg/YnpIdOHgKA=;
+        b=hn9TpKVaCKso8Yjo34cye9FOvDxFbGX1viBehTLWjYhqIjUf7IOmWMhwvcHmxHQnIn
+         FF4U1oxaH5fqpWm/swKa9rpEUCPCD696wePcxL+2lw1ucVqjoS5MNAOgbNFW2mvuuZNc
+         ZESsdo4siKUnvc8vuU2hVK9lXqHHxtp3OcnC2zQNUxUZ2A1Ss73ly3IRFs8BKCUz9Xf9
+         D4l6D7Qf8iprxRDT9aPgio3+DNTVYGWsE250Rm4evJ7kkGZRGuuSaK01o2Rmqs1uR1N+
+         aVcBY8PjC5Qkimy2KkFFX4UAP4QVloX8s9uNdDz24g9mKELguD86QNrzYJSqfJGlBUlq
+         /jAw==
+X-Gm-Message-State: AOAM5301Gl2VjaL/SS4hsauga0zsq+i6mTectIpXQXoR51BsTnw707nM
+        yKkEZkqxTwNn26QaJkJQ+PBhjg==
+X-Google-Smtp-Source: ABdhPJw3Ip8vO/1+HSILbK6hPsf2Tnb1VWLRa9LQz5MYHsS2lwxwBEZCQ0c7Omj0EJ7aXxIunxnCsQ==
+X-Received: by 2002:a63:40c3:0:b0:3fd:12b8:3207 with SMTP id n186-20020a6340c3000000b003fd12b83207mr30674164pga.57.1654782951047;
+        Thu, 09 Jun 2022 06:55:51 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f10-20020a17090ace0a00b001e31803540fsm16034735pju.6.2022.06.09.06.55.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 06:55:50 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 13:55:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/5] KVM: selftests: Add MONITOR/MWAIT quirk test
+Message-ID: <YqH74glDW88oZBzi@google.com>
+References: <20220608224516.3788274-1-seanjc@google.com>
+ <20220608224516.3788274-6-seanjc@google.com>
+ <20220609063720.wf4famdgoucbglnq@yy-desk-7060>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [GIT PULL] KVM/riscv fixes for 5.19, take #1
-Content-Language: en-US
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-References: <CAAhSdy3BY551VEP5D-_vj7nzhb9O_k69v99jMdjQ+OxWZpxzpA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAAhSdy3BY551VEP5D-_vj7nzhb9O_k69v99jMdjQ+OxWZpxzpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220609063720.wf4famdgoucbglnq@yy-desk-7060>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/9/22 07:20, Anup Patel wrote:
-> 1) Typo fix in arch/riscv/kvm/vmid.c
-> 2) Remove broken reference pattern from MAINTAINERS entry
+On Thu, Jun 09, 2022, Yuan Yao wrote:
+> On Wed, Jun 08, 2022 at 10:45:16PM +0000, Sean Christopherson wrote:
+> > +static void guest_monitor_wait(int testcase)
+> > +{
+> > +	/*
+> > +	 * If both MWAIT and its quirk are disabled, MONITOR/MWAIT should #UD,
+> > +	 * in all other scenarios KVM should emulate them as nops.
+> > +	 */
+> > +	bool fault_wanted = (testcase & MWAIT_QUIRK_DISABLED) &&
+> > +			    (testcase & MWAIT_DISABLED);
+> > +	u8 vector;
+> > +
+> > +	GUEST_SYNC(testcase);
+> > +
+> > +	vector = kvm_asm_safe("monitor");
+> > +	if (fault_wanted)
+> > +		GUEST_ASSERT_2(vector == UD_VECTOR, testcase, vector);
+> > +	else
+> > +		GUEST_ASSERT_2(!vector, testcase, vector);
+> > +
+> > +	vector = kvm_asm_safe("monitor");
+> 
+> emmm... should one of the "monitor" be "mwait" ?
 
-Pulled, thanks.
+/facepalm
 
-Paolo
+Thanks for catching my copy+paste fail!
