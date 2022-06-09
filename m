@@ -2,144 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2FB0544E8C
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 16:17:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F096E544EFD
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 16:29:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239258AbiFIORy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 10:17:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33772 "EHLO
+        id S240564AbiFIO1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 10:27:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbiFIORx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 10:17:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 321FF14B2CD
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 07:17:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C2A6F61DC5
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 14:17:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29A53C34114;
-        Thu,  9 Jun 2022 14:17:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654784271;
-        bh=kJkLKSYMhSBwA9NtLKwJ+0pfq4+7mhggk7YAmP0J9Mc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Wf7AUsBWT3hqYpXrvTnOKNI6Qub1Ehc3Yd0iwDD/j0zOm2blaHob+b5Uakqs1rBHp
-         LtmkXZQ6ObaXZ/VQGfTi4JjCdMob/VU892p7oZEtOPveP+Lkq7RVxK1IfhStH0C/oC
-         +E5j6Xd12e1Lj02VmYmsdN37h9Y5dmoUoqWuEIFXIOEXowQGYRjaBjrnWlGK9XffL0
-         5J2mrN+KlZHPets+bNCklX1kAWL3KkmlPaNL4GR/VvBbFRL0w5aOcJqSXMRGWql07r
-         tNXeQ2P1k/E06+WTQnl6YSBOuR++3FMQHYfjo5MFqIrkio/5EhZpq2Ps0vGKn0PfBc
-         MK7XdgSLB4ZlQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nzIyq-00Gtbd-Lw; Thu, 09 Jun 2022 15:17:48 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        David Brazdil <dbrazdil@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        sunliming <sunliming@kylinos.cn>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 fixes for 5.19, take #1
-Date:   Thu,  9 Jun 2022 15:17:31 +0100
-Message-Id: <20220609141731.1197304-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229973AbiFIO1q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 10:27:46 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F3412FB29;
+        Thu,  9 Jun 2022 07:27:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654784865; x=1686320865;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eCY5vfssjBdEESu3NYeDhokIbEHWS/CgrAYFRq7UYdE=;
+  b=DXH8TA4evcya/w22/AJ3pBxXQ/UxKms8dGCZKg2yCCidvBaG5orPxp+S
+   QiPbZHNrn5IldMAjOhtJhR4gHGsNo7mLSGehHwTeAwQYbfWvAmfASF9b2
+   iTZHT0qmAuqzA/oYSdfbHyk6z9r/asxDavKkQFOdtceFO0ARHLENyR5JT
+   c2bQYn2T0u+wszTo5OP779k6EgZiLxPIeblOvwEJAnVHIaWSh3kQAB50p
+   8yxxtNPRA1e/iRQ+VVXZ7LihhbV9tpsPZ3eEZHXIfJQFhicXpatwtIH2x
+   il7TWj+oVsLLuHrW11jEFaj36DiN0i7+JD8Obvq53c2Lh0fLX5ArOmChi
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10373"; a="257125019"
+X-IronPort-AV: E=Sophos;i="5.91,287,1647327600"; 
+   d="scan'208";a="257125019"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 07:27:44 -0700
+X-IronPort-AV: E=Sophos;i="5.91,287,1647327600"; 
+   d="scan'208";a="908344064"
+Received: from fungjona-mobl.amr.corp.intel.com (HELO [10.212.203.188]) ([10.212.203.188])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 07:27:43 -0700
+Message-ID: <f62ab257-b2e0-3097-e394-93a9e7a0d2bf@intel.com>
+Date:   Thu, 9 Jun 2022 07:27:43 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, dbrazdil@google.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, sunliming@kylinos.cn, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oupton@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH 1/2] x86: notify hypervisor about guest entering s2idle
+ state
+Content-Language: en-US
+To:     Grzegorz Jaszczyk <jaz@semihalf.com>, linux-kernel@vger.kernel.org
+Cc:     dmy@semihalf.com,
+        Zide Chen <zide.chen@intel.corp-partner.google.com>,
+        Peter Fang <peter.fang@intel.corp-partner.google.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Sachi King <nakato@nakato.io>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        David Dunn <daviddunn@google.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        "open list:ACPI" <linux-acpi@vger.kernel.org>,
+        "open list:HIBERNATION (aka Software Suspend, aka swsusp)" 
+        <linux-pm@vger.kernel.org>
+References: <20220609110337.1238762-1-jaz@semihalf.com>
+ <20220609110337.1238762-2-jaz@semihalf.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20220609110337.1238762-2-jaz@semihalf.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On 6/9/22 04:03, Grzegorz Jaszczyk wrote:
+> Co-developed-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
+> Signed-off-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
+> Co-developed-by: Tomasz Nowicki <tn@semihalf.com>
+> Signed-off-by: Tomasz Nowicki <tn@semihalf.com>
+> Signed-off-by: Zide Chen <zide.chen@intel.corp-partner.google.com>
+> Co-developed-by: Grzegorz Jaszczyk <jaz@semihalf.com>
+> Signed-off-by: Grzegorz Jaszczyk <jaz@semihalf.com>
+> ---
+>  Documentation/virt/kvm/x86/hypercalls.rst | 7 +++++++
+>  arch/x86/kvm/x86.c                        | 3 +++
+>  drivers/acpi/x86/s2idle.c                 | 8 ++++++++
+>  include/linux/suspend.h                   | 1 +
+>  include/uapi/linux/kvm_para.h             | 1 +
+>  kernel/power/suspend.c                    | 4 ++++
+>  6 files changed, 24 insertions(+)
 
-Here's the first set of fixes for 5.19. Nothing major (one fix for the
-GICv2 emulation, one for the embryonic protected VM support), the rest
-being a bunch of small scale cleanup that I have decided to take now
-rather than leaving them for later.
+What's the deal with these emails?
 
-Please pull,
+	zide.chen@intel.corp-partner.google.com
 
-	M.
+I see a smattering of those in the git logs, but never for Intel folks.
 
-The following changes since commit f2906aa863381afb0015a9eb7fefad885d4e5a56:
-
-  Linux 5.19-rc1 (2022-06-05 17:18:54 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.19-1
-
-for you to fetch changes up to bcbfb588cf323929ac46767dd14e392016bbce04:
-
-  KVM: arm64: Drop stale comment (2022-06-09 13:24:02 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.19, take #1
-
-- Properly reset the SVE/SME flags on vcpu load
-
-- Fix a vgic-v2 regression regarding accessing the pending
-  state of a HW interrupt from userspace (and make the code
-  common with vgic-v3)
-
-- Fix access to the idreg range for protected guests
-
-- Ignore 'kvm-arm.mode=protected' when using VHE
-
-- Return an error from kvm_arch_init_vm() on allocation failure
-
-- A bunch of small cleanups (comments, annotations, indentation)
-
-----------------------------------------------------------------
-Marc Zyngier (7):
-      KVM: arm64: Always start with clearing SVE flag on load
-      KVM: arm64: Always start with clearing SME flag on load
-      KVM: arm64: Don't read a HW interrupt pending state in user context
-      KVM: arm64: Replace vgic_v3_uaccess_read_pending with vgic_uaccess_read_pending
-      KVM: arm64: Warn if accessing timer pending state outside of vcpu context
-      KVM: arm64: Handle all ID registers trapped for a protected VM
-      KVM: arm64: Drop stale comment
-
-Will Deacon (4):
-      KVM: arm64: Return error from kvm_arch_init_vm() on allocation failure
-      KVM: arm64: Ignore 'kvm-arm.mode=protected' when using VHE
-      KVM: arm64: Extend comment in has_vhe()
-      KVM: arm64: Remove redundant hyp_assert_lock_held() assertions
-
-sunliming (1):
-      KVM: arm64: Fix inconsistent indenting
-
- Documentation/admin-guide/kernel-parameters.txt |  1 -
- arch/arm64/include/asm/kvm_host.h               |  5 ---
- arch/arm64/include/asm/virt.h                   |  3 ++
- arch/arm64/kernel/cpufeature.c                  | 10 +-----
- arch/arm64/kvm/arch_timer.c                     |  3 ++
- arch/arm64/kvm/arm.c                            | 10 ++++--
- arch/arm64/kvm/fpsimd.c                         |  2 ++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c           |  4 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c              | 42 ++++++++++++++++++++-----
- arch/arm64/kvm/vgic/vgic-mmio-v2.c              |  4 +--
- arch/arm64/kvm/vgic/vgic-mmio-v3.c              | 40 ++---------------------
- arch/arm64/kvm/vgic/vgic-mmio.c                 | 40 ++++++++++++++++++++---
- arch/arm64/kvm/vgic/vgic-mmio.h                 |  3 ++
- arch/arm64/kvm/vmid.c                           |  2 +-
- 14 files changed, 95 insertions(+), 74 deletions(-)
+I'll also say that I'm a bit suspicious of a patch that includes 5
+authors for 24 lines of code.  Did it really take five of you to write
+24 lines of code?
