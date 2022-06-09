@@ -2,115 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2043A54578B
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 00:42:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A646754578D
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 00:42:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345776AbiFIWmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 18:42:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41690 "EHLO
+        id S1344924AbiFIWmZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 18:42:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232459AbiFIWmE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 18:42:04 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC9AF163286
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 15:42:02 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id y16so19763148ili.13
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 15:42:02 -0700 (PDT)
+        with ESMTP id S232460AbiFIWmY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 18:42:24 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED428259CF8
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 15:42:22 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id z17so22280384pff.7
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 15:42:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=/FRQdMUJFk/jNgSEtRr45RURpkqhM+6c+D2uuhvjBdA=;
-        b=F1qS4l61NvQIYpWebJAGv78hw7aPsRYLCh3mE58G7/Ec4aOo3LrCtJs0CjLaGUtWJR
-         HbHll4Vxu5pJfCti//ZoSU55atT3fGYdUPS7Eop91RNIfNFxyul2ajc6R6ZbwCqhWOA0
-         M316HOJEXr02WadyV1yXbRaROpSr3L+X6W23KHeK5wb0uoMKZKMYAH08avnwJnTv7OjO
-         ZPdR688JsZGrO7ENGSCIzqPN35AKWfR5jk38dqIutTgTAYLMIlK0ETIKPQJhdazjTY7Z
-         W9zYk5UZQOKAsNsvYMGjbR1f29oZE7TNcka9AaDErsTuV4QVC1Ep8mXH7Qms/ElkjOHB
-         nCgw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=lelPW5lpCggZHvNs+wr3m0ZEWB3pzhs4qG1pUg8elhM=;
+        b=ZZSoXoM1DbaycxvcgDpFuRODWzmX4fkykaNvl7T4TWumygRhWt13WBrCf87O5R8UoN
+         +2LanqJtH3c9ttuPEY0YktJkjFPGD0W03xeKbJAUPB+M+p89drQy3+BzWheAZfrh8ZqV
+         MlXKVHEUHaoIGKzcVoyj1tCJ4lviw95YneigqkEM6UHkqhNJZ+rjp+drX0/ciW4jQwrV
+         UlPlQT78ggSI5XzGp/F4cp97+W252N3/G2FjCCB+bO5tpBgy73gW36cHIWKc+ptU0Y9m
+         GpqgqA7IIMqTLwckCP2FYR6DOq0VQA4MVQ6VcrVUKDDfFD1D3glaP/Wnxri1KUoaN6SO
+         2K5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to:content-transfer-encoding;
-        bh=/FRQdMUJFk/jNgSEtRr45RURpkqhM+6c+D2uuhvjBdA=;
-        b=b385JxJtZ1Ju2DW0Fg1LIrfwafhym5z6+UBzYTFmSM7KbiIIANdds/n7QCTow4v9W9
-         TEpN7I04tEA9OjxT4qNCDgaNSsaREK7m5gL4s+9EvkDyQyrNzcz4BYw0Z/rlb3+FnfwP
-         5l5JRxWjH8vqHT7jkemhOeCQo6b8jg8WXhsszUZk9Bq5eX+sNYDwWBRlIyTfVmFSDakX
-         x82+6K4yUMuuIczyxLLdq+zBAcIo1KPLCsdVaZOGZcO9fqvbk6seSsvApcZsyhHn6qQA
-         torxlGwpFmx6Z9+UhN7yzkYSk8pKO394HZ3+i1Wuq+K1etgE+AHfwrd6Yh0ToJ1RXwZD
-         nqvg==
-X-Gm-Message-State: AOAM531IgqoGItVbYS3ZcvD8mS3VBjxJGU2x/hHEq4G38QY903/Af3L5
-        CmWFBgS+ENKWqmn8wKeyitexDfZG9mLDlzHmYF4=
-X-Google-Smtp-Source: ABdhPJzgRr8Pkh3rIo3j118PVjZxW1ewQ3UP9ivmfHw7OBub/6Qeinf8Q12OoIs6jOyTL/Sq3j638J69f/kzX8hlZ3g=
-X-Received: by 2002:a05:6e02:4a1:b0:2d3:a778:f0f1 with SMTP id
- e1-20020a056e0204a100b002d3a778f0f1mr23627282ils.212.1654814521989; Thu, 09
- Jun 2022 15:42:01 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=lelPW5lpCggZHvNs+wr3m0ZEWB3pzhs4qG1pUg8elhM=;
+        b=0uhvB8Ux/LY76wlAjIvhLrfranXKo3bwaG3bcEFCOnj64fz1u46U7OFZhkVLnO3cSx
+         ulFkb1KbG0iKxKKZnEh9y2oJg4YU6lfZoy8GmcZxDVuebRWTneJdL4HxwBs+30yTPmcn
+         GBT18zM/ldXML56e0/BBK5vFeJ71vP+QcO7TWOGey2fU2XKZ/yVc3nzCfchNYsdIhSmw
+         5wI2jssE12fVqwwnizKFCtL29JxbJ33yVwyJGuO/tUqjfIOpH3Gk3WHAWxfOXUdE8Zm3
+         zaeexSSH+beYNJ+vXXPW9qiXucBmUvHKADvE/r31nyuR6P1HrWzs72YngzhQLGGQ25QM
+         qIYw==
+X-Gm-Message-State: AOAM530VaN/VD7jL4hYt6vb4ZohvvyKo3Wlr9MuuugT5Wvmik5M6YCjc
+        VpIJtaJQQNt0YSdxdcCynFy5kg==
+X-Google-Smtp-Source: ABdhPJy3a1oYttRHKD6u1tbHs3WsBjK+zg7wNq5WP8biWjs5gXbBbv7SniXEv/KhSZ5FvZeVrs66gw==
+X-Received: by 2002:a63:114:0:b0:3fd:431a:dd77 with SMTP id 20-20020a630114000000b003fd431add77mr28873731pgb.619.1654814542283;
+        Thu, 09 Jun 2022 15:42:22 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d4-20020a170903230400b00167729dfe0bsm10004981plh.168.2022.06.09.15.42.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 15:42:21 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 22:42:18 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 5/6] KVM: x86: de-underscorify __emulator_pio_in
+Message-ID: <YqJ3So/Snq31R2Ym@google.com>
+References: <20220608121253.867333-1-pbonzini@redhat.com>
+ <20220608121253.867333-6-pbonzini@redhat.com>
 MIME-Version: 1.0
-Sender: mrs.christiana.and.sons@gmail.com
-Received: by 2002:a05:6e04:183:0:0:0:0 with HTTP; Thu, 9 Jun 2022 15:42:01
- -0700 (PDT)
-From:   Jackie James <jackiejames614@gmail.com>
-Date:   Thu, 9 Jun 2022 10:42:01 -1200
-X-Google-Sender-Auth: 9lFhKWeef4HIRwiHUkfOjPxEbQg
-Message-ID: <CANV73fB3N8Zat5qWFaMV1au93RFXbq8HLzxTfDh7X1LVUE71Uw@mail.gmail.com>
-Subject: Greethings my beloved
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=4.2 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
-        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_FROM,LOTS_OF_MONEY,MONEY_FRAUD_8,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220608121253.867333-6-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello my beloved,
+On Wed, Jun 08, 2022, Paolo Bonzini wrote:
+> Now all callers except emulator_pio_in_emulated are using
+> __emulator_pio_in/complete_emulator_pio_in explicitly.
+> Move the "either copy the result or attempt PIO" logic in
+> emulator_pio_in_emulated, and rename __emulator_pio_in to
+> just emulator_pio_in.
 
-  I sent this mail praying it will get to you in a good condition of
-health, since I myself are in a very critical health condition in
-which I sleep every night without knowing if I may be alive to see the
-next day. I bring peace and love to you. It is by the grace of God, I
-had no choice than to do what is lawful and right in the sight of God
-for eternal life and in the sight of man, for witness of God=E2=80=99s merc=
-y
-and glory upon my life,I am Mrs,James Jackie.a widow,I am suffering
-from a long time brain tumor, It has defiled all forms of medical
-treatment, and right now I have about a few months to leave, according
-to medical experts.
+Wrap changelogs closer to 75 chars, <60 is a bit too aggressive.
 
-   The situation has gotten complicated recently with my inability to
-hear proper, am communicating with you with the help of the chief
-nurse herein the hospital, from all indication my conditions is really
-deteriorating and it is quite obvious that, according to my doctors
-they have advised me that I may not live too long, Because this
-illness has gotten to a very bad stage. I plead that you will not
-expose or betray this trust and confidence that I am about to repose
-on you for the mutual benefit of the orphans and the less privilege. I
-have some funds I inherited from my late husband, the sum of
-($11,500,000.00 Dollars).Having known my condition, I decided to
-donate this fund to you believing that you will utilize it the way i
-am going to instruct herein.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 22 ++++++++--------------
+>  1 file changed, 8 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index aefcc71a7040..fd4382602f65 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7456,7 +7456,7 @@ static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
+>  	return 0;
+>  }
+>  
+> -static int __emulator_pio_in(struct kvm_vcpu *vcpu, int size,
+> +static int emulator_pio_in(struct kvm_vcpu *vcpu, int size,
+>  			     unsigned short port, void *val, unsigned int count)
 
-   I need you to assist me and reclaim this money and use it for
-Charity works, for orphanages and gives justice and help to the poor,
-needy and widows says The Lord." Jeremiah 22:15-16.=E2=80=9C and also build
-schools for less privilege that will be named after my late husband if
-possible and to promote the word of God and the effort that the house
-of God is maintained. I do not want a situation where this money will
-be used in an ungodly manner. That's why I'm taking this decision. I'm
-not afraid of death, so I know where I'm going. I accept this decision
-because I do not have any child who will inherit this money after I
-die. Please I want your sincerely and urgent answer to know if you
-will be able to execute this project for the glory of God, and I will
-give you more information on how the fund will be transferred to your
-bank account. May the grace, peace, love and the truth in the Word of
-God be with you and all those that you love and care for.
-I'm waiting for your immediate reply,
-Faithfully.
-Mrs,James Jackie.
-Writting From the hospital.
-May God Bless you.
+Align the second line of parameters.  Even gets it below 80 columns ;-)
+
+>  {
+>  	int r = emulator_pio_in_out(vcpu, size, port, val, count, true);
+> @@ -7475,9 +7475,11 @@ static void complete_emulator_pio_in(struct kvm_vcpu *vcpu, void *val)
+>  	vcpu->arch.pio.count = 0;
+>  }
+>  
+> -static int emulator_pio_in(struct kvm_vcpu *vcpu, int size,
+> -			   unsigned short port, void *val, unsigned int count)
+> +static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
+> +				    int size, unsigned short port, void *val,
+
+"int size" fits on the first line, emulator_pio_in_emulated() and
+emulator_pio_out_emulated() have different formatting either way.
+
+> +				    unsigned int count)
+>  {
+> +	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+
+Newline after variable declarations.
+
+>  	if (vcpu->arch.pio.count) {
+>  		/*
+>  		 * Complete a previous iteration that required userspace I/O.
+> @@ -7489,18 +7491,10 @@ static int emulator_pio_in(struct kvm_vcpu *vcpu, int size,
+>  		complete_emulator_pio_in(vcpu, val);
+>  		return 1;
+>  	} else {
+> -		return __emulator_pio_in(vcpu, size, port, val, count);
+> +		return emulator_pio_in(vcpu, size, port, val, count);
+>  	}
+>  }
+>  
+> -static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
+> -				    int size, unsigned short port, void *val,
+> -				    unsigned int count)
+> -{
+> -	return emulator_pio_in(emul_to_vcpu(ctxt), size, port, val, count);
+> -
+> -}
+> -
+>  static int emulator_pio_out(struct kvm_vcpu *vcpu, int size,
+>  			    unsigned short port, const void *val,
+>  			    unsigned int count)
+> @@ -8707,7 +8701,7 @@ static int kvm_fast_pio_in(struct kvm_vcpu *vcpu, int size,
+>  	/* For size less than 4 we merge, else we zero extend */
+>  	val = (size < 4) ? kvm_rax_read(vcpu) : 0;
+>  
+> -	ret = __emulator_pio_in(vcpu, size, port, &val, 1);
+> +	ret = emulator_pio_in(vcpu, size, port, &val, 1);
+>  	if (ret) {
+>  		kvm_rax_write(vcpu, val);
+>  		return ret;
+> @@ -13078,7 +13072,7 @@ static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
+>  	for (;;) {
+>  		unsigned int count =
+>  			min_t(unsigned int, PAGE_SIZE / size, vcpu->arch.sev_pio_count);
+> -		if (!__emulator_pio_in(vcpu, size, port, vcpu->arch.sev_pio_data, count))
+> +		if (!emulator_pio_in(vcpu, size, port, vcpu->arch.sev_pio_data, count))
+>  			break;
+>  
+>  		/* Emulation done by the kernel.  */
+> -- 
+> 2.31.1
+> 
+> 
