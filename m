@@ -2,151 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73A1E5457A8
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 00:50:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AB815458E4
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 01:58:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237439AbiFIWuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 18:50:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50430 "EHLO
+        id S237495AbiFIX6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 19:58:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232358AbiFIWui (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 18:50:38 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73482114D
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 15:50:37 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id n18so21393118plg.5
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 15:50:37 -0700 (PDT)
+        with ESMTP id S229924AbiFIX6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 19:58:04 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1FA1B586F
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 16:58:03 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id e66so23247080pgc.8
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 16:58:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=86+OU2zu0HQo0h80hOWzoZfp7+C3/RaLCcLpObk4okU=;
-        b=LRdGpJ2DN9iUzIXLjq7TFFay31t4JVL5sF+TcU5L5E9QkwpKgL0PAr2tOFzWd8PVEY
-         MKzrLq5lTxMAUZqrFgFQImLShr146ck3DmdoOC/Nw6GJownBRlFa/bsBADLfBUHFCx3c
-         0qWlvLjG7Jtvjkg8i8Py7qBpjX5mSzSpoTHLmnmHs3d/0gj8EyfRIMO5Lrp9OJ5uCmqU
-         +3bei8n04Qj8KbbQPtM8V+zeDhd+uwTzU6e/1t9R671Rl62BFk/los2+MDJVx/nW04kj
-         1xabhqmU4Uwx3lHZpYS0FPCphCcUjA8YBBQTnF8ouVKyqlGF7nJBt04AfoxreCoA21a2
-         wBhA==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=JAJP3OZiiXRmUnwBXEpDieTWJpbglY+QSS3c6IUFAEs=;
+        b=chHSNPktdpo+Jx8lJ9pjXu1uch3qBvi8yNLvSmQdlaWgPihtyZMZRBVcen/0bFdIiJ
+         DUvLQS4Ssn7obIur8WPjtKo3gtpVsPXB8CzNrqs+LjCpXmuMozIx00KYc31SMFRNprOe
+         C4pbpAd9lYcxayA+rq6dW8n9OPmOjAwmb6DDhBmdfF7/Dn8l+Sap664Mn9J3WFJoBV3H
+         V/va6coC+QVDd6abSilRPzCGPbQ/c2MZFPccJKr+nFE90XssqV2bcXy6sEJCA2SGWpXB
+         WswBGiUtsDxlFBe6GWPlAZWiokle1Wasfz6YkkzoJjVIwVBHspbn5jZ9HpQEQtDJUm/w
+         /A+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=86+OU2zu0HQo0h80hOWzoZfp7+C3/RaLCcLpObk4okU=;
-        b=wc9k4uwKhtUJbyWo2DBKi4/MusizzBYkv/VAXXND8sABvcu5nnrON797ev7qZVRqBL
-         o3uYncQOVeL+q2q+6rwCVBkaRy5Co7byipLyyInjo17pzd8LfJgjwgStrUPExGVBtyJw
-         RqSGtuoEO1zgpBnTtLr8etyMuq36flo1AI96MSRqv3N1bnobgmCmRutTxZtl+zwWh/OY
-         CDCSYb5clVH24w8RLD9QBLvsemaxtSYhY66ZFxx7yMq+5Yki2Z0DDF1xijcPWB+nHsyj
-         bvGsNzthIPl3LjHJUDKhxp+qlBtCdg9zOtvayjM0K+jhLy5aOePwtqJRXpbzQ9KOOHPw
-         +HKQ==
-X-Gm-Message-State: AOAM530lL+5qBLzacwsT+CkHfyG7/MfsmiN6Uoy5YzyEwmfRIH76pKuk
-        K1GNrdSDKD18m3deBkweCxvd61+I5tgC0A==
-X-Google-Smtp-Source: ABdhPJxCqBlVUFdhyH8Sq2wxDim/OZzBnGusIkiRzN9CqJDp/O3fE4hkwqlQdWQVPtKkEeNHBR4pMA==
-X-Received: by 2002:a17:903:1205:b0:15e:8cbc:fd2b with SMTP id l5-20020a170903120500b0015e8cbcfd2bmr42052809plh.99.1654815036741;
-        Thu, 09 Jun 2022 15:50:36 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s8-20020a62e708000000b0051835ccc008sm17688886pfh.115.2022.06.09.15.50.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 15:50:36 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 22:50:33 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 6/6] KVM: SEV-ES: reuse advance_sev_es_emulated_ins for
- OUT too
-Message-ID: <YqJ5OXwAyXvQuC2/@google.com>
-References: <20220608121253.867333-1-pbonzini@redhat.com>
- <20220608121253.867333-7-pbonzini@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=JAJP3OZiiXRmUnwBXEpDieTWJpbglY+QSS3c6IUFAEs=;
+        b=kQnml2zh1GtuNCeoRE8UCP8GwRx8EJz5GbqDJJ7dSJMH8WwzYa18rTMfvVzgk5j9k1
+         190Q5WR98GPAAV0nDKT/WfZtTKz6ynInAJ9BxT9YjEaLutmnHYeMt3zS5qJcKrjmm2o4
+         em+fezAximnQJypnJN6Lrma8RN3E4L3YncOk4QIUvfo1phDTbmUiq2sk3f/yW4+hOpfT
+         nsSxXCM7bZXvLwl5x0GZ99rjgsFjKbL2HINWtAaL/aJDE/5tjfQrrPnNP0vjmc1ibgIt
+         exmX53oSS6plSjvsP6MPZAIs8EfRWe+8HEK4CHRxF2Gm70Kd3FlFDwhr6oHBqXFG+nrz
+         T+2w==
+X-Gm-Message-State: AOAM533Ecaqlfd96zj51G5dTGkzPbdGaqgJrd7U4l6jb/Zds9ZV+cC0K
+        cd8TDuZaAo58npQtHx4NBUE=
+X-Google-Smtp-Source: ABdhPJz/4kSqVq23Nt3JM/SwJ9F2M9rK7LZcwfiBcXxXPMeDOg6wCANZ7RK7j6toTfWMA/QC11NAZw==
+X-Received: by 2002:a62:7b4c:0:b0:51b:9c0e:a03d with SMTP id w73-20020a627b4c000000b0051b9c0ea03dmr42654844pfc.54.1654819083130;
+        Thu, 09 Jun 2022 16:58:03 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.22])
+        by smtp.gmail.com with ESMTPSA id i189-20020a636dc6000000b00401bf2a6e08sm348347pgc.93.2022.06.09.16.58.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jun 2022 16:58:02 -0700 (PDT)
+Message-ID: <2bd56b9f-cf27-f4a3-321f-1b1b11172bc0@gmail.com>
+Date:   Fri, 10 Jun 2022 07:57:56 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220608121253.867333-7-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.10.0
+Subject: Re: [kvm-unit-tests PATCH 2/3] x86: Skip running test when pmu is
+ disabled
+Content-Language: en-US
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
+        <pbonzini@redhat.com>
+References: <20220609083916.36658-1-weijiang.yang@intel.com>
+ <20220609083916.36658-3-weijiang.yang@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20220609083916.36658-3-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08, 2022, Paolo Bonzini wrote:
-> complete_emulator_pio_in only has to be called by
-> complete_sev_es_emulated_ins now; therefore, all that the function does
-> now is adjust sev_pio_count and sev_pio_data.  Which is the same for
-> both IN and OUT.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fd4382602f65..a3651aa74ed7 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13007,6 +13007,12 @@ int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned int bytes,
->  }
->  EXPORT_SYMBOL_GPL(kvm_sev_es_mmio_read);
->  
-> +static void advance_sev_es_emulated_pio(struct kvm_vcpu *vcpu, unsigned count, int size)
-> +{
-> +	vcpu->arch.sev_pio_count -= count;
-> +	vcpu->arch.sev_pio_data += count * size;
-> +}
-> +
->  static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
->  			   unsigned int port);
->  
-> @@ -13030,8 +13036,7 @@ static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
->  		int ret = emulator_pio_out(vcpu, size, port, vcpu->arch.sev_pio_data, count);
->  
->  		/* memcpy done already by emulator_pio_out.  */
-> -		vcpu->arch.sev_pio_count -= count;
-> -		vcpu->arch.sev_pio_data += count * vcpu->arch.pio.size;
-> +		advance_sev_es_emulated_pio(vcpu, count, size);
+On 9/6/2022 4:39 pm, Yang Weijiang wrote:
+> +	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
 
-I think this is a bug fix that should go in a separate patch.  size == vcpu->arch.pio.size
-when kvm_sev_es_outs() is called from complete_sev_es_emulated_outs(), but when
-it's called from kvm_sev_es_string_io() it will hold the size of the previous PIO.
-
->  		if (!ret)
->  			break;
->  
-> @@ -13047,12 +13052,6 @@ static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
->  static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
->  			  unsigned int port);
->  
-> -static void advance_sev_es_emulated_ins(struct kvm_vcpu *vcpu, unsigned count, int size)
-> -{
-> -	vcpu->arch.sev_pio_count -= count;
-> -	vcpu->arch.sev_pio_data += count * size;
-> -}
-> -
->  static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
->  {
->  	unsigned count = vcpu->arch.pio.count;
-> @@ -13060,7 +13059,7 @@ static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
->  	int port = vcpu->arch.pio.port;
->  
->  	complete_emulator_pio_in(vcpu, vcpu->arch.sev_pio_data);
-> -	advance_sev_es_emulated_ins(vcpu, count, size);
-> +	advance_sev_es_emulated_pio(vcpu, count, size);
->  	if (vcpu->arch.sev_pio_count)
->  		return kvm_sev_es_ins(vcpu, size, port);
->  	return 1;
-> @@ -13076,7 +13075,7 @@ static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
->  			break;
->  
->  		/* Emulation done by the kernel.  */
-> -		advance_sev_es_emulated_ins(vcpu, count, size);
-> +		advance_sev_es_emulated_pio(vcpu, count, size);
->  		if (!vcpu->arch.sev_pio_count)
->  			return 1;
->  	}
-> -- 
-> 2.31.1
-> 
+Nit, check the PDCM bit before accessing this MSR.
