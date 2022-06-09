@@ -2,72 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4052F5442CD
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 06:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F58D54430E
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 07:22:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237531AbiFIE7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 00:59:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52346 "EHLO
+        id S238175AbiFIFVO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 01:21:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237038AbiFIE7a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 00:59:30 -0400
-Received: from smtp.smtpout.orange.fr (smtp01.smtpout.orange.fr [80.12.242.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 714051E4BF5
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 21:59:27 -0700 (PDT)
-Received: from [192.168.1.18] ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id zAGRnsqeNk3ICzAGRnIqe6; Thu, 09 Jun 2022 06:59:25 +0200
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Thu, 09 Jun 2022 06:59:25 +0200
-X-ME-IP: 90.11.190.129
-Message-ID: <22584780-a2eb-0a83-daaa-f259aa2adc42@wanadoo.fr>
-Date:   Thu, 9 Jun 2022 06:59:23 +0200
+        with ESMTP id S235383AbiFIFVN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 01:21:13 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD7BF3A7814
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 22:21:11 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id q26so20424384wra.1
+        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 22:21:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=3JvmTDsGJDO8gLLj4AkIUZGP939Dw1HwCVtV4Fo1fIc=;
+        b=gvpL1tx8KEFZNPWGZCgk5FC/3L2U7PZMRwO9ausTf+jLLYmZwWAdvdIUejsm+2wTBx
+         QauAaV9t6tSX2IayxvQU1LJIFVbnfta0gAOd8aFNxgJ87G1xNV21ncl5wcmbr/7y1myv
+         CWAa/X8nB6ygdk/1nQ6m0x7FL6bBxjojSoPyq1pbIJHFYPkmI7WLjvHB/8vwgb2jMScc
+         Mzp24FW8/IFCzNRRbOLSohAT0Dha4ewb7uI7TlUlQKzfZ+aZg5NbGzj4rCdlPTDS+7wp
+         Glhm71qxTVSQH3Va5gVbKt7j5JpZ3PPzhPrVSLFv2cUXlWTBANcgObx5ZPRa1P01Gpop
+         0hMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=3JvmTDsGJDO8gLLj4AkIUZGP939Dw1HwCVtV4Fo1fIc=;
+        b=H8HLWwkSSFepPh/EDsQZN4wY6s3ONDVx/kGxL1/XRdJTPZPW0oX9p8te6Afi1HsaAI
+         GcggJGAUbBPhEBAfIUjfsKYsVVDCPwtS2NNBOeZalKBhoFyd7nBnSUm4jQaHeBdgTohV
+         G2LphXwlw3qSUAeCx3tXWg9pRLMLOoXq2JEeFnjfVduPQg1b83UvwbBzLX/Cvu0+O21S
+         qo+ijbcyLR1IQ0MtdzFSe/QhZ3JnVwu2dsDT/+GUH20ePsw3AzXjUcMM3ZBwoI1KMJBd
+         0P/Pd0RI8ZehudwoL5H9offpNEqE9ROw7VMuMEX2+3Cw14Y6/H6z8WJ6oZcUpb9fgsnz
+         W1Lw==
+X-Gm-Message-State: AOAM53037REl4FxOv85NeeaqAT4+doh+2hg9vAOsGefL/715zfaglbMA
+        XSp8VWbC9m7pt309/Cux4sMCr30EktnHLOvMHHq4hmIltmOEMA==
+X-Google-Smtp-Source: ABdhPJwwgl51ub88+ijPWwcfkn2THzzdQExCqu39kwCgVQUo9/VGLBkfRIBDJKUNmtB+lj/v62O5FE3nmVeTvZ5tt68=
+X-Received: by 2002:adf:e30f:0:b0:210:346e:d5da with SMTP id
+ b15-20020adfe30f000000b00210346ed5damr35611235wrj.313.1654752070224; Wed, 08
+ Jun 2022 22:21:10 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH] virtio: Directly use ida_alloc_range()/ida_free()
-Content-Language: en-US
-To:     =?UTF-8?B?dG9tb3Jyb3cgV2FuZyAo546L5b635piOKQ==?= 
-        <wangdeming@inspur.com>, "mst@redhat.com" <mst@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <aff7bba2680b49fab6a14694e33fd41d@inspur.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <aff7bba2680b49fab6a14694e33fd41d@inspur.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+From:   Anup Patel <anup@brainfault.org>
+Date:   Thu, 9 Jun 2022 10:50:55 +0530
+Message-ID: <CAAhSdy3BY551VEP5D-_vj7nzhb9O_k69v99jMdjQ+OxWZpxzpA@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv fixes for 5.19, take #1
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Le 09/06/2022 à 02:42, tomorrow Wang (王德明) a écrit :
->>
->> An explanation in the commit log of why the -1 is needed would also help
->> reviewer/maintainer, IMHO.
->>
->> It IS correct, but it is not that obvious without looking at
->> ida_simple_get() and ida_alloc_range().
->>
-> 
-> can I mention one patch about repair ida_free  for this.
-> 
-> 
+Hi Paolo,
 
-If you manage to find another patch and provide a lore.kernel.org link 
-to it, I think it should be okay.
+Two minor fixes were missed in 5.19 merge window which include:
+1) Typo fix in arch/riscv/kvm/vmid.c
+2) Remove broken reference pattern from MAINTAINERS entry
 
-However, after a *quick* look in some mailing list, I've not found yet a 
-description for that.
+Please pull.
 
-CJ
+Regards,
+Anup
+
+The following changes since commit f2906aa863381afb0015a9eb7fefad885d4e5a56:
+
+  Linux 5.19-rc1 (2022-06-05 17:18:54 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-5.19-1
+
+for you to fetch changes up to 1a12b25274b9e54b0d2d59e21620f8cf13b268cb:
+
+  MAINTAINERS: Limit KVM RISC-V entry to existing selftests
+(2022-06-09 09:18:22 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 5.19, take #1
+
+- Typo fix in arch/riscv/kvm/vmid.c
+
+- Remove broken reference pattern from MAINTAINERS entry
+
+----------------------------------------------------------------
+Julia Lawall (1):
+      RISC-V: KVM: fix typos in comments
+
+Lukas Bulwahn (1):
+      MAINTAINERS: Limit KVM RISC-V entry to existing selftests
+
+ MAINTAINERS           | 1 -
+ arch/riscv/kvm/vmid.c | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
