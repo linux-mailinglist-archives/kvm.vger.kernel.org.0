@@ -2,121 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F096E544EFD
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 16:29:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1257544F05
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 16:29:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240564AbiFIO1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 10:27:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
+        id S240883AbiFIO3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 10:29:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229973AbiFIO1q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 10:27:46 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F3412FB29;
-        Thu,  9 Jun 2022 07:27:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654784865; x=1686320865;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eCY5vfssjBdEESu3NYeDhokIbEHWS/CgrAYFRq7UYdE=;
-  b=DXH8TA4evcya/w22/AJ3pBxXQ/UxKms8dGCZKg2yCCidvBaG5orPxp+S
-   QiPbZHNrn5IldMAjOhtJhR4gHGsNo7mLSGehHwTeAwQYbfWvAmfASF9b2
-   iTZHT0qmAuqzA/oYSdfbHyk6z9r/asxDavKkQFOdtceFO0ARHLENyR5JT
-   c2bQYn2T0u+wszTo5OP779k6EgZiLxPIeblOvwEJAnVHIaWSh3kQAB50p
-   8yxxtNPRA1e/iRQ+VVXZ7LihhbV9tpsPZ3eEZHXIfJQFhicXpatwtIH2x
-   il7TWj+oVsLLuHrW11jEFaj36DiN0i7+JD8Obvq53c2Lh0fLX5ArOmChi
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10373"; a="257125019"
-X-IronPort-AV: E=Sophos;i="5.91,287,1647327600"; 
-   d="scan'208";a="257125019"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 07:27:44 -0700
-X-IronPort-AV: E=Sophos;i="5.91,287,1647327600"; 
-   d="scan'208";a="908344064"
-Received: from fungjona-mobl.amr.corp.intel.com (HELO [10.212.203.188]) ([10.212.203.188])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 07:27:43 -0700
-Message-ID: <f62ab257-b2e0-3097-e394-93a9e7a0d2bf@intel.com>
-Date:   Thu, 9 Jun 2022 07:27:43 -0700
+        with ESMTP id S1343871AbiFIO2a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 10:28:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6538E188E59
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 07:28:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654784905;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=D9bt/rT+ACc5asHr7sl5YVnLU/QODOwZ6hb9zGalE84=;
+        b=Qh6wC/HP4n2qDtl8+mCafn/lpyNqoPiI2Ln55jWtNYc8bcWcvGVqyGlksFqn5Dfehqdv8Z
+        jRKoLS75g/8Rx8hIA+ntfi6j4B4uXlx7k+1Ay//+cu9cRQ+LEOFhEkJ8LkJLaodl0QFPIT
+        nlqvCOw3L8HbWmHhagEt7WR0RhM/ZJw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-455-0nxzMpY8NmafHPoMqzbd6A-1; Thu, 09 Jun 2022 10:28:24 -0400
+X-MC-Unique: 0nxzMpY8NmafHPoMqzbd6A-1
+Received: by mail-wr1-f70.google.com with SMTP id m18-20020adff392000000b0021848a78a53so3101603wro.19
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 07:28:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=D9bt/rT+ACc5asHr7sl5YVnLU/QODOwZ6hb9zGalE84=;
+        b=KrCLwZHHAN0+53A8ECbed3CDK0vGFkEe+eLSGdT4DlNmEowBy3sWOfMkLDyCKYJ3Cx
+         5f+JrdKm0CcnK6Wb81EgW7qZ/uZBb0zHJ1w7f9X9ccIFT9X57Bflt9DJRTzvbxbf1/Er
+         ldCDW9Q6M9Y8xkDn3xBBaoJ/CjzoNdgNwZeSSG+hPMB4lXqmzp3J1PEoPRhj1pJi3Y/7
+         qUMBOErw4jddRX5LgsmKH2WRMJRB3KvzEIv+5hAWz+LLkS1v4fEqVPqX5izvF1gSggSF
+         3AqnvU/4yFdIJdbz8kl/79+4GAUOg/vq3B7fpegytKpYZZVDnPbnBbjSA0Hm3jfR1LW+
+         EX+Q==
+X-Gm-Message-State: AOAM5330UXhrkqBOe1U3pxRfQh9qq7Xz6inSXlgUWwGcqfv6luI9xtJ6
+        CvK+zY8Ehv5Jd4MHGYndKms/2vvipE7CCDq25Qd7glnGdt6XbVNYwaEcZosZM1NjSAZNrPKl7PO
+        jdu0D4soIlPCu
+X-Received: by 2002:a05:600c:2312:b0:397:7647:2ac4 with SMTP id 18-20020a05600c231200b0039776472ac4mr3586881wmo.125.1654784902964;
+        Thu, 09 Jun 2022 07:28:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwESbXtfgCVdHUHBlqUyB7+uBGuQskr7UH7a9ukf3MhwYxhwZpS3sh4RAgSo9rKZX/Kfrr0xg==
+X-Received: by 2002:a05:600c:2312:b0:397:7647:2ac4 with SMTP id 18-20020a05600c231200b0039776472ac4mr3586843wmo.125.1654784902646;
+        Thu, 09 Jun 2022 07:28:22 -0700 (PDT)
+Received: from [192.168.1.129] (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
+        by smtp.gmail.com with ESMTPSA id g19-20020a05600c4ed300b0039c4506bd25sm24810750wmq.14.2022.06.09.07.28.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jun 2022 07:28:22 -0700 (PDT)
+Message-ID: <66dc8d78-ccd3-ac21-644d-26b8d20ba791@redhat.com>
+Date:   Thu, 9 Jun 2022 16:28:20 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH 1/2] x86: notify hypervisor about guest entering s2idle
- state
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v6 0/5] Fix some races between sysfb device registration
+ and drivers probe
 Content-Language: en-US
-To:     Grzegorz Jaszczyk <jaz@semihalf.com>, linux-kernel@vger.kernel.org
-Cc:     dmy@semihalf.com,
-        Zide Chen <zide.chen@intel.corp-partner.google.com>,
-        Peter Fang <peter.fang@intel.corp-partner.google.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>,
+To:     linux-kernel@vger.kernel.org
+Cc:     dri-devel@lists.freedesktop.org,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Daniel Vetter <daniel@ffwll.ch>,
         Hans de Goede <hdegoede@redhat.com>,
-        Sachi King <nakato@nakato.io>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        David Dunn <daviddunn@google.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "open list:ACPI" <linux-acpi@vger.kernel.org>,
-        "open list:HIBERNATION (aka Software Suspend, aka swsusp)" 
-        <linux-pm@vger.kernel.org>
-References: <20220609110337.1238762-1-jaz@semihalf.com>
- <20220609110337.1238762-2-jaz@semihalf.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20220609110337.1238762-2-jaz@semihalf.com>
+        Helge Deller <deller@gmx.de>, Jonathan Corbet <corbet@lwn.net>,
+        Peter Jones <pjones@redhat.com>, linux-doc@vger.kernel.org,
+        linux-fbdev@vger.kernel.org
+References: <20220607182338.344270-1-javierm@redhat.com>
+From:   Javier Martinez Canillas <javierm@redhat.com>
+In-Reply-To: <20220607182338.344270-1-javierm@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/9/22 04:03, Grzegorz Jaszczyk wrote:
-> Co-developed-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
-> Signed-off-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
-> Co-developed-by: Tomasz Nowicki <tn@semihalf.com>
-> Signed-off-by: Tomasz Nowicki <tn@semihalf.com>
-> Signed-off-by: Zide Chen <zide.chen@intel.corp-partner.google.com>
-> Co-developed-by: Grzegorz Jaszczyk <jaz@semihalf.com>
-> Signed-off-by: Grzegorz Jaszczyk <jaz@semihalf.com>
-> ---
->  Documentation/virt/kvm/x86/hypercalls.rst | 7 +++++++
->  arch/x86/kvm/x86.c                        | 3 +++
->  drivers/acpi/x86/s2idle.c                 | 8 ++++++++
->  include/linux/suspend.h                   | 1 +
->  include/uapi/linux/kvm_para.h             | 1 +
->  kernel/power/suspend.c                    | 4 ++++
->  6 files changed, 24 insertions(+)
+On 6/7/22 20:23, Javier Martinez Canillas wrote:
+> The patches in this series contain mostly changes suggested by Daniel Vetter
+> Thomas Zimmermann. They aim to fix existing races between the Generic System
+> Framebuffer (sysfb) infrastructure and the fbdev and DRM device registration.
+> 
+> For example, it is currently possible for sysfb to register a platform
+> device after a real DRM driver was registered and requested to remove the
+> conflicting framebuffers. Or is possible for a simple{fb,drm} to match with
+> a device previously registered by sysfb, even after a real driver is present.
+> 
+> A symptom of this issue, was worked around with the commit fb561bf9abde
+> ("fbdev: Prevent probing generic drivers if a FB is already registered")
+> but that's really a hack and should be reverted instead.
+> 
+> This series attempt to fix it more correctly and revert the mentioned hack.
+> That will also allow to make the num_registered_fb variable not visible to
+> drivers anymore, since that's internal to fbdev core.
+> 
 
-What's the deal with these emails?
+Pushed patches 1-4 to drm-misc (drm-misc-next). Thanks!
 
-	zide.chen@intel.corp-partner.google.com
+-- 
+Best regards,
 
-I see a smattering of those in the git logs, but never for Intel folks.
+Javier Martinez Canillas
+Linux Engineering
+Red Hat
 
-I'll also say that I'm a bit suspicious of a patch that includes 5
-authors for 24 lines of code.  Did it really take five of you to write
-24 lines of code?
