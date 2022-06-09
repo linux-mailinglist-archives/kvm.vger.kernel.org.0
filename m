@@ -2,66 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26CD354456E
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:13:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FAE4544618
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:39:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239122AbiFIINg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 04:13:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55628 "EHLO
+        id S241503AbiFIIhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 04:37:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240578AbiFIINa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:13:30 -0400
+        with ESMTP id S231558AbiFIIhx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 04:37:53 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 519895EDD8
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:13:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4C16D33E17
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:37:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654762408;
+        s=mimecast20190719; t=1654763871;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0UBhD5YEWFNp4aDc/ahVKPUNtBuVUhhYKUmhLtmUs50=;
-        b=LhXp7zrEl9+ReQFdw3iG8KP+6xBzlA45OHahSv9S+UnbYDVLpHoooXnfRvgyHvfHlU51P+
-        qQXOTihOyLNv0KNcn8zM+GSLo3ttSSR65TxEszx6xBjUVdC4EV0/+nxX5TvkjmEYeUvaPs
-        MxdhL+WPTe6n1jSx88L0WgMF0fnF9Qc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=694gobC9lwyLqW5J3peoYMEWnd+AT+IRtqYjzog1lRg=;
+        b=PcLHF1oftXOyIZ/cRVnIReAJEKI784DkRIbZDe97ZfB8cGcK20kYPpKa6BFAU+QMg5tRxo
+        5q/a2H6SZh/JnflcwYBnyTvpTvbl1gUmr0F0UTLNheYXwWEk9YhgEr+fse705Hcm7Oj90Y
+        wtRKtgz7+HNy6QSegmkB+5AShLVRYBk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-637-LSqcigi8OVWcf-rDwFRfYQ-1; Thu, 09 Jun 2022 04:13:27 -0400
-X-MC-Unique: LSqcigi8OVWcf-rDwFRfYQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AEF381C004E9;
-        Thu,  9 Jun 2022 08:13:26 +0000 (UTC)
-Received: from starship (unknown [10.40.194.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C72111121315;
-        Thu,  9 Jun 2022 08:13:22 +0000 (UTC)
-Message-ID: <909920fcfb5a614861fbc2654b3e8c1f0240bb51.camel@redhat.com>
-Subject: Re: [PATCH 4/7] KVM: x86: SVM: fix avic_kick_target_vcpus_fast
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        stable@vger.kernel.org
-Date:   Thu, 09 Jun 2022 11:13:21 +0300
-In-Reply-To: <c7fb78e2-2650-f9a2-3062-5d5ecc34332b@redhat.com>
-References: <20220606180829.102503-1-mlevitsk@redhat.com>
-         <20220606180829.102503-5-mlevitsk@redhat.com>
-         <c7fb78e2-2650-f9a2-3062-5d5ecc34332b@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-657-ITKA_GAyP4Cx7DfdKYKIkA-1; Thu, 09 Jun 2022 04:37:50 -0400
+X-MC-Unique: ITKA_GAyP4Cx7DfdKYKIkA-1
+Received: by mail-wr1-f69.google.com with SMTP id v4-20020adfebc4000000b002102c69be5eso5308772wrn.13
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 01:37:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=694gobC9lwyLqW5J3peoYMEWnd+AT+IRtqYjzog1lRg=;
+        b=bBR0Ea7ybhcUSTB2VFYkUXYPJQngH9U61nBL870c3hKdgLco8c7L8ErJttj6E8IQnj
+         s5tBjzwlsajLS8ZHySwGYuThnI0Afg82qOtkngSuL0E5MBUyf0YttPNcAaif4PwKjdly
+         mR+g6GuxTDjFBDV9KoOIU995op+ihSK8APeBE79rwvQWFTBiyLI5WolEytA/dtu7yHsi
+         vOxMrGZzvuQrao3ZnLBQd3b6t4nyxjTqRhOM+Iz6Sb/N1SiEPcU0tieX8c/GTcXbqghB
+         S1KCeBYDEGByFvUOtocTJIRyYX5ofUdI0cW+x4+gRTMEsnnZ36OXFk9epcU6q5R46ns3
+         5exQ==
+X-Gm-Message-State: AOAM532CGOHCZpvwb/KW1DXr2MgF/2YN4A2C7K6jBSubV7F9LThpqRZw
+        teAx7LTUjSXyB7gg9V9OB4VZ++f2W7jbhVE0hEvRcBtdZcqg8jYWR7igp7/2zz83qwADasa/VJ1
+        gIdH65QwqglaB
+X-Received: by 2002:a5d:4b90:0:b0:210:2b99:3862 with SMTP id b16-20020a5d4b90000000b002102b993862mr35493369wrt.586.1654763869332;
+        Thu, 09 Jun 2022 01:37:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzwiqT3Yvpq9pYGfhjPxNPxWZqR6y14eJJY0ZyXFqShFrcIt83mK03m0/3Oo0tgjuYoxDJ5vA==
+X-Received: by 2002:a5d:4b90:0:b0:210:2b99:3862 with SMTP id b16-20020a5d4b90000000b002102b993862mr35493350wrt.586.1654763869063;
+        Thu, 09 Jun 2022 01:37:49 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
+        by smtp.gmail.com with ESMTPSA id h1-20020a5d4fc1000000b0020fc4cd81f6sm23434686wrw.60.2022.06.09.01.37.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 01:37:48 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 10:37:45 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jason Wang <jasowang@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>,
+        Krasnov Arseniy <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v2 1/8] virtio/vsock: rework packet allocation logic
+Message-ID: <20220609083745.hgqzaq6i7s4u2cgx@sgarzare-redhat>
+References: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
+ <78157286-3663-202f-da94-1a17e4ffe819@sberdevices.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <78157286-3663-202f-da94-1a17e4ffe819@sberdevices.ru>
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -72,84 +87,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-06-08 at 15:21 +0200, Paolo Bonzini wrote:
-> On 6/6/22 20:08, Maxim Levitsky wrote:
-> > There are two issues in avic_kick_target_vcpus_fast
-> > 
-> > 1. It is legal to issue an IPI request with APIC_DEST_NOSHORT
-> >     and a physical destination of 0xFF (or 0xFFFFFFFF in case of x2apic),
-> >     which must be treated as a broadcast destination.
-> > 
-> >     Fix this by explicitly checking for it.
-> >     Also don’t use ‘index’ in this case as it gives no new information.
-> > 
-> > 2. It is legal to issue a logical IPI request to more than one target.
-> >     Index field only provides index in physical id table of first
-> >     such target and therefore can't be used before we are sure
-> >     that only a single target was addressed.
-> > 
-> >     Instead, parse the ICRL/ICRH, double check that a unicast interrupt
-> >     was requested, and use that info to figure out the physical id
-> >     of the target vCPU.
-> >     At that point there is no need to use the index field as well.
-> > 
-> > 
-> > In addition to fixing the above	issues,	also skip the call to
-> > kvm_apic_match_dest.
-> > 
-> > It is possible to do this now, because now as long as AVIC is not
-> > inhibited, it is guaranteed that none of the vCPUs changed their
-> > apic id from its default value.
-> > 
-> > 
-> > This fixes boot of windows guest with AVIC enabled because it uses
-> > IPI with 0xFF destination and no destination shorthand.
-> > 
-> > Fixes: 7223fd2d5338 ("KVM: SVM: Use target APIC ID to complete AVIC IRQs when possible")
-> > Cc: stable@vger.kernel.org
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> Is it possible to use kvm_intr_is_single_vcpu_fast, or am I missing 
-> something?
+On Fri, Jun 03, 2022 at 05:31:00AM +0000, Arseniy Krasnov wrote:
+>To support zerocopy receive, packet's buffer allocation
+>is changed: for buffers which could be mapped to user's
+>vma we can't use 'kmalloc()'(as kernel restricts to map
+>slab pages to user's vma) and raw buddy allocator now
+>called. But, for tx packets(such packets won't be mapped
+>to user), previous 'kmalloc()' way is used, but with special
+>flag in packet's structure which allows to distinguish
+>between 'kmalloc()' and raw pages buffers.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> include/linux/virtio_vsock.h            | 1 +
+> net/vmw_vsock/virtio_transport.c        | 8 ++++++--
+> net/vmw_vsock/virtio_transport_common.c | 9 ++++++++-
+> 3 files changed, 15 insertions(+), 3 deletions(-)
 
-Yes, except that it needs 'struct kvm_lapic_irq' which we won't have when
-we emulate guest<->guest interrupts, and also it goes over apic map and such,
-which can be be skipped.
+Each patch should as much as possible work to not break the 
+bisectability, and here we are not touching vhost_vsock_alloc_pkt() that 
+uses kmalloc to allocate the buffer.
 
-It also does more unneeded things like dealing with low priority mode for example,
-which thankfully AVIC doenst' support and if attempted will still VM exit
-with 'incomplete IPI' but with AVIC_IPI_FAILURE_INVALID_INT_TYPE subreason,
-which goes through full APIC register emulation.
+I see you updated it in the next patch, that should be fine, but here 
+you should set slab_buf in vhost_vsock_alloc_pkt(), or you can merge the 
+two patches.
 
-I do think about the fact that ICRL/H parsing in the case of logical ID,
-(which depends on cluser mode and x2apic mode) can be moved to some common
-code, but I wasn't able yet to find a clean way to do it.
-
-BTW: there is another case where AVIC must be inhibited: in xapic mode,
-logical ids, don't have to have a single bit set in the mask area of the logical id, 
-(low 4 bits in cluster mode and all 8 bits in flat mode)
-and neither there is a guarnantee that multilple CPUs don't share these bits.
-
-AVIC however has a logical ID table which maps each (bit x cluster value) to a physical id,
-and therefore a single vCPU, so tha later is not possible to support with AVIC.
-
-I haven't studied the code that is responsible for this, I will do this soon.
-
-
-Thankfully IPIv only supports physical IPI mode (this is what I heard, don't know for sure).
-
-I also will write a unit test for this very soon, to test various logical id
-IPIs, messing with logical id registers, etc, etc.
-
-Best regards,
-	Maxim Levitsky
-
-
-> 
-> Series queued, thanks.
-> 
-> Paolo
-> 
-
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index 35d7eedb5e8e..d02cb7aa922f 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -50,6 +50,7 @@ struct virtio_vsock_pkt {
+> 	u32 off;
+> 	bool reply;
+> 	bool tap_delivered;
+>+	bool slab_buf;
+> };
+>
+> struct virtio_vsock_pkt_info {
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index ad64f403536a..19909c1e9ba3 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -255,16 +255,20 @@ static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
+> 	vq = vsock->vqs[VSOCK_VQ_RX];
+>
+> 	do {
+>+		struct page *buf_page;
+>+
+> 		pkt = kzalloc(sizeof(*pkt), GFP_KERNEL);
+> 		if (!pkt)
+> 			break;
+>
+>-		pkt->buf = kmalloc(buf_len, GFP_KERNEL);
+>-		if (!pkt->buf) {
+>+		buf_page = alloc_page(GFP_KERNEL);
+>+
+>+		if (!buf_page) {
+> 			virtio_transport_free_pkt(pkt);
+> 			break;
+> 		}
+>
+>+		pkt->buf = page_to_virt(buf_page);
+> 		pkt->buf_len = buf_len;
+> 		pkt->len = buf_len;
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index ec2c2afbf0d0..278567f748f2 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -69,6 +69,7 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+> 		if (!pkt->buf)
+> 			goto out_pkt;
+>
+>+		pkt->slab_buf = true;
+> 		pkt->buf_len = len;
+>
+> 		err = memcpy_from_msg(pkt->buf, info->msg, len);
+>@@ -1342,7 +1343,13 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
+>
+> void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
+> {
+>-	kfree(pkt->buf);
+>+	if (pkt->buf_len) {
+>+		if (pkt->slab_buf)
+>+			kfree(pkt->buf);
+>+		else
+>+			free_pages(buf, get_order(pkt->buf_len));
+>+	}
+>+
+> 	kfree(pkt);
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
+>-- 
+>2.25.1
 
