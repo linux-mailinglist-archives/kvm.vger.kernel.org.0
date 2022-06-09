@@ -2,104 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C267544256
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 06:09:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5D13544265
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 06:19:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237281AbiFIEJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 00:09:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32780 "EHLO
+        id S235159AbiFIETO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 00:19:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbiFIEJc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 00:09:32 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD343EF01
-        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 21:09:29 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id v14so4412109wra.5
-        for <kvm@vger.kernel.org>; Wed, 08 Jun 2022 21:09:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qr3m2Yddcj/9rkP9P1MqPdJ/Rr6E/RCde4JzQwq0ygk=;
-        b=jjA7kaTwlPG+8lAJw8aS2qYkTELSRhTtioIkasP3Ua7Ncb8/Um8F1OEZyiGbMI6SeO
-         ETd1KmKAR6a+w/PaNJyt8tzy4HP7ptThXmSP4ZLLdG/HPw9N535qzDqZ/aaVsB6mpgs4
-         ekokUA+HBIacx6iBplvxFX5b4YM3ZxJ9X0ffgyTEb8LkEJlwYpfaYJOrYnc5ZaefX82u
-         xXximfYvyQtlDROih7T+K0lvuvtzvkPaB9YyinAkRhhjbudH7UkKve6UtSpzaLWj3IEH
-         PgmYE6GWpSDDrFh2H+0Anhh0sjG9TVGHn0ycyusXPfTXgQT5l5+hSgm3wUfg3mh0tas3
-         xbXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qr3m2Yddcj/9rkP9P1MqPdJ/Rr6E/RCde4JzQwq0ygk=;
-        b=swYvUYKmK2C3fw1I1cGqcXaZH0RjDougOqJRxBGP4HMbO3E3BXZEE8rBvYCu7LMCPX
-         6BXk8XWtxG3ek6MpUkM6eJtfImB1o1nCJBTSLRFB2cIIg+GgG6iGD/t/PD2FBridCD5C
-         X92BAwhQ5YA6T7b+dEYHbxF6qsC+vzaA+mjOIMwzD8n7v4UyFr7pB0o5pQd3cUmlw0d2
-         DNwntnd3w+sIuOZkolk98+6QlurB7BwDkLg80Y863/RboX8B+msOhWPfmZmrAFCjAf/D
-         vzwzT+Lse0lNkreX08Xsa6ANsQQ85c6bp5Dc+R71tYulz5XNBrQO23eG+zdJlNgpv8EJ
-         8wiw==
-X-Gm-Message-State: AOAM533AD4cQ9tDal0MzBKK5Enxyx2AHpeBxACmjFT+WfPuDu2/ayhSp
-        6fEfY+65vCfOfKQZCvFNiKLles6qejJPGtVpe8GXUA==
-X-Google-Smtp-Source: ABdhPJzATZGYNXOEfNeC1xjFpQoXzH0chk3Mdxdc6eyXuvY61inSv66u7opI40j6F9/vdCRh2cJ/4vUkZLFYNZGRkY8=
-X-Received: by 2002:a5d:6c6b:0:b0:1ea:77ea:dde8 with SMTP id
- r11-20020a5d6c6b000000b001ea77eadde8mr36664559wrz.690.1654747767939; Wed, 08
- Jun 2022 21:09:27 -0700 (PDT)
+        with ESMTP id S232593AbiFIETN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 00:19:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F28F2FA608
+        for <kvm@vger.kernel.org>; Wed,  8 Jun 2022 21:19:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654748351;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=2EUgTmBmBQS8TADvNh3w+eG84Zb6i5oxbEJ7TRa74m8=;
+        b=NR6wseoncpZHa7RFyM51BZZCd0odUNsPs5ST3o4Qqp6FQlrd4Obx+LpVZpfpqxH+fsXeE6
+        o87uoRgPP1QKbVdMXmuSKDFkQy4OMqUAvAJpP59sBc4ARGZd3J+pUR/+jy6cotnaiqerJ7
+        FhNVb91JRDTNsSodZt7N5C45Sb+y2AY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-575-z2rJ_Z0XPfueqmTPLXd04A-1; Thu, 09 Jun 2022 00:19:07 -0400
+X-MC-Unique: z2rJ_Z0XPfueqmTPLXd04A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F6C3811E75;
+        Thu,  9 Jun 2022 04:19:07 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-14-4.pek2.redhat.com [10.72.14.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7733A1730C;
+        Thu,  9 Jun 2022 04:19:04 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     mst@redhat.com, jasowang@redhat.com
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Gautam Dawar <gautam.dawar@xilinx.com>
+Subject: [PATCH] vdpa: make get_vq_group and set_group_asid optional
+Date:   Thu,  9 Jun 2022 12:19:01 +0800
+Message-Id: <20220609041901.2029-1-jasowang@redhat.com>
 MIME-Version: 1.0
-References: <20220430191122.8667-6-Julia.Lawall@inria.fr>
-In-Reply-To: <20220430191122.8667-6-Julia.Lawall@inria.fr>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 9 Jun 2022 09:39:15 +0530
-Message-ID: <CAAhSdy1kEPYJQdK+f-6Dkb92ScV9fG2m0J2rJSeWjfNFUtjVwA@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: fix typos in comments
-To:     Julia Lawall <Julia.Lawall@inria.fr>
-Cc:     kernel-janitors@vger.kernel.org,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 1, 2022 at 12:41 AM Julia Lawall <Julia.Lawall@inria.fr> wrote:
->
-> Various spelling mistakes in comments.
-> Detected with the help of Coccinelle.
->
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+This patch makes get_vq_group and set_group_asid optional. This is
+needed to unbreak the vDPA parent that doesn't support multiple
+address spaces.
 
-I have included this patch for 5.19-rc fixes
+Cc: Gautam Dawar <gautam.dawar@xilinx.com>
+Fixes: aaca8373c4b1 ("vhost-vdpa: support ASID based IOTLB API")
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/vhost/vdpa.c | 2 ++
+ include/linux/vdpa.h | 5 +++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-Thanks,
-Anup
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 935a1d0ddb97..5ad2596c6e8a 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -499,6 +499,8 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 		ops->set_vq_ready(vdpa, idx, s.num);
+ 		return 0;
+ 	case VHOST_VDPA_GET_VRING_GROUP:
++		if (!ops->get_vq_group)
++			return -EOPNOTSUPP;
+ 		s.index = idx;
+ 		s.num = ops->get_vq_group(vdpa, idx);
+ 		if (s.num >= vdpa->ngroups)
+diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+index 15af802d41c4..6113a978fbcd 100644
+--- a/include/linux/vdpa.h
++++ b/include/linux/vdpa.h
+@@ -176,7 +176,8 @@ struct vdpa_map_file {
+  *				for the device
+  *				@vdev: vdpa device
+  *				Returns virtqueue algin requirement
+- * @get_vq_group:		Get the group id for a specific virtqueue
++ * @get_vq_group:		Get the group id for a specific
++ *				virtqueue (optional)
+  *				@vdev: vdpa device
+  *				@idx: virtqueue index
+  *				Returns u32: group id for this virtqueue
+@@ -241,7 +242,7 @@ struct vdpa_map_file {
+  *				Returns the iova range supported by
+  *				the device.
+  * @set_group_asid:		Set address space identifier for a
+- *				virtqueue group
++ *				virtqueue group (optional)
+  *				@vdev: vdpa device
+  *				@group: virtqueue group
+  *				@asid: address space id for this group
+-- 
+2.25.1
 
->
-> ---
->  arch/riscv/kvm/vmid.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
-> index 2fa4f7b1813d..4a2178c60b5d 100644
-> --- a/arch/riscv/kvm/vmid.c
-> +++ b/arch/riscv/kvm/vmid.c
-> @@ -92,7 +92,7 @@ void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu)
->                  * We ran out of VMIDs so we increment vmid_version and
->                  * start assigning VMIDs from 1.
->                  *
-> -                * This also means existing VMIDs assignement to all Guest
-> +                * This also means existing VMIDs assignment to all Guest
->                  * instances is invalid and we have force VMID re-assignement
->                  * for all Guest instances. The Guest instances that were not
->                  * running will automatically pick-up new VMIDs because will
->
