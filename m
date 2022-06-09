@@ -2,177 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86CE9545681
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 23:33:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99444545697
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 23:41:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239526AbiFIVdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 17:33:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53030 "EHLO
+        id S241904AbiFIVlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 17:41:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbiFIVdi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 17:33:38 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2ACEE1147
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 14:33:34 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id o6so16174057plg.2
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 14:33:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=m7ycA4UvCRcWR4yKEUVYS54WeWG49dg/6jDxIB9tTNA=;
-        b=Jqq2qaUmztHXYlLC5OtDZ1kjE3J4zkrncd42dGrvID2KbEKbAY9YGGZYNNdpgSsi17
-         LVCDdST/dYjbt6pTf+bnRXMgQM4hHqzJLOyHwtqChyrmT6E2+mlWn5hIF2V0TZSXd6yt
-         tVMowv8ZPTS/p62/qff/4OAqw4onqe01bLt8JukOqng8pdaIBh7P0ZeFKNL9ggilP8vk
-         5LxStOh07fwcYGt8ioBMcXY0DG9zd6FfQyvQKMf0TjX0iv11uUTujpxVcY4APAA0AWAO
-         YqnYYpPyAl71U0a8/FIrW8jkdfNmx0BdSLrmQttJMQoo9xzBZXmfFbTJdG+/jUdJJ56l
-         IKXw==
+        with ESMTP id S241840AbiFIVlM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 17:41:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 960E252E63
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 14:41:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654810870;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+0dAgKBzfPuu/Qpg4c3Cqr8k4N4HCUwtJu4hqNYeV2g=;
+        b=YmbL4XZoIJIOU4TL7LW8rCrw/7uNf5B5FP8xCfmWk3JAYRaupqmT4j/MS/WkcR74lWZGHn
+        RtSTBE6ULNM77O3y18CSeqyaMeAG67/fgAZG5R5LVQ1ZU00MowNrZezPy5WLmVXnGTYFPe
+        K/WbUwPqIRzXvEP/Tdl1Sb7UHjFSSfs=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-148-bdWv-sSZOyqN5vrcPfgKHA-1; Thu, 09 Jun 2022 17:41:07 -0400
+X-MC-Unique: bdWv-sSZOyqN5vrcPfgKHA-1
+Received: by mail-il1-f198.google.com with SMTP id i16-20020a056e021d1000b002d3bbe39232so18456242ila.20
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 14:41:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=m7ycA4UvCRcWR4yKEUVYS54WeWG49dg/6jDxIB9tTNA=;
-        b=zGobQefxCQrQBZvSnx0DcVy7EcleyLR7/eK+bBDwMTvNTY9HwKtiuv5hfwfI15hUXG
-         A93CdG8FDHjlkI0zWYv7ORldJuFS6R1a8iFNnPV4EqnreiP5wyVocOtO9Ntzte9bH5iR
-         NqtEX8be5z7S7kNvoB2DaIFSNqUUJk/f8kpw+TFt3cR8kvWWnRh3mL2sdezoqj8FNynb
-         Nm3w2dd3oLKbLMY46ix3Tlcb+8t3kb50Lkp1+MLQBTOB8gqsVUjnQMzdYcn34oT1BZhX
-         bwNi6JJofMeVn8ilRMtPFQTzoESlEtBPoIXT178sa61NVmswN5nlCizBQuZ6gyDoVEJK
-         GT+Q==
-X-Gm-Message-State: AOAM530IeFffOHob0oIjuiNcwkElGtbHLCIhJrvpGlMy7N9l0JM7kSZK
-        /hzWTir+nAF9AI/3Rn2TlHfJRI9o5pG3dA==
-X-Google-Smtp-Source: ABdhPJyMFtULqK6xP7o6ODg72mXgOYMUfRbFIM45qO5zRVZM10jyMpfcu73oXSgj7e4Wxz96JFuhfg==
-X-Received: by 2002:a17:903:2312:b0:163:daf7:83a9 with SMTP id d18-20020a170903231200b00163daf783a9mr41587405plh.160.1654810414111;
-        Thu, 09 Jun 2022 14:33:34 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h11-20020a62830b000000b0050dc7628150sm17761006pfe.42.2022.06.09.14.33.32
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=+0dAgKBzfPuu/Qpg4c3Cqr8k4N4HCUwtJu4hqNYeV2g=;
+        b=FXD1+W2ZIX76ePrccrRE2YFSOvbFJjgmWCFXGePottK8vDigQvA3EbIpnxoKA5N92l
+         3uasLGw3UVTKvFXsfdrE/nbuvG1n71wkLKNnhNMLDGjBjnl8/zgWZIVqyfaRRB0A5qKQ
+         MJ7uE4ZFdF3zTrNBEur9JeznjnbNv+kceHxDIaBui6XjdIwz9wIucm6Bbl5bd36LAeQ2
+         U8mPAdKdhnkSLQutp3p6cqF/xangTigpfHx9qI8ucT21Ok/OrXx0Mx73aghXyHDM+ePJ
+         EmDHqiBjPU6CcmbkYOzLhVhLi39Kg/+nYvmtRgEJa342Izz/yyVWiG/geE5JK/ncZ3c3
+         t8BA==
+X-Gm-Message-State: AOAM531egtD0JiVfNJ10Z0tawuPI7fie3PNrSBp2s8HxUVXU0Nmg/1qF
+        rIMkaun0mMiyOwcvgd9ETcPu6AFqWEb+RbtGRDwBTfks7VEYJW/eS/piBHL5PKHcQh6zqIhfnL1
+        hYQg4p1odOEjq
+X-Received: by 2002:a05:6638:dd3:b0:331:d98c:9a67 with SMTP id m19-20020a0566380dd300b00331d98c9a67mr7194724jaj.47.1654810866034;
+        Thu, 09 Jun 2022 14:41:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxLYxbzXLY+uqvkGUeuaM8Esk3FhbYDeZwBAuNSC8NN4cjxlecj6CnbA+l3i4GOPufnvI4knw==
+X-Received: by 2002:a05:6638:dd3:b0:331:d98c:9a67 with SMTP id m19-20020a0566380dd300b00331d98c9a67mr7194664jaj.47.1654810864338;
+        Thu, 09 Jun 2022 14:41:04 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a18-20020a6b6d12000000b0066938e02579sm7583703iod.38.2022.06.09.14.41.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 14:33:32 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 21:33:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/6] KVM: x86: inline kernel_pio into its sole caller
-Message-ID: <YqJnKSpnPFZ5VsnL@google.com>
-References: <20220608121253.867333-1-pbonzini@redhat.com>
- <20220608121253.867333-2-pbonzini@redhat.com>
+        Thu, 09 Jun 2022 14:41:03 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 15:41:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Thomas Zimmermann <tzimmermann@suse.de>
+Cc:     kvm@vger.kernel.org, airlied@linux.ie,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        Laszlo Ersek <lersek@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
+Message-ID: <20220609154102.5cb1d3ca.alex.williamson@redhat.com>
+In-Reply-To: <01c74525-38b7-1e00-51ba-7cd793439f03@suse.de>
+References: <165453797543.3592816.6381793341352595461.stgit@omen>
+        <165453800875.3592816.12944011921352366695.stgit@omen>
+        <0c45183c-cdb8-4578-e346-bc4855be038f@suse.de>
+        <20220608080432.45282f0b.alex.williamson@redhat.com>
+        <01c74525-38b7-1e00-51ba-7cd793439f03@suse.de>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220608121253.867333-2-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08, 2022, Paolo Bonzini wrote:
-> The caller of kernel_pio already has arguments for most of what kernel_pio
-> fishes out of vcpu->arch.pio.  This is the first step towards ensuring that
-> vcpu->arch.pio.* is only used when exiting to userspace.
+On Thu, 9 Jun 2022 11:13:22 +0200
+Thomas Zimmermann <tzimmermann@suse.de> wrote:
 > 
-> We can now also WARN if emulated PIO performs successful in-kernel iterations
-> before having to fall back to userspace.  The code is not ready for that, and
-> it should never happen.
+> Please have a look at the attached patch. It moves the aperture helpers 
+> to a location common to the various possible users (DRM, fbdev, vfio). 
+> The DRM interfaces remain untouched for now.  The patch should provide 
+> what you need in vfio and also serve our future use cases for graphics 
+> drivers. If possible, please create your patch on top of it.
 
-Please avoid pronouns and state what patch does, not what "can" be done.  It's not
-clear without reading the actual code whether "The code is not ready for that" means
-"KVM is not ready to WARN" or "KVM is not ready to fall back to exiting userspace
-if a
+Looks good to me, this of course makes the vfio change quite trivial.
+One change I'd request:
 
-E.g.
+diff --git a/drivers/video/console/Kconfig b/drivers/video/console/Kconfig
+index 40c50fa2dd70..7f3c44e1538b 100644
+--- a/drivers/video/console/Kconfig
++++ b/drivers/video/console/Kconfig
+@@ -10,6 +10,7 @@ config VGA_CONSOLE
+ 	depends on !4xx && !PPC_8xx && !SPARC && !M68K && !PARISC &&  !SUPERH && \
+ 		(!ARM || ARCH_FOOTBRIDGE || ARCH_INTEGRATOR || ARCH_NETWINDER) && \
+ 		!ARM64 && !ARC && !MICROBLAZE && !OPENRISC && !S390 && !UML
++	select APERTURE_HELPERS if (DRM || FB || VFIO_PCI)
+ 	default y
+ 	help
+ 	  Saying Y here will allow you to use Linux in text mode through a
 
-  WARN if emulated PIO falls back to userspace after successfully handling
-  one or more in-kernel iterations.  The port, size, and access type do not
-  change, and KVM so it should be impossible for in-kernel PIO to fail on
-  subsequent iterations.
+This should be VFIO_PCI_CORE.  Thanks,
 
-That said, I don't think the above statement is true.  KVM is running with SRCU
-protection, but the synchronize_srcu_expedited() in kvm_io_bus_unregister_dev()
-only protects against use-after-free, it does not prevent two calls to
-kvm_io_bus_read() from seeing different incarnations of kvm->buses.
+Alex
 
-And if I'm right, that could be exploited to create a buffer overrun due to doing
-this memcpy with "data = <original data> + i * size".
-
-	else
-		memcpy(vcpu->arch.pio_data, data, size * count);
-
-The existing code is arguably wrong too in that it will result in replaying PIO
-accesses, but IMO userspace gets to keep the pieces if it unregisters a device
-while vCPUs are running.
- 
-> No functional change intended.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 39 +++++++++++++++++----------------------
->  1 file changed, 17 insertions(+), 22 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 79efdc19b4c8..2f9100f2564e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7415,37 +7415,32 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
->  	return emulator_write_emulated(ctxt, addr, new, bytes, exception);
->  }
->  
-> -static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
-> -{
-> -	int r = 0, i;
-> -
-> -	for (i = 0; i < vcpu->arch.pio.count; i++) {
-> -		if (vcpu->arch.pio.in)
-> -			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, vcpu->arch.pio.port,
-> -					    vcpu->arch.pio.size, pd);
-> -		else
-> -			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS,
-> -					     vcpu->arch.pio.port, vcpu->arch.pio.size,
-> -					     pd);
-> -		if (r)
-> -			break;
-> -		pd += vcpu->arch.pio.size;
-> -	}
-> -	return r;
-> -}
-> -
->  static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
->  			       unsigned short port,
->  			       unsigned int count, bool in)
->  {
-> +	void *data = vcpu->arch.pio_data;
-> +	unsigned i;
-> +	int r;
-> +
->  	vcpu->arch.pio.port = port;
->  	vcpu->arch.pio.in = in;
-> -	vcpu->arch.pio.count  = count;
-> +	vcpu->arch.pio.count = count;
->  	vcpu->arch.pio.size = size;
->  
-> -	if (!kernel_pio(vcpu, vcpu->arch.pio_data))
-> -		return 1;
-> +	for (i = 0; i < count; i++) {
-> +		if (in)
-> +			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, port, size, data);
-> +		else
-> +			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS, port, size, data);
-> +		if (r)
-> +			goto userspace_io;
-> +		data += size;
-> +	}
-> +	return 1;
->  
-> +userspace_io:
-> +	WARN_ON(i != 0);
->  	vcpu->run->exit_reason = KVM_EXIT_IO;
->  	vcpu->run->io.direction = in ? KVM_EXIT_IO_IN : KVM_EXIT_IO_OUT;
->  	vcpu->run->io.size = size;
-> -- 
-> 2.31.1
-> 
-> 
