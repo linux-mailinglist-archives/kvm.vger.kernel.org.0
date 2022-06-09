@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFFA3544628
-	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:41:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9C2A54464C
+	for <lists+kvm@lfdr.de>; Thu,  9 Jun 2022 10:48:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242217AbiFIIlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 04:41:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39710 "EHLO
+        id S230490AbiFIIo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 04:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241992AbiFIIjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:39:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 91A6F5FC8
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:39:38 -0700 (PDT)
+        with ESMTP id S242777AbiFIIn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 04:43:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1353446C9D
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 01:42:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654763977;
+        s=mimecast20190719; t=1654764130;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=FkEmK5Yjp3T2Zha/9EpqMwyl5wd2BEswY0cUWBW6j8E=;
-        b=B7fELXwOwyBaizHOZ/oE38nKXOcYWKRuDieFuiHwv/wT0ss/3PIX1kbaK7ZRvU5ayT+n+r
-        hGNc/UJXJ8badER63CzFq/3/1lUYjmiEsuj827Rcv5WB80vFf4HQ6JjwMcXptQpwe4C8MT
-        Rr15c7imszzqN0AKL5YI3RfaKxk1Ijk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=hbvCaL1wOfOFrYCFWGLThfbo1GLwl4GEM9yi4TGDwQo=;
+        b=SZuPhUKw67ZzyeFu/1wuWbnRkB5reGHt0Lstl3OEB5SpSStN6Xd4U+WCwOyEEyl44AZZug
+        +kFow8lveUVaWErzhWh9xpS+3QEiizfFZe17/Gh11yoIKHbNAszNOoBMfNMS8OoiEvBRKp
+        /UMLvFmGamyzFc3fdx815Rr1j4fxO5o=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-9-xNgxaCdRN56dhR6w6fNPMg-1; Thu, 09 Jun 2022 04:39:34 -0400
-X-MC-Unique: xNgxaCdRN56dhR6w6fNPMg-1
-Received: by mail-wm1-f70.google.com with SMTP id k32-20020a05600c1ca000b0039c4cf75023so6704377wms.9
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 01:39:34 -0700 (PDT)
+ us-mta-354-BvloDDHDOQijyVZFoewZgw-1; Thu, 09 Jun 2022 04:42:01 -0400
+X-MC-Unique: BvloDDHDOQijyVZFoewZgw-1
+Received: by mail-wm1-f69.google.com with SMTP id p24-20020a05600c1d9800b0039c51c2da19so524133wms.0
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 01:42:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=FkEmK5Yjp3T2Zha/9EpqMwyl5wd2BEswY0cUWBW6j8E=;
-        b=4cpITlG0qjqh/gXJ8JY4klW3BUV9Y65HBO8/Z59cYMpq+zk/BSXPJ4ZnR8/x09yIyl
-         BaxoOb2o52O5SO8PGZ6RGvARPWX27Lnsr5so8ws57IdAW1v6CI/EcqagasWSBLrpl7/x
-         ea/+c8mp0WXO8wGslDqz1GdrMJ/DCXyDtMzvbB7Ov1h5MHpU29blBzazPNS8oWfLxF+S
-         wvW/+GDLqgVR+CFxqRB+6ujuBGz//wXi/uCT9e/ObDyTMNoiCoRNSlU2voGmIt/Eizx0
-         f0HUPyrSmkG8g6zNfhJwEVOFGYhk0Mc4BVFeR+NpiUQ918jKm7YREieBQ9BnKZ2s1JPs
-         d2sQ==
-X-Gm-Message-State: AOAM533Fxmy4pjCHK9R2ZlHi6tbKoPTnXA9QpILrmdNhjrobE6Eh3ZqV
-        4gxeoVvuAbFR7t2AcG3nmwclJIctmVHu1DH34rfrPhiTV/6wLl14S8Mb9bO0rAoIO+gwCEUYdMI
-        lIZlieiI0aV7F
-X-Received: by 2002:a05:600c:d0:b0:39c:5927:3fa7 with SMTP id u16-20020a05600c00d000b0039c59273fa7mr2178811wmm.36.1654763973471;
-        Thu, 09 Jun 2022 01:39:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwipOC17XpHdu2HZYnw61hrXrs5XVkMTXD2WI/C7Xf1w4B5Nd4hlKO567xMpO1R9xcMkD1aqQ==
-X-Received: by 2002:a05:600c:d0:b0:39c:5927:3fa7 with SMTP id u16-20020a05600c00d000b0039c59273fa7mr2178778wmm.36.1654763973160;
-        Thu, 09 Jun 2022 01:39:33 -0700 (PDT)
+        bh=hbvCaL1wOfOFrYCFWGLThfbo1GLwl4GEM9yi4TGDwQo=;
+        b=ItOqP3vq85FgS3c3M+mji4BAyb5kHmEXgfVdaFi34GPpH/Rsb6Yb34QS8XOTjefSaK
+         m7j8MagcN7+3wL34AGubGZ+RkCo7PZnoT5oL0PI0jQqXlT4SGhnJAFYUuEpA85LEag1R
+         BrgN4fcPg3i6tV8s/zcf/8J3DLwv5/5DI+ymZR8pFM/t4fWSTT0SDlU6/BuFwTwi+E3l
+         lgvwpg3cdsPDofSmVwxjbsu7+oeQJTfatGac20kmPlX3x58JBP2HJ1ag0YXExFRmm7+D
+         X0HF+q4Du3CfVVA20YOBNaP0g9wLCWXI/uE0gCOvD/Rj3m50J5QbR6YoQOCd53/hhaJt
+         wgKg==
+X-Gm-Message-State: AOAM532VvoaMHmGrGGLzR8msIUMZe/A2n9n23QEP472YL1tVfN2PfLHJ
+        zjXJxuppnSmu+kd2mQB+rPCVZCl39LYkwg2idXozu+rs3nE1UO4CZUJRb7vkJ7FP6h1A9EeHKV7
+        Ye3F5GlR8se2r
+X-Received: by 2002:adf:e189:0:b0:218:45f0:5c0a with SMTP id az9-20020adfe189000000b0021845f05c0amr17559332wrb.683.1654764118263;
+        Thu, 09 Jun 2022 01:41:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysiPURDeTjXE66ZO6ZgkFeDnfAlmBehDg4QQ8l/XXYzqjWiblxWAsfpyM1NHDhusMQyK9a/Q==
+X-Received: by 2002:adf:e189:0:b0:218:45f0:5c0a with SMTP id az9-20020adfe189000000b0021845f05c0amr17559297wrb.683.1654764117949;
+        Thu, 09 Jun 2022 01:41:57 -0700 (PDT)
 Received: from sgarzare-redhat (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
-        by smtp.gmail.com with ESMTPSA id d16-20020a05600c34d000b003973d425a7fsm2047244wmq.41.2022.06.09.01.39.31
+        by smtp.gmail.com with ESMTPSA id p9-20020a5d4589000000b0020fcf070f61sm23705284wrq.59.2022.06.09.01.41.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 01:39:32 -0700 (PDT)
-Date:   Thu, 9 Jun 2022 10:39:29 +0200
+        Thu, 09 Jun 2022 01:41:57 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 10:41:54 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -69,14 +69,14 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         kernel <kernel@sberdevices.ru>,
         Krasnov Arseniy <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v2 3/8] af_vsock: add zerocopy receive logic
-Message-ID: <20220609083929.5k37tajo3qli4kr2@sgarzare-redhat>
+Subject: Re: [RFC PATCH v2 4/8] virtio/vsock: add transport zerocopy callback
+Message-ID: <20220609084154.kvkkc2iax456lvud@sgarzare-redhat>
 References: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
- <129aa328-ad4d-cb2c-4a51-4a2bf9c9be37@sberdevices.ru>
+ <6f76eed7-decc-68d1-6ae7-7bafb09fdad3@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <129aa328-ad4d-cb2c-4a51-4a2bf9c9be37@sberdevices.ru>
+In-Reply-To: <6f76eed7-decc-68d1-6ae7-7bafb09fdad3@sberdevices.ru>
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -87,221 +87,310 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 03, 2022 at 05:35:48AM +0000, Arseniy Krasnov wrote:
->This:
->1) Adds callback for 'mmap()' call on socket. It checks vm
->   area flags and sets vm area ops.
->2) Adds special 'getsockopt()' case which calls transport
->   zerocopy callback. Input argument is vm area address.
->3) Adds 'getsockopt()/setsockopt()' for switching on/off rx
->   zerocopy mode.
+On Fri, Jun 03, 2022 at 05:37:48AM +0000, Arseniy Krasnov wrote:
+>This adds transport callback which processes rx
+>queue of socket and instead of copying data to
+>user provided buffer, it inserts data pages of
+>each packet to user's vm area.
 >
 >Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >---
-> include/net/af_vsock.h          |   7 +++
-> include/uapi/linux/vm_sockets.h |   3 +
-> net/vmw_vsock/af_vsock.c        | 100 ++++++++++++++++++++++++++++++++
-> 3 files changed, 110 insertions(+)
+> include/linux/virtio_vsock.h            |   4 +
+> include/uapi/linux/virtio_vsock.h       |   6 +
+> net/vmw_vsock/virtio_transport_common.c | 208 +++++++++++++++++++++++-
+> 3 files changed, 215 insertions(+), 3 deletions(-)
 >
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index f742e50207fb..f15f84c648ff 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -135,6 +135,13 @@ struct vsock_transport {
-> 	bool (*stream_is_active)(struct vsock_sock *);
-> 	bool (*stream_allow)(u32 cid, u32 port);
->
->+	int (*rx_zerocopy_set)(struct vsock_sock *vsk,
->+			       bool enable);
->+	int (*rx_zerocopy_get)(struct vsock_sock *vsk);
->+	int (*zerocopy_dequeue)(struct vsock_sock *vsk,
->+				struct vm_area_struct *vma,
->+				unsigned long addr);
->+
-> 	/* SEQ_PACKET. */
-> 	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
-> 				     int flags);
->diff --git a/include/uapi/linux/vm_sockets.h b/include/uapi/linux/vm_sockets.h
->index c60ca33eac59..d1f792bed1a7 100644
->--- a/include/uapi/linux/vm_sockets.h
->+++ b/include/uapi/linux/vm_sockets.h
->@@ -83,6 +83,9 @@
->
-> #define SO_VM_SOCKETS_CONNECT_TIMEOUT_NEW 8
->
->+#define SO_VM_SOCKETS_MAP_RX 9
->+#define SO_VM_SOCKETS_ZEROCOPY 10
->+
-> #if !defined(__KERNEL__)
-> #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-> #define SO_VM_SOCKETS_CONNECT_TIMEOUT SO_VM_SOCKETS_CONNECT_TIMEOUT_OLD
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index f04abf662ec6..10061ef21730 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1644,6 +1644,17 @@ static int vsock_connectible_setsockopt(struct socket *sock,
-> 		}
-> 		break;
-> 	}
->+	case SO_VM_SOCKETS_ZEROCOPY: {
->+		if (!transport || !transport->rx_zerocopy_set) {
->+			err = -EOPNOTSUPP;
->+		} else {
->+			COPY_IN(val);
->+
->+			if (transport->rx_zerocopy_set(vsk, val))
->+				err = -EINVAL;
->+		}
->+		break;
->+	}
->
-> 	default:
-> 		err = -ENOPROTOOPT;
->@@ -1657,6 +1668,48 @@ static int vsock_connectible_setsockopt(struct socket *sock,
-> 	return err;
-> }
->
->+static const struct vm_operations_struct afvsock_vm_ops = {
->+};
->+
->+static int vsock_recv_zerocopy(struct socket *sock,
->+			       unsigned long address)
->+{
->+	struct sock *sk = sock->sk;
->+	struct vsock_sock *vsk = vsock_sk(sk);
->+	struct vm_area_struct *vma;
->+	const struct vsock_transport *transport;
->+	int res;
->+
->+	transport = vsk->transport;
->+
->+	if (!transport->rx_zerocopy_get)
->+		return -EOPNOTSUPP;
->+
->+	if (!transport->rx_zerocopy_get(vsk))
->+		return -EOPNOTSUPP;
-
-Maybe we can merge in
-         if (!transport->rx_zerocopy_get ||
-             !transport->rx_zerocopy_get(vsk)}
-                 return -EOPNOTSUPP;
-
->+
->+	if (!transport->zerocopy_dequeue)
->+		return -EOPNOTSUPP;
->+
->+	lock_sock(sk);
->+	mmap_write_lock(current->mm);
-
-So, multiple threads using different sockets are serialized if they use 
-zero-copy?
-
-IIUC this is necessary because the callback calls vm_insert_page().
-
-At this point I think it's better not to do this in every transport, but 
-have the callback return an array of pages to map and we map them here 
-trying to limit as much as possible the critical section to protect with 
-mmap_write_lock().
-
->+
->+	vma = vma_lookup(current->mm, address);
->+
->+	if (!vma || vma->vm_ops != &afvsock_vm_ops) {
->+		mmap_write_unlock(current->mm);
->+		release_sock(sk);
->+		return -EINVAL;
->+	}
->+
->+	res = transport->zerocopy_dequeue(vsk, vma, address);
->+
->+	mmap_write_unlock(current->mm);
->+	release_sock(sk);
->+
->+	return res;
->+}
->+
-> static int vsock_connectible_getsockopt(struct socket *sock,
-> 					int level, int optname,
-> 					char __user *optval,
->@@ -1701,6 +1754,39 @@ static int vsock_connectible_getsockopt(struct socket *sock,
-> 		lv = sock_get_timeout(vsk->connect_timeout, &v,
-> 				      optname == SO_VM_SOCKETS_CONNECT_TIMEOUT_OLD);
-> 		break;
->+	case SO_VM_SOCKETS_ZEROCOPY: {
->+		const struct vsock_transport *transport;
->+		int res;
->+
->+		transport = vsk->transport;
->+
->+		if (!transport->rx_zerocopy_get)
->+			return -EOPNOTSUPP;
->+
->+		lock_sock(sk);
-
-I think we should call lock_sock() before reading the transport to avoid 
-races and we should check if it is assigned.
-
-At that point I think is better to store this info in vsock_sock and not 
-in the transport.
-
-And maybe we should allow to change it only if the socket state is 
-SS_UNCONNECTED, inheriting from the parent the setting for sockets that 
-have it.
-
->+
->+		res = transport->rx_zerocopy_get(vsk);
->+
->+		release_sock(sk);
->+
->+		if (res < 0)
->+			return -EINVAL;
->+
->+		v.val64 = res;
->+
->+		break;
->+	}
->+	case SO_VM_SOCKETS_MAP_RX: {
->+		unsigned long vma_addr;
->+
->+		if (len < sizeof(vma_addr))
->+			return -EINVAL;
->+
->+		if (copy_from_user(&vma_addr, optval, sizeof(vma_addr)))
->+			return -EFAULT;
->+
->+		return vsock_recv_zerocopy(sock, vma_addr);
->+	}
->
-> 	default:
-> 		return -ENOPROTOOPT;
->@@ -2129,6 +2215,19 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	return err;
-> }
->
->+static int afvsock_mmap(struct file *file, struct socket *sock,
->+			struct vm_area_struct *vma)
->+{
->+	if (vma->vm_flags & (VM_WRITE | VM_EXEC))
->+		return -EPERM;
->+
->+	vma->vm_flags &= ~(VM_MAYWRITE | VM_MAYEXEC);
->+	vma->vm_flags |= (VM_MIXEDMAP);
->+	vma->vm_ops = &afvsock_vm_ops;
->+
->+	return 0;
->+}
->+
-> static const struct proto_ops vsock_stream_ops = {
-> 	.family = PF_VSOCK,
-> 	.owner = THIS_MODULE,
->@@ -2148,6 +2247,7 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.recvmsg = vsock_connectible_recvmsg,
-> 	.mmap = sock_no_mmap,
-> 	.sendpage = sock_no_sendpage,
->+	.mmap = afvsock_mmap,
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index d02cb7aa922f..47a68a2ea838 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -51,6 +51,7 @@ struct virtio_vsock_pkt {
+> 	bool reply;
+> 	bool tap_delivered;
+> 	bool slab_buf;
+>+	bool split;
 > };
 >
-> static const struct proto_ops vsock_seqpacket_ops = {
->-- 
->2.25.1
+> struct virtio_vsock_pkt_info {
+>@@ -131,6 +132,9 @@ int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> 				struct sockaddr_vm *addr);
+> bool virtio_transport_dgram_allow(u32 cid, u32 port);
+>
+>+int virtio_transport_zerocopy_dequeue(struct vsock_sock *vsk,
+>+				      struct vm_area_struct *vma,
+>+				      unsigned long addr);
+> int virtio_transport_connect(struct vsock_sock *vsk);
+>
+> int virtio_transport_shutdown(struct vsock_sock *vsk, int mode);
+>diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
+>index 64738838bee5..6775c6c44b5b 100644
+>--- a/include/uapi/linux/virtio_vsock.h
+>+++ b/include/uapi/linux/virtio_vsock.h
+>@@ -66,6 +66,12 @@ struct virtio_vsock_hdr {
+> 	__le32	fwd_cnt;
+> } __attribute__((packed));
+>
+>+struct virtio_vsock_usr_hdr {
+>+	u32 flags;
+>+	u32 len;
+>+	u32 copy_len;
+>+} __attribute__((packed));
+>+
+> enum virtio_vsock_type {
+> 	VIRTIO_VSOCK_TYPE_STREAM = 1,
+> 	VIRTIO_VSOCK_TYPE_SEQPACKET = 2,
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 278567f748f2..3a3e84176c75 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -12,6 +12,7 @@
+> #include <linux/ctype.h>
+> #include <linux/list.h>
+> #include <linux/virtio_vsock.h>
+>+#include <linux/mm.h>
+> #include <uapi/linux/vsockmon.h>
+>
+> #include <net/sock.h>
+>@@ -347,6 +348,196 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+> 	return err;
+> }
+>
+>+#define MAX_PAGES_TO_MAP 256
+>+
+>+int virtio_transport_zerocopy_dequeue(struct vsock_sock *vsk,
+>+				      struct vm_area_struct *vma,
+>+				      unsigned long addr)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	struct virtio_vsock_usr_hdr *usr_hdr_buffer;
+>+	unsigned long max_pages_to_insert;
+>+	unsigned long tmp_pages_inserted;
+>+	unsigned long pages_to_insert;
+>+	struct page *usr_hdr_page;
+>+	unsigned long vma_size;
+>+	struct page **pages;
+>+	int max_vma_pages;
+>+	int max_usr_hdrs;
+>+	int res;
+>+	int err;
+>+	int i;
+>+
+>+	/* Only use VMA from first page. */
+>+	if (vma->vm_start != addr)
+>+		return -EFAULT;
+>+
+>+	vma_size = vma->vm_end - vma->vm_start;
+>+
+>+	/* Too small vma(at least one page for headers
+>+	 * and one page for data).
+>+	 */
+>+	if (vma_size < 2 * PAGE_SIZE)
+>+		return -EFAULT;
+>+
+>+	/* Page for meta data. */
+>+	usr_hdr_page = alloc_page(GFP_KERNEL);
+
+I think all these checks should be done in af_vsock.c.
+
+It would be nice to avoid that every transport reimplements the same 
+thing and especially that all transports have the same behavior.
+
+If you can would be nice to have the transports to return an array of 
+pages to map, and af_vsock will handle it and the usr_hdr_page.
+
+Do you think it's doable?
+
+>+
+>+	if (!usr_hdr_page)
+>+		return -EFAULT;
+>+
+>+	pages = kmalloc_array(MAX_PAGES_TO_MAP, sizeof(pages[0]), GFP_KERNEL);
+>+
+>+	if (!pages)
+>+		return -EFAULT;
+>+
+>+	pages[pages_to_insert++] = usr_hdr_page;
+>+
+>+	usr_hdr_buffer = page_to_virt(usr_hdr_page);
+>+
+>+	err = 0;
+>+
+>+	/* As we use first page for headers, so total number of
+>+	 * pages for user is min between number of headers in
+>+	 * first page and size of vma(in pages, except first page).
+>+	 */
+>+	max_usr_hdrs = PAGE_SIZE / sizeof(*usr_hdr_buffer);
+>+	max_vma_pages = (vma_size / PAGE_SIZE) - 1;
+>+	max_pages_to_insert = min(max_usr_hdrs, max_vma_pages);
+>+
+>+	if (max_pages_to_insert > MAX_PAGES_TO_MAP)
+>+		max_pages_to_insert = MAX_PAGES_TO_MAP;
+>+
+>+	spin_lock_bh(&vvs->rx_lock);
+>+
+>+	while (!list_empty(&vvs->rx_queue) &&
+>+	       pages_to_insert < max_pages_to_insert) {
+>+		struct virtio_vsock_pkt *pkt;
+>+		ssize_t rest_data_bytes;
+>+		size_t moved_data_bytes;
+>+		unsigned long pg_offs;
+>+
+>+		pkt = list_first_entry(&vvs->rx_queue,
+>+				       struct virtio_vsock_pkt, list);
+>+
+>+		/* Buffer was allocated by 'kmalloc()'. This could
+>+		 * happen, when zerocopy was enabled, but we still
+>+		 * have pending packet which was created before it.
+>+		 */
+>+		if (pkt->slab_buf) {
+>+			usr_hdr_buffer->flags = le32_to_cpu(pkt->hdr.flags);
+>+			usr_hdr_buffer->len = 0;
+>+			usr_hdr_buffer->copy_len = le32_to_cpu(pkt->hdr.len);
+>+			/* Report user to read it using copy. */
+
+Is it a "to do"?
+
+>+			break;
+>+		}
+>+
+>+		/* This could happen, when packet was dequeued before
+>+		 * by an ordinary 'read()' call. We can't handle such
+>+		 * packet. Drop it.
+
+We can't drop packets.
+I think we should allow to enable/disable this new feature before the 
+connection.
+
+>+		 */
+>+		if (pkt->off % PAGE_SIZE) {
+>+			list_del(&pkt->list);
+>+			virtio_transport_dec_rx_pkt(vvs, pkt);
+>+			virtio_transport_free_pkt(pkt);
+>+			continue;
+>+		}
+>+
+>+		rest_data_bytes = le32_to_cpu(pkt->hdr.len) - pkt->off;
+>+
+>+		/* For packets, bigger than one page, split it's
+>+		 * high order allocated buffer to 0 order pages.
+>+		 * Otherwise 'vm_insert_pages()' will fail, for
+>+		 * all pages except first.
+>+		 */
+>+		if (rest_data_bytes > PAGE_SIZE) {
+>+			/* High order buffer not split yet. */
+>+			if (!pkt->split) {
+>+				split_page(virt_to_page(pkt->buf),
+>+					   get_order(le32_to_cpu(pkt->hdr.len)));
+>+				pkt->split = true;
+>+			}
+>+		}
+>+
+>+		pg_offs = pkt->off;
+>+		moved_data_bytes = 0;
+>+
+>+		while (rest_data_bytes &&
+>+		       pages_to_insert < max_pages_to_insert) {
+>+			struct page *buf_page;
+>+
+>+			buf_page = virt_to_page(pkt->buf + pg_offs);
+>+
+>+			pages[pages_to_insert++] = buf_page;
+>+			/* Get reference to prevent this page being
+>+			 * returned to page allocator when packet will
+>+			 * be freed. Ref count will be 2.
+>+			 */
+>+			get_page(buf_page);
+>+			pg_offs += PAGE_SIZE;
+>+
+>+			if (rest_data_bytes >= PAGE_SIZE) {
+>+				moved_data_bytes += PAGE_SIZE;
+>+				rest_data_bytes -= PAGE_SIZE;
+>+			} else {
+>+				moved_data_bytes += rest_data_bytes;
+>+				rest_data_bytes = 0;
+>+			}
+>+		}
+>+
+>+		usr_hdr_buffer->flags = le32_to_cpu(pkt->hdr.flags);
+>+		usr_hdr_buffer->len = moved_data_bytes;
+>+		usr_hdr_buffer->copy_len = 0;
+>+		usr_hdr_buffer++;
+>+
+>+		pkt->off = pg_offs;
+>+
+>+		if (rest_data_bytes == 0) {
+>+			list_del(&pkt->list);
+>+			virtio_transport_dec_rx_pkt(vvs, pkt);
+>+			virtio_transport_free_pkt(pkt);
+>+		}
+>+
+>+		/* Now ref count for all pages of packet is 1. */
+>+	}
+>+
+>+	/* Set last buffer empty(if we have one). */
+>+	if (pages_to_insert - 1 < max_usr_hdrs)
+>+		usr_hdr_buffer->len = 0;
+>+
+>+	spin_unlock_bh(&vvs->rx_lock);
+>+
+>+	tmp_pages_inserted = pages_to_insert;
+>+
+>+	res = vm_insert_pages(vma, addr, pages, &tmp_pages_inserted);
+>+
+>+	if (res || tmp_pages_inserted) {
+>+		/* Failed to insert some pages, we have "partially"
+>+		 * mapped vma. Do not return, set error code. This
+>+		 * code will be returned to user. User needs to call
+>+		 * 'madvise()/mmap()' to clear this vma. Anyway,
+>+		 * references to all pages will to be dropped below.
+>+		 */
+>+		err = -EFAULT;
+>+	}
+>+
+>+	/* Put reference for every page. */
+>+	for (i = 0; i < pages_to_insert; i++) {
+>+		/* Ref count is 2 ('get_page()' + 'vm_insert_pages()' above).
+>+		 * Put reference once, page will be returned to allocator
+>+		 * after user's 'madvice()/munmap()' call(or it wasn't mapped
+>+		 * if 'vm_insert_pages()' failed).
+>+		 */
+>+		put_page(pages[i]);
+>+	}
+>+
+>+	virtio_transport_send_credit_update(vsk);
+>+	kfree(pages);
+>+
+>+	return err;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_zerocopy_dequeue);
+>+
+> static ssize_t
+> virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 				   struct msghdr *msg,
+>@@ -1344,10 +1535,21 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
+> void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
+> {
+> 	if (pkt->buf_len) {
+>-		if (pkt->slab_buf)
+>+		if (pkt->slab_buf) {
+> 			kfree(pkt->buf);
+>-		else
+>-			free_pages(buf, get_order(pkt->buf_len));
+>+		} else {
+>+			unsigned int order = get_order(pkt->buf_len);
+>+			unsigned long buf = (unsigned long)pkt->buf;
+>+
+>+			if (pkt->split) {
+>+				int i;
+>+
+>+				for (i = 0; i < (1 << order); i++)
+>+					free_page(buf + i * PAGE_SIZE);
+>+			} else {
+>+				free_pages(buf, order);
+>+			}
+>+		}
+> 	}
+>
+> 	kfree(pkt);
+>-- 2.25.1
 
