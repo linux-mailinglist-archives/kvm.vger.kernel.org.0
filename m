@@ -2,142 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C054B5462B3
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 11:47:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC9A3546439
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 12:44:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344642AbiFJJqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 05:46:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
+        id S245312AbiFJKnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 06:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343647AbiFJJqo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 05:46:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADA393DB6D6
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654854402;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uFSrK6QjMWjmxXq2UmX5nbX9kQXYdC0Rrd+ljS/aypg=;
-        b=gvJf3cpaxmpCB7V+FpJt47g7vieC2kmFVyl3nF5ssvmvuuwoS+IevRUmXaOODKbOFz0AfP
-        0zVMFQOYk2IMiS7Dj7nAvodJAkBsXfq3+qH/H7uFQD8AW4Sa7LhVlf5U9gHgz6TwOLGzS7
-        o3L3RudrQGzXNDcqbdn9+DnHVnxSONo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-16-ahJ8_wqOPYmKAYPYyfBNLg-1; Fri, 10 Jun 2022 05:46:41 -0400
-X-MC-Unique: ahJ8_wqOPYmKAYPYyfBNLg-1
-Received: by mail-wr1-f69.google.com with SMTP id bv8-20020a0560001f0800b002183c5d5c26so3916470wrb.20
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:46:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uFSrK6QjMWjmxXq2UmX5nbX9kQXYdC0Rrd+ljS/aypg=;
-        b=JYh90Bo35wboWPk+B7IVZ7MHWv+9Y9ABhnvKzI1rx35n6sK4TwQdUSu5H1CTgThG5L
-         PkRrOYU/WWE7QPwhfCY0HXg21m4+/F8LBVx0TT8TuPGFDZuPMpYohklF/t8y2uTFxJyZ
-         udvL2uOWGS3zDVlhUfp9r6Y6NDJWhPNVrPvQsMPmAuXGL5OEM0XUmVj7UkwJdQbp6PjW
-         Goj8OzBujRhcY3NSn/HbMLis0NWckj7jqaDa0mXOyBsGjnluXY7wL/NfekuDyH/XfOH3
-         d/BDIeUtvwWvNhZYh0uLTKI0G9bimyzB5pRXHot9mTD6a9DCQM9jF8DCknn68BwICKKu
-         LLVg==
-X-Gm-Message-State: AOAM531HXNAXXi0QozlEcHscrs/qpDIpCnbb3DOduuKewd7Ma+9TQRXK
-        pyP1XMyVU/tJg7PuN5LbXpyufy0hoB2I0imCdDxQawebxCIcWi0OsF25xsjVI+cOdAV4Gugkhpx
-        C7uy9ZIeLB68x
-X-Received: by 2002:a1c:4c12:0:b0:39c:6750:be17 with SMTP id z18-20020a1c4c12000000b0039c6750be17mr8137806wmf.21.1654854400462;
-        Fri, 10 Jun 2022 02:46:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwU3TqojSiB2ZPtENgLzReySdlXbwaYQW8P6z/18TZYg166Ti+yAosoW2JeaOyBpxeWpicnZA==
-X-Received: by 2002:a1c:4c12:0:b0:39c:6750:be17 with SMTP id z18-20020a1c4c12000000b0039c6750be17mr8137784wmf.21.1654854400250;
-        Fri, 10 Jun 2022 02:46:40 -0700 (PDT)
-Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
-        by smtp.gmail.com with ESMTPSA id b11-20020a5d4d8b000000b0020c7ec0fdf4sm31494421wru.117.2022.06.10.02.46.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jun 2022 02:46:39 -0700 (PDT)
-Date:   Fri, 10 Jun 2022 11:46:37 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org,
-        anup@brainfault.org, Raghavendra Rao Ananta <rananta@google.com>,
-        eric.auger@redhat.com
-Subject: Re: [PATCH v2 000/144] KVM: selftests: Overhaul APIs, purge VCPU_ID
-Message-ID: <20220610094637.lg5wf2f2w2pez4dq@gator>
-References: <20220603004331.1523888-1-seanjc@google.com>
- <21570ac1-e684-7983-be00-ba8b3f43a9ee@redhat.com>
- <93b87b7b5a599c1dfa47ee025f0ae9c4@kernel.org>
- <YqEupumS/m5IArTj@google.com>
- <20220609074027.fntbvcgac4nroy35@gator>
- <YqIPYP0gKIoU7JLG@google.com>
- <YqItO2cbsGDSyxD8@google.com>
+        with ESMTP id S1347191AbiFJKml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 06:42:41 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52FD120EEB6;
+        Fri, 10 Jun 2022 03:37:57 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25A9i8kR029502;
+        Fri, 10 Jun 2022 10:37:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=y3WZH7Xgy1/7hkM/FVqfm2kED3YXkg7t76emqLbhDss=;
+ b=ja8RA+HvQolk5CeFXidNKPaTUqqg8si2j9vPZyJArJEjenJhfi/jvEP39I4xVNkRSiH4
+ PNXpyw0sO5fj/sfiWnE+n5+bHQGIESBQYG4R3LYaWLFN1PuEadrQwnAjB4ZQtLKZs6u8
+ Nmu2eitKaT2huZlR9x4WgIxVZd4/wwKS918RHCPe82swBwDQNs5qdYgOpvMg8AZBh4Zd
+ GUd0F7hOntADgKh4N3dCGefaZyGqpeCLWUT/zZr72yDIjb+FGqAY8QvKwI6GK78SjfKw
+ 33j4Gk4juwOZQ8LPzxM5AA1Zc/0iUbudHwFBPaNLefJwu9cByY9JX8oWKzNAz70GvPJ3 +w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gm3k20xg9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jun 2022 10:37:56 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25AAAneq021450;
+        Fri, 10 Jun 2022 10:37:56 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gm3k20xfa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jun 2022 10:37:55 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25AAb3uR000310;
+        Fri, 10 Jun 2022 10:37:54 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3gfy19g3yc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jun 2022 10:37:54 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25AAbo6O18809096
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jun 2022 10:37:50 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CAEA3AE065;
+        Fri, 10 Jun 2022 10:37:50 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7C8A9AE05D;
+        Fri, 10 Jun 2022 10:37:50 +0000 (GMT)
+Received: from [9.171.82.252] (unknown [9.171.82.252])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 10 Jun 2022 10:37:50 +0000 (GMT)
+Message-ID: <fadd5a33-89ef-b2b3-5890-340b93013a34@linux.ibm.com>
+Date:   Fri, 10 Jun 2022 12:37:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YqItO2cbsGDSyxD8@google.com>
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: Rework TEID decoding and
+ usage
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220608133303.1532166-1-scgl@linux.ibm.com>
+ <20220608133303.1532166-4-scgl@linux.ibm.com>
+ <1b4f731f-866c-5357-b0e0-b8bc375976cd@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <1b4f731f-866c-5357-b0e0-b8bc375976cd@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bQjJJBDgI2VjXxXG8LacfilqIxeGp6DZ
+X-Proofpoint-GUID: NvEiuv5Yu3Od60RI3THxM0z78seE3kAg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-10_02,2022-06-09_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 spamscore=0 mlxscore=0
+ malwarescore=0 bulkscore=0 adultscore=0 impostorscore=0 phishscore=0
+ mlxlogscore=999 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2204290000 definitions=main-2206100040
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 09, 2022 at 05:26:19PM +0000, Sean Christopherson wrote:
-> On Thu, Jun 09, 2022, Sean Christopherson wrote:
-> > On Thu, Jun 09, 2022, Andrew Jones wrote:
-> > > On Wed, Jun 08, 2022 at 11:20:06PM +0000, Sean Christopherson wrote:
-> > > > diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> > > > index b3116c151d1c..17f7ef975d5c 100644
-> > > > --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> > > > +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> > > > @@ -419,7 +419,7 @@ static void run_test(struct vcpu_config *c)
-> > > > 
-> > > >         check_supported(c);
-> > > > 
-> > > > -       vm = vm_create_barebones();
-> > > > +       vm = vm_create(1);
-> > > 
-> > > Hmm, looks like something, somewhere for AArch64 needs improving to avoid
-> > > strangeness like this. I'll look into it after we get this series merged.
-> > 
-> > Huh, you're right, that is odd.  Ah, duh, aarch64_vcpu_add() allocates a stack
-> > for the vCPU, and that will fail if there's no memslot from which to allocate
-> > guest memory.
-> > 
-> > So, this is my goof in
-> > 
-> >   KVM: selftests: Rename vm_create() => vm_create_barebones(), drop param
-> > 
-> > get-reg-list should first be converted to vm_create_without_vcpus().  I'll also
-> > add a comment explaining that vm_create_barebones() can be used with __vm_vcpu_add(),
-> > but not the "full" vm_vcpu_add() or vm_arch_vcpu_add() variants.
+On 6/10/22 11:31, Janosch Frank wrote:
+> On 6/8/22 15:33, Janis Schoetterl-Glausch wrote:
+>> The translation-exception identification (TEID) contains information to
+>> identify the cause of certain program exceptions, including translation
+>> exceptions occurring during dynamic address translation, as well as
+>> protection exceptions.
+>> The meaning of fields in the TEID is complex, depending on the exception
+>> occurring and various potentially installed facilities.
+>>
+>> Rework the type describing the TEID, in order to ease decoding.
+>> Change the existing code interpreting the TEID and extend it to take the
+>> installed suppression-on-protection facility into account.
+>>
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>>   lib/s390x/asm/interrupt.h | 61 +++++++++++++++++++++++++++---------
+>>   lib/s390x/fault.h         | 30 +++++-------------
+>>   lib/s390x/fault.c         | 65 ++++++++++++++++++++++++++-------------
+>>   lib/s390x/interrupt.c     |  2 +-
+>>   s390x/edat.c              | 26 ++++++++++------
+>>   5 files changed, 115 insertions(+), 69 deletions(-)
+>>
+>> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+>> index d9ab0bd7..3ca6bf76 100644
+>> --- a/lib/s390x/asm/interrupt.h
+>> +++ b/lib/s390x/asm/interrupt.h
+>> @@ -20,23 +20,56 @@
+>>     union teid {
+>>       unsigned long val;
+>> -    struct {
+>> -        unsigned long addr:52;
+>> -        unsigned long fetch:1;
+>> -        unsigned long store:1;
+>> -        unsigned long reserved:6;
+>> -        unsigned long acc_list_prot:1;
+>> -        /*
+>> -         * depending on the exception and the installed facilities,
+>> -         * the m field can indicate several different things,
+>> -         * including whether the exception was triggered by a MVPG
+>> -         * instruction, or whether the addr field is meaningful
+>> -         */
+>> -        unsigned long m:1;
+>> -        unsigned long asce_id:2;
+>> +    union {
+>> +        /* common fields DAT exc & protection exc */
+>> +        struct {
+>> +            uint64_t addr            : 52 -  0;
+>> +            uint64_t acc_exc_f_s        : 54 - 52;
+>> +            uint64_t side_effect_acc    : 55 - 54;
+>> +            uint64_t /* reserved */        : 62 - 55;
+>> +            uint64_t asce_id        : 64 - 62;
+>> +        };
+>> +        /* DAT exc */
+>> +        struct {
+>> +            uint64_t /* pad */        : 61 -  0;
+>> +            uint64_t dat_move_page        : 62 - 61;
+>> +        };
+>> +        /* suppression on protection */
+>> +        struct {
+>> +            uint64_t /* pad */        : 60 -  0;
+>> +            uint64_t sop_acc_list        : 61 - 60;
+>> +            uint64_t sop_teid_predictable    : 62 - 61;
+>> +        };
+>> +        /* enhanced suppression on protection 2 */
+>> +        struct {
+>> +            uint64_t /* pad */        : 56 -  0;
+>> +            uint64_t esop2_prot_code_0    : 57 - 56;
+>> +            uint64_t /* pad */        : 60 - 57;
+>> +            uint64_t esop2_prot_code_1    : 61 - 60;
+>> +            uint64_t esop2_prot_code_2    : 62 - 61;
+>> +        };
 > 
-> Actually, I agree with your assessment.  A better solution is to open code the
-> calls to add and setup the vCPU.  It's a small amount of code duplication, but I
-> actually like the end result because it better documents the test's dependencies.
-> 
-> Assuming it actually works, i.e. the stack setup is truly unnecessary, I'll add a
-> patch like so before the barebones change.
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index ecfb773ec41e..7bba365b1522 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -418,7 +418,8 @@ static void run_test(struct vcpu_config *c)
-> 
->         vm = vm_create(DEFAULT_GUEST_PHY_PAGES);
->         prepare_vcpu_init(c, &init);
-> -       aarch64_vcpu_add_default(vm, 0, &init, NULL);
-> +       vm_vcpu_add(vm, vcpuid);
-> +       aarch64_vcpu_setup(vm, 0, &init);
->         finalize_vcpu(vm, 0, c);
-> 
->         reg_list = vcpu_get_reg_list(vm, 0);
->
+> Quite messy, would it be more readable to unionize the fields that overlap?
 
-LGTM, Thanks 
+Not sure, I prefer this because it reflects the structure of the PoP,
+where there is a section for DAT exceptions, SOP, ESOP1, ESOP2.
+It's not exactly like this in the code because I factored out common fields,
+and I removed the struct for ESOP1 because it was mostly redundant with SOP.
+> 
+>>       };
+>>   };
+>>   +enum prot_code {
+>> +    PROT_KEY_LAP,
+> 
+> That's key OR LAP, right?
+
+Yes, do you want me to make that explicit?
+> 
+>> +    PROT_DAT,
+>> +    PROT_KEY,
+>> +    PROT_ACC_LIST,
+>> +    PROT_LAP,
+>> +    PROT_IEP,
+>> +};
+>> +
+> 
+> Yes, I like that more than my quick fixes :-)
+> 
+>> +static void print_decode_pgm_prot(union teid teid, bool dat)
+>> +{
+>> +    switch (get_supp_on_prot_facility()) {
+>> +    case SOP_NONE:
+>> +        printf("Type: ?\n");
+>> +        break;
+>> +    case SOP_BASIC:
+>> +        if (teid.sop_teid_predictable && dat && teid.sop_acc_list)
+>> +            printf("Type: ACC\n");
+>> +        else
+>> +            printf("Type: ?\n");
+>> +        break;
+> 
+> I'm wondering if we should cut off the two possibilities above to make it a bit more sane. The SOP facility is about my age now and ESOP1 has been introduced with z10 if I'm not mistaken so it's not young either.
+
+So
+
+case SOP_NONE:
+case SOP_BASIC:
+	assert(false);
+
+?
+	
+> 
+> Do we have tests that require SOP/no-SOP?
+
+No, just going for correctness.
 
