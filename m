@@ -2,68 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55006546D1B
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 21:18:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE4C2546D1E
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 21:19:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347427AbiFJTSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 15:18:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43780 "EHLO
+        id S1348232AbiFJTSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 15:18:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243528AbiFJTSR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 15:18:17 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB951582B
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:16 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id y63-20020a638a42000000b003fd47b6f280so1432pgd.12
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=y1EZXvSmEPvb6mcUcqNnwAea2ZEKw13g9a15hObG/5M=;
-        b=j5Ol8gvjwBqhz1FCGnzOa9I7myBdajprl0eYTZ+G6kUBS6rutkN9NY3k/9rtRye1bq
-         5rhky7E5n4gcRy8RojPyZxnwIQ8q1ptSi1dzy3Y/i20I4s/b+JMGnT55rvp16jPNuo1J
-         qpI7gjpVmiB7Ra9W4owVS05GYZ+Xj7IdUvRKyoCHKD9hnkdaCv4MVdzDNyCy5KqTphQU
-         1W9At+Oo2woTSGCE0NLVNGMlxiGBNcz6geY1r0gg1MKxg+YJyWY+xr7QC5G3KYaPkQN1
-         dtb9K90++nmjmu7WdBfIRuoK745VE4EENDEXbSpZTZ/RlSLnEJNrjx6O2PqMrqBhRJtR
-         GPPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc:content-transfer-encoding;
-        bh=y1EZXvSmEPvb6mcUcqNnwAea2ZEKw13g9a15hObG/5M=;
-        b=b325ObZQ32YnCnuj1UT7fMaZWVWxvqHuV9aIeqAHyxIsqYz9bobTstjXs4kHvercs/
-         2m73oDwkKsPeAo/mJs7SfvTc0A76pIGu/XOHEB6uRn6G/cXz7RjbPnnnH1eHi5HwBVj2
-         asqnVIuZUN61HjgshSmmX2qFMsz2yrtuYU1BAMcsldm4m7tiCdu8BYbkY34NM8MAqtJo
-         3bUaYrZWTOzzW3ONCVbW/97T4q12GVfZTcBMrOnQeRSqU0B2BUDUXweLaIAhO+rHMwUt
-         6Q0/nYhUAw3BQNJFFXWMn/eKzJUi1TP0a0Q1nlOgD+XzXoSb5ajA/baNm+GGuwM7Ivud
-         6hjQ==
-X-Gm-Message-State: AOAM532QRdrDzSIsqLSu5HInTcCzcmYx/hXf7MA6yjY3T7RMeRKzBMm8
-        kxhSMOHHyoEWfAXDUFQWPOVNDvDajZc=
-X-Google-Smtp-Source: ABdhPJyMSmx7IVBsg90eGIeP4sJzAfrDgpQtiK6YO/BOyTkm6qK/b/c2N1oKuSC58vea5TL9kCTYgM2xFis=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
- t9-20020a17090a024900b001e0a8a33c6cmr2350pje.0.1654888695567; Fri, 10 Jun
- 2022 12:18:15 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Jun 2022 19:18:13 +0000
-Message-Id: <20220610191813.371682-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH] KVM: SVM: Fix a misplaced paranthesis in APICV inhibit mask generation
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S1347839AbiFJTSr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 15:18:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A1B1C92E
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D3CBF6223C
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 19:18:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41727C341CF
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 19:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654888720;
+        bh=hM5nW1VA3yu5jpO3mlOUoDJaWYFKk3W0xm89jLGspjI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=HhH/LtWGsBwB06n1CnPo9lhK0VtlQ6R1OeUxR4n65mwZeBEFV6sMuVM/FQ4mWjKfC
+         U0buD2yynVGlZgaWK2yhy6sCYPwzRpoLMXXRNC35AXp8WPmbjWScn8eeu+b4znMsyo
+         SBLsipBoAgnNOKj9AmZY2W5Wf3H0Kmmm5b4EHejPbftkHKC+R73iWdRMndn/qU7LdN
+         mi8mlFucHHdXR3vU1iUTLqfm10BRj29AjwGU2+vcfzCq9fPpj35CHw9WzOEvI4Yn5B
+         f5qeWPoNNahJsN/WYeZcsckWm0SeiIae32rB0ZzDFftWrWFELWEKh7GyQQVeErl1tH
+         OVUa6I1o1xhTA==
+Received: by mail-ej1-f46.google.com with SMTP id m20so55148387ejj.10
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:40 -0700 (PDT)
+X-Gm-Message-State: AOAM5317xgECHo968deWkoCJfxqeoX13D74ILN3SrWhWF1Atv51vODj6
+        5WLHI6r5hHg9ib+T6bvRyeSq5nRxlYaM1Kyj8qaJVQ==
+X-Google-Smtp-Source: ABdhPJwexJxeTadU2a/HS+Q0PaTCtU7UH0lxqqpyQzdJR6JkeVtaY0mkRVT4jHiiW5JTPVMgfQPUbTO0E50JluvSE3Y=
+X-Received: by 2002:a17:906:25d8:b0:6fe:9f11:3906 with SMTP id
+ n24-20020a17090625d800b006fe9f113906mr40977072ejb.538.1654888718314; Fri, 10
+ Jun 2022 12:18:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
+ <YksIQYdG41v3KWkr@google.com> <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com> <Ykwbqv90C7+8K+Ao@google.com>
+ <YkyEaYiL0BrDYcZv@google.com> <20220422105612.GB61987@chaop.bj.intel.com>
+ <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com> <20220425134051.GA175928@chaop.bj.intel.com>
+ <27616b2f-1eff-42ff-91e0-047f531639ea@www.fastmail.com> <YmcFAJEJmmtYa+82@google.com>
+In-Reply-To: <YmcFAJEJmmtYa+82@google.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Fri, 10 Jun 2022 12:18:25 -0700
+X-Gmail-Original-Message-ID: <CALCETrU_BdaYcPgVcjj4o9zFPyvU9oyjCCtjKTbSSgeL0aZaGQ@mail.gmail.com>
+Message-ID: <CALCETrU_BdaYcPgVcjj4o9zFPyvU9oyjCCtjKTbSSgeL0aZaGQ@mail.gmail.com>
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Steven Price <steven.price@arm.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,47 +98,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Relocate a ")" to its proper place at the end of a BIT usage, the intent
-is most definitely not to have a feedback loop of BITs in the mask.
+On Mon, Apr 25, 2022 at 1:31 PM Sean Christopherson <seanjc@google.com> wro=
+te:
+>
+> On Mon, Apr 25, 2022, Andy Lutomirski wrote:
+> >
+> >
+> > On Mon, Apr 25, 2022, at 6:40 AM, Chao Peng wrote:
+> > > On Sun, Apr 24, 2022 at 09:59:37AM -0700, Andy Lutomirski wrote:
+> > >>
+> >
+> > >>
+> > >> 2. Bind the memfile to a VM (or at least to a VM technology).  Now i=
+t's in
+> > >> the initial state appropriate for that VM.
+> > >>
+> > >> For TDX, this completely bypasses the cases where the data is prepop=
+ulated
+> > >> and TDX can't handle it cleanly.
+>
+> I believe TDX can handle this cleanly, TDH.MEM.PAGE.ADD doesn't require t=
+hat the
+> source and destination have different HPAs.  There's just no pressing nee=
+d to
+> support such behavior because userspace is highly motivated to keep the i=
+nitial
+> image small for performance reasons, i.e. burning a few extra pages while=
+ building
+> the guest is a non-issue.
 
-arch/x86/kvm/svm/avic.c: In function =E2=80=98avic_check_apicv_inhibit_reas=
-ons=E2=80=99:
-include/vdso/bits.h:7:40: error: left shift count >=3D width of type [-Werr=
-or=3Dshift-count-overflow]
-    7 | #define BIT(nr)                 (UL(1) << (nr))
-      |                                        ^~
-arch/x86/kvm/svm/avic.c:911:27: note: in expansion of macro =E2=80=98BIT=E2=
-=80=99
-  911 |                           BIT(APICV_INHIBIT_REASON_SEV      |
-      |                           ^~~
+Following up on this, rather belatedly.  After re-reading the docs,
+TDX can populate guest memory using TDH.MEM.PAGE.ADD, but see Intel=C2=AE
+TDX Module Base Spec v1.5, section 2.3, step D.4 substeps 1 and 2
+here:
 
-Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or=
- APIC base")
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/avic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+https://www.intel.com/content/dam/develop/external/us/en/documents/intel-td=
+x-module-1.5-base-spec-348549001.pdf
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 5542d8959e11..d1bc5820ea46 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -908,9 +908,9 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_in=
-hibit reason)
- 			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
- 			  BIT(APICV_INHIBIT_REASON_X2APIC) |
- 			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
--			  BIT(APICV_INHIBIT_REASON_SEV      |
-+			  BIT(APICV_INHIBIT_REASON_SEV)      |
- 			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |
--			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED));
-+			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED);
-=20
- 	return supported & BIT(reason);
- }
+For each TD page:
 
-base-commit: b23f8810c46978bc05252db03055a61fcadc07d5
---=20
-2.36.1.476.g0c4daa206d-goog
+1. The host VMM specifies a TDR as a parameter and calls the
+TDH.MEM.PAGE.ADD function. It copies the contents from the TD
+image page into the target TD page which is encrypted with the TD
+ephemeral key. TDH.MEM.PAGE.ADD also extends the TD
+measurement with the page GPA.
 
+2. The host VMM extends the TD measurement with the contents of
+the new page by calling the TDH.MR.EXTEND function on each 256-
+byte chunk of the new TD page.
+
+So this is a bit like SGX.  There is a specific series of operations
+that have to be done in precisely the right order to reproduce the
+intended TD measurement.  Otherwise the guest will boot and run until
+it tries to get a report and then it will have a hard time getting
+anyone to believe its report.
+
+So I don't think the host kernel can get away with host userspace just
+providing pre-populated memory.  Userspace needs to tell the host
+kernel exactly what sequence of adds, extends, etc to perform and in
+what order, and the host kernel needs to do precisely what userspace
+asks it to do.  "Here's the contents of memory" doesn't cut it unless
+the tooling that builds the guest image matches the exact semantics
+that the host kernel provides.
+
+--Andy
