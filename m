@@ -2,140 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C20F546856
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 16:31:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FDBD546865
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 16:34:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245156AbiFJOax (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 10:30:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60642 "EHLO
+        id S1349548AbiFJOeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 10:34:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242574AbiFJOau (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 10:30:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 678D819C38
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 07:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654871440;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g/ATkA29NC2oD/Jp54XfWVa6EbDzgeGcRbqECMdYNQQ=;
-        b=jJawV6V17jN+4Baj+0GOF0VlCJiumcDu95kndkYiX/rrkws39ublNHXrES7oj+wQrNZWwc
-        7QYYBf7sFL+Zmws62SAUte1YtebfyVhEevZJVsJRhnFgvyGoTz7MNILK6b1KvbeaVqUXTz
-        ozZTKUQitij0aaysMrva7JH3Mq9IE3Q=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-602-KmF2v-TrOuO03lVC9fEHcg-1; Fri, 10 Jun 2022 10:30:38 -0400
-X-MC-Unique: KmF2v-TrOuO03lVC9fEHcg-1
-Received: by mail-io1-f70.google.com with SMTP id i126-20020a6bb884000000b006691e030971so10896259iof.15
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 07:30:38 -0700 (PDT)
+        with ESMTP id S1349550AbiFJOd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 10:33:58 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5078013FBFF
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 07:33:16 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id q12-20020a17090a304c00b001e2d4fb0eb4so2417547pjl.4
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 07:33:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=PxR9OrMSrWpGfEqawpy3/wVuAkYaSeZlAnBh5KVMXJE=;
+        b=NJbzSY3yJxO4M4StgBH/ADd+InJNwVt4O3UCjO1lmgKqqZoWakKAC4evwmHBWOT6DD
+         ZXztB7rGawow2r4HA4er20ia0kLPCsu6l5vPb53g9jzV06R6FazDE00XpE4uBONTos35
+         qpc+wlG9Ale+JvKoySfGLzKdmfZM/XSb9PomEoFCY4enp8ZUXSX0NMyJAB+WxM2+3sUk
+         S6iFFlKOiNWC8b5gZJ+5p5+yKSbk+e1QjJpLpMZ15ikiAY91IrV5pzHCmN5B/gkn/aUf
+         Mep+j/k2tWgjRuUV40mYcHHczhP8X+QCTXPVn9ZhnPz8A8g541OlmakI7DWfYvCl0o0F
+         k2BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=g/ATkA29NC2oD/Jp54XfWVa6EbDzgeGcRbqECMdYNQQ=;
-        b=5up1oOXt7n+CW2fo3Gg/BqNU3+zQivdUOJG4HOl7h/PYZMWAxnUl+yNwxTTleTheX9
-         5xyTEmHx1Eoa9RlMNGEIh/GQxYBGTLVD9PdEJUOzs9/ENYXWn6keDSr4Zma3+GaJa224
-         TB2pQfkblzl/NfSacTySLC2a9oL6CPLBS2ljWP2KZcN/S9QF8umiRd9/vprK6p6eQ9EM
-         gQR/kiTHQeXn5ThoS0/B0f2oXL3eAQ9+259mQzCyM13n5Ex+0uqnRefhn/NWtjU7zZ/O
-         HP/uN2VZ/VzBC5dIkiYUV2XeOjO0AbkSycKotZQp1DePOBakgYdSRUFeLDxiQZkNxn7g
-         qXtg==
-X-Gm-Message-State: AOAM531Ng9rrIdxatYLcyEpNjPUsYMpwFGzPqiAiHP1bOcB/pPqlzW2b
-        jJUoaqFrYl+M78iiI3cDltWYDb1Ue0byNluMOv+JhI6HlCR/38zOQpMW09CW0lEM09nXAaIztwv
-        No4HXIr/PsLQc
-X-Received: by 2002:a02:9f14:0:b0:331:9195:dd3e with SMTP id z20-20020a029f14000000b003319195dd3emr16642779jal.0.1654871438187;
-        Fri, 10 Jun 2022 07:30:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxuksuRngDSTwfthGPHYoV3J/PiHhBjlEWnHC4GjZIaz8XTqKR8K8VGTwh5fbuBCpB4djwCgg==
-X-Received: by 2002:a02:9f14:0:b0:331:9195:dd3e with SMTP id z20-20020a029f14000000b003319195dd3emr16642758jal.0.1654871437955;
-        Fri, 10 Jun 2022 07:30:37 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id w15-20020a056e0213ef00b002d65eedd403sm4127189ilj.71.2022.06.10.07.30.36
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PxR9OrMSrWpGfEqawpy3/wVuAkYaSeZlAnBh5KVMXJE=;
+        b=lyjD8UCG6fErGAQ/2Sbu9GCPJiwmWg0LEa5TAewarkHZ+8nMeNoPBvc84540djNyUp
+         U5aBZwaYUHX8X2ZK33mrqaemN1peYs7hMDI7/hpY2rseLXbfN39UdCP6pGe5El0RGma1
+         A9C4dAX9MEQ6lcIPTEPXkKhJ18zS5x9BW4gA91aIaGhS9LHM/g2YNdd9JajARuEPMp86
+         K7iQ09nsRr8g7jqxmmwDnYVzNcV/KE4Dlnr0TWzjssvmQVyKz+Rvv8oUrHWMAokCjeEg
+         v89cCQpLF50Jy1/3yYZcOEe74AKPaI/j2K6nSR2FbsptuyN7QXk62dMM0USf+CaVJpXY
+         4tmA==
+X-Gm-Message-State: AOAM533Brmb/2pqNLQ5lA1zabY5Xn9SawJrLZGsVO3C/mwilHD8gHHxV
+        NktJ8VwUiV5HQFBYT6LoybqsNw==
+X-Google-Smtp-Source: ABdhPJz5794unjcLLHf76DTPX/t1FfZvxPtA+iJKJnZE7mgcdzh1ieHg0oZJuGEsiodfohqFec+KlQ==
+X-Received: by 2002:a17:90b:3805:b0:1e6:85aa:51b with SMTP id mq5-20020a17090b380500b001e685aa051bmr70256pjb.182.1654871595529;
+        Fri, 10 Jun 2022 07:33:15 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d9-20020a656b89000000b003fd7e217686sm11556105pgw.57.2022.06.10.07.33.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jun 2022 07:30:37 -0700 (PDT)
-Date:   Fri, 10 Jun 2022 08:30:33 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Thomas Zimmermann <tzimmermann@suse.de>
-Cc:     kvm@vger.kernel.org, airlied@linux.ie,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
-Message-ID: <20220610083033.3f98beae.alex.williamson@redhat.com>
-In-Reply-To: <b13d6d73-6290-92b6-d2b3-62af6efef3dc@suse.de>
-References: <165453797543.3592816.6381793341352595461.stgit@omen>
-        <165453800875.3592816.12944011921352366695.stgit@omen>
-        <0c45183c-cdb8-4578-e346-bc4855be038f@suse.de>
-        <20220608080432.45282f0b.alex.williamson@redhat.com>
-        <01c74525-38b7-1e00-51ba-7cd793439f03@suse.de>
-        <20220609154102.5cb1d3ca.alex.williamson@redhat.com>
-        <20220609154416.676b1068.alex.williamson@redhat.com>
-        <b13d6d73-6290-92b6-d2b3-62af6efef3dc@suse.de>
-Organization: Red Hat
+        Fri, 10 Jun 2022 07:33:14 -0700 (PDT)
+Date:   Fri, 10 Jun 2022 14:33:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 126/144] KVM: selftests: Convert kvm_binary_stats_test
+ away from vCPU IDs
+Message-ID: <YqNWJwlGWleTw7sR@google.com>
+References: <20220603004331.1523888-1-seanjc@google.com>
+ <20220603004331.1523888-127-seanjc@google.com>
+ <20220610104851.g2r6yzd6j22xod6m@gator>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220610104851.g2r6yzd6j22xod6m@gator>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Jun 2022 09:03:15 +0200
-Thomas Zimmermann <tzimmermann@suse.de> wrote:
-
-> Hi
+On Fri, Jun 10, 2022, Andrew Jones wrote:
+> On Fri, Jun 03, 2022 at 12:43:13AM +0000, Sean Christopherson wrote:
+> > @@ -220,17 +221,21 @@ int main(int argc, char *argv[])
+> >  	/* Create VMs and VCPUs */
+> >  	vms = malloc(sizeof(vms[0]) * max_vm);
+> >  	TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
+> > +
+> > +	vcpus = malloc(sizeof(struct kvm_vcpu *) * max_vm * max_vcpu);
+> > +	TEST_ASSERT(vcpus, "Allocate memory for storing vCPU pointers");
+> > +
+> >  	for (i = 0; i < max_vm; ++i) {
+> >  		vms[i] = vm_create_barebones();
+> >  		for (j = 0; j < max_vcpu; ++j)
+> > -			__vm_vcpu_add(vms[i], j);
+> > +			vcpus[j * max_vcpu + i] = __vm_vcpu_add(vms[i], j);
 > 
-> Am 09.06.22 um 23:44 schrieb Alex Williamson:
-> > On Thu, 9 Jun 2022 15:41:02 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> >> On Thu, 9 Jun 2022 11:13:22 +0200
-> >> Thomas Zimmermann <tzimmermann@suse.de> wrote:  
-> >>>
-> >>> Please have a look at the attached patch. It moves the aperture helpers
-> >>> to a location common to the various possible users (DRM, fbdev, vfio).
-> >>> The DRM interfaces remain untouched for now.  The patch should provide
-> >>> what you need in vfio and also serve our future use cases for graphics
-> >>> drivers. If possible, please create your patch on top of it.  
-> >>
-> >> Looks good to me, this of course makes the vfio change quite trivial.
-> >> One change I'd request:
-> >>
-> >> diff --git a/drivers/video/console/Kconfig b/drivers/video/console/Kconfig
-> >> index 40c50fa2dd70..7f3c44e1538b 100644
-> >> --- a/drivers/video/console/Kconfig
-> >> +++ b/drivers/video/console/Kconfig
-> >> @@ -10,6 +10,7 @@ config VGA_CONSOLE
-> >>   	depends on !4xx && !PPC_8xx && !SPARC && !M68K && !PARISC &&  !SUPERH && \
-> >>   		(!ARM || ARCH_FOOTBRIDGE || ARCH_INTEGRATOR || ARCH_NETWINDER) && \
-> >>   		!ARM64 && !ARC && !MICROBLAZE && !OPENRISC && !S390 && !UML
-> >> +	select APERTURE_HELPERS if (DRM || FB || VFIO_PCI)
-> >>   	default y
-> >>   	help
-> >>   	  Saying Y here will allow you to use Linux in text mode through a
-> >>
-> >> This should be VFIO_PCI_CORE.  Thanks,  
-> 
-> I attached an updated patch to this email.
-> 
-> > 
-> > Also, whatever tree this lands in, I'd appreciate a topic branch being
-> > made available so I can more easily get the vfio change in on the same
-> > release.  Thanks,  
-> 
-> You can add my patch to your series and merge it through vfio. You'd 
-> only have to cc dri-devel for the patch's review. I guess it's more 
-> important for vfio than DRM. We have no hurry on the DRM side, but v5.20 
-> would be nice.
+> The expression for the index should be 'i * max_vcpu + j'. The swapped
+> i,j usage isn't causing problems now because
+> DEFAULT_NUM_VM == DEFAULT_NUM_VCPU, but that could change.
 
-Ok, I didn't realize you were offering the patch for me to post and
-merge.  I'll do that.  Thanks!
+It's better to be lucky than good?
 
-Alex
-
+Thanks much, I appreciate the reviews!
