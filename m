@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 388DA546EFA
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 23:05:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00105546F5B
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 23:41:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350836AbiFJVFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 17:05:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
+        id S1350671AbiFJVlq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 17:41:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350795AbiFJVFC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 17:05:02 -0400
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5392CE2F
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:05:01 -0700 (PDT)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-30c143c41e5so3945147b3.3
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:05:01 -0700 (PDT)
+        with ESMTP id S1347712AbiFJVlp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 17:41:45 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EAFD28E05
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:41:43 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id z67-20020a254c46000000b0065cd3d2e67eso386921yba.7
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:41:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xJlKMK3HVq56WXfodTgOAOhNas0GRU8DHURRXkOK2dA=;
-        b=SxT0lhEd13pHhK1+KST3B6KvA8cFHhURWis09vfvF0B6ltmmLVBEjVXL91BgxJ+0SQ
-         d2e+LJxpycjGXiHOzxE3gXU0HWSXr7hTJ6Q3r2FmFOrlEfr2e0oxSuIep45tDQ3VOCJA
-         G+wiwJIF/pWLi8rl8XCfe5YIHlswiXbhQLezYwTEWCjmGCoo4gy2CmnfnEpzMfAbtzy7
-         AtsUxcz+GMHhuoNWaLk5OnHEP1r1N9b3ndFgHT0S1a3xZvgU24UN5qjTclxGHfzTWZgC
-         5TyT/bg5kK34oJWoFn7fKvf3lV3/3CeHCt99iNwrRNh6yVhciImWy8u/3uAINcKXUuaT
-         mZCg==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=QRwkxD449IEvVBU53Os0OsTpTWGeUKY9nEsyApnDNxM=;
+        b=nG+8NxDyG19Tn+MrYth0pBt/LayA+JxKX+6WS3zpT+O+3YAMOvWuawWbEYrhk13k5C
+         58Pi/we6J/OQ/TxF5WaXH1dL99nO/kdd90JJMPgqyvNy9Dv9geElEaa6r+QNrk9hwY19
+         HqkZz5y+0i8GB+m3uYAUaBj0DjvBGe9/Xu8uUu7nRkhkVqM8R/dNI3L7tOatAs7OHr8G
+         j4EC6PI6OtfU7mg5fqw1NQZD3jZ+Zi/Hw+qv6pTP7J+2VYBupMtKkzxCthX1HtFKvyI2
+         D+rj/Z7le29/zpPhdPcn/MFBNHvpWMd7tl/EME0oszHoRmb1qq3G3/+nHgzOSMORco+m
+         6s3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xJlKMK3HVq56WXfodTgOAOhNas0GRU8DHURRXkOK2dA=;
-        b=Kqqe4sbNQX6ZrGu/Z2fzZDr6d5SNBigzV92IB/YlW6uttq2GS4oYlek/r+VKdxzJ+w
-         CC1fl7OV960Kcinn/iKCNBk5x5+LT4JvKvafCjOqjICDktXUoPKSgMo/bAS+vt8Sdq5H
-         YKipBdMrRJDeCirEV4g1pzOLU5hJytA+3fuh2aygZupBiUwVP7y3Ekiy1YL0swpg0s4G
-         vk2hk/OCoYn1EsbkN6UhFG1bcC7B+xp9bMtJjjAIwbHPi9fkaxlGZ92OU7BBUlLjQWhF
-         HwTUO9RtUUxE2dWvUCYl8hXweT3DjAst9bRtDgSk130CnoRxFiRSNsH/2x8VUW0OkbbB
-         AknA==
-X-Gm-Message-State: AOAM530iW6ormf28xN++QU/m/iN0VtWNsCOupv2DlVra2601MczGKB2o
-        QA3TTE8j9DI1MqcRbB8qoNZbIzTxt8nW2iltTpuKNA==
-X-Google-Smtp-Source: ABdhPJzkTaSGVJkh5pjJAIaIz4OU76YdvHXrdXNhim9IcSyDfVPY1QNmGVVh79xcWdhtLPsTCCXNpW1DtaDVmfHmNtc=
-X-Received: by 2002:a81:c54a:0:b0:2d6:435a:5875 with SMTP id
- o10-20020a81c54a000000b002d6435a5875mr49234125ywj.181.1654895100356; Fri, 10
- Jun 2022 14:05:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1651774250.git.isaku.yamahata@intel.com> <9a45667060dd2f8634bf1ecba23b89567c7e46e7.1651774251.git.isaku.yamahata@intel.com>
-In-Reply-To: <9a45667060dd2f8634bf1ecba23b89567c7e46e7.1651774251.git.isaku.yamahata@intel.com>
-From:   Sagi Shahar <sagis@google.com>
-Date:   Fri, 10 Jun 2022 14:04:49 -0700
-Message-ID: <CAAhR5DE8FmzACXja1znjdR04HS_kOsJ4awWsU5AHm3__oqOx8g@mail.gmail.com>
-Subject: Re: [RFC PATCH v6 095/104] KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall
-To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=QRwkxD449IEvVBU53Os0OsTpTWGeUKY9nEsyApnDNxM=;
+        b=evFnFJeeuObH0hkRvVDNcA0Z+SNNclTHcflheT4B8mtHtRVDQdJkhv/qMbvt8JMUzO
+         MCn8t55WOrSPDs+Z3Cn5i29d8dCO6FWwlxAodmWVvAwKf3Db8w7p/JNx5nQIId8xVkSe
+         BuhlVoVoZtnG211OsjtVLZPA0Zbm5wY/4+W5WUAdYkNwP+00Aw/CxTQ8ZV71bBn8hiXe
+         oQSOlyDiOAAkjafDDTw8iHfD2k5EOTpCFyG7J/iEfdx8rNkV5woVzuHOcmguP0T3hcaf
+         w0ZQqCa8AXV74jreYvwf4u3eYKE2jl2FTAI+cyJW5KteKSddgAiQhUSGR/Pf4NOuGIQf
+         ZzTg==
+X-Gm-Message-State: AOAM531LXeSoEVVfs2RdEoZ7VhbBj7YpXTznFec+/4eS6GS3oixxlBmj
+        yJWUp93lMk1GRnMEr1EZujk64I7RzBo=
+X-Google-Smtp-Source: ABdhPJzLIGA/VY1p3SL4QfQ3gCm4vTKkKl9Vj/IqUInmjiEG02PjbI7nYTb8eVmDLxi5oZoZApEfHcaYC5U=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a81:21d7:0:b0:313:76ac:4aa6 with SMTP id
+ h206-20020a8121d7000000b0031376ac4aa6mr16296719ywh.423.1654897302541; Fri, 10
+ Jun 2022 14:41:42 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 10 Jun 2022 21:41:40 +0000
+Message-Id: <20220610214140.612025-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
+Subject: [PATCH] KVM: VMX: Skip filter updates for MSRs that KVM is already intercepting
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,87 +69,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 5, 2022 at 11:16 AM <isaku.yamahata@intel.com> wrote:
->
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Wire up TDX PV rdmsr/wrmsr hypercall to the KVM backend function.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/vmx/tdx.c | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index f46825843a8b..1518a8c310d6 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1169,6 +1169,39 @@ static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
->         return 1;
->  }
->
-> +static int tdx_emulate_rdmsr(struct kvm_vcpu *vcpu)
-> +{
-> +       u32 index = tdvmcall_a0_read(vcpu);
-> +       u64 data;
-> +
-> +       if (kvm_get_msr(vcpu, index, &data)) {
+When handling userspace MSR filter updates, recompute interception for
+possible passthrough MSRs if and only if KVM wants to disabled
+interception.  If KVM wants to intercept accesses, i.e. the associated
+bit is set in vmx->shadow_msr_intercept, then there's no need to set the
+intercept again as KVM will intercept the MSR regardless of userspace's
+wants.
 
-kvm_get_msr and kvm_set_msr used to check the MSR permissions using
-kvm_msr_allowed but that behaviour changed in "KVM: x86: Only do MSR
-filtering when access MSR by rdmsr/wrmsr".
+No functional change intended, the call to vmx_enable_intercept_for_msr()
+really is just a gigantic nop.
 
-Now kvm_get_msr and kvm_set_msr skip these checks and will allow
-access regardless of the permissions in the msr_filter.
+Suggested-by: Aaron Lewis <aaronlewis@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-These should be changed to kvm_get_msr_with_filter and
-kvm_set_msr_with_filter or something similar that checks permissions
-for MSR access.
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5e14e4c40007..61962f3c4b28 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3981,17 +3981,21 @@ static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
+ 	u32 i;
+ 
+ 	/*
+-	 * Set intercept permissions for all potentially passed through MSRs
+-	 * again. They will automatically get filtered through the MSR filter,
+-	 * so we are back in sync after this.
++	 * Redo intercept permissions for MSRs that KVM is passing through to
++	 * the guest.  Disabling interception will check the new MSR filter and
++	 * ensure that KVM enables interception if usersepace wants to filter
++	 * the MSR.  MSRs that KVM is already intercepting don't need to be
++	 * refreshed since KVM is going to intercept them regardless of what
++	 * userspace wants.
+ 	 */
+ 	for (i = 0; i < ARRAY_SIZE(vmx_possible_passthrough_msrs); i++) {
+ 		u32 msr = vmx_possible_passthrough_msrs[i];
+-		bool read = test_bit(i, vmx->shadow_msr_intercept.read);
+-		bool write = test_bit(i, vmx->shadow_msr_intercept.write);
+ 
+-		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_R, read);
+-		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_W, write);
++		if (!test_bit(i, vmx->shadow_msr_intercept.read))
++			vmx_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_R);
++
++		if (!test_bit(i, vmx->shadow_msr_intercept.write))
++			vmx_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_W);
+ 	}
+ 
+ 	pt_update_intercept_for_msr(vcpu);
 
-> +               trace_kvm_msr_read_ex(index);
-> +               tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-> +               return 1;
-> +       }
-> +       trace_kvm_msr_read(index, data);
-> +
-> +       tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-> +       tdvmcall_set_return_val(vcpu, data);
-> +       return 1;
-> +}
-> +
-> +static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
-> +{
-> +       u32 index = tdvmcall_a0_read(vcpu);
-> +       u64 data = tdvmcall_a1_read(vcpu);
-> +
-> +       if (kvm_set_msr(vcpu, index, data)) {
-> +               trace_kvm_msr_write_ex(index, data);
-> +               tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-> +               return 1;
-> +       }
-> +
-> +       trace_kvm_msr_write(index, data);
-> +       tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-> +       return 1;
-> +}
-> +
->  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
->  {
->         if (tdvmcall_exit_type(vcpu))
-> @@ -1183,6 +1216,10 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
->                 return tdx_emulate_io(vcpu);
->         case EXIT_REASON_EPT_VIOLATION:
->                 return tdx_emulate_mmio(vcpu);
-> +       case EXIT_REASON_MSR_READ:
-> +               return tdx_emulate_rdmsr(vcpu);
-> +       case EXIT_REASON_MSR_WRITE:
-> +               return tdx_emulate_wrmsr(vcpu);
->         default:
->                 break;
->         }
-> --
-> 2.25.1
->
+base-commit: f38fdc2d315b8876ea2faa50cfb3481262e15abf
+-- 
+2.36.1.476.g0c4daa206d-goog
 
-Sagi
