@@ -2,142 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BF095458F1
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 02:04:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3ABE545903
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 02:11:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238802AbiFJAEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 20:04:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44068 "EHLO
+        id S238886AbiFJALj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 20:11:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231197AbiFJAEi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 20:04:38 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2052.outbound.protection.outlook.com [40.107.244.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200B52E93E7;
-        Thu,  9 Jun 2022 17:04:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RWw8qmAIQV8n4SLR+cTBch8sFHDZ7ONliENFZIaYSQv4wx9NkqaBmR8bMK/aF+EWfowcRaaj8JAzffRJZUM4T+Ba5zOaWlmfDQQfPMAFoRZ4kYj4j8czdM0mJiuwwsgYWlgxVQ3sxT6GFbFtBwpKwxO3k7LzG64HoPqXRfo+SEdHP2XJ2eZkiyGBbOYTu4aLNDOrGCZGIm4tBD5eE6UyEtFOrAoBFqR24UGNABy3E6WRbeY+lWef2N6tVKyrTUogmSTboNjd/30Kn0bFt2jTNEAGlH0sofX+mcYdkD9UKOKKs6SIBaCS9vn74nSXgYjQut547hYjLszw0E1/FS3Whw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BkJSpoqJIZ+uhN6zMr35XHimir9RM5KTDo8T0C1uJWg=;
- b=Gmeygob0T8EQRyHBjTNWGQS+ApV6G4B0EEtcumW+5eYAqVIv33Zn7jqWJwQAPf0tkDAyiDE6Z/+MUzDjnaIWXtCFZVS8U9AG/1PESYlvt5EeJsJhkuF/ttvuTxqWG0j2mkRp0ojZHRMzWpoqBy3qpaAUzlaA8fWrt3CFLzo5azX27qMC1FMz1vWic2cH74j1M/A8KfyxJk9lUSs433J/7IisuGOTcqutVJ+P5PZcLYiw6EZA/atpo2Bx/XwBUtd84JTvbUcBbVAJxGPZZ5UinmAtxS4WF4nXZMgt7Bkmwv8T3e65lgnmuMZmyeQGKObzsNAWXzJnS0LujjyMun0ymg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BkJSpoqJIZ+uhN6zMr35XHimir9RM5KTDo8T0C1uJWg=;
- b=q9Lpk4gf533toSPgrEjBEbgkc7mGPF+7Uvs+ttzLOtT4u1MC08cLaEs2+0KJYmH+NKpqZQbzJBLnYORLEmdQV4qE8Zh1lizBtuPEuddVUFaxlO7hSo7N9UusMF7sfWbHdmAOmeFJKXE8Imm3w85W+T+8e2qLMrVW37KVDzuL2CN9a+J5e+22/qpRvJhghQm9M7dO0q5Rsz6XZD5WNpA8jm+/IGGiiajizUEAurZagMIIzbfTPmx9hlJGktEtd+ndeHX9c8zSq1b0dDrI7xVefJv6JweIXOFXdXVBwsgB6Z+s7Ykv3ArD5Hem+BrAQJCiOEf2sRAxaFxzTuO03j4Cxw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CY4PR12MB1768.namprd12.prod.outlook.com (2603:10b6:903:11c::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.17; Fri, 10 Jun
- 2022 00:04:35 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5332.013; Fri, 10 Jun 2022
- 00:04:35 +0000
-Date:   Thu, 9 Jun 2022 21:04:34 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kwankhede@nvidia.com, farman@linux.ibm.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, diana.craciun@oss.nxp.com, cohuck@redhat.com,
-        eric.auger@redhat.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, yishaih@nvidia.com, hch@lst.de
-Subject: Re: [PATCH] vfio: de-extern-ify function prototypes
-Message-ID: <20220610000434.GE1343366@nvidia.com>
-References: <165471414407.203056.474032786990662279.stgit@omen>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <165471414407.203056.474032786990662279.stgit@omen>
-X-ClientProxiedBy: MN2PR16CA0042.namprd16.prod.outlook.com
- (2603:10b6:208:234::11) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S238178AbiFJALg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 20:11:36 -0400
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DEB94C7BB
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 17:11:35 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-fe32122311so1408774fac.7
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 17:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lN+fOqwv9bBcDqIpukqHItG5mOqsK9h2lCdbXTf1cPM=;
+        b=DayT0SdBt1ymTKyry+8RI8dWvFXfKXAgjmO8VhNnB1yoDZK63YuzcCUTHD3X1Z3+t5
+         KxmGEbccYszaa9LA1rH+uPvXkUot/k7y+eYJ5dVw1vcNDUZMV9ll/y/F+7N08dr0Wzcn
+         baBzETzPA15Z2tn9QgoF5S7+WOA0j8RJa/fH3l+HKIsIdEIRN75ENG6RuJQTaJE4f7s+
+         tdQ6ePOMDHk+W48X2uZ7KmmqPYEcwu7pMK65fJXjpYRLWoV5X97j/IkcgrkGUpYpxwIB
+         E5LIO66muSm/XASIShQU2K4+YUS/ejVNHYtSotPk8eFHXkkvvETkJhzMm8POKoBM9Wup
+         sSZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lN+fOqwv9bBcDqIpukqHItG5mOqsK9h2lCdbXTf1cPM=;
+        b=lM1YMA+YdlbyY+3ovM54XocQKsSp9VqjmV0/sVsEbV0nW+ofLGu2LwTqYV9+otBWIx
+         jrtvBGSea6glnS7s2qfsDtHah4ssHPhCCI4SP0CsnTVVXF4BxXOHxPMdtohv3+Rvrk4f
+         918f6IhvfQTfiPV1hVJiqSTr5g51c3muiHkSLYzLyP6Yyy7zmsFkzAq9h7heCkKomCy+
+         qMhyTRk4FTJ9WduKasweNzq1EOP09zUSXhxg5dC46Zxr7kEG9A+0Bq99PCMT9JV1OXUk
+         yzhULIB6aVMQMZSzxdEXrKWFBvg+y5NHPqjIj7pHIE+/Ue8xNRAFIGtaZpCK61QLwJwa
+         Uvzg==
+X-Gm-Message-State: AOAM530aAnnSEOKU7J6dExsLBbVZXnb8kG8V9rwi3SfMK11MHoQvIT/M
+        q/0mHBWcCXZAcWc0cM1e6MggKuSDvEx0kSfCKoVW0A==
+X-Google-Smtp-Source: ABdhPJzdaT0C30mX9Im9rqGsL6x1Rmi0294lLn68XE92+pqgxWwSN0AqB6f3CMYnEGDUJ7ZH1btvuZX8xfTHzXelZbU=
+X-Received: by 2002:a05:6870:b616:b0:e2:f8bb:5eb with SMTP id
+ cm22-20020a056870b61600b000e2f8bb05ebmr3338490oab.218.1654819893261; Thu, 09
+ Jun 2022 17:11:33 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a54be9f8-45fe-4684-df7e-08da4a74cdbe
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1768:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1768D2513F9569138FA509B5C2A69@CY4PR12MB1768.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7InaZMIrXuv9s253r6D/zEYbk2FZ1fZclqCwT+QwR/Pel/3hhUSrf9Xd6Y/TuwfYIc6OJtXvbIm8C/wkQAP3Og+45311F+oVAL1m3QobgNlnh/2ITeBid0zHcM27UMq8iFOECEOR/Fl+1gOjW53OnlNLyCzVoDXyvfqX6yjS+QNrXtiZiv7oniiV+9JvqUO3UcLhtk8XEbGHoUWgnN6g73YLyFvtG/9Jt3BgrnTUvtXwLCg2+fk9vW7At2DhHo2vMskurIaRpdGxDbGv20xhC18VDqDcjnsDJKiWosxUyboABIX2WFDmRPEUa8xFp+Xn6Vk/XHg+mt/YmWwTROkme6YVrWBjv7R9/koSPm3fay/JPBr+Iu2gldsqFmcJIYiCP0VvKNWxFqKe+8XLXArE/yzdBYQJWi6QmyT78KSb9CVFYVLGQSfzAbFPKSKns/MKXCSILL+UCCmbiAF71lMMtxFuGRseF2RpW32J8W+RqeD7pHQb+obAN+t3/Y53Zo+O5zdomg6byXXpkLh03M/9FGRPfTtPy4CZkZTdBgDJpA4WMtNMxYqo1QHeKL3TYIz0p0UZZuSa1JcUL3NuAYGKoADExfVRRcE/5fMM32QN5aYRr0egz5fAWCjtbl63qNWTyizJbTeKaHB8WYro3gyHog==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(38100700002)(186003)(5660300002)(6916009)(4326008)(66946007)(8936002)(8676002)(66556008)(66476007)(4744005)(508600001)(316002)(7416002)(6486002)(33656002)(6506007)(86362001)(26005)(36756003)(2906002)(2616005)(6512007)(1076003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fbatCssn4GawTpeCIlXO4P+V9btiSQaWnecQzFFkF7ZXBJe73V5uPx2dOk2q?=
- =?us-ascii?Q?NKG5XCeoIc7wSxUG2gwmn5xpOmHMfWVP70gFSFNW7FcfWKoiBlC99HFBO+kd?=
- =?us-ascii?Q?ccp8CrcBTGgBcpZa7uggl9XTfwWQMFw2t57mvxmx1C4LpTXpRhvObW4VM3WO?=
- =?us-ascii?Q?kiZIhYJXQCdbcoezDGAsAt2PUH7JrQiWB2MBvnMvA9IWBwkudFMN1lJ+DUtr?=
- =?us-ascii?Q?1lNBaiaUZreizhHWphDUMTACansJSQesfewED79BVt0kMx5OvXKmgykhvW8g?=
- =?us-ascii?Q?y8NUoTh3bdUfimMlrW3FJ7ldVEcZWKicLvxxor1H+3Y6y67dQt2JvzpVw0CB?=
- =?us-ascii?Q?u9gFsL8zuBSS+LdQTP5yzeCiVJ9W+8GyP25dD5SedHRqDWn6WHo5Ct54WRU0?=
- =?us-ascii?Q?DXWVTYP1HMnlp2wW7nSTR2bMfhePBgMtGNCohUJ2KVeGIPofsw8a7hRyPICh?=
- =?us-ascii?Q?r7UraBQ45UV0nOe15/8kt5NyYKlMaUV2AlLcWOCeJAB/y7Z1qPvMkPwYLt0I?=
- =?us-ascii?Q?fER7GcHc4NPFB2T8dgCAK5y7n7VGjSW3ftadkFT81EHE2vgnsCI3Pj2ZdNam?=
- =?us-ascii?Q?BTPZSJU6wTW/SeP7y+QeEY/rkUwg9rwul0RK3yWO36CLErfuVB/IQ6T3bbas?=
- =?us-ascii?Q?ufI+JqweuzqIbQuePAIS0QKnJwGJuse3Yd3IjEC8JxnzWdblpBZUP8lAKZZq?=
- =?us-ascii?Q?7rAFGkBGw2SObjmXcrbZltQ4xNUWAInpy9aemWuNgx3Mm+qDujMEmIiJ1+q1?=
- =?us-ascii?Q?yjrTjgpBj3zaDpixU3uQOx2q5XHmjhTJ5lOXTJ3l3S18eWTuiyjg98mL07kL?=
- =?us-ascii?Q?XzBs1Tvsfni8dQmIx02WMvjLqzGOEcYCOPvCbpDKFgMQRJGtvvDjF12LBvx0?=
- =?us-ascii?Q?3mAWI2ni2xSHcfW3TWRmvFhbQ8ZJ102v8F8llcGGuzv6iN/hZ/xAGd0Y7l9D?=
- =?us-ascii?Q?tTQL3WSevWtvOksfrCZTUgx82DrxJ+ciDXqnunj+FSLIkkH51gI9Kd9k+eF2?=
- =?us-ascii?Q?vQqSJ+QzoTHuaDEDODAkXVNka6HA7RiXDVpQ/HDh3FCAhD62KY2KTsKDvWvg?=
- =?us-ascii?Q?zkgmmqUlfPOm0LtYmeN426Ck4jpGH8OxlNTpp1vWlU5M+pJMSsOv3sMV4zyE?=
- =?us-ascii?Q?BfbKY0LnfnQ4ISMc6Z249Xc/bDREScMI6jHAfhMQi4O0ovR+db7hfryepBfw?=
- =?us-ascii?Q?U2ArKnmZv1gCTMCuJRjUGvOYKUhYRxLnZVoZHlEfziibOOlxEv/Zyc5wsLjS?=
- =?us-ascii?Q?88GjvpkenX0xnzoFPo4upkQiuegpgO9UZstyeVViAmq5XFqriDJOrsesryFs?=
- =?us-ascii?Q?0JUIegerxK8k/8lDX3lUJmkSDvdbPHOHvtX9lSLqghL7A8N9in5LQbYHwgq+?=
- =?us-ascii?Q?laJzqzzQdHAqReLYnN9VQDrxrs+2j6tRhjlG9ODYl9k4qbDkdvj4P+jg176i?=
- =?us-ascii?Q?wfgQOXyzIRtwl0IrqMeZMuv0QF62LUtkHNAR75GYUBiszvgLCysI1qqEPNQ7?=
- =?us-ascii?Q?JNyKDK8zZuNmIEBaIyRU0WECGoNMCZ5B04BbwhT2QIEFkiHR7DYzV1BvFQnc?=
- =?us-ascii?Q?eBcXAQ25Xiw6ewnqKkIUuxoO0KJJd5gB7n6/sYUfyiWwlFzmuPKl8ibrUmgi?=
- =?us-ascii?Q?OE5Ebp0paROITbWFybTZKKvmWTnWpTbxk3cZtHoaIXKlBDoBpuVfDBXnHFHa?=
- =?us-ascii?Q?/eAJh7e/ywCKCWN0F2UiLbDLr5qwoHW59dSeptlrLjA8BldWspFsBi0zoREc?=
- =?us-ascii?Q?uIvnQUfhJQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a54be9f8-45fe-4684-df7e-08da4a74cdbe
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2022 00:04:35.6565
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7rIPBbajZ9g25y1MrwWXPxrj+W01nrWfCnwVLe2nXhbGAhHXqKdUgJE5o0U0vUkN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1768
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <CAGtprH_83CEC0U-cBR2FzHsxbwbGn0QJ87WFNOEet8sineOcbQ@mail.gmail.com>
+ <20220607065749.GA1513445@chaop.bj.intel.com> <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
+ <20220608021820.GA1548172@chaop.bj.intel.com>
+In-Reply-To: <20220608021820.GA1548172@chaop.bj.intel.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Thu, 9 Jun 2022 17:11:21 -0700
+Message-ID: <CAA03e5GmJw8u83=OG2wYrhdO81Sx5Jme-jkUnoTMQ7cc_o7u=w@mail.gmail.com>
+Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Vishal Annapurve <vannapurve@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 08, 2022 at 12:55:13PM -0600, Alex Williamson wrote:
-> The use of 'extern' in function prototypes has been disrecommended in
-> the kernel coding style for several years now, remove them from all vfio
-> related files so contributors no longer need to decide between style and
-> consistency.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
-> 
-> A patch in the same vein was proposed about a year ago, but tied to an ill
-> fated series and forgotten.  Now that we're at the beginning of a new
-> development cycle, I'd like to propose kicking off the v5.20 vfio next
-> branch with this patch and would kindly ask anyone with pending respins or
-> significant conflicts to rebase on top of this patch.  Thanks!
+On Tue, Jun 7, 2022 at 7:22 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+>
+> On Tue, Jun 07, 2022 at 05:55:46PM -0700, Marc Orr wrote:
+> > On Tue, Jun 7, 2022 at 12:01 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > >
+> > > On Mon, Jun 06, 2022 at 01:09:50PM -0700, Vishal Annapurve wrote:
+> > > > >
+> > > > > Private memory map/unmap and conversion
+> > > > > ---------------------------------------
+> > > > > Userspace's map/unmap operations are done by fallocate() ioctl on the
+> > > > > backing store fd.
+> > > > >   - map: default fallocate() with mode=0.
+> > > > >   - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
+> > > > > The map/unmap will trigger above memfile_notifier_ops to let KVM map/unmap
+> > > > > secondary MMU page tables.
+> > > > >
+> > > > ....
+> > > > >    QEMU: https://github.com/chao-p/qemu/tree/privmem-v6
+> > > > >
+> > > > > An example QEMU command line for TDX test:
+> > > > > -object tdx-guest,id=tdx \
+> > > > > -object memory-backend-memfd-private,id=ram1,size=2G \
+> > > > > -machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
+> > > > >
+> > > >
+> > > > There should be more discussion around double allocation scenarios
+> > > > when using the private fd approach. A malicious guest or buggy
+> > > > userspace VMM can cause physical memory getting allocated for both
+> > > > shared (memory accessible from host) and private fds backing the guest
+> > > > memory.
+> > > > Userspace VMM will need to unback the shared guest memory while
+> > > > handling the conversion from shared to private in order to prevent
+> > > > double allocation even with malicious guests or bugs in userspace VMM.
+> > >
+> > > I don't know how malicious guest can cause that. The initial design of
+> > > this serie is to put the private/shared memory into two different
+> > > address spaces and gives usersapce VMM the flexibility to convert
+> > > between the two. It can choose respect the guest conversion request or
+> > > not.
+> >
+> > For example, the guest could maliciously give a device driver a
+> > private page so that a host-side virtual device will blindly write the
+> > private page.
+>
+> With this patch series, it's actually even not possible for userspace VMM
+> to allocate private page by a direct write, it's basically unmapped from
+> there. If it really wants to, it should so something special, by intention,
+> that's basically the conversion, which we should allow.
 
-Can you stick it in your branch please?
+I think Vishal did a better job to explain this scenario in his last
+reply than I did.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> > > It's possible for a usrspace VMM to cause double allocation if it fails
+> > > to call the unback operation during the conversion, this may be a bug
+> > > or not. Double allocation may not be a wrong thing, even in conception.
+> > > At least TDX allows you to use half shared half private in guest, means
+> > > both shared/private can be effective. Unbacking the memory is just the
+> > > current QEMU implementation choice.
+> >
+> > Right. But the idea is that this patch series should accommodate all
+> > of the CVM architectures. Or at least that's what I know was
+> > envisioned last time we discussed this topic for SNP [*].
+>
+> AFAICS, this series should work for both TDX and SNP, and other CVM
+> architectures. I don't see where TDX can work but SNP cannot, or I
+> missed something here?
 
-Thanks
-Jason
+Agreed. I was just responding to the "At least TDX..." bit. Sorry for
+any confusion.
+
+> >
+> > Regardless, it's important to ensure that the VM respects its memory
+> > budget. For example, within Google, we run VMs inside of containers.
+> > So if we double allocate we're going to OOM. This seems acceptable for
+> > an early version of CVMs. But ultimately, I think we need a more
+> > robust way to ensure that the VM operates within its memory container.
+> > Otherwise, the OOM is going to be hard to diagnose and distinguish
+> > from a real OOM.
+>
+> Thanks for bringing this up. But in my mind I still think userspace VMM
+> can do and it's its responsibility to guarantee that, if that is hard
+> required. By design, userspace VMM is the decision-maker for page
+> conversion and has all the necessary information to know which page is
+> shared/private. It also has the necessary knobs to allocate/free the
+> physical pages for guest memory. Definitely, we should make userspace
+> VMM more robust.
+
+Vishal and Sean did a better job to articulate the concern in their
+most recent replies.
