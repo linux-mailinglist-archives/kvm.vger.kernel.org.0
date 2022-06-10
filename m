@@ -2,191 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3ABE545903
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 02:11:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CC94545909
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 02:14:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238886AbiFJALj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jun 2022 20:11:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47288 "EHLO
+        id S238485AbiFJAOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jun 2022 20:14:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238178AbiFJALg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jun 2022 20:11:36 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DEB94C7BB
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 17:11:35 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-fe32122311so1408774fac.7
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 17:11:35 -0700 (PDT)
+        with ESMTP id S231631AbiFJAOd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jun 2022 20:14:33 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B063280B1F
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 17:14:32 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id g186so14419959pgc.1
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 17:14:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lN+fOqwv9bBcDqIpukqHItG5mOqsK9h2lCdbXTf1cPM=;
-        b=DayT0SdBt1ymTKyry+8RI8dWvFXfKXAgjmO8VhNnB1yoDZK63YuzcCUTHD3X1Z3+t5
-         KxmGEbccYszaa9LA1rH+uPvXkUot/k7y+eYJ5dVw1vcNDUZMV9ll/y/F+7N08dr0Wzcn
-         baBzETzPA15Z2tn9QgoF5S7+WOA0j8RJa/fH3l+HKIsIdEIRN75ENG6RuJQTaJE4f7s+
-         tdQ6ePOMDHk+W48X2uZ7KmmqPYEcwu7pMK65fJXjpYRLWoV5X97j/IkcgrkGUpYpxwIB
-         E5LIO66muSm/XASIShQU2K4+YUS/ejVNHYtSotPk8eFHXkkvvETkJhzMm8POKoBM9Wup
-         sSZg==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=5ZpICK2s04+dMtDaxHdX9/pjuoOJWneKfeE8NGKcaY0=;
+        b=l9o+WnImMyYUEacgUO29oijJhkwXuCtjdze61yEpxNqyqkwEyfMhsqwtizEgPudEDk
+         c92hO/+MnixUKLVmYn+nAv2h3vK5tMTyrqb6cGX33FJblnha1pmpFUCO1XzNpmo2nlKz
+         18oh60v+N1dPExEGVzW65W6Nhxyr9mh2JUrfhFyx9nh8+GoKEGWcGI8phO4rM4v2fLAD
+         iQbJnPAe2MQMJvMbXhJGmJZoPFpnvsytJuXIwNaSoyXBSY+5/xUXmljxzhXSk0UiwAYM
+         H3+xb5WNti9zIWvWAivyFt/nL40sd91BXz+5kpKXAOCVu6bzKVPvFuZuvls+/KRRbPj/
+         h0SA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lN+fOqwv9bBcDqIpukqHItG5mOqsK9h2lCdbXTf1cPM=;
-        b=lM1YMA+YdlbyY+3ovM54XocQKsSp9VqjmV0/sVsEbV0nW+ofLGu2LwTqYV9+otBWIx
-         jrtvBGSea6glnS7s2qfsDtHah4ssHPhCCI4SP0CsnTVVXF4BxXOHxPMdtohv3+Rvrk4f
-         918f6IhvfQTfiPV1hVJiqSTr5g51c3muiHkSLYzLyP6Yyy7zmsFkzAq9h7heCkKomCy+
-         qMhyTRk4FTJ9WduKasweNzq1EOP09zUSXhxg5dC46Zxr7kEG9A+0Bq99PCMT9JV1OXUk
-         yzhULIB6aVMQMZSzxdEXrKWFBvg+y5NHPqjIj7pHIE+/Ue8xNRAFIGtaZpCK61QLwJwa
-         Uvzg==
-X-Gm-Message-State: AOAM530aAnnSEOKU7J6dExsLBbVZXnb8kG8V9rwi3SfMK11MHoQvIT/M
-        q/0mHBWcCXZAcWc0cM1e6MggKuSDvEx0kSfCKoVW0A==
-X-Google-Smtp-Source: ABdhPJzdaT0C30mX9Im9rqGsL6x1Rmi0294lLn68XE92+pqgxWwSN0AqB6f3CMYnEGDUJ7ZH1btvuZX8xfTHzXelZbU=
-X-Received: by 2002:a05:6870:b616:b0:e2:f8bb:5eb with SMTP id
- cm22-20020a056870b61600b000e2f8bb05ebmr3338490oab.218.1654819893261; Thu, 09
- Jun 2022 17:11:33 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=5ZpICK2s04+dMtDaxHdX9/pjuoOJWneKfeE8NGKcaY0=;
+        b=zJ22AePzuTQ58bDNgMMkzgVsndIWws6jOcUWO6+S7Hpbjjg0Fb6tbJEvj4UmXe1VY+
+         7ZBP9SYoKUIFRuI/o67LbCnMGQV1nhHYwFDjKgth5hY9LjFbBrIl1E1tsWrvYrEV4WpO
+         2f5gznBRF5fpPpEgsbSh4IY9n1ywKN4qLH3r/i/b1vq2oO/Qn4jjJhc2sBUbr8AoRroQ
+         u5MAVgzsrJ8VpiyMAJIm0BzM7QXf9/7u1/oWAo8kxeaMJLr06UJbfZpMBdmE0lJBPMhU
+         0Ux1RoyER5wkc9IRoh9e0li8NeAwh41vSwZWqutfm5nY795q6IuU2kP358lz4a5X5CHN
+         7+Vg==
+X-Gm-Message-State: AOAM531LLeMIXxWt3ed6rISAQJrlGQEtjdyveX8rPVsosFj/GZKLhSZg
+        w5ips1h2PpvULKqFyW6g9sPnluGbHvI=
+X-Google-Smtp-Source: ABdhPJwGxHFpHyc6M363MnJHSXMw6w4Ray5hjxq0LqjCgMsm1WGXrIEVMLGG5UNX3zLL2/lVrOb0FQ==
+X-Received: by 2002:a05:6a00:1482:b0:51c:6134:de1a with SMTP id v2-20020a056a00148200b0051c6134de1amr12219241pfu.31.1654820071655;
+        Thu, 09 Jun 2022 17:14:31 -0700 (PDT)
+Received: from [192.168.255.10] ([203.205.141.22])
+        by smtp.gmail.com with ESMTPSA id r10-20020a170902ea4a00b00163e459be9asm10439161plg.136.2022.06.09.17.14.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jun 2022 17:14:31 -0700 (PDT)
+Message-ID: <587f8bc5-76fc-6cd7-d3d7-3a712c3f1274@gmail.com>
+Date:   Fri, 10 Jun 2022 08:14:27 +0800
 MIME-Version: 1.0
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <CAGtprH_83CEC0U-cBR2FzHsxbwbGn0QJ87WFNOEet8sineOcbQ@mail.gmail.com>
- <20220607065749.GA1513445@chaop.bj.intel.com> <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
- <20220608021820.GA1548172@chaop.bj.intel.com>
-In-Reply-To: <20220608021820.GA1548172@chaop.bj.intel.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 9 Jun 2022 17:11:21 -0700
-Message-ID: <CAA03e5GmJw8u83=OG2wYrhdO81Sx5Jme-jkUnoTMQ7cc_o7u=w@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.10.0
+Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Skip perf related tests when pmu
+ is disabled
+Content-Language: en-US
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
+        <pbonzini@redhat.com>
+References: <20220609083916.36658-1-weijiang.yang@intel.com>
+ <20220609083916.36658-4-weijiang.yang@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20220609083916.36658-4-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 7, 2022 at 7:22 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
->
-> On Tue, Jun 07, 2022 at 05:55:46PM -0700, Marc Orr wrote:
-> > On Tue, Jun 7, 2022 at 12:01 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> > >
-> > > On Mon, Jun 06, 2022 at 01:09:50PM -0700, Vishal Annapurve wrote:
-> > > > >
-> > > > > Private memory map/unmap and conversion
-> > > > > ---------------------------------------
-> > > > > Userspace's map/unmap operations are done by fallocate() ioctl on the
-> > > > > backing store fd.
-> > > > >   - map: default fallocate() with mode=0.
-> > > > >   - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
-> > > > > The map/unmap will trigger above memfile_notifier_ops to let KVM map/unmap
-> > > > > secondary MMU page tables.
-> > > > >
-> > > > ....
-> > > > >    QEMU: https://github.com/chao-p/qemu/tree/privmem-v6
-> > > > >
-> > > > > An example QEMU command line for TDX test:
-> > > > > -object tdx-guest,id=tdx \
-> > > > > -object memory-backend-memfd-private,id=ram1,size=2G \
-> > > > > -machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
-> > > > >
-> > > >
-> > > > There should be more discussion around double allocation scenarios
-> > > > when using the private fd approach. A malicious guest or buggy
-> > > > userspace VMM can cause physical memory getting allocated for both
-> > > > shared (memory accessible from host) and private fds backing the guest
-> > > > memory.
-> > > > Userspace VMM will need to unback the shared guest memory while
-> > > > handling the conversion from shared to private in order to prevent
-> > > > double allocation even with malicious guests or bugs in userspace VMM.
-> > >
-> > > I don't know how malicious guest can cause that. The initial design of
-> > > this serie is to put the private/shared memory into two different
-> > > address spaces and gives usersapce VMM the flexibility to convert
-> > > between the two. It can choose respect the guest conversion request or
-> > > not.
-> >
-> > For example, the guest could maliciously give a device driver a
-> > private page so that a host-side virtual device will blindly write the
-> > private page.
->
-> With this patch series, it's actually even not possible for userspace VMM
-> to allocate private page by a direct write, it's basically unmapped from
-> there. If it really wants to, it should so something special, by intention,
-> that's basically the conversion, which we should allow.
+On 9/6/2022 4:39 pm, Yang Weijiang wrote:
+> executing rdpmc leads to #GP,
 
-I think Vishal did a better job to explain this scenario in his last
-reply than I did.
+RDPMC still works on processors that do not support architectural performance 
+monitoring.
 
-> > > It's possible for a usrspace VMM to cause double allocation if it fails
-> > > to call the unback operation during the conversion, this may be a bug
-> > > or not. Double allocation may not be a wrong thing, even in conception.
-> > > At least TDX allows you to use half shared half private in guest, means
-> > > both shared/private can be effective. Unbacking the memory is just the
-> > > current QEMU implementation choice.
-> >
-> > Right. But the idea is that this patch series should accommodate all
-> > of the CVM architectures. Or at least that's what I know was
-> > envisioned last time we discussed this topic for SNP [*].
->
-> AFAICS, this series should work for both TDX and SNP, and other CVM
-> architectures. I don't see where TDX can work but SNP cannot, or I
-> missed something here?
-
-Agreed. I was just responding to the "At least TDX..." bit. Sorry for
-any confusion.
-
-> >
-> > Regardless, it's important to ensure that the VM respects its memory
-> > budget. For example, within Google, we run VMs inside of containers.
-> > So if we double allocate we're going to OOM. This seems acceptable for
-> > an early version of CVMs. But ultimately, I think we need a more
-> > robust way to ensure that the VM operates within its memory container.
-> > Otherwise, the OOM is going to be hard to diagnose and distinguish
-> > from a real OOM.
->
-> Thanks for bringing this up. But in my mind I still think userspace VMM
-> can do and it's its responsibility to guarantee that, if that is hard
-> required. By design, userspace VMM is the decision-maker for page
-> conversion and has all the necessary information to know which page is
-> shared/private. It also has the necessary knobs to allocate/free the
-> physical pages for guest memory. Definitely, we should make userspace
-> VMM more robust.
-
-Vishal and Sean did a better job to articulate the concern in their
-most recent replies.
+The #GP will violate ISA, and try to treat it as NOP (plus EAX=EDX=0) if 
+!enable_pmu.
