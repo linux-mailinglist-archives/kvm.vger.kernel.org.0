@@ -2,96 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 768B9546EE8
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 23:01:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 388DA546EFA
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 23:05:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347518AbiFJVB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 17:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42736 "EHLO
+        id S1350836AbiFJVFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 17:05:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244872AbiFJVBz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 17:01:55 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5680201A5
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:01:53 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id j7so471164pjn.4
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:01:53 -0700 (PDT)
+        with ESMTP id S1350795AbiFJVFC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 17:05:02 -0400
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5392CE2F
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:05:01 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-30c143c41e5so3945147b3.3
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:05:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=9j+lUZ+Mcfs1Jcoa4etI2TPzedTT1LtFJEr4fDqaygA=;
-        b=NKflmcL3DRRoEVI9aA2myzxnaV92k/hIea6L4aJUQzCGDuHMfvHPgs1/rD0/Vm7kOy
-         ZTQxPAjfe1ez1G30H2jihUbHdbUmFFXTAmnEYfpv2Nrs8pSzHaktoorFzSEvDx13LGG6
-         UkPqWHPJiteD974QKgN0Tq5hW/vfR9VBK4nDGXkd4ymYHM1wEZ0IG2QZSq6d720hjieK
-         TBepncYM2w+AqxgoR/le9W1+ez7DFwX0gcDPeo3JWb0yCnkE1FiidcdGAskXT7g3L5ia
-         jvDiTdAx3e9ZCPlt3uX1o7eE7x+2h6VjNxbWH5BbvnNP3NNWqZO+PUjGttxVaxnRNLTU
-         +9vQ==
+        bh=xJlKMK3HVq56WXfodTgOAOhNas0GRU8DHURRXkOK2dA=;
+        b=SxT0lhEd13pHhK1+KST3B6KvA8cFHhURWis09vfvF0B6ltmmLVBEjVXL91BgxJ+0SQ
+         d2e+LJxpycjGXiHOzxE3gXU0HWSXr7hTJ6Q3r2FmFOrlEfr2e0oxSuIep45tDQ3VOCJA
+         G+wiwJIF/pWLi8rl8XCfe5YIHlswiXbhQLezYwTEWCjmGCoo4gy2CmnfnEpzMfAbtzy7
+         AtsUxcz+GMHhuoNWaLk5OnHEP1r1N9b3ndFgHT0S1a3xZvgU24UN5qjTclxGHfzTWZgC
+         5TyT/bg5kK34oJWoFn7fKvf3lV3/3CeHCt99iNwrRNh6yVhciImWy8u/3uAINcKXUuaT
+         mZCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=9j+lUZ+Mcfs1Jcoa4etI2TPzedTT1LtFJEr4fDqaygA=;
-        b=NLjfDgFlzxvvYg67y+qZAjbvT+fTnRubDwgoFT8+iNN0CJyG9QvPfxrwDuuhgmHm3A
-         yA/b3gzfg1XLXaS5qIO54/lqMNKUO1SbXObqyJFSztri1ZMyvHFlC7g2OjyZdSc/qUqb
-         WdlonuoXzJjteJcMMu+rt4pfEITTo7cw2t44uFwDwWqw2ObFiSJn4HV0EIGfGKC0gkRh
-         GEmURK0ALgW/YfeUvbsQlktUWgVjMF6qBJlhv/23PJ6UVwfu8DHld61iEeEc7m7RTwcX
-         YLlZFRIAoIZgM5waVDLGgqfVh2o5/Cs8g3bEvB3S53zZNTh3dAjGav8Fcz65g5GplUn9
-         LK6g==
-X-Gm-Message-State: AOAM5306twGyHx8O3y4I1E6QzCVsPswVuGVcL5jhFEF+vo1LI2w53Zrv
-        7dBbzme88qJ1IPFxUvUW7MfsZO7TnXEwYUefq9Xe5A==
-X-Google-Smtp-Source: ABdhPJwvRGSfjW+BQVoBdbJMFI3SGm9Mmrx5BjmO46SgVdtXKMaXbKuqMg2V/NxgtH3LSYo3AH35O1L6keWUVQOdZgw=
-X-Received: by 2002:a17:90b:3806:b0:1e2:adc5:d192 with SMTP id
- mq6-20020a17090b380600b001e2adc5d192mr1581921pjb.223.1654894912870; Fri, 10
- Jun 2022 14:01:52 -0700 (PDT)
+        bh=xJlKMK3HVq56WXfodTgOAOhNas0GRU8DHURRXkOK2dA=;
+        b=Kqqe4sbNQX6ZrGu/Z2fzZDr6d5SNBigzV92IB/YlW6uttq2GS4oYlek/r+VKdxzJ+w
+         CC1fl7OV960Kcinn/iKCNBk5x5+LT4JvKvafCjOqjICDktXUoPKSgMo/bAS+vt8Sdq5H
+         YKipBdMrRJDeCirEV4g1pzOLU5hJytA+3fuh2aygZupBiUwVP7y3Ekiy1YL0swpg0s4G
+         vk2hk/OCoYn1EsbkN6UhFG1bcC7B+xp9bMtJjjAIwbHPi9fkaxlGZ92OU7BBUlLjQWhF
+         HwTUO9RtUUxE2dWvUCYl8hXweT3DjAst9bRtDgSk130CnoRxFiRSNsH/2x8VUW0OkbbB
+         AknA==
+X-Gm-Message-State: AOAM530iW6ormf28xN++QU/m/iN0VtWNsCOupv2DlVra2601MczGKB2o
+        QA3TTE8j9DI1MqcRbB8qoNZbIzTxt8nW2iltTpuKNA==
+X-Google-Smtp-Source: ABdhPJzkTaSGVJkh5pjJAIaIz4OU76YdvHXrdXNhim9IcSyDfVPY1QNmGVVh79xcWdhtLPsTCCXNpW1DtaDVmfHmNtc=
+X-Received: by 2002:a81:c54a:0:b0:2d6:435a:5875 with SMTP id
+ o10-20020a81c54a000000b002d6435a5875mr49234125ywj.181.1654895100356; Fri, 10
+ Jun 2022 14:05:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220524205646.1798325-1-vannapurve@google.com> <20220610010510.vlxax4g3sgvsmoly@amd.com>
-In-Reply-To: <20220610010510.vlxax4g3sgvsmoly@amd.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Fri, 10 Jun 2022 14:01:41 -0700
-Message-ID: <CAGtprH92PVtCDGrtwcvfrsKokFbYrqXqtH6D_aUrYXvHYyWpyQ@mail.gmail.com>
-Subject: Re: [RFC V1 PATCH 0/3] selftests: KVM: sev: selftests for fd-based
- approach of supporting private memory
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     x86 <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        dave.hansen@linux.intel.com, "H . Peter Anvin" <hpa@zytor.com>,
-        shuah <shuah@kernel.org>, yang.zhong@intel.com,
-        drjones@redhat.com, Ricardo Koller <ricarkol@google.com>,
-        Aaron Lewis <aaronlewis@google.com>, wei.w.wang@intel.com,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Marc Orr <marcorr@google.com>,
+References: <cover.1651774250.git.isaku.yamahata@intel.com> <9a45667060dd2f8634bf1ecba23b89567c7e46e7.1651774251.git.isaku.yamahata@intel.com>
+In-Reply-To: <9a45667060dd2f8634bf1ecba23b89567c7e46e7.1651774251.git.isaku.yamahata@intel.com>
+From:   Sagi Shahar <sagis@google.com>
+Date:   Fri, 10 Jun 2022 14:04:49 -0700
+Message-ID: <CAAhR5DE8FmzACXja1znjdR04HS_kOsJ4awWsU5AHm3__oqOx8g@mail.gmail.com>
+Subject: Re: [RFC PATCH v6 095/104] KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall
+To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
         Erdem Aktas <erdemaktas@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        "Nikunj A. Dadhania" <nikunj@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Austin Diviness <diviness@google.com>, maz@kernel.org,
-        dmatlack@google.com, axelrasmussen@google.com,
-        maciej.szmigiero@oracle.com, Mingwei Zhang <mizhang@google.com>,
-        bgardon@google.com
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -104,65 +68,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-....
+On Thu, May 5, 2022 at 11:16 AM <isaku.yamahata@intel.com> wrote:
 >
-> I ended up adding a KVM_CAP_UNMAPPED_PRIVATE_MEM to distinguish between the
-> 2 modes. With UPM-mode enabled it basically means KVM can/should enforce that
-> all private guest pages are backed by private memslots, and enable a couple
-> platform-specific hooks to handle MAP_GPA_RANGE, and queries from MMU on
-> whether or not an NPT fault is for a private page or not. SEV uses these hooks
-> to manage its encryption bitmap, and uses that bitmap as the authority on
-> whether or not a page is encrypted. SNP uses GHCB page-state-change requests
-> so MAP_GPA_RANGE is a no-op there, but uses the MMU hook to indicate whether a
-> fault is private based on the page fault flags.
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> When UPM-mode isn't enabled, MAP_GPA_RANGE just gets passed on to userspace
-> as before, and platform-specific hooks above are no-ops. That's the mode
-> your SEV self-tests ran in initially. I added a test that runs the
-> PrivateMemoryPrivateAccess in UPM-mode, where the guest's OS memory is also
-> backed by private memslot and the platform hooks are enabled, and things seem
-> to still work okay there. I only added a UPM-mode test for the
-> PrivateMemoryPrivateAccess one though so far. I suppose we'd want to make
-> sure it works exactly as it did with UPM-mode disabled, but I don't see why
-> it wouldn't.
+> Wire up TDX PV rdmsr/wrmsr hypercall to the KVM backend function.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/tdx.c | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index f46825843a8b..1518a8c310d6 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1169,6 +1169,39 @@ static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
+>         return 1;
+>  }
+>
+> +static int tdx_emulate_rdmsr(struct kvm_vcpu *vcpu)
+> +{
+> +       u32 index = tdvmcall_a0_read(vcpu);
+> +       u64 data;
+> +
+> +       if (kvm_get_msr(vcpu, index, &data)) {
 
-Thanks Michael for the update. Yeah, using the bitmap to track
-private/shared-ness of gfn ranges should be the better way to go as
-compared to the limited approach I used to just track a single
-contiguous pfn range.
-I spent some time in getting the SEV/SEV-ES priv memfd selftests to
-execute from private fd as well and ended up doing similar changes as
-part of the github tree:
-https://github.com/vishals4gh/linux/commits/sev_upm_selftests_rfc_v2.
+kvm_get_msr and kvm_set_msr used to check the MSR permissions using
+kvm_msr_allowed but that behaviour changed in "KVM: x86: Only do MSR
+filtering when access MSR by rdmsr/wrmsr".
 
->
-> But probably worth having some discussion on how exactly we should define this
-> mode, and whether that meshes with what TDX folks are planning.
->
-> I've pushed my UPM-mode selftest additions here:
->   https://github.com/mdroth/linux/commits/sev_upm_selftests_rfc_v1_upmmode
->
-> And the UPM SEV/SEV-SNP tree I'm running them against (DISCLAIMER: EXPERIMENTAL):
->   https://github.com/mdroth/linux/commits/pfdv6-on-snpv6-upm1
+Now kvm_get_msr and kvm_set_msr skip these checks and will allow
+access regardless of the permissions in the msr_filter.
+
+These should be changed to kvm_get_msr_with_filter and
+kvm_set_msr_with_filter or something similar that checks permissions
+for MSR access.
+
+> +               trace_kvm_msr_read_ex(index);
+> +               tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
+> +               return 1;
+> +       }
+> +       trace_kvm_msr_read(index, data);
+> +
+> +       tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
+> +       tdvmcall_set_return_val(vcpu, data);
+> +       return 1;
+> +}
+> +
+> +static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
+> +{
+> +       u32 index = tdvmcall_a0_read(vcpu);
+> +       u64 data = tdvmcall_a1_read(vcpu);
+> +
+> +       if (kvm_set_msr(vcpu, index, data)) {
+> +               trace_kvm_msr_write_ex(index, data);
+> +               tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
+> +               return 1;
+> +       }
+> +
+> +       trace_kvm_msr_write(index, data);
+> +       tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
+> +       return 1;
+> +}
+> +
+>  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>  {
+>         if (tdvmcall_exit_type(vcpu))
+> @@ -1183,6 +1216,10 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>                 return tdx_emulate_io(vcpu);
+>         case EXIT_REASON_EPT_VIOLATION:
+>                 return tdx_emulate_mmio(vcpu);
+> +       case EXIT_REASON_MSR_READ:
+> +               return tdx_emulate_rdmsr(vcpu);
+> +       case EXIT_REASON_MSR_WRITE:
+> +               return tdx_emulate_wrmsr(vcpu);
+>         default:
+>                 break;
+>         }
+> --
+> 2.25.1
 >
 
-Thanks for the references here. This helps get a clear picture around
-the status of priv memfd integration with Sev-SNP VMs and this work
-will be the base of future SEV specific priv memfd selftest patches as
-things get more stable.
-
-I see usage of pwrite to populate initial private memory contents.
-Does it make sense to have SEV_VM_LAUNCH_UPDATE_DATA handle the
-private fd population as well?
-I tried to prototype it via:
-https://github.com/vishals4gh/linux/commit/c85ee15c8bf9d5d43be9a34898176e8230a3b680#
-as I got this suggestion from Erdem Aktas(erdemaktas@google) while
-discussing about executing guest code from private fd.
-Apart from the aspects I might not be aware of, this can have
-performance overhead depending on the initial Guest UEFI boot memory
-requirements. But this can allow the userspace VMM to keep most of the
-guest vm boot memory setup the same and
-avoid changing the host kernel to allow private memfd writes from userspace.
-
-Regards,
-Vishal
+Sagi
