@@ -2,168 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3B1546A28
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 18:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBF47546A66
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 18:32:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345812AbiFJQO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 12:14:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56644 "EHLO
+        id S1344640AbiFJQce (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 12:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238087AbiFJQO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 12:14:28 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FDA31DF3
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:14:27 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id q140so10141673pgq.6
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:14:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sqYpRJpV7hTVkJzWeySC/55ywPreerEYyAHVK7rq9LA=;
-        b=ZehwwLYuij7pbQaghWD2GrdTIOfQ1XgasEUmVI+nhvd82X4ZEWGF79XBvheRliFM+8
-         LQlrxByJVokCQ/gINBsFhOZhZjHXcpmAir492TXOaXI7iC/F7Bwi4ptRQtYUbYGyY5SQ
-         TxK5qW/wV8CCV8YqQLV5jWM8YEEm92a1WCcQVxigUczBkLKzhwgrSGPjDy4yzeckQMEl
-         k23GcmLFp8s0aWbczjuNfnjBEB9gzzj7nGZZJi5rfah1FRb/8MQ3Cd99incf77459IOk
-         fmV8msfIleb4V2r4FMWvWw0fr1RX3bQCUO2JP23SfG2qby97FTF15ddfD8Y7n8su8tG3
-         h2BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sqYpRJpV7hTVkJzWeySC/55ywPreerEYyAHVK7rq9LA=;
-        b=fUBWaYqDDWkRupE4ySlB8oU+1vMoTB8q41VKI7fsBquEzPDalUEukOJkKiYTtiC+Ky
-         mYEzc54BglfqfkmIoDArIY2Btpnn5t0vR70QeZPdq4/wYrg1EwcbGu6J6f+koaUgYl0y
-         hQkBbWZ5m31R+8WTVX8TVaI/wJKXiMzMxSlz8BHuAUFCOK7hMNKBs223erZu3GIp5gv1
-         8KLv482+hC1xbCJb6/CnEcu9IJwP/z6CiQHwsbZ4Qj3BVPB2IwDGRRQ0nWGYLlON0qFo
-         mTcYwgSgzNXLMTHp8D6+lRu9YEAhhFmJJrr5EJ40iTGvR83n7S+QTZAqZar3BO9XD8gu
-         kADQ==
-X-Gm-Message-State: AOAM532E3J4m/OL8vIzbiWeKY0qfWu2CthiBqrmddB9ToBHKWhCQyKBA
-        /a8hL5kx2pRNQwzotpTRUizotBdfbBbqVQ==
-X-Google-Smtp-Source: ABdhPJzxrryZznx/9GnvIIDqh+c23V5/Xt5ZsJHD0N8PohIbtiXWvM06mGWU66DmH3LeRvNyTftAHA==
-X-Received: by 2002:a63:5:0:b0:3fe:2558:677 with SMTP id 5-20020a630005000000b003fe25580677mr14572323pga.113.1654877666234;
-        Fri, 10 Jun 2022 09:14:26 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id r11-20020a170902e3cb00b0015e8d4eb28csm18669442ple.214.2022.06.10.09.14.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jun 2022 09:14:25 -0700 (PDT)
-Date:   Fri, 10 Jun 2022 16:14:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Andy Lutomirski <luto@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Subject: Re: [PATCH v6 4/8] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <YqNt3Sgzge5Rph/R@google.com>
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <20220519153713.819591-5-chao.p.peng@linux.intel.com>
- <8840b360-cdb2-244c-bfb6-9a0e7306c188@kernel.org>
- <YofeZps9YXgtP3f1@google.com>
- <20220523132154.GA947536@chaop.bj.intel.com>
- <YoumuHUmgM6TH20S@google.com>
- <20220530132613.GA1200843@chaop.bj.intel.com>
+        with ESMTP id S240625AbiFJQcd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 12:32:33 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51E9A56B08
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:32:28 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D881612FC;
+        Fri, 10 Jun 2022 09:32:27 -0700 (PDT)
+Received: from myrica (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CDBC3F73B;
+        Fri, 10 Jun 2022 09:32:26 -0700 (PDT)
+Date:   Fri, 10 Jun 2022 17:31:58 +0100
+From:   Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     Andre Przywara <Andre.Przywara@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>
+Subject: Re: [PATCH kvmtool 00/24] Virtio v1 support
+Message-ID: <YqNx/lW+avOlv1Mf@myrica>
+References: <20220607170239.120084-1-jean-philippe.brucker@arm.com>
+ <20220609123948.GA2599@willie-the-truck>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220530132613.GA1200843@chaop.bj.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20220609123948.GA2599@willie-the-truck>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 30, 2022, Chao Peng wrote:
-> On Mon, May 23, 2022 at 03:22:32PM +0000, Sean Christopherson wrote:
-> > Actually, if the semantics are that userspace declares memory as private, then we
-> > can reuse KVM_MEMORY_ENCRYPT_REG_REGION and KVM_MEMORY_ENCRYPT_UNREG_REGION.  It'd
-> > be a little gross because we'd need to slightly redefine the semantics for TDX, SNP,
-> > and software-protected VM types, e.g. the ioctls() currently require a pre-exisitng
-> > memslot.  But I think it'd work...
+On Thu, Jun 09, 2022 at 01:39:48PM +0100, Will Deacon wrote:
+> On Tue, Jun 07, 2022 at 06:02:15PM +0100, Jean-Philippe Brucker wrote:
+> > Add support for version 1 of the virtio transport to kvmtool. Based on a
+> > RFC by Sasha Levin [1], I've been trying to complete it here and there.
+> > It's long overdue and is quite painful to rebase, so let's get it
+> > merged.
+> >
+> > Several reasons why the legacy transport needs to be replaced:
+> >
+> > * Only 32 feature bits are supported. Most importantly
+> >   VIRTIO_F_ACCESS_PLATFORM, which forces a Linux guest to use the DMA
+> >   API, cannot be enabled. So we can't support private guests that
+> >   decrypt or share only their DMA memory with the host.
 > 
-> These existing ioctls looks good for TDX and probably SNP as well. For
-> softrware-protected VM types, it may not be enough. Maybe for the first
-> step we can reuse this for all hardware based solutions and invent new
-> interface when software-protected solution gets really supported.
+> Woohoo!
 > 
-> There is semantics difference for fd-based private memory. Current above
-> two ioctls() use userspace addreess(hva) while for fd-based it should be
-> fd+offset, and probably it's better to use gpa in this case. Then we
-> will need change existing semantics and break backward-compatibility.
+> > * Legacy virtqueue address is a 32-bit pfn, aligned on 4kB. Since Linux
+> >   guests bypass the DMA API they can't support large GPAs.
+> >
+> > * New devices types (iommu, crypto, memory, etc) and new features cannot
+> >   be supported.
+> >
+> > * New guests won't implement the legacy transport. Existing guests will
+> >   eventually drop legacy support.
+> >
+> > Support for modern transport becomes the default and legacy is enabled
+> > with --virtio-legacy.
+> >
+> > I only tested what I could: vsock, scsi and vhost-net are currently
+> > broken and can be fixed later (they have issues with mem regions and
+> > feature mask, among other things). I also haven't tested big-endian.
+> 
+> If these are broken, then shall we default to legacy mode and have the
+> modern transport be opt-in? Otherwise we're regressing people in a
+> confusing way.
 
-My thought was to keep the existing semantics for VMs with type==0, i.e. SEV and
-SEV-ES VMs.  It's a bit gross, but the pinning behavior is a dead end for SNP and
-TDX, so it effectively needs to be deprecated anyways.  I'm definitely not opposed
-to a new ioctl if Paolo or others think this is too awful, but burning an ioctl
-for this seems wasteful.
+What I meant was that even without these patches, I wasn't able to use any
+of the vhost devices, they already had several bugs. But now that I spent
+a little more time trying to fix them, it looks like the modern transport
+does add one regression (vhost ioeventfd is set on I/O port but modern
+transport uses MMIO).
 
-Then generic KVM can do something like:
+I'll sort this out and resend. Thanks for picking up the base patches!
 
-	case KVM_MEMORY_ENCRYPT_REG_REGION:
-	case KVM_MEMORY_ENCRYPT_UNREG_REGION:
-		struct kvm_enc_region region;
-
-		if (!kvm_arch_vm_supports_private_memslots(kvm))
-			goto arch_vm_ioctl;
-
-		r = -EFAULT;
-		if (copy_from_user(&region, argp, sizeof(region)))
-			goto out;
-
-		r = kvm_set_encrypted_region(ioctl, &region);
-		break;
-	default:
-arch_vm_ioctl:
-		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
-
-
-where common KVM provides
-
-  __weak void kvm_arch_vm_supports_private_memslots(struct kvm *kvm)
-  {
-	return false;
-  }
-
-and x86 overrides that to
-
-  bool kvm_arch_vm_supports_private_memslots(struct kvm *kvm)
-  {
-  	/* I can't remember what we decided on calling type '0' VMs. */
-	return !!kvm->vm_type;
-  }
-
-and if someone ever wants to enable private memslot for SEV/SEV-ES guests we can
-always add a capability or even a new VM type.
-
-pKVM on arm can then obviously implement kvm_arch_vm_supports_private_memslots()
-to grab whatever identifies a pKVM VM.
+Thanks,
+Jean
