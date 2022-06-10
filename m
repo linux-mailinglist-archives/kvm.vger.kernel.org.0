@@ -2,141 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39FC9546CC8
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 20:55:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55006546D1B
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 21:18:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350190AbiFJSzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 14:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55118 "EHLO
+        id S1347427AbiFJTSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 15:18:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344236AbiFJSzo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 14:55:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9C1E1CAD31
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 11:55:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654887342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xo+DiF3X53FfIv1ZxPHXs0464GqQecVa9I/ZUWP1FOo=;
-        b=FSWjTc8VjRqaV+fPVrhlKv+ue/4BS9EwmterQU5B7aqXGnfos+P4e6HVIx/mZq7a33+56u
-        o8/Yxg8sENCSiwJOqPN82+mM2Iy0I9rW489xfufU35Cksrph1f3rkOQ4YU+al1tQDiY40L
-        uErpd5APQ+AUw9dSLQo+aTOahzn3/Rw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-643-fDyF4jPPNDa3GygtWzr4kA-1; Fri, 10 Jun 2022 14:55:41 -0400
-X-MC-Unique: fDyF4jPPNDa3GygtWzr4kA-1
-Received: by mail-wm1-f72.google.com with SMTP id o3-20020a05600c510300b0039743540ac7so9974774wms.5
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 11:55:41 -0700 (PDT)
+        with ESMTP id S243528AbiFJTSR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 15:18:17 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB951582B
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:16 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id y63-20020a638a42000000b003fd47b6f280so1432pgd.12
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=y1EZXvSmEPvb6mcUcqNnwAea2ZEKw13g9a15hObG/5M=;
+        b=j5Ol8gvjwBqhz1FCGnzOa9I7myBdajprl0eYTZ+G6kUBS6rutkN9NY3k/9rtRye1bq
+         5rhky7E5n4gcRy8RojPyZxnwIQ8q1ptSi1dzy3Y/i20I4s/b+JMGnT55rvp16jPNuo1J
+         qpI7gjpVmiB7Ra9W4owVS05GYZ+Xj7IdUvRKyoCHKD9hnkdaCv4MVdzDNyCy5KqTphQU
+         1W9At+Oo2woTSGCE0NLVNGMlxiGBNcz6geY1r0gg1MKxg+YJyWY+xr7QC5G3KYaPkQN1
+         dtb9K90++nmjmu7WdBfIRuoK745VE4EENDEXbSpZTZ/RlSLnEJNrjx6O2PqMrqBhRJtR
+         GPPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xo+DiF3X53FfIv1ZxPHXs0464GqQecVa9I/ZUWP1FOo=;
-        b=1BOKjJA/jzMRYHeY5bLqWTkeAxGQ5YpfeUxIU+JJSt8HrT8xPRSVUSXc0DdI5NOpR2
-         NKdD61Z32caqGEA2HWK/XTagbqXeECtm1Rh10xInJv5Jd5lAlRJilxsRzzBOGM9fVSxp
-         AJaBJPypgGS5w6gwAPtaaGuFU55coXkOkLb7acGVb7se25myw6mieelqXwSCwdBFmiF3
-         V3o35sfLMLkubr0Qf1c/Mb1IyUcE4K2bLWiN0OPDP3n+TDuwqflbt7e+wh77e2Rvmi9R
-         EkgwxHPFBHDO1YAVrbTF7yzbwTzX2KjZAFxcmyB9IfRPN8tzB9lsv+91U35Xwq9ifo0Y
-         dK2A==
-X-Gm-Message-State: AOAM5306f99aTnGVfDNMHlaeARPCDZ4/vrZTGRGzGEpK+616OezJd+0B
-        3TS5iev70OGlwHdNngRaFc9s6ai/N51DXOHD02c+xd3Q5WW2FKgeN2E1AJQv4FKlMmWfjpsoLE5
-        zE+tS0q4HNqrT
-X-Received: by 2002:adf:f902:0:b0:20e:66db:b9d2 with SMTP id b2-20020adff902000000b0020e66dbb9d2mr46557939wrr.682.1654887340520;
-        Fri, 10 Jun 2022 11:55:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxmReUAzKV7E5P58fAT7mFP57LZDJ7OJfJiMbxiqwsMcpprtD5WdQ+3Lch/8dCfFc6pygkU6A==
-X-Received: by 2002:adf:f902:0:b0:20e:66db:b9d2 with SMTP id b2-20020adff902000000b0020e66dbb9d2mr46557921wrr.682.1654887340268;
-        Fri, 10 Jun 2022 11:55:40 -0700 (PDT)
-Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
-        by smtp.gmail.com with ESMTPSA id j7-20020a05600c190700b0039c4ba160absm11194736wmq.2.2022.06.10.11.55.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jun 2022 11:55:39 -0700 (PDT)
-Date:   Fri, 10 Jun 2022 20:55:37 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc:content-transfer-encoding;
+        bh=y1EZXvSmEPvb6mcUcqNnwAea2ZEKw13g9a15hObG/5M=;
+        b=b325ObZQ32YnCnuj1UT7fMaZWVWxvqHuV9aIeqAHyxIsqYz9bobTstjXs4kHvercs/
+         2m73oDwkKsPeAo/mJs7SfvTc0A76pIGu/XOHEB6uRn6G/cXz7RjbPnnnH1eHi5HwBVj2
+         asqnVIuZUN61HjgshSmmX2qFMsz2yrtuYU1BAMcsldm4m7tiCdu8BYbkY34NM8MAqtJo
+         3bUaYrZWTOzzW3ONCVbW/97T4q12GVfZTcBMrOnQeRSqU0B2BUDUXweLaIAhO+rHMwUt
+         6Q0/nYhUAw3BQNJFFXWMn/eKzJUi1TP0a0Q1nlOgD+XzXoSb5ajA/baNm+GGuwM7Ivud
+         6hjQ==
+X-Gm-Message-State: AOAM532QRdrDzSIsqLSu5HInTcCzcmYx/hXf7MA6yjY3T7RMeRKzBMm8
+        kxhSMOHHyoEWfAXDUFQWPOVNDvDajZc=
+X-Google-Smtp-Source: ABdhPJyMSmx7IVBsg90eGIeP4sJzAfrDgpQtiK6YO/BOyTkm6qK/b/c2N1oKuSC58vea5TL9kCTYgM2xFis=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
+ t9-20020a17090a024900b001e0a8a33c6cmr2350pje.0.1654888695567; Fri, 10 Jun
+ 2022 12:18:15 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 10 Jun 2022 19:18:13 +0000
+Message-Id: <20220610191813.371682-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
+Subject: [PATCH] KVM: SVM: Fix a misplaced paranthesis in APICV inhibit mask generation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 000/144] KVM: selftests: Overhaul APIs, purge VCPU_ID
-Message-ID: <20220610185537.ivbcwyzlwzbv6zig@gator>
-References: <20220603004331.1523888-1-seanjc@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220603004331.1523888-1-seanjc@google.com>
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 03, 2022 at 12:41:07AM +0000, Sean Christopherson wrote:
-> Overhaul KVM's selftest APIs to get selftests to a state where adding new
-> features and writing tests is less painful/disgusting.
-> 
-> Patches 1 fixes a goof in kvm/queue and should be squashed.
-> 
-> I would really, really, really like to get this queued up sooner than
-> later, or maybe just thrown into a separate selftests-specific branch that
-> folks can develop against.  Rebasing is tedious, frustrating, and time
-> consuming.  And spoiler alert, there's another 42 x86-centric patches
-> inbound that builds on this series to clean up CPUID related crud...
-> 
-> The primary theme is to stop treating tests like second class citizens.
-> Stop hiding vcpu, kvm_vm, etc...  There's no sensitive data/constructs, and
-> the encapsulation has led to really, really bad and difficult to maintain
-> code.  E.g. having to pass around the VM just to call a vCPU ioctl(),
-> arbitrary non-zero vCPU IDs, tests having to care about the vCPU ID in the
-> first place, etc...
-> 
-> The other theme in the rework is to deduplicate code and try to set us
-> up for success in the future.  E.g. provide macros/helpers instead of
-> spamming CTRL-C => CTRL-V (see the -1k LoC), structure the VM creation
-> APIs to build on one another, etc...
-> 
-> The absurd patch count (as opposed to just ridiculous) is due to converting
-> each test away from using hardcoded vCPU IDs in a separate patch.  The vast
-> majority of those patches probably aren't worth reviewing in depth, the
-> changes are mostly mechanical in nature.
-> 
-> However, _running_ non-x86 tests (or tests that have unique non-x86
-> behavior) would be extremely valuable.  All patches have been compile tested
-> on x86, arm, risc-v, and s390, but I've only run the tests on x86.  Based on
-> my track record for the x86+common tests, I will be very, very surprised if
-> I didn't break any of the non-x86 tests, e.g. pthread_create()'s 'void *'
-> param tripped me up multiple times.
-> 
-> I have not run x86's amx_test due to lack of hardware.  I also haven't run
-> sev_migration; something is wonky in either the upstream support for INIT_EX
-> or in our test machines and I can't get SEV to initialize.
-> 
-> v2:
->   - Drop the forced -Werror patch. [Vitaly]
->   - Add TEST_REQUIRE to reduce KSFT_SKIP boilerplate.
->   - Rebase to kvm/queue, commit 55371f1d0c01.
->   - Clean up even more bad copy+paste code (x86 was hiding a lot of crud).
->   - Assert that the input to an ioctl() is (likely) the correct struct.
-> 
-> v1: https://lore.kernel.org/all/20220504224914.1654036-1-seanjc@google.com
->
+Relocate a ")" to its proper place at the end of a BIT usage, the intent
+is most definitely not to have a feedback loop of BITs in the mask.
 
-Hi Sean,
+arch/x86/kvm/svm/avic.c: In function =E2=80=98avic_check_apicv_inhibit_reas=
+ons=E2=80=99:
+include/vdso/bits.h:7:40: error: left shift count >=3D width of type [-Werr=
+or=3Dshift-count-overflow]
+    7 | #define BIT(nr)                 (UL(1) << (nr))
+      |                                        ^~
+arch/x86/kvm/svm/avic.c:911:27: note: in expansion of macro =E2=80=98BIT=E2=
+=80=99
+  911 |                           BIT(APICV_INHIBIT_REASON_SEV      |
+      |                           ^~~
 
-I've completed a thorough skim / review and it looks great to me. Besides
-the final patch where I'm wondering about the loss of the type checking
-on our ioctl wrappers, I don't think there are any patches where I
-wouldn't be happy to add an r-b. So, for the series, except the last patch
+Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or=
+ APIC base")
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/avic.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 5542d8959e11..d1bc5820ea46 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -908,9 +908,9 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_in=
+hibit reason)
+ 			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
+ 			  BIT(APICV_INHIBIT_REASON_X2APIC) |
+ 			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+-			  BIT(APICV_INHIBIT_REASON_SEV      |
++			  BIT(APICV_INHIBIT_REASON_SEV)      |
+ 			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |
+-			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED));
++			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED);
+=20
+ 	return supported & BIT(reason);
+ }
 
-Thanks,
-drew
+base-commit: b23f8810c46978bc05252db03055a61fcadc07d5
+--=20
+2.36.1.476.g0c4daa206d-goog
 
