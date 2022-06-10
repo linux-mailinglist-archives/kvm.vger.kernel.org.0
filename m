@@ -2,141 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C54A05465DB
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 13:38:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5E19546626
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 13:58:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245415AbiFJLiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 07:38:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54378 "EHLO
+        id S1347121AbiFJL44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 07:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345060AbiFJLhd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 07:37:33 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E53D37893F
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 04:36:53 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id m25so25962168lji.11
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 04:36:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2bt8jTYVrowhc1gg8uINAlbLKdSaOnKBxI1tejzJnw0=;
-        b=VytV+NMseeOv5ay6lpQ90w3nH/J9TkSL7TDekYgqNJ6A5QUx0JjdEV0LQWDwhoNvvm
-         Rz8hppK3LV/Zx32rXRUnaGgGsmX5wt3+Wmt5lTiuSxzOy65Y0u8rI5JHIib+7RFuxjoR
-         K4FMqtzyophRWwfQGCU0kfhqOEQ94XiFDzl6um4dsmiYHUWa3LfOkaMwdF1Qku7lIBoX
-         +J4huc80z4RkwDz+5pqpvmsCfTSDrhJkZa4kFfpu1icagXacVx0PxFd+2xgKHpaVRf2K
-         OAx2EknOTp0kRe54ep30g5Aq3K5hi4ofIym1NY+KaQ9x9OaGRMBB+UILcxymGGjOJClP
-         HyHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2bt8jTYVrowhc1gg8uINAlbLKdSaOnKBxI1tejzJnw0=;
-        b=UrN2TKxucHqt4EYLi42uNFryVQV3XBUbD/BMkFyw4NZAptTAQGAnoAzYuQN30bP9W4
-         X20PmxfamGnRXNeiJhj8mi7TfRicmNmCkTcv1BDAw1AQAcbePZ7bK2sKw7Mb7SpOq/dP
-         cfSjkzfVQVskc3mqeNpZMP9+Zb6MnpCVXN2Ao1SqfMoXGKbUn9HZZsJzk6p/lX/eGBeZ
-         ch/YwHc290FeG+2M0UPY6ynZLib22QBrdTqkTiVgAdZuowwh6vQWSiadbINkwNdtZ2N4
-         qmfRLLdmf5kHYYTyfCdMgYFgHX41KIJkVctoBnLVs8XZ0TUZVDGs5l/mn4wwp078AF2Y
-         aREw==
-X-Gm-Message-State: AOAM530/k1gMBDErxGKObXYFWIb59eABKBhqceZ9uAGGEm8+UmISF90+
-        kvallrlSsQDi/VhQijw5zNHhMDz/JIM/4MyZcCvJNg==
-X-Google-Smtp-Source: ABdhPJz8nMlzBjn3iuzofJua8K4CiElzoan8JfpHCRGcxYs+YT4rOc7inWwuPW0xOg+L4p23ZR9tOj3oZXYetl1y8Z0=
-X-Received: by 2002:a2e:9a82:0:b0:255:77fd:1c2c with SMTP id
- p2-20020a2e9a82000000b0025577fd1c2cmr21978710lji.357.1654861012161; Fri, 10
- Jun 2022 04:36:52 -0700 (PDT)
+        with ESMTP id S1347496AbiFJL4w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 07:56:52 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4136590;
+        Fri, 10 Jun 2022 04:56:47 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25A9U1wQ013799;
+        Fri, 10 Jun 2022 11:56:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=g5kgbOY/y5zqzsTJnEt+xt393TSPicHZcNITcUnKX9M=;
+ b=mcEXZ0WF0S+LoqKcP9LxXYCemtLUXlGyeicWxBDRNcu9Sxx5bGZZXE32hnRECwKFLUej
+ K4kvtawVwLVKZZlmj19hVGUVrlMubnau8M2vcfu85ZSscwNz2i+gkop5bomxI9c+zbt5
+ LVFZP+ZzXrPYu+C6gPf4fa7ZGZ6RH+m2X2kCTiwmHboE2q3eiSTb/GwztNjpucGz2ya4
+ bNbMmIRDb03hcxwOVhhZ5i90fwzrZuUCHyBv9K35KL5kTszabAGc+lPIhEJV1Y/7qYDB
+ kEsIEZ/tnIhTXLlHBDKt9UI1aOtFsMb1YR2fsn78mJesk2hIxaC+zgOFByAz524AaDUr ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gm3ck2rpp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jun 2022 11:56:46 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25AB2l3O004770;
+        Fri, 10 Jun 2022 11:56:45 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gm3ck2rpc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jun 2022 11:56:45 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25ABrJ2f027434;
+        Fri, 10 Jun 2022 11:56:44 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3gfy19g6bw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jun 2022 11:56:43 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25ABuJI221758380
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jun 2022 11:56:19 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98A6B4C044;
+        Fri, 10 Jun 2022 11:56:40 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 460664C040;
+        Fri, 10 Jun 2022 11:56:40 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.15.52])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 10 Jun 2022 11:56:40 +0000 (GMT)
+Date:   Fri, 10 Jun 2022 13:56:38 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, thuth@redhat.com, scgl@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v4 1/1] s390x: add migration test for
+ storage keys
+Message-ID: <20220610135638.2c4f6b1d@p-imbrenda>
+In-Reply-To: <2fc9f517-57d0-73ae-3083-26e5dcf05dbb@linux.ibm.com>
+References: <20220608131328.6519-1-nrb@linux.ibm.com>
+        <20220608131328.6519-2-nrb@linux.ibm.com>
+        <2fc9f517-57d0-73ae-3083-26e5dcf05dbb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20220609110337.1238762-1-jaz@semihalf.com> <20220609110337.1238762-2-jaz@semihalf.com>
- <f62ab257-b2e0-3097-e394-93a9e7a0d2bf@intel.com>
-In-Reply-To: <f62ab257-b2e0-3097-e394-93a9e7a0d2bf@intel.com>
-From:   Grzegorz Jaszczyk <jaz@semihalf.com>
-Date:   Fri, 10 Jun 2022 13:36:41 +0200
-Message-ID: <CAH76GKPo6VL33tBaZyszL8wvjpzJ7hjOg3o1JddaEnuGbwk=dQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86: notify hypervisor about guest entering s2idle state
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     linux-kernel@vger.kernel.org, Dmytro Maluka <dmy@semihalf.com>,
-        Zide Chen <zide.chen@intel.corp-partner.google.com>,
-        Peter Fang <peter.fang@intel.corp-partner.google.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Sachi King <nakato@nakato.io>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        David Dunn <daviddunn@google.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "open list:ACPI" <linux-acpi@vger.kernel.org>,
-        "open list:HIBERNATION (aka Software Suspend, aka swsusp)" 
-        <linux-pm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Fv0ZmTYGhhMBM47M0V65qs5czoeD71Qo
+X-Proofpoint-ORIG-GUID: 8moidcYAiB4yOm7T1tM-filF0LihlJDo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-10_05,2022-06-09_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ clxscore=1015 spamscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
+ bulkscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206100044
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-czw., 9 cze 2022 o 16:27 Dave Hansen <dave.hansen@intel.com> napisa=C5=82(a=
-):
->
-> On 6/9/22 04:03, Grzegorz Jaszczyk wrote:
-> > Co-developed-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
-> > Signed-off-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
-> > Co-developed-by: Tomasz Nowicki <tn@semihalf.com>
-> > Signed-off-by: Tomasz Nowicki <tn@semihalf.com>
-> > Signed-off-by: Zide Chen <zide.chen@intel.corp-partner.google.com>
-> > Co-developed-by: Grzegorz Jaszczyk <jaz@semihalf.com>
-> > Signed-off-by: Grzegorz Jaszczyk <jaz@semihalf.com>
-> > ---
-> >  Documentation/virt/kvm/x86/hypercalls.rst | 7 +++++++
-> >  arch/x86/kvm/x86.c                        | 3 +++
-> >  drivers/acpi/x86/s2idle.c                 | 8 ++++++++
-> >  include/linux/suspend.h                   | 1 +
-> >  include/uapi/linux/kvm_para.h             | 1 +
-> >  kernel/power/suspend.c                    | 4 ++++
-> >  6 files changed, 24 insertions(+)
->
-> What's the deal with these emails?
->
->         zide.chen@intel.corp-partner.google.com
->
-> I see a smattering of those in the git logs, but never for Intel folks.
+On Fri, 10 Jun 2022 10:49:28 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-I've kept emails as they were in the original patch and I do not think
-I should change them. This is what Zide and Peter originally used.
+[...]
 
->
-> I'll also say that I'm a bit suspicious of a patch that includes 5
-> authors for 24 lines of code.  Did it really take five of you to write
-> 24 lines of code?
+> > +		key_to_set = i * 2;
+> > +		set_storage_key(pagebuf[i], key_to_set, 1);
+> > +	}
+> > +
+> > +	puts("Please migrate me, then press return\n");
+> > +	(void)getchar();
+> > +
+> > +	for (i = 0; i < NUM_PAGES; i++) {
+> > +		report_prefix_pushf("page %d", i);
+> > +
+> > +		actual_key.val = get_storage_key(pagebuf[i]);  
+> 
+> iske is nice but I think it would also be interesting to check if the 
+> actual memory protection was carried over. The iske check is enough for 
+> now though.
 
-This patch was built iteratively: original patch comes from Zide and
-Peter, I've squashed it with Tomasz later changes and reworked by
-myself for upstream. I didn't want to take credentials from any of the
-above so ended up with Zide as an author and 3 co-developers. Please
-let me know if that's an issue.
+we had that in a previous version, but I think it's overkill, there are
+separate tests to check for key protection, I think?
 
-Best regards,
-Grzegorz
+also, under TCG the value of the storage keys is migrated, but there is
+no protection, this makes the test unnecessarily complex
+
+[...]
