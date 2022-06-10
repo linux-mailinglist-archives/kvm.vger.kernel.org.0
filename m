@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AA1A546B80
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 19:15:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC5A9546B89
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 19:15:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350145AbiFJRLs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 13:11:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40312 "EHLO
+        id S1350147AbiFJRLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 13:11:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346765AbiFJRLr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 13:11:47 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC541F5E1C
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 10:11:45 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id il9-20020a17090b164900b001e31dd8be25so1730005pjb.3
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 10:11:45 -0700 (PDT)
+        with ESMTP id S1348867AbiFJRLt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 13:11:49 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7C51F702C
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 10:11:48 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id i17-20020a259d11000000b0064cd3084085so23373100ybp.9
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 10:11:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=vdyp/lIplKGL5QbZNVdEhHWSmxyd9Tq09BS7PksJiNc=;
-        b=L5p0TSLR1J1rqisQB3nAow0rZ6r7tKjU6Xt1PZx1BAn4llS6dCKKHNDAy7FdCIc+3T
-         gFi+EdbmlaGMvYv9Uom3AwSPNRA+qC7VdMuFoUWYkPCIWAq6KU7bpya+8j2q9sgWR6To
-         Px7bIkV/3E+VMSTOYT/mYRbnuS6sywInh5aEGf1osfOfkoGYLG4W2IV05IxWnNGh4z0s
-         hu6NXmEWmRKaHyyzoQbQnXLrOf/hx01bgLE6JVwdj11/cjff2RFIQrS3lslP2BmVFYe4
-         pSRpYYJHwdxp6gSMBuEW4M6adW8tVVtUpPVmYsqkRD/7mfW4kGV9aAUpF6G8Bm6iypS5
-         OFiA==
+        bh=t8ZIKMaZWd/kgq7//BTCVhDTNO2lmebl8XJJDz2uLBo=;
+        b=JfLtdmdTiM0ARSn83d6s3o7mox9am5+5hj6HTfEjBn1hkwfdV76G8jKr/rsPI64tqi
+         ZZQnL+Y+DIYC790yyLEF2r7gO8u8aTDdyvZRZacq3W/iqunPnzgMrTJx5xr/36KW87cP
+         v285BScEE7fGBMypIUTKeZANngzZ9PYZf4ykyoWZZ6+MvOuOhPFDd+tMCnl7GCZ5Pt5a
+         4Uk1v8Iv6SS6aTFfEhH4G5tz8rg5OpgcqNKn7KW7akYBvCS+7gF/0y8G4gbVzorafbs6
+         5XNqpJ06ZV7wrQ5TeBb8cxOLHbonsgLZlTTo4Cqp5r7T1NMo+XIaySsiU+HjAGYB3kxj
+         buVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=vdyp/lIplKGL5QbZNVdEhHWSmxyd9Tq09BS7PksJiNc=;
-        b=g1NsxTx8fptAMsq/jbrDUvR7wR4hAsWJwDd/ffPiOJN0MXbmrVrGRNAH2cTzwf57Sw
-         pSej38jYnvUoeyEN5RtQlIGbeypJFfwd2Lxy8F9s+jU6fzTkmXzNW9zUdaTemZQL+4Lu
-         Kp9dZo5DgwHgKOxjcba7QvtJ7H6pINSQYvTNnKlxvxSzu7d3PJ5scsI6ZvmnsCQAOpiP
-         xE02fRaY/BikPIXMRMOT4xeLSNJyz1QMnmFaRcDNLN4PeeHcPVtk9IT40dsqAIH2rPDX
-         KNq8yst89L+BPdAc//jxDtmi1KEk61We2UdYs1PwsEvVMQES5TPaVNy8MbEfutD9EoKS
-         j4vQ==
-X-Gm-Message-State: AOAM5324qV9oCRTckyfG5yU4C1XN8uAw8+wI3wQK3idtuCXT9ihmUFl3
-        HXtbLJjDmfnEJLgHa6MVLBdKicR2
-X-Google-Smtp-Source: ABdhPJwAspSAmPEQ0sP7pPcv430+v75VDunJC3twbbOzqA7uU68rz3JYS5vsaxcaHouEVJD/vO7wcQCh
+        bh=t8ZIKMaZWd/kgq7//BTCVhDTNO2lmebl8XJJDz2uLBo=;
+        b=tyJorsrC9MlMeRxOQHOX2lNDjMvoI7g9sSuusTyblVeYWSP3WS5I2An9eIXA0H31ZP
+         4L5nZo3QR4JZ/ocB+ZDq2vMjwHzgPUa6x1zAOtm5pWZoR8xCrFOi7A5ngw6VF/GMmwzP
+         /A+vs9AyrSwihEpkr6t+xWhCqZup3W+kzu611i3S0Ygqlq/S8EIgIwts6BcP7QB3m5Uc
+         7Ovbjl4UphbRAOs9G2pMDWMiq2anE/8fNojWpC6SXZH/VxJ5ibX1HFbewKDqDMDI9c6C
+         jt4TuIIfrAhiQVzDI+v2Mw5AuXEl6SWm/KziEXEwGR1KZzK3hHNN4r4Ztz3rgH2wt8aW
+         mFAA==
+X-Gm-Message-State: AOAM532Q3hXRHFGcucSR68K/pcYmwmNW5KyUSHqmQ2S/svyWLpV6e6+9
+        n5Plk+0/j+AI4EC5mxAe2+m5uh2R
+X-Google-Smtp-Source: ABdhPJw49VXYUi4Oh2250oRITyod15FGbC0thZ6tdLuhsm8dOx7eUa+ctxlzvR6wct5P3f9iaJIPjlkg
 X-Received: from juew-desktop.sea.corp.google.com ([2620:15c:100:202:9a6e:681b:67df:5cc4])
- (user=juew job=sendgmr) by 2002:a05:6a00:1306:b0:512:ca3d:392f with SMTP id
- j6-20020a056a00130600b00512ca3d392fmr114772794pfu.79.1654881105252; Fri, 10
- Jun 2022 10:11:45 -0700 (PDT)
-Date:   Fri, 10 Jun 2022 10:11:28 -0700
+ (user=juew job=sendgmr) by 2002:a0d:e648:0:b0:30c:62ba:ae0c with SMTP id
+ p69-20020a0de648000000b0030c62baae0cmr50240603ywe.56.1654881107681; Fri, 10
+ Jun 2022 10:11:47 -0700 (PDT)
+Date:   Fri, 10 Jun 2022 10:11:29 -0700
 In-Reply-To: <20220610171134.772566-1-juew@google.com>
-Message-Id: <20220610171134.772566-3-juew@google.com>
+Message-Id: <20220610171134.772566-4-juew@google.com>
 Mime-Version: 1.0
 References: <20220610171134.772566-1-juew@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH v5 2/8] KVM: x86: Fill apic_lvt_mask with enums / explicit entries.
+Subject: [PATCH v5 3/8] KVM: x86: Add APIC_LVTx() macro.
 From:   Jue Wang <juew@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -74,94 +74,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch defines a lapic_lvt_entry enum used as explicit indices to
-the apic_lvt_mask array. In later patches a LVT_CMCI will be added to
-implement the Corrected Machine Check Interrupt signaling.
+An APIC_LVTx macro is introduced to calcualte the APIC_LVTx register
+offset based on the index in the lapic_lvt_entry enum. Later patches
+will extend the APIC_LVTx macro to support the APIC_LVTCMCI register
+in order to implement Corrected Machine Check Interrupt signaling.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Jue Wang <juew@google.com>
 ---
- arch/x86/kvm/lapic.c | 19 ++++++++++---------
- arch/x86/kvm/lapic.h | 12 +++++++++++-
- 2 files changed, 21 insertions(+), 10 deletions(-)
+ arch/x86/kvm/lapic.c | 7 +++----
+ arch/x86/kvm/lapic.h | 2 ++
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index a5caa77e279f..73f5cd248a63 100644
+index 73f5cd248a63..db12d2ef1aef 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -401,7 +401,7 @@ static inline int apic_lvt_nmi_mode(u32 lvt_val)
- void kvm_apic_set_version(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
--	u32 v = APIC_VERSION | ((KVM_APIC_LVT_NUM - 1) << 16);
-+	u32 v = APIC_VERSION | ((KVM_APIC_MAX_NR_LVT_ENTRIES - 1) << 16);
- 
- 	if (!lapic_in_kernel(vcpu))
- 		return;
-@@ -419,12 +419,13 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
- 	kvm_lapic_set_reg(apic, APIC_LVR, v);
- }
- 
--static const unsigned int apic_lvt_mask[KVM_APIC_LVT_NUM] = {
--	LVT_MASK ,      /* part LVTT mask, timer mode mask added at runtime */
--	LVT_MASK | APIC_MODE_MASK,	/* LVTTHMR */
--	LVT_MASK | APIC_MODE_MASK,	/* LVTPC */
--	LINT_MASK, LINT_MASK,	/* LVT0-1 */
--	LVT_MASK		/* LVTERR */
-+static const unsigned int apic_lvt_mask[KVM_APIC_MAX_NR_LVT_ENTRIES] = {
-+	[LVT_TIMER] = LVT_MASK,      /* timer mode mask added at runtime */
-+	[LVT_THERMAL_MONITOR] = LVT_MASK | APIC_MODE_MASK,
-+	[LVT_PERFORMANCE_COUNTER] = LVT_MASK | APIC_MODE_MASK,
-+	[LVT_LINT0] = LINT_MASK,
-+	[LVT_LINT1] = LINT_MASK,
-+	[LVT_ERROR] = LVT_MASK
- };
- 
- static int find_highest_vector(void *bitmap)
-@@ -2084,7 +2085,7 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
- 			int i;
+@@ -2086,9 +2086,8 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
  			u32 lvt_val;
  
--			for (i = 0; i < KVM_APIC_LVT_NUM; i++) {
-+			for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++) {
- 				lvt_val = kvm_lapic_get_reg(apic,
- 						       APIC_LVTT + 0x10 * i);
- 				kvm_lapic_set_reg(apic, APIC_LVTT + 0x10 * i,
-@@ -2383,7 +2384,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 		kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
+ 			for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++) {
+-				lvt_val = kvm_lapic_get_reg(apic,
+-						       APIC_LVTT + 0x10 * i);
+-				kvm_lapic_set_reg(apic, APIC_LVTT + 0x10 * i,
++				lvt_val = kvm_lapic_get_reg(apic, APIC_LVTx(i));
++				kvm_lapic_set_reg(apic, APIC_LVTx(i),
+ 					     lvt_val | APIC_LVT_MASKED);
+ 			}
+ 			apic_update_lvtt(apic);
+@@ -2385,7 +2384,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
  	kvm_apic_set_version(apic->vcpu);
  
--	for (i = 0; i < KVM_APIC_LVT_NUM; i++)
-+	for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++)
- 		kvm_lapic_set_reg(apic, APIC_LVTT + 0x10 * i, APIC_LVT_MASKED);
+ 	for (i = 0; i < KVM_APIC_MAX_NR_LVT_ENTRIES; i++)
+-		kvm_lapic_set_reg(apic, APIC_LVTT + 0x10 * i, APIC_LVT_MASKED);
++		kvm_lapic_set_reg(apic, APIC_LVTx(i), APIC_LVT_MASKED);
  	apic_update_lvtt(apic);
  	if (kvm_vcpu_is_reset_bsp(vcpu) &&
+ 	    kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_LINT0_REENABLED))
 diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 4e4f8a22754f..4990793c2034 100644
+index 4990793c2034..2d197ed0b8ce 100644
 --- a/arch/x86/kvm/lapic.h
 +++ b/arch/x86/kvm/lapic.h
-@@ -10,7 +10,6 @@
- 
- #define KVM_APIC_INIT		0
- #define KVM_APIC_SIPI		1
--#define KVM_APIC_LVT_NUM	6
- 
- #define APIC_SHORT_MASK			0xc0000
- #define APIC_DEST_NOSHORT		0x0
-@@ -29,6 +28,17 @@ enum lapic_mode {
- 	LAPIC_MODE_X2APIC = MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE,
+@@ -39,6 +39,8 @@ enum lapic_lvt_entry {
+ 	KVM_APIC_MAX_NR_LVT_ENTRIES,
  };
  
-+enum lapic_lvt_entry {
-+	LVT_TIMER,
-+	LVT_THERMAL_MONITOR,
-+	LVT_PERFORMANCE_COUNTER,
-+	LVT_LINT0,
-+	LVT_LINT1,
-+	LVT_ERROR,
-+
-+	KVM_APIC_MAX_NR_LVT_ENTRIES,
-+};
++#define APIC_LVTx(x) (APIC_LVTT + 0x10 * (x))
 +
  struct kvm_timer {
  	struct hrtimer timer;
