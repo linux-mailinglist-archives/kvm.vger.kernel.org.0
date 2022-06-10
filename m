@@ -2,104 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49E31545B62
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 06:57:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 509D5545B6A
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 07:06:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238858AbiFJE4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 00:56:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33006 "EHLO
+        id S240625AbiFJFGX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 01:06:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232562AbiFJE4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 00:56:46 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605531ABF94
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 21:56:44 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id gd1so23124323pjb.2
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 21:56:44 -0700 (PDT)
+        with ESMTP id S231392AbiFJFGW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 01:06:22 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87727253FD1
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 22:06:18 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id g186so14886743pgc.1
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 22:06:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=wWjtS385ZKQca2fjL2X4GDJv94vUWqUo8oxBcA17Ies=;
-        b=gtNaxGcrVWIEuUSDw+7YizT9InDhgtV0YWzTxToR6qrnPi2m+QTVqyYQkXrU4mjFcZ
-         PF9v0Ocz57khVnS9m25ojEANjXCXe754sf6z78iUlOGI5k8aOL9pewPuVwW4dVyCxn70
-         n/cR5JJQ86ca04ShNRF3eTheKK4ApTJ9uIUiA+6Ml6CcttIWco340JJ1M0cbtzQ7jQyw
-         Nu5x0QTypgeDZDZmyr8QVIo7q2mnd269pu8UNG89z/LwuAgqCefU183fMcj2QG8OWcOL
-         xJOs42J+Kx798Sve3YJ8JUy39gBY4PX/st6CoUXdPfoSHraAuHCxkq4pvQo1NGzBJkDY
-         lZ8w==
+        d=ventanamicro.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rbnBF3SupX16h4V+L32e9kicSqU8X+l6y02dEeIHSV8=;
+        b=hMpBl7S+khoWtaiMQH2q/PpiPaJ82+mNbitAXXVEZKEpAzp6w/P9i+Tz8SqjP2NbU1
+         3QokBo0J9Zh/4cstHvaL4422P/JKlZ8yaQWxBbUHNjvJ8pS8SK4kYrvZPRQZ1O/pW6Zg
+         RlK/kF3qmfQn2UGk92ZceMqqO63r6UNW2u9bVapSbt3p7BDq4/p0KPWX2ciaTSJ9dUB7
+         Vcu34fK49AuVuvm6+khJnKJHI475tXU7Uvp3PfJOsVWCem36l+Gz82/9wZXa0g/yAWaF
+         0kQFS9wXXddKPLpEzXcVP8Qe5GjhjUpipMwNmSxFVoglQ/MpM726Rg8NHFXKVaN2CY8J
+         8xIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=wWjtS385ZKQca2fjL2X4GDJv94vUWqUo8oxBcA17Ies=;
-        b=RIK5Fkkz2fqh5aQPUtYLeMU3mXwicdPHaVDwkHPAdci/AnS7S80ckM8pqX+Lg7VCBv
-         s5NcLhYQDGuDij65vDH9jorc0Cog0ZAieePwr/M1vKx0GLTSNIii3eSWAnp0PM+G6l52
-         gRLCMtKoyTXRjMQOIAwuzPnf6jzLwn18l7dzqXGx3VK0fKz8QZ7KTWehiqJSOriF0ZSY
-         Qs4jw1WJeAIlW1cBU9E4IYxLOh5qWwiIQpPygiv3cwoWD0weGbi2W6jp6O4X2V5iuOVq
-         wsA6xWlfyxGpUaUetVlXpoRaJwb65Pho92pF70pn7/8vZInZ5/NO0cq/K1DRxMcvuB0/
-         E7Aw==
-X-Gm-Message-State: AOAM531qsBRLjiR5CoQqQjglGAPyd2tmwebVWy0/e1ILvVVy7vN4IwkR
-        OI73gOklZ7vkaK0duluuEJE=
-X-Google-Smtp-Source: ABdhPJzfaznNqpjJenRj8K6+LfT+W9IUkHfnjgg+CsF7BP8rn7xIwWjXJ8DGco3s2PpX5u/KFSQQhg==
-X-Received: by 2002:a17:902:ea0c:b0:163:ed09:9e5f with SMTP id s12-20020a170902ea0c00b00163ed099e5fmr43126571plg.86.1654837003910;
-        Thu, 09 Jun 2022 21:56:43 -0700 (PDT)
-Received: from [192.168.255.10] ([203.205.141.21])
-        by smtp.gmail.com with ESMTPSA id l5-20020a17090a4d4500b001e0b971196csm597604pjh.57.2022.06.09.21.56.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jun 2022 21:56:43 -0700 (PDT)
-Message-ID: <a77e6ccf-e694-b71d-b4e6-fa851459382c@gmail.com>
-Date:   Fri, 10 Jun 2022 12:56:38 +0800
+        bh=rbnBF3SupX16h4V+L32e9kicSqU8X+l6y02dEeIHSV8=;
+        b=AjC5lAmVop9BMDV+r7Do7TlwbWvdsinkLIOQYjS8LQWV0hewvgKtHpMltKxU0DulD/
+         dQWEoqHyPscVRWDah/Z5vesRaA0Ft5hXHqhzNA5/adERs8CcnEBPl4aotvdeqFIMb1CD
+         3sFq8Fz+NiaZAzep2Rpymu6hCUxlIWrJ9V746x2e99TAqgDYv2Riqe+mqnNekacs/0uU
+         gecCprRY3JsoHCezpRms3YBgD11c89uve5rXykBL6oebChX+/CBcxirDlPgxA+ZDZiHU
+         tXqyl4h07gjrFfQRhh9c997GfEKe7m9wLWtd6obwGuwzi09Z3Wbr1J2AO3S/+w1ifOnl
+         Q6OA==
+X-Gm-Message-State: AOAM530J3caHTsae+1GkUA2yN6HOdxuAfgVsrQIz4NE1HxToauHJ1wWN
+        XeSzV39QHE7fwZDehOrqyEzlcWVRPK3t9Q==
+X-Google-Smtp-Source: ABdhPJzM/qCodL1LGXRkBY0EbWv8AZW9XZ61+8sHljtJEtEXgCIs3+vGyLmEtFdvzOOCqXXtf8NK+w==
+X-Received: by 2002:a63:3c3:0:b0:3fc:5864:7412 with SMTP id 186-20020a6303c3000000b003fc58647412mr37096930pgd.138.1654837577990;
+        Thu, 09 Jun 2022 22:06:17 -0700 (PDT)
+Received: from anup-ubuntu64-vm.. ([106.200.250.139])
+        by smtp.gmail.com with ESMTPSA id u7-20020a056a00158700b00519cfca8e30sm12429424pfk.209.2022.06.09.22.06.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 22:06:17 -0700 (PDT)
+From:   Anup Patel <apatel@ventanamicro.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH 0/3] Improve instruction and CSR emulation in KVM RISC-V
+Date:   Fri, 10 Jun 2022 10:35:52 +0530
+Message-Id: <20220610050555.288251-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.10.0
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Skip perf related tests when pmu
- is disabled
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        "Yang, Weijiang" <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org,
-        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
-        <pbonzini@redhat.com>
-References: <20220609083916.36658-1-weijiang.yang@intel.com>
- <20220609083916.36658-4-weijiang.yang@intel.com>
- <587f8bc5-76fc-6cd7-d3d7-3a712c3f1274@gmail.com>
- <987d8a3d-19ef-094d-5c0e-007133362c30@intel.com>
- <CALMp9eT4JD-jTwOmpsayqZvheh4BvWB2aUiRAGsxNT145En6xg@mail.gmail.com>
- <ddff538b-81c4-6d96-bda8-6f614f1304fa@gmail.com>
- <CALMp9eQL1YmS+Ysn7ZPQjcha6HoqALNVTBqTLO7iTFpZMgyUAg@mail.gmail.com>
- <CALMp9eRO0K7L=OtoE4MWok6_7cy0DX5FyjPw6Sv83cZBCws0AQ@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <CALMp9eRO0K7L=OtoE4MWok6_7cy0DX5FyjPw6Sv83cZBCws0AQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/6/2022 12:22 pm, Jim Mattson wrote:
-> On Thu, Jun 9, 2022 at 9:16 PM Jim Mattson <jmattson@google.com> wrote:
->>
->> On Thu, Jun 9, 2022 at 7:49 PM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->>> RDPMC Intel Operation:
-> 
-> Actually, the key phrase is also present in the pseudocode you quoted:
-> 
->>> MSCB = Most Significant Counter Bit (* Model-specific *)
->>> IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported
->>> counter))
->   ...
-> 
-> The final conjunct in that condition is false under KVM when
-> !enable_pmu, because there are no supported counters.
+Currently, the instruction emulation for MMIO traps and Virtual instruction
+traps co-exist with general VCPU exit handling. The instruction and CSR
+emulation will grow with upcoming SBI PMU, AIA, and Nested virtualization
+in KVM RISC-V. In addition, we also need a mechanism to allow user-space
+emulate certain CSRs under certain situation (example, host has AIA support
+but user-space does not wants to use in-kernel AIA IMSIC and APLIC support).
 
-Uh, I have lifted a stone and smashed my own feet.
+This series improves instruction and CSR emulation in KVM RISC-V to make
+it extensible based on above.
 
-Please move on with #GP expectation.
+These patches can also be found in riscv_kvm_csr_v1 branch at:
+https://github.com/avpatel/linux.git
+
+Anup Patel (3):
+  RISC-V: KVM: Factor-out instruction emulation into separate sources
+  RISC-V: KVM: Add extensible system instruction emulation framework
+  RISC-V: KVM: Add extensible CSR emulation framework
+
+ arch/riscv/include/asm/kvm_host.h           |  16 +-
+ arch/riscv/include/asm/kvm_vcpu_insn.h      |  48 ++
+ arch/riscv/kvm/Makefile                     |   1 +
+ arch/riscv/kvm/vcpu.c                       |  11 +
+ arch/riscv/kvm/vcpu_exit.c                  | 490 +----------------
+ arch/riscv/kvm/{vcpu_exit.c => vcpu_insn.c} | 560 +++++++++++---------
+ include/uapi/linux/kvm.h                    |   8 +
+ 7 files changed, 382 insertions(+), 752 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_insn.h
+ copy arch/riscv/kvm/{vcpu_exit.c => vcpu_insn.c} (64%)
+
+-- 
+2.34.1
+
