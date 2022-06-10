@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2446F546271
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC06546273
 	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 11:31:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348852AbiFJJap (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 05:30:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56448 "EHLO
+        id S1348785AbiFJJao (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 05:30:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349224AbiFJJaN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 05:30:13 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D98314B2D2
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:29:00 -0700 (PDT)
+        with ESMTP id S1349165AbiFJJaM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 05:30:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0404E14AF69
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:28:58 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EBD8AB83356
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 800B561EF4
         for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:28:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96456C3411D;
-        Fri, 10 Jun 2022 09:28:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31831C3411C;
+        Fri, 10 Jun 2022 09:28:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654853337;
-        bh=4ckXcuO+B/l9iJLZl+doV3AabOXpAFkDbMaPdb0HKSw=;
+        s=k20201202; t=1654853338;
+        bh=68oiCCyxS4S7DdUYrRTW7h9tvNOxZZWKbz15cVBY2gA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GnB9hGvAA2ElIeyxXBYS7hnfzivPtl6/qmuGHXY1neeOqRBMQkwE7UOuqOR2BTd5E
-         GwZUnyze5LVJYnx94rENs9NIgoynKwKQQuA+pxly8dEOGtSjAllj2S0xT61RxufeBg
-         3A3YGkVS4TKg4XnPCWMRaMGHbBUlItQlQdsRq9yfLLgtR8bc9z9x//+UBy6LlFPBG2
-         AE+cU+UbiR+FNwnX3kq45XKrm8+uFYpuF51VqmmE8GrSPkQcnOYW9jeD4/ovYvsaCD
-         B8hVGAtxA4k+/+3ZuxQHD8yB1aO8WC9OFRcxZsUe8m1bjJZEJcJtDsd3gbbTHeAe5R
-         JEqVz52QZWC3A==
+        b=NlLUsaT0eZraqUHPMDT0Dl1/kvwsp/khIahx6vfdCrU6UaiX+vbqADCCDvRdtezbi
+         AN0hyV0nACnhwU+E5rlungy6391x3TlmwRYEtesD7R9yC2ojLobVqYjg/AsYqS3VKZ
+         UHPo3yOPpqcRfYSZuqreot8UF+Gm7Z20yMrgagmDxR9Y6Pjbya+TK6DJ9BZjeoGmLj
+         qmB6pOvzQLXhWLSGV0U4IEoywKkXhGdVBnHcunlkndsIfh2We0BJTK0TGPa/CjcFuE
+         PwBHRadyGvH/q0gLX8Q9EK5SIGv3amNzLKXC4SvCDZdB6et7QGATo7LSNyHNQw2fRJ
+         hWS4hvFF5G/fw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nzawp-00H6Dt-LP; Fri, 10 Jun 2022 10:28:55 +0100
+        id 1nzawp-00H6Dt-Tf; Fri, 10 Jun 2022 10:28:55 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -47,9 +47,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Quentin Perret <qperret@google.com>,
         Mark Brown <broonie@kernel.org>,
         Reiji Watanabe <reijiw@google.com>, kernel-team@android.com
-Subject: [PATCH v2 08/19] KVM: arm64: Move vcpu PC/Exception flags to the input flag set
-Date:   Fri, 10 Jun 2022 10:28:27 +0100
-Message-Id: <20220610092838.1205755-9-maz@kernel.org>
+Subject: [PATCH v2 09/19] KVM: arm64: Move vcpu debug/SPE/TRBE flags to the input flag set
+Date:   Fri, 10 Jun 2022 10:28:28 +0100
+Message-Id: <20220610092838.1205755-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220610092838.1205755-1-maz@kernel.org>
 References: <20220610092838.1205755-1-maz@kernel.org>
@@ -69,267 +69,245 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The PC update flags (which also deal with exception injection)
-is one of the most complicated use of the flag we have. Make it
-more fool prof by:
+The three debug flags (which deal with the debug registers, SPE and
+TRBE) all are input flags to the hypervisor code.
 
-- moving it over to the new accessors and assign it to the
-  input flag set
-
-- turn the combination of generic ELx flags with another flag
-  indicating the target EL itself into an explicit set of
-  flags for each EL and vector combination
-
-- add a new accessor to pend the exception
-
-This is otherwise a pretty straightformward conversion.
+Move them into the input set and convert them to the new accessors.
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  9 ++++-
- arch/arm64/include/asm/kvm_host.h    | 58 ++++++++++++++++------------
- arch/arm64/kvm/arm.c                 |  4 +-
- arch/arm64/kvm/hyp/exception.c       | 23 ++++++-----
- arch/arm64/kvm/hyp/nvhe/sys_regs.c   |  4 +-
- arch/arm64/kvm/inject_fault.c        | 17 +++-----
- 6 files changed, 61 insertions(+), 54 deletions(-)
+ arch/arm64/include/asm/kvm_host.h          |  9 +++++---
+ arch/arm64/kvm/debug.c                     | 25 +++++++++++-----------
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h  |  6 +++---
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c         |  8 +++----
+ arch/arm64/kvm/sys_regs.c                  |  8 +++----
+ 6 files changed, 31 insertions(+), 29 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 0e66edd3aff2..6ec58080ece8 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -473,9 +473,16 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
- 
- static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.flags |= KVM_ARM64_INCREMENT_PC;
-+	vcpu_set_flag(vcpu, INCREMENT_PC);
- }
- 
-+#define kvm_pend_exception(v, e)					\
-+	do {								\
-+		vcpu_set_flag((v), PENDING_EXCEPTION);			\
-+		vcpu_set_flag((v), e);					\
-+	} while (0)
-+
-+
- static inline bool vcpu_has_feature(struct kvm_vcpu *vcpu, int feature)
- {
- 	return test_bit(feature, vcpu->arch.features);
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 66a08b0e12a8..db42b4c06449 100644
+index db42b4c06449..4c7446400b77 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -474,6 +474,40 @@ struct kvm_vcpu_arch {
- /* PTRAUTH exposed to guest */
- #define GUEST_HAS_PTRAUTH	__vcpu_single_flag(cflags, BIT(2))
- 
-+/* Exception pending */
-+#define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
-+/*
-+ * PC increment. Overlaps with EXCEPT_MASK on purpose so that it can't
-+ * be set together with an exception...
-+ */
-+#define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
-+/* Target EL/MODE (not a single flag, but let's abuse the macro) */
-+#define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
-+
-+/* Helpers to encode exceptions with minimum fuss */
-+#define __EXCEPT_MASK_VAL	unpack_vcpu_flag(EXCEPT_MASK)
-+#define __EXCEPT_SHIFT		__builtin_ctzl(__EXCEPT_MASK_VAL)
-+#define __vcpu_except_flags(_f)	iflags, (_f << __EXCEPT_SHIFT), __EXCEPT_MASK_VAL
-+
-+/*
-+ * When PENDING_EXCEPTION is set, EXCEPT_MASK can take the following
-+ * values:
-+ *
-+ * For AArch32 EL1:
-+ */
-+#define EXCEPT_AA32_UND		__vcpu_except_flags(0)
-+#define EXCEPT_AA32_IABT	__vcpu_except_flags(1)
-+#define EXCEPT_AA32_DABT	__vcpu_except_flags(2)
-+/* For AArch64: */
-+#define EXCEPT_AA64_EL1_SYNC	__vcpu_except_flags(0)
-+#define EXCEPT_AA64_EL1_IRQ	__vcpu_except_flags(1)
-+#define EXCEPT_AA64_EL1_FIQ	__vcpu_except_flags(2)
-+#define EXCEPT_AA64_EL1_SERR	__vcpu_except_flags(3)
-+/* For AArch64 with NV (one day): */
-+#define EXCEPT_AA64_EL2_SYNC	__vcpu_except_flags(4)
-+#define EXCEPT_AA64_EL2_IRQ	__vcpu_except_flags(5)
-+#define EXCEPT_AA64_EL2_FIQ	__vcpu_except_flags(6)
-+#define EXCEPT_AA64_EL2_SERR	__vcpu_except_flags(7)
+@@ -508,6 +508,12 @@ struct kvm_vcpu_arch {
+ #define EXCEPT_AA64_EL2_IRQ	__vcpu_except_flags(5)
+ #define EXCEPT_AA64_EL2_FIQ	__vcpu_except_flags(6)
+ #define EXCEPT_AA64_EL2_SERR	__vcpu_except_flags(7)
++/* Guest debug is live */
++#define DEBUG_DIRTY		__vcpu_single_flag(iflags, BIT(4))
++/* Save SPE context if active  */
++#define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
++/* Save TRBE context if active  */
++#define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
  
  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-@@ -498,30 +532,6 @@ struct kvm_vcpu_arch {
+@@ -530,10 +536,7 @@ struct kvm_vcpu_arch {
+ })
+ 
  /* vcpu_arch flags field values: */
- #define KVM_ARM64_DEBUG_DIRTY		(1 << 0)
+-#define KVM_ARM64_DEBUG_DIRTY		(1 << 0)
  #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
--#define KVM_ARM64_PENDING_EXCEPTION	(1 << 8) /* Exception pending */
--/*
-- * Overlaps with KVM_ARM64_EXCEPT_MASK on purpose so that it can't be
-- * set together with an exception...
-- */
--#define KVM_ARM64_INCREMENT_PC		(1 << 9) /* Increment PC */
--#define KVM_ARM64_EXCEPT_MASK		(7 << 9) /* Target EL/MODE */
--/*
-- * When KVM_ARM64_PENDING_EXCEPTION is set, KVM_ARM64_EXCEPT_MASK can
-- * take the following values:
-- *
-- * For AArch32 EL1:
-- */
--#define KVM_ARM64_EXCEPT_AA32_UND	(0 << 9)
--#define KVM_ARM64_EXCEPT_AA32_IABT	(1 << 9)
--#define KVM_ARM64_EXCEPT_AA32_DABT	(2 << 9)
--/* For AArch64: */
--#define KVM_ARM64_EXCEPT_AA64_ELx_SYNC	(0 << 9)
--#define KVM_ARM64_EXCEPT_AA64_ELx_IRQ	(1 << 9)
--#define KVM_ARM64_EXCEPT_AA64_ELx_FIQ	(2 << 9)
--#define KVM_ARM64_EXCEPT_AA64_ELx_SERR	(3 << 9)
--#define KVM_ARM64_EXCEPT_AA64_EL1	(0 << 11)
--#define KVM_ARM64_EXCEPT_AA64_EL2	(1 << 11)
--
- #define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
- #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
+-#define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
+-#define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
  #define KVM_ARM64_ON_UNSUPPORTED_CPU	(1 << 15) /* Physical CPU not in supported_cpus */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 400bb0fe2745..5beabbe69585 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1013,8 +1013,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	 * the vcpu state. Note that this relies on __kvm_adjust_pc()
- 	 * being preempt-safe on VHE.
+ #define KVM_ARM64_HOST_SME_ENABLED	(1 << 16) /* SME enabled for EL0 */
+ #define KVM_ARM64_WFIT			(1 << 17) /* WFIT instruction trapped */
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 4fd5c216c4bb..0b28d7db7c76 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -104,11 +104,11 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+ 	 * Trap debug register access when one of the following is true:
+ 	 *  - Userspace is using the hardware to debug the guest
+ 	 *  (KVM_GUESTDBG_USE_HW is set).
+-	 *  - The guest is not using debug (KVM_ARM64_DEBUG_DIRTY is clear).
++	 *  - The guest is not using debug (DEBUG_DIRTY clear).
+ 	 *  - The guest has enabled the OS Lock (debug exceptions are blocked).
  	 */
--	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
--					 KVM_ARM64_INCREMENT_PC)))
-+	if (unlikely(vcpu_get_flag(vcpu, PENDING_EXCEPTION) ||
-+		     vcpu_get_flag(vcpu, INCREMENT_PC)))
- 		kvm_call_hyp(__kvm_adjust_pc, vcpu);
+ 	if ((vcpu->guest_debug & KVM_GUESTDBG_USE_HW) ||
+-	    !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY) ||
++	    !vcpu_get_flag(vcpu, DEBUG_DIRTY) ||
+ 	    kvm_vcpu_os_lock_enabled(vcpu))
+ 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
  
- 	vcpu_put(vcpu);
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index c5d009715402..b7557b25ed56 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -303,14 +303,14 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+@@ -147,8 +147,8 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
+  * debug related registers.
+  *
+  * Additionally, KVM only traps guest accesses to the debug registers if
+- * the guest is not actively using them (see the KVM_ARM64_DEBUG_DIRTY
+- * flag on vcpu->arch.flags).  Since the guest must not interfere
++ * the guest is not actively using them (see the DEBUG_DIRTY
++ * flag on vcpu->arch.iflags).  Since the guest must not interfere
+  * with the hardware state when debugging the guest, we must ensure that
+  * trapping is enabled whenever we are debugging the guest using the
+  * debug registers.
+@@ -205,9 +205,8 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ 		 *
+ 		 * We simply switch the debug_ptr to point to our new
+ 		 * external_debug_state which has been populated by the
+-		 * debug ioctl. The existing KVM_ARM64_DEBUG_DIRTY
+-		 * mechanism ensures the registers are updated on the
+-		 * world switch.
++		 * debug ioctl. The existing DEBUG_DIRTY mechanism ensures
++		 * the registers are updated on the world switch.
+ 		 */
+ 		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
+ 			/* Enable breakpoints/watchpoints */
+@@ -216,7 +215,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ 			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+ 
+ 			vcpu->arch.debug_ptr = &vcpu->arch.external_debug_state;
+-			vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
++			vcpu_set_flag(vcpu, DEBUG_DIRTY);
+ 
+ 			trace_kvm_arm_set_regset("BKPTS", get_num_brps(),
+ 						&vcpu->arch.debug_ptr->dbg_bcr[0],
+@@ -246,7 +245,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ 
+ 	/* If KDE or MDE are set, perform a full save/restore cycle. */
+ 	if (vcpu_read_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
+-		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
++		vcpu_set_flag(vcpu, DEBUG_DIRTY);
+ 
+ 	/* Write mdcr_el2 changes since vcpu_load on VHE systems */
+ 	if (has_vhe() && orig_mdcr_el2 != vcpu->arch.mdcr_el2)
+@@ -298,16 +297,16 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_PMSVER_SHIFT) &&
+ 	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(SYS_PMBIDR_EL1_P_SHIFT)))
+-		vcpu->arch.flags |= KVM_ARM64_DEBUG_STATE_SAVE_SPE;
++		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+ 
+ 	/* Check if we have TRBE implemented and available at the host */
+ 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_TRBE_SHIFT) &&
+ 	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_PROG))
+-		vcpu->arch.flags |= KVM_ARM64_DEBUG_STATE_SAVE_TRBE;
++		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+ }
+ 
+ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
  {
- 	if (vcpu_el1_is_32bit(vcpu)) {
--		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
--		case KVM_ARM64_EXCEPT_AA32_UND:
-+		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
-+		case unpack_vcpu_flag(EXCEPT_AA32_UND):
- 			enter_exception32(vcpu, PSR_AA32_MODE_UND, 4);
- 			break;
--		case KVM_ARM64_EXCEPT_AA32_IABT:
-+		case unpack_vcpu_flag(EXCEPT_AA32_IABT):
- 			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 12);
- 			break;
--		case KVM_ARM64_EXCEPT_AA32_DABT:
-+		case unpack_vcpu_flag(EXCEPT_AA32_DABT):
- 			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 16);
- 			break;
- 		default:
-@@ -318,9 +318,8 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
- 			break;
- 		}
+-	vcpu->arch.flags &= ~(KVM_ARM64_DEBUG_STATE_SAVE_SPE |
+-			      KVM_ARM64_DEBUG_STATE_SAVE_TRBE);
++	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
++	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+ }
+diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+index 4ebe9f558f3a..961bbef104a6 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+@@ -132,7 +132,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
+ 	struct kvm_guest_debug_arch *host_dbg;
+ 	struct kvm_guest_debug_arch *guest_dbg;
+ 
+-	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
++	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
+ 		return;
+ 
+ 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+@@ -151,7 +151,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+ 	struct kvm_guest_debug_arch *host_dbg;
+ 	struct kvm_guest_debug_arch *guest_dbg;
+ 
+-	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
++	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
+ 		return;
+ 
+ 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+@@ -162,7 +162,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+ 	__debug_save_state(guest_dbg, guest_ctxt);
+ 	__debug_restore_state(host_dbg, host_ctxt);
+ 
+-	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
++	vcpu_clear_flag(vcpu, DEBUG_DIRTY);
+ }
+ 
+ #endif /* __ARM64_KVM_HYP_DEBUG_SR_H__ */
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 7ecca8b07851..baa5b9b3dde5 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -195,7 +195,7 @@ static inline void __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ 	__vcpu_sys_reg(vcpu, DACR32_EL2) = read_sysreg(dacr32_el2);
+ 	__vcpu_sys_reg(vcpu, IFSR32_EL2) = read_sysreg(ifsr32_el2);
+ 
+-	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
++	if (has_vhe() || vcpu_get_flag(vcpu, DEBUG_DIRTY))
+ 		__vcpu_sys_reg(vcpu, DBGVCR32_EL2) = read_sysreg(dbgvcr32_el2);
+ }
+ 
+@@ -212,7 +212,7 @@ static inline void __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ 	write_sysreg(__vcpu_sys_reg(vcpu, DACR32_EL2), dacr32_el2);
+ 	write_sysreg(__vcpu_sys_reg(vcpu, IFSR32_EL2), ifsr32_el2);
+ 
+-	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
++	if (has_vhe() || vcpu_get_flag(vcpu, DEBUG_DIRTY))
+ 		write_sysreg(__vcpu_sys_reg(vcpu, DBGVCR32_EL2), dbgvcr32_el2);
+ }
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index df361d839902..e17455773b98 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -84,10 +84,10 @@ static void __debug_restore_trace(u64 trfcr_el1)
+ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	/* Disable and flush SPE data generation */
+-	if (vcpu->arch.flags & KVM_ARM64_DEBUG_STATE_SAVE_SPE)
++	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
+ 		__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
+ 	/* Disable and flush Self-Hosted Trace generation */
+-	if (vcpu->arch.flags & KVM_ARM64_DEBUG_STATE_SAVE_TRBE)
++	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+ 		__debug_save_trace(&vcpu->arch.host_debug_state.trfcr_el1);
+ }
+ 
+@@ -98,9 +98,9 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+ 
+ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+-	if (vcpu->arch.flags & KVM_ARM64_DEBUG_STATE_SAVE_SPE)
++	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
+ 		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
+-	if (vcpu->arch.flags & KVM_ARM64_DEBUG_STATE_SAVE_TRBE)
++	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+ 		__debug_restore_trace(vcpu->arch.host_debug_state.trfcr_el1);
+ }
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c06c0477fab5..f24797c57df8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -387,7 +387,7 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+ {
+ 	if (p->is_write) {
+ 		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+-		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
++		vcpu_set_flag(vcpu, DEBUG_DIRTY);
  	} else {
--		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
--		case (KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
--		      KVM_ARM64_EXCEPT_AA64_EL1):
-+		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
-+		case unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC):
- 			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
- 			break;
- 		default:
-@@ -340,12 +339,12 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
-  */
- void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
- {
--	if (vcpu->arch.flags & KVM_ARM64_PENDING_EXCEPTION) {
-+	if (vcpu_get_flag(vcpu, PENDING_EXCEPTION)) {
- 		kvm_inject_exception(vcpu);
--		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
--				      KVM_ARM64_EXCEPT_MASK);
--	} else 	if (vcpu->arch.flags & KVM_ARM64_INCREMENT_PC) {
-+		vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
-+		vcpu_clear_flag(vcpu, EXCEPT_MASK);
-+	} else if (vcpu_get_flag(vcpu, INCREMENT_PC)) {
- 		kvm_skip_instr(vcpu);
--		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
-+		vcpu_clear_flag(vcpu, INCREMENT_PC);
+ 		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
  	}
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index b6d86e423319..edd3eabf520f 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -38,9 +38,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
- 	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+@@ -403,8 +403,8 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+  * A 32 bit write to a debug register leave top bits alone
+  * A 32 bit read from a debug register only returns the bottom bits
+  *
+- * All writes will set the KVM_ARM64_DEBUG_DIRTY flag to ensure the
+- * hyp.S code switches between host and guest values in future.
++ * All writes will set the DEBUG_DIRTY flag to ensure the hyp code
++ * switches between host and guest values in future.
+  */
+ static void reg_to_dbg(struct kvm_vcpu *vcpu,
+ 		       struct sys_reg_params *p,
+@@ -420,7 +420,7 @@ static void reg_to_dbg(struct kvm_vcpu *vcpu,
+ 	val |= (p->regval & (mask >> shift)) << shift;
+ 	*dbg_reg = val;
  
--	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1 |
--			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
--			     KVM_ARM64_PENDING_EXCEPTION);
-+	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
- 
- 	__kvm_adjust_pc(vcpu);
- 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 55a5dbe957e0..f32f4a2a347f 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -20,9 +20,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
- 	u64 esr = 0;
- 
--	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1		|
--			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
--			     KVM_ARM64_PENDING_EXCEPTION);
-+	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
- 
- 	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
- 
-@@ -52,9 +50,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- {
- 	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
- 
--	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1		|
--			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
--			     KVM_ARM64_PENDING_EXCEPTION);
-+	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
- 
- 	/*
- 	 * Build an unknown exception, depending on the instruction
-@@ -73,8 +69,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 
- static void inject_undef32(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_UND |
--			     KVM_ARM64_PENDING_EXCEPTION);
-+	kvm_pend_exception(vcpu, EXCEPT_AA32_UND);
+-	vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
++	vcpu_set_flag(vcpu, DEBUG_DIRTY);
  }
  
- /*
-@@ -97,14 +92,12 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
- 	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
- 
- 	if (is_pabt) {
--		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IABT |
--				     KVM_ARM64_PENDING_EXCEPTION);
-+		kvm_pend_exception(vcpu, EXCEPT_AA32_IABT);
- 		far &= GENMASK(31, 0);
- 		far |= (u64)addr << 32;
- 		vcpu_write_sys_reg(vcpu, fsr, IFSR32_EL2);
- 	} else { /* !iabt */
--		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_DABT |
--				     KVM_ARM64_PENDING_EXCEPTION);
-+		kvm_pend_exception(vcpu, EXCEPT_AA32_DABT);
- 		far &= GENMASK(63, 32);
- 		far |= addr;
- 		vcpu_write_sys_reg(vcpu, fsr, ESR_EL1);
+ static void dbg_to_reg(struct kvm_vcpu *vcpu,
 -- 
 2.34.1
 
