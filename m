@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F28654628F
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 11:35:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F089546299
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 11:36:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245750AbiFJJfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 05:35:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59350 "EHLO
+        id S1349151AbiFJJf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 05:35:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348347AbiFJJfh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 05:35:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5CE215
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:35:34 -0700 (PDT)
+        with ESMTP id S1347078AbiFJJfy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 05:35:54 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CD9F2982C
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:35:52 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 83C1361E8F
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:35:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEA67C34114;
-        Fri, 10 Jun 2022 09:35:32 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AFBD5B83310
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:35:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656D9C34114;
+        Fri, 10 Jun 2022 09:35:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654853733;
-        bh=S85Gho6tKCAJq6nccolLm+QaZWBGnvHyY2hcy5bXr3k=;
+        s=k20201202; t=1654853750;
+        bh=Y9Re+PzleYqLYTAnywwGvif4ouH1rfjI6sgzNtrNb3g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=m3UExdEB0HqFTeWuUjMPeMyqAdOhCUV2DL2P3DUW6AoAQuC95rUEFDEdHweDzNFdt
-         p7R0ebnCsTRBGGUY1ruenwEMGtlpl5MWqO9YLN9XrdDFaew5oyi2bR1FsE8m+8Tr0I
-         ltdhzdX44i4GWkWYEiYkOOhvlZcsTIFaVeWyv0P26jUNUHnbnLfZ5cr/N6x0rJReGU
-         nlTAE5GcrKq5F+P41rLuDmaBQUMKNsIzlTXDYWecsznbZc6PfCVa0wP7LVlKVP3Z4n
-         CImJqp2aPGDfIdF4Nu6qABUKWnio7HjYIeyLikMCtvPAYQU1Uv4mww+cE6NgnFEyED
-         VIrTL57e8wA6w==
+        b=a4VfKo1ImapFmBgu6AE+w1VGwXx4h0mE2f5JJkcZ3XZ/2K+ev/zMnhAvfSBPCEBdt
+         MtkxlyRCj/PQ0BttsusOfEsUE8VyC0xVutxiOyZOa3JUAk1EP739j0oeWhsuXgWirP
+         ojIlpsxWSbuTFCRjrPzm/XvhM3IMI0Xq/wlo/51yyYlD+wFtPI+TqemA0uFdT96QFS
+         Id2V0b+oj8IrYaYA6gEqse6TbA+fKocI5ahWc7edEpeSL6ncH95+mG3mNysJB0n60M
+         yCmO1AnIlHnwi+GuFli6CQVQmNU4r+q0DJtW1VGaXDxD3wBs+ohACCjlqA1PI6/V33
+         7zIaPLw/zvrIA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nzaws-00H6Dt-6s; Fri, 10 Jun 2022 10:28:58 +0100
+        id 1nzaws-00H6Dt-EW; Fri, 10 Jun 2022 10:28:58 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -47,9 +47,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Quentin Perret <qperret@google.com>,
         Mark Brown <broonie@kernel.org>,
         Reiji Watanabe <reijiw@google.com>, kernel-team@android.com
-Subject: [PATCH v2 18/19] KVM: arm64: Document why pause cannot be turned into a flag
-Date:   Fri, 10 Jun 2022 10:28:37 +0100
-Message-Id: <20220610092838.1205755-19-maz@kernel.org>
+Subject: [PATCH v2 19/19] KVM: arm64: Move the handling of !FP outside of the fast path
+Date:   Fri, 10 Jun 2022 10:28:38 +0100
+Message-Id: <20220610092838.1205755-20-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220610092838.1205755-1-maz@kernel.org>
 References: <20220610092838.1205755-1-maz@kernel.org>
@@ -69,51 +69,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It would be tempting to turn the 'pause' state into a flag.
+We currently start by assuming that the host owns the FP unit
+at load time, then check again whether this is the case as
+we are about to run. Only at this point do we account for the
+fact that there is a (vanishingly small) chance that we're running
+on a system without a FPSIMD unit (yes, this is madness).
 
-However, this cannot easily be done as it is updated out of context,
-while all the flags expect to only be updated from the vcpu thread.
-Turning it into a flag would require to make all flag updates
-atomic, which isn't necessary desireable.
+We can actually move this FPSIMD check as early as load-time,
+and drop the check at run time.
 
-Document this, and take this opportunity to move the field next
-to the flag sets, filling a hole in the vcpu structure.
+No intended change in behaviour.
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
+Suggested-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/arm.c    | 6 ++++++
+ arch/arm64/kvm/fpsimd.c | 8 ++++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c6975ecf5a5f..2cc42e1fec18 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -341,6 +341,15 @@ struct kvm_vcpu_arch {
- 	/* State flags for kernel bookkeeping, unused by the hypervisor code */
- 	u8 sflags;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 8b9da9d30485..a9dd7ec38f38 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -328,6 +328,12 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
  
 +	/*
-+	 * Don't run the guest (internal implementation need).
-+	 *
-+	 * Contrary to the flags above, this is set/cleared outside of
-+	 * a vcpu context, and thus cannot be mixed with the flags
-+	 * themselves (or the flag accesses need to be made atomic).
++	 * Default value for the FP state, will be overloaded at load
++	 * time if we support FP (pretty likely)
 +	 */
-+	bool pause;
++	vcpu->arch.fp_state = FP_STATE_FREE;
 +
- 	/*
- 	 * We maintain more than a single set of debug registers to support
- 	 * debugging the guest from the host and to maintain separate host and
-@@ -394,9 +403,6 @@ struct kvm_vcpu_arch {
- 	/* vcpu power state */
- 	struct kvm_mp_state mp_state;
+ 	/* Set up the timer */
+ 	kvm_timer_vcpu_init(vcpu);
  
--	/* Don't run the guest (internal implementation need) */
--	bool pause;
--
- 	/* Cache some mmu pages needed inside spinlock regions */
- 	struct kvm_mmu_memory_cache mmu_page_cache;
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 557a96f8e06a..ec8e4494873d 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -77,6 +77,9 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+ 	BUG_ON(!current->mm);
+ 	BUG_ON(test_thread_flag(TIF_SVE));
+ 
++	if (!system_supports_fpsimd())
++		return;
++
+ 	vcpu->arch.fp_state = FP_STATE_HOST_OWNED;
+ 
+ 	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
+@@ -110,13 +113,10 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+  * FP while we were preemptible (such as off the back of an interrupt),
+  * then neither the host nor the guest own the FP hardware (and it was the
+  * responsibility of the code that used FP to save the existing state).
+- *
+- * Note that not supporting FP is basically the same thing as far as the
+- * hypervisor is concerned (nothing to save).
+  */
+ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
+ {
+-	if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
++	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+ 		vcpu->arch.fp_state = FP_STATE_FREE;
+ }
  
 -- 
 2.34.1
