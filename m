@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AD61545AEA
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 06:16:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E631545AEF
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 06:22:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234813AbiFJEQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 00:16:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46650 "EHLO
+        id S235982AbiFJEW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 00:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232425AbiFJEQY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 00:16:24 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679C760C6
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 21:16:18 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id w16so24417443oie.5
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 21:16:18 -0700 (PDT)
+        with ESMTP id S229595AbiFJEWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 00:22:24 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21D42D56C2
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 21:22:22 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id l81so18852345oif.9
+        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 21:22:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=hkGa/PDuyzntrwdlXUO76bHwmviUPpWbtzdxGwAtZFA=;
-        b=MONVFrjDmw5TNZl+N7xic7WrT6pFbIwGQHtmMCmUKvaL2wMtwOJh4slUmYhpLWRtwC
-         Gr5ABDbGtCt0q8wKhZPIib/aLxg33emm67OOJtg3PhnmnrHKuR6i5eBUOwB6lQPi4/Qe
-         EtjoOy7Ukdvp5VWh//qc8bhfMzIdSfk1k3jo7F66kfU+WKjRI+WSSB4v4sLziOV6mT7k
-         rBcasiLw6d9KP4KsvlyxrxCvOFfwizuDU96P+BMQkuMPVDBkZ5hFOLTPy6mFsPHBOHOQ
-         vfqsHnUzEeq4f/4ahIfacF4fgYz9qqAPOCJWUFJJWaFmSujFINw7Z329DruWh6/j7J1c
-         OjIw==
+        bh=gaj0oheke5OQkaHG5tbuEIzRasAdO37vo5qEEpHUshs=;
+        b=b1uWzdAmG1cVbn2NY4PO+LLU27EzNGIxzvi1S/PlWa/kiqUedrFiWil9YljuK5gVda
+         PnaSTEraPK9gwtd5A1UtYnsCjcGCorlKQNUzU4Px2ScUxKl4WlAitd7P7WfQCScUbFsW
+         1X5/eyXSjgXrOOs+l7x70fU60GJ5dfSyu9ThAaQ65blZtAFQe11lcsi9v2IBrqTWuT7C
+         8L03e5VilYcRwH7VYz3rMf03hwqFxhvec9xZ6hqGSrtfAuSV6tPDmcq5V7pqd9G/rGx2
+         jyxwXevHOINXyZv/+VyIVurtR7dy1efrr4KFE3Hv4W/x2X37B83Vq0x/Zi7CXD0DivOm
+         W0Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=hkGa/PDuyzntrwdlXUO76bHwmviUPpWbtzdxGwAtZFA=;
-        b=gSPGVPQwTCSgqhGZ4esWdxv0Y5q6NHiArCGHlsf8OdBwb1y9BNzxmxporNjMUXmX9z
-         cC9By53gCpT8jRd56FtHpB5e9Vzuag9cP/irn0mI39qMvv2XS0QczV9+Uwih0Sqt83o0
-         sJ7cLE3wdcqJN7LMyDOlnF/yDUrhILzeHXb+vW9JuAkdTaSJb0WVoCh0VIH76XR+UeQg
-         cYuD3lZY4z++MO9e2Y1ruzeSzxI4rJecZ7G0ciCf/wEYugC5jp3V6tKZF6VdvUUQoWdX
-         6QezzhuDG/o16x6gcUdvWa3U/OPxNJsfuslekKfKCQra0/5KEK1GkdMDk9QBeIzFQedR
-         Rhfw==
-X-Gm-Message-State: AOAM530MDGfg7dlbeIgsQljJ6bcubyxBwpIz1YO0t6pcMcD1S+DXBFpe
-        8ZbXf2JjR0B1QegOqy+23hWP7Hwr7AeWSX0Mwq3j3D51FKA1tg==
-X-Google-Smtp-Source: ABdhPJzt3NnZQ0tVOpU7+w0Qr11+2eGZl5EtENbkKzpWP2q0OxZ2Sg28ZvJaz6FfQ/Ny5S2moCNGmbq4TPrbBLNSNBQ=
-X-Received: by 2002:a05:6808:1189:b0:32b:7fb5:f443 with SMTP id
- j9-20020a056808118900b0032b7fb5f443mr3643613oil.269.1654834577419; Thu, 09
- Jun 2022 21:16:17 -0700 (PDT)
+        bh=gaj0oheke5OQkaHG5tbuEIzRasAdO37vo5qEEpHUshs=;
+        b=c8foZXBa7IqTa6YZeLLTqwfI1UMcYAE4E51xque0SsdkV9gcq3nxLW3zy3+LmepF9J
+         fj0MnSdhhPxnmpSDW8PwU0E0UB/crKhhaCxWcNl5zKmfiFsURgGI7r5zBnZdOBSU5s/s
+         XvH+OA8Zy++9lyc1gLv4sWY0rEyFmSv1Va9YH5zWcmyvf1/4c2MpEkQX+KlpqF3uWID/
+         gr+54NUDW9gRRW8rFCT3JTQU890XIDY2jZtZKRS9IGz7TKMatL7+pPvzlhe9LKTM2Bv8
+         K3MhkNh1uM4Fh/4UcI1sHVjHGjxbYtJN3Xq3CbeCZnaRqogMs13Tteb9sSxBJOUUaKc9
+         onow==
+X-Gm-Message-State: AOAM533rQtiSQo05GaOedLnBxejIE2EW7nCP+kXE6XR21LxcmsNZSKa3
+        nMa11DHaGpd/ujqaX4amWJKJ8GNOwOudIbbc+hskiA==
+X-Google-Smtp-Source: ABdhPJxp1zHg9orfHLA4DxS/aPs6yXf+FaQFIM0yFzrnyVQSIhnLSBsFRL5ueiuX7jQGdzoJNatdjDZo/i07lks8nOE=
+X-Received: by 2002:a05:6808:1283:b0:32e:f2d1:b2ac with SMTP id
+ a3-20020a056808128300b0032ef2d1b2acmr2812570oiw.13.1654834941822; Thu, 09 Jun
+ 2022 21:22:21 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220609083916.36658-1-weijiang.yang@intel.com>
  <20220609083916.36658-4-weijiang.yang@intel.com> <587f8bc5-76fc-6cd7-d3d7-3a712c3f1274@gmail.com>
  <987d8a3d-19ef-094d-5c0e-007133362c30@intel.com> <CALMp9eT4JD-jTwOmpsayqZvheh4BvWB2aUiRAGsxNT145En6xg@mail.gmail.com>
- <ddff538b-81c4-6d96-bda8-6f614f1304fa@gmail.com>
-In-Reply-To: <ddff538b-81c4-6d96-bda8-6f614f1304fa@gmail.com>
+ <ddff538b-81c4-6d96-bda8-6f614f1304fa@gmail.com> <CALMp9eQL1YmS+Ysn7ZPQjcha6HoqALNVTBqTLO7iTFpZMgyUAg@mail.gmail.com>
+In-Reply-To: <CALMp9eQL1YmS+Ysn7ZPQjcha6HoqALNVTBqTLO7iTFpZMgyUAg@mail.gmail.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 9 Jun 2022 21:16:06 -0700
-Message-ID: <CALMp9eQL1YmS+Ysn7ZPQjcha6HoqALNVTBqTLO7iTFpZMgyUAg@mail.gmail.com>
+Date:   Thu, 9 Jun 2022 21:22:10 -0700
+Message-ID: <CALMp9eRO0K7L=OtoE4MWok6_7cy0DX5FyjPw6Sv83cZBCws0AQ@mail.gmail.com>
 Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Skip perf related tests when pmu
  is disabled
 To:     Like Xu <like.xu.linux@gmail.com>
@@ -71,31 +71,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 9, 2022 at 7:49 PM Like Xu <like.xu.linux@gmail.com> wrote:
-
-> RDPMC Intel Operation:
+On Thu, Jun 9, 2022 at 9:16 PM Jim Mattson <jmattson@google.com> wrote:
 >
-> MSCB = Most Significant Counter Bit (* Model-specific *)
-> IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported
-> counter))
->         THEN
->                 EAX := counter[31:0];
->                 EDX := ZeroExtend(counter[MSCB:32]);
->         ELSE (* ECX is not valid or CR4.PCE is 0 and CPL is 1, 2, or 3 and CR0.PE is 1 *)
->                 #GP(0);
-> FI;
+> On Thu, Jun 9, 2022 at 7:49 PM Like Xu <like.xu.linux@gmail.com> wrote:
 >
-> Therefore, we will not have a #GP if !enable_pmu for legacy or future user space
-> programs.
+> > RDPMC Intel Operation:
 
-I beg to differ. Continue on a bit further...
+Actually, the key phrase is also present in the pseudocode you quoted:
 
-#GP If an invalid performance counter index is specified.
+> > MSCB = Most Significant Counter Bit (* Model-specific *)
+> > IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported
+> > counter))
+ ...
 
-If !enable_pmu, no performance counters are supported by kvm. Hence,
-all performance counter indices are invalid.
-
-The only CPUs for which one might argue that userspace could
-reasonably assume that some PMCs are valid, in spite of
-CPUID.0AH:EAX[7:0]=0, are the three legacy families I mentioned
-previously.
+The final conjunct in that condition is false under KVM when
+!enable_pmu, because there are no supported counters.
