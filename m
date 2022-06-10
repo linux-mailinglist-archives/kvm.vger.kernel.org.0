@@ -2,66 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDB0B545C21
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 08:13:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC41B545C36
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 08:29:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244158AbiFJGNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 02:13:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47136 "EHLO
+        id S241779AbiFJG3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 02:29:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244150AbiFJGNj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 02:13:39 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6742122AE51
-        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 23:13:38 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id w16so24629853oie.5
-        for <kvm@vger.kernel.org>; Thu, 09 Jun 2022 23:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gpIjTUIy/sYUCUxAj7KpvSMIco0OqPienYjZRuLvs/M=;
-        b=VAfU23ocUGTYC2vy6DVxgSaoiUC2MRx7bj2MyyD6z+lrcKLSm719EmdaWBW7dwDBjF
-         5mXbB0fh8uPL4ElnsiDw9xOWC7VIQVSmO0IH7CWA7XJb2Te5NrGiNDvqu87pyJBsDCQI
-         +CD0jwICLt8uwtntWgx5e/SXA2AvuqNzMHiz3wvYU3AjFpXUGzrdZDAOTpYHFXsnINHR
-         qn2hL9eQfopRDxHYzzRzaNUdxChfJMb5ZmdByP+PMOlRsXHM+PQmdsRVDqR/YgHipTI6
-         9+u/0+xd3C8k0gpB7b6qEfuEdcMc423hszvyJmk5S8l4dRzDlpC0ctZR7wd4/u8holCl
-         wevg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gpIjTUIy/sYUCUxAj7KpvSMIco0OqPienYjZRuLvs/M=;
-        b=Pllw1N2l5hoLr6zMlI6r0p3K/fMNs87jRqTwAE3W82h2GJdMkOGAoBxvretUzDSl62
-         WqP3Ke5K07yAKQybeoi9Sb7Dwl9S9eK/uXqMrPj4t2w+1slgWTQqTjv5/rxjGweefNBo
-         amFYHen1dc5hPYRBdR0BI32MuG2ukuUR8MzZNMqQASOlyNPiQRBcT4Z86zHrENNxH5TV
-         cGXsYvjo8HbAeCI3HgdgUkS5I5+MgUh8fIUBRwBG7WLTNojPQHsj9yqYZVQJKLbv6r1z
-         5gb7OjYHzVVxiTax7N2wZml6Hypx/ecXLN/FE5iL7xFeePNAQJe/3ep9LVQ5U5bQW6Bs
-         3JZQ==
-X-Gm-Message-State: AOAM531MS03aXaZdkQKYiUiusDG6BPOQ+qL0ppDzLS7n+ahX74+YRHKt
-        4HHHGC1YHE7CSxcddD6bMZ4pzkuCeEx2UOZLo8vwmQ==
-X-Google-Smtp-Source: ABdhPJxvHBDy+GsUTZeTF2opWbpTgXcsvwdl4BgLSzULzLgn7eCarwu0mJbV3IEMC7FZ98AK5iwyyqEDRasTsWl7QHI=
-X-Received: by 2002:a05:6808:144d:b0:32b:7fbc:943d with SMTP id
- x13-20020a056808144d00b0032b7fbc943dmr3713078oiv.107.1654841617628; Thu, 09
- Jun 2022 23:13:37 -0700 (PDT)
+        with ESMTP id S234725AbiFJG3T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 02:29:19 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692E42DCB3B
+        for <kvm@vger.kernel.org>; Thu,  9 Jun 2022 23:29:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654842558; x=1686378558;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PqFmt3e1TEQPbp0qcurYiVoJcmrz35VT+3lR86veX9Q=;
+  b=S96kwjjOIK94tBaqrMtm3LhioyIUhlNn9sDEkVugUAyaR3RTuSZiuaWZ
+   VggikxQE/TOP+A75vYOe8O64YCxQU8X1oi6qx1WklxbAR+rKg9Oy/teYl
+   FzJMsWCwYDlP8LwpfXfXkDWWGbi+3KChCIVSlhUGImwca2qTf1dmhdC01
+   oleRnh/9W8csgNLcH1jR+6mDIo63hlYgysSnYIIrTrfcxxPa4xi5yROuj
+   7OlP2rajfHBEKcKOGzVVL7LnkLEqWTYVj+GVVHrjekwR53jGRSGtR5GyG
+   uijQgsBiMOF/ugk/JmL0m99OAK84dvyxwzy+gJg9H8NB7No+Fu4XJnygO
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10373"; a="260652817"
+X-IronPort-AV: E=Sophos;i="5.91,288,1647327600"; 
+   d="scan'208";a="260652817"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 23:29:13 -0700
+X-IronPort-AV: E=Sophos;i="5.91,288,1647327600"; 
+   d="scan'208";a="828071267"
+Received: from yangweij-mobl.ccr.corp.intel.com (HELO [10.255.29.27]) ([10.255.29.27])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 23:29:11 -0700
+Message-ID: <9a03cd78-d432-1f14-5b17-dbd705759297@intel.com>
+Date:   Fri, 10 Jun 2022 14:29:08 +0800
 MIME-Version: 1.0
-References: <20220528113829.1043361-1-maz@kernel.org> <20220528113829.1043361-9-maz@kernel.org>
-In-Reply-To: <20220528113829.1043361-9-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 9 Jun 2022 23:13:21 -0700
-Message-ID: <CAAeT=FyfKbubGTFpssRq1KoAs=Fxu2jZjFSbYCm85X9Zk-ZWbA@mail.gmail.com>
-Subject: Re: [PATCH 08/18] KVM: arm64: Move vcpu PC/Exception flags to the
- input flag set
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kernel-team@android.com, Will Deacon <will@kernel.org>,
-        Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [kvm-unit-tests PATCH 0/3] Fix up test failures induced by
+ !enable_pmu
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     kvm@vger.kernel.org,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
+        <pbonzini@redhat.com>
+References: <20220609083916.36658-1-weijiang.yang@intel.com>
+ <7423da17-1c36-8d37-3e1d-5b51b4d7c370@gmail.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <7423da17-1c36-8d37-3e1d-5b51b4d7c370@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,21 +64,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> The PC update flags (which also deal with exception injection)
-> is one of the most complicated use of the flag we have. Make it
-> more fool prof by:
->
-> - moving it over to the new accessors and assign it to the
->   input flag set
->
-> - turn the combination of generic ELx flags with another flag
->   indicating the target EL itself into an explicit set of
->   flags for each EL and vector combination
->
-> This is otherwise a pretty straightformward conversion.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+On 6/10/2022 8:02 AM, Like Xu wrote:
+> On 9/6/2022 4:39 pm, Yang Weijiang wrote:
+>> When pmu is disabled via enable_pmu=0, some perf related MSRs or 
+>> instructions
+>> are not available to VM, this results into some test failures, fix 
+>> them in
+>> this series.
+>
+> How about applying it in the x86/unittests.cfg:
+>
+>     check = /sys/module/kvm/parameters/enable_pmu=N
+
+I'm afraid you mean check enable_pmu=Y for those failing tests?
+
+Let's not hide the defects of the code :-)
+
+>
+> and add another pmu_disable.flat to cover all those unavailable 
+> expectations ?
+
+A standalone test for !enable_pmu is a good idea, but the checklist is open,
+
+it may be added to the _TODO_ list.
+
