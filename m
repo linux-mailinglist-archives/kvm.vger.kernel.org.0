@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75E2154624C
+	by mail.lfdr.de (Postfix) with ESMTP id E3A5F54624D
 	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 11:30:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346633AbiFJJaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 05:30:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53034 "EHLO
+        id S1348406AbiFJJam (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 05:30:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349161AbiFJJaM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1349160AbiFJJaM (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 10 Jun 2022 05:30:12 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF1214AF70
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:28:59 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98C4814AA59
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:28:57 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9EB50B83326
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3F60161EC2
         for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:28:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 485A7C3411F;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B7C8C341CA;
         Fri, 10 Jun 2022 09:28:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1654853336;
-        bh=lgavra4KkfkFNo+v7d2DprVkFjFFaOpmoCafz+YH1JI=;
+        bh=DG76y4Z939DqmsXiB0LyRZxGXoziZjzuonFMjVMbd1s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MbvpGPQTIaD4vf1jiaIvVhpP8u/oob0O2eAkfU0mftKaMykbEwb89bQGdxPUa4uU3
-         dyPuWxro66M2IIsc6Vpoy4h+4UDxFW7OccNKc09bKZID5wcUBur08QYRVTQAXgO2iY
-         bbRzb11b1M4aXs3lCZ3jJWfMMJVSpFaoHVhUm/bgMkIda3cq+bdyQXx7kssthzNLoQ
-         /J6S8tCQBxhtIGDq8qca/GnGPpulu1En71mnzMNKhSni37lON8lXG31TRFaTworql9
-         f+iHyqo2noat+TSwQs8He5+T8w90o2D2MB6hkBTNTOXfRNJGBbuUrYKXWKfBmTiTPR
-         vLyOlRTX/0UqA==
+        b=mV1+pNJwXcr/eehsrfRLTqydpbHqa3AudTItOikFcVO1n6sSIqaMBIfA0etHSK9r7
+         ej6HtHHauFIyDYEus2kFXuwUwzmJypgIQzZb2I955WnXDplrDbneMDz+bo13jI6O/6
+         I7EZ/Oey80Hm0rc1Oin3eJ+5EyT2UMMIGn6oaZS3xZ2eSwIUfAEfz6tso+LlQVpuNg
+         fpn79Gna+qUkIKvVrboEYUeS7Fzjsr/zugEk2l41BUVhe7sUUCbvzWV51/aZ/du8s4
+         bdt4+E90ZPQNe+jvdnGMa4lcWHNsZ5/UByZykw7IzfbLByPm5E6J3ytwPEVo5zzGB7
+         DjCAeWRNBrQ9A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nzawo-00H6Dt-6T; Fri, 10 Jun 2022 10:28:54 +0100
+        id 1nzawo-00H6Dt-Dz; Fri, 10 Jun 2022 10:28:54 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -47,9 +47,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Quentin Perret <qperret@google.com>,
         Mark Brown <broonie@kernel.org>,
         Reiji Watanabe <reijiw@google.com>, kernel-team@android.com
-Subject: [PATCH v2 02/19] KVM: arm64: Always start with clearing SME flag on load
-Date:   Fri, 10 Jun 2022 10:28:21 +0100
-Message-Id: <20220610092838.1205755-3-maz@kernel.org>
+Subject: [PATCH v2 03/19] KVM: arm64: Drop FP_FOREIGN_STATE from the hypervisor code
+Date:   Fri, 10 Jun 2022 10:28:22 +0100
+Message-Id: <20220610092838.1205755-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220610092838.1205755-1-maz@kernel.org>
 References: <20220610092838.1205755-1-maz@kernel.org>
@@ -69,39 +69,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On each vcpu load, we set the KVM_ARM64_HOST_SME_ENABLED
-flag if SME is enabled for EL0 on the host. This is used to
-restore the correct state on vpcu put.
+The vcpu KVM_ARM64_FP_FOREIGN_FPSTATE flag tracks the thread's own
+TIF_FOREIGN_FPSTATE so that we can evaluate just before running
+the vcpu whether it the FP regs contain something that is owned
+by the vcpu or not by updating the rest of the FP flags.
 
-However, it appears that nothing ever clears this flag. Once
-set, it will stick until the vcpu is destroyed, which has the
-potential to spuriously enable SME for userspace. As it turns
-out, this is due to the SME code being more or less copied from
-SVE, and inheriting the same shortcomings.
+We do this in the hypervisor code in order to make sure we're
+in a context where we are not interruptible. But we already
+have a hook in the run loop to generate this flag. We may as
+well update the FP flags directly and save the pointless flag
+tracking.
 
-We never saw the issue because nothing uses SME, and the amount
-of testing is probably still pretty low.
+Whilst we're at it, rename update_fp_enabled() to guest_owns_fp_regs()
+to indicate what the leftover of this helper actually do.
 
-Fixes: 861262ab8627 ("KVM: arm64: Handle SME host state when running guests")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviwed-by: Mark Brown <broonie@kernel.org>
-Link: https://lore.kernel.org/r/20220528113829.1043361-3-maz@kernel.org
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kvm/fpsimd.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/kvm_host.h       |  1 -
+ arch/arm64/kvm/fpsimd.c                 | 17 ++++++++++-------
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 16 ++--------------
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+ 5 files changed, 14 insertions(+), 24 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 47a1e25e25bb..63103cc1bdc4 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -462,7 +462,6 @@ struct kvm_vcpu_arch {
+ 
+ #define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
+ #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
+-#define KVM_ARM64_FP_FOREIGN_FPSTATE	(1 << 14)
+ #define KVM_ARM64_ON_UNSUPPORTED_CPU	(1 << 15) /* Physical CPU not in supported_cpus */
+ #define KVM_ARM64_HOST_SME_ENABLED	(1 << 16) /* SME enabled for EL0 */
+ #define KVM_ARM64_WFIT			(1 << 17) /* WFIT instruction trapped */
 diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 8267ff4642d3..6012b08ecb14 100644
+index 6012b08ecb14..edbc0183c89b 100644
 --- a/arch/arm64/kvm/fpsimd.c
 +++ b/arch/arm64/kvm/fpsimd.c
-@@ -94,6 +94,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	 * operations. Do this for ZA as well for now for simplicity.
- 	 */
- 	if (system_supports_sme()) {
-+		vcpu->arch.flags &= ~KVM_ARM64_HOST_SME_ENABLED;
- 		if (read_sysreg(cpacr_el1) & CPACR_EL1_SMEN_EL0EN)
- 			vcpu->arch.flags |= KVM_ARM64_HOST_SME_ENABLED;
+@@ -107,16 +107,19 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+ }
  
+ /*
+- * Called just before entering the guest once we are no longer
+- * preemptable. Syncs the host's TIF_FOREIGN_FPSTATE with the KVM
+- * mirror of the flag used by the hypervisor.
++ * Called just before entering the guest once we are no longer preemptable
++ * and interrupts are disabled. If we have managed to run anything using
++ * FP while we were preemptible (such as off the back of an interrupt),
++ * then neither the host nor the guest own the FP hardware (and it was the
++ * responsibility of the code that used FP to save the existing state).
++ *
++ * Note that not supporting FP is basically the same thing as far as the
++ * hypervisor is concerned (nothing to save).
+  */
+ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
+ {
+-	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+-		vcpu->arch.flags |= KVM_ARM64_FP_FOREIGN_FPSTATE;
+-	else
+-		vcpu->arch.flags &= ~KVM_ARM64_FP_FOREIGN_FPSTATE;
++	if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
++		vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_FP_HOST);
+ }
+ 
+ /*
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 37d9f211c200..e54320384943 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -37,21 +37,9 @@ struct kvm_exception_table_entry {
+ extern struct kvm_exception_table_entry __start___kvm_ex_table;
+ extern struct kvm_exception_table_entry __stop___kvm_ex_table;
+ 
+-/* Check whether the FP regs were dirtied while in the host-side run loop: */
+-static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
++/* Check whether the FP regs are owned by the guest */
++static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
+ {
+-	/*
+-	 * When the system doesn't support FP/SIMD, we cannot rely on
+-	 * the _TIF_FOREIGN_FPSTATE flag. However, we always inject an
+-	 * abort on the very first access to FP and thus we should never
+-	 * see KVM_ARM64_FP_ENABLED. For added safety, make sure we always
+-	 * trap the accesses.
+-	 */
+-	if (!system_supports_fpsimd() ||
+-	    vcpu->arch.flags & KVM_ARM64_FP_FOREIGN_FPSTATE)
+-		vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
+-				      KVM_ARM64_FP_HOST);
+-
+ 	return !!(vcpu->arch.flags & KVM_ARM64_FP_ENABLED);
+ }
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 6db801db8f27..a6b9f1186577 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -43,7 +43,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	val = vcpu->arch.cptr_el2;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
+-	if (!update_fp_enabled(vcpu)) {
++	if (!guest_owns_fp_regs(vcpu)) {
+ 		val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 969f20daf97a..46f365254e9f 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -55,7 +55,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	val |= CPTR_EL2_TAM;
+ 
+-	if (update_fp_enabled(vcpu)) {
++	if (guest_owns_fp_regs(vcpu)) {
+ 		if (vcpu_has_sve(vcpu))
+ 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
+ 	} else {
 -- 
 2.34.1
 
