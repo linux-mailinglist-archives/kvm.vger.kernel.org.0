@@ -2,100 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FDBD546865
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 16:34:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 074E8546994
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 17:40:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349548AbiFJOeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 10:34:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60898 "EHLO
+        id S1345771AbiFJPj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 11:39:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349550AbiFJOd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 10:33:58 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5078013FBFF
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 07:33:16 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id q12-20020a17090a304c00b001e2d4fb0eb4so2417547pjl.4
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 07:33:16 -0700 (PDT)
+        with ESMTP id S1345481AbiFJPjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 11:39:21 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D324128DC09
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 08:39:19 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id 19so6322050iou.12
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 08:39:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PxR9OrMSrWpGfEqawpy3/wVuAkYaSeZlAnBh5KVMXJE=;
-        b=NJbzSY3yJxO4M4StgBH/ADd+InJNwVt4O3UCjO1lmgKqqZoWakKAC4evwmHBWOT6DD
-         ZXztB7rGawow2r4HA4er20ia0kLPCsu6l5vPb53g9jzV06R6FazDE00XpE4uBONTos35
-         qpc+wlG9Ale+JvKoySfGLzKdmfZM/XSb9PomEoFCY4enp8ZUXSX0NMyJAB+WxM2+3sUk
-         S6iFFlKOiNWC8b5gZJ+5p5+yKSbk+e1QjJpLpMZ15ikiAY91IrV5pzHCmN5B/gkn/aUf
-         Mep+j/k2tWgjRuUV40mYcHHczhP8X+QCTXPVn9ZhnPz8A8g541OlmakI7DWfYvCl0o0F
-         k2BQ==
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=ustad4Oit1LbdSHBANPMFYdxqbyRopb/4kSjojaTPVc=;
+        b=OQzSd9NThiAkyWfOJU99r2XLdSeMO9RN1xDK7cJcv+NuGepTE4T4PPm+aqd+IEmuWG
+         s2MyKfJa++z9sEi391aqlt4WG9aK+qdyMCqMKMdzKMiXluLJE5GRLsRVZkmiq347HCuo
+         ahbcogUcvCFVnm16lEKfB7AL/pWunUZK/J4nJdFPqLMT22qD2R/H5rvx+R7LINQeGAem
+         I83yEAs/bfvaAYWvXw0DmTkQe2UxCRsGX5Dn/hziTfKEKVNcs9XaS5y0ZK24Atc3c14K
+         NNABVibT+ha+2DxoTnw9KHgAvUJIS+/Sn8fN2UYHddccM4vwjDUW6TiQbT8jRtttmsv+
+         Hhog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PxR9OrMSrWpGfEqawpy3/wVuAkYaSeZlAnBh5KVMXJE=;
-        b=lyjD8UCG6fErGAQ/2Sbu9GCPJiwmWg0LEa5TAewarkHZ+8nMeNoPBvc84540djNyUp
-         U5aBZwaYUHX8X2ZK33mrqaemN1peYs7hMDI7/hpY2rseLXbfN39UdCP6pGe5El0RGma1
-         A9C4dAX9MEQ6lcIPTEPXkKhJ18zS5x9BW4gA91aIaGhS9LHM/g2YNdd9JajARuEPMp86
-         K7iQ09nsRr8g7jqxmmwDnYVzNcV/KE4Dlnr0TWzjssvmQVyKz+Rvv8oUrHWMAokCjeEg
-         v89cCQpLF50Jy1/3yYZcOEe74AKPaI/j2K6nSR2FbsptuyN7QXk62dMM0USf+CaVJpXY
-         4tmA==
-X-Gm-Message-State: AOAM533Brmb/2pqNLQ5lA1zabY5Xn9SawJrLZGsVO3C/mwilHD8gHHxV
-        NktJ8VwUiV5HQFBYT6LoybqsNw==
-X-Google-Smtp-Source: ABdhPJz5794unjcLLHf76DTPX/t1FfZvxPtA+iJKJnZE7mgcdzh1ieHg0oZJuGEsiodfohqFec+KlQ==
-X-Received: by 2002:a17:90b:3805:b0:1e6:85aa:51b with SMTP id mq5-20020a17090b380500b001e685aa051bmr70256pjb.182.1654871595529;
-        Fri, 10 Jun 2022 07:33:15 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d9-20020a656b89000000b003fd7e217686sm11556105pgw.57.2022.06.10.07.33.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jun 2022 07:33:14 -0700 (PDT)
-Date:   Fri, 10 Jun 2022 14:33:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 126/144] KVM: selftests: Convert kvm_binary_stats_test
- away from vCPU IDs
-Message-ID: <YqNWJwlGWleTw7sR@google.com>
-References: <20220603004331.1523888-1-seanjc@google.com>
- <20220603004331.1523888-127-seanjc@google.com>
- <20220610104851.g2r6yzd6j22xod6m@gator>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=ustad4Oit1LbdSHBANPMFYdxqbyRopb/4kSjojaTPVc=;
+        b=S7Y+vsZV0amFgcxKDFRF84Y0kQXI970S9zvw51dNZ5z8a+K/hdSbnQkLsMKbzcIxzf
+         RckfyfYOV0aJJPV//IhCRp8e8kz6R0+qtfhqCfiKDVOnhZP84UMFR9yowWbPFRYvKlBf
+         emOAXvbjN87XmWz8pcaWXeNjk7XYVc8wJcTpZB6JzU+tfrywzwUaREIcG1HIahyiP1xE
+         c1hr318S24gaRmAlMjh5uXsPXIDmhjH4lhGaSimJts6k8ECNX8Nz4034UFztEX8gZ5MB
+         mMHZjBV0O+XpPaVUfg1YYPqYFQTH05WDVsaHubUApInOJXgGffzxl061fZobP7veN88C
+         lg4A==
+X-Gm-Message-State: AOAM533kBRCYTwU+YtkCnijeKPGBQzu7ONTmTfZCdWUnHELCt53JubkH
+        NnmfyE+QiFj0lwqllQ/sCSWMByr05oPnb1C3dH0=
+X-Google-Smtp-Source: ABdhPJxyBMJb1QSW9qjWcVjKXsbenK35sbZ/xCLTgDd7snXihGp70BD6AykdITG627PgrDtvqH+GFdcylPAVYZtF1sQ=
+X-Received: by 2002:a05:6638:438c:b0:331:adac:a274 with SMTP id
+ bo12-20020a056638438c00b00331adaca274mr15799962jab.192.1654875558497; Fri, 10
+ Jun 2022 08:39:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220610104851.g2r6yzd6j22xod6m@gator>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Received: by 2002:a4f:a709:0:0:0:0:0 with HTTP; Fri, 10 Jun 2022 08:39:17
+ -0700 (PDT)
+Reply-To: rl715537@gmail.com
+From:   Rebecca Lawrence <angel.corrin2015@gmail.com>
+Date:   Fri, 10 Jun 2022 15:39:17 +0000
+Message-ID: <CANUTHViXoswJ37BN9eK2CYiwPzj0u87gCPpo72EtHCAL1iK==Q@mail.gmail.com>
+Subject: 
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=4.4 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 10, 2022, Andrew Jones wrote:
-> On Fri, Jun 03, 2022 at 12:43:13AM +0000, Sean Christopherson wrote:
-> > @@ -220,17 +221,21 @@ int main(int argc, char *argv[])
-> >  	/* Create VMs and VCPUs */
-> >  	vms = malloc(sizeof(vms[0]) * max_vm);
-> >  	TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
-> > +
-> > +	vcpus = malloc(sizeof(struct kvm_vcpu *) * max_vm * max_vcpu);
-> > +	TEST_ASSERT(vcpus, "Allocate memory for storing vCPU pointers");
-> > +
-> >  	for (i = 0; i < max_vm; ++i) {
-> >  		vms[i] = vm_create_barebones();
-> >  		for (j = 0; j < max_vcpu; ++j)
-> > -			__vm_vcpu_add(vms[i], j);
-> > +			vcpus[j * max_vcpu + i] = __vm_vcpu_add(vms[i], j);
-> 
-> The expression for the index should be 'i * max_vcpu + j'. The swapped
-> i,j usage isn't causing problems now because
-> DEFAULT_NUM_VM == DEFAULT_NUM_VCPU, but that could change.
-
-It's better to be lucky than good?
-
-Thanks much, I appreciate the reviews!
+Hello Dear,
+My name is Rebecca, I am a United States and a military woman who has
+never married with no kids yet. I came across your profile, and I
+personally took interest in being your friend. For confidential
+matters, please contact me back through my private email
+rl715537@gmail.com to enable me to send you my pictures and give you
+more details about me. I Hope to hear from you soon.
+Regards
+Rebecca.
