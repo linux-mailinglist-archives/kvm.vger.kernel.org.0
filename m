@@ -2,124 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00105546F5B
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 23:41:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A948546FB6
+	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 00:44:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350671AbiFJVlq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 17:41:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
+        id S1348592AbiFJWoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 18:44:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347712AbiFJVlp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 17:41:45 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EAFD28E05
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:41:43 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id z67-20020a254c46000000b0065cd3d2e67eso386921yba.7
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 14:41:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=QRwkxD449IEvVBU53Os0OsTpTWGeUKY9nEsyApnDNxM=;
-        b=nG+8NxDyG19Tn+MrYth0pBt/LayA+JxKX+6WS3zpT+O+3YAMOvWuawWbEYrhk13k5C
-         58Pi/we6J/OQ/TxF5WaXH1dL99nO/kdd90JJMPgqyvNy9Dv9geElEaa6r+QNrk9hwY19
-         HqkZz5y+0i8GB+m3uYAUaBj0DjvBGe9/Xu8uUu7nRkhkVqM8R/dNI3L7tOatAs7OHr8G
-         j4EC6PI6OtfU7mg5fqw1NQZD3jZ+Zi/Hw+qv6pTP7J+2VYBupMtKkzxCthX1HtFKvyI2
-         D+rj/Z7le29/zpPhdPcn/MFBNHvpWMd7tl/EME0oszHoRmb1qq3G3/+nHgzOSMORco+m
-         6s3A==
+        with ESMTP id S1348418AbiFJWoO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 18:44:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8293D3BFBF
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 15:44:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654901052;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pblZd+Kqp7f2K+2rxNpvXUuiOLaopPh9IaEYk0kwYKE=;
+        b=NTjYhRsx6ctDVsjQjsegWvbKCxKclOsEO07UrXSk8ypDynoqmphEPoXwlWosTDmIHU9jKu
+        NKAwmxOJK34qSCSYKb+G7QwCrJl47j/kbQpKWg4P/UnmlckC+uUe3niKVZInsbxS/dMuzs
+        suM1nz9eAMOXglsw91/x6M5dOdPLk4g=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-580-Qd_niQHQPTCCw14LJshG-g-1; Fri, 10 Jun 2022 18:44:11 -0400
+X-MC-Unique: Qd_niQHQPTCCw14LJshG-g-1
+Received: by mail-io1-f72.google.com with SMTP id k4-20020a6b4004000000b006697f6074e6so244399ioa.11
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 15:44:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=QRwkxD449IEvVBU53Os0OsTpTWGeUKY9nEsyApnDNxM=;
-        b=evFnFJeeuObH0hkRvVDNcA0Z+SNNclTHcflheT4B8mtHtRVDQdJkhv/qMbvt8JMUzO
-         MCn8t55WOrSPDs+Z3Cn5i29d8dCO6FWwlxAodmWVvAwKf3Db8w7p/JNx5nQIId8xVkSe
-         BuhlVoVoZtnG211OsjtVLZPA0Zbm5wY/4+W5WUAdYkNwP+00Aw/CxTQ8ZV71bBn8hiXe
-         oQSOlyDiOAAkjafDDTw8iHfD2k5EOTpCFyG7J/iEfdx8rNkV5woVzuHOcmguP0T3hcaf
-         w0ZQqCa8AXV74jreYvwf4u3eYKE2jl2FTAI+cyJW5KteKSddgAiQhUSGR/Pf4NOuGIQf
-         ZzTg==
-X-Gm-Message-State: AOAM531LXeSoEVVfs2RdEoZ7VhbBj7YpXTznFec+/4eS6GS3oixxlBmj
-        yJWUp93lMk1GRnMEr1EZujk64I7RzBo=
-X-Google-Smtp-Source: ABdhPJzLIGA/VY1p3SL4QfQ3gCm4vTKkKl9Vj/IqUInmjiEG02PjbI7nYTb8eVmDLxi5oZoZApEfHcaYC5U=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a81:21d7:0:b0:313:76ac:4aa6 with SMTP id
- h206-20020a8121d7000000b0031376ac4aa6mr16296719ywh.423.1654897302541; Fri, 10
- Jun 2022 14:41:42 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Jun 2022 21:41:40 +0000
-Message-Id: <20220610214140.612025-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH] KVM: VMX: Skip filter updates for MSRs that KVM is already intercepting
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=pblZd+Kqp7f2K+2rxNpvXUuiOLaopPh9IaEYk0kwYKE=;
+        b=DQ1XmZ6Q/0K6kv7VF68QABOH55EU3MD9MWQowi9zx8fu6F6u9ZjOIs0D4NhluHQ85Z
+         b964F1OzLMmCtC1Vijw95b7nvzdEUNkOhv8DbsHERlahuduAxBRDI4MkgbD6UqgcZ9sl
+         ityIQaXRC832+DCtai61dJH0N81Y3yHkpCeqOsyyq9u/WFLVgegyldyOHsuyWlJ1qMxn
+         YHK0862b3bMZEyqO1/H2CzWeLDY7OGTymRlpmlJ2I7m0+oagMSX/zrZsz3iPcwhs5vBC
+         uGTcthZ7Y+W9MEJ+vWIuASgH6S31p9uwx/OJXWNkRvbRsQC20ZpnJ/J1YcoWP7sXhTsZ
+         cIDA==
+X-Gm-Message-State: AOAM530tqnreRsOHaQCGiqCwN7W1uniaeP5nGl7x3cNWWOpmXooX5LRR
+        0x+KU4wNSESLXMlWE3Jj74P/dygeqTHzXeqcGtv0danxt+mMMXMXYfOr8X9WHu3OnF2GvPbcuLX
+        NswGEFCvtLc8Y
+X-Received: by 2002:a02:c811:0:b0:332:2c2e:88e0 with SMTP id p17-20020a02c811000000b003322c2e88e0mr343353jao.132.1654901050840;
+        Fri, 10 Jun 2022 15:44:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwgEFjSHs9TXHG3p6x60NRKxwsOGKtJ1mMFIodXcBQ3lbM9zLgveeGgcd98DfNgAuz2vKQAXQ==
+X-Received: by 2002:a02:c811:0:b0:332:2c2e:88e0 with SMTP id p17-20020a02c811000000b003322c2e88e0mr343346jao.132.1654901050600;
+        Fri, 10 Jun 2022 15:44:10 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y2-20020a926402000000b002d3a3a089b3sm130533ilb.1.2022.06.10.15.44.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jun 2022 15:44:09 -0700 (PDT)
+Date:   Fri, 10 Jun 2022 16:44:07 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     kwankhede@nvidia.com, farman@linux.ibm.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, diana.craciun@oss.nxp.com, cohuck@redhat.com,
+        eric.auger@redhat.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, yishaih@nvidia.com, hch@lst.de
+Subject: Re: [PATCH] vfio: de-extern-ify function prototypes
+Message-ID: <20220610164407.25feeb23.alex.williamson@redhat.com>
+In-Reply-To: <20220610000434.GE1343366@nvidia.com>
+References: <165471414407.203056.474032786990662279.stgit@omen>
+        <20220610000434.GE1343366@nvidia.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When handling userspace MSR filter updates, recompute interception for
-possible passthrough MSRs if and only if KVM wants to disabled
-interception.  If KVM wants to intercept accesses, i.e. the associated
-bit is set in vmx->shadow_msr_intercept, then there's no need to set the
-intercept again as KVM will intercept the MSR regardless of userspace's
-wants.
+On Thu, 9 Jun 2022 21:04:34 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-No functional change intended, the call to vmx_enable_intercept_for_msr()
-really is just a gigantic nop.
+> On Wed, Jun 08, 2022 at 12:55:13PM -0600, Alex Williamson wrote:
+> > The use of 'extern' in function prototypes has been disrecommended in
+> > the kernel coding style for several years now, remove them from all vfio
+> > related files so contributors no longer need to decide between style and
+> > consistency.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> > 
+> > A patch in the same vein was proposed about a year ago, but tied to an ill
+> > fated series and forgotten.  Now that we're at the beginning of a new
+> > development cycle, I'd like to propose kicking off the v5.20 vfio next
+> > branch with this patch and would kindly ask anyone with pending respins or
+> > significant conflicts to rebase on top of this patch.  Thanks!  
+> 
+> Can you stick it in your branch please?
 
-Suggested-by: Aaron Lewis <aaronlewis@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+Thanks for the R-b, it was my plan today to put it in my next branch,
+but I can't currently test vfio on mainline due to:
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5e14e4c40007..61962f3c4b28 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3981,17 +3981,21 @@ static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
- 	u32 i;
- 
- 	/*
--	 * Set intercept permissions for all potentially passed through MSRs
--	 * again. They will automatically get filtered through the MSR filter,
--	 * so we are back in sync after this.
-+	 * Redo intercept permissions for MSRs that KVM is passing through to
-+	 * the guest.  Disabling interception will check the new MSR filter and
-+	 * ensure that KVM enables interception if usersepace wants to filter
-+	 * the MSR.  MSRs that KVM is already intercepting don't need to be
-+	 * refreshed since KVM is going to intercept them regardless of what
-+	 * userspace wants.
- 	 */
- 	for (i = 0; i < ARRAY_SIZE(vmx_possible_passthrough_msrs); i++) {
- 		u32 msr = vmx_possible_passthrough_msrs[i];
--		bool read = test_bit(i, vmx->shadow_msr_intercept.read);
--		bool write = test_bit(i, vmx->shadow_msr_intercept.write);
- 
--		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_R, read);
--		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_W, write);
-+		if (!test_bit(i, vmx->shadow_msr_intercept.read))
-+			vmx_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_R);
-+
-+		if (!test_bit(i, vmx->shadow_msr_intercept.write))
-+			vmx_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_W);
- 	}
- 
- 	pt_update_intercept_for_msr(vcpu);
+https://lore.kernel.org/all/165490039431.944052.12458624139225785964.stgit@omen/
 
-base-commit: f38fdc2d315b8876ea2faa50cfb3481262e15abf
--- 
-2.36.1.476.g0c4daa206d-goog
+I'll get this in once there's a mainline base where vfio still works.  Thanks,
+
+Alex
 
