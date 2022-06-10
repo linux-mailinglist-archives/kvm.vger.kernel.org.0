@@ -2,60 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE4C2546D1E
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 21:19:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EE97546D3B
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 21:27:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348232AbiFJTSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 15:18:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46170 "EHLO
+        id S1350281AbiFJT1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 15:27:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347839AbiFJTSr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 15:18:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A1B1C92E
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D3CBF6223C
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 19:18:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41727C341CF
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 19:18:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654888720;
-        bh=hM5nW1VA3yu5jpO3mlOUoDJaWYFKk3W0xm89jLGspjI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=HhH/LtWGsBwB06n1CnPo9lhK0VtlQ6R1OeUxR4n65mwZeBEFV6sMuVM/FQ4mWjKfC
-         U0buD2yynVGlZgaWK2yhy6sCYPwzRpoLMXXRNC35AXp8WPmbjWScn8eeu+b4znMsyo
-         SBLsipBoAgnNOKj9AmZY2W5Wf3H0Kmmm5b4EHejPbftkHKC+R73iWdRMndn/qU7LdN
-         mi8mlFucHHdXR3vU1iUTLqfm10BRj29AjwGU2+vcfzCq9fPpj35CHw9WzOEvI4Yn5B
-         f5qeWPoNNahJsN/WYeZcsckWm0SeiIae32rB0ZzDFftWrWFELWEKh7GyQQVeErl1tH
-         OVUa6I1o1xhTA==
-Received: by mail-ej1-f46.google.com with SMTP id m20so55148387ejj.10
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:18:40 -0700 (PDT)
-X-Gm-Message-State: AOAM5317xgECHo968deWkoCJfxqeoX13D74ILN3SrWhWF1Atv51vODj6
-        5WLHI6r5hHg9ib+T6bvRyeSq5nRxlYaM1Kyj8qaJVQ==
-X-Google-Smtp-Source: ABdhPJwexJxeTadU2a/HS+Q0PaTCtU7UH0lxqqpyQzdJR6JkeVtaY0mkRVT4jHiiW5JTPVMgfQPUbTO0E50JluvSE3Y=
-X-Received: by 2002:a17:906:25d8:b0:6fe:9f11:3906 with SMTP id
- n24-20020a17090625d800b006fe9f113906mr40977072ejb.538.1654888718314; Fri, 10
- Jun 2022 12:18:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <83fd55f8-cd42-4588-9bf6-199cbce70f33@www.fastmail.com>
- <YksIQYdG41v3KWkr@google.com> <Ykslo2eo2eRXrpFR@google.com>
- <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com> <Ykwbqv90C7+8K+Ao@google.com>
- <YkyEaYiL0BrDYcZv@google.com> <20220422105612.GB61987@chaop.bj.intel.com>
- <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com> <20220425134051.GA175928@chaop.bj.intel.com>
- <27616b2f-1eff-42ff-91e0-047f531639ea@www.fastmail.com> <YmcFAJEJmmtYa+82@google.com>
-In-Reply-To: <YmcFAJEJmmtYa+82@google.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Fri, 10 Jun 2022 12:18:25 -0700
-X-Gmail-Original-Message-ID: <CALCETrU_BdaYcPgVcjj4o9zFPyvU9oyjCCtjKTbSSgeL0aZaGQ@mail.gmail.com>
-Message-ID: <CALCETrU_BdaYcPgVcjj4o9zFPyvU9oyjCCtjKTbSSgeL0aZaGQ@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
+        with ESMTP id S237516AbiFJT1m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 15:27:42 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D491455A6
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:27:39 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id f9so83927plg.0
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 12:27:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=PkrZb935FOMK/VTbtX8totq42RNXT0VkqR/O4EKP5jw=;
+        b=kmpQnW9pQgc6jCgIv4PLRkvKW49ZsJ+smOOvRhdRKVJdJ9Zkgk/YtNmm2SoA/O56aA
+         yjFKkHRfbiMSOg+r0ZuEHtWF+14lgCCm5q+DXC3bejs09+0NaISJZNgBhtVPM9hZrici
+         3midqgBOk1EJAH+oLhfyYrDiwbBDxS42gWbD3T1HxBtTqZj5rJQ1Vj5t+t/6Y/yDFzkR
+         TRp+d8eLox2jVwYtlenr13zA6kmJWThb1Qn1BG5USAR/NIbWIM5rxoKgalwJT2rnYHA0
+         Li6tjfWy3x6EaebIJ1bWYlnHEdXiiKan7s8y/yDhYNyNGVMe9Qq5RglipqFtGNp66N0C
+         fy8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=PkrZb935FOMK/VTbtX8totq42RNXT0VkqR/O4EKP5jw=;
+        b=wHZDj8n0WPvvSRPuwpmYta7KL2Ow251fuCSbz7Zava/wt5IhN3Fg2tdD++InR70R4k
+         X5NctaN34vYmeqeb33BhYkuahensRP1atMoi75fdLmXM5jF0Ekf2ptfa5yUIBMPWgVVv
+         n34z74fZG3NUj6YyqzC1epiAbiOgKma+uETAE/6S553xrJ0E/gQ/xXrVIPXc+sKTfAj5
+         seFNb8kNs2uQXexRE7FM5N9qQlfFyf/BS1K1b6YIBY49VgpYNVZ0/wg+q3FIAnOAexXy
+         nDALX3lYd84tsJ0Smee5LfFtJCA2dGJHaDsZV0JpZ+WEQqYy0hv1jxaAlR/IhFnjMdE6
+         L//g==
+X-Gm-Message-State: AOAM530rZM8XBM2kfAY0gc9UwdlN9O0qUAUt5VB6FfIxZdrzVMDpcXT0
+        CiGRLuFEztirwwhmz366hjWpeg==
+X-Google-Smtp-Source: ABdhPJzu4+uiwCvV1vrvW1wojSNf5k+tJhEK5603Gry9wHXsc+/ZSsj5mtg+D4HxhdsWZ9rjzRno9w==
+X-Received: by 2002:a17:902:be12:b0:167:6cbd:f113 with SMTP id r18-20020a170902be1200b001676cbdf113mr32389883pls.69.1654889259182;
+        Fri, 10 Jun 2022 12:27:39 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 187-20020a6215c4000000b0051b32c2a5a7sm19853799pfv.138.2022.06.10.12.27.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jun 2022 12:27:38 -0700 (PDT)
+Date:   Fri, 10 Jun 2022 19:27:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
         Quentin Perret <qperret@google.com>,
         Steven Price <steven.price@arm.com>,
         kvm list <kvm@vger.kernel.org>,
@@ -70,7 +66,7 @@ Cc:     Andy Lutomirski <luto@kernel.org>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
         Jeff Layton <jlayton@kernel.org>,
         "J . Bruce Fields" <bfields@fieldses.org>,
@@ -86,79 +82,97 @@ Cc:     Andy Lutomirski <luto@kernel.org>,
         Andi Kleen <ak@linux.intel.com>,
         David Hildenbrand <david@redhat.com>,
         Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <YqObJ4v2k7W+O2j9@google.com>
+References: <Ykslo2eo2eRXrpFR@google.com>
+ <eefc3c74-acca-419c-8947-726ce2458446@www.fastmail.com>
+ <Ykwbqv90C7+8K+Ao@google.com>
+ <YkyEaYiL0BrDYcZv@google.com>
+ <20220422105612.GB61987@chaop.bj.intel.com>
+ <3b99f157-0f30-4b30-8399-dd659250ab8d@www.fastmail.com>
+ <20220425134051.GA175928@chaop.bj.intel.com>
+ <27616b2f-1eff-42ff-91e0-047f531639ea@www.fastmail.com>
+ <YmcFAJEJmmtYa+82@google.com>
+ <CALCETrU_BdaYcPgVcjj4o9zFPyvU9oyjCCtjKTbSSgeL0aZaGQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALCETrU_BdaYcPgVcjj4o9zFPyvU9oyjCCtjKTbSSgeL0aZaGQ@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 25, 2022 at 1:31 PM Sean Christopherson <seanjc@google.com> wro=
-te:
->
-> On Mon, Apr 25, 2022, Andy Lutomirski wrote:
+On Fri, Jun 10, 2022, Andy Lutomirski wrote:
+> On Mon, Apr 25, 2022 at 1:31 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
+> > On Mon, Apr 25, 2022, Andy Lutomirski wrote:
+> > >
+> > >
+> > > On Mon, Apr 25, 2022, at 6:40 AM, Chao Peng wrote:
+> > > > On Sun, Apr 24, 2022 at 09:59:37AM -0700, Andy Lutomirski wrote:
+> > > >>
+> > >
+> > > >>
+> > > >> 2. Bind the memfile to a VM (or at least to a VM technology).  Now it's in
+> > > >> the initial state appropriate for that VM.
+> > > >>
+> > > >> For TDX, this completely bypasses the cases where the data is prepopulated
+> > > >> and TDX can't handle it cleanly.
 > >
-> > On Mon, Apr 25, 2022, at 6:40 AM, Chao Peng wrote:
-> > > On Sun, Apr 24, 2022 at 09:59:37AM -0700, Andy Lutomirski wrote:
-> > >>
-> >
-> > >>
-> > >> 2. Bind the memfile to a VM (or at least to a VM technology).  Now i=
-t's in
-> > >> the initial state appropriate for that VM.
-> > >>
-> > >> For TDX, this completely bypasses the cases where the data is prepop=
-ulated
-> > >> and TDX can't handle it cleanly.
->
-> I believe TDX can handle this cleanly, TDH.MEM.PAGE.ADD doesn't require t=
-hat the
-> source and destination have different HPAs.  There's just no pressing nee=
-d to
-> support such behavior because userspace is highly motivated to keep the i=
-nitial
-> image small for performance reasons, i.e. burning a few extra pages while=
- building
-> the guest is a non-issue.
+> > I believe TDX can handle this cleanly, TDH.MEM.PAGE.ADD doesn't require that the
+> > source and destination have different HPAs.  There's just no pressing need to
+> > support such behavior because userspace is highly motivated to keep the initial
+> > image small for performance reasons, i.e. burning a few extra pages while building
+> > the guest is a non-issue.
+> 
+> Following up on this, rather belatedly.  After re-reading the docs,
+> TDX can populate guest memory using TDH.MEM.PAGE.ADD, but see Intel®
+> TDX Module Base Spec v1.5, section 2.3, step D.4 substeps 1 and 2
+> here:
+> 
+> https://www.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-module-1.5-base-spec-348549001.pdf
+> 
+> For each TD page:
+> 
+> 1. The host VMM specifies a TDR as a parameter and calls the
+> TDH.MEM.PAGE.ADD function. It copies the contents from the TD
+> image page into the target TD page which is encrypted with the TD
+> ephemeral key. TDH.MEM.PAGE.ADD also extends the TD
+> measurement with the page GPA.
+> 
+> 2. The host VMM extends the TD measurement with the contents of
+> the new page by calling the TDH.MR.EXTEND function on each 256-
+> byte chunk of the new TD page.
+> 
+> So this is a bit like SGX.  There is a specific series of operations
+> that have to be done in precisely the right order to reproduce the
+> intended TD measurement.  Otherwise the guest will boot and run until
+> it tries to get a report and then it will have a hard time getting
+> anyone to believe its report.
+> 
+> So I don't think the host kernel can get away with host userspace just
+> providing pre-populated memory.  Userspace needs to tell the host
+> kernel exactly what sequence of adds, extends, etc to perform and in
+> what order, and the host kernel needs to do precisely what userspace
+> asks it to do.  "Here's the contents of memory" doesn't cut it unless
+> the tooling that builds the guest image matches the exact semantics
+> that the host kernel provides.
 
-Following up on this, rather belatedly.  After re-reading the docs,
-TDX can populate guest memory using TDH.MEM.PAGE.ADD, but see Intel=C2=AE
-TDX Module Base Spec v1.5, section 2.3, step D.4 substeps 1 and 2
-here:
+For TDX, yes, a KVM ioctl() is mandatory for all intents and purposes since adding
+non-zero memory into the guest requires a SEAMCALL.  My "idea", which I'm not sure
+would actually work, is more than a bit contrived, and which I don't think is remotely
+critical to support, is to let userspace fill the guest private memory directly
+and then use the private page for both the source and the target to TDH.MEM.PAGE.ADD.
 
-https://www.intel.com/content/dam/develop/external/us/en/documents/intel-td=
-x-module-1.5-base-spec-348549001.pdf
-
-For each TD page:
-
-1. The host VMM specifies a TDR as a parameter and calls the
-TDH.MEM.PAGE.ADD function. It copies the contents from the TD
-image page into the target TD page which is encrypted with the TD
-ephemeral key. TDH.MEM.PAGE.ADD also extends the TD
-measurement with the page GPA.
-
-2. The host VMM extends the TD measurement with the contents of
-the new page by calling the TDH.MR.EXTEND function on each 256-
-byte chunk of the new TD page.
-
-So this is a bit like SGX.  There is a specific series of operations
-that have to be done in precisely the right order to reproduce the
-intended TD measurement.  Otherwise the guest will boot and run until
-it tries to get a report and then it will have a hard time getting
-anyone to believe its report.
-
-So I don't think the host kernel can get away with host userspace just
-providing pre-populated memory.  Userspace needs to tell the host
-kernel exactly what sequence of adds, extends, etc to perform and in
-what order, and the host kernel needs to do precisely what userspace
-asks it to do.  "Here's the contents of memory" doesn't cut it unless
-the tooling that builds the guest image matches the exact semantics
-that the host kernel provides.
-
---Andy
+That would avoid having to double allocate memory for the initial guest image.  But
+like I said, contrived and low priority.
