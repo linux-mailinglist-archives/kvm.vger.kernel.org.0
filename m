@@ -2,75 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 074E8546994
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 17:40:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF3B1546A28
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 18:14:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345771AbiFJPj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 11:39:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45462 "EHLO
+        id S1345812AbiFJQO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 12:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345481AbiFJPjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 11:39:21 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D324128DC09
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 08:39:19 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id 19so6322050iou.12
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 08:39:19 -0700 (PDT)
+        with ESMTP id S238087AbiFJQO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 12:14:28 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FDA31DF3
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:14:27 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id q140so10141673pgq.6
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 09:14:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=ustad4Oit1LbdSHBANPMFYdxqbyRopb/4kSjojaTPVc=;
-        b=OQzSd9NThiAkyWfOJU99r2XLdSeMO9RN1xDK7cJcv+NuGepTE4T4PPm+aqd+IEmuWG
-         s2MyKfJa++z9sEi391aqlt4WG9aK+qdyMCqMKMdzKMiXluLJE5GRLsRVZkmiq347HCuo
-         ahbcogUcvCFVnm16lEKfB7AL/pWunUZK/J4nJdFPqLMT22qD2R/H5rvx+R7LINQeGAem
-         I83yEAs/bfvaAYWvXw0DmTkQe2UxCRsGX5Dn/hziTfKEKVNcs9XaS5y0ZK24Atc3c14K
-         NNABVibT+ha+2DxoTnw9KHgAvUJIS+/Sn8fN2UYHddccM4vwjDUW6TiQbT8jRtttmsv+
-         Hhog==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sqYpRJpV7hTVkJzWeySC/55ywPreerEYyAHVK7rq9LA=;
+        b=ZehwwLYuij7pbQaghWD2GrdTIOfQ1XgasEUmVI+nhvd82X4ZEWGF79XBvheRliFM+8
+         LQlrxByJVokCQ/gINBsFhOZhZjHXcpmAir492TXOaXI7iC/F7Bwi4ptRQtYUbYGyY5SQ
+         TxK5qW/wV8CCV8YqQLV5jWM8YEEm92a1WCcQVxigUczBkLKzhwgrSGPjDy4yzeckQMEl
+         k23GcmLFp8s0aWbczjuNfnjBEB9gzzj7nGZZJi5rfah1FRb/8MQ3Cd99incf77459IOk
+         fmV8msfIleb4V2r4FMWvWw0fr1RX3bQCUO2JP23SfG2qby97FTF15ddfD8Y7n8su8tG3
+         h2BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=ustad4Oit1LbdSHBANPMFYdxqbyRopb/4kSjojaTPVc=;
-        b=S7Y+vsZV0amFgcxKDFRF84Y0kQXI970S9zvw51dNZ5z8a+K/hdSbnQkLsMKbzcIxzf
-         RckfyfYOV0aJJPV//IhCRp8e8kz6R0+qtfhqCfiKDVOnhZP84UMFR9yowWbPFRYvKlBf
-         emOAXvbjN87XmWz8pcaWXeNjk7XYVc8wJcTpZB6JzU+tfrywzwUaREIcG1HIahyiP1xE
-         c1hr318S24gaRmAlMjh5uXsPXIDmhjH4lhGaSimJts6k8ECNX8Nz4034UFztEX8gZ5MB
-         mMHZjBV0O+XpPaVUfg1YYPqYFQTH05WDVsaHubUApInOJXgGffzxl061fZobP7veN88C
-         lg4A==
-X-Gm-Message-State: AOAM533kBRCYTwU+YtkCnijeKPGBQzu7ONTmTfZCdWUnHELCt53JubkH
-        NnmfyE+QiFj0lwqllQ/sCSWMByr05oPnb1C3dH0=
-X-Google-Smtp-Source: ABdhPJxyBMJb1QSW9qjWcVjKXsbenK35sbZ/xCLTgDd7snXihGp70BD6AykdITG627PgrDtvqH+GFdcylPAVYZtF1sQ=
-X-Received: by 2002:a05:6638:438c:b0:331:adac:a274 with SMTP id
- bo12-20020a056638438c00b00331adaca274mr15799962jab.192.1654875558497; Fri, 10
- Jun 2022 08:39:18 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=sqYpRJpV7hTVkJzWeySC/55ywPreerEYyAHVK7rq9LA=;
+        b=fUBWaYqDDWkRupE4ySlB8oU+1vMoTB8q41VKI7fsBquEzPDalUEukOJkKiYTtiC+Ky
+         mYEzc54BglfqfkmIoDArIY2Btpnn5t0vR70QeZPdq4/wYrg1EwcbGu6J6f+koaUgYl0y
+         hQkBbWZ5m31R+8WTVX8TVaI/wJKXiMzMxSlz8BHuAUFCOK7hMNKBs223erZu3GIp5gv1
+         8KLv482+hC1xbCJb6/CnEcu9IJwP/z6CiQHwsbZ4Qj3BVPB2IwDGRRQ0nWGYLlON0qFo
+         mTcYwgSgzNXLMTHp8D6+lRu9YEAhhFmJJrr5EJ40iTGvR83n7S+QTZAqZar3BO9XD8gu
+         kADQ==
+X-Gm-Message-State: AOAM532E3J4m/OL8vIzbiWeKY0qfWu2CthiBqrmddB9ToBHKWhCQyKBA
+        /a8hL5kx2pRNQwzotpTRUizotBdfbBbqVQ==
+X-Google-Smtp-Source: ABdhPJzxrryZznx/9GnvIIDqh+c23V5/Xt5ZsJHD0N8PohIbtiXWvM06mGWU66DmH3LeRvNyTftAHA==
+X-Received: by 2002:a63:5:0:b0:3fe:2558:677 with SMTP id 5-20020a630005000000b003fe25580677mr14572323pga.113.1654877666234;
+        Fri, 10 Jun 2022 09:14:26 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id r11-20020a170902e3cb00b0015e8d4eb28csm18669442ple.214.2022.06.10.09.14.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jun 2022 09:14:25 -0700 (PDT)
+Date:   Fri, 10 Jun 2022 16:14:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Andy Lutomirski <luto@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+Subject: Re: [PATCH v6 4/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <YqNt3Sgzge5Rph/R@google.com>
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <20220519153713.819591-5-chao.p.peng@linux.intel.com>
+ <8840b360-cdb2-244c-bfb6-9a0e7306c188@kernel.org>
+ <YofeZps9YXgtP3f1@google.com>
+ <20220523132154.GA947536@chaop.bj.intel.com>
+ <YoumuHUmgM6TH20S@google.com>
+ <20220530132613.GA1200843@chaop.bj.intel.com>
 MIME-Version: 1.0
-Received: by 2002:a4f:a709:0:0:0:0:0 with HTTP; Fri, 10 Jun 2022 08:39:17
- -0700 (PDT)
-Reply-To: rl715537@gmail.com
-From:   Rebecca Lawrence <angel.corrin2015@gmail.com>
-Date:   Fri, 10 Jun 2022 15:39:17 +0000
-Message-ID: <CANUTHViXoswJ37BN9eK2CYiwPzj0u87gCPpo72EtHCAL1iK==Q@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.4 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220530132613.GA1200843@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Dear,
-My name is Rebecca, I am a United States and a military woman who has
-never married with no kids yet. I came across your profile, and I
-personally took interest in being your friend. For confidential
-matters, please contact me back through my private email
-rl715537@gmail.com to enable me to send you my pictures and give you
-more details about me. I Hope to hear from you soon.
-Regards
-Rebecca.
+On Mon, May 30, 2022, Chao Peng wrote:
+> On Mon, May 23, 2022 at 03:22:32PM +0000, Sean Christopherson wrote:
+> > Actually, if the semantics are that userspace declares memory as private, then we
+> > can reuse KVM_MEMORY_ENCRYPT_REG_REGION and KVM_MEMORY_ENCRYPT_UNREG_REGION.  It'd
+> > be a little gross because we'd need to slightly redefine the semantics for TDX, SNP,
+> > and software-protected VM types, e.g. the ioctls() currently require a pre-exisitng
+> > memslot.  But I think it'd work...
+> 
+> These existing ioctls looks good for TDX and probably SNP as well. For
+> softrware-protected VM types, it may not be enough. Maybe for the first
+> step we can reuse this for all hardware based solutions and invent new
+> interface when software-protected solution gets really supported.
+> 
+> There is semantics difference for fd-based private memory. Current above
+> two ioctls() use userspace addreess(hva) while for fd-based it should be
+> fd+offset, and probably it's better to use gpa in this case. Then we
+> will need change existing semantics and break backward-compatibility.
+
+My thought was to keep the existing semantics for VMs with type==0, i.e. SEV and
+SEV-ES VMs.  It's a bit gross, but the pinning behavior is a dead end for SNP and
+TDX, so it effectively needs to be deprecated anyways.  I'm definitely not opposed
+to a new ioctl if Paolo or others think this is too awful, but burning an ioctl
+for this seems wasteful.
+
+Then generic KVM can do something like:
+
+	case KVM_MEMORY_ENCRYPT_REG_REGION:
+	case KVM_MEMORY_ENCRYPT_UNREG_REGION:
+		struct kvm_enc_region region;
+
+		if (!kvm_arch_vm_supports_private_memslots(kvm))
+			goto arch_vm_ioctl;
+
+		r = -EFAULT;
+		if (copy_from_user(&region, argp, sizeof(region)))
+			goto out;
+
+		r = kvm_set_encrypted_region(ioctl, &region);
+		break;
+	default:
+arch_vm_ioctl:
+		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
+
+
+where common KVM provides
+
+  __weak void kvm_arch_vm_supports_private_memslots(struct kvm *kvm)
+  {
+	return false;
+  }
+
+and x86 overrides that to
+
+  bool kvm_arch_vm_supports_private_memslots(struct kvm *kvm)
+  {
+  	/* I can't remember what we decided on calling type '0' VMs. */
+	return !!kvm->vm_type;
+  }
+
+and if someone ever wants to enable private memslot for SEV/SEV-ES guests we can
+always add a capability or even a new VM type.
+
+pKVM on arm can then obviously implement kvm_arch_vm_supports_private_memslots()
+to grab whatever identifies a pKVM VM.
