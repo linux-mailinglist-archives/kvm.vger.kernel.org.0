@@ -2,142 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47C1E5466CF
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 14:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C764E546713
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 15:06:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242506AbiFJMtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 08:49:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40036 "EHLO
+        id S1343662AbiFJNG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 09:06:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239131AbiFJMtI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 08:49:08 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAEC1EEF6;
-        Fri, 10 Jun 2022 05:49:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654865347; x=1686401347;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=tgp8OHfSndf8X9XOTJF9Tb0izZaAsaa2D0KBtc/ukNo=;
-  b=d9YWw9b92M3fXAVdGCcSSxlDxxwlOx9fNiiKgDyhhNbABmJww0tmWXC2
-   3yo4GcMb3iVZLPKSIQFxHnNdLxERAOKzlRrp0Bfpui32gHOPwUymOkUiX
-   FVQy9TX9mtjpPvx5e0mExLXlQDGjEeOjmnMuh3q9wtyLePC6MsJh027f2
-   yHskeDmpTIQLwjSxZQjTzfeAGIGslr2o3xf1p9WRxP0EJ79FyCu1cfKx3
-   JIkKTgUA7nsQX/DJwMG+PGogetYctgV6ZR5E9qTG9bfXK1iAcbY/RXFyt
-   +5O1tzppNlU891NMjg2LrAFQqbFqf6f9m/Nn0/ePxGvx8jA+5o0kJ7NM+
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10373"; a="275152767"
-X-IronPort-AV: E=Sophos;i="5.91,290,1647327600"; 
-   d="scan'208";a="275152767"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2022 05:49:06 -0700
-X-IronPort-AV: E=Sophos;i="5.91,290,1647327600"; 
-   d="scan'208";a="684527290"
-Received: from elmerred-mobl2.amr.corp.intel.com (HELO [10.251.8.219]) ([10.251.8.219])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2022 05:49:05 -0700
-Message-ID: <2854ae00-e965-ab0f-80dd-6012ae36b271@intel.com>
-Date:   Fri, 10 Jun 2022 05:49:04 -0700
+        with ESMTP id S242513AbiFJNGZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 09:06:25 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A942A70B
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 06:06:23 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 93-20020a9d02e6000000b0060c252ee7a4so3365560otl.13
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 06:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3ebXiX+kepLI2Qw0XY13GE4xS0GXBZo65rTV2JEU/MI=;
+        b=r0iXm+ECrwbIGGwW7KlGtF0yJdsBcMHlE4hMJ4SXOUPArR/ih29baGIkqdoRmEseEO
+         kR4ufVtDPBFugWHxlY7YlXTKmBAIoksSW5tPnHjVFjdSh9i2FF9CKThov13NopQrgpWB
+         19vdsedFXIhd34+lTvRp9X9LsN7xm1M0e039aKwuPwBiRbEh1P2CtC+p94HOxhrJVGkR
+         mfCQ4+IY/l0D5RERjRqFNKVHbwCSHy0SzH95s/OytvEmAQcKC8j3JBnAXSEm70rcX+RU
+         m/meheKnwOW3RgIihgkqS9JFFSHKVIlyDa4QtXlE6LPrzWLG1WOIddzEuKROHlt4qZ8f
+         rDtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3ebXiX+kepLI2Qw0XY13GE4xS0GXBZo65rTV2JEU/MI=;
+        b=J6UQoqbAShP8PJY+DdPtbTWivCPNC2kI+22P2DCXWvtDyhKjzNNF6u3mFYiajiCAoP
+         0Z4Xim00tILas4cgBGfOrwlDDDnWk14lmXv+OsQvQdATDH0yha1oy/wfWmSlWdHtuh5M
+         9JcNchww83JrU/bvd0ErbTj6mNUmPIAct6sSRcBgxFBbUbGC+6ksFtnmxNo1M1FkdKEf
+         6T4VLzb5kK8pmThyx5Dey4JDsplGY8XqSJx7/SruuGQCxbL26YFZYmHONsp1ve9YrKsd
+         Uk/dqsoGa+BLKMGAjVkFDlPNYFQYhgmPykSucn4+rbB5ETcdpZr5Tpd8pmR289FFfUMN
+         fmRA==
+X-Gm-Message-State: AOAM532INiSRK+47sSmQ4Bcjf+mkZ51hIq0aY72suoGZqPJnCAbMUjfn
+        JnoPce6tEKk/3+FkEmyE2DJKmUaF03qf1qo3+ryFQ4EV0Mc=
+X-Google-Smtp-Source: ABdhPJws07QUSYA+aDl5QUraZzBJCoFdEH8iiTu7BE5zOytCnaRv8bQE/ltNd6eD1MjkNjL1RwSMLW116iSLjnB0qJc=
+X-Received: by 2002:a9d:7057:0:b0:60c:406e:1a7 with SMTP id
+ x23-20020a9d7057000000b0060c406e01a7mr206631otj.299.1654866382571; Fri, 10
+ Jun 2022 06:06:22 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH 1/2] x86: notify hypervisor about guest entering s2idle
- state
-Content-Language: en-US
-To:     Grzegorz Jaszczyk <jaz@semihalf.com>
-Cc:     linux-kernel@vger.kernel.org, Dmytro Maluka <dmy@semihalf.com>,
-        Zide Chen <zide.chen@intel.corp-partner.google.com>,
-        Peter Fang <peter.fang@intel.corp-partner.google.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Sachi King <nakato@nakato.io>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        David Dunn <daviddunn@google.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "open list:ACPI" <linux-acpi@vger.kernel.org>,
-        "open list:HIBERNATION (aka Software Suspend, aka swsusp)" 
-        <linux-pm@vger.kernel.org>
-References: <20220609110337.1238762-1-jaz@semihalf.com>
- <20220609110337.1238762-2-jaz@semihalf.com>
- <f62ab257-b2e0-3097-e394-93a9e7a0d2bf@intel.com>
- <CAH76GKPo6VL33tBaZyszL8wvjpzJ7hjOg3o1JddaEnuGbwk=dQ@mail.gmail.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <CAH76GKPo6VL33tBaZyszL8wvjpzJ7hjOg3o1JddaEnuGbwk=dQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20220610092838.1205755-1-maz@kernel.org> <20220610092838.1205755-6-maz@kernel.org>
+In-Reply-To: <20220610092838.1205755-6-maz@kernel.org>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Fri, 10 Jun 2022 14:05:46 +0100
+Message-ID: <CA+EHjTw_ZJREm+E2PEqB8etjaDNN7psT9p09WQU=Tp3YvB_bkw@mail.gmail.com>
+Subject: Re: [PATCH v2 05/19] KVM: arm64: Add helpers to manipulate vcpu flags
+ among a set
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Mark Brown <broonie@kernel.org>,
+        Reiji Watanabe <reijiw@google.com>, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/10/22 04:36, Grzegorz Jaszczyk wrote:
-> czw., 9 cze 2022 o 16:27 Dave Hansen <dave.hansen@intel.com> napisał(a):
->> On 6/9/22 04:03, Grzegorz Jaszczyk wrote:
->>> Co-developed-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
->>> Signed-off-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
->>> Co-developed-by: Tomasz Nowicki <tn@semihalf.com>
->>> Signed-off-by: Tomasz Nowicki <tn@semihalf.com>
->>> Signed-off-by: Zide Chen <zide.chen@intel.corp-partner.google.com>
->>> Co-developed-by: Grzegorz Jaszczyk <jaz@semihalf.com>
->>> Signed-off-by: Grzegorz Jaszczyk <jaz@semihalf.com>
->>> ---
->>>  Documentation/virt/kvm/x86/hypercalls.rst | 7 +++++++
->>>  arch/x86/kvm/x86.c                        | 3 +++
->>>  drivers/acpi/x86/s2idle.c                 | 8 ++++++++
->>>  include/linux/suspend.h                   | 1 +
->>>  include/uapi/linux/kvm_para.h             | 1 +
->>>  kernel/power/suspend.c                    | 4 ++++
->>>  6 files changed, 24 insertions(+)
->> What's the deal with these emails?
->>
->>         zide.chen@intel.corp-partner.google.com
->>
->> I see a smattering of those in the git logs, but never for Intel folks.
-> I've kept emails as they were in the original patch and I do not think
-> I should change them. This is what Zide and Peter originally used.
+Hi Marc,
 
-"Original patch"?  Where did you get this from?
+On Fri, Jun 10, 2022 at 10:28 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Careful analysis of the vcpu flags show that this is a mix of
+> configuration, communication between the host and the hypervisor,
+> as well as anciliary state that has no consistency. It'd be a lot
+> better if we could split these flags into consistent categories.
+>
+> However, even if we split these flags apart, we want to make sure
+> that each flag can only be applied to its own set, and not across
+> sets.
+>
+> To achieve this, use a preprocessor hack so that each flag is always
+> associated with:
+>
+> - the set that contains it,
+>
+> - a mask that describe all the bits that contain it (for a simple
+>   flag, this is the same thing as the flag itself, but we will
+>   eventually have values that cover multiple bits at once).
+>
+> Each flag is thus a triplet that is not directly usable as a value,
+> but used by three helpers that allow the flag to be set, cleared,
+> and fetched. By mandating the use of such helper, we can easily
+> enforce that a flag can only be used with the set it belongs to.
+>
+> Finally, one last helper "unpacks" the raw value from the triplet
+> that represents a flag, which is useful for multi-bit values that
+> need to be enumerated (in a switch statement, for example).
+>
+> Further patches will start making use of this infrastructure.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 372c5642cfab..6d30ac7e3164 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -415,6 +415,50 @@ struct kvm_vcpu_arch {
+>         } steal;
+>  };
+>
+> +/*
+> + * Each 'flag' is composed of a comma-separated triplet:
+> + *
+> + * - the flag-set it belongs to in the vcpu->arch structure
+> + * - the value for that flag
+> + * - the mask for that flag
+> + *
+> + *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
+> + * unpack_vcpu_flag() extract the flag value from the triplet for
+> + * direct use outside of the flag accessors.
+> + */
+> +#define __vcpu_single_flag(_set, _f)   _set, (_f), (_f)
+> +
+> +#define __unpack_flag(_set, _f, _m)    _f
+> +#define unpack_vcpu_flag(...)          __unpack_flag(__VA_ARGS__)
+> +
+> +#define __vcpu_get_flag(v, flagset, f, m)                      \
+> +       ({                                                      \
+> +               v->arch.flagset & (m);                          \
+> +       })
+> +
+> +#define __vcpu_set_flag(v, flagset, f, m)                      \
+> +       do {                                                    \
+> +               typeof(v->arch.flagset) *fset;                  \
+> +                                                               \
+> +               fset = &v->arch.flagset;                        \
+> +               if (HWEIGHT(m) > 1)                             \
+> +                       *fset &= ~(m);                          \
+> +               *fset |= (f);                                   \
+> +       } while (0)
+> +
+> +#define __vcpu_clear_flag(v, flagset, f, m)                    \
+> +       do {                                                    \
+> +               typeof(v->arch.flagset) *fset;                  \
+> +                                                               \
+> +               fset = &v->arch.flagset;                        \
+> +               *fset &= ~(m);                                  \
+> +       } while (0)
+> +
+> +#define vcpu_get_flag(v, ...)  __vcpu_get_flag((v), __VA_ARGS__)
+> +#define vcpu_set_flag(v, ...)  __vcpu_set_flag((v), __VA_ARGS__)
+> +#define vcpu_clear_flag(v, ...)        __vcpu_clear_flag((v), __VA_ARGS__)
+> +
+> +
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
+>                              sve_ffr_offset((vcpu)->arch.sve_max_vl))
 
->> I'll also say that I'm a bit suspicious of a patch that includes 5
->> authors for 24 lines of code.  Did it really take five of you to write
->> 24 lines of code?
-> This patch was built iteratively: original patch comes from Zide and
-> Peter, I've squashed it with Tomasz later changes and reworked by
-> myself for upstream. I didn't want to take credentials from any of the
-> above so ended up with Zide as an author and 3 co-developers. Please
-> let me know if that's an issue.
+A bit of macro magic going on here, but with some help I think I've
+wrapped my head around it. With that
 
-It just looks awfully fishy.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-If it were me, and I'd put enough work into it to believe I deserved
-credit as an *author* (again, of ~13 lines of actual code), I'd probably
-just zap all the other SoB's and mention them in the changelog.  I'd
-also explain where the code came from.
+Cheers,
+/fuad
 
-Your text above wouldn't be horrible context to add to a cover letter.
+
+> --
+> 2.34.1
+>
