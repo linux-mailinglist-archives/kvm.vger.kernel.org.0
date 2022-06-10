@@ -2,132 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1587C5462AD
-	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 11:43:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C054B5462B3
+	for <lists+kvm@lfdr.de>; Fri, 10 Jun 2022 11:47:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344740AbiFJJnl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 05:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59746 "EHLO
+        id S1344642AbiFJJqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 05:46:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243444AbiFJJnk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 05:43:40 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72D14223BCB;
-        Fri, 10 Jun 2022 02:43:39 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25A8T3ZQ031673;
-        Fri, 10 Jun 2022 09:43:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=xnu0IeugXXhLb8TMu2gOhNJSSkFKJgPniah1ZXloVu8=;
- b=P6s8SMKCa8JHouHZ7H8XWUNpS8wIw+WETHFZocb/gkcH4JRAhSf8Uj7dFxhUiu/dDIIP
- aDCbke4HK+ulOfZg/GjBe7ZgJbm2x1oGzckhOlmyC7rB+MyUlBI9WTtLZgNa2TwSLWkS
- gRK1LtOHBqxzEV416Sww2hr1nvWLuQeVOhv3yn/Wj3m5FyMuWCsT40o3KoKfm+AYv07O
- oVCIrKQgZGRlIgDMELTVjhhFVNrf5pIhnrYOe3oj0OCD6ungF8hLICDg4v4CGKPIScHE
- 5UvppvmW20IQt6JXc427fO3pSPlbaE9tNisFKdazvy366qdAuOdbccW171dhe0GwKMjl DA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gm2fu999g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Jun 2022 09:43:38 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25A8TIvE000319;
-        Fri, 10 Jun 2022 09:43:38 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gm2fu998u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Jun 2022 09:43:38 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25A9a6aD009990;
-        Fri, 10 Jun 2022 09:43:35 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gfy19g1tj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Jun 2022 09:43:35 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25A9hWa614025058
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Jun 2022 09:43:32 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8ED7B52050;
-        Fri, 10 Jun 2022 09:43:32 +0000 (GMT)
-Received: from [9.145.63.156] (unknown [9.145.63.156])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3A3625204E;
-        Fri, 10 Jun 2022 09:43:32 +0000 (GMT)
-Message-ID: <17c65d73-b791-46f9-8ec7-0fa592e7cb61@linux.ibm.com>
-Date:   Fri, 10 Jun 2022 11:43:31 +0200
+        with ESMTP id S1343647AbiFJJqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 05:46:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADA393DB6D6
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654854402;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uFSrK6QjMWjmxXq2UmX5nbX9kQXYdC0Rrd+ljS/aypg=;
+        b=gvJf3cpaxmpCB7V+FpJt47g7vieC2kmFVyl3nF5ssvmvuuwoS+IevRUmXaOODKbOFz0AfP
+        0zVMFQOYk2IMiS7Dj7nAvodJAkBsXfq3+qH/H7uFQD8AW4Sa7LhVlf5U9gHgz6TwOLGzS7
+        o3L3RudrQGzXNDcqbdn9+DnHVnxSONo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-16-ahJ8_wqOPYmKAYPYyfBNLg-1; Fri, 10 Jun 2022 05:46:41 -0400
+X-MC-Unique: ahJ8_wqOPYmKAYPYyfBNLg-1
+Received: by mail-wr1-f69.google.com with SMTP id bv8-20020a0560001f0800b002183c5d5c26so3916470wrb.20
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 02:46:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uFSrK6QjMWjmxXq2UmX5nbX9kQXYdC0Rrd+ljS/aypg=;
+        b=JYh90Bo35wboWPk+B7IVZ7MHWv+9Y9ABhnvKzI1rx35n6sK4TwQdUSu5H1CTgThG5L
+         PkRrOYU/WWE7QPwhfCY0HXg21m4+/F8LBVx0TT8TuPGFDZuPMpYohklF/t8y2uTFxJyZ
+         udvL2uOWGS3zDVlhUfp9r6Y6NDJWhPNVrPvQsMPmAuXGL5OEM0XUmVj7UkwJdQbp6PjW
+         Goj8OzBujRhcY3NSn/HbMLis0NWckj7jqaDa0mXOyBsGjnluXY7wL/NfekuDyH/XfOH3
+         d/BDIeUtvwWvNhZYh0uLTKI0G9bimyzB5pRXHot9mTD6a9DCQM9jF8DCknn68BwICKKu
+         LLVg==
+X-Gm-Message-State: AOAM531HXNAXXi0QozlEcHscrs/qpDIpCnbb3DOduuKewd7Ma+9TQRXK
+        pyP1XMyVU/tJg7PuN5LbXpyufy0hoB2I0imCdDxQawebxCIcWi0OsF25xsjVI+cOdAV4Gugkhpx
+        C7uy9ZIeLB68x
+X-Received: by 2002:a1c:4c12:0:b0:39c:6750:be17 with SMTP id z18-20020a1c4c12000000b0039c6750be17mr8137806wmf.21.1654854400462;
+        Fri, 10 Jun 2022 02:46:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwU3TqojSiB2ZPtENgLzReySdlXbwaYQW8P6z/18TZYg166Ti+yAosoW2JeaOyBpxeWpicnZA==
+X-Received: by 2002:a1c:4c12:0:b0:39c:6750:be17 with SMTP id z18-20020a1c4c12000000b0039c6750be17mr8137784wmf.21.1654854400250;
+        Fri, 10 Jun 2022 02:46:40 -0700 (PDT)
+Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
+        by smtp.gmail.com with ESMTPSA id b11-20020a5d4d8b000000b0020c7ec0fdf4sm31494421wru.117.2022.06.10.02.46.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jun 2022 02:46:39 -0700 (PDT)
+Date:   Fri, 10 Jun 2022 11:46:37 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org,
+        anup@brainfault.org, Raghavendra Rao Ananta <rananta@google.com>,
+        eric.auger@redhat.com
+Subject: Re: [PATCH v2 000/144] KVM: selftests: Overhaul APIs, purge VCPU_ID
+Message-ID: <20220610094637.lg5wf2f2w2pez4dq@gator>
+References: <20220603004331.1523888-1-seanjc@google.com>
+ <21570ac1-e684-7983-be00-ba8b3f43a9ee@redhat.com>
+ <93b87b7b5a599c1dfa47ee025f0ae9c4@kernel.org>
+ <YqEupumS/m5IArTj@google.com>
+ <20220609074027.fntbvcgac4nroy35@gator>
+ <YqIPYP0gKIoU7JLG@google.com>
+ <YqItO2cbsGDSyxD8@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, scgl@linux.ibm.com,
-        pmorel@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com
-References: <20220603154037.103733-1-imbrenda@linux.ibm.com>
- <20220603154037.103733-3-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] lib: s390x: better smp interrupt
- checks
-In-Reply-To: <20220603154037.103733-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wWV1WgZ2V5dn_5Ff3EbzY7pZYpTkt1AV
-X-Proofpoint-ORIG-GUID: 7jHsTVIqcjn85v1sYd2gmmGg-x-L0v-N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-10_02,2022-06-09_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 impostorscore=0 mlxscore=0 suspectscore=0
- adultscore=0 priorityscore=1501 spamscore=0 mlxlogscore=952 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206100035
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YqItO2cbsGDSyxD8@google.com>
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/3/22 17:40, Claudio Imbrenda wrote:
-> Use per-CPU flags and callbacks for Program, Extern, and I/O interrupts
-> instead of global variables.
+On Thu, Jun 09, 2022 at 05:26:19PM +0000, Sean Christopherson wrote:
+> On Thu, Jun 09, 2022, Sean Christopherson wrote:
+> > On Thu, Jun 09, 2022, Andrew Jones wrote:
+> > > On Wed, Jun 08, 2022 at 11:20:06PM +0000, Sean Christopherson wrote:
+> > > > diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > > > index b3116c151d1c..17f7ef975d5c 100644
+> > > > --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > > > +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > > > @@ -419,7 +419,7 @@ static void run_test(struct vcpu_config *c)
+> > > > 
+> > > >         check_supported(c);
+> > > > 
+> > > > -       vm = vm_create_barebones();
+> > > > +       vm = vm_create(1);
+> > > 
+> > > Hmm, looks like something, somewhere for AArch64 needs improving to avoid
+> > > strangeness like this. I'll look into it after we get this series merged.
+> > 
+> > Huh, you're right, that is odd.  Ah, duh, aarch64_vcpu_add() allocates a stack
+> > for the vCPU, and that will fail if there's no memslot from which to allocate
+> > guest memory.
+> > 
+> > So, this is my goof in
+> > 
+> >   KVM: selftests: Rename vm_create() => vm_create_barebones(), drop param
+> > 
+> > get-reg-list should first be converted to vm_create_without_vcpus().  I'll also
+> > add a comment explaining that vm_create_barebones() can be used with __vm_vcpu_add(),
+> > but not the "full" vm_vcpu_add() or vm_arch_vcpu_add() variants.
 > 
-> This allows for more accurate error handling; a CPU waiting for an
-> interrupt will not have it "stolen" by a different CPU that was not
-> supposed to wait for one, and now two CPUs can wait for interrupts at
-> the same time.
+> Actually, I agree with your assessment.  A better solution is to open code the
+> calls to add and setup the vCPU.  It's a small amount of code duplication, but I
+> actually like the end result because it better documents the test's dependencies.
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   lib/s390x/asm/arch_def.h |  7 ++++++-
->   lib/s390x/interrupt.c    | 38 ++++++++++++++++----------------------
->   2 files changed, 22 insertions(+), 23 deletions(-)
+> Assuming it actually works, i.e. the stack setup is truly unnecessary, I'll add a
+> patch like so before the barebones change.
 > 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 72553819..3a0d9c43 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -124,7 +124,12 @@ struct lowcore {
->   	uint8_t		pad_0x0280[0x0308 - 0x0280];	/* 0x0280 */
->   	uint64_t	sw_int_crs[16];			/* 0x0308 */
->   	struct psw	sw_int_psw;			/* 0x0388 */
-> -	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
-> +	uint32_t	pgm_int_expected;		/* 0x0398 */
-> +	uint32_t	ext_int_expected;		/* 0x039c */
-> +	void		(*pgm_cleanup_func)(void);	/* 0x03a0 */
-> +	void		(*ext_cleanup_func)(void);	/* 0x03a8 */
-> +	void		(*io_int_func)(void);		/* 0x03b0 */
-> +	uint8_t		pad_0x03b8[0x11b0 - 0x03b8];	/* 0x03b8 */
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index ecfb773ec41e..7bba365b1522 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -418,7 +418,8 @@ static void run_test(struct vcpu_config *c)
+> 
+>         vm = vm_create(DEFAULT_GUEST_PHY_PAGES);
+>         prepare_vcpu_init(c, &init);
+> -       aarch64_vcpu_add_default(vm, 0, &init, NULL);
+> +       vm_vcpu_add(vm, vcpuid);
+> +       aarch64_vcpu_setup(vm, 0, &init);
+>         finalize_vcpu(vm, 0, c);
+> 
+>         reg_list = vcpu_get_reg_list(vm, 0);
+>
 
-Before we directly pollute the lowcore I'd much rather have a pointer to 
-a struct. We could then either use any area of the lowcore by adding a 
-union or we extend the SMP lib per-cpu structs.
-
-I don't want to have to review offset calculations for every change of 
-per-cpu data. They are just way too easy to get wrong.
-
+LGTM, Thanks 
 
