@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58FC4547723
-	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 20:38:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC476547725
+	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 20:41:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230218AbiFKSiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Jun 2022 14:38:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50220 "EHLO
+        id S230247AbiFKSlz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Jun 2022 14:41:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbiFKSiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Jun 2022 14:38:08 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C3321825
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:38:07 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id r206so3212787oib.8
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:38:07 -0700 (PDT)
+        with ESMTP id S229672AbiFKSly (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Jun 2022 14:41:54 -0400
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96792D1E2
+        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:41:53 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-fb6b4da1dfso3311963fac.4
+        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:41:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Xs8uTlhkm0yxZvl9ZPv6y+oBdIiDVMBnaFckx2/YwFs=;
-        b=qrlIf23QC+/+YYfd/iBrITJEsFMxAPmrYnqxIPxctSu9Mne3uXPHRxFUKjfmAVijrw
-         VW9X34uewzK5wSBrQROA4iDpRVtITeafCoe78LMSDERdm7xYf3HRkwgOpXtHF6m9ts+v
-         YSJO2bBDqsJ7WFvP7/qOJ7bGd8+9bolMun6rpUsE/tmosL6tmHsSADf9HNrJ7+WYnfWZ
-         Xa+zDJkDfP/0eX2D3ubwAylb0IKjXEOTCFmRdv2vAU+T+vguB92CQlISjY2Ei2logeOu
-         HWzAL5B68l8S7kEmFkWNMu+CxRXYbjVMXHs61/W3NHn4PI2m2rPr4ms+8B8j76/bQkje
-         sFlA==
+        bh=aGUj2LVLNGk5sOwR7+tKcU/mD91p7d7Dvbf7YRvu4qg=;
+        b=rPFZGQ3gOLwesD2QG9IU7Z5ORHjifYdHd3M3rHmqO3uS3mAECeXs6WSr08jhHalONZ
+         00kH3g/6qwvm7Dxs4OZ+92EBsLjn+o7VUtqj90p3R3wmrgQ2eb8atHHvBtZZBrCW8++X
+         kFVuv1Ot4n+8SKCcIx2n/ihi+/dBLMJD8UVXyxR68MluJYDarVW4aa25cfakTZv84r1J
+         nn7YN7qw6zWnfq/+xGkexU0DFWnuoSdRk9EyoCt1b05nphByzWoPaWx2BZLAk18WZ0gs
+         5+qCnSeOw0GNdYe6zeodER3hcZKsS8SpAhSeNZnVC6+Hjz3AEQiwhzij2Jsh9TGn5hDx
+         +E4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Xs8uTlhkm0yxZvl9ZPv6y+oBdIiDVMBnaFckx2/YwFs=;
-        b=bqBkZMU0Z2igN2d8Yq54SZhUftCiZzP21a1MMN7N3E3lBKL4mK1aeH8HG0xF7f6tTb
-         euERysxAyWRF6cDHuvhG5U/KhybnIvPQSuBebxj7bpYMHl10X4pvQnXBDFY36zNHZ7Kz
-         6BnPB4Sr71D4AbN39KD5zx3gaGCQmt9YIQpyl1UtXcd0UUvczC64PNBOZbvakdbT88ct
-         85xtlDkOz0PQl1HIH9N4UxJLHDH3tQu96gt4SSywsK7eGrtSNkabEvjbQiYQvX+Y6JA4
-         IJzJG8c8ptnvrBM4rlvs627IhJ0uCDnar+tphNEKIViKR2UhbpLBgt9N3vh6CJqMj64C
-         I/zw==
-X-Gm-Message-State: AOAM531Ns8xA4ijyWknwR4fN2FVY0A/FBneyqcGKx7tUa6ByCQ3C8n2g
-        F09bBJ1jSM4jZ1A3b/lh4z19xWt1Tf1QW25M2Nvj4g==
-X-Google-Smtp-Source: ABdhPJw7tXu1b8dVOKxTSnAh5gbv8di1OCAQ1O999DYbmxN1zbqRW6SfDG7qKBmoytsNW4pLT2zLJrDJcRtYbxdRcJo=
-X-Received: by 2002:aca:1901:0:b0:32f:7cf:db5e with SMTP id
- l1-20020aca1901000000b0032f07cfdb5emr2983324oii.16.1654972686314; Sat, 11 Jun
- 2022 11:38:06 -0700 (PDT)
+        bh=aGUj2LVLNGk5sOwR7+tKcU/mD91p7d7Dvbf7YRvu4qg=;
+        b=zBUK79X+NsTqX43NHdsjVWYFjDvM6+RB1X3iyrwqFf5bHFis6//+o055olMWkBQVF6
+         0bDbIKWzeawo/CBcPCYOWjMZAIvrRdrVWYaigi8xLhCmcUxA8r833IdMtM5TGzR+jMqU
+         P5ACKwvH7NLU+iUQ954hY25dE/9ScXbaeyOdPdnByUwgScUyyW7aVCv/KkMtTeYnUPC/
+         NVDLzRPQbHfNDACoJaNWA6Z/QytMzVxzqSOr0AxgbS33beoDxzEQOdwc2xWPYh2obHLV
+         nrosEhqXyRpo1h3F5fIikvrEVwrM5Mr9b4i/rZ6xYkYDFsnx/b8DtF6YUNsOQBGgXU40
+         jJ5g==
+X-Gm-Message-State: AOAM5309fqA9xEN5Plg1LrLOhkbReFXFDbptjEDggrFcbqo1PFf+fgob
+        Gb/QMIgJdQKx5qrVs2t/vccwiKEbqPc8LWJvKzfvVcqtG7Z68w==
+X-Google-Smtp-Source: ABdhPJwBqvM9uOWilf/hZkJ/qSGvf+HPCw8ZzSqEItH5yaUmYPdRrrdg19+h1EH+Z84nEY0g6QaKN8589eW/COQRu1E=
+X-Received: by 2002:a05:6870:304b:b0:f2:d164:5c85 with SMTP id
+ u11-20020a056870304b00b000f2d1645c85mr3138557oau.107.1654972913135; Sat, 11
+ Jun 2022 11:41:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220610092838.1205755-1-maz@kernel.org> <20220610092838.1205755-6-maz@kernel.org>
-In-Reply-To: <20220610092838.1205755-6-maz@kernel.org>
+References: <20220610092838.1205755-1-maz@kernel.org> <20220610092838.1205755-7-maz@kernel.org>
+In-Reply-To: <20220610092838.1205755-7-maz@kernel.org>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sat, 11 Jun 2022 11:37:50 -0700
-Message-ID: <CAAeT=Fxu+s7JNYP-U-ov2yqhLVp7Nvf_yox0JaVZh06a=rHwzg@mail.gmail.com>
-Subject: Re: [PATCH v2 05/19] KVM: arm64: Add helpers to manipulate vcpu flags
- among a set
+Date:   Sat, 11 Jun 2022 11:41:37 -0700
+Message-ID: <CAAeT=FxsPKgRbeNKWmRW3BYAnNrf_j6DeNGaCGUVG+_uNUUrFA@mail.gmail.com>
+Subject: Re: [PATCH v2 06/19] KVM: arm64: Add three sets of flags to the vcpu state
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
@@ -74,107 +73,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 10, 2022 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
+On Fri, Jun 10, 2022 at 2:29 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Careful analysis of the vcpu flags show that this is a mix of
-> configuration, communication between the host and the hypervisor,
-> as well as anciliary state that has no consistency. It'd be a lot
-> better if we could split these flags into consistent categories.
+> It so appears that each of the vcpu flags is really belonging to
+> one of three categories:
 >
-> However, even if we split these flags apart, we want to make sure
-> that each flag can only be applied to its own set, and not across
-> sets.
+> - a configuration flag, set once and for all
+> - an input flag generated by the kernel for the hypervisor to use
+> - a state flag that is only for the kernel's own bookkeeping
 >
-> To achieve this, use a preprocessor hack so that each flag is always
-> associated with:
+> As we are going to split all the existing flags into these three
+> sets, introduce all three in one go.
 >
-> - the set that contains it,
+> No functional change other than a bit of bloat...
 >
-> - a mask that describe all the bits that contain it (for a simple
->   flag, this is the same thing as the flag itself, but we will
->   eventually have values that cover multiple bits at once).
->
-> Each flag is thus a triplet that is not directly usable as a value,
-> but used by three helpers that allow the flag to be set, cleared,
-> and fetched. By mandating the use of such helper, we can easily
-> enforce that a flag can only be used with the set it belongs to.
->
-> Finally, one last helper "unpacks" the raw value from the triplet
-> that represents a flag, which is useful for multi-bit values that
-> need to be enumerated (in a switch statement, for example).
->
-> Further patches will start making use of this infrastructure.
->
+> Reviewed-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
+>  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 372c5642cfab..6d30ac7e3164 100644
+> index 6d30ac7e3164..af45320f247f 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -415,6 +415,50 @@ struct kvm_vcpu_arch {
->         } steal;
->  };
+> @@ -335,6 +335,15 @@ struct kvm_vcpu_arch {
+>         /* Miscellaneous vcpu state flags */
+>         u64 flags;
 >
-> +/*
-> + * Each 'flag' is composed of a comma-separated triplet:
-> + *
-> + * - the flag-set it belongs to in the vcpu->arch structure
-> + * - the value for that flag
-> + * - the mask for that flag
-> + *
-> + *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
-> + * unpack_vcpu_flag() extract the flag value from the triplet for
-> + * direct use outside of the flag accessors.
-> + */
-> +#define __vcpu_single_flag(_set, _f)   _set, (_f), (_f)
+> +       /* Configuration flags, set once and for all before the vcpu can run */
+> +       u64 cflags;
 > +
-> +#define __unpack_flag(_set, _f, _m)    _f
-> +#define unpack_vcpu_flag(...)          __unpack_flag(__VA_ARGS__)
+> +       /* Input flags to the hypervisor code, potentially cleared after use */
+> +       u64 iflags;
 > +
-> +#define __vcpu_get_flag(v, flagset, f, m)                      \
-> +       ({                                                      \
-> +               v->arch.flagset & (m);                          \
-> +       })
-> +
-> +#define __vcpu_set_flag(v, flagset, f, m)                      \
-> +       do {                                                    \
-> +               typeof(v->arch.flagset) *fset;                  \
-> +                                                               \
-> +               fset = &v->arch.flagset;                        \
-> +               if (HWEIGHT(m) > 1)                             \
-> +                       *fset &= ~(m);                          \
-> +               *fset |= (f);                                   \
-> +       } while (0)
-> +
-> +#define __vcpu_clear_flag(v, flagset, f, m)                    \
-> +       do {                                                    \
-> +               typeof(v->arch.flagset) *fset;                  \
-> +                                                               \
-> +               fset = &v->arch.flagset;                        \
-> +               *fset &= ~(m);                                  \
-> +       } while (0)
+> +       /* State flags for kernel bookkeeping, unused by the hypervisor code */
+> +       u64 sflags;
 
 Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
-IMHO I would prefer to have 'v' enclosed in parentheses in the
-implementation of __vcpu_{get,set,clear}_flag rather than in
-the implementation of vcpu_{get,set,clear}_flag though.
-(That was what I meant in my comment for v1)
+Thank you, those comments are more clear to me now.
 
 Thanks,
 Reiji
 
-> +#define vcpu_get_flag(v, ...)  __vcpu_get_flag((v), __VA_ARGS__)
-> +#define vcpu_set_flag(v, ...)  __vcpu_set_flag((v), __VA_ARGS__)
-> +#define vcpu_clear_flag(v, ...)        __vcpu_clear_flag((v), __VA_ARGS__)
+
 > +
-> +
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
->                              sve_ffr_offset((vcpu)->arch.sve_max_vl))
+>         /*
+>          * We maintain more than a single set of debug registers to support
+>          * debugging the guest from the host and to maintain separate host and
 > --
 > 2.34.1
 >
