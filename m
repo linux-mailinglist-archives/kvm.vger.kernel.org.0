@@ -2,89 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2F4354763C
-	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 17:51:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58FC4547723
+	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 20:38:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238935AbiFKPvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Jun 2022 11:51:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
+        id S230218AbiFKSiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Jun 2022 14:38:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233305AbiFKPvb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Jun 2022 11:51:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 87296DF39
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 08:51:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654962689;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nhRp/pGhgveCjZGUs+5rCBmMFDNeRBkg8UfANY7q/7Q=;
-        b=WCA8x0pQiCiNe9Wo/4SSa2IutroB+6RAT2vfpjUBjSXOZXD/llXwS/OpsBDtEp0uHnUrnr
-        DnfXA6f+3q+O0joEjJjPS+2tFulIn86fCQ/XA3pURxQZ20Duh7KuIZVoRCEOVdzSyRDe9h
-        tbuv4dQoOUtgPe4QmERwhKSK6yU4100=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-369-OaF57PyAMWKtNkzR7EgL7A-1; Sat, 11 Jun 2022 11:51:28 -0400
-X-MC-Unique: OaF57PyAMWKtNkzR7EgL7A-1
-Received: by mail-ed1-f70.google.com with SMTP id j4-20020aa7ca44000000b0042dd12a7bc5so1461783edt.13
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 08:51:28 -0700 (PDT)
+        with ESMTP id S229672AbiFKSiI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Jun 2022 14:38:08 -0400
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C3321825
+        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:38:07 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id r206so3212787oib.8
+        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:38:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Xs8uTlhkm0yxZvl9ZPv6y+oBdIiDVMBnaFckx2/YwFs=;
+        b=qrlIf23QC+/+YYfd/iBrITJEsFMxAPmrYnqxIPxctSu9Mne3uXPHRxFUKjfmAVijrw
+         VW9X34uewzK5wSBrQROA4iDpRVtITeafCoe78LMSDERdm7xYf3HRkwgOpXtHF6m9ts+v
+         YSJO2bBDqsJ7WFvP7/qOJ7bGd8+9bolMun6rpUsE/tmosL6tmHsSADf9HNrJ7+WYnfWZ
+         Xa+zDJkDfP/0eX2D3ubwAylb0IKjXEOTCFmRdv2vAU+T+vguB92CQlISjY2Ei2logeOu
+         HWzAL5B68l8S7kEmFkWNMu+CxRXYbjVMXHs61/W3NHn4PI2m2rPr4ms+8B8j76/bQkje
+         sFlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=nhRp/pGhgveCjZGUs+5rCBmMFDNeRBkg8UfANY7q/7Q=;
-        b=rvSNDUC1Avvai40CRRFhSrGWnTCSAi9PqZrO7MAhSRh6YD9P3+c59nFG4nB7nma+Ox
-         rCB13G4EOEkFDJWY4OW21eNSkW70KvNOz08k54z1DUY6t2WdlwhgJ7jAeSgRZjjb1xYp
-         dSP13NPz30bAImfO+UQaqrb1RvA4WJmFhkqeKbCeq3kXGRmlBgwXQFzzzHlc70YUUSol
-         Mq1x7Wd+/DQVUtrnYuwJWUC0AB/k6OnnC+TWCK5PW5km+m+zkTVWIEPaoaenr1pYL90U
-         jrpZUbOd0EuC76wdBpoS+toP8OpoOZI2dPLIVovzLKCmyFkLuwbhbD16GlD9E/Yei9ed
-         Sy+Q==
-X-Gm-Message-State: AOAM532u3ycL9VPW9Tck4ZqgNyz0XL/O8kz7BOR1l4gY89MdxQn0Z427
-        zSgZokrmxHUJDgWcBXY7Gcdvj1poPTyfTWmNzG3HW8C08nxhUr8/x/CDVtf6yvqXoFRrdR0qdji
-        9d7LYGOERxJq2
-X-Received: by 2002:a05:6402:23a2:b0:42d:d5f1:d470 with SMTP id j34-20020a05640223a200b0042dd5f1d470mr43214821eda.365.1654962687347;
-        Sat, 11 Jun 2022 08:51:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx7i/21cJ65P0sfonbSV4Xxlqt9fZPtGU+UdW0ennP9y/mw+amxh0Oy8KPFgQJlhQH/Z3jRXQ==
-X-Received: by 2002:a05:6402:23a2:b0:42d:d5f1:d470 with SMTP id j34-20020a05640223a200b0042dd5f1d470mr43214806eda.365.1654962687159;
-        Sat, 11 Jun 2022 08:51:27 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id lu33-20020a170906fae100b007041e969a8asm1189152ejb.97.2022.06.11.08.51.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jun 2022 08:51:24 -0700 (PDT)
-Message-ID: <a1e80ec8-67dc-bde4-8f17-5aa2b3b1a32a@redhat.com>
-Date:   Sat, 11 Jun 2022 17:51:19 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Xs8uTlhkm0yxZvl9ZPv6y+oBdIiDVMBnaFckx2/YwFs=;
+        b=bqBkZMU0Z2igN2d8Yq54SZhUftCiZzP21a1MMN7N3E3lBKL4mK1aeH8HG0xF7f6tTb
+         euERysxAyWRF6cDHuvhG5U/KhybnIvPQSuBebxj7bpYMHl10X4pvQnXBDFY36zNHZ7Kz
+         6BnPB4Sr71D4AbN39KD5zx3gaGCQmt9YIQpyl1UtXcd0UUvczC64PNBOZbvakdbT88ct
+         85xtlDkOz0PQl1HIH9N4UxJLHDH3tQu96gt4SSywsK7eGrtSNkabEvjbQiYQvX+Y6JA4
+         IJzJG8c8ptnvrBM4rlvs627IhJ0uCDnar+tphNEKIViKR2UhbpLBgt9N3vh6CJqMj64C
+         I/zw==
+X-Gm-Message-State: AOAM531Ns8xA4ijyWknwR4fN2FVY0A/FBneyqcGKx7tUa6ByCQ3C8n2g
+        F09bBJ1jSM4jZ1A3b/lh4z19xWt1Tf1QW25M2Nvj4g==
+X-Google-Smtp-Source: ABdhPJw7tXu1b8dVOKxTSnAh5gbv8di1OCAQ1O999DYbmxN1zbqRW6SfDG7qKBmoytsNW4pLT2zLJrDJcRtYbxdRcJo=
+X-Received: by 2002:aca:1901:0:b0:32f:7cf:db5e with SMTP id
+ l1-20020aca1901000000b0032f07cfdb5emr2983324oii.16.1654972686314; Sat, 11 Jun
+ 2022 11:38:06 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v2 000/144] KVM: selftests: Overhaul APIs, purge VCPU_ID
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Anup Patel <anup@brainfault.org>
-Cc:     KVM General <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
+References: <20220610092838.1205755-1-maz@kernel.org> <20220610092838.1205755-6-maz@kernel.org>
+In-Reply-To: <20220610092838.1205755-6-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Sat, 11 Jun 2022 11:37:50 -0700
+Message-ID: <CAAeT=Fxu+s7JNYP-U-ov2yqhLVp7Nvf_yox0JaVZh06a=rHwzg@mail.gmail.com>
+Subject: Re: [PATCH v2 05/19] KVM: arm64: Add helpers to manipulate vcpu flags
+ among a set
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oupton@google.com>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Marc Zyngier <maz@kernel.org>
-References: <20220603004331.1523888-1-seanjc@google.com>
- <21570ac1-e684-7983-be00-ba8b3f43a9ee@redhat.com>
- <CAAhSdy0_50KshS1rAcOjtFBUu=R7a0uXYa76vNibD_n7s=q6XA@mail.gmail.com>
- <CAAhSdy1N9vwX1aXkdVEvO=MLV7TEWKMB2jxpNNfzT2LUQ-Q01A@mail.gmail.com>
- <YqIKYOtQTvrGpmPV@google.com> <YqKRrK7SwO0lz/6e@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YqKRrK7SwO0lz/6e@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Mark Brown <broonie@kernel.org>, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,16 +74,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/10/22 02:34, Sean Christopherson wrote:
-> I pushed a new version that's based on the current kvm/queue, commit 5e9402ac128b.
-> arm and x86 look good (though I've yet to test on AMD).
-> 
-> Thomas,
-> If you get a chance, could you rerun the s390 tests?  The recent refactorings to
-> use TAP generated some fun conflicts.
+On Fri, Jun 10, 2022 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Careful analysis of the vcpu flags show that this is a mix of
+> configuration, communication between the host and the hypervisor,
+> as well as anciliary state that has no consistency. It'd be a lot
+> better if we could split these flags into consistent categories.
+>
+> However, even if we split these flags apart, we want to make sure
+> that each flag can only be applied to its own set, and not across
+> sets.
+>
+> To achieve this, use a preprocessor hack so that each flag is always
+> associated with:
+>
+> - the set that contains it,
+>
+> - a mask that describe all the bits that contain it (for a simple
+>   flag, this is the same thing as the flag itself, but we will
+>   eventually have values that cover multiple bits at once).
+>
+> Each flag is thus a triplet that is not directly usable as a value,
+> but used by three helpers that allow the flag to be set, cleared,
+> and fetched. By mandating the use of such helper, we can easily
+> enforce that a flag can only be used with the set it belongs to.
+>
+> Finally, one last helper "unpacks" the raw value from the triplet
+> that represents a flag, which is useful for multi-bit values that
+> need to be enumerated (in a switch statement, for example).
+>
+> Further patches will start making use of this infrastructure.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 372c5642cfab..6d30ac7e3164 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -415,6 +415,50 @@ struct kvm_vcpu_arch {
+>         } steal;
+>  };
+>
+> +/*
+> + * Each 'flag' is composed of a comma-separated triplet:
+> + *
+> + * - the flag-set it belongs to in the vcpu->arch structure
+> + * - the value for that flag
+> + * - the mask for that flag
+> + *
+> + *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
+> + * unpack_vcpu_flag() extract the flag value from the triplet for
+> + * direct use outside of the flag accessors.
+> + */
+> +#define __vcpu_single_flag(_set, _f)   _set, (_f), (_f)
+> +
+> +#define __unpack_flag(_set, _f, _m)    _f
+> +#define unpack_vcpu_flag(...)          __unpack_flag(__VA_ARGS__)
+> +
+> +#define __vcpu_get_flag(v, flagset, f, m)                      \
+> +       ({                                                      \
+> +               v->arch.flagset & (m);                          \
+> +       })
+> +
+> +#define __vcpu_set_flag(v, flagset, f, m)                      \
+> +       do {                                                    \
+> +               typeof(v->arch.flagset) *fset;                  \
+> +                                                               \
+> +               fset = &v->arch.flagset;                        \
+> +               if (HWEIGHT(m) > 1)                             \
+> +                       *fset &= ~(m);                          \
+> +               *fset |= (f);                                   \
+> +       } while (0)
+> +
+> +#define __vcpu_clear_flag(v, flagset, f, m)                    \
+> +       do {                                                    \
+> +               typeof(v->arch.flagset) *fset;                  \
+> +                                                               \
+> +               fset = &v->arch.flagset;                        \
+> +               *fset &= ~(m);                                  \
+> +       } while (0)
 
-I did so, rebased over David's nested dirty_log_perf_test patches and 
-pushed to kvm/queue.
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
-Paolo
+IMHO I would prefer to have 'v' enclosed in parentheses in the
+implementation of __vcpu_{get,set,clear}_flag rather than in
+the implementation of vcpu_{get,set,clear}_flag though.
+(That was what I meant in my comment for v1)
 
+Thanks,
+Reiji
+
+> +#define vcpu_get_flag(v, ...)  __vcpu_get_flag((v), __VA_ARGS__)
+> +#define vcpu_set_flag(v, ...)  __vcpu_set_flag((v), __VA_ARGS__)
+> +#define vcpu_clear_flag(v, ...)        __vcpu_clear_flag((v), __VA_ARGS__)
+> +
+> +
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
+>                              sve_ffr_offset((vcpu)->arch.sve_max_vl))
+> --
+> 2.34.1
+>
