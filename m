@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BE775470BE
-	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 02:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0D705470C8
+	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 02:58:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348760AbiFKA6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 20:58:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56678 "EHLO
+        id S1349009AbiFKA6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jun 2022 20:58:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344017AbiFKA6D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 20:58:03 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2AF69CEE
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 17:58:02 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id n8-20020a635908000000b00401a7b6235bso302195pgb.5
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 17:58:02 -0700 (PDT)
+        with ESMTP id S1344800AbiFKA6F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jun 2022 20:58:05 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C1E69CD4
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 17:58:04 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id u22-20020a170902a61600b0016363cdfe84so371467plq.10
+        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 17:58:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=xJFWCgWI3EZenc2tlDcSehPBrfChnvoivOJPRUBuTOk=;
-        b=OI2RYCYvH9YEFwqQYZCeFKsUd8hIlfgy8Qfm16pgMy3uNoPO3vPz7kQAI8sxh9hwd6
-         iTYqMqbreCW4+yPgj9JD6jQou46MTuJiq2LuQYVJyoKx73RSel+DViKa6Eg6lHYqpvbs
-         ZyKlge2JPsxJWb+NxbZ8NHbT9jqIC7NWq//fec+IFcNlFjhCmI1UkWl/Wk1FarNxetX3
-         tY1EPve4Hp/NDLSCrwfO2O6oCOVxFnZqdfDv/z1LGYc45HHtAp7/a7KuqSu7b4DQbZ7X
-         9MaMNOMZUVrF+9IevRUYJ2CIW9Fy4s+XCRKs6VTWkveUywNfPhkVN2BWuNhoVKQw32/Q
-         yPiA==
+        bh=AVQRubkzoQn/ed1EYoJH5pfC/v1u5yrl7rOVcK+kmGE=;
+        b=VRiSwc2//odTKj+Eikd4OHXG3B/142UyF51ul2JgNOdEGUo27qch42urrIwYQjX4X0
+         W3gjMlZ1sC/ZFB3Bpv2KccjO+6a+Ac+T6bLDwX8aH3pdYjMTC3sSZlxtYuEr/xamNZDe
+         00w417jax+aMFmj9dabWcc49lg4BxoAYUQUp/Ub4Ut5gsAC/NlQSiHazeVfgNhoSEB/a
+         QemA8PXGPECUB1ZtbxB2aHZzNcGTy+qOID+luCycolJUSGx+NH6P7BFmCufYtVF7W6zN
+         +y6YQ6iySYfkV6AhhkZwNQ4SGYrH0kWRjb3JrFfKNZW/8sZoxxv0aXHbKqoYft+qR/dq
+         q3GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=xJFWCgWI3EZenc2tlDcSehPBrfChnvoivOJPRUBuTOk=;
-        b=d71BrdIGM8lo631+Ebz06k/dJl/IkURaekuNw6hLglWVLuykxL1Fq8bvtUnHtPl5bo
-         OShNnYqpltFWw5ym6Nx8RCk35iEn237RfLMj7LSB3DBeej3oWC93cMSG6prB5vxB/p2C
-         nwKkLdpplPWQ7w+ZUzKpbmRmntw0PR/FpIsXXEnk3tZHZJDI/yZk8a/TOCFw2mGBDm74
-         wAo+UE0d4sWGE/iezy1cVjBA4JkcbT5fIjUqxWT07+k6t8wsk2f2JRC2U8AiC69px/ep
-         ROzxtAWreXPuFrJFkRXv1NZ74Q/JKtnoC39+l7ZaHJrcWU7ne1n+ilDy6Eb/AKG0rm++
-         lrMg==
-X-Gm-Message-State: AOAM533b9IQj+7KC0L7ABeP+JzysQa0dBhYIFCtwy5QOhEXrvzcb5FfF
-        qXnUKbsHVovEdHzS7t9mOsiLBDMQrgA=
-X-Google-Smtp-Source: ABdhPJx+qfVTFFmlfIT6OsNBQeUg4btE9LEEK5spRpsXxEqgb919qH0klWyJfztDfRY/nMYWkZ77jIXvXjY=
+        bh=AVQRubkzoQn/ed1EYoJH5pfC/v1u5yrl7rOVcK+kmGE=;
+        b=wipoTYRSHs7MdoqHLh+EuVYvauWmiYns60C6yXkaOMANrDR2WVmHOuxIlg7sc/mcBv
+         K0+7IxVRXrz8ohcKOT+IxnWXdepd0EhzEi8KUscNds53zggEHl7DWOk02anYUOfrSIX5
+         ojdJ9vWc4HIozzD0y5u5kDDJ2k4X3IVEGWbQB1ZZc0kXJXqExrAPj43bs8IOHw2aZ0Cn
+         1eZM8YNKR+sphAYE5ZXFyddTl9nq8IkD4pZYvHZSxuR7QIKoXKEE4P+p7W3TETO/qT4d
+         A/qbF5vVQPiu+AqO5P/Vfth6baJ9i9yHahdkXcTYBk7el7XZgL5+IClUqaIwETIlz6Cc
+         DkeA==
+X-Gm-Message-State: AOAM532uOYUGkf9NMupicxF7ty3BZzQvECvkdkcETuU8p7kmZaQ3teQu
+        dBXtYmytjup2bAfVv3VSerEf/BFh7Jo=
+X-Google-Smtp-Source: ABdhPJz0VXKGAmbpeP1mI8hPMgAEsThaF7yFOUoQL4dG2YifgaHvI+1U0YLnaVaH7A8lar4qT043gNdIaI0=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
- t9-20020a17090a024900b001e0a8a33c6cmr13457pje.0.1654909081383; Fri, 10 Jun
- 2022 17:58:01 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:178f:b0:1e3:3ba:c185 with SMTP id
+ q15-20020a17090a178f00b001e303bac185mr13438pja.1.1654909083306; Fri, 10 Jun
+ 2022 17:58:03 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 11 Jun 2022 00:57:50 +0000
+Date:   Sat, 11 Jun 2022 00:57:51 +0000
 In-Reply-To: <20220611005755.753273-1-seanjc@google.com>
-Message-Id: <20220611005755.753273-3-seanjc@google.com>
+Message-Id: <20220611005755.753273-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220611005755.753273-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH 2/7] KVM: VMX:  Give host userspace full control of MSR_IA32_PERF_CAPABILITIES
+Subject: [PATCH 3/7] Revert "KVM: x86/pmu: Accept 0 for absent PMU MSRs when
+ host-initiated if !enable_pmu"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -72,38 +73,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do not clear manipulate MSR_IA32_PERF_CAPABILITIES in intel_pmu_refresh(),
-i.e. give userspace full control over capability/read-only MSRs.  KVM is
-not a babysitter, it is userspace's responsiblity to provide a valid and
-coherent vCPU model.
+Eating reads and writes to all "PMU" MSRs when there is no PMU is wildly
+broken as it results in allowing accesses to _any_ MSR on Intel CPUs
+as intel_is_valid_msr() returns true for all host_initiated accesses.
 
-Attempting to "help" the guest by forcing a consistent model creates edge
-cases, and ironicially leads to inconsistent behavior.
+A revert of commit d1c88a402056 ("KVM: x86: always allow host-initiated
+writes to PMU MSRs") will soon follow.
 
-Example #1:  KVM doesn't do intel_pmu_refresh() when userspace writes
-the MSR.
-
-Example #2: KVM doesn't clear the bits when the PMU is disabled, or when
-there's no architectural PMU.
+This reverts commit 8e6a58e28b34e8d247e772159b8fa8f6bae39192.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 2 --
- 1 file changed, 2 deletions(-)
+ arch/x86/kvm/pmu.c     |  8 --------
+ arch/x86/kvm/svm/pmu.c | 11 +----------
+ 2 files changed, 1 insertion(+), 18 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 3b324ce0b142..b62012766226 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -619,8 +619,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 			pmu->pebs_enable_mask =
- 				~((1ull << pmu->nr_arch_gp_counters) - 1);
- 		}
--	} else {
--		vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
- 	}
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 6a32092460d3..87483e503c46 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -442,19 +442,11 @@ static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
+ 
+ int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ {
+-	if (msr_info->host_initiated && !vcpu->kvm->arch.enable_pmu) {
+-		msr_info->data = 0;
+-		return 0;
+-	}
+-
+ 	return static_call(kvm_x86_pmu_get_msr)(vcpu, msr_info);
  }
  
+ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ {
+-	if (msr_info->host_initiated && !vcpu->kvm->arch.enable_pmu)
+-		return !!msr_info->data;
+-
+ 	kvm_pmu_mark_pmc_in_use(vcpu, msr_info->index);
+ 	return static_call(kvm_x86_pmu_set_msr)(vcpu, msr_info);
+ }
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index fe520b2649b5..256244b8f89c 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -182,16 +182,7 @@ static struct kvm_pmc *amd_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+ static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr, bool host_initiated)
+ {
+ 	/* All MSRs refer to exactly one PMC, so msr_idx_to_pmc is enough.  */
+-	if (!host_initiated)
+-		return false;
+-
+-	switch (msr) {
+-	case MSR_K7_EVNTSEL0 ... MSR_K7_PERFCTR3:
+-	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+-		return true;
+-	default:
+-		return false;
+-	}
++	return false;
+ }
+ 
+ static struct kvm_pmc *amd_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
 -- 
 2.36.1.476.g0c4daa206d-goog
 
