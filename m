@@ -2,101 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 069725470CF
-	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 03:01:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBB2E5472B5
+	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 09:49:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350784AbiFKA60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jun 2022 20:58:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57324 "EHLO
+        id S231293AbiFKHtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Jun 2022 03:49:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348466AbiFKA6L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jun 2022 20:58:11 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC4569CD4
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 17:58:10 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id o16-20020a170902d4d000b00166d7813226so367810plg.13
-        for <kvm@vger.kernel.org>; Fri, 10 Jun 2022 17:58:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=ql1Sd9pF/0aevrNAhN/dPI6LOpxERHFTraDXP5pQQ+M=;
-        b=DEDudNDeQbi9BYH3iE/CYgy5GDEV9rOO4CJb9h/8tP2YrKiFrPFdtZY05MkDgIyeiD
-         o+b7ijnX2IhHEI9r/mdsqCtB1KpCT49EQLrLswhG6staT3WpC79S1T9lKKD3XD4pf9Et
-         uowg6fwG2Kan3bDR2t/IBibKniCS31inDVsyL2lGwyfF0biO1TgJr33mRRi7rlGvzNZZ
-         0eQWZWGLrFwuwK5+B1boY3SPJJylQpB1MAZLMndhb+ZrOsA/jhXfL80jJg3tv8sjUCk8
-         oTykfkM/FPON8GVOS1PeMEnt+rIthEcOVZvDHQ7eRIEZSeHW4tTnmeuGFTwAIqYv1Ibe
-         kgIQ==
+        with ESMTP id S231196AbiFKHs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Jun 2022 03:48:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E1B1C2983D
+        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 00:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654933737;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=qyk9g0ELjVAhO4lsyGp9C9P5YSNZEspWcN+xPCYvwJY=;
+        b=aozyP3tGVq0MGYnGr/oLwhYCUR3ZJ4W25jDFtAqq03bDcVm4EjNvEeV/JbNU8kcQZ6A4me
+        yzEfZmr/wdPyhTUvHv8CuSk3ixw14ku2rl67Xj3GmYbmWqzEYUwGQN3ipkrTjSz+opifcr
+        CFi2rF4vl1KRGbo2XrRgPXeJdx29g6U=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-675--aYc-6gYNEGfZVwj7pucJg-1; Sat, 11 Jun 2022 03:48:54 -0400
+X-MC-Unique: -aYc-6gYNEGfZVwj7pucJg-1
+Received: by mail-ed1-f69.google.com with SMTP id g3-20020a056402320300b0042dc956d80eso939666eda.14
+        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 00:48:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=ql1Sd9pF/0aevrNAhN/dPI6LOpxERHFTraDXP5pQQ+M=;
-        b=Db7zIeTa1OnVyenG9vMlYKXmoBGUwJHS1Cq2uDyJHhBjRgtmpoezVG7HKBG4pXvWof
-         J4LF+FOlcaAMZvPuk0Z0T2rtqyIZCvLTToD8I/Wxg1lODpt5QfcZ9a13uHOagC5hsmxk
-         QPbxaZ8VapN9KbZHTpgsroTNbX2knONkOZw+DHtu5DL9m0bbOQSIK3qCZIoc2OP6yw0Y
-         5QetXFP8mh/YBFoILaEuEhhskqmErrkVEZiOIT5ubzZDPIUK4cvxPrwGFuT3MqFi3WTb
-         cMZgDO4l2JQYBPERP2tfb0mBIt7WtLcDsU6Z8IVJIvQg0CYzu75IciS/Lb/FVKbCtnG2
-         SJCw==
-X-Gm-Message-State: AOAM532Gz+wsRVFZY9vyPn+q0qs9WiMhkJFxEe9+4Zu7qygLRT+fFyBc
-        T/yC2DbhtxP73+Xi6RfBPrGVOxu7OWI=
-X-Google-Smtp-Source: ABdhPJy5qpzI553uCL2+KmgXAhbnULI+Wzywy/Ign1YsEDFkvhxjWSV26vmO4i8KdM0PNo1tWRlVv1H06+I=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a62:ce4f:0:b0:51b:ac5c:4e49 with SMTP id
- y76-20020a62ce4f000000b0051bac5c4e49mr48265688pfg.81.1654909090550; Fri, 10
- Jun 2022 17:58:10 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 11 Jun 2022 00:57:55 +0000
-In-Reply-To: <20220611005755.753273-1-seanjc@google.com>
-Message-Id: <20220611005755.753273-8-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220611005755.753273-1-seanjc@google.com>
-X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH 7/7] KVM: x86: Ignore benign host writes to "unsupported"
- F15H_PERF_CTL MSRs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=qyk9g0ELjVAhO4lsyGp9C9P5YSNZEspWcN+xPCYvwJY=;
+        b=29dZYvh/E725OKpqC7jdJf05oV0PDrDdAGwDpGbDQ5rwU1C0GsSAPeQE0ikv5orYpf
+         4CXFMO845SV/g4rrYbCftRQeAjAJZpz44TCHQ0TCHwtZie5WkzYtrNUiWRTtkKMGvOk2
+         Nm/ApEHgm88giTF9AmXYKcs6NJoY5CgJSLQvLCcl1VxjqD1+zf2VI4UfpT9jgBRaZkGm
+         sxoqBowc7pmpRBW7dXkFjxl2kqfC3WFfUI9pWfYgX3UCawoxN8bGA95gr+SPh9k44EK/
+         i2Hn0pozlKSLdyLdunDTxs91RWl2cYR6sBMg+GymWQTTnpZhH5MDStXjEqwAvj7N2KDF
+         88kQ==
+X-Gm-Message-State: AOAM530penglrOiLYjipnUgO76rs+++KojbPqBhrXfxWYGey4c6RFOIN
+        PcwFLFWebpuweKt9kdM8mAuy/+/ViQi0zRtWIhzSNLmbJg8MxwS8tf2Gm9gqkUMoNDnzlpPhAgi
+        hTwcu7JT32YZm
+X-Received: by 2002:a05:6402:2553:b0:431:6e08:56de with SMTP id l19-20020a056402255300b004316e0856demr31201059edb.406.1654933733330;
+        Sat, 11 Jun 2022 00:48:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwwLx5bFdq30xI5P4i3ZyKGrtOytrp9e+V51+s6ADqB5Q4i9rEt7pLobi3Np6OXDutzcfAAxQ==
+X-Received: by 2002:a05:6402:2553:b0:431:6e08:56de with SMTP id l19-20020a056402255300b004316e0856demr31201044edb.406.1654933733098;
+        Sat, 11 Jun 2022 00:48:53 -0700 (PDT)
+Received: from redhat.com ([212.116.178.142])
+        by smtp.gmail.com with ESMTPSA id zj11-20020a170907338b00b006ff0fe78cb7sm664853ejb.133.2022.06.11.00.48.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Jun 2022 00:48:52 -0700 (PDT)
+Date:   Sat, 11 Jun 2022 03:48:48 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dan.carpenter@oracle.com, elic@nvidia.com, fam.zheng@bytedance.com,
+        gautam.dawar@xilinx.com, jasowang@redhat.com,
+        johannes@sipsolutions.net, liubo03@inspur.com, mst@redhat.com,
+        oliver.sang@intel.com, pilgrimtao@gmail.com, si-wei.liu@oracle.com,
+        stable@vger.kernel.org,
+        syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com,
+        vincent.whitchurch@axis.com, wangxiang@cdjrlc.com,
+        xieyongji@bytedance.com
+Subject: [GIT PULL] virtio,vdpa: fixes
+Message-ID: <20220611034848-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ignore host userspace writes of '0' to F15H_PERF_CTL MSRs KVM reports
-in the MSR-to-save list, but the MSRs are ultimately unsupported.  All
-MSRs in said list must be writable by userspace, e.g. if userspace sends
-the list back at KVM without filtering out the MSRs it doesn't need.
+The following changes since commit f2906aa863381afb0015a9eb7fefad885d4e5a56:
 
-Note, reads of said MSRs already have the desired behavior.
+  Linux 5.19-rc1 (2022-06-05 17:18:54 -0700)
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 1 +
- 1 file changed, 1 insertion(+)
+are available in the Git repository at:
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 655fb0b3bba4..2fc556ac8a70 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3789,6 +3789,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_PEBS_ENABLE:
- 	case MSR_IA32_DS_AREA:
- 	case MSR_PEBS_DATA_CFG:
-+	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
- 		if (kvm_pmu_is_valid_msr(vcpu, msr))
- 			return kvm_pmu_set_msr(vcpu, msr_info);
- 		/*
--- 
-2.36.1.476.g0c4daa206d-goog
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to eacea844594ff338db06437806707313210d4865:
+
+  um: virt-pci: set device ready in probe() (2022-06-10 20:38:06 -0400)
+
+----------------------------------------------------------------
+virtio,vdpa: fixes
+
+Fixes all over the place, most notably fixes for latent
+bugs in drivers that got exposed by suppressing
+interrupts before DRIVER_OK, which in turn has been
+done by 8b4ec69d7e09 ("virtio: harden vring IRQ").
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Bo Liu (1):
+      virtio: Fix all occurences of the "the the" typo
+
+Dan Carpenter (2):
+      vdpa/mlx5: fix error code for deleting vlan
+      vdpa/mlx5: clean up indenting in handle_ctrl_vlan()
+
+Jason Wang (2):
+      virtio-rng: make device ready before making request
+      vdpa: make get_vq_group and set_group_asid optional
+
+Vincent Whitchurch (1):
+      um: virt-pci: set device ready in probe()
+
+Xiang wangx (1):
+      vdpa/mlx5: Fix syntax errors in comments
+
+Xie Yongji (2):
+      vringh: Fix loop descriptors check in the indirect cases
+      vduse: Fix NULL pointer dereference on sysfs access
+
+chengkaitao (1):
+      virtio-mmio: fix missing put_device() when vm_cmdline_parent registration failed
+
+ arch/um/drivers/virt-pci.c             |  7 ++++++-
+ drivers/char/hw_random/virtio-rng.c    |  2 ++
+ drivers/vdpa/mlx5/net/mlx5_vnet.c      |  9 +++++----
+ drivers/vdpa/vdpa_user/vduse_dev.c     |  7 +++----
+ drivers/vhost/vdpa.c                   |  2 ++
+ drivers/vhost/vringh.c                 | 10 ++++++++--
+ drivers/virtio/virtio_mmio.c           |  3 ++-
+ drivers/virtio/virtio_pci_modern_dev.c |  2 +-
+ include/linux/vdpa.h                   |  5 +++--
+ 9 files changed, 32 insertions(+), 15 deletions(-)
 
