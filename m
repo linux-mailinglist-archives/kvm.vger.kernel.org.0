@@ -2,78 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBB2E5472B5
-	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 09:49:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 796535474E6
+	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 15:44:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231293AbiFKHtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Jun 2022 03:49:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37800 "EHLO
+        id S233764AbiFKNoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Jun 2022 09:44:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbiFKHs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Jun 2022 03:48:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E1B1C2983D
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 00:48:57 -0700 (PDT)
+        with ESMTP id S233328AbiFKNoR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Jun 2022 09:44:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0696513CC7
+        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 06:44:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654933737;
+        s=mimecast20190719; t=1654955054;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=qyk9g0ELjVAhO4lsyGp9C9P5YSNZEspWcN+xPCYvwJY=;
-        b=aozyP3tGVq0MGYnGr/oLwhYCUR3ZJ4W25jDFtAqq03bDcVm4EjNvEeV/JbNU8kcQZ6A4me
-        yzEfZmr/wdPyhTUvHv8CuSk3ixw14ku2rl67Xj3GmYbmWqzEYUwGQN3ipkrTjSz+opifcr
-        CFi2rF4vl1KRGbo2XrRgPXeJdx29g6U=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=45HLPCXXqTkMdZ7LqQ9jrXy/Uzs9B569cMj5sdJqp1c=;
+        b=hFpgLN2pP6y/y/w2lM/CZTtIQje2PPPX+wwYSItgLgLsiQpm8iUgsBOrE2mpgovVT787f7
+        rt6XKfl7EEGJDcrDsjbh1hnyGuRnZcDPBpA8vodiZWkCKy9T4PbdjzMBviRQ4rvUv0Z35g
+        QHJIh6YL8Vn2ZV20fK8hWeimZLv2MhQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-675--aYc-6gYNEGfZVwj7pucJg-1; Sat, 11 Jun 2022 03:48:54 -0400
-X-MC-Unique: -aYc-6gYNEGfZVwj7pucJg-1
-Received: by mail-ed1-f69.google.com with SMTP id g3-20020a056402320300b0042dc956d80eso939666eda.14
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 00:48:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=qyk9g0ELjVAhO4lsyGp9C9P5YSNZEspWcN+xPCYvwJY=;
-        b=29dZYvh/E725OKpqC7jdJf05oV0PDrDdAGwDpGbDQ5rwU1C0GsSAPeQE0ikv5orYpf
-         4CXFMO845SV/g4rrYbCftRQeAjAJZpz44TCHQ0TCHwtZie5WkzYtrNUiWRTtkKMGvOk2
-         Nm/ApEHgm88giTF9AmXYKcs6NJoY5CgJSLQvLCcl1VxjqD1+zf2VI4UfpT9jgBRaZkGm
-         sxoqBowc7pmpRBW7dXkFjxl2kqfC3WFfUI9pWfYgX3UCawoxN8bGA95gr+SPh9k44EK/
-         i2Hn0pozlKSLdyLdunDTxs91RWl2cYR6sBMg+GymWQTTnpZhH5MDStXjEqwAvj7N2KDF
-         88kQ==
-X-Gm-Message-State: AOAM530penglrOiLYjipnUgO76rs+++KojbPqBhrXfxWYGey4c6RFOIN
-        PcwFLFWebpuweKt9kdM8mAuy/+/ViQi0zRtWIhzSNLmbJg8MxwS8tf2Gm9gqkUMoNDnzlpPhAgi
-        hTwcu7JT32YZm
-X-Received: by 2002:a05:6402:2553:b0:431:6e08:56de with SMTP id l19-20020a056402255300b004316e0856demr31201059edb.406.1654933733330;
-        Sat, 11 Jun 2022 00:48:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwwLx5bFdq30xI5P4i3ZyKGrtOytrp9e+V51+s6ADqB5Q4i9rEt7pLobi3Np6OXDutzcfAAxQ==
-X-Received: by 2002:a05:6402:2553:b0:431:6e08:56de with SMTP id l19-20020a056402255300b004316e0856demr31201044edb.406.1654933733098;
-        Sat, 11 Jun 2022 00:48:53 -0700 (PDT)
-Received: from redhat.com ([212.116.178.142])
-        by smtp.gmail.com with ESMTPSA id zj11-20020a170907338b00b006ff0fe78cb7sm664853ejb.133.2022.06.11.00.48.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jun 2022 00:48:52 -0700 (PDT)
-Date:   Sat, 11 Jun 2022 03:48:48 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dan.carpenter@oracle.com, elic@nvidia.com, fam.zheng@bytedance.com,
-        gautam.dawar@xilinx.com, jasowang@redhat.com,
-        johannes@sipsolutions.net, liubo03@inspur.com, mst@redhat.com,
-        oliver.sang@intel.com, pilgrimtao@gmail.com, si-wei.liu@oracle.com,
-        stable@vger.kernel.org,
-        syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com,
-        vincent.whitchurch@axis.com, wangxiang@cdjrlc.com,
-        xieyongji@bytedance.com
-Subject: [GIT PULL] virtio,vdpa: fixes
-Message-ID: <20220611034848-mutt-send-email-mst@kernel.org>
+ us-mta-422-VoatBileMyOaX4L1wnbWew-1; Sat, 11 Jun 2022 09:44:10 -0400
+X-MC-Unique: VoatBileMyOaX4L1wnbWew-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDA31801E67;
+        Sat, 11 Jun 2022 13:44:09 +0000 (UTC)
+Received: from starship (unknown [10.40.194.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 64CDD1415102;
+        Sat, 11 Jun 2022 13:44:07 +0000 (UTC)
+Message-ID: <1d71f8acb62120aed87238051ef0f22b1ac58470.camel@redhat.com>
+Subject: Re: [PATCH] KVM: SVM: Fix a misplaced paranthesis in APICV inhibit
+ mask generation
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Sat, 11 Jun 2022 16:44:06 +0300
+In-Reply-To: <20220610191813.371682-1-seanjc@google.com>
+References: <20220610191813.371682-1-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,61 +66,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit f2906aa863381afb0015a9eb7fefad885d4e5a56:
+On Fri, 2022-06-10 at 19:18 +0000, Sean Christopherson wrote:
+> Relocate a ")" to its proper place at the end of a BIT usage, the intent
+> is most definitely not to have a feedback loop of BITs in the mask.
+> 
+> arch/x86/kvm/svm/avic.c: In function ‘avic_check_apicv_inhibit_reasons’:
+> include/vdso/bits.h:7:40: error: left shift count >= width of type [-Werror=shift-count-overflow]
+>     7 | #define BIT(nr)                 (UL(1) << (nr))
+>       |                                        ^~
+> arch/x86/kvm/svm/avic.c:911:27: note: in expansion of macro ‘BIT’
+>   911 |                           BIT(APICV_INHIBIT_REASON_SEV      |
+>       |                           ^~~
+> 
+> Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 5542d8959e11..d1bc5820ea46 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -908,9 +908,9 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
+>  			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
+>  			  BIT(APICV_INHIBIT_REASON_X2APIC) |
+>  			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+> -			  BIT(APICV_INHIBIT_REASON_SEV      |
+> +			  BIT(APICV_INHIBIT_REASON_SEV)      |
+>  			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |
+> -			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED));
+> +			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED);
+>  
+>  	return supported & BIT(reason);
+>  }
+> 
+> base-commit: b23f8810c46978bc05252db03055a61fcadc07d5
 
-  Linux 5.19-rc1 (2022-06-05 17:18:54 -0700)
+Sorry about it!
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to eacea844594ff338db06437806707313210d4865:
-
-  um: virt-pci: set device ready in probe() (2022-06-10 20:38:06 -0400)
-
-----------------------------------------------------------------
-virtio,vdpa: fixes
-
-Fixes all over the place, most notably fixes for latent
-bugs in drivers that got exposed by suppressing
-interrupts before DRIVER_OK, which in turn has been
-done by 8b4ec69d7e09 ("virtio: harden vring IRQ").
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Bo Liu (1):
-      virtio: Fix all occurences of the "the the" typo
-
-Dan Carpenter (2):
-      vdpa/mlx5: fix error code for deleting vlan
-      vdpa/mlx5: clean up indenting in handle_ctrl_vlan()
-
-Jason Wang (2):
-      virtio-rng: make device ready before making request
-      vdpa: make get_vq_group and set_group_asid optional
-
-Vincent Whitchurch (1):
-      um: virt-pci: set device ready in probe()
-
-Xiang wangx (1):
-      vdpa/mlx5: Fix syntax errors in comments
-
-Xie Yongji (2):
-      vringh: Fix loop descriptors check in the indirect cases
-      vduse: Fix NULL pointer dereference on sysfs access
-
-chengkaitao (1):
-      virtio-mmio: fix missing put_device() when vm_cmdline_parent registration failed
-
- arch/um/drivers/virt-pci.c             |  7 ++++++-
- drivers/char/hw_random/virtio-rng.c    |  2 ++
- drivers/vdpa/mlx5/net/mlx5_vnet.c      |  9 +++++----
- drivers/vdpa/vdpa_user/vduse_dev.c     |  7 +++----
- drivers/vhost/vdpa.c                   |  2 ++
- drivers/vhost/vringh.c                 | 10 ++++++++--
- drivers/virtio/virtio_mmio.c           |  3 ++-
- drivers/virtio/virtio_pci_modern_dev.c |  2 +-
- include/linux/vdpa.h                   |  5 +++--
- 9 files changed, 32 insertions(+), 15 deletions(-)
+Best regards,
+	Maxim Levitsky
 
