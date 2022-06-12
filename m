@@ -2,52 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F512547ADC
-	for <lists+kvm@lfdr.de>; Sun, 12 Jun 2022 17:54:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA981547AF5
+	for <lists+kvm@lfdr.de>; Sun, 12 Jun 2022 18:08:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233122AbiFLPya (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jun 2022 11:54:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49096 "EHLO
+        id S231872AbiFLQIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Jun 2022 12:08:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231857AbiFLPy3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jun 2022 11:54:29 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4173D35DE8
-        for <kvm@vger.kernel.org>; Sun, 12 Jun 2022 08:54:28 -0700 (PDT)
+        with ESMTP id S229763AbiFLQIh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Jun 2022 12:08:37 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 383EC24587;
+        Sun, 12 Jun 2022 09:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655049268; x=1686585268;
-  h=date:from:to:cc:message-id:mime-version;
-  bh=83FuJ2IMlDK/ukDG4XwNKQhzeub2sJIxJ/HAHCL49UE=;
-  b=lDrFNQKjbrBuBQB+yM6mq2c+fUQnyXoxS8Nrur4GNka/yyE0LFhD6PUR
-   2FIR+zpjkNYtlkeUY7GnCax3hVd7wiZNuF1fpS6eh9SgXVRQW+wMzucmO
-   StwXoolJrEL5vV2pPMbqpn7wbqBxtT1rWlGzRJPuoFIPa4pNxPkcyMDaw
-   4pcOQpy78TEZe6fVsT1aMhwjDyAHd1NrVOqqkMa5PeXFTwOicGp6908wK
-   nNqqMr0UajC6fwU8s81daSnBXw3R5VH+dlrMYTtxcoX06o9suQiniFXdL
-   STnipuCjdbkNmvIVsnWu1Hg197EgIxqW2eIzC9FSOTtzAdHp00bVEIC1U
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10376"; a="258502708"
+  t=1655050116; x=1686586116;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=hz5PhftjnQ+VKN73iQs/unZiiFFho2wt5hrRHGCWT64=;
+  b=entvL28pVh8FW67M9LCcAAJwOorsI2u9XUxBmLlTLoo0hFDVVro7nhLA
+   +kfTBAE7M9gryXaHpavfzvIr7CTPN2JINLyaEmDIHw7I8RlgnVur9pOTP
+   bXx4nYMFQanm+/BsU6LNz1RC4x8o9RyPs+IjPD6BnX5/oa2wxyiF9G26c
+   XghQdRDormL4JPsPNZMHm13JA8xC9H/tDdvKFLyuPCA/TqURK1HRCI7ly
+   zqn1gTFjzeGqHPl1zIr4J0OD7DuwG2D+Zqm79fBQ4XEFuK4rgtL+QHt2E
+   OaCTq0KIumXD5laKzvlzuRKeZd/IcgvILN1BI6I0laCScOb8BXGiWtoBM
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10376"; a="261119285"
 X-IronPort-AV: E=Sophos;i="5.91,294,1647327600"; 
-   d="scan'208";a="258502708"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2022 08:54:28 -0700
+   d="scan'208";a="261119285"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2022 09:08:35 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,294,1647327600"; 
-   d="scan'208";a="639228400"
+   d="scan'208";a="685594416"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.132])
-  by fmsmga008.fm.intel.com with ESMTP; 12 Jun 2022 08:54:26 -0700
-Date:   Sun, 12 Jun 2022 23:58:14 +0800
+  by fmsmga002.fm.intel.com with ESMTP; 12 Jun 2022 09:08:33 -0700
+Date:   Mon, 13 Jun 2022 00:12:20 +0800
 From:   Zhao Liu <zhao1.liu@linux.intel.com>
 To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org
-Message-ID: <20220612155814.GA52899@liuzhao-OptiPlex-7080>
+Cc:     Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Zhao Liu <zhao1.liu@linux.intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH 3/3] RISC-V: KVM: Add extensible CSR emulation framework
+Message-ID: <20220612161220.GA53120@liuzhao-OptiPlex-7080>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,MISSING_SUBJECT,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -164,24 +167,25 @@ On Fri, Jun 10, 2022 at 10:35:55AM +0530, Anup Patel wrote:
 > +	}
 > +
 
+
 Hi Anup, what about a `switch` to handle exit_reason?
-	switch(run->exit_reason) {
-		case KVM_EXIT_MMIO:
-			ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
-			break;
-		case KVM_EXIT_RISCV_SBI:
-			ret = kvm_riscv_vcpu_sbi_return(vcpu, vcpu->run);
-			break;
-		case KVM_EXIT_RISCV_CSR:
-			ret = kvm_riscv_vcpu_csr_return(vcpu, vcpu->run);
-			break;
-		case default:
-			break;
-	}
-	if (ret) {
-		kvm_vcpu_srcu_read_unlock(vcpu);
-		return ret;
-	}
+        switch(run->exit_reason) {
+                case KVM_EXIT_MMIO:
+                        ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
+                        break;
+                case KVM_EXIT_RISCV_SBI:
+                        ret = kvm_riscv_vcpu_sbi_return(vcpu, vcpu->run);
+                        break;
+                case KVM_EXIT_RISCV_CSR:
+                        ret = kvm_riscv_vcpu_csr_return(vcpu, vcpu->run);
+                        break;
+                case default:
+                        break;
+        }
+        if (ret) {
+                kvm_vcpu_srcu_read_unlock(vcpu);
+                return ret;
+        }
 
 >  	if (run->immediate_exit) {
 >  		kvm_vcpu_srcu_read_unlock(vcpu);
@@ -278,9 +282,12 @@ Hi Anup, what about a `switch` to handle exit_reason?
 > +	switch (GET_RM(insn)) {
 > +	case 1:
 
-It's better to define these rounding mode, eg: #define INSN_RM_RTZ 1.
+It's better to define these rounding mode.
+What about this name: #define INSN_RM_RTZ 1.
 
-Thanks.
+Thanks,
+Zhao
+
 > +		wr_mask = -1UL;
 > +		new_val = rs1_val;
 > +		break;
