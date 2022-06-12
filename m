@@ -2,55 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9759547935
-	for <lists+kvm@lfdr.de>; Sun, 12 Jun 2022 09:35:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD131547961
+	for <lists+kvm@lfdr.de>; Sun, 12 Jun 2022 10:59:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234664AbiFLHff (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jun 2022 03:35:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54070 "EHLO
+        id S235140AbiFLI7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Jun 2022 04:59:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbiFLHfc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jun 2022 03:35:32 -0400
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D144F39BA2
-        for <kvm@vger.kernel.org>; Sun, 12 Jun 2022 00:35:29 -0700 (PDT)
-Received: by mail-il1-f198.google.com with SMTP id e4-20020a056e020b2400b002d5509de6f3so2564223ilu.6
-        for <kvm@vger.kernel.org>; Sun, 12 Jun 2022 00:35:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=1Xgh0uMJ75AgI9MjY81mi9Hj4ZGB8BF+ScF7gj9/dZs=;
-        b=7oV78FdCcEW77zAf9CAmvrsSm7jS/dA83sOmD0bdkSoPbJpHBbBYL6n43Cm91carWV
-         +FbNhh07s5DgwTjXxVkTlo5PJTHZy8BKsgvN/oR9V+B2jNoMwyLd6Ly5ddiQwYNsbrmW
-         suYbvncLl7aDkJuvu7IqkrJb0++0qAYMHHAgm7t/IKc0Y0FrrtzCV9KrGU8fUnqlVXZb
-         RyxRopToGEKkOq5/PXmD2aA8f3SLhvb1DigB/PHgm+Km3/hIlDMwXrzRthpGKmdyMhGm
-         1OMICo0LXUKohILXhV/1YGGlcNJOKEuwWaLwoYftTqKS7S+umgGdBZ1KLXHy7uRpI4y1
-         AU9w==
-X-Gm-Message-State: AOAM532H24ph61PXsbXZPANzDkl8PiLEYbGCHePWqIolaZVlk8Xr5WJ2
-        YUoraKet0pR9NRa27Fah4vrx1daBxZyIiIwum0pYAJShJg28
-X-Google-Smtp-Source: ABdhPJyFszkRlznaIKtJRNsItp2ig/3Ynjfye5LPspwE2oE45vUhET4fVhR5gtyI6VgYzWK2bJ0wpu5vhofFsGPNvpaD7ZJzJB39
-MIME-Version: 1.0
-X-Received: by 2002:a92:c24c:0:b0:2d1:cdd0:1959 with SMTP id
- k12-20020a92c24c000000b002d1cdd01959mr28765647ilo.39.1655019329229; Sun, 12
- Jun 2022 00:35:29 -0700 (PDT)
-Date:   Sun, 12 Jun 2022 00:35:29 -0700
-In-Reply-To: <0000000000000a5eae05d8947adb@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003719fc05e13b37e3@google.com>
-Subject: Re: [syzbot] WARNING in handle_exception_nmi (2)
-From:   syzbot <syzbot+4688c50a9c8e68e7aaa1@syzkaller.appspotmail.com>
-To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        with ESMTP id S233187AbiFLI7e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Jun 2022 04:59:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C654A45516
+        for <kvm@vger.kernel.org>; Sun, 12 Jun 2022 01:59:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 846BEB80B68
+        for <kvm@vger.kernel.org>; Sun, 12 Jun 2022 08:59:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D6CC34115;
+        Sun, 12 Jun 2022 08:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655024371;
+        bh=lAZd4om3O/HhLmnjR6wY2GSgGFgCHW1e+OFvSSyBIds=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=tBA2DhCeU+J+TQVwkHA+0m0syzbtrutzouveFNnovfkfbe0tG/RExhAV406Y2kiw0
+         1GtK06OLvCwuNweJo2nu3xZf7rAT0PgP7KWuIAEt2AZNbQZKJaiUrQ6IbcWwPql/VR
+         C5BcXeACz3JXJwg9ujtbrl4FKnqRoF0CEWXydbtWRiovHIHNqqYQXwnd6yMC9nnl9w
+         O4npE1M3QOAr1s09VQyFzx+OrtcZeSEawgDxlV/72FkmhLryGee1R37WtvoOhw9z6v
+         inxqYzTUdYWnhDUMuxNxfBwJeEeyY1yxP1xPiVSgSINnJz87s7Jz9jKRJF8nvWDqZW
+         rlapsgc4Mg+JA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1o0JRQ-00HVLI-W9;
+        Sun, 12 Jun 2022 09:59:29 +0100
+Date:   Sun, 12 Jun 2022 09:59:03 +0100
+Message-ID: <87zgiip8a0.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Mark Brown <broonie@kernel.org>, kernel-team@android.com
+Subject: Re: [PATCH v2 05/19] KVM: arm64: Add helpers to manipulate vcpu flags among a set
+In-Reply-To: <CAAeT=Fxu+s7JNYP-U-ov2yqhLVp7Nvf_yox0JaVZh06a=rHwzg@mail.gmail.com>
+References: <20220610092838.1205755-1-maz@kernel.org>
+        <20220610092838.1205755-6-maz@kernel.org>
+        <CAAeT=Fxu+s7JNYP-U-ov2yqhLVp7Nvf_yox0JaVZh06a=rHwzg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com, will@kernel.org, tabba@google.com, qperret@google.com, broonie@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,60 +74,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+On Sat, 11 Jun 2022 19:37:50 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> On Fri, Jun 10, 2022 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Careful analysis of the vcpu flags show that this is a mix of
+> > configuration, communication between the host and the hypervisor,
+> > as well as anciliary state that has no consistency. It'd be a lot
+> > better if we could split these flags into consistent categories.
+> >
+> > However, even if we split these flags apart, we want to make sure
+> > that each flag can only be applied to its own set, and not across
+> > sets.
+> >
+> > To achieve this, use a preprocessor hack so that each flag is always
+> > associated with:
+> >
+> > - the set that contains it,
+> >
+> > - a mask that describe all the bits that contain it (for a simple
+> >   flag, this is the same thing as the flag itself, but we will
+> >   eventually have values that cover multiple bits at once).
+> >
+> > Each flag is thus a triplet that is not directly usable as a value,
+> > but used by three helpers that allow the flag to be set, cleared,
+> > and fetched. By mandating the use of such helper, we can easily
+> > enforce that a flag can only be used with the set it belongs to.
+> >
+> > Finally, one last helper "unpacks" the raw value from the triplet
+> > that represents a flag, which is useful for multi-bit values that
+> > need to be enumerated (in a switch statement, for example).
+> >
+> > Further patches will start making use of this infrastructure.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
+> >  1 file changed, 44 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 372c5642cfab..6d30ac7e3164 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -415,6 +415,50 @@ struct kvm_vcpu_arch {
+> >         } steal;
+> >  };
+> >
+> > +/*
+> > + * Each 'flag' is composed of a comma-separated triplet:
+> > + *
+> > + * - the flag-set it belongs to in the vcpu->arch structure
+> > + * - the value for that flag
+> > + * - the mask for that flag
+> > + *
+> > + *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
+> > + * unpack_vcpu_flag() extract the flag value from the triplet for
+> > + * direct use outside of the flag accessors.
+> > + */
+> > +#define __vcpu_single_flag(_set, _f)   _set, (_f), (_f)
+> > +
+> > +#define __unpack_flag(_set, _f, _m)    _f
+> > +#define unpack_vcpu_flag(...)          __unpack_flag(__VA_ARGS__)
+> > +
+> > +#define __vcpu_get_flag(v, flagset, f, m)                      \
+> > +       ({                                                      \
+> > +               v->arch.flagset & (m);                          \
+> > +       })
+> > +
+> > +#define __vcpu_set_flag(v, flagset, f, m)                      \
+> > +       do {                                                    \
+> > +               typeof(v->arch.flagset) *fset;                  \
+> > +                                                               \
+> > +               fset = &v->arch.flagset;                        \
+> > +               if (HWEIGHT(m) > 1)                             \
+> > +                       *fset &= ~(m);                          \
+> > +               *fset |= (f);                                   \
+> > +       } while (0)
+> > +
+> > +#define __vcpu_clear_flag(v, flagset, f, m)                    \
+> > +       do {                                                    \
+> > +               typeof(v->arch.flagset) *fset;                  \
+> > +                                                               \
+> > +               fset = &v->arch.flagset;                        \
+> > +               *fset &= ~(m);                                  \
+> > +       } while (0)
+> 
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> 
+> IMHO I would prefer to have 'v' enclosed in parentheses in the
+> implementation of __vcpu_{get,set,clear}_flag rather than in
+> the implementation of vcpu_{get,set,clear}_flag though.
+> (That was what I meant in my comment for v1)
 
-HEAD commit:    7a68065eb9cd Merge tag 'gpio-fixes-for-v5.19-rc2' of git:/..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=177df408080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=20ac3e0ebf0db3bd
-dashboard link: https://syzkaller.appspot.com/bug?extid=4688c50a9c8e68e7aaa1
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12087173f00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16529343f00000
+I understood what you were asking the first place, but I don't think
+this has any advantage over what is above. __vcpu_{get,set,clear}_flag
+are not meant to be used directly, and adding extra bracketing to
+these only makes them more painful to read.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4688c50a9c8e68e7aaa1@syzkaller.appspotmail.com
+If you can show a case where it breaks, I'll be happy to revisit this.
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 3609 at arch/x86/kvm/vmx/vmx.c:4896 handle_exception_nmi+0xfdc/0x1190 arch/x86/kvm/vmx/vmx.c:4896
-Modules linked in:
-CPU: 0 PID: 3609 Comm: syz-executor169 Not tainted 5.19.0-rc1-syzkaller-00303-g7a68065eb9cd #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:handle_exception_nmi+0xfdc/0x1190 arch/x86/kvm/vmx/vmx.c:4896
-Code: 0f 84 c8 f3 ff ff e8 33 5c 58 00 48 89 ef c7 85 84 0d 00 00 00 00 00 00 e8 21 35 ec ff 41 89 c4 e9 af f3 ff ff e8 14 5c 58 00 <0f> 0b e9 69 f6 ff ff e8 08 5c 58 00 be f5 ff ff ff bf 01 00 00 00
-RSP: 0018:ffffc9000309faf8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88801ba1d880 RSI: ffffffff8122171c RDI: 0000000000000001
-RBP: ffff88807cd88000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: 00000000a0000975
-R13: ffff88807cd88248 R14: 0000000000000000 R15: 0000000080000300
-FS:  0000555556c8d300(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 00000000229ca000 CR4: 00000000003526e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 00000000b8fecd19 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6174 [inline]
- vmx_handle_exit+0x498/0x1950 arch/x86/kvm/vmx/vmx.c:6191
- vcpu_enter_guest arch/x86/kvm/x86.c:10361 [inline]
- vcpu_run arch/x86/kvm/x86.c:10450 [inline]
- kvm_arch_vcpu_ioctl_run+0x4208/0x66f0 arch/x86/kvm/x86.c:10654
- kvm_vcpu_ioctl+0x570/0xf30 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3944
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x7f56efaee199
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc37353158 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f56efaee199
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-RBP: 00007f56efab1bf0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f56efab1c80
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+Thanks,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
