@@ -2,126 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC476547725
-	for <lists+kvm@lfdr.de>; Sat, 11 Jun 2022 20:41:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB634547810
+	for <lists+kvm@lfdr.de>; Sun, 12 Jun 2022 02:33:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230247AbiFKSlz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Jun 2022 14:41:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33688 "EHLO
+        id S233228AbiFLAdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Jun 2022 20:33:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbiFKSly (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Jun 2022 14:41:54 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96792D1E2
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:41:53 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-fb6b4da1dfso3311963fac.4
-        for <kvm@vger.kernel.org>; Sat, 11 Jun 2022 11:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aGUj2LVLNGk5sOwR7+tKcU/mD91p7d7Dvbf7YRvu4qg=;
-        b=rPFZGQ3gOLwesD2QG9IU7Z5ORHjifYdHd3M3rHmqO3uS3mAECeXs6WSr08jhHalONZ
-         00kH3g/6qwvm7Dxs4OZ+92EBsLjn+o7VUtqj90p3R3wmrgQ2eb8atHHvBtZZBrCW8++X
-         kFVuv1Ot4n+8SKCcIx2n/ihi+/dBLMJD8UVXyxR68MluJYDarVW4aa25cfakTZv84r1J
-         nn7YN7qw6zWnfq/+xGkexU0DFWnuoSdRk9EyoCt1b05nphByzWoPaWx2BZLAk18WZ0gs
-         5+qCnSeOw0GNdYe6zeodER3hcZKsS8SpAhSeNZnVC6+Hjz3AEQiwhzij2Jsh9TGn5hDx
-         +E4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aGUj2LVLNGk5sOwR7+tKcU/mD91p7d7Dvbf7YRvu4qg=;
-        b=zBUK79X+NsTqX43NHdsjVWYFjDvM6+RB1X3iyrwqFf5bHFis6//+o055olMWkBQVF6
-         0bDbIKWzeawo/CBcPCYOWjMZAIvrRdrVWYaigi8xLhCmcUxA8r833IdMtM5TGzR+jMqU
-         P5ACKwvH7NLU+iUQ954hY25dE/9ScXbaeyOdPdnByUwgScUyyW7aVCv/KkMtTeYnUPC/
-         NVDLzRPQbHfNDACoJaNWA6Z/QytMzVxzqSOr0AxgbS33beoDxzEQOdwc2xWPYh2obHLV
-         nrosEhqXyRpo1h3F5fIikvrEVwrM5Mr9b4i/rZ6xYkYDFsnx/b8DtF6YUNsOQBGgXU40
-         jJ5g==
-X-Gm-Message-State: AOAM5309fqA9xEN5Plg1LrLOhkbReFXFDbptjEDggrFcbqo1PFf+fgob
-        Gb/QMIgJdQKx5qrVs2t/vccwiKEbqPc8LWJvKzfvVcqtG7Z68w==
-X-Google-Smtp-Source: ABdhPJwBqvM9uOWilf/hZkJ/qSGvf+HPCw8ZzSqEItH5yaUmYPdRrrdg19+h1EH+Z84nEY0g6QaKN8589eW/COQRu1E=
-X-Received: by 2002:a05:6870:304b:b0:f2:d164:5c85 with SMTP id
- u11-20020a056870304b00b000f2d1645c85mr3138557oau.107.1654972913135; Sat, 11
- Jun 2022 11:41:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220610092838.1205755-1-maz@kernel.org> <20220610092838.1205755-7-maz@kernel.org>
-In-Reply-To: <20220610092838.1205755-7-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sat, 11 Jun 2022 11:41:37 -0700
-Message-ID: <CAAeT=FxsPKgRbeNKWmRW3BYAnNrf_j6DeNGaCGUVG+_uNUUrFA@mail.gmail.com>
-Subject: Re: [PATCH v2 06/19] KVM: arm64: Add three sets of flags to the vcpu state
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Mark Brown <broonie@kernel.org>, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232842AbiFLAdn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Jun 2022 20:33:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B76F93DDC7;
+        Sat, 11 Jun 2022 17:33:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6ADB1B80B74;
+        Sun, 12 Jun 2022 00:33:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 368F6C34116;
+        Sun, 12 Jun 2022 00:33:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654994020;
+        bh=YK+v++7aHXh6ZVsNGPhoQ32la+K/dqkHHmiEfw1ISHg=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=Hh6uL5u9xn3vFbB7R+vcU+f8l+A2htz8iUC8hP7V9VGu2rmdOC8N8sZ8oXs3LK42M
+         QNj0xZyYREMyzdCEYboJOaCxEWkEYZ8JD1ElOEENCEYqGb74xgiTdg1EY4odTQdwbc
+         zBGbR+qS0GadrEnC1JQni46mScY/n01yG/I5hmjWcQOpgtc9jl2cInzhZtVmY3uT+1
+         T3p0S2BKDXu/6cIeXcdsInzM+bvvTbkcTsJGvm9yMzNZzQl1hJgVlBvwdGNYXeL2t8
+         sDGoRWACJMAVz2yoaga6ZP0+Ionzq3Z1viWp7C2+e0X+aPLneP25IKXDRwAjQq3n3l
+         5WObU+CphcP4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2315FE737F0;
+        Sun, 12 Jun 2022 00:33:40 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio,vdpa: fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20220611034848-mutt-send-email-mst@kernel.org>
+References: <20220611034848-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20220611034848-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: eacea844594ff338db06437806707313210d4865
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: abe71eb32f3051f461d2975c674c0857549d0b93
+Message-Id: <165499402013.23172.7490053891155613764.pr-tracker-bot@kernel.org>
+Date:   Sun, 12 Jun 2022 00:33:40 +0000
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dan.carpenter@oracle.com, elic@nvidia.com, fam.zheng@bytedance.com,
+        gautam.dawar@xilinx.com, jasowang@redhat.com,
+        johannes@sipsolutions.net, liubo03@inspur.com, mst@redhat.com,
+        oliver.sang@intel.com, pilgrimtao@gmail.com, si-wei.liu@oracle.com,
+        stable@vger.kernel.org,
+        syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com,
+        vincent.whitchurch@axis.com, wangxiang@cdjrlc.com,
+        xieyongji@bytedance.com
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 10, 2022 at 2:29 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> It so appears that each of the vcpu flags is really belonging to
-> one of three categories:
->
-> - a configuration flag, set once and for all
-> - an input flag generated by the kernel for the hypervisor to use
-> - a state flag that is only for the kernel's own bookkeeping
->
-> As we are going to split all the existing flags into these three
-> sets, introduce all three in one go.
->
-> No functional change other than a bit of bloat...
->
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 6d30ac7e3164..af45320f247f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -335,6 +335,15 @@ struct kvm_vcpu_arch {
->         /* Miscellaneous vcpu state flags */
->         u64 flags;
->
-> +       /* Configuration flags, set once and for all before the vcpu can run */
-> +       u64 cflags;
-> +
-> +       /* Input flags to the hypervisor code, potentially cleared after use */
-> +       u64 iflags;
-> +
-> +       /* State flags for kernel bookkeeping, unused by the hypervisor code */
-> +       u64 sflags;
+The pull request you sent on Sat, 11 Jun 2022 03:48:48 -0400:
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-Thank you, those comments are more clear to me now.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/abe71eb32f3051f461d2975c674c0857549d0b93
 
-Thanks,
-Reiji
+Thank you!
 
-
-> +
->         /*
->          * We maintain more than a single set of debug registers to support
->          * debugging the guest from the host and to maintain separate host and
-> --
-> 2.34.1
->
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
