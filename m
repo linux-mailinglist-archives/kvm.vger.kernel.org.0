@@ -2,83 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8275554846B
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 12:16:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 385F2548C72
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 18:12:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241638AbiFMKPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 06:15:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60458 "EHLO
+        id S1352723AbiFMLRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 07:17:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241534AbiFMKP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 06:15:28 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C74B1E0;
-        Mon, 13 Jun 2022 03:14:46 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25D8uToX029055;
-        Mon, 13 Jun 2022 10:14:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=WqQX4gZN1wlNT57RJA8mJ52WwcVtji3VJg5ApeO8dzY=;
- b=A2QfD2GsttJJNXvmncBp4BkP+b5sTCYO4J7Q3bA37ZYOmaQjDnwMmplySVaLcgz1HKDP
- dZTD6kpGhA/9HVqrF0cg9RDO3hiZjm5m1P4VZFeBkNLWkMo/bWftHgIlXliYYbrz105E
- Sz5938nDxtol1HYSKP2Tyc3L8nOwBcypqlcYYSL2Xnj9I6tmmXBu3l+xE4cvNmmgfCq3
- ETC1ru7Aiimo3qIpTXimSK1O/7bQV7XnQlye84PKQgwx6Tx55NvDv51+TakgBHvW9AfV
- y6ljT37C23UdntKBkwgUUpLSgdiV7l1V/p6faTvowzN6e3ewLvvmH3W8jaAb3yW/q8yk Cw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gn5484tdx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Jun 2022 10:14:45 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25DA7Lak010748;
-        Mon, 13 Jun 2022 10:14:45 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gn5484tdf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Jun 2022 10:14:44 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25DA7AON011912;
-        Mon, 13 Jun 2022 10:14:43 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3gmjp8syeb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Jun 2022 10:14:42 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25DAEd4221102888
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Jun 2022 10:14:40 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5D395204F;
-        Mon, 13 Jun 2022 10:14:39 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9651652057;
-        Mon, 13 Jun 2022 10:14:39 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        scgl@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v5 1/1] s390x: add migration test for storage keys
-Date:   Mon, 13 Jun 2022 12:14:39 +0200
-Message-Id: <20220613101439.557174-2-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220613101439.557174-1-nrb@linux.ibm.com>
-References: <20220613101439.557174-1-nrb@linux.ibm.com>
+        with ESMTP id S1353439AbiFMLPl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 07:15:41 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B9F37BF8
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 03:38:05 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id p6-20020a05600c1d8600b0039c630b8d96so3709317wms.1
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 03:38:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=26AqgsiLBQQlzuJUkVsAgW2IClgk95IZwjfcYpy3YGQ=;
+        b=xUvNvopOL3BPegwK5rrckxjvFW/tG0wNBvBRzLkiHpo0gXKszMPfgauMPiMMFg1iCJ
+         iPV+bu2FwXVer7dIOi+hP2HHzHa6mwBSDbDe8IVxQ4N84VTPO01XJOo8p/qniOD3RY6S
+         hxDDo2W7VdxXXMKFggBLzZomsS8Na6zupxsKa0Up1hzHHkc05AMrI2CgoR7QGQrqOGtS
+         DbGVsW2dsPzv++CZidxwuo1Vdp7hhNoxpAghrXkRd4hzWU8Qlcx8ppxzSYdmX+SZ8/XQ
+         YwZbMatxoHcXRSxBltcE6LYo+WKEUvZS75mZCr1zr/HZAQUnrauM0N72UevKunyS+yv0
+         V+eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=26AqgsiLBQQlzuJUkVsAgW2IClgk95IZwjfcYpy3YGQ=;
+        b=1c6vgEJUZ0x+cHQ4r7srnWI23f36dhoi9eOB2D/tro7XTyX3c07+EM4P4sNjqldg0a
+         TYYxtFr2XzkZC8aNc/WgCCPqLvH3Lub3RIIrXi9ZMJkYo/kkrVoZe6z5KkGbQFYW2Y9u
+         CSUT8LJ+KazR/AQSzB543cmjig1dcbK50zznVZSKqF9j+3OHQVR6FDQ57QNb11FjvAja
+         4prtq9hP64yckiTS+XfAvuTA6ECP3qQu9fpFki+6XPYvCarGUBE1O3vt2Y73MnG2dNt4
+         ONLn8UJ5nBRs6VgqqRPaKqLicjboI3NGVx72ieOeNFwsILy7EgqN/6ItdduRkBf6/zUA
+         lUBA==
+X-Gm-Message-State: AOAM532pfzpqI6xXpOD4/hx/CVikEuZSNANDVR0h+IyZ3WTAq/y1MxDe
+        naRtTM7+UT5RLvre5RrfwN6lycyJd2ryK9R/l/HCHw==
+X-Google-Smtp-Source: ABdhPJwMut2WB87/qBbxigJT+mlBYD8TjFdOf8Fx3eYGgh2M1j8q+kKBmc2i3hZ9Cc5lpjOHPkkpSB24WLkisXJRu68=
+X-Received: by 2002:a05:600c:5112:b0:397:53f5:e15b with SMTP id
+ o18-20020a05600c511200b0039753f5e15bmr14235147wms.93.1655116683603; Mon, 13
+ Jun 2022 03:38:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0NtjODS-m9oD8RPPET1bjBRegJIs6k3P
-X-Proofpoint-ORIG-GUID: VjrNl2g-WhL7wartsuYlPnglk9y7a5JQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-13_03,2022-06-09_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- clxscore=1015 adultscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 suspectscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206130046
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+References: <20220612161220.GA53120@liuzhao-OptiPlex-7080>
+In-Reply-To: <20220612161220.GA53120@liuzhao-OptiPlex-7080>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 13 Jun 2022 16:07:20 +0530
+Message-ID: <CAAhSdy165881W=cJcBoay4Gsu2B5Vcnm=N6r1PguVqyYZQpR6g@mail.gmail.com>
+Subject: Re: [PATCH 3/3] RISC-V: KVM: Add extensible CSR emulation framework
+To:     Zhao Liu <zhao1.liu@linux.intel.com>
+Cc:     Anup Patel <apatel@ventanamicro.com>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,130 +69,387 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upon migration, we expect storage keys set by the guest to be preserved, so add
-a test for it.
+On Sun, Jun 12, 2022 at 9:38 PM Zhao Liu <zhao1.liu@linux.intel.com> wrote:
+>
+> kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+> linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>,
+> Zhao Liu <zhao1.liu@linux.intel.com>, Zhenyu Wang
+> <zhenyuw@linux.intel.com>
+> Bcc:
+> Subject: Re: [PATCH 3/3] RISC-V: KVM: Add extensible CSR emulation framework
+> Reply-To:
+> In-Reply-To: <20220610050555.288251-4-apatel@ventanamicro.com>
+>
+> On Fri, Jun 10, 2022 at 10:35:55AM +0530, Anup Patel wrote:
+> > Date: Fri, 10 Jun 2022 10:35:55 +0530
+> > From: Anup Patel <apatel@ventanamicro.com>
+> > Subject: [PATCH 3/3] RISC-V: KVM: Add extensible CSR emulation framework
+> > X-Mailer: git-send-email 2.34.1
+> >
+> > We add an extensible CSR emulation framework which is based upon the
+> > existing system instruction emulation. This will be useful to upcoming
+> > AIA, PMU, Nested and other virtualization features.
+> >
+> > The CSR emulation framework also has provision to emulate CSR in user
+> > space but this will be used only in very specific cases such as AIA
+> > IMSIC CSR emulation in user space or vendor specific CSR emulation
+> > in user space.
+> >
+> > By default, all CSRs not handled by KVM RISC-V will be redirected back
+> > to Guest VCPU as illegal instruction trap.
+> >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  arch/riscv/include/asm/kvm_host.h      |   5 +
+> >  arch/riscv/include/asm/kvm_vcpu_insn.h |   6 +
+> >  arch/riscv/kvm/vcpu.c                  |  11 ++
+> >  arch/riscv/kvm/vcpu_insn.c             | 169 +++++++++++++++++++++++++
+> >  include/uapi/linux/kvm.h               |   8 ++
+> >  5 files changed, 199 insertions(+)
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> > index 03103b86dd86..a54744d7e1ba 100644
+> > --- a/arch/riscv/include/asm/kvm_host.h
+> > +++ b/arch/riscv/include/asm/kvm_host.h
+> > @@ -64,6 +64,8 @@ struct kvm_vcpu_stat {
+> >       u64 wfi_exit_stat;
+> >       u64 mmio_exit_user;
+> >       u64 mmio_exit_kernel;
+> > +     u64 csr_exit_user;
+> > +     u64 csr_exit_kernel;
+> >       u64 exits;
+> >  };
+> >
+> > @@ -209,6 +211,9 @@ struct kvm_vcpu_arch {
+> >       /* MMIO instruction details */
+> >       struct kvm_mmio_decode mmio_decode;
+> >
+> > +     /* CSR instruction details */
+> > +     struct kvm_csr_decode csr_decode;
+> > +
+> >       /* SBI context */
+> >       struct kvm_sbi_context sbi_context;
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_vcpu_insn.h b/arch/riscv/include/asm/kvm_vcpu_insn.h
+> > index 3351eb61a251..350011c83581 100644
+> > --- a/arch/riscv/include/asm/kvm_vcpu_insn.h
+> > +++ b/arch/riscv/include/asm/kvm_vcpu_insn.h
+> > @@ -18,6 +18,11 @@ struct kvm_mmio_decode {
+> >       int return_handled;
+> >  };
+> >
+> > +struct kvm_csr_decode {
+> > +     unsigned long insn;
+> > +     int return_handled;
+> > +};
+> > +
+> >  /* Return values used by function emulating a particular instruction */
+> >  enum kvm_insn_return {
+> >       KVM_INSN_EXIT_TO_USER_SPACE = 0,
+> > @@ -28,6 +33,7 @@ enum kvm_insn_return {
+> >  };
+> >
+> >  void kvm_riscv_vcpu_wfi(struct kvm_vcpu *vcpu);
+> > +int kvm_riscv_vcpu_csr_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+> >  int kvm_riscv_vcpu_virtual_insn(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> >                               struct kvm_cpu_trap *trap);
+> >
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 7f4ad5e4373a..cf9616da68f6 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -26,6 +26,8 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+> >       STATS_DESC_COUNTER(VCPU, wfi_exit_stat),
+> >       STATS_DESC_COUNTER(VCPU, mmio_exit_user),
+> >       STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
+> > +     STATS_DESC_COUNTER(VCPU, csr_exit_user),
+> > +     STATS_DESC_COUNTER(VCPU, csr_exit_kernel),
+> >       STATS_DESC_COUNTER(VCPU, exits)
+> >  };
+> >
+> > @@ -869,6 +871,15 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >               }
+> >       }
+> >
+> > +     /* Process CSR value returned from user-space */
+> > +     if (run->exit_reason == KVM_EXIT_RISCV_CSR) {
+> > +             ret = kvm_riscv_vcpu_csr_return(vcpu, vcpu->run);
+> > +             if (ret) {
+> > +                     kvm_vcpu_srcu_read_unlock(vcpu);
+> > +                     return ret;
+> > +             }
+> > +     }
+> > +
+>
+>
+> Hi Anup, what about a `switch` to handle exit_reason?
+>         switch(run->exit_reason) {
+>                 case KVM_EXIT_MMIO:
+>                         ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
+>                         break;
+>                 case KVM_EXIT_RISCV_SBI:
+>                         ret = kvm_riscv_vcpu_sbi_return(vcpu, vcpu->run);
+>                         break;
+>                 case KVM_EXIT_RISCV_CSR:
+>                         ret = kvm_riscv_vcpu_csr_return(vcpu, vcpu->run);
+>                         break;
+>                 case default:
+>                         break;
+>         }
+>         if (ret) {
+>                 kvm_vcpu_srcu_read_unlock(vcpu);
+>                 return ret;
+>         }
 
-We keep 128 pages and set predictable storage keys. Then, we migrate and check
-that they can be read back and match the value originally set.
+I agree with your suggestion. I will use switch-case in v2.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- s390x/Makefile         |  1 +
- s390x/migration-skey.c | 78 ++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg    |  4 +++
- 3 files changed, 83 insertions(+)
- create mode 100644 s390x/migration-skey.c
+>
+> >       if (run->immediate_exit) {
+> >               kvm_vcpu_srcu_read_unlock(vcpu);
+> >               return -EINTR;
+> > diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
+> > index 75ca62a7fba5..c9542ba98431 100644
+> > --- a/arch/riscv/kvm/vcpu_insn.c
+> > +++ b/arch/riscv/kvm/vcpu_insn.c
+> > @@ -14,6 +14,19 @@
+> >  #define INSN_MASK_WFI                0xffffffff
+> >  #define INSN_MATCH_WFI               0x10500073
+> >
+> > +#define INSN_MATCH_CSRRW     0x1073
+> > +#define INSN_MASK_CSRRW              0x707f
+> > +#define INSN_MATCH_CSRRS     0x2073
+> > +#define INSN_MASK_CSRRS              0x707f
+> > +#define INSN_MATCH_CSRRC     0x3073
+> > +#define INSN_MASK_CSRRC              0x707f
+> > +#define INSN_MATCH_CSRRWI    0x5073
+> > +#define INSN_MASK_CSRRWI     0x707f
+> > +#define INSN_MATCH_CSRRSI    0x6073
+> > +#define INSN_MASK_CSRRSI     0x707f
+> > +#define INSN_MATCH_CSRRCI    0x7073
+> > +#define INSN_MASK_CSRRCI     0x707f
+> > +
+> >  #define INSN_MATCH_LB                0x3
+> >  #define INSN_MASK_LB         0x707f
+> >  #define INSN_MATCH_LH                0x1003
+> > @@ -71,6 +84,7 @@
+> >  #define SH_RS1                       15
+> >  #define SH_RS2                       20
+> >  #define SH_RS2C                      2
+> > +#define MASK_RX                      0x1f
+> >
+> >  #define RV_X(x, s, n)                (((x) >> (s)) & ((1 << (n)) - 1))
+> >  #define RVC_LW_IMM(x)                ((RV_X(x, 6, 1) << 2) | \
+> > @@ -189,7 +203,162 @@ static int wfi_insn(struct kvm_vcpu *vcpu, struct kvm_run *run, ulong insn)
+> >       return KVM_INSN_CONTINUE_NEXT_SEPC;
+> >  }
+> >
+> > +struct csr_func {
+> > +     unsigned int base;
+> > +     unsigned int count;
+> > +     /*
+> > +      * Possible return values are as same as "func" callback in
+> > +      * "struct insn_func".
+> > +      */
+> > +     int (*func)(struct kvm_vcpu *vcpu, unsigned int csr_num,
+> > +                 unsigned long *val, unsigned long new_val,
+> > +                 unsigned long wr_mask);
+> > +};
+> > +
+> > +static const struct csr_func csr_funcs[] = { };
+> > +
+> > +/**
+> > + * kvm_riscv_vcpu_csr_return -- Handle CSR read/write after user space
+> > + *                           emulation or in-kernel emulation
+> > + *
+> > + * @vcpu: The VCPU pointer
+> > + * @run:  The VCPU run struct containing the CSR data
+> > + *
+> > + * Returns > 0 upon failure and 0 upon success
+> > + */
+> > +int kvm_riscv_vcpu_csr_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > +{
+> > +     ulong insn;
+> > +
+> > +     if (vcpu->arch.csr_decode.return_handled)
+> > +             return 0;
+> > +     vcpu->arch.csr_decode.return_handled = 1;
+> > +
+> > +     /* Update destination register for CSR reads */
+> > +     insn = vcpu->arch.csr_decode.insn;
+> > +     if ((insn >> SH_RD) & MASK_RX)
+> > +             SET_RD(insn, &vcpu->arch.guest_context,
+> > +                    run->riscv_csr.ret_value);
+> > +
+> > +     /* Move to next instruction */
+> > +     vcpu->arch.guest_context.sepc += INSN_LEN(insn);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static int csr_insn(struct kvm_vcpu *vcpu, struct kvm_run *run, ulong insn)
+> > +{
+> > +     int i, rc = KVM_INSN_ILLEGAL_TRAP;
+> > +     unsigned int csr_num = insn >> SH_RS2;
+> > +     unsigned int rs1_num = (insn >> SH_RS1) & MASK_RX;
+> > +     ulong rs1_val = GET_RS1(insn, &vcpu->arch.guest_context);
+> > +     const struct csr_func *tcfn, *cfn = NULL;
+> > +     ulong val = 0, wr_mask = 0, new_val = 0;
+> > +
+> > +     /* Decode the CSR instruction */
+> > +     switch (GET_RM(insn)) {
+> > +     case 1:
+>
+> It's better to define these rounding mode.
+> What about this name: #define INSN_RM_RTZ 1.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index a8e04aa6fe4d..f8ea594b641d 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -32,6 +32,7 @@ tests += $(TEST_DIR)/epsw.elf
- tests += $(TEST_DIR)/adtl-status.elf
- tests += $(TEST_DIR)/migration.elf
- tests += $(TEST_DIR)/pv-attest.elf
-+tests += $(TEST_DIR)/migration-skey.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-new file mode 100644
-index 000000000000..f7082937e3a9
---- /dev/null
-+++ b/s390x/migration-skey.c
-@@ -0,0 +1,78 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Storage Key migration tests
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/facility.h>
-+#include <asm/page.h>
-+#include <asm/mem.h>
-+#include <asm/interrupt.h>
-+#include <hardware.h>
-+
-+#define NUM_PAGES 128
-+static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-+
-+static void test_migration(void)
-+{
-+	union skey expected_key, actual_key;
-+	int i, key_to_set, key_mismatches = 0;
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		/*
-+		 * Storage keys are 7 bit, lowest bit is always returned as zero
-+		 * by iske.
-+		 * This loop will set all 7 bits which means we set fetch
-+		 * protection as well as reference and change indication for
-+		 * some keys.
-+		 */
-+		key_to_set = i * 2;
-+		set_storage_key(pagebuf[i], key_to_set, 1);
-+	}
-+
-+	puts("Please migrate me, then press return\n");
-+	(void)getchar();
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		actual_key.val = get_storage_key(pagebuf[i]);
-+		expected_key.val = i * 2;
-+
-+		/* ignore reference bit */
-+		actual_key.str.rf = 0;
-+		expected_key.str.rf = 0;
-+
-+		/* don't log anything when key matches to avoid spamming the log */
-+		if (actual_key.val != expected_key.val) {
-+			key_mismatches++;
-+			report_fail("page %d expected_key=0x%x actual_key=0x%x", i, expected_key.val, actual_key.val);
-+		}
-+	}
-+
-+	report(!key_mismatches, "skeys after migration match");
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("migration-skey");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+
-+		/*
-+		 * If we just exit and don't ask migrate_cmd to migrate us, it
-+		 * will just hang forever. Hence, also ask for migration when we
-+		 * skip this test altogether.
-+		 */
-+		puts("Please migrate me, then press return\n");
-+		(void)getchar();
-+	} else {
-+		test_migration();
-+	}
-+
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index b456b2881448..1e851d8e3dd8 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -176,3 +176,7 @@ extra_params = -cpu qemu,gs=off,vx=off
- file = migration.elf
- groups = migration
- smp = 2
-+
-+[migration-skey]
-+file = migration-skey.elf
-+groups = migration
--- 
-2.36.1
+Actually, there is no "Rm" field in CSR instruction encoding. Instead,
+the BIT[14:12] of CSR instruction is "funct3" field. I will fix this in v2.
 
+Also, instead of adding new defines for "funct3" field of CSR instruction,
+we can simply use INSN_MATCH_xyz defines to avoid hard-coding.
+
+Regards,
+Anup
+
+>
+> Thanks,
+> Zhao
+>
+> > +             wr_mask = -1UL;
+> > +             new_val = rs1_val;
+> > +             break;
+> > +     case 2:
+> > +             wr_mask = rs1_val;
+> > +             new_val = -1UL;
+> > +             break;
+> > +     case 3:
+> > +             wr_mask = rs1_val;
+> > +             new_val = 0;
+> > +             break;
+> > +     case 5:
+> > +             wr_mask = -1UL;
+> > +             new_val = rs1_num;
+> > +             break;
+> > +     case 6:
+> > +             wr_mask = rs1_num;
+> > +             new_val = -1UL;
+> > +             break;
+> > +     case 7:
+> > +             wr_mask = rs1_num;
+> > +             new_val = 0;
+> > +             break;
+> > +     default:
+> > +             return rc;
+> > +     };
+> > +
+> > +     /* Save instruction decode info */
+> > +     vcpu->arch.csr_decode.insn = insn;
+> > +     vcpu->arch.csr_decode.return_handled = 0;
+> > +
+> > +     /* Update CSR details in kvm_run struct */
+> > +     run->riscv_csr.csr_num = csr_num;
+> > +     run->riscv_csr.new_value = new_val;
+> > +     run->riscv_csr.write_mask = wr_mask;
+> > +     run->riscv_csr.ret_value = 0;
+> > +
+> > +     /* Find in-kernel CSR function */
+> > +     for (i = 0; i < ARRAY_SIZE(csr_funcs); i++) {
+> > +             tcfn = &csr_funcs[i];
+> > +             if ((tcfn->base <= csr_num) &&
+> > +                 (csr_num < (tcfn->base + tcfn->count))) {
+> > +                     cfn = tcfn;
+> > +                     break;
+> > +             }
+> > +     }
+> > +
+> > +     /* First try in-kernel CSR emulation */
+> > +     if (cfn && cfn->func) {
+> > +             rc = cfn->func(vcpu, csr_num, &val, new_val, wr_mask);
+> > +             if (rc > KVM_INSN_EXIT_TO_USER_SPACE) {
+> > +                     if (rc == KVM_INSN_CONTINUE_NEXT_SEPC) {
+> > +                             run->riscv_csr.ret_value = val;
+> > +                             vcpu->stat.csr_exit_kernel++;
+> > +                             kvm_riscv_vcpu_csr_return(vcpu, run);
+> > +                             rc = KVM_INSN_CONTINUE_SAME_SEPC;
+> > +                     }
+> > +                     return rc;
+> > +             }
+> > +     }
+> > +
+> > +     /* Exit to user-space for CSR emulation */
+> > +     if (rc <= KVM_INSN_EXIT_TO_USER_SPACE) {
+> > +             vcpu->stat.csr_exit_user++;
+> > +             run->exit_reason = KVM_EXIT_RISCV_CSR;
+> > +     }
+> > +
+> > +     return rc;
+> > +}
+> > +
+> >  static const struct insn_func system_opcode_funcs[] = {
+> > +     {
+> > +             .mask  = INSN_MASK_CSRRW,
+> > +             .match = INSN_MATCH_CSRRW,
+> > +             .func  = csr_insn,
+> > +     },
+> > +     {
+> > +             .mask  = INSN_MASK_CSRRS,
+> > +             .match = INSN_MATCH_CSRRS,
+> > +             .func  = csr_insn,
+> > +     },
+> > +     {
+> > +             .mask  = INSN_MASK_CSRRC,
+> > +             .match = INSN_MATCH_CSRRC,
+> > +             .func  = csr_insn,
+> > +     },
+> > +     {
+> > +             .mask  = INSN_MASK_CSRRWI,
+> > +             .match = INSN_MATCH_CSRRWI,
+> > +             .func  = csr_insn,
+> > +     },
+> > +     {
+> > +             .mask  = INSN_MASK_CSRRSI,
+> > +             .match = INSN_MATCH_CSRRSI,
+> > +             .func  = csr_insn,
+> > +     },
+> > +     {
+> > +             .mask  = INSN_MASK_CSRRCI,
+> > +             .match = INSN_MATCH_CSRRCI,
+> > +             .func  = csr_insn,
+> > +     },
+> >       {
+> >               .mask  = INSN_MASK_WFI,
+> >               .match = INSN_MATCH_WFI,
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 5088bd9f1922..c48fd3d1c45b 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -270,6 +270,7 @@ struct kvm_xen_exit {
+> >  #define KVM_EXIT_X86_BUS_LOCK     33
+> >  #define KVM_EXIT_XEN              34
+> >  #define KVM_EXIT_RISCV_SBI        35
+> > +#define KVM_EXIT_RISCV_CSR        36
+> >
+> >  /* For KVM_EXIT_INTERNAL_ERROR */
+> >  /* Emulate instruction failed. */
+> > @@ -496,6 +497,13 @@ struct kvm_run {
+> >                       unsigned long args[6];
+> >                       unsigned long ret[2];
+> >               } riscv_sbi;
+> > +             /* KVM_EXIT_RISCV_CSR */
+> > +             struct {
+> > +                     unsigned long csr_num;
+> > +                     unsigned long new_value;
+> > +                     unsigned long write_mask;
+> > +                     unsigned long ret_value;
+> > +             } riscv_csr;
+> >               /* Fix the size of the union. */
+> >               char padding[256];
+> >       };
+> > --
+> > 2.34.1
+> >
+> >
+> > _______________________________________________
+> > linux-riscv mailing list
+> > linux-riscv@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-riscv
