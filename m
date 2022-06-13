@@ -2,63 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58741549A96
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 19:55:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C85E54994C
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 18:53:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240835AbiFMRyv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 13:54:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57638 "EHLO
+        id S241357AbiFMQwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 12:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242464AbiFMRyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 13:54:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9979C79374
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 06:41:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655127676;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eKACbGUbv4aXo64CZow7fz+SSCxVkiu29gSoKAYPpPo=;
-        b=buoVv+UfM1QhUv9Js9L+7XjsVIOkHPgf8RI6raQ12CglAYQDeeOSVFT2T2lm8I5t+3sYPq
-        xaJdRApukU60rE2j08ICAjwpuCiL4Z1q6Uam5dMwf5vv/H2Iiav9Gfxz/C7LKKlc/I+fNa
-        RZnfe/IesADNZNCFJoW1C3rC3rJ3o/U=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-119-r9T_plOYMF-XWbtNZG5wfQ-1; Mon, 13 Jun 2022 09:41:13 -0400
-X-MC-Unique: r9T_plOYMF-XWbtNZG5wfQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 43372803B22;
-        Mon, 13 Jun 2022 13:41:12 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C3981492CA4;
-        Mon, 13 Jun 2022 13:41:09 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v7 39/39] KVM: selftests: Rename 'evmcs_test' to 'hyperv_evmcs'
-Date:   Mon, 13 Jun 2022 15:39:22 +0200
-Message-Id: <20220613133922.2875594-40-vkuznets@redhat.com>
-In-Reply-To: <20220613133922.2875594-1-vkuznets@redhat.com>
-References: <20220613133922.2875594-1-vkuznets@redhat.com>
+        with ESMTP id S240718AbiFMQwk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 12:52:40 -0400
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFCA11F2F2A;
+        Mon, 13 Jun 2022 07:37:42 -0700 (PDT)
+Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <heiko@sntech.de>)
+        id 1o0lCE-00010b-AB; Mon, 13 Jun 2022 16:37:38 +0200
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     Guo Ren <guoren@kernel.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        Alexandre Ghiti <alexandre.ghiti@canonical.com>
+Cc:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
+Subject: Re: [PATCH -fixes v2] riscv: Fix missing PAGE_PFN_MASK
+Date:   Mon, 13 Jun 2022 16:37:37 +0200
+Message-ID: <2110796.irdbgypaU6@diego>
+In-Reply-To: <20220613085307.260256-1-alexandre.ghiti@canonical.com>
+References: <20220613085307.260256-1-alexandre.ghiti@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,T_SPF_HELO_TEMPERROR autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,59 +47,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Conform to the rest of Hyper-V emulation selftests which have 'hyperv'
-prefix. Get rid of '_test' suffix as well as the purpose of this code
-is fairly obvious.
+Am Montag, 13. Juni 2022, 10:53:07 CEST schrieb Alexandre Ghiti:
+> There are a bunch of functions that use the PFN from a page table entry
+> that end up with the svpbmt upper-bits because they are missing the newly
+> introduced PAGE_PFN_MASK which leads to wrong addresses conversions and
+> then crash: fix this by adding this mask.
+> 
+> Fixes: 100631b48ded ("riscv: Fix accessing pfn bits in PTEs for non-32bit variants")
+> Signed-off-by: Alexandre Ghiti <alexandre.ghiti@canonical.com>
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore                          | 2 +-
- tools/testing/selftests/kvm/Makefile                            | 2 +-
- .../selftests/kvm/x86_64/{evmcs_test.c => hyperv_evmcs.c}       | 0
- 3 files changed, 2 insertions(+), 2 deletions(-)
- rename tools/testing/selftests/kvm/x86_64/{evmcs_test.c => hyperv_evmcs.c} (100%)
+Looks great now
+Reviewed-by: Heiko Stuebner <heiko@sntech.de>
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 7f086656f3e0..6be2be664f7b 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -15,7 +15,6 @@
- /x86_64/cpuid_test
- /x86_64/cr4_cpuid_sync_test
- /x86_64/debug_regs
--/x86_64/evmcs_test
- /x86_64/emulator_error_test
- /x86_64/fix_hypercall_test
- /x86_64/get_msr_index_features
-@@ -23,6 +22,7 @@
- /x86_64/kvm_pv_test
- /x86_64/hyperv_clock
- /x86_64/hyperv_cpuid
-+/x86_64/hyperv_evmcs
- /x86_64/hyperv_features
- /x86_64/hyperv_ipi
- /x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 2b6a4ad3a718..2e2bc4d4d6b1 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -74,11 +74,11 @@ LIBKVM_riscv += lib/riscv/ucall.c
- TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
- TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
--TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
- TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
- TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-+TEST_GEN_PROGS_x86_64 += x86_64/hyperv_evmcs
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_ipi
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
-similarity index 100%
-rename from tools/testing/selftests/kvm/x86_64/evmcs_test.c
-rename to tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
--- 
-2.35.3
+On both qemu-riscv64 and d1-nezha
+Tested-by: Heiko Stuebner <heiko@sntech.de>
+
+
+
+> ---
+>  arch/riscv/include/asm/pgtable-64.h | 12 ++++++------
+>  arch/riscv/include/asm/pgtable.h    |  6 +++---
+>  arch/riscv/kvm/mmu.c                |  2 +-
+>  3 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/riscv/include/asm/pgtable-64.h b/arch/riscv/include/asm/pgtable-64.h
+> index 5c2aba5efbd0..dc42375c2357 100644
+> --- a/arch/riscv/include/asm/pgtable-64.h
+> +++ b/arch/riscv/include/asm/pgtable-64.h
+> @@ -175,7 +175,7 @@ static inline pud_t pfn_pud(unsigned long pfn, pgprot_t prot)
+>  
+>  static inline unsigned long _pud_pfn(pud_t pud)
+>  {
+> -	return pud_val(pud) >> _PAGE_PFN_SHIFT;
+> +	return __page_val_to_pfn(pud_val(pud));
+>  }
+>  
+>  static inline pmd_t *pud_pgtable(pud_t pud)
+> @@ -278,13 +278,13 @@ static inline p4d_t pfn_p4d(unsigned long pfn, pgprot_t prot)
+>  
+>  static inline unsigned long _p4d_pfn(p4d_t p4d)
+>  {
+> -	return p4d_val(p4d) >> _PAGE_PFN_SHIFT;
+> +	return __page_val_to_pfn(p4d_val(p4d));
+>  }
+>  
+>  static inline pud_t *p4d_pgtable(p4d_t p4d)
+>  {
+>  	if (pgtable_l4_enabled)
+> -		return (pud_t *)pfn_to_virt(p4d_val(p4d) >> _PAGE_PFN_SHIFT);
+> +		return (pud_t *)pfn_to_virt(__page_val_to_pfn(p4d_val(p4d)));
+>  
+>  	return (pud_t *)pud_pgtable((pud_t) { p4d_val(p4d) });
+>  }
+> @@ -292,7 +292,7 @@ static inline pud_t *p4d_pgtable(p4d_t p4d)
+>  
+>  static inline struct page *p4d_page(p4d_t p4d)
+>  {
+> -	return pfn_to_page(p4d_val(p4d) >> _PAGE_PFN_SHIFT);
+> +	return pfn_to_page(__page_val_to_pfn(p4d_val(p4d)));
+>  }
+>  
+>  #define pud_index(addr) (((addr) >> PUD_SHIFT) & (PTRS_PER_PUD - 1))
+> @@ -347,7 +347,7 @@ static inline void pgd_clear(pgd_t *pgd)
+>  static inline p4d_t *pgd_pgtable(pgd_t pgd)
+>  {
+>  	if (pgtable_l5_enabled)
+> -		return (p4d_t *)pfn_to_virt(pgd_val(pgd) >> _PAGE_PFN_SHIFT);
+> +		return (p4d_t *)pfn_to_virt(__page_val_to_pfn(pgd_val(pgd)));
+>  
+>  	return (p4d_t *)p4d_pgtable((p4d_t) { pgd_val(pgd) });
+>  }
+> @@ -355,7 +355,7 @@ static inline p4d_t *pgd_pgtable(pgd_t pgd)
+>  
+>  static inline struct page *pgd_page(pgd_t pgd)
+>  {
+> -	return pfn_to_page(pgd_val(pgd) >> _PAGE_PFN_SHIFT);
+> +	return pfn_to_page(__page_val_to_pfn(pgd_val(pgd)));
+>  }
+>  #define pgd_page(pgd)	pgd_page(pgd)
+>  
+> diff --git a/arch/riscv/include/asm/pgtable.h b/arch/riscv/include/asm/pgtable.h
+> index 1d1be9d9419c..5dbd6610729b 100644
+> --- a/arch/riscv/include/asm/pgtable.h
+> +++ b/arch/riscv/include/asm/pgtable.h
+> @@ -261,7 +261,7 @@ static inline pgd_t pfn_pgd(unsigned long pfn, pgprot_t prot)
+>  
+>  static inline unsigned long _pgd_pfn(pgd_t pgd)
+>  {
+> -	return pgd_val(pgd) >> _PAGE_PFN_SHIFT;
+> +	return __page_val_to_pfn(pgd_val(pgd));
+>  }
+>  
+>  static inline struct page *pmd_page(pmd_t pmd)
+> @@ -590,14 +590,14 @@ static inline pmd_t pmd_mkinvalid(pmd_t pmd)
+>  	return __pmd(pmd_val(pmd) & ~(_PAGE_PRESENT|_PAGE_PROT_NONE));
+>  }
+>  
+> -#define __pmd_to_phys(pmd)  (pmd_val(pmd) >> _PAGE_PFN_SHIFT << PAGE_SHIFT)
+> +#define __pmd_to_phys(pmd)  (__page_val_to_pfn(pmd_val(pmd)) << PAGE_SHIFT)
+>  
+>  static inline unsigned long pmd_pfn(pmd_t pmd)
+>  {
+>  	return ((__pmd_to_phys(pmd) & PMD_MASK) >> PAGE_SHIFT);
+>  }
+>  
+> -#define __pud_to_phys(pud)  (pud_val(pud) >> _PAGE_PFN_SHIFT << PAGE_SHIFT)
+> +#define __pud_to_phys(pud)  (__page_val_to_pfn(pud_val(pud)) << PAGE_SHIFT)
+>  
+>  static inline unsigned long pud_pfn(pud_t pud)
+>  {
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 1c00695ebee7..9826073fbc67 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -54,7 +54,7 @@ static inline unsigned long gstage_pte_index(gpa_t addr, u32 level)
+>  
+>  static inline unsigned long gstage_pte_page_vaddr(pte_t pte)
+>  {
+> -	return (unsigned long)pfn_to_virt(pte_val(pte) >> _PAGE_PFN_SHIFT);
+> +	return (unsigned long)pfn_to_virt(__page_val_to_pfn(pte_val(pte)));
+>  }
+>  
+>  static int gstage_page_size_to_level(unsigned long page_size, u32 *out_level)
+> 
+
+
+
 
