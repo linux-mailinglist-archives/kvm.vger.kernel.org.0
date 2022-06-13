@@ -2,109 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28F36549B3A
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 20:15:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FDF1549B90
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 20:32:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245123AbiFMSPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 14:15:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54560 "EHLO
+        id S245636AbiFMScE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 14:32:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239904AbiFMSOw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 14:14:52 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08EE5985B5
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 07:09:44 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d13so5167750plh.13
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 07:09:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=h45d/U/M29ku8Z+G7RjVs2R1LY0TLFzhv/m4QOs4IU0=;
-        b=MNmTIdaBdvI7XatwRTiFZmRQi1v3dLfiisbLNnKjpPMSAJGY/QMAMeQqVvVQedUxa3
-         iXDTIrDxLRViNHfUDOVmJbABJLFuhLghXJAORWnHvvixEwBBHVdXRPHv0wqyJ0FHqQ9y
-         l9NpVnK9/qwh9f1+vRjsaaT+xt+cg7eqnh0bziM8J5MV561IpHpx5CUrqEKX5RGUq6/w
-         6Kc0UVIoDq2ENd2GD/vW0oc2pDO8mmkuH0Bc8n9QhBtkhXSdRX72AX2kZ2bSP8c/rQ+U
-         SMsMfe6F6bUfSXu6um9HNmO1YRbARO2hYdyn4gK9dlmw6bVhCQXe/ekwgvJ//3DA2+/y
-         SrVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=h45d/U/M29ku8Z+G7RjVs2R1LY0TLFzhv/m4QOs4IU0=;
-        b=h5A/t1NuLxqlPQpB3g6quDyjM3JwkcuPyKvq6b2pbBUJUOtUDF3nDvAXgKZievsqWG
-         q75Xqs0ZFhhdiPbK6E2xt9VF66k1ksY5j8KJUliNOXd6gc0wJPkakyqKdIxDe4e2VeH0
-         JiceRB3VVAHvngY5SEfNlbk+8iYoptO+9+0YCaLJSzXeyLet0cpZgaAFAobjmygLE4QK
-         kbvmyLOy28kLiBuSZB87EEpPGgsqqSscEULWnwfrIelAVoJ10IwJenZCQ9VWm5vrDOvZ
-         deALIdBrF6gWpGY8FgmtiQ4JrEujPmnPOPmGC5/17yh/6HlBlUs9QIfVH1bwqXtqTY1x
-         S5kg==
-X-Gm-Message-State: AOAM5319g8Cba+kMXUKyy5DAnqDDgr+PoQi+qak9h6LA6V4IbhhYfQJC
-        0f+p8BtxwWB6ae3penIVpnnbzesPAr09Sg==
-X-Google-Smtp-Source: ABdhPJwRlHQgf29lt8TLiWwmXZoGd4ZR5dDQdZp4UdXuhuQ/NnisD5WWCZmIGtyuBa+B+VxEL/M6Ug==
-X-Received: by 2002:a17:90b:3a90:b0:1e6:a203:c7dd with SMTP id om16-20020a17090b3a9000b001e6a203c7ddmr16319472pjb.144.1655129383224;
-        Mon, 13 Jun 2022 07:09:43 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v3-20020aa799c3000000b0051bc538baadsm5402039pfi.184.2022.06.13.07.09.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jun 2022 07:09:42 -0700 (PDT)
-Date:   Mon, 13 Jun 2022 14:09:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Subject: Re: [PATCH 6/7] KVM: x86: Ignore benign host accesses to
- "unsupported" PEBS and BTS MSRs
-Message-ID: <YqdFIilui+0ji+WZ@google.com>
-References: <20220611005755.753273-1-seanjc@google.com>
- <20220611005755.753273-7-seanjc@google.com>
+        with ESMTP id S245653AbiFMSbm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 14:31:42 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178671D6864
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 07:50:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655131800; x=1686667800;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=KtPUKYDbJWerz/NmuDvWPFgzxMHwxXup5EBi0GMyYVU=;
+  b=J5wFWCwecn1+M7UJJISqavkGK1wybcX9XcT0mAoa+bGDDKcAz+/toIG3
+   4ovL0pGX0xuTbe/g/U0gIRdxAtvzNWzHsTnUaFeuUX5ch75t897lJO9cs
+   hTXJaSnGtcS/PD1LQhPXIAmSd9znIN1MjyVxtvWLBBN6VgSHuk+Nbhtmc
+   iDA7oUIYfJ4L6vzTFJhyrgkrq3pUfCSrT2M8WMTkBBokj7ypLiYKGzdwV
+   gTYkFHIIKmNeUzP8ldl2BWLsZ4ObyEEh9Fdpr64AZNX2uckhGd0SHwSmm
+   zKHv3aeSkcQ3+nHMITJ6sow0xDAW6+qcRRbQXuZsDqBNyez1+KGBkElEn
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10377"; a="266997277"
+X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
+   d="scan'208";a="266997277"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2022 07:49:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
+   d="scan'208";a="535129917"
+Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 13 Jun 2022 07:49:49 -0700
+Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o0lO1-000Kst-3h;
+        Mon, 13 Jun 2022 14:49:49 +0000
+Date:   Mon, 13 Jun 2022 22:49:20 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:queue 5/184] arch/x86/kvm/svm/avic.c:913:6: warning: shift
+ count >= width of type
+Message-ID: <202206132237.17DFkdFl-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220611005755.753273-7-seanjc@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 11, 2022, Sean Christopherson wrote:
-> @@ -4122,6 +4132,16 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		msr_info->data = vcpu->arch.guest_fpu.xfd_err;
->  		break;
->  #endif
-> +	case MSR_IA32_PEBS_ENABLE:
-> +	case MSR_IA32_DS_AREA:
-> +	case MSR_PEBS_DATA_CFG:
-> +		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
-> +			return kvm_pmu_get_msr(vcpu, msr_info);
-> +		/*
-> +		 * Userspace is allowed to read MSRs that KVM reports as
-> +		 * to-be-saved, even if an MSR isn't fully supported.
-> +		 */
-> +		return !msr_info->host_initiated;
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   8baacf67c76c560fed954ac972b63e6e59a6fba0
+commit: 3743c2f0251743b8ae968329708bbbeefff244cf [5/184] KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base
+config: i386-buildonly-randconfig-r002-20220613 (https://download.01.org/0day-ci/archive/20220613/202206132237.17DFkdFl-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d378268ead93c85803c270277f0243737b536ae7)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=3743c2f0251743b8ae968329708bbbeefff244cf
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm queue
+        git checkout 3743c2f0251743b8ae968329708bbbeefff244cf
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kvm/ drivers/gpu/drm/amd/display/amdgpu_dm/
 
-Gah, this needs to set msr_info->data.
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-		/*
-		 * Userspace is allowed to read MSRs that KVM reports as
-		 * to-be-saved, even if an MSR isn't fully supported.
-		 */
-		if (!msr_info->host_initiated)
-			return 1;
+All warnings (new ones prefixed by >>):
 
-		msr_info->data = 0;
+>> arch/x86/kvm/svm/avic.c:913:6: warning: shift count >= width of type [-Wshift-count-overflow]
+                             BIT(APICV_INHIBIT_REASON_SEV      |
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/vdso/bits.h:7:26: note: expanded from macro 'BIT'
+   #define BIT(nr)                 (UL(1) << (nr))
+                                          ^  ~~~~
+   1 warning generated.
 
->  	default:
->  		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
->  			return kvm_pmu_get_msr(vcpu, msr_info);
-> -- 
-> 2.36.1.476.g0c4daa206d-goog
-> 
+
+vim +913 arch/x86/kvm/svm/avic.c
+
+   902	
+   903	bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
+   904	{
+   905		ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
+   906				  BIT(APICV_INHIBIT_REASON_ABSENT) |
+   907				  BIT(APICV_INHIBIT_REASON_HYPERV) |
+   908				  BIT(APICV_INHIBIT_REASON_NESTED) |
+   909				  BIT(APICV_INHIBIT_REASON_IRQWIN) |
+   910				  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
+   911				  BIT(APICV_INHIBIT_REASON_X2APIC) |
+   912				  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+ > 913				  BIT(APICV_INHIBIT_REASON_SEV      |
+   914				  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |
+   915				  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED));
+   916	
+   917		return supported & BIT(reason);
+   918	}
+   919	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
