@@ -2,122 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC3AF549B3E
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 20:15:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39249549B41
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 20:15:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233171AbiFMSAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 14:00:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34640 "EHLO
+        id S244786AbiFMSPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 14:15:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244164AbiFMR6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 13:58:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ECAFF78ED6
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 06:41:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655127662;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PcXj7rF+YNeWDy75jVAivm7WbSpMYmPCUqIi3ZpKFPs=;
-        b=ScxJXOola9morMMgqYFum6t+eX08Bi3Lkm+zrVftS/GqFjH0c+y3x/5ILyZWZN0f+4FyLn
-        y7fMjoc3xopM/fjqmOHTvznPGDKKEX6Tm720Mn4CVOoExqxMzOAovJ4f2STqsQWBEgSYv1
-        g4mfArFHJtl4OSsqWYZjIPNcNUyTL3c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-327-yBDhlO5jNXiVP8Vpadaobw-1; Mon, 13 Jun 2022 09:40:59 -0400
-X-MC-Unique: yBDhlO5jNXiVP8Vpadaobw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 751A6801E6B;
-        Mon, 13 Jun 2022 13:40:58 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1215D492CA2;
-        Mon, 13 Jun 2022 13:40:55 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v7 34/39] KVM: selftests: nSVM: Allocate Hyper-V partition assist and VP assist pages
-Date:   Mon, 13 Jun 2022 15:39:17 +0200
-Message-Id: <20220613133922.2875594-35-vkuznets@redhat.com>
-In-Reply-To: <20220613133922.2875594-1-vkuznets@redhat.com>
-References: <20220613133922.2875594-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S245066AbiFMSPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 14:15:06 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC182D1E7;
+        Mon, 13 Jun 2022 07:10:15 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25DDahxw011975;
+        Mon, 13 Jun 2022 14:10:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=QfLKbMb7cIw5v3tYJr7zvKgdZRe+cbXtG2HPvLS7uXA=;
+ b=orOdpHcoYEetDFdNRR2goTxBPczi12XtuaxAYglXudznr7Y2CHaK6CjBHPkC4l+8KlUh
+ SRhEPzQqtDelomIcgC0L7eBiu0/FpSCurSzznHq9TSAbRIZtHW9jctwU/yGib7FpAgU9
+ 0ktawcEgUORBdz+iQzarax/KVD7G8gmLTSF+hBZdg5Tpq3aCcIT1S9pe7MMETCsDFsek
+ 4FT1KAQWuT9wGP0baOJt5OVkSQ1GJ3P3sD3J54u+UqBt5NrInMTvvy7s5j8geBuLgj5e
+ KVkCq/3bh1f2dhwzy8Cy+4Lttl4Q3EQ59a3pMyDAMkjc2GOIiohTxP4v5YM51lBNHObp 2A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gp3jtm8ay-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Jun 2022 14:10:06 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25DCxPlj014688;
+        Mon, 13 Jun 2022 14:10:06 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gp3jtm8ae-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Jun 2022 14:10:06 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25DE6bxk012087;
+        Mon, 13 Jun 2022 14:10:05 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma05wdc.us.ibm.com with ESMTP id 3gmjp9wt7s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Jun 2022 14:10:05 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25DEA4AP27132370
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Jun 2022 14:10:04 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 72D1CAE05F;
+        Mon, 13 Jun 2022 14:10:04 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE785AE060;
+        Mon, 13 Jun 2022 14:10:00 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.211.62.157])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Jun 2022 14:10:00 +0000 (GMT)
+Message-ID: <291fe7935b24273d9fdd9425a9ce02bb1f1d5448.camel@linux.ibm.com>
+Subject: Re: [PATCH v1 14/18] vfio/mdev: Add mdev available instance
+ checking to the core
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>, Neo Jia <cjia@nvidia.com>,
+        Dheeraj Nigam <dnigam@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+Date:   Mon, 13 Jun 2022 10:08:29 -0400
+In-Reply-To: <20220613064655.GA493@lst.de>
+References: <20220602171948.2790690-1-farman@linux.ibm.com>
+         <20220602171948.2790690-15-farman@linux.ibm.com>
+         <63a87e1e-7d99-b091-4c6b-fa25dd7c5211@nvidia.com>
+         <c818e1ef24c466a3b1d14d4ab10163d5e349a3b4.camel@linux.ibm.com>
+         <BN9PR11MB5276228F26CC7B9EBE13489B8CA69@BN9PR11MB5276.namprd11.prod.outlook.com>
+         <20220613064655.GA493@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 92wx5Go0EIdAsXRaqR1Re3qeer1xW2_s
+X-Proofpoint-ORIG-GUID: 69G2lwM_-sgVqYGmHSSm_BmNJgrkptaC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-13_06,2022-06-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ priorityscore=1501 bulkscore=0 adultscore=0 suspectscore=0 phishscore=0
+ mlxlogscore=966 impostorscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206130063
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation to testing Hyper-V L2 TLB flush hypercalls, allocate VP
-assist and Partition assist pages and link them to 'struct svm_test_data'.
+On Mon, 2022-06-13 at 08:46 +0200, Christoph Hellwig wrote:
+> On Fri, Jun 10, 2022 at 07:43:46AM +0000, Tian, Kevin wrote:
+> > btw with those latest changes [1] we don't need .get_available()
+> > then,
+> > as mdev type is now added by mdev driver one-by-one then the
+> > available instance can be provided directly in that path.
+> 
+> Yes, we can probably add a helper to add the vailable attibrute,
+> which
+> takes the number of instances.  Is it ok if I just add a version of
+> this
+> patch and the device_api one to my series, and we rebase this series
+> on top of it?  I'll try to get out a new version ASAP.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/include/x86_64/svm_util.h | 10 ++++++++++
- tools/testing/selftests/kvm/lib/x86_64/svm.c          | 10 ++++++++++
- 2 files changed, 20 insertions(+)
+That's fine with me. Thanks!
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-index 136ba6a5d027..3922e4842c68 100644
---- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-@@ -36,6 +36,16 @@ struct svm_test_data {
- 	void *msr; /* gva */
- 	void *msr_hva;
- 	uint64_t msr_gpa;
-+
-+	/* Hyper-V VP assist page */
-+	void *vp_assist; /* gva */
-+	void *vp_assist_hva;
-+	uint64_t vp_assist_gpa;
-+
-+	/* Hyper-V Partition assist page */
-+	void *partition_assist; /* gva */
-+	void *partition_assist_hva;
-+	uint64_t partition_assist_gpa;
- };
- 
- #define stgi()			\
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/svm.c b/tools/testing/selftests/kvm/lib/x86_64/svm.c
-index 37e9c0a923e0..98a47bf4cb2f 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/svm.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/svm.c
-@@ -47,6 +47,16 @@ vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva)
- 	svm->msr_gpa = addr_gva2gpa(vm, (uintptr_t)svm->msr);
- 	memset(svm->msr_hva, 0, getpagesize());
- 
-+	svm->vp_assist = (void *)vm_vaddr_alloc_page(vm);
-+	svm->vp_assist_hva = addr_gva2hva(vm, (uintptr_t)svm->vp_assist);
-+	svm->vp_assist_gpa = addr_gva2gpa(vm, (uintptr_t)svm->vp_assist);
-+	memset(svm->vp_assist_hva, 0, getpagesize());
-+
-+	svm->partition_assist = (void *)vm_vaddr_alloc_page(vm);
-+	svm->partition_assist_hva = addr_gva2hva(vm, (uintptr_t)svm->partition_assist);
-+	svm->partition_assist_gpa = addr_gva2gpa(vm, (uintptr_t)svm->partition_assist);
-+	memset(svm->partition_assist_hva, 0, getpagesize());
-+
- 	*p_svm_gva = svm_gva;
- 	return svm;
- }
--- 
-2.35.3
+Eric
+
 
