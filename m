@@ -2,254 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23FB0549DA8
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 21:27:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76F54549DAE
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 21:29:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350482AbiFMT1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 15:27:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53158 "EHLO
+        id S1349243AbiFMT3w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 15:29:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349981AbiFMT0t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 15:26:49 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4215AA6E;
-        Mon, 13 Jun 2022 10:49:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bkTifxIDtJegKV15Y+vAi33H2SihkVEY8+/Vt9oP7ep3lmwT5YZMkM2/M5DFk3xVqoKfGEs30mDTVkSXew0u9JiQPxMCpaEvlgaWTPr3DQqyF8oOibXzH5FfL+EXfXrOcR3UjGepQ6y73p/EmX6iRrt205F7YLoyxteQ7yVIZHajW+ep9s0Wq02lyE9ywF9QJ7ekbjYYUvEmRWNq7Ml+Vhe3XfcK6jIqpRdLnAfeHTIvwpCVgLv9jEv04FMFlVEBjU5gwaR8BmT7e3iPkbvhpcrIptpk12zEPvvJTUDq8vmfjUq7TaQx77E/M93VF/amyAWlIuGpSkdcR7iw/rlJ/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X9iAepru/TMLc8m+RSnwuK/VHeQhBiJI1HaFiNxuBzw=;
- b=V6NtGChQCAcZi0+oDpQguNLYq31hQ7p2tamoDD/2SVikYPZ6kvTff3PGsT4u3HvwU3bLdh8wWPZaWbrXjc7fq6Xe8hRu9q6cDG8GL+vDkozz92PwuPULK4o/7DNIjoDUTNC35GEdcl4FcBNNF2lYFjCZaVQlcfh8F4AHooK3QB2/PgBAaWaXlR9KoB1+Hi3uiagNfzi0CtKshpeMckF/w6WsMMoDJG20lpQ9k5PX9zcicPmAatMxD51W/aCafFvvB1mrzGMKk5890gLDm3LoJrsoEYvA3rzyXW4bxnmbQqSt4zs8lths1JZyDzpAN9Hz/dIvv8SCtnG5OfFOy9zJ0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X9iAepru/TMLc8m+RSnwuK/VHeQhBiJI1HaFiNxuBzw=;
- b=OHeQ0Svw1576b7lL+WQQgO77zC/tJB+jvZqH34lnaPGWRT54SvvbwUyw6UflDCTOPnyovC4mrhr522Mf74MOfuPHumQw0elFm3VnDCeQQpwXfCATYCVMMrSRXOQ/pt9y1BcWxucPjTXW2mNfBIFxU1xwjiibWnhhbQRrUXWfZp8=
-Received: from DM3PR12CA0107.namprd12.prod.outlook.com (2603:10b6:0:55::27) by
- LV2PR12MB5750.namprd12.prod.outlook.com (2603:10b6:408:17e::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5332.20; Mon, 13 Jun 2022 17:49:44 +0000
-Received: from DM6NAM11FT039.eop-nam11.prod.protection.outlook.com
- (2603:10b6:0:55:cafe::2c) by DM3PR12CA0107.outlook.office365.com
- (2603:10b6:0:55::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.12 via Frontend
- Transport; Mon, 13 Jun 2022 17:49:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT039.mail.protection.outlook.com (10.13.172.83) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5332.12 via Frontend Transport; Mon, 13 Jun 2022 17:49:43 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Mon, 13 Jun
- 2022 12:49:42 -0500
-Date:   Mon, 13 Jun 2022 12:49:28 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-CC:     x86 <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>,
-        shuah <shuah@kernel.org>, <yang.zhong@intel.com>,
-        <drjones@redhat.com>, "Ricardo Koller" <ricarkol@google.com>,
-        Aaron Lewis <aaronlewis@google.com>, <wei.w.wang@intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Hugh Dickins" <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        "Dave Hansen" <dave.hansen@intel.com>,
-        Quentin Perret <qperret@google.com>,
-        "Steven Price" <steven.price@arm.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        "Vlastimil Babka" <vbabka@suse.cz>, Marc Orr <marcorr@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        "Nikunj A. Dadhania" <nikunj@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Austin Diviness" <diviness@google.com>, <maz@kernel.org>,
-        <dmatlack@google.com>, <axelrasmussen@google.com>,
-        <maciej.szmigiero@oracle.com>, Mingwei Zhang <mizhang@google.com>,
-        <bgardon@google.com>
-Subject: Re: [RFC V1 PATCH 0/3] selftests: KVM: sev: selftests for fd-based
- approach of supporting private memory
-Message-ID: <20220613174928.f4yyvu45rliuuld6@amd.com>
-References: <20220524205646.1798325-1-vannapurve@google.com>
- <20220610010510.vlxax4g3sgvsmoly@amd.com>
- <CAGtprH92PVtCDGrtwcvfrsKokFbYrqXqtH6D_aUrYXvHYyWpyQ@mail.gmail.com>
+        with ESMTP id S1351702AbiFMT3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 15:29:38 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EC8C5B3C2
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 10:54:07 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 31so4553140pgv.11
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 10:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=EpkxShZgsyvOC558FK0jGzBMP0ZDetJPHuYDFcyKyHc=;
+        b=eG1Pt6SNmAWAbkQk0PJbYFEvmFih5RDAoAG3SGj9P+NC9N4y2TBh/8isp3VZBGLNND
+         yDB1cZ+gI8hf7X/1TgWUueDSwHZUKcPPgJ8cvQxWYoqNtqMYspH5vxuMOlOSjlodhHgo
+         NCF/c7tLgHjo6IkzT/GNDMo7q8CeO9mlRyslgemmXeCc883bzaJZfz0iTITTCdAieJX1
+         edRMTkN+sI6nqjdHKTnzFJFXwTllkMb7mraT8WCdDi9rXA1U7aFLKpDBTa0k3OproqJ8
+         9eps/zayaB+UUjZYpaXGOrKephUjO/9VYF+pKzdVEs0hQ1YTJ/FL/r85EY3lAxNctwzO
+         /0vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EpkxShZgsyvOC558FK0jGzBMP0ZDetJPHuYDFcyKyHc=;
+        b=pJekw8kqvmr104iVkG6ykeA0NaWZQMjJuvfIgDIkuT4ToiWQDAV+DZJC3trc+ItHre
+         lh+MWc/pbWviuwEhGJIkvHY18juvj4FxDZjfAjmLrScuz1AH2Vt4aR6Q5eezgFM2y1hC
+         S68PxlMozoP7ZtXDWAuRGdWrK5mavIOGB4kbyl8nbz6iRQy4XVPpJT6XkFgyYgVYNIoy
+         LuVJ/8H4CuThLfXgrbgnwGXI8AUuvLZjEf0tfKfJ8c/tOQ8kYIx2Y73lXsBElIBzMKPW
+         VVVxT1Jek+saBcLjaB8TQuPOtdcd7pEfSNX2M/7Vyf/wzz4Y8+cuHxwMBPYOqJ3Ut/NY
+         /m3A==
+X-Gm-Message-State: AOAM532NmLJ+B10+LkAVbDlUCFO3hTX+oQR5Qdz01Zg5avi3GZtE1tlu
+        NZELYNh9ueGvp26GgjQ0HN972w==
+X-Google-Smtp-Source: ABdhPJwmaLN1NSMSGFo0uwnuNY059nYyRtqZVSuz1JztPm/dzXwvfwgkAcmuxoNDA0S+IlGMwxsw4A==
+X-Received: by 2002:a63:f25:0:b0:401:d066:2727 with SMTP id e37-20020a630f25000000b00401d0662727mr700401pgl.386.1655142846731;
+        Mon, 13 Jun 2022 10:54:06 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f20-20020a17090a639400b001ea75a02805sm7735594pjj.52.2022.06.13.10.54.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jun 2022 10:54:06 -0700 (PDT)
+Date:   Mon, 13 Jun 2022 17:54:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     syzbot <syzbot+4688c50a9c8e68e7aaa1@syzkaller.appspotmail.com>
+Cc:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Subject: Re: [syzbot] WARNING in handle_exception_nmi (2)
+Message-ID: <Yqd5upAHNOxD0wrQ@google.com>
+References: <0000000000000a5eae05d8947adb@google.com>
+ <0000000000003719fc05e13b37e3@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGtprH92PVtCDGrtwcvfrsKokFbYrqXqtH6D_aUrYXvHYyWpyQ@mail.gmail.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 878a940e-d0d2-471e-ac17-08da4d65195b
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5750:EE_
-X-Microsoft-Antispam-PRVS: <LV2PR12MB5750A6BA9B80ECD2565BC24095AB9@LV2PR12MB5750.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: h//F0zPkyoad1Kw5Qed4PVEOHODy5MYHVNcL7oVx/MVdoYNqhyE+pHwHybk1zxXlC4u0ocyPFfzJg62W/TshuL6UUyIJmES1J29xSAkdouIR8C/ckjDl72BUhuqo7P7omzBFkuxg0wN6kQHwNX+g6r9xB0cGdjaaoLczgDXzoDPzd7v4kPH6EtSRtxhRfi73dSPP7nmrL7WCIAiNRBW9GezkXGP57fInQtoaAoXCCUgHx4FEbsJ/qLKpHJSH8HQBbnFeY64evSMJwmpZ6seT6rFJ1W3d25Vyrap/WB98NHdexUHrISVzDKUjbivo8CkwBZHuvQATkfgPP1L0g248vksMq24lHOGHPcqrYbau3aJG20yvT1LI2VKtspr20/sJQKA6DO2qyIhAUxSTjrDhiV5A0fzKcT3tDcOCWPEqSBK2QICwNKgmvX65zXSkb4boWUIa90P5YDTdFstp+FVTeFcNUiK1jLQWWE0ApAh9gyyOTHFF1t2dbTs5Fuc6amdCe7z6x7A41aDCOevWAU47yYbZBpZUPP6jFYz/vnI0e2ZHaof6YANTWS5mu/OV1Y0DAmXmGwi3LUaFMGag46iRG/mCpWEZoTcspAADtrF5Xt57mXL5XcI4urhAoTShcxQaZW692Owd4m09T5OEUSPlr4a5StwPv5k4T9HL69G6woKGIuevtNxGbKJqzFBjYxmJFfkw9DIySWW7U2PCAjJD4DB7c98YpgzjPx4tdgOMag76QXD0nVjwa19qDb5XItP41mSjRfppDyjwandukBrDdaiutZv8PVjheUSHj87ajkGC0f/cQqO3k+2WrY92Bqeaw6rFlStoyT299RYgeDc2Aw==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(40470700004)(36840700001)(46966006)(508600001)(44832011)(7416002)(5660300002)(8936002)(7406005)(45080400002)(6916009)(356005)(36756003)(81166007)(966005)(2906002)(40460700003)(8676002)(70206006)(86362001)(70586007)(6666004)(4326008)(54906003)(426003)(316002)(83380400001)(336012)(2616005)(186003)(16526019)(26005)(1076003)(47076005)(82310400005)(36860700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2022 17:49:43.7726
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 878a940e-d0d2-471e-ac17-08da4d65195b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT039.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5750
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <0000000000003719fc05e13b37e3@google.com>
+X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 10, 2022 at 02:01:41PM -0700, Vishal Annapurve wrote:
-> ....
-> >
-> > I ended up adding a KVM_CAP_UNMAPPED_PRIVATE_MEM to distinguish between the
-> > 2 modes. With UPM-mode enabled it basically means KVM can/should enforce that
-> > all private guest pages are backed by private memslots, and enable a couple
-> > platform-specific hooks to handle MAP_GPA_RANGE, and queries from MMU on
-> > whether or not an NPT fault is for a private page or not. SEV uses these hooks
-> > to manage its encryption bitmap, and uses that bitmap as the authority on
-> > whether or not a page is encrypted. SNP uses GHCB page-state-change requests
-> > so MAP_GPA_RANGE is a no-op there, but uses the MMU hook to indicate whether a
-> > fault is private based on the page fault flags.
-> >
-> > When UPM-mode isn't enabled, MAP_GPA_RANGE just gets passed on to userspace
-> > as before, and platform-specific hooks above are no-ops. That's the mode
-> > your SEV self-tests ran in initially. I added a test that runs the
-> > PrivateMemoryPrivateAccess in UPM-mode, where the guest's OS memory is also
-> > backed by private memslot and the platform hooks are enabled, and things seem
-> > to still work okay there. I only added a UPM-mode test for the
-> > PrivateMemoryPrivateAccess one though so far. I suppose we'd want to make
-> > sure it works exactly as it did with UPM-mode disabled, but I don't see why
-> > it wouldn't.
+On Sun, Jun 12, 2022, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
 > 
-> Thanks Michael for the update. Yeah, using the bitmap to track
-> private/shared-ness of gfn ranges should be the better way to go as
-> compared to the limited approach I used to just track a single
-> contiguous pfn range.
-> I spent some time in getting the SEV/SEV-ES priv memfd selftests to
-> execute from private fd as well and ended up doing similar changes as
-> part of the github tree:
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fvishals4gh%2Flinux%2Fcommits%2Fsev_upm_selftests_rfc_v2&amp;data=05%7C01%7Cmichael.roth%40amd.com%7Cf040f8a9f98146f8008508da4b2472c5%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637904917162115269%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=%2Bb3S2xOAWga8k5tsS2EHMQF5CXuKG60qy0ToeEhhQ4A%3D&amp;reserved=0.
+> HEAD commit:    7a68065eb9cd Merge tag 'gpio-fixes-for-v5.19-rc2' of git:/..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=177df408080000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=20ac3e0ebf0db3bd
+> dashboard link: https://syzkaller.appspot.com/bug?extid=4688c50a9c8e68e7aaa1
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12087173f00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16529343f00000
 > 
-> >
-> > But probably worth having some discussion on how exactly we should define this
-> > mode, and whether that meshes with what TDX folks are planning.
-> >
-> > I've pushed my UPM-mode selftest additions here:
-> >   https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fmdroth%2Flinux%2Fcommits%2Fsev_upm_selftests_rfc_v1_upmmode&amp;data=05%7C01%7Cmichael.roth%40amd.com%7Cf040f8a9f98146f8008508da4b2472c5%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637904917162115269%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=3YLZcCevIkuo5cw%2FpKk5Sf9y6%2F1ZPss6ujZtLYEbV3M%3D&amp;reserved=0
-> >
-> > And the UPM SEV/SEV-SNP tree I'm running them against (DISCLAIMER: EXPERIMENTAL):
-> >   https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fmdroth%2Flinux%2Fcommits%2Fpfdv6-on-snpv6-upm1&amp;data=05%7C01%7Cmichael.roth%40amd.com%7Cf040f8a9f98146f8008508da4b2472c5%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637904917162115269%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=mW8ypNWyREtoDJ%2BHNi20OT8Hzelqk5Na8eC8ihkfCjY%3D&amp;reserved=0
-> >
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+4688c50a9c8e68e7aaa1@syzkaller.appspotmail.com
 > 
-> Thanks for the references here. This helps get a clear picture around
-> the status of priv memfd integration with Sev-SNP VMs and this work
-> will be the base of future SEV specific priv memfd selftest patches as
-> things get more stable.
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 3609 at arch/x86/kvm/vmx/vmx.c:4896 handle_exception_nmi+0xfdc/0x1190 arch/x86/kvm/vmx/vmx.c:4896
+> Modules linked in:
+> CPU: 0 PID: 3609 Comm: syz-executor169 Not tainted 5.19.0-rc1-syzkaller-00303-g7a68065eb9cd #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+
+I'm pretty sure this is a bug in GCE's L0 KVM.  Per syzbot's bisection, the WARN
+repros all the way back to v5.11 on GCE.  The test is doing VMWRITE from its L1
+(effective L2) with a memory operand that takes a #PF.  The #PF ends up in L1,
+which triggers the splat as KVM (real L1) isn't intercepting #PFs.
+
+I've repro'd this on a GCE host running a GCE kernel, and verified the same host
+running a v5.18 kernel does _not_ trigger the splat.
+
+I'll route this to someone internally.
+
+> RIP: 0010:handle_exception_nmi+0xfdc/0x1190 arch/x86/kvm/vmx/vmx.c:4896
+> Code: 0f 84 c8 f3 ff ff e8 33 5c 58 00 48 89 ef c7 85 84 0d 00 00 00 00 00 00 e8 21 35 ec ff 41 89 c4 e9 af f3 ff ff e8 14 5c 58 00 <0f> 0b e9 69 f6 ff ff e8 08 5c 58 00 be f5 ff ff ff bf 01 00 00 00
+> RSP: 0018:ffffc9000309faf8 EFLAGS: 00010293
+> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+> RDX: ffff88801ba1d880 RSI: ffffffff8122171c RDI: 0000000000000001
+> RBP: ffff88807cd88000 R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000001 R12: 00000000a0000975
+> R13: ffff88807cd88248 R14: 0000000000000000 R15: 0000000080000300
+> FS:  0000555556c8d300(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 00000000229ca000 CR4: 00000000003526e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 00000000b8fecd19 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6174 [inline]
+>  vmx_handle_exit+0x498/0x1950 arch/x86/kvm/vmx/vmx.c:6191
+>  vcpu_enter_guest arch/x86/kvm/x86.c:10361 [inline]
+>  vcpu_run arch/x86/kvm/x86.c:10450 [inline]
+>  kvm_arch_vcpu_ioctl_run+0x4208/0x66f0 arch/x86/kvm/x86.c:10654
+>  kvm_vcpu_ioctl+0x570/0xf30 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3944
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:870 [inline]
+>  __se_sys_ioctl fs/ioctl.c:856 [inline]
+>  __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+> RIP: 0033:0x7f56efaee199
+> Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffc37353158 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f56efaee199
+> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+> RBP: 00007f56efab1bf0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f56efab1c80
+> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+>  </TASK>
 > 
-> I see usage of pwrite to populate initial private memory contents.
-> Does it make sense to have SEV_VM_LAUNCH_UPDATE_DATA handle the
-> private fd population as well?
-> I tried to prototype it via:
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fvishals4gh%2Flinux%2Fcommit%2Fc85ee15c8bf9d5d43be9a34898176e8230a3b680%23&amp;data=05%7C01%7Cmichael.roth%40amd.com%7Cf040f8a9f98146f8008508da4b2472c5%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637904917162115269%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=QwP4JioniC06yFV7c%2BY35LtqJy9INGlcQ9Z6gn3nOrI%3D&amp;reserved=0
-
-Thanks for the pointer and for taking a stab at this approach (hadn't
-realized you were looking into this so sorry for the overlap with your
-code).
-
-> as I got this suggestion from Erdem Aktas(erdemaktas@google) while
-> discussing about executing guest code from private fd.
-
-The way we way have the host patches implemented currently is sort of based
-around the idea that userspace handles all private/shared conversion via
-allocations/deallocations from the private backing store, since I
-thought that was one of the design goals. For SNP that means allocating a
-page from backing store will trigger the additional hooks in the kernel needed
-to do some additional bookkeeping like RMP updates and removing from directmap,
-which I'm doing via a platform-specific callback I've added to the KVM memfile
-notifier callback.
-
-There was some talk of allowing a sort of pre-boot stage to the
-MFD_INACCESSIBLE protections where writes would be allowed up until a
-certain point. The kernel hack to allow pwrite() was sort of a holdover
-for this support.
-
-Handling pre-population as part of SNP_LAUNCH_UPDATE seems sort of
-incompatible with this, since it reads from shared memory and writes
-into private memory. So either:
-
-a) userspace pre-allocated the private backing page before calling
-   SNP_LAUNCH_UPDATE to fill it, in which case the kernel is mapping
-   private memory into it's address space that is now already
-   guest-owned which will cause an RMP fault, or
-
-b) userspace lets SNP_LAUNCH_UPDATE allocate the private page as part of
-   copying over the data from shared page, in which case we'd get the
-   invalidation notifier callback going through the normal shmem
-   allocation path, and would need to bypass this to ensure that
-   notifier trigger after the memory has been populated.
-
-Maybe some other sort of notifier to handle the RMP/directmap changes
-would avoid these issues, but that seems to move us closer to just
-having a KVM ioctl to handle the conversions and manage this
-book-keeping via KVM ioctls rather than mem FD callbacks/notifiers.
-There seems to be some discussion around doing something of this sort
-but still need to get some clarity on this.
-
-> Apart from the aspects I might not be aware of, this can have
-> performance overhead depending on the initial Guest UEFI boot memory
-> requirements. But this can allow the userspace VMM to keep most of the
-> guest vm boot memory setup the same and
-> avoid changing the host kernel to allow private memfd writes from userspace.
-
-I think it would be good if we could reduce the complexity on the VMM
-side. Having a KVM ioctl that instructs KVM to convert a range of GPAs
-between private<->shared via private memslot/FD would also achieve that,
-while also avoiding needing special handling for this pre-launch case
-vs. conversions during run-time. Probably worth discussing more in
-Chao's thread where there's some related discussion.
-
-Thanks,
-
-Mike
-
-> 
-> Regards,
-> Vishal
