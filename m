@@ -2,165 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37E7854A178
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 23:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BBF154A1AA
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 23:42:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352400AbiFMVbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 17:31:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32894 "EHLO
+        id S1348713AbiFMVms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 17:42:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353199AbiFMV31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 17:29:27 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E1995
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 14:25:43 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id c11-20020a17090a4d0b00b001e4e081d525so6938983pjg.7
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 14:25:43 -0700 (PDT)
+        with ESMTP id S240307AbiFMVmr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 17:42:47 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD2360F7
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 14:42:46 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id y2-20020a655b42000000b0040014afa54cso3921939pgr.21
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 14:42:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=2HZEMfRIxWFvhgNolJdHE+4fmvokBk1d/agQn4Bf6T4=;
-        b=RdGzy/6cYG/hqt377t5RGc5j2qzeneOwISpagbEXNwhnJRGvEuJRIOJNxRgc1uaD9J
-         z1XHzQ3qx6rtvshQtkND+/6k5zcdfEmAGAQe4MBNv37e95zUI5qlEr+ukkA7NSdUsA1z
-         SRcW9mBtWtFzBGnm/P9jSA8P/+/B31FIzTXSkjfDUHBHwnMuu6nFLEgVutqEPjNF2Njr
-         I6aapXMjXkcuw4mTcC+r8vW3kDTpnhz1sSNktr6TUaIlqZg7AJ94G0IPUs8ZUmEDzxES
-         JsjLZl1f2MpBzRN6+L3kZ6u7UkB6aktI6zG3HWkWXJN/vQ/rnFhG9lnuDv6PFe1YDY69
-         nI0Q==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=RVy85ULONsPMosb1NmFt3NRY87u30o0irh/ZWjWjAQQ=;
+        b=SEpiP60SyyDEf/Tnm3zpDuQbs8gKvGqZQWxGmHhqNnIx2TWH/CkGAZ9qantBF7CRk6
+         a+mFjO2HObwDwvtZzU62OBzinGjx0MP01SfwVdRTRSFOoyxBVLH29eEbdeRYE423f9xF
+         Kl7aaN0WWWwrEbZ7SzaEYVhle5y6gfBRLn2dRSuMQwWAIbtMaDQaJqEINEK1YclQi3Pq
+         gwdYCsX72hMjPUGj7PQXWFrDRhuhvPK47GWICbL/v/nmgRvnjGnJuKVSx2r4BxQkgEno
+         NMC7vp5Op6Ui4qJahNYCLavsZN7o7hfmv147En8DCOyi82LSOxm6QHeXQnKRAFt/NOHi
+         n0Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=2HZEMfRIxWFvhgNolJdHE+4fmvokBk1d/agQn4Bf6T4=;
-        b=q13/eXUgsLzD7+1MnvxN0pziwk3sqvbVDQRfArL/uHoMETkB1dMKBsgrVTOuwrxGCm
-         FtbFW9SnwGYseR1lNQ3NFlfXP+AMnBg+q2lx7UXNpiY0h44BAYGpb4wOrrxRTHDP0QPL
-         0p4j7J+/e7Ldau5AwwWbbwxt1UCxMCK4I5xkWhYoNHOuQAXpJ/6rbNuViteQrTIctU72
-         fc4MM7onkmvygRTZ6evXOUgEMi6kxo05bxx2W6MX6LfGKNwTvVs6zlelSty+30WpK1XZ
-         dY+7BmFiHAE/2zvbOGUVk6I4A/cy7hEbuVXPJaWnl7F7MB7+OSlhCM1DEV9UtbP6Kr4T
-         3qyQ==
-X-Gm-Message-State: AJIora97BwvHGak9x7prd9JhvD2EAWHdXdcU90FMKaCFYtLXsDZeZ60o
-        ezUTeOoH2kV5+u2oQVlMnTQRz8H/+LH0NkQaQqg716H96j6CX0Mg+9eClw+1bJpMA/JhYdOcVFw
-        EaYxpVBTAodgdg17hY8ouRyrzDaY/RGZdFDoIG+Mi9UlQgbzjKd0b91GLNx/V
-X-Google-Smtp-Source: AGRyM1vSLQ762BI4fr+CHdSH7bPhrBuiIxkFdEVnBv9ahJasB6kow7g6SLnoXz4WYJnTfC/qn+sEUP/QTeGX
-X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:a17:90b:1192:b0:1e2:da25:4095 with SMTP id
- gk18-20020a17090b119200b001e2da254095mr737030pjb.240.1655155542892; Mon, 13
- Jun 2022 14:25:42 -0700 (PDT)
-Date:   Mon, 13 Jun 2022 21:25:23 +0000
-In-Reply-To: <20220613212523.3436117-1-bgardon@google.com>
-Message-Id: <20220613212523.3436117-11-bgardon@google.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=RVy85ULONsPMosb1NmFt3NRY87u30o0irh/ZWjWjAQQ=;
+        b=n7xmqYontuBaoCFxUDuOec6VTBV1EhzfihmYPj4+GBQapy/lHukMn3DBI053uSJDZa
+         5iqUp52Llv6Tj+j15bsCRkEPRHzurJRObPA6aW7Xa9e6SkaUGAxoHhY26lkm6he1SmEn
+         JUSrvmoGZKdVdBik54ZQJ7+YdLlC7Oahz/EKaZCuboj7F9/nBzWIRRodUt2JeXZp4cvk
+         eVdvM6XVWXphLxNE3jbu9iaZF+S8bj5ogyPyhIE/LaSH8fpcgBH5npDn8hGFsTqywake
+         QL8HNKJjLC4CYLVDwPqwfb7EDWHrlnK6XMTC3GMiMidMk/csRQ3oYrrZuhh2ArjKBlAJ
+         7hwA==
+X-Gm-Message-State: AJIora9WyPJRRVQC7aThg2JP/at9XTZT2w50e1areTuhlh9GtB57o2sd
+        DDIJsNn0CHQ626FvqJsLDSi0uBl0KeU=
+X-Google-Smtp-Source: AGRyM1urKA7NScvmeBtxVRmnJcZPpHOq5ewz3AmNrW84SUP+NUFAo6x/+herBNp05LNlC6l+fSWyWo0gPnY=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:178f:b0:1e3:3ba:c185 with SMTP id
+ q15-20020a17090a178f00b001e303bac185mr47660pja.1.1655156565067; Mon, 13 Jun
+ 2022 14:42:45 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon, 13 Jun 2022 21:42:37 +0000
+Message-Id: <20220613214237.2538266-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20220613212523.3436117-1-bgardon@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH v9 10/10] KVM: selftests: Cache binary stats metadata for
- duration of test
-From:   Ben Gardon <bgardon@google.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
+Subject: [PATCH] KVM: SVM: Hide SEV migration lockdep goo behind CONFIG_DEBUG_LOCK_ALLOC
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Ben Gardon <bgardon@google.com>
+        Joerg Roedel <joro@8bytes.org>, Tom Rix <trix@redhat.com>,
+        kvm@vger.kernel.org, llvm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to improve performance across multiple reads of VM stats, cache
-the stats metadata in the VM struct.
+Wrap the manipulation of @role and the manual mutex_{release,acquire}()
+invocations in CONFIG_PROVE_LOCKING=y to squash a clang-15 warning.  When
+building with -Wunused-but-set-parameter and CONFIG_DEBUG_LOCK_ALLOC=n,
+clang-15 seees there's no usage of @role in mutex_lock_killable_nested()
+and yells.  PROVE_LOCKING selects DEBUG_LOCK_ALLOC, and the only reason
+KVM manipulates @role is to make PROVE_LOCKING happy.
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
+To avoid true ugliness, use "i" and "j" to detect the first pass in the
+loops; the "idx" field that's used by kvm_for_each_vcpu() is guaranteed
+to be '0' on the first pass as it's simply the first entry in the vCPUs
+XArray, which is fully KVM controlled.  kvm_for_each_vcpu() passes '0'
+for xa_for_each_range()'s "start", and xa_for_each_range() will not enter
+the loop if there's no entry at '0'.
+
+Fixes: 0c2c7c069285 ("KVM: SEV: Mark nested locking of vcpu->lock")
+Reported-by: kernel test robot <lkp@intel.com>
+Cc: Peter Gonda <pgonda@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     |  5 +++
- tools/testing/selftests/kvm/lib/kvm_util.c    | 32 ++++++++++---------
- 2 files changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 537b8a047d6e..daf201174d2a 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -84,6 +84,11 @@ struct kvm_vm {
- 	vm_vaddr_t idt;
- 	vm_vaddr_t handlers;
- 	uint32_t dirty_ring_size;
-+
-+	/* Cache of information for binary stats interface */
-+	int stats_fd;
-+	struct kvm_stats_header stats_header;
-+	struct kvm_stats_desc *stats_desc;
- };
- 
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 0d97142a590e..787aeb0c61f3 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -551,6 +551,12 @@ void kvm_vm_free(struct kvm_vm *vmp)
- 	if (vmp == NULL)
- 		return;
- 
-+	/* Free cached stats metadata and close FD */
-+	if (vmp->stats_fd) {
-+		free(vmp->stats_desc);
-+		close(vmp->stats_fd);
-+	}
-+
- 	/* Free userspace_mem_regions. */
- 	hash_for_each_safe(vmp->regions.slot_hash, ctr, node, region, slot_node)
- 		__vm_mem_region_delete(vmp, region, false);
-@@ -1942,32 +1948,28 @@ void read_stat_data(int stats_fd, struct kvm_stats_header *header,
- void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
- 		   size_t max_elements)
+Compile tested only, still haven't figured out why SEV is busted on our
+test systems with upstream kernels.  I also haven't verified this squashes
+the clang-15 warning, so a thumbs up on that end would be helpful.
+
+ arch/x86/kvm/svm/sev.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 51fd985cf21d..309bcdb2f929 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1606,38 +1606,35 @@ static int sev_lock_vcpus_for_migration(struct kvm *kvm,
  {
--	struct kvm_stats_desc *stats_desc;
--	struct kvm_stats_header header;
- 	struct kvm_stats_desc *desc;
- 	size_t size_desc;
--	int stats_fd;
- 	int i;
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long i, j;
+-	bool first = true;
  
--	stats_fd = vm_get_stats_fd(vm);
--
--	read_stats_header(stats_fd, &header);
--
--	stats_desc = read_stats_descriptors(stats_fd, &header);
-+	if (!vm->stats_fd) {
-+		vm->stats_fd = vm_get_stats_fd(vm);
-+		read_stats_header(vm->stats_fd, &vm->stats_header);
-+		vm->stats_desc = read_stats_descriptors(vm->stats_fd,
-+							&vm->stats_header);
-+	}
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		if (mutex_lock_killable_nested(&vcpu->mutex, role))
+ 			goto out_unlock;
  
--	size_desc = get_stats_descriptor_size(&header);
-+	size_desc = get_stats_descriptor_size(&vm->stats_header);
- 
--	for (i = 0; i < header.num_desc; ++i) {
--		desc = (void *)stats_desc + (i * size_desc);
-+	for (i = 0; i < vm->stats_header.num_desc; ++i) {
-+		desc = (void *)vm->stats_desc + (i * size_desc);
- 
- 		if (strcmp(desc->name, stat_name))
- 			continue;
- 
--		read_stat_data(stats_fd, &header, desc, data, max_elements);
-+		read_stat_data(vm->stats_fd, &vm->stats_header, desc,
-+			       data, max_elements);
- 
- 		break;
+-		if (first) {
++#ifdef CONFIG_PROVE_LOCKING
++		if (!i)
+ 			/*
+ 			 * Reset the role to one that avoids colliding with
+ 			 * the role used for the first vcpu mutex.
+ 			 */
+ 			role = SEV_NR_MIGRATION_ROLES;
+-			first = false;
+-		} else {
++		else
+ 			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
+-		}
++#endif
  	}
+ 
+ 	return 0;
+ 
+ out_unlock:
+ 
+-	first = true;
+ 	kvm_for_each_vcpu(j, vcpu, kvm) {
+ 		if (i == j)
+ 			break;
+ 
+-		if (first)
+-			first = false;
+-		else
++#ifdef CONFIG_PROVE_LOCKING
++		if (j)
+ 			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
 -
--	free(stats_desc);
--	close(stats_fd);
- }
++#endif
+ 
+ 		mutex_unlock(&vcpu->mutex);
+ 	}
+
+base-commit: 8baacf67c76c560fed954ac972b63e6e59a6fba0
 -- 
 2.36.1.476.g0c4daa206d-goog
 
