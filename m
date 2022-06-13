@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73206549B3D
+	by mail.lfdr.de (Postfix) with ESMTP id BC3AF549B3E
 	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 20:15:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244152AbiFMSAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 14:00:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34380 "EHLO
+        id S233171AbiFMSAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 14:00:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233968AbiFMR5q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 13:57:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 474D478928
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 06:40:59 -0700 (PDT)
+        with ESMTP id S244164AbiFMR6C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 13:58:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ECAFF78ED6
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 06:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655127657;
+        s=mimecast20190719; t=1655127662;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Po6X1qwbVSYYhUlpNcgBCTKJG7wN/6Y9NKjEXzUYKYY=;
-        b=e0LCRExhpEW0sqkav+dt3ISoMf0XaVBIGiUGuICMzGEkC2DQ0rKH3zQDhz9pvRDupM3qda
-        /xDnE4R2NpegvdcM71KITxEUVSj57in50yyQNlJFPphlN98jpPW9mYbd6XP2JH7szdvTLY
-        wmcwIs2yFtUg1nZwv9upISTqYrQEpVk=
+        bh=PcXj7rF+YNeWDy75jVAivm7WbSpMYmPCUqIi3ZpKFPs=;
+        b=ScxJXOola9morMMgqYFum6t+eX08Bi3Lkm+zrVftS/GqFjH0c+y3x/5ILyZWZN0f+4FyLn
+        y7fMjoc3xopM/fjqmOHTvznPGDKKEX6Tm720Mn4CVOoExqxMzOAovJ4f2STqsQWBEgSYv1
+        g4mfArFHJtl4OSsqWYZjIPNcNUyTL3c=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-362-biGCB997PJilDdQPP439sA-1; Mon, 13 Jun 2022 09:40:53 -0400
-X-MC-Unique: biGCB997PJilDdQPP439sA-1
+ us-mta-327-yBDhlO5jNXiVP8Vpadaobw-1; Mon, 13 Jun 2022 09:40:59 -0400
+X-MC-Unique: yBDhlO5jNXiVP8Vpadaobw-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4246B101E989;
-        Mon, 13 Jun 2022 13:40:53 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 751A6801E6B;
+        Mon, 13 Jun 2022 13:40:58 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.194.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EF359492CA2;
-        Mon, 13 Jun 2022 13:40:50 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1215D492CA2;
+        Mon, 13 Jun 2022 13:40:55 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -47,9 +47,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v7 32/39] KVM: selftests: Sync 'struct hv_enlightened_vmcs' definition with hyperv-tlfs.h
-Date:   Mon, 13 Jun 2022 15:39:15 +0200
-Message-Id: <20220613133922.2875594-33-vkuznets@redhat.com>
+Subject: [PATCH v7 34/39] KVM: selftests: nSVM: Allocate Hyper-V partition assist and VP assist pages
+Date:   Mon, 13 Jun 2022 15:39:17 +0200
+Message-Id: <20220613133922.2875594-35-vkuznets@redhat.com>
 In-Reply-To: <20220613133922.2875594-1-vkuznets@redhat.com>
 References: <20220613133922.2875594-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -66,66 +66,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-'struct hv_enlightened_vmcs' definition in selftests is not '__packed'
-and so we rely on the compiler doing the right padding. This is not
-obvious so it seems beneficial to use the same definition as in kernel.
+In preparation to testing Hyper-V L2 TLB flush hypercalls, allocate VP
+assist and Partition assist pages and link them to 'struct svm_test_data'.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- tools/testing/selftests/kvm/include/x86_64/evmcs.h | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ tools/testing/selftests/kvm/include/x86_64/svm_util.h | 10 ++++++++++
+ tools/testing/selftests/kvm/lib/x86_64/svm.c          | 10 ++++++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/evmcs.h b/tools/testing/selftests/kvm/include/x86_64/evmcs.h
-index 3c9260f8e116..367e027cd2a4 100644
---- a/tools/testing/selftests/kvm/include/x86_64/evmcs.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/evmcs.h
-@@ -41,6 +41,8 @@ struct hv_enlightened_vmcs {
- 	u16 host_gs_selector;
- 	u16 host_tr_selector;
- 
-+	u16 padding16_1;
+diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+index 136ba6a5d027..3922e4842c68 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
++++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+@@ -36,6 +36,16 @@ struct svm_test_data {
+ 	void *msr; /* gva */
+ 	void *msr_hva;
+ 	uint64_t msr_gpa;
 +
- 	u64 host_ia32_pat;
- 	u64 host_ia32_efer;
++	/* Hyper-V VP assist page */
++	void *vp_assist; /* gva */
++	void *vp_assist_hva;
++	uint64_t vp_assist_gpa;
++
++	/* Hyper-V Partition assist page */
++	void *partition_assist; /* gva */
++	void *partition_assist_hva;
++	uint64_t partition_assist_gpa;
+ };
  
-@@ -159,7 +161,7 @@ struct hv_enlightened_vmcs {
- 	u64 ept_pointer;
+ #define stgi()			\
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/svm.c b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+index 37e9c0a923e0..98a47bf4cb2f 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/svm.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+@@ -47,6 +47,16 @@ vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva)
+ 	svm->msr_gpa = addr_gva2gpa(vm, (uintptr_t)svm->msr);
+ 	memset(svm->msr_hva, 0, getpagesize());
  
- 	u16 virtual_processor_id;
--	u16 padding16[3];
-+	u16 padding16_2[3];
- 
- 	u64 padding64_2[5];
- 	u64 guest_physical_address;
-@@ -195,15 +197,15 @@ struct hv_enlightened_vmcs {
- 	u64 guest_rip;
- 
- 	u32 hv_clean_fields;
--	u32 hv_padding_32;
-+	u32 padding32_1;
- 	u32 hv_synthetic_controls;
- 	struct {
- 		u32 nested_flush_hypercall:1;
- 		u32 msr_bitmap:1;
- 		u32 reserved:30;
--	} hv_enlightenments_control;
-+	}  __packed hv_enlightenments_control;
- 	u32 hv_vp_id;
--
-+	u32 padding32_2;
- 	u64 hv_vm_id;
- 	u64 partition_assist_page;
- 	u64 padding64_4[4];
-@@ -211,7 +213,7 @@ struct hv_enlightened_vmcs {
- 	u64 padding64_5[7];
- 	u64 xss_exit_bitmap;
- 	u64 padding64_6[7];
--};
-+} __packed;
- 
- #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE                     0
- #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP                BIT(0)
++	svm->vp_assist = (void *)vm_vaddr_alloc_page(vm);
++	svm->vp_assist_hva = addr_gva2hva(vm, (uintptr_t)svm->vp_assist);
++	svm->vp_assist_gpa = addr_gva2gpa(vm, (uintptr_t)svm->vp_assist);
++	memset(svm->vp_assist_hva, 0, getpagesize());
++
++	svm->partition_assist = (void *)vm_vaddr_alloc_page(vm);
++	svm->partition_assist_hva = addr_gva2hva(vm, (uintptr_t)svm->partition_assist);
++	svm->partition_assist_gpa = addr_gva2gpa(vm, (uintptr_t)svm->partition_assist);
++	memset(svm->partition_assist_hva, 0, getpagesize());
++
+ 	*p_svm_gva = svm_gva;
+ 	return svm;
+ }
 -- 
 2.35.3
 
