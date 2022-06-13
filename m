@@ -2,214 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1F7C549D52
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 21:19:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 532E7549D92
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 21:24:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346266AbiFMTT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 15:19:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44864 "EHLO
+        id S1349261AbiFMTYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 15:24:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351229AbiFMTTa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 15:19:30 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A52D927FDF
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 10:16:58 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id bo5so6325075pfb.4
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 10:16:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4TaaV2PEoFhV4y67SQr7QhEUHOK5RcdeAAxsIltPwAU=;
-        b=WXComPS7WulpGwGpqiaTQf8XJe7dX407TYL+QI+yCy4IkSrjD27CrJzyYgd0MgGeCR
-         jAKLJBGh87eIrgDAHVqFDk/DDcQM23qx/IMFDzQHSqenbwGV3Og2nUWk3co6hXYBkDPQ
-         RdauMPRH9EfKpLJ8cHGxRoFrZOBGwMgsCI83FADyvT9EOU9ckqcEjwkGdOkSqE2y+noo
-         Lj2C05rOlOkSFK31YS14nS0LP4SKUgHji02PrRX0Kl2KXWQWIvH89htw24DgSjnNEXfn
-         MGhCMbyOjfyMp+6hzjfQoHllLlD+PF7vzfYpX2ItfQfQmz5WYPfr6RYr5UG9q7LhAY3g
-         OKUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4TaaV2PEoFhV4y67SQr7QhEUHOK5RcdeAAxsIltPwAU=;
-        b=yq2r+YtkUCR2LbEUUrK5XcVLwnkJzBMqlDM1b6bXc74RUdKejipG+xxHZXBgyzjL/i
-         533v/TR2WLhqU0vHffF6rJ0TwGKqFPrQTmoGD+zuhsc5PN3EtE50UfPk0BwB5MGp2bJt
-         czsbL8S+nlVrbbID7apO0QqBfuBpXQtuWwf/VFZkbA2pQ6Fw42NzSmwtNEGJ0Qwt26Wh
-         OFLIAjKAixAmrwJINkiiDPNmgcZFlb2CRBKOjLa7jSXpPNcEwIfsg+U/6OG8JnHF3s/+
-         98ZeATe107Q+LToVJbM2dfaJiz7xZGlhSZkhnXANEMhq/DaBAXTPC+8yYor+mKQN8Kgu
-         tV2Q==
-X-Gm-Message-State: AOAM532cG91vcJmancPd0lzUlKpXU9RwitM1hyFY5D9xWxcj/blWKr5W
-        nWFgZjmOrR5IfQrqxsq3qu/lqA==
-X-Google-Smtp-Source: ABdhPJwMozkURIYk+QKnVhZsCbbtI2V04QuQtsbR5BUKWn9xwuZRWm3qzw0SOP0F4rx29MEGPm4ZKA==
-X-Received: by 2002:a05:6a00:1585:b0:51c:3a6e:95f3 with SMTP id u5-20020a056a00158500b0051c3a6e95f3mr214729pfk.51.1655140617847;
-        Mon, 13 Jun 2022 10:16:57 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k9-20020a056a00134900b0051bb0be7109sm5689429pfu.78.2022.06.13.10.16.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jun 2022 10:16:57 -0700 (PDT)
-Date:   Mon, 13 Jun 2022 17:16:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     wangguangju <wangguangju@baidu.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        dave.hansen@linux.intel.co, tglx@linutronix.de, mingo@redhat.com,
-        x86@kernel.org, linux-kernel@vger.kernel.orga
-Subject: Re: [PATCH] KVM: x86: add a bool variable to distinguish whether to
- use PVIPI
-Message-ID: <YqdxAFhkeLjvi7L5@google.com>
-References: <1655124522-42030-1-git-send-email-wangguangju@baidu.com>
+        with ESMTP id S1350295AbiFMTXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 15:23:25 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B5C34BF71;
+        Mon, 13 Jun 2022 10:20:27 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9632D23A;
+        Mon, 13 Jun 2022 10:20:27 -0700 (PDT)
+Received: from e120937-lin (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F6B23F792;
+        Mon, 13 Jun 2022 10:20:25 -0700 (PDT)
+Date:   Mon, 13 Jun 2022 18:20:15 +0100
+From:   Cristian Marussi <cristian.marussi@arm.com>
+To:     Neeraj Upadhyay <quic_neeraju@quicinc.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, sudeep.holla@arm.com,
+        quic_sramana@quicinc.com, vincent.guittot@linaro.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org,
+        Souvik Chakravarty <Souvik.Chakravarty@arm.com>
+Subject: Re: [RFC 0/3] SCMI Vhost and Virtio backend implementation
+Message-ID: <Yqdxz9lZo5qedTG4@e120937-lin>
+References: <20220609071956.5183-1-quic_neeraju@quicinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1655124522-42030-1-git-send-email-wangguangju@baidu.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220609071956.5183-1-quic_neeraju@quicinc.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The shortlog is not at all helpful, it doesn't say anything about what actual
-functional change.
++CC: Souvik
 
-  KVM: x86: Don't advertise PV IPI to userspace if IPIs are virtualized
+On Thu, Jun 09, 2022 at 12:49:53PM +0530, Neeraj Upadhyay wrote:
+> This RFC series, provides ARM System Control and Management Interface (SCMI)
+> protocol backend implementation for Virtio transport. The purpose of this
 
-On Mon, Jun 13, 2022, wangguangju wrote:
-> Commit d588bb9be1da ("KVM: VMX: enable IPI virtualization")
-> enable IPI virtualization in Intel SPR platform.There is no point
-> in using PVIPI if IPIv is supported, it doesn't work less good
-> with PVIPI than without it.
+Hi Neeraj,
+
+Thanks for this work, I only glanced through the series at first to
+grasp a general understanding of it (without goind into much details for
+now) and I'd have a few questions/concerns that I'll noted down below.
+
+I focused mainly on the backend server aims/functionalities/issues ignoring
+at first the vhost-scmi entry-point since the vost-scmi accelerator is just
+a (more-or-less) standard means of configuring and grabbing SCMI traffic
+from the VMs into the Host Kernel and so I found more interesting at first
+to understand what we can do with such traffic at first.
+(IOW the vhost-scmi layer is welcome but remain to see what to do with it...)
+
+> feature is to provide para-virtualized interfaces to guest VMs, to various
+> hardware blocks like clocks, regulators. This allows the guest VMs to
+> communicate their resource needs to the host, in the absence of direct
+> access to those resources.
+
+In an SCMI stack the agents (like VMs) issue requests to an SCMI platform
+backend that is in charge of policying and armonizing such requests
+eventually denying some of these (possibly malicious) while allowing others
+(possibly armonizing/merging such reqs); with your solution basically the
+SCMI backend in Kernel marshals/conveys all of such SCMI requests to the
+proper Linux Kernel subsystem that is usually in charge of it, using
+dedicated protocol handlers that basically translates SCMI requests to
+Linux APIs calls to the Host. (I may have oversimplified or missed
+something...)
+
+At the price of a bit of overhead and code-duplication introduced by
+this SCMI Backend you can indeed leverage the existing mechanisms for
+resource accounting and sharing included in such Linux subsystems (like
+Clock framework), and that's nice and useful, BUT how do you policy/filter
+(possibly dinamically as VMs come and go) what these VMs can see and do
+with these resources ?
+
+... MORE importantly how do you protect the Host (or another VM) from
+unacceptable (or possibly malicious) requests conveyed from one VM request
+vqueue into the Linux subsystems (like clocks) ?
+
+I saw you have added a good deal of DT bindings for the backend
+describing protocols, so you could just expose only some protocols via
+the backend (if I get it right) but you cannot anyway selectively expose
+only a subset of resources to the different agents, so, if you expose the
+clock protocol, that will be visible by any VMs and an agent could potentially
+kill the Host or mount some clock related attack acting on the right clock.
+(I mean you cannot describe in the Host DT a number X of clocks to be
+supported by the Host Linux Clock framework BUT then expose selectively to
+the SCMI agents only a subset Y < X to shield the Host from misbehaviour...
+...at least not in a dynamic way avoiding to bake a fixed policy into
+the backend...or maybe I'm missing how you can do that, in such a case
+please explain...)
+
+Moreover, in a normal SCMI stack the server resides out of reach from the
+OSPM agents since the server, wherever it sits, has the last word and can
+deny and block unreasonable/malicious requests while armonizing others: this
+means the typical SCMI platform fw is configured in such a way that clearly
+defines a set of policies to be enforced between the access of the various
+agents. (and it can reside in the trusted codebase given its 'reduced'
+size...even though this policies are probably at the moment not so
+dynamically modificable there either...)
+
+With your approach of a Linux Kernel based SCMI platform backend you are
+certainly using all the good and well proven mechanisms offered by the
+Kernel to share and co-ordinate access to such resources, which is good
+(.. even though Linux is not so small in term of codebase to be used as
+a TCB to tell the truth :D), BUT I don't see the same level of policying
+or filtering applied anywhere in the proposed RFCs, especially to protect
+the Host which at the end is supposed to use the same Linux subsystems and
+possibly share some of those resources for its own needs.
+
+I saw the Base protocol basic implementation you provided to expose the
+supported backend protocols to the VMs, it would be useful to see how
+you plan to handle something like the Clock protocol you mention in the
+example below. (if you have Clock protocol backend that as WIP already
+would be interesting to see it...)
+
+Another issue/criticality that comes to my mind is how do you gather in
+general basic resources states/descriptors from the existing Linux subsystems
+(even leaving out any policying concerns): as an example, how do you gather
+from the Host Clock framework the list of available clocks and their rates
+descriptors that you're going expose to a specific VMs once this latter will
+issue the related SCMI commands to get to know which SCMI Clock domain are
+available ?
+(...and I mean in a dynamic way not using a builtin per-platform baked set of
+ resources known to be made available... I doubt that any sort of DT
+ description would be accepted in this regards ...)
+
 > 
-> So add a bool variable to distinguish whether to use PVIPI.
-
-Similar complaint with the changelog, it doesn't actually call out why PV IPIs
-are unwanted.
-
-  Don't advertise PV IPI support to userspace if IPI virtualization is
-  supported by the CPU.  Hardware virtualization of IPIs more performant
-  as senders do not need to exit.
-
-That said, I'm not sure that KVM should actually hide PV_SEND_IPI.  KVM still
-supports the feature, and unlike sched_info_on(), IPI virtualization is platform
-dependent and not fully controlled by software.  E.g. hiding PV_SEND_IPI could
-cause problems when migrating from a platform without IPIv to a platform with IPIv,
-as a paranoid VMM might complain that an exposed feature isn't supported by KVM.
-
-There's also the question of what to do about AVIC.  AVIC has many more inhibits
-than APICv, e.g. an x2APIC guest running on hardware that doesn't accelerate x2APIC
-IPIs will probably be better off with PV IPIs.
-
-Given that userspace should have read access to the module param, I'm tempted to
-say KVM should let userspace make the decision of whether or not to advertise PV
-IPIs to the guest.
-
-> Signed-off-by: wangguangju <wangguangju@baidu.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 +
->  arch/x86/kvm/cpuid.c            | 4 +++-
->  arch/x86/kvm/vmx/vmx.c          | 1 +
->  arch/x86/kvm/x86.c              | 3 +++
->  4 files changed, 8 insertions(+), 1 deletion(-)
+> 1. Architecture overview
+> ---------------------
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index a4b9282..239c1a992 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1671,6 +1671,7 @@ void kvm_fire_mask_notifiers(struct kvm *kvm, unsigned irqchip, unsigned pin,
->  			     bool mask);
->  
->  extern bool tdp_enabled;
-> +extern bool kvm_ipiv_cap_supported;
-
-Please use "struct kvm_caps", which was added specifically to avoid these one-off
-bools.
-
->  u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index d47222a..9643572 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1049,7 +1049,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  			     (1 << KVM_FEATURE_PV_UNHALT) |
->  			     (1 << KVM_FEATURE_PV_TLB_FLUSH) |
->  			     (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
-> -			     (1 << KVM_FEATURE_PV_SEND_IPI) |
->  			     (1 << KVM_FEATURE_POLL_CONTROL) |
->  			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
->  			     (1 << KVM_FEATURE_ASYNC_PF_INT);
-> @@ -1057,6 +1056,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		if (sched_info_on())
->  			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
->  
-> +		if (!kvm_ipiv_cap_supported)
-> +			entry->eax |= (1 << KVM_FEATURE_PV_SEND_IPI);
-> +
->  		entry->ebx = 0;
->  		entry->ecx = 0;
->  		entry->edx = 0;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index f741de4..21b67f4 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4490,6 +4490,7 @@ static int vmx_alloc_ipiv_pid_table(struct kvm *kvm)
->  		return -ENOMEM;
->  
->  	kvm_vmx->pid_table = (void *)page_address(pages);
-> +	kvm_ipiv_cap_supported = true;
-
-This is far too late, as allocation of the table doesn't happen until the first
-VM is created.
-
-E.g.
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b959fe24c13b..73973b5901a3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8221,6 +8221,7 @@ static __init int hardware_setup(void)
-        kvm_caps.tsc_scaling_ratio_frac_bits = 48;
-        kvm_caps.has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();
-        kvm_caps.has_notify_vmexit = cpu_has_notify_vmexit();
-+       kvm_caps.has_ipi_virtualization = enable_ipiv;
-
-        set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
-
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 501b884b8cc4..9b80aa67349f 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -23,6 +23,7 @@ struct kvm_caps {
-        bool has_bus_lock_exit;
-        /* notify VM exit supported? */
-        bool has_notify_vmexit;
-+       bool has_ipi_virtualization;
-
-        u64 supported_mce_cap;
-        u64 supported_xcr0;
-
-
->  	return 0;
->  }
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f9d0c56..099f76f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -226,6 +226,9 @@ EXPORT_SYMBOL_GPL(enable_apicv);
->  u64 __read_mostly host_xss;
->  EXPORT_SYMBOL_GPL(host_xss);
->  
-> +bool __read_mostly kvm_ipiv_cap_supported = false;
-> +EXPORT_SYMBOL_GPL(kvm_ipiv_cap_supported);
-> +
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
->  	KVM_GENERIC_VM_STATS(),
->  	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
-> -- 
-> 2.9.4
+> Below diagram shows the overall software architecture of SCMI communication
+> between guest VM and the host software. In this diagram, guest is a linux
+> VM; also, host uses KVM linux.
 > 
+>          GUEST VM                   HOST
+>  +--------------------+    +---------------------+    +--------------+
+>  |   a. Device A      |    |   k. Device B       |    |      PLL     |
+>  |  (Clock consumer)  |    |  (Clock consumer)   |    |              |
+>  +--------------------+    +---------------------+    +--------------+
+>           |                         |                         ^
+>           v                         v                         |
+>  +--------------------+    +---------------------+    +-----------------+
+>  | b. Clock Framework |    | j. Clock Framework  | -->| l. Clock Driver |
+>  +-- -----------------+    +---------------------+    +-----------------+
+>           |                         ^
+>           v                         |
+>  +--------------------+    +------------------------+
+>  |  c. SCMI Clock     |    | i. SCMI Virtio Backend |
+>  +--------------------+    +------------------------+ 
+>           |                         ^
+>           v                         |
+>  +--------------------+    +----------------------+
+>  |  d. SCMI Virtio    |    |   h. SCMI Vhost      |<-----------+
+>  +--------------------+    +----------------------+            |
+>           |                         ^                          |
+>           v                         |                          |
+> +-------------------------------------------------+    +-----------------+
+> |              e. Virtio Infra                    |    |    g. VMM       |
+> +-------------------------------------------------+    +-----------------+
+>           |                         ^                           ^
+>           v                         |                           |
+> +-------------------------------------------------+             |
+> |                f. Hypervisor                    |-------------
+> +-------------------------------------------------+
+> 
+
+Looking at the above schema and thinking out loud where any dynamic
+policying against the resources can fit (..and trying desperately NOT to push
+that into the Kernel too :P...) ... I think that XEN was trying something similar
+(with a real backend SCMI platform FW at the end of the pipe though I think...) and
+in their case the per-VMs resource allocation was performed using SCMI
+BASE_SET_DEVICE_PERMISSIONS commands issued by the Hypervisor/VMM itself
+I think or by a Dom0 elected as a trusted agent and so allowed to configure
+such resource partitioning ...
+
+https://www.mail-archive.com/xen-devel@lists.xenproject.org/msg113868.html
+
+...maybe a similar approach, with some sort of SCMI Trusted Agent living within
+the VMM and in charge of directing such resources' partitioning between
+VMs by issuing BASE_SET_DEVICE_PERMISSIONS towards the Kernel SCMI Virtio
+Backend, could help keeping at least the policy bits related to the VMs out of
+the kernel/DTs and possibly dynamically configurable following VMs lifecycle.
+
+Even though, in our case ALL the resource management by device ID would have to
+happen in the Kernel SCMI backend at the end, given that is where the SCMI
+platform resides indeed, BUT at least you could keep the effective policy out of
+kernel space, doing something like:
+
+1. VMM/TrustedAgent query Kernel_SCMI_Virtio_backend for available resources
+
+2. VMM/TrustedAg decides resources allocation between VMs (and/or possibly the Host
+   based on some configured policy)
+
+3. VMM/TrustedAgent issues BASE_SET_DEVICE_PERMISSIONS/PROTOCOLS to the
+   Kernel_SCMI_Virtio_backend
+
+4. Kernel_SCMI_Virtio_backend enforces resource partioning and sharing
+   when processing subsequent VMs SCMI requests coming via Vhost-SCMI
+
+...where the TrustedAgent here could be (I guess) the VMM or the Host or
+both with different level of privilege if you don't want the VMM to be able
+to configure resources access for the whole Host.
+
+> a. Device A             This is the client kernel driver in guest VM,
+>                         for ex. diplay driver, which uses standard
+>                         clock framework APIs to vote for a clock.
+> 
+> b. Clock Framework      Underlying kernel clock framework on
+>                         guest.
+> 
+> c. SCMI Clock           SCMI interface based clock driver.
+> 
+> d. SCMI Virtio          Underlying SCMI framework, using Virtio as
+>                         transport driver.
+> 
+> e. Virtio Infra         Virtio drivers on guest VM. These drivers
+>                         initiate virtqueue requests over Virtio
+>                         transport (MMIO/PCI), and forwards response
+>                         to SCMI Virtio registered callbacks.
+> 
+> f. Hypervisor           Hosted Hypervisor (KVM for ex.), which traps
+>                         and forwards requests on virtqueue ring
+>                         buffers to the VMM.
+> 
+> g. VMM                  Virtual Machine Monitor, running on host userspace,
+>                         which manages the lifecycle of guest VMs, and forwards
+>                         guest initiated virtqueue requests as IOCTLs to the
+>                         Vhost driver on host.
+> 
+> h. SCMI Vhost           In kernel driver, which handles SCMI virtqueue
+>                         requests from guest VMs. This driver forwards the
+>                         requests to SCMI Virtio backend driver, and returns
+>                         the response from backend, over the virtqueue ring
+>                         buffers.
+> 
+> i. SCMI Virtio Backend  SCMI backend, which handles the incoming SCMI messages
+>                         from SCMI Vhost driver, and forwards them to the
+>                         backend protocols like clock and voltage protocols.
+>                         The backend protocols uses the host apis for those
+>                         resources like clock APIs provided by clock framework,
+>                         to vote/request for the resource. The response from
+>                         the host api is parceled into a SCMI response message,
+>                         and is returned to the SCMI Vhost driver. The SCMI
+>                         Vhost driver in turn, returns the reponse over the
+>                         Virtqueue reponse buffers.
+> 
+
+Last but not least, this SCMI Virtio Backend layer in charge of
+processing incoming SCMI packets, interfacing with the Linux subsystems
+final backend and building SCMI replies from Linux will introduce a
+certain level of code/funcs duplication given that this same SCMI basic
+processing capabilities have been already baked in the SCMI stacks found in
+SCP and in TF-A (.. and maybe a few other other proprietary backends)...
+
+... but this is something maybe to be addressed in general in a
+different context not something that can be addressed by this series.
+
+Sorry for the usual flood of words :P ... I'll have a more in deep
+review of the series in the next days, for now I wanted just to share my
+concerns and (maybe wrong) understanding and see what you or Sudeep and
+Souvik think about.
+
+Thanks,
+Cristian
+
