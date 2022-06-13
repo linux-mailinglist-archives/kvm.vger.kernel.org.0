@@ -2,145 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5945C5481D1
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 10:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7751054825C
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 10:56:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239648AbiFMINJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 04:13:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37952 "EHLO
+        id S240302AbiFMIvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 04:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239860AbiFMIMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 04:12:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 079AC1EAC4
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 01:12:14 -0700 (PDT)
+        with ESMTP id S240027AbiFMIvA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 04:51:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 83A842608
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 01:50:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655107933;
+        s=mimecast20190719; t=1655110258;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zylh1uwH3+G7KCcoxsL8sX4hSmvWfJyfd8skUX3SqY0=;
-        b=axQK7uuju7sP5HSR22bEUsIqoPHvFMW4uPxKTyKDaDwLXo8/7kKmqDTxKCuOe8uxvjvi7u
-        ono7Y2nsgEPnGyIdgdDEx4Uo3suCfWYdrNyqv58JTaKhth2HESvjOkQTXMhbDCgAFs0KJa
-        NKNK5ryneGb/PJkum1jxfJBpfKiW+3w=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=mpNKgbpx+78NLRf26/oOXOkBqasMpEHURTXeLdxK0yI=;
+        b=EDQ/yHqsg+Cr5cFKZyuK/hbct2b7htcOintF36AVoXlcSFN0hU0gTs9VKddQ14vfe9dneS
+        z/UONkvWaKrLJQO6jFG/ADUZE281FcgQO+zUpwqOnPp06H3b5N3nq6lZxkFvzt7OGKjfo9
+        tzcf56QzgszvIMB/3c/Y+ud20j+lfyA=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-96-4UN9UBGQOJGsD3WyJodglA-1; Mon, 13 Jun 2022 04:12:12 -0400
-X-MC-Unique: 4UN9UBGQOJGsD3WyJodglA-1
-Received: by mail-qv1-f70.google.com with SMTP id q36-20020a0c9127000000b00461e3828064so3397675qvq.12
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 01:12:12 -0700 (PDT)
+ us-mta-557-shBDWq4BOCeHcvoQcXjOHA-1; Mon, 13 Jun 2022 04:50:57 -0400
+X-MC-Unique: shBDWq4BOCeHcvoQcXjOHA-1
+Received: by mail-qk1-f199.google.com with SMTP id h16-20020a05620a401000b006a6b8ac9c64so4531377qko.8
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 01:50:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=zylh1uwH3+G7KCcoxsL8sX4hSmvWfJyfd8skUX3SqY0=;
-        b=diair3EYT5f7ujcjBXHw11gr5QzpO/AGxJCevn2MUwIJ02oS23CwcJ4aQmWhWsF6Fy
-         W48wGQHJyJiUWdp62EgHpMIh/jAiQdqhNd9QgPi4CjjstZPQV7e8RRgtCKUwa42e8Ygl
-         n3UwxCKrwIZnPeRP9jeLcycvyqGwt7QGDR9YMwY5Of64ilyq+7ru3Z1FywfgIE/Izjbj
-         nE98S8cweWZRx3PM2yPTFh772k6ANRkkR/ffVcmSh92i+1F7CW+JGqJ/z1RrOXFQv3sS
-         hrYyrfuFZ6ftqfgN+BAcFY9kcMVFyvb5SEUflNqefN94Xnq1nT8fuxjEOUG7Fjm0NI7x
-         t5LQ==
-X-Gm-Message-State: AOAM532PyYPAEIfcf98QgyOawjCOPZ/y+n/wkGowosBlFB2sPY0kd6VG
-        zalMBHTluGeNYIAlo1DTEpQhmYqj3I6uFxH2DXRifRXZ7yhdPw9LSTaQJNjrm+q1/y2kAOHm4XH
-        Gb6sHblOWD9/O
-X-Received: by 2002:a05:622a:1829:b0:304:ef78:8385 with SMTP id t41-20020a05622a182900b00304ef788385mr29662309qtc.251.1655107931898;
-        Mon, 13 Jun 2022 01:12:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxjLbgha+Atbwd2/672pHZ9TBWRG8nE6aGEjsg4713GAJdcGUXYTIFRS5oET6rQnKiNs5SleA==
-X-Received: by 2002:a05:622a:1829:b0:304:ef78:8385 with SMTP id t41-20020a05622a182900b00304ef788385mr29662298qtc.251.1655107931645;
-        Mon, 13 Jun 2022 01:12:11 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-42-115-130.web.vodafone.de. [109.42.115.130])
-        by smtp.gmail.com with ESMTPSA id j1-20020a05620a410100b006a65c58db99sm6390714qko.64.2022.06.13.01.12.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jun 2022 01:12:11 -0700 (PDT)
-Message-ID: <2d8bcbb1-ee9d-8e88-b01d-88b80da86f13@redhat.com>
-Date:   Mon, 13 Jun 2022 10:12:06 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=mpNKgbpx+78NLRf26/oOXOkBqasMpEHURTXeLdxK0yI=;
+        b=h208S02zfMSD+dvxYXMsh3sS8VbxZrF6FGe5PyUhzif1Z1HAxjhQpcqmbXXUp4K0CT
+         Fj9IeXyU4FiS1YxjpMw6ChoMYGnAsvBnUDM5daei8KN5ALptOT3E+hgGU1fZZBvAamBy
+         6/jtAc1aN2uLl2Ccym3AR2rjce+eSbAFhWI9PW8RVeY9ZaOcppyI2DC4xeEa/OZX9c96
+         ybUoIXuZ5j0aDgUwpckRsvi/3uCYmCXwuv3DuFIju3RBdvnSAIDMaqiplpOeCXJzYH6j
+         IQ/tFxvIpcqcWBp3/vO41B5n3Eud1pVC1ZvDnW7L2K8nGIMbZNV9ozPKnOlGK2fQ1vjA
+         nlsg==
+X-Gm-Message-State: AOAM533BSA0dNPcYBANKVBLcN+3F3MapyWeOR5Nb++RaXh1GCcG2YcEz
+        k2m9/lPcQkj9dFkZbE48LvhbUbrQeuiRomYu3obD2CQ2dBLlCfFozn5JGblV+5KAH/CZWkhooeI
+        LMRPNonBZg0UB
+X-Received: by 2002:ac8:5904:0:b0:304:f0d0:ed16 with SMTP id 4-20020ac85904000000b00304f0d0ed16mr28949946qty.475.1655110257058;
+        Mon, 13 Jun 2022 01:50:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwccVKGRgAaqpV1votdrIxrBJEruzT8HwAeGhXCKLdk7lNXAQV1g1JTpnyocJYZ53WI0waY1Q==
+X-Received: by 2002:ac8:5904:0:b0:304:f0d0:ed16 with SMTP id 4-20020ac85904000000b00304f0d0ed16mr28949936qty.475.1655110256772;
+        Mon, 13 Jun 2022 01:50:56 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
+        by smtp.gmail.com with ESMTPSA id w18-20020ac87192000000b002f9114d2ebcsm4592355qto.17.2022.06.13.01.50.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jun 2022 01:50:56 -0700 (PDT)
+Date:   Mon, 13 Jun 2022 10:50:46 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        kernel <kernel@sberdevices.ru>,
+        Krasnov Arseniy <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v2 3/8] af_vsock: add zerocopy receive logic
+Message-ID: <20220613085046.ee7cb2ye5yq5cbfo@sgarzare-redhat>
+References: <e37fdf9b-be80-35e1-ae7b-c9dfeae3e3db@sberdevices.ru>
+ <129aa328-ad4d-cb2c-4a51-4a2bf9c9be37@sberdevices.ru>
+ <20220609083929.5k37tajo3qli4kr2@sgarzare-redhat>
+ <204f5bc4-987e-a1ff-71e2-e51343e13f24@sberdevices.ru>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v2 000/144] KVM: selftests: Overhaul APIs, purge VCPU_ID
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Anup Patel <anup@brainfault.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        KVM General <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20220603004331.1523888-1-seanjc@google.com>
- <21570ac1-e684-7983-be00-ba8b3f43a9ee@redhat.com>
- <CAAhSdy0_50KshS1rAcOjtFBUu=R7a0uXYa76vNibD_n7s=q6XA@mail.gmail.com>
- <CAAhSdy1N9vwX1aXkdVEvO=MLV7TEWKMB2jxpNNfzT2LUQ-Q01A@mail.gmail.com>
- <YqIKYOtQTvrGpmPV@google.com> <YqKRrK7SwO0lz/6e@google.com>
- <YqKXExV4BOVRbOVc@google.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <YqKXExV4BOVRbOVc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <204f5bc4-987e-a1ff-71e2-e51343e13f24@sberdevices.ru>
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/06/2022 02.57, Sean Christopherson wrote:
-> +s390 folks...
-> 
-> On Fri, Jun 10, 2022, Sean Christopherson wrote:
->> On Thu, Jun 09, 2022, Sean Christopherson wrote:
->>> On Thu, Jun 09, 2022, Anup Patel wrote:
->>>> On Wed, Jun 8, 2022 at 9:26 PM Anup Patel <anup@brainfault.org> wrote:
->>>>>
->>>>> On Tue, Jun 7, 2022 at 8:57 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>>>>
->>>>>> Marc, Christian, Anup, can you please give this a go?
->>>>>
->>>>> Sure, I will try this series.
->>>>
->>>> I tried to apply this series on top of kvm/next and kvm/queue but
->>>> I always get conflicts. It seems this series is dependent on other
->>>> in-flight patches.
+On Thu, Jun 09, 2022 at 12:20:22PM +0000, Arseniy Krasnov wrote:
+>On 09.06.2022 11:39, Stefano Garzarella wrote:
+>> On Fri, Jun 03, 2022 at 05:35:48AM +0000, Arseniy Krasnov wrote:
+>>> This:
+>>> 1) Adds callback for 'mmap()' call on socket. It checks vm
+>>>   area flags and sets vm area ops.
+>>> 2) Adds special 'getsockopt()' case which calls transport
+>>>   zerocopy callback. Input argument is vm area address.
+>>> 3) Adds 'getsockopt()/setsockopt()' for switching on/off rx
+>>>   zerocopy mode.
 >>>
->>> Hrm, that's odd, it's based directly on kvm/queue, commit 55371f1d0c01 ("KVM: ...).
->>
->> Duh, Paolo updated kvm/queue.  Where's Captain Obvious when you need him...
->>
->>>> Is there a branch somewhere in a public repo ?
+>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>>> ---
+>>> include/net/af_vsock.h          |   7 +++
+>>> include/uapi/linux/vm_sockets.h |   3 +
+>>> net/vmw_vsock/af_vsock.c        | 100 ++++++++++++++++++++++++++++++++
+>>> 3 files changed, 110 insertions(+)
 >>>
->>> https://github.com/sean-jc/linux/tree/x86/selftests_overhaul
+>>> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>>> index f742e50207fb..f15f84c648ff 100644
+>>> --- a/include/net/af_vsock.h
+>>> +++ b/include/net/af_vsock.h
+>>> @@ -135,6 +135,13 @@ struct vsock_transport {
+>>>     bool (*stream_is_active)(struct vsock_sock *);
+>>>     bool (*stream_allow)(u32 cid, u32 port);
+>>>
+>>> +    int (*rx_zerocopy_set)(struct vsock_sock *vsk,
+>>> +                   bool enable);
+>>> +    int (*rx_zerocopy_get)(struct vsock_sock *vsk);
+>>> +    int (*zerocopy_dequeue)(struct vsock_sock *vsk,
+>>> +                struct vm_area_struct *vma,
+>>> +                unsigned long addr);
+>>> +
+>>>     /* SEQ_PACKET. */
+>>>     ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+>>>                      int flags);
+>>> diff --git a/include/uapi/linux/vm_sockets.h b/include/uapi/linux/vm_sockets.h
+>>> index c60ca33eac59..d1f792bed1a7 100644
+>>> --- a/include/uapi/linux/vm_sockets.h
+>>> +++ b/include/uapi/linux/vm_sockets.h
+>>> @@ -83,6 +83,9 @@
+>>>
+>>> #define SO_VM_SOCKETS_CONNECT_TIMEOUT_NEW 8
+>>>
+>>> +#define SO_VM_SOCKETS_MAP_RX 9
+>>> +#define SO_VM_SOCKETS_ZEROCOPY 10
+>>> +
+>>> #if !defined(__KERNEL__)
+>>> #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
+>>> #define SO_VM_SOCKETS_CONNECT_TIMEOUT SO_VM_SOCKETS_CONNECT_TIMEOUT_OLD
+>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>> index f04abf662ec6..10061ef21730 100644
+>>> --- a/net/vmw_vsock/af_vsock.c
+>>> +++ b/net/vmw_vsock/af_vsock.c
+>>> @@ -1644,6 +1644,17 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+>>>         }
+>>>         break;
+>>>     }
+>>> +    case SO_VM_SOCKETS_ZEROCOPY: {
+>>> +        if (!transport || !transport->rx_zerocopy_set) {
+>>> +            err = -EOPNOTSUPP;
+>>> +        } else {
+>>> +            COPY_IN(val);
+>>> +
+>>> +            if (transport->rx_zerocopy_set(vsk, val))
+>>> +                err = -EINVAL;
+>>> +        }
+>>> +        break;
+>>> +    }
+>>>
+>>>     default:
+>>>         err = -ENOPROTOOPT;
+>>> @@ -1657,6 +1668,48 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+>>>     return err;
+>>> }
+>>>
+>>> +static const struct vm_operations_struct afvsock_vm_ops = {
+>>> +};
+>>> +
+>>> +static int vsock_recv_zerocopy(struct socket *sock,
+>>> +                   unsigned long address)
+>>> +{
+>>> +    struct sock *sk = sock->sk;
+>>> +    struct vsock_sock *vsk = vsock_sk(sk);
+>>> +    struct vm_area_struct *vma;
+>>> +    const struct vsock_transport *transport;
+>>> +    int res;
+>>> +
+>>> +    transport = vsk->transport;
+>>> +
+>>> +    if (!transport->rx_zerocopy_get)
+>>> +        return -EOPNOTSUPP;
+>>> +
+>>> +    if (!transport->rx_zerocopy_get(vsk))
+>>> +        return -EOPNOTSUPP;
 >>
->> I pushed a new version that's based on the current kvm/queue, commit 5e9402ac128b.
->> arm and x86 look good (though I've yet to test on AMD).
+>> Maybe we can merge in
+>>         if (!transport->rx_zerocopy_get ||
+>>             !transport->rx_zerocopy_get(vsk)}
+>>                 return -EOPNOTSUPP;
 >>
->> Thomas,
->> If you get a chance, could you rerun the s390 tests?  The recent refactorings to
->> use TAP generated some fun conflicts.
+>>> +
+>>> +    if (!transport->zerocopy_dequeue)
+>>> +        return -EOPNOTSUPP;
+>>> +
+>>> +    lock_sock(sk);
+>>> +    mmap_write_lock(current->mm);
+>>
+>> So, multiple threads using different sockets are serialized if they use zero-copy?
+>>
+>> IIUC this is necessary because the callback calls vm_insert_page().
+>>
+>> At this point I think it's better not to do this in every transport, but have the callback return an array of pages to map and we map them here trying to limit as much as possible the critical section to protect with mmap_write_lock().
+>
+>Yes, it will be easy to return array of pages by transport callback,
+>
+>>
+>>> +
+>>> +    vma = vma_lookup(current->mm, address);
+>>> +
+>>> +    if (!vma || vma->vm_ops != &afvsock_vm_ops) {
+>>> +        mmap_write_unlock(current->mm);
+>>> +        release_sock(sk);
+>>> +        return -EINVAL;
+>>> +    }
+>>> +
+>>> +    res = transport->zerocopy_dequeue(vsk, vma, address);
+>>> +
+>>> +    mmap_write_unlock(current->mm);
+>>> +    release_sock(sk);
+>>> +
+>>> +    return res;
+>>> +}
+>>> +
+>>> static int vsock_connectible_getsockopt(struct socket *sock,
+>>>                     int level, int optname,
+>>>                     char __user *optval,
+>>> @@ -1701,6 +1754,39 @@ static int vsock_connectible_getsockopt(struct socket *sock,
+>>>         lv = sock_get_timeout(vsk->connect_timeout, &v,
+>>>                       optname == SO_VM_SOCKETS_CONNECT_TIMEOUT_OLD);
+>>>         break;
+>>> +    case SO_VM_SOCKETS_ZEROCOPY: {
+>>> +        const struct vsock_transport *transport;
+>>> +        int res;
+>>> +
+>>> +        transport = vsk->transport;
+>>> +
+>>> +        if (!transport->rx_zerocopy_get)
+>>> +            return -EOPNOTSUPP;
+>>> +
+>>> +        lock_sock(sk);
+>>
+>> I think we should call lock_sock() before reading the transport to avoid races and we should check if it is assigned.
+>>
+>> At that point I think is better to store this info in vsock_sock and not in the transport.
+>You mean to store flag that zerocopy is enabled in 'vsock_sock', just reading it here, without touching transport?
 
-Still works fine!
-Tested-by: Thomas Huth <thuth@redhat.com>
+Yep.
 
->> Speaking of TAP, I added a patch to convert __TEST_REQUIRE to use ksft_exit_skip()
->> instead of KVM's custom print_skip().  The s390 tests are being converted to use
->> TAP output, I couldn't see any advantage of KVM's arbitrary "skipping test" over
->> TAP-friendly output, and converting everything is far easier than special casing s390.
-
-Sounds like a good idea to me. I already considered starting to convert some 
-x86 tests, too 
-(https://lore.kernel.org/linux-kselftest/20220429071149.488114-1-thuth@redhat.com 
-), but didn't get much feedback there yet, but anyway, we'll be better 
-prepared with your change for that now.
-
-  Thomas
+Thanks,
+Stefano
 
