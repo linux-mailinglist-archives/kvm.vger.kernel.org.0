@@ -2,203 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 814DE548030
-	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 09:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6627354806C
+	for <lists+kvm@lfdr.de>; Mon, 13 Jun 2022 09:27:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239014AbiFMHNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 03:13:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38300 "EHLO
+        id S239263AbiFMH0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 03:26:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238948AbiFMHNJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 03:13:09 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2065.outbound.protection.outlook.com [40.107.93.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289031A3B4
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 00:13:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I1YGuk8oC+tnwteFNYzaiwOBB7+lAc5YoyVmUbMXvqrEHKfTNYmw61WTAppZ0loOwHnpgEEkhNEUVAtfk1FWAL9de7TvLCv0SqWfIXOZF6lUgf40kXtJWd0ZtbKhT1NVqZ4TQZVWDYWZ/868mDNRBxnshqrGYRkTWfIgRtxC/LEUIrBFYymG5bxqWPphmrV0wmdRcWS8lF2v85TTwIrnQ9UmuebGteROW0OH3X/N76cxq/WdBNUsydCubC6ktzXwO59UJbQjTZajNh3zDweH9vs+oNAtajy/pzrAye+GJd5l+Yh2RGmKQuIkGYPDhDIOn4B5c+O6YCE7R1WgVmUhuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JedgFLMCG7Sv4O0OD3glQMvonjoHycppnjIz8TIPuiY=;
- b=DWkF9sZp6UpME/C82ohF6nBVypqQmST67E7/iKYqdDYwuZ4YkJfoMXMjxwfuUyblQuEZewZc0ANijeB5eL4chaQlHiEKH53yaWpbHokaLQe0q0i9otm7A2I335fCehK+hzo85Qj/vq7wmcFDGYA06SmgMYEDbXkqP9GxSqy4EQrVQ07OJe1/+J9XtsRtHH0iFWJ06l9mJxiEPd/MMwr5zLmmUs3uUYB2Lqt0d15fFPrHTmf+WezSNwVVXzS+MVEuHXArL226gFvydvFvtgzsViea1oe6aSra/0M3yPIkDWi6wClAUcjTgL/QMAnmRsFWWsHRn38eeCFRGMffLoADxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JedgFLMCG7Sv4O0OD3glQMvonjoHycppnjIz8TIPuiY=;
- b=q2nLziW/TGp7yeCjYxD7MjK+lNLCxOjllkq0zNTrrr/F4JBMjXHSFPqkH+M8ZFdj9R5a7qhf/CzJq8MAxsbqhewRzZB2gyu5+O0zQphnWkSrkVKcST2b6nMmDi1oa5/r7fVyg2duxvU2+Z6XBMDWtT2/INdZ7wo/0aM7N2auXvhc7c5gX7798nCxjEcGRisI3ZPtVs1BX9U5VSgT8NnQ1Vf415XWkbZsPaLzGw8qyeNqJf3uGwoTHRDkAVxD18lQhwhWmuqdfC8VMfT+J7liHvpeIBnYjomQNaMgur8tg8TCuvgBGWQh012sbEr3VtBgC1nxmAs88qDXzSuuP/zamQ==
-Received: from MW4PR04CA0048.namprd04.prod.outlook.com (2603:10b6:303:6a::23)
- by LV2PR12MB5965.namprd12.prod.outlook.com (2603:10b6:408:172::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.19; Mon, 13 Jun
- 2022 07:13:06 +0000
-Received: from CO1NAM11FT019.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:6a:cafe::21) by MW4PR04CA0048.outlook.office365.com
- (2603:10b6:303:6a::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.13 via Frontend
- Transport; Mon, 13 Jun 2022 07:13:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- CO1NAM11FT019.mail.protection.outlook.com (10.13.175.57) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5332.12 via Frontend Transport; Mon, 13 Jun 2022 07:13:06 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Mon, 13 Jun
- 2022 07:13:05 +0000
-Received: from [172.27.11.221] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Mon, 13 Jun
- 2022 00:13:02 -0700
-Message-ID: <2c917ec1-6d4f-50a4-a391-8029c3a3228b@nvidia.com>
-Date:   Mon, 13 Jun 2022 10:13:01 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH vfio 2/2] vfio: Split migration ops from main device ops
+        with ESMTP id S231228AbiFMH0x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 03:26:53 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A481AD8B;
+        Mon, 13 Jun 2022 00:26:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655105212; x=1686641212;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=cvLueTdmhN3hJgNVAvOLkfvWJp0QJnKpGRgdoW7g6VE=;
+  b=nfRSQvRQpDQv+Q6YJ1mC2M6tWlpno4GogSkgD2LFC2EPr11am+Zanjvv
+   Ol0LQQRe3DAyQvVUn1qhyTU4/O1e6NFafDX9xJN+GMOJdkEV6gcBJqtiV
+   IAxIY2BvR55bJ6U77VsmuK8TF+ydQnny8YGaFNUnRQj22bvwQUdio40Gg
+   wmUH/feKABVAPrnWmaF/D1b+qMSUJsZd0BoE6cZxOQpr/TBH5xWInwfBd
+   XklN/4kvpUWufsOHSYe1CzKRntGlpiSlbw3SWYAtquO+Uvu9aWOKyjoD+
+   fsf0IuXsk9FzpL7BOBYvyv/uULNkANGXGttH8ee58lbxngDGWEZcUjMrs
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10376"; a="275728700"
+X-IronPort-AV: E=Sophos;i="5.91,296,1647327600"; 
+   d="scan'208";a="275728700"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2022 00:26:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,296,1647327600"; 
+   d="scan'208";a="582101815"
+Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
+  by orsmga007.jf.intel.com with ESMTP; 13 Jun 2022 00:26:52 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Mon, 13 Jun 2022 00:26:51 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Mon, 13 Jun 2022 00:26:51 -0700
+Received: from fmsmsx612.amr.corp.intel.com ([10.18.126.92]) by
+ fmsmsx612.amr.corp.intel.com ([10.18.126.92]) with mapi id 15.01.2308.027;
+ Mon, 13 Jun 2022 00:26:51 -0700
+From:   "Sang, Oliver" <oliver.sang@intel.com>
+To:     "Qiang, Chenyi" <chenyi.qiang@intel.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "Chen, Farrah" <farrah.chen@intel.com>,
+        "Wei, Danmei" <danmei.wei@intel.com>,
+        "lkp@lists.01.org" <lkp@lists.01.org>, lkp <lkp@intel.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>
+Subject: RE: [KVM]  a5202946dc: kernel-selftests.kvm.make_fail
+Thread-Topic: [KVM]  a5202946dc: kernel-selftests.kvm.make_fail
+Thread-Index: AQHYfsSs2wejXgf5QkCfnMMhu7wPqK1NLIaA///Dp1A=
+Date:   Mon, 13 Jun 2022 07:26:51 +0000
+Message-ID: <d16188160405497a9ea9b206e4178730@intel.com>
+References: <20220613012644.GA7252@xsang-OptiPlex-9020>
+ <SA2PR11MB50525D04633E934148F8132781AB9@SA2PR11MB5052.namprd11.prod.outlook.com>
+In-Reply-To: <SA2PR11MB50525D04633E934148F8132781AB9@SA2PR11MB5052.namprd11.prod.outlook.com>
+Accept-Language: zh-CN, en-US
 Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "maorg@nvidia.com" <maorg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "liulongfang@huawei.com" <liulongfang@huawei.com>
-References: <20220606085619.7757-1-yishaih@nvidia.com>
- <20220606085619.7757-3-yishaih@nvidia.com>
- <BN9PR11MB5276F5548A4448B506A8F66A8CA69@BN9PR11MB5276.namprd11.prod.outlook.com>
-From:   Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <BN9PR11MB5276F5548A4448B506A8F66A8CA69@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0e9969ad-b22c-4826-ca5c-08da4d0c29bb
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5965:EE_
-X-Microsoft-Antispam-PRVS: <LV2PR12MB5965204ECAA8438243E9882DC3AB9@LV2PR12MB5965.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pNLc6zx6yzkKo7Y5gZfedXolPu2mzguy+QJJb/OHsyHbm0WDFo3p2/B12QwndwLfQObYMXW7t3CrXxpH0ajtxVRcprNpsc07Uyc8DEbKUmlabCdqs47CNLqKrRlPX8nGaOL1dXX9dG1TbMWUH12DuH34YUB+51cj31E/JYb40Q8BvTcclDGGI+w4+x2kCsTPIcUIWcgBBYrdnS/Ft98pVK9JKk7o9+BBS+XrQIgfNbOX+/7qttBD4DBbfNH3C2P7C+zzXt2s7z7NE8jJbPN0vrDWssbduypod+MbRlaBLKE20KNyBcU+dnubMG4YGNVaAbOKZV7/PuCZodJz6MwJSal2mupdSfsU9Coj5a107AoXWNzfS/Xeh4jyD9eb91G6QRHd/MR2pgQtXsTTnz1zZGknK41/YkHm3oKdnSXGN9xf4yHPORoGkvnfV2dZ6ytyRs4mOTRIKKoU++eNmgIfdbz/N7CWn5Znth2M1GfsSjPHpDKx72iTqDTc0UI0/8tiTiSBPJpT3dBx77zsreOIkml7n1gElrrxADQQO57l8VxlH5w3chudTMfkkOboMnZzbXuKrIqvuSP9UxioXsyQNA57k7hNMywkUsmBF4EzZ3fleWxZI1mqUWdNUs6BjuC4oD4fTet7y75tR/U6LREgij6fIyvITK7BGLBdMUfRmN1GUykYqw7ePZFIbdGsRaNtXl+B04ZBjCS5oDWZQkGYywB9YirbxiCbyC4we7pOxIbW6MSdSiicduyUUFFIcVHi
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(40470700004)(36840700001)(46966006)(2906002)(16526019)(356005)(36860700001)(16576012)(508600001)(81166007)(36756003)(316002)(26005)(53546011)(86362001)(83380400001)(426003)(336012)(47076005)(40460700003)(31696002)(82310400005)(8676002)(54906003)(110136005)(4326008)(2616005)(70586007)(5660300002)(8936002)(31686004)(186003)(70206006)(43740500002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2022 07:13:06.0215
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e9969ad-b22c-4826-ca5c-08da4d0c29bb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT019.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5965
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.6.500.17
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/06/2022 6:32, Tian, Kevin wrote:
->> From: Yishai Hadas <yishaih@nvidia.com>
->> Sent: Monday, June 6, 2022 4:56 PM
->>
->> vfio core checks whether the driver sets some migration op (e.g.
->> set_state/get_state) and accordingly calls its op.
->>
->> However, currently mlx5 driver sets the above ops without regards to its
->> migration caps.
->>
->> This might lead to unexpected usage/Oops if user space may call to the
->> above ops even if the driver doesn't support migration. As for example,
->> the migration state_mutex is not initialized in that case.
->>
->> The cleanest way to manage that seems to split the migration ops from
->> the main device ops, this will let the driver setting them separately
->> from the main ops when it's applicable.
->>
->> As part of that, changed HISI driver to match this scheme.
->>
->> This scheme may enable down the road to come with some extra group of
->> ops (e.g. DMA log) that can be set without regards to the other options
->> based on driver caps.
->>
->> Fixes: 6fadb021266d ("vfio/mlx5: Implement vfio_pci driver for mlx5 devices")
->> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>, with one nit:
-
-Thanks Kevin, please see below.
-
->
->> @@ -1534,8 +1534,8 @@ vfio_ioctl_device_feature_mig_device_state(struct
->> vfio_device *device,
->>   	struct file *filp = NULL;
->>   	int ret;
->>
->> -	if (!device->ops->migration_set_state ||
->> -	    !device->ops->migration_get_state)
->> +	if (!device->mig_ops->migration_set_state ||
->> +	    !device->mig_ops->migration_get_state)
->>   		return -ENOTTY;
-> ...
->
->> @@ -1582,8 +1583,8 @@ static int
->> vfio_ioctl_device_feature_migration(struct vfio_device *device,
->>   	};
->>   	int ret;
->>
->> -	if (!device->ops->migration_set_state ||
->> -	    !device->ops->migration_get_state)
->> +	if (!device->mig_ops->migration_set_state ||
->> +	    !device->mig_ops->migration_get_state)
->>   		return -ENOTTY;
->>
-> Above checks can be done once when the device is registered then
-> here replaced with a single check on device->mig_ops.
->
-I agree, it may look as of below.
-
-Theoretically, this could be done even before this patch upon device 
-registration.
-
-We could check that both 'ops' were set and *not* only one of and later 
-check for the specific 'op' upon the feature request.
-
-Alex,
-
-Do you prefer to switch to the below as part of V2 or stay as of current 
-submission and I'll just add Kevin as Reviewed-by ?
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c 
-b/drivers/vfio/pci/vfio_pci_core.c
-index a0d69ddaf90d..f42102a03851 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1855,6 +1855,11 @@ int vfio_pci_core_register_device(struct 
-vfio_pci_core_device *vdev)
-         if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
-                 return -EINVAL;
-
-+       if (vdev->vdev.mig_ops &&
-+          !(vdev->vdev.mig_ops->migration_get_state &&
-+            vdev->vdev.mig_ops->migration_get_state))
-+               return -EINVAL;
-+
-
-Yishai
-
+SGkgQ2hlbnlpLA0KDQo+IEZyb206IFFpYW5nLCBDaGVueWkgPGNoZW55aS5xaWFuZ0BpbnRlbC5j
+b20+DQo+IFNlbnQ6IE1vbmRheSwgSnVuZSAxMywgMjAyMiAxMjowMiBQTQ0KPiANCj4gSGkgT2xp
+dmVyDQo+IA0KPiBJIGZvdW5kIHRoaXMgaXNzdWUgaXMgYWxyZWFkeSBmaXhlZCBieSBTZWFuIGlu
+IHF1ZXVlIGJyYW5jaC4gVGhhbmtzIGZvciB5b3VyDQo+IHRlc3RpbmcgYW5kIHJlcG9ydC4NCg0K
+VGhhbmtzIGEgbG90IGZvciBpbmZvcm1hdGlvbiENCg0KPiANCj4gVGhhbmtzDQo+IENoZW55aQ0K
+PiANCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2FuZywgT2xpdmVyIDxv
+bGl2ZXIuc2FuZ0BpbnRlbC5jb20+DQo+IFNlbnQ6IE1vbmRheSwgSnVuZSAxMywgMjAyMiA5OjI3
+IEFNDQo+IFRvOiBRaWFuZywgQ2hlbnlpIDxjaGVueWkucWlhbmdAaW50ZWwuY29tPg0KPiBDYzog
+UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT47IENocmlzdG9waGVyc29uLCwgU2Vh
+bg0KPiA8c2VhbmpjQGdvb2dsZS5jb20+OyBMS01MIDxsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwu
+b3JnPjsNCj4ga3ZtQHZnZXIua2VybmVsLm9yZzsgSHUsIFJvYmVydCA8cm9iZXJ0Lmh1QGludGVs
+LmNvbT47IENoZW4sIEZhcnJhaA0KPiA8ZmFycmFoLmNoZW5AaW50ZWwuY29tPjsgV2VpLCBEYW5t
+ZWkgPGRhbm1laS53ZWlAaW50ZWwuY29tPjsNCj4gbGtwQGxpc3RzLjAxLm9yZzsgbGtwIDxsa3BA
+aW50ZWwuY29tPjsgSGFvLCBYdWRvbmcgPHh1ZG9uZy5oYW9AaW50ZWwuY29tPg0KPiBTdWJqZWN0
+OiBbS1ZNXSBhNTIwMjk0NmRjOiBrZXJuZWwtc2VsZnRlc3RzLmt2bS5tYWtlX2ZhaWwNCj4gDQo+
+IA0KPiANCj4gR3JlZXRpbmcsDQo+IA0KPiBGWUksIHdlIG5vdGljZWQgdGhlIGZvbGxvd2luZyBj
+b21taXQgKGJ1aWx0IHdpdGggZ2NjLTExKToNCj4gDQo+IGNvbW1pdDogYTUyMDI5NDZkYzdiMjBi
+ZjJhYmUxYmQzNWFkZjJmNDZhYTE1NWFjMCAoIktWTTogc2VsZnRlc3RzOiBBZGQgYQ0KPiB0ZXN0
+IHRvIGdldC9zZXQgdHJpcGxlIGZhdWx0IGV2ZW50IikgaHR0cHM6Ly9naXQua2VybmVsLm9yZy9j
+Z2l0L3ZpcnQva3ZtL2t2bS5naXQNCj4gbGJyLWZvci13ZWlqaWFuZw0KPiANCj4gaW4gdGVzdGNh
+c2U6IGtlcm5lbC1zZWxmdGVzdHMNCj4gdmVyc2lvbjoga2VybmVsLXNlbGZ0ZXN0cy14ODZfNjQt
+ZDg4OWIxNTEtMV8yMDIyMDYwOA0KPiB3aXRoIGZvbGxvd2luZyBwYXJhbWV0ZXJzOg0KPiANCj4g
+CWdyb3VwOiBrdm0NCj4gCXVjb2RlOiAweGVjDQo+IA0KPiB0ZXN0LWRlc2NyaXB0aW9uOiBUaGUg
+a2VybmVsIGNvbnRhaW5zIGEgc2V0IG9mICJzZWxmIHRlc3RzIiB1bmRlciB0aGUNCj4gdG9vbHMv
+dGVzdGluZy9zZWxmdGVzdHMvIGRpcmVjdG9yeS4gVGhlc2UgYXJlIGludGVuZGVkIHRvIGJlIHNt
+YWxsIHVuaXQgdGVzdHMgdG8NCj4gZXhlcmNpc2UgaW5kaXZpZHVhbCBjb2RlIHBhdGhzIGluIHRo
+ZSBrZXJuZWwuDQo+IHRlc3QtdXJsOiBodHRwczovL3d3dy5rZXJuZWwub3JnL2RvYy9Eb2N1bWVu
+dGF0aW9uL2tzZWxmdGVzdC50eHQNCj4gDQo+IA0KPiBvbiB0ZXN0IG1hY2hpbmU6IDggdGhyZWFk
+cyBJbnRlbChSKSBDb3JlKFRNKSBpNy02NzAwIENQVSBAIDMuNDBHSHogd2l0aCAyOEcNCj4gbWVt
+b3J5DQo+IA0KPiBjYXVzZWQgYmVsb3cgY2hhbmdlcyAocGxlYXNlIHJlZmVyIHRvIGF0dGFjaGVk
+IGRtZXNnL2ttc2cgZm9yIGVudGlyZQ0KPiBsb2cvYmFja3RyYWNlKToNCj4gDQo+IA0KPiANCj4g
+DQo+IElmIHlvdSBmaXggdGhlIGlzc3VlLCBraW5kbHkgYWRkIGZvbGxvd2luZyB0YWcNCj4gUmVw
+b3J0ZWQtYnk6IGtlcm5lbCB0ZXN0IHJvYm90IDxvbGl2ZXIuc2FuZ0BpbnRlbC5jb20+DQo+IA0K
+PiANCj4gDQo+IGdjYyAtV2FsbCAtV3N0cmljdC1wcm90b3R5cGVzIC1XdW5pbml0aWFsaXplZCAt
+TzIgLWcgLXN0ZD1nbnU5OSAtZm5vLXN0YWNrLQ0KPiBwcm90ZWN0b3IgLWZuby1QSUUgLUkuLi8u
+Li8uLi8uLi90b29scy9pbmNsdWRlIC1JLi4vLi4vLi4vLi4vdG9vbHMvYXJjaC94ODYvaW5jbHVk
+ZSAtDQo+IEkuLi8uLi8uLi8uLi91c3IvaW5jbHVkZS8gLUlpbmNsdWRlIC1JeDg2XzY0IC1JaW5j
+bHVkZS94ODZfNjQgLUkuLiAgICAtcHRocmVhZCAgLW5vLXBpZQ0KPiB4ODZfNjQvdHJpcGxlX2Zh
+dWx0X2V2ZW50X3Rlc3QuYyAvdXNyL3NyYy9wZXJmX3NlbGZ0ZXN0cy14ODZfNjQtcmhlbC04LjMt
+DQo+IGtzZWxmdGVzdHMtDQo+IGE1MjAyOTQ2ZGM3YjIwYmYyYWJlMWJkMzVhZGYyZjQ2YWExNTVh
+YzAvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2xpYmsNCj4gdm0uYSAgLW8gL3Vzci9zcmMv
+cGVyZl9zZWxmdGVzdHMteDg2XzY0LXJoZWwtOC4zLWtzZWxmdGVzdHMtDQo+IGE1MjAyOTQ2ZGM3
+YjIwYmYyYWJlMWJkMzVhZGYyZjQ2YWExNTVhYzAvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3Zt
+L3g4Ng0KPiBfNjQvdHJpcGxlX2ZhdWx0X2V2ZW50X3Rlc3QNCj4geDg2XzY0L3RyaXBsZV9mYXVs
+dF9ldmVudF90ZXN0LmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6DQo+IHg4Nl82NC90cmlwbGVf
+ZmF1bHRfZXZlbnRfdGVzdC5jOjUwOjEwOiBlcnJvcjoNCj4g4oCYS1ZNX0NBUF9UUklQTEVfRkFV
+TFRfRVZFTlTigJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pOyBkaWQg
+eW91DQo+IG1lYW4g4oCYS1ZNX0NBUF9YODZfVFJJUExFX0ZBVUxUX0VWRU5U4oCZPw0KPiAgICA1
+MCB8ICAgLmNhcCA9IEtWTV9DQVBfVFJJUExFX0ZBVUxUX0VWRU5ULA0KPiAgICAgICB8ICAgICAg
+ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQo+ICAgICAgIHwgICAgICAgICAgS1ZNX0NB
+UF9YODZfVFJJUExFX0ZBVUxUX0VWRU5UDQo+IHg4Nl82NC90cmlwbGVfZmF1bHRfZXZlbnRfdGVz
+dC5jOjUwOjEwOiBub3RlOiBlYWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBpcw0KPiByZXBvcnRl
+ZCBvbmx5IG9uY2UgZm9yIGVhY2ggZnVuY3Rpb24gaXQgYXBwZWFycyBpbg0KPiBtYWtlOiAqKiog
+Wy4uL2xpYi5tazoxNTI6IC91c3Ivc3JjL3BlcmZfc2VsZnRlc3RzLXg4Nl82NC1yaGVsLTguMy1r
+c2VsZnRlc3RzLQ0KPiBhNTIwMjk0NmRjN2IyMGJmMmFiZTFiZDM1YWRmMmY0NmFhMTU1YWMwL3Rv
+b2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS94ODYNCj4gXzY0L3RyaXBsZV9mYXVsdF9ldmVudF90
+ZXN0XSBFcnJvciAxDQo+IG1ha2U6IExlYXZpbmcgZGlyZWN0b3J5ICcvdXNyL3NyYy9wZXJmX3Nl
+bGZ0ZXN0cy14ODZfNjQtcmhlbC04LjMta3NlbGZ0ZXN0cy0NCj4gYTUyMDI5NDZkYzdiMjBiZjJh
+YmUxYmQzNWFkZjJmNDZhYTE1NWFjMC90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0nDQo+IA0K
+PiANCj4gDQo+IFRvIHJlcHJvZHVjZToNCj4gDQo+ICAgICAgICAgZ2l0IGNsb25lIGh0dHBzOi8v
+Z2l0aHViLmNvbS9pbnRlbC9sa3AtdGVzdHMuZ2l0DQo+ICAgICAgICAgY2QgbGtwLXRlc3RzDQo+
+ICAgICAgICAgc3VkbyBiaW4vbGtwIGluc3RhbGwgam9iLnlhbWwgICAgICAgICAgICMgam9iIGZp
+bGUgaXMgYXR0YWNoZWQgaW4gdGhpcyBlbWFpbA0KPiAgICAgICAgIGJpbi9sa3Agc3BsaXQtam9i
+IC0tY29tcGF0aWJsZSBqb2IueWFtbCAjIGdlbmVyYXRlIHRoZSB5YW1sIGZpbGUgZm9yIGxrcCBy
+dW4NCj4gICAgICAgICBzdWRvIGJpbi9sa3AgcnVuIGdlbmVyYXRlZC15YW1sLWZpbGUNCj4gDQo+
+ICAgICAgICAgIyBpZiBjb21lIGFjcm9zcyBhbnkgZmFpbHVyZSB0aGF0IGJsb2NrcyB0aGUgdGVz
+dCwNCj4gICAgICAgICAjIHBsZWFzZSByZW1vdmUgfi8ubGtwIGFuZCAvbGtwIGRpciB0byBydW4g
+ZnJvbSBhIGNsZWFuIHN0YXRlLg0KPiANCj4gDQo+IA0KPiAtLQ0KPiAwLURBWSBDSSBLZXJuZWwg
+VGVzdCBTZXJ2aWNlDQo+IGh0dHBzOi8vMDEub3JnL2xrcA0KPiANCj4gDQoNCg==
