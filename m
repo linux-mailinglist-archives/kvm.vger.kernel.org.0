@@ -2,86 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0666154AEFB
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 13:05:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FA1254AFBF
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 14:02:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347495AbiFNLFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 07:05:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56830 "EHLO
+        id S1356176AbiFNMCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 08:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241526AbiFNLFa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 07:05:30 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F83E427C7;
-        Tue, 14 Jun 2022 04:05:29 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25E9r2vJ001765;
-        Tue, 14 Jun 2022 11:05:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=CnX0mQNoGiPeHfBu13OM9XfUOR80CVwSXQ7qy7N+sHY=;
- b=YPXTd4x1A3V1TQFsve8NM3z9AunEdCZdqAI7xXJT3B9VBP6AKx5d1hKN95Ok9oYHH68o
- UcX5JL4sj3sfHKu8rDM9l206/2WLiY5FoRrTjP7clqb1U0VpE+jQtmmL1m6FLoERIuHG
- a0PXhPlfezeL2ittc4wEoNG5DJN3Bbpgk/4JI017juRSG61pMkHUuvDAzUmNp1KSmuPh
- kYx7YXG8Ofu6N0z5TLKF6Q/ZgJ/pcCAtF4SxwhdPxOViJqVzccP7+zPiwGgZVFDVDCZR
- ddHgbwkJVQSWH29bMlfmOfxxf2brTsWd/d4ZaTnB0JJh18NmkNEm+wKpreouTudoIsQ9 Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpr3f1rdk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jun 2022 11:05:28 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25EAmPGC019687;
-        Tue, 14 Jun 2022 11:05:27 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpr3f1rcs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jun 2022 11:05:27 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25EAomnN032376;
-        Tue, 14 Jun 2022 11:05:25 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 3gmjp8u95w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jun 2022 11:05:25 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25EB5MM715663516
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Jun 2022 11:05:22 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F74942041;
-        Tue, 14 Jun 2022 11:05:22 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C41A42045;
-        Tue, 14 Jun 2022 11:05:22 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 14 Jun 2022 11:05:22 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        scgl@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v6 1/1] s390x: add migration test for storage keys
-Date:   Tue, 14 Jun 2022 13:05:21 +0200
-Message-Id: <20220614110521.123205-2-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220614110521.123205-1-nrb@linux.ibm.com>
-References: <20220614110521.123205-1-nrb@linux.ibm.com>
+        with ESMTP id S1356088AbiFNMCI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 08:02:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E4A248323
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 05:01:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655208119;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o96R2liK/Rw+rA+r9jCufpYDG8GL1tJQ/8vEiFbyM6o=;
+        b=WzX++k2nAc/2RHz9J242mTwhddSTaO3k1X7mOUOa5UjIoq7HGniNrHH0aHc24YMcZDITTf
+        jcSSjR84ndbH1DbPhdFYB9YiJQNqIhFjKb00zGaA7XJXoGbTHJSAHzLzlXCM62mF1i7Wjl
+        SW19+slh2XHpBFra06D0P5o+JzaqhKs=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-488-lPf57nTLMaKlPD5JT6uWZQ-1; Tue, 14 Jun 2022 08:01:57 -0400
+X-MC-Unique: lPf57nTLMaKlPD5JT6uWZQ-1
+Received: by mail-ej1-f70.google.com with SMTP id gr1-20020a170906e2c100b006fefea3ec0aso2753479ejb.14
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 05:01:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:cc:subject:in-reply-to:references
+         :date:message-id:mime-version;
+        bh=o96R2liK/Rw+rA+r9jCufpYDG8GL1tJQ/8vEiFbyM6o=;
+        b=saSj2Fi0bgTLmmp9WTaLs7e5eAOyHEij/uKZWNcMa9mkirqLut2/ISwQXr45CVcCio
+         VkiDX1Rf66iLfF9DwWgVQZRuzrBlpgHyqTn/kbPDepkhNosa5Z2QxPmpusn5875x8grc
+         0xC5Ws9yBJHx3XrIAvXNV7xxglPhBTE2jq6ocQaPilLk1nLhD1q7QPJs7m/FKwZ3eQ12
+         2PXt6zACYWrQCCDW5CYDGxdlEyRTow8Lw94hgQ9qKhQSNbQm1NDY4yAL+hfxp8ouPgBN
+         vcXb0K1M58GWNySlWnE6xt79dhE7nediQKvaHDL/iNEzcfRHSEDSLJoIq+HR1+t2Hzn6
+         YrFw==
+X-Gm-Message-State: AOAM532vO05Vbf5C5Cpp9qMSTCuOiJUT4PYhYmeEdlQEwqul4gAlUcNG
+        PP/fkHuY+U4SZVJZ7Wyd4KmF+I2J2q12YCoIW2WOfjKdyDicXa/dyO1+VdoyjeRvOsy4lWs0CS6
+        s1LExQiYG8FmR
+X-Received: by 2002:a05:6402:b09:b0:42d:bd80:11ac with SMTP id bm9-20020a0564020b0900b0042dbd8011acmr5697602edb.244.1655208116045;
+        Tue, 14 Jun 2022 05:01:56 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tEtZpjxqfX31iR1J4Bw5cOqOaEdjuVhAslKHGEPsqyrNUbKoaC6+E3Rv9RKO/BWr1fuea/Iw==
+X-Received: by 2002:a05:6402:b09:b0:42d:bd80:11ac with SMTP id bm9-20020a0564020b0900b0042dbd8011acmr5697568edb.244.1655208115822;
+        Tue, 14 Jun 2022 05:01:55 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id v14-20020a056402348e00b0042dc25fdf5bsm7112494edc.29.2022.06.14.05.01.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jun 2022 05:01:55 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Dongliang Mu <dzm91@hust.edu.cn>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Cc:     mudongliang <mudongliangabcd@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] x86: kvm: remove NULL check before kfree
+In-Reply-To: <20220614085035.122521-1-dzm91@hust.edu.cn>
+References: <20220614085035.122521-1-dzm91@hust.edu.cn>
+Date:   Tue, 14 Jun 2022 14:01:54 +0200
+Message-ID: <87zgifihcd.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: s71FgHgDPsEJ-rAiBhNT87FsYJgk6uWc
-X-Proofpoint-GUID: GKxYjrEKHY190MqAPChrINxSh-LWTH5-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-14_03,2022-06-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 adultscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- bulkscore=0 suspectscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206140044
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,135 +82,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upon migration, we expect storage keys set by the guest to be preserved, so add
-a test for it.
+Dongliang Mu <dzm91@hust.edu.cn> writes:
 
-We keep 128 pages and set predictable storage keys. Then, we migrate and check
-that they can be read back and match the value originally set.
+> From: mudongliang <mudongliangabcd@gmail.com>
+>
+> kfree can handle NULL pointer as its argument.
+> According to coccinelle isnullfree check, remove NULL check
+> before kfree operation.
+>
+> Signed-off-by: mudongliang <mudongliangabcd@gmail.com>
+> ---
+>  arch/x86/kernel/kvm.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 1a3658f7e6d9..d4e48b4a438b 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -236,8 +236,7 @@ void kvm_async_pf_task_wake(u32 token)
+>  	raw_spin_unlock(&b->lock);
+>  
+>  	/* A dummy token might be allocated and ultimately not used.  */
+> -	if (dummy)
+> -		kfree(dummy);
+> +	kfree(dummy);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_async_pf_task_wake);
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- s390x/Makefile         |  1 +
- s390x/migration-skey.c | 83 ++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg    |  4 ++
- 3 files changed, 88 insertions(+)
- create mode 100644 s390x/migration-skey.c
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 1877c8a6e86e..efd5e0c13102 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -33,6 +33,7 @@ tests += $(TEST_DIR)/adtl-status.elf
- tests += $(TEST_DIR)/migration.elf
- tests += $(TEST_DIR)/pv-attest.elf
- tests += $(TEST_DIR)/migration-cmm.elf
-+tests += $(TEST_DIR)/migration-skey.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-new file mode 100644
-index 000000000000..b7bd82581abe
---- /dev/null
-+++ b/s390x/migration-skey.c
-@@ -0,0 +1,83 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Storage Key migration tests
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/facility.h>
-+#include <asm/page.h>
-+#include <asm/mem.h>
-+#include <asm/interrupt.h>
-+#include <hardware.h>
-+
-+#define NUM_PAGES 128
-+static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-+
-+static void test_migration(void)
-+{
-+	union skey expected_key, actual_key;
-+	int i, key_to_set, key_mismatches = 0;
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		/*
-+		 * Storage keys are 7 bit, lowest bit is always returned as zero
-+		 * by iske.
-+		 * This loop will set all 7 bits which means we set fetch
-+		 * protection as well as reference and change indication for
-+		 * some keys.
-+		 */
-+		key_to_set = i * 2;
-+		set_storage_key(pagebuf[i], key_to_set, 1);
-+	}
-+
-+	puts("Please migrate me, then press return\n");
-+	(void)getchar();
-+
-+	for (i = 0; i < NUM_PAGES; i++) {
-+		actual_key.val = get_storage_key(pagebuf[i]);
-+		expected_key.val = i * 2;
-+
-+		/*
-+		 * The PoP neither gives a guarantee that the reference bit is
-+		 * accurate nor that it won't be cleared by hardware. Hence we
-+		 * don't rely on it and just clear the bits to avoid compare
-+		 * errors.
-+		 */
-+		actual_key.str.rf = 0;
-+		expected_key.str.rf = 0;
-+
-+		/* don't log anything when key matches to avoid spamming the log */
-+		if (actual_key.val != expected_key.val) {
-+			key_mismatches++;
-+			report_fail("page %d expected_key=0x%x actual_key=0x%x", i, expected_key.val, actual_key.val);
-+		}
-+	}
-+
-+	report(!key_mismatches, "skeys after migration match");
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("migration-skey");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+
-+		/*
-+		 * If we just exit and don't ask migrate_cmd to migrate us, it
-+		 * will just hang forever. Hence, also ask for migration when we
-+		 * skip this test altogether.
-+		 */
-+		puts("Please migrate me, then press return\n");
-+		(void)getchar();
-+	} else {
-+		test_migration();
-+	}
-+
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 9b97d0471bcf..8e52f560bb1e 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -180,3 +180,7 @@ smp = 2
- [migration-cmm]
- file = migration-cmm.elf
- groups = migration
-+
-+[migration-skey]
-+file = migration-skey.elf
-+groups = migration
 -- 
-2.36.1
+Vitaly
 
