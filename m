@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A490854BB92
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 22:22:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEA4D54BB6B
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 22:21:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357616AbiFNULE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 16:11:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44398 "EHLO
+        id S1357829AbiFNUK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 16:10:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357364AbiFNUKg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 16:10:36 -0400
+        with ESMTP id S1357815AbiFNUKh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 16:10:37 -0400
 Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A1F711A30
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:08:34 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id j4-20020a170902da8400b00168b0b2341dso5354475plx.5
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:08:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 835444B42F
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:08:35 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id s17-20020a170902ea1100b00168b7cad0efso5337289plg.14
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:08:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=GcnQGtIgWgA8fnCOJZ2NC0z3fNMByJKLtilK+3LRet8=;
-        b=UUtRfLBdt6WVEsGg8pTCK6naNVhi6UmL2mpQWCl4tgb+SWxp688YfD43lVCKfntZtp
-         ulzBd3n3DXfhY32sqPSq40Uo8lgJ2qnSVRsBRN/OswminfCDsUmo8WOzC3xnw6s2nQ/q
-         0dDOIAinhyxAs6/Lq9gY5rAhptG1Mz8jcWsyPLBMz2EQb66gZlz3QFYnaLHAcEYoXwS7
-         Dnwv7Qe7yRYZ2lVH9FTCVwXKXYpHIWub63SuXvefqgHcw785Ez7TKcdYSM5xIy7cr4L5
-         8NMLQ2m+hy+43ld5vGxlvk5tWwo9B9gGRE8po6sm6g6mvdSSQHfExeqUkQE06XrYY96M
-         5Msg==
+        bh=+JUUrANpcy0WjjSaiXZvhzOGdtbSexwErj2l4cNYJS4=;
+        b=Vb6Fxn9aW/ul2PuLhdqDpBabNbGgeHaHowJIejicivMlRiTuveW2wSWYlyj8pjeGcD
+         Mc86DtuoPa63NN5X2eCCV9xegjdN+JE3VK9F2XensCypsWWMEFpKCFMFULfsG2kR++3D
+         kW3z8ZlsCnWm4SXmgEm2sMh5O/qYrG9GysgrHHgSP2uu7aofa2NvtGkcChgZujvq4aXK
+         kcZlFttFF88PaiFHDmyL0ihlkgq3+yyC3UweBLXypfk07710ZQIE+vf+X7QfHaxLcF+4
+         p4iRdkRkFD/wWdDDi91ZmSZsWyVT8IIR3RaGoP8gqpic9ZmExjPt4R1tMPkT6kse8qN/
+         EoDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=GcnQGtIgWgA8fnCOJZ2NC0z3fNMByJKLtilK+3LRet8=;
-        b=ha57LJM6tfPpc83XgZ4N1HwNfYwoOEUNQIy/QnvOhF8a7LUfOqT0UJfUP3Gd/aSssW
-         BuqNOo73sj4YmyN3QWsTt3/Iat2BFnLn/LMN7mEzt7YTQdP5V0/yElcYKxsC/SvFFEiC
-         jfCVjigiZiDCIZeftC+pe4zIqrbx8SgfGCW5gjXYfDJsM+b8/O1GqqT+wL9DZh71Zj/W
-         yw/2q3Bdp/Ren2KL5VWX/Ct6o2waqiGzizUG5qSPz0YouODTM2ASP+UKqv9LEaa+Ltw/
-         kHGT4ylmcBh8MDFEqXZ8akkp1HwH6JG7h/5RG6x2g5JzqUJdo64qhZAxoMnOe0VhPJTe
-         J+zg==
-X-Gm-Message-State: AJIora8gcRXB9NRpwt1b+Zf5mqid+j5vc+C//0QLDnc5gbFyJTc/QywR
-        x+jQTxiOtsz/cOib72cgbEvsw2aZGqI=
-X-Google-Smtp-Source: AGRyM1tbmRuWodF0xUlWN6zVml/CAWJNtDGr7rzGXaVv3e5/LmimEj98XorvzTGzIlQDPkTO0GS2+EyRaz4=
+        bh=+JUUrANpcy0WjjSaiXZvhzOGdtbSexwErj2l4cNYJS4=;
+        b=Qpk0zJHPEb003U4TmMLp+W7WuvzzxhViVTAfn2JPxydlhpulte1z/uBXp/DoyF6Xqx
+         ZseNpPqwb6qJI3BIY1ZZd08uEGSjPOKqOOtf2CYbBefXcgQUgxQJbl4U5cqvT+q7oV0H
+         TyPKs5OsGr+y4DCCtHD/3xR6Y0B8mk/IE5o5OrU1Lq4IzpCZGKkRQ4KUdOhn511NGUnf
+         zUFT4EMzMBm2XK8bK0SK0+y7g2v42kQ6u7CymclgqJtZiFKG0H4ZpQYxsyOGlNng22K/
+         NI9nFWnj6iK7iLVs+nxmD9b6nOQi9xxwjxhW8x5J2Kfq3Xf4ZNymG670QECJV950yt63
+         2nmg==
+X-Gm-Message-State: AOAM533buR5xCbd/VY2mAnwSgpoE/2VYHTAmf328x5VYd0Zh4i9S9ohf
+        zcoDM/9yHUT5ENwEqmEIZqMpi+IwgNs=
+X-Google-Smtp-Source: ABdhPJwnUdjdJO83HH4EqAXo+UyDJs0dAsj30iouzGW8CMW3p9szyM5Gb6CDc09QkFopB/4B4KXP2M0us9I=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1d02:b0:1e6:961d:d56f with SMTP id
- on2-20020a17090b1d0200b001e6961dd56fmr6287808pjb.225.1655237302377; Tue, 14
- Jun 2022 13:08:22 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:aa7:9f84:0:b0:51b:b64d:fc69 with SMTP id
+ z4-20020aa79f84000000b0051bb64dfc69mr6412254pfr.7.1655237303978; Tue, 14 Jun
+ 2022 13:08:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 14 Jun 2022 20:07:04 +0000
+Date:   Tue, 14 Jun 2022 20:07:05 +0000
 In-Reply-To: <20220614200707.3315957-1-seanjc@google.com>
-Message-Id: <20220614200707.3315957-40-seanjc@google.com>
+Message-Id: <20220614200707.3315957-41-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220614200707.3315957-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH v2 39/42] KVM: selftests: Skip AMX test if ARCH_REQ_XCOMP_GUEST_PERM
- isn't supported
+Subject: [PATCH v2 40/42] KVM: selftests: Clean up requirements for XFD-aware
+ XSAVE features
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -70,36 +70,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip the AMX test instead of silently returning if the host kernel
-doesn't support ARCH_REQ_XCOMP_GUEST_PERM.  KVM didn't support XFD until
-v5.17, so it's extremely unlikely allowing the test to run on a pre-v5.15
-kernel is the right thing to do.
+Provide informative error messages for the various checks related to
+requesting access to XSAVE features that are buried behind XSAVE Feature
+Disabling (XFD).
+
+Opportunistically rename the helper to have "require" in the name so that
+it's somewhat obvious that the helper may skip the test.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 5 ++++-
+ tools/testing/selftests/kvm/lib/x86_64/processor.c     | 8 +++++---
+ tools/testing/selftests/kvm/x86_64/amx_test.c          | 2 +-
+ 3 files changed, 10 insertions(+), 5 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index b51227ccfb96..19c023f767fc 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -758,7 +758,10 @@ void vm_set_page_table_entry(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+ 		       uint64_t a3);
+ 
+-void vm_xsave_req_perm(int bit);
++void __vm_xsave_require_permission(int bit, const char *name);
++
++#define vm_xsave_require_permission(perm)	\
++	__vm_xsave_require_permission(perm, #perm)
+ 
+ enum pg_level {
+ 	PG_LEVEL_NONE,
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index c7fe584c71ed..ee346a280482 100644
+index ee346a280482..d606ee2d970a 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -601,14 +601,7 @@ void vm_xsave_req_perm(int bit)
+@@ -578,7 +578,7 @@ static void vcpu_setup(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 	vcpu_sregs_set(vcpu, &sregs);
+ }
  
- 	TEST_REQUIRE(bitmask & (1ULL << bit));
+-void vm_xsave_req_perm(int bit)
++void __vm_xsave_require_permission(int bit, const char *name)
+ {
+ 	int kvm_fd;
+ 	u64 bitmask;
+@@ -596,10 +596,12 @@ void vm_xsave_req_perm(int bit)
+ 	close(kvm_fd);
  
--	rc = syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, bit);
--
--	/*
--	 * The older kernel version(<5.15) can't support
--	 * ARCH_REQ_XCOMP_GUEST_PERM and directly return.
--	 */
--	if (rc)
--		return;
-+	TEST_REQUIRE(!syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, bit));
+ 	if (rc == -1 && (errno == ENXIO || errno == EINVAL))
+-		exit(KSFT_SKIP);
++		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported");
++
+ 	TEST_ASSERT(rc == 0, "KVM_GET_DEVICE_ATTR(0, KVM_X86_XCOMP_GUEST_SUPP) error: %ld", rc);
  
- 	rc = syscall(SYS_arch_prctl, ARCH_GET_XCOMP_GUEST_PERM, &bitmask);
- 	TEST_ASSERT(rc == 0, "prctl(ARCH_GET_XCOMP_GUEST_PERM) error: %ld", rc);
+-	TEST_REQUIRE(bitmask & (1ULL << bit));
++	__TEST_REQUIRE(bitmask & (1ULL << bit),
++		       "Required XSAVE feature '%s' not supported", name);
+ 
+ 	TEST_REQUIRE(!syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, bit));
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+index 411a33cd4296..5d749eae8c45 100644
+--- a/tools/testing/selftests/kvm/x86_64/amx_test.c
++++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+@@ -307,7 +307,7 @@ int main(int argc, char *argv[])
+ 	u32 amx_offset;
+ 	int stage, ret;
+ 
+-	vm_xsave_req_perm(XSTATE_XTILE_DATA_BIT);
++	vm_xsave_require_permission(XSTATE_XTILE_DATA_BIT);
+ 
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
 -- 
 2.36.1.476.g0c4daa206d-goog
 
