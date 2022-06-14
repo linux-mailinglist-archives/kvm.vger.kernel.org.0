@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B40AA54A6EA
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 04:38:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE13754A6F7
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 04:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356446AbiFNCfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 22:35:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58270 "EHLO
+        id S1354842AbiFNCmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 22:42:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355344AbiFNCfK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 22:35:10 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C25738BDB;
-        Mon, 13 Jun 2022 19:13:28 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id z9so3878128wmf.3;
-        Mon, 13 Jun 2022 19:13:28 -0700 (PDT)
+        with ESMTP id S1352649AbiFNCl6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 22:41:58 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 607045005F;
+        Mon, 13 Jun 2022 19:20:35 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id k19so9246392wrd.8;
+        Mon, 13 Jun 2022 19:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qx1x66X9cxQ2Do1EWzHRpluo9ytwIzS6EQlleJWoehY=;
-        b=fFWt4iizlpVuwbqmb/m8i1/dvxNDmKsIyRbCjZdRm21fChV8QpPP50TmJbkR0aUw4T
-         whze9ldyTpOeVy0dNlAs2t6gV0/cogGNdu+uKbWzrUGPCwN2WISJ3b6Sa1F7LlTzHO4g
-         iUUn78rEiGDdleKX2k0OJZHvgiFOl7swWPVBeIQsJDGlDhSR4tgaHSsLEwmrHGI8TAal
-         BVxefl1+gEOgHXo0BKa13hmmbqKSDnPHqyXMnezfuiX19BPp9z4Ycd4De6m3cmeoi4Lu
-         zgdC9oBfcizi9O2ZfoEAJOzluaxR9QbTtLCA+tSdUUUPAvsrbxuLkhn0OCiM8sTMKntD
-         0eJA==
+        bh=rUo3H58Xo6jRmNEwjhL/eFhQ7obXUHzajy+AECzxVt4=;
+        b=EJgw/8kmPw3eQcaDqa7qbY1kJIy78gC/KghBVXCdqDMgTzYadRYzJ3sGCCnVrA2kse
+         rywQ+E5TqEPUmp+Jfy7MidbwAdeiDVmzwHPIbfak9JqyDLf+7sxrt9KNhMTxCNLL+6ND
+         HscvHsh1J5UBnvE7uLlaa5Ngbhx9QyyOQsHZehUHmpyy/OkgYsyJGKO6FrZkHqBDN4p6
+         /WYFyoo9Xe6hy2xVV+B4Hb8qQ0nePuiwOQUWwaClsDK7hRXClprraG6bk3ysPp+MNGWw
+         ACvnWlC6LxUakujWE+2Xj7XXWbBX8/JWOr5xHE7q/IhBMW0HZt5XydwoKwdCv3agLIyb
+         zMbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qx1x66X9cxQ2Do1EWzHRpluo9ytwIzS6EQlleJWoehY=;
-        b=QoW4ruPvF29zFVaby59Xb+72BLJLC25xxp/Ag91glRevLTEH37B0Uh20Y9+TzjM27Q
-         tM2P1x2cOtu8g3Um6BnnMByPPYdxti66GxVBV71i0J7F6c2Qe8BFDA/r/hO75QO0paHs
-         tpJTGT/ep+udfBi026yDPcF0pieExlWgp6/zSVQNF/LkHetEWotlmp3GNDqJKpGCye6p
-         eNkL4pVmv+7NI6pxYkVCaINAmp0lX3tPKo+bwnhkaiXmjyXE46F1Fc0N1JjTfPv5C6rE
-         gmOLzZe1WDV2hs7R3o+YA467lrFE5ooddh22KHk5qz5tnvLMCYYI6WMknLZRWoHnjrfW
-         Mtgg==
-X-Gm-Message-State: AOAM530hpBlkBxtGKbp8BbYF9S4kRSyNZEvGa6si+nq1ZoOuYazIrqw+
-        YHanv3+udQqL2ak6yBt6htbZTc+n4KFAAqvB4yo=
-X-Google-Smtp-Source: ABdhPJwoEYy9BBV9NZpta2nTXCP5Zq6MIoI/3/DMRpBP8zIM1i4VyoWJH5O8IzMLWNWoe6HQ1whA1Vcf9JKdtDo3Zj8=
-X-Received: by 2002:a05:600c:d0:b0:39c:5927:3fa7 with SMTP id
- u16-20020a05600c00d000b0039c59273fa7mr1629426wmm.36.1655172805503; Mon, 13
- Jun 2022 19:13:25 -0700 (PDT)
+        bh=rUo3H58Xo6jRmNEwjhL/eFhQ7obXUHzajy+AECzxVt4=;
+        b=Vegelk6lIPFzUzsGGUK4mnB8b14nUwuTzkJ+tgXJx3hoOnKVjxkM5NaCA2v4vMWV2T
+         +o1zU/LJlpfBg6mtE6wfuR4x7P07m2Jv+5qul0a7w+jfa9sCKoZWi4Y4vvj/Puj1YdiD
+         3V7aFw3UJDzxtb5r/+fAqvoh2U/z85KMOjJrfvPX1bEF57IQSvHR/RYDdiklPIxYe3Xu
+         0qk53BCkEOFzBgNR6kWkX64k3vuiUc7FP+30IrLr0ncpVN+3IA6qJmg7dpgLhkIuQs2I
+         5/0e4+RoyBwIkhh9XkKtyyjbAfxzr3c3Rjk5UGPC9FYNX3oH56ywJaECvYZUbz4Pnx0n
+         qRMg==
+X-Gm-Message-State: AJIora9Fw+Xk3ohsuhT9o0+CtdTh4YAPMKq0IzNRqRRdYXMmQXW7Jy1B
+        PlfEAvOdLrUS6AkQGFzWr5DLLxkiJkXeaPYhfUOHqghDry0SPA==
+X-Google-Smtp-Source: AGRyM1vubLAYvzxsNOBMNnDLnOtApG/1brEj+260Ctcbqrc8JeVzrcSUop4bg/ADhdmxahpfwOZjnagUGwbHugPCQqg=
+X-Received: by 2002:a5d:5c07:0:b0:218:544d:4347 with SMTP id
+ cc7-20020a5d5c07000000b00218544d4347mr2291230wrb.107.1655173228921; Mon, 13
+ Jun 2022 19:20:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220613225723.2734132-1-seanjc@google.com> <20220613225723.2734132-2-seanjc@google.com>
-In-Reply-To: <20220613225723.2734132-2-seanjc@google.com>
+References: <20220613225723.2734132-1-seanjc@google.com> <20220613225723.2734132-4-seanjc@google.com>
+In-Reply-To: <20220613225723.2734132-4-seanjc@google.com>
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 14 Jun 2022 10:13:14 +0800
-Message-ID: <CAJhGHyDjFCJdRjdV-W5+reg-3jiwJAqeCQ7A-vdUqt+dToJBdA@mail.gmail.com>
-Subject: Re: [PATCH 1/8] KVM: x86/mmu: Drop unused CMPXCHG macro from paging_tmpl.h
+Date:   Tue, 14 Jun 2022 10:20:17 +0800
+Message-ID: <CAJhGHyCMsc4g7rdW8td5vOA5iAZBu7+hewUJW8tUXX=_-UBVOA@mail.gmail.com>
+Subject: Re: [PATCH 3/8] KVM: x86/mmu: Bury 32-bit PSE paging helpers in paging_tmpl.h
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -72,12 +72,13 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Jun 14, 2022 at 6:59 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Drop the CMPXCHG macro from paging_tmpl.h, it's no longer used now that
-> KVM uses a common uaccess helper to do 8-byte CMPXCHG.
+> Move a handful of one-off macros and helpers for 32-bit PSE paging into
+> paging_tmpl.h and hide them behind "PTTYPE == 32".  Under no circumstance
+> should anything but 32-bit shadow paging care about PSE paging.
 >
-> Fixes: f122dfe44768 ("KVM: x86: Use __try_cmpxchg_user() to update guest PTE A/D bits")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
+Moving code from paging_tmp.h is on my to-do list.
+I don't think the opposite direction is preferred.
 
-In https://lore.kernel.org/lkml/20220605063417.308311-2-jiangshanlai@gmail.com/
-two other unused macros are also removed.
+And is_cpuid_PSE36() is also used in mmu.c, is it a good idea to move
+it into paging_tmp.h?
