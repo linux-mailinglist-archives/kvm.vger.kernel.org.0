@@ -2,84 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C17054B421
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 17:03:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38D8754B425
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 17:03:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356176AbiFNPBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 11:01:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58808 "EHLO
+        id S1355636AbiFNPBS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 11:01:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244722AbiFNPBA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 11:01:00 -0400
+        with ESMTP id S1355471AbiFNPBC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 11:01:02 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C99D3F327
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 08:01:00 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25EEsknK015615
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 15:00:59 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1049940927
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 08:01:01 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25EEqCjA010830
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 15:01:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=GJVsHlUIY26F8yz64cxaMTAF61m17Q68tdTGQOOweSo=;
- b=cwosYmvnEPu62m0XZo7ZP+Hvexm+nKXGh0ZWEftpKn5l5wVCJQuYzb2Jzea4bjXErGjg
- AsZH08KtajvfzGYUskAH0IEf+swonlNTDbBaD1ComrPnxsQa09LTQAK2pA8IIqBfIhMx
- I5O5+XLHiZzAkL5Ye0ajY41FSGhhoQVe4d8r3rcZfYuJMvlBb2WniHdbeO7etXXlACA0
- rBPxIdKsFGyF0Vb/Z8xxdP/YSyeTTDLXLEFOQW8orZwInIyfO1c94XS1hBqA5O8mwk+Q
- DKM11ZuH/JgsS1hQlSCzMHl85hIEN43j1/jCjEeEfAoMq846h/yzJVQLmPaPSlSF/7Fo 4w== 
+ bh=wOPcrSDbNwAupg/tu3V+b2eJGB2c590AycC27gd/P+I=;
+ b=DLuEdZNJn69Igpw/l98qo90ePcYG9iK+oHKzxKMMOMG33pim4rRL+YyQDUz+Dh5RVybg
+ qIKTvPTEFbSBefPKz1RoYf1Pd3MsPqjbM7qYZOuD+ZpSGfhazd0NyeffWomxHwwFiBjG
+ wNA9XZ6ZClvYj6JNWIoh40d67H+qT0pNDHPqB0H0QxxLsJbj91UguhvHoDSrmeAVjOYH
+ 8zys8nVQ4TLym0uHX63EylZpGvATCFKVsZhIA9h40aXBfZlXK3Ah7cW8gCjZcOyFxg3e
+ FauW5B71chhZSLcpg8JJ3SRDZaXeyLvbja67dl1ayf09TWBpnqtslTOTkGwcOvqhOFva LQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpqnb9dy6-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6hn3n7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 15:00:59 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25EEsrSQ016516
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 15:00:59 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpqnb9dwg-1
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 15:01:00 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25EEqVZx013209
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 15:01:00 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6hn3kx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jun 2022 15:00:58 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25EEotsd027257;
-        Tue, 14 Jun 2022 15:00:56 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gmjp9chm7-1
+        Tue, 14 Jun 2022 15:00:59 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25EEoUVX003454;
+        Tue, 14 Jun 2022 15:00:57 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3gmjajchvh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jun 2022 15:00:56 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25EF0NMa16908798
+        Tue, 14 Jun 2022 15:00:57 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25EF0sEW15794438
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Jun 2022 15:00:23 GMT
+        Tue, 14 Jun 2022 15:00:54 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5207842049;
+        by IMSVA (Postfix) with ESMTP id E659942047;
         Tue, 14 Jun 2022 15:00:53 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CCF8F42042;
-        Tue, 14 Jun 2022 15:00:52 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 70B6342049;
+        Tue, 14 Jun 2022 15:00:53 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.145.3.94])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 14 Jun 2022 15:00:52 +0000 (GMT)
+        Tue, 14 Jun 2022 15:00:53 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, thuth@redhat.com, frankja@linux.ibm.com,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Subject: [kvm-unit-tests GIT PULL 4/5] s390x: Fix gcc 12 warning about array bounds
-Date:   Tue, 14 Jun 2022 17:00:48 +0200
-Message-Id: <20220614150049.55787-5-imbrenda@linux.ibm.com>
+        Nico Boehr <nrb@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 5/5] s390x: add migration test for storage keys
+Date:   Tue, 14 Jun 2022 17:00:49 +0200
+Message-Id: <20220614150049.55787-6-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220614150049.55787-1-imbrenda@linux.ibm.com>
 References: <20220614150049.55787-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5qfhzsop2TFGA7DDsMpSnJPOs_uCGbtG
-X-Proofpoint-GUID: qEfWa4T_XDfy0-BHu_v2uEYYs6l-FAhY
+X-Proofpoint-GUID: BirG65VfgBCs3n3oEJBNf-Wdlp8zcJ0g
+X-Proofpoint-ORIG-GUID: P_cykVyeGhKzT1rqwTO0-gns6TMy0_iI
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-14_05,2022-06-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- malwarescore=0 lowpriorityscore=0 impostorscore=0 spamscore=0 phishscore=0
- mlxlogscore=729 suspectscore=0 bulkscore=0 priorityscore=1501 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206140059
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 clxscore=1015 adultscore=0
+ mlxlogscore=953 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206140059
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -89,79 +89,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+From: Nico Boehr <nrb@linux.ibm.com>
 
-gcc 12 warns about pointer constant <4k dereference.
-Silence the warning by using the extern lowcore symbol to derive the
-pointers. This way gcc cannot conclude that the pointer is <4k.
+Upon migration, we expect storage keys set by the guest to be preserved, so add
+a test for it.
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Message-Id: <20220608122953.1051952-3-scgl@linux.ibm.com>
+We keep 128 pages and set predictable storage keys. Then, we migrate and check
+that they can be read back and match the value originally set.
+
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Message-Id: <20220614110521.123205-2-nrb@linux.ibm.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- lib/s390x/asm/mem.h | 4 ++++
- s390x/emulator.c    | 5 +++--
- s390x/skey.c        | 2 +-
- 3 files changed, 8 insertions(+), 3 deletions(-)
+ s390x/Makefile         |  1 +
+ s390x/migration-skey.c | 83 ++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg    |  4 ++
+ 3 files changed, 88 insertions(+)
+ create mode 100644 s390x/migration-skey.c
 
-diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
-index 845c00cc..64ef59b5 100644
---- a/lib/s390x/asm/mem.h
-+++ b/lib/s390x/asm/mem.h
-@@ -7,6 +7,10 @@
-  */
- #ifndef _ASMS390X_MEM_H_
- #define _ASMS390X_MEM_H_
-+#include <asm/arch_def.h>
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 1877c8a6..efd5e0c1 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -33,6 +33,7 @@ tests += $(TEST_DIR)/adtl-status.elf
+ tests += $(TEST_DIR)/migration.elf
+ tests += $(TEST_DIR)/pv-attest.elf
+ tests += $(TEST_DIR)/migration-cmm.elf
++tests += $(TEST_DIR)/migration-skey.elf
+ 
+ pv-tests += $(TEST_DIR)/pv-diags.elf
+ 
+diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
+new file mode 100644
+index 00000000..b7bd8258
+--- /dev/null
++++ b/s390x/migration-skey.c
+@@ -0,0 +1,83 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Storage Key migration tests
++ *
++ * Copyright IBM Corp. 2022
++ *
++ * Authors:
++ *  Nico Boehr <nrb@linux.ibm.com>
++ */
 +
-+/* create pointer while avoiding compiler warnings */
-+#define OPAQUE_PTR(x) ((void *)(((uint64_t)&lowcore) + (x)))
- 
- #define SKEY_ACC	0xf0
- #define SKEY_FP		0x08
-diff --git a/s390x/emulator.c b/s390x/emulator.c
-index c9182ea4..2c42f96f 100644
---- a/s390x/emulator.c
-+++ b/s390x/emulator.c
-@@ -12,6 +12,7 @@
- #include <asm/cpacf.h>
- #include <asm/interrupt.h>
- #include <asm/float.h>
++#include <libcflat.h>
++#include <asm/facility.h>
++#include <asm/page.h>
 +#include <asm/mem.h>
- #include <linux/compiler.h>
- 
- static inline void __test_spm_ipm(uint8_t cc, uint8_t key)
-@@ -138,7 +139,7 @@ static __always_inline void __test_cpacf_invalid_parm(unsigned int opcode)
- {
- 	report_prefix_push("invalid parm address");
- 	expect_pgm_int();
--	__cpacf_query(opcode, (void *) -1);
-+	__cpacf_query(opcode, OPAQUE_PTR(-1));
- 	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
- 	report_prefix_pop();
- }
-@@ -148,7 +149,7 @@ static __always_inline void __test_cpacf_protected_parm(unsigned int opcode)
- 	report_prefix_push("protected parm address");
- 	expect_pgm_int();
- 	low_prot_enable();
--	__cpacf_query(opcode, (void *) 8);
-+	__cpacf_query(opcode, OPAQUE_PTR(8));
- 	low_prot_disable();
- 	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
- 	report_prefix_pop();
-diff --git a/s390x/skey.c b/s390x/skey.c
-index 32bf1070..445476a0 100644
---- a/s390x/skey.c
-+++ b/s390x/skey.c
-@@ -349,7 +349,7 @@ static void test_set_prefix(void)
- 	set_storage_key(pagebuf, 0x28, 0);
- 	expect_pgm_int();
- 	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
--	set_prefix_key_1((uint32_t *)2048);
-+	set_prefix_key_1(OPAQUE_PTR(2048));
- 	install_page(root, 0, 0);
- 	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
- 	report(get_prefix() == old_prefix, "did not set prefix");
++#include <asm/interrupt.h>
++#include <hardware.h>
++
++#define NUM_PAGES 128
++static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
++
++static void test_migration(void)
++{
++	union skey expected_key, actual_key;
++	int i, key_to_set, key_mismatches = 0;
++
++	for (i = 0; i < NUM_PAGES; i++) {
++		/*
++		 * Storage keys are 7 bit, lowest bit is always returned as zero
++		 * by iske.
++		 * This loop will set all 7 bits which means we set fetch
++		 * protection as well as reference and change indication for
++		 * some keys.
++		 */
++		key_to_set = i * 2;
++		set_storage_key(pagebuf[i], key_to_set, 1);
++	}
++
++	puts("Please migrate me, then press return\n");
++	(void)getchar();
++
++	for (i = 0; i < NUM_PAGES; i++) {
++		actual_key.val = get_storage_key(pagebuf[i]);
++		expected_key.val = i * 2;
++
++		/*
++		 * The PoP neither gives a guarantee that the reference bit is
++		 * accurate nor that it won't be cleared by hardware. Hence we
++		 * don't rely on it and just clear the bits to avoid compare
++		 * errors.
++		 */
++		actual_key.str.rf = 0;
++		expected_key.str.rf = 0;
++
++		/* don't log anything when key matches to avoid spamming the log */
++		if (actual_key.val != expected_key.val) {
++			key_mismatches++;
++			report_fail("page %d expected_key=0x%x actual_key=0x%x", i, expected_key.val, actual_key.val);
++		}
++	}
++
++	report(!key_mismatches, "skeys after migration match");
++}
++
++int main(void)
++{
++	report_prefix_push("migration-skey");
++	if (test_facility(169)) {
++		report_skip("storage key removal facility is active");
++
++		/*
++		 * If we just exit and don't ask migrate_cmd to migrate us, it
++		 * will just hang forever. Hence, also ask for migration when we
++		 * skip this test altogether.
++		 */
++		puts("Please migrate me, then press return\n");
++		(void)getchar();
++	} else {
++		test_migration();
++	}
++
++	report_prefix_pop();
++	return report_summary();
++}
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index 9b97d047..8e52f560 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -180,3 +180,7 @@ smp = 2
+ [migration-cmm]
+ file = migration-cmm.elf
+ groups = migration
++
++[migration-skey]
++file = migration-skey.elf
++groups = migration
 -- 
 2.36.1
 
