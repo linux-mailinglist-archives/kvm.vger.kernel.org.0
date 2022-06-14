@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A5A6054B844
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 20:08:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8FB754B860
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 20:15:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245051AbiFNSIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 14:08:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59400 "EHLO
+        id S245409AbiFNSPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 14:15:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238035AbiFNSI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 14:08:29 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD9A83527C
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 11:08:28 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id w2so16486895ybi.7
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 11:08:28 -0700 (PDT)
+        with ESMTP id S242307AbiFNSPM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 14:15:12 -0400
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2BBE19F80
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 11:15:11 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-30c2f288f13so38228527b3.7
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 11:15:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=C78v/CAN8C2z22MVaDl0QxTyyJoCfPguMq8MOK3tOJc=;
-        b=KPQRP+y1/9biwSKOdmOrA7l+Ng8mYs2ZKqEsk1EcYmkGcOWMD3eVJOVUvBbrZYLqLa
-         XxmEyIa3+nMLYvLo8wsYQD6u2h6vJ69PlvvEWBU4hwT/ftXEt28sTdms2tNq2oqAwkJ2
-         xCAMYyeEgKvWmnPoO7td7+2N+gClf9AyQwwCLajgaaQu89TWxl4Z3nrdDmLCzj2nvrDt
-         iEDgjcTO60gIUOVeCKdV4ZZl/HvoU7NaI0kNlP+lV1x3XSzN1cMxBhRoG5rEWorAbSrH
-         Bc+DXxtEPmMLZj2PPf9qEivHmu0mikMk2gU1zLrWRRh2zuFLQceSL6wcyYVB3HSoZP1/
-         nNTA==
+        bh=X8/2+wu+PsORoT0rrjFQwUQli114atWqejDxqt8afco=;
+        b=BFx2nJFuweeoIaiSk88tCK+Zvw/48JIpbtu0DqX6f/hV+jNuutdiHEAglJEN3NBoDU
+         t1VXH8kqiON/rit1qB1/lZ/zauzkEapcDmpRo6A/gozVX61yAIfYE8N7WeRDRT1ZTYEL
+         LM7k4VXG88rZ21uChYEzNZphXMtmzUGZ/nMgAr+lvM00cgknWByKrHMEGd6QBptun3YW
+         qmRPuBmHQqJW8ZARpdFifG4e2nEkENmFsELeBnylz/XzT+jkn+BZFNh+ujTONbSQI5pV
+         xxP7nK7Fw3aZYfrdt2qEaQY3TRXip1WYtiYQKe3Qdo9qNBliA1j8ZaDPB1JgGfbA4GRD
+         UOrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=C78v/CAN8C2z22MVaDl0QxTyyJoCfPguMq8MOK3tOJc=;
-        b=TXNzaI95q+XVKO86HHcBm7lzyUzNv3Z7A68MjNQZjS/ggn4JYD5/uLhbQnLVNYoRaI
-         ssDuULwuLPW4dLnonyw+ny2Q22nEbMMjgmRbBh/F/5CPp6Wb4ZVaHlfyvysH/dRD82t2
-         bhL3b/YD1hAT4f5SnWog7saaLO4X63S/1ptmeKgMHSF6ICkVFxp1RVyM8n4U4lWc4WLh
-         wuADxhIhM4C/yGZRCqjKqNLJoI6jOqM7vT0l+5+rAS1S3FsYTqOu9xXec+kgaH7JyL5p
-         5yhLn4MUHkm9IGAbZl0V43c1snG2sog8kqGaI5xS37g+bOkF1AGQ9Bk7MOA5yM01e8KE
-         jPNg==
-X-Gm-Message-State: AJIora8EYwoB5sNgbQ6dsgelQORGZmFC0YXX5rXHphjy+ocOEFAQmnXB
-        LNdE2FxW1Oct0CF/RNJ6VRtPkv0WQrXGRGIhfKhIVyOyEyw=
-X-Google-Smtp-Source: AGRyM1srZeha6aWpFJbD1p8y4wYjg8EMJ2RoztXJmVyLYONCPC4TSE6IGnH1wzu0dpdgL/3uTx0GgDipYFQRNz1mLZs=
-X-Received: by 2002:a25:5d0d:0:b0:633:25c8:380 with SMTP id
- r13-20020a255d0d000000b0063325c80380mr5966062ybb.167.1655230107606; Tue, 14
- Jun 2022 11:08:27 -0700 (PDT)
+        bh=X8/2+wu+PsORoT0rrjFQwUQli114atWqejDxqt8afco=;
+        b=3wf65jkZRZXyffqabj4ZnHVfFpwqhgySAhC5QLaWjOcoX6OLP2gdWymJrzBbWYo8tR
+         SWeDkVjwfsCZ5hbA2mCy2CJT2Pt+V+20fYnDmFidnusQhjkyrRw3EcdF2VKVxa7AS0wJ
+         7XqPVc7D0m+26/eYa4h/To//5R39j58y3oIEXT1SV56mJShIN2QHexeokY7YDdtdY9bn
+         OKgEIZUXW/0am0/3tRB2Ohh1NP7frGnWi60kr2EAU/oQDpvEKSXo95J9EzFdDvq8Dyxr
+         Gz9JkbAsK3zIL9hXUqZZkth5yIasHY655pwbjGeV93OFPGyOGNWaCVW2TY3WzYLv9RLn
+         wKrQ==
+X-Gm-Message-State: AJIora/47BlRQEBT3JdWTUxN0PwR+9AdRfzB1FwrhY7TEaflET3wsWIN
+        s/O8aPbzsA3rPikpR1pWeuojfGi7RqayRWXn8lsWzw==
+X-Google-Smtp-Source: AGRyM1tCLsG24HvArA2qQ8N8ID4VHNuExsG9weA5PfeXAdVigd9V2muc6YeDqSqskiWnDsCe6UppeJ+sTve5pmlxZQw=
+X-Received: by 2002:a81:1294:0:b0:313:f850:53b1 with SMTP id
+ 142-20020a811294000000b00313f85053b1mr6960671yws.181.1655230510732; Tue, 14
+ Jun 2022 11:15:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1651774250.git.isaku.yamahata@intel.com> <ea5e6a1fc740cfe69167c8713b63fdb952a98e8b.1651774251.git.isaku.yamahata@intel.com>
-In-Reply-To: <ea5e6a1fc740cfe69167c8713b63fdb952a98e8b.1651774251.git.isaku.yamahata@intel.com>
+References: <cover.1651774250.git.isaku.yamahata@intel.com> <98939c0ec83a109c8f49045e82096d6cdd5dafa3.1651774251.git.isaku.yamahata@intel.com>
+In-Reply-To: <98939c0ec83a109c8f49045e82096d6cdd5dafa3.1651774251.git.isaku.yamahata@intel.com>
 From:   Sagi Shahar <sagis@google.com>
-Date:   Tue, 14 Jun 2022 11:08:16 -0700
-Message-ID: <CAAhR5DGHhPagnaiC=Bn9v0qhNQ5N9HjsrDyQkv4dtui7dfMAbA@mail.gmail.com>
-Subject: Re: [RFC PATCH v6 093/104] KVM: TDX: Handle TDX PV MMIO hypercall
+Date:   Tue, 14 Jun 2022 11:15:00 -0700
+Message-ID: <CAAhR5DHPk2no0PVFX6P1NnZdwtVccjmdn4RLg4wKSmfpjD6Qkg@mail.gmail.com>
+Subject: Re: [RFC PATCH v6 090/104] KVM: TDX: Handle TDX PV CPUID hypercall
 To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
@@ -61,7 +61,7 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -70,193 +70,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, May 5, 2022 at 11:16 AM <isaku.yamahata@intel.com> wrote:
 >
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> Export kvm_io_bus_read and kvm_mmio tracepoint and wire up TDX PV MMIO
-> hypercall to the KVM backend functions.
+> Wire up TDX PV CPUID hypercall to the KVM backend function.
 >
-> kvm_io_bus_read/write() searches KVM device emulated in kernel of the given
-> MMIO address and emulates the MMIO.  As TDX PV MMIO also needs it, export
-> kvm_io_bus_read().  kvm_io_bus_write() is already exported.  TDX PV MMIO
-> emulates some of MMIO itself.  To add trace point consistently with x86
-> kvm, export kvm_mmio tracepoint.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/x86.c     |   1 +
->  virt/kvm/kvm_main.c    |   2 +
->  3 files changed, 117 insertions(+)
+>  arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 >
 > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index ee0cf5336ade..6ab4a52fc9e9 100644
+> index 9c712f661a7c..c7cdfee397ec 100644
 > --- a/arch/x86/kvm/vmx/tdx.c
 > +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1057,6 +1057,118 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
->         return ret;
+> @@ -946,12 +946,34 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
+>         return 1;
 >  }
 >
-> +static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
+> +static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
 > +{
-> +       unsigned long val = 0;
-> +       gpa_t gpa;
-> +       int size;
+> +       u32 eax, ebx, ecx, edx;
 > +
-> +       WARN_ON(vcpu->mmio_needed != 1);
-> +       vcpu->mmio_needed = 0;
+> +       /* EAX and ECX for cpuid is stored in R12 and R13. */
+> +       eax = tdvmcall_a0_read(vcpu);
+> +       ecx = tdvmcall_a1_read(vcpu);
 > +
-> +       if (!vcpu->mmio_is_write) {
-> +               gpa = vcpu->mmio_fragments[0].gpa;
-> +               size = vcpu->mmio_fragments[0].len;
+> +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+
+According to the GHCI spec section 3.6
+(TDG.VP.VMCALL<Instruction.CPUID>) we should return
+VMCALL_INVALID_OPERAND if an invalid CPUID is requested.
+
+kvm_cpuid already returns false in this case so we should use that
+return value to set the tdvmcall return code in case of invalid leaf.
 > +
-> +               memcpy(&val, vcpu->run->mmio.data, size);
-> +               tdvmcall_set_return_val(vcpu, val);
-> +               trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-> +       }
-> +       return 1;
-> +}
+> +       tdvmcall_a0_write(vcpu, eax);
+> +       tdvmcall_a1_write(vcpu, ebx);
+> +       tdvmcall_a2_write(vcpu, ecx);
+> +       tdvmcall_a3_write(vcpu, edx);
 > +
-> +static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
-> +                                unsigned long val)
-> +{
-> +       if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-> +           kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-> +               return -EOPNOTSUPP;
-> +
-> +       trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
-> +       return 0;
-> +}
-> +
-> +static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
-> +{
-> +       unsigned long val;
-> +
-> +       if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-> +           kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-> +               return -EOPNOTSUPP;
-> +
-> +       tdvmcall_set_return_val(vcpu, val);
-> +       trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-> +       return 0;
-> +}
-> +
-> +static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm_memory_slot *slot;
-> +       int size, write, r;
-> +       unsigned long val;
-> +       gpa_t gpa;
-> +
-> +       WARN_ON(vcpu->mmio_needed);
-> +
-> +       size = tdvmcall_a0_read(vcpu);
-> +       write = tdvmcall_a1_read(vcpu);
-> +       gpa = tdvmcall_a2_read(vcpu);
-> +       val = write ? tdvmcall_a3_read(vcpu) : 0;
-> +
-> +       if (size != 1 && size != 2 && size != 4 && size != 8)
-> +               goto error;
-> +       if (write != 0 && write != 1)
-> +               goto error;
-> +
-> +       /* Strip the shared bit, allow MMIO with and without it set. */
-> +       gpa = gpa & ~gfn_to_gpa(kvm_gfn_shared_mask(vcpu->kvm));
-> +
-> +       if (size > 8u || ((gpa + size - 1) ^ gpa) & PAGE_MASK)
-> +               goto error;
-> +
-> +       slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
-> +       if (slot && !(slot->flags & KVM_MEMSLOT_INVALID))
-> +               goto error;
-> +
-> +       if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
-> +               trace_kvm_fast_mmio(gpa);
-> +               return 1;
-> +       }
-> +
-> +       if (write)
-> +               r = tdx_mmio_write(vcpu, gpa, size, val);
-> +       else
-> +               r = tdx_mmio_read(vcpu, gpa, size);
-> +       if (!r) {
-> +               /* Kernel completed device emulation. */
-> +               tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-> +               return 1;
-> +       }
-> +
-> +       /* Request the device emulation to userspace device model. */
-> +       vcpu->mmio_needed = 1;
-> +       vcpu->mmio_is_write = write;
-> +       vcpu->arch.complete_userspace_io = tdx_complete_mmio;
-> +
-> +       vcpu->run->mmio.phys_addr = gpa;
-> +       vcpu->run->mmio.len = size;
-> +       vcpu->run->mmio.is_write = write;
-> +       vcpu->run->exit_reason = KVM_EXIT_MMIO;
-> +
-> +       if (write) {
-> +               memcpy(vcpu->run->mmio.data, &val, size);
-> +       } else {
-> +               vcpu->mmio_fragments[0].gpa = gpa;
-> +               vcpu->mmio_fragments[0].len = size;
-> +               trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
-> +       }
-> +       return 0;
-> +
-> +error:
 > +       tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-
-We should return an error code here.
-
+> +
 > +       return 1;
 > +}
 > +
 >  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
 >  {
 >         if (tdvmcall_exit_type(vcpu))
-> @@ -1069,6 +1181,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
->                 return tdx_emulate_hlt(vcpu);
->         case EXIT_REASON_IO_INSTRUCTION:
->                 return tdx_emulate_io(vcpu);
-> +       case EXIT_REASON_EPT_VIOLATION:
-> +               return tdx_emulate_mmio(vcpu);
+>                 return tdx_emulate_vmcall(vcpu);
+>
+>         switch (tdvmcall_leaf(vcpu)) {
+> +       case EXIT_REASON_CPUID:
+> +               return tdx_emulate_cpuid(vcpu);
 >         default:
 >                 break;
 >         }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5f291470a6f6..f367d0dcef97 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13166,6 +13166,7 @@ bool kvm_arch_dirty_log_supported(struct kvm *kvm)
->
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_mmio);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4bf7178e42bd..7f01131666de 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2294,6 +2294,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
->
->         return NULL;
->  }
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
->
->  bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
->  {
-> @@ -5169,6 +5170,7 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->         r = __kvm_io_bus_read(vcpu, bus, &range, val);
->         return r < 0 ? r : 0;
->  }
-> +EXPORT_SYMBOL_GPL(kvm_io_bus_read);
->
->  /* Caller must hold slots_lock. */
->  int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
 > --
 > 2.25.1
 >
