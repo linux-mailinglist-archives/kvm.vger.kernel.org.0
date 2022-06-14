@@ -2,135 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3980454B7D0
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 19:38:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5A6054B844
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 20:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245409AbiFNRh7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 13:37:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55702 "EHLO
+        id S245051AbiFNSIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 14:08:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245279AbiFNRhz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 13:37:55 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAB86DEA
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 10:37:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A67E4B81A3F
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 17:37:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B000C341C7
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 17:37:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655228271;
-        bh=IfvLnQR788L8QWGOY03Cidk5AO0MFCOejaXVfQOMPCw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=rVsqTEMCOYtQg0EhaeIyrGXi4SPR+xCja/Zzrm4/rXKs2rHudfxst4/iDfEc7IQHK
-         231UQkTDY6d6nmdAlt1kRM+zRgLLBDu035jXo5xVowLng3mEh3oiXDy8mQR20Hacmd
-         LnzQlaeG3xrE2iaFi/ZdceqCE70b9VENcDWjU+WHKEa2HJsyqUZj0vCI94Pk49Z42u
-         h/RWzCu6j4a9w8yEsj7rK5e9uiDjc2EiFUc+avH0qZI0dyuzeA/z91zXgiRd7yeSl3
-         8mOVqXBg2pv8zvUY79qtaym4zlYLKvBcSVb7us+LoO+lJ2erExWSiAMs/ARQBPGhP9
-         Q8CDnPjgM2DNQ==
-Received: by mail-ej1-f42.google.com with SMTP id m20so18534027ejj.10
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 10:37:51 -0700 (PDT)
-X-Gm-Message-State: AOAM533v5wCPgTTvKcfX3VLBjvtB0QISqsBrCGAM0P/9+p6KKsBjc2po
-        dWwGthyQo8a0bh7RZ4H1m1FKUZhLTQOFeEGmXfkEuw==
-X-Google-Smtp-Source: ABdhPJww+lYVXFvUzPwylC2186LPMaNfdFPXgghAh2gRgIANvpNaY/HFZOJeSAxuhp7fvjON6/ZRor4QvsJ9snnK8jU=
-X-Received: by 2002:a17:906:2298:b0:715:7f3d:32ec with SMTP id
- p24-20020a170906229800b007157f3d32ecmr5255068eja.538.1655228269361; Tue, 14
- Jun 2022 10:37:49 -0700 (PDT)
+        with ESMTP id S238035AbiFNSI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 14:08:29 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD9A83527C
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 11:08:28 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id w2so16486895ybi.7
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 11:08:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C78v/CAN8C2z22MVaDl0QxTyyJoCfPguMq8MOK3tOJc=;
+        b=KPQRP+y1/9biwSKOdmOrA7l+Ng8mYs2ZKqEsk1EcYmkGcOWMD3eVJOVUvBbrZYLqLa
+         XxmEyIa3+nMLYvLo8wsYQD6u2h6vJ69PlvvEWBU4hwT/ftXEt28sTdms2tNq2oqAwkJ2
+         xCAMYyeEgKvWmnPoO7td7+2N+gClf9AyQwwCLajgaaQu89TWxl4Z3nrdDmLCzj2nvrDt
+         iEDgjcTO60gIUOVeCKdV4ZZl/HvoU7NaI0kNlP+lV1x3XSzN1cMxBhRoG5rEWorAbSrH
+         Bc+DXxtEPmMLZj2PPf9qEivHmu0mikMk2gU1zLrWRRh2zuFLQceSL6wcyYVB3HSoZP1/
+         nNTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C78v/CAN8C2z22MVaDl0QxTyyJoCfPguMq8MOK3tOJc=;
+        b=TXNzaI95q+XVKO86HHcBm7lzyUzNv3Z7A68MjNQZjS/ggn4JYD5/uLhbQnLVNYoRaI
+         ssDuULwuLPW4dLnonyw+ny2Q22nEbMMjgmRbBh/F/5CPp6Wb4ZVaHlfyvysH/dRD82t2
+         bhL3b/YD1hAT4f5SnWog7saaLO4X63S/1ptmeKgMHSF6ICkVFxp1RVyM8n4U4lWc4WLh
+         wuADxhIhM4C/yGZRCqjKqNLJoI6jOqM7vT0l+5+rAS1S3FsYTqOu9xXec+kgaH7JyL5p
+         5yhLn4MUHkm9IGAbZl0V43c1snG2sog8kqGaI5xS37g+bOkF1AGQ9Bk7MOA5yM01e8KE
+         jPNg==
+X-Gm-Message-State: AJIora8EYwoB5sNgbQ6dsgelQORGZmFC0YXX5rXHphjy+ocOEFAQmnXB
+        LNdE2FxW1Oct0CF/RNJ6VRtPkv0WQrXGRGIhfKhIVyOyEyw=
+X-Google-Smtp-Source: AGRyM1srZeha6aWpFJbD1p8y4wYjg8EMJ2RoztXJmVyLYONCPC4TSE6IGnH1wzu0dpdgL/3uTx0GgDipYFQRNz1mLZs=
+X-Received: by 2002:a25:5d0d:0:b0:633:25c8:380 with SMTP id
+ r13-20020a255d0d000000b0063325c80380mr5966062ybb.167.1655230107606; Tue, 14
+ Jun 2022 11:08:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <CAGtprH_83CEC0U-cBR2FzHsxbwbGn0QJ87WFNOEet8sineOcbQ@mail.gmail.com>
- <20220607065749.GA1513445@chaop.bj.intel.com> <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
- <20220608021820.GA1548172@chaop.bj.intel.com> <CAGtprH8xyf07jMN7ubTC__BvDj+z41uVGRiCJ7Rc5cv3KWg03w@mail.gmail.com>
- <YqJYEheLiGI4KqXF@google.com> <20220614072800.GB1783435@chaop.bj.intel.com>
-In-Reply-To: <20220614072800.GB1783435@chaop.bj.intel.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Tue, 14 Jun 2022 10:37:37 -0700
-X-Gmail-Original-Message-ID: <CALCETrWw=Q=1AKW0Jcj3ZGscjyjDJXAjuxOnQx_sabQ6ZtS-wg@mail.gmail.com>
-Message-ID: <CALCETrWw=Q=1AKW0Jcj3ZGscjyjDJXAjuxOnQx_sabQ6ZtS-wg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+References: <cover.1651774250.git.isaku.yamahata@intel.com> <ea5e6a1fc740cfe69167c8713b63fdb952a98e8b.1651774251.git.isaku.yamahata@intel.com>
+In-Reply-To: <ea5e6a1fc740cfe69167c8713b63fdb952a98e8b.1651774251.git.isaku.yamahata@intel.com>
+From:   Sagi Shahar <sagis@google.com>
+Date:   Tue, 14 Jun 2022 11:08:16 -0700
+Message-ID: <CAAhR5DGHhPagnaiC=Bn9v0qhNQ5N9HjsrDyQkv4dtui7dfMAbA@mail.gmail.com>
+Subject: Re: [RFC PATCH v6 093/104] KVM: TDX: Handle TDX PV MMIO hypercall
+To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 12:32 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+On Thu, May 5, 2022 at 11:16 AM <isaku.yamahata@intel.com> wrote:
 >
-> On Thu, Jun 09, 2022 at 08:29:06PM +0000, Sean Christopherson wrote:
-> > On Wed, Jun 08, 2022, Vishal Annapurve wrote:
-> >
-> > One argument is that userspace can simply rely on cgroups to detect misbehaving
-> > guests, but (a) those types of OOMs will be a nightmare to debug and (b) an OOM
-> > kill from the host is typically considered a _host_ issue and will be treated as
-> > a missed SLO.
-> >
-> > An idea for handling this in the kernel without too much complexity would be to
-> > add F_SEAL_FAULT_ALLOCATIONS (terrible name) that would prevent page faults from
-> > allocating pages, i.e. holes can only be filled by an explicit fallocate().  Minor
-> > faults, e.g. due to NUMA balancing stupidity, and major faults due to swap would
-> > still work, but writes to previously unreserved/unallocated memory would get a
-> > SIGSEGV on something it has mapped.  That would allow the userspace VMM to prevent
-> > unintentional allocations without having to coordinate unmapping/remapping across
-> > multiple processes.
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 >
-> Since this is mainly for shared memory and the motivation is catching
-> misbehaved access, can we use mprotect(PROT_NONE) for this? We can mark
-> those range backed by private fd as PROT_NONE during the conversion so
-> subsequence misbehaved accesses will be blocked instead of causing double
-> allocation silently.
+> Export kvm_io_bus_read and kvm_mmio tracepoint and wire up TDX PV MMIO
+> hypercall to the KVM backend functions.
+>
+> kvm_io_bus_read/write() searches KVM device emulated in kernel of the given
+> MMIO address and emulates the MMIO.  As TDX PV MMIO also needs it, export
+> kvm_io_bus_read().  kvm_io_bus_write() is already exported.  TDX PV MMIO
+> emulates some of MMIO itself.  To add trace point consistently with x86
+> kvm, export kvm_mmio tracepoint.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c     |   1 +
+>  virt/kvm/kvm_main.c    |   2 +
+>  3 files changed, 117 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index ee0cf5336ade..6ab4a52fc9e9 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1057,6 +1057,118 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
+>         return ret;
+>  }
+>
+> +static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long val = 0;
+> +       gpa_t gpa;
+> +       int size;
+> +
+> +       WARN_ON(vcpu->mmio_needed != 1);
+> +       vcpu->mmio_needed = 0;
+> +
+> +       if (!vcpu->mmio_is_write) {
+> +               gpa = vcpu->mmio_fragments[0].gpa;
+> +               size = vcpu->mmio_fragments[0].len;
+> +
+> +               memcpy(&val, vcpu->run->mmio.data, size);
+> +               tdvmcall_set_return_val(vcpu, val);
+> +               trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
+> +       }
+> +       return 1;
+> +}
+> +
+> +static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
+> +                                unsigned long val)
+> +{
+> +       if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
+> +           kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
+> +               return -EOPNOTSUPP;
+> +
+> +       trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
+> +       return 0;
+> +}
+> +
+> +static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
+> +{
+> +       unsigned long val;
+> +
+> +       if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
+> +           kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
+> +               return -EOPNOTSUPP;
+> +
+> +       tdvmcall_set_return_val(vcpu, val);
+> +       trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
+> +       return 0;
+> +}
+> +
+> +static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
+> +{
+> +       struct kvm_memory_slot *slot;
+> +       int size, write, r;
+> +       unsigned long val;
+> +       gpa_t gpa;
+> +
+> +       WARN_ON(vcpu->mmio_needed);
+> +
+> +       size = tdvmcall_a0_read(vcpu);
+> +       write = tdvmcall_a1_read(vcpu);
+> +       gpa = tdvmcall_a2_read(vcpu);
+> +       val = write ? tdvmcall_a3_read(vcpu) : 0;
+> +
+> +       if (size != 1 && size != 2 && size != 4 && size != 8)
+> +               goto error;
+> +       if (write != 0 && write != 1)
+> +               goto error;
+> +
+> +       /* Strip the shared bit, allow MMIO with and without it set. */
+> +       gpa = gpa & ~gfn_to_gpa(kvm_gfn_shared_mask(vcpu->kvm));
+> +
+> +       if (size > 8u || ((gpa + size - 1) ^ gpa) & PAGE_MASK)
+> +               goto error;
+> +
+> +       slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
+> +       if (slot && !(slot->flags & KVM_MEMSLOT_INVALID))
+> +               goto error;
+> +
+> +       if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
+> +               trace_kvm_fast_mmio(gpa);
+> +               return 1;
+> +       }
+> +
+> +       if (write)
+> +               r = tdx_mmio_write(vcpu, gpa, size, val);
+> +       else
+> +               r = tdx_mmio_read(vcpu, gpa, size);
+> +       if (!r) {
+> +               /* Kernel completed device emulation. */
+> +               tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
+> +               return 1;
+> +       }
+> +
+> +       /* Request the device emulation to userspace device model. */
+> +       vcpu->mmio_needed = 1;
+> +       vcpu->mmio_is_write = write;
+> +       vcpu->arch.complete_userspace_io = tdx_complete_mmio;
+> +
+> +       vcpu->run->mmio.phys_addr = gpa;
+> +       vcpu->run->mmio.len = size;
+> +       vcpu->run->mmio.is_write = write;
+> +       vcpu->run->exit_reason = KVM_EXIT_MMIO;
+> +
+> +       if (write) {
+> +               memcpy(vcpu->run->mmio.data, &val, size);
+> +       } else {
+> +               vcpu->mmio_fragments[0].gpa = gpa;
+> +               vcpu->mmio_fragments[0].len = size;
+> +               trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
+> +       }
+> +       return 0;
+> +
+> +error:
+> +       tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
 
-This patch series is fairly close to implementing a rather more
-efficient solution.  I'm not familiar enough with hypervisor userspace
-to really know if this would work, but:
+We should return an error code here.
 
-What if shared guest memory could also be file-backed, either in the
-same fd or with a second fd covering the shared portion of a memslot?
-This would allow changes to the backing store (punching holes, etc) to
-be some without mmap_lock or host-userspace TLB flushes?  Depending on
-what the guest is doing with its shared memory, userspace might need
-the memory mapped or it might not.
+> +       return 1;
+> +}
+> +
+>  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>  {
+>         if (tdvmcall_exit_type(vcpu))
+> @@ -1069,6 +1181,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>                 return tdx_emulate_hlt(vcpu);
+>         case EXIT_REASON_IO_INSTRUCTION:
+>                 return tdx_emulate_io(vcpu);
+> +       case EXIT_REASON_EPT_VIOLATION:
+> +               return tdx_emulate_mmio(vcpu);
+>         default:
+>                 break;
+>         }
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 5f291470a6f6..f367d0dcef97 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13166,6 +13166,7 @@ bool kvm_arch_dirty_log_supported(struct kvm *kvm)
+>
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_mmio);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 4bf7178e42bd..7f01131666de 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2294,6 +2294,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+>
+>         return NULL;
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
+>
+>  bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
+>  {
+> @@ -5169,6 +5170,7 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
+>         r = __kvm_io_bus_read(vcpu, bus, &range, val);
+>         return r < 0 ? r : 0;
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_io_bus_read);
+>
+>  /* Caller must hold slots_lock. */
+>  int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+> --
+> 2.25.1
+>
 
---Andy
+Sagi
