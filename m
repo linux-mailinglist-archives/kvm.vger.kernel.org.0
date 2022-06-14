@@ -2,82 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AD7E54B760
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 19:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CC3654B75C
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 19:12:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242998AbiFNRJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 13:09:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58882 "EHLO
+        id S243075AbiFNRKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 13:10:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243674AbiFNRJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 13:09:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 72091201A4
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 10:09:08 -0700 (PDT)
+        with ESMTP id S244451AbiFNRKp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 13:10:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B63D21265
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 10:10:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655226547;
+        s=mimecast20190719; t=1655226644;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TtO7y3+ijZ6YgcAc4PQtJVzw8h5/IO41lJW3F/O5h8o=;
-        b=dEeSXGr3F4xyw5pxf8wuE8MktMdUQu1eFLQmbCgnueDKBjS+AKLAAwKN68u6HzWNdawlJ+
-        v6F6AftpdZfGsQEmNgUr0MX96aaTtU5borSfG5Pevo1SGMW37CHTkvqm3/rigDldPq6SQm
-        DCROFmnLr/8dmT4VwGZvUK/c1STI3Go=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wdTx0UxZNie9egiNrklzoc2+ItGio2T/VUZ8M/iIzT0=;
+        b=T4ggdqZRc+h6MPK9LpxEa1PBObhZjdQQ5IktKoU/aDp8ZgqzLlFUbxO0zoYqHR4e5GQXxq
+        ROhnA0gH+YFG0tQGrNWStPg4zoIaUnhk4l7YN8dtd5SROBqg9y5TUiXgsAVNkhCATz6M5f
+        QUDI3HKWVTr5xYUTiOBGu0s59+dLyLg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-386-PX590xngP3SaqljB0n74gQ-1; Tue, 14 Jun 2022 13:09:04 -0400
-X-MC-Unique: PX590xngP3SaqljB0n74gQ-1
-Received: by mail-wm1-f69.google.com with SMTP id v125-20020a1cac83000000b0039c832fbd02so4414180wme.4
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 10:09:04 -0700 (PDT)
+ us-mta-661-68PbLGp7NHuxzjhckdYeNA-1; Tue, 14 Jun 2022 13:10:43 -0400
+X-MC-Unique: 68PbLGp7NHuxzjhckdYeNA-1
+Received: by mail-wm1-f71.google.com with SMTP id k34-20020a05600c1ca200b0039c7db490c8so5084673wms.1
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 10:10:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=TtO7y3+ijZ6YgcAc4PQtJVzw8h5/IO41lJW3F/O5h8o=;
-        b=1aCuVf+w+bVorjBaD+x+wrx0hqr9G4H6QMETmQdbI4Ne6hc5IaB55SbLArCaB3Zsv6
-         H9cmaWgvlPW7CRE6tFwEmCyt1ajRfW6rHhzdIKru8NIbziAVkDgE5i4er7iKUjTqlwVZ
-         XiX6LeqELpX2yXJJwYlqDRXssXvpPSvroCrbkrGfPTcirrKvf1w6oevYuciugBtVabjf
-         xUMeJ5eRQyJwQrqlLT5FSbA27vmHXmlylELiZXDwGM8bBigG9Zsq3IEvMMo3clr7y5Y8
-         nX8xzDiJ+vREWbFay/XhntcVaGSqng38t0S5wepZxAe8tND6AeyOt8z/MQUJauEzv7mK
-         8odA==
-X-Gm-Message-State: AOAM531ZBh8DV0i2Dasy3/NeNyOngOs0Gx342c6f5WWAllFebgi9+FFb
-        G7BebKw+TxP6dXzcSnmKtPB3D1Gs5TJZtd3ewwG6TbFD9e3Imw6MUIkzmjhPuJ7qOWzIILV94xm
-        d/ZBO2h1zAwxc
-X-Received: by 2002:a1c:f213:0:b0:39b:ad32:5e51 with SMTP id s19-20020a1cf213000000b0039bad325e51mr5215046wmc.72.1655226543168;
-        Tue, 14 Jun 2022 10:09:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwEH0VwSnOcNDbF6N4JmvvUE3uFVg/Be8POxZzNI8KiXy7aOZbLTS8Lt1QSrzLFl377ZtNdew==
-X-Received: by 2002:a1c:f213:0:b0:39b:ad32:5e51 with SMTP id s19-20020a1cf213000000b0039bad325e51mr5215014wmc.72.1655226542875;
-        Tue, 14 Jun 2022 10:09:02 -0700 (PDT)
+        bh=wdTx0UxZNie9egiNrklzoc2+ItGio2T/VUZ8M/iIzT0=;
+        b=ITWnRlFs85aRfdbTYKqJcJRlmNSyAmY9C1ww8IkdN13r1G8P7SQn7s3/v7cbpxEMss
+         6BoDo6jS2J2qez+qhaVa3AcqTJdh8MxOdlQIWN5EypZtZ5Oz5lbUm0Zm2QMESbYFazZD
+         9TGQPjpnR6EiMw20OZzomQLAJ6RxcB/NydHtvfcSG6eOTV6pVNER3hX+siFrVYKdDaqu
+         35t3cx1A5dY0ay/moLDFUvCGc5pNfjaIgtk8w6yLHz83HyDyliG+KeEmQ2V1OO+3AF7x
+         +HdauA7x6fX5PKz+/FpiwQiOd7208YagPD75ntkuHPmOde3aoFOrG6AqlcVJeQyKGudb
+         wX6w==
+X-Gm-Message-State: AJIora/omXD/y2/EFYVFDdIvFOCZyOs2NLhOJHyEOlSAM3jXV0ZJBZFo
+        Z28APwCLjg425tw/ebWltUIPqZA6bPx+J731KFE3zHNlolbqL2m4YfcrX/A1LJTgGjPBS57I9Gr
+        v9o6UEhN0qtBK
+X-Received: by 2002:a5d:5222:0:b0:213:b7f7:58fe with SMTP id i2-20020a5d5222000000b00213b7f758femr5502062wra.620.1655226641575;
+        Tue, 14 Jun 2022 10:10:41 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1t9/AkMew9VeDM8YYt21zvgf/5/6NovrH8S/spj9cUNFHVR2U9Nsa7Do36pfJPc1RFOGvs39g==
+X-Received: by 2002:a5d:5222:0:b0:213:b7f7:58fe with SMTP id i2-20020a5d5222000000b00213b7f758femr5502044wra.620.1655226641339;
+        Tue, 14 Jun 2022 10:10:41 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id v1-20020adfebc1000000b0020d07d90b71sm12236421wrn.66.2022.06.14.10.09.01
+        by smtp.googlemail.com with ESMTPSA id r20-20020a05600c35d400b0039c1396b495sm14287976wmq.9.2022.06.14.10.10.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jun 2022 10:09:01 -0700 (PDT)
-Message-ID: <6dca9fc3-d50a-2920-b22e-73f0bd2c93f9@redhat.com>
-Date:   Tue, 14 Jun 2022 19:09:00 +0200
+        Tue, 14 Jun 2022 10:10:40 -0700 (PDT)
+Message-ID: <25edd702-3364-921c-2bcf-015fd86296c4@redhat.com>
+Date:   Tue, 14 Jun 2022 19:10:30 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
-Subject: Re: [PATCH] KVM: s390: selftests: Fix memop extension capability
- check
+Subject: Re: [PATCH 1/8] KVM: x86/mmu: Drop unused CMPXCHG macro from
+ paging_tmpl.h
 Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>, thuth@redhat.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     david@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-s390@vger.kernel.org, shuah@kernel.org
-References: <36d83871-343d-e8a0-1aed-05bf386f9b1b@redhat.com>
- <20220614162635.3445019-1-scgl@linux.ibm.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20220613225723.2734132-1-seanjc@google.com>
+ <20220613225723.2734132-2-seanjc@google.com>
+ <CAJhGHyDjFCJdRjdV-W5+reg-3jiwJAqeCQ7A-vdUqt+dToJBdA@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220614162635.3445019-1-scgl@linux.ibm.com>
+In-Reply-To: <CAJhGHyDjFCJdRjdV-W5+reg-3jiwJAqeCQ7A-vdUqt+dToJBdA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,37 +88,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/14/22 18:26, Janis Schoetterl-Glausch wrote:
-> Fix the inverted logic of the memop extension capability check.
-> 
-> Fixes: 97da92c0ff92 ("KVM: s390: selftests: Use TAP interface in the memop test")
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
-> 
-> 
-> Here you go.
-> Hope it doesn't get lost as a reply, but I can always resend
-> and it's not super critical after all.
+On 6/14/22 04:13, Lai Jiangshan wrote:
+> On Tue, Jun 14, 2022 at 6:59 AM Sean Christopherson <seanjc@google.com> wrote:
+>>
+>> Drop the CMPXCHG macro from paging_tmpl.h, it's no longer used now that
+>> KVM uses a common uaccess helper to do 8-byte CMPXCHG.
+>>
+>> Fixes: f122dfe44768 ("KVM: x86: Use __try_cmpxchg_user() to update guest PTE A/D bits")
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > 
 > 
->   tools/testing/selftests/kvm/s390x/memop.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> In https://lore.kernel.org/lkml/20220605063417.308311-2-jiangshanlai@gmail.com/
+> two other unused macros are also removed.
 > 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index e704c6fa5758..e1056f20dfa1 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> @@ -769,7 +769,7 @@ int main(int argc, char *argv[])
->   	ksft_set_plan(ARRAY_SIZE(testlist));
->   
->   	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
-> -		if (testlist[idx].extension >= extension_cap) {
-> +		if (extension_cap >= testlist[idx].extension) {
->   			testlist[idx].test();
->   			ksft_test_result_pass("%s\n", testlist[idx].name);
->   		} else {
 
-Done, thanks!
+Queued that one, thanks!
 
 Paolo
 
