@@ -2,164 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E740E54AE5F
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 12:32:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75DEE54AE90
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 12:39:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235246AbiFNKcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 06:32:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45978 "EHLO
+        id S241845AbiFNKi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 06:38:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229887AbiFNKcP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 06:32:15 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE234738F;
-        Tue, 14 Jun 2022 03:32:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655202734; x=1686738734;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=QPKTMnB8uVps7X54urmGLJnx57cnpdme41Eu0QbkSIE=;
-  b=cmBTpN0vQOBGgPptXWs8iWPRZbDBGeaU/0blZYr34Wek3EE2ep0i78Ft
-   V1LVdhuK3zi7khdGl+ebn9cytc8X/ZtXz+c8YbOST5HkhVekF+0ePVYPV
-   JKZp4OFh/wmJS3Cp8TN9C4hzzHHUJghvOq1ZnUcoLTr8pyZl9HZEo9bMX
-   /+TXXGaIkLU+OH9aZyOD0x1sVJv5ZXBNRrhL5kqtwgeniOJ92yd9MDsr3
-   XGAPYpKMsxFZd/QxxcxkV8zOKRyLx49YB6q11+B0Mwp4W7od9ImVTYQNv
-   iV0IqBALkYna5UrY6oht3Vz2HZ2MKnp/HJAgqlBy6ZEANfiKoXCmVZO+D
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10377"; a="261607906"
-X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
-   d="scan'208";a="261607906"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 03:32:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
-   d="scan'208";a="640291351"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Jun 2022 03:32:13 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Tue, 14 Jun 2022 03:32:13 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Tue, 14 Jun 2022 03:32:13 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.171)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Tue, 14 Jun 2022 03:32:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JyCu1WBXHXSRjovRCH983UxvQmxfSlvSdQtD754SuPStnyPL/BpgUMduD8jN7GE3+EQw5UWbrPsAEPL1eBGmb6IxGYvKXC8q2lUO0y5hfkyaIHG/PoxDGzIlE1MZxZPbd3pdTK4apxh+0UfnBcWBDRzKQ1QIkBYI/xWnatTlD4c+Q6t5OGZHKU0rgU0VAYza4kDkjOXO/YaMkgnsDPHi2HGNzzNE/DVEHkug4X96XQSxKuCQhdbUVBSE0oj5paRnng71qZwLJU3lGeZf0pvbVpckge+UdA5DobB0l2osVRPq/W0xv1cSm/TPGfOw8RfshLUlHXwBokZpfqbsa8xZYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=axRfZt8Gj58duZdGvYw63maRadYk/GPHouJ8eIU/5pE=;
- b=k1v183tWUa7SBR1wmSswJAWvrZzn63svpzzbQXil8gIqaQW69yCJ01Q4wfyoQA7i0dsTOIHepvuWMrsqhQRmhum5/cxUgpTKyLZWGpDbwgRlcEh9/BA2cmXsQzOTITvjrG/0JnKVJFW3PoFcA20Y7ahhtsbGHd/FwdSeK6vhYaDOGs6aKTYU4Ioiz0W/9PabW1UT4OT18o9zwVqG3CHrR+Jfp129bnlNAgU150ljrRndiYu1Hq6nIzH8kn5TfpcNNWAvuKJ9x4DrwAyLhIbFHaEiumn13P0yPdGUfLi3TSjKP4tNLxDOLqjiFEI6afAiW65gQ1BEp2N4AyPhhppU7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BL1PR11MB5416.namprd11.prod.outlook.com (2603:10b6:208:319::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.12; Tue, 14 Jun
- 2022 10:32:11 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::3583:afc6:2732:74b8]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::3583:afc6:2732:74b8%4]) with mapi id 15.20.5332.022; Tue, 14 Jun 2022
- 10:32:11 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Alex Williamson" <alex.williamson@redhat.com>
-CC:     "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH 13/13] vfio/mdev: add mdev available instance checking to
- the core
-Thread-Topic: [PATCH 13/13] vfio/mdev: add mdev available instance checking to
- the core
-Thread-Index: AQHYf6sGj5um/s7K/EC5sPLf12L81a1Osm3g
-Date:   Tue, 14 Jun 2022 10:32:11 +0000
-Message-ID: <BN9PR11MB5276BB7AA39243BA5A21CFEC8CAA9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220614045428.278494-1-hch@lst.de>
- <20220614045428.278494-14-hch@lst.de>
-In-Reply-To: <20220614045428.278494-14-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.6.500.17
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2f208e65-36df-45ca-8ddc-08da4df123e1
-x-ms-traffictypediagnostic: BL1PR11MB5416:EE_
-x-microsoft-antispam-prvs: <BL1PR11MB54165813162847285DF0D9C98CAA9@BL1PR11MB5416.namprd11.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: r19zAlAFMQoqgyP8uaHFERlEnZqTTnAUYyDxKbjfy0HfJ+BdRXubfA74wFNeL9SfA9mtad0chFHdefhR4tefecSKp7bs6UzQ3edhODEdA111fnvxuxMqqRIIXJNdJiOg0aubLLsJVy2WEc8SNaoRCPX0TCXn1WjixSwUMWbzh/heghQWytN6NieeztOECjO95WNDcxyMtlxeN0JT1GqwfmzlFV8MOPtEaoo2G5+suF0BMQXTGgim/FM1lQnRWADSpgAHq0R3334VOLZnKM29K/DGVhBq0w3Z9Pa1b6sgLHtM3SzggDc7nSmtKixtevqt3DVkjNTjQ6r37ilbc3YHqHgPSf7A7JwdFDAI7mslPjPfLwFEeVNEhiukHify60VJY0gahRvwspGVlMVnxfrkhZLJEva60kegQym+uptfJQYh33A7BrdQ46wyPdkVymHlslP1RjfELazjxPjcKv/imyhL+xg6XkeOKl149D9vowaN2/A3XD/xyOy7UWzE0ZEJXPcwpPvwCAQc1b+8Sw7x+B7pgGfCNKOfCyJyGLsjXm3ZLckzcukS3GKagIAESMnYGWflQFN3iqfXBFdWH3Msp9epb9oXfWNHwxdxugubGcJ4FS2U5U7DUucoQtvn3TsshKGiaj5JxWNz9q5zX7XaE7aqobRWatMwGU5Vm9ASee0CrMS5HC+fWi5pjxhHP0x/Tb6Oiq477+7W2JlTdB5R6crapvaKNLkTkRKEl0TkR5lOTq8xuwjuFvADTNXbEJw2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(366004)(38100700002)(6506007)(38070700005)(55016003)(33656002)(71200400001)(316002)(7696005)(86362001)(122000001)(921005)(2906002)(110136005)(54906003)(508600001)(9686003)(4326008)(82960400001)(83380400001)(52536014)(8676002)(64756008)(66946007)(76116006)(66556008)(66446008)(26005)(66476007)(7416002)(5660300002)(186003)(8936002)(131093003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qGjSFvhYRrkrGUo06jhl8ULSx4/ACqUINilDVLsFN8Lap3n9Ke24pZeETgTS?=
- =?us-ascii?Q?eByBVIoY3QVzOjq2RwElxsesReF0PAU8NmBOzvyQy30ZdE44JKgRSnN/JGKN?=
- =?us-ascii?Q?1tr9PfrOM97Y8syoeJpihAKPDBkEZCS4mnmhS3StIqzH1/Uoi/CusOPztQRT?=
- =?us-ascii?Q?X6jz6EGsVI1v0KVCic+L3cTH6mZ7UrHD17caSUb8LIyITlASUvIN1b/7DRdN?=
- =?us-ascii?Q?a74hWydeUN5+MbB9a1+C9OeYRgj8NKL5aveqRGEXshGG6BUEy/QdaVbdviXD?=
- =?us-ascii?Q?1dfWVSuTCZh6KSlo1FAgu/kfJ9bnGdJM20/nefOeK2bwRJmUBnXKperc4gmW?=
- =?us-ascii?Q?Es1vNr08tRQRD81H/RyVvF4PUrXNb8NvnFwU3B7tnffNsqEyZzS9iprJKi6n?=
- =?us-ascii?Q?w8HuuKd4koD+XqoGU/pR9O0TT7lloPmthQU69qI+1Olp3awpGGyOYhNhIvux?=
- =?us-ascii?Q?FO9Ze0ziVZqSSTO3HCv+rUF17aebP/StTkfBBTn8qlL/vNTBeVz8jKEjIADK?=
- =?us-ascii?Q?eiZ5SVha+LaFJ18nwweMLv855x29Ta1UBzslPDDEDJOHdSYDjTUrPM7gLUOl?=
- =?us-ascii?Q?q+dklbafXMOKdGCDzv+HRdudzuNshHC/ehPR2x8ougFsHtRV81iC1zkiwJNa?=
- =?us-ascii?Q?k7qFnPeaYwaoF2BNnrWpTPI3lIoojnujQQimKD26nRsk3FA9Zsj4XaOKzaHP?=
- =?us-ascii?Q?toUVf2cx6wEoFYvhRqAhpkag62yukr+UjlIadYkm55vtm+gsZS36HwHJWq37?=
- =?us-ascii?Q?FJDy4m5Sl20jINPlaPxvPUcYBb3VSq+BEylkZm91olV3pT1d2rNPzOtJizup?=
- =?us-ascii?Q?emaoibSAma7myATeNP2vewgXUoC4VAxoeub3L8VxjYZtzDtxns1ywGMIhkMF?=
- =?us-ascii?Q?WegllFxVbMJ9eRchZzXP2n2o4WeNrsMaHQ89CAafQUFnUYW2+2RFuj2Z3adB?=
- =?us-ascii?Q?PQtdQX51h4Ydu2lliN2s/xlsZ3gW5m7vWePNgbRq7Oq5HygfLrRn2Il70XRf?=
- =?us-ascii?Q?hJhfmrZ0PjrbFxZVCJqoKEBwfR7WNnw5Py55WQjIk12PTYqPy31nOL+jFwsx?=
- =?us-ascii?Q?3d5iH7HoW34jqFjo8Sh0ONHub1hiznu6THogqS23UP/NLrBlT/QVNKJQYmSN?=
- =?us-ascii?Q?X4Er2zW/WjV3mofC96KUz7Uq/W9ggH9iAGxKVEHyqtiBov7mDmKVqhD2A78p?=
- =?us-ascii?Q?uDlnQdt+88ItcfkviBATJ7OjDHlnb26oShXnyh+v0cJwCtVS+a4t29iE4Qad?=
- =?us-ascii?Q?084smYXhrKuaB9zGbqjnD/2K2/IJUymKEz5YEjY9zL0MPCADcDbYOezzPvGx?=
- =?us-ascii?Q?subkoej2zx/6KM7imO+x8GHlbuMUNI+LrajihJSUUpV+S0dAfBn06cnSrmOL?=
- =?us-ascii?Q?xr2tqTGq1xj8SSu37n/lMjzEMvC8VAr7SZOqdSJWILDacijIr/NmyUNREK5z?=
- =?us-ascii?Q?a5e2006DkJED7csRMacAQbKemffg64oXrSoxEVXSmuvu+pp3tyaHuIwISLBX?=
- =?us-ascii?Q?4bjumAxjA5WjL6tlZsWBy9qoFd66WzdP++tPERtyWu6az8vEDFI4bwdv+Eyp?=
- =?us-ascii?Q?43wJItPmKkPPPe8oKiYFvWTYElYSmjyKH6rgkcTfI+glk895fxrQksyvslU5?=
- =?us-ascii?Q?YBz26qBeK+zWu68bfs3VNWFwnNEYzp+zEvFBH6MXAy2lzapSQlzFtZ3SpDpG?=
- =?us-ascii?Q?5RNecPTwuuBtnXL4u/vPiBFwW2lzqs/u6Q/93yDLlx13f6sfNE6xXWZoaBQl?=
- =?us-ascii?Q?u0TuoBxVbA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S230157AbiFNKi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 06:38:56 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A468C35252;
+        Tue, 14 Jun 2022 03:38:55 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25E96fHg024970;
+        Tue, 14 Jun 2022 10:38:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=fenuCRyA2MbBa5B5nqlyL4fDAInAfNqYcCHTaK+ep6c=;
+ b=suhlY2Ae8Zzv/ThqTEhWxC4kz+32aBI0a+u/g52ayzRnRcUgwGfYjNdfsv+GQ3knLuCf
+ Su/MUA+K5IhD1SE1uhVqy9jrejPhLgHYMETkUib1AmrTcQMTEUzehdJca3g6KGzOYRGD
+ wzOBTNc9EtDUrERKvAqu0+/gP0GaroH730HLiWUWzJ196+WIPUe7ALzwLqiJ4CZL8hiL
+ nnnphSTtdiL/23YMg4dGIJ2ls56Dlp+pr1G9qVqthSZoUdSl8eMiGo0WapwpcPRdDGTG
+ etsJ7AaW4r5CinIuz7BsbOdfACS2MvjWA5npXbv+OmUeb19ZAKf16IaG7eTfXoRPHTk3 JA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6hc952-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jun 2022 10:38:47 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25E96uKM025759;
+        Tue, 14 Jun 2022 10:38:47 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6hc94e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jun 2022 10:38:47 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25EAaom7021792;
+        Tue, 14 Jun 2022 10:38:44 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3gmjajc787-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jun 2022 10:38:44 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25EAcfks8716654
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Jun 2022 10:38:41 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8B9DB42042;
+        Tue, 14 Jun 2022 10:38:41 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2DA8342041;
+        Tue, 14 Jun 2022 10:38:39 +0000 (GMT)
+Received: from [9.171.29.58] (unknown [9.171.29.58])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Jun 2022 10:38:37 +0000 (GMT)
+Message-ID: <07576ae9-9798-316f-d33e-10c91faeebfb@linux.ibm.com>
+Date:   Tue, 14 Jun 2022 12:38:37 +0200
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f208e65-36df-45ca-8ddc-08da4df123e1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2022 10:32:11.0631
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mAny8JbvKGexe1m3s2B+qzzQRWVYHLqUdRKeiQm4lCnLI/ahrdEbHonqFMqXuFUWAYxrBeddvZzqcXVAZM8iHg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5416
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v4 1/4] KVM: s390: selftests: Use TAP interface in the
+ memop test
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, linux-s390@vger.kernel.org
+References: <20220531101554.36844-1-thuth@redhat.com>
+ <20220531101554.36844-2-thuth@redhat.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <20220531101554.36844-2-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nKt6VK9FhXp14FtCBnSww5of7OpRYt0T
+X-Proofpoint-ORIG-GUID: citumcxVuJL2MZYB4n2rHeF_iUEaQ4ZW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-14_03,2022-06-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 clxscore=1011 adultscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206140041
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -167,35 +100,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Christoph Hellwig
-> Sent: Tuesday, June 14, 2022 12:54 PM
->=20
-> From: Jason Gunthorpe <jgg@nvidia.com>
->=20
-> Many of the mdev drivers use a simple counter for keeping track of the
-> available instances. Move this code to the core code and store the counte=
-r
-> in the mdev_type. Implement it using correct locking, fixing mdpy.
->=20
-> Drivers provide a the value in the mdev_driver at registration time and
-> the core code provides a standard sysfs attribute to return the
-> available_instances.
->=20
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> [count instances per-parent instead of per-type]
+On 5/31/22 12:15, Thomas Huth wrote:
+> The memop test currently does not have any output (unless one of the
+> TEST_ASSERT statement fails), so it's hard to say for a user whether
+> a certain new sub-test has been included in the binary or not. Let's
+> make this a little bit more user-friendly and include some TAP output
+> via the kselftests.h interface.
+> 
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/s390x/memop.c | 95 ++++++++++++++++++-----
+>  1 file changed, 77 insertions(+), 18 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+> index 49f26f544127..e704c6fa5758 100644
+> --- a/tools/testing/selftests/kvm/s390x/memop.c
+> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> @@ -14,6 +14,7 @@
+>  
 
-per-parent counting works only if the parent doesn't have overlapping
-instances between types. This is probably worth a clarification in doc.
+[...]
 
-> @@ -135,6 +136,7 @@ static void mdev_device_release(struct device *dev)
->=20
->  	mutex_lock(&mdev_list_lock);
->  	list_del(&mdev->next);
-> +	mdev->type->parent->available_instances++;
+>  int main(int argc, char *argv[])
+>  {
+> -	int memop_cap, extension_cap;
+> +	int memop_cap, extension_cap, idx;
+>  
+>  	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
+>  
+> +	ksft_print_header();
+> +
+>  	memop_cap = kvm_check_cap(KVM_CAP_S390_MEM_OP);
+>  	extension_cap = kvm_check_cap(KVM_CAP_S390_MEM_OP_EXTENSION);
+>  	if (!memop_cap) {
+> -		print_skip("CAP_S390_MEM_OP not supported");
+> -		exit(KSFT_SKIP);
+> +		ksft_exit_skip("CAP_S390_MEM_OP not supported.\n");
+>  	}
+>  
+> -	test_copy();
+> -	if (extension_cap > 0) {
+> -		test_copy_key();
+> -		test_copy_key_storage_prot_override();
+> -		test_copy_key_fetch_prot();
+> -		test_copy_key_fetch_prot_override();
+> -		test_errors_key();
+> -		test_termination();
+> -		test_errors_key_storage_prot_override();
+> -		test_errors_key_fetch_prot_override_not_enabled();
+> -		test_errors_key_fetch_prot_override_enabled();
+> -	} else {
+> -		print_skip("storage key memop extension not supported");
+> +	ksft_set_plan(ARRAY_SIZE(testlist));
+> +
+> +	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
+> +		if (testlist[idx].extension >= extension_cap) {
 
-	if (!drv->get_available)
-		mdev->type->parent->available_instances++;
+This is reversed, should be
 
-Otherwise this looks good to me:
+   		if (testlist[idx].extension <= extension_cap) {
+or
+		if (extension_cap >= testlist[idx].extension) {
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+I'd prefer the latter.
+
+> +			testlist[idx].test();
+> +			ksft_test_result_pass("%s\n", testlist[idx].name);
+> +		} else {
+> +			ksft_test_result_skip("%s - extension level %d not supported\n",
+> +					      testlist[idx].name,
+> +					      testlist[idx].extension);
+> +		}
+>  	}
+> -	test_errors();
+>  
+> -	return 0;
+> +	ksft_finished();	/* Print results and exit() accordingly */
+>  }
+
