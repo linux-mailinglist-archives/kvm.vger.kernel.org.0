@@ -2,81 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92E1254A356
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 02:57:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D08AF54A677
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 04:37:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236652AbiFNA4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 20:56:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40524 "EHLO
+        id S1354660AbiFNC1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 22:27:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229892AbiFNA4G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 20:56:06 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797F931344
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 17:56:05 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id gc3-20020a17090b310300b001e33092c737so7616593pjb.3
-        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 17:56:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zM25P5j7I6ljpapb2NJdghZi7EF+oAA2atXWjdhgbqU=;
-        b=EmCpvYAGXd48+DwFFSxtFRqmLKmNO11mM4ZuQheqGjuzckadHock5jF+A86mJnH1SH
-         PN8tM2+xM8BdV7pk4jBWLWsq7novWKwN6WKknSfiXb/wfFkWQhzqLlqtfrbqO5AyBWrp
-         p3O8Rym02lcZQKvvCkphYjfUvAJCre9XBYHqtBpJE9TIR8gTNEBwnpTVjGLF4VRtvRSJ
-         y7P37M+l9sC/nuYLn0B8cX4NsT/VJCbHbuuLQjefy42jbGFBSZ9xgS8YkEAoJEJbjP/W
-         uOHfdKdhWBS84t0tAK/tKevET7xMS6OihQFya6NdfRjVONDHcdG/2Be7mUyuONDGs5CS
-         y0rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zM25P5j7I6ljpapb2NJdghZi7EF+oAA2atXWjdhgbqU=;
-        b=XytI0DgBJwIj5GA8YtEzEPNpKWn7O3OOOKmEtUW7Xfx2io/+mFMylp3M7i+e2wCOSZ
-         px+ivzG3FMtOuYghlvMx3qRXt8xW3MlYLMgP40sURu7F9LQheuHYQkFXqj/Af8JTWOMA
-         ajue8dn/xbRksTxtCPuBhfLTlCFhJA/c3mx8uP7Gv3skicibjnLFEcU1AzmBideqgYAD
-         TKNG+ucUY9jlW0WH6ovWRJNzcdpJCH/Dz0xJCL7QEjhEmRJrMqmR1VtDdN/KoQqRWGwT
-         8IlJ27S4yFeYAC9DtvHwAdxsXe/nZmA+P2epfxZQiK9QUZ9z7USYAXYEFFy1eImsTe5r
-         e6bw==
-X-Gm-Message-State: AJIora+qK3x8Gny86+XO6E6z4IiP28k4XKIPdNnIF3ylvzGSfTcNhQ9B
-        TX4J8Mg38SVvIZu5wdD28vTBeA==
-X-Google-Smtp-Source: AGRyM1v4hqWo35Dq9bSSU14Eq4t+QYXwRnRiFLU+htOcGPcAFII/epQGniZ47FPQcHCrpmzqqRXR1A==
-X-Received: by 2002:a17:902:edca:b0:167:ccca:30af with SMTP id q10-20020a170902edca00b00167ccca30afmr1998924plk.40.1655168164794;
-        Mon, 13 Jun 2022 17:56:04 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x10-20020a627c0a000000b0050e006279bfsm6036776pfc.137.2022.06.13.17.56.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jun 2022 17:56:04 -0700 (PDT)
-Date:   Tue, 14 Jun 2022 00:56:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Shukla, Manali" <mashukla@amd.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        "Shukla, Manali" <manali.shukla@amd.com>
-Subject: Re: [kvm-unit-tests PATCH v4 0/8] Move npt test cases and NPT code
- improvements
-Message-ID: <YqfcoSk3cTWhNBJB@google.com>
-References: <20220428070851.21985-1-manali.shukla@amd.com>
- <1b1998e2-0ff9-23cc-aaff-4f1e5ae3d06b@amd.com>
- <420e1cda-61ad-e7d1-df50-0cd6907ff329@amd.com>
- <29c35f14-8941-288d-2a0a-6642bf399a32@amd.com>
+        with ESMTP id S1354616AbiFNCZa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 22:25:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEC736E35;
+        Mon, 13 Jun 2022 19:11:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DF59960EE1;
+        Tue, 14 Jun 2022 02:11:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 219F2C341C0;
+        Tue, 14 Jun 2022 02:11:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655172679;
+        bh=cx8dXSfJMM65Dx7oEQhGNE/xAv1BxP8sP+76SbXcyk4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=k7KyrYxoRwXI+CoQq3EYfe7dRskOcE9t97WvY5GWt1TjuQ75TV01iBvcVfEdIOYnD
+         wFGLVDUcfVvjrjBEWPNXeQ7rCebqKfeEDRvkQAff3eY3Cr1dnpEWhMSTe0cq4Plots
+         yt6YoV9LHTTHInsK3JMs4CWg1JlP0pmWUxx/i9J3VpFxJBfHhE1/s69s2TbowYsMuZ
+         UkX+CAShw4wK/GLqGnOeMimE0iTjruAWcpcd2Uw/LeJvpSbZHx3Qnw6B7JiNIp+kiS
+         r7CJdr0FE7AtunwauN900lawq95moOvoZOy2+BNOlkrg1pKHD+NEvfX+pyGk3LRxTw
+         pppwNjTJlaqnw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Jann Horn <jannh@google.com>,
+        Sasha Levin <sashal@kernel.org>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, kvm@vger.kernel.org
+Subject: [PATCH MANUALSEL 5.18 1/6] KVM: x86: do not report a vCPU as preempted outside instruction boundaries
+Date:   Mon, 13 Jun 2022 22:11:10 -0400
+Message-Id: <20220614021116.1101331-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29c35f14-8941-288d-2a0a-6642bf399a32@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 09, 2022, Shukla, Manali wrote:
-> Shall I rebase and resend this series?
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-If you have spare bandwidth and/or it's a trivial rebase, sure.  I'm hoping to get
-to this in the next few days; waiting for that may or may not save you time in the
-long run (truly don't know at this point).
+[ Upstream commit 6cd88243c7e03845a450795e134b488fc2afb736 ]
+
+If a vCPU is outside guest mode and is scheduled out, it might be in the
+process of making a memory access.  A problem occurs if another vCPU uses
+the PV TLB flush feature during the period when the vCPU is scheduled
+out, and a virtual address has already been translated but has not yet
+been accessed, because this is equivalent to using a stale TLB entry.
+
+To avoid this, only report a vCPU as preempted if sure that the guest
+is at an instruction boundary.  A rescheduling request will be delivered
+to the host physical CPU as an external interrupt, so for simplicity
+consider any vmexit *not* instruction boundary except for external
+interrupts.
+
+It would in principle be okay to report the vCPU as preempted also
+if it is sleeping in kvm_vcpu_block(): a TLB flush IPI will incur the
+vmentry/vmexit overhead unnecessarily, and optimistic spinning is
+also unlikely to succeed.  However, leave it for later because right
+now kvm_vcpu_check_block() is doing memory accesses.  Even
+though the TLB flush issue only applies to virtual memory address,
+it's very much preferrable to be conservative.
+
+Reported-by: Jann Horn <jannh@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/include/asm/kvm_host.h |  3 +++
+ arch/x86/kvm/svm/svm.c          |  2 ++
+ arch/x86/kvm/vmx/vmx.c          |  1 +
+ arch/x86/kvm/x86.c              | 22 ++++++++++++++++++++++
+ 4 files changed, 28 insertions(+)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 4ff36610af6a..9fdaa847d4b6 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -651,6 +651,7 @@ struct kvm_vcpu_arch {
+ 	u64 ia32_misc_enable_msr;
+ 	u64 smbase;
+ 	u64 smi_count;
++	bool at_instruction_boundary;
+ 	bool tpr_access_reporting;
+ 	bool xsaves_enabled;
+ 	bool xfd_no_write_intercept;
+@@ -1289,6 +1290,8 @@ struct kvm_vcpu_stat {
+ 	u64 nested_run;
+ 	u64 directed_yield_attempted;
+ 	u64 directed_yield_successful;
++	u64 preemption_reported;
++	u64 preemption_other;
+ 	u64 guest_mode;
+ };
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 7e45d03cd018..5842abf1eac4 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4165,6 +4165,8 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
+ 
+ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ {
++	if (to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_INTR)
++		vcpu->arch.at_instruction_boundary = true;
+ }
+ 
+ static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 982df9c000d3..c44f8e1d30c8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6549,6 +6549,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	handle_interrupt_nmi_irqoff(vcpu, gate_offset(desc));
++	vcpu->arch.at_instruction_boundary = true;
+ }
+ 
+ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 39c571224ac2..36453517e847 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -291,6 +291,8 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+ 	STATS_DESC_COUNTER(VCPU, nested_run),
+ 	STATS_DESC_COUNTER(VCPU, directed_yield_attempted),
+ 	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
++	STATS_DESC_COUNTER(VCPU, preemption_reported),
++	STATS_DESC_COUNTER(VCPU, preemption_other),
+ 	STATS_DESC_ICOUNTER(VCPU, guest_mode)
+ };
+ 
+@@ -4604,6 +4606,19 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 	struct kvm_memslots *slots;
+ 	static const u8 preempted = KVM_VCPU_PREEMPTED;
+ 
++	/*
++	 * The vCPU can be marked preempted if and only if the VM-Exit was on
++	 * an instruction boundary and will not trigger guest emulation of any
++	 * kind (see vcpu_run).  Vendor specific code controls (conservatively)
++	 * when this is true, for example allowing the vCPU to be marked
++	 * preempted if and only if the VM-Exit was due to a host interrupt.
++	 */
++	if (!vcpu->arch.at_instruction_boundary) {
++		vcpu->stat.preemption_other++;
++		return;
++	}
++
++	vcpu->stat.preemption_reported++;
+ 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+ 		return;
+ 
+@@ -10358,6 +10373,13 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.l1tf_flush_l1d = true;
+ 
+ 	for (;;) {
++		/*
++		 * If another guest vCPU requests a PV TLB flush in the middle
++		 * of instruction emulation, the rest of the emulation could
++		 * use a stale page translation. Assume that any code after
++		 * this point can start executing an instruction.
++		 */
++		vcpu->arch.at_instruction_boundary = false;
+ 		if (kvm_vcpu_running(vcpu)) {
+ 			r = vcpu_enter_guest(vcpu);
+ 		} else {
+-- 
+2.35.1
+
