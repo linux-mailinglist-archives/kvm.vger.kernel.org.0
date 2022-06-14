@@ -2,244 +2,381 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B209E54AC21
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 10:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3023E54AC54
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 10:49:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229441AbiFNIle (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 04:41:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35004 "EHLO
+        id S1355529AbiFNIr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 04:47:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355088AbiFNIlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 04:41:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F2EA542A0F
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 01:40:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655196057;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7JqiAgsVYLwS4+FFvNHU6GMxusP/+pOciDPNZhIjWYw=;
-        b=IrqYeh/31r0j/vr1SA0outgUNfGsEvBDLdtG/CjX6X+eRug+5LAS0geSCwER6hvFAKaaYI
-        GgmU33zQn2NTBD7hWrk+yrB7BvHP3eR3mxv2m6cOlmgKrvyQAzfkQ0/0gqQzSsWXUx+e7V
-        EOtXCQdXTMrDC3OWbAkIcb5Cj9QMvkA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-111-mA8d-KHJNYa1q9rSGXm01g-1; Tue, 14 Jun 2022 04:40:42 -0400
-X-MC-Unique: mA8d-KHJNYa1q9rSGXm01g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9796A811E81;
-        Tue, 14 Jun 2022 08:40:41 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 312E69D7F;
-        Tue, 14 Jun 2022 08:40:41 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Auger <eauger@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC 1/2] arm/kvm: enable MTE if available
-In-Reply-To: <a3d0a093-3d59-5882-c9c8-6619e5aeb3ab@redhat.com>
-Organization: Red Hat GmbH
-References: <20220512131146.78457-1-cohuck@redhat.com>
- <20220512131146.78457-2-cohuck@redhat.com>
- <a3d0a093-3d59-5882-c9c8-6619e5aeb3ab@redhat.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Tue, 14 Jun 2022 10:40:39 +0200
-Message-ID: <877d5jskmw.fsf@redhat.com>
+        with ESMTP id S242247AbiFNIpb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 04:45:31 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFAFB26F3;
+        Tue, 14 Jun 2022 01:45:29 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25E6x5hD030743;
+        Tue, 14 Jun 2022 08:45:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4zxJa9F5EPuzusw5W/ArpOl9cOy89L1yV2FuFByKwgI=;
+ b=asSK40xAFvkpdDV1mSi+34XrCXgaNyMW/F9z9F+46aNovxAEpf56+dcR++16RZRr11wq
+ yzoM6XsU+3v+lKVvfuKa90QrEDXl3VTTdnJdz+COwS2Rm9VGJ9Zilf28IkiSWkTETOdt
+ IwykKNBn5kPYiEIn0+UsjQgXPz5/7V6LCDso+Cjf/YnoVLhR9pyG7Vk+YN4K1VLR0ok8
+ 0J9FOXEhoIuz/9hhUkac6XyGGnFSEUNjZqwSKaS52IwwdK4bd2s8R30wfaGapW6HtZE9
+ CZYJ79Pekrl/vU7tG0rCyrtzmPF08nK+D7kH1sy9N6LSgwksT6aGb5guN43TvxvkTGfE 4w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpeevhe6r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jun 2022 08:45:25 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25E8cqJH014847;
+        Tue, 14 Jun 2022 08:45:25 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpeevhe60-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jun 2022 08:45:25 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25E8aLVs016549;
+        Tue, 14 Jun 2022 08:45:23 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3gmjajc2pf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jun 2022 08:45:23 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25E8jNpu22610252
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Jun 2022 08:45:23 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 18649AE051;
+        Tue, 14 Jun 2022 08:45:20 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BB0C9AE04D;
+        Tue, 14 Jun 2022 08:45:18 +0000 (GMT)
+Received: from [9.171.87.27] (unknown [9.171.87.27])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Jun 2022 08:45:18 +0000 (GMT)
+Message-ID: <7fd7d517-d80a-bfab-bbd2-f92d8d572472@linux.ibm.com>
+Date:   Tue, 14 Jun 2022 10:49:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v9 20/21] KVM: s390: add KVM_S390_ZPCI_OP to manage guest
+ zPCI devices
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
+ <20220606203325.110625-21-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220606203325.110625-21-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: pV4KW1kpV_ebIhd5TlMiaj4yvVcyHccU
+X-Proofpoint-GUID: _3NWkhAmeULgBU1gFe6uz7WSG4qBfxH-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-14_02,2022-06-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 adultscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1011 bulkscore=0 spamscore=0 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206140033
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 10 2022, Eric Auger <eauger@redhat.com> wrote:
 
-> Hi Connie,
-> On 5/12/22 15:11, Cornelia Huck wrote:
->> We need to disable migration, as we do not yet have a way to migrate
->> the tags as well.
->
-> This patch does much more than adding a migration blocker ;-) you may
-> describe the new cpu option and how it works.
 
-I admit this is a bit terse ;) The idea is to control mte at the cpu
-level directly (and not indirectly via tag memory at the machine
-level). I.e. the user gets whatever is available given the constraints
-(host support etc.) if they don't specify anything, and they can
-explicitly turn it off/on.
+On 6/6/22 22:33, Matthew Rosato wrote:
+> The KVM_S390_ZPCI_OP ioctl provides a mechanism for managing
+> hardware-assisted virtualization features for s390x zPCI passthrough.
+> Add the first 2 operations, which can be used to enable/disable
+> the specified device for Adapter Event Notification interpretation.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
->> 
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  target/arm/cpu.c     | 18 ++++------
->>  target/arm/cpu.h     |  4 +++
->>  target/arm/cpu64.c   | 78 ++++++++++++++++++++++++++++++++++++++++++++
->>  target/arm/kvm64.c   |  5 +++
->>  target/arm/kvm_arm.h | 12 +++++++
->>  target/arm/monitor.c |  1 +
->>  6 files changed, 106 insertions(+), 12 deletions(-)
->> 
->> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->> index 029f644768b1..f0505815b1e7 100644
->> --- a/target/arm/cpu.c
->> +++ b/target/arm/cpu.c
->> @@ -1435,6 +1435,11 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
->>              error_propagate(errp, local_err);
->>              return;
->>          }
->> +        arm_cpu_mte_finalize(cpu, &local_err);
->> +        if (local_err != NULL) {
->> +            error_propagate(errp, local_err);
->> +            return;
->> +        }
->>      }
->>  
->>      if (kvm_enabled()) {
->> @@ -1504,7 +1509,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->>          }
->>          if (cpu->tag_memory) {
->>              error_setg(errp,
->> -                       "Cannot enable KVM when guest CPUs has MTE enabled");
->> +                       "Cannot enable KVM when guest CPUs has tag memory enabled");
-> before this series, tag_memory was used to detect MTE was enabled at
-> machine level. And this was not compatible with KVM.
->
-> Hasn't it changed now with this series? Sorry I don't know much about
-> that tag_memory along with the KVM use case? Can you describe it as well
-> in the cover letter.
+Despite I really do not like passing the FH in the structure.
+I think that if I admit that then this LGTM.
 
-IIU the current code correctly, the purpose of tag_memory is twofold:
-- control whether mte should be available in the first place
-- provide a place where a memory region used by the tcg implemtation can
-  be linked
+Acked-by: Pierre Morel <pmorel@linux.ibm.com>
 
-The latter part (extra memory region) is not compatible with
-kvm. "Presence of extra memory for the implementation" as the knob to
-configure mte for tcg makes sense, but it didn't seem right to me to use
-it for kvm while controlling something which is basically a cpu property.
 
->>              return;
->>          }
->>      }
+> ---
+>   Documentation/virt/kvm/api.rst | 47 +++++++++++++++++++
+>   arch/s390/kvm/kvm-s390.c       | 16 +++++++
+>   arch/s390/kvm/pci.c            | 85 ++++++++++++++++++++++++++++++++++
+>   arch/s390/kvm/pci.h            |  2 +
+>   include/uapi/linux/kvm.h       | 31 +++++++++++++
+>   5 files changed, 181 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 11e00a46c610..2eb604769dce 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5802,6 +5802,53 @@ of CPUID leaf 0xD on the host.
+>   
+>   This ioctl injects an event channel interrupt directly to the guest vCPU.
+>   
+> +4.136 KVM_S390_ZPCI_OP
+> +--------------------
+> +
+> +:Capability: KVM_CAP_S390_ZPCI_OP
+> +:Architectures: s390
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_s390_zpci_op (in)
+> +:Returns: 0 on success, <0 on error
+> +
+> +Used to manage hardware-assisted virtualization features for zPCI devices.
+> +
+> +Parameters are specified via the following structure::
+> +
+> +  struct kvm_s390_zpci_op {
+> +	/* in */
+> +	__u32 fh;		/* target device */
+> +	__u8  op;		/* operation to perform */
+> +	__u8  pad[3];
+> +	union {
+> +		/* for KVM_S390_ZPCIOP_REG_AEN */
+> +		struct {
+> +			__u64 ibv;	/* Guest addr of interrupt bit vector */
+> +			__u64 sb;	/* Guest addr of summary bit */
+> +			__u32 flags;
+> +			__u32 noi;	/* Number of interrupts */
+> +			__u8 isc;	/* Guest interrupt subclass */
+> +			__u8 sbo;	/* Offset of guest summary bit vector */
+> +			__u16 pad;
+> +		} reg_aen;
+> +		__u64 reserved[8];
+> +	} u;
+> +  };
+> +
+> +The type of operation is specified in the "op" field.
+> +KVM_S390_ZPCIOP_REG_AEN is used to register the VM for adapter event
+> +notification interpretation, which will allow firmware delivery of adapter
+> +events directly to the vm, with KVM providing a backup delivery mechanism;
+> +KVM_S390_ZPCIOP_DEREG_AEN is used to subsequently disable interpretation of
+> +adapter event notifications.
+> +
+> +The target zPCI function must also be specified via the "fh" field.  For the
+> +KVM_S390_ZPCIOP_REG_AEN operation, additional information to establish firmware
+> +delivery must be provided via the "reg_aen" struct.
+> +
+> +The "pad" and "reserved" fields may be used for future extensions and should be
+> +set to 0s by userspace.
+> +
+>   5. The kvm_run structure
+>   ========================
+>   
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 4758bb731199..f214e0fc62ed 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -618,6 +618,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_S390_PROTECTED:
+>   		r = is_prot_virt_host();
+>   		break;
+> +	case KVM_CAP_S390_ZPCI_OP:
+> +		r = kvm_s390_pci_interp_allowed();
+> +		break;
+>   	default:
+>   		r = 0;
+>   	}
+> @@ -2629,6 +2632,19 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>   			r = -EFAULT;
+>   		break;
+>   	}
+> +	case KVM_S390_ZPCI_OP: {
+> +		struct kvm_s390_zpci_op args;
+> +
+> +		r = -EINVAL;
+> +		if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
+> +			break;
+> +		if (copy_from_user(&args, argp, sizeof(args))) {
+> +			r = -EFAULT;
+> +			break;
+> +		}
+> +		r = kvm_s390_pci_zpci_op(kvm, &args);
+> +		break;
+> +	}
+>   	default:
+>   		r = -ENOTTY;
+>   	}
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+> index 24211741deb0..4946fb7757d6 100644
+> --- a/arch/s390/kvm/pci.c
+> +++ b/arch/s390/kvm/pci.c
+> @@ -585,6 +585,91 @@ void kvm_s390_pci_clear_list(struct kvm *kvm)
+>   	spin_unlock(&kvm->arch.kzdev_list_lock);
+>   }
+>   
+> +static struct zpci_dev *get_zdev_from_kvm_by_fh(struct kvm *kvm, u32 fh)
+> +{
+> +	struct zpci_dev *zdev = NULL;
+> +	struct kvm_zdev *kzdev;
+> +
+> +	spin_lock(&kvm->arch.kzdev_list_lock);
+> +	list_for_each_entry(kzdev, &kvm->arch.kzdev_list, entry) {
+> +		if (kzdev->zdev->fh == fh) {
+> +			zdev = kzdev->zdev;
+> +			break;
+> +		}
+> +	}
+> +	spin_unlock(&kvm->arch.kzdev_list_lock);
+> +
+> +	return zdev;
+> +}
+> +
+> +static int kvm_s390_pci_zpci_reg_aen(struct zpci_dev *zdev,
+> +				     struct kvm_s390_zpci_op *args)
+> +{
+> +	struct zpci_fib fib = {};
+> +	bool hostflag;
+> +
+> +	fib.fmt0.aibv = args->u.reg_aen.ibv;
+> +	fib.fmt0.isc = args->u.reg_aen.isc;
+> +	fib.fmt0.noi = args->u.reg_aen.noi;
+> +	if (args->u.reg_aen.sb != 0) {
+> +		fib.fmt0.aisb = args->u.reg_aen.sb;
+> +		fib.fmt0.aisbo = args->u.reg_aen.sbo;
+> +		fib.fmt0.sum = 1;
+> +	} else {
+> +		fib.fmt0.aisb = 0;
+> +		fib.fmt0.aisbo = 0;
+> +		fib.fmt0.sum = 0;
+> +	}
+> +
+> +	hostflag = !(args->u.reg_aen.flags & KVM_S390_ZPCIOP_REGAEN_HOST);
+> +	return kvm_s390_pci_aif_enable(zdev, &fib, hostflag);
+> +}
+> +
+> +int kvm_s390_pci_zpci_op(struct kvm *kvm, struct kvm_s390_zpci_op *args)
+> +{
+> +	struct kvm_zdev *kzdev;
+> +	struct zpci_dev *zdev;
+> +	int r;
+> +
+> +	zdev = get_zdev_from_kvm_by_fh(kvm, args->fh);
+> +	if (!zdev)
+> +		return -ENODEV;
+> +
+> +	mutex_lock(&zdev->kzdev_lock);
+> +	mutex_lock(&kvm->lock);
+> +
+> +	kzdev = zdev->kzdev;
+> +	if (!kzdev) {
+> +		r = -ENODEV;
+> +		goto out;
+> +	}
+> +	if (kzdev->kvm != kvm) {
+> +		r = -EPERM;
+> +		goto out;
+> +	}
+> +
+> +	switch (args->op) {
+> +	case KVM_S390_ZPCIOP_REG_AEN:
+> +		/* Fail on unknown flags */
+> +		if (args->u.reg_aen.flags & ~KVM_S390_ZPCIOP_REGAEN_HOST) {
+> +			r = -EINVAL;
+> +			break;
+> +		}
+> +		r = kvm_s390_pci_zpci_reg_aen(zdev, args);
+> +		break;
+> +	case KVM_S390_ZPCIOP_DEREG_AEN:
+> +		r = kvm_s390_pci_aif_disable(zdev, false);
+> +		break;
+> +	default:
+> +		r = -EINVAL;
+> +	}
+> +
+> +out:
+> +	mutex_unlock(&kvm->lock);
+> +	mutex_unlock(&zdev->kzdev_lock);
+> +	return r;
+> +}
+> +
+>   int kvm_s390_pci_init(void)
+>   {
+>   	aift = kzalloc(sizeof(struct zpci_aift), GFP_KERNEL);
+> diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
+> index fb2b91b76e0c..0351382e990f 100644
+> --- a/arch/s390/kvm/pci.h
+> +++ b/arch/s390/kvm/pci.h
+> @@ -59,6 +59,8 @@ void kvm_s390_pci_aen_exit(void);
+>   void kvm_s390_pci_init_list(struct kvm *kvm);
+>   void kvm_s390_pci_clear_list(struct kvm *kvm);
+>   
+> +int kvm_s390_pci_zpci_op(struct kvm *kvm, struct kvm_s390_zpci_op *args);
+> +
+>   int kvm_s390_pci_init(void);
+>   void kvm_s390_pci_exit(void);
+>   
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5088bd9f1922..52cc12d53022 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1157,6 +1157,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_VM_TSC_CONTROL 214
+>   #define KVM_CAP_SYSTEM_EVENT_DATA 215
+>   #define KVM_CAP_ARM_SYSTEM_SUSPEND 216
+> +#define KVM_CAP_S390_ZPCI_OP 217
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> @@ -2118,4 +2119,34 @@ struct kvm_stats_desc {
+>   /* Available with KVM_CAP_XSAVE2 */
+>   #define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+>   
+> +/* Available with KVM_CAP_S390_ZPCI_OP */
+> +#define KVM_S390_ZPCI_OP         _IOW(KVMIO,  0xd1, struct kvm_s390_zpci_op)
+> +
+> +struct kvm_s390_zpci_op {
+> +	/* in */
+> +	__u32 fh;               /* target device */
+> +	__u8  op;               /* operation to perform */
+> +	__u8  pad[3];
+> +	union {
+> +		/* for KVM_S390_ZPCIOP_REG_AEN */
+> +		struct {
+> +			__u64 ibv;      /* Guest addr of interrupt bit vector */
+> +			__u64 sb;       /* Guest addr of summary bit */
+> +			__u32 flags;
+> +			__u32 noi;      /* Number of interrupts */
+> +			__u8 isc;       /* Guest interrupt subclass */
+> +			__u8 sbo;       /* Offset of guest summary bit vector */
+> +			__u16 pad;
+> +		} reg_aen;
+> +		__u64 reserved[8];
+> +	} u;
+> +};
+> +
+> +/* types for kvm_s390_zpci_op->op */
+> +#define KVM_S390_ZPCIOP_REG_AEN                0
+> +#define KVM_S390_ZPCIOP_DEREG_AEN      1
+> +
+> +/* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+> +#define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+> +
+>   #endif /* __LINUX_KVM_H */
+> 
 
-(...)
-
->> +void aarch64_add_mte_properties(Object *obj)
->> +{
->> +    ARMCPU *cpu = ARM_CPU(obj);
->> +
->> +    /*
->> +     * For tcg, the machine type may provide tag memory for MTE emulation.
-> s/machine type/machine?
-
-Either, I guess, as only the virt machine type provides tag memory in
-the first place.
-
->> +     * We do not know whether that is the case at this point in time, so
->> +     * default MTE to on and check later.
->> +     * This preserves pre-existing behaviour, but is really a bit awkward.
->> +     */
->> +    qdev_property_add_static(DEVICE(obj), &arm_cpu_mte_property);
->> +    if (kvm_enabled()) {
->> +        /*
->> +         * Default MTE to off, as long as migration support is not
->> +         * yet implemented.
->> +         * TODO: implement migration support for kvm
->> +         */
->> +        cpu->prop_mte = false;
->> +    }
->> +}
->> +
->> +void arm_cpu_mte_finalize(ARMCPU *cpu, Error **errp)
->> +{
->> +    if (!cpu->prop_mte) {
->> +        /* Disable MTE feature bits. */
->> +        cpu->isar.id_aa64pfr1 =
->> +            FIELD_DP64(cpu->isar.id_aa64pfr1, ID_AA64PFR1, MTE, 0);
->> +        return;
->> +    }
->> +#ifndef CONFIG_USER_ONLY
->> +    if (!kvm_enabled()) {
->> +        if (cpu_isar_feature(aa64_mte, cpu) && !cpu->tag_memory) {
->> +            /*
->> +             * Disable the MTE feature bits, unless we have tag-memory
->> +             * provided by the machine.
->> +             * This silent downgrade is not really nice if the user had
->> +             * explicitly requested MTE to be enabled by the cpu, but it
->> +             * preserves pre-existing behaviour. In an ideal world, we
->
->
-> Can't we "simply" prevent the end-user from using the prop_mte option
-> with a TCG CPU? and have something like
->
-> For TCG, MTE depends on the CPU feature availability + machine tag memory
-> For KVM, MTE depends on the user opt-in + CPU feature avail (if
-> relevant) + host VM capability (?)
-
-I don't like kvm and tcg cpus behaving too differently... but then, tcg
-is already different as it needs tag_memory.
-
-Thinking about it, maybe we could repurpose tag_memory in the kvm case
-(e.g. for a temporary buffer for migration purposes) and require it in
-all cases (making kvm fail if the user specified tag memory, but the
-host doesn't support it). A cpu feature still looks more natural to me,
-but I'm not yet quite used to how things are done in arm :)
-
-The big elefant in the room is how migration will end up
-working... after reading the disscussions in
-https://lore.kernel.org/all/CAJc+Z1FZxSYB_zJit4+0uTR-88VqQL+-01XNMSEfua-dXDy6Wg@mail.gmail.com/
-I don't think it will be as "easy" as I thought, and we probably require
-some further fiddling on the kernel side.
-
->
-> But maybe I miss the point ...
->> +             * would fail if MTE was requested, but no tag memory has
->> +             * been provided.
->> +             */
->> +            cpu->isar.id_aa64pfr1 =
->> +                FIELD_DP64(cpu->isar.id_aa64pfr1, ID_AA64PFR1, MTE, 0);
->> +        }
->> +        if (!cpu_isar_feature(aa64_mte, cpu)) {
->> +            cpu->prop_mte = false;
->> +        }
->> +        return;
->> +    }
->> +    if (kvm_arm_mte_supported()) {
->> +#ifdef CONFIG_KVM
->> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_ARM_MTE, 0)) {
->> +            error_setg(errp, "Failed to enable KVM_CAP_ARM_MTE");
->> +        } else {
->> +            /* TODO: add proper migration support with MTE enabled */
->> +            if (!mte_migration_blocker) {
->> +                error_setg(&mte_migration_blocker,
->> +                           "Live migration disabled due to MTE enabled");
->> +                if (migrate_add_blocker(mte_migration_blocker, NULL)) {
-> error_free(mte_migration_blocker);
-> mte_migration_blocker = NULL;
-
-Ah, I missed that, thanks.
-
->> +                    error_setg(errp, "Failed to add MTE migration blocker");
->> +                }
->> +            }
->> +        }
->> +#endif
->> +    }
->> +    /* When HVF provides support for MTE, add it here */
->> +#endif
->> +}
->> +
-
+-- 
+Pierre Morel
+IBM Lab Boeblingen
