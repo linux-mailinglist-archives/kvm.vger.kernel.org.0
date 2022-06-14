@@ -2,172 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E087D54AAB0
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 09:32:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C8754AAD9
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 09:45:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354618AbiFNHbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 03:31:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47280 "EHLO
+        id S1352820AbiFNHpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 03:45:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354512AbiFNHbf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 03:31:35 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585273E5D7;
-        Tue, 14 Jun 2022 00:31:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655191893; x=1686727893;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=BwfIVHuEaK8z+QZZOZqmlU4SXCS0pKVU8k7FqNhuJ+Y=;
-  b=nPDtOROeeJYCkJ9Gto/aTf7q28luIOhBq7Q4CrikfFK/Gn34lmPmYcuS
-   er00auX4GEcl0W5+k2+1YdQkgK+7qKi08yUskedjoM6L8U1vp+NT1nh1b
-   9oKWF8eZbuIAmEYFRu4O/aJ1/vI+T0KREddvV6B3mhxTX4w00A0reTcPx
-   RL5IrTGErBFWfv45Ftv9w8i2oKJIy7yxZ8y1IgsGx4g6qtf7TsaH2Ae+F
-   kqU0BhxzqWnglMSXz8HGMUqvDE9I5fRIm63x6PTGb80lztLdJ7N3cUSam
-   8/xzXqWh0AOu8uJjlsoaKD08UodYQQVIhcAxCoFzXJcVNxyd6dGOPgBUk
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10377"; a="258370173"
-X-IronPort-AV: E=Sophos;i="5.91,299,1647327600"; 
-   d="scan'208";a="258370173"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 00:31:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,299,1647327600"; 
-   d="scan'208";a="582581789"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga007.jf.intel.com with ESMTP; 14 Jun 2022 00:31:23 -0700
-Date:   Tue, 14 Jun 2022 15:28:00 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
+        with ESMTP id S238963AbiFNHpH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 03:45:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 28C2725EB9
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 00:45:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655192705;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dgyIXyBsOELAwe/LYhSIfeWs8SqQKOJEdzlYMa9u4pA=;
+        b=YVdResl+eNTZ6sCAHvuGG9/55k9kUq7yDU9fTkDANCb53ivmFLts4PrV31IoE4kgadLyqZ
+        ah4HHj9sU+evzd6SZSWImyYXEVSl8X1mmuGEFh8TSM6KBD2TimrWL80aJGaN7Tz+nCvaya
+        ZqfI8QfJ4+51m4kSpIqLAPDabgIIU7o=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-497-HnPPc3sQN0a1jBnSm5HJZA-1; Tue, 14 Jun 2022 03:45:03 -0400
+X-MC-Unique: HnPPc3sQN0a1jBnSm5HJZA-1
+Received: by mail-ej1-f71.google.com with SMTP id gh36-20020a1709073c2400b0070759e390fbso2495569ejc.13
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 00:45:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=dgyIXyBsOELAwe/LYhSIfeWs8SqQKOJEdzlYMa9u4pA=;
+        b=GqU4OH/7xqQ7LbVo070bWmuSYm2aTgQ6X6K0bVNisy1xTGAEmR5o2e177YGnjB49ar
+         x5zTh6D+/5yn0MRWXEG5bu4mVTXSY7ZJsjB9flad8KNx/QeIJo3rJyGw6FacXCk22c3G
+         REpLxHlTB9zDKLW0M2QfBhNNfmhmO2rzUtBWsvvaoFAj5ROJB6Iw18wChjoazdTs0wRU
+         vi6Ws12YffnE1HsWLpf/hzhnxpqohOnsRI/At+4Z5qL1pYNHuw2FpnYZYLd0sU6Udjw5
+         q1fepZI1NLhzlgIrL3YYCV5tGt0ysVWdqPrtBSMjo3vYP20ZVyJBdkuPHxidZ5DVqnqF
+         bnMw==
+X-Gm-Message-State: AJIora85C1quvb4/PbQoGaV+CCwV+lYRtHL5uBn4fqadEspq8cFPTMJm
+        /UrYLe70BAod2qPcM5Xl3HedYjYoFAMd6qAHlS9KJItZGESbbekSVadfjtRnlI3XYWUZs/VN3/Z
+        cHraWMzRF0/tu
+X-Received: by 2002:aa7:c84d:0:b0:431:4226:70c9 with SMTP id g13-20020aa7c84d000000b00431422670c9mr4271495edt.51.1655192702384;
+        Tue, 14 Jun 2022 00:45:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwJ5IlXxslNIf6I97hjXfT4GlolXDA60Ma8Z62WzRzPo1MZt3AJ8Xm7QzGo4XAnyp297JvrmA==
+X-Received: by 2002:aa7:c84d:0:b0:431:4226:70c9 with SMTP id g13-20020aa7c84d000000b00431422670c9mr4271477edt.51.1655192702127;
+        Tue, 14 Jun 2022 00:45:02 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id z6-20020a056402274600b0042def6cd141sm6689297edd.30.2022.06.14.00.45.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jun 2022 00:45:01 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>,
-        Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
-Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20220614072800.GB1783435@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <CAGtprH_83CEC0U-cBR2FzHsxbwbGn0QJ87WFNOEet8sineOcbQ@mail.gmail.com>
- <20220607065749.GA1513445@chaop.bj.intel.com>
- <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
- <20220608021820.GA1548172@chaop.bj.intel.com>
- <CAGtprH8xyf07jMN7ubTC__BvDj+z41uVGRiCJ7Rc5cv3KWg03w@mail.gmail.com>
- <YqJYEheLiGI4KqXF@google.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 6/7] KVM: x86: Ignore benign host accesses to
+ "unsupported" PEBS and BTS MSRs
+In-Reply-To: <20220611005755.753273-7-seanjc@google.com>
+References: <20220611005755.753273-1-seanjc@google.com>
+ <20220611005755.753273-7-seanjc@google.com>
+Date:   Tue, 14 Jun 2022 09:45:01 +0200
+Message-ID: <875yl3k7sy.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YqJYEheLiGI4KqXF@google.com>
-X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 09, 2022 at 08:29:06PM +0000, Sean Christopherson wrote:
-> On Wed, Jun 08, 2022, Vishal Annapurve wrote:
-> > ...
-> > > With this patch series, it's actually even not possible for userspace VMM
-> > > to allocate private page by a direct write, it's basically unmapped from
-> > > there. If it really wants to, it should so something special, by intention,
-> > > that's basically the conversion, which we should allow.
-> > >
-> > 
-> > A VM can pass GPA backed by private pages to userspace VMM and when
-> > Userspace VMM accesses the backing hva there will be pages allocated
-> > to back the shared fd causing 2 sets of pages backing the same guest
-> > memory range.
-> > 
-> > > Thanks for bringing this up. But in my mind I still think userspace VMM
-> > > can do and it's its responsibility to guarantee that, if that is hard
-> > > required.
-> 
-> That was my initial reaction too, but there are unfortunate side effects to punting
-> this to userspace. 
-> 
-> > By design, userspace VMM is the decision-maker for page
-> > > conversion and has all the necessary information to know which page is
-> > > shared/private. It also has the necessary knobs to allocate/free the
-> > > physical pages for guest memory. Definitely, we should make userspace
-> > > VMM more robust.
-> > 
-> > Making Userspace VMM more robust to avoid double allocation can get
-> > complex, it will have to keep track of all in-use (by Userspace VMM)
-> > shared fd memory to disallow conversion from shared to private and
-> > will have to ensure that all guest supplied addresses belong to shared
-> > GPA ranges.
-> 
-> IMO, the complexity argument isn't sufficient justfication for introducing new
-> kernel functionality.  If multiple processes are accessing guest memory then there
-> already needs to be some amount of coordination, i.e. it can't be _that_ complex.
-> 
-> My concern with forcing userspace to fully handle unmapping shared memory is that
-> it may lead to additional performance overhead and/or noisy neighbor issues, even
-> if all guests are well-behaved.
-> 
-> Unnmapping arbitrary ranges will fragment the virtual address space and consume
-> more memory for all the result VMAs.  The extra memory consumption isn't that big
-> of a deal, and it will be self-healing to some extent as VMAs will get merged when
-> the holes are filled back in (if the guest converts back to shared), but it's still
-> less than desirable.
-> 
-> More concerning is having to take mmap_lock for write for every conversion, which
-> is very problematic for configurations where a single userspace process maps memory
-> belong to multiple VMs.  Unmapping and remapping on every conversion will create a
-> bottleneck, especially if a VM has sub-optimal behavior and is converting pages at
-> a high rate.
-> 
-> One argument is that userspace can simply rely on cgroups to detect misbehaving
-> guests, but (a) those types of OOMs will be a nightmare to debug and (b) an OOM
-> kill from the host is typically considered a _host_ issue and will be treated as
-> a missed SLO.
-> 
-> An idea for handling this in the kernel without too much complexity would be to
-> add F_SEAL_FAULT_ALLOCATIONS (terrible name) that would prevent page faults from
-> allocating pages, i.e. holes can only be filled by an explicit fallocate().  Minor
-> faults, e.g. due to NUMA balancing stupidity, and major faults due to swap would
-> still work, but writes to previously unreserved/unallocated memory would get a
-> SIGSEGV on something it has mapped.  That would allow the userspace VMM to prevent
-> unintentional allocations without having to coordinate unmapping/remapping across
-> multiple processes.
+Sean Christopherson <seanjc@google.com> writes:
 
-Since this is mainly for shared memory and the motivation is catching
-misbehaved access, can we use mprotect(PROT_NONE) for this? We can mark
-those range backed by private fd as PROT_NONE during the conversion so
-subsequence misbehaved accesses will be blocked instead of causing double
-allocation silently.
+> Ignore host userspace reads and writes of '0' to PEBS and BTS MSRs that
+> KVM reports in the MSR-to-save list, but the MSRs are ultimately
+> unsupported.  All MSRs in said list must be writable by userspace, e.g.
+> if userspace sends the list back at KVM without filtering out the MSRs it
+> doesn't need.
+>
+> 8183a538cd95 ("KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS")
+> 902caeb6841a ("KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS")
+> c59a1f106f5c ("KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS")
 
-Chao
+These are 'Fixes:' tags I suppose?
+
+...
+
+-- 
+Vitaly
+
