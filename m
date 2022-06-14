@@ -2,94 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88E5454B4DE
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 17:39:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B2A54B4FD
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 17:46:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343685AbiFNPhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 11:37:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46536 "EHLO
+        id S242479AbiFNPn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 11:43:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236865AbiFNPhy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 11:37:54 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B98B2E9F3
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 08:37:53 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id g2so10191587ljk.5
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 08:37:52 -0700 (PDT)
+        with ESMTP id S240407AbiFNPny (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 11:43:54 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5C63BA62
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 08:43:53 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d13so8041463plh.13
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 08:43:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fn8gtxL6sSNRSsiDRRI9nlOANxjqFwtwIBrOJj9PDX4=;
-        b=LT/lyo0Gkm8vUesqRnJoPnu//GtJ2a4J7xk0YQo1fVzKIPstZDTs4ocVHUhOQzAzDf
-         1mhknKFZFcyuP+FcITbRZ9C3Zb5IygQ+dSD/d5sDSo5jPxZ3Xod61S+96JIZEmvp/ioU
-         ZLBYWsR7cCtO3xXbwzi+P+VOMS8qTkNT6dLd5qwOG4wKAOBEMDsF5IyyBzSoJSpbj7Ps
-         0sLvaRhd6KXmBxBx5Mnte8TQS/1qrwy08MCnMdz9Rwv7O5iKxxqDYqsRoQXOdKe/qqv/
-         D1JOHgxvD7xtNV5gXfizVs33keuKhzIJmtdRXlLVfle9UauwzrlzB+MCJvLuXXUxDdkT
-         328Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=v7R3AU8eay3jFLbgOIExfUOsI5EdQhSbQRsdrHwotJw=;
+        b=ehHmS6K8XnQ2SrjXe0GbtBVb7v2r/7AcW7sIGGWUjjSMTDgZG99AgHzHG+emgMuy78
+         oJg0pzPpvCtiu3YGgen4uTSgcaIQrSr23K6ULxNbRwaPO6Yv/2KLZXVbn7tBDmMEA+JB
+         /OEgfzksSH1MA4vy1vX+tyavgxHUWffoUJgQft6aRg+kifewPpPNV53IAZXgkNQBHTWY
+         Ql4t/SIvDY0bHTODMSic0GJaxZI6gfqzTzQMvW4xvnj/rmFRw+k9nbzv081yS6sEUTLa
+         VSazk4yWTKuGPfHB+dJmXxfbDPgU54AVHMrrKLFMMzFiEc/Rb9mMF6g9UULaB5YLhewT
+         nzjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fn8gtxL6sSNRSsiDRRI9nlOANxjqFwtwIBrOJj9PDX4=;
-        b=tTHM0a+kIGdtd0B93oD7EY9Qx9gFzFZ+f04xNqZTBdAMDrl3s6nuolgoWQmDaefSa6
-         KcUMUzFz3TubAkBNy5x0/9w4qmULZI5Un6qJKX918OQ6+SfH5nk5tlnuimuwleOQ2awE
-         GahA0e/xVQWH8hDey6+gEq8pZnHOV6IGgqoEsaOtyOqVsAQ5tT9Y6AUebjisgqbG0TX6
-         tLCFtg8ZGnUMcJfyE8sRnujbwCrw4Jz8CKOsl6puPj4tiw2Hq8nXmOdioz9RWfCk/E3o
-         S8NSdSk4r+E2hXtOPASSNA3i8asNvvP1WWcJpbvUoAn13KziIhFm22HZEB0fs+rKpxHP
-         I8kg==
-X-Gm-Message-State: AJIora8V2yDW6T2JZZzR5LPlf6qGWiYB/sA7W7T8MpEk9tiz7e98zMKL
-        aSj4/WBtqtZQtdreoeMwII56NlAGPNG6CQrEDJh4zA==
-X-Google-Smtp-Source: AGRyM1tVivOgpTFI/b0e/Dm7QRVBpJJPup//gAccjasK6nMQcbpqWB6Xf55xhXL4gRzWthbIWts51F5C1RaIfIMXqkE=
-X-Received: by 2002:a2e:547:0:b0:255:703a:d9ae with SMTP id
- 68-20020a2e0547000000b00255703ad9aemr2756675ljf.282.1655221071098; Tue, 14
- Jun 2022 08:37:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-24-brijesh.singh@amd.com>
- <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
- <1cadca0d-c3dc-68ed-075f-f88ccb0ccc0a@amd.com> <CABpDEun0rjrNVCGZDXd8SO3tfZi-2ku3mit2XMGLwCsijbF9tg@mail.gmail.com>
- <ee1a829f-9a89-e447-d182-877d4033c96a@amd.com>
-In-Reply-To: <ee1a829f-9a89-e447-d182-877d4033c96a@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 14 Jun 2022 09:37:39 -0600
-Message-ID: <CAMkAt6q3otA3n-daFfEBP7kzD+ucMQjP=3bX1PkuAUFrH9epUQ@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
-To:     Ashish Kalra <ashkalra@amd.com>
-Cc:     Alper Gun <alpergun@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=v7R3AU8eay3jFLbgOIExfUOsI5EdQhSbQRsdrHwotJw=;
+        b=rG7vDbcnrLmVZEoLDP3v4YniXbH4z1eTgN7KYeLCGQ9FA8tcZopMZh79XyV0yAxSyF
+         iiRNdYgG4xMqeqZULjMeurainn9IEhavqhilD4oMLO7j1GaPL2OZ5U2qV12PzUWlr4/v
+         l6I5lq8CjQnHBjXBgMPKFyPDfUetdBbZV7L/GBuDpWs92ea6C2gkyR+Hf5icXCZf23mn
+         srGTmiwKQfqnYLK2asH/IsmPI192NW2xeMeOiOnpIzsrT6G1+co1+6awYp0gkfqJBFNJ
+         6H7eT7Yi2RFYsDBki+8z2EMhrKQQH2iMSda7GV1kBIr5l0pCv/J0ZMMPXIHHxdxGwKQ4
+         eQUA==
+X-Gm-Message-State: AJIora/Iyksd4DN3E/LW1GFrfDeMFN7P0SKkFwJwIaRobKsYKc1wTkBm
+        JphWMpM3yn0UOM+CR1Fpc14LPg==
+X-Google-Smtp-Source: AGRyM1sSpS8ksQoeFsAiBuqnaVFCfTWw36cqGK81vkz64eI2RfYURAd4rfysk6IagqiDsDg27788vA==
+X-Received: by 2002:a17:90a:fd0d:b0:1ea:b661:4fa1 with SMTP id cv13-20020a17090afd0d00b001eab6614fa1mr5238743pjb.46.1655221432801;
+        Tue, 14 Jun 2022 08:43:52 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v11-20020a1709028d8b00b00165105518f6sm7390006plo.287.2022.06.14.08.43.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jun 2022 08:43:52 -0700 (PDT)
+Date:   Tue, 14 Jun 2022 15:43:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
         Tobin Feldman-Fitzthum <tobin@ibm.com>,
         Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Pavan Kumar Paluri <papaluri@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v12 19/46] x86/kernel: Make the .bss..decrypted section
+ shared in RMP table
+Message-ID: <YqistMvngNKEJu2o@google.com>
+References: <20220307213356.2797205-1-brijesh.singh@amd.com>
+ <20220307213356.2797205-20-brijesh.singh@amd.com>
+ <YqfabnTRxFSM+LoX@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YqfabnTRxFSM+LoX@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -101,80 +96,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 13, 2022 at 6:21 PM Ashish Kalra <ashkalra@amd.com> wrote:
->
->
-> On 6/13/22 23:33, Alper Gun wrote:
-> > On Mon, Jun 13, 2022 at 4:15 PM Ashish Kalra <ashkalra@amd.com> wrote:
-> >> Hello Alper,
-> >>
-> >> On 6/13/22 20:58, Alper Gun wrote:
-> >>> static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> >>>>    {
-> >>>> +       bool es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
-> >>>>           struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> >>>> -       bool es_active = argp->id == KVM_SEV_ES_INIT;
-> >>>> +       bool snp_active = argp->id == KVM_SEV_SNP_INIT;
-> >>>>           int asid, ret;
-> >>>>
-> >>>>           if (kvm->created_vcpus)
-> >>>> @@ -249,12 +269,22 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> >>>>                   return ret;
-> >>>>
-> >>>>           sev->es_active = es_active;
-> >>>> +       sev->snp_active = snp_active;
-> >>>>           asid = sev_asid_new(sev);
-> >>>>           if (asid < 0)
-> >>>>                   goto e_no_asid;
-> >>>>           sev->asid = asid;
-> >>>>
-> >>>> -       ret = sev_platform_init(&argp->error);
-> >>>> +       if (snp_active) {
-> >>>> +               ret = verify_snp_init_flags(kvm, argp);
-> >>>> +               if (ret)
-> >>>> +                       goto e_free;
-> >>>> +
-> >>>> +               ret = sev_snp_init(&argp->error);
-> >>>> +       } else {
-> >>>> +               ret = sev_platform_init(&argp->error);
-> >>> After SEV INIT_EX support patches, SEV may be initialized in the platform late.
-> >>> In my tests, if SEV has not been initialized in the platform yet, SNP
-> >>> VMs fail with SEV_DF_FLUSH required error. I tried calling
-> >>> SEV_DF_FLUSH right after the SNP platform init but this time it failed
-> >>> later on the SNP launch update command with SEV_RET_INVALID_PARAM
-> >>> error. Looks like there is another dependency on SEV platform
-> >>> initialization.
-> >>>
-> >>> Calling sev_platform_init for SNP VMs fixes the problem in our tests.
-> >> Trying to get some more context for this issue.
-> >>
-> >> When you say after SEV_INIT_EX support patches, SEV may be initialized
-> >> in the platform late, do you mean sev_pci_init()->sev_snp_init() ...
-> >> sev_platform_init() code path has still not executed on the host BSP ?
-> >>
-> > Correct, INIT_EX requires the file system to be ready and there is a
-> > ccp module param to call it only when needed.
-> >
-> > MODULE_PARM_DESC(psp_init_on_probe, " if true, the PSP will be
-> > initialized on module init. Else the PSP will be initialized on the
-> > first command requiring it");
-> >
-> > If this module param is false, it won't initialize SEV on the platform
-> > until the first SEV VM.
-> >
-> Ok, that makes sense.
->
-> So the fix will be to call sev_platform_init() unconditionally here in
-> sev_guest_init(), and both sev_snp_init() and sev_platform_init() are
-> protected from being called again, so there won't be any issues if these
-> functions are invoked again at SNP/SEV VM launch if they have been
-> invoked earlier during module init.
+On Tue, Jun 14, 2022, Sean Christopherson wrote:
+> s/Brijesh/Michael
+> 
+> On Mon, Mar 07, 2022, Brijesh Singh wrote:
+> > The encryption attribute for the .bss..decrypted section is cleared in the
+> > initial page table build. This is because the section contains the data
+> > that need to be shared between the guest and the hypervisor.
+> > 
+> > When SEV-SNP is active, just clearing the encryption attribute in the
+> > page table is not enough. The page state need to be updated in the RMP
+> > table.
+> > 
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > ---
+> >  arch/x86/kernel/head64.c | 13 +++++++++++++
+> >  1 file changed, 13 insertions(+)
+> > 
+> > diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+> > index 83514b9827e6..656d2f3e2cf0 100644
+> > --- a/arch/x86/kernel/head64.c
+> > +++ b/arch/x86/kernel/head64.c
+> > @@ -143,7 +143,20 @@ static unsigned long __head sme_postprocess_startup(struct boot_params *bp, pmdv
+> >  	if (sme_get_me_mask()) {
+> >  		vaddr = (unsigned long)__start_bss_decrypted;
+> >  		vaddr_end = (unsigned long)__end_bss_decrypted;
+> > +
+> >  		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
+> > +			/*
+> > +			 * On SNP, transition the page to shared in the RMP table so that
+> > +			 * it is consistent with the page table attribute change.
+> > +			 *
+> > +			 * __start_bss_decrypted has a virtual address in the high range
+> > +			 * mapping (kernel .text). PVALIDATE, by way of
+> > +			 * early_snp_set_memory_shared(), requires a valid virtual
+> > +			 * address but the kernel is currently running off of the identity
+> > +			 * mapping so use __pa() to get a *currently* valid virtual address.
+> > +			 */
+> > +			early_snp_set_memory_shared(__pa(vaddr), __pa(vaddr), PTRS_PER_PMD);
+> 
+> This breaks SME on Rome and Milan when compiling with clang-13.  I haven't been
+> able to figure out exactly what goes wrong.  printk isn't functional at this point,
+> and interactive debug during boot on our test systems is beyond me.  I can't even
+> verify that the bug is specific to clang because the draconian build system for our
+> test systems apparently is stuck pointing at gcc-4.9.
+> 
+> I suspect the issue is related to relocation and/or encrypting memory, as skipping
+> the call to early_snp_set_memory_shared() if SNP isn't active masks the issue.
+> I've dug through the assembly and haven't spotted a smoking gun, e.g. no obvious
+> use of absolute addresses.
+> 
+> Forcing a VM through the same path doesn't fail.  I can't test an SEV guest at the
+> moment because INIT_EX is also broken.
 
-That's one solution. I don't know if there is a downside to the system
-for enabling SEV if SNP is being enabled but another solution could be
-to just directly place a DF_FLUSH command instead of calling
-sev_platform_init().
+The SEV INIT_EX was a PEBKAC issue.  An SEV guest boots just fine with a clang-built
+kernel, so either it's a finnicky relocation issue or something specific to SME.
 
->
-> Thanks, Ashish
->
+> The crash incurs a very, very slow reboot, and I was out of cycles to work on this
+> about three hours ago.  If someone on the AMD side can repro, it would be much
+> appreciated.
