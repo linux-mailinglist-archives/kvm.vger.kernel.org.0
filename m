@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB6BD54BB2F
+	by mail.lfdr.de (Postfix) with ESMTP id 1C45154BB2D
 	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 22:21:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351337AbiFNUH0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 16:07:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41638 "EHLO
+        id S1352353AbiFNUHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 16:07:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350580AbiFNUHT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 16:07:19 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AEB34D6AA
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:07:17 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id q200-20020a252ad1000000b006632baa38deso8489649ybq.15
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:07:17 -0700 (PDT)
+        with ESMTP id S1350584AbiFNUHU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 16:07:20 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAA524D9C1
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:07:18 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id p123-20020a625b81000000b0051c31cc75dfso4237088pfb.5
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:07:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=gFBrtRlDF3lH8d+M3xs/KaCiXtONEeFHhxQZdekcdbU=;
-        b=RwZiSISLRP5Jmddd28lockJNVdfvQZA4w4rWdZGYLt+asA4X5x0/OSzjaVS9RnPgvf
-         dca+zd0t6wam9yqO0UYy4r6C+8s7Kcf8xwI8cQ1GozrxgKQXOxetyEHs672fkneibNEP
-         f0Iv/g1S6G3lM7op5OIPNu4VJjbG2uhJIq1D2qlvr1aycbaoyDYucSibs8GwI8aw0t7B
-         9xCxpUkiRrZbjk9NHi2uHIl4JYr+F2YsLMo/lpqFuDOIz7dm/3++yARmGD5FGSFgsj87
-         Om2fiUMw+PmCFjQwlXCIBBpaFlPHz1fXQDH08G+kz008LC9rR+TPDrJEuYNEgkMe6GiX
-         MzcA==
+        bh=KTI4cDcDxRU2AdleYfc0AxKMoqQ5q7lkRFosyv3tl7Y=;
+        b=WEDEWQkuXhSllM1JC9oQhj/pCnwiE7iF98H3mjG/aYZZ7lbVH/6Z5dbZa7YrmruZMW
+         Jp27bzveE+Ya+fSj6NgZXVZyxb1uxWP1S0lA8Qr4kP4CvvxSWlXLWt7EsYPnkFkQWaj0
+         sCcQiUm8syctpWhMtyaziC8rn++i43vhBDU5t4AwLaGKLKSezD6tDLqAhYrRF6ii9tLe
+         /Duk3QjYcaze8akzq0b3LPqWsgErUuJ67+4UhN7gzeigWS3+Rbl53Maeqarb4LqOhqtv
+         sZ5+JeDO95H6ZjeSK2Q95rnKsdIFq4a3s1MolsGYUFUSuaks2AONXQwKGOw91oARXftT
+         FG1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=gFBrtRlDF3lH8d+M3xs/KaCiXtONEeFHhxQZdekcdbU=;
-        b=JlhkJSOHvJ3KkQG+kSecrEsWoRgSueqXja5VpqOhUfrfqmQDXJ/UiPTpl5XWTBzgJy
-         T9Yqyj/YvoSMpJ/WlxRGWgu0ltXlafBQ8rS4xvnePZnhDDwM6+GTjEd0JxxP0E5VoC8h
-         ODlszaJmRnV26JQqjpJCjDBDMJZPny3wrZ6dIqdtZgHnmYKA+2d9c8UnVF9M/jzhwkAD
-         boxGSSN2xOexFztFQCzt8xIrwAR7waxODdL8J92u7UYuzJ5aBLgljGe8K+bcikskhGm5
-         LC2z/KKCyUI+SOw2gHmtymtbPiQYWyRjb+kqzUUCdmR6RFNl3vDkoqfSasvTGZrSZ5HP
-         DSrA==
-X-Gm-Message-State: AJIora9bLcgurFlHKsAFvdsoi3ZQprJIZqAU/Z/YQNsbxakrU6pDILXK
-        1dwceqFbGAp9coK8RfxMR1q2apYesSU=
-X-Google-Smtp-Source: AGRyM1vdSturGtI2PTOIo343GwMnfY2JF4QJfIJXDZQQzFSc21V8131+XS87dx52wrjxAWs9EX7RTdjXPig=
+        bh=KTI4cDcDxRU2AdleYfc0AxKMoqQ5q7lkRFosyv3tl7Y=;
+        b=55486GbvRDxVkl1Z+HgyJMGk8aqe0oyGFeAu9DnimCNkjGKsf8n8+tJg53HO77FLTk
+         gAIKr2+bX8LNnIOhJ85tvQOwef8ZhN8unYapCIW6MlczkFCkeo7iBhnXKXXrrQ5zyTnf
+         jYKzCqcDPHN72V+y6TMpKg0/l8Bdhm9Mv/sNusYDkchjjkCFkjr3A3bucCMHF4ZLXnGz
+         jFG2rUFqTOv+5TLP+qMLCdGiBz1Ha1z2snVW9J8wp4yforTk6YI/wv5xV9ODXk1foXtx
+         MF3JoIoCffjVPWVdld+zta87qRvHRctzxMWsM/IZ2XFkJETPkmnCxKKkY/JTQ4q+6PKB
+         p8LA==
+X-Gm-Message-State: AJIora8PUEKm/B2f9ip3zm4pf7RzanUAfiAXxVBVhHzcNhuaPPspXTKT
+        U85aHZEaV27vHPkbdws6dmtHml75rK0=
+X-Google-Smtp-Source: AGRyM1v4EQlG3wiKA/PqQz/ZBuEzfBcFq0tXOl0lwAd6C12EawhwojNf4d35w9mQ0v5jBs3DgR1AdWQRttM=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a81:11d3:0:b0:314:67c9:1654 with SMTP id
- 202-20020a8111d3000000b0031467c91654mr4202824ywr.481.1655237236710; Tue, 14
- Jun 2022 13:07:16 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:6946:b0:167:8ff3:1608 with SMTP id
+ k6-20020a170902694600b001678ff31608mr5765641plt.116.1655237238390; Tue, 14
+ Jun 2022 13:07:18 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 14 Jun 2022 20:06:27 +0000
+Date:   Tue, 14 Jun 2022 20:06:28 +0000
 In-Reply-To: <20220614200707.3315957-1-seanjc@google.com>
-Message-Id: <20220614200707.3315957-3-seanjc@google.com>
+Message-Id: <20220614200707.3315957-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220614200707.3315957-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH v2 02/42] KVM: sefltests: Use CPUID_XSAVE and CPUID_OSXAVE
- instead of X86_FEATURE_*
+Subject: [PATCH v2 03/42] KVM: selftests: Add framework to query KVM CPUID bits
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -63,138 +62,256 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename X86_FEATURE_* macros to CPUID_* in the AMX and CR4/CPUID sync
-tests to free up the X86_FEATURE_* names for KVM-Unit-Tests style CPUID
-automagic where the function, leaf, register, and bit for the feature is
-embedded in its macro value.
+Add X86_FEATURE_* magic in the style of KVM-Unit-Tests' implementation,
+where the CPUID function, index, output register, and output bit position
+are embedded in the macro value.  Add kvm_cpu_has() to query KVM's
+supported CPUID and use it set_sregs_test, which is the most prolific
+user of manual feature querying.
 
-No functional change intended.
+Opportunstically rename calc_cr4_feature_bits() to
+calc_supported_cr4_feature_bits() to better capture how the CR4 bits are
+chosen.
 
+Link: https://lore.kernel.org/all/20210422005626.564163-1-ricarkol@google.com
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/x86_64/processor.h   | 4 ++++
- tools/testing/selftests/kvm/x86_64/amx_test.c            | 9 +++------
- tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c | 7 ++-----
- .../selftests/kvm/x86_64/svm_nested_soft_inject_test.c   | 3 +--
- 4 files changed, 10 insertions(+), 13 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h  | 106 ++++++++++++++++--
+ .../selftests/kvm/lib/x86_64/processor.c      |  22 ++++
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  28 ++---
+ 3 files changed, 128 insertions(+), 28 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 32964d7b2218..2b13ea74362a 100644
+index 2b13ea74362a..ee3f7239cea7 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -48,6 +48,7 @@
- #define CPUID_SMX		(1ul << 6)
- #define CPUID_PCID		(1ul << 17)
- #define CPUID_XSAVE		(1ul << 26)
-+#define CPUID_OSXSAVE		(1ul << 27)
+@@ -43,23 +43,96 @@
+ #define X86_CR4_SMAP		(1ul << 21)
+ #define X86_CR4_PKE		(1ul << 22)
  
- /* CPUID.7.EBX */
- #define CPUID_FSGSBASE		(1ul << 0)
-@@ -62,6 +63,9 @@
++/* Note, these are ordered alphabetically to match kvm_cpuid_entry2.  Eww. */
++enum cpuid_output_regs {
++	KVM_CPUID_EAX,
++	KVM_CPUID_EBX,
++	KVM_CPUID_ECX,
++	KVM_CPUID_EDX
++};
++
++/*
++ * Pack the information into a 64-bit value so that each X86_FEATURE_XXX can be
++ * passed by value with no overhead.
++ */
++struct kvm_x86_cpu_feature {
++	u32	function;
++	u16	index;
++	u8	reg;
++	u8	bit;
++};
++#define	KVM_X86_CPU_FEATURE(fn, idx, gpr, __bit)	\
++({							\
++	struct kvm_x86_cpu_feature feature = {		\
++		.function = fn,				\
++		.index = idx,				\
++		.reg = KVM_CPUID_##gpr,			\
++		.bit = __bit,				\
++	};						\
++							\
++	feature;					\
++})
++
++/*
++ * Basic Leafs, a.k.a. Intel defined
++ */
++#define	X86_FEATURE_MWAIT		KVM_X86_CPU_FEATURE(0x1, 0, ECX, 3)
++#define	X86_FEATURE_VMX			KVM_X86_CPU_FEATURE(0x1, 0, ECX, 5)
++#define	X86_FEATURE_SMX			KVM_X86_CPU_FEATURE(0x1, 0, ECX, 6)
++#define	X86_FEATURE_PCID		KVM_X86_CPU_FEATURE(0x1, 0, ECX, 17)
++#define	X86_FEATURE_MOVBE		KVM_X86_CPU_FEATURE(0x1, 0, ECX, 22)
++#define	X86_FEATURE_TSC_DEADLINE_TIMER	KVM_X86_CPU_FEATURE(0x1, 0, ECX, 24)
++#define	X86_FEATURE_XSAVE		KVM_X86_CPU_FEATURE(0x1, 0, ECX, 26)
++#define	X86_FEATURE_OSXSAVE		KVM_X86_CPU_FEATURE(0x1, 0, ECX, 27)
++#define	X86_FEATURE_RDRAND		KVM_X86_CPU_FEATURE(0x1, 0, ECX, 30)
++#define	X86_FEATURE_MCE			KVM_X86_CPU_FEATURE(0x1, 0, EDX, 7)
++#define	X86_FEATURE_APIC		KVM_X86_CPU_FEATURE(0x1, 0, EDX, 9)
++#define	X86_FEATURE_CLFLUSH		KVM_X86_CPU_FEATURE(0x1, 0, EDX, 19)
++#define	X86_FEATURE_XMM			KVM_X86_CPU_FEATURE(0x1, 0, EDX, 25)
++#define	X86_FEATURE_XMM2		KVM_X86_CPU_FEATURE(0x1, 0, EDX, 26)
++#define	X86_FEATURE_FSGSBASE		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 0)
++#define	X86_FEATURE_TSC_ADJUST		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 1)
++#define	X86_FEATURE_HLE			KVM_X86_CPU_FEATURE(0x7, 0, EBX, 4)
++#define	X86_FEATURE_SMEP	        KVM_X86_CPU_FEATURE(0x7, 0, EBX, 7)
++#define	X86_FEATURE_INVPCID		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 10)
++#define	X86_FEATURE_RTM			KVM_X86_CPU_FEATURE(0x7, 0, EBX, 11)
++#define	X86_FEATURE_SMAP		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 20)
++#define	X86_FEATURE_PCOMMIT		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 22)
++#define	X86_FEATURE_CLFLUSHOPT		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 23)
++#define	X86_FEATURE_CLWB		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 24)
++#define	X86_FEATURE_UMIP		KVM_X86_CPU_FEATURE(0x7, 0, ECX, 2)
++#define	X86_FEATURE_PKU			KVM_X86_CPU_FEATURE(0x7, 0, ECX, 3)
++#define	X86_FEATURE_LA57		KVM_X86_CPU_FEATURE(0x7, 0, ECX, 16)
++#define	X86_FEATURE_RDPID		KVM_X86_CPU_FEATURE(0x7, 0, ECX, 22)
++#define	X86_FEATURE_SHSTK		KVM_X86_CPU_FEATURE(0x7, 0, ECX, 7)
++#define	X86_FEATURE_IBT			KVM_X86_CPU_FEATURE(0x7, 0, EDX, 20)
++#define	X86_FEATURE_SPEC_CTRL		KVM_X86_CPU_FEATURE(0x7, 0, EDX, 26)
++#define	X86_FEATURE_ARCH_CAPABILITIES	KVM_X86_CPU_FEATURE(0x7, 0, EDX, 29)
++#define	X86_FEATURE_PKS			KVM_X86_CPU_FEATURE(0x7, 0, ECX, 31)
++
++/*
++ * Extended Leafs, a.k.a. AMD defined
++ */
++#define	X86_FEATURE_SVM			KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 2)
++#define	X86_FEATURE_NX			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 20)
++#define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
++#define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
++#define	X86_FEATURE_LM			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 29)
++#define	X86_FEATURE_RDPRU		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 4)
++#define	X86_FEATURE_AMD_IBPB		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 12)
++#define	X86_FEATURE_NPT			KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 0)
++#define	X86_FEATURE_LBRV		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 1)
++#define	X86_FEATURE_NRIPS		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 3)
++#define X86_FEATURE_TSCRATEMSR          KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 4)
++#define X86_FEATURE_PAUSEFILTER         KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 10)
++#define X86_FEATURE_PFTHRESHOLD         KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 12)
++#define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
++
+ /* CPUID.1.ECX */
+ #define CPUID_VMX		(1ul << 5)
+-#define CPUID_SMX		(1ul << 6)
+-#define CPUID_PCID		(1ul << 17)
+ #define CPUID_XSAVE		(1ul << 26)
+ #define CPUID_OSXSAVE		(1ul << 27)
+ 
+-/* CPUID.7.EBX */
+-#define CPUID_FSGSBASE		(1ul << 0)
+-#define CPUID_SMEP		(1ul << 7)
+-#define CPUID_SMAP		(1ul << 20)
+-
+-/* CPUID.7.ECX */
+-#define CPUID_UMIP		(1ul << 2)
+-#define CPUID_PKU		(1ul << 3)
+-#define CPUID_LA57		(1ul << 16)
+-
  /* CPUID.0x8000_0001.EDX */
  #define CPUID_GBPAGES		(1ul << 26)
  
-+/* CPUID.0x8000_000A.EDX */
-+#define CPUID_NRIPS		BIT(3)
+@@ -488,6 +561,15 @@ static inline void vcpu_xcrs_set(struct kvm_vcpu *vcpu, struct kvm_xcrs *xcrs)
+ }
+ 
+ struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
 +
- /* Page table bitfield declarations */
- #define PTE_PRESENT_MASK        BIT_ULL(0)
- #define PTE_WRITABLE_MASK       BIT_ULL(1)
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index 95f59653dbce..7127873bb0cb 100644
---- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -25,9 +25,6 @@
- # error This test is 64-bit only
- #endif
++bool kvm_cpuid_has(const struct kvm_cpuid2 *cpuid,
++		   struct kvm_x86_cpu_feature feature);
++
++static inline bool kvm_cpu_has(struct kvm_x86_cpu_feature feature)
++{
++	return kvm_cpuid_has(kvm_get_supported_cpuid(), feature);
++}
++
+ struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vcpu *vcpu);
  
--#define X86_FEATURE_XSAVE		(1 << 26)
--#define X86_FEATURE_OSXSAVE		(1 << 27)
--
- #define NUM_TILES			8
- #define TILE_SIZE			1024
- #define XSAVE_SIZE			((NUM_TILES * TILE_SIZE) + PAGE_SIZE)
-@@ -128,9 +125,9 @@ static inline void check_cpuid_xsave(void)
- 	eax = 1;
- 	ecx = 0;
- 	cpuid(&eax, &ebx, &ecx, &edx);
--	if (!(ecx & X86_FEATURE_XSAVE))
-+	if (!(ecx & CPUID_XSAVE))
- 		GUEST_ASSERT(!"cpuid: no CPU xsave support!");
--	if (!(ecx & X86_FEATURE_OSXSAVE))
-+	if (!(ecx & CPUID_OSXSAVE))
- 		GUEST_ASSERT(!"cpuid: no OS xsave support!");
+ static inline int __vcpu_set_cpuid(struct kvm_vcpu *vcpu,
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index c46a22f8a9af..7666f24a145a 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -734,6 +734,28 @@ struct kvm_cpuid2 *kvm_get_supported_cpuid(void)
+ 	return cpuid;
  }
  
-@@ -333,7 +330,7 @@ int main(int argc, char *argv[])
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 
- 	entry = kvm_get_supported_cpuid_entry(1);
--	TEST_REQUIRE(entry->ecx & X86_FEATURE_XSAVE);
-+	TEST_REQUIRE(entry->ecx & CPUID_XSAVE);
- 
- 	TEST_REQUIRE(kvm_get_cpuid_max_basic() >= 0xd);
- 
-diff --git a/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c b/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c
-index a80940ac420f..8b0bb36205d9 100644
---- a/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c
-@@ -19,9 +19,6 @@
- #include "kvm_util.h"
- #include "processor.h"
- 
--#define X86_FEATURE_XSAVE	(1<<26)
--#define X86_FEATURE_OSXSAVE	(1<<27)
--
- static inline bool cr4_cpuid_is_sync(void)
++bool kvm_cpuid_has(const struct kvm_cpuid2 *cpuid,
++		   struct kvm_x86_cpu_feature feature)
++{
++	const struct kvm_cpuid_entry2 *entry;
++	int i;
++
++	for (i = 0; i < cpuid->nent; i++) {
++		entry = &cpuid->entries[i];
++
++		/*
++		 * The output registers in kvm_cpuid_entry2 are in alphabetical
++		 * order, but kvm_x86_cpu_feature matches that mess, so yay
++		 * pointer shenanigans!
++		 */
++		if (entry->function == feature.function &&
++		    entry->index == feature.index)
++			return (&entry->eax)[feature.reg] & BIT(feature.bit);
++	}
++
++	return false;
++}
++
+ uint64_t kvm_get_feature_msr(uint64_t msr_index)
  {
- 	int func, subfunc;
-@@ -36,7 +33,7 @@ static inline bool cr4_cpuid_is_sync(void)
- 
- 	cr4 = get_cr4();
- 
--	return (!!(ecx & X86_FEATURE_OSXSAVE)) == (!!(cr4 & X86_CR4_OSXSAVE));
-+	return (!!(ecx & CPUID_OSXSAVE)) == (!!(cr4 & X86_CR4_OSXSAVE));
+ 	struct {
+diff --git a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+index dd344439ad33..2bb08bf2125d 100644
+--- a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+@@ -43,36 +43,32 @@ static void test_cr4_feature_bit(struct kvm_vcpu *vcpu, struct kvm_sregs *orig,
+ 	TEST_ASSERT(!memcmp(&sregs, orig, sizeof(sregs)), "KVM modified sregs");
  }
  
- static void guest_code(void)
-@@ -70,7 +67,7 @@ int main(int argc, char *argv[])
- 	struct ucall uc;
+-static uint64_t calc_cr4_feature_bits(struct kvm_vm *vm)
++static uint64_t calc_supported_cr4_feature_bits(void)
+ {
+-	struct kvm_cpuid_entry2 *cpuid_1, *cpuid_7;
+ 	uint64_t cr4;
  
- 	entry = kvm_get_supported_cpuid_entry(1);
--	TEST_REQUIRE(entry->ecx & X86_FEATURE_XSAVE);
-+	TEST_REQUIRE(entry->ecx & CPUID_XSAVE);
+-	cpuid_1 = kvm_get_supported_cpuid_entry(1);
+-	cpuid_7 = kvm_get_supported_cpuid_entry(7);
+-
+ 	cr4 = X86_CR4_VME | X86_CR4_PVI | X86_CR4_TSD | X86_CR4_DE |
+ 	      X86_CR4_PSE | X86_CR4_PAE | X86_CR4_MCE | X86_CR4_PGE |
+ 	      X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_OSXMMEXCPT;
+-	if (cpuid_7->ecx & CPUID_UMIP)
++	if (kvm_cpu_has(X86_FEATURE_UMIP))
+ 		cr4 |= X86_CR4_UMIP;
+-	if (cpuid_7->ecx & CPUID_LA57)
++	if (kvm_cpu_has(X86_FEATURE_LA57))
+ 		cr4 |= X86_CR4_LA57;
+-	if (cpuid_1->ecx & CPUID_VMX)
++	if (kvm_cpu_has(X86_FEATURE_VMX))
+ 		cr4 |= X86_CR4_VMXE;
+-	if (cpuid_1->ecx & CPUID_SMX)
++	if (kvm_cpu_has(X86_FEATURE_SMX))
+ 		cr4 |= X86_CR4_SMXE;
+-	if (cpuid_7->ebx & CPUID_FSGSBASE)
++	if (kvm_cpu_has(X86_FEATURE_FSGSBASE))
+ 		cr4 |= X86_CR4_FSGSBASE;
+-	if (cpuid_1->ecx & CPUID_PCID)
++	if (kvm_cpu_has(X86_FEATURE_PCID))
+ 		cr4 |= X86_CR4_PCIDE;
+-	if (cpuid_1->ecx & CPUID_XSAVE)
++	if (kvm_cpu_has(X86_FEATURE_XSAVE))
+ 		cr4 |= X86_CR4_OSXSAVE;
+-	if (cpuid_7->ebx & CPUID_SMEP)
++	if (kvm_cpu_has(X86_FEATURE_SMEP))
+ 		cr4 |= X86_CR4_SMEP;
+-	if (cpuid_7->ebx & CPUID_SMAP)
++	if (kvm_cpu_has(X86_FEATURE_SMAP))
+ 		cr4 |= X86_CR4_SMAP;
+-	if (cpuid_7->ecx & CPUID_PKU)
++	if (kvm_cpu_has(X86_FEATURE_PKU))
+ 		cr4 |= X86_CR4_PKE;
  
- 	/* Tell stdout not to buffer its content */
- 	setbuf(stdout, NULL);
-diff --git a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-index 1c3f457aa3aa..051f70167074 100644
---- a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-@@ -19,7 +19,6 @@
- #include "test_util.h"
+ 	return cr4;
+@@ -99,7 +95,7 @@ int main(int argc, char *argv[])
  
- #define INT_NR			0x20
--#define X86_FEATURE_NRIPS	BIT(3)
+ 	vcpu_sregs_get(vcpu, &sregs);
  
- static_assert(ATOMIC_INT_LOCK_FREE == 2, "atomic int is not lockless");
+-	sregs.cr4 |= calc_cr4_feature_bits(vm);
++	sregs.cr4 |= calc_supported_cr4_feature_bits();
+ 	cr4 = sregs.cr4;
  
-@@ -204,7 +203,7 @@ int main(int argc, char *argv[])
- 	nested_svm_check_supported();
- 
- 	cpuid = kvm_get_supported_cpuid_entry(0x8000000a);
--	TEST_ASSERT(cpuid->edx & X86_FEATURE_NRIPS,
-+	TEST_ASSERT(cpuid->edx & CPUID_NRIPS,
- 		    "KVM with nSVM is supposed to unconditionally advertise nRIP Save\n");
- 
- 	atomic_init(&nmi_stage, 0);
+ 	rc = _vcpu_sregs_set(vcpu, &sregs);
 -- 
 2.36.1.476.g0c4daa206d-goog
 
