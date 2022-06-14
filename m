@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 951C154BC0B
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 22:49:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B19D54BC31
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 22:50:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240108AbiFNUrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 16:47:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36760 "EHLO
+        id S241229AbiFNUru (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 16:47:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235192AbiFNUrl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 16:47:41 -0400
+        with ESMTP id S235640AbiFNUrn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 16:47:43 -0400
 Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C32D1E3FC
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:47:40 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id u71-20020a63854a000000b004019c5cac3aso5482756pgd.19
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:47:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C61391D0EB
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:47:41 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id e18-20020a656492000000b003fa4033f9a7so5486933pgv.17
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 13:47:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=u8bzNiBps6E2wSU5SkQtzvlTmzoTVHSDY5lFfXr39Zk=;
-        b=NW/smZkiDd1uJ4BP5Z2HhFtWDNoo8oNHVv9ysPZG6omGQQshynXbpsBgtihy5M542x
-         mwXglKnK2f2nwTv5CH3kFCD1UDuWlOElGHVpVE2G/8JtD3YQkgKB6lgReLoR8GfVa0/v
-         6Y/HdUGgTvmwTUqcQeC1HOermxW17NFfypftkD+cMAQmCGOINwFC0iDLwJ0UOZpdvy0B
-         LDrBdZnaRP5NsJHvfcxmdaDRZ6P7L5jcOVSl67ru+mE0T3H0x6OGKkDk4JlXlpX15oXK
-         Xfc2ixz71VShPaTQPjHvTtzJaJzuxLBIhPttmyV/aWVswn9Po2Xwh8lcdPQFChj2SJA1
-         K25g==
+        bh=S6MVCft9LaHiNhWyF7FD9LCOGxdFEPDWsG4/kVl+FmI=;
+        b=TgQLUbxB7n/ualcy2OzKA3Sa77C9pngWE2rlTiSyuzTdOsHwnty1/vgyvf3DV7YlVY
+         kab7xWrs9PBf5+e9/qAMHIr4auL77u7ojkiUt5G82LV/fZxn0Fwc62jb0xTyg1RKtnUq
+         b750KanEC+sRBPDpRSbiE5rTYbpof3xPOq66zx14nxOw1xOPGOkPtNjjnTi/9FKecIfs
+         Zxwyp3qwtiDBM2UgvleviuXl+cfNAmh0QwyfGMN4faQoOvZIykOHL1IaEThJh2o9j/9u
+         cwvrduyq1j0Wxt2sbjXNnP3qmILsXznpKPoVxHnrCX750+lLuRZd2NVci2wyKyJY4A1K
+         Rzsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=u8bzNiBps6E2wSU5SkQtzvlTmzoTVHSDY5lFfXr39Zk=;
-        b=nyoOtc1P/j3cbw/JNiGc/KaZSYnZkFzkZZ2E6rmsdmL/+Qvs4XbbIlEW7/Ut+4QX9G
-         qAp1Z46qJv8kyzRV7DrlbMMDyJrkt3NVFr6xn4infXP+ORQgsLmr18D9wzq5Z56ZXyeG
-         GOd1zKPhT1AkPQYXo1yzAVKFk8ecV1wgRUKdao0lUTEeOD8BhRTUOMonqP+tKnRsQ2ND
-         pIwKWDcqN8fJSd+tH05WiDee4gbIPdYa4Tcv7IY7XaXj8BiTD8VNEqaTMQAQrVz7eDIn
-         ZTbZRxMVMZQgbXTd7S4IHxyRBx6rjIhrCv+CUHLh281G3b1vGNxMLiKUtTBzpBq2jWrE
-         Vrag==
-X-Gm-Message-State: AJIora9iiNGeVh5kg9ojucsHm9N3gueHmhaRJt5kybGFvQLJ8TM722kw
-        eOz+1xyb8XIycEJqDPvFMUWoazkPuHw=
-X-Google-Smtp-Source: AGRyM1s8gN0PKCp0jJCS0uvJtwSOItDg7kIV0FDoXpWE2v10ECCFQz0vbVQnfNj5eB+DcUqLbReRrwPTRB0=
+        bh=S6MVCft9LaHiNhWyF7FD9LCOGxdFEPDWsG4/kVl+FmI=;
+        b=f/C9HCVBG5qUHL7IsEv97SiBUj4TxJouW0kA0V0mnMYQy6KDgKYutMvZf2aWGdceow
+         PXj2Rkh35fRcyV4PcmL7PDwF57zVoPDCifhgbWVBZ3ftPx9Gg/H4B6M1knc882Dv4o1Y
+         5tZFUCGQmqReLZeJ3FFiAV+qbUK4tihaT2gWwOlJF4kWefRtJ9NvijReBSqvHRq3ONT6
+         BJUXLSP7wRUP6A5lo9GaO1KsiE/p0F85AAwkilqkVoyivraSyb80d3FlP9GJN4FtjmtK
+         A2WV37c+QGOMMW8Iafaqy9LQPqiO1v9rsPCfiaXV6s9CUtWfd9FtiePyPrQoUmid6Od/
+         FHWQ==
+X-Gm-Message-State: AJIora+b5vCz2/+2UeoRWCi2nCxpyDdHT4JeQOz1pqZ/qExPNgzyZPpI
+        AGyYkFNFvkmtzgMYVRxsVksJuZtd01k=
+X-Google-Smtp-Source: AGRyM1v/jtl477wqnGxDW7NdKC+b3LLICZHtlLrtE4nHZMHKrblNXYIktFnkwpF4w2RL4UXHS4Xkkew8e6A=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:930c:b0:167:8960:2c39 with SMTP id
- bc12-20020a170902930c00b0016789602c39mr6024164plb.33.1655239659566; Tue, 14
- Jun 2022 13:47:39 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:cb8c:b0:1e6:715f:ed28 with SMTP id
+ a12-20020a17090acb8c00b001e6715fed28mr6401949pju.69.1655239661300; Tue, 14
+ Jun 2022 13:47:41 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 14 Jun 2022 20:47:11 +0000
+Date:   Tue, 14 Jun 2022 20:47:12 +0000
 In-Reply-To: <20220614204730.3359543-1-seanjc@google.com>
-Message-Id: <20220614204730.3359543-3-seanjc@google.com>
+Message-Id: <20220614204730.3359543-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220614204730.3359543-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [PATCH v2 02/21] KVM: VMX: Drop bits 31:16 when shoving exception
- error code into VMCS
+Subject: [PATCH v2 03/21] KVM: x86: Don't check for code breakpoints when
+ emulating on exception
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -74,65 +74,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Deliberately truncate the exception error code when shoving it into the
-VMCS (VM-Entry field for vmcs01 and vmcs02, VM-Exit field for vmcs12).
-Intel CPUs are incapable of handling 32-bit error codes and will never
-generate an error code with bits 31:16, but userspace can provide an
-arbitrary error code via KVM_SET_VCPU_EVENTS.  Failure to drop the bits
-on exception injection results in failed VM-Entry, as VMX disallows
-setting bits 31:16.  Setting the bits on VM-Exit would at best confuse
-L1, and at worse induce a nested VM-Entry failure, e.g. if L1 decided to
-reinject the exception back into L2.
+Don't check for code breakpoints during instruction emulation if the
+emulation was triggered by exception interception.  Code breakpoints are
+the highest priority fault-like exception, and KVM only emulates on
+exceptions that are fault-like.  Thus, if hardware signaled a different
+exception, then the vCPU is already passed the stage of checking for
+hardware breakpoints.
 
-Cc: stable@vger.kernel.org
+This is likely a glorified nop in terms of functionality, and is more for
+clarification and is technically an optimization.  Intel's SDM explicitly
+states vmcs.GUEST_RFLAGS.RF on exception interception is the same as the
+value that would have been saved on the stack had the exception not been
+intercepted, i.e. will be '1' due to all fault-like exceptions setting RF
+to '1'.  AMD says "guest state saved ... is the processor state as of the
+moment the intercept triggers", but that begs the question, "when does
+the intercept trigger?".
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c |  9 ++++++++-
- arch/x86/kvm/vmx/vmx.c    | 11 ++++++++++-
- 2 files changed, 18 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index ee6f27dffdba..33ffc8bcf9cd 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3833,7 +3833,14 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
- 	u32 intr_info = nr | INTR_INFO_VALID_MASK;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2318a99139fa..c5db31b4bd6f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8364,8 +8364,24 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_skip_emulated_instruction);
  
- 	if (vcpu->arch.exception.has_error_code) {
--		vmcs12->vm_exit_intr_error_code = vcpu->arch.exception.error_code;
-+		/*
-+		 * Intel CPUs will never generate an error code with bits 31:16
-+		 * set, and more importantly VMX disallows setting bits 31:16
-+		 * in the injected error code for VM-Entry.  Drop the bits to
-+		 * mimic hardware and avoid inducing failure on nested VM-Entry
-+		 * if L1 chooses to inject the exception back to L2.
-+		 */
-+		vmcs12->vm_exit_intr_error_code = (u16)vcpu->arch.exception.error_code;
- 		intr_info |= INTR_INFO_DELIVER_CODE_MASK;
- 	}
+-static bool kvm_vcpu_check_code_breakpoint(struct kvm_vcpu *vcpu, int *r)
++static bool kvm_vcpu_check_code_breakpoint(struct kvm_vcpu *vcpu,
++					   int emulation_type, int *r)
+ {
++	WARN_ON_ONCE(emulation_type & EMULTYPE_NO_DECODE);
++
++	/*
++	 * Do not check for code breakpoints if hardware has already done the
++	 * checks, as inferred from the emulation type.  On NO_DECODE and SKIP,
++	 * the instruction has passed all exception checks, and all intercepted
++	 * exceptions that trigger emulation have lower priority than code
++	 * breakpoints, i.e. the fact that the intercepted exception occurred
++	 * means any code breakpoints have already been serviced.
++	 */
++	if (emulation_type & (EMULTYPE_NO_DECODE | EMULTYPE_SKIP |
++			      EMULTYPE_TRAP_UD | EMULTYPE_TRAP_UD_FORCED |
++			      EMULTYPE_VMWARE_GP | EMULTYPE_PF))
++		return false;
++
+ 	if (unlikely(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) &&
+ 	    (vcpu->arch.guest_debug_dr7 & DR7_BP_EN_MASK)) {
+ 		struct kvm_run *kvm_run = vcpu->run;
+@@ -8487,8 +8503,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		 * are fault-like and are higher priority than any faults on
+ 		 * the code fetch itself.
+ 		 */
+-		if (!(emulation_type & EMULTYPE_SKIP) &&
+-		    kvm_vcpu_check_code_breakpoint(vcpu, &r))
++		if (kvm_vcpu_check_code_breakpoint(vcpu, emulation_type, &r))
+ 			return r;
  
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5e14e4c40007..ec98992024e2 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1621,7 +1621,16 @@ static void vmx_queue_exception(struct kvm_vcpu *vcpu)
- 	kvm_deliver_exception_payload(vcpu);
- 
- 	if (has_error_code) {
--		vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, error_code);
-+		/*
-+		 * Despite the error code being architecturally defined as 32
-+		 * bits, and the VMCS field being 32 bits, Intel CPUs and thus
-+		 * VMX don't actually supporting setting bits 31:16.  Hardware
-+		 * will (should) never provide a bogus error code, but KVM's
-+		 * ABI lets userspace shove in arbitrary 32-bit values.  Drop
-+		 * the upper bits to avoid VM-Fail, losing information that
-+		 * does't really exist is preferable to killing the VM.
-+		 */
-+		vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, (u16)error_code);
- 		intr_info |= INTR_INFO_DELIVER_CODE_MASK;
- 	}
- 
+ 		r = x86_decode_emulated_instruction(vcpu, emulation_type,
 -- 
 2.36.1.476.g0c4daa206d-goog
 
