@@ -2,65 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1619E54A352
-	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 02:55:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92E1254A356
+	for <lists+kvm@lfdr.de>; Tue, 14 Jun 2022 02:57:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239605AbiFNAwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jun 2022 20:52:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38702 "EHLO
+        id S236652AbiFNA4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jun 2022 20:56:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239132AbiFNAwr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jun 2022 20:52:47 -0400
-Received: from mail-yw1-x1143.google.com (mail-yw1-x1143.google.com [IPv6:2607:f8b0:4864:20::1143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B50A47D;
-        Mon, 13 Jun 2022 17:52:46 -0700 (PDT)
-Received: by mail-yw1-x1143.google.com with SMTP id 00721157ae682-31336535373so14984037b3.2;
-        Mon, 13 Jun 2022 17:52:46 -0700 (PDT)
+        with ESMTP id S229892AbiFNA4G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jun 2022 20:56:06 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797F931344
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 17:56:05 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id gc3-20020a17090b310300b001e33092c737so7616593pjb.3
+        for <kvm@vger.kernel.org>; Mon, 13 Jun 2022 17:56:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=OJVToNO7CfirM2mS/wmfpYjagzrj98GWvj0UuFFVilo=;
-        b=VtO4WhW0LTva8izAKf2cjLEEVNuc00h/nyH5oRd+R0dxDmyDOBwVkQm3haSlubjltK
-         mLPCLmBGsqSIPBcwTmJsB1mi0eOhaaypjvveq2CX82fmLerrKW+5RSWbeqjQGzaYNyTm
-         4OKpcFgzNh7Cf3y/QW5y0TCNiVA2Oc8tG7zqSHChA2w8KQUuFVnCW1g4A15MCQwyTNDz
-         axjeL1j5PGxzZzUgfrg6coWHmvMQTAi9IsXdcczJtzaG9Q8iM6FB/sCa/wkkFQTj1ikd
-         Cps6HcjWp/I5wtrsEALQViMgXDMiaO9ORrdQ/AW7NsYYOcVFcD+n7PILkvqUk+l8oJOR
-         pFZw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zM25P5j7I6ljpapb2NJdghZi7EF+oAA2atXWjdhgbqU=;
+        b=EmCpvYAGXd48+DwFFSxtFRqmLKmNO11mM4ZuQheqGjuzckadHock5jF+A86mJnH1SH
+         PN8tM2+xM8BdV7pk4jBWLWsq7novWKwN6WKknSfiXb/wfFkWQhzqLlqtfrbqO5AyBWrp
+         p3O8Rym02lcZQKvvCkphYjfUvAJCre9XBYHqtBpJE9TIR8gTNEBwnpTVjGLF4VRtvRSJ
+         y7P37M+l9sC/nuYLn0B8cX4NsT/VJCbHbuuLQjefy42jbGFBSZ9xgS8YkEAoJEJbjP/W
+         uOHfdKdhWBS84t0tAK/tKevET7xMS6OihQFya6NdfRjVONDHcdG/2Be7mUyuONDGs5CS
+         y0rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=OJVToNO7CfirM2mS/wmfpYjagzrj98GWvj0UuFFVilo=;
-        b=Fu1VqRtaNDo7IB+uveh2oQa0nO5lC5/6P32TmvkCp1gy3AvweeXbzbIHprQ8rofsMP
-         OEeX1C+QTOeklRAo0dkUdz4dpCZ71gjNqvfIC0u4poxLFdaLJyDNzIDROTLr904UNcVz
-         Yie5GGpbVTuHGppp5lDA/EJKoSH+s1cawhsBxpzlpqbujokgK2utd7DjNBSqIaqHOoif
-         qvH4EG1VkTGIi1aa5e4eFFCbqNKA891p2+ObHSJCdTLj/+1zrYf0YobJwQjk3HZOzXNt
-         zWNvuzeSHKV4dpl6ssczxfai2RYwsjn9Qkn9oVp5KiWHW2eg7Vuqb7X4938tiPsSg4iD
-         KIVg==
-X-Gm-Message-State: AJIora/36imUHcemZo0yTCPxK6sCU/lYCXngmq0e0mECxHmAjGD7PPlw
-        D5qxmm/hTrusHH1f/fqpK446PATJJJNQAkj6PA==
-X-Google-Smtp-Source: AGRyM1voaKvM7WL9yh0uhoHYjcQwH/vjf54SJBxEEiBT75sTy5z1IUD20MbAuQK1UAm6t97oeaa7ZaehvkFXi05T4No=
-X-Received: by 2002:a81:2fd8:0:b0:314:eaa:bbc1 with SMTP id
- v207-20020a812fd8000000b003140eaabbc1mr2748956ywv.141.1655167965520; Mon, 13
- Jun 2022 17:52:45 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zM25P5j7I6ljpapb2NJdghZi7EF+oAA2atXWjdhgbqU=;
+        b=XytI0DgBJwIj5GA8YtEzEPNpKWn7O3OOOKmEtUW7Xfx2io/+mFMylp3M7i+e2wCOSZ
+         px+ivzG3FMtOuYghlvMx3qRXt8xW3MlYLMgP40sURu7F9LQheuHYQkFXqj/Af8JTWOMA
+         ajue8dn/xbRksTxtCPuBhfLTlCFhJA/c3mx8uP7Gv3skicibjnLFEcU1AzmBideqgYAD
+         TKNG+ucUY9jlW0WH6ovWRJNzcdpJCH/Dz0xJCL7QEjhEmRJrMqmR1VtDdN/KoQqRWGwT
+         8IlJ27S4yFeYAC9DtvHwAdxsXe/nZmA+P2epfxZQiK9QUZ9z7USYAXYEFFy1eImsTe5r
+         e6bw==
+X-Gm-Message-State: AJIora+qK3x8Gny86+XO6E6z4IiP28k4XKIPdNnIF3ylvzGSfTcNhQ9B
+        TX4J8Mg38SVvIZu5wdD28vTBeA==
+X-Google-Smtp-Source: AGRyM1v4hqWo35Dq9bSSU14Eq4t+QYXwRnRiFLU+htOcGPcAFII/epQGniZ47FPQcHCrpmzqqRXR1A==
+X-Received: by 2002:a17:902:edca:b0:167:ccca:30af with SMTP id q10-20020a170902edca00b00167ccca30afmr1998924plk.40.1655168164794;
+        Mon, 13 Jun 2022 17:56:04 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x10-20020a627c0a000000b0050e006279bfsm6036776pfc.137.2022.06.13.17.56.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jun 2022 17:56:04 -0700 (PDT)
+Date:   Tue, 14 Jun 2022 00:56:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Shukla, Manali" <mashukla@amd.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        "Shukla, Manali" <manali.shukla@amd.com>
+Subject: Re: [kvm-unit-tests PATCH v4 0/8] Move npt test cases and NPT code
+ improvements
+Message-ID: <YqfcoSk3cTWhNBJB@google.com>
+References: <20220428070851.21985-1-manali.shukla@amd.com>
+ <1b1998e2-0ff9-23cc-aaff-4f1e5ae3d06b@amd.com>
+ <420e1cda-61ad-e7d1-df50-0cd6907ff329@amd.com>
+ <29c35f14-8941-288d-2a0a-6642bf399a32@amd.com>
 MIME-Version: 1.0
-References: <20220612035641.1161945-1-sunliming@kylinos.cn> <66c1cf3a-9f2a-e05a-3c76-62b1ee056385@intel.com>
-In-Reply-To: <66c1cf3a-9f2a-e05a-3c76-62b1ee056385@intel.com>
-From:   sunliming <kelulanainsley@gmail.com>
-Date:   Tue, 14 Jun 2022 08:52:34 +0800
-Message-ID: <CAJncD7Tn4i59SR=Ee-dEXkXq74g8LEzRQ7X=fE92kM26BFocig@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Remove unused "type" of split_page_type()
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     isaku.yamahata@intel.com, pbonzini@redhat.com, seanjc@google.com,
-        mingo@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <29c35f14-8941-288d-2a0a-6642bf399a32@amd.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,52 +74,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I got it, I am sorry aboot it , thanks.
+On Thu, Jun 09, 2022, Shukla, Manali wrote:
+> Shall I rebase and resend this series?
 
-Xiaoyao Li <xiaoyao.li@intel.com> =E4=BA=8E2022=E5=B9=B46=E6=9C=8813=E6=97=
-=A5=E5=91=A8=E4=B8=80 10:48=E5=86=99=E9=81=93=EF=BC=9A
-
->
-> On 6/12/2022 11:56 AM, sunliming wrote:
-> > The variable 'type' in split_page_type() is set but not used, so remove
-> > it.
-> >
-> > Fixes the following w1 warning:
-> >
-> > arch/x86/kvm/mmu/mmu.c:982:28: warning: variable 'type' set but not use=
-d [-Wunused-but-set-variable]
->
-> Please note, the code doesn't get into upstream yet.
->
-> The fix shouldn't be sent to upstream maillist.
->
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Signed-off-by: sunliming <sunliming@kylinos.cn>
-> > ---
-> >   arch/x86/kvm/mmu/mmu.c | 2 --
-> >   1 file changed, 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 7b3df91a93cf..f4d577335f94 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -979,14 +979,12 @@ static void split_page_type(gfn_t gfn, struct kvm=
-_memory_slot *slot,
-> >                           enum pg_level level)
-> >   {
-> >       struct kvm_page_attr *page_attr =3D page_attr_slot(gfn, slot, lev=
-el);
-> > -     enum kvm_page_type type;
-> >       gfn_t base_gfn;
-> >
-> >       if (WARN_ON_ONCE(!kvm_page_type_valid(page_attr) || level <=3D PG=
-_LEVEL_4K))
-> >               return;
-> >
-> >       base_gfn =3D gfn & ~(KVM_PAGES_PER_HPAGE(level) - 1);
-> > -     type =3D page_attr->type;
-> >
-> >       /*
-> >        * Set the type to KVM_PAGE_TYPE_MIXED in advance since when a la=
-rge
->
+If you have spare bandwidth and/or it's a trivial rebase, sure.  I'm hoping to get
+to this in the next few days; waiting for that may or may not save you time in the
+long run (truly don't know at this point).
