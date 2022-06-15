@@ -2,184 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC01C54CAB4
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:01:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0338D54CABE
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:02:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355472AbiFOOAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 10:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44226 "EHLO
+        id S243453AbiFOOB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 10:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355512AbiFOOAW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 10:00:22 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBB4A4A3F8
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:00:02 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25FDvMBL013333;
-        Wed, 15 Jun 2022 13:59:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=r5pwv3s3jrrSmU6ATFm7CvGsLuJe44D8Rv8s3w+Jb+0=;
- b=EUJKX73Id6iGTYbb/EOZCStHHk2KPqdeN7h/8xgT8XPgvBO8SVR5kbBAUXucj/Hz5/BD
- j+HMSrQtctW62Qq1WqDHYnErYT1RYsuxQLnyb+YWQgGniJMYuqIEc0pZ2f5j9dvNWvZU
- EWQCphSGbqZdtrkYRthp+FuggRhiDsJZf7w46JcX3KnxsCiJ5ICLSB/o6s2okLJilX7z
- mYFF4duOEFbPk20wLSiN44gAjNswHJE4x+Gy/ju9ZAAKtHqNs8OJIOozZJeiVz8/m9Yh
- e1xZXPwtxcg6BuwfCrIumjhKR7VYnrPmZy3rYuMZ/JylNnYVUKBMRV/nE6bWDbQopOyM oA== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3gmkktgp7q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Jun 2022 13:59:56 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 25FDuMSU004285;
-        Wed, 15 Jun 2022 13:59:55 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3gprbrt9w6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Jun 2022 13:59:55 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RWKOaeJYrMYfZowNTcr1AcCFLV6vdXcFkkTtrGs6HCJ9i3RVr1ws3nERQR1e6QO7TWA4ta2RzShl3HCwqOAIrlZMTQ+SOI2e2uxtrPw44e7IYws7PQXPjGjZjKUx2KlF0q8JA8nT3oLJtAhos6APGpzXPRPjCm517XWJ5L2ScQ35RPRQ1xJ3vp6U1g3JVYBVCSUK5K0dH8oOsRITux3UU0fuaEsy0tl8q3S6ZzQstDOQ/aVcyghyJNH6AC2e4iF9XstEC8PLZ5O7qlKEq61UOX/WoDduubP+bngHhBxFzpt+q92YVsQpFYutGd1yNfQPFvIYkbzS7he3bK69r0TsZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r5pwv3s3jrrSmU6ATFm7CvGsLuJe44D8Rv8s3w+Jb+0=;
- b=SoPJuyM9CUOPKn5OTdclkwkaBTBjssFkGdDAy7EfwpO3eXcJJxeQNeVFgEMoBPTQ6X76SPKDAAdH2p22gRPuZoKtXrCx2mlmvH8B3/rLOprLa7KVLYfJepQVpVYzoF48WtCJHNJNQTYwxcCpNP+7reBzjeolVnji8KurMvtxLw1pLakDLueqwjIWFjD87pvygYUttHE++mFl6leP+nt6Y/xDOxoUFH4enMABCjBdjeec/AvUtWZ1Re2BX1D88YUSfP5UxVDOwbeApNsEynft6/O4NYzdN8AZJ/8S5bIGwo29mrWcukrEsV9M3cj+vGhVG57yPUQFo5TpkFcKg4RqSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r5pwv3s3jrrSmU6ATFm7CvGsLuJe44D8Rv8s3w+Jb+0=;
- b=QmQFfrieNV6zq/mUCWKfWnHWqWhDTZ0wNyXdjHE47XBsJsFVpQpB3813vrFTKs03pI1kyClPnx10Jmbhzuvo8CZ9v6nv+LZ/KKPeScdCB23a9tdK4xdPMUxBdhMDAwPIPiiVZMvvSLVbk31/AkCR8ABv6w2cS2dY+gNK0nB2k6M=
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by CH2PR10MB4039.namprd10.prod.outlook.com (2603:10b6:610:10::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.16; Wed, 15 Jun
- 2022 13:59:53 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::b842:a301:806d:231e]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::b842:a301:806d:231e%9]) with mapi id 15.20.5353.014; Wed, 15 Jun 2022
- 13:59:53 +0000
-Message-ID: <c9ecff6e-6822-095d-24db-afc3227d4c8e@oracle.com>
-Date:   Wed, 15 Jun 2022 14:59:45 +0100
-Subject: Re: Bug report: vfio over kernel 5.19 - mm area
-Content-Language: en-US
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     jason Gunthorpe <jgg@nvidia.com>, maor Gottlieb <maorg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, idok@nvidia.com,
-        linux-mm@kvack.org, Alex Williamson <alex.williamson@redhat.com>,
-        akpm@linux-foundation.org
-References: <a99ed393-3b17-887f-a1f8-a288da9108a0@nvidia.com>
- <3391f2e5-149a-7825-f89e-8bde3c6d555d@nvidia.com>
-From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <3391f2e5-149a-7825-f89e-8bde3c6d555d@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0509.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:13b::16) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+        with ESMTP id S1355685AbiFOOB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 10:01:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 995B144767
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:01:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655301684;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fkqA8lXM7RGqvrGS7f6UnaLKbk7wXVD0P9vKbHcd5hs=;
+        b=UBUoDGvbd7HIrRrYqaZdvirDy/THMkWPyGP7l8u9KlOCI9kEFdRyrUzstoSLyHKEzWCe0o
+        QQCn3l5NO13yqIYzxB6Fp/M3zQBPGFgP2RUirO4nFPjkbKhqTiBL7DPB0NLNZjmMkdsLyY
+        swtAGjpYmNNFakr2hXFVrwzzVjJDiQA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-353-qvVpFnHHM8OMKgaCH4EbNg-1; Wed, 15 Jun 2022 10:01:23 -0400
+X-MC-Unique: qvVpFnHHM8OMKgaCH4EbNg-1
+Received: by mail-wm1-f72.google.com with SMTP id l17-20020a05600c4f1100b0039c860db521so1261600wmq.5
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:01:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=fkqA8lXM7RGqvrGS7f6UnaLKbk7wXVD0P9vKbHcd5hs=;
+        b=fZFXLCZ8Q+99jrzxCInyMEwa8yqWz1qr9JRRuyq4KOSHXj3zg8Bd0WuUFDg6FISiv6
+         7Vam6flX3u5k8HAW9CaTx1wmaLN5eYCgrc5jeF9o4pfpOAmzZrSy2DqOpfW1utBaZvGj
+         Lbwy5wOm2+gZopS7Vf+GJvgrrvalna3j82GbKTdSaTEqLZPYLIgrLz50A2ljEyHa/ImC
+         qYgW22NOSDDs5LzRP5sHs1pupa+j5KlQMlc/bByJBRlDE7h6PFy/iWQvv0HpsnxfK/y3
+         fK3i8yMjfOnPrfcdNc4y7TXR2nMpJNl/6unDWIQXbEfMvjhE66aVpq6lrxQSGUyrin78
+         qjNA==
+X-Gm-Message-State: AOAM531KQs0tWLkyuwREdxm9/D6isbnTgthyLJ8/ORdwAKXdcqmcz8ZN
+        Yx3huOekYYPa78oBbPZh8OwVVivzYCR/tkyGN7nd8XN47Gv87v386O3HceKNbpJYL1BIGU5D6ha
+        1NvC939D/TJBS
+X-Received: by 2002:a05:600c:1f0c:b0:39c:600e:6d51 with SMTP id bd12-20020a05600c1f0c00b0039c600e6d51mr9930067wmb.3.1655301682010;
+        Wed, 15 Jun 2022 07:01:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxYHsXkYT3PfPo0qLxobsWOVSY9s4CmbO+huQNlARM5lycW74V6oc28+X3LTyQ84YUmoNq99Q==
+X-Received: by 2002:a05:600c:1f0c:b0:39c:600e:6d51 with SMTP id bd12-20020a05600c1f0c00b0039c600e6d51mr9930045wmb.3.1655301681743;
+        Wed, 15 Jun 2022 07:01:21 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id d6-20020adff2c6000000b002100e86319asm14663442wrp.78.2022.06.15.07.01.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jun 2022 07:01:20 -0700 (PDT)
+Message-ID: <090e701d-6893-ea25-1237-233ff3dd01ee@redhat.com>
+Date:   Wed, 15 Jun 2022 16:01:19 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bd078426-9af1-4718-70e5-08da4ed751d4
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4039:EE_
-X-Microsoft-Antispam-PRVS: <CH2PR10MB4039D71F19A0316CF47A2C52BBAD9@CH2PR10MB4039.namprd10.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gc7tVZaurbFWIYbC9Xh6neAiveAuucd7iSWRf5XQxC/ZmTOKSdSRz+86YljGMlxweYoKnZ7METKrLzfPvGS/g9pYkv4um7NlaytT1F5woobh5yPG6l0KmDCl9If+BG14C0mvsgkXfkZZQ5q0OvMc0/jEvsI2X15iWl7Jrig2n79LeBoQ+zzf+xLSriMUbbWOzU37qi84m75D1bp7TraaFrhTxpult9UaMkEtwcFjOb784+KN2JYPGJPK9zB1rbTfFF9DgP+F1o1UuYK9JCYaVM6RDkOfNOtzi2Gg4C2Ysobyppi5nHmGj48VOLOlgSefUXeTLreStsVUyoXtuGssHBC3BOQlLk+Dlp7KZyc3m+ethxQuLJXF9HZG3umuk9zJ3bGNfQbA/VHQs69nnWg3X5lxQ1A/VS1CxhtvCy9FZ9ZPf8EkQqKR3ebKkM6LONEomC3sWzt/xohqvkl1emfUARyncy2YR49gsDvVZfmibNXQ78zRDxd8P5yKwSk5YcrgekXoCW9gswop+u3ID9oL4hHPTUtHsnxGkCTWA95eZTvtUYeWu4cjVPpRSlBp61/9EVXLTgBR+wC//C1ZVAdt1cMkHV4KP8+4K935QXn74HhILGCu2DmVvGfxHAduuPmagYX69dAilCs+1eQQZZM2rkc8Pc7+7v7OSEOrCNuxADVwcS8fCf44Ah8W/fze797RTvpq9G+OgeNxuA5UG57E7tlnx5yVEcoamvZ56fxcCA0ZCcuym+9U0nqNF/zZtLMlj3cQLk59vCOtlqNZPvTmRCVU5jem1xm8uL06i+9A0FlqM0t2CS0ucgyzahx3x7VddtfCbeJ7QE4D9xe75vXU0Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(366004)(4744005)(8936002)(966005)(6486002)(83380400001)(186003)(508600001)(5660300002)(2906002)(54906003)(6666004)(53546011)(26005)(6916009)(6512007)(31696002)(6506007)(8676002)(66946007)(66556008)(31686004)(66476007)(4326008)(38100700002)(86362001)(316002)(36756003)(2616005)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UDBLQUlGWUlTWkJoSkxQQktpV3Q1SkE0RTNJRUZWa1RGS3A0VjQ0c1Y3QVd5?=
- =?utf-8?B?WFFLbyt4YWhJei9xZHFDN2E2WkRxRG5lb2l3OURsTGJlNGRwSnA3aXhaR09K?=
- =?utf-8?B?YmxmYXR4L0pSVm55YUVwK2h1YlFiMkVCbnBqZTJXVUl4WmFZM2dJMzZiTG1C?=
- =?utf-8?B?WGZnRHNHK0dtSlJ0dStHNXdJUWxpY1dFRURLMHkzUWdNdC9oYXlnbUFOL1dM?=
- =?utf-8?B?dGM1elN2aEhZWjJNbCsvMkFQK0QzOURxb3NRdXcwS21WTVlqYVc3cmovVDVi?=
- =?utf-8?B?c09IWGN3aXNjU3lKUmpiSmRvQm1YdU9mNSsyTzBJdnNlOGU1QytucThtdEVl?=
- =?utf-8?B?SVROT0NCOTA0cmQxckxGTytBZXNuSTZnbmUyd3FMcG1yME10UWh6S3crV0FT?=
- =?utf-8?B?MFprZmNWWGpMV0VIZllxdCs4RTFJazhucUt2MkRrSTdpc0RoQ08vMFhkaFda?=
- =?utf-8?B?Njh1Qi81WjB1RlFJUG5ZMnp3TDFiWndqdEpSTmhHdVM2b2dYdmRpOUtOV0NB?=
- =?utf-8?B?UmxOMVh4am1qbks5NWF5MXA5L29aU3dEQzl5UklJNVBUeUlzRDVOT0QyNXZt?=
- =?utf-8?B?N0w5TVJoV1UySWtTVEJWbFIvOEUrdWVFYWRjTlRrWE8vang4WmZUZGszSFBB?=
- =?utf-8?B?bXlhQWZJTUxMVTIzemdMOWRCRFhkOHZ6a0JJSHhMRVU2alByRFltOTZHbkFG?=
- =?utf-8?B?M3hYeDlvUVJsb0lMQUwzb2JvKzVmSHY3RWhsdHJ5SlRzNEJuQS9BSi84MG9V?=
- =?utf-8?B?d0Q1VnlXcXEwa2M0ZGlyTC9oUi9KRldBMENsNysyQk1nbzBWTTFhaHJzZHNI?=
- =?utf-8?B?c0pWd2pPNTR1SVNOdWFWZCtQc0RxL0g5aTZHYTQzVG5BbWxlSzBGOEZrL0lt?=
- =?utf-8?B?Yk0wNmZGcTJzRTlpbkUyc21kR1RVTjZ3UWJlRFJNTEFRcVRXNjJvWW9CZXlx?=
- =?utf-8?B?MytLdEl0S0dhelFjbHo3VllwOWJqSytqSkdCeW4vYUl1SDl1cVJxNXRYbTBY?=
- =?utf-8?B?c1lrQ3hQOHVQUDMwaTdVdUpoNjZ0ZWp1L2tYb0MrNE9ySThPcjlXb05JOGYr?=
- =?utf-8?B?RFBZVlp0cExNWHVIb1RaMG1NeTg5bjhxZnhaNGtWWjRIOUZjaHR1czRyZ3RW?=
- =?utf-8?B?WVpzdjJ1NEswOUFrRDVyUDdjYUJWcHpxUW5uaStmR09XWmdPbmlyNUhwKzFn?=
- =?utf-8?B?ejVaQm9PeDhJbGtQbko2SlpVMklXZzNEQzl2MVJ0NlV0U3Y2U1Z1V29uM3Jj?=
- =?utf-8?B?SnZudEFnVGc5aTF5TkRDeW0xMkF1SSt1ZWxUQVNjcDgzSDRBWHVFVWFsM0Ry?=
- =?utf-8?B?NDZWaWJWTTcyQlZLK3BvZXFNREVQZW9RNVdYdXdneXI1eTg0V2NKeDMydlgx?=
- =?utf-8?B?djJLVHNTRHh4THZQVXZ0UGhTUUJ0eGhWM0taRnlQeXFwY3RzUzhmbUhuemFU?=
- =?utf-8?B?M1JnVUZjYWN0TVZTdkpNSDRZSVZBN0kySHJ5NjRYYkhic1VnWlZ1dGVwbTVR?=
- =?utf-8?B?THdvdTRvM3dxbGhEVlhENzVNcURRUG9oNTZHdWE0QTZraVI2blk4b0k3VUZV?=
- =?utf-8?B?YkUybXJZVjJlVnR0Rmo5SjNYQVZ6dWlXekpubXJ4dllMMVVxVkptRUpYYjNT?=
- =?utf-8?B?TytvUlJqWFZLN05jVFNXK1ZEalpoaWgrMUhQazh5YnV1b3BjUTVyZFEwYkVP?=
- =?utf-8?B?Tnd6L0lBUFlpSUthalU5WFlkQVI5QW94eHFyWUJZZkpjc0xZakFBQmhoQXRN?=
- =?utf-8?B?K0FMdm9OZ0U2UUdub1BGSi9xUTEza3pMeTZhYTJZU0FTaGR6N2tsOE5meXQ5?=
- =?utf-8?B?eE9CNXJ4Qjg3VCtQcjFJOGEvcFhpUTRBZlBjV0VqTTlZelE5NmhSTDJHc1JK?=
- =?utf-8?B?MktYczNNY08vS2xLQit5QitOMjg1d004QXdLYUpMWnpJMEZkK0ZVN1gzQ0Jn?=
- =?utf-8?B?ODRrZG1lR1pWOGZEOEY2M0kvQlp2U1dxdmgydmJTMGtOVGVzQW05aURrTVU2?=
- =?utf-8?B?ZzIxdGdZUi9FMnF1bGYyQnV3Uk94VEkyWGQxVlY4V28rdVpGYlY0azRObC9i?=
- =?utf-8?B?elJ0bnp6UDl3UU1GVGY4UHRjVWw1RmxpVTBBWlN5RXc1Qm1XWERsOEliYTBo?=
- =?utf-8?B?SUlzdHZJdzQ1RUMxcjNlTG00VHBUaEs3U1NNOVh2cVJsWjl5ZFZhcndPYWFI?=
- =?utf-8?B?Um9BUzl4NjRSWkpsTDdzT0NyVGRvTWRFVFAreVBhQWIwQWtzQzJIOGJKdTIz?=
- =?utf-8?B?eXVaTGhLYkpXQW9pUW0xOVZKQ0hva0x2d0RlSW8rM1V6MDRqQ3d4M09vdThC?=
- =?utf-8?B?QUd5MWZjSFlyTjJ4bFdLM3UxSjBOWWRKZEJEQnNPekxuTktlY216QllERm01?=
- =?utf-8?Q?wbR48HcDxhFj02mA=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd078426-9af1-4718-70e5-08da4ed751d4
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2022 13:59:53.0733
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2NR5dIutIYLHhkIIWSe38p/qgpaOoLzBc2HH9FUclMgntwfmcebXwi7uJuTI27OM95sMMx7aLJGwU132ka3/6NQnBLPFwDnYXlpCukO+cjo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4039
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.517,18.0.874
- definitions=2022-06-15_04:2022-06-15,2022-06-15 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=881 spamscore=0
- phishscore=0 suspectscore=0 adultscore=0 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206150056
-X-Proofpoint-GUID: IFz0FxjxFie1sWfZbnDXsQItuYVhCw42
-X-Proofpoint-ORIG-GUID: IFz0FxjxFie1sWfZbnDXsQItuYVhCw42
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2 5/8] KVM: x86/mmu: Use separate namespaces for guest
+ PTEs and shadow PTEs
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>
+References: <20220614233328.3896033-1-seanjc@google.com>
+ <20220614233328.3896033-6-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220614233328.3896033-6-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 6/15/22 11:52, Yishai Hadas wrote:
-> Adding some extra relevant people from the MM area.
+On 6/15/22 01:33, Sean Christopherson wrote:
+> Separate the macros for KVM's shadow PTEs (SPTE) from guest 64-bit PTEs
+> (PT64).  SPTE and PT64 are _mostly_ the same, but the few differences are
+> quite critical, e.g. *_BASE_ADDR_MASK must differentiate between host and
+> guest physical address spaces, and SPTE_PERM_MASK (was PT64_PERM_MASK) is
+> very much specific to SPTEs.
 > 
-> On 15/06/2022 13:43, Yishai Hadas wrote:
->> Hi All,
->>
->> Any idea what could cause the below break in 5.19 ? we run QEMU and 
->> immediately the machine is stuck.
->>
->> Once I run, echo l > /proc/sysrq-trigger could see the below task 
->> which seems to be stuck..
->>
->> This basic flow worked fine in 5.18.
->>
+> Opportunistically (and temporarily) move most guest macros into paging.h
+> to clearly associate them with shadow paging, and to ensure that they're
+> not used as of this commit.  A future patch will eliminate them entirely.
+> 
+> Sadly, PT32_LEVEL_BITS is left behind in mmu_internal.h because it's
+> needed for the quadrant calculation in kvm_mmu_get_page().  The quadrant
+> calculation is hot enough (when using shadow paging with 32-bit guests)
+> that adding a per-context helper is undesirable, and burying the
+> computation in paging_tmpl.h with a forward declaration isn't exactly an
+> improvement.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Maybe this one:
+A better try:
 
-https://lore.kernel.org/all/165490039431.944052.12458624139225785964.stgit@omen/
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 54b3e39d07b3..cd561b49cc84 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2011,8 +2011,21 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+  	role.direct = direct;
+  	role.access = access;
+  	if (role.has_4_byte_gpte) {
++		/*
++		 * The "quadrant" value corresponds to those bits of the address
++		 * that have already been used by the 8-byte shadow page table
++		 * lookup, but not yet in the 4-byte guest page tables.  Having
++		 * the quadrant as part of the role ensures that each upper sPTE
++		 * points to the the correct portion of the guest page table
++		 * structure.
++		 *
++		 * For example, a 4-byte PDE consumes bits 31:22 and an 8-byte PDE
++		 * consumes bits 29:21.  Each guest PD must be expanded into four
++		 * shadow PDs, one for each value of bits 31:30, and the PDPEs
++		 * will use the four quadrants in round-robin fashion.
++		 */
+  		quadrant = gaddr >> (PAGE_SHIFT + (SPTE_LEVEL_BITS * level));
+-		quadrant &= (1 << ((PT32_LEVEL_BITS - SPTE_LEVEL_BITS) * level)) - 1;
++		quadrant &= (1 << level) - 1;
+  		role.quadrant = quadrant;
+  	}
+  	if (level <= vcpu->arch.mmu->cpu_role.base.level)
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index cb9d4d358335..5e1e3c8f8aaa 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -20,9 +20,6 @@ extern bool dbg;
+  #define MMU_WARN_ON(x) do { } while (0)
+  #endif
+  
+-/* The number of bits for 32-bit PTEs is to needed compute the quandrant. */
+-#define PT32_LEVEL_BITS 10
+-
+  /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
+  #define __PT_LEVEL_SHIFT(level, bits_per_level)	\
+  	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 6c29aef4092b..e4655056e651 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -38,7 +38,7 @@
+  	#define pt_element_t u32
+  	#define guest_walker guest_walker32
+  	#define FNAME(name) paging##32_##name
+-	#define PT_LEVEL_BITS PT32_LEVEL_BITS
++	#define PT_LEVEL_BITS 10
+  	#define PT_MAX_FULL_LEVELS 2
+  	#define PT_GUEST_DIRTY_SHIFT PT_DIRTY_SHIFT
+  	#define PT_GUEST_ACCESSED_SHIFT PT_ACCESSED_SHIFT
 
-.. but I think it's not yet merged for v5.19:
+Paolo
 
-https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git/log/?h=mm-hotfixes-unstable
