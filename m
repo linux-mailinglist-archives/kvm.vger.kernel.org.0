@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C436054D540
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:30:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89FCF54D53C
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:30:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344042AbiFOX3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 19:29:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43862 "EHLO
+        id S1347671AbiFOX35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 19:29:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232323AbiFOX3w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 19:29:52 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 993A813E3F
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:51 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id ob5-20020a17090b390500b001e2f03294a7so111549pjb.8
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:51 -0700 (PDT)
+        with ESMTP id S232323AbiFOX3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 19:29:55 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3897013E3F
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:53 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id p123-20020a625b81000000b0051c31cc75dfso5757232pfb.5
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=IpRHRC1m/nfVpFclf0C9MrqrO+VlgUhAW9qPS5MuHGY=;
-        b=UXwvtJrl58O24fn2gm5JgHIWpnhSgGVrfKptZAy24BOMKf4CZyok7jCC9HCnyWCDMR
-         ALZ7/vvis0xr8pNTl+IbDPHpzDQ/IvQWJbcpFYd5zbpLKY0pMt4f+IyFmkl2coG9Wxjc
-         5xh5aQIFfXETwq+FYBHd+wXhw6oVkuGEgeNf1D+L19k2nYx+TVI3UZyltxodfLAlOikU
-         KnEb9PWcLCqtPBWK7qbGOfAjZNx8+guMW1WXiAoheTpOq3Hki9j0yMDjX+Ig/z/Gb/uY
-         2+OPm6QP8iNQzRZPzJgGQMwVKzsHk7uMdB6W66no9oaxM7d4gZjJhgC7KqDoqJ3twQbc
-         dP7w==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=UPa2qRsj0spolXYuBb6nQbQiFRfDL61mBkMfsRuMG4Q=;
+        b=hXUUCoBvy5NvC8lv7jHqLVGetdigwUeWXyVKsCcoVSHfycfpY2jVKQHVAgc0ExBqXW
+         QRGVmssbm5lyeF84aB5rTSHN3TJvSlZWFeZNLKi290p5ZK7Wdq3mO8oPPJxomJG9smOR
+         Ok7rtdWDRJbChjK3RpgNcBgZO/HqKXN1i4rn3acK+sLn1pLxD8gztoFqxJiA1OYddK84
+         8FmUbU3JlhAKyHNoZNxZPI81Dqy9ld5zd+G3J4mOsmv+hww6YOSJpIDTh72zVGVRk46Y
+         7uF5NyA+FoOZ7upEmnTJsI25PWuEXXhhuqt0d4xH2vU5oKpkiFcGJo34+dptQkFg8KOD
+         q4SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=IpRHRC1m/nfVpFclf0C9MrqrO+VlgUhAW9qPS5MuHGY=;
-        b=0vYjAFSH49SoLNcWlwVg0C4Idm2Hof/ypsXI3LcvWid6FhN5jg57ICeLiJtjFC+txF
-         rAbJ14IaTcL4F+XOVLOotK1p0GxYG7WyRsmi0/6Mkxo6kSw1j7zPFMhguFP97vgvqEtG
-         cL3KMaiTySgexEuxMY7Wout6zaXmIozwRrVWyRHHXoic+B647/4UD/oHiXarly2E68f6
-         tIFSDR2ebUPAYXc5HxgamXbKslNjaN8kXYMhD7nJWkwV8/rbwbZHvF0sN1Euxcdijm1f
-         zOX2mjpv6Iuen3yRFWY/EEe7K3QRsf3PcsKiSKiegEQXlCae5/PMqDu9DOjinJRkYzx1
-         EdTQ==
-X-Gm-Message-State: AJIora9ElzXm0q4pAuXp+M7Bf4j12lsZqxbPnbDtuxvT8WZjL0cXGcKo
-        4OpsNd7OCdoRHLzvemDdlbvSzvYjdVw=
-X-Google-Smtp-Source: AGRyM1swrc7drVMIncN+c4veuXF8fOC6rDbDycDtcETNnPL51Ttli9b1xrDKJwBqdHx3y/ITXUKq8Zxf5MQ=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=UPa2qRsj0spolXYuBb6nQbQiFRfDL61mBkMfsRuMG4Q=;
+        b=Z1L2P63SsjiISXpJ0dQTN626rGQHSHWrO57kul3eVEwxUy8/e6zcmTAqW1QrECZMRp
+         yJbR8gMko0sh5Gh4t+6drzVBmMJmYeB703PlGjrpKsygNNcbxVU5k7D/+C15hxtulmJr
+         1ik5fiOtiz5sEpJtbtU+C/euhwiF2KG68tUCWzVAzOOcglpbC/1+6hUlydKjFq2/zozd
+         2WtXWt7nXSDY5pFLAiiE5NMR7I80V4ZdVRGcSDE4EdifAsXFnYQ5NYOHWCBSQBM4rE9I
+         PEyowa0vBYPvKfEWueCpYiHKOyPapbatboSGjM0VMXxqNy1xyjoxJ2DlxH7Hs1VzMEQo
+         uBwA==
+X-Gm-Message-State: AJIora9qshA7r9P5VrloVwbVlO+QmFKhGgp8TRH9O2Qh7ZRUNOYal4Ij
+        usKh5hHdNt3KWHJqw3NYTzbSZcb6ywY=
+X-Google-Smtp-Source: AGRyM1s0WsSP25NFfYuaBZuoSnOQPchCznFhpHUuaCLbmL4YvLcWE6sZX9h7DN46zGLyBb6BDZ9xmBNCGHs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:a113:0:b0:51c:1b4c:38d1 with SMTP id
- b19-20020a62a113000000b0051c1b4c38d1mr1846514pff.13.1655335791125; Wed, 15
- Jun 2022 16:29:51 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:6c86:0:b0:3fd:ae53:3881 with SMTP id
+ h128-20020a636c86000000b003fdae533881mr1832968pgc.507.1655335792603; Wed, 15
+ Jun 2022 16:29:52 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 15 Jun 2022 23:29:30 +0000
-Message-Id: <20220615232943.1465490-1-seanjc@google.com>
+Date:   Wed, 15 Jun 2022 23:29:31 +0000
+In-Reply-To: <20220615232943.1465490-1-seanjc@google.com>
+Message-Id: <20220615232943.1465490-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220615232943.1465490-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [kvm-unit-tests PATCH v4 00/13] x86: SMP Support for x86 UEFI Tests
+Subject: [kvm-unit-tests PATCH v4 01/13] x86: Use an explicit magic string to
+ detect that dummy.efi passes
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -71,68 +75,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is Varad's series to bring multi-vcpu support to UEFI tests on x86,
-with some relatively minor massaging by me.  The only change I made that
-I suspect might be controversial is squashing start16.S and start32.S into
-a single trampolines.S.
+Print an explicit "Dummy Hello World!" from the dummy "test" that is used
+by x86 EFI to probe the basic setup.  Relying on the last line to match an
+arbitrary, undocumented string in x86's boot flow is evil and fragile,
+e.g. a future patch to share boot code between EFI and !EFI will print
+something AP bringup info after the "enabling apic" line.
 
-Most of the necessary AP bringup code already exists within kvm-unit-tests'
-cstart64.S, and has now been either rewritten in C or moved to a common location
-to be shared between EFI and non-EFI test builds.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ scripts/runtime.bash | 2 +-
+ x86/dummy.c          | 8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-A call gate is used to transition from 16-bit to 32-bit mode, since EFI may
-not load the 32-bit entrypoint low enough to be reachable from the SIPI vector.
-
-v4:
- - Add an explict magic string in dummy.c for probing.
- - Reduce #ifdefs via macros
- - Consolidate final "AP online" code.
- - Misc tweaks, e.g. to adhere to preferred style.
-
-v3:
- - Unbreak i386 build, ingest seanjc's reviews from v2.a
- - https://lore.kernel.org/all/20220426114352.1262-1-varad.gautam@suse.com
-
-v2: https://lore.kernel.org/kvm/20220412173407.13637-1-varad.gautam@suse.com/
-
-Sean Christopherson (3):
-  x86: Use an explicit magic string to detect that dummy.efi passes
-  x86: Rename ap_init() to bringup_aps()
-  x86: Add ap_online() to consolidate final "AP is alive!" code
-
-Varad Gautam (10):
-  x86: Share realmode trampoline between i386 and x86_64
-  x86: Move ap_init() to smp.c
-  x86: Move load_idt() to desc.c
-  x86: desc: Split IDT entry setup into a generic helper
-  x86: Move load_gdt_tss() to desc.c
-  x86: efi: Provide a stack within testcase memory
-  x86: efi: Provide percpu storage
-  x86: Move 32-bit => 64-bit transition code to trampolines.S
-  x86: efi, smp: Transition APs from 16-bit to 32-bit mode
-  x86: Provide a common 64-bit AP entrypoint for EFI and non-EFI
-
- lib/alloc_page.h          |   3 +
- lib/x86/apic.c            |   2 -
- lib/x86/asm/setup.h       |   3 +
- lib/x86/desc.c            |  38 ++++++++--
- lib/x86/desc.h            |   4 +
- lib/x86/setup.c           |  82 +++++++++++++++++----
- lib/x86/smp.c             | 150 +++++++++++++++++++++++++++++++++++++-
- lib/x86/smp.h             |  11 +++
- scripts/runtime.bash      |   2 +-
- x86/cstart.S              |  48 ++----------
- x86/cstart64.S            | 125 +------------------------------
- x86/dummy.c               |   8 ++
- x86/efi/crt0-efi-x86_64.S |   3 +
- x86/efi/efistart64.S      |  79 ++++++++++++--------
- x86/svm_tests.c           |  10 +--
- x86/trampolines.S         | 129 ++++++++++++++++++++++++++++++++
- 16 files changed, 470 insertions(+), 227 deletions(-)
- create mode 100644 x86/trampolines.S
-
-
-base-commit: 610c15284a537484682adfb4b6d6313991ab954f
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 7d0180b..bbf87cf 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -132,7 +132,7 @@ function run()
+ 
+     last_line=$(premature_failure > >(tail -1)) && {
+         skip=true
+-        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "enabling apic" ]]; then
++        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "Dummy Hello World!" ]]; then
+             skip=false
+         fi
+         if [ ${skip} == true ]; then
+diff --git a/x86/dummy.c b/x86/dummy.c
+index 5019e79..7033bb7 100644
+--- a/x86/dummy.c
++++ b/x86/dummy.c
+@@ -1,4 +1,12 @@
++#include "libcflat.h"
++
+ int main(int argc, char **argv)
+ {
++	/*
++	 * scripts/runtime.bash uses this test as a canary to determine if the
++	 * basic setup is functional.  Print a magic string to let runtime.bash
++	 * know that all is well.
++	 */
++	printf("Dummy Hello World!");
+ 	return 0;
+ }
 -- 
 2.36.1.476.g0c4daa206d-goog
 
