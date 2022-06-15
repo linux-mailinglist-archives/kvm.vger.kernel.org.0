@@ -2,135 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F157554C734
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 13:13:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2521854C784
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 13:31:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346600AbiFOLNs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 07:13:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40194 "EHLO
+        id S1347875AbiFOLbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 07:31:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243558AbiFOLN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 07:13:27 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9513B03D;
-        Wed, 15 Jun 2022 04:13:26 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25FAbsfg011334;
-        Wed, 15 Jun 2022 11:13:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=csDdvx+atFc4IFUFG//B+LyG9gsn7+/OKEPNkF2FqKY=;
- b=rG/hytbw3rgwFey1iYCi9ugxMKu6O+cfOIYkRRBJEEF9Q2iyusXSqIh46r2QvXrzNFDr
- SBv+ln7kLbDWkX9euge/nDEo5sHhFe9/MK5KH+ztz7Vts1YtSk4INimnheE8FWcH84Pz
- AxmICbtF8omtTxboMwTuKBuk1+MtybDuBRVzqcuCuWLVesBbof3Zz1DZT4Q3D3E/B+Y6
- TjwwTQhQVCjUqRwiw0ojkJTxXrFJsom0k1t4sxJtTM1X56Yw2chLjIaJVlbBongK9Oex
- 0rL4xIEEr8UjEIMfY8bF8BpHmG9E1uPabwLt21L/VeSzgcbMDz2qABR2Y6XOEVxV6UMb oQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpr3g4efr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jun 2022 11:13:25 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25FAh6UM024131;
-        Wed, 15 Jun 2022 11:13:24 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpr3g4ef2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jun 2022 11:13:24 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25FB6x7f015900;
-        Wed, 15 Jun 2022 11:13:22 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma02fra.de.ibm.com with ESMTP id 3gmjp94ds4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jun 2022 11:13:22 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25FBDJqW19857878
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Jun 2022 11:13:19 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 599F252050;
-        Wed, 15 Jun 2022 11:13:19 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.1.67])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9006C5204E;
-        Wed, 15 Jun 2022 11:13:18 +0000 (GMT)
-Date:   Wed, 15 Jun 2022 13:13:16 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        mimu@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [PATCH v11 14/19] KVM: s390: pv: cleanup leftover protected VMs
- if needed
-Message-ID: <20220615131316.6336eb6d@p-imbrenda>
-In-Reply-To: <44b2b227-9757-b7a2-41a0-cbea0e2bbbdc@linux.ibm.com>
-References: <20220603065645.10019-1-imbrenda@linux.ibm.com>
-        <20220603065645.10019-15-imbrenda@linux.ibm.com>
-        <0a13397a-86e0-7c25-0044-7a5733f61730@linux.ibm.com>
-        <20220615121916.77b039af@p-imbrenda>
-        <44b2b227-9757-b7a2-41a0-cbea0e2bbbdc@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S1347683AbiFOLbC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 07:31:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32D9052E42
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 04:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655292657;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=deu1fZ+rJg4vtIyzufwUH9tCrx+7IF3P/lvcMVMcMto=;
+        b=jOY+f9s5ny1+xF2LOeakdX57gA4kAOsuwKJlideOsv398UA6ruA9Va3a4K34d5B5XbanEo
+        6WfmCAFx1vMNlBLI5f0F6SDM7bJV2E4z2uqfAXDqO86LMHPmAK8c+xqldJc7TqBctjeVPJ
+        +5kOkWNAGb13DBbPLWPWyHYOSyx1rrI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-568-L80_tF_4PVSVjKX4__ZRFg-1; Wed, 15 Jun 2022 07:30:56 -0400
+X-MC-Unique: L80_tF_4PVSVjKX4__ZRFg-1
+Received: by mail-wm1-f69.google.com with SMTP id m22-20020a7bcb96000000b0039c4f6ade4dso4962961wmi.8
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 04:30:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=deu1fZ+rJg4vtIyzufwUH9tCrx+7IF3P/lvcMVMcMto=;
+        b=u3JYp7Q4yOHgbINl542YYKITr/8QxSzKhtFlBTYVXmCqOQqnU2TeTtHKscFPumKEQH
+         Wy/gCDcKp6yW3Pn1VwfEIFou4VH4bopF92lWSlHCPIoTP4dMO4CDTw5fmRk5PAVdXRV+
+         QoC/Svyn0oBAiKE8L5DMlZwWn/jHWx86Jkn7buHI0z8PV7pGLV3hGS9dXEHzUjLbUdYl
+         gpokac/bxQ00hh3/AetzrEIxxcQfz+rCcDId7L+sBRBPwqv7GgoWVB0T6UgZSwf/WivM
+         HAb9Na8Scm75sq8VFDT2dXuRO3lL2kEHjCEvdKJ/I4h5fSm6B0Hegl5ZG+GoOFR1k+ea
+         d3ZA==
+X-Gm-Message-State: AJIora/tlc9T90bOjQCiNOyNCK3q0iZPpl34ugrxh/5L6+H1h6NNK/9t
+        JpSBuhI6FgWcDb/mb+4dLd8X++XRXv01MOhPpmqiwMrA8c0bJtpdlC/8lI17qsxfpwqDHwBWorz
+        63OerdnJi1cLq
+X-Received: by 2002:a05:6000:1808:b0:21a:1322:cd9b with SMTP id m8-20020a056000180800b0021a1322cd9bmr9793144wrh.164.1655292655040;
+        Wed, 15 Jun 2022 04:30:55 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1v6ZjaAdpwX7tIwW3bDni1DiejlVqSRKsvOo3OuGN1wsYo5tjNHWI+jwvqWm6RPrB9yjf7DNQ==
+X-Received: by 2002:a05:6000:1808:b0:21a:1322:cd9b with SMTP id m8-20020a056000180800b0021a1322cd9bmr9793119wrh.164.1655292654831;
+        Wed, 15 Jun 2022 04:30:54 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id q17-20020adffed1000000b00219f9829b71sm12682321wrs.56.2022.06.15.04.30.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jun 2022 04:30:54 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     mail@anirudhrb.com, kumarpraveen@linux.microsoft.com,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        wei.liu@kernel.org, robert.bradford@intel.com, liuwe@microsoft.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Ilias Stamatis <ilstam@amazon.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Don't expose TSC scaling to L1 when on Hyper-V
+In-Reply-To: <87pmjbi90m.fsf@redhat.com>
+References: <20220613161611.3567556-1-anrayabh@linux.microsoft.com>
+ <87sfo7igis.fsf@redhat.com> <87pmjbi90m.fsf@redhat.com>
+Date:   Wed, 15 Jun 2022 13:30:53 +0200
+Message-ID: <87ilp2i2oi.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: juiPRvCgQW3jYTedCvH_lGwbhVZ6ZJma
-X-Proofpoint-GUID: HL0Hle144Ba_E4Z-h_dv5ye5nfshGXKO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-15_03,2022-06-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 adultscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- bulkscore=0 suspectscore=0 spamscore=0 mlxlogscore=968 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206150043
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Jun 2022 12:57:39 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-[...]
+> Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+>
+>> Anirudh Rayabharam <anrayabh@linux.microsoft.com> writes:
+>>
+>> ...
+>>
+>>>
+>>> As per the comments in arch/x86/kvm/vmx/evmcs.h, TSC multiplier field is
+>>> currently not supported in EVMCS.
+>>
+>> The latest version:
+>> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/datatypes/hv_vmx_enlightened_vmcs
+>>
+>> has it, actually. It was missing before (compare with e.g. 6.0b version
+>> here:
+>> https://github.com/MicrosoftDocs/Virtualization-Documentation/raw/live/tlfs/Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf)
+>>
+>> but AFAIR TSC scaling wasn't advertised by genuine Hyper-V either.
+>> Interestingly enough, eVMCS version didn't change when these fields were
+>> added, it is still '1'.
+>>
+>> I even have a patch in my stash (attached). I didn't send it out because
+>> it wasn't properly tested with different Hyper-V versions.
+>
+> And of course I forgot a pre-requisite patch which updates 'struct
+> hv_enlightened_vmcs' to the latest:
+>
 
-> >> I think we should switch this patch and the next one and add this struct
-> >> to the next patch. The list work below makes more sense once the next
-> >> patch has been read.  
-> > 
-> > but the next patch will leave leftovers in some circumstances, and
-> > those won't be cleaned up without this patch.
-> > 
-> > having this patch first means that when the next patch is applied, the
-> > leftovers are already taken care of  
-> 
-> Then I opt for squashing the patch.
-> 
-> Without the next patch prepared_for_async_deinit will always be NULL and 
-> this code is completely unneeded, no?
+The good news is that TscMultiplies seems to work fine for me, at least
+with an Azure Dv5 instance where I can see Tsc scaling exposed. The bad
+news is that a few more patches are needed:
 
-correct. I had split them to make them smaller and easier to review
+1) Fix 'struct hv_enlightened_vmcs' definition:
+https://lore.kernel.org/kvm/20220613133922.2875594-20-vkuznets@redhat.com/
 
-I will squash them if you think it's better
+2) Define VMCS-to-EVMCS conversion for the new fields :
 
-> 
-> >   
-> >>>    static void kvm_s390_clear_pv_state(struct kvm *kvm)
-> >>>    {
-> >>>    	kvm->arch.pv.handle = 0;
-> >>> @@ -158,23 +171,88 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
-> >>>    	return -ENOMEM;
-> >>>    }
-> >>>        
-> >>  
-> >>>        
-> >>  
-> >   
-> 
+diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+index 6a61b1ae7942..707a8de11802 100644
+--- a/arch/x86/kvm/vmx/evmcs.c
++++ b/arch/x86/kvm/vmx/evmcs.c
+@@ -28,6 +28,8 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
+        EVMCS1_FIELD(HOST_IA32_EFER, host_ia32_efer,
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
++       EVMCS1_FIELD(HOST_IA32_PERF_GLOBAL_CTRL, host_ia32_perf_global_ctrl,
++                    HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
+        EVMCS1_FIELD(HOST_CR0, host_cr0,
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
+        EVMCS1_FIELD(HOST_CR3, host_cr3,
+@@ -78,6 +80,8 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
+        EVMCS1_FIELD(GUEST_IA32_EFER, guest_ia32_efer,
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
++       EVMCS1_FIELD(GUEST_IA32_PERF_GLOBAL_CTRL, guest_ia32_perf_global_ctrl,
++                    HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
+        EVMCS1_FIELD(GUEST_PDPTR0, guest_pdptr0,
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
+        EVMCS1_FIELD(GUEST_PDPTR1, guest_pdptr1,
+@@ -126,24 +130,47 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
+        EVMCS1_FIELD(XSS_EXIT_BITMAP, xss_exit_bitmap,
+                     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
++       EVMCS1_FIELD(ENCLS_EXITING_BITMAP, encls_exiting_bitmap,
++                    HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
++       EVMCS1_FIELD(TSC_MULTIPLIER, tsc_multiplier,
++                    HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
+
+...
+
+so it is becoming more and more complicated to assemble for testing. Let
+me finish my testing and I'll put a series together and send it out to
+simplify the process. Stay tuned!
+
+-- 
+Vitaly
 
