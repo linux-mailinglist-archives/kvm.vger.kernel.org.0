@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF65254BF25
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 03:17:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E83B54BF21
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 03:17:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238761AbiFOBRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 21:17:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50018 "EHLO
+        id S239528AbiFOBRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 21:17:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233876AbiFOBRO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 21:17:14 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2066.outbound.protection.outlook.com [40.107.223.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FF532A720;
-        Tue, 14 Jun 2022 18:17:13 -0700 (PDT)
+        with ESMTP id S236818AbiFOBRV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 21:17:21 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2086.outbound.protection.outlook.com [40.107.220.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05D863916B;
+        Tue, 14 Jun 2022 18:17:19 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LXEW1jtCmlUxkDXm2Nf6EOXgMv2cSB64ihHXiNQ+0zr9zNtvTbQOZ82h0dBtKinUboqM6JMyl8SAqNBuIW7FmpsG905LqLAf2Px3m83Ww5Uxk1V4jy3utfaFT2AKUhLDa/+0EGP+9Js7jEIBh7t7zSfHht8DWpCiF7p3d4AjazgxT0y3g3iWyMwmxdNgS79WXvspuQ/jJkgcKDOCTjaQdtx6gnNMHBC5TnIU7e74B4at017+phaK5RweGgTUP1x4WLnXQlG7TIm1MaYvhPdZpGNcLZF9sGau1ENFUSvFjkS0dSr82jDkWSU/gk66ONdpGkuMiAE9l/Lhqx1Iv6x8AA==
+ b=TGnbV8BN4ZjqoqlNfCKjMMoLMG9+OVBwQBnZcn6o2WZVTgVWZ7ar8DPNQH0fXdxVXN/CYc0RhHCz3NZURqak9/QV2ebX3HxxkiXbBKteMBCAY5+XVEkrKZrAEdCZ2gd1pz1AjQsJJwDt+udAXKuo8V3YsDTyu3DbTI/PTUkNiB7sV3wClhGm+Jv5xvCiX+erMxzZ21EDc+o4ohX0Jltq8PtjNo2hyrI4zKgJNtLABuL2vVipAaNHfInybVrcQV/f5RXOw2y8fP+2jMfmLIQU/0GaqKzQ/xGQ+TU+nKjgKKzQJqHQMSsyiGoa5dSPGGXGVjKYFlNGmt1L5WsqlRCW8g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GIwLnEbVk8hlZfhkVEeyots2gpBoQWKS5Xh6mUr26Og=;
- b=Jljun276cLaxPZvYL9DAyfKA1X6hO8zo8PVDJsU2oLlz2B0VbvkyEfSw0oIMmaF34ymDGtOmy75wm9WGdzqnoiozJSTR66ipCXMIRHXl38bVo2IszBdR2xqmo2Vua/kmYg3Sxtu9Ge9ixsC3XeIMkqAZgEV72L/OAOvkjjB5BvkYcwoaKV2VWfJpiL4KBD+nJtZu89oKWZlwPf8ARpPfnBT0xhOSU5jYZJ5UPYnUeMvx2ANvh7xTggM/01moZdK07eXHUr8B/42y0jBMjiFjogN61Kd4fE4IH0fsBOH6FGrsyTJGQxCALapduuK01YriX1IFQ1IVnuQg8YHzR4wtww==
+ bh=MQFMSfQAbsEUSI3Jph/BToZ98JCiMeJ93p5rV04Dm5U=;
+ b=jvJzoz/V1xeYG9Pb4Ky/NRQGZJwC5h5PBx4GoyEKzLfHyz9Qd3tHMYaFww5Trnjt93CBIMf/0QW8EqUQP5HF+zg/d5GboREYWvteqFWycz2lGhFcWAi6jlWm8zZ33V3GXHyOv6gb9Fy+XRzQq3nUf2j2hqfR3g+HTTnsmzDHMFLQpYI9Yc9pbgLksNCtR3E4d3aqyEz948yisi712fqhGaMyFiVp+s6VGnyROeLmtyZCkN/w+eYDNP5Z510NwtACJXPQTjguIA2MqLoZsJmYeaa0ptKE39cV2AUOOrwJUL+bqDxCB4QGQ3Rj0EzcBECGiTWPzcDFxTr1FeSivy4b5g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 12.22.5.235) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GIwLnEbVk8hlZfhkVEeyots2gpBoQWKS5Xh6mUr26Og=;
- b=rAAep5TWCNqYMArnDqxwb+QdWCKX/pPyQ14igazFlV4bLutWbUWg6mOCnkjdu8clkFyZ12J/C+fGGYrj4LvBQN6zzfaeL5tikRRq7MbQY/+gbEqi+ubiNkvO/4iPossGKQjN0w8/o4wSc51FQHkYzruKJNZixq6zZH2ykU4DAyvq86JuuAUq7LPin3Nc7nAEfI9Qvjpa+/381RIAk8dtUO4p4nnAxCFKsak1vH8N8xaKtxGJFxGqL9G7wK5FtG8BMQIbADQVuuTbRmcLfI0ssd8hpMyi9t97bYlPI0XPOwikmETWxHSd0ZAPlThekYdMG7anScABX6Ches7NiKZ9fg==
-Received: from DS7PR03CA0042.namprd03.prod.outlook.com (2603:10b6:5:3b5::17)
- by PH0PR12MB5404.namprd12.prod.outlook.com (2603:10b6:510:d7::14) with
+ bh=MQFMSfQAbsEUSI3Jph/BToZ98JCiMeJ93p5rV04Dm5U=;
+ b=NVmEWhHi+KwX/4Xbvp+iSfiRWYdWgpx7hU49Z+DKO9EdbNcolNvTrKJ9K4JjhiquJAtAZpoNS4DHW6hvx39Qwui4WuOg6f5fzC5C4qp7YW/e8FsyZGolybpJju8TRcTSj8i34iZK1+oz8mov/gNmgZb/IXpETfcy8QYOZZtCfGZr80ZGxU37ssEtLcJFeXyYZDdVnIvNus12ECq5QAFkMPRCdacKRzzQ0hO+1iCnYm4nYnA5nTGj7A2/BKTyFvDeeXuRwrWenCp2KJfnevxoSYQWKeAOrQ0RK7M3beKxtQ+SPyjhAhw1jyHRuWB7nwqTQ7V1ld92+TyHWcQRby850g==
+Received: from DM5PR21CA0049.namprd21.prod.outlook.com (2603:10b6:3:129::11)
+ by CY4PR1201MB0023.namprd12.prod.outlook.com (2603:10b6:910:1f::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.13; Wed, 15 Jun
- 2022 01:17:11 +0000
-Received: from DM6NAM11FT036.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b5:cafe::4f) by DS7PR03CA0042.outlook.office365.com
- (2603:10b6:5:3b5::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.22 via Frontend
- Transport; Wed, 15 Jun 2022 01:17:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
+ 2022 01:17:17 +0000
+Received: from DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:129:cafe::3e) by DM5PR21CA0049.outlook.office365.com
+ (2603:10b6:3:129::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.6 via Frontend
+ Transport; Wed, 15 Jun 2022 01:17:17 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- DM6NAM11FT036.mail.protection.outlook.com (10.13.172.64) with Microsoft SMTP
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.235) by
+ DM6NAM11FT048.mail.protection.outlook.com (10.13.173.114) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5332.12 via Frontend Transport; Wed, 15 Jun 2022 01:17:11 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 15 Jun
- 2022 01:17:10 +0000
+ 15.20.5332.12 via Frontend Transport; Wed, 15 Jun 2022 01:17:16 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 15 Jun
+ 2022 01:17:16 +0000
 Received: from foundations-user-AS-2114GT-DNR-C1-NC24B.nvidia.com
  (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Tue, 14 Jun 2022 18:17:09 -0700
+ 15.2.986.22; Tue, 14 Jun 2022 18:17:15 -0700
 From:   Kechen Lu <kechenl@nvidia.com>
 To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>
 CC:     <vkuznets@redhat.com>, <somduttar@nvidia.com>,
         <kechenl@nvidia.com>, <linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH v3 1/7] KVM: x86: only allow exits disable before vCPUs created
-Date:   Tue, 14 Jun 2022 18:16:16 -0700
-Message-ID: <20220615011622.136646-2-kechenl@nvidia.com>
+Subject: [RFC PATCH v3 2/7] KVM: x86: Move *_in_guest power management flags to vCPU scope
+Date:   Tue, 14 Jun 2022 18:16:17 -0700
+Message-ID: <20220615011622.136646-3-kechenl@nvidia.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220615011622.136646-1-kechenl@nvidia.com>
 References: <20220615011622.136646-1-kechenl@nvidia.com>
@@ -76,24 +76,24 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2f8b7306-e234-4708-f8c8-08da4e6cc620
-X-MS-TrafficTypeDiagnostic: PH0PR12MB5404:EE_
-X-Microsoft-Antispam-PRVS: <PH0PR12MB540485595BB544E5C804F3CBCAAD9@PH0PR12MB5404.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 31ba33fc-58e7-4a8a-0f64-08da4e6cc994
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0023:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB0023AD1985ABEA01912195E1CAAD9@CY4PR1201MB0023.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IyrHq9qn4kD72E2H58EXbdusWL3yCO/1n5YcqhcqPm8D+sfAp7GFt49Ym53cFOny4usexcdi+bwf+Wwx0JtzRojETjWHQHi+kc9KfakDXgvsnhW/JxWcK76p6mCxR9KvgjWXZD/Mih5ms8pHPMhFNWlBADBvlrfuO87tOFHoyvNmLL5kkKZEp3I4Ffbl0jrzpgY0+MEQgQgndpwhc4a5YSQXY+1IzQv7sj1SdlK95mq+N59v/2S+JXAkWm3gahn2O22IZvDxZEgW9eQ27wtI4UH+aAcUDN4qGvJM+X+kmfZXpY8hPY/2uqeqDaDgww4QhKH4wye9FhePwuO9Ci5XomKTvXPl2c5UqYRWSEiuGuoH5hzrBKkumwMvV1BsXWVqkU/FlXvU3OG2j0EiUDUBdj/4GzL3n2d2M9yvVdqzdq/zgR0YvU1FfWlmYn/74FYn6lk7pAHP//wPXVk0tSPiq7PN7RmkKhArgQYOLZ+EbULzuWxSKDDIVrX0PApDCh+fA4wN7Dffc6DLwnkIW9vjwKIypMHqreP1K8LLRRTmdlEkt+aXOUZx9m2lxLbK5ezy0yQ9Qqxac6FUTntcBqcIoippYgqu4sd1xgmavDhbcK5Q/oZzqLGbrrHkLc1pWBoYRTOWGP4nXP0X48P+VakXd4QIAMHUk4qBH8YgBaDTQJ6ifQ0AfNXiKo4c+b16Acd/+tXzcYv4iCQvcNvfrtzxnw==
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(36840700001)(40470700004)(46966006)(2906002)(2616005)(8936002)(508600001)(70206006)(4326008)(8676002)(26005)(83380400001)(70586007)(54906003)(186003)(86362001)(6666004)(47076005)(336012)(1076003)(426003)(40460700003)(356005)(7696005)(82310400005)(5660300002)(16526019)(36860700001)(316002)(110136005)(36756003)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: WPgBl48aT8wztnA15t8NBN15dYcXCud6ua3pcYLM7jvXeT+75IdlLEPkoLzVYw3Vk240CR6NPXNAEX3BvuOpM7RD8uDJSSmklio1mjgztvBst9nxG5kmUoEu8UY4Ed1OmK3Wb8DwJ95aY1mx1QlbFNb4fsll9FO88+f+i4oNhN6eg+dnYCgF6MWOQjFqhiqCKgW8GU9QGBf30tEqkXgVtosgys0tPv3x10xl18oFE9BXm1XG5r55+QqTanKD+QYixpSBBscghpkno0g6VrMl7oXQKsxdJXYa0qAUwvPV2dwrW8ij4rpKhO8n49HiLrXos5qmIK2Qv+VevcoWfl/Xnf2hn7NQSZf8zXxBzhawGK5rQElh6pnNWkIPf0rRelMYhvJGLX+iNl8snE26oESrzzixG40nwN28W3ahz3mWmOKdVu3Rf/Y1jaHoX658RDFX7rNN7thDpdO7Jd15KIe/43qKJx+tnxueR+CLAfwSfMI2AED+jGKbLxH8tCQHj/+BqvUP/L0zEGtioEk8qJdhpJW5IPhP20Dfw8amnbSGLJqgScgVXY/zlN2VjpNsH2w2hlnGh4hA0uwRv4X6xQGy77Esr+bhUhU1KFXJyg3P6xG3pMc50Mtw5qNkglrWkuMuFPZKex7Vqdbp3hewPpNw3i+2pKtV34qkIzGwkw4mpQ8OjnLNfJY17vVPxFtWeZkJT5Esr7WNLzUXq1VzaYPQJw==
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(40470700004)(46966006)(36840700001)(26005)(86362001)(7696005)(356005)(336012)(81166007)(36860700001)(426003)(47076005)(40460700003)(16526019)(1076003)(2616005)(186003)(316002)(36756003)(30864003)(2906002)(110136005)(8936002)(54906003)(4326008)(5660300002)(8676002)(70206006)(82310400005)(508600001)(83380400001)(70586007)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2022 01:17:11.2736
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2022 01:17:16.9829
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f8b7306-e234-4708-f8c8-08da4e6cc620
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31ba33fc-58e7-4a8a-0f64-08da4e6cc994
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT036.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5404
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0023
 X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -104,58 +104,287 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+Make the runtime disabled mwait/hlt/pause/cstate exits flags vCPU scope
+to allow finer-grained, per-vCPU control.  The VM-scoped control is only
+allowed before vCPUs are created, thus preserving the existing behavior
+is a simple matter of snapshotting the flags at vCPU creation.
 
-Since VMX and SVM both would never update the control bits if exits
-are disable after vCPUs are created, only allow setting exits
-disable flag before vCPU creation.
-
-Fixes: 4d5422cea3b6 ("KVM: X86: Provide a capability to disable MWAIT
-intercepts")
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Kechen Lu <kechenl@nvidia.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- Documentation/virt/kvm/api.rst | 1 +
- arch/x86/kvm/x86.c             | 6 ++++++
- 2 files changed, 7 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  5 +++++
+ arch/x86/kvm/cpuid.c            |  4 ++--
+ arch/x86/kvm/lapic.c            |  7 +++----
+ arch/x86/kvm/svm/nested.c       |  4 ++--
+ arch/x86/kvm/svm/svm.c          | 12 ++++++------
+ arch/x86/kvm/vmx/vmx.c          | 16 ++++++++--------
+ arch/x86/kvm/x86.c              |  6 +++++-
+ arch/x86/kvm/x86.h              | 16 ++++++++--------
+ 8 files changed, 39 insertions(+), 31 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 11e00a46c610..d0d8749591a8 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6933,6 +6933,7 @@ branch to guests' 0x200 interrupt vector.
- :Architectures: x86
- :Parameters: args[0] defines which exits are disabled
- :Returns: 0 on success, -EINVAL when args[0] contains invalid exits
-+          or if any vCPU has already been created
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9217bd6cf0d1..573a39bf7a84 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -924,6 +924,11 @@ struct kvm_vcpu_arch {
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	hpa_t hv_root_tdp;
+ #endif
++
++	bool mwait_in_guest;
++	bool hlt_in_guest;
++	bool pause_in_guest;
++	bool cstate_in_guest;
+ };
  
- Valid bits in args[0] are::
+ struct kvm_lpage_info {
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index de6d44e07e34..f013ff4f49c5 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -245,8 +245,8 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+ 		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+ 
+ 	best = __kvm_find_kvm_cpuid_features(vcpu, entries, nent);
+-	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
+-		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
++	if (kvm_hlt_in_guest(vcpu) &&
++	    best && (best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
+ 		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
+ 
+ 	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)) {
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 0e68b4c937fc..9e29d658a8c2 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -147,14 +147,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+ static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+ {
+ 	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+-		(kvm_mwait_in_guest(vcpu->kvm) || kvm_hlt_in_guest(vcpu->kvm));
++		(kvm_mwait_in_guest(vcpu) || kvm_hlt_in_guest(vcpu));
+ }
+ 
+ bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_x86_ops.set_hv_timer
+-	       && !(kvm_mwait_in_guest(vcpu->kvm) ||
+-		    kvm_can_post_timer_interrupt(vcpu));
++	return kvm_x86_ops.set_hv_timer &&
++		!(kvm_mwait_in_guest(vcpu) || kvm_can_post_timer_interrupt(vcpu));
+ }
+ EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
+ 
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index ba7cd26f438f..f143ec757467 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -675,7 +675,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+ 
+ 	pause_count12 = svm->pause_filter_enabled ? svm->nested.ctl.pause_filter_count : 0;
+ 	pause_thresh12 = svm->pause_threshold_enabled ? svm->nested.ctl.pause_filter_thresh : 0;
+-	if (kvm_pause_in_guest(svm->vcpu.kvm)) {
++	if (kvm_pause_in_guest(&svm->vcpu)) {
+ 		/* use guest values since host doesn't intercept PAUSE */
+ 		vmcb02->control.pause_filter_count = pause_count12;
+ 		vmcb02->control.pause_filter_thresh = pause_thresh12;
+@@ -951,7 +951,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 	vmcb12->control.event_inj         = svm->nested.ctl.event_inj;
+ 	vmcb12->control.event_inj_err     = svm->nested.ctl.event_inj_err;
+ 
+-	if (!kvm_pause_in_guest(vcpu->kvm)) {
++	if (!kvm_pause_in_guest(vcpu)) {
+ 		vmcb01->control.pause_filter_count = vmcb02->control.pause_filter_count;
+ 		vmcb_mark_dirty(vmcb01, VMCB_INTERCEPTS);
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 87da90360bc7..b32987f54ace 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -921,7 +921,7 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+ 	int old = control->pause_filter_count;
+ 
+-	if (kvm_pause_in_guest(vcpu->kvm))
++	if (kvm_pause_in_guest(vcpu))
+ 		return;
+ 
+ 	control->pause_filter_count = __grow_ple_window(old,
+@@ -942,7 +942,7 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+ 	int old = control->pause_filter_count;
+ 
+-	if (kvm_pause_in_guest(vcpu->kvm))
++	if (kvm_pause_in_guest(vcpu))
+ 		return;
+ 
+ 	control->pause_filter_count =
+@@ -1136,12 +1136,12 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	svm_set_intercept(svm, INTERCEPT_RDPRU);
+ 	svm_set_intercept(svm, INTERCEPT_RSM);
+ 
+-	if (!kvm_mwait_in_guest(vcpu->kvm)) {
++	if (!kvm_mwait_in_guest(vcpu)) {
+ 		svm_set_intercept(svm, INTERCEPT_MONITOR);
+ 		svm_set_intercept(svm, INTERCEPT_MWAIT);
+ 	}
+ 
+-	if (!kvm_hlt_in_guest(vcpu->kvm))
++	if (!kvm_hlt_in_guest(vcpu))
+ 		svm_set_intercept(svm, INTERCEPT_HLT);
+ 
+ 	control->iopm_base_pa = __sme_set(iopm_base);
+@@ -1185,7 +1185,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	svm->nested.vmcb12_gpa = INVALID_GPA;
+ 	svm->nested.last_vmcb12_gpa = INVALID_GPA;
+ 
+-	if (!kvm_pause_in_guest(vcpu->kvm)) {
++	if (!kvm_pause_in_guest(vcpu)) {
+ 		control->pause_filter_count = pause_filter_count;
+ 		if (pause_filter_thresh)
+ 			control->pause_filter_thresh = pause_filter_thresh;
+@@ -4269,7 +4269,7 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 
+ static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	if (!kvm_pause_in_guest(vcpu->kvm))
++	if (!kvm_pause_in_guest(vcpu))
+ 		shrink_ple_window(vcpu);
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 553dd2317b9c..f24c9a357f70 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1597,7 +1597,7 @@ static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
+ 	 * then the instruction is already executing and RIP has already been
+ 	 * advanced.
+ 	 */
+-	if (kvm_hlt_in_guest(vcpu->kvm) &&
++	if (kvm_hlt_in_guest(vcpu) &&
+ 			vmcs_read32(GUEST_ACTIVITY_STATE) == GUEST_ACTIVITY_HLT)
+ 		vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
+ }
+@@ -4212,10 +4212,10 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
+ 		exec_control |= CPU_BASED_CR3_STORE_EXITING |
+ 				CPU_BASED_CR3_LOAD_EXITING  |
+ 				CPU_BASED_INVLPG_EXITING;
+-	if (kvm_mwait_in_guest(vmx->vcpu.kvm))
++	if (kvm_mwait_in_guest(&vmx->vcpu))
+ 		exec_control &= ~(CPU_BASED_MWAIT_EXITING |
+ 				CPU_BASED_MONITOR_EXITING);
+-	if (kvm_hlt_in_guest(vmx->vcpu.kvm))
++	if (kvm_hlt_in_guest(&vmx->vcpu))
+ 		exec_control &= ~CPU_BASED_HLT_EXITING;
+ 	return exec_control;
+ }
+@@ -4294,7 +4294,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	}
+ 	if (!enable_unrestricted_guest)
+ 		exec_control &= ~SECONDARY_EXEC_UNRESTRICTED_GUEST;
+-	if (kvm_pause_in_guest(vmx->vcpu.kvm))
++	if (kvm_pause_in_guest(&vmx->vcpu))
+ 		exec_control &= ~SECONDARY_EXEC_PAUSE_LOOP_EXITING;
+ 	if (!kvm_vcpu_apicv_active(vcpu))
+ 		exec_control &= ~(SECONDARY_EXEC_APIC_REGISTER_VIRT |
+@@ -4397,7 +4397,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
+ 	}
+ 
+-	if (!kvm_pause_in_guest(vmx->vcpu.kvm)) {
++	if (!kvm_pause_in_guest(&vmx->vcpu)) {
+ 		vmcs_write32(PLE_GAP, ple_gap);
+ 		vmx->ple_window = ple_window;
+ 		vmx->ple_window_dirty = true;
+@@ -5562,7 +5562,7 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+  */
+ static int handle_pause(struct kvm_vcpu *vcpu)
+ {
+-	if (!kvm_pause_in_guest(vcpu->kvm))
++	if (!kvm_pause_in_guest(vcpu))
+ 		grow_ple_window(vcpu);
+ 
+ 	/*
+@@ -7059,7 +7059,7 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
+ 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
+ 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+-	if (kvm_cstate_in_guest(vcpu->kvm)) {
++	if (kvm_cstate_in_guest(vcpu)) {
+ 		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C1_RES, MSR_TYPE_R);
+ 		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
+ 		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
+@@ -7597,7 +7597,7 @@ static void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu)
+ 
+ static void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	if (!kvm_pause_in_guest(vcpu->kvm))
++	if (!kvm_pause_in_guest(vcpu))
+ 		shrink_ple_window(vcpu);
+ }
  
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 158b2e135efc..3ac6329e6d43 100644
+index 3ac6329e6d43..b419b258ed90 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -6006,6 +6006,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		if (cap->args[0] & ~KVM_X86_DISABLE_VALID_EXITS)
- 			break;
+@@ -11355,6 +11355,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	vcpu->arch.hv_root_tdp = INVALID_PAGE;
+ #endif
++	vcpu->arch.mwait_in_guest = vcpu->kvm->arch.mwait_in_guest;
++	vcpu->arch.hlt_in_guest = vcpu->kvm->arch.hlt_in_guest;
++	vcpu->arch.pause_in_guest = vcpu->kvm->arch.pause_in_guest;
++	vcpu->arch.cstate_in_guest = vcpu->kvm->arch.cstate_in_guest;
  
-+		mutex_lock(&kvm->lock);
-+		if (kvm->created_vcpus)
-+			goto disable_exits_unlock;
-+
- 		if ((cap->args[0] & KVM_X86_DISABLE_EXITS_MWAIT) &&
- 			kvm_can_mwait_in_guest())
- 			kvm->arch.mwait_in_guest = true;
-@@ -6016,6 +6020,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		if (cap->args[0] & KVM_X86_DISABLE_EXITS_CSTATE)
- 			kvm->arch.cstate_in_guest = true;
- 		r = 0;
-+disable_exits_unlock:
-+		mutex_unlock(&kvm->lock);
- 		break;
- 	case KVM_CAP_MSR_PLATFORM_INFO:
- 		kvm->arch.guest_can_read_msr_platform_info = cap->args[0];
+ 	r = static_call(kvm_x86_vcpu_create)(vcpu);
+ 	if (r)
+@@ -12539,7 +12543,7 @@ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+ 		     vcpu->arch.exception.pending))
+ 		return false;
+ 
+-	if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
++	if (kvm_hlt_in_guest(vcpu) && !kvm_can_deliver_async_pf(vcpu))
+ 		return false;
+ 
+ 	/*
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 588792f00334..a59b73e11726 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -324,24 +324,24 @@ static inline u64 nsec_to_cycles(struct kvm_vcpu *vcpu, u64 nsec)
+ 	    __rem;						\
+ 	 })
+ 
+-static inline bool kvm_mwait_in_guest(struct kvm *kvm)
++static inline bool kvm_mwait_in_guest(struct kvm_vcpu *vcpu)
+ {
+-	return kvm->arch.mwait_in_guest;
++	return vcpu->arch.mwait_in_guest;
+ }
+ 
+-static inline bool kvm_hlt_in_guest(struct kvm *kvm)
++static inline bool kvm_hlt_in_guest(struct kvm_vcpu *vcpu)
+ {
+-	return kvm->arch.hlt_in_guest;
++	return vcpu->arch.hlt_in_guest;
+ }
+ 
+-static inline bool kvm_pause_in_guest(struct kvm *kvm)
++static inline bool kvm_pause_in_guest(struct kvm_vcpu *vcpu)
+ {
+-	return kvm->arch.pause_in_guest;
++	return vcpu->arch.pause_in_guest;
+ }
+ 
+-static inline bool kvm_cstate_in_guest(struct kvm *kvm)
++static inline bool kvm_cstate_in_guest(struct kvm_vcpu *vcpu)
+ {
+-	return kvm->arch.cstate_in_guest;
++	return vcpu->arch.cstate_in_guest;
+ }
+ 
+ enum kvm_intr_type {
 -- 
 2.32.0
 
