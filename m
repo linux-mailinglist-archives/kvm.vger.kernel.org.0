@@ -2,308 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 038E254BF2C
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 03:18:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A57F54BF3F
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 03:29:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345214AbiFOBSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 21:18:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51034 "EHLO
+        id S235428AbiFOB3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 21:29:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244004AbiFOBRs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 21:17:48 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2087.outbound.protection.outlook.com [40.107.94.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FD71186C4;
-        Tue, 14 Jun 2022 18:17:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DpdCPWxLw+Rx2XeuvoD7pY0c+VUhTSPSTTEkN6Ip9LlMHrAk2NQICc1XcOVFBnuIKRQ0EXds/7yrg0mF3UPWe5C9UqGXbioN/9sJWqYKqQ4HGTCFxR4qbal602PYTz/oFd5pCnpbQXGXTBuz+RaI/NLE1dZB7xDrP6AMogoKDOb1nNUysxAhAl5CMHH82N7Bk2p3wP3JED+gVwmgEJr+WODludgEFdP2hZKt5cP9wACzju7exu4SMKzOpt7Q4mp3jlNdk3fXimiUphlzW4XTMKrzJzLFfeej3KGA3Nop4jwJp5nuRgZjJ2eQ+til7TYGJaA+2Zsznlvh3g5uVl5oWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YgO2osWC8XTZczE4S5VSh8NkUm635zDBZziOwh1CC70=;
- b=jvwkjr5QefA56JpttbZmVuS1VlHlkWb1GtH8rUMqj/7PWFKcAWR8M5AsT4fQwSp1uuWP5ZYrTLdnVn6ZiCDpH65oF7ji0aUWHhgXcIRPQL7FpL3eahuJBjTF3h9kOaJqmmcyGEOmMDgsDADWwST3qRBPxctFOSFt7DFEK4OsPpP/oeO8VtEXDlrLpT0dLFqt+B8OtUR1p/niiJ6ogqLk2ULegeXu/jUVCDGMsoH7U/WRiRfGDkwtJcPvcRhrhXjv4xQ7s1TNbYqwQtg9F0MfxSAI0e78jZdf7FkVNEtVaAeVmXTfIEypJ/QixuDVs8g6ChDjy64pjBWN6Alp4KU+ag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YgO2osWC8XTZczE4S5VSh8NkUm635zDBZziOwh1CC70=;
- b=niQd/92JOM2nFEqVItB0ufThACKcGis4bqmMPWTzDurS3Gl3Nh2IL/ohoGpOFpXQ3y9LX5NP1/IcIlUH8ojsF4lHVOSQ4z/pn+fSwD0D3asmANOk5lyLyAdy0s6tbzuzlbyiUZXpASSD1/aHVUQyzD+sB5FDkRhV39eDK2TySM5FHo6xXktEYE8fNomH59lnCiWk+7rrcWIxiddpBTBji5J3Y6W+IXje/zHJNGi3yagYkJg+W4y/NHGHi0S5HnQ8fkstaS8mG6E9rb43rYubn1mmSIwWZlxiVHmNun8IkW+tsnHNi0FXFSNCbCDQ0Rnh2+zp+UWwJ8YtVaimPtKETQ==
-Received: from DM3PR11CA0007.namprd11.prod.outlook.com (2603:10b6:0:54::17) by
- DM6PR12MB4545.namprd12.prod.outlook.com (2603:10b6:5:2a3::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5332.12; Wed, 15 Jun 2022 01:17:28 +0000
-Received: from DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
- (2603:10b6:0:54:cafe::ad) by DM3PR11CA0007.outlook.office365.com
- (2603:10b6:0:54::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.13 via Frontend
- Transport; Wed, 15 Jun 2022 01:17:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- DM6NAM11FT025.mail.protection.outlook.com (10.13.172.197) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5332.12 via Frontend Transport; Wed, 15 Jun 2022 01:17:27 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 15 Jun
- 2022 01:17:26 +0000
-Received: from foundations-user-AS-2114GT-DNR-C1-NC24B.nvidia.com
- (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Tue, 14 Jun 2022 18:17:25 -0700
-From:   Kechen Lu <kechenl@nvidia.com>
-To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>
-CC:     <vkuznets@redhat.com>, <somduttar@nvidia.com>,
-        <kechenl@nvidia.com>, <linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH v3 7/7] KVM: selftests: Add tests for VM and vCPU cap KVM_CAP_X86_DISABLE_EXITS
-Date:   Tue, 14 Jun 2022 18:16:22 -0700
-Message-ID: <20220615011622.136646-8-kechenl@nvidia.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220615011622.136646-1-kechenl@nvidia.com>
-References: <20220615011622.136646-1-kechenl@nvidia.com>
+        with ESMTP id S237190AbiFOB3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 21:29:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CD62C2DABD
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 18:29:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655256543;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gPcslwf6/5AipVOiJxjFuNmMuJiLjP5Ai/xX9fViRS4=;
+        b=QQbe3riAOnysT+McwsCYR7Jyb8wsIGxw0xHpuuwGxDvnfL07OpA2GcdlJt73su7ULDMVJs
+        pBGne0MMx/OjS1c+f9I8qBWpOzkmDSoyY4iVsGJgeKM4J3jhnt3ItQn8z/JXzc98UVcRiL
+        MsVXOP/B3BBLDgk1C1fBhYlxajhAZhI=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-596-SSUcE3wPOJOmUVyUt7E4uA-1; Tue, 14 Jun 2022 21:29:02 -0400
+X-MC-Unique: SSUcE3wPOJOmUVyUt7E4uA-1
+Received: by mail-lj1-f199.google.com with SMTP id a16-20020a05651c211000b002557bb9091bso1569159ljq.11
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 18:29:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gPcslwf6/5AipVOiJxjFuNmMuJiLjP5Ai/xX9fViRS4=;
+        b=ZF4wAfHSZJpfeWjZIqto5UJ9MqQ7CaE3vYSfi6PCg0eIOwD1Qxc9TdYKgbUfjyGMHD
+         r0djm0bOK90FRqirXkYetqP4yqnBOX775kpQJVK72Ac8E5T81yM0W3UztBvZzMlyJ/5f
+         4xMrtCIYYQgvGfyDt/7pxXabiFt46Bx011eDjx0wE+Xw3BTdPViNqu6n5lI7nPgLOkJM
+         x9hQuqT0g9W6m6Ki3tWlsmXaqgEKnjVRFXrdvp25K/96u2NGP7Jt1zkD5k1u0XN4VYQS
+         54WIGwk2vyV2fpYy0VP2FeBjsl6495oxJW0YH6F+GJN5dVY8uzqdnA6Jm261r+lzdXYM
+         i69Q==
+X-Gm-Message-State: AJIora9ei42xseqHqvYgiU6/YUt2d5SqKau05xKMaAia2Fty7I17KfIl
+        wXDBRIoaox+qXbN0QUTreV8kbjsYvFve88H/Rf076Zz7DUhS5I9qoANsuPLZHL5DJegS1tyE7VT
+        NFjCDRrKZJ64cMTg62Xw7wqOWzu19
+X-Received: by 2002:a19:4352:0:b0:479:5d1:3fef with SMTP id m18-20020a194352000000b0047905d13fefmr4549821lfj.411.1655256541023;
+        Tue, 14 Jun 2022 18:29:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzy6G17S6B/NL5asgkhJ3N6qCPtMcJgm4jIUP9oxu6MOto7+cw1fHjnYuylfVl22jAQ1SwvKuEFSnQqUE0b/Qw=
+X-Received: by 2002:a19:4352:0:b0:479:5d1:3fef with SMTP id
+ m18-20020a194352000000b0047905d13fefmr4549812lfj.411.1655256540740; Tue, 14
+ Jun 2022 18:29:00 -0700 (PDT)
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9916ea44-6b51-4326-8427-08da4e6cd000
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4545:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB45456DBEFC748A691EB073BDCAAD9@DM6PR12MB4545.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MDhi29E9cNZQ6xXNxPqFbVE/iWvnL3U7w1+AoL3r3WRsf3OeI/l2/lCPfRqf5oJsQoEGAx6CqlQm6PD1nK7+VcaAKi/5UA+PqdzuWCjzCGOP0Sy49GziCAvZp3MvWYqS4S4vNBmhikzhKTz2qQpUWAypZZVHvs3TG+wCZSn06tmVw08+J87EXydNsoKbqaWgQwob9Kd9mSN9ZX8fAz+erAKADpCPQiCqJ6DN8bQqwfL/CgG1hn3c6nAFBebz2e52dnq4h+ze38hhyNs9j+/hi6rhETmPfUkpLiKyHl79jadEbw31RCAo32S3Tx7E06r8gEN6rG4d+jceB8Lfmuw9SyuXG5TQyF/rD2fTl/7o5uqDnyiKMh0+YJhCidtp0+5Z5oYrKTViiCEh/W8722Tq5vIhXtUQv5H+kWFC9oHC/GoZuh2OOZPya3VYbnLCJbK+B4d/q2Y9lfi9tGbfYuUZYsmP0oSztgAcZEOBy19SJ048bBGXTM7n/kV8mn67HV7SzJe5R072myKgEZNX7TDp3w2UylIY/WXcq+X6m6Qqhb8j7kt5j4MkafIWVdlC/IVuvxt5CimVR0b8QrWu0dQQOev6t1+r2CnPeOKJesguSwPnJqVC2G+94izdkcUCUMnugm1WfsA00x6rH3HgzngEfG8Mr9BQeW2+kUh0OhK1SSudqPDaow5ob0INAl491mcyJfYDcBHo9jADWC76drMXQw==
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(46966006)(40470700004)(36840700001)(26005)(316002)(508600001)(54906003)(110136005)(2616005)(86362001)(82310400005)(7696005)(6666004)(356005)(81166007)(36860700001)(40460700003)(16526019)(186003)(336012)(47076005)(426003)(83380400001)(1076003)(70586007)(70206006)(36756003)(4326008)(8676002)(8936002)(5660300002)(2906002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2022 01:17:27.8069
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9916ea44-6b51-4326-8427-08da4e6cd000
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4545
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220526124338.36247-1-eperezma@redhat.com> <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <20220527065442-mutt-send-email-mst@kernel.org> <CACGkMEubfv_OJOsJ_ROgei41Qx4mPO0Xz8rMVnO8aPFiEqr8rA@mail.gmail.com>
+ <PH0PR12MB5481695930E7548BAAF1B0D9DCDC9@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEsSKF_MyLgFdzVROptS3PCcp1y865znLWgnzq9L7CpFVQ@mail.gmail.com>
+ <PH0PR12MB5481CAA3F57892FF7F05B004DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEsJJL34iUYQMxHguOV2cQ7rts+hRG5Gp3XKCGuqNdnNQg@mail.gmail.com>
+ <PH0PR12MB5481D099A324C91DAF01259BDCDE9@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEueG76L8H+F70D=T5kjK_+J68ARNQmQQo51rq3CfcOdRA@mail.gmail.com> <PH0PR12MB5481994AF05D3B4999EC1F0EDCAD9@PH0PR12MB5481.namprd12.prod.outlook.com>
+In-Reply-To: <PH0PR12MB5481994AF05D3B4999EC1F0EDCAD9@PH0PR12MB5481.namprd12.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 15 Jun 2022 09:28:49 +0800
+Message-ID: <CACGkMEtRTyymit=Zmwwcq0jNan-_C9p70vcLP0g7XmwQiOjUbw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
+To:     Parav Pandit <parav@nvidia.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "martinh@xilinx.com" <martinh@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "martinpo@xilinx.com" <martinpo@xilinx.com>,
+        "lvivier@redhat.com" <lvivier@redhat.com>,
+        "pabloc@xilinx.com" <pabloc@xilinx.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Zhang Min <zhang.min9@zte.com.cn>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
+        "gautam.dawar@amd.com" <gautam.dawar@amd.com>,
+        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
+        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "dinang@xilinx.com" <dinang@xilinx.com>,
+        Longpeng <longpeng2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add tests for KVM cap KVM_CAP_X86_DISABLE_EXITS overriding flags
-in VM and vCPU scope both works as expected.
+On Wed, Jun 15, 2022 at 8:10 AM Parav Pandit <parav@nvidia.com> wrote:
+>
+>
+>
+> > From: Jason Wang <jasowang@redhat.com>
+> > Sent: Wednesday, June 1, 2022 11:54 PM
+> >
+> > On Thu, Jun 2, 2022 at 10:59 AM Parav Pandit <parav@nvidia.com> wrote:
+> > >
+> > >
+> > > > From: Jason Wang <jasowang@redhat.com>
+> > > > Sent: Wednesday, June 1, 2022 10:00 PM
+> > > >
+> > > > On Thu, Jun 2, 2022 at 2:58 AM Parav Pandit <parav@nvidia.com> wrote:
+> > > > >
+> > > > >
+> > > > > > From: Jason Wang <jasowang@redhat.com>
+> > > > > > Sent: Tuesday, May 31, 2022 10:42 PM
+> > > > > >
+> > > > > > Well, the ability to query the virtqueue state was proposed as
+> > > > > > another feature (Eugenio, please correct me). This should be
+> > > > > > sufficient for making virtio-net to be live migrated.
+> > > > > >
+> > > > > The device is stopped, it won't answer to this special vq config done
+> > here.
+> > > >
+> > > > This depends on the definition of the stop. Any query to the device
+> > > > state should be allowed otherwise it's meaningless for us.
+> > > >
+> > > > > Programming all of these using cfg registers doesn't scale for
+> > > > > on-chip
+> > > > memory and for the speed.
+> > > >
+> > > > Well, they are orthogonal and what I want to say is, we should first
+> > > > define the semantics of stop and state of the virtqueue.
+> > > >
+> > > > Such a facility could be accessed by either transport specific
+> > > > method or admin virtqueue, it totally depends on the hardware
+> > architecture of the vendor.
+> > > >
+> > > I find it hard to believe that a vendor can implement a CVQ but not AQ and
+> > chose to expose tens of hundreds of registers.
+> > > But maybe, it fits some specific hw.
+> >
+> > You can have a look at the ifcvf dpdk driver as an example.
+> >
+> Ifcvf is an example of using registers.
+> It is not an answer why AQ is hard for it. :)
 
-Signed-off-by: Kechen Lu <kechenl@nvidia.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/svm_util.h   |   1 +
- .../selftests/kvm/x86_64/disable_exits_test.c | 147 ++++++++++++++++++
- 4 files changed, 150 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/disable_exits_test.c
+Well, it's an example of how vDPA is implemented. I think we agree
+that for vDPA, vendors have the flexibility to implement their
+perferrable datapath.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 4509a3a7eeae..2b50170db9b2 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -15,6 +15,7 @@
- /x86_64/cpuid_test
- /x86_64/cr4_cpuid_sync_test
- /x86_64/debug_regs
-+/x86_64/disable_exits_test
- /x86_64/evmcs_test
- /x86_64/emulator_error_test
- /x86_64/fix_hypercall_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 22423c871ed6..de11d1f95700 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -115,6 +115,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
- TEST_GEN_PROGS_x86_64 += x86_64/amx_test
-+TEST_GEN_PROGS_x86_64 += x86_64/disable_exits_test
- TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-index a25aabd8f5e7..d8cad1cff578 100644
---- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-@@ -17,6 +17,7 @@
- #define CPUID_SVM		BIT_ULL(CPUID_SVM_BIT)
- 
- #define SVM_EXIT_MSR		0x07c
-+#define SVM_EXIT_HLT		0x078
- #define SVM_EXIT_VMMCALL	0x081
- 
- struct svm_test_data {
-diff --git a/tools/testing/selftests/kvm/x86_64/disable_exits_test.c b/tools/testing/selftests/kvm/x86_64/disable_exits_test.c
-new file mode 100644
-index 000000000000..8ca427357ed0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/disable_exits_test.c
-@@ -0,0 +1,147 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test per-VM and per-vCPU disable exits cap
-+ *
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "svm_util.h"
-+#include "vmx.h"
-+#include "processor.h"
-+
-+#define VCPU_ID_1 0
-+#define VCPU_ID_2 1
-+
-+static void guest_code_exits(void) {
-+	asm volatile("sti; hlt; cli");
-+}
-+
-+/* Set debug control for trapped instruction exiting to userspace */
-+static void vcpu_set_debug_exit_userspace(struct kvm_vm *vm, int vcpuid,
-+		struct kvm_guest_debug *debug) {
-+	memset(debug, 0, sizeof(*debug));
-+	debug->control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_EXIT_USERSPACE;
-+	vcpu_set_guest_debug(vm, VCPU_ID_1, debug);
-+}
-+
-+static void test_vm_cap_disable_exits(void) {
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_X86_DISABLE_EXITS,
-+		.args[0] = KVM_X86_DISABLE_EXITS_HLT|KVM_X86_DISABLE_EXITS_OVERRIDE,
-+	};
-+	struct kvm_guest_debug debug;
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+
-+	/* Create VM */
-+	vm = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
-+
-+	/* Test Case #1
-+	 * Default without disabling HLT exits in VM scope
-+	 */
-+	vm_vcpu_add_default(vm, VCPU_ID_1, (void *)guest_code_exits);
-+	vcpu_set_debug_exit_userspace(vm, VCPU_ID_1, &debug);
-+	run = vcpu_state(vm, VCPU_ID_1);
-+	vcpu_run(vm, VCPU_ID_1);
-+	/* Exit reason should be HLT */
-+	if (is_amd_cpu())
-+		TEST_ASSERT(run->hw.hardware_exit_reason == SVM_EXIT_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+	else
-+		TEST_ASSERT(run->hw.hardware_exit_reason == EXIT_REASON_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+
-+	/* Test Case #2
-+	 * Disabling HLT exits in VM scope
-+	 */
-+	vm_vcpu_add_default(vm, VCPU_ID_2, (void *)guest_code_exits);
-+	vcpu_set_debug_exit_userspace(vm, VCPU_ID_2, &debug);
-+	run = vcpu_state(vm, VCPU_ID_2);
-+	/* Set VM scoped cap arg
-+	 * KVM_X86_DISABLE_EXITS_HLT|KVM_X86_DISABLE_EXITS_OVERRIDE
-+	 * after vCPUs creation so requiring override flag
-+	 */
-+	TEST_ASSERT(!vm_enable_cap(vm, &cap), "Failed to set KVM_CAP_X86_DISABLE_EXITS");
-+	vcpu_run(vm, VCPU_ID_2);
-+	/* Exit reason should not be HLT, would finish the guest
-+	 * running and exit (e.g. SVM_EXIT_SHUTDOWN)
-+	 */
-+	if (is_amd_cpu())
-+		TEST_ASSERT(run->hw.hardware_exit_reason != SVM_EXIT_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+	else
-+		TEST_ASSERT(run->hw.hardware_exit_reason != EXIT_REASON_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_vcpu_cap_disable_exits(void) {
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_X86_DISABLE_EXITS,
-+		.args[0] = KVM_X86_DISABLE_EXITS_HLT|KVM_X86_DISABLE_EXITS_OVERRIDE,
-+	};
-+	struct kvm_guest_debug debug;
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+
-+	/* Create VM */
-+	vm = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
-+	vm_vcpu_add_default(vm, VCPU_ID_1, (void *)guest_code_exits);
-+	vcpu_set_debug_exit_userspace(vm, VCPU_ID_1, &debug);
-+	vm_vcpu_add_default(vm, VCPU_ID_2, (void *)guest_code_exits);
-+	vcpu_set_debug_exit_userspace(vm, VCPU_ID_2, &debug);
-+	/* Set vCPU 2 scoped cap arg
-+	 * KVM_X86_DISABLE_EXITS_HLT|KVM_X86_DISABLE_EXITS_OVERRIDE
-+	 */
-+	TEST_ASSERT(!vcpu_enable_cap(vm, VCPU_ID_2, &cap), "Failed to set KVM_CAP_X86_DISABLE_EXITS");
-+
-+	/* Test Case #3
-+	 * Default without disabling HLT exits in this vCPU 1
-+	 */
-+	run = vcpu_state(vm, VCPU_ID_1);
-+	vcpu_run(vm, VCPU_ID_1);
-+	/* Exit reason should be HLT */
-+	if (is_amd_cpu())
-+		TEST_ASSERT(run->hw.hardware_exit_reason == SVM_EXIT_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+	else
-+		TEST_ASSERT(run->hw.hardware_exit_reason == EXIT_REASON_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+
-+	/* Test Case #4
-+	 * Disabling HLT exits in vCPU 2
-+	 */
-+	run = vcpu_state(vm, VCPU_ID_2);
-+	vcpu_run(vm, VCPU_ID_2);
-+	/* Exit reason should not be HLT, would finish the guest
-+	 * running and exit (e.g. SVM_EXIT_SHUTDOWN)
-+	 */
-+	if (is_amd_cpu())
-+		TEST_ASSERT(run->hw.hardware_exit_reason != SVM_EXIT_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+	else
-+		TEST_ASSERT(run->hw.hardware_exit_reason != EXIT_REASON_HLT,
-+			"Got exit_reason other than HLT: 0x%llx\n",
-+			run->hw.hardware_exit_reason);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_vm_cap_disable_exits();
-+	test_vcpu_cap_disable_exits();
-+	return 0;
-+}
--- 
-2.32.0
+> virtio spec has definition of queue now and implementing yet another queue shouldn't be a problem.
+>
+> So far no one seem to have problem with the additional queue.
+> So I take it as AQ is ok.
+>
+> > But another thing that is unrelated to hardware architecture is the nesting
+> > support. Having admin virtqueue in a nesting environment looks like an
+> > overkill. Presenting a register in L1 and map it to L0's admin should be good
+> > enough.
+> So may be a optimized interface can be added that fits nested env.
+> At this point in time real users that we heard are interested in non-nested use cases. Let's enable them first.
+
+That's fine. For nests, it's actually really easy, just adding an
+interface within the existing transport should be sufficient.
+
+>
+>
+> >
+> > >
+> > > I like to learn the advantages of such method other than simplicity.
+> > >
+> > > We can clearly that we are shifting away from such PCI registers with SIOV,
+> > IMS and other scalable solutions.
+> > > virtio drifting in reverse direction by introducing more registers as
+> > transport.
+> > > I expect it to an optional transport like AQ.
+> >
+> > Actually, I had a proposal of using admin virtqueue as a transport, it's
+> > designed to be SIOV/IMS capable. And it's not hard to extend it with the
+> > state/stop support etc.
+> >
+> > >
+> > > > >
+> > > > > Next would be to program hundreds of statistics of the 64 VQs
+> > > > > through a
+> > > > giant PCI config space register in some busy polling scheme.
+> > > >
+> > > > We don't need giant config space, and this method has been
+> > > > implemented by some vDPA vendors.
+> > > >
+> > > There are tens of 64-bit counters per VQs. These needs to programmed on
+> > destination side.
+> > > Programming these via registers requires exposing them on the registers.
+> > > In one of the proposals, I see them being queried via CVQ from the device.
+> >
+> > I didn't see a proposal like this. And I don't think querying general virtio state
+> > like idx with a device specific CVQ is a good design.
+> >
+> My example was not for the idx. But for VQ statistics that is queried via CVQ.
+>
+> > >
+> > > Programming them via cfg registers requires large cfg space or synchronous
+> > programming until receiving ACK from it.
+> > > This means one entry at a time...
+> > >
+> > > Programming them via CVQ needs replicate and align cmd values etc on all
+> > device types. All duplicate and hard to maintain.
+> > >
+> > >
+> > > > >
+> > > > > I can clearly see how all these are inefficient for faster LM.
+> > > > > We need an efficient AQ to proceed with at minimum.
+> > > >
+> > > > I'm fine with admin virtqueue, but the stop and state are orthogonal to
+> > that.
+> > > > And using admin virtqueue for stop/state will be more natural if we
+> > > > use admin virtqueue as a transport.
+> > > Ok.
+> > > We should have defined it bit earlier that all vendors can use. :(
+> >
+> > I agree.
+>
+> I remember few months back, you acked in the weekly meeting that TC has approved the AQ direction.
+> And we are still in this circle of debating the AQ.
+
+I think not. Just to make sure we are on the same page, the proposal
+here is for vDPA, and hope it can provide forward compatibility to
+virtio. So in the context of vDPA, admin virtqueue is not a must.
+
+Thanks
 
