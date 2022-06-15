@@ -2,168 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F24DC54CB42
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:26:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3EFB54CB5A
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:29:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346834AbiFOO0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 10:26:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42132 "EHLO
+        id S1351186AbiFOO3x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 10:29:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231311AbiFOO0O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 10:26:14 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907E138DBB
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:26:13 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q12-20020a17090a304c00b001e2d4fb0eb4so2270915pjl.4
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:26:13 -0700 (PDT)
+        with ESMTP id S239380AbiFOO3v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 10:29:51 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A4E35AB1
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:29:50 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id bo5so11623581pfb.4
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:29:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=qB8AcXg/PxEC/cUAdUagdguJMmCygQ7WZVfOSedDdss=;
-        b=ctRJ2nN7r6oxfv7MoQvj22wgZ3LiXE7oNwbVkCZIzJ1lRjqtirLDOHMhaTrj2m7BuS
-         o7H+FUGtt/aLHQH2J2SAJu31qcBFlEXbrv/3dOmGpHZ/cUxpO6qQdIDUP2Ee4C/cUOWh
-         DSrnKwdKX8au6tec5NvHWIJ7mNFH5RGcuzxoV0ZWHOSOwCUItA/wCreqM7KSfdgdtLxn
-         IdqCvc7sHPXO2ubIZpcPFaT4U91N+ATBZkyBt2vhOgnGsyx9ohDrwVcdarhAJn5/YrUY
-         ariE4V01SVoWXDW8y6wg/KzD5Ne86yFgBQe7oW9c1CaDdFHAZhUv6VHxhoD2yNeHuvtd
-         z55A==
+        bh=urXLCEo0HdMiwrT9/lHPLDvk+tFr+S8kFKoTasWYgTM=;
+        b=jE8+1EoaVPLQAQgJuF6uSHsVQUNEYiULaZEf4qWJ+FDCtBcy5wU+1PuRU/qTw6mXuJ
+         rhkDSC1GoM3r6gP1XqDzyFKdRxVJyQscQceF46fTmrMh4tpJ7/3OD4E0UUUL4FXaE4E4
+         HLsY4nWxsZ1bLbc4mtfRzI75UcR7ige6egZvCSqqgKpyeTsqtkTZjDQiW2mEf6TP1C0u
+         784mpZz2YhCQYjeTdJsTJu7oJeXZ7GHllZjsJApUFHo2QiJHGuFpB3Xi7l8+I0pC+m8X
+         WUI+8LcLsPMDaqunWg8z0EiW4EPIpYE086RJe+7JyYOWlUAXkMPBTz0xEA+GhbwuK97s
+         EpUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=qB8AcXg/PxEC/cUAdUagdguJMmCygQ7WZVfOSedDdss=;
-        b=3C3hH/u+1XCycN2zd1vFx9w1TDagmCFtTfCf9Hi8iXL/rs8wJuHks22NwwpFDt6+mg
-         5Pr0tELE/VBeU7xvYXvFPuAWf+tOhVXLoveGA72WWNiNuBbxGP/Ql+WpGpvVKxKBOm+Q
-         Os32bajwhmqAudwW6Wuc7/UvbGIxZ0WyXdFYINofz4CxAgIAvWWCiCwi0SrduN0PcOdo
-         b3zpHIdgPwdBtHxUwz4n69QEElR/iMxSK8CVFT6GnIv8XtKPKLIK72jjqrB33HRXyqn/
-         I9cC2zqyFmA68IOLI0t+tRq5h6zetTBJCSn9DSgWXuekKEYLYbsj1qeG29/xwqbRE8tf
-         SpVw==
-X-Gm-Message-State: AJIora8ZvY8jkxTmiXziFzWPP3JViaRWAYjYDVJMe2rAYBnMwW2MgLsi
-        aWMtmzmCzT98zAa8NCQo+6Md8g==
-X-Google-Smtp-Source: AGRyM1vSXp/DX78MiZUWevdRXHKoUuMgN0XH/wsQBE5ApqwZVKMWUZmmlCJjimO/EjxvqUsYaIdqeA==
-X-Received: by 2002:a17:902:e951:b0:168:b530:135b with SMTP id b17-20020a170902e95100b00168b530135bmr9652483pll.93.1655303172795;
-        Wed, 15 Jun 2022 07:26:12 -0700 (PDT)
+        bh=urXLCEo0HdMiwrT9/lHPLDvk+tFr+S8kFKoTasWYgTM=;
+        b=Qs0Ivvo1OuYvSx6677293/cV7GRDOVaADtquP3kK+S/au+LOufVjTN9yZrZAHSMdbE
+         3v9V/82f/w37vjxYW5lmNE58pYtbctUN0p2kOc6Ux90cvM7UVGYsGW/nuGrLMpf8bvUx
+         tg7mnfD15P+zPNoIbUqj9RrD/BsALSrBlBRNdCUV0xm1/mih7Ke/iEZVdOBLXUCJwfpM
+         B3eZk4/a15LuRIlSCYJ0ZT+szbSKrOUGGtwtgdTLu4fEkrb/lH/hPP1dVEM2hZfNfWON
+         rTPkR6CHLddmx76v7+2HXugD5XP3C/QypU9DGjUW3U2XyaGsJ0/nqnjMuhqWZBtmy+3W
+         a4vQ==
+X-Gm-Message-State: AJIora8SAdrKdoVmA4zT1oEjydH3nAEljNEDNb9XOhkR/yWTzzV10x2I
+        DGU9Wxj3DYtyWzQ6p0nLxW1nQQ==
+X-Google-Smtp-Source: AGRyM1tbE6e2B2i42MyE6StE9nppc07YDmrFHDgu8iNlTHFWW5xo4NNjzQzQb9yFXGjB6QHFLP8hJw==
+X-Received: by 2002:a63:e1c:0:b0:3fd:f319:df7b with SMTP id d28-20020a630e1c000000b003fdf319df7bmr75509pgl.135.1655303389770;
+        Wed, 15 Jun 2022 07:29:49 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id y16-20020a17090264d000b0016362da9a03sm9264943pli.245.2022.06.15.07.26.12
+        by smtp.gmail.com with ESMTPSA id z15-20020a170903018f00b0015eb200cc00sm9366660plg.138.2022.06.15.07.29.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 07:26:12 -0700 (PDT)
-Date:   Wed, 15 Jun 2022 14:26:08 +0000
+        Wed, 15 Jun 2022 07:29:49 -0700 (PDT)
+Date:   Wed, 15 Jun 2022 14:29:45 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: Re: [PATCH v2 5/8] KVM: x86/mmu: Use separate namespaces for guest
- PTEs and shadow PTEs
-Message-ID: <YqnsAIKxQniAsb1d@google.com>
-References: <20220614233328.3896033-1-seanjc@google.com>
- <20220614233328.3896033-6-seanjc@google.com>
- <090e701d-6893-ea25-1237-233ff3dd01ee@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+Subject: Re: [PATCH v6 0/8] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <Yqns2ar0TND4RP9P@google.com>
+References: <20220607065749.GA1513445@chaop.bj.intel.com>
+ <CAA03e5H_vOQS-qdZgacnmqP5T5jJLnEfm44yfRzJQ2KVu0Br+Q@mail.gmail.com>
+ <20220608021820.GA1548172@chaop.bj.intel.com>
+ <CAGtprH8xyf07jMN7ubTC__BvDj+z41uVGRiCJ7Rc5cv3KWg03w@mail.gmail.com>
+ <YqJYEheLiGI4KqXF@google.com>
+ <20220614072800.GB1783435@chaop.bj.intel.com>
+ <CALCETrWw=Q=1AKW0Jcj3ZGscjyjDJXAjuxOnQx_sabQ6ZtS-wg@mail.gmail.com>
+ <Yqjcx6u0KJcJuZfI@google.com>
+ <CALCETrUdGoZ2yUnNGbxJ-Xr3KD7QhTi-ddhS8AUMjFyJM5pDfA@mail.gmail.com>
+ <20220615091759.GB1823790@chaop.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <090e701d-6893-ea25-1237-233ff3dd01ee@redhat.com>
+In-Reply-To: <20220615091759.GB1823790@chaop.bj.intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 15, 2022, Paolo Bonzini wrote:
-> On 6/15/22 01:33, Sean Christopherson wrote:
-> > Separate the macros for KVM's shadow PTEs (SPTE) from guest 64-bit PTEs
-> > (PT64).  SPTE and PT64 are _mostly_ the same, but the few differences are
-> > quite critical, e.g. *_BASE_ADDR_MASK must differentiate between host and
-> > guest physical address spaces, and SPTE_PERM_MASK (was PT64_PERM_MASK) is
-> > very much specific to SPTEs.
+On Wed, Jun 15, 2022, Chao Peng wrote:
+> On Tue, Jun 14, 2022 at 01:59:41PM -0700, Andy Lutomirski wrote:
+> > On Tue, Jun 14, 2022 at 12:09 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Tue, Jun 14, 2022, Andy Lutomirski wrote:
+> > > > This patch series is fairly close to implementing a rather more
+> > > > efficient solution.  I'm not familiar enough with hypervisor userspace
+> > > > to really know if this would work, but:
+> > > >
+> > > > What if shared guest memory could also be file-backed, either in the
+> > > > same fd or with a second fd covering the shared portion of a memslot?
+> > > > This would allow changes to the backing store (punching holes, etc) to
+> > > > be some without mmap_lock or host-userspace TLB flushes?  Depending on
+> > > > what the guest is doing with its shared memory, userspace might need
+> > > > the memory mapped or it might not.
+> > >
+> > > That's what I'm angling for with the F_SEAL_FAULT_ALLOCATIONS idea.  The issue,
+> > > unless I'm misreading code, is that punching a hole in the shared memory backing
+> > > store doesn't prevent reallocating that hole on fault, i.e. a helper process that
+> > > keeps a valid mapping of guest shared memory can silently fill the hole.
+> > >
+> > > What we're hoping to achieve is a way to prevent allocating memory without a very
+> > > explicit action from userspace, e.g. fallocate().
 > > 
-> > Opportunistically (and temporarily) move most guest macros into paging.h
-> > to clearly associate them with shadow paging, and to ensure that they're
-> > not used as of this commit.  A future patch will eliminate them entirely.
-> > 
-> > Sadly, PT32_LEVEL_BITS is left behind in mmu_internal.h because it's
-> > needed for the quadrant calculation in kvm_mmu_get_page().  The quadrant
-> > calculation is hot enough (when using shadow paging with 32-bit guests)
-> > that adding a per-context helper is undesirable, and burying the
-> > computation in paging_tmpl.h with a forward declaration isn't exactly an
-> > improvement.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > Ah, I misunderstood.  I thought your goal was to mmap it and prevent
+> > page faults from allocating.
+
+I don't think you misunderstood, that's also one of the goals.  The use case is
+that multiple processes in the host mmap() guest memory, and we'd like to be able
+to punch a hole without having to rendezvous with all processes and also to prevent
+an unintentional re-allocation.
+
+> I think we still need the mmap, but want to prevent allocating when
+> userspace touches previously mmaped area that has never filled the page.
+
+Yes, or if a chunk was filled at some point but then was removed via PUNCH_HOLE.
+
+> I don't have clear answer if other operations like read/write should be
+> also prevented (probably yes). And only after an explicit fallocate() to
+> allocate the page these operations would act normally.
+
+I always forget about read/write.  I believe reads should be ok, the semantics of
+holes are that they return zeros, i.e. can use ZERO_PAGE() and not allocate a new
+backing page.  Not sure what to do about writes though.  Allocating on direct writes
+might be ok for our use case, but that could also result in a rather wierd API.
+
+> > It is indeed the case (and has been since before quite a few of us
+> > were born) that a hole in a sparse file is logically just a bunch of
+> > zeros.  A way to make a file for which a hole is an actual hole seems
+> > like it would solve this problem nicely.  It could also be solved more
+> > specifically for KVM by making sure that the private/shared mode that
+> > userspace programs is strict enough to prevent accidental allocations
+> > -- if a GPA is definitively private, shared, neither, or (potentially,
+> > on TDX only) both, then a page that *isn't* shared will never be
+> > accidentally allocated by KVM.
 > 
-> A better try:
+> KVM is clever enough to not allocate since it knows a GPA is shared or
+> not. This case it's the host userspace that can cause the allocating and
+> is too complex to check on every access from guest.
 
-Very nice!  It's obvious once someone else writes the code.  :-)
+Yes, KVM is not in the picture at all.  KVM won't trigger allocation, but KVM also
+is not in a position to prevent userspace from touching memory.
 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 54b3e39d07b3..cd561b49cc84 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2011,8 +2011,21 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->  	role.direct = direct;
->  	role.access = access;
->  	if (role.has_4_byte_gpte) {
-> +		/*
-> +		 * The "quadrant" value corresponds to those bits of the address
-> +		 * that have already been used by the 8-byte shadow page table
-> +		 * lookup, but not yet in the 4-byte guest page tables.  Having
-> +		 * the quadrant as part of the role ensures that each upper sPTE
-> +		 * points to the the correct portion of the guest page table
-> +		 * structure.
-> +		 *
-> +		 * For example, a 4-byte PDE consumes bits 31:22 and an 8-byte PDE
-> +		 * consumes bits 29:21.  Each guest PD must be expanded into four
-> +		 * shadow PDs, one for each value of bits 31:30, and the PDPEs
-> +		 * will use the four quadrants in round-robin fashion.
-
-It's not round-robin, that would imply KVM rotates through each quadrant on its
-own.  FWIW, I like David's comment from his patch that simplifies this mess in a
-similar way.
-
-https://lore.kernel.org/all/20220516232138.1783324-5-dmatlack@google.com
-> +		 */
->  		quadrant = gaddr >> (PAGE_SHIFT + (SPTE_LEVEL_BITS * level));
-> -		quadrant &= (1 << ((PT32_LEVEL_BITS - SPTE_LEVEL_BITS) * level)) - 1;
-> +		quadrant &= (1 << level) - 1;
->  		role.quadrant = quadrant;
->  	}
->  	if (level <= vcpu->arch.mmu->cpu_role.base.level)
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index cb9d4d358335..5e1e3c8f8aaa 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -20,9 +20,6 @@ extern bool dbg;
->  #define MMU_WARN_ON(x) do { } while (0)
->  #endif
-> -/* The number of bits for 32-bit PTEs is to needed compute the quandrant. */
-
-Heh, and it gets rid of my typo.
-
-> -#define PT32_LEVEL_BITS 10
-> -
->  /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
->  #define __PT_LEVEL_SHIFT(level, bits_per_level)	\
->  	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 6c29aef4092b..e4655056e651 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -38,7 +38,7 @@
->  	#define pt_element_t u32
->  	#define guest_walker guest_walker32
->  	#define FNAME(name) paging##32_##name
-> -	#define PT_LEVEL_BITS PT32_LEVEL_BITS
-> +	#define PT_LEVEL_BITS 10
->  	#define PT_MAX_FULL_LEVELS 2
->  	#define PT_GUEST_DIRTY_SHIFT PT_DIRTY_SHIFT
->  	#define PT_GUEST_ACCESSED_SHIFT PT_ACCESSED_SHIFT
+> > If the shared backing is not mmapped,
+> > it also won't be accidentally allocated by host userspace on a stray
+> > or careless write.
 > 
-> Paolo
-> 
+> As said above, mmap is still prefered, otherwise too many changes are
+> needed for usespace VMM.
+
+Forcing userspace to change doesn't bother me too much, the biggest concern is
+having to take mmap_lock for write in a per-host process.
