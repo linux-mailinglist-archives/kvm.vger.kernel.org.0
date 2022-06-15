@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98FCA54D2B0
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 22:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A80554D2B4
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 22:34:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348631AbiFOUeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 16:34:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56996 "EHLO
+        id S1348559AbiFOUeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 16:34:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346906AbiFOUda (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 16:33:30 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CBBC31DD7;
-        Wed, 15 Jun 2022 13:33:29 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25FJkKcl023055;
-        Wed, 15 Jun 2022 20:33:27 GMT
+        with ESMTP id S1346775AbiFOUd3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 16:33:29 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 676A72F643;
+        Wed, 15 Jun 2022 13:33:27 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25FImLdZ029334;
+        Wed, 15 Jun 2022 20:33:26 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=Dudzy4G990uznrPqWLhzBG10xTXSUjrkv+jp+RxM6lo=;
- b=FZomiNnXkqAAxnZDWrrCz02XUJlpQg8tv6Mno7iOfi0M+SmaNGw/cFc8Is2bGxAoJjvL
- dHxo/X3pkhI3ysUXHu41dC/MspGdqjZ7CpCrs5VPf4ZZCMXU2akqiS1nT+P8axUjKOix
- gWa1ggAT5v/nJbVTiQA9AOmiqSwBpHPCJCnoTgj3hbjhenGbDyTiJfk7vTVHx5JXRZ4s
- XjgCS9ofAkf4zbI94PZo8GNLCZG82BQkXL9Q7SuXhAjT8MkktUhkjt0cTn2hlclkiGeD
- tufPnts5zDn3TlyXDpQnbANT6zeNAy7Ybu4KnaTQr2j4YhLhsdc6IRZQFiX+hHsXEbfs 3A== 
+ bh=9a4Cpv591bVbKUqSytiuUGYu0C6PS6j6PcM5Y+8b9EY=;
+ b=GP9BcHzEgb05gASYVNaxA8R4soY8WL4aQHbgYzNkwBt/h9LkPQ56EFYP4fJwnyXQpGjA
+ x7EuwCPGUZoG/tynja2tYz/H413/aM4q0qOPzAUiB6ikf2dWkiX5IIilKvg87xJ2YY9C
+ hsa9lMNLqWJA0FdkXTlNy4D1CBg7TWFw0MjudU3y1er5UPEu1q1z0UmtVnXFSPjbT6RD
+ ekx1e9IghB+GrZYAuHLvCUkLCndRoKwt52BIK1wOPdOugBWZgp6Q1hi2iJgoX5dSMDLT
+ G/cIx0Yu2WRUKxl3a7z3lqDx/NxIC322RjYgcKaMmSCkQky29nLJVpJQGmAg+HI5sk5o gQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqfvj37k6-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqbn2b9gd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 15 Jun 2022 20:33:26 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25FK8Sit000718;
-        Wed, 15 Jun 2022 20:33:26 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqfvj37j6-1
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25FJopJY014895;
+        Wed, 15 Jun 2022 20:33:25 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqbn2b9fm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jun 2022 20:33:26 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25FKLVjq015732;
+        Wed, 15 Jun 2022 20:33:25 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25FKLHVh000455;
         Wed, 15 Jun 2022 20:33:23 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3gmjp8vwqj-1
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3gmjp9697q-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 15 Jun 2022 20:33:23 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25FKXKr614614906
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25FKXKnf23200234
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 15 Jun 2022 20:33:20 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 81E04A405B;
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 85D30A404D;
         Wed, 15 Jun 2022 20:33:20 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F5E6A4054;
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 74938A4055;
         Wed, 15 Jun 2022 20:33:20 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Wed, 15 Jun 2022 20:33:20 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 14D48E008F; Wed, 15 Jun 2022 22:33:20 +0200 (CEST)
+        id 168CCE009E; Wed, 15 Jun 2022 22:33:20 +0200 (CEST)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Matthew Rosato <mjrosato@linux.ibm.com>
 Cc:     Jason Gunthorpe <jgg@nvidia.com>,
@@ -66,25 +66,25 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v2 06/10] vfio/ccw: Flatten MDEV device (un)register
-Date:   Wed, 15 Jun 2022 22:33:14 +0200
-Message-Id: <20220615203318.3830778-7-farman@linux.ibm.com>
+Subject: [PATCH v2 07/10] vfio/ccw: Create an OPEN FSM Event
+Date:   Wed, 15 Jun 2022 22:33:15 +0200
+Message-Id: <20220615203318.3830778-8-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220615203318.3830778-1-farman@linux.ibm.com>
 References: <20220615203318.3830778-1-farman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IYq9nu4w3HLqzBQ-sB7C_QfyqUmfyIjv
-X-Proofpoint-ORIG-GUID: pHiaUAoPHQwCOLEEZKohNmmGRX4eX00N
+X-Proofpoint-GUID: U25sr5xggMd_EQFekfKrIuKOujJvv0vf
+X-Proofpoint-ORIG-GUID: zLRA1na2jtt-32b04Zha89nefB05ydFH
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-15_16,2022-06-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- priorityscore=1501 phishscore=0 spamscore=0 impostorscore=0 adultscore=0
- suspectscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206150074
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 adultscore=0 clxscore=1015 suspectscore=0 phishscore=0
+ spamscore=0 impostorscore=0 mlxlogscore=999 lowpriorityscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206150074
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -94,74 +94,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vfio_ccw_mdev_(un)reg routines are merely vfio-ccw routines that
-pass control to mdev_(un)register_device. Since there's only one
-caller of each, let's just call the mdev routines directly.
+Move the process of enabling a subchannel for use by vfio-ccw
+into the FSM, such that it can manage the sequence of lifecycle
+events for the device.
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+That is, if the FSM state is NOT_OPER(erational), then do the work
+that would enable the subchannel and move the FSM to STANDBY state.
+An attempt to perform this event again from any of the other operating
+states (IDLE, CP_PROCESSING, CP_PENDING) will convert the device back
+to NOT_OPER so the configuration process can be started again.
+
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_drv.c     |  4 ++--
- drivers/s390/cio/vfio_ccw_ops.c     | 10 ----------
- drivers/s390/cio/vfio_ccw_private.h |  3 ---
- 3 files changed, 2 insertions(+), 15 deletions(-)
+ drivers/s390/cio/vfio_ccw_drv.c     |  7 ++-----
+ drivers/s390/cio/vfio_ccw_fsm.c     | 21 +++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_private.h |  1 +
+ 3 files changed, 24 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 279ad2161f17..fe87a2652a22 100644
+index fe87a2652a22..52249c40a565 100644
 --- a/drivers/s390/cio/vfio_ccw_drv.c
 +++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -240,7 +240,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+@@ -231,11 +231,8 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 
+ 	dev_set_drvdata(&sch->dev, private);
+ 
+-	spin_lock_irq(sch->lock);
+-	sch->isc = VFIO_CCW_ISC;
+-	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
+-	spin_unlock_irq(sch->lock);
+-	if (ret)
++	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
++	if (private->state == VFIO_CCW_STATE_NOT_OPER)
+ 		goto out_free;
  
  	private->state = VFIO_CCW_STATE_STANDBY;
+diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+index bbcc5b486749..7e7ed69e1461 100644
+--- a/drivers/s390/cio/vfio_ccw_fsm.c
++++ b/drivers/s390/cio/vfio_ccw_fsm.c
+@@ -11,6 +11,8 @@
  
--	ret = vfio_ccw_mdev_reg(sch);
-+	ret = mdev_register_device(&sch->dev, &vfio_ccw_mdev_driver);
- 	if (ret)
- 		goto out_disable;
+ #include <linux/vfio.h>
  
-@@ -262,7 +262,7 @@ static void vfio_ccw_sch_remove(struct subchannel *sch)
- 	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
++#include <asm/isc.h>
++
+ #include "ioasm.h"
+ #include "vfio_ccw_private.h"
  
- 	vfio_ccw_sch_quiesce(sch);
--	vfio_ccw_mdev_unreg(sch);
-+	mdev_unregister_device(&sch->dev);
+@@ -364,6 +366,20 @@ static void fsm_irq(struct vfio_ccw_private *private,
+ 		complete(private->completion);
+ }
  
- 	dev_set_drvdata(&sch->dev, NULL);
- 
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 81377270d4a7..a7ea9358e461 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -654,13 +654,3 @@ struct mdev_driver vfio_ccw_mdev_driver = {
- 	.remove = vfio_ccw_mdev_remove,
- 	.supported_type_groups  = mdev_type_groups,
++static void fsm_open(struct vfio_ccw_private *private,
++		     enum vfio_ccw_event event)
++{
++	struct subchannel *sch = private->sch;
++	int ret;
++
++	spin_lock_irq(sch->lock);
++	sch->isc = VFIO_CCW_ISC;
++	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
++	if (!ret)
++		private->state = VFIO_CCW_STATE_STANDBY;
++	spin_unlock_irq(sch->lock);
++}
++
+ /*
+  * Device statemachine
+  */
+@@ -373,29 +389,34 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+ 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
++		[VFIO_CCW_EVENT_OPEN]		= fsm_open,
+ 	},
+ 	[VFIO_CCW_STATE_STANDBY] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+ 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
+ 	},
+ 	[VFIO_CCW_STATE_IDLE] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
+ 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_request,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_OPEN]		= fsm_notoper,
+ 	},
+ 	[VFIO_CCW_STATE_CP_PROCESSING] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_retry,
+ 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_retry,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_OPEN]		= fsm_notoper,
+ 	},
+ 	[VFIO_CCW_STATE_CP_PENDING] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
+ 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_request,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_OPEN]		= fsm_notoper,
+ 	},
  };
--
--int vfio_ccw_mdev_reg(struct subchannel *sch)
--{
--	return mdev_register_device(&sch->dev, &vfio_ccw_mdev_driver);
--}
--
--void vfio_ccw_mdev_unreg(struct subchannel *sch)
--{
--	mdev_unregister_device(&sch->dev);
--}
 diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index 5c128eec596b..4cfdd5fc0961 100644
+index 4cfdd5fc0961..8dff1699a7d9 100644
 --- a/drivers/s390/cio/vfio_ccw_private.h
 +++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -117,9 +117,6 @@ struct vfio_ccw_private {
- 	struct work_struct	crw_work;
- } __aligned(8);
- 
--extern int vfio_ccw_mdev_reg(struct subchannel *sch);
--extern void vfio_ccw_mdev_unreg(struct subchannel *sch);
--
- extern int vfio_ccw_sch_quiesce(struct subchannel *sch);
- 
- extern struct mdev_driver vfio_ccw_mdev_driver;
+@@ -142,6 +142,7 @@ enum vfio_ccw_event {
+ 	VFIO_CCW_EVENT_IO_REQ,
+ 	VFIO_CCW_EVENT_INTERRUPT,
+ 	VFIO_CCW_EVENT_ASYNC_REQ,
++	VFIO_CCW_EVENT_OPEN,
+ 	/* last element! */
+ 	NR_VFIO_CCW_EVENTS
+ };
 -- 
 2.32.0
 
