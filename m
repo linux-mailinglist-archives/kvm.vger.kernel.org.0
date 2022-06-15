@@ -2,177 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40D9354D091
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 20:00:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE5DB54D0D3
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 20:21:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357890AbiFOSAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 14:00:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44270 "EHLO
+        id S1344237AbiFOSV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 14:21:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349821AbiFOSAx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 14:00:53 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F2F54004
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 11:00:51 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id o17so11054445pla.6
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 11:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=aKVoJG94TlRK1lO5EtxaMQBi2kCbacnBTEUYcvXReYs=;
-        b=FNCP2oYfZ40CEmxTy0qRZfyApcZ+1R96el63F2TOp0qXRzJnR18YS28i4ComAHwniE
-         NzTpAhKsSs6GfhSpMAsAxbNJupjAtzYcPojh6rHDREBCcik6J0UGscpWefqG+eMOycrr
-         aNexRCGLHPIzOHCw8RDDtF/Fgo2OCR6YPINhDQDEeoxo8cbnCZpBaY+kr2yrXknY/y1Z
-         zfx+ItNutvYmKUljGz5VBNfeGRdgaNZ+CJnsAfAr6ZB+wBvlE7tz22gcnBLKKfCg1Vig
-         RWkN5AS2C0LgtERETqvsbgVx5ftTRmODp8vNncg5KxCNG3Nyopz/Rx/p6HlmPiHQzMF9
-         OMBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=aKVoJG94TlRK1lO5EtxaMQBi2kCbacnBTEUYcvXReYs=;
-        b=eMx0wqN8qKBYg4msKkCqUdFog0+L9O+DbSBYt//KxkTv63i//CLNPQBGBaryZpn8bP
-         5fZFI9sW/Pu2wBkQR9RWOVHeasMq0m+RCES0MfW2hn8EY+afhpgo79/0N/MH0o8DBhJw
-         5g4FdglpNX2xNLQhXeemEMR9ddPkbYQhXj68mBpsw2zHeQIYyRYJz+m6U7mC0+w/aRfd
-         njYiF6WUCqnwm32ONtKEU96LTKH9TkhvwrHtSDwNBfiNE50Ir0vSNkE/o50SzDByoFoM
-         fJlm+ejJ3f9vw5O2zDdXG+p8tdbkjiybDfwwWMhaRGhwIzPHybu3Fi0WT6fzKvXhGYNv
-         c9CQ==
-X-Gm-Message-State: AJIora/46bRnBoh1tybDJLyCZ/ThEHYfP1JZo4Sqg3Txm7+M3LXtEkAx
-        y1K2uy6e6pZaju881sirLs65KGkfeIVJYeQB5SB1pg==
-X-Google-Smtp-Source: AGRyM1sMkrDeId7x/50KkjN7iA2jK8X0btO6512sJN4xGHhvO2BWqk0v85/hMP7+RYjUk3yjrmwAVc2SnFWgd5AdlWU=
-X-Received: by 2002:a17:90b:2247:b0:1e8:9f24:269a with SMTP id
- hk7-20020a17090b224700b001e89f24269amr11622697pjb.14.1655316051101; Wed, 15
- Jun 2022 11:00:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220609110337.1238762-1-jaz@semihalf.com> <20220609110337.1238762-2-jaz@semihalf.com>
- <f62ab257-b2e0-3097-e394-93a9e7a0d2bf@intel.com> <CAH76GKPo6VL33tBaZyszL8wvjpzJ7hjOg3o1JddaEnuGbwk=dQ@mail.gmail.com>
- <2854ae00-e965-ab0f-80dd-6012ae36b271@intel.com> <7eb5313e-dea0-c73e-5467-d01f0ca0fc2d@amd.com>
-In-Reply-To: <7eb5313e-dea0-c73e-5467-d01f0ca0fc2d@amd.com>
-From:   Grzegorz Jaszczyk <jaz@semihalf.com>
-Date:   Wed, 15 Jun 2022 20:00:39 +0200
-Message-ID: <CAH76GKO-X-DrR=yAh3NpvAC_Spd_aJ8+yLTATm+c34iPShNttQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86: notify hypervisor about guest entering s2idle state
-To:     Mario Limonciello <mario.limonciello@amd.com>,
-        Dave Hansen <dave.hansen@intel.com>
-Cc:     linux-kernel@vger.kernel.org, Dmytro Maluka <dmy@semihalf.com>,
-        Zide Chen <zide.chen@intel.corp-partner.google.com>,
-        Peter Fang <peter.fang@intel.corp-partner.google.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Sachi King <nakato@nakato.io>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        David Dunn <daviddunn@google.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "open list:ACPI" <linux-acpi@vger.kernel.org>,
-        "open list:HIBERNATION (aka Software Suspend, aka swsusp)" 
-        <linux-pm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S235304AbiFOSVz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 14:21:55 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2048.outbound.protection.outlook.com [40.107.220.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E7E544F6;
+        Wed, 15 Jun 2022 11:21:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F4a9aKKCaDPAQgIKDxp7r4z2i4SXcwSFk/i9IcKIDAQOdhm2QiSvqIiJd7TDiJ0DVUEizxIBDKRga1PX+felJlpKKTc2Imabe4trFKMAdlBiTU6oM7GzfbFPpZIt5GK7Lf1RBKDezHHdfpd6pyYJ0ejWFbDR/ZjMZovlGDJ7t5u5spMfNy7V45v8H8D6pSip7HYiTZud2TLZiJMU7++fcppyGDxPckvYBVKoXz+U5ZYR66a6g6BqlqzXRClscDmPamq8BqACoUWh7UIDjeGZaRqPY1Vr7KhU9RcAnSGVfFyeACO2DyctoEzuDC+Glaj0jeeWA+IGFibk39RAeX8RGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=16NcllNhshOWBZDssPVg8X7a0B1e5cRcq333y2PvZuU=;
+ b=CULarb4W6nekoXyY1e8SYH/KrZSiodegi1kVXUdGHBIgGuhMcJgtJ+8W66T0jjnRHhSvd12OKDtQ0pUHZn1xmUmKQvjbxpBPcih6gDHXg9ZYwRSnRTHRmIxO6aKg+vupL4kuKsHt3IpTdCQ5q4p9Ck9ijwV+WgaKqvayE6wcvxzbxI7vuHbITe0W+nIiWN8c1qOCMs/+2Aq+yxZ6bZxRvHPEJj00Gdo7WK1MxZmxFBWHutbOLiK1iFj2D6CT5XF+ki8cRb+CcsxBc2scbK6x3BpnPgXz8tfo9M0vZhEjltLIyRilxcAEhtj7L1gLRV8pvWP4zCGU7nHxyjSDwqoMww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=16NcllNhshOWBZDssPVg8X7a0B1e5cRcq333y2PvZuU=;
+ b=C+a3CSsWxDwSqBuRaqsQWnUOhCEttfoe4VKmIiKlcH6/qG1HohivS3FaxKnF+hMgA+kTcp7NzSYh/v11a8UUhm/owIHHNmNjmplSBmlYUkyCUh0HiNDRdTWgNsUhKI2ISl56oGn7ObeLpllypn+UBn+bMp8/TlErGwHELjfiBJYkPGH1v1fwt4Oe32xORA49x9C5ipLTVLLvUyyHGERfg2e5bVkrlhI0xTrERrEj17X0sEhBX9OtXMdkQz0e3NIHQ9opDn4Qp2EhDbDU8pjlfUwpBQHSdYOIjGHtlFEcceysmXcSXFl0Hi0aiR/coFREpH2QqEH6WFPiHls3vBxVVQ==
+Received: from DM6PR12MB3500.namprd12.prod.outlook.com (2603:10b6:5:11d::16)
+ by BN8PR12MB3156.namprd12.prod.outlook.com (2603:10b6:408:96::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14; Wed, 15 Jun
+ 2022 18:21:53 +0000
+Received: from DM6PR12MB3500.namprd12.prod.outlook.com
+ ([fe80::d450:aced:134c:78ae]) by DM6PR12MB3500.namprd12.prod.outlook.com
+ ([fe80::d450:aced:134c:78ae%5]) with mapi id 15.20.5332.022; Wed, 15 Jun 2022
+ 18:21:53 +0000
+From:   Kechen Lu <kechenl@nvidia.com>
+To:     Chao Gao <chao.gao@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        Somdutta Roy <somduttar@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [RFC PATCH v3 7/7] KVM: selftests: Add tests for VM and vCPU cap
+ KVM_CAP_X86_DISABLE_EXITS
+Thread-Topic: [RFC PATCH v3 7/7] KVM: selftests: Add tests for VM and vCPU cap
+ KVM_CAP_X86_DISABLE_EXITS
+Thread-Index: AQHYgFW05l6dlnrEPEaeZiMoTvE3oK1Py00AgAD6S2A=
+Date:   Wed, 15 Jun 2022 18:21:53 +0000
+Message-ID: <DM6PR12MB3500F48AD42562C7DB7A3DEACAAD9@DM6PR12MB3500.namprd12.prod.outlook.com>
+References: <20220615011622.136646-1-kechenl@nvidia.com>
+ <20220615011622.136646-8-kechenl@nvidia.com> <20220615031407.GC7808@gao-cwp>
+In-Reply-To: <20220615031407.GC7808@gao-cwp>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8567fef0-5e29-4c58-7dd0-08da4efbec37
+x-ms-traffictypediagnostic: BN8PR12MB3156:EE_
+x-microsoft-antispam-prvs: <BN8PR12MB31562A0C33A274B0961DEF92CAAD9@BN8PR12MB3156.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: q4ZM5ocK0RsjXubeg2z7hLvZLJSbRQY34p9QGPUvgHLSomFFVnJxB7ZzGS50uzIKfzSaMBgI3NlZt4KnxsITW3VphVL7+1uQXbEYTk4jXWZppALIXxqwoR9ZK66c15K+J05/4qV+l26zBh+XxvoLcQnPPRxjM3/r+X02/CPz5n2U6G/5raxEZlaGZVPP7YALQhgKqUFboAJhVOW49s/kgY7l9uS9AOQf6GBDOsnBRlIL/mnOeUy85hJ5ncSqhcDcqi2tlk5IXQlwaokNIGATZ9GzJH8YFiGI/E55wJXvHtZ9qFSjhkLjGbZpT02hzqlrlelo5c/RDNinre6MJaatBOBfxP2AYZM73enQgy5CrfeIZEUiB3Q62UyqORoZQv7Xd92d/AD4G03oDg2vuxGA8gjfZa7TsQ4CM8GWtwfz7VH2g2PxcAO/MDKLKU8SBSPVicmBSajxlr8muRDOvyoTrKDWs+2FY1UlrHpi/dims8ydYQZXzsJV4l9MWw1G6yyS723fQ3YSK94Vzynx13pfZ8FUTLAz+fCgSbsLiskyy21DS2JF2RyxYuYYWRH5b2mfZTX0jFqIbE9AbofZllvLepAgSo27XELv/vc9oY5t4DzBa6ulqQd6ak5qRXn/z91sYmJY47J0a+09rIODniomL88NYHR4LIS7K8NcikFMc7miv55Fa7YRB9dUtcl3kw+6YMcy+geIAlE2SGYlZdObCA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(38100700002)(316002)(55016003)(122000001)(6916009)(54906003)(186003)(38070700005)(83380400001)(52536014)(26005)(5660300002)(8936002)(33656002)(4744005)(64756008)(66446008)(8676002)(76116006)(66476007)(4326008)(66946007)(66556008)(2906002)(508600001)(7696005)(6506007)(53546011)(71200400001)(9686003)(86362001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fLTEybJjv6+dL2qnlVaechPxudw7pX+sVG9xgkKjSMM5UlFtwjLZJhqQ199Q?=
+ =?us-ascii?Q?PWiDklIeApNZ0UG4TUtR6I5iA1/PjR4VpkcgoP4/oabBYgJP2GWNQEFZEsON?=
+ =?us-ascii?Q?A7qZDOtuyGqWyNieymBPEzmwY7k8QqDe+YG7+vzWpy+VEjG9wC1KRzBiyDQn?=
+ =?us-ascii?Q?6YC4uFYTzrP9qpZMFokF12pPfHDqnlbliZ8CKlVLvrFHhS2Go4ICnbmxrjyQ?=
+ =?us-ascii?Q?kx5eF8MQbaZ2D8t4SiHoS8dj4ehQVlXJcxli0DTaY22RZFBBtDHIhvLsUAYD?=
+ =?us-ascii?Q?MJG2pvDR8Utbs3bKivwvygxCGbDKWPwiJH7FNvnT5V1AqG68EkUkKuhCykUp?=
+ =?us-ascii?Q?dbk+s2VeOQYfZVxGy9y/9zQ6vJCx50p08Dv5WsoBTMBmmGYqb1sfBDzHI2nV?=
+ =?us-ascii?Q?xyshLQF/FkO9NNZDegns4bOnEJwJ4HlTGYYOpE/NuuxJX1XWhJpoGkCupgZ/?=
+ =?us-ascii?Q?twcPAHWiUMBtVn0QSAL41PRfl0gfDwo1vIXP4ns1nGHHcEdlmKoQ5bVjGf21?=
+ =?us-ascii?Q?K+LGLz8S624DQlovtCvtlvHJ+N6J/IOc+LnMgauSSbLBCwPgRfXJ3EP1I/QJ?=
+ =?us-ascii?Q?ZEOAwLwAi6X78HSdEvzTuCK+dlST5BqsMM2vllay0Mkz/KYa3JdETcwWpJiQ?=
+ =?us-ascii?Q?APfT4RIUK6ITyMBbX9Cv7zNCzoIMcaMsqcDVgmXRqW+mUF+KTCBbw8LRMueT?=
+ =?us-ascii?Q?Yksc3BUhqYovn+gD/BAnaoUy/WkvxlxEFnb+Dk1686oW4LX7zLshkYf2CZdJ?=
+ =?us-ascii?Q?u6DJAB+10qCv/c/YfxwzU/u6OO5SG0TVG95aED1z1f+Tb9X2S4URZjcf/BtV?=
+ =?us-ascii?Q?X68wvL3qX96umMS8aDF8e9uUHiMw3V5ukGho2BHQi1ZUuLX9NaaG/mvgG0dq?=
+ =?us-ascii?Q?ohBO6izFPTtkNr4yGx62RDtCTfeISSyZTQtBk1ucaZfoEzIUoIWdSYU8yhQ4?=
+ =?us-ascii?Q?T1kgiXyZYq4HPz0i8ljzETxf8cOuplE0wteZYPNYjaAv0aRyXk6xMQZ+fgeu?=
+ =?us-ascii?Q?y0IPBhh1K2ySmmcR1sobjJdJWc+TnOwlJOBb6YUPN+wZWng/np3paMHx2Um0?=
+ =?us-ascii?Q?uoHBsYpGXHMokCj2kBJqBN6kum8JLntCC6UjL0RYV9Vq9qwo/5A6rHlGCDVe?=
+ =?us-ascii?Q?bmsrjgMFILADCFrWUL5Es7Uo2KaNFm6Me4IQNo2IL8OWZqi2asa08WaK4yzX?=
+ =?us-ascii?Q?D//G5UnJS/dhaB1VcGfae+u8bKVf0NA8Ey8+4Iyzl6si0wQsZW+4TQQdUXml?=
+ =?us-ascii?Q?LJ5XrzdnqRRahLNBsQO7bTAiuSCDvXIFB1fruCB2IFDdDtSJWZI/gDLFP8r9?=
+ =?us-ascii?Q?KhtihFlGV+kG1GZiMdFJ1Lco7vmKPyrEAi67I9lX4xqMYpnu/LvQYJ8yEyI6?=
+ =?us-ascii?Q?KoChmkY5woCibCTwzJwpaipRbAclX0+Qsap9JtsqkpltC1WQeRv6Ppbbuumb?=
+ =?us-ascii?Q?BWvhTo9W9PP4BvVLJHfj/wXSRV6fCPhM5vnO6YtEeBLqxHfeyrVca9BuZn12?=
+ =?us-ascii?Q?oiRLr/kfXsICRWnBlZqtVJr2UeGSKrqAi0HopD9HKfPQOl9jyu4W4bjdhQp5?=
+ =?us-ascii?Q?waKjpblY+lbLXcF4cf5I/ZAPduU+T61Lw0q2c0W6CoeXK2s17Mo5GoeiFx/K?=
+ =?us-ascii?Q?Hqfk7hZqDpYZpebn+1oMs49jCOccsDEVH7nPO16FHvTR7tINtuHZPdICfAOc?=
+ =?us-ascii?Q?qWNtvkRJLzXHuEEBCMdHNDWtMHCvKWeJeIgYXw4FLHfGhCptaPFc3lgWzFz4?=
+ =?us-ascii?Q?6sAmYiP1Yg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8567fef0-5e29-4c58-7dd0-08da4efbec37
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2022 18:21:53.2851
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mAb8eqW7q4b99m51iSWdXUm5elOpVDTXJYJq2zcFoIxbaxlBkqSxWEENW90vAugNz1sY9jrycAPebt18LOr3vA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3156
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-pon., 13 cze 2022 o 07:03 Mario Limonciello
-<mario.limonciello@amd.com> napisa=C5=82(a):
->
-> On 6/10/22 07:49, Dave Hansen wrote:
-> > On 6/10/22 04:36, Grzegorz Jaszczyk wrote:
-> >> czw., 9 cze 2022 o 16:27 Dave Hansen <dave.hansen@intel.com> napisa=C5=
-=82(a):
-> >>> On 6/9/22 04:03, Grzegorz Jaszczyk wrote:
-> >>>> Co-developed-by: Peter Fang <peter.fang@intel.corp-partner.google.co=
-m>
-> >>>> Signed-off-by: Peter Fang <peter.fang@intel.corp-partner.google.com>
-> >>>> Co-developed-by: Tomasz Nowicki <tn@semihalf.com>
-> >>>> Signed-off-by: Tomasz Nowicki <tn@semihalf.com>
-> >>>> Signed-off-by: Zide Chen <zide.chen@intel.corp-partner.google.com>
-> >>>> Co-developed-by: Grzegorz Jaszczyk <jaz@semihalf.com>
-> >>>> Signed-off-by: Grzegorz Jaszczyk <jaz@semihalf.com>
-> >>>> ---
-> >>>>   Documentation/virt/kvm/x86/hypercalls.rst | 7 +++++++
-> >>>>   arch/x86/kvm/x86.c                        | 3 +++
-> >>>>   drivers/acpi/x86/s2idle.c                 | 8 ++++++++
-> >>>>   include/linux/suspend.h                   | 1 +
-> >>>>   include/uapi/linux/kvm_para.h             | 1 +
-> >>>>   kernel/power/suspend.c                    | 4 ++++
-> >>>>   6 files changed, 24 insertions(+)
-> >>> What's the deal with these emails?
-> >>>
-> >>>          zide.chen@intel.corp-partner.google.com
-> >>>
-> >>> I see a smattering of those in the git logs, but never for Intel folk=
-s.
-> >> I've kept emails as they were in the original patch and I do not think
-> >> I should change them. This is what Zide and Peter originally used.
-> >
-> > "Original patch"?  Where did you get this from?
->
-> Is this perhaps coming from Chromium Gerrit?  If so, I think you should
-> include a link to the Gerrit code review discussion.
+Hi Chao,
 
-Yes, the original patch comes from chromium gerrit:
-https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/=
-3482475/4
-and after reworking but before sending to the mailing list, I've asked
-all involved guys for ack and it was done internally on gerrit:
-https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/=
-3666997
+> -----Original Message-----
+> From: Chao Gao <chao.gao@intel.com>
+> Sent: Tuesday, June 14, 2022 8:14 PM
+> To: Kechen Lu <kechenl@nvidia.com>
+> Cc: kvm@vger.kernel.org; pbonzini@redhat.com; seanjc@google.com;
+> vkuznets@redhat.com; Somdutta Roy <somduttar@nvidia.com>; linux-
+> kernel@vger.kernel.org
+> Subject: Re: [RFC PATCH v3 7/7] KVM: selftests: Add tests for VM and vCPU
+> cap KVM_CAP_X86_DISABLE_EXITS
+>=20
+> External email: Use caution opening links or attachments
+>=20
+>=20
+> >+/* Set debug control for trapped instruction exiting to userspace */
+> >+static void vcpu_set_debug_exit_userspace(struct kvm_vm *vm, int
+> vcpuid,
+> >+              struct kvm_guest_debug *debug) {
+>=20
+> The debug argument looks pointless. Probably you can remove it.
 
->
-> If it's not a public discussion/patch originally perhaps Suggested-by:
-> might be a better tag to use.
->
-> >
-> >>> I'll also say that I'm a bit suspicious of a patch that includes 5
-> >>> authors for 24 lines of code.  Did it really take five of you to writ=
-e
-> >>> 24 lines of code?
-> >> This patch was built iteratively: original patch comes from Zide and
-> >> Peter, I've squashed it with Tomasz later changes and reworked by
-> >> myself for upstream. I didn't want to take credentials from any of the
-> >> above so ended up with Zide as an author and 3 co-developers. Please
-> >> let me know if that's an issue.
-> >
-> > It just looks awfully fishy.
-> >
-> > If it were me, and I'd put enough work into it to believe I deserved
-> > credit as an *author* (again, of ~13 lines of actual code), I'd probabl=
-y
-> > just zap all the other SoB's and mention them in the changelog.  I'd
-> > also explain where the code came from.
-> >
-> > Your text above wouldn't be horrible context to add to a cover letter.
+Makes sense. Thanks for pointing out. Will remove it.
 
-Actually it may not be an issue for the next version since the
-suggested by Sean approach is quite different so I would most likely
-end up with reduced SoB/Co-dev-by in the next version.
+BR,
+Kechen
 
-Best regards,
-Grzegorz
+>=20
+> >+      memset(debug, 0, sizeof(*debug));
+> >+      debug->control =3D KVM_GUESTDBG_ENABLE |
+> KVM_GUESTDBG_EXIT_USERSPACE;
+> >+      vcpu_set_guest_debug(vm, VCPU_ID_1, debug); }
