@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 981DF54D55A
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:33:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E209F54D549
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:33:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345675AbiFOXaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 19:30:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44070 "EHLO
+        id S1349282AbiFOXaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 19:30:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348823AbiFOXaG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1348918AbiFOXaG (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 15 Jun 2022 19:30:06 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7323B13F0A
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:30:04 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id p143-20020a25d895000000b006648c7235a6so10818856ybg.1
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:30:04 -0700 (PDT)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFC713E3F
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:30:05 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id s17-20020a170902ea1100b00168b7cad0efso7255404plg.14
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:30:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=2UiHUBJdG3kBglVhF7Bs3cpAVQykvhGl3NHfWFs8dP8=;
-        b=mptUci4Eg1Oo63FZN6eH/CwizTI3FQNMj8e8KOZ384D+wv/17t7Uoh+NbZosgXI4AV
-         V9J9jAr7XA8KEkS6adJroq/9CAINEuRf+AE+e0A2JYWGPh219kmrWTFkJjfC1kc7XrM9
-         20VZgskhKA2rWPb/ploCBlevMxDtD2vKyrcXiz1bKdxXnOKlMZRfEz/EpSsbM8PvKsLw
-         hl6JMuyLstw2qU5Ln87X/ayZanRX++Pnrej5tU7xXv4s1uZCzebAb4aua/sNLuhn6n0W
-         cggaSwwXSzqxTCa65sPLVeHVAkpp1PLlendod65rfdyN6CMzklgcU9K59o7LZFK2CXS5
-         zfNA==
+        bh=KOUNeTkbG+akxiwaletV/9PUjLoGLpOO55sty1IBjCM=;
+        b=tjeL88b9rEvjGll2Nm1LVibZkIlFEU7TA2aI1dMhkQA7DUrW5ShO/lN/DhWwhuBq82
+         ao2oe309dQ53GDPOfFnrZ0XAAHZvPbrfoNEmaSnHE8Mh+QZnVTpaq4Mkj1qfllAY6PCa
+         lphDBjea6FpmiPdJoTwri2/9Gl5/VCob11iuOgY3bPDavB2bfkghRvXxYy/1fk52QsOh
+         WZZI/gWur6hCE93f221uO5W2R3QMNprZvQ8ZM+kqakz3oHKPJqEltNKDTuouOIqOnkad
+         yv+bGSiW0wekpo3RDB5cfEgxOGvj5Sxxrzdh541myava6TbrG8KYBXBK9UrYtuyRusGt
+         6uLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=2UiHUBJdG3kBglVhF7Bs3cpAVQykvhGl3NHfWFs8dP8=;
-        b=2LoPfhD2Slvyl8xYh0wFu3nGishMhaORDLRzbES1ycCbdklLMlrvpuh46wXUrDBi+Y
-         Kn8Auo78fSTujSvDBpHJ5btXKiHI4h3g7DBSLX/crpRbjvLHbAnVxity7D4Qxk7TCHeY
-         7SnV14tr7KqrkoCGhmM/arYf3KKs+6W7IYvpnRmEUNpsaCYKvi5jdWKxF5UPMZQOfAtD
-         Jrroj/fmWS5x1gN5Xz7993w8zOKKGgdoHaC92IvC+gmRYVrckmUkac5N5kxpTKrhghvl
-         6JIFDAppa8/j1P8/6QU2bJbOjMNMPUivZpSBYtEynIapb+JO7dFsriAon7xYeul/Ihb3
-         Mw7w==
-X-Gm-Message-State: AJIora+Bm2K+VVr0Zd6TvmH+4RzANV/lN2pN6uQNQf6avYkmtLZb4l11
-        Vw7kZmnK+JN74tG9vEUosFDBbJ8HR1U=
-X-Google-Smtp-Source: AGRyM1toPeRNszifjLjvljD6TsA7B45GwqlIc+EH9cIYBDJZ0ACekfu0UVzwVN48hOb/McfXYgyUqk/2DAs=
+        bh=KOUNeTkbG+akxiwaletV/9PUjLoGLpOO55sty1IBjCM=;
+        b=mx0mIhV4I8TsjtqXMnp6Te+B74NKNUMn19K77VU7rYPOu9KPD3SSmey4Txut0MNAe0
+         94walR4OKqyJi+X4Vk+Tut7i6rAkcK2x/AE/r+sbQLm0yGaj1RG7ucXoTkwMmSUzLmOZ
+         kePZFDrm1AxHkqcvQfHeKnhQiBvXiVclUchQXq3v8J60wK8w1T5KZaSnP9PpMy73SgzC
+         NAC0gjHDWxliQxlpWXqbvsW59nfJeWEyhphb++lLt5QCKBkCeENKRyisaXlYdsIQJ/MD
+         SKKVONU7p3KFPA94qkaGWt0vNzELZnyl6lgULDHeoPmOIKdnC5b+swdKePLwx6E4cWzs
+         A3AA==
+X-Gm-Message-State: AJIora/8LsL+8UQa6uxZ2sTvet1CjyqpQDniLbb/iTJZxPcTvN68rEI5
+        BIqr3bgBge/8yi6Cyro7ZDyTnTglnjU=
+X-Google-Smtp-Source: AGRyM1vl64iN1UU/oVQwypVRxUuSsQHyTOMbEadkYEHsaygaj2+jrs8J9cS1T2K1rsf4DAa0otLXks6iat8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:c7c2:0:b0:310:1042:839e with SMTP id
- j185-20020a0dc7c2000000b003101042839emr2613960ywd.4.1655335803701; Wed, 15
- Jun 2022 16:30:03 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:c407:b0:163:df01:bbbc with SMTP id
+ k7-20020a170902c40700b00163df01bbbcmr1695241plk.4.1655335805048; Wed, 15 Jun
+ 2022 16:30:05 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 15 Jun 2022 23:29:38 +0000
+Date:   Wed, 15 Jun 2022 23:29:39 +0000
 In-Reply-To: <20220615232943.1465490-1-seanjc@google.com>
-Message-Id: <20220615232943.1465490-9-seanjc@google.com>
+Message-Id: <20220615232943.1465490-10-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220615232943.1465490-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [kvm-unit-tests PATCH v4 08/13] x86: efi: Provide percpu storage
+Subject: [kvm-unit-tests PATCH v4 09/13] x86: Move 32-bit => 64-bit transition
+ code to trampolines.S
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -76,89 +77,196 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Varad Gautam <varad.gautam@suse.com>
 
-UEFI tests do not update MSR_GS_BASE during bringup, and continue
-using the GS_BASE set up by the UEFI implementation for percpu
-storage.
+Move the code for transitioning from unpaged 32-bit mode to paged 64-bit
+mode to trampoline.S, it can be shared across EFI and non-EFI builds.
 
-Update this MSR during setup_segments64() to allow storing percpu
-data at a sane location reserved by the testcase, and ensure that
-this happens before any operation that ends up storing to the percpu
-space.
-
-Since apic_ops (touched by reset_apic()) is percpu, move reset_apic()
-to happen after setup_gdt_tss(). With this, ap_init() can now use
-percpu apic_ops via apic_icr_write().
+Leave 5-level paging behind for the time being, EFI doesn't yet support
+support disabling paging, which is required to get from 4-level to
+5-level paging.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+[sean: move to trampolines.S instead of start32.S, reword changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/setup.c |  7 ++++++-
- lib/x86/smp.c   | 14 --------------
- 2 files changed, 6 insertions(+), 15 deletions(-)
+ x86/cstart64.S    | 60 ---------------------------------------
+ x86/trampolines.S | 71 +++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 69 insertions(+), 62 deletions(-)
 
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index 9724465..c7c0983 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -169,6 +169,8 @@ void setup_multiboot(struct mbi_bootinfo *bi)
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 8ac6e9c..0a561ce 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -56,36 +56,12 @@ mb_flags = 0x0
+ 	.long mb_magic, mb_flags, 0 - (mb_magic + mb_flags)
+ mb_cmdline = 16
  
- #ifdef CONFIG_EFI
- 
-+static struct percpu_data __percpu_data[MAX_TEST_CPUS];
-+
- static void setup_segments64(void)
- {
- 	/* Update data segments */
-@@ -178,6 +180,9 @@ static void setup_segments64(void)
- 	write_gs(KERNEL_DS);
- 	write_ss(KERNEL_DS);
- 
-+	/* Setup percpu base */
-+	wrmsr(MSR_GS_BASE, (u64)&__percpu_data[pre_boot_apic_id()]);
-+
- 	/*
- 	 * Update the code segment by putting it on the stack before the return
- 	 * address, then doing a far return: this will use the new code segment
-@@ -337,8 +342,8 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 		return status;
- 	}
- 
--	reset_apic();
- 	setup_gdt_tss();
-+	reset_apic();
- 	setup_idt();
- 	load_idt();
- 	mask_pic_interrupts();
-diff --git a/lib/x86/smp.c b/lib/x86/smp.c
-index 81dacef..2f554ce 100644
---- a/lib/x86/smp.c
-+++ b/lib/x86/smp.c
-@@ -184,25 +184,11 @@ void ap_init(void)
- 
- 	setup_rm_gdt();
- 
--#ifdef CONFIG_EFI
--	/*
--	 * apic_icr_write() is unusable on CONFIG_EFI until percpu area gets set up.
--	 * Use raw writes to APIC_ICR to send IPIs for time being.
--	 */
--	volatile u32 *apic_icr = (volatile u32 *) (APIC_DEFAULT_PHYS_BASE + APIC_ICR);
+-MSR_GS_BASE = 0xc0000101
 -
--	/* INIT */
--	*apic_icr = APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT;
+-.macro setup_percpu_area
+-	lea -4096(%esp), %eax
+-	mov $0, %edx
+-	mov $MSR_GS_BASE, %ecx
+-	wrmsr
+-.endm
 -
--	/* SIPI */
--	*apic_icr = APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP;
--#else
- 	/* INIT */
- 	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
+ .macro load_tss
+ 	movq %rsp, %rdi
+ 	call setup_tss
+ 	ltr %ax
+ .endm
  
- 	/* SIPI */
- 	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP, 0);
--#endif
+-.macro setup_segments
+-	mov $MSR_GS_BASE, %ecx
+-	rdmsr
+-
+-	mov $0x10, %bx
+-	mov %bx, %ds
+-	mov %bx, %es
+-	mov %bx, %fs
+-	mov %bx, %gs
+-	mov %bx, %ss
+-
+-	/* restore MSR_GS_BASE */
+-	wrmsr
+-.endm
+-
+ .globl start
+ start:
+ 	mov %ebx, mb_boot_info
+@@ -118,33 +94,6 @@ switch_to_5level:
+ 	call enter_long_mode
+ 	jmpl $8, $lvl5
  
- 	_cpu_count = fwcfg_get_nb_cpus();
+-prepare_64:
+-	lgdt gdt_descr
+-	setup_segments
+-
+-	xor %eax, %eax
+-	mov %eax, %cr4
+-
+-enter_long_mode:
+-	mov %cr4, %eax
+-	bts $5, %eax  // pae
+-	mov %eax, %cr4
+-
+-	mov pt_root, %eax
+-	mov %eax, %cr3
+-
+-efer = 0xc0000080
+-	mov $efer, %ecx
+-	rdmsr
+-	bts $8, %eax
+-	wrmsr
+-
+-	mov %cr0, %eax
+-	bts $0, %eax
+-	bts $31, %eax
+-	mov %eax, %cr0
+-	ret
+-
+ smp_stacktop:	.long stacktop - 4096
  
+ .align 16
+@@ -155,15 +104,6 @@ gdt32:
+ 	.quad 0x00cf93000000ffff // flat 32-bit data segment
+ gdt32_end:
+ 
+-.code32
+-ap_start32:
+-	setup_segments
+-	mov $-4096, %esp
+-	lock xaddl %esp, smp_stacktop
+-	setup_percpu_area
+-	call prepare_64
+-	ljmpl $8, $ap_start64
+-
+ .code64
+ save_id:
+ 	movl $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
+diff --git a/x86/trampolines.S b/x86/trampolines.S
+index 9640c66..deb5057 100644
+--- a/x86/trampolines.S
++++ b/x86/trampolines.S
+@@ -1,6 +1,9 @@
+-/* Common bootstrapping code to transition from 16-bit to 32-bit code. */
++/*
++ * Common bootstrapping code to transition from 16-bit to 32-bit code, and to
++ * transition from 32-bit to 64-bit code (x86-64 only)
++ */
+ 
+-/* EFI provides it's own SIPI sequence to handle relocation. */
++ /* EFI provides it's own SIPI sequence to handle relocation. */
+ #ifndef CONFIG_EFI
+ .code16
+ .globl rm_trampoline
+@@ -28,3 +31,67 @@ ap_rm_gdt_descr:
+ .globl rm_trampoline_end
+ rm_trampoline_end:
+ #endif
++
++/* The 32-bit => 64-bit trampoline is x86-64 only. */
++#ifdef __x86_64__
++.code32
++
++MSR_GS_BASE = 0xc0000101
++
++.macro setup_percpu_area
++	lea -4096(%esp), %eax
++	mov $0, %edx
++	mov $MSR_GS_BASE, %ecx
++	wrmsr
++.endm
++
++.macro setup_segments
++	mov $MSR_GS_BASE, %ecx
++	rdmsr
++
++	mov $0x10, %bx
++	mov %bx, %ds
++	mov %bx, %es
++	mov %bx, %fs
++	mov %bx, %gs
++	mov %bx, %ss
++
++	/* restore MSR_GS_BASE */
++	wrmsr
++.endm
++
++prepare_64:
++	lgdt gdt_descr
++	setup_segments
++
++	xor %eax, %eax
++	mov %eax, %cr4
++
++enter_long_mode:
++	mov %cr4, %eax
++	bts $5, %eax  // pae
++	mov %eax, %cr4
++
++	mov pt_root, %eax
++	mov %eax, %cr3
++
++efer = 0xc0000080
++	mov $efer, %ecx
++	rdmsr
++	bts $8, %eax
++	wrmsr
++
++	mov %cr0, %eax
++	bts $0, %eax
++	bts $31, %eax
++	mov %eax, %cr0
++	ret
++
++ap_start32:
++	setup_segments
++	mov $-4096, %esp
++	lock xaddl %esp, smp_stacktop
++	setup_percpu_area
++	call prepare_64
++	ljmpl $8, $ap_start64
++#endif
 -- 
 2.36.1.476.g0c4daa206d-goog
 
