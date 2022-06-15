@@ -2,484 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 705E354CB67
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:32:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 592F854CB28
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:22:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242340AbiFOOcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 10:32:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
+        id S244348AbiFOOW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 10:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230160AbiFOOcv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 10:32:51 -0400
-X-Greylist: delayed 981 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 15 Jun 2022 07:32:49 PDT
-Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 307B029366
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:32:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=virtuozzo.com; s=relay; h=Content-Type:Mime-Version:Message-Id:Subject:From
-        :Date; bh=393jYk0BHRsjYGtrYQk+4+L0lb7cpOQc6CKXPRMTyRs=; b=SaiFND/q+HXjfLPZI3Z
-        jgcFvD5EEqlNSB9B/HJdnl0ELU1CKzKTgzAEahQgqpx1Om4lD7Uvs8TOPuVgSAuNZfbLkLJwPJomm
-        ml0PB6BLoNkvak889x3K4ywfU1FgOYAQuuE9IJBiZ+eHxbnkAm1uKRYgT0WmDE73ZqWA3I/bq90=;
-Received: from [192.168.16.39] (helo=mikhalitsyn-laptop)
-        by relay.virtuozzo.com with esmtp (Exim 4.94.2)
-        (envelope-from <alexander.mikhalitsyn@virtuozzo.com>)
-        id 1o1Tng-005JLB-Pk; Wed, 15 Jun 2022 16:15:16 +0200
-Date:   Wed, 15 Jun 2022 17:14:10 +0300
-From:   Alexander Mikhalitsyn <alexander.mikhalitsyn@virtuozzo.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <joro@8bytes.org>, den@virtuozzo.com,
-        ptikhomirov@virtuozzo.com, alexander@mihalicyn.com
-Subject: [Question] debugging VM cpu hotplug (#GP -> #DF) which results in
- reset
-Message-Id: <20220615171410.ab537c7af3691a0d91171a76@virtuozzo.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S238295AbiFOOWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 10:22:24 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2073.outbound.protection.outlook.com [40.107.96.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E98B635A97
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:22:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZDLrXJ6mBLKw4/3k7XLTIoCQemJd678XklFNZQiVAaovn8+aOybnssa5wEJzS3QLORbB3uVxOy1N/B79RoEp2pfbn1kRiIZopVbZpbxxHwJtxR0rW6dHadVpeVKq7r+7b4uGahiQFYkE579p4gjqYz2SFUdKY6+5bxUB3Eat/s9oqyavNztL8nrlfd+W4BRShGY/bhs0qYJ9Lfv7W4EEWA6+TYYj9fjqKQZGws5tZFsfi2rvDonOhSACP6iBZd3Ww0NDK/0t260LZleqPgPuWl9ixpdmZqtiJiAh1X+u+jrsoZw8GOuG7RhptSodgFr1ei4XGHtnwQLSH0X5rzandA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mWHM5T5R0X+ochVnqtqwqT130l8jP32aNSwBtz05v0M=;
+ b=PN5IkH8C0xLieYUXuFPDgUgA6YGGNPnUHzFVuCfdVhRSDW6DtbS4kQpQg4dPJz6O0qs7sXWJ8/l7XGnECmuLeiAVG8Ibk6Yx6ASkYoTtrjDe5Yez7PJGnZj77C8+W3gGvMxp+IVkP2duF+pVMw4uhoBNGnn2ZvloFPndS0zHR95+BzvchtR8RL4dGrFDsjAuDdvidunNVnu2TB9wpJeu8jZ4+wdb6epP+B7k+NXglqc6LBhzJBgtiyuJt6OPXSxHtiFe5AZq8/MnoIoJ5QLb1lDhkZKwS5DGaoP2w9GWzAIAX2oaHn+p5oKbbifTwnJp0xMcz7hXXtk4v9QUsWVJyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.234) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mWHM5T5R0X+ochVnqtqwqT130l8jP32aNSwBtz05v0M=;
+ b=k9nQR3ed9u82378SRb/KXj8X/hbHX4aRGGRWZLtwD/vIqfT+OvXZboI+B9hBw2uWDhBWfWnA7NdUlAh7k3LDCYPGMcECva+/uaff92DFzRIR7UzOD5bcDiWEPFABmEp7Xsfoyz42KNHCFd8OBgpLhQKqWaPad8ZMtXSTrbzx+jHDX2tbX1pb7n8gGdZQjI5xHmjmD3B3Ag8qkxIF4POIGtyG0BX+HgtzENc8o35+woiEQXVGX+mPHfTcb6AprYozTS034+fdnEWqu7PG4/8jBnDSXl2fSWy9UNgxDMdHmzyKNCU+cCq/lxVJ5S0d/o/1F4q6MPGkHGVEY/Lw8HH6wQ==
+Received: from DM6PR03CA0023.namprd03.prod.outlook.com (2603:10b6:5:40::36) by
+ SJ0PR12MB5634.namprd12.prod.outlook.com (2603:10b6:a03:429::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5332.20; Wed, 15 Jun 2022 14:22:22 +0000
+Received: from DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:40:cafe::2c) by DM6PR03CA0023.outlook.office365.com
+ (2603:10b6:5:40::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.15 via Frontend
+ Transport; Wed, 15 Jun 2022 14:22:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.234) by
+ DM6NAM11FT006.mail.protection.outlook.com (10.13.173.104) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5332.12 via Frontend Transport; Wed, 15 Jun 2022 14:22:22 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL101.nvidia.com
+ (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Wed, 15 Jun
+ 2022 14:22:16 +0000
+Received: from [172.27.13.119] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Wed, 15 Jun
+ 2022 07:22:13 -0700
+Message-ID: <572592c1-ff69-fba0-9cda-15d5c584a742@nvidia.com>
+Date:   Wed, 15 Jun 2022 17:22:11 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: Bug report: vfio over kernel 5.19 - mm area
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     <akpm@linux-foundation.org>, jason Gunthorpe <jgg@nvidia.com>,
+        "maor Gottlieb" <maorg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, <idok@nvidia.com>,
+        <linux-mm@kvack.org>
+References: <a99ed393-3b17-887f-a1f8-a288da9108a0@nvidia.com>
+ <3391f2e5-149a-7825-f89e-8bde3c6d555d@nvidia.com>
+ <20220615080228.7a5e7552.alex.williamson@redhat.com>
+ <00724e48-b6db-4b80-8b53-dbf2b2ca4017@intel.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <00724e48-b6db-4b80-8b53-dbf2b2ca4017@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4580aa88-29b5-4798-2e8a-08da4eda7668
+X-MS-TrafficTypeDiagnostic: SJ0PR12MB5634:EE_
+X-Microsoft-Antispam-PRVS: <SJ0PR12MB5634D4359FD9138A05602CDAC3AD9@SJ0PR12MB5634.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QvkNQitpQqOKoTzbKv3jYXVyyQkRR0o5WzQeWe0morDyS+uvjmUo/vGOi1cW50ZoGP5UdMv4lYdCeIx7bRi6OS1FziZcrzfm7DG0XQSj6lF0AdZ9JpaZPfLyEfHMsjqxMv8rLVFuvtFGsb3saw80UVlP+z+3VKTfIKtC41muDbGzkVDbjYniuraASPUFnnq7MLiyfUVQRd5BYdAhOTfnWhg6/biMBTiZ26vXlqhXU19rSiaSjrXqpV9RKnm31amP8uh+lwOEiKDAkiGsY9ZSswoPGIkr7m5BsId+jY6eSclw8Jzu2c3AltTfjL23yqYergGez0/ItXJt8b8IR7oZp3lcP/MNB3+il9WIHkO+h7nfBO62Vy1T0kT57qqo3GdYi+5WBKHgEuhdt6M/Ktq2X/OsZ/MBDlBcJRq3zxWSN+sIluo+4UFPCYuqCcI8ugT1eNfN8RhR3ovb3nqQLIkB4ybth8IU7DtOulGyZb4z4kvap9CS52D29buKUs2xLX/YvIQcp1LSCvHcByB3hNbp2RANYaMo0prqT1NChUJmLbwXm+raELpyRZu7Q9ItRzttNrxt6vq5+XvtalfvHIUGH91rgufQ1SXNAzTPkjcuzsMS/zwg/O/Lx4qe1XBAWukOWKVBPTuiwSJQYjbYRMVo5vRospz0nECt4sGsgma2bYordlHef5sqP74q7mpC3/gbOQp/fFv1ch9O5LPx3ZzpFyHUCZFJnzqooNREg4Ba+ovIOUleWpHMPj236MaL6yTdfLsICcUJpc+uIKt6gdhQq7JE2N6BbfOVBgs2Vkv8IywpYx2+wB0cYcTjyPrdHGR6ewebq3zyIcgW7WFB3zWomg==
+X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(36840700001)(46966006)(40470700004)(47076005)(81166007)(426003)(40460700003)(36860700001)(110136005)(336012)(70586007)(82310400005)(186003)(356005)(31686004)(83380400001)(16526019)(8936002)(16576012)(5660300002)(54906003)(966005)(4326008)(8676002)(86362001)(53546011)(2616005)(31696002)(70206006)(36756003)(316002)(508600001)(26005)(2906002)(36900700001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2022 14:22:22.1472
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4580aa88-29b5-4798-2e8a-08da4eda7668
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5634
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear friends,
-
-I'm sorry for disturbing you but I've getting stuck with debugging KVM problem and looking for an advice. I'm working mostly on kernel containers/CRIU and am newbie with KVM so, I believe that I'm missing something very simple.
-
-My case:
-- AMD EPYC 7443P 24-Core Processor (Milan family processor)
-- OpenVZ kernel (based on RHEL7 3.10.0-1160.53.1) on the Host Node (HN)
-- Qemu/KVM VM (8 vCPU assigned) with many different kernels from 3.10.0-1160 RHEL7 to mainline 5.18
-
-Reproducer (run inside VM):
-echo 0 > /sys/devices/system/cpu/cpu3/online
-echo 1 > /sys/devices/system/cpu/cpu3/online <- got reset here
-
-*Not* reproducible on:
-- any Intel which we tried
-- AMD EPYC 7261 (Rome family)
-- without KVM (on Host)
-
-Issue is not reproducible on the Host. But it's reproducible in L2 (with /sys/module/kvm_amd/parameters/nested = 1, of course).
-
-I know that RHEL7 is not supports AMD Milan but OpenVZ have some limited support backported from fresh kernels.
-
-What was done to debug it:
-1. of course, kexec/crashkernel is useless here, because VM just resets without producing
-a panic().
-
-2. qemu-kvm cmdline option -d int,unimp,guest_errors,cpu_reset
-shows me that the CPU which was offlined/onlined is in 32-bit mode (!) just before reset (thanks to cpu_reset option)
-
-*I'll put qemu log at the end of email*
-
-3. I've used qemu gdb server and step by step debugging with hope that I find the particular instruction which triggers reset. I always came into smpboot.c/do_boot_cpu() function and reset comes somewhere in between of:
-	if (!boot_error) {
-...
-		while (time_before(jiffies, timeout)) {
-			if (cpumask_test_cpu(cpu, cpu_initialized_mask)) {
-				/*
-				 * Tell AP to proceed with initialization
-				 */
-				cpumask_set_cpu(cpu, cpu_callout_mask);
-				boot_error = 0;
-				break;
-			}
-			schedule();
-		}
-	}
-
-	if (!boot_error) {
-		/*
-		 * Wait till AP completes initial initialization
-		 */
-		while (!cpumask_test_cpu(cpu, cpu_callin_mask)) {
-			/*
-			 * Allow other tasks to run while we wait for the
-			 * AP to come online. This also gives a chance
-			 * for the MTRR work(triggered by the AP coming online)
-			 * to be completed in the stop machine context.
-			 */
-			schedule();
-		}
-	}
-
-But I can't manage to catch a particular instruction.
-* gdb session logs at the end *
-
-My suspicious is that problem happens in the middle on schedule() call because processor wasn't fully initialized during onlining for some reason. schedule() does a lot of tricky activity like rcu-related things and so on. I can't figure out the where to pay attention.
-
-4. perf. I've set probes in most interesting places in the kernel where tripple/double faults are handled kvm_multiple_exception, handle_emulation_failure, shutdown_interception, vcpu_enter_guest functions. And got *log at the end*.
-
-If I'm correct, #GP happens, then #DF and then reset. But I've no idea how to catch origin problem of #GP. And why fault occurs during #GP processing?..
-
-5. building with CFLAGS_smpboot.o  :=  -DDEBUG
-
-[    5.529631] device virbr0-nic left promiscuous mode
-[    5.529661] virbr0: port 1(virbr0-nic) entered disabled state
-[    8.395604] input: spice vdagent tablet as /devices/virtual/input/input6
-[   46.687483] smpboot: CPU 3 is now offline
---Type <RET> for more, q to quit, c to continue without paging--
-[  186.136060] smpboot: ++++++++++++++++++++=_---CPU UP  3
-[  186.136180] smpboot: Booting Node 0 Processor 3 APIC 0x3
-[  186.136180] smpboot: Setting warm reset code and vector.
-[  186.150339] smpboot: Asserting INIT
-[  186.150352] smpboot: Waiting for send to finish...
-[  186.150352] smpboot: Deasserting INIT
-[  186.150360] smpboot: Waiting for send to finish...
-[  186.150361] smpboot: #startup loops: 2
-[  186.150361] smpboot: Sending STARTUP #1
-[  186.150387] smpboot: After apic_write
-[  186.150420] smpboot: Startup point 1
-[  186.150422] smpboot: Waiting for send to finish...
-[  186.150451] smpboot: Sending STARTUP #2
-[  186.150469] smpboot: After apic_write
-[  186.150490] smpboot: Startup point 1
-[  186.150490] smpboot: Waiting for send to finish...
-[  186.150514] smpboot: After Startup
-
-*reset occured*
-
-Finally, I'm looking for advices about approaches to debug Double faults/Tripple faults and fresh look on this bug.
-
-Thanks for your attention to my email. I'll be happy about any advice/point.
-
-Regards,
-Alexander Mikhalitsyn
-
-===== Logs =====
-
-====== qemu-kvm -d int,unimp,guest_errors,cpu_reset =======
-
-CPU Reset (CPU 0)
-RAX=ffffffff81bb1480 RBX=0000000000000000 RCX=7fffffef89980f7f RDX=00000000000b99d6
-RSI=0000000000000000 RDI=ffff88807fc1d680 RBP=0000000000000000 RSP=ffffffff82603e80
-R8 =000000000000cf59 R9 =ffff888004913000 R10=0000000000000014 R11=0000000000000003
-R12=ffffffffffffffff R13=0000000000000000 R14=0000000000000000 R15=ffffffff82614840
-RIP=ffffffff81bb15ce RFL=00000206 [-----P-] CPL=0 II=0 A20=1 SMM=0 HLT=1
-ES =0000 0000000000000000 00000000 00000000
-CS =0010 0000000000000000 ffffffff 00a09b00 DPL=0 CS64 [-RA]
-SS =0018 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-DS =0000 0000000000000000 00000000 00000000
-FS =0000 0000000000000000 00000000 00000000
-GS =0000 ffff88807fc00000 00000000 00000000
-LDT=0000 0000000000000000 00000000 00000000
-TR =0040 fffffe0000003000 0000206f 00008b00 DPL=0 TSS64-busy
-GDT=     fffffe0000001000 0000007f
-IDT=     fffffe0000000000 00000fff
-CR0=80050033 CR2=000055b078794670 CR3=000000000260c003 CR4=00370ef0
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000 
-DR6=00000000ffff0ff0 DR7=0000000000000400
-CCS=0000000000000000 CCD=0000000000000000 CCO=DYNAMIC 
-EFER=0000000000000d01
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001fa0
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=c000000000000000 4000
-FPR6=c000000000000000 4000 FPR7=e000000000000000 4001
-XMM00=00007f2b4660666000007f2b5330a000 XMM01=00007f2b4662ed1800007f2b5330a000
-XMM02=000000ff00000000ff000000ff0000ff XMM03=00007f2b476c5c5000007f2b4663ae88
-XMM04=00007f2b4662e88000007f2b538e9ed8 XMM05=00007f2b4662e22800007f2b50c69688
-XMM06=00007f2b50c6968800007f2b50c69688 XMM07=00007f2b50c6968800007f2b50c69688
-XMM08=4f4f7c006672657000697c69004f4f00 XMM09=00000000000000000000000000000000
-XMM10=000000000000000000007f2b5332b9d0 XMM11=00000000000000000000000000000000
-XMM12=ffffffffffffffffffffffffffffffff XMM13=00000000000000030000000000000000
-XMM14=00007f2b4844d85000007f2b47ee9b10 XMM15=00000004000000040000000400000004
-CPU Reset (CPU 1)
-RAX=ffffffff81bb1480 RBX=0000000000000001 RCX=ffff8880049fcd58 RDX=00000000000b157a
-RSI=0000000000000000 RDI=00000010767732c0 RBP=0000000000000001 RSP=ffffc9000038fea0
-R8 =fffffffffff18c64 R9 =0000000000000001 R10=0000000000000033 R11=0000000000000000
-R12=ffffffffffffffff R13=0000000000000000 R14=0000000000000000 R15=ffff888004910000
-RIP=ffffffff81bb15ce RFL=00000202 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=1
-ES =0000 0000000000000000 00000000 00000000
-CS =0010 0000000000000000 ffffffff 00a09b00 DPL=0 CS64 [-RA]
-SS =0018 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-DS =0000 0000000000000000 00000000 00000000
-FS =0000 0000000000000000 00000000 00000000
-GS =0000 ffff88807fc80000 00000000 00000000
-LDT=0000 0000000000000000 00000000 00000000
-TR =0040 fffffe0000036000 0000206f 00008b00 DPL=0 TSS64-busy
-GDT=     fffffe0000034000 0000007f
-IDT=     fffffe0000000000 00000fff
-CR0=80050033 CR2=000055b07875dc18 CR3=000000000260c005 CR4=00370ee0
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000 
-DR6=00000000ffff0ff0 DR7=0000000000000400
-CCS=0000000000000000 CCD=0000000000000000 CCO=DYNAMIC 
-EFER=0000000000000d01
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-XMM00=00000000000000000000000000000000 XMM01=00007fff7180e6600000003000000010
-XMM02=ff00000000000000000000000000ff00 XMM03=79732f6563696c732e6d65747379732f
-XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
-XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
-XMM08=0074736f507472617453636578450065 XMM09=00000000000000000000000000000000
-XMM10=20202000002020202020202020202020 XMM11=00000000000000000000000000000000
-XMM12=00000000000000000000000000000000 XMM13=00000000000000000000000000000000
-XMM14=00000000000000000000000000000000 XMM15=00000000000000000000000000000000
-CPU Reset (CPU 2)
-RAX=0000000000000001 RBX=ffff88807fd2a080 RCX=dead000000000200 RDX=0000000000000000
-RSI=ffff88807fd2aab8 RDI=ffff88807fd2a080 RBP=ffffc90000acbc98 RSP=ffffc90000acbc38
-R8 =ffff88807fd2aab8 R9 =0000000000000004 R10=0000000000000000 R11=0000000000000001
-R12=ffff888044d817c0 R13=ffff888044d817c0 R14=0000000000000000 R15=ffffffff82033800
-RIP=ffffffff811c463c RFL=00000046 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0000 0000000000000000 00000000 00000000
-CS =0010 0000000000000000 ffffffff 00a09b00 DPL=0 CS64 [-RA]
-SS =0018 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-DS =0000 0000000000000000 00000000 00000000
-FS =0000 00007f3bb670a740 00000000 00000000
-GS =0000 ffff88807fd00000 00000000 00000000
-LDT=0000 0000000000000000 00000000 00000000
-TR =0040 fffffe0000069000 0000206f 00008b00 DPL=0 TSS64-busy
-GDT=     fffffe0000067000 0000007f
-IDT=     fffffe0000000000 00000fff
-CR0=80050033 CR2=000055a6d6c955c8 CR3=00000000092a2005 CR4=00370ee0
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000 
-DR6=00000000ffff0ff0 DR7=0000000000000400
-CCS=0000000000000000 CCD=0000000000000000 CCO=DYNAMIC 
-EFER=0000000000000d01
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=8000000000000000 3fff
-FPR6=8000000000000000 3fff FPR7=c000000000000000 4000
-XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
-XMM02=00000001007501090000680100670108 XMM03=0000000400750105000000360000001b
-XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
-XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
-XMM08=302e373231007373657264646120676e XMM09=00000000000000000000000000000000
-XMM10=20002020000000000000000000000000 XMM11=00000000000000000000000000000000
-XMM12=00000000000000000000000000000000 XMM13=00000000000000000000000000000000
-XMM14=00000000000000000000000000000000 XMM15=00000000000000000000000000000000
-CPU Reset (CPU 3)
-EAX=00000001 EBX=03000800 ECX=fffa3203 EDX=06000018
-ESI=00000000 EDI=00000001 EBP=00000000 ESP=00005020
-EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0000 00000000 0000ffff 00009300
-CS =f000 ffff0000 0000ffff 00009a00
-SS =0000 00000000 0000ffff 00009200
-DS =0000 00000000 0000ffff 00009300
-FS =0000 00000000 0000ffff 00009300
-GS =0000 00000000 0000ffff 00009300
-LDT=0000 00000000 0000ffff 00008200
-TR =0000 00000000 0000ffff 00008300
-GDT=     00000000 0000ffff
-IDT=     00000000 0000ffff
-CR0=60000010 CR2=00000000 CR3=0260c004 CR4=00370ee0
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000 
-DR6=00000000ffff0ff0 DR7=0000000000000400
-CCS=00000000 CCD=00000000 CCO=DYNAMIC 
-EFER=0000000000000000
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001fa0
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=c000000000000000 4000
-FPR6=c000000000000000 4000 FPR7=e000000000000000 4001
-XMM00=00000000000000000000000000000000 XMM01=0356e899f600f6798ce31f5fdc51809a
-XMM02=4121079c00270412e4aa20f6253322c0 XMM03=00000000000000000000000000000000
-XMM04=00000000000000000000000000000000 XMM05=00000000000000006fecd5e21a37c78d
-XMM06=0569fa2fe5158326a00bd0180a1318c6 XMM07=95af9ce2f991ed48a5622a37ef069be0
-
-==== trace-cmd record -b 20000 -e kvm:kvm_cr -e kvm:kvm_userspace_exit -e probe:* =====
-
-             CPU-1834  [003] 69194.833364: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
-             CPU-1838  [000] 69194.834177: kvm_multiple_exception_L9: (ffffffff814313c6) vcpu=0xffff93ee9a528000
-             CPU-1838  [000] 69194.834180: kvm_multiple_exception_L41: (ffffffff81431493) vcpu=0xffff93ee9a528000 exception=0xd000001 has_error=0x0 nr=0xd error_code=0x0 has_payload=0x0
-             CPU-1838  [000] 69194.834195: kvm_multiple_exception_L9: (ffffffff814313c6) vcpu=0xffff93ee9a528000
-             CPU-1838  [000] 69194.834196: kvm_multiple_exception_L41: (ffffffff81431493) vcpu=0xffff93ee9a528000 exception=0x8000100 has_error=0x0 nr=0x8 error_code=0x0 has_payload=0x0
-             CPU-1838  [000] 69194.834200: shutdown_interception_L8: (ffffffff8146e4a0)
-             CPU-1838  [000] 69194.834207: kvm_userspace_exit:   reason KVM_EXIT_SHUTDOWN (8)
-             CPU-1834  [003] 69194.836313: kvm_userspace_exit:   reason KVM_EXIT_INTR (10)
-             CPU-1836  [006] 69194.836352: kvm_userspace_exit:   reason KVM_EXIT_INTR (10)
-             CPU-1837  [005] 69194.836513: kvm_userspace_exit:   reason KVM_EXIT_INTR (10)
-             CPU-1836  [007] 69194.930872: kvm_userspace_exit:   reason KVM_EXIT_INTR (10)
-             CPU-1838  [000] 69194.930915: kvm_userspace_exit:   reason KVM_EXIT_SHUTDOWN (8)
+On 15/06/2022 17:14, Yi Liu wrote:
+> Hi Alex,
+>
+> On 2022/6/15 22:02, Alex Williamson wrote:
+>> On Wed, 15 Jun 2022 13:52:10 +0300
+>> Yishai Hadas <yishaih@nvidia.com> wrote:
+>>
+>>> Adding some extra relevant people from the MM area.
+>>>
+>>> On 15/06/2022 13:43, Yishai Hadas wrote:
+>>>> Hi All,
+>>>>
+>>>> Any idea what could cause the below break in 5.19 ? we run QEMU and
+>>>> immediately the machine is stuck.
+>>>>
+>>>> Once I run, echo l > /proc/sysrq-trigger could see the below task
+>>>> which seems to be stuck..
+>>>>
+>>>> This basic flow worked fine in 5.18.
+>>
+>> Spent Friday bisecting this and posted this fix:
+>>
+>> https://lore.kernel.org/all/165490039431.944052.12458624139225785964.stgit@omen/ 
+>>
+>>
+>> I expect you're hotting the same.  Thanks,
+>
+> I also hit a hang at calling pin_user_pages_remote() in the
+> vaddr_get_pfns(). With the fix in the link, the issue got fixed.
+> You may add my test-by to your fix. :-)
 
 
-======= gdb session ========
+Thanks Alex, it seems to be the same issue, with your fix I don't hit 
+the problem.
 
-[root@localhost linux-4.18.0-348.el8.x86_64]# gdb vmlinux 
-...
-(gdb) lx-symbols 
-loading vmlinux
-(gdb) target remote :1234
-Remote debugging using :1234
-0xffffffff81bb15ce in native_safe_halt () at ./arch/x86/include/asm/irqflags.h:57
-57		asm volatile("sti; hlt": : :"memory");
-(gdb) break do_boot_cpu
-Breakpoint 1 at 0xffffffff810d2ef0: file arch/x86/kernel/smpboot.c, line 1049.
-(gdb) break arch/x86/kernel/smpboot.c:1067
-Breakpoint 2 at 0xffffffff810d3020: file arch/x86/kernel/smpboot.c, line 1074.
-(gdb) c
-Continuing.
-[Switching to Thread 1.2]
 
-Thread 2 hit Breakpoint 1, do_boot_cpu (apicid=apicid@entry=3, cpu=cpu@entry=3, idle=idle@entry=0xffff888004938000, cpu0_nmi_registered=cpu0_nmi_registered@entry=0xffffc90000d77d0c)
-    at arch/x86/kernel/smpboot.c:1049
-1049	{
-(gdb) s
-1050		volatile u32 *trampoline_status =
-(gdb) s
-1058		idle->thread.sp = (unsigned long)task_pt_regs(idle);
-(gdb) s
-1059		early_gdt_descr.address = (unsigned long)get_cpu_gdt_rw(cpu);
-(gdb) s
-get_cpu_gdt_rw (cpu=<optimized out>) at ./arch/x86/include/asm/desc.h:57
-57		return per_cpu(gdt_page, cpu).gdt;
-(gdb) s
-do_boot_cpu (apicid=apicid@entry=3, cpu=cpu@entry=3, idle=idle@entry=0xffff888004938000, cpu0_nmi_registered=cpu0_nmi_registered@entry=0xffffc90000d77d0c) at arch/x86/kernel/smpboot.c:1064
-1064		init_espfix_ap(cpu);
-(gdb) si
-init_espfix_ap (cpu=cpu@entry=3) at arch/x86/kernel/espfix_64.c:140
-140	{
-(gdb) si
-151		if (likely(per_cpu(espfix_stack, cpu)))
-..
-(gdb) si
-933		if (system_state < SYSTEM_RUNNING) {
-(gdb) si
-0xffffffff810d2fd1	933		if (system_state < SYSTEM_RUNNING) {
-(gdb) si
-950			pr_info("Booting Node %d Processor %d APIC 0x%x\n",
-(gdb) si
-0xffffffff810d3d23	950			pr_info("Booting Node %d Processor %d APIC 0x%x\n",
-..
-(gdb) si
-0xffffffff810d3022	1074		if (x86_platform.legacy.warm_reset) {
-(gdb) si
-arch_static_branch (branch=false, key=0xffffffff8285ce68 <descriptor+40>) at ./arch/x86/include/asm/jump_label.h:38
-38		asm_volatile_goto("1:"
-(gdb) si
-smpboot_setup_warm_reset_vector (start_eip=630784) at ./include/linux/spinlock.h:329
-329		return &lock->rlock;
-(gdb) si
-0xffffffff810d3034	329		return &lock->rlock;
-(gdb) si
-0xffffffff810d3038	329		return &lock->rlock;
-(gdb) si
-_raw_spin_lock_irqsave (lock=0xffffffff82fdc7a0 <rtc_lock>) at kernel/locking/spinlock.c:158
-158	{
-..
-(gdb) si
-0xffffffff810d306f in smpboot_setup_warm_reset_vector (start_eip=630784) at ./arch/x86/include/asm/io.h:150
-150		return __va(address);
-..
-(gdb) si
-apic_read (reg=640) at ./arch/x86/include/asm/apic.h:398
-398		return apic->read(reg);
-(gdb) n
-do_boot_cpu (apicid=apicid@entry=3, cpu=cpu@entry=3, idle=idle@entry=0xffff888004938000, cpu0_nmi_registered=cpu0_nmi_registered@entry=0xffffc90000d77d0c) at arch/x86/kernel/smpboot.c:1094
-1094		cpumask_clear_cpu(cpu, cpu_initialized_mask);
-(gdb) si
-clear_bit (addr=<optimized out>, nr=3) at ./arch/x86/include/asm/bitops.h:118
-118			asm volatile(LOCK_PREFIX __ASM_SIZE(btr) " %1,%0"
-(gdb) si
-do_boot_cpu (apicid=apicid@entry=3, cpu=cpu@entry=3, idle=idle@entry=0xffff888004938000, cpu0_nmi_registered=cpu0_nmi_registered@entry=0xffffc90000d77d0c) at arch/x86/kernel/smpboot.c:1095
-1095		smp_mb();
-(gdb) si
-1103		if (apic->wakeup_secondary_cpu)
-(gdb) si
-0xffffffff810d30ce	1103		if (apic->wakeup_secondary_cpu)
-(gdb) si
-0xffffffff810d30d5	1103		if (apic->wakeup_secondary_cpu)
-(gdb) si
-0xffffffff810d30d8	1103		if (apic->wakeup_secondary_cpu)
-(gdb) si
-wakeup_cpu_via_init_nmi (cpu0_nmi_registered=0xffffc90000d77d0c, apicid=3, start_ip=630784, cpu=3) at arch/x86/kernel/smpboot.c:1106
-1106			boot_error = wakeup_cpu_via_init_nmi(cpu, start_ip, apicid,
-..
-(gdb) n
-wakeup_secondary_cpu_via_init (start_eip=630784, phys_apicid=3) at arch/x86/kernel/smpboot.c:817
-817			apic_read(APIC_ESR);
-(gdb) n
-820		pr_debug("Asserting INIT\n");
-(gdb) n
-828		apic_icr_write(APIC_INT_LEVELTRIG | APIC_INT_ASSERT | APIC_DM_INIT,
-(gdb) n
-831		pr_debug("Waiting for send to finish...\n");
-(gdb) n
-832		send_status = safe_apic_wait_icr_idle();
-(gdb) si
-0xffffffff810d32e6 in safe_apic_wait_icr_idle () at ./arch/x86/include/asm/apic.h:428
-428		return apic->safe_wait_icr_idle();
-(gdb) n
-wakeup_secondary_cpu_via_init (start_eip=630784, phys_apicid=3) at arch/x86/kernel/smpboot.c:834
-834		udelay(init_udelay);
-(gdb) si
-0xffffffff810d32f5	834		udelay(init_udelay);
-(gdb) si
-__udelay (usecs=0) at arch/x86/lib/delay.c:222
-222	{
-(gdb) si
-__const_udelay (xloops=0) at arch/x86/lib/delay.c:223
-223		__const_udelay(usecs * 0x000010c7); /* 2**32 / 1000000 (rounded up) */
-(gdb) n
-209		unsigned long lpj = this_cpu_read(cpu_info.loops_per_jiffy) ? : loops_per_jiffy;
-(gdb) n
-212		xloops *= 4;
-(gdb) n
-213		asm("mull %%edx"
-(gdb) n
-217		__delay(++xloops);
-(gdb) n
-delay_tsc (cycles=1) at arch/x86/lib/delay.c:64
-64	{
-(gdb) n
-69		cpu = smp_processor_id();
-(gdb) n
-70		bclock = rdtsc_ordered();
-(gdb) n
-72			now = rdtsc_ordered();
-(gdb) n
-73			if ((now - bclock) >= cycles)
-(gdb) n
-96		preempt_enable();
-(gdb) n
-wakeup_secondary_cpu_via_init (start_eip=630784, phys_apicid=3) at arch/x86/kernel/smpboot.c:836
-836		pr_debug("Deasserting INIT\n");
-(gdb) n
-840		apic_icr_write(APIC_INT_LEVELTRIG | APIC_DM_INIT, phys_apicid);
-(gdb) n
-842		pr_debug("Waiting for send to finish...\n");
-(gdb) n
-843		send_status = safe_apic_wait_icr_idle();
-(gdb) n
-845		mb();
-(gdb) n
-861		pr_debug("#startup loops: %d\n", num_starts);
-(gdb) n
-...
-(gdb) n
-904			if (send_status || accept_status)
-(gdb) n
-863		for (j = 1; j <= num_starts; j++) {
-(gdb) n
-864			pr_debug("Sending STARTUP #%d\n", j);
-(gdb) n
-865			if (maxlvt > 3)		/* Due to the Pentium erratum 3AP.  */
-(gdb) n
-...
-(gdb) si
-1114			timeout = jiffies + 10*HZ;
-(gdb) n
-1115			while (time_before(jiffies, timeout)) {
-(gdb) n
-1116				if (cpumask_test_cpu(cpu, cpu_initialized_mask)) {
-(gdb) n
-341		return oldbit;
-(gdb) n
-1124				schedule();
-(gdb) si
-schedule () at kernel/sched/core.c:3932
-3932	{
-...
+>
+>> Alex
+>>
+>>>>
+>>>> [1162.056583] NMI backtrace for cpu 4
+>>>> [ 1162.056585] CPU: 4 PID: 1979 Comm: qemu-system-x86 Not tainted
+>>>> 5.19.0-rc1 #747
+>>>> [ 1162.056587] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
+>>>> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+>>>> [ 1162.056588] RIP: 0010:pmd_huge+0x0/0x20
+>>>> [ 1162.056592] Code: 49 89 44 24 28 48 8b 47 30 49 89 44 24 30 31 c0
+>>>> 41 5c c3 5b b8 01 00 00 00 5d 41 5c c3 cc cc cc cc cc cc cc cc cc cc
+>>>> cc cc cc <0f> 1f 44 00 00 31 c0 48 f7 c7 9f ff ff ff 74 0f 81 e7 81 00
+>>>> 00 00
+>>>> [ 1162.056594] RSP: 0018:ffff888146253b38 EFLAGS: 00000202
+>>>> [ 1162.056596] RAX: ffff888101461980 RBX: ffff888146253bc0 RCX:
+>>>> 000ffffffffff000
+>>>> [ 1162.056597] RDX: ffff88814fa22000 RSI: 00007f9f68231000 RDI:
+>>>> 000000010a6b6067
+>>>> [ 1162.056598] RBP: ffff888111b90dc0 R08: 000000000002f424 R09:
+>>>> 0000000000000001
+>>>> [ 1162.056599] R10: ffffffff825c2a40 R11: 0000000000000a08 R12:
+>>>> ffff88814fa22a08
+>>>> [ 1162.056600] R13: 000000010a6b6067 R14: 0000000000052202 R15:
+>>>> 00007f9f68231000
+>>>> [ 1162.056602] FS:  00007f9f6c228c40(0000) GS:ffff88885f900000(0000)
+>>>> knlGS:0000000000000000
+>>>> [ 1162.056605] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [ 1162.056606] CR2: 00005643994fd0ed CR3: 00000001496da005 CR4:
+>>>> 0000000000372ea0
+>>>> [ 1162.056607] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
+>>>> 0000000000000000
+>>>> [ 1162.056609] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
+>>>> 0000000000000400
+>>>> [ 1162.056610] Call Trace:
+>>>> [ 1162.056611]  <TASK>
+>>>> [ 1162.056611]  follow_page_mask+0x196/0x5e0
+>>>> [ 1162.056615]  __get_user_pages+0x190/0x5d0
+>>>> [ 1162.056617]  ? flush_workqueue_prep_pwqs+0x110/0x110
+>>>> [ 1162.056620]  __gup_longterm_locked+0xaf/0x470
+>>>> [ 1162.056624]  vaddr_get_pfns+0x8e/0x240 [vfio_iommu_type1]
+>>>> [ 1162.056628]  ? qi_flush_iotlb+0x83/0xa0
+>>>> [ 1162.056631]  vfio_pin_pages_remote+0x326/0x460 [vfio_iommu_type1]
+>>>> [ 1162.056634]  vfio_iommu_type1_ioctl+0x421/0x14f0 [vfio_iommu_type1]
+>>>> [ 1162.056638]  __x64_sys_ioctl+0x3e4/0x8e0
+>>>> [ 1162.056641]  do_syscall_64+0x3d/0x90
+>>>> [ 1162.056644]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>>>> [ 1162.056646] RIP: 0033:0x7f9f6d14317b
+>>>> [ 1162.056648] Code: 0f 1e fa 48 8b 05 1d ad 0c 00 64 c7 00 26 00 00
+>>>> 00 48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00
+>>>> 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ed ac 0c 00 f7 d8 64 89
+>>>> 01 48
+>>>> [ 1162.056650] RSP: 002b:00007fff4fca15b8 EFLAGS: 00000246 ORIG_RAX:
+>>>> 0000000000000010
+>>>> [ 1162.056652] RAX: ffffffffffffffda RBX: 0000000000000001 RCX:
+>>>> 00007f9f6d14317b
+>>>> [ 1162.056653] RDX: 00007fff4fca1620 RSI: 0000000000003b71 RDI:
+>>>> 000000000000001c
+>>>> [ 1162.056654] RBP: 00007fff4fca1650 R08: 0000000000000001 R09:
+>>>> 0000000000000000
+>>>> [ 1162.056655] R10: 0000000100000000 R11: 0000000000000246 R12:
+>>>> 0000000000000000
+>>>> [ 1162.056656] R13: 0000000000000000 R14: 0000000000000000 R15:
+>>>> 0000000000000000
+>>>> [ 1162.056657]  </TASK>
+>>>>
+>>>> Yishai
+>>>
+>>
+>
+
