@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8776E54D545
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:30:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C02ED54D552
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:33:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348243AbiFOXaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 19:30:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43968 "EHLO
+        id S1348787AbiFOXaE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 19:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348173AbiFOXaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 19:30:00 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8684213E3F
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:59 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id c4-20020a170902d48400b001640bfb2b4fso7248261plg.20
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:59 -0700 (PDT)
+        with ESMTP id S1348302AbiFOXaB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 19:30:01 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271AC13E3F
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:30:01 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id c11-20020a17090a4d0b00b001e4e081d525so113984pjg.7
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:30:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=NAYu/p++KbYQKAixptTixDluswnneyi65Qx5LtCiF4Q=;
-        b=mEzQoZmMyBjJ/XTXXmFSR6U6gQLEhjwjSPEiLW45ounxRqklw3lMszhk3VvNt9ml7c
-         uiXOys2f+dCEsYX2EaLc+uYrU326AG2Oilx8Fmk9vJHF5d4khbkicE3w0t/xsxOPK8c0
-         ZUyjpypfXhLOH6XaHYXChpeX56NGaw4/GYS91uQ0zNrUY7ZACerOYtkw9u3q01ilLoyU
-         ALON4bw9yZpZ1wBDhaAZb6tkuInXXhwygPciQ8TXaHnbNDwBbLxR/PCHsdGuL8mr6LpB
-         O0rZ5hAXMx9QhOPGVApzVyAJznf1vIjR4t3aCB2jT5d6ks0gH5SfNhtJHs3nP/dl9fZ5
-         vxXw==
+        bh=DG6WalYERHkMR3Airm7dl51TN+7M6heKIE0NPiP3UMA=;
+        b=DYAwpzflYcDSuqlm+Dddx6PjHh4neoYOIgWfjwdUWYmdW9UjeUnKyt1HbbyuCCfDEZ
+         KvjStYumR9BB8Sx/WotTSnPMrGs2Z0r0MxVFVtiR5ky8RoDBlVLASEPKCG3xDhK812yv
+         Dzf8FbzCjwCo5xfWTPWVhZpbLuyxJIFusZNNgCn6eSWoi+lbLW8/tMSln3tvdcPU8UWv
+         ElofgwgKjw3LDlmWeAVmdChvlD98xQaDGDplfoRfcf0JEdZEOtPppLOS01Znsq07ufpO
+         TR8xnt703NiKzCNCfyIL3T5O+PenE4p8DG3mXv8nDHulD2kkh8yDHqELI6UWd5GXgxx7
+         SW/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=NAYu/p++KbYQKAixptTixDluswnneyi65Qx5LtCiF4Q=;
-        b=pKcDUSgPbdQkDOiPi8zE/lG2k14plBGdVFtvlfFaH1F33OVYy9oYS49OY7BzsTJbIq
-         sy0KjGUu+Iewjj0LhkoGfGFledmPQxjm9Cl40VfCXsKlEUk3jraLK815NkpQD9Xc0Ka2
-         59oW4a/GrDWzntul4MaOrrXZZoRTG8GU7RTpN09wUe40tIjxIIIK78XQBqVxAW8j7inP
-         NS93sdu267wdrz/KoOH672zqBiiQAawDBFvI0UE0OYvIa6kySKXdoE9kD1GFLBKTDPIi
-         /747JSO+H8diGBL+6mQ1LXcXEZmZwi4TzMyXwuIdP9mqn3E1MCAIX1Fo09rEa3HGgGuz
-         Ke+g==
-X-Gm-Message-State: AJIora/n5MYsU2YoadKWXvG3iLtUsqd1ZGy2mOrBKlDusbF594ch1gm1
-        MymGjEyMNHYsTp/yedQMQvibEa/yqGQ=
-X-Google-Smtp-Source: AGRyM1ul/GbgiEo77mjIG6Tvgrlwl2QDswwsE2i/gweEfPxZ4ZLtukTi1+JKDm+oyR3EDWlET4dHj7PoqWk=
+        bh=DG6WalYERHkMR3Airm7dl51TN+7M6heKIE0NPiP3UMA=;
+        b=Vsqo11W7ftQWv/uko/bqZl0gT47qx2kQa2HLmLbkF03JnjgaRvKXsCybmMkWVPgOA7
+         pHRZgrGpNvjYYlqnxeOWU3UQC/UlFvSXEQsPQxsC0qQ+hblnN7cWB4YXfAD8uHbmv8mH
+         pQ7PTvaiZaubkqi+flZMVkeh2NG4kTaPEOk/bDQfpGm8LFh6twHiYqlePIhqRHnJCUxx
+         u8qZKzgC37agOWfVhxYjoHBXZoThLGzQhs9NPTrM3+cX/9cpEQ8jfc3RDEGdCu04RdNI
+         oo1Wyrggjs2KtFG2uL5nti44Dt7kpppbJKo1U2qx92HhL6nilOSs/o6PVAcDHStLE1N8
+         XcIQ==
+X-Gm-Message-State: AJIora8JHoa+1j48dgFCu07gmZvjMD8aMV7In8E+qh6inee8ZD0gDpwJ
+        auSUHLnr+XJLrP23IqpL5SURGFgA80I=
+X-Google-Smtp-Source: AGRyM1sjANQWXSqPbadq7zplTeVpepe4zVB8svqOkuW6VoeiDowfztJevlyJpx8iQgo9UAERaygV84UhR1s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4b48:b0:1e8:7df8:1e25 with SMTP id
- mi8-20020a17090b4b4800b001e87df81e25mr1915351pjb.186.1655335799016; Wed, 15
- Jun 2022 16:29:59 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:b51:b0:51b:f772:40c5 with SMTP id
+ p17-20020a056a000b5100b0051bf77240c5mr1805236pfo.22.1655335800640; Wed, 15
+ Jun 2022 16:30:00 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 15 Jun 2022 23:29:35 +0000
+Date:   Wed, 15 Jun 2022 23:29:36 +0000
 In-Reply-To: <20220615232943.1465490-1-seanjc@google.com>
-Message-Id: <20220615232943.1465490-6-seanjc@google.com>
+Message-Id: <20220615232943.1465490-7-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220615232943.1465490-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [kvm-unit-tests PATCH v4 05/13] x86: desc: Split IDT entry setup into
- a generic helper
+Subject: [kvm-unit-tests PATCH v4 06/13] x86: Move load_gdt_tss() to desc.c
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -77,80 +76,135 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Varad Gautam <varad.gautam@suse.com>
 
-EFI bootstrapping code configures a call gate in a later commit to jump
-from 16-bit to 32-bit code.
+Split load_gdt_tss() functionality into:
+1. Load gdt/tss
+2. Setup segments in 64-bit mode and update %cs via far-return
 
-Introduce a set_desc_entry() routine which can be used to fill both
-an interrupt descriptor and a call gate descriptor on x86.
+and move load_gdt_tss() to desc.c to share this code between
+EFI and non-EFI tests.
+
+Move the segment setup code specific to EFI into
+setup.c:setup_segments64().
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/desc.c | 27 +++++++++++++++++++++------
- lib/x86/desc.h |  2 ++
- 2 files changed, 23 insertions(+), 6 deletions(-)
+ lib/x86/desc.c       |  6 ++++++
+ lib/x86/desc.h       |  1 +
+ lib/x86/setup.c      | 25 +++++++++++++++++++++++--
+ x86/efi/efistart64.S | 27 ---------------------------
+ 4 files changed, 30 insertions(+), 29 deletions(-)
 
 diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-index 087e85c..9512363 100644
+index 9512363..a7c3480 100644
 --- a/lib/x86/desc.c
 +++ b/lib/x86/desc.c
-@@ -57,22 +57,37 @@ __attribute__((regparm(1)))
- #endif
- void do_handle_exception(struct ex_regs *regs);
- 
--void set_idt_entry(int vec, void *addr, int dpl)
-+/*
-+ * Fill an idt_entry_t or call gate entry, clearing e_sz bytes first.
-+ *
-+ * This can be used for both IDT entries and call gate entries, since the gate
-+ * descriptor layout is identical to idt_entry_t, except for the absence of
-+ * .offset2 and .reserved fields. To do so, pass in e_sz according to the gate
-+ * descriptor size.
-+ */
-+void set_desc_entry(idt_entry_t *e, size_t e_sz, void *addr,
-+		    u16 sel, u16 type, u16 dpl)
- {
--	idt_entry_t *e = &boot_idt[vec];
--	memset(e, 0, sizeof *e);
-+	memset(e, 0, e_sz);
- 	e->offset0 = (unsigned long)addr;
--	e->selector = read_cs();
-+	e->selector = sel;
- 	e->ist = 0;
--	e->type = 14;
-+	e->type = type;
- 	e->dpl = dpl;
- 	e->p = 1;
- 	e->offset1 = (unsigned long)addr >> 16;
- #ifdef __x86_64__
--	e->offset2 = (unsigned long)addr >> 32;
-+	if (e_sz == sizeof(*e))
-+		e->offset2 = (unsigned long)addr >> 32;
+@@ -361,6 +361,12 @@ void set_gdt_entry(int sel, unsigned long base,  u32 limit, u8 type, u8 flags)
  #endif
  }
  
-+void set_idt_entry(int vec, void *addr, int dpl)
++void load_gdt_tss(size_t tss_offset)
 +{
-+	idt_entry_t *e = &boot_idt[vec];
-+	set_desc_entry(e, sizeof *e, addr, read_cs(), 14, dpl);
++	lgdt(&gdt_descr);
++	ltr(tss_offset);
 +}
 +
- void set_idt_dpl(int vec, u16 dpl)
+ #ifndef __x86_64__
+ void set_gdt_task_gate(u16 sel, u16 tss_sel)
  {
- 	idt_entry_t *e = &boot_idt[vec];
 diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index 3044409..1dc1ea0 100644
+index 1dc1ea0..9dcc92b 100644
 --- a/lib/x86/desc.h
 +++ b/lib/x86/desc.h
-@@ -217,6 +217,8 @@ unsigned exception_vector(void);
- int write_cr4_checking(unsigned long val);
- unsigned exception_error_code(void);
- bool exception_rflags_rf(void);
-+void set_desc_entry(idt_entry_t *e, size_t e_sz, void *addr,
-+		    u16 sel, u16 type, u16 dpl);
- void set_idt_entry(int vec, void *addr, int dpl);
+@@ -223,6 +223,7 @@ void set_idt_entry(int vec, void *addr, int dpl);
  void set_idt_sel(int vec, u16 sel);
  void set_idt_dpl(int vec, u16 dpl);
+ void set_gdt_entry(int sel, unsigned long base, u32 limit, u8 access, u8 gran);
++void load_gdt_tss(size_t tss_offset);
+ void set_intr_alt_stack(int e, void *fn);
+ void print_current_tss_info(void);
+ handler handle_exception(u8 v, handler fn);
+diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+index dd2b916..9724465 100644
+--- a/lib/x86/setup.c
++++ b/lib/x86/setup.c
+@@ -169,8 +169,27 @@ void setup_multiboot(struct mbi_bootinfo *bi)
+ 
+ #ifdef CONFIG_EFI
+ 
+-/* From x86/efi/efistart64.S */
+-extern void load_gdt_tss(size_t tss_offset);
++static void setup_segments64(void)
++{
++	/* Update data segments */
++	write_ds(KERNEL_DS);
++	write_es(KERNEL_DS);
++	write_fs(KERNEL_DS);
++	write_gs(KERNEL_DS);
++	write_ss(KERNEL_DS);
++
++	/*
++	 * Update the code segment by putting it on the stack before the return
++	 * address, then doing a far return: this will use the new code segment
++	 * along with the address.
++	 */
++	asm volatile("pushq %1\n\t"
++		     "lea 1f(%%rip), %0\n\t"
++		     "pushq %0\n\t"
++		     "lretq\n\t"
++		     "1:"
++		     :: "r" ((u64)KERNEL_DS), "i" (KERNEL_CS));
++}
+ 
+ static efi_status_t setup_memory_allocator(efi_bootinfo_t *efi_bootinfo)
+ {
+@@ -275,6 +294,8 @@ static void setup_gdt_tss(void)
+ 	/* 64-bit setup_tss does not use the stacktop argument.  */
+ 	tss_offset = setup_tss(NULL);
+ 	load_gdt_tss(tss_offset);
++
++	setup_segments64();
+ }
+ 
+ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
+index 98cc965..b94c5ab 100644
+--- a/x86/efi/efistart64.S
++++ b/x86/efi/efistart64.S
+@@ -26,33 +26,6 @@ ptl4:
+ .code64
+ .text
+ 
+-.globl load_gdt_tss
+-load_gdt_tss:
+-	/* Load GDT */
+-	lgdt gdt_descr(%rip)
+-
+-	/* Load TSS */
+-	mov %rdi, %rax
+-	ltr %ax
+-
+-	/* Update data segments */
+-	mov $0x10, %ax /* 3rd entry in gdt64: 32/64-bit data segment */
+-	mov %ax, %ds
+-	mov %ax, %es
+-	mov %ax, %fs
+-	mov %ax, %gs
+-	mov %ax, %ss
+-
+-	/*
+-	 * Update the code segment by putting it on the stack before the return
+-	 * address, then doing a far return: this will use the new code segment
+-	 * along with the address.
+-	 */
+-	popq %rdi
+-	pushq $0x08 /* 2nd entry in gdt64: 64-bit code segment */
+-	pushq %rdi
+-	lretq
+-
+ .code16
+ 
+ .globl rm_trampoline
 -- 
 2.36.1.476.g0c4daa206d-goog
 
