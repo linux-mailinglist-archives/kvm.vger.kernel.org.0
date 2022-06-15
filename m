@@ -2,102 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A57F54BF3F
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 03:29:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0042654BFBF
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 04:44:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235428AbiFOB3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jun 2022 21:29:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
+        id S1343802AbiFOCnl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jun 2022 22:43:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237190AbiFOB3G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jun 2022 21:29:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CD62C2DABD
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 18:29:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655256543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gPcslwf6/5AipVOiJxjFuNmMuJiLjP5Ai/xX9fViRS4=;
-        b=QQbe3riAOnysT+McwsCYR7Jyb8wsIGxw0xHpuuwGxDvnfL07OpA2GcdlJt73su7ULDMVJs
-        pBGne0MMx/OjS1c+f9I8qBWpOzkmDSoyY4iVsGJgeKM4J3jhnt3ItQn8z/JXzc98UVcRiL
-        MsVXOP/B3BBLDgk1C1fBhYlxajhAZhI=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-596-SSUcE3wPOJOmUVyUt7E4uA-1; Tue, 14 Jun 2022 21:29:02 -0400
-X-MC-Unique: SSUcE3wPOJOmUVyUt7E4uA-1
-Received: by mail-lj1-f199.google.com with SMTP id a16-20020a05651c211000b002557bb9091bso1569159ljq.11
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 18:29:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gPcslwf6/5AipVOiJxjFuNmMuJiLjP5Ai/xX9fViRS4=;
-        b=ZF4wAfHSZJpfeWjZIqto5UJ9MqQ7CaE3vYSfi6PCg0eIOwD1Qxc9TdYKgbUfjyGMHD
-         r0djm0bOK90FRqirXkYetqP4yqnBOX775kpQJVK72Ac8E5T81yM0W3UztBvZzMlyJ/5f
-         4xMrtCIYYQgvGfyDt/7pxXabiFt46Bx011eDjx0wE+Xw3BTdPViNqu6n5lI7nPgLOkJM
-         x9hQuqT0g9W6m6Ki3tWlsmXaqgEKnjVRFXrdvp25K/96u2NGP7Jt1zkD5k1u0XN4VYQS
-         54WIGwk2vyV2fpYy0VP2FeBjsl6495oxJW0YH6F+GJN5dVY8uzqdnA6Jm261r+lzdXYM
-         i69Q==
-X-Gm-Message-State: AJIora9ei42xseqHqvYgiU6/YUt2d5SqKau05xKMaAia2Fty7I17KfIl
-        wXDBRIoaox+qXbN0QUTreV8kbjsYvFve88H/Rf076Zz7DUhS5I9qoANsuPLZHL5DJegS1tyE7VT
-        NFjCDRrKZJ64cMTg62Xw7wqOWzu19
-X-Received: by 2002:a19:4352:0:b0:479:5d1:3fef with SMTP id m18-20020a194352000000b0047905d13fefmr4549821lfj.411.1655256541023;
-        Tue, 14 Jun 2022 18:29:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzy6G17S6B/NL5asgkhJ3N6qCPtMcJgm4jIUP9oxu6MOto7+cw1fHjnYuylfVl22jAQ1SwvKuEFSnQqUE0b/Qw=
-X-Received: by 2002:a19:4352:0:b0:479:5d1:3fef with SMTP id
- m18-20020a194352000000b0047905d13fefmr4549812lfj.411.1655256540740; Tue, 14
- Jun 2022 18:29:00 -0700 (PDT)
+        with ESMTP id S242752AbiFOCnc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jun 2022 22:43:32 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2792321801;
+        Tue, 14 Jun 2022 19:43:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655261012; x=1686797012;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9is4Wtv18iXnGG040jECVRF40gaLkbneYddeUdfg+z8=;
+  b=UdMIFU9lH5jQcO1ZYPzBQOXXOkMCsFd76HIHUfyFTpPASyP0OcjE7oiM
+   EWAiCyAkCFMDM/yKawlSQwhoTYkuRcBJXhueRiB8xhEl+DQh/QcRgllO+
+   hKNyEhKDl+WZiC0HWw9nCFeTaz7mqe2FsbnPqcdZOMbLFHHzvB4d7QI+d
+   p9bOmhAZlYSeJgyRjESOX6+6uoQhXceTs9WrahzF72l2LfQo3KyjMfXo7
+   eI81r8yI7ef2Xz13sJ4xWEM7HVgAcKnVdGulJVAxg2iGn15Pvz4dCG9xl
+   CoHzkC0deL3b7m9F8ApheZNVLcbyPjWOqWEBFAzHV5HTPy9yruAa+2J5w
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10378"; a="340473425"
+X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
+   d="scan'208";a="340473425"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 19:43:31 -0700
+X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
+   d="scan'208";a="588834092"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 19:43:29 -0700
+Date:   Wed, 15 Jun 2022 10:43:16 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Kechen Lu <kechenl@nvidia.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, somduttar@nvidia.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v3 5/7] KVM: x86: add vCPU scoped toggling for
+ disabled exits
+Message-ID: <20220615024311.GA7808@gao-cwp>
+References: <20220615011622.136646-1-kechenl@nvidia.com>
+ <20220615011622.136646-6-kechenl@nvidia.com>
 MIME-Version: 1.0
-References: <20220526124338.36247-1-eperezma@redhat.com> <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20220527065442-mutt-send-email-mst@kernel.org> <CACGkMEubfv_OJOsJ_ROgei41Qx4mPO0Xz8rMVnO8aPFiEqr8rA@mail.gmail.com>
- <PH0PR12MB5481695930E7548BAAF1B0D9DCDC9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEsSKF_MyLgFdzVROptS3PCcp1y865znLWgnzq9L7CpFVQ@mail.gmail.com>
- <PH0PR12MB5481CAA3F57892FF7F05B004DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEsJJL34iUYQMxHguOV2cQ7rts+hRG5Gp3XKCGuqNdnNQg@mail.gmail.com>
- <PH0PR12MB5481D099A324C91DAF01259BDCDE9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEueG76L8H+F70D=T5kjK_+J68ARNQmQQo51rq3CfcOdRA@mail.gmail.com> <PH0PR12MB5481994AF05D3B4999EC1F0EDCAD9@PH0PR12MB5481.namprd12.prod.outlook.com>
-In-Reply-To: <PH0PR12MB5481994AF05D3B4999EC1F0EDCAD9@PH0PR12MB5481.namprd12.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 15 Jun 2022 09:28:49 +0800
-Message-ID: <CACGkMEtRTyymit=Zmwwcq0jNan-_C9p70vcLP0g7XmwQiOjUbw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
-To:     Parav Pandit <parav@nvidia.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "martinh@xilinx.com" <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "martinpo@xilinx.com" <martinpo@xilinx.com>,
-        "lvivier@redhat.com" <lvivier@redhat.com>,
-        "pabloc@xilinx.com" <pabloc@xilinx.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-        "gautam.dawar@amd.com" <gautam.dawar@amd.com>,
-        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
-        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "dinang@xilinx.com" <dinang@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220615011622.136646-6-kechenl@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -105,137 +62,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 8:10 AM Parav Pandit <parav@nvidia.com> wrote:
->
->
->
-> > From: Jason Wang <jasowang@redhat.com>
-> > Sent: Wednesday, June 1, 2022 11:54 PM
-> >
-> > On Thu, Jun 2, 2022 at 10:59 AM Parav Pandit <parav@nvidia.com> wrote:
-> > >
-> > >
-> > > > From: Jason Wang <jasowang@redhat.com>
-> > > > Sent: Wednesday, June 1, 2022 10:00 PM
-> > > >
-> > > > On Thu, Jun 2, 2022 at 2:58 AM Parav Pandit <parav@nvidia.com> wrote:
-> > > > >
-> > > > >
-> > > > > > From: Jason Wang <jasowang@redhat.com>
-> > > > > > Sent: Tuesday, May 31, 2022 10:42 PM
-> > > > > >
-> > > > > > Well, the ability to query the virtqueue state was proposed as
-> > > > > > another feature (Eugenio, please correct me). This should be
-> > > > > > sufficient for making virtio-net to be live migrated.
-> > > > > >
-> > > > > The device is stopped, it won't answer to this special vq config done
-> > here.
-> > > >
-> > > > This depends on the definition of the stop. Any query to the device
-> > > > state should be allowed otherwise it's meaningless for us.
-> > > >
-> > > > > Programming all of these using cfg registers doesn't scale for
-> > > > > on-chip
-> > > > memory and for the speed.
-> > > >
-> > > > Well, they are orthogonal and what I want to say is, we should first
-> > > > define the semantics of stop and state of the virtqueue.
-> > > >
-> > > > Such a facility could be accessed by either transport specific
-> > > > method or admin virtqueue, it totally depends on the hardware
-> > architecture of the vendor.
-> > > >
-> > > I find it hard to believe that a vendor can implement a CVQ but not AQ and
-> > chose to expose tens of hundreds of registers.
-> > > But maybe, it fits some specific hw.
-> >
-> > You can have a look at the ifcvf dpdk driver as an example.
-> >
-> Ifcvf is an example of using registers.
-> It is not an answer why AQ is hard for it. :)
+>@@ -5980,6 +5987,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_event,
+> int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> 			    struct kvm_enable_cap *cap)
+> {
+>+	struct kvm_vcpu *vcpu;
+>+	unsigned long i;
+> 	int r;
+> 
+> 	if (cap->flags)
+>@@ -6036,14 +6045,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> 			break;
+> 
+> 		mutex_lock(&kvm->lock);
+>-		if (kvm->created_vcpus)
+>-			goto disable_exits_unlock;
+>+		if (kvm->created_vcpus) {
+>+			kvm_for_each_vcpu(i, vcpu, kvm) {
+>+				kvm_ioctl_disable_exits(vcpu->arch, cap->args[0]);
+>+				static_call(kvm_x86_update_disabled_exits)(vcpu);
 
-Well, it's an example of how vDPA is implemented. I think we agree
-that for vDPA, vendors have the flexibility to implement their
-perferrable datapath.
+IMO, this won't work on Intel platforms. Because, to manipulate a vCPU's
+VMCS, vcpu_load() should be invoked in advance to load the VMCS.
+Alternatively, you can add a request KVM_REQ_XXX and defer updating VMCS
+to the next vCPU entry.
 
-> virtio spec has definition of queue now and implementing yet another queue shouldn't be a problem.
+>+			}
+>+		}
+>+		mutex_unlock(&kvm->lock);
+> 
+> 		kvm_ioctl_disable_exits(kvm->arch, cap->args[0]);
+> 
+> 		r = 0;
+>-disable_exits_unlock:
+>-		mutex_unlock(&kvm->lock);
+> 		break;
+> 	case KVM_CAP_MSR_PLATFORM_INFO:
+> 		kvm->arch.guest_can_read_msr_platform_info = cap->args[0];
+>-- 
+>2.32.0
 >
-> So far no one seem to have problem with the additional queue.
-> So I take it as AQ is ok.
->
-> > But another thing that is unrelated to hardware architecture is the nesting
-> > support. Having admin virtqueue in a nesting environment looks like an
-> > overkill. Presenting a register in L1 and map it to L0's admin should be good
-> > enough.
-> So may be a optimized interface can be added that fits nested env.
-> At this point in time real users that we heard are interested in non-nested use cases. Let's enable them first.
-
-That's fine. For nests, it's actually really easy, just adding an
-interface within the existing transport should be sufficient.
-
->
->
-> >
-> > >
-> > > I like to learn the advantages of such method other than simplicity.
-> > >
-> > > We can clearly that we are shifting away from such PCI registers with SIOV,
-> > IMS and other scalable solutions.
-> > > virtio drifting in reverse direction by introducing more registers as
-> > transport.
-> > > I expect it to an optional transport like AQ.
-> >
-> > Actually, I had a proposal of using admin virtqueue as a transport, it's
-> > designed to be SIOV/IMS capable. And it's not hard to extend it with the
-> > state/stop support etc.
-> >
-> > >
-> > > > >
-> > > > > Next would be to program hundreds of statistics of the 64 VQs
-> > > > > through a
-> > > > giant PCI config space register in some busy polling scheme.
-> > > >
-> > > > We don't need giant config space, and this method has been
-> > > > implemented by some vDPA vendors.
-> > > >
-> > > There are tens of 64-bit counters per VQs. These needs to programmed on
-> > destination side.
-> > > Programming these via registers requires exposing them on the registers.
-> > > In one of the proposals, I see them being queried via CVQ from the device.
-> >
-> > I didn't see a proposal like this. And I don't think querying general virtio state
-> > like idx with a device specific CVQ is a good design.
-> >
-> My example was not for the idx. But for VQ statistics that is queried via CVQ.
->
-> > >
-> > > Programming them via cfg registers requires large cfg space or synchronous
-> > programming until receiving ACK from it.
-> > > This means one entry at a time...
-> > >
-> > > Programming them via CVQ needs replicate and align cmd values etc on all
-> > device types. All duplicate and hard to maintain.
-> > >
-> > >
-> > > > >
-> > > > > I can clearly see how all these are inefficient for faster LM.
-> > > > > We need an efficient AQ to proceed with at minimum.
-> > > >
-> > > > I'm fine with admin virtqueue, but the stop and state are orthogonal to
-> > that.
-> > > > And using admin virtqueue for stop/state will be more natural if we
-> > > > use admin virtqueue as a transport.
-> > > Ok.
-> > > We should have defined it bit earlier that all vendors can use. :(
-> >
-> > I agree.
->
-> I remember few months back, you acked in the weekly meeting that TC has approved the AQ direction.
-> And we are still in this circle of debating the AQ.
-
-I think not. Just to make sure we are on the same page, the proposal
-here is for vDPA, and hope it can provide forward compatibility to
-virtio. So in the context of vDPA, admin virtqueue is not a must.
-
-Thanks
-
