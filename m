@@ -2,78 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36C4754CB91
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:42:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B4C754CBEA
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 16:54:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245626AbiFOOmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 10:42:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55346 "EHLO
+        id S1344443AbiFOOyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 10:54:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349219AbiFOOlc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 10:41:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 596713153D
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:41:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655304089;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PF6zqQnyPSf5DhKZM4pIhF6Gs544Q4BUxgZ4sGWs3gk=;
-        b=EqFBvJ+A+Q4WajZSP7YCb9CGyOgmA/iYYtYf5W0Fb2gL6pBRrR3ArRJWdBpLcw8uOQbz3v
-        3RC0t5D5VJpVrrFdBPdN28/JBT4sdXib7B9/K11SmvoxSTgGgmdoq/0zwRY6R60MaClf7f
-        mSknzTKHs8AePTofL+o+aZMUdieHN5c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-159-5p7cls1BOuyVkfRrzdFLCg-1; Wed, 15 Jun 2022 10:41:28 -0400
-X-MC-Unique: 5p7cls1BOuyVkfRrzdFLCg-1
-Received: by mail-wm1-f72.google.com with SMTP id j20-20020a05600c1c1400b0039c747a1e5aso1299460wms.9
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:41:27 -0700 (PDT)
+        with ESMTP id S1345907AbiFOOy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 10:54:27 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 400F535A98
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:54:22 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id t25so19294456lfg.7
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 07:54:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aoMDtHtTQLo9Hcq1dT+XWeUHhZY2P5SZpdzuA1mTFwI=;
+        b=mZaSSuMapl6ZdG640VcUpFw3YExNCMsY53STmUB0Q4FpEKMAjgqnBpLtkLKXRQtM8O
+         Iazav9Ncviujq+pFGcNdcrTMbBwnfJoZB6QJ2kQNofoTtiNN4fOK6hQPI5tDnHcFiwwx
+         5VGQIdQMn6HSb2HaEiMFnO6nSB1UtLq1BALXqVewg/s9uxIkTbdFpXe3LwEwWVgc90Y9
+         cJ66J/SwV55xg//85NUUjFTFVM6Kwy8X/PGmH0T61WzGj2AhkP2RBbYwXl3ETZCX2O/e
+         DgIt3x6vHILIok+ouydxTujxJORpRehqWxvB7t94SBYrxkXNfaskOQGbY/zfEw3piXe4
+         CPBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=PF6zqQnyPSf5DhKZM4pIhF6Gs544Q4BUxgZ4sGWs3gk=;
-        b=bMfR+VsKR3jL+bBCDs/U8MgGviZ3pjJtTPyl+DWluwU5m8SSbXfnS9Atg6W21TAGTH
-         JQGm14QtQKQYxuDjIS52QI/2vQmY26KPznMpGPf1KWm2ok077Sgpc6rJ9InKGf5mH660
-         wENtnWFz+6MXSzTYNQzdT17fIxhGnnZHVOXqmy9GKodMJza0EuhPTnwW0SbrZneDEXle
-         ws+0QSUadcp1/kfQPF8w8ZnOkYOuHN/nCNd4cdCX5VAfJ29cOHWYPSD/l97ezICxgfHo
-         K/Qj4dYQ5THPsoVccRUfOXnatP4ARIpgThhAzXPR59WcsY3gCU/w8qJS0G/E/pdLsJZs
-         ODLg==
-X-Gm-Message-State: AJIora+JGsbElqpqpfWEvQlOh7QF840uiAbklG4uBAzR2wTVo3L1lNoW
-        3dpzvMRIcafrO1l3Y3Miue2l4pL8mg9YJmUdO2gQiWPbCIez8mX5IPek5NvPMiJyMbucYcvfw6H
-        XU+im87nNKPCW
-X-Received: by 2002:a5d:5c04:0:b0:21a:23e0:6ba3 with SMTP id cc4-20020a5d5c04000000b0021a23e06ba3mr143466wrb.71.1655304086178;
-        Wed, 15 Jun 2022 07:41:26 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tM2UgzMTtlFDYLrxnzoxjjBmm/N+BB0gblnqodYLm//YxFzehP59lNUWCo87G4DF8GEoCU7A==
-X-Received: by 2002:a5d:5c04:0:b0:21a:23e0:6ba3 with SMTP id cc4-20020a5d5c04000000b0021a23e06ba3mr143453wrb.71.1655304085947;
-        Wed, 15 Jun 2022 07:41:25 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id q1-20020adff501000000b002117ef160fbsm15081710wro.21.2022.06.15.07.41.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jun 2022 07:41:25 -0700 (PDT)
-Message-ID: <c6cd0617-7b32-7f87-6f55-52ec097fb250@redhat.com>
-Date:   Wed, 15 Jun 2022 16:41:24 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aoMDtHtTQLo9Hcq1dT+XWeUHhZY2P5SZpdzuA1mTFwI=;
+        b=XyZJ2G4VKExw06RnWzFF5IB9Q55XX3QCY5TBAQSxmcv/CAi1i/GfOQzEN0iIl+3sLX
+         g9tD2pk53wszsuHzaICIV6cyU/WY/V11W9QhKvNd4gS8aREG8zsmuAYdt+OSiq5JuWr/
+         8iKplhSmeeE/ZIdI0biziWdVupsr5VPcbI0OJWXU67yOBDfKkV87ZSZrleG16J7U5dT2
+         TgoP9+gl1KS1Xax7vQcwOdKw/Tgo17/w1OCh3VDnxFiyBIVPDVgbmN8m9cJOjQhKjkWF
+         3mfkxjR/MHQ/cNMWX5qpXArvlHWZA0lUXvB7eLXb4RT9w3aDvrLntbpb0OiFNqYzodK+
+         VSJA==
+X-Gm-Message-State: AJIora9zKIOuqbYZaDzW6zVzF7ep8nlNgqUshnKJo8hkpmAFTNsVYu9p
+        /89l3qQSrXkM5cu1fCvmI942gcYNGVw+Y09i3QdGrA==
+X-Google-Smtp-Source: ABdhPJwBmMj0bnW0ZsZejTsoolvSYTgfqgbqhXjoDD1fQt6pLLYs8UcZCewi1iLyYw+UvuuGlJDrvN3cG28dwguycXM=
+X-Received: by 2002:a19:5059:0:b0:479:4739:3768 with SMTP id
+ z25-20020a195059000000b0047947393768mr6468219lfj.315.1655304860454; Wed, 15
+ Jun 2022 07:54:20 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220608121253.867333-1-pbonzini@redhat.com>
- <20220608121253.867333-7-pbonzini@redhat.com> <YqJ5OXwAyXvQuC2/@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 6/6] KVM: SEV-ES: reuse advance_sev_es_emulated_ins for
- OUT too
-In-Reply-To: <YqJ5OXwAyXvQuC2/@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20220614021141.1101486-1-sashal@kernel.org>
+In-Reply-To: <20220614021141.1101486-1-sashal@kernel.org>
+From:   Jann Horn <jannh@google.com>
+Date:   Wed, 15 Jun 2022 16:53:44 +0200
+Message-ID: <CAG48ez1bRMCUzmkP2zpQ_4Jx0sqRw=b9-sDa-0QSqoGHpqZVJA@mail.gmail.com>
+Subject: Re: [PATCH MANUALSEL 5.15 1/4] KVM: x86: do not report a vCPU as
+ preempted outside instruction boundaries
+To:     Sasha Levin <sashal@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,93 +69,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/10/22 00:50, Sean Christopherson wrote:
-> On Wed, Jun 08, 2022, Paolo Bonzini wrote:
->> complete_emulator_pio_in only has to be called by
->> complete_sev_es_emulated_ins now; therefore, all that the function does
->> now is adjust sev_pio_count and sev_pio_data.  Which is the same for
->> both IN and OUT.
->>
->> No functional change intended.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   arch/x86/kvm/x86.c | 19 +++++++++----------
->>   1 file changed, 9 insertions(+), 10 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index fd4382602f65..a3651aa74ed7 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -13007,6 +13007,12 @@ int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned int bytes,
->>   }
->>   EXPORT_SYMBOL_GPL(kvm_sev_es_mmio_read);
->>   
->> +static void advance_sev_es_emulated_pio(struct kvm_vcpu *vcpu, unsigned count, int size)
->> +{
->> +	vcpu->arch.sev_pio_count -= count;
->> +	vcpu->arch.sev_pio_data += count * size;
->> +}
->> +
->>   static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
->>   			   unsigned int port);
->>   
->> @@ -13030,8 +13036,7 @@ static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
->>   		int ret = emulator_pio_out(vcpu, size, port, vcpu->arch.sev_pio_data, count);
->>   
->>   		/* memcpy done already by emulator_pio_out.  */
->> -		vcpu->arch.sev_pio_count -= count;
->> -		vcpu->arch.sev_pio_data += count * vcpu->arch.pio.size;
->> +		advance_sev_es_emulated_pio(vcpu, count, size);
-> 
-> I think this is a bug fix that should go in a separate patch.  size == vcpu->arch.pio.size
-> when kvm_sev_es_outs() is called from complete_sev_es_emulated_outs(), but when
-> it's called from kvm_sev_es_string_io() it will hold the size of the previous PIO.
+On Tue, Jun 14, 2022 at 4:11 AM Sasha Levin <sashal@kernel.org> wrote:
+>
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>
+> [ Upstream commit 6cd88243c7e03845a450795e134b488fc2afb736 ]
+>
+> If a vCPU is outside guest mode and is scheduled out, it might be in the
+> process of making a memory access.  A problem occurs if another vCPU uses
+> the PV TLB flush feature during the period when the vCPU is scheduled
+> out, and a virtual address has already been translated but has not yet
+> been accessed, because this is equivalent to using a stale TLB entry.
+>
+> To avoid this, only report a vCPU as preempted if sure that the guest
+> is at an instruction boundary.  A rescheduling request will be delivered
+> to the host physical CPU as an external interrupt, so for simplicity
+> consider any vmexit *not* instruction boundary except for external
+> interrupts.
+>
+> It would in principle be okay to report the vCPU as preempted also
+> if it is sleeping in kvm_vcpu_block(): a TLB flush IPI will incur the
+> vmentry/vmexit overhead unnecessarily, and optimistic spinning is
+> also unlikely to succeed.  However, leave it for later because right
+> now kvm_vcpu_check_block() is doing memory accesses.  Even
+> though the TLB flush issue only applies to virtual memory address,
+> it's very much preferrable to be conservative.
+>
+> Reported-by: Jann Horn <jannh@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-It's not a bugfix for current master, because emulator_pio_out() sets 
-vcpu->arch.pio.size = size.
+This feature was introduced in commit f38a7b75267f1f (first in 4.16).
+I think the fix has to be applied all the way back to there (so
+additionally to what you already did, it'd have to be added to 4.19,
+5.4 and 5.10)?
 
-However, it has to be moved before "KVM: x86: wean in-kernel PIO from 
-vcpu->arch.pio*" or squashed therein.
-
-Paolo
-
->>   		if (!ret)
->>   			break;
->>   
->> @@ -13047,12 +13052,6 @@ static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
->>   static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
->>   			  unsigned int port);
->>   
->> -static void advance_sev_es_emulated_ins(struct kvm_vcpu *vcpu, unsigned count, int size)
->> -{
->> -	vcpu->arch.sev_pio_count -= count;
->> -	vcpu->arch.sev_pio_data += count * size;
->> -}
->> -
->>   static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
->>   {
->>   	unsigned count = vcpu->arch.pio.count;
->> @@ -13060,7 +13059,7 @@ static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
->>   	int port = vcpu->arch.pio.port;
->>   
->>   	complete_emulator_pio_in(vcpu, vcpu->arch.sev_pio_data);
->> -	advance_sev_es_emulated_ins(vcpu, count, size);
->> +	advance_sev_es_emulated_pio(vcpu, count, size);
->>   	if (vcpu->arch.sev_pio_count)
->>   		return kvm_sev_es_ins(vcpu, size, port);
->>   	return 1;
->> @@ -13076,7 +13075,7 @@ static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
->>   			break;
->>   
->>   		/* Emulation done by the kernel.  */
->> -		advance_sev_es_emulated_ins(vcpu, count, size);
->> +		advance_sev_es_emulated_pio(vcpu, count, size);
->>   		if (!vcpu->arch.sev_pio_count)
->>   			return 1;
->>   	}
->> -- 
->> 2.31.1
->>
-> 
-
+But it doesn't seem to apply cleanly to those older branches. Paolo,
+are you going to send stable backports of this?
