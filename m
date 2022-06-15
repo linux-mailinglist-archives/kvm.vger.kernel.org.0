@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 415FA54D53B
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A8D654D538
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 01:30:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347077AbiFOX34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 19:29:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43908 "EHLO
+        id S1346864AbiFOX36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 19:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346170AbiFOX3z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 19:29:55 -0400
+        with ESMTP id S1347839AbiFOX35 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 19:29:57 -0400
 Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D7013E93
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:54 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id u71-20020a63854a000000b004019c5cac3aso7166403pgd.19
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532AC13E3F
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:56 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id g129-20020a636b87000000b00401b8392ac8so7179026pgc.4
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 16:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=+1k/Z16nuoJyCB7Sl5SBm/MLvI1YKFcWfcLGapioqcs=;
-        b=qziGcinLGSvrdoEe3iIkn9RnXp8hgODS3/kl6NmI2Vu/LN2/qynAc0fbzgH2XVFM4I
-         K+FQO0Ig87u6O/qDcpJb2+VJ5d6LPPVv9IoMlOblq+uYlLVjAytO8gHxeeks/uCvERFx
-         Qpmd309keFg7H+MLNamiEZIcsf6Hni7wLBZOJYAHNDdWiKwA+QqXBf0QmzjE9xVf0RQN
-         pgmiaUePxKjo2h4/Nh9kGlGqjVb88RQz9id0MEuYFtPHWAxD1liHj7zJq3FB/laGV4Gr
-         RNF03Rn6XgceLvscykndACrBOBTf+pPsEtwSycqdslEUohDauD0lj9Fmp0o7w09Vru4G
-         HzBA==
+        bh=khUKmCI1huwExugVfBYA8RrP0sx4icvZitR+db2ggPQ=;
+        b=mfTaG7McFvdBiENyvqM5EhLjmr4W4I9Yggu/pADJRl/nqYdchq/vlWgsOC86wWfDyf
+         7iLOBNnM+gjAcn8FeQo+fQJIC7GUSEAx/nEGurT9UBPD6lxHbwK33AhoPcxW1/cJcds1
+         5Cds0q6qc1dCeXDCBHnrXixLjcsuihd415IM2eGPclPG/0kmuoOhFkME9otv0oJVVdV9
+         IwSaIglmySbpPrPge9lyLXQUofQ/Ji+eF7HIS8zkH++9oVWXfj7uibAjgecoLCDI9vzq
+         eSRTio6reN8gaO7fuKMnYwFoVFNbmqlVxIVIrWTOd+7sAM5DlvT5TVRTJfpnwJVviam5
+         Q/YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=+1k/Z16nuoJyCB7Sl5SBm/MLvI1YKFcWfcLGapioqcs=;
-        b=szF7Mhlm91cYX0zDfGZh2gp3FM0OrrSIImL+Z5mFngduTO0F1+3GCrXCNRYeFXAgv9
-         rJqRa0hiZsswj0R/8Klq16e8mCoTd8C90wdXq0Rq77HcwfqxH9ujRNNOdlLA7jv/q6Ol
-         TjggbDl7y13k9BZ3io6yL7KvU624LRHJcmBdWJggvQkxpE2f59xfxcGyw+xAt8DTqWhy
-         totZ0IBUPhrH+LSMuzZd05x3X5LQ2BCZ3Jbg2TBwmTzDhHDSDxPtTY9KNBrFJhcsGn/B
-         oMw3yPH45P67YQsjEPHFMHNExN0ksMnLSeKgAakuWRL7YgYV45Kh3tHzGHrnVFBgSOlp
-         nytw==
-X-Gm-Message-State: AJIora+yhio9Ih4qn8hs9S0OlLd5RQPFcIiqwyEymFw8OMZuwLhgWEM8
-        Ne8kAmlDaplJqwtNc+XXSmPhv7zU5Rs=
-X-Google-Smtp-Source: AGRyM1vb68hEOQlI3eH1f8mpGVUmi+gl5iq39x2IK7w6YWeC1DyFQtZ40fSB1e4d5TXm+UAfWklTP3wsRlM=
+        bh=khUKmCI1huwExugVfBYA8RrP0sx4icvZitR+db2ggPQ=;
+        b=KWcopti4BMf0GP2SH0eRqJigTYczHCdF5lgODK3PbluPI0T1g7ANyLRzlJ3Q5i6F5l
+         HTDPtfAdOrEhhn22NDTe4PXZs9t8wTTi7+br+UbW9GYUON33ED4j/zwdx4Uki5NQCL1I
+         3HZB0TMwHnPIHfE9csadXib1YTngmB1pj1DoXtlolVyZTUV6pF80iGlwhv9qaizrf/5b
+         hCOcmt9kCO3fKCpvnNzmtAxeSXauAz3mQxrSIUSKeKnn3mziafZwA9DkVYO002mrT/bc
+         CL7ZCgZtxPeXdMUCkzUu0de2ePlNY+CJz/XzfhCGeayomEkaZ97zR/+C3WdV9Rcd3AoH
+         qtgw==
+X-Gm-Message-State: AJIora9CF90fozbgeuywaansAzhYAMzwoHv08LC36IXTK3SQS7A5DHgU
+        EXuTXbC3Q2p65tmrNNRvLq5rNHVMb3o=
+X-Google-Smtp-Source: AGRyM1u0I3B+0MIoujUolGW/eLKKiJef+rebG5Pfl4azMlBT1x/zX1wBVy7q2hvN+Q+ELo87JL4IHamjvhw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4c2:b0:166:46c9:577b with SMTP id
- o2-20020a170902d4c200b0016646c9577bmr1709247plg.66.1655335794176; Wed, 15 Jun
- 2022 16:29:54 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:35c8:b0:1ea:4cec:62d4 with SMTP id
+ nb8-20020a17090b35c800b001ea4cec62d4mr1904118pjb.156.1655335795811; Wed, 15
+ Jun 2022 16:29:55 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 15 Jun 2022 23:29:32 +0000
+Date:   Wed, 15 Jun 2022 23:29:33 +0000
 In-Reply-To: <20220615232943.1465490-1-seanjc@google.com>
-Message-Id: <20220615232943.1465490-3-seanjc@google.com>
+Message-Id: <20220615232943.1465490-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220615232943.1465490-1-seanjc@google.com>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-Subject: [kvm-unit-tests PATCH v4 02/13] x86: Share realmode trampoline
- between i386 and x86_64
+Subject: [kvm-unit-tests PATCH v4 03/13] x86: Move ap_init() to smp.c
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -77,141 +76,316 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Varad Gautam <varad.gautam@suse.com>
 
-i386 and x86_64 each maintain their own copy of the realmode trampoline
-(sipi_entry). Move the 16-bit SIPI vector and GDT to a new trampolines.S
-to be shared by both.  The common trampoline file will also be used to
-shared 32-bit to 64-bit trampoline code.
+ap_init() copies the SIPI vector to lowmem, sends INIT/SIPI to APs
+and waits on the APs to come up.
+
+Port this routine to C from asm and move it to smp.c to allow sharing
+this functionality between the EFI (-fPIC) and non-EFI builds.
+
+Call ap_init() from the EFI setup path to reset the APs to a known
+location.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
-[sean: rename to trampolines.S to avoid naming conundrum]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/cstart.S      | 20 ++++----------------
- x86/cstart64.S    | 21 ++++-----------------
- x86/trampolines.S | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 38 insertions(+), 33 deletions(-)
- create mode 100644 x86/trampolines.S
+ lib/alloc_page.h     |  3 ++
+ lib/x86/setup.c      |  1 +
+ lib/x86/smp.c        | 72 ++++++++++++++++++++++++++++++++++++++++++--
+ lib/x86/smp.h        |  5 +++
+ x86/cstart.S         | 19 ------------
+ x86/cstart64.S       | 19 ------------
+ x86/efi/efistart64.S | 15 +++++++++
+ x86/svm_tests.c      | 10 +++---
+ 8 files changed, 98 insertions(+), 46 deletions(-)
 
+diff --git a/lib/alloc_page.h b/lib/alloc_page.h
+index eed2ba0..060e041 100644
+--- a/lib/alloc_page.h
++++ b/lib/alloc_page.h
+@@ -13,6 +13,9 @@
+ 
+ #define AREA_ANY_NUMBER	0xff
+ 
++/* The realmode trampoline gets relocated here during bootup. */
++#define RM_TRAMPOLINE_ADDR 0
++
+ #define AREA_ANY	0x00000
+ #define AREA_MASK	0x0ffff
+ 
+diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+index 8a4fa3c..2004e7f 100644
+--- a/lib/x86/setup.c
++++ b/lib/x86/setup.c
+@@ -323,6 +323,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+ 	load_idt();
+ 	mask_pic_interrupts();
+ 	enable_apic();
++	ap_init();
+ 	enable_x2apic();
+ 	smp_init();
+ 	setup_page_table();
+diff --git a/lib/x86/smp.c b/lib/x86/smp.c
+index 683b25d..81dacef 100644
+--- a/lib/x86/smp.c
++++ b/lib/x86/smp.c
+@@ -1,11 +1,16 @@
+ 
+ #include <libcflat.h>
++
++#include <asm/barrier.h>
++
+ #include "processor.h"
+ #include "atomic.h"
+ #include "smp.h"
+ #include "apic.h"
+ #include "fwcfg.h"
+ #include "desc.h"
++#include "alloc_page.h"
++#include "asm/page.h"
+ 
+ #define IPI_VECTOR 0x20
+ 
+@@ -18,6 +23,13 @@ static volatile int ipi_done;
+ static volatile bool ipi_wait;
+ static int _cpu_count;
+ static atomic_t active_cpus;
++extern u8 rm_trampoline, rm_trampoline_end;
++#ifdef __i386__
++extern u8 ap_rm_gdt_descr;
++#endif
++
++/* The BSP is online from time zero. */
++atomic_t cpu_online_count = { .counter = 1 };
+ 
+ static __attribute__((used)) void ipi(void)
+ {
+@@ -114,8 +126,6 @@ void smp_init(void)
+ 	int i;
+ 	void ipi_entry(void);
+ 
+-	_cpu_count = fwcfg_get_nb_cpus();
+-
+ 	setup_idt();
+ 	init_apic_map();
+ 	set_idt_entry(IPI_VECTOR, ipi_entry, 0);
+@@ -142,3 +152,61 @@ void smp_reset_apic(void)
+ 
+ 	atomic_inc(&active_cpus);
+ }
++
++static void setup_rm_gdt(void)
++{
++#ifdef __i386__
++	struct descriptor_table_ptr *rm_gdt =
++		(struct descriptor_table_ptr *) (&ap_rm_gdt_descr - &rm_trampoline);
++	/*
++	 * On i386, place the gdt descriptor to be loaded from SIPI vector right after
++	 * the vector code.
++	 */
++	sgdt(rm_gdt);
++#endif
++}
++
++void ap_init(void)
++{
++	void *rm_trampoline_dst = RM_TRAMPOLINE_ADDR;
++	size_t rm_trampoline_size = (&rm_trampoline_end - &rm_trampoline) + 1;
++	assert(rm_trampoline_size < PAGE_SIZE);
++
++	asm volatile("cld");
++
++	/*
++	 * Fill the trampoline page with with INT3 (0xcc) so that any AP
++	 * that goes astray within the first page gets a fault.
++	 */
++	memset(rm_trampoline_dst, 0xcc /* INT3 */, PAGE_SIZE);
++
++	memcpy(rm_trampoline_dst, &rm_trampoline, rm_trampoline_size);
++
++	setup_rm_gdt();
++
++#ifdef CONFIG_EFI
++	/*
++	 * apic_icr_write() is unusable on CONFIG_EFI until percpu area gets set up.
++	 * Use raw writes to APIC_ICR to send IPIs for time being.
++	 */
++	volatile u32 *apic_icr = (volatile u32 *) (APIC_DEFAULT_PHYS_BASE + APIC_ICR);
++
++	/* INIT */
++	*apic_icr = APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT;
++
++	/* SIPI */
++	*apic_icr = APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP;
++#else
++	/* INIT */
++	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
++
++	/* SIPI */
++	apic_icr_write(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP, 0);
++#endif
++
++	_cpu_count = fwcfg_get_nb_cpus();
++
++	printf("smp: waiting for %d APs\n", _cpu_count - 1);
++	while (_cpu_count != atomic_read(&cpu_online_count))
++		cpu_relax();
++}
+diff --git a/lib/x86/smp.h b/lib/x86/smp.h
+index bd303c2..77f8a19 100644
+--- a/lib/x86/smp.h
++++ b/lib/x86/smp.h
+@@ -3,6 +3,8 @@
+ 
+ #include <stddef.h>
+ #include <asm/spinlock.h>
++#include "libcflat.h"
++#include "atomic.h"
+ 
+ /* Offsets into the per-cpu page. */
+ struct percpu_data {
+@@ -78,5 +80,8 @@ void on_cpu(int cpu, void (*function)(void *data), void *data);
+ void on_cpu_async(int cpu, void (*function)(void *data), void *data);
+ void on_cpus(void (*function)(void *data), void *data);
+ void smp_reset_apic(void);
++void ap_init(void);
++
++extern atomic_t cpu_online_count;
+ 
+ #endif
 diff --git a/x86/cstart.S b/x86/cstart.S
-index 6db6a38..8aa29ee 100644
+index 8aa29ee..88d25fc 100644
 --- a/x86/cstart.S
 +++ b/x86/cstart.S
-@@ -126,10 +126,10 @@ start32:
+@@ -124,26 +124,7 @@ start32:
+ 	push %eax
+ 	call exit
  
- ap_init:
- 	cld
--	sgdtl ap_gdt_descr // must be close to sipi_entry for real mode access to work
--	lea sipi_entry, %esi
-+	sgdtl ap_rm_gdt_descr // must be close to rm_trampoline for real mode access to work
-+	lea rm_trampoline, %esi
- 	xor %edi, %edi
--	mov $(sipi_end - sipi_entry), %ecx
-+	mov $(rm_trampoline_end - rm_trampoline), %ecx
- 	rep movsb
- 	mov $APIC_DEFAULT_PHYS_BASE, %eax
- 	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT), APIC_ICR(%eax)
-@@ -146,16 +146,4 @@ online_cpus:
- .align 2
- cpu_online_count:	.word 1
+-ap_init:
+-	cld
+-	sgdtl ap_rm_gdt_descr // must be close to rm_trampoline for real mode access to work
+-	lea rm_trampoline, %esi
+-	xor %edi, %edi
+-	mov $(rm_trampoline_end - rm_trampoline), %ecx
+-	rep movsb
+-	mov $APIC_DEFAULT_PHYS_BASE, %eax
+-	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT), APIC_ICR(%eax)
+-	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP), APIC_ICR(%eax)
+-	call fwcfg_get_nb_cpus
+-1:	pause
+-	cmpw %ax, cpu_online_count
+-	jne 1b
+-	ret
+-
+ online_cpus:
+ 	.fill (max_cpus + 7) / 8, 1, 0
  
--.code16
--sipi_entry:
--	mov %cr0, %eax
--	or $1, %eax
--	mov %eax, %cr0
--	lgdtl ap_gdt_descr - sipi_entry
--	ljmpl $8, $ap_start32
+-.align 2
+-cpu_online_count:	.word 1
 -
--ap_gdt_descr:
--	.word 0
--	.long 0
--
--sipi_end:
-+#include "trampolines.S"
+ #include "trampolines.S"
 diff --git a/x86/cstart64.S b/x86/cstart64.S
-index 7272452..129ef0b 100644
+index 129ef0b..f0d12fb 100644
 --- a/x86/cstart64.S
 +++ b/x86/cstart64.S
-@@ -45,8 +45,9 @@ mb_boot_info:	.quad 0
+@@ -2,7 +2,6 @@
+ #include "apic-defs.h"
  
- pt_root:	.quad ptl4
+ .globl online_cpus
+-.globl cpu_online_count
  
-+#include "trampolines.S"
+ ipi_vector = 0x20
+ 
+@@ -227,21 +226,3 @@ lvl5:
+ 
+ online_cpus:
+ 	.fill (max_cpus + 7) / 8, 1, 0
+-
+-ap_init:
+-	cld
+-	lea rm_trampoline, %rsi
+-	xor %rdi, %rdi
+-	mov $(rm_trampoline_end - rm_trampoline), %rcx
+-	rep movsb
+-	mov $APIC_DEFAULT_PHYS_BASE, %eax
+-	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT), APIC_ICR(%rax)
+-	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP), APIC_ICR(%rax)
+-	call fwcfg_get_nb_cpus
+-1:	pause
+-	cmpw %ax, cpu_online_count
+-	jne 1b
+-	ret
+-
+-.align 2
+-cpu_online_count:	.word 1
+diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
+index 017abba..7d50f96 100644
+--- a/x86/efi/efistart64.S
++++ b/x86/efi/efistart64.S
+@@ -57,3 +57,18 @@ load_gdt_tss:
+ 	pushq $0x08 /* 2nd entry in gdt64: 64-bit code segment */
+ 	pushq %rdi
+ 	lretq
 +
- .section .init
--
- .code32
- 
- mb_magic = 0x1BADB002
-@@ -156,20 +157,6 @@ gdt32:
- 	.quad 0x00cf93000000ffff // flat 32-bit data segment
- gdt32_end:
- 
--.code16
--sipi_entry:
--	mov %cr0, %eax
--	or $1, %eax
--	mov %eax, %cr0
--	lgdtl gdt32_descr - sipi_entry
--	ljmpl $8, $ap_start32
--
--gdt32_descr:
--	.word gdt32_end - gdt32 - 1
--	.long gdt32
--
--sipi_end:
--
- .code32
- ap_start32:
- 	setup_segments
-@@ -243,9 +230,9 @@ online_cpus:
- 
- ap_init:
- 	cld
--	lea sipi_entry, %rsi
-+	lea rm_trampoline, %rsi
- 	xor %rdi, %rdi
--	mov $(sipi_end - sipi_entry), %rcx
-+	mov $(rm_trampoline_end - rm_trampoline), %rcx
- 	rep movsb
- 	mov $APIC_DEFAULT_PHYS_BASE, %eax
- 	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT), APIC_ICR(%rax)
-diff --git a/x86/trampolines.S b/x86/trampolines.S
-new file mode 100644
-index 0000000..9640c66
---- /dev/null
-+++ b/x86/trampolines.S
-@@ -0,0 +1,30 @@
-+/* Common bootstrapping code to transition from 16-bit to 32-bit code. */
-+
-+/* EFI provides it's own SIPI sequence to handle relocation. */
-+#ifndef CONFIG_EFI
 +.code16
++
 +.globl rm_trampoline
 +rm_trampoline:
 +
-+/* Store SIPI vector code at the beginning of trampoline. */
++.globl sipi_entry
 +sipi_entry:
-+	mov %cr0, %eax
-+	or $1, %eax
-+	mov %eax, %cr0
-+	lgdtl ap_rm_gdt_descr - sipi_entry
-+	ljmpl $8, $ap_start32
-+sipi_end:
++	jmp sipi_entry
 +
-+.globl ap_rm_gdt_descr
-+ap_rm_gdt_descr:
-+#ifdef __i386__
-+	.word 0
-+	.long 0
-+#else
-+	.word gdt32_end - gdt32 - 1
-+	.long gdt32
-+#endif
++.globl sipi_end
++sipi_end:
 +
 +.globl rm_trampoline_end
 +rm_trampoline_end:
-+#endif
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 1bd4d3b..f8c0589 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -17,8 +17,6 @@ static void *scratch_page;
+ 
+ #define LATENCY_RUNS 1000000
+ 
+-extern u16 cpu_online_count;
+-
+ u64 tsc_start;
+ u64 tsc_end;
+ 
+@@ -1955,20 +1953,20 @@ static void init_startup_prepare(struct svm_test *test)
+ 
+     on_cpu(1, get_tss_entry, &tss_entry);
+ 
+-    orig_cpu_count = cpu_online_count;
++    orig_cpu_count = atomic_read(&cpu_online_count);
+ 
+     apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT,
+                    id_map[1]);
+ 
+     delay(100000000ULL);
+ 
+-    --cpu_online_count;
++    atomic_dec(&cpu_online_count);
+ 
+     tss_entry->type &= ~DESC_BUSY;
+ 
+     apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP, id_map[1]);
+ 
+-    for (i = 0; i < 5 && cpu_online_count < orig_cpu_count; i++)
++    for (i = 0; i < 5 && atomic_read(&cpu_online_count) < orig_cpu_count; i++)
+        delay(100000000ULL);
+ }
+ 
+@@ -1979,7 +1977,7 @@ static bool init_startup_finished(struct svm_test *test)
+ 
+ static bool init_startup_check(struct svm_test *test)
+ {
+-    return cpu_online_count == orig_cpu_count;
++    return atomic_read(&cpu_online_count) == orig_cpu_count;
+ }
+ 
+ static volatile bool init_intercept;
 -- 
 2.36.1.476.g0c4daa206d-goog
 
