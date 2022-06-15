@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C453654D38E
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 23:20:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C389154D3BE
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 23:31:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346316AbiFOVUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 17:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45398 "EHLO
+        id S1349595AbiFOVbQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 17:31:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236639AbiFOVUn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 17:20:43 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18C4C5548E
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 14:20:40 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id k5-20020a17090a404500b001e8875e6242so3177485pjg.5
-        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 14:20:40 -0700 (PDT)
+        with ESMTP id S1347897AbiFOVbO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 17:31:14 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F5C562D8
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 14:31:12 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id r5so5823756pgr.3
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 14:31:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=bZ2jijzUr9kP3/+ZB7xrTeqibuRh4MlSOX5jIQq32bA=;
-        b=hGrtgly/BOuSL45qMp6NrqVzp7fv+eS2iXR3r0BTW8yJJPS/eeZb0GCsR/HW8IjMHX
-         GMNra6ylJThbP7YVHHn76cObux4NeOI158i+A3PvD/c98qtxWvA/XsD0PcJnwZuOgBAC
-         eBlSAMv/ClM304Os1PeT0YaWY2yH0F5yqkmlRoEF1RXjaK7oDQO5pgxJboCTpYcXv+Qo
-         nxFsIU0Kn73DoamB8RxVEM2BXyEzDbvgVbdnt5kU1GV8mx7gVeaCbGNbg877chHsvKnA
-         l79rZK4Eyal+Wjcdj0SY7q8yfAfYhuDLR4TupWoJYTCWwebWWXjEgmAagc5mcdHY8ZNx
-         H/1w==
+        bh=XJuTtRboMAs9N8ktAMOKiSjB9u8x15BH2R8IRWsSTLA=;
+        b=WBmxK2TVhZ65xiZjJYPjbVXQNXYMUCA80p1fVmy3YIO1rki7OA9rQoK8AFbvYHQIgJ
+         2lnzIVR3VFHk8eZtawrzFa6jNIjy7Mq8/23mils46pweJsQgEdhdEz6Zn1Kfkm9WjtmO
+         aUZRBjYp+A6xThUOq5NvjyZV7DohsWk1sY60BX4e21Zi2QjMhamaluD0Gr6G090U30hy
+         GOshubwCmaQIZ7wvl4wRCoIVTH3JasCbwNTT9kWqok+om9mLKHmUH7P42k1CzDz8bTgX
+         pX9f7A18Q60ewh/UofVbnlp4gK5wiGVD/obBo2pObOyeDwJHipabGLgz/YlX2vZAJ5aq
+         ewFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=bZ2jijzUr9kP3/+ZB7xrTeqibuRh4MlSOX5jIQq32bA=;
-        b=QGqrG6E5dv4H1BtJwkB+RNpzj9c7Qwug3cpFIvTkkDhJ/w8anaj+ixD+tMLo/ctCbO
-         f/4Mjfjp+EQwefh3+/dA0PYowyOdiPA3rejlDmXdQm6jiR2Daxldc/yDSvoxmLAViP65
-         ubC98Y1dFGXhz6QXqd8iaGazOneGIUvssBT9hSuIu116X8ky6Nz/VC8gO+z//TRRSxYs
-         yRSNVnxYP7LcpGLmudMvmcnWpaMOI04upWrOrR6RQm2UC2Hi44PqdmojZQXW9yqncoAg
-         wriuyIrLGG1+rzVOD5coTZmoM9iK2m1ljj2CCQmJuCbXLPWzMXs+8RKJ1Py/UF/zRpJN
-         iQAg==
-X-Gm-Message-State: AJIora+L1VIYBK04Ygzfnrpr54lIcMgbqj70FUvk6iP0HnxV1nIhsba/
-        LSxdxbncM7NgG5u8C9fljd58eM3cUCDwHw==
-X-Google-Smtp-Source: AGRyM1uC97bspuSAdV15Dx6QqXD59NMwG9t5kOqV7nxRMHiwvAn8FuG8UtWsDnNQiJPRsqs/wWroJQ==
-X-Received: by 2002:a17:90b:4c10:b0:1e8:d377:4998 with SMTP id na16-20020a17090b4c1000b001e8d3774998mr12453231pjb.227.1655328039337;
-        Wed, 15 Jun 2022 14:20:39 -0700 (PDT)
+        bh=XJuTtRboMAs9N8ktAMOKiSjB9u8x15BH2R8IRWsSTLA=;
+        b=GH8MwFKFj0W6MMS0xUwmwRlyqTzJJO4nxooNr7lcRE9uMAlCAb8+521lmmLSWMtfg+
+         D8aZ9ztcFOh+aydJLJBvdIukl/J4YuCAMMM1Zcms+5lqnxAdLOWE+plDYOeKCIecidtT
+         VN73kZQ/uYxW3NEnKjhAEejaXuxkjiOod3GDiH7Z1OhqzXW5T5AfAChjxexLM7n20GpO
+         RqnoXaxT25ckAwvkVMFzgElkTxpimeqfw6ESNJd3mh2wM946VYhQ52dR5YAKo7OysJ+D
+         MdilyfQMBqzPNqWGWI6zDAZQ2p6U/DSoSMKCx9MThgSf89JmYULJgCdz6BWWcOyoMxw+
+         ZM1Q==
+X-Gm-Message-State: AJIora+YmybQA8tMKf8guym/LOi+cFTOYBY8vYKeE3vE4BykvThyViJ7
+        y8yHWN12q4U1bmrPLIWsBVOKgpofoDsFaQ==
+X-Google-Smtp-Source: AGRyM1vDVQI22iYNU+4MJQ4BAhmbuPwj2hoWVXbKTSPdGrzB9TvUNcPvtiEHtujFPeLTN1aNxDJ7JA==
+X-Received: by 2002:a63:f506:0:b0:3fc:962b:6e02 with SMTP id w6-20020a63f506000000b003fc962b6e02mr1547581pgh.266.1655328671853;
+        Wed, 15 Jun 2022 14:31:11 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id p18-20020a17090a931200b001e8875e3326sm2249512pjo.47.2022.06.15.14.20.38
+        by smtp.gmail.com with ESMTPSA id je11-20020a170903264b00b0016223016d79sm94813plb.90.2022.06.15.14.31.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 14:20:39 -0700 (PDT)
-Date:   Wed, 15 Jun 2022 21:20:35 +0000
+        Wed, 15 Jun 2022 14:31:11 -0700 (PDT)
+Date:   Wed, 15 Jun 2022 21:31:07 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Varad Gautam <varad.gautam@suse.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
@@ -55,7 +55,7 @@ Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
         rientjes@google.com, brijesh.singh@amd.com,
         Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
 Subject: Re: [kvm-unit-tests PATCH v3 02/11] x86: Move ap_init() to smp.c
-Message-ID: <YqpNI9nXv1RKmn7T@google.com>
+Message-ID: <YqpPmz2SUP5nsUL+@google.com>
 References: <20220426114352.1262-1-varad.gautam@suse.com>
  <20220426114352.1262-3-varad.gautam@suse.com>
 MIME-Version: 1.0
@@ -75,7 +75,8 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Apr 26, 2022, Varad Gautam wrote:
 > +	printf("smp: waiting for %d APs\n", _cpu_count - 1);
-> +	while (_cpu_count != atomic_read(&cpu_online_count)) {
 
-Curly braces aren't needed.  And to make this more robust, I think it makes sense
-to do cpu_relax() in the loop so that it's more obvious that this is busy waiting.
+Oof, this breaks run_test.sh / runtime.bash.  runtime.bash has a godawful hack
+to detect that dummy.efi ran cleanly; it looks for "enabling apic" as the last
+line to detect success.  I'll add a patch to fix this by having dummy.c print an
+explicit magic string, e.g. Dummy Hello World!.
