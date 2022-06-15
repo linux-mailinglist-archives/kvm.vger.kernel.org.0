@@ -2,81 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3549054C3C2
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 10:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 874B854C3ED
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 10:47:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346369AbiFOIle (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 04:41:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44008 "EHLO
+        id S1346568AbiFOIrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 04:47:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346459AbiFOIlN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 04:41:13 -0400
-Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D013F4A933;
-        Wed, 15 Jun 2022 01:41:10 -0700 (PDT)
-Received: from ([60.208.111.195])
-        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id KGF00005;
-        Wed, 15 Jun 2022 16:41:05 +0800
-Received: from localhost.localdomain (10.200.104.97) by
- jtjnmail201602.home.langchao.com (10.100.2.2) with Microsoft SMTP Server id
- 15.1.2308.27; Wed, 15 Jun 2022 16:41:06 +0800
-From:   Bo Liu <liubo03@inspur.com>
-To:     <mst@redhat.com>, <jasowang@redhat.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Bo Liu <liubo03@inspur.com>
-Subject: [PATCH] vhost-vdpa: Remove usage of the deprecated ida_simple_xxx API
-Date:   Wed, 15 Jun 2022 04:40:55 -0400
-Message-ID: <20220615084055.4797-1-liubo03@inspur.com>
-X-Mailer: git-send-email 2.18.2
+        with ESMTP id S1346206AbiFOIrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 04:47:19 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EACA4BB83
+        for <kvm@vger.kernel.org>; Wed, 15 Jun 2022 01:47:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655282839; x=1686818839;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0WqBBL8dZ2gC2Ve2CzEmoOSpch5gYgXNhWvTLMyaiE0=;
+  b=SeA3BA7vn+sIDThxZXZHR29BFghYiqFJ9p4Gg5YYPY7IHnDA/nSlbjur
+   9OdBp56vi6C8sXJXiETE9AcU8zjgzY47kHpwfZK3lJQckk5iZeHaF43nD
+   0mh8uO+uVDmNFO+2tIcHFwBjmVwRLK1MEJbw6FUhodMFI9rVt2fCFvcOx
+   KVgDAB7Z2BXddG90aXVSJz91qrGtj0O1OySVscBVmIzXuGF5MnfCiOo70
+   tSPXR2SG4zKeH80wpyEb6sP+9JOdYnhbRfP/rkfDxmbUXFQNw6J1A7N7U
+   I15ldJ8zY3RUwHFETGaikGc31IA71ExaEGwp3/nXmPi7HyO3ykladSJP8
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10378"; a="342848608"
+X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
+   d="scan'208";a="342848608"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2022 01:47:17 -0700
+X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
+   d="scan'208";a="558944456"
+Received: from embargo.jf.intel.com ([10.165.9.183])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2022 01:47:17 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com
+Cc:     like.xu.linux@gmail.com, jmattson@google.com, kvm@vger.kernel.org,
+        Yang Weijiang <weijiang.yang@intel.com>
+Subject: [kvm-unit-tests PATCH v2 0/3] Fix up failures induced by !enable_pmu
+Date:   Wed, 15 Jun 2022 04:46:38 -0400
+Message-Id: <20220615084641.6977-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.200.104.97]
-tUid:   2022615164105b10b1c60219b480d69d964b77389ea2f
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use ida_alloc_xxx()/ida_free() instead of
-ida_simple_get()/ida_simple_remove().
-The latter is deprecated and more verbose.
+Recently Paolo and Like submitted fixup patches for !enable_pmu case,
+this induces some test failures in kvm unit tests, fix them in this
+series.
 
-Signed-off-by: Bo Liu <liubo03@inspur.com>
----
- drivers/vhost/vdpa.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Patches were tested with below config:
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 5ad2596c6e8a..8fc5c0bbb428 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -1295,7 +1295,7 @@ static void vhost_vdpa_release_dev(struct device *device)
- 	struct vhost_vdpa *v =
- 	       container_of(device, struct vhost_vdpa, dev);
- 
--	ida_simple_remove(&vhost_vdpa_ida, v->minor);
-+	ida_free(&vhost_vdpa_ida, v->minor);
- 	kfree(v->vqs);
- 	kfree(v);
- }
-@@ -1318,7 +1318,7 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
- 	if (!v)
- 		return -ENOMEM;
- 
--	minor = ida_simple_get(&vhost_vdpa_ida, 0,
-+	minor = ida_alloc_max(&vhost_vdpa_ida,
- 			       VHOST_VDPA_DEV_MAX, GFP_KERNEL);
- 	if (minor < 0) {
- 		kfree(v);
+kernel:
+kvm/queue, commit 8baacf67c76c
+
+qemu:
+master, commit 9b1f58854959
+
+platform:
+Skylake/Sapphire Rapids
+
+v2:
+1. Check PDCM bit of CPUID(1).ecx before read PERF_CAPABILIIES msr.
+2. Rebased to newer kvm unit tests master branch.
+
+Yang Weijiang (3):
+  x86: Remove perf enable bit from default config
+  x86: Skip running test when pmu is disabled
+  x86: Skip perf related tests when pmu is disabled
+
+ x86/msr.c       |  4 +++-
+ x86/pmu_lbr.c   | 12 +++++++++++-
+ x86/vmx_tests.c | 24 ++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 2 deletions(-)
+
+
+base-commit: 610c15284a537484682adfb4b6d6313991ab954f
 -- 
-2.27.0
+2.31.1
 
