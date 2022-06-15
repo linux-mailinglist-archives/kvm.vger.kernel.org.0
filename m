@@ -2,192 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9661754C542
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 11:59:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8192154C546
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 11:59:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347295AbiFOJ7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 05:59:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43606 "EHLO
+        id S1347318AbiFOJ7z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 05:59:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347294AbiFOJ7o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 05:59:44 -0400
+        with ESMTP id S1347312AbiFOJ7x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 05:59:53 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340A83B2B2;
-        Wed, 15 Jun 2022 02:59:44 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25F8dYot026177;
-        Wed, 15 Jun 2022 09:59:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511AA3B023;
+        Wed, 15 Jun 2022 02:59:52 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25F8kuCU024870;
+        Wed, 15 Jun 2022 09:59:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=TeixsNQbLwvMEPn7lXyqsgYrOwtvRiNkoBG8rNo/Uyo=;
- b=Z5OL978gJou6Pi1lFx4Bd56r9yJTZhXXIsjIBNmJtyWYS10xh11soFwftnkvSoghcO2g
- CiW7kECkkdwUgQOQ963DKB+WAx1/wRB452VENuNZPfVP6ISIrWvXRu4Rf30rTUVsM94O
- 9IjF22eFPuHBfHOHEm+8JTbzvYITuwLVhjWHbMI3+CTAOLUAGfePjD6m687pFHgYxjKW
- 9BfEqWVpmZ5oUjpZ98QVIbl9Jq5pLSLiRiYtKu+SDHlusiU/ATpRNXha3Zr8uQU2xIKu
- kYVWjriG3UjWcGsU7H3RG9QjYKMg+DNaypTRNJGtBNNuxW8Y1PdHDfYAjWm0mTjNASB9 PQ== 
+ bh=lBTF7emAg7+hzyjMO7wprAdMwph+OiuhuNTpiaYtriE=;
+ b=CO7JMEidxvgWLDviigpCt9EaAIvePyEfq+nfW3KnCdJdufxlF+kzUHnNS0GjBMxOzj2D
+ hwUc/GlmBHO20L8twoBZOt1vwdRvtxX1CcIXfpra5IAjsDltp99j8iRRdP24Mw20IV8i
+ tNZF7I+1IlKo6M2DBAu7q4VtBvRo3DEEQGQwIZkirsc5brK8BuXpKPiR/SZo50dK/F9u
+ 1tdbCj24GZCOJnrm0+RLG9uvLaCzaNMzd4VoFaxM/OrAY049yD3FOSIaswfV3D/JEqOX
+ FW8IGFdg/8NrQDBo+bUlGUyOU8WBuKcs8fG7o2vdUR2WKIYbpUOQKYNihyQRBIZR7VJ3 Bw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6jeawp-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpq69w0ab-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jun 2022 09:59:43 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25F9Zhor032082;
-        Wed, 15 Jun 2022 09:59:43 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6jeavr-1
+        Wed, 15 Jun 2022 09:59:51 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25F8qcED022573;
+        Wed, 15 Jun 2022 09:59:51 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpq69w09w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jun 2022 09:59:43 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25F9obD8025993;
-        Wed, 15 Jun 2022 09:59:40 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3gmjajdmh8-1
+        Wed, 15 Jun 2022 09:59:51 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25F9odwC005639;
+        Wed, 15 Jun 2022 09:59:48 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma01fra.de.ibm.com with ESMTP id 3gmjp8vc7y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jun 2022 09:59:40 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25F9xbCS17367330
+        Wed, 15 Jun 2022 09:59:48 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25F9xDup14745958
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Jun 2022 09:59:37 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 52E51AE04D;
-        Wed, 15 Jun 2022 09:59:37 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CFB6AAE045;
-        Wed, 15 Jun 2022 09:59:36 +0000 (GMT)
-Received: from [9.145.158.83] (unknown [9.145.158.83])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Jun 2022 09:59:36 +0000 (GMT)
-Message-ID: <0a13397a-86e0-7c25-0044-7a5733f61730@linux.ibm.com>
-Date:   Wed, 15 Jun 2022 11:59:36 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
-        david@redhat.com, linux-s390@vger.kernel.org,
+        Wed, 15 Jun 2022 09:59:13 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 53A7D11C052;
+        Wed, 15 Jun 2022 09:59:45 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 84B9C11C050;
+        Wed, 15 Jun 2022 09:59:44 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.1.67])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 15 Jun 2022 09:59:44 +0000 (GMT)
+Date:   Wed, 15 Jun 2022 11:59:42 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
         mimu@linux.ibm.com, nrb@linux.ibm.com
+Subject: Re: [PATCH v11 07/19] KVM: s390: pv: module parameter to fence
+ asynchronous destroy
+Message-ID: <20220615115942.762ac791@p-imbrenda>
+In-Reply-To: <bcbfcc87-aef4-d151-8e34-4646f1533c25@linux.ibm.com>
 References: <20220603065645.10019-1-imbrenda@linux.ibm.com>
- <20220603065645.10019-15-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v11 14/19] KVM: s390: pv: cleanup leftover protected VMs
- if needed
-In-Reply-To: <20220603065645.10019-15-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        <20220603065645.10019-8-imbrenda@linux.ibm.com>
+        <bcbfcc87-aef4-d151-8e34-4646f1533c25@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 1y0irkH7GOV4QmrrioXjVZZCp9xey4Kd
-X-Proofpoint-ORIG-GUID: i1uOJL1657KvTC5fPOjJaFvTtKAZxMES
+X-Proofpoint-GUID: 0RYFp40E29VCMFLFv281UP1jSwbYr6vx
+X-Proofpoint-ORIG-GUID: 4XD9-SRTwMeBqHiUaSLzNH5rEPYFe6Zj
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-15_03,2022-06-13_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 priorityscore=1501 clxscore=1015 adultscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 mlxscore=0 adultscore=0 bulkscore=0
+ phishscore=0 spamscore=0 suspectscore=0 clxscore=1015 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2204290000 definitions=main-2206150036
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/3/22 08:56, Claudio Imbrenda wrote:
-> In upcoming patches it will be possible to start tearing down a
-> protected VM, and finish the teardown concurrently in a different
-> thread.
+On Wed, 15 Jun 2022 11:53:17 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-s/,/
-s/the/its/
+> On 6/3/22 08:56, Claudio Imbrenda wrote:
+> > Add the module parameter "async_destroy", to allow the asynchronous
+> > destroy mechanism to be switched off.  This might be useful for
+> > debugging purposes.
+> > 
+> > The parameter is enabled by default.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Reviewed-by: Janosch Frank <frankja@linux.ibm.com>  
+> 
+> Normally this would be one of the last patches in the series, no?
+
+I need the variable to be already defined, because the subsequent
+patches use it to fence things
 
 > 
-> Protected VMs that are pending for tear down ("leftover") need to be
-> cleaned properly when the userspace process (e.g. qemu) terminates.
+> > ---
+> >   arch/s390/kvm/kvm-s390.c | 5 +++++
+> >   1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> > index 76ad6408cb2c..49e27b5d7c3a 100644
+> > --- a/arch/s390/kvm/kvm-s390.c
+> > +++ b/arch/s390/kvm/kvm-s390.c
+> > @@ -206,6 +206,11 @@ unsigned int diag9c_forwarding_hz;
+> >   module_param(diag9c_forwarding_hz, uint, 0644);
+> >   MODULE_PARM_DESC(diag9c_forwarding_hz, "Maximum diag9c forwarding per second, 0 to turn off");
+> >   
+> > +/* allow asynchronous deinit for protected guests, enable by default */
+> > +static int async_destroy = 1;
+> > +module_param(async_destroy, int, 0444);
+> > +MODULE_PARM_DESC(async_destroy, "Asynchronous destroy for protected guests");
+> > +
+> >   /*
+> >    * For now we handle at most 16 double words as this is what the s390 base
+> >    * kernel handles and stores in the prefix page. If we ever need to go beyond  
 > 
-> This patch makes sure that all "leftover" protected VMs are always
-> properly torn down.
-
-So we're handling the kvm_arch_destroy_vm() case here, right?
-Maybe add that in a more prominent way and rework the subject:
-
-KVM: s390: pv: cleanup leftover PV VM shells on VM shutdown
-
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_host.h |   2 +
->   arch/s390/kvm/kvm-s390.c         |   2 +
->   arch/s390/kvm/pv.c               | 109 ++++++++++++++++++++++++++++---
->   3 files changed, 104 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 5824efe5fc9d..cca8e05e0a71 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -924,6 +924,8 @@ struct kvm_s390_pv {
->   	u64 guest_len;
->   	unsigned long stor_base;
->   	void *stor_var;
-> +	void *prepared_for_async_deinit;
-> +	struct list_head need_cleanup;
->   	struct mmu_notifier mmu_notifier;
->   };
->   
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index fe1fa896def7..369de8377116 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2890,6 +2890,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   	kvm_s390_vsie_init(kvm);
->   	if (use_gisa)
->   		kvm_s390_gisa_init(kvm);
-> +	INIT_LIST_HEAD(&kvm->arch.pv.need_cleanup);
-> +	kvm->arch.pv.prepared_for_async_deinit = NULL;
->   	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
->   
->   	return 0;
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index 6cffea26c47f..8471c17d538c 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -17,6 +17,19 @@
->   #include <linux/mmu_notifier.h>
->   #include "kvm-s390.h"
->   
-> +/**
-> + * @struct leftover_pv_vm
-
-Any other ideas on naming these VMs?
-Also I'd turn that around: pv_vm_leftover
-
-> + * Represents a "leftover" protected VM that is still registered with the
-> + * Ultravisor, but which does not correspond any longer to an active KVM VM.
-> + */
-> +struct leftover_pv_vm {
-> +	struct list_head list;
-> +	unsigned long old_gmap_table;
-> +	u64 handle;
-> +	void *stor_var;
-> +	unsigned long stor_base;
-> +};
-> +
-
-I think we should switch this patch and the next one and add this struct 
-to the next patch. The list work below makes more sense once the next 
-patch has been read.
-
->   static void kvm_s390_clear_pv_state(struct kvm *kvm)
->   {
->   	kvm->arch.pv.handle = 0;
-> @@ -158,23 +171,88 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
->   	return -ENOMEM;
->   }
->   
-
->   
 
