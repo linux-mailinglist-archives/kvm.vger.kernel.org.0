@@ -2,37 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBB1954C0CF
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 06:37:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B20554C136
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 07:43:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238774AbiFOEhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 00:37:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39706 "EHLO
+        id S238751AbiFOFdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 01:33:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232921AbiFOEhM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 00:37:12 -0400
-X-Greylist: delayed 947 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 14 Jun 2022 21:37:10 PDT
-Received: from baidu.com (mx20.baidu.com [111.202.115.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E62B27FFF
-        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 21:37:10 -0700 (PDT)
-Received: from BJHW-Mail-Ex08.internal.baidu.com (unknown [10.127.64.18])
-        by Forcepoint Email with ESMTPS id 89628443559C07418D0D;
-        Wed, 15 Jun 2022 12:21:20 +0800 (CST)
-Received: from bjkjy-mail-ex26.internal.baidu.com (172.31.50.42) by
- BJHW-Mail-Ex08.internal.baidu.com (10.127.64.18) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Wed, 15 Jun 2022 12:21:21 +0800
-Received: from BC-Mail-Ex25.internal.baidu.com (172.31.51.19) by
- bjkjy-mail-ex26.internal.baidu.com (172.31.50.42) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2375.18; Wed, 15 Jun 2022 12:21:21 +0800
-Received: from BC-Mail-Ex25.internal.baidu.com ([172.31.51.19]) by
- BC-Mail-Ex25.internal.baidu.com ([172.31.51.19]) with mapi id 15.01.2308.020;
- Wed, 15 Jun 2022 12:21:21 +0800
-From:   "Wang,Guangju" <wangguangju@baidu.com>
-To:     Chao Gao <chao.gao@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        with ESMTP id S234510AbiFOFdv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 01:33:51 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B917F49F83
+        for <kvm@vger.kernel.org>; Tue, 14 Jun 2022 22:33:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655271230; x=1686807230;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=d7t339grLpqlhNNESGUxLpA2BKb5q2L+gVUe5y5cn9Y=;
+  b=L489fK40clT3bQSLeyXxPMwBArZUB40fPB5RT1kPhSyDlb7Qkrp2JWc1
+   RXDyTJY2XXeZpX8OUQa6IH5q8DncIyrovBM6OqH+pJV6/A99aN1/YcQNH
+   4SDrkFQ5HInW1f99MivHVZBgJYJfJC62A2u+9f2gRiAp7w8vm3kjQhuLc
+   eenhswCppdVuVEciWrSR4IxG9HEBBBRKRHPjxXPOSi3hIoGaAtC0AwQw6
+   pju9K6O+pxgTu5Th7cUo7NPjX26bpETM9h/66gR+VE61IxBK/AdHpsCiw
+   TuZ77rQtahsofs08dRyzdzZes2q1queKZLFJZPeFv6isP9ligr+m26HC2
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10378"; a="258694125"
+X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
+   d="scan'208";a="258694125"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 22:33:50 -0700
+X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
+   d="scan'208";a="830844473"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 22:33:47 -0700
+Date:   Wed, 15 Jun 2022 13:33:34 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     "Wang,Guangju" <wangguangju@baidu.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "vkuznets@redhat.com" <vkuznets@redhat.com>,
         "wanpengli@tencent.com" <wanpengli@tencent.com>,
         "jmattson@google.com" <jmattson@google.com>,
@@ -43,28 +51,23 @@ CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "mingo@redhat.com" <mingo@redhat.com>,
         "x86@kernel.org" <x86@kernel.org>,
         "linux-kernel@vger.kernel.orga" <linux-kernel@vger.kernel.orga>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBLVk06IHg4NjogYWRkIGEgYm9vbCB2YXJpYWJsZSB0?=
- =?gb2312?Q?o_distinguish_whether_to_use_PVIPI?=
-Thread-Topic: [PATCH] KVM: x86: add a bool variable to distinguish whether to
- use PVIPI
-Thread-Index: AQHYfyPr/9L7okltJU2kC54bFkCPZK1NDlYAgAChdACAAMV9AIAABh+AgAFi4vA=
-Date:   Wed, 15 Jun 2022 04:21:21 +0000
-Message-ID: <aa618267a02c4ca9b10d75b5035b92d0@baidu.com>
+Subject: Re: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTog?= =?utf-8?Q?x86=3A?= add
+ a bool variable to distinguish whether to use PVIPI
+Message-ID: <20220615053329.GA13836@gao-cwp>
 References: <1655124522-42030-1-git-send-email-wangguangju@baidu.com>
- <YqdxAFhkeLjvi7L5@google.com> <20220614025434.GA15042@gao-cwp>
- <YqieGua0ouUePWol@google.com> <20220614150319.GA13174@gao-cwp>
-In-Reply-To: <20220614150319.GA13174@gao-cwp>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.192.190]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+ <YqdxAFhkeLjvi7L5@google.com>
+ <20220614025434.GA15042@gao-cwp>
+ <YqieGua0ouUePWol@google.com>
+ <20220614150319.GA13174@gao-cwp>
+ <aa618267a02c4ca9b10d75b5035b92d0@baidu.com>
 MIME-Version: 1.0
-X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex08_2022-06-15 12:21:21:956
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa618267a02c4ca9b10d75b5035b92d0@baidu.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,38 +75,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pk9uIE1vbiwgSnVuIDEzLCAyMDIyIGF0IDA1OjE2OjQ4UE0gKzAwMDAsIFNlYW4gQ2hyaXN0b3Bo
-ZXJzb24gd3JvdGU6DQo+PlRoZSBzaG9ydGxvZyBpcyBub3QgYXQgYWxsIGhlbHBmdWwsIGl0IGRv
-ZXNuJ3Qgc2F5IGFueXRoaW5nIGFib3V0IHdoYXQgDQo+PmFjdHVhbCBmdW5jdGlvbmFsIGNoYW5n
-ZS4NCj4+DQo+PiAgS1ZNOiB4ODY6IERvbid0IGFkdmVydGlzZSBQViBJUEkgdG8gdXNlcnNwYWNl
-IGlmIElQSXMgYXJlIHZpcnR1YWxpemVkDQo+Pg0KPj5PbiBNb24sIEp1biAxMywgMjAyMiwgd2Fu
-Z2d1YW5nanUgd3JvdGU6DQo+Pj4gQ29tbWl0IGQ1ODhiYjliZTFkYSAoIktWTTogVk1YOiBlbmFi
-bGUgSVBJIHZpcnR1YWxpemF0aW9uIikgZW5hYmxlIA0KPj4gPklQSSB2aXJ0dWFsaXphdGlvbiBp
-biBJbnRlbCBTUFIgcGxhdGZvcm0uVGhlcmUgaXMgbm8gcG9pbnQgaW4gdXNpbmcgDQo+PiA+UFZJ
-UEkgaWYgSVBJdiBpcyBzdXBwb3J0ZWQsIGl0IGRvZXNuJ3Qgd29yayBsZXNzIGdvb2Qgd2l0aCBQ
-VklQSSB0aGFuIA0KPj4gPndpdGhvdXQgaXQuDQo+Pj4gDQo+PiA+U28gYWRkIGEgYm9vbCB2YXJp
-YWJsZSB0byBkaXN0aW5ndWlzaCB3aGV0aGVyIHRvIHVzZSBQVklQSS4NCj4+DQo+PlNpbWlsYXIg
-Y29tcGxhaW50IHdpdGggdGhlIGNoYW5nZWxvZywgaXQgZG9lc24ndCBhY3R1YWxseSBjYWxsIG91
-dCB3aHkgDQo+PlBWIElQSXMgYXJlIHVud2FudGVkLg0KPj4NCj4+ICBEb24ndCBhZHZlcnRpc2Ug
-UFYgSVBJIHN1cHBvcnQgdG8gdXNlcnNwYWNlIGlmIElQSSB2aXJ0dWFsaXphdGlvbiBpcyAgDQo+
-ID5zdXBwb3J0ZWQgYnkgdGhlIENQVS4gIEhhcmR3YXJlIHZpcnR1YWxpemF0aW9uIG9mIElQSXMg
-bW9yZSBwZXJmb3JtYW50ICANCj4gPmFzIHNlbmRlcnMgZG8gbm90IG5lZWQgdG8gZXhpdC4NCg0K
-PlBWSVBJIGlzIG1haW5seSBbKl0gZm9yIHNlbmRpbmcgbXVsdGktY2FzdCBJUElzLiBJbnRlbCBJ
-UEkgdmlydHVhbGl6YXRpb24gY2FuIHZpcnR1YWxpemUgb25seSB1bmktY2FzdCBJUElzLiBUaGVp
-ciB1c2UgY2FzZXMgZG9uJ3Qgb3ZlcmxhcC4gU28sIEkgZG9uJ3QgdGhpbmsgaXQgbWFrZXMgc2Vu
-c2UgdG8gZGlzYWJsZSBQVklQSSBpZiBpbnRlbCBJUEkgdmlydHVhbGl6YXRpb24gaXMgc3VwcG9y
-dGVkLg0KQSBxdWVzdGlvbiwgbGlrZSB4MmFwaWMgbW9kZSwgZ3Vlc3QgdXNlcyBQVklQSSB3aXRo
-IHJlcGxhY2UgYXBpYy0+c2VuZF9JUElfbWFzayB0byBrdm1fc2VuZF9pcGlfbWFzay4gVGhlIG9y
-aWdpbmFsIGZ1bmN0aW9uIGltcGxlbWVudGF0aW9uIGlzIF9feDJhcGljX3NlbmRfSVBJX21hc2sg
-LCBhbmQgaXQgcG9sbCBlYWNoIENQVSB0byBzZW5kIElQSS4gU28gaW4gdGhpcyBjYXNlIA0KSW50
-ZWwgdmlydHVhbGl6YXRpb24gY2FuIG5vdCB3b3JrPyBUaGFua3MuDQoNCnN0YXRpYyB2b2lkDQpf
-X3gyYXBpY19zZW5kX0lQSV9tYXNrKGNvbnN0IHN0cnVjdCBjcHVtYXNrICptYXNrLCBpbnQgdmVj
-dG9yLCBpbnQgYXBpY19kZXN0KQ0Kew0KCXVuc2lnbmVkIGxvbmcgcXVlcnlfY3B1Ow0KCXVuc2ln
-bmVkIGxvbmcgdGhpc19jcHU7DQoJdW5zaWduZWQgbG9uZyBmbGFnczsNCg0KCS8qIHgyYXBpYyBN
-U1JzIGFyZSBzcGVjaWFsIGFuZCBuZWVkIGEgc3BlY2lhbCBmZW5jZTogKi8NCgl3ZWFrX3dybXNy
-X2ZlbmNlKCk7DQoNCglsb2NhbF9pcnFfc2F2ZShmbGFncyk7DQoNCgl0aGlzX2NwdSA9IHNtcF9w
-cm9jZXNzb3JfaWQoKTsNCglmb3JfZWFjaF9jcHUocXVlcnlfY3B1LCBtYXNrKSB7DQoJCWlmIChh
-cGljX2Rlc3QgPT0gQVBJQ19ERVNUX0FMTEJVVCAmJiB0aGlzX2NwdSA9PSBxdWVyeV9jcHUpDQoJ
-CQljb250aW51ZTsNCgkJX194MmFwaWNfc2VuZF9JUElfZGVzdChwZXJfY3B1KHg4Nl9jcHVfdG9f
-YXBpY2lkLCBxdWVyeV9jcHUpLA0KCQkJCSAgICAgICB2ZWN0b3IsIEFQSUNfREVTVF9QSFlTSUNB
-TCk7DQoJfQ0KCWxvY2FsX2lycV9yZXN0b3JlKGZsYWdzKTsNCn0NCg==
+On Wed, Jun 15, 2022 at 04:21:21AM +0000, Wang,Guangju wrote:
+>>On Mon, Jun 13, 2022 at 05:16:48PM +0000, Sean Christopherson wrote:
+>>>The shortlog is not at all helpful, it doesn't say anything about what 
+>>>actual functional change.
+>>>
+>>>  KVM: x86: Don't advertise PV IPI to userspace if IPIs are virtualized
+>>>
+>>>On Mon, Jun 13, 2022, wangguangju wrote:
+>>>> Commit d588bb9be1da ("KVM: VMX: enable IPI virtualization") enable 
+>>> >IPI virtualization in Intel SPR platform.There is no point in using 
+>>> >PVIPI if IPIv is supported, it doesn't work less good with PVIPI than 
+>>> >without it.
+>>>> 
+>>> >So add a bool variable to distinguish whether to use PVIPI.
+>>>
+>>>Similar complaint with the changelog, it doesn't actually call out why 
+>>>PV IPIs are unwanted.
+>>>
+>>>  Don't advertise PV IPI support to userspace if IPI virtualization is  
+>> >supported by the CPU.  Hardware virtualization of IPIs more performant  
+>> >as senders do not need to exit.
+>
+>>PVIPI is mainly [*] for sending multi-cast IPIs. Intel IPI virtualization can virtualize only uni-cast IPIs. Their use cases don't overlap. So, I don't think it makes sense to disable PVIPI if intel IPI virtualization is supported.
+>A question, like x2apic mode, guest uses PVIPI with replace apic->send_IPI_mask to kvm_send_ipi_mask. The original function implementation is __x2apic_send_IPI_mask , and it poll each CPU to send IPI. So in this case 
+>Intel virtualization can not work? Thanks.
+
+Yes, it can work. But some experiments we conducted based on a modified
+kvm-unit-test showed that PVIPI outperforms native ICR writes (w/ IPI
+virtualization) in terms of sending multi-cast (i.e., dest vCPUs >=2) IPIs
