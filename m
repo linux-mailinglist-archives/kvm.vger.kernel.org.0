@@ -2,185 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA95454C53B
-	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 11:58:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9661754C542
+	for <lists+kvm@lfdr.de>; Wed, 15 Jun 2022 11:59:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347168AbiFOJ6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jun 2022 05:58:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41696 "EHLO
+        id S1347295AbiFOJ7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jun 2022 05:59:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346802AbiFOJ63 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jun 2022 05:58:29 -0400
-X-Greylist: delayed 122 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 15 Jun 2022 02:58:24 PDT
-Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CFEB2ED74;
-        Wed, 15 Jun 2022 02:58:24 -0700 (PDT)
-Received: from ([60.208.111.195])
-        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id KHU00114;
-        Wed, 15 Jun 2022 17:56:14 +0800
-Received: from jtjnmail201622.home.langchao.com (10.100.2.22) by
- jtjnmail201620.home.langchao.com (10.100.2.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Wed, 15 Jun 2022 17:56:18 +0800
-Received: from jtjnmail201622.home.langchao.com ([fe80::15c3:8d74:3aa6:25f6])
- by jtjnmail201622.home.langchao.com ([fe80::15c3:8d74:3aa6:25f6%7]) with mapi
- id 15.01.2308.027; Wed, 15 Jun 2022 17:56:18 +0800
-From:   =?gb2312?B?Qm8gTGl1ICjB9bKoKS3Ay7Ox0MXPog==?= <liubo03@inspur.com>
-To:     "dmatlack@google.com" <dmatlack@google.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "inux-kernel@vger.kernel.org" <inux-kernel@vger.kernel.org>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBLVk06IFVzZSBjb25zaXN0ZW50IHR5cGUgZm9yIHJl?=
- =?gb2312?B?dHVybiB2YWx1ZSBvZiBrdm1fbW11X21lbW9yeV9jYWNoZV9ucl9mcmVlX29i?=
- =?gb2312?Q?jects()?=
-Thread-Topic: [PATCH] KVM: Use consistent type for return value of
- kvm_mmu_memory_cache_nr_free_objects()
-Thread-Index: AQHYf9GoAt8m3higMU6WSKX3/LCUGq1OeSwAgAAZc4CAAakEgA==
-Date:   Wed, 15 Jun 2022 09:56:18 +0000
-Message-ID: <137b79dffc384b18a756788c7452a8b8@inspur.com>
-References: <20220614093222.25387-1-liubo03@inspur.com>
- <YqiigqccucuU2AQg@google.com>
- <CALzav=deWrsJjNigiAOGkG-LjWuW91-NKfAx0ZkVj1CEZEZLZg@mail.gmail.com>
-In-Reply-To: <CALzav=deWrsJjNigiAOGkG-LjWuW91-NKfAx0ZkVj1CEZEZLZg@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.200.104.97]
-Content-Type: application/pkcs7-mime; smime-type=signed-data;
-        name="smime.p7m"
-Content-Disposition: attachment; filename="smime.p7m"
-Content-Transfer-Encoding: base64
+        with ESMTP id S1347294AbiFOJ7o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jun 2022 05:59:44 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340A83B2B2;
+        Wed, 15 Jun 2022 02:59:44 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25F8dYot026177;
+        Wed, 15 Jun 2022 09:59:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TeixsNQbLwvMEPn7lXyqsgYrOwtvRiNkoBG8rNo/Uyo=;
+ b=Z5OL978gJou6Pi1lFx4Bd56r9yJTZhXXIsjIBNmJtyWYS10xh11soFwftnkvSoghcO2g
+ CiW7kECkkdwUgQOQ963DKB+WAx1/wRB452VENuNZPfVP6ISIrWvXRu4Rf30rTUVsM94O
+ 9IjF22eFPuHBfHOHEm+8JTbzvYITuwLVhjWHbMI3+CTAOLUAGfePjD6m687pFHgYxjKW
+ 9BfEqWVpmZ5oUjpZ98QVIbl9Jq5pLSLiRiYtKu+SDHlusiU/ATpRNXha3Zr8uQU2xIKu
+ kYVWjriG3UjWcGsU7H3RG9QjYKMg+DNaypTRNJGtBNNuxW8Y1PdHDfYAjWm0mTjNASB9 PQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6jeawp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Jun 2022 09:59:43 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25F9Zhor032082;
+        Wed, 15 Jun 2022 09:59:43 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gpp6jeavr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Jun 2022 09:59:43 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25F9obD8025993;
+        Wed, 15 Jun 2022 09:59:40 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3gmjajdmh8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Jun 2022 09:59:40 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25F9xbCS17367330
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Jun 2022 09:59:37 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 52E51AE04D;
+        Wed, 15 Jun 2022 09:59:37 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CFB6AAE045;
+        Wed, 15 Jun 2022 09:59:36 +0000 (GMT)
+Received: from [9.145.158.83] (unknown [9.145.158.83])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 15 Jun 2022 09:59:36 +0000 (GMT)
+Message-ID: <0a13397a-86e0-7c25-0044-7a5733f61730@linux.ibm.com>
+Date:   Wed, 15 Jun 2022 11:59:36 +0200
 MIME-Version: 1.0
-tUid:   20226151756144a1fdba28f7b4f34f99dd6f1ea1a5a6c
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,ENCRYPTED_MESSAGE,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
+        david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com, nrb@linux.ibm.com
+References: <20220603065645.10019-1-imbrenda@linux.ibm.com>
+ <20220603065645.10019-15-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v11 14/19] KVM: s390: pv: cleanup leftover protected VMs
+ if needed
+In-Reply-To: <20220603065645.10019-15-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1y0irkH7GOV4QmrrioXjVZZCp9xey4Kd
+X-Proofpoint-ORIG-GUID: i1uOJL1657KvTC5fPOjJaFvTtKAZxMES
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-15_03,2022-06-13_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 clxscore=1015 adultscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206150036
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAaCAJIAEggtsQ29u
-dGVudC1UeXBlOiB0ZXh0L3BsYWluOw0KCWNoYXJzZXQ9ImdiMjMxMiINCkNvbnRlbnQtVHJhbnNm
-ZXItRW5jb2Rpbmc6IDdiaXQNCg0KPk9uIFR1ZSwgSnVuIDE0LCAyMDIyIGF0IDg6MDEgQU0gU2Vh
-biBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+d3JvdGU6DQo+Pg0KPj4gT24g
-VHVlLCBKdW4gMTQsIDIwMjIsIEJvIExpdSB3cm90ZToNCj4+ID4gVGhlIHJldHVybiB2YWx1ZSB0
-eXBlIG9mIHRoZSBmdW5jdGlvbiBybWFwX2Nhbl9hZGQoKSBpcyAiYm9vbCIsIGFuZA0KPj4gPiBp
-dCB3aWxsIHJldHVybnMgdGhlIHJlc3VsdCBvZiB0aGUgZnVuY3Rpb24NCj5rdm1fbW11X21lbW9y
-eV9jYWNoZV9ucl9mcmVlX29iamVjdHMoKS4NCj4+ID4gU28gd2Ugc2hvdWxkIGNoYW5nZSB0aGUg
-cmV0dXJuIHZhbHVlIHR5cGUgb2YNCj4+ID4ga3ZtX21tdV9tZW1vcnlfY2FjaGVfbnJfZnJlZV9v
-YmplY3RzKCkgdG8gImJvb2wiLg0KPj4gPg0KPj4gPiBTaWduZWQtb2ZmLWJ5OiBCbyBMaXUgPGxp
-dWJvMDNAaW5zcHVyLmNvbT4NCj4+ID4gLS0tDQo+PiA+ICBpbmNsdWRlL2xpbnV4L2t2bV9ob3N0
-LmggfCAyICstDQo+PiA+ICB2aXJ0L2t2bS9rdm1fbWFpbi5jICAgICAgfCA0ICsrLS0NCj4+ID4g
-IDIgZmlsZXMgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPj4gPg0K
-Pj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oIGIvaW5jbHVkZS9saW51
-eC9rdm1faG9zdC5oDQo+PiA+IGluZGV4IGMyMGYyZDU1ODQwYy4uYTM5OWE3NDg1Nzk1IDEwMDY0
-NA0KPj4gPiAtLS0gYS9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgNCj4+ID4gKysrIGIvaW5jbHVk
-ZS9saW51eC9rdm1faG9zdC5oDQo+PiA+IEBAIC0xMzU4LDcgKzEzNTgsNyBAQCB2b2lkIGt2bV9m
-bHVzaF9yZW1vdGVfdGxicyhzdHJ1Y3Qga3ZtICprdm0pOw0KPj4gPg0KPj4gPiAgI2lmZGVmIEtW
-TV9BUkNIX05SX09CSlNfUEVSX01FTU9SWV9DQUNIRSAgaW50DQo+PiA+IGt2bV9tbXVfdG9wdXBf
-bWVtb3J5X2NhY2hlKHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNoZSAqbWMsDQo+aW50DQo+PiA+
-IG1pbik7IC1pbnQga3ZtX21tdV9tZW1vcnlfY2FjaGVfbnJfZnJlZV9vYmplY3RzKHN0cnVjdA0K
-Pj4gPiBrdm1fbW11X21lbW9yeV9jYWNoZSAqbWMpOw0KPj4gPiArYm9vbCBrdm1fbW11X21lbW9y
-eV9jYWNoZV9ucl9mcmVlX29iamVjdHMoc3RydWN0DQo+PiA+ICtrdm1fbW11X21lbW9yeV9jYWNo
-ZSAqbWMpOw0KPj4gPiAgdm9pZCBrdm1fbW11X2ZyZWVfbWVtb3J5X2NhY2hlKHN0cnVjdCBrdm1f
-bW11X21lbW9yeV9jYWNoZQ0KPiptYyk7DQo+PiA+IHZvaWQgKmt2bV9tbXVfbWVtb3J5X2NhY2hl
-X2FsbG9jKHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNoZQ0KPiptYyk7DQo+PiA+ICNlbmRpZiBk
-aWZmIC0tZ2l0IGEvdmlydC9rdm0va3ZtX21haW4uYyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMgaW5k
-ZXgNCj4+ID4gYTY3ZTk5NmNiZjdmLi4yODcyNTY5ZTM1ODAgMTAwNjQ0DQo+PiA+IC0tLSBhL3Zp
-cnQva3ZtL2t2bV9tYWluLmMNCj4+ID4gKysrIGIvdmlydC9rdm0va3ZtX21haW4uYw0KPj4gPiBA
-QCAtMzk0LDkgKzM5NCw5IEBAIGludCBrdm1fbW11X3RvcHVwX21lbW9yeV9jYWNoZShzdHJ1Y3QN
-Cj5rdm1fbW11X21lbW9yeV9jYWNoZSAqbWMsIGludCBtaW4pDQo+PiA+ICAgICAgIHJldHVybiAw
-Ow0KPj4gPiAgfQ0KPj4gPg0KPj4gPiAtaW50IGt2bV9tbXVfbWVtb3J5X2NhY2hlX25yX2ZyZWVf
-b2JqZWN0cyhzdHJ1Y3QNCj4+ID4ga3ZtX21tdV9tZW1vcnlfY2FjaGUgKm1jKQ0KPj4gPiArYm9v
-bCBrdm1fbW11X21lbW9yeV9jYWNoZV9ucl9mcmVlX29iamVjdHMoc3RydWN0DQo+PiA+ICtrdm1f
-bW11X21lbW9yeV9jYWNoZSAqbWMpDQo+Pg0KPj4gQWJzb2x1dGVseSBub3QsIHRoZSBuYW1lIG9m
-IHRoZSBmdW5jdGlvbiBpcyAibnJfZnJlZV9vYmplY3RzIi4NCj4+IFJlbmFtaW5nIGl0IHRvICJo
-YXNfZnJlZV9vYmplY3RzIiBpcyBub3QgYSBuZXQgcG9zaXRpdmUgSU1PLg0KPg0KPkFsc28gbmVz
-dGVkIGVhZ2VyIHBhZ2Ugc3BsaXR0aW5nIFsxXSB1c2VzDQo+a3ZtX21tdV9tZW1vcnlfY2FjaGVf
-bnJfZnJlZV9vYmplY3RzKCkgYW5kIG5lZWRzIHRvIGtub3cgdGhlIG51bWJlcg0KPm9mIGZyZWUg
-b2JqZWN0cy4NCj4NCj5bMV0NCj5odHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvMjAyMjA1MTYy
-MzIxMzguMTc4MzMyNC0yMy1kbWF0bGFja0Bnb29nbGUuYw0KPm9tLw0KPg0KSSBnb3QgaXQuDQpU
-aGFua3MuDQoNCj4+IElmIHdlIHJlYWxseSBjYXJlIGFib3V0IHJldHVybmluZw0KPj4gYSBib29s
-IHRoZW4gd2UgY2FuIHR3ZWFrIHJtYXBfY2FuX2FkZCgpLg0KPj4NCj4+IGRpZmYgLS1naXQgYS9h
-cmNoL3g4Ni9rdm0vbW11L21tdS5jIGIvYXJjaC94ODYva3ZtL21tdS9tbXUuYyBpbmRleA0KPj4g
-MTcyNTJmMzliZDdjLi4wNDc4NTVkMTM0ZGEgMTAwNjQ0DQo+PiAtLS0gYS9hcmNoL3g4Ni9rdm0v
-bW11L21tdS5jDQo+PiArKysgYi9hcmNoL3g4Ni9rdm0vbW11L21tdS5jDQo+PiBAQCAtMTAxOCw3
-ICsxMDE4LDcgQEAgc3RhdGljIGJvb2wgcm1hcF9jYW5fYWRkKHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSkNCj4+ICAgICAgICAgc3RydWN0IGt2bV9tbXVfbWVtb3J5X2NhY2hlICptYzsNCj4+DQo+PiAg
-ICAgICAgIG1jID0gJnZjcHUtPmFyY2gubW11X3B0ZV9saXN0X2Rlc2NfY2FjaGU7DQo+PiAtICAg
-ICAgIHJldHVybiBrdm1fbW11X21lbW9yeV9jYWNoZV9ucl9mcmVlX29iamVjdHMobWMpOw0KPj4g
-KyAgICAgICByZXR1cm4gISFrdm1fbW11X21lbW9yeV9jYWNoZV9ucl9mcmVlX29iamVjdHMobWMp
-Ow0KPj4gIH0NCj4+DQo+PiAgc3RhdGljIHZvaWQgcm1hcF9yZW1vdmUoc3RydWN0IGt2bSAqa3Zt
-LCB1NjQgKnNwdGUpDQoAAAAAAACgggrwMIIDojCCAoqgAwIBAgIQY8pSLFM4dppNwhLkOtBW6jAN
-BgkqhkiG9w0BAQsFADBZMRMwEQYKCZImiZPyLGQBGRYDY29tMRgwFgYKCZImiZPyLGQBGRYIbGFu
-Z2NoYW8xFDASBgoJkiaJk/IsZAEZFgRob21lMRIwEAYDVQQDEwlJTlNQVVItQ0EwHhcNMTcwMTA5
-MDkyODMwWhcNMjcwMTA5MDkzODI5WjBZMRMwEQYKCZImiZPyLGQBGRYDY29tMRgwFgYKCZImiZPy
-LGQBGRYIbGFuZ2NoYW8xFDASBgoJkiaJk/IsZAEZFgRob21lMRIwEAYDVQQDEwlJTlNQVVItQ0Ew
-ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCr5DXvG2MkvKnmGBcOJ7WvgN42PvpVS9tk
-1LLBZTnOHH57Qu7STBxnRPcqdxl2B1bKpi9EkxD9VWpfeBLhXG0vDfMGuD2Qa4PQt+kfRwDZvRke
-nFGHlZqk/Xh+VxKH+WdrCKDb3PjjB9QSDjfJNk6U588qiz8ObrDKsm1o+YPoAXvDj68VkfTMxh+N
-CRI3/EaBLc48E0AHw9MczaxX58WaeeVMWnJGDQ4ggDZ+gAtm+MiM11R+nyQwZKH9lUx8epMfh6j4
-Vxk9n632dNolDP1xLKXDfr4iDoUZkcD9mr7R9jJULFHVktQsZLrCxV6nyPTvnOVKKetWkxp2C45w
-CtOHAgMBAAGjZjBkMBMGCSsGAQQBgjcUAgQGHgQAQwBBMAsGA1UdDwQEAwIBhjAPBgNVHRMBAf8E
-BTADAQH/MB0GA1UdDgQWBBReWQOmtExYYJFO9h61pTmmMsE1ajAQBgkrBgEEAYI3FQEEAwIBADAN
-BgkqhkiG9w0BAQsFAAOCAQEASsTfu+11K7aJhVcW+auDkJ7hjk3ITK9pOHmtMa38J4OO4VLmTBik
-dUu3dQVgnEs9OUC4Eo0HAm5BMNemcQ6QGNPC6QLRVnjTZqDdu8X8BDzUVXJwpnq2zxwDN3YY6NGt
-DKVgHBlv8feJN8SwB/msP95gUE1Lprhwnbs5Dexjg3dnIJdVGWiCwf51dXw2frwGwehjvpO+BZtr
-FWwh6mtN1JlTM0KxxvmvHjqr5+cTQV4crTWKIoDGWIevIOiSy4ImgeEpjFBO5LzYD2vkQYAtN2ZH
-GFIsv+S+vYzefdZmZUvpS6UEWw1Iole4jNN7b4OYyvkNhyybRl81sM4BWss+dTCCB0YwggYuoAMC
-AQICE34AANHR1UxsCE9f8IsAAAAA0dEwDQYJKoZIhvcNAQELBQAwWTETMBEGCgmSJomT8ixkARkW
-A2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdjaGFvMRQwEgYKCZImiZPyLGQBGRYEaG9tZTESMBAG
-A1UEAxMJSU5TUFVSLUNBMB4XDTIwMDcxNDA2MjgyN1oXDTI1MDcxMzA2MjgyN1owgaIxEzARBgoJ
-kiaJk/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZFghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkW
-BGhvbWUxHjAcBgNVBAsMFeS6keaVsOaNruS4reW/g+mbhuWbojEYMBYGA1UEAwwP5YiY5rOiKGxp
-dWJvMDMpMSEwHwYJKoZIhvcNAQkBFhJsaXVibzAzQGluc3B1ci5jb20wggEiMA0GCSqGSIb3DQEB
-AQUAA4IBDwAwggEKAoIBAQD7f4+LawmacfqX8BF7XWulYDQEDwdISSg2e2AJfClVBusFxt28FVxQ
-Kh/i3mmxZ6lIBAbNgouiaYVs4fPKrMWa60KHv++XNQjkRHFXf1GHBMoVEfT8WqEL+y9TfnKd71Dk
-3YPa7kCN7T8rERSLAnwA4zAEE9gSLpXvKtDza4wV3S5nyPVXCtrNu1SM8wx7q0wxgy1Wi0P5xNQI
-ZS+wk17KcZ86e0qu5FNvNNMlZlF2AIOwgFC06jGOc7q0sR0ymgLBWf413BRixq5d0YZq/H2VPUef
-nPEvhwua/Xduf8RXvAiohZjgD1g+1Ihsw9CRc0wQ99WO4fEzygfOPNHDXm2NAgMBAAGjggO7MIID
-tzA9BgkrBgEEAYI3FQcEMDAuBiYrBgEEAYI3FQiC8qkfhIHXeoapkT2GgPcVg9iPXIFK/YsmgZSn
-TQIBZAIBYDApBgNVHSUEIjAgBggrBgEFBQcDAgYIKwYBBQUHAwQGCisGAQQBgjcKAwQwCwYDVR0P
-BAQDAgWgMDUGCSsGAQQBgjcVCgQoMCYwCgYIKwYBBQUHAwIwCgYIKwYBBQUHAwQwDAYKKwYBBAGC
-NwoDBDBEBgkqhkiG9w0BCQ8ENzA1MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAICAIAwBwYF
-Kw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFOQd2n/Lf4O4MnXdDVjOBT2JXs13MB8GA1UdIwQY
-MBaAFF5ZA6a0TFhgkU72HrWlOaYywTVqMIIBDwYDVR0fBIIBBjCCAQIwgf+ggfyggfmGgbpsZGFw
-Oi8vL0NOPUlOU1BVUi1DQSxDTj1KVENBMjAxMixDTj1DRFAsQ049UHVibGljJTIwS2V5JTIwU2Vy
-dmljZXMsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1ob21lLERDPWxhbmdjaGFvLERD
-PWNvbT9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlzdHJp
-YnV0aW9uUG9pbnSGOmh0dHA6Ly9KVENBMjAxMi5ob21lLmxhbmdjaGFvLmNvbS9DZXJ0RW5yb2xs
-L0lOU1BVUi1DQS5jcmwwggEpBggrBgEFBQcBAQSCARswggEXMIGxBggrBgEFBQcwAoaBpGxkYXA6
-Ly8vQ049SU5TUFVSLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXklMjBTZXJ2aWNlcyxDTj1TZXJ2
-aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWhvbWUsREM9bGFuZ2NoYW8sREM9Y29tP2NBQ2VydGlm
-aWNhdGU/YmFzZT9vYmplY3RDbGFzcz1jZXJ0aWZpY2F0aW9uQXV0aG9yaXR5MGEGCCsGAQUFBzAC
-hlVodHRwOi8vSlRDQTIwMTIuaG9tZS5sYW5nY2hhby5jb20vQ2VydEVucm9sbC9KVENBMjAxMi5o
-b21lLmxhbmdjaGFvLmNvbV9JTlNQVVItQ0EuY3J0MEEGA1UdEQQ6MDigIgYKKwYBBAGCNxQCA6AU
-DBJsaXVibzAzQGluc3B1ci5jb22BEmxpdWJvMDNAaW5zcHVyLmNvbTANBgkqhkiG9w0BAQsFAAOC
-AQEAD4FpjcHepea9mruDu1kvOrZVCNT/9cdObKXnwYsNZ1Uey5feWsAbAR8tWdSh2m+2GO1vtPvE
-RTMmHgXrbMsVKbwc4E8fUH7pIVAoKEdl4zSlq69evWStG1W/zZGAuxTbpetcVQ8341w/C3u87DXM
-c6IOJzhqcvcD2Cy4OWMCLaX4IDlFjTnIv7yitqwQCE5gvr6Sz1oHxCILFtnNKGQNMySuHQ3UOOgE
-tqJu2eUj9/E5Rgzq+B2Ij4ULTYbjUHfrhkBzWZptIW8Yg/pwh2v+iWms9A6P1yrrMyLTmpQFSPba
-EO+FxjROVPh8QlKu9uWn8sbqpO1UjeKVQDGF7yL1wjGCA5MwggOPAgEBMHAwWTETMBEGCgmSJomT
-8ixkARkWA2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdjaGFvMRQwEgYKCZImiZPyLGQBGRYEaG9t
-ZTESMBAGA1UEAxMJSU5TUFVSLUNBAhN+AADR0dVMbAhPX/CLAAAAANHRMAkGBSsOAwIaBQCgggH4
-MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIyMDYxNTA5NTYxNlow
-IwYJKoZIhvcNAQkEMRYEFMrQUipIuZMVUsZpn9VSgnerSFPEMH8GCSsGAQQBgjcQBDFyMHAwWTET
-MBEGCgmSJomT8ixkARkWA2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdjaGFvMRQwEgYKCZImiZPy
-LGQBGRYEaG9tZTESMBAGA1UEAxMJSU5TUFVSLUNBAhN+AADR0dVMbAhPX/CLAAAAANHRMIGBBgsq
-hkiG9w0BCRACCzFyoHAwWTETMBEGCgmSJomT8ixkARkWA2NvbTEYMBYGCgmSJomT8ixkARkWCGxh
-bmdjaGFvMRQwEgYKCZImiZPyLGQBGRYEaG9tZTESMBAGA1UEAxMJSU5TUFVSLUNBAhN+AADR0dVM
-bAhPX/CLAAAAANHRMIGTBgkqhkiG9w0BCQ8xgYUwgYIwCgYIKoZIhvcNAwcwCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFA
-MAcGBSsOAwIaMAsGCWCGSAFlAwQCAzALBglghkgBZQMEAgIwCwYJYIZIAWUDBAIBMA0GCSqGSIb3
-DQEBAQUABIIBAMLilcz8BMh6/TxBX4HBCVXTfO3CXKZNTful2cdCKtnIyX0zmvSd/VCi9uUrf9jg
-IbKKxx+SWaQbdMtgjZ17EVJDbMA1CuehxmXmFtLQO+iFQyr2Sa6EVjhcmHkM3tJqoxF9OlGpG/Gr
-pkNyuOH4VZWUXuPgZlfofIdSVsz1GwC7VX7AKqPudPNtYkqlIq86L5+muQBndeVj+FPbmCDM5uj1
-QteMbYTE1lXd9YyMiWUtX8gcUVbMcnLxydm/j1OmJpQMtwTGWR/TR2CchgK41fYVNewjCtS8qGzn
-Vt7L0MN4BjxxLJNcadE7OmBTe4+KzheiTJjjSUuPq4UpfChc5rkAAAAAAAA=
+On 6/3/22 08:56, Claudio Imbrenda wrote:
+> In upcoming patches it will be possible to start tearing down a
+> protected VM, and finish the teardown concurrently in a different
+> thread.
+
+s/,/
+s/the/its/
+
+> 
+> Protected VMs that are pending for tear down ("leftover") need to be
+> cleaned properly when the userspace process (e.g. qemu) terminates.
+> 
+> This patch makes sure that all "leftover" protected VMs are always
+> properly torn down.
+
+So we're handling the kvm_arch_destroy_vm() case here, right?
+Maybe add that in a more prominent way and rework the subject:
+
+KVM: s390: pv: cleanup leftover PV VM shells on VM shutdown
+
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h |   2 +
+>   arch/s390/kvm/kvm-s390.c         |   2 +
+>   arch/s390/kvm/pv.c               | 109 ++++++++++++++++++++++++++++---
+>   3 files changed, 104 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 5824efe5fc9d..cca8e05e0a71 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -924,6 +924,8 @@ struct kvm_s390_pv {
+>   	u64 guest_len;
+>   	unsigned long stor_base;
+>   	void *stor_var;
+> +	void *prepared_for_async_deinit;
+> +	struct list_head need_cleanup;
+>   	struct mmu_notifier mmu_notifier;
+>   };
+>   
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index fe1fa896def7..369de8377116 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2890,6 +2890,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	kvm_s390_vsie_init(kvm);
+>   	if (use_gisa)
+>   		kvm_s390_gisa_init(kvm);
+> +	INIT_LIST_HEAD(&kvm->arch.pv.need_cleanup);
+> +	kvm->arch.pv.prepared_for_async_deinit = NULL;
+>   	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
+>   
+>   	return 0;
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index 6cffea26c47f..8471c17d538c 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -17,6 +17,19 @@
+>   #include <linux/mmu_notifier.h>
+>   #include "kvm-s390.h"
+>   
+> +/**
+> + * @struct leftover_pv_vm
+
+Any other ideas on naming these VMs?
+Also I'd turn that around: pv_vm_leftover
+
+> + * Represents a "leftover" protected VM that is still registered with the
+> + * Ultravisor, but which does not correspond any longer to an active KVM VM.
+> + */
+> +struct leftover_pv_vm {
+> +	struct list_head list;
+> +	unsigned long old_gmap_table;
+> +	u64 handle;
+> +	void *stor_var;
+> +	unsigned long stor_base;
+> +};
+> +
+
+I think we should switch this patch and the next one and add this struct 
+to the next patch. The list work below makes more sense once the next 
+patch has been read.
+
+>   static void kvm_s390_clear_pv_state(struct kvm *kvm)
+>   {
+>   	kvm->arch.pv.handle = 0;
+> @@ -158,23 +171,88 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+>   	return -ENOMEM;
+>   }
+>   
+
+>   
+
