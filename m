@@ -2,67 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1282F54EC82
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 23:25:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DC9C54ECE0
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 23:54:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378928AbiFPVZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 17:25:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45340 "EHLO
+        id S1378512AbiFPVy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 17:54:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378323AbiFPVZs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 17:25:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4266F60DB9
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 14:25:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CA14061DF6
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 21:25:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3CDFFC341C0
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 21:25:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655414746;
-        bh=Dh3atd3DHejyD0KSsiHQbyPsXJzqCeyPoAUINaotHvs=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=NUDTwSTjS6ScAKt/XzyfGhjXivlxf3YCF+FjjTgEOMxQpt8iDEgMyfYgHmuMwGA4m
-         yzEYodMmVZGhZ1BimUWSxI6TPy2poTJRhsO17Qbd0+wz45r85TMxxDc6XTqj0G1EP7
-         RcCUUMabF4RBhWTtJzSsmmnajfHVjFtn+hY0pCk52RMFTbVpGViyUq5bzMF6bzZk2h
-         Q6O2rFtQCIiUQRNOqGe8kZ3g5a05OJfYX6f83dfCWbjhRlOOxpEfGDzBIiPx8uTtBF
-         HbkHGkc+6amEB4NRBEFgoXJBtsrFZfho0KAZ/cv2qj8eoswGAUTU4YlCoqTUNh4LFO
-         Hy8Cnhsq6Wn9Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 288FBCC13B4; Thu, 16 Jun 2022 21:25:46 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216026] Fails to compile using gcc 12.1 under Ubuntu 22.04
-Date:   Thu, 16 Jun 2022 21:25:45 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: nanook@eskimo.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216026-28872-Be6cR7Z15s@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216026-28872@https.bugzilla.kernel.org/>
-References: <bug-216026-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S1377916AbiFPVy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 17:54:26 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2C72057144
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 14:54:23 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-62-astVriicPDe5cx5R_yDGqw-1; Thu, 16 Jun 2022 22:54:18 +0100
+X-MC-Unique: astVriicPDe5cx5R_yDGqw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.36; Thu, 16 Jun 2022 22:54:16 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.036; Thu, 16 Jun 2022 22:54:16 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     "'oliver.upton@linux.dev'" <oliver.upton@linux.dev>
+CC:     Raghavendra Rao Ananta <rananta@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        "Ricardo Koller" <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        "Reiji Watanabe" <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        "Colton Lewis" <coltonlewis@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Andrew Jones" <drjones@redhat.com>
+Subject: RE: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
+Thread-Topic: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
+Thread-Index: AQHYgXkNkdHi2edO0UOJoWwOrv/ni61SMGPg///3a4CAABX/cIAAENKAgABDjYA=
+Date:   Thu, 16 Jun 2022 21:54:16 +0000
+Message-ID: <2ec9ecbfb13d422ab6cda355ff011c9f@AcuMS.aculab.com>
+References: <3e73cb07968d4c92b797781b037c2d45@AcuMS.aculab.com>
+ <20220615185706.1099208-1-rananta@google.com>
+ <20220616120232.ctkekviusrozqpru@gator>
+ <33ca91aeb5254831a88e187ff8d9a2c2@AcuMS.aculab.com>
+ <20220616162557.55bopzfa6glusuh5@gator>
+ <7b1040c48bc9b2986798322c336660ab@linux.dev>
+In-Reply-To: <7b1040c48bc9b2986798322c336660ab@linux.dev>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,38 +81,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216026
+RnJvbTogb2xpdmVyLnVwdG9uQGxpbnV4LmRldg0KPiBTZW50OiAxNiBKdW5lIDIwMjIgMTk6NDUN
+Cg0KPiANCj4gSnVuZSAxNiwgMjAyMiAxMTo0OCBBTSwgIkRhdmlkIExhaWdodCIgPERhdmlkLkxh
+aWdodEBhY3VsYWIuY29tPiB3cm90ZToNCj4gPiBObyB3b25kZXIgSSB3YXMgY29uZnVzZWQuDQo+
+ID4gSXQncyBub3Qgc3VycHJpc2luZyB0aGUgY29tcGlsZXIgb3B0aW1pc2VzIGl0IGFsbCBhd2F5
+Lg0KPiA+DQo+ID4gSXQgZG9lc24ndCBzZWVtIHJpZ2h0IHRvIGJlICdhYnVzaW5nJyBXUklURV9P
+TkNFKCkgaGVyZS4NCj4gPiBKdXN0IGFkZGluZyBiYXJyaWVyKCkgc2hvdWxkIGJlIGVub3VnaCBh
+bmQgbXVjaCBtb3JlIGRlc2NyaXB0aXZlLg0KPiANCj4gSSBoYWQgdGhlIHNhbWUgdGhvdWdodCwg
+YWx0aG91Z2ggSSBkbyBub3QgYmVsaWV2ZSBiYXJyaWVyKCkgaXMgc3VmZmljaWVudA0KPiBvbiBp
+dHMgb3duLiBiYXJyaWVyX2RhdGEoKSB3aXRoIGEgcG9pbnRlciB0byB1YyBwYXNzZWQgdGhyb3Vn
+aA0KPiBpcyByZXF1aXJlZCB0byBrZWVwIGNsYW5nIGZyb20gZWxpbWluYXRpbmcgdGhlIGRlYWQg
+c3RvcmUuDQoNCkEgYmFycmllcigpIChmdWxsIG1lbW9yeSBjbG9iYmVyKSBvdWdodCB0byBiZSBz
+dHJvbmdlciB0aGFuDQp0aGUgcGFydGlhbCBvbmUgdGhhbiBiYXJyaWVyX2RhdGEoKSBnZW5lcmF0
+ZXMuDQoNCkkgY2FuJ3QgcXVpdGUgZGVjaWRlIHdoZXRoZXIgeW91IG5lZWQgYSBiYXJyaWVyKCkg
+Ym90aCBzaWRlcw0Kb2YgdGhlICdtYWdpYyB3cml0ZScuDQpQbGF1c2libHkgdGhlIGNvbXBpbGVy
+IGNvdWxkIGRpc2NhcmQgdGhlIG9uLXN0YWNrIGRhdGENCmFmdGVyIHRoZSBiYXJyaWVyKCkgYW5k
+IGJlZm9yZSB0aGUgJ21hZ2ljIHdyaXRlJy4NCg0KQ2VydGFpbmx5IHB1dHRpbmcgdGhlICdtYWdp
+YyB3cml0ZScgaW5zaWRlIGEgYXNtIGJsb2NrDQp0aGF0IGhhcyBhIG1lbW9yeSBjbG9iYmVyIGlz
+IGEgbW9yZSBjb3JyZWN0IHNvbHV0aW9uLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRy
+ZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1L
+MSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
---- Comment #23 from Robert Dinse (nanook@eskimo.com) ---
-This is from 5.18.5:
-
-In function =E2=80=98reg_read=E2=80=99,
-    inlined from =E2=80=98reg_rmw=E2=80=99 at arch/x86/kvm/emulate.c:266:2:
-arch/x86/kvm/emulate.c:254:27: error: array subscript 32 is above array bou=
-nds
-of =E2=80=98long unsigned int[17]=E2=80=99 [-Werror=3Darray-bounds]
-  254 |         return ctxt->_regs[nr];
-      |                ~~~~~~~~~~~^~~~
-In file included from arch/x86/kvm/emulate.c:23:
-arch/x86/kvm/kvm_emulate.h: In function =E2=80=98reg_rmw=E2=80=99:
-arch/x86/kvm/kvm_emulate.h:366:23: note: while referencing =E2=80=98_regs=
-=E2=80=99
-  366 |         unsigned long _regs[NR_VCPU_REGS];
-      |                       ^~~~~
-cc1: all warnings being treated as errors
-make[5]: *** [scripts/Makefile.build:288: arch/x86/kvm/emulate.o] Error 1
-make[5]: *** Waiting for unfinished jobs....
-make[4]: *** [scripts/Makefile.build:550: arch/x86/kvm] Error 2
-make[3]: *** [Makefile:1834: arch/x86] Error 2
-make[3]: *** Waiting for unfinished jobs....
-make[2]: *** [debian/rules:7: build-arch] Error 2
-dpkg-buildpackage: error: debian/rules binary subprocess returned exit stat=
-us 2
-make[1]: *** [scripts/Makefile.package:83: bindeb-pkg] Error 2
-make: *** [Makefile:1542: bindeb-pkg] Error 2
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
