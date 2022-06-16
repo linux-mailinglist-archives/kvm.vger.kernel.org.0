@@ -2,81 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AC3454E60B
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 17:28:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEE9A54E617
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 17:30:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377903AbiFPP2s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 11:28:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38240 "EHLO
+        id S1377891AbiFPPal (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 11:30:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234101AbiFPP2q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 11:28:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D7E6248FB
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 08:28:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655393325;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XskGf25OAiPtPSUK4BxcnPczRA0Oydi/igOaaTpXUSQ=;
-        b=bdDBnxXql2SOny0hceigHtBqaMQQEQeNGOv8yJdKDVIWqxcdrE0YHy2hAdDU1Lib9mWMOc
-        FFLTWBu+k2XFHJyfRYAMiqO9A2R+2RQ3Pgu6hlVnpkyNS//GIrTuPKXnWknevWxw3NU+3j
-        EJFnXXN5KfVdQRTyOCYv/RfDszXny8I=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-58-6nfnIUjxN7em9GxzCzGe6A-1; Thu, 16 Jun 2022 11:28:43 -0400
-X-MC-Unique: 6nfnIUjxN7em9GxzCzGe6A-1
-Received: by mail-ed1-f69.google.com with SMTP id eh10-20020a0564020f8a00b0042dd9bf7c57so1485189edb.17
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 08:28:43 -0700 (PDT)
+        with ESMTP id S234927AbiFPPak (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 11:30:40 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557962E9CF
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 08:30:38 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d5so1538384plo.12
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 08:30:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xyQA3i9LnHHRPtVIgpzT7gUhIahjzWNFcSvLeE3NzXM=;
+        b=m8zeYkKW1u4euayYAVyXDBaR9zlZbRLD9hLN82f7yubbRQj413prV28w+UiWa+pdmO
+         KfQU5sqy4lxAVxLWqvxNJ+R0X1Cg49NLh+9dqRacje4S+bLKHChZGLn5cCY9qVldylWv
+         BThfklbuxOqytrmtLCTcgu6672q0ulAJh/DmRwjEMqmbseJmnzoSpyL3Re5y11oA/Pdf
+         ene2w0/s2/w8UiMku30v+m6LUnIoyJEEw1zTmk4fXijS4O9ZxAzsgd8cwtwv5imNpYnA
+         96g8TJtI50rX4BZPGwQ1loluMHVGomrK3kyaqqHN+iXQKU9L12RDbql4lPWX3FeB8+lo
+         J93Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=XskGf25OAiPtPSUK4BxcnPczRA0Oydi/igOaaTpXUSQ=;
-        b=Kv884aT2ehDpTc/S43O8qLOTn8Ha3fdbqfvqqJgo/uwjtjQT2L16tWGNJiRUR6yR/m
-         1nspeFrsuDDtx8X2WX6zyt48TuPEDMmydGN+4YM+ZsLCmxqsq8Vq86m5/Jag7Ke1vx0E
-         qTHb62fwUXAJMWiLj+lIjQgfs2MRQVpeDRXzLC3DeYUWW6G+7DB+ul/iURmOV/+ERQlv
-         APtd52UJwMK/5fMYjDrYBiaGFLWAFuWhHZcG3IsR1G2ehAZneuAcFxoGpEE/7FkDohoN
-         l1rwTaQ7djmplwx4KgFc7pXXA3Jugl8DeXWAim3xITGuaCb2vALuNGSWoFCjSXM1FBL7
-         1ijg==
-X-Gm-Message-State: AJIora/diArecBpcVoZ57+7tdK0z+FSz4jXkFQ8IG18c0r2RmFokjB99
-        Po6q5bZs6ACbjWDEv/EptrmgMLZpEsqkmtCYdrC4c+WNVQKPrpn0H9O064ULJaxViZI2eNiUUxC
-        ObtSRTQQs398r
-X-Received: by 2002:a17:906:7a4a:b0:712:c6d:46df with SMTP id i10-20020a1709067a4a00b007120c6d46dfmr5085386ejo.314.1655393322557;
-        Thu, 16 Jun 2022 08:28:42 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vJsE6d4JZOi53Tz2XAP/rgRHZ/OSAOnXOCoxVH7wTJZGlMIVUlbi95yyig9j53CDCfTpb6Jw==
-X-Received: by 2002:a17:906:7a4a:b0:712:c6d:46df with SMTP id i10-20020a1709067a4a00b007120c6d46dfmr5085361ejo.314.1655393322317;
-        Thu, 16 Jun 2022 08:28:42 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id w12-20020a056402268c00b0042aaaf3f41csm2083977edd.4.2022.06.16.08.28.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Jun 2022 08:28:41 -0700 (PDT)
-Message-ID: <8a38488d-fb6e-72f9-3529-b098a97d8c97@redhat.com>
-Date:   Thu, 16 Jun 2022 17:28:40 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xyQA3i9LnHHRPtVIgpzT7gUhIahjzWNFcSvLeE3NzXM=;
+        b=O9MU76F7CR0pG2KvvmfzeormPBubg9z8yiPIgT7T1Erg3ZKKRQVwSDzZyxKHI20+Dw
+         FZ9h1LIZqFzQTWXf9jqgOncPGkmMXlL/VgSUYPRDMeEnqzhwolWHZi3V5sq/VNEdNhLM
+         Z0yWhVX8YFolDjQ9l4FAynnVs2edlxVo+fjjAyOY4gvoOF22Knir5H0VvxhTByc96KAR
+         SDywS0lJocC/Q6DNh+qkREvFfhyuRhqBfq0bC7Xm5/QRAG7j3+xVQPJ5Y7rGXfTxr7uS
+         VyBsTFS6eF0ZWOfZjRWX11g4wiSAkUVjgV+Sx/23Y1+ynyY/DB+S8+7Ur+trOq+nLvu8
+         9L9A==
+X-Gm-Message-State: AJIora8JcVEdmkwCgnS/N+FAW2R9QwweSpxZqEBSRSevTssXX1KtphWl
+        J9cntbEL3Xi4DulSXIc4KRubOg==
+X-Google-Smtp-Source: AGRyM1vJ6B9gtYuMINf2l7lRLtW7qllBMCm1snr4t0uqnQGiA2z/c3Ik3BuauG2Z1RHrpJXEIU4ngg==
+X-Received: by 2002:a17:90b:4b02:b0:1e2:ff51:272a with SMTP id lx2-20020a17090b4b0200b001e2ff51272amr5616373pjb.56.1655393437532;
+        Thu, 16 Jun 2022 08:30:37 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id x10-20020a1709028eca00b0016368840c41sm179880plo.14.2022.06.16.08.30.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jun 2022 08:30:36 -0700 (PDT)
+Date:   Thu, 16 Jun 2022 15:30:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: vmx, pmu: accept 0 for absent MSRs when
+ host-initiated
+Message-ID: <YqtMmAiOvJbmHCaP@google.com>
+References: <20220531175450.295552-1-pbonzini@redhat.com>
+ <20220531175450.295552-2-pbonzini@redhat.com>
+ <YpZgU+vfjkRuHZZR@google.com>
+ <ce2b4fed-3d9e-a179-a907-5b8e09511b7d@gmail.com>
+ <YpeWPAHNhQQ/lRKF@google.com>
+ <cbb9a8b5-f31f-dd3b-3278-01f12d935ebe@gmail.com>
+ <YqoqZjH+yjYJTxmT@google.com>
+ <69fac460-ff29-ca76-d9a8-d2529cf02fa2@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rick.p.edgecombe@intel.com
-References: <20220616084643.19564-1-weijiang.yang@intel.com>
- <YqsB9upUystxvl+d@hirez.programming.kicks-ass.net>
- <62d4f7f0-e7b2-83ad-a2c7-a90153129da2@redhat.com>
- <Yqs7qjjbqxpw62B/@hirez.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 00/19] Refresh queued CET virtualization series
-In-Reply-To: <Yqs7qjjbqxpw62B/@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <69fac460-ff29-ca76-d9a8-d2529cf02fa2@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,35 +78,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/16/22 16:18, Peter Zijlstra wrote:
-> On Thu, Jun 16, 2022 at 12:21:20PM +0200, Paolo Bonzini wrote:
->> On 6/16/22 12:12, Peter Zijlstra wrote:
->>> Do I understand this right in that a host without X86_KERNEL_IBT cannot
->>> run a guest with X86_KERNEL_IBT on? That seems unfortunate, since that
->>> was exactly what I did while developing the X86_KERNEL_IBT patches.
->>>
->>> I'm thinking that if the hardware supports it, KVM should expose it,
->>> irrespective of the host kernel using it.
->>
->> For IBT in particular, I think all processor state is only loaded and stored
->> at vmentry/vmexit (does not need XSAVES), so it should be feasible.
+On Thu, Jun 16, 2022, Paolo Bonzini wrote:
+> On 6/15/22 20:52, Sean Christopherson wrote:
+> > I completely agree on needing better transparency for the lifecycle of patches
+> > going through the KVM tree.  First and foremost, there need to be formal, documented
+> > rules for the "official" kvm/* branches, e.g. everything in kvm/queue passes ABC
+> > tests, everything in kvm/next also passes XYZ tests.  That would also be a good
+> > place to document expectations, how things works, etc...
 > 
-> That would be the S_CET stuff, yeah, that's VMCS managed. The U_CET
-> stuff is all XSAVE though.
+> Agreed.  I think this is a more general problem with Linux development and I
+> will propose this for maintainer summit.
 
-What matters is whether XFEATURE_MASK_USER_SUPPORTED includes 
-XFEATURE_CET_USER.  If you build with !X86_KERNEL_IBT, KVM can still 
-rely on the FPU state for U_CET state, and S_CET is saved/restored via 
-the VMCS independent of X86_KERNEL_IBT.
+I believe the documentation side of things is an acknowledged gap, people just need
+to actually write the documentation, e.g. Boris and Thomas documented the tip-tree
+under Documentation/process/maintainer-tip.rst and stubbed in maintainer-handbooks.rst.
 
-Paolo
-
-> But funny thing, CPUID doesn't enumerate {U,S}_CET separately. It *does*
-> enumerate IBT and SS separately, but for each IBT/SS you have to
-> implement both U and S.
-> 
-> That was a problem with the first series, which only implemented support
-> for U_CET while advertising IBT and SS (very much including S_CET), and
-> still is a problem with this series because S_SS is missing while
-> advertised.
-
+As for patch lifecycle, I would love to have something like tip-bot (can we just
+steal whatever scripts they use?) that explicitly calls out the branch, commit,
+committer, date, etc...  IMO that'd pair nicely with adding kvm/pending, as the
+bot/script could provide updates when a patch is first added to kvm/pending, then
+again when it got moved to kvm/queue or dropped because it was broken, etc...
