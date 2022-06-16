@@ -2,130 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13E8B54E824
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:53:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3418654E80E
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:48:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233494AbiFPQxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 12:53:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47622 "EHLO
+        id S1377090AbiFPQs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 12:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378462AbiFPQs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 12:48:29 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4F2403F8
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:48:20 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id m14so1722336plg.5
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:48:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=/kn16vTwAaiq9Bc2ILIkOn3nZMwcL4ACg5m6p87/3Yo=;
-        b=PRRxzD/clcgliJHEd07/uq15rx/yBZ9V4j/rYWq4ZHrSp30epHtSPOlJiP59CoqqZr
-         6c1JmzQXK2eO929G6Ykm1fK/53At6DA/HfU+VdIRzVij4QeUeNz26ZovCUMIy/fEqvk4
-         JM/pLBrzU8c2a0aiSiWN7IXGKNVRF8+wynuX/BN73HFNKFTlbDiKzEaEsYMdnPFk9yyI
-         GVHyulrayWn/dcsOkO0yjThufPqncch97jY/VlU6HRpIQcMWDL5ERCShy+I9KvEM7UZg
-         vzbcHTshM7cmF0QzoRdyO34Xk9YZOKwVNUbTLAU2ZwSgTtziSbN2uOYvamfTR/Ncpnu3
-         ABjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=/kn16vTwAaiq9Bc2ILIkOn3nZMwcL4ACg5m6p87/3Yo=;
-        b=vu0bCoIFDcmoOLJZwEfVmVeKhqz4wtwanMz3PZqSu1wLXlqs8Cw9weBb6Sx+hIHf4Q
-         IeSVD+zA7yIODg+MGCaYiW2IVFNTNmPAmiW6crty/ke9Ixzvr8ohCSpyq5+EEzxnNQ9p
-         U/mx9XU673R3yn8fPyg9wXzSZ9uegq3Z+0k0Gdd0n+bpRZJBhkEBYlbukN9QjSPzvJ7C
-         Jo7oj0kXzhuNDO54ZmqML+KzJYwdnnS18BGtGhIZ9X0si+96VfNPUyPK6EVCbjcaFWoZ
-         epAGhsb7sS6MIWQfJhyOC8sH9FaFrV/lpvE7JwDRebB1uVNA8VbiCmZspkoplNYNg4iO
-         HgcQ==
-X-Gm-Message-State: AJIora+ZMV6bTMjepbfqaZ3UDM5DeqgVyF8+zb/z6RMCQbj6vhuDY7aC
-        0ed9blWls3nxrV4zIlPH2Src0A==
-X-Google-Smtp-Source: AGRyM1t3uWSAXvdTnUwhyjK92FH1zEVpL2y3mTXY46DWvFJiA+j/mfNxm/+AhMgmBmGLFn0ua19XVQ==
-X-Received: by 2002:a17:902:e889:b0:167:523c:6011 with SMTP id w9-20020a170902e88900b00167523c6011mr5191842plg.114.1655398099979;
-        Thu, 16 Jun 2022 09:48:19 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id p14-20020a170902e74e00b00163bfaf0b17sm1881313plf.233.2022.06.16.09.48.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 09:48:19 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 16:48:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Grzegorz Jaszczyk <jaz@semihalf.com>
-Cc:     linux-kernel@vger.kernel.org, Dmytro Maluka <dmy@semihalf.com>,
-        Zide Chen <zide.chen@intel.corp-partner.google.com>,
-        Peter Fang <peter.fang@intel.corp-partner.google.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Sachi King <nakato@nakato.io>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        David Dunn <daviddunn@google.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "open list:ACPI" <linux-acpi@vger.kernel.org>,
-        "open list:HIBERNATION (aka Software Suspend, aka swsusp)" 
-        <linux-pm@vger.kernel.org>, Dominik Behr <dbehr@google.com>,
-        Dmitry Torokhov <dtor@google.com>
-Subject: Re: [PATCH 1/2] x86: notify hypervisor about guest entering s2idle
- state
-Message-ID: <Yqtez/J540yD7VdD@google.com>
-References: <20220609110337.1238762-1-jaz@semihalf.com>
- <20220609110337.1238762-2-jaz@semihalf.com>
- <YqIJ8HtdqnoVzfQD@google.com>
- <CAH76GKNRDXAyGYvs2ji5Phu=5YPW8+SV8-6TLjizBRzTCnEROg@mail.gmail.com>
- <YqNVYz4+yVbWnmNv@google.com>
- <CAH76GKNSfaHwpy46r1WWTVgnsuijqcHe=H5nvUTUUs1UbdZvkQ@mail.gmail.com>
+        with ESMTP id S1378519AbiFPQsq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 12:48:46 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F08274;
+        Thu, 16 Jun 2022 09:48:45 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25GFgWsq013004;
+        Thu, 16 Jun 2022 16:48:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/eQCzarlfdsOw2sh7xIbiRlakkDqEkJ1fs8yTubQsnc=;
+ b=jZG6Ej7LlUX0jlbqc/BpzpiTGAP1WF+X0ug4zxhFWM/4FGOhu0jtn6OKSJBFcJ1GfVY6
+ utd/C0mdwwEiPvZrO9evh8NHH+1bIYckixa6fvNIXVKgHtQJ2icKfj2VNnrd4aFDJo/Q
+ OOUs2S6I913CurH7Le4J7vmL4FwVzrgfMJ1aAsjaiPtpRanTxwWGz5eLQ46CJpXl5K6P
+ k9eLmABxJNgiSxSXQ21p14AF10kITeSCRLar6Lest6BZ7P0I5DKQUUqlGbdpePClRQuS
+ SYA6+/fjSrIFg3FQxA5sXnigsF8qnPEL9GhjVQ4qPFzVwKuV56OAQHfmO71scPbZxa+w HA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqr2prgmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Jun 2022 16:48:43 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25GFii2M006561;
+        Thu, 16 Jun 2022 16:48:42 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqr2prgm6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Jun 2022 16:48:42 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25GGamEN031796;
+        Thu, 16 Jun 2022 16:48:42 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma05wdc.us.ibm.com with ESMTP id 3gmjpak3sd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Jun 2022 16:48:42 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25GGmf5I8520110
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Jun 2022 16:48:41 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 24F54136051;
+        Thu, 16 Jun 2022 16:48:41 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4692D136059;
+        Thu, 16 Jun 2022 16:48:40 +0000 (GMT)
+Received: from [9.211.56.136] (unknown [9.211.56.136])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Jun 2022 16:48:40 +0000 (GMT)
+Message-ID: <75e251c7-f239-a0d6-4ee6-51b7cdfb5b83@linux.ibm.com>
+Date:   Thu, 16 Jun 2022 12:48:38 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH76GKNSfaHwpy46r1WWTVgnsuijqcHe=H5nvUTUUs1UbdZvkQ@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v2 08/10] vfio/ccw: Create a CLOSE FSM event
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220615203318.3830778-1-farman@linux.ibm.com>
+ <20220615203318.3830778-9-farman@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20220615203318.3830778-9-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IpdH8gqToE_6gaFYSBBcKFGrboTAOe-n
+X-Proofpoint-ORIG-GUID: HnqfNTPoQtXMnfKINjvXD_KC4MQfj4WY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-16_12,2022-06-16_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ spamscore=0 impostorscore=0 priorityscore=1501 suspectscore=0 bulkscore=0
+ malwarescore=0 mlxlogscore=991 phishscore=0 mlxscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206160068
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 15, 2022, Grzegorz Jaszczyk wrote:
-> pt., 10 cze 2022 o 16:30 Sean Christopherson <seanjc@google.com> napisał(a):
-> > MMIO or PIO for the actual exit, there's nothing special about hypercalls.  As for
-> > enumerating to the guest that it should do something, why not add a new ACPI_LPS0_*
-> > function?  E.g. something like
-> >
-> > static void s2idle_hypervisor_notify(void)
-> > {
-> >         if (lps0_dsm_func_mask > 0)
-> >                 acpi_sleep_run_lps0_dsm(ACPI_LPS0_EXIT_HYPERVISOR_NOTIFY
-> >                                         lps0_dsm_func_mask, lps0_dsm_guid);
-> > }
-> 
-> Great, thank you for your suggestion! I will try this approach and
-> come back. Since this will be the main change in the next version,
-> will it be ok for you to add Suggested-by: Sean Christopherson
-> <seanjc@google.com> tag?
+On 6/15/22 4:33 PM, Eric Farman wrote:
+> Refactor the vfio_ccw_sch_quiesce() routine to extract the bit that
+> disables the subchannel and affects the FSM state. Use this to form
+> the basis of a CLOSE event that will mirror the OPEN event, and move
+> the subchannel back to NOT_OPER state.
 
-If you want, but there's certainly no need to do so.  But I assume you or someone
-at Intel will need to get formal approval for adding another ACPI LPS0 function?
-I.e. isn't there work to be done outside of the kernel before any patches can be
-merged?
+Similar comments here related to previous patch.  If a close event can 
+trigger fsm_notoper then it should probably should cut a different trace 
+entry when event == CLOSE
+
+> 
+> A key difference with that mirroring is that while OPEN handles the
+> transition from NOT_OPER => STANDBY, the later probing of the mdev
+> handles the transition from STANDBY => IDLE. On the other hand,
+> the CLOSE event will move from one of the operating states {IDLE,
+> CP_PROCESSING, CP_PENDING} => NOT_OPER. That is, there is no stop
+> in a STANDBY state on the deconfigure path.
+> 
+> Add a call to cp_free() in this event, such that it is captured for
+> the various permutations of this event.
+> 
+> In the unlikely event that cio_disable_subchannel() returns -EBUSY,
+> the remaining logic of vfio_ccw_sch_quiesce() can still be used.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>   drivers/s390/cio/vfio_ccw_drv.c     | 17 +++++------------
+>   drivers/s390/cio/vfio_ccw_fsm.c     | 26 ++++++++++++++++++++++++++
+>   drivers/s390/cio/vfio_ccw_ops.c     | 14 ++------------
+>   drivers/s390/cio/vfio_ccw_private.h |  1 +
+>   4 files changed, 34 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> index 52249c40a565..62bd6f969b76 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -41,13 +41,6 @@ int vfio_ccw_sch_quiesce(struct subchannel *sch)
+>   	DECLARE_COMPLETION_ONSTACK(completion);
+>   	int iretry, ret = 0;
+>   
+> -	spin_lock_irq(sch->lock);
+> -	if (!sch->schib.pmcw.ena)
+> -		goto out_unlock;
+> -	ret = cio_disable_subchannel(sch);
+> -	if (ret != -EBUSY)
+> -		goto out_unlock;
+> -
+>   	iretry = 255;
+>   	do {
+>   
+> @@ -74,9 +67,7 @@ int vfio_ccw_sch_quiesce(struct subchannel *sch)
+>   		spin_lock_irq(sch->lock);
+>   		ret = cio_disable_subchannel(sch);
+>   	} while (ret == -EBUSY);
+> -out_unlock:
+> -	private->state = VFIO_CCW_STATE_NOT_OPER;
+> -	spin_unlock_irq(sch->lock);
+> +
+>   	return ret;
+>   }
+>   
+> @@ -258,7 +249,7 @@ static void vfio_ccw_sch_remove(struct subchannel *sch)
+>   {
+>   	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+>   
+> -	vfio_ccw_sch_quiesce(sch);
+> +	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
+>   	mdev_unregister_device(&sch->dev);
+>   
+>   	dev_set_drvdata(&sch->dev, NULL);
+> @@ -272,7 +263,9 @@ static void vfio_ccw_sch_remove(struct subchannel *sch)
+>   
+>   static void vfio_ccw_sch_shutdown(struct subchannel *sch)
+>   {
+> -	vfio_ccw_sch_quiesce(sch);
+> +	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+> +
+> +	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
+>   }
+>   
+>   /**
+> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+> index 7e7ed69e1461..fa546d33e595 100644
+> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> @@ -380,6 +380,27 @@ static void fsm_open(struct vfio_ccw_private *private,
+>   	spin_unlock_irq(sch->lock);
+>   }
+>   
+> +static void fsm_close(struct vfio_ccw_private *private,
+> +		      enum vfio_ccw_event event)
+> +{
+> +	struct subchannel *sch = private->sch;
+> +	int ret;
+> +
+> +	spin_lock_irq(sch->lock);
+> +
+> +	if (!sch->schib.pmcw.ena)
+> +		goto out_unlock;
+> +
+> +	ret = cio_disable_subchannel(sch);
+> +	if (ret == -EBUSY)
+> +		vfio_ccw_sch_quiesce(sch);
+> +
+> +out_unlock:
+> +	private->state = VFIO_CCW_STATE_NOT_OPER;
+> +	spin_unlock_irq(sch->lock);
+> +	cp_free(&private->cp);
+> +}
+> +
+>   /*
+>    * Device statemachine
+>    */
+> @@ -390,6 +411,7 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+>   		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+>   		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
+>   		[VFIO_CCW_EVENT_OPEN]		= fsm_open,
+> +		[VFIO_CCW_EVENT_CLOSE]		= fsm_nop,
+>   	},
+>   	[VFIO_CCW_STATE_STANDBY] = {
+>   		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+> @@ -397,6 +419,7 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+>   		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+>   		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+>   		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
+> +		[VFIO_CCW_EVENT_CLOSE]		= fsm_notoper,
+
+But if we are in STANDBY doesn't that imply we already did the OPEN? 
+Don't we need to close it now before going NOT_OPER?
+
+
