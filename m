@@ -2,57 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C1FE54EC98
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 23:31:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 782E454EC65
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 23:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378826AbiFPVbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 17:31:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
+        id S235569AbiFPVW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 17:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378548AbiFPVbQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 17:31:16 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D4761299;
-        Thu, 16 Jun 2022 14:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655415076; x=1686951076;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=fbbL5YLQP0MasUHy7YV1k35vvgrXQQq2fNl3ZEoDQ3Y=;
-  b=d3r6H0NyAwn1nbLnhJTw1odjqMTIikaIhyX9x5iMyQ2pYiwRLgaCXZE1
-   BGkg9Z5euWw8Gw0++X2Df4HZYHy4rdmGS4CqJRqrfgOCPMjvwpx54roet
-   1q0SBYKNd8JJTo5j8zPTntSs/4MRjmTkruabn5EmKeFefRjmdPdrc5KNt
-   Dw5q8rQIzGNwNqZcyLHF8XyEmAQT4KPGCAcde8v+nAgJv9jJEotbYzWj5
-   5XI+T+9R2uDU8FyqOGwvWbG5LPj7nJPsk4wSLGMVPHRRSPeejdXF1uu7m
-   2fdeKwKaW78tYBgQzYNfFtaO/vMaUOL4LGR76yHcymktdeltwkapoPuBZ
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="280389925"
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="280389925"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2022 14:31:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="589824135"
-Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by fmsmga007.fm.intel.com with ESMTP; 16 Jun 2022 14:31:15 -0700
-From:   "Chang S. Bae" <chang.seok.bae@intel.com>
-To:     dave.hansen@intel.com, len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com
-Cc:     corbet@lwn.net, pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        chang.seok.bae@intel.com
-Subject: [PATCH 2/2] Documentation/x86: Explain guest XSTATE permission control
-Date:   Thu, 16 Jun 2022 14:22:10 -0700
-Message-Id: <20220616212210.3182-3-chang.seok.bae@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220616212210.3182-1-chang.seok.bae@intel.com>
-References: <20220616212210.3182-1-chang.seok.bae@intel.com>
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        with ESMTP id S229482AbiFPVWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 17:22:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4643460DAA
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 14:22:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DCC6061ECD
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 21:22:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 444F6C341C0
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 21:22:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655414543;
+        bh=UbgwbFDZFA5rn7GYhPvIwFQFcKUmmy/iWcIsMiWQCio=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=n7DRRZYM9btNxjtV0KpZiUsZ+10oQ1GYoQberleufMEI91FAb4/Z4g6jyVKkX3Y42
+         ThXX+/JIENwMHCurKZMp/hRzKxp6fB2m9J7U1RqwS+9mwHRlSKARGG0GZKUHxxBzjY
+         JVWgibBK6d4g4og306IOhxU8ogJAT7iOsOPxfPFrvl2z5ZFe0jL5NAnTb2k+clepon
+         tnvg3FoUOsPctpoIAYKLVAm4Gh5PKj4eUCK5NEte38TN6CPSLT5NCUrZn7JRInuG7e
+         B7yHdmcj9WcPZm7lO2tN9ZmxGWYDT07BagWz6jnZGspwVmLT/1e3+RusI1Ghjl29+O
+         dWQ+7111kKIKw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 2DE15CC13B4; Thu, 16 Jun 2022 21:22:23 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216026] Fails to compile using gcc 12.1 under Ubuntu 22.04
+Date:   Thu, 16 Jun 2022 21:22:22 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: nanook@eskimo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216026-28872-Q7fY6QszyZ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216026-28872@https.bugzilla.kernel.org/>
+References: <bug-216026-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,52 +70,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 980fe2fddcff ("x86/fpu: Extend fpu_xstate_prctl() with guest
-permissions") extends a couple of arch_prctl(2) options for VCPU threads.
-Add description for them.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216026
 
-Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
-Reviewed-by: Yang Zhong <yang.zhong@intel.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-doc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- Documentation/x86/xstate.rst | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+--- Comment #22 from Robert Dinse (nanook@eskimo.com) ---
+Tried to compile 5.18.5, STILL BROKEN.  Same Error.
 
-diff --git a/Documentation/x86/xstate.rst b/Documentation/x86/xstate.rst
-index 9597e6caa30e..55cbce580853 100644
---- a/Documentation/x86/xstate.rst
-+++ b/Documentation/x86/xstate.rst
-@@ -64,6 +64,27 @@ the handler allocates a larger xstate buffer for the task so the large
- state can be context switched. In the unlikely cases that the allocation
- fails, the kernel sends SIGSEGV.
- 
-+In addition, a couple of extended options are provided for a VCPU thread.
-+The VCPU XSTATE permission is separately controlled.
-+
-+-ARCH_GET_XCOMP_GUEST_PERM
-+
-+ arch_prctl(ARCH_GET_XCOMP_GUEST_PERM, &features);
-+
-+ ARCH_GET_XCOMP_GUEST_PERM is a variant of ARCH_GET_XCOMP_PERM. So it
-+ provides the same semantics and functionality but for VCPU.
-+
-+-ARCH_REQ_XCOMP_GUEST_PERM
-+
-+ arch_prctl(ARCH_REQ_XCOMP_GUEST_PERM, feature_nr);
-+
-+ ARCH_REQ_XCOMP_GUEST_PERM is a variant of ARCH_REQ_XCOMP_PERM. Like the
-+ above, it has the same semantics for VCPU permission. It performs a
-+ similar functionality but with a constraint. Permission is frozen when the
-+ first VCPU is created. So any attempt to change permission after that
-+ point is rejected. Thus, permission has to be requested before the first
-+ VCPU creation.
-+
- AMX TILE_DATA enabling example
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
--- 
-2.17.1
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are watching the assignee of the bug.=
