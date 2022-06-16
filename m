@@ -2,83 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C03254E07C
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 14:02:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75EA654E091
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 14:10:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbiFPMCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 08:02:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
+        id S1376811AbiFPMKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 08:10:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376453AbiFPMCj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 08:02:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 81595FEB
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:02:38 -0700 (PDT)
+        with ESMTP id S1376762AbiFPMKO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 08:10:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E1452CCBA
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:10:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655380957;
+        s=mimecast20190719; t=1655381411;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=a1YqFst/wCS3dV9U1tom4IUI5FqJmZTxEQ7sGvmyW7Q=;
-        b=RJdGcfl+i3u8t7j0cEg6S3ah4Z01mYuOsPHluadPG3IuufcxiGUfEgbCQMzmyDkqNIIjgJ
-        KriszEvgDpgwPhwXiMb7yGoKtKGlXGdS10Bnu3ureEhiWwS/RD6VKQ5mvxPj+PSjsInrY5
-        utbAII8H7x5+17SwyKRL74Tn4zOF/u0=
+        bh=fnbFANRgoRclz/nSGpz08wiygYjL/K249VvGKPTLsfU=;
+        b=VOSkStcVNOCYtYPBWbHbaSuQKti/vm5iHzQAVx03Id0bO0i6mLzGaB6BxAYCnSOGNdOUGT
+        39WZ+TtYbcai5ZMlUSf9s41AgwjRdo3zIA++eiep2YalW7sV/dEOUwp4Nwjb9Aa5DUWG8h
+        f4mA9EeiCjRbIQwlVj+1w/WFWWn5UPU=
 Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
  [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-48-MQkstV2sNtiYXsJrIvhQTw-1; Thu, 16 Jun 2022 08:02:36 -0400
-X-MC-Unique: MQkstV2sNtiYXsJrIvhQTw-1
-Received: by mail-ed1-f72.google.com with SMTP id f9-20020a056402354900b0042ded146259so1094922edd.20
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:02:36 -0700 (PDT)
+ us-mta-669-remI2F40P0uUbA-Nx7dZaw-1; Thu, 16 Jun 2022 08:10:10 -0400
+X-MC-Unique: remI2F40P0uUbA-Nx7dZaw-1
+Received: by mail-ed1-f72.google.com with SMTP id k21-20020aa7d2d5000000b0042dcac48313so1131021edr.8
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:10:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=a1YqFst/wCS3dV9U1tom4IUI5FqJmZTxEQ7sGvmyW7Q=;
-        b=admhgtd7/vUal1tmP9zV5oQuwkA9VkRErIw7Y30nRtz7DuxQ2ose0WJQrm6tYPtGmM
-         +E1JrAlgsDqb9pM58sJxlOPrifzljhbxGnF84gt6g1bWOjkElxO7oGKmXHr99Ha4klFp
-         epTq6tLR4FvByyMy7lYm1YQkrXxGPwYhPGh8dGVASr9iSCqArtzHS9dU5y/CdVjIWRiZ
-         vBBd24s6BsBp4If/QL93s5DGdYicNmFdgE07oOo8ZFNcbzOA56zmr1YjiO6cxphiQeil
-         XGze/qpBiinR/eHmQ812obNDt0EwdXImVOvprHBwhcph4Qb8bjh5l5sEK6R8y8+UxcAm
-         0KcA==
-X-Gm-Message-State: AJIora8AoxtU1JIOkbY01DiOLfBrE/zc9VGhaz2Czz34T5h3H7G0Hw5C
-        na4aTmBgNzFnqyhGSBeLDQvDv7cSwoftpC/8BRC0DJcL3Ktf24Rc80oTDJTY+SoDyDldc9jtC86
-        vkFIZQ4CmANrw
-X-Received: by 2002:a17:906:7489:b0:712:2a98:d36 with SMTP id e9-20020a170906748900b007122a980d36mr4185829ejl.340.1655380955114;
-        Thu, 16 Jun 2022 05:02:35 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sEH/in2gBn+9ByhlZfqVmDXWc4YuaZczo9onOWmlO+Y4/lrgYkHIWOHfH8wVylG+qd74/UKg==
-X-Received: by 2002:a17:906:7489:b0:712:2a98:d36 with SMTP id e9-20020a170906748900b007122a980d36mr4185795ejl.340.1655380954888;
-        Thu, 16 Jun 2022 05:02:34 -0700 (PDT)
+        bh=fnbFANRgoRclz/nSGpz08wiygYjL/K249VvGKPTLsfU=;
+        b=ocKFrhiCVuhZLfSRDLSbBEpngZyfd/T72tDOMJOj5OlfSC677YJR2SCPGkypbfqY4z
+         q/xYgIEmUXA0b5iwv1N7gGIyLhrU7dcZg2zvKegosvHMTDiMsDk+MYi1OY09lloYjIyN
+         KU/Dpq2VMbxEg8kpw0a+ES369WF7Ds6N3IAAHw9csPCq3uk+HmH6jcRC/KHeOHvYNmOK
+         K1lFqmMKf8s4wUPvn1452O1EcGyPOKyBeCPvxGCC4xZWgHXqCpCH5PzsfA9ogYYL2M7L
+         UjNTlAZemXB7sI8nRoAfRIHm2I1morRQQhlSy9GuCWLfudnYyv638iImlI9cLyYf74Xx
+         Ojig==
+X-Gm-Message-State: AJIora/cfYuvD2inyfyQAZnvGGDY8Ja4znv1H8Qh500kwKpTnyNKxR7+
+        fCQe4vRY7yPWgkta+BGl9Gt9VR/P9dvC5y2y9bfpcsL90olRBJpphoXwZXqUqqiXAWS0/5uTyA/
+        fKkkRCcG9ur2v
+X-Received: by 2002:a05:6402:ea7:b0:433:6141:840e with SMTP id h39-20020a0564020ea700b004336141840emr6109525eda.266.1655381409549;
+        Thu, 16 Jun 2022 05:10:09 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1shrqTcIAQx5WuqolRTdcuV69UIK8NkIrhIplpkXUIdvASi2H8d4HpaeyriLBogszA7USoIuA==
+X-Received: by 2002:a05:6402:ea7:b0:433:6141:840e with SMTP id h39-20020a0564020ea700b004336141840emr6109506eda.266.1655381409416;
+        Thu, 16 Jun 2022 05:10:09 -0700 (PDT)
 Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
-        by smtp.gmail.com with ESMTPSA id u22-20020a17090617d600b006f3ef214dc0sm709130eje.38.2022.06.16.05.02.33
+        by smtp.gmail.com with ESMTPSA id o17-20020aa7dd51000000b0042df0c7deccsm1628311edw.78.2022.06.16.05.10.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 05:02:34 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 14:02:32 +0200
+        Thu, 16 Jun 2022 05:10:08 -0700 (PDT)
+Date:   Thu, 16 Jun 2022 14:10:06 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
-Message-ID: <20220616120232.ctkekviusrozqpru@gator>
-References: <20220615185706.1099208-1-rananta@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        thuth@redhat.com, maz@kernel.org
+Subject: Re: [PATCH 2/4] KVM: selftests: Increase UCALL_MAX_ARGS to 7
+Message-ID: <20220616121006.ch6x7du6ycevjo5m@gator>
+References: <20220615193116.806312-1-coltonlewis@google.com>
+ <20220615193116.806312-3-coltonlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220615185706.1099208-1-rananta@google.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+In-Reply-To: <20220615193116.806312-3-coltonlewis@google.com>
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -87,57 +77,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 06:57:06PM +0000, Raghavendra Rao Ananta wrote:
-> The selftests, when built with newer versions of clang, is found
-> to have over optimized guests' ucall() function, and eliminating
-> the stores for uc.cmd (perhaps due to no immediate readers). This
-> resulted in the userspace side always reading a value of '0', and
-> causing multiple test failures.
+On Wed, Jun 15, 2022 at 07:31:14PM +0000, Colton Lewis wrote:
+> Increase UCALL_MAX_ARGS to 7 to allow GUEST_ASSERT_4 to pass 3 builtin
+> ucall arguments specified in guest_assert_builtin_args plus 4
+> user-specified arguments.
 > 
-> As a result, prevent the compiler from optimizing the stores in
-> ucall() with WRITE_ONCE().
-> 
-> Suggested-by: Ricardo Koller <ricarkol@google.com>
-> Suggested-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  tools/testing/selftests/kvm/lib/aarch64/ucall.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+>  tools/testing/selftests/kvm/include/ucall_common.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> index e0b0164e9af8..be1d9728c4ce 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> @@ -73,20 +73,19 @@ void ucall_uninit(struct kvm_vm *vm)
+> diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+> index dbe872870b83..568c562f14cd 100644
+> --- a/tools/testing/selftests/kvm/include/ucall_common.h
+> +++ b/tools/testing/selftests/kvm/include/ucall_common.h
+> @@ -16,7 +16,7 @@ enum {
+>  	UCALL_UNHANDLED,
+>  };
 >  
->  void ucall(uint64_t cmd, int nargs, ...)
->  {
-> -	struct ucall uc = {
-> -		.cmd = cmd,
-> -	};
-> +	struct ucall uc = {};
->  	va_list va;
->  	int i;
+> -#define UCALL_MAX_ARGS 6
+> +#define UCALL_MAX_ARGS 7
 >  
-> +	WRITE_ONCE(uc.cmd, cmd);
->  	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
->  
->  	va_start(va, nargs);
->  	for (i = 0; i < nargs; ++i)
-> -		uc.args[i] = va_arg(va, uint64_t);
-> +		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
->  	va_end(va);
->  
-> -	*ucall_exit_mmio_addr = (vm_vaddr_t)&uc;
-> +	WRITE_ONCE(*ucall_exit_mmio_addr, (vm_vaddr_t)&uc);
->  }
->  
->  uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
+>  struct ucall {
+>  	uint64_t cmd;
 > -- 
 > 2.36.1.476.g0c4daa206d-goog
 >
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+We probably want to ensure all architectures are good with this. afaict,
+riscv only expects 6 args and uses UCALL_MAX_ARGS to cap the ucall inputs,
+for example.
 
 Thanks,
 drew
