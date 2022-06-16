@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56BA454E7FD
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:47:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B2B454E823
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:53:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378348AbiFPQqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 12:46:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48442 "EHLO
+        id S233441AbiFPQxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 12:53:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233528AbiFPQp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 12:45:56 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9634C7B9
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:44:57 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d13so1691298plh.13
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:44:57 -0700 (PDT)
+        with ESMTP id S1378240AbiFPQsV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 12:48:21 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C426620194
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:47:41 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id s6so3053881lfo.13
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:47:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xG1JxbDKxb01OfIHZiWzJ8dX+sp4j/hRW+fJhSLHjUM=;
-        b=b4rY5tlFpOatFB3vmE9a2jj1fFVMclIEwyq0WxVDdILA+fTeqUJYGA5QHDQVVVil+d
-         aE5PIwuqCJDADBd9bP2hg8VoxOCkrp0XkzZ+Okshjc5L5rVDU84v3rYBqKI27xRyn+4G
-         53ZStZx2xGi01pKf9bJ/2syyif9NbYH/fCzTMiTCXO9EnSvJJhol7+yPswpzHVD1HN75
-         o9gH5yqJKQSDpJaQioFHhRBBqco2gW/UOx+d/kqqzmFGRFpZzfaxg/+8t0sBT7DtF3jb
-         kU81KAR1rBOj+zaH9JKC5dLIgUOUI1TJGUJZLIaK4CPwXIIsn473Kw5qc+3L7e3B+8lI
-         h6JQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ma+cQgxf4eaYFFNkDorw41RhIratRGMLiSnvn0U+ZYI=;
+        b=rSekvEmNvj6W2U+61h2xi2LHRNXk7NFne+/XF8MTBVA/dLaHuCQPklth1kBkFA+WGw
+         IXm92gGMZAf2tSEOXVZAnsPWqQlv6x0OLzMdZ6F0XyIsn+e4dNrmCo5W6DMsK7IWWDI2
+         VofO56DT68LiDTwWFf/e9WFb75csGGLBXDXnh+g42tZFmq+5jDra37r026DuydlxnW61
+         e3/KkG74R6jwN3a3bPc6vw7JyT5Tb31NdKC9HSkUC9k/Xz3F/6h33TMykeM7mqF9/a5u
+         oJBW5TcBpPzsIvQMxNgGt0dtovHqAL5gKl6XpF5HalCydMvC5dE2P2mVNR3Lc7I+T3fb
+         dfpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xG1JxbDKxb01OfIHZiWzJ8dX+sp4j/hRW+fJhSLHjUM=;
-        b=HNFgy8qpg2qQnI/EXOcvU6hMfGfcch/rQ/UA/0lSeG6m/UwzxdDQjrqrQUFl4/rG4H
-         UKm1qf2bgmjsVg+p/4NMN0SKFs6IR6XjbRQlncuH5BC/hjvyDrhnT/JF9kTpVR+RFOhJ
-         w1VQnOehfP4B3lHKXCPF/WA7IzbNmEkNVqmaZpOH/rIiAlu6WBQCtljKqJ2dllIftUm1
-         UXE8icuPjCxjZ6M4OOeyBauQpbJNJ8adeY/iqgW4eiEtSSWPBSzVSmxUfA00PZMi6Da+
-         ae5RIpSduBf1BxtXHbcj/KCS55P5pc/qBZ5LWXpp7enRPDtLyDj3RPTixVtpMuoKEFCt
-         pstg==
-X-Gm-Message-State: AJIora9+y0FxtSPNUKrmiUNn1LedII4zW+fA3qcFCAoIjD5PWOUNCQoW
-        eNeIZC4JZBoiniYdebR3lfExJg==
-X-Google-Smtp-Source: AGRyM1vosOIKitlvNBM5Iykv0v1VUHnUQBJH/nVCh/M4Oe/f0ApTqCG4ggZDu8FbdFoccbhJElwYJg==
-X-Received: by 2002:a17:902:ce8d:b0:169:c18:a322 with SMTP id f13-20020a170902ce8d00b001690c18a322mr2165443plg.51.1655397896578;
-        Thu, 16 Jun 2022 09:44:56 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id c11-20020a621c0b000000b0051ba303f1c0sm2001278pfc.127.2022.06.16.09.44.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 09:44:56 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 16:44:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Varad Gautam <varad.gautam@suse.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, marcorr@google.com, zxwang42@gmail.com,
-        erdemaktas@google.com, rientjes@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v3 02/11] x86: Move ap_init() to smp.c
-Message-ID: <YqteBKYywG3N9ipt@google.com>
-References: <20220426114352.1262-1-varad.gautam@suse.com>
- <20220426114352.1262-3-varad.gautam@suse.com>
- <YqpPmz2SUP5nsUL+@google.com>
- <20220616115646.7u2bgbyppgzjivk6@gator>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ma+cQgxf4eaYFFNkDorw41RhIratRGMLiSnvn0U+ZYI=;
+        b=YDUkR6RCPzpVj/wGvUywQ7cYfwGqtUvaVOINw4xTGqdknfByAc0UjXMq6BojqDqKN9
+         theAQhbgo0+4MYdxTl7oo/fDE86dCdNSTrb9mC4UC4ivibQAtzHG/YMTWgX+YL+v/NTG
+         c0LXmoFgEqGGYcrcFHnt9KwpsiFnZfpq1vU7UVzrqMQguwBLkIf5XMPqYsshT51J7tIC
+         +VgpH4i63yaiRZf6zN3eN615TFcNUbv1nPGEmhodE70fkcWSOkRLifC8NWAT2N5uVvxB
+         yH6uYcmdpsCR2aTblsUos/LRUiT3y9InhaJOY3IzeuyxL0EAIqrtI9aeBnmK0NC44Gp9
+         Vu2Q==
+X-Gm-Message-State: AJIora8++KYtAp8zjM6D3Mvwil9pApHZ7/hZU5xD0+BGghNchyHXD3HB
+        GhWxnZwWrO9EBF1/+F1sE9HndItOYyow+7Ky2VhoTA==
+X-Google-Smtp-Source: AGRyM1t2wXiSqrp+/hCsncfT7hZVQUaXE+aX/b80uh35Ci0QwSm1VxZlUHpOtCbANAJ7fxBPOZRLFJupOCDM2AW34kA=
+X-Received: by 2002:a05:6512:220f:b0:479:65e1:c802 with SMTP id
+ h15-20020a056512220f00b0047965e1c802mr3239500lfu.250.1655398059857; Thu, 16
+ Jun 2022 09:47:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220616115646.7u2bgbyppgzjivk6@gator>
+References: <20220613145022.183105-1-kyle.meyer@hpe.com> <CALzav=eWPiii4_zmYifdi_pSS6nUvMEchwQcvD+W2CfOR+-s8Q@mail.gmail.com>
+ <8735g7k5u2.fsf@redhat.com>
+In-Reply-To: <8735g7k5u2.fsf@redhat.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 16 Jun 2022 09:47:13 -0700
+Message-ID: <CALzav=fjvO0csAV5onsdXijDnvYJNMccoNHKPiraU6tHhCURuQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Increase KVM_MAX_VCPUS to 2048
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Kyle Meyer <kyle.meyer@hpe.com>, kvm list <kvm@vger.kernel.org>,
+        X86 ML <x86@kernel.org>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, russ.anderson@hpe.com,
+        payton@hpe.com, "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,23 +75,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 16, 2022, Andrew Jones wrote:
-> On Wed, Jun 15, 2022 at 09:31:07PM +0000, Sean Christopherson wrote:
-> > On Tue, Apr 26, 2022, Varad Gautam wrote:
-> > > +	printf("smp: waiting for %d APs\n", _cpu_count - 1);
-> > 
-> > Oof, this breaks run_test.sh / runtime.bash.  runtime.bash has a godawful hack
-> > to detect that dummy.efi ran cleanly; it looks for "enabling apic" as the last
-> > line to detect success.  I'll add a patch to fix this by having dummy.c print an
-> > explicit magic string, e.g. Dummy Hello World!.
+On Tue, Jun 14, 2022 at 1:28 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> David Matlack <dmatlack@google.com> writes:
+>
+> > On Mon, Jun 13, 2022 at 11:35 AM Kyle Meyer <kyle.meyer@hpe.com> wrote:
+> >>
+> >> Increase KVM_MAX_VCPUS to 2048 so we can run larger virtual machines.
 > >
-> 
-> powerpc and s390x always exit with
-> 
->  printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-> 
-> It's because they can only exit with exit code zero, but maybe it's worth
-> adopting the same line and format for EFI tests?
+> > Does the host machine have 2048 CPUs (or more) as well in your usecase?
+> >
+> > I'm wondering if it makes sense to start configuring KVM_MAX_VCPUS
+> > based on NR_CPUS. That way KVM can scale up on large machines without
+> > using more memory on small machines.
+> >
+> > e.g.
+> >
+> > /* Provide backwards compatibility. */
+> > #if NR_CPUS < 1024
+> >   #define KVM_MAX_VCPUS 1024
+> > #else
+> >   #define KVM_MAX_VCPUS NR_CPUS
+> > #endif
+> >
+> > The only downside I can see for this approach is if you are trying to
+> > kick the tires a new large VM on a smaller host because the new "large
+> > host" hardware hasn't landed yet.
 
-Honestly, I'd prefer using truly magic string in dummy.c for the probing code so
-that it's super obvious that there's meaning in the string.
+Heh. My point here doesn't make sense. The actual number of CPUs in
+the host machine wouldn't matter, just the host kernel's NR_CPUS.
+
+>
+> FWIW, while I don't think there's anything wrong with such approach, it
+> won't help much distro kernels which are not recompiled to meet the
+> needs of a particular host.
+
+But is there a use-case for running a VM with more vCPUs than the
+kernel's NR_CPUS?
+
+
+> According to Kyle's numbers, the biggest
+> growth is observed with 'struct kvm_ioapic' and that's only because of
+> 'struct rtc_status' embedded in it. Maybe it's possible to use something
+> different from a KVM_MAX_VCPU_IDS-bound flat bitmask there? I'm not sure
+> how important this is as it's just another 4K per-VM and when guest's
+> memory is taken into account it's probably not much.
+>
+> The growth in 'struct kvm'/'struct kvm_arch' seems to be insignificant
+> and on-stack allocations are probably OK.
+>
+> --
+> Vitaly
+>
