@@ -2,103 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DC9C54ECE0
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 23:54:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8DA454ED2F
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 00:18:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378512AbiFPVy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 17:54:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39400 "EHLO
+        id S1378859AbiFPWSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 18:18:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377916AbiFPVy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 17:54:26 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2C72057144
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 14:54:23 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-62-astVriicPDe5cx5R_yDGqw-1; Thu, 16 Jun 2022 22:54:18 +0100
-X-MC-Unique: astVriicPDe5cx5R_yDGqw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.36; Thu, 16 Jun 2022 22:54:16 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.036; Thu, 16 Jun 2022 22:54:16 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'oliver.upton@linux.dev'" <oliver.upton@linux.dev>
-CC:     Raghavendra Rao Ananta <rananta@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        "Ricardo Koller" <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        "Reiji Watanabe" <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        "Colton Lewis" <coltonlewis@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Andrew Jones" <drjones@redhat.com>
-Subject: RE: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
-Thread-Topic: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
-Thread-Index: AQHYgXkNkdHi2edO0UOJoWwOrv/ni61SMGPg///3a4CAABX/cIAAENKAgABDjYA=
-Date:   Thu, 16 Jun 2022 21:54:16 +0000
-Message-ID: <2ec9ecbfb13d422ab6cda355ff011c9f@AcuMS.aculab.com>
-References: <3e73cb07968d4c92b797781b037c2d45@AcuMS.aculab.com>
- <20220615185706.1099208-1-rananta@google.com>
- <20220616120232.ctkekviusrozqpru@gator>
- <33ca91aeb5254831a88e187ff8d9a2c2@AcuMS.aculab.com>
- <20220616162557.55bopzfa6glusuh5@gator>
- <7b1040c48bc9b2986798322c336660ab@linux.dev>
-In-Reply-To: <7b1040c48bc9b2986798322c336660ab@linux.dev>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        with ESMTP id S230174AbiFPWSO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 18:18:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C575060041
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 15:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655417891;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9DWpHhljjMLBCYm+B5HqD4SLrNJSN/X7QHRnWVk9iss=;
+        b=e9zS0j//AEAuZs8NfvfGHGNOHnPBsqgn962EbFQjhxfWmd61jxwbJZ4fGIZnDCG5FU2MvX
+        4YFDMvIsIj77eM+TGnXWqyRhzLVD+0v98WVstJdT1Qxi/72noKYArzokoZCfx7uTwyGR9W
+        offrOwc7v2rckRDarrYIs54aeM/5Vpw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-589-wp9qcvtCPoKeVUx-w0eenA-1; Thu, 16 Jun 2022 18:18:10 -0400
+X-MC-Unique: wp9qcvtCPoKeVUx-w0eenA-1
+Received: by mail-wm1-f71.google.com with SMTP id m22-20020a7bcb96000000b0039c4f6ade4dso1100814wmi.8
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 15:18:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=9DWpHhljjMLBCYm+B5HqD4SLrNJSN/X7QHRnWVk9iss=;
+        b=iPPjozpIIMA/MEUcIS9cWEOhbheofSo9hUnS8PS95yJDiiI3QBdpYe2yhHNtkqmiYy
+         YFc6LR4EOYBflOIskmv9CpZWOhaZwwIKti2MDudnKgqu+QzaKUjNAGhPwlNu9kf7rs68
+         CnxhJxwhgopQ9LS9nqu+hhYA0fjpLwCk1qRQq2xp0AkwP3ihwFyIOTZTpPS8bWFjROKV
+         MEqGPUoT0TX5WzET5RD70jKsJ/DysCGPL0WogSFcxwQh3mwRXo0n/oSh96OXO6LbEo06
+         vfDI5Z4rVX5HyrTxdwo4I/oTy65qoSBvGRvOJ53gLWs4dBJjIUMImn5maAOgmS8Lmp9G
+         M+JA==
+X-Gm-Message-State: AJIora8WRAs7ejeLlBlhu41BXKCRnjnG6CFitFmxKMN/2Gqm2skHoLUC
+        N0cgNRcIeDl8kwPkWChRS02yCzRM79qC/kCCth8X303mPKlqt7c6lePCr2N7FwvcF9bx6DnWT4d
+        XXnm7RCP5AYZs
+X-Received: by 2002:adf:e181:0:b0:213:bbe1:ba66 with SMTP id az1-20020adfe181000000b00213bbe1ba66mr6215478wrb.325.1655417887946;
+        Thu, 16 Jun 2022 15:18:07 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uO1cJJMNUcHhX2JKlWJowzj7WQI64QGyPrnUyRc32kSMp0t+NjedvVfCVD7/vwLeNG3ZUpmw==
+X-Received: by 2002:adf:e181:0:b0:213:bbe1:ba66 with SMTP id az1-20020adfe181000000b00213bbe1ba66mr6215452wrb.325.1655417887629;
+        Thu, 16 Jun 2022 15:18:07 -0700 (PDT)
+Received: from [192.168.1.129] (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
+        by smtp.gmail.com with ESMTPSA id l15-20020a05600c2ccf00b003974a00697esm7435615wmc.38.2022.06.16.15.18.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jun 2022 15:18:07 -0700 (PDT)
+Message-ID: <a633d605-4cb3-2e04-1818-85892cf6f7b0@redhat.com>
+Date:   Fri, 17 Jun 2022 00:18:05 +0200
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v6 3/5] fbdev: Disable sysfb device registration when
+ removing conflicting FBs
 Content-Language: en-US
+To:     Zack Rusin <zackr@vmware.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "tzimmermann@suse.de" <tzimmermann@suse.de>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>,
+        "lersek@redhat.com" <lersek@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "deller@gmx.de" <deller@gmx.de>,
+        Linux-graphics-maintainer <Linux-graphics-maintainer@vmware.com>
+References: <20220607182338.344270-1-javierm@redhat.com>
+ <20220607182338.344270-4-javierm@redhat.com>
+ <de83ae8cb6de7ee7c88aa2121513e91bb0a74608.camel@vmware.com>
+ <38473dcd-0666-67b9-28bd-afa2d0ce434a@redhat.com>
+ <603e3613b9b8ff7815b63f294510d417b5b12937.camel@vmware.com>
+From:   Javier Martinez Canillas <javierm@redhat.com>
+In-Reply-To: <603e3613b9b8ff7815b63f294510d417b5b12937.camel@vmware.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RnJvbTogb2xpdmVyLnVwdG9uQGxpbnV4LmRldg0KPiBTZW50OiAxNiBKdW5lIDIwMjIgMTk6NDUN
-Cg0KPiANCj4gSnVuZSAxNiwgMjAyMiAxMTo0OCBBTSwgIkRhdmlkIExhaWdodCIgPERhdmlkLkxh
-aWdodEBhY3VsYWIuY29tPiB3cm90ZToNCj4gPiBObyB3b25kZXIgSSB3YXMgY29uZnVzZWQuDQo+
-ID4gSXQncyBub3Qgc3VycHJpc2luZyB0aGUgY29tcGlsZXIgb3B0aW1pc2VzIGl0IGFsbCBhd2F5
-Lg0KPiA+DQo+ID4gSXQgZG9lc24ndCBzZWVtIHJpZ2h0IHRvIGJlICdhYnVzaW5nJyBXUklURV9P
-TkNFKCkgaGVyZS4NCj4gPiBKdXN0IGFkZGluZyBiYXJyaWVyKCkgc2hvdWxkIGJlIGVub3VnaCBh
-bmQgbXVjaCBtb3JlIGRlc2NyaXB0aXZlLg0KPiANCj4gSSBoYWQgdGhlIHNhbWUgdGhvdWdodCwg
-YWx0aG91Z2ggSSBkbyBub3QgYmVsaWV2ZSBiYXJyaWVyKCkgaXMgc3VmZmljaWVudA0KPiBvbiBp
-dHMgb3duLiBiYXJyaWVyX2RhdGEoKSB3aXRoIGEgcG9pbnRlciB0byB1YyBwYXNzZWQgdGhyb3Vn
-aA0KPiBpcyByZXF1aXJlZCB0byBrZWVwIGNsYW5nIGZyb20gZWxpbWluYXRpbmcgdGhlIGRlYWQg
-c3RvcmUuDQoNCkEgYmFycmllcigpIChmdWxsIG1lbW9yeSBjbG9iYmVyKSBvdWdodCB0byBiZSBz
-dHJvbmdlciB0aGFuDQp0aGUgcGFydGlhbCBvbmUgdGhhbiBiYXJyaWVyX2RhdGEoKSBnZW5lcmF0
-ZXMuDQoNCkkgY2FuJ3QgcXVpdGUgZGVjaWRlIHdoZXRoZXIgeW91IG5lZWQgYSBiYXJyaWVyKCkg
-Ym90aCBzaWRlcw0Kb2YgdGhlICdtYWdpYyB3cml0ZScuDQpQbGF1c2libHkgdGhlIGNvbXBpbGVy
-IGNvdWxkIGRpc2NhcmQgdGhlIG9uLXN0YWNrIGRhdGENCmFmdGVyIHRoZSBiYXJyaWVyKCkgYW5k
-IGJlZm9yZSB0aGUgJ21hZ2ljIHdyaXRlJy4NCg0KQ2VydGFpbmx5IHB1dHRpbmcgdGhlICdtYWdp
-YyB3cml0ZScgaW5zaWRlIGEgYXNtIGJsb2NrDQp0aGF0IGhhcyBhIG1lbW9yeSBjbG9iYmVyIGlz
-IGEgbW9yZSBjb3JyZWN0IHNvbHV0aW9uLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRy
-ZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1L
-MSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
+On 6/16/22 23:03, Zack Rusin wrote:
+> On Thu, 2022-06-16 at 21:55 +0200, Javier Martinez Canillas wrote:
+>> Hello Zack,
+>>
+>> On 6/16/22 21:29, Zack Rusin wrote:
+>>> On Tue, 2022-06-07 at 20:23 +0200, Javier Martinez Canillas wrote:
+>>>> The platform devices registered by sysfb match with firmware-based DRM or
+>>>> fbdev drivers, that are used to have early graphics using a framebuffer
+>>>> provided by the system firmware.
+>>>>
+>>
+>> [snip]
+>>
+>>>
+>>> Hi, Javier.
+>>>
+>>> This change broke arm64 with vmwgfx. We get a kernel oops at boot (let me know if
+>>> you'd like .config or just have us test something directly for you):
+>>>
+>>
+>> Yes please share your .config and I'll try to reproduce on an arm64 machine.
+> 
+> Attached. It might be a little hard to reproduce unless you have an arm64 machine
+> with a dedicated gpu. You'll need a system that actually transitions from a generic
+> fb driver (e.g. efifb) to the dedicated one.
+>
+
+Yes, all my testing for this was done with a rpi4 so I should be able to reproduce
+that case. I'm confused though because I tested efifb -> vc4, simplefb -> vc4 and
+simpledrm -> vc4.
+ 
+>>>
+>>>  Unable to handle kernel NULL pointer dereference at virtual address
+>>> 0000000000000008
+>>>  Mem abort info:
+>>>    ESR = 0x96000004
+>>>    EC = 0x25: DABT (current EL), IL = 32 bits
+>>>    SET = 0, FnV = 0
+>>>    EA = 0, S1PTW = 0
+>>>    FSC = 0x04: level 0 translation fault
+>>>  Data abort info:
+>>>    ISV = 0, ISS = 0x00000004
+>>>    CM = 0, WnR = 0
+>>>  user pgtable: 4k pages, 48-bit VAs, pgdp=00000001787ee000
+>>>  [0000000000000008] pgd=0000000000000000, p4d=0000000000000000
+>>>  Internal error: Oops: 96000004 [#1] SMP
+>>>  Modules linked in: vmwgfx(+) e1000e(+) nvme ahci(+) xhci_pci drm_ttm_helper ttm
+>>> sha256_arm64 sha1_ce nvme_core xhci_pci_renesas aes_neon_bs aes_neon_blk aes>
+>>>  CPU: 3 PID: 215 Comm: systemd-udevd Tainted: G     U            5.18.0-rc5-vmwgfx
+>>> #12
+>>
+>> I'm confused, your kernel version seems to be 5.18.0-rc5 but this patch
+>> is only in drm-misc-next now and will land in 5.20...
+>>
+>> Did you backport it? Can you please try to reproduce with latest drm-tip ?
+> 
+> No, this is drm-misc-next as of yesterday. drm-misc-next was still on 5.18.0-rc5
+> yesterday.
+> 
+
+Right! I looked at the base for drm-tip but forgot that drm-misc was still on 5.18.
+
+I'll look at this tomorrow but in the meantime, could you please look if the following
+commits on top of drm-misc-next help ?
+
+d258d00fb9c7 fbdev: efifb: Cleanup fb_info in .fb_destroy rather than .remove
+1b5853dfab7f fbdev: efifb: Fix a use-after-free due early fb_info cleanup
+
+-- 
+Best regards,
+
+Javier Martinez Canillas
+Linux Engineering
+Red Hat
 
