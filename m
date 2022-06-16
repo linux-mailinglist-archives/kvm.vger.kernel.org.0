@@ -2,73 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4FE054E108
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 14:47:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C8B954E1A9
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 15:16:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230511AbiFPMrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 08:47:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53818 "EHLO
+        id S233490AbiFPNQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 09:16:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbiFPMrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 08:47:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99945473BD
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:47:11 -0700 (PDT)
+        with ESMTP id S231802AbiFPNQS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 09:16:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 54F2D3C4BD
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 06:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655383630;
+        s=mimecast20190719; t=1655385376;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eHLQpuAU4wLXl8S1FY+BvKbQEk+v7epLCejlC4CMvYY=;
-        b=htb/cpE8/QpnNTlBjUvWUkdBjq3JWDE0TpMC6MWbo4hZmIXWmvBJKfjm4belUoaHWiA6Hm
-        YfzasaexmYRmAt5CgpsV6hwxwoLNlqbSAKleAWvFkdh/I9jAqlsuUGp5mI5feAZrWfP2gD
-        Ru9iTDutWh6WhuLRPEl2synub3TlEU0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=nB9yDKf10sIzmuHYwsgLVJwemxZLzqM9n4RH86XcgFc=;
+        b=bjKZ71bsQ5mDZnt5GpwGPA4hGN38ejDvrReIzqlyOQiyC2OE42hlSCNAthLwMaFmizBahn
+        dQs1q2qE5TAWBM3ocFv5bDesOAmrMl98FNwEa+mWxP+Jk2Fnzx+LBf3l80Fyp8nK6LhBwP
+        Jd6g9cXdSORf/63affEbaXzgHCjdL5Q=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-190-vWEdkT8NOWOp1NTJaZ-j0w-1; Thu, 16 Jun 2022 08:47:09 -0400
-X-MC-Unique: vWEdkT8NOWOp1NTJaZ-j0w-1
-Received: by mail-ej1-f69.google.com with SMTP id fp4-20020a1709069e0400b00711911cecf9so562932ejc.3
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:47:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eHLQpuAU4wLXl8S1FY+BvKbQEk+v7epLCejlC4CMvYY=;
-        b=y0a9n2mRednNFY//zoOa7LJHGqS9QI5VFlbHl6q+CuefZ7BfnVmx5mSLHNrY0TodTi
-         bCM4hRIzgQjyDTBYrVHnjmhBNKEPOY7KmW1eqbZlvwMdFtct2QkCsNn2hkexQGS7nvgG
-         PYcrL+7uiKJBAdyezQdiLIC6GleiqaoGunz2oLOyfFmwEWp9sAO+iS+XTzC7jhDwSbv0
-         Uv4MqjL3MntvaF2aJmpYr8pNxTFePNm36jduW8c2ndwOO8dXVd9ZpSMAXV+mLkHC3RYz
-         c3LNa7j4eTg9lUl7xDgUh0WkWxkvnUcomd4tD/lCz5RTeeefk+jbK+RqKwrQxcKAtQfI
-         PaTg==
-X-Gm-Message-State: AJIora/1S54EMrCuFqYGJlB46FafhUKmt7iQNlGjQSBqMEZquqNRc9P3
-        BvxMPoUQ75NqmABLbWOSIsvJyVv3lWnB/OUAHg3CX9sKiocMfwake8cbx4PxwJ3KtNgCWdFeimw
-        NLdZQD0bjTen4
-X-Received: by 2002:a05:6402:23a3:b0:42e:251a:c963 with SMTP id j35-20020a05640223a300b0042e251ac963mr6296498eda.173.1655383628443;
-        Thu, 16 Jun 2022 05:47:08 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tpIYwJjkFopmtzI0GIlGcLZdwZ6PcGGP/8fD6qnBnNu7Xzc7i8G+/aM6OTa6GGy5Vz99TU8Q==
-X-Received: by 2002:a05:6402:23a3:b0:42e:251a:c963 with SMTP id j35-20020a05640223a300b0042e251ac963mr6296486eda.173.1655383628301;
-        Thu, 16 Jun 2022 05:47:08 -0700 (PDT)
-Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
-        by smtp.gmail.com with ESMTPSA id j4-20020a50ed04000000b004318ba244dcsm1714996eds.10.2022.06.16.05.47.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 05:47:07 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 14:47:05 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        thuth@redhat.com, maz@kernel.org
-Subject: Re: [PATCH 1/4] KVM: selftests: enumerate GUEST_ASSERT arguments
-Message-ID: <20220616124705.wsll33usok4gfhqc@gator>
-References: <20220615193116.806312-1-coltonlewis@google.com>
- <20220615193116.806312-2-coltonlewis@google.com>
+ us-mta-15--L5YKvq3OhGOjIaNURlllA-1; Thu, 16 Jun 2022 09:16:12 -0400
+X-MC-Unique: -L5YKvq3OhGOjIaNURlllA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1AFE1C1448A;
+        Thu, 16 Jun 2022 13:16:06 +0000 (UTC)
+Received: from starship (unknown [10.40.194.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 49BA110725;
+        Thu, 16 Jun 2022 13:16:04 +0000 (UTC)
+Message-ID: <1081aa507b52a803d173a180897b9242119bb055.camel@redhat.com>
+Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Date:   Thu, 16 Jun 2022 16:16:03 +0300
+In-Reply-To: <20220614204730.3359543-1-seanjc@google.com>
+References: <20220614204730.3359543-1-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220615193116.806312-2-coltonlewis@google.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -77,36 +66,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 07:31:13PM +0000, Colton Lewis wrote:
-> Enumerate GUEST_ASSERT arguments to avoid magic indices to ucall.args.
+On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
+> The main goal of this series is to fix KVM's longstanding bug of not
+> honoring L1's exception intercepts wants when handling an exception that
+> occurs during delivery of a different exception.  E.g. if L0 and L1 are
+> using shadow paging, and L2 hits a #PF, and then hits another #PF while
+> vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
+> KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
+> so that the #PF is routed to L1, not injected into L2 as a #DF.
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  tools/testing/selftests/kvm/include/ucall_common.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> nVMX has hacked around the bug for years by overriding the #PF injector
+> for shadow paging to go straight to VM-Exit, and nSVM has started doing
+> the same.  The hacks mostly work, but they're incomplete, confusing, and
+> lead to other hacky code, e.g. bailing from the emulator because #PF
+> injection forced a VM-Exit and suddenly KVM is back in L1.
 > 
-> diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-> index 98562f685151..dbe872870b83 100644
-> --- a/tools/testing/selftests/kvm/include/ucall_common.h
-> +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-> @@ -32,6 +32,14 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
->  				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
->  #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
->  #define GUEST_DONE()		ucall(UCALL_DONE, 0)
-> +
-> +enum guest_assert_builtin_args {
-> +	GUEST_ERROR_STRING,
-> +	GUEST_FILE,
-> +	GUEST_LINE,
-> +	GUEST_ASSERT_BUILTIN_NARGS
-> +};
-> +
->  #define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {    \
->  	if (!(_condition))                                              \
->  		ucall(UCALL_ABORT, 2 + _nargs,                          \
-> -- 
-> 2.36.1.476.g0c4daa206d-goog
->
+> Everything leading up to that are related fixes and cleanups I encountered
+> along the way; some through code inspection, some through tests.
+> 
+> v2:
+>   - Rebased to kvm/queue (commit 8baacf67c76c) + selftests CPUID
+>     overhaul.
+>     https://lore.kernel.org/all/20220614200707.3315957-1-seanjc@google.com
+>   - Treat KVM_REQ_TRIPLE_FAULT as a pending exception.
+> 
+> v1: https://lore.kernel.org/all/20220311032801.3467418-1-seanjc@google.com
+> 
+> Sean Christopherson (21):
+>   KVM: nVMX: Unconditionally purge queued/injected events on nested
+>     "exit"
+>   KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
+>   KVM: x86: Don't check for code breakpoints when emulating on exception
+>   KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
+>   KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
+>   KVM: x86: Treat #DBs from the emulator as fault-like (code and
+>     DR7.GD=1)
+>   KVM: x86: Use DR7_GD macro instead of open coding check in emulator
+>   KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
+>   KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
+>   KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
+>   KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
+>   KVM: x86: Make kvm_queued_exception a properly named, visible struct
+>   KVM: x86: Formalize blocking of nested pending exceptions
+>   KVM: x86: Use kvm_queue_exception_e() to queue #DF
+>   KVM: x86: Hoist nested event checks above event injection logic
+>   KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
+>     VM-Exit
+>   KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
+>   KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions
+>   KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
+>     behavior
+>   KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
+>   KVM: selftests: Add an x86-only test to verify nested exception
+>     queueing
+> 
+>  arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+>  arch/x86/include/asm/kvm_host.h               |  35 +-
+>  arch/x86/kvm/emulate.c                        |   3 +-
+>  arch/x86/kvm/svm/nested.c                     | 102 ++---
+>  arch/x86/kvm/svm/svm.c                        |  18 +-
+>  arch/x86/kvm/vmx/nested.c                     | 319 +++++++++-----
+>  arch/x86/kvm/vmx/sgx.c                        |   2 +-
+>  arch/x86/kvm/vmx/vmx.c                        |  53 ++-
+>  arch/x86/kvm/x86.c                            | 404 +++++++++++-------
+>  arch/x86/kvm/x86.h                            |  11 +-
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/include/x86_64/svm_util.h   |   7 +-
+>  .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
+>  .../kvm/x86_64/nested_exceptions_test.c       | 295 +++++++++++++
+>  15 files changed, 886 insertions(+), 418 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
+> 
+> 
+> base-commit: 816967202161955f398ce379f9cbbedcb1eb03cb
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Next week I will review all of this patch series.
+
+Best regards,
+	Maxim Levitsky
 
