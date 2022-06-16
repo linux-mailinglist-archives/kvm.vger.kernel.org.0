@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2F6254E973
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 20:35:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 789D154E997
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 20:40:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233921AbiFPSfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 14:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35954 "EHLO
+        id S1378048AbiFPSk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 14:40:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232129AbiFPSfB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 14:35:01 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B148C517FC
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:35:00 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id f65so1990086pgc.7
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:35:00 -0700 (PDT)
+        with ESMTP id S1378046AbiFPSk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 14:40:28 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E433A54BD3
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:40:26 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id c196so2232970pfb.1
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:40:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=2DDMpYpJIW2G43lM7VbrvSxw342R0ygln5vOT5hucU8=;
-        b=ownebIQxonM5KkMhFH5JVGkaQme8MLm7ZX9ST78hEoYEe28ZGs3vdCPcHrqkelSlS+
-         4ONsFY1pObJisnUI/UE7dFPVJmmZOQqjpFQv7hTCJld83h7UmpqzNrDrvFaYma/1YFTH
-         VAftM64D62Ob+eBJe49LqaJJ+T3YPPf6vmJQZLH2COzZHsCJBOatYGO7yhBNq5JtYUEp
-         Euqla277KaMufi5RgPvC0cxFFfOT7lguI4xXB69uxERh3HQIH3Gq7kqvuImBmBk8r4L8
-         drD8Rg/XkJTg1R5vOewzCS4A1nlZUwF8tNUynkpC1L+iEkZu7GVbZJ1+xHuBULLXyYK9
-         P2uA==
+        bh=qOtsGgRe/HH6fZCGA1Vqnp/Pu2SpXJ203pmsMApP9BQ=;
+        b=ghV/+SwhOrmWSAqfHY6oib0Bgukkl21RuufbSrEMtukRTyKO6vNTe3H6zfHENiXv7F
+         I0H7Hd2s8l69WZ2midlhigmck6rArP0HJBqV4UGpNKarYuop9SoRh0nfOqkOtaKPGlA/
+         zj0fRsthrrh6p/lSTvsFyoOgblRLJry6PSKZkg3h6CEwCaD/zbIPH7rjfneJamf/J4Dx
+         XpfIuGQTP4vftc7+ZF3REFz7wNPDErkY9RKwuY6nd3YRjn3qEAalVz0sioDhaJl7zAsJ
+         dhpxaeIPL7hN6x3ogpfBqBfCFv99CP7mJItiIe12fGDc2XG/poQYWU8kMSPC+nxcq7Jr
+         LjzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=2DDMpYpJIW2G43lM7VbrvSxw342R0ygln5vOT5hucU8=;
-        b=VAkjtwTnws0wGm1zjXId4duz1Pab7eF+V05IMdB+k5FArXguCsQJFVN4PSTHyFcYKT
-         sOzMOa4PRFelwpwO+m4z+afP9qKGzpe6evRU9HIjoKz+h8d9UaCJTrCpGRyiotFO+0qY
-         vYR3kYzzKChgv4+FSehkifZolIGpm6vGsTS4FDk349KDbI/7v2R4MYhPE70FgxFZ9PEr
-         CMLlpGb2UPwKMBGPDOYQ/TMxatcV7KvXIfb+UucyHJ+yVfzo1Y7DPp6g8crZtR/EElG7
-         PCDPQ70H5GkpAIfUIt8whDPue8F4Q74vUeEbkmUJuvktW9u92Sr5fasRD4uxemOKWq1G
-         Jd/g==
-X-Gm-Message-State: AJIora+l4AeBMyJDxENbh+Z0VbUc39LFoj16+z+LfLBlqv+VFE/IDCZz
-        APRQVVMxdIhkHNbgt7BB9exG9UKzBiIDvA==
-X-Google-Smtp-Source: AGRyM1tGcFUTWV6HEKvRwId+6xa3/GnNX6fAt0Y85hLxhIGXMWuI5xRARf8gSN5Iy1izmWeuyaY5rw==
-X-Received: by 2002:a65:6044:0:b0:3fc:674:8f5a with SMTP id a4-20020a656044000000b003fc06748f5amr5608538pgp.436.1655404499824;
-        Thu, 16 Jun 2022 11:34:59 -0700 (PDT)
+        bh=qOtsGgRe/HH6fZCGA1Vqnp/Pu2SpXJ203pmsMApP9BQ=;
+        b=4kmTEhY1nGNQ1alGj/m4CqSjd7A2zp+Gxn5zoEGrhrWopzq6QGOBaawbdCzOJ7GmPJ
+         rck+ecNX/bPov6mEIJXsN4BarO6ku5pYVOyIabcRZFYNm5NQSVhhntM/ReKXFUH3potR
+         0x1sgHuQKFB4+ZKbxxr11EQJZ/gmXZhnIfbX3BGb4xqT3ZH+nZa7KkfyVf9+PH8ai8xx
+         6IlKvZ4kv+rF/m4w5CUTcDiEQ0jXc4P8VGWvWcRfCa19wuniAlqJbo8rZngMc4wcfLdY
+         +ffmPCPcwVKmT7yqoT8/SU6StAF/MGVGBWvWg6ptC+x4052iPC6GpuqDHtkzeDrQ3a+5
+         WrjA==
+X-Gm-Message-State: AJIora/9GFH4cGYpsLgC97iIu8b8gmYKmTsYr15FdFPNTfQY/Jb/J3SJ
+        Zs8epM2QfgufRy+84bnnFm8Rcg==
+X-Google-Smtp-Source: AGRyM1uBPJnjS+zaEQvs0WWO2BBd1tCDhgkg2x0s/MDJqsQU2VYIAT9vHByVJYS2WACJKoZyiciIPQ==
+X-Received: by 2002:a63:8bc7:0:b0:3fc:b8ab:c612 with SMTP id j190-20020a638bc7000000b003fcb8abc612mr5508336pge.535.1655404826017;
+        Thu, 16 Jun 2022 11:40:26 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id c11-20020a62f84b000000b0051844a64d3dsm2082312pfm.25.2022.06.16.11.34.58
+        by smtp.gmail.com with ESMTPSA id w1-20020a63a741000000b00404fd2138afsm2181375pgo.40.2022.06.16.11.40.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 11:34:59 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 18:34:55 +0000
+        Thu, 16 Jun 2022 11:40:25 -0700 (PDT)
+Date:   Thu, 16 Jun 2022 18:40:21 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     pbonzini@redhat.com, like.xu.linux@gmail.com, jmattson@google.com,
         kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] x86: Skip running test when pmu is
- disabled
-Message-ID: <Yqt3zzTV2UrsFX3v@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] x86: Skip perf related tests when
+ pmu is disabled
+Message-ID: <Yqt5Fa/8l56XhfRC@google.com>
 References: <20220615084641.6977-1-weijiang.yang@intel.com>
- <20220615084641.6977-3-weijiang.yang@intel.com>
+ <20220615084641.6977-4-weijiang.yang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220615084641.6977-3-weijiang.yang@intel.com>
+In-Reply-To: <20220615084641.6977-4-weijiang.yang@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,74 +73,67 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Jun 15, 2022, Yang Weijiang wrote:
-> Read MSR_IA32_PERF_CAPABILITIES triggers #GP when pmu is disabled
-> by enable_pmu=0 in KVM. Let's check whether pmu is available before
-> issue msr reading to avoid the #GP. Also check PDCM bit before read
-> the MSR.
+> When pmu is disabled in KVM, reading MSR_CORE_PERF_GLOBAL_CTRL
+> or executing rdpmc leads to #GP, so skip related tests in this case.
 > 
 > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > ---
->  x86/pmu_lbr.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
+>  x86/vmx_tests.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 > 
-> diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
-> index 688634d..62614a0 100644
-> --- a/x86/pmu_lbr.c
-> +++ b/x86/pmu_lbr.c
-> @@ -5,6 +5,7 @@
->  #define N 1000000
->  #define MAX_NUM_LBR_ENTRY	  32
->  #define DEBUGCTLMSR_LBR	  (1UL <<  0)
-> +#define PDCM_ENABLED	  (1UL << 15)
->  #define PMU_CAP_LBR_FMT	  0x3f
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 4d581e7..dd6fc13 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -944,6 +944,16 @@ static void insn_intercept_main(void)
+>  			continue;
+>  		}
 >  
->  #define MSR_LBR_NHM_FROM	0x00000680
-> @@ -74,13 +75,22 @@ int main(int ac, char **av)
->  		return 0;
->  	}
->  
-> -	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
->  	eax.full = id.a;
->  
->  	if (!eax.split.version_id) {
->  		printf("No pmu is detected!\n");
->  		return report_summary();
->  	}
+> +		if (insn_table[cur_insn].flag == CPU_RDPMC) {
+> +			struct cpuid id = cpuid(10);
 > +
-> +	id = cpuid(1);
+> +			if (!(id.a & 0xff)) {
+
+Please add helpers to query (a) the PMU version and (b) whether or not PERF_GLOBAL_CTRL
+is supported.
+
+> +				printf("\tFeature required for %s is not supported.\n",
+> +				       insn_table[cur_insn].name);
+> +				continue;
+> +			}
+> +		}
 > +
-> +	if (!(id.c & PDCM_ENABLED)) {
-
-Don't open code cpuid(), add and use X86_FEATURE_PDCM:
-
-  #define	X86_FEATURE_PDCM		(CPUID(0x1, 0, ECX, 15))
-
-	if (!this_cpu_has(X86_FEATURE_PDCM))
-		...
-
-
-
-> +		printf("No PDCM is detected!\n");
-
-If your going to bother printing a message, please make it useful.  Every time I
-read PMU code I have to reread the kernel's cpufeatures.h to remember what PDCM
-stands for.
-
-		printf("Perf/Debug Capabilities MSR isn't supported\n");
-
-> +		return report_summary();
+>  		if (insn_table[cur_insn].disabled) {
+>  			printf("\tFeature required for %s is not supported.\n",
+>  			       insn_table[cur_insn].name);
+> @@ -7490,6 +7500,13 @@ static void test_perf_global_ctrl(u32 nr, const char *name, u32 ctrl_nr,
+>  
+>  static void test_load_host_perf_global_ctrl(void)
+>  {
+> +	struct cpuid id = cpuid(10);
+> +
+> +	if (!(id.a & 0xff)) {
+> +		report_skip("test_load_host_perf_global_ctrl");
+> +		return;
 > +	}
 > +
-> +	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
+>  	if (!(ctrl_exit_rev.clr & EXI_LOAD_PERF)) {
+>  		printf("\"load IA32_PERF_GLOBAL_CTRL\" exit control not supported\n");
+>  		return;
+> @@ -7502,6 +7519,13 @@ static void test_load_host_perf_global_ctrl(void)
+>  
+>  static void test_load_guest_perf_global_ctrl(void)
+>  {
+> +	struct cpuid id = cpuid(10);
 > +
->  	if (!(perf_cap & PMU_CAP_LBR_FMT)) {
->  		printf("No LBR is detected!\n");
-
-Similar complaint,
-
-		printf("Architectural LBRs are not supported.\n");
-
->  		return report_summary();
+> +	if (!(id.a & 0xff)) {
+> +		report_skip("test_load_guest_perf_global_ctrl");
+> +		return;
+> +	}
+> +
+>  	if (!(ctrl_enter_rev.clr & ENT_LOAD_PERF)) {
+>  		printf("\"load IA32_PERF_GLOBAL_CTRL\" entry control not supported\n");
+>  		return;
 > -- 
 > 2.31.1
 > 
