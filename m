@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02F3454DD6A
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 10:49:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD73B54DD78
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 10:49:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376380AbiFPItf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 04:49:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35324 "EHLO
+        id S1359672AbiFPItP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 04:49:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376391AbiFPIsy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 04:48:54 -0400
+        with ESMTP id S1359798AbiFPIs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 04:48:57 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B56BE53700;
-        Thu, 16 Jun 2022 01:47:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7966D424B3;
+        Thu, 16 Jun 2022 01:47:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655369267; x=1686905267;
+  t=1655369272; x=1686905272;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DNQHbD5a674vCUo1VWtLPFj7GhV8y9chgvxSiYSfVNY=;
-  b=IlSDl792FFu4QfRYMCsjgRW/9PNh9LROzOz1OTUQcg1bnvyuEmqznlLx
-   f+e5HcBFGQUB7yCn49VjXNKK8JgkD1Zipo/hxJAcmmosB8feTWBvzkNbU
-   V9tDuYyT2Gkjq1ygc3rJwE5dSemDUbhxIh7ueTW03qEIZRGok5fE+52jg
-   Sq+cQSZu1Kw/64OjwmX1TVG71sBshrduM47uloxphWDitutLc+zALq3Sp
-   upUp2Xgr9DPelbfHuXfw+zpZ2UV/sMkIs9vaq9R+MH4r+N+BCwkfQ9y6N
-   vwIbcMXNjpVxELRJqfz3ZrIo9yV2yA5KsoeqtUa+X21cGH9qcHf1wxvkQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10379"; a="259664556"
+  bh=GeWyVkmGWKHPsJgw/B+NoLBgTSesUAxxZOkxfdZhD8M=;
+  b=M9Lb0UZYW77ejhpzJ3WIAy0cr79DmW+jn8PdKyDn+RLjC/9JSFkslhA6
+   Fy8gDw3wK0UnEzUhhhKv+1s/wb0Xb/zMZiyo31QUeepsLM0zp9SQcZOAZ
+   w9oSHaPkflT9Ae5LYhWoJd1MP6aWja5lZQ5v9id7a2ptU1hbxRL0HZsBb
+   01NCGX8PH4U1VG6m8WZ34TwDfR6LBddo7FoqDXCJJ2wkZbkrJOkJ4J4p/
+   gK+Eg2XQBkRUB3hiKW6GViREKBcHVf6XW4gyVCFdn3fvUcvEHUXrUFr+6
+   lolK3EDXFrUNNPfLpHfjUSS3wLwv10a2maX29W5wXWP+V+J4KcmogLLPj
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10379"; a="259664559"
 X-IronPort-AV: E=Sophos;i="5.91,304,1647327600"; 
-   d="scan'208";a="259664556"
+   d="scan'208";a="259664559"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2022 01:47:41 -0700
 X-IronPort-AV: E=Sophos;i="5.91,304,1647327600"; 
-   d="scan'208";a="613083137"
+   d="scan'208";a="613083140"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2022 01:47:40 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         rick.p.edgecombe@intel.com
-Cc:     weijiang.yang@intel.com, Yu-cheng Yu <yu-cheng.yu@intel.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH 04/19] x86/fpu/xstate: Introduce CET MSR and XSAVES supervisor states
-Date:   Thu, 16 Jun 2022 04:46:28 -0400
-Message-Id: <20220616084643.19564-5-weijiang.yang@intel.com>
+Cc:     weijiang.yang@intel.com, Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH 05/19] x86/fpu: Add helper for modifying xstate
+Date:   Thu, 16 Jun 2022 04:46:29 -0400
+Message-Id: <20220616084643.19564-6-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220616084643.19564-1-weijiang.yang@intel.com>
 References: <20220616084643.19564-1-weijiang.yang@intel.com>
@@ -60,290 +59,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Yu-cheng Yu <yu-cheng.yu@intel.com>
+From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 
-Shadow stack register state can be managed with XSAVE. The registers
-can logically be separated into two groups:
-        * Registers controlling user-mode operation
-        * Registers controlling kernel-mode operation
+Just like user xfeatures, supervisor xfeatures can be active in the
+registers or present in the task FPU buffer. If the registers are
+active, the registers can be modified directly. If the registers are
+not active, the modification must be performed on the task FPU buffer.
 
-The architecture has two new XSAVE state components: one for each group
-of those groups of registers. This lets an OS manage them separately if
-it chooses. Future patches for host userspace and KVM guests will only
-utilize the user-mode registers, so only configure XSAVE to save
-user-mode registers. This state will add 16 bytes to the xsave buffer
-size.
+When the state is not active, the kernel could perform modifications
+directly to the buffer. But in order for it to do that, it needs
+to know where in the buffer the specific state it wants to modify is
+located. Doing this is not robust against optimizations that compact
+the FPU buffer, as each access would require computing where in the
+buffer it is.
 
-Future patches will use the user-mode XSAVE area to save guest user-mode
-CET state. However, VMCS includes new fields for guest CET supervisor
-states. KVM can use these to save and restore guest supervisor state, so
-host supervisor XSAVE support is not required.
+The easiest way to modify supervisor xfeature data is to force restore
+the registers and write directly to the MSRs. Often times this is just fine
+anyway as the registers need to be restored before returning to userspace.
+Do this for now, leaving buffer writing optimizations for the future.
 
-Adding this exacerbates the already unwieldy if statement in
-check_xstate_against_struct() that handles warning about un-implemented
-xfeatures. So refactor these check's by having XCHECK_SZ() set a bool when
-it actually check's the xfeature. This ends up exceeding 80 chars, but was
-better on balance than other options explored. Pass the bool as pointer to
-make it clear that XCHECK_SZ() can change the variable.
+Add a new function fpregs_lock_and_load() that can simultaneously call
+fpregs_lock() and do this restore. Also perform some extra sanity
+checks in this function since this will be used in non-fpu focused code.
 
-While configuring user-mode XSAVE, clarify kernel-mode registers are not
-managed by XSAVE by defining the xfeature in
-XFEATURE_MASK_SUPERVISOR_UNSUPPORTED, like is done for XFEATURE_MASK_PT.
-This serves more of a documentation as code purpose, and functionally,
-only enables a few safety checks.
-
-Both XSAVE state components are supervisor states, even the state
-controlling user-mode operation. This is a departure from earlier features
-like protection keys where the PKRU state a normal user (non-supervisor)
-state. Having the user state be supervisor-managed ensures there is no
-direct, unprivileged access to it, making it harder for an attacker to
-subvert CET.
-
-To facilitate this privileged access, define the two user-mode CET MSRs,
-and the bits defined in those MSRs relevant to future shadow stack
-enablement patches.
-
-Signed-off-by: Yu-cheng Yu <yu-cheng.yu@intel.com>
-Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Cc: Kees Cook <keescook@chromium.org>
 
 ---
 v2:
- - Reword commit log using some verbiage posted by Dave Hansen
- - Remove unlikely to be used supervisor cet xsave struct
- - Clarify that supervisor cet state is not saved by xsave
- - Remove unused supervisor MSRs
+ - Drop optimization of writing directly the buffer, and change API
+   accordingly.
+ - fpregs_lock_and_load() suggested by tglx
+ - Some commit log verbiage from dhansen
 
 v1:
- - Remove outdated reference to sigreturn checks on msr's.
+ - New patch.
 
-Yu-cheng v29:
- - Move CET MSR definition up in msr-index.h.
+ arch/x86/include/asm/fpu/api.h |  7 ++++++-
+ arch/x86/kernel/fpu/core.c     | 19 +++++++++++++++++++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
-Yu-cheng v28:
- - Add XFEATURE_MASK_CET_USER to XFEATURES_INIT_FPSTATE_HANDLED.
-
-Yu-cheng v25:
- - Update xsave_cpuid_features[].  Now CET XSAVES features depend on
-   X86_FEATURE_SHSTK (vs. the software-defined X86_FEATURE_CET).
-
- arch/x86/include/asm/fpu/types.h  | 14 ++++-
- arch/x86/include/asm/fpu/xstate.h |  6 +-
- arch/x86/kernel/fpu/xstate.c      | 93 ++++++++++++++++---------------
- 3 files changed, 63 insertions(+), 50 deletions(-)
-
-diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
-index eb7cd1139d97..03aa98fb9c2b 100644
---- a/arch/x86/include/asm/fpu/types.h
-+++ b/arch/x86/include/asm/fpu/types.h
-@@ -115,8 +115,8 @@ enum xfeature {
- 	XFEATURE_PT_UNIMPLEMENTED_SO_FAR,
- 	XFEATURE_PKRU,
- 	XFEATURE_PASID,
--	XFEATURE_RSRVD_COMP_11,
--	XFEATURE_RSRVD_COMP_12,
-+	XFEATURE_CET_USER,
-+	XFEATURE_CET_KERNEL_UNIMPLEMENTED_SO_FAR,
- 	XFEATURE_RSRVD_COMP_13,
- 	XFEATURE_RSRVD_COMP_14,
- 	XFEATURE_LBR,
-@@ -138,6 +138,8 @@ enum xfeature {
- #define XFEATURE_MASK_PT		(1 << XFEATURE_PT_UNIMPLEMENTED_SO_FAR)
- #define XFEATURE_MASK_PKRU		(1 << XFEATURE_PKRU)
- #define XFEATURE_MASK_PASID		(1 << XFEATURE_PASID)
-+#define XFEATURE_MASK_CET_USER		(1 << XFEATURE_CET_USER)
-+#define XFEATURE_MASK_CET_KERNEL	(1 << XFEATURE_CET_KERNEL_UNIMPLEMENTED_SO_FAR)
- #define XFEATURE_MASK_LBR		(1 << XFEATURE_LBR)
- #define XFEATURE_MASK_XTILE_CFG		(1 << XFEATURE_XTILE_CFG)
- #define XFEATURE_MASK_XTILE_DATA	(1 << XFEATURE_XTILE_DATA)
-@@ -252,6 +254,14 @@ struct pkru_state {
- 	u32				pad;
- } __packed;
+diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+index 6b0f31fb53f7..4f34812b4dd5 100644
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -82,6 +82,12 @@ static inline void fpregs_unlock(void)
+ 		preempt_enable();
+ }
  
 +/*
-+ * State component 11 is Control-flow Enforcement user states
++ * Lock and load the fpu state into the registers, if they are not already
++ * loaded.
 + */
-+struct cet_user_state {
-+	u64 user_cet;			/* user control-flow settings */
-+	u64 user_ssp;			/* user shadow stack pointer */
-+};
++void fpu_lock_and_load(void);
 +
- /*
-  * State component 15: Architectural LBR configuration state.
-  * The size of Arch LBR state depends on the number of LBRs (lbr_depth).
-diff --git a/arch/x86/include/asm/fpu/xstate.h b/arch/x86/include/asm/fpu/xstate.h
-index cd3dd170e23a..d4427b88ee12 100644
---- a/arch/x86/include/asm/fpu/xstate.h
-+++ b/arch/x86/include/asm/fpu/xstate.h
-@@ -50,7 +50,8 @@
- #define XFEATURE_MASK_USER_DYNAMIC	XFEATURE_MASK_XTILE_DATA
+ #ifdef CONFIG_X86_DEBUG_FPU
+ extern void fpregs_assert_state_consistent(void);
+ #else
+@@ -163,5 +169,4 @@ static inline bool fpstate_is_confidential(struct fpu_guest *gfpu)
  
- /* All currently supported supervisor features */
--#define XFEATURE_MASK_SUPERVISOR_SUPPORTED (XFEATURE_MASK_PASID)
-+#define XFEATURE_MASK_SUPERVISOR_SUPPORTED (XFEATURE_MASK_PASID | \
-+					    XFEATURE_MASK_CET_USER)
- 
- /*
-  * A supervisor state component may not always contain valuable information,
-@@ -77,7 +78,8 @@
-  * Unsupported supervisor features. When a supervisor feature in this mask is
-  * supported in the future, move it to the supported supervisor feature mask.
-  */
--#define XFEATURE_MASK_SUPERVISOR_UNSUPPORTED (XFEATURE_MASK_PT)
-+#define XFEATURE_MASK_SUPERVISOR_UNSUPPORTED (XFEATURE_MASK_PT | \
-+					      XFEATURE_MASK_CET_KERNEL)
- 
- /* All supervisor states including supported and unsupported states. */
- #define XFEATURE_MASK_SUPERVISOR_ALL (XFEATURE_MASK_SUPERVISOR_SUPPORTED | \
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index c8340156bfd2..5e6a4867fd05 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -39,26 +39,26 @@
-  */
- static const char *xfeature_names[] =
- {
--	"x87 floating point registers"	,
--	"SSE registers"			,
--	"AVX registers"			,
--	"MPX bounds registers"		,
--	"MPX CSR"			,
--	"AVX-512 opmask"		,
--	"AVX-512 Hi256"			,
--	"AVX-512 ZMM_Hi256"		,
--	"Processor Trace (unused)"	,
--	"Protection Keys User registers",
--	"PASID state",
--	"unknown xstate feature"	,
--	"unknown xstate feature"	,
--	"unknown xstate feature"	,
--	"unknown xstate feature"	,
--	"unknown xstate feature"	,
--	"unknown xstate feature"	,
--	"AMX Tile config"		,
--	"AMX Tile data"			,
--	"unknown xstate feature"	,
-+	"x87 floating point registers"			,
-+	"SSE registers"					,
-+	"AVX registers"					,
-+	"MPX bounds registers"				,
-+	"MPX CSR"					,
-+	"AVX-512 opmask"				,
-+	"AVX-512 Hi256"					,
-+	"AVX-512 ZMM_Hi256"				,
-+	"Processor Trace (unused)"			,
-+	"Protection Keys User registers"		,
-+	"PASID state"					,
-+	"Control-flow User registers"			,
-+	"Control-flow Kernel registers (unused)"	,
-+	"unknown xstate feature"			,
-+	"unknown xstate feature"			,
-+	"unknown xstate feature"			,
-+	"unknown xstate feature"			,
-+	"AMX Tile config"				,
-+	"AMX Tile data"					,
-+	"unknown xstate feature"			,
- };
- 
- static unsigned short xsave_cpuid_features[] __initdata = {
-@@ -73,6 +73,7 @@ static unsigned short xsave_cpuid_features[] __initdata = {
- 	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
- 	[XFEATURE_PKRU]				= X86_FEATURE_PKU,
- 	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
-+	[XFEATURE_CET_USER]			= X86_FEATURE_SHSTK,
- 	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
- 	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
- };
-@@ -276,6 +277,7 @@ static void __init print_xstate_features(void)
- 	print_xstate_feature(XFEATURE_MASK_Hi16_ZMM);
- 	print_xstate_feature(XFEATURE_MASK_PKRU);
- 	print_xstate_feature(XFEATURE_MASK_PASID);
-+	print_xstate_feature(XFEATURE_MASK_CET_USER);
- 	print_xstate_feature(XFEATURE_MASK_XTILE_CFG);
- 	print_xstate_feature(XFEATURE_MASK_XTILE_DATA);
+ /* prctl */
+ extern long fpu_xstate_prctl(int option, unsigned long arg2);
+-
+ #endif /* _ASM_X86_FPU_API_H */
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 0531d6a06df5..4d250dba1619 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -756,6 +756,25 @@ void switch_fpu_return(void)
  }
-@@ -344,6 +346,7 @@ static __init void os_xrstor_booting(struct xregs_state *xstate)
- 	 XFEATURE_MASK_BNDREGS |		\
- 	 XFEATURE_MASK_BNDCSR |			\
- 	 XFEATURE_MASK_PASID |			\
-+	 XFEATURE_MASK_CET_USER |		\
- 	 XFEATURE_MASK_XTILE)
+ EXPORT_SYMBOL_GPL(switch_fpu_return);
  
- /*
-@@ -446,13 +449,14 @@ static void __init __xstate_dump_leaves(void)
- 	}									\
- } while (0)
- 
--#define XCHECK_SZ(sz, nr, nr_macro, __struct) do {			\
--	if ((nr == nr_macro) &&						\
--	    WARN_ONCE(sz != sizeof(__struct),				\
--		"%s: struct is %zu bytes, cpu state %d bytes\n",	\
--		__stringify(nr_macro), sizeof(__struct), sz)) {		\
--		__xstate_dump_leaves();					\
--	}								\
-+#define XCHECK_SZ(checked, sz, nr, nr_macro, __struct) do {			\
-+	if (nr == nr_macro) {							\
-+		*checked = true;						\
-+		if (WARN_ONCE(sz != sizeof(__struct),				\
-+			      "%s: struct is %zu bytes, cpu state %d bytes\n",	\
-+			      __stringify(nr_macro), sizeof(__struct), sz))	\
-+			__xstate_dump_leaves();					\
-+	}									\
- } while (0)
- 
- /**
-@@ -527,33 +531,30 @@ static bool __init check_xstate_against_struct(int nr)
- 	 * Ask the CPU for the size of the state.
- 	 */
- 	int sz = xfeature_size(nr);
-+	bool chked = false;
++void fpu_lock_and_load(void)
++{
++	/*
++	 * fpregs_lock() only disables preemption (mostly). So modifing state
++	 * in an interrupt could screw up some in progress fpregs operation,
++	 * but appear to work. Warn about it.
++	 */
++	WARN_ON_ONCE(!irq_fpu_usable());
++	WARN_ON_ONCE(current->flags & PF_KTHREAD);
 +
- 	/*
- 	 * Match each CPU state with the corresponding software
- 	 * structure.
- 	 */
--	XCHECK_SZ(sz, nr, XFEATURE_YMM,       struct ymmh_struct);
--	XCHECK_SZ(sz, nr, XFEATURE_BNDREGS,   struct mpx_bndreg_state);
--	XCHECK_SZ(sz, nr, XFEATURE_BNDCSR,    struct mpx_bndcsr_state);
--	XCHECK_SZ(sz, nr, XFEATURE_OPMASK,    struct avx_512_opmask_state);
--	XCHECK_SZ(sz, nr, XFEATURE_ZMM_Hi256, struct avx_512_zmm_uppers_state);
--	XCHECK_SZ(sz, nr, XFEATURE_Hi16_ZMM,  struct avx_512_hi16_state);
--	XCHECK_SZ(sz, nr, XFEATURE_PKRU,      struct pkru_state);
--	XCHECK_SZ(sz, nr, XFEATURE_PASID,     struct ia32_pasid_state);
--	XCHECK_SZ(sz, nr, XFEATURE_XTILE_CFG, struct xtile_cfg);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_YMM,       struct ymmh_struct);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_BNDREGS,   struct mpx_bndreg_state);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_BNDCSR,    struct mpx_bndcsr_state);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_OPMASK,    struct avx_512_opmask_state);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_ZMM_Hi256, struct avx_512_zmm_uppers_state);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_Hi16_ZMM,  struct avx_512_hi16_state);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_PKRU,      struct pkru_state);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_PASID,     struct ia32_pasid_state);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_XTILE_CFG, struct xtile_cfg);
-+	XCHECK_SZ(&chked, sz, nr, XFEATURE_CET_USER,  struct cet_user_state);
- 
- 	/* The tile data size varies between implementations. */
--	if (nr == XFEATURE_XTILE_DATA)
-+	if (nr == XFEATURE_XTILE_DATA) {
- 		check_xtile_data_against_struct(sz);
-+		chked = true;
-+	}
- 
--	/*
--	 * Make *SURE* to add any feature numbers in below if
--	 * there are "holes" in the xsave state component
--	 * numbers.
--	 */
--	if ((nr < XFEATURE_YMM) ||
--	    (nr >= XFEATURE_MAX) ||
--	    (nr == XFEATURE_PT_UNIMPLEMENTED_SO_FAR) ||
--	    ((nr >= XFEATURE_RSRVD_COMP_11) && (nr <= XFEATURE_RSRVD_COMP_16))) {
-+	if (!chked) {
- 		WARN_ONCE(1, "no structure for xstate: %d\n", nr);
- 		XSTATE_WARN_ON(1);
- 		return false;
++	fpregs_lock();
++
++	fpregs_assert_state_consistent();
++
++	if (test_thread_flag(TIF_NEED_FPU_LOAD))
++		fpregs_restore_userregs();
++}
++EXPORT_SYMBOL_GPL(fpu_lock_and_load);
++
+ #ifdef CONFIG_X86_DEBUG_FPU
+ /*
+  * If current FPU state according to its tracking (loaded FPU context on this
 -- 
 2.27.0
 
