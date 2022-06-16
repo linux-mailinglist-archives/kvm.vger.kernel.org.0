@@ -2,158 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08BB554E6F0
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:26:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B784C54E760
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:34:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232552AbiFPQ0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 12:26:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59728 "EHLO
+        id S233708AbiFPQeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 12:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230056AbiFPQ0G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 12:26:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 589A02E9E3
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:26:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655396763;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cq3EZTL12suGQBdO/AxiYch3x1bNx+94IHDi7h+Rhok=;
-        b=d9gXLvdu00EYqZtFdIzNu/qXjl6xZT6JlP4rqiShGKxiddvtP/QVT0+v1T1q8Buvq9uK5G
-        sK4WgMTViLwlZQrDXxdNMDwDwVgYZikzxwsRbFof5fIBzf6nxdq8al+D7J9nj3xbpGLxDy
-        Qn80C5sX+zP2NipfP+HMcoIyv7UpURs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-554-PLDUKvsZPi2pmmMkBGoIgQ-1; Thu, 16 Jun 2022 12:26:02 -0400
-X-MC-Unique: PLDUKvsZPi2pmmMkBGoIgQ-1
-Received: by mail-ed1-f70.google.com with SMTP id n8-20020a05640205c800b00434fb0c150cso1565845edx.19
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:26:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cq3EZTL12suGQBdO/AxiYch3x1bNx+94IHDi7h+Rhok=;
-        b=yReCTAHnHJ8O7eA9ssydVabYMIszpv1xZMF7TwSvw95HHAJBQ+qpr+aSL3fooOKeCI
-         nq2gpN6NKuGjqweQ0+QDY0jWhEGJOeqm9iBUP/oyd5YdOMM0okEMal4arjsF1i0YgXaL
-         uPuGo4r19qcd0g4fBltyJ3DxKXhRWiW+a77pGVdrjaoNTfFDlc0w7/fnV5YtvTgFlRmy
-         fdhpUb/E8lmN9inhKTLrKKWmCKmAptpU/V5sP2bIBE0nzZ+YOrcjkN/NQr8Tw33TVBo4
-         IymBu6liPpEVqe6q30FH8QI8Z7S0nZuc7ZMyR8zKY4QxhiSaPiUlJgmy7RJi/fohMdYU
-         tvgw==
-X-Gm-Message-State: AJIora9SH7HQn/2LXnIbfyrasYLgPq8rqKL3wbGxBraBVKI+QzspfSas
-        7e3pP8G6eirZ7Mj+FlISYxgU4nrO0INub0mIao7P/D3pE3HQ8NFp/CArGcm77OnV4ICIXacU8OQ
-        Az46oJPDT7rzF
-X-Received: by 2002:a17:906:ff18:b0:711:d197:b942 with SMTP id zn24-20020a170906ff1800b00711d197b942mr5233786ejb.357.1655396760903;
-        Thu, 16 Jun 2022 09:26:00 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1snrckDTTS90UbXkNnXz7wC/j3NwBRdfiiLHQ55Yf08Jlwcihk2BkICbCcSqD0NukcTombHSw==
-X-Received: by 2002:a17:906:ff18:b0:711:d197:b942 with SMTP id zn24-20020a170906ff1800b00711d197b942mr5233761ejb.357.1655396760732;
-        Thu, 16 Jun 2022 09:26:00 -0700 (PDT)
-Received: from gator ([194.213.204.253])
-        by smtp.gmail.com with ESMTPSA id ep14-20020a1709069b4e00b006febc86b8besm936606ejc.117.2022.06.16.09.25.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 09:26:00 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 18:25:57 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
-Message-ID: <20220616162557.55bopzfa6glusuh5@gator>
-References: <20220615185706.1099208-1-rananta@google.com>
- <20220616120232.ctkekviusrozqpru@gator>
- <33ca91aeb5254831a88e187ff8d9a2c2@AcuMS.aculab.com>
+        with ESMTP id S230319AbiFPQeR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 12:34:17 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7710A28E1B;
+        Thu, 16 Jun 2022 09:34:16 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25GG0EWe015227;
+        Thu, 16 Jun 2022 16:34:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Ci/a7I63QJU+Pc7s+bkHePJfXI1vWQ2/kGBX5DvlM3Q=;
+ b=YEEPUATk8V8IqRE4TbVHePsHnfmDnXjohoyabbBow6ltx/hlAOtS8E43gYAvbGmpUxly
+ L+qaP2VGIT9w9AweW1NAuI+HMT6u9Y0ejbn51ZRYeEl3YAHukbqry+87KkkoIsrXEUFv
+ fyGluTWu/h5tvn8jI4egMddkMAn+ELRKQPHDbO9ekemMSMSQ+zaWManJwRNmsG/jyp6Q
+ dD6/xJ0dTtKYLzj4Wpk/W6piWt+fefIJgDxpJRqyeNodMN+5kGQNkepc7DZ2gyN/PFWX
+ AoXA0tz87aFC6fHytYp7Ps53KhC4+VHG+QVazId2I2tuzSf7uYho1mijpum7OkCPxuTL 3A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqhbdku8q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Jun 2022 16:34:14 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25GGWLLW002316;
+        Thu, 16 Jun 2022 16:34:14 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqhbdku85-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Jun 2022 16:34:14 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25GGL9Xs020643;
+        Thu, 16 Jun 2022 16:34:13 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma01dal.us.ibm.com with ESMTP id 3gmjpabmp9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Jun 2022 16:34:13 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25GGYBxC33161480
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Jun 2022 16:34:11 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91643136053;
+        Thu, 16 Jun 2022 16:34:11 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F14A513604F;
+        Thu, 16 Jun 2022 16:33:55 +0000 (GMT)
+Received: from [9.211.56.136] (unknown [9.211.56.136])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Jun 2022 16:33:55 +0000 (GMT)
+Message-ID: <0816ab3a-8601-0462-6c2b-4ba7fa8a1e2b@linux.ibm.com>
+Date:   Thu, 16 Jun 2022 12:33:50 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33ca91aeb5254831a88e187ff8d9a2c2@AcuMS.aculab.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v2 07/10] vfio/ccw: Create an OPEN FSM Event
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220615203318.3830778-1-farman@linux.ibm.com>
+ <20220615203318.3830778-8-farman@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20220615203318.3830778-8-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: GSDu_1LVU3yCzKwkroV2dBdSOXD4Ug7w
+X-Proofpoint-GUID: 5qb3tBapchWviQP6DXBGDX-wRC93J5Zr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-16_12,2022-06-16_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 mlxscore=0
+ malwarescore=0 mlxlogscore=999 spamscore=0 impostorscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206160068
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 16, 2022 at 03:58:52PM +0000, David Laight wrote:
-> From: Andrew Jones
-> > Sent: 16 June 2022 13:03
-> > 
-> > On Wed, Jun 15, 2022 at 06:57:06PM +0000, Raghavendra Rao Ananta wrote:
-> > > The selftests, when built with newer versions of clang, is found
-> > > to have over optimized guests' ucall() function, and eliminating
-> > > the stores for uc.cmd (perhaps due to no immediate readers). This
-> > > resulted in the userspace side always reading a value of '0', and
-> > > causing multiple test failures.
-> > >
-> > > As a result, prevent the compiler from optimizing the stores in
-> > > ucall() with WRITE_ONCE().
-> > >
-> > > Suggested-by: Ricardo Koller <ricarkol@google.com>
-> > > Suggested-by: Reiji Watanabe <reijiw@google.com>
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/lib/aarch64/ucall.c | 9 ++++-----
-> > >  1 file changed, 4 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> > b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> > > index e0b0164e9af8..be1d9728c4ce 100644
-> > > --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> > > +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> > > @@ -73,20 +73,19 @@ void ucall_uninit(struct kvm_vm *vm)
-> > >
-> > >  void ucall(uint64_t cmd, int nargs, ...)
-> > >  {
-> > > -	struct ucall uc = {
-> > > -		.cmd = cmd,
-> > > -	};
-> > > +	struct ucall uc = {};
-> > >  	va_list va;
-> > >  	int i;
-> > >
-> > > +	WRITE_ONCE(uc.cmd, cmd);
-> > >  	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
-> > >
-> > >  	va_start(va, nargs);
-> > >  	for (i = 0; i < nargs; ++i)
-> > > -		uc.args[i] = va_arg(va, uint64_t);
-> > > +		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
-> > >  	va_end(va);
-> > >
-> > > -	*ucall_exit_mmio_addr = (vm_vaddr_t)&uc;
-> > > +	WRITE_ONCE(*ucall_exit_mmio_addr, (vm_vaddr_t)&uc);
-> > >  }
+On 6/15/22 4:33 PM, Eric Farman wrote:
+> Move the process of enabling a subchannel for use by vfio-ccw
+> into the FSM, such that it can manage the sequence of lifecycle
+> events for the device.
 > 
-> Am I misreading things again?
-> That function looks like it writes the address of an on-stack
-> item into global data.
+> That is, if the FSM state is NOT_OPER(erational), then do the work
+> that would enable the subchannel and move the FSM to STANDBY state.
+> An attempt to perform this event again from any of the other operating
+> states (IDLE, CP_PROCESSING, CP_PENDING) will convert the device back
+> to NOT_OPER so the configuration process can be started again.
 
-The write to the address that the global points at causes a switch
-from guest to host context. The guest's stack remains intact while
-executing host code and the host can access the uc stack variable
-directly by its address. Take a look at lib/aarch64/ucall.c to see
-all the details.
+Except STANDBY, which ignores the event via fsm_nop.  I wonder though, 
+whether that's the right thing to do.  For each of the other states 
+you're saying 'if it's already open, go back to NOT_OPER so we can start 
+over' -- In this case a STANDBY->STANDBY is also a case of 'it's already 
+open' so shouldn't we also go back to NOT_OPER so we can start over? 
+Seems to me really we just don't expect to ever get an OPEN event unless 
+we are in NOT_OPER.
 
-Thanks,
-drew
+If there's a reason to keep STANDBY->STANDBY as a nop, but we don't 
+expect to see it and don't' want to WARN because of it, then maybe a log 
+entry at least would make sense.
+
+As for the IDLE/CP_PROCESSING/CP_PENDING cases, going fsm_notoper 
+because this is unexpected probably makes sense, but the logging is 
+going to be really confusing (before this change, you know that you 
+called fsm_notoper because you got VFIO_CCW_EVENT_NOT_OPER -- now you'll 
+see a log entry cut for NOT_OPER but won't be sure if it was for 
+EVENT_NOT_OPER or EVENT_OPEN).  Maybe you can look at 'event' inside 
+fsm_notoper and cut a slightly different trace entry when arriving here 
+for EVENT_OPEN?
+
+...
+
+> +static void fsm_open(struct vfio_ccw_private *private,
+> +		     enum vfio_ccw_event event)
+> +{
+> +	struct subchannel *sch = private->sch;
+> +	int ret;
+> +
+> +	spin_lock_irq(sch->lock);
+> +	sch->isc = VFIO_CCW_ISC;
+> +	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
+> +	if (!ret)
+> +		private->state = VFIO_CCW_STATE_STANDBY;
+
+nit: could get rid of 'ret' and just do
+
+if (!cio_enable...)
+      private->state = VFIO_CCW_STATE_STANDBY;
+
+> +	spin_unlock_irq(sch->lock);
+> +}
+> +
+>   /*
+>    * Device statemachine
+>    */
+> @@ -373,29 +389,34 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+>   		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+>   		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+>   		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
+> +		[VFIO_CCW_EVENT_OPEN]		= fsm_open,
+>   	},
+>   	[VFIO_CCW_STATE_STANDBY] = {
+>   		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+>   		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+>   		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+>   		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> +		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
+>   	},
+>   	[VFIO_CCW_STATE_IDLE] = {
+>   		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+>   		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
+>   		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_request,
+>   		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> +		[VFIO_CCW_EVENT_OPEN]		= fsm_notoper,
+>   	},
+>   	[VFIO_CCW_STATE_CP_PROCESSING] = {
+>   		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+>   		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_retry,
+>   		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_retry,
+>   		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> +		[VFIO_CCW_EVENT_OPEN]		= fsm_notoper,
+>   	},
+>   	[VFIO_CCW_STATE_CP_PENDING] = {
+>   		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+>   		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
+>   		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_request,
+>   		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> +		[VFIO_CCW_EVENT_OPEN]		= fsm_notoper,
+>   	},
+>   };
+> diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
+> index 4cfdd5fc0961..8dff1699a7d9 100644
+> --- a/drivers/s390/cio/vfio_ccw_private.h
+> +++ b/drivers/s390/cio/vfio_ccw_private.h
+> @@ -142,6 +142,7 @@ enum vfio_ccw_event {
+>   	VFIO_CCW_EVENT_IO_REQ,
+>   	VFIO_CCW_EVENT_INTERRUPT,
+>   	VFIO_CCW_EVENT_ASYNC_REQ,
+> +	VFIO_CCW_EVENT_OPEN,
+>   	/* last element! */
+>   	NR_VFIO_CCW_EVENTS
+>   };
 
