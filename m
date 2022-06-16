@@ -2,106 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9563C54E62D
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 17:36:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 741EA54E670
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 17:56:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377944AbiFPPgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 11:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45040 "EHLO
+        id S1377891AbiFPP4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 11:56:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377809AbiFPPgg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 11:36:36 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1C9B31503;
-        Thu, 16 Jun 2022 08:36:35 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25GEecYK013165;
-        Thu, 16 Jun 2022 15:36:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=F2D5JfxwtgyI3b6ctYA9aNW/R40yNZMWEhJ9PxgN60g=;
- b=aoE22GAbMMpAJDjVwtsl9yJEP7piWN6k4lty0ar4FqJ18CBOS8XYWgTIzFZIIoZZl60e
- d1iYpAuJrXZdKnj0NF4MnO7zxmdKipPHjID8l62qMRcaHGMqUSEK3Lu64wubrYaBx24c
- Qg+7V/tZ5d0ZlX4WsLmenNxNeVCBUHFRo36R2HfplbxGqqhindYwJ8f4rlS01koxjuac
- zGLBzqX7h+1yT7EEZWi43P4urM6yLAiNL20bpqMLJrw+fPEAkWcMq5gfp0V3EpySvqcp
- ffiDVfVvjos4sRADYsqlPaRRnwD7Nnk6eiUg0nBJX7A+ce7tT8aPUy54n4IrkyNEFJNA IA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqr2ppt0p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Jun 2022 15:36:33 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25GF2LwK000745;
-        Thu, 16 Jun 2022 15:36:33 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gqr2ppt0c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Jun 2022 15:36:33 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25GFZ1O1026006;
-        Thu, 16 Jun 2022 15:36:32 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma02wdc.us.ibm.com with ESMTP id 3gmjp9tp93-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Jun 2022 15:36:32 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25GFaV2p15991122
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jun 2022 15:36:31 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B27D6136051;
-        Thu, 16 Jun 2022 15:36:31 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0E71A13604F;
-        Thu, 16 Jun 2022 15:36:31 +0000 (GMT)
-Received: from [9.211.56.136] (unknown [9.211.56.136])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Jun 2022 15:36:30 +0000 (GMT)
-Message-ID: <285b6fe1-d1bd-21a0-97d2-e8ef52e9acf3@linux.ibm.com>
-Date:   Thu, 16 Jun 2022 11:36:30 -0400
+        with ESMTP id S235974AbiFPP43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 11:56:29 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C19530559;
+        Thu, 16 Jun 2022 08:56:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655394989; x=1686930989;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vl6QQxwjCAX4+CqE6Wqd7HLf/CcgifYO4slix8mPH74=;
+  b=SfXsXRNLqq/aRYCWuJ1kU9xgGroTHI8U+tavOH2CjNTnls3L5yiYzD31
+   /5rWT2Ni0z3Inw5rruVSScKBIU9+EpoIWjgDC5DBVx/DnXdb1nlUq6uJX
+   iVv8wmwQSdka+3KNnZCCZ8zrHqRRSuYo90/MqxJIjclycvouXzr35+Dyz
+   F+f5ohxXLMSlmlP35krC37A7DC6u9eTViL9h9sqV4kKI1tHebxFHouCxd
+   vHqMFwPvrMNRT01qlIxvdcRTAuLnvbe4quDCchLuoB+m50YdVaJ6qRK70
+   Jc5/y0HB3f3sDhHIvSYy6mCDDSOXmW7U8AqS8F6SZAdKoSisOcbTdI2BW
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="278074937"
+X-IronPort-AV: E=Sophos;i="5.92,305,1650956400"; 
+   d="scan'208";a="278074937"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2022 08:56:29 -0700
+X-IronPort-AV: E=Sophos;i="5.92,305,1650956400"; 
+   d="scan'208";a="675079729"
+Received: from yangweij-mobl.ccr.corp.intel.com (HELO [10.255.30.124]) ([10.255.30.124])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2022 08:56:26 -0700
+Message-ID: <8d104ff6-5f31-5388-90f9-7dd6474440c9@intel.com>
+Date:   Thu, 16 Jun 2022 23:56:17 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v2 04/10] vfio/ccw: Remove private->mdev
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 19/19] KVM: x86: Enable supervisor IBT support for guest
 Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220615203318.3830778-1-farman@linux.ibm.com>
- <20220615203318.3830778-5-farman@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20220615203318.3830778-5-farman@linux.ibm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+References: <20220616084643.19564-1-weijiang.yang@intel.com>
+ <20220616084643.19564-20-weijiang.yang@intel.com>
+ <YqsRttmgmbthHWVR@worktop.programming.kicks-ass.net>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <YqsRttmgmbthHWVR@worktop.programming.kicks-ass.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7uO0xnwC404RSkZ4BAAqT8rNqzAuhsPQ
-X-Proofpoint-ORIG-GUID: FYW2UkhqO8SQZPWpiidCz7GTR2ew89k0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-16_12,2022-06-16_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- spamscore=0 impostorscore=0 priorityscore=1501 suspectscore=0 bulkscore=0
- malwarescore=0 mlxlogscore=901 phishscore=0 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206160060
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/15/22 4:33 PM, Eric Farman wrote:
-> There are no remaining users of private->mdev. Remove it.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+On 6/16/2022 7:19 PM, Peter Zijlstra wrote:
+> On Thu, Jun 16, 2022 at 04:46:43AM -0400, Yang Weijiang wrote:
+>> Mainline kernel now supports supervisor IBT for kernel code,
+>> to make s-IBT work in guest(nested guest), pass through
+>> MSR_IA32_S_CET to guest(nested guest) if host kernel and KVM
+>> enabled IBT. Note, s-IBT can work independent to host xsaves
+>> support because guest MSR_IA32_S_CET can be stored/loaded from
+>> specific VMCS field.
+>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index fe049d0e5ecc..c0118b33806a 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -1463,6 +1463,7 @@ static const u32 msrs_to_save_all[] = {
+>>   	MSR_IA32_XFD, MSR_IA32_XFD_ERR,
+>>   	MSR_IA32_XSS,
+>>   	MSR_IA32_U_CET, MSR_IA32_PL3_SSP, MSR_KVM_GUEST_SSP,
+>> +	MSR_IA32_S_CET,
+>>   };
+>
+> So much like my local kvm/qemu hacks; this patch suffers the problem of
+> not exposing S_SHSTK. What happens if a guest tries to use that?
+With current solution, I think guest kernel will hit #GP while 
+reading/writing PL0_SSP.
+>
+> Should we intercept and reject setting those bits or complete this patch
+> and support full S_SHSTK? (with all the warts and horrors that entails)
+>
+> I don't think throwing this out in this half-finished state makes much
+> sense (which is why I never much shared my hacks).
+
+You reminded me to think over these cases even I don't have a solution now,
+
+thank you!
+
+>
+>
+>> @@ -11830,7 +11835,13 @@ int kvm_arch_hardware_setup(void *opaque)
+>>   	/* Update CET features now as kvm_caps.supported_xss is finalized. */
+>>   	if (!kvm_cet_user_supported()) {
+>>   		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+>> -		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+>> +		/* If CET user bit is disabled due to cmdline option such as
+>> +		 * noxsaves, but kernel IBT is on, this means we can expose
+>> +		 * kernel IBT alone to guest since CET user mode msrs are not
+>> +		 * passed through to guest.
+>> +		 */
+> Invalid multi-line comment style.
+Oops, last minute change messed it up :-(
+>
+>> +		if (!cet_kernel_ibt_supported())
+>> +			kvm_cpu_cap_clear(X86_FEATURE_IBT);
