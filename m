@@ -2,124 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD31154E56C
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 16:54:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 233D154E576
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 16:55:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377317AbiFPOyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 10:54:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
+        id S1377248AbiFPOzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 10:55:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377233AbiFPOyj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 10:54:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ED3D92BB1E
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 07:54:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655391278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1cICD+IJ7/ONnZC/LuWzYTAkQtdI3gcDnjHQFrlNn6s=;
-        b=FZZu1jDSqJE6AR/+oiJIriDEVixPEkJoG6gpz+Z1LcNWHoUh7X3D7OnbNr0zB/ePOWzQm2
-        Dtar/mA72YkuqyobDZwE6J0PvrQJoAt5h7AmAY1iQBsOHBvkDQBUWM2rkoqPITnYfdVCO4
-        kkzMNVIiKhiAgwodLylgs2adIxHZNUk=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-359-77EMXCcwPamgFjRXj9ruTg-1; Thu, 16 Jun 2022 10:54:36 -0400
-X-MC-Unique: 77EMXCcwPamgFjRXj9ruTg-1
-Received: by mail-ej1-f71.google.com with SMTP id pv1-20020a170907208100b00710f5f8105cso713832ejb.17
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 07:54:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=1cICD+IJ7/ONnZC/LuWzYTAkQtdI3gcDnjHQFrlNn6s=;
-        b=qyk7amJE6R26jRN1kvEMKvLTSdFxn0cWGBnyCj/eEpsM0VIrAU2ZvGxUseVdJJ/LMd
-         kjlSZbifFRB9e1xJwDBRfHe7ZmMn2iFWBnrcYER2SAUZhTPwUFjan/3UrvTwZKURWG9R
-         Y3PUAeUF/v7iCrDq9/Vhc5mEmIKZyfcUyjkJf0OhvEpcFZyODzqzCZhRC8GUwq3kWYD9
-         dF2lTcDe75G35+Fquutu8mSjO6erUxqE2QqaShPBw95mduFZKRRVTYiczL62GXKZt8Mk
-         UKqCygrym0KiyYB+sI2OLk3S8R6pF7TBnJt7JT/qugVYbU4GIlbgGxuLERcC8xCyZLQb
-         X5MA==
-X-Gm-Message-State: AJIora85whou+KnSMO6XNWVAii4Nf3mku2I6nz1yEE0PSblgFLXSIFmo
-        fzoNJYVCyj3+/GCzxbeM4w5kjzHzHyPXKFbE9T78GQUnTRty1LPldT7rK5jofElqOhWFX/Uc9pQ
-        yit+tq4zRZLD9
-X-Received: by 2002:a05:6402:11d1:b0:433:4a09:3f49 with SMTP id j17-20020a05640211d100b004334a093f49mr6891861edw.357.1655391275524;
-        Thu, 16 Jun 2022 07:54:35 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tz5m+CaNItXHHf5d7bcmJBR3NWAYfylhg778tBfOwYbogq00BMubl8ww1j2446kZCToO+fSw==
-X-Received: by 2002:a05:6402:11d1:b0:433:4a09:3f49 with SMTP id j17-20020a05640211d100b004334a093f49mr6891844edw.357.1655391275329;
-        Thu, 16 Jun 2022 07:54:35 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id h18-20020a056402281200b0043173ab6728sm2090037ede.7.2022.06.16.07.54.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Jun 2022 07:54:34 -0700 (PDT)
-Message-ID: <3dccee6c-8682-66c8-6a22-e58630825443@redhat.com>
-Date:   Thu, 16 Jun 2022 16:54:33 +0200
+        with ESMTP id S243496AbiFPOzd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 10:55:33 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 808882F00D
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 07:55:32 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EB1C2B;
+        Thu, 16 Jun 2022 07:55:32 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 036283F7F5;
+        Thu, 16 Jun 2022 07:55:30 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>
+Subject: [PATCH kvmtool] arm: gic: fdt: fix PPI CPU mask calculation
+Date:   Thu, 16 Jun 2022 15:55:26 +0100
+Message-Id: <20220616145526.3337196-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 01/10] KVM: Do not zero initialize 'pfn' in hva_to_pfn()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220429010416.2788472-1-seanjc@google.com>
- <20220429010416.2788472-2-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220429010416.2788472-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/22 03:04, Sean Christopherson wrote:
-> Drop the unnecessary initialization of the local 'pfn' variable in
-> hva_to_pfn().  First and foremost, '0' is not an invalid pfn, it's a
-> perfectly valid pfn on most architectures.  I.e. if hva_to_pfn() were to
-> return an "uninitializd" pfn, it would actually be interpeted as a legal
-> pfn by most callers.
-> 
-> Second, hva_to_pfn() can't return an uninitialized pfn as hva_to_pfn()
-> explicitly sets pfn to an error value (or returns an error value directly)
-> if a helper returns failure, and all helpers set the pfn on success.
-> 
-> Note, the zeroing of 'pfn' was introduced by commit 2fc843117d64 ("KVM:
-> reorganize hva_to_pfn"), and was unnecessary and misguided paranoia even
-> then.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   virt/kvm/kvm_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 0848430f36c6..04ed4334473c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2567,7 +2567,7 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
->   		     bool write_fault, bool *writable)
->   {
->   	struct vm_area_struct *vma;
-> -	kvm_pfn_t pfn = 0;
-> +	kvm_pfn_t pfn;
->   	int npages, r;
->   
->   	/* we can do it either atomically or asynchronously, not both */
+The GICv2 DT binding describes the third cell in each interrupt
+descriptor as holding the trigger type, but also the CPU mask that this
+IRQ applies to, in bits [15:8]. However this is not the case for GICv3,
+where we don't use a CPU mask in the third cell: a simple mask wouldn't
+fit for the many more supported cores anyway.
 
-I wonder if it was needed to avoid uninitialized variable warnings on 
-"return pfn;"...
+At the moment we fill this CPU mask field regardless of the GIC type,
+for the PMU and arch timer DT nodes. This is not only the wrong thing to
+do in case of a GICv3, but also triggers UBSAN splats when using more
+than 30 cores, as we do shifting beyond what a u32 can hold:
+$ lkvm run -k Image -c 31 --pmu
+arm/timer.c:13:22: runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
+arm/timer.c:13:38: runtime error: signed integer overflow: -2147483648 - 1 cannot be represented in type 'int'
+arm/timer.c:13:43: runtime error: left shift of 2147483647 by 8 places cannot be represented in type 'int'
+arm/aarch64/pmu.c:202:22: runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
+arm/aarch64/pmu.c:202:38: runtime error: signed integer overflow: -2147483648 - 1 cannot be represented in type 'int'
+arm/aarch64/pmu.c:202:43: runtime error: left shift of 2147483647 by 8 places cannot be represented in type 'int'
 
-Paolo
+Fix that by adding a function that creates the mask by looking at the
+GIC type first, and returning zero when a GICv3 is used. Also we
+explicitly check for the CPU limit again, even though this would be
+done before already, when we try to create a GICv2 VM with more than 8
+cores.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arm/aarch64/pmu.c            |  3 +--
+ arm/gic.c                    | 13 +++++++++++++
+ arm/include/arm-common/gic.h |  1 +
+ arm/timer.c                  |  4 +---
+ 4 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/arm/aarch64/pmu.c b/arm/aarch64/pmu.c
+index 5f189b32..5ed4979a 100644
+--- a/arm/aarch64/pmu.c
++++ b/arm/aarch64/pmu.c
+@@ -199,8 +199,7 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 	int pmu_id = -ENXIO;
+ 	int i;
+ 
+-	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
+-		       & GIC_FDT_IRQ_PPI_CPU_MASK;
++	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
+ 	u32 irq_prop[] = {
+ 		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+ 		cpu_to_fdt32(irq - 16),
+diff --git a/arm/gic.c b/arm/gic.c
+index 26be4b4c..a223a72c 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -399,6 +399,19 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
+ 	_FDT(fdt_end_node(fdt));
+ }
+ 
++u32 gic__get_fdt_irq_cpumask(struct kvm *kvm)
++{
++	/* Only for GICv2 */
++	if (kvm->cfg.arch.irqchip == IRQCHIP_GICV3 ||
++	    kvm->cfg.arch.irqchip == IRQCHIP_GICV3_ITS)
++		return 0;
++
++	if (kvm->nrcpus > 8)
++		return GIC_FDT_IRQ_PPI_CPU_MASK;
++
++	return ((1U << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT;
++}
++
+ #define KVM_IRQCHIP_IRQ(x) (KVM_ARM_IRQ_TYPE_SPI << KVM_ARM_IRQ_TYPE_SHIFT) |\
+ 			   ((x) & KVM_ARM_IRQ_NUM_MASK)
+ 
+diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
+index ec9cf31a..ad8bcbf2 100644
+--- a/arm/include/arm-common/gic.h
++++ b/arm/include/arm-common/gic.h
+@@ -37,6 +37,7 @@ int gic__alloc_irqnum(void);
+ int gic__create(struct kvm *kvm, enum irqchip_type type);
+ int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
+ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
++u32 gic__get_fdt_irq_cpumask(struct kvm *kvm);
+ 
+ int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
+ 		   int resample_fd);
+diff --git a/arm/timer.c b/arm/timer.c
+index 71bfe8d4..6acc50ef 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -9,9 +9,7 @@
+ void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
+ {
+ 	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
+-
+-	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
+-		       & GIC_FDT_IRQ_PPI_CPU_MASK;
++	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
+ 	u32 irq_prop[] = {
+ 		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+ 		cpu_to_fdt32(irqs[0]),
+-- 
+2.25.1
 
