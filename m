@@ -2,95 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E461554E774
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:41:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56BA454E7FD
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 18:47:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235525AbiFPQlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 12:41:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41910 "EHLO
+        id S1378348AbiFPQqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 12:46:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233941AbiFPQlM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 12:41:12 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84FB819C08
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:41:10 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id m14so1708576plg.5
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:41:10 -0700 (PDT)
+        with ESMTP id S233528AbiFPQp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 12:45:56 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9634C7B9
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:44:57 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d13so1691298plh.13
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 09:44:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=MgmvFnUtjCO2ZoSD/nh5tvlUNfC+KyhUyQKzm2xuMbA=;
-        b=rlwAFQlOm9itrfoCxgGh2ywywZl2bMeNhE/UA1PRYZB7i/vvH7BJx3aAMyfon2pdrX
-         pGUCFTdy6Qt+qWQjwXYPfiIcqN2Zn1lVN7FZmUw4gBTqeBQzHay+jfk5j8v8udJ69z4c
-         Ovi2fhLTQyq92Fboa5CW44YjCxausTVRZBemYXcSZxLbvYlej4x2lNJtiFZH0EC43HNm
-         6zrK2x9JwIjc/UxsKb4jh0zY64YzOcypofW1QgsGJAYt8YH5SlvJ6ob0WVBnlosQCuB7
-         C80yyHM3T2egJ6kEAfcwVphKIOZ24uXk1bcvLPuwLcvQgo3vqgtnZ2759mIzyjU2ethL
-         94zg==
+        bh=xG1JxbDKxb01OfIHZiWzJ8dX+sp4j/hRW+fJhSLHjUM=;
+        b=b4rY5tlFpOatFB3vmE9a2jj1fFVMclIEwyq0WxVDdILA+fTeqUJYGA5QHDQVVVil+d
+         aE5PIwuqCJDADBd9bP2hg8VoxOCkrp0XkzZ+Okshjc5L5rVDU84v3rYBqKI27xRyn+4G
+         53ZStZx2xGi01pKf9bJ/2syyif9NbYH/fCzTMiTCXO9EnSvJJhol7+yPswpzHVD1HN75
+         o9gH5yqJKQSDpJaQioFHhRBBqco2gW/UOx+d/kqqzmFGRFpZzfaxg/+8t0sBT7DtF3jb
+         kU81KAR1rBOj+zaH9JKC5dLIgUOUI1TJGUJZLIaK4CPwXIIsn473Kw5qc+3L7e3B+8lI
+         h6JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=MgmvFnUtjCO2ZoSD/nh5tvlUNfC+KyhUyQKzm2xuMbA=;
-        b=F0jIyJ1r/dC/4k7EzPP2+tb2A2uqRf5hGB2bTZURvBRB5YvB9/0ikhC7knWy6y/O3q
-         T232Gcq1g8WfBhi8jYBOtJJ8a4TvTvj04vP45rOwXH3ieiDLdI8yb83GPoVp2dO2WTUD
-         fPeOabt9LJhhTF2mObHHPMavoFPNjIFRNiwhMQJ/eIqUsxiJwMQQrcmFywovrfKqd9+B
-         D6y7WhFGbLHrm1jbFcHFJNiJMiamvY6Yt7i4uvgbdC+bJ0OvY//mjIQ4xs35ciGWmKeT
-         vDN3BbA6uTVugqUrCZSCRtFgwJaHLEgyEIxINa/em8XK3hS2m6Kl6WF/QvcvguIvkL7X
-         FDFQ==
-X-Gm-Message-State: AJIora9szXGUvFbbC7R2BrxcPv3Sraz5q2G5y4tMV9JRuivp2DYqhIF+
-        rWdegc+1SmINcF1mm2PTXy8VVg==
-X-Google-Smtp-Source: AGRyM1vlSK6hxncAIYtMkN18fpKkq/QvaVi/pEh5N9nHCclY7o89DXDIz4RXJ2yZPL1ZZAT6zOGVRg==
-X-Received: by 2002:a17:903:41ca:b0:169:9b8:36bf with SMTP id u10-20020a17090341ca00b0016909b836bfmr2742734ple.161.1655397669715;
-        Thu, 16 Jun 2022 09:41:09 -0700 (PDT)
+        bh=xG1JxbDKxb01OfIHZiWzJ8dX+sp4j/hRW+fJhSLHjUM=;
+        b=HNFgy8qpg2qQnI/EXOcvU6hMfGfcch/rQ/UA/0lSeG6m/UwzxdDQjrqrQUFl4/rG4H
+         UKm1qf2bgmjsVg+p/4NMN0SKFs6IR6XjbRQlncuH5BC/hjvyDrhnT/JF9kTpVR+RFOhJ
+         w1VQnOehfP4B3lHKXCPF/WA7IzbNmEkNVqmaZpOH/rIiAlu6WBQCtljKqJ2dllIftUm1
+         UXE8icuPjCxjZ6M4OOeyBauQpbJNJ8adeY/iqgW4eiEtSSWPBSzVSmxUfA00PZMi6Da+
+         ae5RIpSduBf1BxtXHbcj/KCS55P5pc/qBZ5LWXpp7enRPDtLyDj3RPTixVtpMuoKEFCt
+         pstg==
+X-Gm-Message-State: AJIora9+y0FxtSPNUKrmiUNn1LedII4zW+fA3qcFCAoIjD5PWOUNCQoW
+        eNeIZC4JZBoiniYdebR3lfExJg==
+X-Google-Smtp-Source: AGRyM1vosOIKitlvNBM5Iykv0v1VUHnUQBJH/nVCh/M4Oe/f0ApTqCG4ggZDu8FbdFoccbhJElwYJg==
+X-Received: by 2002:a17:902:ce8d:b0:169:c18:a322 with SMTP id f13-20020a170902ce8d00b001690c18a322mr2165443plg.51.1655397896578;
+        Thu, 16 Jun 2022 09:44:56 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id j5-20020a17090adc8500b001e34b5ed5a7sm4031001pjv.35.2022.06.16.09.41.09
+        by smtp.gmail.com with ESMTPSA id c11-20020a621c0b000000b0051ba303f1c0sm2001278pfc.127.2022.06.16.09.44.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 09:41:09 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 16:41:05 +0000
+        Thu, 16 Jun 2022 09:44:56 -0700 (PDT)
+Date:   Thu, 16 Jun 2022 16:44:52 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v12 19/46] x86/kernel: Make the .bss..decrypted section
- shared in RMP table
-Message-ID: <YqtdIf7OSivLxFL0@google.com>
-References: <20220307213356.2797205-1-brijesh.singh@amd.com>
- <20220307213356.2797205-20-brijesh.singh@amd.com>
- <YqfabnTRxFSM+LoX@google.com>
- <YqistMvngNKEJu2o@google.com>
- <daaf7a84-4204-48ca-e40c-7ba296b4789c@amd.com>
- <YqizrTCk460kov/X@google.com>
- <6db51d45-e17a-38dd-131d-e43132c55dfb@amd.com>
- <Yqjm/b3deMlxxePh@google.com>
- <9abe9a71-242d-91d5-444a-b56c8b9b6d90@amd.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Varad Gautam <varad.gautam@suse.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, marcorr@google.com, zxwang42@gmail.com,
+        erdemaktas@google.com, rientjes@google.com, brijesh.singh@amd.com,
+        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de
+Subject: Re: [kvm-unit-tests PATCH v3 02/11] x86: Move ap_init() to smp.c
+Message-ID: <YqteBKYywG3N9ipt@google.com>
+References: <20220426114352.1262-1-varad.gautam@suse.com>
+ <20220426114352.1262-3-varad.gautam@suse.com>
+ <YqpPmz2SUP5nsUL+@google.com>
+ <20220616115646.7u2bgbyppgzjivk6@gator>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9abe9a71-242d-91d5-444a-b56c8b9b6d90@amd.com>
+In-Reply-To: <20220616115646.7u2bgbyppgzjivk6@gator>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -102,101 +75,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 16, 2022, Tom Lendacky wrote:
-> On 6/14/22 14:52, Sean Christopherson wrote:
-> > On Tue, Jun 14, 2022, Tom Lendacky wrote:
-> > > On 6/14/22 11:13, Sean Christopherson wrote:
-> > > > > > > This breaks SME on Rome and Milan when compiling with clang-13.  I haven't been
-> > > > > > > able to figure out exactly what goes wrong.  printk isn't functional at this point,
-> > > > > > > and interactive debug during boot on our test systems is beyond me.  I can't even
-> > > > > > > verify that the bug is specific to clang because the draconian build system for our
-> > > > > > > test systems apparently is stuck pointing at gcc-4.9.
-> > > > > > > 
-> > > > > > > I suspect the issue is related to relocation and/or encrypting memory, as skipping
-> > > > > > > the call to early_snp_set_memory_shared() if SNP isn't active masks the issue.
-> > > > > > > I've dug through the assembly and haven't spotted a smoking gun, e.g. no obvious
-> > > > > > > use of absolute addresses.
-> > > > > > > 
-> > > > > > > Forcing a VM through the same path doesn't fail.  I can't test an SEV guest at the
-> > > > > > > moment because INIT_EX is also broken.
-> > > > > > 
-> 
+On Thu, Jun 16, 2022, Andrew Jones wrote:
+> On Wed, Jun 15, 2022 at 09:31:07PM +0000, Sean Christopherson wrote:
+> > On Tue, Apr 26, 2022, Varad Gautam wrote:
+> > > +	printf("smp: waiting for %d APs\n", _cpu_count - 1);
 > > 
-> > > I'm not sure if there's a way to remove the jump table optimization for
-> > > the arch/x86/coco/core.c file when retpolines aren't configured.
-> > 
-> > And for post-boot I don't think we'd want to disable any such optimizations.
-> > 
-> > A possibled "fix" would be to do what sme_encrypt_kernel() does and just query
-> > sev_status directly.  But even that works, the fragility of the boot code is
-> > terrifying :-(  I can't think of any clever solutions though.
+> > Oof, this breaks run_test.sh / runtime.bash.  runtime.bash has a godawful hack
+> > to detect that dummy.efi ran cleanly; it looks for "enabling apic" as the last
+> > line to detect success.  I'll add a patch to fix this by having dummy.c print an
+> > explicit magic string, e.g. Dummy Hello World!.
+> >
 > 
-> I worry that another use of cc_platform_has() could creep in at some point
-> and cause the same issue. Not sure how bad it would be, performance-wise, to
-> remove the jump table optimization for arch/x86/coco/core.c.
-
-One thought would be to initialize "vendor" to a bogus value, disallow calls to
-cc_set_vendor() until after the kernel as gotten to a safe point, and then WARN
-(or panic?) if cc_platform_has() is called before "vendor" is explicitly set.
-New calls can still get in, but they'll be much easier to detect and less likely
-to escape initial testing.
-
-diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
-index 49b44f881484..803220cd34a6 100644
---- a/arch/x86/coco/core.c
-+++ b/arch/x86/coco/core.c
-@@ -13,7 +13,11 @@
- #include <asm/coco.h>
- #include <asm/processor.h>
-
--static enum cc_vendor vendor __ro_after_init;
-+/*
-+ * Initialize the vendor to garbage to detect usage of cc_platform_has() before
-+ * the vendor has been set.
-+ */
-+static enum cc_vendor vendor = CC_NR_VENDORS __ro_after_init;
- static u64 cc_mask __ro_after_init;
-
- static bool intel_cc_platform_has(enum cc_attr attr)
-@@ -90,7 +94,10 @@ bool cc_platform_has(enum cc_attr attr)
-                return intel_cc_platform_has(attr);
-        case CC_VENDOR_HYPERV:
-                return hyperv_cc_platform_has(attr);
-+       case CC_VENDOR_NONE:
-+               return false;
-        default:
-+               WARN_ONCE(1, "blah blah blah");
-                return false;
-        }
- }
-diff --git a/arch/x86/include/asm/coco.h b/arch/x86/include/asm/coco.h
-index 3d98c3a60d34..adfd2fbce7ac 100644
---- a/arch/x86/include/asm/coco.h
-+++ b/arch/x86/include/asm/coco.h
-@@ -9,6 +9,7 @@ enum cc_vendor {
-        CC_VENDOR_AMD,
-        CC_VENDOR_HYPERV,
-        CC_VENDOR_INTEL,
-+       CC_NR_VENDORS,
- };
-
- void cc_set_vendor(enum cc_vendor v);
-
-> I guess we can wait for Boris to get back and chime in.
+> powerpc and s390x always exit with
 > 
-> > diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-> > index bd4a34100ed0..5efab0d8e49d 100644
-> > --- a/arch/x86/kernel/head64.c
-> > +++ b/arch/x86/kernel/head64.c
-> > @@ -127,7 +127,9 @@ static bool __head check_la57_support(unsigned long physaddr)
-> >   }
-> >   #endif
-> > 
-> > -static unsigned long __head sme_postprocess_startup(struct boot_params *bp, pmdval_t *pmd)
-> > +static unsigned long __head sme_postprocess_startup(struct boot_params *bp,
-> > +						    pmdval_t *pmd,
-> > +						    unsigned long physaddr)
+>  printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
 > 
-> I noticed that you added the physaddr parameter but never use it...
+> It's because they can only exit with exit code zero, but maybe it's worth
+> adopting the same line and format for EFI tests?
 
-Likely just garbage on my end, I was trying various ideas.
+Honestly, I'd prefer using truly magic string in dummy.c for the probing code so
+that it's super obvious that there's meaning in the string.
