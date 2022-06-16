@@ -2,72 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E0D554E103
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 14:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4FE054E108
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 14:47:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230386AbiFPMqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 08:46:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53416 "EHLO
+        id S230511AbiFPMrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 08:47:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230141AbiFPMqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 08:46:16 -0400
+        with ESMTP id S229702AbiFPMrN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 08:47:13 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 30F0D2EA3A
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:46:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99945473BD
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:47:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655383574;
+        s=mimecast20190719; t=1655383630;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=gLgx7hmsWQsQo30sh+kzZRE6xJ8y056KBCH3mRvUzv8=;
-        b=EtQX6ObX9ufAqtmDpEd3Nf8rv1s6v5xiyjsq89lGUAzzg1TaQhUlYVobgiVA2blH7Kkbrm
-        aabPxSY+ciQxv/ijsA1YH1YFEVmCMwnI2m3pzGzWFsOg0JVa6gCFFI5SzOuf8UMDPHQkS8
-        sB3RtTyqbbBW19k+/mei59mo1ugNakw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=eHLQpuAU4wLXl8S1FY+BvKbQEk+v7epLCejlC4CMvYY=;
+        b=htb/cpE8/QpnNTlBjUvWUkdBjq3JWDE0TpMC6MWbo4hZmIXWmvBJKfjm4belUoaHWiA6Hm
+        YfzasaexmYRmAt5CgpsV6hwxwoLNlqbSAKleAWvFkdh/I9jAqlsuUGp5mI5feAZrWfP2gD
+        Ru9iTDutWh6WhuLRPEl2synub3TlEU0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-78-PFXSAtKeNRyL9YyrAJzqcw-1; Thu, 16 Jun 2022 08:46:13 -0400
-X-MC-Unique: PFXSAtKeNRyL9YyrAJzqcw-1
-Received: by mail-ed1-f72.google.com with SMTP id x8-20020a056402414800b0042d8498f50aso1158774eda.23
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:46:12 -0700 (PDT)
+ us-mta-190-vWEdkT8NOWOp1NTJaZ-j0w-1; Thu, 16 Jun 2022 08:47:09 -0400
+X-MC-Unique: vWEdkT8NOWOp1NTJaZ-j0w-1
+Received: by mail-ej1-f69.google.com with SMTP id fp4-20020a1709069e0400b00711911cecf9so562932ejc.3
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 05:47:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=gLgx7hmsWQsQo30sh+kzZRE6xJ8y056KBCH3mRvUzv8=;
-        b=Q/dU4REKfS38Q1F2LRQASY9cH0QlH0wD7Q0/YpNfTwJyQ0ZDLy1ssz5mxWr9PPf9Q2
-         ovd2hfwd4Qknu2xXy2rScrcZ6Pxs4c+4/uPHK0bgLkjpZ9GP3iU+Db93/3eouUwn3Fti
-         D6vgeF0p3iZ9HNlxp2PZi4uxVQCaIEQF3IvcatSCIbzc9E5oS+lSsbbixS8bMsaRKBUD
-         Icmwj+/liZZOmJJGCN6OlGSjGg7csJYW4lV06QCheZ/Wik+Gw9++A/8aG8bvR/D7gsjK
-         FEs8ZGSHJqSg/439evMUgnjsZMR2u/pNiiukn/l3XtU9cDe1AlWsksivQi0B2VNDXb6W
-         4Sxg==
-X-Gm-Message-State: AJIora+gqHKKk9fZkygLTSrdLVTni39diyauwOHCaEmCLxhxh+sZhMzK
-        TRrS4jxN1pNNBnG7hwp3OMXWf8BEG3azbizM/ntgJuX9ONLYQGsDbfM+46OOGAtU0d4RIbeHoZj
-        AjuSKZadoQ9Z4
-X-Received: by 2002:a05:6402:3807:b0:435:20fb:318d with SMTP id es7-20020a056402380700b0043520fb318dmr6324736edb.272.1655383571817;
-        Thu, 16 Jun 2022 05:46:11 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1v3lxgSx+whO8T5GvlDJx/RuoG4NSeOFL5I9qG6AmpHIWH5MdvIkc6+sxrw5L52/Yz1p/cM8A==
-X-Received: by 2002:a05:6402:3807:b0:435:20fb:318d with SMTP id es7-20020a056402380700b0043520fb318dmr6324718edb.272.1655383571670;
-        Thu, 16 Jun 2022 05:46:11 -0700 (PDT)
+        bh=eHLQpuAU4wLXl8S1FY+BvKbQEk+v7epLCejlC4CMvYY=;
+        b=y0a9n2mRednNFY//zoOa7LJHGqS9QI5VFlbHl6q+CuefZ7BfnVmx5mSLHNrY0TodTi
+         bCM4hRIzgQjyDTBYrVHnjmhBNKEPOY7KmW1eqbZlvwMdFtct2QkCsNn2hkexQGS7nvgG
+         PYcrL+7uiKJBAdyezQdiLIC6GleiqaoGunz2oLOyfFmwEWp9sAO+iS+XTzC7jhDwSbv0
+         Uv4MqjL3MntvaF2aJmpYr8pNxTFePNm36jduW8c2ndwOO8dXVd9ZpSMAXV+mLkHC3RYz
+         c3LNa7j4eTg9lUl7xDgUh0WkWxkvnUcomd4tD/lCz5RTeeefk+jbK+RqKwrQxcKAtQfI
+         PaTg==
+X-Gm-Message-State: AJIora/1S54EMrCuFqYGJlB46FafhUKmt7iQNlGjQSBqMEZquqNRc9P3
+        BvxMPoUQ75NqmABLbWOSIsvJyVv3lWnB/OUAHg3CX9sKiocMfwake8cbx4PxwJ3KtNgCWdFeimw
+        NLdZQD0bjTen4
+X-Received: by 2002:a05:6402:23a3:b0:42e:251a:c963 with SMTP id j35-20020a05640223a300b0042e251ac963mr6296498eda.173.1655383628443;
+        Thu, 16 Jun 2022 05:47:08 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tpIYwJjkFopmtzI0GIlGcLZdwZ6PcGGP/8fD6qnBnNu7Xzc7i8G+/aM6OTa6GGy5Vz99TU8Q==
+X-Received: by 2002:a05:6402:23a3:b0:42e:251a:c963 with SMTP id j35-20020a05640223a300b0042e251ac963mr6296486eda.173.1655383628301;
+        Thu, 16 Jun 2022 05:47:08 -0700 (PDT)
 Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
-        by smtp.gmail.com with ESMTPSA id d13-20020a170906304d00b00704757b1debsm754009ejd.9.2022.06.16.05.46.10
+        by smtp.gmail.com with ESMTPSA id j4-20020a50ed04000000b004318ba244dcsm1714996eds.10.2022.06.16.05.47.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 05:46:11 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 14:46:09 +0200
+        Thu, 16 Jun 2022 05:47:07 -0700 (PDT)
+Date:   Thu, 16 Jun 2022 14:47:05 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Colton Lewis <coltonlewis@google.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
         thuth@redhat.com, maz@kernel.org
-Subject: Re: [PATCH 3/4] KVM: selftests: Write REPORT_GUEST_ASSERT macros to
- pair with GUEST_ASSERT
-Message-ID: <20220616124609.fforgaccsp3rwbxi@gator>
+Subject: Re: [PATCH 1/4] KVM: selftests: enumerate GUEST_ASSERT arguments
+Message-ID: <20220616124705.wsll33usok4gfhqc@gator>
 References: <20220615193116.806312-1-coltonlewis@google.com>
- <20220615193116.806312-4-coltonlewis@google.com>
+ <20220615193116.806312-2-coltonlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220615193116.806312-4-coltonlewis@google.com>
+In-Reply-To: <20220615193116.806312-2-coltonlewis@google.com>
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -78,84 +77,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 07:31:15PM +0000, Colton Lewis wrote:
-> Write REPORT_GUEST_ASSERT macros to pair with GUEST_ASSERT to abstract
-> and make consistent all guest assertion reporting. Every report
-> includes an explanatory string, a filename, and a line number.
+On Wed, Jun 15, 2022 at 07:31:13PM +0000, Colton Lewis wrote:
+> Enumerate GUEST_ASSERT arguments to avoid magic indices to ucall.args.
 > 
 > Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  .../selftests/kvm/include/ucall_common.h      | 42 +++++++++++++++++++
->  1 file changed, 42 insertions(+)
+>  tools/testing/selftests/kvm/include/ucall_common.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
 > diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-> index 568c562f14cd..e8af3b4fef6d 100644
+> index 98562f685151..dbe872870b83 100644
 > --- a/tools/testing/selftests/kvm/include/ucall_common.h
 > +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-> @@ -6,6 +6,7 @@
->   */
->  #ifndef SELFTEST_KVM_UCALL_COMMON_H
->  #define SELFTEST_KVM_UCALL_COMMON_H
-> +#include "test_util.h"
->  
->  /* Common ucalls */
->  enum {
-> @@ -64,4 +65,45 @@ enum guest_assert_builtin_args {
->  
->  #define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
->  
-> +#define __REPORT_GUEST_ASSERT(_ucall, fmt, _args...)			\
-> +	TEST_FAIL("%s at %s:%ld\n" fmt,					\
-> +		  (const char *)(_ucall).args[GUEST_ERROR_STRING],	\
-> +		  (const char *)(_ucall).args[GUEST_FILE],		\
-> +		  (_ucall).args[GUEST_LINE],				\
-> +		  ##_args)
+> @@ -32,6 +32,14 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
+>  				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+>  #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
+>  #define GUEST_DONE()		ucall(UCALL_DONE, 0)
 > +
-> +#define GUEST_ASSERT_ARG(ucall, i) ((ucall).args[GUEST_ASSERT_BUILTIN_NARGS + i])
+> +enum guest_assert_builtin_args {
+> +	GUEST_ERROR_STRING,
+> +	GUEST_FILE,
+> +	GUEST_LINE,
+> +	GUEST_ASSERT_BUILTIN_NARGS
+> +};
 > +
-> +#define REPORT_GUEST_ASSERT(ucall)		\
-> +	__REPORT_GUEST_ASSERT((ucall), "")
-> +
-> +#define REPORT_GUEST_ASSERT_1(ucall, fmt)			\
-> +	__REPORT_GUEST_ASSERT((ucall),				\
-> +			      fmt,				\
-> +			      GUEST_ASSERT_ARG((ucall), 0))
-> +
-> +#define REPORT_GUEST_ASSERT_2(ucall, fmt)			\
-> +	__REPORT_GUEST_ASSERT((ucall),				\
-> +			      fmt,				\
-> +			      GUEST_ASSERT_ARG((ucall), 0),	\
-> +			      GUEST_ASSERT_ARG((ucall), 1))
-> +
-> +#define REPORT_GUEST_ASSERT_3(ucall, fmt)			\
-> +	__REPORT_GUEST_ASSERT((ucall),				\
-> +			      fmt,				\
-> +			      GUEST_ASSERT_ARG((ucall), 0),	\
-> +			      GUEST_ASSERT_ARG((ucall), 1),	\
-> +			      GUEST_ASSERT_ARG((ucall), 2))
-> +
-> +#define REPORT_GUEST_ASSERT_4(ucall, fmt)			\
-> +	__REPORT_GUEST_ASSERT((ucall),				\
-> +			      fmt,				\
-> +			      GUEST_ASSERT_ARG((ucall), 0),	\
-> +			      GUEST_ASSERT_ARG((ucall), 1),	\
-> +			      GUEST_ASSERT_ARG((ucall), 2),	\
-> +			      GUEST_ASSERT_ARG((ucall), 3))
-> +
-> +#define REPORT_GUEST_ASSERT_N(ucall, fmt, args...)	\
-> +	__REPORT_GUEST_ASSERT((ucall), fmt, ##args)
-> +
->  #endif /* SELFTEST_KVM_UCALL_COMMON_H */
+>  #define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {    \
+>  	if (!(_condition))                                              \
+>  		ucall(UCALL_ABORT, 2 + _nargs,                          \
 > -- 
 > 2.36.1.476.g0c4daa206d-goog
 >
 
-nit: All the ()'s around ucall when it's between ( and , are unnecessary.
-
-Otherwise,
-
 Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thanks,
-drew
 
