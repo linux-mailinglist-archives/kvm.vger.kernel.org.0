@@ -2,142 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 233D154E576
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 16:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2964D54E588
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 17:00:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377248AbiFPOzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 10:55:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34830 "EHLO
+        id S1377712AbiFPPAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 11:00:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243496AbiFPOzd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 10:55:33 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 808882F00D
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 07:55:32 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EB1C2B;
-        Thu, 16 Jun 2022 07:55:32 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 036283F7F5;
-        Thu, 16 Jun 2022 07:55:30 -0700 (PDT)
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>
-Subject: [PATCH kvmtool] arm: gic: fdt: fix PPI CPU mask calculation
-Date:   Thu, 16 Jun 2022 15:55:26 +0100
-Message-Id: <20220616145526.3337196-1-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S1377598AbiFPPAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 11:00:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E3AE3DDC9
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 08:00:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655391634;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sXxXlYnYhCGpc7S9VveQqavZUJPHiAJ+eb7im3bQ2A8=;
+        b=SuQOtzEkr1UWibdnzFXKFX1RmtOAkFyNz6TFLtB7mg30t3HBG4eeLRGc3i5uMpf/w8sCMQ
+        vsJdVWDhu8uEZmGsQE5EHiOprRfZg7aFM9qGTbdvEu33pzyYyQtjYqILRvCXCVnHv/rR8x
+        ygwRwzC+xvoWlsNqPOC4ZVbtT1hS0Wc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-460-iAJn7tvHPpa1OpXetZ9h5A-1; Thu, 16 Jun 2022 11:00:25 -0400
+X-MC-Unique: iAJn7tvHPpa1OpXetZ9h5A-1
+Received: by mail-ed1-f69.google.com with SMTP id v7-20020a056402348700b004351fb80abaso1428072edc.14
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 08:00:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sXxXlYnYhCGpc7S9VveQqavZUJPHiAJ+eb7im3bQ2A8=;
+        b=mT5rTlMSUq09jwlXZx7FCsLIZUxIfN2HOTW9vb6bnCTnb70AttC5edDxRZ/kQ9r2vz
+         9T6GrHkz8YUFXrzXAo+DuZP2+OQOH3034Ltc9+Dn9PvvZnHPdBeWEdooWBXXEgzmqHgr
+         tLqBCsVM+2isdqZnHrlR+IOz3Cqskz5G8NTTWCgeeO69WS0lYuq7iKJciUMPRvg4iJnj
+         GBHby8ZwWLKm2UiN+Scb5hJdC/x6jQn4k0sPHvcbyxpH2lj+iCJgBl+IzVV3a+VzW1Do
+         fFLzuaIqizTStIgO8Ge6iBHVjchVnvn+DcTqPxkOohhXF3HTiB/uYeRTnpV6GtYhq/R3
+         NJ4A==
+X-Gm-Message-State: AJIora9cHnvnlIIsFzXpXuIN8fOFJo/jJtmdcbgIJ5EsjIJzYDXqMHsF
+        p/tUY+88l/T1z2GZekByL9t26axMD9wO1NtVeg+NBfaD1a0w59i/YilEQqT7hiLxi0AKVyCl240
+        ZyrFdDtwh2Aj8
+X-Received: by 2002:a05:6402:42c8:b0:42d:f0b0:c004 with SMTP id i8-20020a05640242c800b0042df0b0c004mr6895713edc.356.1655391624770;
+        Thu, 16 Jun 2022 08:00:24 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uLrXhf+s+0dq937PbW8fcacrqQrsPZ9lwKsPd2mBj0KcNbkNXCt99ZEqW7ol+UYPqFEvfXtQ==
+X-Received: by 2002:a05:6402:42c8:b0:42d:f0b0:c004 with SMTP id i8-20020a05640242c800b0042df0b0c004mr6895697edc.356.1655391624592;
+        Thu, 16 Jun 2022 08:00:24 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id ky4-20020a170907778400b006fe921fcb2dsm897605ejc.49.2022.06.16.08.00.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jun 2022 08:00:23 -0700 (PDT)
+Message-ID: <e793f8f4-69dd-1824-7bb1-048428d977f4@redhat.com>
+Date:   Thu, 16 Jun 2022 17:00:22 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 04/10] KVM: Avoid pfn_to_page() and vice versa when
+ releasing pages
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220429010416.2788472-1-seanjc@google.com>
+ <20220429010416.2788472-5-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220429010416.2788472-5-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The GICv2 DT binding describes the third cell in each interrupt
-descriptor as holding the trigger type, but also the CPU mask that this
-IRQ applies to, in bits [15:8]. However this is not the case for GICv3,
-where we don't use a CPU mask in the third cell: a simple mask wouldn't
-fit for the many more supported cores anyway.
+On 4/29/22 03:04, Sean Christopherson wrote:
+> -
+> +/*
+> + * Note, checking for an error/noslot pfn is the caller's responsibility when
+> + * directly marking a page dirty/accessed.  Unlike the "release" helpers, the
+> + * "set" helpers are not to be unused when the pfn might point at garbage.
+> + */
 
-At the moment we fill this CPU mask field regardless of the GIC type,
-for the PMU and arch timer DT nodes. This is not only the wrong thing to
-do in case of a GICv3, but also triggers UBSAN splats when using more
-than 30 cores, as we do shifting beyond what a u32 can hold:
-$ lkvm run -k Image -c 31 --pmu
-arm/timer.c:13:22: runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
-arm/timer.c:13:38: runtime error: signed integer overflow: -2147483648 - 1 cannot be represented in type 'int'
-arm/timer.c:13:43: runtime error: left shift of 2147483647 by 8 places cannot be represented in type 'int'
-arm/aarch64/pmu.c:202:22: runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
-arm/aarch64/pmu.c:202:38: runtime error: signed integer overflow: -2147483648 - 1 cannot be represented in type 'int'
-arm/aarch64/pmu.c:202:43: runtime error: left shift of 2147483647 by 8 places cannot be represented in type 'int'
+s/unused/unused/
 
-Fix that by adding a function that creates the mask by looking at the
-GIC type first, and returning zero when a GICv3 is used. Also we
-explicitly check for the CPU limit again, even though this would be
-done before already, when we try to create a GICv2 VM with more than 8
-cores.
+But while at it, I'd rather add a WARN_ON(is_error_noslot_pfn(pfn)).
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/aarch64/pmu.c            |  3 +--
- arm/gic.c                    | 13 +++++++++++++
- arm/include/arm-common/gic.h |  1 +
- arm/timer.c                  |  4 +---
- 4 files changed, 16 insertions(+), 5 deletions(-)
+Paolo
 
-diff --git a/arm/aarch64/pmu.c b/arm/aarch64/pmu.c
-index 5f189b32..5ed4979a 100644
---- a/arm/aarch64/pmu.c
-+++ b/arm/aarch64/pmu.c
-@@ -199,8 +199,7 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	int pmu_id = -ENXIO;
- 	int i;
- 
--	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
--		       & GIC_FDT_IRQ_PPI_CPU_MASK;
-+	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
- 	u32 irq_prop[] = {
- 		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
- 		cpu_to_fdt32(irq - 16),
-diff --git a/arm/gic.c b/arm/gic.c
-index 26be4b4c..a223a72c 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -399,6 +399,19 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
- 	_FDT(fdt_end_node(fdt));
- }
- 
-+u32 gic__get_fdt_irq_cpumask(struct kvm *kvm)
-+{
-+	/* Only for GICv2 */
-+	if (kvm->cfg.arch.irqchip == IRQCHIP_GICV3 ||
-+	    kvm->cfg.arch.irqchip == IRQCHIP_GICV3_ITS)
-+		return 0;
-+
-+	if (kvm->nrcpus > 8)
-+		return GIC_FDT_IRQ_PPI_CPU_MASK;
-+
-+	return ((1U << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT;
-+}
-+
- #define KVM_IRQCHIP_IRQ(x) (KVM_ARM_IRQ_TYPE_SPI << KVM_ARM_IRQ_TYPE_SHIFT) |\
- 			   ((x) & KVM_ARM_IRQ_NUM_MASK)
- 
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index ec9cf31a..ad8bcbf2 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -37,6 +37,7 @@ int gic__alloc_irqnum(void);
- int gic__create(struct kvm *kvm, enum irqchip_type type);
- int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
- void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
-+u32 gic__get_fdt_irq_cpumask(struct kvm *kvm);
- 
- int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
- 		   int resample_fd);
-diff --git a/arm/timer.c b/arm/timer.c
-index 71bfe8d4..6acc50ef 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -9,9 +9,7 @@
- void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
- {
- 	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
--
--	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
--		       & GIC_FDT_IRQ_PPI_CPU_MASK;
-+	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
- 	u32 irq_prop[] = {
- 		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
- 		cpu_to_fdt32(irqs[0]),
--- 
-2.25.1
+>   void kvm_set_pfn_dirty(kvm_pfn_t pfn)
+>   {
+> -	if (kvm_is_ad_tracked_pfn(pfn))
+> -		SetPageDirty(pfn_to_page(pfn));
+> +	if (pfn_valid(pfn))
+> +		kvm_set_page_dirty(pfn_to_page(pfn));
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_set_pfn_dirty);
+>   
+>   void kvm_set_pfn_accessed(kvm_pfn_t pfn)
+>   {
+> -	if (kvm_is_ad_tracked_pfn(pfn))
+> -		mark_page_accessed(pfn_to_page(pfn));
+> +	if (pfn_valid(pfn))
+> +		kvm_set_page_accessed(pfn_to_page(pfn));
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_set_pfn_accessed);
 
