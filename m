@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C38154E95E
-	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 20:30:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2F6254E973
+	for <lists+kvm@lfdr.de>; Thu, 16 Jun 2022 20:35:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358050AbiFPSaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 14:30:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60022 "EHLO
+        id S233921AbiFPSfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 14:35:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230021AbiFPSae (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 14:30:34 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4E21517E5
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:30:33 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 129so1989862pgc.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:30:33 -0700 (PDT)
+        with ESMTP id S232129AbiFPSfB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 14:35:01 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B148C517FC
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:35:00 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id f65so1990086pgc.7
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 11:35:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=2MT5n56eTX6232MDw48kDPyLYs/2jjEt1BMxZqgDQ7Y=;
-        b=NiI1HQfcQv9+8Gev0XwEu2FM2Dnd0HiUaP/qsnNNqaSLlODazHtJE57NTHV3K8NG36
-         +6JD7VOiwlw49flHCCuycXXpY47ajI0Uf/ZR71NZkslFgx2HEF1zG97CaXBHkwQnJBnC
-         HBdlcRIB6olNA3yCBp3JmFyivdT6qwTxQ2x7F/zfEyxUSLtJZyZZR2AvfX8Nf0DF5zaV
-         2vN0XwqHb8v1LkDecKeLaQ3yj8mH9DqIsa94VPncBqxCdcOtu1grcByFjBhMZlbwku7H
-         hCwAyFnj5kr/Fiu7z7kHeQCJZBi5DMpIhPE0/USwQh+sgBE+svEJr609w8p2WYmJ9EPm
-         UZeg==
+        bh=2DDMpYpJIW2G43lM7VbrvSxw342R0ygln5vOT5hucU8=;
+        b=ownebIQxonM5KkMhFH5JVGkaQme8MLm7ZX9ST78hEoYEe28ZGs3vdCPcHrqkelSlS+
+         4ONsFY1pObJisnUI/UE7dFPVJmmZOQqjpFQv7hTCJld83h7UmpqzNrDrvFaYma/1YFTH
+         VAftM64D62Ob+eBJe49LqaJJ+T3YPPf6vmJQZLH2COzZHsCJBOatYGO7yhBNq5JtYUEp
+         Euqla277KaMufi5RgPvC0cxFFfOT7lguI4xXB69uxERh3HQIH3Gq7kqvuImBmBk8r4L8
+         drD8Rg/XkJTg1R5vOewzCS4A1nlZUwF8tNUynkpC1L+iEkZu7GVbZJ1+xHuBULLXyYK9
+         P2uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=2MT5n56eTX6232MDw48kDPyLYs/2jjEt1BMxZqgDQ7Y=;
-        b=JtjLLknIAc7iEMUwgCnsDHFscKQsaNSpr1RpRARHn8oSRil6ye5oCxu/63To5s9uYs
-         zIVp6rqq46bTfzZ7fanymQ/9cMNb3jY3h4CLFIFENpBqoaGNw5fN+yPj1iFAsFj93Es2
-         jSUwJp6vDk7aScag6t1X0iFCtWfzgL/spLaJSMDQ1O4pbcLt5u/3q0SIS9J1iXYV4gFv
-         l/GfFptE+8bZ/HtG3ryRbqXPHQJucpazPtccF2x91rcQBwi71hJeS4EwDfteJInhJVWK
-         ebDFczsZNba0MMhahQg+IDzGbXcSl6zet8Ae9H8UIo0NXaifA14WU5bJKdiFZWv0GiOO
-         uLLw==
-X-Gm-Message-State: AJIora8FMOF1d9HYmzT+ydeIYZREovRGmkq5UHIdCAtDWN4dbh8T2Vb/
-        hVWvX6N1g7FMzW2Htp1M5Gy1Hg==
-X-Google-Smtp-Source: AGRyM1tI9hHUbW41iWk6dh+FQxhk3UabYeJ7/dBN2tGZhweR9tWzqxVjaW6nhVpVFEnOxdHwmneWHA==
-X-Received: by 2002:a62:a113:0:b0:51c:1b4c:38d1 with SMTP id b19-20020a62a113000000b0051c1b4c38d1mr5975138pff.13.1655404233174;
-        Thu, 16 Jun 2022 11:30:33 -0700 (PDT)
+        bh=2DDMpYpJIW2G43lM7VbrvSxw342R0ygln5vOT5hucU8=;
+        b=VAkjtwTnws0wGm1zjXId4duz1Pab7eF+V05IMdB+k5FArXguCsQJFVN4PSTHyFcYKT
+         sOzMOa4PRFelwpwO+m4z+afP9qKGzpe6evRU9HIjoKz+h8d9UaCJTrCpGRyiotFO+0qY
+         vYR3kYzzKChgv4+FSehkifZolIGpm6vGsTS4FDk349KDbI/7v2R4MYhPE70FgxFZ9PEr
+         CMLlpGb2UPwKMBGPDOYQ/TMxatcV7KvXIfb+UucyHJ+yVfzo1Y7DPp6g8crZtR/EElG7
+         PCDPQ70H5GkpAIfUIt8whDPue8F4Q74vUeEbkmUJuvktW9u92Sr5fasRD4uxemOKWq1G
+         Jd/g==
+X-Gm-Message-State: AJIora+l4AeBMyJDxENbh+Z0VbUc39LFoj16+z+LfLBlqv+VFE/IDCZz
+        APRQVVMxdIhkHNbgt7BB9exG9UKzBiIDvA==
+X-Google-Smtp-Source: AGRyM1tGcFUTWV6HEKvRwId+6xa3/GnNX6fAt0Y85hLxhIGXMWuI5xRARf8gSN5Iy1izmWeuyaY5rw==
+X-Received: by 2002:a65:6044:0:b0:3fc:674:8f5a with SMTP id a4-20020a656044000000b003fc06748f5amr5608538pgp.436.1655404499824;
+        Thu, 16 Jun 2022 11:34:59 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id z4-20020a62d104000000b005180c127200sm2110263pfg.24.2022.06.16.11.30.32
+        by smtp.gmail.com with ESMTPSA id c11-20020a62f84b000000b0051844a64d3dsm2082312pfm.25.2022.06.16.11.34.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 11:30:32 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 18:30:28 +0000
+        Thu, 16 Jun 2022 11:34:59 -0700 (PDT)
+Date:   Thu, 16 Jun 2022 18:34:55 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     pbonzini@redhat.com, like.xu.linux@gmail.com, jmattson@google.com,
         kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 1/3] x86: Remove perf enable bit from
- default config
-Message-ID: <Yqt2xBFkFZw3VaQT@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 2/3] x86: Skip running test when pmu is
+ disabled
+Message-ID: <Yqt3zzTV2UrsFX3v@google.com>
 References: <20220615084641.6977-1-weijiang.yang@intel.com>
- <20220615084641.6977-2-weijiang.yang@intel.com>
+ <20220615084641.6977-3-weijiang.yang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220615084641.6977-2-weijiang.yang@intel.com>
+In-Reply-To: <20220615084641.6977-3-weijiang.yang@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,43 +73,74 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Jun 15, 2022, Yang Weijiang wrote:
-> When pmu is disabled in KVM by enable_pmu=0, bit 7 of guest
-> MSR_IA32_MISC_ENABLE is cleared, but the default value of
-> the MSR assumes pmu is always available, this leads to test
-> failure. Change the logic to make it aligned with KVM config.
+> Read MSR_IA32_PERF_CAPABILITIES triggers #GP when pmu is disabled
+> by enable_pmu=0 in KVM. Let's check whether pmu is available before
+> issue msr reading to avoid the #GP. Also check PDCM bit before read
+> the MSR.
 > 
 > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-
-Paolo's more generic approach is preferable, though even that can be more generic.
-
-https://lore.kernel.org/all/20220520183207.7952-1-pbonzini@redhat.com
-
 > ---
->  x86/msr.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  x86/pmu_lbr.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 > 
-> diff --git a/x86/msr.c b/x86/msr.c
-> index 44fbb3b..fc05d6c 100644
-> --- a/x86/msr.c
-> +++ b/x86/msr.c
-> @@ -34,7 +34,7 @@ struct msr_info msr_info[] =
->  	MSR_TEST(MSR_IA32_SYSENTER_ESP, addr_ul, false),
->  	MSR_TEST(MSR_IA32_SYSENTER_EIP, addr_ul, false),
->  	// reserved: 1:2, 4:6, 8:10, 13:15, 17, 19:21, 24:33, 35:63
-> -	MSR_TEST(MSR_IA32_MISC_ENABLE, 0x400c51889, false),
-> +	MSR_TEST(MSR_IA32_MISC_ENABLE, 0x400c51809, false),
->  	MSR_TEST(MSR_IA32_CR_PAT, 0x07070707, false),
->  	MSR_TEST(MSR_FS_BASE, addr_64, true),
->  	MSR_TEST(MSR_GS_BASE, addr_64, true),
-> @@ -59,6 +59,8 @@ static void test_msr_rw(struct msr_info *msr, unsigned long long val)
->  	 */
->  	if (msr->index == MSR_EFER)
->  		val |= orig;
-> +	if (msr->index == MSR_IA32_MISC_ENABLE)
-> +		val |= MSR_IA32_MISC_ENABLE_EMON & orig;
->  	wrmsr(msr->index, val);
->  	r = rdmsr(msr->index);
->  	wrmsr(msr->index, orig);
+> diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
+> index 688634d..62614a0 100644
+> --- a/x86/pmu_lbr.c
+> +++ b/x86/pmu_lbr.c
+> @@ -5,6 +5,7 @@
+>  #define N 1000000
+>  #define MAX_NUM_LBR_ENTRY	  32
+>  #define DEBUGCTLMSR_LBR	  (1UL <<  0)
+> +#define PDCM_ENABLED	  (1UL << 15)
+>  #define PMU_CAP_LBR_FMT	  0x3f
+>  
+>  #define MSR_LBR_NHM_FROM	0x00000680
+> @@ -74,13 +75,22 @@ int main(int ac, char **av)
+>  		return 0;
+>  	}
+>  
+> -	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
+>  	eax.full = id.a;
+>  
+>  	if (!eax.split.version_id) {
+>  		printf("No pmu is detected!\n");
+>  		return report_summary();
+>  	}
+> +
+> +	id = cpuid(1);
+> +
+> +	if (!(id.c & PDCM_ENABLED)) {
+
+Don't open code cpuid(), add and use X86_FEATURE_PDCM:
+
+  #define	X86_FEATURE_PDCM		(CPUID(0x1, 0, ECX, 15))
+
+	if (!this_cpu_has(X86_FEATURE_PDCM))
+		...
+
+
+
+> +		printf("No PDCM is detected!\n");
+
+If your going to bother printing a message, please make it useful.  Every time I
+read PMU code I have to reread the kernel's cpufeatures.h to remember what PDCM
+stands for.
+
+		printf("Perf/Debug Capabilities MSR isn't supported\n");
+
+> +		return report_summary();
+> +	}
+> +
+> +	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
+> +
+>  	if (!(perf_cap & PMU_CAP_LBR_FMT)) {
+>  		printf("No LBR is detected!\n");
+
+Similar complaint,
+
+		printf("Architectural LBRs are not supported.\n");
+
+>  		return report_summary();
 > -- 
 > 2.31.1
 > 
