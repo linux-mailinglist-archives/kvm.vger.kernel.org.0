@@ -2,63 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C1CA54F2B9
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 10:21:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70F7254F33F
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 10:43:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380878AbiFQIVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 04:21:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59012 "EHLO
+        id S1380594AbiFQImy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 04:42:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380876AbiFQIVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 04:21:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97CBA68982
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 01:21:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3482461F71
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 08:21:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 847C9C3411B;
-        Fri, 17 Jun 2022 08:21:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655454073;
-        bh=W2Ginzv0iaA6XSuuFMDWgNtEDCY4cfJBuvI+BxE8JME=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=t4+zHCvGZjfjXcYFtoD9CeeZln8e39/Qx/aPuTg8H9kW+eXrylGP8+xVKeu9uZpTl
-         XTlSTYddmtf9DGCqqHg7x2W//pCgOvCeSeJFX57H+Q2BFBoAlZuMWm8R07pdrNwzqx
-         I0sFdPyPZlR9j/50EK8WMfA+RXuH1rkmdJGjVSgFv6ZBTtyrB1MyNankaJiDep6WfW
-         Z5j93PRNVfq8DgcePG7T1EFA5ZjglC9k8D7n2xzQAf4xky6tnHd3QBF9EtaxPiyQ1U
-         mKmjqSu+57Cz5z04ax7aYjGBNxSguOFJ4JfM2e2lcEyiKBeBE6GSSWVMS7hThUKUGe
-         YhXHnY2JrP00Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1o27E7-001F60-8g;
-        Fri, 17 Jun 2022 09:21:11 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Add Oliver as a reviewer
-Date:   Fri, 17 Jun 2022 09:21:08 +0100
-Message-Id: <165545405829.771018.16969597411109895074.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220616085318.1303657-1-maz@kernel.org>
-References: <20220616085318.1303657-1-maz@kernel.org>
+        with ESMTP id S1380537AbiFQImx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 04:42:53 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4981E1146F;
+        Fri, 17 Jun 2022 01:42:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0+txUdQ43jf+UIe9zCVUaGGeb7a9BrmjbJwClV7VdAQ=; b=PiIGLlDRnD4KR6sJKZqqRuNH4y
+        A1WYA1tieOBnORXjxYl7vYwDNHafaUH7kYlCGCM7t1x+LNel94rwNqbGLhL4BlEC1MZI6OoXIujQ+
+        vShzmh+5ZQkZyPwkWL4IeGPcVy3qPp0FVWp+1X3n5/wOKktGNoZ+yXqlvb1GolNq7m204U7ValNhe
+        PkayypEKB6d3IiePr18juhMYL99/5gj5wb8bEduIdLVbW/pWQRg5bqTa0WI1L1c72qUazXmBQ3noN
+        dvIC73wU5vA/zg4eIo53LFb51U5nQ1OmOZtia6HZ6P0IvRSnO212m0w+el6cH6nOpWbqjM0UR53we
+        YsE01FbA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o27Yw-006PUX-Gk; Fri, 17 Jun 2022 08:42:42 +0000
+Date:   Fri, 17 Jun 2022 01:42:42 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, jchrist@linux.ibm.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [RFT][PATCH v1 3/6] vfio: Pass in starting IOVA to
+ vfio_pin/unpin_pages API
+Message-ID: <Yqw+goqTJwb0lrxy@infradead.org>
+References: <20220616235212.15185-1-nicolinc@nvidia.com>
+ <20220616235212.15185-4-nicolinc@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, kernel-team@android.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220616235212.15185-4-nicolinc@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,23 +64,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 Jun 2022 09:53:18 +0100, Marc Zyngier wrote:
-> Oliver Upton has agreed to help with reviewing the KVM/arm64
-> patches, and has been doing so for a while now, so adding him
-> as to the reviewer list.
-> 
-> Note that Oliver is using a different email address for this
-> purpose, rather than the one his been using for his other
-> contributions.
+On Thu, Jun 16, 2022 at 04:52:09PM -0700, Nicolin Chen wrote:
+> +	ret = vfio_unpin_pages(&vgpu->vfio_device, gfn << PAGE_SHIFT, npage);
+> +	drm_WARN_ON(&i915->drm, ret != npage);
 
-Applied to fixes, thanks!
+The shifting of gfn seems to happen bother here and in the callers.
 
-[1/1] KVM: arm64: Add Oliver as a reviewer
-      commit: 8507e0b6edb3ac24cdf86f7cfba74eaeee00bf27
+Also this is the only caller that does anything withthe vfio_unpin_pages
+return value.  Given that you touch the API here we might as well
+not return any value, and turn the debug checks that can return errors
+into WARN_ON_ONCE calls the vfio/iommu_type1 code.
 
-Cheers,
+> +extern int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
+>  			  int npage, int prot, unsigned long *phys_pfn);
+> -extern int vfio_unpin_pages(struct vfio_device *device, unsigned long *user_pfn,
+> +extern int vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova,
+>  			    int npage);
 
-	M.
--- 
-Marc Zyngier <maz@kernel.org>
-
+This will clash with the extern removal patch that Alex has sent.
