@@ -2,86 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7140154F3AA
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 10:54:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 952F654F3C5
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 11:02:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381385AbiFQIyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 04:54:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42200 "EHLO
+        id S235131AbiFQJC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 05:02:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381372AbiFQIyN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 04:54:13 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 886453B032;
-        Fri, 17 Jun 2022 01:54:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8nZ1ta+BsGc00ew4rYHJjg70RdBuVGkJ01/aKd/F76M=; b=22UofexgYSmp52aMwe+HIOOhvH
-        HYrP5hQF/Y99IdWt/OJ7frq9bDlj6D/Gp2E2LfXGLyDec9bdW3ElpSca05pMX63lDBDkaRyZilvm3
-        s0jUbrt1CiiZKRQ7vdxJZ9yVK90jEAwy2ITMbKKpviGKsecKQDJYrt7hAOD3RKzBVjb7fHmOaLxxP
-        cWKZd5500xnwfiechgxDSX2HIctMCobu1VuwMbdK3f6uiymnj2Jg8g0IZBPG77/wBQcXmkLcVlGR6
-        ssra39uhQZxgkJ+zs68oXh47Qe6h+fzmWqqiKHEwunXSUDLK/l3ieRfYn9Q5bYSjpMZjludDm3YY1
-        UaH6OBmw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o27jx-006UvK-VQ; Fri, 17 Jun 2022 08:54:05 +0000
-Date:   Fri, 17 Jun 2022 01:54:05 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com,
-        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
-        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, jchrist@linux.ibm.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
-Subject: Re: [RFT][PATCH v1 6/6] vfio: Replace phys_pfn with phys_page for
- vfio_pin_pages()
-Message-ID: <YqxBLbu8yPJiwK6Z@infradead.org>
-References: <20220616235212.15185-1-nicolinc@nvidia.com>
- <20220616235212.15185-7-nicolinc@nvidia.com>
+        with ESMTP id S232062AbiFQJCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 05:02:25 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA48393CD;
+        Fri, 17 Jun 2022 02:02:22 -0700 (PDT)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id EBA0379E; Fri, 17 Jun 2022 11:02:19 +0200 (CEST)
+Date:   Fri, 17 Jun 2022 11:02:14 +0200
+From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>
+To:     linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-pci@vger.kernel.org, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Arnd Bergmann <arnd@kernel.org>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vasant Hegde <vasant.hegde@amd.com>,
+        Will Deacon <will@kernel.org>
+Subject: [CFP LPC 2022] VFIO/IOMMU/PCI Microconference
+Message-ID: <YqxDFkAFdLjqnW8O@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220616235212.15185-7-nicolinc@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is a bunch of code an comments in the iommu type1 code that
-suggest we can pin memory that is not page backed.  
+Hello everyone!
 
->  int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
-> +		   int npage, int prot, struct page **phys_page)
+We are pleased to announce that there will be another
 
-I don't think phys_page makes much sense as an argument name.
-I'd just call this pages.
+	VFIO/IOMMU/PCI Microconference
 
-> +			phys_page[i] = pfn_to_page(vpfn->pfn);
+at this year's Linux Plumbers Conference (LPC), from 12th to the 14th of
+September in Dublin, Ireland. LPC is a hybrid event this year;
+attendance can be in person or remote.
 
-Please store the actual page pointer in the vfio_pfn structure.
+In this microconference we want to discuss ongoing developments around
+the VFIO, IOMMU and PCI subsystems and their interactions in Linux.
 
->  		remote_vaddr = dma->vaddr + (iova - dma->iova);
-> -		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
-> +		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn,
->  					     do_accounting);
+Tentative topics that are under consideration for this year include (but
+not limited to):
 
-Please just return the actual page from vaddr_get_pfns through
-vfio_pin_pages_remote and vfio_pin_page_external, maybe even as a prep
-patch as that is a fair amount of churn.
+	* PCI:
+	  - Cache Coherent Interconnect for Accelerators (CCIX)/Compute
+	    Express Link (CXL) expansion memory and accelerators
+	    management
+	  - Data Object Exchange (DOE)
+	  - Integrity and Data Encryption (IDE)
+	  - Component Measurement and Authentication (CMA)
+	  - Security Protocol and Data Model (SPDM)
+	  - I/O Address Space ID Allocator (IOASID)
+	  - INTX/MSI IRQ domain consolidation
+	  - Gen-Z interconnect fabric
+	  - ARM64 architecture and hardware
+	  - PCI native host controllers/endpoints drivers current
+	    challenges and improvements (e.g., state of PCI quirks, etc.)
+	  - PCI error handling and management e.g., Advanced Error
+	    Reporting (AER), Downstream Port Containment (DPC), ACPI
+	    Platform Error Interface (APEI) and Error Disconnect Recover
+	    (EDR)
+	  - Power management and devices supporting Active-state Power
+	    Management (ASPM)
+	  - Peer-to-Peer DMA (P2PDMA)
+	  - Resources claiming/assignment consolidation
+	  - Probing of native PCIe controllers and general reset
+	    implementation
+	  - Prefetchable vs non-prefetchable BAR address mappings
+	  - Untrusted/external devices management
+	  - DMA ownership models
+	  - Thunderbolt, DMA, RDMA and USB4 security
+
+	* VFIO:
+	  - Write-combine on non-x86 architectures
+	  - I/O Page Fault (IOPF) for passthrough devices
+	  - Shared Virtual Addressing (SVA) interface
+	  - Single-root I/O Virtualization(SRIOV)/Process Address Space
+	    ID (PASID) integration
+	  - PASID in SRIOV virtual functions
+	  - Device assignment/sub-assignment
+
+	* IOMMU:
+	  - /dev/iommufd development
+	  - IOMMU virtualization
+	  - IOMMU drivers SVA interface
+	  - DMA-API layer interactions and the move towards generic
+	    dma-ops for IOMMU drivers
+	  - Possible IOMMU core changes (e.g., better integration with
+	    device-driver core, etc.)
+
+Please submit your proposals on the LPC website at:
+
+	https://lpc.events/event/16/abstracts/
+
+Make sure to select the "VFIO/IOMMU/PCI MC" in the Track pulldown
+menu.
+
+Looking forward to seeing you all there, either in Dublin or virtual! :)
+
+The organizers,
+
+	Alex Williamson
+	Bjorn Helgaas
+	Jörg Rödel
+	Lorenzo Pieralisi
+	Krzysztof Wilczyński
+
