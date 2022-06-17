@@ -2,133 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA17654F9A4
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 16:49:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 849C854F975
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 16:45:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382997AbiFQOsp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 10:48:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
+        id S1382850AbiFQOpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 10:45:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382969AbiFQOsn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 10:48:43 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2071.outbound.protection.outlook.com [40.107.92.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CA1186DD;
-        Fri, 17 Jun 2022 07:48:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e8ezECQesM/drHrMsR/wAdaDMbrRlTxfg49oTIhdmdRxzkAeEpA1EuWBjpHkh1MTTSswB9RfE/EJDW32BFRVc2pWGqQLSk0tFa7abuAKjfJWqTU6x4/LW47oxqDGgEbUYfstEG639m4lvVbW+yQzNUPgHAqKnyreq4HQ3xlezBI6VgKPnIJxOorg/c4ETqsELtDOVHPub/3oMknKV1XoKynzL1aj/REeUPuIhG7O4RRtGfgDvZq5hkzMThoTU8kA9580mdQ78VVVPDXxF8Jzt4l5WStFykQIY46XBTCU0wG7fAi3sF2oKmJSZmJunMXcYqjELIkSmcMAAS5y7PE4CQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hff/11NKQZI7kIfvdw5OrwNQVotovQZBD5vquLwkayE=;
- b=GivNh2dxtEj6kznsHhYxUc/xZdMILWs+mUBVGztdov9Tq5Rj7ICv7J8JVSLr0xg6zdSLcNYNtmi1sPRnQtYchlvSHltp6SgQIzCeSRWifjsEDgh2jn03gdP9ocdeAVniW5Ete9nUHfP3DKSvum9KlCYP3OLmAR1PEw5YcKgTZ+oVf0LDY7pY3dx1P7AC2lrsvF4zejnb0diJIuKph4nbHvx+Xwuu7nkO8Kq5tnMLlC8GVZID0hca+HhLWBQ3Cx97zyXTWlI8Xs1TNM00aILTGE5FbPlp+QatJDWmN6NEoWa2fvu+7c8KQV6dHHG8+SCGWxAcPeh7MuFChQma48FwdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hff/11NKQZI7kIfvdw5OrwNQVotovQZBD5vquLwkayE=;
- b=WWibCoIKWVH1/2rxmQKPWoJ7gS0W6VycdsQq471oALJBto6wz917xCrmipTnuE8Wzp71ZLTr5X9i9dqN8dQ3MDGoeq2l3K0HnkSLCVVpvXEGZj4Taq2OeUH7FjNGzvGLRrVXB+HsXg73wJXH1fxyvHms2bcsC+O4e05CQw7CC2w=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11)
- by CY4PR12MB1879.namprd12.prod.outlook.com (2603:10b6:903:125::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.20; Fri, 17 Jun
- 2022 14:48:39 +0000
-Received: from CY5PR12MB6323.namprd12.prod.outlook.com
- ([fe80::29ce:b5ab:bd97:8a89]) by CY5PR12MB6323.namprd12.prod.outlook.com
- ([fe80::29ce:b5ab:bd97:8a89%7]) with mapi id 15.20.5353.015; Fri, 17 Jun 2022
- 14:48:39 +0000
-Message-ID: <fcf79616-ccbe-1137-6080-57d00773ff83@amd.com>
-Date:   Fri, 17 Jun 2022 20:18:27 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH 3/7] KVM: SVM: Add VNMI support in get/set_nmi_mask
-Content-Language: en-US
-From:   "Shukla, Santosh" <santosh.shukla@amd.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220602142620.3196-1-santosh.shukla@amd.com>
- <20220602142620.3196-4-santosh.shukla@amd.com>
- <d3f2da59b5afd300531ae428174c1f91d731e655.camel@redhat.com>
- <91c551a2-11fc-202f-2a8f-75b6374286b6@amd.com>
-In-Reply-To: <91c551a2-11fc-202f-2a8f-75b6374286b6@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0183.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:be::8) To CY5PR12MB6323.namprd12.prod.outlook.com
- (2603:10b6:930:20::11)
+        with ESMTP id S1382778AbiFQOpQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 10:45:16 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0859338A4;
+        Fri, 17 Jun 2022 07:45:15 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25HEGLmM025161;
+        Fri, 17 Jun 2022 14:45:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=SNQOSMRj6adOqCszklIL6pvFPIWsV3z4dOyiPWhjZBw=;
+ b=ZtfwMBTBErTrIN2WavHCc3nNpBPvW8hUhnJozAdQdBjrW1cLTANBil6U7cNqpaqxNrs1
+ wdKlV4r22+cQpBK9jy5lHNiSTxAjUkaB6HxrL09hQMRkXYUl55w7OIaoVeBxCATcE2vZ
+ +do+oPK7DPqMo/Ga5mo5ZlAxMrX4too6uJYL9fLen0cdAIsV6rFMaDuLy0jAfW58M69l
+ aGzlKkxAtGhJ51qBnhuB3p3PzaLV6rO5rGk1t3doWzBxO/ni0aqtWnKchvIDMBaAxVOU
+ HEEZfS620T6KseW1cRznUMM1PpYO+p4a+kMZ4Uy6RuTMiRqCsvMXeVb45CVCNu24KLDB Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3grs10vms2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Jun 2022 14:45:15 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25HESwVb016331;
+        Fri, 17 Jun 2022 14:45:14 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3grs10vmqn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Jun 2022 14:45:14 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25HEbqiq019423;
+        Fri, 17 Jun 2022 14:45:12 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3gmjp8xyus-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Jun 2022 14:45:12 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25HEjCCp19857858
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Jun 2022 14:45:12 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 802DF5204F;
+        Fri, 17 Jun 2022 14:45:08 +0000 (GMT)
+Received: from [9.171.9.193] (unknown [9.171.9.193])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DA45252051;
+        Fri, 17 Jun 2022 14:45:07 +0000 (GMT)
+Message-ID: <769a1889-31a1-c7e1-5c1b-21d30ce518c9@linux.ibm.com>
+Date:   Fri, 17 Jun 2022 16:49:29 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 362d61d5-afdc-4cdb-c7bd-08da5070772c
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1879:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1879D94EE2E097A00E255A4387AF9@CY4PR12MB1879.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WDfZx0zlRaQjIZbRNDI2RqlNVVlnsGOR6wGp7jpRY9V9cO88v5gQ/8tfA3jmgr17Z95zyK14aBi16rIIpctBgtcWQefSA7vITCgMbvgrCUDJGo+W4Us8gQ2xlCaW0slajgq032nr1Hh3f9QDaS0mz9lfswD6rtKcezFsB4Mbgbk/kl+DqU2gv+XETh11iYkcwD1n/AxZ/aExVaiujjDCOD03vqCZtRptXgMw6vIjZFNEv8DelQE+GA/kqZtsgdI/d9EYBL/7x2RrJ2Zsc7qhv9CJ9GLWoLeIy/5FXncFonyl3bwUp1cXc6No6Pimaqv5XBiPgPWiHSFUMuvcBLvOJXIwM+FiN4nkA4HpYcr5pQFVYufXV4XG1/uAbLXwpMdAng19mjATMEGdK3+mgahbYYCC0PrVZrQDbvckYAf3BfqiR2ubh5Hbwdece1mp0hNF4TTo9QvwI0VLqyyG5egamb5Pi1pZvBBeLZWT5xp/khSTrDQN+KrEwYJNSOQecLL5IVcJW9TUBs4K7kodTNI2dVlrwRaw1vy/FV9Zh92K8IIAzZvIMRWMisYrhBHOK9AuXxRyIU0et+rZHmiGSvXSm6eE8Z2dpOG9iaShPJBmBwDs8CGECubC37tMHP2wf7g12L5/8CCUlpqyOegg/h6foeoJYYLdxFvcxVnLQPs+GJeSuhLzWYYu622GrCYwz5ktlcUROAip6rUGXD4qvruslXA2mo0LhZFvNO4S6h4XwIACv1v/9asCnVcY4aszkZRC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6323.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(54906003)(316002)(8936002)(2616005)(36756003)(498600001)(31696002)(5660300002)(66476007)(66556008)(6486002)(4326008)(66946007)(8676002)(83380400001)(6506007)(6666004)(110136005)(31686004)(186003)(53546011)(86362001)(2906002)(38100700002)(26005)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VWtPUGtNTVZKeGdsN25FRkZkN0tINjlSdGorRlZJVEFTN09jbjh0d0JUeGZC?=
- =?utf-8?B?M2JVT21CWTdOdzBFNmw0alNOOVpZR3JMTTNoSFpycVFUSExWMmNob1dEK3p1?=
- =?utf-8?B?YjN3eEJmdlJiSGc2VnJBcmVNNTB4bGxUamJaSXlhNmpMUHR0OUZhLzBOMldt?=
- =?utf-8?B?UGwyZ0xIdnJHLzA0WU0zTXg5RitjZXlUcDN5Z0oxTi9DbEV2QzA1bnlvL1ov?=
- =?utf-8?B?ZUlFYWYrNHphOVpkaDlBUFh0OFg3Z3ljUHRvcTBJWmxEMDBJUzdtQmgxbm14?=
- =?utf-8?B?ZWdOd3EvWGphb040a21pQlVlOVdGWG5MOVJEdEtPN2duZXdyeVd0a2IxVzBI?=
- =?utf-8?B?TU5iVXBPUTJqWXB3WFlFdzNRSEQ5MFNJaGJmdlFXV2xEd1JGZWRoRC82YzEz?=
- =?utf-8?B?NlBZSWg3cEkwWno1UjVTUVVaTmQ5UHFZY2cwUm1GYlFrZmRjeW83aWgvYWpW?=
- =?utf-8?B?VFExSTZUMkFhTXRnZTBKUEI0S1NkY2Z2aHB0TXJFMVJ4VzZ2V05GVTBRSS9k?=
- =?utf-8?B?aWk1a1A5VTRQRnFKRmhjcVZDdEMyR0JNZk9GUUdBeDlsb2lqWk82ejdhdEZE?=
- =?utf-8?B?WGFXamE2M3c5WUxIMUo4Q1B4T1pwVWNLL0JkOUd3ZEdTM2ZFVHh5QUI5em5n?=
- =?utf-8?B?S1NNWEZtaStiTC9ETGNORlJFdWl3VXIzdDRQREJwRkN0bTlOclBZVXBsSTRK?=
- =?utf-8?B?dFd2cG5HRGovNTRLNVY5UFgxclYyMjhpeGFkcGJRSW5GTThqemNTQmtTN0Ri?=
- =?utf-8?B?dDJNNTV4Yzl5NWVVYldCbkQ1c043QU5ZcXJBeUlUVjd0V1QxVjZvSEFQWXdo?=
- =?utf-8?B?eGFnSnZMc3MxL0ZEdjdmcDNscmo2NUZnQ1VtU0tLTHM3SWJORW5MNko2bmtF?=
- =?utf-8?B?SGVKcmxjZXpkVHRsQ3JLWXg3cGgyQVhhMThBdkhzTDNnWkQ5UWVmYkl2L0ZD?=
- =?utf-8?B?SE5DOEgxcHdHMmduWTFTT1M1TTZDRFlwaTNMY3FNbDQzTCtrVmVmMEh4SDVK?=
- =?utf-8?B?dzBiTkFVVHg5cHA3bTF0TDl5TTlmb0pmUWQ1ajV4K1orNlpuY0I0ZnQrbEs3?=
- =?utf-8?B?WWNMR2VHWDhDeUNrRUtWN2Q1NWZkVkNRUmw3NWJ2TFhycGRqS3NDa2V6bFRx?=
- =?utf-8?B?UXdKanJHa3REM0cyMzNMNXozVjFPQjRQOXYxbjVKZGZTSWJtVTRRVmh0VkZ2?=
- =?utf-8?B?bWkzK1dWQXhYRnoybVA4c09hUFkxRnUrbEV1bSszeVpuTzhCUkRacDR4b05N?=
- =?utf-8?B?M1J2cit4VXpBQWd5a0RkWnNFdG9PelphSmkyTU9hYWJnWFBQL2hsTXIzZU4r?=
- =?utf-8?B?K3BvRTZ2NFJCMHY2QnRYU2g1Y2tFVHdXOEFWNTdZSVg4ak0zbm5qdDZBNmpx?=
- =?utf-8?B?bGdYbXh1dWVEZ25QVUUyVTZvSWRmZUVQWWJqOU5hU05zK21yMGJ3Rks3cDZx?=
- =?utf-8?B?a3JBK2lYVHdCeFpXY1ZkdEh1L2xVc1hYY2lKeVEvRkE2ZHdzOGZRbjAzRDJt?=
- =?utf-8?B?WWgyY1pwWmE0WFFMVkxsL2laM2JGUEJhZFJTNUdFT1MrZm96MGpxUUZFYVdN?=
- =?utf-8?B?Rkw3SWg4UjB3N01iTGhjc0hnUVlFaS9pT3Nqa2hZZHhObldMTGpWY2V1bDZp?=
- =?utf-8?B?cExqeDJad0x4bWlDcGJtU0NsLzFGZDdOdUdmeUhsUDVRdXREVHJGR2tHcXhi?=
- =?utf-8?B?cUNXSFY3Qnk4R3pOOW9yR01SVjlrNGhZcml1d25kRmNZVDAzTnJUUnhmKzRX?=
- =?utf-8?B?WElCdkVIdGJQenRtRm5Xc3lhMThlV0dUQVYxVGJQYUpqN0d3akpDWDhZMXZC?=
- =?utf-8?B?V2pGdmxsL0xEZ2Q0aWhtNDZpM3hrTDQ1RUZTYzM3T3FkZHkrUjEzMXF4ODNy?=
- =?utf-8?B?M2pSSndtWWZrR0hFZk96Yks4K0VlZE5vL0RiRWh6SHhGZWJUL2E1UXp5Y0l5?=
- =?utf-8?B?VWxSaWZJYmgraFQ3bTVpUytlc3h0VFJ5bzJwZVpEMGlsZHhvcjVQR21hbU9N?=
- =?utf-8?B?THdXRExuNS9LeW00V09xK3VFdmVPTWhzdmV0d3I4MG9PM0NoNnNtUE53Z0Zz?=
- =?utf-8?B?L3RERllDQWtZbEloQ1BtVnYva0pCV005Q0xzaDJkc0lwTFZnSUdmYzdwTXA5?=
- =?utf-8?B?T2cxZ09hV21PVTluUTV5dDZsZEtzZzRWRzNwQVlVeWdBbU9WOGRLdWU4ZXk0?=
- =?utf-8?B?UjVpb0VuN1F0eFNNTVNvYlVWeWpQTVNoZ3FLZHpKdDJmTFlFWUtqdFEzVFhq?=
- =?utf-8?B?S3licHBVN2RENUwrV0RRcCtmSzhta05GdE53c0J0OHZrd3ZaNXNidUtyRG5L?=
- =?utf-8?B?M0ZiWWlNNHNIZnRTK1pURm1LYlk4ZlQxWC9sRzVkaG5yM0dxeU15QT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 362d61d5-afdc-4cdb-c7bd-08da5070772c
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6323.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2022 14:48:39.6246
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dsp92lo8xCwdZKlVKTNxx0ACOZxbKU3Zn+OqspznppM9OX7X5OO6RGOZbAnT9A3cFSrLNV3qp9VH99YiqusWAA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1879
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v9 2/3] s390x: KVM: guest support for topology function
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220506092403.47406-1-pmorel@linux.ibm.com>
+ <20220506092403.47406-3-pmorel@linux.ibm.com>
+ <2ffb7b35-5066-3e63-7648-7663a9142e7d@redhat.com>
+ <23b2cb4c-88be-b332-d82f-961e38a069f1@linux.ibm.com>
+In-Reply-To: <23b2cb4c-88be-b332-d82f-961e38a069f1@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9MKFSgSkUAxf1_p_7W41VwiF_lpA1o0F
+X-Proofpoint-ORIG-GUID: oSEXw1XK7sesz0YQZN-IBXRMxqMPy8rJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-17_10,2022-06-17_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 clxscore=1015
+ spamscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206170062
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -137,86 +98,95 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 6/17/2022 8:15 PM, Shukla, Santosh wrote:
+On 5/16/22 16:13, Pierre Morel wrote:
 > 
 > 
-> On 6/7/2022 6:37 PM, Maxim Levitsky wrote:
->> On Thu, 2022-06-02 at 19:56 +0530, Santosh Shukla wrote:
->>> VMCB intr_ctrl bit12 (V_NMI_MASK) is set by the processor when handling
->>> NMI in guest and is cleared after the NMI is handled. Treat V_NMI_MASK as
->>> read-only in the hypervisor and do not populate set accessors.
+> On 5/12/22 11:24, David Hildenbrand wrote:
+>> On 06.05.22 11:24, Pierre Morel wrote:
+>>> We let the userland hypervisor know if the machine support the CPU
+>>> topology facility using a new KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
 >>>
->>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
->>> ---
->>>  arch/x86/kvm/svm/svm.c | 20 +++++++++++++++++++-
->>>  1 file changed, 19 insertions(+), 1 deletion(-)
+>>> The PTF instruction will report a topology change if there is any change
+>>> with a previous STSI_15_1_2 SYSIB.
+>>> Changes inside a STSI_15_1_2 SYSIB occur if CPU bits are set or clear
+>>> inside the CPU Topology List Entry CPU mask field, which happens with
+>>> changes in CPU polarization, dedication, CPU types and adding or
+>>> removing CPUs in a socket.
 >>>
->>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->>> index 860f28c668bd..d67a54517d95 100644
->>> --- a/arch/x86/kvm/svm/svm.c
->>> +++ b/arch/x86/kvm/svm/svm.c
->>> @@ -323,6 +323,16 @@ static int is_external_interrupt(u32 info)
->>>         return info == (SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_INTR);
->>>  }
->>>  
->>> +static bool is_vnmi_enabled(struct vmcb *vmcb)
->>> +{
->>> +       return vnmi && (vmcb->control.int_ctl & V_NMI_ENABLE);
->>> +}
+>>> The reporting to the guest is done using the Multiprocessor
+>>> Topology-Change-Report (MTCR) bit of the utility entry of the guest's
+>>> SCA which will be cleared during the interpretation of PTF.
+>>>
+>>> To check if the topology has been modified we use a new field of the
+>>> arch vCPU to save the previous real CPU ID at the end of a schedule
+>>> and verify on next schedule that the CPU used is in the same socket.
+>>> We do not report polarization, CPU Type or dedication change.
+>>>
+>>> STSI(15.1.x) gives information on the CPU configuration topology.
+>>> Let's accept the interception of STSI with the function code 15 and
+>>> let the userland part of the hypervisor handle it when userland
+>>> support the CPU Topology facility.
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 >>
->> Following Paolo's suggestion I recently removed vgif_enabled(),
->> based on the logic that vgif_enabled == vgif, because
->> we always enable vGIF for L1 as long as 'vgif' module param is set,
->> which is set unless either hardware or user cleared it.
+>> [...]
 >>
-> Yes. In v2, Thanks!.
+>>
+>>> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+>>> index 0e8603acc105..d9e16b09c8bf 100644
+>>> --- a/arch/s390/kvm/priv.c
+>>> +++ b/arch/s390/kvm/priv.c
+>>> @@ -874,10 +874,12 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>>>       if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+>>>           return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+>>> -    if (fc > 3) {
+>>> -        kvm_s390_set_psw_cc(vcpu, 3);
+>>> -        return 0;
+>>> -    }
+>>> +    if (fc > 3 && fc != 15)
+>>> +        goto out_no_data;
+>>> +
+>>> +    /* fc 15 is provided with PTF/CPU topology support */
+>>> +    if (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))
+>>> +        goto out_no_data;
+>>
+>>
+>> Maybe shorter as
+>>
+>> if (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))
+>>     goto out_no_data;
+>> else if (fc > 3)
+>>     goto out_no_data;
+>>
 > 
->> Note that here vmcb is the current vmcb, which can be vmcb02,
->> and it might be wrong
->>
->>> +
->>> +static bool is_vnmi_mask_set(struct vmcb *vmcb)
->>> +{
->>> +       return !!(vmcb->control.int_ctl & V_NMI_MASK);
->>> +}
->>> +
->>>  static u32 svm_get_interrupt_shadow(struct kvm_vcpu *vcpu)
->>>  {
->>>         struct vcpu_svm *svm = to_svm(vcpu);
->>> @@ -3502,13 +3512,21 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
->>>  
->>>  static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
->>>  {
->>> -       return !!(vcpu->arch.hflags & HF_NMI_MASK);
->>> +       struct vcpu_svm *svm = to_svm(vcpu);
->>> +
->>> +       if (is_vnmi_enabled(svm->vmcb))
->>> +               return is_vnmi_mask_set(svm->vmcb);
->>> +       else
->>> +               return !!(vcpu->arch.hflags & HF_NMI_MASK);
->>>  }
->>>  
->>>  static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
->>>  {
->>>         struct vcpu_svm *svm = to_svm(vcpu);
->>>  
->>> +       if (is_vnmi_enabled(svm->vmcb))
->>> +               return;
->>
->> What if the KVM wants to mask NMI, shoudn't we update the 
->> V_NMI_MASK value in int_ctl instead of doing nothing?
->>
+> yes.
 
-V_NMI_MASK is cpu controlled meaning HW sets the mask while processing
-event and clears right after processing, so in away its Read-only for hypervisor.
+hum, sorry, but no.
 
->> Best regards,
->> 	Maxim Levitsky
+when test_kvm_facility(11) is true then !test_kvm_facility(11) is false 
+and the first test fails
+and the second succeed jumping to out_no_data for fc == 15
+
+I can use what I proposed with a comment to make it better readable.
+What about:
+
+         /* Bailout forbidden function codes */
+         if (fc > 3 && fc != 15)
+                 goto out_no_data;
+         /* fc 15 is provided with PTF/CPU topology support */
+         if (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))
+                 goto out_no_data;
+
+
+> 
 >>
+>> Apart from that, LGTM.
 >>
->>> +
->>>         if (masked) {
->>>                 vcpu->arch.hflags |= HF_NMI_MASK;
->>>                 if (!sev_es_guest(vcpu->kvm))
->>
->>
+> 
+> Thanks,
+> Pierre
+> 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
