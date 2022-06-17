@@ -2,64 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C583154F38C
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 10:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7140154F3AA
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 10:54:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381250AbiFQIud (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 04:50:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37848 "EHLO
+        id S1381385AbiFQIyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 04:54:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381315AbiFQIuc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 04:50:32 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BC0369CCB
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 01:50:28 -0700 (PDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LPXj65tw7zSgxV;
-        Fri, 17 Jun 2022 16:47:06 +0800 (CST)
-Received: from kwepemm600006.china.huawei.com (7.193.23.105) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 17 Jun 2022 16:50:09 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- kwepemm600006.china.huawei.com (7.193.23.105) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 17 Jun 2022 16:50:02 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2375.024; Fri, 17 Jun 2022 09:50:00 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "maorg@nvidia.com" <maorg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-Subject: RE: [PATCH vfio 2/2] vfio: Split migration ops from main device ops
-Thread-Topic: [PATCH vfio 2/2] vfio: Split migration ops from main device ops
-Thread-Index: AQHYeYN0vdLHTThAIUqnXD4l/FZlpK1H8beAgAT0hoCABS3PAIAAkiIAgACsQgA=
-Date:   Fri, 17 Jun 2022 08:50:00 +0000
-Message-ID: <6f6b36765fe9408f902d1d644b149df3@huawei.com>
-References: <20220606085619.7757-1-yishaih@nvidia.com>
-        <20220606085619.7757-3-yishaih@nvidia.com>
-        <BN9PR11MB5276F5548A4448B506A8F66A8CA69@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <2c917ec1-6d4f-50a4-a391-8029c3a3228b@nvidia.com>
-        <5d54c7dc-0c80-5125-9336-c672e0f29cd1@nvidia.com>
- <20220616170118.497620ba.alex.williamson@redhat.com>
-In-Reply-To: <20220616170118.497620ba.alex.williamson@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S1381372AbiFQIyN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 04:54:13 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 886453B032;
+        Fri, 17 Jun 2022 01:54:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8nZ1ta+BsGc00ew4rYHJjg70RdBuVGkJ01/aKd/F76M=; b=22UofexgYSmp52aMwe+HIOOhvH
+        HYrP5hQF/Y99IdWt/OJ7frq9bDlj6D/Gp2E2LfXGLyDec9bdW3ElpSca05pMX63lDBDkaRyZilvm3
+        s0jUbrt1CiiZKRQ7vdxJZ9yVK90jEAwy2ITMbKKpviGKsecKQDJYrt7hAOD3RKzBVjb7fHmOaLxxP
+        cWKZd5500xnwfiechgxDSX2HIctMCobu1VuwMbdK3f6uiymnj2Jg8g0IZBPG77/wBQcXmkLcVlGR6
+        ssra39uhQZxgkJ+zs68oXh47Qe6h+fzmWqqiKHEwunXSUDLK/l3ieRfYn9Q5bYSjpMZjludDm3YY1
+        UaH6OBmw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o27jx-006UvK-VQ; Fri, 17 Jun 2022 08:54:05 +0000
+Date:   Fri, 17 Jun 2022 01:54:05 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, jchrist@linux.ibm.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [RFT][PATCH v1 6/6] vfio: Replace phys_pfn with phys_page for
+ vfio_pin_pages()
+Message-ID: <YqxBLbu8yPJiwK6Z@infradead.org>
+References: <20220616235212.15185-1-nicolinc@nvidia.com>
+ <20220616235212.15185-7-nicolinc@nvidia.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220616235212.15185-7-nicolinc@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,118 +64,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleCBXaWxsaWFtc29u
-IFttYWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDE3IEp1bmUgMjAy
-MiAwMDowMQ0KPiBUbzogWWlzaGFpIEhhZGFzIDx5aXNoYWloQG52aWRpYS5jb20+DQo+IENjOiBU
-aWFuLCBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+OyBtYW9yZ0BudmlkaWEuY29tOw0KPiBj
-b2h1Y2tAcmVkaGF0LmNvbTsgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaQ0KPiA8c2hhbWVlcmFs
-aS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPjsgbGl1bG9uZ2ZhbmcNCj4gPGxpdWxvbmdmYW5n
-QGh1YXdlaS5jb20+OyBrdm1Admdlci5rZXJuZWwub3JnOyBqZ2dAbnZpZGlhLmNvbQ0KPiBTdWJq
-ZWN0OiBSZTogW1BBVENIIHZmaW8gMi8yXSB2ZmlvOiBTcGxpdCBtaWdyYXRpb24gb3BzIGZyb20g
-bWFpbiBkZXZpY2Ugb3BzDQo+IA0KPiBPbiBUaHUsIDE2IEp1biAyMDIyIDE3OjE4OjE2ICswMzAw
-DQo+IFlpc2hhaSBIYWRhcyA8eWlzaGFpaEBudmlkaWEuY29tPiB3cm90ZToNCj4gDQo+ID4gT24g
-MTMvMDYvMjAyMiAxMDoxMywgWWlzaGFpIEhhZGFzIHdyb3RlOg0KPiA+ID4gT24gMTAvMDYvMjAy
-MiA2OjMyLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPiA+Pj4gRnJvbTogWWlzaGFpIEhhZGFzIDx5
-aXNoYWloQG52aWRpYS5jb20+DQo+ID4gPj4+IFNlbnQ6IE1vbmRheSwgSnVuZSA2LCAyMDIyIDQ6
-NTYgUE0NCj4gPiA+Pj4NCj4gPiA+Pj4gdmZpbyBjb3JlIGNoZWNrcyB3aGV0aGVyIHRoZSBkcml2
-ZXIgc2V0cyBzb21lIG1pZ3JhdGlvbiBvcCAoZS5nLg0KPiA+ID4+PiBzZXRfc3RhdGUvZ2V0X3N0
-YXRlKSBhbmQgYWNjb3JkaW5nbHkgY2FsbHMgaXRzIG9wLg0KPiA+ID4+Pg0KPiA+ID4+PiBIb3dl
-dmVyLCBjdXJyZW50bHkgbWx4NSBkcml2ZXIgc2V0cyB0aGUgYWJvdmUgb3BzIHdpdGhvdXQgcmVn
-YXJkcyB0bw0KPiA+ID4+PiBpdHMNCj4gPiA+Pj4gbWlncmF0aW9uIGNhcHMuDQo+ID4gPj4+DQo+
-ID4gPj4+IFRoaXMgbWlnaHQgbGVhZCB0byB1bmV4cGVjdGVkIHVzYWdlL09vcHMgaWYgdXNlciBz
-cGFjZSBtYXkgY2FsbCB0byB0aGUNCj4gPiA+Pj4gYWJvdmUgb3BzIGV2ZW4gaWYgdGhlIGRyaXZl
-ciBkb2Vzbid0IHN1cHBvcnQgbWlncmF0aW9uLiBBcyBmb3IgZXhhbXBsZSwNCj4gPiA+Pj4gdGhl
-IG1pZ3JhdGlvbiBzdGF0ZV9tdXRleCBpcyBub3QgaW5pdGlhbGl6ZWQgaW4gdGhhdCBjYXNlLg0K
-PiA+ID4+Pg0KPiA+ID4+PiBUaGUgY2xlYW5lc3Qgd2F5IHRvIG1hbmFnZSB0aGF0IHNlZW1zIHRv
-IHNwbGl0IHRoZSBtaWdyYXRpb24gb3BzIGZyb20NCj4gPiA+Pj4gdGhlIG1haW4gZGV2aWNlIG9w
-cywgdGhpcyB3aWxsIGxldCB0aGUgZHJpdmVyIHNldHRpbmcgdGhlbSBzZXBhcmF0ZWx5DQo+ID4g
-Pj4+IGZyb20gdGhlIG1haW4gb3BzIHdoZW4gaXQncyBhcHBsaWNhYmxlLg0KPiA+ID4+Pg0KPiA+
-ID4+PiBBcyBwYXJ0IG9mIHRoYXQsIGNoYW5nZWQgSElTSSBkcml2ZXIgdG8gbWF0Y2ggdGhpcyBz
-Y2hlbWUuDQo+ID4gPj4+DQo+ID4gPj4+IFRoaXMgc2NoZW1lIG1heSBlbmFibGUgZG93biB0aGUg
-cm9hZCB0byBjb21lIHdpdGggc29tZSBleHRyYQ0KPiBncm91cCBvZg0KPiA+ID4+PiBvcHMgKGUu
-Zy4gRE1BIGxvZykgdGhhdCBjYW4gYmUgc2V0IHdpdGhvdXQgcmVnYXJkcyB0byB0aGUgb3RoZXIg
-b3B0aW9ucw0KPiA+ID4+PiBiYXNlZCBvbiBkcml2ZXIgY2Fwcy4NCj4gPiA+Pj4NCj4gPiA+Pj4g
-Rml4ZXM6IDZmYWRiMDIxMjY2ZCAoInZmaW8vbWx4NTogSW1wbGVtZW50IHZmaW9fcGNpIGRyaXZl
-ciBmb3IgbWx4NQ0KPiA+ID4+PiBkZXZpY2VzIikNCj4gPiA+Pj4gU2lnbmVkLW9mZi1ieTogWWlz
-aGFpIEhhZGFzIDx5aXNoYWloQG52aWRpYS5jb20+DQo+ID4gPj4gUmV2aWV3ZWQtYnk6IEtldmlu
-IFRpYW4gPGtldmluLnRpYW5AaW50ZWwuY29tPiwgd2l0aCBvbmUgbml0Og0KPiA+ID4NCj4gPiA+
-IFRoYW5rcyBLZXZpbiwgcGxlYXNlIHNlZSBiZWxvdy4NCj4gPiA+DQo+ID4gPj4NCj4gPiA+Pj4g
-QEAgLTE1MzQsOCArMTUzNCw4IEBADQo+IHZmaW9faW9jdGxfZGV2aWNlX2ZlYXR1cmVfbWlnX2Rl
-dmljZV9zdGF0ZShzdHJ1Y3QNCj4gPiA+Pj4gdmZpb19kZXZpY2UgKmRldmljZSwNCj4gPiA+Pj4g
-wqDCoMKgwqDCoCBzdHJ1Y3QgZmlsZSAqZmlscCA9IE5VTEw7DQo+ID4gPj4+IMKgwqDCoMKgwqAg
-aW50IHJldDsNCj4gPiA+Pj4NCj4gPiA+Pj4gLcKgwqDCoCBpZiAoIWRldmljZS0+b3BzLT5taWdy
-YXRpb25fc2V0X3N0YXRlIHx8DQo+ID4gPj4+IC3CoMKgwqDCoMKgwqDCoCAhZGV2aWNlLT5vcHMt
-Pm1pZ3JhdGlvbl9nZXRfc3RhdGUpDQo+ID4gPj4+ICvCoMKgwqAgaWYgKCFkZXZpY2UtPm1pZ19v
-cHMtPm1pZ3JhdGlvbl9zZXRfc3RhdGUgfHwNCj4gPiA+Pj4gK8KgwqDCoMKgwqDCoMKgICFkZXZp
-Y2UtPm1pZ19vcHMtPm1pZ3JhdGlvbl9nZXRfc3RhdGUpDQo+ID4gPj4+IMKgwqDCoMKgwqDCoMKg
-wqDCoCByZXR1cm4gLUVOT1RUWTsNCj4gPiA+PiAuLi4NCj4gPiA+Pg0KPiA+ID4+PiBAQCAtMTU4
-Miw4ICsxNTgzLDggQEAgc3RhdGljIGludA0KPiA+ID4+PiB2ZmlvX2lvY3RsX2RldmljZV9mZWF0
-dXJlX21pZ3JhdGlvbihzdHJ1Y3QgdmZpb19kZXZpY2UgKmRldmljZSwNCj4gPiA+Pj4gwqDCoMKg
-wqDCoCB9Ow0KPiA+ID4+PiDCoMKgwqDCoMKgIGludCByZXQ7DQo+ID4gPj4+DQo+ID4gPj4+IC3C
-oMKgwqAgaWYgKCFkZXZpY2UtPm9wcy0+bWlncmF0aW9uX3NldF9zdGF0ZSB8fA0KPiA+ID4+PiAt
-wqDCoMKgwqDCoMKgwqAgIWRldmljZS0+b3BzLT5taWdyYXRpb25fZ2V0X3N0YXRlKQ0KPiA+ID4+
-PiArwqDCoMKgIGlmICghZGV2aWNlLT5taWdfb3BzLT5taWdyYXRpb25fc2V0X3N0YXRlIHx8DQo+
-ID4gPj4+ICvCoMKgwqDCoMKgwqDCoCAhZGV2aWNlLT5taWdfb3BzLT5taWdyYXRpb25fZ2V0X3N0
-YXRlKQ0KPiA+ID4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FTk9UVFk7DQo+ID4gPj4+
-DQo+ID4gPj4gQWJvdmUgY2hlY2tzIGNhbiBiZSBkb25lIG9uY2Ugd2hlbiB0aGUgZGV2aWNlIGlz
-IHJlZ2lzdGVyZWQgdGhlbg0KPiA+ID4+IGhlcmUgcmVwbGFjZWQgd2l0aCBhIHNpbmdsZSBjaGVj
-ayBvbiBkZXZpY2UtPm1pZ19vcHMuDQo+ID4gPj4NCj4gPiA+IEkgYWdyZWUsIGl0IG1heSBsb29r
-IGFzIG9mIGJlbG93Lg0KPiA+ID4NCj4gPiA+IFRoZW9yZXRpY2FsbHksIHRoaXMgY291bGQgYmUg
-ZG9uZSBldmVuIGJlZm9yZSB0aGlzIHBhdGNoIHVwb24gZGV2aWNlDQo+ID4gPiByZWdpc3RyYXRp
-b24uDQo+ID4gPg0KPiA+ID4gV2UgY291bGQgY2hlY2sgdGhhdCBib3RoICdvcHMnIHdlcmUgc2V0
-IGFuZCAqbm90KiBvbmx5IG9uZSBvZiBhbmQNCj4gPiA+IGxhdGVyIGNoZWNrIGZvciB0aGUgc3Bl
-Y2lmaWMgJ29wJyB1cG9uIHRoZSBmZWF0dXJlIHJlcXVlc3QuDQo+ID4gPg0KPiA+ID4gQWxleCwN
-Cj4gPiA+DQo+ID4gPiBEbyB5b3UgcHJlZmVyIHRvIHN3aXRjaCB0byB0aGUgYmVsb3cgYXMgcGFy
-dCBvZiBWMiBvciBzdGF5IGFzIG9mDQo+ID4gPiBjdXJyZW50IHN1Ym1pc3Npb24gYW5kIEknbGwg
-anVzdCBhZGQgS2V2aW4gYXMgUmV2aWV3ZWQtYnkgPw0KPiA+ID4NCj4gPiA+IGRpZmYgLS1naXQg
-YS9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2NvcmUuYw0KPiA+ID4gYi9kcml2ZXJzL3ZmaW8v
-cGNpL3ZmaW9fcGNpX2NvcmUuYw0KPiA+ID4gaW5kZXggYTBkNjlkZGFmOTBkLi5mNDIxMDJhMDM4
-NTEgMTAwNjQ0DQo+ID4gPiAtLS0gYS9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2NvcmUuYw0K
-PiA+ID4gKysrIGIvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9jb3JlLmMNCj4gPiA+IEBAIC0x
-ODU1LDYgKzE4NTUsMTEgQEAgaW50IHZmaW9fcGNpX2NvcmVfcmVnaXN0ZXJfZGV2aWNlKHN0cnVj
-dA0KPiA+ID4gdmZpb19wY2lfY29yZV9kZXZpY2UgKnZkZXYpDQo+ID4gPiDCoMKgwqDCoMKgwqDC
-oCBpZiAocGRldi0+aGRyX3R5cGUgIT0gUENJX0hFQURFUl9UWVBFX05PUk1BTCkNCj4gPiA+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVJTlZBTDsNCj4gPiA+DQo+ID4g
-PiArwqDCoMKgwqDCoMKgIGlmICh2ZGV2LT52ZGV2Lm1pZ19vcHMgJiYNCj4gPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqAgISh2ZGV2LT52ZGV2Lm1pZ19vcHMtPm1pZ3JhdGlvbl9nZXRfc3RhdGUgJiYN
-Cj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZkZXYtPnZkZXYubWlnX29wcy0+bWlncmF0
-aW9uX2dldF9zdGF0ZSkpDQo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1
-cm4gLUVJTlZBTDsNCj4gPiA+ICsNCj4gPiA+DQo+ID4gPiBZaXNoYWkNCj4gPiA+DQo+ID4gSGkg
-QWxleCwNCj4gPg0KPiA+IERpZCB5b3UgaGF2ZSB0aGUgY2hhbmNlIHRvIHJldmlldyB0aGUgYWJv
-dmUgbm90ZSA/DQo+ID4NCj4gPiBJIHdvdWxkIGxpa2UgdG8gc2VuZCBWMiB3aXRoIEtldmluJ3Mg
-UmV2aWV3ZWQtYnkgdGFnIGZvciBib3RoIHBhdGNoZXMsDQo+ID4ganVzdCB3b25kZXIgYWJvdXQg
-dGhlIG5pdC4NCj4gDQo+IFRoZSB3aG9sZSBtaWdfb3BzIGhhbmRsaW5nIHNlZW1zIHJhdGhlciBh
-ZC1ob2MgdG8gbWUuICBXaGF0IHRlbGxzIGENCj4gZGV2ZWxvcGVyIHdoZW4gbWlnX29wcyBjYW4g
-YmUgc2V0PyAgQ2FuIHRoZXkgYmUgdW5zZXQ/ICBEb2VzIHRoaXMNCj4gZW5hYmxlIGEgZGV2aWNl
-IGZlYXR1cmUgY2FsbG91dCB0byBkeW5hbWljYWxseSBlbmFibGUgbWlncmF0aW9uPyAgV2h5IGRv
-DQo+IHdlIGluaXQgdGhlIGRldmljZSB3aXRoIHZmaW9fZGV2aWNlX29wcywgYnV0IHRoZW4gb3Bl
-biBjb2RlIHBlciBkcml2ZXINCj4gc2V0dGluZyB2ZmlvX21pZ3JhdGlvbl9vcHM/DQo+IA0KPiBG
-b3IgdGhlIGhpc2lfYWNjIGNoYW5nZXMsIHRoZXkncmUgc3BlY2lmaWNhbGx5IGRlZmluaW5nIHR3
-byBkZXZpY2Vfb3BzLA0KPiBvbmUgZm9yIG1pZ3JhdGlvbiBhbmQgb25lIHdpdGhvdXQgbWlncmF0
-aW9uLiAgVGhpcyBwYXRjaCBvZGRseSBtYWtlcw0KPiB0aGVtIGlkZW50aWNhbCBvdGhlciB0aGFu
-IHRoZSBuYW1lIGFuZCBkb2Vzbid0IHNpbXBsaWZ5IHRoZSBzZXR1cCBwYXRoLA0KPiB3aGljaCBz
-aG91bGQgbm93IG9ubHkgcmVxdWlyZSBhIHNpbmdsZSBjYWxsIHBvaW50IGZvciBpbml0LWRldmlj
-ZSB3aXRoDQo+IHRoZSBwcm9wb3NlZCBBUEkgcmF0aGVyIHRoYW4gdGhlIGV4aXN0aW5nIHRocmVl
-Lg0KDQpJIHRoaW5rIG9uZSBvZiB0aGUgcmVhc29ucyB3ZSBlbmRlZCB1cCB1c2luZyB0d28gZGlm
-ZiBvcHMgd2VyZSB0byByZXN0cmljdA0KZXhwb3NpbmcgdGhlIG1pZ3JhdGlvbiBCQVIgcmVnaW9u
-cyB0byBHdWVzdChhbmQgZm9yIHRoYXQgd2Ugb25seSBleHBvc2UNCmhhbGYgb2YgdGhlIEJBUiBy
-ZWdpb24gbm93KS4gQW5kIGZvciBuZXN0ZWQgYXNzaWdubWVudHMgdGhpcyBtYXkgcmVzdWx0DQpp
-biBpbnZhbGlkIEJBUiBzaXplcyBpZiB3ZSBkbyBpdCBmb3Igbm8gbWlncmF0aW9uIGNhc2VzLiBI
-ZW5jZSB3ZSBoYXZlDQpvdmVycmlkZXMgZm9yIHJlYWQvd3JpdGUvbW1hcC9pb2N0bCBmdW5jdGlv
-bnMgaW4gaGlzaV9hY2NfdmZpb19wY2lfbWlncm5fb3BzIC4NCg0KSWYgd2UgaGF2ZSB0byBzaW1w
-bGlmeSB0aGUgc2V0dXAgcGF0aCwgSSBndWVzcyB3ZSByZXRhaW4gb25seSB0aGUgX21pZ3JuX29w
-cyBhbmQNCmFkZCBleHBsaWNpdCBjaGVja3MgZm9yIG1pZ3JhdGlvbiBzdXBwb3J0IGluIHRoZSBh
-Ym92ZSBvdmVycmlkZSBmdW5jdGlvbnMuICANCg0KPiANCj4gSWYgd2UgcmVtb3ZlIHRoZSBtaWdy
-YXRpb24gY2FsbGJhY2tzIGZyb20gdmZpb19kZXZpY2Vfb3BzLCB0aGVyZSdzIGFsc28NCj4gYW4g
-b3Bwb3J0dW5pdHkgdGhhdCB3ZSBjYW4gZml4IHRoZSB2ZmlvX2RldmljZV9vcHMubmFtZSBoYW5k
-bGluZyBpbg0KPiBoaXNpX2FjYywgd2hlcmUgdGhlIG9ubHkgY3VycmVudCB1c2VyIG9mIHRoaXMg
-aXMgdG8gc2V0IHRoZSBkcml2ZXINCj4gb3ZlcnJpZGUgZm9yIHNwYXduZWQgVkZzIGZyb20gYSB2
-ZmlvIG93bmVkIFBGLiAgVGhpcyBpcyBwcm9iYWJseQ0KPiBpcnJlbGV2YW50IGZvciB0aGlzIGRy
-aXZlciwgYnV0IGNsZWFybHkgd2UgaGF2ZSBhbiBleHBlY3RhdGlvbiB0aGVyZQ0KPiB0aGF0IG5h
-bWUgaXMgdGhlIG5hbWUgb2YgdGhlIG1vZHVsZSBwcm92aWRpbmcgdGhlIG9wcyBhbmQgd2UgaGF2
-ZSBubw0KPiBtb2R1bGUgbmFtZWQgaGlzaS1hY2MtdmZpby1wY2ktbWlncmF0aW9uLiAgVGhhbmtz
-LA0KPiANCg0KU2luY2UgdGhlIGRyaXZlciBpcyBtYWlubHkgdG8gcHJvdmlkZSBtaWdyYXRpb24g
-c3VwcG9ydCwgSSBhbSBqdXN0IHRoaW5raW5nDQp3aGV0aGVyIGl0IG1ha2Ugc2Vuc2UgdG8gcmV0
-dXJuIGZhaWx1cmUgaW4gcHJvYmUoKSBpZiBtaWdyYXRpb24gY2Fubm90IGJlDQpzdXBwb3J0ZWQg
-YW5kIHRoZW4gaWYgdXNlciB3aXNoZXMgY2FuIGJpbmQgdG8gdGhlIGdlbmVyaWMgdmZpby1wY2kg
-ZHJpdmVyDQppbnN0ZWFkLg0KDQpUaGFua3MsDQpTaGFtZWVyDQo=
+There is a bunch of code an comments in the iommu type1 code that
+suggest we can pin memory that is not page backed.  
+
+>  int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
+> +		   int npage, int prot, struct page **phys_page)
+
+I don't think phys_page makes much sense as an argument name.
+I'd just call this pages.
+
+> +			phys_page[i] = pfn_to_page(vpfn->pfn);
+
+Please store the actual page pointer in the vfio_pfn structure.
+
+>  		remote_vaddr = dma->vaddr + (iova - dma->iova);
+> -		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
+> +		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn,
+>  					     do_accounting);
+
+Please just return the actual page from vaddr_get_pfns through
+vfio_pin_pages_remote and vfio_pin_page_external, maybe even as a prep
+patch as that is a fair amount of churn.
