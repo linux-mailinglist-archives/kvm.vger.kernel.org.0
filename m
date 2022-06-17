@@ -2,166 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D33E54EEDD
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 03:36:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBA5A54EEE1
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 03:42:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379572AbiFQBfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 21:35:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60092 "EHLO
+        id S1379429AbiFQBl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 21:41:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232692AbiFQBfw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 21:35:52 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2055.outbound.protection.outlook.com [40.107.94.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCF463BC1;
-        Thu, 16 Jun 2022 18:35:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W6FGFYQLFgouHLY8JQQ0W/f+259jnS7OCnkBFl6moNokYzqfFnmwg841CvaxlXKN1uX2Xfi3OLvtpvh1g+eWz31hPv+B18OUtDWe/ERBdIViPbCCipHY4atw5otOKNbFgKgIacSC1RwVrmopBndWxlQtbK0qohAerivsE4wZO5yfuRFfzFoyM0HkDGqW7aHPnSxIa35dvAZYwU/FaxMsVKnzR3hyU4h03POpWikwm38kgZfQpey2iMcvi5/N/MzBAb22HkwIVBBtYCCGKFiEIKKW+V3tlkObSsW8oK+AT6pxdAfhxmAl/qPCIMitcxHjvlKCdZyb0YZb/JwX0/Fw8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q2gMc4T5xYSEJRgmx6ph+H6R4jYAUKQky+Hje0RoYiE=;
- b=b/xGt7ilNNB6LMrU/n9DZBzqg8hi+WZ7Mh0XPq/7gHgbHYfjNr6Df4ip9+9qfPRYMsvhBxSh0WAPJubILlwUCDMmPsjChnGC00H9cciqfgZzfrD6kDBKu/CDS3B2XRRXkpf0vNggBhm0CooH517ntL3BxKRdLkOm3L4LcozoMnaeszSas/SQS4qBSpfOpnUohMUuJGbp5ehObj0HuXdjfnXJ/2KLs2ZiP03dJbMexWtqUHoNqQikhhSD9XzbhF+dvtLsPK1+DQ/ePF3+9ZsnpT7iueWtCPLHh+QhlzQlDjkHojckoqC4T2eJzpD/IAmL7nPrYXFzyp1/QkqBauoBNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q2gMc4T5xYSEJRgmx6ph+H6R4jYAUKQky+Hje0RoYiE=;
- b=ApJ82ec9ZVVsEJPIpqQGiU9AgW93/wWg582Et8ZdimCgZMziVuPazyZnSQFngaRQkzKp+LGRV7iGxmRbim51RuT1kntcsIezi7Z1FAgtKHCNLByCcCjOAcJPiLpMRK9AUl+E+WoYn0QUOqebqHda+szY5f1ogrdW/JjJuz7DkZM=
-Received: from CY4PR05MB3047.namprd05.prod.outlook.com (2603:10b6:903:f4::7)
- by SJ0PR05MB8710.namprd05.prod.outlook.com (2603:10b6:a03:38a::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.9; Fri, 17 Jun
- 2022 01:35:49 +0000
-Received: from CY4PR05MB3047.namprd05.prod.outlook.com
- ([fe80::14fc:26d8:a523:ce02]) by CY4PR05MB3047.namprd05.prod.outlook.com
- ([fe80::14fc:26d8:a523:ce02%3]) with mapi id 15.20.5353.011; Fri, 17 Jun 2022
- 01:35:49 +0000
-From:   Zack Rusin <zackr@vmware.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "javierm@redhat.com" <javierm@redhat.com>
-CC:     "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
-        "tzimmermann@suse.de" <tzimmermann@suse.de>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>,
-        "lersek@redhat.com" <lersek@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "deller@gmx.de" <deller@gmx.de>,
-        Linux-graphics-maintainer <Linux-graphics-maintainer@vmware.com>
-Subject: Re: [PATCH v6 3/5] fbdev: Disable sysfb device registration when
- removing conflicting FBs
-Thread-Topic: [PATCH v6 3/5] fbdev: Disable sysfb device registration when
- removing conflicting FBs
-Thread-Index: AQHYepvEjLx5F4TpvU6kmXodMqZSca1SeaGAgAAHMACAABLpgIAAFPSAgAARqgCAACWUAA==
-Date:   Fri, 17 Jun 2022 01:35:49 +0000
-Message-ID: <711c88299ef41afd8556132b7c1dcb75ee7e6117.camel@vmware.com>
-References: <20220607182338.344270-1-javierm@redhat.com>
-         <20220607182338.344270-4-javierm@redhat.com>
-         <de83ae8cb6de7ee7c88aa2121513e91bb0a74608.camel@vmware.com>
-         <38473dcd-0666-67b9-28bd-afa2d0ce434a@redhat.com>
-         <603e3613b9b8ff7815b63f294510d417b5b12937.camel@vmware.com>
-         <a633d605-4cb3-2e04-1818-85892cf6f7b0@redhat.com>
-         <97565fb5-cf7f-5991-6fb3-db96fe239ee8@redhat.com>
-In-Reply-To: <97565fb5-cf7f-5991-6fb3-db96fe239ee8@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.44.1-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vmware.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d6fefa13-d4eb-4991-62ef-08da5001b570
-x-ms-traffictypediagnostic: SJ0PR05MB8710:EE_
-x-ld-processed: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0,ExtAddr
-x-microsoft-antispam-prvs: <SJ0PR05MB8710FBD4FBF9FCE0A254D7E3CEAF9@SJ0PR05MB8710.namprd05.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5KPLCvpYRA5fAh0YObPa4tyNDq/W4LOre1z/B94uXtIbSvys5xzIPqJWzKJCYTEujHkUgS+6vX5KqbxiCx18v0EgPlqra1R+/PG3eKzqA0BApPqmuqlI9oNKyi2xV8tyJYo8pi/cuzrTIRMU6vBycT4gyucbcM0chMPVGz2ymHTFh7yC6EdrqCY+aGuEyyTRUvLhmI8NiBIF8o768N6+AFtxplk8R/EbohGmMuBEqD3/a49zjmkFXhCCzELJppa6q3Z9hVk6G4XFNR4HtbiTt7IqNzQrFKt1YooeB2N5Cx8iOvo1bWLZcDD0PoF5hm/Fq6zBggnPubdfu89zg2WGGU4Xw7yGQbwx9ZMUpa8y8fOujwuHh9DCC2bPcdicstA+fZgCz1dL0rvQS2JmR8j1bBZTxSERVBSycIvO3OgJrsm0CE+PinRlcr7GWj+aF2OAjP2w7FM+BnfMNL1+EAK2/uQHPHpTJX63/V6+iA0Tju7eie595++WWm+g4nAwfkq+fHST23huLw7LCjGqCVKMWEQ0sSdo3SKUAie/K3XEDZh3EEe/6WaVygq8lb7Lbx/u7b4hwfqH6rfVyHUlB6KyrmMXNo3/6KzuCLZVcY4yeIXY3pHlbL6os4omCNcD4qM1VvCNy5CMnRdQLHWzor++M6Qe8wqGdipOiZ/hSg/JxMIQmJms0AbrYwN+Ltiv+vuiHn9SdqMgHNgZFdsL7PNXSBk2LG0qGVfjifMp7AkayTLurJKHIVDOCDjhLDAgXlEL
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR05MB3047.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(8676002)(66476007)(66446008)(66556008)(316002)(76116006)(66946007)(186003)(64756008)(4326008)(71200400001)(6486002)(498600001)(54906003)(2616005)(8936002)(91956017)(36756003)(107886003)(4744005)(2906002)(7416002)(5660300002)(122000001)(110136005)(38100700002)(6506007)(53546011)(26005)(6512007)(38070700005)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZFAyOXRjekk1QzVyU2N1VnpTQi9hN2I4ODBkaFY3RDVFenVOcXlucEpoN3NJ?=
- =?utf-8?B?VWFQQ0piQU0ySExmM2NrL1YyWFZZZUpPWHE0Sm94eXA0SmFGZzB2MWlvSG5Q?=
- =?utf-8?B?MCs0TGR1Zng4cGhuS0pyREhBVTdPOGRGZUFzclBtOTRnd2RqMlBnZkhDeDA0?=
- =?utf-8?B?MEVFS0d5T2k2N2did2plWkErZFJpcHQ5Z2xKY2h5UG1aSmpqc1NBczBZcFMr?=
- =?utf-8?B?cTFaYkpMellidDVUbEtkc1FRUXF0dE1IbDF4M0VyMDZTMXQ1SjIwK2h0TWF6?=
- =?utf-8?B?cmcrTDRacGtmRlhCLzFXcFNEeEVmeXhPZkg0cjZ2YUlnZ0RyVzZ6bGdGUStX?=
- =?utf-8?B?Z3gxL2U0OUM5ajl5VEJva0R4SHYxL0xnNUdPOU1QdmtWM25yazFzdERicWsv?=
- =?utf-8?B?TWUrQlNRdTh5bFVUUllHRVJzY3pmdzRTTVFqT0txYU5idnFwdk0vRGFMRisz?=
- =?utf-8?B?QWxZdVh6c1pFakg4T004aENVVmtLbTBZMlkvYkRNcjlIVUdZUURHUWg1dGRJ?=
- =?utf-8?B?Q2hoTGRYd1VNTlRjb2tWbE1Hb3BWQ2N0aXNEZHJwVmZFSmlQQVltcWpZS3VQ?=
- =?utf-8?B?ZVRBSkhBN2hrbVlZbTFFZEZmNFpPRjgzN2EyWUhCTk5PaituZUVNY1BXKzdZ?=
- =?utf-8?B?RStCNW1SRktEb29Oalh4V0xPVTY1cHA4R0FEQmdwZ1cwcU5RYTc0b2FNQnlo?=
- =?utf-8?B?Qm0xT3d1NVlDZlhyR0s0Q1c4Qy9Oc0VYd2ZzSHdBbityRWNJajRONVVpc2Zk?=
- =?utf-8?B?V2RDZ1hEZ2RmcE40aGdxWXpSMzZjY2ZHRlZsT2JtNkNaeVZ6NDRPRU43YnFa?=
- =?utf-8?B?UTB1dkdLcHJ1bW1haHBNRUh1NktURE42Rk15QlB3S1pZQXlCQU1vRVFXM1Zm?=
- =?utf-8?B?YTBwRUZITk9BdjE1OEFBWjZuY0trTGFMUjNzKzNVaXJmbGVFN3VaQzZWbWlR?=
- =?utf-8?B?ZjU2SGRVcWNYVTBYN2hEU3RxNzdmODA4K0c0c3EwTEVHc010REZFam0rNFpL?=
- =?utf-8?B?LzJxc3FNdzh1bXFvN3A0TjEyWXlzdjh2RUZKYTJyZG13M0V3MTFiTmZaK2dP?=
- =?utf-8?B?WERwdDNaSDVuakZjNnMrYjhRQTd0MHAySU92Q3gwTG9qVmcydTRoYnlxOTQx?=
- =?utf-8?B?Mm1sY1Bvcm9rVnhDRnNjVVl2L3FqQ2NlUEJWdTNoNG1teThSeDQ1NUZ1TDRm?=
- =?utf-8?B?TVI4MXdPUDBDclhOaFZUM2EzU293clpWS1daZXBKRUlRdXF5bngxcCtHL3JF?=
- =?utf-8?B?bWtmVDJueWJSRzV1eFN0bFZLeE9tTGkyc1JVeTEwaGlXaWJrZGtVdzdNVzhQ?=
- =?utf-8?B?UFRoMmxTYVdqNWtESC80cTVuY0xrdUc0WWkzSFZiYUIwYkFmVEMzV2ZncU0v?=
- =?utf-8?B?aGx1M3g2U1JQY1BqRGZwWUErWFg3NnFqYXlSaklRY1htVHlpMDh1SGJsN0RT?=
- =?utf-8?B?dkk2UWFEQis0ejgyQzdUWDNUbGVCb1pSdmN0MDljNXpJK01qc0k4ajROZTEy?=
- =?utf-8?B?SDVjUkhFVXM0OW5NYUhNYVBHandqenBlSXJwdzhNeVBUYjJqUzQ1ekpTRGJr?=
- =?utf-8?B?aU1COUtDZ2lYelFoMjZPVm9NVUZLKzR5bDZ5V2RhWVRoYlhDVFNxbndLdmlQ?=
- =?utf-8?B?UURtQlpQQ0Z5MWM3YmRJM0xFbVRUU1RvOTA2SFpzM3hLQzNOM0JJR3VFeGt2?=
- =?utf-8?B?Ynl4cFU1cG5tbEwwaTJLMW9ITUpwOUd6aE5EU1UrZlJSb1NBM3Nab0NJZlpR?=
- =?utf-8?B?Ni9qdGlrVklXTmwyYWtmeGgvZkxnU2pIcmVBL2VYM3FUb0VLOWV5WVZqTENV?=
- =?utf-8?B?ZG9ZWUJleXF2bHFuL1RsNEhxaCtWUHRNK1NHTTlJVmhpVU9rNzludU9iY3Ba?=
- =?utf-8?B?SWhHOU9MeHB2UUtaVkY5UDJHZ3JiU01FdGlXekprY2huZWV6WTQ0dXBnNGxr?=
- =?utf-8?B?MFZnTzJwcXExS2owazhqekI2clJEOGkxZTdtMC9oelpoWG4wZnJHeVAycVJF?=
- =?utf-8?B?M29GUFBvckladGgwU041SWU4UzBLNTNQSkFxVzFlN01CdGRaV1ZQNVNRK3Fn?=
- =?utf-8?B?bmkvaE1DNHRVeTN1SXhRVTJVRXZtbVJhWWlLRmxIV3g0dktBaVZGbURuVkJP?=
- =?utf-8?B?d2VZZFI3TTROZythUUszWk1FSkp4c0NYMEZ1UVhtSzh3Q3lrb0RWU2FSeFBG?=
- =?utf-8?B?SEtYVGJtN1M5TDdNcjJndkhIaWZSVnhJbk9qZjFuWFBCUk9taHJZZ2hDVys5?=
- =?utf-8?B?d2MzYUwyc3o2VGx0S3ZWbHhZQ3FRZWNyQ3h0Y3JHNExRZExGMW9LV1BOblg0?=
- =?utf-8?B?SFprRWZ6SU5KOFIxU0JQRmpkcmpzWndOdW1YRVl0ZGZkR1BoNU9JUT09?=
+        with ESMTP id S231814AbiFQBlz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 21:41:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 62BB46353B
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 18:41:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655430113;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/DD/JbIqyCltKPwmfzhCpkXevQRYLJ0ZJFcUAJ03F54=;
+        b=N8cuFGBcvKhKM8QMGhOn0sdq0k6ArxHGjmfN1wIIBImRNmNdu06Im3xYLEvnDQX87Jbfvd
+        aWXD15GVvKw9b0S5rt2+xaq+6J4K1iyJdrx0yEACiY+M6iqNv+VtZyPqX3xDdAiDfZDPf8
+        NgQFB8LgNPK0O2s0e+djdQstY2rEcn8=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-581-ZwFEKXJOO2OdryWrMrfJkg-1; Thu, 16 Jun 2022 21:41:52 -0400
+X-MC-Unique: ZwFEKXJOO2OdryWrMrfJkg-1
+Received: by mail-io1-f72.google.com with SMTP id h4-20020a056602008400b0066a011ac3d6so1751968iob.14
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 18:41:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/DD/JbIqyCltKPwmfzhCpkXevQRYLJ0ZJFcUAJ03F54=;
+        b=sbw6eTgrIzgQa5d3cHTp9V/eN0+FUQqGsuFHszbyC9YAtuuxKcU0E0hWJqTqZpBzyf
+         gfuE2En3dNEyEFp91a38Le+9iDXPpECNXdGKOh5OepOT9QQHtsXQy6CW6KYWrn2hPcYi
+         4jKp+xmmUobsirAagoLss6c3OjBhCZ/n7pGbjBC2Oya00GTbRWqlf9jcgjZNYwNmH7vm
+         JAQ+jh/5Vr4kpw/fFHUn5rG4P/W+KPuLZO3wGvML5yY6KJ11voG0/lLhXx9P5ir8yts7
+         eo8GjREQjl1yTw5LdhGnu45aSg+V05nNbeh9iYvyTljpT4979Vh8Sve5hX4w89YVPMTh
+         +3QQ==
+X-Gm-Message-State: AJIora+RlIbvva/pQN1J8xkCwFevuTkfeqILuW4mXQUDEDXIRbupQwWA
+        bt+kSeEkCqwuWuLwtnGqemE7azNm+ji0mqc92lMtNKeV0O2FSKkq/nPvl4oH1ie2wGRj35esCGF
+        ImrYkYcKks2ZZopfGhcHJ7bvCtoi9ahYE6yVt63GY/QFOhJFhdQXldg8bpyKhlw==
+X-Received: by 2002:a05:6e02:f4f:b0:2d8:c9b1:d7b0 with SMTP id y15-20020a056e020f4f00b002d8c9b1d7b0mr4409633ilj.99.1655430111141;
+        Thu, 16 Jun 2022 18:41:51 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vtH1fB1CTBTIxUDTUJnGxdyhGmr8yEs3Uk7gUcYkCtiqMAyVuKyZ5em+h2G7ONgFzOt+7eaw==
+X-Received: by 2002:a05:6e02:f4f:b0:2d8:c9b1:d7b0 with SMTP id y15-20020a056e020f4f00b002d8c9b1d7b0mr4409616ilj.99.1655430110891;
+        Thu, 16 Jun 2022 18:41:50 -0700 (PDT)
+Received: from localhost.localdomain (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id n4-20020a056e02140400b002d522958fb4sm1726538ilo.2.2022.06.16.18.41.49
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 16 Jun 2022 18:41:50 -0700 (PDT)
+From:   Peter Xu <peterx@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>, peterx@redhat.com
+Subject: [PATCH RFC 0/4] kvm/mm: Allow GUP to respond to non fatal signals
+Date:   Thu, 16 Jun 2022 21:41:43 -0400
+Message-Id: <20220617014147.7299-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.32.0
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <D474DE127295C848B2EA7F834FB1680A@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR05MB3047.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6fefa13-d4eb-4991-62ef-08da5001b570
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2022 01:35:49.5421
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IhITlYlcGced3axyFSEf3tVssGiU+Z9YhUnVQhabC0xDBIk3bX+xRepq9dFyQ/lPTp4wgK+4KBi9mCyj3zdgNg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR05MB8710
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gRnJpLCAyMDIyLTA2LTE3IGF0IDAxOjIxICswMjAwLCBKYXZpZXIgTWFydGluZXogQ2FuaWxs
-YXMgd3JvdGU6DQo+IE9uIDYvMTcvMjIgMDA6MTgsIEphdmllciBNYXJ0aW5leiBDYW5pbGxhcyB3
-cm90ZToNCj4gPiBPbiA2LzE2LzIyIDIzOjAzLCBaYWNrIFJ1c2luIHdyb3RlOg0KPiANCj4gW3Nu
-aXBdDQo+IA0KPiA+IA0KPiA+IEknbGwgbG9vayBhdCB0aGlzIHRvbW9ycm93IGJ1dCBpbiB0aGUg
-bWVhbnRpbWUsIGNvdWxkIHlvdSBwbGVhc2UgbG9vayBpZiB0aGUgZm9sbG93aW5nDQo+ID4gY29t
-bWl0cyBvbiB0b3Agb2YgZHJtLW1pc2MtbmV4dCBoZWxwID8NCj4gPiANCj4gPiBkMjU4ZDAwZmI5
-YzcgZmJkZXY6IGVmaWZiOiBDbGVhbnVwIGZiX2luZm8gaW4gLmZiX2Rlc3Ryb3kgcmF0aGVyIHRo
-YW4gLnJlbW92ZQ0KPiA+IDFiNTg1M2RmYWI3ZiBmYmRldjogZWZpZmI6IEZpeCBhIHVzZS1hZnRl
-ci1mcmVlIGR1ZSBlYXJseSBmYl9pbmZvIGNsZWFudXANCj4gPiANCj4gDQo+IFNjcmF0Y2ggdGhh
-dC4gSSBzZWUgaW4geW91ciBjb25maWcgbm93IHRoYXQgeW91IGFyZSBub3QgdXNpbmcgZWZpZmIg
-YnV0IGluc3RlYWQNCj4gc2ltcGxlZHJtOiBDT05GSUdfRFJNX1NJTVBMRURSTT15LCBDT05GSUdf
-U1lTRkJfU0lNUExFRkI9eSBhbmQgQ09ORklHX0RSTV9WTVdHRlguDQo+IA0KPiBTaW5jZSB5b3Ug
-bWVudGlvbmVkIGVmaWZiIEkgbWlzdW5kZXJzdG9vZCB0aGF0IHlvdSBhcmUgdXNpbmcgaXQuIEFu
-eXdheXMsIGFzDQo+IHNhaWQgSSdsbCBpbnZlc3RpZ2F0ZSB0aGlzIHRvbW9ycm93Lg0KDQpTb3Vu
-ZHMgZ29vZC4gTGV0IG1lIGtub3cgaWYgeW91J2QgbGlrZSBtZSB0byB0cnkgaXQgd2l0aG91dCBT
-SU1QTEVGQi4NCg0Keg0K
+[Marked as RFC for now]
+
+One issue was reported that libvirt won't be able to stop the virtual
+machine using QMP command "stop" during a paused postcopy migration [1].
+
+It won't work because "stop the VM" operation requires the hypervisor to
+kick all the vcpu threads out using SIG_IPI in QEMU (which is translated to
+a SIGUSR1).  However since during a paused postcopy, the vcpu threads are
+hang death at handle_userfault() so there're simply not responding to the
+kicks.  Further, the "stop" command will further hang the QMP channel.
+
+The mm has facility to process generic signal (FAULT_FLAG_INTERRUPTIBLE),
+however it's only used in the PF handlers only, not in GUP. Unluckily, KVM
+is a heavy GUP user on guest page faults.  It means we won't be able to
+interrupt a long page fault for KVM fetching guest pages with what we have
+right now.
+
+I think it's reasonable for GUP to only listen to fatal signals, as most of
+the GUP users are not really ready to handle such case.  But actually KVM
+is not such an user, and KVM actually has rich infrastructure to handle
+even generic signals, and properly deliver the signal to the userspace.
+Then the page fault can be retried in the next KVM_RUN.
+
+This patchset added FOLL_INTERRUPTIBLE to enable FAULT_FLAG_INTERRUPTIBLE,
+and let KVM be the first one to use it.
+
+Tests
+=====
+
+I created a postcopy environment, pause the migration by shutting down the
+network to emulate a network failure (so the handle_userfault() will stuck
+for a long time), then I tried three things:
+
+  (1) Sending QMP command "stop" to QEMU monitor,
+  (2) Hitting Ctrl-C from QEMU cmdline,
+  (3) GDB attach to the dest QEMU process.
+
+Before this patchset, all three use case hang.  After the patchset, all
+work just like when there's not network failure at all.
+
+Please have a look, thanks.
+
+[1] https://gitlab.com/qemu-project/qemu/-/issues/1052
+
+Peter Xu (4):
+  mm/gup: Add FOLL_INTERRUPTIBLE
+  kvm: Merge "atomic" and "write" in __gfn_to_pfn_memslot()
+  kvm: Add new pfn error KVM_PFN_ERR_INTR
+  kvm/x86: Allow to respond to generic signals during slow page faults
+
+ arch/arm64/kvm/mmu.c                   |  5 ++--
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  5 ++--
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  5 ++--
+ arch/x86/kvm/mmu/mmu.c                 | 19 ++++++++----
+ include/linux/kvm_host.h               | 21 ++++++++++++-
+ include/linux/mm.h                     |  1 +
+ mm/gup.c                               | 33 ++++++++++++++++++---
+ virt/kvm/kvm_main.c                    | 41 ++++++++++++++++----------
+ virt/kvm/kvm_mm.h                      |  6 ++--
+ virt/kvm/pfncache.c                    |  2 +-
+ 10 files changed, 104 insertions(+), 34 deletions(-)
+
+-- 
+2.32.0
+
