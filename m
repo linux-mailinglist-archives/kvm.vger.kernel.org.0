@@ -2,283 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 890F754F99C
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 16:48:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA17654F9A4
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 16:49:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382947AbiFQOr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 10:47:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51060 "EHLO
+        id S1382997AbiFQOsp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 10:48:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382945AbiFQOrp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 10:47:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 44B622DD
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 07:47:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655477251;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uTqHz4jzt2D3Rjkah2DCrjZXWvdHUasIzpW9EJieYN8=;
-        b=iTSV9W2XDcV7v+7fkIU9wbKCge/Yq1OLkYtWdlaH7A31+WD39KHxheBIMkqZHV2yIJIgDm
-        u4DuFIYF8HwCtZCkeuL9iNPBs/N8bv+tenJrtk93VTlsFRq2l9E1C5NRBG90GkIh+bafct
-        vka7jJQQdlfobDFjCH8T7evBjUAT1i0=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-582-BIlK40WXOnOX8G1E9wQMjA-1; Fri, 17 Jun 2022 10:47:30 -0400
-X-MC-Unique: BIlK40WXOnOX8G1E9wQMjA-1
-Received: by mail-io1-f71.google.com with SMTP id k5-20020a6bba05000000b00668eb755190so2629511iof.13
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 07:47:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=uTqHz4jzt2D3Rjkah2DCrjZXWvdHUasIzpW9EJieYN8=;
-        b=Oq2TS6u2JP95uHNCdHsQzu1z6Oh7RmtwoFb8Qfu1p4xPn8x90a8dhGktOhjciryybA
-         9X22sC8s9fJXnRVjjJ524qW3mWtki3Oiz8PyuKFQTbzBTOtOjchuTZZpML2aXkG8semr
-         dxipClhiRMSZsvgJU1OcHs8EdDiw1X3LFxFWVB9mf9+pKFMSYIzR7BnmONBm5Yf0o/Lp
-         3+o4NQAuk7lL+WRmnPgmKVkdOPnUppa6Cq4XiyD7SoAcowHANPL6ZrDf60uJEeLsQhvi
-         /+hHjQl+YMSJNusEi2rBk2IV/AbXFBkzP5TnM9lkxtdj2vVUMYdKh1wj69VwQExXynAE
-         o5pg==
-X-Gm-Message-State: AJIora/ECzUJDAcCOJFV8gxz7XrgNnQ+38QuiBc/uCYJA8XWY0cXHCSp
-        QYfpWsofH5QO5YZ+vSSkuhU+Z7mlMY9xJAwFrCfzrlL1Oqltoa0ObzQC4QKb1spury3tiHgYdab
-        l5zBYCPWjYs03
-X-Received: by 2002:a05:6638:16ce:b0:332:44e:af98 with SMTP id g14-20020a05663816ce00b00332044eaf98mr5744756jat.112.1655477248529;
-        Fri, 17 Jun 2022 07:47:28 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1t/WdyPm/tbAetFO465ekvhkG5WL2gdb3wutpRvzaaIkLBAu7mb0OZapaUkMw0AOrSHRXbm3g==
-X-Received: by 2002:a05:6638:16ce:b0:332:44e:af98 with SMTP id g14-20020a05663816ce00b00332044eaf98mr5744675jat.112.1655477246839;
-        Fri, 17 Jun 2022 07:47:26 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id k26-20020a02cb5a000000b00331b6dcfa07sm2288268jap.61.2022.06.17.07.47.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jun 2022 07:47:26 -0700 (PDT)
-Date:   Fri, 17 Jun 2022 08:47:23 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "maorg@nvidia.com" <maorg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-Subject: Re: [PATCH vfio 2/2] vfio: Split migration ops from main device ops
-Message-ID: <20220617084723.00298d67.alex.williamson@redhat.com>
-In-Reply-To: <6f6b36765fe9408f902d1d644b149df3@huawei.com>
-References: <20220606085619.7757-1-yishaih@nvidia.com>
-        <20220606085619.7757-3-yishaih@nvidia.com>
-        <BN9PR11MB5276F5548A4448B506A8F66A8CA69@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <2c917ec1-6d4f-50a4-a391-8029c3a3228b@nvidia.com>
-        <5d54c7dc-0c80-5125-9336-c672e0f29cd1@nvidia.com>
-        <20220616170118.497620ba.alex.williamson@redhat.com>
-        <6f6b36765fe9408f902d1d644b149df3@huawei.com>
-Organization: Red Hat
-MIME-Version: 1.0
+        with ESMTP id S1382969AbiFQOsn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 10:48:43 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2071.outbound.protection.outlook.com [40.107.92.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CA1186DD;
+        Fri, 17 Jun 2022 07:48:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e8ezECQesM/drHrMsR/wAdaDMbrRlTxfg49oTIhdmdRxzkAeEpA1EuWBjpHkh1MTTSswB9RfE/EJDW32BFRVc2pWGqQLSk0tFa7abuAKjfJWqTU6x4/LW47oxqDGgEbUYfstEG639m4lvVbW+yQzNUPgHAqKnyreq4HQ3xlezBI6VgKPnIJxOorg/c4ETqsELtDOVHPub/3oMknKV1XoKynzL1aj/REeUPuIhG7O4RRtGfgDvZq5hkzMThoTU8kA9580mdQ78VVVPDXxF8Jzt4l5WStFykQIY46XBTCU0wG7fAi3sF2oKmJSZmJunMXcYqjELIkSmcMAAS5y7PE4CQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hff/11NKQZI7kIfvdw5OrwNQVotovQZBD5vquLwkayE=;
+ b=GivNh2dxtEj6kznsHhYxUc/xZdMILWs+mUBVGztdov9Tq5Rj7ICv7J8JVSLr0xg6zdSLcNYNtmi1sPRnQtYchlvSHltp6SgQIzCeSRWifjsEDgh2jn03gdP9ocdeAVniW5Ete9nUHfP3DKSvum9KlCYP3OLmAR1PEw5YcKgTZ+oVf0LDY7pY3dx1P7AC2lrsvF4zejnb0diJIuKph4nbHvx+Xwuu7nkO8Kq5tnMLlC8GVZID0hca+HhLWBQ3Cx97zyXTWlI8Xs1TNM00aILTGE5FbPlp+QatJDWmN6NEoWa2fvu+7c8KQV6dHHG8+SCGWxAcPeh7MuFChQma48FwdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hff/11NKQZI7kIfvdw5OrwNQVotovQZBD5vquLwkayE=;
+ b=WWibCoIKWVH1/2rxmQKPWoJ7gS0W6VycdsQq471oALJBto6wz917xCrmipTnuE8Wzp71ZLTr5X9i9dqN8dQ3MDGoeq2l3K0HnkSLCVVpvXEGZj4Taq2OeUH7FjNGzvGLRrVXB+HsXg73wJXH1fxyvHms2bcsC+O4e05CQw7CC2w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11)
+ by CY4PR12MB1879.namprd12.prod.outlook.com (2603:10b6:903:125::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.20; Fri, 17 Jun
+ 2022 14:48:39 +0000
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::29ce:b5ab:bd97:8a89]) by CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::29ce:b5ab:bd97:8a89%7]) with mapi id 15.20.5353.015; Fri, 17 Jun 2022
+ 14:48:39 +0000
+Message-ID: <fcf79616-ccbe-1137-6080-57d00773ff83@amd.com>
+Date:   Fri, 17 Jun 2022 20:18:27 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH 3/7] KVM: SVM: Add VNMI support in get/set_nmi_mask
+Content-Language: en-US
+From:   "Shukla, Santosh" <santosh.shukla@amd.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220602142620.3196-1-santosh.shukla@amd.com>
+ <20220602142620.3196-4-santosh.shukla@amd.com>
+ <d3f2da59b5afd300531ae428174c1f91d731e655.camel@redhat.com>
+ <91c551a2-11fc-202f-2a8f-75b6374286b6@amd.com>
+In-Reply-To: <91c551a2-11fc-202f-2a8f-75b6374286b6@amd.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN3PR01CA0183.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:be::8) To CY5PR12MB6323.namprd12.prod.outlook.com
+ (2603:10b6:930:20::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 362d61d5-afdc-4cdb-c7bd-08da5070772c
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1879:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1879D94EE2E097A00E255A4387AF9@CY4PR12MB1879.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WDfZx0zlRaQjIZbRNDI2RqlNVVlnsGOR6wGp7jpRY9V9cO88v5gQ/8tfA3jmgr17Z95zyK14aBi16rIIpctBgtcWQefSA7vITCgMbvgrCUDJGo+W4Us8gQ2xlCaW0slajgq032nr1Hh3f9QDaS0mz9lfswD6rtKcezFsB4Mbgbk/kl+DqU2gv+XETh11iYkcwD1n/AxZ/aExVaiujjDCOD03vqCZtRptXgMw6vIjZFNEv8DelQE+GA/kqZtsgdI/d9EYBL/7x2RrJ2Zsc7qhv9CJ9GLWoLeIy/5FXncFonyl3bwUp1cXc6No6Pimaqv5XBiPgPWiHSFUMuvcBLvOJXIwM+FiN4nkA4HpYcr5pQFVYufXV4XG1/uAbLXwpMdAng19mjATMEGdK3+mgahbYYCC0PrVZrQDbvckYAf3BfqiR2ubh5Hbwdece1mp0hNF4TTo9QvwI0VLqyyG5egamb5Pi1pZvBBeLZWT5xp/khSTrDQN+KrEwYJNSOQecLL5IVcJW9TUBs4K7kodTNI2dVlrwRaw1vy/FV9Zh92K8IIAzZvIMRWMisYrhBHOK9AuXxRyIU0et+rZHmiGSvXSm6eE8Z2dpOG9iaShPJBmBwDs8CGECubC37tMHP2wf7g12L5/8CCUlpqyOegg/h6foeoJYYLdxFvcxVnLQPs+GJeSuhLzWYYu622GrCYwz5ktlcUROAip6rUGXD4qvruslXA2mo0LhZFvNO4S6h4XwIACv1v/9asCnVcY4aszkZRC
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6323.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(54906003)(316002)(8936002)(2616005)(36756003)(498600001)(31696002)(5660300002)(66476007)(66556008)(6486002)(4326008)(66946007)(8676002)(83380400001)(6506007)(6666004)(110136005)(31686004)(186003)(53546011)(86362001)(2906002)(38100700002)(26005)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VWtPUGtNTVZKeGdsN25FRkZkN0tINjlSdGorRlZJVEFTN09jbjh0d0JUeGZC?=
+ =?utf-8?B?M2JVT21CWTdOdzBFNmw0alNOOVpZR3JMTTNoSFpycVFUSExWMmNob1dEK3p1?=
+ =?utf-8?B?YjN3eEJmdlJiSGc2VnJBcmVNNTB4bGxUamJaSXlhNmpMUHR0OUZhLzBOMldt?=
+ =?utf-8?B?UGwyZ0xIdnJHLzA0WU0zTXg5RitjZXlUcDN5Z0oxTi9DbEV2QzA1bnlvL1ov?=
+ =?utf-8?B?ZUlFYWYrNHphOVpkaDlBUFh0OFg3Z3ljUHRvcTBJWmxEMDBJUzdtQmgxbm14?=
+ =?utf-8?B?ZWdOd3EvWGphb040a21pQlVlOVdGWG5MOVJEdEtPN2duZXdyeVd0a2IxVzBI?=
+ =?utf-8?B?TU5iVXBPUTJqWXB3WFlFdzNRSEQ5MFNJaGJmdlFXV2xEd1JGZWRoRC82YzEz?=
+ =?utf-8?B?NlBZSWg3cEkwWno1UjVTUVVaTmQ5UHFZY2cwUm1GYlFrZmRjeW83aWgvYWpW?=
+ =?utf-8?B?VFExSTZUMkFhTXRnZTBKUEI0S1NkY2Z2aHB0TXJFMVJ4VzZ2V05GVTBRSS9k?=
+ =?utf-8?B?aWk1a1A5VTRQRnFKRmhjcVZDdEMyR0JNZk9GUUdBeDlsb2lqWk82ejdhdEZE?=
+ =?utf-8?B?WGFXamE2M3c5WUxIMUo4Q1B4T1pwVWNLL0JkOUd3ZEdTM2ZFVHh5QUI5em5n?=
+ =?utf-8?B?S1NNWEZtaStiTC9ETGNORlJFdWl3VXIzdDRQREJwRkN0bTlOclBZVXBsSTRK?=
+ =?utf-8?B?dFd2cG5HRGovNTRLNVY5UFgxclYyMjhpeGFkcGJRSW5GTThqemNTQmtTN0Ri?=
+ =?utf-8?B?dDJNNTV4Yzl5NWVVYldCbkQ1c043QU5ZcXJBeUlUVjd0V1QxVjZvSEFQWXdo?=
+ =?utf-8?B?eGFnSnZMc3MxL0ZEdjdmcDNscmo2NUZnQ1VtU0tLTHM3SWJORW5MNko2bmtF?=
+ =?utf-8?B?SGVKcmxjZXpkVHRsQ3JLWXg3cGgyQVhhMThBdkhzTDNnWkQ5UWVmYkl2L0ZD?=
+ =?utf-8?B?SE5DOEgxcHdHMmduWTFTT1M1TTZDRFlwaTNMY3FNbDQzTCtrVmVmMEh4SDVK?=
+ =?utf-8?B?dzBiTkFVVHg5cHA3bTF0TDl5TTlmb0pmUWQ1ajV4K1orNlpuY0I0ZnQrbEs3?=
+ =?utf-8?B?WWNMR2VHWDhDeUNrRUtWN2Q1NWZkVkNRUmw3NWJ2TFhycGRqS3NDa2V6bFRx?=
+ =?utf-8?B?UXdKanJHa3REM0cyMzNMNXozVjFPQjRQOXYxbjVKZGZTSWJtVTRRVmh0VkZ2?=
+ =?utf-8?B?bWkzK1dWQXhYRnoybVA4c09hUFkxRnUrbEV1bSszeVpuTzhCUkRacDR4b05N?=
+ =?utf-8?B?M1J2cit4VXpBQWd5a0RkWnNFdG9PelphSmkyTU9hYWJnWFBQL2hsTXIzZU4r?=
+ =?utf-8?B?K3BvRTZ2NFJCMHY2QnRYU2g1Y2tFVHdXOEFWNTdZSVg4ak0zbm5qdDZBNmpx?=
+ =?utf-8?B?bGdYbXh1dWVEZ25QVUUyVTZvSWRmZUVQWWJqOU5hU05zK21yMGJ3Rks3cDZx?=
+ =?utf-8?B?a3JBK2lYVHdCeFpXY1ZkdEh1L2xVc1hYY2lKeVEvRkE2ZHdzOGZRbjAzRDJt?=
+ =?utf-8?B?WWgyY1pwWmE0WFFMVkxsL2laM2JGUEJhZFJTNUdFT1MrZm96MGpxUUZFYVdN?=
+ =?utf-8?B?Rkw3SWg4UjB3N01iTGhjc0hnUVlFaS9pT3Nqa2hZZHhObldMTGpWY2V1bDZp?=
+ =?utf-8?B?cExqeDJad0x4bWlDcGJtU0NsLzFGZDdOdUdmeUhsUDVRdXREVHJGR2tHcXhi?=
+ =?utf-8?B?cUNXSFY3Qnk4R3pOOW9yR01SVjlrNGhZcml1d25kRmNZVDAzTnJUUnhmKzRX?=
+ =?utf-8?B?WElCdkVIdGJQenRtRm5Xc3lhMThlV0dUQVYxVGJQYUpqN0d3akpDWDhZMXZC?=
+ =?utf-8?B?V2pGdmxsL0xEZ2Q0aWhtNDZpM3hrTDQ1RUZTYzM3T3FkZHkrUjEzMXF4ODNy?=
+ =?utf-8?B?M2pSSndtWWZrR0hFZk96Yks4K0VlZE5vL0RiRWh6SHhGZWJUL2E1UXp5Y0l5?=
+ =?utf-8?B?VWxSaWZJYmgraFQ3bTVpUytlc3h0VFJ5bzJwZVpEMGlsZHhvcjVQR21hbU9N?=
+ =?utf-8?B?THdXRExuNS9LeW00V09xK3VFdmVPTWhzdmV0d3I4MG9PM0NoNnNtUE53Z0Zz?=
+ =?utf-8?B?L3RERllDQWtZbEloQ1BtVnYva0pCV005Q0xzaDJkc0lwTFZnSUdmYzdwTXA5?=
+ =?utf-8?B?T2cxZ09hV21PVTluUTV5dDZsZEtzZzRWRzNwQVlVeWdBbU9WOGRLdWU4ZXk0?=
+ =?utf-8?B?UjVpb0VuN1F0eFNNTVNvYlVWeWpQTVNoZ3FLZHpKdDJmTFlFWUtqdFEzVFhq?=
+ =?utf-8?B?S3licHBVN2RENUwrV0RRcCtmSzhta05GdE53c0J0OHZrd3ZaNXNidUtyRG5L?=
+ =?utf-8?B?M0ZiWWlNNHNIZnRTK1pURm1LYlk4ZlQxWC9sRzVkaG5yM0dxeU15QT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 362d61d5-afdc-4cdb-c7bd-08da5070772c
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6323.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2022 14:48:39.6246
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dsp92lo8xCwdZKlVKTNxx0ACOZxbKU3Zn+OqspznppM9OX7X5OO6RGOZbAnT9A3cFSrLNV3qp9VH99YiqusWAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1879
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Jun 2022 08:50:00 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-> > -----Original Message-----
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: 17 June 2022 00:01
-> > To: Yishai Hadas <yishaih@nvidia.com>
-> > Cc: Tian, Kevin <kevin.tian@intel.com>; maorg@nvidia.com;
-> > cohuck@redhat.com; Shameerali Kolothum Thodi
-> > <shameerali.kolothum.thodi@huawei.com>; liulongfang
-> > <liulongfang@huawei.com>; kvm@vger.kernel.org; jgg@nvidia.com
-> > Subject: Re: [PATCH vfio 2/2] vfio: Split migration ops from main devic=
-e ops
-> >=20
-> > On Thu, 16 Jun 2022 17:18:16 +0300
-> > Yishai Hadas <yishaih@nvidia.com> wrote:
-> >  =20
-> > > On 13/06/2022 10:13, Yishai Hadas wrote: =20
-> > > > On 10/06/2022 6:32, Tian, Kevin wrote: =20
-> > > >>> From: Yishai Hadas <yishaih@nvidia.com>
-> > > >>> Sent: Monday, June 6, 2022 4:56 PM
-> > > >>>
-> > > >>> vfio core checks whether the driver sets some migration op (e.g.
-> > > >>> set_state/get_state) and accordingly calls its op.
-> > > >>>
-> > > >>> However, currently mlx5 driver sets the above ops without regards=
- to
-> > > >>> its
-> > > >>> migration caps.
-> > > >>>
-> > > >>> This might lead to unexpected usage/Oops if user space may call t=
-o the
-> > > >>> above ops even if the driver doesn't support migration. As for ex=
-ample,
-> > > >>> the migration state_mutex is not initialized in that case.
-> > > >>>
-> > > >>> The cleanest way to manage that seems to split the migration ops =
-from
-> > > >>> the main device ops, this will let the driver setting them separa=
-tely
-> > > >>> from the main ops when it's applicable.
-> > > >>>
-> > > >>> As part of that, changed HISI driver to match this scheme.
-> > > >>>
-> > > >>> This scheme may enable down the road to come with some extra =20
-> > group of =20
-> > > >>> ops (e.g. DMA log) that can be set without regards to the other o=
-ptions
-> > > >>> based on driver caps.
-> > > >>>
-> > > >>> Fixes: 6fadb021266d ("vfio/mlx5: Implement vfio_pci driver for ml=
-x5
-> > > >>> devices")
-> > > >>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com> =20
-> > > >> Reviewed-by: Kevin Tian <kevin.tian@intel.com>, with one nit: =20
-> > > >
-> > > > Thanks Kevin, please see below.
-> > > > =20
-> > > >> =20
-> > > >>> @@ -1534,8 +1534,8 @@ =20
-> > vfio_ioctl_device_feature_mig_device_state(struct =20
-> > > >>> vfio_device *device,
-> > > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct file *filp =3D NULL;
-> > > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
-> > > >>>
-> > > >>> -=C2=A0=C2=A0=C2=A0 if (!device->ops->migration_set_state ||
-> > > >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !device->ops->migrati=
-on_get_state)
-> > > >>> +=C2=A0=C2=A0=C2=A0 if (!device->mig_ops->migration_set_state ||
-> > > >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !device->mig_ops->mig=
-ration_get_state)
-> > > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EN=
-OTTY; =20
-> > > >> ...
-> > > >> =20
-> > > >>> @@ -1582,8 +1583,8 @@ static int
-> > > >>> vfio_ioctl_device_feature_migration(struct vfio_device *device,
-> > > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
-> > > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
-> > > >>>
-> > > >>> -=C2=A0=C2=A0=C2=A0 if (!device->ops->migration_set_state ||
-> > > >>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !device->ops->migrati=
-on_get_state)
-> > > >>> +=C2=A0=C2=A0=C2=A0 if (!device->mig_ops->migration_set_state ||
-> > > >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !device->mig_ops->mig=
-ration_get_state)
-> > > >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EN=
-OTTY;
-> > > >>> =20
-> > > >> Above checks can be done once when the device is registered then
-> > > >> here replaced with a single check on device->mig_ops.
-> > > >> =20
-> > > > I agree, it may look as of below.
-> > > >
-> > > > Theoretically, this could be done even before this patch upon device
-> > > > registration.
-> > > >
-> > > > We could check that both 'ops' were set and *not* only one of and
-> > > > later check for the specific 'op' upon the feature request.
-> > > >
-> > > > Alex,
-> > > >
-> > > > Do you prefer to switch to the below as part of V2 or stay as of
-> > > > current submission and I'll just add Kevin as Reviewed-by ?
-> > > >
-> > > > diff --git a/drivers/vfio/pci/vfio_pci_core.c
-> > > > b/drivers/vfio/pci/vfio_pci_core.c
-> > > > index a0d69ddaf90d..f42102a03851 100644
-> > > > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > > > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > > > @@ -1855,6 +1855,11 @@ int vfio_pci_core_register_device(struct
-> > > > vfio_pci_core_device *vdev)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (pdev->hdr_type !=3D =
-PCI_HEADER_TYPE_NORMAL)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
-> > > >
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (vdev->vdev.mig_ops &&
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !(vdev->vde=
-v.mig_ops->migration_get_state &&
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- vdev->vdev.mig_ops->migration_get_state))
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 return -EINVAL;
-> > > > +
-> > > >
-> > > > Yishai
-> > > > =20
-> > > Hi Alex,
-> > >
-> > > Did you have the chance to review the above note ?
-> > >
-> > > I would like to send V2 with Kevin's Reviewed-by tag for both patches,
-> > > just wonder about the nit. =20
-> >=20
-> > The whole mig_ops handling seems rather ad-hoc to me.  What tells a
-> > developer when mig_ops can be set?  Can they be unset?  Does this
-> > enable a device feature callout to dynamically enable migration?  Why do
-> > we init the device with vfio_device_ops, but then open code per driver
-> > setting vfio_migration_ops?
-> >=20
-> > For the hisi_acc changes, they're specifically defining two device_ops,
-> > one for migration and one without migration.  This patch oddly makes
-> > them identical other than the name and doesn't simplify the setup path,
-> > which should now only require a single call point for init-device with
-> > the proposed API rather than the existing three. =20
->=20
-> I think one of the reasons we ended up using two diff ops were to restrict
-> exposing the migration BAR regions to Guest(and for that we only expose
-> half of the BAR region now). And for nested assignments this may result
-> in invalid BAR sizes if we do it for no migration cases. Hence we have
-> overrides for read/write/mmap/ioctl functions in hisi_acc_vfio_pci_migrn_=
-ops .
 
-Darn, I always forget about that and skimmed too quickly, the close,
-read, write, and mmap callbacks are all different.  Sorry about that.
+On 6/17/2022 8:15 PM, Shukla, Santosh wrote:
+> 
+> 
+> On 6/7/2022 6:37 PM, Maxim Levitsky wrote:
+>> On Thu, 2022-06-02 at 19:56 +0530, Santosh Shukla wrote:
+>>> VMCB intr_ctrl bit12 (V_NMI_MASK) is set by the processor when handling
+>>> NMI in guest and is cleared after the NMI is handled. Treat V_NMI_MASK as
+>>> read-only in the hypervisor and do not populate set accessors.
+>>>
+>>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+>>> ---
+>>>  arch/x86/kvm/svm/svm.c | 20 +++++++++++++++++++-
+>>>  1 file changed, 19 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>>> index 860f28c668bd..d67a54517d95 100644
+>>> --- a/arch/x86/kvm/svm/svm.c
+>>> +++ b/arch/x86/kvm/svm/svm.c
+>>> @@ -323,6 +323,16 @@ static int is_external_interrupt(u32 info)
+>>>         return info == (SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_INTR);
+>>>  }
+>>>  
+>>> +static bool is_vnmi_enabled(struct vmcb *vmcb)
+>>> +{
+>>> +       return vnmi && (vmcb->control.int_ctl & V_NMI_ENABLE);
+>>> +}
+>>
+>> Following Paolo's suggestion I recently removed vgif_enabled(),
+>> based on the logic that vgif_enabled == vgif, because
+>> we always enable vGIF for L1 as long as 'vgif' module param is set,
+>> which is set unless either hardware or user cleared it.
+>>
+> Yes. In v2, Thanks!.
+> 
+>> Note that here vmcb is the current vmcb, which can be vmcb02,
+>> and it might be wrong
+>>
+>>> +
+>>> +static bool is_vnmi_mask_set(struct vmcb *vmcb)
+>>> +{
+>>> +       return !!(vmcb->control.int_ctl & V_NMI_MASK);
+>>> +}
+>>> +
+>>>  static u32 svm_get_interrupt_shadow(struct kvm_vcpu *vcpu)
+>>>  {
+>>>         struct vcpu_svm *svm = to_svm(vcpu);
+>>> @@ -3502,13 +3512,21 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+>>>  
+>>>  static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
+>>>  {
+>>> -       return !!(vcpu->arch.hflags & HF_NMI_MASK);
+>>> +       struct vcpu_svm *svm = to_svm(vcpu);
+>>> +
+>>> +       if (is_vnmi_enabled(svm->vmcb))
+>>> +               return is_vnmi_mask_set(svm->vmcb);
+>>> +       else
+>>> +               return !!(vcpu->arch.hflags & HF_NMI_MASK);
+>>>  }
+>>>  
+>>>  static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+>>>  {
+>>>         struct vcpu_svm *svm = to_svm(vcpu);
+>>>  
+>>> +       if (is_vnmi_enabled(svm->vmcb))
+>>> +               return;
+>>
+>> What if the KVM wants to mask NMI, shoudn't we update the 
+>> V_NMI_MASK value in int_ctl instead of doing nothing?
+>>
 
-> If we have to simplify the setup path, I guess we retain only the _migrn_=
-ops and
-> add explicit checks for migration support in the above override functions=
-. =20
+V_NMI_MASK is cpu controlled meaning HW sets the mask while processing
+event and clears right after processing, so in away its Read-only for hypervisor.
 
-Yes, that's an option and none of those callbacks should be terribly
-performance sensitive to an inline test, it's just a matter of where we
-want to simplify the code.  Given the additional differences in
-callbacks I'm not necessarily suggesting this is something we need to
-change.
-
-> > If we remove the migration callbacks from vfio_device_ops, there's also
-> > an opportunity that we can fix the vfio_device_ops.name handling in
-> > hisi_acc, where the only current user of this is to set the driver
-> > override for spawned VFs from a vfio owned PF.  This is probably
-> > irrelevant for this driver, but clearly we have an expectation there
-> > that name is the name of the module providing the ops and we have no
-> > module named hisi-acc-vfio-pci-migration.  Thanks,
-> >  =20
->=20
-> Since the driver is mainly to provide migration support, I am just thinki=
-ng
-> whether it make sense to return failure in probe() if migration cannot be
-> supported and then if user wishes can bind to the generic vfio-pci driver
-> instead.
-
-That might be asking too much for userspace.  We're conveying to
-userspace via the modinfo alias information which vfio-pci variant to
-use for the device, but then to have the driver reject the device and
-expect userspace to move to the next match seems like a lot to ask.  It
-doesn't seem wrong for a driver to have multiple vfio_device_ops, but
-we might need to think more about the purpose of the name field, if the
-use of it for capturing VFs is valid, or if we'd rather have some sort
-of explicit capture driver provided by the ops.  Thanks,
-
-Alex
-
+>> Best regards,
+>> 	Maxim Levitsky
+>>
+>>
+>>> +
+>>>         if (masked) {
+>>>                 vcpu->arch.hflags |= HF_NMI_MASK;
+>>>                 if (!sev_es_guest(vcpu->kvm))
+>>
+>>
