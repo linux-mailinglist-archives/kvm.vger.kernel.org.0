@@ -2,97 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6172D54F6D7
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 13:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E6E554F8B9
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 15:59:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381819AbiFQLjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 07:39:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37584 "EHLO
+        id S1382258AbiFQN6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 09:58:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380126AbiFQLjI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 07:39:08 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDDF5A0A9;
-        Fri, 17 Jun 2022 04:39:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=KiwPkQU7A4VOjqjjcy7oDsNGb93k5UOyD9PqekH8rm0=; b=oDvQbGklpawwNO9iOP5fXHlrm3
-        34uucaw/4esCO4fl21ya2Dq9mNmiC4V3UKcuoXql1MONITTIeTX+wRB2iKgFIXxpwclOMfn/pMbJY
-        eCvQ6UyEpARjvl4srHQ08QJCHJpgmwJaPfVULStZ8TD/83nttAf47cJiq6vQhBQrc7yVEfEprcYl4
-        TgnLldr/DvuZphqprj7rydmoqJ+olXTKW7z/Y9SYXl6OjMpVymOIksPkL/23NaF8f8jb1Cldbdj0r
-        pelIpgv7Rpn2uZlNrjJP1EfXuIq9yu0W6DB1z1ZJaz8CeA7VA64cHng1mg4MlOVkx5jo2nPMPNP8k
-        CVlN2ygw==;
-Received: from dhcp-077-249-017-003.chello.nl ([77.249.17.3] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o2AJG-002nYp-SK; Fri, 17 Jun 2022 11:38:43 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 2F7599816B5; Fri, 17 Jun 2022 13:38:41 +0200 (CEST)
-Date:   Fri, 17 Jun 2022 13:38:41 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc:     "Yang, Weijiang" <weijiang.yang@intel.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yu, Yu-cheng" <yu-cheng.yu@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 03/19] x86/cpufeatures: Enable CET CR4 bit for shadow
- stack
-Message-ID: <YqxnwRn+/c+i1vL6@worktop.programming.kicks-ass.net>
-References: <20220616084643.19564-1-weijiang.yang@intel.com>
- <20220616084643.19564-4-weijiang.yang@intel.com>
- <YqsEyoaxPFpZcolP@hirez.programming.kicks-ass.net>
- <ca4e04f2dcc33849ebb9bf128f6ff632b5ffe747.camel@intel.com>
+        with ESMTP id S1382527AbiFQN6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 09:58:13 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D324037028
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 06:58:10 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id e25so2018865wrc.13
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 06:58:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=pSKuz9BJS/Qwel4yBJUKsJP++c1z8gtIosTtEbMtN5I=;
+        b=Nkib7oMmCnLiHqUdMqxjpQ8LJgaJhkMeRRj16nq3osMcqcOENZPc5s7JoYezdOZfbz
+         h0J2dODBA8n6UfVVa/V4JgDoGaNBQSBtGuzzeP1wdu0BZLy8jWSvJ58I5guxfpCWT6qT
+         /IuDf/a/7Sr5Wklc6XKgv5HS8EW8op1bltj4nlahlUy5/YR4BKq56cNE4OlXucDB+be0
+         6IimMnuG+oqsTdHf/9d037m3xAHi1zk/UgzKjVO+oaaNL5MSKTfJBkW1UtPqb61XJ9sN
+         V8mV8TABBeJn5FpMqZGoat073qoz2u8v7QCGVJxM14UKfWGWfHGBAc0kDK8VQ0kQ6PEF
+         S6Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=pSKuz9BJS/Qwel4yBJUKsJP++c1z8gtIosTtEbMtN5I=;
+        b=i1aC5pUiW4te1tCY8o8AQzuXrxTL1HqNEXfOaKhNhaPNgJ/bma/ey4K9y+29qLKbC6
+         HSkrGia7KKQfz+hb0YdOdofCfG5zR4vaMGenclmdkNM/Toh1SnTebGyJcsdhejnrnyn2
+         mNziF15iSZgUviVz0eLv9yD/ugVAhNEsrToDM0fz7bboqDBXMtloLynFqE0hZX9VUs5i
+         WQPPBMWpVE7NiuLvrPzuFkPK4E7wXbhxdSoieMLkduEiHlnOvTGJaIpri49Q8YqutSr7
+         3fpEg6DWODI890g35uGCKn6A9525KiLIbh04ComouWRYYAKPhFGx/NvmN7Za8cemnHNZ
+         9bjg==
+X-Gm-Message-State: AJIora9EwoL5tStrnoJk2h8dYrEVX/HPxFBvMaagb8zsrz5jXCXXIQNM
+        fzIC6B4TDEE7C7eQhsIbQMujhjwcfscRk9sj6fQ=
+X-Google-Smtp-Source: AGRyM1u8uC3qAnkEb4sE+njImP16K59XFmnqh9kUDK2yYguQ/PMTk9GHp7IAy3yZREgGDKQ7RBcxsjgvZGEowpbRpVg=
+X-Received: by 2002:a05:6000:a13:b0:21a:3d94:c7aa with SMTP id
+ co19-20020a0560000a1300b0021a3d94c7aamr4197582wrb.12.1655474289242; Fri, 17
+ Jun 2022 06:58:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca4e04f2dcc33849ebb9bf128f6ff632b5ffe747.camel@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Received: by 2002:a05:6000:156b:0:0:0:0 with HTTP; Fri, 17 Jun 2022 06:58:08
+ -0700 (PDT)
+Reply-To: davidnelson7702626@gmail.com
+From:   dedi mark <dedi788877@gmail.com>
+Date:   Fri, 17 Jun 2022 14:58:08 +0100
+Message-ID: <CAF3O_y2ck6CkA2t1BAEQCKBEseSEv8RepWL3KQFgLzfvw3oWzg@mail.gmail.com>
+Subject: 
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=4.3 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 16, 2022 at 05:12:47PM +0000, Edgecombe, Rick P wrote:
-> On Thu, 2022-06-16 at 12:24 +0200, Peter Zijlstra wrote:
-> > On Thu, Jun 16, 2022 at 04:46:27AM -0400, Yang Weijiang wrote:
-> > > --- a/arch/x86/include/asm/cpu.h
-> > > +++ b/arch/x86/include/asm/cpu.h
-> > > @@ -74,7 +74,7 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c);
-> > >   static inline void init_ia32_feat_ctl(struct cpuinfo_x86 *c) {}
-> > >   #endif
-> > >   
-> > > -extern __noendbr void cet_disable(void);
-> > > +extern __noendbr void ibt_disable(void);
-> > >   
-> > >   struct ucode_cpu_info;
-> > >   
-> > > diff --git a/arch/x86/kernel/cpu/common.c
-> > > b/arch/x86/kernel/cpu/common.c
-> > > index c296cb1c0113..86102a8d451e 100644
-> > > --- a/arch/x86/kernel/cpu/common.c
-> > > +++ b/arch/x86/kernel/cpu/common.c
-> > > @@ -598,23 +598,23 @@ __noendbr void ibt_restore(u64 save)
-> > >   
-> > > -__noendbr void cet_disable(void)
-> > > +__noendbr void ibt_disable(void)
-> > >   {
-> > >        if (cpu_feature_enabled(X86_FEATURE_IBT))
-> > >                wrmsrl(MSR_IA32_S_CET, 0);
-> > 
-> > Not sure about this rename; it really disables all of (S) CET.
-> > 
-> > Specifically, once we do S-SHSTK (after FRED) we might also very much
-> > need to kill that for kexec.
-> 
-> Sure, what about something like sup_cet_disable()?
-
-Why bother? Arguably kexec should clear U_CET too.
+Hello friend, I want to send money to you to enable me invest in your
+country get back to me if you are interested.
