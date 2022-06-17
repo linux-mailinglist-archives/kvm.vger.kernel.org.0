@@ -2,156 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EAA754EEAE
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 03:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49F2C54EEB5
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 03:20:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379463AbiFQBPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jun 2022 21:15:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44774 "EHLO
+        id S229445AbiFQBUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jun 2022 21:20:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379468AbiFQBPg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jun 2022 21:15:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 34D3262106
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 18:15:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655428534;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qj6jImPewXvPaBqVDCu6KZmly2mSua8Ga/tEmjDhDBg=;
-        b=L/X8cVsyM/uwQn3/aEL5dbDB3t1xZsFjM/jQlTUHWehC3mctC9H5cT4En8Zt9Vdg0QB5Ua
-        jPrp0f/kFJkNDMcd78vK7neTqSNikwZIxI8y8vb2TbcZDqiqNPNN4MHpiOyJ/u/h1jZb2H
-        itm7rSXKrq9MKoh9nefBImT0W7/pF1Q=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-154-jYuiLBpyMQ6t-4Cm949OTQ-1; Thu, 16 Jun 2022 21:15:32 -0400
-X-MC-Unique: jYuiLBpyMQ6t-4Cm949OTQ-1
-Received: by mail-lf1-f70.google.com with SMTP id j3-20020a05651231c300b0047dbea7b031so1546847lfe.19
-        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 18:15:32 -0700 (PDT)
+        with ESMTP id S230016AbiFQBUE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jun 2022 21:20:04 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4F1F6213F
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 18:20:01 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id f16so1780744pjj.1
+        for <kvm@vger.kernel.org>; Thu, 16 Jun 2022 18:20:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Y2sVZsV4hLehRdszdnSTiRASTciGWgNQoaJ3cAo1Ors=;
+        b=VgqagXTj5gYeuGBOqkJi0z+m2/qgp8DtTjsHnD2H1fdiPe5a+h53X5IDLvvGxTBb+7
+         z/UhozWkKJxpm01YkMrl/83qvJJ9oU8HdBLSXena+tlqm9MoE7str7TPBo0C1Z8s0VHJ
+         y/h551EQ8Chsrrp4wWtojUaTTtVzpYEnubqp4tjud7imeGs+BTP0jekJFZF8svXgWkGD
+         9o6+Y1D8Z67aWQyixlKShCPbYHJmKoumWI+AIz1ZcA8JTK+mJy8aoa9CA7gV9Ezc+v6z
+         ipERzAumHZgNczr5HXDrRC5qr2dYG2gAbZ/0wCuSCkkOs/QzdoWPiEafUR1/rX2ELPgj
+         AiGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=qj6jImPewXvPaBqVDCu6KZmly2mSua8Ga/tEmjDhDBg=;
-        b=sFk9Jyv6WtKQSXkVxZg5mrbJmm57RSRyOE00dX8BCWKPONlymiyBIbxqMDefhsK/Mo
-         rjD6qghOMwSX+rN7AcvYszBxWk5VKzBFsj+5KhrjAXS8N5npcG66PBe1K7X+uzr82wo0
-         V2PaloxWxrXJX1+B5ovMkCThzbMgOKRPw1XNYX5xAhczHv41URmhVlq/PODIgnHrh2uc
-         KN6l9mNRnhdAO95SbsEnk1i68uNHSyV/VzE/KFSfoMCYL+iMc/xPg3OTrfthEsyU1zni
-         T+TW8mRc2v6/h03g7RRuzmaLDIpQP63YiRsajH7nlepsxS0IMK1nss0X88uMB2mxAVZe
-         JHqw==
-X-Gm-Message-State: AJIora+Ms+MvnPwow4j6BR1nFuO+mhuicYoPmZAOrkeqCCkIqtcv6dXf
-        2Z5WBQTvzbtBKKeSPl28rf9m46Of37oyYz/rbbB+VnIQ5WHtyMe+xA/yDwUS5C28d8Rut2i3Sa1
-        T0DuyhwXv2OOyIUE9byGRcn0cvF04
-X-Received: by 2002:a05:6512:a8f:b0:479:63e5:d59f with SMTP id m15-20020a0565120a8f00b0047963e5d59fmr4266515lfu.124.1655428531141;
-        Thu, 16 Jun 2022 18:15:31 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tVLEwZlQ5b3n2hD9EvzjMdrwv7jEBRqw/ihfRAuZxBUVL8mY4ADtDpm6/g+7FS+TtENdDl8nkcM5M830HVPM4=
-X-Received: by 2002:a05:6512:a8f:b0:479:63e5:d59f with SMTP id
- m15-20020a0565120a8f00b0047963e5d59fmr4266484lfu.124.1655428530874; Thu, 16
- Jun 2022 18:15:30 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Y2sVZsV4hLehRdszdnSTiRASTciGWgNQoaJ3cAo1Ors=;
+        b=LV9WmPaBYzpvruUAwtiFuRI5SQuDfizbZEUXIVm4M3CccPV1/P+bdrKrlzA3YERFkC
+         U9b11PRMnyd/R4vuzFXJ0rrSqmReG17eK1AZk+Lj2BEFIiMuU7tiLYbZn07rJv5bLszj
+         vbXW0+/WU7dquEPXvJUwum2dVROoC92Ca6uyZB9b8+KHdMX/5MfrqoVqfMFg2tsQ/ivb
+         nW+4G72McBhC5rNJZV4/OKeOxCam30PAHZodV0nJqGgOpBXPrlK4p30iF+FL4C29XfC8
+         Z5VBKXbKOhdIxX3PBx/o9eawYddtbMJVyqSuf9Z93fV4WQGluW9YjfhX1opBDi2acF7D
+         XzTw==
+X-Gm-Message-State: AJIora+GzFo4B3J11sL2+L/Di6UKc/W0YQ6K5AX2bJvHpv0NCd7Opyeo
+        DDUGZV3d0n6gPEQunB7llDqrGQ==
+X-Google-Smtp-Source: AGRyM1tvkgciSGisoF7rebBN+b2h+lQqZ1NtBxEPIyWm8m8y2GMhDR1d4VVJ7J0JBRwGdIbf805KEg==
+X-Received: by 2002:a17:90b:3a90:b0:1e6:a203:c7dd with SMTP id om16-20020a17090b3a9000b001e6a203c7ddmr19135466pjb.144.1655428800798;
+        Thu, 16 Jun 2022 18:20:00 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id iq11-20020a17090afb4b00b001e31fea8c85sm1948836pjb.14.2022.06.16.18.20.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jun 2022 18:20:00 -0700 (PDT)
+Date:   Fri, 17 Jun 2022 01:19:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        maciej.szmigiero@oracle.com,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Subject: Re: [PATCH v6 04/22] KVM: x86/mmu: Derive shadow MMU page role from
+ parent
+Message-ID: <YqvWvBv27fYzOFdE@google.com>
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-5-dmatlack@google.com>
 MIME-Version: 1.0
-References: <20220526124338.36247-1-eperezma@redhat.com> <PH0PR12MB54819C6C6DAF6572AEADC1AEDCD99@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20220527065442-mutt-send-email-mst@kernel.org> <CACGkMEubfv_OJOsJ_ROgei41Qx4mPO0Xz8rMVnO8aPFiEqr8rA@mail.gmail.com>
- <PH0PR12MB5481695930E7548BAAF1B0D9DCDC9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEsSKF_MyLgFdzVROptS3PCcp1y865znLWgnzq9L7CpFVQ@mail.gmail.com>
- <PH0PR12MB5481CAA3F57892FF7F05B004DCDF9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEsJJL34iUYQMxHguOV2cQ7rts+hRG5Gp3XKCGuqNdnNQg@mail.gmail.com>
- <PH0PR12MB5481D099A324C91DAF01259BDCDE9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEueG76L8H+F70D=T5kjK_+J68ARNQmQQo51rq3CfcOdRA@mail.gmail.com>
- <PH0PR12MB5481994AF05D3B4999EC1F0EDCAD9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEtRTyymit=Zmwwcq0jNan-_C9p70vcLP0g7XmwQiOjUbw@mail.gmail.com> <PH0PR12MB548104990A5544C738A5A95BDCAC9@PH0PR12MB5481.namprd12.prod.outlook.com>
-In-Reply-To: <PH0PR12MB548104990A5544C738A5A95BDCAC9@PH0PR12MB5481.namprd12.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 17 Jun 2022 09:15:19 +0800
-Message-ID: <CACGkMEtytpnCdWdmSh-BuFGXt55DJ9dYxnbw7JQwMXi9bQ8fvQ@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Implement vdpasim stop operation
-To:     Parav Pandit <parav@nvidia.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "martinh@xilinx.com" <martinh@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "martinpo@xilinx.com" <martinpo@xilinx.com>,
-        "lvivier@redhat.com" <lvivier@redhat.com>,
-        "pabloc@xilinx.com" <pabloc@xilinx.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        "Piotr.Uminski@intel.com" <Piotr.Uminski@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-        "gautam.dawar@amd.com" <gautam.dawar@amd.com>,
-        "habetsm.xilinx@gmail.com" <habetsm.xilinx@gmail.com>,
-        "tanuj.kamde@amd.com" <tanuj.kamde@amd.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "dinang@xilinx.com" <dinang@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220516232138.1783324-5-dmatlack@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 17, 2022 at 3:36 AM Parav Pandit <parav@nvidia.com> wrote:
->
->
-> > From: Jason Wang <jasowang@redhat.com>
-> > Sent: Tuesday, June 14, 2022 9:29 PM
-> >
-> > Well, it's an example of how vDPA is implemented. I think we agree that=
- for
-> > vDPA, vendors have the flexibility to implement their perferrable datap=
-ath.
-> >
-> Yes for the vdpa level and for the virtio level.
->
-> > >
-> > > I remember few months back, you acked in the weekly meeting that TC h=
-as
-> > approved the AQ direction.
-> > > And we are still in this circle of debating the AQ.
-> >
-> > I think not. Just to make sure we are on the same page, the proposal he=
-re is
-> > for vDPA, and hope it can provide forward compatibility to virtio. So i=
-n the
-> > context of vDPA, admin virtqueue is not a must.
-> In context of vdpa over virtio, an efficient transport interface is neede=
-d.
-> If AQ is not much any other interface such as hundreds to thousands of re=
-gisters is not must either.
->
-> AQ is one interface proposed with multiple benefits.
-> I haven=E2=80=99t seen any other alternatives that delivers all the benef=
-its.
-> Only one I have seen is synchronous config registers.
->
-> If you let vendors progress, handful of sensible interfaces can exist, ea=
-ch with different characteristics.
-> How would we proceed from here?
+On Mon, May 16, 2022, David Matlack wrote:
+> Instead of computing the shadow page role from scratch for every new
+> page, derive most of the information from the parent shadow page.  This
+> eliminates the dependency on the vCPU root role to allocate shadow page
+> tables, and reduces the number of parameters to kvm_mmu_get_page().
+> 
+> Preemptively split out the role calculation to a separate function for
+> use in a following commit.
+> 
+> Note that when calculating the MMU root role, we can take
+> @role.passthrough, @role.direct, and @role.access directly from
+> @vcpu->arch.mmu->root_role. Only @role.level and @role.quadrant still
+> must be overridden for PAE page directories.
 
-I'm pretty fine with having admin virtqueue in the virtio spec. If you
-remember, I've even submitted a proposal to use admin virtqueue as a
-transport last year.
+Nit, instead of "for PAE page directories", something like "when shadowing 32-bit
+guest page tables with PAE page tables".  Not all PAE PDEs need to be overridden.
 
-Let's just proceed in the virtio-dev list.
+> No functional change intended.
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c         | 98 +++++++++++++++++++++++-----------
+>  arch/x86/kvm/mmu/paging_tmpl.h |  9 ++--
+>  2 files changed, 71 insertions(+), 36 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index a9d28bcabcbb..515e0b33144a 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
 
-Thanks
+...
 
+> -	if (level <= vcpu->arch.mmu->cpu_role.base.level)
+> -		role.passthrough = 0;
+> -
+>  	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+>  	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
+>  		if (sp->gfn != gfn) {
+
+...
+
+> +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
+> +{
+> +	struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
+> +	union kvm_mmu_page_role role;
+> +
+> +	role = parent_sp->role;
+> +	role.level--;
+> +	role.access = access;
+> +	role.direct = direct;
+> +	role.passthrough = 0;
+
+I don't love that this subtly relies on passthrough being limited to 5-level nNPT
+with 4-level L1 NPT.  That's really just an implementation oddity, e.g. KVM can
+and (hopefully) will eventually use passthrough pages for at least level=4 when
+shadowing 3-level or 2-level NPT.
+
+The easiest thing would be to add a WARN so that we don't forget to handle this
+when this collides with Lai's series, and to document why KVM never sets "passthrough"
+for child shadow pages.  The latter is especially confusing because it does have
+other passthrough pages, they just don't happen to have an associated "struct kvm_mmu_page".
+
+	/*
+	 * KVM currently doesn't use "struct kvm_mmu_page" to track passthrough
+	 * pages when the guest is using 3-level or 2-level NPT, and instead
+	 * uses bare page allocations (see pml4/5_root and pae_root).  The only
+	 * scenario where KVM uses a passthrough "struct kvm_mmu_page" is when
+	 * shadowing 4-level NPT with 5-level nNPT.  So even though passthrough
+	 * child pages do exist, such pages aren't tracked in the list of shadow
+	 * pages and so don't need to compute a role.
+	 */
+	WARN_ON_ONCE(role.passthrough && role.level != PT64_ROOT_4LEVEL);
+	role.passthrough = 0;
+
+> +
+> +	/*
+> +	 * If the guest has 4-byte PTEs then that means it's using 32-bit,
+> +	 * 2-level, non-PAE paging. KVM shadows such guests with PAE paging
+> +	 * (i.e. 8-byte PTEs). The difference in PTE size means that KVM must
+> +	 * shadow each guest page table with multiple shadow page tables, which
+> +	 * requires extra bookkeeping in the role.
+> +	 *
+> +	 * Specifically, to shadow the guest's page directory (which covers a
+> +	 * 4GiB address space), KVM uses 4 PAE page directories, each mapping
+
+Nit, it's worth explicitly saying "virtual address space" at least once.
+
+> +	 * 1GiB of the address space. @role.quadrant encodes which quarter of
+> +	 * the address space each maps.
+> +	 *
+> +	 * To shadow the guest's page tables (which each map a 4MiB region), KVM
+> +	 * uses 2 PAE page tables, each mapping a 2MiB region. For these,
+> +	 * @role.quadrant encodes which half of the region they map.
+
+Oof, so I really like this comment because it simplifies the concept, but it glosses
+over one very crucial detail.  The 32-bit GPTE consumes bits 21:12, and the 64-bit PTE
+consumes bits 20:12.  So while it's absolutely correct to state the the quadrant
+encodes which half, bit 21 is consumed when doing a lookup in the _parent_, which
+is the _least_ significant bit in when indexing PDEs, hence the quadrant essentially
+becomes evens and odds.  Specifically, it does NOT split the parent PD down the middle.
+
+Paolo's more concrete comment about bits helps a map things out explicit.  Paolo is
+going to snag the above, so for your looming rebase, how about replacing the paragraph
+below with a version of Paolo's concrete example to pair with your abstract definition?
+
+	 *
+	 * Concretely, a 4-byte PDE consumes bits 31:22, while an 8-byte PDE
+	 * consumes bits 29:21.  To consume bits 31:30, KVM's uses 4 shadow
+	 * PDPTEs; those 4 PAE page directories are pre-allocated and their
+	 * quadrant is assigned in mmu_alloc_root().  To consume bit 21, KVM
+	 * uses an additional PDE in every PD; the page table being configured
+	 * here is what's pointed at by the PDE.  Thus, bit 21 is the _least_
+	 * significant bit of the PDE index pointing at the shadow PT.
+	 */
+
+[*] https://lore.kernel.org/all/090e701d-6893-ea25-1237-233ff3dd01ee@redhat.com
+
+> +	 *
+> +	 * Note, the 4 PAE page directories are pre-allocated and the quadrant
+> +	 * assigned in mmu_alloc_root(). So only page tables need to be handled
+> +	 * here.
+> +	 */
+> +	if (role.has_4_byte_gpte) {
+> +		WARN_ON_ONCE(role.level != PG_LEVEL_4K);
+> +		role.quadrant = (sptep - parent_sp->spt) % 2;
+
+Oh hell no.  LOL.  It took me a _long_ time to realize you're doing pointer arithmetic
+on "u64 *".  I actually booted a 32-bit VM with printks and even then it still took
+me a good 20 seconds wondering if I was having a brain fart and simply forgot how mod
+works.
+
+The calculation is also unnecessarily costly; not that anyone is likely to notice,
+but still.  The compiler doesn't know that sptep and parent_sp->spt are intertwined
+and so can't optimize, i.e. is forced to do the subtraction.
+
+A more efficient equivalent that doesn't require pointer arithmetic:
+
+	role.quadrant = ((unsigned long)sptep / sizeof(*sptep)) & 1;
