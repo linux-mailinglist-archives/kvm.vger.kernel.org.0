@@ -2,140 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 952F654F3C5
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 11:02:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FE4554F42A
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 11:22:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235131AbiFQJC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 05:02:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48368 "EHLO
+        id S1381066AbiFQJWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 05:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232062AbiFQJCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 05:02:25 -0400
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA48393CD;
-        Fri, 17 Jun 2022 02:02:22 -0700 (PDT)
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id EBA0379E; Fri, 17 Jun 2022 11:02:19 +0200 (CEST)
-Date:   Fri, 17 Jun 2022 11:02:14 +0200
-From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>
-To:     linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-pci@vger.kernel.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Arnd Bergmann <arnd@kernel.org>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Baolu Lu <baolu.lu@linux.intel.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vasant Hegde <vasant.hegde@amd.com>,
-        Will Deacon <will@kernel.org>
-Subject: [CFP LPC 2022] VFIO/IOMMU/PCI Microconference
-Message-ID: <YqxDFkAFdLjqnW8O@8bytes.org>
+        with ESMTP id S235187AbiFQJWV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 05:22:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 249FD5D5EB
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 02:22:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655457740;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0FjuEQv4Qeb+ua2EzfVRmN0EZRhGaGIjPcxZ3XMGWqQ=;
+        b=RoW4V/2cIjCODXreqwy4XfQmIUUugPlbAckZCowhMmSfkXNhA3ncncd+xlnot2VMxWxsDW
+        F/yOLGjdpGzjb7Z4qh7xt1t3tXbjubD1C/YDe9H0uyOL+RzVhj+CipJ9O9yl8JAWXp4Vm+
+        nwEt0awW4uKWPJrr33+L8i4z9Iw4Dzc=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-90-O68je8eVM8KC3GIKN07eYw-1; Fri, 17 Jun 2022 05:22:17 -0400
+X-MC-Unique: O68je8eVM8KC3GIKN07eYw-1
+Received: by mail-ed1-f71.google.com with SMTP id f9-20020a056402354900b0042ded146259so2935301edd.20
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 02:22:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=0FjuEQv4Qeb+ua2EzfVRmN0EZRhGaGIjPcxZ3XMGWqQ=;
+        b=7dWfF34rsojqt++DlXBiEKB56RR9G6GzOfFqwLNLyCzn3RzdKELFrGXQkPwR84DaoI
+         2M3ccbC/bO72vS36Sn0FoBRCeKoYGzCwSr8g06+vE23gqKio9ERR1gCmgxIK1wBiVQtQ
+         jLMeNMI3XKYweRYlSbuU1fmlErobicl9KsxfhUbYurqS9aeo7NtGYlznq1djkd4xnhOp
+         RVEdvgvdLSJSbwweDJ6SCA8wbcngAb8dThKWkLiRHRFF9He8johx59RUcsbIi2Leaa/X
+         SuodPb2mDIXhqOeKXP4Z54/ZcEuoMgNPh66zBnLTTv1QNCyv5nYF/I9s1yfzg6BIpx9D
+         w/ew==
+X-Gm-Message-State: AJIora+ON7DEqYEYaz44KMqqfJ69h9+5jHs8e7L9xGScbx4iD44wnhSv
+        8r68EU6zDw76zllLZwwSwFpvAM6sEsWf9mdTDr10IuO+EyZHlLbDfzTIeQsRDT5p9Yo9UW+ZaDt
+        AN78pAfmSfzWq
+X-Received: by 2002:a17:907:c202:b0:710:8d1c:2501 with SMTP id ti2-20020a170907c20200b007108d1c2501mr8036298ejc.377.1655457736792;
+        Fri, 17 Jun 2022 02:22:16 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sxScwELvm5Z4jJpyq2068amOUJIbJurQnj8zaZ+VzizUFIGSt842UCMnLfjZlggLVeac5uRA==
+X-Received: by 2002:a17:907:c202:b0:710:8d1c:2501 with SMTP id ti2-20020a170907c20200b007108d1c2501mr8036279ejc.377.1655457736560;
+        Fri, 17 Jun 2022 02:22:16 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id h18-20020a056402281200b0043173ab6728sm3611928ede.7.2022.06.17.02.22.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jun 2022 02:22:13 -0700 (PDT)
+Message-ID: <34e1b920-0a6b-5030-bbd9-6b1816789b8d@redhat.com>
+Date:   Fri, 17 Jun 2022 11:22:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
+Content-Language: en-US
+To:     Andrew Jones <drjones@redhat.com>,
+        David Laight <David.Laight@aculab.com>
+Cc:     "'oliver.upton@linux.dev'" <oliver.upton@linux.dev>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+References: <3e73cb07968d4c92b797781b037c2d45@AcuMS.aculab.com>
+ <20220615185706.1099208-1-rananta@google.com>
+ <20220616120232.ctkekviusrozqpru@gator>
+ <33ca91aeb5254831a88e187ff8d9a2c2@AcuMS.aculab.com>
+ <20220616162557.55bopzfa6glusuh5@gator>
+ <7b1040c48bc9b2986798322c336660ab@linux.dev>
+ <2ec9ecbfb13d422ab6cda355ff011c9f@AcuMS.aculab.com>
+ <20220617072800.cvqb4wmafxdi3knq@gator>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220617072800.cvqb4wmafxdi3knq@gator>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello everyone!
+On 6/17/22 09:28, Andrew Jones wrote:
+> On Thu, Jun 16, 2022 at 09:54:16PM +0000, David Laight wrote:
+>> From: oliver.upton@linux.dev
+>>> Sent: 16 June 2022 19:45
+>>
+>>>
+>>> June 16, 2022 11:48 AM, "David Laight" <David.Laight@aculab.com> wrote:
+>>>> No wonder I was confused.
+>>>> It's not surprising the compiler optimises it all away.
+>>>>
+>>>> It doesn't seem right to be 'abusing' WRITE_ONCE() here.
+>>>> Just adding barrier() should be enough and much more descriptive.
+>>>
+>>> I had the same thought, although I do not believe barrier() is sufficient
+>>> on its own. barrier_data() with a pointer to uc passed through
+>>> is required to keep clang from eliminating the dead store.
+>>
+>> A barrier() (full memory clobber) ought to be stronger than
+>> the partial one than barrier_data() generates.
+>>
+>> I can't quite decide whether you need a barrier() both sides
+>> of the 'magic write'.
+>> Plausibly the compiler could discard the on-stack data
+>> after the barrier() and before the 'magic write'.
+>>
+>> Certainly putting the 'magic write' inside a asm block
+>> that has a memory clobber is a more correct solution.
+> 
+> Indeed, since the magic write is actually a guest MMIO write, then
+> it should be using writeq().
 
-We are pleased to announce that there will be another
+It doesn't need to use writeq() because no special precautions are 
+needed with respect to cacheability or instruction reordering (as is the 
+case with hardware registers).
 
-	VFIO/IOMMU/PCI Microconference
+WRITE_ONCE is okay, especially since the code never reads it (and if it 
+did it would also use READ_ONCE).
 
-at this year's Linux Plumbers Conference (LPC), from 12th to the 14th of
-September in Dublin, Ireland. LPC is a hybrid event this year;
-attendance can be in person or remote.
+Paolo
 
-In this microconference we want to discuss ongoing developments around
-the VFIO, IOMMU and PCI subsystems and their interactions in Linux.
-
-Tentative topics that are under consideration for this year include (but
-not limited to):
-
-	* PCI:
-	  - Cache Coherent Interconnect for Accelerators (CCIX)/Compute
-	    Express Link (CXL) expansion memory and accelerators
-	    management
-	  - Data Object Exchange (DOE)
-	  - Integrity and Data Encryption (IDE)
-	  - Component Measurement and Authentication (CMA)
-	  - Security Protocol and Data Model (SPDM)
-	  - I/O Address Space ID Allocator (IOASID)
-	  - INTX/MSI IRQ domain consolidation
-	  - Gen-Z interconnect fabric
-	  - ARM64 architecture and hardware
-	  - PCI native host controllers/endpoints drivers current
-	    challenges and improvements (e.g., state of PCI quirks, etc.)
-	  - PCI error handling and management e.g., Advanced Error
-	    Reporting (AER), Downstream Port Containment (DPC), ACPI
-	    Platform Error Interface (APEI) and Error Disconnect Recover
-	    (EDR)
-	  - Power management and devices supporting Active-state Power
-	    Management (ASPM)
-	  - Peer-to-Peer DMA (P2PDMA)
-	  - Resources claiming/assignment consolidation
-	  - Probing of native PCIe controllers and general reset
-	    implementation
-	  - Prefetchable vs non-prefetchable BAR address mappings
-	  - Untrusted/external devices management
-	  - DMA ownership models
-	  - Thunderbolt, DMA, RDMA and USB4 security
-
-	* VFIO:
-	  - Write-combine on non-x86 architectures
-	  - I/O Page Fault (IOPF) for passthrough devices
-	  - Shared Virtual Addressing (SVA) interface
-	  - Single-root I/O Virtualization(SRIOV)/Process Address Space
-	    ID (PASID) integration
-	  - PASID in SRIOV virtual functions
-	  - Device assignment/sub-assignment
-
-	* IOMMU:
-	  - /dev/iommufd development
-	  - IOMMU virtualization
-	  - IOMMU drivers SVA interface
-	  - DMA-API layer interactions and the move towards generic
-	    dma-ops for IOMMU drivers
-	  - Possible IOMMU core changes (e.g., better integration with
-	    device-driver core, etc.)
-
-Please submit your proposals on the LPC website at:
-
-	https://lpc.events/event/16/abstracts/
-
-Make sure to select the "VFIO/IOMMU/PCI MC" in the Track pulldown
-menu.
-
-Looking forward to seeing you all there, either in Dublin or virtual! :)
-
-The organizers,
-
-	Alex Williamson
-	Bjorn Helgaas
-	Jörg Rödel
-	Lorenzo Pieralisi
-	Krzysztof Wilczyński
 
