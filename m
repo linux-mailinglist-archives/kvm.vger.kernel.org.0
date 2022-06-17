@@ -2,175 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60EE154FDEB
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 21:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CAAF54FEA7
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 23:02:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245188AbiFQTwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 15:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33068 "EHLO
+        id S1383526AbiFQUwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 16:52:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234198AbiFQTwO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 15:52:14 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB815A0A6
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 12:52:13 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id h190-20020a636cc7000000b003fd5d5452cfso2656109pgc.8
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 12:52:13 -0700 (PDT)
+        with ESMTP id S235359AbiFQUwW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 16:52:22 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60DFE5E170
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 13:52:20 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id f16so3831337pjj.1
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 13:52:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=Lv+NejjYJPAtPZEJ3w1I1cBl7ejfDuSrn7GM/dgRjS8=;
-        b=eVdoaGWT3W3S+FNNXUl/8ah2ngDbVZZ/YVNxeA0nZ0gL47rhoODis3BvDFE9yqAcfH
-         cs4wBmNz80D72Ms77gB/eJBWKI65CEF42UxNx+XUDwpk9XX1+YDcy7Ml10Gy6s162N36
-         +q0K/skwNeIWULDIpliP4IfDnc/kArrCD/nfkLd+9kT5agyG6zFW126D7IOBmCnbe1io
-         tSRJbVTndrz4H2ATzb4kUDGeNnpfOsUIjNdxuvHcfYdNauvIzxyizN2KtgwDYL6zitfj
-         lQYg+qY4KYC3qrc17OqT3pJZSWV4py9IZJGT/6GCM2Vs7u3JmAmpeyhcSR0v8djKmCTT
-         7Rwg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=0gvTzgsYSiMbpMdNzx7QQ0trcTLfq0qz6qq+d/xtlqM=;
+        b=Tm8fa78A+8xoP3d1vCfCPWpSCzWj+i2sJA/HPesmtuW0WMA5RtXd8iQDFxpA6qnpWj
+         wBRS1u0wecIeTRbxK8Gvt9RweINogdUBePYhR7lrzoNnF83AL1EhBDPIsG2P4LsKfvjj
+         ttjEyi9Fit5b3gG154/moMPm/lVvZAp4uLT57JQgKeitkDyKmrVK02sDA6Ax1ld05qdf
+         pHz22A+L+cEY7/LSa3Ah2ecGSGVEe+9KAB/GSJIfCUDRfXSVs0RllQyfmcEru1D0w1Fe
+         lz1ro/0YeBLRjS5RYvDHkjd9t+a0tND1zjuM8uuDkkuZHNsaQui6mPrJ1fudbeWdMDCh
+         b2yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=Lv+NejjYJPAtPZEJ3w1I1cBl7ejfDuSrn7GM/dgRjS8=;
-        b=T/yqKHldtlTMhKXKA9Rvaz38OJ8yBG7NG5jl/KXnuKqKy+ZjB5bwvL3WKb3Zg4dTi8
-         zTihf1xqcozAkOjU+neD4vYtZgTBQM3lq1S6TtX0cRER/nOTY+hmApG1yA6mK+MXkkx8
-         skhZzfo2UP8D+XbqOUrz3k3GTu7JtODRLFSMlHJFXdUCJd1rbJ7JpsRAxGC+KKQDAFNU
-         YkZpmHOgua+73sQncMaoz0O4gqwGGQu2/YaQmrpL/0UJ0hjEmxmQnCIkLLhhERHViSIu
-         28NwmTQbfau2mMg4fm5SNOksZ0KG8tEb0Jys8ZYggYCyHhAmc3LQUJL2G/DJKGYBWPuU
-         faxQ==
-X-Gm-Message-State: AJIora9eM1kDlEAQSrGUiSjATOvtJtB8FTZbH6m+BuzgvZqmnNRBj7aL
-        /V3tzK3/sqipEMxW9RtK311NseE79uRDex0R4j7SXBLpxTCqa0nHnd38wG3zHf7hlFa1GIGf5Re
-        Jp23I2OK4Svls8l8hDMRbvmIOaZZs413HxirSW+YoRErRhL3XT0kSU15o5A==
-X-Google-Smtp-Source: AGRyM1vQbx4q8SwKybNxxRMWTFV4usZRF+S42IgTimAM7QW0ZYWAuE2SSWY/hklamaqRNBbXHKxT3w7HMr0=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:a27f:324e:df09:e093])
- (user=pgonda job=sendgmr) by 2002:a17:902:f690:b0:163:f8eb:3741 with SMTP id
- l16-20020a170902f69000b00163f8eb3741mr10984379plg.112.1655495532341; Fri, 17
- Jun 2022 12:52:12 -0700 (PDT)
-Date:   Fri, 17 Jun 2022 12:51:41 -0700
-Message-Id: <20220617195141.2866706-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
-Subject: [PATCH] KVM: SEV: Init target VMCBs in sev_migrate_from
-From:   Peter Gonda <pgonda@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0gvTzgsYSiMbpMdNzx7QQ0trcTLfq0qz6qq+d/xtlqM=;
+        b=SgC2Q+rGjNHZ6Y7I0b40dKCS6HUJGv2zWtiahxe2SrVXB9AWrGmp8qt4LEpjiEfj9p
+         8YmGmkXhpL+wRoBm8FFP/Dk6RoTo2DSRUmvb5Phsdh28nnPUL6GT2yMQXgubYCfrlHfo
+         vu87n/862KBGWTdonR7BFEvu64r2W8g251NfXGTP3cggeK7vOmn/0SWB/ScKOfGpMss6
+         hsGQze1s7r6ZuoPdbmjpjtVXS47g8v6M7fF7DSBgnBLzVEuja71+vmL0bM2Q7RLNzyjT
+         TzA6rBPM20LrxO/TMeYePMvoKwEWUgxwp1r3ycaZAlA1xkHyrRhWV8Cor8URqL6L7erU
+         PoTg==
+X-Gm-Message-State: AJIora/E8YfumgVS8tp30r4YwuUyiRPBoHOs21f+QQ0NwTPyw14eAIFr
+        vPlClDdIfJKkw/IT81uWp7MtIw==
+X-Google-Smtp-Source: AGRyM1t/zG6fhbTElhgwQ8jpzkHKKzon/AJS4F2Xyo6NtESIYzM5NELoKnpSdcxh3Foi9ICA7Z0Xtg==
+X-Received: by 2002:a17:902:ef47:b0:169:a2a7:94cf with SMTP id e7-20020a170902ef4700b00169a2a794cfmr7330944plx.143.1655499139356;
+        Fri, 17 Jun 2022 13:52:19 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id y1-20020a63ad41000000b003fae8a7e3e5sm4127465pgo.91.2022.06.17.13.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jun 2022 13:52:18 -0700 (PDT)
+Date:   Fri, 17 Jun 2022 20:52:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+Subject: Re: [PATCH v6 4/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <Yqzpf3AEYabFWjnW@google.com>
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <20220519153713.819591-5-chao.p.peng@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220519153713.819591-5-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The target VMCBs during an intra-host migration need to correctly setup
-for running SEV and SEV-ES guests. Use the sev_es_init_vmcb() to setup
-the sev-es VMCBs and refactor out a new sev_init_vmcb() function to
-handle SEV only migrations.
+On Thu, May 19, 2022, Chao Peng wrote:
+> @@ -653,12 +662,12 @@ struct kvm_irq_routing_table {
+>  };
+>  #endif
+>  
+> -#ifndef KVM_PRIVATE_MEM_SLOTS
+> -#define KVM_PRIVATE_MEM_SLOTS 0
+> +#ifndef KVM_INTERNAL_MEM_SLOTS
+> +#define KVM_INTERNAL_MEM_SLOTS 0
+>  #endif
 
-Fixes: 0b020f5af092 ("KVM: SEV: Add support for SEV-ES intra host migration")
-Fixes: b56639318bb2 ("KVM: SEV: Add support for SEV intra host migration")
+This rename belongs in a separate patch.
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+>  #define KVM_MEM_SLOTS_NUM SHRT_MAX
+> -#define KVM_USER_MEM_SLOTS (KVM_MEM_SLOTS_NUM - KVM_PRIVATE_MEM_SLOTS)
+> +#define KVM_USER_MEM_SLOTS (KVM_MEM_SLOTS_NUM - KVM_INTERNAL_MEM_SLOTS)
+>  
+>  #ifndef __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+>  static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+> @@ -1087,9 +1096,9 @@ enum kvm_mr_change {
+>  };
+>  
+>  int kvm_set_memory_region(struct kvm *kvm,
+> -			  const struct kvm_userspace_memory_region *mem);
+> +			  const struct kvm_user_mem_region *mem);
+>  int __kvm_set_memory_region(struct kvm *kvm,
+> -			    const struct kvm_userspace_memory_region *mem);
+> +			    const struct kvm_user_mem_region *mem);
+>  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+>  void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+>  int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index e10d131edd80..28cacd3656d4 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -103,6 +103,29 @@ struct kvm_userspace_memory_region {
+>  	__u64 userspace_addr; /* start of the userspace allocated memory */
+>  };
+>  
+> +struct kvm_userspace_memory_region_ext {
+> +	struct kvm_userspace_memory_region region;
+> +	__u64 private_offset;
+> +	__u32 private_fd;
+> +	__u32 pad1;
+> +	__u64 pad2[14];
+> +};
+> +
+> +#ifdef __KERNEL__
+> +/* Internal helper, the layout must match above user visible structures */
 
----
+It's worth explicity calling out which structureso this aliases.  And rather than
+add a comment about the layout needing to match that, enforce it in code. I
+personally wouldn't bother with an expolicit comment about the layout, IMO that's
+a fairly obvious implication of aliasing.
 
-I had tested this with the selftests and by backporting patches to our
-kernel fork and running on our Vanadium VMM internally. Doing that however
-I dropped the requirement that SEV_INIT not be done on the target for
-minimal changes to our VMM for testing. This lead to me missing this bug.
+/*
+ * kvm_user_mem_region is a kernel-only alias of kvm_userspace_memory_region_ext
+ * that "unpacks" kvm_userspace_memory_region so that KVM can directly access
+ * all fields from the top-level "extended" region.
+ */
 
-Tested by backporting back to our kernel fork and running our intra-host
-migration test suite without SEV_INITing the target VM.
 
----
- arch/x86/kvm/svm/sev.c | 14 ++++++++++++++
- arch/x86/kvm/svm/svm.c |  3 +--
- arch/x86/kvm/svm/svm.h |  1 +
- 3 files changed, 16 insertions(+), 2 deletions(-)
+And I think it's in this patch that you missed a conversion to the alias, in the
+prototype for check_memory_region_flags() (looks like it gets fixed up later in
+the series).
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 655770522471..d483f253fcf5 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1666,6 +1666,8 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- 	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
- 	struct kvm_sev_info *src = &to_kvm_svm(src_kvm)->sev_info;
- 	struct kvm_sev_info *mirror;
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i;
- 
- 	dst->active = true;
- 	dst->asid = src->asid;
-@@ -1681,6 +1683,10 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- 
- 	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
- 
-+	kvm_for_each_vcpu(i, vcpu, dst_kvm) {
-+		sev_init_vmcb(to_svm(vcpu));
-+	}
-+
- 	/*
- 	 * If this VM has mirrors, "transfer" each mirror's refcount of the
- 	 * source to the destination (this KVM).  The caller holds a reference
-@@ -1739,6 +1745,8 @@ static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
- 		src_svm->vmcb->control.ghcb_gpa = INVALID_PAGE;
- 		src_svm->vmcb->control.vmsa_pa = INVALID_PAGE;
- 		src_vcpu->arch.guest_state_protected = false;
-+
-+		sev_es_init_vmcb(dst_svm);
- 	}
- 	to_kvm_svm(src)->sev_info.es_active = false;
- 	to_kvm_svm(dst)->sev_info.es_active = true;
-@@ -2914,6 +2922,12 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
- 				    count, in);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 0f81bf0407be..8765b334477d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1466,7 +1466,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
+        }
  }
- 
-+void sev_init_vmcb(struct vcpu_svm *svm)
+
+-static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
++static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
+ {
+        u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+
+@@ -4514,6 +4514,33 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
+        return fd;
+ }
+
++#define SANITY_CHECK_MEM_REGION_FIELD(field)                                   \
++do {                                                                           \
++       BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=             \
++                    offsetof(struct kvm_userspace_memory_region, field));      \
++       BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=         \
++                    sizeof_field(struct kvm_userspace_memory_region, field));  \
++} while (0)
++
++#define SANITY_CHECK_MEM_REGION_EXT_FIELD(field)                                       \
++do {                                                                                   \
++       BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=                     \
++                    offsetof(struct kvm_userspace_memory_region_ext, field));          \
++       BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=                 \
++                    sizeof_field(struct kvm_userspace_memory_region_ext, field));      \
++} while (0)
++
++static void kvm_sanity_check_user_mem_region_alias(void)
 +{
-+	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
-+	clr_exception_intercept(svm, UD_VECTOR);
++       SANITY_CHECK_MEM_REGION_FIELD(slot);
++       SANITY_CHECK_MEM_REGION_FIELD(flags);
++       SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
++       SANITY_CHECK_MEM_REGION_FIELD(memory_size);
++       SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
++       SANITY_CHECK_MEM_REGION_EXT_FIELD(private_offset);
++       SANITY_CHECK_MEM_REGION_EXT_FIELD(private_fd);
 +}
 +
- void sev_es_init_vmcb(struct vcpu_svm *svm)
+ static long kvm_vm_ioctl(struct file *filp,
+                           unsigned int ioctl, unsigned long arg)
  {
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 12e792389e8b..9b9bbc228a69 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1247,8 +1247,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (sev_guest(vcpu->kvm)) {
--		svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
--		clr_exception_intercept(svm, UD_VECTOR);
-+		sev_init_vmcb(svm);
- 
- 		if (sev_es_guest(vcpu->kvm)) {
- 			/* Perform SEV-ES specific VMCB updates */
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index cd92f4343753..33b6c6dd1a10 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -656,6 +656,7 @@ int sev_cpu_init(struct svm_cpu_data *sd);
- void sev_free_vcpu(struct kvm_vcpu *vcpu);
- int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
- int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
-+void sev_init_vmcb(struct vcpu_svm *svm);
- void sev_es_init_vmcb(struct vcpu_svm *svm);
- void sev_es_vcpu_reset(struct vcpu_svm *svm);
- void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
--- 
-2.36.1.476.g0c4daa206d-goog
+@@ -4541,6 +4568,8 @@ static long kvm_vm_ioctl(struct file *filp,
+                unsigned long size;
+                u32 flags;
 
++               kvm_sanity_check_user_mem_region_alias();
++
+                memset(&mem, 0, sizeof(mem));
+
+                r = -EFAULT;
+
+> +struct kvm_user_mem_region {
+> +	__u32 slot;
+> +	__u32 flags;
+> +	__u64 guest_phys_addr;
+> +	__u64 memory_size;
+> +	__u64 userspace_addr;
+> +	__u64 private_offset;
+> +	__u32 private_fd;
+> +	__u32 pad1;
+> +	__u64 pad2[14];
+> +};
+> +#endif
+> +
+>  /*
+>   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
+>   * other bits are reserved for kvm internal use which are defined in
+> @@ -110,6 +133,7 @@ struct kvm_userspace_memory_region {
+>   */
+>  #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+>  #define KVM_MEM_READONLY	(1UL << 1)
+> +#define KVM_MEM_PRIVATE		(1UL << 2)
+
+Hmm, KVM_MEM_PRIVATE is technically wrong now that a "private" memslot maps private
+and/or shared memory.  Strictly speaking, we don't actually need a new flag.  Valid
+file descriptors must be >=0, so the logic for specifying a memslot that can be
+converted between private and shared could be that "(int)private_fd < 0" means
+"not convertible", i.e. derive the flag from private_fd.
+
+And looking at the two KVM consumers of the flag, via kvm_slot_is_private(), they're
+both wrong.  Both kvm_faultin_pfn() and kvm_mmu_max_mapping_level() should operate
+on the _fault_, not the slot.  So it would actually be a positive to not have an easy
+way to query if a slot supports conversion.
+
+>  /* for KVM_IRQ_LINE */
+>  struct kvm_irq_level {
+
+...
+
+> +		if (flags & KVM_MEM_PRIVATE) {
+
+An added bonus of dropping KVM_MEM_PRIVATE is that these checks go away.
+
+> +			r = -EINVAL;
+> +			goto out;
+> +		}
+> +
+> +		size = sizeof(struct kvm_userspace_memory_region);
+> +
+> +		if (copy_from_user(&mem, argp, size))
+> +			goto out;
+> +
+> +		r = -EINVAL;
+> +		if ((flags ^ mem.flags) & KVM_MEM_PRIVATE)
+>  			goto out;
+>  
+> -		r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
+> +		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
+>  		break;
+>  	}
+>  	case KVM_GET_DIRTY_LOG: {
+> -- 
+> 2.25.1
+> 
