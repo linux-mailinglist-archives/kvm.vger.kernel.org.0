@@ -2,96 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84E7C54FB08
-	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 18:29:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2424354FB30
+	for <lists+kvm@lfdr.de>; Fri, 17 Jun 2022 18:40:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383252AbiFQQ2s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 12:28:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41990 "EHLO
+        id S1383423AbiFQQj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 12:39:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383253AbiFQQ2q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 12:28:46 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEC341FAB
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 09:28:44 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id 73-20020a17090a0fcf00b001eaee69f600so4603364pjz.1
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 09:28:44 -0700 (PDT)
+        with ESMTP id S1382975AbiFQQjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 12:39:21 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AEE3427C0
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 09:39:20 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id y6so4351245plg.0
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 09:39:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=ikdZWQajtcXHyKH9cwfe1WfBf7z5hZlJ5ctRUGfamlg=;
-        b=bKOqTm4VHtoh+tNs1+zszHl4qT0YMrNAovePO+NULfamQiOqwVXuW1ln4Bh/4sKdg0
-         cXGRAf02ro+LfrtUjyEvIJ8kgm0ihYvyksME03mbgpmFBvPrCeOwvSFy27O14i6EDfBb
-         qmJmtctX4Dp/Djfs7qZDcEaw85XVtdDf1wPxsF8ddJ1UXcuevlDnld5OMTw6qOhWdEXe
-         wB+0CoejzSloI3rmuMW/4ZmyOhQWfWc05l9xlSBjQXdGTHA7scPn/f8qaaIzkclLsSaT
-         xhZjNKq1t7QNzRvCIgNsNn55ViSkKG+k50D+hlZrYOUIdBeds9EMX0EceU6RLhnp6FmE
-         842A==
+         :content-disposition:in-reply-to;
+        bh=wrdO5P+XurdaeOgOSQ+5kEyKwT7FiNPp233iypu4ges=;
+        b=GLI0UsmAM2SwCj2zsTHa0oDcnMYgcUb1C8zvkJSBU2UTOlY+q5LsCvt8d+o0gH9deL
+         EJxKuYIJsSURtNXkFUX2typL9jcEhnHUIRDb2fSyphm9SbBxXCf/MxljTwYKChU0WzD6
+         /u1khMJU8yxHRUkSSrcsf2gPV+QsawCwxs6Z7CB1hM4QlTf2EFT/vN36oa28X48YXT+G
+         dUjTHEpcxFF355xRlPkgRYJHYusbuSXE6SVvev0aFEMSpuRmMiYWYOgP6gRhRDvuQUkw
+         f0gwMORKivzLEb67Z570CcSn5DcFYQGhm25keeGm2aqAsRUjtljk6RQGoKz0WIt/+DNi
+         FCsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ikdZWQajtcXHyKH9cwfe1WfBf7z5hZlJ5ctRUGfamlg=;
-        b=Zn7rjOkJDoj3VjP4gw6vYYfvqwO69zyQ8Vwp1uo9biexX/ynir7GWgPFYXTAzXVhcO
-         FDqKKmXqNlY18wUhMKDKGmuLmyNJWTtTwRxWK5OVINpPiXcoXhj9m1e5/TafLAU6sJt3
-         gwNR3S3wE2FLoBjqQn2A7wqtfrJQsU3BFOKdUzB/+z7a94B1im4dVE/6JmFTI/0fn54v
-         vzM+yR9Dm/sLC1iciSekjgASGYxPSMT5YZc62RmFAhxSNqL/H5V8jj6nK5ACU9rg8Ibp
-         yRwg7QFjBMUcmcHkQupjYD9TDQ9LKhtVwYhc+iqrCaOjQmMVj2AUU5v26uqRAhvMZPTM
-         keZQ==
-X-Gm-Message-State: AJIora92SItQBSGwiDrWNDwRApOdARqFdKnvVJHb7CLmC5+wry2uldmU
-        NVTHF62AkmfnE2WmR9PZPqa+MQ==
-X-Google-Smtp-Source: AGRyM1uxx3rxCTzmjYp2x2InU4H6kqXPbe9/j3UBIM4H5kEze44ULSzDQhVLhvnKHdaDYluwfj0+MQ==
-X-Received: by 2002:a17:902:efc6:b0:167:8177:60a7 with SMTP id ja6-20020a170902efc600b00167817760a7mr10319625plb.110.1655483323741;
-        Fri, 17 Jun 2022 09:28:43 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=wrdO5P+XurdaeOgOSQ+5kEyKwT7FiNPp233iypu4ges=;
+        b=jvXKEWn/KuOb75ogtJ4/6i3ntMWHmMoUEe7dPTOUd8/VlmXcHJrm9CSRfF75+I8PZg
+         +SEmf/ZFYMbalIG3JR0Z6bg2cmvao7HPK+UbEDOQoTewQ54V6UG6iSgjj52wDGXdPGVt
+         ctxB8WBq7aaLJAkKeWL/syPshe7StkXTjbUSxcxhqk/L9pDVl2JY1zX4WoGwIQj4HG0u
+         xfu+wdSdzhM8CnEEBZdkVkzsCAvlIfDiT4SG+EEwWd0xvvDctzAJCMm6k9awGsQJF/Uj
+         ZKDX5ZBQ0EWqKwgnpqgEu8eNM7v3U1H1zKhB3UKsjRB4Zbt3fpoe0lgmANn7dglBEehs
+         RWSw==
+X-Gm-Message-State: AJIora8zL77hG3Tjgr59Ne/7k5ukh/yy2q8Gpy2dAasw+TlCf7LP7dKS
+        GSNpCnVUDnqaMPj4Kh6Je7ywZA==
+X-Google-Smtp-Source: AGRyM1vVWqfyGPjBRUy89tBJu9kICwdn0HHYHxZToGtJz6hzC1Mdg/1dOrUNNuf4HFLCQTuqX0StEg==
+X-Received: by 2002:a17:902:c407:b0:163:df01:bbbc with SMTP id k7-20020a170902c40700b00163df01bbbcmr10210387plk.4.1655483959855;
+        Fri, 17 Jun 2022 09:39:19 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id a11-20020a056a001d0b00b00518895f0dabsm3877205pfx.59.2022.06.17.09.28.43
+        by smtp.gmail.com with ESMTPSA id s10-20020a63af4a000000b003db7de758besm4134739pgo.5.2022.06.17.09.39.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jun 2022 09:28:43 -0700 (PDT)
-Date:   Fri, 17 Jun 2022 16:28:39 +0000
+        Fri, 17 Jun 2022 09:39:19 -0700 (PDT)
+Date:   Fri, 17 Jun 2022 16:39:15 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Red Hat Product Security <secalert@redhat.com>
-Cc:     mingo@redhat.com, bp@alien8.de, pgn@zju.edu.cn,
-        pbonzini@redhat.com, wanpengli@tencent.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de,
-        kangel@zju.edu.cn, syzkaller@googlegroups.com, jmattson@google.com,
-        vkuznets@redhat.com, dave.hansen@linux.intel.com,
-        linux-sgx@vger.kernel.org, jarkko@kernel.org, joro@8bytes.org,
-        hpa@zytor.com
-Subject: Re: 'WARNING in vcpu_enter_guest' bug in arch/x86/kvm/x86.c:9877
-Message-ID: <Yqyrt71TG1v0gPSf@google.com>
-References: <25270242.531.1655475119097@app133160.ycg3.service-now.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        maciej.szmigiero@oracle.com,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Subject: Re: [PATCH v6 15/22] KVM: x86/mmu: Decouple rmap_add() and
+ link_shadow_page() from kvm_vcpu
+Message-ID: <YqyuM3v0SNPyrOmP@google.com>
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-16-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <25270242.531.1655475119097@app133160.ycg3.service-now.com>
+In-Reply-To: <20220516232138.1783324-16-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 17, 2022, Red Hat Product Security wrote:
-> Hello!
-> 
-> INC2131147 ('WARNING in vcpu_enter_guest' bug in arch/x86/kvm/x86.c:9877) is pending your review.
-> 
-> Opened for: pgn@zju.edu.cn
-> Followers: Paolo Bonzini, seanjc@google.com, Vitaly Kuznetsov, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, tglx@linutronix.de, Ingo Molnar, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, jarkko@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org, kangel@zju.edu.cn, syzkaller@googlegroups.com
-> 
-> Mauro Matteo Cascella updated your request with the following comments:
-> 
-> Hi Sean,
->  Thanks for the fix: https://github.com/torvalds/linux/commit/423ecfea77dda83823c71b0fad1c2ddb2af1e5fc [https://github.com/torvalds/linux/commit/423ecfea77dda83823c71b0fad1c2ddb2af1e5fc].
-> Is this CVE worthy? As /dev/kvm is world accessible and unprivileged users could trigger the bug IIUC. We (Red Hat) can assign one if needed.
+On Mon, May 16, 2022, David Matlack wrote:
+> @@ -1592,15 +1589,21 @@ static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+>  	sp = sptep_to_sp(spte);
+>  	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
+>  	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
+> -	rmap_count = pte_list_add(vcpu, spte, rmap_head);
+> +	rmap_count = pte_list_add(cache, spte, rmap_head);
+>  
+>  	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
+> -		kvm_unmap_rmapp(vcpu->kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
+> +		kvm_unmap_rmapp(kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
 
-IMO, it's not CVE worthy.  Unprivileged users can trigger the bug, but the bug
-itself is not harmful to the system at large, only to that user's VM/workload.
-The splat is a WARN_ON_ONCE() so it won't spam the kernel log.  panic_on_warn
-would be problematic, but assigning a CVE for every WARN seems excessive.
+Ewww, the existing code is awful.  This call passes NULL for @slot, but it already
+has a slot!  This could simply be
+
+		pte_list_destroy(vcpu->kvm, rmap_head);
+
+but that's undesirable with the current name as it's not remotely obvious that
+pte_list_destroy() actually zaps rmaps.
+
+I'll send a separate series to clean this up, e.g. rename pte_list_destroy() to
+make it clear that it zaps SPTEs.  That'll also give me a good excuse to kill the
+"p is for pointer" rmapp() naming scheme.  The only conflict with your series is
+this one vcpu->kvm => kvm change, which is easy to note and resolve.
+
+>  		kvm_flush_remote_tlbs_with_address(
+> -				vcpu->kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+> +				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+>  	}
+>  }
+>  
+> +static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+> +		     u64 *spte, gfn_t gfn)
+> +{
+> +	__rmap_add(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, slot, spte, gfn);
+
+I prefer to grab "cache" locally,
+
+	struct kvm_mmu_memory_cache *cache = &vcpu->arch.mmu_pte_list_desc_cache;
+
+	__rmap_add(vcpu->kvm, cache, slot, spte, gfn);
+
+both to keep the lines shorter in the final form (adding "access" runs yours out
+to 93 chars), and because I find it easier to see read the call without a gigantic
+parameter in the midde.
