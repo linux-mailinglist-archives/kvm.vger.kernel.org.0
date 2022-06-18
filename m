@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFD4655016A
-	for <lists+kvm@lfdr.de>; Sat, 18 Jun 2022 02:38:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39218550180
+	for <lists+kvm@lfdr.de>; Sat, 18 Jun 2022 03:00:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358481AbiFRAiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jun 2022 20:38:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57408 "EHLO
+        id S1383658AbiFRBAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jun 2022 21:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231921AbiFRAiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jun 2022 20:38:08 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7AB2AC50
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 17:38:05 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d13so5115308plh.13
-        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 17:38:05 -0700 (PDT)
+        with ESMTP id S233738AbiFRBAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jun 2022 21:00:17 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C6024F20
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 18:00:16 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id t3-20020a17090a510300b001ea87ef9a3dso5482564pjh.4
+        for <kvm@vger.kernel.org>; Fri, 17 Jun 2022 18:00:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=rVrqXDo0tSbjEZ2PFx7oaAYlhv3FIN4HP2sOqRT4O8w=;
-        b=WwOMpakC1dJm4I/Mg5Y++XeWZzgLIDvxAfHYYk81Wdg2cCj4OmmTFG3peORQ1JZn9x
-         7DxzJB4YlIO7stLXdxlrZgmqHpbqkvRnLZrcyvLIREQEsqYrTtXGF222o4vjIAn1h3Yt
-         jdkiqwYWQmIkHi7Kx4mdOx+d4zJQpuv5+koc0g57qGyv104ZlYWuVhsxDnB4Y9QSCaRx
-         RoWEt9OLBmBTzV90I5bFc3m5M/9u614SZc7zN3EOYKvdmJe7CKRKDvn8wbsKx0SC+5Dr
-         2edpui4IMrjRSvkitn7RhUzf2mv4tP0hAzmMzQuSAM3zUwO8Cpo+Mh1aIw7QV4K3YG1Z
-         WFNg==
+        bh=ED4T7FRniyzeEhOAGbwENSdE+eyCSBYreP74Jda3he8=;
+        b=UqVccnSmV/PyRRg1w6xAUSxnxBghYiM8DZH7ETme5X10pRZGpujmvw/oruXOhVjEQ6
+         x3Zu8OMdy0KwPW8FZFqpkUYOv7xVzJiu27w/GgXlnNFSGV3Ni8k/Uwd82oe83qUUQ2Lz
+         rseKkK2spvrTeDs9xdPF5mlQA0q9u+NZVK1IFtItFSsbQu+SVWbSo1Vg7TP8HsynVp83
+         Wu6Bl/ltHGjIyA/cCL9ToQKKbOdd6C+tjI+eXuh9CrTiEdU/GxSXuEAX/c2Z1AoPxBWO
+         aI0WYtFuKH/E5XwwHiwq47l7ge7QTqOowNfOKduc+AY/Ijlq44JmpkbcAiFjWJeKySQy
+         ttGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=rVrqXDo0tSbjEZ2PFx7oaAYlhv3FIN4HP2sOqRT4O8w=;
-        b=rm1wbD1KUHu1Xahch0c6tzu4UGvh0iVMKY5yuzq4VhyZcjhqzjlvAhakqblmxjj6w5
-         cg+AEZHJR7OW7hrGeK9XKwfQ3srUCT1iJylW0Q8C15sOk16k07n5lIpHC/8Z9wpsfVBT
-         /SmjqRpHrSwOREl9acNzrHqt84P588nbOgGSbBhsCapzldxhhZpPguPCKeozplJncuOs
-         PZ5gUD0Uo1mjGEtab9wOKQe88xZhlPIwmDcv7jznOeyMSQTFf+py5i3QOHul7WEsAaT6
-         URNboG+PlCh8/iKNFuxS4gG+lZHdhU0SiWklDFk+26YrC0XFSv+TMiF9HdBgu/EvaB3O
-         g2fw==
-X-Gm-Message-State: AJIora8KEkR6ECDrntBqzQ+Kj9BFMBGWq4+UhVdCM/fX0UOi/1jnJQ55
-        GSq3l0OoGQpnTAV+t0qoMq79HA==
-X-Google-Smtp-Source: AGRyM1sjQpW2v09iDM1lxZV1gIfjMPQpmwQFRO3hVHxYIOvjPvc6xHG4ipxz/hYprLfsw8en9SLisg==
-X-Received: by 2002:a17:903:284:b0:168:4d1a:3ccc with SMTP id j4-20020a170903028400b001684d1a3cccmr12421491plr.78.1655512685168;
-        Fri, 17 Jun 2022 17:38:05 -0700 (PDT)
+        bh=ED4T7FRniyzeEhOAGbwENSdE+eyCSBYreP74Jda3he8=;
+        b=LVP6t+emyWvjNf6x6Adt0L7N4Bqm6IlOaRcKJ2RGFwcSHi+ZybzozFCVPY6eMWxc28
+         KXL8HwZPgepQhC9QY150G4URVQ9Up+kW3cSCHoAeofBHRDaJlfKatLXu3MT74/oeXUxH
+         CrmCMCMfbzlACT3lhNBmVsjctJSLmlIIpmgmnbkK+dFAmj8dxSO6fGP2zesIWakUNlsx
+         wzaZTnF4EjnYG3Qk4F8CRSEly2C9WDlxxM1ULpdearLBugailahRlQM9u+XtGhBF1qCk
+         999/7emVK7rKt6L5cw02Tm5idKJ44AyWZDm1Ch+dB1lDYBd6e/iLsQaNVWNUrI9gv8Yg
+         uvLg==
+X-Gm-Message-State: AJIora/aaXP5XE5FJ5LTd6RLJXODHvxgc14lCCfGsDTk/nQsWsp/+QVi
+        EE/LWrAOiVgb1bP+FD4Vbh+fMg==
+X-Google-Smtp-Source: AGRyM1uoMnfy3U9dOg/LLkLG+CLjVGh/0Mw8cEGB32IY3QFVv+mAxltylgZJj0QT+k9parVD9BfyZg==
+X-Received: by 2002:a17:90a:880c:b0:1ea:b0a6:8385 with SMTP id s12-20020a17090a880c00b001eab0a68385mr13691160pjn.142.1655514014835;
+        Fri, 17 Jun 2022 18:00:14 -0700 (PDT)
 Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id p22-20020a637416000000b003fcfdc9946dsm4408797pgc.51.2022.06.17.17.38.04
+        by smtp.gmail.com with ESMTPSA id p2-20020a170902a40200b0015e8d4eb285sm4119994plq.207.2022.06.17.18.00.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jun 2022 17:38:04 -0700 (PDT)
-Date:   Fri, 17 Jun 2022 17:38:01 -0700
+        Fri, 17 Jun 2022 18:00:14 -0700 (PDT)
+Date:   Fri, 17 Jun 2022 18:00:10 -0700
 From:   Ricardo Koller <ricarkol@google.com>
 To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
 Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
         jade.alglave@arm.com, alexandru.elisei@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 03/23] lib: Add support for the XSDT
- ACPI table
-Message-ID: <Yq0eaaOiud8pOXZN@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 04/23] lib: Extend the definition of
+ the ACPI table FADT
+Message-ID: <Yq0jmuqus141FMqF@google.com>
 References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-4-nikos.nikoleris@arm.com>
+ <20220506205605.359830-5-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220506205605.359830-4-nikos.nikoleris@arm.com>
+In-Reply-To: <20220506205605.359830-5-nikos.nikoleris@arm.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,199 +72,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nikos,
-
-On Fri, May 06, 2022 at 09:55:45PM +0100, Nikos Nikoleris wrote:
-> XSDT provides pointers to other ACPI tables much like RSDT. However,
-> contrary to RSDT that provides 32-bit addresses, XSDT provides 64-bit
-> pointers. ACPI requires that if XSDT is valid then it takes precedence
-> over RSDT.
+On Fri, May 06, 2022 at 09:55:46PM +0100, Nikos Nikoleris wrote:
+> This change add more fields in the APCI table FADT to allow for the
+> discovery of the PSCI conduit in arm64 systems. The definition for
+> FADT is similar to the one in include/acpi/actbl.h in Linux.
 > 
 > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 > ---
->  lib/acpi.h |   6 ++++
->  lib/acpi.c | 103 ++++++++++++++++++++++++++++++++---------------------
->  2 files changed, 68 insertions(+), 41 deletions(-)
+>  lib/acpi.h   | 35 ++++++++++++++++++++++++++++++-----
+>  lib/acpi.c   |  2 +-
+>  x86/s3.c     |  2 +-
+>  x86/vmexit.c |  2 +-
+>  4 files changed, 33 insertions(+), 8 deletions(-)
 > 
 > diff --git a/lib/acpi.h b/lib/acpi.h
-> index 42a2c16..d80b983 100644
+> index d80b983..9f27eb1 100644
 > --- a/lib/acpi.h
 > +++ b/lib/acpi.h
-> @@ -13,6 +13,7 @@
->  
->  #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
->  #define RSDT_SIGNATURE ACPI_SIGNATURE('R','S','D','T')
-> +#define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
->  #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
->  #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
->  
-> @@ -56,6 +57,11 @@ struct rsdt_descriptor_rev1 {
->      u32 table_offset_entry[0];
+> @@ -62,7 +62,15 @@ struct acpi_table_xsdt {
+>      u64 table_offset_entry[1];
 >  } __attribute__ ((packed));
 >  
-> +struct acpi_table_xsdt {
-> +    ACPI_TABLE_HEADER_DEF
-> +    u64 table_offset_entry[1];
-
-nit: This should be "[0]" to match the usage above (in rsdt).
-
-I was about to suggest using an unspecified size "[]", but after reading
-what the C standard says about it (below), now I'm not sure. was the
-"[1]" needed for something that I'm missing?
-
-	106) The length is unspecified to allow for the fact that
-	implementations may give array members different
-	alignments according to their lengths.
-
-
+> -struct fadt_descriptor_rev1
+> +struct acpi_generic_address {
+> +    u8 space_id;            /* Address space where struct or register exists */
+> +    u8 bit_width;           /* Size in bits of given register */
+> +    u8 bit_offset;          /* Bit offset within the register */
+> +    u8 access_width;        /* Minimum Access size (ACPI 3.0) */
+> +    u64 address;            /* 64-bit address of struct or register */
 > +} __attribute__ ((packed));
 > +
->  struct fadt_descriptor_rev1
+> +struct acpi_table_fadt
 >  {
 >      ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
+>      u32 firmware_ctrl;          /* Physical address of FACS */
+> @@ -100,10 +108,27 @@ struct fadt_descriptor_rev1
+>      u8  day_alrm;               /* Index to day-of-month alarm in RTC CMOS RAM */
+>      u8  mon_alrm;               /* Index to month-of-year alarm in RTC CMOS RAM */
+>      u8  century;                /* Index to century in RTC CMOS RAM */
+> -    u8  reserved4;              /* Reserved */
+> -    u8  reserved4a;             /* Reserved */
+> -    u8  reserved4b;             /* Reserved */
+> -};
+> +    u16 boot_flags;             /* IA-PC Boot Architecture Flags (see below for individual flags) */
+> +    u8 reserved;                /* Reserved, must be zero */
+> +    u32 flags;                  /* Miscellaneous flag bits (see below for individual flags) */
+> +    struct acpi_generic_address reset_register;     /* 64-bit address of the Reset register */
+> +    u8 reset_value;             /* Value to write to the reset_register port to reset the system */
+> +    u16 arm_boot_flags;         /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
+> +    u8 minor_revision;          /* FADT Minor Revision (ACPI 5.1) */
+> +    u64 Xfacs;                  /* 64-bit physical address of FACS */
+> +    u64 Xdsdt;                  /* 64-bit physical address of DSDT */
+> +    struct acpi_generic_address xpm1a_event_block;  /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
+> +    struct acpi_generic_address xpm1b_event_block;  /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
+> +    struct acpi_generic_address xpm1a_control_block;        /* 64-bit Extended Power Mgt 1a Control Reg Blk address */
+> +    struct acpi_generic_address xpm1b_control_block;        /* 64-bit Extended Power Mgt 1b Control Reg Blk address */
+> +    struct acpi_generic_address xpm2_control_block; /* 64-bit Extended Power Mgt 2 Control Reg Blk address */
+> +    struct acpi_generic_address xpm_timer_block;    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
+> +    struct acpi_generic_address xgpe0_block;        /* 64-bit Extended General Purpose Event 0 Reg Blk address */
+> +    struct acpi_generic_address xgpe1_block;        /* 64-bit Extended General Purpose Event 1 Reg Blk address */
+> +    struct acpi_generic_address sleep_control;      /* 64-bit Sleep Control register (ACPI 5.0) */
+> +    struct acpi_generic_address sleep_status;       /* 64-bit Sleep Status register (ACPI 5.0) */
+> +    u64 hypervisor_id;      /* Hypervisor Vendor ID (ACPI 6.0) */
+> +}  __attribute__ ((packed));
+>  
+>  struct facs_descriptor_rev1
+>  {
 > diff --git a/lib/acpi.c b/lib/acpi.c
-> index de275ca..9b8700c 100644
+> index 9b8700c..e8440ae 100644
 > --- a/lib/acpi.c
 > +++ b/lib/acpi.c
-> @@ -38,45 +38,66 @@ static struct rsdp_descriptor *get_rsdp(void)
+> @@ -46,7 +46,7 @@ void* find_acpi_table_addr(u32 sig)
 >  
->  void* find_acpi_table_addr(u32 sig)
-
-nit: This one could also be fixed as well: "void *".
-
+>  	/* FACS is special... */
+>  	if (sig == FACS_SIGNATURE) {
+> -		struct fadt_descriptor_rev1 *fadt;
+> +		struct acpi_table_fadt *fadt;
+>  
+>  		fadt = find_acpi_table_addr(FACP_SIGNATURE);
+>  		if (!fadt)
+> diff --git a/x86/s3.c b/x86/s3.c
+> index 89d69fc..16e79f8 100644
+> --- a/x86/s3.c
+> +++ b/x86/s3.c
+> @@ -30,7 +30,7 @@ extern char resume_start, resume_end;
+>  
+>  int main(int argc, char **argv)
 >  {
-> -    struct rsdp_descriptor *rsdp;
-> -    struct rsdt_descriptor_rev1 *rsdt;
-> -    void *end;
-> -    int i;
-> -
-> -    /* FACS is special... */
-> -    if (sig == FACS_SIGNATURE) {
-> -        struct fadt_descriptor_rev1 *fadt;
-> -        fadt = find_acpi_table_addr(FACP_SIGNATURE);
-> -        if (!fadt) {
-> -            return NULL;
-> -        }
-> -        return (void*)(ulong)fadt->firmware_ctrl;
-> -    }
-> -
-> -    rsdp = get_rsdp();
-> -    if (rsdp == NULL) {
-> -        printf("Can't find RSDP\n");
-> -        return 0;
-> -    }
-> -
-> -    if (sig == RSDP_SIGNATURE) {
-> -        return rsdp;
-> -    }
-> -
-> -    rsdt = (void*)(ulong)rsdp->rsdt_physical_address;
-> -    if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
-> -        return 0;
-> -
-> -    if (sig == RSDT_SIGNATURE) {
-> -        return rsdt;
-> -    }
-> -
-> -    end = (void*)rsdt + rsdt->length;
-> -    for (i=0; (void*)&rsdt->table_offset_entry[i] < end; i++) {
-> -        struct acpi_table *t = (void*)(ulong)rsdt->table_offset_entry[i];
-> -        if (t && t->signature == sig) {
-> -            return t;
-> -        }
-> -    }
-> -   return NULL;
-> +	struct rsdp_descriptor *rsdp;
-> +	struct rsdt_descriptor_rev1 *rsdt;
-> +	struct acpi_table_xsdt *xsdt = NULL;
-> +	void *end;
-> +	int i;
-> +
-> +	/* FACS is special... */
-> +	if (sig == FACS_SIGNATURE) {
-> +		struct fadt_descriptor_rev1 *fadt;
-> +
-> +		fadt = find_acpi_table_addr(FACP_SIGNATURE);
-> +		if (!fadt)
-> +			return NULL;
-> +
-> +		return (void*)(ulong)fadt->firmware_ctrl;
-> +	}
-> +
-> +	rsdp = get_rsdp();
-> +	if (rsdp == NULL) {
-> +		printf("Can't find RSDP\n");
-> +		return 0;
-> +	}
-> +
-> +	if (sig == RSDP_SIGNATURE)
-> +		return rsdp;
-> +
-> +	rsdt = (void *)(ulong)rsdp->rsdt_physical_address;
-> +	if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
-> +		rsdt = NULL;
-> +
-> +	if (sig == RSDT_SIGNATURE)
-> +		return rsdt;
-> +
-> +	if (rsdp->revision > 1)
-> +		xsdt = (void *)(ulong)rsdp->xsdt_physical_address;
-> +	if (!xsdt || xsdt->signature != XSDT_SIGNATURE)
-> +		xsdt = NULL;
-> +
-
-To simplify this function a bit, finding the xsdt could be moved to some
-kind of init function.
-
-> +	if (sig == XSDT_SIGNATURE)
-> +		return xsdt;
-> +
-> +	// APCI requires that we first try to use XSDT if it's valid,
-> +	//  we use to find other tables, otherwise we use RSDT.
-> +	if (xsdt) {
-> +		end = (void *)(ulong)xsdt + xsdt->length;
-> +		for (i = 0; (void *)&xsdt->table_offset_entry[i] < end; i++) {
-> +			struct acpi_table *t =
-> +				(void *)xsdt->table_offset_entry[i];
-> +			if (t && t->signature == sig)
-> +				return t;
-> +		}
-> +	} else if (rsdt) {
-> +		end = (void *)rsdt + rsdt->length;
-> +		for (i = 0; (void *)&rsdt->table_offset_entry[i] < end; i++) {
-> +			struct acpi_table *t =
-> +				(void *)(ulong)rsdt->table_offset_entry[i];
-> +			if (t && t->signature == sig)
-> +				return t;
-> +		}
-> +	}
-
-The two for-loops could be moved into some common function, or maybe a
-macro to deal with the fact that it deals with two different structures
-(the rsdt and the xsdt). This is my attempt at making it a function:
-
-void *scan_system_descriptor_table(void *dt)
-{
-	int i;
-	void *end;
-	/* XXX: Not sure if this is the nicest thing to do, but the rsdt
-	 * and the xsdt have "length" and "table_offset_entry" at the
-	 * same offsets. */
-	struct acpi_table_xsdt *xsdt = dt;
-
-	end = (void *)(ulong)xsdt + xsdt->length;
-	for (i = 0; &xsdt->table_offset_entry[i] < end; i++) {
-		struct acpi_table *t = (void *)xsdt->table_offset_entry[i];
-		if (t && t->signature == sig)
-			return t;
-}
-
-Thanks,
-Ricardo
-
-> +
-> +	return NULL;
->  }
+> -	struct fadt_descriptor_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+> +	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+>  	struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+>  	char *addr, *resume_vec = (void*)0x1000;
+>  
+> diff --git a/x86/vmexit.c b/x86/vmexit.c
+> index 2bac049..fcc0760 100644
+> --- a/x86/vmexit.c
+> +++ b/x86/vmexit.c
+> @@ -206,7 +206,7 @@ int pm_tmr_blk;
+>  static void inl_pmtimer(void)
+>  {
+>      if (!pm_tmr_blk) {
+> -	struct fadt_descriptor_rev1 *fadt;
+> +	struct acpi_table_fadt *fadt;
+>  
+>  	fadt = find_acpi_table_addr(FACP_SIGNATURE);
+>  	pm_tmr_blk = fadt->pm_tmr_blk;
 > -- 
 > 2.25.1
-> 
+>
+
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
