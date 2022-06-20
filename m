@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D128A5527D9
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 01:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBC895527DE
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 01:13:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346981AbiFTXLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 19:11:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55956 "EHLO
+        id S1347005AbiFTXLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 19:11:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346332AbiFTXK7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:10:59 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2075.outbound.protection.outlook.com [40.107.92.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF7E25289;
-        Mon, 20 Jun 2022 16:09:55 -0700 (PDT)
+        with ESMTP id S1346492AbiFTXLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 19:11:24 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2064.outbound.protection.outlook.com [40.107.94.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED75025E8B;
+        Mon, 20 Jun 2022 16:10:16 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SF5RdWBC1T2HcI7S7QOMB9C6/O5obGwM5+/bff9JUSS0WbKEaXnDw0LCX1AEXfI8tS+nXvnzeI//eahgaSlJpL4R0F41JqAQBoQP9CpMfyUn8PHz/ughmA9GLF0e6+7cSXfqthn2IvW6rRMU5JU1X992QhkspgTJm6JGvWhtioAFCF/shXCrpIjjytZFQhlpJQAea3hBZ5kr630rB1JClVZjMw5e95w1N/GWq4qC6TkajAh+vaiTKZozJNBwpakmCF+sj1m7gOvjsttGFYpqAJ6DIdQZk7ET9n+ZeWhGOg/O3VU6u/ENPPTLTlVN5KqI+BplqUeIkvvR6ivwkiOuuA==
+ b=U2fv0Xlc8E8r+7pK5qs4/9aGgiYIHArO4/OsbX55Nd+cg8dRa8WPT9AU+pgxC644UGfpZdLzANJmP2z8p47P8ztHxpqeJIyxf3uy5zaFGuHnOvTR073S6aGa1zbLszACd9YuLNrx1yL3GK0/UzQqcDdkif+WWIr+yTm/2137+QCrCWzktMT8gHeZYq4LNGCA7mfV0ycxGuvsmgRNKyNjAWLEqKW3zwnQe9SyEeUuaA5Ics9Im3vdneXl+smapZl0/NSM8JlHGXmNpQLJ1UYD4EVTFScmU8xyEO2WST/qDHeKTCM8lqrnQwtL23fq8kDnn0nFBKChtUUovtPsTb5hIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0v0N0T8Vf/8XXZjkhhCfupcxoYGhRpo76s0qQCIMLhE=;
- b=NJPQO0u01JZSdZn2UXsoYdKVVEpiH1GV8f73FR1KDdycOxM7n3RcVW5K1obNBnFtiJew4ZdTg70HpjTqB12kHIsMq+LGKTzbtQNG0tkrq6hPjJtbm0kJ2MpHu+stokZT2w1ALUlWwA4VRB72wlFqcUbVAyH0AhNOjKyV5wellmBM3I8Zr1xb4dB/g6PiRlvU1v0ygyyLAwweFmH1DRGpp+aghv/yzAP/2yGCaT2s0Te9Kl5uBIHjh6y38QuqJDp0CcHDIivQP1IGIv5erwqRnb6PmQSu7CpFzZIUL+bItvmxrn3b/wi1zvtcKqcqYb4oWc9dvCkUZ/9QNJ/aWMEJGg==
+ bh=qSKKHMpTuDiL/WXrVm0mP/gYeJ7kX9ggtq/chHAYeuY=;
+ b=NpoB2VxXGl/OHKjDlW2H8vzrRB/cHKHWc0cl6oTZGm9bgyk0h3fF7aMi/9oLJarVPHLrpZDt16zTLbNnrQj+kLiZivFaUQG88gPzCWjSbR72yuqIACGLicm63goy5JZLaaofYKvoypvO6DHCWFa6zsM8u7rK8bwaxtQH4YJMaLxxEL34VJon6571oPaUiyvljl4Z4KTxV9BLc2pIctdSx69/R2zTnxk19XzbpI4P2dqj9696Thc5nizLV1LSrgpDjnTHMGeaNzQcadg9yY31E5TZdbVXlS7bzZPbIqDunGxaiy4o+lT59QiuXhyOBNGYpJooefMjCqR9aVMcCQjdgg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0v0N0T8Vf/8XXZjkhhCfupcxoYGhRpo76s0qQCIMLhE=;
- b=vYIwyLBsgutCovgsKPgv9tlTA+dCSsWfNl38dsZIwcI3ZnnSk0rFembtVs6mJpHlDw4FspdXPFWsBnUejdAL3pzM1mNDkDJzeTTpu9GCUf3D3R6AlDXKrtg6QIAsn1lM015BmG2Imp1ZOvWSqQlqnD7pwlWDPRhU95gqi7cfUag=
-Received: from DM6PR13CA0004.namprd13.prod.outlook.com (2603:10b6:5:bc::17) by
- BL1PR12MB5221.namprd12.prod.outlook.com (2603:10b6:208:30b::9) with Microsoft
+ bh=qSKKHMpTuDiL/WXrVm0mP/gYeJ7kX9ggtq/chHAYeuY=;
+ b=1ATraF84PSlCBB0b+JPSGYDkvIt/z5S930Vb7arncLkluX+BSiv0wat8wQhe7p0DgnOfLHWZgkZeDvhbFdEJO74bhTbgeiTVb2WvYUW+9+MH8D3YzPC9v/wKOCqw/DR9P8LRjMtownoyz3PAbO9VYjbVlHlZh8ykP8YFDJ1i3a0=
+Received: from CP0PR80CA0024.lamprd80.prod.outlook.com (2603:10d6:103:14::36)
+ by DS7PR12MB6119.namprd12.prod.outlook.com (2603:10b6:8:99::8) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5353.15; Mon, 20 Jun 2022 23:09:53 +0000
-Received: from DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:bc:cafe::23) by DM6PR13CA0004.outlook.office365.com
- (2603:10b6:5:bc::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.11 via Frontend
- Transport; Mon, 20 Jun 2022 23:09:53 +0000
+ 15.20.5353.18; Mon, 20 Jun 2022 23:10:10 +0000
+Received: from DM6NAM11FT064.eop-nam11.prod.protection.outlook.com
+ (2603:10d6:103:14:cafe::f7) by CP0PR80CA0024.outlook.office365.com
+ (2603:10d6:103:14::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14 via Frontend
+ Transport; Mon, 20 Jun 2022 23:10:08 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -45,13 +45,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT048.mail.protection.outlook.com (10.13.173.114) with Microsoft SMTP
+ DM6NAM11FT064.mail.protection.outlook.com (10.13.172.234) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:09:53 +0000
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:10:08 +0000
 Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 20 Jun 2022 18:09:50 -0500
+ 15.1.2375.28; Mon, 20 Jun 2022 18:10:05 -0500
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -68,9 +68,9 @@ CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
-Subject: [PATCH Part2 v6 31/49] KVM: x86: Introduce kvm_mmu_get_tdp_walk() for SEV-SNP use
-Date:   Mon, 20 Jun 2022 23:09:41 +0000
-Message-ID: <9151e79d4f5af888242b9589c0a106a49a97837c.1655761627.git.ashish.kalra@amd.com>
+Subject: [PATCH Part2 v6 32/49] KVM: x86: Define RMP page fault error bits for #NPF
+Date:   Mon, 20 Jun 2022 23:09:57 +0000
+Message-ID: <0b639f605c1489dc7ccb212d867628988aea4ef6.1655761627.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
@@ -82,24 +82,24 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7e5c5354-123d-43b4-9636-08da5311fc05
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5221:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5221B0115BC4126E879228148EB09@BL1PR12MB5221.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 1fecebd8-5925-43b5-049a-08da531204f6
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6119:EE_
+X-Microsoft-Antispam-PRVS: <DS7PR12MB6119F7CD481D0C2D175ED1398EB09@DS7PR12MB6119.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LsOUCst45OeJ5185T1tVp0ndaRkSr9/VkNgA/eQdXHM+UuMKXZGe+FiS+VzFMF7sSQLNT0ASlg24xayCAUEIxmzgD/Nt/FLPnmWoR0mRwRKuyMOCNwwwJtFHDEqC74+B+YOmbcb8BeAd30LYE1Tf1+Re8MVz1lKV1CmqP6imJ2BleV+mYuFx6x55FMCJ0xQnb9VeTGgxxyIWCYC/3E0Dr9q25IuPu9SW4fpDIqR6bGV+DNbygEUMky60lTTPy/4c9Nvbmmftakm0B135+Vf6bpHvNMcA7wFtHfO0X911LJk9RP7HnUAPKmEgB0+8/pJEHcV0RgKW1T6GHv038nqUM5g4EpCoGFTVQJSi8RwzUPqhLw95K3dZ37BHAFr91Ekp2no2mOxytF/ls+Q3A2+R1qSVYe2d458oxczHZ9TaPkFpBqPM0RMaY+dfojvM4Abvgp5CjH7ZnQi/KSGyAPYjDHXGdZwVerDhEpNnl3pAIC3URPeOgF+ZT/EW+m0+g+YwD5LfQ+Zel0xiCTuLu377UBShCoAu692kv4rpf8MjcNgHZTcCFZiazpEDmIBczzXzoKHyFA+io6vhX0j00/A0qHJrC1idm4VLnyxSHxFUvBffpGsMA4FxRFgTX9ONktWED+O/kFv8XO6cqbcct5XvJXbewDXI/YE1mYc/GNGYAPFTzXTLRdgviGgwDagP2u5nT9dadZBG2tzHRFkNVKkA12H2lThJUuQev7V81wE+PYUDQGo6r4YgLLMRQET+GYsyy99rz4VJDIEoodBH6yZQqA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(346002)(396003)(376002)(40470700004)(46966006)(36840700001)(8676002)(2906002)(70586007)(4326008)(82310400005)(186003)(336012)(41300700001)(70206006)(36756003)(426003)(2616005)(86362001)(26005)(16526019)(36860700001)(7696005)(47076005)(40460700003)(54906003)(356005)(5660300002)(8936002)(82740400003)(316002)(83380400001)(40480700001)(7406005)(478600001)(6666004)(81166007)(7416002)(110136005)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: RuRRCPYBnAlKdAgLecYFrQyRkOrKGQIl9ct5NAqr2+IWV51Ad+ckJo7UCEWYK5vX9FbSf8uHqow2wglRj2f/qISPRlw1Rdaas3RzunTIQ7msDYEjDi6WkcO6d50AF8RuygdvRHIPkxZX00TSkpfy0RYh/RD7sEFsX+oB5jlZ2N5Nt0yz77Td8XI7qGJ3oYwmZWrt4CuLn1l8NCOZGrV5kRJEX1nRBihzDaY7Pzv+NPiqwsZBq8Vi5tkvnW0ERGO1Yg2oU/VjfLjqgREzSF9Gio4qrKr01mVXqaPYuGjRJdcY1Wcp+B2euSQMsl5DPw4cdB3/DBTa9z21PWddAsJI72I8XdzMcl6JSq6x3K+FLM+CgtKHqcP0w0Jbh8lBMia7p1EhkRgEgmu4/POj5jczZPaL9f8OkGvVPi8EF/+ISrb5Ch4qLu//se7miP9q9jx8Od3ZfpSrHijy428BiVqCJn1DEZjXQ3QEq8kvTcds9aXJSqOdnGeEeIJagTjW9odm3Mil/I7w+2P/I2u81UflKWABrl11n1AAlpJdQtpZkKQrYpCkla20Tkq8tVVRiETor5Uw8SkxBs4561chS03wxVIHHT1pgVMAnDJSf46eQLyYS7cesLqg+wJD/WQhSRuN3Z3r2B901210xgRMY3f7yiaS3UH6NB7agO/F3hZ/v1SS+Prvb1dDQgX2ld3HvmBeLtt743VvynbawBh7WVNrrgeid2ch1zmgJ2TIfNZSFPF9iOKODqPc3Vsvv1UUx6PJAbM9RmXdv/+cKqwagAEu9Q==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(396003)(346002)(39860400002)(136003)(46966006)(36840700001)(40470700004)(81166007)(82310400005)(356005)(36860700001)(26005)(5660300002)(82740400003)(426003)(110136005)(316002)(47076005)(336012)(7696005)(41300700001)(478600001)(7406005)(7416002)(83380400001)(4326008)(2616005)(40460700003)(16526019)(8676002)(70586007)(86362001)(40480700001)(2906002)(36756003)(54906003)(6666004)(70206006)(186003)(8936002)(2101003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:09:53.2870
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:10:08.3157
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e5c5354-123d-43b4-9636-08da5311fc05
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1fecebd8-5925-43b5-049a-08da531204f6
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT048.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT064.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5221
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6119
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -112,88 +112,47 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The SEV-SNP VMs may call the page state change VMGEXIT to add the GPA
-as private or shared in the RMP table. The page state change VMGEXIT
-will contain the RMP page level to be used in the RMP entry. If the
-page level between the TDP and RMP does not match then, it will result
-in nested-page-fault (RMP violation).
+When SEV-SNP is enabled globally, the hardware places restrictions on all
+memory accesses based on the RMP entry, whether the hypervisor or a VM,
+performs the accesses. When hardware encounters an RMP access violation
+during a guest access, it will cause a #VMEXIT(NPF).
 
-The SEV-SNP VMGEXIT handler will use the kvm_mmu_get_tdp_walk() to get
-the current page-level in the TDP for the given GPA and calculate a
-workable page level. If a GPA is mapped as a 4K-page in the TDP, but
-the guest requested to add the GPA as a 2M in the RMP entry then the
-2M request will be broken into 4K-pages to keep the RMP and TDP
-page-levels in sync.
-
-TDP SPTEs are RCU protected so need to put kvm_mmu_get_tdp_walk() in RCU
-read-side critical section by using walk_shadow_page_lockless_begin() and
-walk_lockless_shadow_page_lockless_end(). This fixes the
-"suspicious RCU usage" message seen with lockdep kernel build.
+See APM2 section 16.36.10 for more details.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- arch/x86/kvm/mmu.h     |  2 ++
- arch/x86/kvm/mmu/mmu.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ arch/x86/include/asm/kvm_host.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index c99b15e97a0a..d55b5166389a 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -178,6 +178,8 @@ static inline bool is_nx_huge_page_enabled(void)
- 	return READ_ONCE(nx_huge_pages);
- }
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2748c69609e3..49b217dc8d7e 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -247,9 +247,13 @@ enum x86_intercept_stage;
+ #define PFERR_FETCH_BIT 4
+ #define PFERR_PK_BIT 5
+ #define PFERR_SGX_BIT 15
++#define PFERR_GUEST_RMP_BIT 31
+ #define PFERR_GUEST_FINAL_BIT 32
+ #define PFERR_GUEST_PAGE_BIT 33
+ #define PFERR_IMPLICIT_ACCESS_BIT 48
++#define PFERR_GUEST_ENC_BIT 34
++#define PFERR_GUEST_SIZEM_BIT 35
++#define PFERR_GUEST_VMPL_BIT 36
  
-+bool kvm_mmu_get_tdp_walk(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t *pfn, int *level);
-+
- static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 					u32 err, bool prefetch)
- {
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 569021af349a..c1ac486e096e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4151,6 +4151,39 @@ kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
- }
- EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
+ #define PFERR_PRESENT_MASK (1U << PFERR_PRESENT_BIT)
+ #define PFERR_WRITE_MASK (1U << PFERR_WRITE_BIT)
+@@ -261,6 +265,10 @@ enum x86_intercept_stage;
+ #define PFERR_GUEST_FINAL_MASK (1ULL << PFERR_GUEST_FINAL_BIT)
+ #define PFERR_GUEST_PAGE_MASK (1ULL << PFERR_GUEST_PAGE_BIT)
+ #define PFERR_IMPLICIT_ACCESS (1ULL << PFERR_IMPLICIT_ACCESS_BIT)
++#define PFERR_GUEST_RMP_MASK (1ULL << PFERR_GUEST_RMP_BIT)
++#define PFERR_GUEST_ENC_MASK (1ULL << PFERR_GUEST_ENC_BIT)
++#define PFERR_GUEST_SIZEM_MASK (1ULL << PFERR_GUEST_SIZEM_BIT)
++#define PFERR_GUEST_VMPL_MASK (1ULL << PFERR_GUEST_VMPL_BIT)
  
-+bool kvm_mmu_get_tdp_walk(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t *pfn, int *level)
-+{
-+	u64 sptes[PT64_ROOT_MAX_LEVEL + 1];
-+	int leaf, root;
-+
-+	walk_shadow_page_lockless_begin(vcpu);
-+
-+	if (is_tdp_mmu(vcpu->arch.mmu))
-+		leaf = kvm_tdp_mmu_get_walk(vcpu, gpa, sptes, &root);
-+	else
-+		leaf = get_walk(vcpu, gpa, sptes, &root);
-+
-+	walk_shadow_page_lockless_end(vcpu);
-+
-+	if (unlikely(leaf < 0))
-+		return false;
-+
-+	/* Check if the leaf SPTE is present */
-+	if (!is_shadow_present_pte(sptes[leaf]))
-+		return false;
-+
-+	*pfn = spte_to_pfn(sptes[leaf]);
-+	if (leaf > PG_LEVEL_4K) {
-+		u64 page_mask = KVM_PAGES_PER_HPAGE(leaf) - KVM_PAGES_PER_HPAGE(leaf - 1);
-+		*pfn |= (gpa_to_gfn(gpa) & page_mask);
-+	}
-+
-+	*level = leaf;
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(kvm_mmu_get_tdp_walk);
-+
- static void nonpaging_init_context(struct kvm_mmu *context)
- {
- 	context->page_fault = nonpaging_page_fault;
+ #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
+ 				 PFERR_WRITE_MASK |		\
 -- 
 2.25.1
 
