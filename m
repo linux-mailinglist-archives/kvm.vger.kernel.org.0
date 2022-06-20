@@ -2,151 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BA48551790
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 13:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 169FC551799
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 13:43:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241076AbiFTLmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 07:42:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58262 "EHLO
+        id S241942AbiFTLnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 07:43:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235801AbiFTLmP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 07:42:15 -0400
-Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F296167DB;
-        Mon, 20 Jun 2022 04:42:10 -0700 (PDT)
-Received: by ajax-webmail-mail-app4 (Coremail) ; Mon, 20 Jun 2022 19:42:06
- +0800 (GMT+08:00)
-X-Originating-IP: [10.192.42.160]
-Date:   Mon, 20 Jun 2022 19:42:06 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   =?UTF-8?B?5r2Y6auY5a6B?= <pgn@zju.edu.cn>
-To:     "Dmitry Vyukov" <dvyukov@google.com>
-Cc:     22121145@zju.edu.cn, kangel@zju.edu.cn, syzkaller@googlegroups.com,
+        with ESMTP id S241905AbiFTLnT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 07:43:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39BE22FA
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 04:43:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655725396;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qxxbDgrZTkB0Cli5g9D86lOEWrOx+awHmsQv7IEefYA=;
+        b=RQmvL/l1/s4qIzm7aoLe5ZejUIoRyvpKNlYHDZ7wk+Ox6K0NO7+dan7yu3/WSb3cGw2t8o
+        W/8lJ2wFaVtbCG1uBrPyzJxIKTvkJR3Yo90FeY7IkFStbcRmxWSCZDNX82PZXZq5snudz0
+        VuRjW5Q6ZG9PQq1AToCJ0Swgp9Eh8Hg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-650-VVSse7XPPOGJ2WLDtRaIRw-1; Mon, 20 Jun 2022 07:43:13 -0400
+X-MC-Unique: VVSse7XPPOGJ2WLDtRaIRw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8248529AB3E2;
+        Mon, 20 Jun 2022 11:43:12 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.39.194.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 804E01415109;
+        Mon, 20 Jun 2022 11:43:09 +0000 (UTC)
+Subject: Re: [PATCH v2 0/2] Improve vfio-pci primary GPU assignment behavior
+To:     Alex Williamson <alex.williamson@redhat.com>, corbet@lwn.net,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
+        deller@gmx.de, gregkh@linuxfoundation.org
+Cc:     Gerd Hoffmann <kraxel@redhat.com>, linux-doc@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: Re: 'WARNING in handle_exception_nmi' bug at
- arch/x86/kvm/vmx/vmx.c:4959
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
-In-Reply-To: <CACT4Y+anXSNgCW3jvsm8wPf0LPxW-kCmXTeno4n-BWntpMaZBA@mail.gmail.com>
-References: <69ab985c.7d507.18180a4dcd7.Coremail.pgn@zju.edu.cn>
- <CACT4Y+anXSNgCW3jvsm8wPf0LPxW-kCmXTeno4n-BWntpMaZBA@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+References: <165541020563.1955826.16350888595945658159.stgit@omen>
+From:   Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f0bdd9b1-16af-8069-65dd-9e90c8f4a6ac@redhat.com>
+Date:   Mon, 20 Jun 2022 13:43:08 +0200
 MIME-Version: 1.0
-Message-ID: <66df6207.7d469.18180eb8295.Coremail.pgn@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: cS_KCgC3PiEPXbBi8fo4Ag--.53045W
-X-CM-SenderInfo: qsryjiatsqq6lmxovvfxof0/1tbiAgkHBlZdtaTnLgAAsZ
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <165541020563.1955826.16350888595945658159.stgit@omen>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T3VyIGhvc3QgbWFjaGluZSBpcyBsaW51eC01LjExLjAuCgoKPiAtLS0tLeWOn+Wni+mCruS7ti0t
-LS0tCj4g5Y+R5Lu25Lq6OiAiRG1pdHJ5IFZ5dWtvdiIgPGR2eXVrb3ZAZ29vZ2xlLmNvbT4KPiDl
-j5HpgIHml7bpl7Q6IDIwMjItMDYtMjAgMTk6MjQ6MjYgKOaYn+acn+S4gCkKPiDmlLbku7bkuro6
-ICLmvZjpq5jlroEiIDxwZ25Aemp1LmVkdS5jbj4KPiDmioTpgIE6IGxpbnV4LXNneEB2Z2VyLmtl
-cm5lbC5vcmcsIHNlY2FsZXJ0QHJlZGhhdC5jb20sIHBib256aW5pQHJlZGhhdC5jb20sIHNlYW5q
-Y0Bnb29nbGUuY29tLCB2a3V6bmV0c0ByZWRoYXQuY29tLCB3YW5wZW5nbGlAdGVuY2VudC5jb20s
-IGptYXR0c29uQGdvb2dsZS5jb20sIGpvcm9AOGJ5dGVzLm9yZywgdGdseEBsaW51dHJvbml4LmRl
-LCBtaW5nb0ByZWRoYXQuY29tLCBicEBhbGllbjguZGUsIGRhdmUuaGFuc2VuQGxpbnV4LmludGVs
-LmNvbSwgeDg2QGtlcm5lbC5vcmcsIGhwYUB6eXRvci5jb20sIGt2bUB2Z2VyLmtlcm5lbC5vcmcs
-IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcsIHN5emthbGxlckBnb29nbGVncm91cHMuY29t
-LCBrYW5nZWxAemp1LmVkdS5jbiwgMjIxMjExNDVAemp1LmVkdS5jbgo+IOS4u+mimDogUmU6ICdX
-QVJOSU5HIGluIGhhbmRsZV9leGNlcHRpb25fbm1pJyBidWcgYXQgYXJjaC94ODYva3ZtL3ZteC92
-bXguYzo0OTU5Cj4gCj4gT24gTW9uLCAyMCBKdW4gMjAyMiBhdCAxMjoyNSwg5r2Y6auY5a6BIDxw
-Z25Aemp1LmVkdS5jbj4gd3JvdGU6Cj4gPgo+ID4gSGVsbG8sCj4gPgo+ID4gICAgIFRoaXMgaXMg
-WGlhbyBMZWksIEdhb25pbmcgUGFuIGFuZCBZb25na2FuZyBKaWEgZnJvbSBaaGVqaWFuZyBVbml2
-ZXJzaXR5LiBXZSBmb3VuZCBhICdXQVJOSU5HIGluIGhhbmRsZV9leGNlcHRpb25fbm1pJyBidWcg
-Ynkgc3l6a2FsbGVyLiBUaGlzIGZsYXcgYWxsb3dzIGEgbWFsaWNpb3VzIHVzZXIgaW4gYSBsb2Nh
-bCBEb1MgY29uZGl0aW9uLiBUaGUgZm9sbG93aW5nIHByb2dyYW0gdHJpZ2dlcnMgTG9jYWwgRG9T
-IGF0IGFyY2gveDg2L2t2bS92bXgvdm14LmM6NDk1OSBpbiBsYXRlc3QgcmVsZWFzZSBsaW51eC01
-LjE4LjUsIHRoaXMgYnVnIGNhbiBiZSByZXByb2R1Y2libGUgc3RhYmx5IGJ5IHRoZSBDIHJlcHJv
-ZHVjZXI6Cj4gCj4gCj4gRldJVyBhIHNpbWlsYXJseS1sb29raW5nIGlzc3VlIHdhcyByZXBvcnRl
-ZCBieSBzeXpib3Q6Cj4gaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20vYnVnP2lkPTFiNDEx
-YmZiMTczOWM0OTdhOGYwYzdmMWFhNTAxMjAyNzI2Y2QwMWEKPiBodHRwczovL2xvcmUua2VybmVs
-Lm9yZy9hbGwvMDAwMDAwMDAwMDAwMGE1ZWFlMDVkODk0N2FkYkBnb29nbGUuY29tLwo+IAo+IFNl
-YW4gc2FpZCBpdCBtYXkgYmUgYW4gaXNzdWUgaW4gTDAga2VybmVsIHJhdGhlciB0aGFuIGluIHRo
-ZSB0ZXN0ZWQga2VybmVsOgo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2FsbC9ZcWQ1dXBBSE5P
-eEQwd3JRQGdvb2dsZS5jb20vCj4gCj4gV2hhdCBrZXJuZWwgZGlkIHlvdSB1c2UgZm9yIHRoZSBo
-b3N0IG1hY2hpbmU/Cj4gCj4gCj4gCj4gCj4gCj4gPiAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0t
-LS0tLS0tLS0tLS0KPiA+IFdBUk5JTkc6IENQVTogMTQgUElEOiA5Mjc3IGF0IGFyY2gveDg2L2t2
-bS92bXgvdm14LmM6NDk1OSBoYW5kbGVfZXhjZXB0aW9uX25taSsweDExYTcvMHgxNGQwIGFyY2gv
-eDg2L2t2bS92bXgvdm14LmM6NDk1OQo+ID4gTW9kdWxlcyBsaW5rZWQgaW46Cj4gPiBDUFU6IDE0
-IFBJRDogOTI3NyBDb21tOiBzeXotZXhlY3V0b3IuNyBOb3QgdGFpbnRlZCA1LjE4LjUgIzEKPiA+
-IEhhcmR3YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBC
-SU9TIDEuMTMuMC0xdWJ1bnR1MS4xIDA0LzAxLzIwMTQKPiA+IFJJUDogMDAxMDpoYW5kbGVfZXhj
-ZXB0aW9uX25taSsweDExYTcvMHgxNGQwIGFyY2gveDg2L2t2bS92bXgvdm14LmM6NDk1OQo+ID4g
-Q29kZTogZmYgZTggMWQgYjcgM2MgMDAgYmUgMGMgNDQgMDAgMDAgNDggYzcgYzcgMDAgYzkgMjMg
-OGEgYzYgMDUgOWYgNzEgNWUgMDQgMDEgZTggNWIgMDIgOGQgMDIgMGYgMGIgZTkgNjQgZjggZmYg
-ZmYgZTggZjkgYjYgM2MgMDAgPDBmPiAwYiBlOSBhZSBmNCBmZiBmZiBlOCBlZCBiNiAzYyAwMCBl
-OCAyOCA5NyBhMCAwMiBlOSA1ZiBmZCBmZiBmZgo+ID4gUlNQOiAwMDE4OmZmZmY4ODgwMzhkYzdi
-NDggRUZMQUdTOiAwMDAxMDI4Ngo+ID4gUkFYOiAwMDAwMDAwMDAwMDAyNjE3IFJCWDogMDAwMDAw
-MDAwMDAwMDAwMCBSQ1g6IGZmZmZmZmZmODExZGNmMjcKPiA+IFJEWDogMDAwMDAwMDAwMDA0MDAw
-MCBSU0k6IGZmZmZjOTAwMDNkZDEwMDAgUkRJOiBmZmZmODg4MDM5NTk1YzBjCj4gPiBSQlA6IGZm
-ZmY4ODgwMzk1OTQwMDAgUjA4OiAwMDAwMDAwMDAwMDAwMDAxIFIwOTogZmZmZjg4ODAzOTU5NDFh
-Nwo+ID4gUjEwOiBmZmZmZWQxMDA3MmIyODM0IFIxMTogMDAwMDAwMDAwMDAwMDAwMSBSMTI6IGZm
-ZmZmZmZmZmZmZmZmZjgKPiA+IFIxMzogMDAwMDAwMDA4MDAwMDMwZSBSMTQ6IGZmZmY4ODgwMzg5
-NWMwMDAgUjE1OiBmZmZmODg4MDM5NTk0MDY4Cj4gPiBGUzogIDAwMDA3ZmY1NmVkZjc3MDAoMDAw
-MCkgR1M6ZmZmZjg4ODA2N2QwMDAwMCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwCj4gPiBD
-UzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzCj4gPiBDUjI6
-IDAwMDAwMDAwMDAwMDAwMDAgQ1IzOiAwMDAwMDAwMDNhZWM4MDA2IENSNDogMDAwMDAwMDAwMDc3
-MmVlMAo+ID4gRFIwOiAwMDAwMDAwMDAwMDAwMDAwIERSMTogMDAwMDAwMDAwMDAwMDAwMCBEUjI6
-IDAwMDAwMDAwMDAwMDAwMDAKPiA+IERSMzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAw
-ZmZmZTBmZjAgRFI3OiAwMDAwMDAwMDAwMDAwNDAwCj4gPiBQS1JVOiA1NTU1NTU1NAo+ID4gQ2Fs
-bCBUcmFjZToKPiA+ICA8VEFTSz4KPiA+ICBfX3ZteF9oYW5kbGVfZXhpdCBhcmNoL3g4Ni9rdm0v
-dm14L3ZteC5jOjYyMzkgW2lubGluZV0KPiA+ICB2bXhfaGFuZGxlX2V4aXQrMHg1ZTcvMHgxYWEw
-IGFyY2gveDg2L2t2bS92bXgvdm14LmM6NjI1Ngo+ID4gIHZjcHVfZW50ZXJfZ3Vlc3QgYXJjaC94
-ODYva3ZtL3g4Ni5jOjEwMjgzIFtpbmxpbmVdCj4gPiAgdmNwdV9ydW4gYXJjaC94ODYva3ZtL3g4
-Ni5jOjEwMzY1IFtpbmxpbmVdCj4gPiAga3ZtX2FyY2hfdmNwdV9pb2N0bF9ydW4rMHgyYTJlLzB4
-NWNhMCBhcmNoL3g4Ni9rdm0veDg2LmM6MTA1NjYKPiA+ICBrdm1fdmNwdV9pb2N0bCsweDRkMi8w
-eGM2MCBhcmNoL3g4Ni9rdm0vLi4vLi4vLi4vdmlydC9rdm0va3ZtX21haW4uYzozOTQzCj4gPiAg
-dmZzX2lvY3RsIGZzL2lvY3RsLmM6NTEgW2lubGluZV0KPiA+ICBfX2RvX3N5c19pb2N0bCBmcy9p
-b2N0bC5jOjg3MCBbaW5saW5lXQo+ID4gIF9fc2Vfc3lzX2lvY3RsIGZzL2lvY3RsLmM6ODU2IFtp
-bmxpbmVdCj4gPiAgX194NjRfc3lzX2lvY3RsKzB4MTZkLzB4MWQwIGZzL2lvY3RsLmM6ODU2Cj4g
-PiAgZG9fc3lzY2FsbF94NjQgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6NTAgW2lubGluZV0KPiA+
-ICBkb19zeXNjYWxsXzY0KzB4MzgvMHg5MCBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzo4MAo+ID4g
-IGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDQ0LzB4YWUKPiA+IFJJUDogMDAzMzow
-eDQ1ZThjOQo+ID4gQ29kZTogNGQgYWYgZmIgZmYgYzMgNjYgMmUgMGYgMWYgODQgMDAgMDAgMDAg
-MDAgMDAgNjYgOTAgNDggODkgZjggNDggODkgZjcgNDggODkgZDYgNDggODkgY2EgNGQgODkgYzIg
-NGQgODkgYzggNGMgOGIgNGMgMjQgMDggMGYgMDUgPDQ4PiAzZCAwMSBmMCBmZiBmZiAwZiA4MyAx
-YiBhZiBmYiBmZiBjMyA2NiAyZSAwZiAxZiA4NCAwMCAwMCAwMCAwMAo+ID4gUlNQOiAwMDJiOjAw
-MDA3ZmY1NmVkZjZjNTggRUZMQUdTOiAwMDAwMDI0NiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDAx
-MAo+ID4gUkFYOiBmZmZmZmZmZmZmZmZmZmRhIFJCWDogMDAwMDAwMDAwMDc3YmY2MCBSQ1g6IDAw
-MDAwMDAwMDA0NWU4YzkKPiA+IFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IDAwMDAwMDAwMDAw
-MGFlODAgUkRJOiAwMDAwMDAwMDAwMDAwMDA1Cj4gPiBSQlA6IDAwMDAwMDAwMDA3N2JmNjAgUjA4
-OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAwMDAwMDAwMDAwMDAwMAo+ID4gUjEwOiAwMDAwMDAw
-MDAwMDAwMDAwIFIxMTogMDAwMDAwMDAwMDAwMDI0NiBSMTI6IDAwMDAwMDAwMDAwMDAwMDAKPiA+
-IFIxMzogMDAwMDdmZmM0OTFiZTZhZiBSMTQ6IDAwMDA3ZmY1NmVkZjc5YzAgUjE1OiAwMDAwMDAw
-MDAwMDAwMDAwCj4gPiAgPC9UQVNLPgo+ID4gLS0tWyBlbmQgdHJhY2UgMDAwMDAwMDAwMDAwMDAw
-MCBdLS0tCj4gPgo+ID4gU3l6a2FsbGVyIHJlcHJvZHVjZXI6Cj4gPiAjIHtUaHJlYWRlZDpmYWxz
-ZSBSZXBlYXQ6ZmFsc2UgUmVwZWF0VGltZXM6MCBQcm9jczoxIFNsb3dkb3duOjEgU2FuZGJveDog
-TGVhazpmYWxzZSBOZXRJbmplY3Rpb246ZmFsc2UgTmV0RGV2aWNlczpmYWxzZSBOZXRSZXNldDpm
-YWxzZSBDZ3JvdXBzOmZhbHNlIEJpbmZtdE1pc2M6ZmFsc2UgQ2xvc2VGRHM6ZmFsc2UgS0NTQU46
-ZmFsc2UgRGV2bGlua1BDSTpmYWxzZSBVU0I6ZmFsc2UgVmhjaUluamVjdGlvbjpmYWxzZSBXaWZp
-OmZhbHNlIElFRUU4MDIxNTQ6ZmFsc2UgU3lzY3RsOnRydWUgVXNlVG1wRGlyOmZhbHNlIEhhbmRs
-ZVNlZ3Y6ZmFsc2UgUmVwcm86ZmFsc2UgVHJhY2U6ZmFsc2UgTGVnYWN5T3B0aW9uczp7Q29sbGlk
-ZTpmYWxzZSBGYXVsdDpmYWxzZSBGYXVsdENhbGw6MCBGYXVsdE50aDowfX0KPiA+IHIwID0gb3Bl
-bmF0JGt2bSgweGZmZmZmZmZmZmZmZmZmOWMsICYoMHg3ZjAwMDAwMDAwMDApLCAweDAsIDB4MCkK
-PiA+IHIxID0gaW9jdGwkS1ZNX0NSRUFURV9WTShyMCwgMHhhZTAxLCAweDApCj4gPiByMiA9IGlv
-Y3RsJEtWTV9DUkVBVEVfVkNQVShyMSwgMHhhZTQxLCAweDApCj4gPiBzeXpfa3ZtX3NldHVwX2Nw
-dSR4ODYocjEsIHIyLCAmKDB4N2YwMDAwZmU4MDAwLzB4MTgwMDApPW5pbCwgJigweDdmMDAwMDAw
-MDBjMCk9W0B0ZXh0cmVhbD17MHg4LCAweDB9XSwgMHgxLCAweDE3LCAmKDB4N2YwMDAwMDAwMTAw
-KT1bQGNyND17MHgxLCAweDIwMDkxNX1dLCAweDEpCj4gPiBpb2N0bCRLVk1fUlVOKHIyLCAweGFl
-ODAsIDB4MCkKPiA+Cj4gPgo+ID4gQyByZXBybyBhbmQgY29uZmlnIGFyZSBhdHRhY2hlZC4KPiA+
-Cj4gPgo+ID4gQmVzdCByZWdyYWRzLgo+ID4KPiA+IFhpYW8gTGVpIGZyb20gWmhlamlhbmcgVW5p
-dmVyc2l0eS4KPiA+Cj4gPiAtLQo+ID4gWW91IHJlY2VpdmVkIHRoaXMgbWVzc2FnZSBiZWNhdXNl
-IHlvdSBhcmUgc3Vic2NyaWJlZCB0byB0aGUgR29vZ2xlIEdyb3VwcyAic3l6a2FsbGVyIiBncm91
-cC4KPiA+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBncm91cCBhbmQgc3RvcCByZWNlaXZpbmcg
-ZW1haWxzIGZyb20gaXQsIHNlbmQgYW4gZW1haWwgdG8gc3l6a2FsbGVyK3Vuc3Vic2NyaWJlQGdv
-b2dsZWdyb3Vwcy5jb20uCj4gPiBUbyB2aWV3IHRoaXMgZGlzY3Vzc2lvbiBvbiB0aGUgd2ViIHZp
-c2l0IGh0dHBzOi8vZ3JvdXBzLmdvb2dsZS5jb20vZC9tc2dpZC9zeXprYWxsZXIvNjlhYjk4NWMu
-N2Q1MDcuMTgxODBhNGRjZDcuQ29yZW1haWwucGduJTQwemp1LmVkdS5jbi4K
+On 06/16/22 22:38, Alex Williamson wrote:
+> When assigning a primary graphics device to VM through vfio-pci device
+> assignment, users often prevent binding of the native PCI graphics
+> driver to avoid device initialization conflicts, however firmware
+> console drivers may still be attached to the device which can often be
+> cumbersome to manually unbind or exclude via cmdline options.
+> 
+> This series proposes to move the DRM aperture helpers out to
+> drivers/video/ to make it more accessible to drivers like vfio-pci,
+> which have neither dependencies on DRM code nor a struct drm_driver
+> to present to existing interfaces.  vfio-pci can then trivially call
+> into the aperture helpers to remove conflicting drivers, rather than
+> open coding it ourselves as was proposed with a new symbol export in
+> v1 of this series[1].
+> 
+> Thanks to Thomas for splitting out the aperture code with new
+> documentation.
+> 
+> Thomas had proposed this going through the vfio tree with appropriate
+> stakeholder acks, that's fine with me, but I'm also open to it going
+> through the DRM tree given that the vfio-pci-core change is even more
+> trivial now and the bulk of the changes are DRM/video paths.  Thanks,
+> 
+> Alex
+> 
+> [1]https://lore.kernel.org/all/165453797543.3592816.6381793341352595461.stgit@omen/
+> 
+> ---
+> 
+> Alex Williamson (1):
+>       vfio/pci: Remove console drivers
+> 
+> Thomas Zimmermann (1):
+>       drm: Implement DRM aperture helpers under video/
+> 
+> 
+>  Documentation/driver-api/aperture.rst |  13 +
+>  Documentation/driver-api/index.rst    |   1 +
+>  drivers/gpu/drm/drm_aperture.c        | 174 +------------
+>  drivers/gpu/drm/tiny/Kconfig          |   1 +
+>  drivers/vfio/pci/vfio_pci_core.c      |   5 +
+>  drivers/video/Kconfig                 |   6 +
+>  drivers/video/Makefile                |   2 +
+>  drivers/video/aperture.c              | 340 ++++++++++++++++++++++++++
+>  drivers/video/console/Kconfig         |   1 +
+>  drivers/video/fbdev/Kconfig           |   7 +-
+>  include/linux/aperture.h              |  56 +++++
+>  11 files changed, 440 insertions(+), 166 deletions(-)
+>  create mode 100644 Documentation/driver-api/aperture.rst
+>  create mode 100644 drivers/video/aperture.c
+>  create mode 100644 include/linux/aperture.h
+> 
+
+series
+Tested-by: Laszlo Ersek <lersek@redhat.com>
+
+(on top of Fedora's 5.18.5-100.fc35.x86_64)
+
+Thanks,
+Laszlo
+
