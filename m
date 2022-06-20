@@ -2,107 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 462BE55177E
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 13:33:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BA48551790
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 13:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241969AbiFTLdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 07:33:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54098 "EHLO
+        id S241076AbiFTLmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 07:42:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241921AbiFTLdi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 07:33:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AA81E15FD4
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 04:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655724811;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3PbCQbIK7HmUq+A4wdqW1zRM8TVyI16FcVAtMkTtwns=;
-        b=dLgGBXxWqu74ukngw6HQmTnZJd1V3a/ny1dQ8kjEPGOa0igty37kNtk+TOM0LugeBsqRU0
-        cXHchhY2CdtvWZ930ph32/tpYvX5lPQu29yIOSR+tqoUmdV5O9JTtjJZSX7QAkhhhdP/TP
-        uMWBDDvwKdVnku7ry+mPsTnd4pG1uuk=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-635-RwroeTPNOY26DN9_NsPKcw-1; Mon, 20 Jun 2022 07:33:31 -0400
-X-MC-Unique: RwroeTPNOY26DN9_NsPKcw-1
-Received: by mail-ed1-f71.google.com with SMTP id h16-20020a05640250d000b0043572a34a61so3760289edb.15
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 04:33:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=3PbCQbIK7HmUq+A4wdqW1zRM8TVyI16FcVAtMkTtwns=;
-        b=pECZKLIQ3rNNtAgOjF7M9B7rtWT/rXGLQPW2uz1+a0OfqkuJf/JIE3PNKQ48svGKpZ
-         WDaZHNp8HXwSSaGpg9QJyo1fJ1Nn5aULeWJ6PNqESV4OfcpnOZH0DHZBSRDRzr2Z6Avs
-         MstUufd/6JE+JnEHmT0B2auchrql8VC0OdnfP8kXzp/BEUbBsZUKAfKihKu1dYG08V+x
-         dvxxD0gviavT/+x7slxyaMQE8ro6cX1zOCkhBOf2mT0qUr3oczXUeBcxlfs4EUADT/Rq
-         iWui/zRFi+hpA0kd4aa9A2SszgalLzpsT02KRTA8LwXkqNnnm5gUydnk1wmIU/udXpUq
-         VH7Q==
-X-Gm-Message-State: AJIora83uHZwSm7kNLdP8VxCRqPBlUikVYubU0O3JXx7niUmIdCgrX6X
-        5+BnGj2zjlmWzpwTtRmOvX6kpi+Rej1sp7f4KhE913z7baWKHtjTGFB7Ks1Heq9oE9IsnGXkOAC
-        PddezRC2XHh7D
-X-Received: by 2002:aa7:dd85:0:b0:435:64d1:5ba with SMTP id g5-20020aa7dd85000000b0043564d105bamr18660988edv.389.1655724809313;
-        Mon, 20 Jun 2022 04:33:29 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tHnk2ocuWxsBwnqq7v2gZTo+b+WJkchX/7ahH1U/LmESuHPgZOhPNyLY8WwvbZRn6F8Jbjtg==
-X-Received: by 2002:aa7:dd85:0:b0:435:64d1:5ba with SMTP id g5-20020aa7dd85000000b0043564d105bamr18660949edv.389.1655724809062;
-        Mon, 20 Jun 2022 04:33:29 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id z19-20020a056402275300b004319b12371asm10485788edd.47.2022.06.20.04.33.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jun 2022 04:33:27 -0700 (PDT)
-Message-ID: <a844abdc-97c3-8e5a-94e7-ea967876f226@redhat.com>
-Date:   Mon, 20 Jun 2022 13:33:23 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: 'WARNING in handle_exception_nmi' bug at
+        with ESMTP id S235801AbiFTLmP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 07:42:15 -0400
+Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F296167DB;
+        Mon, 20 Jun 2022 04:42:10 -0700 (PDT)
+Received: by ajax-webmail-mail-app4 (Coremail) ; Mon, 20 Jun 2022 19:42:06
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.192.42.160]
+Date:   Mon, 20 Jun 2022 19:42:06 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   =?UTF-8?B?5r2Y6auY5a6B?= <pgn@zju.edu.cn>
+To:     "Dmitry Vyukov" <dvyukov@google.com>
+Cc:     22121145@zju.edu.cn, kangel@zju.edu.cn, syzkaller@googlegroups.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: Re: 'WARNING in handle_exception_nmi' bug at
  arch/x86/kvm/vmx/vmx.c:4959
-Content-Language: en-US
-To:     Dmitry Vyukov <dvyukov@google.com>,
-        =?UTF-8?B?5r2Y6auY5a6B?= <pgn@zju.edu.cn>
-Cc:     linux-sgx@vger.kernel.org, secalert@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller@googlegroups.com, kangel@zju.edu.cn, 22121145@zju.edu.cn
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
+In-Reply-To: <CACT4Y+anXSNgCW3jvsm8wPf0LPxW-kCmXTeno4n-BWntpMaZBA@mail.gmail.com>
 References: <69ab985c.7d507.18180a4dcd7.Coremail.pgn@zju.edu.cn>
  <CACT4Y+anXSNgCW3jvsm8wPf0LPxW-kCmXTeno4n-BWntpMaZBA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CACT4Y+anXSNgCW3jvsm8wPf0LPxW-kCmXTeno4n-BWntpMaZBA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Message-ID: <66df6207.7d469.18180eb8295.Coremail.pgn@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: cS_KCgC3PiEPXbBi8fo4Ag--.53045W
+X-CM-SenderInfo: qsryjiatsqq6lmxovvfxof0/1tbiAgkHBlZdtaTnLgAAsZ
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/20/22 13:24, Dmitry Vyukov wrote:
-> On Mon, 20 Jun 2022 at 12:25, 潘高宁 <pgn@zju.edu.cn> wrote:
->>
->> Hello,
->>
->>      This is Xiao Lei, Gaoning Pan and Yongkang Jia from Zhejiang University. We found a 'WARNING in handle_exception_nmi' bug by syzkaller. This flaw allows a malicious user in a local DoS condition. The following program triggers Local DoS at arch/x86/kvm/vmx/vmx.c:4959 in latest release linux-5.18.5, this bug can be reproducible stably by the C reproducer:
-> 
-> 
-> FWIW a similarly-looking issue was reported by syzbot:
-> https://syzkaller.appspot.com/bug?id=1b411bfb1739c497a8f0c7f1aa501202726cd01a
-> https://lore.kernel.org/all/0000000000000a5eae05d8947adb@google.com/
-> 
-> Sean said it may be an issue in L0 kernel rather than in the tested kernel:
-> https://lore.kernel.org/all/Yqd5upAHNOxD0wrQ@google.com/
-
-Indeed I cannot reproduce these either on bare metal.
-
-Paolo
-
+T3VyIGhvc3QgbWFjaGluZSBpcyBsaW51eC01LjExLjAuCgoKPiAtLS0tLeWOn+Wni+mCruS7ti0t
+LS0tCj4g5Y+R5Lu25Lq6OiAiRG1pdHJ5IFZ5dWtvdiIgPGR2eXVrb3ZAZ29vZ2xlLmNvbT4KPiDl
+j5HpgIHml7bpl7Q6IDIwMjItMDYtMjAgMTk6MjQ6MjYgKOaYn+acn+S4gCkKPiDmlLbku7bkuro6
+ICLmvZjpq5jlroEiIDxwZ25Aemp1LmVkdS5jbj4KPiDmioTpgIE6IGxpbnV4LXNneEB2Z2VyLmtl
+cm5lbC5vcmcsIHNlY2FsZXJ0QHJlZGhhdC5jb20sIHBib256aW5pQHJlZGhhdC5jb20sIHNlYW5q
+Y0Bnb29nbGUuY29tLCB2a3V6bmV0c0ByZWRoYXQuY29tLCB3YW5wZW5nbGlAdGVuY2VudC5jb20s
+IGptYXR0c29uQGdvb2dsZS5jb20sIGpvcm9AOGJ5dGVzLm9yZywgdGdseEBsaW51dHJvbml4LmRl
+LCBtaW5nb0ByZWRoYXQuY29tLCBicEBhbGllbjguZGUsIGRhdmUuaGFuc2VuQGxpbnV4LmludGVs
+LmNvbSwgeDg2QGtlcm5lbC5vcmcsIGhwYUB6eXRvci5jb20sIGt2bUB2Z2VyLmtlcm5lbC5vcmcs
+IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcsIHN5emthbGxlckBnb29nbGVncm91cHMuY29t
+LCBrYW5nZWxAemp1LmVkdS5jbiwgMjIxMjExNDVAemp1LmVkdS5jbgo+IOS4u+mimDogUmU6ICdX
+QVJOSU5HIGluIGhhbmRsZV9leGNlcHRpb25fbm1pJyBidWcgYXQgYXJjaC94ODYva3ZtL3ZteC92
+bXguYzo0OTU5Cj4gCj4gT24gTW9uLCAyMCBKdW4gMjAyMiBhdCAxMjoyNSwg5r2Y6auY5a6BIDxw
+Z25Aemp1LmVkdS5jbj4gd3JvdGU6Cj4gPgo+ID4gSGVsbG8sCj4gPgo+ID4gICAgIFRoaXMgaXMg
+WGlhbyBMZWksIEdhb25pbmcgUGFuIGFuZCBZb25na2FuZyBKaWEgZnJvbSBaaGVqaWFuZyBVbml2
+ZXJzaXR5LiBXZSBmb3VuZCBhICdXQVJOSU5HIGluIGhhbmRsZV9leGNlcHRpb25fbm1pJyBidWcg
+Ynkgc3l6a2FsbGVyLiBUaGlzIGZsYXcgYWxsb3dzIGEgbWFsaWNpb3VzIHVzZXIgaW4gYSBsb2Nh
+bCBEb1MgY29uZGl0aW9uLiBUaGUgZm9sbG93aW5nIHByb2dyYW0gdHJpZ2dlcnMgTG9jYWwgRG9T
+IGF0IGFyY2gveDg2L2t2bS92bXgvdm14LmM6NDk1OSBpbiBsYXRlc3QgcmVsZWFzZSBsaW51eC01
+LjE4LjUsIHRoaXMgYnVnIGNhbiBiZSByZXByb2R1Y2libGUgc3RhYmx5IGJ5IHRoZSBDIHJlcHJv
+ZHVjZXI6Cj4gCj4gCj4gRldJVyBhIHNpbWlsYXJseS1sb29raW5nIGlzc3VlIHdhcyByZXBvcnRl
+ZCBieSBzeXpib3Q6Cj4gaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20vYnVnP2lkPTFiNDEx
+YmZiMTczOWM0OTdhOGYwYzdmMWFhNTAxMjAyNzI2Y2QwMWEKPiBodHRwczovL2xvcmUua2VybmVs
+Lm9yZy9hbGwvMDAwMDAwMDAwMDAwMGE1ZWFlMDVkODk0N2FkYkBnb29nbGUuY29tLwo+IAo+IFNl
+YW4gc2FpZCBpdCBtYXkgYmUgYW4gaXNzdWUgaW4gTDAga2VybmVsIHJhdGhlciB0aGFuIGluIHRo
+ZSB0ZXN0ZWQga2VybmVsOgo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2FsbC9ZcWQ1dXBBSE5P
+eEQwd3JRQGdvb2dsZS5jb20vCj4gCj4gV2hhdCBrZXJuZWwgZGlkIHlvdSB1c2UgZm9yIHRoZSBo
+b3N0IG1hY2hpbmU/Cj4gCj4gCj4gCj4gCj4gCj4gPiAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0t
+LS0tLS0tLS0tLS0KPiA+IFdBUk5JTkc6IENQVTogMTQgUElEOiA5Mjc3IGF0IGFyY2gveDg2L2t2
+bS92bXgvdm14LmM6NDk1OSBoYW5kbGVfZXhjZXB0aW9uX25taSsweDExYTcvMHgxNGQwIGFyY2gv
+eDg2L2t2bS92bXgvdm14LmM6NDk1OQo+ID4gTW9kdWxlcyBsaW5rZWQgaW46Cj4gPiBDUFU6IDE0
+IFBJRDogOTI3NyBDb21tOiBzeXotZXhlY3V0b3IuNyBOb3QgdGFpbnRlZCA1LjE4LjUgIzEKPiA+
+IEhhcmR3YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBC
+SU9TIDEuMTMuMC0xdWJ1bnR1MS4xIDA0LzAxLzIwMTQKPiA+IFJJUDogMDAxMDpoYW5kbGVfZXhj
+ZXB0aW9uX25taSsweDExYTcvMHgxNGQwIGFyY2gveDg2L2t2bS92bXgvdm14LmM6NDk1OQo+ID4g
+Q29kZTogZmYgZTggMWQgYjcgM2MgMDAgYmUgMGMgNDQgMDAgMDAgNDggYzcgYzcgMDAgYzkgMjMg
+OGEgYzYgMDUgOWYgNzEgNWUgMDQgMDEgZTggNWIgMDIgOGQgMDIgMGYgMGIgZTkgNjQgZjggZmYg
+ZmYgZTggZjkgYjYgM2MgMDAgPDBmPiAwYiBlOSBhZSBmNCBmZiBmZiBlOCBlZCBiNiAzYyAwMCBl
+OCAyOCA5NyBhMCAwMiBlOSA1ZiBmZCBmZiBmZgo+ID4gUlNQOiAwMDE4OmZmZmY4ODgwMzhkYzdi
+NDggRUZMQUdTOiAwMDAxMDI4Ngo+ID4gUkFYOiAwMDAwMDAwMDAwMDAyNjE3IFJCWDogMDAwMDAw
+MDAwMDAwMDAwMCBSQ1g6IGZmZmZmZmZmODExZGNmMjcKPiA+IFJEWDogMDAwMDAwMDAwMDA0MDAw
+MCBSU0k6IGZmZmZjOTAwMDNkZDEwMDAgUkRJOiBmZmZmODg4MDM5NTk1YzBjCj4gPiBSQlA6IGZm
+ZmY4ODgwMzk1OTQwMDAgUjA4OiAwMDAwMDAwMDAwMDAwMDAxIFIwOTogZmZmZjg4ODAzOTU5NDFh
+Nwo+ID4gUjEwOiBmZmZmZWQxMDA3MmIyODM0IFIxMTogMDAwMDAwMDAwMDAwMDAwMSBSMTI6IGZm
+ZmZmZmZmZmZmZmZmZjgKPiA+IFIxMzogMDAwMDAwMDA4MDAwMDMwZSBSMTQ6IGZmZmY4ODgwMzg5
+NWMwMDAgUjE1OiBmZmZmODg4MDM5NTk0MDY4Cj4gPiBGUzogIDAwMDA3ZmY1NmVkZjc3MDAoMDAw
+MCkgR1M6ZmZmZjg4ODA2N2QwMDAwMCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwCj4gPiBD
+UzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzCj4gPiBDUjI6
+IDAwMDAwMDAwMDAwMDAwMDAgQ1IzOiAwMDAwMDAwMDNhZWM4MDA2IENSNDogMDAwMDAwMDAwMDc3
+MmVlMAo+ID4gRFIwOiAwMDAwMDAwMDAwMDAwMDAwIERSMTogMDAwMDAwMDAwMDAwMDAwMCBEUjI6
+IDAwMDAwMDAwMDAwMDAwMDAKPiA+IERSMzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAw
+ZmZmZTBmZjAgRFI3OiAwMDAwMDAwMDAwMDAwNDAwCj4gPiBQS1JVOiA1NTU1NTU1NAo+ID4gQ2Fs
+bCBUcmFjZToKPiA+ICA8VEFTSz4KPiA+ICBfX3ZteF9oYW5kbGVfZXhpdCBhcmNoL3g4Ni9rdm0v
+dm14L3ZteC5jOjYyMzkgW2lubGluZV0KPiA+ICB2bXhfaGFuZGxlX2V4aXQrMHg1ZTcvMHgxYWEw
+IGFyY2gveDg2L2t2bS92bXgvdm14LmM6NjI1Ngo+ID4gIHZjcHVfZW50ZXJfZ3Vlc3QgYXJjaC94
+ODYva3ZtL3g4Ni5jOjEwMjgzIFtpbmxpbmVdCj4gPiAgdmNwdV9ydW4gYXJjaC94ODYva3ZtL3g4
+Ni5jOjEwMzY1IFtpbmxpbmVdCj4gPiAga3ZtX2FyY2hfdmNwdV9pb2N0bF9ydW4rMHgyYTJlLzB4
+NWNhMCBhcmNoL3g4Ni9rdm0veDg2LmM6MTA1NjYKPiA+ICBrdm1fdmNwdV9pb2N0bCsweDRkMi8w
+eGM2MCBhcmNoL3g4Ni9rdm0vLi4vLi4vLi4vdmlydC9rdm0va3ZtX21haW4uYzozOTQzCj4gPiAg
+dmZzX2lvY3RsIGZzL2lvY3RsLmM6NTEgW2lubGluZV0KPiA+ICBfX2RvX3N5c19pb2N0bCBmcy9p
+b2N0bC5jOjg3MCBbaW5saW5lXQo+ID4gIF9fc2Vfc3lzX2lvY3RsIGZzL2lvY3RsLmM6ODU2IFtp
+bmxpbmVdCj4gPiAgX194NjRfc3lzX2lvY3RsKzB4MTZkLzB4MWQwIGZzL2lvY3RsLmM6ODU2Cj4g
+PiAgZG9fc3lzY2FsbF94NjQgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6NTAgW2lubGluZV0KPiA+
+ICBkb19zeXNjYWxsXzY0KzB4MzgvMHg5MCBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzo4MAo+ID4g
+IGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDQ0LzB4YWUKPiA+IFJJUDogMDAzMzow
+eDQ1ZThjOQo+ID4gQ29kZTogNGQgYWYgZmIgZmYgYzMgNjYgMmUgMGYgMWYgODQgMDAgMDAgMDAg
+MDAgMDAgNjYgOTAgNDggODkgZjggNDggODkgZjcgNDggODkgZDYgNDggODkgY2EgNGQgODkgYzIg
+NGQgODkgYzggNGMgOGIgNGMgMjQgMDggMGYgMDUgPDQ4PiAzZCAwMSBmMCBmZiBmZiAwZiA4MyAx
+YiBhZiBmYiBmZiBjMyA2NiAyZSAwZiAxZiA4NCAwMCAwMCAwMCAwMAo+ID4gUlNQOiAwMDJiOjAw
+MDA3ZmY1NmVkZjZjNTggRUZMQUdTOiAwMDAwMDI0NiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDAx
+MAo+ID4gUkFYOiBmZmZmZmZmZmZmZmZmZmRhIFJCWDogMDAwMDAwMDAwMDc3YmY2MCBSQ1g6IDAw
+MDAwMDAwMDA0NWU4YzkKPiA+IFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IDAwMDAwMDAwMDAw
+MGFlODAgUkRJOiAwMDAwMDAwMDAwMDAwMDA1Cj4gPiBSQlA6IDAwMDAwMDAwMDA3N2JmNjAgUjA4
+OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAwMDAwMDAwMDAwMDAwMAo+ID4gUjEwOiAwMDAwMDAw
+MDAwMDAwMDAwIFIxMTogMDAwMDAwMDAwMDAwMDI0NiBSMTI6IDAwMDAwMDAwMDAwMDAwMDAKPiA+
+IFIxMzogMDAwMDdmZmM0OTFiZTZhZiBSMTQ6IDAwMDA3ZmY1NmVkZjc5YzAgUjE1OiAwMDAwMDAw
+MDAwMDAwMDAwCj4gPiAgPC9UQVNLPgo+ID4gLS0tWyBlbmQgdHJhY2UgMDAwMDAwMDAwMDAwMDAw
+MCBdLS0tCj4gPgo+ID4gU3l6a2FsbGVyIHJlcHJvZHVjZXI6Cj4gPiAjIHtUaHJlYWRlZDpmYWxz
+ZSBSZXBlYXQ6ZmFsc2UgUmVwZWF0VGltZXM6MCBQcm9jczoxIFNsb3dkb3duOjEgU2FuZGJveDog
+TGVhazpmYWxzZSBOZXRJbmplY3Rpb246ZmFsc2UgTmV0RGV2aWNlczpmYWxzZSBOZXRSZXNldDpm
+YWxzZSBDZ3JvdXBzOmZhbHNlIEJpbmZtdE1pc2M6ZmFsc2UgQ2xvc2VGRHM6ZmFsc2UgS0NTQU46
+ZmFsc2UgRGV2bGlua1BDSTpmYWxzZSBVU0I6ZmFsc2UgVmhjaUluamVjdGlvbjpmYWxzZSBXaWZp
+OmZhbHNlIElFRUU4MDIxNTQ6ZmFsc2UgU3lzY3RsOnRydWUgVXNlVG1wRGlyOmZhbHNlIEhhbmRs
+ZVNlZ3Y6ZmFsc2UgUmVwcm86ZmFsc2UgVHJhY2U6ZmFsc2UgTGVnYWN5T3B0aW9uczp7Q29sbGlk
+ZTpmYWxzZSBGYXVsdDpmYWxzZSBGYXVsdENhbGw6MCBGYXVsdE50aDowfX0KPiA+IHIwID0gb3Bl
+bmF0JGt2bSgweGZmZmZmZmZmZmZmZmZmOWMsICYoMHg3ZjAwMDAwMDAwMDApLCAweDAsIDB4MCkK
+PiA+IHIxID0gaW9jdGwkS1ZNX0NSRUFURV9WTShyMCwgMHhhZTAxLCAweDApCj4gPiByMiA9IGlv
+Y3RsJEtWTV9DUkVBVEVfVkNQVShyMSwgMHhhZTQxLCAweDApCj4gPiBzeXpfa3ZtX3NldHVwX2Nw
+dSR4ODYocjEsIHIyLCAmKDB4N2YwMDAwZmU4MDAwLzB4MTgwMDApPW5pbCwgJigweDdmMDAwMDAw
+MDBjMCk9W0B0ZXh0cmVhbD17MHg4LCAweDB9XSwgMHgxLCAweDE3LCAmKDB4N2YwMDAwMDAwMTAw
+KT1bQGNyND17MHgxLCAweDIwMDkxNX1dLCAweDEpCj4gPiBpb2N0bCRLVk1fUlVOKHIyLCAweGFl
+ODAsIDB4MCkKPiA+Cj4gPgo+ID4gQyByZXBybyBhbmQgY29uZmlnIGFyZSBhdHRhY2hlZC4KPiA+
+Cj4gPgo+ID4gQmVzdCByZWdyYWRzLgo+ID4KPiA+IFhpYW8gTGVpIGZyb20gWmhlamlhbmcgVW5p
+dmVyc2l0eS4KPiA+Cj4gPiAtLQo+ID4gWW91IHJlY2VpdmVkIHRoaXMgbWVzc2FnZSBiZWNhdXNl
+IHlvdSBhcmUgc3Vic2NyaWJlZCB0byB0aGUgR29vZ2xlIEdyb3VwcyAic3l6a2FsbGVyIiBncm91
+cC4KPiA+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBncm91cCBhbmQgc3RvcCByZWNlaXZpbmcg
+ZW1haWxzIGZyb20gaXQsIHNlbmQgYW4gZW1haWwgdG8gc3l6a2FsbGVyK3Vuc3Vic2NyaWJlQGdv
+b2dsZWdyb3Vwcy5jb20uCj4gPiBUbyB2aWV3IHRoaXMgZGlzY3Vzc2lvbiBvbiB0aGUgd2ViIHZp
+c2l0IGh0dHBzOi8vZ3JvdXBzLmdvb2dsZS5jb20vZC9tc2dpZC9zeXprYWxsZXIvNjlhYjk4NWMu
+N2Q1MDcuMTgxODBhNGRjZDcuQ29yZW1haWwucGduJTQwemp1LmVkdS5jbi4K
