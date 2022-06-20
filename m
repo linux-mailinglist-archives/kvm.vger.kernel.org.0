@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1C1D551F35
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 16:42:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CE9B551F1E
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 16:42:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346319AbiFTOkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 10:40:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39152 "EHLO
+        id S245580AbiFTOko (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 10:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245151AbiFTOj7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S245117AbiFTOj7 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 20 Jun 2022 10:39:59 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C335D65BF
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6585863D5
         for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 06:59:47 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25KBwerN009104;
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25KDMImD005819;
         Mon, 20 Jun 2022 13:59:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=G9j1+/yevYHbvtRG2qJ3oucNY4LQ5FBP4Bi4PSa/zjI=;
- b=FjCP9TU3VLZiPE6ocy5uB7h6hDpxu1O32fz4Z2/Qw3OOfsDDghMum0NrWYsBQwSztl3I
- ZEC4Q2/a+Baj30L4GjD8VObN6Izs9rMEl3kHlovi5+w2xM8M0miMxSY9f+ovI5xcjUxt
- JeGHuTpAf6hFLNOn3/gs+ASqiX+gqzyh/9PerZ2amA0zPuhSYo72H716VA1D73C4LkQG
- jrtuPWfKSE/zdhVv/JEVAzUsvVtBDWROM1q0RKhvjjzo+r7UYE4rLIh9pvab22tvlQ85
- kNFnf4QmqllndckepIeRc377+whZKv8Xn9cIsR3cuOMv4+k/ykzF89l0yD1REZfNg5Ii +g== 
+ bh=Iur1XtJOldKsIw2vepB5Gr/txk7H3Frv0yM5d5CqFPI=;
+ b=R/C7aFfLpalg4PMFag5Tw6HM1z65JrWvVRyGY6AcIeChv/pQm0NgyIBPYtMgWgoZJgkH
+ MjdimHYYjKlRs3muQVqSOFW6QlkjnbQ1AU0zhPJxoP2ssjbxuwpkgNUfyQlDuylvHUwg
+ WzqnoWw2rgEg32aT3JpTGG6Fe3ajkPpKApJBX+ZhsS310ZIqZb1YrX8EptZAg/tfTEhy
+ T+jNrVEU9brrYu4jENfYjw6KOO7uVHYTmxOXTF0x70XS+WEzOLDqJuo1zLD5ay1xSBLV
+ taBAI1ktLeXmI6tLHMlv4q+oyfRfmNXIY+wSjxWL2G6zKKHIkWJbpkXUJ++bEM2KRX6P Yw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gsrb633g3-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gsrrrjtv1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Jun 2022 13:59:43 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25KClnFn026767;
+        Mon, 20 Jun 2022 13:59:43 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gsrrrjtuc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 20 Jun 2022 13:59:42 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25KCTUAX024605;
-        Mon, 20 Jun 2022 13:59:42 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gsrb633fh-1
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25KDpPH8028001;
+        Mon, 20 Jun 2022 13:59:41 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3gs6b8t223-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Jun 2022 13:59:42 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25KDoefj002887;
-        Mon, 20 Jun 2022 13:59:40 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 3gs6b921yp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Jun 2022 13:59:40 +0000
+        Mon, 20 Jun 2022 13:59:41 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25KDxbSQ23003506
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25KDxcu418022688
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Jun 2022 13:59:37 GMT
+        Mon, 20 Jun 2022 13:59:38 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1EC1211C04C;
+        by IMSVA (Postfix) with ESMTP id 05DF411C04A;
+        Mon, 20 Jun 2022 13:59:38 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 32BB811C052;
         Mon, 20 Jun 2022 13:59:37 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4C7A311C04A;
-        Mon, 20 Jun 2022 13:59:36 +0000 (GMT)
 Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.62.140])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Jun 2022 13:59:36 +0000 (GMT)
+        Mon, 20 Jun 2022 13:59:37 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
@@ -65,24 +65,24 @@ Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         kvm@vger.kernel.org, ehabkost@redhat.com,
         marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
         seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-Subject: [PATCH v8 07/12] s390x/cpu_topology: Adding drawers to STSI
-Date:   Mon, 20 Jun 2022 16:03:47 +0200
-Message-Id: <20220620140352.39398-8-pmorel@linux.ibm.com>
+Subject: [PATCH v8 08/12] s390x/cpu_topology: implementing numa for the s390x topology
+Date:   Mon, 20 Jun 2022 16:03:48 +0200
+Message-Id: <20220620140352.39398-9-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220620140352.39398-1-pmorel@linux.ibm.com>
 References: <20220620140352.39398-1-pmorel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jbSo_v-AeLeGXFnFiqJiWTvNgAXBbeCz
-X-Proofpoint-GUID: s835T-rfq2ezT0eZ-PNQo8lGBX-HQeAo
+X-Proofpoint-GUID: yLKGMltHtriVm2qkvdAyUnJIVWP745-q
+X-Proofpoint-ORIG-GUID: 7-6mNzzf7hLZZYTS9X1lFNoktkucLr44
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-20_05,2022-06-17_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- spamscore=0 phishscore=0 mlxscore=0 mlxlogscore=999 impostorscore=0
- suspectscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
+ adultscore=0 mlxscore=0 mlxlogscore=999 impostorscore=0 bulkscore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2204290000 definitions=main-2206200063
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -93,368 +93,189 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's add STSI support for the container level 4, drawers,
-and provide the information back to the guest.
+S390x CPU Topology allows a non uniform repartition of the CPU
+inside the topology containers, sockets, books and drawers.
+
+We use numa to place the CPU inside the right topology container
+and report the non uniform topology to the guest.
+
+Note that s390x needs CPU0 to belong to the topology and consequently
+all topology must include CPU0.
+
+We accept a partial QEMU numa definition, in that case undefined CPUs
+are added to free slots in the topology starting with slot 0 and going
+up.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- hw/s390x/cpu-topology.c         | 145 +++++++++++++++++++++++++++++---
- include/hw/s390x/cpu-topology.h |  19 ++++-
- include/hw/s390x/sclp.h         |   2 +-
- target/s390x/cpu_topology.c     |  40 +++++++--
- 4 files changed, 184 insertions(+), 22 deletions(-)
+ hw/core/machine.c          | 18 ++++++++++
+ hw/s390x/s390-virtio-ccw.c | 68 ++++++++++++++++++++++++++++++++++----
+ 2 files changed, 79 insertions(+), 7 deletions(-)
 
-diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-index eba003d498..107cdbecad 100644
---- a/hw/s390x/cpu-topology.c
-+++ b/hw/s390x/cpu-topology.c
-@@ -118,6 +118,28 @@ static S390TopologyBook *s390_create_book(MachineState *ms,
-     return book;
- }
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 4c5c8d1655..3bee66acc6 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -760,6 +760,16 @@ void machine_set_cpu_numa_node(MachineState *machine,
+             return;
+         }
  
-+static S390TopologyDrawer *s390_create_drawer(S390TopologyNode *node,
-+                                              int id, Error **errp)
-+{
-+    DeviceState *dev;
-+    S390TopologyDrawer *drawer;
-+    const MachineState *ms = MACHINE(qdev_get_machine());
++        if (props->has_book_id && !slot->props.has_book_id) {
++            error_setg(errp, "book-id is not supported");
++            return;
++        }
 +
-+    if (node->bus->num_children >= ms->smp.drawers) {
-+        error_setg(errp, "Unable to create more drawers.");
-+        return NULL;
-+    }
++        if (props->has_drawer_id && !slot->props.has_drawer_id) {
++            error_setg(errp, "drawer-id is not supported");
++            return;
++        }
 +
-+    dev = qdev_new(TYPE_S390_TOPOLOGY_DRAWER);
-+    qdev_realize_and_unref(dev, node->bus, &error_fatal);
-+
-+    drawer = S390_TOPOLOGY_DRAWER(dev);
-+    drawer->drawer_id = id;
-+    node->cnt++;
-+
-+    return drawer;
-+}
-+
- /*
-  * s390_get_cores:
-  * @ms: Machine state
-@@ -174,6 +196,34 @@ static S390TopologySocket *s390_get_socket(MachineState *ms,
-     return s390_create_socket(ms, book, socket_id, errp);
- }
+         /* skip slots with explicit mismatch */
+         if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
+                 continue;
+@@ -782,6 +792,14 @@ void machine_set_cpu_numa_node(MachineState *machine,
+                 continue;
+         }
  
-+/*
-+ * s390_get_drawer:
-+ * @ms: Machine state
-+ * @node: The node to search into
-+ * @drawer_id: the identifier of the drawer to search for
-+ * @errp: Error pointer
-+ *
-+ * returns a pointer to a S390TopologyDrawer structure within a book having
-+ * the specified drawer_id.
-+ * First search if the book is already containing the S390TopologyDrawer
-+ * structure and if not create one with this drawer_id.
-+ */
-+static S390TopologyDrawer *s390_get_drawer(MachineState *ms,
-+                                           S390TopologyNode *node,
-+                                           int drawer_id, Error **errp)
-+{
-+    S390TopologyDrawer *drawer;
-+    BusChild *kid;
++        if (props->has_book_id && props->book_id != slot->props.book_id) {
++                continue;
++        }
 +
-+    QTAILQ_FOREACH(kid, &node->bus->children, sibling) {
-+        drawer = S390_TOPOLOGY_DRAWER(kid->child);
-+        if (drawer->drawer_id == drawer_id) {
-+            return drawer;
++        if (props->has_drawer_id && props->drawer_id != slot->props.drawer_id) {
++                continue;
++        }
++
+         /* reject assignment if slot is already assigned, for compatibility
+          * of legacy cpu_index mapping with SPAPR core based mapping do not
+          * error out if cpu thread and matched core have the same node-id */
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 3b2a1f2729..5c0dbff6fd 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -85,14 +85,34 @@ out:
+ static void s390_init_cpus(MachineState *machine)
+ {
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+-    int i;
++    CPUArchId *slot;
++    int i, n = 0;
+ 
+     /* initialize possible_cpus */
+     mc->possible_cpu_arch_ids(machine);
+ 
+     s390_topology_setup(machine);
+-    for (i = 0; i < machine->smp.cpus; i++) {
++
++    /* For NUMA configuration create defined nodes */
++    if (machine->numa_state->num_nodes) {
++        for (i = 0; i < machine->smp.max_cpus; i++) {
++            slot = &machine->possible_cpus->cpus[i];
++            if (slot->arch_id != -1 && n < machine->smp.cpus) {
++                s390x_new_cpu(machine->cpu_type, i, &error_fatal);
++                n++;
++            }
 +        }
 +    }
-+    return s390_create_drawer(node, drawer_id, errp);
-+}
 +
- /*
-  * s390_get_book:
-  * @ms: Machine state
-@@ -215,19 +265,26 @@ static S390TopologyBook *s390_get_book(MachineState *ms,
-  */
- bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp)
- {
-+    S390TopologyNode *node;
-     S390TopologyDrawer *drawer;
-     S390TopologyBook *book;
-     S390TopologySocket *socket;
-     S390TopologyCores *cores;
-     int nb_cores_per_socket;
-     int nb_cores_per_book;
-+    int nb_cores_per_drawer;
-     int origin, bit;
++    /* create all remaining CPUs */
++    for (i = 0; n < machine->smp.cpus && i < machine->smp.max_cpus; i++) {
++        slot = &machine->possible_cpus->cpus[i];
++        /* For NUMA configuration skip defined nodes */
++        if (machine->numa_state->num_nodes && slot->arch_id != -1) {
++            continue;
++        }
+         s390x_new_cpu(machine->cpu_type, i, &error_fatal);
++        n++;
+     }
+ }
  
--    drawer = s390_get_topology();
-+    node = s390_get_topology();
+@@ -275,6 +295,11 @@ static void ccw_init(MachineState *machine)
+     /* register hypercalls */
+     virtio_ccw_register_hcalls();
  
-     nb_cores_per_socket = ms->smp.cores * ms->smp.threads;
-     nb_cores_per_book = ms->smp.sockets * nb_cores_per_socket;
-+    nb_cores_per_drawer = ms->smp.books * nb_cores_per_book;
- 
-+    drawer = s390_get_drawer(ms, node, core_id / nb_cores_per_drawer, errp);
-+    if (!drawer) {
-+        return false;
++    /* CPU0 must exist on S390x */
++    if (!s390_cpu_addr2state(0)) {
++        error_printf("Core_id 0 must be defined in the CPU configuration\n");
++        exit(1);
 +    }
-     book = s390_get_book(ms, drawer, core_id / nb_cores_per_book, errp);
-     if (!book) {
-         return false;
-@@ -273,23 +330,23 @@ void s390_topology_setup(MachineState *ms)
-     DeviceState *dev;
+     s390_enable_css_support(s390_cpu_addr2state(0));
  
-     /* Create BOOK bridge device */
--    dev = qdev_new(TYPE_S390_TOPOLOGY_DRAWER);
-+    dev = qdev_new(TYPE_S390_TOPOLOGY_NODE);
-     object_property_add_child(qdev_get_machine(),
--                              TYPE_S390_TOPOLOGY_DRAWER, OBJECT(dev));
-+                              TYPE_S390_TOPOLOGY_NODE, OBJECT(dev));
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
- }
+     ret = css_create_css_image(VIRTUAL_CSSID, true);
+@@ -307,6 +332,7 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
  
--S390TopologyDrawer *s390_get_topology(void)
-+S390TopologyNode *s390_get_topology(void)
+     g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
+     ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
++    ms->possible_cpus->cpus[cpu->env.core_id].arch_id = cpu->env.core_id;
+ 
+     if (!s390_topology_new_cpu(ms, cpu->env.core_id, errp)) {
+         return;
+@@ -532,7 +558,9 @@ static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
+ static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
  {
--    static S390TopologyDrawer *drawer;
-+    static S390TopologyNode *node;
+     int i;
++    int drawer_id, book_id, socket_id;
+     unsigned int max_cpus = ms->smp.max_cpus;
++    CPUArchId *slot;
  
--    if (!drawer) {
--        drawer = S390_TOPOLOGY_DRAWER(object_resolve_path(
--                                      TYPE_S390_TOPOLOGY_DRAWER, NULL));
--        assert(drawer != NULL);
-+    if (!node) {
-+        node = S390_TOPOLOGY_NODE(object_resolve_path(
-+                                  TYPE_S390_TOPOLOGY_NODE, NULL));
-+        assert(node != NULL);
+     if (ms->possible_cpus) {
+         g_assert(ms->possible_cpus && ms->possible_cpus->len == max_cpus);
+@@ -543,11 +571,25 @@ static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
+                                   sizeof(CPUArchId) * max_cpus);
+     ms->possible_cpus->len = max_cpus;
+     for (i = 0; i < ms->possible_cpus->len; i++) {
+-        ms->possible_cpus->cpus[i].type = ms->cpu_type;
+-        ms->possible_cpus->cpus[i].vcpus_count = 1;
+-        ms->possible_cpus->cpus[i].arch_id = i;
+-        ms->possible_cpus->cpus[i].props.has_core_id = true;
+-        ms->possible_cpus->cpus[i].props.core_id = i;
++        slot = &ms->possible_cpus->cpus[i];
++
++        slot->type = ms->cpu_type;
++        slot->vcpus_count = 1;
++        slot->arch_id = i;
++        slot->props.has_core_id = true;
++        slot->props.core_id = i;
++
++        socket_id = i / ms->smp.cores;
++        slot->props.socket_id = socket_id;
++        slot->props.has_socket_id = true;
++
++        book_id = socket_id / ms->smp.sockets;
++        slot->props.book_id = book_id;
++        slot->props.has_book_id = true;
++
++        drawer_id = book_id / ms->smp.books;
++        slot->props.drawer_id = drawer_id;
++        slot->props.has_drawer_id = true;
      }
  
--    return drawer;
-+    return node;
+     return ms->possible_cpus;
+@@ -589,6 +631,17 @@ static ram_addr_t s390_fixup_ram_size(ram_addr_t sz)
+     return newsz;
  }
  
- /* --- CORES Definitions --- */
-@@ -503,6 +560,7 @@ static void drawer_class_init(ObjectClass *oc, void *data)
- 
-     hc->unplug = qdev_simple_device_unplug_cb;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->bus_type = TYPE_S390_TOPOLOGY_NODE_BUS;
-     dc->realize = s390_drawer_device_realize;
-     device_class_set_props(dc, s390_topology_drawer_properties);
-     dc->desc = "topology drawer";
-@@ -510,7 +568,7 @@ static void drawer_class_init(ObjectClass *oc, void *data)
- 
- static const TypeInfo drawer_info = {
-     .name          = TYPE_S390_TOPOLOGY_DRAWER,
--    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .parent        = TYPE_DEVICE,
-     .instance_size = sizeof(S390TopologyDrawer),
-     .class_init    = drawer_class_init,
-     .interfaces = (InterfaceInfo[]) {
-@@ -518,6 +576,69 @@ static const TypeInfo drawer_info = {
-         { }
-     }
- };
-+
-+/* --- NODE Definitions --- */
-+
 +/*
-+ * Nodes are the first level of CPU topology we support
-+ * only one NODE for the moment.
++ * S390 defines CPU topology level 2 as the level for which a change in topology
++ * is worth being taking care of.
++ * Let use level 2, socket, as the numa node.
 + */
-+static char *node_bus_get_dev_path(DeviceState *dev)
++static int64_t s390_get_default_cpu_node_id(const MachineState *ms, int idx)
 +{
-+    return g_strdup("00");
++    ms->possible_cpus->cpus[idx].arch_id = -1;
++    return idx / ms->smp.cores;
 +}
 +
-+static void node_bus_class_init(ObjectClass *oc, void *data)
-+{
-+    BusClass *k = BUS_CLASS(oc);
-+
-+    k->get_dev_path = node_bus_get_dev_path;
-+    k->max_dev = S390_MAX_NODES;
-+}
-+
-+static const TypeInfo node_bus_info = {
-+    .name = TYPE_S390_TOPOLOGY_NODE_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = 0,
-+    .class_init = node_bus_class_init,
-+};
-+
-+static void s390_node_device_realize(DeviceState *dev, Error **errp)
-+{
-+    S390TopologyNode *node = S390_TOPOLOGY_NODE(dev);
-+    BusState *bus;
-+
-+    /* Create NODE bus on NODE bridge device */
-+    bus = qbus_new(TYPE_S390_TOPOLOGY_NODE_BUS, dev,
-+                   TYPE_S390_TOPOLOGY_NODE_BUS);
-+    node->bus = bus;
-+
-+    /* Enable hotplugging */
-+    qbus_set_hotplug_handler(bus, OBJECT(dev));
-+}
-+
-+static void node_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
-+
-+    hc->unplug = qdev_simple_device_unplug_cb;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->realize = s390_node_device_realize;
-+    dc->desc = "topology node";
-+}
-+
-+static const TypeInfo node_info = {
-+    .name          = TYPE_S390_TOPOLOGY_NODE,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(S390TopologyNode),
-+    .class_init    = node_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOTPLUG_HANDLER },
-+        { }
-+    }
-+};
-+
- static void topology_register(void)
+ static void ccw_machine_class_init(ObjectClass *oc, void *data)
  {
-     type_register_static(&cpu_cores_info);
-@@ -527,6 +648,8 @@ static void topology_register(void)
-     type_register_static(&book_info);
-     type_register_static(&drawer_bus_info);
-     type_register_static(&drawer_info);
-+    type_register_static(&node_bus_info);
-+    type_register_static(&node_info);
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -621,6 +674,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+     mc->default_ram_id = "s390.ram";
+     mc->smp_props.books_supported = true;
+     mc->smp_props.drawers_supported = true;
++    mc->get_default_cpu_node_id = s390_get_default_cpu_node_id;
  }
  
- type_init(topology_register);
-diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-index 5ffb8cba77..ba0b1c1d7a 100644
---- a/include/hw/s390x/cpu-topology.h
-+++ b/include/hw/s390x/cpu-topology.h
-@@ -68,18 +68,29 @@ OBJECT_DECLARE_SIMPLE_TYPE(S390TopologyBook, S390_TOPOLOGY_BOOK)
- #define TYPE_S390_TOPOLOGY_DRAWER "topology drawer"
- #define TYPE_S390_TOPOLOGY_DRAWER_BUS "drawer-bus"
- struct S390TopologyDrawer {
--    SysBusDevice parent_obj;
-+    DeviceState parent_obj;
-     BusState *bus;
-     uint8_t drawer_id;
-     int cnt;
- };
- typedef struct S390TopologyDrawer S390TopologyDrawer;
- OBJECT_DECLARE_SIMPLE_TYPE(S390TopologyDrawer, S390_TOPOLOGY_DRAWER)
--#define S390_MAX_DRAWERS 1
-+#define S390_MAX_DRAWERS 4
- 
--S390TopologyDrawer *s390_init_topology(void);
-+#define TYPE_S390_TOPOLOGY_NODE "topology node"
-+#define TYPE_S390_TOPOLOGY_NODE_BUS "node-bus"
-+struct S390TopologyNode {
-+    SysBusDevice parent_obj;
-+    BusState *bus;
-+    uint8_t node_id;
-+    int cnt;
-+};
-+typedef struct S390TopologyNode S390TopologyNode;
-+OBJECT_DECLARE_SIMPLE_TYPE(S390TopologyNode, S390_TOPOLOGY_NODE)
-+#define S390_MAX_NODES 1
- 
--S390TopologyDrawer *s390_get_topology(void);
-+S390TopologyNode *s390_init_topology(void);
-+S390TopologyNode *s390_get_topology(void);
- void s390_topology_setup(MachineState *ms);
- bool s390_topology_new_cpu(MachineState *ms, int core_id, Error **errp);
- 
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index 139d46efa4..7f9ff84bf8 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -111,7 +111,7 @@ typedef struct CPUEntry {
-     uint8_t reserved1;
- } QEMU_PACKED CPUEntry;
- 
--#define SCLP_READ_SCP_INFO_MNEST                  3
-+#define SCLP_READ_SCP_INFO_MNEST                  4
- #define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
- typedef struct ReadInfo {
-     SCCBHeader h;
-diff --git a/target/s390x/cpu_topology.c b/target/s390x/cpu_topology.c
-index d14b2fb25c..bd2ca171f6 100644
---- a/target/s390x/cpu_topology.c
-+++ b/target/s390x/cpu_topology.c
-@@ -77,36 +77,64 @@ static int set_book(const MachineState *ms, void *p,
-     return len;
- }
- 
-+static int set_drawer(const MachineState *ms, void *p,
-+                      S390TopologyDrawer *drawer, int level)
-+{
-+    BusChild *kid;
-+    int l, len = 0;
-+
-+    if (level >= 4) {
-+        len += stsi_15_container(p, 3, drawer->drawer_id);
-+        p += len;
-+    }
-+
-+    QTAILQ_FOREACH_REVERSE(kid, &drawer->bus->children, sibling) {
-+        l = set_book(ms, p, S390_TOPOLOGY_BOOK(kid->child), level);
-+        p += l;
-+        len += l;
-+    }
-+
-+    return len;
-+}
-+
- static void setup_stsi(const MachineState *ms, void *p, int level)
- {
--    S390TopologyDrawer *drawer;
-+    S390TopologyNode *node;
-     SysIB_151x *sysib;
-     BusChild *kid;
--    int nb_sockets, nb_books;
-+    int nb_sockets, nb_books, nb_drawers;
-     int len, l;
- 
-     sysib = (SysIB_151x *)p;
-     sysib->mnest = level;
-     switch (level) {
-     case 2:
-+        nb_drawers = 0;
-         nb_books = 0;
--        nb_sockets = ms->smp.sockets * ms->smp.books;
-+        nb_sockets = ms->smp.sockets * ms->smp.books * ms->smp.drawers;
-         break;
-     case 3:
-+        nb_drawers = 0;
-+        nb_books = ms->smp.books * ms->smp.drawers;
-+        nb_sockets = ms->smp.sockets;
-+        break;
-+    case 4:
-+        nb_drawers = ms->smp.drawers;
-         nb_books = ms->smp.books;
-         nb_sockets = ms->smp.sockets;
-         break;
-     }
-+    sysib->mag[TOPOLOGY_NR_MAG4] = nb_drawers;
-     sysib->mag[TOPOLOGY_NR_MAG3] = nb_books;
-     sysib->mag[TOPOLOGY_NR_MAG2] = nb_sockets;
-     sysib->mag[TOPOLOGY_NR_MAG1] = ms->smp.cores * ms->smp.threads;
- 
--    drawer = s390_get_topology();
-+    node = s390_get_topology();
-     len = sizeof(SysIB_151x);
-     p += len;
- 
--    QTAILQ_FOREACH_REVERSE(kid, &drawer->bus->children, sibling) {
--        l = set_book(ms, p, S390_TOPOLOGY_BOOK(kid->child), level);
-+    QTAILQ_FOREACH_REVERSE(kid, &node->bus->children, sibling) {
-+        l = set_drawer(ms, p, S390_TOPOLOGY_DRAWER(kid->child), level);
-         p += l;
-         len += l;
-     }
+ static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
 -- 
 2.31.1
 
