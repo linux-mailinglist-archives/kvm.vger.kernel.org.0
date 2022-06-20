@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E728552787
+	by mail.lfdr.de (Postfix) with ESMTP id AADDB552788
 	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 01:05:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345395AbiFTXEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 19:04:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46352 "EHLO
+        id S1346295AbiFTXE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 19:04:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345752AbiFTXES (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:04:18 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2048.outbound.protection.outlook.com [40.107.243.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567DC20F69;
-        Mon, 20 Jun 2022 16:04:14 -0700 (PDT)
+        with ESMTP id S1346124AbiFTXEu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 19:04:50 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE0522538;
+        Mon, 20 Jun 2022 16:04:30 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XZM25cENgNcRIHhAkd4gVfrHvfdsNATCoJRgiQUlknK5aGZLV1YYDqSFxSp7EaonF4KT2jjLxk9x968aykkkn054+I8/9fkpbFmlEJgrmYu7nCZPHV8LXJ1kNQZC9E7br8OwVno6I2/FEuQnhmPuiBIoPATbnDOdoOHq52c1Q/zXLYFwn933v75oaMPqaWwOig5JrEl9j5x1MvfGkw6+h3OQLiq/Z/lWqOVVv2/1SHfly0qL/+YAhuBWxUs3z8znP5EPO5xk0hOY2AlhX1RJ05rBG3c1jlS3JCczK7F/aGA8KNaAJGGUn6ZeUExtWTpbT4nS+sR4y2Si0ZQP8QvW/Q==
+ b=gooQaPpNrLdtYvYtNDydfJRJjlR/7AJr6owOI7CR8ZBnD3DXw1XKFq1WZRjvQV2Pd1ZIP6Z7wAJWUJ7hqyiASOoNxdekdA2KCzCEG9CK9s+6QDluK7fw212FbALGpRp/PzuhWwSMRspA/qm2/AaweRj/kjpVKOQmT1CsbPkqPQFQv5er95+yfCB7ezBWPr/dh7NVeunQobvq9GhumxqdNb7M0TDm5/8AmZkPWkRnIdM3Je1JD8Q7UK8dHIKLqy5NK/aeRD03VZHqEQX6Y2OY1lS/3n2PaYU0nNkU40HyA2Ea/m+2reqrtywF38nGNFWX3iDqu0c+C2hAYaArKHVAbA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WU3JMwJgqvyPUcyzBZs7TBL5nqj7/gWSpusixIl6aVc=;
- b=QigYGxk8yVUAEvMHWYpqIKTm6wj1QnLJZuHNp28qPVlUgvVGOt8k4zKHUaVCTTk4enLYPAMCJP1i3+RHImxM9R2UlJnyCvDI0IaAG/l2TtAcn4hUt2TiFJJSJYzJJPWvogOobMqFdDqTLgi+jAmH9nTLryIe5rFy6lGNg9vbOcQlH9hyjA+LBFJRujlCA+Lg3lzqXy56SP6wnd77rL0FB1aEqg2ZLB8W4IubPBcCelgumY3ODucfArfQXmPH7pRDYE99qZZamGErGxpGvFq0bz5gmgR5gBPghdlOwf1T5Jk2pqdJfocR+Qm1crbtSzoEV0z8BChFcpMFJv0X0e/sfA==
+ bh=pg4zQ/yUsU6Fg1kyiVahkpOCAiv2WsDy1gbOZFp5PVo=;
+ b=FjqMrFUErR95nsvj/qfwLCHVY7/1q4JHUoglsMTBW+ys/CBE01RDm7u+VuDDHOqFLfHCNA+xc4rjhrsbLtrMIUmLrmGkSJR/LCGmF0NILWdRiAXUvb2dP8ZGjTY5l5v/B2n8R0Kt3GjTXI22Nq0il8kBK7K+gMvutqNV0jbEdB+UfpgSk1AwgBjxgzPqAZw4IQkuxOtlMN2sIg/76/15OCku0CNJ7c9G6W9vWh2W1mxPWEhcXZ87bSYJy69i7ju7wC58SNcE6QMGmd1H+WcCLItINUZYjQQMrI9XUzQoQiGXIsej30YHKGUw4Z9z7rXeb+dE5CAFWYBSx2jZA2KZ5g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WU3JMwJgqvyPUcyzBZs7TBL5nqj7/gWSpusixIl6aVc=;
- b=rpdDK4LIMmRU3EBgVOCZR1czzAf4dqMbgScBGyZrTXle/kIkMLaJJI5DQtG5RWUV+b2IAvFAyJmxWnQqP39qupU/2+vHbdiAiUAtfI8vX3aySMurDnyQNvyjkeugiM7Wz1jEfnRL2Wd1WSeABVin/m4FC9k4VAXq6xA+dfI9fsw=
-Received: from YQBPR0101CA0166.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:c01:f::9)
- by BN6PR1201MB2546.namprd12.prod.outlook.com (2603:10b6:404:b0::22) with
+ bh=pg4zQ/yUsU6Fg1kyiVahkpOCAiv2WsDy1gbOZFp5PVo=;
+ b=v3VtWRuclJysKEk2e0RAaFE6YNKwVbiOxAcFjSq5yJKxhfeOgJ8BsEg0JA/3xfwB25rA9tBK5Tsqh9Jlyq/2Hx0r6MIX1ucg1TiuDd9HB2u7lilV8OrBVhVSfuntdpo81KYAXtjHUrPcT6aAXSGrcQR/W3iEtYYqXZWXxZbL/Oc=
+Received: from SJ0PR03CA0090.namprd03.prod.outlook.com (2603:10b6:a03:331::35)
+ by CO6PR12MB5489.namprd12.prod.outlook.com (2603:10b6:303:139::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14; Mon, 20 Jun
- 2022 23:04:10 +0000
-Received: from DM6NAM11FT044.eop-nam11.prod.protection.outlook.com
- (2603:10b6:c01:f:cafe::f) by YQBPR0101CA0166.outlook.office365.com
- (2603:10b6:c01:f::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14 via Frontend
- Transport; Mon, 20 Jun 2022 23:04:10 +0000
+ 2022 23:04:27 +0000
+Received: from DM6NAM11FT058.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:a03:331:cafe::5f) by SJ0PR03CA0090.outlook.office365.com
+ (2603:10b6:a03:331::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.17 via Frontend
+ Transport; Mon, 20 Jun 2022 23:04:26 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT044.mail.protection.outlook.com (10.13.173.185) with Microsoft SMTP
+ DM6NAM11FT058.mail.protection.outlook.com (10.13.172.216) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:04:10 +0000
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:04:26 +0000
 Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 20 Jun 2022 18:04:07 -0500
+ 15.1.2375.28; Mon, 20 Jun 2022 18:04:23 -0500
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -69,9 +69,9 @@ CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
-Subject: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry on fault
-Date:   Mon, 20 Jun 2022 23:03:58 +0000
-Message-ID: <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
+Subject: [PATCH Part2 v6 11/49] crypto:ccp: Define the SEV-SNP commands
+Date:   Mon, 20 Jun 2022 23:04:14 +0000
+Message-ID: <f5dec307d246096768afd770d16a26be25fa28b3.1655761627.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
@@ -83,24 +83,24 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bc7f4d59-db38-4cc8-9abe-08da53112f74
-X-MS-TrafficTypeDiagnostic: BN6PR1201MB2546:EE_
-X-Microsoft-Antispam-PRVS: <BN6PR1201MB25464941300B42D36A2A5BF98EB09@BN6PR1201MB2546.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 9a765b70-61c3-472f-c4f2-08da53113948
+X-MS-TrafficTypeDiagnostic: CO6PR12MB5489:EE_
+X-Microsoft-Antispam-PRVS: <CO6PR12MB548959C13CD9F3B3942EC7308EB09@CO6PR12MB5489.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3pHDBzM5VpiGW4Nl98G0PwVZGoYHbn8OONLwOnAoKVc0L3vc+8vCsdD1nrJKYrCKbjqzhpos3i8alACGd4yXNQ1hjk26+p6PTydSz3XjZ+Y9gGL2Sqh9zpYxxerAzR2Vm3GWIDEBb/xmZG1/lL7Ny7ACwTJ94FPuFpK/LZQXa7lXClDBufhlth55aU+C/PdszSC4DooWixhq46kE7xNKnxDhftcrP3FM/pYIp7Qud67RdWxIt+7Mb2b9LMBKiC93cRD/osmSHOOi+va3Bl2pylBw73u1oKFEQJ/+yoRNtE8fesGyiCfnwSUybI6mOgtEQzPNEXRpPOTXlW11IpDLmUM+1xfQ9jE2uuZT6auomNL2hyq9Gc/eEQEqL/Y3IFnLpuDE4mqur90RiyqnRRbgWlz1rXR9GI57QowAt3NxVMpAOeLrv49gU0Uqb0hcCwHXW+ArmmZgOhLEaVb43/4UNw0mNzxXXuTrwBISWRjsCLpf4tt5ba4tCcWxq8vDXcYQJ9qikQr1oGSFTwadVFGtyQi3X4Dd7BC3NfB76kBox3ZcQdkTDLFUlqwjnr2zUhjtddO7Av7dsyA0Fu6bR1NvVZMW46KpivKzriHPItn85gPSa8jpXS+Yau+K8SG/SCcBEv5T7sFQOVZy83PYm/paf3gspn5BblBEjGhrfS19+SZADwkiOtYnKRlME91qnrhe15EoMTADgVeYnhGBQOQxQFJ/RzhCTxJar13c9pu55Pjx7fz3IpuZ8sesf41QSSDj/6hGQdQwvmKd/zLnVhBOGQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(136003)(376002)(39860400002)(46966006)(36840700001)(40470700004)(40460700003)(336012)(82310400005)(6666004)(81166007)(426003)(47076005)(26005)(2616005)(41300700001)(40480700001)(7696005)(7406005)(2906002)(7416002)(5660300002)(36756003)(8936002)(70206006)(316002)(36860700001)(70586007)(54906003)(356005)(4326008)(8676002)(83380400001)(82740400003)(86362001)(478600001)(186003)(16526019)(110136005)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: v1QCRKbb/rgnRPNNGzveNTQUUXYwomWWyEFYRlr2tO8kr+x8sPTjITh6ITOeiW2r+vsQm2RB7Zse2nFGVvMjXvvIHfkCuvgEAIYj+rwy69H8RFDbXU6TQRRLnImdnJFWOQTvKzpbbHCvQOHyneJtZSCdnvlqZnpNZkdJ/wI0H4az/K9aoiTTetjW4VBoUdpI2ncm/7ImLckpAuFmhtwJMrIfVnU26Z3iyBN5SRVYgbSv0fOBIcqxiWPufBWlGwGgvWh/1h1+Cequx4CcBhYV1JR4LETfAc3yJgdQmQB6mv6lF5AWoh/JZIMFRbiOzY9VdJc3IUN5kCHP4nFf/Cb2FXT+VI2bD+NRrSFZrOgVdAGg+iFrGlujSOIfgWTkv9ujPfn0zou3hREFAJbzf3K/LbExWvkn+U3Frjjc1qAwkTOssR80KdeX5w9yTk63UJzpkwqW5cLV+Sxu10uPSK2HElPzQTSMntv74wJuST6yK+nc4mPlGrdU82EJGeWutu/VQpHvkMlsAqPRKqGNdWMRBQV81kXT+IbevFNZ/LeB5+TvOCdICdxzX0zYU6Pp5Wi6NQtM32rVu/XR/pFHYTmCN5f+BMi+ICgnE4GxXnOFWIluUPxkgRZ8q1mm++jWle8kAyN1DD+PU70kcIUFwRTtL8dopBY2fKBHXNJWVzMH+s+8dT11yMKlGZmuQ3pVEbp3tDwn35Zwu4Of1pcp4aSiI9AuVWk75bKIWQAxHyJ8wWxuZury5A9LP0KDg+otp8BUt3fPvupvWJc7xhZRFWc5LTWH9u6TIkZdiOoegFdpQiG5W9HRMeDBCxdVMNUpaDfDa5EyP63/QHMQ2zTLb7XatPWty7ol2xXvNJvKhqXPiyQ=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(396003)(39860400002)(346002)(46966006)(40470700004)(36840700001)(478600001)(54906003)(36860700001)(82310400005)(82740400003)(36756003)(83380400001)(2906002)(8936002)(70586007)(110136005)(8676002)(7406005)(5660300002)(7416002)(30864003)(316002)(7696005)(4326008)(81166007)(186003)(426003)(336012)(47076005)(16526019)(6666004)(2616005)(40480700001)(86362001)(40460700003)(70206006)(26005)(356005)(41300700001)(84970400001)(36900700001)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:04:10.1129
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:04:26.5872
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc7f4d59-db38-4cc8-9abe-08da53112f74
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a765b70-61c3-472f-c4f2-08da53113948
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT044.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT058.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB2546
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5489
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -113,215 +113,346 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-When SEV-SNP is enabled globally, a write from the host goes through the
-RMP check. If the hardware encounters the check failure, then it raises
-the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
-the debug.
+AMD introduced the next generation of SEV called SEV-SNP (Secure Nested
+Paging). SEV-SNP builds upon existing SEV and SEV-ES functionality
+while adding new hardware security protection.
+
+Define the commands and structures used to communicate with the AMD-SP
+when creating and managing the SEV-SNP guests. The SEV-SNP firmware spec
+is available at developer.amd.com/sev.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/sev.h |  7 +++++++
- arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
- arch/x86/mm/fault.c        | 17 +++++++++++----
- include/linux/sev.h        |  2 ++
- 4 files changed, 65 insertions(+), 4 deletions(-)
+ drivers/crypto/ccp/sev-dev.c |  14 +++
+ include/linux/psp-sev.h      | 222 +++++++++++++++++++++++++++++++++++
+ include/uapi/linux/psp-sev.h |  42 +++++++
+ 3 files changed, 278 insertions(+)
 
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 6ab872311544..c0c4df817159 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -113,6 +113,11 @@ struct __packed rmpentry {
- 
- #define rmpentry_assigned(x)	((x)->info.assigned)
- #define rmpentry_pagesize(x)	((x)->info.pagesize)
-+#define rmpentry_vmsa(x)	((x)->info.vmsa)
-+#define rmpentry_asid(x)	((x)->info.asid)
-+#define rmpentry_validated(x)	((x)->info.validated)
-+#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
-+#define rmpentry_immutable(x)	((x)->info.immutable)
- 
- #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
- 
-@@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
- bool snp_init(struct boot_params *bp);
- void snp_abort(void);
- int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
-+void dump_rmpentry(u64 pfn);
- #else
- static inline void sev_es_ist_enter(struct pt_regs *regs) { }
- static inline void sev_es_ist_exit(void) { }
-@@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
- {
- 	return -ENOTTY;
- }
-+static inline void dump_rmpentry(u64 pfn) {}
- #endif
- 
- #endif
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 734cddd837f5..6640a639fffc 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
- 	return entry;
- }
- 
-+void dump_rmpentry(u64 pfn)
-+{
-+	unsigned long pfn_end;
-+	struct rmpentry *e;
-+	int level;
-+
-+	e = __snp_lookup_rmpentry(pfn, &level);
-+	if (!e) {
-+		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
-+		return;
-+	}
-+
-+	if (rmpentry_assigned(e)) {
-+		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
-+			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
-+			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
-+			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
-+			rmpentry_validated(e));
-+		return;
-+	}
-+
-+	/*
-+	 * If the RMP entry at the faulting pfn was not assigned, then we do not
-+	 * know what caused the RMP violation. To get some useful debug information,
-+	 * let iterate through the entire 2MB region, and dump the RMP entries if
-+	 * one of the bit in the RMP entry is set.
-+	 */
-+	pfn = pfn & ~(PTRS_PER_PMD - 1);
-+	pfn_end = pfn + PTRS_PER_PMD;
-+
-+	while (pfn < pfn_end) {
-+		e = __snp_lookup_rmpentry(pfn, &level);
-+		if (!e)
-+			return;
-+
-+		if (e->low || e->high)
-+			pr_alert("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
-+				 pfn << PAGE_SHIFT, e->high, e->low);
-+		pfn++;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(dump_rmpentry);
-+
- /*
-  * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
-  * and -errno if there is no corresponding RMP entry.
-diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-index f5de9673093a..25896a6ba04a 100644
---- a/arch/x86/mm/fault.c
-+++ b/arch/x86/mm/fault.c
-@@ -34,6 +34,7 @@
- #include <asm/kvm_para.h>		/* kvm_handle_async_pf		*/
- #include <asm/vdso.h>			/* fixup_vdso_exception()	*/
- #include <asm/irq_stack.h>
-+#include <asm/sev.h>			/* dump_rmpentry()		*/
- 
- #define CREATE_TRACE_POINTS
- #include <asm/trace/exceptions.h>
-@@ -290,7 +291,7 @@ static bool low_pfn(unsigned long pfn)
- 	return pfn < max_low_pfn;
- }
- 
--static void dump_pagetable(unsigned long address)
-+static void dump_pagetable(unsigned long address, bool show_rmpentry)
- {
- 	pgd_t *base = __va(read_cr3_pa());
- 	pgd_t *pgd = &base[pgd_index(address)];
-@@ -346,10 +347,11 @@ static int bad_address(void *p)
- 	return get_kernel_nofault(dummy, (unsigned long *)p);
- }
- 
--static void dump_pagetable(unsigned long address)
-+static void dump_pagetable(unsigned long address, bool show_rmpentry)
- {
- 	pgd_t *base = __va(read_cr3_pa());
- 	pgd_t *pgd = base + pgd_index(address);
-+	unsigned long pfn;
- 	p4d_t *p4d;
- 	pud_t *pud;
- 	pmd_t *pmd;
-@@ -367,6 +369,7 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(p4d))
- 		goto bad;
- 
-+	pfn = p4d_pfn(*p4d);
- 	pr_cont("P4D %lx ", p4d_val(*p4d));
- 	if (!p4d_present(*p4d) || p4d_large(*p4d))
- 		goto out;
-@@ -375,6 +378,7 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(pud))
- 		goto bad;
- 
-+	pfn = pud_pfn(*pud);
- 	pr_cont("PUD %lx ", pud_val(*pud));
- 	if (!pud_present(*pud) || pud_large(*pud))
- 		goto out;
-@@ -383,6 +387,7 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(pmd))
- 		goto bad;
- 
-+	pfn = pmd_pfn(*pmd);
- 	pr_cont("PMD %lx ", pmd_val(*pmd));
- 	if (!pmd_present(*pmd) || pmd_large(*pmd))
- 		goto out;
-@@ -391,9 +396,13 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(pte))
- 		goto bad;
- 
-+	pfn = pte_pfn(*pte);
- 	pr_cont("PTE %lx", pte_val(*pte));
- out:
- 	pr_cont("\n");
-+
-+	if (show_rmpentry)
-+		dump_rmpentry(pfn);
- 	return;
- bad:
- 	pr_info("BAD\n");
-@@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
- 		show_ldttss(&gdt, "TR", tr);
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index fd928199bf1e..9cb3265f3bef 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -153,6 +153,20 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
+ 	case SEV_CMD_ATTESTATION_REPORT:	return sizeof(struct sev_data_attestation_report);
+ 	case SEV_CMD_SEND_CANCEL:		return sizeof(struct sev_data_send_cancel);
++	case SEV_CMD_SNP_GCTX_CREATE:		return sizeof(struct sev_data_snp_gctx_create);
++	case SEV_CMD_SNP_LAUNCH_START:		return sizeof(struct sev_data_snp_launch_start);
++	case SEV_CMD_SNP_LAUNCH_UPDATE:		return sizeof(struct sev_data_snp_launch_update);
++	case SEV_CMD_SNP_ACTIVATE:		return sizeof(struct sev_data_snp_activate);
++	case SEV_CMD_SNP_DECOMMISSION:		return sizeof(struct sev_data_snp_decommission);
++	case SEV_CMD_SNP_PAGE_RECLAIM:		return sizeof(struct sev_data_snp_page_reclaim);
++	case SEV_CMD_SNP_GUEST_STATUS:		return sizeof(struct sev_data_snp_guest_status);
++	case SEV_CMD_SNP_LAUNCH_FINISH:		return sizeof(struct sev_data_snp_launch_finish);
++	case SEV_CMD_SNP_DBG_DECRYPT:		return sizeof(struct sev_data_snp_dbg);
++	case SEV_CMD_SNP_DBG_ENCRYPT:		return sizeof(struct sev_data_snp_dbg);
++	case SEV_CMD_SNP_PAGE_UNSMASH:		return sizeof(struct sev_data_snp_page_unsmash);
++	case SEV_CMD_SNP_PLATFORM_STATUS:	return sizeof(struct sev_data_snp_platform_status_buf);
++	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
++	case SEV_CMD_SNP_CONFIG:		return sizeof(struct sev_user_data_snp_config);
+ 	default:				return 0;
  	}
  
--	dump_pagetable(address);
-+	dump_pagetable(address, error_code & X86_PF_RMP);
- }
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 1595088c428b..01ba9dc46ca3 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -86,6 +86,34 @@ enum sev_cmd {
+ 	SEV_CMD_DBG_DECRYPT		= 0x060,
+ 	SEV_CMD_DBG_ENCRYPT		= 0x061,
  
- static noinline void
-@@ -596,7 +605,7 @@ pgtable_bad(struct pt_regs *regs, unsigned long error_code,
++	/* SNP specific commands */
++	SEV_CMD_SNP_INIT		= 0x81,
++	SEV_CMD_SNP_SHUTDOWN		= 0x82,
++	SEV_CMD_SNP_PLATFORM_STATUS	= 0x83,
++	SEV_CMD_SNP_DF_FLUSH		= 0x84,
++	SEV_CMD_SNP_INIT_EX		= 0x85,
++	SEV_CMD_SNP_DECOMMISSION	= 0x90,
++	SEV_CMD_SNP_ACTIVATE		= 0x91,
++	SEV_CMD_SNP_GUEST_STATUS	= 0x92,
++	SEV_CMD_SNP_GCTX_CREATE		= 0x93,
++	SEV_CMD_SNP_GUEST_REQUEST	= 0x94,
++	SEV_CMD_SNP_ACTIVATE_EX		= 0x95,
++	SEV_CMD_SNP_LAUNCH_START	= 0xA0,
++	SEV_CMD_SNP_LAUNCH_UPDATE	= 0xA1,
++	SEV_CMD_SNP_LAUNCH_FINISH	= 0xA2,
++	SEV_CMD_SNP_DBG_DECRYPT		= 0xB0,
++	SEV_CMD_SNP_DBG_ENCRYPT		= 0xB1,
++	SEV_CMD_SNP_PAGE_SWAP_OUT	= 0xC0,
++	SEV_CMD_SNP_PAGE_SWAP_IN	= 0xC1,
++	SEV_CMD_SNP_PAGE_MOVE		= 0xC2,
++	SEV_CMD_SNP_PAGE_MD_INIT	= 0xC3,
++	SEV_CMD_SNP_PAGE_MD_RECLAIM	= 0xC4,
++	SEV_CMD_SNP_PAGE_RO_RECLAIM	= 0xC5,
++	SEV_CMD_SNP_PAGE_RO_RESTORE	= 0xC6,
++	SEV_CMD_SNP_PAGE_RECLAIM	= 0xC7,
++	SEV_CMD_SNP_PAGE_UNSMASH	= 0xC8,
++	SEV_CMD_SNP_CONFIG		= 0xC9,
++
+ 	SEV_CMD_MAX,
+ };
  
- 	printk(KERN_ALERT "%s: Corrupted page table at address %lx\n",
- 	       tsk->comm, address);
--	dump_pagetable(address);
-+	dump_pagetable(address, false);
+@@ -531,6 +559,200 @@ struct sev_data_attestation_report {
+ 	u32 len;				/* In/Out */
+ } __packed;
  
- 	if (__die("Bad pagetable", regs, error_code))
- 		sig = 0;
-diff --git a/include/linux/sev.h b/include/linux/sev.h
-index 1a68842789e1..734b13a69c54 100644
---- a/include/linux/sev.h
-+++ b/include/linux/sev.h
-@@ -16,6 +16,7 @@ int snp_lookup_rmpentry(u64 pfn, int *level);
- int psmash(u64 pfn);
- int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
- int rmp_make_shared(u64 pfn, enum pg_level level);
-+void dump_rmpentry(u64 pfn);
- #else
- static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
- static inline int psmash(u64 pfn) { return -ENXIO; }
-@@ -25,6 +26,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
- 	return -ENODEV;
- }
- static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
-+static inline void dump_rmpentry(u64 pfn) { }
++/**
++ * struct sev_data_snp_platform_status_buf - SNP_PLATFORM_STATUS command params
++ *
++ * @address: physical address where the status should be copied
++ */
++struct sev_data_snp_platform_status_buf {
++	u64 status_paddr;			/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
++ *
++ * @address: physical address of firmware image
++ * @len: len of the firmware image
++ */
++struct sev_data_snp_download_firmware {
++	u64 address;				/* In */
++	u32 len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_gctx_create - SNP_GCTX_CREATE command params
++ *
++ * @gctx_paddr: system physical address of the page donated to firmware by
++ *		the hypervisor to contain the guest context.
++ */
++struct sev_data_snp_gctx_create {
++	u64 gctx_paddr;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_activate - SNP_ACTIVATE command params
++ *
++ * @gctx_paddr: system physical address guest context page
++ * @asid: ASID to bind to the guest
++ */
++struct sev_data_snp_activate {
++	u64 gctx_paddr;				/* In */
++	u32 asid;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_decommission - SNP_DECOMMISSION command params
++ *
++ * @address: system physical address guest context page
++ */
++struct sev_data_snp_decommission {
++	u64 gctx_paddr;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_launch_start - SNP_LAUNCH_START command params
++ *
++ * @gctx_addr: system physical address of guest context page
++ * @policy: guest policy
++ * @ma_gctx_addr: system physical address of migration agent
++ * @imi_en: launch flow is launching an IMI for the purpose of
++ *   guest-assisted migration.
++ * @ma_en: the guest is associated with a migration agent
++ */
++struct sev_data_snp_launch_start {
++	u64 gctx_paddr;				/* In */
++	u64 policy;				/* In */
++	u64 ma_gctx_paddr;			/* In */
++	u32 ma_en:1;				/* In */
++	u32 imi_en:1;				/* In */
++	u32 rsvd:30;
++	u8 gosvw[16];				/* In */
++} __packed;
++
++/* SNP support page type */
++enum {
++	SNP_PAGE_TYPE_NORMAL		= 0x1,
++	SNP_PAGE_TYPE_VMSA		= 0x2,
++	SNP_PAGE_TYPE_ZERO		= 0x3,
++	SNP_PAGE_TYPE_UNMEASURED	= 0x4,
++	SNP_PAGE_TYPE_SECRET		= 0x5,
++	SNP_PAGE_TYPE_CPUID		= 0x6,
++
++	SNP_PAGE_TYPE_MAX
++};
++
++/**
++ * struct sev_data_snp_launch_update - SNP_LAUNCH_UPDATE command params
++ *
++ * @gctx_addr: system physical address of guest context page
++ * @imi_page: indicates that this page is part of the IMI of the guest
++ * @page_type: encoded page type
++ * @page_size: page size 0 indicates 4K and 1 indicates 2MB page
++ * @address: system physical address of destination page to encrypt
++ * @vmpl1_perms: VMPL permission mask for VMPL1
++ * @vmpl2_perms: VMPL permission mask for VMPL2
++ * @vmpl3_perms: VMPL permission mask for VMPL3
++ */
++struct sev_data_snp_launch_update {
++	u64 gctx_paddr;				/* In */
++	u32 page_size:1;			/* In */
++	u32 page_type:3;			/* In */
++	u32 imi_page:1;				/* In */
++	u32 rsvd:27;
++	u32 rsvd2;
++	u64 address;				/* In */
++	u32 rsvd3:8;
++	u32 vmpl1_perms:8;			/* In */
++	u32 vmpl2_perms:8;			/* In */
++	u32 vmpl3_perms:8;			/* In */
++	u32 rsvd4;
++} __packed;
++
++/**
++ * struct sev_data_snp_launch_finish - SNP_LAUNCH_FINISH command params
++ *
++ * @gctx_addr: system pphysical address of guest context page
++ */
++struct sev_data_snp_launch_finish {
++	u64 gctx_paddr;
++	u64 id_block_paddr;
++	u64 id_auth_paddr;
++	u8 id_block_en:1;
++	u8 auth_key_en:1;
++	u64 rsvd:62;
++	u8 host_data[32];
++} __packed;
++
++/**
++ * struct sev_data_snp_guest_status - SNP_GUEST_STATUS command params
++ *
++ * @gctx_paddr: system physical address of guest context page
++ * @address: system physical address of guest status page
++ */
++struct sev_data_snp_guest_status {
++	u64 gctx_paddr;
++	u64 address;
++} __packed;
++
++/**
++ * struct sev_data_snp_page_reclaim - SNP_PAGE_RECLAIM command params
++ *
++ * @paddr: system physical address of page to be claimed. The BIT0 indicate
++ *	the page size. 0h indicates 4 kB and 1h indicates 2 MB page.
++ */
++struct sev_data_snp_page_reclaim {
++	u64 paddr;
++} __packed;
++
++/**
++ * struct sev_data_snp_page_unsmash - SNP_PAGE_UNMASH command params
++ *
++ * @paddr: system physical address of page to be unmashed. The BIT0 indicate
++ *	the page size. 0h indicates 4 kB and 1h indicates 2 MB page.
++ */
++struct sev_data_snp_page_unsmash {
++	u64 paddr;
++} __packed;
++
++/**
++ * struct sev_data_dbg - DBG_ENCRYPT/DBG_DECRYPT command parameters
++ *
++ * @handle: handle of the VM to perform debug operation
++ * @src_addr: source address of data to operate on
++ * @dst_addr: destination address of data to operate on
++ * @len: len of data to operate on
++ */
++struct sev_data_snp_dbg {
++	u64 gctx_paddr;				/* In */
++	u64 src_addr;				/* In */
++	u64 dst_addr;				/* In */
++	u32 len;				/* In */
++} __packed;
++
++/**
++ * struct sev_snp_guest_request - SNP_GUEST_REQUEST command params
++ *
++ * @gctx_paddr: system physical address of guest context page
++ * @req_paddr: system physical address of request page
++ * @res_paddr: system physical address of response page
++ */
++struct sev_data_snp_guest_request {
++	u64 gctx_paddr;				/* In */
++	u64 req_paddr;				/* In */
++	u64 res_paddr;				/* In */
++} __packed;
++
++/**
++ * struuct sev_data_snp_init - SNP_INIT_EX structure
++ *
++ * @init_rmp: indicate that the RMP should be initialized.
++ */
++struct sev_data_snp_init_ex {
++	u32 init_rmp:1;
++	u32 rsvd:31;
++	u8 rsvd1[60];
++} __packed;
++
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
  
- #endif /* CONFIG_AMD_MEM_ENCRYPT */
- #endif /* __LINUX_SEV_H */
+ /**
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 91b4c63d5cbf..bed65a891223 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -61,6 +61,13 @@ typedef enum {
+ 	SEV_RET_INVALID_PARAM,
+ 	SEV_RET_RESOURCE_LIMIT,
+ 	SEV_RET_SECURE_DATA_INVALID,
++	SEV_RET_INVALID_PAGE_SIZE,
++	SEV_RET_INVALID_PAGE_STATE,
++	SEV_RET_INVALID_MDATA_ENTRY,
++	SEV_RET_INVALID_PAGE_OWNER,
++	SEV_RET_INVALID_PAGE_AEAD_OFLOW,
++	SEV_RET_RMP_INIT_REQUIRED,
++
+ 	SEV_RET_MAX,
+ } sev_ret_code;
+ 
+@@ -147,6 +154,41 @@ struct sev_user_data_get_id2 {
+ 	__u32 length;				/* In/Out */
+ } __packed;
+ 
++/**
++ * struct sev_user_data_snp_status - SNP status
++ *
++ * @major: API major version
++ * @minor: API minor version
++ * @state: current platform state
++ * @build: firmware build id for the API version
++ * @guest_count: the number of guest currently managed by the firmware
++ * @tcb_version: current TCB version
++ */
++struct sev_user_data_snp_status {
++	__u8 api_major;		/* Out */
++	__u8 api_minor;		/* Out */
++	__u8 state;		/* Out */
++	__u8 rsvd;
++	__u32 build_id;		/* Out */
++	__u32 rsvd1;
++	__u32 guest_count;	/* Out */
++	__u64 tcb_version;	/* Out */
++	__u64 rsvd2;
++} __packed;
++
++/*
++ * struct sev_user_data_snp_config - system wide configuration value for SNP.
++ *
++ * @reported_tcb: The TCB version to report in the guest attestation report.
++ * @mask_chip_id: Indicates that the CHID_ID field in the attestation report
++ * will always be zero.
++ */
++struct sev_user_data_snp_config {
++	__u64 reported_tcb;     /* In */
++	__u32 mask_chip_id;     /* In */
++	__u8 rsvd[52];
++} __packed;
++
+ /**
+  * struct sev_issue_cmd - SEV ioctl parameters
+  *
 -- 
 2.25.1
 
