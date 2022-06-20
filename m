@@ -2,115 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D6755520CC
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 17:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 998A655212F
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 17:36:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244576AbiFTP1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 11:27:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55248 "EHLO
+        id S239244AbiFTPgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 11:36:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242349AbiFTP0n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 11:26:43 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F1DC15
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 08:25:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 69FA6B81211
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 15:25:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E96C1C341C5
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 15:25:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655738750;
-        bh=ISXPhUBg6qQOCiqX/l88DDSasMb8lBnj2ojhuaqrzvk=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=eu49XZhxfxApYqYvjAeOzpwPRpEug2GRWuGp9rW+N+dE3dtD7K0hgs7nwP7izoMSl
-         QnXHITma2Gh7UU8oHwtvIVTw+X4Pjm5+HNlYfl50k93hdOZxiarPhmWS7pZFARKNYe
-         XAXbkaRolmjICxQ+cH49FQdzRdOLcZ/Rg32uvC9je5WRATfsZTYvg2VbniziynPEiL
-         B0IKl5YRy1zhDny/MD6xZGlSJkmBwbB/vfhNRSqJ6bThWG5uXIAPBtUDv3auQagYr3
-         Sb64ZY4t+xPpyipPvnPtjGPgwHAo76LdCj1I159Q3qhXsEGazSWFeMBbVnfFzDgmiR
-         yj8nY3iHK8F4g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D489AC05FD6; Mon, 20 Jun 2022 15:25:50 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216026] Fails to compile using gcc 12.1 under Ubuntu 22.04
-Date:   Mon, 20 Jun 2022 15:25:50 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-216026-28872-njUcH11dFN@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216026-28872@https.bugzilla.kernel.org/>
-References: <bug-216026-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S240728AbiFTPgd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 11:36:33 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2072.outbound.protection.outlook.com [40.107.243.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0932814D3B;
+        Mon, 20 Jun 2022 08:36:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ipm6XsXR3XMoRqJncOojL2E6Fv+VSYsgOPT2CLtTxArq0W0v6GpxYJLt3EMKwZag8KPzZmIUnsZQWwSW2KKpQ9hxIsMWmj340VzpLZxGyKX6bRg6WVjKhMx+orEFAjmGW7Zp96bCJJ4aJn9VtLYTe6yVWbFm8oJV+1AivDg95CqtvZdexSJyC4RAgmuJBoU6aX80gZT02U5vsMzFipIkAabrUFP7bFs+SHp1s+xh3+xqb7eotjVT+DUOOOnZbMHdw1CcVAMGi76NtdPL+ImMNhmlQ+cAWTA4Cm2EdaSjzcBx5JXjOwp674F4QaPnzs11fDGL+2b25tHtMs0leqJexA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XxExLSLje0IsPubQt3DEVni75/KwiaOILS42XzkUvGY=;
+ b=Ilas+esHwLm8+FLwwQYGiWoZvuP2JWDy9idEBnJeUyDlI7uTPkDU5M3xT7jToghL68wZxBRzZT4MfsqAWcoAfP7DnB3Zzp5GUT1k+cm+w8X6uTMocdCL1fUCJMxo1N5vnHklatq2NO1x0LBAvv78NL6ZJdGTovnOvQeq240xUPQNlM9hfMWTez2hd61Jv3UzOrO8f8dB9CwV+RJ8o/xuOZKql7ZEkEg3pnfKvwRJ0YNL93Ztw7yqk2YN3UbPx2IlMO1l/Y1rQYt9P777tR8VqpoPIsrVI1tAURpFlWUrS1W859bA1mhAI4yurE0quePumD2+pkmJLMMJ7dRK45OPpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XxExLSLje0IsPubQt3DEVni75/KwiaOILS42XzkUvGY=;
+ b=jxASaIkrt8oJ1etwInaRX0uwuKHHLplY+FMPVq/s4UYOg/BvXlCaxuHEGA0Fsxp0zNFl7aXxA/dtxbiuuDjoXYWv16r3e+gOf/LKr8O2W8Pd7HCcjcFdV6+2Ak/JrOiBKH/sCu8gXUo9WZbSeT4TcdcZ+/Z4XcZAI//ta62ERxIqOa9G+VKlZd8cKSwGO/TgAEbTiTxSqoFVcTawfJnP6RZ6hJvgWxktShMVT6YcbdRGdtO26H+4D+w7FsCa+5Drokk2Cl43XUroQqI8Q4957mephX2h5GRkcUba85fJR6WlWF8pokOhtv//w9MztyMzaTYqGMDi9cubjEYUOU95fg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BY5PR12MB3794.namprd12.prod.outlook.com (2603:10b6:a03:1aa::28) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14; Mon, 20 Jun
+ 2022 15:36:31 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5353.022; Mon, 20 Jun 2022
+ 15:36:31 +0000
+Date:   Mon, 20 Jun 2022 12:36:28 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Nicolin Chen <nicolinc@nvidia.com>, kwankhede@nvidia.com,
+        corbet@lwn.net, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        kevin.tian@intel.com, jchrist@linux.ibm.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [RFT][PATCH v1 6/6] vfio: Replace phys_pfn with phys_page for
+ vfio_pin_pages()
+Message-ID: <20220620153628.GA5502@nvidia.com>
+References: <20220616235212.15185-1-nicolinc@nvidia.com>
+ <20220616235212.15185-7-nicolinc@nvidia.com>
+ <YqxBLbu8yPJiwK6Z@infradead.org>
+ <20220620030046.GB5219@nvidia.com>
+ <YrAK87zjdOqUF6gB@infradead.org>
+ <YrAVuxMEkV4Wytci@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YrAVuxMEkV4Wytci@infradead.org>
+X-ClientProxiedBy: MW4P220CA0005.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:303:115::10) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e282e9b6-c05b-4e66-1963-08da52d2a5dd
+X-MS-TrafficTypeDiagnostic: BY5PR12MB3794:EE_
+X-Microsoft-Antispam-PRVS: <BY5PR12MB3794099CB9611D2E36FD1B7DC2B09@BY5PR12MB3794.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Wt1ZsE06Wa31OUiH/4sISpZcCjPh0ORWltRH8WiWERo1OD8NBVYjopikouY1IbRHV3T26ykAoZ8Iq7L0s94fSQnqpeoZMQrlzdisHN+/5gtQb9pP2g0AcqKG2YwNwqBTQIYyr1W8I6oiq00DQLLcenb90ekC9XlKeIFMOO4Jm6EPVfST4W7q+WlWxw5Y4IWPBYqDYhuGZ/HXIZerYYBwI/rW5wZxvjid1wjjF6Jf6Z+yloAxhOFNihydZtMspvAVIGs1JYJ66iFVhKQGX1D2dep1s/ykWlTl+1qsKExposcx65OzgvBuFeWfHw4NNgBkTU8BCaip7EBotf+wy06b9XYwUUhjiL64GLpu3fAbGG6RBBUyXgWLRdRcQgDGzghtQE00CLoBdSNR7qJkDuh46tmpwpYhw0LLeK74BvJgCiEMh+PEtC0cCiBFNKm8wDN+W0mMI5y0pmqonXg1nH/gvgTgNucfDGm8tih7J0zWAvPeDNYQOTKENogEAAyyNFD0P7CbGX3/eaUmZtua0cD4sX1zN+PwN3j0HjSfddO3pv6o6dnHvpQXG7KRL13vr0E63znT0hbN9SS7PNXRYUVOVvWDcGeKR5UCgRephcjm+CyjR1xz+CWH3ljht4ZmWFmOOUXNkLb5y8CFUtgknUKhtQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(346002)(376002)(396003)(136003)(39860400002)(7416002)(5660300002)(7406005)(186003)(41300700001)(66476007)(6512007)(26005)(33656002)(38100700002)(66946007)(8676002)(4326008)(66556008)(1076003)(2616005)(36756003)(6916009)(316002)(6666004)(2906002)(6486002)(8936002)(478600001)(86362001)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MFrMjvpYjPTzQhVzhXqeHisd1VLlV/VyeEXaP+smyVNdHEJVKk5ACx8jICZ0?=
+ =?us-ascii?Q?seYauzwjkrj60rwhKZzR5f38hogWoQNRfqFh53Evvu/d13AixiORokWVVG8d?=
+ =?us-ascii?Q?dbFZfQi/WLTBiAam+7v8/xGJmWaiP99/lnhyewH1GapBXnF6SALPUqiB0FHB?=
+ =?us-ascii?Q?0cbF5L21iHqVzf3Bk2jd7/B20w22cYMhcSPZH66KOBcNdkBXtztFdH12kqPe?=
+ =?us-ascii?Q?P/75VIRmLUA7bFlsmlSFHBayNNRkc1v1gKQ6CdaTDdrlsCDjb3gWIcKd1114?=
+ =?us-ascii?Q?MmeUUxoaizikPx5PQDIOVd4Bly6zFl0jwxYHJrXYCbnhjBkLdctqm5KOAdyG?=
+ =?us-ascii?Q?7SbcYln+AO+UWqyYdkJsEI7gCCWzI3B5P39SRuxZYn7aHIVAgUDLPVJf8Ksi?=
+ =?us-ascii?Q?5XAVtk75GQ7eJAaBFWLokC+xddyR452jySL7+ZRv7fd9LmB0L1644lpRoohF?=
+ =?us-ascii?Q?W1Qk2ZWQDTFdOz/pxDXQULnkx11E7OEOa1b9NzPO55+e2SmsfMvabNSgizlF?=
+ =?us-ascii?Q?FYF66isIfB1Ies4gQYnU3yj0rE4ql/mEWyB3kQifanDA+UnqeigzyaK8Kox/?=
+ =?us-ascii?Q?9AW5FUtR/T304rAUqwCVjxWwJ2mqqFqYjqTtvPCQIWZ0BPfGsLKJ5lbVxmq9?=
+ =?us-ascii?Q?oycpwWUD1w4tYL0hwKMdmhu8HUam+kbFPwTexR9qvvni6g46JBBXX60MRtjw?=
+ =?us-ascii?Q?SZ35IQFw2YRsliA4O1NjxFeGJU3L7rBB4k1yAIHPLnFGktkCT8I9CeWDa6ll?=
+ =?us-ascii?Q?QPI0g8EbdCcEqUdHgCb6LGDbCbCwRFOwJ46EpklyJZ20aLT6j+yJG0Fg/vjH?=
+ =?us-ascii?Q?zNw0NmtvRNCXkrSCvkSKE5t4DSVEIHwC+kNlr60yIs34tSEcz1X5ikL9HHjJ?=
+ =?us-ascii?Q?39zjKeumI03T1SYqTfZW89BBUza7ceIhT9gaGfQ6Y6xz4oCbCtBwTaTM0NL/?=
+ =?us-ascii?Q?n55AqyOhHPTNK0/2kipdXvPG8p5ECkKb/+kCtGyfbQk2/YBDr4AAq2nrHjJ+?=
+ =?us-ascii?Q?UVYI/nH2Pu1dTII7RzcoB5JQp97hfoQ0Vt2XUHhzbFA+p0fxo+W4XxI1zOfy?=
+ =?us-ascii?Q?yLn0tCb19XkeIzv0nHwWwDxSGCHXzyNtCl5RlvAJ5vxZdH+U4YVk9muzasM5?=
+ =?us-ascii?Q?ZTay6lGFzcYSgKVJiB5OfyNrVMKB3FI8kNbAQXoOLF6dvr3I7KiZ9+Y7wbnZ?=
+ =?us-ascii?Q?LxdwosQZvGoM+P6fBsAB1VCQetXLbIFY4Mnfunvd7RXKyaW3yGmFtccSXSr2?=
+ =?us-ascii?Q?iAmMniGF0FNCq7m+hZsX6rqIxhH6iEBXfoUaAH1rCU9R7AxNNg8801xCkrbU?=
+ =?us-ascii?Q?PC7yYLgrcjenlrC/8M82tOeXDuxanSYgP9JbHMTMps3ZwE8q1WFZezp6klj4?=
+ =?us-ascii?Q?mJcq4+HktNtxozPDID89VpHz8v1l/J63fQMCqt7IgdS3SHSdbg8oAtRNuXa4?=
+ =?us-ascii?Q?dyXi9AwyrrozeVNGsPJ/B9WqaxbIZeBrAkCG5I9EFZ7Qtx/tUJrOQreChaOR?=
+ =?us-ascii?Q?BKuKm1UrZzHqMbDWUgPo94LKp+c0rtmz4So9Cgi86AQYdRsH3Rxe64lBEUBC?=
+ =?us-ascii?Q?BvVsW+EsQVVS1Y0REmWqGthpZW67+1AfQKiNnJ4PBrg0KBNBGz703REI1OI7?=
+ =?us-ascii?Q?sdM7YNh6+lob5Pie4VEmzVYy/1ihY9+W/RQaa4RkKuC5gX7TQ8t4owzXXmBZ?=
+ =?us-ascii?Q?5DfmjNwZFE2bVujaLukvZrFeADGi+m0K0RHtRRHE4XEIpp76Nd2znDUnbFp/?=
+ =?us-ascii?Q?nXEaa7iHRA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e282e9b6-c05b-4e66-1963-08da52d2a5dd
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 15:36:30.8186
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lqmMCY6R9ngDAW1/DoezGpwxppoHEaXlifgiXmdUvpbMS4IpKaReVgYzE21BqcC9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB3794
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216026
+On Sun, Jun 19, 2022 at 11:37:47PM -0700, Christoph Hellwig wrote:
+> On Sun, Jun 19, 2022 at 10:51:47PM -0700, Christoph Hellwig wrote:
+> > On Mon, Jun 20, 2022 at 12:00:46AM -0300, Jason Gunthorpe wrote:
+> > > On Fri, Jun 17, 2022 at 01:54:05AM -0700, Christoph Hellwig wrote:
+> > > > There is a bunch of code an comments in the iommu type1 code that
+> > > > suggest we can pin memory that is not page backed.  
+> > > 
+> > > AFAIK you can.. The whole follow_pte() mechanism allows raw PFNs to be
+> > > loaded into the type1 maps and the pin API will happily return
+> > > them. This happens in almost every qemu scenario because PCI MMIO BAR
+> > > memory ends up routed down this path.
+> > 
+> > Indeed, my read wasn't deep enough.  Which means that we can't change
+> > the ->pin_pages interface to return a struct pages array, as we don't
+> > have one for those.
+> 
+> Actually.  gvt requires a struct page, and both s390 seem to require
+> normal non-I/O, non-remapped kernel pointers.  So I think for the
+> vfio_pin_pages we can assume that we only want page backed memory and
+> remove the follow_fault_pfn case entirely.   But we'll probably have
+> to keep it for the vfio_iommu_replay case that is not tied to
+> emulated IOMMU drivers.
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+Right, that is my thinking - since all drivers actually need a struct
+page we should have the API return a working struct page and have the
+VFIO layer isolate the non-struct page stuff so it never leaks out of
+this API.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |aros@gmx.com
+This nicely fixes the various problems in all the drivers if io memory
+comes down this path.
 
---- Comment #33 from Artem S. Tashkinov (aros@gmx.com) ---
-Let's be honestly brutal here for a second, shall we?
+It is also why doing too much surgery deeper into type 1 probably
+isn't too worthwhile as it still needs raw pfns in its data
+structures for iommu modes.
 
-1. Do you pay for the Linux kernel or have any sort of contract/agreement w=
-ith
-Linux kernel developers? Absolutely no. There's a license attached to the
-kernel, please read it carefully and thoroughly.
-
-2. Do Linux kernel developers owe you anything? Absolutely no.
-
-What makes you believe someone should suddenly give up on the pressing tasks
-they are being paid for (and the failure to complete those tasks could also
-mean a lost job) and pay attention to a random self-righteous guy who's
-screaming his lungs out?
-
-You're completely lost.
-
-What's more you're _actively spamming_ a mailing list with dozens if not
-hundreds of subscribers.
-
-You don't add any new info, you just demand, demand and demand. Not only th=
-at
-you've already managed to create two duplicates as if it will suddenly make=
- the
-people responsible for this kernel subsystem give up on their primary job a=
-nd
-rush to meet your demands.
-
-Please stop. This message does _not_ need a reply. Keep this bug open for
-Christ's sake if it makes you happy.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks,
+Jason
