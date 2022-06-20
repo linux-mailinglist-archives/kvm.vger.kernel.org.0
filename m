@@ -2,128 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 968C955168E
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 13:06:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AA18551693
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 13:07:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241215AbiFTLG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 07:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55850 "EHLO
+        id S238928AbiFTLHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 07:07:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241013AbiFTLG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 07:06:28 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E40B713FB5
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 04:06:27 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D6B01113E;
-        Mon, 20 Jun 2022 04:06:27 -0700 (PDT)
-Received: from [10.57.9.33] (unknown [10.57.9.33])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EA453F7D7;
-        Mon, 20 Jun 2022 04:06:26 -0700 (PDT)
-Message-ID: <cea12393-ecf5-820d-81ae-0c8b9e81ceba@arm.com>
-Date:   Mon, 20 Jun 2022 12:06:24 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.10.0
-Subject: Re: [kvm-unit-tests PATCH v2 03/23] lib: Add support for the XSDT
- ACPI table
-Content-Language: en-GB
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
-        jade.alglave@arm.com
-References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-4-nikos.nikoleris@arm.com>
- <Yq0eaaOiud8pOXZN@google.com> <YrA0yajcrohAOIoS@monolith.localdoman>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <YrA0yajcrohAOIoS@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        with ESMTP id S238910AbiFTLHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 07:07:09 -0400
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BE31572D
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 04:07:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=virtuozzo.com; s=relay; h=Content-Type:Mime-Version:Message-Id:Subject:From
+        :Date; bh=9SCkUg6RVcBLlFwNe0+AFrt9G+zfWlBnbqgWsw1QYNE=; b=fsA8ufeyh5reRwAxsc+
+        Dr4/brYe6RUpAxE5nf40OfEeePSi00vFeOA2gBmHW0MQZl2j2EMADIq6SxKN4i2WReM6+Ln5T3D4Y
+        WLLaCBZPOFFjkrZfgxMEgso3rqaIcsYv5VCqH5MyHP2fffsaSIVCNNBhXIXCdrLzN4sstay4F2U=;
+Received: from [192.168.16.160] (helo=mikhalitsyn-laptop)
+        by relay.virtuozzo.com with esmtp (Exim 4.94.2)
+        (envelope-from <alexander.mikhalitsyn@virtuozzo.com>)
+        id 1o3FEu-00604B-GC; Mon, 20 Jun 2022 13:06:40 +0200
+Date:   Mon, 20 Jun 2022 14:06:56 +0300
+From:   Alexander Mikhalitsyn <alexander.mikhalitsyn@virtuozzo.com>
+To:     Alexander Mikhalitsyn <alexander.mikhalitsyn@virtuozzo.com>
+Cc:     babu.moger@amd.com,
+        Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <joro@8bytes.org>, den@virtuozzo.com,
+        ptikhomirov@virtuozzo.com
+Subject: Re: [Question] debugging VM cpu hotplug (#GP -> #DF) which results
+ in reset
+Message-Id: <20220620140656.9b3db5987fb21d2321f10cec@virtuozzo.com>
+In-Reply-To: <20220620140432.17273d8d58e1e3516457b951@virtuozzo.com>
+References: <20220615171410.ab537c7af3691a0d91171a76@virtuozzo.com>
+        <Yqn0GofIXFOHk6k4@google.com>
+        <CAJqdLrrM7ttxM-psdLG0rLydS+HBPX3Yqi_TEtxizni4a4eySA@mail.gmail.com>
+        <20220620140432.17273d8d58e1e3516457b951@virtuozzo.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex, Ricardo,
+On Mon, 20 Jun 2022 14:04:32 +0300
+Alexander Mikhalitsyn <alexander.mikhalitsyn@virtuozzo.com> wrote:
 
-Thank you both for the reviews!
-
-On 20/06/2022 09:53, Alexandru Elisei wrote:
-> Hi,
+> On Wed, 15 Jun 2022 22:47:57 +0300
+> Alexander Mikhalitsyn <alexander@mihalicyn.com> wrote:
 > 
-> On Fri, Jun 17, 2022 at 05:38:01PM -0700, Ricardo Koller wrote:
->> Hi Nikos,
->>
->> On Fri, May 06, 2022 at 09:55:45PM +0100, Nikos Nikoleris wrote:
->>> XSDT provides pointers to other ACPI tables much like RSDT. However,
->>> contrary to RSDT that provides 32-bit addresses, XSDT provides 64-bit
->>> pointers. ACPI requires that if XSDT is valid then it takes precedence
->>> over RSDT.
->>>
->>> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->>> ---
->>>   lib/acpi.h |   6 ++++
->>>   lib/acpi.c | 103 ++++++++++++++++++++++++++++++++---------------------
->>>   2 files changed, 68 insertions(+), 41 deletions(-)
->>>
->>> diff --git a/lib/acpi.h b/lib/acpi.h
->>> index 42a2c16..d80b983 100644
->>> --- a/lib/acpi.h
->>> +++ b/lib/acpi.h
->>> @@ -13,6 +13,7 @@
->>>   
->>>   #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
->>>   #define RSDT_SIGNATURE ACPI_SIGNATURE('R','S','D','T')
->>> +#define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
->>>   #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
->>>   #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
->>>   
->>> @@ -56,6 +57,11 @@ struct rsdt_descriptor_rev1 {
->>>       u32 table_offset_entry[0];
->>>   } __attribute__ ((packed));
->>>   
->>> +struct acpi_table_xsdt {
->>> +    ACPI_TABLE_HEADER_DEF
->>> +    u64 table_offset_entry[1];
->>
->> nit: This should be "[0]" to match the usage above (in rsdt).
->>
->> I was about to suggest using an unspecified size "[]", but after reading
->> what the C standard says about it (below), now I'm not sure. was the
->> "[1]" needed for something that I'm missing?
->>
->> 	106) The length is unspecified to allow for the fact that
->> 	implementations may give array members different
->> 	alignments according to their lengths.
+> > Dear Sean,
+> > 
+> > Thanks a lot for your answer!
+> > 
+> > On Wed, Jun 15, 2022 at 6:00 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Wed, Jun 15, 2022, Alexander Mikhalitsyn wrote:
+> > > > Dear friends,
+> > > >
+> > > > I'm sorry for disturbing you but I've getting stuck with debugging KVM
+> > > > problem and looking for an advice. I'm working mostly on kernel
+> > > > containers/CRIU and am newbie with KVM so, I believe that I'm missing
+> > > > something very simple.
+> > > >
+> > > > My case:
+> > > > - AMD EPYC 7443P 24-Core Processor (Milan family processor)
+> > > > - OpenVZ kernel (based on RHEL7 3.10.0-1160.53.1) on the Host Node (HN)
+> > > > - Qemu/KVM VM (8 vCPU assigned) with many different kernels from 3.10.0-1160 RHEL7 to mainline 5.18
+> > > >
+> > > > Reproducer (run inside VM):
+> > > > echo 0 > /sys/devices/system/cpu/cpu3/online
+> > > > echo 1 > /sys/devices/system/cpu/cpu3/online <- got reset here
+> > > >
+> > > > *Not* reproducible on:
+> > > > - any Intel which we tried
+> > > > - AMD EPYC 7261 (Rome family)
+> > >
+> > > Hmm, given that Milan is problematic but Rome isn't, that implies the bug is related
+> > > to a feature that's new in Milan.  PCID is the one that comes to mind, and IIRC there
+> > > were issues with PCID (or INVCPID?) in various kernels when running on Milan.
+> > >
+> > > Can you try hiding PCID and INVPCID from the guest?
+> > 
+> > Yep, I've tried to disable PCID and INVPCID features by nopcid and
+> > noinvpcid kernel cmdline flags.
+> > noinvpcid not effects on the problem, but nopcid does! Fantastic!
+> > 
+> > Of course, masking CPU feature from qemu side is also works:
+> >   <cpu mode='host-model' check='partial'>
+> >     <feature policy='disable' name='pcid'/>
+> >   </cpu>
+> > 
+> > Now, thanks to your advice, I will try to understand why the PCID
+> > feature breaks VMs. I see
+> > that we've some support for this feature in our host kernel (based on
+> > RHEL7 3.10.0-1160.53.1), probably
+> > We have some bugs or are not handling something PCID-related from the KVM side.
+> > 
+> > Thanks again, I couldn't have pulled this off without your advice, Sean.
+> > 
+> > >
+> > > > - without KVM (on Host)
+> > >
+> > > ...
+> > >
+> > > > ==== trace-cmd record -b 20000 -e kvm:kvm_cr -e kvm:kvm_userspace_exit -e probe:* =====
+> > > >
+> > > >              CPU-1834  [003] 69194.833364: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
+> > > >              CPU-1838  [000] 69194.834177: kvm_multiple_exception_L9: (ffffffff814313c6) vcpu=0xffff93ee9a528000
+> > > >              CPU-1838  [000] 69194.834180: kvm_multiple_exception_L41: (ffffffff81431493) vcpu=0xffff93ee9a528000 exception=0xd000001 has_error=0x0 nr=0xd error_code=0x0 has_payload=0x0
+> > > >              CPU-1838  [000] 69194.834195: kvm_multiple_exception_L9: (ffffffff814313c6) vcpu=0xffff93ee9a528000
+> > > >              CPU-1838  [000] 69194.834196: kvm_multiple_exception_L41: (ffffffff81431493) vcpu=0xffff93ee9a528000 exception=0x8000100 has_error=0x0 nr=0x8 error_code=0x0 has_payload=0x0
+> > > >              CPU-1838  [000] 69194.834200: shutdown_interception_L8: (ffffffff8146e4a0)
+> > >
+> > > If you can modify the host kernel, throwing a WARN in kvm_multiple_exception() should
+> > > pinpoint the source of the #GP.  Though you may get unlucky and find that KVM is just
+> > > reflecting an intercepted a #GP that was first "injected" by hardware.  Note that this
+> > > could spam the log if KVM is injecting a large number of #GPs.
+> > >
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 9cea051ca62e..19d959bf97cc 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -612,6 +612,8 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
+> > >         u32 prev_nr;
+> > >         int class1, class2;
+> > >
+> > > +       WARN_ON(nr == GP_VECTOR);
+> > > +
+> > >         kvm_make_request(KVM_REQ_EVENT, vcpu);
+> > >
+> > >         if (!vcpu->arch.exception.pending && !vcpu->arch.exception.injected) {
+> > >
+> > 
+> > Thanks! I'll try to play with that.
+> > 
+> > Best regards,
+> > Alex
 > 
-> GCC prefers "flexible array members" (array[]) [1]. Linux has deprecated
-> the use of zero-length arrays [2]. The kernel docs do make a pretty good
-> case for flexible array members.
+> Just in case if someone will meet the same issue with CPU hotplug on RHEL7 with AMD Milan.
 > 
-> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-> [2] https://elixir.bootlin.com/linux/v5.18/source/Documentation/process/deprecated.rst#L234
+> This patch (authored by Babu Moger) helps:
+> KVM: SVM: Clear the CR4 register on reset
+> https://patchwork.kernel.org/project/kvm/patch/161471109108.30811.6392805173629704166.stgit@bmoger-ubuntu/
 > 
+> It's easy to apply it to RHEL7 kernel code:
+> https://lists.openvz.org/pipermail/devel/2022-June/079762.html
+> 
+> It fixes problem because cpu hotplug triggers the same codepath as early start of kexec'ed kernel.
+> 
+> Huge thanks to Sean Christopherson for pointing me out to PCID and Babu Moger for the fix :-)
+> 
+> Regards,
+> Alex
 
-Happy to change this, I don't have a strong preference. To be consistent 
-with RSDT we would have to declare:
-
-u64 table_offset_entry[0];
-
-But it might be better to change RSDT as well. Linux kernel declares:
-
-u64 table_offset_entry[1];
-
-but it seems, we would rather have:
-
-u64 table_offset_entry[];
-
-For alignment, we shouldn't be relying on the length specifier, all 
-structs in <acpi.h> should be packed.
-
-Thanks,
-
-Nikos
++CC Babu Moger
