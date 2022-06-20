@@ -2,162 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 453C5550E7A
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 04:03:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F12C5550E9F
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 04:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236560AbiFTCDx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Jun 2022 22:03:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52604 "EHLO
+        id S236024AbiFTCmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Jun 2022 22:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237556AbiFTCDv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Jun 2022 22:03:51 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2089.outbound.protection.outlook.com [40.107.244.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0688365B8
-        for <kvm@vger.kernel.org>; Sun, 19 Jun 2022 19:03:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jCGOfJlYIwUe9O2xKmWcRjDKiCgmLR2kNR/7f723bMhw9e51rGIWIMQtsBBiq5lAdS1I3K9ycc8ehdZPGVnt8d/Wef3xpllh60tyTyW2q42HrdzWSJJkdOVAffbRVQqstloFOdlBKiKmf6t/xtpBaTmOBQgQ5eqOW7eAmfIeAjkwoj4sKd60/D2sHmMUlZjTpS3OXZ4pkycko+31xZwSlwfzD6cKrBcf9bEu5os6klV04yXUs+aIBVLRcPsb5RD3F6/8238kHWUeoirKM4mKgrBkS2Iuv3dXiHJJr5bTKidnTKg8U6mvSjLAu3HDt7LYks5aFaPl68JAkDHUCCu3ng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rqbm3yGHvW0QDAO7CEnWsDeoao7DbgtK/AD7cQFfjxs=;
- b=FvSpYtOMxWME5ebDEw220GykefKX4zszBsrr0K08FUy6keytcIL4JIAaL4EET2uAXUYnfteZ77nm4AMLTfkNFjNmI0AIUE3AKxQNS0YZpLCRirBjFcMYMdy5ot9p+GkAZoW6APR+k3WVBLXyRTTWusskBdZwuHZ1v2AsVZ1jIWeZ0ahDVzuuiQfNPabAVjNx+4Q1Z3esG6ZGknKh7Q9bX8DJB9OqMFXgsXzubVahoQEPBjhlkYDRq01sigRM9FjXhwsiuKGDqRGOJYC4Pvb4gKXBFdJwH1bucsnR4Rss8I5q7OyFDeX/urWQhuMlEW4QCk2vB7bGJN1aTOpqt95I5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rqbm3yGHvW0QDAO7CEnWsDeoao7DbgtK/AD7cQFfjxs=;
- b=RaObeOqkEa9MkqyofFTRx4jeuaCzdaXlIRtDph2tVG8Pi/73YN6g98OHQMZcuqKkgP224VYyYkQHtdY0W1lUUzREdwtJUgy2c01x83UkZN0YDCZGbEUJ5p6U5UBrVWMlavUjHm+/O2Whh0uTbpLPDaC8hKn12Ra+NbA/OLc6e5o=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- MWHPR12MB1151.namprd12.prod.outlook.com (2603:10b6:300:e::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5353.14; Mon, 20 Jun 2022 02:03:46 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::bdcc:775:f274:7f12]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::bdcc:775:f274:7f12%4]) with mapi id 15.20.5353.014; Mon, 20 Jun 2022
- 02:03:45 +0000
-Message-ID: <d9cac7fe-c38a-1470-2048-3319eb9d3470@amd.com>
-Date:   Mon, 20 Jun 2022 07:33:35 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [kvm-unit-tests PATCH v4 2/8] x86: nSVM: Move all nNPT test cases
- from svm_tests.c to a separate file.
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
-References: <20220428070851.21985-1-manali.shukla@amd.com>
- <20220428070851.21985-3-manali.shukla@amd.com> <Yqpur6a7oYqUEfGd@google.com>
-From:   "Shukla, Manali" <mashukla@amd.com>
-In-Reply-To: <Yqpur6a7oYqUEfGd@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0043.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:98::19) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+        with ESMTP id S232916AbiFTCmS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Jun 2022 22:42:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EA15B2BF
+        for <kvm@vger.kernel.org>; Sun, 19 Jun 2022 19:42:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655692935;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/oknfccPAIxyEAuYdT4y1IrsCu7NWdjJuGzW6X5z710=;
+        b=PSzCY3UuIzA6rR+Nsr3B/Bg7uRAth8uXsrF5Q50GqFWZ7JnyP/rXU3ji2+WRc+R7ogko9J
+        6lO+XeORR5aQbuIYdEhI9bmvFvH6R39tvkmFgFZAP+lxxcJCHisDXFySa6aaoZPhRVEonN
+        VymahPKcO5uJjudBSRuRzl95JySk0l8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-147-ROevF3OlOLOOELPM_umplw-1; Sun, 19 Jun 2022 22:42:06 -0400
+X-MC-Unique: ROevF3OlOLOOELPM_umplw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 66EDE101A56C;
+        Mon, 20 Jun 2022 02:42:05 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-16.pek2.redhat.com [10.72.12.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2CB65C08087;
+        Mon, 20 Jun 2022 02:42:00 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     cohuck@redhat.com, pasic@linux.ibm.com, jasowang@redhat.com,
+        mst@redhat.com
+Cc:     gor@linux.ibm.com, borntraeger@de.ibm.com, agordeev@linux.ibm.com,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH V2] virtio: disable notification hardening by default
+Date:   Mon, 20 Jun 2022 10:41:58 +0800
+Message-Id: <20220620024158.2505-1-jasowang@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4fb80c4a-8245-42c4-d200-08da52611b9e
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1151:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR12MB115198DA2B5ECA746FFA6DFCFDB09@MWHPR12MB1151.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HPK5Elsi28UHuy4KoW54JVLr/bNHieeZjJTV1MFg7+F8EvlGzMCHbrlUGDMUMYWmVLY6zBajRpFCyhpOrPSwKDw3S0TpM6ej0vEhURI1QT5dn9MJiNDi3wlMoIipYqiCdyn+byy4poN71J04uOlocLRHIRgBrHB8tldOzynb8Q4OyDC2VyH9Yzr/b6vDxWu7b7bFsPMAXda7KvflyfWzup7gGcTw4/9yczOrGpZZ9QhbOj9JCP4tcWdRa6aMmZncd7Ge0gQ397CjGejWDf+6sKqmIw6Tq6VQMDsJ25wvnRqUXnlfPW9PKinjBQylm60Worq9m9WOrw6JSZpq7BKZj1CB9UwypcJbs2L0JbXs2960ellO1H1OfL3hisbekuWR8hZiwknw8UlPRSqSkJSPR1++jvJoz1NwLuk+9TiGLfIN+gRKg38Xfgm9g4UdalDqj1nmdVjnu21+E5Z1l9to/MedWWgDpjv3okS1vrsQ6AxBgCTKtv/f9QrWJlHXv2pP6V9n5MRLbdjVSiFqjCRJEUawWxOlEv4fdjpFiaZoU5jMn/6dPEtmTo2TkdWW7B3axFAnzNosqpFqPpc+n55JhOze7b9r3d9ZHuR6koYR+osy8KHoN+8vYJCz29An2uxBJyFNCRPCK89JaIOoIvs/N7fTBK4M0U5rAo+lUy1Y6e/MFL/VWI72U14wlubgGtMJYYC6a8JbK2vqjuxUgGWsMS51h073y5zET7nXMsVdHfE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(39860400002)(376002)(396003)(366004)(6512007)(478600001)(41300700001)(31686004)(316002)(6916009)(8936002)(26005)(8676002)(6666004)(6506007)(6486002)(36756003)(53546011)(83380400001)(4326008)(66556008)(66946007)(66476007)(186003)(5660300002)(2906002)(31696002)(38100700002)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U1Q3SE5zc0dMNFJ6VDdCcjRSWEc1dWp1UFJFejZsZFZrNXozT3MyVzZCVURB?=
- =?utf-8?B?eVNBc1dKQmVUMXhQN3YrVU16L0FFS01wODZBQ2kzWEM0emczRHUxcG82Sk9U?=
- =?utf-8?B?bTBHZDNtMm9jSW9rVzJiVmFidVlyd1ljMlB0Z0FtNjVnOEk5aGNBQUs2V2Jz?=
- =?utf-8?B?MkM5ekovbnZPdytrV3hvSzZNZGw3cGNSMm03K2c1S0M0b05UVGNqOC9vb0Ry?=
- =?utf-8?B?WnZQb0ZWeHQvbWhHYms0aWE2eGdGWmhQQk1JSmNEYkVIRGdMOHQvV0F6WmFu?=
- =?utf-8?B?Y3hIUG16RThFNytqdjM1YjRoem9TZyttVWladEtuQ051eXNmVlJhVjhvWEoy?=
- =?utf-8?B?L0JxanZiekNaZ3JoY0lXbjh3TnBybENJR2lKVExDZjR1RjNJL3ppS3pBbHZG?=
- =?utf-8?B?REtHZFNlMHpxdEFKL0ZHSk04RlpTcnU1dUNqVjRXWDBtaHVCS1pSZ05XQXdu?=
- =?utf-8?B?bm9RRDRZY3FtRlA1emIyYldLQi9hV2R0N3lkd21lZHY4Y3ZXUGw0bUF1MFB0?=
- =?utf-8?B?QklnQ0N0OW01ck44NWJja1A4VUxrcVRTeW4wRE81ZUd5U1QzOUt2OGY3eWt2?=
- =?utf-8?B?eXVzMmdNL1Nrc29IbGk0QjV2aEgvWVRjeFh0R3RGcTB3UFBHYVFxNWlCWDJG?=
- =?utf-8?B?UjRiVGZaeEJ4OTZYbFpaQmVrcjFGeXMveWRYZFVRZjdDQWs5bFZWTHZjTC9h?=
- =?utf-8?B?WE85T2dpaUExeHVZR2dkWStGTjNEL25pN2dBRnpldVp0K0Yvdm5vMVRJeWQ3?=
- =?utf-8?B?WlkvbS9HR1BNV2d1VjNRa2lqN3d2eVdZZytoN2VMbEdqS0pRUlFxVWxNTDJU?=
- =?utf-8?B?d3NIMHBObGxjV2RyS3Q2c3FVUlNDRWdEbFRobmR1bUE1Y2pDR2Fwd3VUOEV3?=
- =?utf-8?B?cFIxRlczdHYxdDYrK0s5OGxmS0JEUmdXeFhZekgwbVZJaFI5VWxaYUhVS2Vv?=
- =?utf-8?B?a0h5N241UG1FOTVZMTFMaHFMZ1pQVU81UXR4UDNoOE5jNloyQ2ZoZGppSmc4?=
- =?utf-8?B?eHBaSzRBbXVsRktlQjNHeDVwMmh2ZXpxM3psblFxU2hMb0d6YnQ4NFZWSlNH?=
- =?utf-8?B?blBpSzk1YXQyc0RoSEE4V1J1NW5lUjJraTk1WXhXamVZQjhEaEgwQTZlY2RC?=
- =?utf-8?B?UWN6Nlh5dThBanpCMy85R29oWHVBSWY4Z1Ird3gva3gzdzRwZitwUUt0V3h5?=
- =?utf-8?B?Ull5T3BFTG9BbHYrWWVQOEE5aFVGVENqcXo4MFdCeERsdnM2S3F5YS95NkxS?=
- =?utf-8?B?bjFaU3RkY1hOUFFBMVAvZVRHUHRsaTVjUjNwWWZMa2MwSndaR1FYOXR5amJ0?=
- =?utf-8?B?UFFzZEZmM21HYzBybUFFcVZRR2FrVjU1eXQ4WmRRdWF5MzlTWUgrVm0rQnRm?=
- =?utf-8?B?YVlIeUp0bVB0NTVlSlNOdDZ2amN6bnBZZDhrcjVrb1haWnZUUlFWeE5MTWFt?=
- =?utf-8?B?Q2t1SmZ6WlNBUGFrc2NkQzRaV3U5SFZnVjg4aGZtcW5LWnFOSjN2aWVZZ3JR?=
- =?utf-8?B?M3AyMFZQbDQzWGowbGgwV3NUbkhpOGl2d1grMUFCRVVZQ1JyZFBqSFZSVFpC?=
- =?utf-8?B?U00rY3hETGM3RlhuY0dEdExiRElCQXdwZDZMU3F3SWFOK1VaN2VaYlNqVzBw?=
- =?utf-8?B?cGhIZGJhZ0hWcm15S21wYzJzNXRKNExTRE1EeXFZNHFDYm9EczhzZy8xYUt4?=
- =?utf-8?B?ZFk5YW12akQzVFlXQU9MQVZWZFV3L3E4c2UzbjhMb0p6VEdYTTkvd1YzWHBz?=
- =?utf-8?B?S29ac21RVGpTN1ZJbUx2YVFheTlKR3doeEh4WU8yUzZ2dk9yeWFML2pSZ0tY?=
- =?utf-8?B?TERSQlFuKzI3eE5YdXhJbUxQaEZiSVhUaHU0LytvdVREN3R4MGJON3czTEMw?=
- =?utf-8?B?YVlrWEZETDlhejNORlZpaGFsdHJpRmxuOFp5ZU1uQ2RmMEM0OGRPNzVHQmFY?=
- =?utf-8?B?a1I3RFpjZkVjRXNtN1pMY1RuTk1GeEdiOXBIVlo5cGhZakd3NVlXMUJQSTg5?=
- =?utf-8?B?dGlKMjU2MjNvZDQwWGVKcVVKcXZtQ0VOelBXREt0OHAwREpzbGtCYU82bytF?=
- =?utf-8?B?L3c3U1JHT3NVeVpvWE5WWFhiZlZydlZRS2p1bXVYUjNMYWdrZ2NMZkx5ODVB?=
- =?utf-8?B?ems0S253b2JXUmNYeXAzN01NWVRhZHRpOEtRSXhDMG5OcmpIV3prMEpvSnIw?=
- =?utf-8?B?WVloUk9UWVI5cXBEdFNRalNzYlVTSW9lbW1scE44Vk81ckxUMEtKakVUSWxs?=
- =?utf-8?B?a1E3aVB4THhYT3ZoVi8xckQyY29XUGQrTU56UmMrbDRkNHh6clhKQmFDK3Bn?=
- =?utf-8?B?b1hMRlZZOWRjVlJDU3phOEFPamNqOEVwQWxtUGJUS1ErMXFwZ3U0UT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb80c4a-8245-42c4-d200-08da52611b9e
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 02:03:45.8482
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mqZyaFO8SXg39PY9ZwqTMR/f7egg0wH3PBU8oPHSgq43BpwWCkDyvaHj4nGDCSEFiy6s69xWZ99nMsLyRWgznA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1151
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We try to harden virtio device notifications in 8b4ec69d7e09 ("virtio:
+harden vring IRQ"). It works with the assumption that the driver or
+core can properly call virtio_device_ready() at the right
+place. Unfortunately, this seems to be not true and uncover various
+bugs of the existing drivers, mainly the issue of using
+virtio_device_ready() incorrectly.
 
+So let's having a Kconfig option and disable it by default. It gives
+us a breath to fix the drivers and then we can consider to enable it
+by default.
 
-On 6/16/2022 5:13 AM, Sean Christopherson wrote:
-> On Thu, Apr 28, 2022, Manali Shukla wrote:
->> nNPT test cases are moved to a separate file svm_npt.c
->> so that they can be run independently with PTE_USER_MASK disabled.
-> 
-> Nit, phrase changelogs as command.  Referring to the patch in the past tense is
-> confusing because it's not always obvious if the author is referring to this
-> patch or something else that happened from long ago.
-> 
-> And kind of a nit, but not really because I suggested this and still forgot why
-> moving to a new file helps.  Moving to a new file isn't what's important, it's
-> having a separate setup that we really care about.  So something like:
-> 
->   Move the nNPT testcases to their own test and file, svm_npt.c, so that the
->   nNPT tests can run without the USER bit set in the host PTEs (in order to
->   toggle CR4.SMEP) without preventing other nSVM testacases from running code
->   in usersmode.
-> 
->> Rest of the test cases can be run with PTE_USER_MASK enabled.
->>
->> No functional change intended.
-> 
-> Heh, this isn't technically true, as running the "svm" testcase will no do
-> different things.
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+Changes since V1:
+- tweak the Kconfig prompt
+- don't hold spinlock for IRQ path in s390
+---
+ drivers/s390/virtio/virtio_ccw.c |  4 ++++
+ drivers/virtio/Kconfig           | 11 +++++++++++
+ drivers/virtio/virtio.c          |  2 ++
+ drivers/virtio/virtio_ring.c     | 12 ++++++++++++
+ include/linux/virtio_config.h    |  2 ++
+ 5 files changed, 31 insertions(+)
 
-Hi Sean,
+diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+index 97e51c34e6cf..89bbf7ccfdd1 100644
+--- a/drivers/s390/virtio/virtio_ccw.c
++++ b/drivers/s390/virtio/virtio_ccw.c
+@@ -1136,8 +1136,10 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+ 			vcdev->err = -EIO;
+ 	}
+ 	virtio_ccw_check_activity(vcdev, activity);
++#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+ 	/* Interrupts are disabled here */
+ 	read_lock(&vcdev->irq_lock);
++#endif
+ 	for_each_set_bit(i, indicators(vcdev),
+ 			 sizeof(*indicators(vcdev)) * BITS_PER_BYTE) {
+ 		/* The bit clear must happen before the vring kick. */
+@@ -1146,7 +1148,9 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+ 		vq = virtio_ccw_vq_by_ind(vcdev, i);
+ 		vring_interrupt(0, vq);
+ 	}
++#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+ 	read_unlock(&vcdev->irq_lock);
++#endif
+ 	if (test_bit(0, indicators2(vcdev))) {
+ 		virtio_config_changed(&vcdev->vdev);
+ 		clear_bit(0, indicators2(vcdev));
+diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+index b5adf6abd241..96ec56d44b91 100644
+--- a/drivers/virtio/Kconfig
++++ b/drivers/virtio/Kconfig
+@@ -35,6 +35,17 @@ menuconfig VIRTIO_MENU
+ 
+ if VIRTIO_MENU
+ 
++config VIRTIO_HARDEN_NOTIFICATION
++        bool "Harden virtio notification"
++        help
++          Enable this to harden the device notifications and supress
++          the ones that are illegal.
++
++          Experimental: not all drivers handle this correctly at this
++          point.
++
++          If unsure, say N.
++
+ config VIRTIO_PCI
+ 	tristate "PCI driver for virtio devices"
+ 	depends on PCI
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index ef04a96942bf..21dc08d2f32d 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -220,6 +220,7 @@ static int virtio_features_ok(struct virtio_device *dev)
+  * */
+ void virtio_reset_device(struct virtio_device *dev)
+ {
++#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+ 	/*
+ 	 * The below virtio_synchronize_cbs() guarantees that any
+ 	 * interrupt for this line arriving after
+@@ -228,6 +229,7 @@ void virtio_reset_device(struct virtio_device *dev)
+ 	 */
+ 	virtio_break_device(dev);
+ 	virtio_synchronize_cbs(dev);
++#endif
+ 
+ 	dev->config->reset(dev);
+ }
+diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+index 13a7348cedff..d9d3b6e201fb 100644
+--- a/drivers/virtio/virtio_ring.c
++++ b/drivers/virtio/virtio_ring.c
+@@ -1688,7 +1688,11 @@ static struct virtqueue *vring_create_virtqueue_packed(
+ 	vq->we_own_ring = true;
+ 	vq->notify = notify;
+ 	vq->weak_barriers = weak_barriers;
++#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+ 	vq->broken = true;
++#else
++	vq->broken = false;
++#endif
+ 	vq->last_used_idx = 0;
+ 	vq->event_triggered = false;
+ 	vq->num_added = 0;
+@@ -2135,9 +2139,13 @@ irqreturn_t vring_interrupt(int irq, void *_vq)
+ 	}
+ 
+ 	if (unlikely(vq->broken)) {
++#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+ 		dev_warn_once(&vq->vq.vdev->dev,
+ 			      "virtio vring IRQ raised before DRIVER_OK");
+ 		return IRQ_NONE;
++#else
++		return IRQ_HANDLED;
++#endif
+ 	}
+ 
+ 	/* Just a hint for performance: so it's ok that this can be racy! */
+@@ -2180,7 +2188,11 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+ 	vq->we_own_ring = false;
+ 	vq->notify = notify;
+ 	vq->weak_barriers = weak_barriers;
++#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+ 	vq->broken = true;
++#else
++	vq->broken = false;
++#endif
+ 	vq->last_used_idx = 0;
+ 	vq->event_triggered = false;
+ 	vq->num_added = 0;
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index 9a36051ceb76..d15c3cdda2d2 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -257,6 +257,7 @@ void virtio_device_ready(struct virtio_device *dev)
+ 
+ 	WARN_ON(status & VIRTIO_CONFIG_S_DRIVER_OK);
+ 
++#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+ 	/*
+ 	 * The virtio_synchronize_cbs() makes sure vring_interrupt()
+ 	 * will see the driver specific setup if it sees vq->broken
+@@ -264,6 +265,7 @@ void virtio_device_ready(struct virtio_device *dev)
+ 	 */
+ 	virtio_synchronize_cbs(dev);
+ 	__virtio_unbreak_device(dev);
++#endif
+ 	/*
+ 	 * The transport should ensure the visibility of vq->broken
+ 	 * before setting DRIVER_OK. See the comments for the transport
+-- 
+2.25.1
 
-Thank you for the review comments.
-
-I will work on comments.
-
-Manali
