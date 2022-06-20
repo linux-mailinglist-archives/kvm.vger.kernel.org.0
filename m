@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AFAE5527BF
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 01:10:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF6A35527BB
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 01:09:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346593AbiFTXJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 19:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47342 "EHLO
+        id S1346531AbiFTXJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 19:09:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346549AbiFTXIL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:08:11 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2069.outbound.protection.outlook.com [40.107.96.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6400B245AC;
-        Mon, 20 Jun 2022 16:07:07 -0700 (PDT)
+        with ESMTP id S1346633AbiFTXIV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 19:08:21 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E62C22533;
+        Mon, 20 Jun 2022 16:07:19 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AluAlBwkaLkJ3lRL0WOwevjqJAVi5LN7oB/GZnjhoHYMq3EsnnEtSNmBe3dz4EVjLzDOZEVpv4hlb66DnM8F9R5/0TBerTd+N7geCvMosDjuYtc6hNfDUq4PKgi7UzfpFDypOheRIylLoJCknN7C6ey9pjj9byOWRsGRMSj7ikhTm5dxby6qXYGlSQR7dtE1pHnzFkCrwwcxRLPbgwew10MxQGhZ9lhnIv/nBS8hYt5tlUsljp7Q/8FJuHArp+LfXeMRiNyVkVW9qSnXk69tn+mErzQEPPoetMtpcF2lTXEG8xPoN55NMKIX8iERaTh0N4lA/qTJsnUP0HgF2WhwUg==
+ b=UXbXueQxWWTrTDMzGC+dfiuZ8g+dvLOEu7A2eAwbm0WhsssU3CwkZqdUHseEPWi703UDQuRfoZ00b9Sl03HstmN+vMeGxDIARg4A2kG1C8XkVINYkVpgwK17LF449xIxjiBYlTAl3Bm4ZBp2n6ZZYYG+1fzeiWVNQye3AHLzo/PwHSkw509rsE3BpbQLfdVjYcPKlHYi/Eo2hJrCiWahDRkphBYP1hYvl0bXihkFKcCGcVOzlU478fYRqaxm97xEyKF2CaCw5LDUcv10SpjCvwgZxQ+FGAR5MuGD+55bl7kxlEWLyQmjGAb9K5rJH2yFylTl9BWLQcjXFP3tpnImuA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eKY142V9qIHXxgky8ugE68QKS8iCilnhDJ1lA28zjiE=;
- b=BrhPDsYgDvJi0IeyBN6fPt44ZInVYGf6zxX3rhisO9ZOhm34o2IML3nVgc6VcmCRGUBMSk5UdXQuCd0W7r843hp+C3EU8Yyl7aJyc3Vcms8mssN8UxztbQP29a45vWjPBNVjdUcUMJ2Y7DRlXsZXv7uMWQ8cjLBDcAiAh3eXIQlP4Jx2wS+jfGDGBNDsRL/6VF8P0PUEOOtfVtj9b4I9qI7o6FtIQ9zm1Et2O3mc7QRF8xuG8El1RNegWK8Q0VtsnQAHB05A9rV0A0yk27tgwEFZwdy6CzLFtrkIyeiV3siOwRJe5Tj+LNiibD+ZQfgDal0jALfhvgRYHVeWrFxfAQ==
+ bh=AqG3hIYcgwAaeeTQokJRRh5536uSMkSgoG0GIC8Kkcw=;
+ b=L1Y+VL5jna9IdIu2oLpF+mWHwkfviDoWaWkM3Iq6LSzkFvTPhn+aTQkzfovfOwLpQm0o5tmiGc0tKRRCqsYV3f27OH7u8Iqx3OI1I//tAeiWzG37w9iyqWMbW40i+hXw7AEd38ZDcJLpLT/laFf81gSfeS32C4CNmF0lUywdBbvP3WsCHxQFi1W2mLt58jUjZby2lordg9rUAcliOS7O1akA9II0QC1oNwIWEA/XyMvh1w+Ig6hJZRKxnvy/+Q5lWh0smksAVRHUSIzSbzi7lOj2aC0Bd/nhuacyJ4y9LadiGiREKebribWi+o7Kw/+GM7vjPtwzccZcg6UPnwgzeQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eKY142V9qIHXxgky8ugE68QKS8iCilnhDJ1lA28zjiE=;
- b=PqT/aVUmgowHND8e0Muh/Xa9q+9AM23bsa7SGvW72Y8LevIrSp308HAfHbEu1reZFVStbMFROApjYwj5nfJKqav1LfNpaY6E2Fgzlkd6N8dOKzp0Lpo9OuOEAl9p0Cv1aOB2SpAyrm2zuIao7wjFRX63RR/WC83NrdUKQIHum7Y=
-Received: from BYAPR01CA0056.prod.exchangelabs.com (2603:10b6:a03:94::33) by
- BYAPR12MB4615.namprd12.prod.outlook.com (2603:10b6:a03:96::21) with Microsoft
+ bh=AqG3hIYcgwAaeeTQokJRRh5536uSMkSgoG0GIC8Kkcw=;
+ b=me7dHRIMgUG74WRQM728a7JVtlMbccmzXMFxy1UMAvvgYir0QqR9yQ34i7zFa1L3nNyolhB6zS3o/nvNPI/YYCz+CECbjVgbEO8zhCuJZzMXcQrJht4urAxu4J5Ke4AWF1tityZ5ykSal8ctMvfoN39jil9FWUhdz4fn2g5BBjk=
+Received: from DS7PR06CA0013.namprd06.prod.outlook.com (2603:10b6:8:2a::13) by
+ DM6PR12MB4893.namprd12.prod.outlook.com (2603:10b6:5:1bd::19) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5353.20; Mon, 20 Jun 2022 23:07:03 +0000
-Received: from DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
- (2603:10b6:a03:94:cafe::5e) by BYAPR01CA0056.outlook.office365.com
- (2603:10b6:a03:94::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.19 via Frontend
- Transport; Mon, 20 Jun 2022 23:07:02 +0000
+ 15.20.5353.14; Mon, 20 Jun 2022 23:07:17 +0000
+Received: from DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:2a:cafe::6) by DS7PR06CA0013.outlook.office365.com
+ (2603:10b6:8:2a::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14 via Frontend
+ Transport; Mon, 20 Jun 2022 23:07:17 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -45,13 +45,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT016.mail.protection.outlook.com (10.13.173.139) with Microsoft SMTP
+ DM6NAM11FT025.mail.protection.outlook.com (10.13.172.197) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:07:02 +0000
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:07:17 +0000
 Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 20 Jun 2022 18:07:00 -0500
+ 15.1.2375.28; Mon, 20 Jun 2022 18:07:15 -0500
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -68,9 +68,9 @@ CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
-Subject: [PATCH Part2 v6 21/49] KVM: SVM: Make AVIC backing, VMSA and VMCB memory allocation SNP safe
-Date:   Mon, 20 Jun 2022 23:06:51 +0000
-Message-ID: <4896f0fd85947a139dce0ad514044c76048eaed2.1655761627.git.ashish.kalra@amd.com>
+Subject: [PATCH Part2 v6 22/49] KVM: SVM: Add initial SEV-SNP support
+Date:   Mon, 20 Jun 2022 23:07:06 +0000
+Message-ID: <81fb57838350832e2e1514e305def84fc28505a2.1655761627.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
@@ -82,24 +82,24 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0632410c-092a-47a4-f9f6-08da5311963d
-X-MS-TrafficTypeDiagnostic: BYAPR12MB4615:EE_
-X-Microsoft-Antispam-PRVS: <BYAPR12MB4615F38A13D0CED6C61BD9008EB09@BYAPR12MB4615.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 2cf9bba6-5419-48ac-c258-08da53119f12
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4893:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB4893C55F11E0209D5FF3900E8EB09@DM6PR12MB4893.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8wKhH7p8YEBjjB1KbiymPCUzZn1Je7P8U+Mmo1ZyoJ4W/JvDlrpFUV5DT5jXGEeftjpSsASS8QCnF1LQnURvYW/sTYP2jJn1XhuIxeOMe/zXlD+6SNki0g1atJK2G8buV1zDvxG8r4MoKXnzsaaOKWsWfV66Q/JWWpIz/FGY4PLmuE289rdc6wazrJH1b4AMSPNZMb4nOkLXf/nB+AmciV3GCgyA/H/wa4UV2xwtIb9mhPRPKcJ3yHsYo75Dfau4IuYPuqHK8qwuriSMsMi3LGtguDQAW1JhC2vSf9k5bHkK5Iq0yywHOcBEMyOZlBvhOgPHsBXKYMlmwPhwFtLvY7ii6eTKwsC/JXtVaSUHAwWV3zk50JJpnwDiCLVZtEX98dn7ACutAN7koSYwk679bOHu5zmjCmNmTMUheKfxGbWoHfOdGt0IGFtMypn/qd1q3fvWXesLSnXUqm70KgDPty3TPVordNyN5ixqh74JkNrZ6bJ4V8RKlOxyMgK9Jouaq5HDLi3mHgK0805sFmdCWzZXE7sqcbhbKUP5hKFMNxqfu0cn7UpTCGZMsLjF2RtZ3fnoLeP/DUoDG2kn5bBtZfhltf9bY9v+lsobjjGsWMEiJ0q2k59Q7bTwEdXquuLzR86/2G8Pu4BbeKDUnQPb5IIGe9E86K99yhS8zqI/5TVehc/3gWfWeAPs4fbmE3B5xmBRqO6cEiXlA1B2B8tkTkYOONmnyw9GUTj7Ry5zhH2MUlVo7C7vzwz2xqRZoqwvmf8YUdD7yxBbd1Ce9DEXMg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(396003)(346002)(376002)(36840700001)(40470700004)(46966006)(4326008)(7696005)(54906003)(86362001)(110136005)(26005)(356005)(82740400003)(70206006)(70586007)(2906002)(316002)(8676002)(16526019)(5660300002)(8936002)(36860700001)(478600001)(7406005)(81166007)(186003)(7416002)(83380400001)(2616005)(36756003)(40460700003)(6666004)(426003)(82310400005)(40480700001)(336012)(47076005)(41300700001)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: uWFGPRNPTZsb0RTo/vyHEFDDAbeEn8oDPg9FrYmYY11lmARtGuAluSqRuhCzFv4WJx8DaUflK/8vLiH0jhTcR0ZZfdxyCmIsl/UstUGdJZgiSb0P2VwQUSF39FLUNGamo30HI/qzjn257NP3tXFIaxF0wp6ZJLPPDRHFpqzeYOG33WI9Kry0IifP+Ua0fft+wMOaNgcqdVxqK4lRBy9oX+OhyeuI0umUSwwvUQxzQgY9XUVllRaIUF5WfRiuGUIN0ZtkIZPhQYMoquNdIRDZcwzU9/DTTNDFmE5vw6DI7fjabCDKlKSZdY5A0vtK+J9yLOtOBjRax4WJfbZJ6YpBVDZx94Fb/UsZBXUj0H20LBxlwaGr8XhUWVgwRF56eb2yhmpeITcFqAgrbiaHlAVjHbqtQL4TZXMXge38CeVSySAJWwtaxT7osvgPA/KjDp33Uwpl8ODcv3dEkp1ENoT19lkZgX3tZdJOZWLdc+b+2GBrHYVGHASlxgPshc2HES5a2bVyEghRwu8tOMfpTyaoWkiNfnR0/nLfURL5LewKj4fqB5cGGX/NpvPmnZ1tHcG5mDMhyE/fRIshnzZ7PxBU/BYPvTZ19qsNMohRf2V9UxxIwmYcBoCd6UL0EAYNUr9VFOCn2R+LdvXfsaLlP6Fbn8TahAtI7KVnFsGnEjL5d19+NsobGojWOTAdd8FDcxBQ+d5MBAJLB6NGfP+PeTAUyMRzfsCsdIsY8tjvZKkA95S7iTrPk9KbNDM/NRse9LuFEgji2+0vzNzuDTOezHJEEQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(396003)(376002)(39860400002)(46966006)(40470700004)(36840700001)(2616005)(5660300002)(36860700001)(7406005)(16526019)(41300700001)(82740400003)(7416002)(2906002)(186003)(81166007)(356005)(6666004)(40460700003)(7696005)(86362001)(26005)(8676002)(110136005)(82310400005)(47076005)(336012)(426003)(36756003)(4326008)(70586007)(70206006)(83380400001)(40480700001)(478600001)(8936002)(54906003)(316002)(36900700001)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:07:02.5602
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:07:17.3765
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0632410c-092a-47a4-f9f6-08da5311963d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cf9bba6-5419-48ac-c258-08da53119f12
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4615
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4893
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -112,182 +112,88 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-Implement a workaround for an SNP erratum where the CPU will incorrectly
-signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-RMP entry of a VMCB, VMSA or AVIC backing page.
+The next generation of SEV is called SEV-SNP (Secure Nested Paging).
+SEV-SNP builds upon existing SEV and SEV-ES functionality  while adding new
+hardware based security protection. SEV-SNP adds strong memory encryption
+integrity protection to help prevent malicious hypervisor-based attacks
+such as data replay, memory re-mapping, and more, to create an isolated
+execution environment.
 
-When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
-backing   pages as "in-use" in the RMP after a successful VMRUN.  This
-is done for _all_ VMs, not just SNP-Active VMs.
+The SNP feature is added incrementally, the later patches adds a new module
+parameters that can be used to enabled SEV-SNP in the KVM.
 
-If the hypervisor accesses an in-use page through a writable
-translation, the CPU will throw an RMP violation #PF. On early SNP
-hardware, if an in-use page is 2mb aligned and software accesses any
-part of the associated 2mb region with a hupage, the CPU will
-incorrectly treat the entire 2mb region as in-use and signal a spurious
-RMP violation #PF.
-
-The recommended is to not use the hugepage for the VMCB, VMSA or
-AVIC backing page. Add a generic allocator that will ensure that the
-page returns is not hugepage (2mb or 1gb) and is safe to be used when
-SEV-SNP is enabled.
-
-Co-developed-by: Marc Orr <marcorr@google.com>
-Signed-off-by: Marc Orr <marcorr@google.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  2 ++
- arch/x86/kvm/lapic.c               |  5 ++++-
- arch/x86/kvm/svm/sev.c             | 35 ++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c             | 16 ++++++++++++--
- arch/x86/kvm/svm/svm.h             |  1 +
- 6 files changed, 57 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/sev.c | 10 +++++++++-
+ arch/x86/kvm/svm/svm.h |  8 ++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index da47f60a4650..a66292dae698 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -128,6 +128,7 @@ KVM_X86_OP(msr_filter_changed)
- KVM_X86_OP(complete_emulated_msr)
- KVM_X86_OP(vcpu_deliver_sipi_vector)
- KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-+KVM_X86_OP(alloc_apic_backing_page)
- 
- #undef KVM_X86_OP
- #undef KVM_X86_OP_OPTIONAL
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c24a72ddc93b..0205e2944067 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1512,6 +1512,8 @@ struct kvm_x86_ops {
- 	 * Returns vCPU specific APICv inhibit reasons
- 	 */
- 	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
-+
-+	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
- };
- 
- struct kvm_x86_nested_ops {
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 66b0eb0bda94..7c7fc6c4a7f9 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2506,7 +2506,10 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
- 
- 	vcpu->arch.apic = apic;
- 
--	apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-+	if (kvm_x86_ops.alloc_apic_backing_page)
-+		apic->regs = static_call(kvm_x86_alloc_apic_backing_page)(vcpu);
-+	else
-+		apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
- 	if (!apic->regs) {
- 		printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
- 		       vcpu->vcpu_id);
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index b49c370d5ae9..93365996bd59 100644
+index 93365996bd59..dc1f69a28aa7 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3030,3 +3030,38 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- 		break;
- 	}
- }
-+
-+struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long pfn;
-+	struct page *p;
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+
-+	/*
-+	 * Allocate an SNP safe page to workaround the SNP erratum where
-+	 * the CPU will incorrectly signal an RMP violation  #PF if a
-+	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
-+	 * or AVIC backing page. The recommeded workaround is to not use the
-+	 * hugepage.
-+	 *
-+	 * Allocate one extra page, use a page which is not 2mb aligned
-+	 * and free the other.
-+	 */
-+	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
-+	if (!p)
-+		return NULL;
-+
-+	split_page(p, 1);
-+
-+	pfn = page_to_pfn(p);
-+	if (IS_ALIGNED(__pfn_to_phys(pfn), PMD_SIZE)) {
-+		pfn++;
-+		__free_page(p);
-+	} else {
-+		__free_page(pfn_to_page(pfn + 1));
-+	}
-+
-+	return pfn_to_page(pfn);
-+}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index efc7623d0f90..b4bd64f94d3a 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1260,7 +1260,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
- 	svm = to_svm(vcpu);
+@@ -56,6 +56,9 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
+ #define sev_es_enabled false
+ #endif /* CONFIG_KVM_AMD_SEV */
  
- 	err = -ENOMEM;
--	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	vmcb01_page = snp_safe_alloc_page(vcpu);
- 	if (!vmcb01_page)
++/* enable/disable SEV-SNP support */
++static bool sev_snp_enabled;
++
+ #define AP_RESET_HOLD_NONE		0
+ #define AP_RESET_HOLD_NAE_EVENT		1
+ #define AP_RESET_HOLD_MSR_PROTO		2
+@@ -2120,6 +2123,7 @@ void __init sev_hardware_setup(void)
+ {
+ #ifdef CONFIG_KVM_AMD_SEV
+ 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
++	bool sev_snp_supported = false;
+ 	bool sev_es_supported = false;
+ 	bool sev_supported = false;
+ 
+@@ -2190,12 +2194,16 @@ void __init sev_hardware_setup(void)
+ 	if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
  		goto out;
  
-@@ -1269,7 +1269,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
- 		 * SEV-ES guests require a separate VMSA page used to contain
- 		 * the encrypted register state of the guest.
- 		 */
--		vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+		vmsa_page = snp_safe_alloc_page(vcpu);
- 		if (!vmsa_page)
- 			goto error_free_vmcb_page;
+-	pr_info("SEV-ES supported: %u ASIDs\n", sev_es_asid_count);
+ 	sev_es_supported = true;
++	sev_snp_supported = sev_snp_enabled && cpu_feature_enabled(X86_FEATURE_SEV_SNP);
++
++	pr_info("SEV-ES %ssupported: %u ASIDs\n",
++		sev_snp_supported ? "and SEV-SNP " : "", sev_es_asid_count);
  
-@@ -4598,6 +4598,16 @@ static int svm_vm_init(struct kvm *kvm)
- 	return 0;
+ out:
+ 	sev_enabled = sev_supported;
+ 	sev_es_enabled = sev_es_supported;
++	sev_snp_enabled = sev_snp_supported;
+ #endif
  }
  
-+static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
-+{
-+	struct page *page = snp_safe_alloc_page(vcpu);
-+
-+	if (!page)
-+		return NULL;
-+
-+	return page_address(page);
-+}
-+
- static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.name = "kvm_amd",
- 
-@@ -4722,6 +4732,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 
- 	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
- 	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
-+
-+	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
- };
- 
- /*
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 1f4a8bd09c9e..9672e25a338d 100644
+index 9672e25a338d..edecc5066517 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -659,6 +659,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
- void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
- void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
- void sev_es_unmap_ghcb(struct vcpu_svm *svm);
-+struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+@@ -75,6 +75,7 @@ enum {
+ struct kvm_sev_info {
+ 	bool active;		/* SEV enabled guest */
+ 	bool es_active;		/* SEV-ES enabled guest */
++	bool snp_active;	/* SEV-SNP enabled guest */
+ 	unsigned int asid;	/* ASID used for this guest */
+ 	unsigned int handle;	/* SEV firmware handle */
+ 	int fd;			/* SEV device fd */
+@@ -314,6 +315,13 @@ static __always_inline bool sev_es_guest(struct kvm *kvm)
+ #endif
+ }
  
- /* vmenter.S */
- 
++static inline bool sev_snp_guest(struct kvm *kvm)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++
++	return sev_es_guest(kvm) && sev->snp_active;
++}
++
+ static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
+ {
+ 	vmcb->control.clean = 0;
 -- 
 2.25.1
 
