@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84060551DBC
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 16:26:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8984551F1F
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 16:42:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237834AbiFTOYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 10:24:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53430 "EHLO
+        id S245099AbiFTOmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 10:42:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350456AbiFTOXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 10:23:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3C0F1F2FE
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 06:39:53 -0700 (PDT)
+        with ESMTP id S245042AbiFTOls (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 10:41:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D022181C
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 07:01:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4204B614B5
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 13:39:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A7E1EC341C5
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 13:39:52 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E6A3F61554
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 14:01:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54110C36AF4
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 14:01:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655732392;
-        bh=T0UDOm72gY7beOjxt3rxkHBboQpmK/MbrQPaf2l54BA=;
+        s=k20201202; t=1655733690;
+        bh=+ZMFQbcDRfI2o5seTPeitM15Z/+Gc3gwmgpmOhiVkvs=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=bN6HGAIV/iJhdkJFPwLfr0u/oLjrTujuG9N0qRCikBylzlWQZjPJwJ9yl1UzJiiaf
-         oF3LxnVcNrzruw0XxXHPLP43l68HsOOmDvgyb3CunYheIWI63afMUCYfwsDmqbzg3R
-         dCdL7/Asfcfx0AsSeHwVXps94ymzE/Urdk38eCDeSzd5mA+ubxQ7B+3gyIIZ8mhOTS
-         sUHhqfoYI8rxzQttUy78RSy6cVKvd2LyD4fKFLLqM+6YB9ert6hU1/go0XLQtiyIaN
-         a/6DNa/f54D4vvh7At1VaNrEpaOZu9hPOl7P9oh05sQfXVxfuTJ1eIoinganc92/si
-         vPsgChoVminKw==
+        b=XHSiNqVdwnhv6/ugUy1S9toVXKBWGK4aTcobWWPa/0c3PiIy2hKrHomg8UKadiru8
+         yH6HPgzHW6YDwLotcL0aGg1q7uLEG1w2MevCGXrKI2ehTUgZCK2H6ubcKeH0RB7JD7
+         WkcIxoZ6oz2sncUUhnjRIAu0PfU4qUvvfkWx5dX5YAjrETwausRmkLc5mAOjOC8BYb
+         oyGK9qrw1D4wQy95aLAIevup+NNXiVSPNuvbYjlEtVt86FvoSj2MD5iU1fBYtof8zE
+         cj2DYEoRMPTqEDeQMnq92DoGXp/U2mIwEkl9Bl2We6Lc6hrjt2TwxkOITs7kyBDvLe
+         U6ev0kMJWS9Mw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 92FD3CC13B5; Mon, 20 Jun 2022 13:39:52 +0000 (UTC)
+        id 3DB78CC13B4; Mon, 20 Jun 2022 14:01:30 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
 Subject: [Bug 216026] Fails to compile using gcc 12.1 under Ubuntu 22.04
-Date:   Mon, 20 Jun 2022 13:39:52 +0000
+Date:   Mon, 20 Jun 2022 14:01:30 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -45,14 +45,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Who: alexander.warth@mailbox.org
 X-Bugzilla-Status: RESOLVED
 X-Bugzilla-Resolution: ANSWERED
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-216026-28872-fixNQkYHiC@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216026-28872-UxG3fjoT9n@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-216026-28872@https.bugzilla.kernel.org/>
 References: <bug-216026-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -72,21 +72,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216026
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+--- Comment #31 from Alexander Warth (alexander.warth@mailbox.org) ---
+1. You are OT  but - Any user who is able to compile the Kernel is an endus=
+er.
+There is no exclusive contract between the Linux Kernel and the Distro
+Maintainers. Thats opensource. Any code user is an end user.=20
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|REOPENED                    |RESOLVED
-         Resolution|---                         |ANSWERED
+2. I'm compiling the kernel and I'm able to solve it by applying the patch
+given earlier in the thers.=20
 
---- Comment #30 from Artem S. Tashkinov (aros@gmx.com) ---
-1. End users are not meant to compile the kernel. You have a distro kernel =
-for
-that.
-2. If you are willing to compile the kernel you must have the means and
-experience to resolve issues.
-3. The status of the bug doesn't affect how fast it's gonna get resolved or
-whether Google finds it.
+What we are asking is to mainline this very patch. Such that other people
+without knowing of this thread in the nerd corners of the web are able to
+benefit from the patch. I guess thats why patches are used to solve bugs.
+
+If the patch is working but not stable it would also be nice to be mentioned
+here.=20=20
+
+3. I don't care when it is resolved or not. Its a bug ..there is already a
+patch why is it not mainlined thats the only question.=20=20
+
+Instead of writing all the 1-3 and putting it to resolved it would be more
+fruitfuly to any one if you/or anyone else briefly write a oneliner like th=
+is:
+
+Hey guys patch works but is not fully tested yet...could take a few weeks
+Or hey guys patch seems to work but breaks xy thats why its not mainlined
+or hey guys patch works but problem is not really solved yet
+or hey guys patch seems to work but only masks a compiler error.
+...=20
+
+This is how a goal oriented user <-> dev <-> maintainer relation works.
+At the end we all want a well working kernel.
 
 --=20
 You may reply to this email to add a comment.
