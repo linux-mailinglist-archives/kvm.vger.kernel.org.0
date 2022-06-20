@@ -2,100 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A6DF551829
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 14:05:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 233D1551BED
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 15:47:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241814AbiFTMFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 08:05:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47900 "EHLO
+        id S1346229AbiFTNj6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 09:39:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242078AbiFTMFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 08:05:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EE17A332
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 05:04:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655726690;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IUXmv+GsqzyvnhaDhp9YkGYuGwZ5GKnH9Fu0vf0lnGk=;
-        b=BZVfVK3ARnkoVgmicrv6tjEkixtLpDpOTjuFNwrvWnVkYudIFMEn4RbhUu/q2C+5CoX9Yf
-        ElomPeUm//+T4csrdXXxvkW80CkQLWVxO6Wzfwp8UbYm4HuhGQXBq4ohs1Ne9U5bGpODVJ
-        k+boQLI95+m88+r2/U3W3OjPsEpiAQU=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-554-GphgUzhwMWyXemEHSAonTA-1; Mon, 20 Jun 2022 08:04:48 -0400
-X-MC-Unique: GphgUzhwMWyXemEHSAonTA-1
-Received: by mail-ej1-f70.google.com with SMTP id rs21-20020a170907037500b0070c40030f0aso3401800ejb.20
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 05:04:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=IUXmv+GsqzyvnhaDhp9YkGYuGwZ5GKnH9Fu0vf0lnGk=;
-        b=FU6oZOhL4OsDHKiyY1kSIl525QOqFeBmTFBULF4Tl8WRCA9+SfwCTMeqmvtjDsKsps
-         Nn+TK3M4BNq6V8MbUpwWMhibqwv9rVf1ifJdLafrUQByzxAQbdvjToDjtw7l4WePn0SB
-         Jc57LMo1LuHSyeAock2ydMQ5qSfyvQyM7cElCvpxR8pw0eZ5mg2D8jR7uEGM+xikkUa8
-         C0YVReLpDDEyp8qR9wz2mxZFI6d7e3Q5UK66OYYXzixq4kV6j1234gmbMD7h5mAswlYH
-         O2F/E4NPh1Hz69FOa0EgeuQxMgLUHVtmy3ZMz7HAa424puaGjaedMLAfSpOBx5Xf06z3
-         7A6Q==
-X-Gm-Message-State: AJIora8urswuO5pmAfowqD/iRnQ67uT1zbvy4n5BsLObfQEoOUA9XBgg
-        BxS35JpWkNvgmay5IpzthfnF7kRhTyEIhtX9dM07KU2mcgW+Hx9yqqpCT5zRsdNVAI/VPYbh9Xz
-        fbE1WCSxNJ6wP
-X-Received: by 2002:a17:906:51c6:b0:712:2a1a:afc8 with SMTP id v6-20020a17090651c600b007122a1aafc8mr21439959ejk.649.1655726687694;
-        Mon, 20 Jun 2022 05:04:47 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uc7990kaGVy2NBjJ6jUWCy9T1osk/a++J5cKPnIJZesaYbWIXlQk2enQG7zkinbsWXRGeDWQ==
-X-Received: by 2002:a17:906:51c6:b0:712:2a1a:afc8 with SMTP id v6-20020a17090651c600b007122a1aafc8mr21439934ejk.649.1655726687452;
-        Mon, 20 Jun 2022 05:04:47 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id o2-20020a170906768200b0070b8a467c82sm5876491ejm.22.2022.06.20.05.04.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jun 2022 05:04:46 -0700 (PDT)
-Message-ID: <2fc82066-f092-bc19-ae69-6852820f41ef@redhat.com>
-Date:   Mon, 20 Jun 2022 14:04:43 +0200
+        with ESMTP id S1347491AbiFTNik (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 09:38:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D533D1F62C;
+        Mon, 20 Jun 2022 06:14:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 57CE961543;
+        Mon, 20 Jun 2022 13:03:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD8FC3411B;
+        Mon, 20 Jun 2022 13:03:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1655730235;
+        bh=r4HTTZDPskHPPm1axn9xIWDD/skwl4wwe/Ur5YtpFjY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=t/y31kxrrj2lrIXPcbwB81yjxm367j3EPpXDZWy/oWnrQlX+20amVFyAO9betY9sX
+         mPf9KIbbkI2b7vEoAF1CLDK+sWEzJpnzkyktCjQVDQOTJuv0wsAZcYDN+9P6fHBSlR
+         JQLBFEytijhnYO6iLUOue5Q00RhfzagUcLri2IfU=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Andy Nguyen <theflow@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Subject: [PATCH 5.10 75/84] KVM: SVM: Use kzalloc for sev ioctl interfaces to prevent kernel data leak
+Date:   Mon, 20 Jun 2022 14:51:38 +0200
+Message-Id: <20220620124723.109661211@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220620124720.882450983@linuxfoundation.org>
+References: <20220620124720.882450983@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 4/4] KVM: selftests: Fix filename reporting in guest
- asserts
-Content-Language: en-US
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        seanjc@google.com, vkuznets@redhat.com, thuth@redhat.com,
-        maz@kernel.org, Ricardo Koller <ricarkol@google.com>, g@gator
-References: <20220615193116.806312-1-coltonlewis@google.com>
- <20220615193116.806312-5-coltonlewis@google.com>
- <20220616124519.erxasor4b5t7zaks@gator>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220616124519.erxasor4b5t7zaks@gator>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/16/22 14:45, Andrew Jones wrote:
->> +#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {	\
->> +		if (!(_condition))					\
->> +			ucall(UCALL_ABORT, GUEST_ASSERT_BUILTIN_NARGS + _nargs,	\
->> +			      "Failed guest assert: " _condstr,		\
->> +			      __FILE__,					\
->> +			      __LINE__,					\
->> +			      ##_args);					\
-> We don't need another level of indentation nor the ## operator on _args.
-> 
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-The ## is needed to drop the comma if there are no _args.
+commit d22d2474e3953996f03528b84b7f52cc26a39403 upstream.
 
-Paolo
+For some sev ioctl interfaces, the length parameter that is passed maybe
+less than or equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data
+that PSP firmware returns. In this case, kmalloc will allocate memory
+that is the size of the input rather than the size of the data.
+Since PSP firmware doesn't fully overwrite the allocated buffer, these
+sev ioctl interface may return uninitialized kernel slab memory.
+
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: David Rientjes <rientjes@google.com>
+Suggested-by: Peter Gonda <pgonda@google.com>
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Fixes: eaf78265a4ab3 ("KVM: SVM: Move SEV code to separate file")
+Fixes: 2c07ded06427d ("KVM: SVM: add support for SEV attestation command")
+Fixes: 4cfdd47d6d95a ("KVM: SVM: Add KVM_SEV SEND_START command")
+Fixes: d3d1af85e2c75 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
+Fixes: eba04b20e4861 ("KVM: x86: Account a variety of miscellaneous allocations")
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+Reviewed-by: Peter Gonda <pgonda@google.com>
+Message-Id: <20220516154310.3685678-1-Ashish.Kalra@amd.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[sudip: adjust context]
+Signed-off-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/x86/kvm/svm/sev.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -537,7 +537,7 @@ static int sev_launch_measure(struct kvm
+ 		}
+ 
+ 		ret = -ENOMEM;
+-		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
++		blob = kzalloc(params.len, GFP_KERNEL_ACCOUNT);
+ 		if (!blob)
+ 			goto e_free;
+ 
+@@ -676,7 +676,7 @@ static int __sev_dbg_decrypt_user(struct
+ 	if (!IS_ALIGNED(dst_paddr, 16) ||
+ 	    !IS_ALIGNED(paddr,     16) ||
+ 	    !IS_ALIGNED(size,      16)) {
+-		tpage = (void *)alloc_page(GFP_KERNEL);
++		tpage = (void *)alloc_page(GFP_KERNEL | __GFP_ZERO);
+ 		if (!tpage)
+ 			return -ENOMEM;
+ 
+
 
