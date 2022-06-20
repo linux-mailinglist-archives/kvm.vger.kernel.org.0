@@ -2,180 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB62E5509B5
-	for <lists+kvm@lfdr.de>; Sun, 19 Jun 2022 12:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 453C5550E7A
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 04:03:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234721AbiFSKgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Jun 2022 06:36:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51226 "EHLO
+        id S236560AbiFTCDx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Jun 2022 22:03:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbiFSKgd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Jun 2022 06:36:33 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F04101C8;
-        Sun, 19 Jun 2022 03:36:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655634992; x=1687170992;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=G9eAJym/nFIzB+XohcHy7aTrn98Z2gzHhy+jfNI0H3g=;
-  b=iZ7XVqFUde4CEmYJK2EEGLtFWildm3tsZOGQ9o7JGpxllpj5LoxBp7wa
-   BWjD7UAzYvRb9NjcmTiohp1z3cW6FcBKGgI00wOxtZIlwqqAKRC/kpij5
-   EapF0gG3EMcOt+n2AWzqj52MibHhtbkyRQTdvDp/hK6sFV+E2ELUtn2gg
-   HqtKzOhFBkwZGRORj8hwVkK+Sev+WqrRMzzpus2CWVh6ScXxwz9HN5aXc
-   /YZo/4BvA46uALUH8GNrWXAXq9MkYDCfUyqeGPuLwArP3u7rmirmPyYAe
-   496m+zpe/D/eYXv9y6Yc0QE06i1U0I9U4POGomTRB60toK+E5t9SamBRF
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="343712799"
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="343712799"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2022 03:36:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="654266919"
-Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
-  by fmsmga004.fm.intel.com with ESMTP; 19 Jun 2022 03:36:31 -0700
-Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
- ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Sun, 19 Jun 2022 03:36:30 -0700
-Received: from orsmsx604.amr.corp.intel.com (10.22.229.17) by
- ORSMSX608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Sun, 19 Jun 2022 03:36:30 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Sun, 19 Jun 2022 03:36:30 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Sun, 19 Jun 2022 03:36:30 -0700
+        with ESMTP id S237556AbiFTCDv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Jun 2022 22:03:51 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2089.outbound.protection.outlook.com [40.107.244.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0688365B8
+        for <kvm@vger.kernel.org>; Sun, 19 Jun 2022 19:03:50 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TNwwPOun1Jamccdi6ANodaU8Gx3FJ7zlJKE0czK3hT23dxwiD4x24Kpm/LhJuyxG1sHiwcc5yzZkEDAXwvSVm4d0tmJZgsb5kbTSKw+VBgAx5Qb8QlzypUh3Go0Lb6oSv9RTPSfUDpJzB8iAnPUFsyvLZywDKTyxBzqZpZkK7IS33oeVuquL6VERrqdbWNb2TRlIrxj80xiXvnFQ8eF6Tbf9ySgoZ7nqs58nZ+iXvX3fX6snxquZgPr2dxvAs6k5pSVWQyQGy4AVgQZ1HSOdupBerbTWHlJGPn1eUnpXCMQAA3wuzqo9l8fBcagmblS4Qb4PL7mIUcG9PdSi6t0hWQ==
+ b=jCGOfJlYIwUe9O2xKmWcRjDKiCgmLR2kNR/7f723bMhw9e51rGIWIMQtsBBiq5lAdS1I3K9ycc8ehdZPGVnt8d/Wef3xpllh60tyTyW2q42HrdzWSJJkdOVAffbRVQqstloFOdlBKiKmf6t/xtpBaTmOBQgQ5eqOW7eAmfIeAjkwoj4sKd60/D2sHmMUlZjTpS3OXZ4pkycko+31xZwSlwfzD6cKrBcf9bEu5os6klV04yXUs+aIBVLRcPsb5RD3F6/8238kHWUeoirKM4mKgrBkS2Iuv3dXiHJJr5bTKidnTKg8U6mvSjLAu3HDt7LYks5aFaPl68JAkDHUCCu3ng==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zxZ6sNLsj+oS8q/Yvha4l2xkI9EhtSUnkzNCAoMj58s=;
- b=NkndaybSiy/XWyT8Sjya/H9JbM5+pCTdZce58iJyk+XUpqvY5n+KobFj55PPLphBWlj/giKOcOi1upxAe4InBirRGDODp0Jk8o5jrKzF6ucL3Bwj+w2y/Ams4fZQudFU+QOsNmMoY+who0PlFSQ5Ev8WtXWn58LHiKKDy9suw9RFxc0D5K+Zr9Ff/+ObgfsmgWBGoKFM1OtIjZmI0EUDrFSBy6EU2j6GDi3J3/SGaUYwZ3BwdOxpl15x1C75B2TqJ3jkRoaVyO6W+oR4IY8n2rZt3dd8eYiXpxoYWfxXcjHGidSUJzz/DPjguyt26omLFWDOYOyyeSD66Hq5aygqfg==
+ bh=rqbm3yGHvW0QDAO7CEnWsDeoao7DbgtK/AD7cQFfjxs=;
+ b=FvSpYtOMxWME5ebDEw220GykefKX4zszBsrr0K08FUy6keytcIL4JIAaL4EET2uAXUYnfteZ77nm4AMLTfkNFjNmI0AIUE3AKxQNS0YZpLCRirBjFcMYMdy5ot9p+GkAZoW6APR+k3WVBLXyRTTWusskBdZwuHZ1v2AsVZ1jIWeZ0ahDVzuuiQfNPabAVjNx+4Q1Z3esG6ZGknKh7Q9bX8DJB9OqMFXgsXzubVahoQEPBjhlkYDRq01sigRM9FjXhwsiuKGDqRGOJYC4Pvb4gKXBFdJwH1bucsnR4Rss8I5q7OyFDeX/urWQhuMlEW4QCk2vB7bGJN1aTOpqt95I5A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rqbm3yGHvW0QDAO7CEnWsDeoao7DbgtK/AD7cQFfjxs=;
+ b=RaObeOqkEa9MkqyofFTRx4jeuaCzdaXlIRtDph2tVG8Pi/73YN6g98OHQMZcuqKkgP224VYyYkQHtdY0W1lUUzREdwtJUgy2c01x83UkZN0YDCZGbEUJ5p6U5UBrVWMlavUjHm+/O2Whh0uTbpLPDaC8hKn12Ra+NbA/OLc6e5o=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN2PR11MB3870.namprd11.prod.outlook.com (2603:10b6:208:152::11)
- by BN8PR11MB3681.namprd11.prod.outlook.com (2603:10b6:408:85::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.17; Sun, 19 Jun
- 2022 10:36:27 +0000
-Received: from MN2PR11MB3870.namprd11.prod.outlook.com
- ([fe80::dd55:c9f5:fbc7:8a74]) by MN2PR11MB3870.namprd11.prod.outlook.com
- ([fe80::dd55:c9f5:fbc7:8a74%3]) with mapi id 15.20.5353.020; Sun, 19 Jun 2022
- 10:36:27 +0000
-Message-ID: <de35d629-e076-e02d-7482-c93de628dd82@intel.com>
-Date:   Sun, 19 Jun 2022 18:36:10 +0800
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ MWHPR12MB1151.namprd12.prod.outlook.com (2603:10b6:300:e::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5353.14; Mon, 20 Jun 2022 02:03:46 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::bdcc:775:f274:7f12]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::bdcc:775:f274:7f12%4]) with mapi id 15.20.5353.014; Mon, 20 Jun 2022
+ 02:03:45 +0000
+Message-ID: <d9cac7fe-c38a-1470-2048-3319eb9d3470@amd.com>
+Date:   Mon, 20 Jun 2022 07:33:35 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.10.0
-Subject: Re: [PATCH 2/3] KVM: selftests: Consolidate boilerplate code in
- get_ucall()
+ Thunderbird/91.6.1
+Subject: Re: [kvm-unit-tests PATCH v4 2/8] x86: nSVM: Move all nNPT test cases
+ from svm_tests.c to a separate file.
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        "Palmer Dabbelt" <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Christian Borntraeger" <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-CC:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Atish Patra" <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm-riscv@lists.infradead.org>,
-        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        "Colton Lewis" <coltonlewis@google.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20220618001618.1840806-1-seanjc@google.com>
- <20220618001618.1840806-3-seanjc@google.com>
-From:   "Huang, Shaoqin" <shaoqin.huang@intel.com>
-In-Reply-To: <20220618001618.1840806-3-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+References: <20220428070851.21985-1-manali.shukla@amd.com>
+ <20220428070851.21985-3-manali.shukla@amd.com> <Yqpur6a7oYqUEfGd@google.com>
+From:   "Shukla, Manali" <mashukla@amd.com>
+In-Reply-To: <Yqpur6a7oYqUEfGd@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR01CA0158.apcprd01.prod.exchangelabs.com
- (2603:1096:4:28::14) To MN2PR11MB3870.namprd11.prod.outlook.com
- (2603:10b6:208:152::11)
+X-ClientProxiedBy: PN3PR01CA0043.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:98::19) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 686f0146-d5cd-41fa-02c5-08da51df903e
-X-MS-TrafficTypeDiagnostic: BN8PR11MB3681:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-Microsoft-Antispam-PRVS: <BN8PR11MB3681F08053D27BDEA1D88959F7B19@BN8PR11MB3681.namprd11.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 4fb80c4a-8245-42c4-d200-08da52611b9e
+X-MS-TrafficTypeDiagnostic: MWHPR12MB1151:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR12MB115198DA2B5ECA746FFA6DFCFDB09@MWHPR12MB1151.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vwTg9Rf2S2jyD++wMd4VV06qTn1F7qvx5sjRUlLZfBg3RuKxnTf/a90uTVyCEakpUXMKxM2xAlhpQ9dsgn+pQp0BrNmPlKVO5VA1DVjUP9numQdT+gtSYn0dlrXbmHWoP4sOdSjZnM9UNJ0olSEGmljv04nmwkYzV1Uu2aRggO5A55bNfPP+sFC+3UNW96DBtm8AjAKiVCqAWylMgIWjrCpYC+d/S5gYhW1d3y+By/IBd3HyW6V0qDItvFD87oskZPYQmuQKcE5EFVxKEuVzU5KhZbxrUexPvLyh7+Fg6OjSsd6tSQc0Ea4GRWRgqYBcEcuuVRrTo0DEsZknSpLnTIwPBpcq57y1OZEfQgLHVEMJOyCECsfPEZUg3rsb61MSac1v8MCn6o8NIdLAQnwJKpppQOIgnL05Kn9fXrZxuEFq2BLAM4JOYKBMmyQbw/bTNbp3laQYZ9qSfRVW0j6TDJ0Ep8BOffr0f0ZPN9hX+5ZKTYj3SG9B2jC9GGlU3M6ZZtxwUdppmh07ZT//Exxk2tqj0H8DJHIO+jqVePwlUOI4T2VKErvH9mFKYjMd5Ak/2FalmzH2z9gFrmu0+xj786ad0pr1Hn0jSHYvsUQdXIDwYJJ+/C8iMqqCd6RKB6zz+WrvKMwi0kar8lmu4jzj0mCRj0+JP5FrrVfTk4vR821isblrLm5KLVNI1dAfb2XxvopfBikp15sbXhCWI8m232IJGCKNDJt3HSMCnZyQot2nf+uiSBKViv/zNk84SQ2p
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR11MB3870.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(366004)(921005)(8676002)(82960400001)(110136005)(316002)(54906003)(6506007)(38100700002)(498600001)(6486002)(6512007)(5660300002)(26005)(7416002)(83380400001)(6666004)(53546011)(2906002)(66476007)(66556008)(66946007)(31696002)(8936002)(86362001)(2616005)(31686004)(186003)(4326008)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: HPK5Elsi28UHuy4KoW54JVLr/bNHieeZjJTV1MFg7+F8EvlGzMCHbrlUGDMUMYWmVLY6zBajRpFCyhpOrPSwKDw3S0TpM6ej0vEhURI1QT5dn9MJiNDi3wlMoIipYqiCdyn+byy4poN71J04uOlocLRHIRgBrHB8tldOzynb8Q4OyDC2VyH9Yzr/b6vDxWu7b7bFsPMAXda7KvflyfWzup7gGcTw4/9yczOrGpZZ9QhbOj9JCP4tcWdRa6aMmZncd7Ge0gQ397CjGejWDf+6sKqmIw6Tq6VQMDsJ25wvnRqUXnlfPW9PKinjBQylm60Worq9m9WOrw6JSZpq7BKZj1CB9UwypcJbs2L0JbXs2960ellO1H1OfL3hisbekuWR8hZiwknw8UlPRSqSkJSPR1++jvJoz1NwLuk+9TiGLfIN+gRKg38Xfgm9g4UdalDqj1nmdVjnu21+E5Z1l9to/MedWWgDpjv3okS1vrsQ6AxBgCTKtv/f9QrWJlHXv2pP6V9n5MRLbdjVSiFqjCRJEUawWxOlEv4fdjpFiaZoU5jMn/6dPEtmTo2TkdWW7B3axFAnzNosqpFqPpc+n55JhOze7b9r3d9ZHuR6koYR+osy8KHoN+8vYJCz29An2uxBJyFNCRPCK89JaIOoIvs/N7fTBK4M0U5rAo+lUy1Y6e/MFL/VWI72U14wlubgGtMJYYC6a8JbK2vqjuxUgGWsMS51h073y5zET7nXMsVdHfE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(39860400002)(376002)(396003)(366004)(6512007)(478600001)(41300700001)(31686004)(316002)(6916009)(8936002)(26005)(8676002)(6666004)(6506007)(6486002)(36756003)(53546011)(83380400001)(4326008)(66556008)(66946007)(66476007)(186003)(5660300002)(2906002)(31696002)(38100700002)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?anhrSllJdlZ0WnF0dGlmREJWT1VLeDJXV1ZseTk3bGNia0hjZGNoLzFZbEJm?=
- =?utf-8?B?M3JCWTgyRW10VWhzQ2UydWlnWUlSUHU5cHRVWUF5LzAyNit4R29GRlV5UWty?=
- =?utf-8?B?VjZ1eXh2dEtWNk1WWTZjNklyT2Nmd1BNcnhhZlI0TzFvSEpIb2xlTXlFUCtL?=
- =?utf-8?B?RENiTkRXKzh2Qy9tM0hmRWdwc09mcnpGUGljWnRHbmJwb29pU2c4UnlFSmkv?=
- =?utf-8?B?dk4ycWhhT1RPSGhWd25DTjdYT2pjRnJkS0RtNXlqTkgxVFFGNjExNDFPM2JI?=
- =?utf-8?B?K0VPTHd4cC9TKzZRRlh3Y0YxUElQOVpmYk1vTHhZM1FLMHFyMHM5ZnZxQ2dM?=
- =?utf-8?B?ZmNNNm9YbStkVEJsaWNzR1FzazVmVEREZFZWVlM0bmN5MTAzNHVaZzJxemdj?=
- =?utf-8?B?RU9jcmVnN3VtYXZ0V3F5YWZxekJDdDFoRmtHT0NSYnBmbC95SGFwS1FzdjlC?=
- =?utf-8?B?YjN3ZXowS2dabFRZUFJsQlk3d1pFYWg2TTdtSS9iM0R5YUtCOHkrNldwT0ox?=
- =?utf-8?B?akc4YmR0U0dXQnVXaCs2YjFCNk1DeWFjZ1FKRzJ2bExsaTNaaHVQdTdaZnM5?=
- =?utf-8?B?WWRJU0FCWi9qZllNRTVmRTdMaGhwY1JlSkEreFJlcGx0RXMyazdEUkRwNm8z?=
- =?utf-8?B?OHBkY3NrMjAwd2d2eDhFWUxRNFFOKzJDZXNIYXM2YUlDcWJCZTlST0p6Rm1V?=
- =?utf-8?B?UEMrYXlUcGJlRDIvZGhuYUJKZktOUnMrNk1hdTlKVHZoNEMzUll2NmNaaXZP?=
- =?utf-8?B?ZHhqZW1KeCtmV0ZnMEtZUmd2K0tjUzJCdjhuaEZ5bjRxWmRvZDA1YWErMStU?=
- =?utf-8?B?dkttdkZaTzR4K0xHelJoM3FIdmNMREZIejc5cVNLbVd4YTNPQkVDbWJ2cVFj?=
- =?utf-8?B?TjZTckp1UGZvT3hmNW9KbERJZTMrZXpsSm9ic3F2aEhnQUVMWmt1MU9oczAx?=
- =?utf-8?B?QWZvZTNvTWJrNHE3cGpsQm9Icm9zNzJkc0t2cExwUkYwb1hnbXd0SzVZU3BC?=
- =?utf-8?B?OEw0UzRCR1BwMGpXeVByN0ovRjJLYjkycDhld2hHNXQvc0tIdGs2U0dLeEN6?=
- =?utf-8?B?V2k4b0NwUnh6THo5WERGOTNOOTUwM21CM3JuamswaXZTS3lQQkFkZDdvbTFv?=
- =?utf-8?B?cmp3Vk96Ny9PcmFuTk1xaDB0bkhyWHoxaVJ0Z2lBeG81Y0tEM1UyYUJEd2o0?=
- =?utf-8?B?NWZHV1JmSVlKZW1DVHJIaVltUzRIams4aFlJZm9vb0o4OVUwYm82blVOeFJq?=
- =?utf-8?B?bWs0Tm1XOVVLeHAwVVJCdXpBUjIwY2gwTmNWSlY5bUdNWGI3dnVQSzg5VmZi?=
- =?utf-8?B?N1VTQ3VMZUV4WFlLclFrbVZDNmkxNS9kbEVhMHVCb1ROdm52Qk84YUJRc0xG?=
- =?utf-8?B?WkxRdEczN1h3RGd6OEhJc3h1d1BWY0VuQXZkZzZlakhxVlZNSjk4dkExUlFR?=
- =?utf-8?B?azBKdWU5R2NVUkJ6bXFMd053NW1ld0JMZWp4ZGFKR0s2Z0N6YjdUQ1BLcjJs?=
- =?utf-8?B?eHNrclprQmdsa2tLSzYvSXY3bGJ1ZTAvdjUwWkh6bENrSGxSUmp0NTNCMExS?=
- =?utf-8?B?dkNCTVo2Vk5YaUd0MGNtZ2lxNlBscEN2V2FNTU9XNWtRa3cvNXVFdW1USjRZ?=
- =?utf-8?B?cHBkRWtCWmhKRTQ3ZmZ2Tk53aXRmN2tTeVkybWNOMzFJZE43cFhveFNZMDJa?=
- =?utf-8?B?Uml5c3UvZVFoYWZIK0RmeUdXRi9HNEdZTThlc3owOUY4Y2dBZ1RzNVhkNmcv?=
- =?utf-8?B?QXg2U1c5ZVpSOXFXOVB4ZU1tS1B4Vk53bnNVZkNFRWFBSGgwaFoxUURkVmI5?=
- =?utf-8?B?bG93Q0FtbFV0cnJVU3ZnT29PM0NKdWJVTTZhVmNwUFFiSHhTclBQeDBiL011?=
- =?utf-8?B?b3ppeUNpT1l6NjdpeHpiZmFScnN5cWJsOTBtak83RG1SbUx1SEhrWlZlVnJa?=
- =?utf-8?B?RDc2VDhkUzMvQWREdndxMmpLd3AzOHZPbTAwWU04WHdpU2k1Q2pVdTJVUDZ0?=
- =?utf-8?B?azdQbTRpbWRkQzkwK3lxNTMxdXZCTHRlSkJPd3lHTnJSSTZnV2RwbUMvSExN?=
- =?utf-8?B?ei9sbiszMEJ2WFJGbmlCd3lvY2I1aGJMVnZFemExQXpBNzhCSGdOQ1FoTlhT?=
- =?utf-8?B?U0czOGJyWjl5NHNsWCtTTWZFOFNNOS92eHppbXhwSmZOSjZxWEhiNVlKS0Qz?=
- =?utf-8?B?RWEwUTBNUWRhSWllRFM2cFk1eC9DMW9BVDl0NWZ5TS95Q21CR0NYN0p2ekhw?=
- =?utf-8?B?M0FjWGtzKzZCcURDZHppVXFBaFB3ZVgxclFYU0lKcjJJQ1d2Ujc3cFU2RlNl?=
- =?utf-8?B?Tk8rRlhEUE5SRWVmZ0l2QlFHckxEVC9TNGJ0YmdXdTQ3NEFlYzB5TkczYVc0?=
- =?utf-8?Q?AlrfM2Vd51hToa1E=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 686f0146-d5cd-41fa-02c5-08da51df903e
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR11MB3870.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U1Q3SE5zc0dMNFJ6VDdCcjRSWEc1dWp1UFJFejZsZFZrNXozT3MyVzZCVURB?=
+ =?utf-8?B?eVNBc1dKQmVUMXhQN3YrVU16L0FFS01wODZBQ2kzWEM0emczRHUxcG82Sk9U?=
+ =?utf-8?B?bTBHZDNtMm9jSW9rVzJiVmFidVlyd1ljMlB0Z0FtNjVnOEk5aGNBQUs2V2Jz?=
+ =?utf-8?B?MkM5ekovbnZPdytrV3hvSzZNZGw3cGNSMm03K2c1S0M0b05UVGNqOC9vb0Ry?=
+ =?utf-8?B?WnZQb0ZWeHQvbWhHYms0aWE2eGdGWmhQQk1JSmNEYkVIRGdMOHQvV0F6WmFu?=
+ =?utf-8?B?Y3hIUG16RThFNytqdjM1YjRoem9TZyttVWladEtuQ051eXNmVlJhVjhvWEoy?=
+ =?utf-8?B?L0JxanZiekNaZ3JoY0lXbjh3TnBybENJR2lKVExDZjR1RjNJL3ppS3pBbHZG?=
+ =?utf-8?B?REtHZFNlMHpxdEFKL0ZHSk04RlpTcnU1dUNqVjRXWDBtaHVCS1pSZ05XQXdu?=
+ =?utf-8?B?bm9RRDRZY3FtRlA1emIyYldLQi9hV2R0N3lkd21lZHY4Y3ZXUGw0bUF1MFB0?=
+ =?utf-8?B?QklnQ0N0OW01ck44NWJja1A4VUxrcVRTeW4wRE81ZUd5U1QzOUt2OGY3eWt2?=
+ =?utf-8?B?eXVzMmdNL1Nrc29IbGk0QjV2aEgvWVRjeFh0R3RGcTB3UFBHYVFxNWlCWDJG?=
+ =?utf-8?B?UjRiVGZaeEJ4OTZYbFpaQmVrcjFGeXMveWRYZFVRZjdDQWs5bFZWTHZjTC9h?=
+ =?utf-8?B?WE85T2dpaUExeHVZR2dkWStGTjNEL25pN2dBRnpldVp0K0Yvdm5vMVRJeWQ3?=
+ =?utf-8?B?WlkvbS9HR1BNV2d1VjNRa2lqN3d2eVdZZytoN2VMbEdqS0pRUlFxVWxNTDJU?=
+ =?utf-8?B?d3NIMHBObGxjV2RyS3Q2c3FVUlNDRWdEbFRobmR1bUE1Y2pDR2Fwd3VUOEV3?=
+ =?utf-8?B?cFIxRlczdHYxdDYrK0s5OGxmS0JEUmdXeFhZekgwbVZJaFI5VWxaYUhVS2Vv?=
+ =?utf-8?B?a0h5N241UG1FOTVZMTFMaHFMZ1pQVU81UXR4UDNoOE5jNloyQ2ZoZGppSmc4?=
+ =?utf-8?B?eHBaSzRBbXVsRktlQjNHeDVwMmh2ZXpxM3psblFxU2hMb0d6YnQ4NFZWSlNH?=
+ =?utf-8?B?blBpSzk1YXQyc0RoSEE4V1J1NW5lUjJraTk1WXhXamVZQjhEaEgwQTZlY2RC?=
+ =?utf-8?B?UWN6Nlh5dThBanpCMy85R29oWHVBSWY4Z1Ird3gva3gzdzRwZitwUUt0V3h5?=
+ =?utf-8?B?Ull5T3BFTG9BbHYrWWVQOEE5aFVGVENqcXo4MFdCeERsdnM2S3F5YS95NkxS?=
+ =?utf-8?B?bjFaU3RkY1hOUFFBMVAvZVRHUHRsaTVjUjNwWWZMa2MwSndaR1FYOXR5amJ0?=
+ =?utf-8?B?UFFzZEZmM21HYzBybUFFcVZRR2FrVjU1eXQ4WmRRdWF5MzlTWUgrVm0rQnRm?=
+ =?utf-8?B?YVlIeUp0bVB0NTVlSlNOdDZ2amN6bnBZZDhrcjVrb1haWnZUUlFWeE5MTWFt?=
+ =?utf-8?B?Q2t1SmZ6WlNBUGFrc2NkQzRaV3U5SFZnVjg4aGZtcW5LWnFOSjN2aWVZZ3JR?=
+ =?utf-8?B?M3AyMFZQbDQzWGowbGgwV3NUbkhpOGl2d1grMUFCRVVZQ1JyZFBqSFZSVFpC?=
+ =?utf-8?B?U00rY3hETGM3RlhuY0dEdExiRElCQXdwZDZMU3F3SWFOK1VaN2VaYlNqVzBw?=
+ =?utf-8?B?cGhIZGJhZ0hWcm15S21wYzJzNXRKNExTRE1EeXFZNHFDYm9EczhzZy8xYUt4?=
+ =?utf-8?B?ZFk5YW12akQzVFlXQU9MQVZWZFV3L3E4c2UzbjhMb0p6VEdYTTkvd1YzWHBz?=
+ =?utf-8?B?S29ac21RVGpTN1ZJbUx2YVFheTlKR3doeEh4WU8yUzZ2dk9yeWFML2pSZ0tY?=
+ =?utf-8?B?TERSQlFuKzI3eE5YdXhJbUxQaEZiSVhUaHU0LytvdVREN3R4MGJON3czTEMw?=
+ =?utf-8?B?YVlrWEZETDlhejNORlZpaGFsdHJpRmxuOFp5ZU1uQ2RmMEM0OGRPNzVHQmFY?=
+ =?utf-8?B?a1I3RFpjZkVjRXNtN1pMY1RuTk1GeEdiOXBIVlo5cGhZakd3NVlXMUJQSTg5?=
+ =?utf-8?B?dGlKMjU2MjNvZDQwWGVKcVVKcXZtQ0VOelBXREt0OHAwREpzbGtCYU82bytF?=
+ =?utf-8?B?L3c3U1JHT3NVeVpvWE5WWFhiZlZydlZRS2p1bXVYUjNMYWdrZ2NMZkx5ODVB?=
+ =?utf-8?B?ems0S253b2JXUmNYeXAzN01NWVRhZHRpOEtRSXhDMG5OcmpIV3prMEpvSnIw?=
+ =?utf-8?B?WVloUk9UWVI5cXBEdFNRalNzYlVTSW9lbW1scE44Vk81ckxUMEtKakVUSWxs?=
+ =?utf-8?B?a1E3aVB4THhYT3ZoVi8xckQyY29XUGQrTU56UmMrbDRkNHh6clhKQmFDK3Bn?=
+ =?utf-8?B?b1hMRlZZOWRjVlJDU3phOEFPamNqOEVwQWxtUGJUS1ErMXFwZ3U0UT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb80c4a-8245-42c4-d200-08da52611b9e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2022 10:36:26.9479
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 02:03:45.8482
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ja28G+zVbxnTE9Zsd1qjoa4S2TLis7tWIIDRukCXTLxxMtKtFrdhjkWSSxTptAYTfKtUfjWz3eX5WymGnPjeqA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR11MB3681
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+X-MS-Exchange-CrossTenant-UserPrincipalName: mqZyaFO8SXg39PY9ZwqTMR/f7egg0wH3PBU8oPHSgq43BpwWCkDyvaHj4nGDCSEFiy6s69xWZ99nMsLyRWgznA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1151
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -185,227 +129,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 6/18/2022 8:16 AM, Sean Christopherson wrote:
-> Consolidate the actual copying of a ucall struct from guest=>host into
-> the common get_ucall().  Return a host virtual address instead of a guest
-> virtual address even though the addr_gva2hva() part could be moved to
-> get_ucall() too.  Conceptually, get_ucall() is invoked from the host and
-> should return a host virtual address (and returning NULL for "nothing to
-> see here" is far superior to returning 0).
+On 6/16/2022 5:13 AM, Sean Christopherson wrote:
+> On Thu, Apr 28, 2022, Manali Shukla wrote:
+>> nNPT test cases are moved to a separate file svm_npt.c
+>> so that they can be run independently with PTE_USER_MASK disabled.
+> 
+> Nit, phrase changelogs as command.  Referring to the patch in the past tense is
+> confusing because it's not always obvious if the author is referring to this
+> patch or something else that happened from long ago.
+> 
+> And kind of a nit, but not really because I suggested this and still forgot why
+> moving to a new file helps.  Moving to a new file isn't what's important, it's
+> having a separate setup that we really care about.  So something like:
+> 
+>   Move the nNPT testcases to their own test and file, svm_npt.c, so that the
+>   nNPT tests can run without the USER bit set in the host PTEs (in order to
+>   toggle CR4.SMEP) without preventing other nSVM testacases from running code
+>   in usersmode.
+> 
+>> Rest of the test cases can be run with PTE_USER_MASK enabled.
+>>
+>> No functional change intended.
+> 
+> Heh, this isn't technically true, as running the "svm" testcase will no do
+> different things.
 
-It seems the get_ucall() returns the uc->cmd, the ucall_arch_get_ucall() 
-returns a host virtual address.
+Hi Sean,
 
-> 
-> Use pointer shenanigans instead of an unnecessary bounce buffer when the
-> caller of get_ucall() provides a valid pointer.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   .../selftests/kvm/include/ucall_common.h      |  8 ++------
->   .../testing/selftests/kvm/lib/aarch64/ucall.c | 15 +++------------
->   tools/testing/selftests/kvm/lib/riscv/ucall.c | 19 +++----------------
->   tools/testing/selftests/kvm/lib/s390x/ucall.c | 16 +++-------------
->   .../testing/selftests/kvm/lib/ucall_common.c  | 19 +++++++++++++++++++
->   .../testing/selftests/kvm/lib/x86_64/ucall.c  | 16 +++-------------
->   6 files changed, 33 insertions(+), 60 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-> index c6a4fd7fe443..cb9b37282701 100644
-> --- a/tools/testing/selftests/kvm/include/ucall_common.h
-> +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-> @@ -26,9 +26,10 @@ struct ucall {
->   void ucall_arch_init(struct kvm_vm *vm, void *arg);
->   void ucall_arch_uninit(struct kvm_vm *vm);
->   void ucall_arch_do_ucall(vm_vaddr_t uc);
-> -uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
-> +void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
->   
->   void ucall(uint64_t cmd, int nargs, ...);
-> +uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
->   
->   static inline void ucall_init(struct kvm_vm *vm, void *arg)
->   {
-> @@ -40,11 +41,6 @@ static inline void ucall_uninit(struct kvm_vm *vm)
->   	ucall_arch_uninit(vm);
->   }
->   
-> -static inline uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-> -{
-> -	return ucall_arch_get_ucall(vcpu, uc);
-> -}
-> -
->   #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
->   				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
->   #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> index 2de9fdd34159..9c124adbb560 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> @@ -75,13 +75,9 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
->   	*ucall_exit_mmio_addr = uc;
->   }
->   
-> -uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-> +void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_run *run = vcpu->run;
-> -	struct ucall ucall = {};
-> -
-> -	if (uc)
-> -		memset(uc, 0, sizeof(*uc));
->   
->   	if (run->exit_reason == KVM_EXIT_MMIO &&
->   	    run->mmio.phys_addr == (uint64_t)ucall_exit_mmio_addr) {
-> @@ -90,12 +86,7 @@ uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
->   		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
->   			    "Unexpected ucall exit mmio address access");
->   		memcpy(&gva, run->mmio.data, sizeof(gva));
-> -		memcpy(&ucall, addr_gva2hva(vcpu->vm, gva), sizeof(ucall));
-> -
-> -		vcpu_run_complete_io(vcpu);
-> -		if (uc)
-> -			memcpy(uc, &ucall, sizeof(ucall));
-> +		return addr_gva2hva(vcpu->vm, gva);
->   	}
-> -
-> -	return ucall.cmd;
-> +	return NULL;
->   }
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> index b1598f418c1f..37e091d4366e 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> @@ -51,27 +51,15 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
->   		  uc, 0, 0, 0, 0, 0);
->   }
->   
-> -uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-> +void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_run *run = vcpu->run;
-> -	struct ucall ucall = {};
-> -
-> -	if (uc)
-> -		memset(uc, 0, sizeof(*uc));
->   
->   	if (run->exit_reason == KVM_EXIT_RISCV_SBI &&
->   	    run->riscv_sbi.extension_id == KVM_RISCV_SELFTESTS_SBI_EXT) {
->   		switch (run->riscv_sbi.function_id) {
->   		case KVM_RISCV_SELFTESTS_SBI_UCALL:
-> -			memcpy(&ucall,
-> -			       addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]),
-> -			       sizeof(ucall));
-> -
-> -			vcpu_run_complete_io(vcpu);
-> -			if (uc)
-> -				memcpy(uc, &ucall, sizeof(ucall));
-> -
-> -			break;
-> +			return addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]);
->   		case KVM_RISCV_SELFTESTS_SBI_UNEXP:
->   			vcpu_dump(stderr, vcpu, 2);
->   			TEST_ASSERT(0, "Unexpected trap taken by guest");
-> @@ -80,6 +68,5 @@ uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
->   			break;
->   		}
->   	}
-> -
-> -	return ucall.cmd;
-> +	return NULL;
->   }
-> diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-> index 114cb4af295f..0f695a031d35 100644
-> --- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-> @@ -20,13 +20,9 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
->   	asm volatile ("diag 0,%0,0x501" : : "a"(uc) : "memory");
->   }
->   
-> -uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-> +void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_run *run = vcpu->run;
-> -	struct ucall ucall = {};
-> -
-> -	if (uc)
-> -		memset(uc, 0, sizeof(*uc));
->   
->   	if (run->exit_reason == KVM_EXIT_S390_SIEIC &&
->   	    run->s390_sieic.icptcode == 4 &&
-> @@ -34,13 +30,7 @@ uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
->   	    (run->s390_sieic.ipb >> 16) == 0x501) {
->   		int reg = run->s390_sieic.ipa & 0xf;
->   
-> -		memcpy(&ucall, addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]),
-> -		       sizeof(ucall));
-> -
-> -		vcpu_run_complete_io(vcpu);
-> -		if (uc)
-> -			memcpy(uc, &ucall, sizeof(ucall));
-> +		return addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]);
->   	}
-> -
-> -	return ucall.cmd;
-> +	return NULL;
->   }
-> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-> index 749ffdf23855..c488ed23d0dd 100644
-> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
-> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-> @@ -18,3 +18,22 @@ void ucall(uint64_t cmd, int nargs, ...)
->   
->   	ucall_arch_do_ucall((vm_vaddr_t)&uc);
->   }
-> +
-> +uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-> +{
-> +	struct ucall ucall;
-> +	void *addr;
-> +
-> +	if (!uc)
-> +		uc = &ucall;
-> +
-> +	addr = ucall_arch_get_ucall(vcpu);
-> +	if (addr) {
-> +		memcpy(uc, addr, sizeof(*uc));
-> +		vcpu_run_complete_io(vcpu);
-> +	} else {
-> +		memset(uc, 0, sizeof(*uc));
-> +	}
-> +
-> +	return uc->cmd;
-> +}
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> index 9f532dba1003..ec53a406f689 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> @@ -22,25 +22,15 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
->   		: : [port] "d" (UCALL_PIO_PORT), "D" (uc) : "rax", "memory");
->   }
->   
-> -uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-> +void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_run *run = vcpu->run;
-> -	struct ucall ucall = {};
-> -
-> -	if (uc)
-> -		memset(uc, 0, sizeof(*uc));
->   
->   	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
->   		struct kvm_regs regs;
->   
->   		vcpu_regs_get(vcpu, &regs);
-> -		memcpy(&ucall, addr_gva2hva(vcpu->vm, (vm_vaddr_t)regs.rdi),
-> -		       sizeof(ucall));
-> -
-> -		vcpu_run_complete_io(vcpu);
-> -		if (uc)
-> -			memcpy(uc, &ucall, sizeof(ucall));
-> +		return addr_gva2hva(vcpu->vm, (vm_vaddr_t)regs.rdi);
->   	}
-> -
-> -	return ucall.cmd;
-> +	return NULL;
->   }
+Thank you for the review comments.
+
+I will work on comments.
+
+Manali
