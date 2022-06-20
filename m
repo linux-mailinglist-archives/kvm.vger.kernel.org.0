@@ -2,127 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 169FC551799
-	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 13:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 334F855182C
+	for <lists+kvm@lfdr.de>; Mon, 20 Jun 2022 14:05:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241942AbiFTLnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 07:43:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59578 "EHLO
+        id S242374AbiFTMFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 08:05:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241905AbiFTLnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 07:43:19 -0400
+        with ESMTP id S242269AbiFTME7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 08:04:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39BE22FA
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 04:43:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 72D1D19F92
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 05:04:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655725396;
+        s=mimecast20190719; t=1655726647;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qxxbDgrZTkB0Cli5g9D86lOEWrOx+awHmsQv7IEefYA=;
-        b=RQmvL/l1/s4qIzm7aoLe5ZejUIoRyvpKNlYHDZ7wk+Ox6K0NO7+dan7yu3/WSb3cGw2t8o
-        W/8lJ2wFaVtbCG1uBrPyzJxIKTvkJR3Yo90FeY7IkFStbcRmxWSCZDNX82PZXZq5snudz0
-        VuRjW5Q6ZG9PQq1AToCJ0Swgp9Eh8Hg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=3fWG6f9+wPyZUdKpzq6SUM1FvIBmD72g2Gxfy7zPec8=;
+        b=dRwY5VDDBDHsFGzABSg0ZHQJQf/0K6G89yufHd/cc6ecWuwrkSmKOtbQZtw2ooojbH8+Z6
+        Okriva/0xWYGqosNB4QvPhZQxGFPdSjqEqXhlynEwxxNh+hyLzyoN8XvmUuyQgeoJ3IVCW
+        P0FOGIfyUBbwe8fJwonIyioPZDuPlWI=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-650-VVSse7XPPOGJ2WLDtRaIRw-1; Mon, 20 Jun 2022 07:43:13 -0400
-X-MC-Unique: VVSse7XPPOGJ2WLDtRaIRw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8248529AB3E2;
-        Mon, 20 Jun 2022 11:43:12 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.39.194.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 804E01415109;
-        Mon, 20 Jun 2022 11:43:09 +0000 (UTC)
-Subject: Re: [PATCH v2 0/2] Improve vfio-pci primary GPU assignment behavior
-To:     Alex Williamson <alex.williamson@redhat.com>, corbet@lwn.net,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
-        deller@gmx.de, gregkh@linuxfoundation.org
-Cc:     Gerd Hoffmann <kraxel@redhat.com>, linux-doc@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <165541020563.1955826.16350888595945658159.stgit@omen>
-From:   Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f0bdd9b1-16af-8069-65dd-9e90c8f4a6ac@redhat.com>
-Date:   Mon, 20 Jun 2022 13:43:08 +0200
+ us-mta-582-lu3RHyPcNwO74V137f68_g-1; Mon, 20 Jun 2022 08:04:06 -0400
+X-MC-Unique: lu3RHyPcNwO74V137f68_g-1
+Received: by mail-ed1-f72.google.com with SMTP id b7-20020a056402350700b004355e4d1e36so6694377edd.10
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 05:04:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3fWG6f9+wPyZUdKpzq6SUM1FvIBmD72g2Gxfy7zPec8=;
+        b=7tEMbrzCCXV+J4wowUVxazfQfZON2f6dG6Xtsi5sDz89MqhwXKZqpkym5dIDDGLWN3
+         yuyQxssLYhu78l2/vUJ2qT1MOTP40n5wCux4TFsFRmiwVcsyksAsBhLPV16XQjiHDFhp
+         DDOUab+oZ/rZvY5QyudYJG2gU50xb8h36hgIV761IxnHyA9odiDr0L6PsWL5oE8giOxQ
+         gwVKJURzlMpXNtVrAXq3ugQuF7ThHTHdgxSs/PaTHxGu5+DwE8okYBSRWlbzT10GJoba
+         GzWxNYKr7CLHDm80WErGQsc89ioTh1FDjDp4Bq+FxTD8uxTwNegXzdyWJswlHnAoRelc
+         gp2w==
+X-Gm-Message-State: AJIora82vgxPH2eZvqojYuEJprwJ4V8lfNxJlP9zNTlaxN6SetisUw1J
+        VLCpb2FLLvieO8FEDhuR/o33ksHz2p7nxM0q1+eoQ+2e3XP0fDnZ2vlFiWoL9p71V/bMhbXBHpS
+        gb8EZZv6AN6eq
+X-Received: by 2002:a05:6402:11:b0:431:680c:cca1 with SMTP id d17-20020a056402001100b00431680ccca1mr29443299edu.420.1655726645158;
+        Mon, 20 Jun 2022 05:04:05 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1u9VhJ+ObuyZNUvGoEylbYK2DQSNd9ckf8bXsZN3l2pKVlgkfhq7FwfxpWwysL4rM30ugQ6lg==
+X-Received: by 2002:a05:6402:11:b0:431:680c:cca1 with SMTP id d17-20020a056402001100b00431680ccca1mr29443254edu.420.1655726644932;
+        Mon, 20 Jun 2022 05:04:04 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id u20-20020a17090657d400b00712134a676asm5894961ejr.93.2022.06.20.05.03.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jun 2022 05:04:01 -0700 (PDT)
+Message-ID: <19bba1a0-8fb7-2aae-a65a-1111e29b92d3@redhat.com>
+Date:   Mon, 20 Jun 2022 14:03:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <165541020563.1955826.16350888595945658159.stgit@omen>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 0/3] KVM: selftests: Consolidate ucall code
 Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Colton Lewis <coltonlewis@google.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20220618001618.1840806-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220618001618.1840806-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/16/22 22:38, Alex Williamson wrote:
-> When assigning a primary graphics device to VM through vfio-pci device
-> assignment, users often prevent binding of the native PCI graphics
-> driver to avoid device initialization conflicts, however firmware
-> console drivers may still be attached to the device which can often be
-> cumbersome to manually unbind or exclude via cmdline options.
+On 6/18/22 02:16, Sean Christopherson wrote:
+> Consolidate the code for making and getting ucalls.  All architectures pass
+> the ucall struct via memory, so filling and copying the struct is 100%
+> generic.  The only per-arch code is sending and receiving the address of
+> said struct.
 > 
-> This series proposes to move the DRM aperture helpers out to
-> drivers/video/ to make it more accessible to drivers like vfio-pci,
-> which have neither dependencies on DRM code nor a struct drm_driver
-> to present to existing interfaces.  vfio-pci can then trivially call
-> into the aperture helpers to remove conflicting drivers, rather than
-> open coding it ourselves as was proposed with a new symbol export in
-> v1 of this series[1].
-> 
-> Thanks to Thomas for splitting out the aperture code with new
-> documentation.
-> 
-> Thomas had proposed this going through the vfio tree with appropriate
-> stakeholder acks, that's fine with me, but I'm also open to it going
-> through the DRM tree given that the vfio-pci-core change is even more
-> trivial now and the bulk of the changes are DRM/video paths.  Thanks,
-> 
-> Alex
-> 
-> [1]https://lore.kernel.org/all/165453797543.3592816.6381793341352595461.stgit@omen/
-> 
-> ---
-> 
-> Alex Williamson (1):
->       vfio/pci: Remove console drivers
-> 
-> Thomas Zimmermann (1):
->       drm: Implement DRM aperture helpers under video/
-> 
-> 
->  Documentation/driver-api/aperture.rst |  13 +
->  Documentation/driver-api/index.rst    |   1 +
->  drivers/gpu/drm/drm_aperture.c        | 174 +------------
->  drivers/gpu/drm/tiny/Kconfig          |   1 +
->  drivers/vfio/pci/vfio_pci_core.c      |   5 +
->  drivers/video/Kconfig                 |   6 +
->  drivers/video/Makefile                |   2 +
->  drivers/video/aperture.c              | 340 ++++++++++++++++++++++++++
->  drivers/video/console/Kconfig         |   1 +
->  drivers/video/fbdev/Kconfig           |   7 +-
->  include/linux/aperture.h              |  56 +++++
->  11 files changed, 440 insertions(+), 166 deletions(-)
->  create mode 100644 Documentation/driver-api/aperture.rst
->  create mode 100644 drivers/video/aperture.c
->  create mode 100644 include/linux/aperture.h
-> 
+> Tested on x86 and arm, compile tested on s390 and RISC-V.
 
-series
-Tested-by: Laszlo Ersek <lersek@redhat.com>
+I'm not sure about doing this yet.  The SEV tests added multiple 
+implementations of the ucalls in one architecture.  I have rebased those 
+recently (not the SEV part) to get more familiar with the new kvm_vcpu 
+API for selftests, and was going to look at your old review next...
 
-(on top of Fedora's 5.18.5-100.fc35.x86_64)
-
-Thanks,
-Laszlo
+Paolo
 
