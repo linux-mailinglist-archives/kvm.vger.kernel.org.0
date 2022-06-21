@@ -2,65 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B41E4553EBE
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 00:52:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 954FF553EE3
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 01:09:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354923AbiFUWwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 18:52:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48528 "EHLO
+        id S1355030AbiFUXJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 19:09:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbiFUWwg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 18:52:36 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434762F008
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:52:35 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id x4so8078905pfq.2
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:52:35 -0700 (PDT)
+        with ESMTP id S1354574AbiFUXJn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 19:09:43 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F752B277
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 16:09:42 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id g8so13816620plt.8
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 16:09:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=hEJHXTVLwkTpuWUzKJ0Wfx9WmvDXmOs4Rv2uPf9F4Js=;
-        b=D3Kc4W7OvAoEI5hUlTGgrx4MCCIxGu9ous6K14y0/pPAVG7cwugH+DQDNFtwS2AFpF
-         xFv7uK2tNxzWXK3gXvgHxQ6nxTO2KXhdvoywaOskkg9kujUSqmUOTjZ6ti6CiNQyWfFb
-         bJZUdAVaqLavYCjCWm4izTbVvqr+ZOtrhEKfyViauMIy1MC7IUnqCA2FT0tFvU1pLdX5
-         kqEkQ0bEInVu0JRMEOcbshUpCgEeWfXrWlbGWNUJORVhtFSYEradM28UMt4aOdODJVAk
-         i7B3sTyAbCTCl3RHLGI0Y9MjUSK3u8YRLLeVrc2ZfrhumhYHzedP6PYBkcHkjHCULXM9
-         7kZA==
+        bh=cy4toclyMlICO1fw4f2pRj7YTFuPOLi7u+RsrPZ5wIc=;
+        b=lntrtQsOxTL8kLd35Q2ayRXnKFcYSQdZmT+KxXcUeBLEOObII1mnQH6u+lrWlv7f22
+         L2oFFB/DiDNYQRnMmZDptDToPqEnjApSeM3ywaxgNjSypfgvFTchLutgW8VlkH0zM4dR
+         TTL3fZ4s/9oREuqicH/UXvreFaqBvJp6jsqpZngaehZ30YZ8QvIGuYGOktqUOlfMug/O
+         WRBu+Zns4bTy3IwpJ1TvwhvoocbOUv4vrAEj6NUz0m6hmDky/g8ecRv9mw28TOnIhFRx
+         DVBLvvESwmEZN91BmvXBcVPk0/Erb7IjULnF1xpt9qSTW5v02iamxisUIxG41KhC6ysJ
+         TWJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=hEJHXTVLwkTpuWUzKJ0Wfx9WmvDXmOs4Rv2uPf9F4Js=;
-        b=jEcdAVnl8qYu5tFsTTonlRibkYu4WJq1tdAG/OGBbERiEKemO6YFlYDiaikj2Ytqb8
-         3TLKJKaqCst5VYw1SjeL0oo68YqbeDctJxSTJ4CZ0NAYHkTf4wyxtBVNzIVhwlOQN0b3
-         yxdLnemgJdxmEgMsJqblB6SRD4RBaM8oi8fMPtcY5pLDrQ09tNh57EUfxmkzc6xls/Rw
-         XV2Ue48937MRxbxRXvFSYeRHXe9WDyMkp2IA2zvWR3vLX5lJIZh/L6Tnn+gFFMdOONAt
-         jNwsbntnrgR0gcrwoqrcfGiImmgJ6hgLdm2GM6T9oOr3GhS8QJnzDi3MfEdoNAU+OhZT
-         PElg==
-X-Gm-Message-State: AJIora+yR+VhRqZUwlLH9tLrTvSTuktZuErSkxDaTD0d+4gGqVen3R3k
-        DoUXOA8DCgwIlUNTbbgxRdDZJg==
-X-Google-Smtp-Source: AGRyM1s6wNQc7ZfAaEgCrgntnZ3sArIfiE+t4bpEKBUKMp6gTJkbl6VDAQCdJN3uj+Gd2+eGLFNlTQ==
-X-Received: by 2002:a63:91ca:0:b0:40d:1a2b:d42e with SMTP id l193-20020a6391ca000000b0040d1a2bd42emr234054pge.379.1655851954562;
-        Tue, 21 Jun 2022 15:52:34 -0700 (PDT)
+        bh=cy4toclyMlICO1fw4f2pRj7YTFuPOLi7u+RsrPZ5wIc=;
+        b=olf17bwKTto9Tt/xBgMv6kjIuPhRhemV8FUuWXkwzvMA1Fa28ld8CBm2Xp/0VPQvWj
+         8aSf9i9wIwZLs60jfk0ZALbM8L3IHEisHkVT3IsJjm1ETcGSjiKekVgUlQQyS/VLZPjw
+         /wPHrKEAagDhlUWIURcxsBqy81jYoFAMJZfMa599EmQT7nm2S5/BJo/De5DbYptjWUgo
+         GA71Hrg/QxjGPbgg4/NFxd0cIKy64sWvoTRbn1DiVLKHTA8b7tHfLmUYdO3wpBEZXw7g
+         9e4dOeGCNpuqk6Ys4MPi9plwDHbjZ/DWoRJn/hQqx/PhGHF5Kt62v2tyr0TN/PEWoNEe
+         qUoQ==
+X-Gm-Message-State: AJIora+WL3CC/N9kfsOclMIogLgJmNgw4xUeu/gK4I+Q2/+oReVd1f6u
+        mbCzCi+KFA11yDz3R8vkIJyvuQ==
+X-Google-Smtp-Source: AGRyM1sQvUU10VSu/ajOX61LW32pLdpSr22xuvPnNyKPk5szXBlzyeIsJcYZ3OvR7giLsueMh8H/3g==
+X-Received: by 2002:a17:90b:1b0e:b0:1ec:e2f6:349e with SMTP id nu14-20020a17090b1b0e00b001ece2f6349emr835888pjb.14.1655852982081;
+        Tue, 21 Jun 2022 16:09:42 -0700 (PDT)
 Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id y5-20020a170902d64500b001641a68f1c7sm11164970plh.273.2022.06.21.15.52.34
+        by smtp.gmail.com with ESMTPSA id jd6-20020a170903260600b0016a1096bc95sm7264247plb.12.2022.06.21.16.09.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 15:52:34 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 15:52:31 -0700
+        Tue, 21 Jun 2022 16:09:41 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 16:09:38 -0700
 From:   Ricardo Koller <ricarkol@google.com>
 To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
 Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
         jade.alglave@arm.com, alexandru.elisei@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 22/23] arm64: Add support for efi in
- Makefile
-Message-ID: <YrJLr6nFZJ30sC9Q@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 23/23] arm64: Add an efi/run script
+Message-ID: <YrJPsmon33EAfe54@google.com>
 References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-23-nikos.nikoleris@arm.com>
+ <20220506205605.359830-24-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220506205605.359830-23-nikos.nikoleris@arm.com>
+In-Reply-To: <20220506205605.359830-24-nikos.nikoleris@arm.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,198 +71,168 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 06, 2022 at 09:56:04PM +0100, Nikos Nikoleris wrote:
-> Users can now build kvm-unit-tests as efi apps by supplying an extra
-> argument when invoking configure:
+On Fri, May 06, 2022 at 09:56:05PM +0100, Nikos Nikoleris wrote:
+> This change adds a efi/run script inspired by the one in x86. This
+> script will setup a folder with the test compiled as an EFI app and a
+> startup.nsh script. The script launches QEMU providing an image with
+> EDKII and the path to the folder with the test which is executed
+> automatically.
 > 
-> $> ./configure --enable-efi
+> For example:
 > 
-> This patch is based on an earlier version by
-> Andrew Jones <drjones@redhat.com>
+> $> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
 > 
 > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 > ---
->  configure           | 15 ++++++++++++---
->  arm/Makefile.arm    |  6 ++++++
->  arm/Makefile.arm64  | 18 ++++++++++++++----
->  arm/Makefile.common | 45 ++++++++++++++++++++++++++++++++++-----------
->  4 files changed, 66 insertions(+), 18 deletions(-)
+>  scripts/runtime.bash | 14 +++++-----
+>  arm/efi/run          | 61 ++++++++++++++++++++++++++++++++++++++++++++
+>  arm/run              |  8 ++++--
+>  arm/Makefile.common  |  1 +
+>  arm/dummy.c          |  4 +++
+>  5 files changed, 78 insertions(+), 10 deletions(-)
+>  create mode 100755 arm/efi/run
+>  create mode 100644 arm/dummy.c
 > 
-> diff --git a/configure b/configure
-> index 86c3095..beef655 100755
-> --- a/configure
-> +++ b/configure
-> @@ -195,14 +195,19 @@ else
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 7d0180b..dc28f24 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -131,14 +131,12 @@ function run()
 >      fi
->  fi
 >  
-> -if [ "$efi" ] && [ "$arch" != "x86_64" ]; then
-> +if [ "$efi" ] && [ "$arch" != "x86_64" ] && [ "$arch" != "arm64" ]; then
->      echo "--[enable|disable]-efi is not supported for $arch"
->      usage
->  fi
+>      last_line=$(premature_failure > >(tail -1)) && {
+> -        skip=true
+> -        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "enabling apic" ]]; then
+> -            skip=false
+> -        fi
+> -        if [ ${skip} == true ]; then
+> -            print_result "SKIP" $testname "" "$last_line"
+> -            return 77
+> -        fi
+> +        if [ "${CONFIG_EFI}" == "y" ] && [ "${ARCH}" = x86_64 ]; then
+> +		if ! [[ "${last_line}" =~ "enabling apic" ]]; then
+> +			print_result "SKIP" $testname "" "$last_line"
+> +			return 77
+> +		fi
+> +	fi
+>      }
 >  
->  if [ -z "$page_size" ]; then
-> -    [ "$arch" = "arm64" ] && page_size="65536"
-> -    [ "$arch" = "arm" ] && page_size="4096"
-> +    if [ "$efi" = 'y' ] && [ "$arch" = "arm64" ]; then
-> +        page_size="4096"
-> +    elif [ "$arch" = "arm64" ]; then
-> +        page_size="65536"
-> +    elif [ "$arch" = "arm" ]; then
-> +        page_size="4096"
-> +    fi
->  else
->      if [ "$arch" != "arm64" ]; then
->          echo "--page-size is not supported for $arch"
-> @@ -217,6 +222,10 @@ else
->          echo "arm64 doesn't support page size of $page_size"
->          usage
->      fi
-> +    if [ "$efi" = 'y' ] && [ "$page_size" != "4096" ]; then
-> +        echo "efi must use 4K pages"
-> +        exit 1
-> +    fi
->  fi
->  
->  [ -z "$processor" ] && processor="$arch"
-> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-> index 01fd4c7..2ce00f5 100644
-> --- a/arm/Makefile.arm
-> +++ b/arm/Makefile.arm
-> @@ -7,6 +7,10 @@ bits = 32
->  ldarch = elf32-littlearm
->  machine = -marm -mfpu=vfp
->  
-> +ifeq ($(CONFIG_EFI),y)
-> +$(error Cannot build arm32 tests as EFI apps)
-> +endif
+>      cmdline=$(get_cmdline $kernel)
+> diff --git a/arm/efi/run b/arm/efi/run
+> new file mode 100755
+> index 0000000..dfff717
+> --- /dev/null
+> +++ b/arm/efi/run
+> @@ -0,0 +1,61 @@
+> +#!/bin/bash
 > +
->  # stack.o relies on frame pointers.
->  KEEP_FRAME_POINTER := y
->  
-> @@ -32,6 +36,8 @@ cflatobjs += lib/arm/stack.o
->  cflatobjs += lib/ldiv32.o
->  cflatobjs += lib/arm/ldivmod.o
->  
-> +exe = flat
+> +set -e
 > +
->  # arm specific tests
->  tests =
->  
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 6feac76..550e1b2 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -27,11 +27,21 @@ cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
->  
->  OBJDIRS += lib/arm64
->  
-> +ifeq ($(CONFIG_EFI),y)
-> +# avoid jump tables before all relocations have been processed
-> +arm/efi/reloc_aarch64.o: CFLAGS += -fno-jump-tables
-> +cflatobjs += arm/efi/reloc_aarch64.o
+> +if [ $# -eq 0 ]; then
+> +	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
+> +	exit 2
+> +fi
 > +
-> +exe = efi
+> +if [ ! -f config.mak ]; then
+> +	echo "run './configure --enable-efi && make' first. See ./configure -h"
+> +	exit 2
+> +fi
+> +source config.mak
+> +source scripts/arch-run.bash
+> +source scripts/common.bash
+> +
+> +: "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
+> +: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
+> +: "${EFI_TEST:=efi-tests}"
+> +: "${EFI_CASE:=$(basename $1 .efi)}"
+> +
+> +if [ ! -f "$EFI_UEFI" ]; then
+> +	echo "UEFI firmware not found: $EFI_UEFI"
+> +	echo "Please install the UEFI firmware to this path"
+> +	echo "Or specify the correct path with the env variable EFI_UEFI"
+> +	exit 2
+> +fi
+> +
+> +# Remove the TEST_CASE from $@
+> +shift 1
+> +
+> +# Fish out the arguments for the test, they should be the next string
+> +# after the "-append" option
+> +qemu_args=()
+> +cmd_args=()
+> +while (( "$#" )); do
+> +	if [ "$1" = "-append" ]; then
+> +		cmd_args=$2
+> +		shift 2
+
+Does this work with params like this (2 words)?
+
+	[pmu-cycle-counter]
+	file = pmu.flat
+	groups = pmu
+	extra_params = -append 'cycle-counter 0'
+
+> +	else
+> +		qemu_args+=("$1")
+> +		shift 1
+> +	fi
+> +done
+> +
+> +if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+> +	EFI_CASE=dummy
+> +fi
+> +
+> +: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
+> +mkdir -p "$EFI_CASE_DIR"
+> +
+> +cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+> +echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
+> +echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
+> +
+> +EFI_RUN=y $TEST_DIR/run \
+> +       -bios "$EFI_UEFI" \
+> +       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+> +       "${qemu_args[@]}"
+> diff --git a/arm/run b/arm/run
+> index 28a0b4a..e96875e 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -67,7 +67,11 @@ fi
+>  
+>  A="-accel $ACCEL"
+>  command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> -command+=" -display none -serial stdio -kernel"
+> +command+=" -display none -serial stdio"
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+> -run_qemu $command "$@"
+> +if [ "$EFI_RUN" = "y" ]; then
+> +	ENVIRON_DEFAULT=n run_qemu $command "$@"
 > +else
-> +exe = flat
-> +endif
-> +
->  # arm64 specific tests
-> -tests = $(TEST_DIR)/timer.flat
-> -tests += $(TEST_DIR)/micro-bench.flat
-> -tests += $(TEST_DIR)/cache.flat
-> -tests += $(TEST_DIR)/debug.flat
-> +tests = $(TEST_DIR)/timer.$(exe)
-> +tests += $(TEST_DIR)/micro-bench.$(exe)
-> +tests += $(TEST_DIR)/cache.$(exe)
-> +tests += $(TEST_DIR)/debug.$(exe)
->  
->  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  
+> +	run_qemu $command -kernel "$@"
+> +fi
 > diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index 5be42c0..a8007f4 100644
+> index a8007f4..aabd335 100644
 > --- a/arm/Makefile.common
 > +++ b/arm/Makefile.common
-> @@ -4,14 +4,14 @@
->  # Authors: Andrew Jones <drjones@redhat.com>
->  #
->  
-> -tests-common  = $(TEST_DIR)/selftest.flat
-> -tests-common += $(TEST_DIR)/spinlock-test.flat
-> -tests-common += $(TEST_DIR)/pci-test.flat
-> -tests-common += $(TEST_DIR)/pmu.flat
-> -tests-common += $(TEST_DIR)/gic.flat
-> -tests-common += $(TEST_DIR)/psci.flat
-> -tests-common += $(TEST_DIR)/sieve.flat
-> -tests-common += $(TEST_DIR)/pl031.flat
-> +tests-common  = $(TEST_DIR)/selftest.$(exe)
-> +tests-common += $(TEST_DIR)/spinlock-test.$(exe)
-> +tests-common += $(TEST_DIR)/pci-test.$(exe)
-> +tests-common += $(TEST_DIR)/pmu.$(exe)
-> +tests-common += $(TEST_DIR)/gic.$(exe)
-> +tests-common += $(TEST_DIR)/psci.$(exe)
-> +tests-common += $(TEST_DIR)/sieve.$(exe)
-> +tests-common += $(TEST_DIR)/pl031.$(exe)
+> @@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.$(exe)
+>  tests-common += $(TEST_DIR)/psci.$(exe)
+>  tests-common += $(TEST_DIR)/sieve.$(exe)
+>  tests-common += $(TEST_DIR)/pl031.$(exe)
+> +tests-common += $(TEST_DIR)/dummy.$(exe)
 >  
 >  tests-all = $(tests-common) $(tests)
 >  all: directories $(tests-all)
-> @@ -54,6 +54,9 @@ cflatobjs += lib/arm/smp.o
->  cflatobjs += lib/arm/delay.o
->  cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
->  cflatobjs += lib/arm/timer.o
-> +ifeq ($(CONFIG_EFI),y)
-> +cflatobjs += lib/efi.o
-> +endif
->  
->  OBJDIRS += lib/arm
->  
-> @@ -61,6 +64,25 @@ libeabi = lib/arm/libeabi.a
->  eabiobjs = lib/arm/eabi_compat.o
->  
->  FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
-> +
-> +ifeq ($(CONFIG_EFI),y)
-> +%.so: EFI_LDFLAGS += -defsym=EFI_SUBSYSTEM=0xa --no-undefined
-> +%.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds $(cstart.o)
-> +	$(CC) $(CFLAGS) -c -o $(@:.so=.aux.o) $(SRCDIR)/lib/auxinfo.c \
-> +		-DPROGNAME=\"$(@:.so=.efi)\" -DAUXFLAGS=$(AUXFLAGS)
-> +	$(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
-> +		$(filter %.o, $^) $(FLATLIBS) $(@:.so=.aux.o) \
-> +		$(EFI_LIBS)
-> +	$(RM) $(@:.so=.aux.o)
-> +
-> +%.efi: %.so
-> +	$(call arch_elf_check, $^)
-> +	$(OBJCOPY) \
-> +		-j .text -j .sdata -j .data -j .dynamic -j .dynsym \
-> +		-j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
-> +		-j .reloc \
-> +		-O binary $^ $@
-> +else
->  %.elf: LDFLAGS = -nostdlib $(arch_LDFLAGS)
->  %.elf: %.o $(FLATLIBS) $(SRCDIR)/arm/flat.lds $(cstart.o)
->  	$(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) $(SRCDIR)/lib/auxinfo.c \
-> @@ -74,13 +96,14 @@ FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
->  	$(call arch_elf_check, $^)
->  	$(OBJCOPY) -O binary $^ $@
->  	@chmod a-x $@
-> +endif
->  
->  $(libeabi): $(eabiobjs)
->  	$(AR) rcs $@ $^
->  
->  arm_clean: asm_offsets_clean
-> -	$(RM) $(TEST_DIR)/*.{o,flat,elf} $(libeabi) $(eabiobjs) \
-> -	      $(TEST_DIR)/.*.d lib/arm/.*.d
-> +	$(RM) $(TEST_DIR)/*.{o,flat,elf,so,efi} $(libeabi) $(eabiobjs) \
-> +	      $(TEST_DIR)/.*.d $(TEST_DIR)/efi/.*.d lib/arm/.*.d
->  
->  generated-files = $(asm-offsets)
-> -$(tests-all:.flat=.o) $(cstart.o) $(cflatobjs): $(generated-files)
-> +$(tests-all:.$(exe)=.o) $(cstart.o) $(cflatobjs): $(generated-files)
+> diff --git a/arm/dummy.c b/arm/dummy.c
+> new file mode 100644
+> index 0000000..5019e79
+> --- /dev/null
+> +++ b/arm/dummy.c
+> @@ -0,0 +1,4 @@
+> +int main(int argc, char **argv)
+> +{
+> +	return 0;
+> +}
 > -- 
 > 2.25.1
->
-
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> 
