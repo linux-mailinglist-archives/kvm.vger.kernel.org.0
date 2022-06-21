@@ -2,89 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E9FD553E80
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 00:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 812FD553E8C
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 00:32:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353601AbiFUWar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 18:30:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
+        id S1354033AbiFUWcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 18:32:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231234AbiFUWap (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 18:30:45 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4435831524
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:30:44 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id a29so24740020lfk.2
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:30:44 -0700 (PDT)
+        with ESMTP id S230302AbiFUWct (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 18:32:49 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC4F3190B
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:32:48 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 184so14377146pga.12
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:32:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=be4KTBeZxtpbZf3YZP05Js8VaqFOMrf83r+bDTDFiOM=;
-        b=TbHQbtE0PGZvjMfU0/fdCKW8kn0RfxMLcQkuL7vMebVX3ouG4SBKD8sC2tkjx1p4tL
-         JxLcXHa+y4RxHDPxAebJuKeKGscJoUKjrE8VXTvglAp1x/G4b03ih1fW6yNXCTiMQAPw
-         teAuWEmSVhc73eNHdbcV4Cw5YrPPKwRNTZrJn8Pi8wlXst7by6Z/L8eV9UBD3t3RBMx4
-         6tPWew7RqfGH09r381WEW8Hp903+By355KdF31SA7pdi4YDiewE/7uhPhZfmYqySyvZp
-         6jI1juXcpFpqrIIQaJi/mwPudugxTKnpFg9ho/joL50I2hmuYTg9jX/3uWx6noKgzt2W
-         Yh6A==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/3O2LWBbOXfJ4ZXSx1dx9gcYSMerGZQCAOg59Vfth3s=;
+        b=E5T4dLgRo5shBqjOJlgImNBqjxAzXPnOskJ+63lPpTwj/rSC6rtEUqJb9lywFaJ0FC
+         50Ds5jXdaaw6BsGnu2vuuP/SCQv7W8zUx+DQ4yhhcTnF0NAyrEFxFAxqbn4G2XpEPF7i
+         vqm4J0ySnIFUk61Te1aeDmnplW5OFKTXMi2mJmFuUZuCFmJ1rPQ42V+aWR+MsoIH1S+y
+         9oTBkxWgl5NrKoxbE4N32l95bZ55oCt2IaP6UKMX320uD5gPmroXt59/j4axmaUbW8Qs
+         mv3Z4l9Zp/WDNVzoJIgF1RIb22sgAU0TN0tvFgh3NFofQOcuqV0mCnfuZug8bghrm+Lv
+         HTyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=be4KTBeZxtpbZf3YZP05Js8VaqFOMrf83r+bDTDFiOM=;
-        b=j8+cpViSa5W/UEezSsJdroNH+TLcD+Tv9Cj7e/hZsPLvRMcYyraKEpvm5DzIiCTPGE
-         4acP3CG60FAV6+dWSb/ALPn61Lrtaeiw7grb/cUlRU6u8/fYSs6X29Em9NlJRkq4nags
-         z2y9e+8elWgLKYqB+Ta5IsNbG9NkC6QAyfYuGk1oGs8BN4svTrhJgWKddYkp6PyxxFQi
-         jTS1PKgcB+XBYeLe6yozn+ieI4riDHJ0MyG0PG3IDkih06Qrj0Dg7xVdo5JbQk+8YAXy
-         zGEsw+FqNQCBwTduEIFF0xKR5vRuB/ZSik9ulsHoxcF4p6oqGHm8dVfIydRVzyp4LABV
-         UPqw==
-X-Gm-Message-State: AJIora9tUDzRUlqXm2cWcVUR2qOQvXZpGCEsQEcGQvZ275T666XkB2WR
-        6aUphaXNBmSui/3Rvjj1p3P1yelh69sRPWt/mA/KuA==
-X-Google-Smtp-Source: AGRyM1tNImbx2kxK7HvpjgFsrzYuq9fWYBmKlPeBU+D7of5gQReoy2FIhun71/isgSXq7ZOimBGSU35RGWxiIk/cWOU=
-X-Received: by 2002:a05:6512:3085:b0:479:3986:1d23 with SMTP id
- z5-20020a056512308500b0047939861d23mr274153lfd.373.1655850642319; Tue, 21 Jun
- 2022 15:30:42 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/3O2LWBbOXfJ4ZXSx1dx9gcYSMerGZQCAOg59Vfth3s=;
+        b=zSmOogJQ5sIyaL+blemoqZaDxdJ88Ueb8l9J+jLPPPgzIpnxOOzjL2QCancF3tuZWz
+         xWkMpugVKcKYNwpQDyAr/jt18d4lN5C4ALJh7CN2+zeif6KXeXxEjsawgPfoPF6804UB
+         Na1zG7usvwuV5QedvG1UR33/aF2QK7mCdQcPCXWexEpBlplV7Jauy4a3dNiUpC4Nv4sG
+         7VYIzFRoRuZT7vQgtYAfHE+38PT87FIOW12upSw/rBrpuDCUtiRf/ySOg43i1PufyfRk
+         UFpjX0rbjaZL+eKl/iwGCK1z9xi5PfkPKUq9S/JvWonhKRxfuU6vwWzvDb75Ga8b3lF7
+         0YCQ==
+X-Gm-Message-State: AJIora+c2RL1uSwltP24tPbR2P3LXxFVSny27R0Ibmat7qsVtl4kSZaT
+        gClvOcrwAT4rgMyQdhuECkN02w==
+X-Google-Smtp-Source: AGRyM1vIl7PHb/fWKHNlfq1vvYAhO0fNZounDNCSaSBhT1SZ4x/ogXV8GnOQwQrPGee8fVvKAcjDTQ==
+X-Received: by 2002:a62:1652:0:b0:525:4253:6f5a with SMTP id 79-20020a621652000000b0052542536f5amr1775803pfw.59.1655850767898;
+        Tue, 21 Jun 2022 15:32:47 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id e11-20020a170902ed8b00b00161e50e2245sm7971291plj.178.2022.06.21.15.32.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jun 2022 15:32:47 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 15:32:44 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
+        jade.alglave@arm.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 19/23] arm64: Use code from the gnu-efi
+ when booting with EFI
+Message-ID: <YrJHDBeTGgd+dpDP@google.com>
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <20220506205605.359830-20-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <afae5980fd4adf52932a9d639a0b0bfe83255c0a.1655761627.git.ashish.kalra@amd.com>
-In-Reply-To: <afae5980fd4adf52932a9d639a0b0bfe83255c0a.1655761627.git.ashish.kalra@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 21 Jun 2022 16:30:30 -0600
-Message-ID: <CAMkAt6pn4FmJchYP9ac3q_Zcrnupgs9Qu-fMe6axXzW_YE283Q@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 18/49] crypto: ccp: Provide APIs to query
- extended attestation report
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220506205605.359830-20-nikos.nikoleris@arm.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -96,136 +72,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 5:06 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> Version 2 of the GHCB specification defines VMGEXIT that is used to get
-> the extended attestation report. The extended attestation report includes
-> the certificate blobs provided through the SNP_SET_EXT_CONFIG.
->
-> The snp_guest_ext_guest_request() will be used by the hypervisor to get
-> the extended attestation report. See the GHCB specification for more
-> details.
->
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+On Fri, May 06, 2022 at 09:56:01PM +0100, Nikos Nikoleris wrote:
+> arm/efi/crt0-efi-aarch64.S defines the header and the handover
+> sequence from EFI to a efi_main. This change includes the whole file
+> in arm/cstart64.S when we compile with EFI support.
+> 
+> In addition, we change the handover code in arm/efi/crt0-efi-aarch64.S
+> to align the stack pointer. This alignment is necessary because we
+> make assumptions about cpu0's stack alignment and most importantly we
+> place its thread_info at the bottom of this stack.
+> 
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 > ---
->  drivers/crypto/ccp/sev-dev.c | 43 ++++++++++++++++++++++++++++++++++++
->  include/linux/psp-sev.h      | 24 ++++++++++++++++++++
->  2 files changed, 67 insertions(+)
->
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 97b479d5aa86..f6306b820b86 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -25,6 +25,7 @@
->  #include <linux/fs.h>
->
->  #include <asm/smp.h>
-> +#include <asm/sev.h>
->
->  #include "psp-dev.h"
->  #include "sev-dev.h"
-> @@ -1857,6 +1858,48 @@ int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
->  }
->  EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
->
-> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> +                               unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
-> +{
-> +       unsigned long expected_npages;
-> +       struct sev_device *sev;
-> +       int rc;
+>  arm/cstart64.S             |  6 ++++++
+>  arm/efi/crt0-efi-aarch64.S | 17 +++++++++++++++--
+>  2 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 55b41ea..08cf02f 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -15,6 +15,10 @@
+>  #include <asm/thread_info.h>
+>  #include <asm/sysreg.h>
+>  
+> +#ifdef CONFIG_EFI
+> +#include "efi/crt0-efi-aarch64.S"
+> +#else
 > +
-> +       if (!psp_master || !psp_master->sev_data)
-> +               return -ENODEV;
+>  .macro zero_range, tmp1, tmp2
+>  9998:	cmp	\tmp1, \tmp2
+>  	b.eq	9997f
+> @@ -107,6 +111,8 @@ start:
+>  	bl	exit
+>  	b	halt
+>  
+> +#endif
 > +
-> +       sev = psp_master->sev_data;
-> +
-> +       if (!sev->snp_inited)
-> +               return -EINVAL;
-> +
-> +       /*
-> +        * Check if there is enough space to copy the certificate chain. Otherwise
-> +        * return ERROR code defined in the GHCB specification.
-> +        */
-> +       expected_npages = sev->snp_certs_len >> PAGE_SHIFT;
-> +       if (*npages < expected_npages) {
-> +               *npages = expected_npages;
-> +               *fw_err = SNP_GUEST_REQ_INVALID_LEN;
-> +               return -EINVAL;
-> +       }
-> +
-> +       rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)&fw_err);
+>  .text
+>  
+>  /*
+> diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
+> index d50e78d..11a062d 100644
+> --- a/arm/efi/crt0-efi-aarch64.S
+> +++ b/arm/efi/crt0-efi-aarch64.S
+> @@ -111,10 +111,19 @@ section_table:
+>  
+>  	.align		12
+>  _start:
+> -	stp		x29, x30, [sp, #-32]!
+> +	stp		x29, x30, [sp, #-16]!
 
-We can just pass |fw_error| here (with the cast) here right? Not need
-to do &fw_err.
+Is this and the "ldp x29, x30, [sp], #16" change below needed?
+why is #-32 not good?
 
-      rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)fw_err);
+> +
+> +	// Align sp; this is necessary due to way we store cpu0's thread_info
 
-> +       if (rc)
-> +               return rc;
-> +
-> +       /* Copy the certificate blob */
-> +       if (sev->snp_certs_data) {
-> +               *npages = expected_npages;
-> +               memcpy((void *)vaddr, sev->snp_certs_data, *npages << PAGE_SHIFT);
+/* */ comment style
 
-Why don't we just make |vaddr| into a void* instead of an unsigned long?
+>  	mov		x29, sp
+> +	and		x29, x29, #THREAD_MASK
+> +	mov		x30, sp
+> +	mov		sp, x29
+> +	str		x30, [sp, #-32]!
+> +
+> +	mov             x29, sp
+>  
+>  	stp		x0, x1, [sp, #16]
+> +
+>  	mov		x2, x0
+>  	mov		x3, x1
+>  	adr		x0, ImageBase
+> @@ -126,5 +135,9 @@ _start:
+>  	ldp		x0, x1, [sp, #16]
+>  	bl		efi_main
+>  
+> -0:	ldp		x29, x30, [sp], #32
+> +	// Restore sp
 
-> +       } else {
-> +               *npages = 0;
-> +       }
+/* */ comment style
+
+> +	ldr		x30, [sp]
+
+I'm not able to understand this. Is this ldr restoring the value pushed
+with "str x30, [sp, #-32]!" above? in that case, shouldn't this be at
+[sp - 32]? But, given that this code is unreachable when efi_main is
+called, do you even need to restore the sp?
+
+> +	mov             sp, x30
 > +
-> +       return rc;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_ext_guest_request);
-> +
->  static void sev_exit(struct kref *ref)
->  {
->         misc_deregister(&misc_dev->misc);
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index a3bb792bb842..cd37ccd1fa1f 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -945,6 +945,23 @@ void *psp_copy_user_blob(u64 uaddr, u32 len);
->  void *snp_alloc_firmware_page(gfp_t mask);
->  void snp_free_firmware_page(void *addr);
->
-> +/**
-> + * snp_guest_ext_guest_request - perform the SNP extended guest request command
-> + *  defined in the GHCB specification.
-> + *
-> + * @data: the input guest request structure
-> + * @vaddr: address where the certificate blob need to be copied.
-> + * @npages: number of pages for the certificate blob.
-> + *    If the specified page count is less than the certificate blob size, then the
-> + *    required page count is returned with error code defined in the GHCB spec.
-> + *    If the specified page count is more than the certificate blob size, then
-> + *    page count is updated to reflect the amount of valid data copied in the
-> + *    vaddr.
-> + */
-> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> +                               unsigned long vaddr, unsigned long *npages,
-> +                               unsigned long *error);
-> +
->  #else  /* !CONFIG_CRYPTO_DEV_SP_PSP */
->
->  static inline int
-> @@ -992,6 +1009,13 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
->
->  static inline void snp_free_firmware_page(void *addr) { }
->
-> +static inline int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> +                                             unsigned long vaddr, unsigned long *n,
-> +                                             unsigned long *error)
-> +{
-> +       return -ENODEV;
-> +}
-> +
->  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
->
->  #endif /* __PSP_SEV_H__ */
-> --
+> +0:	ldp		x29, x30, [sp], #16
+>  	ret
+> -- 
 > 2.25.1
->
+> 
