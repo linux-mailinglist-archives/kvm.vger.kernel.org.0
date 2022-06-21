@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48BBA553EB9
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 00:51:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B41E4553EBE
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 00:52:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354615AbiFUWvm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 18:51:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47850 "EHLO
+        id S1354923AbiFUWwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 18:52:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230021AbiFUWvl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 18:51:41 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD0E2F008
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:51:40 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id c205so7681023pfc.7
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:51:40 -0700 (PDT)
+        with ESMTP id S229951AbiFUWwg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 18:52:36 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434762F008
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:52:35 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id x4so8078905pfq.2
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:52:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=azlAAGz618kiomZlrecMnLLAJbtZMZPGRWZS5TwAPYo=;
-        b=fEWglGipZEemPrLunm+CRK5rgLUflGaMubsoz2U7KEniqt3+EM6rpj7cPX3pSs9Ya9
-         54jxpPsud5cpFV7eTM0L+eJXhsQNOCjJavWClKa8kBIONrHNfBqGQ6W/ac0/eO9eqeVZ
-         QXN+DpkMPuON3MRW5kMF3XcSPKuzLb0fYaW+XsepGISySuslsAm3xRpGqZ1R0TL6HnNy
-         hrAePqrnpTaNA1qRWPLK7NnyeZJDohcVFmWXT10B2UMvi5PzoTSaWQgEF+nqO0liawWY
-         JoLa1FDphy5P1pqVzNxHM7TsalO3eFcondTLN1EuNOxhug2RucOdyj4QtoCF09CH/rBx
-         1TFA==
+        bh=hEJHXTVLwkTpuWUzKJ0Wfx9WmvDXmOs4Rv2uPf9F4Js=;
+        b=D3Kc4W7OvAoEI5hUlTGgrx4MCCIxGu9ous6K14y0/pPAVG7cwugH+DQDNFtwS2AFpF
+         xFv7uK2tNxzWXK3gXvgHxQ6nxTO2KXhdvoywaOskkg9kujUSqmUOTjZ6ti6CiNQyWfFb
+         bJZUdAVaqLavYCjCWm4izTbVvqr+ZOtrhEKfyViauMIy1MC7IUnqCA2FT0tFvU1pLdX5
+         kqEkQ0bEInVu0JRMEOcbshUpCgEeWfXrWlbGWNUJORVhtFSYEradM28UMt4aOdODJVAk
+         i7B3sTyAbCTCl3RHLGI0Y9MjUSK3u8YRLLeVrc2ZfrhumhYHzedP6PYBkcHkjHCULXM9
+         7kZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=azlAAGz618kiomZlrecMnLLAJbtZMZPGRWZS5TwAPYo=;
-        b=sjzLE0bWUOhBsZYamcOFfXdyLyzUCv6+0r/TXmJABv0tkMPRoZfBuflkbqh3X7C1+E
-         oKoHkfUX3ycpPpDFJqx3dt9cpaZ/Mz42cIkrxHtgl9DxkL+AmYj40pvnQK5U6g1zbNu5
-         azmz9W6r1IRvsDMrU+R3/OSY2Jg2MaXrRLiy1NE4/2IU5OUYQ1vEH5Xb7CmmevbAFPCd
-         R2StZSfFLFmN0ys71kKI/GVkAGQWryreK2hyo/3aj8yKji4Sd3LMYLWbC7v1QDv6O4Pj
-         3MszkYEoom/cBS/naWWTi4UPFlM2qo3a+uecIb7WX+b+K770zkg1csPGQI2cAkft0wGP
-         yKvw==
-X-Gm-Message-State: AJIora+/RJCA8ot4UsbUVBPhhehO23S/d6gLeOZhBi5GHyOD3XVsv17T
-        kUKDT7smWOIlrAQLcrOsGc9CGQ==
-X-Google-Smtp-Source: AGRyM1uUCiS+VpM0QdIssRacWqApw+iKZL2xRzxEwVEA6qhWlcXLcQ57DL3+AaXvgp8pgRULjTNQKQ==
-X-Received: by 2002:a05:6a00:1acc:b0:525:345d:cdcf with SMTP id f12-20020a056a001acc00b00525345dcdcfmr6820314pfv.76.1655851899588;
-        Tue, 21 Jun 2022 15:51:39 -0700 (PDT)
+        bh=hEJHXTVLwkTpuWUzKJ0Wfx9WmvDXmOs4Rv2uPf9F4Js=;
+        b=jEcdAVnl8qYu5tFsTTonlRibkYu4WJq1tdAG/OGBbERiEKemO6YFlYDiaikj2Ytqb8
+         3TLKJKaqCst5VYw1SjeL0oo68YqbeDctJxSTJ4CZ0NAYHkTf4wyxtBVNzIVhwlOQN0b3
+         yxdLnemgJdxmEgMsJqblB6SRD4RBaM8oi8fMPtcY5pLDrQ09tNh57EUfxmkzc6xls/Rw
+         XV2Ue48937MRxbxRXvFSYeRHXe9WDyMkp2IA2zvWR3vLX5lJIZh/L6Tnn+gFFMdOONAt
+         jNwsbntnrgR0gcrwoqrcfGiImmgJ6hgLdm2GM6T9oOr3GhS8QJnzDi3MfEdoNAU+OhZT
+         PElg==
+X-Gm-Message-State: AJIora+yR+VhRqZUwlLH9tLrTvSTuktZuErSkxDaTD0d+4gGqVen3R3k
+        DoUXOA8DCgwIlUNTbbgxRdDZJg==
+X-Google-Smtp-Source: AGRyM1s6wNQc7ZfAaEgCrgntnZ3sArIfiE+t4bpEKBUKMp6gTJkbl6VDAQCdJN3uj+Gd2+eGLFNlTQ==
+X-Received: by 2002:a63:91ca:0:b0:40d:1a2b:d42e with SMTP id l193-20020a6391ca000000b0040d1a2bd42emr234054pge.379.1655851954562;
+        Tue, 21 Jun 2022 15:52:34 -0700 (PDT)
 Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id y5-20020a170902d64500b001641a68f1c7sm11164351plh.273.2022.06.21.15.51.39
+        by smtp.gmail.com with ESMTPSA id y5-20020a170902d64500b001641a68f1c7sm11164970plh.273.2022.06.21.15.52.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 15:51:39 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 15:51:35 -0700
+        Tue, 21 Jun 2022 15:52:34 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 15:52:31 -0700
 From:   Ricardo Koller <ricarkol@google.com>
 To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
 Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
         jade.alglave@arm.com, alexandru.elisei@arm.com
 Subject: Re: [kvm-unit-tests PATCH v2 22/23] arm64: Add support for efi in
  Makefile
-Message-ID: <YrJLd9mreN4cb3NE@google.com>
+Message-ID: <YrJLr6nFZJ30sC9Q@google.com>
 References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
  <20220506205605.359830-23-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
@@ -124,10 +124,6 @@ On Fri, May 06, 2022 at 09:56:04PM +0100, Nikos Nikoleris wrote:
 > +        echo "efi must use 4K pages"
 > +        exit 1
 > +    fi
-
-nit: not really needed as x86 doesn't allow other page sizes, arm64
-already forces 4096 above, and arm32 doesn't support efi.
-
 >  fi
 >  
 >  [ -z "$processor" ] && processor="$arch"
@@ -268,4 +264,6 @@ already forces 4096 above, and arm32 doesn't support efi.
 > +$(tests-all:.$(exe)=.o) $(cstart.o) $(cflatobjs): $(generated-files)
 > -- 
 > 2.25.1
-> 
+>
+
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
