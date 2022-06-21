@@ -2,64 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60A9D55394F
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 20:00:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39CBE553964
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 20:11:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230506AbiFUSAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 14:00:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50390 "EHLO
+        id S235563AbiFUSLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 14:11:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353090AbiFUSAB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 14:00:01 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453BC22BFB
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:59:59 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d5so13185899plo.12
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:59:59 -0700 (PDT)
+        with ESMTP id S229592AbiFUSLc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 14:11:32 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2841E19006
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 11:11:30 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id j21so10620808lfe.1
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 11:11:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OFlAbsvpGwxKC8v9hcxNHeeToeoSLQTFfbixtor1asE=;
-        b=k18+wrY6BPrHu7s+c3MAiZve3MKiPu1tFg8myfBwNap03HiXzxDIcQSx4uELC5WLUV
-         +EQRKVER6Gxi411v3Jjl9eEr3Ff+O1gzo/1SXgvKeAD7/GFwyQtSpcDdftR9Cz51ojGW
-         tY+0h37qKGyMOG8jvX/kPczlVCKSGz/mrkaH3Hlcogj7ToqvjtfGVsc52Wpp9K+ZANKe
-         8CJLLlxKBgj1zbybmmmLFj8oiLgL8fc5lV3T1IMHwmeRYCMRjdTftkk8ImIemctvVTEG
-         wEqK0tXMDufOxiBqbgGG9sSfHzRiTLj/LE49geRDAm/gZjVWXRC+0EIePMnP0uM4+bnl
-         JgoQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2OSsNJ8sjhHVo8wfzEftOtkr5HcPtOIMNqFox2iufIY=;
+        b=KfpRIF7uvdbQP1hWnFLJ+wpZPfbpqsrugXnGuBN4Y2LuuBPaadL720Ip9F4FODWsdT
+         VM2j0PB8vjwQRVjuQToTj6i29KrZVTNE+QMAvS3+6HqT9yurtX34jlaqW6+JLTqkHKPa
+         skmol3spbDfgOnTVWWODiSdu/2ZDcdYZhc0h5mQBzLxrzbKg2HAM8W4laB/s5SWWc9VM
+         iBFc1MaF6aaxT4b8v1GCvc9D1YL01eGPpZyzbtsnzaZBQRZTYWCcih8VNdNv1wdRcaKP
+         uA2sE9f38hN0pSnYgZaS3peHv6Gu5t6F6GktqAdvmdJS19+hl6JgNbGekkmN2ZsCd2Z/
+         sDMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OFlAbsvpGwxKC8v9hcxNHeeToeoSLQTFfbixtor1asE=;
-        b=VENTrxRDplTTMuIeHycUD4nKZ70TsZJIeeqC9ULfIkUPZ2678LBy9O4jU4zwdaO8ef
-         SHemBX29kZnWSXa11BpfN+2S23p1VpE+2M1d1CdAnBTXy3vQlVrRWKTGejoTo54sxltm
-         mf+eODEY8H87k4tqgviYmQ3hdJPQ57mQi/6P9jDgb4YVI6R4dSaDKs20NSTDbItyFFK5
-         oI++30x0nqyMQKpPwvwJdVwJ34iIVxgXAEDJNOMSZuCbf//z9vkIhoyUDkf5CNBaGN7P
-         SC7Q6IhiaujrWBp/pN13PwN/vLPB8FWlu+o2tWECSdUoqsMTinSSeQLIVxW/u/glavKi
-         cuzg==
-X-Gm-Message-State: AJIora/9RcwLeUgEnspauUYFZw3xZgjXKqcWdi1rvxA1TWQUIvlKzSFW
-        mOf4DCTpgSJgUmPHcJ6eFHwhzA==
-X-Google-Smtp-Source: AGRyM1tSSCafU7Vxohem8QAV6z+b9PtjEV98SClT0W+H+3Vdi/nlDW3HxJmV38c5XPeq1hamq42XHA==
-X-Received: by 2002:a17:902:d2c1:b0:16a:4028:4748 with SMTP id n1-20020a170902d2c100b0016a40284748mr2138865plc.37.1655834398514;
-        Tue, 21 Jun 2022 10:59:58 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id d21-20020a056a0010d500b005251c3e7ac5sm5582086pfu.166.2022.06.21.10.59.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 10:59:57 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 10:59:54 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
-        jade.alglave@arm.com, alexandru.elisei@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 17/23] arm64: Copy code from GNU-EFI
-Message-ID: <YrIHGlx1OmswclFa@google.com>
-References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
- <20220506205605.359830-18-nikos.nikoleris@arm.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2OSsNJ8sjhHVo8wfzEftOtkr5HcPtOIMNqFox2iufIY=;
+        b=A7sV9cfz1Mn4J3ZUq1x0QRTpRperUpVwzv02DQu0atmhXvISzpRRXHQQIJJJ33j1br
+         EK1/kvlS/4f8lpN/sloUU1j/R/mTkcPm3xcp1l/lIjSSbuBI9rReiLql99vBA8gOB9rX
+         WHztmO2WV3giBzz2sgb8llKbzjsUO4KwqK+X4OP6nex7INdEm93CiEPtaUOm9gLuEElv
+         Z41sOZ9cqL2hGD8nabqc1PEUt9o+vudgukU8BSI8pzBgt+LcrllBHmfTaOCbbaD3FIqZ
+         eQG32IAvxsOomzxUgR7AmGNSPFgzZUkPlTuPIwxG7+4GIvMJMx94uKt7twUwuI3NR4tW
+         QseA==
+X-Gm-Message-State: AJIora8O+/XV3mMCcVeI5w18PC0wFOZejJVUiOpOZ2BIX0W+hs8iWUR/
+        Tcfica1qwuJplPn4k9NBE3c8DSnzwcLRy9DeEUdAnA==
+X-Google-Smtp-Source: AGRyM1u3cNzkcdbb03ARGSv06yGgZax05RL/7AWsD9zEB9NhJk5fSjh68eGxcM8/9z7NrHB5xxdny2TUaHEWAkam0zc=
+X-Received: by 2002:a05:6512:401a:b0:47f:6ea5:dace with SMTP id
+ br26-20020a056512401a00b0047f6ea5dacemr6981952lfb.402.1655835088052; Tue, 21
+ Jun 2022 11:11:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220506205605.359830-18-nikos.nikoleris@arm.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 21 Jun 2022 12:11:16 -0600
+Message-ID: <CAMkAt6ruxMazN3NmWHsemDNQj6Uj0PhCVeaxw2unCxU=YZFRWw@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,332 +96,400 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 06, 2022 at 09:55:59PM +0100, Nikos Nikoleris wrote:
-> This change adds unmodified dependencies that we need from GNU-EFI in
-> order to build arm64 EFI apps.
-> 
-> GNU-EFI sources from  https://git.code.sf.net/p/gnu-efi/code v3.0.14
-> 
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> ---
->  arm/efi/elf_aarch64_efi.lds |  63 +++++++++++++++++
->  arm/efi/crt0-efi-aarch64.S  | 130 ++++++++++++++++++++++++++++++++++++
->  arm/efi/reloc_aarch64.c     |  97 +++++++++++++++++++++++++++
->  3 files changed, 290 insertions(+)
->  create mode 100644 arm/efi/elf_aarch64_efi.lds
->  create mode 100644 arm/efi/crt0-efi-aarch64.S
->  create mode 100644 arm/efi/reloc_aarch64.c
-> 
-> diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
-> new file mode 100644
-> index 0000000..836d982
-> --- /dev/null
-> +++ b/arm/efi/elf_aarch64_efi.lds
-> @@ -0,0 +1,63 @@
-> +OUTPUT_FORMAT("elf64-littleaarch64", "elf64-littleaarch64", "elf64-littleaarch64")
-> +OUTPUT_ARCH(aarch64)
-> +ENTRY(_start)
-> +SECTIONS
-> +{
-> +  .text 0x0 : {
-> +    _text = .;
-> +    *(.text.head)
-> +    *(.text)
-> +    *(.text.*)
-> +    *(.gnu.linkonce.t.*)
-> +    *(.srodata)
-> +    *(.rodata*)
-> +    . = ALIGN(16);
-> +  }
-> +  _etext = .;
-> +  _text_size = . - _text;
-> +  .dynamic  : { *(.dynamic) }
-> +  .data : ALIGN(4096)
-> +  {
-> +   _data = .;
-> +   *(.sdata)
-> +   *(.data)
-> +   *(.data1)
-> +   *(.data.*)
-> +   *(.got.plt)
-> +   *(.got)
-> +
-> +   /* the EFI loader doesn't seem to like a .bss section, so we stick
-> +      it all into .data: */
-> +   . = ALIGN(16);
-> +   _bss = .;
-> +   *(.sbss)
-> +   *(.scommon)
-> +   *(.dynbss)
-> +   *(.bss)
-> +   *(COMMON)
-> +   . = ALIGN(16);
-> +   _bss_end = .;
-> +  }
-> +
-> +  .rela.dyn : { *(.rela.dyn) }
-> +  .rela.plt : { *(.rela.plt) }
-> +  .rela.got : { *(.rela.got) }
-> +  .rela.data : { *(.rela.data) *(.rela.data*) }
-> +  . = ALIGN(512);
-> +  _edata = .;
-> +  _data_size = . - _data;
-> +
-> +  . = ALIGN(4096);
-> +  .dynsym   : { *(.dynsym) }
-> +  . = ALIGN(4096);
-> +  .dynstr   : { *(.dynstr) }
-> +  . = ALIGN(4096);
-> +  .note.gnu.build-id : { *(.note.gnu.build-id) }
-> +  /DISCARD/ :
-> +  {
-> +    *(.rel.reloc)
-> +    *(.eh_frame)
-> +    *(.note.GNU-stack)
-> +  }
-> +  .comment 0 : { *(.comment) }
-> +}
-> diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
-> new file mode 100644
-> index 0000000..d50e78d
-> --- /dev/null
-> +++ b/arm/efi/crt0-efi-aarch64.S
-> @@ -0,0 +1,130 @@
-> +/*
-> + * crt0-efi-aarch64.S - PE/COFF header for AArch64 EFI applications
-> + *
-> + * Copright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
-> + *
-> + * Redistribution and use in source and binary forms, with or without
-> + * modification, are permitted provided that the following conditions
-> + * are met:
-> + * 1. Redistributions of source code must retain the above copyright
-> + *    notice and this list of conditions, without modification.
-> + * 2. The name of the author may not be used to endorse or promote products
-> + *    derived from this software without specific prior written permission.
-> + *
-> + * Alternatively, this software may be distributed under the terms of the
-> + * GNU General Public License as published by the Free Software Foundation;
-> + * either version 2 of the License, or (at your option) any later version.
-> + */
-> +
-> +	.section	.text.head
-> +
-> +	/*
-> +	 * Magic "MZ" signature for PE/COFF
-> +	 */
-> +	.globl	ImageBase
-> +ImageBase:
-> +	.ascii	"MZ"
-> +	.skip	58				// 'MZ' + pad + offset == 64
-> +	.long	pe_header - ImageBase		// Offset to the PE header.
-> +pe_header:
-> +	.ascii	"PE"
-> +	.short 	0
-> +coff_header:
-> +	.short	0xaa64				// AArch64
-> +	.short	2				// nr_sections
-> +	.long	0 				// TimeDateStamp
-> +	.long	0				// PointerToSymbolTable
-> +	.long	0				// NumberOfSymbols
-> +	.short	section_table - optional_header	// SizeOfOptionalHeader
-> +	.short	0x206				// Characteristics.
-> +						// IMAGE_FILE_DEBUG_STRIPPED |
-> +						// IMAGE_FILE_EXECUTABLE_IMAGE |
-> +						// IMAGE_FILE_LINE_NUMS_STRIPPED
-> +optional_header:
-> +	.short	0x20b				// PE32+ format
-> +	.byte	0x02				// MajorLinkerVersion
-> +	.byte	0x14				// MinorLinkerVersion
-> +	.long	_data - _start			// SizeOfCode
-> +	.long	_data_size			// SizeOfInitializedData
-> +	.long	0				// SizeOfUninitializedData
-> +	.long	_start - ImageBase		// AddressOfEntryPoint
-> +	.long	_start - ImageBase		// BaseOfCode
-> +
-> +extra_header_fields:
-> +	.quad	0				// ImageBase
-> +	.long	0x1000				// SectionAlignment
-> +	.long	0x200				// FileAlignment
-> +	.short	0				// MajorOperatingSystemVersion
-> +	.short	0				// MinorOperatingSystemVersion
-> +	.short	0				// MajorImageVersion
-> +	.short	0				// MinorImageVersion
-> +	.short	0				// MajorSubsystemVersion
-> +	.short	0				// MinorSubsystemVersion
-> +	.long	0				// Win32VersionValue
-> +
-> +	.long	_edata - ImageBase		// SizeOfImage
-> +
-> +	// Everything before the kernel image is considered part of the header
-> +	.long	_start - ImageBase		// SizeOfHeaders
-> +	.long	0				// CheckSum
-> +	.short	EFI_SUBSYSTEM			// Subsystem
-> +	.short	0				// DllCharacteristics
-> +	.quad	0				// SizeOfStackReserve
-> +	.quad	0				// SizeOfStackCommit
-> +	.quad	0				// SizeOfHeapReserve
-> +	.quad	0				// SizeOfHeapCommit
-> +	.long	0				// LoaderFlags
-> +	.long	0x6				// NumberOfRvaAndSizes
-> +
-> +	.quad	0				// ExportTable
-> +	.quad	0				// ImportTable
-> +	.quad	0				// ResourceTable
-> +	.quad	0				// ExceptionTable
-> +	.quad	0				// CertificationTable
-> +	.quad	0				// BaseRelocationTable
-> +
-> +	// Section table
-> +section_table:
-> +	.ascii	".text\0\0\0"
-> +	.long	_data - _start		// VirtualSize
-> +	.long	_start - ImageBase	// VirtualAddress
-> +	.long	_data - _start		// SizeOfRawData
-> +	.long	_start - ImageBase	// PointerToRawData
-> +
-> +	.long	0		// PointerToRelocations (0 for executables)
-> +	.long	0		// PointerToLineNumbers (0 for executables)
-> +	.short	0		// NumberOfRelocations  (0 for executables)
-> +	.short	0		// NumberOfLineNumbers  (0 for executables)
-> +	.long	0x60000020	// Characteristics (section flags)
-> +
-> +	.ascii	".data\0\0\0"
-> +	.long	_data_size		// VirtualSize
-> +	.long	_data - ImageBase	// VirtualAddress
-> +	.long	_data_size		// SizeOfRawData
-> +	.long	_data - ImageBase	// PointerToRawData
-> +
-> +	.long	0		// PointerToRelocations (0 for executables)
-> +	.long	0		// PointerToLineNumbers (0 for executables)
-> +	.short	0		// NumberOfRelocations  (0 for executables)
-> +	.short	0		// NumberOfLineNumbers  (0 for executables)
-> +	.long	0xc0000040	// Characteristics (section flags)
-> +
-> +	.align		12
-> +_start:
-> +	stp		x29, x30, [sp, #-32]!
-> +	mov		x29, sp
-> +
-> +	stp		x0, x1, [sp, #16]
-> +	mov		x2, x0
-> +	mov		x3, x1
-> +	adr		x0, ImageBase
-> +	adrp		x1, _DYNAMIC
-> +	add		x1, x1, #:lo12:_DYNAMIC
-> +	bl		_relocate
-> +	cbnz		x0, 0f
-> +
-> +	ldp		x0, x1, [sp, #16]
-> +	bl		efi_main
-> +
-> +0:	ldp		x29, x30, [sp], #32
-> +	ret
-> diff --git a/arm/efi/reloc_aarch64.c b/arm/efi/reloc_aarch64.c
-> new file mode 100644
-> index 0000000..0867279
-> --- /dev/null
-> +++ b/arm/efi/reloc_aarch64.c
-> @@ -0,0 +1,97 @@
-> +/* reloc_aarch64.c - position independent x86 ELF shared object relocator
-> +   Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
-> +   Copyright (C) 1999 Hewlett-Packard Co.
-> +	Contributed by David Mosberger <davidm@hpl.hp.com>.
-> +
-> +    All rights reserved.
-> +
-> +    Redistribution and use in source and binary forms, with or without
-> +    modification, are permitted provided that the following conditions
-> +    are met:
-> +
-> +    * Redistributions of source code must retain the above copyright
-> +      notice, this list of conditions and the following disclaimer.
-> +    * Redistributions in binary form must reproduce the above
-> +      copyright notice, this list of conditions and the following
-> +      disclaimer in the documentation and/or other materials
-> +      provided with the distribution.
-> +    * Neither the name of Hewlett-Packard Co. nor the names of its
-> +      contributors may be used to endorse or promote products derived
-> +      from this software without specific prior written permission.
-> +
-> +    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-> +    CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-> +    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-> +    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-> +    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-> +    BE LIABLE FOR ANYDIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-> +    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-> +    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-> +    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-> +    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-> +    TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-> +    THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-> +    SUCH DAMAGE.
-> +*/
-> +
-> +#include <efi.h>
-> +#include <efilib.h>
-> +
-> +#include <elf.h>
-> +
-> +EFI_STATUS _relocate (long ldbase, Elf64_Dyn *dyn,
-> +		      EFI_HANDLE image EFI_UNUSED,
-> +		      EFI_SYSTEM_TABLE *systab EFI_UNUSED)
-> +{
-> +	long relsz = 0, relent = 0;
-> +	Elf64_Rela *rel = 0;
-> +	unsigned long *addr;
-> +	int i;
-> +
-> +	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
-> +		switch (dyn[i].d_tag) {
-> +			case DT_RELA:
-> +				rel = (Elf64_Rela*)
-> +					((unsigned long)dyn[i].d_un.d_ptr
-> +					 + ldbase);
-> +				break;
-> +
-> +			case DT_RELASZ:
-> +				relsz = dyn[i].d_un.d_val;
-> +				break;
-> +
-> +			case DT_RELAENT:
-> +				relent = dyn[i].d_un.d_val;
-> +				break;
-> +
-> +			default:
-> +				break;
-> +		}
-> +	}
-> +
-> +	if (!rel && relent == 0)
-> +		return EFI_SUCCESS;
-> +
-> +	if (!rel || relent == 0)
-> +		return EFI_LOAD_ERROR;
-> +
-> +	while (relsz > 0) {
-> +		/* apply the relocs */
-> +		switch (ELF64_R_TYPE (rel->r_info)) {
-> +			case R_AARCH64_NONE:
-> +				break;
-> +
-> +			case R_AARCH64_RELATIVE:
-> +				addr = (unsigned long *)
-> +					(ldbase + rel->r_offset);
-> +				*addr = ldbase + rel->r_addend;
-> +				break;
-> +
-> +			default:
-> +				break;
-> +		}
-> +		rel = (Elf64_Rela*) ((char *) rel + relent);
-> +		relsz -= relent;
-> +	}
-> +	return EFI_SUCCESS;
-> +}
-> -- 
-> 2.25.1
-> 
+On Mon, Jun 20, 2022 at 5:05 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The behavior and requirement for the SEV-legacy command is altered when
+> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
+> for more details.
+>
+> Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region
+> when SNP is enabled to satify new requirements for the SNP. Continue
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+satisfy
+
+> allocating a 1mb region for !SNP configuration.
+>
+> While at it, provide API that can be used by others to allocate a page
+> that can be used by the firmware. The immediate user for this API will
+> be the KVM driver. The KVM driver to need to allocate a firmware context
+> page during the guest creation. The context page need to be updated
+> by the firmware. See the SEV-SNP specification for further details.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 173 +++++++++++++++++++++++++++++++++--
+>  include/linux/psp-sev.h      |  11 +++
+>  2 files changed, 178 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 35d76333e120..0dbd99f29b25 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -79,6 +79,14 @@ static void *sev_es_tmr;
+>  #define NV_LENGTH (32 * 1024)
+>  static void *sev_init_ex_buffer;
+>
+> +/* When SEV-SNP is enabled the TMR needs to be 2MB aligned and 2MB size. */
+> +#define SEV_SNP_ES_TMR_SIZE    (2 * 1024 * 1024)
+> +
+> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
+
+Why not keep all this TMR stuff together near the SEV_ES_TMR_SIZE define?
+
+> +
+> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
+> +static int sev_do_cmd(int cmd, void *data, int *psp_ret);
+> +
+>  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+>  {
+>         struct sev_device *sev = psp_master->sev_data;
+> @@ -177,11 +185,161 @@ static int sev_cmd_buffer_len(int cmd)
+>         return 0;
+>  }
+>
+> +static void snp_leak_pages(unsigned long pfn, unsigned int npages)
+> +{
+> +       WARN(1, "psc failed, pfn 0x%lx pages %d (leaking)\n", pfn, npages);
+> +       while (npages--) {
+> +               memory_failure(pfn, 0);
+> +               dump_rmpentry(pfn);
+> +               pfn++;
+> +       }
+> +}
+> +
+> +static int snp_reclaim_pages(unsigned long pfn, unsigned int npages, bool locked)
+> +{
+> +       struct sev_data_snp_page_reclaim data;
+> +       int ret, err, i, n = 0;
+> +
+> +       for (i = 0; i < npages; i++) {
+
+What about setting |n| here too, also the other increments.
+
+for (i = 0, n = 0; i < npages; i++, n++, pfn++)
+
+> +               memset(&data, 0, sizeof(data));
+> +               data.paddr = pfn << PAGE_SHIFT;
+> +
+> +               if (locked)
+> +                       ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> +               else
+> +                       ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+
+Can we change `sev_cmd_mutex` to some sort of nesting lock type? That
+could clean up this if (locked) code.
+
+> +               if (ret)
+> +                       goto cleanup;
+> +
+> +               ret = rmp_make_shared(pfn, PG_LEVEL_4K);
+> +               if (ret)
+> +                       goto cleanup;
+> +
+> +               pfn++;
+> +               n++;
+> +       }
+> +
+> +       return 0;
+> +
+> +cleanup:
+> +       /*
+> +        * If failed to reclaim the page then page is no longer safe to
+> +        * be released, leak it.
+> +        */
+> +       snp_leak_pages(pfn, npages - n);
+> +       return ret;
+> +}
+> +
+> +static inline int rmp_make_firmware(unsigned long pfn, int level)
+> +{
+> +       return rmp_make_private(pfn, 0, level, 0, true);
+> +}
+> +
+> +static int snp_set_rmp_state(unsigned long paddr, unsigned int npages, bool to_fw, bool locked,
+> +                            bool need_reclaim)
+
+This function can do a lot and when I read the call sites its hard to
+see what its doing since we have a combination of arguments which tell
+us what behavior is happening, some of which are not valid (ex: to_fw
+== true and need_reclaim == true is an invalid argument combination).
+Also this for loop over |npages| is duplicated from
+snp_reclaim_pages(). One improvement here is that on the current
+snp_reclaim_pages() if we fail to reclaim a page we assume we cannot
+reclaim the next pages, this may cause us to snp_leak_pages() more
+pages than we actually need too.
+
+What about something like this?
+
+static snp_leak_page(u64 pfn, enum pg_level level)
+{
+   memory_failure(pfn, 0);
+   dump_rmpentry(pfn);
+}
+
+static int snp_reclaim_page(u64 pfn, enum pg_level level)
+{
+  int ret;
+  struct sev_data_snp_page_reclaim data;
+
+  ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+  if (ret)
+    goto cleanup;
+
+  ret = rmp_make_shared(pfn, level);
+  if (ret)
+    goto cleanup;
+
+return 0;
+
+cleanup:
+    snp_leak_page(pfn, level)
+}
+
+typedef int (*rmp_state_change_func) (u64 pfn, enum pg_level level);
+
+static int snp_set_rmp_state(unsigned long paddr, unsigned int npages,
+rmp_state_change_func state_change, rmp_state_change_func cleanup)
+{
+  struct sev_data_snp_page_reclaim data;
+  int ret, err, i, n = 0;
+
+  for (i = 0, n = 0; i < npages; i++, n++, pfn++) {
+    ret = state_change(pfn, PG_LEVEL_4K)
+    if (ret)
+      goto cleanup;
+  }
+
+  return 0;
+
+cleanup:
+  for (; i>= 0; i--, n--, pfn--) {
+    cleanup(pfn, PG_LEVEL_4K);
+  }
+
+  return ret;
+}
+
+Then inside of __snp_alloc_firmware_pages():
+
+snp_set_rmp_state(paddr, npages, rmp_make_firmware, snp_reclaim_page);
+
+And inside of __snp_free_firmware_pages():
+
+snp_set_rmp_state(paddr, npages, snp_reclaim_page, snp_leak_page);
+
+Just a suggestion feel free to ignore. The readability comment could
+be addressed much less invasively by just making separate functions
+for each valid combination of arguments here. Like
+snp_set_rmp_fw_state(), snp_set_rmp_shared_state(),
+snp_set_rmp_release_state() or something.
+
+> +{
+> +       unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT; /* Cbit maybe set in the paddr */
+> +       int rc, n = 0, i;
+> +
+> +       for (i = 0; i < npages; i++) {
+> +               if (to_fw)
+> +                       rc = rmp_make_firmware(pfn, PG_LEVEL_4K);
+> +               else
+> +                       rc = need_reclaim ? snp_reclaim_pages(pfn, 1, locked) :
+> +                                           rmp_make_shared(pfn, PG_LEVEL_4K);
+> +               if (rc)
+> +                       goto cleanup;
+> +
+> +               pfn++;
+> +               n++;
+> +       }
+> +
+> +       return 0;
+> +
+> +cleanup:
+> +       /* Try unrolling the firmware state changes */
+> +       if (to_fw) {
+> +               /*
+> +                * Reclaim the pages which were already changed to the
+> +                * firmware state.
+> +                */
+> +               snp_reclaim_pages(paddr >> PAGE_SHIFT, n, locked);
+> +
+> +               return rc;
+> +       }
+> +
+> +       /*
+> +        * If failed to change the page state to shared, then its not safe
+> +        * to release the page back to the system, leak it.
+> +        */
+> +       snp_leak_pages(pfn, npages - n);
+> +
+> +       return rc;
+> +}
+> +
+> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
+> +{
+> +       unsigned long npages = 1ul << order, paddr;
+> +       struct sev_device *sev;
+> +       struct page *page;
+> +
+> +       if (!psp_master || !psp_master->sev_data)
+> +               return NULL;
+> +
+> +       page = alloc_pages(gfp_mask, order);
+> +       if (!page)
+> +               return NULL;
+> +
+> +       /* If SEV-SNP is initialized then add the page in RMP table. */
+> +       sev = psp_master->sev_data;
+> +       if (!sev->snp_inited)
+> +               return page;
+> +
+> +       paddr = __pa((unsigned long)page_address(page));
+> +       if (snp_set_rmp_state(paddr, npages, true, locked, false))
+> +               return NULL;
+
+So what about the case where snp_set_rmp_state() fails but we were
+able to reclaim all the pages? Should we be able to signal that to
+callers so that we could free |page| here? But given this is an error
+path already maybe we can optimize this in a follow up series.
+
+> +
+> +       return page;
+> +}
+> +
+> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
+> +{
+> +       struct page *page;
+> +
+> +       page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
+> +
+> +       return page ? page_address(page) : NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
+> +
+> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
+> +{
+> +       unsigned long paddr, npages = 1ul << order;
+> +
+> +       if (!page)
+> +               return;
+> +
+> +       paddr = __pa((unsigned long)page_address(page));
+> +       if (snp_set_rmp_state(paddr, npages, false, locked, true))
+> +               return;
+
+Here we may be able to free some of |page| depending how where inside
+of snp_set_rmp_state() we failed. But again given this is an error
+path already maybe we can optimize this in a follow up series.
+
+
+
+> +
+> +       __free_pages(page, order);
+> +}
+> +
+> +void snp_free_firmware_page(void *addr)
+> +{
+> +       if (!addr)
+> +               return;
+> +
+> +       __snp_free_firmware_pages(virt_to_page(addr), 0, false);
+> +}
+> +EXPORT_SYMBOL(snp_free_firmware_page);
+> +
+>  static void *sev_fw_alloc(unsigned long len)
+>  {
+>         struct page *page;
+>
+> -       page = alloc_pages(GFP_KERNEL, get_order(len));
+> +       page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(len), false);
+>         if (!page)
+>                 return NULL;
+>
+> @@ -393,7 +551,7 @@ static int __sev_init_locked(int *error)
+>                 data.tmr_address = __pa(sev_es_tmr);
+>
+>                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
+> -               data.tmr_len = SEV_ES_TMR_SIZE;
+> +               data.tmr_len = sev_es_tmr_size;
+>         }
+>
+>         return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> @@ -421,7 +579,7 @@ static int __sev_init_ex_locked(int *error)
+>                 data.tmr_address = __pa(sev_es_tmr);
+>
+>                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
+> -               data.tmr_len = SEV_ES_TMR_SIZE;
+> +               data.tmr_len = sev_es_tmr_size;
+>         }
+>
+>         return __sev_do_cmd_locked(SEV_CMD_INIT_EX, &data, error);
+> @@ -818,6 +976,8 @@ static int __sev_snp_init_locked(int *error)
+>         sev->snp_inited = true;
+>         dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
+>
+> +       sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
+> +
+>         return rc;
+>  }
+>
+> @@ -1341,8 +1501,9 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+>                 /* The TMR area was encrypted, flush it from the cache */
+>                 wbinvd_on_all_cpus();
+>
+> -               free_pages((unsigned long)sev_es_tmr,
+> -                          get_order(SEV_ES_TMR_SIZE));
+> +               __snp_free_firmware_pages(virt_to_page(sev_es_tmr),
+> +                                         get_order(sev_es_tmr_size),
+> +                                         false);
+>                 sev_es_tmr = NULL;
+>         }
+>
+> @@ -1430,7 +1591,7 @@ void sev_pci_init(void)
+>         }
+>
+>         /* Obtain the TMR memory area for SEV-ES use */
+> -       sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
+> +       sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
+>         if (!sev_es_tmr)
+>                 dev_warn(sev->dev,
+>                          "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 9f921d221b75..a3bb792bb842 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -12,6 +12,8 @@
+>  #ifndef __PSP_SEV_H__
+>  #define __PSP_SEV_H__
+>
+> +#include <linux/sev.h>
+> +
+>  #include <uapi/linux/psp-sev.h>
+>
+>  #ifdef CONFIG_X86
+> @@ -940,6 +942,8 @@ int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
+>  int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
+>
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+> +void *snp_alloc_firmware_page(gfp_t mask);
+> +void snp_free_firmware_page(void *addr);
+>
+>  #else  /* !CONFIG_CRYPTO_DEV_SP_PSP */
+>
+> @@ -981,6 +985,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
+>         return -ENODEV;
+>  }
+>
+> +static inline void *snp_alloc_firmware_page(gfp_t mask)
+> +{
+> +       return NULL;
+> +}
+> +
+> +static inline void snp_free_firmware_page(void *addr) { }
+> +
+>  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
+>
+>  #endif /* __PSP_SEV_H__ */
+> --
+> 2.25.1
+>
