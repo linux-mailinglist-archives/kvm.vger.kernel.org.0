@@ -2,118 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2CCC5536E4
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 17:55:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8820C553724
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 18:00:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351964AbiFUPwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 11:52:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34246 "EHLO
+        id S1353487AbiFUP7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 11:59:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353266AbiFUPwF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 11:52:05 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 768D22D1ED;
-        Tue, 21 Jun 2022 08:52:04 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25LEnwb4035928;
-        Tue, 21 Jun 2022 15:52:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=zc2bn5fhqwKgZBnqIu0vVtEw3IUYFo7BSDMiVQKSDYw=;
- b=mrIcBNmJrywUO1aph30VJzY53kHwV0xGlO2DlqTQAFwyaVT5dNqyY5jZCXXBRzyjsAPQ
- C6yAPans4/qLFMW2boah8MO/r0CKXKPPkpduV0eLpNaHJi9fUiSD2X2OIyKV02qezzVP
- gsf+FEVPPSu6Ut4S35cOeLGb96JhqS1jLfPvISLxep78hga5kyInu/Fopabsetxtetuz
- yjsjs9QQHSEhivBmztvIiM4IdwviDYmFkfBPHNU3kE2iEYvMtTw5Z/wpETaXcP0jTxtf
- B+mluyaI/wzNtbUacDU17Yer3sHpOJeF5gGpStfV7rE9QHV535CjVUJdX+s0Os/p4mc0 Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gug3mhw7d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jun 2022 15:52:02 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25LEnwAs035925;
-        Tue, 21 Jun 2022 15:52:01 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gug3mhw6u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jun 2022 15:52:01 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25LFZdCl010359;
-        Tue, 21 Jun 2022 15:52:01 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma01dal.us.ibm.com with ESMTP id 3gs6b9j1wp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jun 2022 15:52:00 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25LFpxhN24772868
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Jun 2022 15:51:59 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9352E136053;
-        Tue, 21 Jun 2022 15:51:59 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 881BA13604F;
-        Tue, 21 Jun 2022 15:51:58 +0000 (GMT)
-Received: from li-fed795cc-2ab6-11b2-a85c-f0946e4a8dff.ibm.com.com (unknown [9.160.18.227])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Jun 2022 15:51:58 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com
-Subject: [PATCH v20 20/20] MAINTAINERS: pick up all vfio_ap docs for VFIO AP maintainers
-Date:   Tue, 21 Jun 2022 11:51:34 -0400
-Message-Id: <20220621155134.1932383-21-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20220621155134.1932383-1-akrowiak@linux.ibm.com>
-References: <20220621155134.1932383-1-akrowiak@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xW97XOdoDbVVKbjSBr_RUUEoKAT4jSg4
-X-Proofpoint-GUID: TFsm6TX5g7jx6kdauQwyPKL23b5smZKM
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 2 URL's were un-rewritten
+        with ESMTP id S1353417AbiFUP6h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 11:58:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C631BB60
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 08:58:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655827115;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OnM6LWqbySomFL+MYIQvAUbrzoQzHU8UBGdR/EPQFvc=;
+        b=YzYq0cDb0J54lNUsXOENlMz1fkqzsXDBzndbeFRMUGo/rKGFMvM7GEOGpziu7N+q5RNcvE
+        rIVAcJjXG5saieuPg01TXzms8zS6kcGyaDHfMJmm8riXaZRrlo7MmorNZ9AZK0XMjn/1RD
+        6mUKcJZVXK+TB23783dA2LAZD+9ZGTk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-347-EI-eceqAOPqCr-ag0dv3CQ-1; Tue, 21 Jun 2022 11:58:34 -0400
+X-MC-Unique: EI-eceqAOPqCr-ag0dv3CQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F17B0811E75;
+        Tue, 21 Jun 2022 15:58:33 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.195.134])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E80F42026985;
+        Tue, 21 Jun 2022 15:58:31 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 00/11] KVM: VMX: Support TscScaling and EnclsExitingBitmap whith eVMCS
+Date:   Tue, 21 Jun 2022 17:58:19 +0200
+Message-Id: <20220621155830.60115-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
- definitions=2022-06-21_08,2022-06-21_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 adultscore=0 impostorscore=0 bulkscore=0 priorityscore=1501
- phishscore=0 spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=868
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206210066
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A new document, Documentation/s390/vfio-ap-locking.rst was added. Make sure
-the new document is picked up for the VFIO AP maintainers by using a
-wildcard: Documentation/s390/vfio-ap*.
+Enlightened VMCS v1 definition was updates to include fields for the
+following features:
+    - PerfGlobalCtrl
+    - EnclsExitingBitmap
+    - TSC scaling
+    - GuestLbrCtl
+    - CET
+    - SSP
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Add support for EnclsExitingBitmap and TSC scaling to KVM. PerfGlobalCtrl 
+doesn't work correctly with Win11, don't enable it yet. SSP, CET and 
+GuestLbrCtl are not currently supported by KVM.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3cf9842d9233..fbe417746e22 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17453,7 +17453,7 @@ M:	Jason Herne <jjherne@linux.ibm.com>
- L:	linux-s390@vger.kernel.org
- S:	Supported
- W:	http://www.ibm.com/developerworks/linux/linux390/
--F:	Documentation/s390/vfio-ap.rst
-+F:	Documentation/s390/vfio-ap*
- F:	drivers/s390/crypto/vfio_ap*
- 
- S390 VFIO-CCW DRIVER
+Note: adding new field for KVM on Hyper-V case is easy but adding them to
+Hyper-V on KVM requires some work to not break live migration as we never
+expected this to happen without eVMCS version update. The series introduces
+new KVM_CAP_HYPERV_ENLIGHTENED_VMCS2 capability and a notion of KVM 
+internal 'Enlightened VMCS revision'.
+
+Example QEMU enablement patch for the new capability will be sent as a 
+follow-up to the series.
+
+Vitaly Kuznetsov (11):
+  KVM: x86: hyper-v: Expose access to debug MSRs in the partition
+    privilege flags
+  x86/hyperv: Fix 'struct hv_enlightened_vmcs' definition
+  x86/hyperv: Update 'struct hv_enlightened_vmcs' definition
+  KVM: VMX: Define VMCS-to-EVMCS conversion for the new fields
+  KVM: nVMX: Support several new fields in eVMCSv1
+  KVM: nVMX: Introduce KVM_CAP_HYPERV_ENLIGHTENED_VMCS2
+  KVM: selftests: Switch to KVM_CAP_HYPERV_ENLIGHTENED_VMCS2
+  KVM: VMX: Support TSC scaling with enlightened VMCS
+  KVM: selftests: Add ENCLS_EXITING_BITMAP{,HIGH} VMCS fields
+  KVM: selftests: Switch to updated eVMCSv1 definition
+  KVM: selftests: Enable TSC scaling in evmcs selftest
+
+ Documentation/virt/kvm/api.rst                |  42 ++++++-
+ arch/x86/include/asm/hyperv-tlfs.h            |  19 ++-
+ arch/x86/include/asm/kvm_host.h               |   2 +-
+ arch/x86/kvm/hyperv.c                         |   1 +
+ arch/x86/kvm/vmx/evmcs.c                      | 116 ++++++++++++++----
+ arch/x86/kvm/vmx/evmcs.h                      |  28 +++--
+ arch/x86/kvm/vmx/nested.c                     |  43 ++++++-
+ arch/x86/kvm/vmx/vmx.c                        |   4 +-
+ arch/x86/kvm/vmx/vmx.h                        |  15 +--
+ arch/x86/kvm/x86.c                            |  15 ++-
+ include/asm-generic/hyperv-tlfs.h             |   2 +
+ include/uapi/linux/kvm.h                      |   3 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   8 ++
+ .../selftests/kvm/include/x86_64/evmcs.h      |  46 ++++++-
+ .../selftests/kvm/include/x86_64/vmx.h        |   2 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   5 +-
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  33 ++++-
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       |   2 +-
+ .../kvm/x86_64/vmx_set_nested_state_test.c    |   2 +-
+ 19 files changed, 321 insertions(+), 67 deletions(-)
+
 -- 
 2.35.3
 
