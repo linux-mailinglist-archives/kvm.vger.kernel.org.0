@@ -2,129 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9987553931
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 19:51:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B880D553948
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 19:59:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350323AbiFURvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 13:51:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44878 "EHLO
+        id S1349240AbiFUR7Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 13:59:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232708AbiFURvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 13:51:14 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D6841EC41
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:51:13 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id e4so16356186ljl.1
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:51:12 -0700 (PDT)
+        with ESMTP id S1347202AbiFUR7N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 13:59:13 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83C2220EE
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:59:11 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id a14so4189260pgh.11
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:59:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/sWmRxaBB/7Gvydpg8oN2fyGVNJ3tXVZl0R1M5vQ/Us=;
-        b=SIUQ2bfTgtqyKzjQXnVabWR9Z3n/VgrhU2riRxw0AgmXz5H2i9bjCSpp+euFcuWuLr
-         btapNTHSb4sb6Dlc8c5EtrlKyvn9xrjsaMXEm7aPioRHs8rBMY+uZERTAzQmLVQnK1vN
-         yKhxZkZUR82fcxHyRRqxyWHUHzDwy9sB8NRvzJ+vl/OwnzuaafTUAnsbscxCWGwt7jMB
-         59esRMJI0H8QHYn6id6vBjd3uYPVHJcFcswVldGJo9tbKjNdP2YqadzjvdVZprf72/is
-         jTh2NPUKW0DrIwZ3k8Ui1RzbVJGEGC+pQhncUSl4DSXTSJGsx66cmG7eT/EtfXyb3aRj
-         zdMg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=JbuWAytcUZALQjKHnKlHD39QZVXy3a1bRzVkWDq42KQ=;
+        b=VErgQoB8GWymThL3YgzGl2WrL12ULYe/Cx/wyQRAW01d1/41ggxbQwxVOnzuwICFhG
+         hlA/lrHAMM3uUbioCGYIMB10kT5kJRIxBeHBxMtKnqe8TOc1UA6q8/qtaiFqCan3/IJX
+         zbld0o+9fIhscaxiitkhFrgx3xF2+mm+jDKQcXlVY6HSgbY1WNrPJinLucleTCE+gUAp
+         ZzKcF99tELyFLUKjMPVKMvpACZbdJEki9ptdeMGLcmOKYAiaI8j87t1CGi/1EX4C73n/
+         er1cQQAVMrZvwmWyBge9+Hybfl4bxzFWz1KNBdnXAQ8WoAaTDtPiczPKVjpEk59p0pZZ
+         80Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/sWmRxaBB/7Gvydpg8oN2fyGVNJ3tXVZl0R1M5vQ/Us=;
-        b=bClxJKzJBMiw9bx5BVSjl91Cb2zshLpMDk9RvAJ3TF7mj1HVSLd/C8TzcgRLH8134V
-         iRRk3B7ov0VoYhFfDLnDtD803wJ6amBlPhdNIe/o9XNk0tvQaQIHtpP6tZpYaAuBLvsx
-         oZxzg2ue89ExSpDT3QHfUKwOmfu7yOrbeDFUQnVxeH6WcDUXXbQD0JKpCSaXHneSQKcu
-         OQc2wG0IqmKG+fweHoopxkMlaSCC6KGnZtg9K865pZFMs6F63UXXydBq5W4cDx9O2me6
-         o9i+VgFnweD/3OD+k1lIlltapzaqYv6cLW5ilXuvSj2UYqP59ZRo9hESnhFnCOXpopRS
-         1uTA==
-X-Gm-Message-State: AJIora9qzh3AQ4YSS6rVR42TPC7ByCvCSL6aPdjXmyO1dvWZE96Da2cR
-        s0koF+nH0ONNgrXGUtdXbXbZDhuWuL71Droo6plIGA==
-X-Google-Smtp-Source: AGRyM1u/rxKy61/kcfa19O8kX+IARHxZ6GtcuY38CjxLPfM7sYm5YakXgDPAfoWdCippLLsbDohcmMAiLcyZQHFOTn4=
-X-Received: by 2002:a2e:2a43:0:b0:25a:84a9:921c with SMTP id
- q64-20020a2e2a43000000b0025a84a9921cmr375799ljq.83.1655833871147; Tue, 21 Jun
- 2022 10:51:11 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JbuWAytcUZALQjKHnKlHD39QZVXy3a1bRzVkWDq42KQ=;
+        b=f1+EMUCR66mH8hIc7uwgC2agVPKe5K88GR6ZLJfAP/5jJTeRvYzsgujuncHSUIWAwx
+         RhA6uIHXENQI0FOnhWJUcB4iTCYcYfoB3WEAAyZDyRVNqJU8bz5/DitMc/vnE7jcb5vn
+         nB27RCoIL3dP3m+eMq22fFgoSTfsN3clb/y3Vla62AEgQYOCUvulkiigafL1e/1NLmH6
+         WQ4uwhzps/XtAsz+xcFxEdBGsfxV+/q6RACom2lU7Ulk7nRM+MXfxgEJLfjHhV5jMF5X
+         KoEE7j+vpuDSxCfFSiJX3x158Ly08WpK9kakyGMATXaqXwLnTZ4690LJxp5DLw6lPIHZ
+         BHqw==
+X-Gm-Message-State: AJIora8TRsWJmViLqSnP6532rRxAMWK/yYjeBdhXyL9Wy4oxZ0FJDXiB
+        RGXTz1bATWYoH6AQKEk5VNrkhQ==
+X-Google-Smtp-Source: AGRyM1tyKoScvgZ9jUTl9r400vYVAKVYV/qzOYeNUaiQG+sTZs1pyelcoub/qTYVZzhpTV2f2gXgXw==
+X-Received: by 2002:a63:e705:0:b0:3fd:fb59:bd7f with SMTP id b5-20020a63e705000000b003fdfb59bd7fmr27065817pgi.505.1655834350902;
+        Tue, 21 Jun 2022 10:59:10 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id jj4-20020a170903048400b001678898ad06sm5027806plb.47.2022.06.21.10.59.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jun 2022 10:59:10 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 17:59:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Subject: Re: [PATCH v6 19/22] KVM: x86/mmu: Zap collapsible SPTEs in shadow
+ MMU at all possible levels
+Message-ID: <YrIG6/dymlPQGwg1@google.com>
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-20-dmatlack@google.com>
+ <Yqyzavjp9eS9p4+m@google.com>
+ <CALzav=dG9f2X8GBLjQgR-Lj4yPKX2Adg3C+9_9aC83A7mzmbtw@mail.gmail.com>
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6r+WSYXLZj-Bs5jpo4CR3+H5cpND0GHjsmgPacBK1GH_Q@mail.gmail.com> <SN6PR12MB2767A51D40E7F53395770DE58EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB2767A51D40E7F53395770DE58EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 21 Jun 2022 11:50:59 -0600
-Message-ID: <CAMkAt6qorwbAXaPaCaSm0SC9o2uQ9ZQzB6s1kBkvAv2D4tkUug@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=dG9f2X8GBLjQgR-Lj4yPKX2Adg3C+9_9aC83A7mzmbtw@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 21, 2022 at 11:45 AM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
->
-> [AMD Official Use Only - General]
->
-> Hello Peter,
->
-> >> +bool iommu_sev_snp_supported(void)
-> >> +{
-> >> +       struct amd_iommu *iommu;
-> >> +
-> >> +       /*
-> >> +        * The SEV-SNP support requires that IOMMU must be enabled, and is
-> >> +        * not configured in the passthrough mode.
-> >> +        */
-> >> +       if (no_iommu || iommu_default_passthrough()) {
-> >> +               pr_err("SEV-SNP: IOMMU is either disabled or
-> >> + configured in passthrough mode.\n");
->
-> > Like below could this say something like snp support is disabled because of iommu settings.
->
-> Here we may need to be more precise with the error information indicating why SNP is not enabled.
-> Please note that this patch may actually become part of the IOMMU + SNP patch series, where
-> additional checks are done, for example, not enabling SNP if IOMMU v2 page tables are enabled,
-> so precise error information will be useful here.
+On Tue, Jun 21, 2022, David Matlack wrote:
+> On Fri, Jun 17, 2022 at 10:01 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Mon, May 16, 2022, David Matlack wrote:
+> > > +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
+> > > +                                        const struct kvm_memory_slot *slot)
+> > > +{
+> > > +     /*
+> > > +      * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
+> > > +      * pages that are already mapped at the maximum possible level.
+> > > +      */
+> > > +     if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+> > > +                           PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
+> > > +                           true))
+> >
+> > No need to wrap, "true" fits easily on the previous line.  That said, I don't see
+> > any point in adding a helper.  It's highly unlike there will be another caller,
+> > and IMO it's not any more readable since I have to go look at another function
+> > when reading kvm_mmu_zap_collapsible_sptes().
+> 
+> I could see an argument for readability either way. Putting it in a
+> helper function abstracts away the details, which would aid
+> readability if the reader does not care about the implementation
+> details of the rmap case.
 
-I agree we should be more precise. I just thought we should explicitly
-state something like: "SEV-SNP: IOMMU is either disabled or configured
-in passthrough mode, SNP cannot be supported".
+I'm ok either way, dealer's choice.
