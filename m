@@ -2,105 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FCE0553504
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 16:54:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E27E55353E
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 17:09:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351916AbiFUOyZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 10:54:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32940 "EHLO
+        id S233490AbiFUPJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 11:09:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233104AbiFUOyX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 10:54:23 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0186D237F6
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 07:54:23 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id g10-20020a17090a708a00b001ea8aadd42bso13682380pjk.0
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 07:54:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ePpQR91B1wy0uIyvmn3lmteXD4y16fGYbzlfAq99TJo=;
-        b=coFv7I5Y78JhXoxS37XR9c+mZYbk7SXPwuO7aREgBr4Q4xY/8nD/BF5WkQBHENLFnR
-         M2swZ0YHKkbeZ6TusTYTCyinn24BoObIO+T5wnAXl9f2sGVIP8rG2F0nAbxkmCVGoPfH
-         dAA8jbBGQ+fJqAoZJEhloFcXw4ggDv8whrRonPLp5/G9ruQkcs3nglSNUwAkZ1SThAWs
-         1rcmQq3sdA0WobCN3wZET42yLYirfqnABm0YdtxHceX3EHLEBkMtv0LKHMPI3jgadxxF
-         dsa+Azc2y1bTS9+0PGwluDhQy+WUsYOcrTtvwmmyLjgGWHBJwb4h86H6/giVMU3D/eNI
-         BJew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ePpQR91B1wy0uIyvmn3lmteXD4y16fGYbzlfAq99TJo=;
-        b=UpTzrzZ7dGM9nY+64MCR4qTcp1kowIgk/ox+ifwxOYZnu8iImyClkclJS+jWR6mfkL
-         qp7tCVSYHvAwKkYlXhC2Y1IDzETmW6js1rgGdDIwuVAIVMwQby8L8cwIdKORkqk/Bowc
-         cPIH9Cnjpkvp+4RmUuku0o5LrXPmDPxyYweHDSMxzBdRfJsSQQ/CYwEUw/VeXxex61u2
-         WDy/71laBQ8NrxRQq3MSX8v2jx0bb5HZ1pdoOiOQ21NdOn+vPzHXm+KyizPFigWLyTi3
-         BT+QAIX4AKcvzvinTvSYRAlrtG7ntMHnj4ATXAPGeiTcdRRGR7+8B43HI3/CwEzwUHkW
-         rMXg==
-X-Gm-Message-State: AJIora+0z9u0qt27ygbJmec+QGCuJ80KcTd49GfY3T6D7eUCdRgDXnCZ
-        iwlvAyOS6bpz34cvub9wgfMWqg==
-X-Google-Smtp-Source: AGRyM1vbuWPmzs8GSCKmhq+oi4jC8RW6CP9GBVkjErftz4qJu7wc14nAXYcvbe2B5lTWXF3n/kUg1Q==
-X-Received: by 2002:a17:90b:4a82:b0:1ec:bb6b:38d0 with SMTP id lp2-20020a17090b4a8200b001ecbb6b38d0mr7523665pjb.213.1655823262366;
-        Tue, 21 Jun 2022 07:54:22 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id b21-20020aa78115000000b00518764d09cdsm11307136pfi.164.2022.06.21.07.54.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 07:54:21 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 14:54:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Colton Lewis <coltonlewis@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 0/3] KVM: selftests: Consolidate ucall code
-Message-ID: <YrHbml1HAfDtvMfn@google.com>
-References: <20220618001618.1840806-1-seanjc@google.com>
- <19bba1a0-8fb7-2aae-a65a-1111e29b92d3@redhat.com>
+        with ESMTP id S1352232AbiFUPJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 11:09:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3E9551C10F
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 08:09:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655824159;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=v6i2sWSli48GTHsEDuVBdZ0meIchicF21PFUgvtM/2Q=;
+        b=BDx8/RQFWl+l9pgQUBrMNCooRlfrZv87vZjh2mrZQ/BTNPwunIW3WBN6Rhq/RjW9PE83og
+        toUPo/YrnN55/Wknqp1joygWg5LiYVc9GZxfvk1Noityp5oIJZLsvDTXRuyMkhIU/Bvzwx
+        cLxglG/R6T386Jtopl/AIDLl4/zuPsU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-38-D6fPNifgP9eHTJqlob27rQ-1; Tue, 21 Jun 2022 11:09:08 -0400
+X-MC-Unique: D6fPNifgP9eHTJqlob27rQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D4C30803520;
+        Tue, 21 Jun 2022 15:09:07 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 679EB9D7F;
+        Tue, 21 Jun 2022 15:09:03 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v2 00/11] SMM emulation and interrupt shadow fixes
+Date:   Tue, 21 Jun 2022 18:08:51 +0300
+Message-Id: <20220621150902.46126-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <19bba1a0-8fb7-2aae-a65a-1111e29b92d3@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022, Paolo Bonzini wrote:
-> On 6/18/22 02:16, Sean Christopherson wrote:
-> > Consolidate the code for making and getting ucalls.  All architectures pass
-> > the ucall struct via memory, so filling and copying the struct is 100%
-> > generic.  The only per-arch code is sending and receiving the address of
-> > said struct.
-> > 
-> > Tested on x86 and arm, compile tested on s390 and RISC-V.
-> 
-> I'm not sure about doing this yet.  The SEV tests added multiple
-> implementations of the ucalls in one architecture.  I have rebased those
-> recently (not the SEV part) to get more familiar with the new kvm_vcpu API
-> for selftests, and was going to look at your old review next...
+This patch series is a result of long debug work to find out why=0D
+sometimes guests with win11 secure boot=0D
+were failing during boot.=0D
+=0D
+During writing a unit test I found another bug, turns out=0D
+that on rsm emulation, if the rsm instruction was done in real=0D
+or 32 bit mode, KVM would truncate the restored RIP to 32 bit.=0D
+=0D
+I also refactored the way we write SMRAM so it is easier=0D
+now to understand what is going on.=0D
+=0D
+The main bug in this series which I fixed is that we=0D
+allowed #SMI to happen during the STI interrupt shadow,=0D
+and we did nothing to both reset it on #SMI handler=0D
+entry and restore it on RSM.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (11):=0D
+  KVM: x86: emulator: em_sysexit should update ctxt->mode=0D
+  KVM: x86: emulator: introduce update_emulation_mode=0D
+  KVM: x86: emulator: remove assign_eip_near/far=0D
+  KVM: x86: emulator: update the emulation mode after rsm=0D
+  KVM: x86: emulator: update the emulation mode after CR0 write=0D
+  KVM: x86: emulator/smm: number of GPRs in the SMRAM image depends on=0D
+    the image format=0D
+  KVM: x86: emulator/smm: add structs for KVM's smram layout=0D
+  KVM: x86: emulator/smm: use smram struct for 32 bit smram load/restore=0D
+  KVM: x86: emulator/smm: use smram struct for 64 bit smram load/restore=0D
+  KVM: x86: SVM: use smram structs=0D
+  KVM: x86: emulator/smm: preserve interrupt shadow in SMRAM=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |   6 -=0D
+ arch/x86/kvm/emulate.c          | 305 ++++++++++++++++----------------=0D
+ arch/x86/kvm/kvm_emulate.h      | 146 +++++++++++++++=0D
+ arch/x86/kvm/svm/svm.c          |  28 +--=0D
+ arch/x86/kvm/x86.c              | 162 ++++++++---------=0D
+ 5 files changed, 394 insertions(+), 253 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-I had forgotten about that code.  My idea of a per-VM list[*] would fit nicely on
-top, though maybe drop the last patch from this series.
-
-[*] https://lore.kernel.org/all/Yc4gcJdhxthBKUUd@google.com
