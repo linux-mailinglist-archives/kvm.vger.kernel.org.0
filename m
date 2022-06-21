@@ -2,65 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 352F8552F4C
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 12:00:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 011845530CA
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 13:23:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231127AbiFUJ75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 05:59:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39014 "EHLO
+        id S1349215AbiFULXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 07:23:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349238AbiFUJ62 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 05:58:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A416326AF5
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 02:58:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655805505;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=H4C/sB5um4hN9/XHAJjRJCQS2mg0bGELmgXp1B2D5DI=;
-        b=gk4t6USREeSuC5RQ7vIMs15xiTmEmZWvRlryiiUzAxmEnkREWAPZ4aQLLwYVTIH/kSJA/U
-        LQyEYe7Um3KqemrRsNXvn/itTjZQBJCTs9jq5ISn8Lhlu7OZCcibYZJ3Py5l80Mx1rrhpp
-        jxiEqJSBYAxGopmKGFde+FjWlJG5d4c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613-88tBitKPN0CK2RYLsijSLA-1; Tue, 21 Jun 2022 05:58:21 -0400
-X-MC-Unique: 88tBitKPN0CK2RYLsijSLA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S1349805AbiFULXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 07:23:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5517B2A972
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 04:23:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F208F101E9BC;
-        Tue, 21 Jun 2022 09:58:20 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.229])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F16F1121314;
-        Tue, 21 Jun 2022 09:58:20 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, mst <mst@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linux-s390@vger.kernel.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        kvm <kvm@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2] virtio: disable notification hardening by default
-In-Reply-To: <CACGkMEun6C9RgQVGq1B8BJMd9DyRQkSXj8shXVVhDymQYQLxgA@mail.gmail.com>
-Organization: Red Hat GmbH
-References: <20220620024158.2505-1-jasowang@redhat.com>
- <87y1xq8jgw.fsf@redhat.com>
- <CACGkMEun6C9RgQVGq1B8BJMd9DyRQkSXj8shXVVhDymQYQLxgA@mail.gmail.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Tue, 21 Jun 2022 11:58:19 +0200
-Message-ID: <87sfny8hj8.fsf@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E35DF616FB
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 11:23:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 534EBC341CC
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 11:23:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655810590;
+        bh=uzDTkuacsNA8+pdPiCafsk2jwmzEF0YEuFVqnUiKXeo=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=HF7Fr8yjSwwmUP91pO0euX+VYjxaJb9N1dJMPluBruhzSD7pigONogAIc004zQbXm
+         NsqVON3UAQcworbvhRXPONgL1EQuWsZNkqqQqYyoqS0/e5E39XKat8bjVei6CFji1f
+         tGc0I3EDGGfbsyxoqdKcY4XzQvcw6Jpg++pfCfBgkIz4bY9T7r2QGjZhr3CLKjyjcP
+         SF4VFsYofofh5TWvtuAr126D6Vg+sMJuHICLqs9uvvZG4fwbZTQ5UpN7Z8Lf+bB5pg
+         HZlAcRWmOQevVVfWRJ/6SMiGPkyZbffwGxz5DnbGWKtbqBqJWHZT044nB8Ok+i2Gxc
+         ECHEV7mFEAd9g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 376DEC05FD2; Tue, 21 Jun 2022 11:23:10 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216026] Fails to compile using gcc 12.1 under Ubuntu 22.04
+Date:   Tue, 21 Jun 2022 11:23:09 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-216026-28872-CqMHKSq2f1@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216026-28872@https.bugzilla.kernel.org/>
+References: <bug-216026-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,21 +70,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 21 2022, Jason Wang <jasowang@redhat.com> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216026
 
-> On Tue, Jun 21, 2022 at 5:16 PM Cornelia Huck <cohuck@redhat.com> wrote:
->>
->> The ifdeffery looks a big ugly, but I don't have a better idea.
->
-> I guess you meant the ccw part, I leave the spinlock here in V1, but
-> Michael prefers to have that.
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-Not doing the locking dance is good; I think the #ifdefs all over are a
-bit ugly, but as I said, I can't think of a good, less-ugly way...
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|REOPENED                    |RESOLVED
+         Resolution|---                         |CODE_FIX
 
-> In the future, we may consider removing that, one possible way is to
-> have a per driver boolean for the hardening.
+--- Comment #35 from Artem S. Tashkinov (aros@gmx.com) ---
+This is fixed in 5.19-rc3.
 
-As in "we've reviewed and tested this driver, so let's turn it on for
-every device bound to it"?
+The fix is trivial:
 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arc=
+h/x86/kvm/Makefile
+
+ccflags-y +=3D -I $(srctree)/arch/x86/kvm
+ccflags-$(CONFIG_KVM_WERROR) +=3D -Werror
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
