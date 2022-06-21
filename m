@@ -2,93 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39CBE553964
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 20:11:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 718065539FD
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 21:09:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235563AbiFUSLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 14:11:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56578 "EHLO
+        id S1352794AbiFUTJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 15:09:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbiFUSLc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 14:11:32 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2841E19006
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 11:11:30 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id j21so10620808lfe.1
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 11:11:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2OSsNJ8sjhHVo8wfzEftOtkr5HcPtOIMNqFox2iufIY=;
-        b=KfpRIF7uvdbQP1hWnFLJ+wpZPfbpqsrugXnGuBN4Y2LuuBPaadL720Ip9F4FODWsdT
-         VM2j0PB8vjwQRVjuQToTj6i29KrZVTNE+QMAvS3+6HqT9yurtX34jlaqW6+JLTqkHKPa
-         skmol3spbDfgOnTVWWODiSdu/2ZDcdYZhc0h5mQBzLxrzbKg2HAM8W4laB/s5SWWc9VM
-         iBFc1MaF6aaxT4b8v1GCvc9D1YL01eGPpZyzbtsnzaZBQRZTYWCcih8VNdNv1wdRcaKP
-         uA2sE9f38hN0pSnYgZaS3peHv6Gu5t6F6GktqAdvmdJS19+hl6JgNbGekkmN2ZsCd2Z/
-         sDMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2OSsNJ8sjhHVo8wfzEftOtkr5HcPtOIMNqFox2iufIY=;
-        b=A7sV9cfz1Mn4J3ZUq1x0QRTpRperUpVwzv02DQu0atmhXvISzpRRXHQQIJJJ33j1br
-         EK1/kvlS/4f8lpN/sloUU1j/R/mTkcPm3xcp1l/lIjSSbuBI9rReiLql99vBA8gOB9rX
-         WHztmO2WV3giBzz2sgb8llKbzjsUO4KwqK+X4OP6nex7INdEm93CiEPtaUOm9gLuEElv
-         Z41sOZ9cqL2hGD8nabqc1PEUt9o+vudgukU8BSI8pzBgt+LcrllBHmfTaOCbbaD3FIqZ
-         eQG32IAvxsOomzxUgR7AmGNSPFgzZUkPlTuPIwxG7+4GIvMJMx94uKt7twUwuI3NR4tW
-         QseA==
-X-Gm-Message-State: AJIora8O+/XV3mMCcVeI5w18PC0wFOZejJVUiOpOZ2BIX0W+hs8iWUR/
-        Tcfica1qwuJplPn4k9NBE3c8DSnzwcLRy9DeEUdAnA==
-X-Google-Smtp-Source: AGRyM1u3cNzkcdbb03ARGSv06yGgZax05RL/7AWsD9zEB9NhJk5fSjh68eGxcM8/9z7NrHB5xxdny2TUaHEWAkam0zc=
-X-Received: by 2002:a05:6512:401a:b0:47f:6ea5:dace with SMTP id
- br26-20020a056512401a00b0047f6ea5dacemr6981952lfb.402.1655835088052; Tue, 21
- Jun 2022 11:11:28 -0700 (PDT)
+        with ESMTP id S243248AbiFUTJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 15:09:27 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 572A122B1F;
+        Tue, 21 Jun 2022 12:09:26 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 423E9165C;
+        Tue, 21 Jun 2022 12:09:26 -0700 (PDT)
+Received: from [10.57.85.30] (unknown [10.57.85.30])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B8893F792;
+        Tue, 21 Jun 2022 12:09:24 -0700 (PDT)
+Message-ID: <4bc34090-249a-c505-3d90-f75a7fe7c17d@arm.com>
+Date:   Tue, 21 Jun 2022 20:09:20 +0100
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
-In-Reply-To: <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 21 Jun 2022 12:11:16 -0600
-Message-ID: <CAMkAt6ruxMazN3NmWHsemDNQj6Uj0PhCVeaxw2unCxU=YZFRWw@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 1/2] vfio/type1: Simplify bus_type determination
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        alex.williamson@redhat.com
+References: <07c69a27fa5bf9724ea8c9fcfe3ff2e8b68f6bf0.1654697988.git.robin.murphy@arm.com>
+ <20220610000343.GD1343366@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20220610000343.GD1343366@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,400 +46,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 5:05 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> The behavior and requirement for the SEV-legacy command is altered when
-> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
-> for more details.
->
-> Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region
-> when SNP is enabled to satify new requirements for the SNP. Continue
+On 2022-06-10 01:03, Jason Gunthorpe via iommu wrote:
+> On Wed, Jun 08, 2022 at 03:25:49PM +0100, Robin Murphy wrote:
+>> Since IOMMU groups are mandatory for drivers to support, it stands to
+>> reason that any device which has been successfully be added to a group
+>> must be on a bus supported by that IOMMU driver, and therefore a domain
+>> viable for any device in the group must be viable for all devices in
+>> the group. This already has to be the case for the IOMMU API's internal
+>> default domain, for instance. Thus even if the group contains devices
+>> on different buses, that can only mean that the IOMMU driver actually
+>> supports such an odd topology, and so without loss of generality we can
+>> expect the bus type of any arbitrary device in a group to be suitable
+>> for IOMMU API calls.
+>>
+>> Replace vfio_bus_type() with a trivial callback that simply returns any
+>> device from which to then derive a usable bus type. This is also a step
+>> towards removing the vague bus-based interfaces from the IOMMU API.
+>>
+>> Furthermore, scrutiny reveals a lack of protection for the bus and/or
+>> device being removed while .attach_group is inspecting them; the
+>> reference we hold on the iommu_group ensures that data remains valid,
+>> but does not prevent the group's membership changing underfoot. Holding
+>> the vfio_goup's device_lock should be sufficient to block any relevant
+>> device's VFIO driver from unregistering, and thus block unbinding and
+>> any further stages of removal for the duration of the attach operation.
+> 
+> The device_lock only protects devices that are on the device_list from
+> concurrent unregistration, the device returned by
+> iommu_group_for_each_dev() is not guarented to be the on the device
+> list.
 
-satisfy
+Sigh, you're quite right, and now I have a vague feeling that you called 
+that out in the previous discussion too, so apologies for forgetting.
 
-> allocating a 1mb region for !SNP configuration.
->
-> While at it, provide API that can be used by others to allocate a page
-> that can be used by the firmware. The immediate user for this API will
-> be the KVM driver. The KVM driver to need to allocate a firmware context
-> page during the guest creation. The context page need to be updated
-> by the firmware. See the SEV-SNP specification for further details.
->
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 173 +++++++++++++++++++++++++++++++++--
->  include/linux/psp-sev.h      |  11 +++
->  2 files changed, 178 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 35d76333e120..0dbd99f29b25 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -79,6 +79,14 @@ static void *sev_es_tmr;
->  #define NV_LENGTH (32 * 1024)
->  static void *sev_init_ex_buffer;
->
-> +/* When SEV-SNP is enabled the TMR needs to be 2MB aligned and 2MB size. */
-> +#define SEV_SNP_ES_TMR_SIZE    (2 * 1024 * 1024)
-> +
-> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
+>> @@ -760,8 +760,11 @@ static int __vfio_container_attach_groups(struct vfio_container *container,
+>>   	int ret = -ENODEV;
+>>   
+>>   	list_for_each_entry(group, &container->group_list, container_next) {
+>> +		/* Prevent devices unregistering during attach */
+>> +		mutex_lock(&group->device_lock);
+>>   		ret = driver->ops->attach_group(data, group->iommu_group,
+>>   						group->type);
+>> +		mutex_unlock(&group->device_lock);
+> 
+> I still prefer the version where we pass in an arbitrary vfio_device
+> from the list the group maintains:
+> 
+>     list_first_entry(group->device_list)
+> 
+> And don't call iommu_group_for_each_dev(), it is much simpler to
+> reason about how it works.
 
-Why not keep all this TMR stuff together near the SEV_ES_TMR_SIZE define?
+Agreed, trying to figure out which are the VFIO devices from within the 
+iommu_group iterator seems beyond the threshold of practicality.
 
-> +
-> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
-> +static int sev_do_cmd(int cmd, void *data, int *psp_ret);
-> +
->  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->  {
->         struct sev_device *sev = psp_master->sev_data;
-> @@ -177,11 +185,161 @@ static int sev_cmd_buffer_len(int cmd)
->         return 0;
->  }
->
-> +static void snp_leak_pages(unsigned long pfn, unsigned int npages)
-> +{
-> +       WARN(1, "psc failed, pfn 0x%lx pages %d (leaking)\n", pfn, npages);
-> +       while (npages--) {
-> +               memory_failure(pfn, 0);
-> +               dump_rmpentry(pfn);
-> +               pfn++;
-> +       }
-> +}
-> +
-> +static int snp_reclaim_pages(unsigned long pfn, unsigned int npages, bool locked)
-> +{
-> +       struct sev_data_snp_page_reclaim data;
-> +       int ret, err, i, n = 0;
-> +
-> +       for (i = 0; i < npages; i++) {
+Quick consensus then: does anyone have a particular preference between 
+changing the .attach_group signature vs. adding a helper based on 
+vfio_group_get_from_iommu() for type1 to call from within its callback? 
+They seem about equal (but opposite) in terms of the simplicity vs. 
+impact tradeoff to me, so I can't quite decide conclusively...
 
-What about setting |n| here too, also the other increments.
-
-for (i = 0, n = 0; i < npages; i++, n++, pfn++)
-
-> +               memset(&data, 0, sizeof(data));
-> +               data.paddr = pfn << PAGE_SHIFT;
-> +
-> +               if (locked)
-> +                       ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-> +               else
-> +                       ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-
-Can we change `sev_cmd_mutex` to some sort of nesting lock type? That
-could clean up this if (locked) code.
-
-> +               if (ret)
-> +                       goto cleanup;
-> +
-> +               ret = rmp_make_shared(pfn, PG_LEVEL_4K);
-> +               if (ret)
-> +                       goto cleanup;
-> +
-> +               pfn++;
-> +               n++;
-> +       }
-> +
-> +       return 0;
-> +
-> +cleanup:
-> +       /*
-> +        * If failed to reclaim the page then page is no longer safe to
-> +        * be released, leak it.
-> +        */
-> +       snp_leak_pages(pfn, npages - n);
-> +       return ret;
-> +}
-> +
-> +static inline int rmp_make_firmware(unsigned long pfn, int level)
-> +{
-> +       return rmp_make_private(pfn, 0, level, 0, true);
-> +}
-> +
-> +static int snp_set_rmp_state(unsigned long paddr, unsigned int npages, bool to_fw, bool locked,
-> +                            bool need_reclaim)
-
-This function can do a lot and when I read the call sites its hard to
-see what its doing since we have a combination of arguments which tell
-us what behavior is happening, some of which are not valid (ex: to_fw
-== true and need_reclaim == true is an invalid argument combination).
-Also this for loop over |npages| is duplicated from
-snp_reclaim_pages(). One improvement here is that on the current
-snp_reclaim_pages() if we fail to reclaim a page we assume we cannot
-reclaim the next pages, this may cause us to snp_leak_pages() more
-pages than we actually need too.
-
-What about something like this?
-
-static snp_leak_page(u64 pfn, enum pg_level level)
-{
-   memory_failure(pfn, 0);
-   dump_rmpentry(pfn);
-}
-
-static int snp_reclaim_page(u64 pfn, enum pg_level level)
-{
-  int ret;
-  struct sev_data_snp_page_reclaim data;
-
-  ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-  if (ret)
-    goto cleanup;
-
-  ret = rmp_make_shared(pfn, level);
-  if (ret)
-    goto cleanup;
-
-return 0;
-
-cleanup:
-    snp_leak_page(pfn, level)
-}
-
-typedef int (*rmp_state_change_func) (u64 pfn, enum pg_level level);
-
-static int snp_set_rmp_state(unsigned long paddr, unsigned int npages,
-rmp_state_change_func state_change, rmp_state_change_func cleanup)
-{
-  struct sev_data_snp_page_reclaim data;
-  int ret, err, i, n = 0;
-
-  for (i = 0, n = 0; i < npages; i++, n++, pfn++) {
-    ret = state_change(pfn, PG_LEVEL_4K)
-    if (ret)
-      goto cleanup;
-  }
-
-  return 0;
-
-cleanup:
-  for (; i>= 0; i--, n--, pfn--) {
-    cleanup(pfn, PG_LEVEL_4K);
-  }
-
-  return ret;
-}
-
-Then inside of __snp_alloc_firmware_pages():
-
-snp_set_rmp_state(paddr, npages, rmp_make_firmware, snp_reclaim_page);
-
-And inside of __snp_free_firmware_pages():
-
-snp_set_rmp_state(paddr, npages, snp_reclaim_page, snp_leak_page);
-
-Just a suggestion feel free to ignore. The readability comment could
-be addressed much less invasively by just making separate functions
-for each valid combination of arguments here. Like
-snp_set_rmp_fw_state(), snp_set_rmp_shared_state(),
-snp_set_rmp_release_state() or something.
-
-> +{
-> +       unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT; /* Cbit maybe set in the paddr */
-> +       int rc, n = 0, i;
-> +
-> +       for (i = 0; i < npages; i++) {
-> +               if (to_fw)
-> +                       rc = rmp_make_firmware(pfn, PG_LEVEL_4K);
-> +               else
-> +                       rc = need_reclaim ? snp_reclaim_pages(pfn, 1, locked) :
-> +                                           rmp_make_shared(pfn, PG_LEVEL_4K);
-> +               if (rc)
-> +                       goto cleanup;
-> +
-> +               pfn++;
-> +               n++;
-> +       }
-> +
-> +       return 0;
-> +
-> +cleanup:
-> +       /* Try unrolling the firmware state changes */
-> +       if (to_fw) {
-> +               /*
-> +                * Reclaim the pages which were already changed to the
-> +                * firmware state.
-> +                */
-> +               snp_reclaim_pages(paddr >> PAGE_SHIFT, n, locked);
-> +
-> +               return rc;
-> +       }
-> +
-> +       /*
-> +        * If failed to change the page state to shared, then its not safe
-> +        * to release the page back to the system, leak it.
-> +        */
-> +       snp_leak_pages(pfn, npages - n);
-> +
-> +       return rc;
-> +}
-> +
-> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
-> +{
-> +       unsigned long npages = 1ul << order, paddr;
-> +       struct sev_device *sev;
-> +       struct page *page;
-> +
-> +       if (!psp_master || !psp_master->sev_data)
-> +               return NULL;
-> +
-> +       page = alloc_pages(gfp_mask, order);
-> +       if (!page)
-> +               return NULL;
-> +
-> +       /* If SEV-SNP is initialized then add the page in RMP table. */
-> +       sev = psp_master->sev_data;
-> +       if (!sev->snp_inited)
-> +               return page;
-> +
-> +       paddr = __pa((unsigned long)page_address(page));
-> +       if (snp_set_rmp_state(paddr, npages, true, locked, false))
-> +               return NULL;
-
-So what about the case where snp_set_rmp_state() fails but we were
-able to reclaim all the pages? Should we be able to signal that to
-callers so that we could free |page| here? But given this is an error
-path already maybe we can optimize this in a follow up series.
-
-> +
-> +       return page;
-> +}
-> +
-> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
-> +{
-> +       struct page *page;
-> +
-> +       page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
-> +
-> +       return page ? page_address(page) : NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
-> +
-> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
-> +{
-> +       unsigned long paddr, npages = 1ul << order;
-> +
-> +       if (!page)
-> +               return;
-> +
-> +       paddr = __pa((unsigned long)page_address(page));
-> +       if (snp_set_rmp_state(paddr, npages, false, locked, true))
-> +               return;
-
-Here we may be able to free some of |page| depending how where inside
-of snp_set_rmp_state() we failed. But again given this is an error
-path already maybe we can optimize this in a follow up series.
-
-
-
-> +
-> +       __free_pages(page, order);
-> +}
-> +
-> +void snp_free_firmware_page(void *addr)
-> +{
-> +       if (!addr)
-> +               return;
-> +
-> +       __snp_free_firmware_pages(virt_to_page(addr), 0, false);
-> +}
-> +EXPORT_SYMBOL(snp_free_firmware_page);
-> +
->  static void *sev_fw_alloc(unsigned long len)
->  {
->         struct page *page;
->
-> -       page = alloc_pages(GFP_KERNEL, get_order(len));
-> +       page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(len), false);
->         if (!page)
->                 return NULL;
->
-> @@ -393,7 +551,7 @@ static int __sev_init_locked(int *error)
->                 data.tmr_address = __pa(sev_es_tmr);
->
->                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> -               data.tmr_len = SEV_ES_TMR_SIZE;
-> +               data.tmr_len = sev_es_tmr_size;
->         }
->
->         return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> @@ -421,7 +579,7 @@ static int __sev_init_ex_locked(int *error)
->                 data.tmr_address = __pa(sev_es_tmr);
->
->                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> -               data.tmr_len = SEV_ES_TMR_SIZE;
-> +               data.tmr_len = sev_es_tmr_size;
->         }
->
->         return __sev_do_cmd_locked(SEV_CMD_INIT_EX, &data, error);
-> @@ -818,6 +976,8 @@ static int __sev_snp_init_locked(int *error)
->         sev->snp_inited = true;
->         dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
->
-> +       sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
-> +
->         return rc;
->  }
->
-> @@ -1341,8 +1501,9 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->                 /* The TMR area was encrypted, flush it from the cache */
->                 wbinvd_on_all_cpus();
->
-> -               free_pages((unsigned long)sev_es_tmr,
-> -                          get_order(SEV_ES_TMR_SIZE));
-> +               __snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-> +                                         get_order(sev_es_tmr_size),
-> +                                         false);
->                 sev_es_tmr = NULL;
->         }
->
-> @@ -1430,7 +1591,7 @@ void sev_pci_init(void)
->         }
->
->         /* Obtain the TMR memory area for SEV-ES use */
-> -       sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
-> +       sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
->         if (!sev_es_tmr)
->                 dev_warn(sev->dev,
->                          "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 9f921d221b75..a3bb792bb842 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -12,6 +12,8 @@
->  #ifndef __PSP_SEV_H__
->  #define __PSP_SEV_H__
->
-> +#include <linux/sev.h>
-> +
->  #include <uapi/linux/psp-sev.h>
->
->  #ifdef CONFIG_X86
-> @@ -940,6 +942,8 @@ int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
->  int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
->
->  void *psp_copy_user_blob(u64 uaddr, u32 len);
-> +void *snp_alloc_firmware_page(gfp_t mask);
-> +void snp_free_firmware_page(void *addr);
->
->  #else  /* !CONFIG_CRYPTO_DEV_SP_PSP */
->
-> @@ -981,6 +985,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
->         return -ENODEV;
->  }
->
-> +static inline void *snp_alloc_firmware_page(gfp_t mask)
-> +{
-> +       return NULL;
-> +}
-> +
-> +static inline void snp_free_firmware_page(void *addr) { }
-> +
->  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
->
->  #endif /* __PSP_SEV_H__ */
-> --
-> 2.25.1
->
+Thanks,
+Robin.
