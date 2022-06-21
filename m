@@ -2,194 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91EAA553611
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 17:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DB1D55362C
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 17:35:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351788AbiFUP3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 11:29:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39360 "EHLO
+        id S1351666AbiFUPft (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 11:35:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352866AbiFUP2X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 11:28:23 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE7D6324
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 08:28:18 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id d19so15866197lji.10
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 08:28:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PPDc7qXBrAf8hM+ois/4M7n9y0Ctx2nTK0cCddntA00=;
-        b=Fi5EjLIzvDAJUiiuADLK7DwH7YYV7f0bHceXlX43VOliKsB9BBv4L4DTZlFmLFmkLk
-         POofabhBgj7RE3usD0FttRM8D8eDilGLOLPHqgnO8YDVQiE1OoG9dKOP/Dt3N9HP2E97
-         pFaXlwW+xYC2rWvtNgYANRwcpOUunAVpIJRCpoGyJRPa7VTijqJgFrS7RPtiWetYUA/S
-         nI082qoNoGUD37fI/pZXTw5gtv676RW9g4oemXpkcgvuAWhRvJ3ckQa3MARMB7BRSwwp
-         c9I9EW0jqRTQRaIdnXBNrGAivBi4QpIXdTKVVrEiFHYLvbScsPkiQHkbzokqo2gVc8J3
-         Pkrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PPDc7qXBrAf8hM+ois/4M7n9y0Ctx2nTK0cCddntA00=;
-        b=L7WnFrlre8wR+93tsUlkzxBm+r4h2bhJMOqYHnWAXjY8UDII6roM0QxKmZaWWoRq2D
-         LVb0TKf44jfY0cB83DTBFlnJojjsfv5s3aIOblxEkTHkKhZbdOCCnr6TQuIGlwR0e8bu
-         AyKUdUtd4I0WhG/FW7sKVspniYQKdmeN+/0906oOOEhUWhCNcufDG7sDr0zIUNaXxv72
-         ZS3wRuCNA3nD3ITYlpX5OrJK83YzHPfJppw74eZe64N82loj4T+TiG1jYhPaBQ6vo/Ss
-         s9nu1PjKfrp2YsZ8IWgfkIyw4EaBnl1ypzZdpC5FliAgZAkDFSd4vglaji6t61+uZ6it
-         Xz2Q==
-X-Gm-Message-State: AJIora+5m18QyVP/Tb8rvFOrvkIR1iLVDW19xyTduS40AZzhBAw+QCyq
-        yXp82I/i7SK4XkaZJ8kaVDj04H2FVCtjGuftTI/6uA==
-X-Google-Smtp-Source: AGRyM1tCe4/jK6PDAE71M19F4NM9E58kJKDMKB8cBjF0f/1wes7fLBrrgPNVl2oI3WpdVtZrOfMqeKvvJybe5z/2EzA=
-X-Received: by 2002:a2e:8091:0:b0:25a:8496:b255 with SMTP id
- i17-20020a2e8091000000b0025a8496b255mr75993ljg.369.1655825296513; Tue, 21 Jun
- 2022 08:28:16 -0700 (PDT)
+        with ESMTP id S1351661AbiFUPfs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 11:35:48 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47C32A734;
+        Tue, 21 Jun 2022 08:35:47 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25LFM35o011962;
+        Tue, 21 Jun 2022 15:35:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FOtXzGpb85PN4x2kcPAH0K4iqOhmMIKBo/UZbDkbBJI=;
+ b=VuqUKyAUVwl4AtkxgiOCLc3KIE4Lgxi7RWUjoBStvT/zUNHwyUBFVHAxSqWW+QE3p8Fd
+ zTOd46DC5DonW/sS4dOpP2F9arst5eLKMIKzCMnb5sguxARPyf+rEeYF3Y0+v2VBPaGU
+ 26wDJuyNI63fttKmo6jvmQy2NG6XxT8BZo49Z05GQduL7Q8wuqTD7gr/Z/6rUeEU8s6w
+ FGc8TlWfY9Dz9zlH49dpda4pMEA8LQ3R/y4V9/PadwDR3MSJ7RzLQQ/qhczwudvm9Lav
+ ywVYO0hYZIOvRNgrytXMV3Eibtv6DaEXB21x4HA4Tnr0wfcr+vkM/ytDYg422p1mPWk+ 0Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gugjmge5x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Jun 2022 15:35:47 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25LFPamk024372;
+        Tue, 21 Jun 2022 15:35:47 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gugjmge4a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Jun 2022 15:35:46 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25LFZVUq003705;
+        Tue, 21 Jun 2022 15:35:44 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3gs6b8ubps-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Jun 2022 15:35:44 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25LFZfPM14877056
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Jun 2022 15:35:41 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F1AFC52052;
+        Tue, 21 Jun 2022 15:35:40 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.4.76])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6DB3C5204E;
+        Tue, 21 Jun 2022 15:35:40 +0000 (GMT)
+Date:   Tue, 21 Jun 2022 17:35:36 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 0/3] s390x: Rework TEID decoding and
+ usage
+Message-ID: <20220621173536.21982a70@p-imbrenda>
+In-Reply-To: <20220621143015.748290-1-scgl@linux.ibm.com>
+References: <20220621143015.748290-1-scgl@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
-In-Reply-To: <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 21 Jun 2022 09:28:04 -0600
-Message-ID: <CAMkAt6r+WSYXLZj-Bs5jpo4CR3+H5cpND0GHjsmgPacBK1GH_Q@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PoUmAp5UO98KE0rKrPvHfNoYvehc747t
+X-Proofpoint-GUID: mS6-I4dxeAnnjtl515CeFfMmCAq5KKPt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-21_08,2022-06-21_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 mlxlogscore=999 spamscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 clxscore=1015
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206210066
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 4:59 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> The SEV-SNP support requires that IOMMU must to enabled, see the IOMMU
-> spec section 2.12 for further details. If IOMMU is not enabled or the
-> SNPSup extended feature register is not set then the SNP_INIT command
-> (used for initializing firmware) will fail.
->
-> The iommu_sev_snp_supported() can be used to check if IOMMU supports the
-> SEV-SNP feature.
->
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  drivers/iommu/amd/init.c | 30 ++++++++++++++++++++++++++++++
->  include/linux/iommu.h    |  9 +++++++++
->  2 files changed, 39 insertions(+)
->
-> diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-> index 1a3ad58ba846..82be8067ddf5 100644
-> --- a/drivers/iommu/amd/init.c
-> +++ b/drivers/iommu/amd/init.c
-> @@ -3361,3 +3361,33 @@ int amd_iommu_pc_set_reg(struct amd_iommu *iommu, u8 bank, u8 cntr, u8 fxn, u64
->
->         return iommu_pc_get_set_reg(iommu, bank, cntr, fxn, value, true);
->  }
-> +
-> +bool iommu_sev_snp_supported(void)
-> +{
-> +       struct amd_iommu *iommu;
-> +
-> +       /*
-> +        * The SEV-SNP support requires that IOMMU must be enabled, and is
-> +        * not configured in the passthrough mode.
-> +        */
-> +       if (no_iommu || iommu_default_passthrough()) {
-> +               pr_err("SEV-SNP: IOMMU is either disabled or configured in passthrough mode.\n");
+On Tue, 21 Jun 2022 16:30:12 +0200
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-Like below could this say something like snp support is disabled
-because of iommu settings.
+> The translation-exception identification (TEID) contains information to
+> identify the cause of certain program exceptions, including translation
+> exceptions occurring during dynamic address translation, as well as
+> protection exceptions.
+> The meaning of fields in the TEID is complex, depending on the exception
+> occurring and various potentially installed facilities.
 
-> +               return false;
-> +       }
-> +
-> +       /*
-> +        * Iterate through all the IOMMUs and verify the SNPSup feature is
-> +        * enabled.
-> +        */
-> +       for_each_iommu(iommu) {
-> +               if (!iommu_feature(iommu, FEATURE_SNP)) {
-> +                       pr_err("SNPSup is disabled (devid: %02x:%02x.%x)\n",
+thanks, queued
 
-SNPSup might not be obvious to readers, what about " SNP Support is
-disabled ...".
+> 
+> Add function to query which suppression-on-protection facility is
+> installed.
+> Rework the type describing the TEID, in order to ease decoding.
+> Change the existing code interpreting the TEID and extend it to take the
+> installed suppression-on-protection facility into account.
+> 
+> Also fix the sclp bit order.
+> 
+> v2 -> v3
+>  * rename some identifiers
+>  * implement Claudio's feedback to assert that the array for printing
+>    has the correct number of elements. I kept the array inside the
+>    printing function, tho, because I consider its content an implementation
+>    detail
+>  * ignore ancient machines without at least ESOP-1
+> 
+> v1 -> v2
+>  * pick up r-b
+>  * get rid of esop1 alias of sop_teid_predictable
+>  * assert that the esop2 protection code is valid
+>  * use string literal array and indexing for protection code printing
+>  * fix protection exception check in edat.c
+> 
+> Janis Schoetterl-Glausch (3):
+>   s390x: Fix sclp facility bit numbers
+>   s390x: lib: SOP facility query function
+>   s390x: Rework TEID decoding and usage
+> 
+>  lib/s390x/asm/facility.h  | 21 +++++++++++++
+>  lib/s390x/asm/interrupt.h | 62 ++++++++++++++++++++++++++++++---------
+>  lib/s390x/fault.h         | 30 +++++--------------
+>  lib/s390x/sclp.h          | 18 +++++++-----
+>  lib/s390x/fault.c         | 58 +++++++++++++++++++++++-------------
+>  lib/s390x/interrupt.c     |  2 +-
+>  lib/s390x/sclp.c          |  2 ++
+>  s390x/edat.c              | 25 +++++++++-------
+>  8 files changed, 142 insertions(+), 76 deletions(-)
+> 
+> Range-diff against v2:
+> 1:  6427944a = 1:  189e03ca s390x: Fix sclp facility bit numbers
+> 2:  a08fce3b = 2:  0783c2a4 s390x: lib: SOP facility query function
+> 3:  eb268af1 ! 3:  615ec8df s390x: Rework TEID decoding and usage
+>     @@ lib/s390x/asm/interrupt.h
+>      +		/* common fields DAT exc & protection exc */
+>      +		struct {
+>      +			uint64_t addr			: 52 -  0;
+>     -+			uint64_t acc_exc_f_s		: 54 - 52;
+>     ++			uint64_t acc_exc_fetch_store	: 54 - 52;
+>      +			uint64_t side_effect_acc	: 55 - 54;
+>      +			uint64_t /* reserved */		: 62 - 55;
+>      +			uint64_t asce_id		: 64 - 62;
+>     @@ lib/s390x/asm/interrupt.h
+>       };
+>       
+>      +enum prot_code {
+>     -+	PROT_KEY_LAP,
+>     ++	PROT_KEY_OR_LAP,
+>      +	PROT_DAT,
+>      +	PROT_KEY,
+>      +	PROT_ACC_LIST,
+>      +	PROT_LAP,
+>      +	PROT_IEP,
+>     ++	PROT_NUM_CODES /* Must always be last */
+>      +};
+>      +
+>      +static inline enum prot_code teid_esop2_prot_code(union teid teid)
+>     @@ lib/s390x/asm/interrupt.h
+>      +		    teid.esop2_prot_code_1 << 1 |
+>      +		    teid.esop2_prot_code_2);
+>      +
+>     -+	assert(code < 6);
+>     ++	assert(code < PROT_NUM_CODES);
+>      +	return (enum prot_code)code;
+>      +}
+>      +
+>     @@ lib/s390x/fault.c
+>      -		printf("Type: IEP\n");
+>      -		return;
+>      -	}
+>     -+static void print_decode_pgm_prot(union teid teid, bool dat)
+>     ++static void print_decode_pgm_prot(union teid teid)
+>      +{
+>      +	switch (get_supp_on_prot_facility()) {
+>      +	case SOP_NONE:
+>     -+		printf("Type: ?\n");
+>     -+		break;
+>      +	case SOP_BASIC:
+>     -+		if (teid.sop_teid_predictable && dat && teid.sop_acc_list)
+>     -+			printf("Type: ACC\n");
+>     -+		else
+>     -+			printf("Type: ?\n");
+>     ++		printf("Type: ?\n"); /* modern/relevant machines have ESOP */
+>      +		break;
+>      +	case SOP_ENHANCED_1:
+>      +		if (teid.sop_teid_predictable) {/* implies access list or DAT */
+>     @@ lib/s390x/fault.c
+>      +			"LAP",
+>      +			"IEP",
+>      +		};
+>     ++		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
+>      +		int prot_code = teid_esop2_prot_code(teid);
+>       
+>      -	if (prot_is_datp(teid)) {
+>      -		printf("Type: DAT\n");
+>      -		return;
+>     -+		assert(0 <= prot_code && prot_code < ARRAY_SIZE(prot_str));
+>      +		printf("Type: %s\n", prot_str[prot_code]);
+>      +		}
+>       	}
+>     @@ lib/s390x/fault.c
+>       	case AS_PRIM:
+>       		printf("Primary\n");
+>       		break;
+>     -@@ lib/s390x/fault.c: void print_decode_teid(uint64_t teid)
+>     - 	}
+>     - 
+>     - 	if (lowcore.pgm_int_code == PGM_INT_CODE_PROTECTION)
+>     --		print_decode_pgm_prot(teid);
+>     -+		print_decode_pgm_prot(teid, dat);
+>     - 
+>     - 	/*
+>     - 	 * If teid bit 61 is off for these two exception the reported
+>      @@ lib/s390x/fault.c: void print_decode_teid(uint64_t teid)
+>       	 */
+>       	if ((lowcore.pgm_int_code == PGM_INT_CODE_SECURE_STOR_ACCESS ||
+>     @@ s390x/edat.c: static bool check_pgm_prot(void *ptr)
+>      -	 * field might or might not be meaningful when the m field is 0.
+>      -	 */
+>      -	if (!teid.m)
+>     +-		return true;
+>     +-	return (!teid.acc_list_prot && !teid.asce_id &&
+>      +	switch (get_supp_on_prot_facility()) {
+>      +	case SOP_NONE:
+>     - 		return true;
+>     --	return (!teid.acc_list_prot && !teid.asce_id &&
+>      +	case SOP_BASIC:
+>     -+		if (!teid.sop_teid_predictable)
+>     -+			return true;
+>     -+		break;
+>     ++		assert(false); /* let's ignore ancient/irrelevant machines */
+>      +	case SOP_ENHANCED_1:
+>      +		if (!teid.sop_teid_predictable) /* implies key or low addr */
+>      +			return false;
+> 
+> base-commit: 610c15284a537484682adfb4b6d6313991ab954f
 
-Also should this have the "SEV-SNP:" prefix like the above log?
-
-> +                              PCI_BUS_NUM(iommu->devid), PCI_SLOT(iommu->devid),
-> +                              PCI_FUNC(iommu->devid));
-> +                       return false;
-> +               }
-> +       }
-> +
-> +       return true;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_sev_snp_supported);
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 9208eca4b0d1..fecb72e1b11b 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -675,6 +675,12 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
->  void iommu_sva_unbind_device(struct iommu_sva *handle);
->  u32 iommu_sva_get_pasid(struct iommu_sva *handle);
->
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +bool iommu_sev_snp_supported(void);
-> +#else
-> +static inline bool iommu_sev_snp_supported(void) { return false; }
-> +#endif
-> +
->  #else /* CONFIG_IOMMU_API */
->
->  struct iommu_ops {};
-> @@ -1031,6 +1037,9 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
->  {
->         return NULL;
->  }
-> +
-> +static inline bool iommu_sev_snp_supported(void) { return false; }
-> +
->  #endif /* CONFIG_IOMMU_API */
->
->  /**
-> --
-> 2.25.1
->
