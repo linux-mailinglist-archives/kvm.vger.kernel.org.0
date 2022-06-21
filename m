@@ -2,137 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 037FF553895
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 19:10:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B6CF5538D5
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 19:25:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351837AbiFURJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 13:09:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46550 "EHLO
+        id S234333AbiFURZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 13:25:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352201AbiFURJm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 13:09:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 037EE27B11
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:09:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655831378;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5kAhXV5ceZVd9SW+rj4Nij9cH0l8kTqdMQa24MeO028=;
-        b=a6tE37yWZvfapKGwM2BaMX2wmLDc/0oRNaiFLfpkIPBaE28KIL3qkVBsKp12PsdhlGq3lU
-        90rGrxpHNMpJtKmJGx01KxV673oZSZxnGc1x/jUY1y21hLwzhkAS/W4B72R4F6JP5UkGOd
-        XduCukErzoY0VrzFq7HyPIoPGjxx9Fo=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-427-f6R0vqI5NEuliIefHVJ-NQ-1; Tue, 21 Jun 2022 13:09:37 -0400
-X-MC-Unique: f6R0vqI5NEuliIefHVJ-NQ-1
-Received: by mail-il1-f199.google.com with SMTP id l2-20020a056e0212e200b002d9258029c4so2093595iln.22
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:09:37 -0700 (PDT)
+        with ESMTP id S233568AbiFURZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 13:25:16 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268F62D1EE
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:25:15 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id w20so23485037lfa.11
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:25:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QxmNtn8D9Dq51lR45DZiK36aZDbgyY5PoNiGUjl0icA=;
+        b=Ld+SXs+fbT42PedNRfBVwRPd4bGGEqJzfB0snipjuJDtE6hrnQapdgsyRXKLSaFLEF
+         SeHC6LW/bNPOFZSmvGwC4yAulJod6HrkGlu2Q/HxkdPrvSMwginiMcuAwi+HJb8SrgJm
+         Dg6a3LD574NJUNbQRoUEz/Z1/AYz/ywSt/LWvYmn69UESDBDxp/43gcSdd5zuehSKpxe
+         5WfN11Dha6FzU37T6JD8yt50/Xsib8ACxxj6Hje3zAyjKUSYqWhA7ZK5VnJqJf5fs9Z0
+         Wrc1cadDRYy1qG2WhCErGy19AwynWxr/HW00aYN4nILtBmD3ttCewO3nVp93ciSI0h92
+         1qgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5kAhXV5ceZVd9SW+rj4Nij9cH0l8kTqdMQa24MeO028=;
-        b=AXpA9TZGEG7+tfaSgQF34BOJK062GyzdyQ64PjxMo44e3lXWfNnKYi5sBtVoB2lV5H
-         udJtkIFYH6/VWD6Vk4Q9DKF1rj5x87aQ5CcILd+7ZsPo6k/n0mlajTxYW4Sdu0cqpJ1E
-         2HMIjh8Xt9mMaT+u8gd/9UADYFycjy3NTkLNRZK8B/WAxXdzmpAZFZpBjU62j48gjp6Y
-         qbL8/gAbKPaMOqj8BWGGoQVtA4vp6Ud7sG0e/BAG5sGYA4rBA18lsjaVlZOB4o2+v6s3
-         EXy6KwT/Qq6pAoX+zFDkSrHAxDo0Pr1GB2UN/DwNafRyZ+Fx3AR4nA/Hmt8LXd1zaStl
-         77CA==
-X-Gm-Message-State: AJIora+QrWYXWPFKs0l84VWHEx0Dup4HtJoStlW9WJ4S8eABCcuLq/UV
-        3G3fPZsitLSz6BR1Jvsh50djYw5Y5B0iopsoMBwOriT2gnPY6fVidiIi5LZZNpQGMu6cNrHP0vo
-        u4ZsXM1JBAZrj
-X-Received: by 2002:a05:6638:240a:b0:332:783:156b with SMTP id z10-20020a056638240a00b003320783156bmr16359095jat.306.1655831376643;
-        Tue, 21 Jun 2022 10:09:36 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sEoM/q2ZzHHdyf2r5gcqetk1jTonW7PHJFLpLSAjDLzc2r35SkR603oJ4EMetLtOp4Z+ydng==
-X-Received: by 2002:a05:6638:240a:b0:332:783:156b with SMTP id z10-20020a056638240a00b003320783156bmr16359088jat.306.1655831376427;
-        Tue, 21 Jun 2022 10:09:36 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id o33-20020a027421000000b00331a211407fsm7406362jac.93.2022.06.21.10.09.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 10:09:35 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 13:09:34 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH RFC 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Message-ID: <YrH7ToN8fDB0PbW3@xz-m1.local>
-References: <20220617014147.7299-1-peterx@redhat.com>
- <20220617014147.7299-2-peterx@redhat.com>
- <212f8b31-e470-d62c-0090-537d0d60add9@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QxmNtn8D9Dq51lR45DZiK36aZDbgyY5PoNiGUjl0icA=;
+        b=SRt/migcSrmn4M6cBmEab6d3mCFcz2BLybP5XeOTv9c96S5AvSvP5jLkGqWUMlDQFs
+         /btkFvy4IepaX1SBVC4QTj5mOtJusqDScGPkmGlSOpFSfe+wud8MuDH7hGxtzgbKQm+M
+         Ul2DmK6Rb7ZAUaP+pdSmoesngulUEHBWr8/gjG1k/Hu2cEFFF2TFxS7PoHBPe251dHBB
+         PHU41lIbS4oVVcHuiM5qLM+kiisR0WTiA3ULtqdDuAug8hMAQ9huoPj9v/Y5JLlkSMwj
+         gDHDQlCBBZkRBFQmP/pb12L2nGX/ZD7PigydTelMDSGtS0ZfBgPrGWcBlVO9cYgyJBtM
+         a0yw==
+X-Gm-Message-State: AJIora9DtCdCNxMivpfo1yZ8bJ6ZxzV9+q0N2mbqVLzFH0Yj2H+aZJ0F
+        5lzySoeevYtt0L3Ogwy49j8vXxs//KunSUu8G88row==
+X-Google-Smtp-Source: AGRyM1s5cjr8sQNsMbvjgG6SWuG6iDiSvWJI9kOqfmURFLq5B+Ub8Rt52OPf2QusJc1z0mMA44WZn84iXTKx0ZqHfTo=
+X-Received: by 2002:a05:6512:4004:b0:479:1d77:4e43 with SMTP id
+ br4-20020a056512400400b004791d774e43mr17252143lfb.537.1655832313238; Tue, 21
+ Jun 2022 10:25:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <212f8b31-e470-d62c-0090-537d0d60add9@redhat.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20220516232138.1783324-1-dmatlack@google.com> <20220516232138.1783324-20-dmatlack@google.com>
+ <Yqyzavjp9eS9p4+m@google.com>
+In-Reply-To: <Yqyzavjp9eS9p4+m@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 21 Jun 2022 10:24:46 -0700
+Message-ID: <CALzav=dG9f2X8GBLjQgR-Lj4yPKX2Adg3C+9_9aC83A7mzmbtw@mail.gmail.com>
+Subject: Re: [PATCH v6 19/22] KVM: x86/mmu: Zap collapsible SPTEs in shadow
+ MMU at all possible levels
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 21, 2022 at 10:23:32AM +0200, David Hildenbrand wrote:
-> On 17.06.22 03:41, Peter Xu wrote:
-> > We have had FAULT_FLAG_INTERRUPTIBLE but it was never applied to GUPs.  One
-> > issue with it is that not all GUP paths are able to handle signal delivers
-> > besides SIGKILL.
-> > 
-> > That's not ideal for the GUP users who are actually able to handle these
-> > cases, like KVM.
-> > 
-> > KVM uses GUP extensively on faulting guest pages, during which we've got
-> > existing infrastructures to retry a page fault at a later time.  Allowing
-> > the GUP to be interrupted by generic signals can make KVM related threads
-> > to be more responsive.  For examples:
-> > 
-> >   (1) SIGUSR1: which QEMU/KVM uses to deliver an inter-process IPI,
-> >       e.g. when the admin issues a vm_stop QMP command, SIGUSR1 can be
-> >       generated to kick the vcpus out of kernel context immediately,
-> > 
-> >   (2) SIGINT: which can be used with interactive hypervisor users to stop a
-> >       virtual machine with Ctrl-C without any delays/hangs,
-> > 
-> >   (3) SIGTRAP: which grants GDB capability even during page faults that are
-> >       stuck for a long time.
-> > 
-> > Normally hypervisor will be able to receive these signals properly, but not
-> > if we're stuck in a GUP for a long time for whatever reason.  It happens
-> > easily with a stucked postcopy migration when e.g. a network temp failure
-> > happens, then some vcpu threads can hang death waiting for the pages.  With
-> > the new FOLL_INTERRUPTIBLE, we can allow GUP users like KVM to selectively
-> > enable the ability to trap these signals.
-> 
-> This makes sense to me. I assume relevant callers will detect "GUP
-> failed" but also "well, there is a signal to handle" and cleanly back
-> off, correct?
+On Fri, Jun 17, 2022 at 10:01 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, May 16, 2022, David Matlack wrote:
+> > Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU. This
+> > is fine for now since KVM never creates intermediate huge pages during
+> > dirty logging. In other words, KVM always replaces 1GiB pages directly
+> > with 4KiB pages, so there is no reason to look for collapsible 2MiB
+> > pages.
+> >
+> > However, this will stop being true once the shadow MMU participates in
+> > eager page splitting. During eager page splitting, each 1GiB is first
+> > split into 2MiB pages and then those are split into 4KiB pages. The
+> > intermediate 2MiB pages may be left behind if an error condition causes
+> > eager page splitting to bail early.
+> >
+> > No functional change intended.
+> >
+> > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 21 ++++++++++++++-------
+> >  1 file changed, 14 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index f83de72feeac..a5d96d452f42 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -6177,18 +6177,25 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+> >       return need_tlb_flush;
+> >  }
+> >
+> > +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
+> > +                                        const struct kvm_memory_slot *slot)
+> > +{
+> > +     /*
+> > +      * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
+> > +      * pages that are already mapped at the maximum possible level.
+> > +      */
+> > +     if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+> > +                           PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
+> > +                           true))
+>
+> No need to wrap, "true" fits easily on the previous line.  That said, I don't see
+> any point in adding a helper.  It's highly unlike there will be another caller,
+> and IMO it's not any more readable since I have to go look at another function
+> when reading kvm_mmu_zap_collapsible_sptes().
 
-Correct, via an -EINTR.
+I could see an argument for readability either way. Putting it in a
+helper function abstracts away the details, which would aid
+readability if the reader does not care about the implementation
+details of the rmap case.
 
-One thing to mention is that the gup user behavior will be the same as
-before if the caller didn't explicilty pass in FOLL_INTERRUPTIBLE with the
-gup call.  So after the whole series applied only kvm (and only some path
-of kvm, not all GUP; I only touched up the x86 slow page fault path) to
-handle this, but that'll be far enough to cover 99.99% use cases that I
-wanted to take care of.
+I also have been thinking about splitting the rmap stuff out of mmu.c
+(e.g. into rmap.c or shadow_mmu.c) to mirror the TDP MMU. That way we
+can have a more clear split between the TDP MMU and shadow MMU, each
+with their own file, and with higher level MMU operations that need to
+operate on either or both MMUs living in mmu.c.
 
-E.g., some kvm request to gup on some guest apic page may not still be able
-to respond to a SIGUSR1 but that's very very rare, and we can always add
-more users of FOLL_INTERRUPTIBLE when the code is ready to benefit from the
-fast respondings.
-
-Thanks,
-
--- 
-Peter Xu
-
+>
+> With some gentle massaging, the comment can squeeze onto two lines even with the
+> extra level of indentation.
+>
+>                 /*
+>                  * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1, there's no need to zap
+>                  * pages that are already mapped at the maximum hugepage level.
+>                  */
+>                 if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+>                                       PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1, true)
+>                         kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+>
+> > +             kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> > +}
+> > +
+> >  void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+> >                                  const struct kvm_memory_slot *slot)
+> >  {
+> >       if (kvm_memslots_have_rmaps(kvm)) {
+> >               write_lock(&kvm->mmu_lock);
+> > -             /*
+> > -              * Zap only 4k SPTEs since the legacy MMU only supports dirty
+> > -              * logging at a 4k granularity and never creates collapsible
+> > -              * 2m SPTEs during dirty logging.
+> > -              */
+> > -             if (slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true))
+> > -                     kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> > +             kvm_rmap_zap_collapsible_sptes(kvm, slot);
+> >               write_unlock(&kvm->mmu_lock);
+> >       }
+> >
+> > --
+> > 2.36.0.550.gb090851708-goog
+> >
