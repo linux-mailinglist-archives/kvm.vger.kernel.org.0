@@ -2,120 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 468E5553886
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 19:07:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 037FF553895
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 19:10:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352193AbiFURHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 13:07:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44302 "EHLO
+        id S1351837AbiFURJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 13:09:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351511AbiFURHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 13:07:21 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E602CE2B
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:07:19 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id a11so7412239ljb.5
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:07:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FnOmw3gVk8tU+AE3cNeQjrjRVGb6taWwsuCOIfWCWxA=;
-        b=YXKgy8GzJNpXWgsQ+ad6BrqIukKRln0aMHUpAz3ufqwzfs7i7BGubSSuGze4kyE/wN
-         0vyoLZwVca0S2XXVcnvAoER6/ZyF44XgJGUi2tzkE2Xe6npHx30ng7Nr5M7fVo16rgk6
-         gjIk5DT1zN/pCNT4kwvyq45YRaR5nZ4/Z59ys9rxb1ZKpiyk06/x/sR1xuyYtFmWpk9V
-         Ln78wPfGHhHjaW3LDgPfga0c9htn6Ss8nTnj4aodGmeaoQlI3MWpLz42Y4dpS1D9jwQa
-         8oKLu/8Fbg6PRfmjj8qzJUo/xsWDGvV5XIV+kyqzRt7lTYz85g2gYnvH4P5+ecQiZWN2
-         H39Q==
+        with ESMTP id S1352201AbiFURJm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 13:09:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 037EE27B11
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:09:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655831378;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5kAhXV5ceZVd9SW+rj4Nij9cH0l8kTqdMQa24MeO028=;
+        b=a6tE37yWZvfapKGwM2BaMX2wmLDc/0oRNaiFLfpkIPBaE28KIL3qkVBsKp12PsdhlGq3lU
+        90rGrxpHNMpJtKmJGx01KxV673oZSZxnGc1x/jUY1y21hLwzhkAS/W4B72R4F6JP5UkGOd
+        XduCukErzoY0VrzFq7HyPIoPGjxx9Fo=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-427-f6R0vqI5NEuliIefHVJ-NQ-1; Tue, 21 Jun 2022 13:09:37 -0400
+X-MC-Unique: f6R0vqI5NEuliIefHVJ-NQ-1
+Received: by mail-il1-f199.google.com with SMTP id l2-20020a056e0212e200b002d9258029c4so2093595iln.22
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 10:09:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FnOmw3gVk8tU+AE3cNeQjrjRVGb6taWwsuCOIfWCWxA=;
-        b=JewBzWxv0yTzejOxi8UhhITBv1hLZl67GMIaUU+Z6t+EpEXk/f72RJlapxazqBtZ2x
-         3Il6hfyMJ5a8B5Az8O2qzYqKfY3LWe0Rcp39qwUQ7Mg3jpKoeywzklyaw7Q7KMZVWIjL
-         8ksNUHURYj80ZPlH6i44JQ+tTJNEio0P0UFVjhUE58wvQca7Q8PkBdMcGt+7gOyBL1ur
-         jdxVNVLNlH57FcXM8Edd4ahpmtQ47Zkico5qOIysUEcCxwbnp2Cu7cGBdZkLBPWr/Xym
-         bU+1M2LxiJQpkYCMmznRwTe8IiD+HWFzHlBq0YdYKUrwXlveFmNw6EWZwHu5iYDDQj84
-         Y0mw==
-X-Gm-Message-State: AJIora8dCFMyPKSo5XN4sul+MttoD1xgfJ+BBpDeMJx98eVoCCxmOdxC
-        DnwKa+B/H62ecdVZq1c5szKZhqJEvH8jazOOGU+HNg==
-X-Google-Smtp-Source: AGRyM1vsnNiJzYI8a4JothArzJ6EPJeG8wTiRAa2dkNSnIZYaQB/MuJ0ERB2pxoUlEJx6kKfxtszHOI0qWmk6ygmp0w=
-X-Received: by 2002:a05:651c:886:b0:258:df66:5040 with SMTP id
- d6-20020a05651c088600b00258df665040mr15428117ljq.16.1655831237279; Tue, 21
- Jun 2022 10:07:17 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5kAhXV5ceZVd9SW+rj4Nij9cH0l8kTqdMQa24MeO028=;
+        b=AXpA9TZGEG7+tfaSgQF34BOJK062GyzdyQ64PjxMo44e3lXWfNnKYi5sBtVoB2lV5H
+         udJtkIFYH6/VWD6Vk4Q9DKF1rj5x87aQ5CcILd+7ZsPo6k/n0mlajTxYW4Sdu0cqpJ1E
+         2HMIjh8Xt9mMaT+u8gd/9UADYFycjy3NTkLNRZK8B/WAxXdzmpAZFZpBjU62j48gjp6Y
+         qbL8/gAbKPaMOqj8BWGGoQVtA4vp6Ud7sG0e/BAG5sGYA4rBA18lsjaVlZOB4o2+v6s3
+         EXy6KwT/Qq6pAoX+zFDkSrHAxDo0Pr1GB2UN/DwNafRyZ+Fx3AR4nA/Hmt8LXd1zaStl
+         77CA==
+X-Gm-Message-State: AJIora+QrWYXWPFKs0l84VWHEx0Dup4HtJoStlW9WJ4S8eABCcuLq/UV
+        3G3fPZsitLSz6BR1Jvsh50djYw5Y5B0iopsoMBwOriT2gnPY6fVidiIi5LZZNpQGMu6cNrHP0vo
+        u4ZsXM1JBAZrj
+X-Received: by 2002:a05:6638:240a:b0:332:783:156b with SMTP id z10-20020a056638240a00b003320783156bmr16359095jat.306.1655831376643;
+        Tue, 21 Jun 2022 10:09:36 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sEoM/q2ZzHHdyf2r5gcqetk1jTonW7PHJFLpLSAjDLzc2r35SkR603oJ4EMetLtOp4Z+ydng==
+X-Received: by 2002:a05:6638:240a:b0:332:783:156b with SMTP id z10-20020a056638240a00b003320783156bmr16359088jat.306.1655831376427;
+        Tue, 21 Jun 2022 10:09:36 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id o33-20020a027421000000b00331a211407fsm7406362jac.93.2022.06.21.10.09.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jun 2022 10:09:35 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 13:09:34 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH RFC 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
+Message-ID: <YrH7ToN8fDB0PbW3@xz-m1.local>
+References: <20220617014147.7299-1-peterx@redhat.com>
+ <20220617014147.7299-2-peterx@redhat.com>
+ <212f8b31-e470-d62c-0090-537d0d60add9@redhat.com>
 MIME-Version: 1.0
-References: <20220516232138.1783324-1-dmatlack@google.com> <20220516232138.1783324-11-dmatlack@google.com>
- <YqyXYJsoZGgp7l62@google.com>
-In-Reply-To: <YqyXYJsoZGgp7l62@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 21 Jun 2022 10:06:50 -0700
-Message-ID: <CALzav=fVzX+GXCdKRwRGofAgKatX206_kBKagT7R-eYO9RnYkA@mail.gmail.com>
-Subject: Re: [PATCH v6 10/22] KVM: x86/mmu: Pass memory caches to allocate SPs separately
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <212f8b31-e470-d62c-0090-537d0d60add9@redhat.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 17, 2022 at 8:02 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, May 16, 2022, David Matlack wrote:
-> > Refactor kvm_mmu_alloc_shadow_page() to receive the caches from which it
-> > will allocate the various pieces of memory for shadow pages as a
-> > parameter, rather than deriving them from the vcpu pointer. This will be
-> > useful in a future commit where shadow pages are allocated during VM
-> > ioctls for eager page splitting, and thus will use a different set of
-> > caches.
-> >
-> > Preemptively pull the caches out all the way to
-> > kvm_mmu_get_shadow_page() since eager page splitting will not be calling
->
-> Uber nit, "eager hugepage splitting" to provide a mental cue/reminder for why
-> those pages are direct.
+On Tue, Jun 21, 2022 at 10:23:32AM +0200, David Hildenbrand wrote:
+> On 17.06.22 03:41, Peter Xu wrote:
+> > We have had FAULT_FLAG_INTERRUPTIBLE but it was never applied to GUPs.  One
+> > issue with it is that not all GUP paths are able to handle signal delivers
+> > besides SIGKILL.
+> > 
+> > That's not ideal for the GUP users who are actually able to handle these
+> > cases, like KVM.
+> > 
+> > KVM uses GUP extensively on faulting guest pages, during which we've got
+> > existing infrastructures to retry a page fault at a later time.  Allowing
+> > the GUP to be interrupted by generic signals can make KVM related threads
+> > to be more responsive.  For examples:
+> > 
+> >   (1) SIGUSR1: which QEMU/KVM uses to deliver an inter-process IPI,
+> >       e.g. when the admin issues a vm_stop QMP command, SIGUSR1 can be
+> >       generated to kick the vcpus out of kernel context immediately,
+> > 
+> >   (2) SIGINT: which can be used with interactive hypervisor users to stop a
+> >       virtual machine with Ctrl-C without any delays/hangs,
+> > 
+> >   (3) SIGTRAP: which grants GDB capability even during page faults that are
+> >       stuck for a long time.
+> > 
+> > Normally hypervisor will be able to receive these signals properly, but not
+> > if we're stuck in a GUP for a long time for whatever reason.  It happens
+> > easily with a stucked postcopy migration when e.g. a network temp failure
+> > happens, then some vcpu threads can hang death waiting for the pages.  With
+> > the new FOLL_INTERRUPTIBLE, we can allow GUP users like KVM to selectively
+> > enable the ability to trap these signals.
+> 
+> This makes sense to me. I assume relevant callers will detect "GUP
+> failed" but also "well, there is a signal to handle" and cleanly back
+> off, correct?
 
-I think it may be too late to move away from the term "eager page
-splitting" (it is already in commit messages and the module param is
-called "eager_page_split"). Using a slightly different name here might
-produce more confusion, or at least cause readers to do a double-take.
+Correct, via an -EINTR.
 
-But naming aside, I don't follow what you mean here. i.e. What does
-the fact that page splitting uses direct shadow pages have to do with
-this patch?
+One thing to mention is that the gup user behavior will be the same as
+before if the caller didn't explicilty pass in FOLL_INTERRUPTIBLE with the
+gup call.  So after the whole series applied only kvm (and only some path
+of kvm, not all GUP; I only touched up the x86 slow page fault path) to
+handle this, but that'll be far enough to cover 99.99% use cases that I
+wanted to take care of.
 
+E.g., some kvm request to gup on some guest apic page may not still be able
+to respond to a SIGUSR1 but that's very very rare, and we can always add
+more users of FOLL_INTERRUPTIBLE when the code is ready to benefit from the
+fast respondings.
 
->
-> > kvm_mmu_alloc_shadow_page() directly.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+Thanks,
+
+-- 
+Peter Xu
+
