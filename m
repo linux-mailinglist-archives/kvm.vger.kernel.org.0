@@ -2,157 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8366553DB9
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 23:27:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C519E553DAF
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 23:27:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356480AbiFUV0D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 17:26:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39518 "EHLO
+        id S1356495AbiFUV0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 17:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356326AbiFUVZq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 17:25:46 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2050.outbound.protection.outlook.com [40.107.243.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338E833A16;
-        Tue, 21 Jun 2022 14:21:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e9tCpbDH9Fk6Kcr2QUm9x/h1nhltk5oOwp87NCOkB4ec+37hu2fAkhDseRI659gHxAOJV9aV+TsnjCyetZFsULZ4ZbPs7zLOQqZLnuvDRh7HTLYdA9mpF9IlMN0I3fELW2sW7hcM3QYi9jaF1QrutkrBdGU/fReqnCvZPxWEDUvW7tdUbwDpw82Dz6brWMpIOaDtcfZjFUfqdwQ8U/CqrxU1aHMlMsNRwOqwgIU+vVf6s1dujfhHVfYjrH69LH4y8Glr/puCYYDSIIl7TbW4g2j6HNFc95nTlI8muvi3jXIYvKKw1AUXaIjkpQJLsxg5WvdImiI4FJkNsNmvYV1ZgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7/csMImmXMS8W+ncO7h86h8MKt61Fpz6P3qybQ1Of5Y=;
- b=LHp3TOwaLQLRotocyO2lyaNUv3a8U/EEUXcd0MxBwEarnvLnxGHB+fp8qYz14arJd7p9SH+Y0eqF4cv9rzyxX/kZ+E5Ge3juwgmt62tTg8FRyy2eEtwlJMIdI20vG/LrkmqEik9R9mbba4pUivCyGOT2Yu03DfTNXvuOV4t7CYZi5v6wmiG5Epc2A8uoIAPh6AeZAPzEM+QoutgN2KNsPJDhW5vt43QoDESOBDrBPXY6RXfhDTJxQDf9kYmeAaCYGerbIyuyAMdhgyDOBxi7h8bP9IpGYCsyoBfcitGjmfHMmy1Zk4BHOlgwaCvRmDPzNfD2M7L5hENxWeZzhQ+LtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7/csMImmXMS8W+ncO7h86h8MKt61Fpz6P3qybQ1Of5Y=;
- b=k9BgDV1VBCYyZYTGxHu0L/9ZT3tKKc1n/m8ogiHlM4VE7MGPnw+M14DLuXQoclg1jwTlCt2ghK1UeSGomvVzDieX4TvhIi/bDKDwNbTt3Md4pmWWP4k0rmqwetQDQrA1hjuEQxaYk5K99Z1UWBWVOblGTShPrK6V5npS1Bao+zLxOAmjF/Gd3dBahA3Q46oPd284wP2YDX6geIlWR+QNdvj0rWOi5IP4gVVaMjaPkgfd3oy+/S1sLvAxZDuSd+GWZaW4uDMXbhHyq7nyrCZ6EgNId9h51DM81iOVTXhK6DHS5ZJUzxv466pq2i9AdTPVjM5SUJxD/87agxFkaWZreQ==
-Received: from MWHPR1401CA0022.namprd14.prod.outlook.com
- (2603:10b6:301:4b::32) by DM8PR12MB5414.namprd12.prod.outlook.com
- (2603:10b6:8:3e::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14; Tue, 21 Jun
- 2022 21:21:29 +0000
-Received: from CO1NAM11FT028.eop-nam11.prod.protection.outlook.com
- (2603:10b6:301:4b:cafe::e3) by MWHPR1401CA0022.outlook.office365.com
- (2603:10b6:301:4b::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.15 via Frontend
- Transport; Tue, 21 Jun 2022 21:21:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- CO1NAM11FT028.mail.protection.outlook.com (10.13.175.214) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5373.15 via Frontend Transport; Tue, 21 Jun 2022 21:21:29 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Tue, 21 Jun
- 2022 21:21:28 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Tue, 21 Jun
- 2022 14:21:28 -0700
-Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22 via Frontend
- Transport; Tue, 21 Jun 2022 14:21:24 -0700
-Date:   Tue, 21 Jun 2022 14:21:22 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     Jason Gunthorpe <jgg@nvidia.com>, <kwankhede@nvidia.com>,
-        <corbet@lwn.net>, <hca@linux.ibm.com>, <gor@linux.ibm.com>,
-        <agordeev@linux.ibm.com>, <borntraeger@linux.ibm.com>,
-        <svens@linux.ibm.com>, <zhenyuw@linux.intel.com>,
-        <zhi.a.wang@intel.com>, <jani.nikula@linux.intel.com>,
-        <joonas.lahtinen@linux.intel.com>, <rodrigo.vivi@intel.com>,
-        <tvrtko.ursulin@linux.intel.com>, <airlied@linux.ie>,
-        <daniel@ffwll.ch>, <farman@linux.ibm.com>,
-        <mjrosato@linux.ibm.com>, <pasic@linux.ibm.com>,
-        <vneethv@linux.ibm.com>, <oberpar@linux.ibm.com>,
-        <freude@linux.ibm.com>, <akrowiak@linux.ibm.com>,
-        <jjherne@linux.ibm.com>, <alex.williamson@redhat.com>,
-        <cohuck@redhat.com>, <kevin.tian@intel.com>,
-        <jchrist@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        <intel-gvt-dev@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>,
-        <dri-devel@lists.freedesktop.org>
-Subject: Re: [RFT][PATCH v1 5/6] vfio/ccw: Add kmap_local_page() for memcpy
-Message-ID: <YrI2Ul/u6pRvt0rT@Asurada-Nvidia>
-References: <20220616235212.15185-1-nicolinc@nvidia.com>
- <20220616235212.15185-6-nicolinc@nvidia.com>
- <Yqw+7gM3Lz96UFdz@infradead.org>
- <20220620025726.GA5219@nvidia.com>
- <YrAUZ7hXy2FcZcjl@infradead.org>
+        with ESMTP id S1356056AbiFUVZs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 17:25:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA013055D;
+        Tue, 21 Jun 2022 14:21:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D1DF8612E9;
+        Tue, 21 Jun 2022 21:21:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D7FDC3411C;
+        Tue, 21 Jun 2022 21:21:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655846495;
+        bh=fq+yHa6pssyqn9w5NdgWQCplgcXLfqXZDZuY6MEMMA0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Zg13X1PgSL5ZatLKsEb1FdCaRvtfKq5ln7sulvo5u4sQNFpCCTVEv28SWenzqyKyy
+         hWVNczNQmmEjKG3GuqegQrB8oNm1Q+VO69TiMGpet4Cm5//mHP9DS6qciV5Kc3hK2i
+         FPYZCO7qH75RscPhwUh0Aa/2LatpR559CMMJ08GI261nAqI/ORGS1Pygj4GXRVhqPP
+         sVwUnrutA5w7S0Iqcf8f3/VBt1/YxPjqL4206uDhCcUImXpPmMJRMfYODGiumJvW5h
+         E6ZujmF41bTSMw/rSCmv4ogdG0Duatjdk+6lfJAhNi4xCdEm/9MMHDYxiVHUqxoh30
+         ZH0PO2jlTTEUA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, kvm@vger.kernel.org
+Subject: [PATCH MANUALSEL 5.18 1/3] KVM: x86: disable preemption while updating apicv inhibition
+Date:   Tue, 21 Jun 2022 17:21:30 -0400
+Message-Id: <20220621212132.251759-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <YrAUZ7hXy2FcZcjl@infradead.org>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2232a662-aa28-4c05-38f3-08da53cc01cb
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5414:EE_
-X-Microsoft-Antispam-PRVS: <DM8PR12MB54142DE1CF737009C21BE559ABB39@DM8PR12MB5414.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ju20LiE/hVT3OWFeuo+XyUQ1uwoFM58J1GnhfAZr3Anwt2ev1iTTMiMOAdGuswyUOWoxLkImGWG4VUMC9TlqvcY4qCKej2JHYr57VAW5U4P62dJwTxcnRhj8jg+aqMxfVz6ti55ODxCS2TThuftDhWaMLnxq2Z0Gk9wuq17rnDcZyeJ0VW6jQh2Nz4DgwLLEzYRA/QYVQJuQynMHshOTpitN4m3gQenH/nzxq0HrBW4ZREM1QROPqw9TngEup0yxiHWpYEWOnbh/776lr3pifhAw6tjXm0Pes9KQC6plNfdZo1Dpzq6J8DbUHSBTqvoneXbpZYf16TrON38jmRk8tzMiHJ2S8y7t9eZPMblIR2SHthukrLGL/UuSxgmQaQ4QEUspQPSk3bJnFhJuEgQKdjfkWFvPs1E6mdy51QQqn+rxV28p3nFjSnu699ZX+PxaTbSuZ2Y6OFwx/7MesAZmuUbJns3tUYh775EmMxdD8m4s8u+ZHlIZokKyunb9nUsUBfzG1YXt1vxShjVtqE93P7n9/0/ps7xpBRZNO9F0v5xyzQC2iLduYqu9YDmAumyJq1sQdVMK2PdiZGi5f9/Ph694XgD+RnhiR/VQEo4XbylBdHvUl8cXRyH5I/1VbongYZbGmk2sPWwqUD7AobjD8L3JzHeIfquVoeheCMEASc90UULfSSvw77MBKEyT69WpgoJQSkljAXeOHKSjzonJqNM1jyO42Ugg+PilIEiy2W2ppHLhthAxUbBpYhRpsN+A
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(376002)(396003)(346002)(136003)(39860400002)(36840700001)(40470700004)(46966006)(8676002)(478600001)(70586007)(83380400001)(70206006)(47076005)(426003)(356005)(6916009)(4326008)(82740400003)(86362001)(36860700001)(336012)(41300700001)(9686003)(54906003)(316002)(40480700001)(26005)(81166007)(186003)(2906002)(5660300002)(40460700003)(82310400005)(33716001)(55016003)(7416002)(8936002)(7406005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2022 21:21:29.3625
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2232a662-aa28-4c05-38f3-08da53cc01cb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT028.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5414
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 19, 2022 at 11:32:07PM -0700, Christoph Hellwig wrote:
-> On Sun, Jun 19, 2022 at 11:57:26PM -0300, Jason Gunthorpe wrote:
-> > The remark about io memory is because on s390 memcpy() will crash even
-> > on ioremapped memory, you have to use the memcpy_to/fromio() which
-> > uses the special s390 io access instructions.
-> 
-> Yes.  The same is true for various other architectures, inluding arm64
-> under the right circumstances.
-> 
-> > This helps because we now block io memory from ever getting into these
-> > call paths. I'm pretty sure this is a serious security bug, but would
-> > let the IBM folks remark as I don't know it all that well..
-> 
-> Prevent as in crash when trying to convert it to a page?
-> 
-> > As for the kmap, I thought it was standard practice even if it is a
-> > non-highmem? Aren't people trying to use this for other security
-> > stuff these days?
-> 
-> Ira has been lookin into the protection keys, although they don't
-> apply to s390.  Either way I don't object to using kmap, but the
-> commit log doesn't make much sense to me.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-How about the updated commit log below? Thanks.
+[ Upstream commit 66c768d30e64e1280520f34dbef83419f55f3459 ]
 
-The pinned PFN list returned from vfio_pin_pages() is converted using
-page_to_pfn(), so direct access via memcpy() will crash on S390 if the
-PFN is an IO PFN, as we have to use the memcpy_to/fromio(), which uses
-the special s390 IO access instructions.
+Currently nothing prevents preemption in kvm_vcpu_update_apicv.
 
-As a standard practice for security purpose, add kmap_local_page() to
-block any IO memory from ever getting into this call path.
+On SVM, If the preemption happens after we update the
+vcpu->arch.apicv_active, the preemption itself will
+'update' the inhibition since the AVIC will be first disabled
+on vCPU unload and then enabled, when the current task
+is loaded again.
+
+Then we will try to update it again, which will lead to a warning
+in __avic_vcpu_load, that the AVIC is already enabled.
+
+Fix this by disabling preemption in this code.
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-Id: <20220606180829.102503-6-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/kvm/x86.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 558d1f2ab5b4..5523bd4b3702 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9765,6 +9765,7 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	down_read(&vcpu->kvm->arch.apicv_update_lock);
++	preempt_disable();
+ 
+ 	activate = kvm_apicv_activated(vcpu->kvm);
+ 	if (vcpu->arch.apicv_active == activate)
+@@ -9784,6 +9785,7 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
+ 
+ out:
++	preempt_enable();
+ 	up_read(&vcpu->kvm->arch.apicv_update_lock);
+ }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
+-- 
+2.35.1
+
