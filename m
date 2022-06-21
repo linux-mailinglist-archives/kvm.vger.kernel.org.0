@@ -2,403 +2,358 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 765E3552860
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 01:43:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DAB6552882
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 02:14:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245221AbiFTXnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jun 2022 19:43:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57332 "EHLO
+        id S245433AbiFUAOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jun 2022 20:14:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239318AbiFTXnF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:43:05 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B0811C26
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 16:43:04 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id t21so5265584pfq.1
-        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 16:43:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UUV6tz2InON+G8AkEZW7LFdFnckw9xLV/oc9guSWUEw=;
-        b=tus7WxsEc5f0ODcAaMAW/iErYdCFKtaokFn8szgdZemwcgVm7F7qhzxmCnZbk3jUmc
-         0aKWZ42fo3QM9uITRQ9+J2Pb7fGyTQu3Vzbu/qDzLfEUtBWwr+yTZCaPxQLIWDBDcJgJ
-         PbHEzADAqi2UacJgr8Ab3SjJS72RgobIUcNkajiPrJqAGzWLQw9qDTu3gQuiT/O+ix8Y
-         G8mZHchHyEbUnM7sj8wpxI/xIpM2+xzNXPS1y0MxGzikkTmVA9v5iz+4B3WYaitAFvyw
-         /j8s2/moZsTOjYMKUMjimbaNxHgfPKdy2x202qKbf3O8YniT/lEEUzoy/JNzohoRmB/h
-         b5tg==
+        with ESMTP id S236390AbiFUAOe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jun 2022 20:14:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86858186F0
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 17:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655770471;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YVrVeKPAQSI4AB4vZ7MyOJPPx0q5Q+PSH+24GSNfDdk=;
+        b=AuB9LtRBzVHe4ONsU+OjiLEooVfZeGqG/wdPilMPon9xPjaAKs5fVmrZi5oFqdTY4VmbUQ
+        B+HEDKpdhkm9/tez23xN4X3Ene3ctDs9qfuvFkM0RA6BLzJqybJoTAllJBXulgXDqBEtam
+        O7zi5NO1q7Vzjp9Pmma4vEKUqSFXbus=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-169-lpAzbRncPkKkvpKCvHDCTg-1; Mon, 20 Jun 2022 20:14:30 -0400
+X-MC-Unique: lpAzbRncPkKkvpKCvHDCTg-1
+Received: by mail-wm1-f70.google.com with SMTP id ay28-20020a05600c1e1c00b0039c5cbe76c1so7614322wmb.1
+        for <kvm@vger.kernel.org>; Mon, 20 Jun 2022 17:14:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=UUV6tz2InON+G8AkEZW7LFdFnckw9xLV/oc9guSWUEw=;
-        b=FMfa5gM2BlXh6mHZXSzd8RZiay/kjRJezUg3RI98aes3Ei442C8uVtvass7fLdljxY
-         s+1yUQT5gwMGkSQekjuxZsb6tT2sb4FR68y0uRUUu2oyLUmb8emujdSnynR8payxwU3V
-         oruf4DsZEAEG/jioQXGtiXbP1ZjEMi8spMBdXVV9394POijHpl5X6ETFBKHfVjKr2uA6
-         +2ZN2NPvoE1Na7CSrO+Z9U2vemo5pPBuhoAHpaI53nVeAvJThxHw9rOyCN1zZYNYCwyj
-         aNKdrkSN+AwWZdA+Mbh4q/Ku380bBPp+OKTa1B3LtgFppPOKpes7RRhVe/GEBauOtuOx
-         gLbw==
-X-Gm-Message-State: AJIora8SM78x4ZocMPIK3YaGD4Rf1ESZ7tCoRdQ70gMWxd4D4ZcWJAw5
-        dxynefXbTyY8FQb49aSRv4SZ4w==
-X-Google-Smtp-Source: AGRyM1vz2B367E43oS1XzqC3w5I7unFMIvv8cJbxni/FCR+fOq6W8CxjHAUINnznlz9GFi6bvPp3ZA==
-X-Received: by 2002:a63:3fcb:0:b0:40c:4da1:555a with SMTP id m194-20020a633fcb000000b0040c4da1555amr18364683pga.3.1655768583733;
-        Mon, 20 Jun 2022 16:43:03 -0700 (PDT)
-Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id o12-20020a62f90c000000b0051b4e53c487sm9722348pfh.45.2022.06.20.16.43.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jun 2022 16:43:03 -0700 (PDT)
-From:   Atish Patra <atishp@rivosinc.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Atish Patra <atishp@rivosinc.com>,
-        Anup Patel <anup@brainfault.org>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        linux-riscv@lists.infradead.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Subject: [PATCH] RISC-V: KVM: Improve ISA extension by using a bitmap
-Date:   Mon, 20 Jun 2022 16:42:54 -0700
-Message-Id: <20220620234254.2610040-1-atishp@rivosinc.com>
-X-Mailer: git-send-email 2.25.1
+        bh=YVrVeKPAQSI4AB4vZ7MyOJPPx0q5Q+PSH+24GSNfDdk=;
+        b=8LIlBqigvrNUEUZLNExTaVzT8qen05VCINxpVf7u+4PMqO/Z7k7lrQVJX5Cz85TM8u
+         gwoybOOtWpKe3UNJ5RUWFUPAbxSVJiTeUNWwgmpYAaxbaVLg/Bp5458+2LQX7AJPLh45
+         4CQ2Qqcfcv4HWIhnK+ZbQKYcLo058biXsncLvUUdFYTie6QnvhOFMmqKO0S51DE04lhp
+         IZ/Lc3k9M5NT5gz/VfdEitUM4DafdSYsZpNltBtsq0kY1mRALMX8wOIq4FbCm7dMySLK
+         9qGNgZlj1ltyVUCJ9OqOIvfUFAIB6pngIru1U+H2lB1EWJYwF2DCAb8Mn61xjvmLLo0S
+         rG2A==
+X-Gm-Message-State: AOAM530YoRuCQmaHTEu4eP3HY30ai7dn9vl9dFK2hFJuaU//1JmuAjJd
+        0drn1Im0SsN0ZFqjBI7Koo4KYqt7Vub3dbPXDWquamvBA+6mbnTwyEpqANNYVP+cI4aYYgbyQd6
+        9xCQ/xiUpxnU5
+X-Received: by 2002:a1c:7318:0:b0:39c:7ab9:934c with SMTP id d24-20020a1c7318000000b0039c7ab9934cmr37918733wmb.200.1655770469033;
+        Mon, 20 Jun 2022 17:14:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy+niHvOlBzhdAVy81+ewTZLfHJj94jM8s0LNLjY3ov8z2Zpwsyks99Njqzq1zWmToWQYxOWg==
+X-Received: by 2002:a1c:7318:0:b0:39c:7ab9:934c with SMTP id d24-20020a1c7318000000b0039c7ab9934cmr37918708wmb.200.1655770468669;
+        Mon, 20 Jun 2022 17:14:28 -0700 (PDT)
+Received: from [192.168.1.129] (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
+        by smtp.gmail.com with ESMTPSA id y16-20020a5d6150000000b0021b932de5d6sm2877092wrt.39.2022.06.20.17.14.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jun 2022 17:14:28 -0700 (PDT)
+Message-ID: <e1fd76ae-a865-889f-b4f0-878c00837368@redhat.com>
+Date:   Tue, 21 Jun 2022 02:14:21 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2 1/2] drm: Implement DRM aperture helpers under video/
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>, corbet@lwn.net,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
+        deller@gmx.de, gregkh@linuxfoundation.org
+Cc:     kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-doc@vger.kernel.org
+References: <165541020563.1955826.16350888595945658159.stgit@omen>
+ <165541192621.1955826.6848784198896919390.stgit@omen>
+From:   Javier Martinez Canillas <javierm@redhat.com>
+In-Reply-To: <165541192621.1955826.6848784198896919390.stgit@omen>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, the every vcpu only stores the ISA extensions in a unsigned long
-which is not scalable as number of extensions will continue to grow.
-Using a bitmap allows the ISA extension to support any number of
-extensions. The CONFIG one reg interface implementation is modified to
-support the bitmap as well. But it is meant only for base extensions.
-Thus, the first element of the bitmap array is sufficient for that
-interface.
+On 6/16/22 22:38, Alex Williamson wrote:
+> From: Thomas Zimmermann <tzimmermann@suse.de>
+> 
+> Implement DRM's aperture helpers under video/ for sharing with other
+> sub-systems. Remove DRM-isms from the interface. The helpers track
+> the ownership of framebuffer apertures and provide hand-over from
+> firmware, such as EFI and VESA, to native graphics drivers.
+> 
+> Other subsystems, such as fbdev and vfio, also have to maintain ownership
+> of framebuffer apertures. Moving DRM's aperture helpers to a more public
+> location allows all subsystems to interact with each other and share a
+> common implementation.
+> 
+> The aperture helpers are selected by the various firmware drivers within
+> DRM and fbdev, and the VGA text-console driver.
+>
 
-In the future, all the new multi-letter extensions must use the
-ISA_EXT one reg interface that allows enabling/disabling any extension
-now.
+Thanks a lot for working on this.
+ 
+> The original DRM interface is kept in place for use by DRM drivers.
+> 
+> Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
 
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- arch/riscv/include/asm/kvm_host.h    |  3 +-
- arch/riscv/include/asm/kvm_vcpu_fp.h |  8 +--
- arch/riscv/kvm/vcpu.c                | 81 ++++++++++++++--------------
- arch/riscv/kvm/vcpu_fp.c             | 27 +++++-----
- 4 files changed, 59 insertions(+), 60 deletions(-)
+[...]
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 319c8aeb42af..c749cdacbd63 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -14,6 +14,7 @@
- #include <linux/kvm_types.h>
- #include <linux/spinlock.h>
- #include <asm/csr.h>
-+#include <asm/hwcap.h>
- #include <asm/kvm_vcpu_fp.h>
- #include <asm/kvm_vcpu_timer.h>
- 
-@@ -170,7 +171,7 @@ struct kvm_vcpu_arch {
- 	int last_exit_cpu;
- 
- 	/* ISA feature bits (similar to MISA) */
--	unsigned long isa;
-+	DECLARE_BITMAP(isa, RISCV_ISA_EXT_MAX);
- 
- 	/* SSCRATCH, STVEC, and SCOUNTEREN of Host */
- 	unsigned long host_sscratch;
-diff --git a/arch/riscv/include/asm/kvm_vcpu_fp.h b/arch/riscv/include/asm/kvm_vcpu_fp.h
-index 4da9b8e0f050..e86bb67f2a8a 100644
---- a/arch/riscv/include/asm/kvm_vcpu_fp.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_fp.h
-@@ -22,9 +22,9 @@ void __kvm_riscv_fp_d_restore(struct kvm_cpu_context *context);
- 
- void kvm_riscv_vcpu_fp_reset(struct kvm_vcpu *vcpu);
- void kvm_riscv_vcpu_guest_fp_save(struct kvm_cpu_context *cntx,
--				  unsigned long isa);
-+				  unsigned long *isa);
- void kvm_riscv_vcpu_guest_fp_restore(struct kvm_cpu_context *cntx,
--				     unsigned long isa);
-+				     unsigned long *isa);
- void kvm_riscv_vcpu_host_fp_save(struct kvm_cpu_context *cntx);
- void kvm_riscv_vcpu_host_fp_restore(struct kvm_cpu_context *cntx);
- #else
-@@ -32,12 +32,12 @@ static inline void kvm_riscv_vcpu_fp_reset(struct kvm_vcpu *vcpu)
- {
- }
- static inline void kvm_riscv_vcpu_guest_fp_save(struct kvm_cpu_context *cntx,
--						unsigned long isa)
-+						unsigned long *isa)
- {
- }
- static inline void kvm_riscv_vcpu_guest_fp_restore(
- 					struct kvm_cpu_context *cntx,
--					unsigned long isa)
-+					unsigned long *isa)
- {
- }
- static inline void kvm_riscv_vcpu_host_fp_save(struct kvm_cpu_context *cntx)
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 7f4ad5e4373a..cb2a65b5d563 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -46,8 +46,19 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- 						riscv_isa_extension_mask(i) | \
- 						riscv_isa_extension_mask(m))
- 
--#define KVM_RISCV_ISA_ALLOWED (KVM_RISCV_ISA_DISABLE_ALLOWED | \
--			       KVM_RISCV_ISA_DISABLE_NOT_ALLOWED)
-+#define KVM_RISCV_ISA_MASK GENMASK(25, 0)
-+
-+/* Mapping between KVM ISA Extension ID & Host ISA extension ID */
-+static unsigned long kvm_isa_ext_arr[] = {
-+	RISCV_ISA_EXT_a,
-+	RISCV_ISA_EXT_c,
-+	RISCV_ISA_EXT_d,
-+	RISCV_ISA_EXT_f,
-+	RISCV_ISA_EXT_h,
-+	RISCV_ISA_EXT_i,
-+	RISCV_ISA_EXT_m,
-+	RISCV_ISA_EXT_SSCOFPMF,
-+};
- 
- static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
- {
-@@ -99,13 +110,20 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *cntx;
- 	struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
-+	unsigned long host_isa, i;
- 
- 	/* Mark this VCPU never ran */
- 	vcpu->arch.ran_atleast_once = false;
- 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-+	bitmap_zero(vcpu->arch.isa, RISCV_ISA_EXT_MAX);
- 
- 	/* Setup ISA features available to VCPU */
--	vcpu->arch.isa = riscv_isa_extension_base(NULL) & KVM_RISCV_ISA_ALLOWED;
-+	for (i = 0; i < ARRAY_SIZE(kvm_isa_ext_arr); i++) {
-+		host_isa = kvm_isa_ext_arr[i];
-+		if (__riscv_isa_extension_available(NULL, host_isa) &&
-+		   host_isa != RISCV_ISA_EXT_h)
-+			set_bit(host_isa, vcpu->arch.isa);
-+	}
- 
- 	/* Setup VCPU hfence queue */
- 	spin_lock_init(&vcpu->arch.hfence_lock);
-@@ -199,7 +217,7 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
- 
- 	switch (reg_num) {
- 	case KVM_REG_RISCV_CONFIG_REG(isa):
--		reg_val = vcpu->arch.isa;
-+		reg_val = vcpu->arch.isa[0] & KVM_RISCV_ISA_MASK;
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -220,6 +238,7 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
- 					    KVM_REG_SIZE_MASK |
- 					    KVM_REG_RISCV_CONFIG);
- 	unsigned long reg_val;
-+	unsigned long isa_mask;
- 
- 	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
- 		return -EINVAL;
-@@ -227,13 +246,19 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
- 	if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
- 		return -EFAULT;
- 
-+	/* This ONE REG interface is only defined for single letter extensions */
-+	if (fls(reg_val) >= RISCV_ISA_EXT_BASE)
-+		return -EINVAL;
-+
- 	switch (reg_num) {
- 	case KVM_REG_RISCV_CONFIG_REG(isa):
- 		if (!vcpu->arch.ran_atleast_once) {
- 			/* Ignore the disable request for these extensions */
--			vcpu->arch.isa = reg_val | KVM_RISCV_ISA_DISABLE_NOT_ALLOWED;
--			vcpu->arch.isa &= riscv_isa_extension_base(NULL);
--			vcpu->arch.isa &= KVM_RISCV_ISA_ALLOWED;
-+			isa_mask = (reg_val | KVM_RISCV_ISA_DISABLE_NOT_ALLOWED);
-+			isa_mask &= riscv_isa_extension_base(NULL);
-+			/* Do not modify anything beyond single letter extensions */
-+			isa_mask |= (~KVM_RISCV_ISA_MASK);
-+			bitmap_and(vcpu->arch.isa, vcpu->arch.isa, &isa_mask, RISCV_ISA_EXT_MAX);
- 			kvm_riscv_vcpu_fp_reset(vcpu);
- 		} else {
- 			return -EOPNOTSUPP;
-@@ -374,17 +399,6 @@ static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--/* Mapping between KVM ISA Extension ID & Host ISA extension ID */
--static unsigned long kvm_isa_ext_arr[] = {
--	RISCV_ISA_EXT_a,
--	RISCV_ISA_EXT_c,
--	RISCV_ISA_EXT_d,
--	RISCV_ISA_EXT_f,
--	RISCV_ISA_EXT_h,
--	RISCV_ISA_EXT_i,
--	RISCV_ISA_EXT_m,
--};
--
- static int kvm_riscv_vcpu_get_reg_isa_ext(struct kvm_vcpu *vcpu,
- 					  const struct kvm_one_reg *reg)
- {
-@@ -403,7 +417,7 @@ static int kvm_riscv_vcpu_get_reg_isa_ext(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 
- 	host_isa_ext = kvm_isa_ext_arr[reg_num];
--	if (__riscv_isa_extension_available(&vcpu->arch.isa, host_isa_ext))
-+	if (__riscv_isa_extension_available(vcpu->arch.isa, host_isa_ext))
- 		reg_val = 1; /* Mark the given extension as available */
- 
- 	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
-@@ -437,30 +451,17 @@ static int kvm_riscv_vcpu_set_reg_isa_ext(struct kvm_vcpu *vcpu,
- 	if (!__riscv_isa_extension_available(NULL, host_isa_ext))
- 		return	-EOPNOTSUPP;
- 
--	if (host_isa_ext >= RISCV_ISA_EXT_BASE &&
--	    host_isa_ext < RISCV_ISA_EXT_MAX) {
--		/*
--		 * Multi-letter ISA extension. Currently there is no provision
--		 * to enable/disable the multi-letter ISA extensions for guests.
--		 * Return success if the request is to enable any ISA extension
--		 * that is available in the hardware.
--		 * Return -EOPNOTSUPP otherwise.
--		 */
--		if (!reg_val)
--			return -EOPNOTSUPP;
--		else
--			return 0;
--	}
--
--	/* Single letter base ISA extension */
- 	if (!vcpu->arch.ran_atleast_once) {
-+		/* All multi-letter extension and a few single letter extension can be disabled */
- 		host_isa_ext_mask = BIT_MASK(host_isa_ext);
--		if (!reg_val && (host_isa_ext_mask & KVM_RISCV_ISA_DISABLE_ALLOWED))
--			vcpu->arch.isa &= ~host_isa_ext_mask;
-+		if (!reg_val &&
-+		   ((host_isa_ext_mask & KVM_RISCV_ISA_DISABLE_ALLOWED) ||
-+		   ((host_isa_ext >= RISCV_ISA_EXT_BASE) && (host_isa_ext < RISCV_ISA_EXT_MAX))))
-+			clear_bit(host_isa_ext, vcpu->arch.isa);
-+		else if (reg_val == 1 && (host_isa_ext != RISCV_ISA_EXT_h))
-+			set_bit(host_isa_ext, vcpu->arch.isa);
- 		else
--			vcpu->arch.isa |= host_isa_ext_mask;
--		vcpu->arch.isa &= riscv_isa_extension_base(NULL);
--		vcpu->arch.isa &= KVM_RISCV_ISA_ALLOWED;
-+			return -EINVAL;
- 		kvm_riscv_vcpu_fp_reset(vcpu);
- 	} else {
- 		return -EOPNOTSUPP;
-diff --git a/arch/riscv/kvm/vcpu_fp.c b/arch/riscv/kvm/vcpu_fp.c
-index d4308c512007..748a8f6a9b5d 100644
---- a/arch/riscv/kvm/vcpu_fp.c
-+++ b/arch/riscv/kvm/vcpu_fp.c
-@@ -16,12 +16,11 @@
- #ifdef CONFIG_FPU
- void kvm_riscv_vcpu_fp_reset(struct kvm_vcpu *vcpu)
- {
--	unsigned long isa = vcpu->arch.isa;
- 	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
- 
- 	cntx->sstatus &= ~SR_FS;
--	if (riscv_isa_extension_available(&isa, f) ||
--	    riscv_isa_extension_available(&isa, d))
-+	if (riscv_isa_extension_available(vcpu->arch.isa, f) ||
-+	    riscv_isa_extension_available(vcpu->arch.isa, d))
- 		cntx->sstatus |= SR_FS_INITIAL;
- 	else
- 		cntx->sstatus |= SR_FS_OFF;
-@@ -34,24 +33,24 @@ static void kvm_riscv_vcpu_fp_clean(struct kvm_cpu_context *cntx)
- }
- 
- void kvm_riscv_vcpu_guest_fp_save(struct kvm_cpu_context *cntx,
--				  unsigned long isa)
-+				  unsigned long *isa)
- {
- 	if ((cntx->sstatus & SR_FS) == SR_FS_DIRTY) {
--		if (riscv_isa_extension_available(&isa, d))
-+		if (riscv_isa_extension_available(isa, d))
- 			__kvm_riscv_fp_d_save(cntx);
--		else if (riscv_isa_extension_available(&isa, f))
-+		else if (riscv_isa_extension_available(isa, f))
- 			__kvm_riscv_fp_f_save(cntx);
- 		kvm_riscv_vcpu_fp_clean(cntx);
- 	}
- }
- 
- void kvm_riscv_vcpu_guest_fp_restore(struct kvm_cpu_context *cntx,
--				     unsigned long isa)
-+				     unsigned long *isa)
- {
- 	if ((cntx->sstatus & SR_FS) != SR_FS_OFF) {
--		if (riscv_isa_extension_available(&isa, d))
-+		if (riscv_isa_extension_available(isa, d))
- 			__kvm_riscv_fp_d_restore(cntx);
--		else if (riscv_isa_extension_available(&isa, f))
-+		else if (riscv_isa_extension_available(isa, f))
- 			__kvm_riscv_fp_f_restore(cntx);
- 		kvm_riscv_vcpu_fp_clean(cntx);
- 	}
-@@ -80,7 +79,6 @@ int kvm_riscv_vcpu_get_reg_fp(struct kvm_vcpu *vcpu,
- 			      unsigned long rtype)
- {
- 	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
--	unsigned long isa = vcpu->arch.isa;
- 	unsigned long __user *uaddr =
- 			(unsigned long __user *)(unsigned long)reg->addr;
- 	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-@@ -89,7 +87,7 @@ int kvm_riscv_vcpu_get_reg_fp(struct kvm_vcpu *vcpu,
- 	void *reg_val;
- 
- 	if ((rtype == KVM_REG_RISCV_FP_F) &&
--	    riscv_isa_extension_available(&isa, f)) {
-+	    riscv_isa_extension_available(vcpu->arch.isa, f)) {
- 		if (KVM_REG_SIZE(reg->id) != sizeof(u32))
- 			return -EINVAL;
- 		if (reg_num == KVM_REG_RISCV_FP_F_REG(fcsr))
-@@ -100,7 +98,7 @@ int kvm_riscv_vcpu_get_reg_fp(struct kvm_vcpu *vcpu,
- 		else
- 			return -EINVAL;
- 	} else if ((rtype == KVM_REG_RISCV_FP_D) &&
--		   riscv_isa_extension_available(&isa, d)) {
-+		   riscv_isa_extension_available(vcpu->arch.isa, d)) {
- 		if (reg_num == KVM_REG_RISCV_FP_D_REG(fcsr)) {
- 			if (KVM_REG_SIZE(reg->id) != sizeof(u32))
- 				return -EINVAL;
-@@ -126,7 +124,6 @@ int kvm_riscv_vcpu_set_reg_fp(struct kvm_vcpu *vcpu,
- 			      unsigned long rtype)
- {
- 	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
--	unsigned long isa = vcpu->arch.isa;
- 	unsigned long __user *uaddr =
- 			(unsigned long __user *)(unsigned long)reg->addr;
- 	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-@@ -135,7 +132,7 @@ int kvm_riscv_vcpu_set_reg_fp(struct kvm_vcpu *vcpu,
- 	void *reg_val;
- 
- 	if ((rtype == KVM_REG_RISCV_FP_F) &&
--	    riscv_isa_extension_available(&isa, f)) {
-+	    riscv_isa_extension_available(vcpu->arch.isa, f)) {
- 		if (KVM_REG_SIZE(reg->id) != sizeof(u32))
- 			return -EINVAL;
- 		if (reg_num == KVM_REG_RISCV_FP_F_REG(fcsr))
-@@ -146,7 +143,7 @@ int kvm_riscv_vcpu_set_reg_fp(struct kvm_vcpu *vcpu,
- 		else
- 			return -EINVAL;
- 	} else if ((rtype == KVM_REG_RISCV_FP_D) &&
--		   riscv_isa_extension_available(&isa, d)) {
-+		   riscv_isa_extension_available(vcpu->arch.isa, d)) {
- 		if (reg_num == KVM_REG_RISCV_FP_D_REG(fcsr)) {
- 			if (KVM_REG_SIZE(reg->id) != sizeof(u32))
- 				return -EINVAL;
+> diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
+> index 427a993c7f57..c69b45f8c427 100644
+> --- a/drivers/video/Kconfig
+> +++ b/drivers/video/Kconfig
+> @@ -5,6 +5,12 @@
+>  
+>  menu "Graphics support"
+>  
+> +config APERTURE_HELPERS
+> +	bool
+> +	help
+> +	  Support tracking and hand-over of aperture ownership. Required
+> +	  for firmware graphics drivers.
+> +
+
+Maybe "graphics drivers using a firmware-provided framebuffer" is more clear?
+
+[...]
+
+> +++ b/drivers/video/aperture.c
+> @@ -0,0 +1,340 @@
+> +// SPDX-License-Identifier: MIT
+> +
+> +#include <linux/aperture.h>
+> +#include <linux/device.h>
+> +#include <linux/fb.h> /* for old fbdev helpers */
+> +#include <linux/list.h>
+> +#include <linux/mutex.h>
+> +#include <linux/pci.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/slab.h>
+> +#include <linux/types.h>
+> +#include <linux/vgaarb.h>
+> +
+> +/**
+> + * DOC: overview
+> + *
+> + * A graphics device might be supported by different drivers, but only one
+> + * driver can be active at any given time. Many systems load a generic
+> + * graphics drivers, such as EFI-GOP or VESA, early during the boot process.
+> + * During later boot stages, they replace the generic driver with a dedicated,
+> + * hardware-specific driver. To take over the device the dedicated driver
+> + * first has to remove the generic driver. Aperture functions manage
+> + * ownership of framebuffer memory and hand-over between drivers.
+> + *
+> + * Graphics drivers should call remove_conflicting_devices()
+> + * at the top of their probe function. The function removes any generic
+> + * driver that is currently associated with the given framebuffer memory.
+> + * If the framebuffer is located at PCI BAR 0, the rsp code looks as in the
+
+s/rsp/respective 
+
+> + * example given below. The cod assumes a DRM driver.
+> + *
+
+s/cod/code
+
+> + * .. code-block:: c
+> + *
+> + *	static const struct drm_driver example_driver = {
+> + *		.name = "exampledrm",
+> + *		...
+> + *	};
+> + *
+> + *	static int remove_conflicting_framebuffers(struct pci_dev *pdev)
+> + *	{
+> + *		bool primary = false;
+> + *		resource_size_t base, size;
+> + *		int ret;
+> + *
+> + *		base = pci_resource_start(pdev, 0);
+> + *		size = pci_resource_len(pdev, 0);
+> + *	#ifdef CONFIG_X86
+> + *		primary = pdev->resource[PCI_ROM_RESOURCE].flags & IORESOURCE_ROM_SHADOW;
+> + *	#endif
+
+This example seems to be copied from drivers/gpu/drm/ast/ast_drv.c and I
+don't see any other driver that has its framebuffer located in PCI BAR 0
+or at least having a similar code.
+
+So I wonder if we really want to have this example for such a corner case ? 
+
+Also, remove_conflicting_pci_framebuffers() seems to already at least check
+for the IORESOURCE_ROM_SHADOW flag so it would be better to grow that and
+support this special case of PCI BAR 0 (maybe adding another param that is
+passed through remove_conflicting_pci_devices() ?
+
+In any case, it seems to me that it is something that ast shouldn't really
+have to open code it and instead the helpers should be fixed to cover that
+case for drivers not to care. I would really not add the snippet in the doc.
+
+Since we are talking about remove_conflicting_devices() here, a better code
+example could be for a platform device instead of a PCI device, like this:
+
+*	static const struct platform_driver example_driver = {
+*		.name = "example",
+*		...
+*	};
+*
+*	static int probe(struct platform_device *pdev)
+*	{
+*		struct resource *mem;
+*		resource_size_t base, size;
+*
+*		mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+*		if (!mem)
+*			return -EINVAL;
+*		base = mem->start;
+*		size = resource_size(mem);
+*
+*		ret = remove_conflicting_devices(base, size, false, &example_driver->name);
+*		if (ret)
+*			return ret;
+*
+*		// ... and initialize the hardware.
+*		...
+*
+*		return 0;
+*	}
+
+> + *	static int probe(struct pci_dev *pdev)
+> + *	{
+> + *		int ret;
+> + *
+> + *		// Remove any generic drivers...
+> + *		ret = remove_conflicting_framebuffers(pdev);
+
+And here we can just use remove_conflicting_pci_devices(pdev) without the
+unnecessary level of indirection. It makes the example more clear IMO and
+it could be moved as an example for the remove_conflicting_pci_devices().
+
+Another option is to have here an example for platform devices instead of
+a PCI device (and move this example when talking about remove
+
+[...]
+
+> + * PCI device drivers can also call remove_conflicting_pci_devices() and let the
+> + * function detect the apertures automatically. Device drivers without knowledge of
+> + * the framebuffer's location shall call remove_all_conflicting_devices(),
+> + * which removes all known devices.
+> + *
+
+Can we get all the public aperture functions be in the aperture namespace? i.e:
+aperture_remove_conflicting_devices(), aperture_remove_all_conflicting_devices()
+and so on. That makes easier to grep, ftrace and also read the drivers' code.
+
+> + * Drivers that are susceptible to being removed by other drivers, such as
+> + * generic EFI or VESA drivers, have to register themselves as owners of their
+> + * framebuffer apertures. Ownership of the framebuffer memory is achieved
+> + * by calling devm_acquire_aperture_of_platform_device(). On success, the driver
+
+AFAICT the aperture infrastructure only allows to remove platform devices, even
+when it can check if the requested I/O resource overlaps with a PCI BAR range,
+so maybe all functions also should use _platform_device() as suffix instead of
+just _device() ? Or maybe the _platform is just verbose but I think that the
+functions should be named consistently and only use either _device or _platform.
+
+[...]
+
+> + *	static int acquire_framebuffers(struct drm_device *dev, struct platform_device *pdev)
+> + *	{
+> + *		resource_size_t base, size;
+> + *
+
+This example is missing a struct resource *mem declaration.
+
+> + * The generic driver is now subject to forced removal by other drivers. This
+> + * only works for platform drivers that support hot unplugging.
+> + * When a driver calls remove_conflicting_devices() et al
+> + * for the registered framebuffer range, the aperture helpers call
+> + * platform_device_unregister() and the generic driver unloads itself. It
+> + * may not access the device's registers, framebuffer memory, ROM, etc
+> + * afterwards.
+> + */
+> +
+> +struct dev_aperture {
+> +	struct device *dev;
+
+And here we could just use a struct platform_device *pdev since currently we
+only support platform devices. It seems to me that this is a DRM-ism that we
+are carrying since for DRM drivers made sense to use struct device.
+
+Doing that would also allow get rid of indirections like the need of both a
+devm_acquire_aperture_of_platform_device() and devm_aperture_acquire() just
+to do a &pdev->dev.
+
+And also some to_platform_device() in drm_aperture_detach_firmware() and
+detach_platform_device().
+
+If we ever support non-platform devices then we can refactor it, but I don't
+think that is worth to complicate just in case we ever support struct device.
+
+> +	resource_size_t base;
+> +	resource_size_t size;
+> +	struct list_head lh;
+> +	void (*detach)(struct device *dev);
+
+Same here, just	void (*detach)(struct platform_device *pdev) if you agree with
+that I mentioned above.
+
+> +};
+> +
+> +static LIST_HEAD(apertures);
+> +static DEFINE_MUTEX(apertures_lock);
+> +
+> +static bool overlap(resource_size_t base1, resource_size_t end1,
+> +		    resource_size_t base2, resource_size_t end2)
+> +{
+> +	return (base1 < end2) && (end1 > base2);
+> +}
+
+There's a resource_overlaps() helper in include/linux/ioport.h, I wonder if it
+could just be used, maybe declaring and filling a struct resource just to call
+that helper. Later as an optimization a resource_range_overlap() or something
+could be proposed for include/linux/ioport.h.
+
+Also, I noticed that resource_overlaps() uses <= and >= but this helper uses
+< and >. It seems there's an off-by-one error here but maybe I'm wrong on this.
+
+[...]
+
+> +static void detach_platform_device(struct device *dev)
+> +{
+> +	struct platform_device *pdev = to_platform_device(dev);
+> +
+> +	/*
+> +	 * Remove the device from the device hierarchy. This is the right thing
+> +	 * to do for firmware-based DRM drivers, such as EFI, VESA or VGA. After
+> +	 * the new driver takes over the hardware, the firmware device's state
+> +	 * will be lost.
+> +	 *
+> +	 * For non-platform devices, a new callback would be required.
+> +	 *
+
+I wonder if we ever are going to need this. AFAICT the problem only happens for
+platform devices. Or do you envision a case when some a bus could need this and
+the aperture unregister the device instead of the Linux kernel device model ?
+
 -- 
-2.25.1
+Best regards,
+
+Javier Martinez Canillas
+Linux Engineering
+Red Hat
 
