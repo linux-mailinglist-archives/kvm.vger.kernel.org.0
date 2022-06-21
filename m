@@ -2,176 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCD215531FB
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 14:25:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11E135531F3
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 14:25:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350373AbiFUMZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 08:25:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58356 "EHLO
+        id S1349970AbiFUMZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 08:25:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350161AbiFUMZr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 08:25:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6CBF127164
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 05:25:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655814345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ChvXxqyn9OOMyURFW0VTLkgw2UAz7rtxv6HEJjFmKS0=;
-        b=L1KD7FzLfeAqAn+A2J1qSJrpHUfps1bSoGYyx3aNoJcBhsVlfOXOVZmruvLqM3bKjl0Gxy
-        NEVlsy3UzgLEzHxVWZyJ9/10shc4mQ+1fOTaE+lsiE0/m6arxN7wCvohz4RtuBJvBuLHoP
-        F8YEwRfAcjpxCaCq4LZFrX3LcmoMnhk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-301-MZVqeuTrNr2gxTMsTrsVBg-1; Tue, 21 Jun 2022 08:25:42 -0400
-X-MC-Unique: MZVqeuTrNr2gxTMsTrsVBg-1
-Received: by mail-wm1-f70.google.com with SMTP id r4-20020a1c4404000000b0039c8f5804c4so1347924wma.3
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 05:25:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ChvXxqyn9OOMyURFW0VTLkgw2UAz7rtxv6HEJjFmKS0=;
-        b=UPikd2N2/96lnvR12qepoy7MS2cLsTnK7klfXwSJeUWlpdFEdQ1ZMYtW8yKUMaxLTf
-         v3iVzZ/uPF7GWZ3KqR3CpKXo5j5aVxAbqpjbU11ZjWxmlqFXiDhZNPBRSk/QBSOiAgx0
-         M06mRU0muCol76qQlcZnlT8Y5IwepWPdyeH80sp0BaFDQ0YrhvqCpp6sd+wJb8TVoWhE
-         04olGHGDWjlz0LXUmNNlm3c5CzSRrh7tqnYgfD7nQ9AhSgQPlmQ8sNNISl3tVFZ3Lz2Y
-         Q8CNQNY81shafOj7lvFdCks8KbvG5JabEskfJjqgUCblPgOboZKlfmkXKpeM3CGu4R3Q
-         TzZw==
-X-Gm-Message-State: AOAM530LNZqX9HscwgyV4ULELwunvp530evNJnbXOYuDlh0N9nBcrSkS
-        b/K9swhByTbX9tgK9b0XfqVdeOJWL1ILQks+WgD1YgZGTYWJyEQBq+ZSATYHtyW8plZxBJ5jEGB
-        eulqBQ9BQGQhU
-X-Received: by 2002:a1c:5411:0:b0:39c:4761:66f8 with SMTP id i17-20020a1c5411000000b0039c476166f8mr39561333wmb.47.1655814340791;
-        Tue, 21 Jun 2022 05:25:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxTAiCn5Imotvz18wokmi04OBc4tB0BgS4MkpRYCxooHQh3Q2IacQwQDWlfA//FgEeY08KGiA==
-X-Received: by 2002:a1c:5411:0:b0:39c:4761:66f8 with SMTP id i17-20020a1c5411000000b0039c476166f8mr39561316wmb.47.1655814340566;
-        Tue, 21 Jun 2022 05:25:40 -0700 (PDT)
-Received: from [192.168.1.129] (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
-        by smtp.gmail.com with ESMTPSA id t19-20020a05600c129300b0039c8a22554bsm18838723wmd.27.2022.06.21.05.25.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jun 2022 05:25:40 -0700 (PDT)
-Message-ID: <c259699e-c478-d3f6-f892-721727a5f1bf@redhat.com>
-Date:   Tue, 21 Jun 2022 14:25:24 +0200
+        with ESMTP id S230309AbiFUMZM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 08:25:12 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3199AA18E
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 05:25:11 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0AAB7165C;
+        Tue, 21 Jun 2022 05:25:11 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B72443F534;
+        Tue, 21 Jun 2022 05:25:09 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 13:25:28 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        drjones@redhat.com, pbonzini@redhat.com, jade.alglave@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 03/23] lib: Add support for the XSDT
+ ACPI table
+Message-ID: <YrG4uFAJiskvTE2n@monolith.localdoman>
+References: <20220506205605.359830-1-nikos.nikoleris@arm.com>
+ <20220506205605.359830-4-nikos.nikoleris@arm.com>
+ <Yq0eaaOiud8pOXZN@google.com>
+ <YrA0yajcrohAOIoS@monolith.localdoman>
+ <cea12393-ecf5-820d-81ae-0c8b9e81ceba@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v2 1/2] drm: Implement DRM aperture helpers under video/
-Content-Language: en-US
-To:     Thomas Zimmermann <tzimmermann@suse.de>,
-        Alex Williamson <alex.williamson@redhat.com>, corbet@lwn.net,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        airlied@linux.ie, daniel@ffwll.ch, deller@gmx.de,
-        gregkh@linuxfoundation.org
-Cc:     dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <165541020563.1955826.16350888595945658159.stgit@omen>
- <165541192621.1955826.6848784198896919390.stgit@omen>
- <e1fd76ae-a865-889f-b4f0-878c00837368@redhat.com>
- <4f6e9b63-f955-d263-e69b-6396fbe48868@suse.de>
-From:   Javier Martinez Canillas <javierm@redhat.com>
-In-Reply-To: <4f6e9b63-f955-d263-e69b-6396fbe48868@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cea12393-ecf5-820d-81ae-0c8b9e81ceba@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Thomas,
+Hi,
 
-On 6/21/22 13:29, Thomas Zimmermann wrote:
-
-[...]
-
->>> +
->>> +static bool overlap(resource_size_t base1, resource_size_t end1,
->>> +		    resource_size_t base2, resource_size_t end2)
->>> +{
->>> +	return (base1 < end2) && (end1 > base2);
->>> +}
->>
->> There's a resource_overlaps() helper in include/linux/ioport.h, I wonder if it
->> could just be used, maybe declaring and filling a struct resource just to call
->> that helper. Later as an optimization a resource_range_overlap() or something
->> could be proposed for include/linux/ioport.h.
+On Mon, Jun 20, 2022 at 12:06:24PM +0100, Nikos Nikoleris wrote:
+> Hi Alex, Ricardo,
 > 
-> Bu then we'd have to declare struct resource-es for using an interface. 
-> This helper is trivial. If anything, resource_overlaps() should be 
-> generalized.
->
-
-Yes, that works too. Probably then we should just keep as is and then as a follow
-up we can add another helper to include/linux/ioport.h to avoid having something
-that's only for the aperture helpers.
-
->>
->> Also, I noticed that resource_overlaps() uses <= and >= but this helper uses
->> < and >. It seems there's an off-by-one error here but maybe I'm wrong on this.
+> Thank you both for the reviews!
 > 
-> struct resource stores the final byte of the resource. In our case 'end' 
-> is the byte after that. So the code is correct.
+> On 20/06/2022 09:53, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > On Fri, Jun 17, 2022 at 05:38:01PM -0700, Ricardo Koller wrote:
+> > > Hi Nikos,
+> > > 
+> > > On Fri, May 06, 2022 at 09:55:45PM +0100, Nikos Nikoleris wrote:
+> > > > XSDT provides pointers to other ACPI tables much like RSDT. However,
+> > > > contrary to RSDT that provides 32-bit addresses, XSDT provides 64-bit
+> > > > pointers. ACPI requires that if XSDT is valid then it takes precedence
+> > > > over RSDT.
+> > > > 
+> > > > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> > > > ---
+> > > >   lib/acpi.h |   6 ++++
+> > > >   lib/acpi.c | 103 ++++++++++++++++++++++++++++++++---------------------
+> > > >   2 files changed, 68 insertions(+), 41 deletions(-)
+> > > > 
+> > > > diff --git a/lib/acpi.h b/lib/acpi.h
+> > > > index 42a2c16..d80b983 100644
+> > > > --- a/lib/acpi.h
+> > > > +++ b/lib/acpi.h
+> > > > @@ -13,6 +13,7 @@
+> > > >   #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
+> > > >   #define RSDT_SIGNATURE ACPI_SIGNATURE('R','S','D','T')
+> > > > +#define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
+> > > >   #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
+> > > >   #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
+> > > > @@ -56,6 +57,11 @@ struct rsdt_descriptor_rev1 {
+> > > >       u32 table_offset_entry[0];
+> > > >   } __attribute__ ((packed));
+> > > > +struct acpi_table_xsdt {
+> > > > +    ACPI_TABLE_HEADER_DEF
+> > > > +    u64 table_offset_entry[1];
+> > > 
+> > > nit: This should be "[0]" to match the usage above (in rsdt).
+> > > 
+> > > I was about to suggest using an unspecified size "[]", but after reading
+> > > what the C standard says about it (below), now I'm not sure. was the
+> > > "[1]" needed for something that I'm missing?
+> > > 
+> > > 	106) The length is unspecified to allow for the fact that
+> > > 	implementations may give array members different
+> > > 	alignments according to their lengths.
+> > 
+> > GCC prefers "flexible array members" (array[]) [1]. Linux has deprecated
+> > the use of zero-length arrays [2]. The kernel docs do make a pretty good
+> > case for flexible array members.
+> > 
+> > [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+> > [2] https://elixir.bootlin.com/linux/v5.18/source/Documentation/process/deprecated.rst#L234
+> > 
 > 
-> Do we ever have resources that end at the top-most byte of the address 
-> space?
->
-
-I don't know to be honest.
-
-[...]
-
->>> +static void detach_platform_device(struct device *dev)
->>> +{
->>> +	struct platform_device *pdev = to_platform_device(dev);
->>> +
->>> +	/*
->>> +	 * Remove the device from the device hierarchy. This is the right thing
->>> +	 * to do for firmware-based DRM drivers, such as EFI, VESA or VGA. After
->>> +	 * the new driver takes over the hardware, the firmware device's state
->>> +	 * will be lost.
->>> +	 *
->>> +	 * For non-platform devices, a new callback would be required.
->>> +	 *
->>
->> I wonder if we ever are going to need this. AFAICT the problem only happens for
->> platform devices. Or do you envision a case when some a bus could need this and
->> the aperture unregister the device instead of the Linux kernel device model ?
->>
+> Happy to change this, I don't have a strong preference. To be consistent
+> with RSDT we would have to declare:
 > 
-> In the current code, we clearly distinguish between the device and the 
-> platform device. The latter is only used in a few places where it's 
-> absolutely necessary, because there's no generic equivalent to 
-> platform_device_unregister(). (device_unregister() is something else 
-> AFAICT.)  At some point, I'd like to see the aperture code being handled 
-> in a more prominent place within resource management. That would need it 
-> to use struct device.
->
+> u64 table_offset_entry[0];
+> 
+> But it might be better to change RSDT as well. Linux kernel declares:
+> 
+> u64 table_offset_entry[1];
+> 
+> but it seems, we would rather have:
+> 
+> u64 table_offset_entry[];
 
-Ok, I was wondering what was the value of the indirection level other than
-making the code more complex and supporting an hypothetical case of a FW
-driver that would not bind against a platform device.
+Sorry, I didn't think about Linux when I wrote my reply. In my opinion, we
+should keep our definitions aligned with Linux for two reasons:
 
-But if the goal is to move this at some point to a more generic place (i.e:
-the Linux device model itself) then I agree that we can just keep it as is.
+- Makes making changes to the header file and borrowing code from Linux less
+  error prone.
 
-When you re-spin this patch, feel free to add my R-b since looks good to me.
+- Linux' implementation, even though it might not be ideal, is proven to be
+  working.
 
-And thanks again for working on this!
+It might also be that Linux uses table_offset_entry[1] for compatibility
+with older compilers, and supporting the same compilers that Linux does
+looks like a safe approach for me; I am not aware of an official policy for
+kvm-unit-tests regarding compiler versions (might be one, it just that I
+don't know about it!).
 
--- 
-Best regards,
-
-Javier Martinez Canillas
-Linux Engineering
-Red Hat
-
+Thanks,
+Alex
