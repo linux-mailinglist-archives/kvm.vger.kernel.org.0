@@ -2,109 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 718065539FD
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 21:09:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D589E553ADE
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 21:56:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352794AbiFUTJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 15:09:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60118 "EHLO
+        id S1354157AbiFUT4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 15:56:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243248AbiFUTJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 15:09:27 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 572A122B1F;
-        Tue, 21 Jun 2022 12:09:26 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 423E9165C;
-        Tue, 21 Jun 2022 12:09:26 -0700 (PDT)
-Received: from [10.57.85.30] (unknown [10.57.85.30])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B8893F792;
-        Tue, 21 Jun 2022 12:09:24 -0700 (PDT)
-Message-ID: <4bc34090-249a-c505-3d90-f75a7fe7c17d@arm.com>
-Date:   Tue, 21 Jun 2022 20:09:20 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 1/2] vfio/type1: Simplify bus_type determination
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     kvm@vger.kernel.org, cohuck@redhat.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com
-References: <07c69a27fa5bf9724ea8c9fcfe3ff2e8b68f6bf0.1654697988.git.robin.murphy@arm.com>
- <20220610000343.GD1343366@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20220610000343.GD1343366@nvidia.com>
+        with ESMTP id S1354182AbiFUT4S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 15:56:18 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0216C2E095;
+        Tue, 21 Jun 2022 12:56:16 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25LJmudX004833;
+        Tue, 21 Jun 2022 19:56:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ reply-to : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding : mime-version; s=pp1;
+ bh=PNhLoyePJieVJUPQtnkVNsib2PrRHGt1oyeaf1N0hAg=;
+ b=qLQYq7ZZBqW/OHta0CaSKr8AKu+Boy5d7JkmTzxnWCIsJOxZA4fYYgUiA8Fgheam/1GV
+ 9ERbVT3RUD/8d8zibeLcWN3X4uCr5NkRb9sbWR6jGBo7sSgMaWULlyEOOSlteEvafKi4
+ qLRxapmuJtSFOHdozjpLsFEf4rDf4R3JYyPUu0P9aYh5VIcyXQpkhaEmytA2gVZ2bDj6
+ oXzFKpqjirx9oE852Zf0g5rdl8TxT8+zxU53IyDPkYTe2PzXoZSeX6rg/HGclpId5JB7
+ xrK6BmvwvqdoeXN1PjEy0qJElrm2b6OcnbGL0nOZmPkQIieU4MvIjnJQmrcqDuDIKmxc yA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gumfr0440-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Jun 2022 19:56:13 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25LJnFtF010268;
+        Tue, 21 Jun 2022 19:56:13 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gumfr043d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Jun 2022 19:56:13 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25LJphnC016660;
+        Tue, 21 Jun 2022 19:56:12 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01wdc.us.ibm.com with ESMTP id 3gs6b9e2mm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Jun 2022 19:56:12 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25LJuAHS31326712
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Jun 2022 19:56:11 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE9D17805C;
+        Tue, 21 Jun 2022 19:56:10 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EEAA578064;
+        Tue, 21 Jun 2022 19:56:09 +0000 (GMT)
+Received: from [9.65.195.48] (unknown [9.65.195.48])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 21 Jun 2022 19:56:09 +0000 (GMT)
+Message-ID: <f18b53b1-b7d4-08b2-1030-7f91c3b22f3d@linux.ibm.com>
+Date:   Tue, 21 Jun 2022 15:56:09 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Reply-To: jjherne@linux.ibm.com
+Subject: Re: [PATCH v20 20/20] MAINTAINERS: pick up all vfio_ap docs for VFIO
+ AP maintainers
+Content-Language: en-US
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20220621155134.1932383-1-akrowiak@linux.ibm.com>
+ <20220621155134.1932383-21-akrowiak@linux.ibm.com>
+From:   "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220621155134.1932383-21-akrowiak@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: M5FTh8smiFQWU1d_0LDJgsumkqQAl-Iu
+X-Proofpoint-GUID: B1pCbIFWB57jkTUFodQhxKyLN9s7oS0l
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-21_09,2022-06-21_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 priorityscore=1501 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206210077
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-06-10 01:03, Jason Gunthorpe via iommu wrote:
-> On Wed, Jun 08, 2022 at 03:25:49PM +0100, Robin Murphy wrote:
->> Since IOMMU groups are mandatory for drivers to support, it stands to
->> reason that any device which has been successfully be added to a group
->> must be on a bus supported by that IOMMU driver, and therefore a domain
->> viable for any device in the group must be viable for all devices in
->> the group. This already has to be the case for the IOMMU API's internal
->> default domain, for instance. Thus even if the group contains devices
->> on different buses, that can only mean that the IOMMU driver actually
->> supports such an odd topology, and so without loss of generality we can
->> expect the bus type of any arbitrary device in a group to be suitable
->> for IOMMU API calls.
->>
->> Replace vfio_bus_type() with a trivial callback that simply returns any
->> device from which to then derive a usable bus type. This is also a step
->> towards removing the vague bus-based interfaces from the IOMMU API.
->>
->> Furthermore, scrutiny reveals a lack of protection for the bus and/or
->> device being removed while .attach_group is inspecting them; the
->> reference we hold on the iommu_group ensures that data remains valid,
->> but does not prevent the group's membership changing underfoot. Holding
->> the vfio_goup's device_lock should be sufficient to block any relevant
->> device's VFIO driver from unregistering, and thus block unbinding and
->> any further stages of removal for the duration of the attach operation.
+On 6/21/22 11:51, Tony Krowiak wrote:
+> A new document, Documentation/s390/vfio-ap-locking.rst was added. Make sure
+> the new document is picked up for the VFIO AP maintainers by using a
+> wildcard: Documentation/s390/vfio-ap*.
 > 
-> The device_lock only protects devices that are on the device_list from
-> concurrent unregistration, the device returned by
-> iommu_group_for_each_dev() is not guarented to be the on the device
-> list.
-
-Sigh, you're quite right, and now I have a vague feeling that you called 
-that out in the previous discussion too, so apologies for forgetting.
-
->> @@ -760,8 +760,11 @@ static int __vfio_container_attach_groups(struct vfio_container *container,
->>   	int ret = -ENODEV;
->>   
->>   	list_for_each_entry(group, &container->group_list, container_next) {
->> +		/* Prevent devices unregistering during attach */
->> +		mutex_lock(&group->device_lock);
->>   		ret = driver->ops->attach_group(data, group->iommu_group,
->>   						group->type);
->> +		mutex_unlock(&group->device_lock);
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>   MAINTAINERS | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I still prefer the version where we pass in an arbitrary vfio_device
-> from the list the group maintains:
-> 
->     list_first_entry(group->device_list)
-> 
-> And don't call iommu_group_for_each_dev(), it is much simpler to
-> reason about how it works.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3cf9842d9233..fbe417746e22 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -17453,7 +17453,7 @@ M:	Jason Herne <jjherne@linux.ibm.com>
+>   L:	linux-s390@vger.kernel.org
+>   S:	Supported
+>   W:	http://www.ibm.com/developerworks/linux/linux390/
+> -F:	Documentation/s390/vfio-ap.rst
+> +F:	Documentation/s390/vfio-ap*
+>   F:	drivers/s390/crypto/vfio_ap*
+>   
+>   S390 VFIO-CCW DRIVER
 
-Agreed, trying to figure out which are the VFIO devices from within the 
-iommu_group iterator seems beyond the threshold of practicality.
+Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
 
-Quick consensus then: does anyone have a particular preference between 
-changing the .attach_group signature vs. adding a helper based on 
-vfio_group_get_from_iommu() for type1 to call from within its callback? 
-They seem about equal (but opposite) in terms of the simplicity vs. 
-impact tradeoff to me, so I can't quite decide conclusively...
-
-Thanks,
-Robin.
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
