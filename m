@@ -2,127 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BA4D552CE8
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 10:25:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74B3F552DC0
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 10:59:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229955AbiFUIYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 04:24:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42532 "EHLO
+        id S1347679AbiFUI64 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 04:58:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347940AbiFUIYC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 04:24:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AB6D113EB3
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 01:23:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655799817;
+        with ESMTP id S1348591AbiFUI6k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 04:58:40 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2AFCE1C;
+        Tue, 21 Jun 2022 01:58:38 -0700 (PDT)
+Received: from zn.tnic (p2e55dbad.dip0.t-ipconnect.de [46.85.219.173])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 56AB81EC0576;
+        Tue, 21 Jun 2022 10:58:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1655801913;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XGU7mDtKklVPCqn8Uk3bMEFXs2W9T3w03LpqwdG17/Y=;
-        b=gGO1aDgYqdOwsKkrCMRJ5ZG5N9Br+8SqnRw8z+OrIPfX1XA8cUsrvwWnfgaOCsC7VMxX6D
-        rVnpCcBA73U9bhNRDGnfXD1WN8/Rw5JrqRr0ZNUrNFjRnK+LI9SpXVDCay3ZG4AkDKXRSt
-        k1EaOGUBuaeUCLLBKYlETSuk21+GLEE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-115-r58LM1fiPnKIMUFuw7Uhzw-1; Tue, 21 Jun 2022 04:23:35 -0400
-X-MC-Unique: r58LM1fiPnKIMUFuw7Uhzw-1
-Received: by mail-wr1-f70.google.com with SMTP id r20-20020adfb1d4000000b0021b8507563eso1897279wra.16
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 01:23:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=XGU7mDtKklVPCqn8Uk3bMEFXs2W9T3w03LpqwdG17/Y=;
-        b=bOdGVVWEoXBXJ4IGkTdDPsk5fHaAGD5wf4Yyzy49ZtCZrQWgKDOh9G7GJZaLXt2WQl
-         0PjfSdMsymeDVekYm8UZHZ5CnjNV1Q6whN+1fzQbuKa0zX2adoEhe4Kvw3LQ6fMl42HS
-         WjVA+qRR3yqrxffsFzUx0PgXUQv7MmFjWDYkYvSQkrvcZUbdxImQMa58GKXlycss2qxT
-         xqGbrB3ZB3W6PyhvnTeLkEN1BIZXjbuNwkxSjU/nieZ01gX6MwsDME9o5KDlobWOd6mI
-         1n1bi7Xlc/5c3uBzMdnvEaDQBxDtN/8AqmOmCe+cazwX+HyXV0o3h91BdqEa8znrC2dM
-         EiFQ==
-X-Gm-Message-State: AJIora80xFUNT+Xd3cGW6SshXhpQ4pG6KonDPx29IIDO5XjHCNxj6aOc
-        QSbtqv58Bcn+zcV2AWpOI9UlMvIXWgKJ5SElRt+mFJoQ7VMHMD2q6g9IQEh0qyX1TyXPVgrWWwu
-        8eGtOYNpxioxa
-X-Received: by 2002:a7b:c758:0:b0:39c:44ce:f00f with SMTP id w24-20020a7bc758000000b0039c44cef00fmr28512312wmk.167.1655799814490;
-        Tue, 21 Jun 2022 01:23:34 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sUotCk+6rcFy05ZeXu+qAjpL3NaHybbZ2BoBeUtiL7/zNAYd2GvpjFdw35xlTwbym9LSrXXg==
-X-Received: by 2002:a7b:c758:0:b0:39c:44ce:f00f with SMTP id w24-20020a7bc758000000b0039c44cef00fmr28512300wmk.167.1655799814242;
-        Tue, 21 Jun 2022 01:23:34 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f04:2500:cdb0:9b78:d423:43f? (p200300d82f042500cdb09b78d423043f.dip0.t-ipconnect.de. [2003:d8:2f04:2500:cdb0:9b78:d423:43f])
-        by smtp.gmail.com with ESMTPSA id j11-20020a05600c190b00b0039c5328ad92sm24367503wmq.41.2022.06.21.01.23.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jun 2022 01:23:33 -0700 (PDT)
-Message-ID: <212f8b31-e470-d62c-0090-537d0d60add9@redhat.com>
-Date:   Tue, 21 Jun 2022 10:23:32 +0200
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=THe01fFq/VVSfqs+JIwBFS+S4rUvRCAH2e4Ug2QOtbU=;
+        b=D+3TDXk5A70FXJH4amYBCqq2eUl/InLmvpky5ywFpHbkfYH1+/Kz38D2aCavRLr5MNpjLH
+        ZN1T8Ki7n5eZa/dUy75+mre+HAkaSlGhiRRig23k/VnuKHepcD61Q+DSn+RLtU4GXIJM+n
+        OKktuV65Kc6g13PHIcdaO7+gvy4nPsk=
+Date:   Tue, 21 Jun 2022 10:58:29 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, michael.roth@amd.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 01/49] x86/cpufeatures: Add SEV-SNP CPU feature
+Message-ID: <YrGINaPc3cojG6/3@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <7abfca61f8595c036e1bd9f1d65ab78af0006627.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH RFC 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Content-Language: en-US
-To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20220617014147.7299-1-peterx@redhat.com>
- <20220617014147.7299-2-peterx@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20220617014147.7299-2-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7abfca61f8595c036e1bd9f1d65ab78af0006627.1655761627.git.ashish.kalra@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.06.22 03:41, Peter Xu wrote:
-> We have had FAULT_FLAG_INTERRUPTIBLE but it was never applied to GUPs.  One
-> issue with it is that not all GUP paths are able to handle signal delivers
-> besides SIGKILL.
+On Mon, Jun 20, 2022 at 10:59:01PM +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> That's not ideal for the GUP users who are actually able to handle these
-> cases, like KVM.
+> Add CPU feature detection for Secure Encrypted Virtualization with
+> Secure Nested Paging. This feature adds a strong memory integrity
+> protection to help prevent malicious hypervisor-based attacks like
+> data replay, memory re-mapping, and more.
 > 
-> KVM uses GUP extensively on faulting guest pages, during which we've got
-> existing infrastructures to retry a page fault at a later time.  Allowing
-> the GUP to be interrupted by generic signals can make KVM related threads
-> to be more responsive.  For examples:
-> 
->   (1) SIGUSR1: which QEMU/KVM uses to deliver an inter-process IPI,
->       e.g. when the admin issues a vm_stop QMP command, SIGUSR1 can be
->       generated to kick the vcpus out of kernel context immediately,
-> 
->   (2) SIGINT: which can be used with interactive hypervisor users to stop a
->       virtual machine with Ctrl-C without any delays/hangs,
-> 
->   (3) SIGTRAP: which grants GDB capability even during page faults that are
->       stuck for a long time.
-> 
-> Normally hypervisor will be able to receive these signals properly, but not
-> if we're stuck in a GUP for a long time for whatever reason.  It happens
-> easily with a stucked postcopy migration when e.g. a network temp failure
-> happens, then some vcpu threads can hang death waiting for the pages.  With
-> the new FOLL_INTERRUPTIBLE, we can allow GUP users like KVM to selectively
-> enable the ability to trap these signals.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
-This makes sense to me. I assume relevant callers will detect "GUP
-failed" but also "well, there is a signal to handle" and cleanly back
-off, correct?
+verify_tags: Warning: Sender Ashish Kalra <Ashish.Kalra@amd.com> hasn't signed off on the patch!
+
+When you send someone else's patch, you need to add your SOB underneath
+it to state that you have handled that patch too, on its way mainline.
+
+While waiting for review, please brush up on the development process by
+perusing the documentation in Documentation/process/ and especially
+
+Documentation/process/submitting-patches.rst
+
+> ---
+>  arch/x86/include/asm/cpufeatures.h       | 1 +
+>  arch/x86/kernel/cpu/amd.c                | 3 ++-
+>  tools/arch/x86/include/asm/cpufeatures.h | 1 +
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index 30da1341f226..1cba0217669f 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -407,6 +407,7 @@
+>  #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
+>  #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
+>  #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
+> +#define X86_FEATURE_SEV_SNP		(19*32+4)  /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
+
+Do you not see how there's a space between the '+' and the single-digit
+number so that the vertical formatting works?
+
+>  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
+>  
+>  /*
+> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+> index 0c0b09796ced..2e87015a9d69 100644
+> --- a/arch/x86/kernel/cpu/amd.c
+> +++ b/arch/x86/kernel/cpu/amd.c
+> @@ -559,7 +559,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+>  	 *	      If the kernel has not enabled SME via any means then
+>  	 *	      don't advertise the SME feature.
+>  	 *   For SEV: If BIOS has not enabled SEV then don't advertise the
+> -	 *            SEV and SEV_ES feature (set in scattered.c).
+> +	 *            SEV, SEV_ES and SEV_SNP feature.
+
+Let's generalize that so that it doesn't get updated with every feature:
+
+"... then don't advertize SEV and any additional functionality based on it."
+
+>  	 *
+>  	 *   In all cases, since support for SME and SEV requires long mode,
+>  	 *   don't advertise the feature under CONFIG_X86_32.
+> @@ -594,6 +594,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+>  clear_sev:
+>  		setup_clear_cpu_cap(X86_FEATURE_SEV);
+>  		setup_clear_cpu_cap(X86_FEATURE_SEV_ES);
+> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
+>  	}
+>  }
+>  
+> diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
+> index 73e643ae94b6..a636342ecb26 100644
+> --- a/tools/arch/x86/include/asm/cpufeatures.h
+> +++ b/tools/arch/x86/include/asm/cpufeatures.h
+> @@ -405,6 +405,7 @@
+>  #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
+>  #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
+>  #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
+> +#define X86_FEATURE_SEV_SNP		(19*32+4)  /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
+>  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
+
+Ditto.
+
+Thx.
 
 -- 
-Thanks,
+Regards/Gruss,
+    Boris.
 
-David / dhildenb
-
+https://people.kernel.org/tglx/notes-about-netiquette
