@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E04455349A
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 16:36:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C30AE55349E
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 16:36:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351433AbiFUOgT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 10:36:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45294 "EHLO
+        id S242186AbiFUOgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 10:36:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242186AbiFUOgS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 10:36:18 -0400
+        with ESMTP id S1349502AbiFUOgT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 10:36:19 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7DA61D0FB;
-        Tue, 21 Jun 2022 07:36:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4747320BCD;
+        Tue, 21 Jun 2022 07:36:18 -0700 (PDT)
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25LEEW9Z010278;
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25LEEmT5015267;
         Tue, 21 Jun 2022 14:36:17 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=zB8WfAckH3r7HEGpG7z+stiH/AnB45hRITZ6ksOs/UM=;
- b=HRwIBoOmCrMCDHEy3kYz7K4ZzgZWmsdB6wkKteSwVkt1Cz6kNVv8JJIVz84OD1khLl5G
- N1vzkpBEC/YxPBV8UuI4T6BRwBaPZBVEEJQOjDv97EKE0VYasewS5mTsJU9BJcx3RM6T
- RAhg7JY93r9FAXFZPbQeL8OkIoFK0cu6ySrdrqeRx1bOUR2gbusoViHsoFjSwLqvlWJW
- LUlcmqhFxNhHCglSY4X1SoYAh6APgMkA6E5u44IzKU5zznHvGy7N2qsWIw3zKxP9nBgx
- mDyRPczX1JZzgt2gg/T3sn7ZgD//qr6DjFBgTdApla2IqZYE6gfUfqc+nQAWJkVJM63h 1Q== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=ApkbzL8sAV1lbIPSlvDRsg4ZhG/zzof/HUtLzNFxJ3c=;
+ b=dLp7knRbW+rwHA/A5/Q8Xmg9PBeYOlrPdtCD/zITOuIBbeiNHA4GQXCatVyucq2PwTtQ
+ Qyu4jSXr7pCm481zeiGdHtA1btf9XLHAWK22ZzVZx9AHLiUblfg3emQnwrYyYxRd3vI5
+ /ND5Z3ZKzlF0qHPZstR68yeKv2dan9QsNLm5D2PcRhBZIGyDEfAZz5NxQcmRjgQZLxX3
+ O/MailOs4uFmsaCka0l474QBa1nSem6Bp30xA0MoOAFp/r5qRCG0ZBvc6LGaUVo0wv7I
+ 3Xm+Qk3h+oPy9foSQHiVa0V+ha/TV96ZnaT4PBG0bMGtVXWUPCo9QSfArL1i+iPQJRFv DQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gufjxrqpw-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gufjxrqq7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jun 2022 14:36:16 +0000
+        Tue, 21 Jun 2022 14:36:17 +0000
 Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25LEFAFX017878;
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25LEG296020143;
         Tue, 21 Jun 2022 14:36:16 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gufjxrqmq-1
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gufjxrqn0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 21 Jun 2022 14:36:16 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25LEMn2m008875;
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25LEMpUr005879;
         Tue, 21 Jun 2022 14:36:14 GMT
 Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 3gs5yj39vv-1
+        by ppma06ams.nl.ibm.com with ESMTP id 3gs5yhm6s6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 21 Jun 2022 14:36:14 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25LEZQft21561828
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25LEZRVn21561830
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Jun 2022 14:35:26 GMT
+        Tue, 21 Jun 2022 14:35:27 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 70287A4060;
+        by IMSVA (Postfix) with ESMTP id C0778A4054;
         Tue, 21 Jun 2022 14:36:11 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C1D4A4054;
+        by IMSVA (Postfix) with ESMTP id 7CB08A4062;
         Tue, 21 Jun 2022 14:36:11 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -63,15 +64,17 @@ To:     Thomas Huth <thuth@redhat.com>,
 Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v5 0/3] More skey instr. emulation test
-Date:   Tue, 21 Jun 2022 16:36:06 +0200
-Message-Id: <20220621143609.753452-1-scgl@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v5 1/3] s390x: Test TEID values in storage key test
+Date:   Tue, 21 Jun 2022 16:36:07 +0200
+Message-Id: <20220621143609.753452-2-scgl@linux.ibm.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220621143609.753452-1-scgl@linux.ibm.com>
+References: <20220621143609.753452-1-scgl@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AyKqADlyVMeaxyV8lcZcY9NIr-bEIdHK
-X-Proofpoint-ORIG-GUID: SD-UMDI4qmK40CjN1uWccrNMvyqZiCKU
+X-Proofpoint-GUID: bG_Rjo1GOSY19WM1W8jFXXtJNz0H1NKb
+X-Proofpoint-ORIG-GUID: tDM8RgJ8dtXjcI53Ar94sYaHgQMS8gBh
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-21_07,2022-06-21_01,2022-02-23_01
@@ -89,97 +92,155 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add test cases similar to those testing the effect of storage keys on
-instructions emulated by KVM, but test instructions emulated by user
-space/qemu instead.
-Test that DIAG 308 is not subject to key protection.
-Additionally, check the transaction exception identification on
-protection exceptions.
+On a protection exception, test that the Translation-Exception
+Identification (TEID) values are correct given the circumstances of the
+particular test.
+The meaning of the TEID values is dependent on the installed
+suppression-on-protection facility.
 
-This series is based on v3 of s390x: Rework TEID decoding and usage .
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+---
+ s390x/skey.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 72 insertions(+), 6 deletions(-)
 
-v4 -> v5
- * rebase onto v3 of TEID series
- * ignore ancient machines without at least ESOP-1
-
-v3 -> v4
- * rebase on newest TEID decoding series
- * pick up r-b's (Thanks Claudio)
- * add check for protection code validity in case of basic SOP
-
-v2 -> v3
- * move sclp patch and part of TEID test to series
-       s390x: Rework TEID decoding and usage
- * make use of reworked TEID union in skey TEID test
- * get rid of pointer to array for diag 308 test
- * use lowcore symbol and mem_all
- * don't reset intparm when expecting exception in msch test
-
-v1 -> v2
- * don't mixup sclp fix with new bits for the TEID patch
- * address feedback
-       * cosmetic changes, i.e. shortening identifiers
-       * remove unconditional report_info
- * add DIAG 308 test
-
-Janis Schoetterl-Glausch (3):
-  s390x: Test TEID values in storage key test
-  s390x: Test effect of storage keys on some more instructions
-  s390x: Test effect of storage keys on diag 308
-
- s390x/skey.c        | 379 +++++++++++++++++++++++++++++++++++++++++++-
- s390x/unittests.cfg |   1 +
- 2 files changed, 374 insertions(+), 6 deletions(-)
-
-Range-diff against v4:
-1:  fbfd7e3b ! 1:  a30f2b45 s390x: Test TEID values in storage key test
-    @@ s390x/skey.c: static void test_test_protection(void)
-     +{
-     +	union teid teid;
-     +	int access_code;
-    -+	bool dat;
-     +
-     +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-     +	report_prefix_push("TEID");
-     +	teid.val = lowcore.trans_exc_id;
-     +	switch (get_supp_on_prot_facility()) {
-     +	case SOP_NONE:
-    -+		break;
-     +	case SOP_BASIC:
-    -+		dat = extract_psw_mask() & PSW_MASK_DAT;
-    -+		report(!teid.sop_teid_predictable || !dat || !teid.sop_acc_list,
-    -+		       "valid protection code");
-    ++		/* let's ignore ancient/irrelevant machines */
-     +		break;
-     +	case SOP_ENHANCED_1:
-     +		report(!teid.sop_teid_predictable, "valid protection code");
-    ++		/* no access code in case of key protection */
-     +		break;
-     +	case SOP_ENHANCED_2:
-     +		switch (teid_esop2_prot_code(teid)) {
-     +		case PROT_KEY:
-    -+			access_code = teid.acc_exc_f_s;
-    ++			/* ESOP-2: no need to check facility */
-    ++			access_code = teid.acc_exc_fetch_store;
-     +
-     +			switch (access_code) {
-     +			case 0:
-    @@ s390x/skey.c: static void test_test_protection(void)
-     +				break;
-     +			}
-     +			/* fallthrough */
-    -+		case PROT_KEY_LAP:
-    ++		case PROT_KEY_OR_LAP:
-     +			report_pass("valid protection code");
-     +			break;
-     +		default:
-2:  868bb863 = 2:  b194f716 s390x: Test effect of storage keys on some more instructions
-3:  d49934c0 = 3:  460d77ec s390x: Test effect of storage keys on diag 308
-
-base-commit: 610c15284a537484682adfb4b6d6313991ab954f
-prerequisite-patch-id: bebbc71ca3cc8d085e36a049466dba5a420c9c75
-prerequisite-patch-id: d38a4fc7bc1fa6e352502f294cb9413f0b738b99
-prerequisite-patch-id: 15d25aaab40e81ad60a13218eaba370585c4a87e
+diff --git a/s390x/skey.c b/s390x/skey.c
+index 445476a0..efce1fc3 100644
+--- a/s390x/skey.c
++++ b/s390x/skey.c
+@@ -8,6 +8,7 @@
+  *  Janosch Frank <frankja@linux.vnet.ibm.com>
+  */
+ #include <libcflat.h>
++#include <asm/arch_def.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/interrupt.h>
+ #include <vmalloc.h>
+@@ -158,6 +159,71 @@ static void test_test_protection(void)
+ 	report_prefix_pop();
+ }
+ 
++enum access {
++	ACC_STORE = 1,
++	ACC_FETCH = 2,
++	ACC_UPDATE = 3,
++};
++
++enum protection {
++	PROT_STORE = 1,
++	PROT_FETCH_STORE = 3,
++};
++
++static void check_key_prot_exc(enum access access, enum protection prot)
++{
++	union teid teid;
++	int access_code;
++
++	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
++	report_prefix_push("TEID");
++	teid.val = lowcore.trans_exc_id;
++	switch (get_supp_on_prot_facility()) {
++	case SOP_NONE:
++	case SOP_BASIC:
++		/* let's ignore ancient/irrelevant machines */
++		break;
++	case SOP_ENHANCED_1:
++		report(!teid.sop_teid_predictable, "valid protection code");
++		/* no access code in case of key protection */
++		break;
++	case SOP_ENHANCED_2:
++		switch (teid_esop2_prot_code(teid)) {
++		case PROT_KEY:
++			/* ESOP-2: no need to check facility */
++			access_code = teid.acc_exc_fetch_store;
++
++			switch (access_code) {
++			case 0:
++				report_pass("valid access code");
++				break;
++			case 1:
++			case 2:
++				report((access & access_code) && (prot & access_code),
++				       "valid access code");
++				break;
++			case 3:
++				/*
++				 * This is incorrect in that reserved values
++				 * should be ignored, but kvm should not return
++				 * a reserved value and having a test for that
++				 * is more valuable.
++				 */
++				report_fail("valid access code");
++				break;
++			}
++			/* fallthrough */
++		case PROT_KEY_OR_LAP:
++			report_pass("valid protection code");
++			break;
++		default:
++			report_fail("valid protection code");
++		}
++		break;
++	}
++	report_prefix_pop();
++}
++
+ /*
+  * Perform STORE CPU ADDRESS (STAP) instruction while temporarily executing
+  * with access key 1.
+@@ -199,7 +265,7 @@ static void test_store_cpu_address(void)
+ 	expect_pgm_int();
+ 	*out = 0xbeef;
+ 	store_cpu_address_key_1(out);
+-	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
++	check_key_prot_exc(ACC_STORE, PROT_STORE);
+ 	report(*out == 0xbeef, "no store occurred");
+ 	report_prefix_pop();
+ 
+@@ -210,7 +276,7 @@ static void test_store_cpu_address(void)
+ 	expect_pgm_int();
+ 	*out = 0xbeef;
+ 	store_cpu_address_key_1(out);
+-	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
++	check_key_prot_exc(ACC_STORE, PROT_STORE);
+ 	report(*out == 0xbeef, "no store occurred");
+ 	report_prefix_pop();
+ 
+@@ -228,7 +294,7 @@ static void test_store_cpu_address(void)
+ 	expect_pgm_int();
+ 	*out = 0xbeef;
+ 	store_cpu_address_key_1(out);
+-	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
++	check_key_prot_exc(ACC_STORE, PROT_STORE);
+ 	report(*out == 0xbeef, "no store occurred");
+ 	report_prefix_pop();
+ 
+@@ -314,7 +380,7 @@ static void test_set_prefix(void)
+ 	set_storage_key(pagebuf, 0x28, 0);
+ 	expect_pgm_int();
+ 	set_prefix_key_1(prefix_ptr);
+-	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
++	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+ 	report(get_prefix() == old_prefix, "did not set prefix");
+ 	report_prefix_pop();
+ 
+@@ -327,7 +393,7 @@ static void test_set_prefix(void)
+ 	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
+ 	set_prefix_key_1((uint32_t *)0);
+ 	install_page(root, 0, 0);
+-	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
++	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+ 	report(get_prefix() == old_prefix, "did not set prefix");
+ 	report_prefix_pop();
+ 
+@@ -351,7 +417,7 @@ static void test_set_prefix(void)
+ 	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
+ 	set_prefix_key_1(OPAQUE_PTR(2048));
+ 	install_page(root, 0, 0);
+-	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
++	check_key_prot_exc(ACC_FETCH, PROT_FETCH_STORE);
+ 	report(get_prefix() == old_prefix, "did not set prefix");
+ 	report_prefix_pop();
+ 
 -- 
 2.36.1
 
