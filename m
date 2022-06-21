@@ -2,54 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 313E05535A4
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 17:15:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16DBA5535CA
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 17:20:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352551AbiFUPOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 11:14:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46338 "EHLO
+        id S1352652AbiFUPUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 11:20:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352553AbiFUPOW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 11:14:22 -0400
+        with ESMTP id S1352648AbiFUPUR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 11:20:17 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 538B51261E
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 08:12:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D73A01F2EE
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 08:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655824376;
+        s=mimecast20190719; t=1655824811;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=emlUx4gUafbHC/k2dMx86pJY4QHfljo+DDH8e6vUpz0=;
-        b=VL05eOM3FVnT1/7HWU0Ke77s8dxKgB4D99o/ipsZlUZ1q7CZtvsMy6ZijBY94DSJ84eK+p
-        nNurgQk0eDWUAiT7NKHnHkXFR/8N03bYHqgbkqK3heLA6/tz/eN2II9TCAYQnRkrX3aE/+
-        bXGK9QxX57A26rO3Nw7No0/btCxTtUs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=P1aTQGCdCd/WCCg+CdRK2dqhWGiAOwiqqFPLYHWnZ4I=;
+        b=bTGb/Zq0RTypJaBcccwgLhP1Vpp6OIBFIi2ONIf+jB8IQ94ZBTJUbLleBcUGMmc4wDbCJj
+        jxQGa4J7j7/dclzyNAuuY/hwc8yxg2rpJLdNlzOIV8Uk6KSd6UcfVMSOzZygnic03ZbsTC
+        VPhAVAPs6RE/9qkAwW7CPBBadhWYqNw=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-495-j_NHfUW5MO-iDRlirOJCQQ-1; Tue, 21 Jun 2022 11:12:55 -0400
-X-MC-Unique: j_NHfUW5MO-iDRlirOJCQQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CEA01808788
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 15:12:54 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.194.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A5F3F1121314;
-        Tue, 21 Jun 2022 15:12:53 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Cathy Avery <cavery@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PATCH] Add test for #SMI during interrupt window
-Date:   Tue, 21 Jun 2022 18:12:52 +0300
-Message-Id: <20220621151252.47288-1-mlevitsk@redhat.com>
+ us-mta-199-3qYQ_oqzO8-Ds5oA7_DXyQ-1; Tue, 21 Jun 2022 11:20:10 -0400
+X-MC-Unique: 3qYQ_oqzO8-Ds5oA7_DXyQ-1
+Received: by mail-qv1-f69.google.com with SMTP id jv13-20020a05621429ed00b0047048fce5bdso4191514qvb.5
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 08:20:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=P1aTQGCdCd/WCCg+CdRK2dqhWGiAOwiqqFPLYHWnZ4I=;
+        b=odnY16zlkpgidfehymzwDbXNp4bp46T+S8QqS55AB20Ke86H2LPtZ4qb+tyfwwYHhX
+         nK0+rP64cqHIswd9Bh0ksPxgciJQaKgdb/RwhJ9cL4wx2tLHRTPxo5q5zN3rGinvkIx4
+         refire2L0oVQ1+v/EBe7tSBix8rqQf5stFjr6hUgnX4QOhVPXN/Fog7VwlmgxmxHkGUR
+         63DE4y0mlO6FUw8cdYiqiHgS7lBWO9cRawdz2bUZHdaTzhcEIbzwHXcuvZF2Q6++bR4k
+         FTL5+o1dGassLS1z2IModX28KdkOyu1ek6rwZD4TQDjtFe0N5wfSpxAhYNTcAM45VJpD
+         OLPA==
+X-Gm-Message-State: AJIora9J6C4VJh1xcCuFnp/V9Wc8O5dbnAKci5ZegwXzuhLpUO9ZpF6B
+        vBMhmDn99zr8l08nDaHLJDOVkY3tiwinkZnBeqsBnjQ4+oXn8GTrbeXvipFRvkZ9aajkdSpxUk9
+        ydU1vOXJ8mK+y
+X-Received: by 2002:a05:622a:f:b0:304:ea08:4227 with SMTP id x15-20020a05622a000f00b00304ea084227mr24100703qtw.620.1655824806134;
+        Tue, 21 Jun 2022 08:20:06 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1ugXnBnBHfSF1q+MNVy/kX/HyG2xqvUeAd8GBefFNsnB10JRRI6pctEPRk+wurKNpL2uMxC1Q==
+X-Received: by 2002:a05:622a:f:b0:304:ea08:4227 with SMTP id x15-20020a05622a000f00b00304ea084227mr24100667qtw.620.1655824805766;
+        Tue, 21 Jun 2022 08:20:05 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
+        by smtp.gmail.com with ESMTPSA id bl38-20020a05620a1aa600b006a6bbc2725esm14686589qkb.118.2022.06.21.08.19.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jun 2022 08:20:05 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 17:19:53 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Gautam Dawar <gautam.dawar@xilinx.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
+        Longpeng <longpeng2@huawei.com>, Eli Cohen <elic@nvidia.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        martinpo@xilinx.com, pabloc@xilinx.com, dinang@xilinx.com,
+        "Kamde, Tanuj" <tanuj.kamde@amd.com>, habetsm.xilinx@gmail.com,
+        ecree.xilinx@gmail.com, Eugenio Perez Martin <eperezma@redhat.com>,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Subject: Re: [PATCH v2 19/19] vdpasim: control virtqueue support
+Message-ID: <CAGxU2F6OO108oHsrLBWJnYRG2yRU8QnRxAdjJhUUcp8AqaAP-g@mail.gmail.com>
+References: <20220330180436.24644-1-gdawar@xilinx.com>
+ <20220330180436.24644-20-gdawar@xilinx.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220330180436.24644-20-gdawar@xilinx.com>
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -57,199 +94,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test tests a corner case in which KVM doesn't
-preserve STI interrupt shadow when #SMI arrives during it.
+Hi Gautam,
 
-Due to apparent fact that STI interrupt shadow blocks real interrupts as well,
-and thus prevents a vCPU kick to make the CPU enter SMM,
-during the interrupt shadow, a workaround was used:
+On Wed, Mar 30, 2022 at 8:21 PM Gautam Dawar <gautam.dawar@xilinx.com> wrote:
+>
+> This patch introduces the control virtqueue support for vDPA
+> simulator. This is a requirement for supporting advanced features like
+> multiqueue.
+>
+> A requirement for control virtqueue is to isolate its memory access
+> from the rx/tx virtqueues. This is because when using vDPA device
+> for VM, the control virqueue is not directly assigned to VM. Userspace
+> (Qemu) will present a shadow control virtqueue to control for
+> recording the device states.
+>
+> The isolation is done via the virtqueue groups and ASID support in
+> vDPA through vhost-vdpa. The simulator is extended to have:
+>
+> 1) three virtqueues: RXVQ, TXVQ and CVQ (control virtqueue)
+> 2) two virtqueue groups: group 0 contains RXVQ and TXVQ; group 1
+>    contains CVQ
+> 3) two address spaces and the simulator simply implements the address
+>    spaces by mapping it 1:1 to IOTLB.
+>
+> For the VM use cases, userspace(Qemu) may set AS 0 to group 0 and AS 1
+> to group 1. So we have:
+>
+> 1) The IOTLB for virtqueue group 0 contains the mappings of guest, so
+>    RX and TX can be assigned to guest directly.
+> 2) The IOTLB for virtqueue group 1 contains the mappings of CVQ which
+>    is the buffers that allocated and managed by VMM only. So CVQ of
+>    vhost-vdpa is visible to VMM only. And Guest can not access the CVQ
+>    of vhost-vdpa.
+>
+> For the other use cases, since AS 0 is associated to all virtqueue
+> groups by default. All virtqueues share the same mapping by default.
+>
+> To demonstrate the function, VIRITO_NET_F_CTRL_MACADDR is
+> implemented in the simulator for the driver to set mac address.
+>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
+> ---
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 91 ++++++++++++++++++++++------
+>  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  2 +
+>  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 88 ++++++++++++++++++++++++++-
+>  3 files changed, 161 insertions(+), 20 deletions(-)
+>
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> index 659e2e2e4b0c..51bd0bafce06 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -96,11 +96,17 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
+>  {
+>         int i;
+>
+> -       for (i = 0; i < vdpasim->dev_attr.nvqs; i++)
+> +       spin_lock(&vdpasim->iommu_lock);
+> +
+> +       for (i = 0; i < vdpasim->dev_attr.nvqs; i++) {
+>                 vdpasim_vq_reset(vdpasim, &vdpasim->vqs[i]);
+> +               vringh_set_iotlb(&vdpasim->vqs[i].vring, &vdpasim->iommu[0],
+> +                                &vdpasim->iommu_lock);
+> +       }
+> +
+> +       for (i = 0; i < vdpasim->dev_attr.nas; i++)
+> +               vhost_iotlb_reset(&vdpasim->iommu[i]);
+>
+> -       spin_lock(&vdpasim->iommu_lock);
+> -       vhost_iotlb_reset(vdpasim->iommu);
+>         spin_unlock(&vdpasim->iommu_lock);
+>
+>         vdpasim->features = 0;
+> @@ -145,7 +151,7 @@ static dma_addr_t vdpasim_map_range(struct vdpasim *vdpasim, phys_addr_t paddr,
+>         dma_addr = iova_dma_addr(&vdpasim->iova, iova);
+>
+>         spin_lock(&vdpasim->iommu_lock);
+> -       ret = vhost_iotlb_add_range(vdpasim->iommu, (u64)dma_addr,
+> +       ret = vhost_iotlb_add_range(&vdpasim->iommu[0], (u64)dma_addr,
+>                                     (u64)dma_addr + size - 1, (u64)paddr, perm);
+>         spin_unlock(&vdpasim->iommu_lock);
+>
+> @@ -161,7 +167,7 @@ static void vdpasim_unmap_range(struct vdpasim *vdpasim, dma_addr_t dma_addr,
+>                                 size_t size)
+>  {
+>         spin_lock(&vdpasim->iommu_lock);
+> -       vhost_iotlb_del_range(vdpasim->iommu, (u64)dma_addr,
+> +       vhost_iotlb_del_range(&vdpasim->iommu[0], (u64)dma_addr,
+>                               (u64)dma_addr + size - 1);
+>         spin_unlock(&vdpasim->iommu_lock);
+>
+> @@ -250,8 +256,9 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr)
+>         else
+>                 ops = &vdpasim_config_ops;
+>
+> -       vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops, 1,
+> -                                   1, dev_attr->name, false);
+> +       vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
+> +                                   dev_attr->ngroups, dev_attr->nas,
+> +                                   dev_attr->name, false);
+>         if (IS_ERR(vdpasim)) {
+>                 ret = PTR_ERR(vdpasim);
+>                 goto err_alloc;
+> @@ -278,16 +285,20 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr)
+>         if (!vdpasim->vqs)
+>                 goto err_iommu;
+>
+> -       vdpasim->iommu = vhost_iotlb_alloc(max_iotlb_entries, 0);
+> +       vdpasim->iommu = kmalloc_array(vdpasim->dev_attr.nas,
+> +                                      sizeof(*vdpasim->iommu), GFP_KERNEL);
+>         if (!vdpasim->iommu)
+>                 goto err_iommu;
+>
+> +       for (i = 0; i < vdpasim->dev_attr.nas; i++)
+> +               vhost_iotlb_init(&vdpasim->iommu[i], 0, 0);
+> +
+>         vdpasim->buffer = kvmalloc(dev_attr->buffer_size, GFP_KERNEL);
+>         if (!vdpasim->buffer)
+>                 goto err_iommu;
+>
+>         for (i = 0; i < dev_attr->nvqs; i++)
+> -               vringh_set_iotlb(&vdpasim->vqs[i].vring, vdpasim->iommu,
+> +               vringh_set_iotlb(&vdpasim->vqs[i].vring, &vdpasim->iommu[0],
+>                                  &vdpasim->iommu_lock);
+>
+>         ret = iova_cache_get();
+> @@ -401,7 +412,11 @@ static u32 vdpasim_get_vq_align(struct vdpa_device *vdpa)
+>
+>  static u32 vdpasim_get_vq_group(struct vdpa_device *vdpa, u16 idx)
+>  {
+> -       return 0;
+> +       /* RX and TX belongs to group 0, CVQ belongs to group 1 */
+> +       if (idx == 2)
+> +               return 1;
+> +       else
+> +               return 0;
 
-An instruction which gets VMexit anyway, but retried by
-KVM is used in the interrupt shadow.
+This code only works for the vDPA-net simulator, since 
+vdpasim_get_vq_group() is also shared with other simulators (e.g.  
+vdpa_sim_blk), should we move this net-specific code into 
+vdpa_sim_net.c, maybe adding a callback implemented by the different 
+simulators?
 
-While emulating such instruction KVM doesn't reset the interrupt shadow
-(because it retries it), but it can notice the pending #SMI and enter SMM,
-thus the test tests that interrupt shadow in this case is preserved.
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- x86/Makefile.common  |   3 +-
- x86/Makefile.x86_64  |   1 +
- x86/smm_int_window.c | 125 +++++++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg    |   5 ++
- 4 files changed, 133 insertions(+), 1 deletion(-)
- create mode 100644 x86/smm_int_window.c
-
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index a600c72d..224a46ee 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -85,7 +85,8 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
-                $(TEST_DIR)/tsx-ctrl.$(exe) \
-                $(TEST_DIR)/eventinj.$(exe) \
-                $(TEST_DIR)/smap.$(exe) \
--               $(TEST_DIR)/umip.$(exe)
-+               $(TEST_DIR)/umip.$(exe) \
-+               $(TEST_DIR)/smm_int_window.$(exe)
- 
- # The following test cases are disabled when building EFI tests because they
- # use absolute addresses in their inline assembly code, which cannot compile
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index e19284ae..31479777 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -34,6 +34,7 @@ tests += $(TEST_DIR)/rdpru.$(exe)
- tests += $(TEST_DIR)/pks.$(exe)
- tests += $(TEST_DIR)/pmu_lbr.$(exe)
- 
-+
- ifeq ($(CONFIG_EFI),y)
- tests += $(TEST_DIR)/amd_sev.$(exe)
- endif
-diff --git a/x86/smm_int_window.c b/x86/smm_int_window.c
-new file mode 100644
-index 00000000..70c5336a
---- /dev/null
-+++ b/x86/smm_int_window.c
-@@ -0,0 +1,125 @@
-+#include "libcflat.h"
-+#include "apic.h"
-+#include "processor.h"
-+#include "smp.h"
-+#include "isr.h"
-+#include "delay.h"
-+#include "asm/barrier.h"
-+#include "alloc_page.h"
-+
-+volatile int bad_int_received;
-+
-+extern u64 shadow_label;
-+
-+static void dummy_ipi_isr(isr_regs_t *regs)
-+{
-+	/* should never reach here */
-+	if (regs->rip == (u64)&shadow_label) {
-+		bad_int_received++;
-+	}
-+	eoi();
-+}
-+
-+
-+#define SELF_INT_VECTOR 0xBB
-+
-+volatile bool test_ended;
-+volatile bool send_smi;
-+
-+static void vcpu1_code(void *data)
-+{
-+	/*
-+	 * Flood vCPU0 with #SMIs
-+	 *
-+	 * Note that kvm unit tests run with seabios and its #SMI handler
-+	 * is only installed on vCPU0 (BSP).
-+	 * Sending #SMI to any other CPU will crash the guest
-+
-+	 * */
-+	setup_vm();
-+
-+	while (!test_ended) {
-+
-+		if (send_smi) {
-+			apic_icr_write(APIC_INT_ASSERT | APIC_DEST_PHYSICAL | APIC_DM_SMI, 0);
-+			send_smi = false;
-+		}
-+		cpu_relax();
-+	}
-+}
-+
-+#define MEM_ALLOC_ORDER 16
-+
-+int main(void)
-+{
-+	int i;
-+	unsigned volatile char *mem;
-+
-+	setup_vm();
-+	cli();
-+
-+	mem = alloc_pages_flags(MEM_ALLOC_ORDER, AREA_ANY | FLAG_DONTZERO);
-+	assert(mem);
-+
-+	handle_irq(SELF_INT_VECTOR, dummy_ipi_isr);
-+	on_cpu_async(1, vcpu1_code, NULL);
-+
-+	for  (i = 0 ; i < (1 << MEM_ALLOC_ORDER) ; i++) {
-+
-+		apic_icr_write(APIC_INT_ASSERT | APIC_DEST_PHYSICAL | APIC_DM_FIXED | SELF_INT_VECTOR, 0);
-+
-+		/* in case the sender is still sending #SMI, wait for it*/
-+		while (send_smi)
-+			;
-+
-+		/* ask the peer vCPU to send SMI to us */
-+		send_smi = true;
-+
-+		asm volatile("sti");
-+		asm volatile("shadow_label:\n");
-+
-+		/*
-+		 * The below memory access should never get an interrupt because
-+		 * it is in an interrupt shadow from the STI.
-+		 *
-+		 * Note that seems that even if a real interrupt happens, it will
-+		 * still not interrupt this instruction, thus vCPU kick from
-+		 * vCPU1, when it attempts to send #SMI to us is not enough itself,
-+		 * to trigger the switch to SMM mode at this point.
-+		 * Therefore STI;CLI sequence itself doesn't lead to #SMI happening
-+		 * in between these instructions.
-+		 *
-+		 * So make the an instruction that accesses a fresh memory, which will
-+		 * force the CPU to  #VMEXIT and just before resuming the guest,
-+		 * KVM might notice incoming #SMI, and enter the SMM
-+		 * with a still pending interrupt shadow.
-+		 *
-+		 * Also note that, just an #VMEXITing instruction like CPUID
-+		 * can't be used here, because KVM itself will emulate it,
-+		 * and clear the interrupt shadow, prior to entering the SMM.
-+		 *
-+		 * Test that in this case, the interrupt shadow is preserved,
-+		 * which means that upon exit from #SMI  handler, the instruction
-+		 * should still not get the pending interrupt
-+		 */
-+
-+		*(mem+(i<<12)) = 1;
-+
-+		asm volatile("cli");
-+
-+		if (bad_int_received)
-+			break;
-+	}
-+
-+	test_ended = 1;
-+
-+	while (cpus_active() > 1)
-+		cpu_relax();
-+
-+	if (bad_int_received)
-+		report (0, "Unexpected interrupt received during interrupt shadow");
-+	else
-+		report(1, "Test passed");
-+
-+	return report_summary();
-+}
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 37017971..0d90b802 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -455,3 +455,8 @@ file = cet.flat
- arch = x86_64
- smp = 2
- extra_params = -enable-kvm -m 2048 -cpu host
-+
-+[smm_int_window]
-+file = smm_int_window.flat
-+smp = 2
-+extra_params = -machine smm=on -machine kernel-irqchip=on -m 2g
--- 
-2.26.3
+Thanks,
+Stefano
 
