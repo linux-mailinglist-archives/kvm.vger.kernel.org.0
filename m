@@ -2,86 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F5E3553819
-	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 18:41:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C5BF55381A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jun 2022 18:42:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353362AbiFUQki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 12:40:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54316 "EHLO
+        id S1350436AbiFUQlw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jun 2022 12:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352267AbiFUQka (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 12:40:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DA1962A41D
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 09:40:24 -0700 (PDT)
+        with ESMTP id S233072AbiFUQlv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jun 2022 12:41:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 159F420199
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 09:41:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655829624;
+        s=mimecast20190719; t=1655829710;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mw7ZffdffuzSEpMbDJcTsX2mwbZPEKH73O8nnPbDnHs=;
-        b=U8SPufhGCk4/8zfZgrFzDQ5SIhWHF6McALR3XgLo9hducPLr/MjFiaOW+6Od5ngUo4Wciu
-        ux+mdiLzmp3H0IQF9MIzzmh2a8sSw37wHmYzq/GvSCLJcjw+qxBkvI/6z5jEurZN5E6Fmn
-        RdtwJEv1QtoVijCGOpSywJR+y60flPg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0weVDdARkMHQItVNjN/m3+YbiiXoPZO+JTau5QeB1Ls=;
+        b=OF/optmieS/wCN2Tx09ur6Zvgy9oCYf9PISoLmU/FDJ4uc/vwKMEnZQixlQ1P2gWbyU158
+        q1CWxubH5X2Qj2bIP5Sg/8Kc3kBKAyzzdQHRAuTGYmJ6BaZszQXhHzcaaDjZgF9Dy3ndQ2
+        G4LJVCi+VD22E2yKSKiPxM1V8QQG5dQ=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-464-35Q8To5qNHaoBFndH8Xsgw-1; Tue, 21 Jun 2022 12:40:22 -0400
-X-MC-Unique: 35Q8To5qNHaoBFndH8Xsgw-1
-Received: by mail-wm1-f72.google.com with SMTP id m22-20020a7bcb96000000b0039c4f6ade4dso4486520wmi.8
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 09:40:22 -0700 (PDT)
+ us-mta-509--Zs8Pnu_MUqp-SPUgbXbag-1; Tue, 21 Jun 2022 12:41:48 -0400
+X-MC-Unique: -Zs8Pnu_MUqp-SPUgbXbag-1
+Received: by mail-il1-f197.google.com with SMTP id s15-20020a056e02216f00b002d3d5e41565so9500924ilv.10
+        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 09:41:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=mw7ZffdffuzSEpMbDJcTsX2mwbZPEKH73O8nnPbDnHs=;
-        b=q0WlODB5+s9dgaFn5+I2TogZpQcW5hEkaKVSS+r57V4gcNlxwA/u+hgNdxInhdLpoK
-         xs4TOs/rdL8mkQLsPncHFhdPoNc3puOhERAIl3AimHLVpD3f2je75bIoBkt+yLor/bSO
-         kFWLy0jdVGJq8SgtkcSNlvyVvR4O7PMogB1OIwAUT0DtUbO5JVn7JS70cRAClQA/ZSS0
-         Ex/BdTMI/BVLICpEbOibyuptBmbhjDoSW7zgYklkg0H8Nv+WnQ6GL3LafM+PKAiqsUpE
-         4z9heNgu80Qjat2/WNDcdqnR7dRyfcnJOVIpJpSNJJw0fQCiRFj6yPjwskcAg71dbPOi
-         pQCg==
-X-Gm-Message-State: AJIora/JiHdFfOWSoG+MADP/yuOIj7S609dN/t5B2z3L8mPu1pLN5Zq3
-        tk5eh6IJ55qmcP9oG6lGd1gYWQUXgNGyE8D0IbzvaYmk5UKdDNbqYav+3IoqmOGaZ/lKDEIYilT
-        KC4a1lplnl/pr
-X-Received: by 2002:a05:6000:1867:b0:218:5c3b:1a41 with SMTP id d7-20020a056000186700b002185c3b1a41mr29948130wri.88.1655829621633;
-        Tue, 21 Jun 2022 09:40:21 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uZ+C2JsjY3zJFhFb5Lae8TkvhpL7JjVU/zwrcqUtnJgpOs1Qo69z93UHzHQ72LKje6dBq3ww==
-X-Received: by 2002:a05:6000:1867:b0:218:5c3b:1a41 with SMTP id d7-20020a056000186700b002185c3b1a41mr29948093wri.88.1655829621342;
-        Tue, 21 Jun 2022 09:40:21 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id y14-20020a1c4b0e000000b0039c95b31812sm18550896wma.31.2022.06.21.09.40.19
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=0weVDdARkMHQItVNjN/m3+YbiiXoPZO+JTau5QeB1Ls=;
+        b=H5+bSbwfEv5rEIyOLsPOTxYyCO0YkHg6/lHlUb1V5tzx390JXTcepHWhdByJOFe8dG
+         K+Y22eSvzjH2Xku7Bhb187NaTVePRHR5NHs8NKWWhPeRDJZ/rmOGxypnySS9HCAMsMhF
+         Sh56VfQ98/WajFlY9VWSfGmn6ujKJO85gJF80awd34MG6P/nIJ/aZ1dNVy9ypSdNSApJ
+         nJijiswHHhT53nhEoTgMvCz2GJDiKHlK/Rre+WB5l7k2NL+j/SDKAI/LUU/g1Rk+Gtg+
+         RbtsT1j0LYKRm/xqAwDf0sdNpZBWtFq6PvLhNLTCIN9vQbp3WZoDmldLSkuDVfLwCl/g
+         9xXQ==
+X-Gm-Message-State: AJIora+GfKAY+aoOwYNnFUH9LfNa71bSHZCWSTd9DdyTjReGThwiiBaY
+        TQP7nWCWYTaTu1Jjy2CRn4NPskLwWVRamBWG95kUCzr/dWekT0+Mq5Hia+XQANX9Xyn/3y4I4Ep
+        pK1PZGAKHDtfq
+X-Received: by 2002:a05:6638:35a3:b0:331:e055:cf6e with SMTP id v35-20020a05663835a300b00331e055cf6emr17694173jal.250.1655829708318;
+        Tue, 21 Jun 2022 09:41:48 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tMl2lMqLwkVb1MYAeKQCs3mj7W8IOsRoMY/9K4B0VYzGr+qnNSAR4kbThOFxmaM43CMLuqUA==
+X-Received: by 2002:a05:6638:35a3:b0:331:e055:cf6e with SMTP id v35-20020a05663835a300b00331e055cf6emr17694155jal.250.1655829708135;
+        Tue, 21 Jun 2022 09:41:48 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id d14-20020a92d5ce000000b002d53be43069sm7687648ilq.64.2022.06.21.09.41.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 09:40:20 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 17:40:17 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Message-ID: <YrH0ca3Sam7Ru11c@work-vm>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+        Tue, 21 Jun 2022 09:41:47 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 10:41:46 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH vfio 2/2] vfio: Split migration ops from main device ops
+Message-ID: <20220621104146.368b429a.alex.williamson@redhat.com>
+In-Reply-To: <20220620034909.GC5219@nvidia.com>
+References: <20220606085619.7757-1-yishaih@nvidia.com>
+        <20220606085619.7757-3-yishaih@nvidia.com>
+        <BN9PR11MB5276F5548A4448B506A8F66A8CA69@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <2c917ec1-6d4f-50a4-a391-8029c3a3228b@nvidia.com>
+        <5d54c7dc-0c80-5125-9336-c672e0f29cd1@nvidia.com>
+        <20220616170118.497620ba.alex.williamson@redhat.com>
+        <6f6b36765fe9408f902d1d644b149df3@huawei.com>
+        <20220617084723.00298d67.alex.williamson@redhat.com>
+        <4f14e015-e4f7-7632-3cd7-0e644ed05c99@nvidia.com>
+        <20220620034909.GC5219@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
-User-Agent: Mutt/2.2.5 (2022-05-16)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,142 +92,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Ashish Kalra (Ashish.Kalra@amd.com) wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
-> hypervisor will use the instruction to add pages to the RMP table. See
-> APM3 for details on the instruction operations.
-> 
-> The PSMASH instruction expands a 2MB RMP entry into a corresponding set of
-> contiguous 4KB-Page RMP entries. The hypervisor will use this instruction
-> to adjust the RMP entry without invalidating the previous RMP entry.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev.h | 11 ++++++
->  arch/x86/kernel/sev.c      | 72 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 83 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index cb16f0e5b585..6ab872311544 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -85,7 +85,9 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
->  
->  /* RMP page size */
->  #define RMP_PG_SIZE_4K			0
-> +#define RMP_PG_SIZE_2M			1
->  #define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
-> +#define X86_TO_RMP_PG_LEVEL(level)	(((level) == PG_LEVEL_4K) ? RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
->  
->  /*
->   * The RMP entry format is not architectural. The format is defined in PPR
-> @@ -126,6 +128,15 @@ struct snp_guest_platform_data {
->  	u64 secrets_gpa;
->  };
->  
-> +struct rmpupdate {
-> +	u64 gpa;
-> +	u8 assigned;
-> +	u8 pagesize;
-> +	u8 immutable;
-> +	u8 rsvd;
-> +	u32 asid;
-> +} __packed;
+On Mon, 20 Jun 2022 00:49:09 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-I see above it says the RMP entry format isn't architectural; is this
-'rmpupdate' structure? If not how is this going to get handled when we
-have a couple of SNP capable CPUs with different layouts?
-
-Dave
-
->  #ifdef CONFIG_AMD_MEM_ENCRYPT
->  extern struct static_key_false sev_es_enable_key;
->  extern void __sev_es_ist_enter(struct pt_regs *regs);
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 59e7ec6b0326..f6c64a722e94 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -2429,3 +2429,75 @@ int snp_lookup_rmpentry(u64 pfn, int *level)
->  	return !!rmpentry_assigned(e);
->  }
->  EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
-> +
-> +int psmash(u64 pfn)
-> +{
-> +	unsigned long paddr = pfn << PAGE_SHIFT;
-> +	int ret;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return -ENXIO;
-> +
-> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */
-> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
-> +		      : "=a"(ret)
-> +		      : "a"(paddr)
-> +		      : "memory", "cc");
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(psmash);
-> +
-> +static int rmpupdate(u64 pfn, struct rmpupdate *val)
-> +{
-> +	unsigned long paddr = pfn << PAGE_SHIFT;
-> +	int ret;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return -ENXIO;
-> +
-> +	/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
-> +	asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-> +		     : "=a"(ret)
-> +		     : "a"(paddr), "c"((unsigned long)val)
-> +		     : "memory", "cc");
-> +	return ret;
-> +}
-> +
-> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable)
-> +{
-> +	struct rmpupdate val;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
-> +	memset(&val, 0, sizeof(val));
-> +	val.assigned = 1;
-> +	val.asid = asid;
-> +	val.immutable = immutable;
-> +	val.gpa = gpa;
-> +	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-> +
-> +	return rmpupdate(pfn, &val);
-> +}
-> +EXPORT_SYMBOL_GPL(rmp_make_private);
-> +
-> +int rmp_make_shared(u64 pfn, enum pg_level level)
-> +{
-> +	struct rmpupdate val;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
-> +	memset(&val, 0, sizeof(val));
-> +	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-> +
-> +	return rmpupdate(pfn, &val);
-> +}
-> +EXPORT_SYMBOL_GPL(rmp_make_shared);
-> -- 
-> 2.25.1
+> On Sun, Jun 19, 2022 at 12:25:50PM +0300, Yishai Hadas wrote:
 > 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > Means, staying with a single device_ops but just inline a check whether
+> > migration is really supported inside the migration get/set state callbacks
+> > and let the core call it unconditionally.  
+> 
+> I find it much cleaner to have op == NULL means unsupported.
+> 
+> As soon as you start linking supported/unsupported to other flags it
+> can get very complicated fairly fast. I have this experiance from RDMA
+> where we've spent a long time now ripping out hundreds of flag tests
+> and replacing them with NULL op checks. Many bugs were fixed doing
+> this as drivers never fully understood what the flags mean and ended
+> up with flags set that their driver doesn't properly implement.
+> 
+> The mistake we made in RDMA was not splitting the ops, instead the ops
+> were left mutable so the driver could load the right combination based
+> on HW ability.
+
+I don't really have an issue with splitting the ops, but what
+techniques have you learned from RDMA to make drivers setting ops less
+ad-hoc than proposed here?  Are drivers expected to set ops before a
+formally defined registration point?  Can ops be dynamically modified?
+Is there an API for setting ops or is it open coded per driver?
+
+We probably don't need this series to propose a solution to the
+hisi-acc name field usage vs vfio-pci-core SR-IOV driver_override
+usage, but let's put it on a to-do list somewhere.  Thanks,
+
+Alex
 
