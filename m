@@ -2,67 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDB925546FF
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8842C55477B
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:12:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234952AbiFVJyE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 05:54:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47768 "EHLO
+        id S235240AbiFVJ7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 05:59:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232187AbiFVJyB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 05:54:01 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619B13A18D
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 02:53:55 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id i64so15612088pfc.8
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 02:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=JRDDa19/V45DwVNKWWlivh1c2U4yhYbqsPjFmKAFcC0=;
-        b=oCbFF8GITK0WLSNS996UukaQQxuW5VMs1JWv2/z4ZDj53CBVxVgSvP1BZWSyaQ2GkT
-         oX4HcC6+Hde6lQYcZIz3g2pAo4gHbPX/iqoaNzOIgqf2zxOfCm+tVqKLVFI7RKpNDjvA
-         sXBZAuwmt3W7e3Q1XFknYcyW3SqJvCud2SydZIk+euKIODjVj30FSlasx09FTl9GrZRB
-         Xs7tHZddYGZGDmXcjY1ad1I04G9u1GiFAPs7+3H6/84YE/8PwZKQI3ithWaRtQVdeLDX
-         9Un2fwGKiy/9sr29uCz/weploPlRk9GjQ3YOIjHDYM2GzY6Gh02wkYt4LslCGwCtoGJB
-         02OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=JRDDa19/V45DwVNKWWlivh1c2U4yhYbqsPjFmKAFcC0=;
-        b=X0ZmzdlB2gPDZ0Vde8T26Dws6UrEeLhg4G1XvzGpHNn2GJlAKm4F/l1dIHyDhNqNuj
-         PBJrHwfTcGXOP1c78OBYBESxxYd1riW2drzDvUrCEsU1TiA9XGiNqjYU681++hKklAx8
-         HJ4aIa72EnXV/pZQ37VvyXQBKotLeY8x+umPnm3HqDXhDPFIaHCCqGzZalUrw76ixIUy
-         wQ15gt+mBwWglJk/v+8GDHjbQqatAxiwCni8NkeidIJDdMMRkdkZuSoRCldId9U68LET
-         Ma+AD1DW+3LiJQ9XceT6NbbODGHRipq8OPiadCQTJn7mrV1VGUeBLfZ02BQlILiSY7Wk
-         sg0w==
-X-Gm-Message-State: AJIora/d1LH720+wfvVJNHQ0/t9Kh18ftT+xm13feYhTJsYEdrZnq4qd
-        ZLH1nZ7QysVH3kAVi8Y1rEQjDgGlrNUs5QlH91T4qw==
-X-Google-Smtp-Source: AGRyM1uQo6daJYtS5ejR5Y/X9OxYYqtlJ3QuYGsgKTVwSdlFfEIAk4PqNE1UhZuwF2CF5RwzGbOWGTczmXlHTHZzmBc=
-X-Received: by 2002:a63:7a11:0:b0:40c:fbcb:2f12 with SMTP id
- v17-20020a637a11000000b0040cfbcb2f12mr2244262pgc.180.1655891634647; Wed, 22
- Jun 2022 02:53:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220609110337.1238762-1-jaz@semihalf.com> <20220609110337.1238762-2-jaz@semihalf.com>
- <YqIJ8HtdqnoVzfQD@google.com> <CAH76GKNRDXAyGYvs2ji5Phu=5YPW8+SV8-6TLjizBRzTCnEROg@mail.gmail.com>
- <YqNVYz4+yVbWnmNv@google.com> <CAH76GKNSfaHwpy46r1WWTVgnsuijqcHe=H5nvUTUUs1UbdZvkQ@mail.gmail.com>
- <Yqtez/J540yD7VdD@google.com> <2201fe5f-5bd8-baaf-aad5-eaaea2f1e20e@amd.com>
- <CAH76GKP=2wu4+eqLCFu1F5a4rHhReUT_7N89K8xbO-gSqEQ-3w@mail.gmail.com> <88344644-44e1-0089-657a-2e34316ea4b4@amd.com>
-In-Reply-To: <88344644-44e1-0089-657a-2e34316ea4b4@amd.com>
-From:   Grzegorz Jaszczyk <jaz@semihalf.com>
-Date:   Wed, 22 Jun 2022 11:53:43 +0200
-Message-ID: <CAH76GKMKjogX9kE5jch+LqkGswGAmyOdu5sOdY_G23Dqpf0puA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86: notify hypervisor about guest entering s2idle state
-To:     "Limonciello, Mario" <mario.limonciello@amd.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, Dmytro Maluka <dmy@semihalf.com>,
-        Zide Chen <zide.chen@intel.corp-partner.google.com>,
-        Peter Fang <peter.fang@intel.corp-partner.google.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
+        with ESMTP id S232779AbiFVJ7I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 05:59:08 -0400
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B6E3983C;
+        Wed, 22 Jun 2022 02:59:07 -0700 (PDT)
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <pdurrant@amazon.com>)
+        id 1o3x8M-0001KN-Cq; Wed, 22 Jun 2022 09:58:50 +0000
+Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=debian.cbg12.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <pdurrant@amazon.com>)
+        id 1o3x8M-0003gP-1t; Wed, 22 Jun 2022 09:58:50 +0000
+From:   Paul Durrant <pdurrant@amazon.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -70,196 +35,180 @@ Cc:     linux-kernel@vger.kernel.org, Dmytro Maluka <dmy@semihalf.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Sachi King <nakato@nakato.io>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        David Dunn <daviddunn@google.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "open list:ACPI" <linux-acpi@vger.kernel.org>,
-        "open list:HIBERNATION (aka Software Suspend, aka swsusp)" 
-        <linux-pm@vger.kernel.org>, Dominik Behr <dbehr@google.com>,
-        Dmitry Torokhov <dtor@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH v2] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
+Date:   Wed, 22 Jun 2022 10:57:50 +0100
+Message-Id: <20220622095750.30563-1-pdurrant@amazon.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_ADSP_ALL,
+        RCVD_IN_DNSWL_MED,SPF_FAIL,SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-pon., 20 cze 2022 o 18:32 Limonciello, Mario
-<mario.limonciello@amd.com> napisa=C5=82(a):
->
-> On 6/20/2022 10:43, Grzegorz Jaszczyk wrote:
-> > czw., 16 cze 2022 o 18:58 Limonciello, Mario
-> > <mario.limonciello@amd.com> napisa=C5=82(a):
-> >>
-> >> On 6/16/2022 11:48, Sean Christopherson wrote:
-> >>> On Wed, Jun 15, 2022, Grzegorz Jaszczyk wrote:
-> >>>> pt., 10 cze 2022 o 16:30 Sean Christopherson <seanjc@google.com> nap=
-isa=C5=82(a):
-> >>>>> MMIO or PIO for the actual exit, there's nothing special about hype=
-rcalls.  As for
-> >>>>> enumerating to the guest that it should do something, why not add a=
- new ACPI_LPS0_*
-> >>>>> function?  E.g. something like
-> >>>>>
-> >>>>> static void s2idle_hypervisor_notify(void)
-> >>>>> {
-> >>>>>           if (lps0_dsm_func_mask > 0)
-> >>>>>                   acpi_sleep_run_lps0_dsm(ACPI_LPS0_EXIT_HYPERVISOR=
-_NOTIFY
-> >>>>>                                           lps0_dsm_func_mask, lps0_=
-dsm_guid);
-> >>>>> }
-> >>>>
-> >>>> Great, thank you for your suggestion! I will try this approach and
-> >>>> come back. Since this will be the main change in the next version,
-> >>>> will it be ok for you to add Suggested-by: Sean Christopherson
-> >>>> <seanjc@google.com> tag?
-> >>>
-> >>> If you want, but there's certainly no need to do so.  But I assume yo=
-u or someone
-> >>> at Intel will need to get formal approval for adding another ACPI LPS=
-0 function?
-> >>> I.e. isn't there work to be done outside of the kernel before any pat=
-ches can be
-> >>> merged?
-> >>
-> >> There are 3 different LPS0 GUIDs in use.  An Intel one, an AMD (legacy=
-)
-> >> one, and a Microsoft one.  They all have their own specs, and so if th=
-is
-> >> was to be added I think all 3 need to be updated.
-> >
-> > Yes this will not be easy to achieve I think.
-> >
-> >>
-> >> As this is Linux specific hypervisor behavior, I don't know you would =
-be
-> >> able to convince Microsoft to update theirs' either.
-> >>
-> >> How about using s2idle_devops?  There is a prepare() call and a
-> >> restore() call that is set for each handler.  The only consumer of thi=
-s
-> >> ATM I'm aware of is the amd-pmc driver, but it's done like a
-> >> notification chain so that a bunch of drivers can hook in if they need=
- to.
-> >>
-> >> Then you can have this notification path and the associated ACPI devic=
-e
-> >> it calls out to be it's own driver.
-> >
-> > Thank you for your suggestion, just to be sure that I've understand
-> > your idea correctly:
-> > 1) it will require to extend acpi_s2idle_dev_ops about something like
-> > hypervisor_notify() call, since existing prepare() is called from end
-> > of acpi_s2idle_prepare_late so it is too early as it was described in
-> > one of previous message (between acpi_s2idle_prepare_late and place
-> > where we use hypercall there are several places where the suspend
-> > could be canceled, otherwise we could probably try to trap on other
-> > acpi_sleep_run_lps0_dsm occurrence from acpi_s2idle_prepare_late).
-> >
->
-> The idea for prepare() was it would be the absolute last thing before
-> the s2idle loop was run.  You're sure that's too early?  It's basically
-> the same thing as having a last stage new _DSM call.
->
-> What about adding a new abort() extension to acpi_s2idle_dev_ops?  Then
-> you could catch the cancelled suspend case still and take corrective
-> action (if that action is different than what restore() would do).
+The scaling information in sub-leaf 1 should match the values in the
+'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info) which
+is shared with the guest. The offset values are not set since a TSC offset
+is already applied.
+The host TSC frequency should also be set in sub-leaf 2.
 
-It will be problematic since the abort/restore notification could
-arrive too late and therefore the whole system will go to suspend
-thinking that the guest is in desired s2ilde state. Also in this case
-it would be impossible to prevent races and actually making sure that
-the guest is suspended or not. We already had similar discussion with
-Sean earlier in this thread why the notification have to be send just
-before swait_event_exclusive(s2idle_wait_head, s2idle_state =3D=3D
-S2IDLE_STATE_WAKE) and that the VMM have to have control over guest
-resumption.
+This patch adds a new kvm_xen_set_cpuid() function that scans for the
+relevant CPUID leaf when the CPUID information is updated by the VMM and
+stashes pointers to the sub-leaves in the kvm_vcpu_xen structure.
+The values are then updated by a call to the, also new,
+kvm_xen_setup_tsc_info() function made at the end of
+kvm_guest_time_update() just before entering the guest.
 
-Nevertheless if extending acpi_s2idle_dev_ops is possible, why not
-extend it about the hypervisor_notify() and use it in the same place
-where the hypercall is used in this patch? Do you see any issue with
-that?
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+---
 
->
-> > 2) using newly introduced acpi_s2idle_dev_ops hypervisor_notify() call
-> > will allow to register handler from Intel x86/intel/pmc/core.c driver
-> > and/or AMD x86/amd-pmc.c driver. Therefore we will need to get only
-> > Intel and/or AMD approval about extending the ACPI LPS0 _DSM method,
-> > correct?
-> >
->
-> Right now the only thing that hooks prepare()/restore() is the amd-pmc
-> driver (unless Intel's PMC had a change I didn't catch yet).
->
-> I don't think you should be changing any existing drivers but rather
-> introduce another platform driver for this specific case.
->
-> So it would be something like this:
->
-> acpi_s2idle_prepare_late
-> -> prepare()
-> --> AMD: amd_pmc handler for prepare()
-> --> Intel: intel_pmc handler for prepare() (conceptual)
-> --> HYPE0001 device: new driver's prepare() routine
->
-> So the platform driver would match the HYPE0001 device to load, and it
-> wouldn't do anything other than provide a prepare()/restore() handler
-> for your case.
->
-> You don't need to change any existing specs.  If anything a new spec to
-> go with this new ACPI device would be made.  Someone would need to
-> reserve the ID and such for it, but I think you can mock it up in advance=
-.
+v2:
+ - Make sure sub-leaf pointers are NULLed if the time leaf is removed
+---
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/cpuid.c            |  2 ++
+ arch/x86/kvm/x86.c              |  1 +
+ arch/x86/kvm/xen.c              | 44 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/xen.h              | 10 ++++++++
+ 5 files changed, 59 insertions(+)
 
-Thank you for your explanation. This means that I should register
-"HYPE" through https://uefi.org/PNP_ACPI_Registry before introducing
-this new driver to Linux.
-I have no experience with the above, so I wonder who should be
-responsible for maintaining such ACPI ID since it will not belong to
-any specific vendor? There is an example of e.g. COREBOOT PROJECT
-using "BOOT" ACPI ID [1], which seems similar in terms of not
-specifying any vendor but rather the project as a responsible entity.
-Maybe you have some recommendations?
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1038ccb7056a..f77a4940542f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -638,6 +638,8 @@ struct kvm_vcpu_xen {
+ 	struct hrtimer timer;
+ 	int poll_evtchn;
+ 	struct timer_list poll_timer;
++	struct kvm_cpuid_entry2 *tsc_info_1;
++	struct kvm_cpuid_entry2 *tsc_info_2;
+ };
+ 
+ struct kvm_vcpu_arch {
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index d47222ab8e6e..eb6cd88c974a 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -25,6 +25,7 @@
+ #include "mmu.h"
+ #include "trace.h"
+ #include "pmu.h"
++#include "xen.h"
+ 
+ /*
+  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
+@@ -310,6 +311,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
+ 
+ 	kvm_hv_set_cpuid(vcpu);
++	kvm_xen_set_cpuid(vcpu);
+ 
+ 	/* Invoke the vendor callback only after the above state is updated. */
+ 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 00e23dc518e0..8b45f9975e45 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3123,6 +3123,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 	if (vcpu->xen.vcpu_time_info_cache.active)
+ 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
+ 	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
++	kvm_xen_setup_tsc_info(v);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 610beba35907..4f8d19df20f4 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -10,6 +10,9 @@
+ #include "xen.h"
+ #include "hyperv.h"
+ #include "lapic.h"
++#include "cpuid.h"
++
++#include <asm/xen/cpuid.h>
+ 
+ #include <linux/eventfd.h>
+ #include <linux/kvm_host.h>
+@@ -1855,3 +1858,44 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
+ 	if (kvm->arch.xen_hvm_config.msr)
+ 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
+ }
++
++void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
++{
++	u32 base = 0;
++	u32 function;
++
++	vcpu->arch.xen.tsc_info_1 = NULL;
++	vcpu->arch.xen.tsc_info_2 = NULL;
++
++	for_each_possible_hypervisor_cpuid_base(function) {
++		struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
++
++		if (entry &&
++		    entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
++		    entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
++		    entry->edx == XEN_CPUID_SIGNATURE_EDX) {
++			base = function;
++			break;
++		}
++	}
++	if (!base)
++		return;
++
++	function = base | XEN_CPUID_LEAF(3);
++	vcpu->arch.xen.tsc_info_1 = kvm_find_cpuid_entry(vcpu, function, 1);
++	vcpu->arch.xen.tsc_info_2 = kvm_find_cpuid_entry(vcpu, function, 2);
++}
++
++void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpuid_entry2 *entry = vcpu->arch.xen.tsc_info_1;
++
++	if (entry) {
++		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
++		entry->edx = vcpu->arch.hv_clock.tsc_shift;
++	}
++
++	entry = vcpu->arch.xen.tsc_info_2;
++	if (entry)
++		entry->eax = vcpu->arch.hw_tsc_khz;
++}
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index 532a535a9e99..1afb663318a9 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -32,6 +32,8 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
+ int kvm_xen_setup_evtchn(struct kvm *kvm,
+ 			 struct kvm_kernel_irq_routing_entry *e,
+ 			 const struct kvm_irq_routing_entry *ue);
++void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu);
++void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu);
+ 
+ static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+ {
+@@ -135,6 +137,14 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
+ {
+ 	return false;
+ }
++
++static inline void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
++{
++}
++
++static inline void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
++{
++}
+ #endif
+ 
+ int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+-- 
+2.20.1
 
-I am also not sure if and where a specification describing such a
-device has to be maintained. Since "HYPE0001" will have its own _DSM
-so will it be required to document it somewhere rather than just using
-it in the driver and preparing proper ACPI tables for guest?
-
->
-> > I wonder if this will be affordable so just re-thinking loudly if
-> > there is no other mechanism that could be suggested and used upstream
-> > so we could notify hypervisor/vmm about guest entering s2idle state?
-> > Especially that such _DSM function will be introduced only to trap on
-> > some fake MMIO/PIO access and will be useful only for guest ACPI
-> > tables?
-> >
->
-> Do you need to worry about Microsoft guests using Modern Standby too or
-> is that out of the scope of your problem set?  I think you'll be a lot
-> more limited in how this can behave and where you can modify things if so=
-.
->
-
-I do not need to worry about Microsoft guests.
-
-[1] https://uefi.org/acpi_id_list
-
-Thank you,
-Grzegorz
