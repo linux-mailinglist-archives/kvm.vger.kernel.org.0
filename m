@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E61A65547E8
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:12:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DB665546B0
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:11:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357288AbiFVLQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 07:16:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56398 "EHLO
+        id S1356755AbiFVLRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 07:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357187AbiFVLQj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 07:16:39 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A018B3BFBC;
-        Wed, 22 Jun 2022 04:16:32 -0700 (PDT)
+        with ESMTP id S1357323AbiFVLRB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 07:17:01 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 799323BFBC;
+        Wed, 22 Jun 2022 04:16:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655896592; x=1687432592;
+  t=1655896618; x=1687432618;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=B8lOyV+NN2DHameRBeRw32eUf0Rp3UclgjoKHzIwykM=;
-  b=DSNsWYHTH9Ojh3t8NGX+dBgFtPQFV8/1sZ92J2yjg9nNcMKcGUTTbowJ
-   CfszV0gjQhz9j1SEWFmTV3cmFEk5Rpt/tEwvxWEZGX3sj2CghdreTib80
-   8YG28UNaA0P1ahPDShP/+XC0QB+jqCMlXN/V+3VMy2jc37ZVdxDzukJbD
-   GYHTgecvo11V1H7uaWhRD1pHgs1rXo5W3hbNRbDYcXVWINCjQ17NfYoaI
-   4U5zZOOi93ajvJzAEGkAN/6uxLgEmIfg6APIH9WH4goxmCd8tpfdhSngF
-   pSFiyFSkHHdtaVoGu9D0VoJ5xLeUBO2iFyDuzNA4XAkRvSPce08tjszJm
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="260820294"
+  bh=0+Ia/Mrs6xjJ9gyYaF6VIrm6VlKPab2Ql2n9Y0pYkTE=;
+  b=JsRSGjvDMyYMKyUtAZZgMnaL+RLbzUnDNICooEDatr1fcHzagNB5+gMR
+   lUA+aC66nZT28v4iBzKIOM/N83uIGB/2oQcd9P08+jAyzRrdeinJOI5Vu
+   k9+A4lXrMpJV1ioRQ2gipQKGIPvFXTv4ANQCOCrWli2T996v/4afgY2ho
+   nixYeVE4A4ER5tO1jj5U5AeEV7Sfvbxssr0uW4nkQZdBh5u1RhNZRVnIf
+   99fI82vs7kcV8GB4xwlmVeuQX/8xefxFCqvy1UIxkktSyN2hOnnk2Z7p/
+   dFgBn97BdoTvY0xPVb8pr/b+xecYdYhHXu5PPrYbdZGHVQAq87c2sSxUE
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="344379984"
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="260820294"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 04:16:32 -0700
+   d="scan'208";a="344379984"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 04:16:58 -0700
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="585679747"
+   d="scan'208";a="834065728"
 Received: from jmatsis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.178.197])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 04:16:28 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 04:16:54 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
-        dave.hansen@intel.com, len.brown@intel.com, tony.luck@intel.com,
+Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
+        len.brown@intel.com, tony.luck@intel.com,
         rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
         dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com, akpm@linux-foundation.org,
-        kai.huang@intel.com
-Subject: [PATCH v5 05/22] x86/virt/tdx: Prevent hot-add driver managed memory
-Date:   Wed, 22 Jun 2022 23:16:19 +1200
-Message-Id: <173e1f9b2348f29e5f7d939855b8dd98625bcb35.1655894131.git.kai.huang@intel.com>
+        isaku.yamahata@intel.com, kai.huang@intel.com
+Subject: [PATCH v5 06/22] x86/virt/tdx: Add skeleton to initialize TDX on demand
+Date:   Wed, 22 Jun 2022 23:16:29 +1200
+Message-Id: <c751d1ce046ccc139a8bb34e04d70b1d6bc34a8d.1655894131.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <cover.1655894131.git.kai.huang@intel.com>
 References: <cover.1655894131.git.kai.huang@intel.com>
@@ -64,143 +63,261 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX provides increased levels of memory confidentiality and integrity.
-This requires special hardware support for features like memory
-encryption and storage of memory integrity checksums.  Not all memory
-satisfies these requirements.
+Before the TDX module can be used to create and run TD guests, it must
+be loaded into the isolated region pointed by the SEAMRR and properly
+initialized.  The TDX module is expected to be loaded by BIOS before
+booting to the kernel, and the kernel is expected to detect and
+initialize it.
 
-As a result, the TDX introduced the concept of a "Convertible Memory
-Region" (CMR).  During boot, the firmware builds a list of all of the
-memory ranges which can provide the TDX security guarantees.  The list
-of these ranges is available to the kernel by querying the TDX module.
+The TDX module can be initialized only once in its lifetime.  Instead
+of always initializing it at boot time, this implementation chooses an
+on-demand approach to initialize TDX until there is a real need (e.g
+when requested by KVM).  This avoids consuming the memory that must be
+allocated by kernel and given to the TDX module as metadata (~1/256th of
+the TDX-usable memory), and also saves the time of initializing the TDX
+module (and the metadata) when TDX is not used at all.  Initializing the
+TDX module at runtime on-demand also is more flexible to support TDX
+module runtime updating in the future (after updating the TDX module, it
+needs to be initialized again).
 
-However those TDX-capable memory regions are not automatically usable to
-the TDX module.  The kernel needs to choose which convertible memory
-regions to be the TDX-usable memory and pass those regions to the TDX
-module when initializing the module.  Once those ranges are passed to
-the TDX module, the TDX-usable memory regions are fixed during module's
-lifetime.
+Add a placeholder tdx_init() to detect and initialize the TDX module on
+demand, with a state machine protected by mutex to support concurrent
+calls from multiple callers.
 
-To avoid having to modify the page allocator to distinguish TDX and
-non-TDX memory allocation, this implementation guarantees all pages
-managed by the page allocator are TDX memory.  This means any hot-added
-memory to the page allocator will break such guarantee thus should be
-prevented.
+The TDX module will be initialized in multi-steps defined by the TDX
+architecture:
 
-There are basically two memory hot-add cases that need to be prevented:
-ACPI memory hot-add and driver managed memory hot-add.  However, adding
-new memory to ZONE_DEVICE should not be prevented as those pages are not
-managed by the page allocator.  Therefore memremap_pages() variants
-should be allowed although they internally also use memory hotplug
-functions.
+  1) Global initialization;
+  2) Logical-CPU scope initialization;
+  3) Enumerate the TDX module capabilities and platform configuration;
+  4) Configure the TDX module about usable memory ranges and global
+     KeyID information;
+  5) Package-scope configuration for the global KeyID;
+  6) Initialize usable memory ranges based on 4).
 
-ACPI memory hotplug is already prevented.  To prevent driver managed
-memory and still allow memremap_pages() variants to work, add a __weak
-hook to do arch-specific check in add_memory_resource().  Implement the
-x86 version to prevent new memory region from being added when TDX is
-enabled by BIOS.
-
-The __weak arch-specific hook is used instead of a new CC_ATTR similar
-to disable software CPU hotplug.  It is because some driver managed
-memory resources may actually be TDX-capable (such as legacy PMEM, which
-is underneath indeed RAM), and the arch-specific hook can be further
-enhanced to allow those when needed.
-
-Note arch-specific hook for __remove_memory() is not required.  Both
-ACPI hot-removal and driver managed memory removal cannot reach it.
+The TDX module can also be shut down at any time during its lifetime.
+In case of any error during the initialization process, shut down the
+module.  It's pointless to leave the module in any intermediate state
+during the initialization.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/mm/init_64.c          | 21 +++++++++++++++++++++
- include/linux/memory_hotplug.h |  2 ++
- mm/memory_hotplug.c            | 15 +++++++++++++++
- 3 files changed, 38 insertions(+)
 
-diff --git a/arch/x86/mm/init_64.c b/arch/x86/mm/init_64.c
-index 96d34ebb20a9..ce89cf88a818 100644
---- a/arch/x86/mm/init_64.c
-+++ b/arch/x86/mm/init_64.c
-@@ -55,6 +55,7 @@
- #include <asm/uv/uv.h>
- #include <asm/setup.h>
- #include <asm/ftrace.h>
-+#include <asm/tdx.h>
+- v3->v5 (no feedback on v4):
+
+ - Removed the check that SEAMRR and TDX KeyID have been detected on
+   all present cpus.
+ - Removed tdx_detect().
+ - Added num_online_cpus() to MADT-enabled CPUs check within the CPU
+   hotplug lock and return early with error message.
+ - Improved dmesg printing for TDX module detection and initialization.
+
+---
+ arch/x86/include/asm/tdx.h  |   2 +
+ arch/x86/virt/vmx/tdx/tdx.c | 153 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 155 insertions(+)
+
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 97511b76c1ac..801f6e10b2db 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -90,8 +90,10 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
  
- #include "mm_internal.h"
+ #ifdef CONFIG_INTEL_TDX_HOST
+ bool platform_tdx_enabled(void);
++int tdx_init(void);
+ #else	/* !CONFIG_INTEL_TDX_HOST */
+ static inline bool platform_tdx_enabled(void) { return false; }
++static inline int tdx_init(void)  { return -ENODEV; }
+ #endif	/* CONFIG_INTEL_TDX_HOST */
  
-@@ -972,6 +973,26 @@ int arch_add_memory(int nid, u64 start, u64 size,
- 	return add_pages(nid, start_pfn, nr_pages, params);
- }
- 
-+int arch_memory_add_precheck(int nid, u64 start, u64 size, mhp_t mhp_flags)
-+{
-+	if (!platform_tdx_enabled())
-+		return 0;
-+
-+	/*
-+	 * TDX needs to guarantee all pages managed by the page allocator
-+	 * are TDX memory in order to not have to distinguish TDX and
-+	 * non-TDX memory allocation.  The kernel needs to pass the
-+	 * TDX-usable memory regions to the TDX module when it gets
-+	 * initialized.  After that, the TDX-usable memory regions are
-+	 * fixed.  This means any memory hot-add to the page allocator
-+	 * will break above guarantee thus should be prevented.
-+	 */
-+	pr_err("Unable to add memory [0x%llx, 0x%llx) on TDX enabled platform.\n",
-+			start, start + size);
-+
-+	return -EINVAL;
-+}
-+
- static void __meminit free_pagetable(struct page *page, int order)
- {
- 	unsigned long magic;
-diff --git a/include/linux/memory_hotplug.h b/include/linux/memory_hotplug.h
-index 1ce6f8044f1e..306ef4ceb419 100644
---- a/include/linux/memory_hotplug.h
-+++ b/include/linux/memory_hotplug.h
-@@ -325,6 +325,8 @@ extern int add_memory_resource(int nid, struct resource *resource,
- extern int add_memory_driver_managed(int nid, u64 start, u64 size,
- 				     const char *resource_name,
- 				     mhp_t mhp_flags);
-+extern int arch_memory_add_precheck(int nid, u64 start, u64 size,
-+				    mhp_t mhp_flags);
- extern void move_pfn_range_to_zone(struct zone *zone, unsigned long start_pfn,
- 				   unsigned long nr_pages,
- 				   struct vmem_altmap *altmap, int migratetype);
-diff --git a/mm/memory_hotplug.c b/mm/memory_hotplug.c
-index 416b38ca8def..2ad4b2603c7c 100644
---- a/mm/memory_hotplug.c
-+++ b/mm/memory_hotplug.c
-@@ -1296,6 +1296,17 @@ bool mhp_supports_memmap_on_memory(unsigned long size)
- 	       IS_ALIGNED(remaining_size, (pageblock_nr_pages << PAGE_SHIFT));
- }
+ #endif /* !__ASSEMBLY__ */
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index eb3294bf1b0a..1f9d8108eeea 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -10,17 +10,39 @@
+ #include <linux/types.h>
+ #include <linux/init.h>
+ #include <linux/printk.h>
++#include <linux/mutex.h>
++#include <linux/cpu.h>
++#include <linux/cpumask.h>
+ #include <asm/cpufeatures.h>
+ #include <asm/cpufeature.h>
+ #include <asm/msr-index.h>
+ #include <asm/msr.h>
++#include <asm/smp.h>
+ #include <asm/tdx.h>
+ #include <asm/coco.h>
+ #include "tdx.h"
  
 +/*
-+ * Pre-check whether hot-add memory is allowed before arch_add_memory().
-+ *
-+ * Arch to provide replacement version if required.
++ * TDX module status during initialization
 + */
-+int __weak arch_memory_add_precheck(int nid, u64 start, u64 size,
-+				    mhp_t mhp_flags)
++enum tdx_module_status_t {
++	/* TDX module hasn't been detected and initialized */
++	TDX_MODULE_UNKNOWN,
++	/* TDX module is not loaded */
++	TDX_MODULE_NONE,
++	/* TDX module is initialized */
++	TDX_MODULE_INITIALIZED,
++	/* TDX module is shut down due to initialization error */
++	TDX_MODULE_SHUTDOWN,
++};
++
+ static u32 tdx_keyid_start __ro_after_init;
+ static u32 tdx_keyid_num __ro_after_init;
+ 
++static enum tdx_module_status_t tdx_module_status;
++/* Prevent concurrent attempts on TDX detection and initialization */
++static DEFINE_MUTEX(tdx_module_lock);
++
+ /* Detect whether CPU supports SEAM */
+ static int detect_seam(void)
+ {
+@@ -101,6 +123,84 @@ static int __init tdx_early_detect(void)
+ }
+ early_initcall(tdx_early_detect);
+ 
++/*
++ * Detect and initialize the TDX module.
++ *
++ * Return -ENODEV when the TDX module is not loaded, 0 when it
++ * is successfully initialized, or other error when it fails to
++ * initialize.
++ */
++static int init_tdx_module(void)
 +{
-+	return 0;
++	/* The TDX module hasn't been detected */
++	return -ENODEV;
 +}
 +
- /*
-  * NOTE: The caller must call lock_device_hotplug() to serialize hotplug
-  * and online/offline operations (triggered e.g. by sysfs).
-@@ -1319,6 +1330,10 @@ int __ref add_memory_resource(int nid, struct resource *res, mhp_t mhp_flags)
- 	if (ret)
- 		return ret;
- 
-+	ret = arch_memory_add_precheck(nid, start, size, mhp_flags);
-+	if (ret)
-+		return ret;
++static void shutdown_tdx_module(void)
++{
++	/* TODO: Shut down the TDX module */
++	tdx_module_status = TDX_MODULE_SHUTDOWN;
++}
 +
- 	if (mhp_flags & MHP_NID_IS_MGID) {
- 		group = memory_group_find_by_id(nid);
- 		if (!group)
++static int __tdx_init(void)
++{
++	int ret;
++
++	/*
++	 * Initializing the TDX module requires running some code on
++	 * all MADT-enabled CPUs.  If not all MADT-enabled CPUs are
++	 * online, it's not possible to initialize the TDX module.
++	 *
++	 * For simplicity temporarily disable CPU hotplug to prevent
++	 * any CPU from going offline during the initialization.
++	 */
++	cpus_read_lock();
++
++	/*
++	 * Check whether all MADT-enabled CPUs are online and return
++	 * early with an explicit message so the user can be aware.
++	 *
++	 * Note ACPI CPU hotplug is prevented when TDX is enabled, so
++	 * num_processors always reflects all present MADT-enabled
++	 * CPUs during boot when disabled_cpus is 0.
++	 */
++	if (disabled_cpus || num_online_cpus() != num_processors) {
++		pr_err("Unable to initialize the TDX module when there's offline CPU(s).\n");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ret = init_tdx_module();
++	if (ret == -ENODEV) {
++		pr_info("TDX module is not loaded.\n");
++		goto out;
++	}
++
++	/*
++	 * Shut down the TDX module in case of any error during the
++	 * initialization process.  It's meaningless to leave the TDX
++	 * module in any middle state of the initialization process.
++	 *
++	 * Shutting down the module also requires running some code on
++	 * all MADT-enabled CPUs.  Do it while CPU hotplug is disabled.
++	 *
++	 * Return all errors during initialization as -EFAULT as
++	 * the TDX module is always shut down in such cases.
++	 */
++	if (ret) {
++		pr_info("Failed to initialize TDX module.  Shut it down.\n");
++		shutdown_tdx_module();
++		ret = -EFAULT;
++		goto out;
++	}
++
++	pr_info("TDX module initialized.\n");
++out:
++	cpus_read_unlock();
++
++	return ret;
++}
++
+ /**
+  * platform_tdx_enabled() - Return whether BIOS has enabled TDX
+  *
+@@ -111,3 +211,56 @@ bool platform_tdx_enabled(void)
+ {
+ 	return tdx_keyid_num >= 2;
+ }
++
++/**
++ * tdx_init - Initialize the TDX module
++ *
++ * Initialize the TDX module to make it ready to run TD guests.
++ *
++ * Caller to make sure all CPUs are online before calling this function.
++ * CPU hotplug is temporarily disabled internally to prevent any cpu
++ * from going offline.
++ *
++ * This function can be called in parallel by multiple callers.
++ *
++ * Return:
++ *
++ * * 0:		The TDX module has been successfully initialized.
++ * * -ENODEV:	The TDX module is not loaded, or TDX is not supported.
++ * * -EINVAL:	The TDX module cannot be initialized due to certain
++ *		conditions are not met (i.e. when not all MADT-enabled
++ *		CPUs are not online).
++ * * -EFAULT:	Other internal fatal errors, or the TDX module is in
++ *		shutdown mode due to it failed to initialize in previous
++ *		attempts.
++ */
++int tdx_init(void)
++{
++	int ret;
++
++	if (!platform_tdx_enabled())
++		return -ENODEV;
++
++	mutex_lock(&tdx_module_lock);
++
++	switch (tdx_module_status) {
++	case TDX_MODULE_UNKNOWN:
++		ret = __tdx_init();
++		break;
++	case TDX_MODULE_NONE:
++		ret = -ENODEV;
++		break;
++	case TDX_MODULE_INITIALIZED:
++		ret = 0;
++		break;
++	default:
++		WARN_ON_ONCE(tdx_module_status != TDX_MODULE_SHUTDOWN);
++		ret = -EFAULT;
++		break;
++	}
++
++	mutex_unlock(&tdx_module_lock);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(tdx_init);
 -- 
 2.36.1
 
