@@ -2,88 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8AD2554CBA
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:19:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE7A9554CE2
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:25:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358143AbiFVOTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 10:19:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44430 "EHLO
+        id S236963AbiFVOZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 10:25:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358175AbiFVOTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:19:50 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35F356307
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:19:50 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id y13-20020a17090a154d00b001eaaa3b9b8dso16948264pja.2
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:19:50 -0700 (PDT)
+        with ESMTP id S1358527AbiFVOY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 10:24:56 -0400
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A27F2369C8;
+        Wed, 22 Jun 2022 07:24:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BzxAUPe5okJNZee9MSLP9PbTGm5gfg8v2qRMcdUL4+0=;
-        b=O5heBvklZbSxZj/ed0HHu9xg0cdTwcYZ8+1Mjr1qOthOBcuL3F9RzDjiYKE75UUzAP
-         WobpdUABHfVrVHR4WoRgqgX79lY4x9h/QuPsPLqYJExoaBsPkFWX19IOZLZGbQkTHleX
-         mg+UFVEr82lEQV/7FHyoPxYREI10yKRjqDF0+BgNbaGNtjmwGrEUOHfsnV0MdXCsAKDk
-         ZTF0mGNGbdPoDUnH6eMhHUiZCdLcIDDHE3nvqC9Rjgh7OxSxwlT693WnktZnMplJdla6
-         eEOEq3SwN+x7zeTkBSI2ha03O/T2Ch7h4aYsWxOgsb8+k7k2Jf3TbVINN3tzzz/Ji1y6
-         rQiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BzxAUPe5okJNZee9MSLP9PbTGm5gfg8v2qRMcdUL4+0=;
-        b=09zssYZYJbkgiTLiEJqxxkZFoCD+SrSNnPX86Dk+Z4xAXrupmqNIVIT977Gnd02QB+
-         tU45oKCdNuQNkm8cIhOY++yPaPNUMduNmV36WvaMO0ZZzE8hZC1Mxhb9+ihYF/RkqDcY
-         9QOALp3FqtElBUyI1PWY0kyRl++CXVNRpJpzRhVnss2N98JMQClYsJiqKTddem1k3/QW
-         QZvtz00SaeXQNWzIGWiW84tqIoatT1LjVDXUogKE13R+xb0FqzVsqwBlXV8J6eLkd83R
-         8ng0swsxDskwDfDsNH3at4lrQP3AdWftRjDmdfKevwuPhhNgY8/dccNYDp6//AzIuTX9
-         nnwA==
-X-Gm-Message-State: AJIora9Lwc2ZoqBefgwn+gruCzMLW16SfByPy/klNol3htgQ/MNncjnV
-        pKPSPYwqUXI2k0LeXtN7t5WCeg==
-X-Google-Smtp-Source: AGRyM1s6BHwkunCCOtr1rJlpNZ/lT0ticChntRH0O/W4Ed8+WafDWpg6DiHb+22bQYkLURbtDY22vg==
-X-Received: by 2002:a17:902:8689:b0:14e:f1a4:d894 with SMTP id g9-20020a170902868900b0014ef1a4d894mr34493773plo.65.1655907589586;
-        Wed, 22 Jun 2022 07:19:49 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id i6-20020a626d06000000b0051c09cdd71fsm13518188pfc.72.2022.06.22.07.19.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 07:19:47 -0700 (PDT)
-Date:   Wed, 22 Jun 2022 14:19:43 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: [PATCH v6 03/22] KVM: x86/mmu: Stop passing @direct to
- mmu_alloc_root()
-Message-ID: <YrMk/z4HCvX0ASPm@google.com>
-References: <20220516232138.1783324-1-dmatlack@google.com>
- <20220516232138.1783324-4-dmatlack@google.com>
- <Yqt6rBPMxfwAPjp1@google.com>
- <bb22c823-f12f-90d8-e8d6-0cddba95f60a@redhat.com>
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1655907893; x=1687443893;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=51C7STjo9soGVumHM19bbsfNeQcBRA/3OS6i/6pYTtM=;
+  b=Rwqzv0KEdznzNHrGlPBYxXT1HRP3Q/4v3mm5pEAAQ6kLkivu1aYOIG2s
+   DQiuPzaGSfOF1dyfssAgX1oajKjhZ/uezIqoUvDB4Tbs/QXeEz80AVk3C
+   P16T0qJ0x01a/FRI6cAA1lUht9Y2zw9OpOHlE6WbdabbNJkf+vpxP7AZw
+   8=;
+X-IronPort-AV: E=Sophos;i="5.92,212,1650931200"; 
+   d="scan'208";a="100777950"
+Subject: RE: [PATCH v2] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
+ if present
+Thread-Topic: [PATCH v2] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
+ if present
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-388992e0.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 22 Jun 2022 14:22:10 +0000
+Received: from EX13D32EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-388992e0.us-west-2.amazon.com (Postfix) with ESMTPS id DBFA6817BA;
+        Wed, 22 Jun 2022 14:22:09 +0000 (UTC)
+Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
+ EX13D32EUC003.ant.amazon.com (10.43.164.24) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.36; Wed, 22 Jun 2022 14:22:08 +0000
+Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
+ EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1497.036;
+ Wed, 22 Jun 2022 14:22:08 +0000
+From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
+To:     David Woodhouse <dwmw2@infradead.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Thread-Index: AQHYhh7hXAu4qxBonEWdTaRZ6uuulK1bcRwAgAAFCdA=
+Date:   Wed, 22 Jun 2022 14:22:07 +0000
+Message-ID: <2d939a362e384a28bcd576b4c21a0376@EX13D32EUC003.ant.amazon.com>
+References: <20220622095750.30563-1-pdurrant@amazon.com>
+ <0b4c451c6967ffb7bd20b6e5bf7812628aa173c5.camel@infradead.org>
+In-Reply-To: <0b4c451c6967ffb7bd20b6e5bf7812628aa173c5.camel@infradead.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.13]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bb22c823-f12f-90d8-e8d6-0cddba95f60a@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-12.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,23 +81,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 22, 2022, Paolo Bonzini wrote:
-> On 6/16/22 20:47, Sean Christopherson wrote:
-> > > The argument @direct is vcpu->arch.mmu->root_role.direct, so just use
-> > > that.
-> > It's worth calling out that, unlike non-root page tables, it's impossible to have
-> > a direct root in an indirect MMU.  I.e. provide a hint as to why there's a need to
-> > pass @direct in the first place.
-> > 
-> 
-> I suppose there's *no* need to pass direct?  Also, there's the trivial (but
-> less interesting) justification that kvm_mmu_load does
-> 
->         if (vcpu->arch.mmu->root_role.direct)
->                 r = mmu_alloc_direct_roots(vcpu);
->         else
->                 r = mmu_alloc_shadow_roots(vcpu);
-> 
-> and those are the only callers of mmu_alloc_root.
-
-Duh, you're right, grabbing root_role.direct in mmu_alloc_root() is much better.
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBEYXZpZCBXb29kaG91c2UgPGR3
+bXcyQGluZnJhZGVhZC5vcmc+DQo+IFNlbnQ6IDIyIEp1bmUgMjAyMiAxNDo0OA0KPiBUbzogRHVy
+cmFudCwgUGF1bCA8cGR1cnJhbnRAYW1hem9uLmNvLnVrPjsgeDg2QGtlcm5lbC5vcmc7IGt2bUB2
+Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+IENjOiBQ
+YW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPjsgU2VhbiBDaHJpc3RvcGhlcnNvbiA8
+c2VhbmpjQGdvb2dsZS5jb20+OyBWaXRhbHkgS3V6bmV0c292DQo+IDx2a3V6bmV0c0ByZWRoYXQu
+Y29tPjsgV2FucGVuZyBMaSA8d2FucGVuZ2xpQHRlbmNlbnQuY29tPjsgSmltIE1hdHRzb24gPGpt
+YXR0c29uQGdvb2dsZS5jb20+OyBKb2VyZw0KPiBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz47IFRo
+b21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPjsgSW5nbyBNb2xuYXIgPG1pbmdvQHJl
+ZGhhdC5jb20+Ow0KPiBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5kZT47IERhdmUgSGFuc2Vu
+IDxkYXZlLmhhbnNlbkBsaW51eC5pbnRlbC5jb20+OyBILiBQZXRlciBBbnZpbg0KPiA8aHBhQHp5
+dG9yLmNvbT4NCj4gU3ViamVjdDogUkU6IFtFWFRFUk5BTF1bUEFUQ0ggdjJdIEtWTTogeDg2L3hl
+bjogVXBkYXRlIFhlbiBDUFVJRCBMZWFmIDQgKHRzYyBpbmZvKSBzdWItbGVhdmVzLCBpZg0KPiBw
+cmVzZW50DQo+IA0KPiBPbiBXZWQsIDIwMjItMDYtMjIgYXQgMTA6NTcgKzAxMDAsIFBhdWwgRHVy
+cmFudCB3cm90ZToNCj4gPiArdm9pZCBrdm1feGVuX3NldF9jcHVpZChzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUpDQo+ID4gK3sNCj4gPiArCXUzMiBiYXNlID0gMDsNCj4gPiArCXUzMiBmdW5jdGlvbjsN
+Cj4gPiArDQo+ID4gKwl2Y3B1LT5hcmNoLnhlbi50c2NfaW5mb18xID0gTlVMTDsNCj4gPiArCXZj
+cHUtPmFyY2gueGVuLnRzY19pbmZvXzIgPSBOVUxMOw0KPiA+ICsNCj4gPiArCWZvcl9lYWNoX3Bv
+c3NpYmxlX2h5cGVydmlzb3JfY3B1aWRfYmFzZShmdW5jdGlvbikgew0KPiA+ICsJCXN0cnVjdCBr
+dm1fY3B1aWRfZW50cnkyICplbnRyeSA9IGt2bV9maW5kX2NwdWlkX2VudHJ5KHZjcHUsIGZ1bmN0
+aW9uLCAwKTsNCj4gPiArDQo+ID4gKwkJaWYgKGVudHJ5ICYmDQo+ID4gKwkJICAgIGVudHJ5LT5l
+YnggPT0gWEVOX0NQVUlEX1NJR05BVFVSRV9FQlggJiYNCj4gPiArCQkgICAgZW50cnktPmVjeCA9
+PSBYRU5fQ1BVSURfU0lHTkFUVVJFX0VDWCAmJg0KPiA+ICsJCSAgICBlbnRyeS0+ZWR4ID09IFhF
+Tl9DUFVJRF9TSUdOQVRVUkVfRURYKSB7DQo+ID4gKwkJCWJhc2UgPSBmdW5jdGlvbjsNCj4gPiAr
+CQkJYnJlYWs7DQo+ID4gKwkJfQ0KPiA+ICsJfQ0KPiANCj4gUGxlYXNlIG1ha2UgaXQgcmV0dXJu
+IGlmIGVudHJ5LT5lYXggPCAzIGhlcmUuIFRoZXJlIHByb2JhYmx5IGFyZW4ndCBhbnkNCj4gKmdv
+b2QqIHJlYXNvbnMgd2h5IGEgbGVhZiBhdCAweDQwMDAweDAzIHdvdWxkIGV4aXN0IGFuZCBiZWxv
+bmcgdG8gc29tZQ0KPiBvdGhlciBlbnRpdHkgKEh5cGVyLVYsIGV0Yy4pLiBUaG9zZSBvdGhlciBl
+eHRyYSByYW5nZXMgb2YgQ1BVSUQgYXJlDQo+IGdlbmVyYWxseSBhbGlnbmVkIGF0IG11bHRpcGxl
+cyBvZiAweDEwMCwgbm90IGp1c3QgdGhlICpuZXh0KiBhdmFpbGFibGUNCj4gbGVhZi4NCj4gDQo+
+IEJ1dCBJIGRvbid0IGNhcmUuIFVubGVzcyBlYXggb24gdGhlIG1haW4gWGVuIGxlYWYgaXMgMyBv
+ciBtb3JlLCB0aGUNCj4gbGVhZiBhdCBOKzMgaXNuJ3QgeW91cnMgdG8gcmVhc29uIGFib3V0IDop
+DQo+IA0KDQpBY2NvcmRpbmcgdG8gaHR0cHM6Ly9sd24ubmV0L0FydGljbGVzLzMwMTg4OCAod2hp
+Y2ggaXMgYW5jaWVudCksIHRoZSBNaWNyb3NvZnQgVExGUyBhbmQgbXkgY29weSBvZiB0aGUgWGVu
+IHNvdXJjZSBjb2RlLCBpdCBzZWVtcyBldmVyeW9uZSBkb2VzIGFncmVlIHRoYXQgdGhlIGh5cGVy
+dmlzb3IgYmFzZSBsZWFmIEVBWCBkb2VzIHNwZWNpZnkgdGhlIG1heGltdW0gbGVhZiAoaW4gYWJz
+b2x1dGUgdGVybXMgcmF0aGVyIHRoYW4gdGhlIG9mZnNldCkgc28gSSdsbCBhZGQgdGhhdCBjaGVj
+ayBpbnRvIHYzLg0KDQogIFBhdWwNCg0KPiA+ICsJaWYgKCFiYXNlKQ0KPiA+ICsJCXJldHVybjsN
+Cj4gPiArDQo+ID4gKwlmdW5jdGlvbiA9IGJhc2UgfCBYRU5fQ1BVSURfTEVBRigzKTsNCj4gPiAr
+CXZjcHUtPmFyY2gueGVuLnRzY19pbmZvXzEgPSBrdm1fZmluZF9jcHVpZF9lbnRyeSh2Y3B1LCBm
+dW5jdGlvbiwgMSk7DQo+ID4gKwl2Y3B1LT5hcmNoLnhlbi50c2NfaW5mb18yID0ga3ZtX2ZpbmRf
+Y3B1aWRfZW50cnkodmNwdSwgZnVuY3Rpb24sIDIpOw0KPiA+ICt9DQo+ID4gKw0K
