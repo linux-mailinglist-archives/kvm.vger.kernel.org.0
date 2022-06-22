@@ -2,175 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50129555487
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 21:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D466555496
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 21:34:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358338AbiFVT2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 15:28:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
+        id S1358629AbiFVTej (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 15:34:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358008AbiFVT13 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 15:27:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C456D3AA5A
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 12:27:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655926044;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PtZNTZPWfsMWYTlAEBsLU5lpYkmjIuplCyLvnN6roN8=;
-        b=K5zoRwWJaN1g52RtLEkRLo5ndv4fo3n+htFklqVOhBOqPUNwnC0j1Y9wF+ZSMtc/w2Nn2W
-        60CZoBA3oZe/T2gzKN/NCfMi4ZEN04eLeiBngNchSaRn/TUv0S5HXOOnyTkyp2Qfg1aRVO
-        8RaDxVW6Z/BzVsGmIXvb1igTltV7wwY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-153-p9sVOKGTNd-Hjl1hFwF5Jw-1; Wed, 22 Jun 2022 15:27:21 -0400
-X-MC-Unique: p9sVOKGTNd-Hjl1hFwF5Jw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 589571C0518C;
-        Wed, 22 Jun 2022 19:27:20 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 01FD61121314;
-        Wed, 22 Jun 2022 19:27:19 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     maz@kernel.org, anup@brainfault.org, seanjc@google.com,
-        bgardon@google.com, peterx@redhat.com, maciej.szmigiero@oracle.com,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, pfeiner@google.com,
-        jiangshanlai@gmail.com, dmatlack@google.com
-Subject: [PATCH v7 23/23] KVM: x86/mmu: Avoid unnecessary flush on eager page split
-Date:   Wed, 22 Jun 2022 15:27:10 -0400
-Message-Id: <20220622192710.2547152-24-pbonzini@redhat.com>
-In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
-References: <20220622192710.2547152-1-pbonzini@redhat.com>
+        with ESMTP id S1358996AbiFVTeE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 15:34:04 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9D13CA74
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 12:33:45 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id y32so29492557lfa.6
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 12:33:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NFbRch3MP4oYfAdvYfvFh8xRiPwpBI5r6t1BeeKJjDI=;
+        b=UzPfjg3Uhny7RcirHKXTpM6X1BLTfbOJLhkHD4gGRWY0a0tN5rFpv5odkr4cWEwqc9
+         +BpnwLCdTfIKXBzH3Oqa/vnt5dxjVrC1sSX6pk94EZgY6RyhOwotmjRHUW5N2F8QBBKQ
+         aHZRW5feO56dfBhra30Q3llLrK+qx0uQEiNGMLmCPxwaHfdIs9hzkre63BMLikRjbBGm
+         8GARYSOusQ7rMBtubyguN+EQVaGXKSwVm9udIECZQ8Yuq2dmzv12lUKqlF8MQQU1NOPV
+         9ARpkQMiexdqxfXbKQzuZphHMVhVN5OyQNSj16EpbExLMYi2j+4qRirHRTE9fv7WqEm/
+         Tipw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NFbRch3MP4oYfAdvYfvFh8xRiPwpBI5r6t1BeeKJjDI=;
+        b=tCROQzbPD8yVvSSsq5VPWoalL3nfRmmALPw63vthxWUA7I/XgQt89VI4S42ml03zAR
+         BwyHil9qVOS9St0RmMF8n7nWRzbETpWzLUWsrIxDBfUs6b7IyGjj7893rzGFKumPAVpy
+         RPjkTEwKG+ZpJsKaxoOumF1uAJAQLhX7JTFJYFv0fO4rHFA9PEAs7OtK6+OWhFHyIRtj
+         WWnF/z11px/yK23QLU5/GU5DlAnac+Idft1vw+z8vP8JI9OybApCILu+fEGPz91ZKnJv
+         /H8QczEJZ5CYy3aQ23IJholCZCN1yHR5ht4NqwqlUYdxF2nBOSlit8ubFFc9sBy1VWXO
+         L9zg==
+X-Gm-Message-State: AJIora84nk0e8DFMyz1IqUlGljPTLP39MvXXgs1ozK7MU+WkyefHLwtF
+        fLMFfR/SU9pSc0mkZogJhrsulbG4lZdLiKbs+M8qXQ==
+X-Google-Smtp-Source: AGRyM1t2HS4ZyWkAiJQg85nvcNXwFn3bkAAE5g1dd7le8l/22YRvukDaRru6XjTm1AhTsK/kCtarFzkU/1DaCx22dOc=
+X-Received: by 2002:a19:6449:0:b0:47f:86b3:f87b with SMTP id
+ b9-20020a196449000000b0047f86b3f87bmr3043737lfj.644.1655926423674; Wed, 22
+ Jun 2022 12:33:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220617195141.2866706-1-pgonda@google.com> <Yqz+CZlGCoQo7lMQ@google.com>
+In-Reply-To: <Yqz+CZlGCoQo7lMQ@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 22 Jun 2022 13:33:32 -0600
+Message-ID: <CAMkAt6p6U6G0N0UP-Dnatr1cLHnaU1DY-1gxvmYhvxjckhbx4g@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SEV: Init target VMCBs in sev_migrate_from
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The TLB flush before installing the newly-populated lower level
-page table is unnecessary if the lower-level page table maps
-the huge page identically.  KVM knows it is if it did not reuse
-an existing shadow page table, tell drop_large_spte() to skip
-the flush in that case.
+> >
+> > +void sev_init_vmcb(struct vcpu_svm *svm)
+> > +{
+> > +     svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
+> > +     clr_exception_intercept(svm, UD_VECTOR);
+>
+> I don't love separating SEV and SEV-ES VMCB initialization, especially since they're
+> both doing RMW operations and not straight writes.  E.g. migration ends up reversing
+> the order between the two relatively to init_vmcb().  That's just asking for a subtle
+> bug to be introduced that affects only due to the ordering difference.
+>
+> What about using common top-level flows for SEV and SEV-ES so that the sequencing
+> between SEV and SEV-ES is more rigid?  The resulting sev_migrate_from() is a little
+> gross, but IMO it's worth having a fixed sequence, and the flip side to the ugliness
+> it that it documents some of the differences between SEV and SEV-ES migration.
 
-Extracted from a patch by David Matlack.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c | 32 ++++++++++++++++++++------------
- 1 file changed, 20 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 22681931921f..79c6a821ea0d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1135,7 +1135,7 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
- 		rmap_remove(kvm, sptep);
- }
- 
--static void drop_large_spte(struct kvm *kvm, u64 *sptep)
-+static void drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
- {
- 	struct kvm_mmu_page *sp;
- 
-@@ -1143,7 +1143,9 @@ static void drop_large_spte(struct kvm *kvm, u64 *sptep)
- 	WARN_ON(sp->role.level == PG_LEVEL_4K);
- 
- 	drop_spte(kvm, sptep);
--	kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-+
-+	if (flush)
-+		kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
- 			KVM_PAGES_PER_HPAGE(sp->role.level));
- }
- 
-@@ -2283,7 +2285,7 @@ static void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
- 
- static void __link_shadow_page(struct kvm *kvm,
- 			       struct kvm_mmu_memory_cache *cache, u64 *sptep,
--			       struct kvm_mmu_page *sp)
-+			       struct kvm_mmu_page *sp, bool flush)
- {
- 	u64 spte;
- 
-@@ -2291,10 +2293,11 @@ static void __link_shadow_page(struct kvm *kvm,
- 
- 	/*
- 	 * If an SPTE is present already, it must be a leaf and therefore
--	 * a large one.  Drop it and flush the TLB before installing sp.
-+	 * a large one.  Drop it, and flush the TLB if needed, before
-+	 * installing sp.
- 	 */
- 	if (is_shadow_present_pte(*sptep))
--		drop_large_spte(kvm, sptep);
-+		drop_large_spte(kvm, sptep, flush);
- 
- 	spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
- 
-@@ -2309,7 +2312,7 @@ static void __link_shadow_page(struct kvm *kvm,
- static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
- 			     struct kvm_mmu_page *sp)
- {
--	__link_shadow_page(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
-+	__link_shadow_page(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, sptep, sp, true);
- }
- 
- static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-@@ -6172,6 +6175,7 @@ static void shadow_mmu_split_huge_page(struct kvm *kvm,
- 	struct kvm_mmu_memory_cache *cache = &kvm->arch.split_desc_cache;
- 	u64 huge_spte = READ_ONCE(*huge_sptep);
- 	struct kvm_mmu_page *sp;
-+	bool flush = false;
- 	u64 *sptep, spte;
- 	gfn_t gfn;
- 	int index;
-@@ -6189,20 +6193,24 @@ static void shadow_mmu_split_huge_page(struct kvm *kvm,
- 		 * gfn-to-pfn translation since the SP is direct, so no need to
- 		 * modify them.
- 		 *
--		 * If a given SPTE points to a lower level page table, installing
--		 * such SPTEs would effectively unmap a potion of the huge page.
--		 * This is not an issue because __link_shadow_page() flushes the TLB
--		 * when the passed sp replaces a large SPTE.
-+		 * However, if a given SPTE points to a lower level page table,
-+		 * that lower level page table may only be partially populated.
-+		 * Installing such SPTEs would effectively unmap a potion of the
-+		 * huge page. Unmapping guest memory always requires a TLB flush
-+		 * since a subsequent operation on the unmapped regions would
-+		 * fail to detect the need to flush.
- 		 */
--		if (is_shadow_present_pte(*sptep))
-+		if (is_shadow_present_pte(*sptep)) {
-+			flush |= !is_last_spte(*sptep, sp->role.level);
- 			continue;
-+		}
- 
- 		spte = make_huge_page_split_spte(kvm, huge_spte, sp->role, index);
- 		mmu_spte_set(sptep, spte);
- 		__rmap_add(kvm, cache, slot, sptep, gfn, sp->role.access);
- 	}
- 
--	__link_shadow_page(kvm, cache, huge_sptep, sp);
-+	__link_shadow_page(kvm, cache, huge_sptep, sp, flush);
- }
- 
- static int shadow_mmu_try_split_huge_page(struct kvm *kvm,
--- 
-2.31.1
-
+Thanks for the suggestion Sean! I like your suggestion here. I'll test
+it out, clean it up and send it out as V2. I think the distinction
+between SEV and SEV-ES migration was largely due to how I split up the
+set of patches that enabled this feature.
