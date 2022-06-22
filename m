@@ -2,357 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 860E25547FF
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:12:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28EA5554801
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:13:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357645AbiFVLTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 07:19:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57394 "EHLO
+        id S241614AbiFVLmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 07:42:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357574AbiFVLTR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 07:19:17 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604AE3CA47;
-        Wed, 22 Jun 2022 04:18:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655896689; x=1687432689;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hTMxv5ATBtehYuUZfbLQ0w47uiDhHQy1BjaByM3jchE=;
-  b=A5bvEOt75outqNKvaj/S5Wca7/Lla6OkdkPz2Z2nD2ilmn3tnLhweeJH
-   tXoQlfSyJm0VQw5Pdol3VFB6MJRsNg/wcIRV3VkmFgFv2M78+XF2BQOmI
-   NelPGI3KmTOcsdOP2qZx7tX/GLGwAoLhhMeongQ0521urvhHkfeDrpjsw
-   +J0JT6qWAFLRtUeW5HHwKhXdKrpX3XvmXdU1UKPgmsL0wmvuDL9rmsRdF
-   I3Q8/xYCMOO7nsXuM2tsdY5gtdnTigDniqPmVcJgWOWzHP7eA+JHfm31v
-   T+jCXZH0XHZsCOO2hPxN5qZNeOgh0pR7rS6S3URdsadSF0ahdgxXfJw8x
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="366713447"
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="366713447"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 04:18:08 -0700
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="834065982"
-Received: from jmatsis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.178.197])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 04:18:05 -0700
-From:   Kai Huang <kai.huang@intel.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
-        len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com, kai.huang@intel.com
-Subject: [PATCH v5 22/22] Documentation/x86: Add documentation for TDX host support
-Date:   Wed, 22 Jun 2022 23:17:50 +1200
-Message-Id: <0712bc0b05a0c6c42437fba68f82d9268ab3113e.1655894131.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <cover.1655894131.git.kai.huang@intel.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
+        with ESMTP id S229582AbiFVLmO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 07:42:14 -0400
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9B8167D6;
+        Wed, 22 Jun 2022 04:42:12 -0700 (PDT)
+Received: by mail-yb1-f180.google.com with SMTP id 23so29698696ybe.8;
+        Wed, 22 Jun 2022 04:42:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JCV2OlM0n75yGXq5Ao9M4QymaqH2JncanYB6RHIUZPs=;
+        b=5KxsD1k27CkrO/nDlmgGnk7hRTxzA7TxK47lcvSFr7XxCZJYc5vv+IA3XQbk7KFoWy
+         xeGnC6M78g7W1C0ia3jjMiCdS7c177xXI6oyfsbtQC4DGpevrp9T7/jdNJZbQe898nQt
+         s//GcgLlZ9PnDTeXuHPfQGQj0LHXzfgpU8hPz17twbCyNM5bAq9AvUHQhV0nT4+Z08gh
+         s1n5bBF4F7XmyeVBM3eI3B5v0KDqvgWHAOP0p2vUVsmWb55OOgX4dS3cQMLfVMQtyb3G
+         /Keut+hSTy1DUPO7dW6GySz1L78Ul1RZ+bqGh56+Iq/zplSUYwJ+Z8pZTN89yJ0gcwlY
+         nkmw==
+X-Gm-Message-State: AJIora997Lv+RXvSWAiRwlYH20smtYY/ooYb6jQOksuwyYz46GoEMglO
+        7NK21NrKBDclAFMO5gwZmpAl0L1VMyzq4XC1dpQ=
+X-Google-Smtp-Source: AGRyM1t+UjB+W2u6c+KuvcQjZuiaMyR3JXTBhu8MFDYNtSJKpufG9a3kUq98N60z/GIEsB/1Kw+FvYOnSJeztB9YtCI=
+X-Received: by 2002:a25:e910:0:b0:668:d4c6:8c2d with SMTP id
+ n16-20020a25e910000000b00668d4c68c2dmr3091586ybd.81.1655898132092; Wed, 22
+ Jun 2022 04:42:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <cover.1655894131.git.kai.huang@intel.com> <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
+In-Reply-To: <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Wed, 22 Jun 2022 13:42:01 +0200
+Message-ID: <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
+Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
+ CPU hotplug
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Len Brown <len.brown@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Rafael Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
+        Tianyu.Lan@microsoft.com, Randy Dunlap <rdunlap@infradead.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Yue Haibing <yuehaibing@huawei.com>, dongli.zhang@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add documentation for TDX host kernel support.  There is already one
-file Documentation/x86/tdx.rst containing documentation for TDX guest
-internals.  Also reuse it for TDX host kernel support.
+On Wed, Jun 22, 2022 at 1:16 PM Kai Huang <kai.huang@intel.com> wrote:
+>
+> Platforms with confidential computing technology may not support ACPI
+> CPU hotplug when such technology is enabled by the BIOS.  Examples
+> include Intel platforms which support Intel Trust Domain Extensions
+> (TDX).
+>
+> If the kernel ever receives ACPI CPU hotplug event, it is likely a BIOS
+> bug.  For ACPI CPU hot-add, the kernel should speak out this is a BIOS
+> bug and reject the new CPU.  For hot-removal, for simplicity just assume
+> the kernel cannot continue to work normally, and BUG().
+>
+> Add a new attribute CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED to indicate the
+> platform doesn't support ACPI CPU hotplug, so that kernel can handle
+> ACPI CPU hotplug events for such platform.  The existing attribute
+> CC_ATTR_HOTPLUG_DISABLED is for software CPU hotplug thus doesn't fit.
+>
+> In acpi_processor_{add|remove}(), add early check against this attribute
+> and handle accordingly if it is set.
+>
+> Also take this chance to rename existing CC_ATTR_HOTPLUG_DISABLED to
+> CC_ATTR_CPU_HOTPLUG_DISABLED as it is for software CPU hotplug.
+>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/coco/core.c          |  2 +-
+>  drivers/acpi/acpi_processor.c | 23 +++++++++++++++++++++++
+>  include/linux/cc_platform.h   | 15 +++++++++++++--
+>  kernel/cpu.c                  |  2 +-
+>  4 files changed, 38 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+> index 4320fadae716..1bde1af75296 100644
+> --- a/arch/x86/coco/core.c
+> +++ b/arch/x86/coco/core.c
+> @@ -20,7 +20,7 @@ static bool intel_cc_platform_has(enum cc_attr attr)
+>  {
+>         switch (attr) {
+>         case CC_ATTR_GUEST_UNROLL_STRING_IO:
+> -       case CC_ATTR_HOTPLUG_DISABLED:
+> +       case CC_ATTR_CPU_HOTPLUG_DISABLED:
+>         case CC_ATTR_GUEST_MEM_ENCRYPT:
+>         case CC_ATTR_MEM_ENCRYPT:
+>                 return true;
+> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> index 6737b1cbf6d6..b960db864cd4 100644
+> --- a/drivers/acpi/acpi_processor.c
+> +++ b/drivers/acpi/acpi_processor.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/pci.h>
+> +#include <linux/cc_platform.h>
+>
+>  #include <acpi/processor.h>
+>
+> @@ -357,6 +358,17 @@ static int acpi_processor_add(struct acpi_device *device,
+>         struct device *dev;
+>         int result = 0;
+>
+> +       /*
+> +        * If the confidential computing platform doesn't support ACPI
+> +        * memory hotplug, the BIOS should never deliver such event to
+> +        * the kernel.  Report ACPI CPU hot-add as a BIOS bug and ignore
+> +        * the new CPU.
+> +        */
+> +       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) {
 
-Introduce a new level menu "TDX Guest Support" and move existing
-materials under it, and add a new menu for TDX host kernel support.
+This will affect initialization, not just hotplug AFAICS.
 
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- Documentation/x86/tdx.rst | 190 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 179 insertions(+), 11 deletions(-)
+You should reset the .hotplug.enabled flag in processor_handler to
+false instead.
 
-diff --git a/Documentation/x86/tdx.rst b/Documentation/x86/tdx.rst
-index b8fa4329e1a5..6c6b09ca6ba4 100644
---- a/Documentation/x86/tdx.rst
-+++ b/Documentation/x86/tdx.rst
-@@ -10,6 +10,174 @@ encrypting the guest memory. In TDX, a special module running in a special
- mode sits between the host and the guest and manages the guest/host
- separation.
- 
-+TDX Host Kernel Support
-+=======================
-+
-+TDX introduces a new CPU mode called Secure Arbitration Mode (SEAM) and
-+a new isolated range pointed by the SEAM Ranger Register (SEAMRR).  A
-+CPU-attested software module called 'the TDX module' runs inside the new
-+isolated range to provide the functionalities to manage and run protected
-+VMs.
-+
-+TDX also leverages Intel Multi-Key Total Memory Encryption (MKTME) to
-+provide crypto-protection to the VMs.  TDX reserves part of MKTME KeyIDs
-+as TDX private KeyIDs, which are only accessible within the SEAM mode.
-+BIOS is responsible for partitioning legacy MKTME KeyIDs and TDX KeyIDs.
-+
-+To enable TDX, BIOS configures SEAMRR and TDX private KeyIDs consistently
-+across all CPU packages.  TDX doesn't trust BIOS.  The MCHECK verifies
-+all configurations from BIOS are correct and enables SEAMRR.
-+
-+After TDX is enabled in BIOS, the TDX module needs to be loaded into the
-+SEAMRR range and properly initialized, before it can be used to create
-+and run protected VMs.
-+
-+The TDX architecture doesn't require BIOS to load the TDX module, but
-+current kernel assumes it is loaded by BIOS (i.e. either directly or by
-+some UEFI shell tool) before booting to the kernel.  Current kernel
-+detects TDX and initializes the TDX module.
-+
-+TDX boot-time detection
-+-----------------------
-+
-+Kernel detects TDX and the TDX private KeyIDs during kernel boot.  User
-+can see below dmesg if TDX is enabled by BIOS:
-+
-+|  [..] tdx: SEAMRR enabled.
-+|  [..] tdx: TDX private KeyID range: [16, 64).
-+|  [..] tdx: TDX enabled by BIOS.
-+
-+TDX module detection and initialization
-+---------------------------------------
-+
-+There is no CPUID or MSR to detect whether the TDX module.  The kernel
-+detects the TDX module by initializing it.
-+
-+The kernel talks to the TDX module via the new SEAMCALL instruction.  The
-+TDX module implements SEAMCALL leaf functions to allow the kernel to
-+initialize it.
-+
-+Initializing the TDX module consumes roughly ~1/256th system RAM size to
-+use it as 'metadata' for the TDX memory.  It also takes additional CPU
-+time to initialize those metadata along with the TDX module itself.  Both
-+are not trivial.  Current kernel doesn't choose to always initialize the
-+TDX module during kernel boot, but provides a function tdx_init() to
-+allow the caller to initialize TDX when it truly wants to use TDX:
-+
-+        ret = tdx_init();
-+        if (ret)
-+                goto no_tdx;
-+        // TDX is ready to use
-+
-+Initializing the TDX module requires all logical CPUs being online and
-+are in VMX operation (requirement of making SEAMCALL) during tdx_init().
-+Currently, KVM is the only user of TDX.  KVM always guarantees all online
-+CPUs are in VMX operation when there's any VM.  Current kernel doesn't
-+handle entering VMX operation in tdx_init() but leaves this to the
-+caller.
-+
-+User can consult dmesg to see the presence of the TDX module, and whether
-+it has been initialized.
-+
-+If the TDX module is not loaded, dmesg shows below:
-+
-+|  [..] tdx: TDX module is not loaded.
-+
-+If the TDX module is initialized successfully, dmesg shows something
-+like below:
-+
-+|  [..] tdx: TDX module: vendor_id 0x8086, major_version 1, minor_version 0, build_date 20211209, build_num 160
-+|  [..] tdx: 65667 pages allocated for PAMT.
-+|  [..] tdx: TDX module initialized.
-+
-+If the TDX module failed to initialize, dmesg shows below:
-+
-+|  [..] tdx: Failed to initialize TDX module.  Shut it down.
-+
-+TDX Interaction to Other Kernel Components
-+------------------------------------------
-+
-+CPU Hotplug
-+~~~~~~~~~~~
-+
-+TDX doesn't work with ACPI CPU hotplug.  To guarantee the security MCHECK
-+verifies all logical CPUs for all packages during platform boot.  Any
-+hot-added CPU is not verified thus cannot support TDX.  A non-buggy BIOS
-+should never deliver ACPI CPU hot-add event to the kernel.  Such event is
-+reported as BIOS bug and the hot-added CPU is rejected.
-+
-+TDX requires all boot-time verified logical CPUs being present until
-+machine reset.  If kernel receives ACPI CPU hot-removal event, assume the
-+kernel cannot continue to work normally so just BUG().
-+
-+Note TDX works with CPU logical online/offline, thus the kernel still
-+allows to offline logical CPU and online it again.
-+
-+Memory Hotplug
-+~~~~~~~~~~~~~~
-+
-+The TDX module reports a list of "Convertible Memory Region" (CMR) to
-+indicate which memory regions are TDX-capable.  Those regions are
-+generated by BIOS and verified by the MCHECK so that they are truly
-+present during platform boot and can meet security guarantee.
-+
-+This means TDX doesn't work with ACPI memory hot-add.  A non-buggy BIOS
-+should never deliver ACPI memory hot-add event to the kernel.  Such event
-+is reported as BIOS bug and the hot-added memory is rejected.
-+
-+TDX also doesn't work with ACPI memory hot-removal.  If kernel receives
-+ACPI memory hot-removal event, assume the kernel cannot continue to work
-+normally so just BUG().
-+
-+Also, the kernel needs to choose which TDX-capable regions to use as TDX
-+memory and pass those regions to the TDX module when it gets initialized.
-+Once they are passed to the TDX module, the TDX-usable memory regions are
-+fixed during module's lifetime.
-+
-+To avoid having to modify the page allocator to distinguish TDX and
-+non-TDX memory allocation, current kernel guarantees all pages managed by
-+the page allocator are TDX memory.  This means any hot-added memory to
-+the page allocator will break such guarantee thus should be prevented.
-+
-+There are basically two memory hot-add cases that need to be prevented:
-+ACPI memory hot-add and driver managed memory hot-add.  The kernel
-+rejectes the driver managed memory hot-add too when TDX is enabled by
-+BIOS.  For instance, dmesg shows below error when using kmem driver to
-+add a legacy PMEM as system RAM:
-+
-+|  [..] tdx: Unable to add memory [0x580000000, 0x600000000) on TDX enabled platform.
-+|  [..] kmem dax0.0: mapping0: 0x580000000-0x5ffffffff memory add failed
-+
-+However, adding new memory to ZONE_DEVICE should not be prevented as
-+those pages are not managed by the page allocator.  Therefore,
-+memremap_pages() variants are still allowed although they internally
-+also uses memory hotplug functions.
-+
-+Kexec()
-+~~~~~~~
-+
-+TDX (and MKTME) doesn't guarantee cache coherency among different KeyIDs.
-+If the TDX module is ever initialized, the kernel needs to flush dirty
-+cachelines associated with any TDX private KeyID, otherwise they may
-+slightly corrupt the new kernel.
-+
-+Similar to SME support, the kernel uses wbinvd() to flush cache in
-+stop_this_cpu().
-+
-+The current TDX module architecture doesn't play nicely with kexec().
-+The TDX module can only be initialized once during its lifetime, and
-+there is no SEAMCALL to reset the module to give a new clean slate to
-+the new kernel.  Therefore, ideally, if the module is ever initialized,
-+it's better to shut down the module.  The new kernel won't be able to
-+use TDX anyway (as it needs to go through the TDX module initialization
-+process which will fail immediately at the first step).
-+
-+However, there's no guarantee CPU is in VMX operation during kexec(), so
-+it's impractical to shut down the module.  Current kernel just leaves the
-+module in open state.
-+
-+TDX Guest Support
-+=================
- Since the host cannot directly access guest registers or memory, much
- normal functionality of a hypervisor must be moved into the guest. This is
- implemented using a Virtualization Exception (#VE) that is handled by the
-@@ -20,7 +188,7 @@ TDX includes new hypercall-like mechanisms for communicating from the
- guest to the hypervisor or the TDX module.
- 
- New TDX Exceptions
--==================
-+------------------
- 
- TDX guests behave differently from bare-metal and traditional VMX guests.
- In TDX guests, otherwise normal instructions or memory accesses can cause
-@@ -30,7 +198,7 @@ Instructions marked with an '*' conditionally cause exceptions.  The
- details for these instructions are discussed below.
- 
- Instruction-based #VE
-----------------------
-+~~~~~~~~~~~~~~~~~~~~~
- 
- - Port I/O (INS, OUTS, IN, OUT)
- - HLT
-@@ -41,7 +209,7 @@ Instruction-based #VE
- - CPUID*
- 
- Instruction-based #GP
-----------------------
-+~~~~~~~~~~~~~~~~~~~~~
- 
- - All VMX instructions: INVEPT, INVVPID, VMCLEAR, VMFUNC, VMLAUNCH,
-   VMPTRLD, VMPTRST, VMREAD, VMRESUME, VMWRITE, VMXOFF, VMXON
-@@ -52,7 +220,7 @@ Instruction-based #GP
- - RDMSR*,WRMSR*
- 
- RDMSR/WRMSR Behavior
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- MSR access behavior falls into three categories:
- 
-@@ -73,7 +241,7 @@ trapping and handling in the TDX module.  Other than possibly being slow,
- these MSRs appear to function just as they would on bare metal.
- 
- CPUID Behavior
----------------
-+~~~~~~~~~~~~~~
- 
- For some CPUID leaves and sub-leaves, the virtualized bit fields of CPUID
- return values (in guest EAX/EBX/ECX/EDX) are configurable by the
-@@ -93,7 +261,7 @@ not know how to handle. The guest kernel may ask the hypervisor for the
- value with a hypercall.
- 
- #VE on Memory Accesses
--======================
-+----------------------
- 
- There are essentially two classes of TDX memory: private and shared.
- Private memory receives full TDX protections.  Its content is protected
-@@ -107,7 +275,7 @@ entries.  This helps ensure that a guest does not place sensitive
- information in shared memory, exposing it to the untrusted hypervisor.
- 
- #VE on Shared Memory
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- Access to shared mappings can cause a #VE.  The hypervisor ultimately
- controls whether a shared memory access causes a #VE, so the guest must be
-@@ -127,7 +295,7 @@ be careful not to access device MMIO regions unless it is also prepared to
- handle a #VE.
- 
- #VE on Private Pages
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- An access to private mappings can also cause a #VE.  Since all kernel
- memory is also private memory, the kernel might theoretically need to
-@@ -145,7 +313,7 @@ The hypervisor is permitted to unilaterally move accepted pages to a
- to handle the exception.
- 
- Linux #VE handler
--=================
-+-----------------
- 
- Just like page faults or #GP's, #VE exceptions can be either handled or be
- fatal.  Typically, an unhandled userspace #VE results in a SIGSEGV.
-@@ -167,7 +335,7 @@ While the block is in place, any #VE is elevated to a double fault (#DF)
- which is not recoverable.
- 
- MMIO handling
--=============
-+-------------
- 
- In non-TDX VMs, MMIO is usually implemented by giving a guest access to a
- mapping which will cause a VMEXIT on access, and then the hypervisor
-@@ -189,7 +357,7 @@ MMIO access via other means (like structure overlays) may result in an
- oops.
- 
- Shared Memory Conversions
--=========================
-+-------------------------
- 
- All TDX guest memory starts out as private at boot.  This memory can not
- be accessed by the hypervisor.  However, some kernel users like device
--- 
-2.36.1
-
+> +               dev_err(&device->dev, "[BIOS bug]: Platform doesn't support ACPI CPU hotplug.  New CPU ignored.\n");
+> +               return -EINVAL;
+> +       }
+> +
+>         pr = kzalloc(sizeof(struct acpi_processor), GFP_KERNEL);
+>         if (!pr)
+>                 return -ENOMEM;
+> @@ -434,6 +446,17 @@ static void acpi_processor_remove(struct acpi_device *device)
+>         if (!device || !acpi_driver_data(device))
+>                 return;
+>
+> +       /*
+> +        * The confidential computing platform is broken if ACPI memory
+> +        * hot-removal isn't supported but it happened anyway.  Assume
+> +        * it's not guaranteed that the kernel can continue to work
+> +        * normally.  Just BUG().
+> +        */
+> +       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) {
+> +               dev_err(&device->dev, "Platform doesn't support ACPI CPU hotplug. BUG().\n");
+> +               BUG();
+> +       }
+> +
+>         pr = acpi_driver_data(device);
+>         if (pr->id >= nr_cpu_ids)
+>                 goto out;
+> diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
+> index 691494bbaf5a..9ce9256facc8 100644
+> --- a/include/linux/cc_platform.h
+> +++ b/include/linux/cc_platform.h
+> @@ -74,14 +74,25 @@ enum cc_attr {
+>         CC_ATTR_GUEST_UNROLL_STRING_IO,
+>
+>         /**
+> -        * @CC_ATTR_HOTPLUG_DISABLED: Hotplug is not supported or disabled.
+> +        * @CC_ATTR_CPU_HOTPLUG_DISABLED: CPU hotplug is not supported or
+> +        *                                disabled.
+>          *
+>          * The platform/OS is running as a guest/virtual machine does not
+>          * support CPU hotplug feature.
+>          *
+>          * Examples include TDX Guest.
+>          */
+> -       CC_ATTR_HOTPLUG_DISABLED,
+> +       CC_ATTR_CPU_HOTPLUG_DISABLED,
+> +
+> +       /**
+> +        * @CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED: ACPI CPU hotplug is not
+> +        *                                     supported.
+> +        *
+> +        * The platform/OS does not support ACPI CPU hotplug.
+> +        *
+> +        * Examples include TDX platform.
+> +        */
+> +       CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED,
+>  };
+>
+>  #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
+> diff --git a/kernel/cpu.c b/kernel/cpu.c
+> index edb8c199f6a3..966772cce063 100644
+> --- a/kernel/cpu.c
+> +++ b/kernel/cpu.c
+> @@ -1191,7 +1191,7 @@ static int cpu_down_maps_locked(unsigned int cpu, enum cpuhp_state target)
+>          * If the platform does not support hotplug, report it explicitly to
+>          * differentiate it from a transient offlining failure.
+>          */
+> -       if (cc_platform_has(CC_ATTR_HOTPLUG_DISABLED))
+> +       if (cc_platform_has(CC_ATTR_CPU_HOTPLUG_DISABLED))
+>                 return -EOPNOTSUPP;
+>         if (cpu_hotplug_disabled)
+>                 return -EBUSY;
+> --
+> 2.36.1
+>
