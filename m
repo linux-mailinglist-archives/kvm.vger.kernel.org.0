@@ -2,130 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83693554661
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:10:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE65255489B
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:15:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353919AbiFVIcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 04:32:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57950 "EHLO
+        id S1352124AbiFVIbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 04:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351464AbiFVIco (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 04:32:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04A7E10BB
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 01:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655886763;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kbGRJbqhqaDpYURUd1iIYFpog7R3QIPoGbLyON7y9kw=;
-        b=NxbF1xGA74jrkn6kNR3sV3M8u+EmpVZUrKaIxrXs8tDpmNdGwq+legna7k6HhnNyrATm9Z
-        H/mVEujZxp9k49ZW9SdKU12+BLMD76CjS5b/V/SlhMJSYjGF3Zo+iZYRTr3+4MTWnXxQzr
-        Qw3gKRoc2yviJgDE47aRNgcLObYEXts=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-iNEYmxvyPGeSc7eIoTibxA-1; Wed, 22 Jun 2022 04:32:29 -0400
-X-MC-Unique: iNEYmxvyPGeSc7eIoTibxA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 54B5F1C04B49;
-        Wed, 22 Jun 2022 08:32:28 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC7EA40C5BF;
-        Wed, 22 Jun 2022 08:32:27 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>, pasic@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
-        agordeev@linux.ibm.com, mst@redhat.com, jasowang@redhat.com,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     ben@decadent.org.uk, david@redhat.com
-Subject: Re: [PATCH V3] virtio: disable notification hardening by default
-In-Reply-To: <20220622012940.21441-1-jasowang@redhat.com>
-Organization: Red Hat GmbH
-References: <20220622012940.21441-1-jasowang@redhat.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Wed, 22 Jun 2022 10:32:26 +0200
-Message-ID: <87h74d85et.fsf@redhat.com>
+        with ESMTP id S1353208AbiFVIbk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 04:31:40 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C5A7FEB
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 01:31:39 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25M7k06Y004919;
+        Wed, 22 Jun 2022 08:31:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wl3ZF7qtvxsSXSZkAdDbi5qBMul+2/bNZ2Fuv0GYqRw=;
+ b=i8Ncp/ouX6GaCnYCWa7AtJZwxyaP9EUHNlCgnUwpEs+DEIXMBD+52Hi7obKzZy7v6b3v
+ k1bi4SVQo/m/dwLnIiGRGFqY7jtB5Fr5Kp7ds8YQBvjLNRZVNgPyj036jXt9auc8n1t2
+ NfCEoziPGxfZN5V09+IgiwjccOvUDdsEnfX5bEH2VXLvSl/hDIB4QwCXAud7JgCuDIU4
+ MJ1fVpuYscFnlvfKujXOh6VYkyU+z5twJUcQf1uLf6qTM3Jqr+OHTlK+M2vI7SNvrVKy
+ JdA6FDDp8kQkt9MbddBkwwvun0GykCO7ryjOpE5GaJIB6MLLICox2tvkkwHWk91C5igH wQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3guxyw16pj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jun 2022 08:31:32 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25M8R5kB032317;
+        Wed, 22 Jun 2022 08:31:31 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3guxyw16ny-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jun 2022 08:31:31 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25M8KvU3003911;
+        Wed, 22 Jun 2022 08:31:29 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3gs5yhnaee-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jun 2022 08:31:29 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25M8VQ5l20709810
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Jun 2022 08:31:26 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 764D94204B;
+        Wed, 22 Jun 2022 08:31:26 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B6A4F42049;
+        Wed, 22 Jun 2022 08:31:25 +0000 (GMT)
+Received: from [9.171.38.79] (unknown [9.171.38.79])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Jun 2022 08:31:25 +0000 (GMT)
+Message-ID: <ea3daac0-875d-dd9d-7ad0-65a0aed2aaed@linux.ibm.com>
+Date:   Wed, 22 Jun 2022 10:35:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v7 3/8] s390x/pci: enable for load/store intepretation
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220606203614.110928-1-mjrosato@linux.ibm.com>
+ <20220606203614.110928-4-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220606203614.110928-4-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kxOU667y70SB8KgBkKdh9r2NuWJCmh4t
+X-Proofpoint-GUID: fVZJya9Zv6ca5PYnOMhyFI13fbomoW2E
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-06-21_11,2022-06-21_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=999 adultscore=0
+ clxscore=1015 bulkscore=0 malwarescore=0 phishscore=0 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206220039
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 22 2022, Jason Wang <jasowang@redhat.com> wrote:
 
-> We try to harden virtio device notifications in 8b4ec69d7e09 ("virtio:
-> harden vring IRQ"). It works with the assumption that the driver or
-> core can properly call virtio_device_ready() at the right
-> place. Unfortunately, this seems to be not true and uncover various
-> bugs of the existing drivers, mainly the issue of using
-> virtio_device_ready() incorrectly.
->
-> So let's having a Kconfig option and disable it by default. It gives
 
-s/having/have/
-
-> us a breath to fix the drivers and then we can consider to enable it
-> by default.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+On 6/6/22 22:36, Matthew Rosato wrote:
+> If the ZPCI_OP ioctl reports that is is available and usable, then the
+> underlying KVM host will enable load/store intepretation for any guest
+> device without a SHM bit in the guest function handle.  For a device that
+> will be using interpretation support, ensure the guest function handle
+> matches the host function handle; this value is re-checked every time the
+> guest issues a SET PCI FN to enable the guest device as it is the only
+> opportunity to reflect function handle changes.
+> 
+> By default, unless interpret=off is specified, interpretation support will
+> always be assumed and exploited if the necessary ioctl and features are
+> available on the host kernel.  When these are unavailable, we will silently
+> revert to the interception model; this allows existing guest configurations
+> to work unmodified on hosts with and without zPCI interpretation support,
+> allowing QEMU to choose the best support model available.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 > ---
-> Changes since V2:
-> - Tweak the Kconfig help
-> - Add comment for the read_lock() pairing in virtio_ccw
-> ---
->  drivers/s390/virtio/virtio_ccw.c |  9 ++++++++-
->  drivers/virtio/Kconfig           | 13 +++++++++++++
->  drivers/virtio/virtio.c          |  2 ++
->  drivers/virtio/virtio_ring.c     | 12 ++++++++++++
->  include/linux/virtio_config.h    |  2 ++
->  5 files changed, 37 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 97e51c34e6cf..1f6a358f65f0 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -1136,8 +1136,13 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
->  			vcdev->err = -EIO;
->  	}
->  	virtio_ccw_check_activity(vcdev, activity);
-> -	/* Interrupts are disabled here */
-> +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
-> +	/*
-> +	 * Paried with virtio_ccw_synchronize_cbs() and interrupts are
+>   hw/s390x/meson.build            |  1 +
+>   hw/s390x/s390-pci-bus.c         | 66 ++++++++++++++++++++++++++++++++-
+>   hw/s390x/s390-pci-inst.c        | 16 ++++++++
+>   hw/s390x/s390-pci-kvm.c         | 22 +++++++++++
+>   include/hw/s390x/s390-pci-bus.h |  1 +
+>   include/hw/s390x/s390-pci-kvm.h | 24 ++++++++++++
+>   target/s390x/kvm/kvm.c          |  7 ++++
+>   target/s390x/kvm/kvm_s390x.h    |  1 +
+>   8 files changed, 137 insertions(+), 1 deletion(-)
+>   create mode 100644 hw/s390x/s390-pci-kvm.c
+>   create mode 100644 include/hw/s390x/s390-pci-kvm.h
+> 
+> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+> index feefe0717e..f291016fee 100644
+> --- a/hw/s390x/meson.build
+> +++ b/hw/s390x/meson.build
+> @@ -23,6 +23,7 @@ s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
+>     's390-skeys-kvm.c',
+>     's390-stattrib-kvm.c',
+>     'pv.c',
+> +  's390-pci-kvm.c',
+>   ))
 
-s/Paried/Paired/
+Here...
 
-> +	 * disabled here.
-> +	 */
->  	read_lock(&vcdev->irq_lock);
-> +#endif
->  	for_each_set_bit(i, indicators(vcdev),
->  			 sizeof(*indicators(vcdev)) * BITS_PER_BYTE) {
->  		/* The bit clear must happen before the vring kick. */
-> @@ -1146,7 +1151,9 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
->  		vq = virtio_ccw_vq_by_ind(vcdev, i);
->  		vring_interrupt(0, vq);
->  	}
-> +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
->  	read_unlock(&vcdev->irq_lock);
-> +#endif
->  	if (test_bit(0, indicators2(vcdev))) {
->  		virtio_config_changed(&vcdev->vdev);
->  		clear_bit(0, indicators2(vcdev));
+> diff --git a/hw/s390x/s390-pci-kvm.c b/hw/s390x/s390-pci-kvm.c
+> new file mode 100644
+> index 0000000000..0f16104a74
+> --- /dev/null
+> +++ b/hw/s390x/s390-pci-kvm.c
+
+...and here:
+
+Shouldn't this file go in target/s390x/kvm ?
 
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> @@ -0,0 +1,22 @@
+> +/*
+> + * s390 zPCI KVM interfaces
+> + *
+> + * Copyright 2022 IBM Corp.
+> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "kvm/kvm_s390x.h"
+> +#include "hw/s390x/pv.h"
+> +#include "hw/s390x/s390-pci-kvm.h"
+> +#include "cpu_models.h"
+> +
+> +bool s390_pci_kvm_interp_allowed(void)
+> +{
+> +    return kvm_s390_get_zpci_op() && !s390_is_pv();
+> +}
 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
