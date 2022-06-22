@@ -2,57 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 817F35540A4
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 04:47:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C3BD5542AB
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 08:25:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355742AbiFVCrl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jun 2022 22:47:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55780 "EHLO
+        id S236913AbiFVGTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 02:19:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232424AbiFVCrl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jun 2022 22:47:41 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D4A2DA89
-        for <kvm@vger.kernel.org>; Tue, 21 Jun 2022 19:47:39 -0700 (PDT)
-Received: from fsav111.sakura.ne.jp (fsav111.sakura.ne.jp [27.133.134.238])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25M2kwYq093430;
-        Wed, 22 Jun 2022 11:46:58 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav111.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp);
- Wed, 22 Jun 2022 11:46:58 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 25M2kvA7093422
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 22 Jun 2022 11:46:58 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <e3a1a213-ea9f-dbd8-93be-74e927794090@I-love.SAKURA.ne.jp>
-Date:   Wed, 22 Jun 2022 11:46:56 +0900
+        with ESMTP id S1349945AbiFVGSv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 02:18:51 -0400
+Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9691DE1;
+        Tue, 21 Jun 2022 23:18:46 -0700 (PDT)
+Received: from ([60.208.111.195])
+        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id QCO00140;
+        Wed, 22 Jun 2022 14:18:40 +0800
+Received: from localhost.localdomain (10.200.104.97) by
+ jtjnmail201611.home.langchao.com (10.100.2.11) with Microsoft SMTP Server id
+ 15.1.2507.9; Wed, 22 Jun 2022 14:18:39 +0800
+From:   Bo Liu <liubo03@inspur.com>
+To:     <alex.williamson@redhat.com>, <cohuck@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Bo Liu <liubo03@inspur.com>
+Subject: [PATCH v2 1/1] vfio: check vfio_register_iommu_driver() return value
+Date:   Wed, 22 Jun 2022 00:56:51 -0400
+Message-ID: <20220622045651.5416-1-liubo03@inspur.com>
+X-Mailer: git-send-email 2.18.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: WARNING in kvm_arch_vcpu_ioctl_run (3)
-Content-Language: en-US
-To:     syzbot <syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com>,
-        Gleb Natapov <gleb@redhat.com>, Avi Kivity <avi@redhat.com>,
-        syzkaller-bugs@googlegroups.com
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Wanpeng Li <kernellwp@gmail.com>
-References: <000000000000d05a78056873bc47@google.com>
- <CANRm+Cz9GEhgc_Na3E8DqYBccPTimybeu+idP1hDJSk4jni7ag@mail.gmail.com>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <CANRm+Cz9GEhgc_Na3E8DqYBccPTimybeu+idP1hDJSk4jni7ag@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain
+X-Originating-IP: [10.200.104.97]
+tUid:   2022622141840142854ce3aeabb36f49408916db67baf
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,42 +45,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2018/03/28 16:29, Wanpeng Li wrote:
->> syzbot dashboard link:
->> https://syzkaller.appspot.com/bug?extid=760a73552f47a8cd0fd9
->>
-> Maybe the same as this one. https://lkml.org/lkml/2018/3/21/174 Paolo,
-> any idea against my analysis?
+As vfio_register_iommu_driver() can fail, we should check the return value.
 
-No progress for 4 years. Did somebody check Wanpeng's analysis ?
+Signed-off-by: Bo Liu <liubo03@inspur.com>
+---
+ Changes from v1:
+ -move the pr_info()
+ -move  #endif above the ret test
+ -remove #ifdefs above the err_driver_register
 
-Since I'm not familiar with KVM, my questions from different direction...
+ drivers/vfio/vfio.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 61e71c1154be..8f435c0d7748 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -2156,13 +2156,17 @@ static int __init vfio_init(void)
+ 	if (ret)
+ 		goto err_alloc_chrdev;
+ 
+-	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+-
+ #ifdef CONFIG_VFIO_NOIOMMU
+-	vfio_register_iommu_driver(&vfio_noiommu_ops);
++	ret = vfio_register_iommu_driver(&vfio_noiommu_ops);
+ #endif
++	if (ret)
++		goto err_driver_register;
++
++	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+ 	return 0;
+ 
++err_driver_register:
++	unregister_chrdev_region(vfio.group_devt, MINORMASK + 1);
+ err_alloc_chrdev:
+ 	class_destroy(vfio.class);
+ 	vfio.class = NULL;
+-- 
+2.27.0
 
-
-syzbot is hitting WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed) added by
-commit 716d51abff06f484 ("KVM: Provide userspace IO exit completion callback")
-due to vcpu->mmio_needed == true.
-
-Question 1: what is the intent of checking for vcpu->mmio_needed == false?
-
-
-
-If we run a reproducer provided by syzbot, we can observe that mutex_unlock(&vcpu->mutex)
-in kvm_vcpu_ioctl() is called with vcpu->mmio_needed == true.
-
-Question 2: Is kvm_vcpu_ioctl() supposed to leave with vcpu->mmio_needed == false?
-In other words, is doing
-
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4104,6 +4104,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 		r = kvm_arch_vcpu_ioctl(filp, ioctl, arg);
- 	}
- out:
-+	WARN_ON_ONCE(vcpu->mmio_needed);
- 	mutex_unlock(&vcpu->mutex);
- 	kfree(fpu);
- 	kfree(kvm_sregs);
-
-appropriate?
