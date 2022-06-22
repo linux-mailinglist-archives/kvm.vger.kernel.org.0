@@ -2,191 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38BDE554D74
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:36:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21379554DAE
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:43:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358715AbiFVOfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 10:35:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33712 "EHLO
+        id S1358536AbiFVOnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 10:43:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358680AbiFVOfh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:35:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CFA13C710
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:35:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655908532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mqHBzJ5IikLI/T/Qp0b//MpzSAkflYAqrEPzT2O75eE=;
-        b=bifTo4NifPJ2cOUCuPzLWw+342SQxTrKosrDG7B+pjky1YooGoPOqheyl2taB/SAoUowVA
-        cN826zogzPrc/iTNJGHLccecwRTStS6pAOAw9A9UzMIj3saclOabvXT1PQS9zV/NO8NYZh
-        UnZbLUY9hszLLO91lIMj0QMVF9nQS80=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-592-2D0O1Yt2MqWPlM3wGFQ6bw-1; Wed, 22 Jun 2022 10:35:31 -0400
-X-MC-Unique: 2D0O1Yt2MqWPlM3wGFQ6bw-1
-Received: by mail-wm1-f70.google.com with SMTP id p6-20020a05600c358600b0039c873184b9so7931847wmq.4
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:35:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=mqHBzJ5IikLI/T/Qp0b//MpzSAkflYAqrEPzT2O75eE=;
-        b=mjwj059yBYcvDLFYMfuJsoUpVHNmBmi4oc/nwTPZO3jTf+DvMVt/AqDOp/XZkeJvfS
-         DwP1Latf69gudRjPkqX44k0xO1E+termCAmPdZGd0Dw6jTknhc70m6hBuR9BXPfaOtg4
-         eLAPAcmS818q1vUixKNkdq2h0aLIruNzh/yyGJb3vDBCeKNHsCmTJ7aMNnCrbtll7PSQ
-         Yk1cLqW+UHIdx+FBluvK6ayo61dR2q6RISh+bOLGc4vhjpEOZiZXpgaAQ9m4exSxzM0V
-         rK/lMPVMRJ3l250DyKBfKlrO3MK6d4UJjN+WBOTqn3C4+/sRv4VZOGPxEkdri5CLpjoh
-         55Gg==
-X-Gm-Message-State: AJIora8qNu8zV2J1L3iBYIP6PotTjGmbECcg/J8DAyvlshODNMfsB8AK
-        1DtkxDCX3rjuz+4l5sAd6Fx1ATeStfonblp1UvCfUpyVgI+0UJGI5FJNulS+CjhnVMVFpa31zPu
-        wsQibHLsO/qqw
-X-Received: by 2002:a5d:59a6:0:b0:21b:a234:8314 with SMTP id p6-20020a5d59a6000000b0021ba2348314mr2724829wrr.316.1655908529925;
-        Wed, 22 Jun 2022 07:35:29 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uRzNKe1o2TRsk2pdleUVR343vFzLH3P88s0wFu9UOAwdJNQdDmkRYfBHgnvCVsa8OT7/f4qA==
-X-Received: by 2002:a5d:59a6:0:b0:21b:a234:8314 with SMTP id p6-20020a5d59a6000000b0021ba2348314mr2724792wrr.316.1655908529685;
-        Wed, 22 Jun 2022 07:35:29 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p11-20020a05600c418b00b00397342e3830sm4923089wmh.0.2022.06.22.07.35.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 07:35:28 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Ilias Stamatis <ilstam@amazon.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, mail@anirudhrb.com,
-        kumarpraveen@linux.microsoft.com, wei.liu@kernel.org,
-        robert.bradford@intel.com, liuwe@microsoft.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: Don't expose TSC scaling to L1 when on Hyper-V
-In-Reply-To: <YrMenI1mTbqA9MaR@anrayabh-desk>
-References: <20220613161611.3567556-1-anrayabh@linux.microsoft.com>
- <592ab920-51f3-4794-331f-8737e1f5b20a@redhat.com>
- <YqdsjW4/zsYaJahf@google.com> <YqipLpHI24NdhgJO@anrayabh-desk>
- <YqiwoOP4HX2LniI4@google.com> <87zgi5xh42.fsf@redhat.com>
- <YrMenI1mTbqA9MaR@anrayabh-desk>
-Date:   Wed, 22 Jun 2022 16:35:27 +0200
-Message-ID: <87r13gyde8.fsf@redhat.com>
+        with ESMTP id S1358494AbiFVOm7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 10:42:59 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 27FFDB9;
+        Wed, 22 Jun 2022 07:42:57 -0700 (PDT)
+Received: from jpiotrowski-Surface-Book-3 (ip-037-201-214-204.um10.pools.vodafone-ip.de [37.201.214.204])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 02ADF20C636D;
+        Wed, 22 Jun 2022 07:42:49 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 02ADF20C636D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1655908976;
+        bh=3p9ZjAM7sex59sizUKu6QYDFUGr8EeBgiFOquCcUwkM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NrPWRQQBC2o9oajSPE53nnlzATXfEgf2dHagcUN5LS60Ha4Ezvaot2T5Wvu8C10g0
+         CHJNf3C+lOyYd+OCx34K+ndvZuVfuqQtRBHXe7I3O+OzymGWnyTO5o3t6LiWs6voaT
+         SSnTy1rlZf9JbY4YZH3R4tktCGmleekxZdzRoF5o=
+Date:   Wed, 22 Jun 2022 16:42:45 +0200
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry
+ on fault
+Message-ID: <YrMqZUfZl1b5I/ud@jpiotrowski-Surface-Book-3>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
+ <YrMoIOv3U+vehi/D@jpiotrowski-Surface-Book-3>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YrMoIOv3U+vehi/D@jpiotrowski-Surface-Book-3>
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Anirudh Rayabharam <anrayabh@linux.microsoft.com> writes:
+On Wed, Jun 22, 2022 at 04:33:04PM +0200, Jeremi Piotrowski wrote:
+> On Mon, Jun 20, 2022 at 11:03:58PM +0000, Ashish Kalra wrote:
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> > 
+> > When SEV-SNP is enabled globally, a write from the host goes through the
+> > RMP check. If the hardware encounters the check failure, then it raises
+> > the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
+> > the debug.
+> > 
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > ---
+> >  arch/x86/include/asm/sev.h |  7 +++++++
+> >  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
+> >  arch/x86/mm/fault.c        | 17 +++++++++++----
+> >  include/linux/sev.h        |  2 ++
+> >  4 files changed, 65 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> > index 6ab872311544..c0c4df817159 100644
+> > --- a/arch/x86/include/asm/sev.h
+> > +++ b/arch/x86/include/asm/sev.h
+> > @@ -113,6 +113,11 @@ struct __packed rmpentry {
+> >  
+> >  #define rmpentry_assigned(x)	((x)->info.assigned)
+> >  #define rmpentry_pagesize(x)	((x)->info.pagesize)
+> > +#define rmpentry_vmsa(x)	((x)->info.vmsa)
+> > +#define rmpentry_asid(x)	((x)->info.asid)
+> > +#define rmpentry_validated(x)	((x)->info.validated)
+> > +#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
+> > +#define rmpentry_immutable(x)	((x)->info.immutable)
+> >  
+> >  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
+> >  
+> > @@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
+> >  bool snp_init(struct boot_params *bp);
+> >  void snp_abort(void);
+> >  int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
+> > +void dump_rmpentry(u64 pfn);
+> >  #else
+> >  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+> >  static inline void sev_es_ist_exit(void) { }
+> > @@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
+> >  {
+> >  	return -ENOTTY;
+> >  }
+> > +static inline void dump_rmpentry(u64 pfn) {}
+> >  #endif
+> >  
+> >  #endif
+> > diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> > index 734cddd837f5..6640a639fffc 100644
+> > --- a/arch/x86/kernel/sev.c
+> > +++ b/arch/x86/kernel/sev.c
+> > @@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
+> >  	return entry;
+> >  }
+> >  
+> > +void dump_rmpentry(u64 pfn)
+> > +{
+> > +	unsigned long pfn_end;
+> > +	struct rmpentry *e;
+> > +	int level;
+> > +
+> > +	e = __snp_lookup_rmpentry(pfn, &level);
+> > +	if (!e) {
+> 
+> __snp_lookup_rmpentry may return -errno so this should be:
+> 
+>   if (e != 1)
 
-> On Wed, Jun 22, 2022 at 10:00:29AM +0200, Vitaly Kuznetsov wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > On Tue, Jun 14, 2022, Anirudh Rayabharam wrote:
->> >> On Mon, Jun 13, 2022 at 04:57:49PM +0000, Sean Christopherson wrote:
->> 
->> ...
->> 
->> >> > 
->> >> > Any reason not to use the already sanitized vmcs_config?  I can't think of any
->> >> > reason why the nested path should blindly use the raw MSR values from hardware.
->> >> 
->> >> vmcs_config has the sanitized exec controls. But how do we construct MSR
->> >> values using them?
->> >
->> > I was thinking we could use the sanitized controls for the allowed-1 bits, and then
->> > take the required-1 bits from the CPU.  And then if we wanted to avoid the redundant
->> > RDMSRs in a follow-up patch we could add required-1 fields to vmcs_config.
->> >
->> > Hastily constructed and compile-tested only, proceed with caution :-)
->> 
->> Independently from "[PATCH 00/11] KVM: VMX: Support TscScaling and
->> EnclsExitingBitmap whith eVMCS" which is supposed to fix the particular
->> TSC scaling issue, I like the idea to make nested_vmx_setup_ctls_msrs()
->> use both allowed-1 and required-1 bits from vmcs_config. I'll pick up
->> the suggested patch and try to construct something for required-1 bits.
->
-> I tried this patch today but it causes some regression which causes
-> /dev/kvm to be unavailable in L1. I didn't get a chance to look into it
-> closely but I am guessing it has something to do with the fact that
-> vmcs_config reflects the config that L0 chose to use rather than what is
-> available to use. So constructing allowed-1 MSR bits based on what bits
-> are set in exec controls maybe isn't correct.
+Sorry, actually it should be:
 
-I've tried to pick it up but it's actually much harder than I think. The
-patch has some minor issues ('&vmcs_config.nested' needs to be switched
-to '&vmcs_conf->nested' in nested_vmx_setup_ctls_msrs()), but the main
-problem is that the set of controls nested_vmx_setup_ctls_msrs() needs
-is NOT a subset of vmcs_config (setup_vmcs_config()). I was able to
-identify at least:
+  if (IS_ERR_OR_NULL(e)) {
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5e14e4c40007..8076352174ad 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2483,8 +2483,14 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-              CPU_BASED_INVLPG_EXITING |
-              CPU_BASED_RDPMC_EXITING;
- 
--       opt = CPU_BASED_TPR_SHADOW |
-+       opt = CPU_BASED_INTR_WINDOW_EXITING |
-+             CPU_BASED_NMI_WINDOW_EXITING |
-+             CPU_BASED_TPR_SHADOW |
-+             CPU_BASED_USE_IO_BITMAPS |
-              CPU_BASED_USE_MSR_BITMAPS |
-+             CPU_BASED_MONITOR_TRAP_FLAG |
-+             CPU_BASED_RDTSC_EXITING |
-+             CPU_BASED_PAUSE_EXITING |
-              CPU_BASED_ACTIVATE_SECONDARY_CONTROLS |
-              CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
-        if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_PROCBASED_CTLS,
-@@ -2582,6 +2588,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- #endif
-        opt = VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-              VM_EXIT_LOAD_IA32_PAT |
-+             VM_EXIT_SAVE_IA32_PAT |
-              VM_EXIT_LOAD_IA32_EFER |
-              VM_EXIT_CLEAR_BNDCFGS |
-              VM_EXIT_PT_CONCEAL_PIP |
-@@ -2604,7 +2611,11 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-                _pin_based_exec_control &= ~PIN_BASED_POSTED_INTR;
- 
-        min = VM_ENTRY_LOAD_DEBUG_CONTROLS;
--       opt = VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-+       opt =
-+#ifdef CONFIG_X86_64
-+             VM_ENTRY_IA32E_MODE |
-+#endif
-+             VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-              VM_ENTRY_LOAD_IA32_PAT |
-              VM_ENTRY_LOAD_IA32_EFER |
-              VM_ENTRY_LOAD_BNDCFGS |
+> 
+> > +		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
+> > +		return;
+> > +	}
+> > +
+> > +	if (rmpentry_assigned(e)) {
+> > +		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
+> > +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
+> > +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
+> > +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
+> > +			rmpentry_validated(e));
+> > +		return;
+> > +	}
+> > +
+> > +	/*
+> > +	 * If the RMP entry at the faulting pfn was not assigned, then we do not
+> > +	 * know what caused the RMP violation. To get some useful debug information,
+> > +	 * let iterate through the entire 2MB region, and dump the RMP entries if
+> > +	 * one of the bit in the RMP entry is set.
+> > +	 */
+> > +	pfn = pfn & ~(PTRS_PER_PMD - 1);
+> > +	pfn_end = pfn + PTRS_PER_PMD;
+> > +
+> > +	while (pfn < pfn_end) {
+> > +		e = __snp_lookup_rmpentry(pfn, &level);
+> > +		if (!e)
+> 
+>   if (e != 1)
+> 
 
-but it is 1) not sufficient because some controls are smartly filtered
-out just because we don't want them for L1 -- and this doesn't mean that
-L2 doesn't need them and 2) because if we add some 'opt' controls to
-setup_vmcs_config() we need to filter them out somewhere else.
+and this too:
 
-I'm starting to think we may just want to store raw VMX MSR values in
-vmcs_config first, then sanitize them (eVMCS, vmx preemtoion timer bug,
-perf_ctrl bug,..) and then do the adjust_vmx_controls() magic. 
+  if (IS_ERR_OR_NULL(e))
 
-I'm not giving up yet but don't expect something small and backportable
-to stable :-) 
 
--- 
-Vitaly
-
+> > +			return;
+> > +
+> > +		if (e->low || e->high)
+> > +			pr_alert("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
+> > +				 pfn << PAGE_SHIFT, e->high, e->low);
+> > +		pfn++;
+> > +	}
+> > +}
+> > +EXPORT_SYMBOL_GPL(dump_rmpentry);
+> > +
+> >  /*
+> >   * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
+> >   * and -errno if there is no corresponding RMP entry.
+> > diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+> > index f5de9673093a..25896a6ba04a 100644
+> > --- a/arch/x86/mm/fault.c
+> > +++ b/arch/x86/mm/fault.c
+> > @@ -34,6 +34,7 @@
+> >  #include <asm/kvm_para.h>		/* kvm_handle_async_pf		*/
+> >  #include <asm/vdso.h>			/* fixup_vdso_exception()	*/
+> >  #include <asm/irq_stack.h>
+> > +#include <asm/sev.h>			/* dump_rmpentry()		*/
+> >  
+> >  #define CREATE_TRACE_POINTS
+> >  #include <asm/trace/exceptions.h>
+> > @@ -290,7 +291,7 @@ static bool low_pfn(unsigned long pfn)
+> >  	return pfn < max_low_pfn;
+> >  }
+> >  
+> > -static void dump_pagetable(unsigned long address)
+> > +static void dump_pagetable(unsigned long address, bool show_rmpentry)
+> >  {
+> >  	pgd_t *base = __va(read_cr3_pa());
+> >  	pgd_t *pgd = &base[pgd_index(address)];
+> > @@ -346,10 +347,11 @@ static int bad_address(void *p)
+> >  	return get_kernel_nofault(dummy, (unsigned long *)p);
+> >  }
+> >  
+> > -static void dump_pagetable(unsigned long address)
+> > +static void dump_pagetable(unsigned long address, bool show_rmpentry)
+> >  {
+> >  	pgd_t *base = __va(read_cr3_pa());
+> >  	pgd_t *pgd = base + pgd_index(address);
+> > +	unsigned long pfn;
+> >  	p4d_t *p4d;
+> >  	pud_t *pud;
+> >  	pmd_t *pmd;
+> > @@ -367,6 +369,7 @@ static void dump_pagetable(unsigned long address)
+> >  	if (bad_address(p4d))
+> >  		goto bad;
+> >  
+> > +	pfn = p4d_pfn(*p4d);
+> >  	pr_cont("P4D %lx ", p4d_val(*p4d));
+> >  	if (!p4d_present(*p4d) || p4d_large(*p4d))
+> >  		goto out;
+> > @@ -375,6 +378,7 @@ static void dump_pagetable(unsigned long address)
+> >  	if (bad_address(pud))
+> >  		goto bad;
+> >  
+> > +	pfn = pud_pfn(*pud);
+> >  	pr_cont("PUD %lx ", pud_val(*pud));
+> >  	if (!pud_present(*pud) || pud_large(*pud))
+> >  		goto out;
+> > @@ -383,6 +387,7 @@ static void dump_pagetable(unsigned long address)
+> >  	if (bad_address(pmd))
+> >  		goto bad;
+> >  
+> > +	pfn = pmd_pfn(*pmd);
+> >  	pr_cont("PMD %lx ", pmd_val(*pmd));
+> >  	if (!pmd_present(*pmd) || pmd_large(*pmd))
+> >  		goto out;
+> > @@ -391,9 +396,13 @@ static void dump_pagetable(unsigned long address)
+> >  	if (bad_address(pte))
+> >  		goto bad;
+> >  
+> > +	pfn = pte_pfn(*pte);
+> >  	pr_cont("PTE %lx", pte_val(*pte));
+> >  out:
+> >  	pr_cont("\n");
+> > +
+> > +	if (show_rmpentry)
+> > +		dump_rmpentry(pfn);
+> >  	return;
+> >  bad:
+> >  	pr_info("BAD\n");
+> > @@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+> >  		show_ldttss(&gdt, "TR", tr);
+> >  	}
+> >  
+> > -	dump_pagetable(address);
+> > +	dump_pagetable(address, error_code & X86_PF_RMP);
+> >  }
+> >  
+> >  static noinline void
+> > @@ -596,7 +605,7 @@ pgtable_bad(struct pt_regs *regs, unsigned long error_code,
+> >  
+> >  	printk(KERN_ALERT "%s: Corrupted page table at address %lx\n",
+> >  	       tsk->comm, address);
+> > -	dump_pagetable(address);
+> > +	dump_pagetable(address, false);
+> >  
+> >  	if (__die("Bad pagetable", regs, error_code))
+> >  		sig = 0;
+> > diff --git a/include/linux/sev.h b/include/linux/sev.h
+> > index 1a68842789e1..734b13a69c54 100644
+> > --- a/include/linux/sev.h
+> > +++ b/include/linux/sev.h
+> > @@ -16,6 +16,7 @@ int snp_lookup_rmpentry(u64 pfn, int *level);
+> >  int psmash(u64 pfn);
+> >  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+> >  int rmp_make_shared(u64 pfn, enum pg_level level);
+> > +void dump_rmpentry(u64 pfn);
+> >  #else
+> >  static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
+> >  static inline int psmash(u64 pfn) { return -ENXIO; }
+> > @@ -25,6 +26,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
+> >  	return -ENODEV;
+> >  }
+> >  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
+> > +static inline void dump_rmpentry(u64 pfn) { }
+> >  
+> >  #endif /* CONFIG_AMD_MEM_ENCRYPT */
+> >  #endif /* __LINUX_SEV_H */
+> > -- 
+> > 2.25.1
+> > 
