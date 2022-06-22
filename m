@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 152E7555450
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 21:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60844555455
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 21:27:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357484AbiFVT12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 15:27:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33302 "EHLO
+        id S1357984AbiFVT13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 15:27:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236696AbiFVT1U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 15:27:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7C42B39686
+        with ESMTP id S237187AbiFVT1X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 15:27:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 774EC393E2
         for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 12:27:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1655926035;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Xf2w4YFMBo/KqjwPtBP8STHhW74PSmVHW8ZoSdl5DBs=;
-        b=N8qCoCy55iGa+j8ldeyMNZuBbpm8K1fXMXSgmpbccX/dber4yIRO4GbHvNzzIZvUYyPoCw
-        OSGZZGzNBylzVE2jYDV+66+Zys1NGzGgTcp8uyoy3u1UqBBxSXCimTe2o77Wb0qFJesCyl
-        CqKltdXit4uLFPygvYxmFTVpb9E+EaA=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UetEegWFrSI4DxaQkVqPZAaYbNMpqePnjSLMmI2uAtM=;
+        b=KTMEiSQQGbeiPdwYAPtBvHbhAuCH0sqaU/zAzJPHxby7aTRkPr4DzaVF4QbQKiI7r+0aaf
+        GfaFOKxqMEfJMIdRkapXFm44rTwXt1rC6MabmgovNWiW1gbveznQ0NeY9KWcCZDL8dkr0+
+        h+HZyY/Ohz+mGMFiNQw9wWLXfyfRpbk=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-473-gprVsIPsOwqRQYeDQd_oYA-1; Wed, 22 Jun 2022 15:27:12 -0400
-X-MC-Unique: gprVsIPsOwqRQYeDQd_oYA-1
+ us-mta-464-nl_lej8DNwCY7ROTjZCaaA-1; Wed, 22 Jun 2022 15:27:12 -0400
+X-MC-Unique: nl_lej8DNwCY7ROTjZCaaA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2E4E18001EA;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D5ED102F0C1;
         Wed, 22 Jun 2022 19:27:11 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B71791121315;
-        Wed, 22 Jun 2022 19:27:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 36C8B1121314;
+        Wed, 22 Jun 2022 19:27:11 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     maz@kernel.org, anup@brainfault.org, seanjc@google.com,
@@ -43,9 +44,11 @@ Cc:     maz@kernel.org, anup@brainfault.org, seanjc@google.com,
         kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
         kvm-riscv@lists.infradead.org, pfeiner@google.com,
         jiangshanlai@gmail.com, dmatlack@google.com
-Subject: [PATCH v7 00/23] KVM: Extend Eager Page Splitting to the shadow MMU
-Date:   Wed, 22 Jun 2022 15:26:47 -0400
-Message-Id: <20220622192710.2547152-1-pbonzini@redhat.com>
+Subject: [PATCH v7 01/23] KVM: x86/mmu: Optimize MMU page cache lookup for all direct SPs
+Date:   Wed, 22 Jun 2022 15:26:48 -0400
+Message-Id: <20220622192710.2547152-2-pbonzini@redhat.com>
+In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
+References: <20220622192710.2547152-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
@@ -60,70 +63,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For the description of the "why" of this patch, I'll just direct you to
-David's excellent cover letter from v6, which can be found at
-https://lore.kernel.org/r/20220516232138.1783324-1-dmatlack@google.com.
+From: David Matlack <dmatlack@google.com>
 
-This version mostly does the following:
+Commit fb58a9c345f6 ("KVM: x86/mmu: Optimize MMU page cache lookup for
+fully direct MMUs") skipped the unsync checks and write flood clearing
+for full direct MMUs. We can extend this further to skip the checks for
+all direct shadow pages. Direct shadow pages in indirect MMUs (i.e.
+shadow paging) are used when shadowing a guest huge page with smaller
+pages. Such direct shadow pages, like their counterparts in fully direct
+MMUs, are never marked unsynced or have a non-zero write-flooding count.
 
-- apply the feedback from Sean and other reviewers, which is mostly
-  aesthetic
+Checking sp->role.direct also generates better code than checking
+direct_map because, due to register pressure, direct_map has to get
+shoved onto the stack and then pulled back off.
 
-- replace the refactoring of drop_large_spte()/__drop_large_spte()
-  with my own version.  The insight there is that drop_large_spte()
-  is always followed by {,__}link_shadow_page(), so the call is
-  moved there
+No functional change intended.
 
-- split the TLB flush optimization into a separate patch, mostly
-  to perform the previous refactoring independent of the optional
-  TLB flush
+Reviewed-by: Lai Jiangshan <jiangshanlai@gmail.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+Message-Id: <20220516232138.1783324-2-dmatlack@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-- rename a few functions from *nested_mmu* to *shadow_mmu*
-
-David Matlack (21):
-  KVM: x86/mmu: Optimize MMU page cache lookup for all direct SPs
-  KVM: x86/mmu: Use a bool for direct
-  KVM: x86/mmu: Stop passing "direct" to mmu_alloc_root()
-  KVM: x86/mmu: Derive shadow MMU page role from parent
-  KVM: x86/mmu: Always pass 0 for @quadrant when gptes are 8 bytes
-  KVM: x86/mmu: Decompose kvm_mmu_get_page() into separate functions
-  KVM: x86/mmu: Consolidate shadow page allocation and initialization
-  KVM: x86/mmu: Rename shadow MMU functions that deal with shadow pages
-  KVM: x86/mmu: Move guest PT write-protection to account_shadowed()
-  KVM: x86/mmu: Pass memory caches to allocate SPs separately
-  KVM: x86/mmu: Replace vcpu with kvm in kvm_mmu_alloc_shadow_page()
-  KVM: x86/mmu: Pass kvm pointer separately from vcpu to
-    kvm_mmu_find_shadow_page()
-  KVM: x86/mmu: Allow NULL @vcpu in kvm_mmu_find_shadow_page()
-  KVM: x86/mmu: Pass const memslot to rmap_add()
-  KVM: x86/mmu: Decouple rmap_add() and link_shadow_page() from kvm_vcpu
-  KVM: x86/mmu: Update page stats in __rmap_add()
-  KVM: x86/mmu: Cache the access bits of shadowed translations
-  KVM: x86/mmu: Extend make_huge_page_split_spte() for the shadow MMU
-  KVM: x86/mmu: Zap collapsible SPTEs in shadow MMU at all possible
-    levels
-  KVM: Allow for different capacities in kvm_mmu_memory_cache structs
-  KVM: x86/mmu: Extend Eager Page Splitting to nested MMUs
-
-Paolo Bonzini (2):
-  KVM: x86/mmu: pull call to drop_large_spte() into __link_shadow_page()
-  KVM: x86/mmu: Avoid unnecessary flush on eager page split
-
- .../admin-guide/kernel-parameters.txt         |   3 +-
- arch/arm64/kvm/mmu.c                          |   2 +-
- arch/riscv/kvm/mmu.c                          |   5 +-
- arch/x86/include/asm/kvm_host.h               |  24 +-
- arch/x86/kvm/mmu/mmu.c                        | 719 ++++++++++++++----
- arch/x86/kvm/mmu/mmu_internal.h               |  17 +-
- arch/x86/kvm/mmu/paging_tmpl.h                |  43 +-
- arch/x86/kvm/mmu/spte.c                       |  15 +-
- arch/x86/kvm/mmu/spte.h                       |   4 +-
- arch/x86/kvm/mmu/tdp_mmu.c                    |   2 +-
- include/linux/kvm_host.h                      |   1 +
- include/linux/kvm_types.h                     |   6 +-
- virt/kvm/kvm_main.c                           |  33 +-
- 13 files changed, 666 insertions(+), 208 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 27b2a5603496..c0afb4f1c8ae 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2000,7 +2000,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 					     int direct,
+ 					     unsigned int access)
+ {
+-	bool direct_mmu = vcpu->arch.mmu->root_role.direct;
+ 	union kvm_mmu_page_role role;
+ 	struct hlist_head *sp_list;
+ 	unsigned quadrant;
+@@ -2060,7 +2059,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 			continue;
+ 		}
+ 
+-		if (direct_mmu)
++		/* unsync and write-flooding only apply to indirect SPs. */
++		if (sp->role.direct)
+ 			goto trace_get_page;
+ 
+ 		if (sp->unsync) {
 -- 
 2.31.1
+
 
