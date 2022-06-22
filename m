@@ -2,268 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73B9155510F
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 18:14:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03C7855512C
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 18:19:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376657AbiFVQOp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 12:14:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
+        id S1376420AbiFVQTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 12:19:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376691AbiFVQOi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 12:14:38 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EAFE3FBC7;
-        Wed, 22 Jun 2022 09:14:33 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id z11so18446366edp.9;
-        Wed, 22 Jun 2022 09:14:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9WjOZvdCTB7Ps/WBVZNvXm3V+edRGPvyOZ6QWomOwFM=;
-        b=WfgOYbVJi99Uf4aae+TXkvpjNJKzqWVk0BQ1VERy+oH7Pfj9aCh1r4AWEJV7vAk9sF
-         PrYGIBVOKz8sMGGphv4QbTK/ANi7pVovHNEd4YcI5/AVWSwI0baJR0HWqg1kZzSxVZec
-         0vxz0jmTXMPInL1/zUGD3zx4hmsXyJY7E+rOQDGUs9omkZU95aiiVdzj6X5ZkysLbnHR
-         il5bgk6NWjDE1RparFoBw/vNNc0CaKzEx4lTrMmHwuDH69KOXWVm/Q9pKTWztHlSRQsg
-         53MqsWzDsyqFXL99zpjSGKLx1TNY9swWSyXNdHZ3N7oKZKE4pFxLNS68Z0XW2F7geALv
-         y0rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9WjOZvdCTB7Ps/WBVZNvXm3V+edRGPvyOZ6QWomOwFM=;
-        b=39ra8fyOPudk3iWOTiRKNh/91fu/2IBN1NAnDVyHgx2Jvu4VTlW1TewEvzjzrYQyQD
-         OHRUpvYCF3oZXkDTN0s/3VOT6UUsqC/PufT8pKU9oIHqtCza4Jgu1UY/YCcUxHR0qH/P
-         8lO8SNwb5RhentbNNl/1OwipaOn6Xq/DNt1G2YERwGMyXZz/4agI/Hsf+XyWm88HMSji
-         EfqWef9LyITx+JXQT7YvEhS5BJgk6LA3kHUKTp+bLRMYvfBi0jly2s76sX0D5W50ZHPr
-         reyphGZulDZAFpt0XYiVoUoYaksyHhnCI5xxfR53GIZxF9LT2TV1tFlf3KiDSyNbHeQc
-         lUfQ==
-X-Gm-Message-State: AJIora9w7zyaV9LgFwAaJeA/0NE5y6Mhoi1iOiCzkOIut+badhd8LJzy
-        vG4lOAOtgQILU4S7mw1juh4=
-X-Google-Smtp-Source: AGRyM1sSylH7Bm+JBs0J+E6rc85AJHG7sjGCqKKXg6ib01R2aWpzXEOJ/VscmDq2T5u7SQzG9Q/ALQ==
-X-Received: by 2002:a05:6402:430f:b0:42e:2a86:abaf with SMTP id m15-20020a056402430f00b0042e2a86abafmr5027442edc.194.1655914471604;
-        Wed, 22 Jun 2022 09:14:31 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id kx8-20020a170907774800b006ff802baf5dsm9520007ejc.54.2022.06.22.09.13.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jun 2022 09:14:31 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <4665c87b-4983-7e15-9262-290d2969b10f@redhat.com>
-Date:   Wed, 22 Jun 2022 18:13:13 +0200
+        with ESMTP id S1357785AbiFVQTv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 12:19:51 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A1DF377CD;
+        Wed, 22 Jun 2022 09:19:50 -0700 (PDT)
+Received: from anrayabh-desk (unknown [167.220.238.193])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 0052420C5A6B;
+        Wed, 22 Jun 2022 09:19:44 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0052420C5A6B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1655914790;
+        bh=QyM2DYaybCkPPWyyb3Q8kmflv5XZZucB3whsOcU0eqU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KWhH0+nWRrf9uLKyqLX1yYWJx/qT696XIYu18PtMfS9d7ada3oBSeFhw6RGs+kANB
+         l9kS6up53vzpL8nWgzMRH0xO8fRk7cPV/W1blKh1LCFrbyMJaq5/VssqcTOW7J3/0x
+         sNFb2L+5O5yBWigzVk7bWeeZueFRJdSZXsVhRItw=
+Date:   Wed, 22 Jun 2022 21:49:40 +0530
+From:   Anirudh Rayabharam <anrayabh@linux.microsoft.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Ilias Stamatis <ilstam@amazon.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, mail@anirudhrb.com,
+        kumarpraveen@linux.microsoft.com, wei.liu@kernel.org,
+        robert.bradford@intel.com, liuwe@microsoft.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: Don't expose TSC scaling to L1 when on Hyper-V
+Message-ID: <YrNBHFLzAgcsw19O@anrayabh-desk>
+References: <20220613161611.3567556-1-anrayabh@linux.microsoft.com>
+ <592ab920-51f3-4794-331f-8737e1f5b20a@redhat.com>
+ <YqdsjW4/zsYaJahf@google.com>
+ <YqipLpHI24NdhgJO@anrayabh-desk>
+ <YqiwoOP4HX2LniI4@google.com>
+ <87zgi5xh42.fsf@redhat.com>
+ <YrMenI1mTbqA9MaR@anrayabh-desk>
+ <87r13gyde8.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v6 20/22] KVM: x86/mmu: Refactor drop_large_spte()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-References: <20220516232138.1783324-1-dmatlack@google.com>
- <20220516232138.1783324-21-dmatlack@google.com> <Yqy1v59ZDJ7EkCix@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yqy1v59ZDJ7EkCix@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r13gyde8.fsf@redhat.com>
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/17/22 19:11, Sean Christopherson wrote:
-> since the shortlog is already
-> a somewhat vague "do a refactor", I vote to opportunistically:
+On Wed, Jun 22, 2022 at 04:35:27PM +0200, Vitaly Kuznetsov wrote:
+> Anirudh Rayabharam <anrayabh@linux.microsoft.com> writes:
 > 
->    - rename drop_large_spte() to drop_spte_if_huge()
->    - rename __drop_large_spte() to drop_huge_spte()
->    - move "if (!is_large_pte(*sptep))" to drop_spte_if_huge() since the split path
->      should never pass in a non-huge SPTE.
+> > On Wed, Jun 22, 2022 at 10:00:29AM +0200, Vitaly Kuznetsov wrote:
+> >> Sean Christopherson <seanjc@google.com> writes:
+> >> 
+> >> > On Tue, Jun 14, 2022, Anirudh Rayabharam wrote:
+> >> >> On Mon, Jun 13, 2022 at 04:57:49PM +0000, Sean Christopherson wrote:
+> >> 
+> >> ...
+> >> 
+> >> >> > 
+> >> >> > Any reason not to use the already sanitized vmcs_config?  I can't think of any
+> >> >> > reason why the nested path should blindly use the raw MSR values from hardware.
+> >> >> 
+> >> >> vmcs_config has the sanitized exec controls. But how do we construct MSR
+> >> >> values using them?
+> >> >
+> >> > I was thinking we could use the sanitized controls for the allowed-1 bits, and then
+> >> > take the required-1 bits from the CPU.  And then if we wanted to avoid the redundant
+> >> > RDMSRs in a follow-up patch we could add required-1 fields to vmcs_config.
+> >> >
+> >> > Hastily constructed and compile-tested only, proceed with caution :-)
+> >> 
+> >> Independently from "[PATCH 00/11] KVM: VMX: Support TscScaling and
+> >> EnclsExitingBitmap whith eVMCS" which is supposed to fix the particular
+> >> TSC scaling issue, I like the idea to make nested_vmx_setup_ctls_msrs()
+> >> use both allowed-1 and required-1 bits from vmcs_config. I'll pick up
+> >> the suggested patch and try to construct something for required-1 bits.
+> >
+> > I tried this patch today but it causes some regression which causes
+> > /dev/kvm to be unavailable in L1. I didn't get a chance to look into it
+> > closely but I am guessing it has something to do with the fact that
+> > vmcs_config reflects the config that L0 chose to use rather than what is
+> > available to use. So constructing allowed-1 MSR bits based on what bits
+> > are set in exec controls maybe isn't correct.
 > 
-> That last point will also clean up an oddity with with "flush" parameter; given
-> the command-like name of "flush", it's a bit weird that __drop_large_spte() doesn't
-> flush when the SPTE is large.
+> I've tried to pick it up but it's actually much harder than I think. The
+> patch has some minor issues ('&vmcs_config.nested' needs to be switched
+> to '&vmcs_conf->nested' in nested_vmx_setup_ctls_msrs()), but the main
+> problem is that the set of controls nested_vmx_setup_ctls_msrs() needs
+> is NOT a subset of vmcs_config (setup_vmcs_config()). I was able to
+> identify at least:
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 5e14e4c40007..8076352174ad 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2483,8 +2483,14 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>               CPU_BASED_INVLPG_EXITING |
+>               CPU_BASED_RDPMC_EXITING;
+>  
+> -       opt = CPU_BASED_TPR_SHADOW |
+> +       opt = CPU_BASED_INTR_WINDOW_EXITING |
+> +             CPU_BASED_NMI_WINDOW_EXITING |
+> +             CPU_BASED_TPR_SHADOW |
+> +             CPU_BASED_USE_IO_BITMAPS |
+>               CPU_BASED_USE_MSR_BITMAPS |
+> +             CPU_BASED_MONITOR_TRAP_FLAG |
+> +             CPU_BASED_RDTSC_EXITING |
+> +             CPU_BASED_PAUSE_EXITING |
+>               CPU_BASED_ACTIVATE_SECONDARY_CONTROLS |
+>               CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
+>         if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_PROCBASED_CTLS,
+> @@ -2582,6 +2588,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>  #endif
+>         opt = VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+>               VM_EXIT_LOAD_IA32_PAT |
+> +             VM_EXIT_SAVE_IA32_PAT |
+>               VM_EXIT_LOAD_IA32_EFER |
+>               VM_EXIT_CLEAR_BNDCFGS |
+>               VM_EXIT_PT_CONCEAL_PIP |
+> @@ -2604,7 +2611,11 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>                 _pin_based_exec_control &= ~PIN_BASED_POSTED_INTR;
+>  
+>         min = VM_ENTRY_LOAD_DEBUG_CONTROLS;
+> -       opt = VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+> +       opt =
+> +#ifdef CONFIG_X86_64
+> +             VM_ENTRY_IA32E_MODE |
+> +#endif
+> +             VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+>               VM_ENTRY_LOAD_IA32_PAT |
+>               VM_ENTRY_LOAD_IA32_EFER |
+>               VM_ENTRY_LOAD_BNDCFGS |
+> 
+> but it is 1) not sufficient because some controls are smartly filtered
+> out just because we don't want them for L1 -- and this doesn't mean that
+> L2 doesn't need them and 2) because if we add some 'opt' controls to
+> setup_vmcs_config() we need to filter them out somewhere else.
+> 
+> I'm starting to think we may just want to store raw VMX MSR values in
+> vmcs_config first, then sanitize them (eVMCS, vmx preemtoion timer bug,
+> perf_ctrl bug,..) and then do the adjust_vmx_controls() magic. 
+> 
+> I'm not giving up yet but don't expect something small and backportable
+> to stable :-) 
 
-Even better, drop_large_spte() is always called right before 
-kvm_mmu_get_child_sp(), so:
+How about we do something simple like the patch below to start with?
+This will easily apply to stable and we can continue improving upon
+it with follow up patches on mainline.
 
- From 86a9490972a1e959a4df114678719494b5475720 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 22 Jun 2022 12:11:44 -0400
-Subject: [PATCH] KVM: MMU: pull drop_large_spte into kvm_mmu_get_child_sp
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index f5cb18e00e78..f88d748c7cc6 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -6564,6 +6564,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 		msrs->pinbased_ctls_high);
+ 	msrs->pinbased_ctls_low |=
+ 		PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR;
++#if IS_ENABLED(CONFIG_HYPERV)
++	if (static_branch_unlikely(&enable_evmcs))
++		msrs->pinbased_ctls_high &= ~EVMCS1_UNSUPPORTED_PINCTRL;
++#endif
+ 	msrs->pinbased_ctls_high &=
+ 		PIN_BASED_EXT_INTR_MASK |
+ 		PIN_BASED_NMI_EXITING |
+@@ -6580,6 +6584,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 	msrs->exit_ctls_low =
+ 		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR;
+ 
++#if IS_ENABLED(CONFIG_HYPERV)
++	if (static_branch_unlikely(&enable_evmcs))
++		msrs->exit_ctls_high &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
++#endif
+ 	msrs->exit_ctls_high &=
+ #ifdef CONFIG_X86_64
+ 		VM_EXIT_HOST_ADDR_SPACE_SIZE |
+@@ -6600,6 +6608,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 		msrs->entry_ctls_high);
+ 	msrs->entry_ctls_low =
+ 		VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR;
++#if IS_ENABLED(CONFIG_HYPERV)
++	if (static_branch_unlikely(&enable_evmcs))
++		msrs->entry_ctls_high &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
++#endif
+ 	msrs->entry_ctls_high &=
+ #ifdef CONFIG_X86_64
+ 		VM_ENTRY_IA32E_MODE |
+@@ -6657,6 +6669,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 		      msrs->secondary_ctls_high);
+ 
+ 	msrs->secondary_ctls_low = 0;
++#if IS_ENABLED(CONFIG_HYPERV)
++	if (static_branch_unlikely(&enable_evmcs))
++		msrs->secondary_ctls_high &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
++#endif
+ 	msrs->secondary_ctls_high &=
+ 		SECONDARY_EXEC_DESC |
+ 		SECONDARY_EXEC_ENABLE_RDTSCP |
 
-Before allocating a child shadow page table, all callers need to
-check whether the parent already points to a huge page and, if so,
-drop it.  This is done by drop_large_spte(), but it can be moved
-to kvm_mmu_get_child_sp().
-
-To ensure that the shadow page is not linked twice if it was
-present, do _not_ opportunistically make kvm_mmu_get_child_sp()
-idempotent: instead, return an error value if the shadow page
-already existed.  This is a bit more verbose, but clearer than
-NULL.
-
-Now that the drop_large_spte() name is not taken anymore,
-remove the two underscores in front of __drop_large_spte().
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 36bc49f08d60..7f52870ee062 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1135,26 +1135,16 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
-  		rmap_remove(kvm, sptep);
-  }
-
--
--static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
-+static void drop_large_spte(struct kvm *kvm, u64 *sptep)
-  {
--	if (is_large_pte(*sptep)) {
--		WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
--		drop_spte(kvm, sptep);
--		return true;
--	}
--
--	return false;
--}
-+	struct kvm_mmu_page *sp;
-
--static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
--{
--	if (__drop_large_spte(vcpu->kvm, sptep)) {
--		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-+	sp = sptep_to_sp(sptep);
-+	WARN_ON(sp->role.level == PG_LEVEL_4K);
-
--		kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
-+	drop_spte(kvm, sptep);
-+	kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-  			KVM_PAGES_PER_HPAGE(sp->role.level));
--	}
-  }
-
-  /*
-@@ -2221,6 +2211,13 @@ static struct kvm_mmu_page 
-*kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
-  {
-  	union kvm_mmu_page_role role;
-
-+	if (is_shadow_present_pte(*sptep)) {
-+		if (!is_large_pte(*sptep))
-+			return ERR_PTR(-EEXIST);
-+
-+		drop_large_spte(vcpu->kvm, sptep, true);
-+	}
-+
-  	role = kvm_mmu_child_role(sptep, direct, access);
-  	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
-  }
-@@ -3080,11 +3077,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, 
-struct kvm_page_fault *fault)
-  		if (it.level == fault->goal_level)
-  			break;
-
--		drop_large_spte(vcpu, it.sptep);
--		if (is_shadow_present_pte(*it.sptep))
--			continue;
--
-  		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn, true, ACC_ALL);
-+		if (sp == ERR_PTR(-EEXIST))
-+			continue;
-
-  		link_shadow_page(vcpu, it.sptep, sp);
-  		if (fault->is_tdp && fault->huge_page_disallowed &&
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 24f292f3f93f..2448fa8d8438 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -648,15 +648,13 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, 
-struct kvm_page_fault *fault,
-  		gfn_t table_gfn;
-
-  		clear_sp_write_flooding_count(it.sptep);
--		drop_large_spte(vcpu, it.sptep);
-
--		sp = NULL;
--		if (!is_shadow_present_pte(*it.sptep)) {
--			table_gfn = gw->table_gfn[it.level - 2];
--			access = gw->pt_access[it.level - 2];
--			sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
--						  false, access);
-+		table_gfn = gw->table_gfn[it.level - 2];
-+		access = gw->pt_access[it.level - 2];
-+		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
-+					  false, access);
-
-+		if (sp != ERR_PTR(-EEXIST)) {
-  			/*
-  			 * We must synchronize the pagetable before linking it
-  			 * because the guest doesn't need to flush tlb when
-@@ -685,7 +683,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, 
-struct kvm_page_fault *fault,
-  		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
-  			goto out_gpte_changed;
-
--		if (sp)
-+		if (sp != ERR_PTR(-EEXIST))
-  			link_shadow_page(vcpu, it.sptep, sp);
-  	}
-
-@@ -709,16 +707,15 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, 
-struct kvm_page_fault *fault,
-
-  		validate_direct_spte(vcpu, it.sptep, direct_access);
-
--		drop_large_spte(vcpu, it.sptep);
-+		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
-+					  true, direct_access);
-+		if (sp == ERR_PTR(-EEXIST))
-+			continue;
-
--		if (!is_shadow_present_pte(*it.sptep)) {
--			sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
--						  true, direct_access);
--			link_shadow_page(vcpu, it.sptep, sp);
--			if (fault->huge_page_disallowed &&
--			    fault->req_level >= it.level)
--				account_huge_nx_page(vcpu->kvm, sp);
--		}
-+		link_shadow_page(vcpu, it.sptep, sp);
-+		if (fault->huge_page_disallowed &&
-+		    fault->req_level >= it.level)
-+			account_huge_nx_page(vcpu->kvm, sp);
-  	}
-
-  	if (WARN_ON_ONCE(it.level != fault->goal_level))
-
-with the obvious patch on top to add the flush argument.
-
-The ERR_PTR(-EEXIST) is a bit heavy, but at least conveys what's going 
-on.  Thoughts?
-
-Paolo
