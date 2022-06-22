@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E04355548A
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 21:34:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C74E0555473
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 21:34:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358916AbiFVT2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 15:28:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33564 "EHLO
+        id S1358548AbiFVT25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 15:28:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357889AbiFVT13 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1358088AbiFVT13 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 22 Jun 2022 15:27:29 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2A86E403C5
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 12:27:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 900DB403C9
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 12:27:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655926043;
+        s=mimecast20190719; t=1655926045;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kNVgldTyS3PJ4ZE/gPt64ZM9nAJ1HaJiWQT9cl6zZ/E=;
-        b=H6YGAVDqSGeE2Mt11e62N1GgCe8351xDhQ7wBsPN/HDRm98VDVl578e+BePqjnTtcTodbv
-        ySYQxiTLGYDmXOa4E9Yv4E1NXzbPr0i270QQ/7Jsqm20NgafIlKYtmR2uZO2TjPn6FB6KJ
-        A+yOa2CTf11tUwv18j4iKld1ZM2MlWk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=XL5TvaCYgfHnPsXIXEP6b8H0e4uXwxl6eHG7sOhlYAE=;
+        b=O9BXxnlUkx5hMOA0ISU5StNWdO3mlacgqUiW+cLA18v+bnyTsd1XMYg9C0RTmZ7GMRysqX
+        Mf1lQWWl+LuGgfm8o3ueVMQm5SUSlm+k+OwhNGI37Th3I7FN6DQjO7C5Ej0j3oxtlsiBV1
+        DXOeDJQk8/30tEGWWqcwgvXPObiYI5g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-225-L5sKVtqpMq2Y7SR5QPPQDw-1; Wed, 22 Jun 2022 15:27:20 -0400
-X-MC-Unique: L5sKVtqpMq2Y7SR5QPPQDw-1
+ us-mta-41-dwIiCJ6LPw64x1HjDYIHng-1; Wed, 22 Jun 2022 15:27:20 -0400
+X-MC-Unique: dwIiCJ6LPw64x1HjDYIHng-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 304EE811E75;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F2253810780;
         Wed, 22 Jun 2022 19:27:19 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CCD551121314;
-        Wed, 22 Jun 2022 19:27:18 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 388621121314;
+        Wed, 22 Jun 2022 19:27:19 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     maz@kernel.org, anup@brainfault.org, seanjc@google.com,
@@ -44,9 +44,9 @@ Cc:     maz@kernel.org, anup@brainfault.org, seanjc@google.com,
         kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
         kvm-riscv@lists.infradead.org, pfeiner@google.com,
         jiangshanlai@gmail.com, dmatlack@google.com
-Subject: [PATCH v7 20/23] KVM: x86/mmu: pull call to drop_large_spte() into __link_shadow_page()
-Date:   Wed, 22 Jun 2022 15:27:07 -0400
-Message-Id: <20220622192710.2547152-21-pbonzini@redhat.com>
+Subject: [PATCH v7 21/23] KVM: Allow for different capacities in kvm_mmu_memory_cache structs
+Date:   Wed, 22 Jun 2022 15:27:08 -0400
+Message-Id: <20220622192710.2547152-22-pbonzini@redhat.com>
 In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
 References: <20220622192710.2547152-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -63,182 +63,168 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before allocating a child shadow page table, all callers check
-whether the parent already points to a huge page and, if so, they
-drop that SPTE.  This is done by drop_large_spte().
+From: David Matlack <dmatlack@google.com>
 
-However, the act that requires dropping the large SPTE is the
-installation of the sp that is returned by kvm_mmu_get_child_sp(),
-which happens in __link_shadow_page().  Move the call there
-instead of having it in each and every caller.
+Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
+declaration time rather than being fixed for all declarations. This will
+be used in a follow-up commit to declare an cache in x86 with a capacity
+of 512+ objects without having to increase the capacity of all caches in
+KVM.
 
-To ensure that the shadow page is not linked twice if it was
-present, do _not_ opportunistically make kvm_mmu_get_child_sp()
-idempotent: instead, return an error value if the shadow page
-already existed.  This is a bit more verbose, but clearer than
-NULL.
+This change requires each cache now specify its capacity at runtime,
+since the cache struct itself no longer has a fixed capacity known at
+compile time. To protect against someone accidentally defining a
+kvm_mmu_memory_cache struct directly (without the extra storage), this
+commit includes a WARN_ON() in kvm_mmu_topup_memory_cache().
 
-Now that the drop_large_spte() name is not taken anymore,
-remove the two underscores in front of __drop_large_spte().
+In order to support different capacities, this commit changes the
+objects pointer array to be dynamically allocated the first time the
+cache is topped-up.
 
+While here, opportunistically clean up the stack-allocated
+kvm_mmu_memory_cache structs in riscv and arm64 to use designated
+initializers.
+
+No functional change intended.
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: David Matlack <dmatlack@google.com>
+Message-Id: <20220516232138.1783324-22-dmatlack@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 43 +++++++++++++++++-----------------
- arch/x86/kvm/mmu/paging_tmpl.h | 31 +++++++++++-------------
- 2 files changed, 35 insertions(+), 39 deletions(-)
+ arch/arm64/kvm/mmu.c      |  2 +-
+ arch/riscv/kvm/mmu.c      |  5 +----
+ include/linux/kvm_host.h  |  1 +
+ include/linux/kvm_types.h |  6 +++++-
+ virt/kvm/kvm_main.c       | 33 ++++++++++++++++++++++++++++++---
+ 5 files changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 36bc49f08d60..bf1ae5ebf41b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1135,26 +1135,16 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
- 		rmap_remove(kvm, sptep);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index f5651a05b6a8..87f1cd0df36e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -786,7 +786,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ {
+ 	phys_addr_t addr;
+ 	int ret = 0;
+-	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
++	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+ 	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+ 				     KVM_PGTABLE_PROT_R |
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 1c00695ebee7..081f8d2b9cf3 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -350,10 +350,7 @@ static int gstage_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
+ 	int ret = 0;
+ 	unsigned long pfn;
+ 	phys_addr_t addr, end;
+-	struct kvm_mmu_memory_cache pcache;
+-
+-	memset(&pcache, 0, sizeof(pcache));
+-	pcache.gfp_zero = __GFP_ZERO;
++	struct kvm_mmu_memory_cache pcache = { .gfp_zero = __GFP_ZERO };
+ 
+ 	end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+ 	pfn = __phys_to_pfn(hpa);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index a2bbdf3ab086..3554e48406e4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1356,6 +1356,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm);
+ 
+ #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
++int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min);
+ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
+ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index f328a01db4fe..4d933518060f 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -85,12 +85,16 @@ struct gfn_to_pfn_cache {
+  * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
+  * holding MMU locks.  Note, these caches act more like prefetch buffers than
+  * classical caches, i.e. objects are not returned to the cache on being freed.
++ *
++ * The @capacity field and @objects array are lazily initialized when the cache
++ * is topped up (__kvm_mmu_topup_memory_cache()).
+  */
+ struct kvm_mmu_memory_cache {
+ 	int nobjs;
+ 	gfp_t gfp_zero;
+ 	struct kmem_cache *kmem_cache;
+-	void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
++	int capacity;
++	void **objects;
+ };
+ #endif
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5b8ae83e09d7..45188d11812c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -396,14 +396,31 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+ 		return (void *)__get_free_page(gfp_flags);
  }
  
--
--static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
-+static void drop_large_spte(struct kvm *kvm, u64 *sptep)
+-int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
++int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
  {
--	if (is_large_pte(*sptep)) {
--		WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
--		drop_spte(kvm, sptep);
--		return true;
--	}
--
--	return false;
--}
-+	struct kvm_mmu_page *sp;
++	gfp_t gfp = GFP_KERNEL_ACCOUNT;
+ 	void *obj;
  
--static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
--{
--	if (__drop_large_spte(vcpu->kvm, sptep)) {
--		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-+	sp = sptep_to_sp(sptep);
-+	WARN_ON(sp->role.level == PG_LEVEL_4K);
- 
--		kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
-+	drop_spte(kvm, sptep);
-+	kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
- 			KVM_PAGES_PER_HPAGE(sp->role.level));
--	}
- }
- 
- /*
-@@ -2221,6 +2211,9 @@ static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
- {
- 	union kvm_mmu_page_role role;
- 
-+	if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep))
-+		return ERR_PTR(-EEXIST);
+ 	if (mc->nobjs >= min)
+ 		return 0;
+-	while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+-		obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
 +
- 	role = kvm_mmu_child_role(sptep, direct, access);
- 	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
- }
-@@ -2288,13 +2281,21 @@ static void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
- 	__shadow_walk_next(iterator, *iterator->sptep);
- }
- 
--static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
-+static void __link_shadow_page(struct kvm *kvm,
-+			       struct kvm_mmu_memory_cache *cache, u64 *sptep,
- 			       struct kvm_mmu_page *sp)
- {
- 	u64 spte;
- 
- 	BUILD_BUG_ON(VMX_EPT_WRITABLE_MASK != PT_WRITABLE_MASK);
- 
-+	/*
-+	 * If an SPTE is present already, it must be a leaf and therefore
-+	 * a large one.  Drop it and flush the TLB before installing sp.
-+	 */
-+	if (is_shadow_present_pte(*sptep))
-+		drop_large_spte(kvm, sptep);
++	if (unlikely(!mc->objects)) {
++		if (WARN_ON_ONCE(!capacity))
++			return -EIO;
 +
- 	spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
- 
- 	mmu_spte_set(sptep, spte);
-@@ -2308,7 +2309,7 @@ static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
- static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
- 			     struct kvm_mmu_page *sp)
- {
--	__link_shadow_page(&vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
-+	__link_shadow_page(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
++		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
++		if (!mc->objects)
++			return -ENOMEM;
++
++		mc->capacity = capacity;
++	}
++
++	/* It is illegal to request a different capacity across topups. */
++	if (WARN_ON_ONCE(mc->capacity != capacity))
++		return -EIO;
++
++	while (mc->nobjs < mc->capacity) {
++		obj = mmu_memory_cache_alloc_obj(mc, gfp);
+ 		if (!obj)
+ 			return mc->nobjs >= min ? 0 : -ENOMEM;
+ 		mc->objects[mc->nobjs++] = obj;
+@@ -411,6 +428,11 @@ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+ 	return 0;
  }
  
- static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-@@ -3080,11 +3081,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		if (it.level == fault->goal_level)
- 			break;
- 
--		drop_large_spte(vcpu, it.sptep);
--		if (is_shadow_present_pte(*it.sptep))
--			continue;
--
- 		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn, true, ACC_ALL);
-+		if (sp == ERR_PTR(-EEXIST))
-+			continue;
- 
- 		link_shadow_page(vcpu, it.sptep, sp);
- 		if (fault->is_tdp && fault->huge_page_disallowed &&
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 24f292f3f93f..2448fa8d8438 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -648,15 +648,13 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 		gfn_t table_gfn;
- 
- 		clear_sp_write_flooding_count(it.sptep);
--		drop_large_spte(vcpu, it.sptep);
- 
--		sp = NULL;
--		if (!is_shadow_present_pte(*it.sptep)) {
--			table_gfn = gw->table_gfn[it.level - 2];
--			access = gw->pt_access[it.level - 2];
--			sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
--						  false, access);
-+		table_gfn = gw->table_gfn[it.level - 2];
-+		access = gw->pt_access[it.level - 2];
-+		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
-+					  false, access);
- 
-+		if (sp != ERR_PTR(-EEXIST)) {
- 			/*
- 			 * We must synchronize the pagetable before linking it
- 			 * because the guest doesn't need to flush tlb when
-@@ -685,7 +683,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
- 			goto out_gpte_changed;
- 
--		if (sp)
-+		if (sp != ERR_PTR(-EEXIST))
- 			link_shadow_page(vcpu, it.sptep, sp);
++int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
++{
++	return __kvm_mmu_topup_memory_cache(mc, KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, min);
++}
++
+ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc)
+ {
+ 	return mc->nobjs;
+@@ -424,6 +446,11 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+ 		else
+ 			free_page((unsigned long)mc->objects[--mc->nobjs]);
  	}
++
++	kvfree(mc->objects);
++
++	mc->objects = NULL;
++	mc->capacity = 0;
+ }
  
-@@ -709,16 +707,15 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 
- 		validate_direct_spte(vcpu, it.sptep, direct_access);
- 
--		drop_large_spte(vcpu, it.sptep);
-+		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
-+					  true, direct_access);
-+		if (sp == ERR_PTR(-EEXIST))
-+			continue;
- 
--		if (!is_shadow_present_pte(*it.sptep)) {
--			sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
--						  true, direct_access);
--			link_shadow_page(vcpu, it.sptep, sp);
--			if (fault->huge_page_disallowed &&
--			    fault->req_level >= it.level)
--				account_huge_nx_page(vcpu->kvm, sp);
--		}
-+		link_shadow_page(vcpu, it.sptep, sp);
-+		if (fault->huge_page_disallowed &&
-+		    fault->req_level >= it.level)
-+			account_huge_nx_page(vcpu->kvm, sp);
- 	}
- 
- 	if (WARN_ON_ONCE(it.level != fault->goal_level))
+ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
 -- 
 2.31.1
 
