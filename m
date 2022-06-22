@@ -2,222 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 603C6554EEB
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 17:18:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52706554EFA
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 17:20:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359360AbiFVPSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 11:18:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52334 "EHLO
+        id S1359193AbiFVPU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 11:20:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359225AbiFVPSR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 11:18:17 -0400
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E61902EA27;
-        Wed, 22 Jun 2022 08:18:15 -0700 (PDT)
-Received: from xenbits.xenproject.org ([104.239.192.120])
-        by mail.xenproject.org with esmtp (Exim 4.92)
-        (envelope-from <pdurrant@amazon.com>)
-        id 1o4275-00079R-O5; Wed, 22 Jun 2022 15:17:51 +0000
-Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=debian.cbg12.amazon.com)
-        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <pdurrant@amazon.com>)
-        id 1o4275-0003bJ-DQ; Wed, 22 Jun 2022 15:17:51 +0000
-From:   Paul Durrant <pdurrant@amazon.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v4] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
-Date:   Wed, 22 Jun 2022 16:17:28 +0100
-Message-Id: <20220622151728.13622-1-pdurrant@amazon.com>
-X-Mailer: git-send-email 2.20.1
+        with ESMTP id S1358961AbiFVPU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 11:20:26 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC573D1C9
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 08:20:24 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25MEpCus018405;
+        Wed, 22 Jun 2022 15:20:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2ZoQbI22i2XTHQYUksNJTgcFuYfkMb40kwjOpxt8NF8=;
+ b=H+CQ81R4In6aPzmjmmdp8V8+QxpMYRfOoR/platbSHR1QYMaakg48UQDF2/6w93vsjUT
+ LvCK6WrS0D8qc6QY7jzq3APUr2oFarVCLkLEpL1IElV9DUiv4Jm4zhiZqAcXwYN/Zi0Y
+ rMsxCrudLciKy0l4iUOYaWytQY8CkxVKhsnoMMt9ZS1bgQr2PFcZgfpRPVYOdYA1AmMG
+ nZL7EGOS0Ri0XHtC2tMxa7/fc/q1ZULbIvCPmNkDGAHMOBOS0O5JQQ1oHCkp1e1ZCLWW
+ V3088FOqZGxKo8bPh6uqpJFJ/lje4E3RXtTfNlHvY6wjUJva2RMBEkgRn61z86G8J74W Wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gv56x8ujd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jun 2022 15:20:18 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25MEq5L6020754;
+        Wed, 22 Jun 2022 15:20:18 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gv56x8uhu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jun 2022 15:20:18 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25MFK3dK018870;
+        Wed, 22 Jun 2022 15:20:17 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma02dal.us.ibm.com with ESMTP id 3gt009bvba-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jun 2022 15:20:17 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25MFKGD310486042
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Jun 2022 15:20:16 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 183F07805F;
+        Wed, 22 Jun 2022 15:20:16 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C10A578063;
+        Wed, 22 Jun 2022 15:20:14 +0000 (GMT)
+Received: from [9.211.143.38] (unknown [9.211.143.38])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Jun 2022 15:20:14 +0000 (GMT)
+Message-ID: <12e29f2a-8641-7ba0-0dc4-1a7f97a7ca49@linux.ibm.com>
+Date:   Wed, 22 Jun 2022 11:20:14 -0400
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v7 3/8] s390x/pci: enable for load/store intepretation
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220606203614.110928-1-mjrosato@linux.ibm.com>
+ <20220606203614.110928-4-mjrosato@linux.ibm.com>
+ <ea3daac0-875d-dd9d-7ad0-65a0aed2aaed@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <ea3daac0-875d-dd9d-7ad0-65a0aed2aaed@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_ADSP_ALL,
-        RCVD_IN_DNSWL_MED,SPF_FAIL,SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: QeFyy9oNksTkeSBmzxn4EuUBZJKqBpV1
+X-Proofpoint-GUID: l9Bi08vowIQ1SDmeaAo4Qo2mQVufqj96
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-22_04,2022-06-22_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 clxscore=1011 impostorscore=0 mlxlogscore=999 bulkscore=0
+ lowpriorityscore=0 adultscore=0 mlxscore=0 phishscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206220075
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The scaling information in subleaf 1 should match the values set by KVM in
-the 'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info)
-which is shared with the guest, but is not directly available to the VMM.
-The offset values are not set since a TSC offset is already applied.
-The TSC frequency should also be set in sub-leaf 2.
+On 6/22/22 4:35 AM, Pierre Morel wrote:
+> 
+> 
+> On 6/6/22 22:36, Matthew Rosato wrote:
+>> If the ZPCI_OP ioctl reports that is is available and usable, then the
+>> underlying KVM host will enable load/store intepretation for any guest
+>> device without a SHM bit in the guest function handle.  For a device that
+>> will be using interpretation support, ensure the guest function handle
+>> matches the host function handle; this value is re-checked every time the
+>> guest issues a SET PCI FN to enable the guest device as it is the only
+>> opportunity to reflect function handle changes.
+>>
+>> By default, unless interpret=off is specified, interpretation support 
+>> will
+>> always be assumed and exploited if the necessary ioctl and features are
+>> available on the host kernel.  When these are unavailable, we will 
+>> silently
+>> revert to the interception model; this allows existing guest 
+>> configurations
+>> to work unmodified on hosts with and without zPCI interpretation support,
+>> allowing QEMU to choose the best support model available.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   hw/s390x/meson.build            |  1 +
+>>   hw/s390x/s390-pci-bus.c         | 66 ++++++++++++++++++++++++++++++++-
+>>   hw/s390x/s390-pci-inst.c        | 16 ++++++++
+>>   hw/s390x/s390-pci-kvm.c         | 22 +++++++++++
+>>   include/hw/s390x/s390-pci-bus.h |  1 +
+>>   include/hw/s390x/s390-pci-kvm.h | 24 ++++++++++++
+>>   target/s390x/kvm/kvm.c          |  7 ++++
+>>   target/s390x/kvm/kvm_s390x.h    |  1 +
+>>   8 files changed, 137 insertions(+), 1 deletion(-)
+>>   create mode 100644 hw/s390x/s390-pci-kvm.c
+>>   create mode 100644 include/hw/s390x/s390-pci-kvm.h
+>>
+>> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+>> index feefe0717e..f291016fee 100644
+>> --- a/hw/s390x/meson.build
+>> +++ b/hw/s390x/meson.build
+>> @@ -23,6 +23,7 @@ s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
+>>     's390-skeys-kvm.c',
+>>     's390-stattrib-kvm.c',
+>>     'pv.c',
+>> +  's390-pci-kvm.c',
+>>   ))
+> 
+> Here...
+> 
+>> diff --git a/hw/s390x/s390-pci-kvm.c b/hw/s390x/s390-pci-kvm.c
+>> new file mode 100644
+>> index 0000000000..0f16104a74
+>> --- /dev/null
+>> +++ b/hw/s390x/s390-pci-kvm.c
+> 
+> ...and here:
+> 
+> Shouldn't this file go in target/s390x/kvm ?
+> 
+> 
 
-Cache pointers to the sub-leaves when CPUID is updated by the VMM and
-populate the relevant information prior to entering the guest.
+I wasn't sure tbh, there seems to be precedent to use hw/s390x already 
+today for kvm-specific pieces of hardware support (e.g. tod, skeys, pv, 
+stattrib) whereas target/s390x/kvm has only kvm.c?
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: David Woodhouse <dwmw2@infradead.org>
+Anyone else have an opinion on this one?
 
-v2:
- - Make sure sub-leaf pointers are NULLed if the time leaf is removed
-
-v3:
- - Add leaf limit check in kvm_xen_set_cpuid()
-
-v4:
- - Update commit comment
----
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/cpuid.c            |  2 ++
- arch/x86/kvm/x86.c              |  1 +
- arch/x86/kvm/xen.c              | 49 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/xen.h              | 10 +++++++
- 5 files changed, 64 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1038ccb7056a..f77a4940542f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -638,6 +638,8 @@ struct kvm_vcpu_xen {
- 	struct hrtimer timer;
- 	int poll_evtchn;
- 	struct timer_list poll_timer;
-+	struct kvm_cpuid_entry2 *tsc_info_1;
-+	struct kvm_cpuid_entry2 *tsc_info_2;
- };
- 
- struct kvm_vcpu_arch {
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index d47222ab8e6e..eb6cd88c974a 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -25,6 +25,7 @@
- #include "mmu.h"
- #include "trace.h"
- #include "pmu.h"
-+#include "xen.h"
- 
- /*
-  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
-@@ -310,6 +311,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
- 
- 	kvm_hv_set_cpuid(vcpu);
-+	kvm_xen_set_cpuid(vcpu);
- 
- 	/* Invoke the vendor callback only after the above state is updated. */
- 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 00e23dc518e0..8b45f9975e45 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3123,6 +3123,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 	if (vcpu->xen.vcpu_time_info_cache.active)
- 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
- 	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
-+	kvm_xen_setup_tsc_info(v);
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 610beba35907..08e65ec6c793 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -10,6 +10,9 @@
- #include "xen.h"
- #include "hyperv.h"
- #include "lapic.h"
-+#include "cpuid.h"
-+
-+#include <asm/xen/cpuid.h>
- 
- #include <linux/eventfd.h>
- #include <linux/kvm_host.h>
-@@ -1855,3 +1858,49 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
- 	if (kvm->arch.xen_hvm_config.msr)
- 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
- }
-+
-+void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	u32 base = 0;
-+	u32 limit;
-+	u32 function;
-+
-+	vcpu->arch.xen.tsc_info_1 = NULL;
-+	vcpu->arch.xen.tsc_info_2 = NULL;
-+
-+	for_each_possible_hypervisor_cpuid_base(function) {
-+		struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
-+
-+		if (entry &&
-+		    entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
-+		    entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
-+		    entry->edx == XEN_CPUID_SIGNATURE_EDX) {
-+			base = function;
-+			limit = entry->eax;
-+			break;
-+		}
-+	}
-+	if (!base)
-+		return;
-+
-+	function = base | XEN_CPUID_LEAF(3);
-+	if (function > limit)
-+		return;
-+
-+	vcpu->arch.xen.tsc_info_1 = kvm_find_cpuid_entry(vcpu, function, 1);
-+	vcpu->arch.xen.tsc_info_2 = kvm_find_cpuid_entry(vcpu, function, 2);
-+}
-+
-+void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid_entry2 *entry = vcpu->arch.xen.tsc_info_1;
-+
-+	if (entry) {
-+		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
-+		entry->edx = vcpu->arch.hv_clock.tsc_shift;
-+	}
-+
-+	entry = vcpu->arch.xen.tsc_info_2;
-+	if (entry)
-+		entry->eax = vcpu->arch.hw_tsc_khz;
-+}
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 532a535a9e99..1afb663318a9 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -32,6 +32,8 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
- int kvm_xen_setup_evtchn(struct kvm *kvm,
- 			 struct kvm_kernel_irq_routing_entry *e,
- 			 const struct kvm_irq_routing_entry *ue);
-+void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu);
-+void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu);
- 
- static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
- {
-@@ -135,6 +137,14 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
- {
- 	return false;
- }
-+
-+static inline void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+static inline void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
-+{
-+}
- #endif
- 
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
--- 
-2.20.1
 
