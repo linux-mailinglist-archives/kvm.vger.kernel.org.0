@@ -2,86 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB51655442D
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 10:11:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83693554661
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 14:10:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354210AbiFVIAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 04:00:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60528 "EHLO
+        id S1353919AbiFVIcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 04:32:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354206AbiFVIAn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 04:00:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8527437A80
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 01:00:42 -0700 (PDT)
+        with ESMTP id S1351464AbiFVIco (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 04:32:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04A7E10BB
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 01:32:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655884841;
+        s=mimecast20190719; t=1655886763;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=p1O7sFFlmBgOcKNYL09qPTXcCanshyqj/I9EvbrMxCk=;
-        b=Z6tnmzC7vKpqafSaF0xQmtmY99MwZ7FBdmxbooQXIghCzuVhbjqb0VBCCeJLOZwOgTm9v2
-        c1wks5rrXosGF8SfwDlZzj744NmLwb6ltoHNd/j8VWsHsInWuqcZ4UVPVzYh1MiRG+GYB7
-        Wrq2jBXqyBnhYFtEGxtZH8RpvRZboCA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=kbGRJbqhqaDpYURUd1iIYFpog7R3QIPoGbLyON7y9kw=;
+        b=NxbF1xGA74jrkn6kNR3sV3M8u+EmpVZUrKaIxrXs8tDpmNdGwq+legna7k6HhnNyrATm9Z
+        H/mVEujZxp9k49ZW9SdKU12+BLMD76CjS5b/V/SlhMJSYjGF3Zo+iZYRTr3+4MTWnXxQzr
+        Qw3gKRoc2yviJgDE47aRNgcLObYEXts=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-590-scXM64pdMXy9fiJYS295aQ-1; Wed, 22 Jun 2022 04:00:32 -0400
-X-MC-Unique: scXM64pdMXy9fiJYS295aQ-1
-Received: by mail-wm1-f72.google.com with SMTP id l3-20020a05600c1d0300b0039c7efa2526so7458831wms.3
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 01:00:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=p1O7sFFlmBgOcKNYL09qPTXcCanshyqj/I9EvbrMxCk=;
-        b=K9M6cJPGOciFQAOVTD/yt6AV9mWsNAf7sl76JH23lCpmzhQsTztz4xw0MgvVAS4sN6
-         V2vJFxRvNCkTkyhdkv7LMlmLnXga2C5HdoXcwb4033Ln0ugICcxBJQwi06KObkyYataJ
-         OuS91LEXiMo5aeRISt76x65JqUVktcWfjkWUtLZZFii7bXOVqE6osB+cOKtqB8CIBHqe
-         e1CRYcPisNhctYPZOGF1PTBmZsHW8y4B6PcI2Tx845vjEhDo4Q9wg8rXkXHPaY2AhERq
-         C+072LbtWCVKGU2SlbT7pqqWBs0eo8PKklqcGyqtBMswis6G0tpmPfMgKf5kGHe5vOxJ
-         16VQ==
-X-Gm-Message-State: AOAM531IdIfu9rlGyo1deLSLzbaN+WAbKypZ8MIMiYtYtZ0bzfeAUJcQ
-        jXzaK5T0kzcv46j1xuhu88/f+Pjm8iS2A673/epu57sMfXURDrXAwXCy0xAAqXugu65oUKMzRzY
-        gtMUaH6cV+PzJ
-X-Received: by 2002:a05:600c:128c:b0:39c:85a4:d334 with SMTP id t12-20020a05600c128c00b0039c85a4d334mr44541240wmd.159.1655884831677;
-        Wed, 22 Jun 2022 01:00:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWZgf9RVSF+aIRirRYltfNsKueQoUWUM/G2tiYpbbYlVSqaru9w78PwKw0eRYh5iGAaI861w==
-X-Received: by 2002:a05:600c:128c:b0:39c:85a4:d334 with SMTP id t12-20020a05600c128c00b0039c85a4d334mr44541196wmd.159.1655884831411;
-        Wed, 22 Jun 2022 01:00:31 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id h4-20020a5d6e04000000b0020d02262664sm18307926wrz.25.2022.06.22.01.00.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 01:00:30 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Ilias Stamatis <ilstam@amazon.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, mail@anirudhrb.com,
-        kumarpraveen@linux.microsoft.com, wei.liu@kernel.org,
-        robert.bradford@intel.com, liuwe@microsoft.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: Don't expose TSC scaling to L1 when on Hyper-V
-In-Reply-To: <YqiwoOP4HX2LniI4@google.com>
-References: <20220613161611.3567556-1-anrayabh@linux.microsoft.com>
- <592ab920-51f3-4794-331f-8737e1f5b20a@redhat.com>
- <YqdsjW4/zsYaJahf@google.com> <YqipLpHI24NdhgJO@anrayabh-desk>
- <YqiwoOP4HX2LniI4@google.com>
-Date:   Wed, 22 Jun 2022 10:00:29 +0200
-Message-ID: <87zgi5xh42.fsf@redhat.com>
+ us-mta-607-iNEYmxvyPGeSc7eIoTibxA-1; Wed, 22 Jun 2022 04:32:29 -0400
+X-MC-Unique: iNEYmxvyPGeSc7eIoTibxA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 54B5F1C04B49;
+        Wed, 22 Jun 2022 08:32:28 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.153])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC7EA40C5BF;
+        Wed, 22 Jun 2022 08:32:27 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>, pasic@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
+        agordeev@linux.ibm.com, mst@redhat.com, jasowang@redhat.com,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     ben@decadent.org.uk, david@redhat.com
+Subject: Re: [PATCH V3] virtio: disable notification hardening by default
+In-Reply-To: <20220622012940.21441-1-jasowang@redhat.com>
+Organization: Red Hat GmbH
+References: <20220622012940.21441-1-jasowang@redhat.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date:   Wed, 22 Jun 2022 10:32:26 +0200
+Message-ID: <87h74d85et.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,34 +64,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Wed, Jun 22 2022, Jason Wang <jasowang@redhat.com> wrote:
 
-> On Tue, Jun 14, 2022, Anirudh Rayabharam wrote:
->> On Mon, Jun 13, 2022 at 04:57:49PM +0000, Sean Christopherson wrote:
-
-...
-
->> > 
->> > Any reason not to use the already sanitized vmcs_config?  I can't think of any
->> > reason why the nested path should blindly use the raw MSR values from hardware.
->> 
->> vmcs_config has the sanitized exec controls. But how do we construct MSR
->> values using them?
+> We try to harden virtio device notifications in 8b4ec69d7e09 ("virtio:
+> harden vring IRQ"). It works with the assumption that the driver or
+> core can properly call virtio_device_ready() at the right
+> place. Unfortunately, this seems to be not true and uncover various
+> bugs of the existing drivers, mainly the issue of using
+> virtio_device_ready() incorrectly.
 >
-> I was thinking we could use the sanitized controls for the allowed-1 bits, and then
-> take the required-1 bits from the CPU.  And then if we wanted to avoid the redundant
-> RDMSRs in a follow-up patch we could add required-1 fields to vmcs_config.
+> So let's having a Kconfig option and disable it by default. It gives
+
+s/having/have/
+
+> us a breath to fix the drivers and then we can consider to enable it
+> by default.
 >
-> Hastily constructed and compile-tested only, proceed with caution :-)
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Changes since V2:
+> - Tweak the Kconfig help
+> - Add comment for the read_lock() pairing in virtio_ccw
+> ---
+>  drivers/s390/virtio/virtio_ccw.c |  9 ++++++++-
+>  drivers/virtio/Kconfig           | 13 +++++++++++++
+>  drivers/virtio/virtio.c          |  2 ++
+>  drivers/virtio/virtio_ring.c     | 12 ++++++++++++
+>  include/linux/virtio_config.h    |  2 ++
+>  5 files changed, 37 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 97e51c34e6cf..1f6a358f65f0 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -1136,8 +1136,13 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+>  			vcdev->err = -EIO;
+>  	}
+>  	virtio_ccw_check_activity(vcdev, activity);
+> -	/* Interrupts are disabled here */
+> +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> +	/*
+> +	 * Paried with virtio_ccw_synchronize_cbs() and interrupts are
 
-Independently from "[PATCH 00/11] KVM: VMX: Support TscScaling and
-EnclsExitingBitmap whith eVMCS" which is supposed to fix the particular
-TSC scaling issue, I like the idea to make nested_vmx_setup_ctls_msrs()
-use both allowed-1 and required-1 bits from vmcs_config. I'll pick up
-the suggested patch and try to construct something for required-1 bits.
+s/Paried/Paired/
 
-Thanks!
+> +	 * disabled here.
+> +	 */
+>  	read_lock(&vcdev->irq_lock);
+> +#endif
+>  	for_each_set_bit(i, indicators(vcdev),
+>  			 sizeof(*indicators(vcdev)) * BITS_PER_BYTE) {
+>  		/* The bit clear must happen before the vring kick. */
+> @@ -1146,7 +1151,9 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+>  		vq = virtio_ccw_vq_by_ind(vcdev, i);
+>  		vring_interrupt(0, vq);
+>  	}
+> +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+>  	read_unlock(&vcdev->irq_lock);
+> +#endif
+>  	if (test_bit(0, indicators2(vcdev))) {
+>  		virtio_config_changed(&vcdev->vdev);
+>  		clear_bit(0, indicators2(vcdev));
 
--- 
-Vitaly
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
