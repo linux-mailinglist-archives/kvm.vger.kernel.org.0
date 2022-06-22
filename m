@@ -2,297 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21379554DAE
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:43:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E405554DB3
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:44:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358536AbiFVOnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 10:43:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40866 "EHLO
+        id S1358066AbiFVOo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 10:44:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358494AbiFVOm7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:42:59 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 27FFDB9;
-        Wed, 22 Jun 2022 07:42:57 -0700 (PDT)
-Received: from jpiotrowski-Surface-Book-3 (ip-037-201-214-204.um10.pools.vodafone-ip.de [37.201.214.204])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 02ADF20C636D;
-        Wed, 22 Jun 2022 07:42:49 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 02ADF20C636D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1655908976;
-        bh=3p9ZjAM7sex59sizUKu6QYDFUGr8EeBgiFOquCcUwkM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NrPWRQQBC2o9oajSPE53nnlzATXfEgf2dHagcUN5LS60Ha4Ezvaot2T5Wvu8C10g0
-         CHJNf3C+lOyYd+OCx34K+ndvZuVfuqQtRBHXe7I3O+OzymGWnyTO5o3t6LiWs6voaT
-         SSnTy1rlZf9JbY4YZH3R4tktCGmleekxZdzRoF5o=
-Date:   Wed, 22 Jun 2022 16:42:45 +0200
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry
- on fault
-Message-ID: <YrMqZUfZl1b5I/ud@jpiotrowski-Surface-Book-3>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
- <YrMoIOv3U+vehi/D@jpiotrowski-Surface-Book-3>
+        with ESMTP id S1359015AbiFVOoM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 10:44:12 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4A2321
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:44:11 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id n12so9373153pfq.0
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:44:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=mrZzVT+DaE4dzWmgVMu4jK9g1YT74nIx3X+44/NAXQg=;
+        b=IC6NzNNl5plJ+Mah/Ys88FlUV0HKR4UEDn+8EWcpGwszqNs2BCiMWrbslIcRr3Ye9p
+         bskeqLhIOV4fRI5pqFF/KtQ62BimoINWtFRayWhif8S+17Oq+91t5AROfQvGt0NMd9qj
+         SDt96e1VcQw00j/SpEZ9GxD9rag0iJrtw4BHrraKeK0UFbyc3XkhqcA37Khuw9scLhj1
+         J9h4Cbe+wQwktNBrLvovwyOYtB9uAtQwonLec5SuXU4hB4qdtTaFGFAiK6ESJVWnTjeh
+         XHt8ukQkvuRO5Lj46bkGHDdhqgG1GPVH9aAwbQPHgfeUcxdjQFdRVehf5er9aSQydhje
+         OIgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mrZzVT+DaE4dzWmgVMu4jK9g1YT74nIx3X+44/NAXQg=;
+        b=Wi+v83ZqWRx4RA3pvqsW2svN04q+eZdvqW1NGSho0d9Cfw77XxL7r/5taQ3zRYNB97
+         Es2SfD7qs2SE9U6J619aOrPF1y8AHDm7PYT0TacTNQgSusYVLfhI246xXrkbICsAEdmE
+         zIq65JQQNWCxjcC5+wow7Z5iu2V4+N1vgYssXKOQ0qV9gdV0yqzXmFaR6LrQiI0lVug9
+         lekHL1PvbEzjBeF6JqcovfGEkR+a/gdIHt1eEdYwruxi/ACI568szgPfP+ZAdPvjGE2k
+         QkJYbyK5ndOUX496jQUSaf9C8889v/lzJOMh5Strb/rYtA3gprHIX8TjYFANP+xGVtYs
+         XT5Q==
+X-Gm-Message-State: AJIora80xZb1Y17UGa2F3DGUZDVG2krNzAyIwmUC6HzFdR5DqM1OpHyo
+        /URG8/vD2DTGiF7OXYZjyzf4Bg==
+X-Google-Smtp-Source: AGRyM1vP49GIW1v9Yn+WDk/Pg//1m7fLQ9YSwDH2V6tqFEOanSJNzIWSKVVs6GHwZYQclEIqNb2HPg==
+X-Received: by 2002:a63:555d:0:b0:3fd:5d54:2708 with SMTP id f29-20020a63555d000000b003fd5d542708mr3176104pgm.92.1655909050732;
+        Wed, 22 Jun 2022 07:44:10 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id ik15-20020a170902ab0f00b0015e8d4eb2d8sm12852644plb.290.2022.06.22.07.44.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 07:44:09 -0700 (PDT)
+Date:   Wed, 22 Jun 2022 14:44:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paul Durrant <pdurrant@amazon.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info)
+ sub-leaves, if present
+Message-ID: <YrMqtHzNSean+qkh@google.com>
+References: <20220622092202.15548-1-pdurrant@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YrMoIOv3U+vehi/D@jpiotrowski-Surface-Book-3>
-X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220622092202.15548-1-pdurrant@amazon.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 22, 2022 at 04:33:04PM +0200, Jeremi Piotrowski wrote:
-> On Mon, Jun 20, 2022 at 11:03:58PM +0000, Ashish Kalra wrote:
-> > From: Brijesh Singh <brijesh.singh@amd.com>
-> > 
-> > When SEV-SNP is enabled globally, a write from the host goes through the
-> > RMP check. If the hardware encounters the check failure, then it raises
-> > the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
-> > the debug.
-> > 
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > ---
-> >  arch/x86/include/asm/sev.h |  7 +++++++
-> >  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
-> >  arch/x86/mm/fault.c        | 17 +++++++++++----
-> >  include/linux/sev.h        |  2 ++
-> >  4 files changed, 65 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> > index 6ab872311544..c0c4df817159 100644
-> > --- a/arch/x86/include/asm/sev.h
-> > +++ b/arch/x86/include/asm/sev.h
-> > @@ -113,6 +113,11 @@ struct __packed rmpentry {
-> >  
-> >  #define rmpentry_assigned(x)	((x)->info.assigned)
-> >  #define rmpentry_pagesize(x)	((x)->info.pagesize)
-> > +#define rmpentry_vmsa(x)	((x)->info.vmsa)
-> > +#define rmpentry_asid(x)	((x)->info.asid)
-> > +#define rmpentry_validated(x)	((x)->info.validated)
-> > +#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
-> > +#define rmpentry_immutable(x)	((x)->info.immutable)
-> >  
-> >  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
-> >  
-> > @@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
-> >  bool snp_init(struct boot_params *bp);
-> >  void snp_abort(void);
-> >  int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
-> > +void dump_rmpentry(u64 pfn);
-> >  #else
-> >  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
-> >  static inline void sev_es_ist_exit(void) { }
-> > @@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
-> >  {
-> >  	return -ENOTTY;
-> >  }
-> > +static inline void dump_rmpentry(u64 pfn) {}
-> >  #endif
-> >  
-> >  #endif
-> > diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> > index 734cddd837f5..6640a639fffc 100644
-> > --- a/arch/x86/kernel/sev.c
-> > +++ b/arch/x86/kernel/sev.c
-> > @@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
-> >  	return entry;
-> >  }
-> >  
-> > +void dump_rmpentry(u64 pfn)
-> > +{
-> > +	unsigned long pfn_end;
-> > +	struct rmpentry *e;
-> > +	int level;
-> > +
-> > +	e = __snp_lookup_rmpentry(pfn, &level);
-> > +	if (!e) {
+On Wed, Jun 22, 2022, Paul Durrant wrote:
+> The scaling information in sub-leaf 1 should match the values in the
+> 'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info) which
+> is shared with the guest. The offset values are not set since a TSC offset
+> is already applied.
+> The host TSC frequency should also be set in sub-leaf 2.
+
+Explain why this is KVM's problem, i.e. why userspace is unable to set the correct
+values.
+
+> This patch adds a new kvm_xen_set_cpuid() function that scans for the
+
+Please avoid "This patch".
+
+> relevant CPUID leaf when the CPUID information is updated by the VMM and
+> stashes pointers to the sub-leaves in the kvm_vcpu_xen structure.
+> The values are then updated by a call to the, also new,
+> kvm_xen_setup_tsc_info() function made at the end of
+> kvm_guest_time_update() just before entering the guest.
+
+This is not a helpful paragraph, it provides zero information that isn't obvious
+from the code.
+
+The changelog should read something like:
+
+  Update Xen CPUID leaves that expose TSC frequency and scaling information
+  to the guest <blah blah blah>.  Cache the leaves <blah blah blah>.
+
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 ++
+>  arch/x86/kvm/cpuid.c            |  2 ++
+>  arch/x86/kvm/x86.c              |  1 +
+>  arch/x86/kvm/xen.c              | 41 +++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/xen.h              | 10 ++++++++
+>  5 files changed, 56 insertions(+)
 > 
-> __snp_lookup_rmpentry may return -errno so this should be:
-> 
->   if (e != 1)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 1038ccb7056a..f77a4940542f 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -638,6 +638,8 @@ struct kvm_vcpu_xen {
+>  	struct hrtimer timer;
+>  	int poll_evtchn;
+>  	struct timer_list poll_timer;
+> +	struct kvm_cpuid_entry2 *tsc_info_1;
+> +	struct kvm_cpuid_entry2 *tsc_info_2;
+>  };
+>  
+>  struct kvm_vcpu_arch {
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index d47222ab8e6e..eb6cd88c974a 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -25,6 +25,7 @@
+>  #include "mmu.h"
+>  #include "trace.h"
+>  #include "pmu.h"
+> +#include "xen.h"
+>  
+>  /*
+>   * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
+> @@ -310,6 +311,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
+>  
+>  	kvm_hv_set_cpuid(vcpu);
+> +	kvm_xen_set_cpuid(vcpu);
+>  
+>  	/* Invoke the vendor callback only after the above state is updated. */
+>  	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 00e23dc518e0..8b45f9975e45 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3123,6 +3123,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+>  	if (vcpu->xen.vcpu_time_info_cache.active)
+>  		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
+>  	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+> +	kvm_xen_setup_tsc_info(v);
 
-Sorry, actually it should be:
+This can be called inside this if statement, no?
 
-  if (IS_ERR_OR_NULL(e)) {
+	if (unlikely(vcpu->hw_tsc_khz != tgt_tsc_khz)) {
 
-> 
-> > +		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
-> > +		return;
-> > +	}
-> > +
-> > +	if (rmpentry_assigned(e)) {
-> > +		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
-> > +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
-> > +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
-> > +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
-> > +			rmpentry_validated(e));
-> > +		return;
-> > +	}
-> > +
-> > +	/*
-> > +	 * If the RMP entry at the faulting pfn was not assigned, then we do not
-> > +	 * know what caused the RMP violation. To get some useful debug information,
-> > +	 * let iterate through the entire 2MB region, and dump the RMP entries if
-> > +	 * one of the bit in the RMP entry is set.
-> > +	 */
-> > +	pfn = pfn & ~(PTRS_PER_PMD - 1);
-> > +	pfn_end = pfn + PTRS_PER_PMD;
-> > +
-> > +	while (pfn < pfn_end) {
-> > +		e = __snp_lookup_rmpentry(pfn, &level);
-> > +		if (!e)
-> 
->   if (e != 1)
-> 
+	}
 
-and this too:
+>  	return 0;
+>  }
+>  
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 610beba35907..a016ff85264d 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -10,6 +10,9 @@
+>  #include "xen.h"
+>  #include "hyperv.h"
+>  #include "lapic.h"
+> +#include "cpuid.h"
+> +
+> +#include <asm/xen/cpuid.h>
+>  
+>  #include <linux/eventfd.h>
+>  #include <linux/kvm_host.h>
+> @@ -1855,3 +1858,41 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
+>  	if (kvm->arch.xen_hvm_config.msr)
+>  		static_branch_slow_dec_deferred(&kvm_xen_enabled);
+>  }
+> +
+> +void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
 
-  if (IS_ERR_OR_NULL(e))
+This is a very, very misleading name.  It does not "set" anything.  Given that
+this patch adds "set" and "setup", I expected the "set" to you know, set the CPUID
+leaves and the "setup" to prepar for that, not the other way around.
 
+If the leaves really do need to be cached, kvm_xen_after_set_cpuid() is probably
+the least awful name.
 
-> > +			return;
-> > +
-> > +		if (e->low || e->high)
-> > +			pr_alert("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
-> > +				 pfn << PAGE_SHIFT, e->high, e->low);
-> > +		pfn++;
-> > +	}
-> > +}
-> > +EXPORT_SYMBOL_GPL(dump_rmpentry);
-> > +
-> >  /*
-> >   * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
-> >   * and -errno if there is no corresponding RMP entry.
-> > diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-> > index f5de9673093a..25896a6ba04a 100644
-> > --- a/arch/x86/mm/fault.c
-> > +++ b/arch/x86/mm/fault.c
-> > @@ -34,6 +34,7 @@
-> >  #include <asm/kvm_para.h>		/* kvm_handle_async_pf		*/
-> >  #include <asm/vdso.h>			/* fixup_vdso_exception()	*/
-> >  #include <asm/irq_stack.h>
-> > +#include <asm/sev.h>			/* dump_rmpentry()		*/
-> >  
-> >  #define CREATE_TRACE_POINTS
-> >  #include <asm/trace/exceptions.h>
-> > @@ -290,7 +291,7 @@ static bool low_pfn(unsigned long pfn)
-> >  	return pfn < max_low_pfn;
-> >  }
-> >  
-> > -static void dump_pagetable(unsigned long address)
-> > +static void dump_pagetable(unsigned long address, bool show_rmpentry)
-> >  {
-> >  	pgd_t *base = __va(read_cr3_pa());
-> >  	pgd_t *pgd = &base[pgd_index(address)];
-> > @@ -346,10 +347,11 @@ static int bad_address(void *p)
-> >  	return get_kernel_nofault(dummy, (unsigned long *)p);
-> >  }
-> >  
-> > -static void dump_pagetable(unsigned long address)
-> > +static void dump_pagetable(unsigned long address, bool show_rmpentry)
-> >  {
-> >  	pgd_t *base = __va(read_cr3_pa());
-> >  	pgd_t *pgd = base + pgd_index(address);
-> > +	unsigned long pfn;
-> >  	p4d_t *p4d;
-> >  	pud_t *pud;
-> >  	pmd_t *pmd;
-> > @@ -367,6 +369,7 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(p4d))
-> >  		goto bad;
-> >  
-> > +	pfn = p4d_pfn(*p4d);
-> >  	pr_cont("P4D %lx ", p4d_val(*p4d));
-> >  	if (!p4d_present(*p4d) || p4d_large(*p4d))
-> >  		goto out;
-> > @@ -375,6 +378,7 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(pud))
-> >  		goto bad;
-> >  
-> > +	pfn = pud_pfn(*pud);
-> >  	pr_cont("PUD %lx ", pud_val(*pud));
-> >  	if (!pud_present(*pud) || pud_large(*pud))
-> >  		goto out;
-> > @@ -383,6 +387,7 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(pmd))
-> >  		goto bad;
-> >  
-> > +	pfn = pmd_pfn(*pmd);
-> >  	pr_cont("PMD %lx ", pmd_val(*pmd));
-> >  	if (!pmd_present(*pmd) || pmd_large(*pmd))
-> >  		goto out;
-> > @@ -391,9 +396,13 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(pte))
-> >  		goto bad;
-> >  
-> > +	pfn = pte_pfn(*pte);
-> >  	pr_cont("PTE %lx", pte_val(*pte));
-> >  out:
-> >  	pr_cont("\n");
-> > +
-> > +	if (show_rmpentry)
-> > +		dump_rmpentry(pfn);
-> >  	return;
-> >  bad:
-> >  	pr_info("BAD\n");
-> > @@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
-> >  		show_ldttss(&gdt, "TR", tr);
-> >  	}
-> >  
-> > -	dump_pagetable(address);
-> > +	dump_pagetable(address, error_code & X86_PF_RMP);
-> >  }
-> >  
-> >  static noinline void
-> > @@ -596,7 +605,7 @@ pgtable_bad(struct pt_regs *regs, unsigned long error_code,
-> >  
-> >  	printk(KERN_ALERT "%s: Corrupted page table at address %lx\n",
-> >  	       tsk->comm, address);
-> > -	dump_pagetable(address);
-> > +	dump_pagetable(address, false);
-> >  
-> >  	if (__die("Bad pagetable", regs, error_code))
-> >  		sig = 0;
-> > diff --git a/include/linux/sev.h b/include/linux/sev.h
-> > index 1a68842789e1..734b13a69c54 100644
-> > --- a/include/linux/sev.h
-> > +++ b/include/linux/sev.h
-> > @@ -16,6 +16,7 @@ int snp_lookup_rmpentry(u64 pfn, int *level);
-> >  int psmash(u64 pfn);
-> >  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
-> >  int rmp_make_shared(u64 pfn, enum pg_level level);
-> > +void dump_rmpentry(u64 pfn);
-> >  #else
-> >  static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
-> >  static inline int psmash(u64 pfn) { return -ENXIO; }
-> > @@ -25,6 +26,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
-> >  	return -ENODEV;
-> >  }
-> >  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
-> > +static inline void dump_rmpentry(u64 pfn) { }
-> >  
-> >  #endif /* CONFIG_AMD_MEM_ENCRYPT */
-> >  #endif /* __LINUX_SEV_H */
-> > -- 
-> > 2.25.1
-> > 
+> +{
+> +	u32 base = 0;
+> +	u32 function;
+> +
+> +	for_each_possible_hypervisor_cpuid_base(function) {
+> +		struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
+> +
+> +		if (entry &&
+> +		    entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
+> +		    entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
+> +		    entry->edx == XEN_CPUID_SIGNATURE_EDX) {
+> +			base = function;
+> +			break;
+> +		}
+> +	}
+> +	if (!base)
+> +		return;
+> +
+> +	function = base | XEN_CPUID_LEAF(3);
+> +	vcpu->arch.xen.tsc_info_1 = kvm_find_cpuid_entry(vcpu, function, 1);
+> +	vcpu->arch.xen.tsc_info_2 = kvm_find_cpuid_entry(vcpu, function, 2);
+
+Is it really necessary to cache the leave?  Guest CPUID isn't optimized, but it's
+not _that_ slow, and unless I'm missing something updating the TSC frequency and
+scaling info should be uncommon, i.e. not performance critical.
