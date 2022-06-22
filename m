@@ -2,106 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAD06554D02
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:29:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B15E554D08
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:30:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357452AbiFVO3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 10:29:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53536 "EHLO
+        id S1358548AbiFVOau (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 10:30:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234169AbiFVO2v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:28:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F13942F01A
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:28:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655908127;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=x34IRi49NgING8whuhdPrWa3tANXSDCipF9OzN2jvL4=;
-        b=KTXOE1ZTOUP8gbxNKFlgx4Hj5P++HdlFHX6WhNau+QeGuOQITie5OsH2GUZqKz+FUsh1Rg
-        Xp0D4ssm0Tx0ci4JOUjtO7a6j8iw1VGFabmhBpDJhE7ubQnc1eGTcqH7oLxhkOghx/fW5w
-        YcsCY2Mng0I1nIq05ny7yvCNtRgWiCc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-671-7feHS5mwMcqQpJv1QXH1zQ-1; Wed, 22 Jun 2022 10:28:46 -0400
-X-MC-Unique: 7feHS5mwMcqQpJv1QXH1zQ-1
-Received: by mail-wm1-f69.google.com with SMTP id j20-20020a05600c1c1400b0039c747a1e5aso7907553wms.9
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:28:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=x34IRi49NgING8whuhdPrWa3tANXSDCipF9OzN2jvL4=;
-        b=WDBo+Ev0fxuHnBIW9J8fIa6uQokTbP3hBzbr3QVR6TAjwtZyMNiUszyT2gXJd/IllA
-         gVauB+OfMkYDSulSl9LxTcjW56VfgcPex0vnT5baju4hjb1s1rlYvFjgjHvITrMAKbjb
-         hl344HsbpBprjgHJaKWLQ8Xlj/q2tAihGNl5SAACmUXNJ1izD2P8p6hbLNKg+eumJBoo
-         eUNlLOms2V35Ld5HRBnuTlUZq1ul7sS+ujBjKLSDVv4P9lF0HqUw+wn2MD3QkB4tqHwi
-         2jSvUPZzaGGwDhX5T0xF723ibXjAmyM5qxNg69hOSSetkuk1pXX9tK4SqZ6A4SNGO68f
-         nRMg==
-X-Gm-Message-State: AJIora+Mh4VJ36ss7NFZhFtrFBAyyhNDXHwiKoVHuKvNaFOJn82lrIGn
-        rPUQBsrQ0Esd3UygrdeoZq9tjm4JdqlANBNp9saoVQJCwuaKh+2QboxIj5zzEQkbJwdFoRfH07X
-        ZMdXgjObrnlpP
-X-Received: by 2002:a5d:5984:0:b0:219:e396:d3d1 with SMTP id n4-20020a5d5984000000b00219e396d3d1mr3649477wri.701.1655908124721;
-        Wed, 22 Jun 2022 07:28:44 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vuhyEjREFg3dGcH7vFPn3yakH8vgcXSr8DuJhoDWbuzWlidbf8KyA6iZoKwjJuqao0HuIjng==
-X-Received: by 2002:a5d:5984:0:b0:219:e396:d3d1 with SMTP id n4-20020a5d5984000000b00219e396d3d1mr3649464wri.701.1655908124542;
-        Wed, 22 Jun 2022 07:28:44 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id c130-20020a1c3588000000b0039c798b2dc5sm25959911wma.8.2022.06.22.07.28.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 07:28:44 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 10/39] KVM: x86: hyper-v: Don't use
- sparse_set_to_vcpu_mask() in kvm_hv_send_ipi()
-In-Reply-To: <36f2de4e-43fe-7280-8cac-f44de89b2b98@redhat.com>
-References: <20220613133922.2875594-1-vkuznets@redhat.com>
- <20220613133922.2875594-11-vkuznets@redhat.com>
- <17a2e85a-a1f2-99e1-fc69-1baed2275bd5@redhat.com>
- <87zgi640mm.fsf@redhat.com>
- <36f2de4e-43fe-7280-8cac-f44de89b2b98@redhat.com>
-Date:   Wed, 22 Jun 2022 16:28:43 +0200
-Message-ID: <87tu8cydpg.fsf@redhat.com>
+        with ESMTP id S1358469AbiFVOa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 10:30:29 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54A1F3CFFA;
+        Wed, 22 Jun 2022 07:29:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655908194; x=1687444194;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PtAWVcHQ/OeCLHQhF7OJWPRZK21owRko6PYyYGt05D0=;
+  b=cYTpoAibFQ2jX6j3PsmcxQkuRqTGuO1ZhzvQ8psHCkryLTqxGuoct+10
+   Po08TgQxAJXJasWuc1PkOMt793izvjuusJNkA2Jp1wBvcbHDVDh+H11A5
+   9Rkn6JL0HtjBmnJkpeCiyFfURLZ2rIT+Woi/iOtQ02/QPfLmxR9+wWSx7
+   ByqQDA6QdL46cHBmKai+ZUEG8ts4GMlyisxLUMq7pA8tXWOA9StYK09Xy
+   Hy6gIyfvgGIkB3anodSu0WXXPcXWjpoJqeDOOp0GECKZ9IhKFDo1Qxaho
+   080nZ6pizcsb7/58E7bxqg92cPmvSs0hedKn5yrKUdjCZdgXPJrh1K+B0
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="260860668"
+X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
+   d="scan'208";a="260860668"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:29:51 -0700
+X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
+   d="scan'208";a="677571663"
+Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:29:49 -0700
+Message-ID: <25be3068-be13-a451-86d4-ff4cc12ddb23@intel.com>
+Date:   Wed, 22 Jun 2022 07:29:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
+Content-Language: en-US
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
+ <cc0c6bd1-a1e3-82ee-8148-040be21cad5c@intel.com>
+ <BYAPR12MB2759A8F48D6D68EE879EEF648EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <BYAPR12MB2759A8F48D6D68EE879EEF648EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 6/22/22 07:22, Kalra, Ashish wrote:
+> As I replied previously on the same subject: Architectural implies
+> that it is defined in the APM and shouldn't change in such a way as
+> to not be backward compatible. I probably think the wording here
+> should be architecture independent or more precisely platform
+> independent.
+Yeah, arch-independent and non-architectural are quite different concepts.
 
-> On 6/21/22 15:17, Vitaly Kuznetsov wrote:
->>>
->>> Just to be clear, PV IPI does*not*  support the VP_ID, right?
->> Hm, with Hyper-V PV IPI hypercall vCPUs are also addressed by their
->> VP_IDs, not by their APIC ids so similar to Hyper-V PV TLB flush we need
->> to convert the supplied set (either flat u64 bitmask of VP_IDs for
->> non-EX hypercall or a sparse set for -EX).
->> 
->
-> So this means the series needs a v8, right?
->
+At Intel, at least, when someone says "not architectural" mean that the
+behavior is implementation-specific.  That, combined with the
+model/family/stepping gave me the wrong impression about what was going on.
 
-No, I was just trying to explaini what the patch is doing in the series,
-it looks good to me (but I'm biased, of course).
-
--- 
-Vitaly
-
+Some more clarity would be greatly appreciated.
