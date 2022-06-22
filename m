@@ -2,120 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3DE5554ED7
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 17:14:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 603C6554EEB
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 17:18:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359182AbiFVPOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 11:14:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48708 "EHLO
+        id S1359360AbiFVPSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 11:18:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359155AbiFVPOT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 11:14:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1E5123A5F0
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 08:14:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655910853;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wGPNK+3CbuAdTkTsB3EwZQ5iFbUOR/MKa+csfzqSuVU=;
-        b=RoWCMe4N5twKBNu23mPODG2UvY9tjXWht22JhXOzDCuuKalvhbZ7ddsKxBsRFQmg+bGm+h
-        QqxpNjx1KgvTwt+9+qF1CjcU6wT541QcCa+3cD4F3qlI9boY1GWBiC0fsPrcglKAoRmbhz
-        BfzseiJtTomWPt/p6XGe/+XOycY/lQo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-21-7T_6O5ybNl6yxKgVyIvRuQ-1; Wed, 22 Jun 2022 11:14:12 -0400
-X-MC-Unique: 7T_6O5ybNl6yxKgVyIvRuQ-1
-Received: by mail-wm1-f71.google.com with SMTP id k32-20020a05600c1ca000b0039c4cf75023so10175709wms.9
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 08:14:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wGPNK+3CbuAdTkTsB3EwZQ5iFbUOR/MKa+csfzqSuVU=;
-        b=JxVKJlNuYWccIcI1gXHO++U44Gdh0phMmMjOamtb0EGD1oS7UHhj7LyZeVM90G17ZS
-         iQ9MJw8a3epYw7rNqoK8ifPsohKAJmtCPpWLzZvAgapzoB1GME21qGzH367ZN4vQr0kC
-         8ySPI+Qpkd+wzMd/NIMseeCw+1SGIYS0uJifBuJ/MwFFLS2G3iXKqtexwSrWS05J/tFW
-         HjHJCem9GDgpqtIx1Zelee8q04BPmJdBSTiR/MrddA/U6L8FSkvCDUrcpjHTOsSqN+Y1
-         GJuvnTapNFKh8l+GKwJKDeOFsOhATBZ0ERjz1A3mddCeWGvOzKgxBiMAvbLVsujFKZhu
-         6Rog==
-X-Gm-Message-State: AOAM532YlLsPecRqPh0kMmKgPGNLo0a4LkOQ+6K0Pv0B0UCkyziQ3uTo
-        lt13lY7D6jKrNgmT+51QoXRoloUcHrzmokyhjGdzqcNI6rNH92zM85HjhdthDm85HDo69PNoH+j
-        H4ApezXhpTSrw
-X-Received: by 2002:a05:600c:3508:b0:39c:8240:5538 with SMTP id h8-20020a05600c350800b0039c82405538mr46419581wmq.165.1655910849746;
-        Wed, 22 Jun 2022 08:14:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzEzFT4TFaMqQR0Ghk5VXNDtqjANOX/reNQn5bceF+MCQwu4Q10ypxVnyl4WOcDbkKlljFl6w==
-X-Received: by 2002:a05:600c:3508:b0:39c:8240:5538 with SMTP id h8-20020a05600c350800b0039c82405538mr46419547wmq.165.1655910849466;
-        Wed, 22 Jun 2022 08:14:09 -0700 (PDT)
-Received: from step1.redhat.com (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
-        by smtp.gmail.com with ESMTPSA id z6-20020a7bc7c6000000b0039c63f4bce0sm25194613wmk.12.2022.06.22.08.14.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 08:14:08 -0700 (PDT)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-        Gautam Dawar <gautam.dawar@xilinx.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH] vhost-vdpa: call vhost_vdpa_cleanup during the release
-Date:   Wed, 22 Jun 2022 17:14:07 +0200
-Message-Id: <20220622151407.51232-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.36.1
+        with ESMTP id S1359225AbiFVPSR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 11:18:17 -0400
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E61902EA27;
+        Wed, 22 Jun 2022 08:18:15 -0700 (PDT)
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <pdurrant@amazon.com>)
+        id 1o4275-00079R-O5; Wed, 22 Jun 2022 15:17:51 +0000
+Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=debian.cbg12.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <pdurrant@amazon.com>)
+        id 1o4275-0003bJ-DQ; Wed, 22 Jun 2022 15:17:51 +0000
+From:   Paul Durrant <pdurrant@amazon.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH v4] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
+Date:   Wed, 22 Jun 2022 16:17:28 +0100
+Message-Id: <20220622151728.13622-1-pdurrant@amazon.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_ADSP_ALL,
+        RCVD_IN_DNSWL_MED,SPF_FAIL,SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before commit 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
-we call vhost_vdpa_iotlb_free() during the release to clean all regions
-mapped in the iotlb.
+The scaling information in subleaf 1 should match the values set by KVM in
+the 'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info)
+which is shared with the guest, but is not directly available to the VMM.
+The offset values are not set since a TSC offset is already applied.
+The TSC frequency should also be set in sub-leaf 2.
 
-That commit removed vhost_vdpa_iotlb_free() and added vhost_vdpa_cleanup()
-to do some cleanup, including deleting all mappings, but we forgot to call
-it in vhost_vdpa_release().
+Cache pointers to the sub-leaves when CPUID is updated by the VMM and
+populate the relevant information prior to entering the guest.
 
-This causes that if an application does not remove all mappings explicitly
-(or it crashes), the mappings remain in the iotlb and subsequent
-applications may fail if they map the same addresses.
-
-Calling vhost_vdpa_cleanup() also fixes a memory leak since we are not
-freeing `v->vdev.vqs` during the release from the same commit.
-
-Since vhost_vdpa_cleanup() calls vhost_dev_cleanup() we can remove its
-call from vhost_vdpa_release().
-
-Fixes: 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
-Cc: gautam.dawar@xilinx.com
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 ---
- drivers/vhost/vdpa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cc: David Woodhouse <dwmw2@infradead.org>
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 5ad2596c6e8a..23dcbfdfa13b 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -1209,7 +1209,7 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
- 	vhost_dev_stop(&v->vdev);
- 	vhost_vdpa_free_domain(v);
- 	vhost_vdpa_config_put(v);
--	vhost_dev_cleanup(&v->vdev);
-+	vhost_vdpa_cleanup(v);
- 	mutex_unlock(&d->mutex);
+v2:
+ - Make sure sub-leaf pointers are NULLed if the time leaf is removed
+
+v3:
+ - Add leaf limit check in kvm_xen_set_cpuid()
+
+v4:
+ - Update commit comment
+---
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/cpuid.c            |  2 ++
+ arch/x86/kvm/x86.c              |  1 +
+ arch/x86/kvm/xen.c              | 49 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/xen.h              | 10 +++++++
+ 5 files changed, 64 insertions(+)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1038ccb7056a..f77a4940542f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -638,6 +638,8 @@ struct kvm_vcpu_xen {
+ 	struct hrtimer timer;
+ 	int poll_evtchn;
+ 	struct timer_list poll_timer;
++	struct kvm_cpuid_entry2 *tsc_info_1;
++	struct kvm_cpuid_entry2 *tsc_info_2;
+ };
  
- 	atomic_dec(&v->opened);
+ struct kvm_vcpu_arch {
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index d47222ab8e6e..eb6cd88c974a 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -25,6 +25,7 @@
+ #include "mmu.h"
+ #include "trace.h"
+ #include "pmu.h"
++#include "xen.h"
+ 
+ /*
+  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
+@@ -310,6 +311,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
+ 
+ 	kvm_hv_set_cpuid(vcpu);
++	kvm_xen_set_cpuid(vcpu);
+ 
+ 	/* Invoke the vendor callback only after the above state is updated. */
+ 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 00e23dc518e0..8b45f9975e45 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3123,6 +3123,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 	if (vcpu->xen.vcpu_time_info_cache.active)
+ 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
+ 	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
++	kvm_xen_setup_tsc_info(v);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 610beba35907..08e65ec6c793 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -10,6 +10,9 @@
+ #include "xen.h"
+ #include "hyperv.h"
+ #include "lapic.h"
++#include "cpuid.h"
++
++#include <asm/xen/cpuid.h>
+ 
+ #include <linux/eventfd.h>
+ #include <linux/kvm_host.h>
+@@ -1855,3 +1858,49 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
+ 	if (kvm->arch.xen_hvm_config.msr)
+ 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
+ }
++
++void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
++{
++	u32 base = 0;
++	u32 limit;
++	u32 function;
++
++	vcpu->arch.xen.tsc_info_1 = NULL;
++	vcpu->arch.xen.tsc_info_2 = NULL;
++
++	for_each_possible_hypervisor_cpuid_base(function) {
++		struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
++
++		if (entry &&
++		    entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
++		    entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
++		    entry->edx == XEN_CPUID_SIGNATURE_EDX) {
++			base = function;
++			limit = entry->eax;
++			break;
++		}
++	}
++	if (!base)
++		return;
++
++	function = base | XEN_CPUID_LEAF(3);
++	if (function > limit)
++		return;
++
++	vcpu->arch.xen.tsc_info_1 = kvm_find_cpuid_entry(vcpu, function, 1);
++	vcpu->arch.xen.tsc_info_2 = kvm_find_cpuid_entry(vcpu, function, 2);
++}
++
++void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpuid_entry2 *entry = vcpu->arch.xen.tsc_info_1;
++
++	if (entry) {
++		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
++		entry->edx = vcpu->arch.hv_clock.tsc_shift;
++	}
++
++	entry = vcpu->arch.xen.tsc_info_2;
++	if (entry)
++		entry->eax = vcpu->arch.hw_tsc_khz;
++}
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index 532a535a9e99..1afb663318a9 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -32,6 +32,8 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
+ int kvm_xen_setup_evtchn(struct kvm *kvm,
+ 			 struct kvm_kernel_irq_routing_entry *e,
+ 			 const struct kvm_irq_routing_entry *ue);
++void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu);
++void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu);
+ 
+ static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+ {
+@@ -135,6 +137,14 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
+ {
+ 	return false;
+ }
++
++static inline void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
++{
++}
++
++static inline void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
++{
++}
+ #endif
+ 
+ int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
 -- 
-2.36.1
+2.20.1
 
