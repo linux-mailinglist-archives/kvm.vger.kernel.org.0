@@ -2,100 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32351555367
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 20:43:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A89755553BF
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 20:54:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359061AbiFVSnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 14:43:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60828 "EHLO
+        id S1359064AbiFVSx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 14:53:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230122AbiFVSnI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 14:43:08 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1C595B2;
-        Wed, 22 Jun 2022 11:43:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655923387; x=1687459387;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vLhzMi2QzzK4JidKA8EX0YX95XP0Zt+Cm+d/NMCKTa8=;
-  b=cRrpQJbDCIAiOurfHHNVOVFnui/lDCkecrxJ+MMK+RxRfPeuybe4FM8u
-   Sqhlgeh2tM6P5ZCGyv+Gg12+lRQkSqM0i5E1DYh256gqvk5rqJ9EsOr63
-   r11qlccXPkay4cwD9amf/40NDUhIj1LpcOvS9nQIUZGVL23pY3EGbmyae
-   zKO/a407RL+vVIx49IPi276CtjPXNGJWQ/hfaEpi8run84JF3B/OrL4g5
-   uDTy4DwUWQBNzGxvP+tIyrsGcqveoGF9zNF6eiP1fF+N+wFXlaUOAU2EQ
-   Tgqn+WTcxizqsCe1G/feei7EL6FRyXDTec+Cq8H3dMm/dB6xtjk+RD+vC
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="263545743"
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="263545743"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 11:43:07 -0700
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="677695719"
-Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 11:43:05 -0700
-Message-ID: <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
-Date:   Wed, 22 Jun 2022 11:42:46 -0700
+        with ESMTP id S1377676AbiFVSxq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 14:53:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5D9DE1AF2F
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 11:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655924024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NUxlW/j88Epc56MqOmmJqiwjv7RfINKqkJmwCtsv0gI=;
+        b=QDaZ5P8DshskWRrjqcaX4KGnJwZLhHCMb8cX+ez7ORlSs1EV8n0GyrHOviAqif6wjOvFe7
+        Whr69xdEjgnFq45fe/oF0YuEzE0gPIs0crBwR8B0TNOznhPIVXESEwRq+VWIn2NFd2NCsj
+        1AvooyAC46vQgUjiP1XDDEVb0fqXJbA=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-384-B4H59beFMi6IqG1N3aX6qg-1; Wed, 22 Jun 2022 14:53:43 -0400
+X-MC-Unique: B4H59beFMi6IqG1N3aX6qg-1
+Received: by mail-qv1-f71.google.com with SMTP id s11-20020a0562140cab00b0046e7d2b24b3so17455915qvs.16
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 11:53:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=NUxlW/j88Epc56MqOmmJqiwjv7RfINKqkJmwCtsv0gI=;
+        b=YwFD4s3tDudqZV4GrOrQDtrzuWLx4BSXXiaQ2VI8py6RLAY5xWxKDkbQcrfsijWczP
+         /KjVsiLjSoXuyc0oBKnkScRa8ct7zFtcME9oyvDQ5V3AuRhFPn+K/yNwF+Q0XOf1eoq7
+         kUPqDUUQKGcrTw7cDi5pTNrRRw+lok+ttw2aHIKgLJ5gWkHOX4frwKZ0Rsicnplvoi7B
+         sey4niV3acsFiT67ie/vPGOyEfR8Js2wloK6RXgxNOw6KKwEgjSrl8ac8pRqnwWgZea7
+         dryQc79NIk3kw/Otg8kESV9pxavPzVEkAHPVTYW+07P0ynCyWnXSMUmMvJ5ii7wnzhx6
+         zHQQ==
+X-Gm-Message-State: AJIora+cdsmLwC0PY43HcYmRNqpMGhV3ZFZTbeR0WsSc/0Ss38mH8hlH
+        ofTq6Ghd92zJjlacBk7WIiA8mfCS/IZFvVuXiorqOuMB0dRLTDGsKG2qFBO0dTJek/8nXN0pM35
+        3Wtph+iNix8isWQS0DPHcHkzhbgAi
+X-Received: by 2002:ac8:598f:0:b0:305:8f8:2069 with SMTP id e15-20020ac8598f000000b0030508f82069mr4463235qte.370.1655924022281;
+        Wed, 22 Jun 2022 11:53:42 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vito0RGMmoO0PY0tCMLhEJ3EtZsz9CJl1GiY/Z98Qu2Yy5UsxoSjB8deyHpN0/O8c0wv8vm/DAfiRMBO7J3Y4=
+X-Received: by 2002:ac8:598f:0:b0:305:8f8:2069 with SMTP id
+ e15-20020ac8598f000000b0030508f82069mr4463221qte.370.1655924022071; Wed, 22
+ Jun 2022 11:53:42 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
-Content-Language: en-US
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
- <cc0c6bd1-a1e3-82ee-8148-040be21cad5c@intel.com>
- <BYAPR12MB2759A8F48D6D68EE879EEF648EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <25be3068-be13-a451-86d4-ff4cc12ddb23@intel.com>
- <BYAPR12MB27599BCEA9F692E173911C3B8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <681e4e45-eff1-600c-9b81-1fa9bdf24232@intel.com>
- <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+References: <20220622151407.51232-1-sgarzare@redhat.com>
+In-Reply-To: <20220622151407.51232-1-sgarzare@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 22 Jun 2022 20:53:06 +0200
+Message-ID: <CAJaqyWf6BKK1=KBwHufVY-eLt0JFz9V4-kK-pPLU0tuDc7uGgQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost-vdpa: call vhost_vdpa_cleanup during the release
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization <virtualization@lists.linux-foundation.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Gautam Dawar <gautam.dawar@xilinx.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -103,16 +78,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/22/22 11:34, Kalra, Ashish wrote:
->> So, if the RMP entry format changes in future processors, how do we
->> make sure that the kernel does not try to use *this* code on those
->> processors?
-> Functions snp_lookup_rmpentry() and dump_rmpentry() which rely on
-> this structure definition will need to handle it accordingly.
+On Wed, Jun 22, 2022 at 5:14 PM Stefano Garzarella <sgarzare@redhat.com> wr=
+ote:
+>
+> Before commit 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
+> we call vhost_vdpa_iotlb_free() during the release to clean all regions
+> mapped in the iotlb.
+>
+> That commit removed vhost_vdpa_iotlb_free() and added vhost_vdpa_cleanup(=
+)
+> to do some cleanup, including deleting all mappings, but we forgot to cal=
+l
+> it in vhost_vdpa_release().
+>
+> This causes that if an application does not remove all mappings explicitl=
+y
+> (or it crashes), the mappings remain in the iotlb and subsequent
+> applications may fail if they map the same addresses.
+>
 
-In other words, old kernels will break on new hardware?
+I tested this behavior even by sending SIGKILL to qemu. The failed map
+is reproducible easily before applying this patch and applying it
+fixes the issue properly.
 
-I think that needs to be fixed.  It should be as simple as a
-model/family check, though.  If someone (for example) attempts to use
-SNP (and thus snp_lookup_rmpentry() and dump_rmpentry()) code on a newer
-CPU, the kernel should refuse.
+> Calling vhost_vdpa_cleanup() also fixes a memory leak since we are not
+> freeing `v->vdev.vqs` during the release from the same commit.
+>
+> Since vhost_vdpa_cleanup() calls vhost_dev_cleanup() we can remove its
+> call from vhost_vdpa_release().
+>
+
+Tested-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+
+> Fixes: 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
+> Cc: gautam.dawar@xilinx.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  drivers/vhost/vdpa.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 5ad2596c6e8a..23dcbfdfa13b 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -1209,7 +1209,7 @@ static int vhost_vdpa_release(struct inode *inode, =
+struct file *filep)
+>         vhost_dev_stop(&v->vdev);
+>         vhost_vdpa_free_domain(v);
+>         vhost_vdpa_config_put(v);
+> -       vhost_dev_cleanup(&v->vdev);
+> +       vhost_vdpa_cleanup(v);
+>         mutex_unlock(&d->mutex);
+>
+>         atomic_dec(&v->opened);
+> --
+> 2.36.1
+>
+
