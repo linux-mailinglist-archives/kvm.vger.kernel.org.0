@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 931EE55546A
+	by mail.lfdr.de (Postfix) with ESMTP id 468F9555468
 	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 21:28:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358816AbiFVT15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 15:27:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33558 "EHLO
+        id S1358720AbiFVT1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 15:27:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241717AbiFVT12 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236696AbiFVT12 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 22 Jun 2022 15:27:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C46513FBFD
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B284E3FBF8
         for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 12:27:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1655926042;
@@ -20,22 +20,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9oMq4GLRZUa/l4xqxYx4J3Z85ock88+SpI4Xe+x2Ml4=;
-        b=G55b4OrZv0v7l2RKavejY0arb7dfkEGmHUxfUgtPFeItyztLyGHA0Es+b+Qrrv90rypfZi
-        ulCOpj+qZE1coAIrsR0Nq4DMnGCO9IAxPA2bWsoO1KFm2TdlpJfJMlaniIvRNy4ilVqewd
-        d//oS8WM9UefvkF115qmxvSYEWvwAOA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xlRQ8mEQ9YvjZnUl++QqeZB4cfPsCz6OaymdUv9rICk=;
+        b=AztjexBDr3FJhmToWc4vhwgTs1bUw1XNdoLnY0omhwavHN183XMYPdaqrUrpxMRZNtnlZt
+        7TJtSSQLUSQLA1fbMvIA3x+qPhFMxinhyYZJXv5xp8Llt6tEW8uDcHR5B1hx6LzEDV4Cyf
+        5X4Ca+MYv+CcuuT4MsOvpKnLSXIiQKg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-582-AJ9guQqgMJSsIz3c33Fhrg-1; Wed, 22 Jun 2022 15:27:16 -0400
-X-MC-Unique: AJ9guQqgMJSsIz3c33Fhrg-1
+ us-mta-647-ZKp3q13APJ6c8yNa5GJx3Q-1; Wed, 22 Jun 2022 15:27:17 -0400
+X-MC-Unique: ZKp3q13APJ6c8yNa5GJx3Q-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E89713C11726;
-        Wed, 22 Jun 2022 19:27:15 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 697B518A6580;
+        Wed, 22 Jun 2022 19:27:16 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93D61141510C;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F0554141510C;
         Wed, 22 Jun 2022 19:27:15 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -44,9 +44,9 @@ Cc:     maz@kernel.org, anup@brainfault.org, seanjc@google.com,
         kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
         kvm-riscv@lists.infradead.org, pfeiner@google.com,
         jiangshanlai@gmail.com, dmatlack@google.com
-Subject: [PATCH v7 12/23] KVM: x86/mmu: Pass kvm pointer separately from vcpu to kvm_mmu_find_shadow_page()
-Date:   Wed, 22 Jun 2022 15:26:59 -0400
-Message-Id: <20220622192710.2547152-13-pbonzini@redhat.com>
+Subject: [PATCH v7 13/23] KVM: x86/mmu: Allow NULL @vcpu in kvm_mmu_find_shadow_page()
+Date:   Wed, 22 Jun 2022 15:27:00 -0400
+Message-Id: <20220622192710.2547152-14-pbonzini@redhat.com>
 In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
 References: <20220622192710.2547152-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -65,117 +65,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Matlack <dmatlack@google.com>
 
-Get the kvm pointer from the caller, rather than deriving it from
-vcpu->kvm, and plumb the kvm pointer all the way from
-kvm_mmu_get_shadow_page(). With this change in place, the vcpu pointer
-is only needed to sync indirect shadow pages. In other words,
-__kvm_mmu_get_shadow_page() can now be used to get *direct* shadow pages
-without a vcpu pointer. This enables eager page splitting, which needs
-to allocate direct shadow pages during VM ioctls.
+Allow @vcpu to be NULL in kvm_mmu_find_shadow_page() (and its only
+caller __kvm_mmu_get_shadow_page()). @vcpu is only required to sync
+indirect shadow pages, so it's safe to pass in NULL when looking up
+direct shadow pages.
 
-No functional change intended.
+This will be used for doing eager page splitting, which allocates direct
+shadow pages from the context of a VM ioctl without access to a vCPU
+pointer.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
-Message-Id: <20220516232138.1783324-13-dmatlack@google.com>
+Message-Id: <20220516232138.1783324-14-dmatlack@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c5a88e8d1b53..88b3f3c2c8b1 100644
+index 88b3f3c2c8b1..a7748c5a2385 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1975,7 +1975,8 @@ static void clear_sp_write_flooding_count(u64 *spte)
+@@ -1975,6 +1975,12 @@ static void clear_sp_write_flooding_count(u64 *spte)
  	__clear_sp_write_flooding_count(sptep_to_sp(spte));
  }
  
--static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
-+static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
-+						     struct kvm_vcpu *vcpu,
++/*
++ * The vCPU is required when finding indirect shadow pages; the shadow
++ * page may already exist and syncing it needs the vCPU pointer in
++ * order to read guest page tables.  Direct shadow pages are never
++ * unsync, thus @vcpu can be NULL if @role.direct is true.
++ */
+ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+ 						     struct kvm_vcpu *vcpu,
  						     gfn_t gfn,
- 						     struct hlist_head *sp_list,
- 						     union kvm_mmu_page_role role)
-@@ -1985,7 +1986,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
- 	int collisions = 0;
- 	LIST_HEAD(invalid_list);
+@@ -2013,6 +2019,9 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+ 			goto out;
  
--	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-+	for_each_valid_sp(kvm, sp, sp_list) {
- 		if (sp->gfn != gfn) {
- 			collisions++;
- 			continue;
-@@ -2002,7 +2003,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
- 			 * upper-level page will be write-protected.
- 			 */
- 			if (role.level > PG_LEVEL_4K && sp->unsync)
--				kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
-+				kvm_mmu_prepare_zap_page(kvm, sp,
- 							 &invalid_list);
- 			continue;
- 		}
-@@ -2030,7 +2031,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
- 
- 			WARN_ON(!list_empty(&invalid_list));
- 			if (ret > 0)
--				kvm_flush_remote_tlbs(vcpu->kvm);
-+				kvm_flush_remote_tlbs(kvm);
- 		}
- 
- 		__clear_sp_write_flooding_count(sp);
-@@ -2039,13 +2040,13 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
- 	}
- 
- 	sp = NULL;
--	++vcpu->kvm->stat.mmu_cache_miss;
-+	++kvm->stat.mmu_cache_miss;
- 
- out:
--	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
-+	kvm_mmu_commit_zap_page(kvm, &invalid_list);
- 
--	if (collisions > vcpu->kvm->stat.max_mmu_page_hash_collisions)
--		vcpu->kvm->stat.max_mmu_page_hash_collisions = collisions;
-+	if (collisions > kvm->stat.max_mmu_page_hash_collisions)
-+		kvm->stat.max_mmu_page_hash_collisions = collisions;
+ 		if (sp->unsync) {
++			if (KVM_BUG_ON(!vcpu, kvm))
++				break;
++
+ 			/*
+ 			 * The page is good, but is stale.  kvm_sync_page does
+ 			 * get the latest guest state, but (unlike mmu_unsync_children)
+@@ -2090,6 +2099,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
  	return sp;
  }
  
-@@ -2089,7 +2090,8 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
- 	return sp;
- }
- 
--static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
-+static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
-+						      struct kvm_vcpu *vcpu,
++/* Note, @vcpu may be NULL if @role.direct is true; see kvm_mmu_find_shadow_page. */
+ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
+ 						      struct kvm_vcpu *vcpu,
  						      struct shadow_page_caches *caches,
- 						      gfn_t gfn,
- 						      union kvm_mmu_page_role role)
-@@ -2098,12 +2100,12 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
- 	struct kvm_mmu_page *sp;
- 	bool created = false;
- 
--	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-+	sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
- 
--	sp = kvm_mmu_find_shadow_page(vcpu, gfn, sp_list, role);
-+	sp = kvm_mmu_find_shadow_page(kvm, vcpu, gfn, sp_list, role);
- 	if (!sp) {
- 		created = true;
--		sp = kvm_mmu_alloc_shadow_page(vcpu->kvm, caches, gfn, sp_list, role);
-+		sp = kvm_mmu_alloc_shadow_page(kvm, caches, gfn, sp_list, role);
- 	}
- 
- 	trace_kvm_mmu_get_page(sp, created);
-@@ -2120,7 +2122,7 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
- 		.gfn_array_cache = &vcpu->arch.mmu_gfn_array_cache,
- 	};
- 
--	return __kvm_mmu_get_shadow_page(vcpu, &caches, gfn, role);
-+	return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
- }
- 
- static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, unsigned int access)
 -- 
 2.31.1
 
