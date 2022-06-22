@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A8DC554D0A
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:31:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C255554D37
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:33:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358546AbiFVOa4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 10:30:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54960 "EHLO
+        id S1358249AbiFVOdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 10:33:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358476AbiFVOaa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:30:30 -0400
+        with ESMTP id S1358066AbiFVOdR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 10:33:17 -0400
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BBACF3D1FA;
-        Wed, 22 Jun 2022 07:29:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DFE9622530;
+        Wed, 22 Jun 2022 07:33:16 -0700 (PDT)
 Received: from jpiotrowski-Surface-Book-3 (ip-037-201-214-204.um10.pools.vodafone-ip.de [37.201.214.204])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 9AC3920C6373;
-        Wed, 22 Jun 2022 07:29:50 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9AC3920C6373
+        by linux.microsoft.com (Postfix) with ESMTPSA id F368F20C5A72;
+        Wed, 22 Jun 2022 07:33:09 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F368F20C5A72
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1655908197;
-        bh=bVDr9RYnzo39JQHeopAO6RxPbu1Q/PG027aMK308rQg=;
+        s=default; t=1655908396;
+        bh=ALGB76keBASr4hY7hNxpqQX9PoomTfBUh9uHAgUzoZ0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IOc2OKiv3+v0ydBT5qmIFyFHOX1Mkeyz/Nrs+5/dczXKnanmkumFEqYmlp2XsH6Zt
-         5ZdEYUSJbpCG8tKB9AcboxNHlGthWy9P4SLXbHCjtSo5IIMnEw0tdUlVtGLVtTYdnH
-         GudTIHbBI+d/tKJtyZ4Bz2gQI47huA3c9BMviP7s=
-Date:   Wed, 22 Jun 2022 16:29:43 +0200
+        b=TQuQbeqWbRyJqyFmVhgUuEJoBS5K/iwNUxkPx+opP5jeWVfpzXQI4KzNOllCIS2zh
+         mU8FnTjBX9ClQRIxHfXEKNV839Uq5DWJzew4nztCg0vmsZJ+56JSnTEpM4fqmceN0D
+         tXbZpMynZVvEgvrwBOTlSQAdtEXVMixKZZIm5rYI=
+Date:   Wed, 22 Jun 2022 16:33:04 +0200
 From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 To:     Ashish Kalra <Ashish.Kalra@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -41,15 +41,15 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
- fault for user address
-Message-ID: <YrMnV7QLUpT1GQAj@jpiotrowski-Surface-Book-3>
+Subject: Re: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry
+ on fault
+Message-ID: <YrMoIOv3U+vehi/D@jpiotrowski-Surface-Book-3>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
- <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
 X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
         SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
@@ -60,196 +60,226 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 11:03:43PM +0000, Ashish Kalra wrote:
+On Mon, Jun 20, 2022 at 11:03:58PM +0000, Ashish Kalra wrote:
 > From: Brijesh Singh <brijesh.singh@amd.com>
 > 
 > When SEV-SNP is enabled globally, a write from the host goes through the
-> RMP check. When the host writes to pages, hardware checks the following
-> conditions at the end of page walk:
-> 
-> 1. Assigned bit in the RMP table is zero (i.e page is shared).
-> 2. If the page table entry that gives the sPA indicates that the target
->    page size is a large page, then all RMP entries for the 4KB
->    constituting pages of the target must have the assigned bit 0.
-> 3. Immutable bit in the RMP table is not zero.
-> 
-> The hardware will raise page fault if one of the above conditions is not
-> met. Try resolving the fault instead of taking fault again and again. If
-> the host attempts to write to the guest private memory then send the
-> SIGBUS signal to kill the process. If the page level between the host and
-> RMP entry does not match, then split the address to keep the RMP and host
-> page levels in sync.
+> RMP check. If the hardware encounters the check failure, then it raises
+> the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
+> the debug.
 > 
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  arch/x86/mm/fault.c      | 66 ++++++++++++++++++++++++++++++++++++++++
->  include/linux/mm.h       |  3 +-
->  include/linux/mm_types.h |  3 ++
->  mm/memory.c              | 13 ++++++++
->  4 files changed, 84 insertions(+), 1 deletion(-)
+>  arch/x86/include/asm/sev.h |  7 +++++++
+>  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
+>  arch/x86/mm/fault.c        | 17 +++++++++++----
+>  include/linux/sev.h        |  2 ++
+>  4 files changed, 65 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-> index a4c270e99f7f..f5de9673093a 100644
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -19,6 +19,7 @@
->  #include <linux/uaccess.h>		/* faulthandler_disabled()	*/
->  #include <linux/efi.h>			/* efi_crash_gracefully_on_page_fault()*/
->  #include <linux/mm_types.h>
-> +#include <linux/sev.h>			/* snp_lookup_rmpentry()	*/
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 6ab872311544..c0c4df817159 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -113,6 +113,11 @@ struct __packed rmpentry {
 >  
->  #include <asm/cpufeature.h>		/* boot_cpu_has, ...		*/
->  #include <asm/traps.h>			/* dotraplinkage, ...		*/
-> @@ -1209,6 +1210,60 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
+>  #define rmpentry_assigned(x)	((x)->info.assigned)
+>  #define rmpentry_pagesize(x)	((x)->info.pagesize)
+> +#define rmpentry_vmsa(x)	((x)->info.vmsa)
+> +#define rmpentry_asid(x)	((x)->info.asid)
+> +#define rmpentry_validated(x)	((x)->info.validated)
+> +#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
+> +#define rmpentry_immutable(x)	((x)->info.immutable)
+>  
+>  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
+>  
+> @@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
+>  bool snp_init(struct boot_params *bp);
+>  void snp_abort(void);
+>  int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
+> +void dump_rmpentry(u64 pfn);
+>  #else
+>  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+>  static inline void sev_es_ist_exit(void) { }
+> @@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
+>  {
+>  	return -ENOTTY;
 >  }
->  NOKPROBE_SYMBOL(do_kern_addr_fault);
+> +static inline void dump_rmpentry(u64 pfn) {}
+>  #endif
 >  
-> +static inline size_t pages_per_hpage(int level)
+>  #endif
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 734cddd837f5..6640a639fffc 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
+>  	return entry;
+>  }
+>  
+> +void dump_rmpentry(u64 pfn)
 > +{
-> +	return page_level_size(level) / PAGE_SIZE;
-> +}
+> +	unsigned long pfn_end;
+> +	struct rmpentry *e;
+> +	int level;
 > +
-> +/*
-> + * Return 1 if the caller need to retry, 0 if it the address need to be split
-> + * in order to resolve the fault.
-> + */
-> +static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
-> +				      unsigned long address)
-> +{
-> +	int rmp_level, level;
-> +	pte_t *pte;
-> +	u64 pfn;
+> +	e = __snp_lookup_rmpentry(pfn, &level);
+> +	if (!e) {
+
+__snp_lookup_rmpentry may return -errno so this should be:
+
+  if (e != 1)
+
+> +		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
+> +		return;
+> +	}
 > +
-> +	pte = lookup_address_in_mm(current->mm, address, &level);
-> +
-> +	/*
-> +	 * It can happen if there was a race between an unmap event and
-> +	 * the RMP fault delivery.
-> +	 */
-> +	if (!pte || !pte_present(*pte))
-> +		return 1;
-> +
-> +	pfn = pte_pfn(*pte);
-> +
-> +	/* If its large page then calculte the fault pfn */
-> +	if (level > PG_LEVEL_4K) {
-> +		unsigned long mask;
-> +
-> +		mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
-> +		pfn |= (address >> PAGE_SHIFT) & mask;
+> +	if (rmpentry_assigned(e)) {
+> +		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
+> +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
+> +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
+> +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
+> +			rmpentry_validated(e));
+> +		return;
 > +	}
 > +
 > +	/*
-> +	 * If its a guest private page, then the fault cannot be resolved.
-> +	 * Send a SIGBUS to terminate the process.
+> +	 * If the RMP entry at the faulting pfn was not assigned, then we do not
+> +	 * know what caused the RMP violation. To get some useful debug information,
+> +	 * let iterate through the entire 2MB region, and dump the RMP entries if
+> +	 * one of the bit in the RMP entry is set.
 > +	 */
-> +	if (snp_lookup_rmpentry(pfn, &rmp_level)) {
-
-snp_lookup_rmpentry returns 0, 1 or -errno, so this should likely be:
-
-  if (snp_lookup_rmpentry(pfn, &rmp_level) != 1)) {
-
-> +		do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
-> +		return 1;
-> +	}
+> +	pfn = pfn & ~(PTRS_PER_PMD - 1);
+> +	pfn_end = pfn + PTRS_PER_PMD;
 > +
-> +	/*
-> +	 * The backing page level is higher than the RMP page level, request
-> +	 * to split the page.
-> +	 */
-> +	if (level > rmp_level)
-> +		return 0;
-> +
-> +	return 1;
-> +}
-> +
->  /*
->   * Handle faults in the user portion of the address space.  Nothing in here
->   * should check X86_PF_USER without a specific justification: for almost
-> @@ -1306,6 +1361,17 @@ void do_user_addr_fault(struct pt_regs *regs,
->  	if (error_code & X86_PF_INSTR)
->  		flags |= FAULT_FLAG_INSTRUCTION;
->  
-> +	/*
-> +	 * If its an RMP violation, try resolving it.
-> +	 */
-> +	if (error_code & X86_PF_RMP) {
-> +		if (handle_user_rmp_page_fault(regs, error_code, address))
+> +	while (pfn < pfn_end) {
+> +		e = __snp_lookup_rmpentry(pfn, &level);
+> +		if (!e)
+
+  if (e != 1)
+
 > +			return;
 > +
-> +		/* Ask to split the page */
-> +		flags |= FAULT_FLAG_PAGE_SPLIT;
+> +		if (e->low || e->high)
+> +			pr_alert("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
+> +				 pfn << PAGE_SHIFT, e->high, e->low);
+> +		pfn++;
 > +	}
+> +}
+> +EXPORT_SYMBOL_GPL(dump_rmpentry);
 > +
->  #ifdef CONFIG_X86_64
->  	/*
->  	 * Faults in the vsyscall page might need emulation.  The
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index de32c0383387..2ccc562d166f 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -463,7 +463,8 @@ static inline bool fault_flag_allow_retry_first(enum fault_flag flags)
->  	{ FAULT_FLAG_USER,		"USER" }, \
->  	{ FAULT_FLAG_REMOTE,		"REMOTE" }, \
->  	{ FAULT_FLAG_INSTRUCTION,	"INSTRUCTION" }, \
-> -	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }
-> +	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }, \
-> +	{ FAULT_FLAG_PAGE_SPLIT,	"PAGESPLIT" }
->  
 >  /*
->   * vm_fault is filled by the pagefault handler and passed to the vma's
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index 6dfaf271ebf8..aa2d8d48ce3e 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -818,6 +818,8 @@ typedef struct {
->   *                      mapped R/O.
->   * @FAULT_FLAG_ORIG_PTE_VALID: whether the fault has vmf->orig_pte cached.
->   *                        We should only access orig_pte if this flag set.
-> + * @FAULT_FLAG_PAGE_SPLIT: The fault was due page size mismatch, split the
-> + *                         region to smaller page size and retry.
->   *
->   * About @FAULT_FLAG_ALLOW_RETRY and @FAULT_FLAG_TRIED: we can specify
->   * whether we would allow page faults to retry by specifying these two
-> @@ -855,6 +857,7 @@ enum fault_flag {
->  	FAULT_FLAG_INTERRUPTIBLE =	1 << 9,
->  	FAULT_FLAG_UNSHARE =		1 << 10,
->  	FAULT_FLAG_ORIG_PTE_VALID =	1 << 11,
-> +	FAULT_FLAG_PAGE_SPLIT =		1 << 12,
->  };
+>   * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
+>   * and -errno if there is no corresponding RMP entry.
+> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+> index f5de9673093a..25896a6ba04a 100644
+> --- a/arch/x86/mm/fault.c
+> +++ b/arch/x86/mm/fault.c
+> @@ -34,6 +34,7 @@
+>  #include <asm/kvm_para.h>		/* kvm_handle_async_pf		*/
+>  #include <asm/vdso.h>			/* fixup_vdso_exception()	*/
+>  #include <asm/irq_stack.h>
+> +#include <asm/sev.h>			/* dump_rmpentry()		*/
 >  
->  typedef unsigned int __bitwise zap_flags_t;
-> diff --git a/mm/memory.c b/mm/memory.c
-> index 7274f2b52bca..c2187ffcbb8e 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -4945,6 +4945,15 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
->  	return 0;
+>  #define CREATE_TRACE_POINTS
+>  #include <asm/trace/exceptions.h>
+> @@ -290,7 +291,7 @@ static bool low_pfn(unsigned long pfn)
+>  	return pfn < max_low_pfn;
 >  }
 >  
-> +static int handle_split_page_fault(struct vm_fault *vmf)
-> +{
-> +	if (!IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))
-> +		return VM_FAULT_SIGBUS;
+> -static void dump_pagetable(unsigned long address)
+> +static void dump_pagetable(unsigned long address, bool show_rmpentry)
+>  {
+>  	pgd_t *base = __va(read_cr3_pa());
+>  	pgd_t *pgd = &base[pgd_index(address)];
+> @@ -346,10 +347,11 @@ static int bad_address(void *p)
+>  	return get_kernel_nofault(dummy, (unsigned long *)p);
+>  }
+>  
+> -static void dump_pagetable(unsigned long address)
+> +static void dump_pagetable(unsigned long address, bool show_rmpentry)
+>  {
+>  	pgd_t *base = __va(read_cr3_pa());
+>  	pgd_t *pgd = base + pgd_index(address);
+> +	unsigned long pfn;
+>  	p4d_t *p4d;
+>  	pud_t *pud;
+>  	pmd_t *pmd;
+> @@ -367,6 +369,7 @@ static void dump_pagetable(unsigned long address)
+>  	if (bad_address(p4d))
+>  		goto bad;
+>  
+> +	pfn = p4d_pfn(*p4d);
+>  	pr_cont("P4D %lx ", p4d_val(*p4d));
+>  	if (!p4d_present(*p4d) || p4d_large(*p4d))
+>  		goto out;
+> @@ -375,6 +378,7 @@ static void dump_pagetable(unsigned long address)
+>  	if (bad_address(pud))
+>  		goto bad;
+>  
+> +	pfn = pud_pfn(*pud);
+>  	pr_cont("PUD %lx ", pud_val(*pud));
+>  	if (!pud_present(*pud) || pud_large(*pud))
+>  		goto out;
+> @@ -383,6 +387,7 @@ static void dump_pagetable(unsigned long address)
+>  	if (bad_address(pmd))
+>  		goto bad;
+>  
+> +	pfn = pmd_pfn(*pmd);
+>  	pr_cont("PMD %lx ", pmd_val(*pmd));
+>  	if (!pmd_present(*pmd) || pmd_large(*pmd))
+>  		goto out;
+> @@ -391,9 +396,13 @@ static void dump_pagetable(unsigned long address)
+>  	if (bad_address(pte))
+>  		goto bad;
+>  
+> +	pfn = pte_pfn(*pte);
+>  	pr_cont("PTE %lx", pte_val(*pte));
+>  out:
+>  	pr_cont("\n");
 > +
-> +	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
-> +	return 0;
-> +}
-> +
->  /*
->   * By the time we get here, we already hold the mm semaphore
->   *
-> @@ -5024,6 +5033,10 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
->  				pmd_migration_entry_wait(mm, vmf.pmd);
->  			return 0;
->  		}
-> +
-> +		if (flags & FAULT_FLAG_PAGE_SPLIT)
-> +			return handle_split_page_fault(&vmf);
-> +
->  		if (pmd_trans_huge(vmf.orig_pmd) || pmd_devmap(vmf.orig_pmd)) {
->  			if (pmd_protnone(vmf.orig_pmd) && vma_is_accessible(vma))
->  				return do_huge_pmd_numa_page(&vmf);
+> +	if (show_rmpentry)
+> +		dump_rmpentry(pfn);
+>  	return;
+>  bad:
+>  	pr_info("BAD\n");
+> @@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+>  		show_ldttss(&gdt, "TR", tr);
+>  	}
+>  
+> -	dump_pagetable(address);
+> +	dump_pagetable(address, error_code & X86_PF_RMP);
+>  }
+>  
+>  static noinline void
+> @@ -596,7 +605,7 @@ pgtable_bad(struct pt_regs *regs, unsigned long error_code,
+>  
+>  	printk(KERN_ALERT "%s: Corrupted page table at address %lx\n",
+>  	       tsk->comm, address);
+> -	dump_pagetable(address);
+> +	dump_pagetable(address, false);
+>  
+>  	if (__die("Bad pagetable", regs, error_code))
+>  		sig = 0;
+> diff --git a/include/linux/sev.h b/include/linux/sev.h
+> index 1a68842789e1..734b13a69c54 100644
+> --- a/include/linux/sev.h
+> +++ b/include/linux/sev.h
+> @@ -16,6 +16,7 @@ int snp_lookup_rmpentry(u64 pfn, int *level);
+>  int psmash(u64 pfn);
+>  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+>  int rmp_make_shared(u64 pfn, enum pg_level level);
+> +void dump_rmpentry(u64 pfn);
+>  #else
+>  static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
+>  static inline int psmash(u64 pfn) { return -ENXIO; }
+> @@ -25,6 +26,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
+>  	return -ENODEV;
+>  }
+>  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
+> +static inline void dump_rmpentry(u64 pfn) { }
+>  
+>  #endif /* CONFIG_AMD_MEM_ENCRYPT */
+>  #endif /* __LINUX_SEV_H */
 > -- 
 > 2.25.1
 > 
