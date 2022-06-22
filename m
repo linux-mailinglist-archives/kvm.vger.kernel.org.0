@@ -2,223 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C182554D3D
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:34:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38BDE554D74
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:36:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358408AbiFVOdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 10:33:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59850 "EHLO
+        id S1358715AbiFVOfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 10:35:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358586AbiFVOdp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:33:45 -0400
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C705CFD16;
-        Wed, 22 Jun 2022 07:33:44 -0700 (PDT)
-Received: from xenbits.xenproject.org ([104.239.192.120])
-        by mail.xenproject.org with esmtp (Exim 4.92)
-        (envelope-from <pdurrant@amazon.com>)
-        id 1o41Q5-0006GT-AF; Wed, 22 Jun 2022 14:33:25 +0000
-Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=debian.cbg12.amazon.com)
-        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <pdurrant@amazon.com>)
-        id 1o41Q4-0001QB-Uo; Wed, 22 Jun 2022 14:33:25 +0000
-From:   Paul Durrant <pdurrant@amazon.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S1358680AbiFVOfh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 10:35:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CFA13C710
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:35:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655908532;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mqHBzJ5IikLI/T/Qp0b//MpzSAkflYAqrEPzT2O75eE=;
+        b=bifTo4NifPJ2cOUCuPzLWw+342SQxTrKosrDG7B+pjky1YooGoPOqheyl2taB/SAoUowVA
+        cN826zogzPrc/iTNJGHLccecwRTStS6pAOAw9A9UzMIj3saclOabvXT1PQS9zV/NO8NYZh
+        UnZbLUY9hszLLO91lIMj0QMVF9nQS80=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-592-2D0O1Yt2MqWPlM3wGFQ6bw-1; Wed, 22 Jun 2022 10:35:31 -0400
+X-MC-Unique: 2D0O1Yt2MqWPlM3wGFQ6bw-1
+Received: by mail-wm1-f70.google.com with SMTP id p6-20020a05600c358600b0039c873184b9so7931847wmq.4
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 07:35:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=mqHBzJ5IikLI/T/Qp0b//MpzSAkflYAqrEPzT2O75eE=;
+        b=mjwj059yBYcvDLFYMfuJsoUpVHNmBmi4oc/nwTPZO3jTf+DvMVt/AqDOp/XZkeJvfS
+         DwP1Latf69gudRjPkqX44k0xO1E+termCAmPdZGd0Dw6jTknhc70m6hBuR9BXPfaOtg4
+         eLAPAcmS818q1vUixKNkdq2h0aLIruNzh/yyGJb3vDBCeKNHsCmTJ7aMNnCrbtll7PSQ
+         Yk1cLqW+UHIdx+FBluvK6ayo61dR2q6RISh+bOLGc4vhjpEOZiZXpgaAQ9m4exSxzM0V
+         rK/lMPVMRJ3l250DyKBfKlrO3MK6d4UJjN+WBOTqn3C4+/sRv4VZOGPxEkdri5CLpjoh
+         55Gg==
+X-Gm-Message-State: AJIora8qNu8zV2J1L3iBYIP6PotTjGmbECcg/J8DAyvlshODNMfsB8AK
+        1DtkxDCX3rjuz+4l5sAd6Fx1ATeStfonblp1UvCfUpyVgI+0UJGI5FJNulS+CjhnVMVFpa31zPu
+        wsQibHLsO/qqw
+X-Received: by 2002:a5d:59a6:0:b0:21b:a234:8314 with SMTP id p6-20020a5d59a6000000b0021ba2348314mr2724829wrr.316.1655908529925;
+        Wed, 22 Jun 2022 07:35:29 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uRzNKe1o2TRsk2pdleUVR343vFzLH3P88s0wFu9UOAwdJNQdDmkRYfBHgnvCVsa8OT7/f4qA==
+X-Received: by 2002:a5d:59a6:0:b0:21b:a234:8314 with SMTP id p6-20020a5d59a6000000b0021ba2348314mr2724792wrr.316.1655908529685;
+        Wed, 22 Jun 2022 07:35:29 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id p11-20020a05600c418b00b00397342e3830sm4923089wmh.0.2022.06.22.07.35.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 07:35:28 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v3] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
-Date:   Wed, 22 Jun 2022 15:33:06 +0100
-Message-Id: <20220622143306.13248-1-pdurrant@amazon.com>
-X-Mailer: git-send-email 2.20.1
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Ilias Stamatis <ilstam@amazon.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, mail@anirudhrb.com,
+        kumarpraveen@linux.microsoft.com, wei.liu@kernel.org,
+        robert.bradford@intel.com, liuwe@microsoft.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: Don't expose TSC scaling to L1 when on Hyper-V
+In-Reply-To: <YrMenI1mTbqA9MaR@anrayabh-desk>
+References: <20220613161611.3567556-1-anrayabh@linux.microsoft.com>
+ <592ab920-51f3-4794-331f-8737e1f5b20a@redhat.com>
+ <YqdsjW4/zsYaJahf@google.com> <YqipLpHI24NdhgJO@anrayabh-desk>
+ <YqiwoOP4HX2LniI4@google.com> <87zgi5xh42.fsf@redhat.com>
+ <YrMenI1mTbqA9MaR@anrayabh-desk>
+Date:   Wed, 22 Jun 2022 16:35:27 +0200
+Message-ID: <87r13gyde8.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_ADSP_ALL,
-        RCVD_IN_DNSWL_MED,SPF_FAIL,SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The scaling information in sub-leaf 1 should match the values in the
-'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info) which
-is shared with the guest. The offset values are not set since a TSC offset
-is already applied.
-The host TSC frequency should also be set in sub-leaf 2.
+Anirudh Rayabharam <anrayabh@linux.microsoft.com> writes:
 
-This patch adds a new kvm_xen_set_cpuid() function that scans for the
-relevant CPUID leaf when the CPUID information is updated by the VMM and
-stashes pointers to the sub-leaves in the kvm_vcpu_xen structure.
-The values are then updated by a call to the, also new,
-kvm_xen_setup_tsc_info() function made at the end of
-kvm_guest_time_update() just before entering the guest.
+> On Wed, Jun 22, 2022 at 10:00:29AM +0200, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> 
+>> > On Tue, Jun 14, 2022, Anirudh Rayabharam wrote:
+>> >> On Mon, Jun 13, 2022 at 04:57:49PM +0000, Sean Christopherson wrote:
+>> 
+>> ...
+>> 
+>> >> > 
+>> >> > Any reason not to use the already sanitized vmcs_config?  I can't think of any
+>> >> > reason why the nested path should blindly use the raw MSR values from hardware.
+>> >> 
+>> >> vmcs_config has the sanitized exec controls. But how do we construct MSR
+>> >> values using them?
+>> >
+>> > I was thinking we could use the sanitized controls for the allowed-1 bits, and then
+>> > take the required-1 bits from the CPU.  And then if we wanted to avoid the redundant
+>> > RDMSRs in a follow-up patch we could add required-1 fields to vmcs_config.
+>> >
+>> > Hastily constructed and compile-tested only, proceed with caution :-)
+>> 
+>> Independently from "[PATCH 00/11] KVM: VMX: Support TscScaling and
+>> EnclsExitingBitmap whith eVMCS" which is supposed to fix the particular
+>> TSC scaling issue, I like the idea to make nested_vmx_setup_ctls_msrs()
+>> use both allowed-1 and required-1 bits from vmcs_config. I'll pick up
+>> the suggested patch and try to construct something for required-1 bits.
+>
+> I tried this patch today but it causes some regression which causes
+> /dev/kvm to be unavailable in L1. I didn't get a chance to look into it
+> closely but I am guessing it has something to do with the fact that
+> vmcs_config reflects the config that L0 chose to use rather than what is
+> available to use. So constructing allowed-1 MSR bits based on what bits
+> are set in exec controls maybe isn't correct.
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: David Woodhouse <dwmw2@infradead.org>
+I've tried to pick it up but it's actually much harder than I think. The
+patch has some minor issues ('&vmcs_config.nested' needs to be switched
+to '&vmcs_conf->nested' in nested_vmx_setup_ctls_msrs()), but the main
+problem is that the set of controls nested_vmx_setup_ctls_msrs() needs
+is NOT a subset of vmcs_config (setup_vmcs_config()). I was able to
+identify at least:
 
-v2:
- - Make sure sub-leaf pointers are NULLed if the time leaf is removed
-
-v3:
- - Add leaf limit check in kvm_xen_set_cpuid()
----
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/cpuid.c            |  2 ++
- arch/x86/kvm/x86.c              |  1 +
- arch/x86/kvm/xen.c              | 49 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/xen.h              | 10 +++++++
- 5 files changed, 64 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1038ccb7056a..f77a4940542f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -638,6 +638,8 @@ struct kvm_vcpu_xen {
- 	struct hrtimer timer;
- 	int poll_evtchn;
- 	struct timer_list poll_timer;
-+	struct kvm_cpuid_entry2 *tsc_info_1;
-+	struct kvm_cpuid_entry2 *tsc_info_2;
- };
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5e14e4c40007..8076352174ad 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2483,8 +2483,14 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+              CPU_BASED_INVLPG_EXITING |
+              CPU_BASED_RDPMC_EXITING;
  
- struct kvm_vcpu_arch {
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index d47222ab8e6e..eb6cd88c974a 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -25,6 +25,7 @@
- #include "mmu.h"
- #include "trace.h"
- #include "pmu.h"
-+#include "xen.h"
- 
- /*
-  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
-@@ -310,6 +311,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
- 
- 	kvm_hv_set_cpuid(vcpu);
-+	kvm_xen_set_cpuid(vcpu);
- 
- 	/* Invoke the vendor callback only after the above state is updated. */
- 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 00e23dc518e0..8b45f9975e45 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3123,6 +3123,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 	if (vcpu->xen.vcpu_time_info_cache.active)
- 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
- 	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
-+	kvm_xen_setup_tsc_info(v);
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 610beba35907..08e65ec6c793 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -10,6 +10,9 @@
- #include "xen.h"
- #include "hyperv.h"
- #include "lapic.h"
-+#include "cpuid.h"
-+
-+#include <asm/xen/cpuid.h>
- 
- #include <linux/eventfd.h>
- #include <linux/kvm_host.h>
-@@ -1855,3 +1858,49 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
- 	if (kvm->arch.xen_hvm_config.msr)
- 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
- }
-+
-+void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	u32 base = 0;
-+	u32 limit;
-+	u32 function;
-+
-+	vcpu->arch.xen.tsc_info_1 = NULL;
-+	vcpu->arch.xen.tsc_info_2 = NULL;
-+
-+	for_each_possible_hypervisor_cpuid_base(function) {
-+		struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
-+
-+		if (entry &&
-+		    entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
-+		    entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
-+		    entry->edx == XEN_CPUID_SIGNATURE_EDX) {
-+			base = function;
-+			limit = entry->eax;
-+			break;
-+		}
-+	}
-+	if (!base)
-+		return;
-+
-+	function = base | XEN_CPUID_LEAF(3);
-+	if (function > limit)
-+		return;
-+
-+	vcpu->arch.xen.tsc_info_1 = kvm_find_cpuid_entry(vcpu, function, 1);
-+	vcpu->arch.xen.tsc_info_2 = kvm_find_cpuid_entry(vcpu, function, 2);
-+}
-+
-+void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid_entry2 *entry = vcpu->arch.xen.tsc_info_1;
-+
-+	if (entry) {
-+		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
-+		entry->edx = vcpu->arch.hv_clock.tsc_shift;
-+	}
-+
-+	entry = vcpu->arch.xen.tsc_info_2;
-+	if (entry)
-+		entry->eax = vcpu->arch.hw_tsc_khz;
-+}
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 532a535a9e99..1afb663318a9 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -32,6 +32,8 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
- int kvm_xen_setup_evtchn(struct kvm *kvm,
- 			 struct kvm_kernel_irq_routing_entry *e,
- 			 const struct kvm_irq_routing_entry *ue);
-+void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu);
-+void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu);
- 
- static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
- {
-@@ -135,6 +137,14 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
- {
- 	return false;
- }
-+
-+static inline void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+static inline void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
-+{
-+}
+-       opt = CPU_BASED_TPR_SHADOW |
++       opt = CPU_BASED_INTR_WINDOW_EXITING |
++             CPU_BASED_NMI_WINDOW_EXITING |
++             CPU_BASED_TPR_SHADOW |
++             CPU_BASED_USE_IO_BITMAPS |
+              CPU_BASED_USE_MSR_BITMAPS |
++             CPU_BASED_MONITOR_TRAP_FLAG |
++             CPU_BASED_RDTSC_EXITING |
++             CPU_BASED_PAUSE_EXITING |
+              CPU_BASED_ACTIVATE_SECONDARY_CONTROLS |
+              CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
+        if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_PROCBASED_CTLS,
+@@ -2582,6 +2588,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
  #endif
+        opt = VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+              VM_EXIT_LOAD_IA32_PAT |
++             VM_EXIT_SAVE_IA32_PAT |
+              VM_EXIT_LOAD_IA32_EFER |
+              VM_EXIT_CLEAR_BNDCFGS |
+              VM_EXIT_PT_CONCEAL_PIP |
+@@ -2604,7 +2611,11 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+                _pin_based_exec_control &= ~PIN_BASED_POSTED_INTR;
  
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+        min = VM_ENTRY_LOAD_DEBUG_CONTROLS;
+-       opt = VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
++       opt =
++#ifdef CONFIG_X86_64
++             VM_ENTRY_IA32E_MODE |
++#endif
++             VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+              VM_ENTRY_LOAD_IA32_PAT |
+              VM_ENTRY_LOAD_IA32_EFER |
+              VM_ENTRY_LOAD_BNDCFGS |
+
+but it is 1) not sufficient because some controls are smartly filtered
+out just because we don't want them for L1 -- and this doesn't mean that
+L2 doesn't need them and 2) because if we add some 'opt' controls to
+setup_vmcs_config() we need to filter them out somewhere else.
+
+I'm starting to think we may just want to store raw VMX MSR values in
+vmcs_config first, then sanitize them (eVMCS, vmx preemtoion timer bug,
+perf_ctrl bug,..) and then do the adjust_vmx_controls() magic. 
+
+I'm not giving up yet but don't expect something small and backportable
+to stable :-) 
+
 -- 
-2.20.1
+Vitaly
 
