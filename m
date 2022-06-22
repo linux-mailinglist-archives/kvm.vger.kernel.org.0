@@ -2,88 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 738BD554E95
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 17:05:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3DE5554ED7
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 17:14:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357614AbiFVPF1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 11:05:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38434 "EHLO
+        id S1359182AbiFVPOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 11:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353361AbiFVPFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 11:05:25 -0400
+        with ESMTP id S1359155AbiFVPOT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 11:14:19 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1536326FF
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 08:05:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1E5123A5F0
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 08:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655910323;
+        s=mimecast20190719; t=1655910853;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/2IQy+E40urhXFacB8Vj36ycB9yteHAjL3Hd6nT3fLI=;
-        b=OcqobsuAmhqEzB/q+lmhbrWi5WN0Y6YQTzD9uoh8TGKn0DWWr3Uaw4BKSx+rXVsTVb6C5P
-        YDk3MOnmhw9tz61KwGQHB1+zkqlwOZ5zeBTrI19NjpCxB06+vC4A0CDe34viTZOopyyexo
-        CzdMDKw3GMM0CJUpq4i3LertXLxzIfI=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=wGPNK+3CbuAdTkTsB3EwZQ5iFbUOR/MKa+csfzqSuVU=;
+        b=RoWCMe4N5twKBNu23mPODG2UvY9tjXWht22JhXOzDCuuKalvhbZ7ddsKxBsRFQmg+bGm+h
+        QqxpNjx1KgvTwt+9+qF1CjcU6wT541QcCa+3cD4F3qlI9boY1GWBiC0fsPrcglKAoRmbhz
+        BfzseiJtTomWPt/p6XGe/+XOycY/lQo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-45-rQ14nXUIPhSjzNw0hqORMw-1; Wed, 22 Jun 2022 11:05:23 -0400
-X-MC-Unique: rQ14nXUIPhSjzNw0hqORMw-1
-Received: by mail-qv1-f69.google.com with SMTP id u18-20020a0cf1d2000000b00470427ccfa5so8597138qvl.18
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 08:05:21 -0700 (PDT)
+ us-mta-21-7T_6O5ybNl6yxKgVyIvRuQ-1; Wed, 22 Jun 2022 11:14:12 -0400
+X-MC-Unique: 7T_6O5ybNl6yxKgVyIvRuQ-1
+Received: by mail-wm1-f71.google.com with SMTP id k32-20020a05600c1ca000b0039c4cf75023so10175709wms.9
+        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 08:14:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/2IQy+E40urhXFacB8Vj36ycB9yteHAjL3Hd6nT3fLI=;
-        b=hzORhAJV6wRp1YVEnAnghd2Lnd1az/BcOK14al9gMoiaPj3CP9s+Zen1zsBUSw3ah+
-         GKQVMpTgi/D67rhN7BfJYx4OO8CX5xB9ctRHIUHWfgyUe0Cx4RAd/mgq3XBtYtHAWsrc
-         pFYMkbTJemc6uGNZ+WpITBaigKsjG+3uQ2BB2E9cTm8gvVQh61s2NrPtxelUk76QHxHO
-         t4dVKIQNJHjnlKKgZBbIXYWybqxDa+FhYwv6L1QoWuK96JJZ7G40qyridU7O7ngHxQ8P
-         0z+uzfAo5D+ElVWw1FnWUewbf9IslsmnRZeovDYj5kYQQALgqZNV6urO5cY5eVEYVW50
-         wTfA==
-X-Gm-Message-State: AJIora8hQtP/s4QnuPfuEFq06DJlIc2tF8B3RRJXtomCCi+MEo9izA0f
-        TfX/ab+pW8D/qX/iCMgyL9pFBtKFkN3qvMCzF4KxGTJrJ/pwY5lXWfBTxuxLGWnbRpBBcH9C6P/
-        197Fkez/Q7lsNt5oVIav+pl3SWUtR
-X-Received: by 2002:a37:9e8d:0:b0:6ae:e97f:0 with SMTP id h135-20020a379e8d000000b006aee97f0000mr771680qke.255.1655910321124;
-        Wed, 22 Jun 2022 08:05:21 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sQQ1h9P/HHEVYnAo2mvHU2BBI6pfbGjZhVCLCVPT5jR/q5Yw/ghpcZqC3xUNOJBIwMqEbn/hBb7fQQn1SmrVE=
-X-Received: by 2002:a37:9e8d:0:b0:6ae:e97f:0 with SMTP id h135-20020a379e8d000000b006aee97f0000mr771619qke.255.1655910320506;
- Wed, 22 Jun 2022 08:05:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220330180436.24644-1-gdawar@xilinx.com> <20220330180436.24644-20-gdawar@xilinx.com>
- <CAGxU2F6OO108oHsrLBWJnYRG2yRU8QnRxAdjJhUUcp8AqaAP-g@mail.gmail.com> <CAJaqyWd8MR9vTRcCTktzC3VL054x5H5_sXy+MLVNewFDkjQUSw@mail.gmail.com>
-In-Reply-To: <CAJaqyWd8MR9vTRcCTktzC3VL054x5H5_sXy+MLVNewFDkjQUSw@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 22 Jun 2022 17:04:44 +0200
-Message-ID: <CAJaqyWc36adK-gUzc8tMgDDe5SoBPy7xN-UtcFA4=aDezdJ5LA@mail.gmail.com>
-Subject: Re: [PATCH v2 19/19] vdpasim: control virtqueue support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Gautam Dawar <gautam.dawar@xilinx.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wGPNK+3CbuAdTkTsB3EwZQ5iFbUOR/MKa+csfzqSuVU=;
+        b=JxVKJlNuYWccIcI1gXHO++U44Gdh0phMmMjOamtb0EGD1oS7UHhj7LyZeVM90G17ZS
+         iQ9MJw8a3epYw7rNqoK8ifPsohKAJmtCPpWLzZvAgapzoB1GME21qGzH367ZN4vQr0kC
+         8ySPI+Qpkd+wzMd/NIMseeCw+1SGIYS0uJifBuJ/MwFFLS2G3iXKqtexwSrWS05J/tFW
+         HjHJCem9GDgpqtIx1Zelee8q04BPmJdBSTiR/MrddA/U6L8FSkvCDUrcpjHTOsSqN+Y1
+         GJuvnTapNFKh8l+GKwJKDeOFsOhATBZ0ERjz1A3mddCeWGvOzKgxBiMAvbLVsujFKZhu
+         6Rog==
+X-Gm-Message-State: AOAM532YlLsPecRqPh0kMmKgPGNLo0a4LkOQ+6K0Pv0B0UCkyziQ3uTo
+        lt13lY7D6jKrNgmT+51QoXRoloUcHrzmokyhjGdzqcNI6rNH92zM85HjhdthDm85HDo69PNoH+j
+        H4ApezXhpTSrw
+X-Received: by 2002:a05:600c:3508:b0:39c:8240:5538 with SMTP id h8-20020a05600c350800b0039c82405538mr46419581wmq.165.1655910849746;
+        Wed, 22 Jun 2022 08:14:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzEzFT4TFaMqQR0Ghk5VXNDtqjANOX/reNQn5bceF+MCQwu4Q10ypxVnyl4WOcDbkKlljFl6w==
+X-Received: by 2002:a05:600c:3508:b0:39c:8240:5538 with SMTP id h8-20020a05600c350800b0039c82405538mr46419547wmq.165.1655910849466;
+        Wed, 22 Jun 2022 08:14:09 -0700 (PDT)
+Received: from step1.redhat.com (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
+        by smtp.gmail.com with ESMTPSA id z6-20020a7bc7c6000000b0039c63f4bce0sm25194613wmk.12.2022.06.22.08.14.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 08:14:08 -0700 (PDT)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        Gautam Dawar <gautam.dawar@xilinx.com>, kvm@vger.kernel.org,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Longpeng <longpeng2@huawei.com>, Eli Cohen <elic@nvidia.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        "Kamde, Tanuj" <tanuj.kamde@amd.com>, habetsm.xilinx@gmail.com,
-        ecree.xilinx@gmail.com, Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Zhang Min <zhang.min9@zte.com.cn>
-Content-Type: text/plain; charset="UTF-8"
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH] vhost-vdpa: call vhost_vdpa_cleanup during the release
+Date:   Wed, 22 Jun 2022 17:14:07 +0200
+Message-Id: <20220622151407.51232-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.36.1
+MIME-Version: 1.0
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,175 +78,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 22, 2022 at 12:21 PM Eugenio Perez Martin
-<eperezma@redhat.com> wrote:
->
-> On Tue, Jun 21, 2022 at 5:20 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >
-> > Hi Gautam,
-> >
-> > On Wed, Mar 30, 2022 at 8:21 PM Gautam Dawar <gautam.dawar@xilinx.com> wrote:
-> > >
-> > > This patch introduces the control virtqueue support for vDPA
-> > > simulator. This is a requirement for supporting advanced features like
-> > > multiqueue.
-> > >
-> > > A requirement for control virtqueue is to isolate its memory access
-> > > from the rx/tx virtqueues. This is because when using vDPA device
-> > > for VM, the control virqueue is not directly assigned to VM. Userspace
-> > > (Qemu) will present a shadow control virtqueue to control for
-> > > recording the device states.
-> > >
-> > > The isolation is done via the virtqueue groups and ASID support in
-> > > vDPA through vhost-vdpa. The simulator is extended to have:
-> > >
-> > > 1) three virtqueues: RXVQ, TXVQ and CVQ (control virtqueue)
-> > > 2) two virtqueue groups: group 0 contains RXVQ and TXVQ; group 1
-> > >    contains CVQ
-> > > 3) two address spaces and the simulator simply implements the address
-> > >    spaces by mapping it 1:1 to IOTLB.
-> > >
-> > > For the VM use cases, userspace(Qemu) may set AS 0 to group 0 and AS 1
-> > > to group 1. So we have:
-> > >
-> > > 1) The IOTLB for virtqueue group 0 contains the mappings of guest, so
-> > >    RX and TX can be assigned to guest directly.
-> > > 2) The IOTLB for virtqueue group 1 contains the mappings of CVQ which
-> > >    is the buffers that allocated and managed by VMM only. So CVQ of
-> > >    vhost-vdpa is visible to VMM only. And Guest can not access the CVQ
-> > >    of vhost-vdpa.
-> > >
-> > > For the other use cases, since AS 0 is associated to all virtqueue
-> > > groups by default. All virtqueues share the same mapping by default.
-> > >
-> > > To demonstrate the function, VIRITO_NET_F_CTRL_MACADDR is
-> > > implemented in the simulator for the driver to set mac address.
-> > >
-> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
-> > > ---
-> > >  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 91 ++++++++++++++++++++++------
-> > >  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  2 +
-> > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 88 ++++++++++++++++++++++++++-
-> > >  3 files changed, 161 insertions(+), 20 deletions(-)
-> > >
-> > > diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> > > index 659e2e2e4b0c..51bd0bafce06 100644
-> > > --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> > > +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> > > @@ -96,11 +96,17 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
-> > >  {
-> > >         int i;
-> > >
-> > > -       for (i = 0; i < vdpasim->dev_attr.nvqs; i++)
-> > > +       spin_lock(&vdpasim->iommu_lock);
-> > > +
-> > > +       for (i = 0; i < vdpasim->dev_attr.nvqs; i++) {
-> > >                 vdpasim_vq_reset(vdpasim, &vdpasim->vqs[i]);
-> > > +               vringh_set_iotlb(&vdpasim->vqs[i].vring, &vdpasim->iommu[0],
-> > > +                                &vdpasim->iommu_lock);
-> > > +       }
-> > > +
-> > > +       for (i = 0; i < vdpasim->dev_attr.nas; i++)
-> > > +               vhost_iotlb_reset(&vdpasim->iommu[i]);
-> > >
-> > > -       spin_lock(&vdpasim->iommu_lock);
-> > > -       vhost_iotlb_reset(vdpasim->iommu);
-> > >         spin_unlock(&vdpasim->iommu_lock);
-> > >
-> > >         vdpasim->features = 0;
-> > > @@ -145,7 +151,7 @@ static dma_addr_t vdpasim_map_range(struct vdpasim *vdpasim, phys_addr_t paddr,
-> > >         dma_addr = iova_dma_addr(&vdpasim->iova, iova);
-> > >
-> > >         spin_lock(&vdpasim->iommu_lock);
-> > > -       ret = vhost_iotlb_add_range(vdpasim->iommu, (u64)dma_addr,
-> > > +       ret = vhost_iotlb_add_range(&vdpasim->iommu[0], (u64)dma_addr,
-> > >                                     (u64)dma_addr + size - 1, (u64)paddr, perm);
-> > >         spin_unlock(&vdpasim->iommu_lock);
-> > >
-> > > @@ -161,7 +167,7 @@ static void vdpasim_unmap_range(struct vdpasim *vdpasim, dma_addr_t dma_addr,
-> > >                                 size_t size)
-> > >  {
-> > >         spin_lock(&vdpasim->iommu_lock);
-> > > -       vhost_iotlb_del_range(vdpasim->iommu, (u64)dma_addr,
-> > > +       vhost_iotlb_del_range(&vdpasim->iommu[0], (u64)dma_addr,
-> > >                               (u64)dma_addr + size - 1);
-> > >         spin_unlock(&vdpasim->iommu_lock);
-> > >
-> > > @@ -250,8 +256,9 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr)
-> > >         else
-> > >                 ops = &vdpasim_config_ops;
-> > >
-> > > -       vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops, 1,
-> > > -                                   1, dev_attr->name, false);
-> > > +       vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
-> > > +                                   dev_attr->ngroups, dev_attr->nas,
-> > > +                                   dev_attr->name, false);
-> > >         if (IS_ERR(vdpasim)) {
-> > >                 ret = PTR_ERR(vdpasim);
-> > >                 goto err_alloc;
-> > > @@ -278,16 +285,20 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr)
-> > >         if (!vdpasim->vqs)
-> > >                 goto err_iommu;
-> > >
-> > > -       vdpasim->iommu = vhost_iotlb_alloc(max_iotlb_entries, 0);
-> > > +       vdpasim->iommu = kmalloc_array(vdpasim->dev_attr.nas,
-> > > +                                      sizeof(*vdpasim->iommu), GFP_KERNEL);
-> > >         if (!vdpasim->iommu)
-> > >                 goto err_iommu;
-> > >
-> > > +       for (i = 0; i < vdpasim->dev_attr.nas; i++)
-> > > +               vhost_iotlb_init(&vdpasim->iommu[i], 0, 0);
-> > > +
-> > >         vdpasim->buffer = kvmalloc(dev_attr->buffer_size, GFP_KERNEL);
-> > >         if (!vdpasim->buffer)
-> > >                 goto err_iommu;
-> > >
-> > >         for (i = 0; i < dev_attr->nvqs; i++)
-> > > -               vringh_set_iotlb(&vdpasim->vqs[i].vring, vdpasim->iommu,
-> > > +               vringh_set_iotlb(&vdpasim->vqs[i].vring, &vdpasim->iommu[0],
-> > >                                  &vdpasim->iommu_lock);
-> > >
-> > >         ret = iova_cache_get();
-> > > @@ -401,7 +412,11 @@ static u32 vdpasim_get_vq_align(struct vdpa_device *vdpa)
-> > >
-> > >  static u32 vdpasim_get_vq_group(struct vdpa_device *vdpa, u16 idx)
-> > >  {
-> > > -       return 0;
-> > > +       /* RX and TX belongs to group 0, CVQ belongs to group 1 */
-> > > +       if (idx == 2)
-> > > +               return 1;
-> > > +       else
-> > > +               return 0;
-> >
-> > This code only works for the vDPA-net simulator, since
-> > vdpasim_get_vq_group() is also shared with other simulators (e.g.
-> > vdpa_sim_blk),
->
-> That's totally right.
->
-> > should we move this net-specific code into
-> > vdpa_sim_net.c, maybe adding a callback implemented by the different
-> > simulators?
-> >
->
-> At this moment, VDPASIM_BLK_VQ_NUM is fixed to 1, so maybe the right
-> thing to do for the -rc phase is to check if idx > vdpasim.attr.nvqs?
-> It's a more general fix.
->
+Before commit 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
+we call vhost_vdpa_iotlb_free() during the release to clean all regions
+mapped in the iotlb.
 
-Actually, that is already checked by vhost/vdpa.c.
+That commit removed vhost_vdpa_iotlb_free() and added vhost_vdpa_cleanup()
+to do some cleanup, including deleting all mappings, but we forgot to call
+it in vhost_vdpa_release().
 
-Taking that into account, is it worth introducing the change for 5.19?
-I'm totally ok with the change for 5.20.
+This causes that if an application does not remove all mappings explicitly
+(or it crashes), the mappings remain in the iotlb and subsequent
+applications may fail if they map the same addresses.
 
-Thanks!
+Calling vhost_vdpa_cleanup() also fixes a memory leak since we are not
+freeing `v->vdev.vqs` during the release from the same commit.
 
-> For the general case, yes, a callback should be issued to the actual
-> simulator so it's not a surprise when VDPASIM_BLK_VQ_NUM increases,
-> either dynamically or by anyone testing it.
->
-> Thoughts?
->
-> Thanks!
+Since vhost_vdpa_cleanup() calls vhost_dev_cleanup() we can remove its
+call from vhost_vdpa_release().
+
+Fixes: 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
+Cc: gautam.dawar@xilinx.com
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ drivers/vhost/vdpa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 5ad2596c6e8a..23dcbfdfa13b 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -1209,7 +1209,7 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+ 	vhost_dev_stop(&v->vdev);
+ 	vhost_vdpa_free_domain(v);
+ 	vhost_vdpa_config_put(v);
+-	vhost_dev_cleanup(&v->vdev);
++	vhost_vdpa_cleanup(v);
+ 	mutex_unlock(&d->mutex);
+ 
+ 	atomic_dec(&v->opened);
+-- 
+2.36.1
 
