@@ -2,98 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46E3E554BF6
-	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 15:59:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BCB3554C04
+	for <lists+kvm@lfdr.de>; Wed, 22 Jun 2022 16:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357788AbiFVN7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 09:59:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49250 "EHLO
+        id S1354653AbiFVOBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 10:01:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358032AbiFVN7W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 09:59:22 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC4F12E9CB;
-        Wed, 22 Jun 2022 06:59:21 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id e40so11489600eda.2;
-        Wed, 22 Jun 2022 06:59:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9Lavx5c1gZGH6D19ZXIDMtTZay0309C+BWs9+IAVz0I=;
-        b=Pj1n1a6fbgdD2JeIQGM58CL7RsalreWUtHsGCU6D1ZjemWs0ZfzXSLEdP/dMMesiZn
-         hY1rXd7843yfVEk3mAY0zfLNQh40yrzCep28FkRHNG/uBCQaQ/5mWytO8MKKdwp6q7Re
-         zoGphS0sbXIYKyBV8AzDpNHKybdct5XnI4vTid5duW2+0G4DnV9n6dDzvM8bgaT2mEv/
-         MucCglOUu1rkCKJaZQtD5BPYBRuUhhh+S9WocEYQSzaOiGxooa6NWWXds1ODiv25LklV
-         XgQfP9ElgoKCTxZfWrAoEh8fKKmi52gUd75QiD9OkDiNaJ5RQQYubd8x/LJY4z5Rt5Z3
-         e94g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9Lavx5c1gZGH6D19ZXIDMtTZay0309C+BWs9+IAVz0I=;
-        b=iDb4Vhx+ANVrkBZ7Fg/hn5v0MhZdYdCGhsAQZ7sl3Eis9SJEWExdigjPe9IT1VUwaF
-         dF2NfPGpMngkZiyOkJOCweJGt093R4BN7m17+l62y1nvwbtDKa0Gwo1RDdSW1BsVNLTz
-         koMwB8vvZnk6cul/zSgGAjAjhWpb8hfolqziADXck7ddFUxW7JegqCDoCQTHbXQaa0j/
-         9uoqnhgeWxpK3vg55LobQRWE/R9NOVAysFFqmoegfmJhLLHfL2nBsDbPgSOJaNnUn5zC
-         M39OEmxAOqhOgBQg2Z92kh2Qr4NuB7Sh8WyGQ5cIe8GRf0RDq60uSAy+y6rSfWq0mCpI
-         rRVg==
-X-Gm-Message-State: AJIora/miX+HLRA4bmCzuPEOFt/TJY7XGoYxVaiz8uOwlx2lTOdWhLCZ
-        YoWkzynb/FHtU75mhmtRQ1k93LNjzTg=
-X-Google-Smtp-Source: AGRyM1v64YQr6UsDXpYkeHRqSDu6hX5yxgearHX++4CYzFqTvST+homTskG1nEoq7V91mig6yhGEuw==
-X-Received: by 2002:aa7:de1a:0:b0:435:7d11:9717 with SMTP id h26-20020aa7de1a000000b004357d119717mr4295116edv.148.1655906360105;
-        Wed, 22 Jun 2022 06:59:20 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id 9-20020a170906310900b0071cbc7487e1sm8744079ejx.69.2022.06.22.06.59.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jun 2022 06:59:19 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <36f2de4e-43fe-7280-8cac-f44de89b2b98@redhat.com>
-Date:   Wed, 22 Jun 2022 15:59:18 +0200
+        with ESMTP id S234575AbiFVOBi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 10:01:38 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DC6369E2;
+        Wed, 22 Jun 2022 07:01:37 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 83EF221C18;
+        Wed, 22 Jun 2022 14:01:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1655906496; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=YUedw22uTonupl5S/QuQDfVjYG8TUjcgcNCTZyOGnGE=;
+        b=ZJpLVCcp3pQ+pNJiwsh0FsMhcXDcJWNOu73JOqO+um4z3crgtaMcEtIAETajwojd6MS48H
+        DqWAILnUWNje2m+SZqpwueDpfbR0JpKrzoETnksDa3zcGXWnvuCHEZC93NJkDUjJ5NbunZ
+        FT9lCISK233TJHx2C9L4aSvv2Gqn/YM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1655906496;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=YUedw22uTonupl5S/QuQDfVjYG8TUjcgcNCTZyOGnGE=;
+        b=esfq23hcixQZ1wWVeJjTN87GXtpefgt1iutwZJocxJ22QJRRUWVHEaxVFoqKHRbTmi7vex
+        8e3F+6Sw5P0EpgAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 34A2B134A9;
+        Wed, 22 Jun 2022 14:01:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id eezhC8Ags2IVRwAAMHmgww
+        (envelope-from <tzimmermann@suse.de>); Wed, 22 Jun 2022 14:01:36 +0000
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+To:     alex.williamson@redhat.com, corbet@lwn.net,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        airlied@linux.ie, daniel@ffwll.ch, deller@gmx.de,
+        gregkh@linuxfoundation.org, javierm@redhat.com, lersek@redhat.com,
+        kraxel@redhat.com
+Cc:     linux-doc@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Thomas Zimmermann <tzimmermann@suse.de>
+Subject: [PATCH v3 0/3] Improve vfio-pci primary GPU assignment behavior
+Date:   Wed, 22 Jun 2022 16:01:31 +0200
+Message-Id: <20220622140134.12763-1-tzimmermann@suse.de>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v7 10/39] KVM: x86: hyper-v: Don't use
- sparse_set_to_vcpu_mask() in kvm_hv_send_ipi()
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220613133922.2875594-1-vkuznets@redhat.com>
- <20220613133922.2875594-11-vkuznets@redhat.com>
- <17a2e85a-a1f2-99e1-fc69-1baed2275bd5@redhat.com> <87zgi640mm.fsf@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87zgi640mm.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/22 15:17, Vitaly Kuznetsov wrote:
->>
->> Just to be clear, PV IPI does*not*  support the VP_ID, right?
-> Hm, with Hyper-V PV IPI hypercall vCPUs are also addressed by their
-> VP_IDs, not by their APIC ids so similar to Hyper-V PV TLB flush we need
-> to convert the supplied set (either flat u64 bitmask of VP_IDs for
-> non-EX hypercall or a sparse set for -EX).
-> 
+(I'm taking over this patchset from Alex, [1] as we agreed that it should
+go through the drm-misc tree.)
 
-So this means the series needs a v8, right?
+When assigning a primary graphics device to VM through vfio-pci device
+assignment, users often prevent binding of the native PCI graphics
+driver to avoid device initialization conflicts, however firmware
+console drivers may still be attached to the device which can often be
+cumbersome to manually unbind or exclude via cmdline options.
 
-Paolo
+This series proposes to move the DRM aperture helpers out to
+drivers/video/ to make it more accessible to drivers like vfio-pci,
+which have neither dependencies on DRM code nor a struct drm_driver
+to present to existing interfaces.  vfio-pci can then trivially call
+into the aperture helpers to remove conflicting drivers, rather than
+open coding it ourselves as was proposed with a new symbol export in
+v1 of this series. [2]
+
+v3:
+	* add aperture_ prefix to all interfaces (Javier)
+	* improved documentation (Javier)
+	* update MAINTAINERS [3] and add aperture helpers
+
+[1] https://lore.kernel.org/all/165541020563.1955826.16350888595945658159.stgit@omen/
+[2] https://lore.kernel.org/all/165453797543.3592816.6381793341352595461.stgit@omen/
+[3] https://lore.kernel.org/all/20220518183006.14548-2-tzimmermann@suse.de/
+
+Alex Williamson (1):
+  vfio/pci: Remove console drivers
+
+Thomas Zimmermann (2):
+  MAINTAINERS: Broaden scope of simpledrm entry
+  drm: Implement DRM aperture helpers under video/
+
+ Documentation/driver-api/aperture.rst |  13 +
+ Documentation/driver-api/index.rst    |   1 +
+ MAINTAINERS                           |   6 +-
+ drivers/gpu/drm/drm_aperture.c        | 178 +------------
+ drivers/gpu/drm/tiny/Kconfig          |   1 +
+ drivers/vfio/pci/vfio_pci_core.c      |   5 +
+ drivers/video/Kconfig                 |   6 +
+ drivers/video/Makefile                |   2 +
+ drivers/video/aperture.c              | 351 ++++++++++++++++++++++++++
+ drivers/video/console/Kconfig         |   1 +
+ drivers/video/fbdev/Kconfig           |   7 +-
+ include/linux/aperture.h              |  56 ++++
+ 12 files changed, 456 insertions(+), 171 deletions(-)
+ create mode 100644 Documentation/driver-api/aperture.rst
+ create mode 100644 drivers/video/aperture.c
+ create mode 100644 include/linux/aperture.h
+
+
+base-commit: 7025c1f111b7a057243de45bd56c14b906242a53
+-- 
+2.36.1
+
