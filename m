@@ -2,181 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B2B355874B
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 20:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2C7C558797
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 20:33:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234408AbiFWSX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 14:23:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59972 "EHLO
+        id S231869AbiFWSdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 14:33:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237455AbiFWSWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 14:22:43 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA71C2283
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 10:25:28 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id cw10so18790693ejb.3
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 10:25:28 -0700 (PDT)
+        with ESMTP id S237507AbiFWScz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 14:32:55 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353C5D191E
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 10:34:20 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id ob5-20020a17090b390500b001e2f03294a7so1543855pjb.8
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 10:34:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=crkWefZHArgO+rkiNc/yWUU2AI/aei44IhcaBZPPRa4=;
-        b=B69yUz/r3Rs5qYUzhTuML3wd4FZ7bhx0VaGkedo4Drdtl6XSZzOWHcqByef9qtuueo
-         ZahVtamiPVhBKHBwHB4liwI80kfxRvGvKf5ZuCzkds9Es2319fkaXPWGnlqXvimzuhdP
-         cOfv8E29rNDtMorcpcSSMKePusmtC+TwE7VD+8zaWBDrbKT+yp+rUZ7QE3/fR3fcHgPm
-         srSevCPyG64lIK/T2r7DnnBzUAPERrJ6V1H21La/w04C6Kk1i4AHOUaogfeo0gfcKPHX
-         i5Ah3prE+7IzqShad53kUg40Vwwp1mrjgtta7Sr6pWG6pzeHWyY4QeNUyQD1bK9sSf+0
-         dXwA==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=YzBiLCY4klTYtqAR87IAA6VD+HxSLPVS13bS8WvciXc=;
+        b=sKnXVkJcT/HWTdp8+iZMbVnsW11LhtEvgOwL4zayP6rwcEwEVSw5XjC4Pc6bVQggsu
+         CWbJgUKzOLz7sYZMfFaw3MKvLlkoX6OZ6GS4bewHNc0TZBqwpNGuy5a0WMEi7EetJlhd
+         NycAp0WSqSK9tX9WTMon+6/phpGY2LodBWt7jf1LKijODwfjN0eSpMiqjgRmKBJf6N0r
+         oeUG90uhZQWqp5yG8KrsoDcjaAKENVm2KRA4r6jgeW8v5HoRLPD6BX1tFihCkxBDRJGr
+         0C3E8b7LDbjhzIXXlMIGtnv53sq3giEH62PsnQ676AVr4EBflodtXY9U+FPCRLlB34AG
+         /ZDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=crkWefZHArgO+rkiNc/yWUU2AI/aei44IhcaBZPPRa4=;
-        b=vJdGB6yilzh2zV9JGNIi3eXi6OkJEkq+fWeq2pEq39/JZEpAzflGeojJheTLDMOU0i
-         GPP5jgv7sJ9JPnFfKP6psDrQwKQMj/kPa9wzeRgokI0FqLNeOSQI1OQizxUr3uy+np5T
-         JAtcJfdsrkVYoVeTyrKZQdbkWr1yCiN7mbl3sdyORnNZMYDvAb8Oc8NvzAsAlfke17DS
-         GKiZv0UVRXm+MsWj7i9dnEVc1AUEmA8WR4AlnEU1f6mqxkdpsCNxGoNtVS5AmIqgoRex
-         b+mJrLlMO0T51FF36Yi6wB4jayLEFDhS6uN3d8ipLJfBxjAQfkp5l/FuM6sAS1owhUPk
-         Uidw==
-X-Gm-Message-State: AJIora9tJk/gJnhqyrwxOtyIjxAaoLazmrBiAh4V6rIBhn/mboiMgWfO
-        l/E1rZHF4+VkdSafNUf6T+0=
-X-Google-Smtp-Source: AGRyM1uVYsWpczLYCuYk+ZrrD4wR6t/LlXrg86SeBhLekzCowD4/w8MnyzIGzZ6KikjijzFebc/B+Q==
-X-Received: by 2002:a17:906:dc8b:b0:722:e656:def5 with SMTP id cs11-20020a170906dc8b00b00722e656def5mr9591094ejc.490.1656005126377;
-        Thu, 23 Jun 2022 10:25:26 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id p26-20020a170906b21a00b00722f48d1f19sm2776630ejz.67.2022.06.23.10.25.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jun 2022 10:25:25 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <5312f6eb-4d82-5bee-b4fa-20e9ba97baa8@redhat.com>
-Date:   Thu, 23 Jun 2022 19:25:23 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v5 0/8] KVM: x86: Add CMCI and UCNA emulation
-Content-Language: en-US
-To:     Jue Wang <juew@google.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=YzBiLCY4klTYtqAR87IAA6VD+HxSLPVS13bS8WvciXc=;
+        b=5748a3sLU1dvzFEeuGpt+K7Wr9mbuNEc6+SXLNPZ5tVZYp1op15hHSA0uOhWajJPhh
+         jrOqTLd71LmHCrRje6BaSfuxkqQEQ4TiJf4uGWmgbxYG6F4ESSFoE6RmbkXz6DxR0vr5
+         LbO0geomemLlRhAO1Sz0ubwnu+vbYIO1okuwJ1a/hVGP7FoSr4Wc/7vf4dIexinjuypH
+         X1xAovA29LHQc29p8n3BqyxKuigh3AjLGRSZXCQBcYsAVBy1jtG7ntmxXIharZQ5WfcE
+         T0cGlqTsYMWN29pYTHQ4k5Xmib0vppmJOmw5E1XFhPKgoUugXdDi2uhC933eE2f3GaqW
+         Hw9A==
+X-Gm-Message-State: AJIora9YQSbX+gaV3CUy/Aovjm0RmZzfUAiwTIfcGVKceJd0RZ16ugfl
+        /7o0SXL0pAX4D0GalKCxVBTdnD8RLVLKB6Q2UIUdEzkcT5n5fb1pzdDu/nagTrd1RJMMtQDIAHm
+        LeCBGzEwxEA0JleJ09wWrEP3hl4qgu+PDKL7VxeN7pHFvMmZ19v7uo2BJeg==
+X-Google-Smtp-Source: AGRyM1s7DibOnE7Mbl6KtMM0c/TJRvFVMdwV6LfruY9B46xoaSSmTP191nkYGoiaR70UiIkHPnHJKO9AUic=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:9b6a:a8a1:3593:35c2])
+ (user=pgonda job=sendgmr) by 2002:a05:6a00:1683:b0:4f7:e497:6a55 with SMTP id
+ k3-20020a056a00168300b004f7e4976a55mr41576663pfc.21.1656005652667; Thu, 23
+ Jun 2022 10:34:12 -0700 (PDT)
+Date:   Thu, 23 Jun 2022 10:34:06 -0700
+Message-Id: <20220623173406.744645-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
+Subject: [PATCH V2] KVM: SEV: Init target VMCBs in sev_migrate_from
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Matlack <dmatlack@google.com>
-Cc:     Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
-        Greg Thelen <gthelen@google.com>,
-        Jiaqi Yan <jiaqiyan@google.com>
-References: <20220610171134.772566-1-juew@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220610171134.772566-1-juew@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+        Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/10/22 19:11, Jue Wang wrote:
-> This patch series implement emulation for Corrected Machine Check
-> Interrupt (CMCI) signaling and UnCorrectable No Action required (UCNA)
-> error injection.
-> 
-> UCNA errors signaled via CMCI allow a guest to be notified as soon as
-> uncorrectable memory errors get detected by some background threads,
-> e.g., threads that migrate guest memory across hosts or threads that
-> constantly scan system memory for errors [1].
-> 
-> Upon receiving UCNAs, guest kernel isolates the poisoned pages which may
-> still be free, preventing future accesses that may cause fatal MCEs.
-> 
-> 1. https://lore.kernel.org/linux-mm/8eceffc0-01e8-2a55-6eb9-b26faa9e3caf@intel.com/t/
-> 
-> 
-> Patch 1-3 clean up KVM APIC LVT logic in preparation to adding APIC_LVTCMCI.
-> 
-> Patch 4 adds APIC_LVTCMCI emulation.
-> 
-> Patch 5 updates mce_banks to use array allocation api.
-> 
-> Patch 6 adds emulation for MSR_IA32_MCx_CTL2 registers that provide per
-> bank control of CMCI signaling.
-> 
-> Patch 7 enables MCG_CMCI_P and handles injected UCNA errors.
-> 
-> Patch 8 adds a KVM self test that validates UCNA injection and CMCI
-> emulation.
-> 
-> v5 changes
-> - Incorporate feedback from David Matlack <dmatlack@google.com>
-> - Rewrite the change log to be more concise and accurate.
-> - Removes several duplicated checks in UCNA injection code.
-> - Add test cases that validate CMCI emulation to self test.
-> 
-> v4 changes
-> - Incorporate feedback from David Matlack <dmatlack@google.com>
-> - Rewrite the change logs to be more descriptive.
-> - Add a KVM self test.
-> 
-> v3 changes
-> - Incorporate feedback from Sean Christopherson <seanjc@google.com>
-> - Split clean up to KVM APIC LVT logic to 3 patches.
-> - Put the clean up of mce_array allocation in a separate patch.
-> - Base the MCi_CTL2 register emulation on Sean's clean up and fix
-> series [2]
-> - Fix bugs around MCi_CTL2 register offset validation and the free of
-> mci_ctl2_banks array.
-> - Rewrite the change log with more details in architectural information
-> about CMCI, UCNA and MCG_CMCI_P.
-> - Fix various comments and wrapping style.
-> 
-> 2. https://lore.kernel.org/lkml/20220512222716.4112548-1-seanjc@google.com/T/
-> 
-> v2 chanegs
-> - Incorporate feedback from Sean Christopherson <seanjc@google.com>
-> - Split the single patch into 4:
->    1). clean up KVM APIC LVT logic
->    2). add CMCI emulation to lapic
->    3). add emulation of MSR_IA32_MCx_CTL2
->    4). enable MCG_CMCI_P and handle injected UCNAs
-> - Fix various style issues.
-> 
-> Jue Wang (8):
->    KVM: x86: Make APIC_VERSION capture only the magic 0x14UL.
->    KVM: x86: Fill apic_lvt_mask with enums / explicit entries.
->    KVM: x86: Add APIC_LVTx() macro.
->    KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to
->      lapic.
->    KVM: x86: Use kcalloc to allocate the mce_banks array.
->    KVM: x86: Add emulation for MSR_IA32_MCx_CTL2 MSRs.
->    KVM: x86: Enable CMCI capability by default and handle injected UCNA
->      errors
->    KVM: selftests: Add a self test for CMCI and UCNA emulations.
-> 
->   arch/x86/include/asm/kvm_host.h               |   1 +
->   arch/x86/kvm/lapic.c                          |  66 ++--
->   arch/x86/kvm/lapic.h                          |  16 +-
->   arch/x86/kvm/vmx/vmx.c                        |   1 +
->   arch/x86/kvm/x86.c                            | 178 ++++++---
->   tools/testing/selftests/kvm/.gitignore        |   1 +
->   tools/testing/selftests/kvm/Makefile          |   1 +
->   .../selftests/kvm/include/x86_64/apic.h       |   1 +
->   .../selftests/kvm/include/x86_64/mce.h        |  25 ++
->   .../selftests/kvm/include/x86_64/processor.h  |   1 +
->   .../selftests/kvm/lib/x86_64/processor.c      |   2 +-
->   .../kvm/x86_64/ucna_injection_test.c          | 347 ++++++++++++++++++
->   12 files changed, 573 insertions(+), 67 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/include/x86_64/mce.h
->   create mode 100644 tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-> 
+The target VMCBs during an intra-host migration need to correctly setup
+for running SEV and SEV-ES guests. Add sev_init_vmcb() function and make
+sev_es_init_vmcb() static. sev_init_vmcb() uses the now private function
+to init SEV-ES guests VMCBs when needed.
 
-Queued, thanks.  The test of course required some changes to adapt to 
-the new API.
+Fixes: 0b020f5af092 ("KVM: SEV: Add support for SEV-ES intra host migration")
+Fixes: b56639318bb2 ("KVM: SEV: Add support for SEV intra host migration")
 
-Paolo
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+
+V2
+* Refactor of sev_es_init_vmcb() and sev_migrate_from suggested by Sean.
+
+---
+ arch/x86/kvm/svm/sev.c | 68 ++++++++++++++++++++++++++++--------------
+ arch/x86/kvm/svm/svm.c | 11 ++-----
+ arch/x86/kvm/svm/svm.h |  2 +-
+ 3 files changed, 48 insertions(+), 33 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 309bcdb2f929..d45868031954 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1662,19 +1662,24 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+ {
+ 	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
+ 	struct kvm_sev_info *src = &to_kvm_svm(src_kvm)->sev_info;
++	struct kvm_vcpu *dst_vcpu, *src_vcpu;
++	struct vcpu_svm *dst_svm, *src_svm;
+ 	struct kvm_sev_info *mirror;
++	unsigned long i;
+ 
+ 	dst->active = true;
+ 	dst->asid = src->asid;
+ 	dst->handle = src->handle;
+ 	dst->pages_locked = src->pages_locked;
+ 	dst->enc_context_owner = src->enc_context_owner;
++	dst->es_active = src->es_active;
+ 
+ 	src->asid = 0;
+ 	src->active = false;
+ 	src->handle = 0;
+ 	src->pages_locked = 0;
+ 	src->enc_context_owner = NULL;
++	src->es_active = false;
+ 
+ 	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
+ 
+@@ -1701,26 +1706,21 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+ 		list_del(&src->mirror_entry);
+ 		list_add_tail(&dst->mirror_entry, &owner_sev_info->mirror_vms);
+ 	}
+-}
+ 
+-static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
+-{
+-	unsigned long i;
+-	struct kvm_vcpu *dst_vcpu, *src_vcpu;
+-	struct vcpu_svm *dst_svm, *src_svm;
++	kvm_for_each_vcpu(i, dst_vcpu, dst_kvm) {
++		dst_svm = to_svm(dst_vcpu);
+ 
+-	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
+-		return -EINVAL;
++		sev_init_vmcb(dst_svm);
+ 
+-	kvm_for_each_vcpu(i, src_vcpu, src) {
+-		if (!src_vcpu->arch.guest_state_protected)
+-			return -EINVAL;
+-	}
++		if (!dst->es_active)
++			continue;
+ 
+-	kvm_for_each_vcpu(i, src_vcpu, src) {
++		/*
++		 * Note, the source is not required to have the same number of
++		 * vCPUs as the destination when migrating a vanilla SEV VM.
++		 */
++		src_vcpu = kvm_get_vcpu(dst_kvm, i);
+ 		src_svm = to_svm(src_vcpu);
+-		dst_vcpu = kvm_get_vcpu(dst, i);
+-		dst_svm = to_svm(dst_vcpu);
+ 
+ 		/*
+ 		 * Transfer VMSA and GHCB state to the destination.  Nullify and
+@@ -1737,8 +1737,23 @@ static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
+ 		src_svm->vmcb->control.vmsa_pa = INVALID_PAGE;
+ 		src_vcpu->arch.guest_state_protected = false;
+ 	}
+-	to_kvm_svm(src)->sev_info.es_active = false;
+-	to_kvm_svm(dst)->sev_info.es_active = true;
++}
++
++static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
++{
++	struct kvm_vcpu *src_vcpu;
++	unsigned long i;
++
++	if (!sev_es_guest(src))
++		return 0;
++
++	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
++		return -EINVAL;
++
++	kvm_for_each_vcpu(i, src_vcpu, src) {
++		if (!src_vcpu->arch.guest_state_protected)
++			return -EINVAL;
++	}
+ 
+ 	return 0;
+ }
+@@ -1786,11 +1801,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+ 	if (ret)
+ 		goto out_dst_vcpu;
+ 
+-	if (sev_es_guest(source_kvm)) {
+-		ret = sev_es_migrate_from(kvm, source_kvm);
+-		if (ret)
+-			goto out_source_vcpu;
+-	}
++	ret = sev_check_source_vcpus(kvm, source_kvm);
++	if (ret)
++		goto out_source_vcpu;
+ 
+ 	sev_migrate_from(kvm, source_kvm);
+ 	kvm_vm_dead(source_kvm);
+@@ -2911,7 +2924,7 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+ 				    count, in);
+ }
+ 
+-void sev_es_init_vmcb(struct vcpu_svm *svm)
++static void sev_es_init_vmcb(struct vcpu_svm *svm)
+ {
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 
+@@ -2964,6 +2977,15 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
+ 	}
+ }
+ 
++void sev_init_vmcb(struct vcpu_svm *svm)
++{
++	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
++	clr_exception_intercept(svm, UD_VECTOR);
++
++	if (sev_es_guest(svm->vcpu.kvm))
++		sev_es_init_vmcb(svm);
++}
++
+ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ {
+ 	/*
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 136298cfb3fb..3c0e581676c3 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1259,15 +1259,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 		svm->vmcb->control.int_ctl |= V_GIF_ENABLE_MASK;
+ 	}
+ 
+-	if (sev_guest(vcpu->kvm)) {
+-		svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
+-		clr_exception_intercept(svm, UD_VECTOR);
+-
+-		if (sev_es_guest(vcpu->kvm)) {
+-			/* Perform SEV-ES specific VMCB updates */
+-			sev_es_init_vmcb(svm);
+-		}
+-	}
++	if (sev_guest(vcpu->kvm))
++		sev_init_vmcb(svm);
+ 
+ 	svm_hv_init_vmcb(vmcb);
+ 	init_vmcb_after_set_cpuid(vcpu);
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index d51de3c9264a..0897ce8a4863 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -649,10 +649,10 @@ void __init sev_set_cpu_caps(void);
+ void __init sev_hardware_setup(void);
+ void sev_hardware_unsetup(void);
+ int sev_cpu_init(struct svm_cpu_data *sd);
++void sev_init_vmcb(struct vcpu_svm *svm);
+ void sev_free_vcpu(struct kvm_vcpu *vcpu);
+ int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
+ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
+-void sev_es_init_vmcb(struct vcpu_svm *svm);
+ void sev_es_vcpu_reset(struct vcpu_svm *svm);
+ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+-- 
+2.37.0.rc0.104.g0611611a94-goog
+
