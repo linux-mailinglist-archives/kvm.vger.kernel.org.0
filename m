@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78FF9557A5D
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 14:31:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10B58557C2F
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 14:56:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231624AbiFWMbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 08:31:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45326 "EHLO
+        id S231835AbiFWM4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 08:56:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231237AbiFWMa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 08:30:59 -0400
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1BA41F87
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:30:58 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-3137316bb69so192049637b3.10
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:30:58 -0700 (PDT)
+        with ESMTP id S232143AbiFWM4a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 08:56:30 -0400
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 032114B84D
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:56:25 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-3177f4ce3e2so169410967b3.5
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:56:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=h4FAaAxDkft/GYKrZH8p1e5O8Z/g+GpcmXs91Mv5s28=;
-        b=w/PZidQ07LR5n2YGfOx4cK5vDAtot3ycJ9M2vvnvf/oz5ZzRvdaWSE+BXZ7jBdESwQ
-         nmeqNxjz8XVaem0TXV8wZO+8wR3PN0WwfA97V3e//IHNwjVyXW7ASm71/Gjxa94C5wbc
-         dC6kr0uvE6l1jO73LuFVv7vB7rrGjzVowPS9o0cwFTBg3ynaZ51CTt37XY3WqCchNQzf
-         npTyXNGPxP7wSQUdDtxXdFIEeGQgdOQkVPtrLeqdwndaaJBGrKrEFavDLy7KvmhofpTH
-         1OpH+ApP6ejgyZoP9UzJTaMqofMlGZoMEIG7iL9LPpmLqpgZDWmCQ7MCx6rkmtWhXDXq
-         dGSQ==
+        bh=R61v/iPwH5KRi9bjTWRa7Tpm/TZZ3nQfs1k5tUMicU0=;
+        b=CfyAChadOteldYBSZO3K48+sg5Z2V+tqrHjV/80mmrJJ2o5mH2AY8xnSUFq15GkPgZ
+         hjqe/TeBLJgEj4U1teQ6SehfoJGiDSJgCpsBHEH/ctk0uB7aoZoF8/KnuMEul40oev7z
+         RrtkLOjjP5k1T1iohMMZj5DdEzXRINS0V6bIqke2DPKwuzeU93kofmrcCxfs8YfeoqOJ
+         ADDL9CQs1cQ9GKVlnqBrfiHzNvlplV2NmZamszXAAur+TUPLbEEVCzLsty7tI6ZortIH
+         2O5I1YQwvN8nBOF/aDzokpZzB7zGxI9mhJfifp4pR6Rs8F/OOw+6TS95PuzxVJZ4Chbt
+         uKVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=h4FAaAxDkft/GYKrZH8p1e5O8Z/g+GpcmXs91Mv5s28=;
-        b=ageH7RPxMCQBk4mAsNx7CZUNcaXGO9aaaqvHeaReHsuv1bNjnwea9/ae64WGk2wn5k
-         EH47fG0/Fh43Qjc+M8Rc9MpRcHaC97IjDs6iKwY1l+xxAamwIFNYvoLIXoT7CmyApNKh
-         3trBM5gJzfZJ+Y+BoEvWXYNLXZiV8qpfEFmIsFDvmkoL5l74snQJn2kYd9iHpW9mQ9MN
-         cbQgQFiTVH5Abi5r8l+Vxgg4hPHnSH4yEIi6YH5OhcsXw6w6lgIwwngOKXWx/JjmuirI
-         Y0YAWpVHvtWK1xJmti9nl9JLsR2/ogdSUB5HYB3sxAcF1dcMQF0Ue7NLCTOVrRkYCQWv
-         9dkw==
-X-Gm-Message-State: AJIora9c0hSiJefxGhnWF2Q8Hpgb8FMQNmD1WEJzism6xrBmfcydcfP2
-        VsipDMg0GdniEhr2KtkgwyD6lFWO5y/axyAf3LUOuQ==
-X-Google-Smtp-Source: AGRyM1vy9K/iFLl5trhp+WIivaF6gz7O/mzMR28cDbyBiwMAjJBEksTqDzrSIrfDMZqHbUruV7+BTzJY5o4dIPToknY=
-X-Received: by 2002:a0d:ca0f:0:b0:317:a2cc:aa2 with SMTP id
- m15-20020a0dca0f000000b00317a2cc0aa2mr10658496ywd.347.1655987457511; Thu, 23
- Jun 2022 05:30:57 -0700 (PDT)
+        bh=R61v/iPwH5KRi9bjTWRa7Tpm/TZZ3nQfs1k5tUMicU0=;
+        b=tyASM3SlGxay2SOxKe2eyA5asKfPFKNSfCuDseVDPJPhfg4FSIsADj1yErHAV5FKL8
+         S1t0bqt89K+Lc5pkYMmyps4tua32FHi/m3X+Qm2N9tu5spNurDrzv2ElIJEVt1A/WvRq
+         +BOaYatU7RKKrQL2FqVXMyOpiesemLuaSVyFZDPcriSbHp0VWh5025BRLvA8XHRpoXZd
+         6VNZ6r0db5YEIVxSV7mPswZxZIZB5l4zgZ2picy5wsiR2lQ6xMd8iQ27TOa4gxGzAl63
+         zBI8CwFHbRF2CjIgQX/c7yBg2CIHrcwG5rZnet8YTFXWYyOpNqOI4PAWPz9k9crFRe6x
+         dP8w==
+X-Gm-Message-State: AJIora87Ql/W0wJv0azIsyZkXY5V9EZ/8jlJb2YmqcWD7tI8Jk9OIVJh
+        krbJ9nvzl+Z80QydQxfeKyJcO+c+ddkInAPpelVt3A==
+X-Google-Smtp-Source: AGRyM1tVLx+H9rwH/n7tGiouqh3J6vgw+U3Yf+geex4bbUsIf922YiYLwp2hXt6Igq1GKIGOrIMA0Gm+U4XJPpcdFxg=
+X-Received: by 2002:a0d:d712:0:b0:317:a108:9778 with SMTP id
+ z18-20020a0dd712000000b00317a1089778mr10304575ywd.64.1655988985132; Thu, 23
+ Jun 2022 05:56:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220623095825.2038562-1-pdel@fb.com> <20220623095825.2038562-7-pdel@fb.com>
-In-Reply-To: <20220623095825.2038562-7-pdel@fb.com>
+References: <20220623095825.2038562-1-pdel@fb.com> <20220623095825.2038562-12-pdel@fb.com>
+In-Reply-To: <20220623095825.2038562-12-pdel@fb.com>
 From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 23 Jun 2022 13:30:46 +0100
-Message-ID: <CAFEAcA-F59JEVBVYSdGX4KcS5d+EB4dNoZ2iE1aitSvo3B7Yfw@mail.gmail.com>
-Subject: Re: [PATCH 06/14] aspeed: Add system-memory QOM link to SoC
+Date:   Thu, 23 Jun 2022 13:56:14 +0100
+Message-ID: <CAFEAcA_iOeL50nGaTSNRa23P0GKH8_0fpiSOxktAOA22CGgZvA@mail.gmail.com>
+Subject: Re: [PATCH 11/14] aspeed: Switch to create_unimplemented_device_in
 To:     Peter Delevoryas <pdel@fb.com>
 Cc:     clg@kaod.org, andrew@aj.id.au, joel@jms.id.au, pbonzini@redhat.com,
         berrange@redhat.com, eduardo@habkost.net,
@@ -68,21 +68,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jun 2022 at 12:31, Peter Delevoryas <pdel@fb.com> wrote:
->
-> Right now it's just defined as the regular global system memory. If we
-> migrate all the SoC code to use this property instead of directly calling
-> get_system_memory(), then we can restrict the memory container for the SoC,
-> which will be useful for multi-SoC machines.
+On Thu, 23 Jun 2022 at 13:04, Peter Delevoryas <pdel@fb.com> wrote:
 >
 > Signed-off-by: Peter Delevoryas <pdel@fb.com>
+> ---
+>  hw/arm/aspeed_ast10x0.c | 10 ++++------
+>  hw/arm/aspeed_ast2600.c | 19 ++++++++++---------
+>  hw/arm/aspeed_soc.c     |  9 +++++----
+>  3 files changed, 19 insertions(+), 19 deletions(-)
+>
+> diff --git a/hw/arm/aspeed_ast10x0.c b/hw/arm/aspeed_ast10x0.c
+> index d259d30fc0..4e6688cc68 100644
+> --- a/hw/arm/aspeed_ast10x0.c
+> +++ b/hw/arm/aspeed_ast10x0.c
+> @@ -158,12 +158,10 @@ static void aspeed_soc_ast1030_realize(DeviceState *dev_soc, Error **errp)
+>      }
+>
+>      /* General I/O memory space to catch all unimplemented device */
+> -    create_unimplemented_device("aspeed.sbc",
+> -                                sc->memmap[ASPEED_DEV_SBC],
+> -                                0x40000);
+> -    create_unimplemented_device("aspeed.io",
+> -                                sc->memmap[ASPEED_DEV_IOMEM],
+> -                                ASPEED_SOC_IOMEM_SIZE);
+> +    create_unimplemented_device_in("aspeed.sbc", sc->memmap[ASPEED_DEV_SBC],
+> +                                   0x40000, s->system_memory);
+> +    create_unimplemented_device_in("aspeed.io", sc->memmap[ASPEED_DEV_IOMEM],
+> +                                   ASPEED_SOC_IOMEM_SIZE, s->system_memory);
 
->  static Property aspeed_soc_properties[] = {
-> +    DEFINE_PROP_LINK("system-memory", AspeedSoCState, system_memory,
-> +                     TYPE_MEMORY_REGION, MemoryRegion *),
+This is SoC code, so it should probably be handling its unimplemented
+devices by creating and mapping TYPE_UNIMPLEMENTED_DEVICE child
+objects directly, the same way it handles all its other child devices.
 
-To the extent that we have a convention, we tend to call this
-property on an SoC or CPU "memory", I think. (Better suggestions
-welcome...)
-
+thanks
 -- PMM
