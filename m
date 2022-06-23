@@ -2,200 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B7D6558B7E
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 01:00:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37F57558B83
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 01:01:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230203AbiFWXAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 19:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49918 "EHLO
+        id S230264AbiFWXBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 19:01:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiFWXAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 19:00:35 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FFD5D137;
-        Thu, 23 Jun 2022 16:00:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UPDKdblPs9BwNuPF8gxg7Mb30CFLTLIRhLYCt5OH5LdGkf/Q93ISzMW0cSdJVfVQ+MpIlrFDXw1UoxVj8h5DKUxvCwe3Isei40hNUCn90603h0f38wZ8oF5hUfg+qY72EW1pqAdtKdZHLshawwKbQnOSrAK8GCuQgRJG7b9kCpRTRt/ai1htnRVR1JZwJdirZ8dFdI86LGn9FTAoLf3AcR8ftC4xkCMca9nki/om7x1B5lQQehbou6FIYNExdGsBDSx+NGpSPq7Jx8CXwd20+wkBO6zVhOcaZOvdsdXKdUFomwbi+fAqHgjum2rzAkKi/uJD1OdN6msv1WjLZDiiag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LcUCsHDOS1mwtvW0OpCsIxwcfsp22daMALGVK68o0Sg=;
- b=PnDt63md8LCHccHT/TeyHw9Ol6miT/hJR2bMxXYa0qO5tQJD0r40jG9vFerrOSFWJmDmKIprui40WHHbOwtoezEWweFPV/tsg+RFolXvTagswDL4LiZhc2v9nTDLftaGestDf4NZs8kZu+lI8YuESJduU/7bdBqJpU9kdv0IJ2pubxCPRuA92a58qJ3vaPtNcD108gTaleGNz+SS/weG09zJpGH/O8uGGQ8Z4Jsm5fyo1srwYR9XhiFZEAR/hxb4BBEulM91AatGsckM5Tb6Y1XI8c70kSCTgAt6T3PH1pQDXs9mASy4Jz7lE34bahVAVs6CF8jmxSJ15lap4d6oLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LcUCsHDOS1mwtvW0OpCsIxwcfsp22daMALGVK68o0Sg=;
- b=TXfwbGanC7jk1WoxCqVCPB/vpvEisaUq0VL40amtIsXbe6HIgSEqqc+WYCoVePDpsiUDLRm33yAb7rdxGplC4cmHNQClfxqPbEwlQwXZhho7bYjW0aDvdM+LHLmtrHC9tozIKhYXJU7MX+tMXA9vYzzbVV/KbIMqHuMQAhuat0k=
-Received: from BN0PR04CA0096.namprd04.prod.outlook.com (2603:10b6:408:ec::11)
- by BL0PR12MB2337.namprd12.prod.outlook.com (2603:10b6:207:45::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.15; Thu, 23 Jun
- 2022 23:00:28 +0000
-Received: from BN8NAM11FT020.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:ec:cafe::40) by BN0PR04CA0096.outlook.office365.com
- (2603:10b6:408:ec::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.16 via Frontend
- Transport; Thu, 23 Jun 2022 23:00:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT020.mail.protection.outlook.com (10.13.176.223) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5373.15 via Frontend Transport; Thu, 23 Jun 2022 23:00:27 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Thu, 23 Jun
- 2022 18:00:27 -0500
-Date:   Thu, 23 Jun 2022 17:59:49 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Andy Lutomirski <luto@kernel.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-api@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        "Hugh Dickins" <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        <jun.nakajima@intel.com>, <dave.hansen@intel.com>,
-        <ak@linux.intel.com>, <david@redhat.com>, <aarcange@redhat.com>,
-        <ddutile@redhat.com>, <dhildenb@redhat.com>,
-        "Quentin Perret" <qperret@google.com>, <mhocko@suse.com>,
-        "Nikunj A. Dadhania" <nikunj@amd.com>
-Subject: Re: [PATCH v6 4/8] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <20220623225949.kkdx6uwjlk2ec4iq@amd.com>
-References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
- <20220519153713.819591-5-chao.p.peng@linux.intel.com>
- <8840b360-cdb2-244c-bfb6-9a0e7306c188@kernel.org>
- <YofeZps9YXgtP3f1@google.com>
+        with ESMTP id S230244AbiFWXA7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 19:00:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5C4955D12D
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 16:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656025257;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K2a+ZoO+OyFnk1IwsI6/2cGromoSIiCUd/MQu22EaXU=;
+        b=R2oMgzUyX87ictoPV5ai8nR84vrZ4Jo5IZiK2JTPnTH68jWopUDQ241ReodRN8gSRVnVZv
+        LOTWh3RvxifDxXKycrvuuYRvODCYYncEe0k26RYMceqi13vDlw77Mk4AQLX0mI8eaU3z0o
+        M9jOZ2y31ultWhxcAltg/E0LpGwoK2A=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-658-2km1lfvEM4Khbl47ScAJoA-1; Thu, 23 Jun 2022 19:00:48 -0400
+X-MC-Unique: 2km1lfvEM4Khbl47ScAJoA-1
+Received: by mail-il1-f197.google.com with SMTP id j1-20020a056e02154100b002d906f7e0b1so272959ilu.17
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 16:00:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=K2a+ZoO+OyFnk1IwsI6/2cGromoSIiCUd/MQu22EaXU=;
+        b=ygLFNIAWbAbbQCIb5roVrm0rwRYQqX2JceFNsEUtDVY+H3mXxh788lcyyJ9mvYJkUP
+         O3fEqSQGMmIl00TLXkrEbjGWgshToB5mtbyxsQShGwKqLkKeMaeSRMO4vNqQAWVB6/Cf
+         hYV3SG3XxdjBtCPEGGJGKw/Y7U4DiJzBYWn2yuYP9XPdPW1W28NUPubq+E00OMWvt58z
+         a6F2x7ptm+3TdXKv7618e0ttNpyjraFN+5zepGTRJE7bzcnQG8Rve+GfxXD+m4wBRIZT
+         /1GuY5L6r4BCCmzFMlmeEjOINtFEPH70VUbaenJg4sTj4pa2dFvUAsIL2hfR+nzOo+4q
+         DhdA==
+X-Gm-Message-State: AJIora9fLEwwLHyO/NbIbWOOSZZvJ2Za7RV7NR3QnjouAqaRF4B0Hu3V
+        duHjZ1dNGB7YT9vzF1s/+oKT6dl2G5tD1iFDJV6lQci4h3wTaFYqjjFWzL1Vu1h8zTapTQ34zEG
+        y8r5KEleQgu4J
+X-Received: by 2002:a05:6602:3311:b0:669:d9d7:1026 with SMTP id b17-20020a056602331100b00669d9d71026mr5845179ioz.3.1656025247390;
+        Thu, 23 Jun 2022 16:00:47 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1s4e7FapPhiWbwyg7k9pxgE/9jBqkSjaoFx8Qxcthe61Ap3+36D6aUVxzWKfQ185aqMc4RTqg==
+X-Received: by 2002:a05:6602:3311:b0:669:d9d7:1026 with SMTP id b17-20020a056602331100b00669d9d71026mr5845165ioz.3.1656025247044;
+        Thu, 23 Jun 2022 16:00:47 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id f63-20020a0284c5000000b00339c2c0d123sm300924jai.116.2022.06.23.16.00.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jun 2022 16:00:46 -0700 (PDT)
+Date:   Thu, 23 Jun 2022 17:00:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     cohuck@redhat.com, jgg@nvidia.com, iommu@lists.linux.dev,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] vfio/type1: Simplify bus_type determination
+Message-ID: <20220623170044.1757267d.alex.williamson@redhat.com>
+In-Reply-To: <68263bd7-4528-7acb-b11f-6b1c6c8c72ef@arm.com>
+References: <b1d13cade281a7d8acbfd0f6a33dcd086207952c.1655898523.git.robin.murphy@arm.com>
+        <20220622161721.469fc9eb.alex.williamson@redhat.com>
+        <68263bd7-4528-7acb-b11f-6b1c6c8c72ef@arm.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <YofeZps9YXgtP3f1@google.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 483e1c84-7011-4faa-d5f4-08da556c2a40
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2337:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: k/mqeTfxDmYu1qUPc5xoXwJOAG1XrRSYYOBQSjQn4MM5Qg+JYTVQ00cUUaOiqQGo/hdoeSH/MsDjPwe1QEQuvzOG1eDHVBggEu2Bpnu11/TZGmSJLwTwcRaMozEGvs9+F5OTfwSZRWodDcD18d6AJLFnEJ6Fh8vpSyF/bnl9WS6aQt4uFcKgSCE42WzT62B/uxXYrZymSzHhx37PXwoxBeClbkw9SWyf3DuEllR+i8mN7YNkvt1nm2TxPW8CLLGKImTwBtF09EgqR37hb3H2vLAGbgshLcKmdSCcD3x+LjdrwdmwZuVGDuZfhWX9ztamhL4CDd+942ulPdnvYjuftj/k1IMd4pIeL7L6uC2qZxgYEqlAsPsrqP0XsY2uAq7J3zaaVEDHe6eTQxDnoAJbq/3k5OYWsBIz/NUT9M9s9eVhM8BNz//9bodToBuFJNGLrhKTPazQqDTMYnTSsbb1cHDo/5desLuXwTJAtF2OBP0A3g0Us0+Ydz3JT09+eaqokiry2EW0FKdz/CJ7f7KtPRnzLxMdK1PajI7swKD7aEfmJSK5GEloQvAiNHjeENbJEOqCJQkJjX6CWFV+JDWRHO/630D1/qfbOwtyYMFMuzeVaW6/gp1KYE7ff3+Qx0qQZH1OrKDkmXVrW/dBjQz7UtAkvOELCJqttZJgWCd2UKqpHt01LJthW4sCCBYE94Ik/JCRXJNHG71dQ9wvhsA4u9gh+8hjCnxiWvobYi7FdIcWPlx9G0XW1UrlBpizmc+FhqVPmt7duCHPVpMhm4DFoxYXrvGclKkZEkOb29+Q/djrfH71l9gUtH9tbAtaSwTCCsOzvFbAxnBp4lFGhUDzRA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(396003)(346002)(136003)(46966006)(36840700001)(40470700004)(47076005)(82740400003)(36756003)(336012)(70206006)(4326008)(8676002)(426003)(83380400001)(16526019)(316002)(478600001)(54906003)(6666004)(356005)(186003)(1076003)(2616005)(86362001)(7406005)(70586007)(40460700003)(44832011)(82310400005)(40480700001)(8936002)(6916009)(81166007)(36860700001)(41300700001)(2906002)(26005)(7416002)(5660300002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2022 23:00:27.9286
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 483e1c84-7011-4faa-d5f4-08da556c2a40
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT020.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2337
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 20, 2022 at 06:31:02PM +0000, Sean Christopherson wrote:
-> On Fri, May 20, 2022, Andy Lutomirski wrote:
-> > The alternative would be to have some kind of separate table or bitmap (part
-> > of the memslot?) that tells KVM whether a GPA should map to the fd.
+On Thu, 23 Jun 2022 13:23:05 +0100
+Robin Murphy <robin.murphy@arm.com> wrote:
+
+> On 2022-06-22 23:17, Alex Williamson wrote:
+> > On Wed, 22 Jun 2022 13:04:11 +0100
+> > Robin Murphy <robin.murphy@arm.com> wrote:
+> >   
+> >> Since IOMMU groups are mandatory for drivers to support, it stands to
+> >> reason that any device which has been successfully be added to a group  
 > > 
-> > What do you all think?
+> > s/be //  
 > 
-> My original proposal was to have expolicit shared vs. private memslots, and punch
-> holes in KVM's memslots on conversion, but due to the way KVM (and userspace)
-> handle memslot updates, conversions would be painfully slow.  That's how we ended
-> up with the current propsoal.
+> Oops.
 > 
-> But a dedicated KVM ioctl() to add/remove shared ranges would be easy to implement
-> and wouldn't necessarily even need to interact with the memslots.  It could be a
-> consumer of memslots, e.g. if we wanted to disallow registering regions without an
-> associated memslot, but I think we'd want to avoid even that because things will
-> get messy during memslot updates, e.g. if dirty logging is toggled or a shared
-> memory region is temporarily removed then we wouldn't want to destroy the tracking.
+> >> must be on a bus supported by that IOMMU driver, and therefore a domain
+> >> viable for any device in the group must be viable for all devices in
+> >> the group. This already has to be the case for the IOMMU API's internal
+> >> default domain, for instance. Thus even if the group contains devices on
+> >> different buses, that can only mean that the IOMMU driver actually
+> >> supports such an odd topology, and so without loss of generality we can
+> >> expect the bus type of any device in a group to be suitable for IOMMU
+> >> API calls.
+> >>
+> >> Replace vfio_bus_type() with a simple call to resolve an appropriate
+> >> member device from which to then derive a bus type. This is also a step
+> >> towards removing the vague bus-based interfaces from the IOMMU API, when
+> >> we can subsequently switch to using this device directly.
+> >>
+> >> Furthermore, scrutiny reveals a lack of protection for the bus being
+> >> removed while vfio_iommu_type1_attach_group() is using it; the reference
+> >> that VFIO holds on the iommu_group ensures that data remains valid, but
+> >> does not prevent the group's membership changing underfoot. Holding the
+> >> vfio_device for as long as we need here also neatly solves this.
+> >>
+> >> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+> >> ---
+> >>
+> >> After sleeping on it, I decided to type up the helper function approach
+> >> to see how it looked in practice, and in doing so realised that with one
+> >> more tweak it could also subsume the locking out of the common paths as
+> >> well, so end up being a self-contained way for type1 to take care of its
+> >> own concern, which I rather like.
+> >>
+> >>   drivers/vfio/vfio.c             | 18 +++++++++++++++++-
+> >>   drivers/vfio/vfio.h             |  3 +++
+> >>   drivers/vfio/vfio_iommu_type1.c | 30 +++++++++++-------------------
+> >>   3 files changed, 31 insertions(+), 20 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> >> index 61e71c1154be..73bab04880d0 100644
+> >> --- a/drivers/vfio/vfio.c
+> >> +++ b/drivers/vfio/vfio.c
+> >> @@ -448,7 +448,7 @@ static void vfio_group_get(struct vfio_group *group)
+> >>    * Device objects - create, release, get, put, search
+> >>    */
+> >>   /* Device reference always implies a group reference */
+> >> -static void vfio_device_put(struct vfio_device *device)
+> >> +void vfio_device_put(struct vfio_device *device)
+> >>   {
+> >>   	if (refcount_dec_and_test(&device->refcount))
+> >>   		complete(&device->comp);
+> >> @@ -475,6 +475,22 @@ static struct vfio_device *vfio_group_get_device(struct vfio_group *group,
+> >>   	return NULL;
+> >>   }
+> >>   
+> >> +struct vfio_device *vfio_device_get_from_iommu(struct iommu_group *iommu_group)
+> >> +{
+> >> +	struct vfio_group *group = vfio_group_get_from_iommu(iommu_group);
+> >> +	struct vfio_device *device;  
+> > 
+> > Check group for NULL.  
 > 
-> I don't think we'd want to use a bitmap, e.g. for a well-behaved guest, XArray
-> should be far more efficient.
+> OK - FWIW in context this should only ever make sense to call with an 
+> iommu_group which has already been derived from a vfio_group, and I did 
+> initially consider a check with a WARN_ON(), but then decided that the 
+> unguarded dereference would be a sufficiently strong message. No problem 
+> with bringing that back to make it more defensive if that's what you prefer.
+
+A while down the road, that's a bit too much implicit knowledge of the
+intent and single purpose of this function just to simply avoid a test.
+
+> >> +
+> >> +	mutex_lock(&group->device_lock);
+> >> +	list_for_each_entry(device, &group->device_list, group_next) {
+> >> +		if (vfio_device_try_get(device)) {
+> >> +			mutex_unlock(&group->device_lock);
+> >> +			return device;
+> >> +		}
+> >> +	}
+> >> +	mutex_unlock(&group->device_lock);
+> >> +	return NULL;  
+> > 
+> > No vfio_group_put() on either path.  
 > 
-> One benefit to explicitly tracking this in KVM is that it might be useful for
-> software-only protected VMs, e.g. KVM could mark a region in the XArray as "pending"
-> based on guest hypercalls to share/unshare memory, and then complete the transaction
-> when userspace invokes the ioctl() to complete the share/unshare.
+> Oops indeed.
+> 
+> >> +}
+> >> +
+> >>   /*
+> >>    * VFIO driver API
+> >>    */
+> >> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> >> index a67130221151..e8f21e64541b 100644
+> >> --- a/drivers/vfio/vfio.h
+> >> +++ b/drivers/vfio/vfio.h
+> >> @@ -70,3 +70,6 @@ struct vfio_iommu_driver_ops {
+> >>   
+> >>   int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+> >>   void vfio_unregister_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+> >> +
+> >> +struct vfio_device *vfio_device_get_from_iommu(struct iommu_group *iommu_group);
+> >> +void vfio_device_put(struct vfio_device *device);
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index c13b9290e357..e38b8bfde677 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -1679,18 +1679,6 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+> >>   	return ret;
+> >>   }
+> >>   
+> >> -static int vfio_bus_type(struct device *dev, void *data)
+> >> -{
+> >> -	struct bus_type **bus = data;
+> >> -
+> >> -	if (*bus && *bus != dev->bus)
+> >> -		return -EINVAL;
+> >> -
+> >> -	*bus = dev->bus;
+> >> -
+> >> -	return 0;
+> >> -}
+> >> -
+> >>   static int vfio_iommu_replay(struct vfio_iommu *iommu,
+> >>   			     struct vfio_domain *domain)
+> >>   {
+> >> @@ -2159,7 +2147,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+> >>   	struct vfio_iommu *iommu = iommu_data;
+> >>   	struct vfio_iommu_group *group;
+> >>   	struct vfio_domain *domain, *d;
+> >> -	struct bus_type *bus = NULL;
+> >> +	struct vfio_device *iommu_api_dev;
+> >>   	bool resv_msi, msi_remap;
+> >>   	phys_addr_t resv_msi_base = 0;
+> >>   	struct iommu_domain_geometry *geo;
+> >> @@ -2192,18 +2180,19 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+> >>   		goto out_unlock;
+> >>   	}
+> >>   
+> >> -	/* Determine bus_type in order to allocate a domain */
+> >> -	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
+> >> -	if (ret)
+> >> +	/* Resolve the group back to a member device for IOMMU API ops */
+> >> +	ret = -ENODEV;
+> >> +	iommu_api_dev = vfio_device_get_from_iommu(iommu_group);
+> >> +	if (!iommu_api_dev)
+> >>   		goto out_free_group;
+> >>   
+> >>   	ret = -ENOMEM;
+> >>   	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
+> >>   	if (!domain)
+> >> -		goto out_free_group;
+> >> +		goto out_put_dev;
+> >>   
+> >>   	ret = -EIO;
+> >> -	domain->domain = iommu_domain_alloc(bus);
+> >> +	domain->domain = iommu_domain_alloc(iommu_api_dev->dev->bus);  
+> > 
+> > It makes sense to move away from a bus centric interface to iommu ops
+> > and I can see that having a device interface when we have device level
+> > address-ability within a group makes sense, but does it make sense to
+> > only have that device level interface?  For example, if an iommu_group
+> > is going to remain an aspect of the iommu subsystem, shouldn't we be
+> > able to allocate a domain and test capabilities based on the group and
+> > the iommu driver should have enough embedded information reachable from
+> > the struct iommu_group to do those things?  This "perform group level
+> > operations based on an arbitrary device in the group" is pretty klunky.  
+> 
+> The fact* is that devices (and domains) are the fundamental units of the 
+> IOMMU API internals, due to what's most practical within the Linux 
+> driver model, while groups remain more of a mid-level abstraction - 
+> IOMMU drivers themselves are only aware of groups at all in terms of 
+> whether they can physically distinguish a given device from others. The 
+> client-driver-facing API is already moving back to being device-centric, 
+> because that's what fits everyone else's usage models, and we concluded 
+> that exposing the complexity of groups everywhere was more trouble than 
+> it's worth.
+> 
+> So yes, technically we could implement an iommu_group_capable() and an 
+> iommu_group_domain_alloc(), which would still just internally resolve 
+> the IOMMU ops and instance data from a member device to perform the 
+> driver-level call, but once again it would be for the benefit of 
+> precisely one user. And I really have minimal enthusiasm for diverging 
+> any further into one IOMMU API for everyone else plus a separate special 
+> IOMMU API for VFIO type1, when type1 is supposed to be the 
+> VFIO-to-IOMMU-API translation layer anyway! To look at it another way, 
+> if most of the complexity of groups is for VFIO's benefit, then why 
+> *shouldn't* VFIO take responsibility for some of the fiddly details that 
+> don't matter to anyone else?
 
-Another upside to implementing a KVM ioctl is basically the reverse of the
-discussion around avoiding double-allocations: *supporting* double-allocations.
 
-One thing I noticed while testing SNP+UPM support is a fairly dramatic
-slow-down with how it handles OVMF, which does some really nasty stuff
-with DMA where it takes 1 or 2 pages and flips them between
-shared/private on every transaction. Obviously that's not ideal and
-should be fixed directly at some point, but it's something that exists in the
-wild and might not be the only such instance where we need to deal with that
-sort of usage pattern. 
+Hmm, I agree, but I can't get past vfio-core exporting a function to
+select an arbitrary vfio_device from an iommu_group.  What if type1 was
+passed an opaque vfio_group pointer and vfio exported a function to
+iterate each vfio_device in that vfio_group?  We'd need to export
+vfio_device_try_get() and vfio_device_put() and type1 itself would stop
+on the first vfio_device object it can get.  Sort of the v1 approach,
+but with a vfio iterator rather than iommu.
 
-With the current implementation, one option I had to address this was to
-disable hole-punching in QEMU when doing shared->private conversions:
+I'd lean towards Kevin's idea that we could store bus_type on the
+vfio_group and pass that to type1, with the same assumptions we're
+making in the commit log that it's consistent, but that doesn't get us
+closer to the long term plan of dropping the bus_type interfaces AIUI.
+Thanks,
 
-Boot time from 1GB guest:
-                               SNP:   32s
-                           SNP+UPM: 1m43s
-  SNP+UPM (disable shared discard): 1m08s
+Alex
 
-Of course, we don't have the option of disabling discard/hole-punching
-for private memory to see if we get similar gains there, since that also
-doubles as the interface for doing private->shared conversions. A separate
-KVM ioctl to decouple these 2 things would allow for that, and allow for a
-way for userspace to implement things like batched/lazy-discard of
-previously-converted pages to deal with cases like these.
-
-Another motivator for these separate ioctl is that, since we're considering
-'out-of-band' interactions with private memfd where userspace might
-erroneously/inadvertently do things like double allocations, another thing it
-might do is pre-allocating pages in the private memfd prior to associating
-the memfd with a private memslot. Since the notifiers aren't registered until
-that point, any associated callbacks that would normally need to be done as
-part of those fallocate() notification would be missed unless we do something
-like 'replay' all the notifications once the private memslot is registered and
-associating with a memfile notifier. But that seems a bit ugly, and I'm not
-sure how well that would work. This also seems to hint at this additional
-'conversion' state being something that should be owned and managed directly
-by KVM rather than hooking into the allocations.
-
-It would also nicely solve the question of how to handle in-place
-encryption, since unlike userspace, KVM is perfectly capable of copying
-data from shared->private prior to conversion / guest start, and
-disallowing such things afterward. Would just need an extra flag basically.
