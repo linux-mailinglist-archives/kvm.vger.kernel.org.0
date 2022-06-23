@@ -2,103 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBEC5557C8E
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 15:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A4B1557C9F
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 15:12:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbiFWNKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 09:10:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52718 "EHLO
+        id S231612AbiFWNMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 09:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230415AbiFWNK2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 09:10:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EAD052E9DC
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 06:10:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655989825;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=rmoM2sqrNH4gB4OMADyCrtt+JYV77lbslouxb07UaD0=;
-        b=ZOv9Z+CamERy+09igdSDh8FrfwnlgW7YgEWF3MROYaaIf55Eunupitv3JbbEU+Ow0T+wZx
-        St6iimL5PjE+z1fNmxu7NEG+OG3MvC4zgn9y7PiyBg/ZyqY6sLbyZoGeCE3tvc17/B8Jhi
-        5e57xREOPI1ocsIHSKOxDYg1lXSSLUs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-82-l24YVwCaORSxh1PyRf7X7Q-1; Thu, 23 Jun 2022 09:10:22 -0400
-X-MC-Unique: l24YVwCaORSxh1PyRf7X7Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B9A538032F6;
-        Thu, 23 Jun 2022 13:10:21 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.40.193.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 58C5940CF8EE;
-        Thu, 23 Jun 2022 13:10:18 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com,
-        thuth@redhat.com, alexandru.elisei@arm.com, alex.bennee@linaro.org,
-        andre.przywara@arm.com, nikos.nikoleris@arm.com,
-        ricarkol@google.com, seanjc@google.com, maz@kernel.org,
-        peter.maydell@linaro.org
-Subject: [PATCH kvm-unit-tests] MAINTAINERS: Change drew's email address
-Date:   Thu, 23 Jun 2022 15:10:17 +0200
-Message-Id: <20220623131017.670589-1-drjones@redhat.com>
+        with ESMTP id S231478AbiFWNMC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 09:12:02 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065B62EA1E
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 06:11:59 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id q6so4003237eji.13
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 06:11:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=44rAwtd104zTF6dbWV55JEwGL2BlYGz1AUagrivcDtc=;
+        b=piKrs1fQPx5PzIuxBtvL8WJ+ocepEXzMVOvQ+r6cSg5qEzEerxBPDNCRzEFSpmHsSd
+         H/7xc3RxTA72PAXq+GCknvZV+fMuWqC7x/2zMuJYHWRFzUrNfUfJQj6QRyAGBRgSJPMU
+         y1RTLYyMHy1BsEU/SqfTGz0vUcT4mnUhvBOcnhUN7+Rp9ZtTmRb2foY70s71EDNnizvO
+         jr97BogCpA6Ba5P2VFa3WcJjHFkK1y4UrlbIpmKlKXdfZqpWFlK0cmjfVfhL2tOkDPW3
+         Zi8nXg2aPPMmJ8rqlh5eUhhVVv2WciZFnH73jNHTHyPpURR00aUSAQGk4T2XEA2hR/a9
+         I9rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=44rAwtd104zTF6dbWV55JEwGL2BlYGz1AUagrivcDtc=;
+        b=KB/Ah9Cwra26IYU7faP9ABv4QHzacE6HVrexixpUB2IfDIkRF3WMraHTqnRCxw7Uw4
+         KHtWDi1q2LotERnvzBk+PccXcv4aZ3AEPO11/h+3APBHNE8/eYfyEjcI+cnc+1Ol3W46
+         CdxDVDJa1GGq7UXDme8V5mKZ4ONE3qp2jtj2YEqcTNfecXSDqA9HCtxEot5gOJk8BYDb
+         0RznhUu3v1+saePOzVhr+rw45wo0FEa60OBaJfXBhnZYKIYh3KQu1PiEH4EYCJ/iYqUu
+         wARRjfJ5oogFLscj4o5ScjIaPgFh5hAxxGu6RsK2kz37DFohL/YS+ZnO1VUvGEcVRKnq
+         Z53w==
+X-Gm-Message-State: AJIora+iJSEqYLaT6+Q1W7JvgDEAyIRbPGF0gSl/N+/UZ8A+1ML5/Cn5
+        gxk9QPjlvee+UDKZBD+qpQqw8CiIgBCuUw==
+X-Google-Smtp-Source: AGRyM1s8IYJ+YI+ZlWvmtnpwUn/+h1WW0BjzOTyTurp9rd8PjvArrkWRTFjF180z3zStfWcrby+HCw==
+X-Received: by 2002:a17:906:5053:b0:70d:a0cc:b3fd with SMTP id e19-20020a170906505300b0070da0ccb3fdmr8007855ejk.162.1655989917478;
+        Thu, 23 Jun 2022 06:11:57 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id bx25-20020a170906a1d900b006fe8d8c54a7sm10873956ejb.87.2022.06.23.06.11.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jun 2022 06:11:57 -0700 (PDT)
+Date:   Thu, 23 Jun 2022 13:11:54 +0000
+From:   Quentin Perret <qperret@google.com>
+To:     Peter Collingbourne <pcc@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Michael Roth <michael.roth@amd.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: add a hypercall for disowning pages
+Message-ID: <YrRmmrY24Pv6hyAO@google.com>
+References: <20220623021926.3443240-1-pcc@google.com>
+ <20220623021926.3443240-2-pcc@google.com>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220623021926.3443240-2-pcc@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As a side effect of leaving Red Hat I won't be able to use my Red Hat
-email address anymore. I'm also changing the name of my gitlab group.
+Hi Peter,
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- MAINTAINERS | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On Wednesday 22 Jun 2022 at 19:19:24 (-0700), Peter Collingbourne wrote:
+> @@ -677,9 +678,9 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+>  	/*
+>  	 * The refcount tracks valid entries as well as invalid entries if they
+>  	 * encode ownership of a page to another entity than the page-table
+> -	 * owner, whose id is 0.
+> +	 * owner, whose id is 0, or NOBODY, which does not correspond to a page-table.
+>  	 */
+> -	return !!pte;
+> +	return !!pte && pte != kvm_init_invalid_leaf_owner(PKVM_ID_NOBODY);
+>  }
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bab08e740332..5e4c7bd70786 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -55,7 +55,7 @@ Maintainers
- -----------
- M: Paolo Bonzini <pbonzini@redhat.com>
- M: Thomas Huth <thuth@redhat.com>
--M: Andrew Jones <drjones@redhat.com>
-+M: Andrew Jones <andrew.jones@linux.dev>
- S: Supported
- L: kvm@vger.kernel.org
- T: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-@@ -64,14 +64,14 @@ Architecture Specific Code:
- ---------------------------
- 
- ARM
--M: Andrew Jones <drjones@redhat.com>
-+M: Andrew Jones <andrew.jones@linux.dev>
- S: Supported
- L: kvm@vger.kernel.org
- L: kvmarm@lists.cs.columbia.edu
- F: arm/
- F: lib/arm/
- F: lib/arm64/
--T: https://gitlab.com/rhdrjones/kvm-unit-tests.git
-+T: https://gitlab.com/drew-jones/kvm-unit-tests.git
- 
- POWERPC
- M: Laurent Vivier <lvivier@redhat.com>
--- 
-2.34.3
+I'm not sure to understand this part? By not refcounting the PTEs that
+are annotated with PKVM_ID_NOBODY, the page-table page that contains
+them may be freed at some point. And when that happens, I don't see how
+the hypervisor will remember to block host accesses to the disowned
+pages.
 
+Cheers,
+Quentin
