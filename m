@@ -2,340 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 263665576E8
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 11:44:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 688235577B4
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 12:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230144AbiFWJoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 05:44:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46916 "EHLO
+        id S231443AbiFWKRt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 06:17:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230113AbiFWJob (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 05:44:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B6E0D48895
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 02:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655977468;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5Z+ZDJJgpbgIXOZdFi38EUFLQ9DT89Je0CI9wqZBuNk=;
-        b=PDhNauK7acvn+KqAzaYBFh+fs14RBqM/siB8+CeOejHKlEr4hwhUT41WwapujOw+212X4O
-        rP+/OsO77M8Jy5zf3WDYzsAJjGakIJ9WsMp/6AE9zCyhonkg8tZHSQGLMNyAoqSKSI7/k8
-        +7uUuYH30bqVVDCpFgAyho28aXzCI/4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-163-smz41-0vPfiHxCFPUHlplg-1; Thu, 23 Jun 2022 05:44:26 -0400
-X-MC-Unique: smz41-0vPfiHxCFPUHlplg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 623D4185A7B2;
-        Thu, 23 Jun 2022 09:44:25 +0000 (UTC)
-Received: from starship (unknown [10.40.194.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3462E492CA5;
-        Thu, 23 Jun 2022 09:44:19 +0000 (UTC)
-Message-ID: <f64191bf059d1fe73627a8738b831ce4b06548c4.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 02/19] KVM: x86: inhibit APICv/AVIC when the
- guest and/or host changes apic id/base from the defaults.
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Date:   Thu, 23 Jun 2022 12:44:18 +0300
-In-Reply-To: <YoZrG3n5fgMp4LQl@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-3-mlevitsk@redhat.com> <YoZrG3n5fgMp4LQl@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231315AbiFWKRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 06:17:46 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32B24A3C1;
+        Thu, 23 Jun 2022 03:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655979458; x=1687515458;
+  h=from:to:cc:subject:date:message-id;
+  bh=NeJur9sIZ5lmTLg5cdWYNoS4OW5zTNJwPnCWv1GQGJQ=;
+  b=RKbywVx9PMGvPw04y8SV1yu8BppdGdSsdSPqWH2pmMt2bOt+zOwpHRSz
+   j27UOlgsLMdPwsDBfZM/fWHHcy/KB04hylR3pT6b8XzSbn6oRE7r3OdnX
+   ofvUoVbk3tCPPUdhSsCx7xo7eUwH8ogYXZ8rXZpbzqnF4TCNxvZFaE0Z5
+   Quih5e7b4xY3EHJl06xvQxR/0aU+5rHwRxVrMHvceYkX63jBV/aP6p0jw
+   y3CkAob2tUldRyB8xzI9zZ6NQHYnd1hZal0eHKntVusS/qtUwAM0dkQa9
+   6rGMiADDQguAfQTVhOQVLPuWYdG0c22mbQVruqOFQ1QQzwKTr4oGsTVWs
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="269405571"
+X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
+   d="scan'208";a="269405571"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 03:17:35 -0700
+X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
+   d="scan'208";a="644669573"
+Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 03:17:33 -0700
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Shuah Khan <shuah@kernel.org>, Gao Chao <chao.gao@intel.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Zeng Guang <guang.zeng@intel.com>
+Subject: [PATCH v2] KVM: selftest: Enhance handling WRMSR ICR register in x2APIC mode
+Date:   Thu, 23 Jun 2022 17:45:11 +0800
+Message-Id: <20220623094511.26066-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-05-19 at 16:06 +0000, Sean Christopherson wrote:
-> On Wed, Apr 27, 2022, Maxim Levitsky wrote:
-> > Neither of these settings should be changed by the guest and it is
-> > a burden to support it in the acceleration code, so just inhibit
-> > it instead.
-> > 
-> > Also add a boolean 'apic_id_changed' to indicate if apic id ever changed.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  3 +++
-> >  arch/x86/kvm/lapic.c            | 25 ++++++++++++++++++++++---
-> >  arch/x86/kvm/lapic.h            |  8 ++++++++
-> >  3 files changed, 33 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 63eae00625bda..636df87542555 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1070,6 +1070,8 @@ enum kvm_apicv_inhibit {
-> >  	APICV_INHIBIT_REASON_ABSENT,
-> >  	/* AVIC is disabled because SEV doesn't support it */
-> >  	APICV_INHIBIT_REASON_SEV,
-> > +	/* APIC ID and/or APIC base was changed by the guest */
-> 
-> I don't see any reason to inhibit APICv if the APIC base is changed.  KVM has
-> never supported that, and disabling APICv won't "fix" anything.
-> 
-> Ignoring that is a minor simplification, but also allows for a more intuitive
-> name, e.g.
-> 
-> 	APICV_INHIBIT_REASON_APIC_ID_MODIFIED,
-> 
-> The inhibit also needs to be added avic_check_apicv_inhibit_reasons() and
-> vmx_check_apicv_inhibit_reasons().
-> 
-> > +	APICV_INHIBIT_REASON_RO_SETTINGS,
-> >  };
-> >  
-> >  struct kvm_arch {
-> > @@ -1258,6 +1260,7 @@ struct kvm_arch {
-> >  	hpa_t	hv_root_tdp;
-> >  	spinlock_t hv_root_tdp_lock;
-> >  #endif
-> > +	bool apic_id_changed;
-> >  };
-> >  
-> >  struct kvm_vm_stat {
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 66b0eb0bda94e..8996675b3ef4c 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2038,6 +2038,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
-> >  	}
-> >  }
-> >  
-> > +static void kvm_lapic_check_initial_apic_id(struct kvm_lapic *apic)
-> 
-> The "check" part is misleading/confusing.  "check" helpers usually query and return
-> state.  I assume you avoided "changed" because the ID may or may not actually be
-> changing.  Maybe kvm_apic_id_updated()?  Ah, better idea.  What about
-> kvm_lapic_xapic_id_updated()?  See below for reasoning.
-> 
-> > +{
-> > +	if (kvm_apic_has_initial_apic_id(apic))
-> 
-> Rather than add a single-use helper, invoke the helper from kvm_apic_state_fixup()
-> in the !x2APIC path, then this can KVM_BUG_ON() x2APIC to help document that KVM
-> should never allow the ID to change for x2APIC.
-> 
-> > +		return;
-> > +
-> > +	pr_warn_once("APIC ID change is unsupported by KVM");
-> 
-> It's supported (modulo x2APIC shenanigans), otherwise KVM wouldn't need to disable
-> APICv.
-> 
-> > +	kvm_set_apicv_inhibit(apic->vcpu->kvm,
-> > +			APICV_INHIBIT_REASON_RO_SETTINGS);
-> > +
-> > +	apic->vcpu->kvm->arch.apic_id_changed = true;
-> > +}
-> > +
-> >  static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >  {
-> >  	int ret = 0;
-> > @@ -2046,9 +2059,11 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >  
-> >  	switch (reg) {
-> >  	case APIC_ID:		/* Local APIC ID */
-> > -		if (!apic_x2apic_mode(apic))
-> > +		if (!apic_x2apic_mode(apic)) {
-> > +
-> 
-> Spurious newline.
-> 
-> >  			kvm_apic_set_xapic_id(apic, val >> 24);
-> > -		else
-> > +			kvm_lapic_check_initial_apic_id(apic);
-> > +		} else
-> 
-> Needs curly braces for both paths.
-> 
-> >  			ret = 1;
-> >  		break;
-> >  
-> 
-> E.g.
-> 
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/lapic.c            | 21 +++++++++++++++++++--
->  arch/x86/kvm/svm/avic.c         |  3 ++-
->  arch/x86/kvm/vmx/vmx.c          |  3 ++-
->  4 files changed, 24 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d895d25c5b2f..d888fa1bae77 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1071,6 +1071,7 @@ enum kvm_apicv_inhibit {
->  	APICV_INHIBIT_REASON_BLOCKIRQ,
->  	APICV_INHIBIT_REASON_ABSENT,
->  	APICV_INHIBIT_REASON_SEV,
-> +	APICV_INHIBIT_REASON_APIC_ID_MODIFIED,
->  };
-> 
->  struct kvm_arch {
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 5fd678c90288..6fe8f20f03d8 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2039,6 +2039,19 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
->  	}
->  }
-> 
-> +static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
-> +{
-> +	struct kvm *kvm = apic->vcpu->kvm;
-> +
-> +	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
-> +		return;
-> +
-> +	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
-> +		return;
-> +
-> +	kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
-> +}
-> +
->  static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->  {
->  	int ret = 0;
-> @@ -2047,10 +2060,12 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> 
->  	switch (reg) {
->  	case APIC_ID:		/* Local APIC ID */
-> -		if (!apic_x2apic_mode(apic))
-> +		if (!apic_x2apic_mode(apic)) {
->  			kvm_apic_set_xapic_id(apic, val >> 24);
-> -		else
-> +			kvm_lapic_xapic_id_updated(apic);
-> +		} else {
->  			ret = 1;
-> +		}
->  		break;
-> 
->  	case APIC_TASKPRI:
-> @@ -2665,6 +2680,8 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
->  			icr = __kvm_lapic_get_reg64(s->regs, APIC_ICR);
->  			__kvm_lapic_set_reg(s->regs, APIC_ICR2, icr >> 32);
->  		}
-> +	} else {
-> +		kvm_lapic_xapic_id_updated(vcpu->arch.apic);
->  	}
-> 
->  	return 0;
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 54fe03714f8a..239c3e8b1f3f 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -910,7 +910,8 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
->  			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
->  			  BIT(APICV_INHIBIT_REASON_X2APIC) |
->  			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
-> -			  BIT(APICV_INHIBIT_REASON_SEV);
-> +			  BIT(APICV_INHIBIT_REASON_SEV) |
-> +			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
-> 
->  	return supported & BIT(reason);
->  }
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index b06eafa5884d..941adade21ea 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7818,7 +7818,8 @@ static bool vmx_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
->  	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
->  			  BIT(APICV_INHIBIT_REASON_ABSENT) |
->  			  BIT(APICV_INHIBIT_REASON_HYPERV) |
-> -			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
-> +			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
-> +			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
-> 
->  	return supported & BIT(reason);
->  }
-> 
-> base-commit: 6ab6e3842d18e4529fa524fb6c668ae8a8bf54f4
-> --
-> 
+Hardware would directly write x2APIC ICR register instead of software
+emulation in some circumstances, e.g when Intel IPI virtualization is
+enabled. This behavior requires normal reserved bits checking to ensure
+them input as zero, otherwise it will cause #GP. So we need mask out
+those reserved bits from the data written to vICR register.
 
+Remove Delivery Status bit emulation in test case as this flag
+is invalid and not needed in x2APIC mode. KVM may ignore clearing
+it during interrupt dispatch which will lead to fake test failure.
 
-Hi Sean!
+Opportunstically correct vector number for test sending IPI to
+non-existent vCPUs.
 
-So, I decided to stop beeing lazy and to understand how KVM actually treats the whole thing:
+Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+---
+ .../selftests/kvm/x86_64/xapic_state_test.c   | 20 ++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-
-- kvm_apic_set_xapic_id - called when apic id changes either by guest write,
-  cpu reset or x2apic beeing disabled due to write to apic base msr.
-  apic register is updated, and apic map is recalculated
-
-
-- kvm_apic_set_x2apic_id - called only when apic base write (guest or userspace),
-  enables x2apic. caller uses vcpu->vcpu_id explicity
-
-
-- kvm_apic_state_fixup - when apic state is uploaded by userspace, has check
-  that check for x2apic api. Also triggers apic map update
-
-
-- kvm_recalculate_apic_map
-  this updates the apic map that we use in IPI emulation.
-  - xapic id (aka APIC_ID >> 24) is only used for APICs which are not in xapic mode.
-  - x2apic ids (aka vcpu->vcpu_id) are used for all APICs which are in x2apic mode,
-    and also (as a hack, when an apic has vcpu_id > 255, even if not in x2apic mode,
-    its x2apic id is still put in the map)
-
-
-Conclusions:
-
-- Practically speaking, when an apic is in x2apic mode, even if userspace uploaded
-non standard APIC_ID, it is ignored, and just read back (garbage in - garbage out)
-
-- Non standard APIC ID is lost when switching to x2apic mode.
-
-
-
-
-Best regards,
-	Maxim Levitsky
-
-
-
-PS: sending this so this info is not lost.
-
-Thankfully my APICv inhibit patch got accepted upstream,
-so one issue less to deal with.
-
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+index 0792334ba243..df916c6f53f9 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+@@ -70,13 +70,27 @@ static void ____test_icr(struct kvm_vm *vm, struct kvm_vcpu *vcpu, uint64_t val)
+ 	vcpu_ioctl(vm, vcpu->id, KVM_GET_LAPIC, &xapic);
+ 	icr = (u64)(*((u32 *)&xapic.regs[APIC_ICR])) |
+ 	      (u64)(*((u32 *)&xapic.regs[APIC_ICR2])) << 32;
+-	if (!vcpu->is_x2apic)
++	if (!vcpu->is_x2apic) {
+ 		val &= (-1u | (0xffull << (32 + 24)));
+-	ASSERT_EQ(icr, val & ~APIC_ICR_BUSY);
++		ASSERT_EQ(icr, val & ~APIC_ICR_BUSY);
++	} else {
++		ASSERT_EQ(icr & ~APIC_ICR_BUSY, val & ~APIC_ICR_BUSY);
++	}
+ }
+ 
++#define X2APIC_RSVED_BITS_MASK  (GENMASK_ULL(31,20) | \
++				 GENMASK_ULL(17,16) | \
++				 GENMASK_ULL(13,13))
++
+ static void __test_icr(struct kvm_vm *vm, struct kvm_vcpu *vcpu, uint64_t val)
+ {
++	if (vcpu->is_x2apic) {
++		/* Hardware writing vICR register requires reserved bits 31:20,
++		 * 17:16 and 13 kept as zero to avoid #GP exception. Data value
++		 * written to vICR should mask out those bits above.
++		 */
++		val &= ~X2APIC_RSVED_BITS_MASK;
++	}
+ 	____test_icr(vm, vcpu, val | APIC_ICR_BUSY);
+ 	____test_icr(vm, vcpu, val & ~(u64)APIC_ICR_BUSY);
+ }
+@@ -100,7 +114,7 @@ static void test_icr(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 	icr = APIC_INT_ASSERT | 0xff;
+ 	for (i = vcpu->id + 1; i < 0xff; i++) {
+ 		for (j = 0; j < 8; j++)
+-			__test_icr(vm, vcpu, i << (32 + 24) | APIC_INT_ASSERT | (j << 8));
++			__test_icr(vm, vcpu, i << (32 + 24) | icr | (j << 8));
+ 	}
+ 
+ 	/* And again with a shorthand destination for all types of IPIs. */
+-- 
+2.27.0
 
