@@ -2,121 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 688235577B4
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 12:18:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F04FA5577AB
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 12:17:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbiFWKRt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 06:17:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48148 "EHLO
+        id S230053AbiFWKRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 06:17:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231315AbiFWKRq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 06:17:46 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32B24A3C1;
-        Thu, 23 Jun 2022 03:17:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655979458; x=1687515458;
-  h=from:to:cc:subject:date:message-id;
-  bh=NeJur9sIZ5lmTLg5cdWYNoS4OW5zTNJwPnCWv1GQGJQ=;
-  b=RKbywVx9PMGvPw04y8SV1yu8BppdGdSsdSPqWH2pmMt2bOt+zOwpHRSz
-   j27UOlgsLMdPwsDBfZM/fWHHcy/KB04hylR3pT6b8XzSbn6oRE7r3OdnX
-   ofvUoVbk3tCPPUdhSsCx7xo7eUwH8ogYXZ8rXZpbzqnF4TCNxvZFaE0Z5
-   Quih5e7b4xY3EHJl06xvQxR/0aU+5rHwRxVrMHvceYkX63jBV/aP6p0jw
-   y3CkAob2tUldRyB8xzI9zZ6NQHYnd1hZal0eHKntVusS/qtUwAM0dkQa9
-   6rGMiADDQguAfQTVhOQVLPuWYdG0c22mbQVruqOFQ1QQzwKTr4oGsTVWs
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="269405571"
-X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="269405571"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 03:17:35 -0700
-X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="644669573"
-Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 03:17:33 -0700
-From:   Zeng Guang <guang.zeng@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229527AbiFWKRd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 06:17:33 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CB93C49F9F;
+        Thu, 23 Jun 2022 03:17:29 -0700 (PDT)
+Received: from anrayabh-desk (unknown [167.220.238.193])
+        by linux.microsoft.com (Postfix) with ESMTPSA id E114E20C63C9;
+        Thu, 23 Jun 2022 03:17:23 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E114E20C63C9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1655979449;
+        bh=ReoHMI5JhpilguE9X6PU0nYis/u6+UJ/Af/HK8AAjZ8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sHf/2Tlb4InhVSYT03UGIfr/kqdGxn++tPTa0f4Sc4REdV0O8T77inimwEka9HLEA
+         W7aQ1A52rdYUEn9UeDxxQL4XKMzI+IyFcFyyBxJfDLF1+pD+n+JJUIkZ8gvxPBKKBY
+         t6m6IF2Uj4t1fIF3vLOGGKLvSWINXVEUlnDCDCC4=
+Date:   Thu, 23 Jun 2022 15:47:18 +0530
+From:   Anirudh Rayabharam <anrayabh@linux.microsoft.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Shuah Khan <shuah@kernel.org>, Gao Chao <chao.gao@intel.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v2] KVM: selftest: Enhance handling WRMSR ICR register in x2APIC mode
-Date:   Thu, 23 Jun 2022 17:45:11 +0800
-Message-Id: <20220623094511.26066-1-guang.zeng@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Ilias Stamatis <ilstam@amazon.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, mail@anirudhrb.com,
+        kumarpraveen@linux.microsoft.com, wei.liu@kernel.org,
+        robert.bradford@intel.com, liuwe@microsoft.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: Don't expose TSC scaling to L1 when on Hyper-V
+Message-ID: <YrQ9rt61a8tPWWGO@anrayabh-desk>
+References: <20220613161611.3567556-1-anrayabh@linux.microsoft.com>
+ <592ab920-51f3-4794-331f-8737e1f5b20a@redhat.com>
+ <YqdsjW4/zsYaJahf@google.com>
+ <YqipLpHI24NdhgJO@anrayabh-desk>
+ <YqiwoOP4HX2LniI4@google.com>
+ <87zgi5xh42.fsf@redhat.com>
+ <YrMenI1mTbqA9MaR@anrayabh-desk>
+ <87r13gyde8.fsf@redhat.com>
+ <YrNBHFLzAgcsw19O@anrayabh-desk>
+ <87k098y77x.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87k098y77x.fsf@redhat.com>
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hardware would directly write x2APIC ICR register instead of software
-emulation in some circumstances, e.g when Intel IPI virtualization is
-enabled. This behavior requires normal reserved bits checking to ensure
-them input as zero, otherwise it will cause #GP. So we need mask out
-those reserved bits from the data written to vICR register.
+On Wed, Jun 22, 2022 at 06:48:50PM +0200, Vitaly Kuznetsov wrote:
+> Anirudh Rayabharam <anrayabh@linux.microsoft.com> writes:
+> 
+> > On Wed, Jun 22, 2022 at 04:35:27PM +0200, Vitaly Kuznetsov wrote:
+> 
+> ...
+> 
+> >> 
+> >> I've tried to pick it up but it's actually much harder than I think. The
+> >> patch has some minor issues ('&vmcs_config.nested' needs to be switched
+> >> to '&vmcs_conf->nested' in nested_vmx_setup_ctls_msrs()), but the main
+> >> problem is that the set of controls nested_vmx_setup_ctls_msrs() needs
+> >> is NOT a subset of vmcs_config (setup_vmcs_config()). I was able to
+> >> identify at least:
+> 
+> ...
+> 
+> I've jsut sent "[PATCH RFC v1 00/10] KVM: nVMX: Use vmcs_config for
+> setting up nested VMX MSRs" which implements Sean's suggestion. Hope
+> this is the way to go for mainline.
+> 
+> >
+> > How about we do something simple like the patch below to start with?
+> > This will easily apply to stable and we can continue improving upon
+> > it with follow up patches on mainline.
+> >
+> 
+> Personally, I'm not against this for @stable. Alternatively, in case the
 
-Remove Delivery Status bit emulation in test case as this flag
-is invalid and not needed in x2APIC mode. KVM may ignore clearing
-it during interrupt dispatch which will lead to fake test failure.
+I think it's a good intermediate fix for mainline too. It is easier to land
+it in stable if it already exists in mainline. It can stay in mainline
+until your series lands and replaces it with the vmcs_config approach.
 
-Opportunstically correct vector number for test sending IPI to
-non-existent vCPUs.
+What do you think?
 
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
----
- .../selftests/kvm/x86_64/xapic_state_test.c   | 20 ++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+> only observed issue is with TSC scaling, we can add support for it for
+> KVM-on-Hyper-V but not for Hyper-V-on-KVM (a small subset of "[PATCH
+> 00/11] KVM: VMX: Support TscScaling and EnclsExitingBitmap whith
+> eVMCS"). I can prepare patches if needed.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
-index 0792334ba243..df916c6f53f9 100644
---- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
-@@ -70,13 +70,27 @@ static void ____test_icr(struct kvm_vm *vm, struct kvm_vcpu *vcpu, uint64_t val)
- 	vcpu_ioctl(vm, vcpu->id, KVM_GET_LAPIC, &xapic);
- 	icr = (u64)(*((u32 *)&xapic.regs[APIC_ICR])) |
- 	      (u64)(*((u32 *)&xapic.regs[APIC_ICR2])) << 32;
--	if (!vcpu->is_x2apic)
-+	if (!vcpu->is_x2apic) {
- 		val &= (-1u | (0xffull << (32 + 24)));
--	ASSERT_EQ(icr, val & ~APIC_ICR_BUSY);
-+		ASSERT_EQ(icr, val & ~APIC_ICR_BUSY);
-+	} else {
-+		ASSERT_EQ(icr & ~APIC_ICR_BUSY, val & ~APIC_ICR_BUSY);
-+	}
- }
- 
-+#define X2APIC_RSVED_BITS_MASK  (GENMASK_ULL(31,20) | \
-+				 GENMASK_ULL(17,16) | \
-+				 GENMASK_ULL(13,13))
-+
- static void __test_icr(struct kvm_vm *vm, struct kvm_vcpu *vcpu, uint64_t val)
- {
-+	if (vcpu->is_x2apic) {
-+		/* Hardware writing vICR register requires reserved bits 31:20,
-+		 * 17:16 and 13 kept as zero to avoid #GP exception. Data value
-+		 * written to vICR should mask out those bits above.
-+		 */
-+		val &= ~X2APIC_RSVED_BITS_MASK;
-+	}
- 	____test_icr(vm, vcpu, val | APIC_ICR_BUSY);
- 	____test_icr(vm, vcpu, val & ~(u64)APIC_ICR_BUSY);
- }
-@@ -100,7 +114,7 @@ static void test_icr(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- 	icr = APIC_INT_ASSERT | 0xff;
- 	for (i = vcpu->id + 1; i < 0xff; i++) {
- 		for (j = 0; j < 8; j++)
--			__test_icr(vm, vcpu, i << (32 + 24) | APIC_INT_ASSERT | (j << 8));
-+			__test_icr(vm, vcpu, i << (32 + 24) | icr | (j << 8));
- 	}
- 
- 	/* And again with a shorthand destination for all types of IPIs. */
--- 
-2.27.0
+Will it fit in stable's 100 line rule?
 
+Thanks!
+
+	- Anirudh.
