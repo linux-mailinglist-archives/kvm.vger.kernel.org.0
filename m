@@ -2,73 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2913556F4C
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 02:09:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9821A557011
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 03:46:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237881AbiFWAJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 20:09:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35386 "EHLO
+        id S1359556AbiFWBqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 21:46:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229687AbiFWAJC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 20:09:02 -0400
+        with ESMTP id S1359719AbiFWBqW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 21:46:22 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A421F340FD;
-        Wed, 22 Jun 2022 17:09:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 311A1434B2;
+        Wed, 22 Jun 2022 18:46:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655942941; x=1687478941;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=l51kT0hSlFet5bjbRgkKhIH8A9wUJZ5R6t4yBpcTrXM=;
-  b=Op0iwc+sbfAGk1taOlz+4Rb0zutb68Nc2RsULQS10kZMJgJE9piV7xz+
-   wEsqkCasYnb0vS9w2QSQTX/FLWw63rAC75NAk0TcTOqXBQ6rf4edGmT+f
-   s9I/vP7fsjbOd4ee/Dd6ri1MCKcxBmsuVu6esGCcLdd4JvbidLfOB5sNf
-   CA/LNQT2rGzrIrMuGHNiKNHl6EWPObSmMIcWDBcb5q74y2YtuXM1mxSGe
-   /MXmMhdXF0gH/f6jZYxoH9yZaiWCt+HxKK3ukkpU1dzA4d8Oee0DSBt6W
-   nY+G0XUe7fcBSIARe749cspljkMMsJFF0YxD7ZcAzsVMGQJu9plCDsoQu
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="260398867"
+  t=1655948781; x=1687484781;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=QCwPmWYcD+MquAMSOXPCydTeGHAkPZLuW112dPh/u+U=;
+  b=XweCD7xUIXkAvbggPhGUMSEFlIMelIS4GuZfMfSY06KClvLanY8AGkOh
+   hHouaYKAE5T0q7YHREd6ISd5lzT9zWfk0I93WC2+CdlXmU90BkX2hIaJZ
+   e2Rwabmt0TmMZPcSuG0NFNxcn/Ma1DoGKGGmfaZVO3e9Ljr0+lX05Xf7r
+   opwvW3HC0TupbWF958QRrV/EXbJusaGPJ5qkqvePGEuCfA+23zsV19Uyg
+   V0uj8/e9ngG/Jwvi3OydXGMleO37UQYF5sNBFztVv6nCPBpmXMOz3EPcD
+   KKxZtVHh6C4vbhyFaWnczyp+1RdQQ4fx3ijhoOAC+TAnUC2wepP2BV9rY
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="260413503"
 X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="260398867"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:09:01 -0700
+   d="scan'208";a="260413503"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 18:46:20 -0700
 X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="677816654"
-Received: from jmatsis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.178.197])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:08:57 -0700
-Message-ID: <198860d65d277dbd30552526a707576db4281b29.camel@intel.com>
-Subject: Re: [PATCH v5 03/22] cc_platform: Add new attribute to prevent ACPI
- memory hotplug
-From:   Kai Huang <kai.huang@intel.com>
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm-devel <kvm@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Len Brown <len.brown@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Rafael Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>
-Date:   Thu, 23 Jun 2022 12:08:55 +1200
-In-Reply-To: <CAJZ5v0jEJNdmkidvcOiRn+OVt01D5095t+nyXaJHKsqEAOvcBQ@mail.gmail.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <87dc19c47bad73509359c8e1e3a81d51d1681e4c.1655894131.git.kai.huang@intel.com>
-         <CAJZ5v0jEJNdmkidvcOiRn+OVt01D5095t+nyXaJHKsqEAOvcBQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+   d="scan'208";a="644487121"
+Received: from yutaoxu-mobl.ccr.corp.intel.com (HELO [10.249.172.190]) ([10.249.172.190])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 18:46:18 -0700
+Message-ID: <e18cca4c-c324-c1ab-7a2f-0f97c6387475@linux.intel.com>
+Date:   Thu, 23 Jun 2022 09:46:16 +0800
 MIME-Version: 1.0
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Cc:     baolu.lu@linux.intel.com, kvm@vger.kernel.org,
+        iommu@lists.linux.dev, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [PATCH v2 1/2] vfio/type1: Simplify bus_type determination
+Content-Language: en-US
+To:     Robin Murphy <robin.murphy@arm.com>, alex.williamson@redhat.com,
+        cohuck@redhat.com
+References: <b1d13cade281a7d8acbfd0f6a33dcd086207952c.1655898523.git.robin.murphy@arm.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <b1d13cade281a7d8acbfd0f6a33dcd086207952c.1655898523.git.robin.murphy@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
         SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -77,91 +63,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-06-22 at 13:45 +0200, Rafael J. Wysocki wrote:
-> On Wed, Jun 22, 2022 at 1:16 PM Kai Huang <kai.huang@intel.com> wrote:
-> >=20
-> > Platforms with confidential computing technology may not support ACPI
-> > memory hotplug when such technology is enabled by the BIOS.  Examples
-> > include Intel platforms which support Intel Trust Domain Extensions
-> > (TDX).
-> >=20
-> > If the kernel ever receives ACPI memory hotplug event, it is likely a
-> > BIOS bug.  For ACPI memory hot-add, the kernel should speak out this is
-> > a BIOS bug and reject the new memory.  For hot-removal, for simplicity
-> > just assume the kernel cannot continue to work normally, and just BUG()=
-.
-> >=20
-> > Add a new attribute CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED to indicate th=
-e
-> > platform doesn't support ACPI memory hotplug, so that kernel can handle
-> > ACPI memory hotplug events for such platform.
-> >=20
-> > In acpi_memory_device_{add|remove}(), add early check against this
-> > attribute and handle accordingly if it is set.
-> >=20
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  drivers/acpi/acpi_memhotplug.c | 23 +++++++++++++++++++++++
-> >  include/linux/cc_platform.h    | 10 ++++++++++
-> >  2 files changed, 33 insertions(+)
-> >=20
-> > diff --git a/drivers/acpi/acpi_memhotplug.c b/drivers/acpi/acpi_memhotp=
-lug.c
-> > index 24f662d8bd39..94d6354ea453 100644
-> > --- a/drivers/acpi/acpi_memhotplug.c
-> > +++ b/drivers/acpi/acpi_memhotplug.c
-> > @@ -15,6 +15,7 @@
-> >  #include <linux/acpi.h>
-> >  #include <linux/memory.h>
-> >  #include <linux/memory_hotplug.h>
-> > +#include <linux/cc_platform.h>
-> >=20
-> >  #include "internal.h"
-> >=20
-> > @@ -291,6 +292,17 @@ static int acpi_memory_device_add(struct acpi_devi=
-ce *device,
-> >         if (!device)
-> >                 return -EINVAL;
-> >=20
-> > +       /*
-> > +        * If the confidential computing platform doesn't support ACPI
-> > +        * memory hotplug, the BIOS should never deliver such event to
-> > +        * the kernel.  Report ACPI CPU hot-add as a BIOS bug and ignor=
-e
-> > +        * the memory device.
-> > +        */
-> > +       if (cc_platform_has(CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED)) {
->=20
-> Same comment as for the acpi_processor driver: this will affect the
-> initialization too and it would be cleaner to reset the
-> .hotplug.enabled flag of the scan handler.
->=20
->=20
+On 2022/6/22 20:04, Robin Murphy wrote:
+> Since IOMMU groups are mandatory for drivers to support, it stands to
+> reason that any device which has been successfully be added to a group
+> must be on a bus supported by that IOMMU driver, and therefore a domain
+> viable for any device in the group must be viable for all devices in
+> the group. This already has to be the case for the IOMMU API's internal
+> default domain, for instance. Thus even if the group contains devices on
+> different buses, that can only mean that the IOMMU driver actually
+> supports such an odd topology, and so without loss of generality we can
+> expect the bus type of any device in a group to be suitable for IOMMU
+> API calls.
 
-Hi Rafael,
+Ideally we could remove bus->iommu_ops and all IOMMU APIs go through the
+dev_iommu_ops().
 
-Thanks for review.  The same to the ACPI CPU hotplug handling, this is ille=
-gal
-also during kernel boot.  If we just want to disable, then perhaps somethin=
-g
-like below?
+> 
+> Replace vfio_bus_type() with a simple call to resolve an appropriate
+> member device from which to then derive a bus type. This is also a step
+> towards removing the vague bus-based interfaces from the IOMMU API, when
+> we can subsequently switch to using this device directly.
+> 
+> Furthermore, scrutiny reveals a lack of protection for the bus being
+> removed while vfio_iommu_type1_attach_group() is using it; the reference
+> that VFIO holds on the iommu_group ensures that data remains valid, but
+> does not prevent the group's membership changing underfoot. Holding the
+> vfio_device for as long as we need here also neatly solves this.
+> 
+> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
 
---- a/drivers/acpi/acpi_memhotplug.c
-+++ b/drivers/acpi/acpi_memhotplug.c
-@@ -366,6 +366,9 @@ static bool __initdata acpi_no_memhotplug;
-=20
- void __init acpi_memory_hotplug_init(void)
- {
-+       if (cc_platform_has(CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED))
-+               acpi_no_memhotplug =3D true;
-+
-        if (acpi_no_memhotplug) {
-                memory_device_handler.attach =3D NULL;
-                acpi_scan_add_handler(&memory_device_handler);
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 
+Best regards,
+baolu
 
---=20
-Thanks,
--Kai
-
+> ---
+> 
+> After sleeping on it, I decided to type up the helper function approach
+> to see how it looked in practice, and in doing so realised that with one
+> more tweak it could also subsume the locking out of the common paths as
+> well, so end up being a self-contained way for type1 to take care of its
+> own concern, which I rather like.
+> 
+>   drivers/vfio/vfio.c             | 18 +++++++++++++++++-
+>   drivers/vfio/vfio.h             |  3 +++
+>   drivers/vfio/vfio_iommu_type1.c | 30 +++++++++++-------------------
+>   3 files changed, 31 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 61e71c1154be..73bab04880d0 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -448,7 +448,7 @@ static void vfio_group_get(struct vfio_group *group)
+>    * Device objects - create, release, get, put, search
+>    */
+>   /* Device reference always implies a group reference */
+> -static void vfio_device_put(struct vfio_device *device)
+> +void vfio_device_put(struct vfio_device *device)
+>   {
+>   	if (refcount_dec_and_test(&device->refcount))
+>   		complete(&device->comp);
+> @@ -475,6 +475,22 @@ static struct vfio_device *vfio_group_get_device(struct vfio_group *group,
+>   	return NULL;
+>   }
+>   
+> +struct vfio_device *vfio_device_get_from_iommu(struct iommu_group *iommu_group)
+> +{
+> +	struct vfio_group *group = vfio_group_get_from_iommu(iommu_group);
+> +	struct vfio_device *device;
+> +
+> +	mutex_lock(&group->device_lock);
+> +	list_for_each_entry(device, &group->device_list, group_next) {
+> +		if (vfio_device_try_get(device)) {
+> +			mutex_unlock(&group->device_lock);
+> +			return device;
+> +		}
+> +	}
+> +	mutex_unlock(&group->device_lock);
+> +	return NULL;
+> +}
+> +
+>   /*
+>    * VFIO driver API
+>    */
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index a67130221151..e8f21e64541b 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -70,3 +70,6 @@ struct vfio_iommu_driver_ops {
+>   
+>   int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+>   void vfio_unregister_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+> +
+> +struct vfio_device *vfio_device_get_from_iommu(struct iommu_group *iommu_group);
+> +void vfio_device_put(struct vfio_device *device);
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index c13b9290e357..e38b8bfde677 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1679,18 +1679,6 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>   	return ret;
+>   }
+>   
+> -static int vfio_bus_type(struct device *dev, void *data)
+> -{
+> -	struct bus_type **bus = data;
+> -
+> -	if (*bus && *bus != dev->bus)
+> -		return -EINVAL;
+> -
+> -	*bus = dev->bus;
+> -
+> -	return 0;
+> -}
+> -
+>   static int vfio_iommu_replay(struct vfio_iommu *iommu,
+>   			     struct vfio_domain *domain)
+>   {
+> @@ -2159,7 +2147,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>   	struct vfio_iommu *iommu = iommu_data;
+>   	struct vfio_iommu_group *group;
+>   	struct vfio_domain *domain, *d;
+> -	struct bus_type *bus = NULL;
+> +	struct vfio_device *iommu_api_dev;
+>   	bool resv_msi, msi_remap;
+>   	phys_addr_t resv_msi_base = 0;
+>   	struct iommu_domain_geometry *geo;
+> @@ -2192,18 +2180,19 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>   		goto out_unlock;
+>   	}
+>   
+> -	/* Determine bus_type in order to allocate a domain */
+> -	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
+> -	if (ret)
+> +	/* Resolve the group back to a member device for IOMMU API ops */
+> +	ret = -ENODEV;
+> +	iommu_api_dev = vfio_device_get_from_iommu(iommu_group);
+> +	if (!iommu_api_dev)
+>   		goto out_free_group;
+>   
+>   	ret = -ENOMEM;
+>   	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
+>   	if (!domain)
+> -		goto out_free_group;
+> +		goto out_put_dev;
+>   
+>   	ret = -EIO;
+> -	domain->domain = iommu_domain_alloc(bus);
+> +	domain->domain = iommu_domain_alloc(iommu_api_dev->dev->bus);
+>   	if (!domain->domain)
+>   		goto out_free_domain;
+>   
+> @@ -2258,7 +2247,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>   	list_add(&group->next, &domain->group_list);
+>   
+>   	msi_remap = irq_domain_check_msi_remap() ||
+> -		    iommu_capable(bus, IOMMU_CAP_INTR_REMAP);
+> +		    iommu_capable(iommu_api_dev->dev->bus, IOMMU_CAP_INTR_REMAP);
+>   
+>   	if (!allow_unsafe_interrupts && !msi_remap) {
+>   		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
+> @@ -2331,6 +2320,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>   	iommu->num_non_pinned_groups++;
+>   	mutex_unlock(&iommu->lock);
+>   	vfio_iommu_resv_free(&group_resv_regions);
+> +	vfio_device_put(iommu_api_dev);
+>   
+>   	return 0;
+>   
+> @@ -2342,6 +2332,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>   	vfio_iommu_resv_free(&group_resv_regions);
+>   out_free_domain:
+>   	kfree(domain);
+> +out_put_dev:
+> +	vfio_device_put(iommu_api_dev);
+>   out_free_group:
+>   	kfree(group);
+>   out_unlock:
 
