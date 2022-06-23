@@ -2,98 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E8EA558A2D
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 22:34:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C62A558A34
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 22:36:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbiFWUeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 16:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33588 "EHLO
+        id S229760AbiFWUf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 16:35:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230140AbiFWUee (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 16:34:34 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289F860E05
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 13:34:32 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id a14so477148pgh.11
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 13:34:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VV9cljBvBFHor9Hsmi3I2V+2UnCkisvxO/5bxp9iuO0=;
-        b=TVePn525gz1XLdYPkgwNoXqcj14LJor7LSwXlZWvK+7XGD1ZD4uIy8qd7M8reu2WHE
-         phe8hp+0H402nxdcKG7yIb5RYp0AHL64lzETS64Xv9XEjlVjE1BA1ltUi+jyBBqN2qTc
-         N1WRXTm+pbum/QZS6WaGMwNNFJnSXxmgAgc7tyLwtZxse4XxIFiihF3sjdqdX0Oisdvn
-         2Z2fQgYWko0tGAnQuqmzieEJCdqD/55dJ/62RZEJRrDxQcrMAH4b77CaPucpni+sQE6y
-         ga6vTEzEe/vYMj1ayGv0icjAJ36ljYfM2Q5r9LlYVJ6EAeFx8ZLPtOf11AoGxl3cY6S6
-         MXQQ==
+        with ESMTP id S229527AbiFWUf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 16:35:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3294D60E38
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 13:35:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656016556;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jBmUQROEGSBi6KZ4o9E9bBpH1DEN5yNQ4K8Bp+Z/iq4=;
+        b=CPzm4RqyO4RL06TxxQKf9e7y7T4S0v1ZjCJwe3FuMIVccdIILiEf4v19uGvtyeV0/5j1xJ
+        HVeOUDjgxTz+jFE2JF9KdWosM9+Pv+qZNiF+T4qi5lVqhgGDYG6nqy/ugWzcjzw8aY9Xyl
+        wOqFFrpxYWEbyHmjF9pR8q5tKSbPbk8=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-674-hsVh8AFPP2eNiNAT1rzjMw-1; Thu, 23 Jun 2022 16:35:55 -0400
+X-MC-Unique: hsVh8AFPP2eNiNAT1rzjMw-1
+Received: by mail-il1-f200.google.com with SMTP id u8-20020a056e021a4800b002d3a5419d1bso102245ilv.12
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 13:35:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VV9cljBvBFHor9Hsmi3I2V+2UnCkisvxO/5bxp9iuO0=;
-        b=TOs++88wkUyvaKasqs6FickSr28Vg/gGS2+v3nKQ7Y+L1da6Joyh85bQH1Y7wP9KOY
-         dIYvONj934eRLUD251v4RGW3D+xWHc8HAoigLrULoa/dl3ghjV4wVJ/8Ee5Jb4qHixcy
-         2sTKem0Q7nepQ8WlNawlv2a0Us+HBtM3+S/QYL1UUlKKUWVNe2LXvZMP2vBog/UKrTaC
-         VKlc8/YjSiwUm9dcyMZOgGjuJdmoOCq3uv3pBJnVTxAhhGrApaACtVyD+4tNeMthU5+K
-         eyV4clMTLSrdkQFihz6dcJe5Rsc0/vdZrqJxfSH+d+v//VL3lUb8n4QibFWFAWYjMhPR
-         1/Lw==
-X-Gm-Message-State: AJIora8QnN0ogAXHjNPrPh6+MxL5jildEuGu0oeRAX8coegN8dzKICCp
-        +HSkykOX9x+BW0DsvNbwe4eIlw==
-X-Google-Smtp-Source: AGRyM1upbFHe5dNWeaInTDpiZf5i80ia/03IiaYuju8VaHMiLBdaK0ZnQif7xXzrfPW9Z/RJsEscPg==
-X-Received: by 2002:a63:5c56:0:b0:3fc:824d:fc57 with SMTP id n22-20020a635c56000000b003fc824dfc57mr9060291pgm.561.1656016471539;
-        Thu, 23 Jun 2022 13:34:31 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id t14-20020a17090340ce00b00163bddfb109sm237949pld.10.2022.06.23.13.34.30
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=jBmUQROEGSBi6KZ4o9E9bBpH1DEN5yNQ4K8Bp+Z/iq4=;
+        b=MfBrLcRba/Gp0fJmJv2oE2THU/1rnTTfRQBW3hK2K67DzME3SDLwfP2P4QhpN8ii2p
+         t85r3ayIFkPUUPtPL0LvoYeBOvn8FnjasilqPX1TYhlxepd0/qxTgmP5+0xtbkmUCzln
+         FSrcTXBl4+hxaMK+XvhTy/1eMNxryDEYv00kzjCtH5lQ3G7MeQVNS0XIxst1QbUrrmxx
+         wTFSk9rsT+veKIfaLHE+XVUGUc5SeH2E8YBBCaKueW8dt8mG3xl/8Y4RXCA90GXIQXkq
+         n+r/KIEGFIZA0Y+4P/Z16P+/bk3smL6T1f8b30aHJPa9SxmAe9iecMxMtU80WND31c48
+         0e+Q==
+X-Gm-Message-State: AJIora+G7itC4DfWpcdw2nGPWxzJHEao2ym2gDMhCQieaO/v2c1u790o
+        16MsiFwOHDAJI6f+BdNXoO0FZ6tlO9n/0IF4LHe1n8G4AQMVdphc/4+Cf+RWbbZkwfdg5ewgJVW
+        uScF6Ex8Xz2eH
+X-Received: by 2002:a02:c503:0:b0:339:ec67:b0a4 with SMTP id s3-20020a02c503000000b00339ec67b0a4mr2600647jam.27.1656016554290;
+        Thu, 23 Jun 2022 13:35:54 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uY4A4ulPkvl+0HkPHVJxiXM5mroTpWUdfuh0+GS53HXI+mhS1f3l3m2WS35NzqHwDBGAYR9g==
+X-Received: by 2002:a02:c503:0:b0:339:ec67:b0a4 with SMTP id s3-20020a02c503000000b00339ec67b0a4mr2600627jam.27.1656016553968;
+        Thu, 23 Jun 2022 13:35:53 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id w16-20020a02cf90000000b00339c3906b08sm151280jar.177.2022.06.23.13.35.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 13:34:31 -0700 (PDT)
-Date:   Thu, 23 Jun 2022 20:34:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Venkatesh Srinivas <venkateshs@chromium.org>
-Subject: Re: [PATCH v2] KVM: selftest: Enhance handling WRMSR ICR register in
- x2APIC mode
-Message-ID: <YrTOU1QHHpGpe0ym@google.com>
-References: <20220623094511.26066-1-guang.zeng@intel.com>
- <20220623103314.GA14006@gao-cwp>
+        Thu, 23 Jun 2022 13:35:53 -0700 (PDT)
+Date:   Thu, 23 Jun 2022 14:35:52 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] vfio/type1: Simplify bus_type determination
+Message-ID: <20220623143552.634779e0.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276A79834CCB5954A3025DF8CB59@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <b1d13cade281a7d8acbfd0f6a33dcd086207952c.1655898523.git.robin.murphy@arm.com>
+        <20220622161721.469fc9eb.alex.williamson@redhat.com>
+        <BN9PR11MB5276A79834CCB5954A3025DF8CB59@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220623103314.GA14006@gao-cwp>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Venkatesh
+On Thu, 23 Jun 2022 08:46:45 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-On Thu, Jun 23, 2022, Chao Gao wrote:
-> On Thu, Jun 23, 2022 at 05:45:11PM +0800, Zeng Guang wrote:
-> >Hardware would directly write x2APIC ICR register instead of software
-> >emulation in some circumstances, e.g when Intel IPI virtualization is
-> >enabled. This behavior requires normal reserved bits checking to ensure
-> >them input as zero, otherwise it will cause #GP. So we need mask out
-> >those reserved bits from the data written to vICR register.
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Thursday, June 23, 2022 6:17 AM
+> >   
+> > >
+> > >  	ret = -EIO;
+> > > -	domain->domain = iommu_domain_alloc(bus);
+> > > +	domain->domain = iommu_domain_alloc(iommu_api_dev->dev-
+> > >bus);  
+> > 
+> > It makes sense to move away from a bus centric interface to iommu ops
+> > and I can see that having a device interface when we have device level
+> > address-ability within a group makes sense, but does it make sense to
+> > only have that device level interface?  For example, if an iommu_group
+> > is going to remain an aspect of the iommu subsystem, shouldn't we be
+> > able to allocate a domain and test capabilities based on the group and
+> > the iommu driver should have enough embedded information reachable
+> > from
+> > the struct iommu_group to do those things?  This "perform group level
+> > operations based on an arbitrary device in the group" is pretty klunky.
+> > Thanks,
+> >   
 > 
-> OK. One open is:
+> This sounds a right thing to do.
 > 
-> Current KVM doesn't emulate this #GP. Is there any historical reason?
-> if no, we will fix KVM and add some tests to verify this #GP is
-> correctly emulated.
+> btw another alternative which I'm thinking of is whether vfio_group
+> can record the bus info when the first device is added to it in
+> __vfio_register_dev(). Then we don't need a group interface from
+> iommu to test if vfio is the only user having such requirement.
 
-It's a bug.  There are patches posted[*], but they need to be refreshed to fix a
-rebase goof.
+That might be more simple, but it's just another variation on vfio
+picking an arbitrary device from a group to satisfy the iommu interface
+rather than operating on an iommu subsystem provided object.  Thanks,
 
-Venkatesh, are you planning on sending a v3 soonish?
+Alex
 
-[*] https://lore.kernel.org/all/20220525173933.1611076-1-venkateshs@chromium.org
