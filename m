@@ -2,171 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F01F0558B46
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 00:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A49F8558B5B
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 00:43:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbiFWWgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 18:36:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33750 "EHLO
+        id S230151AbiFWWnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 18:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbiFWWgp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 18:36:45 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88CA45133A
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 15:36:44 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id b12-20020a17090a6acc00b001ec2b181c98so3971229pjm.4
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 15:36:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JetDtHU3X+1B2pqv06q6XrBYV3K3bGShzpXgJBS5x0g=;
-        b=dyEgVIex9SIwN8/Oyba1p0Nc/YJDQKTUUM+mY41FwvpygkyZzf0UtRzkKtS4EIBHHA
-         Xck2+vMALl3GyO0YO8LzH+UzcYB+LWSq4wyqHpkd6GB7JHgdEgY4GmC2kYqywMW9wsls
-         zHvDQWimUQ2Amyryb6JyWPUCRISy1yFQeB2SK1K2Q1zmns78u8LqMrF2dCe0rnOnEtOS
-         s4EI3EPGuqp63XvDPn4eK8iO6Q9nl13rFabYy1ssU8BiQGN2cC5gYvW0Kh0SSQATdEo1
-         YR4qTvqz2T8gAwdcHcKLG32P3KZmowtxSSGghozM+FEM9d62/53a/FQfUV/bBixZfntZ
-         9BUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JetDtHU3X+1B2pqv06q6XrBYV3K3bGShzpXgJBS5x0g=;
-        b=AYEU4+sS73OOZtTlQ2zX2D8D/q3vRjyjCP2I/6IiaAoOZboTYW351/h2JRwm5ITWvg
-         maUnUuXPBmGigGN3LgQqoWvTnj/fLrbCIjaqDndE7tGoRhBR3m0klI1dVYZi9cqk/r3o
-         RyZWDUB6OczhAWjRxOQEPLX4UXdrBNBVcbJHzK/iS/bsVdzknKJgG47CnWR54TkwNa/2
-         IXbybrTwWdeazXrEg72BP/BLtSOdGiRxr7urZY5rrojZlepkdtNMvlwYf6qAH1XysADR
-         XNNUApE3y1vPJUZYe2C47wcVBZEyZa2JPSV1Xc/e2z24/wZHRS2HBtcJ5FRS2h7yx9lC
-         20PA==
-X-Gm-Message-State: AJIora8UaIqQWYRgeBxv8VRNIC7K6ILO+cIZLz5m041T7o/VkMRPxccK
-        1UBP1jjUouWdMyPfXSTJ7vXBww==
-X-Google-Smtp-Source: AGRyM1tvIami/If6+RQSfpCBjEgTqjpFW/6mqfqXNmMf74n8X2WXBnNOJEHAYhBFEwQGjNfyTfwJcg==
-X-Received: by 2002:a17:903:10a:b0:16a:2762:88e2 with SMTP id y10-20020a170903010a00b0016a276288e2mr21456838plc.22.1656023803838;
-        Thu, 23 Jun 2022 15:36:43 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id ca27-20020a056a00419b00b00525133f98adsm154148pfb.146.2022.06.23.15.36.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 15:36:42 -0700 (PDT)
-Date:   Thu, 23 Jun 2022 22:36:37 +0000
-From:   David Matlack <dmatlack@google.com>
+        with ESMTP id S230105AbiFWWnn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 18:43:43 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2059.outbound.protection.outlook.com [40.107.244.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5AB31DEA;
+        Thu, 23 Jun 2022 15:43:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S9Rk+IXqIBu83xsPgo+gl42+crg0kapx/VnGc4I+Q23Tk7/qstsX3RJ51ylNOkSLfXZbUhvcKOHxm33a4RYKhttHhiuq+16KFwJ5iO9bhLKViA0vg6TBt4Y1e36ROh8tIMUu3GI4GgeSy60JOvl6xXB9CEGOr2rsjcefInK6+rZiswhjXfMfUyYrLzMDMFK/B6V4tnVJiKC+vG5AXMd+M6BBXS1jWv8A3jXCehrypoBKORiGSqcmY1phrj9/6WfvfTJBTHhYnqGoiQ6A+hdDLY2h7jAndKukQESBLJHMhjVXe/aZ9nAm5p0Qq3YrfnaRH+Hj0lSdhhA/3NNma70YYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XmWTbC0XMAjcwz41kPAqWhcTQibAnsZakzkk9hsOPVQ=;
+ b=kkXIjR1YxCqCbx2WVsmpfNwnu/w34c/lrgC1LJOd4HYG6r/Uwv6SV87aLitqlrcIQ2MxMpQHvcEizki9IwloEd0D+zmR5eouR0t7erHHhUZf5KMJ2O1MSZyR8rjhN7A7+ii1mvJjK9q452sP1QzQ2umWBIUjBNywGroLmM53GRC2RfRRmVxEruxFF3EXnaufQmSKCIcsVAvEP7qRN8UMPX81o7wRruvIO0XoWH+apMIoKWpHiVKenYjmOtAPyOYuAKpOXx6qaJEXgkFvSylXEREwPBZwOYB9CXGNUjSN4HJFyhDwHYPHhyKdUDJQ3L5L4Sw/bidkPO8Br64OrX4WYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XmWTbC0XMAjcwz41kPAqWhcTQibAnsZakzkk9hsOPVQ=;
+ b=etl/yJEcPtfKicuAXhWly0Rde/X1JlOkbRjZ4QnGYaREIYifOzsoV3STxZLXcmf3ENzHrtnAxqXP3gXCtvsbHfJ7CBFhBkrg4ZvmSkjL9rdt41ObOXXxn98GP5RmCppSho9bG/ybFPgcL4/4Hhbcap39APhw4sp2qqR7Iyyivm8=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by DM5PR12MB1337.namprd12.prod.outlook.com (2603:10b6:3:6e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.18; Thu, 23 Jun
+ 2022 22:43:40 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::8953:6baa:97bb:a15d]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::8953:6baa:97bb:a15d%7]) with mapi id 15.20.5373.015; Thu, 23 Jun 2022
+ 22:43:40 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: [PATCH v7 22/23] KVM: x86/mmu: Extend Eager Page Splitting to
- nested MMUs
-Message-ID: <YrTq9RU7r05ud+tb@google.com>
-References: <20220622192710.2547152-1-pbonzini@redhat.com>
- <20220622192710.2547152-23-pbonzini@redhat.com>
- <CALzav=fH_9_LKVE0_UCftwy2KZaB3nSBoWU07aPWALag4_mcHQ@mail.gmail.com>
- <YrTDcrsn0/+alpzf@google.com>
+CC:     Dave Hansen <dave.hansen@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: RE: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
+Thread-Topic: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
+Thread-Index: AQHYhkJMEjVRVcpx502HVSPCQUlAqK1bejcAgAACPYCAAD2E8IAAAkWAgAAEHtCAAALbAIAAEKeAgAACGACAAAZmMIABummAgAABGvA=
+Date:   Thu, 23 Jun 2022 22:43:40 +0000
+Message-ID: <SN6PR12MB276743CBEAD5AFE9033AFE558EB59@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cc0c6bd1-a1e3-82ee-8148-040be21cad5c@intel.com>
+ <BYAPR12MB2759A8F48D6D68EE879EEF648EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <25be3068-be13-a451-86d4-ff4cc12ddb23@intel.com>
+ <BYAPR12MB27599BCEA9F692E173911C3B8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <681e4e45-eff1-600c-9b81-1fa9bdf24232@intel.com>
+ <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
+ <BYAPR12MB275984F14B1E103935A103D98EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <5db37cc2-4fb1-7a73-c39a-3531260414d0@intel.com>
+ <BYAPR12MB2759AA368C8B6A5F1C31642F8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <YrTq3WfOeA6ehsk6@google.com>
+In-Reply-To: <YrTq3WfOeA6ehsk6@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-06-23T22:40:10Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=5def7f6e-6548-47d6-9076-0224b55af496;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-06-23T22:43:38Z
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: fc99d3ee-b6fb-4b19-8b25-948f2aef7f76
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6ae229b8-9ade-4605-21da-08da5569d18a
+x-ms-traffictypediagnostic: DM5PR12MB1337:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uXSIj1/bxNnVPiAFMiMSZq2JUs6G40bmdEU5wpBXqGAij6Bw1tGiPXkTnkB7PRE/9bTp6INMyfcAwfldTW7eNLkc+vn6mXOpq0paRzKLR3vWbR4KwJMEcTRogLwzEipuGqpnOURU0FeBbXRlmeZnrEsrksAsKfrVaBzgEs7sM903kCC5OOQRCl4/g0516GjcKV6DxdYMXjWVuAIF3CdLefRhyRsNuwDJnEyCctp6tPOhHXkAL2pR3Mtmmr1I57uXVFmxZccWT0efUBqusgP4QKqlbtGZIjo3snKRJUQXsfVLlz5hQyw+6Crl0/93sHpz7NjuiWUlsZFlaY7V3SLZOMNTAKh6W5xohXJniCL2qyBjnHFpTfD7aFiQopgMfPnVQsb0bkbW6hSr4HXWRXLVj0m7eZt4p/AjMuYtolDUhFoCQU7yXc2yCVzr9VKr8U7VtWVJu7QNdsVLGbqHnh2OIHAmmC5dhc63PNhSC2Gx9oLndiSWj+5BbLMj6YAFEBGFI3KD2CVL77/f3/dhscTsVynXMK3omOyGIQM74E4DGcnshnqGmU9RyRHs6VRHxn/Npi7Ahzau1BXh21iONT9hEgnL4LG+JrAJlo6OYxqvMV9xVBCt/Iauedn8+W9kEDTpkUX5BxNRpJG0KPevE35olKqy3Vp7HBDcAHgKQ8SicOBHoB86D5l+SN5HcM8gTAOBmiqtbMy5/2HoG7prsBrV9GsoHbbe3scIUHuWdnFfss3kf4JnNTRcKjVdqZjOLytY+DZy5suONfZ8bET4gk0fCiW0XjY0b2RQLlc16E6ks4Xc/Ex0Vz5hMmpsZRSj+WNy9rQj0gc3FhyBEHv0JQ74gw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(396003)(346002)(366004)(39860400002)(83380400001)(54906003)(26005)(9686003)(122000001)(316002)(38070700005)(86362001)(6506007)(186003)(38100700002)(478600001)(52536014)(8936002)(7416002)(2906002)(53546011)(4326008)(66446008)(66556008)(7406005)(7696005)(71200400001)(5660300002)(41300700001)(6916009)(8676002)(76116006)(45080400002)(966005)(66946007)(66476007)(64756008)(55016003)(33656002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gZUIazP8sN2UXoqA1vAld9NbvTh/zZva1BXBPdrQwcHBVPYIqayscXrJumii?=
+ =?us-ascii?Q?VN9feh7UH05om1PuuhRA09zJFzVUiiiGKdCx6w69Y47hhuari9c79RdaRuun?=
+ =?us-ascii?Q?mSXbgB70qYkciCmCVmiSWxRB6XjlVtqsGCfVsHSl7bIva/z3VlqM+3KhYcIQ?=
+ =?us-ascii?Q?YkyI6huIma+ZEFIkXqPKibxd4Qz8ImIldhddqvnI0Bt3mB48FT8ngUKTwHmG?=
+ =?us-ascii?Q?y0cL3+aFAVzzK1u61ujSrOeuuWgx8lP7eVkr5Hig2pdvHBxplUlL1rr5ufwh?=
+ =?us-ascii?Q?sWiTrtv+CUvZCzm/aub7QGfVxO9li6RteOFXvHPYFimC68KtwAdsTpe6X+ZB?=
+ =?us-ascii?Q?hKegkcrFqhnMR+3OTys0MXyuNQNzlUSiS+k580y3nNpwIhUzEAcTVw30rd2I?=
+ =?us-ascii?Q?5HXGrBAd2C6Z1QMKTLJd8fkfhDXcY97Eb4ZWJx/tfAcU1m/ovib3P6OnQRhx?=
+ =?us-ascii?Q?qMiz3EiwXCom8530y00NDmD3H/rjWVEBfOt6hS5JatyD4eEIzMQDBRi7Cf1P?=
+ =?us-ascii?Q?gEddvTBn4NKxsfLXVIlfvAeLn+sm3HJo4FcmF4vU+8KXAe6egoqSfrCvsqNZ?=
+ =?us-ascii?Q?so5gRmGwBfQVNZpVxFye/ThGfSbmqDGE9WW+dPfyPG66zs2N0FXVtLGglGAi?=
+ =?us-ascii?Q?dVqejfD6vvaP3eH9dbXWDlxyHe3P5O5sqh/oWAkBrlJ0IoSB1YGxIqmbqsyG?=
+ =?us-ascii?Q?HgEz4gdwO9Z6sD//HVeK0xxgtu9wQXwcdw5gaRTNcH5Wa6VSxYzCGePWJaN7?=
+ =?us-ascii?Q?Sdjy+l9j8ZRaD+si5aKHIysb3taZCKAi1/utXjZsjYt8moPcS0VT7dQPw2Dy?=
+ =?us-ascii?Q?WK/KPrEgB/Gcht4EcSw9rBhYXaGjXvLxy9vqVlTCojBzVmmwtvKg6UDeyO1j?=
+ =?us-ascii?Q?NDSxcS9fUup50yBycHr+I+HP9pRG6qRGYiDRNSRGBMD0gV0A9qSM60BudIJi?=
+ =?us-ascii?Q?G0G9HsJfSfB5AHvtm/wvYxvqCCIzqg9EIcYN63+kRBYxMhWaggE9VEEZrziR?=
+ =?us-ascii?Q?eajJ19ec28J90UDlqyxVf4BeAZF46nPHS7DrsmV8dESywBMnxln+0Ty5DV47?=
+ =?us-ascii?Q?WSzvHgbgZOS/HhaJ4/TZgoVNsTe0mL14zTKcy4N9R42g5FEB0dnZmBVieCys?=
+ =?us-ascii?Q?u4pq+nnXwSll9+b/eCIzNhWKS5lokQzwKKX1N2LTH71TfdsVkHMR2gyZzpCX?=
+ =?us-ascii?Q?LswG8cdlzhNhTjNLXzeT/HkE9qapPfIz5R5JTiiVC123pABXlr3dxaQrlb1X?=
+ =?us-ascii?Q?2Mnt+X+xlo/Bf9k2+fNH6F4a/UhEU5SE60vsass/aGcZw7mqSn5x2d+UBz1n?=
+ =?us-ascii?Q?g/c3oUAzzIm2huIb0sGwBBOOnqNHzT8DDiuOTetIXnn5Pb1tdbu2cyconfnt?=
+ =?us-ascii?Q?nRZxlKs/i3i40oiILzeJ1VOUZ9N43jN/wY/Ow+TjZ7umYU3hn4Ct8ZBbw639?=
+ =?us-ascii?Q?moGV+S02TAAqN6JcuTjBnx4e/5Dk7bbHWQGUqKPtvQNeIEcXKQ95jAkpIRvE?=
+ =?us-ascii?Q?jzFFeaKhvqwPLJr/KBdYK/vplG5m7kOH7bPvzh1Sp0gILTbxQn6n/gzzwQwE?=
+ =?us-ascii?Q?r8mFnUJPUifJobxEXDs=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YrTDcrsn0/+alpzf@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ae229b8-9ade-4605-21da-08da5569d18a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2022 22:43:40.1608
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HYjUSq3i0qIJldeq0pfrR4jv8nloZ2AvMZBiwt+QsvoBh3j4N7BUbUtT3alo8UaHtIvpTPGoqx9KEGpN0Ujm/A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1337
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 07:48:02PM +0000, Sean Christopherson wrote:
-> On Thu, Jun 23, 2022, David Matlack wrote:
-> > On Wed, Jun 22, 2022 at 12:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> Please trim replies.
-> 
-> > > +static int topup_split_caches(struct kvm *kvm)
-> > > +{
-> > > +       int r;
-> > > +
-> > > +       lockdep_assert_held(&kvm->slots_lock);
-> > > +
-> > > +       /*
-> > > +        * It's common to need all SPLIT_DESC_CACHE_MIN_NR_OBJECTS (513) objects
-> > > +        * when splitting a page, but setting capacity == min would cause
-> > > +        * KVM to drop mmu_lock even if just one object was consumed from the
-> > > +        * cache.  So make capacity larger than min and handle two huge pages
-> > > +        * without having to drop the lock.
-> > 
-> > I was going to do some testing this week to confirm, but IIUC KVM will
-> > only allocate from split_desc_cache if the L1 hypervisor has aliased a
-> > huge page in multiple {E,N}PT12 page table entries. i.e. L1 is mapping
-> > a huge page into an L2 multiple times, or mapped into multiple L2s.
-> > This should be common in traditional, process-level, shadow paging,
-> > but I think will be quite rare for nested shadow paging.
-> 
-> Ooooh, right, I forgot that that pte_list_add() needs to allocate if and only if
-> there are multiple rmap entries, otherwise rmap->val points that the one and only
-> rmap directly.
-> 
-> Doubling the capacity is all but guaranteed to be pointless overhead.  What about
-> buffering with the default capacity?  That way KVM doesn't have to topup if it
-> happens to encounter an aliased gfn.  It's arbitrary, but so is the default capacity
-> size.
-> 
-> E.g. as fixup
+[AMD Official Use Only - General]
 
-LGTM
+>> On 6/22/22 12:43, Kalra, Ashish wrote:
+>> >>> I think that needs to be fixed.  It should be as simple as a=20
+>> >>> model/family check, though.  If someone (for example) attempts to=20
+>> >>> use SNP (and thus snp_lookup_rmpentry() and dump_rmpentry()) code=20
+>> >>> on a newer CPU, the kernel should refuse.
+>> >> More specifically I am thinking of adding RMP entry field accessors=20
+>> >> so that they can do this cpu model/family check and return the=20
+>> >> correct field as per processor architecture.
+>>=20
+>> >That will be helpful down the road when there's more than one format. =
+=20
+>> >But, the real issue is that the kernel doesn't *support* a different RM=
+P format.
+>> >So, the SNP support should be disabled when encountering a=20
+>> >model/family other than the known good one.
+>>=20
+>> Yes, that makes sense, will add an additional check in snp_rmptable_init=
+().
 
-> 
-> ---
->  arch/x86/kvm/mmu/mmu.c | 26 +++++++++++++++-----------
->  1 file changed, 15 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 22b87007efff..90d6195edcf3 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6125,19 +6125,23 @@ static bool need_topup_split_caches_or_resched(struct kvm *kvm)
-> 
->  static int topup_split_caches(struct kvm *kvm)
->  {
-> -	int r;
-> -
-> -	lockdep_assert_held(&kvm->slots_lock);
-> -
->  	/*
-> -	 * It's common to need all SPLIT_DESC_CACHE_MIN_NR_OBJECTS (513) objects
-> -	 * when splitting a page, but setting capacity == min would cause
-> -	 * KVM to drop mmu_lock even if just one object was consumed from the
-> -	 * cache.  So make capacity larger than min and handle two huge pages
-> -	 * without having to drop the lock.
-> +	 * Allocating rmap list entries when splitting huge pages for nested
-> +	 * MMUs is rare as KVM needs to allocate if and only if there is more
-> +	 * than one rmap entry for the gfn, i.e. requires an L1 gfn to be
-> +	 * aliased by multiple L2 gfns, which is very atypical for VMMs.  If
-> +	 * there is only one rmap entry, rmap->val points directly at that one
-> +	 * entry and doesn't need to allocate a list.  Buffer the cache by the
-> +	 * default capacity so that KVM doesn't have to topup the cache if it
-> +	 * encounters an aliased gfn or two.
->  	 */
-> -	r = __kvm_mmu_topup_memory_cache(&kvm->arch.split_desc_cache,
-> -					 2 * SPLIT_DESC_CACHE_MIN_NR_OBJECTS,
-> +	const int capacity = SPLIT_DESC_CACHE_MIN_NR_OBJECTS +
-> +			     KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> +	int r;
-> +
-> +	lockdep_assert_held(&kvm->slots_lock);
-> +
-> +	r = __kvm_mmu_topup_memory_cache(&kvm->arch.split_desc_cache, capacity,
->  					 SPLIT_DESC_CACHE_MIN_NR_OBJECTS);
->  	if (r)
->  		return r;
-> 
-> base-commit: 436b1c29f36ed3d4385058ba6f0d6266dbd2a882
-> --
-> 
+>And as I suggested in v5[*], bury the microarchitectural struct in sev.c s=
+o that nothing outside of the few bits of SNP code that absolutely need to =
+know the layout of the struct should even be aware that there's a struct ov=
+erlay for RMP entries.
+
+Yes, that's a nice way to hide it from the rest of the kernel which does no=
+t require access to this structure anyway, in essence, it becomes a private=
+ structure.
+
+Thanks,
+Ashish
+
+>[*] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flo=
+re.kernel.org%2Fall%2FYPCAZaROOHNskGlO%40google.com&amp;data=3D05%7C01%7CAs=
+hish.Kalra%40amd.com%7Ce210ec383f654556348c08da5568ca81%>7C3dd8961fe4884e60=
+8e11a82d994e183d%7C0%7C0%7C637916205851843411%7CUnknown%7CTWFpbGZsb3d8eyJWI=
+joiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%=
+7C&amp;sdata=3D6TOpchjhgFg%>2F5JTa%2FqSviiTuehNoZgvTVBuZv6JxsXc%3D&amp;rese=
+rved=3D0
