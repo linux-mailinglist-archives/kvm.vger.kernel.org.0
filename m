@@ -2,119 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 102D0557A14
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 14:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83740557A1A
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 14:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231559AbiFWMPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 08:15:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33646 "EHLO
+        id S231646AbiFWMQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 08:16:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbiFWMPk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 08:15:40 -0400
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C96319F
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:15:39 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-3177f4ce3e2so168347027b3.5
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:15:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=F7bi0kL/rFqoaqds1vEBpPil9sgMeNQmgZzhUbZCVTs=;
-        b=Q+HHtwCb8GnSNrQGUec7nNeSX83ZY4mtoO2gA80VcnefwaqK+d4K4Kl5l/5sxX6A0K
-         +dDmkhkOgDoUbSGcrrtMmc9dF4p/rn7h6tx38fI3R5VDOnXMBX53CMgvZZ8I04jiiFmC
-         hC8sqYjPWZ4bct0DAxU5yTQX/N8Wj7jCQqKrI1LdiZlR35fkCmEosGn0hcgWvjLdfSfE
-         vWyJzODLKneRIk2JmOcrG5vmBt5dIG7OMK1WaVJHUPPphumQxRu3lG4kTgH3DDOANwnw
-         nx7J/MI0e4dtTMGnQFCLzf4hfGa5H80LU/lev6/9TM+x++71Rzz1tzVILro+5lmbFyA5
-         R3OA==
+        with ESMTP id S229913AbiFWMQX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 08:16:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7377B3151E
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:16:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655986581;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g5bzHytzbyt3LJ4/dxkxeQpreFgNZKacxErPJ4wA59E=;
+        b=B0LfD2kV0x229827MmnrCxoND3KXyjEh8upwnejclhbooyx2BeSUcpFXoYA4SB3TxqUO8N
+        gOvmYPBpMT6H+wG3C0RKvM5/2mmEdg7K6NyTR7NCGm/YUcnF0bZoDIH73+bC7SVTrnKyHa
+        2Udv29QhVchWNBaPGvT7JExwzm5mhmY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-99-ZykTjQL0NYSDKDA0eWEp8A-1; Thu, 23 Jun 2022 08:16:20 -0400
+X-MC-Unique: ZykTjQL0NYSDKDA0eWEp8A-1
+Received: by mail-ed1-f69.google.com with SMTP id n8-20020a05640205c800b00434fb0c150cso15457924edx.19
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 05:16:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=F7bi0kL/rFqoaqds1vEBpPil9sgMeNQmgZzhUbZCVTs=;
-        b=35osCai/2KGvtZ7QfKVusK7b9OqhS7BQs4SnLNGhtrqrtWjBWzoXR3kgq066/vAfa2
-         rb6trjw0nGnIMYVQt+J90hNDtFxH3ZuqMvZPBILLM4nPEm6APHK03/z3eBEX3Ckx4xYZ
-         MACBaFEBOhhIZXndGBs6xCUpu8fKGLK6y3PHqjIClcTbJRXRJLMtRdpQT0a16Q5AI0oy
-         no/kD7GgXxut/y1v9Z2y2Ph6wb9RwaIAs1j+JkmAl+h3hSwdcswrq/2InI6XWKPwEvyf
-         qCaAr4BLPuBdz1NfBGLpAyZd5J0IUibLk5LInsSwvxLqw/ByIDE2ijTieHoWB7jBpA+O
-         AqfA==
-X-Gm-Message-State: AJIora86Asld0DchtNsmAoGMsk83Xa92yPOm6/dk4cVT5T01FhOf06+1
-        MOfZT++RZA3nrveR5Gd0VAOYM9qPgT5P+ATH67wW6Q==
-X-Google-Smtp-Source: AGRyM1uRz69Bfh9NsvumFonp6zhJqvibH5w5p7nJe65BZK6bxanJjfUicvi7sbmlQz5eAk2+A255dWUpO0qsDcfXed4=
-X-Received: by 2002:a81:8486:0:b0:317:a4af:4e0a with SMTP id
- u128-20020a818486000000b00317a4af4e0amr10217824ywf.455.1655986538673; Thu, 23
- Jun 2022 05:15:38 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=g5bzHytzbyt3LJ4/dxkxeQpreFgNZKacxErPJ4wA59E=;
+        b=skca27U5N/ieR8TvL/xOZ1SujhCctXf4keEATG2fh8wk78nMqvPK4GAxOTj9Wkokeh
+         IrzhvSHHlUiOMsGWl/sI3mgcCMQRNIAE5cbH28zMcioI98s7efjPmiG6VfxwnpwtBQaZ
+         iuyfrgA6YV+yi6g5pCbLCClfDZvS5okQWBc59ohH/bP2X2UqRmZcfGsHBCn3cT1l1ddt
+         OAFq8njV3Mq2kFS9jHgmEIk70aGuv3WJl/6yZVesSb9EozZF9Yq56R0+p+TgJrYY/PjH
+         HfcidMudYHInDw12/lAlf/J0HW8ZryEQPvbL2xnq8t8wuRD2XuQiHlvh+CG/ySpbymLt
+         UAgg==
+X-Gm-Message-State: AJIora90ot9y1SDOWHqDnnRWgefaob07mc9x3N1ITS3Hkb0cDmeoynmA
+        J3cV/tObdJc4ep3s2zYNLkwNwW597qhKNnp+3/BY6Q+QJ1kqWRXv/WClG/Mlx0EG7Aq6VvS4AjT
+        pE7BVaYP4dzjW
+X-Received: by 2002:a05:6402:3546:b0:42e:2f58:2c90 with SMTP id f6-20020a056402354600b0042e2f582c90mr10416196edd.84.1655986579150;
+        Thu, 23 Jun 2022 05:16:19 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1s5GbGLU/i4oYJJek4q+iHhJv6ku0wmJbThXLZyDHJYQGqHKnaW+A0I0asdOmN8xuRbLwQSQA==
+X-Received: by 2002:a05:6402:3546:b0:42e:2f58:2c90 with SMTP id f6-20020a056402354600b0042e2f582c90mr10416167edd.84.1655986578936;
+        Thu, 23 Jun 2022 05:16:18 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id d8-20020a056402000800b00435a912358dsm3953372edu.30.2022.06.23.05.16.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jun 2022 05:16:18 -0700 (PDT)
+Message-ID: <795f73d0-9f88-28c9-9d8f-41e931f51230@redhat.com>
+Date:   Thu, 23 Jun 2022 14:16:16 +0200
 MIME-Version: 1.0
-References: <20220623102617.2164175-1-pdel@fb.com> <20220623102617.2164175-5-pdel@fb.com>
-In-Reply-To: <20220623102617.2164175-5-pdel@fb.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 23 Jun 2022 13:15:27 +0100
-Message-ID: <CAFEAcA9zmmaUth+9k82+ZrhAMOmsmttq2HOKs+DVNx0L1dx6=w@mail.gmail.com>
-Subject: Re: [PATCH 04/14] sysbus: Add sysbus_mmio_map_in
-To:     Peter Delevoryas <pdel@fb.com>
-Cc:     clg@kaod.org, andrew@aj.id.au, joel@jms.id.au, pbonzini@redhat.com,
-        berrange@redhat.com, eduardo@habkost.net,
-        marcel.apfelbaum@gmail.com, richard.henderson@linaro.org,
-        f4bug@amsat.org, ani@anisinha.ca, qemu-devel@nongnu.org,
-        qemu-arm@nongnu.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.19, take #2
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Quentin Perret <qperret@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+References: <20220623074158.1429243-1-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220623074158.1429243-1-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jun 2022 at 11:56, Peter Delevoryas <pdel@fb.com> wrote:
->
-> Signed-off-by: Peter Delevoryas <pdel@fb.com>
-> ---
->  hw/core/sysbus.c    | 6 ++++++
->  include/hw/sysbus.h | 2 ++
->  2 files changed, 8 insertions(+)
->
-> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-> index cb4d6bae9d..7b63ec3fed 100644
-> --- a/hw/core/sysbus.c
-> +++ b/hw/core/sysbus.c
-> @@ -160,6 +160,12 @@ void sysbus_mmio_map(SysBusDevice *dev, int n, hwaddr addr)
->      sysbus_mmio_map_common(dev, n, addr, false, 0, get_system_memory());
->  }
->
-> +void sysbus_mmio_map_in(SysBusDevice *dev, int n, hwaddr addr,
-> +                        MemoryRegion *system_memory)
-> +{
-> +    sysbus_mmio_map_common(dev, n, addr, false, 0, system_memory);
-> +}
-> +
->  void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
->                               int priority)
->  {
-> diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-> index a7c23d5fb1..f4578029e4 100644
-> --- a/include/hw/sysbus.h
-> +++ b/include/hw/sysbus.h
-> @@ -80,6 +80,8 @@ void sysbus_connect_irq(SysBusDevice *dev, int n, qemu_irq irq);
->  bool sysbus_is_irq_connected(SysBusDevice *dev, int n);
->  qemu_irq sysbus_get_connected_irq(SysBusDevice *dev, int n);
->  void sysbus_mmio_map(SysBusDevice *dev, int n, hwaddr addr);
-> +void sysbus_mmio_map_in(SysBusDevice *dev, int n, hwaddr addr,
-> +                        MemoryRegion *system_memory);
->  void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
->                               int priority);
+On 6/23/22 09:41, Marc Zyngier wrote:
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.19-2
 
-What's this going to be used for?
+Pulled, thanks.
 
-The current standard way to map a sysbus MMIO region into something
-other than the global system memory region is to do:
-   memory_region_add_subregion(&container, addr,
-                               sysbus_mmio_get_region(sbd, 0));
+Paolo
 
-I'd rather not have two ways to do the same thing; we have
-far too many of those already.
-
-thanks
--- PMM
