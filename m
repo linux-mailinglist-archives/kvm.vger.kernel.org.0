@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FC9B556F46
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 02:02:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2913556F4C
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 02:09:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235707AbiFWAB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 20:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59840 "EHLO
+        id S237881AbiFWAJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 20:09:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232190AbiFWAB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 20:01:56 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5802403F8;
-        Wed, 22 Jun 2022 17:01:55 -0700 (PDT)
+        with ESMTP id S229687AbiFWAJC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 20:09:02 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A421F340FD;
+        Wed, 22 Jun 2022 17:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655942515; x=1687478515;
+  t=1655942941; x=1687478941;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=T15ZJso/B5LUFRkGGDDvgKQQDe8xUIdacYkRiD8qF2I=;
-  b=ZMC2niVbGOm+g78fKfNpWC//GvWPt7ogL/QM6Fn7QJXYLZz2rAQQaO7U
-   PlORxsI0kiW9vPcSzdQL4r/QbUGMNFrXZnLuNzLOf+Nhi0JvxS6I0lVW9
-   A0FNpwA+Pfq4VwMLgtRRDekTh0DHG4/tNoMEAa0o1u9+xiFVEhX7UjTYm
-   bJ6hdllqnv6EZ7e6a9GLXPvYmBNCQJdw4zJTP21nwHZMuKoH82CM+ZCE1
-   1i5MhJMgyafYK+qQlFPTx5eInKg7bn0r8bkuvDOHcB6eFKVNO2pafr48/
-   tcjl24dtmJSX+GP5MaMpWkPFHVxcdQu+exO+2s45ENj6h/p4F6uB5JGqX
+  bh=l51kT0hSlFet5bjbRgkKhIH8A9wUJZ5R6t4yBpcTrXM=;
+  b=Op0iwc+sbfAGk1taOlz+4Rb0zutb68Nc2RsULQS10kZMJgJE9piV7xz+
+   wEsqkCasYnb0vS9w2QSQTX/FLWw63rAC75NAk0TcTOqXBQ6rf4edGmT+f
+   s9I/vP7fsjbOd4ee/Dd6ri1MCKcxBmsuVu6esGCcLdd4JvbidLfOB5sNf
+   CA/LNQT2rGzrIrMuGHNiKNHl6EWPObSmMIcWDBcb5q74y2YtuXM1mxSGe
+   /MXmMhdXF0gH/f6jZYxoH9yZaiWCt+HxKK3ukkpU1dzA4d8Oee0DSBt6W
+   nY+G0XUe7fcBSIARe749cspljkMMsJFF0YxD7ZcAzsVMGQJu9plCDsoQu
    g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="280627383"
+X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="260398867"
 X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="280627383"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:01:55 -0700
+   d="scan'208";a="260398867"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:09:01 -0700
 X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="644454589"
+   d="scan'208";a="677816654"
 Received: from jmatsis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.178.197])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:01:50 -0700
-Message-ID: <d3ba563f3f4e7aaf90fb99d20c651b5751972f7b.camel@intel.com>
-Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
- CPU hotplug
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:08:57 -0700
+Message-ID: <198860d65d277dbd30552526a707576db4281b29.camel@intel.com>
+Subject: Re: [PATCH v5 03/22] cc_platform: Add new attribute to prevent ACPI
+ memory hotplug
 From:   Kai Huang <kai.huang@intel.com>
 To:     "Rafael J. Wysocki" <rafael@kernel.org>
 Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
@@ -57,25 +57,19 @@ Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         Kuppuswamy Sathyanarayanan 
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
-        Tianyu.Lan@microsoft.com, Randy Dunlap <rdunlap@infradead.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Yue Haibing <yuehaibing@huawei.com>, dongli.zhang@oracle.com
-Date:   Thu, 23 Jun 2022 12:01:48 +1200
-In-Reply-To: <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
+        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>
+Date:   Thu, 23 Jun 2022 12:08:55 +1200
+In-Reply-To: <CAJZ5v0jEJNdmkidvcOiRn+OVt01D5095t+nyXaJHKsqEAOvcBQ@mail.gmail.com>
 References: <cover.1655894131.git.kai.huang@intel.com>
-         <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
-         <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
+         <87dc19c47bad73509359c8e1e3a81d51d1681e4c.1655894131.git.kai.huang@intel.com>
+         <CAJZ5v0jEJNdmkidvcOiRn+OVt01D5095t+nyXaJHKsqEAOvcBQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,132 +77,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-06-22 at 13:42 +0200, Rafael J. Wysocki wrote:
+On Wed, 2022-06-22 at 13:45 +0200, Rafael J. Wysocki wrote:
 > On Wed, Jun 22, 2022 at 1:16 PM Kai Huang <kai.huang@intel.com> wrote:
 > >=20
 > > Platforms with confidential computing technology may not support ACPI
-> > CPU hotplug when such technology is enabled by the BIOS.  Examples
+> > memory hotplug when such technology is enabled by the BIOS.  Examples
 > > include Intel platforms which support Intel Trust Domain Extensions
 > > (TDX).
 > >=20
-> > If the kernel ever receives ACPI CPU hotplug event, it is likely a BIOS
-> > bug.  For ACPI CPU hot-add, the kernel should speak out this is a BIOS
-> > bug and reject the new CPU.  For hot-removal, for simplicity just assum=
+> > If the kernel ever receives ACPI memory hotplug event, it is likely a
+> > BIOS bug.  For ACPI memory hot-add, the kernel should speak out this is
+> > a BIOS bug and reject the new memory.  For hot-removal, for simplicity
+> > just assume the kernel cannot continue to work normally, and just BUG()=
+.
+> >=20
+> > Add a new attribute CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED to indicate th=
 e
-> > the kernel cannot continue to work normally, and BUG().
+> > platform doesn't support ACPI memory hotplug, so that kernel can handle
+> > ACPI memory hotplug events for such platform.
 > >=20
-> > Add a new attribute CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED to indicate the
-> > platform doesn't support ACPI CPU hotplug, so that kernel can handle
-> > ACPI CPU hotplug events for such platform.  The existing attribute
-> > CC_ATTR_HOTPLUG_DISABLED is for software CPU hotplug thus doesn't fit.
-> >=20
-> > In acpi_processor_{add|remove}(), add early check against this attribut=
-e
-> > and handle accordingly if it is set.
-> >=20
-> > Also take this chance to rename existing CC_ATTR_HOTPLUG_DISABLED to
-> > CC_ATTR_CPU_HOTPLUG_DISABLED as it is for software CPU hotplug.
+> > In acpi_memory_device_{add|remove}(), add early check against this
+> > attribute and handle accordingly if it is set.
 > >=20
 > > Signed-off-by: Kai Huang <kai.huang@intel.com>
 > > ---
-> >  arch/x86/coco/core.c          |  2 +-
-> >  drivers/acpi/acpi_processor.c | 23 +++++++++++++++++++++++
-> >  include/linux/cc_platform.h   | 15 +++++++++++++--
-> >  kernel/cpu.c                  |  2 +-
-> >  4 files changed, 38 insertions(+), 4 deletions(-)
+> >  drivers/acpi/acpi_memhotplug.c | 23 +++++++++++++++++++++++
+> >  include/linux/cc_platform.h    | 10 ++++++++++
+> >  2 files changed, 33 insertions(+)
 > >=20
-> > diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
-> > index 4320fadae716..1bde1af75296 100644
-> > --- a/arch/x86/coco/core.c
-> > +++ b/arch/x86/coco/core.c
-> > @@ -20,7 +20,7 @@ static bool intel_cc_platform_has(enum cc_attr attr)
-> >  {
-> >         switch (attr) {
-> >         case CC_ATTR_GUEST_UNROLL_STRING_IO:
-> > -       case CC_ATTR_HOTPLUG_DISABLED:
-> > +       case CC_ATTR_CPU_HOTPLUG_DISABLED:
-> >         case CC_ATTR_GUEST_MEM_ENCRYPT:
-> >         case CC_ATTR_MEM_ENCRYPT:
-> >                 return true;
-> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processo=
-r.c
-> > index 6737b1cbf6d6..b960db864cd4 100644
-> > --- a/drivers/acpi/acpi_processor.c
-> > +++ b/drivers/acpi/acpi_processor.c
+> > diff --git a/drivers/acpi/acpi_memhotplug.c b/drivers/acpi/acpi_memhotp=
+lug.c
+> > index 24f662d8bd39..94d6354ea453 100644
+> > --- a/drivers/acpi/acpi_memhotplug.c
+> > +++ b/drivers/acpi/acpi_memhotplug.c
 > > @@ -15,6 +15,7 @@
-> >  #include <linux/kernel.h>
-> >  #include <linux/module.h>
-> >  #include <linux/pci.h>
+> >  #include <linux/acpi.h>
+> >  #include <linux/memory.h>
+> >  #include <linux/memory_hotplug.h>
 > > +#include <linux/cc_platform.h>
 > >=20
-> >  #include <acpi/processor.h>
+> >  #include "internal.h"
 > >=20
-> > @@ -357,6 +358,17 @@ static int acpi_processor_add(struct acpi_device *=
-device,
-> >         struct device *dev;
-> >         int result =3D 0;
+> > @@ -291,6 +292,17 @@ static int acpi_memory_device_add(struct acpi_devi=
+ce *device,
+> >         if (!device)
+> >                 return -EINVAL;
 > >=20
 > > +       /*
 > > +        * If the confidential computing platform doesn't support ACPI
 > > +        * memory hotplug, the BIOS should never deliver such event to
 > > +        * the kernel.  Report ACPI CPU hot-add as a BIOS bug and ignor=
 e
-> > +        * the new CPU.
+> > +        * the memory device.
 > > +        */
-> > +       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) {
+> > +       if (cc_platform_has(CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED)) {
 >=20
-> This will affect initialization, not just hotplug AFAICS.
+> Same comment as for the acpi_processor driver: this will affect the
+> initialization too and it would be cleaner to reset the
+> .hotplug.enabled flag of the scan handler.
 >=20
-> You should reset the .hotplug.enabled flag in processor_handler to
-> false instead.
+>=20
 
 Hi Rafael,
 
-Thanks for the review.  By "affect initialization" did you mean this
-acpi_processor_add() is also called during kernel boot when any logical cpu=
- is
-brought up?  Or do you mean ACPI CPU hotplug can also happen during kernel =
-boot
-(after acpi_processor_init())?
+Thanks for review.  The same to the ACPI CPU hotplug handling, this is ille=
+gal
+also during kernel boot.  If we just want to disable, then perhaps somethin=
+g
+like below?
 
-I see acpi_processor_init() calls acpi_processor_check_duplicates() which c=
-alls
-acpi_evaluate_object() but I don't know details of ACPI so I don't know whe=
-ther
-this would trigger acpi_processor_add().
-
-One thing is TDX doesn't support ACPI CPU hotplug is an architectural thing=
-, so
-it is illegal even if it happens during kernel boot.  Dave's idea is the ke=
-rnel
-should  speak out loudly if physical CPU hotplug indeed happened on (BIOS) =
-TDX-
-enabled platforms.  Otherwise perhaps we can just give up initializing the =
-ACPI
-CPU hotplug in acpi_processor_init(), something like below?
-
---- a/drivers/acpi/acpi_processor.c
-+++ b/drivers/acpi/acpi_processor.c
-@@ -707,6 +707,10 @@ bool acpi_duplicate_processor_id(int proc_id)
- void __init acpi_processor_init(void)
+--- a/drivers/acpi/acpi_memhotplug.c
++++ b/drivers/acpi/acpi_memhotplug.c
+@@ -366,6 +366,9 @@ static bool __initdata acpi_no_memhotplug;
+=20
+ void __init acpi_memory_hotplug_init(void)
  {
-        acpi_processor_check_duplicates();
++       if (cc_platform_has(CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED))
++               acpi_no_memhotplug =3D true;
 +
-+       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED))
-+               return;
-+
-        acpi_scan_add_handler_with_hotplug(&processor_handler, "processor")=
-;
-        acpi_scan_add_handler(&processor_container_handler);
- }
+        if (acpi_no_memhotplug) {
+                memory_device_handler.attach =3D NULL;
+                acpi_scan_add_handler(&memory_device_handler);
 
-
->=20
-> > +               dev_err(&device->dev, "[BIOS bug]: Platform doesn't sup=
-port ACPI CPU hotplug.  New CPU ignored.\n");
-> > +               return -EINVAL;
-> > +       }
-> > +
 
 --=20
 Thanks,
