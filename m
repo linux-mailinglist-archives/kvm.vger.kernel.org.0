@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA92D557DCE
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 16:31:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C56D557E0A
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 16:46:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231661AbiFWOb4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 10:31:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59346 "EHLO
+        id S231449AbiFWOqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 10:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231479AbiFWOby (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 10:31:54 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81E7E4578F
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 07:31:52 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 9so1029549pgd.7
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 07:31:52 -0700 (PDT)
+        with ESMTP id S230330AbiFWOqN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 10:46:13 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F220377D6
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 07:46:13 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 184so19351527pga.12
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 07:46:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=SdE1Q+FcIHNdzvHylki5AIGEmd7N5R8sBfbJlSX0V5M=;
-        b=O3yF4t8UGVG0qmedo7bFOSVoLfU69kgt3uZgtLN+p298+LsaWx3piWWHvwrtOCrSmf
-         MhNhoPdfi3sHp15DQhMbwRJVDE/Hi3TJt6RR5uuEn/372PZKCymelEOT3q1YqTDdiojO
-         3XCTJVYeKKeHpP5aMnagBgY7dMncCsNflyUdpXwqeEUIciwk5egWd+UyvhD3sL5LqALT
-         RMTU8uzvchBw07rkiaruQbdcZcqEz3phXzVIDCzbhZPm+nTlWYqlFJmXGflDHO5VNMuB
-         9AhukAv5fUOamgiBwpRxFlVPKy1JeKxs26HMdTB3r6NqybVxC+gl4sbwuFKvWvTt1c+V
-         t4VQ==
+        bh=XoO7ESB32RV6It/bv3sCZc7jqSp5ygArn4dp49/Te3Y=;
+        b=m+vseIWPrJS5h+yWXbxnAASP7WipdB/WdQ35XDIZvwyp3G004IaTSBgX2iXZMmcUrz
+         JgPMn1V93+cwvO3PgmFiNhLS8twBBeZ+4eLyyTaGrs9FT/1k2yGwD0aHuExMbdEtCxOc
+         +DHrh7GM8eByAUsQC7rkUATDrxiKLgkO1tNDdUosATZ6Af/WD6RPfOGfWelNquNZdqI4
+         vHqxdVDqKJYB02A5HZQsnb9TadnpDN6qZY7ChVaJpbf6B/k64VTXjP89bMXjqCX79N0m
+         lzaLLcdniS2tHbb68OmhEQxV6lIjZ66dbN9J4G9aantCrHoecOy1GQ5Y2lCklYEIHtw8
+         Zk3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=SdE1Q+FcIHNdzvHylki5AIGEmd7N5R8sBfbJlSX0V5M=;
-        b=dgIuASM4IpbnsJIocDoWO0C7ZewvokP+8XPaju6ArmXniRRSfLsX4m3uSJJ81Fwubk
-         LffpdG/FQreZm+ScVQOUGfQ9tsdZIftQR8PRulfK3iiGni/1Vyb739NmGrvZusqGW/Ub
-         x2UHRdcM8wQb2t9nxPqLinSJb4BUXeeCkNy7OZ2hV5LtuL6mmxP94UY9tri/7gf/L68O
-         Cuoe/r6KBtx61XEinigjVsoxIon3JP6P3RzVeZwX61wuZ2wykoTj9j0eDzXoaC6NXbwH
-         RvdxXz379v++DgqzCJypcTQ+oMXdZlBGfkvvjkEQLTwyHHx1GkNlwGg9faABJ0VbzW+M
-         mPMA==
-X-Gm-Message-State: AJIora/TauYQ+MTTV72ricCh2nlT4Fmf9V5M3eC5X1OfkQC4yazh9wXZ
-        39tQovkxIG4o6ED5lX5WJHhthQ==
-X-Google-Smtp-Source: AGRyM1s+/p15SaFZzmeOpC2GidYUhYH38ADbe6rtkG2Iae5V1dUrzuMDysKbpQPsePjwMEHt62hJRQ==
-X-Received: by 2002:a63:7946:0:b0:408:c6ac:939b with SMTP id u67-20020a637946000000b00408c6ac939bmr7834470pgc.349.1655994711761;
-        Thu, 23 Jun 2022 07:31:51 -0700 (PDT)
+        bh=XoO7ESB32RV6It/bv3sCZc7jqSp5ygArn4dp49/Te3Y=;
+        b=vwwmF+S6YNvFgIQPsqbeWHaABlOefmllxyCd0ZFCYDTVeBfv67mv3tBaA/EJH4Ud/I
+         JQNtPNf9cX+ifXuDSsdZVgKYMLIMO4a+fgztfVnpiljCl6vTvnqvpg+rNf5y5M4E2PcJ
+         +RRUschfNzeF2GT1SQ1p9/ebAZeHzrbzgF23TYD61OZgQo97mbDY0R8o7H48HV9QfqmI
+         2e2CE2YPFuy7tZOxvASc/lwWBd7XmswEUnDeTp0tw20Ry6zx++LWlLO88Vo9Aq8bjGUD
+         c5r4YL361NAoOOM9hRbY+4Zx0Q6W2jkN4JdP5zWYi8WYl27mSYbzwoyzNFthi3VdxCnN
+         /kzQ==
+X-Gm-Message-State: AJIora9u9NSxdzyND/AYBmm6FipIZW5v50NbKBM0k4OBmtoEDP9GqOqj
+        YkIQjWqY1kZUvpqj+fUSswjK5w==
+X-Google-Smtp-Source: AGRyM1tK3xPVSaeZB/nRQExRDbnxBwwsb/ysSZCcGTt7qU3WXdtH5Qv2rC7HnwpCIfde7rX9RyVKGg==
+X-Received: by 2002:a05:6a02:117:b0:3fa:de2:357a with SMTP id bg23-20020a056a02011700b003fa0de2357amr7805740pgb.169.1655995572571;
+        Thu, 23 Jun 2022 07:46:12 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id jj9-20020a170903048900b0016a100c9a2esm11019125plb.112.2022.06.23.07.31.51
+        by smtp.gmail.com with ESMTPSA id d12-20020a17090abf8c00b001ec839fff50sm1990244pjs.34.2022.06.23.07.46.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 07:31:51 -0700 (PDT)
-Date:   Thu, 23 Jun 2022 14:31:47 +0000
+        Thu, 23 Jun 2022 07:46:12 -0700 (PDT)
+Date:   Thu, 23 Jun 2022 14:46:08 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Peter Xu <peterx@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -57,19 +57,20 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Linux MM Mailing List <linux-mm@kvack.org>
-Subject: Re: [PATCH 3/4] kvm: Add new pfn error KVM_PFN_ERR_INTR
-Message-ID: <YrR5U1mHP9fYQ1k9@google.com>
+Subject: Re: [PATCH 4/4] kvm/x86: Allow to respond to generic signals during
+ slow page faults
+Message-ID: <YrR8sKap6KHT22Dx@google.com>
 References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-4-peterx@redhat.com>
+ <20220622213656.81546-5-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220622213656.81546-4-peterx@redhat.com>
+In-Reply-To: <20220622213656.81546-5-peterx@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -77,53 +78,77 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Jun 22, 2022, Peter Xu wrote:
-> Add one new PFN error type to show when we cannot finish fetching the PFN
-> due to interruptions.  For example, by receiving a generic signal.
-> 
-> This prepares KVM to be able to respond to SIGUSR1 (for QEMU that's the
-> SIGIPI) even during e.g. handling an userfaultfd page fault.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/linux/kvm_host.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e92f1ab63d6a..b39acb7cb16d 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3012,6 +3012,13 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+>  static int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  			       unsigned int access)
+>  {
+> +	/* NOTE: not all error pfn is fatal; handle intr before the other ones */
+> +	if (unlikely(is_intr_pfn(fault->pfn))) {
+> +		vcpu->run->exit_reason = KVM_EXIT_INTR;
+> +		++vcpu->stat.signal_exits;
+> +		return -EINTR;
+> +	}
+> +
+>  	/* The pfn is invalid, report the error! */
+>  	if (unlikely(is_error_pfn(fault->pfn)))
+>  		return kvm_handle_bad_page(vcpu, fault->gfn, fault->pfn);
+> @@ -4017,6 +4024,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  		}
+>  	}
+>  
+> +	/* Allow to respond to generic signals in slow page faults */
+
+"slow" is being overloaded here.  The previous call __gfn_to_pfn_memslot() will
+end up in hva_to_pfn_slow(), but because of passing a non-null async it won't wait.
+This code really should have a more extensive comment irrespective of the interruptible
+stuff, now would be a good time to add that.
+
+Comments aside, isn't this series incomplete from the perspective that there are
+still many flows where KVM will hang if gfn_to_pfn() gets stuck in gup?  E.g. if
+KVM is retrieving a page pointed at by vmcs12.
+
+> +	flags |= KVM_GTP_INTERRUPTIBLE;
+>  	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, flags, NULL,
+>  					  &fault->map_writable, &fault->hva);
+>  	return RET_PF_CONTINUE;
 > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index b646b6fcaec6..4f84a442f67f 100644
+> index 4f84a442f67f..c8d98e435537 100644
 > --- a/include/linux/kvm_host.h
 > +++ b/include/linux/kvm_host.h
-> @@ -96,6 +96,7 @@
->  #define KVM_PFN_ERR_FAULT	(KVM_PFN_ERR_MASK)
->  #define KVM_PFN_ERR_HWPOISON	(KVM_PFN_ERR_MASK + 1)
->  #define KVM_PFN_ERR_RO_FAULT	(KVM_PFN_ERR_MASK + 2)
-> +#define KVM_PFN_ERR_INTR	(KVM_PFN_ERR_MASK + 3)
+> @@ -1163,6 +1163,7 @@ typedef unsigned int __bitwise kvm_gtp_flag_t;
 >  
->  /*
->   * error pfns indicate that the gfn is in slot but faild to
-> @@ -106,6 +107,16 @@ static inline bool is_error_pfn(kvm_pfn_t pfn)
->  	return !!(pfn & KVM_PFN_ERR_MASK);
->  }
+>  #define  KVM_GTP_WRITE          ((__force kvm_gtp_flag_t) BIT(0))
+>  #define  KVM_GTP_ATOMIC         ((__force kvm_gtp_flag_t) BIT(1))
+> +#define  KVM_GTP_INTERRUPTIBLE  ((__force kvm_gtp_flag_t) BIT(2))
 >  
-> +/*
-> + * When KVM_PFN_ERR_INTR is returned, it means we're interrupted during
-> + * fetching the PFN (e.g. a signal might have arrived), so we may want to
-> + * retry at some later point and kick the userspace to handle the signal.
-> + */
-> +static inline bool is_intr_pfn(kvm_pfn_t pfn)
-> +{
-> +	return pfn == KVM_PFN_ERR_INTR;
-
-What about is_sigpending_pfn() and KVM_PFN_ERR_SIGPENDING?  "intr" is too close to
-a real thing KVM will encounter, and I think knowing that KVM is effectively
-responding to a pending signal is the most important detail for KVM developers
-encountering this code for this first time.  E.g. from KVM_PFN_ERR_INTR alone, one
-might think that any interrupt during GUP will trigger this.
-
-> +}
-> +
->  /*
->   * error_noslot pfns indicate that the gfn can not be
->   * translated to pfn - it is not in slot or failed to
+>  kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+>  			       kvm_gtp_flag_t gtp_flags, bool *async,
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 952400b42ee9..b3873cac5672 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2462,6 +2462,8 @@ static int hva_to_pfn_slow(unsigned long addr, bool *async,
+>  		flags |= FOLL_WRITE;
+>  	if (async)
+>  		flags |= FOLL_NOWAIT;
+> +	if (gtp_flags & KVM_GTP_INTERRUPTIBLE)
+> +		flags |= FOLL_INTERRUPTIBLE;
+>  
+>  	npages = get_user_pages_unlocked(addr, 1, &page, flags);
+>  	if (npages != 1)
+> @@ -2599,6 +2601,8 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, kvm_gtp_flag_t gtp_flags, bool *async,
+>  	npages = hva_to_pfn_slow(addr, async, gtp_flags, writable, &pfn);
+>  	if (npages == 1)
+>  		return pfn;
+> +	if (npages == -EINTR)
+> +		return KVM_PFN_ERR_INTR;
+>  
+>  	mmap_read_lock(current->mm);
+>  	if (npages == -EHWPOISON ||
 > -- 
 > 2.32.0
 > 
