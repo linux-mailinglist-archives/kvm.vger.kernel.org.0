@@ -2,140 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26278556F44
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 02:00:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FC9B556F46
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 02:02:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234514AbiFWAA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jun 2022 20:00:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59374 "EHLO
+        id S235707AbiFWAB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jun 2022 20:01:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232190AbiFWAA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jun 2022 20:00:28 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0937D403F8
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 17:00:27 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id bo5so17498681pfb.4
-        for <kvm@vger.kernel.org>; Wed, 22 Jun 2022 17:00:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=3rHWukX/982VVQshnDvvj6GQbQddSOFHJAD6q40l/44=;
-        b=OmPOCAMzms0w3oTblnyQltKKi/thfzvNUG4zP7xHKX2PzTIDcJUFoZ9De5Sczk7Kgw
-         +1bDTOxLOiB+ECCROvP954pOZqeNMdoqvdszr5j93dvwf7d4REa8NDvVwpiyIAFH1Udt
-         gnSpA7nqBnrr8onoj3AMImSy+tZSS56J3AUd31KbB30Hjx47YXekYpkP6YaEPSs/4NU5
-         N0tTC9sgPkB6tdC+x8uAvKNRdiQT90O2/eqtOp+0BWvHRLKU5Vp7BcVB2N8blLeLsXon
-         P8v+t6+K5Z3k2MOyeNObu1PQ2fQRwF1iyuN7DL7U6D9dCXi854TeDiERFyViYqYF9T5o
-         q8oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to:content-transfer-encoding;
-        bh=3rHWukX/982VVQshnDvvj6GQbQddSOFHJAD6q40l/44=;
-        b=GbQNaGfxuMwiHJeXtFp6zs8jt/xAbOFqnYv+EZ4Sz3d3ebwALIfS50wCxNmBNRtVuV
-         2S6gKMHtGBXzfxsjBaujgBwL89hRC1EkE7QRsdtWNXQpMzCAYSiR/NElgJQ4pbRu58E0
-         nL0ynRGosRtnBM662yurIxVGXnAkPorjVnWWB+uhFMiXs/927vXnuLwRtJeuzFi7zEKC
-         8QIE6dMyAMwnR5+5/UyhnTwIPOUnCqMVk1leQjNXe4KbL+sEK+d1OzVC9nAVVwSpDeCV
-         GDYfnJPVgpEjKwjCNX653GRrvAvaPEEzWtcNdYGG+C5qQR5jX8nQ6CE4A0VWVwlOi7E/
-         tfvg==
-X-Gm-Message-State: AJIora9NwFiKydS2yH1wH1Sz780DDf1T3UiDBVsK1efisAoEqcINMmW1
-        IDf+n/OCtVqq7IatHl+MZrUZ97qByeMcaKJutUc=
-X-Google-Smtp-Source: AGRyM1vZLWWm882QsFgEMVUZPF8aEuax/Apnx5gx4PQdWxMlfUxzRIDO0CKDXdVh1sEwny5uV5PaKOYtFhmF14VckBE=
-X-Received: by 2002:a63:7909:0:b0:40c:6cba:b1d0 with SMTP id
- u9-20020a637909000000b0040c6cbab1d0mr5017868pgc.353.1655942426487; Wed, 22
- Jun 2022 17:00:26 -0700 (PDT)
-MIME-Version: 1.0
-Sender: aileen.sami1hh@gmail.com
-Received: by 2002:a05:6a10:e208:0:0:0:0 with HTTP; Wed, 22 Jun 2022 17:00:26
- -0700 (PDT)
-From:   Juliette Morgan <juliettemorgan21@gmail.com>
-Date:   Thu, 23 Jun 2022 02:00:26 +0200
-X-Google-Sender-Auth: K3oloum0iV_P6GfiIFI6ObaujfU
-Message-ID: <CAG848prajqtV5n6D1FQtpzT6vZcK3_JtM5BNdq0kyo+geHG2RQ@mail.gmail.com>
-Subject: READ AND REPLY URGENT
-To:     undisclosed-recipients:;
+        with ESMTP id S232190AbiFWAB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jun 2022 20:01:56 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5802403F8;
+        Wed, 22 Jun 2022 17:01:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655942515; x=1687478515;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=T15ZJso/B5LUFRkGGDDvgKQQDe8xUIdacYkRiD8qF2I=;
+  b=ZMC2niVbGOm+g78fKfNpWC//GvWPt7ogL/QM6Fn7QJXYLZz2rAQQaO7U
+   PlORxsI0kiW9vPcSzdQL4r/QbUGMNFrXZnLuNzLOf+Nhi0JvxS6I0lVW9
+   A0FNpwA+Pfq4VwMLgtRRDekTh0DHG4/tNoMEAa0o1u9+xiFVEhX7UjTYm
+   bJ6hdllqnv6EZ7e6a9GLXPvYmBNCQJdw4zJTP21nwHZMuKoH82CM+ZCE1
+   1i5MhJMgyafYK+qQlFPTx5eInKg7bn0r8bkuvDOHcB6eFKVNO2pafr48/
+   tcjl24dtmJSX+GP5MaMpWkPFHVxcdQu+exO+2s45ENj6h/p4F6uB5JGqX
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="280627383"
+X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
+   d="scan'208";a="280627383"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:01:55 -0700
+X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
+   d="scan'208";a="644454589"
+Received: from jmatsis-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.178.197])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 17:01:50 -0700
+Message-ID: <d3ba563f3f4e7aaf90fb99d20c651b5751972f7b.camel@intel.com>
+Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
+ CPU hotplug
+From:   Kai Huang <kai.huang@intel.com>
+To:     "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Len Brown <len.brown@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Rafael Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
+        Tianyu.Lan@microsoft.com, Randy Dunlap <rdunlap@infradead.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Yue Haibing <yuehaibing@huawei.com>, dongli.zhang@oracle.com
+Date:   Thu, 23 Jun 2022 12:01:48 +1200
+In-Reply-To: <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
+         <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: Yes, score=6.1 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
-        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_FROM,LOTS_OF_MONEY,MONEY_FRAUD_8,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,T_MONEY_PERCENT,
-        T_SCC_BODY_TEXT_LINE,UNDISC_MONEY autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:441 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.5 SUBJ_ALL_CAPS Subject is all capitals
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [aileen.sami1hh[at]gmail.com]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  0.0 T_MONEY_PERCENT X% of a lot of money for you
-        *  0.0 MONEY_FRAUD_8 Lots of money and very many fraud phrases
-        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
-        *  2.0 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: ******
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Dear God,s Select Good Day,
+On Wed, 2022-06-22 at 13:42 +0200, Rafael J. Wysocki wrote:
+> On Wed, Jun 22, 2022 at 1:16 PM Kai Huang <kai.huang@intel.com> wrote:
+> >=20
+> > Platforms with confidential computing technology may not support ACPI
+> > CPU hotplug when such technology is enabled by the BIOS.  Examples
+> > include Intel platforms which support Intel Trust Domain Extensions
+> > (TDX).
+> >=20
+> > If the kernel ever receives ACPI CPU hotplug event, it is likely a BIOS
+> > bug.  For ACPI CPU hot-add, the kernel should speak out this is a BIOS
+> > bug and reject the new CPU.  For hot-removal, for simplicity just assum=
+e
+> > the kernel cannot continue to work normally, and BUG().
+> >=20
+> > Add a new attribute CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED to indicate the
+> > platform doesn't support ACPI CPU hotplug, so that kernel can handle
+> > ACPI CPU hotplug events for such platform.  The existing attribute
+> > CC_ATTR_HOTPLUG_DISABLED is for software CPU hotplug thus doesn't fit.
+> >=20
+> > In acpi_processor_{add|remove}(), add early check against this attribut=
+e
+> > and handle accordingly if it is set.
+> >=20
+> > Also take this chance to rename existing CC_ATTR_HOTPLUG_DISABLED to
+> > CC_ATTR_CPU_HOTPLUG_DISABLED as it is for software CPU hotplug.
+> >=20
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > ---
+> >  arch/x86/coco/core.c          |  2 +-
+> >  drivers/acpi/acpi_processor.c | 23 +++++++++++++++++++++++
+> >  include/linux/cc_platform.h   | 15 +++++++++++++--
+> >  kernel/cpu.c                  |  2 +-
+> >  4 files changed, 38 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+> > index 4320fadae716..1bde1af75296 100644
+> > --- a/arch/x86/coco/core.c
+> > +++ b/arch/x86/coco/core.c
+> > @@ -20,7 +20,7 @@ static bool intel_cc_platform_has(enum cc_attr attr)
+> >  {
+> >         switch (attr) {
+> >         case CC_ATTR_GUEST_UNROLL_STRING_IO:
+> > -       case CC_ATTR_HOTPLUG_DISABLED:
+> > +       case CC_ATTR_CPU_HOTPLUG_DISABLED:
+> >         case CC_ATTR_GUEST_MEM_ENCRYPT:
+> >         case CC_ATTR_MEM_ENCRYPT:
+> >                 return true;
+> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processo=
+r.c
+> > index 6737b1cbf6d6..b960db864cd4 100644
+> > --- a/drivers/acpi/acpi_processor.c
+> > +++ b/drivers/acpi/acpi_processor.c
+> > @@ -15,6 +15,7 @@
+> >  #include <linux/kernel.h>
+> >  #include <linux/module.h>
+> >  #include <linux/pci.h>
+> > +#include <linux/cc_platform.h>
+> >=20
+> >  #include <acpi/processor.h>
+> >=20
+> > @@ -357,6 +358,17 @@ static int acpi_processor_add(struct acpi_device *=
+device,
+> >         struct device *dev;
+> >         int result =3D 0;
+> >=20
+> > +       /*
+> > +        * If the confidential computing platform doesn't support ACPI
+> > +        * memory hotplug, the BIOS should never deliver such event to
+> > +        * the kernel.  Report ACPI CPU hot-add as a BIOS bug and ignor=
+e
+> > +        * the new CPU.
+> > +        */
+> > +       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) {
+>=20
+> This will affect initialization, not just hotplug AFAICS.
+>=20
+> You should reset the .hotplug.enabled flag in processor_handler to
+> false instead.
 
-I apologized, If this mail find's you disturbing, It might not be the
-best way to approach you as we have not met before, but due to the
-urgency of my present situation i decided  to communicate this way, so
-please pardon my manna, I am writing this mail to you with heavy tears
-In my eyes and great sorrow in my heart, My Name is Mrs.Juliette
-Morgan, and I am contacting you from my country Norway, I want to tell
-you this because I don't have any other option than to tell you as I
-was touched to open up to you,
+Hi Rafael,
 
-I married to Mr.sami Morgan. Who worked with Norway embassy in Burkina
-Faso for nine years before he died in the year 2020.We were married
-for eleven years without a child He died after a brief illness that
-lasted for only five days. Since his death I decided not to remarry,
-When my late husband was alive he deposited the sum of =E2=82=AC 8.5 Millio=
-n
-Euro (Eight million, Five hundred thousand Euros) in a bank in
-Ouagadougou the capital city of Burkina Faso in west Africa Presently
-this money is still in bank. He made this money available for
-exportation of Gold from Burkina Faso mining.
+Thanks for the review.  By "affect initialization" did you mean this
+acpi_processor_add() is also called during kernel boot when any logical cpu=
+ is
+brought up?  Or do you mean ACPI CPU hotplug can also happen during kernel =
+boot
+(after acpi_processor_init())?
 
-Recently, My Doctor told me that I would not last for the period of
-seven months due to cancer problem. The one that disturbs me most is
-my stroke sickness.Having known my condition I decided to hand you
-over this money to take care of the less-privileged people, you will
-utilize this money the way I am going to instruct herein.
+I see acpi_processor_init() calls acpi_processor_check_duplicates() which c=
+alls
+acpi_evaluate_object() but I don't know details of ACPI so I don't know whe=
+ther
+this would trigger acpi_processor_add().
 
-I want you to take 30 Percent of the total money for your personal use
-While 70% of the money will go to charity, people in the street and
-helping the orphanage. I grew up as an Orphan and I don't have any
-body as my family member, just to endeavour that the house of God is
-maintained. Am doing this so that God will forgive my sins and accept
-my soul because these sicknesses have suffered me so much.
+One thing is TDX doesn't support ACPI CPU hotplug is an architectural thing=
+, so
+it is illegal even if it happens during kernel boot.  Dave's idea is the ke=
+rnel
+should  speak out loudly if physical CPU hotplug indeed happened on (BIOS) =
+TDX-
+enabled platforms.  Otherwise perhaps we can just give up initializing the =
+ACPI
+CPU hotplug in acpi_processor_init(), something like below?
 
-As soon as I receive your reply I shall give you the contact of the
-bank in Burkina Faso and I will also instruct the Bank Manager to
-issue you an authority letter that will prove you the present
-beneficiary of the money in the bank that is if you assure me that you
-will act accordingly as I Stated herein.
+--- a/drivers/acpi/acpi_processor.c
++++ b/drivers/acpi/acpi_processor.c
+@@ -707,6 +707,10 @@ bool acpi_duplicate_processor_id(int proc_id)
+ void __init acpi_processor_init(void)
+ {
+        acpi_processor_check_duplicates();
++
++       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED))
++               return;
++
+        acpi_scan_add_handler_with_hotplug(&processor_handler, "processor")=
+;
+        acpi_scan_add_handler(&processor_container_handler);
+ }
 
-Always reply to my alternative for security purposes
 
-Hoping to receive your reply:
-From Mrs.Juliette Morgan,
+>=20
+> > +               dev_err(&device->dev, "[BIOS bug]: Platform doesn't sup=
+port ACPI CPU hotplug.  New CPU ignored.\n");
+> > +               return -EINVAL;
+> > +       }
+> > +
+
+--=20
+Thanks,
+-Kai
+
+
