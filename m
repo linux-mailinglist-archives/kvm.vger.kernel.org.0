@@ -2,177 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F210C5572BB
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 07:57:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C83F55732B
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 08:34:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbiFWF5Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 01:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
+        id S229891AbiFWGe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 02:34:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiFWF5X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 01:57:23 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A69343ED1;
-        Wed, 22 Jun 2022 22:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655963842; x=1687499842;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8pd8Oamgron657/1QMJs6kHNOEmzKM8mE2Gr1jHf/Cw=;
-  b=gCX9loaARlZxJbDfH/ng2wN84EO33TIDS5qMBrmQn5Po2jPiNkCb5wu5
-   K0JMDITIROGmnesgFuITKn+e4koDfEGWjOw4f4j0TkX2n11n1bXYX4XZT
-   9PehWH8GHxmLAfeX8H+3R9P1O14GGv9ebJ2sq2fze6darz0E2+t1zsbNf
-   jHqhGqPHkKNuv7S65ilYw1uHZpMJFJHdlJwH1lJ9/VZ3n5hZfFcNLwX/a
-   ngGGP6587YRy9aZf6HCcgi2IT777cq+eVJJSxZ6Mu0oZ9QYxsh0hUyWoL
-   DTSZgYoW43czp6RBFVqESykr+X39RGBk+YVZirRjV9LjETTxoCdhA+ZYj
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="306092389"
-X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="306092389"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 22:57:22 -0700
-X-IronPort-AV: E=Sophos;i="5.92,215,1650956400"; 
-   d="scan'208";a="644570302"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 22:57:18 -0700
-Date:   Thu, 23 Jun 2022 13:57:03 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
-        len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Subject: Re: [PATCH v5 01/22] x86/virt/tdx: Detect TDX during kernel boot
-Message-ID: <20220623055658.GA2934@gao-cwp>
-References: <cover.1655894131.git.kai.huang@intel.com>
- <062075b36150b119bf2d0a1262de973b0a2b11a7.1655894131.git.kai.huang@intel.com>
+        with ESMTP id S229807AbiFWGeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 02:34:25 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E7B38DB2;
+        Wed, 22 Jun 2022 23:34:24 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25N4ZmGo029275;
+        Thu, 23 Jun 2022 06:34:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ivouve314BzSQTYmhbx7zKJw5GkyqQ3+NZn0Y50glXA=;
+ b=naVifPKRtohRFRuJsTk1nU6F5ZjQvCPrG5b9Z9F7v94BDlGcjTm+S5iph/4tOLKxDiA/
+ eeFmKv8BQ62swMGtSkHnK+t6xmUBLvcNJ/bIkXmRGw/SZoZ40CW8wxbLZHTqBEHRos+u
+ 13+nfO3lKC8EXoWXmdkiQIf+PuhxVmWzjRZXTVfkVR05BNpTNHZGqkPfgIi9ESzKG22n
+ 8jsNRLOLrbUKfGArBIYAMalcLSwAX/lhcZG4e67/4i9vviohqJe+w0vAXAQRbQZHnEI2
+ YthAfBpB6VNXNkdhNnQnrC1Gq8KsQ7grIWxIiyD7HtZZsAMTzB4MELPir5Ab9brFIzBX tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gvedq6k82-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Jun 2022 06:34:21 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25N6Qgkb026302;
+        Thu, 23 Jun 2022 06:34:20 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gvedq6k77-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Jun 2022 06:34:20 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25N65mNe003030;
+        Thu, 23 Jun 2022 06:34:18 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 3gv3mb8tnv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Jun 2022 06:34:17 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25N6YEik21954942
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Jun 2022 06:34:14 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7D28DA405F;
+        Thu, 23 Jun 2022 06:34:14 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CEB9AA4054;
+        Thu, 23 Jun 2022 06:34:13 +0000 (GMT)
+Received: from [9.145.6.211] (unknown [9.145.6.211])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Jun 2022 06:34:13 +0000 (GMT)
+Message-ID: <afee9027-1c4d-5c9c-8726-0b751cc13f46@linux.ibm.com>
+Date:   Thu, 23 Jun 2022 08:34:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <062075b36150b119bf2d0a1262de973b0a2b11a7.1655894131.git.kai.huang@intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH] KVM: s390: drop unexpected word 'and' in the comments
+Content-Language: en-US
+To:     Jiang Jian <jiangjian@cdjrlc.com>, borntraeger@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     david@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, svens@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220622140720.7617-1-jiangjian@cdjrlc.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220622140720.7617-1-jiangjian@cdjrlc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0_9K9oypSQMSUEHSxIR5Hz2ge2JTTeiH
+X-Proofpoint-GUID: Sw8cJhq6-4Ns5-NNeo46kSMLGlZTjnHh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-23_03,2022-06-22_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ clxscore=1011 mlxlogscore=841 phishscore=0 impostorscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206230023
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 22, 2022 at 11:15:30PM +1200, Kai Huang wrote:
->Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
->host and certain physical attacks.  TDX introduces a new CPU mode called
->Secure Arbitration Mode (SEAM) and a new isolated range pointed by the
-						    ^ perhaps, range of memory
+On 6/22/22 16:07, Jiang Jian wrote:
+> there is an unexpected word 'and' in the comments that need to be dropped
+> 
+> file: arch/s390/kvm/interrupt.c
+> line: 705
+> 
+> * Subsystem damage are the only two and and are indicated by
+> 
+> changed to:
+> 
+> * Subsystem damage are the only two and are indicated by
+> 
+> Signed-off-by: Jiang Jian <jiangjian@cdjrlc.com>
 
->SEAM Ranger Register (SEAMRR).  A CPU-attested software module called
->'the TDX module' runs inside the new isolated range to implement the
->functionalities to manage and run protected VMs.
->
->Pre-TDX Intel hardware has support for a memory encryption architecture
->called MKTME.  The memory encryption hardware underpinning MKTME is also
->used for Intel TDX.  TDX ends up "stealing" some of the physical address
->space from the MKTME architecture for crypto-protection to VMs.  BIOS is
->responsible for partitioning the "KeyID" space between legacy MKTME and
->TDX.  The KeyIDs reserved for TDX are called 'TDX private KeyIDs' or
->'TDX KeyIDs' for short.
->
->To enable TDX, BIOS needs to configure SEAMRR (core-scope) and TDX
->private KeyIDs (package-scope) consistently for all packages.  TDX
->doesn't trust BIOS.  TDX ensures all BIOS configurations are correct,
->and if not, refuses to enable SEAMRR on any core.  This means detecting
->SEAMRR alone on BSP is enough to check whether TDX has been enabled by
->BIOS.
->
->To start to support TDX, create a new arch/x86/virt/vmx/tdx/tdx.c for
->TDX host kernel support.  Add a new Kconfig option CONFIG_INTEL_TDX_HOST
->to opt-in TDX host kernel support (to distinguish with TDX guest kernel
->support).  So far only KVM is the only user of TDX.  Make the new config
->option depend on KVM_INTEL.
->
->Use early_initcall() to detect whether TDX is enabled by BIOS during
->kernel boot, and add a function to report that.  Use a function instead
->of a new CPU feature bit.  This is because the TDX module needs to be
->initialized before it can be used to run any TDX guests, and the TDX
->module is initialized at runtime by the caller who wants to use TDX.
->
->Explicitly detect SEAMRR but not just only detect TDX private KeyIDs.
->Theoretically, a misconfiguration of TDX private KeyIDs can result in
->SEAMRR being disabled, but the BSP can still report the correct TDX
->KeyIDs.  Such BIOS bug can be caught when initializing the TDX module,
->but it's better to do more detection during boot to provide a more
->accurate result.
->
->Also detect the TDX KeyIDs.  This allows userspace to know how many TDX
->guests the platform can run w/o needing to wait until TDX is fully
->functional.
->
->Signed-off-by: Kai Huang <kai.huang@intel.com>
+Thanks, queued
 
-Reviewed-by: Chao Gao <chao.gao@intel.com>
+> ---
+>   arch/s390/kvm/interrupt.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index af96dc0549a4..1e3fb2d4d448 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -702,7 +702,7 @@ static int __must_check __deliver_machine_check(struct kvm_vcpu *vcpu)
+>   	/*
+>   	 * We indicate floating repressible conditions along with
+>   	 * other pending conditions. Channel Report Pending and Channel
+> -	 * Subsystem damage are the only two and and are indicated by
+> +	 * Subsystem damage are the only two and are indicated by
+>   	 * bits in mcic and masked in cr14.
+>   	 */
+>   	if (test_and_clear_bit(IRQ_PEND_MCHK_REP, &fi->pending_irqs)) {
 
-But some cosmetic comments below ...
-
->---
->+
->+static u32 tdx_keyid_start __ro_after_init;
->+static u32 tdx_keyid_num __ro_after_init;
->+
-...
-
->+static int detect_tdx_keyids(void)
->+{
->+	u64 keyid_part;
->+
->+	rdmsrl(MSR_IA32_MKTME_KEYID_PARTITIONING, keyid_part);
-
-how about:
-	rdmsr(MSR_IA32_MKTME_KEYID_PARTITIONING, tdx_keyid_start, tdx_keyid_num);
-	tdx_keyid_start++;
-
-Then TDX_KEYID_NUM/START can be dropped.
-
->+
->+	tdx_keyid_num = TDX_KEYID_NUM(keyid_part);
->+	tdx_keyid_start = TDX_KEYID_START(keyid_part);
->+
->+	pr_info("TDX private KeyID range: [%u, %u).\n",
->+			tdx_keyid_start, tdx_keyid_start + tdx_keyid_num);
->+
->+	/*
->+	 * TDX guarantees at least two TDX KeyIDs are configured by
->+	 * BIOS, otherwise SEAMRR is disabled.  Invalid TDX private
->+	 * range means kernel bug (TDX is broken).
-
-Maybe it is better to have a comment for why TDX/kernel guarantees
-there should be at least 2 TDX keyIDs.
-
->+
->+/*
->+ * This file contains both macros and data structures defined by the TDX
->+ * architecture and Linux defined software data structures and functions.
->+ * The two should not be mixed together for better readability.  The
->+ * architectural definitions come first.
->+ */
->+
->+/*
->+ * Intel Trusted Domain CPU Architecture Extension spec:
->+ *
->+ * IA32_MTRRCAP:
->+ *   Bit 15:	The support of SEAMRR
->+ *
->+ * IA32_SEAMRR_PHYS_MASK (core-scope):
->+ *   Bit 10:	Lock bit
->+ *   Bit 11:	Enable bit
->+ */
->+#define MTRR_CAP_SEAMRR			BIT_ULL(15)
-
-Can you move this bit definition to arch/x86/include/asm/msr-index.h
-right after MSR_MTRRcap definition there?
