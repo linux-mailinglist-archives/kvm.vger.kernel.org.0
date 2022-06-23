@@ -2,174 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6A8E558989
-	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 21:49:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0051955898C
+	for <lists+kvm@lfdr.de>; Thu, 23 Jun 2022 21:50:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231922AbiFWTtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 15:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47398 "EHLO
+        id S231420AbiFWTuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 15:50:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231821AbiFWTt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:49:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 151467645
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 12:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656013583;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BFyjSv4yqYoLPIUfIrUH6yAVaXDxfw3QohX9kRJWVng=;
-        b=FGA3JcQ4gAUzjQX9Nv4cU1ElnSH+XnHGLr5CJ11fPfiWpVSk5fHv+h7n7S4yri8TRDKOPz
-        nFGAJ87SpyNyTM/tpyBIT4OqLKJx2dv3yM6CI5TyCcEZ9vCx1nJKIOXFPq+ZD7cyvfkTFQ
-        WGOeJSXsGEovqfwNVd5vpHSmpliIa+U=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-343-6WHICVIKNs2pl-4L_r6Idw-1; Thu, 23 Jun 2022 15:46:19 -0400
-X-MC-Unique: 6WHICVIKNs2pl-4L_r6Idw-1
-Received: by mail-il1-f199.google.com with SMTP id n14-20020a056e021bae00b002d92c91da8aso25899ili.15
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 12:46:19 -0700 (PDT)
+        with ESMTP id S230496AbiFWTuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 15:50:00 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180E12E092
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 12:48:07 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 68so378728pgb.10
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 12:48:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fwXOVWaOks5aEB9DnQ0+LscIdibd3v9vBir98C6rDhg=;
+        b=CQndzaYspw1/WKtdaLFGLHVaJegMtkhawi5iLktrm/WtozYiFtOC8IG/36xJvdHg4W
+         k6vB1z9W/Cs08olUSBnSn32v+KVGz9b0wEvkWCRfKCMpZi3y8M/brwvaxp/GZVlJsdE+
+         a5ACIRVUCZAO29t6ZGW5et/uRRD1d3WvAgDAcb2SSxWfqVGM12ELdbBknV/GtDWC6mKA
+         vP4/Z9l+Rztp5bFydD/NohQTZcm/AUhsbJonqQaWM8fuRR+S///2Ib7H9EtQuQMn2i4X
+         KMVLtUOUN9eYoG6H9iKils1LWKtkKcSn59RJkEiJWSH634OQjWGq5brVdUBGXvOiHxB4
+         Yv9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=BFyjSv4yqYoLPIUfIrUH6yAVaXDxfw3QohX9kRJWVng=;
-        b=C9tzj86gJISR8aqvdDpf5r26BZc7cX4t/EZrU4o6unwDaoUekPdpcoR4B3J0mZ4Zpf
-         PJJSSAJv+5uOsfIc2i/cdkfKcOgdmtpH11f56aPZVBo3fO6SbRB+g2SpcZa4hNHtNC3z
-         TxT9WgkiVXiOBSp+7uXbekrYVLf/yTUuIzPa7mTcYcQYmaqG0rxqx5DgcAPegoCQbKkQ
-         Wn8CWlUBM5qt3QmGH2Tf4AoDmh/uuOAJzc6m/xKMwnFetWtXSd9JskHKw0PW70LhHYKn
-         JmvCiZpfrqRoWiZdyakJstNcGQyqoew1eNmggmHQFKjvnLpnFu4mnEszp4x2h+x6d1dj
-         cXrw==
-X-Gm-Message-State: AJIora+kK9+GE2JoBFmiam/VM+F5s0pNd65V/ztEbDn+Y+nqur6ttqj6
-        T6h0OlQZqXltBIAJFeoKor4HG44gZ+FdUkEPw8vvkAswUg74TilzmvUK3/ud0iLge6L4F9DUW5G
-        ikNfdJOnWNX5F
-X-Received: by 2002:a05:6638:34a2:b0:339:eeed:e65e with SMTP id t34-20020a05663834a200b00339eeede65emr1844927jal.202.1656013578868;
-        Thu, 23 Jun 2022 12:46:18 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1s2jidDjwKi4+oOZL1EZ/+u6ihMVoMMf6fOmYdDweXZw+XLrQoYnmYeralcR2uOCBAxLGEwvw==
-X-Received: by 2002:a05:6638:34a2:b0:339:eeed:e65e with SMTP id t34-20020a05663834a200b00339eeede65emr1844910jal.202.1656013578614;
-        Thu, 23 Jun 2022 12:46:18 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id x42-20020a0294ad000000b00330c5581c03sm144313jah.1.2022.06.23.12.46.16
+        bh=fwXOVWaOks5aEB9DnQ0+LscIdibd3v9vBir98C6rDhg=;
+        b=8Dk1Fkuu9MW7ZJcwLnV+izTifbu3EwPb2XbXx0DD997E45ragzD+Nom4qmLQT3DBHK
+         LPmYbRL9oxb7Q2qjOSgGym3OBpeZruiyw5K/c4WUHiyV/gobdOFl48vYSTV4m44oZvp4
+         WAYOXpymoPK84enBqaixlmNKztFWMPM/UoOrSWPBnl4yifU4fmVZ+E36nXuxwo73H+3w
+         poeqfyQoknhtR1IxvFD8CRznUFH7WP+RP4mnX7Tzj2EwKAcwpRl9mAq7altqMtEElg/8
+         IuGOVMa50OB0uCEuAG9jNxA4cNBE0bPwXZZeERM05LRtmPOBxzmo6XKIG6IFpw9Sd7cI
+         m6Eg==
+X-Gm-Message-State: AJIora/58s9YXFti2UXQEqm+s+LnsXclV2HlP5aym1OfGPDyww7t/oyb
+        TFnE/UMBp69ZwwF4M765S8DzXQ==
+X-Google-Smtp-Source: AGRyM1sfHJfUUw/z2jILs3RXN+LCGbbXiT6lLVzBDJ8fDqyWZMCpRFSMeph94IMzJrMYodDY7V2XQg==
+X-Received: by 2002:a63:790c:0:b0:40c:3c04:e3d3 with SMTP id u12-20020a63790c000000b0040c3c04e3d3mr8898464pgc.44.1656013686345;
+        Thu, 23 Jun 2022 12:48:06 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id i13-20020aa787cd000000b00522d329e36esm22686pfo.140.2022.06.23.12.48.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 12:46:17 -0700 (PDT)
-Date:   Thu, 23 Jun 2022 15:46:15 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>
-Subject: Re: [PATCH 2/4] kvm: Merge "atomic" and "write" in
- __gfn_to_pfn_memslot()
-Message-ID: <YrTDBwoddwoY1uSV@xz-m1.local>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-3-peterx@redhat.com>
- <YrR9i3yHzh5ftOxB@google.com>
+        Thu, 23 Jun 2022 12:48:05 -0700 (PDT)
+Date:   Thu, 23 Jun 2022 19:48:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Subject: Re: [PATCH v7 22/23] KVM: x86/mmu: Extend Eager Page Splitting to
+ nested MMUs
+Message-ID: <YrTDcrsn0/+alpzf@google.com>
+References: <20220622192710.2547152-1-pbonzini@redhat.com>
+ <20220622192710.2547152-23-pbonzini@redhat.com>
+ <CALzav=fH_9_LKVE0_UCftwy2KZaB3nSBoWU07aPWALag4_mcHQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YrR9i3yHzh5ftOxB@google.com>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CALzav=fH_9_LKVE0_UCftwy2KZaB3nSBoWU07aPWALag4_mcHQ@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 02:49:47PM +0000, Sean Christopherson wrote:
-> On Wed, Jun 22, 2022, Peter Xu wrote:
-> > Merge two boolean parameters into a bitmask flag called kvm_gtp_flag_t for
-> > __gfn_to_pfn_memslot().  This cleans the parameter lists, and also prepare
-> > for new boolean to be added to __gfn_to_pfn_memslot().
-> 
-> ...
-> 
-> > @@ -3999,8 +4000,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  	}
-> >  
-> >  	async = false;
-> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, &async,
-> > -					  fault->write, &fault->map_writable,
-> > +	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, flags,
-> > +					  &async, &fault->map_writable,
-> >  					  &fault->hva);
-> >  	if (!async)
-> >  		return RET_PF_CONTINUE; /* *pfn has correct page already */
-> > @@ -4016,9 +4017,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  		}
-> >  	}
-> >  
-> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, NULL,
-> > -					  fault->write, &fault->map_writable,
-> > -					  &fault->hva);
-> > +	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, flags, NULL,
-> > +					  &fault->map_writable, &fault->hva);
-> >  	return RET_PF_CONTINUE;
-> >  }
-> >  
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index c20f2d55840c..b646b6fcaec6 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1146,8 +1146,15 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
-> >  		      bool *writable);
-> >  kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn);
-> >  kvm_pfn_t gfn_to_pfn_memslot_atomic(const struct kvm_memory_slot *slot, gfn_t gfn);
+On Thu, Jun 23, 2022, David Matlack wrote:
+> On Wed, Jun 22, 2022 at 12:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+Please trim replies.
+
+> > +static int topup_split_caches(struct kvm *kvm)
+> > +{
+> > +       int r;
 > > +
-> > +/* gfn_to_pfn (gtp) flags */
-> > +typedef unsigned int __bitwise kvm_gtp_flag_t;
+> > +       lockdep_assert_held(&kvm->slots_lock);
 > > +
-> > +#define  KVM_GTP_WRITE          ((__force kvm_gtp_flag_t) BIT(0))
-> > +#define  KVM_GTP_ATOMIC         ((__force kvm_gtp_flag_t) BIT(1))
-> > +
-> >  kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
-> > -			       bool atomic, bool *async, bool write_fault,
-> > +			       kvm_gtp_flag_t gtp_flags, bool *async,
-> >  			       bool *writable, hva_t *hva);
+> > +       /*
+> > +        * It's common to need all SPLIT_DESC_CACHE_MIN_NR_OBJECTS (513) objects
+> > +        * when splitting a page, but setting capacity == min would cause
+> > +        * KVM to drop mmu_lock even if just one object was consumed from the
+> > +        * cache.  So make capacity larger than min and handle two huge pages
+> > +        * without having to drop the lock.
 > 
-> I completely agree the list of booleans is a mess, but I don't love the result of
-> adding @flags.  I wonder if we can do something similar to x86's struct kvm_page_fault
-> and add an internal struct to pass params.
+> I was going to do some testing this week to confirm, but IIUC KVM will
+> only allocate from split_desc_cache if the L1 hypervisor has aliased a
+> huge page in multiple {E,N}PT12 page table entries. i.e. L1 is mapping
+> a huge page into an L2 multiple times, or mapped into multiple L2s.
+> This should be common in traditional, process-level, shadow paging,
+> but I think will be quite rare for nested shadow paging.
 
-Yep we can.  It's just that it'll be another goal irrelevant of this series
-but it could be a standalone cleanup patchset for gfn->hpa conversion
-paths.  Say, the new struct can also be done on top containing the new
-flag, IMHO.
+Ooooh, right, I forgot that that pte_list_add() needs to allocate if and only if
+there are multiple rmap entries, otherwise rmap->val points that the one and only
+rmap directly.
 
-This reminded me of an interesting topic that Nadav used to mention that
-when Matthew changed some of the Linux function parameters into a structure
-then the .obj actually grows a bit due to the strong stack protector that
-Linux uses.  If I'll be doing such a change I'd guess I need to dig a bit
-into that first, but hopefully I don't need to for this series alone.
+Doubling the capacity is all but guaranteed to be pointless overhead.  What about
+buffering with the default capacity?  That way KVM doesn't have to topup if it
+happens to encounter an aliased gfn.  It's arbitrary, but so is the default capacity
+size.
 
-Sorry to be off-topic: I think it's a matter of whether you think it's okay
-we merge the flags first, even if we want to go with a struct pointer
-finally.
+E.g. as fixup
 
-> And then add e.g. gfn_to_pfn_interruptible() to wrap that logic.
+---
+ arch/x86/kvm/mmu/mmu.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-That helper sounds good, it's just that the major user I'm modifying here
-doesn't really use gfn_to_pfn() at all but __gfn_to_pfn_memslot()
-underneath.  I'll remember to have that when I plan to convert some
-gfn_to_pfn() call sites.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 22b87007efff..90d6195edcf3 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6125,19 +6125,23 @@ static bool need_topup_split_caches_or_resched(struct kvm *kvm)
 
-> 
-> I suspect we could also clean up the @async behavior at the same time, as its
-> interaction with FOLL_NOWAIT is confusing.
+ static int topup_split_caches(struct kvm *kvm)
+ {
+-	int r;
+-
+-	lockdep_assert_held(&kvm->slots_lock);
+-
+ 	/*
+-	 * It's common to need all SPLIT_DESC_CACHE_MIN_NR_OBJECTS (513) objects
+-	 * when splitting a page, but setting capacity == min would cause
+-	 * KVM to drop mmu_lock even if just one object was consumed from the
+-	 * cache.  So make capacity larger than min and handle two huge pages
+-	 * without having to drop the lock.
++	 * Allocating rmap list entries when splitting huge pages for nested
++	 * MMUs is rare as KVM needs to allocate if and only if there is more
++	 * than one rmap entry for the gfn, i.e. requires an L1 gfn to be
++	 * aliased by multiple L2 gfns, which is very atypical for VMMs.  If
++	 * there is only one rmap entry, rmap->val points directly at that one
++	 * entry and doesn't need to allocate a list.  Buffer the cache by the
++	 * default capacity so that KVM doesn't have to topup the cache if it
++	 * encounters an aliased gfn or two.
+ 	 */
+-	r = __kvm_mmu_topup_memory_cache(&kvm->arch.split_desc_cache,
+-					 2 * SPLIT_DESC_CACHE_MIN_NR_OBJECTS,
++	const int capacity = SPLIT_DESC_CACHE_MIN_NR_OBJECTS +
++			     KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
++	int r;
++
++	lockdep_assert_held(&kvm->slots_lock);
++
++	r = __kvm_mmu_topup_memory_cache(&kvm->arch.split_desc_cache, capacity,
+ 					 SPLIT_DESC_CACHE_MIN_NR_OBJECTS);
+ 	if (r)
+ 		return r;
 
-Yeah I don't like that either.  Let me think about that when proposing a
-new version.  Logically that's separate idea from this series too, but if
-you think that'll be nice to have altogether then I can give it a shot.
-
-Thanks,
-
--- 
-Peter Xu
+base-commit: 436b1c29f36ed3d4385058ba6f0d6266dbd2a882
+--
 
