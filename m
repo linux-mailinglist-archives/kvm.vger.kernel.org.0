@@ -2,153 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8F5B559D02
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 17:09:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FC89559D0F
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 17:12:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231127AbiFXPJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 11:09:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51292 "EHLO
+        id S232552AbiFXPMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 11:12:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231672AbiFXPJt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 11:09:49 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D31B4B1CD;
-        Fri, 24 Jun 2022 08:09:41 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25OEfnIU004966;
-        Fri, 24 Jun 2022 15:09:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BNMEw2FCh/42/TTd/gAiREnkz/dO+iNB1RdK2H0KYhE=;
- b=N7d+ZFa+CHZEf5Q8R8gR9Cxak8/vevyKj9pdZUHzIViTsnHIDD8DePj2pwThzwS94nci
- FKygwf0OcJBZVQGtl80ZQb423dvP9FJWW7FD22tYbnefKrR9mqM8SdJATSEDWp+YHZCO
- uqB+IapEsFbG1iWKE9eUZIIFEnTFHHm1nnc5bfvqKpbmBT2vHjasiOEpZbMbAEBNPnUK
- RDmpS2dX0+Ffdxtogx7PuYKy5UxBOoJKeD++4JMHsCzWDRrl5qDbrxaBJjXF7bPQu2bL
- 5U0TJ2LviNzg3yTyb+dL0ur5VsPdIJ016Ql8vMJQZu1YYSnI4tmf4GHHmYEOxbNx7jak mQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gwf8rgtv6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 15:09:41 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25OEgBoT005497;
-        Fri, 24 Jun 2022 15:09:40 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gwf8rgtru-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 15:09:40 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25OEoT5a021530;
-        Fri, 24 Jun 2022 15:09:36 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gvuj7sjmb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 15:09:36 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25OF9XHi20840796
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jun 2022 15:09:33 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5288952051;
-        Fri, 24 Jun 2022 15:09:33 +0000 (GMT)
-Received: from [9.171.40.178] (unknown [9.171.40.178])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B34215204E;
-        Fri, 24 Jun 2022 15:09:30 +0000 (GMT)
-Message-ID: <258450b3-e8e0-9868-4b38-1c39421cef05@linux.ibm.com>
-Date:   Fri, 24 Jun 2022 17:09:29 +0200
+        with ESMTP id S232556AbiFXPMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 11:12:36 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8467E4D9D1
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 08:12:33 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id x3so5039418lfd.2
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 08:12:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=x8Jy0OJ39PBOXthgIfAdqP1jgQfbb438h2GvJW/Mdq0=;
+        b=mVTuWLuN8XZpFMJ+S+7U0qjJl+qK5dJblLURULdgRe/zT3wWoBwZfRqWcI9kIGhQix
+         nJ0AlpkWAXgQzKGyiv+kR+rVuzVz+DEiOKI+39aGe1PTUDQ8PQmnF7lzUOTyeVqe+jYj
+         /sPnpedyt4AqMb/Oe/lOmeQR9MXlebXyA5UNaCTZQAkhpYwhIjp+b0opRH/UNwzNPtdQ
+         Kk22/0JzzDkTIXbMGifjZwkz6D6F0dqP5YXT6OK/4HiWJaQ2EEPlJAoKT7iFqZHu+CO3
+         yCdSI3Vrj02rJYLXVd24AKX1AmjoKBptyIgnOqn/2cJdm0bxgeklwSTdhUM5wS9vLoIB
+         buLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=x8Jy0OJ39PBOXthgIfAdqP1jgQfbb438h2GvJW/Mdq0=;
+        b=oylrBsf5rPgdAaQYUGb6MWxMdDR9iPoDv00dSL7X8ErR00IlrBEnbWBS5vBtylBzoe
+         6+BZclQn8Z5P6qZUyk9WvndD/XnQGCAw2M0crOT8bwVpfCldYKgDL0pR2WqYCbFRMZCh
+         Zadba4HkuJ6s5SEHzqOQb1ueKp/ohbAWije4sjWOjjBZklCCenHslMEjMW17woBpgPpf
+         FrETM4y11GdrJSL4I/HG4wrai25WR04Ak0IUfntiLK8qLeaZyFskBZf+qw1HmH4PQ3uZ
+         upT4SHG9inhXthFX5oLDLomiadUKfs5t2CCj0numIMNsWZBEQlonA8ejdFLQGjl2L6jA
+         Nhpg==
+X-Gm-Message-State: AJIora/P4roV0DCH/IUEtrVyPlSq7N3OBHe6w4wk69wQTxxz9m8ho5WZ
+        yIS8Wp2NdaEwFQq7mQTvWvv8Rn/ti/n3BcOrh0WTYA==
+X-Google-Smtp-Source: AGRyM1ux6fJI1UqfhbKtYI3380oq0Yc9WPcnS1B8UQFcR4k15s9NIrtzUEPIL6muaukL0Y7LrG0POm9dBMYr5wpMzHA=
+X-Received: by 2002:a05:6512:401a:b0:47f:6ea5:dace with SMTP id
+ br26-20020a056512401a00b0047f6ea5dacemr9014219lfb.402.1656083551555; Fri, 24
+ Jun 2022 08:12:31 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v10 2/3] KVM: s390: guest support for topology function
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220620125437.37122-1-pmorel@linux.ibm.com>
- <20220620125437.37122-3-pmorel@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220620125437.37122-3-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Bvs2Vap4A2HKVEYiXtjjwjcHmXw4b5JU
-X-Proofpoint-GUID: P4_-43GJZ3SP3jYMwlfq9Fz4ZaS_gMI8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-24_07,2022-06-23_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- impostorscore=0 mlxscore=0 mlxlogscore=999 adultscore=0 lowpriorityscore=0
- malwarescore=0 clxscore=1015 phishscore=0 priorityscore=1501 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206240058
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <cover.1655761627.git.ashish.kalra@amd.com> <7845d453af6344d0b156493eb4555399aad78615.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <7845d453af6344d0b156493eb4555399aad78615.1655761627.git.ashish.kalra@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 24 Jun 2022 09:12:20 -0600
+Message-ID: <CAMkAt6oGzqoMxN5ws9QZ9P1q5Rah92bb4V2KSYBgi0guMGUKAQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 35/49] KVM: SVM: Remove the long-lived GHCB host map
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/20/22 14:54, Pierre Morel wrote:
-> We report a topology change to the guest for any CPU hotplug.
-> 
-> The reporting to the guest is done using the Multiprocessor
-> Topology-Change-Report (MTCR) bit of the utility entry in the guest's
-> SCA which will be cleared during the interpretation of PTF.
-> 
-> On every vCPU creation we set the MCTR bit to let the guest know the
-> next time he uses the PTF with command 2 instruction that the
-> topology changed and that he should use the STSI(15.1.x) instruction
-> to get the topology details.
-> 
-> STSI(15.1.x) gives information on the CPU configuration topology.
-> Let's accept the interception of STSI with the function code 15 and
-> let the userland part of the hypervisor handle it when userland
-> support the CPU Topology facility.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On Mon, Jun 20, 2022 at 5:11 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> On VMGEXIT, sev_handle_vmgexit() creates a host mapping for the GHCB GPA,
+> and unmaps it just before VM-entry. This long-lived GHCB map is used by
+> the VMGEXIT handler through accessors such as ghcb_{set_get}_xxx().
+>
+> A long-lived GHCB map can cause issue when SEV-SNP is enabled. When
+> SEV-SNP is enabled the mapped GPA needs to be protected against a page
+> state change.
+>
+> To eliminate the long-lived GHCB mapping, update the GHCB sync operations
+> to explicitly map the GHCB before access and unmap it after access is
+> complete. This requires that the setting of the GHCBs sw_exit_info_{1,2}
+> fields be done during sev_es_sync_to_ghcb(), so create two new fields in
+> the vcpu_svm struct to hold these values when required to be set outside
+> of the GHCB mapping.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  arch/s390/include/asm/kvm_host.h | 11 ++++++++---
->  arch/s390/kvm/kvm-s390.c         | 27 ++++++++++++++++++++++++++-
->  arch/s390/kvm/priv.c             | 15 +++++++++++----
->  arch/s390/kvm/vsie.c             |  3 +++
->  4 files changed, 48 insertions(+), 8 deletions(-)
-> 
-[...]
-
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 8fcb56141689..95b96019ca8e 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -1691,6 +1691,25 @@ static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
->  	return ret;
+>  arch/x86/kvm/svm/sev.c | 131 ++++++++++++++++++++++++++---------------
+>  arch/x86/kvm/svm/svm.c |  12 ++--
+>  arch/x86/kvm/svm/svm.h |  24 +++++++-
+>  3 files changed, 111 insertions(+), 56 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 01ea257e17d6..c70f3f7e06a8 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2823,15 +2823,40 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+>         kvfree(svm->sev_es.ghcb_sa);
 >  }
-> 
-> +/**
-> + * kvm_s390_sca_set_mtcr
-> + * @kvm: guest KVM description
-> + *
-> + * Is only relevant if the topology facility is present,
-> + * the caller should check KVM facility 11
-> + *
-> + * Updates the Multiprocessor Topology-Change-Report to signal
-> + * the guest with a topology change.
-> + */
-> +static void kvm_s390_sca_set_mtcr(struct kvm *kvm)
+>
+> +static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
 > +{
-> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+> +       struct vmcb_control_area *control = &svm->vmcb->control;
+> +       u64 gfn = gpa_to_gfn(control->ghcb_gpa);
 > +
-> +	ipte_lock(kvm);
-
-Why do we need to take the ipte lock here and in patch 3?
-
-> +	sca->utility |= SCA_UTILITY_MTCR;
-> +	ipte_unlock(kvm);
+> +       if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
+> +               /* Unable to map GHCB from guest */
+> +               pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
+> +               return -EFAULT;
+> +       }
+> +
+> +       return 0;
 > +}
 
-[...]
+There is a perf cost to this suggestion but it might make accessing
+the GHCB safer for KVM. Have you thought about just using
+kvm_read_guest() or copy_from_user() to fully copy out the GCHB into a
+KVM owned buffer, then copying it back before the VMRUN. That way the
+KVM doesn't need to guard against page_state_changes on the GHCBs,
+that could be a perf improvement in a follow up.
+
+Since we cannot unmap GHCBs I don't think UPM will help here so we
+probably want to make these patches safe against malicious guests
+making GHCBs private. But maybe UPM does help?
