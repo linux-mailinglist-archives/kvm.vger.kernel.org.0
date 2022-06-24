@@ -2,83 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CF5A558C0A
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:00:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29F05558C15
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:04:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229750AbiFXAAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 20:00:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35690 "EHLO
+        id S231344AbiFXAET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 20:04:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbiFXAAT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 20:00:19 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C2B252E57
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:00:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2A08CB8251D
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 00:00:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CA661C341CC
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 00:00:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656028815;
-        bh=ONSOyV4ca1W6XFBifSkqX1EgtG2uXuzjSeLTaejO7S4=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=Xyh+DkdLEOytvXCfmPKUP6np26GfdLyVdlvfnIMujN8p9xKKa+fHcbST4RPIFJCDg
-         RV0CjswH9Pc0pEqOF5+cL1u8kp4R3q2y85BDf+BnQBnphFM9G4GZYdE9G7LgHFqDlK
-         VAdGQtE29tSOA65N6b61IQn1pjkqU5R6RwVCx98wXrcNFwUsy2zezeVO9wgPhUVsKQ
-         3oQf4CFA84yN3ooLS769xub6v4nhnNvVtFt0I3DC6iy1aMLLXow6yENwT0aOdyssMp
-         WnoD5GDjyj6RQvGDpfZt+ECZxFNS/7yMqYU9S6M3Ft8N8Q0/WTfWqQurSlQnVKkBmy
-         NVOjmC8clOOSQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id B4923CC13B5; Fri, 24 Jun 2022 00:00:15 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216026] Fails to compile using gcc 12.1 under Ubuntu 22.04
-Date:   Fri, 24 Jun 2022 00:00:15 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: nanook@eskimo.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216026-28872-o3UH1LEJE7@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216026-28872@https.bugzilla.kernel.org/>
-References: <bug-216026-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S229729AbiFXAES (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 20:04:18 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E946563AC
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:04:17 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id p3-20020a17090a428300b001ec865eb4a2so4133776pjg.3
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:04:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=aR3UMVXNJuFYXHEFaVui3S/bLvpbWl7F9qhTqAkCqU8=;
+        b=Hqf/87S0rYc3YO1mmftbe/pRY+U84b5V2ONzOenkIThl1iQOtr+PjeA+R0o4HUhBri
+         eBciKAiGzNgeX/2NDv+dn7aksHDalV0whg66lmxPfY415HpmlVhb3iqOduUz1xlFoZQH
+         ehVkaaOxKag15ztDOQmEzPJzQfGSpGAcP3szyJpwMW04oc0cC8DIqSfCFCChJlZnIf3t
+         UUrQXywbBR25UZjrxLdHYor3yE3VVsuXf1l+Jq+5/J/WcfLXZTTQNCOZh07PVAY8QpLz
+         VPnIDUKndZnLssxPkQtTp4SmElMwALEy98cNQ5QoLeZp+dw12TnF8ZoeUNNsHGIqmKdQ
+         isxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aR3UMVXNJuFYXHEFaVui3S/bLvpbWl7F9qhTqAkCqU8=;
+        b=XVvJSMGI9Xu+7TwKp4hhHNsx0WXoIXzC1rRPrfnftXL+Z1po/UCx2nL9B1l3jAEdzS
+         Eg5qCKp8MUqkx1V+CDETbOXMTyDA6o5aISmk0rEQ50M+8Pm5KJHhA1odnIcuxu0qHaaI
+         rO6UVyyIMLv6lZ4R8RZSGEePwqS/dvgkEUvCINRd0iwAm16yOjXTZCgF80izcyxtaNX+
+         Rn9IttXHZEoKaWsV26QEmUPpbc2BR24XwF37aJKv7823rDMBrNCFACYrLaEjgnD54tN7
+         yqiCFnjQUWCGMUzfD9PFlh8cZT7dnp78SVtPRXf5n+dPbPg3+gdCdMTuqjICs6P8fldo
+         ejNw==
+X-Gm-Message-State: AJIora9SEgliFoh4+MA8+pm2/7VV94vQgBi/c2ieBFcWMuQDJQ9+hyJk
+        HvDHRur8xp8MmSMtkQ2wEN098Q==
+X-Google-Smtp-Source: AGRyM1tpyr8ete82+M/6LC+zY3ZuFXiGABgTIUa1dsT3jGlH8w1nZYKl2R4L+YalNDc2emkjGkDM9g==
+X-Received: by 2002:a17:902:f602:b0:16a:178a:7b0b with SMTP id n2-20020a170902f60200b0016a178a7b0bmr27032003plg.20.1656029056747;
+        Thu, 23 Jun 2022 17:04:16 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id x5-20020a17090a1f8500b001e87bd6f6c2sm2513931pja.50.2022.06.23.17.04.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jun 2022 17:04:16 -0700 (PDT)
+Date:   Fri, 24 Jun 2022 00:04:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v1 03/10] KVM: VMX: Move
+ CPU_BASED_{CR3_LOAD,CR3_STORE,INVLPG}_EXITING filtering out of
+ setup_vmcs_config()
+Message-ID: <YrT/fHgxKUrsH7fE@google.com>
+References: <20220622164432.194640-1-vkuznets@redhat.com>
+ <20220622164432.194640-4-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220622164432.194640-4-vkuznets@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216026
+On Wed, Jun 22, 2022, Vitaly Kuznetsov wrote:
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 01294a2fc1c1..4583de7f0324 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4293,6 +4293,16 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
+>  			  CPU_BASED_MONITOR_TRAP_FLAG |
+>  			  CPU_BASED_PAUSE_EXITING);
+>  
+> +	if (vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_ENABLE_EPT) {
+> +		/*
+> +		 * CR3 accesses and invlpg don't need to cause VM Exits when EPT
+> +		 * enabled.
+> +		 */
+> +		exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
+> +				  CPU_BASED_CR3_STORE_EXITING |
+> +				  CPU_BASED_INVLPG_EXITING);
+> +	}
 
---- Comment #39 from Robert Dinse (nanook@eskimo.com) ---
-5.18.6 compiled successfully using GCC 12.1 so this issue is fixed in the 5=
-.18
-line as well.  Much thanks to all involved.
+No need to clear them based on support, just invert the logic so that KVM leaves
+them set in the base config and then cleares them if EPT is enabled (instead of
+clearing them if EPT is supported and then restoring them if EPT is disabled via
+module param).
 
---=20
-You may reply to this email to add a comment.
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 23 Jun 2022 17:00:58 -0700
+Subject: [PATCH] KVM: VMX: Clear controls obsoleted by EPT at runtime, not
+ setup
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Clear the CR3 and INVLPG interception controls at runtime based on
+whether or not EPT is being _used_, as opposed to clearing the bits at
+setup if EPT is _supported_ in hardware, and then restoring them when EPT
+is not used.  Not mucking with the base config will allow using the base
+config as the starting point for emulating the VMX capability MSRs.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5d8f28b5d6ca..f39af86a6c50 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2550,13 +2550,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	rdmsr_safe(MSR_IA32_VMX_EPT_VPID_CAP,
+ 		&vmx_cap->ept, &vmx_cap->vpid);
+
+-	if (_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_EPT) {
+-		/* CR3 accesses and invlpg don't need to cause VM Exits when EPT
+-		   enabled */
+-		_cpu_based_exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
+-					     CPU_BASED_CR3_STORE_EXITING |
+-					     CPU_BASED_INVLPG_EXITING);
+-	} else if (vmx_cap->ept) {
++	if (!(_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_EPT) &&
++	    vmx_cap->ept) {
+ 		pr_warn_once("EPT CAP should not exist if not support "
+ 				"1-setting enable EPT VM-execution control\n");
+
+@@ -4320,10 +4315,12 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
+ 				CPU_BASED_CR8_LOAD_EXITING;
+ #endif
+ 	}
+-	if (!enable_ept)
+-		exec_control |= CPU_BASED_CR3_STORE_EXITING |
+-				CPU_BASED_CR3_LOAD_EXITING  |
+-				CPU_BASED_INVLPG_EXITING;
++
++	/* No need to intercept CR3 access or INVPLG when using EPT. */
++	if (enable_ept)
++		exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
++				  CPU_BASED_CR3_STORE_EXITING |
++				  CPU_BASED_INVLPG_EXITING);
+ 	if (kvm_mwait_in_guest(vmx->vcpu.kvm))
+ 		exec_control &= ~(CPU_BASED_MWAIT_EXITING |
+ 				CPU_BASED_MONITOR_EXITING);
+
+base-commit: d365a92177bda6629885401d44fbe912106b3df6
+--
+
