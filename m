@@ -2,202 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDB555599ED
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 14:54:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A6F3559A0A
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 15:02:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231895AbiFXMyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 08:54:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33532 "EHLO
+        id S232098AbiFXNCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 09:02:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230053AbiFXMyE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 08:54:04 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2066.outbound.protection.outlook.com [40.107.220.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A8C625A;
-        Fri, 24 Jun 2022 05:54:03 -0700 (PDT)
+        with ESMTP id S231503AbiFXNCJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 09:02:09 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2043.outbound.protection.outlook.com [40.107.92.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692EC52E49;
+        Fri, 24 Jun 2022 06:02:07 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PIzLa5TKbcrqQiDgrReszmf+tkK9LVBdlyt+eIZgAqhdAkUl1npXe1IzES/zXYVOS8KZxncRQuS6zrygti7Al/IklYxgS2Ii1S5G2YQDBdbpuJdC+fZM+M0LSqRyAu9+TnpwjdL8QnMunl5soXEaAhWuegCMQRU3gPw4SwCqYJ9veEOfT+67w4jdAhTWzYEvyL0mp1O2ORapEbql1FPFr8ye2EeLxpOinZF0JmsiyB9l10LaFAX//EOQBZyUpW1qBVIX2io3J7WSwrDooXrk/QK6zwhl0zJ9Psjwj30u2trLlGX7TttnoKHXdZuzD6d/0N1lnJbre0AjJgk42qjHLA==
+ b=oOUggiIi2v5uGQ7owBCEJqY6YtaN+po3d8bGLVrmhLDSi6MSGMkLJyPYKzGiuHiKSJatOjkHqVkcXJKRCXyNdX2CMiKjgy0PJPMathhq8GARr6EbOD8lJAOO3O+SYI88akIiC8MWpgcf+8Qo1KwBiX7DMb/53CrGRXoptnIGhY0kIqX3SabOYsbXwjbzVyZbAH9V/9AkPi/NHDhoCBjm5/zNdn6JNmoDaJZXQrY7h+U4tH45PXHO4Oilb8YLU3FOHFeZsYs+3WjJF0iYnWC1wRLv1kNWR/3p1I8lO1gJGtxhAwoT1DN9Hzq5B5oP/X2UgNH6pLyxnkx2b7f55MPQ3w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z4nuwiHwSt8E245YMqOQAqtMtRvLhq5VMWUpBw+W+Wk=;
- b=IqysHGOURBVQn9V0JFiR8X1uQP5dPc3c8M8Gj31yThhWUvjR+7Unm0Ur4/fPrExuTRh5acVTt5qddAdfGIt6DIwcbXZErRqjWH8XGw4Lk6VBi3gU+hlF+FBnvZAS5WT5Fk/Z2eciOuDLGm61Z0TJ2XmTqiyQw5ojneQmQP7ADhmeAOoN1hhx6hR7fzi8kxCl3zxzg8TQPsYnGPCfdUvB6FVjWhNXwnDjTB6WCvvwd6RJcY/klw6YRITKeWjzlOy9O9LNKb0TPS+s/Ku4s8F6CmN4NEj/00I/B1BzLj0GQeG2i/snBSuqGe9BZkOk0Kk8LTeSm5cAAoN/H1/SUxcbUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=8on6/xXxc0lsJx1jxYZS6kAyl65PGQ9qYN645XAhyPc=;
+ b=G0ulSERJbdqu7gzEUsdyiuURD2A3E2eOY4f8YXVQTGoGu5BbExdlKJsTFRf0YBqqJskOF45CApxrlha5HWx6WiHf5s3w+rhFhGZ8upZyihlmS/rMuxd3SGN9Fju/2f8MBIOi7rlWM7YWjunwnx6crsEqyqyLSnsblR7hr5thc+SBGz40aMWlfdYANsuhvS0PxjsNcGERzBN5FDWQ3r4pP+vq3WFRgbslJujGLW3WFr9rveoZFmXRc2eYCkETUjGRNZC/XaEQN2Wd2QjlVnU2UmabAk8bBuA2iHk6qtKiya4n05ZJwKnd6o0+Q7INBd5k6RscTUIko/yv1T84grTd4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z4nuwiHwSt8E245YMqOQAqtMtRvLhq5VMWUpBw+W+Wk=;
- b=rEAR+SxuYtHaXmxfzzBNR+wA5eQUnY/guQb1wxLFn6lL3EkSoSaJgKagR1YvGPtud2hMQaTMpi8kLrP6VMSfGqv53TlwzAINJlcREPkhhPgkHHoYc3BIrFRTST+skIqOXAO+FT/RDdLgWS9b00FISixleEXlluL0YKzUN97unL54YLbIEsacN4sE2z1gZly3vkEiDF+cG3bkedcRmKe/k4J3KeoXq+oztFWo3I3ymgeMHnJJb2e8XlEIlFSWKBUkWiVwb5Rvo0HOkDNv1vW4P4Id95gOcPjtL0ky+sfKyx3FPSSeZ4gJU7ssZUsDsS8Liz6nqDcXYcZxYnUF/Gvc0A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4206.namprd12.prod.outlook.com (2603:10b6:208:1d5::18)
- by CH2PR12MB4070.namprd12.prod.outlook.com (2603:10b6:610:ae::22) with
+ bh=8on6/xXxc0lsJx1jxYZS6kAyl65PGQ9qYN645XAhyPc=;
+ b=zyEIypN/7Zv21SNu1jm6K17i2ljKEyft/klCapsFyJB8tq1DA8+/SRT0yiL4ivP3fvUNX3dRzbq2fDjlfSca1TRqajKkt1/Z/XApEDQ4hCqkr765/RYSVIPFDFhn+XuvNNrOzwAQPgBdI0sGCOOMcRbPwqlKiq9QNjwgcF3TYyk=
+Received: from BN1PR12CA0016.namprd12.prod.outlook.com (2603:10b6:408:e1::21)
+ by MW5PR12MB5649.namprd12.prod.outlook.com (2603:10b6:303:19d::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.17; Fri, 24 Jun
- 2022 12:54:01 +0000
-Received: from MN2PR12MB4206.namprd12.prod.outlook.com
- ([fe80::d5df:ac97:8e92:fc14]) by MN2PR12MB4206.namprd12.prod.outlook.com
- ([fe80::d5df:ac97:8e92:fc14%8]) with mapi id 15.20.5373.017; Fri, 24 Jun 2022
- 12:54:01 +0000
-Message-ID: <b158ee0d-d7bf-c827-637b-3cd98c66b193@nvidia.com>
-Date:   Fri, 24 Jun 2022 18:23:48 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH 02/13] vfio/mdev: embedd struct mdev_parent in the parent
- data structure
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org, Neo Jia <cjia@nvidia.com>,
-        Dheeraj Nigam <dnigam@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-References: <20220614045428.278494-1-hch@lst.de>
- <20220614045428.278494-3-hch@lst.de>
- <ab47e216-f027-2083-308b-89c6aaa2e806@nvidia.com>
- <20220623201844.GA48313@nvidia.com>
- <f152e97f-0d07-e7a5-baea-3ae7de5662cb@nvidia.com>
- <20220624123344.GL4147@nvidia.com>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-In-Reply-To: <20220624123344.GL4147@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MAXPR0101CA0023.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:c::33) To MN2PR12MB4206.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::18)
+ 2022 13:02:04 +0000
+Received: from BN8NAM11FT053.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e1:cafe::e2) by BN1PR12CA0016.outlook.office365.com
+ (2603:10b6:408:e1::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.15 via Frontend
+ Transport; Fri, 24 Jun 2022 13:02:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT053.mail.protection.outlook.com (10.13.177.209) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5373.15 via Frontend Transport; Fri, 24 Jun 2022 13:02:03 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Fri, 24 Jun
+ 2022 08:02:02 -0500
+Date:   Fri, 24 Jun 2022 08:01:44 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Andy Lutomirski <luto@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-api@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Steven Price" <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Vishal Annapurve" <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        <jun.nakajima@intel.com>, <dave.hansen@intel.com>,
+        <ak@linux.intel.com>, <david@redhat.com>, <aarcange@redhat.com>,
+        <ddutile@redhat.com>, <dhildenb@redhat.com>,
+        Quentin Perret <qperret@google.com>, <mhocko@suse.com>,
+        "Nikunj A. Dadhania" <nikunj@amd.com>
+Subject: Re: [PATCH v6 4/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <20220624130144.2ydfbhytrtv4vgsl@amd.com>
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <20220519153713.819591-5-chao.p.peng@linux.intel.com>
+ <8840b360-cdb2-244c-bfb6-9a0e7306c188@kernel.org>
+ <YofeZps9YXgtP3f1@google.com>
+ <20220623225949.kkdx6uwjlk2ec4iq@amd.com>
+ <20220624085426.GB2178308@chaop.bj.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20220624085426.GB2178308@chaop.bj.intel.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7129dbd5-fae5-4261-8969-08da55e09c80
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4070:EE_
+X-MS-Office365-Filtering-Correlation-Id: b42f8dc5-8468-4f9a-ae39-08da55e1bc03
+X-MS-TrafficTypeDiagnostic: MW5PR12MB5649:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /xXB2phSJDkOIHAZfGcwsLAOn6fqmh2eV17ugktP1pyNyjv8NNvh9fk+am8DCwJygkkwD8bUECFwgLiHhAFLMG9cSo1IeaM4GOK/W+1fn8zhLPymVObS0RFy1cPhKB+cJX0DBXpZL7zWtpWYyTyqo83kUPYT4fNVRUKxY7ia3zq2cQ5ZWZSfldF2xZhmPTcuMH5eCIT4zH/7mMiRAfHk2dEXdk11lIsprcP2p/OvgH+VOebkKx9IMr9gPhDgkOXP+ssp4htvakOvFRixOhzxdl0ARK9q+/GwyH2+THWnsTZXk493Mw2fdY5oXxBD6EuPvP4Y/V1CX1TE6EBvakG0W7D3t88z0uutN/U3hEeibfaHTRAJ3mqRReQdj+aVcwpPzDI6KacuFKIEjOKl4ojohf51moGdK0df/Xk1vVdzEJ5gWxwebE3YCBrkaUEnP4inYQqpaKChnIgX2cg1oxQIi7Yu0gV7LjSo48QdssxslPCAIbK6yUzvoOasNngunLiwmg0J/hG/jl9v+Wivd3JlvmSNufeQyQpQX+Lc/MC/LwhOui9gILF2rfmMdo/EWnHM64STiVaEcDaotyQRJR6+TLGmQEfApCwHwwK5l1bnJhFk5PasQNUtvl6AlRoy5vurFYUoC/fPHDRpFQmwA8txHau46JaWMRWnH3QnvFABATWMteKyoTlrNF5V6uz2bcS0DOsG3eWy/Htd7Emo9NS1C7KEA0p7cDHrAiLUbzl68yRgXCPPenFhdXzSQuCFosOLZvVqt2+ttu196rmnnkgfPzebmJh3UM1OeWtaLwumWq+hscBpNOP/RYlsXYmTRl5FmpmUkJILewoI79WPqY+FRw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4206.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(39860400002)(366004)(376002)(136003)(396003)(6512007)(53546011)(107886003)(186003)(7416002)(2616005)(6506007)(55236004)(26005)(38100700002)(6862004)(2906002)(8936002)(5660300002)(6636002)(41300700001)(6666004)(66556008)(66476007)(66946007)(31686004)(36756003)(4326008)(6486002)(478600001)(316002)(54906003)(37006003)(8676002)(86362001)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cGJILy9McW1yaDdiTjc2QlMzVXlDdTFLUmxtaTd4bmd0WHgvY3JSWUhvR3hV?=
- =?utf-8?B?Wm1jd2pRMXNYZU1wVGRCYU9hNHJQNTNXZ0ZFWVpFNFp6bjVYa2VtRUpoZXg2?=
- =?utf-8?B?WEt2cnN5S1RNOGo4TllGZWtGeXNKWDlyM0xMN2NRTG45TFNtODhWL3REKzN4?=
- =?utf-8?B?UkFSTHoxRXhKTFVieDFrQjU4aVRIN3ZyOHd6RWI4aEdUVVdoN3RnOTY5b3Jp?=
- =?utf-8?B?cFh2UU1jbHZqMC9ZSS9QeHI4OFlHVGR3cjlpZ3VtK2ZrY0JseEdDUGVld1Nz?=
- =?utf-8?B?b0UzM05MWFpyTzQwZHQ1VEtrSWIrbU01a3dkNGFsakV0ZmJsbloxekZ0ek5T?=
- =?utf-8?B?RkpBVDk0TXpta3pLcDZ0UkppeXhjc1dXcTVGNXVHaDgwVkhvZ3NjOW0yN2xm?=
- =?utf-8?B?SGtGOWRKTlNMd2l1bEtBOTJWK0VOQjEvMnhjMHFJWnlEclNtRnRmcWxoKzdm?=
- =?utf-8?B?ZlQweldjV0pSQWVQZjhqcjhzWCtOblpxd0FqWGUxQU5sbXQ4RmhPckhwVlJz?=
- =?utf-8?B?Uk8zZGpSUnpnL2VKVWxBdGRHVGxpaWkrTy9uK0R0M3J1T0svbFdUaXptZWZM?=
- =?utf-8?B?Y0xvQ25VeXNiU01QWHQ2TXJuSkFSUEowVWxla05PYnRkN2ZMYW9QOHpDV1Ev?=
- =?utf-8?B?T0EzamhBTE9vc3ZTVDJYYmJEVU1ZQU5RQWhVTVdKYk5sRmdqNDJFZXpxcjFX?=
- =?utf-8?B?L0cwTTlQZ3htejhTbFRUTXBjZWlUVmJkSitPM3hEVkREai9PVEduWDlQUy9G?=
- =?utf-8?B?RTJVL0gyNG9lbHB6cFRPaTV0UDhYZnVzZkhJcSs3RHMySy9HWVRuUWdHWi82?=
- =?utf-8?B?QWlqYlBvWjg4VWNqY1VEQjZhV29KWXhwYUJVZ01paEVGMWtQQ25wckozSDNo?=
- =?utf-8?B?cXp3aS84QWhYOTFzVm5NR0NKbStpSmJvK2FFanhyZklPMEpRdEJHazg5MEdy?=
- =?utf-8?B?bHVlWlpuUEJlc2lYYWpDS3lkQWY0VWg1YzM4bmdma1FSckdsekRxdzA1Ymsy?=
- =?utf-8?B?dUprK05pdWFDMVRWY05MTFkzVSt0SDBKdWoxZzNwb2RWVEt4NlhTc2pxUGlu?=
- =?utf-8?B?dUFPYVRUcHNxNXJsY2ZuaFNzNTIwL2RnV0xUdTdVeGgxL2k5WkZvK1hBcmF1?=
- =?utf-8?B?NzJPbGdUeXR1anI2OVV5L1ovZjVKMktjdFMvRmVKUGdQMFhjVTRxbXNmbVRN?=
- =?utf-8?B?T3c4a1pkdG1tK0RCc2dwMTVtaDRna08vV0tOb3g3R1p4U1p4Y081QW9NQlp2?=
- =?utf-8?B?OTZiSndzbUdocGFMeXIwZjZCeVZ2cnoranBiK2NOb3VET3FEUHRob2VEby8z?=
- =?utf-8?B?Vmp2TmQ1RTR3SVhYZzBTUkpRTVRXRWtSaHlYL0lxWWhuL29aUkRQcThVbEJh?=
- =?utf-8?B?WDhRV2FrMW51bVlGdndlc1NodVRYZzE2YzFsSGErV0REdlJmWTRKT1ZBMmth?=
- =?utf-8?B?OHdIQU1sUjFvcGIwTUpCY0IvYVM0d2k0TTlMNDE5QjVNWmdyWlh0MCtNYlkw?=
- =?utf-8?B?Wmxkc0FXbXB4ejhNdUgxVVZScWQzUFd1VmdNb1FCQktUaHJyTGthSXVrRVdJ?=
- =?utf-8?B?UU8wb3dRY2VxbEkyZnZxOGNOd2FqbUFYWFFacmVid1NTTDVLWm8rUW1TV05Z?=
- =?utf-8?B?bitTdHdrakhlMG5iYzVFQWNQbnBXN2Q2SElnOGxDbTY0dHlRMkNwUXVCSDFR?=
- =?utf-8?B?K0dITmdlSVBtWGZUMkU0Z1lnWllaUDBudEE0ekoyZTlOeTZiT2N2cXF6WSt5?=
- =?utf-8?B?NXFHbzdhUm5RZ2gvSE0xTlFJNHhnZlNwSVhWaWR2OUZNNmhRQ0hMTGoyeG1X?=
- =?utf-8?B?NC94cmI1b1RhTDBWcDJCbURURXRRRUV4VXNDaTNnQnFoRUtaZWF2QUJQRFYy?=
- =?utf-8?B?RGZBRTNsSVRzZWtUSGlaN25MWncyRUVHY2w5SVBINXVkRnVsYXFDZmJzdVhy?=
- =?utf-8?B?THp1YUVpSUhWN1ZVZkVQVHlKYmJSVnVIZkF1NmFNWHhGSTh4aG8vS0M1aHFS?=
- =?utf-8?B?N3FzUVF0OXB1Y2h4WnBOS2RPYVllb3BCaGlxVEFMQTR3ZkNKL1ppQ0VXbTRF?=
- =?utf-8?B?TjZYS0graENSY2thU1R2R3J4VzQ0T3huSy9Da0NQeUY0c1FyYlVTNThPNURF?=
- =?utf-8?Q?1DdVG3eHvaORbGVuYwn1YtaCd?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7129dbd5-fae5-4261-8969-08da55e09c80
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4206.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2022 12:54:01.6656
+X-Microsoft-Antispam-Message-Info: 6ctnYInZpoqd5MX5k37KdlMO1N+u+N8TUnG8Nn0pudaAFTtkPcIfhB7wpCcqzTOu0vqQ6s4b1wPQZ9fR4wfBs8PdH2Q1d5rBD6FkhhUZwwRewYiO3YIaX2ZfqsprYJ/BJp05ph8A4wplzmG2crJ7CCWQCUmtYrhdSfiVCwkjGfzVvGLgoZ9OQ/BqQQ00idCTumMnte37z6r7oH4Codz+5xpDdrN3IFUYO23x0XAwweonRWc7DOciT5/CqBh5OHoDOx2gGGhtLoaoASIUJzXq8v3ab6ylhnrQU0xleTf6n9RlPJE55TBcRX7EENrRyh0GN6YHcLZUxPEA+pYVckjPGUCav++pOm4tjJ4y/XbDNTW+7SE0BCDIDwAjjoVQ7L7zILW0Ce8fqSR7raRLZfNKih+V4VGKnuo8BPKwowAMmTFtYLg/WE3+ydA1B9xBqv22jXMHYYR71quaMEkt4duFhKphpN7Zrh1KwSCq6q2fyyzdz+CYReEmIOdulN9rpMfy1wvqRrsP7jiua6kEN7vfp8Q8zLJ6ZftjDPKJ5wo1olscjQhjzF3SJet9CpNOCAwTWAqtsDtA/0w5ECQXCNterzetvEdQ0JgAdi9OAAe/4V25i+48ScljHSS1JUEjrxFATEC9AyvDR36fPaJDWBvk3e2KJH4TRpJw7eD7f2eLTa5FhnhB1TJq3A+D8Kdt50uFczwykPP24NF0Ky/VFW6cHiH1jXqCNZRev4DNkuCw3o07iVzE2WeO+LcKsd4c+GKabgpFjC+mZbkeUYMesuVmzLGoPlsrcls5gJIGk0zJfyE87iFX41ZEGwzjztRBB0l5lLMqchyDtOCxCmdOGbginQTfHzyCkXVXjdqBeZIcHcQ=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(396003)(136003)(376002)(346002)(39860400002)(40470700004)(46966006)(36840700001)(26005)(41300700001)(86362001)(40460700003)(6666004)(54906003)(966005)(478600001)(8936002)(5660300002)(2616005)(7406005)(44832011)(82310400005)(2906002)(426003)(47076005)(186003)(16526019)(1076003)(7416002)(8676002)(82740400003)(36860700001)(356005)(40480700001)(81166007)(316002)(6916009)(4326008)(36756003)(83380400001)(70206006)(70586007)(336012)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2022 13:02:03.5925
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: k9ejrPX/KoB1VxGJNEmRvaFQDvRRfyN3J90fIaj+j2AcpbnZRlN//PdrC0uctrSdTe+AEN4BXKF1SjrlUJuSOQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4070
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: b42f8dc5-8468-4f9a-ae39-08da55e1bc03
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT053.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR12MB5649
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 6/24/2022 6:03 PM, Jason Gunthorpe wrote:
-> On Fri, Jun 24, 2022 at 05:59:58PM +0530, Kirti Wankhede wrote:
+On Fri, Jun 24, 2022 at 04:54:26PM +0800, Chao Peng wrote:
+> On Thu, Jun 23, 2022 at 05:59:49PM -0500, Michael Roth wrote:
+> > On Fri, May 20, 2022 at 06:31:02PM +0000, Sean Christopherson wrote:
+> > > On Fri, May 20, 2022, Andy Lutomirski wrote:
+> > > > The alternative would be to have some kind of separate table or bitmap (part
+> > > > of the memslot?) that tells KVM whether a GPA should map to the fd.
+> > > > 
+> > > > What do you all think?
+> > > 
+> > > My original proposal was to have expolicit shared vs. private memslots, and punch
+> > > holes in KVM's memslots on conversion, but due to the way KVM (and userspace)
+> > > handle memslot updates, conversions would be painfully slow.  That's how we ended
+> > > up with the current propsoal.
+> > > 
+> > > But a dedicated KVM ioctl() to add/remove shared ranges would be easy to implement
+> > > and wouldn't necessarily even need to interact with the memslots.  It could be a
+> > > consumer of memslots, e.g. if we wanted to disallow registering regions without an
+> > > associated memslot, but I think we'd want to avoid even that because things will
+> > > get messy during memslot updates, e.g. if dirty logging is toggled or a shared
+> > > memory region is temporarily removed then we wouldn't want to destroy the tracking.
+> > > 
+> > > I don't think we'd want to use a bitmap, e.g. for a well-behaved guest, XArray
+> > > should be far more efficient.
+> > > 
+> > > One benefit to explicitly tracking this in KVM is that it might be useful for
+> > > software-only protected VMs, e.g. KVM could mark a region in the XArray as "pending"
+> > > based on guest hypercalls to share/unshare memory, and then complete the transaction
+> > > when userspace invokes the ioctl() to complete the share/unshare.
+> > 
+> > Another upside to implementing a KVM ioctl is basically the reverse of the
+> > discussion around avoiding double-allocations: *supporting* double-allocations.
+> > 
+> > One thing I noticed while testing SNP+UPM support is a fairly dramatic
+> > slow-down with how it handles OVMF, which does some really nasty stuff
+> > with DMA where it takes 1 or 2 pages and flips them between
+> > shared/private on every transaction. Obviously that's not ideal and
+> > should be fixed directly at some point, but it's something that exists in the
+> > wild and might not be the only such instance where we need to deal with that
+> > sort of usage pattern. 
+> > 
+> > With the current implementation, one option I had to address this was to
+> > disable hole-punching in QEMU when doing shared->private conversions:
+> > 
+> > Boot time from 1GB guest:
+> >                                SNP:   32s
+> >                            SNP+UPM: 1m43s
+> >   SNP+UPM (disable shared discard): 1m08s
+> > 
+> > Of course, we don't have the option of disabling discard/hole-punching
+> > for private memory to see if we get similar gains there, since that also
+> > doubles as the interface for doing private->shared conversions.
 > 
->>> The reason this is here is because the type->parent is used in a few
->>> places and is put back in release:
->>>
->>> @@ -81,7 +81,7 @@ static void mdev_type_release(struct kobject *kobj)
->>>
->>>           pr_debug("Releasing group %s\n", kobj->name);
->>>           /* Pairs with the get in add_mdev_supported_type() */
->>> -       mdev_put_parent(type->parent);
->>> +       put_device(type->parent->dev);
->>>           kfree(type);
->>>    }
->>>
->>> If this was a simple sysfs kobj with only a show/store we wouldn't
->>> need to do anything as the natural kobj parentage holds a ref up to
->>> the struct device - but this kobj is used internally, ie dependent
->>> from mdev_device_create(), independently of the normal sysfs
->>> life-cycle so that doesn't protect enough either.
->>>
->>
->>
->> Life span of 'type' is from mdev_register_device to mdev_unregister_device.
->> If device/parent is being unregistered then only types are removed, so
->> referencing 'type' from mdev_device_create() is still safe. Therefore,
->> parent device's reference should be held and release from
->> register-unregister call.
+> Private should be the same, minus time consumed for private memory, the
+> data should be close to SNP case. You can't try that in current version
+> due to we rely on the existence of the private page to tell a page is
+> private.
 > 
-> No, I've already explained this.
+> > A separate
+> > KVM ioctl to decouple these 2 things would allow for that, and allow for a
+> > way for userspace to implement things like batched/lazy-discard of
+> > previously-converted pages to deal with cases like these.
+> 
+> The planned ioctl includes two responsibilities:
+>   - Mark the range as private/shared
+>   - Zap the existing SLPT mapping for the range
+> 
+> Whether doing the hole-punching or not on the fd is unrelated to this
+> ioctl, userspace has freedom to do that or not. Since we don't reply on
+> the fact that private memoy should have been allocated, we can support
+> lazy faulting and don't need explicit fallocate(). That means, whether
+> the memory is discarded or not in the memory backing store is not
+> required by KVM, but be a userspace option.
 
-Its not correct.
+Nice, that sounds promising.
 
-kobject_init_and_add(&type->kobj, ...) which called from
-mdev_register_parent()
-     -> parent_create_sysfs_files() holds reference for type->kobj
+> 
+> > 
+> > Another motivator for these separate ioctl is that, since we're considering
+> > 'out-of-band' interactions with private memfd where userspace might
+> > erroneously/inadvertently do things like double allocations, another thing it
+> > might do is pre-allocating pages in the private memfd prior to associating
+> > the memfd with a private memslot. Since the notifiers aren't registered until
+> > that point, any associated callbacks that would normally need to be done as
+> > part of those fallocate() notification would be missed unless we do something
+> > like 'replay' all the notifications once the private memslot is registered and
+> > associating with a memfile notifier. But that seems a bit ugly, and I'm not
+> > sure how well that would work. This also seems to hint at this additional
+> > 'conversion' state being something that should be owned and managed directly
+> > by KVM rather than hooking into the allocations.
+> 
+> Right, once we move the private/shared state into KVM then we don't rely
+> on those callbacks so the 'replay' thing is unneeded. fallocate()
+> notification is useless for sure, invalidate() is likely still needed,
+> just like the invalidate for mmu_notifier to bump the mmu_seq and do the
+> zap.
 
-This is released from
-  mdev_unregister_parent()
-      -> parent_remove_sysfs_files()
-          -> kset_unregister()
+Ok, yah, makes sense that we'd still up needing the invalidation hooks.
 
-In the next patch [3/13] of this series, these calltraces are changed as
-mdev_register_parent()
-     -> mdev_type_add()
-         -> kobject_init_and_add(&type->kobj, ...) holds reference for 
-type->kobj
+> 
+> > 
+> > It would also nicely solve the question of how to handle in-place
+> > encryption, since unlike userspace, KVM is perfectly capable of copying
+> > data from shared->private prior to conversion / guest start, and
+> > disallowing such things afterward. Would just need an extra flag basically.
+> 
+> Agree it's possible to do additional copy during the conversion but I'm
+> not so confident this is urgent and the right API. Currently TDX does
+> not have this need. Maybe as the first step just add the conversion
+> itself. Adding additional feature like this can always be possible
+> whenever we are clear.
 
-which is released from
+That seems fair. In the meantime we can adopt the approach proposed by
+Sean and Vishal[1] and handle it directly in the relevant SNP KVM ioctls.
 
-mdev_unregister_parent()
-     -> mdev_type_remove()
-         -> kobject_put(&type->kobj)
+If we end up keeping that approach we'll probably want to make sure these
+KVM-driven 'implicit' conversions are documented in the KVM/SNP API so that
+userspace can account for it in it's view of what's private/shared. In this
+case at least it's pretty obvious, just thinking of when other archs and
+VMMs utilizing this more.
 
-Thanks,
-Kirti
+Thanks!
+
+-Mike
+
+[1] https://lore.kernel.org/kvm/20220524205646.1798325-4-vannapurve@google.com/T/#m1e9bb782b1bea66c36ae7c4c9f4f0c35c2d7e338
+
+> 
+> Thanks,
+> Chao
