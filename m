@@ -2,346 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06C26559CBE
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 17:00:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4501E559CCC
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 17:00:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232909AbiFXOv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 10:51:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54114 "EHLO
+        id S232638AbiFXO72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 10:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233375AbiFXOvL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 10:51:11 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7263382893;
-        Fri, 24 Jun 2022 07:45:41 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25OEBFf0004158;
-        Fri, 24 Jun 2022 14:45:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=+515POr1rNBllaPieGhfoIaJ0XbILDWZ9l76ZjK73Zk=;
- b=skFiesczSOD+FRjeWrfO6wseSp8Fi+0i+V+YXOQ66ElI26TZX39po/SISv3RuxbfHkho
- /sv7dfy7A2lhJ/q0RXB3aYP9HxvWismWpwcw3OVxy8ro8LL7yyalLNH0qY0A0jqr66tD
- CkiRonlUD2xtFFu0nRvbB2bV1i3cv05vFQVcTE5k2duvyso+g9N35dJpaC0Ibirtb0g2
- 1vo9DQ9fYYftakcG9/uZBoz6b03oMlaIaOGX6CvTFPRTGW3uB7tEAfnEVkCmadtR12N0
- kIDawM4JrfrtM/Y5ppm1ONr1LxvRXhm1/zDji+RObFUJPCF3KjkB7csE/ihV89Ec5reE gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gweg79b0g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 14:45:25 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25OEF7Z0022085;
-        Fri, 24 Jun 2022 14:45:25 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gweg79ayq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 14:45:25 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25OEN0nm029241;
-        Fri, 24 Jun 2022 14:45:23 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3gs6b995tw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 14:45:23 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25OEiTqM16122338
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jun 2022 14:44:29 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 613C9A4053;
-        Fri, 24 Jun 2022 14:45:20 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D957A4059;
-        Fri, 24 Jun 2022 14:45:20 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.40])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Jun 2022 14:45:20 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        scgl@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 3/3] lib: s390x: better smp interrupt checks
-Date:   Fri, 24 Jun 2022 16:45:18 +0200
-Message-Id: <20220624144518.66573-4-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220624144518.66573-1-imbrenda@linux.ibm.com>
-References: <20220624144518.66573-1-imbrenda@linux.ibm.com>
+        with ESMTP id S232705AbiFXO7N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 10:59:13 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2073.outbound.protection.outlook.com [40.107.96.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C74C8EF83
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 07:54:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g7QfAEOMUIwIV9SArlfYSz7ThZ4zi0fBOPnlqxII0x3W95GYJiPRwm+0SHOY4Sr+QjK4ICg1Yp6Tv3aXmXdQShpoH+1TtYnJRiYdMBaj0kuTmKsaOp5UKuQp83FJjQ28gDXOpNImOjknAkAVfspmdGx2oG4IwAX75+7+TfxSs+9boY6ryLuOcr85pzt+qWIzYsqgRo9FlsYYoNjuGAM0+RZ4nAoMO+Y2z+2L4vs9vSOxVj/xLA81vG8Dr6OO93PfShHtwj/Qon1YqiZEJens7asR2QGxlAKkXkZ8x9wf2ExZrqw8ctFEbKpJRYA4xCUSOv2dAI8QxHcWE7vJ2MuRTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WrhF/RWafNPD8p+6aD7b+ENXNC3za65nDuEMnM+COkQ=;
+ b=HSDAedplhwmUjTH63DJDn/HRffoN9vMT+KPtmTs1qhZ0BWiS973ZA1JPh1JSUbaXoHi9NXZF0tgVCON+lHuSetqbZW5GcMpb1NwTJ9IVYJDwLxwRkzFGQFZE2C583fm5DW7iXgA9VbjyUgYpzGtOmavLuV12sZ6z5lg9rBijybZRFgnCqyO2cYUrafNs2t+bErVQkk7DhpA6VIpx8ir2M3gHlZt8oILFjpFvG8FjkmJGlc6RVmDXg+j+Y/bWvGOmsjum5JiylxtyvNbdQscstIJCQBa1xaHoDjPAHIMjMQHfm0RdfJArInuKllL1EDqxkg9MPdjxTUnftNsMeLbdpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WrhF/RWafNPD8p+6aD7b+ENXNC3za65nDuEMnM+COkQ=;
+ b=pDrRTthsvOQPsRSaLQ5Yz9WZKp5RemOQeXms7zjyDyju1a/L2CVIvAhYePMvIZP3Cts4Zi1UE79IAyrg43SQNFbLsP5asz1xaJd1IpSVLJdgOAPL5v3l3/vapuFK/lVUGkTd4vBtixsX72Bs8QIhqaF8w09Pua+wCFHxbLWG9gKdPw8WmfOrSqRpN4tmDsodIivKzwab/HMxtiI0pc4bA6lXst9dwi/fSqsGSkcTMGQb0IU4/gKpGViOk4UspSe9TvcNeLASpHASFdiqnk1VVuc5LQXa/FIX4Smy7Jbv9QUBW8oDuYjKd2nrqDnn+KjDf1fJOnne+cggCojALQpi4w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN6PR1201MB2467.namprd12.prod.outlook.com (2603:10b6:404:a7::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.15; Fri, 24 Jun
+ 2022 14:53:59 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5373.016; Fri, 24 Jun 2022
+ 14:53:59 +0000
+Date:   Fri, 24 Jun 2022 11:53:58 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH vfio 2/2] vfio: Split migration ops from main device ops
+Message-ID: <20220624145358.GT4147@nvidia.com>
+References: <2c917ec1-6d4f-50a4-a391-8029c3a3228b@nvidia.com>
+ <5d54c7dc-0c80-5125-9336-c672e0f29cd1@nvidia.com>
+ <20220616170118.497620ba.alex.williamson@redhat.com>
+ <6f6b36765fe9408f902d1d644b149df3@huawei.com>
+ <20220617084723.00298d67.alex.williamson@redhat.com>
+ <4f14e015-e4f7-7632-3cd7-0e644ed05c99@nvidia.com>
+ <20220620034909.GC5219@nvidia.com>
+ <20220621104146.368b429a.alex.williamson@redhat.com>
+ <20220624141237.GQ4147@nvidia.com>
+ <20220624084125.6d819a3c.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220624084125.6d819a3c.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL0PR02CA0017.namprd02.prod.outlook.com
+ (2603:10b6:207:3c::30) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0mMIphXj7hSvZPqlXz8J47mEyuerwgrg
-X-Proofpoint-ORIG-GUID: Dn_Sp5yd397DOLQJTbSHW9SIrC0LobQU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-24_07,2022-06-23_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 phishscore=0 spamscore=0 priorityscore=1501
- impostorscore=0 malwarescore=0 mlxlogscore=935 suspectscore=0
- clxscore=1015 mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2206240056
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 61aacc20-4673-4df7-46d0-08da55f15f09
+X-MS-TrafficTypeDiagnostic: BN6PR1201MB2467:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YhU6JLH9D0eRRcTa8enyuPV3Y2vFtOE0ErVDuyVTpVskauwfe1HHwDRqogzqJ1M2YvC7RPAKPeFzFdWkTqvO9zMDLgfUUrVG2eCpg+b13LwIS3IkkiN0+0XO0PxJRD1wWtrkQ8hu6lp3eWUj3lvQQin+H6gDXi0dVI6sjkJefiFOZrbJxpoMnQhPteNyCv/EuoDufAehHO6ZCM+E0Utnic36mfZN0jTFE8k+QhUf7Sv+lt8+pBKpbXJb8+ee/f4W2RNPdvovsZm7lT7fh524xVpiOhHmRqRnthq53tjNRDWl1xgnaYIJ+igv1t86WtnJILF99M/ciZWVuvSufNPd9Kj8C/S5Chbjo8w+lvcizXFjR1r4cMx/RAMaizGTCuFaSxNlmZmcKg7tExtIhDbl6Aa4m2nLA3EuXlAeLZ2hAACJbh9VTq7N9juHXZNrbwT/Q442fzq5gaVGVF1cS/eB/WLpx+AUS+tASnFvlbYywUOAyK2rT5bTXbWJTBVwe+dSdfze6h/cE63+GiVXBnCzXxkNX5uRIqm9gwitDP532lYYOd90nZUJkpmOgzzPqxawFd11li5fa+dwAvWIj/PRbgCMSYffp954RFVs9eV/bT0tlHYUDLLGyL4njiYlC2zPYDT3vVk9iywDk7PjzdlcPI1EZU/WNlkHX8AfiiJXCM5oWf07/j6UIbnxcsLdtTRm+Fz6hc6ZvoU7o3TsgToCzuRW6tvVvT3qc37BJUQVNRixLcwqWcjUeaAuSDG3EmwU
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(376002)(346002)(39860400002)(366004)(6506007)(86362001)(41300700001)(2616005)(2906002)(33656002)(36756003)(316002)(38100700002)(186003)(6916009)(66946007)(4326008)(1076003)(5660300002)(66556008)(8676002)(6486002)(26005)(478600001)(6512007)(8936002)(54906003)(4744005)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3hKQbU7lRCcZRdWrzQvgCMLfSSVvoOmczRLf5T5M6i7c7p0JOj0SiTPvVm9L?=
+ =?us-ascii?Q?IjWOTwZyZj7CTpZF+gOnfa4QL3JpKYH9/CnpEP//jPiSebw+6CHNcbA4M0U+?=
+ =?us-ascii?Q?JkWoMMVDMRPZ6ZvDPoazBj2MDKrH6PLSFHd/rVLL68eAIHPnNxUQpF5dDdie?=
+ =?us-ascii?Q?g7RnDmzigf47GTfEryx6g3W7pdV1CUpbXgrMLT+puv5sDRxSJdYhXUMrOE93?=
+ =?us-ascii?Q?dvNCytzXsfcPZwnbTExJsy4Q+j78GO2VHJntt6g516/iFke1aE6MEgz0IpAN?=
+ =?us-ascii?Q?rg/inZd13deYMFYfsoFRLwj68H5F58tljfLYZ+l5/bzg+/ecun5pEILApoZY?=
+ =?us-ascii?Q?07oGEbQsNDflWL03M+5qFW6cP3O+iIp14NYDbNZ0ZPCA/r0D1JzJb6y7peyK?=
+ =?us-ascii?Q?tuwgRC8kq2Qx/MmS/nXKEoSpJE5hb9X7PToZ7AmWNfyyY0nna9+iJLnCeYKu?=
+ =?us-ascii?Q?8uF8rYxQXOITv0nae0D5t7NyZnK+q8T7f1F+aFHQoMuO5EyGrkT5tS8wAdaf?=
+ =?us-ascii?Q?RNZKkXXKsIOrxApmZ9Kxh7z+YJvNkMqTp8XmdJIzo+YWNN6cdrtxUxnNo2QP?=
+ =?us-ascii?Q?K8ChYbMZk9KZdyzDok/6s1Sh/OwIhvBOlP7ACZSAFlVTWlVBAYZts3R7smtM?=
+ =?us-ascii?Q?q0g4tHxrwE8Hk6vbZRX4MvOmOQUEEkv04d2UWC325CkChQOydJi16HjAk6F+?=
+ =?us-ascii?Q?rVpq9Zt7W6Q2C1SZtb1mh6vh+oUacQlnYgFRq6ZlachdFXpQmj0p1WeSfa9Z?=
+ =?us-ascii?Q?x5RB9cKsPbrvTYhfrZEPGOcejPM9TBYJnmdBUM4ZMivQteECX6tM87S9+wsl?=
+ =?us-ascii?Q?+R7r6teF7j3GAgABhur19QnYoNAYCS7xI1bgeJdvCpGVpeg4Mg0aCsfsujci?=
+ =?us-ascii?Q?bg71HelhJ3GGrweUDd87ost6SxxW0N6cBtaq5ig/FVmZSPoRXjvfEUg1MCnW?=
+ =?us-ascii?Q?MPy3cD9/1DWf9Lqn9Rjnut4rVU4+k1F3w01i1E+U1aL5YDugsETxXCUdtuTn?=
+ =?us-ascii?Q?sXuLbeTD5qAJYtEtLTww9p/VTh8CTtdeZiSl62B407qZ7ANeRrEdxov7be+P?=
+ =?us-ascii?Q?S2NY4bdzMJztpxQ7GuhGFSrBueF2JSiN22ahcxyrCdHF7lEDkVmqTTuUU0nu?=
+ =?us-ascii?Q?ry5KMHzyPIlIQ2E8b/6oMXgGvgmBygzzwHDRGx243mJG4neX8vV5RzzKgV4a?=
+ =?us-ascii?Q?hBT3gzFdlIX6pqCB4DNh1Ikbijsyq7JHIHs8Z0q+zQotYat5HXh+P6Wu+1t7?=
+ =?us-ascii?Q?hv1JW099WhXBchELUf/VaXBE6IVxqMdXnSzGL02xk9KuLsCvKEK/CT32+W/t?=
+ =?us-ascii?Q?yGOLs6nfqZLDwM9mz3JrpiabtqO8iEkGh14yoAQ1ng83bW+3Sm38ulvNCKmj?=
+ =?us-ascii?Q?7ifPUeDPtFwsfAH440xaG6eqlb08Hijvu+CW/GyPLFRSFJEIaJ/dsxjy78bX?=
+ =?us-ascii?Q?yremSFmp/Wvgk3SYFr3yn4oNqEBBum+3z2sLxtUP2OqvElxZrZAuVAc+cZrK?=
+ =?us-ascii?Q?GqKTdjdp4xO3cEMSnxyepXv5dVilbjhkpeprQ/MCbC3bXpO7l9fa1gkptGX6?=
+ =?us-ascii?Q?Pdv/EiNB+1OVMh7RJylR69smIEbnW1jPEiOy1WDM?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61aacc20-4673-4df7-46d0-08da55f15f09
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2022 14:53:59.7362
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Jc56ikPS+AB7bUM7z9VR4eqQ3bj/VfeBZCUM31cHlrOcWorJHw8SufMw2sYhUiYV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB2467
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use per-CPU flags and callbacks for Program and Extern interrupts,
-instead of global variables.
+On Fri, Jun 24, 2022 at 08:41:25AM -0600, Alex Williamson wrote:
 
-This allows for more accurate error handling; a CPU waiting for an
-interrupt will not have it "stolen" by a different CPU that was not
-supposed to wait for one, and now two CPUs can wait for interrupts at
-the same time.
+> > RDMA uses a function ib_set_device_ops() but that is only because
+> > there is alot of code in that function to do the copying of ops
+> > pointers. Splitting avoids the copying so we don't really need a
+> > function.
+> 
+> So maybe we just need a comment in the definition of the
+> vfio_migration_ops that vfio_device.mig_ops is a static property of the
+> vfio_device which must be set prior to registering the vfio_device.
 
-This will significantly improve error reporting and debugging when
-things go wrong.
+Sure
 
-Both program interrupts and extern interrupts are now CPU-bound, even
-though some extern interrupts are floating (notably, the SCLP
-interrupt). In those cases, the testcases should mask interrupts and/or
-expect them appropriately according to need.
-
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- lib/s390x/asm/arch_def.h | 17 +++++++++++-
- lib/s390x/smp.h          |  8 +-----
- lib/s390x/interrupt.c    | 57 +++++++++++++++++++++++++++++-----------
- lib/s390x/smp.c          | 11 ++++++++
- 4 files changed, 70 insertions(+), 23 deletions(-)
-
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index b0052848..9fefdbff 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -41,6 +41,18 @@ struct psw {
- 	uint64_t	addr;
- };
- 
-+struct cpu {
-+	struct lowcore *lowcore;
-+	uint64_t *stack;
-+	void (*pgm_cleanup_func)(void);
-+	void (*ext_cleanup_func)(void);
-+	uint16_t addr;
-+	uint16_t idx;
-+	bool active;
-+	bool pgm_int_expected;
-+	bool ext_int_expected;
-+};
-+
- #define AS_PRIM				0
- #define AS_ACCR				1
- #define AS_SECN				2
-@@ -125,7 +137,8 @@ struct lowcore {
- 	uint8_t		pad_0x0280[0x0308 - 0x0280];	/* 0x0280 */
- 	uint64_t	sw_int_crs[16];			/* 0x0308 */
- 	struct psw	sw_int_psw;			/* 0x0388 */
--	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
-+	struct cpu *	this_cpu;			/* 0x0398 */
-+	uint8_t		pad_0x03a0[0x11b0 - 0x03a0];	/* 0x03a0 */
- 	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
- 	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
- 	uint64_t	fprs_sa[16];			/* 0x1200 */
-@@ -148,6 +161,8 @@ _Static_assert(sizeof(struct lowcore) == 0x1900, "Lowcore size");
- 
- extern struct lowcore lowcore;
- 
-+#define THIS_CPU (lowcore.this_cpu)
-+
- #define PGM_INT_CODE_OPERATION			0x01
- #define PGM_INT_CODE_PRIVILEGED_OPERATION	0x02
- #define PGM_INT_CODE_EXECUTE			0x03
-diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-index df184cb8..f4ae973d 100644
---- a/lib/s390x/smp.h
-+++ b/lib/s390x/smp.h
-@@ -12,13 +12,6 @@
- 
- #include <asm/arch_def.h>
- 
--struct cpu {
--	struct lowcore *lowcore;
--	uint64_t *stack;
--	uint16_t addr;
--	bool active;
--};
--
- struct cpu_status {
-     uint64_t    fprs[16];                       /* 0x0000 */
-     uint64_t    grs[16];                        /* 0x0080 */
-@@ -52,5 +45,6 @@ int smp_cpu_setup(uint16_t idx, struct psw psw);
- void smp_teardown(void);
- void smp_setup(void);
- int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status);
-+struct lowcore *smp_get_lowcore(uint16_t idx);
- 
- #endif
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index 6da20c44..45f16429 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -15,25 +15,36 @@
- #include <fault.h>
- #include <asm/page.h>
- 
--static bool pgm_int_expected;
--static bool ext_int_expected;
--static void (*pgm_cleanup_func)(void);
--
-+/**
-+ * expect_pgm_int - Expect a program interrupt on the current CPU.
-+ */
- void expect_pgm_int(void)
- {
--	pgm_int_expected = true;
-+	THIS_CPU->pgm_int_expected = true;
- 	lowcore.pgm_int_code = 0;
- 	lowcore.trans_exc_id = 0;
- 	mb();
- }
- 
-+/**
-+ * expect_ext_int - Expect an extern interrupt on the current CPU.
-+ */
- void expect_ext_int(void)
- {
--	ext_int_expected = true;
-+	THIS_CPU->ext_int_expected = true;
- 	lowcore.ext_int_code = 0;
- 	mb();
- }
- 
-+/**
-+ * clear_pgm_int - Clear program interrupt information
-+ *
-+ * Clear program interrupt information, including the expected program
-+ * interrupt flag.
-+ * No program interrupts are expected after calling this function.
-+ *
-+ * Return: the program interrupt code before clearing
-+ */
- uint16_t clear_pgm_int(void)
- {
- 	uint16_t code;
-@@ -42,10 +53,17 @@ uint16_t clear_pgm_int(void)
- 	code = lowcore.pgm_int_code;
- 	lowcore.pgm_int_code = 0;
- 	lowcore.trans_exc_id = 0;
--	pgm_int_expected = false;
-+	THIS_CPU->pgm_int_expected = false;
- 	return code;
- }
- 
-+/**
-+ * check_pgm_int_code - Check the program interrupt code on the current CPU.
-+ * @code the expected program interrupt code on the current CPU
-+ *
-+ * Check and report if the program interrupt on the current CPU matches the
-+ * expected one.
-+ */
- void check_pgm_int_code(uint16_t code)
- {
- 	mb();
-@@ -54,9 +72,19 @@ void check_pgm_int_code(uint16_t code)
- 	       lowcore.pgm_int_code);
- }
- 
-+/**
-+ * register_pgm_cleanup_func - Register a cleanup function for progam
-+ * interrupts for the current CPU.
-+ * @f the cleanup function to be registered on the current CPU
-+ *
-+ * Register a cleanup function to be called at the end of the normal
-+ * interrupt handling for program interrupts for this CPU.
-+ *
-+ * Pass NULL to unregister a previously registered cleanup function.
-+ */
- void register_pgm_cleanup_func(void (*f)(void))
- {
--	pgm_cleanup_func = f;
-+	THIS_CPU->pgm_cleanup_func = f;
- }
- 
- static void fixup_pgm_int(struct stack_frame_int *stack)
-@@ -183,24 +211,23 @@ static void print_pgm_info(struct stack_frame_int *stack)
- 
- void handle_pgm_int(struct stack_frame_int *stack)
- {
--	if (!pgm_int_expected) {
-+	if (!THIS_CPU->pgm_int_expected) {
- 		/* Force sclp_busy to false, otherwise we will loop forever */
- 		sclp_handle_ext();
- 		print_pgm_info(stack);
- 	}
- 
--	pgm_int_expected = false;
-+	THIS_CPU->pgm_int_expected = false;
- 
--	if (pgm_cleanup_func)
--		(*pgm_cleanup_func)();
-+	if (THIS_CPU->pgm_cleanup_func)
-+		THIS_CPU->pgm_cleanup_func();
- 	else
- 		fixup_pgm_int(stack);
- }
- 
- void handle_ext_int(struct stack_frame_int *stack)
- {
--	if (!ext_int_expected &&
--	    lowcore.ext_int_code != EXT_IRQ_SERVICE_SIG) {
-+	if (!THIS_CPU->ext_int_expected && lowcore.ext_int_code != EXT_IRQ_SERVICE_SIG) {
- 		report_abort("Unexpected external call interrupt (code %#x): on cpu %d at %#lx",
- 			     lowcore.ext_int_code, stap(), lowcore.ext_old_psw.addr);
- 		return;
-@@ -210,7 +237,7 @@ void handle_ext_int(struct stack_frame_int *stack)
- 		stack->crs[0] &= ~(1UL << 9);
- 		sclp_handle_ext();
- 	} else {
--		ext_int_expected = false;
-+		THIS_CPU->ext_int_expected = false;
- 	}
- 
- 	if (!(stack->crs[0] & CR0_EXTM_MASK))
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index a0495cd9..65ea524c 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -39,6 +39,15 @@ int smp_query_num_cpus(void)
- 	return sclp_get_cpu_num();
- }
- 
-+struct lowcore *smp_get_lowcore(uint16_t idx)
-+{
-+	if (THIS_CPU->idx == idx)
-+		return &lowcore;
-+
-+	check_idx(idx);
-+	return cpus[idx].lowcore;
-+}
-+
- int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
- {
- 	check_idx(idx);
-@@ -253,6 +262,7 @@ static int smp_cpu_setup_nolock(uint16_t idx, struct psw psw)
- 
- 	/* Copy all exception psws. */
- 	memcpy(lc, cpus[0].lowcore, 512);
-+	lc->this_cpu = cpus + idx;
- 
- 	/* Setup stack */
- 	cpus[idx].stack = (uint64_t *)alloc_pages(2);
-@@ -325,6 +335,7 @@ void smp_setup(void)
- 	for (i = 0; i < num; i++) {
- 		cpus[i].addr = entry[i].address;
- 		cpus[i].active = false;
-+		cpus[i].idx = i;
- 		/*
- 		 * Fill in the boot CPU. If the boot CPU is not at index 0,
- 		 * swap it with the one at index 0. This guarantees that the
--- 
-2.36.1
-
+Jason
