@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7759F55A4A1
-	for <lists+kvm@lfdr.de>; Sat, 25 Jun 2022 01:08:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64EAA55A4CF
+	for <lists+kvm@lfdr.de>; Sat, 25 Jun 2022 01:28:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230355AbiFXXHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 19:07:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40864 "EHLO
+        id S231328AbiFXX1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 19:27:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiFXXHB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 19:07:01 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24ED688B0B
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 16:07:01 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id jh14so3316112plb.1
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 16:07:01 -0700 (PDT)
+        with ESMTP id S230129AbiFXX1i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 19:27:38 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9D687D64
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 16:27:37 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 134-20020a63018c000000b0040cf04213a1so1669458pgb.6
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 16:27:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=M034/RMdz5Qbmfln1Y0Q9RQOoS0pm2Uq8u+/WgT65Dk=;
-        b=anvPTCnvjEhTyxynd7MA372XfOoBsgzujHVVnMw0aW4X99JBDgXo7INlEhM3/WEB3R
-         pRUGu9GCkdOUkL8krJXuuRS+E/shB+vfGy2i834ihRMkEaLd+dYJ0NADhzcd10h7z9LH
-         3igGTaDQZKQFqjDvZ6/xe+5hURawFnKWlWuvAcFttwJrL2sy1gqbBggEvseSA44WgwWQ
-         WFCR7pStad52przPjTR7+5NUu8+l79ZexzZfgNiHEv/1JupLoPa4zh7veKBSIPJF8F2Y
-         Qo2VbA4rCf4i0C03wk9ixgUGuGUg5+bS9scmtmWLoxSkyqTfZNTdBkrpS9ZtP6wYXQ9s
-         b2sg==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=bGEwwK9r6L7n5r0u6Dx3CqpLQXQpKyDLKzzGFvy5vt0=;
+        b=hRmiXc9tTN/+eUZA5alTpsbp4FGvgtMAZJ9DmACX/Cmz+vdWGk7NkwDov0rb09Ntnj
+         8JasqyMD0UnmFBj0nOR43A0gtVIYWKT/v2/qjHd8NNOpz8bPgJIcLswVkW7qr121FHcu
+         mrsTgcxfkdfuv57II9ZKwVfM07UGhBzliy1i0db5qF6w8CSpxd5Z5BiyDqLtGnjwwCv+
+         nN/z/kaSombuGitx8ODDfSSSLRz2JHGxgomOm9gbnG0+DKq4IiHpqKR1hb2L7lZQ+AR9
+         yKFhbFNYuN4XEoHjQspVvllPL//RqBF4QuNuEg5j6B0dkesA/r/9j9EyXdX8NUFnir5N
+         jKIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=M034/RMdz5Qbmfln1Y0Q9RQOoS0pm2Uq8u+/WgT65Dk=;
-        b=qNQ+/GKnuTQ/NSfY3BGnPwQIZChVsiqfrBpKrOl5flyQi1rGc9KJx4JdQ+qTXzqF0P
-         HKh34yGJocgZZNmbctrBSdc1DAWT3lJz+V8GAfuB+i67f0umjeMmO2qcoLMoR0e1PUWH
-         w/gII638Jr76wYO3AzubVW06zVd6K4wRLrkbbJHPv9UtyFnh04JYY2ELSr5xOhFnBywF
-         GpyL6GbRh8DvsV8cvETGg5iSY7XLCjF8sB/mf0Wki/5l5ruzU8tzg0AsatoaZ96j6dxc
-         XPohIDbjMdWFc1+5x82VvRg/bT1IucgWwFAQxlHZCCejVZ89ZYEE/SlpiREODJIUJBWo
-         c2tw==
-X-Gm-Message-State: AJIora9VqLaN/L569ZfQCw+gtjU2zSaocdh0wt47B9+dBuyTaRaXAugb
-        E6ZJDAQECx4i3hKAhKGarGG90XMOeE4DYw==
-X-Google-Smtp-Source: AGRyM1uwRkTAlNC28vzK4calU+YrTTtgqyY4sc7VqpQ7dR60345mVH5JElaVOcC+4QVJPOGTL5Cc0w==
-X-Received: by 2002:a17:902:6901:b0:168:9bb4:7adb with SMTP id j1-20020a170902690100b001689bb47adbmr1410845plk.147.1656112020514;
-        Fri, 24 Jun 2022 16:07:00 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id b205-20020a621bd6000000b0051bb1785286sm2229594pfb.167.2022.06.24.16.06.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jun 2022 16:06:59 -0700 (PDT)
-Date:   Fri, 24 Jun 2022 23:06:56 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=bGEwwK9r6L7n5r0u6Dx3CqpLQXQpKyDLKzzGFvy5vt0=;
+        b=irPpD/VC5aKMpEpf8web7075jwt0dbaUVmf/kqYNavk4IOWa0LCpvcAdo+EcMbwGYV
+         u2AvEQywxkFGpjQ7izjCKEOsG1k0xnleAmyqxSvVprsN1GYx/3QuOCUUxiH9SE5xPqS9
+         2SckzAPY1cf0urAuoD/cGJvjhkVvTnzclfjjsVXy42HtnzZs6s40eA74ZGSOI7w03zyr
+         WWOGG1E3DICYh49oFtPBecBDIJCFM7a0LWBYWXGLBJiYv5SaBvh4SFoLf6TB39l2x2BW
+         qEoplihgJakXYQWdFzAUbycon3fHlF41iM0i08V0wFh5avcirotBs2JFYNge8i6Y6YFy
+         wPZw==
+X-Gm-Message-State: AJIora+6hC9CaLTsJxUV505S0/ASb+DSZtZGRge6SF5QDZ/0oj7zqAM1
+        XTZAUQEAS1IvqPZURMBt1CkxgOU0I9A=
+X-Google-Smtp-Source: AGRyM1soUMSp2JRrMGymkYgHj1TJiKUDBciGq3uHyTvhFQ/4ohUJlXI395zGAoN08rEPVNjI6W8LQd4mdaM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:aa7:9206:0:b0:525:1068:c026 with SMTP id
+ 6-20020aa79206000000b005251068c026mr1604348pfo.52.1656113257525; Fri, 24 Jun
+ 2022 16:27:37 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 24 Jun 2022 23:27:31 +0000
+Message-Id: <20220624232735.3090056-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
+Subject: [PATCH 0/4] KVM: x86/mmu: pte_list_desc fix and cleanups
 From:   Sean Christopherson <seanjc@google.com>
-To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [PATCH 0/5] Fix wrong gfn range of tlb flushing with range
-Message-ID: <YrZDkBSKwuQSrK+r@google.com>
-References: <cover.1656039275.git.houwenlong.hwl@antgroup.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1656039275.git.houwenlong.hwl@antgroup.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,43 +69,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 24, 2022, Hou Wenlong wrote:
-> Commit c3134ce240eed
-> ("KVM: Replace old tlb flush function with new one to flush a specified range.")
-> replaces old tlb flush function with kvm_flush_remote_tlbs_with_address()
-> to do tlb flushing. However, the gfn range of tlb flushing is wrong in
-> some cases. E.g., when a spte is dropped, the start gfn of tlb flushing
+Reviewing the eager page splitting code made me realize that burning 14
+rmap entries for nested TDP MMUs is extremely wasteful due to the per-vCPU
+caches allocating 40 entries by default.  For nested TDP, aliasing L2 gfns
+to L1 gfns is quite rare and is not performance critical (it's exclusively
+pre-boot behavior for sane setups).
 
-Heh, "some" cases.  Looks like KVM is wrong on 7 of 15 cases.  And IIRC, there
-were already several rounds of fixes due to passing "end" instead of "nr_pages".
+Patch 1 fixes a bug where pte_list_desc is not correctly aligned nor sized
+on 32-bit kernels.  The primary motivation for the fix is to be able to add
+a compile-time assertion on the size being a multiple of the cache line
+size, I doubt anyone cares about the performance/memory impact.
 
-Patches look ok on a quick read through, but I'd have to stare a bunch more to
-be confident.
+Patch 2 tweaks MMU setup to support a dynamic pte_list_desc size.
 
-Part of me wonders if we should just revert the whole thing and then only reintroduce
-range-based flushing with proper testing and maybe even require performance numbers
-to justify the benefits.  Give that almost 50% of the users are broken, it's pretty
-obvious that no one running KVM actually tests the behavior.
+Patch 3 reduces the number of sptes per pte_list_desc to 2 for nested TDP
+MMUs, i.e. allocates the bare minimum to prioritize the memory footprint
+over performance for sane setups.
 
-> should be the gfn of spte not the base gfn of SP which contains the spte.
-> So this patchset would fix them and do some cleanups.
-> 
-> Hou Wenlong (5):
->   KVM: x86/mmu: Fix wrong gfn range of tlb flushing in
->     validate_direct_spte()
->   KVM: x86/mmu: Fix wrong gfn range of tlb flushing in
->     kvm_set_pte_rmapp()
->   KVM: x86/mmu: Reduce gfn range of tlb flushing in
->     tdp_mmu_map_handle_target_level()
->   KVM: x86/mmu: Fix wrong start gfn of tlb flushing with range
->   KVM: x86/mmu: Use 1 as the size of gfn range for tlb flushing in
->     FNAME(invlpg)()
-> 
->  arch/x86/kvm/mmu/mmu.c         | 15 +++++++++------
->  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
->  arch/x86/kvm/mmu/tdp_mmu.c     |  4 ++--
->  3 files changed, 12 insertions(+), 9 deletions(-)
-> 
-> --
-> 2.31.1
-> 
+Patch 4 fills the pte_list_desc cache if and only if rmaps are in use,
+i.e. doesn't allocate pte_list_desc when using the TDP MMU until nested
+TDP is used.
+
+Sean Christopherson (4):
+  KVM: x86/mmu: Track the number entries in a pte_list_desc with a ulong
+  KVM: x86/mmu: Defer "full" MMU setup until after vendor
+    hardware_setup()
+  KVM: x86/mmu: Shrink pte_list_desc size when KVM is using TDP
+  KVM: x86/mmu: Topup pte_list_desc cache iff VM is using rmaps
+
+ arch/x86/include/asm/kvm_host.h |  5 ++-
+ arch/x86/kvm/mmu/mmu.c          | 78 +++++++++++++++++++++++----------
+ arch/x86/kvm/x86.c              | 17 ++++---
+ 3 files changed, 70 insertions(+), 30 deletions(-)
+
+
+base-commit: 4b88b1a518b337de1252b8180519ca4c00015c9e
+-- 
+2.37.0.rc0.161.g10f37bed90-goog
+
