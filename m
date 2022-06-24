@@ -2,88 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89797558C1A
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 963F3558C1C
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:09:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229965AbiFXAGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 20:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40130 "EHLO
+        id S229624AbiFXAJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 20:09:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbiFXAGa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 20:06:30 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6965E60F20
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:06:28 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id s1-20020a4adb81000000b00422e6bf0e92so167169oou.13
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:06:28 -0700 (PDT)
+        with ESMTP id S229475AbiFXAJn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 20:09:43 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2237356FAB
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:09:41 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id 128so1047080pfv.12
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:09:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5ztn/U14y4+bLEVfHDiR279Ws4kSCGIatUDLg6ETdSA=;
-        b=sE1nWpmur5YxV9tq2Xcbc8zQ7qv68r4grAVVsiWE+Hb5IjzYTfE2kF71zHL669RRu1
-         8EOee7QUNQm5IwxycAlLVHbYxsj9/B6zjw6THdaB8U9bCQ04QFEyuYMUqXCJL/VwKgQw
-         pERU0qG1+ubCmP0USVfbwqV9mQ7Ae/RYAmO3fT7BMk97N+H1MM15EKJoEsqjc0jqIM4J
-         ZmZqKBi+d2WXbVUkR5ZsnAH9c+tnaqZuMUUSeMcuNV+zfEnu/lsMYmuSZtLU8S8UCtss
-         yBdMMbxpNC6LgDmkRNH0oPPD4EO3hws1baml0AuV16zVe/kIfr0tuYlgKqK5lM8mR69W
-         tMxw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kmIOcSZ0XyvR8utlTv5b37APzufzmKu6KXV604cAkks=;
+        b=PFe18VaFhnS2ZT5vucNtUjtMrbL5fT+p1wHxfF79shjK8OTNjP53aakMa2b+zVXkuc
+         CmA8KDew4qpMkvB6Yk5ZQ4WTjrLuHnFR6dyH+m8BPa6dHem6Em6vDpPKN/etuMv+GIPX
+         jNlPai9N3MGMUF97DkaQORnNzm1lA7ZI7U2mny/9lnqMi4EZ99EHlf3CNPiiBeBypOVE
+         Yapf26UfzsiC40UcMcnUwh4BOqyrrHAi/tg1RBSN7ThyTMI2f6qokY8M3DIs9fBGQ6YR
+         vCu2CgQcMubPd4aHpb/Plffwgn5V7kQAPWkC38EyQoe/PfanOtJxDvYcHeyFV5t5dcvO
+         ScjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5ztn/U14y4+bLEVfHDiR279Ws4kSCGIatUDLg6ETdSA=;
-        b=X+tBe1/8+0BOxRhNfmgjsbAaW935TIWBznd4nvghwSJM+8idnvMXQgD2TuZJVlm/Xv
-         SwoLs2DfxJfJ6uvL1bYagPZ50ufNd6enolClmNFQqqx38pvzRQj8mSR05zo9F4IeUI3n
-         c3IatEX7wAJJswSus+GamWyGS+YA0uxnIBzJxX6WNnoaOhZwyTv5t4ItHfHV/TlFiTJt
-         V9uMC0wQTRJH18/zDqTA8hdUqg48CvTzczUsCsPPdncTL8vclyaXkjY340oF5x+BHrbQ
-         UiA7U/uWzA4wH7F2thi5WbRY0mEhtv1icUncZ3Nt1NhJJ7/H1yKA8E8DGU9cICLZABEH
-         +ZzA==
-X-Gm-Message-State: AJIora9OLz9UR6rWGHZ0aEZ/ACc3pvaGHwlAdVbXUa3l7yDBXMGRkGOx
-        duVNuQioo/rZLddAYL8Hp4lDu7PBqNP7WwKl78Tghw==
-X-Google-Smtp-Source: AGRyM1v+s5D9Hg1qgXGD+4GvtPs2SxeqIL4O85m4dCEssimCyLkAYn0KyTciSq2Hm2MRqFVC/wqLMIaPXf3Gq+wcLLY=
-X-Received: by 2002:a4a:d842:0:b0:41b:c75d:f2dd with SMTP id
- g2-20020a4ad842000000b0041bc75df2ddmr4805823oov.20.1656029187423; Thu, 23 Jun
- 2022 17:06:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
-In-Reply-To: <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 23 Jun 2022 17:06:16 -0700
-Message-ID: <CAA03e5HDxkhV1rnVfPj7W_Hf85JMAG0s8eLKN6hA0n4sCy8tww@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
- when adding it to RMP table
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kmIOcSZ0XyvR8utlTv5b37APzufzmKu6KXV604cAkks=;
+        b=fJkGFiNIseqzpLxdPps9ViWpiBeYV32JTgul3cdQpzc+pmvGysWMigjuyULv6p5v89
+         dAkyJ217S5+DuGmTP9ge/YS1WhXuM+HVkx2QQV7grWMX+hEy+BKXQduHMOjAc5vPkebr
+         H+Irjpa9CCnWXfrhIs9nMMC5+GN2xuevCoKrzVtP/fcOhrr9oYHCZSPHgQYf1iqX6Olk
+         hE8rVNaAIov0SRSIhl2cndUXQ+HHj9nMArcsx0brAusAofYVLysQCOHLwrtzzbhxODJe
+         X5XwVy5q75WLXEsycPy0NYjIsHEDXT5xS4w9opaVidu6+4uJnWoMhfeHxsXLVs+X9OfJ
+         TX+Q==
+X-Gm-Message-State: AJIora/QS1OkHniD/vhbEF7p9qgba9v5GFtgfsi3cyi0YLrYa5rGCKn3
+        1OdLjDejAG25wSjaYAQ7Brvcvw==
+X-Google-Smtp-Source: AGRyM1vOU2JOxzyPmhn3SCTphsf1lpqO4zI/+wpXbPVC8mkQutvYrMGQoOaRm82CH9BNGfIrgKqQHg==
+X-Received: by 2002:a63:371e:0:b0:40c:f411:6768 with SMTP id e30-20020a63371e000000b0040cf4116768mr9519656pga.471.1656029380480;
+        Thu, 23 Jun 2022 17:09:40 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id z11-20020aa7888b000000b0052516db7123sm229410pfe.35.2022.06.23.17.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jun 2022 17:09:39 -0700 (PDT)
+Date:   Fri, 24 Jun 2022 00:09:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v1 01/10] KVM: VMX: Move
+ CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering out of setup_vmcs_config()
+Message-ID: <YrUAwPJTrYNT+zIt@google.com>
+References: <20220622164432.194640-1-vkuznets@redhat.com>
+ <20220622164432.194640-2-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220622164432.194640-2-vkuznets@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -95,130 +76,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 4:03 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> The integrity guarantee of SEV-SNP is enforced through the RMP table.
-> The RMP is used with standard x86 and IOMMU page tables to enforce memory
-> restrictions and page access rights. The RMP check is enforced as soon as
-> SEV-SNP is enabled globally in the system. When hardware encounters an
-> RMP checks failure, it raises a page-fault exception.
-
-nit: "RMP checks ..." -> "RMP-check ..."
-
->
-> The rmp_make_private() and rmp_make_shared() helpers are used to add
-> or remove the pages from the RMP table. Improve the rmp_make_private() to
-> invalid state so that pages cannot be used in the direct-map after its
-
-nit: "invalid state ..." -> "invalidate state ..."
-nit: "... after its" -> "... after they're"
-
-(Here, and in the patch subject too.)
-
-> added in the RMP table, and restore to its default valid permission after
-
-nit: "... restore to its ..." -> "... restored to their ..."
-
-> the pages are removed from the RMP table.
->
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+On Wed, Jun 22, 2022, Vitaly Kuznetsov wrote:
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  arch/x86/kernel/sev.c | 61 ++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 60 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index f6c64a722e94..734cddd837f5 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -2451,10 +2451,42 @@ int psmash(u64 pfn)
->  }
->  EXPORT_SYMBOL_GPL(psmash);
->
-> +static int restore_direct_map(u64 pfn, int npages)
-> +{
-> +       int i, ret = 0;
-> +
-> +       for (i = 0; i < npages; i++) {
-> +               ret = set_direct_map_default_noflush(pfn_to_page(pfn + i));
-> +               if (ret)
-> +                       goto cleanup;
-> +       }
-> +
-> +cleanup:
-> +       WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i);
-> +       return ret;
-> +}
-> +
-> +static int invalid_direct_map(unsigned long pfn, int npages)
+>  arch/x86/kvm/vmx/vmx.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 5e14e4c40007..24da9e93bdab 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2490,11 +2490,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>  	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_PROCBASED_CTLS,
+>  				&_cpu_based_exec_control) < 0)
+>  		return -EIO;
+> -#ifdef CONFIG_X86_64
+> -	if (_cpu_based_exec_control & CPU_BASED_TPR_SHADOW)
+> -		_cpu_based_exec_control &= ~CPU_BASED_CR8_LOAD_EXITING &
+> -					   ~CPU_BASED_CR8_STORE_EXITING;
 
-I think we should rename this function to "invalidate_direct_map()".
+Eww, who does a double "~" with an "&"?
 
-> +{
-> +       int i, ret = 0;
-> +
-> +       for (i = 0; i < npages; i++) {
-> +               ret = set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
-> +               if (ret)
-> +                       goto cleanup;
-> +       }
-> +
-> +       return 0;
-> +
-> +cleanup:
-> +       restore_direct_map(pfn, i);
-> +       return ret;
-> +}
-> +
->  static int rmpupdate(u64 pfn, struct rmpupdate *val)
+> -#endif
+>  	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS) {
+>  		min2 = 0;
+>  		opt2 = SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+> @@ -4285,6 +4280,12 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
 >  {
->         unsigned long paddr = pfn << PAGE_SHIFT;
-> -       int ret;
-> +       int ret, level, npages;
->
->         if (!pfn_valid(pfn))
->                 return -EINVAL;
-> @@ -2462,11 +2494,38 @@ static int rmpupdate(u64 pfn, struct rmpupdate *val)
->         if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
->                 return -ENXIO;
->
-> +       level = RMP_TO_X86_PG_LEVEL(val->pagesize);
-> +       npages = page_level_size(level) / PAGE_SIZE;
-> +
-> +       /*
-> +        * If page is getting assigned in the RMP table then unmap it from the
-> +        * direct map.
-> +        */
-> +       if (val->assigned) {
-> +               if (invalid_direct_map(pfn, npages)) {
-> +                       pr_err("Failed to unmap pfn 0x%llx pages %d from direct_map\n",
-> +                              pfn, npages);
-> +                       return -EFAULT;
-> +               }
-> +       }
-> +
->         /* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
->         asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
->                      : "=a"(ret)
->                      : "a"(paddr), "c"((unsigned long)val)
->                      : "memory", "cc");
-> +
-> +       /*
-> +        * Restore the direct map after the page is removed from the RMP table.
-> +        */
-> +       if (!ret && !val->assigned) {
-> +               if (restore_direct_map(pfn, npages)) {
-> +                       pr_err("Failed to map pfn 0x%llx pages %d in direct_map\n",
-> +                              pfn, npages);
-> +                       return -EFAULT;
-> +               }
-> +       }
-> +
->         return ret;
->  }
->
-> --
-> 2.25.1
->
->
+>  	u32 exec_control = vmcs_config.cpu_based_exec_ctrl;
+>  
+> +#ifdef CONFIG_X86_64
+> +	if (exec_control & CPU_BASED_TPR_SHADOW)
+> +		exec_control &= ~CPU_BASED_CR8_LOAD_EXITING &
+> +			~CPU_BASED_CR8_STORE_EXITING;
+
+If you shove this done a few lines, then you can have a single set of #ifdefs,
+and avoid restoring the controls a few lines later if it turns out KVM isn't
+enabling the TPR shadow, e.g. (with fixup to use the more canonical ~(x | y)
+pattern).
+
+	if (!cpu_need_tpr_shadow(&vmx->vcpu))
+		exec_control &= ~CPU_BASED_TPR_SHADOW;
+
+#ifdef CONFIG_X86_64
+	if (exec_control & CPU_BASED_TPR_SHADOW)
+		exec_control &= ~(CPU_BASED_CR8_LOAD_EXITING |
+				  CPU_BASED_CR8_STORE_EXITING);
+	else
+		exec_control |= CPU_BASED_CR8_STORE_EXITING |
+				CPU_BASED_CR8_LOAD_EXITING;
+#endif
