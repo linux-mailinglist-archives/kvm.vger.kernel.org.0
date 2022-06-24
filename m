@@ -2,136 +2,440 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1FBC559B83
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 16:28:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B1BB559B8F
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 16:33:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232211AbiFXO2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 10:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57332 "EHLO
+        id S230073AbiFXOdh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 10:33:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230224AbiFXO2h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 10:28:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5130A54BEB
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 07:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656080915;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p4JvKqCiOdKw+A9E4Z2S6cfj22fiQzAHjq7B7dp14dQ=;
-        b=chHNKsX4l/r256r6McYA601XCObk48MqS4mb0o4IAJE02XJCQ6l9tjhUAZTFyrDKqMUE71
-        GVUayCAQbZGHPjBcX+I/Ybc9TtBka8G1MsqCKZ2dfJ3vBAg3yc32B5pgohI73ml15n6nUn
-        q6/GPy9rRzneAOCQ5s3JYfXgRLlNnLI=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-382-pEP3u2EnOeSO_Qeyr98w6w-1; Fri, 24 Jun 2022 10:28:34 -0400
-X-MC-Unique: pEP3u2EnOeSO_Qeyr98w6w-1
-Received: by mail-il1-f200.google.com with SMTP id f18-20020a056e020c7200b002d949d97ed9so1500283ilj.7
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 07:28:34 -0700 (PDT)
+        with ESMTP id S232046AbiFXOdg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 10:33:36 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D285CE0B
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 07:33:34 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id o23so2947314ljg.13
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 07:33:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0yhMNVTfPgAiz+CgtIR9pHMpZQGSdtbAVl/2DeBNAqc=;
+        b=SjJEMzrWxAcKwc5YzGrav8NBQX276eeEeaWCtW3CaaxjO2ltEuVAL6sjneDt8mLwMn
+         G6omp21sIapg84ueYj+ecm4lMnl2oPZc8MrWyBu7vx5vt3yt77+RjCP//eeuR7ow53sn
+         VnnylV8XIzAoEQEuEz4hxs8qd3t0zqP4KQ9SzEQh0VCHd4ml8YA99OQxsqxV3YgqjJjL
+         aWusHu4Bphs1xWYY5SOgSPxmBo+MvIuc/HJDTXMRpWrdYBJWzuf/0vsMJWq14wpSeisJ
+         MnxOEE3UFKvBxX5t+eB5AQfzMwsQX0c/vbKbT//6/qzs6CLTB1B9hAzjiZz/YUrPRgCg
+         585A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=p4JvKqCiOdKw+A9E4Z2S6cfj22fiQzAHjq7B7dp14dQ=;
-        b=rlhIZ2gQmtU2y0GrH14Vbk+STizMTX4xv6CNtpRCbKt/5VytewLFmZ/NN0myoFMHw2
-         94r3ZVkT2nr11W8I7oIodPELmkS8JrY7qjuYJikcCuuNvR8KNECR/sk3580PoJUEQrJH
-         OAfehXtL7ZN246Yu4b4Xd7BBbuqrvyBnho0DFt3UU/aHQWMR5jPvakmyzuHfePqiIvEi
-         N+otdNhukLOfZ12/+vuwPVb9yIrNSWqKOtS8MEbYifhrN4tQGDrXigwkoa2r17Be5DVR
-         evn5ZFuo5EOf/8CXwDYCiJQiRpBkgxmft9+vjSj4YB2WG9Oh6+nPvmUKbZ7fZnbrOuTv
-         b8aQ==
-X-Gm-Message-State: AJIora98H5q5CnUb2eMKuxsibhWLr9PnR+Zg8WdBDvvCzQcU9tq6gu1c
-        uaTUJhBNvGPsWCenHGc3k1zKBEKZHRlRctCr1UUP4M5NfCPlPTSu7EhA693ZbGD3c8zcYHfyfnW
-        Y9Quxzq5Mabj2
-X-Received: by 2002:a6b:4e14:0:b0:674:f787:ccc9 with SMTP id c20-20020a6b4e14000000b00674f787ccc9mr3406924iob.55.1656080913725;
-        Fri, 24 Jun 2022 07:28:33 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sAYENMFVMTMR+qSukJBYoPPYDA1IawKk6u6vxfGS5ZaF7SIgNQl/j1f+D7x5oOoyI0hy3bnw==
-X-Received: by 2002:a6b:4e14:0:b0:674:f787:ccc9 with SMTP id c20-20020a6b4e14000000b00674f787ccc9mr3406911iob.55.1656080913442;
-        Fri, 24 Jun 2022 07:28:33 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l5-20020a02cce5000000b003314d7b59b0sm1125426jaq.88.2022.06.24.07.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jun 2022 07:28:32 -0700 (PDT)
-Date:   Fri, 24 Jun 2022 08:28:31 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>, cohuck@redhat.com,
-        iommu@lists.linux.dev, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] vfio/type1: Simplify bus_type determination
-Message-ID: <20220624082831.22de3d51.alex.williamson@redhat.com>
-In-Reply-To: <20220624141836.GS4147@nvidia.com>
-References: <b1d13cade281a7d8acbfd0f6a33dcd086207952c.1655898523.git.robin.murphy@arm.com>
-        <20220622161721.469fc9eb.alex.williamson@redhat.com>
-        <68263bd7-4528-7acb-b11f-6b1c6c8c72ef@arm.com>
-        <20220623170044.1757267d.alex.williamson@redhat.com>
-        <20220624015030.GJ4147@nvidia.com>
-        <20220624081159.508baed3.alex.williamson@redhat.com>
-        <20220624141836.GS4147@nvidia.com>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0yhMNVTfPgAiz+CgtIR9pHMpZQGSdtbAVl/2DeBNAqc=;
+        b=MDcwWqRlyyRNJ11hrwhJ788UvKSRxlvNR5AzR/HQqY9HLHfznkmEhnpe75ewKEojHJ
+         HKIngixIa41ZNDx019M8+clePurMPAKivUVegMEZoZA634zYHCaIzdU7bv5Bn8zpFGOd
+         qGtnToWkK8rzkfcSkD8R/8mVJTe5g0LGa96pxKqiuViuAhjm8rFDO9/ZhZD4Gq7AagPo
+         2JmhqC+geZNQNRT0ViQlWS2AVd5L2M+XE4mqnNL8ga05kSOsXNiX6Nn/jJEz+5bwLUBq
+         DMX4RWgmvy6hUwzSQQV+r5L5Omp3ubCtBtsrys7k2AV3i6jYtmb2aFW5gXE5DHmiJcNP
+         xTDw==
+X-Gm-Message-State: AJIora897jcAPwRyk7ye73+T1maROjfUq0+mYLyHiAZAk6CABz1JWtZ9
+        hnbEPlx1tOyKhFh3rCWkAwcoxCvb3xW3K9Kkkad8pw==
+X-Google-Smtp-Source: AGRyM1vdiMmZacgjEGkkuIL1NK5wWJI4LMznvMCziB6kOQphLZLpwbEtJYE7oZ87HpYB93JjjWFeHHJ2h3V4164qP4I=
+X-Received: by 2002:a2e:2a43:0:b0:25a:84a9:921c with SMTP id
+ q64-20020a2e2a43000000b0025a84a9921cmr7511271ljq.83.1656081212439; Fri, 24
+ Jun 2022 07:33:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <cover.1655761627.git.ashish.kalra@amd.com> <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 24 Jun 2022 08:33:21 -0600
+Message-ID: <CAMkAt6o2cQPAAzYK31myzBQWckUSQWVOOV2+-5VpnTym-wN7sA@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 26/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 24 Jun 2022 11:18:36 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Mon, Jun 20, 2022 at 5:08 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The KVM_SEV_SNP_LAUNCH_UPDATE command can be used to insert data into the
+> guest's memory. The data is encrypted with the cryptographic context
+> created with the KVM_SEV_SNP_LAUNCH_START.
+>
+> In addition to the inserting data, it can insert a two special pages
+> into the guests memory: the secrets page and the CPUID page.
+>
+> While terminating the guest, reclaim the guest pages added in the RMP
+> table. If the reclaim fails, then the page is no longer safe to be
+> released back to the system and leak them.
+>
+> For more information see the SEV-SNP specification.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  .../virt/kvm/x86/amd-memory-encryption.rst    |  29 +++
+>  arch/x86/kvm/svm/sev.c                        | 187 ++++++++++++++++++
+>  include/uapi/linux/kvm.h                      |  19 ++
+>  3 files changed, 235 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> index 878711f2dca6..62abd5c1f72b 100644
+> --- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> @@ -486,6 +486,35 @@ Returns: 0 on success, -negative on error
+>
+>  See the SEV-SNP specification for further detail on the launch input.
+>
+> +20. KVM_SNP_LAUNCH_UPDATE
+> +-------------------------
+> +
+> +The KVM_SNP_LAUNCH_UPDATE is used for encrypting a memory region. It also
+> +calculates a measurement of the memory contents. The measurement is a signature
+> +of the memory contents that can be sent to the guest owner as an attestation
+> +that the memory was encrypted correctly by the firmware.
+> +
+> +Parameters (in): struct  kvm_snp_launch_update
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_sev_snp_launch_update {
+> +                __u64 start_gfn;        /* Guest page number to start from. */
+> +                __u64 uaddr;            /* userspace address need to be encrypted */
+> +                __u32 len;              /* length of memory region */
+> +                __u8 imi_page;          /* 1 if memory is part of the IMI */
+> +                __u8 page_type;         /* page type */
+> +                __u8 vmpl3_perms;       /* VMPL3 permission mask */
+> +                __u8 vmpl2_perms;       /* VMPL2 permission mask */
+> +                __u8 vmpl1_perms;       /* VMPL1 permission mask */
+> +        };
+> +
+> +See the SEV-SNP spec for further details on how to build the VMPL permission
+> +mask and page type.
+> +
+> +
+>  References
+>  ==========
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 41b83aa6b5f4..b5f0707d7ed6 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/processor.h>
+>  #include <linux/trace_events.h>
+>  #include <linux/hugetlb.h>
+> +#include <linux/sev.h>
+>
+>  #include <asm/pkru.h>
+>  #include <asm/trapnr.h>
+> @@ -233,6 +234,49 @@ static void sev_decommission(unsigned int handle)
+>         sev_guest_decommission(&decommission, NULL);
+>  }
+>
+> +static inline void snp_leak_pages(u64 pfn, enum pg_level level)
+> +{
+> +       unsigned int npages = page_level_size(level) >> PAGE_SHIFT;
+> +
+> +       WARN(1, "psc failed pfn 0x%llx pages %d (leaking)\n", pfn, npages);
+> +
+> +       while (npages) {
+> +               memory_failure(pfn, 0);
+> +               dump_rmpentry(pfn);
+> +               npages--;
+> +               pfn++;
+> +       }
+> +}
 
-> On Fri, Jun 24, 2022 at 08:11:59AM -0600, Alex Williamson wrote:
-> > On Thu, 23 Jun 2022 22:50:30 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Thu, Jun 23, 2022 at 05:00:44PM -0600, Alex Williamson wrote:
-> > >   
-> > > > > >> +struct vfio_device *vfio_device_get_from_iommu(struct iommu_group *iommu_group)
-> > > > > >> +{
-> > > > > >> +	struct vfio_group *group = vfio_group_get_from_iommu(iommu_group);
-> > > > > >> +	struct vfio_device *device;      
-> > > > > > 
-> > > > > > Check group for NULL.      
-> > > > > 
-> > > > > OK - FWIW in context this should only ever make sense to call with an 
-> > > > > iommu_group which has already been derived from a vfio_group, and I did 
-> > > > > initially consider a check with a WARN_ON(), but then decided that the 
-> > > > > unguarded dereference would be a sufficiently strong message. No problem 
-> > > > > with bringing that back to make it more defensive if that's what you prefer.    
-> > > > 
-> > > > A while down the road, that's a bit too much implicit knowledge of the
-> > > > intent and single purpose of this function just to simply avoid a test.    
-> > > 
-> > > I think we should just pass the 'struct vfio_group *' into the
-> > > attach_group op and have this API take that type in and forget the
-> > > vfio_group_get_from_iommu().  
-> > 
-> > That's essentially what I'm suggesting, the vfio_group is passed as an
-> > opaque pointer which type1 can use for a
-> > vfio_group_for_each_vfio_device() type call.  Thanks,  
-> 
-> I don't want to add a whole vfio_group_for_each_vfio_device()
-> machinery that isn't actually needed by anything.. This is all
-> internal, we don't need to design more than exactly what is needed.
-> 
-> At this point if we change the signature of the attach then we may as
-> well just pass in the representative vfio_device, that is probably
-> less LOC overall.
+Should this be deduplicated with the snp_leak_pages() in "crypto: ccp:
+Handle the legacy TMR allocation when SNP is enabled" ?
 
-That means that vfio core still needs to pick an arbitrary
-representative device, which I find in fundamental conflict to the
-nature of groups.  Type1 is the interface to the IOMMU API, if through
-the IOMMU API we can make an assumption that all devices within the
-group are equivalent for a given operation, that should be done in type1
-code, not in vfio core.  A for-each interface is commonplace and not
-significantly more code or design than already proposed.  Thanks,
+> +
+> +static int snp_page_reclaim(u64 pfn)
+> +{
+> +       struct sev_data_snp_page_reclaim data = {0};
+> +       int err, rc;
+> +
+> +       data.paddr = __sme_set(pfn << PAGE_SHIFT);
+> +       rc = snp_guest_page_reclaim(&data, &err);
+> +       if (rc) {
+> +               /*
+> +                * If the reclaim failed, then page is no longer safe
+> +                * to use.
+> +                */
+> +               snp_leak_pages(pfn, PG_LEVEL_4K);
+> +       }
+> +
+> +       return rc;
+> +}
+> +
+> +static int host_rmp_make_shared(u64 pfn, enum pg_level level, bool leak)
+> +{
+> +       int rc;
+> +
+> +       rc = rmp_make_shared(pfn, level);
+> +       if (rc && leak)
+> +               snp_leak_pages(pfn, level);
+> +
+> +       return rc;
+> +}
+> +
+>  static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
+>  {
+>         struct sev_data_deactivate deactivate;
+> @@ -1902,6 +1946,123 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         return rc;
+>  }
+>
+> +static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct list_head *head = &sev->regions_list;
+> +       struct enc_region *i;
+> +
+> +       lockdep_assert_held(&kvm->lock);
+> +
+> +       list_for_each_entry(i, head, list) {
+> +               u64 start = i->uaddr;
+> +               u64 end = start + i->size;
+> +
+> +               if (start <= hva && end >= (hva + len))
+> +                       return true;
+> +       }
 
-Alex
+Given that usersapce could load sev->regions_list with any # of any
+sized regions. Should we add a  cond_resched() like in
+sev_vm_destroy()?
 
+> +
+> +       return false;
+> +}
+> +
+> +static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_snp_launch_update data = {0};
+> +       struct kvm_sev_snp_launch_update params;
+> +       unsigned long npages, pfn, n = 0;
+> +       int *error = &argp->error;
+> +       struct page **inpages;
+> +       int ret, i, level;
+> +       u64 gfn;
+> +
+> +       if (!sev_snp_guest(kvm))
+> +               return -ENOTTY;
+> +
+> +       if (!sev->snp_context)
+> +               return -EINVAL;
+> +
+> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +               return -EFAULT;
+> +
+> +       /* Verify that the specified address range is registered. */
+> +       if (!is_hva_registered(kvm, params.uaddr, params.len))
+> +               return -EINVAL;
+> +
+> +       /*
+> +        * The userspace memory is already locked so technically we don't
+> +        * need to lock it again. Later part of the function needs to know
+> +        * pfn so call the sev_pin_memory() so that we can get the list of
+> +        * pages to iterate through.
+> +        */
+> +       inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
+> +       if (!inpages)
+> +               return -ENOMEM;
+> +
+> +       /*
+> +        * Verify that all the pages are marked shared in the RMP table before
+> +        * going further. This is avoid the cases where the userspace may try
+> +        * updating the same page twice.
+> +        */
+> +       for (i = 0; i < npages; i++) {
+> +               if (snp_lookup_rmpentry(page_to_pfn(inpages[i]), &level) != 0) {
+> +                       sev_unpin_memory(kvm, inpages, npages);
+> +                       return -EFAULT;
+> +               }
+> +       }
+> +
+> +       gfn = params.start_gfn;
+> +       level = PG_LEVEL_4K;
+> +       data.gctx_paddr = __psp_pa(sev->snp_context);
+> +
+> +       for (i = 0; i < npages; i++) {
+> +               pfn = page_to_pfn(inpages[i]);
+> +
+> +               ret = rmp_make_private(pfn, gfn << PAGE_SHIFT, level, sev_get_asid(kvm), true);
+> +               if (ret) {
+> +                       ret = -EFAULT;
+> +                       goto e_unpin;
+> +               }
+> +
+> +               n++;
+> +               data.address = __sme_page_pa(inpages[i]);
+> +               data.page_size = X86_TO_RMP_PG_LEVEL(level);
+> +               data.page_type = params.page_type;
+> +               data.vmpl3_perms = params.vmpl3_perms;
+> +               data.vmpl2_perms = params.vmpl2_perms;
+> +               data.vmpl1_perms = params.vmpl1_perms;
+> +               ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE, &data, error);
+> +               if (ret) {
+> +                       /*
+> +                        * If the command failed then need to reclaim the page.
+> +                        */
+> +                       snp_page_reclaim(pfn);
+> +                       goto e_unpin;
+> +               }
+> +
+> +               gfn++;
+> +       }
+> +
+> +e_unpin:
+> +       /* Content of memory is updated, mark pages dirty */
+> +       for (i = 0; i < n; i++) {
+
+Since |n| is not only a loop variable but actually carries the number
+of private pages over to e_unpin can we use a more descriptive name?
+How about something like 'nprivate_pages'?
+
+> +               set_page_dirty_lock(inpages[i]);
+> +               mark_page_accessed(inpages[i]);
+> +
+> +               /*
+> +                * If its an error, then update RMP entry to change page ownership
+> +                * to the hypervisor.
+> +                */
+> +               if (ret)
+> +                       host_rmp_make_shared(pfn, level, true);
+> +       }
+> +
+> +       /* Unlock the user pages */
+> +       sev_unpin_memory(kvm, inpages, npages);
+> +
+> +       return ret;
+> +}
+> +
+>  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>         struct kvm_sev_cmd sev_cmd;
+> @@ -1995,6 +2156,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>         case KVM_SEV_SNP_LAUNCH_START:
+>                 r = snp_launch_start(kvm, &sev_cmd);
+>                 break;
+> +       case KVM_SEV_SNP_LAUNCH_UPDATE:
+> +               r = snp_launch_update(kvm, &sev_cmd);
+> +               break;
+>         default:
+>                 r = -EINVAL;
+>                 goto out;
+> @@ -2113,6 +2277,29 @@ find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
+>  static void __unregister_enc_region_locked(struct kvm *kvm,
+>                                            struct enc_region *region)
+>  {
+> +       unsigned long i, pfn;
+> +       int level;
+> +
+> +       /*
+> +        * The guest memory pages are assigned in the RMP table. Unassign it
+> +        * before releasing the memory.
+> +        */
+> +       if (sev_snp_guest(kvm)) {
+> +               for (i = 0; i < region->npages; i++) {
+> +                       pfn = page_to_pfn(region->pages[i]);
+> +
+> +                       if (!snp_lookup_rmpentry(pfn, &level))
+> +                               continue;
+> +
+> +                       cond_resched();
+> +
+> +                       if (level > PG_LEVEL_4K)
+> +                               pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+> +
+> +                       host_rmp_make_shared(pfn, level, true);
+> +               }
+> +       }
+> +
+>         sev_unpin_memory(kvm, region->pages, region->npages);
+>         list_del(&region->list);
+>         kfree(region);
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 0cb119d66ae5..9b36b07414ea 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1813,6 +1813,7 @@ enum sev_cmd_id {
+>         /* SNP specific commands */
+>         KVM_SEV_SNP_INIT,
+>         KVM_SEV_SNP_LAUNCH_START,
+> +       KVM_SEV_SNP_LAUNCH_UPDATE,
+>
+>         KVM_SEV_NR_MAX,
+>  };
+> @@ -1929,6 +1930,24 @@ struct kvm_sev_snp_launch_start {
+>         __u8 pad[6];
+>  };
+>
+> +#define KVM_SEV_SNP_PAGE_TYPE_NORMAL           0x1
+> +#define KVM_SEV_SNP_PAGE_TYPE_VMSA             0x2
+> +#define KVM_SEV_SNP_PAGE_TYPE_ZERO             0x3
+> +#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED       0x4
+> +#define KVM_SEV_SNP_PAGE_TYPE_SECRETS          0x5
+> +#define KVM_SEV_SNP_PAGE_TYPE_CPUID            0x6
+> +
+> +struct kvm_sev_snp_launch_update {
+> +       __u64 start_gfn;
+> +       __u64 uaddr;
+> +       __u32 len;
+> +       __u8 imi_page;
+> +       __u8 page_type;
+> +       __u8 vmpl3_perms;
+> +       __u8 vmpl2_perms;
+> +       __u8 vmpl1_perms;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> --
+> 2.25.1
+>
