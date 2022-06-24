@@ -2,187 +2,344 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 931E555A25C
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 22:13:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BC7F55A262
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 22:15:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbiFXUNM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 16:13:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57274 "EHLO
+        id S230366AbiFXUN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 16:13:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbiFXUNK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 16:13:10 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2088.outbound.protection.outlook.com [40.107.94.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B13F1EEE1;
-        Fri, 24 Jun 2022 13:13:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EaDNfR5vlWvSP3G5rl8HV+Y7M+LBxv1gVvErjh+KUmE7AhMy7lfDCSjmwOyWoDX6A60QQn9xw0J+xngRVAEmR2/oZex+Ws0dsNQr6FUsygUu0PN4VesX7q+uiZyAhF9Db2AT7cTNk7By3TAEB4wVSsSM1bcQRQ/U9B+ZbJGcZJp76IhDiagETz54zDTMpLTtpZsMSForD8bRTXOq3y0ZGYG/xY/gcdq4zgSaz9Nm9fJoSqmVRxhhyffcY8mfiAx4n5qVwk92fDsy2+F1KENFjyee4IQ9byD83Q4UETJgqbT+p99n9QZ6UzTyV0Csbcn3XBJLP/DWXS4b4eTKLE6eUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RzgnU+TMHr+pm9HolGrJT7h1uOTC9zJLZyYoG6PBbiU=;
- b=n68f5voOfZTVNPadJjMtBxT48HpQrOzynlO/17QMARgbm736EtL8d9KDJMXd1tzwHGiZ1hPUjZzjGqOkfeBnCBWvI0RR1tvnudnVBFx4WsDYLbAnq1EygoLa8jjHq2tMvBPjVpV661X6mKyjyYj0BwJ+h31cetxbvnUy9A2AvYBZ6cM7A7K2gm632QesIWyn5FFGGtoorBkXufs5xbn94YkMMfArf1k+4n0et7/dNfJ16rDvObFfSEpb0/lXFR4qCR56XZ21rHKTnB7XRyzxpQ37mLsadZfoINlUjEiVzgpkFd/zKqR9APOAv4cOVyQMr5Gp1KSHZ5SLWLBdC+0znQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.236) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RzgnU+TMHr+pm9HolGrJT7h1uOTC9zJLZyYoG6PBbiU=;
- b=PVFurWXs1kaA+VNCKewAOYtKtjgXQ/ELvW3V7BuapIzcK2UYknuKxNcInPpgtAvjzjS3SOoM3Lde3udcFp4IwJPB1wMSZQF4FbG+kPa/otZd6vCjiCPm8YCxvo2Bx4p5s5gr3ZhWkhptgBN3ZmUgkLCJYkBvCwC1fcwBNxY5jyElml8mmaRPrq6W7h3RTKmw/fUMug9/2iJCqgBK1PObQZRU5ZViGC540RjA8kLFgEXewskbf5Vxrk2NETwdOcHZuzVdtTCIobAQ6XpRRDpWGWpop+P8Qt6mHJ3UORtyewKx6hFCU1iUwEbqB0oslcessvjEMUTYl4dpceVlYGI5fw==
-Received: from DM6PR01CA0024.prod.exchangelabs.com (2603:10b6:5:296::29) by
- BYAPR12MB3527.namprd12.prod.outlook.com (2603:10b6:a03:13c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.20; Fri, 24 Jun
- 2022 20:13:06 +0000
-Received: from DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:296:cafe::c0) by DM6PR01CA0024.outlook.office365.com
- (2603:10b6:5:296::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.15 via Frontend
- Transport; Fri, 24 Jun 2022 20:13:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.236; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.236) by
- DM6NAM11FT042.mail.protection.outlook.com (10.13.173.165) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5373.15 via Frontend Transport; Fri, 24 Jun 2022 20:13:05 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by DRHQMAIL109.nvidia.com
- (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Fri, 24 Jun
- 2022 20:13:00 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Fri, 24 Jun
- 2022 13:13:00 -0700
-Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
- Transport; Fri, 24 Jun 2022 13:12:58 -0700
-Date:   Fri, 24 Jun 2022 13:12:56 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Christoph Hellwig <hch@infradead.org>, <kwankhede@nvidia.com>,
-        <corbet@lwn.net>, <hca@linux.ibm.com>, <gor@linux.ibm.com>,
-        <agordeev@linux.ibm.com>, <borntraeger@linux.ibm.com>,
-        <svens@linux.ibm.com>, <zhenyuw@linux.intel.com>,
-        <zhi.a.wang@intel.com>, <jani.nikula@linux.intel.com>,
-        <joonas.lahtinen@linux.intel.com>, <rodrigo.vivi@intel.com>,
-        <tvrtko.ursulin@linux.intel.com>, <airlied@linux.ie>,
-        <daniel@ffwll.ch>, <farman@linux.ibm.com>,
-        <mjrosato@linux.ibm.com>, <pasic@linux.ibm.com>,
-        <vneethv@linux.ibm.com>, <oberpar@linux.ibm.com>,
-        <freude@linux.ibm.com>, <akrowiak@linux.ibm.com>,
-        <jjherne@linux.ibm.com>, <alex.williamson@redhat.com>,
-        <cohuck@redhat.com>, <kevin.tian@intel.com>,
-        <jchrist@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        <intel-gvt-dev@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>,
-        <dri-devel@lists.freedesktop.org>
-Subject: Re: [RFT][PATCH v1 5/6] vfio/ccw: Add kmap_local_page() for memcpy
-Message-ID: <YrYayPvA7XlCZLQ2@Asurada-Nvidia>
-References: <20220616235212.15185-1-nicolinc@nvidia.com>
- <20220616235212.15185-6-nicolinc@nvidia.com>
- <Yqw+7gM3Lz96UFdz@infradead.org>
- <20220620025726.GA5219@nvidia.com>
- <YrAUZ7hXy2FcZcjl@infradead.org>
- <YrI2Ul/u6pRvt0rT@Asurada-Nvidia>
- <20220624135615.GO4147@nvidia.com>
- <YrYO/KAa2bqmxEIu@Asurada-Nvidia>
- <20220624193042.GB4147@nvidia.com>
+        with ESMTP id S229964AbiFXUN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 16:13:56 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A66E62C14;
+        Fri, 24 Jun 2022 13:13:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656101635; x=1687637635;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=a/9AYP0CqpJEejZf5BLz9HoLGj03WYq3WJOtUzm0mmg=;
+  b=buv7vja3YdD3/912M0xWjlgK39o0EdLvkXl5u4XzqLOSwBdbm4ZPH+h3
+   8g/QY4LvdZsiFTBuVBKg1l8lPOoo8Q1unBch8i+WAvEsW71JbOU5iLLcI
+   bqRW/aDGyD61v7jwexrdfJ6mmivauY2oEiBcA1M71lFA40LGsWeA5kNc/
+   e5Eun6cdamSgbFKVZy3jw6lldMszoI3PzSziHhAMvlXDCmR3UB+fjgv/N
+   yiW0Nq1lh7oYlQ3ExQCgaPDLVLliEtsD6kX85CELoxWbw1PlBVWzRroCZ
+   rqexsAvWTXOXkh6sBGbZNgbvCxmTMZI6wWMct6n030ksTgUu/NZqYZefV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10388"; a="279846348"
+X-IronPort-AV: E=Sophos;i="5.92,220,1650956400"; 
+   d="scan'208";a="279846348"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 13:13:55 -0700
+X-IronPort-AV: E=Sophos;i="5.92,220,1650956400"; 
+   d="scan'208";a="731454987"
+Received: from mdedeogl-mobl.amr.corp.intel.com (HELO [10.209.126.186]) ([10.209.126.186])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 13:13:53 -0700
+Message-ID: <e72703b0-767a-ec88-7cb6-f95a3564d823@intel.com>
+Date:   Fri, 24 Jun 2022 13:13:18 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20220624193042.GB4147@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 18334a95-48f9-4aea-8e72-08da561df32b
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3527:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BG9z1jxjs/MCm5kz344subvZiOvaZ9apsFIkixu7eRRYTTkhr/ieoQ9CV9nvlOwrGkHNfCCLvFpZZdCNBB6NjjjZY3kldnsB4Zk/qAlqPuaKtiHszeYdqSrdLgkkyln3uYaxzjhErRv6V99jACT9lO0BDiq4OHZRJApWiSKBfTV4loarQnyw4+DPBSOmKP/P5dt683ZAIjqguJ6JtGyUcg5Jtnf/7MqgckA4KI9Zy8377km0jzAtt+t8p3j8Hsn3zP5Fc4r1BI/Z4Wa6y+7EABG298C+Qw4WSzm+1MTyZwmqjNRdMtW1kaIF/o9djtrgVHMnyrImDo50IvEFLw5ZQ795iMLpcaYIBAj7iI5dbEj3bMVpGXOkt7jynnL65Ceh0SWAhQB0Sdn2mjd0VR62AUd+tT9ZI51QnL7WZvU9AXMOMYinyE4f507Gnzy5LLiU3OMe8goUBcXDZZqIgHNaNbeSfYp7k9y4QKOIZ4H0n31v0fBbE5Ls8ECGYfKawPYlH/K3LThhL1C6mWXxouGu2/2ZbTSaAQEzLIJdqx/G8ZvZoOUr2Pj+Ozo/nYuxO+DeCTuuiCRsii8FPxknCkbjo7xblCDko65yzjGlsOlK+0mhe/+1Zw779yG4ucG4CqAfT/inrFDXrAMNaUt0No8Gb5EI+4c4pX/ZwJ9qByGceSaozM8WNlM+SepwwL9L+s9ogMM+Ch+d2hCCuFmff2PV8F6Wkdz2qY8c0c0NSA8lbrodBy/VAzubxaylzp4k7Pe0yU2UE4mkUAVWvHs/vrmgQ6Ka72htZBgx25YHDKa3D37jruI5kfwJOwQwMnZpcySBafyJChclNjT/6RconPPrpA==
-X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(136003)(346002)(376002)(46966006)(36840700001)(40470700004)(4326008)(70206006)(8676002)(40480700001)(356005)(82740400003)(70586007)(82310400005)(36860700001)(83380400001)(2906002)(55016003)(336012)(186003)(426003)(41300700001)(47076005)(7416002)(40460700003)(54906003)(5660300002)(26005)(8936002)(81166007)(7406005)(6636002)(33716001)(9686003)(86362001)(316002)(6862004)(478600001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2022 20:13:05.8229
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18334a95-48f9-4aea-8e72-08da561df32b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3527
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v5 15/22] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+References: <cover.1655894131.git.kai.huang@intel.com>
+ <c504a8acd06dc455050c25e2a4cc70aef5eb9358.1655894131.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <c504a8acd06dc455050c25e2a4cc70aef5eb9358.1655894131.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 24, 2022 at 04:30:42PM -0300, Jason Gunthorpe wrote:
-> On Fri, Jun 24, 2022 at 12:22:36PM -0700, Nicolin Chen wrote:
-> > On Fri, Jun 24, 2022 at 10:56:15AM -0300, Jason Gunthorpe wrote:
-> > 
-> > > > How about the updated commit log below? Thanks.
-> > > > 
-> > > > The pinned PFN list returned from vfio_pin_pages() is converted using
-> > > > page_to_pfn(), so direct access via memcpy() will crash on S390 if the
-> > > > PFN is an IO PFN, as we have to use the memcpy_to/fromio(), which uses
-> > > > the special s390 IO access instructions.
-> > > > 
-> > > > As a standard practice for security purpose, add kmap_local_page() to
-> > > > block any IO memory from ever getting into this call path.
-> > > 
-> > > The kmap_local_page is not about the IO memory, the switch to struct
-> > > page is what is protecting against IO memory.
-> > > 
-> > > Use kmap_local_page() is just the correct way to convert a struct page
-> > > into a CPU address to use with memcpy and it is a NOP on S390 because
-> > > it doesn't use highmem/etc.
-> > 
-> > I thought the whole purpose of switching to "struct page *" was to use
-> > kmap_local_page() for the memcpy call, and the combination of these two
-> > does the protection. Do you mind explaining how the switching part does
-> > the protection?
-> 
-> A 'struct page' (ignoring ZONE_DEVICE) cannot represent IO memory
-> inherently because a 'struct page' is always a CPU coherent thing.
-> 
-> So, when VFIO returns only struct pages it also is promising that the
-> memory is not IO.
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 4988a91d5283..ec496e96d120 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -1973,6 +1973,7 @@ config INTEL_TDX_HOST
+>  	depends on CPU_SUP_INTEL
+>  	depends on X86_64
+>  	depends on KVM_INTEL
+> +	depends on CONTIG_ALLOC
+>  	select ARCH_HAS_CC_PLATFORM
+>  	select ARCH_KEEP_MEMBLOCK
+>  	help
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index fd9f449b5395..36260dd7e69f 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -558,6 +558,196 @@ static int create_tdmrs(struct tdmr_info *tdmr_array, int *tdmr_num)
+>  	return 0;
+>  }
+>  
+> +/* Page sizes supported by TDX */
+> +enum tdx_page_sz {
+> +	TDX_PG_4K,
+> +	TDX_PG_2M,
+> +	TDX_PG_1G,
+> +	TDX_PG_MAX,
+> +};
 
-Ah. The "switch to struct page" means the next patch that changes the
-vfio_pin_pages, not the pfn_to_page in this patch.
+Are these the same constants as the magic numbers in Kirill's
+try_accept_one()?
 
-> The kmap_local_page() arose because the code doing memcpy had to be
-> updated to go from a struct page to a void * for use with memcpy and
-> the kmap_local_page() is the correct API to use for that.
-> 
-> The existing code which casts a pfn to a void * is improper.
+> +/*
+> + * Calculate PAMT size given a TDMR and a page size.  The returned
+> + * PAMT size is always aligned up to 4K page boundary.
+> + */
+> +static unsigned long tdmr_get_pamt_sz(struct tdmr_info *tdmr,
+> +				      enum tdx_page_sz pgsz)
+> +{
+> +	unsigned long pamt_sz;
+> +	int pamt_entry_nr;
 
-Yes.
+'nr_pamt_entries', please.
 
-If I understand everything correctly:
+> +	switch (pgsz) {
+> +	case TDX_PG_4K:
+> +		pamt_entry_nr = tdmr->size >> PAGE_SHIFT;
+> +		break;
+> +	case TDX_PG_2M:
+> +		pamt_entry_nr = tdmr->size >> PMD_SHIFT;
+> +		break;
+> +	case TDX_PG_1G:
+> +		pamt_entry_nr = tdmr->size >> PUD_SHIFT;
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +		return 0;
+> +	}
+> +
+> +	pamt_sz = pamt_entry_nr * tdx_sysinfo.pamt_entry_size;
+> +	/* TDX requires PAMT size must be 4K aligned */
+> +	pamt_sz = ALIGN(pamt_sz, PAGE_SIZE);
+> +
+> +	return pamt_sz;
+> +}
+> +
+> +/*
+> + * Pick a NUMA node on which to allocate this TDMR's metadata.
+> + *
+> + * This is imprecise since TDMRs are 1G aligned and NUMA nodes might
+> + * not be.  If the TDMR covers more than one node, just use the _first_
+> + * one.  This can lead to small areas of off-node metadata for some
+> + * memory.
+> + */
+> +static int tdmr_get_nid(struct tdmr_info *tdmr)
+> +{
+> +	unsigned long start_pfn, end_pfn;
+> +	int i, nid;
+> +
+> +	/* Find the first memory region covered by the TDMR */
+> +	memblock_for_each_tdx_mem_pfn_range(i, &start_pfn, &end_pfn, &nid) {
+> +		if (end_pfn > (tdmr_start(tdmr) >> PAGE_SHIFT))
+> +			return nid;
+> +	}
+> +
+> +	/*
+> +	 * No memory region found for this TDMR.  It cannot happen since
+> +	 * when one TDMR is created, it must cover at least one (or
+> +	 * partial) memory region.
+> +	 */
+> +	WARN_ON_ONCE(1);
+> +	return 0;
+> +}
 
-A PFN is not secure enough to promise that the memory is not IO. And
-direct access via memcpy() that only handles CPU memory will crash on
-S390 if the PFN is an IO PFN, as we have to use the memcpy_to/fromio()
-that uses the special S390 IO access instructions. On the other hand,
-a "struct page *" is always a CPU coherent thing that fits memcpy().
+You should really describe what you are doing.  At first glance "return
+0;" looks like "declare success".  How about something like this?
 
-Also, casting a PFN to "void *" for memcpy() is not an proper practice,
-kmap_local_page() is the correct API to call here, though S390 doesn't
-use highmem, which means kmap_local_page() is a NOP.
+	/*
+	 * Fall back to allocating the TDMR from node 0 when no memblock
+	 * can be found.  This should never happen since TDMRs originate
+	 * from the memblocks.
+	 */
 
-There's a following patch changing the vfio_pin_pages() API to return
-a list of "struct page *" instead of PFNs. It will block any IO memory
-from ever getting into this call path, for such a security purpose. In
-this patch, add kmap_local_page() to prepare for that.
+Does that miss any of the points you were trying to make?
+
+> +static int tdmr_set_up_pamt(struct tdmr_info *tdmr)
+> +{
+> +	unsigned long pamt_base[TDX_PG_MAX];
+> +	unsigned long pamt_size[TDX_PG_MAX];
+> +	unsigned long tdmr_pamt_base;
+> +	unsigned long tdmr_pamt_size;
+> +	enum tdx_page_sz pgsz;
+> +	struct page *pamt;
+> +	int nid;
+> +
+> +	nid = tdmr_get_nid(tdmr);
+> +
+> +	/*
+> +	 * Calculate the PAMT size for each TDX supported page size
+> +	 * and the total PAMT size.
+> +	 */
+> +	tdmr_pamt_size = 0;
+> +	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++) {
+> +		pamt_size[pgsz] = tdmr_get_pamt_sz(tdmr, pgsz);
+> +		tdmr_pamt_size += pamt_size[pgsz];
+> +	}
+> +
+> +	/*
+> +	 * Allocate one chunk of physically contiguous memory for all
+> +	 * PAMTs.  This helps minimize the PAMT's use of reserved areas
+> +	 * in overlapped TDMRs.
+> +	 */
+> +	pamt = alloc_contig_pages(tdmr_pamt_size >> PAGE_SHIFT, GFP_KERNEL,
+> +			nid, &node_online_map);
+> +	if (!pamt)
+> +		return -ENOMEM;
+
+I'm not sure it's worth mentioning, but this doesn't really need to be
+GFP_KERNEL.  __GFP_HIGHMEM would actually be just fine.  But,
+considering that this is 64-bit only, that's just a technicality.
+
+> +	/* Calculate PAMT base and size for all supported page sizes. */
+
+That comment isn't doing much good.  If you say anything here it should be:
+
+	/*
+	 * Break the contiguous allocation back up into
+	 * the individual PAMTs for each page size:
+	 */
+
+Also, this is *not* "calculating size".  That's done above.
+
+> +	tdmr_pamt_base = page_to_pfn(pamt) << PAGE_SHIFT;
+> +	for (pgsz = TDX_PG_4K; pgsz < TDX_PG_MAX; pgsz++) {
+> +		pamt_base[pgsz] = tdmr_pamt_base;
+> +		tdmr_pamt_base += pamt_size[pgsz];
+> +	}
+> +
+> +	tdmr->pamt_4k_base = pamt_base[TDX_PG_4K];
+> +	tdmr->pamt_4k_size = pamt_size[TDX_PG_4K];
+> +	tdmr->pamt_2m_base = pamt_base[TDX_PG_2M];
+> +	tdmr->pamt_2m_size = pamt_size[TDX_PG_2M];
+> +	tdmr->pamt_1g_base = pamt_base[TDX_PG_1G];
+> +	tdmr->pamt_1g_size = pamt_size[TDX_PG_1G];
+> +
+> +	return 0;
+> +}
+>
+> +static void tdmr_get_pamt(struct tdmr_info *tdmr, unsigned long *pamt_pfn,
+> +			  unsigned long *pamt_npages)
+> +{
+> +	unsigned long pamt_base, pamt_sz;
+> +
+> +	/*
+> +	 * The PAMT was allocated in one contiguous unit.  The 4K PAMT
+> +	 * should always point to the beginning of that allocation.
+> +	 */
+> +	pamt_base = tdmr->pamt_4k_base;
+> +	pamt_sz = tdmr->pamt_4k_size + tdmr->pamt_2m_size + tdmr->pamt_1g_size;
+> +
+> +	*pamt_pfn = pamt_base >> PAGE_SHIFT;
+> +	*pamt_npages = pamt_sz >> PAGE_SHIFT;
+> +}
+> +
+> +static void tdmr_free_pamt(struct tdmr_info *tdmr)
+> +{
+> +	unsigned long pamt_pfn, pamt_npages;
+> +
+> +	tdmr_get_pamt(tdmr, &pamt_pfn, &pamt_npages);
+> +
+> +	/* Do nothing if PAMT hasn't been allocated for this TDMR */
+> +	if (!pamt_npages)
+> +		return;
+> +
+> +	if (WARN_ON_ONCE(!pamt_pfn))
+> +		return;
+> +
+> +	free_contig_range(pamt_pfn, pamt_npages);
+> +}
+> +
+> +static void tdmrs_free_pamt_all(struct tdmr_info *tdmr_array, int tdmr_num)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < tdmr_num; i++)
+> +		tdmr_free_pamt(tdmr_array_entry(tdmr_array, i));
+> +}
+> +
+> +/* Allocate and set up PAMTs for all TDMRs */
+> +static int tdmrs_set_up_pamt_all(struct tdmr_info *tdmr_array, int tdmr_num)
+> +{
+> +	int i, ret = 0;
+> +
+> +	for (i = 0; i < tdmr_num; i++) {
+> +		ret = tdmr_set_up_pamt(tdmr_array_entry(tdmr_array, i));
+> +		if (ret)
+> +			goto err;
+> +	}
+> +
+> +	return 0;
+> +err:
+> +	tdmrs_free_pamt_all(tdmr_array, tdmr_num);
+> +	return ret;
+> +}
+> +
+> +static unsigned long tdmrs_get_pamt_pages(struct tdmr_info *tdmr_array,
+> +					  int tdmr_num)
+
+"get" is for refcounting.  tdmrs_count_pamt_pages() would be preferable.
+
+> +{
+> +	unsigned long pamt_npages = 0;
+> +	int i;
+> +
+> +	for (i = 0; i < tdmr_num; i++) {
+> +		unsigned long pfn, npages;
+> +
+> +		tdmr_get_pamt(tdmr_array_entry(tdmr_array, i), &pfn, &npages);
+> +		pamt_npages += npages;
+> +	}
+> +
+> +	return pamt_npages;
+> +}
+> +
+>  /*
+>   * Construct an array of TDMRs to cover all memory regions in memblock.
+>   * This makes sure all pages managed by the page allocator are TDX
+> @@ -572,8 +762,13 @@ static int construct_tdmrs_memeblock(struct tdmr_info *tdmr_array,
+>  	if (ret)
+>  		goto err;
+>  
+> +	ret = tdmrs_set_up_pamt_all(tdmr_array, *tdmr_num);
+> +	if (ret)
+> +		goto err;
+> +
+>  	/* Return -EINVAL until constructing TDMRs is done */
+>  	ret = -EINVAL;
+> +	tdmrs_free_pamt_all(tdmr_array, *tdmr_num);
+>  err:
+>  	return ret;
+>  }
+> @@ -644,6 +839,11 @@ static int init_tdx_module(void)
+>  	 * process are done.
+>  	 */
+>  	ret = -EINVAL;
+> +	if (ret)
+> +		tdmrs_free_pamt_all(tdmr_array, tdmr_num);
+> +	else
+> +		pr_info("%lu pages allocated for PAMT.\n",
+> +				tdmrs_get_pamt_pages(tdmr_array, tdmr_num));
+>  out_free_tdmrs:
+>  	/*
+>  	 * The array of TDMRs is freed no matter the initialization is
+
+The rest looks OK.
