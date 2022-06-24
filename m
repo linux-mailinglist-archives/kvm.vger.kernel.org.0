@@ -2,297 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 733E1559345
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 08:22:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2649A55937D
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 08:33:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbiFXGWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 02:22:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33936 "EHLO
+        id S230244AbiFXGb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 02:31:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230042AbiFXGWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 02:22:43 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C96C43FDA5;
-        Thu, 23 Jun 2022 23:22:42 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25O5orOT006898;
-        Fri, 24 Jun 2022 06:22:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Di51jl6wOZ18ExhrQMG2SxXoh7hgGushxQFiaaPCd9Q=;
- b=n2xZ7L0mM7V7Huz787QNeqiB4mT0ttcPOP6ORdNlp28T/G1C27lckGxV6SBfgMFzeboq
- szAFrBD8Wta+6QV9VKvebSzp4FYquRTJiT4uOfMdc3gat9g6u0cujvnvkYNm5xjsHqPl
- CYV+YCddv/5OjyaRB2Beso/iDCKSlp0yewxTnINVY6t5XSBGz7dU85Ag27y/QUHamfeW
- bgh+t0suYCAGrR+ikjZN0NVRGou2n4QV5LyGSiGFP3SunwtousR+S+WbqdR/UTct4zd9
- NW5/XFMQ2pMrFzZHBecJQ6fVqn10Z/rLy+iB+KH/iBlP5uS8x+I5+eK0+xmdSfRpwCuP aQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gw7fxrpmu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 06:22:42 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25O5u0GV027351;
-        Fri, 24 Jun 2022 06:22:41 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gw7fxrpm2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 06:22:41 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25O6K4uZ016759;
-        Fri, 24 Jun 2022 06:22:39 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3gv3mba4na-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jun 2022 06:22:39 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25O6MZkO20644100
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jun 2022 06:22:35 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7014C4C040;
-        Fri, 24 Jun 2022 06:22:35 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C0EC4C044;
-        Fri, 24 Jun 2022 06:22:34 +0000 (GMT)
-Received: from [9.145.85.86] (unknown [9.145.85.86])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Jun 2022 06:22:34 +0000 (GMT)
-Message-ID: <5217b1ec-c170-d046-5158-e17ffcfe8316@linux.ibm.com>
-Date:   Fri, 24 Jun 2022 08:22:34 +0200
+        with ESMTP id S229830AbiFXGb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 02:31:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 23A4A5DF20
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 23:31:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656052315;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fkwre6WoTaZ3HcBGKyAfeqBPtQ+kpW2QzG2weDAdapc=;
+        b=WMmdrzyqOioWiaDMYT8iKfePxi292ECdFvbhi3SNvlzh1xkL4FySZBFTerRFwPmTJrGemv
+        S2nVT7lvzMOc6S7HStxtUDZM6grbBpC9uPhrsPTZLoz62aFeGmJHhOIMYt9bzuKS9hsZ3R
+        C60mRM7edCq1STsxhTHqVWFrhOqIiX0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-59-sFWmGrO3MimBe_cD6nBgeA-1; Fri, 24 Jun 2022 02:31:53 -0400
+X-MC-Unique: sFWmGrO3MimBe_cD6nBgeA-1
+Received: by mail-wm1-f70.google.com with SMTP id h125-20020a1c2183000000b003a0374f1eb8so1489953wmh.8
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 23:31:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fkwre6WoTaZ3HcBGKyAfeqBPtQ+kpW2QzG2weDAdapc=;
+        b=MmBJfn3BC0uPgAKr5NVLXJF9vyUZ2mSyhTX71JzEqVBthsbAeMveyFnRCKHzIjLVEC
+         GhF+MAAzc9h0FbDCBi/CAvrbDUTz2MnWlad7UF2IR/b0lTGJRq+CJW3/6XAANYM2Hxpt
+         JPcB9dKrmSkPH82kc2LJIWREAra1MHrhL/kejpcFZLwrQy9TsUFGNcjvjdfFEbAa0vVB
+         ISEaCC/6mIgP0t4ZZESS8C33DWY4xB4mj/MtfhWr1S0IXEZ+B8luhhyn79z3hDE20A/k
+         XSgMJhk1RVqMgVI1fFQGgKvrVO/V94/9hPQY0Wea0rr8s/UZ9o5SREBUsbBJlvycyDga
+         0QfQ==
+X-Gm-Message-State: AJIora9NCTD5ZabpNzE6LSVaCEsxAoMKjbuQytNUmxGOjLgUGTwzbv4K
+        ZVY0cPksYOdKMXO+LvuLaYywnFAaDbTaJT7giJAI6Phkn5+N99BFCE5/kCPs5Hd83ELRkgmDE3e
+        wtiZ6bSSJ14dx
+X-Received: by 2002:a5d:6481:0:b0:219:8930:6e48 with SMTP id o1-20020a5d6481000000b0021989306e48mr11516416wri.574.1656052312300;
+        Thu, 23 Jun 2022 23:31:52 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vRwBTxtgCODqWGWtTx/7SSJNNx7vYLqsQ5RQvPSrwfQn6gMWJQbS/U+j9i6mC+QbxjMDDN1g==
+X-Received: by 2002:a5d:6481:0:b0:219:8930:6e48 with SMTP id o1-20020a5d6481000000b0021989306e48mr11516397wri.574.1656052311996;
+        Thu, 23 Jun 2022 23:31:51 -0700 (PDT)
+Received: from redhat.com ([2.55.188.216])
+        by smtp.gmail.com with ESMTPSA id r21-20020a05600c35d500b003a02f957245sm5754978wmq.26.2022.06.23.23.31.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jun 2022 23:31:51 -0700 (PDT)
+Date:   Fri, 24 Jun 2022 02:31:46 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH V3] virtio: disable notification hardening by default
+Message-ID: <20220624022622-mutt-send-email-mst@kernel.org>
+References: <20220622012940.21441-1-jasowang@redhat.com>
+ <20220622025047-mutt-send-email-mst@kernel.org>
+ <CACGkMEtJY2ioD0L8ifTrCPatG6-NqQ01V=d2L1FeoweKV74LaA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com
-References: <20220620125437.37122-1-pmorel@linux.ibm.com>
- <20220620125437.37122-3-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v10 2/3] KVM: s390: guest support for topology function
-In-Reply-To: <20220620125437.37122-3-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lb-mluRrEEYCQspZr6VJMT6wCmQyqykT
-X-Proofpoint-ORIG-GUID: IpcmkmX6gChLJNIVCbJ2K3pyAaprb5J9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-24_04,2022-06-23_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 impostorscore=0 mlxlogscore=999 malwarescore=0
- spamscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
- clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2206240022
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEtJY2ioD0L8ifTrCPatG6-NqQ01V=d2L1FeoweKV74LaA@mail.gmail.com>
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/20/22 14:54, Pierre Morel wrote:
-> We report a topology change to the guest for any CPU hotplug.
+On Wed, Jun 22, 2022 at 03:09:31PM +0800, Jason Wang wrote:
+> On Wed, Jun 22, 2022 at 3:03 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Wed, Jun 22, 2022 at 09:29:40AM +0800, Jason Wang wrote:
+> > > We try to harden virtio device notifications in 8b4ec69d7e09 ("virtio:
+> > > harden vring IRQ"). It works with the assumption that the driver or
+> > > core can properly call virtio_device_ready() at the right
+> > > place. Unfortunately, this seems to be not true and uncover various
+> > > bugs of the existing drivers, mainly the issue of using
+> > > virtio_device_ready() incorrectly.
+> > >
+> > > So let's having a Kconfig option and disable it by default. It gives
+> > > us a breath to fix the drivers and then we can consider to enable it
+> > > by default.
+> > >
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >
+> >
+> > OK I will queue, but I think the problem is fundamental.
 > 
-> The reporting to the guest is done using the Multiprocessor
-> Topology-Change-Report (MTCR) bit of the utility entry in the guest's
-> SCA which will be cleared during the interpretation of PTF.
+> If I understand correctly, you want some core IRQ work?
+
+Yes.
+
+> As discussed
+> before, it doesn't solve all the problems, we still need to do per
+> driver audit.
 > 
-> On every vCPU creation we set the MCTR bit to let the guest know the
-> next time he uses the PTF with command 2 instruction that the
-> topology changed and that he should use the STSI(15.1.x) instruction
-> to get the topology details.
-> 
-> STSI(15.1.x) gives information on the CPU configuration topology.
-> Let's accept the interception of STSI with the function code 15 and
-> let the userland part of the hypervisor handle it when userland
-> support the CPU Topology facility.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_host.h | 11 ++++++++---
->   arch/s390/kvm/kvm-s390.c         | 27 ++++++++++++++++++++++++++-
->   arch/s390/kvm/priv.c             | 15 +++++++++++----
->   arch/s390/kvm/vsie.c             |  3 +++
->   4 files changed, 48 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 766028d54a3e..bb54196d4ed6 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -97,15 +97,19 @@ struct bsca_block {
->   	union ipte_control ipte_control;
->   	__u64	reserved[5];
->   	__u64	mcn;
-> -	__u64	reserved2;
-> +#define SCA_UTILITY_MTCR	0x8000
+> Thanks
 
-I'm not too happy having this in the bsca but not in the esca. I'd 
-suggest putting it outside the structs or to go with my next suggestion:
+Maybe, but we don't need to tie things to device_ready then.
+We can do
 
-Just make it a bit field struct and make that a member in bsca/esca.
-No messing about with ANDing, ORing etc.
+- disable irqs
+- device ready
+- setup everything
+- enable irqs
 
-It's unfortunate that we only use one bit in that field but I'd still 
-find it easier to read.
 
-> +	__u16	utility;
-> +	__u8	reserved2[6];
->   	struct bsca_entry cpu[KVM_S390_BSCA_CPU_SLOTS];
->   };
->   
->   struct esca_block {
->   	union ipte_control ipte_control;
-> -	__u64   reserved1[7];
-> +	__u64   reserved1[6];
-> +	__u16	utility;
-> +	__u8	reserved2[6];
->   	__u64   mcn[4];
-> -	__u64   reserved2[20];
-> +	__u64   reserved3[20];
->   	struct esca_entry cpu[KVM_S390_ESCA_CPU_SLOTS];
->   };
->   
-> @@ -249,6 +253,7 @@ struct kvm_s390_sie_block {
->   #define ECB_SPECI	0x08
->   #define ECB_SRSI	0x04
->   #define ECB_HOSTPROTINT	0x02
-> +#define ECB_PTF		0x01
->   	__u8	ecb;			/* 0x0061 */
->   #define ECB2_CMMA	0x80
->   #define ECB2_IEP	0x20
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 8fcb56141689..95b96019ca8e 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -1691,6 +1691,25 @@ static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
->   	return ret;
->   }
->   
-> +/**
-> + * kvm_s390_sca_set_mtcr
-> + * @kvm: guest KVM description
-> + *
-> + * Is only relevant if the topology facility is present,
-> + * the caller should check KVM facility 11
+and this works for most things, the only issue is
+this deadlocks if "setup everything" waits for interrupts.
 
-I'm not sure that this statement make sense since you set the mctr in 
-kvm_s390_vcpu_setup() unconditionally and don't check stfle 11.
 
-I think we can remove the second line from this.
+With the current approach there's really no good time:
+1.- setup everything
+- device ready
 
-> + *
-> + * Updates the Multiprocessor Topology-Change-Report to signal
-> + * the guest with a topology change.
+can cause kicks before device is ready
 
-Please swap those two comments
+2.- device ready
+- setup everything
 
-> + */
-> +static void kvm_s390_sca_set_mtcr(struct kvm *kvm)
-> +{
-> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+can cause callbacks before setup.
 
-Please put the comment above the statement and maybe extend it a bit:
-SCA version doesn't matter, the utility field always has the same offset.
+So I prefer the 1. and fix the hardening in the core.
 
-> +
-> +	ipte_lock(kvm);
-> +	sca->utility |= SCA_UTILITY_MTCR;
-> +	ipte_unlock(kvm);
-> +}
-> +
->   static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
->   {
->   	int ret;
-> @@ -3143,7 +3162,6 @@ __u64 kvm_s390_get_cpu_timer(struct kvm_vcpu *vcpu)
->   
->   void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->   {
-> -
 
-Please remove that change
-
->   	gmap_enable(vcpu->arch.enabled_gmap);
->   	kvm_s390_set_cpuflags(vcpu, CPUSTAT_RUNNING);
->   	if (vcpu->arch.cputm_enabled && !is_vcpu_idle(vcpu))
-> @@ -3272,6 +3290,11 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
->   		vcpu->arch.sie_block->ecb |= ECB_HOSTPROTINT;
->   	if (test_kvm_facility(vcpu->kvm, 9))
->   		vcpu->arch.sie_block->ecb |= ECB_SRSI;
-> +
-> +	/* PTF needs guest facilities to enable interpretation */
-> +	if (test_kvm_facility(vcpu->kvm, 11))
-> +		vcpu->arch.sie_block->ecb |= ECB_PTF;
-> +
->   	if (test_kvm_facility(vcpu->kvm, 73))
->   		vcpu->arch.sie_block->ecb |= ECB_TE;
->   	if (!kvm_is_ucontrol(vcpu->kvm))
-> @@ -3403,6 +3426,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   	rc = kvm_s390_vcpu_setup(vcpu);
->   	if (rc)
->   		goto out_ucontrol_uninit;
-> +
-> +	kvm_s390_sca_set_mtcr(vcpu->kvm);
->   	return 0;
->   
->   out_ucontrol_uninit:
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 12c464c7cddf..77a692238585 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -873,10 +873,13 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->   	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
->   		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
->   
-> -	if (fc > 3) {
-> -		kvm_s390_set_psw_cc(vcpu, 3);
-> -		return 0;
-> -	}
-> +	/* Bailout forbidden function codes */
-> +	if (fc > 3 && fc != 15)
-> +		goto out_no_data;
-> +
-> +	/* fc 15 is provided with PTF/CPU topology support */
-> +	if (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))
-> +		goto out_no_data;
->   
->   	if (vcpu->run->s.regs.gprs[0] & 0x0fffff00
->   	    || vcpu->run->s.regs.gprs[1] & 0xffff0000)
-> @@ -910,6 +913,10 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->   			goto out_no_data;
->   		handle_stsi_3_2_2(vcpu, (void *) mem);
->   		break;
-> +	case 15:
-> +		trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
-> +		insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
-> +		return -EREMOTE;
->   	}
->   	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
->   		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
-> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index dada78b92691..4f4fee697550 100644
-> --- a/arch/s390/kvm/vsie.c
-> +++ b/arch/s390/kvm/vsie.c
-> @@ -503,6 +503,9 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
->   	/* Host-protection-interruption introduced with ESOP */
->   	if (test_kvm_cpu_feat(vcpu->kvm, KVM_S390_VM_CPU_FEAT_ESOP))
->   		scb_s->ecb |= scb_o->ecb & ECB_HOSTPROTINT;
-> +	/* CPU Topology */
-
-Maybe also add:
-This facility only uses the utility field of the SCA and none of the cpu 
-entries that are problematic with the other interpretation facilities so 
-we can pass it through.
-
-> +	if (test_kvm_facility(vcpu->kvm, 11))
-> +		scb_s->ecb |= scb_o->ecb & ECB_PTF;
->   	/* transactional execution */
->   	if (test_kvm_facility(vcpu->kvm, 73) && wants_tx) {
->   		/* remap the prefix is tx is toggled on */
+> >
+> >
+> > > ---
+> > > Changes since V2:
+> > > - Tweak the Kconfig help
+> > > - Add comment for the read_lock() pairing in virtio_ccw
+> > > ---
+> > >  drivers/s390/virtio/virtio_ccw.c |  9 ++++++++-
+> > >  drivers/virtio/Kconfig           | 13 +++++++++++++
+> > >  drivers/virtio/virtio.c          |  2 ++
+> > >  drivers/virtio/virtio_ring.c     | 12 ++++++++++++
+> > >  include/linux/virtio_config.h    |  2 ++
+> > >  5 files changed, 37 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> > > index 97e51c34e6cf..1f6a358f65f0 100644
+> > > --- a/drivers/s390/virtio/virtio_ccw.c
+> > > +++ b/drivers/s390/virtio/virtio_ccw.c
+> > > @@ -1136,8 +1136,13 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+> > >                       vcdev->err = -EIO;
+> > >       }
+> > >       virtio_ccw_check_activity(vcdev, activity);
+> > > -     /* Interrupts are disabled here */
+> > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > +     /*
+> > > +      * Paried with virtio_ccw_synchronize_cbs() and interrupts are
+> > > +      * disabled here.
+> > > +      */
+> > >       read_lock(&vcdev->irq_lock);
+> > > +#endif
+> > >       for_each_set_bit(i, indicators(vcdev),
+> > >                        sizeof(*indicators(vcdev)) * BITS_PER_BYTE) {
+> > >               /* The bit clear must happen before the vring kick. */
+> > > @@ -1146,7 +1151,9 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+> > >               vq = virtio_ccw_vq_by_ind(vcdev, i);
+> > >               vring_interrupt(0, vq);
+> > >       }
+> > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > >       read_unlock(&vcdev->irq_lock);
+> > > +#endif
+> > >       if (test_bit(0, indicators2(vcdev))) {
+> > >               virtio_config_changed(&vcdev->vdev);
+> > >               clear_bit(0, indicators2(vcdev));
+> > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> > > index b5adf6abd241..c04f370a1e5c 100644
+> > > --- a/drivers/virtio/Kconfig
+> > > +++ b/drivers/virtio/Kconfig
+> > > @@ -35,6 +35,19 @@ menuconfig VIRTIO_MENU
+> > >
+> > >  if VIRTIO_MENU
+> > >
+> > > +config VIRTIO_HARDEN_NOTIFICATION
+> > > +        bool "Harden virtio notification"
+> > > +        help
+> > > +          Enable this to harden the device notifications and suppress
+> > > +          those that happen at a time where notifications are illegal.
+> > > +
+> > > +          Experimental: Note that several drivers still have bugs that
+> > > +          may cause crashes or hangs when correct handling of
+> > > +          notifications is enforced; depending on the subset of
+> > > +          drivers and devices you use, this may or may not work.
+> > > +
+> > > +          If unsure, say N.
+> > > +
+> > >  config VIRTIO_PCI
+> > >       tristate "PCI driver for virtio devices"
+> > >       depends on PCI
+> > > diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> > > index ef04a96942bf..21dc08d2f32d 100644
+> > > --- a/drivers/virtio/virtio.c
+> > > +++ b/drivers/virtio/virtio.c
+> > > @@ -220,6 +220,7 @@ static int virtio_features_ok(struct virtio_device *dev)
+> > >   * */
+> > >  void virtio_reset_device(struct virtio_device *dev)
+> > >  {
+> > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > >       /*
+> > >        * The below virtio_synchronize_cbs() guarantees that any
+> > >        * interrupt for this line arriving after
+> > > @@ -228,6 +229,7 @@ void virtio_reset_device(struct virtio_device *dev)
+> > >        */
+> > >       virtio_break_device(dev);
+> > >       virtio_synchronize_cbs(dev);
+> > > +#endif
+> > >
+> > >       dev->config->reset(dev);
+> > >  }
+> > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > > index 13a7348cedff..d9d3b6e201fb 100644
+> > > --- a/drivers/virtio/virtio_ring.c
+> > > +++ b/drivers/virtio/virtio_ring.c
+> > > @@ -1688,7 +1688,11 @@ static struct virtqueue *vring_create_virtqueue_packed(
+> > >       vq->we_own_ring = true;
+> > >       vq->notify = notify;
+> > >       vq->weak_barriers = weak_barriers;
+> > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > >       vq->broken = true;
+> > > +#else
+> > > +     vq->broken = false;
+> > > +#endif
+> > >       vq->last_used_idx = 0;
+> > >       vq->event_triggered = false;
+> > >       vq->num_added = 0;
+> > > @@ -2135,9 +2139,13 @@ irqreturn_t vring_interrupt(int irq, void *_vq)
+> > >       }
+> > >
+> > >       if (unlikely(vq->broken)) {
+> > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > >               dev_warn_once(&vq->vq.vdev->dev,
+> > >                             "virtio vring IRQ raised before DRIVER_OK");
+> > >               return IRQ_NONE;
+> > > +#else
+> > > +             return IRQ_HANDLED;
+> > > +#endif
+> > >       }
+> > >
+> > >       /* Just a hint for performance: so it's ok that this can be racy! */
+> > > @@ -2180,7 +2188,11 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+> > >       vq->we_own_ring = false;
+> > >       vq->notify = notify;
+> > >       vq->weak_barriers = weak_barriers;
+> > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > >       vq->broken = true;
+> > > +#else
+> > > +     vq->broken = false;
+> > > +#endif
+> > >       vq->last_used_idx = 0;
+> > >       vq->event_triggered = false;
+> > >       vq->num_added = 0;
+> > > diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+> > > index 9a36051ceb76..d15c3cdda2d2 100644
+> > > --- a/include/linux/virtio_config.h
+> > > +++ b/include/linux/virtio_config.h
+> > > @@ -257,6 +257,7 @@ void virtio_device_ready(struct virtio_device *dev)
+> > >
+> > >       WARN_ON(status & VIRTIO_CONFIG_S_DRIVER_OK);
+> > >
+> > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > >       /*
+> > >        * The virtio_synchronize_cbs() makes sure vring_interrupt()
+> > >        * will see the driver specific setup if it sees vq->broken
+> > > @@ -264,6 +265,7 @@ void virtio_device_ready(struct virtio_device *dev)
+> > >        */
+> > >       virtio_synchronize_cbs(dev);
+> > >       __virtio_unbreak_device(dev);
+> > > +#endif
+> > >       /*
+> > >        * The transport should ensure the visibility of vq->broken
+> > >        * before setting DRIVER_OK. See the comments for the transport
+> > > --
+> > > 2.25.1
+> >
 
