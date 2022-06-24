@@ -2,68 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD24855A396
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 23:34:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DB9A55A3F5
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 23:51:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231643AbiFXVd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 17:33:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60694 "EHLO
+        id S231468AbiFXVvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 17:51:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231654AbiFXVd0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 17:33:26 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C6D381702
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 14:33:24 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3187c3e8751so31633477b3.2
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 14:33:24 -0700 (PDT)
+        with ESMTP id S231419AbiFXVvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 17:51:08 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 231E187B58
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 14:51:07 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id m1so4809189wrb.2
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 14:51:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=w7pYH3Bp+7D9xuT3co02A5pJbc4yA028A6ZIKFRsVP4=;
-        b=WMOIzGv+yBgmPmWboW5Ib1BtgY+7qA8wvottktfkN+RrL22pEEfHfLiOCA56hKi1g4
-         qZjmllp4XM0O52pMMhB8lR7ykCAtM/HaKIicOw7Zmw3HCnUqy/fvSlvoPixK8Lq7D+5A
-         SOJmXAjm9RCNRyMR/SAsOox5gBIRsoGDXohzFCioViiFltsaj32tylEMrYOI23xJSDNl
-         8AwoKodZYbyMEkWiJUW+wDT601H9febrWwm+W6+rArsfFZcyM9LvzbFvkHbrgJ4nM0pW
-         E8fYCP9rAyYcaocc+bdk5mdeIWGRTgHYFmV5Ze2n09dhAJEy9a9qq3GMTfD26srlGQ2I
-         m1lQ==
+        bh=ygHo4kCjlplomgaDbLB/O69dvwBvbC5Loc23ldoxb3Y=;
+        b=RsFWPuqWaoLcQtnQjgye0TXSrWqr2gSZP/JqpocE2GMf+HPDFUKs0eQ03fdTXAy25m
+         mAn7ndJzQ5Ot91T0BnJG+wIfYUyXbMDliJ4XSKHWOEnrH2aYdvnWxWHTyWL3hSC7qMRM
+         D+4z+0moSBKDpopAba4+GZrWcIQc0REx9PuZ0WTpskVsqewQAN6+HZOoG+I2UfNsPo35
+         GCrp6xkZQ5Hhf/zCu2+zR0iTPTNgdPOD9lQJsDDwu/683Sn+qQmM26nXGaLzwhN/8Jj9
+         xOKspLeH0Fp/qROPBWylrPNxLoMnTwmXJtKMHMrQsy30GTKTSM++YEegq1m0IhsbybZR
+         hVSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=w7pYH3Bp+7D9xuT3co02A5pJbc4yA028A6ZIKFRsVP4=;
-        b=1uCcQLCCNc+xCQitQqHS2H1R398NrYcnm/vvxy8u3Og7cPgSEiQAyPvE+e8+PVAAoj
-         4porwl0Ffxpw7FCO128ANsscFTo+e3EVBogazcMWdt4tn1W6k3jhunGwF6UixhdPvLwU
-         5QjUM2fFp5X7WjH0Jf5ei3qF4Ag9F5Ueh9WQdtgrheLK1KHcPeHxdrF85mxzER5CbBQn
-         Azb8RKOLzcxOdCUuzXma9T9gI89HBMySARMBHjP7i6BsknlFLnx/MfPuPzgkmCsdy6Al
-         8XPkvSM1/lLSHYkhbX9KifqLGBAmQt2ZnyWko++XAh0rJLCGngmIQL3IZgIqPuEoKbRS
-         IyLA==
-X-Gm-Message-State: AJIora/hvbKihXKn0BibdrBWHKcImoes4fQEKopXZO27BQlvvXJrTTCF
-        7HX5jxWZpavXw9/krDR5pKUEvuIh+MsUf55MWJFoU4JrmCZD3U6r8EwNOm3MvoVufo5QHyFG1uP
-        yZ/1pgAn6E9LP3A7WgFYNUy+6tLQ26CfDGoDC2wKjOC8UrG0ny+U/K//hguVV5oE=
-X-Google-Smtp-Source: AGRyM1ufgISjcvjyIPokRN7wEV5P1Oyma2JgDTA2seroXGdLHZ1Yl3hfPPWOXaf4uVjlaWkEAPNYY7k9ga7HJg==
-X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a0d:fac6:0:b0:317:5202:b8c1 with SMTP id
- k189-20020a0dfac6000000b003175202b8c1mr1037201ywf.467.1656106403490; Fri, 24
- Jun 2022 14:33:23 -0700 (PDT)
-Date:   Fri, 24 Jun 2022 14:32:57 -0700
-In-Reply-To: <20220624213257.1504783-1-ricarkol@google.com>
-Message-Id: <20220624213257.1504783-14-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20220624213257.1504783-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
-Subject: [PATCH v4 13/13] KVM: selftests: aarch64: Add mix of tests into page_fault_test
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com
-Cc:     pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, oupton@google.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, dmatlack@google.com,
-        axelrasmussen@google.com, Ricardo Koller <ricarkol@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ygHo4kCjlplomgaDbLB/O69dvwBvbC5Loc23ldoxb3Y=;
+        b=BnGIJpU1zp4jauDF9D4R5bEnuYXb7YgWgKvdxpGS5MYCwXXiaHgrVV4KLYTqSYupCg
+         t3+vUi29xPki6otqqxQgCJsPWmtLkBW2dShhVM+XPEUQpgnLollwy/p26eA2PblrSMeJ
+         1T33eb4qDyPnBkEC7vnE6ZbSnyXz3TgMb7mXvTsugjTxWhcFh/OBqYJtxg2+J7e6jQjh
+         TbznFjjNxQ3gde89ju5tZp4oKZaPGoMGE+tq+tcjPni1w3tGtZeohqI10x60s/SUyi2G
+         jMuBnVm2V0ITAoxeUfZBHMNxCym2yYSBqbf2WA60BZcuwwzZVNhoPkZNuDPTfygeDQxn
+         2Aug==
+X-Gm-Message-State: AJIora9QCjkgXPa4IabMp2iP+P9vZWQeTnFIvmnYDH72y+PPSATSxDN1
+        kFLG1C/6zHdTVRDh9rQokvMGZyTn7+w/ySzas30fw5EX24g=
+X-Google-Smtp-Source: AGRyM1t2jcGW3PeWYunQh6GfpJeg8eVQCrLSWuOvf0glSyRhsk25Df+XOBeTdbLhrqqfHC+TqtbY7gSVXm3SdN2NYKk=
+X-Received: by 2002:a05:6000:54f:b0:21b:944c:c70b with SMTP id
+ b15-20020a056000054f00b0021b944cc70bmr1072670wrf.572.1656107465447; Fri, 24
+ Jun 2022 14:51:05 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220623234944.141869-1-pcc@google.com> <YrXu0Uzi73pUDwye@arm.com>
+In-Reply-To: <YrXu0Uzi73pUDwye@arm.com>
+From:   Peter Collingbourne <pcc@google.com>
+Date:   Fri, 24 Jun 2022 14:50:53 -0700
+Message-ID: <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Michael Roth <michael.roth@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>,
+        Steven Price <steven.price@arm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,233 +72,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some mix of tests into page_fault_test: memslots with all the
-pairwise combinations of read-only, userfaultfd, and dirty-logging.  For
-example, writing into a read-only memslot which has a hole handled with
-userfaultfd.
+On Fri, Jun 24, 2022 at 10:05 AM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+>
+> + Steven as he added the KVM and swap support for MTE.
+>
+> On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
+> > Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
+> > depend on being able to map guest memory as MAP_SHARED. The current
+> > restriction on sharing MAP_SHARED pages with the guest is preventing
+> > the use of those features with MTE. Therefore, remove this restriction.
+>
+> We already have some corner cases where the PG_mte_tagged logic fails
+> even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
+> KVM MAP_SHARED will potentially make things worse (or hard to reason
+> about; for example the VMM sets PROT_MTE as well). I'm more inclined to
+> get rid of PG_mte_tagged altogether, always zero (or restore) the tags
+> on user page allocation, copy them on write. For swap we can scan and if
+> all tags are 0 and just skip saving them.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../selftests/kvm/aarch64/page_fault_test.c   | 178 ++++++++++++++++++
- 1 file changed, 178 insertions(+)
+A problem with this approach is that it would conflict with any
+potential future changes that we might make that would require the
+kernel to avoid modifying the tags for non-PROT_MTE pages.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index c96fc2fd3390..4116a35979d5 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -396,6 +396,12 @@ static int uffd_test_read_handler(int mode, int uffd, struct uffd_msg *msg)
- 	return uffd_generic_handler(mode, uffd, msg, &memslot[TEST], false);
- }
- 
-+static int uffd_no_handler(int mode, int uffd, struct uffd_msg *msg)
-+{
-+	TEST_FAIL("There was no UFFD fault expected.");
-+	return -1;
-+}
-+
- /* Returns false if the test should be skipped. */
- static bool punch_hole_in_memslot(struct kvm_vm *vm,
- 		struct memslot_desc *memslot)
-@@ -886,6 +892,22 @@ static void help(char *name)
- 	.expected_events	= { 0 },					\
- }
- 
-+#define TEST_UFFD_AND_DIRTY_LOG(_access, _with_af, _uffd_test_handler,		\
-+		_uffd_faults, _test_check)					\
-+{										\
-+	.name			= SCAT3(uffd_and_dirty_log, _access, _with_af),	\
-+	.test_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.guest_prepare		= { _PREPARE(_with_af),				\
-+				    _PREPARE(_access) },			\
-+	.guest_test		= _access,					\
-+	.mem_mark_cmd		= CMD_HOLE_TEST | CMD_HOLE_PT,			\
-+	.guest_test_check	= { _CHECK(_with_af), _test_check },		\
-+	.uffd_test_handler	= _uffd_test_handler,				\
-+	.uffd_pt_handler	= uffd_pt_write_handler,			\
-+	.expected_events	= { .uffd_faults = _uffd_faults, },		\
-+}
-+
- #define TEST_RO_MEMSLOT(_access, _mmio_handler, _mmio_exits,			\
- 			_iabt_handler, _dabt_handler, _aborts)			\
- {										\
-@@ -912,6 +934,71 @@ static void help(char *name)
- 	.expected_events	= { .aborts = 1, .fail_vcpu_runs = 1 },		\
- }
- 
-+#define TEST_RO_MEMSLOT_AND_DIRTY_LOG(_access, _mmio_handler, _mmio_exits,	\
-+				      _iabt_handler, _dabt_handler, _aborts,	\
-+				      _test_check)				\
-+{										\
-+	.name			= SCAT3(ro_memslot, _access, _with_af),		\
-+	.test_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.pt_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.guest_prepare		= { _PREPARE(_access) },			\
-+	.guest_test		= _access,					\
-+	.guest_test_check	= { _test_check },				\
-+	.mmio_handler		= _mmio_handler,				\
-+	.iabt_handler		= _iabt_handler,				\
-+	.dabt_handler		= _dabt_handler,				\
-+	.expected_events	= { .mmio_exits = _mmio_exits,			\
-+				    .aborts = _aborts},				\
-+}
-+
-+#define TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(_access, _test_check)		\
-+{										\
-+	.name			= SCAT2(ro_memslot_no_syn_and_dlog, _access),	\
-+	.test_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.pt_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.guest_test		= _access,					\
-+	.guest_test_check	= { _test_check },				\
-+	.dabt_handler		= dabt_s1ptw_on_ro_memslot_handler,		\
-+	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
-+	.expected_events	= { .aborts = 1, .fail_vcpu_runs = 1 },		\
-+}
-+
-+#define TEST_RO_MEMSLOT_AND_UFFD(_access, _mmio_handler, _mmio_exits,		\
-+				 _iabt_handler, _dabt_handler, _aborts,		\
-+				_uffd_test_handler, _uffd_faults)		\
-+{										\
-+	.name			= SCAT2(ro_memslot_uffd, _access),		\
-+	.test_memslot_flags	= KVM_MEM_READONLY,				\
-+	.pt_memslot_flags	= KVM_MEM_READONLY,				\
-+	.mem_mark_cmd		= CMD_HOLE_TEST | CMD_HOLE_PT,			\
-+	.guest_prepare		= { _PREPARE(_access) },			\
-+	.guest_test		= _access,					\
-+	.uffd_test_handler	= _uffd_test_handler,				\
-+	.uffd_pt_handler	= uffd_pt_write_handler,			\
-+	.mmio_handler		= _mmio_handler,				\
-+	.iabt_handler		= _iabt_handler,				\
-+	.dabt_handler		= _dabt_handler,				\
-+	.expected_events	= { .mmio_exits = _mmio_exits,			\
-+				    .aborts = _aborts,				\
-+				    .uffd_faults = _uffd_faults },		\
-+}
-+
-+#define TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(_access, _uffd_test_handler,	\
-+					     _uffd_faults)			\
-+{										\
-+	.name			= SCAT2(ro_memslot_no_syndrome, _access),	\
-+	.test_memslot_flags	= KVM_MEM_READONLY,				\
-+	.pt_memslot_flags	= KVM_MEM_READONLY,				\
-+	.mem_mark_cmd		= CMD_HOLE_TEST | CMD_HOLE_PT,			\
-+	.guest_test		= _access,					\
-+	.uffd_test_handler	= _uffd_test_handler,				\
-+	.uffd_pt_handler	= uffd_pt_write_handler,			\
-+	.dabt_handler		= dabt_s1ptw_on_ro_memslot_handler,		\
-+	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
-+	.expected_events	= { .aborts = 1, .fail_vcpu_runs = 1,		\
-+				    .uffd_faults = _uffd_faults },		\
-+}
-+
- static struct test_desc tests[] = {
- 	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
- 	TEST_ACCESS(guest_read64, with_af, CMD_NONE),
-@@ -979,6 +1066,35 @@ static struct test_desc tests[] = {
- 	TEST_DIRTY_LOG(guest_dc_zva, with_af, guest_check_write_in_dirty_log),
- 	TEST_DIRTY_LOG(guest_st_preidx, with_af, guest_check_write_in_dirty_log),
- 
-+	/*
-+	 * Access when the test and PT memslots are both marked for dirty
-+	 * logging and UFFD at the same time. The expected result is that
-+	 * writes should mark the dirty log and trigger a userfaultfd write
-+	 * fault.  Reads/execs should result in a read userfaultfd fault, and
-+	 * nothing in the dirty log.  The S1PTW in all cases should result in a
-+	 * write in the dirty log and a userfaultfd write.
-+	 */
-+	TEST_UFFD_AND_DIRTY_LOG(guest_read64, with_af, uffd_test_read_handler, 2,
-+			guest_check_no_write_in_dirty_log),
-+	/* no_af should also lead to a PT write. */
-+	TEST_UFFD_AND_DIRTY_LOG(guest_read64, no_af, uffd_test_read_handler, 2,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_ld_preidx, with_af, uffd_test_read_handler,
-+			2, guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_at, with_af, 0, 1,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_exec, with_af, uffd_test_read_handler, 2,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_write64, with_af, uffd_test_write_handler,
-+			2, guest_check_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_cas, with_af, uffd_test_read_handler, 2,
-+			guest_check_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_dc_zva, with_af, uffd_test_write_handler,
-+			2, guest_check_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_st_preidx, with_af,
-+			uffd_test_write_handler, 2,
-+			guest_check_write_in_dirty_log),
-+
- 	/*
- 	 * Try accesses when both the test and PT memslots are marked read-only
- 	 * (with KVM_MEM_READONLY). The S1PTW results in an guest abort, whose
-@@ -1005,6 +1121,68 @@ static struct test_desc tests[] = {
- 	TEST_RO_MEMSLOT_NO_SYNDROME(guest_cas),
- 	TEST_RO_MEMSLOT_NO_SYNDROME(guest_st_preidx),
- 
-+	/*
-+	 * Access when both the test and PT memslots are read-only and marked
-+	 * for dirty logging at the same time. The expected result is that
-+	 * there should be no write in the dirty log. The S1PTW results in an
-+	 * abort which is handled by asking the host to recreate the memslot as
-+	 * writable. The readonly handling are the same as if the memslots were
-+	 * not marked for dirty logging: writes with a syndrome result in an
-+	 * MMIO exit, and writes with no syndrome result in a failed vcpu run.
-+	 */
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_read64, 0, 0, 0,
-+			dabt_s1ptw_on_ro_memslot_handler, 1,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_ld_preidx, 0, 0, 0,
-+			dabt_s1ptw_on_ro_memslot_handler, 1,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_at, 0, 0, 0,
-+			dabt_s1ptw_on_ro_memslot_handler, 1,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_exec, 0, 0,
-+			iabt_s1ptw_on_ro_memslot_handler, 0, 1,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_write64, mmio_on_test_gpa_handler,
-+			1, 0, dabt_s1ptw_on_ro_memslot_handler, 1,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_dc_zva,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_cas,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_st_preidx,
-+			guest_check_no_write_in_dirty_log),
-+
-+	/*
-+	 * Access when both the test and PT memslots are read-only, and punched
-+	 * with holes tracked with userfaultfd.  The expected result is the
-+	 * union of both userfaultfd and read-only behaviors. For example,
-+	 * write accesses result in a userfaultfd write fault and an MMIO exit.
-+	 * Writes with no syndrome result in a failed vcpu run and no
-+	 * userfaultfd write fault. Reads only result in userfaultfd getting
-+	 * triggered.
-+	 */
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_read64, 0, 0, 0,
-+			dabt_s1ptw_on_ro_memslot_handler, 1,
-+			uffd_test_read_handler, 2),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_ld_preidx, 0, 0, 0,
-+			dabt_s1ptw_on_ro_memslot_handler, 1,
-+			uffd_test_read_handler, 2),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_at, 0, 0, 0,
-+			dabt_s1ptw_on_ro_memslot_handler, 1,
-+			uffd_no_handler, 1),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_exec, 0, 0,
-+			iabt_s1ptw_on_ro_memslot_handler, 0, 1,
-+			uffd_test_read_handler, 2),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_write64, mmio_on_test_gpa_handler, 1, 0,
-+			dabt_s1ptw_on_ro_memslot_handler, 1,
-+			uffd_test_write_handler, 2),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_cas,
-+			uffd_test_read_handler, 2),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_dc_zva,
-+			uffd_no_handler, 1),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_st_preidx,
-+			uffd_no_handler, 1),
-+
- 	{ 0 }
- };
- 
--- 
-2.37.0.rc0.161.g10f37bed90-goog
+Thinking about this some more, another idea that I had was to only
+allow MAP_SHARED mappings in a guest with MTE enabled if the mapping
+is PROT_MTE and there are no non-PROT_MTE aliases. For anonymous
+mappings I don't think it's possible to create a non-PROT_MTE alias in
+another mm (since you can't turn off PROT_MTE with mprotect), and for
+memfd maybe we could introduce a flag that requires PROT_MTE on all
+mappings. That way, we are guaranteed that either the page has been
+tagged prior to fault or we have exclusive access to it so it can be
+tagged on demand without racing. Let me see what effect that has on
+crosvm.
 
+> Another aspect is a change in the KVM ABI with this patch. It's probably
+> not that bad since it's rather a relaxation but it has the potential to
+> confuse the VMM, especially as it doesn't know whether it's running on
+> older kernels or not (it would have to probe unless we expose this info
+> to the VMM in some other way).
+>
+> > To avoid races between multiple tasks attempting to clear tags on the
+> > same page, introduce a new page flag, PG_mte_tag_clearing, and test-set it
+> > atomically before beginning to clear tags on a page. If the flag was not
+> > initially set, spin until the other task has finished clearing the tags.
+>
+> TBH, I can't mentally model all the corner cases, so maybe a formal
+> model would help (I can have a go with TLA+, though not sure when I find
+> a bit of time this summer). If we get rid of PG_mte_tagged altogether,
+> this would simplify things (hopefully).
+>
+> As you noticed, the problem is that setting PG_mte_tagged and clearing
+> (or restoring) the tags is not an atomic operation. There are places
+> like mprotect() + CoW where one task can end up with stale tags. Another
+> is shared memfd mappings if more than one mapping sets PROT_MTE and
+> there's the swap restoring on top.
+>
+> > diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+> > index f6b00743c399..8f9655053a9f 100644
+> > --- a/arch/arm64/kernel/mte.c
+> > +++ b/arch/arm64/kernel/mte.c
+> > @@ -57,7 +57,18 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
+> >        * the new page->flags are visible before the tags were updated.
+> >        */
+> >       smp_wmb();
+> > -     mte_clear_page_tags(page_address(page));
+> > +     mte_ensure_page_tags_cleared(page);
+> > +}
+> > +
+> > +void mte_ensure_page_tags_cleared(struct page *page)
+> > +{
+> > +     if (test_and_set_bit(PG_mte_tag_clearing, &page->flags)) {
+> > +             while (!test_bit(PG_mte_tagged, &page->flags))
+> > +                     ;
+> > +     } else {
+> > +             mte_clear_page_tags(page_address(page));
+> > +             set_bit(PG_mte_tagged, &page->flags);
+> > +     }
+> >  }
+>
+> mte_sync_tags() already sets PG_mte_tagged prior to clearing the page
+> tags. The reason was so that multiple concurrent set_pte_at() would not
+> all rush to clear (or restore) the tags. But we do have the risk of one
+> thread accessing the page with the stale tags (copy_user_highpage() is
+> worse as the tags would be wrong in the destination page). I'd rather be
+> consistent everywhere with how we set the flags.
+>
+> However, I find it easier to reason about if we used the new flag as a
+> lock. IOW, if PG_mte_tagged is set, we know that tags are valid. If not
+> set, take the PG_mte_locked flag, check PG_mte_tagged again and
+> clear/restore the tags followed by PG_mte_tagged (and you can use
+> test_and_set_bit_lock() for the acquire semantics).
+
+Okay, I can look at doing it that way as well.
+
+> It would be interesting to benchmark the cost of always zeroing the tags
+> on allocation and copy when MTE is not in use:
+>
+> diff --git a/arch/arm64/mm/copypage.c b/arch/arm64/mm/copypage.c
+> index 0dea80bf6de4..d31708886bf9 100644
+> --- a/arch/arm64/mm/copypage.c
+> +++ b/arch/arm64/mm/copypage.c
+> @@ -21,7 +21,7 @@ void copy_highpage(struct page *to, struct page *from)
+>
+>         copy_page(kto, kfrom);
+>
+> -       if (system_supports_mte() && test_bit(PG_mte_tagged, &from->flags)) {
+> +       if (system_supports_mte()) {
+>                 set_bit(PG_mte_tagged, &to->flags);
+>                 page_kasan_tag_reset(to);
+>                 /*
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index c5e11768e5c1..b42cad9b9349 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -913,12 +913,7 @@ struct page *alloc_zeroed_user_highpage_movable(struct vm_area_struct *vma,
+>  {
+>         gfp_t flags = GFP_HIGHUSER_MOVABLE | __GFP_ZERO;
+>
+> -       /*
+> -        * If the page is mapped with PROT_MTE, initialise the tags at the
+> -        * point of allocation and page zeroing as this is usually faster than
+> -        * separate DC ZVA and STGM.
+> -        */
+> -       if (vma->vm_flags & VM_MTE)
+> +       if (system_supports_mte())
+>                 flags |= __GFP_ZEROTAGS;
+>
+>         return alloc_page_vma(flags, vma, vaddr);
+>
+> If that's negligible, we can hopefully get rid of PG_mte_tagged. For
+> swap we could move the restoring to arch_do_swap_page() (but move the
+> call one line above set_pte_at() in do_swap_page()).
+
+I could experiment with this but I'm hesistant given the potential to
+cut off potential future changes.
+
+Peter
