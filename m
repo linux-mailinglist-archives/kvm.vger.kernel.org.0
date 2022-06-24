@@ -2,164 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CABC0559F1A
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 19:06:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEADA559FA4
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 19:26:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231349AbiFXRFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 13:05:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
+        id S231367AbiFXRSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 13:18:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231296AbiFXRFc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 13:05:32 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269F348333
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 10:05:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D0C26B82AA7
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 17:05:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93FC0C34114;
-        Fri, 24 Jun 2022 17:05:25 +0000 (UTC)
-Date:   Fri, 24 Jun 2022 18:05:21 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Peter Collingbourne <pcc@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Michael Roth <michael.roth@amd.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>,
-        Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
-Message-ID: <YrXu0Uzi73pUDwye@arm.com>
-References: <20220623234944.141869-1-pcc@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220623234944.141869-1-pcc@google.com>
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231168AbiFXRSM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 13:18:12 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157CF1EAD6
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 10:18:11 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id e8-20020a17090301c800b0016a57150c37so1577958plh.3
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 10:18:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=v5yna8ItikU2fb5u1sePnTAPT+OQna41hrQ1rG7Dn0Y=;
+        b=KyIuHFn8LfqulIFW1TY5xQGMGKE5mrB5KYFzJL5pvXrFz9Z+E8TP798YlQiCx0euRQ
+         hACEWEJ6aNEucjttEX9XhVoJgxjBu2sOAZ6pLxOxcPm2wmyAZSgZiK1BPzML1Um0M+k0
+         yE3Tl0UTpLUitJyMN8wUwnX93sPI9+HQ3Ao49FkAPuK34WwuRNEqEE1fHuLkb/buqMpa
+         5bPwAIpA7c/yXX9a7gflIxragXVwgj9D6/tNfTijiNYw1xmnkLwLY4q6a/K2E6yn5heC
+         hRaa4vU+hwzw42TSYRgStAn1/+LuwEpNObCwzt4XMpgU+9X/gGLcIHT7DhbBvD5anPBu
+         i8Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=v5yna8ItikU2fb5u1sePnTAPT+OQna41hrQ1rG7Dn0Y=;
+        b=h0+eZZueDqRQfh9hSQuOX49KmRqzgryUe6xtiO3QmYh2bjq6qvK7F3U3FCImTyXpZd
+         IcQU0QOHq+2TD+bDDespUmHSvMUEZdMXVoPgfXZHr9+XUx0Yp0uTD9WAb5ND/cNMmOq7
+         tgdQHC8VfJ4nF9RvmcmUky7QyRchK5/foLs0LiCeoLCT6Epm95K6fOlLIy2zm5mszXkD
+         cp/FOUUqtdmiR/iQMPwaz3qbE7WGgRPLeMy63ej0jUZ8wLdWJQVVXdlI4CaPJgfOsFQc
+         F6l8VWHbY1Y3tfFiahKn5D9z4iV0nxPlZjUx7G6JYovJ9SQi73KRasx7Wt3j1ZuYLQcn
+         emlA==
+X-Gm-Message-State: AJIora8MkX3Y3dn02Tvvn0P+Xbw1oatfTXr6WclgHf20SZRIXhRpmnZ/
+        8Cod3CcmVgwqbobaO0co4KayW2+3fN8=
+X-Google-Smtp-Source: AGRyM1vNM3+l3baD53Rb//jNTwLDUmtvY2umobKNWJc93BvkYCSdkLSQPoj0oan9ZhziLBTWSveAjIySE5E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2450:b0:4f7:bf07:c063 with SMTP id
+ d16-20020a056a00245000b004f7bf07c063mr47194536pfj.51.1656091090609; Fri, 24
+ Jun 2022 10:18:10 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 24 Jun 2022 17:18:05 +0000
+Message-Id: <20220624171808.2845941-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
+Subject: [PATCH 0/3] KVM: x86/mmu: Cleanups for eager page splitting
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ Steven as he added the KVM and swap support for MTE.
+Eager page splitting cleanups for a few minor things that were noted in
+code review but didn't make it into the committed code.
 
-On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
-> Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
-> depend on being able to map guest memory as MAP_SHARED. The current
-> restriction on sharing MAP_SHARED pages with the guest is preventing
-> the use of those features with MTE. Therefore, remove this restriction.
+The last patch in particular is a bit more urgent than I first realized.
+I had forgotten that pte_list_desc is now 128 bytes, and I also had a
+brain fart and thought it was just allocating pointers, i.e. 8 bytes.
+In other words, I was thinking the 513 object buffer was "only" wasting
+~8kb per VM, whereas it actually costs ~64kb per VM.
 
-We already have some corner cases where the PG_mte_tagged logic fails
-even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
-KVM MAP_SHARED will potentially make things worse (or hard to reason
-about; for example the VMM sets PROT_MTE as well). I'm more inclined to
-get rid of PG_mte_tagged altogether, always zero (or restore) the tags
-on user page allocation, copy them on write. For swap we can scan and if
-all tags are 0 and just skip saving them.
+Sean Christopherson (3):
+  KVM: x86/mmu: Avoid subtle pointer arithmetic in kvm_mmu_child_role()
+  KVM: x86/mmu: Use "unsigned int", not "u32", for SPTEs' @access info
+  KVM: x86/mmu: Buffer nested MMU split_desc_cache only by default
+    capacity
 
-Another aspect is a change in the KVM ABI with this patch. It's probably
-not that bad since it's rather a relaxation but it has the potential to
-confuse the VMM, especially as it doesn't know whether it's running on
-older kernels or not (it would have to probe unless we expose this info
-to the VMM in some other way).
+ arch/x86/kvm/mmu/mmu.c | 53 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 35 insertions(+), 18 deletions(-)
 
-> To avoid races between multiple tasks attempting to clear tags on the
-> same page, introduce a new page flag, PG_mte_tag_clearing, and test-set it
-> atomically before beginning to clear tags on a page. If the flag was not
-> initially set, spin until the other task has finished clearing the tags.
 
-TBH, I can't mentally model all the corner cases, so maybe a formal
-model would help (I can have a go with TLA+, though not sure when I find
-a bit of time this summer). If we get rid of PG_mte_tagged altogether,
-this would simplify things (hopefully).
-
-As you noticed, the problem is that setting PG_mte_tagged and clearing
-(or restoring) the tags is not an atomic operation. There are places
-like mprotect() + CoW where one task can end up with stale tags. Another
-is shared memfd mappings if more than one mapping sets PROT_MTE and
-there's the swap restoring on top.
-
-> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-> index f6b00743c399..8f9655053a9f 100644
-> --- a/arch/arm64/kernel/mte.c
-> +++ b/arch/arm64/kernel/mte.c
-> @@ -57,7 +57,18 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
->  	 * the new page->flags are visible before the tags were updated.
->  	 */
->  	smp_wmb();
-> -	mte_clear_page_tags(page_address(page));
-> +	mte_ensure_page_tags_cleared(page);
-> +}
-> +
-> +void mte_ensure_page_tags_cleared(struct page *page)
-> +{
-> +	if (test_and_set_bit(PG_mte_tag_clearing, &page->flags)) {
-> +		while (!test_bit(PG_mte_tagged, &page->flags))
-> +			;
-> +	} else {
-> +		mte_clear_page_tags(page_address(page));
-> +		set_bit(PG_mte_tagged, &page->flags);
-> +	}
->  }
-
-mte_sync_tags() already sets PG_mte_tagged prior to clearing the page
-tags. The reason was so that multiple concurrent set_pte_at() would not
-all rush to clear (or restore) the tags. But we do have the risk of one
-thread accessing the page with the stale tags (copy_user_highpage() is
-worse as the tags would be wrong in the destination page). I'd rather be
-consistent everywhere with how we set the flags.
-
-However, I find it easier to reason about if we used the new flag as a
-lock. IOW, if PG_mte_tagged is set, we know that tags are valid. If not
-set, take the PG_mte_locked flag, check PG_mte_tagged again and
-clear/restore the tags followed by PG_mte_tagged (and you can use
-test_and_set_bit_lock() for the acquire semantics).
-
-It would be interesting to benchmark the cost of always zeroing the tags
-on allocation and copy when MTE is not in use:
-
-diff --git a/arch/arm64/mm/copypage.c b/arch/arm64/mm/copypage.c
-index 0dea80bf6de4..d31708886bf9 100644
---- a/arch/arm64/mm/copypage.c
-+++ b/arch/arm64/mm/copypage.c
-@@ -21,7 +21,7 @@ void copy_highpage(struct page *to, struct page *from)
- 
- 	copy_page(kto, kfrom);
- 
--	if (system_supports_mte() && test_bit(PG_mte_tagged, &from->flags)) {
-+	if (system_supports_mte()) {
- 		set_bit(PG_mte_tagged, &to->flags);
- 		page_kasan_tag_reset(to);
- 		/*
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index c5e11768e5c1..b42cad9b9349 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -913,12 +913,7 @@ struct page *alloc_zeroed_user_highpage_movable(struct vm_area_struct *vma,
- {
- 	gfp_t flags = GFP_HIGHUSER_MOVABLE | __GFP_ZERO;
- 
--	/*
--	 * If the page is mapped with PROT_MTE, initialise the tags at the
--	 * point of allocation and page zeroing as this is usually faster than
--	 * separate DC ZVA and STGM.
--	 */
--	if (vma->vm_flags & VM_MTE)
-+	if (system_supports_mte())
- 		flags |= __GFP_ZEROTAGS;
- 
- 	return alloc_page_vma(flags, vma, vaddr);
-
-If that's negligible, we can hopefully get rid of PG_mte_tagged. For
-swap we could move the restoring to arch_do_swap_page() (but move the
-call one line above set_pte_at() in do_swap_page()).
-
+base-commit: 4b88b1a518b337de1252b8180519ca4c00015c9e
 -- 
-Catalin
+2.37.0.rc0.161.g10f37bed90-goog
+
