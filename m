@@ -2,66 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1E9355A110
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 20:55:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B36FC55A151
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 20:55:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231723AbiFXSux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 14:50:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49338 "EHLO
+        id S230165AbiFXSue (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 14:50:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbiFXSuv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 14:50:51 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A6381736;
-        Fri, 24 Jun 2022 11:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656096650; x=1687632650;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Ut2SGnvpDx+O8nXdZtY5kkO5aRgYZRiMvdxYgKwPPVE=;
-  b=RNwVstez+6KGZFiIBakNJubuiwt0NJ7XwqexC7M+d0bP/sZEsCbymnvW
-   SmP0l3Gt8mHCxSrgGceRrJlv7Z9wBOOMgB2FwUDLGBzi4sBLEE8JgtAI3
-   /1C1ZND985skhhNG3g0lBhN+sFCtWYLYDwh7Jap7KRCn9Mb1JQRf2SR1K
-   GBmA9s6ZA35C36YNh+JZ01MXXwQWtTyG94BUjJQK9DzVAi3TmKJnXK0W6
-   8qHU5F8V4Rn9JM/nrfNtumoyLMdQfym6WvZrVRWm5W3UsaWZhUqYX/6+v
-   FayPDhs/lcno03Jt3olkTKvgO1n9SI7/aLpO4B8vhcAZmZVRobOX+wKTl
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10388"; a="260878551"
-X-IronPort-AV: E=Sophos;i="5.92,220,1650956400"; 
-   d="scan'208";a="260878551"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 11:50:50 -0700
-X-IronPort-AV: E=Sophos;i="5.92,220,1650956400"; 
-   d="scan'208";a="731429723"
-Received: from mdedeogl-mobl.amr.corp.intel.com (HELO [10.209.126.186]) ([10.209.126.186])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 11:50:49 -0700
-Message-ID: <765a20f1-681d-33c2-68e9-24cc249fe6f9@intel.com>
-Date:   Fri, 24 Jun 2022 11:50:14 -0700
+        with ESMTP id S229725AbiFXSuc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 14:50:32 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6FE81732
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 11:50:31 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id g10-20020a17090a708a00b001ea8aadd42bso3688485pjk.0
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 11:50:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=q6rfr27frAJafJqMgSkhsqEES6anfv72cn5sJOShRWg=;
+        b=lPyBwFVYgDgojYMZLm9K8IQPLtILllrC448H9vIQl3PSY85Fupyk+joMMWGmQWeXM1
+         r6g3XYa4mmW7wl1K7Qc5wuG+6orRfx6xbxL/kjd0Jr2xvu1A23uNXxf1FZCV5FDbxEaI
+         7MC/9tN3CuFTEN9hcWQaXskKO0E0YJtuPqiQizFjQxacdy4wIJRwsd85RSKcu3sSsQL7
+         +/XTTvfs6rQ4WlQ2AoasmMQUPFgwcUAxiR4z2NtuqIK5HPXmQYy1bql/kKFX34sCcUXv
+         UzS56h0LHHR/FLDpXLp1wFaD18eOUla2KoP4Twi3xX6E1p1hpQefwow0f1Pl9DrhC6zT
+         u3YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=q6rfr27frAJafJqMgSkhsqEES6anfv72cn5sJOShRWg=;
+        b=hsn5ofqQfdB99ZFVLsIxcVwxI209jHoEum0xnkF005QOlcPJkAppjQ+31jiMaoU6yv
+         v+y3QxGFYAyXFqr25uYzdqUZAJx/sD7eLaDscRb98yk4aBbIELHyz9HRWEhwXfkKSUpy
+         FNRRBZH2uEjGXS0UJAn/URsEnX2Zrhl5o3g6iUIZH9Vmj4XtavKhvu78w0w0s3T9DeJO
+         q8reqLTFuMj1+1SrBLpMRz/fhUs+6Agsgns/eNSiFyLJmG+IUV4C4wlHpHGBnc5IvM2Y
+         42PnhqHL8z9C8HenVq/zz81A+Jhtq5mqlsKgx+K32YnCyyHF65xu41Pwu8HDlJXDVN/m
+         wNKA==
+X-Gm-Message-State: AJIora/puV1yRdxrtwZCPgw9fUvgmdD4EfUrbwV6URjtxGOmK/uIw3Vp
+        iSv27cCg5a1+67Q5xXBFrJv2CQ==
+X-Google-Smtp-Source: AGRyM1t+BrMAJc3FK1feaNJwIwRFADdLm2Q1Y7zAR1oGUMoY80j1jfgCOLrhQPq3RgTaBuQrnNQw6Q==
+X-Received: by 2002:a17:90a:410a:b0:1ec:7fc8:6d15 with SMTP id u10-20020a17090a410a00b001ec7fc86d15mr326047pjf.236.1656096631204;
+        Fri, 24 Jun 2022 11:50:31 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id h8-20020a056a00170800b0050dc762819bsm2041961pfc.117.2022.06.24.11.50.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jun 2022 11:50:30 -0700 (PDT)
+Date:   Fri, 24 Jun 2022 18:50:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: x86/mmu: Avoid subtle pointer arithmetic in
+ kvm_mmu_child_role()
+Message-ID: <YrYHc4BIAf+pGRhW@google.com>
+References: <20220624171808.2845941-1-seanjc@google.com>
+ <20220624171808.2845941-2-seanjc@google.com>
+ <YrX1WB1FZzXiR+Io@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v5 08/22] x86/virt/tdx: Shut down TDX module in case of
- error
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-References: <cover.1655894131.git.kai.huang@intel.com>
- <89fffc70cdbb74c80bb324364b712ec41e5f8b91.1655894131.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <89fffc70cdbb74c80bb324364b712ec41e5f8b91.1655894131.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YrX1WB1FZzXiR+Io@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,114 +77,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-So, the last patch was called:
+On Fri, Jun 24, 2022, David Matlack wrote:
+> On Fri, Jun 24, 2022 at 05:18:06PM +0000, Sean Christopherson wrote:
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -2168,7 +2168,8 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
+> >  	return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
+> >  }
+> >  
+> > -static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, unsigned int access)
+> > +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct,
+> > +						  unsigned int access)
+> >  {
+> >  	struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
+> >  	union kvm_mmu_page_role role;
+> > @@ -2195,13 +2196,19 @@ static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, unsig
+> >  	 * uses 2 PAE page tables, each mapping a 2MiB region. For these,
+> >  	 * @role.quadrant encodes which half of the region they map.
+> >  	 *
+> > -	 * Note, the 4 PAE page directories are pre-allocated and the quadrant
+> > -	 * assigned in mmu_alloc_root(). So only page tables need to be handled
+> > -	 * here.
+> > +	 * Concretely, a 4-byte PDE consumes bits 31:22, while an 8-byte PDE
+> > +	 * consumes bits 29:21.  To consume bits 31:30, KVM's uses 4 shadow
+> > +	 * PDPTEs; those 4 PAE page directories are pre-allocated and their
+> > +	 * quadrant is assigned in mmu_alloc_root().   A 4-byte PTE consumes
+> > +	 * bits 21:12, while an 8-byte PTE consumes bits 20:12.  To consume
+> > +	 * bit 21 in the PTE (the child here), KVM propagates that bit to the
+> > +	 * quadrant, i.e. sets quadrant to '0' or '1'.  The parent 8-byte PDE
+> > +	 * covers bit 21 (see above), thus the quadrant is calculated from the
+> > +	 * _least_ significant bit of the PDE index.
+> >  	 */
+> >  	if (role.has_4_byte_gpte) {
+> >  		WARN_ON_ONCE(role.level != PG_LEVEL_4K);
+> > -		role.quadrant = (sptep - parent_sp->spt) % 2;
+> > +		role.quadrant = ((unsigned long)sptep / sizeof(*sptep)) & 1;
+> >  	}
+> 
+> I find both difficult to read TBH.
 
-	Implement SEAMCALL function
+No argument there.  My objection to the pointer arithmetic is that it's easy to
+misread.
 
-and yet, in this patch, we have a "seamcall()" function.  That's a bit
-confusing and not covered at *all* in this subject.
+> And "sptep -> sp->spt" is repeated in other places.
 
-Further, seamcall() is the *ONLY* caller of __seamcall() that I see in
-this series.  That makes its presence here even more odd.
+> 
+> How about using this oppotunity to introduce a helper that turns an
+> sptep into an index to use here and clean up the other users?
+> 
+> e.g.
+> 
+> static inline int spte_index(u64 *sptep)
+> {
+>         return ((unsigned long)sptep / sizeof(*sptep)) & (SPTE_ENT_PER_PAGE - 1);
+> }
+> 
+> Then kvm_mmu_child_role() becomes:
+> 
+>         if (role.has_4_byte_gpte) {
+>         	WARN_ON_ONCE(role.level != PG_LEVEL_4K);
+>         	role.quadrant = spte_index(sptep) & 1;
+>         }
 
-The seamcall() bits should either be in their own patch, or mashed in
-with __seamcall().
-
-> +/*
-> + * Wrapper of __seamcall().  It additionally prints out the error
-> + * informationi if __seamcall() fails normally.  It is useful during
-> + * the module initialization by providing more information to the user.
-> + */
-> +static u64 seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
-> +		    struct tdx_module_output *out)
-> +{
-> +	u64 ret;
-> +
-> +	ret = __seamcall(fn, rcx, rdx, r8, r9, out);
-> +	if (ret == TDX_SEAMCALL_VMFAILINVALID || !ret)
-> +		return ret;
-> +
-> +	pr_err("SEAMCALL failed: leaf: 0x%llx, error: 0x%llx\n", fn, ret);
-> +	if (out)
-> +		pr_err("SEAMCALL additional output: rcx 0x%llx, rdx 0x%llx, r8 0x%llx, r9 0x%llx, r10 0x%llx, r11 0x%llx.\n",
-> +			out->rcx, out->rdx, out->r8, out->r9, out->r10, out->r11);
-> +
-> +	return ret;
-> +}
-> +
-> +static void seamcall_smp_call_function(void *data)
-> +{
-> +	struct seamcall_ctx *sc = data;
-> +	struct tdx_module_output out;
-> +	u64 ret;
-> +
-> +	ret = seamcall(sc->fn, sc->rcx, sc->rdx, sc->r8, sc->r9, &out);
-> +	if (ret)
-> +		atomic_set(&sc->err, -EFAULT);
-> +}
-> +
-> +/*
-> + * Call the SEAMCALL on all online CPUs concurrently.  Caller to check
-> + * @sc->err to determine whether any SEAMCALL failed on any cpu.
-> + */
-> +static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
-> +{
-> +	on_each_cpu(seamcall_smp_call_function, sc, true);
-> +}
-
-You can get away with this three-liner seamcall_on_each_cpu() being in
-this patch, but seamcall() itself doesn't belong here.
-
->  /*
->   * Detect and initialize the TDX module.
->   *
-> @@ -138,7 +195,10 @@ static int init_tdx_module(void)
->  
->  static void shutdown_tdx_module(void)
->  {
-> -	/* TODO: Shut down the TDX module */
-> +	struct seamcall_ctx sc = { .fn = TDH_SYS_LP_SHUTDOWN };
-> +
-> +	seamcall_on_each_cpu(&sc);
-> +
->  	tdx_module_status = TDX_MODULE_SHUTDOWN;
->  }
->  
-> @@ -221,6 +281,9 @@ bool platform_tdx_enabled(void)
->   * CPU hotplug is temporarily disabled internally to prevent any cpu
->   * from going offline.
->   *
-> + * Caller also needs to guarantee all CPUs are in VMX operation during
-> + * this function, otherwise Oops may be triggered.
-
-I would *MUCH* rather have this be a:
-
-	if (!cpu_feature_enabled(X86_FEATURE_VMX))
-		WARN_ONCE("VMX should be on blah blah\n");
-
-than just plain oops.  Even a pr_err() that preceded the oops would be
-nicer than an oops that someone has to go decode and then grumble when
-their binutils is too old that it can't disassemble the TDCALL.
-
-
-
->   * This function can be called in parallel by multiple callers.
->   *
->   * Return:
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> index f1a2dfb978b1..95d4eb884134 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.h
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -46,6 +46,11 @@
->  #define TDX_KEYID_NUM(_keyid_part)	((u32)((_keyid_part) >> 32))
->  
->  
-> +/*
-> + * TDX module SEAMCALL leaf functions
-> + */
-> +#define TDH_SYS_LP_SHUTDOWN	44
-> +
->  /*
->   * Do not put any hardware-defined TDX structure representations below this
->   * comment!
-
+Nice!  I like this a lot.  Will do in v2.
