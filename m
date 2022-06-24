@@ -2,239 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C335559334
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 08:16:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 733E1559345
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 08:22:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229454AbiFXGQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 02:16:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58430 "EHLO
+        id S230222AbiFXGWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 02:22:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiFXGQT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 02:16:19 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24FF4D631;
-        Thu, 23 Jun 2022 23:16:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656051378; x=1687587378;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=4uq2/4ZBLj2o++nE9q0tN6AQfiBZTqTk0dA5724flZg=;
-  b=nJPgiUUsahWlYwXop6khjm+zyWeyio9XnUUHYamIKJLRAgZscVKP2CG+
-   0aoJkuSYOIkmFVSx8m2TZv7XJQmOQKR4fd58egj2GpiO4ZTVkFhlyYAa0
-   7cZCEOdehexv3ESI3sTjGtuK54Uwn2JMYWp85HxPPshKsVX5wDjYvOs/y
-   shkw/lxskP8IUZZ1JxQNFOm5cbXjRi6n7cXYAvcWOJ6/rHk7AkkItjGg1
-   osztrjpHv7UEggpFWasMXrWHfWhz6ILdVKk37KvZDcHctroCmxu/7lYiX
-   zzvYFMGSJRdJlXVBuGddGf2EUNTY/cnfDfVab4zj2Ppp3RyxLWJSQiAqG
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10387"; a="279699208"
-X-IronPort-AV: E=Sophos;i="5.92,218,1650956400"; 
-   d="scan'208";a="279699208"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 23:16:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,218,1650956400"; 
-   d="scan'208";a="586466299"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
-  by orsmga007.jf.intel.com with ESMTP; 23 Jun 2022 23:16:16 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Thu, 23 Jun 2022 23:16:15 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Thu, 23 Jun 2022 23:16:15 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Thu, 23 Jun 2022 23:16:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RDU0oJBrPTeM9GZbfYVHCJPneRWHX+oZPFxzDnhVQTTE38L84NBTbcsrebHvm4ihu6fub0zhZeDXNw0lYl2+29f0sa/l/rZB+CULpKyScUpXw/5R8j4UsZJub6kL9xzR6oo3nVDa2Vc9zyBCPsjptdQ0yMuP18S91QlDpWdBnj0EaLkJPg5xVX4LwMKnoUSoO8FoWxgkFBT94rV+0YIMMWL0WCmjK2DUub+68zQE3q0vXZApZUxan9qjkdEHSjtCEykZWyaEHRAwh5c4jtCyESFu+ciFyWt4HeltmDVX96NrX+jr/q62fLHLT/OqIjY2lH9wiJBGG9zQHLgxwqe6GQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sM24M8EWTU37ZtL5sdXGAwPx+ETCvLCKdnK4jo1Fu9E=;
- b=j143aAgCDUMo26YXxm6pnhc5ccWDH4juCVsDJLkXb1qq9CaP3prm9wzMB8R2gIWlA/dXDI9gj/f0zaNkIqode/x0PfZNkdmHqINIiuEmJPFWJBXwbhdXkNU2s6esp+fanfW35vuljGmS2EcY26xPypLR4Vxwa7eaChTfiNJZllJfI4YnInt+fDW/Vd2Ec/sMg/906GaihNx9ulTVMFCYNW6ppAEgF77HN6v87diRXF/kIna87uTHKsAB9EpzHiIUMMT7QL7gV2jRqLVDTrnNk3xU8aCWPfnM4YBmgGhLdadyN1geThIaYgjWho7BTl8B1odVy4AIO6BkabUwQaUNbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CY4PR1101MB2246.namprd11.prod.outlook.com (2603:10b6:910:21::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.20; Fri, 24 Jun
- 2022 06:16:10 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::8435:5a99:1e28:b38c]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::8435:5a99:1e28:b38c%2]) with mapi id 15.20.5373.017; Fri, 24 Jun 2022
- 06:16:10 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Yong Wu <yong.wu@mediatek.com>, Nicolin Chen <nicolinc@nvidia.com>,
-        "Baolu Lu" <baolu.lu@linux.intel.com>
-CC:     "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "jordan@cosmicpenguin.net" <jordan@cosmicpenguin.net>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-        "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "alyssa@rosenzweig.io" <alyssa@rosenzweig.io>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "zhang.lyra@gmail.com" <zhang.lyra@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "jonathanh@nvidia.com" <jonathanh@nvidia.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "yangyingliang@huawei.com" <yangyingliang@huawei.com>,
-        "orsonzhai@gmail.com" <orsonzhai@gmail.com>,
-        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-        "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "marcan@marcan.st" <marcan@marcan.st>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolin.wang7@gmail.com" <baolin.wang7@gmail.com>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Subject: RE: [PATCH v3 1/5] iommu: Return -EMEDIUMTYPE for incompatible domain
- and device/group
-Thread-Topic: [PATCH v3 1/5] iommu: Return -EMEDIUMTYPE for incompatible
- domain and device/group
-Thread-Index: AQHYhzwc+z9iMdoELUOwrg1xSZWs8q1dxv6AgAATDQCAADDjAIAACdeA
-Date:   Fri, 24 Jun 2022 06:16:10 +0000
-Message-ID: <BN9PR11MB527629DEF740C909A7B7BEB38CB49@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220623200029.26007-1-nicolinc@nvidia.com>
- <20220623200029.26007-2-nicolinc@nvidia.com>
- <270eec00-8aee-2288-4069-d604e6da2925@linux.intel.com>
- <YrUk8IINqDEZLfIa@Asurada-Nvidia>
- <8a5e9c81ab1487154828af3ca21e62e39bcce18c.camel@mediatek.com>
-In-Reply-To: <8a5e9c81ab1487154828af3ca21e62e39bcce18c.camel@mediatek.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 74ba5b81-fd53-4198-60ad-08da55a90880
-x-ms-traffictypediagnostic: CY4PR1101MB2246:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lZwwV/VJOS7HVWaYwyA4dsFtTMjtULz3XX/AS/JkToSWsvK4V0U5KE9es8tlXbebICfD+eTD9D2fSDS+quUaKnqgj6fUTcukVFN92O2MQIqGJf2Qw4Q5n2Q5IuD3RdH1ojsM0eImVQkDyP4GJHswgmr3LiR21Qf0YnXgtYsVHVaujc9hnPT2HFx97mNsu6385vraq1EDUM8sX9WPH3icR7GKLWHYe1nbLdL+ee/5w7P18wP9S79YjCrWZebX0aK1RufCu4q3AnRCvF2cElHdU446o2LZoJP+3nmP2qIndul4zqPjKbBMceXtzJyhCBmj1aGgNKth7W5UhItMpGJm4EFHf5VpaW2t3mPS6ZHWhfwsBuUeBmjGGoYgWRI7QUh+cfFguq0vBBZ2D+v5TJ5+1FpL7AHdCvP7q8SCQlGSk745ltdh7WzP81C4oAq3YGl+j8UQ2CWZkDeN2kwICe3w4pyWBfpSqm0ifKLU1Oz508Rh1XQEWSS5wCARaDRcFVPlvfDa0zKK1aKhuivKNdN9JrCUZV+mNDx1/feBKB6mglZK3s4VsD4+larvrNTXNxOiOCPygYXhJMMOlw+1MOx/21VCvsOPeFX4DS7j8KDhcFyiH+BE3C++kPuJ+OE+JCrZE3y7Xm8Vzb9CA+Qv4vQR7qLMBYIAWIGld+8XunhQ2IiCHvZD4SP9Dv6zK8V2D9/la1p1vqke6T9WcxOPWMAXf6W1GjBiJC4riXm9HjVgqLAGOIFSX/lNg9GHCb5deXFNc1uOYeQkPRP5CPLlFoVD9DX65FYddDaChC1iRfpPbf8XfjG0G2+nlJMHR81drkH3Wuks+ABLXChTHTecv2XQpg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(376002)(39860400002)(366004)(136003)(396003)(346002)(41300700001)(6506007)(4326008)(186003)(83380400001)(66946007)(7416002)(66556008)(7406005)(64756008)(38100700002)(8676002)(76116006)(110136005)(71200400001)(66476007)(478600001)(52536014)(66446008)(9686003)(26005)(7696005)(53546011)(54906003)(82960400001)(38070700005)(8936002)(33656002)(316002)(122000001)(86362001)(2906002)(55016003)(966005)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7y+lG9YFZmxl+4w62lEhiXwxXi/7200BWprCmy7rvq6MHt69+ERqxkNEHhF3?=
- =?us-ascii?Q?47k59wFaAqNNcHN+4UzhdtUIvcJmhsV/kSqd5mI3WBE4bHThhw10g5GzMLj1?=
- =?us-ascii?Q?HuQv7Kn0OZ2fNdJg7v6REkg3X2/mgs8XQjsmdNy3u1tE3MuK7ZSzOvvZ/6dF?=
- =?us-ascii?Q?7Bl3FucNWcNLbDldu+DxP4nwOiIfzJVc9upubXYTju0E5oLDPfafbdrxvdQl?=
- =?us-ascii?Q?b+FL+jrwbOSm14+iU7AJW6q7g71rSEQQtNLwx8bVZa5jJrgZ/tBgqD4OSRVM?=
- =?us-ascii?Q?RTa+LkIPabBcu2mP0ZXs5VFQExdR4PYz16m5ghY7QgPGykg0d+qU5sywoQl0?=
- =?us-ascii?Q?fgQLkIwKh9+5sH7GI8tZ7dnwgWBWXKjuF2wutLcSs7cwtH20VMUXbbTT3nm1?=
- =?us-ascii?Q?H7tC7GWdf3pj/6lylQzT2mdcftraBxp2uHBoKbxi2+pr0h/q3oLruCgms/Re?=
- =?us-ascii?Q?Fd5GU2+ny1JhJsLf32tYC0nrg+qHJZK3Pq8NcRmajzpIR2YreVyPmaYl/s+X?=
- =?us-ascii?Q?7Gz4a2stYcpb9lNRuTn9K2UXGpv1/hehcoc+O0L8myo+w6QpXeyTJI+Wbn3+?=
- =?us-ascii?Q?YhhGjrt9gEZA19xn9So5omtBvyxh75WLZ4LKKK1EfIbAZEC4PmU4t4n0XhwP?=
- =?us-ascii?Q?gNvaXm2q5FqiSblalxziXu9/kzFbMO2Y9ElAoS+cIvNeL6+CcGajR5MvsrL6?=
- =?us-ascii?Q?pwJ6VxD5SZruf8f6Qe7Wp3ag9mt6/zQG+TA5qIC9ebKWSeuk+4voLCWZlS5c?=
- =?us-ascii?Q?jkqKpZrCt3F+K/fkN2yu6R4ujbl+02uqxugNSnYWVza4tGnecmadGKWN6YSR?=
- =?us-ascii?Q?YmFP1pdOVY4hU+OJjOF6fH5jAwe4ooAN0kUb2fvGHS+r3DCJNvIHMC49d6A2?=
- =?us-ascii?Q?/t8JkE581+QSKWu6cjgGILl4/C6LWE/9H8iiz3GP3/nDyIXXi1Wm18iDbQT6?=
- =?us-ascii?Q?3/Rg/+TXh3wxdTYEtrr6Maq0wWKkGdmzkmyN8Ov3LqMClherG81TJOTr0drc?=
- =?us-ascii?Q?JQJqu0Yce1BaTgAtHR05WvRAcLMuXGwd0yv/2lkbAK1FX7zyC2ACwZQnSKhd?=
- =?us-ascii?Q?lGs6qPvlyqRZYcL6DBSI0RCyaOEofFKZU2i9CN8KDsfq3zQyy5VgRe3AxARy?=
- =?us-ascii?Q?UXUqo418NCgv5NcRm0abY1xPnZ0zFVsE21PTS8QNWUzVWhfrSy6SOfffFauo?=
- =?us-ascii?Q?fZyII9lLkvO3yc/56GEJNxlIu9aW7KJBIGmQmqLtd1jvWtzk54QcbLZDIybB?=
- =?us-ascii?Q?gbOpLQtmn0abJ8ebrR0nbfkdv2AwK5T1wrPmsKrbNO5+PRybFO3Og+EQ2vni?=
- =?us-ascii?Q?wy1R4Fu2UcZOsdfrst1cUYwupjJgNFKLJvxGj95xSN1mfcrSp4fcDxpGuOvr?=
- =?us-ascii?Q?UuSkBvb64bmIYOWmqP5O4hawGldYp4x9t0MaBGhlv8jRYcbB+q0pq7BDUWZd?=
- =?us-ascii?Q?6sKjUyrFOuZgAx6qclmB86PXnb1rYquL1ZqPGSZaknNGp0n+Hn/NJgqfBAWc?=
- =?us-ascii?Q?63cDlReM/oXY6Dh77WuAL7V+HWbCckQ5VabXO5OSSSfotQQYGEPJ3yS+m+WV?=
- =?us-ascii?Q?jFWId0lRp1U3PL0PQ2gbDbL3xemYsZuDlzj5SQoe?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S230042AbiFXGWn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 02:22:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C96C43FDA5;
+        Thu, 23 Jun 2022 23:22:42 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25O5orOT006898;
+        Fri, 24 Jun 2022 06:22:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Di51jl6wOZ18ExhrQMG2SxXoh7hgGushxQFiaaPCd9Q=;
+ b=n2xZ7L0mM7V7Huz787QNeqiB4mT0ttcPOP6ORdNlp28T/G1C27lckGxV6SBfgMFzeboq
+ szAFrBD8Wta+6QV9VKvebSzp4FYquRTJiT4uOfMdc3gat9g6u0cujvnvkYNm5xjsHqPl
+ CYV+YCddv/5OjyaRB2Beso/iDCKSlp0yewxTnINVY6t5XSBGz7dU85Ag27y/QUHamfeW
+ bgh+t0suYCAGrR+ikjZN0NVRGou2n4QV5LyGSiGFP3SunwtousR+S+WbqdR/UTct4zd9
+ NW5/XFMQ2pMrFzZHBecJQ6fVqn10Z/rLy+iB+KH/iBlP5uS8x+I5+eK0+xmdSfRpwCuP aQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gw7fxrpmu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Jun 2022 06:22:42 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25O5u0GV027351;
+        Fri, 24 Jun 2022 06:22:41 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gw7fxrpm2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Jun 2022 06:22:41 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25O6K4uZ016759;
+        Fri, 24 Jun 2022 06:22:39 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3gv3mba4na-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Jun 2022 06:22:39 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25O6MZkO20644100
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jun 2022 06:22:35 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7014C4C040;
+        Fri, 24 Jun 2022 06:22:35 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C0EC4C044;
+        Fri, 24 Jun 2022 06:22:34 +0000 (GMT)
+Received: from [9.145.85.86] (unknown [9.145.85.86])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 24 Jun 2022 06:22:34 +0000 (GMT)
+Message-ID: <5217b1ec-c170-d046-5158-e17ffcfe8316@linux.ibm.com>
+Date:   Fri, 24 Jun 2022 08:22:34 +0200
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74ba5b81-fd53-4198-60ad-08da55a90880
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jun 2022 06:16:10.6342
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wFKlbjuB+3MkwmfpNTRXBaYe7fMsPiKonVsy0CxXAN7aQ3LsXIzNAUd4fe79s7s8rCfTUVxyUrbJIGq1O0N1mA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1101MB2246
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20220620125437.37122-1-pmorel@linux.ibm.com>
+ <20220620125437.37122-3-pmorel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v10 2/3] KVM: s390: guest support for topology function
+In-Reply-To: <20220620125437.37122-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: lb-mluRrEEYCQspZr6VJMT6wCmQyqykT
+X-Proofpoint-ORIG-GUID: IpcmkmX6gChLJNIVCbJ2K3pyAaprb5J9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-24_04,2022-06-23_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 malwarescore=0
+ spamscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
+ clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2204290000 definitions=main-2206240022
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Yong Wu
-> Sent: Friday, June 24, 2022 1:39 PM
->=20
-> On Thu, 2022-06-23 at 19:44 -0700, Nicolin Chen wrote:
-> > On Fri, Jun 24, 2022 at 09:35:49AM +0800, Baolu Lu wrote:
-> > > External email: Use caution opening links or attachments
-> > >
-> > >
-> > > On 2022/6/24 04:00, Nicolin Chen wrote:
-> > > > diff --git a/drivers/iommu/mtk_iommu_v1.c
-> > > > b/drivers/iommu/mtk_iommu_v1.c
-> > > > index e1cb51b9866c..5386d889429d 100644
-> > > > --- a/drivers/iommu/mtk_iommu_v1.c
-> > > > +++ b/drivers/iommu/mtk_iommu_v1.c
-> > > > @@ -304,7 +304,7 @@ static int mtk_iommu_v1_attach_device(struct
-> > > > iommu_domain *domain, struct device
-> > > >       /* Only allow the domain created internally. */
-> > > >       mtk_mapping =3D data->mapping;
-> > > >       if (mtk_mapping->domain !=3D domain)
-> > > > -             return 0;
-> > > > +             return -EMEDIUMTYPE;
-> > > >
-> > > >       if (!data->m4u_dom) {
-> > > >               data->m4u_dom =3D dom;
-> > >
-> > > This change looks odd. It turns the return value from success to
-> > > failure. Is it a bug? If so, it should go through a separated fix
-> > > patch.
->=20
-> Thanks for the review:)
->=20
-> >
-> > Makes sense.
-> >
-> > I read the commit log of the original change:
-> >
-> https://lore.kernel.org/r/1589530123-30240-1-git-send-email-
-> yong.wu@mediatek.com
-> >
-> > It doesn't seem to allow devices to get attached to different
-> > domains other than the shared mapping->domain, created in the
-> > in the mtk_iommu_probe_device(). So it looks like returning 0
-> > is intentional. Though I am still very confused by this return
-> > value here, I doubt it has ever been used in a VFIO context.
->=20
-> It's not used in VFIO context. "return 0" just satisfy the iommu
-> framework to go ahead. and yes, here we only allow the shared "mapping-
-> >domain" (All the devices share a domain created internally).
->=20
-> thus I think we should still keep "return 0" here.
->=20
+On 6/20/22 14:54, Pierre Morel wrote:
+> We report a topology change to the guest for any CPU hotplug.
+> 
+> The reporting to the guest is done using the Multiprocessor
+> Topology-Change-Report (MTCR) bit of the utility entry in the guest's
+> SCA which will be cleared during the interpretation of PTF.
+> 
+> On every vCPU creation we set the MCTR bit to let the guest know the
+> next time he uses the PTF with command 2 instruction that the
+> topology changed and that he should use the STSI(15.1.x) instruction
+> to get the topology details.
+> 
+> STSI(15.1.x) gives information on the CPU configuration topology.
+> Let's accept the interception of STSI with the function code 15 and
+> let the userland part of the hypervisor handle it when userland
+> support the CPU Topology facility.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h | 11 ++++++++---
+>   arch/s390/kvm/kvm-s390.c         | 27 ++++++++++++++++++++++++++-
+>   arch/s390/kvm/priv.c             | 15 +++++++++++----
+>   arch/s390/kvm/vsie.c             |  3 +++
+>   4 files changed, 48 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 766028d54a3e..bb54196d4ed6 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -97,15 +97,19 @@ struct bsca_block {
+>   	union ipte_control ipte_control;
+>   	__u64	reserved[5];
+>   	__u64	mcn;
+> -	__u64	reserved2;
+> +#define SCA_UTILITY_MTCR	0x8000
 
-What prevent this driver from being used in VFIO context?
+I'm not too happy having this in the bsca but not in the esca. I'd 
+suggest putting it outside the structs or to go with my next suggestion:
 
-and why would we want to go ahead when an obvious error occurs
-i.e. when a device is attached to an unexpected domain?
+Just make it a bit field struct and make that a member in bsca/esca.
+No messing about with ANDing, ORing etc.
+
+It's unfortunate that we only use one bit in that field but I'd still 
+find it easier to read.
+
+> +	__u16	utility;
+> +	__u8	reserved2[6];
+>   	struct bsca_entry cpu[KVM_S390_BSCA_CPU_SLOTS];
+>   };
+>   
+>   struct esca_block {
+>   	union ipte_control ipte_control;
+> -	__u64   reserved1[7];
+> +	__u64   reserved1[6];
+> +	__u16	utility;
+> +	__u8	reserved2[6];
+>   	__u64   mcn[4];
+> -	__u64   reserved2[20];
+> +	__u64   reserved3[20];
+>   	struct esca_entry cpu[KVM_S390_ESCA_CPU_SLOTS];
+>   };
+>   
+> @@ -249,6 +253,7 @@ struct kvm_s390_sie_block {
+>   #define ECB_SPECI	0x08
+>   #define ECB_SRSI	0x04
+>   #define ECB_HOSTPROTINT	0x02
+> +#define ECB_PTF		0x01
+>   	__u8	ecb;			/* 0x0061 */
+>   #define ECB2_CMMA	0x80
+>   #define ECB2_IEP	0x20
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 8fcb56141689..95b96019ca8e 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1691,6 +1691,25 @@ static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
+>   	return ret;
+>   }
+>   
+> +/**
+> + * kvm_s390_sca_set_mtcr
+> + * @kvm: guest KVM description
+> + *
+> + * Is only relevant if the topology facility is present,
+> + * the caller should check KVM facility 11
+
+I'm not sure that this statement make sense since you set the mctr in 
+kvm_s390_vcpu_setup() unconditionally and don't check stfle 11.
+
+I think we can remove the second line from this.
+
+> + *
+> + * Updates the Multiprocessor Topology-Change-Report to signal
+> + * the guest with a topology change.
+
+Please swap those two comments
+
+> + */
+> +static void kvm_s390_sca_set_mtcr(struct kvm *kvm)
+> +{
+> +	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+
+Please put the comment above the statement and maybe extend it a bit:
+SCA version doesn't matter, the utility field always has the same offset.
+
+> +
+> +	ipte_lock(kvm);
+> +	sca->utility |= SCA_UTILITY_MTCR;
+> +	ipte_unlock(kvm);
+> +}
+> +
+>   static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>   {
+>   	int ret;
+> @@ -3143,7 +3162,6 @@ __u64 kvm_s390_get_cpu_timer(struct kvm_vcpu *vcpu)
+>   
+>   void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>   {
+> -
+
+Please remove that change
+
+>   	gmap_enable(vcpu->arch.enabled_gmap);
+>   	kvm_s390_set_cpuflags(vcpu, CPUSTAT_RUNNING);
+>   	if (vcpu->arch.cputm_enabled && !is_vcpu_idle(vcpu))
+> @@ -3272,6 +3290,11 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+>   		vcpu->arch.sie_block->ecb |= ECB_HOSTPROTINT;
+>   	if (test_kvm_facility(vcpu->kvm, 9))
+>   		vcpu->arch.sie_block->ecb |= ECB_SRSI;
+> +
+> +	/* PTF needs guest facilities to enable interpretation */
+> +	if (test_kvm_facility(vcpu->kvm, 11))
+> +		vcpu->arch.sie_block->ecb |= ECB_PTF;
+> +
+>   	if (test_kvm_facility(vcpu->kvm, 73))
+>   		vcpu->arch.sie_block->ecb |= ECB_TE;
+>   	if (!kvm_is_ucontrol(vcpu->kvm))
+> @@ -3403,6 +3426,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   	rc = kvm_s390_vcpu_setup(vcpu);
+>   	if (rc)
+>   		goto out_ucontrol_uninit;
+> +
+> +	kvm_s390_sca_set_mtcr(vcpu->kvm);
+>   	return 0;
+>   
+>   out_ucontrol_uninit:
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 12c464c7cddf..77a692238585 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -873,10 +873,13 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>   	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+>   		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+>   
+> -	if (fc > 3) {
+> -		kvm_s390_set_psw_cc(vcpu, 3);
+> -		return 0;
+> -	}
+> +	/* Bailout forbidden function codes */
+> +	if (fc > 3 && fc != 15)
+> +		goto out_no_data;
+> +
+> +	/* fc 15 is provided with PTF/CPU topology support */
+> +	if (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))
+> +		goto out_no_data;
+>   
+>   	if (vcpu->run->s.regs.gprs[0] & 0x0fffff00
+>   	    || vcpu->run->s.regs.gprs[1] & 0xffff0000)
+> @@ -910,6 +913,10 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>   			goto out_no_data;
+>   		handle_stsi_3_2_2(vcpu, (void *) mem);
+>   		break;
+> +	case 15:
+> +		trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
+> +		insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
+> +		return -EREMOTE;
+>   	}
+>   	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
+>   		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index dada78b92691..4f4fee697550 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -503,6 +503,9 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>   	/* Host-protection-interruption introduced with ESOP */
+>   	if (test_kvm_cpu_feat(vcpu->kvm, KVM_S390_VM_CPU_FEAT_ESOP))
+>   		scb_s->ecb |= scb_o->ecb & ECB_HOSTPROTINT;
+> +	/* CPU Topology */
+
+Maybe also add:
+This facility only uses the utility field of the SCA and none of the cpu 
+entries that are problematic with the other interpretation facilities so 
+we can pass it through.
+
+> +	if (test_kvm_facility(vcpu->kvm, 11))
+> +		scb_s->ecb |= scb_o->ecb & ECB_PTF;
+>   	/* transactional execution */
+>   	if (test_kvm_facility(vcpu->kvm, 73) && wants_tx) {
+>   		/* remap the prefix is tx is toggled on */
+
