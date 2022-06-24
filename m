@@ -2,131 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83400558F7D
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 06:10:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE4E6558FF4
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 06:28:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbiFXEKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 00:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51090 "EHLO
+        id S229715AbiFXE2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 00:28:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbiFXEKD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 00:10:03 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E7C68036;
-        Thu, 23 Jun 2022 21:10:01 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4LTkD40yFcz4xD9;
-        Fri, 24 Jun 2022 14:09:55 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1656043796;
-        bh=NO6gwIyi/Vom9COuKpinlF5k4tXD56005MmLKL+dN0w=;
-        h=Date:From:To:Cc:Subject:From;
-        b=JVh5a8t9/x+kX7/oKEJgu218npZY2vlU8FcmMgsl2yzwKXTHW7uQTJK7PHrvOoDT0
-         lOcyXInjOfINvyM/ilnPlglkgs6gEqOhnN0AY/ZmWz4C6KHTtnsPbrYIIegH7dXVee
-         OhtdT7zzbNDvYqUFZyvSVR5Ermt9weHR/2aVQYzuaxEag1wz1sFczP9Zaz7XroHsY+
-         MsGFWgbGR4oHQri6MQK5odLARKZeur6ifUq7Rf7rmwHCgZ/lR3jeaY1b1qC0enOuT8
-         OEbDSNETTh4p22X639ih6YwwEE41/AGrig45sCoTGSam9aZWQCYNsSi7UdZtTcfEZo
-         GQgXcCYI50yqg==
-Date:   Fri, 24 Jun 2022 14:09:54 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Guo Zhengkui <guozhengkui@vivo.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: linux-next: manual merge of the kvm tree with the kvm-fixes tree
-Message-ID: <20220624140954.2ff3de30@canb.auug.org.au>
+        with ESMTP id S229441AbiFXE2v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 00:28:51 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B98AE506CA;
+        Thu, 23 Jun 2022 21:28:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656044929; x=1687580929;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=QH5uBpNzzzCen9Zs76R2e80kGV9JSlE7H9DNbONwgs4=;
+  b=kncBKnBQWDvYnUP21CL2lmooN/GD963maksO3YKeMrXKBbZG7kWojqWt
+   pYt/b2QixyVheaJGdQQwWbMmw+rWRq18R2zfSbpQM5g9+awyyXECztAT2
+   y2ZoXrxUp3zCeVIv+5VI78MY4+wCtakItWMIkh5f7FcGXpKolwwwfnsXK
+   HYJbd2cS5FEjr005okUszBZbFx1KgEBomfEb0wJu/wZyyBK4e99AZlmEj
+   VIlrOrq2tp1qZZP1hhXMPgD/dSrcg2hGTPdqxo+S+1x7LUlHGp/uXDKzY
+   w6QRVz8QMW3BqL+X3GT0O+LbiKs014CItY4Kh1qJ/wuqo2XFvwEADvN9J
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10387"; a="342607051"
+X-IronPort-AV: E=Sophos;i="5.92,218,1650956400"; 
+   d="scan'208";a="342607051"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 21:28:49 -0700
+X-IronPort-AV: E=Sophos;i="5.92,218,1650956400"; 
+   d="scan'208";a="645095406"
+Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.255.31.117]) ([10.255.31.117])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 21:28:47 -0700
+Message-ID: <fc6c4f6e-07c6-2d16-5457-dbe03ceb1bee@intel.com>
+Date:   Fri, 24 Jun 2022 12:28:38 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/OgCw0P=XsdnZ810zrH_w7y+";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2] KVM: selftest: Enhance handling WRMSR ICR register in
+ x2APIC mode
+Content-Language: en-US
+To:     "Gao, Chao" <chao.gao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20220623094511.26066-1-guang.zeng@intel.com>
+ <20220623103314.GA14006@gao-cwp>
+From:   Zeng Guang <guang.zeng@intel.com>
+In-Reply-To: <20220623103314.GA14006@gao-cwp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/OgCw0P=XsdnZ810zrH_w7y+
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On 6/23/2022 6:33 PM, Gao, Chao wrote:
+> On Thu, Jun 23, 2022 at 05:45:11PM +0800, Zeng Guang wrote:
+>
+>> +		ASSERT_EQ(icr & ~APIC_ICR_BUSY, val & ~APIC_ICR_BUSY);
+> Probably add a comment for it would be better. E.g.,
+>
+> APIC_ICR_BUSY is removed and not used when CPU is in x2APIC mode.
+> It is undefined whether write 1 to this bit will be preserved. So,
+> even KVM keeps this bit cleared in some cases even in x2apic mode,
+> no guarantee that hardware (specifically, CPU ucode when Intel IPI
+> virtualization enabled) will clear the bit. So, skip checking this
+> bit.
+Hardware won't touch APIC_ICR_BUSY in x2apic mode. It totally depends on 
+KVM to
+clear it or not if set for test purpose. While in Intel IPI 
+virtualization case,
+KVM doesn't take care of this bit in vICR writes. So how about the 
+comments as
+below:
 
-Today's linux-next merge of the kvm tree got a conflict in:
+APIC_ICR_BUSY is removed and not used when CPU is in x2APIC mode.
+KVM doesn't guarantee to clear this bit in some cases e.g. When
+Intel IPI virtualization enabled, if it's set for test purpose.
+So, skip checking this bit.
 
-  tools/testing/selftests/kvm/lib/aarch64/ucall.c
+Thanks.
+Zeng Guang
 
-between commit:
-
-  9e2f6498efbb ("selftests: KVM: Handle compiler optimizations in ucall")
-
-from the kvm-fixes tree and commit:
-
-  5d9cd8b55cdc ("selftests: kvm: replace ternary operator with min()")
-
-from the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index be1d9728c4ce,0b949ee06b5e..000000000000
---- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@@ -77,20 -78,19 +76,20 @@@ void ucall(uint64_t cmd, int nargs, ...
-  	va_list va;
-  	int i;
- =20
- +	WRITE_ONCE(uc.cmd, cmd);
-- 	nargs =3D nargs <=3D UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
-+ 	nargs =3D min(nargs, UCALL_MAX_ARGS);
- =20
-  	va_start(va, nargs);
-  	for (i =3D 0; i < nargs; ++i)
- -		uc.args[i] =3D va_arg(va, uint64_t);
- +		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
-  	va_end(va);
- =20
- -	*ucall_exit_mmio_addr =3D (vm_vaddr_t)&uc;
- +	WRITE_ONCE(*ucall_exit_mmio_addr, (vm_vaddr_t)&uc);
-  }
- =20
-- uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
-+ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-  {
-- 	struct kvm_run *run =3D vcpu_state(vm, vcpu_id);
-+ 	struct kvm_run *run =3D vcpu->run;
-  	struct ucall ucall =3D {};
- =20
-  	if (uc)
-
---Sig_/OgCw0P=XsdnZ810zrH_w7y+
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmK1ORIACgkQAVBC80lX
-0GxKpgf/VbU3YPMdd9IlNDJWJHa94TFUZualU3MXl6Wz4hF5GRzoIKGOPLUxmGpE
-R8WZf82XJy2d1ea4zjLghyF7JGVzbD2O62qTzg16eJasp4hu9bxV78Bfav5ed5zQ
-pYjWUK5yHTH6Cjfxj8efKPa82RBuqp67KeHSlZ4LaAAmchFHA+Z/7F7MZJsT4zKf
-tlFOZoCr8EeBustjWs4FowCE6DMvwfAWBEJIi+6XtkDKoI/P9ZgnS+/OxwxsxFTZ
-IdqdwlFO/GLmfqS5P6axvU2qGvARPLDSGhv16UJECBHDoxHge28DGEgpXSRSQNaA
-4zbEqJijkl3GXliDBGcypMjKkPG6Sw==
-=elo4
------END PGP SIGNATURE-----
-
---Sig_/OgCw0P=XsdnZ810zrH_w7y+--
