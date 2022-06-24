@@ -2,70 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29F05558C15
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:04:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89797558C1A
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:06:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231344AbiFXAET (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 20:04:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39036 "EHLO
+        id S229965AbiFXAGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 20:06:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbiFXAES (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 20:04:18 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E946563AC
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:04:17 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id p3-20020a17090a428300b001ec865eb4a2so4133776pjg.3
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:04:17 -0700 (PDT)
+        with ESMTP id S229504AbiFXAGa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 20:06:30 -0400
+Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6965E60F20
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:06:28 -0700 (PDT)
+Received: by mail-oo1-xc34.google.com with SMTP id s1-20020a4adb81000000b00422e6bf0e92so167169oou.13
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:06:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aR3UMVXNJuFYXHEFaVui3S/bLvpbWl7F9qhTqAkCqU8=;
-        b=Hqf/87S0rYc3YO1mmftbe/pRY+U84b5V2ONzOenkIThl1iQOtr+PjeA+R0o4HUhBri
-         eBciKAiGzNgeX/2NDv+dn7aksHDalV0whg66lmxPfY415HpmlVhb3iqOduUz1xlFoZQH
-         ehVkaaOxKag15ztDOQmEzPJzQfGSpGAcP3szyJpwMW04oc0cC8DIqSfCFCChJlZnIf3t
-         UUrQXywbBR25UZjrxLdHYor3yE3VVsuXf1l+Jq+5/J/WcfLXZTTQNCOZh07PVAY8QpLz
-         VPnIDUKndZnLssxPkQtTp4SmElMwALEy98cNQ5QoLeZp+dw12TnF8ZoeUNNsHGIqmKdQ
-         isxA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5ztn/U14y4+bLEVfHDiR279Ws4kSCGIatUDLg6ETdSA=;
+        b=sE1nWpmur5YxV9tq2Xcbc8zQ7qv68r4grAVVsiWE+Hb5IjzYTfE2kF71zHL669RRu1
+         8EOee7QUNQm5IwxycAlLVHbYxsj9/B6zjw6THdaB8U9bCQ04QFEyuYMUqXCJL/VwKgQw
+         pERU0qG1+ubCmP0USVfbwqV9mQ7Ae/RYAmO3fT7BMk97N+H1MM15EKJoEsqjc0jqIM4J
+         ZmZqKBi+d2WXbVUkR5ZsnAH9c+tnaqZuMUUSeMcuNV+zfEnu/lsMYmuSZtLU8S8UCtss
+         yBdMMbxpNC6LgDmkRNH0oPPD4EO3hws1baml0AuV16zVe/kIfr0tuYlgKqK5lM8mR69W
+         tMxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aR3UMVXNJuFYXHEFaVui3S/bLvpbWl7F9qhTqAkCqU8=;
-        b=XVvJSMGI9Xu+7TwKp4hhHNsx0WXoIXzC1rRPrfnftXL+Z1po/UCx2nL9B1l3jAEdzS
-         Eg5qCKp8MUqkx1V+CDETbOXMTyDA6o5aISmk0rEQ50M+8Pm5KJHhA1odnIcuxu0qHaaI
-         rO6UVyyIMLv6lZ4R8RZSGEePwqS/dvgkEUvCINRd0iwAm16yOjXTZCgF80izcyxtaNX+
-         Rn9IttXHZEoKaWsV26QEmUPpbc2BR24XwF37aJKv7823rDMBrNCFACYrLaEjgnD54tN7
-         yqiCFnjQUWCGMUzfD9PFlh8cZT7dnp78SVtPRXf5n+dPbPg3+gdCdMTuqjICs6P8fldo
-         ejNw==
-X-Gm-Message-State: AJIora9SEgliFoh4+MA8+pm2/7VV94vQgBi/c2ieBFcWMuQDJQ9+hyJk
-        HvDHRur8xp8MmSMtkQ2wEN098Q==
-X-Google-Smtp-Source: AGRyM1tpyr8ete82+M/6LC+zY3ZuFXiGABgTIUa1dsT3jGlH8w1nZYKl2R4L+YalNDc2emkjGkDM9g==
-X-Received: by 2002:a17:902:f602:b0:16a:178a:7b0b with SMTP id n2-20020a170902f60200b0016a178a7b0bmr27032003plg.20.1656029056747;
-        Thu, 23 Jun 2022 17:04:16 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id x5-20020a17090a1f8500b001e87bd6f6c2sm2513931pja.50.2022.06.23.17.04.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 17:04:16 -0700 (PDT)
-Date:   Fri, 24 Jun 2022 00:04:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v1 03/10] KVM: VMX: Move
- CPU_BASED_{CR3_LOAD,CR3_STORE,INVLPG}_EXITING filtering out of
- setup_vmcs_config()
-Message-ID: <YrT/fHgxKUrsH7fE@google.com>
-References: <20220622164432.194640-1-vkuznets@redhat.com>
- <20220622164432.194640-4-vkuznets@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5ztn/U14y4+bLEVfHDiR279Ws4kSCGIatUDLg6ETdSA=;
+        b=X+tBe1/8+0BOxRhNfmgjsbAaW935TIWBznd4nvghwSJM+8idnvMXQgD2TuZJVlm/Xv
+         SwoLs2DfxJfJ6uvL1bYagPZ50ufNd6enolClmNFQqqx38pvzRQj8mSR05zo9F4IeUI3n
+         c3IatEX7wAJJswSus+GamWyGS+YA0uxnIBzJxX6WNnoaOhZwyTv5t4ItHfHV/TlFiTJt
+         V9uMC0wQTRJH18/zDqTA8hdUqg48CvTzczUsCsPPdncTL8vclyaXkjY340oF5x+BHrbQ
+         UiA7U/uWzA4wH7F2thi5WbRY0mEhtv1icUncZ3Nt1NhJJ7/H1yKA8E8DGU9cICLZABEH
+         +ZzA==
+X-Gm-Message-State: AJIora9OLz9UR6rWGHZ0aEZ/ACc3pvaGHwlAdVbXUa3l7yDBXMGRkGOx
+        duVNuQioo/rZLddAYL8Hp4lDu7PBqNP7WwKl78Tghw==
+X-Google-Smtp-Source: AGRyM1v+s5D9Hg1qgXGD+4GvtPs2SxeqIL4O85m4dCEssimCyLkAYn0KyTciSq2Hm2MRqFVC/wqLMIaPXf3Gq+wcLLY=
+X-Received: by 2002:a4a:d842:0:b0:41b:c75d:f2dd with SMTP id
+ g2-20020a4ad842000000b0041bc75df2ddmr4805823oov.20.1656029187423; Thu, 23 Jun
+ 2022 17:06:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220622164432.194640-4-vkuznets@redhat.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Thu, 23 Jun 2022 17:06:16 -0700
+Message-ID: <CAA03e5HDxkhV1rnVfPj7W_Hf85JMAG0s8eLKN6hA0n4sCy8tww@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "Roth, Michael" <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,90 +95,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 22, 2022, Vitaly Kuznetsov wrote:
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Mon, Jun 20, 2022 at 4:03 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The integrity guarantee of SEV-SNP is enforced through the RMP table.
+> The RMP is used with standard x86 and IOMMU page tables to enforce memory
+> restrictions and page access rights. The RMP check is enforced as soon as
+> SEV-SNP is enabled globally in the system. When hardware encounters an
+> RMP checks failure, it raises a page-fault exception.
+
+nit: "RMP checks ..." -> "RMP-check ..."
+
+>
+> The rmp_make_private() and rmp_make_shared() helpers are used to add
+> or remove the pages from the RMP table. Improve the rmp_make_private() to
+> invalid state so that pages cannot be used in the direct-map after its
+
+nit: "invalid state ..." -> "invalidate state ..."
+nit: "... after its" -> "... after they're"
+
+(Here, and in the patch subject too.)
+
+> added in the RMP table, and restore to its default valid permission after
+
+nit: "... restore to its ..." -> "... restored to their ..."
+
+> the pages are removed from the RMP table.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 01294a2fc1c1..4583de7f0324 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4293,6 +4293,16 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
->  			  CPU_BASED_MONITOR_TRAP_FLAG |
->  			  CPU_BASED_PAUSE_EXITING);
->  
-> +	if (vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_ENABLE_EPT) {
-> +		/*
-> +		 * CR3 accesses and invlpg don't need to cause VM Exits when EPT
-> +		 * enabled.
-> +		 */
-> +		exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
-> +				  CPU_BASED_CR3_STORE_EXITING |
-> +				  CPU_BASED_INVLPG_EXITING);
-> +	}
+>  arch/x86/kernel/sev.c | 61 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 60 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index f6c64a722e94..734cddd837f5 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2451,10 +2451,42 @@ int psmash(u64 pfn)
+>  }
+>  EXPORT_SYMBOL_GPL(psmash);
+>
+> +static int restore_direct_map(u64 pfn, int npages)
+> +{
+> +       int i, ret = 0;
+> +
+> +       for (i = 0; i < npages; i++) {
+> +               ret = set_direct_map_default_noflush(pfn_to_page(pfn + i));
+> +               if (ret)
+> +                       goto cleanup;
+> +       }
+> +
+> +cleanup:
+> +       WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i);
+> +       return ret;
+> +}
+> +
+> +static int invalid_direct_map(unsigned long pfn, int npages)
 
-No need to clear them based on support, just invert the logic so that KVM leaves
-them set in the base config and then cleares them if EPT is enabled (instead of
-clearing them if EPT is supported and then restoring them if EPT is disabled via
-module param).
+I think we should rename this function to "invalidate_direct_map()".
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 23 Jun 2022 17:00:58 -0700
-Subject: [PATCH] KVM: VMX: Clear controls obsoleted by EPT at runtime, not
- setup
-
-Clear the CR3 and INVLPG interception controls at runtime based on
-whether or not EPT is being _used_, as opposed to clearing the bits at
-setup if EPT is _supported_ in hardware, and then restoring them when EPT
-is not used.  Not mucking with the base config will allow using the base
-config as the starting point for emulating the VMX capability MSRs.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5d8f28b5d6ca..f39af86a6c50 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2550,13 +2550,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	rdmsr_safe(MSR_IA32_VMX_EPT_VPID_CAP,
- 		&vmx_cap->ept, &vmx_cap->vpid);
-
--	if (_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_EPT) {
--		/* CR3 accesses and invlpg don't need to cause VM Exits when EPT
--		   enabled */
--		_cpu_based_exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
--					     CPU_BASED_CR3_STORE_EXITING |
--					     CPU_BASED_INVLPG_EXITING);
--	} else if (vmx_cap->ept) {
-+	if (!(_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_EPT) &&
-+	    vmx_cap->ept) {
- 		pr_warn_once("EPT CAP should not exist if not support "
- 				"1-setting enable EPT VM-execution control\n");
-
-@@ -4320,10 +4315,12 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
- 				CPU_BASED_CR8_LOAD_EXITING;
- #endif
- 	}
--	if (!enable_ept)
--		exec_control |= CPU_BASED_CR3_STORE_EXITING |
--				CPU_BASED_CR3_LOAD_EXITING  |
--				CPU_BASED_INVLPG_EXITING;
-+
-+	/* No need to intercept CR3 access or INVPLG when using EPT. */
-+	if (enable_ept)
-+		exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
-+				  CPU_BASED_CR3_STORE_EXITING |
-+				  CPU_BASED_INVLPG_EXITING);
- 	if (kvm_mwait_in_guest(vmx->vcpu.kvm))
- 		exec_control &= ~(CPU_BASED_MWAIT_EXITING |
- 				CPU_BASED_MONITOR_EXITING);
-
-base-commit: d365a92177bda6629885401d44fbe912106b3df6
---
-
+> +{
+> +       int i, ret = 0;
+> +
+> +       for (i = 0; i < npages; i++) {
+> +               ret = set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
+> +               if (ret)
+> +                       goto cleanup;
+> +       }
+> +
+> +       return 0;
+> +
+> +cleanup:
+> +       restore_direct_map(pfn, i);
+> +       return ret;
+> +}
+> +
+>  static int rmpupdate(u64 pfn, struct rmpupdate *val)
+>  {
+>         unsigned long paddr = pfn << PAGE_SHIFT;
+> -       int ret;
+> +       int ret, level, npages;
+>
+>         if (!pfn_valid(pfn))
+>                 return -EINVAL;
+> @@ -2462,11 +2494,38 @@ static int rmpupdate(u64 pfn, struct rmpupdate *val)
+>         if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+>                 return -ENXIO;
+>
+> +       level = RMP_TO_X86_PG_LEVEL(val->pagesize);
+> +       npages = page_level_size(level) / PAGE_SIZE;
+> +
+> +       /*
+> +        * If page is getting assigned in the RMP table then unmap it from the
+> +        * direct map.
+> +        */
+> +       if (val->assigned) {
+> +               if (invalid_direct_map(pfn, npages)) {
+> +                       pr_err("Failed to unmap pfn 0x%llx pages %d from direct_map\n",
+> +                              pfn, npages);
+> +                       return -EFAULT;
+> +               }
+> +       }
+> +
+>         /* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+>         asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+>                      : "=a"(ret)
+>                      : "a"(paddr), "c"((unsigned long)val)
+>                      : "memory", "cc");
+> +
+> +       /*
+> +        * Restore the direct map after the page is removed from the RMP table.
+> +        */
+> +       if (!ret && !val->assigned) {
+> +               if (restore_direct_map(pfn, npages)) {
+> +                       pr_err("Failed to map pfn 0x%llx pages %d in direct_map\n",
+> +                              pfn, npages);
+> +                       return -EFAULT;
+> +               }
+> +       }
+> +
+>         return ret;
+>  }
+>
+> --
+> 2.25.1
+>
+>
