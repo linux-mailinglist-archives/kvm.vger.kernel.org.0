@@ -2,68 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3D5E558C47
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:31:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FD68558C65
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 02:46:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230462AbiFXAbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jun 2022 20:31:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57440 "EHLO
+        id S229787AbiFXAqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jun 2022 20:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229887AbiFXAbW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jun 2022 20:31:22 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F19E563B9
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:31:21 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id g16-20020a17090a7d1000b001ea9f820449so4179816pjl.5
-        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:31:21 -0700 (PDT)
+        with ESMTP id S229475AbiFXAqN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jun 2022 20:46:13 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1FF4FC6F
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:46:11 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id 65so1111139pfw.11
+        for <kvm@vger.kernel.org>; Thu, 23 Jun 2022 17:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=IOiiEzf2Owa8eEtkAWHI6gKx/+L0ogxrj4UywWa0Fvs=;
-        b=ZyMkz1B9QFJcuQz/QRPOneAkqYcC+jOpJBpbASB5peQZufT5/r5En2t3mYwdPkd3Lr
-         a2ftkjaXiXS4qkOmZ11BBMR5ZtHpcbFG8ikAcILytdEJ1oY/ONBcq0rGRUG5rl9k/1wp
-         rlCBJ2fLTN0Eh47nwHLen44taBjN741iYlvffjTKsd4+RawpXhvy55otTUQCobZjc+F4
-         8fJIMNnNLTMVBOIi/j3RsAMXyVmOLsjH4dnQ6uqt411oEOyrA/1nkxh5bg0LZ8uJzbiJ
-         CXp0WKHGuKk/ENCY4UIH50SiJJ27697p8b3DBegKh5E4YxR/zJkeed3FjUWjWo/17q9M
-         hyxQ==
+        bh=Uk4RcAkJ2iHz5FftlK5Anuz4Mp+lFEGCK1mbqyMleKM=;
+        b=V70GTP6LuazSLZENGZhir7UBvmeZ6RXSpfkpjOF+mwXTeTXmOrCx+eWyZIjxftrtE7
+         8nY278CwnnKMQgGkV1g9f0tQf/xWpCUrlvQjBn++nap/hje9l9yRRqfMBiKWiXMx66ny
+         ekYLGxK4H+9o6HXM6EWEvNOi6DriPKFG7d6kx4Ewns8qH4Yy8sIwNyd/Eu0gGWEkwU/Q
+         oVPtzmDpgpF05uxq0eZnIm00QxQVfGzxVNAH72LZMPR5lxfWFX4XL5A9qCtZwdLiz66p
+         i9dj0t93tFwKuZ/FqoqPWA4EImh4+c2GsMFpazTxsaV0jN5H3KyChEsxxaVmpR65OK72
+         YF8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=IOiiEzf2Owa8eEtkAWHI6gKx/+L0ogxrj4UywWa0Fvs=;
-        b=7VwrOTDF0S8gVqdR7WPue+R1Q1DLa80UB7eym26Too85gpGyBHdvTRGgh88GNixiNB
-         O6A3R9l1J5kgtP+Gc+BRui5GfOH8aeOW4VPrTmWDnplR+i/AUZM6x/HduG7JgMnGclF5
-         ydXqx1wqT6LXWmJb0m/YQcvQsyAPc56c7IYyIFWV7aEVmrSsZwFej/aZ9s3d/AZgj4Zr
-         sSDe9QwVFVvyE+2ELTRszarhJNZUn1jGC1zutRiO10aNfH2JeRJZFjbQcLFxv4U/K8QT
-         rcg1mG2mRISwsAv50tzLwK7DN4DmJ6+lq2xT4Ussg/9SfsMvjG1yOZcxQD+l16OK5IyU
-         q89Q==
-X-Gm-Message-State: AJIora82eBoMATOQ2dStGQBJrRihvXEpuUXKbCf161HvrkR1uTvOBkF0
-        oTMYsirp0zB4feSHmKWDuFtFSg==
-X-Google-Smtp-Source: AGRyM1vcGIva17Yiz9xNolPeazjHi8DWAZr4gphlJGqm2XezqABG60RkTIfMAjrt7dBawSc3HCB4pg==
-X-Received: by 2002:a17:90b:1d90:b0:1e8:5a98:d591 with SMTP id pf16-20020a17090b1d9000b001e85a98d591mr712610pjb.126.1656030680952;
-        Thu, 23 Jun 2022 17:31:20 -0700 (PDT)
+        bh=Uk4RcAkJ2iHz5FftlK5Anuz4Mp+lFEGCK1mbqyMleKM=;
+        b=AXwPqvUIHAaYr2BRyvm+aOpE3PTlUgQa249qq2yDYVqhC9EsfwXm8Qzsfulc6vB7cj
+         5qk2gAuHd7O9uCu2wCZmsy5Z4rkxO24rb/6sUcDhVrVmFA/JWUmbtVFUErMRV58SoLq3
+         33lzZErAoVnVkHAB8k4BsdXPVg4BCEBBLO8Vedi/M+4k2g57B4YIdqZ7xonYanUyucXi
+         uSp5XWeHxyAa6nb1yhIs/g+UzkTPMXDfXJ7WhPrTxOPrfEm/glacDISWXOlLRfRTa8CD
+         B2fHleDKjTMXIJKfVWqwjKNJJt9OHT/0TZusKyKvMqe0FwvLgnN8unArVwYExUmFzdf1
+         IWZQ==
+X-Gm-Message-State: AJIora/4rq27EAuH0QfFm410SZnHxniP7IopmtYXd99NcH+djzw7apSH
+        X1H3Vb/ahD/eWQ8gZwa27eQtHg==
+X-Google-Smtp-Source: AGRyM1u3c2BZpFtsdffygFS9wDzKZ1PQNih23PPvAsqc1grUfpDsA8VOwZmZK92i46iH8tH+Riscsw==
+X-Received: by 2002:a63:ba07:0:b0:40d:77fd:9429 with SMTP id k7-20020a63ba07000000b0040d77fd9429mr1986334pgf.110.1656031571245;
+        Thu, 23 Jun 2022 17:46:11 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id y1-20020a17090a1f4100b001ec9f9fe028sm2536065pjy.46.2022.06.23.17.31.20
+        by smtp.gmail.com with ESMTPSA id c4-20020a170902d90400b0016767ff327dsm398476plz.129.2022.06.23.17.46.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 17:31:20 -0700 (PDT)
-Date:   Fri, 24 Jun 2022 00:31:17 +0000
+        Thu, 23 Jun 2022 17:46:10 -0700 (PDT)
+Date:   Fri, 24 Jun 2022 00:46:06 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v1 00/10] KVM: nVMX: Use vmcs_config for setting up
- nested VMX MSRs
-Message-ID: <YrUF1Zj35BYvXrB6@google.com>
-References: <20220622164432.194640-1-vkuznets@redhat.com>
+To:     "Shukla, Manali" <mashukla@amd.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v4 4/8] x86: Improve set_mmu_range() to
+ implement npt
+Message-ID: <YrUJTt1wfMPotyvW@google.com>
+References: <20220428070851.21985-1-manali.shukla@amd.com>
+ <20220428070851.21985-5-manali.shukla@amd.com>
+ <YqpyC1HmsFBSXedh@google.com>
+ <YqpzjMY+w5MZfb81@google.com>
+ <aed29a6c-5e59-d924-f3ed-a3cef91aac79@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220622164432.194640-1-vkuznets@redhat.com>
+In-Reply-To: <aed29a6c-5e59-d924-f3ed-a3cef91aac79@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,82 +74,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 22, 2022, Vitaly Kuznetsov wrote:
-> vmcs_config is a sanitized version of host VMX MSRs where some controls are
-> filtered out (e.g. when Enlightened VMCS is enabled, some know bugs are 
-> discovered, some inconsistencies in controls are detected,...) but
-> nested_vmx_setup_ctls_msrs() uses raw host MSRs instead. This may end up
-> in exposing undesired controls to L1. Switch to using vmcs_config instead.
+On Wed, Jun 22, 2022, Shukla, Manali wrote:
 > 
-> RFC part: vmcs_config's sanitization now is a mix of "what can't be enabled"
-> and "what KVM doesn't want" and we need to separate these as for nested VMX
-> MSRs only the first category makes sense. This gives vmcs_config a slightly
-> different meaning "controls which can be (theoretically) used". An alternative
-> approach would be to store sanitized host MSRs values separately, sanitize
-> them and and use in nested_vmx_setup_ctls_msrs() but currently I don't see
-> any benefits. Comments welcome!
+> On 6/16/2022 5:34 AM, Sean Christopherson wrote:
+> > void __setup_mmu_range(pgd_t *cr3, phys_addr_t start, size_t len, bool nested_mmu)
+> > {
+> >         u64 orig_opt_mask = pte_opt_mask;
+> > 	u64 max = (u64)len + (u64)start;
+> > 	u64 phys = start;
+> > 
+> > 	/* comment goes here. */
+> > 	pte_opt_mask |= PT_USER_MASK;
+> > 
+> >         if (use_hugepages) {
+> >                 while (phys + LARGE_PAGE_SIZE <= max) {
+> >                         install_large_page(cr3, phys, (void *)(ulong)phys);
+> > 		        phys += LARGE_PAGE_SIZE;
+> > 	        }
+> > 	}
+> > 	install_pages(cr3, phys, max - phys, (void *)(ulong)phys);
+> > 
+> > 	pte_opt_mask = orig_opt_mask;
+> > }
+> 
+> Hi Sean,
+> 
+> Thank you so much for reviewing my changes.
+> 
+> RSVD bit test case will start failing with above implementation as we will be
+> setting PT_USER_MASK bit for all host PTEs (in order to toggle CR4.SMEP)
+> which will defeat one of the purpose of this patch. 
 
-I like the idea overall, even though it's a decent amount of churn.  It seems
-easier to maintain than separate paths for nested.  The alternative would be to
-add common helpers to adjust the baseline configurations, but I don't see any
-way to programmatically make that approach more robust.
+/facepalm
 
-An idea to further harden things.  Or: an excuse to extend macro shenanigans :-)
+> Right now, pte_opt_mask value which is set from setup_vm(), is overwritten in
+> setup_mmu_range() for all the conditions.  How about setting PT_USER_MASK
+> only for nested mmu in setup_mmu_range()?  It will retain the same value of
+> pte_opt_mask which is set from setup_vm() in all the other cases.
 
-If we throw all of the "opt" and "min" lists into macros, e.g. KVM_REQUIRED_*
-and KVM_OPTIONAL_*, and then use those to define a KVM_KNOWN_* field, we can
-prevent using the mutators to set/clear unknown bits at runtime via BUILD_BUG_ON().
-The core builders, e.g. vmx_exec_control(), can still set unknown bits, i.e. set
-bits that aren't enumerated to L1, but that's easier to audit and this would catch
-regressions for the issues fixed in patches.
+Ya, that should work.
 
-It'll required making add_atomic_switch_msr_special() __always_inline (or just
-open code it), but that's not a big deal.
+> #define IS_NESTED_MMU 1ULL
+> #define USE_HUGEPAGES 2ULL
 
-E.g. if we have
+Use BIT().  And not the ULL single the param is an unsigned long, not a u64.
 
-  #define KVM_REQUIRED_CPU_BASED_VM_EXEC_CONTROL <blah blah blah>
-  #define KVM_OPTIONAL_CPU_BASED_VM_EXEC_CONTROL <blah blah blah>
+> void __setup_mmu_range(pgd_t *cr3, phys_addr_t start, size_t len, unsigned long mmu_flags) {
 
-Then the builders for the controls shadows can do:
+Brace goes on its own line.
 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 286c88e285ea..5eb75822a09e 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -468,6 +468,8 @@ static inline u8 vmx_get_rvi(void)
- }
- 
- #define BUILD_CONTROLS_SHADOW(lname, uname, bits)                              \
-+#define KVM_KNOWN_ ## uname                                                    \
-+       (KVM_REQUIRED_ ## uname | KVM_OPTIONAL_ ## uname)                       \
- static inline void lname##_controls_set(struct vcpu_vmx *vmx, u##bits val)     \
- {                                                                              \
-        if (vmx->loaded_vmcs->controls_shadow.lname != val) {                   \
-@@ -485,10 +487,12 @@ static inline u##bits lname##_controls_get(struct vcpu_vmx *vmx)          \
- }                                                                              \
- static inline void lname##_controls_setbit(struct vcpu_vmx *vmx, u##bits val)  \
- {                                                                              \
-+       BUILD_BUG_ON(!(val & KVM_KNOWN_ ## uname));                             \
-        lname##_controls_set(vmx, lname##_controls_get(vmx) | val);             \
- }                                                                              \
- static inline void lname##_controls_clearbit(struct vcpu_vmx *vmx, u##bits val)        \
- {                                                                              \
-+       BUILD_BUG_ON(!(val & KVM_KNOWN_ ## uname));                             \
-        lname##_controls_set(vmx, lname##_controls_get(vmx) & ~val);            \
- }
- BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS, 32)
+>         u64 orig_opt_mask = pte_opt_mask;
+>         u64 max = (u64)len + (u64)start;
+>         u64 phys = start;
+> 
+>         /* Allocate 4k pages only for nested page table, PT_USER_MASK needs to
+	
+	/*
+	 * Multi-line comments look like this.
+	 * Line 2.
+	 */
 
-
-
-Handling the controls that are restricted to CONFIG_X86_64=y will be midly annoying,
-but adding a base set isn't too bad, e.g.
-
-#define __KVM_REQUIRED_CPU_BASED_VM_EXEC_CONTROL <blah blah blah>
-#ifdef CONFIG_X86_64
-#define KVM_REQUIRED_CPU_BASED_VM_EXEC_CONTROL (__KVM_REQUIRED_CPU_BASED_VM_EXEC_CONTROL | \
-						CPU_BASED_CR8_LOAD_EXITING |		   \
-						CPU_BASED_CR8_STORE_EXITING)
-#else
-#define KVM_REQUIRED_CPU_BASED_VM_EXEC_CONTROL __KVM_REQUIRED_CPU_BASED_VM_EXEC_CONTROL
-#endif
+>          * be enabled for nested page.
+>          */
+>         if (mmu_flags & IS_NESTED_MMU)
+>                 pte_opt_mask |= PT_USER_MASK;
+> 
+>         if (mmu_flags & USE_HUGEPAGES) {
+>                 while (phys + LARGE_PAGE_SIZE <= max) {
+>                         install_large_page(cr3, phys, (void *)(ulong)phys);
+>                         phys += LARGE_PAGE_SIZE;
+>                 }
+>         }
+>         install_pages(cr3, phys, max - phys, (void *)(ulong)phys);
+> 
+>         pte_opt_mask = orig_opt_mask;
+> }
+> 
+> static inline void setup_mmu_range(pgd_t *cr3, phys_addr_t start, size_t len) {
+>         __setup_mmu_range(cr3, start, len, USE_HUGEPAGES);
+> }
+> 
+> Thank you,
+> Manali
