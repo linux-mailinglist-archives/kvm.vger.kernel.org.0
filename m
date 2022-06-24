@@ -2,222 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84433559428
-	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 09:27:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C2A155946B
+	for <lists+kvm@lfdr.de>; Fri, 24 Jun 2022 09:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230248AbiFXH1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 03:27:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53378 "EHLO
+        id S230109AbiFXH5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jun 2022 03:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiFXH1g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 03:27:36 -0400
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C334D612;
-        Fri, 24 Jun 2022 00:27:34 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VHG.Bjb_1656055647;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VHG.Bjb_1656055647)
-          by smtp.aliyun-inc.com;
-          Fri, 24 Jun 2022 15:27:28 +0800
-Message-ID: <1656055406.7931285-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v10 00/41] virtio pci support VIRTIO_F_RING_RESET
-Date:   Fri, 24 Jun 2022 15:23:26 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com
-References: <20220624025621.128843-1-xuanzhuo@linux.alibaba.com>
- <20220624025954-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220624025954-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229911AbiFXH5E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jun 2022 03:57:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 165B969FA1
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 00:57:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656057422;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=s2LZA/fXI+mD13WTemreZqL0kxh0eBajgvaYdX/0vbQ=;
+        b=gMIXHNyeT5Y3T+b68PoCRGPpoe0R3VXJQRw7FzGY+/E6mCMtDNAORqbTggpVKsiH4IGs7a
+        VlaTmvW4MxX3PwkMp0S9qvd0SFCvBfbe9FTX7YL0pMm6tRHsP++QP5ysRWIx5u+ZOGkMVW
+        ivRJ50AcTpJBHO1IlwM5bmhCFkK55TQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-360-xS3TFKZaPiqns5Czko2zAQ-1; Fri, 24 Jun 2022 03:57:00 -0400
+X-MC-Unique: xS3TFKZaPiqns5Czko2zAQ-1
+Received: by mail-wr1-f69.google.com with SMTP id u9-20020adfa189000000b0021b8b3c8f74so163416wru.12
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 00:57:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=s2LZA/fXI+mD13WTemreZqL0kxh0eBajgvaYdX/0vbQ=;
+        b=sPpq/D2t4qPesWPAJA4evCtQsgUEzSL6GBWVqw3KpwAn//dxbk69evTlGXItkZXGD7
+         9eteCnV6XvkeqYyBtgs5MWxlgrsc6mjJRhpZfiuO/ACqKLEbGgPHdosLRKcCbXsVzwgQ
+         WpgcUdDF+LGNhr75PC+uFR+v3DbXfMomkp9q1y4EjlOSO/z+QR8q19cLwv+IzxAfwZzV
+         FE/syb9W7ZeD240zMjLebsGhrzZlH4FdJ+5HwE7oT8UUQ0b8vc/niKBaFihs7CR730jN
+         QkB8H5QRg2pnyHOwBDhblNigmuhU9K9OnY5sBF/YS6zb22zCUIwGXSXODJ4NGa9krF7B
+         7HpQ==
+X-Gm-Message-State: AJIora8BSGWTOvNubO27umouJ+IigkNHKxjVsnosVsmnuhfA8EECUydJ
+        xIusfoOWsjyeYOAzwPwrgf1Xw5suj/Zs+g+7GNCImHFvcEBMC0wsy/fjmSIo8FhrpCNuBNR9AjL
+        QArDFhGH4QQZ5
+X-Received: by 2002:a05:600c:4ca7:b0:3a0:3905:d441 with SMTP id g39-20020a05600c4ca700b003a03905d441mr2235412wmp.159.1656057419296;
+        Fri, 24 Jun 2022 00:56:59 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vNfHWb9u9vWiW5DWSFpAv1CdnziWuY0VO871vq8AjALqHLbv+K+Sigjdz+Mpcfn9SgjHzANA==
+X-Received: by 2002:a05:600c:4ca7:b0:3a0:3905:d441 with SMTP id g39-20020a05600c4ca700b003a03905d441mr2235389wmp.159.1656057419075;
+        Fri, 24 Jun 2022 00:56:59 -0700 (PDT)
+Received: from step1.redhat.com (host-79-46-200-40.retail.telecomitalia.it. [79.46.200.40])
+        by smtp.gmail.com with ESMTPSA id c2-20020a1c3502000000b0039c5328ad92sm5975322wma.41.2022.06.24.00.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jun 2022 00:56:58 -0700 (PDT)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH] vringh: iterate on iotlb_translate to handle large translations
+Date:   Fri, 24 Jun 2022 09:56:56 +0200
+Message-Id: <20220624075656.13997-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.36.1
+MIME-Version: 1.0
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 24 Jun 2022 03:00:12 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Fri, Jun 24, 2022 at 10:55:40AM +0800, Xuan Zhuo wrote:
-> > The virtio spec already supports the virtio queue reset function. This patch set
-> > is to add this function to the kernel. The relevant virtio spec information is
-> > here:
-> >
-> >     https://github.com/oasis-tcs/virtio-spec/issues/124
-> >     https://github.com/oasis-tcs/virtio-spec/issues/139
-> >
-> > Also regarding MMIO support for queue reset, I plan to support it after this
-> > patch is passed.
-> >
-> > This patch set implements the refactoring of vring. Finally, the
-> > virtuque_resize() interface is provided based on the reset function of the
-> > transport layer.
-> >
-> > Test environment:
-> >     Host: 4.19.91
-> >     Qemu: QEMU emulator version 6.2.50 (with vq reset support)
-> >     Test Cmd:  ethtool -G eth1 rx $1 tx $2; ethtool -g eth1
-> >
-> >     The default is split mode, modify Qemu virtio-net to add PACKED feature to test
-> >     packed mode.
-> >
-> > Qemu code:
-> >     https://github.com/fengidri/qemu/compare/89f3bfa3265554d1d591ee4d7f1197b6e3397e84...master
->
->
-> Pls rebase on top of my latest tree, there are some conflicts.
+iotlb_translate() can return -ENOBUFS if the bio_vec is not big enough
+to contain all the ranges for translation.
+This can happen for example if the VMM maps a large bounce buffer,
+without using hugepages, that requires more than 16 ranges to translate
+the addresses.
 
-OK, I'll pull your latest version before committing the next version.
+To handle this case, let's extend iotlb_translate() to also return the
+number of bytes successfully translated.
+In copy_from_iotlb()/copy_to_iotlb() loops by calling iotlb_translate()
+several times until we complete the translation.
 
-Thanks.
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ drivers/vhost/vringh.c | 78 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 56 insertions(+), 22 deletions(-)
 
->
-> > In order to simplify the review of this patch set, the function of reusing
-> > the old buffers after resize will be introduced in subsequent patch sets.
-> >
-> > Please review. Thanks.
-> >
-> > v10:
-> >   1. on top of the harden vring IRQ
-> >   2. factor out split and packed from struct vring_virtqueue
-> >   3. some suggest from @Jason Wang
-> >
-> > v9:
-> >   1. Provide a virtqueue_resize() interface directly
-> >   2. A patch set including vring resize, virtio pci reset, virtio-net resize
-> >   3. No more separate structs
-> >
-> > v8:
-> >   1. Provide a virtqueue_reset() interface directly
-> >   2. Split the two patch sets, this is the first part
-> >   3. Add independent allocation helper for allocating state, extra
-> >
-> > v7:
-> >   1. fix #6 subject typo
-> >   2. fix #6 ring_size_in_bytes is uninitialized
-> >   3. check by: make W=12
-> >
-> > v6:
-> >   1. virtio_pci: use synchronize_irq(irq) to sync the irq callbacks
-> >   2. Introduce virtqueue_reset_vring() to implement the reset of vring during
-> >      the reset process. May use the old vring if num of the vq not change.
-> >   3. find_vqs() support sizes to special the max size of each vq
-> >
-> > v5:
-> >   1. add virtio-net support set_ringparam
-> >
-> > v4:
-> >   1. just the code of virtio, without virtio-net
-> >   2. Performing reset on a queue is divided into these steps:
-> >     1. reset_vq: reset one vq
-> >     2. recycle the buffer from vq by virtqueue_detach_unused_buf()
-> >     3. release the ring of the vq by vring_release_virtqueue()
-> >     4. enable_reset_vq: re-enable the reset queue
-> >   3. Simplify the parameters of enable_reset_vq()
-> >   4. add container structures for virtio_pci_common_cfg
-> >
-> > v3:
-> >   1. keep vq, irq unreleased
-> >
-> > *** BLURB HERE ***
-> >
-> > Xuan Zhuo (41):
-> >   remoteproc: rename len of rpoc_vring to num
-> >   virtio: add helper virtqueue_get_vring_max_size()
-> >   virtio: struct virtio_config_ops add callbacks for queue_reset
-> >   virtio_ring: update the document of the virtqueue_detach_unused_buf
-> >     for queue reset
-> >   virtio_ring: remove the arg vq of vring_alloc_desc_extra()
-> >   virtio_ring: extract the logic of freeing vring
-> >   virtio_ring: split vring_virtqueue
-> >   virtio_ring: introduce virtqueue_init()
-> >   virtio_ring: split: introduce vring_free_split()
-> >   virtio_ring: split: extract the logic of alloc queue
-> >   virtio_ring: split: extract the logic of alloc state and extra
-> >   virtio_ring: split: extract the logic of attach vring
-> >   virtio_ring: split: extract the logic of vring init
-> >   virtio_ring: split: introduce virtqueue_reinit_split()
-> >   virtio_ring: split: reserve vring_align, may_reduce_num
-> >   virtio_ring: split: introduce virtqueue_resize_split()
-> >   virtio_ring: packed: introduce vring_free_packed
-> >   virtio_ring: packed: extract the logic of alloc queue
-> >   virtio_ring: packed: extract the logic of alloc state and extra
-> >   virtio_ring: packed: extract the logic of attach vring
-> >   virtio_ring: packed: extract the logic of vring init
-> >   virtio_ring: packed: introduce virtqueue_reinit_packed()
-> >   virtio_ring: packed: introduce virtqueue_resize_packed()
-> >   virtio_ring: introduce virtqueue_resize()
-> >   virtio_pci: struct virtio_pci_common_cfg add queue_notify_data
-> >   virtio: queue_reset: add VIRTIO_F_RING_RESET
-> >   virtio: allow to unbreak/break virtqueue individually
-> >   virtio_pci: update struct virtio_pci_common_cfg
-> >   virtio_pci: introduce helper to get/set queue reset
-> >   virtio_pci: extract the logic of active vq for modern pci
-> >   virtio_pci: support VIRTIO_F_RING_RESET
-> >   virtio: find_vqs() add arg sizes
-> >   virtio_pci: support the arg sizes of find_vqs()
-> >   virtio_mmio: support the arg sizes of find_vqs()
-> >   virtio: add helper virtio_find_vqs_ctx_size()
-> >   virtio_net: set the default max ring size by find_vqs()
-> >   virtio_net: get ringparam by virtqueue_get_vring_max_size()
-> >   virtio_net: split free_unused_bufs()
-> >   virtio_net: support rx queue resize
-> >   virtio_net: support tx queue resize
-> >   virtio_net: support set_ringparam
-> >
-> >  arch/um/drivers/virtio_uml.c             |   3 +-
-> >  drivers/net/virtio_net.c                 | 209 +++++-
-> >  drivers/platform/mellanox/mlxbf-tmfifo.c |   3 +
-> >  drivers/remoteproc/remoteproc_core.c     |   4 +-
-> >  drivers/remoteproc/remoteproc_virtio.c   |  13 +-
-> >  drivers/s390/virtio/virtio_ccw.c         |   4 +
-> >  drivers/virtio/virtio_mmio.c             |  11 +-
-> >  drivers/virtio/virtio_pci_common.c       |  32 +-
-> >  drivers/virtio/virtio_pci_common.h       |   3 +-
-> >  drivers/virtio/virtio_pci_legacy.c       |   8 +-
-> >  drivers/virtio/virtio_pci_modern.c       | 157 ++++-
-> >  drivers/virtio/virtio_pci_modern_dev.c   |  39 ++
-> >  drivers/virtio/virtio_ring.c             | 794 +++++++++++++++++------
-> >  drivers/virtio/virtio_vdpa.c             |   3 +
-> >  include/linux/remoteproc.h               |   4 +-
-> >  include/linux/virtio.h                   |   9 +
-> >  include/linux/virtio_config.h            |  38 +-
-> >  include/linux/virtio_pci_modern.h        |   2 +
-> >  include/uapi/linux/virtio_config.h       |   7 +-
-> >  include/uapi/linux/virtio_pci.h          |  14 +
-> >  20 files changed, 1063 insertions(+), 294 deletions(-)
-> >
-> > --
-> > 2.31.0
->
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index eab55accf381..11f59dd06a74 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -1095,7 +1095,8 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
+ #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
+ 
+ static int iotlb_translate(const struct vringh *vrh,
+-			   u64 addr, u64 len, struct bio_vec iov[],
++			   u64 addr, u64 len, u64 *translated,
++			   struct bio_vec iov[],
+ 			   int iov_size, u32 perm)
+ {
+ 	struct vhost_iotlb_map *map;
+@@ -1136,43 +1137,76 @@ static int iotlb_translate(const struct vringh *vrh,
+ 
+ 	spin_unlock(vrh->iotlb_lock);
+ 
++	if (translated)
++		*translated = min(len, s);
++
+ 	return ret;
+ }
+ 
+ static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
+ 				  void *src, size_t len)
+ {
+-	struct iov_iter iter;
+-	struct bio_vec iov[16];
+-	int ret;
++	u64 total_translated = 0;
+ 
+-	ret = iotlb_translate(vrh, (u64)(uintptr_t)src,
+-			      len, iov, 16, VHOST_MAP_RO);
+-	if (ret < 0)
+-		return ret;
++	while (total_translated < len) {
++		struct bio_vec iov[16];
++		struct iov_iter iter;
++		u64 translated;
++		int ret;
+ 
+-	iov_iter_bvec(&iter, READ, iov, ret, len);
++		ret = iotlb_translate(vrh, (u64)(uintptr_t)src,
++				      len - total_translated, &translated,
++				      iov, ARRAY_SIZE(iov), VHOST_MAP_RO);
++		if (ret == -ENOBUFS)
++			ret = ARRAY_SIZE(iov);
++		else if (ret < 0)
++			return ret;
+ 
+-	ret = copy_from_iter(dst, len, &iter);
++		iov_iter_bvec(&iter, READ, iov, ret, translated);
+ 
+-	return ret;
++		ret = copy_from_iter(dst, translated, &iter);
++		if (ret < 0)
++			return ret;
++
++		src += translated;
++		dst += translated;
++		total_translated += translated;
++	}
++
++	return total_translated;
+ }
+ 
+ static inline int copy_to_iotlb(const struct vringh *vrh, void *dst,
+ 				void *src, size_t len)
+ {
+-	struct iov_iter iter;
+-	struct bio_vec iov[16];
+-	int ret;
++	u64 total_translated = 0;
+ 
+-	ret = iotlb_translate(vrh, (u64)(uintptr_t)dst,
+-			      len, iov, 16, VHOST_MAP_WO);
+-	if (ret < 0)
+-		return ret;
++	while (total_translated < len) {
++		struct bio_vec iov[16];
++		struct iov_iter iter;
++		u64 translated;
++		int ret;
++
++		ret = iotlb_translate(vrh, (u64)(uintptr_t)dst,
++				      len - total_translated, &translated,
++				      iov, ARRAY_SIZE(iov), VHOST_MAP_WO);
++		if (ret == -ENOBUFS)
++			ret = ARRAY_SIZE(iov);
++		else if (ret < 0)
++			return ret;
+ 
+-	iov_iter_bvec(&iter, WRITE, iov, ret, len);
++		iov_iter_bvec(&iter, WRITE, iov, ret, translated);
++
++		ret = copy_to_iter(src, translated, &iter);
++		if (ret < 0)
++			return ret;
++
++		src += translated;
++		dst += translated;
++		total_translated += translated;
++	}
+ 
+-	return copy_to_iter(src, len, &iter);
++	return total_translated;
+ }
+ 
+ static inline int getu16_iotlb(const struct vringh *vrh,
+@@ -1183,7 +1217,7 @@ static inline int getu16_iotlb(const struct vringh *vrh,
+ 	int ret;
+ 
+ 	/* Atomic read is needed for getu16 */
+-	ret = iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
++	ret = iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
+ 			      &iov, 1, VHOST_MAP_RO);
+ 	if (ret < 0)
+ 		return ret;
+@@ -1204,7 +1238,7 @@ static inline int putu16_iotlb(const struct vringh *vrh,
+ 	int ret;
+ 
+ 	/* Atomic write is needed for putu16 */
+-	ret = iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
++	ret = iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
+ 			      &iov, 1, VHOST_MAP_WO);
+ 	if (ret < 0)
+ 		return ret;
+-- 
+2.36.1
+
