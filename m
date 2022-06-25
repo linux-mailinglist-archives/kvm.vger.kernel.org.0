@@ -2,95 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EF3C55A98B
-	for <lists+kvm@lfdr.de>; Sat, 25 Jun 2022 13:45:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4EF555ADAE
+	for <lists+kvm@lfdr.de>; Sun, 26 Jun 2022 01:59:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232660AbiFYLmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Jun 2022 07:42:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59630 "EHLO
+        id S233620AbiFYX7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Jun 2022 19:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232286AbiFYLmt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Jun 2022 07:42:49 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C511DA62;
-        Sat, 25 Jun 2022 04:42:49 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id r1so4249614plo.10;
-        Sat, 25 Jun 2022 04:42:49 -0700 (PDT)
+        with ESMTP id S233590AbiFYX7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Jun 2022 19:59:09 -0400
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82DBE13DF1
+        for <kvm@vger.kernel.org>; Sat, 25 Jun 2022 16:59:07 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id 89so10062548qvc.0
+        for <kvm@vger.kernel.org>; Sat, 25 Jun 2022 16:59:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FVCRMGb+Cx09Uie3dQkwHqVyER5uIEsfwxOzBnP3Djg=;
-        b=HbJbB3yiwysOUYx70A9rJ3IyqHJZD53w2ugOLFfWnQL9fE3Xv37YHL88kbqBLF3FDw
-         eofdHyDWKzf88V4uam5r09y46d3q9n1n/BER56T0Vc6t7VB19m4x5Qg2eFXGkI+076EA
-         bJ8H0caDs25x5ypQBnEwZW114Eq7GlrhHM01ysrGXU2I5UQ+bf4c9+ylQeTtNNQe3SWt
-         8zXqgck2CFpTQXozmXFB2csi9SrRkV4NQlnmCTTbQhNdSo4STt+yltK6OZKeC3iQzHyU
-         1OnZx4ZEEC293glV6bTb3tS+9t22WnBSJGatcTKVZVtuHVmJYY8mrC9BnDHl7YC7DH9h
-         rL5w==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OIkvZSCfU1CjrPejBudrIGntnY32egXHLdKIcmmN0pg=;
+        b=duH504ulYOnzBaVTLyLo1maWRZER3UvuJOkl8g0W5A7EYWwmU7JLyVVOeVm/mzY6jz
+         wEQqHqotXWBM9p2+EAvrZPlBnGf0wIXCNnyoHFxr5zjGsKVcLPXHkfQVwIGTrVZFfHJg
+         E4e8lZiIn8rsAZTGPhWBTHBxWkOp5DngPB1Az8BgpizpK4wZTN68kKTCIq1n4SCn6Y5V
+         56K05ugA1OyB3vJpg7045S8yLgufcX3ypvS9ZGEs793kJzwt2Pp/5EpQpLRLJ0SmkWOO
+         9J5MhDH6Dt3+awMXHKsUxbuCGMHLj/OPr3AwVMHf2ZWmG4UVE5Y1CWHYNDj00yZt0DW0
+         kIiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FVCRMGb+Cx09Uie3dQkwHqVyER5uIEsfwxOzBnP3Djg=;
-        b=cgokASi3kl9Rnde84Uv94UW5UUVZJkpLDbbpZQyaq8qdp6A4hr/bqnEzG0jxpNkrV6
-         ZYw0caycYHmWy6T8U3KmCg73D7dMnnKpnSxoLV6jXTXeKcOXD84XKkMVpjIFYiRF7i1C
-         PuyF6eD9iu6qVtwvgJGG5xmzWbKdE5zjKX6NIaKjDHLWdNlkYsANdhMhqNVzmRtM3T5C
-         7x8WBLzRuSusvUsgmdBqInnsmbtBWF8LLmNs5q6AJgr5D6xDegrRqsFgADHUjhccPUfL
-         gYwvZMuKuU3oD8PgLGhUnqEuCGsekfqsvcFSns2yMi8ZUap8NhQBFUHw0GJo575YcIZr
-         eMmg==
-X-Gm-Message-State: AJIora/u1bEZ2ZNXxx/qsOkI40DlvyP5pxqHoGw0vfPYJHkgOBvGvBa+
-        N9aKHsPGO2PezhMchzJpQ5Q=
-X-Google-Smtp-Source: AGRyM1vyPaYnUF9plyh2nRkg7XifFzCevz2lvXaBIKvKXigYwZNXwk1KQRvDNSvPkEe7/xtGx/gdTg==
-X-Received: by 2002:a17:90a:34c7:b0:1ec:91a6:f3db with SMTP id m7-20020a17090a34c700b001ec91a6f3dbmr4224398pjf.112.1656157368625;
-        Sat, 25 Jun 2022 04:42:48 -0700 (PDT)
-Received: from localhost.localdomain ([103.152.221.103])
-        by smtp.gmail.com with ESMTPSA id y17-20020a1709027c9100b0016648412514sm3504736pll.188.2022.06.25.04.42.46
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OIkvZSCfU1CjrPejBudrIGntnY32egXHLdKIcmmN0pg=;
+        b=WCOptaATF3hvsD9jiQphV6un2awJde9VFqztZg2G5COZ8AfNGLXksEtvoue7RbteJh
+         vnsiqO4AMLtHbTHbURkeV4JmQjk+69AUrlnkfLkx6vyzLjzRoABuk3CvOwQWD8zn0jZK
+         7nXeYKr1sWEolfv4vJ70jJWD6yx+8+QHS1dWqJGGh5Zz/Huqtjn1Xu0zn9oLckgqmt6B
+         7NljGCTVri07b+qwESwa/WYRGBUtTkHa5X+FVhqLMUfhzM6vtF0EnC/rnB+ipkFzX4fC
+         P8ejvqDd+KThBiQQK/N6ebd7vS7l5H/+i0BACDuuAh93X0ugE43o+R0lbX13JL5PC4DO
+         /FzA==
+X-Gm-Message-State: AJIora85I8VJNRWE9ksc4nsjmdb60flxT16sz89jafzZLk582mJv5X9L
+        7xtlPEGFR1Ml56yG+Rrdpz2aWQ==
+X-Google-Smtp-Source: AGRyM1vkSR+fkkuzlMpkZs/yPAV/CYQBTRY/CutcwMiNTqboWAwrJeP6fXDvYF6KEeySkwQaI+gI6w==
+X-Received: by 2002:a05:622a:13c8:b0:317:7862:6b45 with SMTP id p8-20020a05622a13c800b0031778626b45mr4688676qtk.266.1656201546699;
+        Sat, 25 Jun 2022 16:59:06 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id l2-20020a05620a28c200b006a6cadd89efsm5717888qkp.82.2022.06.25.16.59.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jun 2022 04:42:48 -0700 (PDT)
-From:   Liam Ni <zhiguangni01@gmail.com>
-To:     alex.williamson@redhat.com, cohuck@redhat.com
+        Sat, 25 Jun 2022 16:59:05 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1o5Fg8-001ry7-9l; Sat, 25 Jun 2022 20:59:04 -0300
+Date:   Sat, 25 Jun 2022 20:59:04 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Peter Xu <peterx@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhiguangni01@gmail.com
-Subject: [PATCH] vfio: check iommu_group_set_name() return value
-Date:   Sat, 25 Jun 2022 19:42:39 +0800
-Message-Id: <20220625114239.9301-1-zhiguangni01@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Hildenbrand <david@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
+Message-ID: <20220625235904.GK23621@ziepe.ca>
+References: <20220622213656.81546-1-peterx@redhat.com>
+ <20220622213656.81546-2-peterx@redhat.com>
+ <20220625003554.GJ23621@ziepe.ca>
+ <YrZjeEv1Z2IDMwgy@xz-m1.local>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Level: *
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YrZjeEv1Z2IDMwgy@xz-m1.local>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As iommu_group_set_name() can fail,we should check the return value.
+On Fri, Jun 24, 2022 at 09:23:04PM -0400, Peter Xu wrote:
+> If to go back to the original question with a shorter answer: if the ioctl
+> context that GUP upon a page that will never be with a uffd context, then
+> it's probably not gonna help at all.. at least not before we use
+> FAULT_FLAG_INTERRUPTIBLE outside uffd page fault handling.
 
-Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
----
- drivers/vfio/vfio.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I think I would be more interested in this if it could abort a swap
+in, for instance. Doesn't this happen if it flows the interruptible
+flag into the VMA's fault handler?
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 61e71c1154be..ca823eeac237 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -504,7 +504,9 @@ static struct vfio_group *vfio_noiommu_group_alloc(struct device *dev,
- 	if (IS_ERR(iommu_group))
- 		return ERR_CAST(iommu_group);
- 
--	iommu_group_set_name(iommu_group, "vfio-noiommu");
-+	ret = iommu_group_set_name(iommu_group, "vfio-noiommu");
-+	if (ret)
-+		goto out_put_group;
- 	ret = iommu_group_add_device(iommu_group, dev);
- 	if (ret)
- 		goto out_put_group;
--- 
-2.25.1
-
+Jason
