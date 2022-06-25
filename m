@@ -2,126 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4F6755A5D6
-	for <lists+kvm@lfdr.de>; Sat, 25 Jun 2022 03:26:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79BA255A783
+	for <lists+kvm@lfdr.de>; Sat, 25 Jun 2022 08:38:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231459AbiFYBXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jun 2022 21:23:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45984 "EHLO
+        id S231975AbiFYGfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Jun 2022 02:35:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231428AbiFYBXO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jun 2022 21:23:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7598D15FEF
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 18:23:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656120191;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7XLzZJXOdWaEWC8BB0Bij+Fr78R+fiLBcMspKDhyed8=;
-        b=FolPKYZb/693Kpf66xPNF5oLCdQkOcNTC2qj8gFkhXXg3BITtkWzs11wjwnhhZ2x/30jS4
-        Q94nGWUpcC85JDjkALakobHkqyVLYVUnop0/unTNaTLjK5FOxUPBnwydMvx98OUl+7hAHX
-        Tn91n7V+kUiEaIcPHBmcJfgWvK7Y0Q8=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-341-yiSOd5fuPSWY5pwI8Mv8vg-1; Fri, 24 Jun 2022 21:23:10 -0400
-X-MC-Unique: yiSOd5fuPSWY5pwI8Mv8vg-1
-Received: by mail-il1-f199.google.com with SMTP id b11-20020a92340b000000b002d3dbbc7b15so2565474ila.5
-        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 18:23:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7XLzZJXOdWaEWC8BB0Bij+Fr78R+fiLBcMspKDhyed8=;
-        b=pzCZqgStmSewQaeQj3rMBDFoCxmnQVEg0i/P3PPDmzIDMx2aU/3i6GWQs5lmTNje3o
-         X52xO0NqgU2eqp/YcGKqJ1a2FLZwkYq02p6EH8xXdKs3YxK6vOnnlNUW4yczq/nFLjgO
-         9ZPcvZLC3w6RJos/L47d3Ti2h3jSlzvZZv9QLDaDk1K2gTZ8EI6JhRPsU7DV8gm1MUGr
-         6RzcVK47zJphh39UPgtyYws5kvwlSuil5mJhfvPej4b18W/YSFYR7Yc1NMlWaI9IoblJ
-         xs5KqzNrOjz3uDWEDkwz646ZZCkETl1asFnZ5oLa7scPGA+FT2CKtmpA7W/yJ5uRh8le
-         3jkA==
-X-Gm-Message-State: AJIora+ghGzuvNluO4+VAfw9kxmKUzznEhHIcV4jU2B0WP/Mt745Yy6A
-        PdBrrwUUp1WdSS24LtCiAdsLfw2gFPS4TqJue+C+NTs1VJyWmldlwIaPPtgSDO4x/rX6vFT0/ed
-        hx/2+60JLAOVP
-X-Received: by 2002:a5d:9291:0:b0:669:d90b:24e0 with SMTP id s17-20020a5d9291000000b00669d90b24e0mr911540iom.53.1656120189522;
-        Fri, 24 Jun 2022 18:23:09 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vU+hqUMZ39OLtBJ83hd5BrE2EQXNCbPmdU+o5BGQ4i9ivzq9fjRpN79r5OZj+RHPH35LRgzA==
-X-Received: by 2002:a5d:9291:0:b0:669:d90b:24e0 with SMTP id s17-20020a5d9291000000b00669d90b24e0mr911528iom.53.1656120189246;
-        Fri, 24 Jun 2022 18:23:09 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id t16-20020a92dc10000000b002d94906dacfsm1739700iln.67.2022.06.24.18.23.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jun 2022 18:23:07 -0700 (PDT)
-Date:   Fri, 24 Jun 2022 21:23:04 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Message-ID: <YrZjeEv1Z2IDMwgy@xz-m1.local>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-2-peterx@redhat.com>
- <20220625003554.GJ23621@ziepe.ca>
+        with ESMTP id S229529AbiFYGfH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Jun 2022 02:35:07 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5EF4AE17
+        for <kvm@vger.kernel.org>; Fri, 24 Jun 2022 23:35:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656138907; x=1687674907;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ncsSzD9lukMtrHqAkss875YlBgCtPzCDAL9ZDZZYm1E=;
+  b=H4I+PTvAS5kbKQtae0On7fx/TGcW/cPbVyzY/YibwoZRI0tU5cu+F6Bv
+   i8lUW5BUedKYLRIFpiNXYZ31Se6/3Cu7ssKpCXwuqsFQCvhf6k9QMAcvR
+   HFULpr8IIcN/kf2eU6mxSkCD9uWOPFFB+zCwD1JjUson/0USfXVkzdKfG
+   nUGvG+hdgAPWhu/HXLu/Lh31eLTi0B9XsV6ejDo5TRRN2g88eVit7dKdh
+   IwibChLdmWu4L9eS3G48BLAuqJxcdJ70VPaAaH/SuGTTjI+riZqWErtbB
+   pJ8IiWom1i0i2BwPVSIfClX/WS1m5OKeVNTlKu093uS9tRwVy0FG50ezT
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10388"; a="306623261"
+X-IronPort-AV: E=Sophos;i="5.92,221,1650956400"; 
+   d="scan'208";a="306623261"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 23:35:07 -0700
+X-IronPort-AV: E=Sophos;i="5.92,221,1650956400"; 
+   d="scan'208";a="645600520"
+Received: from yangweij-mobl.ccr.corp.intel.com (HELO [10.249.169.7]) ([10.249.169.7])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 23:35:05 -0700
+Message-ID: <8b0ed7fb-9dba-f677-0779-8f80166c29c2@intel.com>
+Date:   Sat, 25 Jun 2022 14:34:54 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220625003554.GJ23621@ziepe.ca>
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 2/3] x86: Skip perf related tests when platform cannot
+ support
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+References: <20220624090828.62191-1-weijiang.yang@intel.com>
+ <20220624090828.62191-3-weijiang.yang@intel.com>
+ <YrY1+UHZMDno74we@google.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <YrY1+UHZMDno74we@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Jason,
 
-On Fri, Jun 24, 2022 at 09:35:54PM -0300, Jason Gunthorpe wrote:
-> Can you talk abit about what is required to use this new interface
-> correctly?
-> 
-> Lots of GUP callers are in simple system call contexts (like ioctl),
-> can/should they set this flag and if so what else do they need to do?
-
-Thanks for taking a look.
-
-IMHO the major thing required is the caller can handle the case when GUP
-returned (1) less page than expected, and (2) -EINTR returns.
-
-For the -EINTR case, IIUC ideally in an ioctl context we should better
-deliver it back to user app this -EINTR (while do cleanups gracefully),
-rather than returning anything else (e.g. converting it to -EFAULT or
-something else).
-
-But note that FAULT_FLAG_INTERRUPTIBLE is only used in an userfaultfd
-context (aka, userfaultfd_get_blocking_state()).  For example, if we hang
-at lock_page() (if not go into whether hanging at lock_page makes sense or
-not at all.. it really sounds like a bug) and we receive a non-fatal
-signal, we won't be able to be scheduled for that since lock_page() uses
-TASK_UNINTERRUPTIBLE always.
-
-I think it's a separate problem on whether we should extend the usage of
-FAULT_FLAG_INTERRUPTIBLE to things like lock_page() (and probably not..),
-and currently it does solve a major issue regarding postcopy hanging on
-pages for hypervisor use case.  Hopefully that still justifies this plumber
-work to enable the interruptible cap to GUP layer.
-
-If to go back to the original question with a shorter answer: if the ioctl
-context that GUP upon a page that will never be with a uffd context, then
-it's probably not gonna help at all.. at least not before we use
-FAULT_FLAG_INTERRUPTIBLE outside uffd page fault handling.
-
-Thanks,
-
--- 
-Peter Xu
-
+On 6/25/2022 6:08 AM, Sean Christopherson wrote:
+> On Fri, Jun 24, 2022, Yang Weijiang wrote:
+>> Add helpers to check whether MSR_CORE_PERF_GLOBAL_CTRL and rdpmc
+>> are supported in KVM. When pmu is disabled with enable_pmu=0,
+>> reading MSR_CORE_PERF_GLOBAL_CTRL or executing rdpmc leads to #GP,
+>> so skip related tests in this case to avoid test failure.
+>>
+>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>> ---
+>>   lib/x86/processor.h | 10 ++++++++++
+>>   x86/vmx_tests.c     | 18 ++++++++++++++++++
+>>   2 files changed, 28 insertions(+)
+>>
+>> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+>> index 9a0dad6..70b9193 100644
+>> --- a/lib/x86/processor.h
+>> +++ b/lib/x86/processor.h
+>> @@ -690,4 +690,14 @@ static inline bool cpuid_osxsave(void)
+>>   	return cpuid(1).c & (1 << (X86_FEATURE_OSXSAVE % 32));
+>>   }
+>>   
+>> +static inline u8 pmu_version(void)
+>> +{
+>> +	return cpuid(10).a & 0xff;
+>> +}
+>> +
+>> +static inline bool has_perf_global_ctrl(void)
+> Slight preference for this_cpu_has_perf_global_ctrl() or cpu_has_perf_global_ctrl().
+OK, will change it. Thanks.
+>
+>> +{
+>> +	return pmu_version() > 1;
+>> +}
+>> +
+>>   #endif
+>> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+>> index 4d581e7..3cf0776 100644
+>> --- a/x86/vmx_tests.c
+>> +++ b/x86/vmx_tests.c
+>> @@ -944,6 +944,14 @@ static void insn_intercept_main(void)
+>>   			continue;
+>>   		}
+>>   
+>> +		if (insn_table[cur_insn].flag == CPU_RDPMC) {
+>> +			if (!!pmu_version()) {
+>> +				printf("\tFeature required for %s is not supported.\n",
+>> +				       insn_table[cur_insn].name);
+>> +				continue;
+>> +			}
+>> +		}
+> There's no need to copy+paste a bunch of code plus a one-off check, just add
+> another helper that plays nice with supported_fn().
+Good, I'll add a supported_fn().
+>
+> static inline bool this_cpu_has_pmu(void)
+> {
+> 	return !!pmu_version();
+> }
+>
+>> +
+>>   		if (insn_table[cur_insn].disabled) {
+>>   			printf("\tFeature required for %s is not supported.\n",
+>>   			       insn_table[cur_insn].name);
+>> @@ -7490,6 +7498,11 @@ static void test_perf_global_ctrl(u32 nr, const char *name, u32 ctrl_nr,
+>>   
+>>   static void test_load_host_perf_global_ctrl(void)
+>>   {
+>> +	if (!has_perf_global_ctrl()) {
+>> +		report_skip("test_load_host_perf_global_ctrl");
+> If you're going to print just the function name, then
+>
+> 		report_skip(__func__);
+>
+> will suffice.  I'd still prefer a more helpful message, especially since there's
+> another "skip" in this function.
+Will do it.
+>
+>> +		return;
+>> +	}
+>> +
+>>   	if (!(ctrl_exit_rev.clr & EXI_LOAD_PERF)) {
+>>   		printf("\"load IA32_PERF_GLOBAL_CTRL\" exit control not supported\n");
+>>   		return;
+> Speaking of said skip, can you clean up the existing code to use report_skip()?
+Will do it.
+>
+>> @@ -7502,6 +7515,11 @@ static void test_load_host_perf_global_ctrl(void)
+>>   
+>>   static void test_load_guest_perf_global_ctrl(void)
+>>   {
+>> +	if (!has_perf_global_ctrl()) {
+>> +		report_skip("test_load_guest_perf_global_ctrl");
+>> +		return;
+>> +	}
+>> +
+>>   	if (!(ctrl_enter_rev.clr & ENT_LOAD_PERF)) {
+>>   		printf("\"load IA32_PERF_GLOBAL_CTRL\" entry control not supported\n");
+>>   		return;
+>> -- 
+>> 2.27.0
+>>
