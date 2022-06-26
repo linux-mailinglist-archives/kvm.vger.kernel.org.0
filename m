@@ -2,54 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C40E755B08D
-	for <lists+kvm@lfdr.de>; Sun, 26 Jun 2022 11:12:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C16755B3AE
+	for <lists+kvm@lfdr.de>; Sun, 26 Jun 2022 21:07:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234174AbiFZJLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Jun 2022 05:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46262 "EHLO
+        id S231587AbiFZTEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Jun 2022 15:04:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234148AbiFZJLP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Jun 2022 05:11:15 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A2812A97;
-        Sun, 26 Jun 2022 02:11:14 -0700 (PDT)
+        with ESMTP id S229775AbiFZTEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Jun 2022 15:04:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6698DAE41
+        for <kvm@vger.kernel.org>; Sun, 26 Jun 2022 12:04:33 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C40A7B80D37;
-        Sun, 26 Jun 2022 09:11:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 157C8C341DC;
-        Sun, 26 Jun 2022 09:11:11 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0404360F60
+        for <kvm@vger.kernel.org>; Sun, 26 Jun 2022 19:04:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58CC6C385A9
+        for <kvm@vger.kernel.org>; Sun, 26 Jun 2022 19:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656234671;
-        bh=h+1QeVS8ACjM0/I0V8004v6I8M6+vBcTeWm3TDyLTxI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=USWBC/8pgaZLj0WIbslgCAxhMNsMTht5DjStVoR5Vy6TrnGpSrJdx8lVh7FVqo8kz
-         IWE9O918sfMAUnmp9BLWjkE7NPcYsKEUuWRrwCYEyPDkeeWRdu9xXqyDZdd76VDCnh
-         z9cZP/Q0skaD5VUW1vAavX6cTmYmV7w41Lf+uKhW6BQEe96yonm29Wdzo8AORZFW4X
-         hn3QPlUiqtC31Z8TZLy3sw5Mc1rRKr03OdVCtFrPB7c641mtqC6P7aosbGQk7W/xZv
-         Eh3U3w7jLIVGt9k3HEHNU+Z6wIeb2evYCiNMPcO1GdknaZO8oLuVngnkjFWgKo3hgS
-         tUMJ+kB6Mtd0g==
-Received: from mchehab by mail.kernel.org with local (Exim 4.95)
-        (envelope-from <mchehab@kernel.org>)
-        id 1o5OIO-001coz-45;
-        Sun, 26 Jun 2022 10:11:08 +0100
-From:   Mauro Carvalho Chehab <mchehab@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Mauro Carvalho Chehab" <mchehab+huawei@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 14/20] Documentation: KVM: update s390-diag.rst reference
-Date:   Sun, 26 Jun 2022 10:11:00 +0100
-Message-Id: <85b81e4678bbe23d0e9692616798762a6465f0a3.1656234456.git.mchehab@kernel.org>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <cover.1656234456.git.mchehab@kernel.org>
-References: <cover.1656234456.git.mchehab@kernel.org>
+        s=k20201202; t=1656270272;
+        bh=Bq7CtgVOL67NJvsDYqg6J1ixt+NZsHCu/tiZlEw73GE=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=PT3S0TKQZHPmvNMB1V6SV1PVXF1W/4mixobbdpvzpHZshIx4SNQY6iuK3dFush1DM
+         v1s+GfJmROQBNoA6WboIR40O9XL6YyB7K20kRMZZ4uIu71L+TCpCD/lkRibum6T0Vg
+         EOJ3bxiUEL/Hm37R7PDYFzrjdCxVmA8BeD0JccQxd9ptRW5y2CeSLMK6+MUlIZZ0cK
+         zYttVysXYf/Uk9yxYqoJ8hwYDlt5DZCJq3AxcPS6KjN+wwN+d31+H3drVP2qbQ/AjA
+         esEGs2M3i3fGqdcdCdwXgO7CGuRokWromDIQsr9n9kk8hH4/dQbxv5JvhMfUkbvTec
+         g/aPBIjqk4IIA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 428F6CC13B4; Sun, 26 Jun 2022 19:04:32 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216026] Fails to compile using gcc 12.1 under Ubuntu 22.04
+Date:   Sun, 26 Jun 2022 19:04:31 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: alexander.warth@mailbox.org
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216026-28872-A3M0IsQ6gz@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216026-28872@https.bugzilla.kernel.org/>
+References: <bug-216026-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -60,35 +70,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Changeset daec8d408308 ("Documentation: KVM: add separate directories for architecture-specific documentation")
-renamed: Documentation/virt/kvm/s390-diag.rst
-to: Documentation/virt/kvm/s390/s390-diag.rst.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216026
 
-Update its cross-reference accordingly.
+--- Comment #40 from Alexander Warth (alexander.warth@mailbox.org) ---
+me too. Thx for the fix and efforts.
 
-Fixes: daec8d408308 ("Documentation: KVM: add separate directories for architecture-specific documentation")
-Signed-off-by: Mauro Carvalho Chehab <mchehab@kernel.org>
----
+--=20
+You may reply to this email to add a comment.
 
-To avoid mailbombing on a large number of people, only mailing lists were C/C on the cover.
-See [PATCH v2 00/20] at: https://lore.kernel.org/all/cover.1656234456.git.mchehab@kernel.org/
-
- Documentation/virt/kvm/x86/hypercalls.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/x86/hypercalls.rst b/Documentation/virt/kvm/x86/hypercalls.rst
-index e56fa8b9cfca..10db7924720f 100644
---- a/Documentation/virt/kvm/x86/hypercalls.rst
-+++ b/Documentation/virt/kvm/x86/hypercalls.rst
-@@ -22,7 +22,7 @@ S390:
-   number in R1.
- 
-   For further information on the S390 diagnose call as supported by KVM,
--  refer to Documentation/virt/kvm/s390-diag.rst.
-+  refer to Documentation/virt/kvm/s390/s390-diag.rst.
- 
- PowerPC:
-   It uses R3-R10 and hypercall number in R11. R4-R11 are used as output registers.
--- 
-2.36.1
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
