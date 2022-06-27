@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA3A455C8DA
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:56:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 729C755D575
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:15:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242043AbiF0V5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:57:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59828 "EHLO
+        id S242023AbiF0V5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:57:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241561AbiF0Vzq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 17:55:46 -0400
+        with ESMTP id S241563AbiF0Vzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 17:55:47 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D20A213D52;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32DC13DE4;
         Mon, 27 Jun 2022 14:55:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1656366905; x=1687902905;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Z/T+R8pNd+jfmnXzaarO7KtGTxMxSyFL1NpPVEsp/E4=;
-  b=anz5V9tQ7A2/AqYrzZSKfOU10De6YcVtuX5Ei7yyNLlQp4YLD6jL5u3B
-   z2im2MFJwTWtKsvFglAmArezGwG29cyIiEq+ja/8BTORtAStkWOdCpTAE
-   6Rq9DsUYWeyVXuxopTYL/nJWIy8WbBU8tezeMVKa76d6xGjHq0cpRScFj
-   b/CEmPdRY/WvRPTzm7CLj2bE4b0xPjW5iTpWm64JrLTrcHDRuigPQRfoD
-   gGjgq6/Nt2jzJH91o5J0aliym3D307Ors0/WYy3vljlGiTFhPQN6N+YXc
-   nOY98LcHYDS7A8GDO60SbkvPFvcfjeb6A6tvvwy1XKeU9L+M7oxt2aHxy
+  bh=eU92c76Bs+XVscnwksCZfXMJ45s+6UVpJv36cdohfPk=;
+  b=cFQu1Hx+RkkhfudRVWGsCiV4C/ePsNk8mZykJasvF6D6hXd9ZkNvHnDB
+   GToaVljzl8OihCr6K4i4CCWRs+/Jbk6nhsmSnB9R27sZIwzn6wzl/t9X5
+   qZd2Jrzl93B0zvt0AUtkFUDL8GKI37nrj4GsqykHwxBq54l1I6xnwL7ib
+   zbG5VMuxeI2M4OP5DR4Te7cMB40tu3NEbRz2+1uAFaKbuVuJ0tqcQLH6t
+   Tnfavsorm9hlvDOmmucb3xCHWxPjrvqEEJvyMhghJY4YlTtJCL2nRU8rV
+   BuhJDP+XRfJWvDN/3luzueDXzQUDcFoAXTItGrXMw1XoPUpVz6CJ0k236
    w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="279116123"
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="279116126"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="279116123"
+   d="scan'208";a="279116126"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:59 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="657863691"
+   d="scan'208";a="657863694"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:59 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v7 078/102] KVM: TDX: Implements vcpu request_immediate_exit
-Date:   Mon, 27 Jun 2022 14:54:10 -0700
-Message-Id: <a12e60b6a20fe5aede210cbabbaaf11195efcf2d.1656366338.git.isaku.yamahata@intel.com>
+Subject: [PATCH v7 079/102] KVM: TDX: Implement methods to inject NMI
+Date:   Mon, 27 Jun 2022 14:54:11 -0700
+Message-Id: <77e49083747faa4cbe9a685180c64dadb1274e14.1656366338.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
@@ -60,44 +60,140 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Now we are able to inject interrupts into TDX vcpu, it's ready to block TDX
-vcpu.  Wire up kvm x86 methods for blocking/unblocking vcpu for TDX.  To
-unblock on pending events, request immediate exit methods is also needed.
+TDX vcpu control structure defines one bit for pending NMI for VMM to
+inject NMI by setting the bit without knowing TDX vcpu NMI states.  Because
+the vcpu state is protected, VMM can't know about NMI states of TDX vcpu.
+The TDX module handles actual injection and NMI states transition.
+
+Add methods for NMI and treat NMI can be injected always.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/main.c    | 62 +++++++++++++++++++++++++++++++++++---
+ arch/x86/kvm/vmx/tdx.c     |  5 +++
+ arch/x86/kvm/vmx/x86_ops.h |  2 ++
+ 3 files changed, 64 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 07ea7211c633..d743de7b087c 100644
+index d743de7b087c..eddfd07506df 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -311,6 +311,14 @@ static void vt_enable_irq_window(struct kvm_vcpu *vcpu)
- 	vmx_enable_irq_window(vcpu);
+@@ -247,6 +247,58 @@ static void vt_flush_tlb_guest(struct kvm_vcpu *vcpu)
+ 	vmx_flush_tlb_guest(vcpu);
  }
  
-+static void vt_request_immediate_exit(struct kvm_vcpu *vcpu)
++static void vt_inject_nmi(struct kvm_vcpu *vcpu)
 +{
 +	if (is_td_vcpu(vcpu))
-+		return __kvm_request_immediate_exit(vcpu);
++		return tdx_inject_nmi(vcpu);
 +
-+	vmx_request_immediate_exit(vcpu);
++	vmx_inject_nmi(vcpu);
 +}
 +
- static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
++static int vt_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
++{
++	/*
++	 * The TDX module manages NMI windows and NMI reinjection, and hides NMI
++	 * blocking, all KVM can do is throw an NMI over the wall.
++	 */
++	if (is_td_vcpu(vcpu))
++		return true;
++
++	return vmx_nmi_allowed(vcpu, for_injection);
++}
++
++static bool vt_get_nmi_mask(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * Assume NMIs are always unmasked.  KVM could query PEND_NMI and treat
++	 * NMIs as masked if a previous NMI is still pending, but SEAMCALLs are
++	 * expensive and the end result is unchanged as the only relevant usage
++	 * of get_nmi_mask() is to limit the number of pending NMIs, i.e. it
++	 * only changes whether KVM or the TDX module drops an NMI.
++	 */
++	if (is_td_vcpu(vcpu))
++		return false;
++
++	return vmx_get_nmi_mask(vcpu);
++}
++
++static void vt_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_set_nmi_mask(vcpu, masked);
++}
++
++static void vt_enable_nmi_window(struct kvm_vcpu *vcpu)
++{
++	/* Refer the comment in vt_get_nmi_mask(). */
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_enable_nmi_window(vcpu);
++}
++
+ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			int pgd_level)
  {
- 	if (!is_td(kvm))
-@@ -435,7 +443,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.check_intercept = vmx_check_intercept,
- 	.handle_exit_irqoff = vmx_handle_exit_irqoff,
+@@ -399,14 +451,14 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.get_interrupt_shadow = vt_get_interrupt_shadow,
+ 	.patch_hypercall = vmx_patch_hypercall,
+ 	.inject_irq = vt_inject_irq,
+-	.inject_nmi = vmx_inject_nmi,
++	.inject_nmi = vt_inject_nmi,
+ 	.queue_exception = vmx_queue_exception,
+ 	.cancel_injection = vt_cancel_injection,
+ 	.interrupt_allowed = vt_interrupt_allowed,
+-	.nmi_allowed = vmx_nmi_allowed,
+-	.get_nmi_mask = vmx_get_nmi_mask,
+-	.set_nmi_mask = vmx_set_nmi_mask,
+-	.enable_nmi_window = vmx_enable_nmi_window,
++	.nmi_allowed = vt_nmi_allowed,
++	.get_nmi_mask = vt_get_nmi_mask,
++	.set_nmi_mask = vt_set_nmi_mask,
++	.enable_nmi_window = vt_enable_nmi_window,
+ 	.enable_irq_window = vt_enable_irq_window,
+ 	.update_cr8_intercept = vmx_update_cr8_intercept,
+ 	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index db3840c040f9..de696d82ddbf 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -815,6 +815,11 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	return EXIT_FASTPATH_NONE;
+ }
  
--	.request_immediate_exit = vmx_request_immediate_exit,
-+	.request_immediate_exit = vt_request_immediate_exit,
++void tdx_inject_nmi(struct kvm_vcpu *vcpu)
++{
++	td_management_write8(to_tdx(vcpu), TD_VCPU_PEND_NMI, 1);
++}
++
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+ {
+ 	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index bc25260aefc6..174e90eb7e2d 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -150,6 +150,7 @@ bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu);
  
- 	.sched_in = vt_sched_in,
+ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 			   int trig_mode, int vector);
++void tdx_inject_nmi(struct kvm_vcpu *vcpu);
  
+ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+@@ -180,6 +181,7 @@ static inline bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu) { ret
+ 
+ static inline void tdx_deliver_interrupt(
+ 	struct kvm_lapic *apic, int delivery_mode, int trig_mode, int vector) {}
++static inline void tdx_inject_nmi(struct kvm_vcpu *vcpu) {}
+ 
+ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
 -- 
 2.25.1
 
