@@ -2,106 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD56D55CA7F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:58:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2795F55DA09
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:22:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233217AbiF0H6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 03:58:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34250 "EHLO
+        id S233073AbiF0ICE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 04:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232816AbiF0H6O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 03:58:14 -0400
+        with ESMTP id S232484AbiF0ICD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 04:02:03 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C27FB109
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 00:58:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4372E219E
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 01:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656316690;
+        s=mimecast20190719; t=1656316921;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gR36iGOYPRI7XA3wSmeHv9qI5C/E+Rq80TLdrN+txO0=;
-        b=AobZvjq7OfvNi0ebg7J5cjjrKuYPAqWvOcmKhmRW5g9S+h7Pt7Dr6YYQr0DRlU8FgSLRBe
-        wtIGtaIjl1nHNrn1SdE4+PyH2C7bWH9OMTvSyxi4XOuEEPuiXH/yXnFAmlx45JNUUgT7UM
-        Q19mwvg/HM9faZR4YN7YUGkqnv5d3R4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NjQ/y3uzOB0VPioQUmdD2/aH8hZijcv/VXyRMlZuNQg=;
+        b=QB2L7UqYcbfJKvcItharUG0ucsLsKmoJv2WheSsmnT1V1bYODE4e7WqukuldHNlEJFWS02
+        O5r/++UIVGHLAvQvDs/hmRVdlRo2awHjMLddRSkQZOwlLOwEWG9bzMDRXXR99tjPvjVV8m
+        9n4NJF3WhrvJrYEYVZE3NGUl1wy9fjY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-589-LhKciNcMPB6d3kHlgQiYPQ-1; Mon, 27 Jun 2022 03:58:09 -0400
-X-MC-Unique: LhKciNcMPB6d3kHlgQiYPQ-1
-Received: by mail-wm1-f71.google.com with SMTP id n35-20020a05600c3ba300b003a02d7bd5caso5238917wms.2
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 00:58:09 -0700 (PDT)
+ us-mta-575-5288VvbbM9uqnFoNaErXTg-1; Mon, 27 Jun 2022 04:01:59 -0400
+X-MC-Unique: 5288VvbbM9uqnFoNaErXTg-1
+Received: by mail-wm1-f70.google.com with SMTP id t20-20020a1c7714000000b003a032360873so6325194wmi.0
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 01:01:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gR36iGOYPRI7XA3wSmeHv9qI5C/E+Rq80TLdrN+txO0=;
-        b=MNUaG1n71fwp7LjnXsoCab1qNRNyifYwLXiOcFtr0Sj6h9AtJIw6pTVlMqVK3Wk51H
-         lBybYC1S9+DfqGC4pDh+GLUpDSA5tEFHa2z5i+5KpuvZEGxb3zQRcS2k4RFHfIjfR8AE
-         rmvbho9bk3n7SB3CR6TeQhpbSR8+YTYEP62MW/tBgOdwxZn8hvUmHEIcAHac3YK2Pg4Q
-         +xgLzXsTL/BTkta0igEGwL2OegRxNqgkwXHStJFCk4Swb/Z6ZNNfwU7DW1rF7tEq9cbB
-         pgUnAVYvjWkzBk8nPNA/Rc2U2qc4ZNy0o2XySacm9SBUcfnTcC7Z/dnW5oTr/l1pi8TM
-         QK6Q==
-X-Gm-Message-State: AJIora/5MVoA7lTuiRjIhZXuaoxPgbW0MnRX0/etmvfoxyLGs4NFzx7Y
-        ogGm8ZkBrskJSIJAfjM4WPcVwzWF5ych/IL8xayRyhKieFzvecF9koZrAsCpOJdLWunuprJ2gKZ
-        Yvr8k4T104fLx
-X-Received: by 2002:a5d:6d8b:0:b0:21b:9804:1959 with SMTP id l11-20020a5d6d8b000000b0021b98041959mr10779925wrs.605.1656316688470;
-        Mon, 27 Jun 2022 00:58:08 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1u006yfHOEqWpSmwDiypaX+nb3Ki7jpntJhsVXGDo34rsHtagr1loLXbMMVyBM9VityuTjV+A==
-X-Received: by 2002:a5d:6d8b:0:b0:21b:9804:1959 with SMTP id l11-20020a5d6d8b000000b0021b98041959mr10779871wrs.605.1656316688168;
-        Mon, 27 Jun 2022 00:58:08 -0700 (PDT)
-Received: from redhat.com ([2.54.45.90])
-        by smtp.gmail.com with ESMTPSA id l13-20020a5d674d000000b0021bbdc3375fsm6171009wrw.68.2022.06.27.00.58.01
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=NjQ/y3uzOB0VPioQUmdD2/aH8hZijcv/VXyRMlZuNQg=;
+        b=UJky27an5LMaMO0VRvBYIF1mR82eyxekJjbVqQu41yJ04iN/egalKaGCCgjTisiIll
+         IeuFtbvR6qlrRf3rC8ztUcvS5LGcALWZqvDdijJgHQ/lpQptvT4xoIungPYZ4B7FAfiP
+         Bh6z3XaKqBqPhiu5kaAHkpZmCylascfSMwXc3R9Ua401RA9oVN5JqtXyOrKHhRVQBtuF
+         YH0GTPPxP1PzuxXZwqay5Oj4r5mnNqPAbMcbqPJgA0lDMS48YaeMsnRIc59JuUpW+Q0K
+         sPIPYg2a0XUyLtoGVvTSDCETbDlmnBpWX9zHzPrxO4+wiRrXI3D1q5FqigDU3JDv4hil
+         ehvA==
+X-Gm-Message-State: AJIora91fXtr0YePO1x79VeZ/OvREjdwFupoQTsnYWpVO1hq1JbK4GHY
+        a+Z4k+Nnnu9ysYrD7hREXHSfgW68WSbJekztU/f5OROEe1MRDviYCgxHE15UY0+abze8GAwbnjX
+        hHnpgf1+at+Zn
+X-Received: by 2002:a05:600c:4f81:b0:39c:809c:8a9e with SMTP id n1-20020a05600c4f8100b0039c809c8a9emr19091640wmq.39.1656316918080;
+        Mon, 27 Jun 2022 01:01:58 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1ucgAGSBXy8zDrJRdc3q59PcoYBheBIuCkSQZpixIvVUMq6Ty2yfJQnho9iegzNyMmUhooTwA==
+X-Received: by 2002:a05:600c:4f81:b0:39c:809c:8a9e with SMTP id n1-20020a05600c4f8100b0039c809c8a9emr19091606wmq.39.1656316917811;
+        Mon, 27 Jun 2022 01:01:57 -0700 (PDT)
+Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id w9-20020a5d6089000000b0020e5b4ebaecsm9700461wrt.4.2022.06.27.01.01.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jun 2022 00:58:07 -0700 (PDT)
-Date:   Mon, 27 Jun 2022 03:57:59 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        kangjie.xu@linux.alibaba.com
-Subject: Re: [PATCH v10 25/41] virtio_pci: struct virtio_pci_common_cfg add
- queue_notify_data
-Message-ID: <20220627034733-mutt-send-email-mst@kernel.org>
-References: <20220624025621.128843-1-xuanzhuo@linux.alibaba.com>
- <20220624025621.128843-26-xuanzhuo@linux.alibaba.com>
- <20220624025817-mutt-send-email-mst@kernel.org>
- <CACGkMEseptD=45j3kQr0yciRxR679Jcig=292H07-RYC2vXmFQ@mail.gmail.com>
- <20220627023841-mutt-send-email-mst@kernel.org>
- <CACGkMEvy8xF2T_vubKeUEPC2aroO_fbB0Xe8nnxK4OBUgAS+Gw@mail.gmail.com>
+        Mon, 27 Jun 2022 01:01:57 -0700 (PDT)
+Date:   Mon, 27 Jun 2022 10:01:55 +0200
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Len Brown <len.brown@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Rafael Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
+        Tianyu.Lan@microsoft.com, Randy Dunlap <rdunlap@infradead.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Yue Haibing <yuehaibing@huawei.com>, dongli.zhang@oracle.com
+Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
+ CPU hotplug
+Message-ID: <20220627100155.71a7b34c@redhat.com>
+In-Reply-To: <d3ba563f3f4e7aaf90fb99d20c651b5751972f7b.camel@intel.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+        <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
+        <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
+        <d3ba563f3f4e7aaf90fb99d20c651b5751972f7b.camel@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEvy8xF2T_vubKeUEPC2aroO_fbB0Xe8nnxK4OBUgAS+Gw@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -112,80 +103,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 03:45:30PM +0800, Jason Wang wrote:
-> On Mon, Jun 27, 2022 at 2:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Jun 27, 2022 at 10:30:42AM +0800, Jason Wang wrote:
-> > > On Fri, Jun 24, 2022 at 2:59 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Fri, Jun 24, 2022 at 10:56:05AM +0800, Xuan Zhuo wrote:
-> > > > > Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
-> > > > > here https://github.com/oasis-tcs/virtio-spec/issues/89
-> > > > >
-> > > > > For not breaks uABI, add a new struct virtio_pci_common_cfg_notify.
-> > > >
-> > > > What exactly is meant by not breaking uABI?
-> > > > Users are supposed to be prepared for struct size to change ... no?
-> > >
-> > > Not sure, any doc for this?
-> > >
-> > > Thanks
-> >
-> >
-> > Well we have this:
-> >
-> >         The drivers SHOULD only map part of configuration structure
-> >         large enough for device operation.  The drivers MUST handle
-> >         an unexpectedly large \field{length}, but MAY check that \field{length}
-> >         is large enough for device operation.
-> 
-> Yes, but that's the device/driver interface. What's done here is the
-> userspace/kernel.
-> 
-> Userspace may break if it uses e.g sizeof(struct virtio_pci_common_cfg)?
-> 
-> Thanks
+On Thu, 23 Jun 2022 12:01:48 +1200
+Kai Huang <kai.huang@intel.com> wrote:
 
-Hmm I guess there's risk... but then how are we going to maintain this
-going forward?  Add a new struct on any change? Can we at least
-prevent this going forward somehow?
+> On Wed, 2022-06-22 at 13:42 +0200, Rafael J. Wysocki wrote:
+> > On Wed, Jun 22, 2022 at 1:16 PM Kai Huang <kai.huang@intel.com> wrote:  
+> > > 
+> > > Platforms with confidential computing technology may not support ACPI
+> > > CPU hotplug when such technology is enabled by the BIOS.  Examples
+> > > include Intel platforms which support Intel Trust Domain Extensions
+> > > (TDX).
+> > > 
+> > > If the kernel ever receives ACPI CPU hotplug event, it is likely a BIOS
+> > > bug.  For ACPI CPU hot-add, the kernel should speak out this is a BIOS
+> > > bug and reject the new CPU.  For hot-removal, for simplicity just assume
+> > > the kernel cannot continue to work normally, and BUG().
+> > > 
+> > > Add a new attribute CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED to indicate the
+> > > platform doesn't support ACPI CPU hotplug, so that kernel can handle
+> > > ACPI CPU hotplug events for such platform.  The existing attribute
+> > > CC_ATTR_HOTPLUG_DISABLED is for software CPU hotplug thus doesn't fit.
+> > > 
+> > > In acpi_processor_{add|remove}(), add early check against this attribute
+> > > and handle accordingly if it is set.
+> > > 
+> > > Also take this chance to rename existing CC_ATTR_HOTPLUG_DISABLED to
+> > > CC_ATTR_CPU_HOTPLUG_DISABLED as it is for software CPU hotplug.
+> > > 
+> > > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > > ---
+> > >  arch/x86/coco/core.c          |  2 +-
+> > >  drivers/acpi/acpi_processor.c | 23 +++++++++++++++++++++++
+> > >  include/linux/cc_platform.h   | 15 +++++++++++++--
+> > >  kernel/cpu.c                  |  2 +-
+> > >  4 files changed, 38 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+> > > index 4320fadae716..1bde1af75296 100644
+> > > --- a/arch/x86/coco/core.c
+> > > +++ b/arch/x86/coco/core.c
+> > > @@ -20,7 +20,7 @@ static bool intel_cc_platform_has(enum cc_attr attr)
+> > >  {
+> > >         switch (attr) {
+> > >         case CC_ATTR_GUEST_UNROLL_STRING_IO:
+> > > -       case CC_ATTR_HOTPLUG_DISABLED:
+> > > +       case CC_ATTR_CPU_HOTPLUG_DISABLED:
+> > >         case CC_ATTR_GUEST_MEM_ENCRYPT:
+> > >         case CC_ATTR_MEM_ENCRYPT:
+> > >                 return true;
+> > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> > > index 6737b1cbf6d6..b960db864cd4 100644
+> > > --- a/drivers/acpi/acpi_processor.c
+> > > +++ b/drivers/acpi/acpi_processor.c
+> > > @@ -15,6 +15,7 @@
+> > >  #include <linux/kernel.h>
+> > >  #include <linux/module.h>
+> > >  #include <linux/pci.h>
+> > > +#include <linux/cc_platform.h>
+> > > 
+> > >  #include <acpi/processor.h>
+> > > 
+> > > @@ -357,6 +358,17 @@ static int acpi_processor_add(struct acpi_device *device,
+> > >         struct device *dev;
+> > >         int result = 0;
+> > > 
+> > > +       /*
+> > > +        * If the confidential computing platform doesn't support ACPI
+> > > +        * memory hotplug, the BIOS should never deliver such event to
+> > > +        * the kernel.  Report ACPI CPU hot-add as a BIOS bug and ignore
+> > > +        * the new CPU.
+> > > +        */
+> > > +       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) {  
+> > 
+> > This will affect initialization, not just hotplug AFAICS.
+> > 
+> > You should reset the .hotplug.enabled flag in processor_handler to
+> > false instead.  
+> 
+> Hi Rafael,
+> 
+> Thanks for the review.  By "affect initialization" did you mean this
+> acpi_processor_add() is also called during kernel boot when any logical cpu is
+> brought up?  Or do you mean ACPI CPU hotplug can also happen during kernel boot
+> (after acpi_processor_init())?
+> 
+> I see acpi_processor_init() calls acpi_processor_check_duplicates() which calls
+> acpi_evaluate_object() but I don't know details of ACPI so I don't know whether
+> this would trigger acpi_processor_add().
+> 
+> One thing is TDX doesn't support ACPI CPU hotplug is an architectural thing, so
+> it is illegal even if it happens during kernel boot.  Dave's idea is the kernel
+> should  speak out loudly if physical CPU hotplug indeed happened on (BIOS) TDX-
+> enabled platforms.  Otherwise perhaps we can just give up initializing the ACPI
+> CPU hotplug in acpi_processor_init(), something like below?
 
+The thing is that by the time ACPI machinery kicks in, physical hotplug
+has already happened and in case of (kvm+qemu+ovmf hypervisor combo)
+firmware has already handled it somehow and handed it over to ACPI.
+If you say it's architectural thing then cpu hotplug is platform/firmware
+bug and should be disabled there instead of working around it in the kernel.
 
-> >
-> >
-> >
-> > >
-> > > >
-> > > >
-> > > > > Since I want to add queue_reset after queue_notify_data, I submitted
-> > > > > this patch first.
-> > > > >
-> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > > ---
-> > > > >  include/uapi/linux/virtio_pci.h | 7 +++++++
-> > > > >  1 file changed, 7 insertions(+)
-> > > > >
-> > > > > diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-> > > > > index 3a86f36d7e3d..22bec9bd0dfc 100644
-> > > > > --- a/include/uapi/linux/virtio_pci.h
-> > > > > +++ b/include/uapi/linux/virtio_pci.h
-> > > > > @@ -166,6 +166,13 @@ struct virtio_pci_common_cfg {
-> > > > >       __le32 queue_used_hi;           /* read-write */
-> > > > >  };
-> > > > >
-> > > > > +struct virtio_pci_common_cfg_notify {
-> > > > > +     struct virtio_pci_common_cfg cfg;
-> > > > > +
-> > > > > +     __le16 queue_notify_data;       /* read-write */
-> > > > > +     __le16 padding;
-> > > > > +};
-> > > > > +
-> > > > >  /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
-> > > > >  struct virtio_pci_cfg_cap {
-> > > > >       struct virtio_pci_cap cap;
-> > > > > --
-> > > > > 2.31.0
-> > > >
-> >
+Perhaps instead of 'preventing' hotplug, complain/panic and be done with it.
+ 
+> --- a/drivers/acpi/acpi_processor.c
+> +++ b/drivers/acpi/acpi_processor.c
+> @@ -707,6 +707,10 @@ bool acpi_duplicate_processor_id(int proc_id)
+>  void __init acpi_processor_init(void)
+>  {
+>         acpi_processor_check_duplicates();
+> +
+> +       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED))
+> +               return;
+> +
+>         acpi_scan_add_handler_with_hotplug(&processor_handler, "processor");
+>         acpi_scan_add_handler(&processor_container_handler);
+>  }
+> 
+> 
+> >   
+> > > +               dev_err(&device->dev, "[BIOS bug]: Platform doesn't support ACPI CPU hotplug.  New CPU ignored.\n");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +  
+> 
 
