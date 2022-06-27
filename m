@@ -2,161 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1708655D2E8
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:11:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8C5055D40A
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:13:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242738AbiF0WuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 18:50:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57790 "EHLO
+        id S242754AbiF0Wuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 18:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238642AbiF0WuP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 18:50:15 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9DE215
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 15:50:15 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id h9-20020a17090a648900b001ecb8596e43so10801017pjj.5
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 15:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7zL1TDH7VwdCezBjRhOqzaqCe5lZyZMVmoHZOpV7Cmc=;
-        b=rjsO5C+1IaaqQBLfXoCoFrmOyck8dX2dTqxLBdeqWhMf6pZwohC2qEoU+sGdPQYPOU
-         6ckWujrZfUQA/i+KZo0h2vJoT542bIuoWPJ23sq1o36v95oMhFqVo9ByAi+NJJAV+CuG
-         D0Fxs9AZzNrnOv/09svdFX6Qcvpmikum6Qs+O/rQUN6zwOpEKnnzzc4MZkjtvki5n+Ih
-         R5v9j4QYvMShcbo25jEP8FyRi2BPlDRNT8tUduIcsvyq/CkuqwEhFCtAggA/HPHy/IqS
-         dfarLqF+XEMplrRuMMuiIZrOQFCPgm0R45oR0iyheZoj17R21nCZwhkLjHZgK2Y0LO7l
-         Ry+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7zL1TDH7VwdCezBjRhOqzaqCe5lZyZMVmoHZOpV7Cmc=;
-        b=Az1ZbBNQ18Rx0r6xgdKEaOjqnFHhcgY5HJV0aNg8PI0cw7LcdYpay7uDnakbwFDZno
-         9Gu0aHeVJQTC/7YC2IhaWUm1PN9iXeiRx7+6X64/Iypxsgd9C3iidEyFBHIwbIar2YmF
-         sje8ar+BGOCxiFQVDQL7Kz08AiM2xpE7WkmtUgK9FIROp1p4KuB3vBgJ/VygqtBYuBix
-         +tBKxV4biv66eeSrlys7Gt8Yp7d2Wzbg5QjVq2m2Og5Re+ZBrzvQYjRjTV91Rh2cPUdD
-         GXQP/luzhE6w7DrIM2FqNjPDyAXU0LVcHg+jBH5SiZT4988WWyrIlzMbkZmSW2cD5h+t
-         15fA==
-X-Gm-Message-State: AJIora8w/66F+qU3K1vf0qis8AvpQTgSEWOiSzCOCmP5bqdya836RduT
-        eLoC6U1dyItUnP4bvbuzg7fUWw==
-X-Google-Smtp-Source: AGRyM1v7GwvY6TMVeVDPpjNkA9kdGiDqeLa/4d3Ii2q3zIWwqkoFPNlHyt9SZUIQC0YyqvclYoEocg==
-X-Received: by 2002:a17:902:cec9:b0:16a:644a:6019 with SMTP id d9-20020a170902cec900b0016a644a6019mr461279plg.82.1656370214406;
-        Mon, 27 Jun 2022 15:50:14 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id u4-20020a170902714400b0015e8d4eb28fsm7780728plm.217.2022.06.27.15.50.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jun 2022 15:50:13 -0700 (PDT)
-Date:   Mon, 27 Jun 2022 22:50:09 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 2/4] KVM: x86/mmu: Defer "full" MMU setup until after
- vendor hardware_setup()
-Message-ID: <Yro0Idtt7hKMqb75@google.com>
-References: <20220624232735.3090056-1-seanjc@google.com>
- <20220624232735.3090056-3-seanjc@google.com>
- <YrZTxZm4kq0rXcKQ@google.com>
- <YrnPgZvgWDpb6+R1@google.com>
+        with ESMTP id S240124AbiF0Wup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 18:50:45 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4131F215;
+        Mon, 27 Jun 2022 15:50:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656370244; x=1687906244;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=WBRX+DWd953nPYpjovL55VvK/pzOBLMxlYRtnDYODx4=;
+  b=hhabvVspqnN2ILFUOdfdtrA02ieJ2XRYJqkOTsFgusGSv5UO5AhZjq+/
+   aU+2r/e0PzJnZEpDanf2gJhkOcdfM+7roE8KssAz/FvC5PN6nlnYSLt4W
+   J5jgzhnad1c0iJlfKrmpv/jvRk8Du+aGDHNEcm3rE2aRPwCfwDVK5boa+
+   1LVOPicRn9rVwGADRvCAId3LsCyEjsdftJLmrQyJmF/NLcuUOsj6wPqfy
+   6HVvPSnmTN+frGaVFAWaUsl9UouPsXXEqZqcKpKp79OY1yzPFNqCygaB7
+   qYGTD5eWdOh6Z5XzJzCh4tYR7lieYbLUnw4OXGCXIZazAsVhPdudUsirC
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="343268820"
+X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
+   d="scan'208";a="343268820"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 15:50:42 -0700
+X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
+   d="scan'208";a="616964404"
+Received: from iiturbeo-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.89.183])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 15:50:38 -0700
+Message-ID: <a610ae9bd554f31364193abc928fad86ed5ebf7c.camel@intel.com>
+Subject: Re: [PATCH v5 15/22] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com
+Date:   Tue, 28 Jun 2022 10:50:36 +1200
+In-Reply-To: <b43bf089-1202-a1fe-cbb3-d4e0926cab67@intel.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <c504a8acd06dc455050c25e2a4cc70aef5eb9358.1655894131.git.kai.huang@intel.com>
+         <e72703b0-767a-ec88-7cb6-f95a3564d823@intel.com>
+         <b376aef05bc032fdf8cc23762ce77a14830440cd.camel@intel.com>
+         <b43bf089-1202-a1fe-cbb3-d4e0926cab67@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YrnPgZvgWDpb6+R1@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 03:40:49PM +0000, Sean Christopherson wrote:
-> On Sat, Jun 25, 2022, David Matlack wrote:
-> > On Fri, Jun 24, 2022 at 11:27:33PM +0000, Sean Christopherson wrote:
-> > > Alternatively, the setup could be done in kvm_configure_mmu(), but that
-> > > would require vendor code to call e.g. kvm_unconfigure_mmu() in teardown
-> > > and error paths, i.e. doesn't actually save code and is arguably uglier.
-> > [...]
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 17ac30b9e22c..ceb81e04aea3 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -6673,10 +6673,8 @@ void kvm_mmu_x86_module_init(void)
-> > >   * loaded as many of the masks/values may be modified by VMX or SVM, i.e. need
-> > >   * to be reset when a potentially different vendor module is loaded.
-> > >   */
-> > > -int kvm_mmu_vendor_module_init(void)
-> > > +void kvm_mmu_vendor_module_init(void)
-> > >  {
-> > > -	int ret = -ENOMEM;
-> > > -
-> > >  	/*
-> > >  	 * MMU roles use union aliasing which is, generally speaking, an
-> > >  	 * undefined behavior. However, we supposedly know how compilers behave
-> > > @@ -6687,7 +6685,13 @@ int kvm_mmu_vendor_module_init(void)
-> > >  	BUILD_BUG_ON(sizeof(union kvm_mmu_extended_role) != sizeof(u32));
-> > >  	BUILD_BUG_ON(sizeof(union kvm_cpu_role) != sizeof(u64));
-> > >  
-> > > +	/* Reset the PTE masks before the vendor module's hardware setup. */
-> > >  	kvm_mmu_reset_all_pte_masks();
-> > > +}
-> > > +
-> > > +int kvm_mmu_hardware_setup(void)
-> > > +{
-> > 
-> > Instead of putting this code in a new function and calling it after
-> > hardware_setup(), we could put it in kvm_configure_mmu().a
-> 
-> Ya, I noted that as an alternative in the changelog but obviously opted to not
-> do the allocation in kvm_configure_mmu(). 
+On Mon, 2022-06-27 at 13:41 -0700, Dave Hansen wrote:
+> On 6/27/22 03:31, Kai Huang wrote:
+> > > > +/* Page sizes supported by TDX */
+> > > > +enum tdx_page_sz {
+> > > > +	TDX_PG_4K,
+> > > > +	TDX_PG_2M,
+> > > > +	TDX_PG_1G,
+> > > > +	TDX_PG_MAX,
+> > > > +};
+> > > Are these the same constants as the magic numbers in Kirill's
+> > > try_accept_one()?
+> > try_accept_once() uses 'enum pg_level' PG_LEVEL_{4K,2M,1G} directly.  T=
+hey can
+> > be used directly too, but 'enum pg_level' has more than we need here:
+>=20
+> I meant this:
+>=20
+> +       switch (level) {
+> +       case PG_LEVEL_4K:
+> +               page_size =3D 0;
+> +               break;
+>=20
+> Because TDX_PG_4K=3D=3Dpage_size=3D=3D0, and for this:
+>=20
+> +       case PG_LEVEL_2M:
+> +               page_size =3D 1;
+>=20
+> where TDX_PG_2M=3D=3Dpage_size=3D=3D1
+>=20
+> See?
+>=20
+> Are Kirill's magic 0/1/2 numbers the same as
+>=20
+> 	TDX_PG_4K,
+> 	TDX_PG_2M,
+> 	TDX_PG_1G,
+>=20
+> ?
 
-Doh! My mistake. The idea to use kvm_configure_mmu() came to me while
-reviewing patch 3 and I totally forgot about that blurb in the commit
-message when I came back here to leave the suggestion.
+Yes they are the same.  Kirill uses 0/1/2 as input of TDX_ACCEPT_PAGE TDCAL=
+L.=20
+Here I only need them to distinguish different page sizes.
 
-> I view kvm_configure_mmu() as a necessary
-> evil.  Ideally vendor code wouldn't call into the MMU during initialization, and
-> common x86 would fully dictate the order of calls so that MMU setup.  We could force
-> that, but it'd require something gross like filling a struct passed into
-> ops->hardware_setup(), and probably would be less robust (more likely to omit a
-> "required" field).
-> 
-> In other words, I like the explicit kvm_mmu_hardware_setup() call from common x86,
-> e.g. to show that vendor code needs to do setup before the MMU, and so that MMU
-> setup isn't buried in a somewhat arbitrary location in vendor hardware setup. 
+Do you mean we should put TDX_PG_4K/2M/1G definition to asm/tdx.h, and
+try_accept_one() should use them instead of magic 0/1/2?
 
-Agreed, but if we're not going to get rid of kvm_configure_mmu(), we're
-stuck with vendor-specific code calling into the MMU code during
-hardware setup either way.
 
-> 
-> I'm not dead set against handling this in kvm_configure_mmu() (though I'd probably
-> vote to rename it to kvm_mmu_hardware_setup()) if anyone has a super strong opinion.
+--=20
+Thanks,
+-Kai
 
-Your call. I'll put in a vote for using kvm_configure_mmu() and renaming
-to kvm_mmu_hardware_setup().
 
->  
-> > This will result in a larger patch diff, but has it eliminates a subtle
-> > and non-trivial-to-verify dependency ordering between
-> 
-> Verification is "trivial" in that this WARN will fire if the order is swapped:
-> 
-> 	if (WARN_ON_ONCE(!nr_sptes_per_pte_list))
-> 		return -EIO;
-
-Ah I missed that, that's good. Although I was thinking more from a code
-readability standpoint.
-
-> 
-> > kvm_configure_mmu() and kvm_mmu_hardware_setup() and it will co-locate
-> > the initialization of nr_sptes_per_pte_list and the code that uses it to
-> > create pte_list_desc_cache in a single function.
