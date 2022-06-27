@@ -2,99 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E2D055B5EE
-	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 06:04:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DBE355B5F0
+	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 06:10:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231397AbiF0EBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 00:01:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44126 "EHLO
+        id S231474AbiF0EJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 00:09:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiF0EBG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 00:01:06 -0400
-Received: from out0-150.mail.aliyun.com (out0-150.mail.aliyun.com [140.205.0.150])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F40B389C
-        for <kvm@vger.kernel.org>; Sun, 26 Jun 2022 21:01:00 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R301e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047204;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---.ODQddaH_1656302457;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.ODQddaH_1656302457)
-          by smtp.aliyun-inc.com;
-          Mon, 27 Jun 2022 12:00:58 +0800
-Date:   Mon, 27 Jun 2022 12:00:57 +0800
-From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [PATCH 2/5] KVM: x86/mmu: Fix wrong gfn range of tlb flushing in
- kvm_set_pte_rmapp()
-Message-ID: <20220627040057.GA56893@k08j02272.eu95sqa>
-References: <cover.1656039275.git.houwenlong.hwl@antgroup.com>
- <a92b4b56116f0f71ffceab2b4ff3c03f47fd468f.1656039275.git.houwenlong.hwl@antgroup.com>
- <YrZAZXHJTsUp8yuP@google.com>
+        with ESMTP id S229538AbiF0EJu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 00:09:50 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 986DF2BF8;
+        Sun, 26 Jun 2022 21:09:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656302989; x=1687838989;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=+MlrCsTACgQ3fdMt0MvL5i5SW0bgC6vhQ3XkFwfrHyo=;
+  b=PdeTN0q/0nLqomX8wmoRg10xsY1yyWR4hCeSs+skmAidbBePmIPt0sIW
+   7f+7jTxUn01IXf35j9U9/Q+Dx/iz3lYBqM6mVsN05FXmtqV6F1DTuRL/7
+   oIu55LLpc6Ok/y9Y3JRR0JfteoJQK4ogt93eCEHCsAfBb/I2OllnwZ7Al
+   mcS75JfU7DLfwcR+zBA7ZVaG18GiWfW168KzzVxOT8phJfMAHNl1yeRLz
+   Tn7cnfRpX5PBQofCa1WR3I0dSl4WTu/rMoHQno3NBKBifYf4XCwH425p1
+   ptipsOgQWWPuO/Ljl/xFHg1izmk8i5jL0ePfmbS67yR/DDrN65IKWvfR1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10390"; a="264392774"
+X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
+   d="scan'208";a="264392774"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 21:09:48 -0700
+X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
+   d="scan'208";a="679401157"
+Received: from fzaeni-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.88.6])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 21:09:42 -0700
+Message-ID: <8853a55e32d6b5f5657e521094dbf01e371516fe.camel@intel.com>
+Subject: Re: [PATCH v5 00/22] TDX host kernel support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, linux-acpi@vger.kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, len.brown@intel.com, tony.luck@intel.com,
+        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
+        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@intel.com, akpm@linux-foundation.org,
+        thomas.lendacky@amd.com, Tianyu.Lan@microsoft.com,
+        rdunlap@infradead.org, Jason@zx2c4.com, juri.lelli@redhat.com,
+        mark.rutland@arm.com, frederic@kernel.org, yuehaibing@huawei.com,
+        dongli.zhang@oracle.com
+Date:   Mon, 27 Jun 2022 16:09:40 +1200
+In-Reply-To: <14e3d8cb-5e36-dc90-bfc8-b34a105749a3@intel.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <14e3d8cb-5e36-dc90-bfc8-b34a105749a3@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YrZAZXHJTsUp8yuP@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 25, 2022 at 06:53:25AM +0800, Sean Christopherson wrote:
-> On Fri, Jun 24, 2022, Hou Wenlong wrote:
-> > When the spte of hupe page is dropped in kvm_set_pte_rmapp(),
-> > the whole gfn range covered by the spte should be flushed.
-> > However, rmap_walk_init_level() doesn't align down the gfn
-> > for new level like tdp iterator does, then the gfn used in
-> > kvm_set_pte_rmapp() is not the base gfn of huge page. And
-> > the size of gfn range is wrong too for huge page. Since
-> > the base gfn of huge page is more meaningful during the
-> > rmap walking, so align down the gfn for new level and use
-> > the correct size of huge page for tlb flushing in
-> > kvm_set_pte_rmapp().
-> 
-> It's also worth noting that kvm_set_pte_rmapp() is the other user of the rmap
-> iterators that consumes @gfn, i.e. modifying iterator->gfn is safe-ish.
->
-> > Fixes: c3134ce240eed ("KVM: Replace old tlb flush function with new one to flush a specified range.")
-> > Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index b8a1f5b46b9d..37bfc88ea212 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -1427,7 +1427,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-> >  	}
-> >  
-> >  	if (need_flush && kvm_available_flush_tlb_with_range()) {
-> > -		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
-> > +		kvm_flush_remote_tlbs_with_address(kvm, gfn, KVM_PAGES_PER_HPAGE(level));
-> >  		return false;
-> >  	}
-> >  
-> > @@ -1455,7 +1455,7 @@ static void
-> >  rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
-> >  {
-> >  	iterator->level = level;
-> > -	iterator->gfn = iterator->start_gfn;
-> > +	iterator->gfn = iterator->start_gfn & -KVM_PAGES_PER_HPAGE(level);
-> 
-> Hrm, arguably this be done on start_gfn in slot_rmap_walk_init().  Having iter->gfn
-> be less than iter->start_gfn will be odd.
->
-Hrm, iter->gfn may be bigger than iter->end_gfn in slot_rmap_walk_next(), which would
-also be odd. I just think it may be better to pass the base gfn of huge page. However,
-as you said, kvm_set_pte_rmapp() is the only user of the rmap iterator that consumes @gfn,
-only modifying it in that function is enough.
+On Fri, 2022-06-24 at 12:47 -0700, Dave Hansen wrote:
+> On 6/22/22 04:15, Kai Huang wrote:
+> > Please kindly help to review, and I would appreciate reviewed-by or
+> > acked-by tags if the patches look good to you.
+>=20
+> Serious question: Is *ANYONE* looking at these patches other than you
+> and the maintainers?  I first saw this code (inside Intel) in early
+> 2020.  In that time, not a single review tag has been acquired?
+>=20
+> $ egrep -ic 'acked-by:|reviewed-by:' kais-patches.mbox
+> 0
 
-> >  	iterator->rmap = gfn_to_rmap(iterator->gfn, level, iterator->slot);
-> >  	iterator->end_rmap = gfn_to_rmap(iterator->end_gfn, level, iterator->slot);
-> >  }
-> > -- 
-> > 2.31.1
-> > 
+Hi Dave,
+
+There were big design changes in the history of this series (i.e. we origin=
+ally
+supported loading both the NP-SEAMLDR ACM and the TDX module during boot, a=
+nd we
+changed from initializing the module from during kernel boot to at runtime)=
+, but
+yes some other Linux/KVM TDX developers in our team have been reviewing thi=
+s
+series during the all time, at least at some extent.  They just didn't give
+Reviewed-by or Acked-by.
+
+Especially, after we had agreed that this series in general should enable T=
+DX
+with minimal code change, Kevin helped to review this series intensively an=
+d
+helped to simplify the code to the current shape (i.e. TDMR part).  He didn=
+'t
+give any of tags either (only said this series is ready for you to review),
+perhaps because he was _helping_ to get this series to the shape that is re=
+ady
+for you and other Intel reviewers to review.
+
+--=20
+Thanks,
+-Kai
+
+
