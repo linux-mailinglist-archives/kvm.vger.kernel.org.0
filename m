@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D473655CCF1
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD1FC55DAAE
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:23:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241477AbiF0VzY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:55:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59304 "EHLO
+        id S241482AbiF0VzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:55:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241296AbiF0Vyz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 17:54:55 -0400
+        with ESMTP id S241291AbiF0Vyx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 17:54:53 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02D7B6263;
-        Mon, 27 Jun 2022 14:54:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BCC35F7F;
+        Mon, 27 Jun 2022 14:54:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1656366892; x=1687902892;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hCnMuBz/aWLrv0xY1KyhBL7QqdXE6/57a1wmJVcYfBw=;
-  b=Ts6mTdcooP+k7HQwvDIux+tDKc55gY/yC60viEuY9JnldTxXl9+xdcZf
-   ec3NBEtplaibmyPHT1AqHkjflPOJ46COgaPMb6JwKxoo9IhOj1AAdVJXL
-   7ns1FTmeDe/OO+nsSO1Q2xDWhRf7+Rdg9fODEVffLBfSM1wr2EsD2DPyZ
-   WfYnk+NzoyIN4E5OGwrEU8xomwvtAXdUSVdtAxahEF7tkb89tkcA/n8G0
-   z2OXnLqmV03k9F20dK/Y//PQ8zUKY4lw8YzwGXEeqQDES/O6e9jFZmwiP
-   AqBaS4DXVOQ3TQc5bdDReUlTNFLZJI+5h/r4XqxTL/fhYwTss6S68YM9H
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609509"
+  bh=Ammg3A2Mnovfv+rRVb0tQyZFWoZUYbJqVmLEz3yGWKI=;
+  b=cV1bi6lq2myWZ6zNXdb5Z396q0MVVy/3KHuUEAYPrdDC/Uw0JyJZZFxC
+   nbBq2JBmArarkJsBI8z+t7zpFknRMfNhFdW+a28rk1tJR4KTANoF7hnnO
+   voiaBeM55lvUprLgVVlZONOGPL0+cRi9mkjMQuG7iDZTv58nEAYkUUI2Y
+   c5MvCiV1O72CoUFFlB7Zx0PQ99hHgy7KA/lclLxO4lhiKSa48Ko3ps8f7
+   9HDJuXZNWtwO0hfOvbLBO9QWbWxBLEAJd8dAof5vqFtE5zWIo38B3rRUx
+   9kxbymB+glp+F37fJgRyuT9yVooTSdY8FfcB8pG/Ra+ymAufsaKn0YjF+
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609510"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="281609509"
+   d="scan'208";a="281609510"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:49 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="657863478"
+   d="scan'208";a="657863481"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:49 -0700
 From:   isaku.yamahata@intel.com
@@ -41,9 +41,9 @@ To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v7 015/102] KVM: TDX: Define TDX architectural definitions
-Date:   Mon, 27 Jun 2022 14:53:07 -0700
-Message-Id: <3e624fd8b963ead17dcd0d60113428e9424b9579.1656366338.git.isaku.yamahata@intel.com>
+Subject: [PATCH v7 016/102] KVM: TDX: Add TDX "architectural" error codes
+Date:   Mon, 27 Jun 2022 14:53:08 -0700
+Message-Id: <0cf120bfa07e12aa648fc66fba19df7506c69ebf.1656366338.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
@@ -59,185 +59,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Define architectural definitions for KVM to issue the TDX SEAMCALLs.
+Add error codes for the TDX SEAMCALLs both for TDX VMM side for TDH
+SEAMCALL and TDX guest side for TDG.VP.VMCALL.  KVM issues the TDX
+SEAMCALLs and checks its error code.  KVM handles hypercall from the TDX
+guest and may return an error.  So error code for the TDX guest is also
+needed.
 
-Structures and values that are architecturally defined in the TDX module
-specifications the chapter of ABI Reference.
+TDX SEAMCALL uses bits 31:0 to return more information, so these error
+codes will only exactly match RAX[63:32].  Error codes for TDG.VP.VMCALL is
+defined by TDX Guest-Host-Communication interface spec.
 
-Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx_arch.h | 157 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 157 insertions(+)
- create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
+ arch/x86/kvm/vmx/tdx_errno.h | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
 
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
 new file mode 100644
-index 000000000000..94258056d742
+index 000000000000..5c878488795d
 --- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -0,0 +1,157 @@
++++ b/arch/x86/kvm/vmx/tdx_errno.h
+@@ -0,0 +1,29 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+/* architectural constants/data definitions for TDX SEAMCALLs */
++/* architectural status code for SEAMCALL */
 +
-+#ifndef __KVM_X86_TDX_ARCH_H
-+#define __KVM_X86_TDX_ARCH_H
++#ifndef __KVM_X86_TDX_ERRNO_H
++#define __KVM_X86_TDX_ERRNO_H
 +
-+#include <linux/types.h>
-+
-+/*
-+ * TDX SEAMCALL API function leaves
-+ */
-+#define TDH_VP_ENTER			0
-+#define TDH_MNG_ADDCX			1
-+#define TDH_MEM_PAGE_ADD		2
-+#define TDH_MEM_SEPT_ADD		3
-+#define TDH_VP_ADDCX			4
-+#define TDH_MEM_PAGE_RELOCATE		5
-+#define TDH_MEM_PAGE_AUG		6
-+#define TDH_MEM_RANGE_BLOCK		7
-+#define TDH_MNG_KEY_CONFIG		8
-+#define TDH_MNG_CREATE			9
-+#define TDH_VP_CREATE			10
-+#define TDH_MNG_RD			11
-+#define TDH_MR_EXTEND			16
-+#define TDH_MR_FINALIZE			17
-+#define TDH_VP_FLUSH			18
-+#define TDH_MNG_VPFLUSHDONE		19
-+#define TDH_MNG_KEY_FREEID		20
-+#define TDH_MNG_INIT			21
-+#define TDH_VP_INIT			22
-+#define TDH_VP_RD			26
-+#define TDH_MNG_KEY_RECLAIMID		27
-+#define TDH_PHYMEM_PAGE_RECLAIM		28
-+#define TDH_MEM_PAGE_REMOVE		29
-+#define TDH_MEM_SEPT_REMOVE		30
-+#define TDH_MEM_TRACK			38
-+#define TDH_MEM_RANGE_UNBLOCK		39
-+#define TDH_PHYMEM_CACHE_WB		40
-+#define TDH_PHYMEM_PAGE_WBINVD		41
-+#define TDH_VP_WR			43
-+#define TDH_SYS_LP_SHUTDOWN		44
-+
-+#define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO		0x10000
-+#define TDG_VP_VMCALL_MAP_GPA				0x10001
-+#define TDG_VP_VMCALL_GET_QUOTE				0x10002
-+#define TDG_VP_VMCALL_REPORT_FATAL_ERROR		0x10003
-+#define TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT	0x10004
-+
-+/* TDX control structure (TDR/TDCS/TDVPS) field access codes */
-+#define TDX_NON_ARCH			BIT_ULL(63)
-+#define TDX_CLASS_SHIFT			56
-+#define TDX_FIELD_MASK			GENMASK_ULL(31, 0)
-+
-+#define __BUILD_TDX_FIELD(non_arch, class, field)	\
-+	(((non_arch) ? TDX_NON_ARCH : 0) |		\
-+	 ((u64)(class) << TDX_CLASS_SHIFT) |		\
-+	 ((u64)(field) & TDX_FIELD_MASK))
-+
-+#define BUILD_TDX_FIELD(class, field)			\
-+	__BUILD_TDX_FIELD(false, (class), (field))
-+
-+#define BUILD_TDX_FIELD_NON_ARCH(class, field)		\
-+	__BUILD_TDX_FIELD(true, (class), (field))
-+
-+
-+/* @field is the VMCS field encoding */
-+#define TDVPS_VMCS(field)		BUILD_TDX_FIELD(0, (field))
-+
-+enum tdx_guest_other_state {
-+	TD_VCPU_STATE_DETAILS_NON_ARCH = 0x100,
-+};
-+
-+union tdx_vcpu_state_details {
-+	struct {
-+		u64 vmxip	: 1;
-+		u64 reserved	: 63;
-+	};
-+	u64 full;
-+};
-+
-+/* @field is any of enum tdx_guest_other_state */
-+#define TDVPS_STATE(field)		BUILD_TDX_FIELD(17, (field))
-+#define TDVPS_STATE_NON_ARCH(field)	BUILD_TDX_FIELD_NON_ARCH(17, (field))
-+
-+/* Management class fields */
-+enum tdx_guest_management {
-+	TD_VCPU_PEND_NMI = 11,
-+};
-+
-+/* @field is any of enum tdx_guest_management */
-+#define TDVPS_MANAGEMENT(field)		BUILD_TDX_FIELD(32, (field))
-+
-+enum tdx_tdcs_execution_control {
-+	TD_TDCS_EXEC_TSC_OFFSET = 10,
-+};
-+
-+/* @field is any of enum tdx_tdcs_execution_control */
-+#define TDCS_EXEC(field)		BUILD_TDX_FIELD(17, (field))
-+
-+#define TDX_EXTENDMR_CHUNKSIZE		256
-+
-+struct tdx_cpuid_value {
-+	u32 eax;
-+	u32 ebx;
-+	u32 ecx;
-+	u32 edx;
-+} __packed;
-+
-+#define TDX_TD_ATTRIBUTE_DEBUG		BIT_ULL(0)
-+#define TDX_TD_ATTRIBUTE_PKS		BIT_ULL(30)
-+#define TDX_TD_ATTRIBUTE_KL		BIT_ULL(31)
-+#define TDX_TD_ATTRIBUTE_PERFMON	BIT_ULL(63)
++#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
 +
 +/*
-+ * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
++ * TDX SEAMCALL Status Codes (returned in RAX)
 + */
-+struct td_params {
-+	u64 attributes;
-+	u64 xfam;
-+	u32 max_vcpus;
-+	u32 reserved0;
-+
-+	u64 eptp_controls;
-+	u64 exec_controls;
-+	u16 tsc_frequency;
-+	u8  reserved1[38];
-+
-+	u64 mrconfigid[6];
-+	u64 mrowner[6];
-+	u64 mrownerconfig[6];
-+	u64 reserved2[4];
-+
-+	union {
-+		struct tdx_cpuid_value cpuid_values[0];
-+		u8 reserved3[768];
-+	};
-+} __packed __aligned(1024);
++#define TDX_SUCCESS				0x0000000000000000ULL
++#define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
++#define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
++#define TDX_LIFECYCLE_STATE_INCORRECT		0xC000060700000000ULL
++#define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
++#define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
++#define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
++#define TDX_KEY_CONFIGURED			0x0000081500000000ULL
++#define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
 +
 +/*
-+ * Guest uses MAX_PA for GPAW when set.
-+ * 0: GPA.SHARED bit is GPA[47]
-+ * 1: GPA.SHARED bit is GPA[51]
++ * TDG.VP.VMCALL Status Codes (returned in R10)
 + */
-+#define TDX_EXEC_CONTROL_MAX_GPAW      BIT_ULL(0)
++#define TDG_VP_VMCALL_SUCCESS			0x0000000000000000ULL
++#define TDG_VP_VMCALL_INVALID_OPERAND		0x8000000000000000ULL
++#define TDG_VP_VMCALL_TDREPORT_FAILED		0x8000000000000001ULL
 +
-+/*
-+ * TDX requires the frequency to be defined in units of 25MHz, which is the
-+ * frequency of the core crystal clock on TDX-capable platforms, i.e. the TDX
-+ * module can only program frequencies that are multiples of 25MHz.  The
-+ * frequency must be between 100mhz and 10ghz (inclusive).
-+ */
-+#define TDX_TSC_KHZ_TO_25MHZ(tsc_in_khz)	((tsc_in_khz) / (25 * 1000))
-+#define TDX_TSC_25MHZ_TO_KHZ(tsc_in_25mhz)	((tsc_in_25mhz) * (25 * 1000))
-+#define TDX_MIN_TSC_FREQUENCY_KHZ		(100 * 1000)
-+#define TDX_MAX_TSC_FREQUENCY_KHZ		(10 * 1000 * 1000)
-+
-+#endif /* __KVM_X86_TDX_ARCH_H */
++#endif /* __KVM_X86_TDX_ERRNO_H */
 -- 
 2.25.1
 
