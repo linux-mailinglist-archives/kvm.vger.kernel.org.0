@@ -2,197 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77BDF55D1C6
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:09:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A25CE55C874
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:55:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233039AbiF0IOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 04:14:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46612 "EHLO
+        id S233428AbiF0IOp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 04:14:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232204AbiF0IOh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 04:14:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16E79626D
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 01:14:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656317674;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pajM9hI9fI/87uBaTeYfHZ+TkaK2uNfPmDfKI6EwRtM=;
-        b=FtuCsPNfd8nsFVdGEecEd7VnwxVIM9qXD3l7VYYXR0uc3/eQy2zNg8IiLOcfvl36r6kepq
-        wnr9/zWXOOODh4FPLl7Z/ILl32QLWKJ6nFzzOWNHEKTA8tf7qntqKhpwuPi+U7m/EV3cB/
-        hPRmQh7gVuRlEC36+695jCs2+ecUWBc=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-391-Im4ZMpyrO4mM735os4xq_Q-1; Mon, 27 Jun 2022 04:14:33 -0400
-X-MC-Unique: Im4ZMpyrO4mM735os4xq_Q-1
-Received: by mail-lj1-f199.google.com with SMTP id by31-20020a05651c1a1f00b00258e4d37520so833297ljb.20
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 01:14:33 -0700 (PDT)
+        with ESMTP id S232059AbiF0IOl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 04:14:41 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C82626A;
+        Mon, 27 Jun 2022 01:14:40 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id t17-20020a1c7711000000b003a0434b0af7so2561626wmi.0;
+        Mon, 27 Jun 2022 01:14:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WyN53yBSmQaV4TeUGBbUPb+3S/pfbZP5il80wSTCxhM=;
+        b=c+gNmopgqqlXia7kaKocEy4i9B2JPmOowTmB2blMf2xrRncGGgUl8gpCeBf0H40Oz7
+         +QHISV7kgnDatz4jww2TjO0zaODQGGrqkhuXjSLcKRMYasEIElykfijvIMc/gYGsHaC6
+         IecFOHQqcpNEWQOHndfnNf4TBik1nBl6wd12fAH3EupB425kxQZP4I/JvYwL6NII11oa
+         l0psqXDa/PKcS7tj5LpRNDl2Paa5p+yatSZGjHJTSrXlV7T5SFnrpddlSGCUFH7MUGhH
+         47cLSdhb8/7s/11xDOVl9v3nC1s/lpPSPUSGlCxwfxXq/f8M/VNX0BEgogrO39rmDbTu
+         MyGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pajM9hI9fI/87uBaTeYfHZ+TkaK2uNfPmDfKI6EwRtM=;
-        b=ebHobg2jDwYpDsqxw2zYpch25dMspbcRmRpV1ZmLYqaJmfx2wks747VkaQ9FVpYcbN
-         7Kp6lCz+Ydh9KQJYDPnU+t0zhj/o74dGqLtsYW+w6kwIDvKile6S29quDTMO/qRlEZ9Z
-         ahdInkDo0xHvuBcb5wppoN0et7rT8Ij9HmSHXxgKMKLbgseWhdZTH2JmPVGXxCHfob8Y
-         jM7HCeRlAcatCu/8BpcLEgaA1NToBX0Z/EYp3r3GHO9jz0vHcm7yZfLv1/pP/+3Rw/5T
-         3MRs7GvN2VXEsEJe/0BhyEZkk6bUyW+Qs8I9UsQOFu1R/JCJWu7GruyoOdb6HQ+hHWAP
-         TZ4Q==
-X-Gm-Message-State: AJIora9KYkhUAkb9S4/NXRFHVzY7DpdakGldFAbm/gpp8eK0e9T7pSDp
-        X1U38rOiDwumgdxQxPHRVnep3nON06pPVYHGpVwWji2c3VALGzoT1oFR3Eu3sQLBQu5lEaZw+Xe
-        RbAj0m8+ty3YlLgKIIlmr2aYE+uvn
-X-Received: by 2002:a05:6512:3f0f:b0:47f:6f89:326 with SMTP id y15-20020a0565123f0f00b0047f6f890326mr7309033lfa.124.1656317672179;
-        Mon, 27 Jun 2022 01:14:32 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1stSWl4OiPqPtvMuSHVstpPhV2ncpnK2QP/uZDvpStVqiSUc6+7r6HgRqJbkG0p8fApLKYURBWKalbv9dZOpEk=
-X-Received: by 2002:a05:6512:3f0f:b0:47f:6f89:326 with SMTP id
- y15-20020a0565123f0f00b0047f6f890326mr7309001lfa.124.1656317671894; Mon, 27
- Jun 2022 01:14:31 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WyN53yBSmQaV4TeUGBbUPb+3S/pfbZP5il80wSTCxhM=;
+        b=UEvKK42+cTWblQ84GZbNZ0+LNednnaA/zq7eFwBbZI3a0sidYkA0X4oQGVEz2C7y8N
+         rE3fqpS/aNahj3cY8onnOVNoKQOWtv9Ef7iU0q0xPeFRHdgjUS8Oh2G2yNxmDPMjwgSi
+         WbtH4Wgy9Y2dqGruHzNpXQmMLKI3V4xLWC/Jw0wDd61MsT0IQSYiZlTFeI+Tzw8UG+p8
+         k4r64hQ57fCu4Ftq9GkcXsPknVe1aNf/NhYaWbM9gzivKwIqxckpRHeaqGL+XPUIObSx
+         Mtrw7GX60YiYcF6WDzkThHbU9ua6Hm2/qhpvFFux40nAJaRGHKJy11SXunI5+9pSn+6X
+         ZhRA==
+X-Gm-Message-State: AJIora84qIHoXZsK5O++ucr/zt9EKd7PFWamh6k6J/BgYye0hwj+YZi1
+        euTBVd2WsMAuka0067D7oZE=
+X-Google-Smtp-Source: AGRyM1sceMx/DaP27aAYpPGx8T4w604aPmcuj3WhO/jldAzYHXK1NMmX4D+KDMta7QlEXFljLyTfhA==
+X-Received: by 2002:a05:600c:2e14:b0:3a0:3ba0:143c with SMTP id o20-20020a05600c2e1400b003a03ba0143cmr17497223wmf.99.1656317678991;
+        Mon, 27 Jun 2022 01:14:38 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id v15-20020a5d43cf000000b0021badf3cb26sm11569623wrr.63.2022.06.27.01.14.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 01:14:38 -0700 (PDT)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH][next] KVM: selftests: Fix spelling mistake "miliseconds" -> "milliseconds"
+Date:   Mon, 27 Jun 2022 09:14:37 +0100
+Message-Id: <20220627081437.45732-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-References: <20220624025621.128843-1-xuanzhuo@linux.alibaba.com>
- <20220624025621.128843-26-xuanzhuo@linux.alibaba.com> <20220624025817-mutt-send-email-mst@kernel.org>
- <CACGkMEseptD=45j3kQr0yciRxR679Jcig=292H07-RYC2vXmFQ@mail.gmail.com>
- <20220627023841-mutt-send-email-mst@kernel.org> <CACGkMEvy8xF2T_vubKeUEPC2aroO_fbB0Xe8nnxK4OBUgAS+Gw@mail.gmail.com>
- <20220627034733-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220627034733-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Mon, 27 Jun 2022 16:14:20 +0800
-Message-ID: <CACGkMEtpjUBaUML=fEs5hR66rzNTBhBXOmfpzyXV1F-6BqvsGg@mail.gmail.com>
-Subject: Re: [PATCH v10 25/41] virtio_pci: struct virtio_pci_common_cfg add queue_notify_data
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        kangjie.xu@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 3:58 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Jun 27, 2022 at 03:45:30PM +0800, Jason Wang wrote:
-> > On Mon, Jun 27, 2022 at 2:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Mon, Jun 27, 2022 at 10:30:42AM +0800, Jason Wang wrote:
-> > > > On Fri, Jun 24, 2022 at 2:59 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > >
-> > > > > On Fri, Jun 24, 2022 at 10:56:05AM +0800, Xuan Zhuo wrote:
-> > > > > > Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
-> > > > > > here https://github.com/oasis-tcs/virtio-spec/issues/89
-> > > > > >
-> > > > > > For not breaks uABI, add a new struct virtio_pci_common_cfg_notify.
-> > > > >
-> > > > > What exactly is meant by not breaking uABI?
-> > > > > Users are supposed to be prepared for struct size to change ... no?
-> > > >
-> > > > Not sure, any doc for this?
-> > > >
-> > > > Thanks
-> > >
-> > >
-> > > Well we have this:
-> > >
-> > >         The drivers SHOULD only map part of configuration structure
-> > >         large enough for device operation.  The drivers MUST handle
-> > >         an unexpectedly large \field{length}, but MAY check that \field{length}
-> > >         is large enough for device operation.
-> >
-> > Yes, but that's the device/driver interface. What's done here is the
-> > userspace/kernel.
-> >
-> > Userspace may break if it uses e.g sizeof(struct virtio_pci_common_cfg)?
-> >
-> > Thanks
->
-> Hmm I guess there's risk... but then how are we going to maintain this
-> going forward?  Add a new struct on any change?
+There is a spelling mistake in the -p option help text. Fix it.
 
-This is the way we have used it for the past 5 or more years. I don't
-see why this must be handled in the vq reset feature.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->Can we at least
-> prevent this going forward somehow?
-
-Like have some padding?
-
-Thanks
-
->
->
-> > >
-> > >
-> > >
-> > > >
-> > > > >
-> > > > >
-> > > > > > Since I want to add queue_reset after queue_notify_data, I submitted
-> > > > > > this patch first.
-> > > > > >
-> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > > > ---
-> > > > > >  include/uapi/linux/virtio_pci.h | 7 +++++++
-> > > > > >  1 file changed, 7 insertions(+)
-> > > > > >
-> > > > > > diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-> > > > > > index 3a86f36d7e3d..22bec9bd0dfc 100644
-> > > > > > --- a/include/uapi/linux/virtio_pci.h
-> > > > > > +++ b/include/uapi/linux/virtio_pci.h
-> > > > > > @@ -166,6 +166,13 @@ struct virtio_pci_common_cfg {
-> > > > > >       __le32 queue_used_hi;           /* read-write */
-> > > > > >  };
-> > > > > >
-> > > > > > +struct virtio_pci_common_cfg_notify {
-> > > > > > +     struct virtio_pci_common_cfg cfg;
-> > > > > > +
-> > > > > > +     __le16 queue_notify_data;       /* read-write */
-> > > > > > +     __le16 padding;
-> > > > > > +};
-> > > > > > +
-> > > > > >  /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
-> > > > > >  struct virtio_pci_cfg_cap {
-> > > > > >       struct virtio_pci_cap cap;
-> > > > > > --
-> > > > > > 2.31.0
-> > > > >
-> > >
->
+diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+index cc6421716400..58876ec4ee51 100644
+--- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+@@ -218,7 +218,7 @@ static void help(char *name)
+ 	puts("");
+ 	printf("usage: %s [-h] [-p period_ms] [-t token]\n", name);
+ 	puts("");
+-	printf(" -p: The NX reclaim period in miliseconds.\n");
++	printf(" -p: The NX reclaim period in milliseconds.\n");
+ 	printf(" -t: The magic token to indicate environment setup is done.\n");
+ 	printf(" -r: The test has reboot permissions and can disable NX huge pages.\n");
+ 	puts("");
+-- 
+2.35.3
 
