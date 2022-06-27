@@ -2,158 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7EA355DDF1
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:28:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E811755DD61
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:27:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234043AbiF0J2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 05:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47888 "EHLO
+        id S234152AbiF0JwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 05:52:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234045AbiF0J21 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 05:28:27 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3F963CF;
-        Mon, 27 Jun 2022 02:28:25 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25R8DSsP029787;
-        Mon, 27 Jun 2022 09:28:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XGSUXB3Rcsiln6Kp4JHxXDV3T+MukAKiofOmAn6K9FA=;
- b=Q5b886FlV11rBGoN7GKImaVBllKgG4qk+8CXwCJ09cHOkvNDojUETWBLsafDeofNW1sQ
- lydWc4sQpLSkkgd0xQlj4/Pk3zfcRyxQVtTAG1L6f8o5VeY4ousyz1T2rSl/sc7m8x56
- grue5xJ+OA4uGnoEwN0kl5gfttfQ2RiB1DXca13JbQe5XxBKo0RECfBHCgsIHTNM1qDy
- 6JxQg6eZruUNWgjs8htCfAQkSA/BTpXxzo1w65zN/eDXjgJG/G3HD9BuI+V8L3PtBRM2
- lyYQrk1jrvsmU+HK6L/w/0PzffBQjyu0gcYHl4ITX89lGoNSL7fXNxQePIihKShKfZ+o Zg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gy8ug1wbx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jun 2022 09:28:24 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25R8DxV4030520;
-        Mon, 27 Jun 2022 09:28:24 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gy8ug1wb7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jun 2022 09:28:24 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25R9LU0r014505;
-        Mon, 27 Jun 2022 09:28:22 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3gwsmj2nsv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jun 2022 09:28:22 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25R9SPKa24248742
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Jun 2022 09:28:25 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41830A4040;
-        Mon, 27 Jun 2022 09:28:19 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C2BA7A404D;
-        Mon, 27 Jun 2022 09:28:18 +0000 (GMT)
-Received: from [9.145.155.49] (unknown [9.145.155.49])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Jun 2022 09:28:18 +0000 (GMT)
-Message-ID: <19169d83-ad31-da70-b3bb-bd7ba43e6484@linux.ibm.com>
-Date:   Mon, 27 Jun 2022 11:28:18 +0200
+        with ESMTP id S234121AbiF0JwC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 05:52:02 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA05263F3;
+        Mon, 27 Jun 2022 02:52:00 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id w24so8721775pjg.5;
+        Mon, 27 Jun 2022 02:52:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2cG8fbzR7+gSe64OpxIhFg9qrmMhTpmF6O45hxZflsM=;
+        b=GWZnMH8B8gSPfjfFy6K8OY0ryGr0AlIE5f5FllGrc2v3EOFqd3Qm9XGAVYT/mDzAqy
+         S/Aha1zwB11XwyNRz4bkUq4EvC4F/RQ2/wjwB//TD9/9M4+hgt62Plyft3icFPNTDG/F
+         OYuc4pvJYiLwiN9JA0YhsJ6Sks+d2Mkf1eND4EwfGuv7S0x69+HkxrNNU5OncpbHPSnv
+         GnGnloQgFHPdSRUXoc7q6hTGZB2eZcUZ3sfT1P9yHzsYJSqGclSWpgBVGAxIMfVjhiDG
+         TGdDtXgU598R+6lQvR0RZoZv+fn3iaCx36p7nO0L0UhGR9MrHAXJO6aNwh6EjSkhmE+c
+         4Tlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2cG8fbzR7+gSe64OpxIhFg9qrmMhTpmF6O45hxZflsM=;
+        b=QieuS6UvqHBvTlK++ofa5ZwgxGJvAs+t4uzsYPw+LczJf4SQDa+WHymPt9UP4FNW0z
+         3fK3TUwSaXTvsLtEH4KWuBb0qeQ4iFr6JD8E4K56UjY8DkW9QaNuxbHGy4VohOMU2R+u
+         IFJKJJuAEGhHNWQAb2NSggfRiU6T6qXTW+9a2iR+fi5BF2R55NSTo1Gm2rEyjQJTeruR
+         /wQTBOg7r3BcdQUohrAgWtqGl4SJBa4apuERXun4lvNuFRrYdHkSGlHCmAdieivgvVqM
+         2vEyXoUHEJ0IBcqxGPwne4e1T1OIm6NFvIRpfER6hCX44rYk0LwS8iRG+cMWLSQdq6Sy
+         L5Gg==
+X-Gm-Message-State: AJIora/QNz9oTNIyBc+4M39VQhXaDOH4ZGCfocjGZ4Y/n5H8WG4mETqw
+        I3k2lRK9fvBTdNRUjnCOB7o=
+X-Google-Smtp-Source: AGRyM1v+OC+sotsqxlAGI9ck77bnETYvYZSfr5HQbc3snuIdWwbtWhQu0mtmcXGPK+sXUaLUzeHUgg==
+X-Received: by 2002:a17:902:b216:b0:16a:854:e641 with SMTP id t22-20020a170902b21600b0016a0854e641mr13288272plr.154.1656323520115;
+        Mon, 27 Jun 2022 02:52:00 -0700 (PDT)
+Received: from debian.me (subs03-180-214-233-72.three.co.id. [180.214.233.72])
+        by smtp.gmail.com with ESMTPSA id p6-20020a170902eac600b0016a6e9a2ec8sm6022128pld.250.2022.06.27.02.51.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 02:51:59 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 396CB1038BD; Mon, 27 Jun 2022 16:51:56 +0700 (WIB)
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     linux-doc@vger.kernel.org
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        kvm@vger.kernel.org, linux-next@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH next 0/2] Documentation: KVM: KVM_CAP_VM_DISABLE_NX_HUGE_PAGES documentation fixes
+Date:   Mon, 27 Jun 2022 16:51:49 +0700
+Message-Id: <20220627095151.19339-1-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.36.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, scgl@linux.ibm.com, nrb@linux.ibm.com,
-        thuth@redhat.com
-References: <20220624144518.66573-1-imbrenda@linux.ibm.com>
- <20220624144518.66573-4-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] lib: s390x: better smp interrupt
- checks
-In-Reply-To: <20220624144518.66573-4-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C85qOWR_UfaN6IIVSzAC9gsZs66nm6bM
-X-Proofpoint-GUID: c9dFpqbIRrqyzD70Pmr-4XSN0vEuRZTQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-27_06,2022-06-24_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- spamscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- lowpriorityscore=0 phishscore=0 suspectscore=0 malwarescore=0
- clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206270039
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/24/22 16:45, Claudio Imbrenda wrote:
-> Use per-CPU flags and callbacks for Program and Extern interrupts,
-> instead of global variables.
-> 
-> This allows for more accurate error handling; a CPU waiting for an
-> interrupt will not have it "stolen" by a different CPU that was not
-> supposed to wait for one, and now two CPUs can wait for interrupts at
-> the same time.
-> 
-> This will significantly improve error reporting and debugging when
-> things go wrong.
-> 
-> Both program interrupts and extern interrupts are now CPU-bound, even
-> though some extern interrupts are floating (notably, the SCLP
-> interrupt). In those cases, the testcases should mask interrupts and/or
-> expect them appropriately according to need.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   lib/s390x/asm/arch_def.h | 17 +++++++++++-
->   lib/s390x/smp.h          |  8 +-----
->   lib/s390x/interrupt.c    | 57 +++++++++++++++++++++++++++++-----------
->   lib/s390x/smp.c          | 11 ++++++++
->   4 files changed, 70 insertions(+), 23 deletions(-)
-[...]
->   
-> +struct lowcore *smp_get_lowcore(uint16_t idx)
-> +{
-> +	if (THIS_CPU->idx == idx)
-> +		return &lowcore;
-> +
-> +	check_idx(idx);
-> +	return cpus[idx].lowcore;
-> +}
+After merging kvm tree for linux-next, Stephen Rothwell reported
+htmldocs warnings on KVM_CAP_VM_DISABLE_NX_HUGE_PAGES capability
+documentation:
 
-This function is unused.
+Documentation/virt/kvm/api.rst:8210: WARNING: Title underline too short.
 
-> +
->   int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
->   {
->   	check_idx(idx);
-> @@ -253,6 +262,7 @@ static int smp_cpu_setup_nolock(uint16_t idx, struct psw psw)
->   
->   	/* Copy all exception psws. */
->   	memcpy(lc, cpus[0].lowcore, 512);
-> +	lc->this_cpu = cpus + idx;
+8.38 KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
+---------------------------
+Documentation/virt/kvm/api.rst:8217: WARNING: Unexpected indentation.
 
-Why not:
-lc->this_cpu = &cpus[idx];
+Fix these warnings by:
 
->   
->   	/* Setup stack */
->   	cpus[idx].stack = (uint64_t *)alloc_pages(2);
-> @@ -325,6 +335,7 @@ void smp_setup(void)
->   	for (i = 0; i < num; i++) {
->   		cpus[i].addr = entry[i].address;
->   		cpus[i].active = false;
-> +		cpus[i].idx = i;
->   		/*
->   		 * Fill in the boot CPU. If the boot CPU is not at index 0,
->   		 * swap it with the one at index 0. This guarantees that the
+  [1/2]: extend the heading underline
+  [2/2]: properly format the capability table
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: David Matlack <dmatlack@google.com>
+Cc: Ben Gardon <bgardon@google.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-next@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Bagas Sanjaya (2):
+  Documentation: KVM: extend KVM_CAP_VM_DISABLE_NX_HUGE_PAGES heading
+    underline
+  KVM: x86/MMU: properly format KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
+    capability table
+
+ Documentation/virt/kvm/api.rst | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+-- 
+An old man doll... just what I always wanted! - Clara
 
