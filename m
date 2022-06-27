@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DC7255C3FE
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:49:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0891A55D1D2
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:10:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241741AbiF0V42 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:56:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59828 "EHLO
+        id S241744AbiF0V4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:56:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241429AbiF0VzK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S241428AbiF0VzK (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 27 Jun 2022 17:55:10 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B991C6326;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6BFB6332;
         Mon, 27 Jun 2022 14:54:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1656366898; x=1687902898;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9+zynqxUnbt7L2tmrykvNHmz+Wt/xr8Fj4lA+9l+hKk=;
-  b=GTshIsVXG/uRrjQyEBklKUdkUpM+a70v4j1US2GXah0W6Kwpfj023yU0
-   ew2MCcuJ6n1WY8u//TMh0LSsc2it/Jw0gRisSQD7iCq98VyCUpWmhZyXk
-   TMUgCRNyhMpeXjUBAATC8XQpINqgPUWBLC60gXP2DMvv/tr1sGNlyJETZ
-   b74uPHTols/gUTxMFunU+WBm0ymbVBRKc5pJoNx5eom9qad108ffoYwu1
-   LJC3X+asaUHyKrcLMZNSiYv+YGfRhCyATb4N/ZBCXkwpgZFrQXSiRAL4z
-   zd3/97j5Mr8jjpGUPDn1irV+8SmfgZaexgxGn4rfMt+6J/HqL0aemsm44
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609557"
+  bh=tyjTv6Pj07vg3EU6zQKqvLE1RD7lHcTTEeGjBabiGlY=;
+  b=VcPwh/r+2d33jBoAAxbWJ+NRTJo9TVIKzS2J2bmLzmrciemu7lulOZKz
+   Xe2XE+phqXcqGYjcKartdhPHTxRmXLRgTNDrRnYsKxiHWwwWz5uXF0Iiy
+   KCgWr9VqF5lqsGRTZJbweimVp2uVUVSKdmTgLxPPx8+LdEVCvR/LGBH9/
+   m+Ra9Lq0J7ZzmVWUK/jy6Rgp+PDfdfnH+5HGfyTAhG0it9zeeJ4Bu/Ffa
+   VDD2QgRrW1rpUQfd4VgbvG1Equ+0JoM6/pBX6s/KleqUYJ8NWtDAXYnPg
+   qOnEraGtYUm4zSgssCYZnQfxPy7KCubmp2gs9/SU+nkPOsLmkFKqBoYHT
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609559"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="281609557"
+   d="scan'208";a="281609559"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:53 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="657863571"
+   d="scan'208";a="657863574"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:53 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v7 042/102] [MARKER] The start of TDX KVM patch series: KVM TDP MMU hooks
-Date:   Mon, 27 Jun 2022 14:53:34 -0700
-Message-Id: <082bd1d5a2c99f9a5313be51790410b66280cd94.1656366338.git.isaku.yamahata@intel.com>
+Subject: [PATCH v7 043/102] KVM: x86/mmu: Focibly use TDP MMU for TDX
+Date:   Mon, 27 Jun 2022 14:53:35 -0700
+Message-Id: <c198d2be26aa9a041176826cf86b51a337427783.1656366338.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
@@ -60,27 +60,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This empty commit is to mark the start of patch series of KVM TDP MMU
-hooks.
+In this patch series, TDX supports only TDP MMU and doesn't support legacy
+MMU.  Forcibly use TDP MMU for TDX irrelevant of kernel parameter to
+disable TDP MMU.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index df003d2ed89e..d5cace00c433 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -25,6 +25,6 @@ Patch Layer status
- * TD vcpu interrupts/exit/hypercall:    Not yet
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 82f1bfac7ee6..7eb41b176d1e 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -18,8 +18,13 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+ {
+ 	struct workqueue_struct *wq;
  
- * KVM MMU GPA shared bits:              Applied
--* KVM TDP refactoring for TDX:          Applying
--* KVM TDP MMU hooks:                    Not yet
-+* KVM TDP refactoring for TDX:          Applied
-+* KVM TDP MMU hooks:                    Applying
- * KVM TDP MMU MapGPA:                   Not yet
+-	if (!tdp_enabled || !READ_ONCE(tdp_mmu_enabled))
+-		return 0;
++	/*
++	 *  Because TDX supports only TDP MMU, forcibly use TDP MMU in the case
++	 *  of TDX.
++	 */
++	if (kvm->arch.vm_type != KVM_X86_TDX_VM &&
++		(!tdp_enabled || !READ_ONCE(tdp_mmu_enabled)))
++		return false;
+ 
+ 	wq = alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
+ 	if (!wq)
 -- 
 2.25.1
 
