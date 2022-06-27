@@ -2,116 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CCCD55DB5F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:24:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F37AB55C510
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:50:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237915AbiF0LvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 07:51:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49688 "EHLO
+        id S238398AbiF0L7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 07:59:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237928AbiF0LtV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 07:49:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E523EDD6
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 04:43:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 827E761241
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 11:43:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD194C3411D;
-        Mon, 27 Jun 2022 11:43:11 +0000 (UTC)
-Date:   Mon, 27 Jun 2022 12:43:08 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Peter Collingbourne <pcc@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Michael Roth <michael.roth@amd.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>,
-        Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
-Message-ID: <YrmXzHXv4babwbNZ@arm.com>
-References: <20220623234944.141869-1-pcc@google.com>
- <YrXu0Uzi73pUDwye@arm.com>
- <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+        with ESMTP id S239520AbiF0L5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 07:57:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AE546BCB7
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 04:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656330812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=R4iA+zJThegEvaay5X9bkB6r2mlx5a4ueL2JEW4gqMI=;
+        b=TA+uUJSSAXxi439YnvjU0idz0Fh9Rjk6i2w+2sga1ZNo44Hd5nmyltefb0YtS5GrUCh9Jk
+        V7fmNPGR0F96m9eq4JU9b3Bq9hDuVpOakgWqZq7Mbt8eCsnSrZxoTRbMI+fx+gGI56lZ0S
+        dzCdXBMY2+R+gbAi8elMRlAB306dAvQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-140-27SPKIbcMpqNDv2NrGTxnw-1; Mon, 27 Jun 2022 07:53:31 -0400
+X-MC-Unique: 27SPKIbcMpqNDv2NrGTxnw-1
+Received: by mail-wr1-f72.google.com with SMTP id g5-20020adff3c5000000b0021bc44c0f7aso516926wrp.22
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 04:53:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=R4iA+zJThegEvaay5X9bkB6r2mlx5a4ueL2JEW4gqMI=;
+        b=Cfl/Z9kM+5O9e7tUmDL2oPv2G+k/rX71kxUz93cJcP0eK35S3jJyNXnQyzP2aU7/W+
+         IW0+iODl3pESmSLVU2ZMU9OH660D9IoofopEBM5uD9pwNAitSrE3o9VyLLnlErNkUK5h
+         WVR1GPSJujSVyOx5lOaC8Re864Jk3Dt6gbZV5WUp+K832uYBOIa6xvFQDdBxNr4YGbfW
+         /Ep1OiIUCD7xnh7K7FX9ol+NIB5ZSKVw/Mw03GUxo8A67g/UBT9WIuKGo9TNes4GmeU5
+         8ULEtmMMI2zGEdMDs4d/ci1WoGlEZ8GCkPIcUUpVC6T7mThIc28pCim3n3LiESapAALa
+         9x+g==
+X-Gm-Message-State: AJIora/UxJdANU4lY9TYufU5QIsdFBQjg2Rcke1umoRUyteQFhLAZoYi
+        jmmKKBBjOrYOg4T3jLdkEmECg6Zzb0k7L3MXpVYR/OHHkgSS3c+MWdVkQ7mxjLQqcvCXADq9Ita
+        rDMA0+7MYCsAY
+X-Received: by 2002:a1c:7c18:0:b0:3a0:39b1:3403 with SMTP id x24-20020a1c7c18000000b003a039b13403mr21172912wmc.84.1656330810174;
+        Mon, 27 Jun 2022 04:53:30 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1umV07YHfv9l89u85pmjMFPA0YWmqYXm7VuXyf0J+ISW9dEoHO5P2MBiXRfYI/0CpLN0ZOgWg==
+X-Received: by 2002:a1c:7c18:0:b0:3a0:39b1:3403 with SMTP id x24-20020a1c7c18000000b003a039b13403mr21172868wmc.84.1656330809951;
+        Mon, 27 Jun 2022 04:53:29 -0700 (PDT)
+Received: from redhat.com ([2.54.45.90])
+        by smtp.gmail.com with ESMTPSA id a19-20020a05600c349300b0039db500714fsm13454861wmq.6.2022.06.27.04.53.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 04:53:29 -0700 (PDT)
+Date:   Mon, 27 Jun 2022 07:53:22 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm <kvm@vger.kernel.org>,
+        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+        kangjie.xu@linux.alibaba.com
+Subject: Re: [PATCH v10 25/41] virtio_pci: struct virtio_pci_common_cfg add
+ queue_notify_data
+Message-ID: <20220627074723-mutt-send-email-mst@kernel.org>
+References: <20220624025621.128843-1-xuanzhuo@linux.alibaba.com>
+ <20220624025621.128843-26-xuanzhuo@linux.alibaba.com>
+ <20220624025817-mutt-send-email-mst@kernel.org>
+ <CACGkMEseptD=45j3kQr0yciRxR679Jcig=292H07-RYC2vXmFQ@mail.gmail.com>
+ <20220627023841-mutt-send-email-mst@kernel.org>
+ <CACGkMEvy8xF2T_vubKeUEPC2aroO_fbB0Xe8nnxK4OBUgAS+Gw@mail.gmail.com>
+ <20220627034733-mutt-send-email-mst@kernel.org>
+ <CACGkMEtpjUBaUML=fEs5hR66rzNTBhBXOmfpzyXV1F-6BqvsGg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CACGkMEtpjUBaUML=fEs5hR66rzNTBhBXOmfpzyXV1F-6BqvsGg@mail.gmail.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 24, 2022 at 02:50:53PM -0700, Peter Collingbourne wrote:
-> On Fri, Jun 24, 2022 at 10:05 AM Catalin Marinas
-> <catalin.marinas@arm.com> wrote:
-> > + Steven as he added the KVM and swap support for MTE.
+On Mon, Jun 27, 2022 at 04:14:20PM +0800, Jason Wang wrote:
+> On Mon, Jun 27, 2022 at 3:58 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 > >
-> > On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
-> > > Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
-> > > depend on being able to map guest memory as MAP_SHARED. The current
-> > > restriction on sharing MAP_SHARED pages with the guest is preventing
-> > > the use of those features with MTE. Therefore, remove this restriction.
+> > On Mon, Jun 27, 2022 at 03:45:30PM +0800, Jason Wang wrote:
+> > > On Mon, Jun 27, 2022 at 2:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Jun 27, 2022 at 10:30:42AM +0800, Jason Wang wrote:
+> > > > > On Fri, Jun 24, 2022 at 2:59 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Fri, Jun 24, 2022 at 10:56:05AM +0800, Xuan Zhuo wrote:
+> > > > > > > Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
+> > > > > > > here https://github.com/oasis-tcs/virtio-spec/issues/89
+> > > > > > >
+> > > > > > > For not breaks uABI, add a new struct virtio_pci_common_cfg_notify.
+> > > > > >
+> > > > > > What exactly is meant by not breaking uABI?
+> > > > > > Users are supposed to be prepared for struct size to change ... no?
+> > > > >
+> > > > > Not sure, any doc for this?
+> > > > >
+> > > > > Thanks
+> > > >
+> > > >
+> > > > Well we have this:
+> > > >
+> > > >         The drivers SHOULD only map part of configuration structure
+> > > >         large enough for device operation.  The drivers MUST handle
+> > > >         an unexpectedly large \field{length}, but MAY check that \field{length}
+> > > >         is large enough for device operation.
+> > >
+> > > Yes, but that's the device/driver interface. What's done here is the
+> > > userspace/kernel.
+> > >
+> > > Userspace may break if it uses e.g sizeof(struct virtio_pci_common_cfg)?
+> > >
+> > > Thanks
 > >
-> > We already have some corner cases where the PG_mte_tagged logic fails
-> > even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
-> > KVM MAP_SHARED will potentially make things worse (or hard to reason
-> > about; for example the VMM sets PROT_MTE as well). I'm more inclined to
-> > get rid of PG_mte_tagged altogether, always zero (or restore) the tags
-> > on user page allocation, copy them on write. For swap we can scan and if
-> > all tags are 0 and just skip saving them.
+> > Hmm I guess there's risk... but then how are we going to maintain this
+> > going forward?  Add a new struct on any change?
 > 
-> A problem with this approach is that it would conflict with any
-> potential future changes that we might make that would require the
-> kernel to avoid modifying the tags for non-PROT_MTE pages.
+> This is the way we have used it for the past 5 or more years. I don't
+> see why this must be handled in the vq reset feature.
+> 
+> >Can we at least
+> > prevent this going forward somehow?
+> 
+> Like have some padding?
+> 
+> Thanks
 
-Not if in all those cases we check VM_MTE_ALLOWED. We seem to have the
-vma available where it matters. We can keep PG_mte_tagged around but
-always set it on page allocation (e.g. when zeroing or CoW) and check
-VM_MTE_ALLOWED rather than VM_MTE.
+Maybe - this is what QEMU does ...
 
-I'm not sure how Linux can deal with pages that do not support MTE.
-Currently we only handle this at the vm_flags level. Assuming that we
-somehow manage to, we can still use PG_mte_tagged to mark the pages that
-supported tags on allocation (and they have been zeroed or copied). I
-guess if you want to move a page around, you'd need to go through
-something like try_to_unmap() (or set all mappings to PROT_NONE like in
-NUMA migration). Then you can either check whether the page is PROT_MTE
-anywhere and maybe read the tags to see whether all are zero after
-unmapping.
+> >
+> >
+> > > >
+> > > >
+> > > >
+> > > > >
+> > > > > >
+> > > > > >
+> > > > > > > Since I want to add queue_reset after queue_notify_data, I submitted
+> > > > > > > this patch first.
+> > > > > > >
+> > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > > > ---
+> > > > > > >  include/uapi/linux/virtio_pci.h | 7 +++++++
+> > > > > > >  1 file changed, 7 insertions(+)
+> > > > > > >
+> > > > > > > diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
+> > > > > > > index 3a86f36d7e3d..22bec9bd0dfc 100644
+> > > > > > > --- a/include/uapi/linux/virtio_pci.h
+> > > > > > > +++ b/include/uapi/linux/virtio_pci.h
+> > > > > > > @@ -166,6 +166,13 @@ struct virtio_pci_common_cfg {
+> > > > > > >       __le32 queue_used_hi;           /* read-write */
+> > > > > > >  };
+> > > > > > >
+> > > > > > > +struct virtio_pci_common_cfg_notify {
+> > > > > > > +     struct virtio_pci_common_cfg cfg;
+> > > > > > > +
+> > > > > > > +     __le16 queue_notify_data;       /* read-write */
+> > > > > > > +     __le16 padding;
+> > > > > > > +};
+> > > > > > > +
+> > > > > > >  /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
+> > > > > > >  struct virtio_pci_cfg_cap {
+> > > > > > >       struct virtio_pci_cap cap;
+> > > > > > > --
+> > > > > > > 2.31.0
+> > > > > >
+> > > >
+> >
 
-Deferring tag zeroing/restoring to set_pte_at() can be racy without a
-lock (or your approach with another flag) but I'm not sure it's worth
-the extra logic if zeroing or copying the tags doesn't have a
-significant overhead for non-PROT_MTE pages.
-
-Another issue with set_pte_at() is that it can write tags on mprotect()
-even if the page is mapped read-only. So far I couldn't find a problem
-with this but it adds to the complexity.
-
-> Thinking about this some more, another idea that I had was to only
-> allow MAP_SHARED mappings in a guest with MTE enabled if the mapping
-> is PROT_MTE and there are no non-PROT_MTE aliases. For anonymous
-> mappings I don't think it's possible to create a non-PROT_MTE alias in
-> another mm (since you can't turn off PROT_MTE with mprotect), and for
-> memfd maybe we could introduce a flag that requires PROT_MTE on all
-> mappings. That way, we are guaranteed that either the page has been
-> tagged prior to fault or we have exclusive access to it so it can be
-> tagged on demand without racing. Let me see what effect that has on
-> crosvm.
-
-You could still have all initial shared mappings as !PROT_MTE and some
-mprotect() afterwards setting PG_mte_tagged and clearing the tags and
-this can race. AFAICT, the easiest way to avoid the race is to set
-PG_mte_tagged on allocation before it ends up in set_pte_at().
-
--- 
-Catalin
