@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F8C455E07D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:32:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 093CB55E0B4
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:32:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240554AbiF0V6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:58:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60452 "EHLO
+        id S241965AbiF0V62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:58:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241278AbiF0Vzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 17:55:54 -0400
+        with ESMTP id S241584AbiF0Vzv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 17:55:51 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F25A15739;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FED217E12;
         Mon, 27 Jun 2022 14:55:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1656366908; x=1687902908;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=nvOKhWUwY4ixdp7Mo14HTOcmCjwpZM07BwLwUn5o6l0=;
-  b=KopfRjWil1HZmbSSjU8CcF2PO5dc3lqiZSQTMDWVg7490QcaQBkl0NIK
-   HkItUGxx7Lbhf/nNbeI0SY9jgBuZYLjyp/mGlO3LEfwhv23K9C6aNflD/
-   jPzK442KAlSY8kS3qie93YAHWerSJIxCVSEZNV70K3GTUg3O5mwcUl13T
-   QRZyZs2Vko4QzzqkqcU61fnldnd3XL13HxPOMOJXN/ggEx1Yu+PR6HSK3
-   NakDOsii4yhgh0PYNNtWrGzg0N3/Jyu3J9vaEkV47E4GIWo+CQG4jfosE
-   Gz49ASU0795JGCJErGM7a62U+UXzP6ohzx89T/8NkIiXj9YQpqd2aDG06
+  bh=/PYwWPGHO/1+qPoFaj/W0MK8YqX25A5UyWr9XEuPVxU=;
+  b=eSKXUb6dyhFxLKmRdM86KAVnoYpOXg2SgsLJ2NMqMw5XxH4vfJ+v8gJY
+   g1Tz2aaHaUaaynUbRcwWAfQS6p43QLtKxOH1SXUyQzeoYbMVMRykkSnDW
+   55ApuBJ2siKFohc4z6XQspxKGAeIaCq5AFm4qV7vW/GTIZUMddp+X07BW
+   os4oKymRmUs1oAv6Vb6Ond0pEs17eqgcxQgeQws1JFdsNVweDcWMd+ELW
+   dT8mPIk1n7/X52uq7noNBYiLcf7K59SoLajZ3at9sZ4m7+TovQs1sNdU2
+   hwTJM1N7sir6ONrSu9/2raYkmL3ToZXUeMDjNon6kBSSlkU+UndVO9oKC
    Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="279116140"
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="279116142"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="279116140"
+   d="scan'208";a="279116142"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:55:01 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="657863735"
+   d="scan'208";a="657863739"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:55:01 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v7 090/102] KVM: TDX: Handle TDX PV HLT hypercall
-Date:   Mon, 27 Jun 2022 14:54:22 -0700
-Message-Id: <57238c84c7956ac8003692474a584233cc7c5eab.1656366338.git.isaku.yamahata@intel.com>
+Subject: [PATCH v7 091/102] KVM: TDX: Handle TDX PV port io hypercall
+Date:   Mon, 27 Jun 2022 14:54:23 -0700
+Message-Id: <39fb8acbd90c1b5e91eb92710cb7eb992d168e39.1656366338.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
@@ -60,102 +60,89 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Wire up TDX PV HLT hypercall to the KVM backend function.
+Wire up TDX PV port IO hypercall to the KVM backend function.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/tdx.h |  3 +++
- 2 files changed, 44 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 57 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 96e41602125b..15dc0ae61e0f 100644
+index 15dc0ae61e0f..a62586a83b80 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -654,7 +654,32 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
- {
--	return pi_has_pending_interrupt(vcpu);
-+	bool ret = pi_has_pending_interrupt(vcpu);
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+
-+	if (ret || vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
-+		return true;
-+
-+	if (tdx->interrupt_disabled_hlt)
-+		return false;
-+
-+	/*
-+	 * This is for the case where the virtual interrupt is recognized,
-+	 * i.e. set in vmcs.RVI, between the STI and "HLT".  KVM doesn't have
-+	 * access to RVI and the interrupt is no longer in the PID (because it
-+	 * was "recognized".  It doesn't get delivered in the guest because the
-+	 * TDCALL completes before interrupts are enabled.
-+	 *
-+	 * TDX modules sets RVI while in an STI interrupt shadow.
-+	 * - TDExit(typically TDG.VP.VMCALL<HLT>) from the guest to TDX module.
-+	 *   The interrupt shadow at this point is gone.
-+	 * - It knows that there is an interrupt that can be delivered
-+	 *   (RVI > PPR && EFLAGS.IF=1, the other conditions of 29.2.2 don't
-+	 *    matter)
-+	 * - It forwards the TDExit nevertheless, to a clueless hypervisor that
-+	 *   has no way to glean either RVI or PPR.
-+	 */
-+	return !!xchg(&tdx->buggy_hlt_workaround, 0);
+@@ -1003,6 +1003,61 @@ static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
+ 	return kvm_emulate_halt_noskip(vcpu);
  }
  
- void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -967,6 +992,17 @@ static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
++static int tdx_complete_pio_in(struct kvm_vcpu *vcpu)
 +{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
++	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
++	unsigned long val = 0;
++	int ret;
 +
-+	/* See tdx_protected_apic_has_interrupt() to avoid heavy seamcall */
-+	tdx->interrupt_disabled_hlt = tdvmcall_a0_read(vcpu);;
++	WARN_ON(vcpu->arch.pio.count != 1);
++
++	ret = ctxt->ops->pio_in_emulated(ctxt, vcpu->arch.pio.size,
++					 vcpu->arch.pio.port, &val, 1);
++	WARN_ON(!ret);
 +
 +	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-+	return kvm_emulate_halt_noskip(vcpu);
++	tdvmcall_set_return_val(vcpu, val);
++
++	return 1;
++}
++
++static int tdx_emulate_io(struct kvm_vcpu *vcpu)
++{
++	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
++	unsigned long val = 0;
++	unsigned int port;
++	int size, ret;
++	bool write;
++
++	++vcpu->stat.io_exits;
++
++	size = tdvmcall_a0_read(vcpu);
++	write = tdvmcall_a1_read(vcpu);
++	port = tdvmcall_a2_read(vcpu);
++
++	if (size != 1 && size != 2 && size != 4) {
++		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
++		return 1;
++	}
++
++	if (write) {
++		val = tdvmcall_a3_read(vcpu);
++		ret = ctxt->ops->pio_out_emulated(ctxt, size, port, &val, 1);
++
++		/* No need for a complete_userspace_io callback. */
++		vcpu->arch.pio.count = 0;
++	} else {
++		ret = ctxt->ops->pio_in_emulated(ctxt, size, port, &val, 1);
++		if (!ret)
++			vcpu->arch.complete_userspace_io = tdx_complete_pio_in;
++		else
++			tdvmcall_set_return_val(vcpu, val);
++	}
++	if (ret)
++		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
++	return ret;
 +}
 +
  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  {
  	if (tdvmcall_exit_type(vcpu))
-@@ -975,6 +1011,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 	switch (tdvmcall_leaf(vcpu)) {
- 	case EXIT_REASON_CPUID:
+@@ -1013,6 +1068,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  		return tdx_emulate_cpuid(vcpu);
-+	case EXIT_REASON_HLT:
-+		return tdx_emulate_hlt(vcpu);
+ 	case EXIT_REASON_HLT:
+ 		return tdx_emulate_hlt(vcpu);
++	case EXIT_REASON_IO_INSTRUCTION:
++		return tdx_emulate_io(vcpu);
  	default:
  		break;
  	}
-@@ -1311,6 +1349,8 @@ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
- 	struct kvm_vcpu *vcpu = apic->vcpu;
- 	struct vcpu_tdx *tdx = to_tdx(vcpu);
- 
-+	/* See comment in tdx_protected_apic_has_interrupt(). */
-+	tdx->buggy_hlt_workaround = 1;
- 	/* TDX supports only posted interrupt.  No lapic emulation. */
- 	__vmx_deliver_posted_interrupt(vcpu, &tdx->pi_desc, vector);
- }
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index b0bb239b51bf..a456ca6ec187 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -116,6 +116,9 @@ struct vcpu_tdx {
- 	bool host_state_need_restore;
- 	u64 msr_host_kernel_gs_base;
- 
-+	bool interrupt_disabled_hlt;
-+	unsigned int buggy_hlt_workaround;
-+
- 	/*
- 	 * Dummy to make pmu_intel not corrupt memory.
- 	 * TODO: Support PMU for TDX.  Future work.
 -- 
 2.25.1
 
