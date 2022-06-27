@@ -2,63 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B610A55CD5F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5332755DA29
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:22:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236737AbiF0Ruf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 13:50:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55520 "EHLO
+        id S239830AbiF0SAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 14:00:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235988AbiF0Rue (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 13:50:34 -0400
-Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2549E6448
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 10:50:34 -0700 (PDT)
-Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-101dc639636so13872050fac.6
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 10:50:34 -0700 (PDT)
+        with ESMTP id S233706AbiF0SAG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 14:00:06 -0400
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153D5B858
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 11:00:05 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id w3-20020a4ab6c3000000b0041c1e737283so2027331ooo.12
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 11:00:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rvLc0KAoeCG/x6cMf474PJVr5c3IRBsOYfpRWzYOz64=;
-        b=b13f20McHwfbhFM7Uv3QqZ+tK3PojQDPvs6uKN1cxttfYLzxMVnB/WnBHOprwgqQlr
-         bX5UDBaIRyM6Pfqq1fUb4ehpuiHnwdiuB5ZuEfdtK5FQfRUrnXpSqIZaxGN6Wa3458H3
-         oYa7qNKfJLj9mBObyCW0Fm1L8ESGgjWD8t7abMrFLqGCsJhW0S/M37WiHVRZ5Asqmqzk
-         T0G9hekokpmUXqnaevM0IGbHvC5N7kgcvl76wTbygNP+3JS1X+mD6Nb15KJNKT2fVsri
-         hZHlUd0jDQBT0aJ4yE8Xkk776Gt8YCORIXRlJsQMcJUfF+13gdNdxvoNKxtpplNDFMyH
-         GBnw==
+        bh=Z4QV8HZyP/VA+g9JqMm75BLwevsM4iFeMnarLv23qdI=;
+        b=RNmGVAbcgbQKmI8UnEPn4DYVmzz9zmNOgSfDfn5jdTK6Jo8BJxXYJVOxhAK2BnR7bp
+         DFyiVDlFdrmDZq9ls3T943+3OuJqn9RifeL6mvF3NhPRT3nFbpg9sYGF1brNKDbUGJiR
+         GI32iimwmvrkzZzDLHFtULmBl34G17vIYZVs/qdoVR8UoOvLeXmfGN0kgpkxk6zjos6z
+         otDAL2qez3BjK6T1JjmrCsNygdUfY0w5Pt+wMr6mfJVrgQQWMrhVa3YA+blo5trlvCyL
+         z+QiuPePlZkMCSOl1rEALWeiV03e62zkuxnV0XfmfYjYkddsTjr6Q1gJM+OqfwDUxr4g
+         ZfwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rvLc0KAoeCG/x6cMf474PJVr5c3IRBsOYfpRWzYOz64=;
-        b=Io0vPVEzh8rKMMrn7DbuRPU29Xgd3f/dH7I3jhowpebeCgSZbej7UrumuSnHG5u0WA
-         JYvBR7DHvHXAooGIASu+tEY8cXhTISIidy23jV1/bnjDd/iXSfq5ycqvPIZJTpRTAHJt
-         quRivvnLtgaw7KPtCSagqxQ5PR0AKUlqw3Ht+35ZCeVrBwaWtV0ud/FHSzWzpln/z8jw
-         9MmCp6qsR9BQ1OPniBrMTlKg50Hq2cNXsSIhJEWqt/WzsGgvAfWFraG+ZYAP1xTRojOg
-         b3tp+33yE405whlb1u3/YV8EeRd/cmlgDYotbxwsUOxSeJosRBQyar4CHqkL7mpi+wS3
-         EsVw==
-X-Gm-Message-State: AJIora9cupjOSVOhVAaEbPBIOzIZHuOX5a+ZrehBNdwPQYqS486LzhXR
-        bO45gmPZLGnqtI2eEcrnOYPABadawN7SEnZMYiFk5g==
-X-Google-Smtp-Source: AGRyM1vGo0mK62j7gn7FGNVciNy5Vm+ednBSsRuJC5Vz4W9QRbFg8IOFjq77y9jLpFVvqi0CbrYtxJR3JSgRSty//L0=
-X-Received: by 2002:a05:6870:c596:b0:101:6409:ae62 with SMTP id
- ba22-20020a056870c59600b001016409ae62mr11029906oab.112.1656352233275; Mon, 27
- Jun 2022 10:50:33 -0700 (PDT)
+        bh=Z4QV8HZyP/VA+g9JqMm75BLwevsM4iFeMnarLv23qdI=;
+        b=ztlQYnWExDUFEy031nSfMVs+UgeR7xYVt6j7AJT4YoOnxvsX42S3tPPeGSU0Pu8kG9
+         rAjvfSN69nJvjqZEOiyRQQ7IO1DwMf2baycLrlZzl4lVsDOl6M4+quif9a72F1ya0Zuw
+         6EGqE0g8+w9w4aIhHMewDujRMELIwW/XbnUdJLqleItSc56PrYS47gRvIh+vAzJ5Ue3+
+         ME0+xG3eatE1gdjnftp89WNSNLXMefHunxlIlerifjYly9qt1OWUYighKsmGNzu91y3D
+         dS2sdNIkzp/PiMozec7qAaGGuSg87x8omNu8aqxdkBvdY/PpGcybl1xhLe0YuqDdNTi1
+         8CNg==
+X-Gm-Message-State: AJIora8VvastYbWns4GFN5aPNQiY6ZqDwBQix15puzLkXqAdOb8mPTKt
+        RyswbU5FtElsO1GP143SriXKqdHP8ZDTrCgeaCJG3A==
+X-Google-Smtp-Source: AGRyM1teebrksgnAxIMlDEIxnmhBx/J4YBMYUdgB2QIqWZpHTzRQK2Y2w+UaldD3P6zRJv36xJ5tIPpI6chs4TIzDm0=
+X-Received: by 2002:a4a:e82b:0:b0:330:cee9:4a8a with SMTP id
+ d11-20020a4ae82b000000b00330cee94a8amr6393702ood.31.1656352804168; Mon, 27
+ Jun 2022 11:00:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220627160440.31857-1-vkuznets@redhat.com>
-In-Reply-To: <20220627160440.31857-1-vkuznets@redhat.com>
+References: <20220622222408.518889-1-jmattson@google.com> <YrnH+nhnbhDFAMas@google.com>
+In-Reply-To: <YrnH+nhnbhDFAMas@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 27 Jun 2022 10:50:22 -0700
-Message-ID: <CALMp9eQL2a+mStk-cLwVX6NVqwAso2UYxAO7UD=Xi2TSGwUM2A@mail.gmail.com>
-Subject: Re: [PATCH 00/14] KVM: nVMX: Use vmcs_config for setting up nested
- VMX MSRs
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 27 Jun 2022 10:59:53 -0700
+Message-ID: <CALMp9eS3ZbV6aEDihw4LskWQuUyLs4HawK+x_5imykngE=a39w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Move VM-exit RSB stuffing out of line
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -71,59 +65,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 9:04 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On Mon, Jun 27, 2022 at 8:08 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Changes since RFC:
-> - "KVM: VMX: Extend VMX controls macro shenanigans" PATCH added and the
->   infrastructure is later used in other patches [Sean] PATCHes 1-3 added
->   to support the change.
-> - "KVM: VMX: Clear controls obsoleted by EPT at runtime, not setup" PATCH
->   added [Sean].
-> - Commit messages added.
+> On Wed, Jun 22, 2022, Jim Mattson wrote:
+> > RSB-stuffing after VM-exit is only needed for legacy CPUs without
+> > eIBRS. Move the RSB-stuffing code out of line.
 >
-> vmcs_config is a sanitized version of host VMX MSRs where some controls are
-> filtered out (e.g. when Enlightened VMCS is enabled, some know bugs are
-> discovered, some inconsistencies in controls are detected,...) but
-> nested_vmx_setup_ctls_msrs() uses raw host MSRs instead. This may end up
-> in exposing undesired controls to L1. Switch to using vmcs_config instead.
+> I assume the primary justification is purely to avoid the JMP on modern CPUs?
 >
-> Sean Christopherson (1):
->   KVM: VMX: Clear controls obsoleted by EPT at runtime, not setup
+> > Preserve the non-sensical correlation of RSB-stuffing with retpoline.
 >
-> Vitaly Kuznetsov (13):
->   KVM: VMX: Check VM_ENTRY_IA32E_MODE in setup_vmcs_config()
->   KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING in
->     setup_vmcs_config()
->   KVM: VMX: Tweak the special handling of SECONDARY_EXEC_ENCLS_EXITING
->     in setup_vmcs_config()
->   KVM: VMX: Extend VMX controls macro shenanigans
->   KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering out of
->     setup_vmcs_config()
->   KVM: VMX: Add missing VMEXIT controls to vmcs_config
->   KVM: VMX: Add missing VMENTRY controls to vmcs_config
->   KVM: VMX: Add missing CPU based VM execution controls to vmcs_config
->   KVM: nVMX: Use sanitized allowed-1 bits for VMX control MSRs
->   KVM: VMX: Store required-1 VMX controls in vmcs_config
->   KVM: nVMX: Use sanitized required-1 bits for VMX control MSRs
->   KVM: VMX: Cache MSR_IA32_VMX_MISC in vmcs_config
->   KVM: nVMX: Use cached host MSR_IA32_VMX_MISC value for setting up
->     nested MSR
->
->  arch/x86/kvm/vmx/capabilities.h |  16 +--
->  arch/x86/kvm/vmx/nested.c       |  37 +++---
->  arch/x86/kvm/vmx/nested.h       |   2 +-
->  arch/x86/kvm/vmx/vmx.c          | 198 ++++++++++++++------------------
->  arch/x86/kvm/vmx/vmx.h          | 118 +++++++++++++++++++
->  5 files changed, 229 insertions(+), 142 deletions(-)
->
-> --
-> 2.35.3
->
+> Either omit the blurb about retpoline, or better yet expand on why it's nonsensical
+> and speculate a bit on why it got tied to retpoline?
 
-Just checking that this doesn't introduce any backwards-compatibility
-issues. That is, all features that were reported as being available in
-the past should still be available moving forward.
+I can expand on why it's nonsensical. I cannot speculate on why it got
+tied to retpoline, but perhaps someone on this list knows?
 
-Thanks,
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmenter.S | 10 +++++++---
+> >  1 file changed, 7 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> > index 435c187927c4..39009a4c86bd 100644
+> > --- a/arch/x86/kvm/vmx/vmenter.S
+> > +++ b/arch/x86/kvm/vmx/vmenter.S
+> > @@ -76,7 +76,12 @@ SYM_FUNC_END(vmx_vmenter)
+> >   */
+> >  SYM_FUNC_START(vmx_vmexit)
+> >  #ifdef CONFIG_RETPOLINE
+> > -     ALTERNATIVE "jmp .Lvmexit_skip_rsb", "", X86_FEATURE_RETPOLINE
+> > +     ALTERNATIVE "", "jmp .Lvmexit_stuff_rsb", X86_FEATURE_RETPOLINE
+> > +#endif
+> > +.Lvmexit_return:
+> > +     RET
+> > +#ifdef CONFIG_RETPOLINE
+> > +.Lvmexit_stuff_rsb:
+> >       /* Preserve guest's RAX, it's used to stuff the RSB. */
+> >       push %_ASM_AX
+>
+> There's a comment in the code here about stuffiing before RET, I think it makes
+> sense to keep that before the RET, i.e. hoist it out of the actual stuffing
+> sequence so that it looks like:
+>
+> #ifdef CONFIG_RETPOLINE
+>         /* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+>         ALTERNATIVE "", "jmp .Lvmexit_stuff_rsb", X86_FEATURE_RETPOLINE
+> #endif
+> .Lvmexit_return:
+>         RET
+>
+> Ha!  Better idea.  Rather than have a bunch of nops to eat through before the
+> !RETPOLINE case gets to the RET, encode the RET as the default.  That allows using
+> a single #ifdef and avoids both the JMP over the RET as well as the JMP back to the
+> RET, and saves 4 nops to boot.
+
+I had considered that option, but I doubt that it will be long before
+someone wants to undo it. In any case, I will make that change in
+version 2.
+
+Thanks!
 
 --jim
