@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD11D55E2B5
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:36:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70EBD55D72D
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:18:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239284AbiF0Vzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:55:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59444 "EHLO
+        id S241433AbiF0Vzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:55:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241365AbiF0Vy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S241368AbiF0Vy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 27 Jun 2022 17:54:58 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054EB63C5;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A3263D5;
         Mon, 27 Jun 2022 14:54:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656366895; x=1687902895;
+  t=1656366896; x=1687902896;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ncNIt0DVblJprtw0IA2haoHQ8Feuv1HEbxzFNl+9ODk=;
-  b=llp0dLvpgBDsHskeJ42q7MtPkAbNlqeV++r5MjNvsIKV/ELcH9yOYGVU
-   tL6gs6LBjVsimWzwndFr4L7UyMqhuu4Jmy3ONmPrDPaeJmrqu8FEUuPdc
-   3QSmvQvtqNm6u8c1XsZ2g2vQ62tzsrk2wHg/t8q1rjf/+UjHGyxHVevYs
-   B0p+agabthWEJcs7mdj6hweXl1Z17ZiosHYhyxIyTJ9TgNpHWXMa7rDuS
-   qhxMxpPIVRcFNGKfUb0N5grCaZAfa82C8sCh0XgteoMlrVUdHe1WBgof3
-   DGPXuNnQvzqVZ4S0rIoHADXtzyurJTOCj+ERSufZBhd3123aXFh9ZbZle
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609526"
+  bh=CQmog2ttJcoHhAh9OiiLQQ5rhSR/GzRAHoEUrfSqJf0=;
+  b=NKnZluTIM0AQ6PV9+X4/oDSyj6SW8PqpkfBToZAt0FMWWGxRk3ZoO2WY
+   MaiIARmth3bbEWcuxob6RDodIIDRaG+/Y8vd8FLR7AKb+b3lwSnmq8bk8
+   s9IeVNLhAEM1YqG/iJQTG+MhJnO7bNfncfWuboTYayrQJxVH80A0XZKeW
+   rtToCgJ8malk9cv4IasO9f5wOCSCOxWE20DWZvPIdWqroP/O+ZE3XA7nH
+   yOqlPf2YhdLiJF7+RgsEw76LbvwBXKhN8Y+Kl4Jp/004twxWmaLF/bXvJ
+   lsrXMfeKKQJpqIRM5/YUbcz0l7ufEf86bjXkXS34t5IM0q3t6HQx5OIhY
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609527"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="281609526"
+   d="scan'208";a="281609527"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:51 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="657863523"
+   d="scan'208";a="657863528"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:51 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v7 028/102] KVM: TDX: allocate/free TDX vcpu structure
-Date:   Mon, 27 Jun 2022 14:53:20 -0700
-Message-Id: <cfc7cfc72ea187b31e1c39df379a20545ca9b686.1656366338.git.isaku.yamahata@intel.com>
+Subject: [PATCH v7 029/102] KVM: TDX: allocate/free TDX vcpu structure
+Date:   Mon, 27 Jun 2022 14:53:21 -0700
+Message-Id: <dad0333516bcdb0fdeccc9d1483299aeae8d80fd.1656366338.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
@@ -70,169 +70,94 @@ on the vcpu initialization.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 135 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 135 insertions(+)
+ arch/x86/kvm/vmx/main.c    | 40 ++++++++++++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/x86_ops.h |  8 ++++++++
+ 2 files changed, 44 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 1273b60a1a00..d9fe3f6463c3 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -6,6 +6,7 @@
- #include "capabilities.h"
- #include "x86_ops.h"
- #include "tdx.h"
-+#include "x86.h"
- 
- #undef pr_fmt
- #define pr_fmt(fmt) "tdx: " fmt
-@@ -61,6 +62,11 @@ static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
- 	return pa;
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 067f5de56c53..4f4ed4ad65a7 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -73,6 +73,38 @@ static void vt_vm_free(struct kvm *kvm)
+ 		return tdx_vm_free(kvm);
  }
  
-+static inline bool is_td_vcpu_created(struct vcpu_tdx *tdx)
++static int vt_vcpu_precreate(struct kvm *kvm)
 +{
-+	return tdx->tdvpr.added;
++	if (is_td(kvm))
++		return 0;
++
++	return vmx_vcpu_precreate(kvm);
 +}
 +
- static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
++static int vt_vcpu_create(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return tdx_vcpu_create(vcpu);
++
++	return vmx_vcpu_create(vcpu);
++}
++
++static void vt_vcpu_free(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return tdx_vcpu_free(vcpu);
++
++	return vmx_vcpu_free(vcpu);
++}
++
++static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
++{
++	if (is_td_vcpu(vcpu))
++		return tdx_vcpu_reset(vcpu, init_event);
++
++	return vmx_vcpu_reset(vcpu, init_event);
++}
++
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	return kvm_tdx->tdr.added;
-@@ -392,6 +398,135 @@ int tdx_vm_init(struct kvm *kvm)
- 	return ret;
- }
+ 	if (!is_td(kvm))
+@@ -98,10 +130,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.vm_destroy = vt_vm_destroy,
+ 	.vm_free = vt_vm_free,
  
-+int tdx_vcpu_create(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	int ret, i;
+-	.vcpu_precreate = vmx_vcpu_precreate,
+-	.vcpu_create = vmx_vcpu_create,
+-	.vcpu_free = vmx_vcpu_free,
+-	.vcpu_reset = vmx_vcpu_reset,
++	.vcpu_precreate = vt_vcpu_precreate,
++	.vcpu_create = vt_vcpu_create,
++	.vcpu_free = vt_vcpu_free,
++	.vcpu_reset = vt_vcpu_reset,
+ 
+ 	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
+ 	.vcpu_load = vmx_vcpu_load,
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index ef6115ae0e88..42b634971544 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -138,6 +138,10 @@ int tdx_vm_init(struct kvm *kvm);
+ void tdx_mmu_release_hkid(struct kvm *kvm);
+ void tdx_vm_free(struct kvm *kvm);
+ 
++int tdx_vcpu_create(struct kvm_vcpu *vcpu);
++void tdx_vcpu_free(struct kvm_vcpu *vcpu);
++void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
 +
-+	/* TDX only supports x2APIC, which requires an in-kernel local APIC. */
-+	if (!vcpu->arch.apic)
-+		return -EINVAL;
+ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+ #else
+ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
+@@ -150,6 +154,10 @@ static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
+ static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
+ static inline void tdx_vm_free(struct kvm *kvm) {}
+ 
++static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
++static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
++static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
 +
-+	fpstate_set_confidential(&vcpu->arch.guest_fpu);
-+
-+	ret = tdx_alloc_td_page(&tdx->tdvpr);
-+	if (ret)
-+		return ret;
-+
-+	tdx->tdvpx = kcalloc(tdx_caps.tdvpx_nr_pages, sizeof(*tdx->tdvpx),
-+			GFP_KERNEL_ACCOUNT);
-+	if (!tdx->tdvpx) {
-+		ret = -ENOMEM;
-+		goto free_tdvpr;
-+	}
-+	for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++) {
-+		ret = tdx_alloc_td_page(&tdx->tdvpx[i]);
-+		if (ret)
-+			goto free_tdvpx;
-+	}
-+
-+	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
-+
-+	vcpu->arch.cr0_guest_owned_bits = -1ul;
-+	vcpu->arch.cr4_guest_owned_bits = -1ul;
-+
-+	vcpu->arch.tsc_offset = to_kvm_tdx(vcpu->kvm)->tsc_offset;
-+	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
-+	vcpu->arch.guest_state_protected =
-+		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTRIBUTE_DEBUG);
-+
-+	return 0;
-+
-+free_tdvpx:
-+	/* @i points at the TDVPX page that failed allocation. */
-+	for (--i; i >= 0; i--)
-+		free_page(tdx->tdvpx[i].va);
-+	kfree(tdx->tdvpx);
-+free_tdvpr:
-+	free_page(tdx->tdvpr.va);
-+
-+	return ret;
-+}
-+
-+void tdx_vcpu_free(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	int i;
-+
-+	/* Can't reclaim or free pages if teardown failed. */
-+	if (is_hkid_assigned(to_kvm_tdx(vcpu->kvm)))
-+		return;
-+
-+	for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++)
-+		tdx_reclaim_td_page(&tdx->tdvpx[i]);
-+	kfree(tdx->tdvpx);
-+	tdx_reclaim_td_page(&tdx->tdvpr);
-+}
-+
-+void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	struct msr_data apic_base_msr;
-+	u64 err;
-+	int i;
-+
-+	/* TDX doesn't support INIT event. */
-+	if (WARN_ON(init_event))
-+		goto td_bugged;
-+	if (WARN_ON(is_td_vcpu_created(tdx)))
-+		goto td_bugged;
-+
-+	err = tdh_vp_create(kvm_tdx->tdr.pa, tdx->tdvpr.pa);
-+	if (WARN_ON_ONCE(err)) {
-+		pr_tdx_error(TDH_VP_CREATE, err, NULL);
-+		goto td_bugged;
-+	}
-+	tdx_mark_td_page_added(&tdx->tdvpr);
-+
-+	for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++) {
-+		err = tdh_vp_addcx(tdx->tdvpr.pa, tdx->tdvpx[i].pa);
-+		if (WARN_ON_ONCE(err)) {
-+			pr_tdx_error(TDH_VP_ADDCX, err, NULL);
-+			goto td_bugged;
-+		}
-+		tdx_mark_td_page_added(&tdx->tdvpx[i]);
-+	}
-+
-+	if (!vcpu->arch.cpuid_entries) {
-+		/*
-+		 * On cpu creation, cpuid entry is blank.  Forcibly enable
-+		 * X2APIC feature to allow X2APIC.
-+		 */
-+		struct kvm_cpuid_entry2 *e;
-+
-+		e = kvmalloc_array(1, sizeof(*e), GFP_KERNEL_ACCOUNT);
-+		*e  = (struct kvm_cpuid_entry2) {
-+			.function = 1,	/* Features for X2APIC */
-+			.index = 0,
-+			.eax = 0,
-+			.ebx = 0,
-+			.ecx = 1ULL << 21,	/* X2APIC */
-+			.edx = 0,
-+		};
-+		vcpu->arch.cpuid_entries = e;
-+		vcpu->arch.cpuid_nent = 1;
-+	}
-+	apic_base_msr.data = APIC_DEFAULT_PHYS_BASE | LAPIC_MODE_X2APIC;
-+	if (kvm_vcpu_is_reset_bsp(vcpu))
-+		apic_base_msr.data |= MSR_IA32_APICBASE_BSP;
-+	apic_base_msr.host_initiated = true;
-+	if (WARN_ON(kvm_set_apic_base(vcpu, &apic_base_msr)))
-+		goto td_bugged;
-+
-+	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-+
-+	return;
-+
-+td_bugged:
-+	vcpu->kvm->vm_bugged = true;
-+}
-+
- int tdx_dev_ioctl(void __user *argp)
- {
- 	struct kvm_tdx_capabilities __user *user_caps;
+ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+ #endif
+ 
 -- 
 2.25.1
 
