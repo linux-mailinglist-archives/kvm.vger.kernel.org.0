@@ -2,167 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E61255CF48
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:06:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E38D55CD31
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:02:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241200AbiF0Vgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40954 "EHLO
+        id S241364AbiF0Vy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:54:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236180AbiF0Vgj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 17:36:39 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5AD10FF;
-        Mon, 27 Jun 2022 14:36:38 -0700 (PDT)
+        with ESMTP id S241229AbiF0Vyu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 17:54:50 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74875F7F;
+        Mon, 27 Jun 2022 14:54:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656365798; x=1687901798;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/Pwkh0uaaHn/paz+I3Jd0J5JSGkYUy5dysY8kQJiyz0=;
-  b=NUrucmQ9b/sFLLkjQ+m8g61IcAD0leLwky2Qp3yFskHJ89LjjWOSB7r7
-   ajOIYiHKzb6TYddoMRINv9Uy/W1Ote6Msw8txvlwPUAwZGcsXdqsjkM8L
-   r0vXVsc1kXXwQ1vXsEi9sNTz9HDnwgnLemFfbWY5ywBQlcoTHi61t5D68
-   Y8tOnj6U1P6wMRUNbQPK+TosWoLp7oYIts5aaY3pB4UW0AGAiN5ZVkmAS
-   snNAtDYOA0gYZozs4r/knvQlpKpozzGGzcuqXYRIxHohaS1uL6EPWBpH0
-   9JiTxyGBReaOLBZ+9k5ecUjhc5Cta2dJl/UokcjSYESc2E15oRn2Yqa8p
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="264610031"
+  t=1656366887; x=1687902887;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qebzYNuPLsnLQPYI/UBRy7X0MGiUMKjYV6GQnYQn6ZY=;
+  b=nBv5bATGs4q4tdQeYVVvDOHsy58x5C8ZVbQ+QfHD/G12/AiIX9nI5RNe
+   oCspNN8C0ygvQvvv+xQIxw/vEA0sFRd63a/69BXiYBN+ywFJEtrRGa7IH
+   gmrJoTYit4bj4sERCQUlOTuSCtK1AQkoPiMlMWHAU1Kgy4aPVTyFX2JeW
+   S/Pu9B4av3hVmeYvm7SumUDmja+Wgo+itiZJLqhqSCTEPXdkdShitFQEM
+   ekgCFcYXSM2n0CO0Cjuqrlx7Y2+SC4ATP8wTs6w4fSW3m5pi5cHG4TQod
+   1Yzr8tMmh9TDo81/Y2MLdb4+xyuVuyo1u5FrzhzpcIHG7hAHfOcCvvr4H
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="345570490"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="264610031"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:36:38 -0700
-X-ExtLoop1: 1
+   d="scan'208";a="345570490"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:47 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="836380542"
-Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
-  by fmsmga006.fm.intel.com with ESMTP; 27 Jun 2022 14:36:37 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Mon, 27 Jun 2022 14:36:37 -0700
-Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Mon, 27 Jun 2022 14:36:37 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Mon, 27 Jun 2022 14:36:36 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.48) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.27; Mon, 27 Jun 2022 14:36:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZifawIHS82eafGEnYWXWJWsqh3kMlnGaSimq1G9h0YUl4797XwYcNDFBeqX5b5VO0tmKGGePj313gFhSkoVbFS8Gk1HFuxYC+vXWu/VNbZgpNBV5+rEI97XTCFhC9IE/HJ8zl9v5XwWHulEVPExrwr2vWCf59vhnPzQhrcFn+I6qP01J8Y+8gqJOyMp2AvnI35w9yvuXR6/fZdmWpWKUuOJqLSNGM9ezhppdggCtHuRS7kzIjSPzGxJjRX342j8gJB98Iy1tIHrfpaiZF3PO+vN/Ng8tUzdGtb6C1QS+Fzy88MMBKYOXjQoSNO1f9WXiF7N6eWttdqmtEPVXWQYvRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/Pwkh0uaaHn/paz+I3Jd0J5JSGkYUy5dysY8kQJiyz0=;
- b=cYSXiebN9QsNn7D1wT6EccgC3nDuhfru+RYdAC6T9FaE6dBRg7ptt26StJjJy//v5IExQM1EUVBFvWCL4AJ5BIyaSwgP8mfB9GtBwyvvnyMwH9TiH179C5IaRaUrfYnqjF6c3zFaMRY64WFpMRVzY3vZo1FkIZo6rfccj4h3c1t7Mh5qNevsDWnR9gs5kd1j4bRLTwRW7VZ0PeWICJ9V7aW+TMqblx9Ver+3Pr3VImG2M+TZf+H0Fy8eIJIH6S1SgkkHK4U485nVfp8lTN5FIDMav6u7xRYbok3+KHqsoCjqTN044Onj+xr7YLpu5hT0Z0ax2NWr3KAdb3Ohr3K8TQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3042.namprd11.prod.outlook.com (2603:10b6:208:78::17)
- by MWHPR11MB1647.namprd11.prod.outlook.com (2603:10b6:301:d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.18; Mon, 27 Jun
- 2022 21:36:33 +0000
-Received: from BL0PR11MB3042.namprd11.prod.outlook.com
- ([fe80::f8f7:ef02:6185:285c]) by BL0PR11MB3042.namprd11.prod.outlook.com
- ([fe80::f8f7:ef02:6185:285c%7]) with mapi id 15.20.5373.019; Mon, 27 Jun 2022
- 21:36:33 +0000
-From:   "Dong, Eddie" <eddie.dong@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-CC:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 04/14] KVM: VMX: Extend VMX controls macro shenanigans
-Thread-Topic: [PATCH 04/14] KVM: VMX: Extend VMX controls macro shenanigans
-Thread-Index: AQHYik6KKFE01MBgH0muEzHMVocHMK1jv5fQ
-Date:   Mon, 27 Jun 2022 21:36:33 +0000
-Message-ID: <BL0PR11MB304264B62299D642FF906C298AB99@BL0PR11MB3042.namprd11.prod.outlook.com>
-References: <20220627160440.31857-1-vkuznets@redhat.com>
- <20220627160440.31857-5-vkuznets@redhat.com>
-In-Reply-To: <20220627160440.31857-5-vkuznets@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.6.500.17
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8b90c33e-24bc-4b50-b275-08da58851b0e
-x-ms-traffictypediagnostic: MWHPR11MB1647:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +h/8pbZm+BbSp6QT8tnPE0lro7k1f622gDTXSkaf4vqg1EbeNf+uyfDAappSgIOXtSPQMduiusoK8m2GanqUKKjiG0zayEoU1whCkB76ZCaT4xefShUw5MsaTKEarIXPk/ry+NPzJ8RCw9Q4kO1ZqPUgS3rh/JMsOhp8oSA51Fi3xkAlsasrgC5QFYGezY4PVYyD7yj8Psooy1+ptwKJOB0ctJ3ZzHqXn6v5FFQTbxP5FOCVa7OF7hUN662o2Xpbe6skVtDt02C88pIO0qG/Vr6/G1xw2zlqwbzu7ERTcW0ej7qsDbHIH6lwFU7oWUWtZ6NWnBI0gkeZABASeIBWGoczDY/bQgvXzTO09c6RWsQjkYlkS0eeOR1U2HOz1k+iBXD0ujMQ1ZVmiA6BleO8bhXLXTwth2fdqctYLytzJyNv76K6+YjNfUnNcIj6le5aPmPe2vRyZYbXc2aSXoaF1WgYRVUgkn5HiZMufaWVsVO8FZaAoDGO4zZxWIkpb1hbSlK80I350Ko+aFin9nC2B5jIpacGvkMCx3F+60hEyWntuylptgomzPStD7FJklX0e6lltL0r7IcZsElxvsCrbGUqpF465Y83CM3MV8nVbZimrK2DlK4Rl5CLWg2V9Rwq8koyhosPiu5JRrtuRpiNrL8mFs/bu29Xm0tX2aRuo089WtCqm5DaY6AQSEa60Y8F4Y/lbPJXGO/n79cWY8Qkv3gUDWIfr+Y2sp37URgU5bVZyRCvwfh0QYyv1dcw0V+A/mNKgW/5dIym3+eYuNeCGQK9Sw6yD/YqBc66mMNcUUc=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3042.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(396003)(346002)(366004)(376002)(39860400002)(136003)(66476007)(41300700001)(66446008)(64756008)(66556008)(478600001)(66946007)(30864003)(122000001)(76116006)(8936002)(71200400001)(6506007)(8676002)(86362001)(4326008)(9686003)(110136005)(53546011)(186003)(7416002)(83380400001)(54906003)(82960400001)(55016003)(5660300002)(7696005)(2906002)(38070700005)(316002)(52536014)(26005)(38100700002)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?b0Fsdm0vZisvNWp4YllPMmlxUG5iaEsrZUxOZzhySG93MUgvYXFMN3RUYU5n?=
- =?utf-8?B?Mm9YRnZ2d0hEaDJtWGdtVndUT1BuR1BkdmdPeElocGoyRlRYdlliZW1EZWpj?=
- =?utf-8?B?ZWxRNVZpTHJGSWdmOFRGd3BUT0dtaXgwUkxIUFdhak1hamI0d1lWSDBHaVdz?=
- =?utf-8?B?SXd4cW96OTJGUFZnVXFBNkZ2RkFNakhRRVl0WlUrL3pVZCtVK1VTZFdqa21C?=
- =?utf-8?B?Mi9LbldYU2hOZEtiUU5xdEFMNFJsODh0RCt2Z3VOa0dwNE01UXJpVUJRbC9N?=
- =?utf-8?B?Sjc2T3ZoZUs1ZjY2ZzljU3lSZ3JIN29UcVRGMEkwMjA5cmg2bmhwa1YzVUtG?=
- =?utf-8?B?TGNpdFZ2U0Y3TWRLOEVqUG9Sc3laUmd2MWV6cTRubUNLVFBSU1FIL2FWdndn?=
- =?utf-8?B?b1VBV3hnaG9aVE9Namt4WTJaeStRNE00NHkxUSt6SGtTQVZsUlNOcTk1amhY?=
- =?utf-8?B?amttdE1WY1N3YzE4b0NtNFFLK09rYWVZR2oxdnhlMnpacWJWRFczR3VMc3pB?=
- =?utf-8?B?TGZaMTdtUkdVSFlBWjgwM3E0UDV0NTV5aCtna0Q1S2NuckRhMVJuMVR4YmNR?=
- =?utf-8?B?VVZtbGk1a1NTTXN0d05xSC83UUpsSDVlQVZEWW00UmhEYndBVmNHOWhuWHRC?=
- =?utf-8?B?VVd0dmV4ek1XeUFieE43Z0FsZjI2a0JETU1YWmdGYy9wUFRPMGlwTmpKbmdC?=
- =?utf-8?B?bElUbTQzMkE2Uk5FVVI4WTZFb3JjeUNiWlRpamRhRFFFU3MwVGExaGMwWk5D?=
- =?utf-8?B?cWpadjN6TzFPOGZEOUEvOVJyamZDVmk0bm1KTFN0OHE0SXZUM3ZvU1dqd1hu?=
- =?utf-8?B?U2RmRDU3ZDJJekpmTkllaWs2ZDd2Z2xzVXVsMzZRU29lYWdHOXQ3eFN6NG44?=
- =?utf-8?B?ZGRaMFQ3QktXdGRaWlpveFpKN01Yb0Y4ajlVdnZ1Y0pjTXVxYkkrMUE1ZWJ6?=
- =?utf-8?B?SFEwNU9LS2UzbUMrV1I1L1BpcWlWY2l1ditXNnl6dktjNmV2ZjRaVVY1Yy9h?=
- =?utf-8?B?aytqRnN0eTZyVnAwK3NQcEZSSkRIS254K2xJaWt6Ty9WeTc5TFQ0a3YvNFdn?=
- =?utf-8?B?Vk42WWltbEN2S3VxWGRLK29ZQkZYOW05YW9sR0xYMGlaR2dEcEsvVE1iV1l0?=
- =?utf-8?B?b2dRVXRXRmhxZ2FSN2YwNEN0WlREdVRzZDBMNDJNS25XcllTSTVqRnBkaFJU?=
- =?utf-8?B?QkJPWUMxdXIrOXZ5bnVoWHRzUkZ6L1dCc2kvT1NxL0lRVjMxZnNTYXNvUVBr?=
- =?utf-8?B?Z3YxZGlDT013MjFHa0hFLzZlbFNqWHVxRnVsTW1vUmdEUGdVZGRReEhNSEc3?=
- =?utf-8?B?aHFwYW9jV2syZEdLOHlRQmlKaDBsbW42Nm9jazY5bkplamlXSzU3Q09zU0Vk?=
- =?utf-8?B?ZGVmT1JSVGxiRXQrN2N5ZlhrQlczOXNTS1gzMjRCTGsyekRnZzYyUnBQYXdU?=
- =?utf-8?B?RzdWRXJjVjk1WWpWMVZmWm5CVzJRclp2cTdWb0t1anJzYUd0Q3dlaEFEUzNL?=
- =?utf-8?B?MDNqdUZpR0Z6L3pHc1FiUFZsNmp3T1JFWmkwTENramNhNHg5YzE2WDdab1pO?=
- =?utf-8?B?SDJlaEVTY2ZPaGVHVGpFMjB1L21IRVo5a2M1am53NXpwUzhXMjBmWjVqdHJi?=
- =?utf-8?B?TFdvZ2JxdE5xenoyZURkd0l0WXlPdER0R1EzYVpPN3VjQzduRFZRRTFtNTFq?=
- =?utf-8?B?SlhGRjhwOXBSNG9jY0w3eU1kcXJHWndBdi8xdnpKMHVhK2srVzJKOVZPdHZm?=
- =?utf-8?B?Qzk2b1JZbmh3SmRFRHV3dzZWKzZJMGk5WkVMVCtiMDhNT0VPNU92TW55bzJW?=
- =?utf-8?B?d3BNVmx6bTY4aVRLVTFBbEM1T0FNU1hoaDluMmE2d2NQQXNwS1UyMEhiRzFu?=
- =?utf-8?B?NUw4UEU3b0JDb2hOTCtkcXY5dlVvOFBGQmg0RENyZzR1NTZtTmk4eG1rdXIr?=
- =?utf-8?B?SkJ5b01UbzhLS1dlMmN0Z0RJZG1sa0ZTTUN6V1h3T2hCZnRkN2ErSWFxZkxV?=
- =?utf-8?B?RTkraXo2eGg3K2xXb0V6ckVKS2dIbEdTVnhHR2VzeExia00xQXBrVUE1VG9D?=
- =?utf-8?B?WGZBR1gwN0lheXlsaXNhM3E2bUExbE5yYW5KR09oeXFKUkthVm14Y0ZWUith?=
- =?utf-8?Q?f/9tuCYmBcfa5IS1laU4Skc/O?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="679762550"
+Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:47 -0700
+From:   isaku.yamahata@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v7 000/102] KVM TDX basic feature support
+Date:   Mon, 27 Jun 2022 14:52:52 -0700
+Message-Id: <cover.1656366337.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3042.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b90c33e-24bc-4b50-b275-08da58851b0e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2022 21:36:33.3876
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jdkx7STJWeeVDIa3KY/73ILUK58UJNerFj/YQvdVWiE1K9Q7k2UHtAdIeEtryBaM5kzBstn+zAoTs7PzDMdK/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1647
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75 autolearn=no
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -170,214 +56,778 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVml0YWx5IEt1em5ldHNv
-diA8dmt1em5ldHNAcmVkaGF0LmNvbT4NCj4gU2VudDogTW9uZGF5LCBKdW5lIDI3LCAyMDIyIDk6
-MDUgQU0NCj4gVG86IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IFBhb2xvIEJvbnppbmkgPHBib256aW5p
-QHJlZGhhdC5jb20+Ow0KPiBDaHJpc3RvcGhlcnNvbiwsIFNlYW4gPHNlYW5qY0Bnb29nbGUuY29t
-Pg0KPiBDYzogQW5pcnVkaCBSYXlhYmhhcmFtIDxhbnJheWFiaEBsaW51eC5taWNyb3NvZnQuY29t
-PjsgV2FucGVuZyBMaQ0KPiA8d2FucGVuZ2xpQHRlbmNlbnQuY29tPjsgSmltIE1hdHRzb24gPGpt
-YXR0c29uQGdvb2dsZS5jb20+OyBNYXhpbQ0KPiBMZXZpdHNreSA8bWxldml0c2tAcmVkaGF0LmNv
-bT47IGxpbnV4LWh5cGVydkB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5r
-ZXJuZWwub3JnDQo+IFN1YmplY3Q6IFtQQVRDSCAwNC8xNF0gS1ZNOiBWTVg6IEV4dGVuZCBWTVgg
-Y29udHJvbHMgbWFjcm8gc2hlbmFuaWdhbnMNCj4gDQo+IFdoZW4gVk1YIGNvbnRyb2xzIG1hY3Jv
-cyBhcmUgdXNlZCB0byBzZXQgb3IgY2xlYXIgYSBjb250cm9sIGJpdCwgbWFrZSBzdXJlDQo+IHRo
-YXQgdGhpcyBiaXQgd2FzIGNoZWNrZWQgaW4gc2V0dXBfdm1jc19jb25maWcoKSBhbmQgdGh1cyBp
-cyBwcm9wZXJseQ0KPiByZWZsZWN0ZWQgaW4gdm1jc19jb25maWcuDQo+IA0KPiBObyBmdW5jdGlv
-bmFsIGNoYW5nZSBpbnRlbmRlZC4NCj4gDQo+IFN1Z2dlc3RlZC1ieTogU2VhbiBDaHJpc3RvcGhl
-cnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IFZpdGFseSBLdXpuZXRz
-b3YgPHZrdXpuZXRzQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgYXJjaC94ODYva3ZtL3ZteC92bXgu
-YyB8ICA5OSArKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICBhcmNoL3g4
-Ni9rdm0vdm14L3ZteC5oIHwgMTA5DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDEyNyBpbnNlcnRpb25zKCspLCA4MSBkZWxl
-dGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14L3ZteC5jIGIvYXJj
-aC94ODYva3ZtL3ZteC92bXguYyBpbmRleA0KPiA1MzAwZjJhZDZhMjUuLjdlZjRiYzY5ZTJjNiAx
-MDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3ZtL3ZteC92bXguYw0KPiArKysgYi9hcmNoL3g4Ni9r
-dm0vdm14L3ZteC5jDQo+IEBAIC0yNDQ4LDcgKzI0NDgsNiBAQCBzdGF0aWMgX19pbml0IGludCBz
-ZXR1cF92bWNzX2NvbmZpZyhzdHJ1Y3QNCj4gdm1jc19jb25maWcgKnZtY3NfY29uZiwNCj4gIAkJ
-CQkgICAgc3RydWN0IHZteF9jYXBhYmlsaXR5ICp2bXhfY2FwKSAgew0KPiAgCXUzMiB2bXhfbXNy
-X2xvdywgdm14X21zcl9oaWdoOw0KPiAtCXUzMiBtaW4sIG9wdCwgbWluMiwgb3B0MjsNCj4gIAl1
-MzIgX3Bpbl9iYXNlZF9leGVjX2NvbnRyb2wgPSAwOw0KPiAgCXUzMiBfY3B1X2Jhc2VkX2V4ZWNf
-Y29udHJvbCA9IDA7DQo+ICAJdTMyIF9jcHVfYmFzZWRfMm5kX2V4ZWNfY29udHJvbCA9IDA7DQo+
-IEBAIC0yNDc0LDI4ICsyNDczLDEwIEBAIHN0YXRpYyBfX2luaXQgaW50IHNldHVwX3ZtY3NfY29u
-ZmlnKHN0cnVjdA0KPiB2bWNzX2NvbmZpZyAqdm1jc19jb25mLA0KPiAgCX07DQo+IA0KPiAgCW1l
-bXNldCh2bWNzX2NvbmYsIDAsIHNpemVvZigqdm1jc19jb25mKSk7DQo+IC0JbWluID0gQ1BVX0JB
-U0VEX0hMVF9FWElUSU5HIHwNCj4gLSNpZmRlZiBDT05GSUdfWDg2XzY0DQo+IC0JICAgICAgQ1BV
-X0JBU0VEX0NSOF9MT0FEX0VYSVRJTkcgfA0KPiAtCSAgICAgIENQVV9CQVNFRF9DUjhfU1RPUkVf
-RVhJVElORyB8DQo+IC0jZW5kaWYNCj4gLQkgICAgICBDUFVfQkFTRURfQ1IzX0xPQURfRVhJVElO
-RyB8DQo+IC0JICAgICAgQ1BVX0JBU0VEX0NSM19TVE9SRV9FWElUSU5HIHwNCj4gLQkgICAgICBD
-UFVfQkFTRURfVU5DT05EX0lPX0VYSVRJTkcgfA0KPiAtCSAgICAgIENQVV9CQVNFRF9NT1ZfRFJf
-RVhJVElORyB8DQo+IC0JICAgICAgQ1BVX0JBU0VEX1VTRV9UU0NfT0ZGU0VUVElORyB8DQo+IC0J
-ICAgICAgQ1BVX0JBU0VEX01XQUlUX0VYSVRJTkcgfA0KPiAtCSAgICAgIENQVV9CQVNFRF9NT05J
-VE9SX0VYSVRJTkcgfA0KPiAtCSAgICAgIENQVV9CQVNFRF9JTlZMUEdfRVhJVElORyB8DQo+IC0J
-ICAgICAgQ1BVX0JBU0VEX1JEUE1DX0VYSVRJTkcgfA0KPiAtCSAgICAgIENQVV9CQVNFRF9JTlRS
-X1dJTkRPV19FWElUSU5HIHwNCj4gLQkgICAgICBDUFVfQkFTRURfTk1JX1dJTkRPV19FWElUSU5H
-Ow0KPiAtDQo+IC0Jb3B0ID0gQ1BVX0JBU0VEX1RQUl9TSEFET1cgfA0KPiAtCSAgICAgIENQVV9C
-QVNFRF9VU0VfTVNSX0JJVE1BUFMgfA0KPiAtCSAgICAgIENQVV9CQVNFRF9BQ1RJVkFURV9TRUNP
-TkRBUllfQ09OVFJPTFMgfA0KPiAtCSAgICAgIENQVV9CQVNFRF9BQ1RJVkFURV9URVJUSUFSWV9D
-T05UUk9MUzsNCj4gLQlpZiAoYWRqdXN0X3ZteF9jb250cm9scyhtaW4sIG9wdCwNCj4gTVNSX0lB
-MzJfVk1YX1BST0NCQVNFRF9DVExTLA0KPiArDQo+ICsJaWYNCj4gKGFkanVzdF92bXhfY29udHJv
-bHMoS1ZNX1JFUV9WTVhfQ1BVX0JBU0VEX1ZNX0VYRUNfQ09OVFJPTCwNCj4gKw0KPiAJS1ZNX09Q
-VF9WTVhfQ1BVX0JBU0VEX1ZNX0VYRUNfQ09OVFJPTCwNCj4gKwkJCQlNU1JfSUEzMl9WTVhfUFJP
-Q0JBU0VEX0NUTFMsDQo+ICAJCQkJJl9jcHVfYmFzZWRfZXhlY19jb250cm9sKSA8IDApDQo+ICAJ
-CXJldHVybiAtRUlPOw0KPiAgI2lmZGVmIENPTkZJR19YODZfNjQNCj4gQEAgLTI1MDQsMzQgKzI0
-ODUsOCBAQCBzdGF0aWMgX19pbml0IGludCBzZXR1cF92bWNzX2NvbmZpZyhzdHJ1Y3QNCj4gdm1j
-c19jb25maWcgKnZtY3NfY29uZiwNCj4gDQo+IH5DUFVfQkFTRURfQ1I4X1NUT1JFX0VYSVRJTkc7
-DQo+ICAjZW5kaWYNCj4gIAlpZiAoX2NwdV9iYXNlZF9leGVjX2NvbnRyb2wgJg0KPiBDUFVfQkFT
-RURfQUNUSVZBVEVfU0VDT05EQVJZX0NPTlRST0xTKSB7DQo+IC0JCW1pbjIgPSAwOw0KPiAtCQlv
-cHQyID0gU0VDT05EQVJZX0VYRUNfVklSVFVBTElaRV9BUElDX0FDQ0VTU0VTIHwNCj4gLQkJCVNF
-Q09OREFSWV9FWEVDX1ZJUlRVQUxJWkVfWDJBUElDX01PREUgfA0KPiAtCQkJU0VDT05EQVJZX0VY
-RUNfV0JJTlZEX0VYSVRJTkcgfA0KPiAtCQkJU0VDT05EQVJZX0VYRUNfRU5BQkxFX1ZQSUQgfA0K
-PiAtCQkJU0VDT05EQVJZX0VYRUNfRU5BQkxFX0VQVCB8DQo+IC0JCQlTRUNPTkRBUllfRVhFQ19V
-TlJFU1RSSUNURURfR1VFU1QgfA0KPiAtCQkJU0VDT05EQVJZX0VYRUNfUEFVU0VfTE9PUF9FWElU
-SU5HIHwNCj4gLQkJCVNFQ09OREFSWV9FWEVDX0RFU0MgfA0KPiAtCQkJU0VDT05EQVJZX0VYRUNf
-RU5BQkxFX1JEVFNDUCB8DQo+IC0JCQlTRUNPTkRBUllfRVhFQ19FTkFCTEVfSU5WUENJRCB8DQo+
-IC0JCQlTRUNPTkRBUllfRVhFQ19BUElDX1JFR0lTVEVSX1ZJUlQgfA0KPiAtCQkJU0VDT05EQVJZ
-X0VYRUNfVklSVFVBTF9JTlRSX0RFTElWRVJZIHwNCj4gLQkJCVNFQ09OREFSWV9FWEVDX1NIQURP
-V19WTUNTIHwNCj4gLQkJCVNFQ09OREFSWV9FWEVDX1hTQVZFUyB8DQo+IC0JCQlTRUNPTkRBUllf
-RVhFQ19SRFNFRURfRVhJVElORyB8DQo+IC0JCQlTRUNPTkRBUllfRVhFQ19SRFJBTkRfRVhJVElO
-RyB8DQo+IC0JCQlTRUNPTkRBUllfRVhFQ19FTkFCTEVfUE1MIHwNCj4gLQkJCVNFQ09OREFSWV9F
-WEVDX1RTQ19TQ0FMSU5HIHwNCj4gLQkJCVNFQ09OREFSWV9FWEVDX0VOQUJMRV9VU1JfV0FJVF9Q
-QVVTRSB8DQo+IC0JCQlTRUNPTkRBUllfRVhFQ19QVF9VU0VfR1BBIHwNCj4gLQkJCVNFQ09OREFS
-WV9FWEVDX1BUX0NPTkNFQUxfVk1YIHwNCj4gLQkJCVNFQ09OREFSWV9FWEVDX0VOQUJMRV9WTUZV
-TkMgfA0KPiAtCQkJU0VDT05EQVJZX0VYRUNfQlVTX0xPQ0tfREVURUNUSU9OIHwNCj4gLQkJCVNF
-Q09OREFSWV9FWEVDX05PVElGWV9WTV9FWElUSU5HIHwNCj4gLQkJCVNFQ09OREFSWV9FWEVDX0VO
-Q0xTX0VYSVRJTkc7DQo+IC0NCj4gLQkJaWYgKGFkanVzdF92bXhfY29udHJvbHMobWluMiwgb3B0
-MiwNCj4gKwkJaWYNCj4gKGFkanVzdF92bXhfY29udHJvbHMoS1ZNX1JFUV9WTVhfU0VDT05EQVJZ
-X1ZNX0VYRUNfQ09OVFJPTCwNCj4gKw0KPiAJS1ZNX09QVF9WTVhfU0VDT05EQVJZX1ZNX0VYRUNf
-Q09OVFJPTCwNCj4gDQo+IAlNU1JfSUEzMl9WTVhfUFJPQ0JBU0VEX0NUTFMyLA0KPiAgCQkJCQkm
-X2NwdV9iYXNlZF8ybmRfZXhlY19jb250cm9sKSA8DQo+IDApDQo+ICAJCQlyZXR1cm4gLUVJTzsN
-Cj4gQEAgLTI1ODEsMzAgKzI1MzYsMjAgQEAgc3RhdGljIF9faW5pdCBpbnQgc2V0dXBfdm1jc19j
-b25maWcoc3RydWN0DQo+IHZtY3NfY29uZmlnICp2bWNzX2NvbmYsDQo+ICAJCV9jcHVfYmFzZWRf
-Mm5kX2V4ZWNfY29udHJvbCAmPQ0KPiB+U0VDT05EQVJZX0VYRUNfRU5DTFNfRVhJVElORzsNCj4g
-DQo+ICAJaWYgKF9jcHVfYmFzZWRfZXhlY19jb250cm9sICYNCj4gQ1BVX0JBU0VEX0FDVElWQVRF
-X1RFUlRJQVJZX0NPTlRST0xTKSB7DQo+IC0JCXU2NCBvcHQzID0gVEVSVElBUllfRVhFQ19JUElf
-VklSVDsNCj4gLQ0KPiAtCQlfY3B1X2Jhc2VkXzNyZF9leGVjX2NvbnRyb2wgPQ0KPiBhZGp1c3Rf
-dm14X2NvbnRyb2xzNjQob3B0MywNCj4gLQ0KPiBNU1JfSUEzMl9WTVhfUFJPQ0JBU0VEX0NUTFMz
-KTsNCj4gKwkJX2NwdV9iYXNlZF8zcmRfZXhlY19jb250cm9sID0NCj4gKw0KPiAJYWRqdXN0X3Zt
-eF9jb250cm9sczY0KEtWTV9PUFRfVk1YX1RFUlRJQVJZX1ZNX0VYRUNfQ09ODQo+IFRST0wsDQo+
-ICsJCQlNU1JfSUEzMl9WTVhfUFJPQ0JBU0VEX0NUTFMzKTsNCj4gIAl9DQo+IA0KPiAtCW1pbiA9
-IFZNX0VYSVRfU0FWRV9ERUJVR19DT05UUk9MUyB8DQo+IFZNX0VYSVRfQUNLX0lOVFJfT05fRVhJ
-VDsNCj4gLSNpZmRlZiBDT05GSUdfWDg2XzY0DQo+IC0JbWluIHw9IFZNX0VYSVRfSE9TVF9BRERS
-X1NQQUNFX1NJWkU7DQo+IC0jZW5kaWYNCj4gLQlvcHQgPSBWTV9FWElUX0xPQURfSUEzMl9QRVJG
-X0dMT0JBTF9DVFJMIHwNCj4gLQkgICAgICBWTV9FWElUX0xPQURfSUEzMl9QQVQgfA0KPiAtCSAg
-ICAgIFZNX0VYSVRfTE9BRF9JQTMyX0VGRVIgfA0KPiAtCSAgICAgIFZNX0VYSVRfQ0xFQVJfQk5E
-Q0ZHUyB8DQo+IC0JICAgICAgVk1fRVhJVF9QVF9DT05DRUFMX1BJUCB8DQo+IC0JICAgICAgVk1f
-RVhJVF9DTEVBUl9JQTMyX1JUSVRfQ1RMOw0KPiAtCWlmIChhZGp1c3Rfdm14X2NvbnRyb2xzKG1p
-biwgb3B0LCBNU1JfSUEzMl9WTVhfRVhJVF9DVExTLA0KPiArCWlmIChhZGp1c3Rfdm14X2NvbnRy
-b2xzKEtWTV9SRVFfVk1YX1ZNX0VYSVRfQ09OVFJPTFMsDQo+ICsJCQkJS1ZNX09QVF9WTVhfVk1f
-RVhJVF9DT05UUk9MUywNCj4gKwkJCQlNU1JfSUEzMl9WTVhfRVhJVF9DVExTLA0KPiAgCQkJCSZf
-dm1leGl0X2NvbnRyb2wpIDwgMCkNCj4gIAkJcmV0dXJuIC1FSU87DQo+IA0KPiAtCW1pbiA9IFBJ
-Tl9CQVNFRF9FWFRfSU5UUl9NQVNLIHwgUElOX0JBU0VEX05NSV9FWElUSU5HOw0KPiAtCW9wdCA9
-IFBJTl9CQVNFRF9WSVJUVUFMX05NSVMgfCBQSU5fQkFTRURfUE9TVEVEX0lOVFIgfA0KPiAtCQkg
-UElOX0JBU0VEX1ZNWF9QUkVFTVBUSU9OX1RJTUVSOw0KPiAtCWlmIChhZGp1c3Rfdm14X2NvbnRy
-b2xzKG1pbiwgb3B0LCBNU1JfSUEzMl9WTVhfUElOQkFTRURfQ1RMUywNCj4gKwlpZg0KPiAoYWRq
-dXN0X3ZteF9jb250cm9scyhLVk1fUkVRX1ZNWF9QSU5fQkFTRURfVk1fRVhFQ19DT05UUk9MLA0K
-PiArDQo+IAlLVk1fT1BUX1ZNWF9QSU5fQkFTRURfVk1fRVhFQ19DT05UUk9MLA0KPiArCQkJCU1T
-Ul9JQTMyX1ZNWF9QSU5CQVNFRF9DVExTLA0KPiAgCQkJCSZfcGluX2Jhc2VkX2V4ZWNfY29udHJv
-bCkgPCAwKQ0KPiAgCQlyZXR1cm4gLUVJTzsNCj4gDQo+IEBAIC0yNjE0LDE3ICsyNTU5LDkgQEAg
-c3RhdGljIF9faW5pdCBpbnQgc2V0dXBfdm1jc19jb25maWcoc3RydWN0DQo+IHZtY3NfY29uZmln
-ICp2bWNzX2NvbmYsDQo+ICAJCVNFQ09OREFSWV9FWEVDX1ZJUlRVQUxfSU5UUl9ERUxJVkVSWSkp
-DQo+ICAJCV9waW5fYmFzZWRfZXhlY19jb250cm9sICY9IH5QSU5fQkFTRURfUE9TVEVEX0lOVFI7
-DQo+IA0KPiAtCW1pbiA9IFZNX0VOVFJZX0xPQURfREVCVUdfQ09OVFJPTFM7DQo+IC0jaWZkZWYg
-Q09ORklHX1g4Nl82NA0KPiAtCW1pbiB8PSBWTV9FTlRSWV9JQTMyRV9NT0RFOw0KPiAtI2VuZGlm
-DQo+IC0Jb3B0ID0gVk1fRU5UUllfTE9BRF9JQTMyX1BFUkZfR0xPQkFMX0NUUkwgfA0KPiAtCSAg
-ICAgIFZNX0VOVFJZX0xPQURfSUEzMl9QQVQgfA0KPiAtCSAgICAgIFZNX0VOVFJZX0xPQURfSUEz
-Ml9FRkVSIHwNCj4gLQkgICAgICBWTV9FTlRSWV9MT0FEX0JORENGR1MgfA0KPiAtCSAgICAgIFZN
-X0VOVFJZX1BUX0NPTkNFQUxfUElQIHwNCj4gLQkgICAgICBWTV9FTlRSWV9MT0FEX0lBMzJfUlRJ
-VF9DVEw7DQo+IC0JaWYgKGFkanVzdF92bXhfY29udHJvbHMobWluLCBvcHQsIE1TUl9JQTMyX1ZN
-WF9FTlRSWV9DVExTLA0KPiArCWlmIChhZGp1c3Rfdm14X2NvbnRyb2xzKEtWTV9SRVFfVk1YX1ZN
-X0VOVFJZX0NPTlRST0xTLA0KPiArCQkJCUtWTV9PUFRfVk1YX1ZNX0VOVFJZX0NPTlRST0xTLA0K
-PiArCQkJCU1TUl9JQTMyX1ZNWF9FTlRSWV9DVExTLA0KPiAgCQkJCSZfdm1lbnRyeV9jb250cm9s
-KSA8IDApDQo+ICAJCXJldHVybiAtRUlPOw0KPiANCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2
-bS92bXgvdm14LmggYi9hcmNoL3g4Ni9rdm0vdm14L3ZteC5oIGluZGV4DQo+IDI4NmM4OGUyODVl
-YS4uNTQwZmViZWNhYzkyIDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L3ZteC5oDQo+
-ICsrKyBiL2FyY2gveDg2L2t2bS92bXgvdm14LmgNCj4gQEAgLTQ2Nyw2ICs0NjcsMTEzIEBAIHN0
-YXRpYyBpbmxpbmUgdTggdm14X2dldF9ydmkodm9pZCkNCj4gIAlyZXR1cm4gdm1jc19yZWFkMTYo
-R1VFU1RfSU5UUl9TVEFUVVMpICYgMHhmZjsgIH0NCj4gDQo+ICsjZGVmaW5lIF9fS1ZNX1JFUV9W
-TVhfVk1fRU5UUllfQ09OVFJPTFMNCj4gCVwNCj4gKwkoVk1fRU5UUllfTE9BRF9ERUJVR19DT05U
-Uk9MUykNCj4gKyNpZmRlZiBDT05GSUdfWDg2XzY0DQo+ICsJI2RlZmluZSBLVk1fUkVRX1ZNWF9W
-TV9FTlRSWV9DT05UUk9MUwkJCVwNCj4gKwkJKF9fS1ZNX1JFUV9WTVhfVk1fRU5UUllfQ09OVFJP
-TFMgfAkJXA0KPiArCQlWTV9FTlRSWV9JQTMyRV9NT0RFKQ0KPiArI2Vsc2UNCj4gKwkjZGVmaW5l
-IEtWTV9SRVFfVk1YX1ZNX0VOVFJZX0NPTlRST0xTCQkJXA0KPiArCQlfX0tWTV9SRVFfVk1YX1ZN
-X0VOVFJZX0NPTlRST0xTDQo+ICsjZW5kaWYNCj4gKyNkZWZpbmUgS1ZNX09QVF9WTVhfVk1fRU5U
-UllfQ09OVFJPTFMNCj4gCVwNCj4gKwkoVk1fRU5UUllfTE9BRF9JQTMyX1BFUkZfR0xPQkFMX0NU
-UkwgfAkJCVwNCj4gKwlWTV9FTlRSWV9MT0FEX0lBMzJfUEFUIHwJCQkJXA0KPiArCVZNX0VOVFJZ
-X0xPQURfSUEzMl9FRkVSIHwJCQkJXA0KPiArCVZNX0VOVFJZX0xPQURfQk5EQ0ZHUyB8CQkJCQlc
-DQo+ICsJVk1fRU5UUllfUFRfQ09OQ0VBTF9QSVAgfAkJCQlcDQo+ICsJVk1fRU5UUllfTE9BRF9J
-QTMyX1JUSVRfQ1RMKQ0KPiArDQo+ICsjZGVmaW5lIF9fS1ZNX1JFUV9WTVhfVk1fRVhJVF9DT05U
-Uk9MUw0KPiAJXA0KPiArCShWTV9FWElUX1NBVkVfREVCVUdfQ09OVFJPTFMgfAkJCQlcDQo+ICsJ
-Vk1fRVhJVF9BQ0tfSU5UUl9PTl9FWElUKQ0KPiArI2lmZGVmIENPTkZJR19YODZfNjQNCj4gKwkj
-ZGVmaW5lIEtWTV9SRVFfVk1YX1ZNX0VYSVRfQ09OVFJPTFMJCQlcDQo+ICsJCShfX0tWTV9SRVFf
-Vk1YX1ZNX0VYSVRfQ09OVFJPTFMgfAkJXA0KPiArCQlWTV9FWElUX0hPU1RfQUREUl9TUEFDRV9T
-SVpFKQ0KPiArI2Vsc2UNCj4gKwkjZGVmaW5lIEtWTV9SRVFfVk1YX1ZNX0VYSVRfQ09OVFJPTFMJ
-CQlcDQo+ICsJCV9fS1ZNX1JFUV9WTVhfVk1fRVhJVF9DT05UUk9MUw0KPiArI2VuZGlmDQo+ICsj
-ZGVmaW5lIEtWTV9PUFRfVk1YX1ZNX0VYSVRfQ09OVFJPTFMJCQkJXA0KPiArCSAgICAgIChWTV9F
-WElUX0xPQURfSUEzMl9QRVJGX0dMT0JBTF9DVFJMIHwJCVwNCj4gKwkgICAgICBWTV9FWElUX0xP
-QURfSUEzMl9QQVQgfAkJCQlcDQo+ICsJICAgICAgVk1fRVhJVF9MT0FEX0lBMzJfRUZFUiB8CQkJ
-CVwNCj4gKwkgICAgICBWTV9FWElUX0NMRUFSX0JORENGR1MgfAkJCQlcDQo+ICsJICAgICAgVk1f
-RVhJVF9QVF9DT05DRUFMX1BJUCB8CQkJCVwNCj4gKwkgICAgICBWTV9FWElUX0NMRUFSX0lBMzJf
-UlRJVF9DVEwpDQo+ICsNCj4gKyNkZWZpbmUgS1ZNX1JFUV9WTVhfUElOX0JBU0VEX1ZNX0VYRUNf
-Q09OVFJPTA0KPiAJXA0KPiArCShQSU5fQkFTRURfRVhUX0lOVFJfTUFTSyB8CQkJCVwNCj4gKwkg
-UElOX0JBU0VEX05NSV9FWElUSU5HKQ0KPiArI2RlZmluZSBLVk1fT1BUX1ZNWF9QSU5fQkFTRURf
-Vk1fRVhFQ19DT05UUk9MDQo+IAlcDQo+ICsJKFBJTl9CQVNFRF9WSVJUVUFMX05NSVMgfAkJCQlc
-DQo+ICsJUElOX0JBU0VEX1BPU1RFRF9JTlRSIHwJCQkJCVwNCj4gKwlQSU5fQkFTRURfVk1YX1BS
-RUVNUFRJT05fVElNRVIpDQo+ICsNCj4gKyNkZWZpbmUgX19LVk1fUkVRX1ZNWF9DUFVfQkFTRURf
-Vk1fRVhFQ19DT05UUk9MDQo+IAlcDQo+ICsJKENQVV9CQVNFRF9ITFRfRVhJVElORyB8CQkJCVwN
-Cj4gKwlDUFVfQkFTRURfQ1IzX0xPQURfRVhJVElORyB8CQkJCVwNCj4gKwlDUFVfQkFTRURfQ1Iz
-X1NUT1JFX0VYSVRJTkcgfAkJCQlcDQo+ICsJQ1BVX0JBU0VEX1VOQ09ORF9JT19FWElUSU5HIHwJ
-CQkJXA0KPiArCUNQVV9CQVNFRF9NT1ZfRFJfRVhJVElORyB8CQkJCVwNCj4gKwlDUFVfQkFTRURf
-VVNFX1RTQ19PRkZTRVRUSU5HIHwJCQkJXA0KPiArCUNQVV9CQVNFRF9NV0FJVF9FWElUSU5HIHwJ
-CQkJXA0KPiArCUNQVV9CQVNFRF9NT05JVE9SX0VYSVRJTkcgfAkJCQlcDQo+ICsJQ1BVX0JBU0VE
-X0lOVkxQR19FWElUSU5HIHwJCQkJXA0KPiArCUNQVV9CQVNFRF9SRFBNQ19FWElUSU5HIHwJCQkJ
-XA0KPiArCUNQVV9CQVNFRF9JTlRSX1dJTkRPV19FWElUSU5HIHwJCQkJXA0KPiArCUNQVV9CQVNF
-RF9OTUlfV0lORE9XX0VYSVRJTkcpDQo+ICsNCj4gKyNpZmRlZiBDT05GSUdfWDg2XzY0DQo+ICsJ
-I2RlZmluZSBLVk1fUkVRX1ZNWF9DUFVfQkFTRURfVk1fRVhFQ19DT05UUk9MDQo+IAlcDQo+ICsJ
-CShfX0tWTV9SRVFfVk1YX0NQVV9CQVNFRF9WTV9FWEVDX0NPTlRST0wgfAlcDQo+ICsJCUNQVV9C
-QVNFRF9DUjhfTE9BRF9FWElUSU5HIHwJCQlcDQo+ICsJCUNQVV9CQVNFRF9DUjhfU1RPUkVfRVhJ
-VElORykNCj4gKyNlbHNlDQo+ICsJI2RlZmluZSBLVk1fUkVRX1ZNWF9DUFVfQkFTRURfVk1fRVhF
-Q19DT05UUk9MDQo+IAlcDQo+ICsJCV9fS1ZNX1JFUV9WTVhfQ1BVX0JBU0VEX1ZNX0VYRUNfQ09O
-VFJPTA0KPiArI2VuZGlmDQo+ICsNCj4gKyNkZWZpbmUgS1ZNX09QVF9WTVhfQ1BVX0JBU0VEX1ZN
-X0VYRUNfQ09OVFJPTA0KPiAJXA0KPiArCShDUFVfQkFTRURfVFBSX1NIQURPVyB8CQkJCQlcDQo+
-ICsJQ1BVX0JBU0VEX1VTRV9NU1JfQklUTUFQUyB8CQkJCVwNCj4gKwlDUFVfQkFTRURfQUNUSVZB
-VEVfU0VDT05EQVJZX0NPTlRST0xTIHwNCj4gCVwNCj4gKwlDUFVfQkFTRURfQUNUSVZBVEVfVEVS
-VElBUllfQ09OVFJPTFMpDQo+ICsNCj4gKyNkZWZpbmUgS1ZNX1JFUV9WTVhfU0VDT05EQVJZX1ZN
-X0VYRUNfQ09OVFJPTCAwDQo+ICsjZGVmaW5lIEtWTV9PUFRfVk1YX1NFQ09OREFSWV9WTV9FWEVD
-X0NPTlRST0wNCj4gCVwNCj4gKwkoU0VDT05EQVJZX0VYRUNfVklSVFVBTElaRV9BUElDX0FDQ0VT
-U0VTIHwJCVwNCj4gKwlTRUNPTkRBUllfRVhFQ19WSVJUVUFMSVpFX1gyQVBJQ19NT0RFIHwNCj4g
-CVwNCj4gKwlTRUNPTkRBUllfRVhFQ19XQklOVkRfRVhJVElORyB8CQkJCVwNCj4gKwlTRUNPTkRB
-UllfRVhFQ19FTkFCTEVfVlBJRCB8CQkJCVwNCj4gKwlTRUNPTkRBUllfRVhFQ19FTkFCTEVfRVBU
-IHwJCQkJXA0KPiArCVNFQ09OREFSWV9FWEVDX1VOUkVTVFJJQ1RFRF9HVUVTVCB8CQkJXA0KPiAr
-CVNFQ09OREFSWV9FWEVDX1BBVVNFX0xPT1BfRVhJVElORyB8CQkJXA0KPiArCVNFQ09OREFSWV9F
-WEVDX0RFU0MgfAkJCQkJXA0KPiArCVNFQ09OREFSWV9FWEVDX0VOQUJMRV9SRFRTQ1AgfAkJCQlc
-DQo+ICsJU0VDT05EQVJZX0VYRUNfRU5BQkxFX0lOVlBDSUQgfAkJCQlcDQo+ICsJU0VDT05EQVJZ
-X0VYRUNfQVBJQ19SRUdJU1RFUl9WSVJUIHwJCQlcDQo+ICsJU0VDT05EQVJZX0VYRUNfVklSVFVB
-TF9JTlRSX0RFTElWRVJZIHwJCQlcDQo+ICsJU0VDT05EQVJZX0VYRUNfU0hBRE9XX1ZNQ1MgfAkJ
-CQlcDQo+ICsJU0VDT05EQVJZX0VYRUNfWFNBVkVTIHwJCQkJCVwNCj4gKwlTRUNPTkRBUllfRVhF
-Q19SRFNFRURfRVhJVElORyB8CQkJCVwNCj4gKwlTRUNPTkRBUllfRVhFQ19SRFJBTkRfRVhJVElO
-RyB8CQkJCVwNCj4gKwlTRUNPTkRBUllfRVhFQ19FTkFCTEVfUE1MIHwJCQkJXA0KPiArCVNFQ09O
-REFSWV9FWEVDX1RTQ19TQ0FMSU5HIHwJCQkJXA0KPiArCVNFQ09OREFSWV9FWEVDX0VOQUJMRV9V
-U1JfV0FJVF9QQVVTRSB8DQo+IAlcDQo+ICsJU0VDT05EQVJZX0VYRUNfUFRfVVNFX0dQQSB8CQkJ
-CVwNCj4gKwlTRUNPTkRBUllfRVhFQ19QVF9DT05DRUFMX1ZNWCB8DQo+IAlcDQo+ICsJU0VDT05E
-QVJZX0VYRUNfRU5BQkxFX1ZNRlVOQyB8CQkJCVwNCj4gKwlTRUNPTkRBUllfRVhFQ19CVVNfTE9D
-S19ERVRFQ1RJT04gfAkJCVwNCj4gKwlTRUNPTkRBUllfRVhFQ19OT1RJRllfVk1fRVhJVElORyB8
-CQkJXA0KPiArCVNFQ09OREFSWV9FWEVDX0VOQ0xTX0VYSVRJTkcpDQo+ICsNCj4gKyNkZWZpbmUg
-S1ZNX1JFUV9WTVhfVEVSVElBUllfVk1fRVhFQ19DT05UUk9MIDANCj4gKyNkZWZpbmUgS1ZNX09Q
-VF9WTVhfVEVSVElBUllfVk1fRVhFQ19DT05UUk9MDQo+IAlcDQo+ICsJKFRFUlRJQVJZX0VYRUNf
-SVBJX1ZJUlQpDQo+ICsNCj4gICNkZWZpbmUgQlVJTERfQ09OVFJPTFNfU0hBRE9XKGxuYW1lLCB1
-bmFtZSwgYml0cykNCj4gCQlcDQo+ICBzdGF0aWMgaW5saW5lIHZvaWQgbG5hbWUjI19jb250cm9s
-c19zZXQoc3RydWN0IHZjcHVfdm14ICp2bXgsIHUjI2JpdHMgdmFsKQ0KPiAJXA0KPiAgew0KPiAJ
-XA0KPiBAQCAtNDg1LDEwICs1OTIsMTIgQEAgc3RhdGljIGlubGluZSB1IyNiaXRzIGxuYW1lIyNf
-Y29udHJvbHNfZ2V0KHN0cnVjdA0KPiB2Y3B1X3ZteCAqdm14KQkJXA0KPiAgfQ0KPiAJXA0KPiAg
-c3RhdGljIGlubGluZSB2b2lkIGxuYW1lIyNfY29udHJvbHNfc2V0Yml0KHN0cnVjdCB2Y3B1X3Zt
-eCAqdm14LCB1IyNiaXRzDQo+IHZhbCkJXA0KPiAgew0KPiAJXA0KPiArCUJVSUxEX0JVR19PTigh
-KHZhbCAmIChLVk1fUkVRX1ZNWF8jI3VuYW1lIHwNCj4gS1ZNX09QVF9WTVhfIyN1bmFtZSkpKTsJ
-XA0KPiAgCWxuYW1lIyNfY29udHJvbHNfc2V0KHZteCwgbG5hbWUjI19jb250cm9sc19nZXQodm14
-KSB8IHZhbCk7DQo+IAlcDQo+ICB9DQo+IAlcDQo+ICBzdGF0aWMgaW5saW5lIHZvaWQgbG5hbWUj
-I19jb250cm9sc19jbGVhcmJpdChzdHJ1Y3QgdmNwdV92bXggKnZteCwgdSMjYml0cw0KPiB2YWwp
-CVwNCj4gIHsNCj4gCVwNCj4gKwlCVUlMRF9CVUdfT04oISh2YWwgJiAoS1ZNX1JFUV9WTVhfIyN1
-bmFtZSB8DQo+IEtWTV9PUFRfVk1YXyMjdW5hbWUpKSk7CVwNCj4gIAlsbmFtZSMjX2NvbnRyb2xz
-X3NldCh2bXgsIGxuYW1lIyNfY29udHJvbHNfZ2V0KHZteCkgJiB+dmFsKTsNCj4gCVwNCj4gIH0N
-Cg0KV2l0aCB0aGlzLCB3aWxsIGl0IGJlIHNhZmVyIGlmIHdlIHByZXNlbnQgTDEgQ1RSTCBNU1Jz
-IHdpdGggdGhlIGJpdHMgS1ZNIHJlYWxseSB1c2VzPyBEbyBJIG1pc3Mgc29tZXRoaW5nPw0KDQo+
-ICBCVUlMRF9DT05UUk9MU19TSEFET1codm1fZW50cnksIFZNX0VOVFJZX0NPTlRST0xTLCAzMikN
-Cj4gLS0NCj4gMi4zNS4zDQoNCg==
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+
+KVM TDX basic feature support
+
+Hello.  This is v7 the patch series vof KVM TDX support.
+This is based on v5.19-rc1 + kvm/queue branch + TDX HOST patch series.
+The tree can be found at https://github.com/intel/tdx/tree/kvm-upstream
+How to run/test: It's describe at https://github.com/intel/tdx/wiki/TDX-KVM
+
+Major changes from v6:
+- rebased to v5.19 base
+
+TODO:
+- integrate fd-based guest memory. As the discussion is still on-going, I
+  intentionally dropped fd-based guest memory support yet.  The integration can
+  be found at https://github.com/intel/tdx/tree/kvm-upstream-workaround.
+- 2M large page support. It's work-in-progress.
+For large page support, there are several design choices. Here is the design options.
+Any thoughts/feedback?
+
+KVM MMU Large page support for TDX
+
+* What needs to be done
+- Track private or shared of each page size (4KB, 2MB, 1GB) based on
+  TDG.VP.VMCALL<MapGPA>.  For large pages(2MB, 1GB), it can be mixed (some
+  lower-size pages are private and some shared.)  In this case, the page can't
+  be large.
+- if necessary, split large page on TDG.VP.VMCALL<MapGPA>
+  (split on dirty page tracking is future work)
+- resolving KVM page fault
+  When resolving a private page and the page is large in the host, GPA can be
+  resolved as a large page in Secure-EPT.  Even if the page is large on the host
+  side, sometimes a 4KB page can be resolved because it's up to guest TD to
+  accept at 4KB, 2MB, or 1GB.
+- collapsing pages into a large page.
+  At this point, it's okay to not implement this.  When dirty page tracking is
+  supported, this needs to be supported.
+  - On MapGPA, the page can be collapsed into a large page
+  - handle zapping SPTE and try to collapse the pages on the next KVM page fault
+    Unlike the EPT case, some trick is needed.
+- For performance, optimize KVM page fault path at the cost of complicating
+  MapGPA path.
+
+* options to track private or shared
+At each page size (4KB, 2MB, and 1GB), track private, shared, or mixed (2MB and
+1GB case). For 4KB each page, 1 bit per page is needed. private or shared.  For
+large pages (2MB and 1GB), 2 bits per large page is needed. (private, shared, or
+mixed).  When resolving KVM page fault, we don't want to check the lower-size
+pages to check if the given GPA can be a large for performance.  On MapGPA check
+it instead.
+
+Option A). enhance kvm_arch_memory_slot
+  enum kvm_page_type {
+       KVM_PAGE_TYPE_INVALID,
+       KVM_PAGE_TYPE_SHARED,
+       KVM_PAGE_TYPE_PRIVATE,
+       KVM_PAGE_TYPE_MIXED,
+  };
+
+  struct kvm_page_attr {
+       enum kvm_page_type type;
+  };
+
+ struct kvm_arch_memory_slot {
+ +      struct kvm_page_attr *page_attr[KVM_NR_PAGE_SIZES];
+
+Option B). steal one more bit SPTE_MIXED_MASK in addition to SPTE_SHARED_MASK
+If !SPTE_MIXED_MASK, it can be large page.
+
+Option C). use SPTE_SHARED_MASK and kvm_mmu_page::mixed bitmap
+kvm_mmu_page::mixed bitmap of 1GB, root indicates mixed for 2MB, 1GB.
+
+
+* comparison
+A).
++ straightforward to implement
++ SPTE_SHARED_MASK isn't needed
+- memory overhead compared to B). or C).
+- more memory reference on KVM page fault
+
+B).
++ simpler than C) (complex than A)?)
++ efficient on KVM page fault. (only SPTE reference)
++ low memory overhead
+- Waste precious SPTE bits.
+
+C).
++ efficient on KVM page fault. (only SPTE reference)
++ low memory overhead
+- complicates MapGPA
+- scattered data structure
+
+Thanks,
+Isaku Yamahata
+
+Changes from v6:
+- rebased to v5.19
+
+Changes from v5:
+- export __seamcall and use it
+- move mutex lock from callee function of smp_call_on_cpu to the caller.
+- rename mmu_prezap => flush_shadow_all_private() and tdx_mmu_release_hkid
+- updated comment
+- drop the use of tdh_mng_key.reclaimid(): as the function is for backward
+  compatibility to only return success
+- struct kvm_tdx_cmd: metadata => flags, added __u64 error.
+- make this ioctl systemwide ioctl
+- ABI change to struct kvm_init_vm
+- guest_tsc_khz: use kvm->arch.default_tsc_khz
+- rename BUILD_BUG_ON_MEMCPY to MEMCPY_SAME_SIZE
+- drop exporting kvm_set_tsc_khz().
+- fix kvm_tdp_page_fault() for mtrr emulation
+- rename it to kvm_gfn_shared_mask(), dropped kvm_gpa_shared_mask()
+- drop kvm_is_private_gfn(), kept kvm_is_private_gpa()
+  keep kvm_{gfn, gpa}_private(), kvm_gpa_private()
+- update commit message
+- rename shadow_init_value => shadow_nonprsent_value
+- added ept_violation_ve_test mode
+- shadow_nonpresent_value => SHADOW_NONPRESENT_VALUE in tdp_mmu.c
+- legacy MMU case
+  => - mmu_topup_shadow_page_cache(), kvm_mmu_create()
+     - FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+- #VE warning:
+- rename: REMOVED_SPTE => __REMOVED_SPTE, SHADOW_REMOVED_SPTE => REMOVED_SPTE
+- merge into Like we discussed, this patch should be merged with patch
+  "KVM: x86/mmu: Allow non-zero init value for shadow PTE".
+- fix pointed by Sagi. check !is_private check => (kvm_gfn_shared_mask && !is_private)
+- introduce kvm_gfn_for_root(kvm, root, gfn)
+- add only_shared argument to kvm_tdp_mmu_handle_gfn()
+- use kvm_arch_dirty_log_supported()
+- rename SPTE_PRIVATE_PROHIBIT to SPTE_SHARED_MASK.
+- rename: is_private_prohibit_spte() => spte_shared_mask()
+- fix: shadow_nonpresent_value => SHADOW_NONPRESENT_VALUE in comment
+- dropped this patch as the change was merged into kvm/queue
+- update vt_apicv_post_state_restore()
+- use is_64_bit_hypercall()
+- comment: expand MSMI -> Machine Check System Management Interrupt
+- fixed TDX_SEPT_PFERR
+- tdvmcall_p[1234]_{write, read}() => tdvmcall_a[0123]_{read,write}()
+- rename tdmvcall_exit_readon() => tdvmcall_leaf()
+- remove optional zero check of argument.
+- do a check for static_call(kvm_x86_has_emulated_msr)(kvm, MSR_IA32_SMBASE)
+   in kvm_vcpu_ioctl_smi and __apic_accept_irq.
+- WARN_ON_ONCE in tdx_smi_allowed and tdx_enable_smi_window.
+- introduce vcpu_deliver_init to x86_ops
+- sprinkeled KVM_BUG_ON()
+
+Changes from v4:
+- rebased to TDX host kernel patch series.
+- include all the patches to make this patch series working.
+- add [MARKER] patches to mark the patch layer clear.
+
+---
+* What's TDX?
+TDX stands for Trust Domain Extensions, which extends Intel Virtual Machines
+Extensions (VMX) to introduce a kind of virtual machine guest called a Trust
+Domain (TD) for confidential computing.
+
+A TD runs in a CPU mode that is designed to protect the confidentiality of its
+memory contents and its CPU state from any other software, including the hosting
+Virtual Machine Monitor (VMM), unless explicitly shared by the TD itself.
+
+We have more detailed explanations below (***).
+We have the high-level design of TDX KVM below (****).
+
+In this patch series, we use "TD" or "guest TD" to differentiate it from the
+current "VM" (Virtual Machine), which is supported by KVM today.
+
+
+* The organization of this patch series
+This patch series is on top of the patches series "TDX host kernel support":
+https://lore.kernel.org/lkml/cover.1646007267.git.kai.huang@intel.com/
+
+this patch series is available at
+https://github.com/intel/tdx/releases/tag/kvm-upstream
+The corresponding patches to qemu are available at
+https://github.com/intel/qemu-tdx/commits/tdx-upstream
+
+The relations of the layers are depicted as follows.
+The arrows below show the order of patch reviews we would like to have.
+
+The below layers are chosen so that the device model, for example, qemu can
+exercise each layering step by step.  Check if TDX is supported, create TD VM,
+create TD vcpu, allow vcpu running, populate TD guest private memory, and handle
+vcpu exits/hypercalls/interrupts to run TD fully.
+
+  TDX vcpu
+  interrupt/exits/hypercall<------------\
+        ^                               |
+        |                               |
+  TD finalization                       |
+        ^                               |
+        |                               |
+  TDX EPT violation<------------\       |
+        ^                       |       |
+        |                       |       |
+  TD vcpu enter/exit            |       |
+        ^                       |       |
+        |                       |       |
+  TD vcpu creation/destruction  |       \-------KVM TDP MMU MapGPA
+        ^                       |                       ^
+        |                       |                       |
+  TD VM creation/destruction    \---------------KVM TDP MMU hooks
+        ^                                               ^
+        |                                               |
+  TDX architectural definitions                 KVM TDP refactoring for TDX
+        ^                                               ^
+        |                                               |
+   TDX, VMX    <--------TDX host kernel         KVM MMU GPA stolen bits
+   coexistence          support
+
+
+The followings are explanations of each layer.  Each layer has a dummy commit
+that starts with [MARKER] in subject.  It is intended to help to identify where
+each layer starts.
+
+TDX host kernel support:
+        https://lore.kernel.org/lkml/cover.1646007267.git.kai.huang@intel.com/
+        The guts of system-wide initialization of TDX module.  There is an
+        independent patch series for host x86.  TDX KVM patches call functions
+        this patch series provides to initialize the TDX module.
+
+TDX, VMX coexistence:
+        Infrastructure to allow TDX to coexist with VMX and trigger the
+        initialization of the TDX module.
+        This layer starts with
+        "KVM: VMX: Move out vmx_x86_ops to 'main.c' to wrap VMX and TDX"
+TDX architectural definitions:
+        Add TDX architectural definitions and helper functions
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TDX architectural definitions".
+TD VM creation/destruction:
+        Guest TD creation/destroy allocation and releasing of TDX specific vm
+        and vcpu structure.  Create an initial guest memory image with TDX
+        measurement.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD VM creation/destruction".
+TD vcpu creation/destruction:
+        guest TD creation/destroy Allocation and releasing of TDX specific vm
+        and vcpu structure.  Create an initial guest memory image with TDX
+        measurement.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD vcpu creation/destruction"
+TDX EPT violation:
+        Create an initial guest memory image with TDX measurement.  Handle
+        secure EPT violations to populate guest pages with TDX SEAMCALLs.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TDX EPT violation"
+TD vcpu enter/exit:
+        Allow TDX vcpu to enter into TD and exit from TD.  Save CPU state before
+        entering into TD.  Restore CPU state after exiting from TD.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD vcpu enter/exit"
+TD vcpu interrupts/exit/hypercall:
+        Handle various exits/hypercalls and allow interrupts to be injected so
+        that TD vcpu can continue running.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD vcpu exits/interrupts/hypercalls"
+
+KVM MMU GPA shared bit:
+        Introduce framework to handle shared bit repurposed bit of GPA TDX
+        repurposed a bit of GPA to indicate shared or private. If it's shared,
+        it's the same as the conventional VMX EPT case.  VMM can access shared
+        guest pages.  If it's private, it's handled by Secure-EPT and the guest
+        page is encrypted.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM MMU GPA stolen bits"
+KVM TDP refactoring for TDX:
+        TDX Secure EPT requires different constants. e.g. initial value EPT
+        entry value etc. Various refactoring for those differences.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM TDP refactoring for TDX"
+KVM TDP MMU hooks:
+        Introduce framework to TDP MMU to add hooks in addition to direct EPT
+        access TDX added Secure EPT which is an enhancement to VMX EPT.  Unlike
+        conventional VMX EPT, CPU can't directly read/write Secure EPT. Instead,
+        use TDX SEAMCALLs to operate on Secure EPT.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM TDP MMU hooks"
+KVM TDP MMU MapGPA:
+        Introduce framework to handle switching guest pages from private/shared
+        to shared/private.  For a given GPA, a guest page can be assigned to a
+        private GPA or a shared GPA exclusively.  With TDX MapGPA hypercall,
+        guest TD converts GPA assignments from private (or shared) to shared (or
+        private).
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM TDP MMU MapGPA "
+
+KVM guest private memory: (not shown in the above diagram)
+[PATCH v4 00/12] KVM: mm: fd-based approach for supporting KVM guest private
+memory: https://lkml.org/lkml/2022/1/18/395
+        Guest private memory requires different memory management in KVM.  The
+        patch proposes a way for it.  Integration with TDX KVM.
+
+(***)
+* TDX module
+A CPU-attested software module called the "TDX module" is designed to implement
+the TDX architecture, and it is loaded by the UEFI firmware today. It can be
+loaded by the kernel or driver at runtime, but in this patch series we assume
+that the TDX module is already loaded and initialized.
+
+The TDX module provides two main new logical modes of operation built upon the
+new SEAM (Secure Arbitration Mode) root and non-root CPU modes added to the VMX
+architecture. TDX root mode is mostly identical to the VMX root operation mode,
+and the TDX functions (described later) are triggered by the new SEAMCALL
+instruction with the desired interface function selected by an input operand
+(leaf number, in RAX). TDX non-root mode is used for TD guest operation.  TDX
+non-root operation (i.e. "guest TD" mode) is similar to the VMX non-root
+operation (i.e. guest VM), with changes and restrictions to better assure that
+no other software or hardware has direct visibility of the TD memory and state.
+
+TDX transitions between TDX root operation and TDX non-root operation include TD
+Entries, from TDX root to TDX non-root mode, and TD Exits from TDX non-root to
+TDX root mode.  A TD Exit might be asynchronous, triggered by some external
+event (e.g., external interrupt or SMI) or an exception, or it might be
+synchronous, triggered by a TDCALL (TDG.VP.VMCALL) function.
+
+TD VCPUs can be entered using SEAMCALL(TDH.VP.ENTER) by KVM. TDH.VP.ENTER is one
+of the TDX interface functions as mentioned above, and "TDH" stands for Trust
+Domain Host. Those host-side TDX interface functions are categorized into
+various areas just for better organization, such as SYS (TDX module management),
+MNG (TD management), VP (VCPU), PHYSMEM (physical memory), MEM (private memory),
+etc. For example, SEAMCALL(TDH.SYS.INFO) returns the TDX module information.
+
+TDCS (Trust Domain Control Structure) is the main control structure of a guest
+TD, and encrypted (using the guest TD's ephemeral private key).  At a high
+level, TDCS holds information for controlling TD operation as a whole,
+execution, EPTP, MSR bitmaps, etc that KVM needs to set it up.  Note that MSR
+bitmaps are held as part of TDCS (unlike VMX) because they are meant to have the
+same value for all VCPUs of the same TD.
+
+Trust Domain Virtual Processor State (TDVPS) is the root control structure of a
+TD VCPU.  It helps the TDX module control the operation of the VCPU, and holds
+the VCPU state while the VCPU is not running. TDVPS is opaque to software and
+DMA access, accessible only by using the TDX module interface functions (such as
+TDH.VP.RD, TDH.VP.WR). TDVPS includes TD VMCS, and TD VMCS auxiliary structures,
+such as virtual APIC page, virtualization exception information, etc.
+
+Several VMX control structures (such as Shared EPT and Posted interrupt
+descriptor) are directly managed and accessed by the host VMM.  These control
+structures are pointed to by fields in the TD VMCS.
+
+The above means that 1) KVM needs to allocate different data structures for TDs,
+2) KVM can reuse the existing code for TDs for some operations, 3) it needs to
+define TD-specific handling for others.  3) Redirect operations to .  3)
+Redirect operations to the TDX specific callbacks, like "if (is_td_vcpu(vcpu))
+tdx_callback() else vmx_callback();".
+
+*TD Private Memory
+TD private memory is designed to hold TD private content, encrypted by the CPU
+using the TD ephemeral key. An encryption engine holds a table of encryption
+keys, and an encryption key is selected for each memory transaction based on a
+Host Key Identifier (HKID). By design, the host VMM does not have access to the
+encryption keys.
+
+In the first generation of MKTME, HKID is "stolen" from the physical address by
+allocating a configurable number of bits from the top of the physical
+address. The HKID space is partitioned into shared HKIDs for legacy MKTME
+accesses and private HKIDs for SEAM-mode-only accesses. We use 0 for the shared
+HKID on the host so that MKTME can be opaque or bypassed on the host.
+
+During TDX non-root operation (i.e. guest TD), memory accesses can be qualified
+as either shared or private, based on the value of a new SHARED bit in the Guest
+Physical Address (GPA).  The CPU translates shared GPAs using the usual VMX EPT
+(Extended Page Table) or "Shared EPT" (in this document), which resides in host
+VMM memory. The Shared EPT is directly managed by the host VMM - the same as
+with the current VMX. Since guest TDs usually require I/O, and the data exchange
+needs to be done via shared memory, thus KVM needs to use the current EPT
+functionality even for TDs.
+
+* Secure EPT and Minoring using the TDP code
+The CPU translates private GPAs using a separate Secure EPT.  The Secure EPT
+pages are encrypted and integrity-protected with the TD's ephemeral private
+key.  Secure EPT can be managed _indirectly_ by the host VMM, using the TDX
+interface functions, and thus conceptually Secure EPT is a subset of EPT (why
+"subset"). Since execution of such interface functions takes much longer time
+than accessing memory directly, in KVM we use the existing TDP code to minor the
+Secure EPT for the TD.
+
+This way, we can effectively walk Secure EPT without using the TDX interface
+functions.
+
+* VM life cycle and TDX specific operations
+The userspace VMM, such as QEMU, needs to build and treat TDs differently.  For
+example, a TD needs to boot in private memory, and the host software cannot copy
+the initial image to private memory.
+
+* TSC Virtualization
+The TDX module helps TDs maintain reliable TSC (Time Stamp Counter) values
+(e.g. consistent among the TD VCPUs) and the virtual TSC frequency is determined
+by TD configuration, i.e. when the TD is created, not per VCPU.  The current KVM
+owns TSC virtualization for VMs, but the TDX module does for TDs.
+
+* MCE support for TDs
+The TDX module doesn't allow VMM to inject MCE.  Instead PV way is needed for TD
+to communicate with VMM.  For now, KVM silently ignores MCE request by VMM.  MSRs
+related to MCE (e.g, MCE bank registers) can be naturally emulated by
+paravirtualizing MSR access.
+
+[1] For details, the specifications, [2], [3], [4], [5], [6], [7], are
+available.
+
+* Restrictions or future work
+Some features are not included to reduce patch size.  Those features are
+addressed as future independent patch series.
+- large page (2M, 1G)
+- qemu gdb stub
+- guest PMU
+- and more
+
+* Prerequisites
+It's required to load the TDX module and initialize it.  It's out of the scope
+of this patch series.  Another independent patch for the common x86 code is
+planned.  It defines CONFIG_INTEL_TDX_HOST and this patch series uses
+CONFIG_INTEL_TDX_HOST.  It's assumed that With CONFIG_INTEL_TDX_HOST=y, the TDX
+module is initialized and ready for KVM to use the TDX module APIs for TDX guest
+life cycle like tdh.mng.init are ready to use.
+
+Concretely Global initialization, LP (Logical Processor) initialization, global
+configuration, the key configuration, and TDMR and PAMT initialization are done.
+The state of the TDX module is SYS_READY.  Please refer to the TDX module
+specification, the chapter Intel TDX Module Lifecycle State Machine
+
+** Detecting the TDX module readiness.
+TDX host patch series implements the detection of the TDX module availability
+and its initialization so that KVM can use it.  Also it manages Host KeyID
+(HKID) assigned to guest TD.
+The assumed APIs the TDX host patch series provides are
+- int seamrr_enabled()
+  Check if required cpu feature (SEAM mode) is available. This only check CPU
+  feature availability.  At this point, the TDX module may not be ready for KVM
+  to use.
+- int init_tdx(void);
+  Initialization of TDX module so that the TDX module is ready for KVM to use.
+- const struct tdsysinfo_struct *tdx_get_sysinfo(void);
+  Return the system wide information about the TDX module.  NULL if the TDX
+  isn't initialized.
+- u32 tdx_get_global_keyid(void);
+  Return global key id that is used for the TDX module itself.
+- int tdx_keyid_alloc(void);
+  Allocate HKID for guest TD.
+- void tdx_keyid_free(int keyid);
+  Free HKID for guest TD.
+
+(****)
+* TDX KVM high-level design
+- Host key ID management
+Host Key ID (HKID) needs to be assigned to each TDX guest for memory encryption.
+It is assumed The TDX host patch series implements necessary functions,
+u32 tdx_get_global_keyid(void), int tdx_keyid_alloc(void) and,
+void tdx_keyid_free(int keyid).
+
+- Data structures and VM type
+Because TDX is different from VMX, define its own VM/VCPU structures, struct
+kvm_tdx and struct vcpu_tdx instead of struct kvm_vmx and struct vcpu_vmx.  To
+identify the VM, introduce VM-type to specify which VM type, VMX (default) or
+TDX, is used.
+
+- VM life cycle and TDX specific operations
+Re-purpose the existing KVM_MEMORY_ENCRYPT_OP to add TDX specific operations.
+New commands are used to get the TDX system parameters, set TDX specific VM/VCPU
+parameters, set initial guest memory and measurement.
+
+The creation of TDX VM requires five additional operations in addition to the
+conventional VM creation.
+  - Get KVM system capability to check if TDX VM type is supported
+  - VM creation (KVM_CREATE_VM)
+  - New: Get the TDX specific system parameters.  KVM_TDX_GET_CAPABILITY.
+  - New: Set TDX specific VM parameters.  KVM_TDX_INIT_VM.
+  - VCPU creation (KVM_CREATE_VCPU)
+  - New: Set TDX specific VCPU parameters.  KVM_TDX_INIT_VCPU.
+  - New: Initialize guest memory as boot state and extend the measurement with
+    the memory.  KVM_TDX_INIT_MEM_REGION.
+  - New: Finalize VM. KVM_TDX_FINALIZE. Complete measurement of the initial
+    TDX VM contents.
+  - VCPU RUN (KVM_VCPU_RUN)
+
+- Protected guest state
+Because the guest state (CPU state and guest memory) is protected, the KVM VMM
+can't operate on them.  For example, accessing CPU registers, injecting
+exceptions, and accessing guest memory.  Those operations are handled as
+silently ignored, returning zero or initial reset value when it's requested via
+KVM API ioctls.
+
+    VM/VCPU state and callbacks for TDX specific operations.
+    Define tdx specific VM state and VCPU state instead of VMX ones.  Redirect
+    operations to TDX specific callbacks.  "if (tdx) tdx_op() else vmx_op()".
+
+    Operations on the CPU state
+    silently ignore operations on the guest state.  For example, the write to
+    CPU registers is ignored and the read from CPU registers returns 0.
+
+    . ignore access to CPU registers except for allowed ones.
+    . TSC: add a check if tsc is immutable and return an error.  Because the KVM
+      implementation updates the internal tsc state and it's difficult to back
+      out those changes.  Instead, skip the logic.
+    . dirty logging: add check if dirty logging is supported.
+    . exceptions/SMI/MCE/SIPI/INIT: silently ignore
+
+    Note: virtual external interrupt and NMI can be injected into TDX guests.
+
+- KVM MMU integration
+One bit of the guest physical address (bit 51 or 47) is repurposed to indicate if
+the guest physical address is private (the bit is cleared) or shared (the bit is
+set).  The bits are called stolen bits.
+
+  - Stolen bits framework
+    systematically tracks which guest physical address, shared or private, is
+    used.
+
+  - Shared EPT and secure EPT
+    There are two EPTs. Shared EPT (the conventional one) and Secure
+    EPT(the new one). Shared EPT is handled the same for the stolen
+    bit set.  Secure EPT points to private guest pages.  To resolve
+    EPT violation, KVM walks one of two EPTs based on faulted GPA.
+    Because it's costly to access secure EPT during walking EPTs with
+    SEAMCALLs for the private guest physical address, another private
+    EPT is used as a shadow of Secure-EPT with the existing logic at
+    the cost of extra memory.
+
+The following depicts the relationship.
+
+                    KVM                             |       TDX module
+                     |                              |           |
+        -------------+----------                    |           |
+        |                      |                    |           |
+        V                      V                    |           |
+     shared GPA           private GPA               |           |
+  CPU shared EPT pointer  KVM private EPT pointer   |  CPU secure EPT pointer
+        |                      |                    |           |
+        |                      |                    |           |
+        V                      V                    |           V
+  shared EPT                private EPT--------mirror----->Secure EPT
+        |                      |                    |           |
+        |                      \--------------------+------\    |
+        |                                           |      |    |
+        V                                           |      V    V
+  shared guest page                                 |    private guest page
+                                                    |
+                                                    |
+                              non-encrypted memory  |    encrypted memory
+                                                    |
+
+  - Operating on Secure EPT
+    Use the TDX module APIs to operate on Secure EPT.  To call the TDX API
+    during resolving EPT violation, add hooks to additional operation and wiring
+    it to TDX backend.
+
+* References
+
+[1] TDX specification
+   https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
+[2] Intel Trust Domain Extensions (Intel TDX)
+   https://cdrdv2.intel.com/v1/dl/getContent/726790
+[3] Intel CPU Architectural Extensions Specification
+   https://www.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-cpu-architectural-specification.pdf
+[4] Intel TDX Module 1.0 Specification
+   https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1.0-public-spec-v0.931.pdf
+[5] Intel TDX Loader Interface Specification
+  https://www.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-seamldr-interface-specification.pdf
+[6] Intel TDX Guest-Hypervisor Communication Interface
+   https://cdrdv2.intel.com/v1/dl/getContent/726790
+[7] Intel TDX Virtual Firmware Design Guide
+   https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.01.pdf
+[8] intel public github
+   kvm TDX branch: https://github.com/intel/tdx/tree/kvm
+   TDX guest branch: https://github.com/intel/tdx/tree/guest
+   qemu TDX https://github.com/intel/qemu-tdx
+[9] TDVF
+    https://github.com/tianocore/edk2-staging/tree/TDVF
+    This was merged into EDK2 main branch. https://github.com/tianocore/edk2
+
+Chao Gao (3):
+  KVM: x86: Move check_processor_compatibility from init ops to runtime
+    ops
+  Partially revert "KVM: Pass kvm_init()'s opaque param to additional
+    arch funcs"
+  KVM: x86: Allow to update cached values in kvm_user_return_msrs w/o
+    wrmsr
+
+Isaku Yamahata (72):
+  KVM: Refactor CPU compatibility check on module initialiization
+  x86/virt/vmx/tdx: export platform_tdx_enabled()
+  KVM: TDX: Detect CPU feature on kernel module initialization
+  KVM: x86: Refactor KVM VMX module init/exit functions
+  KVM: TDX: Add placeholders for TDX VM/vcpu structure
+  x86/virt/tdx: Add a helper function to return system wide info about
+    TDX module
+  KVM: TDX: Initialize TDX module when loading kvm_intel.ko
+  KVM: TDX: Make TDX VM type supported
+  [MARKER] The start of TDX KVM patch series: TDX architectural
+    definitions
+  KVM: TDX: Define TDX architectural definitions
+  KVM: TDX: Add C wrapper functions for SEAMCALLs to the TDX module
+  KVM: TDX: Add helper functions to print TDX SEAMCALL error
+  [MARKER] The start of TDX KVM patch series: TD VM creation/destruction
+  x86/cpu: Add helper functions to allocate/free TDX private host key id
+  KVM: TDX: Add place holder for TDX VM specific mem_enc_op ioctl
+  KVM: TDX: Make pmu_intel.c ignore guest TD case
+  [MARKER] The start of TDX KVM patch series: TD vcpu
+    creation/destruction
+  KVM: TDX: allocate/free TDX vcpu structure
+  KVM: TDX: allocate/free TDX vcpu structure
+  [MARKER] The start of TDX KVM patch series: KVM MMU GPA shared bits
+  KVM: x86/mmu: introduce config for PRIVATE KVM MMU
+  [MARKER] The start of TDX KVM patch series: KVM TDP refactoring for
+    TDX
+  KVM: x86/mmu: Disallow fast page fault on private GPA
+  KVM: VMX: Introduce test mode related to EPT violation VE
+  [MARKER] The start of TDX KVM patch series: KVM TDP MMU hooks
+  KVM: x86/mmu: Focibly use TDP MMU for TDX
+  KVM: x86/mmu: Add a private pointer to struct kvm_mmu_page
+  KVM: x86/tdp_mmu: refactor kvm_tdp_mmu_map()
+  KVM: x86/tdp_mmu: Support TDX private mapping for TDP MMU
+  [MARKER] The start of TDX KVM patch series: TDX EPT violation
+  KVM: x86/tdp_mmu: Ignore unsupported mmu operation on private GFNs
+  KVM: TDX: don't request KVM_REQ_APIC_PAGE_RELOAD
+  KVM: TDX: TDP MMU TDX support
+  [MARKER] The start of TDX KVM patch series: KVM TDP MMU MapGPA
+  KVM: x86/mmu: steal software usable git to record if GFN is for shared
+    or not
+  KVM: x86/tdp_mmu: implement MapGPA hypercall for TDX
+  [MARKER] The start of TDX KVM patch series: TD finalization
+  KVM: TDX: Create initial guest memory
+  KVM: TDX: Finalize VM initialization
+  [MARKER] The start of TDX KVM patch series: TD vcpu enter/exit
+  KVM: TDX: Add helper assembly function to TDX vcpu
+  KVM: TDX: Implement TDX vcpu enter/exit path
+  KVM: TDX: vcpu_run: save/restore host state(host kernel gs)
+  KVM: TDX: restore host xsave state when exit from the guest TD
+  KVM: TDX: restore user ret MSRs
+  [MARKER] The start of TDX KVM patch series: TD vcpu
+    exits/interrupts/hypercalls
+  KVM: TDX: complete interrupts after tdexit
+  KVM: TDX: restore debug store when TD exit
+  KVM: TDX: handle vcpu migration over logical processor
+  KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched
+    behavior
+  KVM: TDX: remove use of struct vcpu_vmx from posted_interrupt.c
+  KVM: TDX: Implement interrupt injection
+  KVM: TDX: Implements vcpu request_immediate_exit
+  KVM: TDX: Implement methods to inject NMI
+  KVM: TDX: Add a place holder to handle TDX VM exit
+  KVM: TDX: handle EXIT_REASON_OTHER_SMI
+  KVM: TDX: handle ept violation/misconfig exit
+  KVM: TDX: handle EXCEPTION_NMI and EXTERNAL_INTERRUPT
+  KVM: TDX: Add a place holder for handler of TDX hypercalls
+    (TDG.VP.VMCALL)
+  KVM: TDX: handle KVM hypercall with TDG.VP.VMCALL
+  KVM: TDX: Handle TDX PV CPUID hypercall
+  KVM: TDX: Handle TDX PV HLT hypercall
+  KVM: TDX: Handle TDX PV port io hypercall
+  KVM: TDX: Implement callbacks for MSR operations for TDX
+  KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall
+  KVM: TDX: Handle TDX PV report fatal error hypercall
+  KVM: TDX: Handle TDX PV map_gpa hypercall
+  KVM: TDX: Handle TDG.VP.VMCALL<GetTdVmCallInfo> hypercall
+  KVM: TDX: Silently discard SMI request
+  KVM: TDX: Silently ignore INIT/SIPI
+  Documentation/virtual/kvm: Document on Trust Domain Extensions(TDX)
+  KVM: x86: design documentation on TDX support of x86 KVM TDP MMU
+
+Rick Edgecombe (1):
+  KVM: x86/mmu: Add address conversion functions for TDX shared bits
+
+Sean Christopherson (25):
+  KVM: VMX: Move out vmx_x86_ops to 'main.c' to wrap VMX and TDX
+  KVM: Enable hardware before doing arch VM initialization
+  KVM: x86: Introduce vm_type to differentiate default VMs from
+    confidential VMs
+  KVM: TDX: Add TDX "architectural" error codes
+  KVM: TDX: Stub in tdx.h with structs, accessors, and VMCS helpers
+  KVM: TDX: create/destroy VM structure
+  KVM: TDX: x86: Add ioctl to get TDX systemwide parameters
+  KVM: TDX: Do TDX specific vcpu initialization
+  KVM: x86/mmu: Explicitly check for MMIO spte in fast page fault
+  KVM: x86/mmu: Allow non-zero value for non-present SPTE
+  KVM: x86/mmu: Track shadow MMIO value/mask on a per-VM basis
+  KVM: x86/mmu: Allow per-VM override of the TDP max page level
+  KVM: x86/mmu: Zap only leaf SPTEs for deleted/moved memslot for
+    private mmu
+  KVM: x86/mmu: Disallow dirty logging for x86 TDX
+  KVM: VMX: Split out guts of EPT violation to common/exposed function
+  KVM: VMX: Move setting of EPT MMU masks to common VT-x code
+  KVM: TDX: Add load_mmu_pgd method for TDX
+  KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
+  KVM: TDX: Add support for find pending IRQ in a protected local APIC
+  KVM: x86: Assume timer IRQ was injected if APIC state is proteced
+  KVM: VMX: Modify NMI and INTR handlers to take intr_info as function
+    argument
+  KVM: VMX: Move NMI/exception handler to common helper
+  KVM: x86: Split core of hypercall emulation to helper function
+  KVM: TDX: Handle TDX PV MMIO hypercall
+  KVM: TDX: Add methods to ignore accesses to CPU state
+
+Xiaoyao Li (1):
+  KVM: TDX: initialize VM with TDX specific parameters
+
+ Documentation/virt/kvm/api.rst                |   30 +-
+ .../virt/kvm/intel-tdx-layer-status.rst       |   33 +
+ Documentation/virt/kvm/intel-tdx.rst          |  381 +++
+ Documentation/virt/kvm/tdx-tdp-mmu.rst        |  466 ++++
+ arch/arm64/kvm/arm.c                          |    2 +-
+ arch/mips/kvm/mips.c                          |   14 +-
+ arch/powerpc/kvm/powerpc.c                    |    2 +-
+ arch/riscv/kvm/main.c                         |    2 +-
+ arch/s390/kvm/kvm-s390.c                      |    2 +-
+ arch/x86/events/intel/ds.c                    |    1 +
+ arch/x86/include/asm/kvm-x86-ops.h            |   10 +
+ arch/x86/include/asm/kvm_host.h               |   56 +-
+ arch/x86/include/asm/tdx.h                    |   67 +
+ arch/x86/include/asm/vmx.h                    |   14 +
+ arch/x86/include/uapi/asm/kvm.h               |   95 +
+ arch/x86/include/uapi/asm/vmx.h               |    5 +-
+ arch/x86/kvm/Kconfig                          |    4 +
+ arch/x86/kvm/Makefile                         |    3 +-
+ arch/x86/kvm/irq.c                            |    3 +
+ arch/x86/kvm/lapic.c                          |   37 +-
+ arch/x86/kvm/lapic.h                          |    2 +
+ arch/x86/kvm/mmu.h                            |   42 +-
+ arch/x86/kvm/mmu/mmu.c                        |  360 ++-
+ arch/x86/kvm/mmu/mmu_internal.h               |  123 +-
+ arch/x86/kvm/mmu/paging_tmpl.h                |    5 +-
+ arch/x86/kvm/mmu/spte.c                       |   46 +-
+ arch/x86/kvm/mmu/spte.h                       |   65 +-
+ arch/x86/kvm/mmu/tdp_iter.c                   |    1 +
+ arch/x86/kvm/mmu/tdp_iter.h                   |    5 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |  690 ++++-
+ arch/x86/kvm/mmu/tdp_mmu.h                    |   12 +-
+ arch/x86/kvm/svm/svm.c                        |   13 +-
+ arch/x86/kvm/vmx/common.h                     |  174 ++
+ arch/x86/kvm/vmx/evmcs.c                      |    2 +-
+ arch/x86/kvm/vmx/evmcs.h                      |    2 +-
+ arch/x86/kvm/vmx/main.c                       | 1071 +++++++
+ arch/x86/kvm/vmx/pmu_intel.c                  |   39 +-
+ arch/x86/kvm/vmx/pmu_intel.h                  |   28 +
+ arch/x86/kvm/vmx/posted_intr.c                |   43 +-
+ arch/x86/kvm/vmx/posted_intr.h                |   13 +
+ arch/x86/kvm/vmx/tdx.c                        | 2465 +++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h                        |  275 ++
+ arch/x86/kvm/vmx/tdx_arch.h                   |  157 ++
+ arch/x86/kvm/vmx/tdx_errno.h                  |   29 +
+ arch/x86/kvm/vmx/tdx_error.c                  |   22 +
+ arch/x86/kvm/vmx/tdx_ops.h                    |  188 ++
+ arch/x86/kvm/vmx/vmenter.S                    |  146 +
+ arch/x86/kvm/vmx/vmx.c                        |  737 ++---
+ arch/x86/kvm/vmx/vmx.h                        |   39 +-
+ arch/x86/kvm/vmx/x86_ops.h                    |  235 ++
+ arch/x86/kvm/x86.c                            |  148 +-
+ arch/x86/virt/vmx/tdx/seamcall.S              |    2 +
+ arch/x86/virt/vmx/tdx/tdx.c                   |   54 +-
+ arch/x86/virt/vmx/tdx/tdx.h                   |   52 -
+ include/linux/kvm_host.h                      |    4 +-
+ include/uapi/linux/kvm.h                      |    2 +
+ tools/arch/x86/include/uapi/asm/kvm.h         |   95 +
+ tools/include/uapi/linux/kvm.h                |    1 +
+ virt/kvm/kvm_main.c                           |   67 +-
+ 59 files changed, 7877 insertions(+), 804 deletions(-)
+ create mode 100644 Documentation/virt/kvm/intel-tdx-layer-status.rst
+ create mode 100644 Documentation/virt/kvm/intel-tdx.rst
+ create mode 100644 Documentation/virt/kvm/tdx-tdp-mmu.rst
+ create mode 100644 arch/x86/kvm/vmx/common.h
+ create mode 100644 arch/x86/kvm/vmx/main.c
+ create mode 100644 arch/x86/kvm/vmx/pmu_intel.h
+ create mode 100644 arch/x86/kvm/vmx/tdx.c
+ create mode 100644 arch/x86/kvm/vmx/tdx.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_error.c
+ create mode 100644 arch/x86/kvm/vmx/tdx_ops.h
+ create mode 100644 arch/x86/kvm/vmx/x86_ops.h
+
+-- 
+2.25.1
+
