@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16DF155B7BA
-	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 07:24:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1607755B7BD
+	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 07:27:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231266AbiF0FYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 01:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54536 "EHLO
+        id S229623AbiF0F0d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 01:26:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230319AbiF0FYE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 01:24:04 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0BD5FA9;
-        Sun, 26 Jun 2022 22:24:03 -0700 (PDT)
+        with ESMTP id S229463AbiF0F0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 01:26:32 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE3F5FAB;
+        Sun, 26 Jun 2022 22:26:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656307443; x=1687843443;
+  t=1656307591; x=1687843591;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=dao6bRTb6endJS3dwZqWfDAFVT3N8FW7QPmL++/+lEg=;
-  b=J/1z6BVSr6MYn3/qYBP5vpd//K4YHwn4US9/AwKx/8ki6ygnpwvoMgAo
-   MBl/jXIZZx8H/9QGdHoVtXH683BcrYOGWzLf/g7JsTvwLze/HBgwHSKS8
-   hcGn3l4UkJ617Hvw8s/JolmAL6067G/NeuvZPojRtRPByzyxlqzjzK6eq
-   b6vDHOYN/NFL4t+u1a/TAeVTELheUUK9DQAniPVDEGwiztUt1ZIfk7tW8
-   Q5R41ZbtrIZyn7EIl24rJ9Kf0d1bnv/L1jH6tk94FWrSriw8EtfK1mo4R
-   iFT+nH3PTgrDWbzgXaT1d26gEtunotiq4bqD0V6Swdfim6q5iOaMdKlCI
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10390"; a="306833472"
+  bh=iPSJPsF1tv3EGhocYM1AiKOjoEEAMTmjLe2J0E/veUM=;
+  b=jWmMkZVoktC6cQX6lS1euceRa76XMrE/S1xRSMWJY7DwCg1JfZcOthIR
+   JICPEcasdfm/4MtrBnwcYoK7l0VlqeR/65Kt7jgTlkRniAU+l/3eAe1Wu
+   rzUQPGkDxyZ0y0Hv+tpNljyugqHoWpkthvzFpj5XspMaoRIJt19KtweoF
+   fPv1pwNkRFOmYwGZD6V5VWy45k1V/0IaSl/rDXCyKxCmbja7sNkBui0uc
+   bSDUzklK/ObIPTGx/AU3IRBf2mb895DpEiWT7UqfwUPwb/1WGAeEfJvcE
+   0tGggr54LH5Tvgi1LYQ5ldqfR96C22DfFK3gnv2cMz8KTBjdnpplwJsjj
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10390"; a="264404720"
 X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
-   d="scan'208";a="306833472"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:24:02 -0700
+   d="scan'208";a="264404720"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:26:30 -0700
 X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
-   d="scan'208";a="589783038"
+   d="scan'208";a="539986175"
 Received: from fzaeni-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.88.6])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:23:59 -0700
-Message-ID: <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
-Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:26:26 -0700
+Message-ID: <cc90e5f8be0c6f48a144240d4569b15bd4b75dd8.camel@intel.com>
+Subject: Re: [PATCH v5 08/22] x86/virt/tdx: Shut down TDX module in case of
+ error
 From:   Kai Huang <kai.huang@intel.com>
 To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -48,155 +49,175 @@ Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
         isaku.yamahata@intel.com
-Date:   Mon, 27 Jun 2022 17:23:57 +1200
-In-Reply-To: <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
+Date:   Mon, 27 Jun 2022 17:26:24 +1200
+In-Reply-To: <765a20f1-681d-33c2-68e9-24cc249fe6f9@intel.com>
 References: <cover.1655894131.git.kai.huang@intel.com>
-         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
-         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
+         <89fffc70cdbb74c80bb324364b712ec41e5f8b91.1655894131.git.kai.huang@intel.com>
+         <765a20f1-681d-33c2-68e9-24cc249fe6f9@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-06-24 at 11:38 -0700, Dave Hansen wrote:
-> On 6/22/22 04:16, Kai Huang wrote:
-> > SEAMCALL instruction causes #GP when SEAMRR isn't enabled, and #UD when
-> > CPU is not in VMX operation.  The TDX_MODULE_CALL macro doesn't handle
-> > SEAMCALL exceptions.  Leave to the caller to guarantee those conditions
-> > before calling __seamcall().
+On Fri, 2022-06-24 at 11:50 -0700, Dave Hansen wrote:
+> So, the last patch was called:
 >=20
-> I was trying to make the argument earlier that you don't need *ANY*
-> detection for TDX, other than the ability to make a SEAMCALL.
-> Basically, patch 01/22 could go away.
+> 	Implement SEAMCALL function
 >=20
-> You are right that:
+> and yet, in this patch, we have a "seamcall()" function.  That's a bit
+> confusing and not covered at *all* in this subject.
 >=20
-> 	The TDX_MODULE_CALL macro doesn't handle SEAMCALL exceptions.
+> Further, seamcall() is the *ONLY* caller of __seamcall() that I see in
+> this series.  That makes its presence here even more odd.
 >=20
-> But, it's also not hard to make it *able* to handle exceptions.
+> The seamcall() bits should either be in their own patch, or mashed in
+> with __seamcall().
+
+Right.  The reason I didn't put the seamcall() into previous patch was it i=
+s
+only used in this tdx.c, so it should be static.  But adding a static funct=
+ion
+w/o using it in previous patch will trigger a compile warning.  So I introd=
+uced
+here where it is first used.
+
+One option is I can introduce seamcall() as a static inline function in tdx=
+.h in
+previous patch so there won't be a warning.  I'll change to use this way.=
+=20
+Please let me know if you have any comments.
+
 >=20
-> So what does patch 01/22 buy us?  One EXTABLE entry?
+> > +/*
+> > + * Wrapper of __seamcall().  It additionally prints out the error
+> > + * informationi if __seamcall() fails normally.  It is useful during
+> > + * the module initialization by providing more information to the user=
+.
+> > + */
+> > +static u64 seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+> > +		    struct tdx_module_output *out)
+> > +{
+> > +	u64 ret;
+> > +
+> > +	ret =3D __seamcall(fn, rcx, rdx, r8, r9, out);
+> > +	if (ret =3D=3D TDX_SEAMCALL_VMFAILINVALID || !ret)
+> > +		return ret;
+> > +
+> > +	pr_err("SEAMCALL failed: leaf: 0x%llx, error: 0x%llx\n", fn, ret);
+> > +	if (out)
+> > +		pr_err("SEAMCALL additional output: rcx 0x%llx, rdx 0x%llx, r8 0x%ll=
+x, r9 0x%llx, r10 0x%llx, r11 0x%llx.\n",
+> > +			out->rcx, out->rdx, out->r8, out->r9, out->r10, out->r11);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static void seamcall_smp_call_function(void *data)
+> > +{
+> > +	struct seamcall_ctx *sc =3D data;
+> > +	struct tdx_module_output out;
+> > +	u64 ret;
+> > +
+> > +	ret =3D seamcall(sc->fn, sc->rcx, sc->rdx, sc->r8, sc->r9, &out);
+> > +	if (ret)
+> > +		atomic_set(&sc->err, -EFAULT);
+> > +}
+> > +
+> > +/*
+> > + * Call the SEAMCALL on all online CPUs concurrently.  Caller to check
+> > + * @sc->err to determine whether any SEAMCALL failed on any cpu.
+> > + */
+> > +static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
+> > +{
+> > +	on_each_cpu(seamcall_smp_call_function, sc, true);
+> > +}
+>=20
+> You can get away with this three-liner seamcall_on_each_cpu() being in
+> this patch, but seamcall() itself doesn't belong here.
 
-There are below pros if we can detect whether TDX is enabled by BIOS during=
- boot
-before initializing the TDX Module:
+Right.  Please see above reply.
 
-1) There are requirements from customers to report whether platform support=
-s TDX
-and the TDX keyID numbers before initializing the TDX module so the userspa=
-ce
-cloud software can use this information to do something.  Sorry I cannot fi=
-nd
-the lore link now.
+>=20
+> >  /*
+> >   * Detect and initialize the TDX module.
+> >   *
+> > @@ -138,7 +195,10 @@ static int init_tdx_module(void)
+> > =20
+> >  static void shutdown_tdx_module(void)
+> >  {
+> > -	/* TODO: Shut down the TDX module */
+> > +	struct seamcall_ctx sc =3D { .fn =3D TDH_SYS_LP_SHUTDOWN };
+> > +
+> > +	seamcall_on_each_cpu(&sc);
+> > +
+> >  	tdx_module_status =3D TDX_MODULE_SHUTDOWN;
+> >  }
+> > =20
+> > @@ -221,6 +281,9 @@ bool platform_tdx_enabled(void)
+> >   * CPU hotplug is temporarily disabled internally to prevent any cpu
+> >   * from going offline.
+> >   *
+> > + * Caller also needs to guarantee all CPUs are in VMX operation during
+> > + * this function, otherwise Oops may be triggered.
+>=20
+> I would *MUCH* rather have this be a:
+>=20
+> 	if (!cpu_feature_enabled(X86_FEATURE_VMX))
+> 		WARN_ONCE("VMX should be on blah blah\n");
+>=20
+> than just plain oops.  Even a pr_err() that preceded the oops would be
+> nicer than an oops that someone has to go decode and then grumble when
+> their binutils is too old that it can't disassemble the TDCALL.
 
-Isaku, if you see, could you provide more info?
+I can add this to seamcall():
 
-2) As you can see, it can be used to handle ACPI CPU/memory hotplug and dri=
-ver
-managed memory hotplug.  Kexec() support patch also can use it.
+	/*
+	 * SEAMCALL requires CPU being in VMX operation otherwise it causes
+#UD.
+	 * Sanity check and return early to avoid Oops.  Note cpu_vmx_enabled()
+	 * actually only checks whether VMX is enabled but doesn't check
+whether
+	 * CPU is in VMX operation (VMXON is done).  There's no way to check
+	 * whether VMXON has been done, but currently enabling VMX and doing
+	 * VMXON are always done together.
+	 */
+	if (!cpu_vmx_enabled())	 {
+		WARN_ONCE("CPU is not in VMX operation before making
+SEAMCALL");
+		return -EINVAL;
+	}
 
-Particularly, in concept, ACPI CPU/memory hotplug is only related to whethe=
-r TDX
-is enabled by BIOS, but not whether TDX module is loaded, or the result of
-initializing the TDX module.  So I think we should have some code to detect=
- TDX
-during boot.
+The reason I didn't do is I'd like to make seamcall() simple, that it only
+returns TDX_SEAMCALL_VMFAILINVALID or the actual SEAMCALL leaf error.  With
+above, this function also returns kernel error code, which isn't good.
 
+Alternatively, we can always add EXTABLE to TDX_MODULE_CALL macro to handle=
+ #UD
+and #GP by returning dedicated error codes (please also see my reply to pre=
+vious
+patch for the code needed to handle), in which case we don't need such chec=
+k
+here.
 
-Also, it seems adding EXTABLE to TDX_MODULE_CALL doesn't have significantly=
- less
-code comparing to detecting TDX during boot:
+Always handling #UD in TDX_MODULE_CALL macro also has another advantage:  t=
+here
+will be no Oops for #UD regardless the issue that "there's no way to check
+whether VMXON has been done" in the above comment.
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 4b75c930fa1b..4a97ca8eb14c 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -8,6 +8,7 @@
- #include <asm/ptrace.h>
- #include <asm/shared/tdx.h>
-
-+#ifdef CONFIG_INTEL_TDX_HOST
- /*
-  * SW-defined error codes.
-  *
-@@ -18,6 +19,21 @@
- #define TDX_SW_ERROR                   (TDX_ERROR | GENMASK_ULL(47, 40))
- #define TDX_SEAMCALL_VMFAILINVALID     (TDX_SW_ERROR | _UL(0xFFFF0000))
-
-+/*
-+ * Special error codes to indicate SEAMCALL #GP and #UD.
-+ *
-+ * SEAMCALL causes #GP when SEAMRR is not properly enabled by BIOS, and
-+ * causes #UD when CPU is not in VMX operation.  Define two separate
-+ * error codes to distinguish the two cases so caller can be aware of
-+ * what caused the SEAMCALL to fail.
-+ *
-+ * Bits 61:48 are reserved bits which will never be set by the TDX
-+ * module.  Borrow 2 reserved bits to represent #GP and #UD.
-+ */
-+#define TDX_SEAMCALL_GP                (TDX_ERROR | GENMASK_ULL(48, 48))
-+#define TDX_SEAMCALL_UD                (TDX_ERROR | GENMASK_ULL(49, 49))
-+#endif
-+
- #ifndef __ASSEMBLY__
-
- /*
-diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcal=
-l.S
-index 49a54356ae99..7431c47258d9 100644
---- a/arch/x86/virt/vmx/tdx/tdxcall.S
-+++ b/arch/x86/virt/vmx/tdx/tdxcall.S
-@@ -1,6 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <asm/asm-offsets.h>
- #include <asm/tdx.h>
-+#include <asm/asm.h>
-
- /*
-  * TDCALL and SEAMCALL are supported in Binutils >=3D 2.36.
-@@ -45,6 +46,7 @@
-        /* Leave input param 2 in RDX */
-
-        .if \host
-+1:
-        seamcall
-        /*
-         * SEAMCALL instruction is essentially a VMExit from VMX root
-@@ -57,9 +59,25 @@
-         * This value will never be used as actual SEAMCALL error code as
-         * it is from the Reserved status code class.
-         */
--       jnc .Lno_vmfailinvalid
-+       jnc .Lseamcall_out
-        mov $TDX_SEAMCALL_VMFAILINVALID, %rax
--.Lno_vmfailinvalid:
-+       jmp .Lseamcall_out
-+2:
-+       /*
-+        * SEAMCALL caused #GP or #UD.  By reaching here %eax contains
-+        * the trap number.  Check the trap number and set up the return
-+        * value to %rax.
-+        */
-+       cmp $X86_TRAP_GP, %eax
-+       je .Lseamcall_gp
-+       mov $TDX_SEAMCALL_UD, %rax
-+       jmp .Lseamcall_out
-+.Lseamcall_gp:
-+       mov $TDX_SEAMCALL_GP, %rax
-+       jmp .Lseamcall_out
-+
-+       _ASM_EXTABLE_FAULT(1b, 2b)
-+.Lseamcall_out
+What's your opinion?
 
 
+--=20
+Thanks,
+-Kai
 
 
