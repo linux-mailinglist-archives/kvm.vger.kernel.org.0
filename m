@@ -2,177 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 276AD55C8E8
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:56:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A83755DF96
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:30:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233376AbiF0LJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 07:09:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
+        id S238285AbiF0Lul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 07:50:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiF0LJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 07:09:52 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68EE464DF;
-        Mon, 27 Jun 2022 04:09:51 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25RB1JJS027189;
-        Mon, 27 Jun 2022 11:09:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=1EUUqAPrNG9SEdkyTHKYD567vWXRfPDsqtSt5rx6Ckk=;
- b=HS/8/wDnmPt7nBW+0M/hG3HkcvP4jCOOYBEJaRs08hFclDYg6HzdWYkuahHmUs3DV/KB
- +qYUPjqzVxh0JhXvcuTDbfvcP5FTM1di0RKgM2OHmQZc8WAz2NePMTW/Vj3gHp/Ykuts
- g6L49O8pXHBmH+Q++Us9qOmQecNX13zRpvcZQGcWLdDbW2/yO49zHSM716dwbivUAciz
- /DuSAAkt4PEPsV656NudcypV6vETxOC7twOX9wCOvHr+r6nhPdK+DQGbyowdoIlmuwxb
- Phxn4eqvvR11fwK29DSGwugAOLIJrUDF2A03LE0/GwI5idN8pkzRQBOE2te+WrWI9auE AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gybaf87gf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jun 2022 11:09:50 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25RB2KQV030308;
-        Mon, 27 Jun 2022 11:09:50 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3gybaf87fq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jun 2022 11:09:49 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25RB5pDv012377;
-        Mon, 27 Jun 2022 11:09:48 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3gwt09257q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jun 2022 11:09:48 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25RB9iDD13500924
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Jun 2022 11:09:44 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C54BBA4059;
-        Mon, 27 Jun 2022 11:09:44 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 810DDA4053;
-        Mon, 27 Jun 2022 11:09:44 +0000 (GMT)
-Received: from [9.145.155.49] (unknown [9.145.155.49])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Jun 2022 11:09:44 +0000 (GMT)
-Message-ID: <30263d61-dd16-5c49-f1c1-e298ce8cf60b@linux.ibm.com>
-Date:   Mon, 27 Jun 2022 13:09:44 +0200
+        with ESMTP id S238584AbiF0Lsr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 07:48:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69042CEA;
+        Mon, 27 Jun 2022 04:42:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 04DCB611AE;
+        Mon, 27 Jun 2022 11:42:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FC3AC3411D;
+        Mon, 27 Jun 2022 11:42:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1656330153;
+        bh=yTy+jkozP0hMY+B0KWkUgzOl8qgLaJsMF/9JTHu7dB4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=jr76LOE0se2fpNwdK/nBBIw0xSKGrZEnhUb+66edY7UNwg1mGt0JettLcSsHzBu/H
+         R/4U8yp/i7vLQU2DdbLdffzqnvwwuJtyn/Ea6lUsZ9xCpQ9lrbhodhEYNhQm9KZA0t
+         G/dnllkHF1he/CNwJnbT8Vu9X0Gan4BBjYExclIM=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Peter Gonda <pgonda@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.18 103/181] KVM: SEV: Init target VMCBs in sev_migrate_from
+Date:   Mon, 27 Jun 2022 13:21:16 +0200
+Message-Id: <20220627111947.686004921@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220627111944.553492442@linuxfoundation.org>
+References: <20220627111944.553492442@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] lib: s390x: better smp interrupt
- checks
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        scgl@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com
-References: <20220624144518.66573-1-imbrenda@linux.ibm.com>
- <20220624144518.66573-4-imbrenda@linux.ibm.com>
- <19169d83-ad31-da70-b3bb-bd7ba43e6484@linux.ibm.com>
- <20220627125314.599cc580@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220627125314.599cc580@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0s4XtYoyk0mXKnQ0bRl_fyWIJMXg3bRU
-X-Proofpoint-ORIG-GUID: 4NTwz0skxQO3foXS_J5pGST_uT4BDPSW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-27_06,2022-06-24_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- phishscore=0 priorityscore=1501 impostorscore=0 mlxlogscore=999
- clxscore=1015 lowpriorityscore=0 mlxscore=0 bulkscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206270049
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/27/22 12:53, Claudio Imbrenda wrote:
-> On Mon, 27 Jun 2022 11:28:18 +0200
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> On 6/24/22 16:45, Claudio Imbrenda wrote:
->>> Use per-CPU flags and callbacks for Program and Extern interrupts,
->>> instead of global variables.
->>>
->>> This allows for more accurate error handling; a CPU waiting for an
->>> interrupt will not have it "stolen" by a different CPU that was not
->>> supposed to wait for one, and now two CPUs can wait for interrupts at
->>> the same time.
->>>
->>> This will significantly improve error reporting and debugging when
->>> things go wrong.
->>>
->>> Both program interrupts and extern interrupts are now CPU-bound, even
->>> though some extern interrupts are floating (notably, the SCLP
->>> interrupt). In those cases, the testcases should mask interrupts and/or
->>> expect them appropriately according to need.
->>>
->>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>> ---
->>>    lib/s390x/asm/arch_def.h | 17 +++++++++++-
->>>    lib/s390x/smp.h          |  8 +-----
->>>    lib/s390x/interrupt.c    | 57 +++++++++++++++++++++++++++++-----------
->>>    lib/s390x/smp.c          | 11 ++++++++
->>>    4 files changed, 70 insertions(+), 23 deletions(-)
->> [...]
->>>    
->>> +struct lowcore *smp_get_lowcore(uint16_t idx)
->>> +{
->>> +	if (THIS_CPU->idx == idx)
->>> +		return &lowcore;
->>> +
->>> +	check_idx(idx);
->>> +	return cpus[idx].lowcore;
->>> +}
->>
->> This function is unused.
-> 
-> not currently, but it's useful to have in lib
-> 
-> should I split this into a separate patch?
-> 
->>
->>> +
->>>    int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
->>>    {
->>>    	check_idx(idx);
->>> @@ -253,6 +262,7 @@ static int smp_cpu_setup_nolock(uint16_t idx, struct psw psw)
->>>    
->>>    	/* Copy all exception psws. */
->>>    	memcpy(lc, cpus[0].lowcore, 512);
->>> +	lc->this_cpu = cpus + idx;
->>
->> Why not:
->> lc->this_cpu = &cpus[idx];
-> 
-> it's equivalent, do you have a reason for changing it?
+From: Peter Gonda <pgonda@google.com>
 
-It's more explicit.
+[ Upstream commit 6defa24d3b12bbd418bc8526dea1cbc605265c06 ]
 
-> 
->>
->>>    
->>>    	/* Setup stack */
->>>    	cpus[idx].stack = (uint64_t *)alloc_pages(2);
->>> @@ -325,6 +335,7 @@ void smp_setup(void)
->>>    	for (i = 0; i < num; i++) {
->>>    		cpus[i].addr = entry[i].address;
->>>    		cpus[i].active = false;
->>> +		cpus[i].idx = i;
->>>    		/*
->>>    		 * Fill in the boot CPU. If the boot CPU is not at index 0,
->>>    		 * swap it with the one at index 0. This guarantees that the
->>
-> 
+The target VMCBs during an intra-host migration need to correctly setup
+for running SEV and SEV-ES guests. Add sev_init_vmcb() function and make
+sev_es_init_vmcb() static. sev_init_vmcb() uses the now private function
+to init SEV-ES guests VMCBs when needed.
+
+Fixes: 0b020f5af092 ("KVM: SEV: Add support for SEV-ES intra host migration")
+Fixes: b56639318bb2 ("KVM: SEV: Add support for SEV intra host migration")
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Message-Id: <20220623173406.744645-1-pgonda@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/kvm/svm/sev.c | 68 ++++++++++++++++++++++++++++--------------
+ arch/x86/kvm/svm/svm.c | 11 ++-----
+ arch/x86/kvm/svm/svm.h |  2 +-
+ 3 files changed, 48 insertions(+), 33 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 4b7d490c0b63..76e9e6eb71d6 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1665,19 +1665,24 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+ {
+ 	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
+ 	struct kvm_sev_info *src = &to_kvm_svm(src_kvm)->sev_info;
++	struct kvm_vcpu *dst_vcpu, *src_vcpu;
++	struct vcpu_svm *dst_svm, *src_svm;
+ 	struct kvm_sev_info *mirror;
++	unsigned long i;
+ 
+ 	dst->active = true;
+ 	dst->asid = src->asid;
+ 	dst->handle = src->handle;
+ 	dst->pages_locked = src->pages_locked;
+ 	dst->enc_context_owner = src->enc_context_owner;
++	dst->es_active = src->es_active;
+ 
+ 	src->asid = 0;
+ 	src->active = false;
+ 	src->handle = 0;
+ 	src->pages_locked = 0;
+ 	src->enc_context_owner = NULL;
++	src->es_active = false;
+ 
+ 	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
+ 
+@@ -1704,26 +1709,21 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+ 		list_del(&src->mirror_entry);
+ 		list_add_tail(&dst->mirror_entry, &owner_sev_info->mirror_vms);
+ 	}
+-}
+ 
+-static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
+-{
+-	unsigned long i;
+-	struct kvm_vcpu *dst_vcpu, *src_vcpu;
+-	struct vcpu_svm *dst_svm, *src_svm;
++	kvm_for_each_vcpu(i, dst_vcpu, dst_kvm) {
++		dst_svm = to_svm(dst_vcpu);
+ 
+-	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
+-		return -EINVAL;
++		sev_init_vmcb(dst_svm);
+ 
+-	kvm_for_each_vcpu(i, src_vcpu, src) {
+-		if (!src_vcpu->arch.guest_state_protected)
+-			return -EINVAL;
+-	}
++		if (!dst->es_active)
++			continue;
+ 
+-	kvm_for_each_vcpu(i, src_vcpu, src) {
++		/*
++		 * Note, the source is not required to have the same number of
++		 * vCPUs as the destination when migrating a vanilla SEV VM.
++		 */
++		src_vcpu = kvm_get_vcpu(dst_kvm, i);
+ 		src_svm = to_svm(src_vcpu);
+-		dst_vcpu = kvm_get_vcpu(dst, i);
+-		dst_svm = to_svm(dst_vcpu);
+ 
+ 		/*
+ 		 * Transfer VMSA and GHCB state to the destination.  Nullify and
+@@ -1740,8 +1740,23 @@ static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
+ 		src_svm->vmcb->control.vmsa_pa = INVALID_PAGE;
+ 		src_vcpu->arch.guest_state_protected = false;
+ 	}
+-	to_kvm_svm(src)->sev_info.es_active = false;
+-	to_kvm_svm(dst)->sev_info.es_active = true;
++}
++
++static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
++{
++	struct kvm_vcpu *src_vcpu;
++	unsigned long i;
++
++	if (!sev_es_guest(src))
++		return 0;
++
++	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
++		return -EINVAL;
++
++	kvm_for_each_vcpu(i, src_vcpu, src) {
++		if (!src_vcpu->arch.guest_state_protected)
++			return -EINVAL;
++	}
+ 
+ 	return 0;
+ }
+@@ -1789,11 +1804,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+ 	if (ret)
+ 		goto out_dst_vcpu;
+ 
+-	if (sev_es_guest(source_kvm)) {
+-		ret = sev_es_migrate_from(kvm, source_kvm);
+-		if (ret)
+-			goto out_source_vcpu;
+-	}
++	ret = sev_check_source_vcpus(kvm, source_kvm);
++	if (ret)
++		goto out_source_vcpu;
+ 
+ 	sev_migrate_from(kvm, source_kvm);
+ 	kvm_vm_dead(source_kvm);
+@@ -2910,7 +2923,7 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+ 				    count, in);
+ }
+ 
+-void sev_es_init_vmcb(struct vcpu_svm *svm)
++static void sev_es_init_vmcb(struct vcpu_svm *svm)
+ {
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 
+@@ -2955,6 +2968,15 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTTOIP, 1, 1);
+ }
+ 
++void sev_init_vmcb(struct vcpu_svm *svm)
++{
++	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
++	clr_exception_intercept(svm, UD_VECTOR);
++
++	if (sev_es_guest(svm->vcpu.kvm))
++		sev_es_init_vmcb(svm);
++}
++
+ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ {
+ 	/*
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 0c0a09b43b10..6bfb0b0e66bd 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1125,15 +1125,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 		svm->vmcb->control.int_ctl |= V_GIF_ENABLE_MASK;
+ 	}
+ 
+-	if (sev_guest(vcpu->kvm)) {
+-		svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
+-		clr_exception_intercept(svm, UD_VECTOR);
+-
+-		if (sev_es_guest(vcpu->kvm)) {
+-			/* Perform SEV-ES specific VMCB updates */
+-			sev_es_init_vmcb(svm);
+-		}
+-	}
++	if (sev_guest(vcpu->kvm))
++		sev_init_vmcb(svm);
+ 
+ 	svm_hv_init_vmcb(svm->vmcb);
+ 	init_vmcb_after_set_cpuid(vcpu);
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 34babf9185fe..8ec8fb58b924 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -616,10 +616,10 @@ void __init sev_set_cpu_caps(void);
+ void __init sev_hardware_setup(void);
+ void sev_hardware_unsetup(void);
+ int sev_cpu_init(struct svm_cpu_data *sd);
++void sev_init_vmcb(struct vcpu_svm *svm);
+ void sev_free_vcpu(struct kvm_vcpu *vcpu);
+ int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
+ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
+-void sev_es_init_vmcb(struct vcpu_svm *svm);
+ void sev_es_vcpu_reset(struct vcpu_svm *svm);
+ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ void sev_es_prepare_switch_to_guest(struct vmcb_save_area *hostsa);
+-- 
+2.35.1
+
+
 
