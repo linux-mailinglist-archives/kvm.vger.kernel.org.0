@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51DC855D518
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:14:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 797D055DE7B
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:29:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241871AbiF0V5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:57:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59822 "EHLO
+        id S241828AbiF0V44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241533AbiF0Vzk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 17:55:40 -0400
+        with ESMTP id S241554AbiF0Vzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 17:55:46 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02A8ADF2C;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F23DF66;
         Mon, 27 Jun 2022 14:55:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656366902; x=1687902902;
+  t=1656366903; x=1687902903;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ug/g8cStHuKj1Nl1jv+yUHbWc+pIFDLkczI7p1jBRL4=;
-  b=ZXqLo/YCbRcXAMewGWQS9xmyHZdOgl0yo9U+Qs6VWVLImTLDjUgX5C8t
-   c92ht3AgiHxMFmQYG0YvrXsrnn2Zko37kYymP+Ru2o/rqUS8ZaVZuIGYS
-   nZwFXJzPUEo67yhugDb2i3ohVTSDwxSginoJX6gn47xnPpYt/A4NtbCch
-   NHuz41QwXNpOQVZdkwJhs/uUN3wntwrecpO5vwHcPIYfzkRGntEUK53qK
-   HVGdt36FcnNZdUwgkBotNN0+TEcxsbNsaimnoQVBcNgfsyTamrBk+BVk6
-   nLLrFxx2Rc1DTjXAAWLcYogJndjs5cTSNRZ+LU+2XaSrt/4Cy+kbvZABf
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609591"
+  bh=411epus5AX5Qv62riJ2Q7lIyk4q64OuSxGdP/khrKOE=;
+  b=dJ8Bzcp43v5VKthCAzrTyfDLUyQv53cgAdkcj2Yvintd4i9qLt7aC7ya
+   LjbeYKpi98NoYQIdMkKX8yyAvKvyEz75FnnYwoU8b6N9RWrWNsijar2F4
+   +gPpVzhb7UpG4unc5BD8St2oRA/fyvbQOQtFHy3r+Z1CQ4gxcFf+fC4RJ
+   IX0Hhe/Gr+Qms5zPPijTC3Ngsjtz0LQ1OVMgyuAYrzi7LvY12Zr6o1+45
+   WXu5vjSeMpzU9lkms0Wt75bZeSOrjm9JjmfloGSn+IHw99QyJ+Cv2fRGR
+   F4RLEk6z+WNTn5QVq27ZzE2tydqMnVrQEWoVrfiDdq2T4JzB21FlYCpUM
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609593"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="281609591"
+   d="scan'208";a="281609593"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:56 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="657863617"
+   d="scan'208";a="657863620"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:55 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:56 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v7 056/102] KVM: x86/mmu: steal software usable git to record if GFN is for shared or not
-Date:   Mon, 27 Jun 2022 14:53:48 -0700
-Message-Id: <5ebf360e196b3f52eb42efaa8eeba587fab5897a.1656366338.git.isaku.yamahata@intel.com>
+Subject: [PATCH v7 057/102] KVM: x86/tdp_mmu: implement MapGPA hypercall for TDX
+Date:   Mon, 27 Jun 2022 14:53:49 -0700
+Message-Id: <7cda2771dffb7a70a33c30eca46ad703638c34d3.1656366338.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
@@ -60,224 +60,503 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-With TDX, all GFNs are private at guest boot time.  At run time guest TD
-can explicitly change it to shared from private or vice-versa by MapGPA
-hypercall.  If it's specified, the given GFN can't be used as otherwise.
-That's is, if a guest tells KVM that the GFN is shared, it can't be used
-as private.  or vice-versa.
+The TDX Guest-Hypervisor communication interface(GHCI) specification
+defines MapGPA hypercall for guest TD to request the host VMM to map given
+GPA range as private or shared.
 
-Steal software usable bit, SPTE_SHARED_MASK, for it from MMIO counter to
-record it.  Use the bit SPTE_SHARED_MASK in shared or private EPT to
-determine which mapping, shared or private, is allowed.  If requested
-mapping isn't allowed, return RET_PF_RETRY to wait for other vcpu to change
-it.  The bit is recorded in both shared and private shadow page to avoid
-traverse one more shadow page when resolving KVM page fault.
+It means the guest TD uses the GPA as shared (or private).  The GPA
+won't be used as private (or shared).  VMM should enforce GPA usage. VMM
+doesn't have to map the GPA on the hypercall request.
 
-The bit needs to be kept over zapping the EPT entry.  Currently the EPT
-entry is initialized SHADOW_NONPRESENT_VALUE unconditionally to clear
-SPTE_SHARED_MASK bit.  To carry SPTE_SHARED_MASK bit, introduce a helper
-function to get initial value for zapped entry with SPTE_SHARED_MASK bit.
-Replace SHADOW_NONPRESENT_VALUE with it.
+- Allocate 4k PTE to record SPTE_SHARED_MASK bit.
+
+- Zap the aliased region.
+  If shared (or private) GPA is requested, zap private (or shared) GPA
+  (modulo shared bit).
+
+- Record the request GPA is shared (or private) by SPTE_SHARED_MASK in SPTE
+  in both shared and private EPT tables.
+  - With SPTE_SHARED_MASK set, a shared GPA is allowed.
+  - With SPTE_SHARED_MASK cleared, a private GPA is allowed.
+
+  The reason to record SPTE_SHARED_MASK in both shared and private EPT
+  is to optimize EPT violation path for normal guest TD execution path and
+  penalize map_gpa hypercall.
+
+  If the guest TD faults on not-allowed GPA (modulo shared bit), the KVM
+  doesn't resolve EPT violation and let vcpu retry.  vcpu will keep
+  faulting until other vcpu maps the region with MapGPA hypercall.  With
+  the nonpresent value of spte(shadow_nonpresent_value), SPTE_SHARED_MASK
+  is cleared.  So the default behavior doesn't change.
+
+- don't map GPA.
+  The GPA is mapped on the next EPT violation.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/spte.h    | 17 +++++++---
- arch/x86/kvm/mmu/tdp_mmu.c | 65 ++++++++++++++++++++++++++++++++------
- 2 files changed, 68 insertions(+), 14 deletions(-)
+ arch/x86/kvm/mmu.h         |   3 +
+ arch/x86/kvm/mmu/mmu.c     | 106 +++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c | 271 ++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/mmu/tdp_mmu.h |   5 +
+ 4 files changed, 382 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 96312ab4fffb..7c1aaf0e963e 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -14,6 +14,9 @@
-  */
- #define SPTE_MMU_PRESENT_MASK		BIT_ULL(11)
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 9ba60fd79d33..f5edf2e58dba 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -225,6 +225,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
  
-+/* Masks that used to track for shared GPA **/
-+#define SPTE_SHARED_MASK		BIT_ULL(62)
+ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+ 
++int kvm_mmu_map_gpa(struct kvm_vcpu *vcpu, gfn_t *startp, gfn_t end,
++		    bool allow_private);
 +
- /*
-  * TDP SPTES (more specifically, EPT SPTEs) may not have A/D bits, and may also
-  * be restricted to using write-protection (for L2 when CPU dirty logging, i.e.
-@@ -104,7 +107,7 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
-  * the memslots generation and is derived as follows:
-  *
-  * Bits 0-7 of the MMIO generation are propagated to spte bits 3-10
-- * Bits 8-18 of the MMIO generation are propagated to spte bits 52-62
-+ * Bits 8-18 of the MMIO generation are propagated to spte bits 52-61
-  *
-  * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
-  * the MMIO generation number, as doing so would require stealing a bit from
-@@ -118,7 +121,7 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
- #define MMIO_SPTE_GEN_LOW_END		10
+ int kvm_mmu_post_init_vm(struct kvm *kvm);
+ void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
  
- #define MMIO_SPTE_GEN_HIGH_START	52
--#define MMIO_SPTE_GEN_HIGH_END		62
-+#define MMIO_SPTE_GEN_HIGH_END		61
- 
- #define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
- 						    MMIO_SPTE_GEN_LOW_START)
-@@ -131,7 +134,7 @@ static_assert(!(SPTE_MMU_PRESENT_MASK &
- #define MMIO_SPTE_GEN_HIGH_BITS		(MMIO_SPTE_GEN_HIGH_END - MMIO_SPTE_GEN_HIGH_START + 1)
- 
- /* remember to adjust the comment above as well if you change these */
--static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
-+static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 10);
- 
- #define MMIO_SPTE_GEN_LOW_SHIFT		(MMIO_SPTE_GEN_LOW_START - 0)
- #define MMIO_SPTE_GEN_HIGH_SHIFT	(MMIO_SPTE_GEN_HIGH_START - MMIO_SPTE_GEN_LOW_BITS)
-@@ -208,6 +211,7 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
- /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
- static_assert(!(__REMOVED_SPTE & SPTE_MMU_PRESENT_MASK));
- static_assert(!(__REMOVED_SPTE & SHADOW_NONPRESENT_VALUE));
-+static_assert(!(__REMOVED_SPTE & SPTE_SHARED_MASK));
- 
- /*
-  * See above comment around __REMOVED_SPTE.  REMOVED_SPTE is the actual
-@@ -217,7 +221,12 @@ static_assert(!(__REMOVED_SPTE & SHADOW_NONPRESENT_VALUE));
- 
- static inline bool is_removed_spte(u64 spte)
- {
--	return spte == REMOVED_SPTE;
-+	return (spte & ~SPTE_SHARED_MASK) == REMOVED_SPTE;
-+}
-+
-+static inline u64 spte_shared_mask(u64 spte)
-+{
-+	return spte & SPTE_SHARED_MASK;
- }
- 
- /*
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index fef6246086a8..4f279700b3cc 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -758,6 +758,11 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 	return 0;
- }
- 
-+static u64 shadow_nonpresent_spte(u64 old_spte)
-+{
-+	return SHADOW_NONPRESENT_VALUE | spte_shared_mask(old_spte);
-+}
-+
- static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 					  struct tdp_iter *iter)
- {
-@@ -791,7 +796,8 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 	 * SHADOW_NONPRESENT_VALUE (which sets "suppress #VE" bit) so it
- 	 * can be set when EPT table entries are zapped.
- 	 */
--	__kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
-+	__kvm_tdp_mmu_write_spte(iter->sptep,
-+			       shadow_nonpresent_spte(iter->old_spte));
- 
- 	return 0;
- }
-@@ -975,8 +981,11 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			continue;
- 
- 		if (!shared)
--			tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
--		else if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
-+			tdp_mmu_set_spte(kvm, &iter,
-+					 shadow_nonpresent_spte(iter.old_spte));
-+		else if (tdp_mmu_set_spte_atomic(
-+				 kvm, &iter,
-+				 shadow_nonpresent_spte(iter.old_spte)))
- 			goto retry;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ef925722ee28..a777a1d4278c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6323,6 +6323,112 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
  	}
  }
-@@ -1033,7 +1042,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- 		return false;
  
- 	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte,
--			   SHADOW_NONPRESENT_VALUE, sp->gfn, sp->role.level + 1,
-+			   shadow_nonpresent_spte(old_spte),
-+			   sp->gfn, sp->role.level + 1,
- 			   true, true, is_private_sp(sp));
- 
- 	return true;
-@@ -1075,11 +1085,20 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- 			continue;
- 		}
- 
-+		/*
-+		 * SPTE_SHARED_MASK is stored as 4K granularity.  The
-+		 * information is lost if we delete upper level SPTE page.
-+		 * TODO: support large page.
-+		 */
-+		if (kvm_gfn_shared_mask(kvm) && iter.level > PG_LEVEL_4K)
++static int kvm_mmu_populate_nonleaf(struct kvm_vcpu *vcpu, gfn_t start, gfn_t end)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_memslots *slots;
++	struct kvm_memslot_iter iter;
++	int ret = 0;
++
++	/* No need to populate as mmu_map_gpa() handles single GPA. */
++	if (!is_tdp_mmu_enabled(kvm))
++		return 0;
++
++	slots = __kvm_memslots(kvm, 0 /* only normal ram. not SMM. */);
++	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
++		struct kvm_memory_slot *memslot = iter.slot;
++		gfn_t s = max(start, memslot->base_gfn);
++		gfn_t e = min(end, memslot->base_gfn + memslot->npages);
++
++		if (WARN_ON_ONCE(s >= e))
 +			continue;
 +
- 		if (!is_shadow_present_pte(iter.old_spte) ||
- 		    !is_last_spte(iter.old_spte, iter.level))
- 			continue;
- 
--		tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
-+		tdp_mmu_set_spte(kvm, &iter,
-+				 shadow_nonpresent_spte(iter.old_spte));
- 		flush = true;
- 	}
- 
-@@ -1195,18 +1214,44 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 	gfn_t gfn_unalias = iter->gfn & ~kvm_gfn_shared_mask(vcpu->kvm);
- 
- 	WARN_ON(sp->role.level != fault->goal_level);
-+	WARN_ON(is_private_sptep(iter->sptep) != fault->is_private);
- 
--	/* TDX shared GPAs are no executable, enforce this for the SDV. */
--	if (kvm_gfn_shared_mask(vcpu->kvm) && !fault->is_private)
--		pte_access &= ~ACC_EXEC_MASK;
-+	if (kvm_gfn_shared_mask(vcpu->kvm)) {
-+		if (fault->is_private) {
-+			/*
-+			 * SPTE allows only RWX mapping. PFN can't be mapped it
-+			 * as READONLY in GPA.
-+			 */
-+			if (fault->slot && !fault->map_writable)
-+				return RET_PF_RETRY;
-+			/*
-+			 * This GPA is not allowed to map as private.  Let
-+			 * vcpu loop in page fault until other vcpu change it
-+			 * by MapGPA hypercall.
-+			 */
-+			if (fault->slot &&
-+				spte_shared_mask(iter->old_spte))
-+				return RET_PF_RETRY;
++		ret = kvm_tdp_mmu_populate_nonleaf(vcpu, kvm_gfn_private(kvm, s),
++						kvm_gfn_private(kvm, e), true, false);
++		if (ret)
++			break;
++		ret = kvm_tdp_mmu_populate_nonleaf(vcpu, kvm_gfn_shared(kvm, s),
++						kvm_gfn_shared(kvm, e), false, false);
++		if (ret)
++			break;
++	}
++	return ret;
++}
++
++int kvm_mmu_map_gpa(struct kvm_vcpu *vcpu, gfn_t *startp, gfn_t end,
++		bool allow_private)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_memslots *slots;
++	struct kvm_memslot_iter iter;
++	gfn_t start = *startp;
++	int ret;
++
++	if (!kvm_gfn_shared_mask(kvm))
++		return -EOPNOTSUPP;
++
++	start = start & ~kvm_gfn_shared_mask(kvm);
++	end = end & ~kvm_gfn_shared_mask(kvm);
++
++	/*
++	 * Allocate S-EPT pages first so that the operations leaf SPTE entry
++	 * can be done without memory allocation.
++	 */
++	while (true) {
++		ret = mmu_topup_memory_caches(vcpu, false);
++		if (ret)
++			return ret;
++
++		mutex_lock(&kvm->slots_lock);
++		write_lock(&kvm->mmu_lock);
++
++		ret = kvm_mmu_populate_nonleaf(vcpu, start, end);
++		if (!ret)
++			break;
++
++		write_unlock(&kvm->mmu_lock);
++		mutex_unlock(&kvm->slots_lock);
++		if (ret == -EAGAIN) {
++			if (need_resched())
++				cond_resched();
++			continue;
++		}
++		return ret;
++	}
++
++	slots = __kvm_memslots(kvm, 0 /* only normal ram. not SMM. */);
++	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
++		struct kvm_memory_slot *memslot = iter.slot;
++		gfn_t s = max(start, memslot->base_gfn);
++		gfn_t e = min(end, memslot->base_gfn + memslot->npages);
++
++		if (WARN_ON_ONCE(s >= e))
++			continue;
++		if (is_tdp_mmu_enabled(kvm)) {
++			ret = kvm_tdp_mmu_map_gpa(vcpu, &s, e, allow_private);
++			if (ret) {
++				start = s;
++				break;
++			}
 +		} else {
-+			/* This GPA is not allowed to map as shared. */
-+			if (fault->slot &&
-+				!spte_shared_mask(iter->old_spte))
-+				return RET_PF_RETRY;
-+			/* TDX shared GPAs are no executable, enforce this. */
-+			pte_access &= ~ACC_EXEC_MASK;
++			ret = -EOPNOTSUPP;
++			break;
 +		}
 +	}
- 
- 	if (unlikely(!fault->slot))
- 		new_spte = make_mmio_spte(vcpu, gfn_unalias, pte_access);
--	else
-+	else {
- 		wrprot = make_spte(vcpu, sp, fault->slot, pte_access,
- 				   gfn_unalias, fault->pfn, iter->old_spte,
- 				   fault->prefetch, true, fault->map_writable,
- 				   &new_spte);
-+		if (spte_shared_mask(iter->old_spte))
-+			new_spte |= SPTE_SHARED_MASK;
++
++	write_unlock(&kvm->mmu_lock);
++	mutex_unlock(&kvm->slots_lock);
++
++	if (ret == -EAGAIN) {
++		if (allow_private)
++			*startp = kvm_gfn_private(kvm, start);
++		else
++			*startp = kvm_gfn_shared(kvm, start);
 +	}
++	return ret;
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_map_gpa);
++
+ static unsigned long
+ mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
+ {
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 4f279700b3cc..c99f2c9a86dc 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -680,6 +680,13 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 		}
+ 		change.sept_page = sept_page;
  
- 	if (new_spte == iter->old_spte)
- 		ret = RET_PF_SPURIOUS;
-@@ -1509,7 +1554,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 	 * invariant that the PFN of a present * leaf SPTE can never change.
- 	 * See __handle_changed_spte().
- 	 */
--	tdp_mmu_set_spte(kvm, iter, SHADOW_NONPRESENT_VALUE);
-+	tdp_mmu_set_spte(kvm, iter, shadow_nonpresent_spte(iter->old_spte));
++		/*
++		 * SPTE_SHARED_MASK is only changed by map_gpa that obtains
++		 * write lock of mmu_lock.
++		 */
++		WARN_ON(shared &&
++			(spte_shared_mask(old_spte) !=
++				spte_shared_mask(new_spte)));
+ 		static_call(kvm_x86_handle_changed_private_spte)(kvm, &change);
+ 	}
+ }
+@@ -1324,7 +1331,8 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+ 	return 0;
+ }
  
- 	if (!pte_write(range->pte)) {
- 		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
+-static int tdp_mmu_populate_nonleaf(struct kvm_vcpu *vcpu, struct tdp_iter *iter, bool account_nx)
++static int tdp_mmu_populate_nonleaf(
++	struct kvm_vcpu *vcpu, struct tdp_iter *iter, bool account_nx, bool shared)
+ {
+ 	struct kvm_mmu_page *sp;
+ 	int ret;
+@@ -1335,7 +1343,7 @@ static int tdp_mmu_populate_nonleaf(struct kvm_vcpu *vcpu, struct tdp_iter *iter
+ 	sp = tdp_mmu_alloc_sp(vcpu, iter->is_private, false);
+ 	tdp_mmu_init_child_sp(sp, iter);
+ 
+-	ret = tdp_mmu_link_sp(vcpu->kvm, iter, sp, account_nx, true);
++	ret = tdp_mmu_link_sp(vcpu->kvm, iter, sp, account_nx, shared);
+ 	if (ret)
+ 		tdp_mmu_free_sp(sp);
+ 	return ret;
+@@ -1411,7 +1419,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 			if (is_removed_spte(iter.old_spte))
+ 				break;
+ 
+-			if (tdp_mmu_populate_nonleaf(vcpu, &iter, account_nx))
++			if (tdp_mmu_populate_nonleaf(vcpu, &iter, account_nx, true))
+ 				break;
+ 		}
+ 	}
+@@ -2143,6 +2151,263 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+ 	return spte_set;
+ }
+ 
++/*
++ * Allocate shadow page table for given gfn so that the following operations
++ * on sptes can be done without memory allocation.
++ */
++int kvm_tdp_mmu_populate_nonleaf(
++	struct kvm_vcpu *vcpu, gfn_t start, gfn_t end, bool is_private, bool shared)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct tdp_iter iter;
++	int ret = 0;
++
++	kvm_lockdep_assert_mmu_lock_held(kvm, false);
++	rcu_read_lock();
++	tdp_mmu_for_each_pte(iter, vcpu->arch.mmu, is_private, start, end) {
++		if (iter.level == PG_LEVEL_4K)
++			continue;
++		if (is_shadow_present_pte(iter.old_spte) &&
++			is_large_pte(iter.old_spte)) {
++			/* TODO: large page support. */
++			WARN_ON_ONCE(true);
++			return -ENOSYS;
++		}
++
++		if (is_shadow_present_pte(iter.old_spte))
++			continue;
++
++		/*
++		 * Guarantee that alloc_tdp_mmu_page() succees which
++		 * assumes page allocation from cache always successes.
++		 */
++		if (vcpu->arch.mmu_page_header_cache.nobjs == 0 ||
++			vcpu->arch.mmu_shadow_page_cache.nobjs == 0 ||
++			vcpu->arch.mmu_private_sp_cache.nobjs == 0) {
++			ret = -EAGAIN;
++			break;
++		}
++
++		/*
++		 * write lock of mmu_lock is held.  No other thread
++		 * freezes SPTE.
++		 */
++		ret = tdp_mmu_populate_nonleaf(vcpu, &iter, false, shared);
++		if (ret) {
++			/* As write lock is held, this case sholdn't happen. */
++			WARN_ON_ONCE(true);
++			break;
++		}
++	}
++	rcu_read_unlock();
++
++	return ret;
++}
++
++typedef void (*update_spte_t)(
++	struct kvm *kvm, struct tdp_iter *iter, bool allow_private);
++
++static int kvm_tdp_mmu_update_range(struct kvm_vcpu *vcpu, bool is_private,
++				gfn_t start, gfn_t end, gfn_t *nextp,
++				update_spte_t fn, bool allow_private)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct tdp_iter iter;
++	int ret = 0;
++
++	rcu_read_lock();
++	tdp_mmu_for_each_pte(iter, vcpu->arch.mmu, is_private, start, end) {
++		if (iter.level == PG_LEVEL_4K) {
++			fn(kvm, &iter, allow_private);
++			continue;
++		}
++
++		/*
++		 * Which GPA is allowed, private or shared, is recorded in the
++		 * granular of 4K in private leaf spte as SPTE_SHARED_MASK.
++		 * Break large page into 4K.
++		 */
++		if (is_shadow_present_pte(iter.old_spte) &&
++			is_large_pte(iter.old_spte)) {
++			/*
++			 * TODO: large page support.
++			 * Doesn't support large page for TDX now
++			 */
++			WARN_ON_ONCE(true);
++			tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
++			iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
++		}
++
++		if (!is_shadow_present_pte(iter.old_spte)) {
++			/*
++			 * Guarantee that alloc_tdp_mmu_page() succees which
++			 * assumes page allocation from cache always successes.
++			 */
++			if (vcpu->arch.mmu_page_header_cache.nobjs == 0 ||
++				vcpu->arch.mmu_shadow_page_cache.nobjs == 0 ||
++				vcpu->arch.mmu_private_sp_cache.nobjs == 0) {
++				ret = -EAGAIN;
++				break;
++			}
++			/*
++			 * write lock of mmu_lock is held.  No other thread
++			 * freezes SPTE.
++			 */
++			ret = tdp_mmu_populate_nonleaf(vcpu, &iter, false, false);
++			if (ret) {
++				/* As write lock is held, this case sholdn't happen. */
++				WARN_ON_ONCE(true);
++				break;
++			}
++		}
++	}
++	rcu_read_unlock();
++
++	if (ret == -EAGAIN)
++		*nextp = iter.next_last_level_gfn;
++
++	return ret;
++}
++
++static void kvm_tdp_mmu_update_shared_spte(
++	struct kvm *kvm, struct tdp_iter *iter, bool allow_private)
++{
++	u64 new_spte;
++
++	WARN_ON(iter->is_private);
++	if (allow_private) {
++		/* Zap SPTE and clear SPTE_SHARED_MASK */
++		new_spte = SHADOW_NONPRESENT_VALUE;
++		if (new_spte != iter->old_spte)
++			tdp_mmu_set_spte(kvm, iter, new_spte);
++	} else {
++		new_spte = iter->old_spte | SPTE_SHARED_MASK;
++		/* No side effect is needed */
++		if (new_spte != iter->old_spte)
++			__kvm_tdp_mmu_write_spte(iter->sptep, new_spte);
++	}
++}
++
++static void kvm_tdp_mmu_update_private_spte(
++	struct kvm *kvm, struct tdp_iter *iter, bool allow_private)
++{
++	u64 new_spte;
++
++	WARN_ON(!iter->is_private);
++	if (allow_private) {
++		new_spte = iter->old_spte & ~SPTE_SHARED_MASK;
++		/* No side effect is needed */
++		if (new_spte != iter->old_spte)
++			__kvm_tdp_mmu_write_spte(iter->sptep, new_spte);
++	} else {
++		if (is_shadow_present_pte(iter->old_spte)) {
++			/* Zap SPTE */
++			new_spte = shadow_nonpresent_spte(iter->old_spte) |
++				SPTE_SHARED_MASK;
++			if (new_spte != iter->old_spte)
++				tdp_mmu_set_spte(kvm, iter, new_spte);
++		} else {
++			new_spte = iter->old_spte | SPTE_SHARED_MASK;
++			/* No side effect is needed */
++			if (new_spte != iter->old_spte)
++				__kvm_tdp_mmu_write_spte(iter->sptep, new_spte);
++		}
++	}
++}
++
++/*
++ * Whether GPA is allowed to map private or shared is recorded in both private
++ * and shared leaf spte entry as SPTE_SHARED_MASK bit.  They must match.
++ * private leaf spte entry
++ * - present: private mapping is allowed. (already mapped)
++ * - non-present: private mapping is allowed.
++ * - present | SPTE_SHARED_MASK: invalid state.
++ * - non-present | SPTE_SHARED_MASK: shared mapping is allowed.
++ *                                        may or may not be mapped as shared.
++ * shared leaf spte entry
++ * - present: invalid state
++ * - non-present: private mapping is allowed.
++ * - present | SPTE_SHARED_MASK: shared mapping is allowed (already mapped)
++ * - non-present | SPTE_SHARED_MASK: shared mapping is allowed.
++ *
++ * state change of private spte:
++ * map_gpa(private):
++ *      private EPT entry: clear SPTE_SHARED_MASK
++ *	  present: nop
++ *	  non-present: nop
++ *	  non-present | SPTE_SHARED_MASK -> non-present
++ *	share EPT entry: zap and clear SPTE_SHARED_MASK
++ *	  any -> non-present
++ * map_gpa(shared):
++ *	private EPT entry: zap and set SPTE_SHARED_MASK
++ *	  present     -> non-present | SPTE_SHARED_MASK
++ *	  non-present -> non-present | SPTE_SHARED_MASK
++ *	  non-present | SPTE_SHARED_MASK: nop
++ *	shared EPT entry: set SPTE_SHARED_MASK
++ *	  present | SPTE_SHARED_MASK: nop
++ *	  non-present -> non-present | SPTE_SHARED_MASK
++ *	  non-present | SPTE_SHARED_MASK: nop
++ * map(private GPA):
++ *	private EPT entry: try to populate
++ *	  present: nop
++ *	  non-present -> present
++ *	  non-present | SPTE_SHARED_MASK: nop. looping on EPT violation
++ *	shared EPT entry: nop
++ * map(shared GPA):
++ *	private EPT entry: nop
++ *	shared EPT entry: populate
++ *	  present | SPTE_SHARED_MASK: nop
++ *	  non-present | SPTE_SHARED_MASK -> present | SPTE_SHARED_MASK
++ *	  non-present: nop. looping on EPT violation
++ * zap(private GPA):
++ *	private EPT entry: zap and keep SPTE_SHARED_MASK
++ *	  present | SPTE_SHARED_MASK -> non-present | SPTE_SHARED_MASK
++ *	  non-present: nop as is_shadow_prsent_pte() is checked
++ *	  non-present | SPTE_SHARED_MASK: nop by is_shadow_present_pte()
++ *	shared EPT entry: nop
++ * zap(shared GPA):
++ *	private EPT entry: nop
++ *	shared EPT entry: zap and keep SPTE_SHARED_MASK
++ *	  present | SPTE_SHARED_MASK -> non-present | SPTE_SHARED_MASK
++ *	  non-present | SPTE_SHARED_MASK: nop
++ *	  non-present: nop.
++ */
++int kvm_tdp_mmu_map_gpa(struct kvm_vcpu *vcpu,
++			gfn_t *startp, gfn_t end, bool allow_private)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_mmu *mmu = vcpu->arch.mmu;
++	gfn_t start = *startp;
++	gfn_t next;
++	int ret = 0;
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++	WARN_ON(start & kvm_gfn_shared_mask(kvm));
++	WARN_ON(end & kvm_gfn_shared_mask(kvm));
++
++	if (!VALID_PAGE(mmu->root.hpa) || !VALID_PAGE(mmu->private_root_hpa))
++		return -EINVAL;
++
++	next = end;
++	ret = kvm_tdp_mmu_update_range(
++		vcpu, false, kvm_gfn_shared(kvm, start), kvm_gfn_shared(kvm, end),
++		&next, kvm_tdp_mmu_update_shared_spte, allow_private);
++	if (ret) {
++		kvm_flush_remote_tlbs_with_address(kvm, start, next - start);
++		return ret;
++	}
++
++	ret = kvm_tdp_mmu_update_range(
++		vcpu, true, kvm_gfn_private(kvm, start), kvm_gfn_private(kvm, end),
++		&next, kvm_tdp_mmu_update_private_spte, allow_private);
++	if (ret == -EAGAIN) {
++		*startp = next;
++		end = *startp;
++	}
++	kvm_flush_remote_tlbs_with_address(kvm, start, end - start);
++	return ret;
++}
++
+ /*
+  * Return the level of the lowest level SPTE added to sptes.
+  * That SPTE may be non-present.
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index d1655571eb2f..4d1c27911134 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -51,6 +51,11 @@ void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
+ 				      gfn_t start, gfn_t end,
+ 				      int target_level, bool shared);
+ 
++int kvm_tdp_mmu_populate_nonleaf(struct kvm_vcpu *vcpu, gfn_t start, gfn_t end,
++				bool is_private, bool shared);
++int kvm_tdp_mmu_map_gpa(struct kvm_vcpu *vcpu,
++			gfn_t *startp, gfn_t end, bool allow_private);
++
+ static inline void kvm_tdp_mmu_walk_lockless_begin(void)
+ {
+ 	rcu_read_lock();
 -- 
 2.25.1
 
