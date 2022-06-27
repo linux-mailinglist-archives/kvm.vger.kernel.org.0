@@ -2,112 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DBE355B5F0
-	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 06:10:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB42755B600
+	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 06:15:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231474AbiF0EJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 00:09:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47036 "EHLO
+        id S229985AbiF0EPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 00:15:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiF0EJu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 00:09:50 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 986DF2BF8;
-        Sun, 26 Jun 2022 21:09:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656302989; x=1687838989;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=+MlrCsTACgQ3fdMt0MvL5i5SW0bgC6vhQ3XkFwfrHyo=;
-  b=PdeTN0q/0nLqomX8wmoRg10xsY1yyWR4hCeSs+skmAidbBePmIPt0sIW
-   7f+7jTxUn01IXf35j9U9/Q+Dx/iz3lYBqM6mVsN05FXmtqV6F1DTuRL/7
-   oIu55LLpc6Ok/y9Y3JRR0JfteoJQK4ogt93eCEHCsAfBb/I2OllnwZ7Al
-   mcS75JfU7DLfwcR+zBA7ZVaG18GiWfW168KzzVxOT8phJfMAHNl1yeRLz
-   Tn7cnfRpX5PBQofCa1WR3I0dSl4WTu/rMoHQno3NBKBifYf4XCwH425p1
-   ptipsOgQWWPuO/Ljl/xFHg1izmk8i5jL0ePfmbS67yR/DDrN65IKWvfR1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10390"; a="264392774"
-X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
-   d="scan'208";a="264392774"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 21:09:48 -0700
-X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
-   d="scan'208";a="679401157"
-Received: from fzaeni-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.88.6])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 21:09:42 -0700
-Message-ID: <8853a55e32d6b5f5657e521094dbf01e371516fe.camel@intel.com>
-Subject: Re: [PATCH v5 00/22] TDX host kernel support
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, linux-acpi@vger.kernel.org, seanjc@google.com,
-        pbonzini@redhat.com, len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com, akpm@linux-foundation.org,
-        thomas.lendacky@amd.com, Tianyu.Lan@microsoft.com,
-        rdunlap@infradead.org, Jason@zx2c4.com, juri.lelli@redhat.com,
-        mark.rutland@arm.com, frederic@kernel.org, yuehaibing@huawei.com,
-        dongli.zhang@oracle.com
-Date:   Mon, 27 Jun 2022 16:09:40 +1200
-In-Reply-To: <14e3d8cb-5e36-dc90-bfc8-b34a105749a3@intel.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <14e3d8cb-5e36-dc90-bfc8-b34a105749a3@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+        with ESMTP id S229746AbiF0EPL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 00:15:11 -0400
+Received: from out0-129.mail.aliyun.com (out0-129.mail.aliyun.com [140.205.0.129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62C252BE9
+        for <kvm@vger.kernel.org>; Sun, 26 Jun 2022 21:15:06 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047205;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---.ODQQnmo_1656303303;
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.ODQQnmo_1656303303)
+          by smtp.aliyun-inc.com;
+          Mon, 27 Jun 2022 12:15:03 +0800
+Date:   Mon, 27 Jun 2022 12:15:03 +0800
+From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [PATCH 0/5] Fix wrong gfn range of tlb flushing with range
+Message-ID: <20220627041503.GA12292@k08j02272.eu95sqa>
+References: <cover.1656039275.git.houwenlong.hwl@antgroup.com>
+ <YrZDkBSKwuQSrK+r@google.com>
+ <8b3d1e58-fb79-ca84-c396-a44318d3ebd1@redhat.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b3d1e58-fb79-ca84-c396-a44318d3ebd1@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-06-24 at 12:47 -0700, Dave Hansen wrote:
-> On 6/22/22 04:15, Kai Huang wrote:
-> > Please kindly help to review, and I would appreciate reviewed-by or
-> > acked-by tags if the patches look good to you.
->=20
-> Serious question: Is *ANYONE* looking at these patches other than you
-> and the maintainers?  I first saw this code (inside Intel) in early
-> 2020.  In that time, not a single review tag has been acquired?
->=20
-> $ egrep -ic 'acked-by:|reviewed-by:' kais-patches.mbox
-> 0
+On Sat, Jun 25, 2022 at 05:13:22PM +0800, Paolo Bonzini wrote:
+> On 6/25/22 01:06, Sean Christopherson wrote:
+> >>("KVM: Replace old tlb flush function with new one to flush a specified range.")
+> >>replaces old tlb flush function with kvm_flush_remote_tlbs_with_address()
+> >>to do tlb flushing. However, the gfn range of tlb flushing is wrong in
+> >>some cases. E.g., when a spte is dropped, the start gfn of tlb flushing
+> >Heh, "some" cases.  Looks like KVM is wrong on 7 of 15 cases.  And IIRC, there
+> >were already several rounds of fixes due to passing "end" instead of "nr_pages".
+> >
+> >Patches look ok on a quick read through, but I'd have to stare a bunch more to
+> >be confident.
+> >
+> >Part of me wonders if we should just revert the whole thing and then only reintroduce
+> >range-based flushing with proper testing and maybe even require performance numbers
+> >to justify the benefits.  Give that almost 50% of the users are broken, it's pretty
+> >obvious that no one running KVM actually tests the behavior.
+> >
+> 
+> I'm pretty sure it's in use on Azure.  Some of the changes are
+> flushing less, for the others it's more than likely that Hyper-V
+> treats a 1-page flush the same if the address points to a huge page.
+> 
+I lookup hyperv_fill_flush_guest_mapping_list(), gpa_list.page.largepage
+is always false. Or the behaviour you said is implemented in Hyper-V not
+in KVM ? 
 
-Hi Dave,
-
-There were big design changes in the history of this series (i.e. we origin=
-ally
-supported loading both the NP-SEAMLDR ACM and the TDX module during boot, a=
-nd we
-changed from initializing the module from during kernel boot to at runtime)=
-, but
-yes some other Linux/KVM TDX developers in our team have been reviewing thi=
-s
-series during the all time, at least at some extent.  They just didn't give
-Reviewed-by or Acked-by.
-
-Especially, after we had agreed that this series in general should enable T=
-DX
-with minimal code change, Kevin helped to review this series intensively an=
-d
-helped to simplify the code to the current shape (i.e. TDMR part).  He didn=
-'t
-give any of tags either (only said this series is ready for you to review),
-perhaps because he was _helping_ to get this series to the shape that is re=
-ady
-for you and other Intel reviewers to review.
-
---=20
-Thanks,
--Kai
-
-
+> Paolo
