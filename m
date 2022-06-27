@@ -2,127 +2,436 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57EF155DACB
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:23:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2A7C55D566
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:15:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234140AbiF0JwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 05:52:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40880 "EHLO
+        id S234199AbiF0Jwl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 05:52:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233867AbiF0JwB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 05:52:01 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C0E6378;
-        Mon, 27 Jun 2022 02:52:00 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id o18so7726819plg.2;
-        Mon, 27 Jun 2022 02:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=dRX8FWNzBU7QvPCSptvJ8/0ZXRASxQI/9/dRpScKoWM=;
-        b=D5W8LLPVBsfy3j+4HKtK9yEJ5wEU0qzSXPu9zRUxd/zIGMunanHjC0QgEYlBA17DAW
-         xt0UIn9TPTx0LrUOk2U3WavV01Zc17vYhSh3LtNtTu923d3YScxoiRdf3iH1wzHHxj08
-         LnzBJWTvio3FBIM9qQFswATUHtvXRqlq1fGIhgJbto41FgKamK3VXpw6Qpwug6Be2Nwx
-         8Q+GVrNqld8SaIS/OlQWVq5ZbeVDv6vPJLZJDH8RcJuGhcns7C5nNMmL/UOTT2fcRFvK
-         VSMk/lkj/PU68D8ktW6iMbaWtQmJ57ov6kIomOYXSv40ZCGSQqo/GzcEa6T8kMLnqSYq
-         4GBw==
+        with ESMTP id S234270AbiF0Jwi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 05:52:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 01B706405
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 02:52:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656323556;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FA4/e7nzPal3eOwEx0TnFAtrjsOunXWeNfCJ/Hz8a2U=;
+        b=a2iihYPHZCzxkdUUsW2fxnJiyHELP/kD0q6+omFfZpiYSrZ7OiurQ1N8PKVvYeCme+H4LP
+        JdWk3288iUIO7loDgRd6V5UrW8XJt/p8t+/bWKNQmy5zM4zkfqFe84Lc1kvSWCfSVg4823
+        jRepUH4eoCHTJ/Bi5k7QXj9zgXwFpEw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-616-XPDM40RgOx2ImzMJLSobgg-1; Mon, 27 Jun 2022 05:52:34 -0400
+X-MC-Unique: XPDM40RgOx2ImzMJLSobgg-1
+Received: by mail-wm1-f72.google.com with SMTP id r65-20020a1c4444000000b003a02a3f0beeso5515266wma.3
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 02:52:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=dRX8FWNzBU7QvPCSptvJ8/0ZXRASxQI/9/dRpScKoWM=;
-        b=BQVYJRMTURx/GcwN5ene5V+GZrsqeHOSjWO5MwGHlsidAw9siyVDyg+ZJrmzRnrV84
-         5QbyUFjcv6bKUIJDfMZrSfy5UsJGLwqSqSX7yKWLglsPeU+48NR6xhuS2cwgLJX5MUKe
-         l1p7fxvYJysVjXUJG94q5ayemME3ZmzKNP03Yj2zjmMcxehyqZ2RtpbB0tXwsOZM39G1
-         VYdzV93HDLbJnp97AuoJwdR7mJkR7fcHR5jlrpbakppgIiHvmKiyn+EiQss6NyyvCCxW
-         6nchVQVB2+hBECXLCMugorSspjAc0K//J8bEjj7Hb6g35kw9EL9jofy3L2W1U/K+3TRy
-         dnUA==
-X-Gm-Message-State: AJIora+q6YB74Igly30V1T9gZRBeJjAXm3037xC6mH92Z4iXj/HAYMZe
-        Vf2kBCNSsWpH0eMWS75Sgxs=
-X-Google-Smtp-Source: AGRyM1vtVzM4K0yHjGP9MGHdazzgBgMeEwQiVqV7kI2RBsQLQMD0tQMY75a1Ieu4RL7NzxOip7APJQ==
-X-Received: by 2002:a17:903:1c4:b0:16b:7928:95ce with SMTP id e4-20020a17090301c400b0016b792895cemr5896510plh.158.1656323519781;
-        Mon, 27 Jun 2022 02:51:59 -0700 (PDT)
-Received: from debian.me (subs03-180-214-233-72.three.co.id. [180.214.233.72])
-        by smtp.gmail.com with ESMTPSA id 71-20020a63034a000000b0040d2d9f15e0sm6727357pgd.20.2022.06.27.02.51.58
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FA4/e7nzPal3eOwEx0TnFAtrjsOunXWeNfCJ/Hz8a2U=;
+        b=gn2RAv4FQhXI77klbNKpbdQFcTHj4uMhbnPPP4XbNxb+oNifln64yS3E+sZbBpkVl6
+         oHKoh0uM80m2ZTipoIvZudXrzE5nClPrKvyzeXVcNDBvc6EV+5ipYjeNpNb7WSN9g8I9
+         9ZAfU7n6DbvTjOULvb8qNV+RevKPzReEfLnlCPlVjJqbl6eJEo4/NsuCghWbrjiytJJ9
+         PNCsn2vTle+PRRKD8+hRWtwDWEi+IeXzm4/40JjL8WKjkSnghjbsMO4BsJRoMNxNT7lG
+         qFYY6D/J59NcianqBP5AbHtDqf9lrs8/ZxB06YSaZc6dl9dMK/4MZm677m1XU98aF7Ct
+         ldvA==
+X-Gm-Message-State: AJIora+BvE7qcfw6k4oY2Lbw59Gj0+T3E126QuXOzKnNRXPe53NO7x51
+        dtgb0/WwJ5iOHdbFccEMMLN2aGA0c4YYxYJkBPi4uAY8PnGyfyOG6d06SHe3bizXIsDtshkIGRq
+        ofEhtuXSTGSdz
+X-Received: by 2002:a05:6000:5c5:b0:21b:9b11:9128 with SMTP id bh5-20020a05600005c500b0021b9b119128mr11703387wrb.492.1656323553155;
+        Mon, 27 Jun 2022 02:52:33 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sCxfv3KriW5BqnNxFUoTxKqQuPPHKNNy+QToEfQnWFhS08FguZ0weFalXCc3i4zDfmqBw1gQ==
+X-Received: by 2002:a05:6000:5c5:b0:21b:9b11:9128 with SMTP id bh5-20020a05600005c500b0021b9b119128mr11703360wrb.492.1656323552827;
+        Mon, 27 Jun 2022 02:52:32 -0700 (PDT)
+Received: from redhat.com ([2.54.45.90])
+        by smtp.gmail.com with ESMTPSA id l16-20020adffe90000000b0021b9a4a75e2sm9888998wrr.30.2022.06.27.02.52.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jun 2022 02:51:59 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id 772C91037D8; Mon, 27 Jun 2022 16:51:56 +0700 (WIB)
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     linux-doc@vger.kernel.org
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        kvm@vger.kernel.org, linux-next@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH next 2/2] KVM: x86/MMU: properly format KVM_CAP_VM_DISABLE_NX_HUGE_PAGES capability table
-Date:   Mon, 27 Jun 2022 16:51:51 +0700
-Message-Id: <20220627095151.19339-3-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.36.0
-In-Reply-To: <20220627095151.19339-1-bagasdotme@gmail.com>
-References: <20220627095151.19339-1-bagasdotme@gmail.com>
+        Mon, 27 Jun 2022 02:52:32 -0700 (PDT)
+Date:   Mon, 27 Jun 2022 05:52:27 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH V3] virtio: disable notification hardening by default
+Message-ID: <20220627053820-mutt-send-email-mst@kernel.org>
+References: <20220622012940.21441-1-jasowang@redhat.com>
+ <20220622025047-mutt-send-email-mst@kernel.org>
+ <CACGkMEtJY2ioD0L8ifTrCPatG6-NqQ01V=d2L1FeoweKV74LaA@mail.gmail.com>
+ <20220624022622-mutt-send-email-mst@kernel.org>
+ <CACGkMEuurobpUWmDL8zmZ6T6Ygc0OEMx6vx2EDCSoGNnZQ0r-w@mail.gmail.com>
+ <20220627024049-mutt-send-email-mst@kernel.org>
+ <CACGkMEvrDXDN7FH1vKoYCob2rkxUsctE_=g61kzHSZ8tNNr6vA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEvrDXDN7FH1vKoYCob2rkxUsctE_=g61kzHSZ8tNNr6vA@mail.gmail.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is unexpected warning on KVM_CAP_VM_DISABLE_NX_HUGE_PAGES capability
-table, which cause the table to be rendered as paragraph text instead.
+On Mon, Jun 27, 2022 at 04:11:18PM +0800, Jason Wang wrote:
+> On Mon, Jun 27, 2022 at 3:33 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Jun 27, 2022 at 10:50:17AM +0800, Jason Wang wrote:
+> > > On Fri, Jun 24, 2022 at 2:31 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Wed, Jun 22, 2022 at 03:09:31PM +0800, Jason Wang wrote:
+> > > > > On Wed, Jun 22, 2022 at 3:03 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Wed, Jun 22, 2022 at 09:29:40AM +0800, Jason Wang wrote:
+> > > > > > > We try to harden virtio device notifications in 8b4ec69d7e09 ("virtio:
+> > > > > > > harden vring IRQ"). It works with the assumption that the driver or
+> > > > > > > core can properly call virtio_device_ready() at the right
+> > > > > > > place. Unfortunately, this seems to be not true and uncover various
+> > > > > > > bugs of the existing drivers, mainly the issue of using
+> > > > > > > virtio_device_ready() incorrectly.
+> > > > > > >
+> > > > > > > So let's having a Kconfig option and disable it by default. It gives
+> > > > > > > us a breath to fix the drivers and then we can consider to enable it
+> > > > > > > by default.
+> > > > > > >
+> > > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > > > >
+> > > > > >
+> > > > > > OK I will queue, but I think the problem is fundamental.
+> > > > >
+> > > > > If I understand correctly, you want some core IRQ work?
+> > > >
+> > > > Yes.
+> > > >
+> > > > > As discussed
+> > > > > before, it doesn't solve all the problems, we still need to do per
+> > > > > driver audit.
+> > > > >
+> > > > > Thanks
+> > > >
+> > > > Maybe, but we don't need to tie things to device_ready then.
+> > > > We can do
+> > > >
+> > > > - disable irqs
+> > > > - device ready
+> > > > - setup everything
+> > > > - enable irqs
+> > > >
+> > > >
+> > > > and this works for most things, the only issue is
+> > > > this deadlocks if "setup everything" waits for interrupts.
+> > > >
+> > > >
+> > > > With the current approach there's really no good time:
+> > > > 1.- setup everything
+> > > > - device ready
+> > > >
+> > > > can cause kicks before device is ready
+> > > >
+> > > > 2.- device ready
+> > > > - setup everything
+> > > >
+> > > > can cause callbacks before setup.
+> > > >
+> > > > So I prefer the 1. and fix the hardening in the core.
+> > >
+> > > So my question is:
+> > >
+> > > 1) do similar hardening like config interrupt
+> > > or
+> > > 2) per transport notification work (e.g for PCI core IRQ work)
+> > >
+> > > 1) seems easier and universal, but we pay little overhead which could
+> > > be eliminated by the config option.
+> >
+> > I doubt 1 is easy and I am not even sure core IRQ changes will help.
+> 
+> Core IRQ won't help in 1), the changes are limited in the virtio.
+> 
+> > My concern with adding overhead is that I'm not sure these are not just
+> > wasted CPU cycles.  We spent a bunch of time on irq hardening and so far
+> > we are still at the "all drivers need to be fixed" stage.
+> 
+> It's not the fault of hardening but the drivers. The hardening just
+> expose those bugs.
 
-The warning is due to missing colon at capability name and returns keyword,
-as well as improper alignment on multi-line returns field.
+Heh. Yea sure. But things work fine for people. What is the chance
+your review found and fixed all driver bugs? After two attempts
+I don't feel like hoping audit will fix all bugs.
 
-Fix the warning by adding missing colons and aligning the field.
 
-Link: https://lore.kernel.org/lkml/20220627181937.3be67263@canb.auug.org.au/
-Fixes: 084cc29f8bbb03 ("KVM: x86/MMU: Allow NX huge pages to be disabled on a per-vm basis")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: David Matlack <dmatlack@google.com>
-Cc: Ben Gardon <bgardon@google.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-next@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Documentation/virt/kvm/api.rst | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> >
+> > The reason config was kind of easy is that config interrupt is rarely
+> > vital for device function so arbitrarily deferring that does not lead to
+> > deadlocks - what you are trying to do with VQ interrupts is
+> > fundamentally different. Things are especially bad if we just drop
+> > an interrupt but deferring can lead to problems too.
+> 
+> I'm not sure I see the difference, disable_irq() stuffs also delay the
+> interrupt processing until enable_irq().
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index ec9f16f472e709..df8fc905217437 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8209,13 +8209,13 @@ available and supports the `KVM_PV_DUMP_CPU` subcommand.
- 8.38 KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
- -------------------------------------
- 
--:Capability KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
-+:Capability: KVM_CAP_VM_DISABLE_NX_HUGE_PAGES
- :Architectures: x86
- :Type: vm
- :Parameters: arg[0] must be 0.
--:Returns 0 on success, -EPERM if the userspace process does not
--	 have CAP_SYS_BOOT, -EINVAL if args[0] is not 0 or any vCPUs have been
--	 created.
-+:Returns: 0 on success, -EPERM if the userspace process does not
-+          have CAP_SYS_BOOT, -EINVAL if args[0] is not 0 or any vCPUs have been
-+          created.
- 
- This capability disables the NX huge pages mitigation for iTLB MULTIHIT.
- 
--- 
-An old man doll... just what I always wanted! - Clara
+
+Absolutely. I am not at all sure disable_irq fixes all problems.
+
+> >
+> > Consider as an example
+> >     virtio-net: fix race between ndo_open() and virtio_device_ready()
+> > if you just defer vq interrupts you get deadlocks.
+> >
+> >
+> 
+> I don't see a deadlock here, maybe you can show more detail on this?
+
+What I mean is this: if we revert the above commit, things still
+work (out of spec, but still). If we revert and defer interrupts until
+device ready then ndo_open that triggers before device ready deadlocks.
+
+
+> >
+> > So, thinking about all this, how about a simple per vq flag meaning
+> > "this vq was kicked since reset"?
+> 
+> And ignore the notification if vq is not kicked? It sounds like the
+> callback needs to be synchronized with the kick.
+
+Note we only need to synchronize it when it changes, which is
+only during initialization and reset.
+
+
+> >
+> > If driver does not kick then it's not ready to get callbacks, right?
+> >
+> > Sounds quite clean, but we need to think through memory ordering
+> > concerns - I guess it's only when we change the value so
+> >         if (!vq->kicked) {
+> >                 vq->kicked = true;
+> >                 mb();
+> >         }
+> >
+> > will do the trick, right?
+> 
+> There's no much difference with the existing approach:
+> 
+> 1) your proposal implicitly makes callbacks ready in virtqueue_kick()
+> 2) my proposal explicitly makes callbacks ready via virtio_device_ready()
+> 
+> Both require careful auditing of all the existing drivers to make sure
+> no kick before DRIVER_OK.
+
+Jason, kick before DRIVER_OK is out of spec, sure. But it is unrelated
+to hardening and in absence of config interrupts is generally easily
+fixed just by sticking virtio_device_ready early in initialization.
+With the current approach one has to *also* not do virtio_device_ready
+too early - and it's really tricky.
+
+With the proposal I think that we don't need to fix all drivers and
+in my eyes that is a huge advantage because frankly I'm fine with
+more work on strict spec compliance taking more than expected
+but I would like the hardening work to finally be done.
+I am not sure the amount of effort expended on the hardening here is
+proportionate to the benefit it provides.
+
+
+
+> >
+> > need to think about the reset path - it already synchronizes callbacks
+> > and already can lose interrupts so we just need to clear vq->kicked
+> > before that, right?
+> 
+> Probably.
+> 
+> >
+> >
+> > > 2) seems require more work in the IRQ core and it can not work for all
+> > > transports (e.g vDPA would be kind of difficult)
+> > >
+> > > Thanks
+> >
+> > Hmm I don't really get why would it be difficult.
+> > VDPA is mostly PCI isn't it? With PCI both level INT#x and edge MSI
+> > have interrupt masking support.
+> 
+> Yes, but consider the case of mlx5_vdpa, PCI stuff was hidden under
+> the auxiliary bus. And that is the way another vendor will go.
+> 
+> Thanks
+
+A bunch of callbacks will do it I guess.
+
+> >
+> >
+> > > >
+> > > >
+> > > > > >
+> > > > > >
+> > > > > > > ---
+> > > > > > > Changes since V2:
+> > > > > > > - Tweak the Kconfig help
+> > > > > > > - Add comment for the read_lock() pairing in virtio_ccw
+> > > > > > > ---
+> > > > > > >  drivers/s390/virtio/virtio_ccw.c |  9 ++++++++-
+> > > > > > >  drivers/virtio/Kconfig           | 13 +++++++++++++
+> > > > > > >  drivers/virtio/virtio.c          |  2 ++
+> > > > > > >  drivers/virtio/virtio_ring.c     | 12 ++++++++++++
+> > > > > > >  include/linux/virtio_config.h    |  2 ++
+> > > > > > >  5 files changed, 37 insertions(+), 1 deletion(-)
+> > > > > > >
+> > > > > > > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> > > > > > > index 97e51c34e6cf..1f6a358f65f0 100644
+> > > > > > > --- a/drivers/s390/virtio/virtio_ccw.c
+> > > > > > > +++ b/drivers/s390/virtio/virtio_ccw.c
+> > > > > > > @@ -1136,8 +1136,13 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+> > > > > > >                       vcdev->err = -EIO;
+> > > > > > >       }
+> > > > > > >       virtio_ccw_check_activity(vcdev, activity);
+> > > > > > > -     /* Interrupts are disabled here */
+> > > > > > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > > > > > +     /*
+> > > > > > > +      * Paried with virtio_ccw_synchronize_cbs() and interrupts are
+> > > > > > > +      * disabled here.
+> > > > > > > +      */
+> > > > > > >       read_lock(&vcdev->irq_lock);
+> > > > > > > +#endif
+> > > > > > >       for_each_set_bit(i, indicators(vcdev),
+> > > > > > >                        sizeof(*indicators(vcdev)) * BITS_PER_BYTE) {
+> > > > > > >               /* The bit clear must happen before the vring kick. */
+> > > > > > > @@ -1146,7 +1151,9 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+> > > > > > >               vq = virtio_ccw_vq_by_ind(vcdev, i);
+> > > > > > >               vring_interrupt(0, vq);
+> > > > > > >       }
+> > > > > > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > > > > >       read_unlock(&vcdev->irq_lock);
+> > > > > > > +#endif
+> > > > > > >       if (test_bit(0, indicators2(vcdev))) {
+> > > > > > >               virtio_config_changed(&vcdev->vdev);
+> > > > > > >               clear_bit(0, indicators2(vcdev));
+> > > > > > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> > > > > > > index b5adf6abd241..c04f370a1e5c 100644
+> > > > > > > --- a/drivers/virtio/Kconfig
+> > > > > > > +++ b/drivers/virtio/Kconfig
+> > > > > > > @@ -35,6 +35,19 @@ menuconfig VIRTIO_MENU
+> > > > > > >
+> > > > > > >  if VIRTIO_MENU
+> > > > > > >
+> > > > > > > +config VIRTIO_HARDEN_NOTIFICATION
+> > > > > > > +        bool "Harden virtio notification"
+> > > > > > > +        help
+> > > > > > > +          Enable this to harden the device notifications and suppress
+> > > > > > > +          those that happen at a time where notifications are illegal.
+> > > > > > > +
+> > > > > > > +          Experimental: Note that several drivers still have bugs that
+> > > > > > > +          may cause crashes or hangs when correct handling of
+> > > > > > > +          notifications is enforced; depending on the subset of
+> > > > > > > +          drivers and devices you use, this may or may not work.
+> > > > > > > +
+> > > > > > > +          If unsure, say N.
+> > > > > > > +
+> > > > > > >  config VIRTIO_PCI
+> > > > > > >       tristate "PCI driver for virtio devices"
+> > > > > > >       depends on PCI
+> > > > > > > diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> > > > > > > index ef04a96942bf..21dc08d2f32d 100644
+> > > > > > > --- a/drivers/virtio/virtio.c
+> > > > > > > +++ b/drivers/virtio/virtio.c
+> > > > > > > @@ -220,6 +220,7 @@ static int virtio_features_ok(struct virtio_device *dev)
+> > > > > > >   * */
+> > > > > > >  void virtio_reset_device(struct virtio_device *dev)
+> > > > > > >  {
+> > > > > > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > > > > >       /*
+> > > > > > >        * The below virtio_synchronize_cbs() guarantees that any
+> > > > > > >        * interrupt for this line arriving after
+> > > > > > > @@ -228,6 +229,7 @@ void virtio_reset_device(struct virtio_device *dev)
+> > > > > > >        */
+> > > > > > >       virtio_break_device(dev);
+> > > > > > >       virtio_synchronize_cbs(dev);
+> > > > > > > +#endif
+> > > > > > >
+> > > > > > >       dev->config->reset(dev);
+> > > > > > >  }
+> > > > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > > > > > > index 13a7348cedff..d9d3b6e201fb 100644
+> > > > > > > --- a/drivers/virtio/virtio_ring.c
+> > > > > > > +++ b/drivers/virtio/virtio_ring.c
+> > > > > > > @@ -1688,7 +1688,11 @@ static struct virtqueue *vring_create_virtqueue_packed(
+> > > > > > >       vq->we_own_ring = true;
+> > > > > > >       vq->notify = notify;
+> > > > > > >       vq->weak_barriers = weak_barriers;
+> > > > > > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > > > > >       vq->broken = true;
+> > > > > > > +#else
+> > > > > > > +     vq->broken = false;
+> > > > > > > +#endif
+> > > > > > >       vq->last_used_idx = 0;
+> > > > > > >       vq->event_triggered = false;
+> > > > > > >       vq->num_added = 0;
+> > > > > > > @@ -2135,9 +2139,13 @@ irqreturn_t vring_interrupt(int irq, void *_vq)
+> > > > > > >       }
+> > > > > > >
+> > > > > > >       if (unlikely(vq->broken)) {
+> > > > > > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > > > > >               dev_warn_once(&vq->vq.vdev->dev,
+> > > > > > >                             "virtio vring IRQ raised before DRIVER_OK");
+> > > > > > >               return IRQ_NONE;
+> > > > > > > +#else
+> > > > > > > +             return IRQ_HANDLED;
+> > > > > > > +#endif
+> > > > > > >       }
+> > > > > > >
+> > > > > > >       /* Just a hint for performance: so it's ok that this can be racy! */
+> > > > > > > @@ -2180,7 +2188,11 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+> > > > > > >       vq->we_own_ring = false;
+> > > > > > >       vq->notify = notify;
+> > > > > > >       vq->weak_barriers = weak_barriers;
+> > > > > > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > > > > >       vq->broken = true;
+> > > > > > > +#else
+> > > > > > > +     vq->broken = false;
+> > > > > > > +#endif
+> > > > > > >       vq->last_used_idx = 0;
+> > > > > > >       vq->event_triggered = false;
+> > > > > > >       vq->num_added = 0;
+> > > > > > > diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+> > > > > > > index 9a36051ceb76..d15c3cdda2d2 100644
+> > > > > > > --- a/include/linux/virtio_config.h
+> > > > > > > +++ b/include/linux/virtio_config.h
+> > > > > > > @@ -257,6 +257,7 @@ void virtio_device_ready(struct virtio_device *dev)
+> > > > > > >
+> > > > > > >       WARN_ON(status & VIRTIO_CONFIG_S_DRIVER_OK);
+> > > > > > >
+> > > > > > > +#ifdef CONFIG_VIRTIO_HARDEN_NOTIFICATION
+> > > > > > >       /*
+> > > > > > >        * The virtio_synchronize_cbs() makes sure vring_interrupt()
+> > > > > > >        * will see the driver specific setup if it sees vq->broken
+> > > > > > > @@ -264,6 +265,7 @@ void virtio_device_ready(struct virtio_device *dev)
+> > > > > > >        */
+> > > > > > >       virtio_synchronize_cbs(dev);
+> > > > > > >       __virtio_unbreak_device(dev);
+> > > > > > > +#endif
+> > > > > > >       /*
+> > > > > > >        * The transport should ensure the visibility of vq->broken
+> > > > > > >        * before setting DRIVER_OK. See the comments for the transport
+> > > > > > > --
+> > > > > > > 2.25.1
+> > > > > >
+> > > >
+> >
 
