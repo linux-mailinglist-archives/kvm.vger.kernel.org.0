@@ -2,112 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D98F155D6AF
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:17:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D76255DEAD
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:29:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238155AbiF0P34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 11:29:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48178 "EHLO
+        id S238364AbiF0PdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 11:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237521AbiF0P3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 11:29:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8E5C819288
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 08:29:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656343791;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=h1/trUpMNLnNGyxwx4diC/Ki/CZLIBKxLxUT9R2hz7A=;
-        b=ZolJ/8IonSKWTE/g4XrGF9Nz9tot6da63w181aiJOV2bN/CcDz3x0PSu3CuuNxvLBQEGzD
-        xpNbn0nB5d+BK0mnJQtJ1NdDjnk+6H/Te0d9PX0MpAHiJKaAcJZMJvn/SJV3Ytp1YVzUUx
-        iolnPZ8H1PEyR+Dzg72qpzLLUyKMLUE=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-650-FOra8EXYOqOsoe8-26aGsQ-1; Mon, 27 Jun 2022 11:29:50 -0400
-X-MC-Unique: FOra8EXYOqOsoe8-26aGsQ-1
-Received: by mail-io1-f69.google.com with SMTP id t11-20020a6bdb0b000000b00674fd106c0cso5720596ioc.16
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 08:29:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=h1/trUpMNLnNGyxwx4diC/Ki/CZLIBKxLxUT9R2hz7A=;
-        b=TNAZVrk8JagSKcysGEb0d1kZaAKIafXw2DUig9BNuq9IZOnJLDomTRDB8LhpErVm8X
-         pP/dLPv5Rw9d8nZ+e4yzRhYBQmf0rWKKCGDuNcXAPtQUKjgnoMkhemgVNV4ITdvGEuyg
-         EoMqgZlZGvSxsnLNBNEGUzHeWyFzTCJpBvMr4WcQCg3csZ1Cq+sbaw75FiID+W9621c+
-         lY5hd5GCBpNwn6WbHWYcoEHso0qB5+DcsYpoxCdq2AaKbbOUXfZxk+jticW5GUP2U1TC
-         5lrRW872Bu6ppWsO/czh9H/XuSEZQt4h8qAnsOHU40nmeJio8R7e9hzlWZ655HLgmbi/
-         0T1w==
-X-Gm-Message-State: AJIora8Uq9dh7OYaMhnwilPCvzfpNUGI2UEzNcBbPW2YZOWHgwcy5BTa
-        bv7xSu4yG5MUWwyNdCseLR+YztZAQNPI7+C9os8X1sHlmzPZAeqr0wWXRyLW0g8F0BVIOGoj3nx
-        Hy9+fdgqidG+F
-X-Received: by 2002:a05:6638:13d5:b0:331:a6f2:3dbf with SMTP id i21-20020a05663813d500b00331a6f23dbfmr8013039jaj.9.1656343789726;
-        Mon, 27 Jun 2022 08:29:49 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uGpsqgUWS6Ce0E8mwLwamXIm8UbctHTOly4JQ9TWGUiHMN6AjyXmJH3vXAr+/oepx37YDf+Q==
-X-Received: by 2002:a05:6638:13d5:b0:331:a6f2:3dbf with SMTP id i21-20020a05663813d500b00331a6f23dbfmr8013019jaj.9.1656343789476;
-        Mon, 27 Jun 2022 08:29:49 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id d1-20020a026041000000b00331f63a3dfasm4808082jaf.122.2022.06.27.08.29.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jun 2022 08:29:48 -0700 (PDT)
-Date:   Mon, 27 Jun 2022 11:29:47 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        with ESMTP id S238264AbiF0PdB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 11:33:01 -0400
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF2CE1A072;
+        Mon, 27 Jun 2022 08:32:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1656343980; x=1687879980;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=YclDPQ8xJyzX28733WQC4oZRwA3ZmY9Y4p4xJQQbjgQ=;
+  b=UqryxeHxyVdzIVK22zNg8KUTeZEmXNLiHVpRGcEHLdix8PXJh12AthLt
+   yHMZtAx1mCGIw484Z3FPBbdBlJJFD50npoMaGtN46gb2DlPTE4xsbiB1p
+   a1RFlT4xY8bcu56W///BVJ0vU5e8xLHPauPqxtEZwqjNy4J1YamvS8hkK
+   8=;
+X-IronPort-AV: E=Sophos;i="5.92,226,1650931200"; 
+   d="scan'208";a="205466353"
+Subject: RE: [PATCH] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
+ if present
+Thread-Topic: [PATCH] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
+ if present
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-b09d0114.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP; 27 Jun 2022 15:32:42 +0000
+Received: from EX13D32EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1a-b09d0114.us-east-1.amazon.com (Postfix) with ESMTPS id D97A8816FA;
+        Mon, 27 Jun 2022 15:32:37 +0000 (UTC)
+Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
+ EX13D32EUC003.ant.amazon.com (10.43.164.24) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.36; Mon, 27 Jun 2022 15:32:36 +0000
+Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
+ EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1497.036;
+ Mon, 27 Jun 2022 15:32:36 +0000
+From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Message-ID: <YrnM6x7QWo6NmFqf@xz-m1.local>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-2-peterx@redhat.com>
- <20220625003554.GJ23621@ziepe.ca>
- <YrZjeEv1Z2IDMwgy@xz-m1.local>
- <20220625235904.GK23621@ziepe.ca>
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Borislav Petkov" <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Thread-Index: AQHYhhnGr94/Tz5Zr06wX+PVouePzq1bgNUAgAAEIQCAB+LOUA==
+Date:   Mon, 27 Jun 2022 15:32:36 +0000
+Message-ID: <0abf9f5de09e45ef9eb06b56bf16e3e6@EX13D32EUC003.ant.amazon.com>
+References: <20220622092202.15548-1-pdurrant@amazon.com>
+ <YrMqtHzNSean+qkh@google.com>
+ <834f41a88e9f49b6b72d9d3672d702e5@EX13D32EUC003.ant.amazon.com>
+In-Reply-To: <834f41a88e9f49b6b72d9d3672d702e5@EX13D32EUC003.ant.amazon.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.192]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220625235904.GK23621@ziepe.ca>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-12.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 25, 2022 at 08:59:04PM -0300, Jason Gunthorpe wrote:
-> On Fri, Jun 24, 2022 at 09:23:04PM -0400, Peter Xu wrote:
-> > If to go back to the original question with a shorter answer: if the ioctl
-> > context that GUP upon a page that will never be with a uffd context, then
-> > it's probably not gonna help at all.. at least not before we use
-> > FAULT_FLAG_INTERRUPTIBLE outside uffd page fault handling.
-> 
-> I think I would be more interested in this if it could abort a swap
-> in, for instance. Doesn't this happen if it flows the interruptible
-> flag into the VMA's fault handler?
+> -----Original Message-----
+[snip]
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 00e23dc518e0..8b45f9975e45 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -3123,6 +3123,7 @@ static int kvm_guest_time_update(struct kvm_vcp=
+u *v)
+> > >       if (vcpu->xen.vcpu_time_info_cache.active)
+> > >               kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_ca=
+che, 0);
+> > >       kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+> > > +     kvm_xen_setup_tsc_info(v);
+> >
+> > This can be called inside this if statement, no?
+> >
+> >         if (unlikely(vcpu->hw_tsc_khz !=3D tgt_tsc_khz)) {
+> >
+> >         }
+> >
 
-The idea makes sense, but it doesn't work like that right now, afaict. We
-need to teach lock_page_or_retry() to be able to consume the flag as
-discussed.
+I think it ought to be done whenever the shared copy of Xen's vcpu_info is =
+updated (it will always match on real Xen) so unconditionally calling it he=
+re seems reasonable.
 
-I don't see a major blocker for it if lock_page_or_retry() is the only one
-we'd like to touch.  Say, the only caller currently is do_swap_page()
-(there's also remove_device_exclusive_entry() but just deeper in the
-stack). Looks doable so far but I'll need to think about it..  I can keep
-you updated if I get something, but it'll be separate from this patchset.
+> > >       return 0;
+> > >  }
+> > >
+> > > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> > > index 610beba35907..a016ff85264d 100644
+> > > --- a/arch/x86/kvm/xen.c
+> > > +++ b/arch/x86/kvm/xen.c
+> > > @@ -10,6 +10,9 @@
+> > >  #include "xen.h"
+> > >  #include "hyperv.h"
+> > >  #include "lapic.h"
+> > > +#include "cpuid.h"
+> > > +
+> > > +#include <asm/xen/cpuid.h>
+> > >
+> > >  #include <linux/eventfd.h>
+> > >  #include <linux/kvm_host.h>
+> > > @@ -1855,3 +1858,41 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
+> > >       if (kvm->arch.xen_hvm_config.msr)
+> > >               static_branch_slow_dec_deferred(&kvm_xen_enabled);
+> > >  }
+> > > +
+> > > +void kvm_xen_set_cpuid(struct kvm_vcpu *vcpu)
+> >
+> > This is a very, very misleading name.  It does not "set" anything.  Giv=
+en that
+> > this patch adds "set" and "setup", I expected the "set" to you know, se=
+t the CPUID
+> > leaves and the "setup" to prepar for that, not the other way around.
+> >
+> > If the leaves really do need to be cached, kvm_xen_after_set_cpuid() is=
+ probably
+> > the least awful name.
+> >
 
-Thanks,
+Ok I'll rename it kvm_xen_after_set_cpuid().
 
--- 
-Peter Xu
+> > > +{
+> > > +     u32 base =3D 0;
+> > > +     u32 function;
+> > > +
+> > > +     for_each_possible_hypervisor_cpuid_base(function) {
+> > > +             struct kvm_cpuid_entry2 *entry =3D kvm_find_cpuid_entry=
+(vcpu, function, 0);
+> > > +
+> > > +             if (entry &&
+> > > +                 entry->ebx =3D=3D XEN_CPUID_SIGNATURE_EBX &&
+> > > +                 entry->ecx =3D=3D XEN_CPUID_SIGNATURE_ECX &&
+> > > +                 entry->edx =3D=3D XEN_CPUID_SIGNATURE_EDX) {
+> > > +                     base =3D function;
+> > > +                     break;
+> > > +             }
+> > > +     }
+> > > +     if (!base)
+> > > +             return;
+> > > +
+> > > +     function =3D base | XEN_CPUID_LEAF(3);
+> > > +     vcpu->arch.xen.tsc_info_1 =3D kvm_find_cpuid_entry(vcpu, functi=
+on, 1);
+> > > +     vcpu->arch.xen.tsc_info_2 =3D kvm_find_cpuid_entry(vcpu, functi=
+on, 2);
+> >
+> > Is it really necessary to cache the leave?  Guest CPUID isn't optimized=
+, but it's
+> > not _that_ slow, and unless I'm missing something updating the TSC freq=
+uency and
+> > scaling info should be uncommon, i.e. not performance critical.
+
+If we're updating the values in the leaves on every entry into the guest (a=
+s with calls to kvm_setup_guest_pvclock()) then I think the cached pointers=
+ are worthwhile.
+
+  Paul
 
