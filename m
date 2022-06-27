@@ -2,260 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A83755DF96
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:30:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CCCD55DB5F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:24:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238285AbiF0Lul (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 07:50:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50010 "EHLO
+        id S237915AbiF0LvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 07:51:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238584AbiF0Lsr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 07:48:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69042CEA;
-        Mon, 27 Jun 2022 04:42:34 -0700 (PDT)
+        with ESMTP id S237928AbiF0LtV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 07:49:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E523EDD6
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 04:43:14 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 04DCB611AE;
-        Mon, 27 Jun 2022 11:42:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FC3AC3411D;
-        Mon, 27 Jun 2022 11:42:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1656330153;
-        bh=yTy+jkozP0hMY+B0KWkUgzOl8qgLaJsMF/9JTHu7dB4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jr76LOE0se2fpNwdK/nBBIw0xSKGrZEnhUb+66edY7UNwg1mGt0JettLcSsHzBu/H
-         R/4U8yp/i7vLQU2DdbLdffzqnvwwuJtyn/Ea6lUsZ9xCpQ9lrbhodhEYNhQm9KZA0t
-         G/dnllkHF1he/CNwJnbT8Vu9X0Gan4BBjYExclIM=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Peter Gonda <pgonda@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.18 103/181] KVM: SEV: Init target VMCBs in sev_migrate_from
-Date:   Mon, 27 Jun 2022 13:21:16 +0200
-Message-Id: <20220627111947.686004921@linuxfoundation.org>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220627111944.553492442@linuxfoundation.org>
-References: <20220627111944.553492442@linuxfoundation.org>
-User-Agent: quilt/0.66
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 827E761241
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 11:43:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD194C3411D;
+        Mon, 27 Jun 2022 11:43:11 +0000 (UTC)
+Date:   Mon, 27 Jun 2022 12:43:08 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Peter Collingbourne <pcc@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Michael Roth <michael.roth@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>,
+        Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+Message-ID: <YrmXzHXv4babwbNZ@arm.com>
+References: <20220623234944.141869-1-pcc@google.com>
+ <YrXu0Uzi73pUDwye@arm.com>
+ <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Gonda <pgonda@google.com>
+On Fri, Jun 24, 2022 at 02:50:53PM -0700, Peter Collingbourne wrote:
+> On Fri, Jun 24, 2022 at 10:05 AM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+> > + Steven as he added the KVM and swap support for MTE.
+> >
+> > On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
+> > > Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
+> > > depend on being able to map guest memory as MAP_SHARED. The current
+> > > restriction on sharing MAP_SHARED pages with the guest is preventing
+> > > the use of those features with MTE. Therefore, remove this restriction.
+> >
+> > We already have some corner cases where the PG_mte_tagged logic fails
+> > even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
+> > KVM MAP_SHARED will potentially make things worse (or hard to reason
+> > about; for example the VMM sets PROT_MTE as well). I'm more inclined to
+> > get rid of PG_mte_tagged altogether, always zero (or restore) the tags
+> > on user page allocation, copy them on write. For swap we can scan and if
+> > all tags are 0 and just skip saving them.
+> 
+> A problem with this approach is that it would conflict with any
+> potential future changes that we might make that would require the
+> kernel to avoid modifying the tags for non-PROT_MTE pages.
 
-[ Upstream commit 6defa24d3b12bbd418bc8526dea1cbc605265c06 ]
+Not if in all those cases we check VM_MTE_ALLOWED. We seem to have the
+vma available where it matters. We can keep PG_mte_tagged around but
+always set it on page allocation (e.g. when zeroing or CoW) and check
+VM_MTE_ALLOWED rather than VM_MTE.
 
-The target VMCBs during an intra-host migration need to correctly setup
-for running SEV and SEV-ES guests. Add sev_init_vmcb() function and make
-sev_es_init_vmcb() static. sev_init_vmcb() uses the now private function
-to init SEV-ES guests VMCBs when needed.
+I'm not sure how Linux can deal with pages that do not support MTE.
+Currently we only handle this at the vm_flags level. Assuming that we
+somehow manage to, we can still use PG_mte_tagged to mark the pages that
+supported tags on allocation (and they have been zeroed or copied). I
+guess if you want to move a page around, you'd need to go through
+something like try_to_unmap() (or set all mappings to PROT_NONE like in
+NUMA migration). Then you can either check whether the page is PROT_MTE
+anywhere and maybe read the tags to see whether all are zero after
+unmapping.
 
-Fixes: 0b020f5af092 ("KVM: SEV: Add support for SEV-ES intra host migration")
-Fixes: b56639318bb2 ("KVM: SEV: Add support for SEV intra host migration")
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Message-Id: <20220623173406.744645-1-pgonda@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/kvm/svm/sev.c | 68 ++++++++++++++++++++++++++++--------------
- arch/x86/kvm/svm/svm.c | 11 ++-----
- arch/x86/kvm/svm/svm.h |  2 +-
- 3 files changed, 48 insertions(+), 33 deletions(-)
+Deferring tag zeroing/restoring to set_pte_at() can be racy without a
+lock (or your approach with another flag) but I'm not sure it's worth
+the extra logic if zeroing or copying the tags doesn't have a
+significant overhead for non-PROT_MTE pages.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 4b7d490c0b63..76e9e6eb71d6 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1665,19 +1665,24 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- {
- 	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
- 	struct kvm_sev_info *src = &to_kvm_svm(src_kvm)->sev_info;
-+	struct kvm_vcpu *dst_vcpu, *src_vcpu;
-+	struct vcpu_svm *dst_svm, *src_svm;
- 	struct kvm_sev_info *mirror;
-+	unsigned long i;
- 
- 	dst->active = true;
- 	dst->asid = src->asid;
- 	dst->handle = src->handle;
- 	dst->pages_locked = src->pages_locked;
- 	dst->enc_context_owner = src->enc_context_owner;
-+	dst->es_active = src->es_active;
- 
- 	src->asid = 0;
- 	src->active = false;
- 	src->handle = 0;
- 	src->pages_locked = 0;
- 	src->enc_context_owner = NULL;
-+	src->es_active = false;
- 
- 	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
- 
-@@ -1704,26 +1709,21 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- 		list_del(&src->mirror_entry);
- 		list_add_tail(&dst->mirror_entry, &owner_sev_info->mirror_vms);
- 	}
--}
- 
--static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
--{
--	unsigned long i;
--	struct kvm_vcpu *dst_vcpu, *src_vcpu;
--	struct vcpu_svm *dst_svm, *src_svm;
-+	kvm_for_each_vcpu(i, dst_vcpu, dst_kvm) {
-+		dst_svm = to_svm(dst_vcpu);
- 
--	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
--		return -EINVAL;
-+		sev_init_vmcb(dst_svm);
- 
--	kvm_for_each_vcpu(i, src_vcpu, src) {
--		if (!src_vcpu->arch.guest_state_protected)
--			return -EINVAL;
--	}
-+		if (!dst->es_active)
-+			continue;
- 
--	kvm_for_each_vcpu(i, src_vcpu, src) {
-+		/*
-+		 * Note, the source is not required to have the same number of
-+		 * vCPUs as the destination when migrating a vanilla SEV VM.
-+		 */
-+		src_vcpu = kvm_get_vcpu(dst_kvm, i);
- 		src_svm = to_svm(src_vcpu);
--		dst_vcpu = kvm_get_vcpu(dst, i);
--		dst_svm = to_svm(dst_vcpu);
- 
- 		/*
- 		 * Transfer VMSA and GHCB state to the destination.  Nullify and
-@@ -1740,8 +1740,23 @@ static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
- 		src_svm->vmcb->control.vmsa_pa = INVALID_PAGE;
- 		src_vcpu->arch.guest_state_protected = false;
- 	}
--	to_kvm_svm(src)->sev_info.es_active = false;
--	to_kvm_svm(dst)->sev_info.es_active = true;
-+}
-+
-+static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
-+{
-+	struct kvm_vcpu *src_vcpu;
-+	unsigned long i;
-+
-+	if (!sev_es_guest(src))
-+		return 0;
-+
-+	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
-+		return -EINVAL;
-+
-+	kvm_for_each_vcpu(i, src_vcpu, src) {
-+		if (!src_vcpu->arch.guest_state_protected)
-+			return -EINVAL;
-+	}
- 
- 	return 0;
- }
-@@ -1789,11 +1804,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	if (ret)
- 		goto out_dst_vcpu;
- 
--	if (sev_es_guest(source_kvm)) {
--		ret = sev_es_migrate_from(kvm, source_kvm);
--		if (ret)
--			goto out_source_vcpu;
--	}
-+	ret = sev_check_source_vcpus(kvm, source_kvm);
-+	if (ret)
-+		goto out_source_vcpu;
- 
- 	sev_migrate_from(kvm, source_kvm);
- 	kvm_vm_dead(source_kvm);
-@@ -2910,7 +2923,7 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
- 				    count, in);
- }
- 
--void sev_es_init_vmcb(struct vcpu_svm *svm)
-+static void sev_es_init_vmcb(struct vcpu_svm *svm)
- {
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
- 
-@@ -2955,6 +2968,15 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
- 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTTOIP, 1, 1);
- }
- 
-+void sev_init_vmcb(struct vcpu_svm *svm)
-+{
-+	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
-+	clr_exception_intercept(svm, UD_VECTOR);
-+
-+	if (sev_es_guest(svm->vcpu.kvm))
-+		sev_es_init_vmcb(svm);
-+}
-+
- void sev_es_vcpu_reset(struct vcpu_svm *svm)
- {
- 	/*
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0c0a09b43b10..6bfb0b0e66bd 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1125,15 +1125,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 		svm->vmcb->control.int_ctl |= V_GIF_ENABLE_MASK;
- 	}
- 
--	if (sev_guest(vcpu->kvm)) {
--		svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
--		clr_exception_intercept(svm, UD_VECTOR);
--
--		if (sev_es_guest(vcpu->kvm)) {
--			/* Perform SEV-ES specific VMCB updates */
--			sev_es_init_vmcb(svm);
--		}
--	}
-+	if (sev_guest(vcpu->kvm))
-+		sev_init_vmcb(svm);
- 
- 	svm_hv_init_vmcb(svm->vmcb);
- 	init_vmcb_after_set_cpuid(vcpu);
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 34babf9185fe..8ec8fb58b924 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -616,10 +616,10 @@ void __init sev_set_cpu_caps(void);
- void __init sev_hardware_setup(void);
- void sev_hardware_unsetup(void);
- int sev_cpu_init(struct svm_cpu_data *sd);
-+void sev_init_vmcb(struct vcpu_svm *svm);
- void sev_free_vcpu(struct kvm_vcpu *vcpu);
- int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
- int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
--void sev_es_init_vmcb(struct vcpu_svm *svm);
- void sev_es_vcpu_reset(struct vcpu_svm *svm);
- void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
- void sev_es_prepare_switch_to_guest(struct vmcb_save_area *hostsa);
+Another issue with set_pte_at() is that it can write tags on mprotect()
+even if the page is mapped read-only. So far I couldn't find a problem
+with this but it adds to the complexity.
+
+> Thinking about this some more, another idea that I had was to only
+> allow MAP_SHARED mappings in a guest with MTE enabled if the mapping
+> is PROT_MTE and there are no non-PROT_MTE aliases. For anonymous
+> mappings I don't think it's possible to create a non-PROT_MTE alias in
+> another mm (since you can't turn off PROT_MTE with mprotect), and for
+> memfd maybe we could introduce a flag that requires PROT_MTE on all
+> mappings. That way, we are guaranteed that either the page has been
+> tagged prior to fault or we have exclusive access to it so it can be
+> tagged on demand without racing. Let me see what effect that has on
+> crosvm.
+
+You could still have all initial shared mappings as !PROT_MTE and some
+mprotect() afterwards setting PG_mte_tagged and clearing the tags and
+this can race. AFAICT, the easiest way to avoid the race is to set
+PG_mte_tagged on allocation before it ends up in set_pte_at().
+
 -- 
-2.35.1
-
-
-
+Catalin
