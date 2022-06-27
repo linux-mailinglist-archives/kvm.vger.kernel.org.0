@@ -2,140 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8693B55CAD9
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE76155D19A
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:09:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237375AbiF0Si0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 14:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37490 "EHLO
+        id S240402AbiF0Sj6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 14:39:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240436AbiF0SiC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 14:38:02 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9128FC34;
-        Mon, 27 Jun 2022 11:35:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5B84EB81A31;
-        Mon, 27 Jun 2022 18:35:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43D52C3411D;
-        Mon, 27 Jun 2022 18:35:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656354918;
-        bh=lSduwLf0URPGJXhzE2uMPDSka0BN2NuObX6s6wiVjLw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=V1wgnhWIBSxTWZs7oVLQcgu6ow7j/nvOHPvXzsT1Nn9X7hdwGhqh7NAL8uHaamcIf
-         IY07sAxOhUQqndCnsaxA3ScC1kTdg2Yn9hsnKIlxq8rxFKlV7RaY+NRmyVh3m75Tb8
-         ZpcqX4hfVCDBy0N1EVQnXiwwX9rIvnnkMDcCS04gZPnAV3H3k5TZVX9FzOMlpLx209
-         8O1zovzb/AU8MtbMYOdG7MyCPnmJKw+tFasJC0wEQpVPIKC5aCfVMO84EEc2E/4TTl
-         9dxSDJTazopgz1hOdfhMFc0UNVAF149+GJwdJJ2/y5zxk6J7RR9WnMOk8pk02PIKf/
-         G0d/RZr8PVXzA==
-Date:   Mon, 27 Jun 2022 20:35:13 +0200
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Daniel Borkmann <daniel@iogearbox.net>
-Cc:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, dm-devel@redhat.com,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, io-uring@vger.kernel.org,
-        lvs-devel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        kasan-dev@googlegroups.com, linux-mmc@vger.kernel.org,
-        nvdimm@lists.linux.dev, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, linux-perf-users@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        v9fs-developer@lists.sourceforge.net, linux-rdma@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] treewide: uapi: Replace zero-length arrays with
- flexible-array members
-Message-ID: <20220627183513.GA137875@embeddedor>
-References: <20220627180432.GA136081@embeddedor>
- <6bc1e94c-ce1d-a074-7d0c-8dbe6ce22637@iogearbox.net>
+        with ESMTP id S240213AbiF0Sj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 14:39:56 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F640B88
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 11:39:55 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id o23so12011979ljg.13
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 11:39:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=j4hbmbJoMUR/043f1gtsU9ggy7W36/KPjU+Af3Jvda8=;
+        b=W2bp3N/nc6A9fd8TGl01wDh9lzy9wHDNwzOb6PTiyT5sHPZ9gZsWvNOfQM+oO2QLy6
+         hn6cLw585q9YpYXzFr7ggc2fH86iRssYldTefymZoF3iUnFAgSvdGVCjX9WlaZ8im9q4
+         6g6HM3bkfYLU9V7ObvqHMofQwZw4Jmsz8Xv/qWgl3KXxofKkdfsaKS/5x/303/PhHMEn
+         UhvAdPSSo0YVDSgcCT9pjeyj8yay52Ham8/uSv14B1iA991nV1cdeUFb9e0SmtFRjFyg
+         tN7V4WRIv4w6Qqqv8Em05r4ZKFGt6EiC6pPmL/IG4V61eL8MjRNAhkz8U2fXq0jp1cLS
+         ULUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=j4hbmbJoMUR/043f1gtsU9ggy7W36/KPjU+Af3Jvda8=;
+        b=y6pRHwWxEQvStRev4p985LDnBIqOAHh/UObbDzFiWVU82vhR/Gvgm77gGM+Yi7ge2D
+         DSg9Omij4teDTojimTbsfJ6Aos4hmxhioqzzC0+rPUJwOBao25FlBnzD3J2soL5YI3jy
+         NC+k+ye/Gxw5vf/6sg394qydw+eF7s3+ey49nX2xaxxxrE0j6C0yC5jsQbO9Lac84tuP
+         RK/snDDcN+/gZ0+QL+3E9xQX8FKQ28Rlg5OY4RFzY6B2yYQWTmxgNAcoINUK1f/RmZFD
+         7TZI1zk0bGs7qneM1gvw4jqBAjcJxDlawHhGrm5HOxEeJrwBssuKvStSYGewwuGcCuHX
+         OGuA==
+X-Gm-Message-State: AJIora8e8Cd1vO122hw/yW2nIm0IFWop7N2Gr8kce/UlzLCE+omq+A/0
+        rAjeCg8YZPOKvSeCUkWjHETaQiIO+xvSCpUR1KbNtg==
+X-Google-Smtp-Source: AGRyM1t2YlhNyy2b2oS22ZEa07490K1W8KWHnnHXnjPVpPlJppubAGVaXmqVB682qW55u19S3zFl1fTsyodE0sxBOaw=
+X-Received: by 2002:a2e:2a43:0:b0:25a:84a9:921c with SMTP id
+ q64-20020a2e2a43000000b0025a84a9921cmr7461767ljq.83.1656355193311; Mon, 27
+ Jun 2022 11:39:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6bc1e94c-ce1d-a074-7d0c-8dbe6ce22637@iogearbox.net>
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20220627161123.1386853-1-pgonda@google.com> <Yrnync27TAhgSRUq@google.com>
+In-Reply-To: <Yrnync27TAhgSRUq@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 27 Jun 2022 12:39:41 -0600
+Message-ID: <CAMkAt6q9iTsJO=UY_6588Zqa_rUjr5c01H5NsCj-4FiuTGnncw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SEV: Clear the pages pointer in sev_unpin_memory
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Greg Thelen <gthelen@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 08:27:37PM +0200, Daniel Borkmann wrote:
-> On 6/27/22 8:04 PM, Gustavo A. R. Silva wrote:
-> > There is a regular need in the kernel to provide a way to declare
-> > having a dynamically sized set of trailing elements in a structure.
-> > Kernel code should always use “flexible array members”[1] for these
-> > cases. The older style of one-element or zero-length arrays should
-> > no longer be used[2].
-> > 
-> > This code was transformed with the help of Coccinelle:
-> > (linux-5.19-rc2$ spatch --jobs $(getconf _NPROCESSORS_ONLN) --sp-file script.cocci --include-headers --dir . > output.patch)
-> > 
-> > @@
-> > identifier S, member, array;
-> > type T1, T2;
-> > @@
-> > 
-> > struct S {
-> >    ...
-> >    T1 member;
-> >    T2 array[
-> > - 0
-> >    ];
-> > };
-> > 
-> > -fstrict-flex-arrays=3 is coming and we need to land these changes
-> > to prevent issues like these in the short future:
-> > 
-> > ../fs/minix/dir.c:337:3: warning: 'strcpy' will always overflow; destination buffer has size 0,
-> > but the source string has length 2 (including NUL byte) [-Wfortify-source]
-> > 		strcpy(de3->name, ".");
-> > 		^
-> > 
-> > Since these are all [0] to [] changes, the risk to UAPI is nearly zero. If
-> > this breaks anything, we can use a union with a new member name.
-> > 
-> > [1] https://en.wikipedia.org/wiki/Flexible_array_member
-> > [2] https://www.kernel.org/doc/html/v5.16/process/deprecated.html#zero-length-and-one-element-arrays
-> > 
-> > Link: https://github.com/KSPP/linux/issues/78
-> > Build-tested-by: https://lore.kernel.org/lkml/62b675ec.wKX6AOZ6cbE71vtF%25lkp@intel.com/
-> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+On Mon, Jun 27, 2022 at 12:10 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Jun 27, 2022, Peter Gonda wrote:
+> > Clear to the @pages array pointer in sev_unpin_memory to avoid leaving a
+> > dangling pointer to invalid memory.
+> >
+> > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > Cc: Greg Thelen <gthelen@google.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Sean Christopherson <seanjc@google.com>
+> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> > Cc: kvm@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org
 > > ---
-> > Hi all!
-> > 
-> > JFYI: I'm adding this to my -next tree. :)
-> 
-> Fyi, this breaks BPF CI:
+> >  arch/x86/kvm/svm/sev.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index 309bcdb2f929..485ad86c01c6 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -452,6 +452,7 @@ static void sev_unpin_memory(struct kvm *kvm, struct page **pages,
+> >       unpin_user_pages(pages, npages);
+> >       kvfree(pages);
+> >       sev->pages_locked -= npages;
+> > +     *pages = NULL;
+>
+> Would this have helped detect a real bug?  I generally like cleaning up, but this
+> leaves things in a somewhat inconsistent state, e.g. when unpinning a kvm_enc_region,
+> pages will be NULL but npages will be non-zero.  It's somewhat moot because the
+> region is immediately freed in that case, but that begs the question of what real
+> benefit this provides.  sev_dbg_crypt() is the only flow where there's much danger
+> of a use-after-free.
+>
 
-Thanks for the report! It seems the 0-day robot didn't catch that one.
-I'll fix it up right away. :)
+No strong opinion here, I just thought since this is a helper that
+takes a 'struct page **pages" we may as well clear this. While there
+are no bugs caught now if someone were to introduce something wrong
+this would make it more clear.
 
---
-Gustavo
+We could update sev_unpin_memory() to take a int *npages so it can be
+cleared as well. Since kvm_enc_region describes a region with u64
+instead of pointers that seemed "safer" give you'd have to cast them
+to dereference.
 
-> 
-> https://github.com/kernel-patches/bpf/runs/7078719372?check_suite_focus=true
-> 
->   [...]
->   progs/map_ptr_kern.c:314:26: error: field 'trie_key' with variable sized type 'struct bpf_lpm_trie_key' not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
->           struct bpf_lpm_trie_key trie_key;
->                                   ^
->   1 error generated.
->   make: *** [Makefile:519: /tmp/runner/work/bpf/bpf/tools/testing/selftests/bpf/map_ptr_kern.o] Error 1
->   make: *** Waiting for unfinished jobs....
->   Error: Process completed with exit code 2.
+Totally fine with the NACK of course. =]
