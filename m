@@ -2,205 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17B6655E22C
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:35:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF92F55CAB9
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:58:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239093AbiF0QRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 12:17:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50684 "EHLO
+        id S238055AbiF0QEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 12:04:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235713AbiF0QRl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 12:17:41 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98BF618B17;
-        Mon, 27 Jun 2022 09:17:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1656346659; x=1687882659;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=USxLX1hhBixQIrWe2JRk26WbQIpHEUrB18xFgZhH74s=;
-  b=AEgoPJ7+VsOyrvO1wKlydr4J21BuVveM2+xSBNqfnUgrKJfHwlc/Gtue
-   9euZcFZOEXD5a2WBjFdxEnESS52fJ0oNaWFHCqFJLH7JE3gR1t0CzYpkO
-   UxpVI01V97DO+Caiqp9LkSI7q8Z2wk2TAb2xNsgd87Owb6Y5yvKVzVKSY
-   c=;
-X-IronPort-AV: E=Sophos;i="5.92,226,1650931200"; 
-   d="scan'208";a="102349472"
-Subject: RE: [PATCH] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
- if present
-Thread-Topic: [PATCH] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves,
- if present
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-7dac3c4d.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 27 Jun 2022 15:56:51 +0000
-Received: from EX13D32EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1e-7dac3c4d.us-east-1.amazon.com (Postfix) with ESMTPS id 8C15DA37DA;
-        Mon, 27 Jun 2022 15:56:46 +0000 (UTC)
-Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
- EX13D32EUC003.ant.amazon.com (10.43.164.24) with Microsoft SMTP Server (TLS)
- id 15.0.1497.36; Mon, 27 Jun 2022 15:56:45 +0000
-Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
- EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1497.036;
- Mon, 27 Jun 2022 15:56:45 +0000
-From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        with ESMTP id S235944AbiF0QEt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 12:04:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 65253B1CF
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 09:04:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656345887;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LYkNIEs5Mn24fJrau8L4ZctBwCdXRpyqBWYk8TuQ9zI=;
+        b=H8coPp1XQVKZmnpwotZJiKG0e9OQXX2ZbOtc8SmRjNk5XMyFtBsbIUKJWvyy7IcLU00YRd
+        PtJ4i2Ur5wUGnCND5qy5r975h4KUIdbkIbq7rdB+2b/KT3IpaWIitJXTkmrXW1NNxEH7S4
+        Ji03qf8SopKK3+M3Oqv+0BdL+tZel3o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-629-4VZnuFsLOpWKkzjSQeBrlg-1; Mon, 27 Jun 2022 12:04:44 -0400
+X-MC-Unique: 4VZnuFsLOpWKkzjSQeBrlg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A46E680418F;
+        Mon, 27 Jun 2022 16:04:43 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.192.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A9006C15D40;
+        Mon, 27 Jun 2022 16:04:41 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "Borislav Petkov" <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Thread-Index: AQHYhhnGr94/Tz5Zr06wX+PVouePzq1bgNUAgAAEIQCAB+LOUIAAB6YAgAAA80A=
-Date:   Mon, 27 Jun 2022 15:56:45 +0000
-Message-ID: <e4711fc9017246978a0b452f1b5ca868@EX13D32EUC003.ant.amazon.com>
-References: <20220622092202.15548-1-pdurrant@amazon.com>
- <YrMqtHzNSean+qkh@google.com>
- <834f41a88e9f49b6b72d9d3672d702e5@EX13D32EUC003.ant.amazon.com>
- <0abf9f5de09e45ef9eb06b56bf16e3e6@EX13D32EUC003.ant.amazon.com>
- <YrnSFGURsmxV2Qmu@google.com>
-In-Reply-To: <YrnSFGURsmxV2Qmu@google.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.165.192]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 00/14] KVM: nVMX: Use vmcs_config for setting up nested VMX MSRs
+Date:   Mon, 27 Jun 2022 18:04:26 +0200
+Message-Id: <20220627160440.31857-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-12.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> -----Original Message-----
-> From: Sean Christopherson <seanjc@google.com>
-> Sent: 27 June 2022 16:52
-> To: Durrant, Paul <pdurrant@amazon.co.uk>
-> Cc: x86@kernel.org; kvm@vger.kernel.org; linux-kernel@vger.kernel.org; Pa=
-olo Bonzini
-> <pbonzini@redhat.com>; Vitaly Kuznetsov <vkuznets@redhat.com>; Wanpeng Li=
- <wanpengli@tencent.com>; Jim
-> Mattson <jmattson@google.com>; Joerg Roedel <joro@8bytes.org>; Thomas Gle=
-ixner <tglx@linutronix.de>;
-> Ingo Molnar <mingo@redhat.com>; Borislav Petkov <bp@alien8.de>; Dave Hans=
-en
-> <dave.hansen@linux.intel.com>; H. Peter Anvin <hpa@zytor.com>
-> Subject: RE: [EXTERNAL][PATCH] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc=
- info) sub-leaves, if present
->=20
-> CAUTION: This email originated from outside of the organization. Do not c=
-lick links or open
-> attachments unless you can confirm the sender and know the content is saf=
-e.
->=20
->=20
->=20
-> On Mon, Jun 27, 2022, Durrant, Paul wrote:
-> > > -----Original Message-----
-> > [snip]
-> > > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > > index 00e23dc518e0..8b45f9975e45 100644
-> > > > > --- a/arch/x86/kvm/x86.c
-> > > > > +++ b/arch/x86/kvm/x86.c
-> > > > > @@ -3123,6 +3123,7 @@ static int kvm_guest_time_update(struct kvm=
-_vcpu *v)
-> > > > >       if (vcpu->xen.vcpu_time_info_cache.active)
-> > > > >               kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_inf=
-o_cache, 0);
-> > > > >       kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
-> > > > > +     kvm_xen_setup_tsc_info(v);
-> > > >
-> > > > This can be called inside this if statement, no?
-> > > >
-> > > >         if (unlikely(vcpu->hw_tsc_khz !=3D tgt_tsc_khz)) {
-> > > >
-> > > >         }
-> > > >
-> >
-> > I think it ought to be done whenever the shared copy of Xen's vcpu_info=
- is
-> > updated (it will always match on real Xen) so unconditionally calling i=
-t here
-> > seems reasonable.
->=20
-> But isn't the call pointless if the vCPU's hw_tsc_khz is unchanged?  E.g =
-if the
-> params were explicitly passed in, then it would look like:
->=20
->         if (unlikely(vcpu->hw_tsc_khz !=3D tgt_tsc_khz)) {
->                 kvm_get_time_scale(NSEC_PER_SEC, tgt_tsc_khz * 1000LL,
->                                    &vcpu->hv_clock.tsc_shift,
->                                    &vcpu->hv_clock.tsc_to_system_mul);
->                 vcpu->hw_tsc_khz =3D tgt_tsc_khz;
->=20
->                 kvm_xen_setup_tsc_info(vcpu, tgt_tsc_khz,
->                                        vcpu->hv_clock.tsc_shift,
->                                        vcpu->hv_clock.tsc_to_system_mul);
->         }
->=20
-> Explicitly passing in the arguments probably isn't necessary, just use a =
-more
-> precise name, e.g. kvm_xen_update_tsc_khz(), to make it clear that the up=
-date is
-> limited to TSC frequency changes.
->=20
-> > > > > +{
-> > > > > +     u32 base =3D 0;
-> > > > > +     u32 function;
-> > > > > +
-> > > > > +     for_each_possible_hypervisor_cpuid_base(function) {
-> > > > > +             struct kvm_cpuid_entry2 *entry =3D kvm_find_cpuid_e=
-ntry(vcpu, function, 0);
-> > > > > +
-> > > > > +             if (entry &&
-> > > > > +                 entry->ebx =3D=3D XEN_CPUID_SIGNATURE_EBX &&
-> > > > > +                 entry->ecx =3D=3D XEN_CPUID_SIGNATURE_ECX &&
-> > > > > +                 entry->edx =3D=3D XEN_CPUID_SIGNATURE_EDX) {
-> > > > > +                     base =3D function;
-> > > > > +                     break;
-> > > > > +             }
-> > > > > +     }
-> > > > > +     if (!base)
-> > > > > +             return;
-> > > > > +
-> > > > > +     function =3D base | XEN_CPUID_LEAF(3);
-> > > > > +     vcpu->arch.xen.tsc_info_1 =3D kvm_find_cpuid_entry(vcpu, fu=
-nction, 1);
-> > > > > +     vcpu->arch.xen.tsc_info_2 =3D kvm_find_cpuid_entry(vcpu, fu=
-nction, 2);
-> > > >
-> > > > Is it really necessary to cache the leave?  Guest CPUID isn't optim=
-ized, but it's
-> > > > not _that_ slow, and unless I'm missing something updating the TSC =
-frequency and
-> > > > scaling info should be uncommon, i.e. not performance critical.
-> >
-> > If we're updating the values in the leaves on every entry into the gues=
-t (as
-> > with calls to kvm_setup_guest_pvclock()) then I think the cached pointe=
-rs are
-> > worthwhile.
->=20
-> But why would you update on every entry to the guest?   Isn't this a rare=
- operation
-> if the update is limited to changes in the host CPU's TSC frequency?  Or =
-am I
-> missing something?
+Changes since RFC:
+- "KVM: VMX: Extend VMX controls macro shenanigans" PATCH added and the
+  infrastructure is later used in other patches [Sean] PATCHes 1-3 added
+  to support the change.
+- "KVM: VMX: Clear controls obsoleted by EPT at runtime, not setup" PATCH
+  added [Sean].
+- Commit messages added.
 
-No, I am indeed forgetting that there is no offset to update (there once wa=
-s) so indeed the values will only change if the freq changes... so I'll dro=
-p the caching.
+vmcs_config is a sanitized version of host VMX MSRs where some controls are
+filtered out (e.g. when Enlightened VMCS is enabled, some know bugs are 
+discovered, some inconsistencies in controls are detected,...) but
+nested_vmx_setup_ctls_msrs() uses raw host MSRs instead. This may end up
+in exposing undesired controls to L1. Switch to using vmcs_config instead.
 
-  Paul
+Sean Christopherson (1):
+  KVM: VMX: Clear controls obsoleted by EPT at runtime, not setup
+
+Vitaly Kuznetsov (13):
+  KVM: VMX: Check VM_ENTRY_IA32E_MODE in setup_vmcs_config()
+  KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING in
+    setup_vmcs_config()
+  KVM: VMX: Tweak the special handling of SECONDARY_EXEC_ENCLS_EXITING
+    in setup_vmcs_config()
+  KVM: VMX: Extend VMX controls macro shenanigans
+  KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering out of
+    setup_vmcs_config()
+  KVM: VMX: Add missing VMEXIT controls to vmcs_config
+  KVM: VMX: Add missing VMENTRY controls to vmcs_config
+  KVM: VMX: Add missing CPU based VM execution controls to vmcs_config
+  KVM: nVMX: Use sanitized allowed-1 bits for VMX control MSRs
+  KVM: VMX: Store required-1 VMX controls in vmcs_config
+  KVM: nVMX: Use sanitized required-1 bits for VMX control MSRs
+  KVM: VMX: Cache MSR_IA32_VMX_MISC in vmcs_config
+  KVM: nVMX: Use cached host MSR_IA32_VMX_MISC value for setting up
+    nested MSR
+
+ arch/x86/kvm/vmx/capabilities.h |  16 +--
+ arch/x86/kvm/vmx/nested.c       |  37 +++---
+ arch/x86/kvm/vmx/nested.h       |   2 +-
+ arch/x86/kvm/vmx/vmx.c          | 198 ++++++++++++++------------------
+ arch/x86/kvm/vmx/vmx.h          | 118 +++++++++++++++++++
+ 5 files changed, 229 insertions(+), 142 deletions(-)
+
+-- 
+2.35.3
+
