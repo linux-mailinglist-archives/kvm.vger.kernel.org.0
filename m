@@ -2,66 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8C5055D40A
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:13:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3946355C73F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:53:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242754AbiF0Wuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 18:50:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57978 "EHLO
+        id S242768AbiF0Wzc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 18:55:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240124AbiF0Wup (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 18:50:45 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4131F215;
-        Mon, 27 Jun 2022 15:50:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656370244; x=1687906244;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=WBRX+DWd953nPYpjovL55VvK/pzOBLMxlYRtnDYODx4=;
-  b=hhabvVspqnN2ILFUOdfdtrA02ieJ2XRYJqkOTsFgusGSv5UO5AhZjq+/
-   aU+2r/e0PzJnZEpDanf2gJhkOcdfM+7roE8KssAz/FvC5PN6nlnYSLt4W
-   J5jgzhnad1c0iJlfKrmpv/jvRk8Du+aGDHNEcm3rE2aRPwCfwDVK5boa+
-   1LVOPicRn9rVwGADRvCAId3LsCyEjsdftJLmrQyJmF/NLcuUOsj6wPqfy
-   6HVvPSnmTN+frGaVFAWaUsl9UouPsXXEqZqcKpKp79OY1yzPFNqCygaB7
-   qYGTD5eWdOh6Z5XzJzCh4tYR7lieYbLUnw4OXGCXIZazAsVhPdudUsirC
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="343268820"
-X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="343268820"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 15:50:42 -0700
-X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="616964404"
-Received: from iiturbeo-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.89.183])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 15:50:38 -0700
-Message-ID: <a610ae9bd554f31364193abc928fad86ed5ebf7c.camel@intel.com>
-Subject: Re: [PATCH v5 15/22] x86/virt/tdx: Allocate and set up PAMTs for
- TDMRs
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-Date:   Tue, 28 Jun 2022 10:50:36 +1200
-In-Reply-To: <b43bf089-1202-a1fe-cbb3-d4e0926cab67@intel.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <c504a8acd06dc455050c25e2a4cc70aef5eb9358.1655894131.git.kai.huang@intel.com>
-         <e72703b0-767a-ec88-7cb6-f95a3564d823@intel.com>
-         <b376aef05bc032fdf8cc23762ce77a14830440cd.camel@intel.com>
-         <b43bf089-1202-a1fe-cbb3-d4e0926cab67@intel.com>
+        with ESMTP id S236092AbiF0Wza (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 18:55:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F33B3C7
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 15:55:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656370529;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7bjvkZS62junHocgoqnop/+MjbdA1dU+9EW2nxvBCLc=;
+        b=K5auKYUzRxXyhHd3x6lJn3SRyeDXtGIwpJhTCjrGC+qI2wQe8qgRYk8sdwSW+KbcULsYnu
+        kA2h+P+wOU8kFg7yMmcij3L5QzlpcXyEKcmwhjK30KU3r5NdJ2GwFj/G2b3Swk+LpSuG4k
+        hcE7gJhrTqPFrt6MYe6sotO3rDKx6SA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-561-3vvwLABbPkyzyMQG_h41LA-1; Mon, 27 Jun 2022 18:55:27 -0400
+X-MC-Unique: 3vvwLABbPkyzyMQG_h41LA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1073A1C05EA2;
+        Mon, 27 Jun 2022 22:55:27 +0000 (UTC)
+Received: from starship (unknown [10.40.194.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CDC331415108;
+        Mon, 27 Jun 2022 22:55:24 +0000 (UTC)
+Message-ID: <d761ef283bc91002322f3cd66c124d329c25f04f.camel@redhat.com>
+Subject: Re: [PATCH v6 15/17] KVM: SVM: Use target APIC ID to complete
+ x2AVIC IRQs when possible
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, joro@8bytes.org, jon.grimm@amd.com,
+        wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Tue, 28 Jun 2022 01:55:23 +0300
+In-Reply-To: <b8610296-6fb7-e110-900f-4616e1e39bb4@redhat.com>
+References: <20220519102709.24125-1-suravee.suthikulpanit@amd.com>
+         <20220519102709.24125-16-suravee.suthikulpanit@amd.com>
+         <b8610296-6fb7-e110-900f-4616e1e39bb4@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -70,55 +66,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-06-27 at 13:41 -0700, Dave Hansen wrote:
-> On 6/27/22 03:31, Kai Huang wrote:
-> > > > +/* Page sizes supported by TDX */
-> > > > +enum tdx_page_sz {
-> > > > +	TDX_PG_4K,
-> > > > +	TDX_PG_2M,
-> > > > +	TDX_PG_1G,
-> > > > +	TDX_PG_MAX,
-> > > > +};
-> > > Are these the same constants as the magic numbers in Kirill's
-> > > try_accept_one()?
-> > try_accept_once() uses 'enum pg_level' PG_LEVEL_{4K,2M,1G} directly.  T=
-hey can
-> > be used directly too, but 'enum pg_level' has more than we need here:
->=20
-> I meant this:
->=20
-> +       switch (level) {
-> +       case PG_LEVEL_4K:
-> +               page_size =3D 0;
-> +               break;
->=20
-> Because TDX_PG_4K=3D=3Dpage_size=3D=3D0, and for this:
->=20
-> +       case PG_LEVEL_2M:
-> +               page_size =3D 1;
->=20
-> where TDX_PG_2M=3D=3Dpage_size=3D=3D1
->=20
-> See?
->=20
-> Are Kirill's magic 0/1/2 numbers the same as
->=20
-> 	TDX_PG_4K,
-> 	TDX_PG_2M,
-> 	TDX_PG_1G,
->=20
-> ?
+On Fri, 2022-06-24 at 18:41 +0200, Paolo Bonzini wrote:
+> On 5/19/22 12:27, Suravee Suthikulpanit wrote:
+> > +			 * If the x2APIC logical ID sub-field (i.e. icrh[15:0]) contains zero
+> > +			 * or more than 1 bits, we cannot match just one vcpu to kick for
+> > +			 * fast path.
+> > +			 */
+> > +			if (!first || (first != last))
+> > +				return -EINVAL;
+> > +
+> > +			apic = first - 1;
+> > +			if ((apic < 0) || (apic > 15) || (cluster >= 0xfffff))
+> > +				return -EINVAL;
+> 
+> Neither of these is possible: first == 0 has been cheked above, and
+> ffs(icrh & 0xffff) cannot exceed 15.  Likewise, cluster is actually
+> limited to 16 bits, not 20.
+> 
+> Plus, C is not Pascal so no parentheses. :)
+> 
+> Putting everything together, it can be simplified to this:
+> 
+> +                       int cluster = (icrh & 0xffff0000) >> 16;
+> +                       int apic = ffs(icrh & 0xffff) - 1;
+> +
+> +                       /*
+> +                        * If the x2APIC logical ID sub-field (i.e. icrh[15:0])
+> +                        * contains anything but a single bit, we cannot use the
+> +                        * fast path, because it is limited to a single vCPU.
+> +                        */
+> +                       if (apic < 0 || icrh != (1 << apic))
+> +                               return -EINVAL;
+> +
+> +                       l1_physical_id = (cluster << 4) + apic;
+> 
+> 
+> > +			apic_id = (cluster << 4) + apic;
 
-Yes they are the same.  Kirill uses 0/1/2 as input of TDX_ACCEPT_PAGE TDCAL=
-L.=20
-Here I only need them to distinguish different page sizes.
+Hi Paolo and Suravee Suthikulpanit!
 
-Do you mean we should put TDX_PG_4K/2M/1G definition to asm/tdx.h, and
-try_accept_one() should use them instead of magic 0/1/2?
+Note that this patch is not needed anymore, I fixed the avic_kick_target_vcpus_fast function,
+and added the support for x2apic because it was very easy to do
+(I already needed to parse logical id for flat and cluser modes)
 
-
---=20
-Thanks,
--Kai
-
+Best regards,
+	Maxim Levitsky
 
