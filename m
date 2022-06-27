@@ -2,47 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F98F55E37B
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:37:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C567555CE26
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:04:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241638AbiF0V4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 17:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59466 "EHLO
+        id S241655AbiF0V4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 17:56:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241375AbiF0Vy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 17:54:59 -0400
+        with ESMTP id S241418AbiF0VzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 17:55:09 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA796263;
-        Mon, 27 Jun 2022 14:54:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E55640F;
+        Mon, 27 Jun 2022 14:54:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656366896; x=1687902896;
+  t=1656366897; x=1687902897;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rWTnsxMrIzKafHc5a68BzRinBeuJZkWqHiP4eLXCUc4=;
-  b=b/5njh9HM5oKt+cWpwuvJabzcafyWG9ZKHtqho18khgWY6nlbuiNkmnr
-   yTko3sDiYmjVcIVj+vbV6jn0PS9SKU854Gj6AtKEY86yZv3VuiP0xlhLz
-   g8FMRr9Vwn7+8LwN+KM6yrB/5BfgaZJui4YWTmZC/Vh1wXMHvm5TRoC+g
-   hEpNQ2Wz4jfZ6lbGgxFpB5/Lx9xShEnMf3YAYlQQi2BPtTIrLjQvggvub
-   B1E6hkj18nNWyCrYT9D4rWE1DCoY9+GRgEYXC8jKDetU+PhhqLaqYxVTN
-   7dNWSjZKq6za801OALYStBDHfRPwmA8dV4jmvj/TW5OyUwpBv9F4dvm9U
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609540"
+  bh=/jIO81u/RJYrHXhBzmbc+beycqBiMd2EoKXzDq8uJCQ=;
+  b=nU8TgNXEc/rtwHBobX7WsyufxMglWNxL68+vdcnU4PZPPotrQZB02HuQ
+   HvFrvmLqNzB50SabWZEpEVLNHuOSK3+2JIcFRB3lWwIKKKvCPuHdK7OVW
+   u7fdBTJgAz1+25DcjyloqVb3atyu1lk/IL8uoNWhaW8jfP/8Bq1b254Oo
+   SVuEyzjuGZLY8TAgXHOnuucDxa10SMtl4iH+j2vOEf3PNpKaGZyhd8kri
+   YLPbcTv8PUIbcT+d9ifF48FGdK4uFJhkqMxNyjCqkyAJ9rv1MIOlWeV0g
+   1w96U/rPXagz+szbCReOTqY+SN7zE4NO9mGw51GCglJq3EnDp69dcq4dT
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="281609542"
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="281609540"
+   d="scan'208";a="281609542"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:52 -0700
 X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="657863544"
+   d="scan'208";a="657863548"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2022 14:54:52 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v7 034/102] [MARKER] The start of TDX KVM patch series: KVM TDP refactoring for TDX
-Date:   Mon, 27 Jun 2022 14:53:26 -0700
-Message-Id: <a08806c284ffa271570dcb98e87608789ca9daac.1656366338.git.isaku.yamahata@intel.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v7 035/102] KVM: x86/mmu: Explicitly check for MMIO spte in fast page fault
+Date:   Mon, 27 Jun 2022 14:53:27 -0700
+Message-Id: <71e4c19d1dff8135792e6c5a17d3a483bc99875b.1656366338.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1656366337.git.isaku.yamahata@intel.com>
 References: <cover.1656366337.git.isaku.yamahata@intel.com>
@@ -58,30 +59,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-This empty commit is to mark the start of patch series of KVM TDP
-refactoring for TDX.
+Explicitly check for an MMIO spte in the fast page fault flow.  TDX will
+use a not-present entry for MMIO sptes, which can be mistaken for an
+access-tracked spte since both have SPTE_SPECIAL_MASK set.
 
+MMIO sptes are handled in handle_mmio_page_fault for non-TDX VMs, so this
+patch does not affect them.  TDX will handle MMIO emulation through a
+hypercall instead.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index 6e3f71ab6b59..df003d2ed89e 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -24,7 +24,7 @@ Patch Layer status
- * TD vcpu enter/exit:                   Not yet
- * TD vcpu interrupts/exit/hypercall:    Not yet
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 17252f39bd7c..51306b80f47c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3163,7 +3163,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 		else
+ 			sptep = fast_pf_get_last_sptep(vcpu, fault->addr, &spte);
  
--* KVM MMU GPA shared bits:              Applying
--* KVM TDP refactoring for TDX:          Not yet
-+* KVM MMU GPA shared bits:              Applied
-+* KVM TDP refactoring for TDX:          Applying
- * KVM TDP MMU hooks:                    Not yet
- * KVM TDP MMU MapGPA:                   Not yet
+-		if (!is_shadow_present_pte(spte))
++		if (!is_shadow_present_pte(spte) || is_mmio_spte(spte))
+ 			break;
+ 
+ 		sp = sptep_to_sp(sptep);
 -- 
 2.25.1
 
