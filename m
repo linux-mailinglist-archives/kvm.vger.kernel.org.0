@@ -2,205 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CDCD55D840
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:19:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D84A55CABB
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:58:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240389AbiF0TNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 15:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59392 "EHLO
+        id S238003AbiF0TVo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 15:21:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237808AbiF0TMw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 15:12:52 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2077.outbound.protection.outlook.com [40.107.96.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9575FF3;
-        Mon, 27 Jun 2022 12:12:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d0FlNzv9b9SlTb94BVp5eks2CDZSDVZoUBOh5sP2ug/SCXymo8nLx6N1aekZxbAXb1bVLcBUQkW7b90PdhFgyKHhSjCr23vrNjVIEJIejljpD7ppE7xx5YcqhuPjNGZBIRc1ANszSr5V6yDmNsz2JEBfVoQj/tiJVHBEBbQki/8efB9DzllGVv1kWDr5rYUBRsDCwgisWgqrIwQmECkDmZeJJvxnj4TWDdMyC369IJgQTK5SMyhkvsnh5yRBMQmmkzx4ECNUbyU1SjqpHJw2yjXIpgTsNWQA6mIhVQDe0EymNvaZXG0NE1oKDgDj/f6UK692yhacHnp1Ra/ci4ylCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DE0IG2h7mSneuMIsBQ9/bnUOrzeQ4UuKHzUslMnmxPY=;
- b=Kg+v0BDImaTEfnMP4eyi8MAJscCFqQVQcUoxSAOr6bn6ewq0sAu5RQJW4LWwmmosnxzc43iHviurtA7rqQPheCD1Y9PD++7az1DlgNlxZTYz/8Gpexdj2GZkQiVFMqZqgmoZ1N6egolEMMwFSjDtyzuDbNhPNF3ljlWNm6W+7SBODTdNvco6RLToOihqE+r3Vh8UupXHzSCHVVj/I/H48kBMmMaSzR2PiJ8JyKF0FMWxIMMX6BnaqRL4Oe+vq1w+C077zPS9lHW4ao1/zmkni7q+kLG9z8wARDQ5tH7coMEb+DtEbq/F32DuZ9GWNUzPEH+38CHnjT/YulsEt5Ln1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DE0IG2h7mSneuMIsBQ9/bnUOrzeQ4UuKHzUslMnmxPY=;
- b=BoVSogP1CIINulkDI5owZi9lttXGtc0/XW/IlDUeT2Gu4XnqYep58AojL6gAJLfywfGp/cRktrG/9WLMzCDjC07yesi90dFZ6iX2fpR6NF7MEds/Cep+M0OvPRanl/8WvmpfoCrMgKxq6EcUsfC2X42Kk4Ahlk4Z8oXp+ivqy9pzkvdVu43uH4I6QyK6SPpuQnSTLZghfD0ZzRXxZrgsSJXTRR3QNLTcp7WQz7fOayfrdu3TqkEaXDF4aM8skMlylL7B/Asv2j07GaznANI7UZlYtXXqoSn6vcVVIL5H/WhdJ3EChfz4NtG3aZOrK04E/qVWYB/rJ+lcLt4+U5EmkA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by BN6PR12MB1650.namprd12.prod.outlook.com (2603:10b6:405:3::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.15; Mon, 27 Jun
- 2022 19:12:43 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::28d4:3575:5db:6910]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::28d4:3575:5db:6910%4]) with mapi id 15.20.5373.018; Mon, 27 Jun 2022
- 19:12:43 +0000
-Message-ID: <f389e72c-c63e-5f47-87a4-8eb987858fee@nvidia.com>
-Date:   Mon, 27 Jun 2022 12:12:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 2/4] kvm: Merge "atomic" and "write" in
- __gfn_to_pfn_memslot()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-3-peterx@redhat.com> <YrR9i3yHzh5ftOxB@google.com>
- <YrTDBwoddwoY1uSV@xz-m1.local> <YrTNGVpT8Cw2yrnr@google.com>
- <YrTbKaRe497n8M0o@xz-m1.local> <YrTgpjLrnRpqFnIa@google.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <YrTgpjLrnRpqFnIa@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY3PR05CA0010.namprd05.prod.outlook.com
- (2603:10b6:a03:254::15) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+        with ESMTP id S235186AbiF0TVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 15:21:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2886EB4A4
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 12:21:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656357700;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tC29q+aNgStWTf3T1gdIerdLoXO+91zXobwFBrVQGCE=;
+        b=dOvh7pe3R8Z3KPzNSk/9Xn7+IdI0ydUIJeHjaonalkpRLUzVlp0bk5WhPFLDjSLGGeltnL
+        hjR1DEfwWTKUZdV5HjQ/FnqqWXd9b7wssD6yYteJ121UtcnF3+I7RocJSZDUsNooTA/CFW
+        wWwrJZM692OMkuTRMEbeyHu8q8G2vRA=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-549-Firmgh8MN2-KULCvC7ug0g-1; Mon, 27 Jun 2022 15:21:39 -0400
+X-MC-Unique: Firmgh8MN2-KULCvC7ug0g-1
+Received: by mail-il1-f198.google.com with SMTP id n14-20020a056e021bae00b002d92c91da8aso6134505ili.15
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 12:21:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=tC29q+aNgStWTf3T1gdIerdLoXO+91zXobwFBrVQGCE=;
+        b=FtJohdHISNm/4tyP2qadlLOxvoldFiPoJQydc0jshy2b2HGxxIN3ifU0w0n4DHZhXM
+         Yj6x+nZ7pI0Wsida0IiFVwdIl/UINBqx3yFsNJSDye9BjMQYxyyZNh5s+4MA6FFN0gCy
+         ICHDVrOpCbmRMDu2U9GpPf0SPa4MhFx4kecr8c3J4PSaUenwJnW8bylirRV/f2cz+hCd
+         fYzwufveiZFIsEIu2FhlzWKsA7zAwIl3eqDUOMzOMgNMJRz7fNEw0wGsH1tsKN3O2+he
+         ek5fqWuCZGbaqFuOMz1ZKucRPe4ONiTRQ6zJOLbmynH/fN4TwyscC6mQhWjtajtZLkXQ
+         rkSg==
+X-Gm-Message-State: AJIora9QS2yET+qVbivnYLzNrly4UAWHW8MYSIS4B3DGQtSI34syn11M
+        O7nXXMab60SGNV6AoscVWNNLWIJ2eSw8XP7HlQW+RPimOtHP5PTwB8inQRPYRFEIAE8PP2pDkWD
+        qbwCPR1DGTzPt
+X-Received: by 2002:a5e:c016:0:b0:675:398:4713 with SMTP id u22-20020a5ec016000000b0067503984713mr7609126iol.149.1656357698908;
+        Mon, 27 Jun 2022 12:21:38 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1ugeHJeLAFVVzGHnn/nqnvt4TYEqjk+64UlN9WD7leHiuAGXnJQAVJhcrElur2pHlk/kXOBWA==
+X-Received: by 2002:a5e:c016:0:b0:675:398:4713 with SMTP id u22-20020a5ec016000000b0067503984713mr7609111iol.149.1656357698650;
+        Mon, 27 Jun 2022 12:21:38 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id k6-20020a02cb46000000b00331743a983asm3707166jap.179.2022.06.27.12.21.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 12:21:38 -0700 (PDT)
+Date:   Mon, 27 Jun 2022 13:21:36 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        jgg@nvidia.com, baolu.lu@linux.intel.com, iommu@lists.linux.dev
+Subject: Re: [PATCH v3 1/2] vfio/type1: Simplify bus_type determination
+Message-ID: <20220627132136.2b902875.alex.williamson@redhat.com>
+In-Reply-To: <194a12d3434d7b38f84fa96503c7664451c8c395.1656092606.git.robin.murphy@arm.com>
+References: <194a12d3434d7b38f84fa96503c7664451c8c395.1656092606.git.robin.murphy@arm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 576a62c5-44aa-472d-364b-08da58710313
-X-MS-TrafficTypeDiagnostic: BN6PR12MB1650:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tKqJxrSUH/PF/XTSzQjFQKZj/AgiBC/qmBU/622L8Q8T3AC7f0BB0f4fOn+ieoAUwA1zdBE0kBcnZi8pwKXWLTe4l2VE3nhhXFjFfLPjjl4hc8XkWFkvRHh26l9EGNxG1yY+sD0Ebof7p0Qsk5TtQddyJ5Dzs7fgRyTzN97UfDjj+N6e0mcvTK6M/UlP7+ngvpRZLCetseInQXS8MfhGDGb7NoPXfpcyu12Tt9w2fGHQZEjnA3wlT/xGvaRfJsVE+CfuJao8ValHS9Gb6kzK6Kr/GUfRNs1O/SI5kJpei2GfSroKSHRsNL4FW5DwcYiRxPUAjLrQFkIgMZJEK5BWe0S64vyNerpccu3Ea2n8Zt+Xms1YWQTNNUyU+mosMno8D3ejpcMflL6kgjClR+vf7Uy6lJH2hlTR5nHX2rXf8q9OHjt1MYA+pMUGIeaJ4KC6ybmJf1kJD7DitWKikNiXlpYgZu6j+Tw6RWBan8v7r7BXz0J05gKM1+FHMd7vGGe+vsuUw7Uya5dvF0fBUPrBrPZOvwjDYJCHI7NgYUvpe8tv9DZMv2+ZBxrFdlClTBX1eaQnrXy9m8WIup2XtL1m26qyKL18+58wrbofHYuxbf5N7dkMT3nzwSjS6y9ZelLWV+TER7n84AXBhV92gaFcFKaa4+pcgOwFuimbRu025mk7xethh1EbcCiqF2kqUkW1HpD4/AqeCNH63SMg07DRZ6h4XH5dGDbfQwAQulFkPxGeLDcvOobDHdG7J+cg3s/1h5de5OPRON+TKGwXFKqHNaA2HrCKP2z5Cc4y7ME9Fht1MBlufEcGfZjkUi33MUX8j4vmCZHhynszGmIVAN5MXQHlNFi+9+hrOsrRbpiXTCs=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(376002)(346002)(366004)(39860400002)(31696002)(7416002)(66476007)(4326008)(8676002)(83380400001)(6486002)(2906002)(66946007)(316002)(54906003)(38100700002)(5660300002)(66556008)(110136005)(36756003)(8936002)(6506007)(53546011)(2616005)(26005)(478600001)(6512007)(186003)(86362001)(31686004)(41300700001)(21314003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d2N5Y3h5cnd5VVZQLzhkQndlRFdHREtJQnhVejNxUkxUWTRPMHJ6S0twekJF?=
- =?utf-8?B?c0xVVjRGZFprQXNmbyt2WitMYkpMejVFRHFsdlhhMVhVbGpEVmNtT0FJNmtI?=
- =?utf-8?B?a1JqWjk3cThOTWxDUFlWMitjUFBHVTZJczQ5R2FmVkVXcnhXUWVZeEZEN3NV?=
- =?utf-8?B?K2tweXVmMUp0Ymd2L3hZbVh5VmFBUjYwM2lmTzdpOC9PdUNXQTZJRW5QaXZQ?=
- =?utf-8?B?aG80NlMvbFpPWFZVMUQrU3lCbW84cHp1Rm5Zai9GTWFlaTFpNXg1SkUrZnBL?=
- =?utf-8?B?MXJWQWluTnE5b29XaGxWL1M2QSs3VFo5MUxKNUFFYm5FcjM1QzBDdFBEcTdr?=
- =?utf-8?B?RjVjWlhRQzZzd29UUHZwcExZODNBQ3pqc2FXWVpvdFQzZGpJUFM0VE55TWNp?=
- =?utf-8?B?cUpYOFBnbXYvaGNSVmtSblV0WndGQU9YcklUeUdFTjBKZE9jWUtXa3B0Vkxw?=
- =?utf-8?B?eDdmY3JmRStUTzNsUlNuVVdFdDhRdldiTThZVElhMDNMMDFCa25ycURvZ2lG?=
- =?utf-8?B?bmxzS3RZSnFqZHZSNEFIdE9sMWcya2p0Sy9VR2hPcndhbFEzOHh2R3plRUUz?=
- =?utf-8?B?em1RemhERzJEd085clJieTZaaU40UGxpbldtVFhWVWFSMlpIODJnUHlTUWd6?=
- =?utf-8?B?bzVVdC9Bbi9PanhLSVFOVUlDY1JTeVl3WWpDS2ZLcEQzMGZ2aDdIQ29IaTFD?=
- =?utf-8?B?bFJWQ21rVnpnNnNnMmpGby9KQkdWMDZ3a1p2aDNGL25JcnNnZkljcjJESG1R?=
- =?utf-8?B?S3JJUW9RaHdlMUNBQW1XTHg0QVdZbkdYQW5HTTgwVkM5STVBTFdWbkxQZWFE?=
- =?utf-8?B?WjY1OXhEaEhoMlVKUnJVMFFBem1lV2RaUWcwVVlIZFVHTUx6ODQvbHc1MEpy?=
- =?utf-8?B?N2ExZkhwZkNoM3FJa3pYUWNlbUJOYzUvZTcxVi9CUThaWlEzTStDR0JOSnEw?=
- =?utf-8?B?Q0dNZnJKN1VQbVdJelY0bVhUSUREdUxvZkpNazljZExmQ014QlM3WDFLNzNi?=
- =?utf-8?B?K2lxWFZ0azBDZFdia0xzZDZmNnc4S2Rid2hBY3FkUUtqM1RXNDUzN1JvNTNo?=
- =?utf-8?B?cWY2WDFxRG5rR1JkSlJiQU1tckhHRGpUVTkySktkM0xxcHA4WWlybkk2bU1E?=
- =?utf-8?B?UWhHNW1zeW1XT2dHUk50S0IwN29CSSt2UnBpTWIvSzNVeGJMazN5YmJtRk0z?=
- =?utf-8?B?TnNFNEJXckVjNFFoVUltdjZrYW1wcUlTMitNM2poSkVVSWFZRkFtVmplYVNs?=
- =?utf-8?B?TjJQNWN3dDNjSW1haVovcFREL0p2bWh1MUllWWoyeWVOc1ovU2Nremh4ajIr?=
- =?utf-8?B?ZVRiSk5tMHFVQnNjVWF0VmMzSHNDK1dIellXeTA2dk5tRXduWHU4bDVIMHRp?=
- =?utf-8?B?RzdqSm1DRExSZFRHNzNJZDIxSmMveFNiOVdGbFl0a3p3NWdGeGtzTmRnbVNL?=
- =?utf-8?B?SDVPellMSWhQa0RuVk4xNTA1eCtPQkxveklHKzFpSldmOVZ1T0VOZXpjamc4?=
- =?utf-8?B?dWFFV0ZTMGxrNUxWTW5qTHFuQU84TVI3MU9Fb1p3N3RBWFFGRjlYRVlNU0sw?=
- =?utf-8?B?ZkJXOWIwbk13dDR2WllEVCtIQ25ZaDlkSzhKdG1uaUZwTmZVcnZqakkvcHhq?=
- =?utf-8?B?RW1CVkNKL0xzTVE0QVhwUTFGMnJBcExBQVVCR2J5U1QvZVltZm4wbUp2Lytt?=
- =?utf-8?B?aThxL2pmMTR2UERRSzF5SWZKYXBtS2tHU3BRbStOT045TmtqYmpkRXA0NHNa?=
- =?utf-8?B?NGZVM1Q4UFphd0QzdkxWL1cwaHpQRlRZZXpNeHBHaXRiYXhKcDRMNDBVRUZl?=
- =?utf-8?B?YzRPTVVqaU9aWlBWSnBrTEM5L2lhczdPdzFMa0lkWnhmWGlMYllvVnJIY2M4?=
- =?utf-8?B?YVRxUzdHVEtpaXQ3dkxOTWdXUlYvUVRIcjF4ai9nRjNaRmRUK3VGSkFKU1dV?=
- =?utf-8?B?bWliSHRhVHgyL0pzREhuWTllUW8yTjNyTXVoU3g2ZTJyMWFQMzBrUnhRbTcy?=
- =?utf-8?B?dnVUYVUxRGgyMHFGRllTVzZ5c21DSHA5RVhuOElDTXdUUm81YStVdDVCMEdW?=
- =?utf-8?B?eG5hdVJwbWxSbTJrOWhjWjdsNnNtTmZvNzhhY3NWYkl3aEJZbEZTeHhBbk9v?=
- =?utf-8?Q?wCWwD+5aszHKw/GEkrpgX4wFR?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 576a62c5-44aa-472d-364b-08da58710313
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2022 19:12:43.5141
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UHU5cGgm5qQUKRF2PBCpk6lk2EeKSytpUd36Mr80j5m6uPbVVWHWG6PLGrJJcIzWKNw27CYqWHsPbc7TZwo4zg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1650
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/23/22 14:52, Sean Christopherson wrote:
-> On Thu, Jun 23, 2022, Peter Xu wrote:
->> On Thu, Jun 23, 2022 at 08:29:13PM +0000, Sean Christopherson wrote:
->>> This is what I came up with for splitting @async into a pure input (no_wait) and
->>> a return value (KVM_PFN_ERR_NEEDS_IO).
->>
->> The attached patch looks good to me.  It's just that..
->>
->> [...]
->>
->>>   kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
->>> -			       bool atomic, bool *async, bool write_fault,
->>> +			       bool atomic, bool no_wait, bool write_fault,
->>>   			       bool *writable, hva_t *hva)
->>
->> .. with this patch on top we'll have 3 booleans already.  With the new one
->> to add separated as suggested then it'll hit 4.
->>
->> Let's say one day we'll have that struct, but.. are you sure you think
->> keeping four booleans around is nicer than having a flag, no matter whether
->> we'd like to have a struct or not?
-> 
-> No.
-> 
->>    kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
->> 			       bool atomic, bool no_wait, bool write_fault,
->>                                 bool interruptible, bool *writable, hva_t *hva);
->>
->> What if the booleans goes to 5, 6, or more?
->>
->> /me starts to wonder what'll be the magic number that we'll start to think
->> a bitmask flag will be more lovely here. :)
-> 
-> For the number to really matter, it'd have to be comically large, e.g. 100+.  This
-> is all on-stack memory, so it's as close to free as can we can get.  Overhead in
-> terms of (un)marshalling is likely a wash for flags versus bools.  Bools pack in
-> nicely, so until there are a _lot_ of bools, memory is a non-issue.
+On Fri, 24 Jun 2022 18:51:44 +0100
+Robin Murphy <robin.murphy@arm.com> wrote:
 
-It's pretty unusual to see that claim, in kernel mm code. :) Flags are often
-used, because they take less space than booleans, and C bitfields have other
-problems.
+> Since IOMMU groups are mandatory for drivers to support, it stands to
+> reason that any device which has been successfully added to a group
+> must be on a bus supported by that IOMMU driver, and therefore a domain
+> viable for any device in the group must be viable for all devices in
+> the group. This already has to be the case for the IOMMU API's internal
+> default domain, for instance. Thus even if the group contains devices on
+> different buses, that can only mean that the IOMMU driver actually
+> supports such an odd topology, and so without loss of generality we can
+> expect the bus type of any device in a group to be suitable for IOMMU
+> API calls.
+> 
+> Furthermore, scrutiny reveals a lack of protection for the bus being
+> removed while vfio_iommu_type1_attach_group() is using it; the reference
+> that VFIO holds on the iommu_group ensures that data remains valid, but
+> does not prevent the group's membership changing underfoot.
+> 
+> We can address both concerns by recycling vfio_bus_type() into some
+> superficially similar logic to indirect the IOMMU API calls themselves.
+> Each call is thus protected from races by the IOMMU group's own locking,
+> and we no longer need to hold group-derived pointers beyond that scope.
+> It also gives us an easy path for the IOMMU API's migration of bus-based
+> interfaces to device-based, of which we can already take the first step
+> with device_iommu_capable(). As with domains, any capability must in
+> practice be consistent for devices in a given group - and after all it's
+> still the same capability which was expected to be consistent across an
+> entire bus! - so there's no need for any complicated validation.
+> 
+> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+> ---
+> 
+> v3: Complete rewrite yet again, and finally it doesn't feel like we're
+> stretching any abstraction boundaries the wrong way, and the diffstat
+> looks right too. I did think about embedding IOMMU_CAP_INTR_REMAP
+> directly in the callback, but decided I like the consistency of minimal
+> generic wrappers. And yes, if the capability isn't supported then it
+> does end up getting tested for the whole group, but meh, it's harmless.
+> 
+>  drivers/vfio/vfio_iommu_type1.c | 42 +++++++++++++++++----------------
+>  1 file changed, 22 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index c13b9290e357..a77ff00c677b 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1679,18 +1679,6 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>  	return ret;
+>  }
+>  
+> -static int vfio_bus_type(struct device *dev, void *data)
+> -{
+> -	struct bus_type **bus = data;
+> -
+> -	if (*bus && *bus != dev->bus)
+> -		return -EINVAL;
+> -
+> -	*bus = dev->bus;
+> -
+> -	return 0;
+> -}
+> -
+>  static int vfio_iommu_replay(struct vfio_iommu *iommu,
+>  			     struct vfio_domain *domain)
+>  {
+> @@ -2153,13 +2141,25 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
+>  	list_splice_tail(iova_copy, iova);
+>  }
+>  
 
-> 
-> That leaves readability, which isn't dependent on the number so much as it is on
-> the usage, and will be highly subjective based on the final code.
-> 
-> In other words, I'm not dead set against flags, but I would like to see a complete
-> cleanup before making a decision.  My gut reaction is to use bools, as it makes
-> consumption cleaner in most cases, e.g.
-> 
-> 	if (!(xxx->write_fault || writable))
-> 		return false;
-> 
-> versus
-> 
-> 	if (!((xxx->flags & KVM_GTP_WRITE) || writable))
-> 		return false;
-> 
-> but again I'm not going to say never until I actually see the end result.
-> 
+Any objection if I add the following comment:
 
-Just to add a light counter-argument: the readability is similar enough that
-I think the compactness in memory makes flags a little better. imho anyway.
+/* Redundantly walks non-present capabilities to simplify caller */
 
+Thanks,
+Alex
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+> +static int vfio_iommu_device_capable(struct device *dev, void *data)
+> +{
+> +	return device_iommu_capable(dev, (enum iommu_cap)data);
+> +}
+> +
+> +static int vfio_iommu_domain_alloc(struct device *dev, void *data)
+> +{
+> +	struct iommu_domain **domain = data;
+> +
+> +	*domain = iommu_domain_alloc(dev->bus);
+> +	return 1; /* Don't iterate */
+> +}
+> +
+>  static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		struct iommu_group *iommu_group, enum vfio_group_type type)
+>  {
+>  	struct vfio_iommu *iommu = iommu_data;
+>  	struct vfio_iommu_group *group;
+>  	struct vfio_domain *domain, *d;
+> -	struct bus_type *bus = NULL;
+>  	bool resv_msi, msi_remap;
+>  	phys_addr_t resv_msi_base = 0;
+>  	struct iommu_domain_geometry *geo;
+> @@ -2192,18 +2192,19 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		goto out_unlock;
+>  	}
+>  
+> -	/* Determine bus_type in order to allocate a domain */
+> -	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
+> -	if (ret)
+> -		goto out_free_group;
+> -
+>  	ret = -ENOMEM;
+>  	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
+>  	if (!domain)
+>  		goto out_free_group;
+>  
+> +	/*
+> +	 * Going via the iommu_group iterator avoids races, and trivially gives
+> +	 * us a representative device for the IOMMU API call. We don't actually
+> +	 * want to iterate beyond the first device (if any).
+> +	 */
+>  	ret = -EIO;
+> -	domain->domain = iommu_domain_alloc(bus);
+> +	iommu_group_for_each_dev(iommu_group, &domain->domain,
+> +				 vfio_iommu_domain_alloc);
+>  	if (!domain->domain)
+>  		goto out_free_domain;
+>  
+> @@ -2258,7 +2259,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	list_add(&group->next, &domain->group_list);
+>  
+>  	msi_remap = irq_domain_check_msi_remap() ||
+> -		    iommu_capable(bus, IOMMU_CAP_INTR_REMAP);
+> +		    iommu_group_for_each_dev(iommu_group, (void *)IOMMU_CAP_INTR_REMAP,
+> +					     vfio_iommu_device_capable);
+>  
+>  	if (!allow_unsafe_interrupts && !msi_remap) {
+>  		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
+
