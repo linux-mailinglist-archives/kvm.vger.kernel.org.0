@@ -2,181 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50A8F55B78D
-	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 07:18:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16DF155B7BA
+	for <lists+kvm@lfdr.de>; Mon, 27 Jun 2022 07:24:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232569AbiF0FGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 01:06:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42052 "EHLO
+        id S231266AbiF0FYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 01:24:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232646AbiF0FGB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 01:06:01 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409C95F53;
-        Sun, 26 Jun 2022 22:05:58 -0700 (PDT)
+        with ESMTP id S230319AbiF0FYE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 01:24:04 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0BD5FA9;
+        Sun, 26 Jun 2022 22:24:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656306358; x=1687842358;
+  t=1656307443; x=1687843443;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=0mUOvxc+ZUex0L9Vx4tMzGBNSSGLbqJptTbWN4fqt6E=;
-  b=jX35jm+pqWi9XEWOSMjX5AiBSuzDA5jHHUy+XhB48GN+QYN2b+/bJjol
-   ln2IgvXJhOArhGpqnoM8lrbW9UO05fZRaTDFqCsq28M9l5AXKHTCbcP2w
-   vr6bM7dIO5eBNtVdQ9LfFM0GTr2CrG2PHWWu81/0xiiFk8v45x/dhi1lD
-   8QifAngCUis6N81WbbX2ffuKkF72gcNj7o1zj6yXNPms0Sj4jXlWCg+Jj
-   JPopXK5F7XhKZGnzfHBSY9evpHEG8tb9UWOlDeuyG+mkdFBH5D5pmgU49
-   ciIzffE49Bdwk3e9lvD9NQkCxX5Xm6nuJ71QtuOsRcPhmr361V35qg3aw
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10390"; a="282447445"
+  bh=dao6bRTb6endJS3dwZqWfDAFVT3N8FW7QPmL++/+lEg=;
+  b=J/1z6BVSr6MYn3/qYBP5vpd//K4YHwn4US9/AwKx/8ki6ygnpwvoMgAo
+   MBl/jXIZZx8H/9QGdHoVtXH683BcrYOGWzLf/g7JsTvwLze/HBgwHSKS8
+   hcGn3l4UkJ617Hvw8s/JolmAL6067G/NeuvZPojRtRPByzyxlqzjzK6eq
+   b6vDHOYN/NFL4t+u1a/TAeVTELheUUK9DQAniPVDEGwiztUt1ZIfk7tW8
+   Q5R41ZbtrIZyn7EIl24rJ9Kf0d1bnv/L1jH6tk94FWrSriw8EtfK1mo4R
+   iFT+nH3PTgrDWbzgXaT1d26gEtunotiq4bqD0V6Swdfim6q5iOaMdKlCI
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10390"; a="306833472"
 X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
-   d="scan'208";a="282447445"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:05:57 -0700
+   d="scan'208";a="306833472"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:24:02 -0700
 X-IronPort-AV: E=Sophos;i="5.92,225,1650956400"; 
-   d="scan'208";a="646248669"
+   d="scan'208";a="589783038"
 Received: from fzaeni-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.88.6])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:05:52 -0700
-Message-ID: <5ebd7c3cfb3ab9d77a2577c4864befcffe5359d4.camel@intel.com>
-Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
- CPU hotplug
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2022 22:23:59 -0700
+Message-ID: <5ce7ebfe54160ea35e432bf50207ebed32db31fc.camel@intel.com>
+Subject: Re: [PATCH v5 07/22] x86/virt/tdx: Implement SEAMCALL function
 From:   Kai Huang <kai.huang@intel.com>
 To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Cc:     linux-acpi@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        len.brown@intel.com, tony.luck@intel.com,
-        rafael.j.wysocki@intel.com, reinette.chatre@intel.com,
-        dan.j.williams@intel.com, peterz@infradead.org, ak@linux.intel.com,
+Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
+        tony.luck@intel.com, rafael.j.wysocki@intel.com,
+        reinette.chatre@intel.com, dan.j.williams@intel.com,
+        peterz@infradead.org, ak@linux.intel.com,
         kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com, thomas.lendacky@amd.com,
-        Tianyu.Lan@microsoft.com, rdunlap@infradead.org, Jason@zx2c4.com,
-        juri.lelli@redhat.com, mark.rutland@arm.com, frederic@kernel.org,
-        yuehaibing@huawei.com, dongli.zhang@oracle.com
-Date:   Mon, 27 Jun 2022 17:05:50 +1200
-In-Reply-To: <43a67bfe-9707-33e0-2574-1e6eca6aa24b@intel.com>
+        isaku.yamahata@intel.com
+Date:   Mon, 27 Jun 2022 17:23:57 +1200
+In-Reply-To: <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
 References: <cover.1655894131.git.kai.huang@intel.com>
-         <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
-         <43a67bfe-9707-33e0-2574-1e6eca6aa24b@intel.com>
+         <095e6bbc57b4470e1e9a9104059a5238c9775f00.1655894131.git.kai.huang@intel.com>
+         <069a062e-a4a6-09af-7b74-7f4929f2ec0b@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-06-24 at 11:57 -0700, Dave Hansen wrote:
-> On 6/22/22 04:15, Kai Huang wrote:
-> > Platforms with confidential computing technology may not support ACPI
-> > CPU hotplug when such technology is enabled by the BIOS.  Examples
-> > include Intel platforms which support Intel Trust Domain Extensions
-> > (TDX).
-> >=20
-> > If the kernel ever receives ACPI CPU hotplug event, it is likely a BIOS
-> > bug.  For ACPI CPU hot-add, the kernel should speak out this is a BIOS
-> > bug and reject the new CPU.  For hot-removal, for simplicity just assum=
-e
-> > the kernel cannot continue to work normally, and BUG().
+On Fri, 2022-06-24 at 11:38 -0700, Dave Hansen wrote:
+> On 6/22/22 04:16, Kai Huang wrote:
+> > SEAMCALL instruction causes #GP when SEAMRR isn't enabled, and #UD when
+> > CPU is not in VMX operation.  The TDX_MODULE_CALL macro doesn't handle
+> > SEAMCALL exceptions.  Leave to the caller to guarantee those conditions
+> > before calling __seamcall().
 >=20
-> So, the kernel is now declaring ACPI CPU hotplug and TDX to be
-> incompatible and even BUG()'ing if we see them together.  Has anyone
-> told the firmware guys about this?  Is this in a spec somewhere?  When
-> the kernel goes boom, are the firmware folks going to cry "Kernel bug!!"?
+> I was trying to make the argument earlier that you don't need *ANY*
+> detection for TDX, other than the ability to make a SEAMCALL.
+> Basically, patch 01/22 could go away.
 >=20
-> This doesn't seem like something the kernel should be doing unilaterally.
+> You are right that:
+>=20
+> 	The TDX_MODULE_CALL macro doesn't handle SEAMCALL exceptions.
+>=20
+> But, it's also not hard to make it *able* to handle exceptions.
+>=20
+> So what does patch 01/22 buy us?  One EXTABLE entry?
 
-TDX doesn't support ACPI CPU hotplug (both hot-add and hot-removal) is an
-architectural behaviour.  The public specs doesn't explicitly say  it, but =
-it is
-implied:
+There are below pros if we can detect whether TDX is enabled by BIOS during=
+ boot
+before initializing the TDX Module:
 
-1) During platform boot MCHECK verifies all logical CPUs on all packages th=
-at
-they are TDX compatible, and it keeps some information, such as total CPU
-packages and total logical cpus at some location of SEAMRR so it can later =
-be
-used by P-SEAMLDR and TDX module.  Please see "3.4 SEAMLDR_SEAMINFO" in the=
- P-
-SEAMLDR spec:
+1) There are requirements from customers to report whether platform support=
+s TDX
+and the TDX keyID numbers before initializing the TDX module so the userspa=
+ce
+cloud software can use this information to do something.  Sorry I cannot fi=
+nd
+the lore link now.
 
-https://cdrdv2.intel.com/v1/dl/getContent/733584
+Isaku, if you see, could you provide more info?
 
-2) Also some SEAMCALLs must be called on all logical CPUs or CPU packages t=
-hat
-the platform has (such as such as TDH.SYS.INIT.LP and TDH.SYS.KEY.CONFIG),
-otherwise the further step of TDX module initialization will fail.
+2) As you can see, it can be used to handle ACPI CPU/memory hotplug and dri=
+ver
+managed memory hotplug.  Kexec() support patch also can use it.
 
-Unfortunately there's no public spec mentioning what's the behaviour of ACP=
-I CPU
-hotplug on TDX enabled platform.  For instance, whether BIOS will ever get =
-the
-ACPI CPU hot-plug event, or if BIOS gets the event, will it suppress it.  W=
-hat I
-got from Intel internally is a non-buggy BIOS should never report such even=
-t to
-the kernel, so if kernel receives such event, it should be fair enough to t=
-reat
-it as BIOS bug.
+Particularly, in concept, ACPI CPU/memory hotplug is only related to whethe=
+r TDX
+is enabled by BIOS, but not whether TDX module is loaded, or the result of
+initializing the TDX module.  So I think we should have some code to detect=
+ TDX
+during boot.
 
-But theoretically, the BIOS isn't in TDX's TCB, and can be from 3rd party..
 
-Also, I was told "CPU hot-plug is a system feature, not a CPU feature or In=
-tel
-architecture feature", so Intel doesn't have an architectural specification=
- for
-CPU hot-plug.=20
+Also, it seems adding EXTABLE to TDX_MODULE_CALL doesn't have significantly=
+ less
+code comparing to detecting TDX during boot:
 
-At the meantime, I am pushing Intel internally to add some statements regar=
-ding
-to the TDX and CPU hotplug interaction to the BIOS write guide and make it
-public.  I guess this is the best thing we can do.
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 4b75c930fa1b..4a97ca8eb14c 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -8,6 +8,7 @@
+ #include <asm/ptrace.h>
+ #include <asm/shared/tdx.h>
 
-Regarding to the code change, I agree the BUG() isn't good.  I used it beca=
-use:
-1) this basically on a theoretical problem and shouldn't happen in practice=
-; 2)
-because there's no architectural specification regarding to the behaviour o=
-f TDX
-when CPU hot-removal, so I just used BUG() in assumption that TDX isn't saf=
-e to
-use anymore.
++#ifdef CONFIG_INTEL_TDX_HOST
+ /*
+  * SW-defined error codes.
+  *
+@@ -18,6 +19,21 @@
+ #define TDX_SW_ERROR                   (TDX_ERROR | GENMASK_ULL(47, 40))
+ #define TDX_SEAMCALL_VMFAILINVALID     (TDX_SW_ERROR | _UL(0xFFFF0000))
 
-But Rafael doesn't like current code change either. I think maybe we can ju=
-st
-disable CPU hotplug code when TDX is enabled by BIOS (something like below)=
-:
-
---- a/drivers/acpi/acpi_processor.c
-+++ b/drivers/acpi/acpi_processor.c
-@@ -707,6 +707,10 @@ bool acpi_duplicate_processor_id(int proc_id)
- void __init acpi_processor_init(void)
- {
-        acpi_processor_check_duplicates();
++/*
++ * Special error codes to indicate SEAMCALL #GP and #UD.
++ *
++ * SEAMCALL causes #GP when SEAMRR is not properly enabled by BIOS, and
++ * causes #UD when CPU is not in VMX operation.  Define two separate
++ * error codes to distinguish the two cases so caller can be aware of
++ * what caused the SEAMCALL to fail.
++ *
++ * Bits 61:48 are reserved bits which will never be set by the TDX
++ * module.  Borrow 2 reserved bits to represent #GP and #UD.
++ */
++#define TDX_SEAMCALL_GP                (TDX_ERROR | GENMASK_ULL(48, 48))
++#define TDX_SEAMCALL_UD                (TDX_ERROR | GENMASK_ULL(49, 49))
++#endif
 +
-+       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED))
-+               return;
+ #ifndef __ASSEMBLY__
+
+ /*
+diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcal=
+l.S
+index 49a54356ae99..7431c47258d9 100644
+--- a/arch/x86/virt/vmx/tdx/tdxcall.S
++++ b/arch/x86/virt/vmx/tdx/tdxcall.S
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ #include <asm/asm-offsets.h>
+ #include <asm/tdx.h>
++#include <asm/asm.h>
+
+ /*
+  * TDCALL and SEAMCALL are supported in Binutils >=3D 2.36.
+@@ -45,6 +46,7 @@
+        /* Leave input param 2 in RDX */
+
+        .if \host
++1:
+        seamcall
+        /*
+         * SEAMCALL instruction is essentially a VMExit from VMX root
+@@ -57,9 +59,25 @@
+         * This value will never be used as actual SEAMCALL error code as
+         * it is from the Reserved status code class.
+         */
+-       jnc .Lno_vmfailinvalid
++       jnc .Lseamcall_out
+        mov $TDX_SEAMCALL_VMFAILINVALID, %rax
+-.Lno_vmfailinvalid:
++       jmp .Lseamcall_out
++2:
++       /*
++        * SEAMCALL caused #GP or #UD.  By reaching here %eax contains
++        * the trap number.  Check the trap number and set up the return
++        * value to %rax.
++        */
++       cmp $X86_TRAP_GP, %eax
++       je .Lseamcall_gp
++       mov $TDX_SEAMCALL_UD, %rax
++       jmp .Lseamcall_out
++.Lseamcall_gp:
++       mov $TDX_SEAMCALL_GP, %rax
++       jmp .Lseamcall_out
 +
-        acpi_scan_add_handler_with_hotplug(&processor_handler, "processor")=
-;
-        acpi_scan_add_handler(&processor_container_handler);
- }
++       _ASM_EXTABLE_FAULT(1b, 2b)
++.Lseamcall_out
 
-This approach is cleaner I think, but we won't be able to report "BIOS bug"=
- when
-ACPI CPU hotplug happens.  But to me it's OK as perhaps it's arguable to tr=
-eat
-it as BIOS bug (as theoretically BIOS can be from 3rd party).=C2=A0
 
-What's your opinion?
-
---=20
-Thanks,
--Kai
 
 
