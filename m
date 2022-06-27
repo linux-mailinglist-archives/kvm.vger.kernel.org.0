@@ -2,67 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2C3855C6CD
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AFDC55C9FC
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235365AbiF0Ojr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 10:39:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54292 "EHLO
+        id S237333AbiF0PIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 11:08:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234730AbiF0Ojp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 10:39:45 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29724F68
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 07:39:45 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id x138so6539887pfc.3
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 07:39:45 -0700 (PDT)
+        with ESMTP id S237760AbiF0PIt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 11:08:49 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1015B140D5
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 08:08:48 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id c6-20020a17090abf0600b001eee794a478so2093489pjs.1
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 08:08:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=ODo85vksqxfNlwx8IGhUrPmazqQ90GEXdELj2np2ST8=;
-        b=YA8WfGqU7USs/E2HJ5c9hXsNZXatb0VsXxWOrOJXkeU9rQw0mWZUL3Baqf5V6VnqhG
-         kVAu+9/+pka4ilRbefJG58CPgG6VGIqnTOCP4IuVM7Ty886YdhOsEgx/6RIVhRiJFJgm
-         BckfEV0n6dP0NB9DegAbNd1jev8JkR7d9quJO5zmo1gy+Sfi8rx1FM3TyifehF/9HTTC
-         2fRAracHAXX8SCi7+GVCXSv2czc//42oJmDvx8NXk74VBLBX7D5DaoSABKZ4NnpcbzEk
-         ZnDWYsUZgCU9lqV9cR1WAoa5apIyJdfK6P8VPD1mpVbgtoWWeS+WPjC3SiSmjuN29Btd
-         tV5Q==
+        bh=FK2nqQdZE1Um0F/qxp1XsLlBofTMHtWjQfVQbrn0Hnk=;
+        b=MqgUMvc6tGx7MX9oFXOfvA5N4Z6rQRxRYs8lDvjNQOn0P2Cygjx/96UVqoNCU8r5ae
+         RM4A2SkI6YBd8YdLYec9bd/aBeAnfmqSOcOLPeQ4j6SXbNU2ZXrzN048H9Mjjtp5puWU
+         vA+lmqwBGuP0FAckANKmlA8ecTq0CTnuj+h0qlLxvSVQsIWkwSGzbH6f2/pe3TU6ySeT
+         +m0Tot3AWYMhPOO2sX5jZZIZMWWTxhd4Gg+Xx0UqlR/QzyZDlPN1Pa/pr7crF6QpNLOJ
+         AHN9E0rM0EfRWPQQbyvmWvwiuNVgWIDdMdm5oSRcHxSt3b3ChCbYyWVcgjOeVoB7u90l
+         4aew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=ODo85vksqxfNlwx8IGhUrPmazqQ90GEXdELj2np2ST8=;
-        b=G3WktFgXYetcAJxAGGWQyNHUWnSPSSViZBjs/Iwd4WemepHAkfdHyDyEt91v0ojnN1
-         i96GViDqnl3FUyjcr9uztKuo81HpKGcgfI0WnW5WsUWGIUvt62MsSDs9HfsX6XExUOPI
-         YRMJ+P3yEClm8lZuoMk4NooTr6nnkt00oFbe8MqB51eOYbO8BcVsmJHtRyFkyx79knxr
-         J6QEfwyFJWossocNY3I1+BEk2aDyLdN22vKKszkyXzhLKKrqa+2y91h7Ty2NWJoeNAaN
-         kv5bQlAizJb2nJRp6NlQ5YrJetadrVF5+u3GJbTGeJjCo7WrA8+ryN6B5roG3jJWLNkm
-         wyvA==
-X-Gm-Message-State: AJIora8JJHxwPz/3RlxuaB0CoVHx4ApRcZdslglGsydsfh1SfMXByCj/
-        91SwjwGDf8I5XHApr/LlBFYBXK4GksMaLg==
-X-Google-Smtp-Source: AGRyM1sYjHgK7wq2bO2XW8AvY7XmBYu8FpCwaa0o1KlAeYvExwUH9S47Az2Ehx1MhCD4ijqDrOfI2g==
-X-Received: by 2002:aa7:91cd:0:b0:525:63e5:9690 with SMTP id z13-20020aa791cd000000b0052563e59690mr15117123pfa.1.1656340784122;
-        Mon, 27 Jun 2022 07:39:44 -0700 (PDT)
+        bh=FK2nqQdZE1Um0F/qxp1XsLlBofTMHtWjQfVQbrn0Hnk=;
+        b=CvWmms7t7pLGYXi7S7jqt/cCTzx+SQ/k7R5Ss8yMlF2uCTXrTPzTefK+8Jdo6yJeRU
+         /za98DtyQHXrD4L3TkSFmFtSz2Ab6PC5lrZ6ySqYPtksq2BwyKMdxyexfCLzIRz+o6bw
+         Rurh58OUtjNJ43TLrANK0LL55tps7D2FcIhpSBif0yMjlCbVzEalfpvJaOLAJfzwwMTG
+         7YdCedg/AD4MaM30iFj458fgc6HihZqpZp3sX9sTmxBO32tsruZEVqcwJtNSQ/gXNW44
+         qdiytiWpVqt2CRbOHBX4ngtrJf047gjyfuMI93iaDFTINUm0sqT1sKxiVMZ0PBu0GZJv
+         4Sfw==
+X-Gm-Message-State: AJIora9I9f7AwwnBN2OjNOXcVZM9zxfnKfY5YjSIQ44vxV9YrI0SbnN2
+        lQ/gk54PIpqEqmxEn8h9P3lb6g==
+X-Google-Smtp-Source: AGRyM1v9zsr08Ftlq4BLT3RaTt/0BEimTJmPBA7tzfixVIKdBfuipz5Q8KQkPI7RIsAKY4sS/MrLsQ==
+X-Received: by 2002:a17:90b:341:b0:1e0:cf43:df4f with SMTP id fh1-20020a17090b034100b001e0cf43df4fmr16356064pjb.126.1656342527345;
+        Mon, 27 Jun 2022 08:08:47 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id f7-20020a170902684700b0016a68098e8fsm1705499pln.242.2022.06.27.07.39.43
+        by smtp.gmail.com with ESMTPSA id d4-20020a170902654400b00168aed83c63sm7354236pln.237.2022.06.27.08.08.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jun 2022 07:39:43 -0700 (PDT)
-Date:   Mon, 27 Jun 2022 14:39:40 +0000
+        Mon, 27 Jun 2022 08:08:46 -0700 (PDT)
+Date:   Mon, 27 Jun 2022 15:08:42 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH] kvm: nVMX: add tracepoint for kvm:kvm_nested_vmrun
-Message-ID: <YrnBLLRljyHCyeOe@google.com>
-References: <20220626200538.3210528-1-mizhang@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: VMX: Move VM-exit RSB stuffing out of line
+Message-ID: <YrnH+nhnbhDFAMas@google.com>
+References: <20220622222408.518889-1-jmattson@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220626200538.3210528-1-mizhang@google.com>
+In-Reply-To: <20220622222408.518889-1-jmattson@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,64 +69,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 26, 2022, Mingwei Zhang wrote:
-> From: David Matlack <dmatlack@google.com>
-> 
-> This tracepoint is called by nested SVM during emulated VMRUN. Call
-> also during emulated VMLAUNCH and VMRESUME in nested VMX.
-> 
-> Attempt to use analagous VMCS fields to the VMCB fields that are
-> reported in the SVM case:
-> 
-> "int_ctl": 32-bit field of the VMCB that the CPU uses to deliver virtual
-> interrupts. The analagous VMCS field is the 16-bit "guest interrupt
-> status".
-> 
-> "event_inj": 32-bit field of VMCB that is used to inject events
-> (exceptions and interrupts) into the guest. The analagous VMCS field
-> is the "VM-entry interruption-information field".
-> 
-> "npt": 1 when the VCPU has enabled nested paging. The analagous VMCS
-> field is the enable-EPT execution control.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> [Move the code into the nested_vmx_enter_non_root_mode().]
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+On Wed, Jun 22, 2022, Jim Mattson wrote:
+> RSB-stuffing after VM-exit is only needed for legacy CPUs without
+> eIBRS. Move the RSB-stuffing code out of line.
+
+I assume the primary justification is purely to avoid the JMP on modern CPUs?
+
+> Preserve the non-sensical correlation of RSB-stuffing with retpoline.
+
+Either omit the blurb about retpoline, or better yet expand on why it's nonsensical
+and speculate a bit on why it got tied to retpoline? 
+
+> Signed-off-by: Jim Mattson <jmattson@google.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  arch/x86/kvm/vmx/vmenter.S | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index f5cb18e00e78..29cc36cf2568 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3367,6 +3367,13 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  	};
->  	u32 failed_index;
->  
-> +	trace_kvm_nested_vmrun(
-> +		kvm_rip_read(vcpu), vmx->nested.current_vmptr,
-> +		vmcs12->guest_rip,
+> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> index 435c187927c4..39009a4c86bd 100644
+> --- a/arch/x86/kvm/vmx/vmenter.S
+> +++ b/arch/x86/kvm/vmx/vmenter.S
+> @@ -76,7 +76,12 @@ SYM_FUNC_END(vmx_vmenter)
+>   */
+>  SYM_FUNC_START(vmx_vmexit)
+>  #ifdef CONFIG_RETPOLINE
+> -	ALTERNATIVE "jmp .Lvmexit_skip_rsb", "", X86_FEATURE_RETPOLINE
+> +	ALTERNATIVE "", "jmp .Lvmexit_stuff_rsb", X86_FEATURE_RETPOLINE
+> +#endif
+> +.Lvmexit_return:
+> +	RET
+> +#ifdef CONFIG_RETPOLINE
+> +.Lvmexit_stuff_rsb:
+>  	/* Preserve guest's RAX, it's used to stuff the RSB. */
+>  	push %_ASM_AX
 
-Be consistent; either put each parameter on it's own line or wrap only when
-necessary.
+There's a comment in the code here about stuffiing before RET, I think it makes
+sense to keep that before the RET, i.e. hoist it out of the actual stuffing
+sequence so that it looks like:
 
-> +		vmcs12->guest_intr_status,
-> +		vmcs12->vm_entry_intr_info_field,
-> +		vmcs12->secondary_vm_exec_control & SECONDARY_EXEC_ENABLE_EPT);
-> +
+#ifdef CONFIG_RETPOLINE
+	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+	ALTERNATIVE "", "jmp .Lvmexit_stuff_rsb", X86_FEATURE_RETPOLINE
+#endif
+.Lvmexit_return:
+	RET
 
-Align the parameters to the opening '(', that "rule" trumps the 80 char soft limit.
+Ha!  Better idea.  Rather than have a bunch of nops to eat through before the
+!RETPOLINE case gets to the RET, encode the RET as the default.  That allows using
+a single #ifdef and avoids both the JMP over the RET as well as the JMP back to the
+RET, and saves 4 nops to boot.
 
-	trace_kvm_nested_vmrun(kvm_rip_read(vcpu),
-			       vmx->nested.current_vmptr,
-			       vmcs12->guest_rip,
-			       vmcs12->guest_intr_status,
-			       vmcs12->vm_entry_intr_info_field,
-			       vmcs12->secondary_vm_exec_control & SECONDARY_EXEC_ENABLE_EPT);
+SYM_FUNC_START(vmx_vmexit)
+#ifdef CONFIG_RETPOLINE
+	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+	ALTERNATIVE "RET", "", X86_FEATURE_RETPOLINE
 
-And if we're going to add nVMX, we should clean up the tracepoint output.  E.g.
-pass in KVM_ISA_{SVM,VMX} to different VMCB vs. VMCS and npt vs. ept (and maybe
-print nNPT and nEPT to make it obvious it's the vmcs12 setting?).  The "nrip"
-field is wrong even for SVM; the tracepoint prints the L2 rip, not the next_rip
-field in vmcs12.  Maybe "L2 rip"?
+	/* Preserve guest's RAX, it's used to stuff the RSB. */
+	push %_ASM_AX
+
+	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
+
+	/* Clear RFLAGS.CF and RFLAGS.ZF to preserve VM-Exit, i.e. !VM-Fail. */
+	or $1, %_ASM_AX
+
+	pop %_ASM_AX
+#endif
+	RET
+SYM_FUNC_END(vmx_vmexit)
