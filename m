@@ -2,60 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C87F155E694
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:30:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C2CD55E892
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:36:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346845AbiF1Nnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 09:43:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46594 "EHLO
+        id S1346774AbiF1NoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 09:44:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346843AbiF1Nnc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 09:43:32 -0400
+        with ESMTP id S1346787AbiF1Nnw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 09:43:52 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F8B9C61
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:43:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A155275E4
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:43:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656423810;
+        s=mimecast20190719; t=1656423828;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cW2a4YUNnUssvuoOmnrQqPk0B+mOaabUamfGI9ndHfY=;
-        b=AcYrYnxLjTP1M3tUDD3haBSN2a3Y2RqVL4cL44ryGfKQYMXeG0dIvsVcEeLmyWFSxjVtQZ
-        sLuZYYIo6v+SPDSH1zIyjfDq2BMkm0TtZWDLT5yi+hyU2eJQezbumTAmugr3sUTEn64i3g
-        vgNs6/z52rucvyykQhUJRqLnPukm9RU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=abXoIOqyAhxt2c9XGMOMQUpyKJ4rqMJ6hybu9hpX0PI=;
+        b=fKPXuQ3gYZWullknpFnkPzlUMVAa3CHtv5OJN9N7AG36R9ZAqBau4GtSxzmVLGbpStZPie
+        NcTV57LGiGF7d9kJCIpu66amSn7L3XU0Jwo6SjOuRgaFtfgQyEOVLZd1h1fhmEhrV+bpVu
+        E1G2eCLFiaIN60H2AKYISpEiX8oRl2w=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-386-OLBmRs1BN464TwGQg1zc_w-1; Tue, 28 Jun 2022 09:43:29 -0400
-X-MC-Unique: OLBmRs1BN464TwGQg1zc_w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 677023C16187;
-        Tue, 28 Jun 2022 13:43:28 +0000 (UTC)
-Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A4F7404E4C8;
-        Tue, 28 Jun 2022 13:43:26 +0000 (UTC)
-Message-ID: <a5fe4ca7a412c7e4970d7c0d48b17cefcd91833c.camel@redhat.com>
-Subject: Re: [PATCH v6 00/17] Introducing AMD x2AVIC and hybrid-AVIC modes
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Tue, 28 Jun 2022 16:43:25 +0300
-In-Reply-To: <84d30ead-7c8e-1f81-aa43-8a959e3ae7d0@amd.com>
-References: <20220519102709.24125-1-suravee.suthikulpanit@amd.com>
-         <84d30ead-7c8e-1f81-aa43-8a959e3ae7d0@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-160-t_X5MuGYMUKbE8eJFa7UbA-1; Tue, 28 Jun 2022 09:43:46 -0400
+X-MC-Unique: t_X5MuGYMUKbE8eJFa7UbA-1
+Received: by mail-wm1-f70.google.com with SMTP id k16-20020a7bc310000000b0038e6cf00439so7156099wmj.0
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:43:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=abXoIOqyAhxt2c9XGMOMQUpyKJ4rqMJ6hybu9hpX0PI=;
+        b=6zrJGbKmpcwMjWrpNsn06OTlQKxC5vtd2qE3QLkHbZn2gwLVNWCjBBuO6lolrygufl
+         Kbj4IvtUH8iO4SRiC85GIBoXTBZm6PwegrFv/qhEhoXrEeWwpoZeJqTh/bWTrn82Iuwu
+         04/vyCwMlV6BtcqVecxae35MJHe3vJ9q1yqfLk5R1Z8TWl/74S8P84hodBs4oWQJeGE8
+         DSeTI7wPBovG4lDR3DIoEfs6ZsenxwdYRGjA3NX9fsikWkYPNqpqpbBEdrvYfENxTMaS
+         NKGpobDo1bY3EqViN5/VF8bapEi3FbpthMbjtgfHW04oAFZY20emYtK7i1QJuxk2l7n6
+         Mb8g==
+X-Gm-Message-State: AJIora85Y4xoGM2wOOiHMGgNfQ3B/NJK5/ufq9iW81pwf0ptSnufeuW9
+        q/XN2lB6E/M3/c+1Eal6fqU/+TemjF76AJM3j3R9K06Ut7fijGejHTHxPk3zx+WdtTvygXIrWUf
+        VF6Oe88HjpMcs
+X-Received: by 2002:a05:6000:1a8b:b0:219:af0c:ddf8 with SMTP id f11-20020a0560001a8b00b00219af0cddf8mr16993613wry.142.1656423824948;
+        Tue, 28 Jun 2022 06:43:44 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1ulCbVDwMIzdNmmQrb5kCw0weokx6fGGdIcmA6shirIYjb3LYAkbgo0mXLYbXoBYhaHKES0mQ==
+X-Received: by 2002:a05:6000:1a8b:b0:219:af0c:ddf8 with SMTP id f11-20020a0560001a8b00b00219af0cddf8mr16993581wry.142.1656423824625;
+        Tue, 28 Jun 2022 06:43:44 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-149.retail.telecomitalia.it. [87.11.6.149])
+        by smtp.gmail.com with ESMTPSA id j18-20020a05600c42d200b003a02b9c47e4sm24072440wme.27.2022.06.28.06.43.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jun 2022 06:43:44 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 15:43:40 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
+Cc:     netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        lulu@redhat.com, tanuj.kamde@amd.com,
+        Si-Wei Liu <si-wei.liu@oracle.com>, Piotr.Uminski@intel.com,
+        habetsm.xilinx@gmail.com, gautam.dawar@amd.com, pabloc@xilinx.com,
+        Zhu Lingshan <lingshan.zhu@intel.com>, lvivier@redhat.com,
+        Longpeng <longpeng2@huawei.com>, dinang@xilinx.com,
+        martinh@xilinx.com, martinpo@xilinx.com,
+        Eli Cohen <elic@nvidia.com>, ecree.xilinx@gmail.com,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, hanand@xilinx.com,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Subject: Re: [PATCH v6 2/4] vhost-vdpa: introduce SUSPEND backend feature bit
+Message-ID: <20220628134340.5fla7surd34bwnq3@sgarzare-redhat>
+References: <20220623160738.632852-1-eperezma@redhat.com>
+ <20220623160738.632852-3-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220623160738.632852-3-eperezma@redhat.com>
 X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,75 +94,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-06-28 at 20:20 +0700, Suthikulpanit, Suravee wrote:
-> Maxim,
-> 
-> On 5/19/2022 5:26 PM, Suravee Suthikulpanit wrote:
-> > Introducing support for AMD x2APIC virtualization. This feature is
-> > indicated by the CPUID Fn8000_000A EDX[14], and it can be activated
-> > by setting bit 31 (enable AVIC) and bit 30 (x2APIC mode) of VMCB
-> > offset 60h.
-> > 
-> > With x2AVIC support, the guest local APIC can be fully virtualized in
-> > both xAPIC and x2APIC modes, and the mode can be changed during runtime.
-> > For example, when AVIC is enabled, the hypervisor set VMCB bit 31
-> > to activate AVIC for each vCPU. Then, it keeps track of each vCPU's
-> > APIC mode, and updates VMCB bit 30 to enable/disable x2APIC
-> > virtualization mode accordingly.
-> > 
-> > Besides setting bit VMCB bit 30 and 31, for x2AVIC, kvm_amd driver needs
-> > to disable interception for the x2APIC MSR range to allow AVIC hardware
-> > to virtualize register accesses.
-> > 
-> > This series also introduce a partial APIC virtualization (hybrid-AVIC)
-> > mode, where APIC register accesses are trapped (i.e. not virtualized
-> > by hardware), but leverage AVIC doorbell for interrupt injection.
-> > This eliminates need to disable x2APIC in the guest on system without
-> > x2AVIC support. (Note: suggested by Maxim)
-> > 
-> > Testing for v5:
-> >    * Test partial AVIC mode by launching a VM with x2APIC mode
-> >    * Tested booting a Linux VM with x2APIC physical and logical modes upto 512 vCPUs.
-> >    * Test the following nested SVM test use cases:
-> > 
-> >               L0     |    L1   |   L2
-> >         ----------------------------------
-> >                 AVIC |    APIC |    APIC
-> >                 AVIC |    APIC |  x2APIC
-> >          hybrid-AVIC |  x2APIC |    APIC
-> >          hybrid-AVIC |  x2APIC |  x2APIC
-> >               x2AVIC |    APIC |    APIC
-> >               x2AVIC |    APIC |  x2APIC
-> >               x2AVIC |  x2APIC |    APIC
-> >               x2AVIC |  x2APIC |  x2APIC
-> 
-> With the commit 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base"),
-> APICV/AVIC is now inhibit when the guest kernel boots w/ option "nox2apic" or "x2apic_phys"
-> due to APICV_INHIBIT_REASON_APIC_ID_MODIFIED.
-> 
-> These cases used to work. In theory, we should be able to allow AVIC works in this case.
-> Is there a way to modify logic in kvm_lapic_xapic_id_updated() to allow these use cases
-> to work w/ APICv/AVIC?
-> 
-> Best Regards,
-> Suravee
-> 
+On Thu, Jun 23, 2022 at 06:07:36PM +0200, Eugenio Pérez wrote:
+>Userland knows if it can suspend the device or not by checking this feature
+>bit.
+>
+>It's only offered if the vdpa driver backend implements the suspend()
+>operation callback, and to offer it or userland to ack it if the backend
+>does not offer that callback is an error.
 
-This seems very strange, I assume you test the kvm/queue of today,
+Should we document in the previous patch that the callback must be 
+implemented only if the drive/device support it?
 
-which contains a fix for a typo I had in the list of inhibit reasons
-(commit 5bdae49fc2f689b5f896b54bd9230425d3643dab - KVM: SEV: fix misplaced closing parenthesis)
+The rest LGTM although I have a doubt whether it is better to move this 
+patch after patch 3, or merge it with patch 3, for bisectability since 
+we enable the feature here but if the userspace calls ioctl() with 
+VHOST_VDPA_SUSPEND we reply back that it is not supported.
 
+Thanks,
+Stefano
 
-Could you share more details on the test? How many vCPUs in the guest, is x2apic exposed to the guest?
-
-
-Looking through the code the the __x2apic_disable, touches the MSR_IA32_APICBASE so I would expect
-the APICV_INHIBIT_REASON_APIC_BASE_MODIFIED inhibit to be triggered and not APICV_INHIBIT_REASON_APIC_ID_MODIFIED
-
-
-I don't see yet how the x2apic_phys can trigger these inhibits.
-
-Best regards,
-	Maxim Levitsky
+>
+>Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+>---
+> drivers/vhost/vdpa.c             | 16 +++++++++++++++-
+> include/uapi/linux/vhost_types.h |  2 ++
+> 2 files changed, 17 insertions(+), 1 deletion(-)
+>
+>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>index 23dcbfdfa13b..3d636e192061 100644
+>--- a/drivers/vhost/vdpa.c
+>+++ b/drivers/vhost/vdpa.c
+>@@ -347,6 +347,14 @@ static long vhost_vdpa_set_config(struct vhost_vdpa *v,
+> 	return 0;
+> }
+>
+>+static bool vhost_vdpa_can_suspend(const struct vhost_vdpa *v)
+>+{
+>+	struct vdpa_device *vdpa = v->vdpa;
+>+	const struct vdpa_config_ops *ops = vdpa->config;
+>+
+>+	return ops->suspend;
+>+}
+>+
+> static long vhost_vdpa_get_features(struct vhost_vdpa *v, u64 __user *featurep)
+> {
+> 	struct vdpa_device *vdpa = v->vdpa;
+>@@ -577,7 +585,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+> 	if (cmd == VHOST_SET_BACKEND_FEATURES) {
+> 		if (copy_from_user(&features, featurep, sizeof(features)))
+> 			return -EFAULT;
+>-		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+>+		if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+>+				 BIT_ULL(VHOST_BACKEND_F_SUSPEND)))
+>+			return -EOPNOTSUPP;
+>+		if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+>+		     !vhost_vdpa_can_suspend(v))
+> 			return -EOPNOTSUPP;
+> 		vhost_set_backend_features(&v->vdev, features);
+> 		return 0;
+>@@ -628,6 +640,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+> 		break;
+> 	case VHOST_GET_BACKEND_FEATURES:
+> 		features = VHOST_VDPA_BACKEND_FEATURES;
+>+		if (vhost_vdpa_can_suspend(v))
+>+			features |= BIT_ULL(VHOST_BACKEND_F_SUSPEND);
+> 		if (copy_to_user(featurep, &features, sizeof(features)))
+> 			r = -EFAULT;
+> 		break;
+>diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+>index 634cee485abb..1bdd6e363f4c 100644
+>--- a/include/uapi/linux/vhost_types.h
+>+++ b/include/uapi/linux/vhost_types.h
+>@@ -161,5 +161,7 @@ struct vhost_vdpa_iova_range {
+>  * message
+>  */
+> #define VHOST_BACKEND_F_IOTLB_ASID  0x3
+>+/* Device can be suspended */
+>+#define VHOST_BACKEND_F_SUSPEND  0x4
+>
+> #endif
+>-- 
+>2.31.1
+>
 
