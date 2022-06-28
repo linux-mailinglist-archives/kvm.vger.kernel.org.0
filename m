@@ -2,170 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C25955E857
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:35:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C87F155E694
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:30:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346644AbiF1NkU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 09:40:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43944 "EHLO
+        id S1346845AbiF1Nnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 09:43:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346388AbiF1NkS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 09:40:18 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 665C227171;
-        Tue, 28 Jun 2022 06:40:17 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SDB1Sn016705;
-        Tue, 28 Jun 2022 13:40:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=FBgDUWz9zu+SVcHFsLwmqLmheCUV+tCagUD444+K/iM=;
- b=nP9nGTSpJTTxLCM/e7EHiIx/Ndo31kBdhG01AiT+nVxGGOIJd+VYZVpA7fXPpKTNr8JK
- /l/54zwUbAFYlGGx64R6SFaLrZnHYD5PIseGAUQykf8TjO8d0h7b+rWGKVzSRHNHT9wJ
- Sxx9ZG1Kwhg4BMHR/dLp1+6xhPFq7sZHJnpo4ZWDe0dGXiJsQ6Fy/UonAOXQ0aXSEq8X
- dF0D8+rbJG3YU66L9xcBB9mTfMcGWNA/IdbhiFAsG1ozb8eg7vTcGuo1FzK/8gdGuyNN
- BkroJEpsq1eUs4k7bFbEk9xRt7UNEms7wnhXIi6IaTh/IY/jjnpFV5gh/7QA9quWN9h6 9g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h01tjaa5b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 13:40:15 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SDC7x4021996;
-        Tue, 28 Jun 2022 13:40:13 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h01tjaa0t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 13:40:13 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SDb8C7025960;
-        Tue, 28 Jun 2022 13:40:11 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma01dal.us.ibm.com with ESMTP id 3gwt09857t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 13:40:11 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SDeAWv32834002
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Jun 2022 13:40:10 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4C2B9AC05E;
-        Tue, 28 Jun 2022 13:40:10 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CE79AAC05B;
-        Tue, 28 Jun 2022 13:40:02 +0000 (GMT)
-Received: from [9.163.8.193] (unknown [9.163.8.193])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 28 Jun 2022 13:40:02 +0000 (GMT)
-Message-ID: <425d3030-94e2-efeb-60fd-08516443a06a@linux.ibm.com>
-Date:   Tue, 28 Jun 2022 09:40:01 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v9 00/21] KVM: s390: enable zPCI for interpretive
- execution
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
- <f86e2e05-114a-cc9e-8f3a-96b36889063d@linux.ibm.com>
- <c98e7c10-272c-2bbb-6909-046d57d721d1@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <c98e7c10-272c-2bbb-6909-046d57d721d1@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jBnlD9HRmTZN25V0BQZsmMSBZ2YhhOAb
-X-Proofpoint-ORIG-GUID: 2Jd4WNhrYwTB9D6Hdj11r_eT12oohFQV
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S1346843AbiF1Nnc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 09:43:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F8B9C61
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:43:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656423810;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cW2a4YUNnUssvuoOmnrQqPk0B+mOaabUamfGI9ndHfY=;
+        b=AcYrYnxLjTP1M3tUDD3haBSN2a3Y2RqVL4cL44ryGfKQYMXeG0dIvsVcEeLmyWFSxjVtQZ
+        sLuZYYIo6v+SPDSH1zIyjfDq2BMkm0TtZWDLT5yi+hyU2eJQezbumTAmugr3sUTEn64i3g
+        vgNs6/z52rucvyykQhUJRqLnPukm9RU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-386-OLBmRs1BN464TwGQg1zc_w-1; Tue, 28 Jun 2022 09:43:29 -0400
+X-MC-Unique: OLBmRs1BN464TwGQg1zc_w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 677023C16187;
+        Tue, 28 Jun 2022 13:43:28 +0000 (UTC)
+Received: from starship (unknown [10.40.194.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A4F7404E4C8;
+        Tue, 28 Jun 2022 13:43:26 +0000 (UTC)
+Message-ID: <a5fe4ca7a412c7e4970d7c0d48b17cefcd91833c.camel@redhat.com>
+Subject: Re: [PATCH v6 00/17] Introducing AMD x2AVIC and hybrid-AVIC modes
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Tue, 28 Jun 2022 16:43:25 +0300
+In-Reply-To: <84d30ead-7c8e-1f81-aa43-8a959e3ae7d0@amd.com>
+References: <20220519102709.24125-1-suravee.suthikulpanit@amd.com>
+         <84d30ead-7c8e-1f81-aa43-8a959e3ae7d0@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-28_07,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 bulkscore=0 spamscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206280057
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/28/22 8:35 AM, Christian Borntraeger wrote:
-> Am 27.06.22 um 22:57 schrieb Matthew Rosato:
->> On 6/6/22 4:33 PM, Matthew Rosato wrote:
->>> Enable interpretive execution of zPCI instructions + adapter 
->>> interruption
->>> forwarding for s390x KVM vfio-pci.  This is done by triggering a routine
->>> when the VFIO group is associated with the KVM guest, transmitting to
->>> firmware a special token (GISA designation) to enable that specific 
->>> guest
->>> for interpretive execution on that zPCI device.  Load/store 
->>> interpreation
->>> enablement is then controlled by userspace (based upon whether or not a
->>> SHM bit is placed in the virtual function handle).  Adapter Event
->>> Notification interpretation is controlled from userspace via a new KVM
->>> ioctl.
->>>
->>> By allowing intepretation of zPCI instructions and firmware delivery of
->>> interrupts to guests, we can reduce the frequency of guest SIE exits for
->>> zPCI.
->>>
->>>  From the perspective of guest configuration, you passthrough zPCI 
->>> devices
->>> in the same manner as before, with intepretation support being used by
->>> default if available in kernel+qemu.
->>>
->>> Will follow up with a link the most recent QEMU series.
->>>
->>> Changelog v8->v9:
->>> - Rebase on top of 5.19-rc1, adjust ioctl and capability defines
->>> - s/kzdev = 0/kzdev = NULL/ (Alex)
->>> - rename vfio_pci_zdev_open to vfio_pci_zdev_open_device (Jason)
->>> - rename vfio_pci_zdev_release to vfio_pci_zdev_close_device (Jason)
->>> - make vfio_pci_zdev_close_device return void, instead WARN_ON or ignore
->>>    errors in lower level function (kvm_s390_pci_unregister_kvm) (Jason)
->>> - remove notifier accidentally left in struct zpci_dev + associated
->>>    include statment (Jason)
->>> - Remove patch 'KVM: s390: introduce CPU feature for zPCI 
->>> Interpretation'
->>>    based on discussion in QEMU thread.
->>>
->>
->> Ping -- I'm hoping this can make the next merge window, but there are 
->> still 2 patches left without any review tag (16 & 17).
+On Tue, 2022-06-28 at 20:20 +0700, Suthikulpanit, Suravee wrote:
+> Maxim,
 > 
-> Yes, I will queue this (as is). Ideally you would rebase this on top of 
-> kvm/next but I can also do while applying.
-> Let me know if you want to respin with the Nits from Pierre.
+> On 5/19/2022 5:26 PM, Suravee Suthikulpanit wrote:
+> > Introducing support for AMD x2APIC virtualization. This feature is
+> > indicated by the CPUID Fn8000_000A EDX[14], and it can be activated
+> > by setting bit 31 (enable AVIC) and bit 30 (x2APIC mode) of VMCB
+> > offset 60h.
+> > 
+> > With x2AVIC support, the guest local APIC can be fully virtualized in
+> > both xAPIC and x2APIC modes, and the mode can be changed during runtime.
+> > For example, when AVIC is enabled, the hypervisor set VMCB bit 31
+> > to activate AVIC for each vCPU. Then, it keeps track of each vCPU's
+> > APIC mode, and updates VMCB bit 30 to enable/disable x2APIC
+> > virtualization mode accordingly.
+> > 
+> > Besides setting bit VMCB bit 30 and 31, for x2AVIC, kvm_amd driver needs
+> > to disable interception for the x2APIC MSR range to allow AVIC hardware
+> > to virtualize register accesses.
+> > 
+> > This series also introduce a partial APIC virtualization (hybrid-AVIC)
+> > mode, where APIC register accesses are trapped (i.e. not virtualized
+> > by hardware), but leverage AVIC doorbell for interrupt injection.
+> > This eliminates need to disable x2APIC in the guest on system without
+> > x2AVIC support. (Note: suggested by Maxim)
+> > 
+> > Testing for v5:
+> >    * Test partial AVIC mode by launching a VM with x2APIC mode
+> >    * Tested booting a Linux VM with x2APIC physical and logical modes upto 512 vCPUs.
+> >    * Test the following nested SVM test use cases:
+> > 
+> >               L0     |    L1   |   L2
+> >         ----------------------------------
+> >                 AVIC |    APIC |    APIC
+> >                 AVIC |    APIC |  x2APIC
+> >          hybrid-AVIC |  x2APIC |    APIC
+> >          hybrid-AVIC |  x2APIC |  x2APIC
+> >               x2AVIC |    APIC |    APIC
+> >               x2AVIC |    APIC |  x2APIC
+> >               x2AVIC |  x2APIC |    APIC
+> >               x2AVIC |  x2APIC |  x2APIC
+> 
+> With the commit 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base"),
+> APICV/AVIC is now inhibit when the guest kernel boots w/ option "nox2apic" or "x2apic_phys"
+> due to APICV_INHIBIT_REASON_APIC_ID_MODIFIED.
+> 
+> These cases used to work. In theory, we should be able to allow AVIC works in this case.
+> Is there a way to modify logic in kvm_lapic_xapic_id_updated() to allow these use cases
+> to work w/ APICv/AVIC?
+> 
+> Best Regards,
+> Suravee
+> 
 
-Ah, sorry -- I assume you mean Paolo's kvm/next?  I tried now and see 
-some conflicts with the ioctl patch.
+This seems very strange, I assume you test the kvm/queue of today,
 
-Why don't I rebase on top of kvm/next along with these couple of changes 
-from Pierre and send this as a v10 for you to queue.
+which contains a fix for a typo I had in the list of inhibit reasons
+(commit 5bdae49fc2f689b5f896b54bd9230425d3643dab - KVM: SEV: fix misplaced closing parenthesis)
 
-While at it, there's one other issue to be aware of -- There will also 
-be small merge conflicts with a patch that just hit vfio-next, "vfio: 
-de-extern-ify function prototypes" - My series already avoids adding 
-externs to new prototypes, but adjacent code changes will cause a 
-conflict with patches 10 and 17.
 
-Not sure what the best way to proceed there is.
+Could you share more details on the test? How many vCPUs in the guest, is x2apic exposed to the guest?
 
-https://lore.kernel.org/kvm/165471414407.203056.474032786990662279.stgit@omen/
+
+Looking through the code the the __x2apic_disable, touches the MSR_IA32_APICBASE so I would expect
+the APICV_INHIBIT_REASON_APIC_BASE_MODIFIED inhibit to be triggered and not APICV_INHIBIT_REASON_APIC_ID_MODIFIED
+
+
+I don't see yet how the x2apic_phys can trigger these inhibits.
+
+Best regards,
+	Maxim Levitsky
+
