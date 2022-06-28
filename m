@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A52955EDDE
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 21:41:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37DEC55EE1F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 21:50:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231398AbiF1Tl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 15:41:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60702 "EHLO
+        id S231935AbiF1TuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 15:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbiF1TlE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 15:41:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D2683AA64
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 12:32:47 -0700 (PDT)
+        with ESMTP id S229627AbiF1TuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 15:50:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2BED538BE4
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 12:47:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656444702;
+        s=mimecast20190719; t=1656445620;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=aM7N7xOZQpVcWKhBhevjLYz+PsasfZgbqn1eTYJzU7E=;
-        b=dccDbxioVQqfFR9VnWFFn5/PTnmJxFw317J687kUmemrPiNFIIfPVCKbzHcELmDOnKKYiZ
-        0SUIBSt2A8qrhRrVlZzdbzwcjDrRxUNlJspaRaU3TH1IuRD+/pktQ851TFZI9fnBvjMc4D
-        WepHa/5/gFj3AWSi2ztiriQRvK2CuuE=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=qQJqzWxMD2wYGMO4NMh8exaYIYOycnFf9yiMWqcQgzM=;
+        b=Mr3jUlP046l0dtKzQ0pjf3rsT8HF5g6YVmtLqkKQrLb1QgBvqOoVfzmwHwlfXkP5u4Oxl2
+        JLGrSeeh/wYapRTCzo2+KlT3Mt4SjmOvWTabmsNXuHaJKUhJS1iTsp1hew35/OF3RC8ZOF
+        nElS00BQT0T9NrQyI2z09wptDtlVJhw=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-77-dlU97GxdNxm_2C8lSOcFIQ-1; Tue, 28 Jun 2022 15:31:41 -0400
-X-MC-Unique: dlU97GxdNxm_2C8lSOcFIQ-1
-Received: by mail-il1-f197.google.com with SMTP id i2-20020a056e021d0200b002d8ff49e7c4so7831225ila.8
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 12:31:41 -0700 (PDT)
+ us-mta-554-jWVHyz9pNOeY9r_OZP1SOw-1; Tue, 28 Jun 2022 15:46:59 -0400
+X-MC-Unique: jWVHyz9pNOeY9r_OZP1SOw-1
+Received: by mail-io1-f70.google.com with SMTP id c8-20020a056602334800b0067500ca88aaso7243421ioz.0
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 12:46:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=aM7N7xOZQpVcWKhBhevjLYz+PsasfZgbqn1eTYJzU7E=;
-        b=VM0RzNZErBjlfvnmrHcdjFdhnO2tW8JrxTmVQEYC3uJEM/4Ay3EXOKT62Pc/H2UfZu
-         whQOkp7757FN521hRl5wg8ydde1Mu307zS0IOn5IPupRoJS+hrlflilVRpmAtoxqAiBJ
-         ypkMQuY61XxynidlQH6abxHOSWk0r7yCvk5L34a6KHtr/M/YUghE+FInp2KXptHUheAj
-         7NBoQJI5DTv/ZL7uFxje86K5qcqMiO75YISKbJ1omXIcvg9kCx5bpFpf21U9SJO1jD3h
-         g5HWQ+58jD2Ql1aGqrwlnRUCMpD8wsgsV3zaOY96WT/uYH5wNhax5SEfMp9PwTz0dAGk
-         Oj4g==
-X-Gm-Message-State: AJIora9NktuutlKvCotF4S5IIs900/PJRq9ePocqw30tC6WY6rWjcuIo
-        ZQhYvaoj/KTlj2KxeQiHRr38XWBeUFknC/xA7ibSeWgRzWdYExwgCqUqV6eccIxQczZZ/xbUCHK
-        IQda/IyIQafON
-X-Received: by 2002:a05:6638:3802:b0:32e:3d9a:9817 with SMTP id i2-20020a056638380200b0032e3d9a9817mr12530755jav.206.1656444700421;
-        Tue, 28 Jun 2022 12:31:40 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1to+EXCpnTsEmC5xi0MGItOFv+6X/o+CybOlBIbsbLbyXX0AmgJOhw77pJBXL2meXzcD8YUgw==
-X-Received: by 2002:a05:6638:3802:b0:32e:3d9a:9817 with SMTP id i2-20020a056638380200b0032e3d9a9817mr12530733jav.206.1656444700166;
-        Tue, 28 Jun 2022 12:31:40 -0700 (PDT)
+        bh=qQJqzWxMD2wYGMO4NMh8exaYIYOycnFf9yiMWqcQgzM=;
+        b=WsJjGKVmxV9nnJ6pS/MrzOwtLy+9uzG6hRfpAMoPU1UJ5uWpGTygScGKfGUN+0ewtX
+         q/gGEEk1Xq28MzlfLpIqFh1cZ5ml3ZBs87XKOwg5zjaun/k9ecHvqmygIGm7xFOxq4NJ
+         KTky1aKmyYQLPbi+788B5Ho5ca+gO/CumPnRolv6u/eBBr9NELdOqjuBxAChjbL47dbS
+         Tx20le+IIIdsj2e5cM6Eh5l4WV260lwpt2x88pwb4YGcMpfz5qmU10yrQkvMqw64H0B4
+         Az3BQQAVWjeL8BZeaBqf2rylnjsqinyw+x7/gn40Oxid0Ew0QIK/hor9htmxHRMOcx77
+         laBg==
+X-Gm-Message-State: AJIora+grRNDPUKAOl1CiipYB9ACROJn0cGdx6XnNNgC0gQHHYDne220
+        Be6fm/oAlYY7qaSZ0f3RN+PVH8wvwVTJzyEeDtRw6+UZwbIaFv+Ki0kChrO/Fr3UYN2WbgRJxuk
+        ogjJRcujyfffv
+X-Received: by 2002:a05:6e02:1749:b0:2da:9a89:3961 with SMTP id y9-20020a056e02174900b002da9a893961mr5843180ill.258.1656445618262;
+        Tue, 28 Jun 2022 12:46:58 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1v2hBFdLGw2ehMsPWTL/s3RLgYsTwLehZi2x21Zstq8Dxrz20PQ+CSwQBynhMOdy324UJkxFQ==
+X-Received: by 2002:a05:6e02:1749:b0:2da:9a89:3961 with SMTP id y9-20020a056e02174900b002da9a893961mr5843158ill.258.1656445617974;
+        Tue, 28 Jun 2022 12:46:57 -0700 (PDT)
 Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id h8-20020a92d848000000b002da9f82c703sm2049757ilq.5.2022.06.28.12.31.38
+        by smtp.gmail.com with ESMTPSA id s9-20020a92cc09000000b002d1c94b7143sm5993039ilp.39.2022.06.28.12.46.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 12:31:39 -0700 (PDT)
-Date:   Tue, 28 Jun 2022 15:31:37 -0400
+        Tue, 28 Jun 2022 12:46:57 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 15:46:55 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -64,17 +64,18 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Andrea Arcangeli <aarcange@redhat.com>,
         Linux MM Mailing List <linux-mm@kvack.org>,
         Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Message-ID: <YrtXGf20oa5eYgIU@xz-m1.local>
+Subject: Re: [PATCH 2/4] kvm: Merge "atomic" and "write" in
+ __gfn_to_pfn_memslot()
+Message-ID: <Yrtar+i2X0YjmD/F@xz-m1.local>
 References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-2-peterx@redhat.com>
- <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
+ <20220622213656.81546-3-peterx@redhat.com>
+ <c047c213-252b-4a0b-9720-070307962d23@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+In-Reply-To: <c047c213-252b-4a0b-9720-070307962d23@nvidia.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -83,117 +84,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, John,
-
-Thanks for your comments!
-
-On Mon, Jun 27, 2022 at 07:07:28PM -0700, John Hubbard wrote:
-
-[...]
-
-> > @@ -2941,6 +2941,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
-> >   #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
-> >   #define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
-> >   #define FOLL_FAST_ONLY	0x80000	/* gup_fast: prevent fall-back to slow gup */
-> > +#define FOLL_INTERRUPTIBLE  0x100000 /* allow interrupts from generic signals */
+On Mon, Jun 27, 2022 at 07:17:09PM -0700, John Hubbard wrote:
+> On 6/22/22 14:36, Peter Xu wrote:
+> > Merge two boolean parameters into a bitmask flag called kvm_gtp_flag_t for
+> > __gfn_to_pfn_memslot().  This cleans the parameter lists, and also prepare
+> > for new boolean to be added to __gfn_to_pfn_memslot().
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >   arch/arm64/kvm/mmu.c                   |  5 ++--
+> >   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  5 ++--
+> >   arch/powerpc/kvm/book3s_64_mmu_radix.c |  5 ++--
+> >   arch/x86/kvm/mmu/mmu.c                 | 10 +++----
+> >   include/linux/kvm_host.h               |  9 ++++++-
+> >   virt/kvm/kvm_main.c                    | 37 +++++++++++++++-----------
+> >   virt/kvm/kvm_mm.h                      |  6 +++--
+> >   virt/kvm/pfncache.c                    |  2 +-
+> >   8 files changed, 49 insertions(+), 30 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index f5651a05b6a8..ce1edb512b4e 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1204,8 +1204,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >   	 */
+> >   	smp_rmb();
+> > -	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
+> > -				   write_fault, &writable, NULL);
+> > +	pfn = __gfn_to_pfn_memslot(memslot, gfn,
+> > +				   write_fault ? KVM_GTP_WRITE : 0,
+> > +				   NULL, &writable, NULL);
+> >   	if (pfn == KVM_PFN_ERR_HWPOISON) {
+> >   		kvm_send_hwpoison_signal(hva, vma_shift);
+> >   		return 0;
+> > diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> > index 514fd45c1994..e2769d58dd87 100644
+> > --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> > +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> > @@ -598,8 +598,9 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
+> >   		write_ok = true;
+> >   	} else {
+> >   		/* Call KVM generic code to do the slow-path check */
+> > -		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
+> > -					   writing, &write_ok, NULL);
+> > +		pfn = __gfn_to_pfn_memslot(memslot, gfn,
+> > +					   writing ? KVM_GTP_WRITE : 0,
+> > +					   NULL, &write_ok, NULL);
+> >   		if (is_error_noslot_pfn(pfn))
+> >   			return -EFAULT;
+> >   		page = NULL;
+> > diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> > index 42851c32ff3b..232b17c75b83 100644
+> > --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> > +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> > @@ -845,8 +845,9 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
+> >   		unsigned long pfn;
+> >   		/* Call KVM generic code to do the slow-path check */
+> > -		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
+> > -					   writing, upgrade_p, NULL);
+> > +		pfn = __gfn_to_pfn_memslot(memslot, gfn,
+> > +					   writing ? KVM_GTP_WRITE : 0,
+> > +					   NULL, upgrade_p, NULL);
+> >   		if (is_error_noslot_pfn(pfn))
+> >   			return -EFAULT;
+> >   		page = NULL;
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index f4653688fa6d..e92f1ab63d6a 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3968,6 +3968,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+> >   static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   {
+> > +	kvm_gtp_flag_t flags = fault->write ? KVM_GTP_WRITE : 0;
+> >   	struct kvm_memory_slot *slot = fault->slot;
+> >   	bool async;
+> > @@ -3999,8 +4000,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   	}
+> >   	async = false;
+> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, &async,
+> > -					  fault->write, &fault->map_writable,
+> > +	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, flags,
+> > +					  &async, &fault->map_writable,
+> >   					  &fault->hva);
+> >   	if (!async)
+> >   		return RET_PF_CONTINUE; /* *pfn has correct page already */
+> > @@ -4016,9 +4017,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   		}
+> >   	}
+> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, NULL,
+> > -					  fault->write, &fault->map_writable,
+> > -					  &fault->hva);
+> > +	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, flags, NULL,
+> > +					  &fault->map_writable, &fault->hva);
 > 
-> Perhaps, s/generic/non-fatal/ ?
+> The flags arg does improve the situation, yes.
 
-Sure.
+Thanks for supporting a flag's existance. :)
 
-> > diff --git a/mm/gup.c b/mm/gup.c
-> > index 551264407624..ad74b137d363 100644
-> > --- a/mm/gup.c
-> > +++ b/mm/gup.c
-> > @@ -933,8 +933,17 @@ static int faultin_page(struct vm_area_struct *vma,
-> >   		fault_flags |= FAULT_FLAG_WRITE;
-> >   	if (*flags & FOLL_REMOTE)
-> >   		fault_flags |= FAULT_FLAG_REMOTE;
-> > -	if (locked)
-> > +	if (locked) {
-> >   		fault_flags |= FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_KILLABLE;
-> > +		/*
-> > +		 * We should only grant FAULT_FLAG_INTERRUPTIBLE when we're
-> > +		 * (at least) killable.  It also mostly means we're not
-> > +		 * with NOWAIT.  Otherwise ignore FOLL_INTERRUPTIBLE since
-> > +		 * it won't make a lot of sense to be used alone.
-> > +		 */
-> 
-> This comment seems a little confusing due to its location. We've just
-> checked "locked", but the comment is talking about other constraints.
-> 
-> Not sure what to suggest. Maybe move it somewhere else?
-
-I put it here to be after FAULT_FLAG_KILLABLE we just set.
-
-Only if we have "locked" will we set FAULT_FLAG_KILLABLE.  That's also the
-key we grant "killable" attribute to this GUP.  So I thought it'll be good
-to put here because I want to have FOLL_INTERRUPTIBLE dependent on "locked"
-being set.
+I'd say ultimately it could be a personal preference thing when the struct
+comes.
 
 > 
-> > +		if (*flags & FOLL_INTERRUPTIBLE)
-> > +			fault_flags |= FAULT_FLAG_INTERRUPTIBLE;
-> > +	}
-> >   	if (*flags & FOLL_NOWAIT)
-> >   		fault_flags |= FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_RETRY_NOWAIT;
-> >   	if (*flags & FOLL_TRIED) {
-> > @@ -1322,6 +1331,22 @@ int fixup_user_fault(struct mm_struct *mm,
+> >   	return RET_PF_CONTINUE;
 > >   }
-> >   EXPORT_SYMBOL_GPL(fixup_user_fault);
-> > +/*
-> > + * GUP always responds to fatal signals.  When FOLL_INTERRUPTIBLE is
-> > + * specified, it'll also respond to generic signals.  The caller of GUP
-> > + * that has FOLL_INTERRUPTIBLE should take care of the GUP interruption.
-> > + */
-> > +static bool gup_signal_pending(unsigned int flags)
-> > +{
-> > +	if (fatal_signal_pending(current))
-> > +		return true;
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index c20f2d55840c..b646b6fcaec6 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1146,8 +1146,15 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+> >   		      bool *writable);
+> >   kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn);
+> >   kvm_pfn_t gfn_to_pfn_memslot_atomic(const struct kvm_memory_slot *slot, gfn_t gfn);
 > > +
-> > +	if (!(flags & FOLL_INTERRUPTIBLE))
-> > +		return false;
-> > +
-> > +	return signal_pending(current);
-> > +}
-> > +
+> > +/* gfn_to_pfn (gtp) flags */
+> > +typedef unsigned int __bitwise kvm_gtp_flag_t;
 > 
-> OK.
-> 
-> >   /*
-> >    * Please note that this function, unlike __get_user_pages will not
-> >    * return 0 for nr_pages > 0 without FOLL_NOWAIT
-> > @@ -1403,11 +1428,11 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
-> >   		 * Repeat on the address that fired VM_FAULT_RETRY
-> >   		 * with both FAULT_FLAG_ALLOW_RETRY and
-> >   		 * FAULT_FLAG_TRIED.  Note that GUP can be interrupted
-> > -		 * by fatal signals, so we need to check it before we
-> > +		 * by fatal signals of even common signals, depending on
-> > +		 * the caller's request. So we need to check it before we
-> >   		 * start trying again otherwise it can loop forever.
-> >   		 */
-> > -
-> > -		if (fatal_signal_pending(current)) {
-> > +		if (gup_signal_pending(flags)) {
-> 
-> This is new and bold. :) Signals that an application was prepared to
-> handle can now cause gup to quit early. I wonder if that will break any
-> use cases out there (SIGPIPE...) ?
+> A minor naming problem: GTP and especially gtp_flags is way too close
+> to gfp_flags. It will make people either wonder if it's a typo, or
+> worse, *assume* that it's a typo. :)
 
-Note: I introduced the new FOLL_INTERRUPTIBLE flag, so only if the caller
-explicitly passing in that flag could there be a functional change.
-
-IOW, no functional change intended for this single patch, not before I
-start to let KVM code passing over that flag.
+I'd try to argu with "I prefixed it with kvm_", but oh well.. yes they're a
+bit close :)
 
 > 
-> Generally, gup callers handle failures pretty well, so it's probably
-> not too bad. But I wanted to mention the idea that handled interrupts
-> might be a little surprising here.
+> Yes, "read the code", but if you can come up with a better TLA than GTP
+> here, let's consider using it.
 
-Yes as I mentioned anyway it'll be an opt-in flag, so by default we don't
-need to worry at all, IMHO, because it should really work exactly like
-before, otherwise I had a bug somewhere else.. :)
+Could I ask what's TLA?  Any suggestions on the abbrev, btw?
+
+> 
+> Overall, the change looks like an improvement, even though
+> 
+>     write_fault ? KVM_GTP_WRITE : 0
+> 
+> is not wonderful. But improving *that* leads to a a big pile of diffs
+> that are rather beyond the scope here.
 
 Thanks,
 
