@@ -2,58 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70C8455EBCC
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 20:03:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DAF755EBF3
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 20:06:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234100AbiF1SDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 14:03:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48014 "EHLO
+        id S232942AbiF1SGH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 14:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233949AbiF1SCt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 14:02:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4932613CCD;
-        Tue, 28 Jun 2022 11:02:49 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DC42861A7B;
-        Tue, 28 Jun 2022 18:02:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E5ACC3411D;
-        Tue, 28 Jun 2022 18:02:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656439368;
-        bh=wRLfI31WrZ59IkEj+z6Z5ZZev9x2pVNmX2cjKkCxs74=;
-        h=From:To:Cc:Subject:Date:From;
-        b=mUAs0OXyMYCIQY+Msh4eCdQKG4n6S+0XnOPFWmVF8o7i/P3HdnPp3ztOq460HhKbh
-         z+4AU3aTT8sSp/+SugH8e9oKVSUODPhdljVc1jzoKwR84n3zv0SFzUwv3Z40dyWfCQ
-         CQ43H3wyelPh8uy27ir9wYUVZURadbwrtd3MbdLzlUyEkeUfmW1QyjIjAUAcshJEUh
-         ov7upuSRIxL4woC018to8h/6XRZ97YV+FHTv9uGFkbb/c/CyC1mvHxaKErBwrNczxh
-         jjD4Yu5AYnPNc3yUVZWizCQi+aAxNIqcufobbiX0VBO8LFk6WskKnVoPjiOsrqRcQi
-         A5xzoIWS/aMJA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Raghavendra Rao Ananta <rananta@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, maz@kernel.org,
-        shuah@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: [PATCH MANUALSEL 5.4] selftests: KVM: Handle compiler optimizations in ucall
-Date:   Tue, 28 Jun 2022 14:02:44 -0400
-Message-Id: <20220628180244.621315-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S233854AbiF1SGA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 14:06:00 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1039C1DA79
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 11:05:55 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id bo5so12722926pfb.4
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 11:05:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=pTcGgtfSu6n7KkCWKQ4ciWe5XeKK5S4riO8KfNVW7Ig=;
+        b=F/CZTCTDOlhkWqZ+vOzW0DaoZ/EZ1dOhoCSSJ2RrwBNwuY7CCyvEtaLLk8DO+FYVI8
+         oY1bh2Rw2NH/e7uwuajkABgxQQynq/vb9wDrQT1ziurYSmeBDoqa9s9XGmGLyXXXVu1m
+         Ptj/OKkdrLcBprdD9gQ9RffSNU26yKh9HCJiI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=pTcGgtfSu6n7KkCWKQ4ciWe5XeKK5S4riO8KfNVW7Ig=;
+        b=HQx4NXSuabmUaCZ7ccaizeD4y8Au/A4CwlvkShZbVfZpM2WnNENttgZ+XkazR/hyaF
+         kZUZCcS9oKiae1iT+w27cIn243tm91haWOgR0hy1fnYyEPZTlN7YCUp3vKVa9othRafW
+         CTCTy2zIskFJ+fBEqIVOHa1poXN/3j/mt2I2onA+w45tbiI6Ta0IIuVxljlc/0+ks5aU
+         qIyZkVJd6J17XdL8JoDSzmeTGWDT0yuCMislfGuVRJpSc01yHEEmg9mfgmRj9ooBNz5y
+         55JRhexx56BoYiDjGiAN1IoQRoJ23WfJKiWiGtsIPFHHKXDs8b+MPD+27taUiaW1JAbB
+         hOCw==
+X-Gm-Message-State: AJIora95CXhjwWixTvrGlgZDU3tDqy1NoGMHqvXrWFt6SaJy4gsIgm5M
+        d7lHslyiO6xD+6E2Aw+oGObLsw==
+X-Google-Smtp-Source: AGRyM1v6cdnwBfGpeB2JnkCbahQ14YUYaqjRd3VUKbR8YPBigZjfWVkzlvmFIFzfbBj+r2XqbA+86w==
+X-Received: by 2002:a63:7412:0:b0:40c:fa27:9d07 with SMTP id p18-20020a637412000000b0040cfa279d07mr18441815pgc.27.1656439554674;
+        Tue, 28 Jun 2022 11:05:54 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id i3-20020a170902cf0300b0016a0ac06424sm9669985plg.51.2022.06.28.11.05.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jun 2022 11:05:54 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 11:05:53 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        dm-devel@redhat.com, linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Intel Graphics Development <intel-gfx@lists.freedesktop.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        linux-can@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux1394-devel@lists.sourceforge.net, io-uring@vger.kernel.org,
+        lvs-devel@vger.kernel.org,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        kasan-dev <kasan-dev@googlegroups.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        nvdimm@lists.linux.dev,
+        NetFilter <netfilter-devel@vger.kernel.org>,
+        coreteam@netfilter.org, linux-perf-users@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        scsi <linux-scsi@vger.kernel.org>,
+        target-devel <target-devel@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        V9FS Developers <v9fs-developer@lists.sourceforge.net>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] treewide: uapi: Replace zero-length arrays with
+ flexible-array members
+Message-ID: <202206281104.7CC3935@keescook>
+References: <20220627180432.GA136081@embeddedor>
+ <CAMuHMdU27TG_rpd=WTRPRcY22A4j4aN-6d_8OmK2aNpX06G3ig@mail.gmail.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <CAMuHMdU27TG_rpd=WTRPRcY22A4j4aN-6d_8OmK2aNpX06G3ig@mail.gmail.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -61,59 +100,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Raghavendra Rao Ananta <rananta@google.com>
+On Tue, Jun 28, 2022 at 09:27:21AM +0200, Geert Uytterhoeven wrote:
+> Hi Gustavo,
+> 
+> Thanks for your patch!
+> 
+> On Mon, Jun 27, 2022 at 8:04 PM Gustavo A. R. Silva
+> <gustavoars@kernel.org> wrote:
+> > There is a regular need in the kernel to provide a way to declare
+> > having a dynamically sized set of trailing elements in a structure.
+> > Kernel code should always use “flexible array members”[1] for these
+> > cases. The older style of one-element or zero-length arrays should
+> > no longer be used[2].
+> 
+> These rules apply to the kernel, but uapi is not considered part of the
+> kernel, so different rules apply.  Uapi header files should work with
+> whatever compiler that can be used for compiling userspace.
 
-[ Upstream commit 9e2f6498efbbc880d7caa7935839e682b64fe5a6 ]
+Right, userspace isn't bound by these rules, but the kernel ends up
+consuming these structures, so we need to fix them. The [0] -> []
+changes (when they are not erroneously being used within other
+structures) is valid for all compilers. Flexible arrays are C99; it's
+been 23 years. :)
 
-The selftests, when built with newer versions of clang, is found
-to have over optimized guests' ucall() function, and eliminating
-the stores for uc.cmd (perhaps due to no immediate readers). This
-resulted in the userspace side always reading a value of '0', and
-causing multiple test failures.
+But, yes, where we DO break stuff we need to workaround it, etc.
 
-As a result, prevent the compiler from optimizing the stores in
-ucall() with WRITE_ONCE().
-
-Suggested-by: Ricardo Koller <ricarkol@google.com>
-Suggested-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Message-Id: <20220615185706.1099208-1-rananta@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- tools/testing/selftests/kvm/lib/aarch64/ucall.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index 6cd91970fbad..3b2a426070c4 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@ -73,20 +73,19 @@ void ucall_uninit(struct kvm_vm *vm)
- 
- void ucall(uint64_t cmd, int nargs, ...)
- {
--	struct ucall uc = {
--		.cmd = cmd,
--	};
-+	struct ucall uc = {};
- 	va_list va;
- 	int i;
- 
-+	WRITE_ONCE(uc.cmd, cmd);
- 	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
--		uc.args[i] = va_arg(va, uint64_t);
-+		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
- 	va_end(va);
- 
--	*ucall_exit_mmio_addr = (vm_vaddr_t)&uc;
-+	WRITE_ONCE(*ucall_exit_mmio_addr, (vm_vaddr_t)&uc);
- }
- 
- uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
 -- 
-2.35.1
-
+Kees Cook
