@@ -2,219 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E6C255E700
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:31:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1109D55E9A0
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:42:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346261AbiF1Ny2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 09:54:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59246 "EHLO
+        id S1346910AbiF1N4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 09:56:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245534AbiF1Ny1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 09:54:27 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90CFD1D326;
-        Tue, 28 Jun 2022 06:54:26 -0700 (PDT)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SBLvB6024227;
-        Tue, 28 Jun 2022 13:54:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=k/7RgisgStEMFzdu3tuuzp0wc6aRaOhsr60PlETMkIw=;
- b=FLFn4VIxaP3St1LLoa3vEHnr0AIt8iYWvm0MCPVWLlvmsObRd7jZ1mAg6zV14iqeiqkr
- 2Lpr+haD6Vh1QYdwOu9qqwDDwsgz4easmJ4qk6RpUWWvhk3rHcYjYch9Kgq0oHlZ9ilK
- 8jrzZjXbHRpwvH12tW/SFIWyL+VSFUaRJ/8B3OR7R/9yowIyWWEq+K5J1sjk6B0OnuF9
- MVuDxDyGRGlPkfkwGctm3idD8ZEfTWTCriXeA/ua02WUDHkabWtdPQvHTUcUBsmXoonP
- koaFmPIT79B1aeGistqKrYtQH6InB0EKY6QjJNAIqmm7EGwNOJOseTm4SPprcaVtYUmS SQ== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3gwsyse3uj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Jun 2022 13:54:23 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 25SDp3il004885;
-        Tue, 28 Jun 2022 13:54:22 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3gwrt7yhuu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Jun 2022 13:54:22 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N4aOF7pHr+eabRlJc2tqjX+GyKrDRi1f1C2p4qNuhmEwP/tdv6NZcbgQWStGtWqYwRnVYuddmVtSr77dywj47qhrF+eJ8mOEoQ3L5cxZOYNrU+YXA33UY8iGi/WeMnvIOJVzAlMzzMSUGBfbEhmLcya0DSrn+gnJw0KfcORTFl19q3gQfq+vtyPoIvwZtrWQHdy9yd0cuNXgeusZJh8VNNydgF+Qbwol0jPqEy/U5Bcts1RpQgZEjpy6gG+gzkPKtQR9nYDSDQO+YQqgWSoM7ViOXjeQODr4X0V+v6h9UNtgNZimhz9FeAiSZp6ZaDnrJPhsqk1cT6yM/9YGloP6Zw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k/7RgisgStEMFzdu3tuuzp0wc6aRaOhsr60PlETMkIw=;
- b=jpNzIfawNVrEMwhzcxDl89dfW+lmqYI2c6mv5Sy0lBESPGeLXbaYNbqo+zkcMgcfHsscme60SQ1T1D2AGJEOec6hgwauk70QboN3NbQ0Qh6EX7sL9eetzPhe9en5JZQYQFBhriRBwcBu+VGwhimNE0f0oAxlPdGfI9NkNeaBkSv5uFn3tjfvgRwCoJ6ii6I8PnvHG2/sgv7XK9/Xel3+s8Ymz13sXAMKGlnlxXIdgzJ0Q8HR2ReRf2OlD1mQp+NC7bTgcDJNROaE37eO3XcdpBOn8UtEavVirZR7oROobAs7D31jBLEpholpmWsqpzGpzKfI8O1Syjg+3BR7UYsXQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k/7RgisgStEMFzdu3tuuzp0wc6aRaOhsr60PlETMkIw=;
- b=M1yQDnhGeJW4f7DvSyD1q7WMlm4J3ELb9frbvtmpriuciG7IZn13LCE+Hz4nJaxESjjStVwzMF0Nz7wgb5wIgbPeFdstNk3hm7ym5BroKbwBFbqos+IcVfRs/A2Fd8E36/ZGQIec5EN+jcQNiF0Y7EAgBLc1hc5AyHwqTXZj/KQ=
-Received: from BYAPR10MB3240.namprd10.prod.outlook.com (2603:10b6:a03:155::17)
- by DM6PR10MB3899.namprd10.prod.outlook.com (2603:10b6:5:1fb::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.18; Tue, 28 Jun
- 2022 13:54:21 +0000
-Received: from BYAPR10MB3240.namprd10.prod.outlook.com
- ([fe80::dc4d:56f4:a55b:4e9]) by BYAPR10MB3240.namprd10.prod.outlook.com
- ([fe80::dc4d:56f4:a55b:4e9%6]) with mapi id 15.20.5395.014; Tue, 28 Jun 2022
- 13:54:21 +0000
-Message-ID: <f7b7a7b0-9404-6b0f-99b5-346af041a479@oracle.com>
-Date:   Tue, 28 Jun 2022 09:54:19 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH] vfio: remove useless judgement
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        lizhe.67@bytedance.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lizefan.x@bytedance.com
-References: <20220627035109.73745-1-lizhe.67@bytedance.com>
- <20220627160640.7edca0dd.alex.williamson@redhat.com>
- <7217566f-9c40-ae9d-6fd6-2ef93f13f853@oracle.com>
- <20220628130350.GN23621@ziepe.ca>
-From:   Steven Sistare <steven.sistare@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20220628130350.GN23621@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR08CA0066.namprd08.prod.outlook.com
- (2603:10b6:a03:117::43) To BYAPR10MB3240.namprd10.prod.outlook.com
- (2603:10b6:a03:155::17)
+        with ESMTP id S1345871AbiF1N42 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 09:56:28 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1DE83336A;
+        Tue, 28 Jun 2022 06:56:26 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SDlZCO004943;
+        Tue, 28 Jun 2022 13:56:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=ocerpo6p3qpLGTD1Ez40+aMfMK2E6M9KcJydSKCbZpM=;
+ b=NynpNfjAd6XJd0TMTXzDj4e2254a6vRLkpM/c91twuckwOhk1ASb0QMlL1KnLQM+KbY2
+ xP3EDO8E12lF5b4RkAtq+qPnetTfLGrn6uQF3D/AfWn9dWBS9sDFpwaoOT49EOJkpHja
+ VlUZMODbRqN7LL/SuxyG5VExXaYRy1Na/90vI7fuHfo2jW8sNTOcBhYVQktDfzBwvK7C
+ Ro07hD818ubVa0pM04X3+VmM9UPWPl+NSi6MfXllFZhaWtF1coPIP2u9z2M6Y8rjbOBq
+ pcnmd0CWNXNsuUDqZyy9lAvB/TqJYXob4EzlRWKSA7qaWMOC75yJyQHJD+SwjY4LGcUs 5Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02uc899j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 13:56:26 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SDqNkI026638;
+        Tue, 28 Jun 2022 13:56:25 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02uc898g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 13:56:25 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SDoQFU025966;
+        Tue, 28 Jun 2022 13:56:23 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 3gwt08upsp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 13:56:23 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SDuKK119333426
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jun 2022 13:56:20 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EB1994C044;
+        Tue, 28 Jun 2022 13:56:19 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 86F624C040;
+        Tue, 28 Jun 2022 13:56:19 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.40])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Jun 2022 13:56:19 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com, nrb@linux.ibm.com
+Subject: [PATCH v12 00/18] KVM: s390: pv: implement lazy destroy for reboot
+Date:   Tue, 28 Jun 2022 15:56:01 +0200
+Message-Id: <20220628135619.32410-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ae1630ea-c2b5-4aa0-5da1-08da590db39d
-X-MS-TrafficTypeDiagnostic: DM6PR10MB3899:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /PQxLpxy9BlOvhTHfsJCmKdccHYZSxbGD983he6L2gEq1ntmBaoVjoGrvK6v8xEiidysBCA3yP0gqQXCcW3o6n4VioWrMsbqRQYrdvgCmd9l1mCJkLUzHeRgmekFNhNB4sl4b95ULKVzOFE1DFk+ssihicP4JXkoOKutqBU3GbbKXwvAO5+qLkNAT00CBr5fjinpLsarmHVGbWN4DVSMLzhoDOgcAu2/2yYmH02mfpsB71L6mbDn/5nayQQU3TJh2ovqZyAzKMKUdUyTN4YWJhXo+nqlPPlrTFUOAoAzc8EPUD05EWaVIeXSo32KjB5tHqH4aXNXknZi4fJFkxSYGE3lZ0M/uJXmMt2MxgycG9F9ewCK5fpS5nJXkhfVb/EjPDL8/et9BOk1M4P4YR7F7au5PAow5j39FVttu6q1cW3iI5Cm3JUO0FfzyludKhRPEkPsBf/rECHJjX/oWVoO2gPJV/xcIg3N5T1i7KRgmw/x+netsxNcdPza2UtN1Vdm1iI6tJa1UFxJvhEdzN0EswqWzOyLxxu0LALYA7GZuWhh04CxWf3HmHxbVk8m5AZRpHj41p2ii5GgaVk+ySfG1sMWi+afsw9YvFKaOQ79XaTX4hIwmEUbrMC3OX8e3Bw8czzweETEcIOZQrs2EgC/6YrSuakyave0zcYn47KHI+TMC4/A59uG/DXZtboP3tDV/Kc10DVyaM7VvrLkj2bUSjIHuvFwYv54gaPkrqJ+RLbpHpEEtxGgQ1F6ajJ5HU6gyugn5NWfqYsErhF5tHV5yLPsf9pFPgPGN32Na92XvdMNsXCCPb+8rS3GQU8nqbI9
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB3240.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(376002)(396003)(39860400002)(346002)(136003)(366004)(44832011)(5660300002)(36756003)(8676002)(316002)(66946007)(6916009)(8936002)(31686004)(2906002)(186003)(86362001)(6506007)(4326008)(66556008)(478600001)(6486002)(6512007)(41300700001)(83380400001)(26005)(53546011)(2616005)(38100700002)(66476007)(31696002)(36916002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cEViUDc4SGhvK0IwdEVZY2M2c0lINU1acHF0R1pZQzB2U2pUa1JDYzh0blA4?=
- =?utf-8?B?MGFjUVdBcGg2YWZWd3MzVThGZldaSVRHWHpxSmdPOHFVSUZLTk5paDF1UDhz?=
- =?utf-8?B?clVyWDRiNnJyNDVxUHF0VTNweEM3Q0l4WkZQN0Jva3pLL2k3OTltbVd5YTVm?=
- =?utf-8?B?OWMwRjhQQlBja1R0a0lzWTVVR1FTNHNnSDcxckdUcXlZOTYwalgyRjJCNGgz?=
- =?utf-8?B?b05wK04vL3FVN0VUaEZydkpGMCsrR2FOZ01WMDg2V2IrcDVhZE5BRzlxeU15?=
- =?utf-8?B?NytMQ3FyU1l3Yzc4VWhCZS9aVkc0c0lpZjB0VWpOeDN6TDJnSjhBU0o2aldi?=
- =?utf-8?B?VmVpOEc1TFJqcnNKUE9peTdWbGpjOVJuQU9jenNJSDhvSW9KMGNSMStUQUZQ?=
- =?utf-8?B?RFgyR0JURERReklFL2svVS9sOTlIRWtFdlh0ZFBRYVJCM3pMdGc3RnlYSThH?=
- =?utf-8?B?ZnJicEtCS0FTREZoc0s1bXdCOFF5RVV1RFZ0OWNKRUx0Si9nT0U2MnlHcEI5?=
- =?utf-8?B?cWFQVElGcUhLQXFaVWh2Yll6UGgzdGplZ0JsVjV1RDBuMUZ1Z2luOWFGb0Na?=
- =?utf-8?B?RDBmaWgvaE5oZmFEL2R3S1k3M2IzQ1VzUFdlSXFpbCtYMk11WDNYcFB2VS9a?=
- =?utf-8?B?czFtaWdHR0c3cHlUeUNwbVJ4aHkvWUFHQkswb0FwVkZjRkJybFNvb1JHcVlU?=
- =?utf-8?B?YjRFT055KzNRZ0F5S0Z6SjNMNnpKL2RYVkNiSUVRZkxKKzR2MkpCVm9lNE5m?=
- =?utf-8?B?ZHNzWXdDZ3dnTnl2RUhoWUs3RWZsR0pYSFFYRGFYMVNDMmpyQk1FWkVNcGkv?=
- =?utf-8?B?eDJFRWxGOTloelI2UWJ5OWkrWlkzamM4bUN3bndGTzVISGRxZDEvRkJzbVRV?=
- =?utf-8?B?Sk0weUsyaFFjWk5jM2hwU0JqR1JzcERqMkJ1ZXJrUVByWlYzYVlvWjZYTWVr?=
- =?utf-8?B?OE40OWoySyt5WTBlc3VBaVV5UUUvOWlHUGZDZ3FGVGVDSUJRVUxrb0htdGVz?=
- =?utf-8?B?WFEwUjNBcWYzNk1ZRkdRejhtNGUvdzlXYjVjTXFxTnBWR2IwZ0tkR0RpWjF0?=
- =?utf-8?B?cW9tYUQ2WEppWUZ4VU9NWFNFcm9DUTVOa2xsWFYzSndPc2hkUUdsSkgzLzFT?=
- =?utf-8?B?U0RLY1hUdkxrYjVTVjJXODQ5Sm9zNmRCb0VBSnRqWGpnOUZ3UkxaQW81ZDlt?=
- =?utf-8?B?Z1h2dnR6Tlg2aHEyQXYvelpYOEEyLy9IWTA5L2hsenJIeGprZ1Z5dEdhWnh1?=
- =?utf-8?B?TldWS2lwQkgwdnYzWU9VQUN2NUVpSXRFUVNCSHlEVUpyMFlEVlRCRDZWY2NE?=
- =?utf-8?B?citOK2p5NUFhc054U2c2RzFCOFhuOGQ5VmFwaEQ4S2I5UVdDWWlOMXk3L0Fm?=
- =?utf-8?B?S2k2ZU1oMVN0NzM2T3cvL3IweFVDaHBRQ043dUZiZXhsZHFwTW1Ca3VZaDhl?=
- =?utf-8?B?Rm1HSDA5ZTBUL1RrQmYyQWZjWndQbmViRWYxSWRoTC82dTVIaWNnaVBPSi9h?=
- =?utf-8?B?ZDByYTl4dTFYUzJ5RVlWQ0Vvb2NQSWdjV3k5bkFCQWFaSk5zYmZrNWNaL2R1?=
- =?utf-8?B?SVFrcm9IZlhvYjNPRUpzNkNUaE9iNjNRaGczaGovR01TNXdOeEVTQUZURUhR?=
- =?utf-8?B?ektUMkFyUDJaYjRoaTB3a3lLUmRMdXBzUGZXM1lKMFdCSVE1ZXRic1BnUFBQ?=
- =?utf-8?B?YkYwS3hlb3BvVjB1dWppVTVuNXFvaXMvczA4Tit6TlNUYW1sTCt5aERNMkJH?=
- =?utf-8?B?emhZejc1VUdmTnhtL3lqajNxNmxDOGRSdllBcUhiZGJvVTdxbU02NjhuSVdE?=
- =?utf-8?B?eFpCbWhJNkVLNllMVm0xNnBkMEN6SUE5emNnMkh3OVdTTG1mRjFvUXlTS0NQ?=
- =?utf-8?B?K1Y4UFNhN0RqYXpXTnN1WFJaQ0g5WkJ6RlJ1b1FQekQzcHI0c1JWQ2V3WFk4?=
- =?utf-8?B?VVpGUnMxbDBqS1JkZFc0YW1qdSs4dGdJWk1UL2tVZGZjZ2JuRTNJQ0JGbENk?=
- =?utf-8?B?Z0gwRTdnOEZuTEx2Vms2LzZYVi9FdU4vengzdmVJaXhOSmU4Z1NySzlET2h4?=
- =?utf-8?B?Rmo1K2ErR2JTUnZYdnZCOHV6RVI5REMzWG5qUDlnczlucVpuNndiL0ZkQUdX?=
- =?utf-8?B?NU0reFg1cVBrNzM4R3g3MHdxQWl5YUpkTjBOTmpIeFVjY1lGdGtlamJqTjZu?=
- =?utf-8?B?Umc9PQ==?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae1630ea-c2b5-4aa0-5da1-08da590db39d
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB3240.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2022 13:54:21.1103
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jp1+0No0pkZhXkDrwy0ZYjx7IAA1G4PU5/eUmiOnTdUg8CRXCRmungLxpsj3t1PD1hiZrcrOvsWhypALeF4EgD/JGudPViTC9/jpW1u4Sq8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB3899
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.517,18.0.883
- definitions=2022-06-28_07:2022-06-28,2022-06-28 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
- mlxscore=0 phishscore=0 malwarescore=0 adultscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206280058
-X-Proofpoint-ORIG-GUID: cXt51qLKrjjMjCIw3GSZPi2XmHhXP3YA
-X-Proofpoint-GUID: cXt51qLKrjjMjCIw3GSZPi2XmHhXP3YA
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bLnBD9-Eo_sZlOnXtSow5zhL-Z_i5ire
+X-Proofpoint-ORIG-GUID: obsKCcvMP9IfeOEMLFvKM4d912_w4T86
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-28_07,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1011
+ malwarescore=0 impostorscore=0 spamscore=0 priorityscore=1501 bulkscore=0
+ adultscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206280057
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/28/2022 9:03 AM, Jason Gunthorpe wrote:
-> On Tue, Jun 28, 2022 at 08:48:11AM -0400, Steven Sistare wrote:
->> For cpr, old qemu directly exec's new qemu, so task does not change.
->>
->> To support fork+exec, the ownership test needs to be deleted or modified.
->>
->> Pinned page accounting is another issue, as the parent counts pins in its
->> mm->locked_vm.  If the child unmaps, it cannot simply decrement its own
->> mm->locked_vm counter.
-> 
-> It is fine already:
-> 
-> 	mm = async ? get_task_mm(dma->task) : dma->task->mm;
-> 	if (!mm)
-> 		return -ESRCH; /* process exited */
-> 
-> 	ret = mmap_write_lock_killable(mm);
-> 	if (!ret) {
-> 		ret = __account_locked_vm(mm, abs(npage), npage > 0, dma->task,
-> 					  dma->lock_cap);
-> 
-> Each 'dma' already stores a pointer to the mm that sourced it and only
-> manipulates the counter in that mm. AFAICT 'current' is not used
-> during unmap.
-Ah yes, no problem then.
-Limits become looser, though, as the child can pin an additional RLIMIT_MEMLOCK
-of pages.  That is the natural consequence of mm->locked_vm being a per process limit, 
-but probably not what the application wants.  Another argument for switching to 
-user->locked_vm.
+Previously, when a protected VM was rebooted or when it was shut down,
+its memory was made unprotected, and then the protected VM itself was
+destroyed. Looping over the whole address space can take some time,
+considering the overhead of the various Ultravisor Calls (UVCs). This
+means that a reboot or a shutdown would take a potentially long amount
+of time, depending on the amount of used memory.
 
->> As you and I have discussed, the count is also wrong in the direct
->> exec model, because exec clears mm->locked_vm.
-> 
-> Really? Yikes, I thought exec would generate a new mm?
+This patchseries implements a deferred destroy mechanism for protected
+guests. When a protected guest is destroyed, its memory can be cleared
+in background, allowing the guest to restart or terminate significantly
+faster than before.
 
-Yes, exec creates a new mm with locked_vm = 0.  The old locked_vm count is dropped
-on the floor.  The existing dma points to the same task, but task->mm has changed,
-and dma->task->mm->locked_vm is 0.  An unmap ioctl drives it negative.
+There are 2 possibilities when a protected VM is torn down:
+* it still has an address space associated (reboot case)
+* it does not have an address space anymore (shutdown case)
 
-I have prototyped a few possible fixes.  One changes vfio to use user->locked_vm.
-Another changes to mm->pinned_vm and preserves it during exec.  A third preserves
-mm->locked_vm across exec, but that is not practical, because mm->locked_vm mixes
-vfio pins and mlocks.  The mlock component must be cleared during exec, and we don't 
-have a separate count for it.
+For the reboot case, two new commands are available for the
+KVM_S390_PV_COMMAND:
 
->> I am thinking vfio could count pins in struct user locked_vm to handle both 
->> models.  The user struct and its count would persist across direct exec,
->> and be shared by parent and child for fork+exec.  However, that does change
->> the RLIMIT_MEMLOCK value that applications must set, because the limit must
->> accommodate vfio plus other sub-systems that count in user->locked_vm, which
->> includes io_uring, skbuff, xdp, and perf.  Plus, the limit must accommodate all
->> processes of that user, not just a single process.
-> 
-> We discussed this, for iommufd we are currently planning to go this
-> way and will See How it Goes.
+KVM_PV_ASYNC_CLEANUP_PREPARE: prepares the current protected VM for
+asynchronous teardown. The current VM will then continue immediately
+as non-protected. If a protected VM had already been set aside without
+starting the teardown process, this call will fail. In this case the
+userspace process should issue a normal KVM_PV_DISABLE
 
-Yes, I have followed that thread with interest.
+KVM_PV_ASYNC_CLEANUP_PERFORM: tears down the protected VM previously
+set aside for asychronous teardown. This PV command should ideally be
+issued by userspace from a separate thread. If a fatal signal is
+received (or the process terminates naturally), the command will
+terminate immediately without completing. The rest of the normal KVM
+teardown process will take care of properly cleaning up all leftovers.
 
-- Steve
+The idea is that userspace should first issue the
+KVM_PV_ASYNC_CLEANUP_PREPARE command, and in case of success, create a
+new thread and issue KVM_PV_ASYNC_CLEANUP_PERFORM from there. This also
+allows for proper accounting of the CPU time needed for the
+asynchronous teardown.
+
+This means that the same address space can have memory belonging to
+more than one protected guest, although only one will be running, the
+others will in fact not even have any CPUs.
+
+The shutdown case should be dealt with in userspace (e.g. using
+clone(CLONE_VM)).
+
+A module parameter is also provided to disable the new functionality,
+which is otherwise enabled by default. This should not be an issue
+since the new functionality is opt-in anyway. This is mainly thought to
+aid debugging.
+
+v11->v12
+* rebase
+* fix and improve comments and documentation
+* introduce the module parameter at the end of the series
+* merge old patch 14 and 15
+* minor cosmetic changes to improve readability
+* renamed some functions and constants (including in uapi)
+* use the lock instead of xchg
+* kvm_s390_pv_deinit_cleanup_all will now cleanup all leftovers, while
+  kvm_s390_pv_deinit will destroy the current protected VM without
+  further action
+* kvm_s390_pv_deinit_cleanup_all now called unconditionally when KVM
+  is being torn down
+* fix small memory leak if kvm_s390_pv_deinit_vm_fast fails
+
+v10->v11
+* rebase
+* improve comments and patch descriptions
+* rename s390_remove_old_asce to s390_unlist_old_asce
+* rename DESTROY_LOOP_THRESHOLD to GATHER_GET_PAGES
+* rename module parameter lazy_destroy to async_destroy
+* move the WRITE_ONCE to be right after the UVC in patch 13
+* improve handling leftover secure VMs in patch 14
+* lock only when needed in patch 15, instead of always locking and then
+  unlocking and locking again
+* refactor should_export_before_import to make it more readable
+
+v9->v10
+* improved and expanded comments, fix typos
+* add new patch: perform destroy configuration UVC before clearing
+  memory for unconditional deinit_vm (instead of afterwards)
+* explicitly initialize kvm->arch.pv.async_deinit in kvm_arch_init_vm
+* do not try to call the destroy fast UVC in the MMU notifier if it is
+  not available
+
+v8->v9
+* rebased
+* added dependency on MMU_NOTIFIER for KVM in arch/s390/kvm/Kconfig
+* add support for the Destroy Secure Configuration Fast UVC
+* minor fixes
+
+v7->v8
+* switched patches 8 and 9
+* improved comments, documentation and patch descriptions
+* remove mm notifier when the struct kvm is torn down
+* removed useless locks in the mm notifier
+* use _ASCE_ORIGIN instead of PAGE_MASK for ASCEs
+* cleanup of some compiler warnings
+* remove some harmless but useless duplicate code
+* the last parameter of __s390_uv_destroy_range is now bool
+* rename the KVM capability to KVM_CAP_S390_PROTECTED_ASYNC_DISABLE
+
+v6->v7
+* moved INIT_LIST_HEAD inside spinlock in patch 1
+* improved commit messages in patch 2
+* added missing locks in patch 3
+* added and expanded some comments in patch 11
+* rebased
+
+v5->v6
+* completely reworked the series
+* removed kernel thread for asynchronous teardown
+* added new commands to KVM_S390_PV_COMMAND ioctl
+
+v4->v5
+* fixed and improved some patch descriptions
+* added some comments to better explain what's going on
+* use vma_lookup instead of find_vma
+* rename is_protected to protected_count since now it's used as a counter
+
+v3->v4
+* added patch 2
+* split patch 3
+* removed the shutdown part -- will be a separate patchseries
+* moved the patch introducing the module parameter
+
+v2->v3
+* added definitions for CC return codes for the UVC instruction
+* improved make_secure_pte:
+  - renamed rc to cc
+  - added comments to explain why returning -EAGAIN is ok
+* fixed kvm_s390_pv_replace_asce and kvm_s390_pv_remove_old_asce:
+  - renamed
+  - added locking
+  - moved to gmap.c
+* do proper error management in do_secure_storage_access instead of
+  trying again hoping to get a different exception
+* fix outdated patch descriptions
+
+v1->v2
+* rebased on a more recent kernel
+* improved/expanded some patch descriptions
+* improves/expanded some comments
+* added patch 1, which prevents stall notification when the system is
+  under heavy load.
+* rename some members of struct deferred_priv to improve readability
+* avoid an use-after-free bug of the struct mm in case of shutdown
+* add missing return when lazy destroy is disabled
+* add support for OOM notifier
+
+Claudio Imbrenda (18):
+  KVM: s390: pv: leak the topmost page table when destroy fails
+  KVM: s390: pv: handle secure storage violations for protected guests
+  KVM: s390: pv: handle secure storage exceptions for normal guests
+  KVM: s390: pv: refactor s390_reset_acc
+  KVM: s390: pv: usage counter instead of flag
+  KVM: s390: pv: add export before import
+  KVM: s390: pv: clear the state without memset
+  KVM: s390: pv: Add kvm_s390_cpus_from_pv to kvm-s390.h and add
+    documentation
+  KVM: s390: pv: add mmu_notifier
+  s390/mm: KVM: pv: when tearing down, try to destroy protected pages
+  KVM: s390: pv: refactoring of kvm_s390_pv_deinit_vm
+  KVM: s390: pv: destroy the configuration before its memory
+  KVM: s390: pv: asynchronous destroy for reboot
+  KVM: s390: pv: api documentation for asynchronous destroy
+  KVM: s390: pv: add KVM_CAP_S390_PROTECTED_ASYNC_DISABLE
+  KVM: s390: pv: avoid export before import if possible
+  KVM: s390: pv: support for Destroy fast UVC
+  KVM: s390: pv: module parameter to fence asynchronous destroy
+
+ Documentation/virt/kvm/api.rst      |  31 ++-
+ arch/s390/include/asm/gmap.h        |  39 ++-
+ arch/s390/include/asm/kvm_host.h    |   4 +
+ arch/s390/include/asm/mmu.h         |   2 +-
+ arch/s390/include/asm/mmu_context.h |   2 +-
+ arch/s390/include/asm/pgtable.h     |  21 +-
+ arch/s390/include/asm/uv.h          |  11 +
+ arch/s390/kernel/uv.c               |  85 ++++++
+ arch/s390/kvm/Kconfig               |   1 +
+ arch/s390/kvm/kvm-s390.c            | 101 +++++++-
+ arch/s390/kvm/kvm-s390.h            |   4 +
+ arch/s390/kvm/pv.c                  | 384 +++++++++++++++++++++++++++-
+ arch/s390/mm/fault.c                |  23 +-
+ arch/s390/mm/gmap.c                 | 177 +++++++++++--
+ include/uapi/linux/kvm.h            |   3 +
+ 15 files changed, 825 insertions(+), 63 deletions(-)
+
+-- 
+2.36.1
+
