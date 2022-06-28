@@ -2,93 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A72355E4F1
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:39:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B536A55E6AF
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:30:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346730AbiF1NhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 09:37:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40308 "EHLO
+        id S231629AbiF1NkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 09:40:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240523AbiF1Ng7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 09:36:59 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EFA52A94E
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:36:54 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id i17so19855436qvo.13
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:36:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gN4ZNyT9GRZ46Vwx3CUzNgwGxKE3ptwelsb3O/2waMc=;
-        b=SRPS2zIET11DP06FAnMANUW30rX+F+KLnmvgpItTZuHDiHMYbx191l+udZ0BIKVo+p
-         DUqKNFcRnPxEdciA9v/rjMoUuUABeinU5a59o91m7mO0ei+LjGwfeqP1sFK6bST4r2Sc
-         +kwNrequilw+r3whlSvEqjUrw7uEou8aBEv26lUqmckZs7QEO1gxqNAIdKmR6ixdoBBW
-         VwXL+VitONeiHER4+6czyOuvux/gSa01CsajOGl6xQeKgTZdOU9/PF5ai6yeP3/8Na6A
-         VkyCaiWAoLiX3IML+rZ/qAH9obhof6Stg3VEpk4n7D6sOfmWV6A4zI2itZ9nI+NyrBEn
-         GAtg==
+        with ESMTP id S238222AbiF1NkJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 09:40:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B0218240B6
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656423607;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JI0SMOllATTHDDnFWqGpyGyrKVYRMdL/R18gEZANfRM=;
+        b=N34XgfuTdposPCi0F6k6e4iuPT82msTP2J4ss2z7m/um3AtaLhefhSKPt1tBD0K8XGMBKl
+        dGl3VwoiOZCTdPvwm2CAxh5o6WnVizKMRpVZGlAahX2bYrEnBu9ojLXMunA/HbuwxoHnAK
+        9Er1GQfW+qlcQfiIJMV/WOuTPJwQskI=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-665-94DBIEtCPva4ZoEclzftiQ-1; Tue, 28 Jun 2022 09:40:06 -0400
+X-MC-Unique: 94DBIEtCPva4ZoEclzftiQ-1
+Received: by mail-qv1-f71.google.com with SMTP id m7-20020ad45dc7000000b0047042480dbfso12250753qvh.9
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:40:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gN4ZNyT9GRZ46Vwx3CUzNgwGxKE3ptwelsb3O/2waMc=;
-        b=Z0xzty2+sdeC/wL/FKeNkwNjb09vM9uz7NLRCEj3I+RtwYpjZxFvaFtqBzgp+YAyZQ
-         m1cND+/dHl15kGkLpAif4bRSJnsqGMVsQK/536di+R1mpAJTp9knXqUfzjMm6C3J2PYX
-         e4fDvJq7vsXONsi/KpERtcv16hjR2cKQ73JLSvdcjJoo+5n+7f5BBEtQ8dj3Zt3n9zXP
-         KwURCru1yZicK7tFxXX+DY/SF5RM+D0xmahYNicjPWWXEED3555mQ8/fsHtsVSSnv0Tj
-         E3jk9Iyjc6Xgyo0PyQy0ysQVAkAV9P2fCrV3Jl0lfnyLVmjgi+Db77df090wylrbCR0H
-         OZRQ==
-X-Gm-Message-State: AJIora+pOGXgHJEw++8CnjfrIA+8011J97PUxRsUc4HKppjP5WjTBjWP
-        BLFvXaKclhaBXMJEqb5cvlTQOA==
-X-Google-Smtp-Source: AGRyM1uooXTVlKXYemR9EvbrrQp4i2XA4BpQT09bjvN7I6xIwm3cKCnpXCNHNGqwd+HxVz52pv3Omw==
-X-Received: by 2002:ac8:5b0d:0:b0:31b:f519:4107 with SMTP id m13-20020ac85b0d000000b0031bf5194107mr1237416qtw.331.1656423413317;
-        Tue, 28 Jun 2022 06:36:53 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id s10-20020a05620a29ca00b006a79479657fsm708363qkp.108.2022.06.28.06.36.52
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=JI0SMOllATTHDDnFWqGpyGyrKVYRMdL/R18gEZANfRM=;
+        b=ts6hnXJOC3rRsl88NPsAmi1b41Kqu6AAb50j8kumHXHGcW4wLlUewvyjZIgDz6kHM6
+         I54VevPfhBJrDUNj88ftwd5YclFTpcs+XHUjsXWhTPed7ZtNJY0L6QQsKYFCqQZbWRwK
+         RubJadp0vks8/NC+WtjjTI/rdz0V9MlqyCaFgielvOcNFwqeIjLUJquJlpNaZGCOKtDb
+         5ttyR2WbcWJwQ2ocT5pqAVku5WSWqxYKDpFgUQKHiMHAuEqQPofm10CvOXcWMHsSqWqD
+         EekTHq3t465HRYyQEC7VRhPHT/+A8n5KeBpQGKD5LBBBzdMokJURMeWaek1j0/xAiuBX
+         r3ug==
+X-Gm-Message-State: AJIora9NPugme3rVjp+AhcEu8L76MC/U8cCMqdtaFqngBm/q5wBS/G02
+        FAF5VpKgYducuTVjAgdbKXr626K8LO6miBojQrtshyFkos4VvWcQqKLIg/q9JoHyqOAzoEhEqQc
+        5PQZZONuun9b5
+X-Received: by 2002:a05:6214:509c:b0:470:529a:1d76 with SMTP id kk28-20020a056214509c00b00470529a1d76mr3556345qvb.7.1656423605651;
+        Tue, 28 Jun 2022 06:40:05 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uR1KivmrgHGt9XzHfmrBurNzgAa+UdSQyz20DSSdlK3mKA/+nt175Sp7jgxeEBsCjfL+bPrw==
+X-Received: by 2002:a05:6214:509c:b0:470:529a:1d76 with SMTP id kk28-20020a056214509c00b00470529a1d76mr3556306qvb.7.1656423605246;
+        Tue, 28 Jun 2022 06:40:05 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-149.retail.telecomitalia.it. [87.11.6.149])
+        by smtp.gmail.com with ESMTPSA id bl10-20020a05620a1a8a00b006a67eb4610fsm11214694qkb.116.2022.06.28.06.39.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 06:36:52 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1o6BOd-002vAA-VA; Tue, 28 Jun 2022 10:36:51 -0300
-Date:   Tue, 28 Jun 2022 10:36:51 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Daniel Borkmann <daniel@iogearbox.net>,
-        Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, dm-devel@redhat.com,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, io-uring@vger.kernel.org,
-        lvs-devel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        kasan-dev@googlegroups.com, linux-mmc@vger.kernel.org,
-        nvdimm@lists.linux.dev, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, linux-perf-users@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        v9fs-developer@lists.sourceforge.net, linux-rdma@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] treewide: uapi: Replace zero-length arrays with
- flexible-array members
-Message-ID: <20220628133651.GO23621@ziepe.ca>
-References: <20220627180432.GA136081@embeddedor>
- <6bc1e94c-ce1d-a074-7d0c-8dbe6ce22637@iogearbox.net>
- <20220628004052.GM23621@ziepe.ca>
- <20220628005825.GA161566@embeddedor>
- <20220628022129.GA8452@embeddedor>
+        Tue, 28 Jun 2022 06:40:04 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 15:39:55 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
+Cc:     netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        lulu@redhat.com, tanuj.kamde@amd.com,
+        Si-Wei Liu <si-wei.liu@oracle.com>, Piotr.Uminski@intel.com,
+        habetsm.xilinx@gmail.com, gautam.dawar@amd.com, pabloc@xilinx.com,
+        Zhu Lingshan <lingshan.zhu@intel.com>, lvivier@redhat.com,
+        Longpeng <longpeng2@huawei.com>, dinang@xilinx.com,
+        martinh@xilinx.com, martinpo@xilinx.com,
+        Eli Cohen <elic@nvidia.com>, ecree.xilinx@gmail.com,
+        Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, hanand@xilinx.com,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Zhang Min <zhang.min9@zte.com.cn>
+Subject: Re: [PATCH v6 1/4] vdpa: Add suspend operation
+Message-ID: <20220628133955.sj32sfounu4byggl@sgarzare-redhat>
+References: <20220623160738.632852-1-eperezma@redhat.com>
+ <20220623160738.632852-2-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20220628022129.GA8452@embeddedor>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220623160738.632852-2-eperezma@redhat.com>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,27 +94,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 04:21:29AM +0200, Gustavo A. R. Silva wrote:
+On Thu, Jun 23, 2022 at 06:07:35PM +0200, Eugenio Pérez wrote:
+>This operation is optional: It it's not implemented, backend feature bit
+>will not be exposed.
+>
+>Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+>---
+> include/linux/vdpa.h | 4 ++++
+> 1 file changed, 4 insertions(+)
+>
+>diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+>index 7b4a13d3bd91..d282f464d2f1 100644
+>--- a/include/linux/vdpa.h
+>+++ b/include/linux/vdpa.h
+>@@ -218,6 +218,9 @@ struct vdpa_map_file {
+>  * @reset:			Reset device
+>  *				@vdev: vdpa device
+>  *				Returns integer: success (0) or error (< 0)
+>+ * @suspend:			Suspend or resume the device (optional)
+                                            ^
+IIUC we removed the resume operation (that should be done with reset),
+so should we update this documentation?
 
-> > > Though maybe we could just switch off -Wgnu-variable-sized-type-not-at-end  during configuration ?
+Thanks,
+Stefano
 
-> We need to think in a different strategy.
+>+ *				@vdev: vdpa device
+>+ *				Returns integer: success (0) or error (< 0)
+>  * @get_config_size:		Get the size of the configuration space includes
+>  *				fields that are conditional on feature bits.
+>  *				@vdev: vdpa device
+>@@ -319,6 +322,7 @@ struct vdpa_config_ops {
+> 	u8 (*get_status)(struct vdpa_device *vdev);
+> 	void (*set_status)(struct vdpa_device *vdev, u8 status);
+> 	int (*reset)(struct vdpa_device *vdev);
+>+	int (*suspend)(struct vdpa_device *vdev);
+> 	size_t (*get_config_size)(struct vdpa_device *vdev);
+> 	void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
+> 			   void *buf, unsigned int len);
+>-- 
+>2.31.1
+>
 
-I think we will need to switch off the warning in userspace - this is
-doable for rdma-core.
-
-On the other hand, if the goal is to enable the array size check
-compiler warning I would suggest focusing only on those structs that
-actually hit that warning in the kernel. IIRC infiniband doesn't
-trigger it because it just pointer casts the flex array to some other
-struct.
-
-It isn't actually an array it is a placeholder for a trailing
-structure, so it is never indexed.
-
-This is also why we hit the warning because the convient way for
-userspace to compose the message is to squash the header and trailer
-structs together in a super struct on the stack, then invoke the
-ioctl.
-
-Jason 
