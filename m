@@ -2,85 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD11455E767
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:32:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA81655E685
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:27:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347018AbiF1N4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 09:56:45 -0400
+        id S1347002AbiF1N4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 09:56:42 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346918AbiF1N4a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346902AbiF1N4a (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 28 Jun 2022 09:56:30 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F377B3335A;
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5083336F;
         Tue, 28 Jun 2022 06:56:29 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SDlSYG019251;
-        Tue, 28 Jun 2022 13:56:29 GMT
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SDlD1P020642;
+        Tue, 28 Jun 2022 13:56:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=nVxjbhDKJVU2SodTU+YqCP2t/lJgulhuO+wfOpNsDb8=;
- b=r9SluuKrRAZJGKnj7VQ44vd5gbEaGAILQE8tMrhYuE/YAS/onPwfLJrhc5ngq1doz6an
- 94RW+PNUZf6r3x/zZ6eSEbsbJizUlPiraUma6VTkLNDlEy01OYOsHyZpPKRdfLFqdJAY
- lvZ4pycoAHW7UgIqv8WwcTmx3XPiH9mPMHLwQIxT2b2KR1yFLEOI1gfdxqKR+/PiySFv
- XWKVVBVPwg9/ReTbsn8lS/rAq+X3lk6pVVFUxdBugG/3gKwq9LQdKt8UqFKzeoQzzskB
- WCRJ3IZSPADml//WkRR3YYnuwxi0kjETB4mzzhT2ePJIlnFUUnothogFzqC4oKUoQ6IK RA== 
+ bh=LwPERVQ/LeDFvhzd+k/ubf+EGcl/b1sGE+qUB8TH8mQ=;
+ b=NxXECasZPPHw92l22BEEoO7rbaQJdNjU/jM71MOMP/Ktv/CN7I7r9bWQenNl0m1Or/3W
+ 2mYEoEORQAzDDF1BoWbkUZ4I9Q2Y9W22KV65K9A0+IjuMa8pyP0k+Nxj1LUQtCpkQyrL
+ TqxVh8qf1YAnHorkTfWdLsz2dIuTRYllwiBCigdPO9e6PY0sLSh0BGwk0hJaNfrzXB+i
+ BHJ8Xr8UVE3vNuj1UEipn3QL4xMXHyYbxDzXW/+2RVnwOhnW8CEf3urfSR0+f83mT4i1
+ xxc3fft1NnUknZ4Q2W7a8rpibjWRnlXLpLYXU/PDW0ETgHNYSdax83LneV6N5DUcn1Jv BQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02u20aj9-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02u7rawt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 28 Jun 2022 13:56:28 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SDmT8v026234;
-        Tue, 28 Jun 2022 13:56:28 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02u20agv-1
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SDlsJl023175;
+        Tue, 28 Jun 2022 13:56:27 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02u7ravf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 13:56:28 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SDptoG004903;
-        Tue, 28 Jun 2022 13:56:25 GMT
+        Tue, 28 Jun 2022 13:56:27 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SDpoCj011099;
+        Tue, 28 Jun 2022 13:56:26 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 3gwt093pt1-1
+        by ppma03fra.de.ibm.com with ESMTP id 3gwt08upku-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 28 Jun 2022 13:56:25 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SDuMYV20054288
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SDuMXB20513104
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 28 Jun 2022 13:56:22 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 236B44C04A;
+        by IMSVA (Postfix) with ESMTP id 8E4B54C046;
         Tue, 28 Jun 2022 13:56:22 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BEEDC4C050;
-        Tue, 28 Jun 2022 13:56:21 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 339344C04E;
+        Tue, 28 Jun 2022 13:56:22 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.40])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 28 Jun 2022 13:56:21 +0000 (GMT)
+        Tue, 28 Jun 2022 13:56:22 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
         pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
         mimu@linux.ibm.com, nrb@linux.ibm.com
-Subject: [PATCH v12 05/18] KVM: s390: pv: usage counter instead of flag
-Date:   Tue, 28 Jun 2022 15:56:06 +0200
-Message-Id: <20220628135619.32410-6-imbrenda@linux.ibm.com>
+Subject: [PATCH v12 06/18] KVM: s390: pv: add export before import
+Date:   Tue, 28 Jun 2022 15:56:07 +0200
+Message-Id: <20220628135619.32410-7-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220628135619.32410-1-imbrenda@linux.ibm.com>
 References: <20220628135619.32410-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gAS6Jzol-nAPJD0MupFmj0VnFTFkkIfK
-X-Proofpoint-ORIG-GUID: URbEtE5MzdHv-ReLT3fOfT3vu08WmSF2
+X-Proofpoint-GUID: HA0rlM-8Nih7hb1FaPCMs-KJND3LJgT5
+X-Proofpoint-ORIG-GUID: p9lk2BvbK6j8cVaAOErGPwVsCqgoUaod
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-06-28_07,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- malwarescore=0 phishscore=0 priorityscore=1501 mlxlogscore=999
- suspectscore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 priorityscore=1501 mlxscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=999 phishscore=0 impostorscore=0 adultscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2204290000 definitions=main-2206280057
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -91,101 +91,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the new protected_count field as a counter instead of the old
-is_protected flag. This will be used in upcoming patches.
+Due to upcoming changes, it will be possible to temporarily have
+multiple protected VMs in the same address space, although only one
+will be actually active.
 
-Increment the counter when a secure configuration is created, and
-decrement it when it is destroyed. Previously the flag was set when the
-set secure parameters UVC was performed.
+In that scenario, it is necessary to perform an export of every page
+that is to be imported, since the hardware does not allow a page
+belonging to a protected guest to be imported into a different
+protected guest.
+
+This also applies to pages that are shared, and thus accessible by the
+host.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- arch/s390/include/asm/mmu.h         |  2 +-
- arch/s390/include/asm/mmu_context.h |  2 +-
- arch/s390/include/asm/pgtable.h     |  2 +-
- arch/s390/kvm/pv.c                  | 12 +++++++-----
- 4 files changed, 10 insertions(+), 8 deletions(-)
+ arch/s390/kernel/uv.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/s390/include/asm/mmu.h b/arch/s390/include/asm/mmu.h
-index 82aae78e1315..1572b3634cdd 100644
---- a/arch/s390/include/asm/mmu.h
-+++ b/arch/s390/include/asm/mmu.h
-@@ -18,7 +18,7 @@ typedef struct {
- 	unsigned long asce_limit;
- 	unsigned long vdso_base;
- 	/* The mmu context belongs to a secure guest. */
--	atomic_t is_protected;
-+	atomic_t protected_count;
- 	/*
- 	 * The following bitfields need a down_write on the mm
- 	 * semaphore when they are written to. As they are only
-diff --git a/arch/s390/include/asm/mmu_context.h b/arch/s390/include/asm/mmu_context.h
-index c7937f369e62..2a38af5a00c2 100644
---- a/arch/s390/include/asm/mmu_context.h
-+++ b/arch/s390/include/asm/mmu_context.h
-@@ -26,7 +26,7 @@ static inline int init_new_context(struct task_struct *tsk,
- 	INIT_LIST_HEAD(&mm->context.gmap_list);
- 	cpumask_clear(&mm->context.cpu_attach_mask);
- 	atomic_set(&mm->context.flush_count, 0);
--	atomic_set(&mm->context.is_protected, 0);
-+	atomic_set(&mm->context.protected_count, 0);
- 	mm->context.gmap_asce = 0;
- 	mm->context.flush_mm = 0;
- #ifdef CONFIG_PGSTE
-diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
-index a397b072a580..f16403ba81ec 100644
---- a/arch/s390/include/asm/pgtable.h
-+++ b/arch/s390/include/asm/pgtable.h
-@@ -525,7 +525,7 @@ static inline int mm_has_pgste(struct mm_struct *mm)
- static inline int mm_is_protected(struct mm_struct *mm)
- {
- #ifdef CONFIG_PGSTE
--	if (unlikely(atomic_read(&mm->context.is_protected)))
-+	if (unlikely(atomic_read(&mm->context.protected_count)))
- 		return 1;
- #endif
- 	return 0;
-diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-index bcbe10862f9f..f3134d79f8e1 100644
---- a/arch/s390/kvm/pv.c
-+++ b/arch/s390/kvm/pv.c
-@@ -166,7 +166,8 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
- 	cc = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
- 			   UVC_CMD_DESTROY_SEC_CONF, rc, rrc);
- 	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
--	atomic_set(&kvm->mm->context.is_protected, 0);
-+	if (!cc)
-+		atomic_dec(&kvm->mm->context.protected_count);
- 	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
- 	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
- 	/* Intended memory leak on "impossible" error */
-@@ -208,11 +209,14 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
- 	/* Outputs */
- 	kvm->arch.pv.handle = uvcb.guest_handle;
- 
-+	atomic_inc(&kvm->mm->context.protected_count);
- 	if (cc) {
--		if (uvcb.header.rc & UVC_RC_NEED_DESTROY)
-+		if (uvcb.header.rc & UVC_RC_NEED_DESTROY) {
- 			kvm_s390_pv_deinit_vm(kvm, &dummy, &dummy);
--		else
-+		} else {
-+			atomic_dec(&kvm->mm->context.protected_count);
- 			kvm_s390_pv_dealloc_vm(kvm);
-+		}
- 		return -EIO;
- 	}
- 	kvm->arch.gmap->guest_handle = uvcb.guest_handle;
-@@ -235,8 +239,6 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
- 	*rrc = uvcb.header.rrc;
- 	KVM_UV_EVENT(kvm, 3, "PROTVIRT VM SET PARMS: rc %x rrc %x",
- 		     *rc, *rrc);
--	if (!cc)
--		atomic_set(&kvm->mm->context.is_protected, 1);
- 	return cc ? -EINVAL : 0;
+diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+index ce14fd0b573c..87b176008785 100644
+--- a/arch/s390/kernel/uv.c
++++ b/arch/s390/kernel/uv.c
+@@ -234,6 +234,32 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
+ 	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
  }
  
++/**
++ * should_export_before_import - Determine whether an export is needed
++ * before an import-like operation
++ * @uvcb: the Ultravisor control block of the UVC to be performed
++ * @mm: the mm of the process
++ *
++ * Returns whether an export is needed before every import-like operation.
++ * This is needed for shared pages, which don't trigger a secure storage
++ * exception when accessed from a different guest.
++ *
++ * Although considered as one, the Unpin Page UVC is not an actual import,
++ * so it is not affected.
++ *
++ * No export is needed also when there is only one protected VM, because the
++ * page cannot belong to the wrong VM in that case (there is no "other VM"
++ * it can belong to).
++ *
++ * Return: true if an export is needed before every import, otherwise false.
++ */
++static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
++{
++	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
++		return false;
++	return atomic_read(&mm->context.protected_count) > 1;
++}
++
+ /*
+  * Requests the Ultravisor to make a page accessible to a guest.
+  * If it's brought in the first time, it will be cleared. If
+@@ -277,6 +303,8 @@ int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
+ 
+ 	lock_page(page);
+ 	ptep = get_locked_pte(gmap->mm, uaddr, &ptelock);
++	if (should_export_before_import(uvcb, gmap->mm))
++		uv_convert_from_secure(page_to_phys(page));
+ 	rc = make_secure_pte(ptep, uaddr, page, uvcb);
+ 	pte_unmap_unlock(ptep, ptelock);
+ 	unlock_page(page);
 -- 
 2.36.1
 
