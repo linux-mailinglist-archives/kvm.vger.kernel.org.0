@@ -2,166 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A5E455CD2D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:02:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4087F55D038
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:07:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344915AbiF1Kdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 06:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36678 "EHLO
+        id S1345107AbiF1Kut (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 06:50:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344904AbiF1Kdg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 06:33:36 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D79E230F62;
-        Tue, 28 Jun 2022 03:33:35 -0700 (PDT)
-Received: from anrayabh-desk.corp.microsoft.com (unknown [167.220.238.193])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 5346C20CD15E;
-        Tue, 28 Jun 2022 03:33:30 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5346C20CD15E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1656412415;
-        bh=hCGQYhHwpOSkpnLZXxvS6HfcNgQdwWClPUDXMEaPtE8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=N4vRaqAOXEV7lTUTiRazbLlEcbdIZ0naG9MKtQxPVGLlRGmh3WiuYQEWYBPwNjQsm
-         Zoo9L8ZSUWa8C87d8wqR9lxv5FLiL6mmPnYsQyRAOBOcftKhQqwSev7hyBLQs8cUwg
-         xQw651inTey5aY1EmSs6JE3la1OMjWIrVbfKq/FY=
-From:   Anirudh Rayabharam <anrayabh@linux.microsoft.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Ilias Stamatis <ilstam@amazon.com>
-Cc:     mail@anirudhrb.com, kumarpraveen@linux.microsoft.com,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        wei.liu@kernel.org, robert.bradford@intel.com, liuwe@microsoft.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: nVMX: Don't expose eVMCS unsupported fields to L1
-Date:   Tue, 28 Jun 2022 16:02:41 +0530
-Message-Id: <20220628103241.1785380-1-anrayabh@linux.microsoft.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S236568AbiF1Kus (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 06:50:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3FADB24F34
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 03:50:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656413446;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fBnpEBJJsEjj4xp1XzlNmSDPEps8RE1TeLCO9pCV3b8=;
+        b=Nh5/HTIO1DVp5K2HoxqI0LjyfaE3XWL7WDfmyZNVK+2bg42oD4Dm13FHxP6rPK1BQUiBRN
+        xqTyifWfaTP9w5MF85p7aeEEYg0HMQREZhQzlKI4RYQXuJsd4saDPoenvpVPOJmnVxqDmO
+        W+sOXi4gAOD7dJEwjXO4MeDM9E9UGus=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-372-GC5ovy_mNAyQcQPdutcz-w-1; Tue, 28 Jun 2022 06:50:45 -0400
+X-MC-Unique: GC5ovy_mNAyQcQPdutcz-w-1
+Received: by mail-wr1-f71.google.com with SMTP id q15-20020a5d61cf000000b0021bc2461141so1113839wrv.5
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 03:50:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=fBnpEBJJsEjj4xp1XzlNmSDPEps8RE1TeLCO9pCV3b8=;
+        b=eTlzhmi5hOR2rCWH3kk8wi979Px7x0XastFANjWhJ7QmUaFMs4xnyOZoKGTM1uFpNk
+         FtQVaLrTFDwDYMlqxjzbf71StGlM/xzEidq3WxSNpzoa9omchwOc9E1yKAZrK7wmlQRY
+         A3+J9LUu5sxIkD48/4W4x7dNLH3Jv2Y83Kcl3Qbi2BoVBgc+DJ+iVgjj6hGCOmjigP8X
+         r8Y/MHt8Ovm5AXWRODg4fyxUhCwxOTGCd3TNA1tP7CdyFuJR58/17nuxngI7MNYALL7k
+         gOj5A2pXGJOVBtcDz9Se43bkxktgVI65Ym1bGtfpyf7NQwtB9LezaX5yHuiOFIjEcayM
+         13WQ==
+X-Gm-Message-State: AJIora/Syb+l9icCZPxpijNeyppVWOvss0HQNPeS/yK76HWhnzkVTeFK
+        g8yOs7UmjLD58wDQ0FRWKe5omevh5OjBZay0D40cO9ToWUTkp+JmiiXl+Lb7J2YcfX2iUNU1ymO
+        JC015L2eFOa0C
+X-Received: by 2002:a05:600c:1547:b0:39c:7fc6:3082 with SMTP id f7-20020a05600c154700b0039c7fc63082mr26228171wmg.189.1656413442948;
+        Tue, 28 Jun 2022 03:50:42 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sOc62+TwZm4Lysu7PiidKj6NprJiStBGJ45lIax1y18ihr6TTIBSDrSl64O72de4xS9gTWfQ==
+X-Received: by 2002:a05:600c:1547:b0:39c:7fc6:3082 with SMTP id f7-20020a05600c154700b0039c7fc63082mr26228150wmg.189.1656413442750;
+        Tue, 28 Jun 2022 03:50:42 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id s11-20020a5d4ecb000000b0020fe61acd09sm13521418wrv.12.2022.06.28.03.50.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jun 2022 03:50:42 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 11:50:39 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
+Message-ID: <Yrrc/6x70wa14c5t@work-vm>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+ <YrH0ca3Sam7Ru11c@work-vm>
+ <SN6PR12MB2767FBF0848B906B9F0284D28EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running cloud-hypervisor tests, VM entry into an L2 guest on KVM on
-Hyper-V fails with this splat (stripped for brevity):
+* Kalra, Ashish (Ashish.Kalra@amd.com) wrote:
+> [AMD Official Use Only - General]
+> 
+> >>>  /*
+> >>>   * The RMP entry format is not architectural. The format is defined 
+> >>> in PPR @@ -126,6 +128,15 @@ struct snp_guest_platform_data {
+> >>>  	u64 secrets_gpa;
+> >>>  };
+> >>>  
+> >>> +struct rmpupdate {
+> >>> +	u64 gpa;
+> >>> +	u8 assigned;
+> >>> +	u8 pagesize;
+> >>> +	u8 immutable;
+> >>> +	u8 rsvd;
+> >>> +	u32 asid;
+> >>> +} __packed;
+> 
+> >>I see above it says the RMP entry format isn't architectural; is this 'rmpupdate' structure? If not how is this going to get handled when we have a couple >of SNP capable CPUs with different layouts?
+> 
+> >Architectural implies that it is defined in the APM and shouldn't change in such a way as to not be backward compatible. 
+> >I probably think the wording here should be architecture independent or more precisely platform independent.
+> 
+> Some more clarity on this: 
+> 
+> Actually, the PPR for family 19h Model 01h, Rev B1 defines the RMP entry format as below:
+> 
+> 2.1.4.2 RMP Entry Format
+> Architecturally the format of RMP entries are not specified in APM. In order to assist software, the following table specifies select portions of the RMP entry format for this specific product. Each RMP entry is 16B in size and is formatted as follows. Software should not rely on any field definitions not specified in this table and the format of an RMP entry may change in future processors. 
+> 
+> Architectural implies that it is defined in the APM and shouldn't change in such a way as to not be backward compatible. So non-architectural in this context means that it is only defined in our PPR.
+> 
+> So actually this RPM entry definition is platform dependent and will need to be changed for different AMD processors and that change has to be handled correspondingly in the dump_rmpentry() code. 
 
-[ 1481.600386] WARNING: CPU: 4 PID: 7641 at arch/x86/kvm/vmx/nested.c:4563 nested_vmx_vmexit+0x70d/0x790 [kvm_intel]
-[ 1481.600427] CPU: 4 PID: 7641 Comm: vcpu2 Not tainted 5.15.0-1008-azure #9-Ubuntu
-[ 1481.600429] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 07/22/2021
-[ 1481.600430] RIP: 0010:nested_vmx_vmexit+0x70d/0x790 [kvm_intel]
-[ 1481.600447] Call Trace:
-[ 1481.600449]  <TASK>
-[ 1481.600451]  nested_vmx_reflect_vmexit+0x10b/0x440 [kvm_intel]
-[ 1481.600457]  __vmx_handle_exit+0xef/0x670 [kvm_intel]
-[ 1481.600467]  vmx_handle_exit+0x12/0x50 [kvm_intel]
-[ 1481.600472]  vcpu_enter_guest+0x83a/0xfd0 [kvm]
-[ 1481.600524]  vcpu_run+0x5e/0x240 [kvm]
-[ 1481.600560]  kvm_arch_vcpu_ioctl_run+0xd7/0x550 [kvm]
-[ 1481.600597]  kvm_vcpu_ioctl+0x29a/0x6d0 [kvm]
-[ 1481.600634]  __x64_sys_ioctl+0x91/0xc0
-[ 1481.600637]  do_syscall_64+0x5c/0xc0
-[ 1481.600667]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[ 1481.600670] RIP: 0033:0x7f688becdaff
-[ 1481.600686]  </TASK>
+You'll need a way to make that fail cleanly when run on a newer CPU
+with different layout, and a way to build kernels that can handle
+more than one layout.
 
-TSC multiplier field is currently not supported in EVMCS in KVM. It was
-previously not supported from Hyper-V but has been added since. Because
-it is not supported in KVM the use "TSC scaling control" is filtered out
-of vmcs_config by evmcs_sanitize_exec_ctrls().
+Dave
 
-However, in nested_vmx_setup_ctls_msrs(), TSC scaling is exposed to L1.
-eVMCS unsupported fields are not sanitized. When L1 tries to launch an L2
-guest, vmcs12 has TSC scaling enabled. This propagates to vmcs02. But KVM
-doesn't set the TSC multiplier value because kvm_has_tsc_control is false.
-Due to this VM entry for L2 guest fails. (VM entry fails if
-"use TSC scaling" is 1 but TSC multiplier is 0.)
-
-To fix, in nested_vmx_setup_ctls_msrs(), sanitize the values read from MSRs
-by filtering out fields that are not supported by eVMCS.
-
-This is a stable-friendly intermediate fix. A more comprehensive fix is
-in progress [1] but is probably too complicated to safely apply to
-stable.
-
-[1]: https://lore.kernel.org/kvm/20220627160440.31857-1-vkuznets@redhat.com/
-
-Fixes: d041b5ea93352 ("KVM: nVMX: Enable nested TSC scaling")
-Signed-off-by: Anirudh Rayabharam <anrayabh@linux.microsoft.com>
----
-
-Changes since v1:
-- Sanitize all eVMCS unsupported fields instead of just TSC scaling.
-
-v1: https://lore.kernel.org/lkml/20220613161611.3567556-1-anrayabh@linux.microsoft.com/
-
----
- arch/x86/kvm/vmx/nested.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f5cb18e00e78..f88d748c7cc6 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6564,6 +6564,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		msrs->pinbased_ctls_high);
- 	msrs->pinbased_ctls_low |=
- 		PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR;
-+#if IS_ENABLED(CONFIG_HYPERV)
-+	if (static_branch_unlikely(&enable_evmcs))
-+		msrs->pinbased_ctls_high &= ~EVMCS1_UNSUPPORTED_PINCTRL;
-+#endif
- 	msrs->pinbased_ctls_high &=
- 		PIN_BASED_EXT_INTR_MASK |
- 		PIN_BASED_NMI_EXITING |
-@@ -6580,6 +6584,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 	msrs->exit_ctls_low =
- 		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR;
- 
-+#if IS_ENABLED(CONFIG_HYPERV)
-+	if (static_branch_unlikely(&enable_evmcs))
-+		msrs->exit_ctls_high &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
-+#endif
- 	msrs->exit_ctls_high &=
- #ifdef CONFIG_X86_64
- 		VM_EXIT_HOST_ADDR_SPACE_SIZE |
-@@ -6600,6 +6608,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		msrs->entry_ctls_high);
- 	msrs->entry_ctls_low =
- 		VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR;
-+#if IS_ENABLED(CONFIG_HYPERV)
-+	if (static_branch_unlikely(&enable_evmcs))
-+		msrs->entry_ctls_high &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
-+#endif
- 	msrs->entry_ctls_high &=
- #ifdef CONFIG_X86_64
- 		VM_ENTRY_IA32E_MODE |
-@@ -6657,6 +6669,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		      msrs->secondary_ctls_high);
- 
- 	msrs->secondary_ctls_low = 0;
-+#if IS_ENABLED(CONFIG_HYPERV)
-+	if (static_branch_unlikely(&enable_evmcs))
-+		msrs->secondary_ctls_high &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
-+#endif
- 	msrs->secondary_ctls_high &=
- 		SECONDARY_EXEC_DESC |
- 		SECONDARY_EXEC_ENABLE_RDTSCP |
+> Thanks,
+> Ashish
+> 
 -- 
-2.34.1
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
