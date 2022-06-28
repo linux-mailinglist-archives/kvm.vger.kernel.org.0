@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1649155DD32
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:27:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7602355CA7E
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:58:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244802AbiF1FO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 01:14:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54282 "EHLO
+        id S244835AbiF1FQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 01:16:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244603AbiF1FOA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 01:14:00 -0400
+        with ESMTP id S243826AbiF1FQL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 01:16:11 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 872592717B;
-        Mon, 27 Jun 2022 22:13:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5EE3275EA;
+        Mon, 27 Jun 2022 22:14:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
         Content-ID:Content-Description:In-Reply-To:References;
-        bh=BybgAHG8mcJZK+n0MmfXzPg6oqI7+V4cJS5wzBl8ZAE=; b=B8vLEhmssejIlGYqBqjL6vg5OW
-        yAwmOIAjITTPfObls/2cn4SR/eqDHafdNul7pH1adSRUWjU+AnGfWFG+M5z0s9kCP++HP+P1BjYWI
-        vJDu27KezM1mjP9YOeR3m15BZGcD/EUa03l0UxvGJCsxR8RR+s1DhFR5kyF+5K3ybNxG+8TuUHDtk
-        xWHfWCfIxjrCs0Iv6a6oGeJgN0APPO3Ml9oAPo1E0GvAXS1nAggd27qg4nVW4ViIxZPhT+C29Z6l+
-        1gUSKK9SqZr/12all5/AlLhiCLDp81esQ658YFFs2n3qPM4b+EzABEQ5s0gDd3bN4Y256ptl6GPt0
-        bjiFZUPg==;
+        bh=BybgAHG8mcJZK+n0MmfXzPg6oqI7+V4cJS5wzBl8ZAE=; b=yFERIp8x7nT49cP4kn2eTgcUme
+        7TrwIDvqFubSp+iBy2hH7htaD/YNWlwa4nECrY6cBLZ2bt7RGZt5gxHk8SwaECDdQJ58u3XTGNQCd
+        33h0vfsiw6YVlZ2HlB1kx4YOsNRn+QmaROeb4MW22f7Qqc99AOoo0u+uDp2zRzh/caChUmknJkMjv
+        SqTWXSr7GWWw68QJKtyGNRuQAjYoLTpk8uAUMpt4T1v0nY6BWQ/GH7FA6szdgV6PRu0YpzYskNJIE
+        T5kOAvM69afobMCj/ZzTKbOW8ELweOJoU0KpxBU2cO26MGnAFr0LY+g+fMTpLDmTxeJqjTQ1ksvQp
+        +VXZFPhA==;
 Received: from [2001:4bb8:199:3788:e965:1541:b076:2977] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o63XK-004KYE-O0; Tue, 28 Jun 2022 05:13:19 +0000
+        id 1o63Yb-004Kkj-GK; Tue, 28 Jun 2022 05:14:38 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -40,8 +40,8 @@ To:     Kirti Wankhede <kwankhede@nvidia.com>,
 Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
 Subject: simplify the mdev interface v3
-Date:   Tue, 28 Jun 2022 07:13:02 +0200
-Message-Id: <20220628051315.695254-1-hch@lst.de>
+Date:   Tue, 28 Jun 2022 07:14:22 +0200
+Message-Id: <20220628051435.695540-1-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
