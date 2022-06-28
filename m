@@ -2,84 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A77A55F1BF
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 01:03:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE15F55F1FF
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 01:47:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231925AbiF1XCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 19:02:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57784 "EHLO
+        id S230044AbiF1Xlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 19:41:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230101AbiF1XCi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 19:02:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F05563A71B
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 16:02:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656457357;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BILLrOx0KBGDparaBoWGr82nDo23bdigh/cJQEB6on8=;
-        b=Qz37mzWj40qCqjlnQ0yjevPZNubWrZEZc+U0xKZW3dGMLCB1mwKk2CcH2ytof2+UNsVyCM
-        4d1XbnlIjWCzKqlTF1HUHQL7Cw5Y3+bl1aHGN2OJzdmBkiRoIIUi9opVR2Y6D/P5lyZIqM
-        G4MCIFuBBxVtTFXDOIfsfwun6JPIVE0=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-130-LsOqHyljNS-lL0E4UOaxhQ-1; Tue, 28 Jun 2022 19:02:35 -0400
-X-MC-Unique: LsOqHyljNS-lL0E4UOaxhQ-1
-Received: by mail-il1-f198.google.com with SMTP id q17-20020a056e02079100b002da727ae897so6300623ils.21
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 16:02:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BILLrOx0KBGDparaBoWGr82nDo23bdigh/cJQEB6on8=;
-        b=hJBmCiVh8s7PiA1KxKcVlTXlp/DIEH4Obv1WkSf0TF9C8EOfVRWrKtnrNLlnqIzb8w
-         kkyz2jrhReKu3Zay66pzXJ3lUwW/rsmFChsN6Etn/70SDXXzw0Ud9sqik7DZe1uoEw6X
-         Bc4L3uVx/X0Z1nuGJ3C/7SL/LKyKgkPQyIoFsJ1+WPpVK8f9nQX5qH4MDt+w7AEtnIXT
-         QYwIfSGPqoMpmbpTrEnS98GjN0qRuz13dJkWg9SRUoPOfaCS8iOI889x8BRBMujc4aAa
-         TkKzNt6TX7rI95MnYPntgBY+n7yJczmiGpJqh9knuC6tY4i/DZcz/08Me9yXg9jTFT0N
-         JrmA==
-X-Gm-Message-State: AJIora83YcesAAyro4+bEQemvWyMXjQWU5gWZhpbaq8pKZsgGzmiCYFh
-        gv/LmUKeHS80AQtEuKWpH0DEymkvd1SYCIp4uhoUIYbZgwlpp5bo049btvtj0coQz/yfV//yYMK
-        xWNR3Xs0tPIi4
-X-Received: by 2002:a05:6638:1446:b0:331:e0cc:bd15 with SMTP id l6-20020a056638144600b00331e0ccbd15mr289906jad.89.1656457354977;
-        Tue, 28 Jun 2022 16:02:34 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sktsRJzoU53vy6uKrBPRFlirO/gd0xp0mF0YJcR9N5sGdjb8aEiG+AA9O8limDyR6fBWNUhA==
-X-Received: by 2002:a05:6638:1446:b0:331:e0cc:bd15 with SMTP id l6-20020a056638144600b00331e0ccbd15mr289894jad.89.1656457354776;
-        Tue, 28 Jun 2022 16:02:34 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id x8-20020a6bd008000000b006755ae0679bsm1816220ioa.50.2022.06.28.16.02.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 16:02:34 -0700 (PDT)
-Date:   Tue, 28 Jun 2022 19:02:32 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        with ESMTP id S229450AbiF1Xlb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 19:41:31 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DCDA33A0C;
+        Tue, 28 Jun 2022 16:41:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656459691; x=1687995691;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=7b5j1MEXlH7DEeLwlQG8w1yR1W0RygEbHO/Yh+JB6uY=;
+  b=SNSbXqNCojdPqF85vurSZGZ0CAVuoteP7I9x5cdfUq1huUxlnBrlFfWA
+   7sNhjhVv9REreO3gYNhOxy0uNNMK38wxVtyvHdRg0CDj+Hi6Pr/pMgRQO
+   5OaMIOXpIx2DacxYoJOlNuuWYX3IbqRINchvqh0w0pN7g5hHkjTdlqpyf
+   aTKKIQSaICuM5r1K9zNSgSB3qHNxEz/IreMdGXx1NZ3OFoL4QY3QbFXyn
+   VTb5FFVvSev9tyfVDmLoIy23E+6+3Ggxu8oLp94YzZWID7zQhnkhVgycR
+   l94TKpg0EjeoSTnufCgwT899uf1xrC7yr265reuFtzE+x2XLpMkvccdqa
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10392"; a="368189569"
+X-IronPort-AV: E=Sophos;i="5.92,230,1650956400"; 
+   d="scan'208";a="368189569"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 16:41:30 -0700
+X-IronPort-AV: E=Sophos;i="5.92,230,1650956400"; 
+   d="scan'208";a="588047790"
+Received: from gregantx-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.119.76])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 16:41:24 -0700
+Message-ID: <f769e68306947461b4ca3540bc18567182166d5a.camel@intel.com>
+Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
+ CPU hotplug
+From:   Kai Huang <kai.huang@intel.com>
+To:     "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Igor Mammedov <imammedo@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 2/4] kvm: Merge "atomic" and "write" in
- __gfn_to_pfn_memslot()
-Message-ID: <YruIiNIII0pXcrYY@xz-m1.local>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-3-peterx@redhat.com>
- <c047c213-252b-4a0b-9720-070307962d23@nvidia.com>
- <Yrtar+i2X0YjmD/F@xz-m1.local>
- <02831f10-3077-8836-34d0-bb853516099f@nvidia.com>
- <YruFm8vJMPxVUJTO@xz-m1.local>
- <c4f7d5cb-5b23-3384-722f-cc8c517cb123@nvidia.com>
+        Dave Hansen <dave.hansen@intel.com>,
+        Len Brown <len.brown@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Rafael Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
+        Tianyu.Lan@microsoft.com, Randy Dunlap <rdunlap@infradead.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Yue Haibing <yuehaibing@huawei.com>, dongli.zhang@oracle.com
+Date:   Wed, 29 Jun 2022 11:41:22 +1200
+In-Reply-To: <CAJZ5v0gtinPZnVKvZzJDc1Ph+DPdNWxVdwwqr32z1Tecx+Qm7Q@mail.gmail.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
+         <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
+         <d3ba563f3f4e7aaf90fb99d20c651b5751972f7b.camel@intel.com>
+         <20220627100155.71a7b34c@redhat.com>
+         <2b676b19db423b995a21c7f215ed117c345c60d9.camel@intel.com>
+         <CAJZ5v0gtinPZnVKvZzJDc1Ph+DPdNWxVdwwqr32z1Tecx+Qm7Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c4f7d5cb-5b23-3384-722f-cc8c517cb123@nvidia.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -88,23 +88,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 03:55:22PM -0700, John Hubbard wrote:
-> On 6/28/22 15:50, Peter Xu wrote:
-> > And if you see the patch I actually did something similar (in kvm_host.h):
-> > 
-> >   /* gfn_to_pfn (gtp) flags */
-> >   ...
-> > 
-> > I'd still go for GTP, but let me know if you think any of the above is
-> > better, I can switch.
-> > 
-> 
-> Yeah, I'll leave that call up to you. I don't have anything better. :)
+On Tue, 2022-06-28 at 19:33 +0200, Rafael J. Wysocki wrote:
+> > Hi Rafael,
+> >=20
+> > I am not sure I got what you mean by "This will affect initialization, =
+not
+> > just
+> > hotplug AFAICS", could you elaborate a little bit?=C2=A0 Thanks.
+>=20
+> So acpi_processor_add() is called for CPUs that are already present at
+> init time, not just for the hot-added ones.
+>=20
+> One of the things it does is to associate an ACPI companion with the give=
+n
+> CPU.
+>=20
+> Don't you need that to happen?
 
-Thanks. I'll also give it a shot with Sean's suggestion on struct when
-repost (I doubt whether I can bare with 4 bools after all..).  If that goes
-well we don't worry this too since there'll be no flag introduced.
+You are right.  I did test again and yes it was also called after boot-time
+present cpus are up (after smp_init()).  I didn't check this carefully at m=
+y
+previous test.  Thanks for catching.
 
--- 
-Peter Xu
+--=20
+Thanks,
+-Kai
+
 
