@@ -2,423 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF3FE55DBA6
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:25:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D53B55CE25
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:04:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244983AbiF1FRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 01:17:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34202 "EHLO
+        id S245154AbiF1FqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 01:46:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244849AbiF1FRU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 01:17:20 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA1BC2D;
-        Mon, 27 Jun 2022 22:15:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=c9kP/2K2zwqYLlgVJNG+HSypnL1Y4h5BY8F9DCIeDug=; b=ojkI84iiLXq2hNPThuA4FvvYjO
-        tX/cl4XJ8cZMLqb0Cg1KxRwepcbP+bWWtl841OsVTAe5vfvC8WGZ/i+/hHBtL+AxGvhUCPQYdqDRk
-        URmBf2gt70zON6PeK/7Hmuh/q4wcoMlcl8yXoAuGn7YLYzh6ic/9z6kleWroLZzuvNJTUuN+OdsRy
-        CC2/AJPkZ/JnMUe6hN/ro/u+m8n9v67Wn56ja7S71kfUbS/fE4EokgO9e9/gYHzDgJgVKTXpyqgrG
-        panajzvHr+F4HuqICYCGIrDj/wuAVSCL8Fvp+tlSBXJxumVbpQbSSw/b13GlLNYiUZ7MCRWU45mzB
-        KZkQ7dow==;
-Received: from [2001:4bb8:199:3788:e965:1541:b076:2977] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o63ZB-004Kwb-N5; Tue, 28 Jun 2022 05:15:14 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
+        with ESMTP id S245152AbiF1FqN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 01:46:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 12315275CA
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 22:46:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656395161;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7XDCFUsIiO1RHnxPVoHQ+XTC5yX5gOLEJx5jlzpdwhw=;
+        b=bTL1f2JK2MhZM8Tm8dVOQbmxkgwC3Pa7s8wN1jr4tXHcZevbuO4aBufO6UKfBX38xPe1UE
+        jPdiksBjFQAEP9FOLIrv2RBn80rlF2pH8iNyA9aOxekxyqajf3sZDElMBFjb8f8etJsD2c
+        D6JSXAtbV4Ni1LyiRP7oEm8PW4xdxrA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-557-cNAgdjJ_NVmxPr1Lqu7IAw-1; Tue, 28 Jun 2022 01:46:00 -0400
+X-MC-Unique: cNAgdjJ_NVmxPr1Lqu7IAw-1
+Received: by mail-wr1-f69.google.com with SMTP id u9-20020adfa189000000b0021b8b3c8f74so1463982wru.12
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 22:46:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7XDCFUsIiO1RHnxPVoHQ+XTC5yX5gOLEJx5jlzpdwhw=;
+        b=PJEfd2nOeWPqqxYaX0BT7EqLOh4DKngpQGnMrPFpc33QH8eA2CmFNz7m66mPMwoJvI
+         78OcPhUtpfAcucbdhWnudktfp+BY7LNOqt0oGTG/sOz3ycVpBF8A5bLtFXQusj5ohp1H
+         7t2TWyVfQaeLq49k8g6NOFDUoRKPtFSYy03eV/6YXmo6gDIJp32n0CXJh1X5sXL5y5Sf
+         zrklIkackQVF/D8xXA7os8yYcIWLEkpJSn/2xXt5FwxW3ulZj0YtGcLZiOj2KmtAY3Nm
+         LE5iPnMOf+7yY8HKUfVJrX/5+CNwp/RxgmI69DinNTDt7bLuVFranefEpZWsno5C8+G3
+         NulQ==
+X-Gm-Message-State: AJIora/tE63nvzHuNcIlWyKctrjpQNnkH5m0I/ZwT0fQAC887CgmHd0u
+        LmXm1GyxvwBgwUKn6QeiC67m6tUO7B5CNhe6F+K7WQCB9YhP/h5n4xhqbXVvN5i/iEuGjxTd040
+        bGsVqXnS+k/lV
+X-Received: by 2002:a05:600c:21ca:b0:3a0:48e6:60cb with SMTP id x10-20020a05600c21ca00b003a048e660cbmr12064716wmj.195.1656395159393;
+        Mon, 27 Jun 2022 22:45:59 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1u1kNy6ksKWTPEZ6IXDwV0UKlQdlBRLnRI/epxlGzaTFb6xBerM5hZUzFha89n6poU/6PoMPw==
+X-Received: by 2002:a05:600c:21ca:b0:3a0:48e6:60cb with SMTP id x10-20020a05600c21ca00b003a048e660cbmr12064664wmj.195.1656395159084;
+        Mon, 27 Jun 2022 22:45:59 -0700 (PDT)
+Received: from redhat.com ([2.52.23.204])
+        by smtp.gmail.com with ESMTPSA id 7-20020a05600c024700b003a03e63e428sm15257206wmj.36.2022.06.27.22.45.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 22:45:58 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 01:45:51 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
         Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
-Subject: [PATCH 13/13] vfio/mdev: add mdev available instance checking to the core
-Date:   Tue, 28 Jun 2022 07:14:35 +0200
-Message-Id: <20220628051435.695540-14-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220628051435.695540-1-hch@lst.de>
-References: <20220628051435.695540-1-hch@lst.de>
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm <kvm@vger.kernel.org>,
+        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+        kangjie.xu@linux.alibaba.com
+Subject: Re: [PATCH v10 25/41] virtio_pci: struct virtio_pci_common_cfg add
+ queue_notify_data
+Message-ID: <20220628014309-mutt-send-email-mst@kernel.org>
+References: <20220624025621.128843-1-xuanzhuo@linux.alibaba.com>
+ <20220624025621.128843-26-xuanzhuo@linux.alibaba.com>
+ <20220624025817-mutt-send-email-mst@kernel.org>
+ <CACGkMEseptD=45j3kQr0yciRxR679Jcig=292H07-RYC2vXmFQ@mail.gmail.com>
+ <20220627023841-mutt-send-email-mst@kernel.org>
+ <CACGkMEvy8xF2T_vubKeUEPC2aroO_fbB0Xe8nnxK4OBUgAS+Gw@mail.gmail.com>
+ <20220627034733-mutt-send-email-mst@kernel.org>
+ <CACGkMEtpjUBaUML=fEs5hR66rzNTBhBXOmfpzyXV1F-6BqvsGg@mail.gmail.com>
+ <20220627074723-mutt-send-email-mst@kernel.org>
+ <CACGkMEv0zdgG6SAaxRwkpObEFX_KRB1ovezNiHX+QXsYhE=qaQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEv0zdgG6SAaxRwkpObEFX_KRB1ovezNiHX+QXsYhE=qaQ@mail.gmail.com>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Many of the mdev drivers use a simple counter for keeping track of the
-available instances. Move this code to the core code and store the counter
-in the mdev_parent. Implement it using correct locking, fixing mdpy.
+On Tue, Jun 28, 2022 at 11:50:37AM +0800, Jason Wang wrote:
+> On Mon, Jun 27, 2022 at 7:53 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Jun 27, 2022 at 04:14:20PM +0800, Jason Wang wrote:
+> > > On Mon, Jun 27, 2022 at 3:58 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Jun 27, 2022 at 03:45:30PM +0800, Jason Wang wrote:
+> > > > > On Mon, Jun 27, 2022 at 2:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Mon, Jun 27, 2022 at 10:30:42AM +0800, Jason Wang wrote:
+> > > > > > > On Fri, Jun 24, 2022 at 2:59 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Fri, Jun 24, 2022 at 10:56:05AM +0800, Xuan Zhuo wrote:
+> > > > > > > > > Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
+> > > > > > > > > here https://github.com/oasis-tcs/virtio-spec/issues/89
+> > > > > > > > >
+> > > > > > > > > For not breaks uABI, add a new struct virtio_pci_common_cfg_notify.
+> > > > > > > >
+> > > > > > > > What exactly is meant by not breaking uABI?
+> > > > > > > > Users are supposed to be prepared for struct size to change ... no?
+> > > > > > >
+> > > > > > > Not sure, any doc for this?
+> > > > > > >
+> > > > > > > Thanks
+> > > > > >
+> > > > > >
+> > > > > > Well we have this:
+> > > > > >
+> > > > > >         The drivers SHOULD only map part of configuration structure
+> > > > > >         large enough for device operation.  The drivers MUST handle
+> > > > > >         an unexpectedly large \field{length}, but MAY check that \field{length}
+> > > > > >         is large enough for device operation.
+> > > > >
+> > > > > Yes, but that's the device/driver interface. What's done here is the
+> > > > > userspace/kernel.
+> > > > >
+> > > > > Userspace may break if it uses e.g sizeof(struct virtio_pci_common_cfg)?
+> > > > >
+> > > > > Thanks
+> > > >
+> > > > Hmm I guess there's risk... but then how are we going to maintain this
+> > > > going forward?  Add a new struct on any change?
+> > >
+> > > This is the way we have used it for the past 5 or more years. I don't
+> > > see why this must be handled in the vq reset feature.
+> > >
+> > > >Can we at least
+> > > > prevent this going forward somehow?
+> > >
+> > > Like have some padding?
+> > >
+> > > Thanks
+> >
+> > Maybe - this is what QEMU does ...
+> 
+> Do you want this to be addressed in this series (it's already very huge anyhow)?
+> 
+> Thanks
 
-Drivers just provide the value in the mdev_driver at registration time
-and the core code takes care of maintaining it and exposing the value in
-sysfs.
+Let's come up with a solution at least. QEMU does not seem to need the struct. Let's just put
+it in virtio_pci_modern.h for now then?
 
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-[count instances per-parent instead of per-type]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/s390/cio/vfio_ccw_drv.c       |  1 -
- drivers/s390/cio/vfio_ccw_ops.c       | 14 +-------------
- drivers/s390/cio/vfio_ccw_private.h   |  2 --
- drivers/s390/crypto/vfio_ap_ops.c     | 21 +++------------------
- drivers/s390/crypto/vfio_ap_private.h |  2 --
- drivers/vfio/mdev/mdev_core.c         | 12 ++++++++++++
- include/linux/mdev.h                  |  3 +++
- samples/vfio-mdev/mdpy.c              | 23 ++++-------------------
- 8 files changed, 23 insertions(+), 55 deletions(-)
-
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 750d0315f1f5b..449c76b29a3b5 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -149,7 +149,6 @@ static struct vfio_ccw_private *vfio_ccw_alloc_private(struct subchannel *sch)
- 	INIT_LIST_HEAD(&private->crw);
- 	INIT_WORK(&private->io_work, vfio_ccw_sch_io_todo);
- 	INIT_WORK(&private->crw_work, vfio_ccw_crw_todo);
--	atomic_set(&private->avail, 1);
- 
- 	private->cp.guest_cp = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1),
- 				       GFP_KERNEL);
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 94cc62b808088..b89ac599a9087 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -70,13 +70,6 @@ static int vfio_ccw_mdev_notifier(struct notifier_block *nb,
- 	return NOTIFY_DONE;
- }
- 
--static unsigned int vfio_ccw_get_available(struct mdev_type *mtype)
--{
--	struct vfio_ccw_private *private = dev_get_drvdata(mtype->parent->dev);
--
--	return atomic_read(&private->avail);
--}
--
- static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- {
- 	struct vfio_ccw_private *private = dev_get_drvdata(mdev->dev.parent);
-@@ -85,9 +78,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- 	if (private->state == VFIO_CCW_STATE_NOT_OPER)
- 		return -ENODEV;
- 
--	if (atomic_dec_if_positive(&private->avail) < 0)
--		return -EPERM;
--
- 	memset(&private->vdev, 0, sizeof(private->vdev));
- 	vfio_init_group_dev(&private->vdev, &mdev->dev,
- 			    &vfio_ccw_dev_ops);
-@@ -108,7 +98,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- 
- err_atomic:
- 	vfio_uninit_group_dev(&private->vdev);
--	atomic_inc(&private->avail);
- 	private->mdev = NULL;
- 	private->state = VFIO_CCW_STATE_IDLE;
- 	return ret;
-@@ -135,7 +124,6 @@ static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
- 	vfio_uninit_group_dev(&private->vdev);
- 	cp_free(&private->cp);
- 	private->mdev = NULL;
--	atomic_inc(&private->avail);
- }
- 
- static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
-@@ -613,6 +601,7 @@ static const struct vfio_device_ops vfio_ccw_dev_ops = {
- 
- struct mdev_driver vfio_ccw_mdev_driver = {
- 	.device_api = VFIO_DEVICE_API_CCW_STRING,
-+	.max_instances = 1,
- 	.driver = {
- 		.name = "vfio_ccw_mdev",
- 		.owner = THIS_MODULE,
-@@ -620,7 +609,6 @@ struct mdev_driver vfio_ccw_mdev_driver = {
- 	},
- 	.probe = vfio_ccw_mdev_probe,
- 	.remove = vfio_ccw_mdev_remove,
--	.get_available = vfio_ccw_get_available,
- };
- 
- int vfio_ccw_mdev_reg(struct subchannel *sch)
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index b7163bac8cc75..9be5baed0cb7f 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -72,7 +72,6 @@ struct vfio_ccw_crw {
-  * @sch: pointer to the subchannel
-  * @state: internal state of the device
-  * @completion: synchronization helper of the I/O completion
-- * @avail: available for creating a mediated device
-  * @mdev: pointer to the mediated device
-  * @nb: notifier for vfio events
-  * @io_region: MMIO region to input/output I/O arguments/results
-@@ -96,7 +95,6 @@ struct vfio_ccw_private {
- 	struct subchannel	*sch;
- 	int			state;
- 	struct completion	*completion;
--	atomic_t		avail;
- 	struct mdev_device	*mdev;
- 	struct notifier_block	nb;
- 	struct ccw_io_region	*io_region;
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 5e6cc43413117..3d1108f1b7556 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -461,14 +461,9 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
- 	struct ap_matrix_mdev *matrix_mdev;
- 	int ret;
- 
--	if ((atomic_dec_if_positive(&matrix_dev->available_instances) < 0))
--		return -EPERM;
--
- 	matrix_mdev = kzalloc(sizeof(*matrix_mdev), GFP_KERNEL);
--	if (!matrix_mdev) {
--		ret = -ENOMEM;
--		goto err_dec_available;
--	}
-+	if (!matrix_mdev)
-+		return -ENOMEM;
- 	vfio_init_group_dev(&matrix_mdev->vdev, &mdev->dev,
- 			    &vfio_ap_matrix_dev_ops);
- 
-@@ -491,8 +486,6 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
- 	mutex_unlock(&matrix_dev->lock);
- 	vfio_uninit_group_dev(&matrix_mdev->vdev);
- 	kfree(matrix_mdev);
--err_dec_available:
--	atomic_inc(&matrix_dev->available_instances);
- 	return ret;
- }
- 
-@@ -508,12 +501,6 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
- 	mutex_unlock(&matrix_dev->lock);
- 	vfio_uninit_group_dev(&matrix_mdev->vdev);
- 	kfree(matrix_mdev);
--	atomic_inc(&matrix_dev->available_instances);
--}
--
--static unsigned int vfio_ap_mdev_get_available(struct mdev_type *mtype)
--{
--	return atomic_read(&matrix_dev->available_instances);
- }
- 
- struct vfio_ap_queue_reserved {
-@@ -1427,6 +1414,7 @@ static const struct vfio_device_ops vfio_ap_matrix_dev_ops = {
- 
- static struct mdev_driver vfio_ap_matrix_driver = {
- 	.device_api = VFIO_DEVICE_API_AP_STRING,
-+	.max_instances = MAX_ZDEV_ENTRIES_EXT,
- 	.driver = {
- 		.name = "vfio_ap_mdev",
- 		.owner = THIS_MODULE,
-@@ -1435,15 +1423,12 @@ static struct mdev_driver vfio_ap_matrix_driver = {
- 	},
- 	.probe = vfio_ap_mdev_probe,
- 	.remove = vfio_ap_mdev_remove,
--	.get_available = vfio_ap_mdev_get_available,
- };
- 
- int vfio_ap_mdev_register(void)
- {
- 	int ret;
- 
--	atomic_set(&matrix_dev->available_instances, MAX_ZDEV_ENTRIES_EXT);
--
- 	ret = mdev_register_driver(&vfio_ap_matrix_driver);
- 	if (ret)
- 		return ret;
-diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-index 5dc5050d03791..b808b343b771f 100644
---- a/drivers/s390/crypto/vfio_ap_private.h
-+++ b/drivers/s390/crypto/vfio_ap_private.h
-@@ -28,7 +28,6 @@
-  * struct ap_matrix_dev - Contains the data for the matrix device.
-  *
-  * @device:	generic device structure associated with the AP matrix device
-- * @available_instances: number of mediated matrix devices that can be created
-  * @info:	the struct containing the output from the PQAP(QCI) instruction
-  * @mdev_list:	the list of mediated matrix devices created
-  * @lock:	mutex for locking the AP matrix device. This lock will be
-@@ -40,7 +39,6 @@
-  */
- struct ap_matrix_dev {
- 	struct device device;
--	atomic_t available_instances;
- 	struct ap_config_info info;
- 	struct list_head mdev_list;
- 	struct mutex lock;
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 93f8caf2e5f77..775efbfed1f35 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -70,6 +70,7 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
- 	parent->mdev_driver = mdev_driver;
- 	parent->types = types;
- 	parent->nr_types = nr_types;
-+	parent->available_instances = mdev_driver->max_instances;
- 
- 	if (!mdev_bus_compat_class) {
- 		mdev_bus_compat_class = class_compat_register("mdev_bus");
-@@ -115,12 +116,15 @@ EXPORT_SYMBOL(mdev_unregister_parent);
- static void mdev_device_release(struct device *dev)
- {
- 	struct mdev_device *mdev = to_mdev_device(dev);
-+	struct mdev_parent *parent = mdev->type->parent;
- 
- 	/* Pairs with the get in mdev_device_create() */
- 	kobject_put(&mdev->type->kobj);
- 
- 	mutex_lock(&mdev_list_lock);
- 	list_del(&mdev->next);
-+	if (!parent->mdev_driver->get_available)
-+		parent->available_instances++;
- 	mutex_unlock(&mdev_list_lock);
- 
- 	dev_dbg(&mdev->dev, "MDEV: destroying\n");
-@@ -144,6 +148,14 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
- 		}
- 	}
- 
-+	if (!drv->get_available) {
-+		if (!parent->available_instances) {
-+			mutex_unlock(&mdev_list_lock);
-+			return -EUSERS;
-+		}
-+		parent->available_instances--;
-+	}
-+
- 	mdev = kzalloc(sizeof(*mdev), GFP_KERNEL);
- 	if (!mdev) {
- 		mutex_unlock(&mdev_list_lock);
-diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index 968494a9f72e3..9ea470e61d7d9 100644
---- a/include/linux/mdev.h
-+++ b/include/linux/mdev.h
-@@ -45,6 +45,7 @@ struct mdev_parent {
- 	struct rw_semaphore unreg_sem;
- 	struct mdev_type **types;
- 	unsigned int nr_types;
-+	unsigned int available_instances;
- };
- 
- static inline struct mdev_device *to_mdev_device(struct device *dev)
-@@ -55,6 +56,7 @@ static inline struct mdev_device *to_mdev_device(struct device *dev)
- /**
-  * struct mdev_driver - Mediated device driver
-  * @device_api: string to return for the device_api sysfs
-+ * @max_instances: maximum number of instances supported (optional)
-  * @probe: called when new device created
-  * @remove: called when device removed
-  * @get_available: Return the max number of instances that can be created
-@@ -63,6 +65,7 @@ static inline struct mdev_device *to_mdev_device(struct device *dev)
-  **/
- struct mdev_driver {
- 	const char *device_api;
-+	unsigned int max_instances;
- 	int (*probe)(struct mdev_device *dev);
- 	void (*remove)(struct mdev_device *dev);
- 	unsigned int (*get_available)(struct mdev_type *mtype);
-diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-index 250b7ea2df2e4..7f7ac5491407e 100644
---- a/samples/vfio-mdev/mdpy.c
-+++ b/samples/vfio-mdev/mdpy.c
-@@ -42,11 +42,6 @@
- 
- MODULE_LICENSE("GPL v2");
- 
--static int max_devices = 4;
--module_param_named(count, max_devices, int, 0444);
--MODULE_PARM_DESC(count, "number of " MDPY_NAME " devices");
--
--
- #define MDPY_TYPE_1 "vga"
- #define MDPY_TYPE_2 "xga"
- #define MDPY_TYPE_3 "hd"
-@@ -93,7 +88,6 @@ static struct class	*mdpy_class;
- static struct cdev	mdpy_cdev;
- static struct device	mdpy_dev;
- static struct mdev_parent mdpy_parent;
--static u32		mdpy_count;
- static const struct vfio_device_ops mdpy_dev_ops;
- 
- /* State of each mdev device */
-@@ -234,9 +228,6 @@ static int mdpy_probe(struct mdev_device *mdev)
- 	u32 fbsize;
- 	int ret;
- 
--	if (mdpy_count >= max_devices)
--		return -ENOMEM;
--
- 	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
- 	if (mdev_state == NULL)
- 		return -ENOMEM;
-@@ -265,8 +256,6 @@ static int mdpy_probe(struct mdev_device *mdev)
- 	mdpy_create_config_space(mdev_state);
- 	mdpy_reset(mdev_state);
- 
--	mdpy_count++;
--
- 	ret = vfio_register_emulated_iommu_dev(&mdev_state->vdev);
- 	if (ret)
- 		goto err_mem;
-@@ -293,8 +282,6 @@ static void mdpy_remove(struct mdev_device *mdev)
- 	kfree(mdev_state->vconfig);
- 	vfio_uninit_group_dev(&mdev_state->vdev);
- 	kfree(mdev_state);
--
--	mdpy_count--;
- }
- 
- static ssize_t mdpy_read(struct vfio_device *vdev, char __user *buf,
-@@ -658,11 +645,6 @@ static ssize_t mdpy_show_description(struct mdev_type *mtype, char *buf)
- 		       type->width, type->height);
- }
- 
--static unsigned int mdpy_get_available(struct mdev_type *mtype)
--{
--	return max_devices - mdpy_count;
--}
--
- static const struct vfio_device_ops mdpy_dev_ops = {
- 	.read = mdpy_read,
- 	.write = mdpy_write,
-@@ -672,6 +654,7 @@ static const struct vfio_device_ops mdpy_dev_ops = {
- 
- static struct mdev_driver mdpy_driver = {
- 	.device_api = VFIO_DEVICE_API_PCI_STRING,
-+	.max_instances = 4,
- 	.driver = {
- 		.name = "mdpy",
- 		.owner = THIS_MODULE,
-@@ -680,7 +663,6 @@ static struct mdev_driver mdpy_driver = {
- 	},
- 	.probe = mdpy_probe,
- 	.remove	= mdpy_remove,
--	.get_available = mdpy_get_available,
- 	.show_description = mdpy_show_description,
- };
- 
-@@ -757,5 +739,8 @@ static void __exit mdpy_dev_exit(void)
- 	mdpy_class = NULL;
- }
- 
-+module_param_named(count, mdpy_driver.max_instances, int, 0444);
-+MODULE_PARM_DESC(count, "number of " MDPY_NAME " devices");
-+
- module_init(mdpy_dev_init)
- module_exit(mdpy_dev_exit)
--- 
-2.30.2
+> >
+> > > >
+> > > >
+> > > > > >
+> > > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > > Since I want to add queue_reset after queue_notify_data, I submitted
+> > > > > > > > > this patch first.
+> > > > > > > > >
+> > > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > > > > > ---
+> > > > > > > > >  include/uapi/linux/virtio_pci.h | 7 +++++++
+> > > > > > > > >  1 file changed, 7 insertions(+)
+> > > > > > > > >
+> > > > > > > > > diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
+> > > > > > > > > index 3a86f36d7e3d..22bec9bd0dfc 100644
+> > > > > > > > > --- a/include/uapi/linux/virtio_pci.h
+> > > > > > > > > +++ b/include/uapi/linux/virtio_pci.h
+> > > > > > > > > @@ -166,6 +166,13 @@ struct virtio_pci_common_cfg {
+> > > > > > > > >       __le32 queue_used_hi;           /* read-write */
+> > > > > > > > >  };
+> > > > > > > > >
+> > > > > > > > > +struct virtio_pci_common_cfg_notify {
+> > > > > > > > > +     struct virtio_pci_common_cfg cfg;
+> > > > > > > > > +
+> > > > > > > > > +     __le16 queue_notify_data;       /* read-write */
+> > > > > > > > > +     __le16 padding;
+> > > > > > > > > +};
+> > > > > > > > > +
+> > > > > > > > >  /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
+> > > > > > > > >  struct virtio_pci_cfg_cap {
+> > > > > > > > >       struct virtio_pci_cap cap;
+> > > > > > > > > --
+> > > > > > > > > 2.31.0
+> > > > > > > >
+> > > > > >
+> > > >
+> >
 
