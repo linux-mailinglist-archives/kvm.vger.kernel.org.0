@@ -2,174 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 531A055F0E1
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 00:10:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EDF155F0EB
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 00:14:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230459AbiF1WKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 18:10:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37450 "EHLO
+        id S229558AbiF1WOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 18:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229781AbiF1WJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 18:09:52 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0242340EC
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 15:09:50 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-31797057755so114895887b3.16
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 15:09:50 -0700 (PDT)
+        with ESMTP id S229489AbiF1WOT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 18:14:19 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17DF8326D2
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 15:14:18 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id m6-20020a05600c3b0600b003a0489f412cso274106wms.1
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 15:14:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=gnqIHh9MJ79JR8UHARjL1RMMQDUE9yqN/1O215pAM3E=;
-        b=eXguEcbgPyavlFpFOa1EXxahxW4srMGJ+98b4fGFkzQpEbd3YWNtmcD67PovTdc4qA
-         fXnRa14oxMCR4UzPA0Rb69W3dduRCCg0msVdImAHNCCE0uDoC3mW7NalrpLVU3hHsOy9
-         koYlPCtWay2m9JrKZUWMOsdgiToa/uk85soHL8fXEJO2p2w5GSqWn2DoRSdBc4YiKjuw
-         wiArVtT3yDZqnyEvlczLci1xDNiA+fCBpfkNXsG99ycgHGB7/+E389xZxGCvQYTgsHR8
-         5q1viEr/xOHOxyNWdhiNTKu9+6+r+bupS/AqK5Zk2ocnv1T5fbQgq4oIep2tspVynMLG
-         y+lA==
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=BeXPYPsPcks1vJnkCiVR+AZ4T0LVp8r4SqdR8q577ps=;
+        b=aXjRcl4mzkQ7SaIHf1a8ezJ61DtHnH8rNOB/06to1GFNsXvTz8JCyDyinU+eAI7uIc
+         gyJBh8uJXAtMKfVj4TPc5yU2/x08AxXE2lNML2imlUJ1dAWeSc1DDVfqfxycW4wtjHry
+         IQV2hL/6mGndVg5Ll5n2OlmYfqZ7zzOTUDxTBO+HQZiPDvFkJ6/mCIT2gWHryee+vy8+
+         4iMjwGG9EESMevGRdLzAyGHQlZfIgiTi0puxBYgUFKkXeyVKYR7wxxzknybXv4FLW6hO
+         pZgk1Z6B5fL1KQIKvO0C8b2OB/MGx3i02/5yYDDY7zvB3GvHj6Ln4JmK60NeFXmZrtOS
+         4lRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=gnqIHh9MJ79JR8UHARjL1RMMQDUE9yqN/1O215pAM3E=;
-        b=MKWjdofh2vkC5plvzwgbQbYEBCZ/ruAwoeB7srvzmRCULSIVsoIDRuBEshYFUkmZj9
-         9aCb+NPaTh/MnR9leHR/SEOXbTXQh/g1h9BWf0/v2Cp1EN+T/k5BS1qhKdWDzQSMqQrm
-         tYq26cmPhkgyEDO7+E3kzAbG9+ruasMPk91rwRm1LRg1jbj3lAS+DFM3FH43V9Rh4Xsa
-         PfwMoEDByk+a6cUHd2El7jAICos7P3WS6MInp0gm7Vi51AWHI6JPWqGQ5Lqv09LFqtOy
-         pa4r5RvOlw0HDPQWBKwEKio2nXWG8BpGbzo1cjUWjbrdp5NHy4JB7alKoEPXTQADBZ6L
-         Nyeg==
-X-Gm-Message-State: AJIora/iwZ1oY0A1bO9mMl5oY5L3gGqlZa5iGcBeuRV/uBN4C5Uk/bUn
-        YHHf+iPSGIYjFTXzaM9DLHcSZ1rPmwdQxx5L
-X-Google-Smtp-Source: AGRyM1umi2UgIYQTv46Vc6mzeFvchYWcjhInaiO2bwyjS9I41B8ANnPYWxN9MPXv8KH+kwsaKoJa5m5b80k5y5ta
-X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
- (user=yosryahmed job=sendgmr) by 2002:a25:9f0a:0:b0:66c:8ecd:9d18 with SMTP
- id n10-20020a259f0a000000b0066c8ecd9d18mr18915199ybq.345.1656454190140; Tue,
- 28 Jun 2022 15:09:50 -0700 (PDT)
-Date:   Tue, 28 Jun 2022 22:09:38 +0000
-In-Reply-To: <20220628220938.3657876-1-yosryahmed@google.com>
-Message-Id: <20220628220938.3657876-5-yosryahmed@google.com>
-Mime-Version: 1.0
-References: <20220628220938.3657876-1-yosryahmed@google.com>
-X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
-Subject: [PATCH v6 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in secondary
- pagetable stats
-From:   Yosry Ahmed <yosryahmed@google.com>
-To:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Oliver Upton <oupton@google.com>
-Cc:     Huang@google.com, Shaoqin <shaoqin.huang@intel.com>,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        Yosry Ahmed <yosryahmed@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=BeXPYPsPcks1vJnkCiVR+AZ4T0LVp8r4SqdR8q577ps=;
+        b=Vcq6Fcn862fjIiR+0bnbB/3aJMElC3TBlcKdmkiS9JW0Aufu2FydhUBv+3YM/keSJl
+         yZLHAWMvozB3fOgIcYCR/4TRzTqiTy8T+0We0HXtpQH6Mpw8o65sAS0etL3XG4YCYMsy
+         H6Xe7yxTrf9ZHOBRBG/1IBGkKK49ssmP/XmzwXAitXtQGLXidlUPg4iqmK6MQ3iAGs16
+         jm7TpchPcAGias61IiprEpLbhH9yn8iu1HKKHdjsbazTACgromdGyt0sYCm4c6uClw++
+         Mg/JYLZYbEvEpA7Iz//sAKmC7VjTty1mhRUPPPVPRYXCHpMrXlLZMYrDmgNgnNHuTYlF
+         HmbQ==
+X-Gm-Message-State: AJIora/k/JbMreL9mTCcgHdU4gcm8UGp1jwWZqWyrK+KED8hBnzrqEnW
+        9MYPFOaYYCP1I68SoAXN1mGMintWr1zmpObxEms=
+X-Google-Smtp-Source: AGRyM1voUQPlAmqRZ4l/SXD33ct9oPA4JA4sFQVTKk5qVckeyXriiYLvZWmk8WJ1W4W1a9L3Q/IJNHxDqsDJGMgdRd0=
+X-Received: by 2002:a05:600c:4b88:b0:3a0:4c39:dee5 with SMTP id
+ e8-20020a05600c4b8800b003a04c39dee5mr100574wmp.32.1656454456526; Tue, 28 Jun
+ 2022 15:14:16 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a5d:4bcc:0:0:0:0:0 with HTTP; Tue, 28 Jun 2022 15:14:15
+ -0700 (PDT)
+From:   Drzulu Nelson <dr.zulunelson09@gmail.com>
+Date:   Tue, 28 Jun 2022 15:14:15 -0700
+Message-ID: <CALWycZrKw52DV+=wXS-kuMt0fqEmzKejKf2AJ6Gy+Zp-3D_u2w@mail.gmail.com>
+Subject: Greetings
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: Yes, score=7.8 required=5.0 tests=ADVANCE_FEE_3_NEW,BAYES_50,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,FREEMAIL_REPLY,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2a00:1450:4864:20:0:0:0:329 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [dr.zulunelson09[at]gmail.com]
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [dr.zulunelson09[at]gmail.com]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  1.0 FREEMAIL_REPLY From and body contain different freemails
+        *  3.5 ADVANCE_FEE_3_NEW Appears to be advance fee fraud (Nigerian
+        *      419)
+        *  2.5 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Count the pages used by KVM in arm64 for stage2 mmu in memory stats
-under secondary pagetable stats (e.g. "SecPageTables" in /proc/meminfo)
-to give better visibility into the memory consumption of KVM mmu in a
-similar way to how normal user page tables are accounted.
+--=20
 
-Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/mmu.c | 36 ++++++++++++++++++++++++++++++++----
- 1 file changed, 32 insertions(+), 4 deletions(-)
+--=20
+Ordering beneficiary,
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 87f1cd0df36ea..9d5a8e93d2fdc 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -92,9 +92,13 @@ static bool kvm_is_device_pfn(unsigned long pfn)
- static void *stage2_memcache_zalloc_page(void *arg)
- {
- 	struct kvm_mmu_memory_cache *mc = arg;
-+	void *virt;
- 
- 	/* Allocated with __GFP_ZERO, so no need to zero */
--	return kvm_mmu_memory_cache_alloc(mc);
-+	virt = kvm_mmu_memory_cache_alloc(mc);
-+	if (virt)
-+		kvm_account_pgtable_pages(virt, 1);
-+	return virt;
- }
- 
- static void *kvm_host_zalloc_pages_exact(size_t size)
-@@ -102,6 +106,21 @@ static void *kvm_host_zalloc_pages_exact(size_t size)
- 	return alloc_pages_exact(size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
- }
- 
-+static void *kvm_s2_zalloc_pages_exact(size_t size)
-+{
-+	void *virt = kvm_host_zalloc_pages_exact(size);
-+
-+	if (virt)
-+		kvm_account_pgtable_pages(virt, (size >> PAGE_SHIFT));
-+	return virt;
-+}
-+
-+static void kvm_s2_free_pages_exact(void *virt, size_t size)
-+{
-+	kvm_account_pgtable_pages(virt, -(size >> PAGE_SHIFT));
-+	free_pages_exact(virt, size);
-+}
-+
- static void kvm_host_get_page(void *addr)
- {
- 	get_page(virt_to_page(addr));
-@@ -112,6 +131,15 @@ static void kvm_host_put_page(void *addr)
- 	put_page(virt_to_page(addr));
- }
- 
-+static void kvm_s2_put_page(void *addr)
-+{
-+	struct page *p = virt_to_page(addr);
-+	/* Dropping last refcount, the page will be freed */
-+	if (page_count(p) == 1)
-+		kvm_account_pgtable_pages(addr, -1);
-+	put_page(p);
-+}
-+
- static int kvm_host_page_count(void *addr)
- {
- 	return page_count(virt_to_page(addr));
-@@ -625,10 +653,10 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
- 
- static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
- 	.zalloc_page		= stage2_memcache_zalloc_page,
--	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
--	.free_pages_exact	= free_pages_exact,
-+	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
-+	.free_pages_exact	= kvm_s2_free_pages_exact,
- 	.get_page		= kvm_host_get_page,
--	.put_page		= kvm_host_put_page,
-+	.put_page		= kvm_s2_put_page,
- 	.page_count		= kvm_host_page_count,
- 	.phys_to_virt		= kvm_host_va,
- 	.virt_to_phys		= kvm_host_pa,
--- 
-2.37.0.rc0.161.g10f37bed90-goog
+This is to inform you that your payment file has been included in the
+first batch,Consequently, payment approval has been issued by the
+International Monitory Fund (IMF) for an initial payment of =E2=82=AC
+4,650,000,00 being part of your long-overdue payment.
 
+To facilitate this and avoid further bureaucratic bottlenecks,an
+accredited financial institution has been appointed to handle your
+payment file as well as others that fall in the same category.
+
+I therefore request to know if you are interested in receiving this
+fund within the next seven banking days or would prefer to have it at
+a later date within the year. If you are ready to receive the above
+mentioned figure as explained,let me know immediately so I can send
+you contact details for the appointed financial institution.
+
+Kindly reply through my private email: ( officeauditor28@gmail.com )
+
+Yours In Servive
+For;The International Monitory Fund (IMF)
+London Ln,Bromley BR1 4HF,UK
+Visit our website: www.imf.org
