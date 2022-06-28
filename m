@@ -2,108 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF6E255ECDB
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 20:44:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C8CD55ED12
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 20:54:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232736AbiF1SoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 14:44:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44808 "EHLO
+        id S232389AbiF1SyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 14:54:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232853AbiF1SoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 14:44:09 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B08623BD2
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 11:44:06 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 2so6454522qvc.0
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 11:44:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=srd0vxfduo9pXREXizXvQ1Gwi/kEACFP1rdXcY0Aglg=;
-        b=QDfPPT0fYl+zbzIvYII9znFGb4s02ZWc7rdJXgoVlQii3pb6MPHXUbo2NQcshGpobE
-         dWlWXPBgu4AcM4BoWih7Z1Nr6ImLeGEz2FZoCblM4qyf8MsycIzs6ej4nXX7nwNpGP6Q
-         WS2wAoLm7tunOmWFHsCTXENR5aJ2dwangh3Hiy+KajaZLCQ31/GJ39i5LG+HlW0f/4Yp
-         DzCT3gMR3JvAVHruRt3NJZXTCo87e7XIf3RRiCTD40KLgGYQ8Oy9U016RK3fPhyNykEI
-         VcI+7whSObzV9gDqoR9iwpi6V1hWpQPbHnX1dl7fE5ec/owdsM9r7W03JXKpNXxaLmSi
-         lJng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=srd0vxfduo9pXREXizXvQ1Gwi/kEACFP1rdXcY0Aglg=;
-        b=qsc2o/iTuLuuyqgqW+xuhEPA83PSxi2iT20cZz2Pd7OxYS+qKVAtZ2siIb4eJTp3bL
-         j8dlJTJF8fxAnci0qIFZcUHCGi/gVKKGeP3M+kmAQP0CpNnCxou6bTTjS4vkW3H74Jf3
-         wRwgozv1Qt+7Sh0gyyxwIVK3wdTwGFvKL6ICqFaLD8qj76hgxo/wxqpX2KJK7dPXoFG8
-         Xw9PxOgwZjKtyK/eCP9CyCj+VItF9Uq2ZRGFpRyhk5ZBp2ivqbo0pkY6iInZo/4vXdG4
-         HLDa0NjahqNMlscttIcqmTclCCAufxKhcyJUXecdrdOlMNPhyu4U7lBHKR+m9gupZpPp
-         c5/g==
-X-Gm-Message-State: AJIora/BSWwEGYE9SZibzbyFOKiyNEeroQojAf0E/Cqxuc2N4+8EkQ0W
-        OZsOebwmqN13a5sMocRTpo/Mdw==
-X-Google-Smtp-Source: AGRyM1uBRJ6m7mmrK5Ju1JW1doBHC+UzIgAGX/xwYqaVx3XSmh4juFCDP3TjiYp7BZ5iZ3elpoeXxg==
-X-Received: by 2002:a05:622a:7:b0:31b:74bd:1597 with SMTP id x7-20020a05622a000700b0031b74bd1597mr6494688qtw.677.1656441846052;
-        Tue, 28 Jun 2022 11:44:06 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id h9-20020ac85149000000b003050bd1f7c9sm9708477qtn.76.2022.06.28.11.44.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 11:44:05 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1o6GBw-0035y2-Fs; Tue, 28 Jun 2022 15:44:04 -0300
-Date:   Tue, 28 Jun 2022 15:44:04 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Daniel Borkmann <daniel@iogearbox.net>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, dm-devel@redhat.com,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, io-uring@vger.kernel.org,
-        lvs-devel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        kasan-dev@googlegroups.com, linux-mmc@vger.kernel.org,
-        nvdimm@lists.linux.dev, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, linux-perf-users@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        v9fs-developer@lists.sourceforge.net, linux-rdma@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] treewide: uapi: Replace zero-length arrays with
- flexible-array members
-Message-ID: <20220628184404.GS23621@ziepe.ca>
-References: <20220627180432.GA136081@embeddedor>
- <6bc1e94c-ce1d-a074-7d0c-8dbe6ce22637@iogearbox.net>
- <20220628004052.GM23621@ziepe.ca>
- <202206281009.4332AA33@keescook>
+        with ESMTP id S229766AbiF1SyF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 14:54:05 -0400
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A81A22BD3;
+        Tue, 28 Jun 2022 11:54:03 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 18:53:55 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1656442441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=htPFhHOsa3d7/VGnFqnbz5VFkkx8xDdtzMvjjntEVQQ=;
+        b=d6djTxUwEkHGAYEqJ+FSn4G/FZeJSZoQaoOZxxQhJaqcI2qvYIgXT+trdlZ0GWC661TwyO
+        1oiSHS8oHUyMAMhElHKJhcjJFylgZXvccpHWWmhbSO2Tv35HgJpLHoM6RfUaZ/baIXg/yK
+        KB8JzslXVDM8K4q77AikRR+g7gpG87A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        cgroups@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v5 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in
+ secondary pagetable stats
+Message-ID: <YrtOQxEi8fijGwSQ@google.com>
+References: <20220606222058.86688-1-yosryahmed@google.com>
+ <20220606222058.86688-5-yosryahmed@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202206281009.4332AA33@keescook>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220606222058.86688-5-yosryahmed@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 10:54:58AM -0700, Kees Cook wrote:
+Hi Yosry,
 
- 
-> which must also be assuming it's a header. So probably better to just
-> drop the driver_data field? I don't see anything using it (that I can
-> find) besides as a sanity-check that the field exists and is at the end
-> of the struct.
+On Mon, Jun 06, 2022 at 10:20:58PM +0000, Yosry Ahmed wrote:
+> Count the pages used by KVM in arm64 for stage2 mmu in secondary pagetable
+> stats.
 
-The field is guaranteeing alignment of the following structure. IIRC
-there are a few cases that we don't have a u64 already to force this.
+You could probably benefit from being a bit more verbose in the commit
+message here as well, per Sean's feedback.
 
-Jason
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 36 ++++++++++++++++++++++++++++++++----
+>  1 file changed, 32 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index f5651a05b6a85..80bc92601fd96 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -92,9 +92,13 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+>  static void *stage2_memcache_zalloc_page(void *arg)
+>  {
+>  	struct kvm_mmu_memory_cache *mc = arg;
+> +	void *virt;
+>  
+>  	/* Allocated with __GFP_ZERO, so no need to zero */
+> -	return kvm_mmu_memory_cache_alloc(mc);
+> +	virt = kvm_mmu_memory_cache_alloc(mc);
+> +	if (virt)
+> +		kvm_account_pgtable_pages(virt, 1);
+> +	return virt;
+>  }
+>  
+>  static void *kvm_host_zalloc_pages_exact(size_t size)
+> @@ -102,6 +106,21 @@ static void *kvm_host_zalloc_pages_exact(size_t size)
+>  	return alloc_pages_exact(size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+>  }
+>  
+> +static void *kvm_s2_zalloc_pages_exact(size_t size)
+> +{
+> +	void *virt = kvm_host_zalloc_pages_exact(size);
+> +
+> +	if (virt)
+> +		kvm_account_pgtable_pages(virt, (size >> PAGE_SHIFT));
+> +	return virt;
+> +}
+> +
+> +static void kvm_s2_free_pages_exact(void *virt, size_t size)
+> +{
+> +	kvm_account_pgtable_pages(virt, -(size >> PAGE_SHIFT));
+> +	free_pages_exact(virt, size);
+> +}
+> +
+>  static void kvm_host_get_page(void *addr)
+>  {
+>  	get_page(virt_to_page(addr));
+> @@ -112,6 +131,15 @@ static void kvm_host_put_page(void *addr)
+>  	put_page(virt_to_page(addr));
+>  }
+>  
+> +static void kvm_s2_put_page(void *addr)
+> +{
+> +	struct page *p = virt_to_page(addr);
+> +	/* Dropping last refcount, the page will be freed */
+> +	if (page_count(p) == 1)
+> +		kvm_account_pgtable_pages(addr, -1);
+> +	put_page(p);
+
+Probably more of a note to myself with the parallel fault series, but
+this is a race waiting to happen. This only works because stage 2 pages
+are dropped behind the write lock.
+
+Besides the commit message nit:
+
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
