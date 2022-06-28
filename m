@@ -2,121 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBCF955E642
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:26:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5DD655E6A4
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:30:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347006AbiF1N4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 09:56:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33650 "EHLO
+        id S1347281AbiF1OCv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 10:02:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346917AbiF1N4a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 09:56:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0FA633378;
-        Tue, 28 Jun 2022 06:56:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 556076198B;
-        Tue, 28 Jun 2022 13:56:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C80ADC341CA;
-        Tue, 28 Jun 2022 13:56:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656424588;
-        bh=b5FsKFMrP1+S6zwgUlKhr8WAIjk2qEr4j/i4jiXKeUI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ipH9xLLON/wfF1+doX0YwzWNurZbGyHCLx43ahE7WR8jLi1R48cI2m2yJAsZCWDQT
-         Un4VNsnpjcqqdwdfvJBWhdCzCR6kAmILST6sGe+QmxtUWHpxGj2/l2NK930cX7S1Vb
-         ck1tdm9dVL3hHqJ5pPK6X9u94v/kg7IeqTTrypuenoyOXdLstD1jm9a1r2/Mn+hjvK
-         A5gIe8GNT4XoGXRtGng12sB0ehpNIhwjOmzNMxwSBDvTu3O5JPGVxOwJ5SG66up68M
-         dTuMxAaqVKV5rVpkj9AWHYexDQNYp0rXQRl//EEgGVYdOgnC2OLlmpTSGeWpC665ae
-         t2Abf09RRIvCQ==
-Date:   Tue, 28 Jun 2022 15:56:23 +0200
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Daniel Borkmann <daniel@iogearbox.net>,
-        Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, dm-devel@redhat.com,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, io-uring@vger.kernel.org,
-        lvs-devel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        kasan-dev@googlegroups.com, linux-mmc@vger.kernel.org,
-        nvdimm@lists.linux.dev, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, linux-perf-users@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        v9fs-developer@lists.sourceforge.net, linux-rdma@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] treewide: uapi: Replace zero-length arrays with
- flexible-array members
-Message-ID: <20220628135623.GA25163@embeddedor>
-References: <20220627180432.GA136081@embeddedor>
- <6bc1e94c-ce1d-a074-7d0c-8dbe6ce22637@iogearbox.net>
- <20220628004052.GM23621@ziepe.ca>
- <20220628005825.GA161566@embeddedor>
- <20220628022129.GA8452@embeddedor>
- <20220628133651.GO23621@ziepe.ca>
+        with ESMTP id S1347267AbiF1OCp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 10:02:45 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A567369FB;
+        Tue, 28 Jun 2022 07:02:44 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SDilM0016406;
+        Tue, 28 Jun 2022 14:02:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=5/QMaliZipWecbQgYNAZovL+fmzTZDinlxHWslcC+dE=;
+ b=blp9Kq+BwBf/teu6/ZuMozeByp2hkXTtZ4x80qjpPHH+V7unWG7lr3OZo6l7z5Kr9TNm
+ F3tMOu8Xuu+993lDWbTuNoSxbv+f2I1+6fA2Im7cc5/0tAVeZRLkzrIs6iykr/ewHr8H
+ FlNOGKn8Gly4InXAspaUfx5d62R3N8XhwzYVIgNcY2OwP79h1LQuy9JcsKFvJr5VmzAa
+ nN68y1xQQmauz6Y9F2VrUuO7z9S7V2YgP3sZS+o+Ut3sGETnVX56K/b8UbrdInjh1CuM
+ Hk5yu9Bz9NFwjT/wyuZ5SQsnjaIBiM7aZN2XZnJ5+FN9miYwaN6bCuluas8qHnTw91gq Lw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02swgprf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 14:02:39 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SDk5xO021402;
+        Tue, 28 Jun 2022 14:02:38 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02swgpq4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 14:02:38 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SDplhr013472;
+        Tue, 28 Jun 2022 14:02:37 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 3gwt08upq8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 14:02:36 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SE2Xe520054336
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jun 2022 14:02:33 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 99F7FA4062;
+        Tue, 28 Jun 2022 14:02:33 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 79CDBA4054;
+        Tue, 28 Jun 2022 14:02:32 +0000 (GMT)
+Received: from [9.171.60.225] (unknown [9.171.60.225])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Jun 2022 14:02:32 +0000 (GMT)
+Message-ID: <66447089-921d-3665-963d-b9303b411f7f@linux.ibm.com>
+Date:   Tue, 28 Jun 2022 16:02:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v9 00/21] KVM: s390: enable zPCI for interpretive
+ execution
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        pbonzini@redhat.com
+Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, corbet@lwn.net, jgg@nvidia.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
+ <f86e2e05-114a-cc9e-8f3a-96b36889063d@linux.ibm.com>
+ <c98e7c10-272c-2bbb-6909-046d57d721d1@linux.ibm.com>
+ <425d3030-94e2-efeb-60fd-08516443a06a@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <425d3030-94e2-efeb-60fd-08516443a06a@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: imExGSBWA-3QoTOSX8w9x6m5dWp2eZ1V
+X-Proofpoint-ORIG-GUID: 46GAodoAsTfTdwPcHQQxYfJKwqZuuSvK
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220628133651.GO23621@ziepe.ca>
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-28_07,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ suspectscore=0 clxscore=1015 mlxscore=0 adultscore=0 priorityscore=1501
+ bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206280059
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 10:36:51AM -0300, Jason Gunthorpe wrote:
-> On Tue, Jun 28, 2022 at 04:21:29AM +0200, Gustavo A. R. Silva wrote:
-> 
-> > > > Though maybe we could just switch off -Wgnu-variable-sized-type-not-at-end  during configuration ?
-> 
-> > We need to think in a different strategy.
-> 
-> I think we will need to switch off the warning in userspace - this is
-> doable for rdma-core.
-> 
-> On the other hand, if the goal is to enable the array size check
-> compiler warning I would suggest focusing only on those structs that
-> actually hit that warning in the kernel. IIRC infiniband doesn't
-> trigger it because it just pointer casts the flex array to some other
-> struct.
 
-Yep; this is actually why I reverted those changes in rdma (before
-sending out the patch) when 0-day reported the same problems you pointed
-out[1].
 
-Also, that's the strategy I'm following right now with the one-element
-array into flex-array member transformations. I'm addressing those cases
-in which the trailing array is actually being iterated over, first.
-
-I just added the patch to my -next tree, so it can be build-tested by
-other people, and let's see what else is reported this week. :)
-
---
-Gustavo
-
-[1] https://lore.kernel.org/lkml/620ca2a5.NkAEIDEfiYoxE9%2Fu%25lkp@intel.com/
-
+Am 28.06.22 um 15:40 schrieb Matthew Rosato:
+> On 6/28/22 8:35 AM, Christian Borntraeger wrote:
+>> Am 27.06.22 um 22:57 schrieb Matthew Rosato:
+>>> On 6/6/22 4:33 PM, Matthew Rosato wrote:
+>>>> Enable interpretive execution of zPCI instructions + adapter interruption
+>>>> forwarding for s390x KVM vfio-pci.  This is done by triggering a routine
+>>>> when the VFIO group is associated with the KVM guest, transmitting to
+>>>> firmware a special token (GISA designation) to enable that specific guest
+>>>> for interpretive execution on that zPCI device.  Load/store interpreation
+>>>> enablement is then controlled by userspace (based upon whether or not a
+>>>> SHM bit is placed in the virtual function handle).  Adapter Event
+>>>> Notification interpretation is controlled from userspace via a new KVM
+>>>> ioctl.
+>>>>
+>>>> By allowing intepretation of zPCI instructions and firmware delivery of
+>>>> interrupts to guests, we can reduce the frequency of guest SIE exits for
+>>>> zPCI.
+>>>>
+>>>>  From the perspective of guest configuration, you passthrough zPCI devices
+>>>> in the same manner as before, with intepretation support being used by
+>>>> default if available in kernel+qemu.
+>>>>
+>>>> Will follow up with a link the most recent QEMU series.
+>>>>
+>>>> Changelog v8->v9:
+>>>> - Rebase on top of 5.19-rc1, adjust ioctl and capability defines
+>>>> - s/kzdev = 0/kzdev = NULL/ (Alex)
+>>>> - rename vfio_pci_zdev_open to vfio_pci_zdev_open_device (Jason)
+>>>> - rename vfio_pci_zdev_release to vfio_pci_zdev_close_device (Jason)
+>>>> - make vfio_pci_zdev_close_device return void, instead WARN_ON or ignore
+>>>>    errors in lower level function (kvm_s390_pci_unregister_kvm) (Jason)
+>>>> - remove notifier accidentally left in struct zpci_dev + associated
+>>>>    include statment (Jason)
+>>>> - Remove patch 'KVM: s390: introduce CPU feature for zPCI Interpretation'
+>>>>    based on discussion in QEMU thread.
+>>>>
+>>>
+>>> Ping -- I'm hoping this can make the next merge window, but there are still 2 patches left without any review tag (16 & 17).
+>>
+>> Yes, I will queue this (as is). Ideally you would rebase this on top of kvm/next but I can also do while applying.
+>> Let me know if you want to respin with the Nits from Pierre.
 > 
-> It isn't actually an array it is a placeholder for a trailing
-> structure, so it is never indexed.
+> Ah, sorry -- I assume you mean Paolo's kvm/next?  I tried now and see some conflicts with the ioctl patch.
 > 
-> This is also why we hit the warning because the convient way for
-> userspace to compose the message is to squash the header and trailer
-> structs together in a super struct on the stack, then invoke the
-> ioctl.
+> Why don't I rebase on top of kvm/next along with these couple of changes from Pierre and send this as a v10 for you to queue.
 > 
-> Jason 
+> While at it, there's one other issue to be aware of -- There will also be small merge conflicts with a patch that just hit vfio-next, "vfio: de-extern-ify function prototypes" - My series already avoids adding externs to new prototypes, but adjacent code changes will cause a conflict with patches 10 and 17.
+> 
+> Not sure what the best way to proceed there is.
+> 
+> https://lore.kernel.org/kvm/165471414407.203056.474032786990662279.stgit@omen/
+
+I think Linus can sort out if the conflicts are trivial. As an alternative Alex could carry these patches, but then we have a merge conflict between him and KVM.
+Alex/Paolo, shall I do a topic branch that you both can merge?
