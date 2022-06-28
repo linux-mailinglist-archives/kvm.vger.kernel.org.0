@@ -2,278 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3FC755F208
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 01:47:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A1DB55F216
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 01:55:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbiF1Xnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 19:43:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56688 "EHLO
+        id S230455AbiF1XtV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 19:49:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiF1Xni (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 19:43:38 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F7F37A08
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 16:43:36 -0700 (PDT)
-Date:   Tue, 28 Jun 2022 16:43:29 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1656459815;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iD9bxhnD+YSICtIu8LvsIbymkt3lQEvJM0mEtuYjhPE=;
-        b=TK4gj2Rv519E4qzCOGaITxugQWfp+8adRlhp2JUURpxNugn+mwNHPjt8j233/0tNVbux64
-        2Jp48OgWF/tFoxFJ0trFrFmxOzVrFUL8fVD8DmswWdFNvKJ/NmcvVgok1TI1fR+Ho4ROMG
-        ermU4KO3Ec3i4mFyW0LNWE58JQb9eOE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, maz@kernel.org, bgardon@google.com,
-        dmatlack@google.com, pbonzini@redhat.com, axelrasmussen@google.com
-Subject: Re: [PATCH v4 09/13] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YruSIWFCOcKdj4NW@google.com>
-References: <20220624213257.1504783-1-ricarkol@google.com>
- <20220624213257.1504783-10-ricarkol@google.com>
+        with ESMTP id S229450AbiF1XtV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 19:49:21 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4311538D9B;
+        Tue, 28 Jun 2022 16:49:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656460160; x=1687996160;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=abqB8hsx2CRn5C6rESUaaRHsxya0aF2DV3aNj32CTmI=;
+  b=HsYs0ddBNizdTeDhPvMflWgCL7HXrH4XYfBWagBHIagrbSeAZs2/tVwG
+   zGGQkK32uY8S70fF5ugBZHgdpB2J8iJ3LxQxTQwKLjyFv4LmnaWfFY7ob
+   sV0V66YXl2/lNdwvdidOtTTbTHKCGY791lLX2O2x9bC0i1SXN4QolQroj
+   ZT6YZuKK2v+Zp7BSIDzVsvfGWW1i2IH4nMNBGlku+sbs2PGyzVmrDxQqT
+   GARvdWfIVnsErQvfa4xLO2D4LJRNgI8dfglDLlI+ZELzTIXFnOcUzV660
+   0mslW2bjJaFxOi5yYLu5r85iSmC56eE6rpPYgaHFq+LoC4uiAibj7Wgby
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10392"; a="282971528"
+X-IronPort-AV: E=Sophos;i="5.92,230,1650956400"; 
+   d="scan'208";a="282971528"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 16:49:19 -0700
+X-IronPort-AV: E=Sophos;i="5.92,230,1650956400"; 
+   d="scan'208";a="917374680"
+Received: from gregantx-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.119.76])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 16:49:16 -0700
+Message-ID: <ceb320a00eebd29d2031b94b6123ff31ba74c313.camel@intel.com>
+Subject: Re: [PATCH v5 03/22] cc_platform: Add new attribute to prevent ACPI
+ memory hotplug
+From:   Kai Huang <kai.huang@intel.com>
+To:     Igor Mammedov <imammedo@redhat.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Len Brown <len.brown@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Rafael Wysocki <rafael.j.wysocki@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>
+Date:   Wed, 29 Jun 2022 11:49:14 +1200
+In-Reply-To: <20220628140112.661154cf@redhat.com>
+References: <cover.1655894131.git.kai.huang@intel.com>
+         <87dc19c47bad73509359c8e1e3a81d51d1681e4c.1655894131.git.kai.huang@intel.com>
+         <CAJZ5v0jEJNdmkidvcOiRn+OVt01D5095t+nyXaJHKsqEAOvcBQ@mail.gmail.com>
+         <20220628140112.661154cf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220624213257.1504783-10-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+On Tue, 2022-06-28 at 14:01 +0200, Igor Mammedov wrote:
+> On Wed, 22 Jun 2022 13:45:01 +0200
+> "Rafael J. Wysocki" <rafael@kernel.org> wrote:
+>=20
+> > On Wed, Jun 22, 2022 at 1:16 PM Kai Huang <kai.huang@intel.com> wrote:
+> > >=20
+> > > Platforms with confidential computing technology may not support ACPI
+> > > memory hotplug when such technology is enabled by the BIOS.  Examples
+> > > include Intel platforms which support Intel Trust Domain Extensions
+> > > (TDX).
+> > >=20
+> > > If the kernel ever receives ACPI memory hotplug event, it is likely a
+> > > BIOS bug.  For ACPI memory hot-add, the kernel should speak out this =
+is
+> > > a BIOS bug and reject the new memory.  For hot-removal, for simplicit=
+y
+> > > just assume the kernel cannot continue to work normally, and just BUG=
+().
+> > >=20
+> > > Add a new attribute CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED to indicate =
+the
+> > > platform doesn't support ACPI memory hotplug, so that kernel can hand=
+le
+> > > ACPI memory hotplug events for such platform.
+> > >=20
+> > > In acpi_memory_device_{add|remove}(), add early check against this
+> > > attribute and handle accordingly if it is set.
+> > >=20
+> > > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > > ---
+> > >  drivers/acpi/acpi_memhotplug.c | 23 +++++++++++++++++++++++
+> > >  include/linux/cc_platform.h    | 10 ++++++++++
+> > >  2 files changed, 33 insertions(+)
+> > >=20
+> > > diff --git a/drivers/acpi/acpi_memhotplug.c b/drivers/acpi/acpi_memho=
+tplug.c
+> > > index 24f662d8bd39..94d6354ea453 100644
+> > > --- a/drivers/acpi/acpi_memhotplug.c
+> > > +++ b/drivers/acpi/acpi_memhotplug.c
+> > > @@ -15,6 +15,7 @@
+> > >  #include <linux/acpi.h>
+> > >  #include <linux/memory.h>
+> > >  #include <linux/memory_hotplug.h>
+> > > +#include <linux/cc_platform.h>
+> > >=20
+> > >  #include "internal.h"
+> > >=20
+> > > @@ -291,6 +292,17 @@ static int acpi_memory_device_add(struct acpi_de=
+vice *device,
+> > >         if (!device)
+> > >                 return -EINVAL;
+> > >=20
+> > > +       /*
+> > > +        * If the confidential computing platform doesn't support ACP=
+I
+> > > +        * memory hotplug, the BIOS should never deliver such event t=
+o
+> > > +        * the kernel.  Report ACPI CPU hot-add as a BIOS bug and ign=
+ore
+> > > +        * the memory device.
+> > > +        */
+> > > +       if (cc_platform_has(c)) { =20
+> >=20
+> > Same comment as for the acpi_processor driver: this will affect the
+> > initialization too and it would be cleaner to reset the
+> > .hotplug.enabled flag of the scan handler.
+>=20
+> with QEMU, it is likely broken when memory is added as
+>   '-device pc-dimm'
+> on CLI since it's advertised only as device node in DSDT.
+>=20
+>=20
 
-On Fri, Jun 24, 2022 at 02:32:53PM -0700, Ricardo Koller wrote:
-> Add a new test for stage 2 faults when using different combinations of
-> guest accesses (e.g., write, S1PTW), backing source type (e.g., anon)
-> and types of faults (e.g., read on hugetlbfs with a hole). The next
-> commits will add different handling methods and more faults (e.g., uffd
-> and dirty logging). This first commit starts by adding two sanity checks
-> for all types of accesses: AF setting by the hw, and accessing memslots
-> with holes.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/aarch64/page_fault_test.c   | 695 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |   6 +
->  3 files changed, 702 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index e4497a3a27d4..13b913225ae7 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -139,6 +139,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
->  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
-> +TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
->  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->  TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
->  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> new file mode 100644
-> index 000000000000..bdda4e3fcdaa
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+Hi Rafael,  Igor,
 
-[...]
+On my test machine, the acpi_memory_device_add() is not called for system
+memory.  It probably because my machine doesn't have memory device in ACPI.
 
-> +/* Compare and swap instruction. */
-> +static void guest_cas(void)
-> +{
-> +	uint64_t val;
-> +
-> +	GUEST_ASSERT_EQ(guest_check_lse(), 1);
+I don't know whether we can have any memory device in ACPI if such memory i=
+s
+present during boot?  Any comments here?
 
-Why not just GUEST_ASSERT(guest_check_lse()) ?
+And CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED is only true on TDX bare-metal sys=
+tem,
+but cannot be true in Qemu guest.  But yes if this flag ever becomes true i=
+n
+guest, then I think we may have problem here.  I will do more study around =
+ACPI.
+Thanks for comments!
 
-> +	asm volatile(".arch_extension lse\n"
-> +		     "casal %0, %1, [%2]\n"
-> +			:: "r" (0), "r" (TEST_DATA), "r" (guest_test_memory));
-> +	val = READ_ONCE(*guest_test_memory);
-> +	GUEST_ASSERT_EQ(val, TEST_DATA);
-> +}
-> +
-> +static void guest_read64(void)
-> +{
-> +	uint64_t val;
-> +
-> +	val = READ_ONCE(*guest_test_memory);
-> +	GUEST_ASSERT_EQ(val, 0);
-> +}
-> +
-> +/* Address translation instruction */
-> +static void guest_at(void)
-> +{
-> +	uint64_t par;
-> +	uint64_t paddr;
-> +
-> +	asm volatile("at s1e1r, %0" :: "r" (guest_test_memory));
-> +	par = read_sysreg(par_el1);
-
-I believe you need explicit synchronization (an isb) before the fault
-information is guaranteed visibile in PAR_EL1.
-
-> +	/* Bit 1 indicates whether the AT was successful */
-> +	GUEST_ASSERT_EQ(par & 1, 0);
-> +	/* The PA in bits [51:12] */
-> +	paddr = par & (((1ULL << 40) - 1) << 12);
-> +	GUEST_ASSERT_EQ(paddr, memslot[TEST].gpa);
-> +}
-> +
-> +/*
-> + * The size of the block written by "dc zva" is guaranteed to be between (2 <<
-> + * 0) and (2 << 9), which is safe in our case as we need the write to happen
-> + * for at least a word, and not more than a page.
-> + */
-> +static void guest_dc_zva(void)
-> +{
-> +	uint16_t val;
-> +
-> +	asm volatile("dc zva, %0\n"
-> +			"dsb ish\n"
-
-nit: use the dsb() macro instead. Extremely minor, but makes it a bit
-more obvious to the reader. Or maybe I need to get my eyes checked ;-)
-
-> +			:: "r" (guest_test_memory));
-> +	val = READ_ONCE(*guest_test_memory);
-> +	GUEST_ASSERT_EQ(val, 0);
-> +}
-> +
-> +/*
-> + * Pre-indexing loads and stores don't have a valid syndrome (ESR_EL2.ISV==0).
-> + * And that's special because KVM must take special care with those: they
-> + * should still count as accesses for dirty logging or user-faulting, but
-> + * should be handled differently on mmio.
-> + */
-> +static void guest_ld_preidx(void)
-> +{
-> +	uint64_t val;
-> +	uint64_t addr = TEST_GVA - 8;
-> +
-> +	/*
-> +	 * This ends up accessing "TEST_GVA + 8 - 8", where "TEST_GVA - 8" is
-> +	 * in a gap between memslots not backing by anything.
-> +	 */
-> +	asm volatile("ldr %0, [%1, #8]!"
-> +			: "=r" (val), "+r" (addr));
-> +	GUEST_ASSERT_EQ(val, 0);
-> +	GUEST_ASSERT_EQ(addr, TEST_GVA);
-> +}
-> +
-> +static void guest_st_preidx(void)
-> +{
-> +	uint64_t val = TEST_DATA;
-> +	uint64_t addr = TEST_GVA - 8;
-> +
-> +	asm volatile("str %0, [%1, #8]!"
-> +			: "+r" (val), "+r" (addr));
-> +
-> +	GUEST_ASSERT_EQ(addr, TEST_GVA);
-> +	val = READ_ONCE(*guest_test_memory);
-> +}
-> +
-> +static bool guest_set_ha(void)
-> +{
-> +	uint64_t mmfr1 = read_sysreg(id_aa64mmfr1_el1);
-> +	uint64_t hadbs, tcr;
-> +
-> +	/* Skip if HA is not supported. */
-> +	hadbs = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR1_HADBS), mmfr1);
-> +	if (hadbs == 0)
-> +		return false;
-> +
-> +	tcr = read_sysreg(tcr_el1) | TCR_EL1_HA;
-> +	write_sysreg(tcr, tcr_el1);
-> +	isb();
-> +
-> +	return true;
-> +}
-> +
-> +static bool guest_clear_pte_af(void)
-> +{
-> +	*((uint64_t *)TEST_PTE_GVA) &= ~PTE_AF;
-> +	flush_tlb_page(TEST_PTE_GVA);
-
-Don't you want to actually flush TEST_GVA to force the TLB fill when you
-poke the address again? This looks like you're flushing the VA of the
-*PTE* not the test address.
-
-> +	return true;
-> +}
-> +
-> +static void guest_check_pte_af(void)
-
-nit: call this guest_test_pte_af(). You use the guest_check_* pattern
-for test preconditions (like guest_check_lse()).
-
-> +{
-> +	flush_tlb_page(TEST_PTE_GVA);
-
-What is the purpose of this flush? I believe you are actually depending
-on a dsb(ish) between the hardware PTE update and the load below. Or,
-that's at least what I gleaned from the jargon of DDI0487H.a D5.4.13 
-'Ordering of hardware updates to the translation tables'.
-
-> +	GUEST_ASSERT_EQ(*((uint64_t *)TEST_PTE_GVA) & PTE_AF, PTE_AF);
-> +}
-
-[...]
-
-> +static void sync_stats_from_guest(struct kvm_vm *vm)
-> +{
-> +	struct event_cnt *ec = addr_gva2hva(vm, (uint64_t)&events);
-> +
-> +	events.aborts += ec->aborts;
-> +}
-
-I believe you can use sync_global_from_guest() instead of this.
-
-> +void fail_vcpu_run_no_handler(int ret)
-> +{
-> +	TEST_FAIL("Unexpected vcpu run failure\n");
-> +}
-> +
-> +extern unsigned char __exec_test;
-> +
-> +void noinline __return_0x77(void)
-> +{
-> +	asm volatile("__exec_test: mov x0, #0x77\n"
-> +			"ret\n");
-> +}
-> +
-> +static void load_exec_code_for_test(void)
-> +{
-> +	uint64_t *code, *c;
-> +
-> +	assert(TEST_EXEC_GVA - TEST_GVA);
-> +	code = memslot[TEST].hva + 8;
-> +
-> +	/*
-> +	 * We need the cast to be separate in order for the compiler to not
-> +	 * complain with: "‘memcpy’ forming offset [1, 7] is out of the bounds
-> +	 * [0, 1] of object ‘__exec_test’ with type ‘unsigned char’"
-> +	 */
-> +	c = (uint64_t *)&__exec_test;
-> +	memcpy(code, c, 8);
-
-Don't you need to sync D$ and I$?
-
---
+--=20
 Thanks,
-Oliver
+-Kai
+
+
