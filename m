@@ -2,74 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B62F555E74C
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:32:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F88555E866
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 18:35:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345308AbiF1Ole (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 10:41:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51480 "EHLO
+        id S1347024AbiF1O66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 10:58:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235217AbiF1Old (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 10:41:33 -0400
+        with ESMTP id S231396AbiF1O6z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 10:58:55 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 829202A268
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 07:41:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BFA822B1B8
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 07:58:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656427291;
+        s=mimecast20190719; t=1656428333;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=48PU0cYYAauvmPMjEHk3daV8QUhCzNTdWpVHcu7cu+c=;
-        b=Qi7ip8PQw3v9Q/Z4bp6Ool89coQoQ16JkHQA29SrD7m2jEXCsVwUEBodyFWNfVQhGnUS42
-        oo8d9Popwz+W3DBAes/DzjAbAxdU0W45AxukJSHsWju5Z15kKAZTIiqq/30l3eoxIX8DEu
-        6xoEeyIqJA3GzI4YpDxcblo9y3UC5dE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wWZyK/uRQKIBLtLS3ewqK6inJf2UuHE+gNb5lfdcjSk=;
+        b=BjKZsspFTMWuVxYopKD5kog7BnCpuu0rJVEH6rQuEbbHeCr/+cltOILUQG75smlCqL4I3z
+        rQQSMSnIkY35YP7M9jbgIRqSwuBtxXUYQhagWp6RNQoWvdoeLBxyrStAqS1nO73+l0nqpi
+        VjQtcvjPRWCvKr8SH8hOh1YQZKXtCaE=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-464-y19ERSOqOQKF1avHceko7A-1; Tue, 28 Jun 2022 10:41:27 -0400
-X-MC-Unique: y19ERSOqOQKF1avHceko7A-1
-Received: by mail-wm1-f70.google.com with SMTP id z11-20020a05600c0a0b00b003a043991610so4844997wmp.8
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 07:41:26 -0700 (PDT)
+ us-mta-624-l8mo8DD2OAy_ggqYzV2lwA-1; Tue, 28 Jun 2022 10:58:52 -0400
+X-MC-Unique: l8mo8DD2OAy_ggqYzV2lwA-1
+Received: by mail-il1-f200.google.com with SMTP id f18-20020a056e020c7200b002d949d97ed9so7394480ilj.7
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 07:58:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=48PU0cYYAauvmPMjEHk3daV8QUhCzNTdWpVHcu7cu+c=;
-        b=B73k8l/5vFhGXTlXGu4qcJRJ4Hay7YLOmDVs7UODh9N6rCrbbPZGlJ0U0OHcae1Ju8
-         clZVOJLnksJHXod5W57eRLF9xOjiU3/CrJLRCDl27cW3td/2pyvHQIGSR0zg9Ld+YMWl
-         CxAFrOq0XwbRuiuv69BXsIsIHhoydGlOrcb1YpbNe8qT3xT13mrWbK6imK1kATCCIniN
-         X96C1d+7tDZlngCVKWYIqAvAmLV8NG5aXhMCeBDdornXeHPtrHTNcoE8rqsexS8VxNJB
-         /LEDYRT+A26Bie668/Bl1RKQnVlKjPv8I/uDo2jgOBXzkysVRIhqGjKIjlSVuV3FHL9I
-         JT4g==
-X-Gm-Message-State: AJIora/tOnGFrWqd5/ehCXWKztTBP4Y4VIl0MV0iE6Y15jC3Oiehx6c9
-        7AtB8HBzsrmFXVVaiakJ27A46Zf5kSY0RWnHW6YfuhJVH/n6ozLap+V91sr2l27Dj3Ai8REaKuu
-        ehFyyzq/I3KFh
-X-Received: by 2002:a7b:c196:0:b0:3a0:3d46:4620 with SMTP id y22-20020a7bc196000000b003a03d464620mr24935513wmi.26.1656427285899;
-        Tue, 28 Jun 2022 07:41:25 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1u6jxItwk84c1RRYlUduqIBWNfAYYgWtgW4dA6EO+OmDjkEApm15lVFsnccLCGmyL7yp+p2yQ==
-X-Received: by 2002:a7b:c196:0:b0:3a0:3d46:4620 with SMTP id y22-20020a7bc196000000b003a03d464620mr24935491wmi.26.1656427285627;
-        Tue, 28 Jun 2022 07:41:25 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id h13-20020adff4cd000000b002103aebe8absm13797860wrp.93.2022.06.28.07.41.24
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=wWZyK/uRQKIBLtLS3ewqK6inJf2UuHE+gNb5lfdcjSk=;
+        b=Etel+sFGLf1Dwe1LqI1NqGTL+hIIYFFqS2UV58fKpl0f3yVHyh6kRcCBQuJYTXIW1/
+         2xgSfdlSrUa7qb68a7wBQR4mMHOl7X1JOEWHSVMhHLwZ2dOk5mW86Pu2qxgAWOWg2ANH
+         sNCf+EBssuj4mZQbeUzO3Df8J6+uwVaG7524VgdMpyll/SSiVsrglC6WJhszUUYH4aLl
+         bDqqJ4oIBdp5GKtWN2c/xrmfI9LIzzfcMXYiKPPycWs9AEfuWiK+DxvcPJBMEyHhJIaY
+         wxLCgXjmeKq55J8VqGfq8rY1c36FyHuRDGtyGnMQkFbrOP6s7tiFeHIVJKkKSv5+5nti
+         pEbw==
+X-Gm-Message-State: AJIora+3ci8EXiR+BhnnofVyWVphlkFPVAeay+kvP2Cti4ama/yqIYKb
+        /8wWPlrPj3rZi7GdZ3FKzmwmhAR+zMRgmDsbfhKWC0gDjBVixFspY15B/bhfJkGu0hUg71fzVju
+        83T19chFmZTwj
+X-Received: by 2002:a02:999a:0:b0:339:f344:9f74 with SMTP id a26-20020a02999a000000b00339f3449f74mr10609365jal.43.1656428332054;
+        Tue, 28 Jun 2022 07:58:52 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uANWXOfsrMsFoE5tiVeWwTUwjkf/3dlb7vOyiE6sRhu1BS85sSjEO6OydCreN5FFFY5yFCYA==
+X-Received: by 2002:a02:999a:0:b0:339:f344:9f74 with SMTP id a26-20020a02999a000000b00339f3449f74mr10609338jal.43.1656428331841;
+        Tue, 28 Jun 2022 07:58:51 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y13-20020a056638038d00b00332109dad56sm6082749jap.137.2022.06.28.07.58.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 07:41:25 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Alexander Mikhalitsyn <alexander.mikhalitsyn@virtuozzo.com>,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <joro@8bytes.org>, babu.moger@amd.com,
-        den@virtuozzo.com, ptikhomirov@virtuozzo.com,
-        alexander@mihalicyn.com, Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [RFC] SVM: L2 hang with fresh L1 and old L0
-In-Reply-To: <20220628172342.ffbb5b087260ef3046797492@virtuozzo.com>
-References: <20220628172342.ffbb5b087260ef3046797492@virtuozzo.com>
-Date:   Tue, 28 Jun 2022 16:41:24 +0200
-Message-ID: <87r138u9yj.fsf@redhat.com>
+        Tue, 28 Jun 2022 07:58:51 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 08:58:49 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v9 10/21] vfio/pci: introduce CONFIG_VFIO_PCI_ZDEV_KVM
+Message-ID: <20220628085849.1b1e67bd.alex.williamson@redhat.com>
+In-Reply-To: <20220606203325.110625-11-mjrosato@linux.ibm.com>
+References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
+        <20220606203325.110625-11-mjrosato@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -80,76 +86,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alexander Mikhalitsyn <alexander.mikhalitsyn@virtuozzo.com> writes:
+On Mon,  6 Jun 2022 16:33:14 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> Dear friends,
->
-> Recently, we (in OpenVZ) noticed an interesting issue with
-> L2 VM hang on RHEL 7 based hosts with SVM (AMD).
->
-> Let me describe our test configuration:
-> - AMD EPYC 7443P (Milan) or AMD EPYC 7261 (Rome)
-> - RHEL 7 based kernel on the Host Node.
-> ... and most important:
->
-> L0 -----------> L1 --------> L2
-> RHEL 7       -> RHEL 7 --------> RHEL 7        *works*
-> RHEL 7       -> RHEL 7 --------> RHEL 8        *works*
-> RHEL 7       -> RHEL 7 --------> recent Fedora *works*
-> RHEL 7       -> RHEL 8 --------> RHEL 7        *L2 hang*
-> RHEL 7       -> fresh Fedora --> RHEL 7        *L2 hang*
->
-> or even more:
-> RHEL 7       -> RHEL 7 --------> *any tested Linux guest*  *works*
-> RHEL 7       -> RHEL 8 --------> *any tested Linux guest*  *L2 hang*
->
-> but at the same time:
-> RHEL 8       -> RHEL 8 --------> *any tested Linux guest*  *works*
->
-> It was the key observation and I've started bisecting L1 kernel to find
-> some hint. It was commit:
-> c9d40913 ("KVM: x86: enable event window in inject_pending_event")
->
-> At the same minute I've tried to revert it for CentOS 8 kernel and retry test,
-> and it... works! To conclude, if we have an *old* kernel on host and *sufficiently new* kernel
-> in L1 then L2 totaly broken (only for SVM).
->
-> I've tried to port this patch for L0 kernel and check if it will fix the issue. And yes,
-> it works. I wonder if it will be useful information for KVM developers and users.
->
-> My attempt to port it for RHEL 7 kernel:
-> https://lists.openvz.org/pipermail/devel/2022-June/079776.html
+> The current contents of vfio-pci-zdev are today only useful in a KVM
+> environment; let's tie everything currently under vfio-pci-zdev to
+> this Kconfig statement and require KVM in this case, reducing complexity
+> (e.g. symbol lookups).
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  drivers/vfio/pci/Kconfig      | 11 +++++++++++
+>  drivers/vfio/pci/Makefile     |  2 +-
+>  include/linux/vfio_pci_core.h |  2 +-
+>  3 files changed, 13 insertions(+), 2 deletions(-)
 
-Thanks for the investigation!
 
-FWIW, nesting was never supported in RHEL7. It was disabled by default
-and only worked to certain extent on Intel. By the time we stopped
-rebasing KVM in RHEL7, nested SVM was still a trainwreck, even upstream.
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
->
-> Possibly I need to port this patches for stable kernels too and send it?
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/log/?h=v4.9.320&qt=grep&q=enable+event+window+in+inject_pending_event
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/log/?h=v4.14.285&qt=grep&q=enable+event+window+in+inject_pending_event
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/log/?h=v4.19.249&qt=grep&q=enable+event+window+in+inject_pending_event
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/log/?h=v5.4.201&qt=grep&q=enable+event+window+in+inject_pending_event
->
-> So, 4.9, 4.14, 4.19 and 5.4 kernels lacks this patch.
 
-Personally, I wouldn't bother with anything below 5.4, nSVM is in very
-poor shape there, fixing one problem will just create an illusion that
-it is 'supported'. 
-
->
-> I've not checked that yet but it looks like, for instance,
->
-> L0  -> L1   -> L2
-> 5.4 -> 5.10 -> *any kernel version*
->
-> setup will hang for SVM.
-
-Cc: Max who fixed a long list of issues on nSVM.
-
--- 
-Vitaly
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index 4da1914425e1..f9d0c908e738 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -44,6 +44,17 @@ config VFIO_PCI_IGD
+>  	  To enable Intel IGD assignment through vfio-pci, say Y.
+>  endif
+>  
+> +config VFIO_PCI_ZDEV_KVM
+> +	bool "VFIO PCI extensions for s390x KVM passthrough"
+> +	depends on S390 && KVM
+> +	default y
+> +	help
+> +	  Support s390x-specific extensions to enable support for enhancements
+> +	  to KVM passthrough capabilities, such as interpretive execution of
+> +	  zPCI instructions.
+> +
+> +	  To enable s390x KVM vfio-pci extensions, say Y.
+> +
+>  source "drivers/vfio/pci/mlx5/Kconfig"
+>  
+>  source "drivers/vfio/pci/hisilicon/Kconfig"
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index 7052ebd893e0..24c524224da5 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -1,7 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  
+>  vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
+> -vfio-pci-core-$(CONFIG_S390) += vfio_pci_zdev.o
+> +vfio-pci-core-$(CONFIG_VFIO_PCI_ZDEV_KVM) += vfio_pci_zdev.o
+>  obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
+>  
+>  vfio-pci-y := vfio_pci.o
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index 23c176d4b073..63af2897939c 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -206,7 +206,7 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+>  }
+>  #endif
+>  
+> -#ifdef CONFIG_S390
+> +#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
+>  extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>  				       struct vfio_info_cap *caps);
+>  #else
 
