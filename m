@@ -2,286 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DE5955EB8D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 19:57:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1E5055EB92
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 19:58:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233629AbiF1R5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 13:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44172 "EHLO
+        id S233621AbiF1R6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 13:58:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233595AbiF1R5q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 13:57:46 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2043.outbound.protection.outlook.com [40.107.95.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B140B64FC;
-        Tue, 28 Jun 2022 10:57:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ep5l1oq1yhBb+WU7NDLuGlv4aCwUVX/ODIGkv6/CDDqUq/mVOaddDrhfDGnhazuVoEIc9r6iD48Uru0Z6s4A4n8URC4n9GBxqKzAYMU+7jskxIAp2AzvrXWMV/uyyjzp96tRx9SulceWlgw2hvgoxi4PRAdGt5k157LaP0Gl1/xFX7yF4vnvYUHimmppVcUcnjkFfdI8/A01VHnGym82XFTQBSnLLszPLJyxGj2oCDcaC0uzhIF6ST7Ir7wx8eX3jT5vKbSWWuaC75ocbR60crkc80u/7R/IBJcsmsO7jorDtbEbz5rzlbXBL05SRIhb9emgfQkZ3rrSbsu7O6+u5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hfjK6teZjOc6AUQwfjsBUHZ+3rTSF4jj8qciTFjfqjk=;
- b=kax9MbYMjvDWHoVUdirxhkoSOoKK/kXlf0r6nRutD0LHcn3/rboyI5gqCEhwU6sg0C7unrmPWqEU8svcf+y+nnTQdM/rE2u5+pSqYb1F5qemk474hujUaEbcJiPkU0fVBXiHEvJMIA52cbU92RubEfYR9K4u+ukdDaJlI8mjY7rILWbMaSZsStySTpi6awfQu1ppbdHV6qRnZt+CgfApoe+IHelzB1n9bqfHtmIUCwLXjlzjneCgi2Tl991lKd3zJvTCPPkEEEAYNrdDSrbrNye+J2qN2pFCKdKwX+DPkIUZNLoqq+dEx9klRROzMrcm67xR96RGkKKHA//A27U8SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hfjK6teZjOc6AUQwfjsBUHZ+3rTSF4jj8qciTFjfqjk=;
- b=V6Zxhd6Zvh4fbEytDmBMP15JolIO2tfnMVzzr54o6ciC9w5LskIYgC1W203zU7PfI26cLVxIuMDz/a68hsMy5SeQxApafQw+2cvRsWIBF4P05qkI9wlayQoalWLiQuxjuYrQlJtKTreOLMOmGuSJbIzw2f9lwprj+HaBdT8pml0=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by BYAPR12MB4792.namprd12.prod.outlook.com (2603:10b6:a03:108::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Tue, 28 Jun
- 2022 17:57:42 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d%7]) with mapi id 15.20.5373.022; Tue, 28 Jun 2022
- 17:57:41 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: RE: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Thread-Topic: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Thread-Index: AQHYhY2kulHh/HmbIUq97K70l/FApa1aH19QgAGdtQCACPGfgIAAdLzQ
-Date:   Tue, 28 Jun 2022 17:57:41 +0000
-Message-ID: <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
- <YrH0ca3Sam7Ru11c@work-vm>
- <SN6PR12MB2767FBF0848B906B9F0284D28EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
- <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <Yrrc/6x70wa14c5t@work-vm>
-In-Reply-To: <Yrrc/6x70wa14c5t@work-vm>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-06-28T17:48:27Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=46f29bd8-1585-495e-83b5-e58dfb002f98;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-06-28T17:57:39Z
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: e25f21d7-47a8-4fea-8c79-95c19848ca4a
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e7b99f7f-9c92-46f3-92d3-08da592fb27f
-x-ms-traffictypediagnostic: BYAPR12MB4792:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: peOWbw5o7QIaJ10c592rrpvQ82aInVzTe63b42ELDVlb4isRlARpTXvTVmq8q7PQpSvLDVXfTID4utTcaDblqjFdnk1PPBb5fC/FMfr6JXBvZvcMtxSD3tioEd/MTTMnGKIZ0RbLYJe6gLXgsXq+ztVZy6b+GhCRO/UyMJjqJfrvZUkO1ZoTNxdGHMV3gK6Kl9UjXzZlAi2dwPmoF1T4/hnvhpkBVBIWaacrmmBcJ2u8MkKzoa36Zcq1KDCabPNZ4a8EldrTlYoRyf8+m5Rq4lAR7fLX3zRT3KR9ztNI6jeLhq/NzmQ8OB7P3LgV4x/Sg7MPKx6QTaA8obd6Cu77MArZSjgFJqca/81W7cqYMsmj/B/TDI7RpcOAl9L+84v1T+duVRXeOr6rNkPdG343v9n3pODH+a3Q2V1T9BOkgAB7MhD4kxAxFPD0G+O99V5lJeg2RAsTrsl8p4GF/JJf+T80w45ArPXdsOxyvk8I6bH5lc0V59oKFIZdEseon3LTM+Fo5/pvI4OFkcAfcWqkSyiz3xLbKeRdzDsNTPPl1XPVi5MG0VLzapEyRSltdo5twtHAWSp/spid7oS+fqqMQ3gQeVL1UEpyGHxfvTVuVj9HKxm0lvcoXchAncnnMqBtMYVvOw5RsOSy3y0mfbF9HxOwiPrUpmQR42FzZBKC58tlVsqKe+vd2OADLFtSUtS3NmzjdWuXG1zDcpg5DUuAGXUCHw9Kcshbr0MUS9T2al7yRnn0kGZbXZ0N9eAaRdmBRW5Hm8oBgaJ3Crwuvbs9/9eJboaNJoz/c2cQOPwpsbQ=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(346002)(396003)(376002)(39860400002)(366004)(53546011)(186003)(7696005)(41300700001)(6506007)(26005)(9686003)(66556008)(66476007)(38100700002)(83380400001)(38070700005)(55016003)(122000001)(8936002)(5660300002)(7406005)(7416002)(316002)(52536014)(33656002)(2906002)(54906003)(64756008)(6916009)(4326008)(86362001)(478600001)(71200400001)(66446008)(8676002)(76116006)(66946007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?J3AW/VS9SEHMjjFv5TD9Z+yY27VxOlbv/BXnvDwAC75saj/TALj/DCK9/ljl?=
- =?us-ascii?Q?PDjvxBnJvunExv9/WfMwdn0LDVfAnljValAKEIsQ12rtkxHyUkvQsCh8UWTY?=
- =?us-ascii?Q?h2NpiQvQRz3NkCtD8TcDl6Fj0CeDq4PK7RPnQDefxP65sXddFOGvTUrbHyK3?=
- =?us-ascii?Q?dAkAr2ISD0iRIwnN5HGcTCJnvbWj2NBjoRBMNFElOMDoyVHJk2RIb87UXURx?=
- =?us-ascii?Q?bvofu5KR2HLzTs1do/CEaxRL5A7CDNzbgqlalCGfDcMteD+QGQsS/wky2Rsl?=
- =?us-ascii?Q?RImUfB3eap7Ncjmlg+mZs+K903/8oX2x2nbbmjUTuuDoXnaiSvFZst0P9Clm?=
- =?us-ascii?Q?oEvWnxag35wStoAnhnGm21ZBodrKfxO9dBJUVNKdo3gaSFtqrgWNb4oj+7pu?=
- =?us-ascii?Q?dGedvisbRyoQhuM8B4pn2cuVtvM+RF1/C/qO68tQVOp4WHvuW8jqyMGVYa7J?=
- =?us-ascii?Q?gNOcjZopB+hD/oEkK+9IPf36Mcw8LbHWN07hlvW6gaTqkzn9xP+6uwH/CPrL?=
- =?us-ascii?Q?D5G6UW7BQUDGcPvV8lVwi0qLS4tsso4wMdjF0nvrwGgMAX62uJipxeq0aSTy?=
- =?us-ascii?Q?OO4O+8HyNZjajlRB0/boFVhRwoXm8SMPyghwEqtsm3Mm35EvRwx+P9hPB4EH?=
- =?us-ascii?Q?YMTMRqCPMFcc9lqOdcxNuJm0XgEewLdw28vlQztRssm9mlMO9MOZ75Nn2Inl?=
- =?us-ascii?Q?OFpm0+y/YhGkSIv2OnWN6ob4/kVEqnF2buavPK1r1Am5xboTHOQQU2aVcizX?=
- =?us-ascii?Q?egQ+7lO5Nzqjix2De0xcQb5nrTWeeIeLVf+FtOgV6wH7922Y4ZrCmB+w2KQ3?=
- =?us-ascii?Q?DWawUqHsUlVqfy02KtzbiBU7E6Ow8x1HSPCLf0A+o2E9Bu8S0XS7c2woJGCX?=
- =?us-ascii?Q?23pg4r4mwq0tg3Ztq0Rtc7fOV68nCqnsC3XvjCyoatnmPwUh+BJsjQ7vgAJY?=
- =?us-ascii?Q?JLg+Bir+fHDk2Gx0Yab2yDnZ2U36K5wPNgEFm1zsAi0xeLdh3EKEnyrVqesL?=
- =?us-ascii?Q?1GaasSpwwuQqEFF2xisu0IHe3klgPKunngF4hgJ5uZaJEG0Z/vNfmMMaxTWN?=
- =?us-ascii?Q?gogZwQOVI4ksY7GuEWkdNNIN3QFWVvTYY8lMztI0kZ+4VVO/6XQVk5/mCSBh?=
- =?us-ascii?Q?x5R6kxc5hNFY7tJvZaS2KRCTHmgH3F1bd5LAg8B2xilM6dkumf2mt7zFIHn/?=
- =?us-ascii?Q?5qJZ1/1OIbiRd7vIgICrD1WzS2X8B4+rWRSIb5ZPQ5KUXWOv88MWtk5Ie5vH?=
- =?us-ascii?Q?oNbEMCZtBbnNIkHO6Gz9G/tZlWoX5zcWPl1ilMNWsnAlw8DQzSD6awe+NWqU?=
- =?us-ascii?Q?2y6ciC6pFaa5D/8/YtOMGncae/kdyleuTd36AaX11dCqrkMDAKkZXFFmcPr0?=
- =?us-ascii?Q?p0xpgTQCJ9h+uPLSucfufVJkTzKOBsgFBWXNhXp/W/1bDU/LxkuVbw2H205w?=
- =?us-ascii?Q?PiN1N3gneg+Ph6ulqIPlmEBVAsBEnI90pE+VbCCFwsVUpBCLvnjoDsWvU9DS?=
- =?us-ascii?Q?cPFT94PlDHDDdCiZbwDVXTL7O+QpFFeOs/0XufiEqbVig/FwDQcepOe5dE0r?=
- =?us-ascii?Q?Z1ZTQvIIE20xd4zmBhs=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S233609AbiF1R6O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 13:58:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F80A6599
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 10:58:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C69A619E1
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 17:58:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F616C3411D;
+        Tue, 28 Jun 2022 17:57:57 +0000 (UTC)
+Date:   Tue, 28 Jun 2022 18:57:53 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Peter Collingbourne <pcc@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Michael Roth <michael.roth@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>,
+        Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+Message-ID: <YrtBIX0/0jyAdgnz@arm.com>
+References: <20220623234944.141869-1-pcc@google.com>
+ <YrXu0Uzi73pUDwye@arm.com>
+ <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+ <YrmXzHXv4babwbNZ@arm.com>
+ <CAMn1gO5s2m-AkoYpY0dcLkKVyEAGeC2borZfgT09iqc=w_LZxQ@mail.gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7b99f7f-9c92-46f3-92d3-08da592fb27f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2022 17:57:41.8761
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: K3hJI7dQImR0CTHDiN2DG976gCqjqZcBgsjF8V8LV2PhjoEDPF/nSDJGQKV6ElA5GoOJTmE2ERXXegqf2UwgMQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4792
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMn1gO5s2m-AkoYpY0dcLkKVyEAGeC2borZfgT09iqc=w_LZxQ@mail.gmail.com>
+X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[AMD Official Use Only - General]
+On Mon, Jun 27, 2022 at 11:16:17AM -0700, Peter Collingbourne wrote:
+> On Mon, Jun 27, 2022 at 4:43 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > On Fri, Jun 24, 2022 at 02:50:53PM -0700, Peter Collingbourne wrote:
+> > > On Fri, Jun 24, 2022 at 10:05 AM Catalin Marinas
+> > > <catalin.marinas@arm.com> wrote:
+> > > > + Steven as he added the KVM and swap support for MTE.
+> > > >
+> > > > On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
+> > > > > Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
+> > > > > depend on being able to map guest memory as MAP_SHARED. The current
+> > > > > restriction on sharing MAP_SHARED pages with the guest is preventing
+> > > > > the use of those features with MTE. Therefore, remove this restriction.
+> > > >
+> > > > We already have some corner cases where the PG_mte_tagged logic fails
+> > > > even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
+> > > > KVM MAP_SHARED will potentially make things worse (or hard to reason
+> > > > about; for example the VMM sets PROT_MTE as well). I'm more inclined to
+> > > > get rid of PG_mte_tagged altogether, always zero (or restore) the tags
+> > > > on user page allocation, copy them on write. For swap we can scan and if
+> > > > all tags are 0 and just skip saving them.
+> > >
+> > > A problem with this approach is that it would conflict with any
+> > > potential future changes that we might make that would require the
+> > > kernel to avoid modifying the tags for non-PROT_MTE pages.
+> >
+> > Not if in all those cases we check VM_MTE_ALLOWED. We seem to have the
+> > vma available where it matters. We can keep PG_mte_tagged around but
+> > always set it on page allocation (e.g. when zeroing or CoW) and check
+> > VM_MTE_ALLOWED rather than VM_MTE.
+> 
+> Right, but for avoiding tagging we would like that to apply to as many
+> pages as possible. If we check VM_MTE_ALLOWED then the heap pages of
+> those processes that are not using MTE would not be covered, which on
+> a mostly non-MTE system would be a majority of pages.
 
-Hello Dave,
+By non-MTE system, I guess you mean a system that supports MTE but most
+of the user apps don't use it. That's why it would be interesting to see
+the effect of using DC GZVA instead of DC ZVA for page zeroing.
 
------Original Message-----
-From: Dr. David Alan Gilbert <dgilbert@redhat.com>=20
-Sent: Tuesday, June 28, 2022 5:51 AM
-To: Kalra, Ashish <Ashish.Kalra@amd.com>
-Cc: x86@kernel.org; linux-kernel@vger.kernel.org; kvm@vger.kernel.org; linu=
-x-coco@lists.linux.dev; linux-mm@kvack.org; linux-crypto@vger.kernel.org; t=
-glx@linutronix.de; mingo@redhat.com; jroedel@suse.de; Lendacky, Thomas <Tho=
-mas.Lendacky@amd.com>; hpa@zytor.com; ardb@kernel.org; pbonzini@redhat.com;=
- seanjc@google.com; vkuznets@redhat.com; jmattson@google.com; luto@kernel.o=
-rg; dave.hansen@linux.intel.com; slp@redhat.com; pgonda@google.com; peterz@=
-infradead.org; srinivas.pandruvada@linux.intel.com; rientjes@google.com; do=
-vmurik@linux.ibm.com; tobin@ibm.com; bp@alien8.de; Roth, Michael <Michael.R=
-oth@amd.com>; vbabka@suse.cz; kirill@shutemov.name; ak@linux.intel.com; ton=
-y.luck@intel.com; marcorr@google.com; sathyanarayanan.kuppuswamy@linux.inte=
-l.com; alpergun@google.com; jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for RMPUP=
-DATE and PSMASH instruction
+I suspect on Android you'd notice the fork() penalty a bit more with all
+the copy-on-write having to copy tags. But we can't tell until we do
+some benchmarks. If the penalty is indeed significant, we'll go back to
+assessing the races here.
 
-* Kalra, Ashish (Ashish.Kalra@amd.com) wrote:
-> [AMD Official Use Only - General]
->=20
-> >>>  /*
-> >>>   * The RMP entry format is not architectural. The format is=20
-> >>> defined in PPR @@ -126,6 +128,15 @@ struct snp_guest_platform_data {
-> >>>  	u64 secrets_gpa;
-> >>>  };
-> >>> =20
-> >>> +struct rmpupdate {
-> >>> +	u64 gpa;
-> >>> +	u8 assigned;
-> >>> +	u8 pagesize;
-> >>> +	u8 immutable;
-> >>> +	u8 rsvd;
-> >>> +	u32 asid;
-> >>> +} __packed;
->=20
-> >>I see above it says the RMP entry format isn't architectural; is this '=
-rmpupdate' structure? If not how is this going to get handled when we have =
-a couple >of SNP capable CPUs with different layouts?
->=20
-> >Architectural implies that it is defined in the APM and shouldn't change=
- in such a way as to not be backward compatible.=20
-> >I probably think the wording here should be architecture independent or =
-more precisely platform independent.
->=20
-> Some more clarity on this:=20
->=20
-> Actually, the PPR for family 19h Model 01h, Rev B1 defines the RMP entry =
-format as below:
->=20
-> 2.1.4.2 RMP Entry Format
-> Architecturally the format of RMP entries are not specified in APM. In or=
-der to assist software, the following table specifies select portions of th=
-e RMP entry format for this specific product. Each RMP entry is 16B in size=
- and is formatted as follows. Software should not rely on any field definit=
-ions not specified in this table and the format of an RMP entry may change =
-in future processors.=20
->=20
-> Architectural implies that it is defined in the APM and shouldn't change =
-in such a way as to not be backward compatible. So non-architectural in thi=
-s context means that it is only defined in our PPR.
->=20
-> So actually this RPM entry definition is platform dependent and will need=
- to be changed for different AMD processors and that change has to be handl=
-ed correspondingly in the dump_rmpentry() code.=20
+Another thing that won't happen for PG_mte_tagged currently is KSM page
+merging. I had a patch to allow comparing the tags but eventually
+dropped it (can dig it out).
 
-> You'll need a way to make that fail cleanly when run on a newer CPU with =
-different layout, and a way to build kernels that can handle more than one =
-layout.
+> Over the weekend I thought of another policy, which would be similar
+> to your original one. We can always tag pages which are mapped as
+> MAP_SHARED. These pages are much less common than private pages, so
+> the impact would be less. So the if statement in
+> alloc_zeroed_user_highpage_movable would become:
+> 
+> if ((vma->vm_flags & VM_MTE) || (system_supports_mte() &&
+>				   (vma->vm_flags & VM_SHARED)))
+> 
+> That would allow us to put basically any shared mapping in the guest
+> address space without needing to deal with races in sanitise_mte_tags.
 
-Yes, I will be adding a check for CPU family/model as following :
+It's not just about VM_SHARED. A page can be effectively shared as a
+result of a fork(). It is read-only in all processes but still shared
+and one task may call mprotect(PROT_MTE).
 
-static int __init snp_rmptable_init(void)
-{
-+       int family, model;
+Another case of sharing is between the VMM and the guest though I think
+an mprotect() in the VMM would trigger the unmapping of the guest
+address and pages mapped into guests already have PG_mte_tagged set.
 
-      if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
-               return 0;
+We probably need to draw a state machine of all the cases. AFAICT, we
+need to take into account a few of the below (it's probably incomplete;
+I've been with Steven through most of them IIRC):
 
-+       family =3D boot_cpu_data.x86;
-+       model  =3D boot_cpu_data.x86_model;
+1. Private mappings with mixed PROT_MTE, CoW sharing and concurrent
+   mprotect(PROT_MTE). That's one of the things I dislike is that a late
+   tag clearing via set_pte_at() can happen without breaking the CoW
+   mapping. It's a bit counter-intuitive if you treat the tags as data
+   (rather than some cache), you don't expect a read-only page to have
+   some (tag) updated.
 
-+       /*
-+        * RMP table entry format is not architectural and it can vary by p=
-rocessor and
-+        * is defined by the per-processor PPR. Restrict SNP support on the=
- known CPU
-+        * model and family for which the RMP table entry format is current=
-ly defined for.
-+        */
-+       if (family !=3D 0x19 || model > 0xaf)
-+               goto nosnp;
-+
+2. Shared mappings with concurrent mprotect(PROT_MTE).
 
-This way SNP will only be enabled specifically on the platforms for which t=
-his RMP entry
-format is defined in those processor's PPR. This will work for Milan and Ge=
-noa as of now.
+3. Shared mapping restoring from swap.
 
-Additionally as per Sean's suggestion, I will be moving the RMP structure d=
-efinition to sev.c,
-which will make it a private structure and not exposed to other parts of th=
-e kernel.
+4. Private mapping restoring from swap into CoW mapping.
 
-Also in the future we will have an architectural interface to read the RMP =
-table entry,
-we will first check for it's availability and if not available fall back to=
- the RMP table
-entry structure definition.
+5. KVM faults.
 
- Thanks,
- Ashish
+6. Concurrent ptrace accesses (or KVM tag copying)
+
+What currently risks failing I think is breaking a CoW mapping with
+concurrent mprotect(PROT_MTE) - we set PG_mte_tagged before zeroing the
+tags. A concurrent copy may read stale tags. In sanitise_mte_tags() we
+do this the other way around - clear tags first and then set the flag.
+
+I think using another bit as a lock may solve most (all) of these but
+another option is to treat the tags as data and make sure they are set
+before mapping.
+
+> We may consider going further than this and require all pages mapped
+> into guests with MTE enabled to be PROT_MTE.
+
+We discussed this when upstreaming KVM support and the idea got pushed
+back. The main problem is that the VMM may use MTE for itself but can no
+longer access the guest memory without the risk of taking a fault. We
+don't have a match-all tag in user space and we can't teach the VMM to
+use the PSTATE.TCO bit since driver emulation can be fairly generic.
+And, of course, there's also the ABI change now.
+
+> I think it would allow
+> dropping sanitise_mte_tags entirely. This would not be a relaxation of
+> the ABI but perhaps we can get away with it if, as Cornelia mentioned,
+> QEMU does not currently support MTE, and since crosvm doesn't
+> currently support it either there's no userspace to break AFAIK. This
+> would also address a current weirdness in the API where it is possible
+> for the underlying pages of a MAP_SHARED file mapping to become tagged
+> via KVM, said tags are exposed to the guest and are discarded when the
+> underlying page is paged out.
+
+Ah, good point, shared file mappings is another reason we did not allow
+MAP_SHARED and MTE for guest memory.
+
+BTW, in user_mem_abort() we should probably check for VM_MTE_ALLOWED
+irrespective of whether we allow MAP_SHARED or not.
+
+> We can perhaps accomplish it by dropping
+> support for KVM_CAP_ARM_MTE in the kernel and introducing something
+> like a KVM_CAP_ARM_MTE_V2 with the new restriction.
+
+That's an option for the ABI upgrade but we still need to solve the
+potential races.
+
+-- 
+Catalin
