@@ -2,112 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01B3055EAA0
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 19:08:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84C4C55EAB3
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 19:12:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231650AbiF1RFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 13:05:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49434 "EHLO
+        id S231565AbiF1RLV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 13:11:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbiF1RFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 13:05:45 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445762AE3B;
-        Tue, 28 Jun 2022 10:05:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656435945; x=1687971945;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=He+/gvN4uag1zs/e9FSisKAycqG0udPhwiCpLr5nAw0=;
-  b=hmUwtDB6+W1/IOfvnm7h7aCPZbyz5YM1puHOUg3aX0SS5VTao0cSn2cr
-   tRZZXavtUVRW/U6zswtqQxPLEJi7h4fFxKi4hloGjpUtbqBYSI0T0dCiO
-   owEty6yeSdVjkXY1cECc0g+riecp1hWhySArcc+z6XtdHeVgQwZJsWEs7
-   GzdO1LTxTI2iqVDYhOH0FcWqfWI3AIvtij95OAcQGoG5LA3ZFyMT33BU/
-   0YBWtIMtvm7anxb0zglETO13r6yUs++L7VnCuNeZv9VdRv0oNrvy6yHnw
-   a4w2a6GukZEWvxFV+9LD0it4U3oeJNowH8K99KzHeARXJQFbCvvlEaUdU
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10392"; a="307282189"
-X-IronPort-AV: E=Sophos;i="5.92,229,1650956400"; 
-   d="scan'208";a="307282189"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 10:05:02 -0700
-X-IronPort-AV: E=Sophos;i="5.92,229,1650956400"; 
-   d="scan'208";a="587937625"
-Received: from staibmic-mobl1.amr.corp.intel.com (HELO [10.209.67.166]) ([10.209.67.166])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 10:05:02 -0700
-Message-ID: <cff391af-9523-46d6-97c8-ac9917097d96@intel.com>
-Date:   Tue, 28 Jun 2022 10:03:57 -0700
+        with ESMTP id S230517AbiF1RLS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 13:11:18 -0400
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDE32C126
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 10:11:17 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-101e1a33fe3so17850437fac.11
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 10:11:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=B9iQSlpW/Sg98O8w3kQrkvkAcMFnb09BQssJyDNeW5o=;
+        b=RgTwDThn6/Nl98GpEo6dfFMm4xqIZT7SgaRaNSYHH2qpRxST1hbQCcxFtBIrgmgsdB
+         KeWqHT6gpzsh04hezaHxC3GesbwdfbNWcAhlTKVekIOdZdMzT44oooHw1y6wDJvkrpnk
+         fNgxFWeHxYUIWW4gUhFc1VTbb+JXvoyDk4bhaxjCJ+r9q0yZVOOezChnp9zTdALdJVqx
+         bW7su34tRzk2WsIyzgmi9eqt+91g92tQmzDBI7H7qB70kKMymmSQzeWPd1526SFUvKWN
+         OsTTcAuiJDqVbEErmzlRq7E1m08COd0HYD5FhZDs5z5AmO1mZRChmoy+ACqtR9GyJphu
+         DtnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=B9iQSlpW/Sg98O8w3kQrkvkAcMFnb09BQssJyDNeW5o=;
+        b=RSjiHIyDtvD788ftThSsOHn/05SagsrKpp3gZbHednRsR5XCKlgkVmILbP9MOMJWkL
+         in/HRF7AXHQAJPNLCLH2F8ccNhnOStgoc5rFGLMdD87OLORNg3PrNugtzF/ja1uHQHbv
+         eG2R26aDTsfbYBlACi1nRo/fOpJ1Ynb6TpkITg/QI8Vhus9TVGZImJnX7YiFwy9glXGx
+         1IwTFZrkV7bkWPCb7RDrTYzMBcpkYCjmQlg2UCk0vyp2dNV8kjchuo8FeZz40aC6vWG/
+         sPBlUI6TAfJMORSAUH72BtvVshhvQNCBAOXN0rS6IMv6A7i3YBQePFo2kFjHS+tGlI4J
+         ADTA==
+X-Gm-Message-State: AJIora+Cy5Osaym7EOkJp+RexDuREM0fPWZvrzUTdaI769BHQjylCA27
+        QS3yssLFA9QPwWkJ26tjU+CUNLSfcCHUAKj8mKhJCluTGSwa5Q==
+X-Google-Smtp-Source: AGRyM1sR4z6Ah0rmM+btTilt1SEBv5YU5YK20x1hgCzFACKUxuftJ/EZ2eE9WBOB9VocegfWn+DlqKjSGy/lk5o+liI=
+X-Received: by 2002:a05:6870:d3c7:b0:104:9120:8555 with SMTP id
+ l7-20020a056870d3c700b0010491208555mr360162oag.181.1656436275331; Tue, 28 Jun
+ 2022 10:11:15 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v5 15/22] x86/virt/tdx: Allocate and set up PAMTs for
- TDMRs
-Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>, Kai Huang <kai.huang@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com
-References: <cover.1655894131.git.kai.huang@intel.com>
- <c504a8acd06dc455050c25e2a4cc70aef5eb9358.1655894131.git.kai.huang@intel.com>
- <e72703b0-767a-ec88-7cb6-f95a3564d823@intel.com>
- <b376aef05bc032fdf8cc23762ce77a14830440cd.camel@intel.com>
- <b43bf089-1202-a1fe-cbb3-d4e0926cab67@intel.com>
- <28110f9c-b84c-591a-d365-ae4412408e48@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <28110f9c-b84c-591a-d365-ae4412408e48@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220627160440.31857-1-vkuznets@redhat.com> <CALMp9eQL2a+mStk-cLwVX6NVqwAso2UYxAO7UD=Xi2TSGwUM2A@mail.gmail.com>
+ <87y1xgubot.fsf@redhat.com> <CALMp9eSBLcvuNDquvSfUnaF3S3f4ZkzqDRSsz-v93ZeX=xnssg@mail.gmail.com>
+ <87letgu68x.fsf@redhat.com>
+In-Reply-To: <87letgu68x.fsf@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 28 Jun 2022 10:11:04 -0700
+Message-ID: <CALMp9eQ35g8GpwObYBJRxjuxZAC8P_HNMMaC0v0uZeC+pMeW_Q@mail.gmail.com>
+Subject: Re: [PATCH 00/14] KVM: nVMX: Use vmcs_config for setting up nested
+ VMX MSRs
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/27/22 17:48, Xiaoyao Li wrote:
->>
->> I meant this:
->>
->> +       switch (level) {
->> +       case PG_LEVEL_4K:
->> +               page_size = 0;
->> +               break;
->>
->> Because TDX_PG_4K==page_size==0, and for this:
->>
->> +       case PG_LEVEL_2M:
->> +               page_size = 1;
-> 
-> here we can just do
-> 
->     page_size = level - 1;
-> 
-> or
->     
->     tdx_page_level = level - 1;
-> 
-> yes, TDX's page level definition is one level smaller of Linux's
-> definition.
+On Tue, Jun 28, 2022 at 9:01 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Jim Mattson <jmattson@google.com> writes:
+>
+> > On Tue, Jun 28, 2022 at 7:04 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >>
+>
+> ...
+>
+> >> Jim Mattson <jmattson@google.com> writes:
+> >>
+> >> > Just checking that this doesn't introduce any backwards-compatibility
+> >> > issues. That is, all features that were reported as being available in
+> >> > the past should still be available moving forward.
+> >> >
+> >>
+> >> All the controls nested_vmx_setup_ctls_msrs() set are in the newly
+> >> introduced KVM_REQ_VMX_*/KVM_OPT_VMX_* sets so we should be good here
+> >> (unless I screwed up, of course).
+> >>
+> >> There's going to be some changes though. E.g this series was started by
+> >> Anirudh's report when KVM was exposing SECONDARY_EXEC_TSC_SCALING while
+> >> running on KVM and using eVMCS which doesn't support the control. This
+> >> is a bug and I don't think we need and 'bug compatibility' here.
+> >
+> > You cannot force VM termination on a kernel upgrade. On live migration
+> > from an older kernel, the new kernel must be willing to accept the
+> > suspended state of a VM that was running under the older kernel. In
+> > particular, the new KVM_SET_MSRS must accept the values of the VMX
+> > capability MSRS that userspace obtains from the older KVM_GET_MSRS. I
+> > don't know if this is what you are referring to as "bug
+> > compatibility," but if it is, then we absolutely do need it.
+> >
+>
+> Oh, right you are, we do seem to have a problem. Even for eVMCS case,
+> the fact that we expose a feature which can't be used in VMX control
+> MSRs doesn't mean that the VM is broken. In particular, the VM may not
+> be using VMX features at all. Same goes to PERF_GLOBAL_CTRL errata.
+>
+> vmx_restore_control_msr() currenly does strict checking of the supplied
+> data against what was initially set by nested_vmx_setup_ctls_msrs(),
+> this basically means we cannot drop feature bits, just add them. Out of
+> top of my head I don't see a solution other than relaxing the check by
+> introducing a "revoke list"... Another questions is whether we want
+> guest visible MSR value to remain like it was before migration or we can
+> be brave and clear 'broken' feature bits there (the features are
+> 'broken' so they couldn't be in use, right?). I'm not sure.
 
-Uhh.  No.
+Read-only MSRs cannot be changed after their values may have been
+observed by the guest.
 
-The 'page_size' is in the kernel/TDX-module ABI.  It can't change.
-PG_LEVEL_* is just some random internal Linux enum.  It *CAN* change.
+> Anirudh, the same concern applies to your 'intermediate' patch too.
+>
+> Smart ideas on what can be done are more than welcome)
 
-There's a *MASSIVE* difference between the two.  What you suggest will
-probably actually work.  But, it will work accidentally and may break in
-horribly confusing ways in the future.
-
-It's the difference between hacking something together and actually
-writing code that will keep working for a long time.  Please, take a
-minute and reflect on this.  Please.
+You could define a bunch of "quirks," and userspace could use
+KVM_CAP_DISABLE_QUIRKS2 to ask that the broken bits be cleared.
