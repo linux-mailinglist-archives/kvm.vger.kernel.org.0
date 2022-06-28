@@ -2,124 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CBE355C124
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15A6355DA67
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:23:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345178AbiF1Mdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 08:33:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33452 "EHLO
+        id S1345478AbiF1Mfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 08:35:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235217AbiF1Mde (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 08:33:34 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2082.outbound.protection.outlook.com [40.107.244.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E148D1DA67;
-        Tue, 28 Jun 2022 05:33:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jr2Q6ws2xsZrvUKtmpFxEnOkzI+TkcFXgMUkAVTOgwpZnkqdbYvkY3fjSzxD0BFOLh8reggTgK9qA6n/W0OukvTuS/X9p041JqhMZQglfQGkiHrTQy0w4XNaA010pQb/NU2Lh/Ub8wfZm7mqHdjUAiddM9s6CgPAMZO94lbdqO5drI3uAuI2DKSbAOUsFTClt04EXSVsa5thM3E1zE+ulJ0R4b8Zk018yiDT4vzhRmPuJScj32z2CDY5Bq7ptWxF66RAKwJLYAQB9b+8uCPgJDwWCAAgVrqvYKGQ68IPaskoFIlJW3x2yPrGDcByoscSRGujHdg0Gt1WiTMtYCec4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YcKdIQUwmXvswNzp/eojixJuHcyDTnEVCSx9LmKdH8s=;
- b=LJzY1wm90eGVwcEfX4C3EbMduDxwBcVK/YOnsy+U2SatpZ8NWR7S6vwhLzEHHVyNK7+JnJS5dJIHhSYCJLaPODhvOnpz41woC7qTRAd4i9Tld9Dz8m5eztrhYjWkgD9fyR7XDfzkrZ9h0O/s3u0K+JKOseGFU6pjeebcMYD82P2GkV0QUHsx249uGNS9A6aKK0oNBdEWn82nhHYa63lvEtMqOLumIu5qCOBJ9TggpwEi760GsxmWDgdkWrTNoGlBxZuUp6GmZO6f/D62sROAhbQ5CyYM2P4udiBfb4MMoxoZ6ZS2/v/M5kdSv+8bHsVLrRMbcxn56dbl+GSRIC7yUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YcKdIQUwmXvswNzp/eojixJuHcyDTnEVCSx9LmKdH8s=;
- b=l3rU/4Oj/lOd/RwEihJhpC4kWX0ddVz245LvQixpLOIzIC2JU5z/k/D4W4taq2c/5T1X6AN+LqHaoZ7VgPUCssl8K8SlI6lWId8LHMfmmSwKIJaQNaYbeksCa2x8PsK2CHxMLBRdwQZx5WFw8QMEueShnlZids7SBL4pIsjKaKY=
-Received: from BN0PR04CA0156.namprd04.prod.outlook.com (2603:10b6:408:eb::11)
- by BL1PR12MB5803.namprd12.prod.outlook.com (2603:10b6:208:393::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.18; Tue, 28 Jun
- 2022 12:33:31 +0000
-Received: from BN8NAM11FT039.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:eb:cafe::b5) by BN0PR04CA0156.outlook.office365.com
- (2603:10b6:408:eb::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14 via Frontend
- Transport; Tue, 28 Jun 2022 12:33:31 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT039.mail.protection.outlook.com (10.13.177.169) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5373.15 via Frontend Transport; Tue, 28 Jun 2022 12:33:31 +0000
-Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Tue, 28 Jun
- 2022 07:33:30 -0500
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC:     <pbonzini@redhat.com>, <mlevitsk@redhat.com>, <seanjc@google.com>,
-        <joro@8bytes.org>, <jon.grimm@amd.com>, <wei.huang2@amd.com>,
-        <terry.bowman@amd.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [PATCH] KVM: SVM: Fix x2APIC Logical ID calculation for avic_kick_target_vcpus_fast
-Date:   Tue, 28 Jun 2022 07:33:14 -0500
-Message-ID: <20220628123314.486001-1-suravee.suthikulpanit@amd.com>
-X-Mailer: git-send-email 2.32.0
+        with ESMTP id S230459AbiF1Mff (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 08:35:35 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570A72ED77;
+        Tue, 28 Jun 2022 05:35:34 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SCHCh0006869;
+        Tue, 28 Jun 2022 12:35:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=VzTRDib4zHd2FCU5EB+yWfonZTP7xYq8c8GPvJz6Hrs=;
+ b=HPp4Ym3KfCxqGjisBYbAiWWX1hq7ezYIHhUU9QOYS28uxvSJ7OwP6jeZukK1z36RWi6F
+ QP6RBcPZ/gJWQnicU9qZiGQ9TMxfsbAkidz/LmthAf26akmiUj+Gz0qVZgfgmAdBiz1q
+ 75I/vQm9RucbtkFVoX7x9JnJiG9HCE5FoIMbWVvxb/pEo0UdhkJPFx5BxZv3dpWz9SZj
+ tYce6DyITtObQLdBdJmAQHxDRe53nMGNnAxFYU5HKjZ947C+MqzFJGishx5wAHgi1u27
+ s/gMu46HUoYJ5WXBqVNTyo2700rf7jJ3AQRDA6fqt2AtMOQqZhUXpDGV3ZA7j4dGHBsU lQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h01h1rj8x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 12:35:31 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SCJRgS017268;
+        Tue, 28 Jun 2022 12:35:30 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h01h1rj82-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 12:35:30 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SCKc8u001772;
+        Tue, 28 Jun 2022 12:35:28 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3gwt08vu62-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 12:35:28 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SCZPUm23986648
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jun 2022 12:35:25 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6BFFAA405B;
+        Tue, 28 Jun 2022 12:35:25 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5794BA4054;
+        Tue, 28 Jun 2022 12:35:24 +0000 (GMT)
+Received: from [9.171.60.225] (unknown [9.171.60.225])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Jun 2022 12:35:24 +0000 (GMT)
+Message-ID: <c98e7c10-272c-2bbb-6909-046d57d721d1@linux.ibm.com>
+Date:   Tue, 28 Jun 2022 14:35:23 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v9 00/21] KVM: s390: enable zPCI for interpretive
+ execution
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
+ <f86e2e05-114a-cc9e-8f3a-96b36889063d@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <f86e2e05-114a-cc9e-8f3a-96b36889063d@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 697179d2-56f3-4ed4-f043-08da590268fa
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5803:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fokju9d08OKQZDp5g7O/RYMrWbu03Tv6F2aOT1NwP945Ktn2yLNk4BEIC0a1/GZtrEKB+LQ217kbTwwKXosCPvrozk/5r9a9uXmNGFbTyTiOrUw19JbOoBOnKdr5JZvjn3rq4HGaD5hvcLFQD7JipeGmkltLnHsGuYaFn5u0RDhiWp79N5EzZN4FJ5DRp4TqcBeA4hnIslUUcG8nFkRHV+SEY1x+fGtNLl9RIWAWDm5dOzSbqSAD+BwrjEZrxHw2ray2wOVQEoMUjqT6VGQucakYP85/vRpxRYWHo3XJyJ8IqTUnv9/91M2qFiot42SZXeiemWrArY2JLtD/4ZSQmHAM4YLLi++DSHSQreMjnxqqEAmhuGEFXSHwetIw7B0kIDSsyIphFiC7xMkj+5lp67646/bUQUb7MqnJ+U35nLu+Oja6ZqlBMr8NYTDUBiKDUUW/iidPFuS3ps7T5BtDsr2UuPyB6voYWDrkPaJerXkUvsfN5kyrNUPnsTA4FH5KuqHOMecQy7frU3bdMh8eQarxkxb5btt+UG77iRJQV42707O67v1KPace1RE9F9zC7RgIxPLJsXofjfDT6jaUpp2CwvBlmab4gNl02VPjaDP+QCA+i4yC9mxfP9a4Mdat9M2gSTS1/5be6C2/sLXE6sZbUWt8gF+FvJ4hNtMO4GtHTXLxcTPbdLX8illJYU+pzP79EjPLsBNIgNC/BNPm3q1FY/t9ZUNoEGzeFmi5CsfLXqfN18ZcRi1Qf4okBDHiNbqXHd0twW8FZwB0AbkkPI0AWhSN73NnLK1JVsrVEqf4MLi59e3JqwOiQDJ9doah5PRchpsJQ2HbrfYAu0Spaw==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(396003)(346002)(39860400002)(40470700004)(36840700001)(46966006)(478600001)(7696005)(5660300002)(70586007)(41300700001)(16526019)(70206006)(110136005)(4326008)(1076003)(186003)(26005)(8676002)(356005)(40480700001)(54906003)(82740400003)(82310400005)(81166007)(8936002)(316002)(6666004)(2616005)(83380400001)(2906002)(86362001)(40460700003)(426003)(4744005)(47076005)(36860700001)(336012)(36756003)(44832011)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2022 12:33:31.1647
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 697179d2-56f3-4ed4-f043-08da590268fa
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT039.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5803
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7kXy1VyFvROoymAGsQ27TyveRw3QZZwH
+X-Proofpoint-ORIG-GUID: pBNTNyMgnNoCtr5oFZikyJQjgjvEXW8u
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-28_06,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 adultscore=0 suspectscore=0
+ impostorscore=0 clxscore=1011 spamscore=0 mlxlogscore=999 mlxscore=0
+ bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206280048
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For X2APIC ID in cluster mode, the logical ID is bit [15:0].
+Am 27.06.22 um 22:57 schrieb Matthew Rosato:
+> On 6/6/22 4:33 PM, Matthew Rosato wrote:
+>> Enable interpretive execution of zPCI instructions + adapter interruption
+>> forwarding for s390x KVM vfio-pci.  This is done by triggering a routine
+>> when the VFIO group is associated with the KVM guest, transmitting to
+>> firmware a special token (GISA designation) to enable that specific guest
+>> for interpretive execution on that zPCI device.  Load/store interpreation
+>> enablement is then controlled by userspace (based upon whether or not a
+>> SHM bit is placed in the virtual function handle).  Adapter Event
+>> Notification interpretation is controlled from userspace via a new KVM
+>> ioctl.
+>>
+>> By allowing intepretation of zPCI instructions and firmware delivery of
+>> interrupts to guests, we can reduce the frequency of guest SIE exits for
+>> zPCI.
+>>
+>>  From the perspective of guest configuration, you passthrough zPCI devices
+>> in the same manner as before, with intepretation support being used by
+>> default if available in kernel+qemu.
+>>
+>> Will follow up with a link the most recent QEMU series.
+>>
+>> Changelog v8->v9:
+>> - Rebase on top of 5.19-rc1, adjust ioctl and capability defines
+>> - s/kzdev = 0/kzdev = NULL/ (Alex)
+>> - rename vfio_pci_zdev_open to vfio_pci_zdev_open_device (Jason)
+>> - rename vfio_pci_zdev_release to vfio_pci_zdev_close_device (Jason)
+>> - make vfio_pci_zdev_close_device return void, instead WARN_ON or ignore
+>>    errors in lower level function (kvm_s390_pci_unregister_kvm) (Jason)
+>> - remove notifier accidentally left in struct zpci_dev + associated
+>>    include statment (Jason)
+>> - Remove patch 'KVM: s390: introduce CPU feature for zPCI Interpretation'
+>>    based on discussion in QEMU thread.
+>>
+> 
+> Ping -- I'm hoping this can make the next merge window, but there are still 2 patches left without any review tag (16 & 17).
 
-Fixes: 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
----
- arch/x86/kvm/svm/avic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index a830468d9cee..29f393251c4c 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -378,7 +378,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
- 
- 		if (apic_x2apic_mode(source)) {
- 			/* 16 bit dest mask, 16 bit cluster id */
--			bitmap = dest & 0xFFFF0000;
-+			bitmap = dest & 0xFFFF;
- 			cluster = (dest >> 16) << 4;
- 		} else if (kvm_lapic_get_reg(source, APIC_DFR) == APIC_DFR_FLAT) {
- 			/* 8 bit dest mask*/
--- 
-2.32.0
-
+Yes, I will queue this (as is). Ideally you would rebase this on top of kvm/next but I can also do while applying.
+Let me know if you want to respin with the Nits from Pierre.
