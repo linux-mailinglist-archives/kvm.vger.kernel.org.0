@@ -2,178 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BA8D55DAC4
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:23:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71A1B55D55D
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:15:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241987AbiF1LfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 07:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59490 "EHLO
+        id S1345230AbiF1Lh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 07:37:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236261AbiF1LfB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 07:35:01 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2DF32FFE8;
-        Tue, 28 Jun 2022 04:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656416099; x=1687952099;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=SeZjE9dIzHv7ak+kD31OSIPBtrgZc4gdk0+yPRC0Dmw=;
-  b=aVmPdVZ0U7rOMKOnO4RH8tSKt3bbJ7zuTqa3TXZFl2xWtXbR6EARU3H2
-   u5wVk8CHpJ8Uom3ACfBjKJJUYK0EMoKj36JnSzE6AeW6Nbna+J70ujkPk
-   DKeM0j1TQWUt9oSjnmb9J80o2DCnvWm3HiyMFn1D68Oy0PTSVpu65FE0b
-   WJNI/kq+Ywhs9denZYwfFvAFhPwc11A4xci/8Je3A5gbwOrouf+sM+Hi1
-   FqtkJ+J0ACRQmrTRIum/4JAWFQS4aV8KPpEHPh7k8Hj/9ypdA5npXSQe3
-   WltpAkA5euINWTLuaZNxfN3h7fywBDYWY2oHgxpPjXVrQG6ff8BiUl1PS
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="270465555"
-X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="270465555"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 04:34:59 -0700
-X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="680009884"
-Received: from nherzalx-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.96.221])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 04:34:57 -0700
-Message-ID: <2ecd255ac85fac7ffa1b90975c9e08f11ddee149.camel@intel.com>
-Subject: Re: [PATCH v7 029/102] KVM: TDX: allocate/free TDX vcpu structure
-From:   Kai Huang <kai.huang@intel.com>
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue, 28 Jun 2022 23:34:55 +1200
-In-Reply-To: <dad0333516bcdb0fdeccc9d1483299aeae8d80fd.1656366338.git.isaku.yamahata@intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
-         <dad0333516bcdb0fdeccc9d1483299aeae8d80fd.1656366338.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+        with ESMTP id S1344093AbiF1Lh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 07:37:26 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037DD32EF4
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 04:37:25 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id g9-20020a056e020d0900b002d958b2a86dso7261498ilj.14
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 04:37:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=nXYR0Ni31x3OMa5NpiTlTGP/nRt/blFERdaKnOstPZI=;
+        b=5h7vvPXCAAjTTWD9Z4Welx9LdUXIKr7KxDRM7lgdeKwW/3JwuNqsNBp+bgtvSnWzpG
+         odqNmP3r+/xMIhvfR4wGwqpwwAJIOI9Jkrb3+o9T5NT3mQ0YzBcety1pciG5OzPaXLt6
+         VhARHC5AkMrQ8K9iflBk+OFhOGkcSV+VWELDXycGFjfbAKVmRUUGXyuOaTqnrzZIFAGC
+         g5SXQ5PgsMefPbA151VMSMEKAog971zP2FgR99ShJGDR8mja1BMo/u02rr8LhY7MqMvE
+         QMOTGnIUlvn9oUgxwtbNtSfxziqTKSCOFnTK/3m2NjieF2cvB+dLiQbjdGnG7E5OvVvl
+         +JFQ==
+X-Gm-Message-State: AJIora/26KJqMKqHmE5kQOVjC08dyFe+p3aJAUvPCDdenJZ2Co+ccxDM
+        VkPmzYwjJ+XIMDfHmP+nCuaVgTDAk7RCze2KfBoHwu3MkHng
+X-Google-Smtp-Source: AGRyM1sVZemfDWn3mXh7IBcwFhV34fnWynfNnE9Yv6qJ2uq0lb4iea99NY0NIkd1DWvz6VYk0CbKSWWq6sZxIu+PdzePo+NrP3uw
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6638:1926:b0:33c:7d9:221f with SMTP id
+ p38-20020a056638192600b0033c07d9221fmr9808990jal.154.1656416244349; Tue, 28
+ Jun 2022 04:37:24 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 04:37:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d8420a05e28075ea@google.com>
+Subject: [syzbot] KMSAN: uninit-value in kvm_irq_delivery_to_apic_fast
+From:   syzbot <syzbot+d6caa905917d353f0d07@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, glider@google.com,
+        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->=20
-> The next step of TDX guest creation is to create vcpu.  Allocate TDX vcpu
-> structures, initialize it.  Allocate pages of TDX vcpu for the TDX module=
-.
->=20
-> In the case of the conventional case, cpuid is empty at the initializatio=
-n.
-> and cpuid is configured after the vcpu initialization.  Because TDX
-> supports only X2APIC mode, cpuid is forcibly initialized to support X2API=
-C
-> on the vcpu initialization.
+Hello,
 
-The patch title and commit message of this patch are identical to the previ=
-ous
-patch.
+syzbot found the following issue on:
 
-What happened? Did you forget to squash two patches together?
-=20
->=20
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/vmx/main.c    | 40 ++++++++++++++++++++++++++++++++++----
->  arch/x86/kvm/vmx/x86_ops.h |  8 ++++++++
->  2 files changed, 44 insertions(+), 4 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 067f5de56c53..4f4ed4ad65a7 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -73,6 +73,38 @@ static void vt_vm_free(struct kvm *kvm)
->  		return tdx_vm_free(kvm);
->  }
-> =20
-> +static int vt_vcpu_precreate(struct kvm *kvm)
-> +{
-> +	if (is_td(kvm))
-> +		return 0;
-> +
-> +	return vmx_vcpu_precreate(kvm);
-> +}
-> +
-> +static int vt_vcpu_create(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_vcpu_create(vcpu);
-> +
-> +	return vmx_vcpu_create(vcpu);
-> +}
-> +
-> +static void vt_vcpu_free(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_vcpu_free(vcpu);
-> +
-> +	return vmx_vcpu_free(vcpu);
-> +}
-> +
-> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_vcpu_reset(vcpu, init_event);
-> +
-> +	return vmx_vcpu_reset(vcpu, init_event);
-> +}
-> +
->  static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->  {
->  	if (!is_td(kvm))
-> @@ -98,10 +130,10 @@ struct kvm_x86_ops vt_x86_ops __initdata =3D {
->  	.vm_destroy =3D vt_vm_destroy,
->  	.vm_free =3D vt_vm_free,
-> =20
-> -	.vcpu_precreate =3D vmx_vcpu_precreate,
-> -	.vcpu_create =3D vmx_vcpu_create,
-> -	.vcpu_free =3D vmx_vcpu_free,
-> -	.vcpu_reset =3D vmx_vcpu_reset,
-> +	.vcpu_precreate =3D vt_vcpu_precreate,
-> +	.vcpu_create =3D vt_vcpu_create,
-> +	.vcpu_free =3D vt_vcpu_free,
-> +	.vcpu_reset =3D vt_vcpu_reset,
-> =20
->  	.prepare_switch_to_guest =3D vmx_prepare_switch_to_guest,
->  	.vcpu_load =3D vmx_vcpu_load,
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index ef6115ae0e88..42b634971544 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -138,6 +138,10 @@ int tdx_vm_init(struct kvm *kvm);
->  void tdx_mmu_release_hkid(struct kvm *kvm);
->  void tdx_vm_free(struct kvm *kvm);
-> =20
-> +int tdx_vcpu_create(struct kvm_vcpu *vcpu);
-> +void tdx_vcpu_free(struct kvm_vcpu *vcpu);
-> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-> +
->  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
->  #else
->  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { retu=
-rn 0; }
-> @@ -150,6 +154,10 @@ static inline void tdx_mmu_release_hkid(struct kvm *=
-kvm) {}
->  static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
->  static inline void tdx_vm_free(struct kvm *kvm) {}
-> =20
-> +static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNO=
-TSUPP; }
-> +static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
-> +static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event=
-) {}
-> +
->  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { ret=
-urn -EOPNOTSUPP; }
->  #endif
-> =20
+HEAD commit:    4b28366af7d9 x86: kmsan: enable KMSAN builds for x86
+git tree:       https://github.com/google/kmsan.git master
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=126a4b60080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d14e10a167d1c585
+dashboard link: https://syzkaller.appspot.com/bug?extid=d6caa905917d353f0d07
+compiler:       clang version 15.0.0 (https://github.com/llvm/llvm-project.git 610139d2d9ce6746b3c617fb3e2f7886272d26ff), GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14d596c4080000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10bcf08ff00000
 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d6caa905917d353f0d07@syzkaller.appspotmail.com
+
+L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
+=====================================================
+BUG: KMSAN: uninit-value in kvm_apic_set_irq arch/x86/kvm/lapic.c:634 [inline]
+BUG: KMSAN: uninit-value in kvm_irq_delivery_to_apic_fast+0x7a7/0x990 arch/x86/kvm/lapic.c:1044
+ kvm_apic_set_irq arch/x86/kvm/lapic.c:634 [inline]
+ kvm_irq_delivery_to_apic_fast+0x7a7/0x990 arch/x86/kvm/lapic.c:1044
+ kvm_irq_delivery_to_apic+0xdb/0xe40 arch/x86/kvm/irq_comm.c:54
+ kvm_pv_kick_cpu_op+0xd1/0x100 arch/x86/kvm/x86.c:9155
+ kvm_emulate_hypercall+0xee7/0x1340 arch/x86/kvm/x86.c:9285
+ __vmx_handle_exit+0x101f/0x1710 arch/x86/kvm/vmx/vmx.c:6237
+ vmx_handle_exit+0x38/0x1f0 arch/x86/kvm/vmx/vmx.c:6254
+ vcpu_enter_guest+0x4733/0x52d0 arch/x86/kvm/x86.c:10366
+ vcpu_run+0x794/0x1230 arch/x86/kvm/x86.c:10455
+ kvm_arch_vcpu_ioctl_run+0x11fe/0x1b30 arch/x86/kvm/x86.c:10659
+ kvm_vcpu_ioctl+0xcd4/0x1980 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3948
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0x222/0x400 fs/ioctl.c:856
+ __x64_sys_ioctl+0x92/0xd0 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+
+Local variable lapic_irq created at:
+ kvm_pv_kick_cpu_op+0x46/0x100 arch/x86/kvm/x86.c:9146
+ kvm_emulate_hypercall+0xee7/0x1340 arch/x86/kvm/x86.c:9285
+
+CPU: 1 PID: 3490 Comm: syz-executor407 Not tainted 5.19.0-rc3-syzkaller-30868-g4b28366af7d9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
