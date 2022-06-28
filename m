@@ -2,82 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F35555D65A
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:16:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F25EE55D36A
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:12:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344244AbiF1KEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 06:04:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36138 "EHLO
+        id S1344870AbiF1KIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 06:08:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344169AbiF1KEx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 06:04:53 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2B22D1C9;
-        Tue, 28 Jun 2022 03:04:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656410692; x=1687946692;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=V8xmQPHT1mCLQeDpG45Uq0txHRzx1XRmzSSIhRmQbPE=;
-  b=GkEH+FWbUO+5DRLixED9hMGJit7an5JnpC03J0SDxipRWxYCAQel6D1v
-   f1Ijs3R9g/NwuezbYLQ3vK1pFqqucR6qDp0gPZuCGCL/F18mR5qcTY20I
-   7uSPZdcr4xBOojFR7cQsUYMgZ59pgBCAmWrdWaEZ2cIMmBqnq3BNOizO2
-   OYQOLuXgHuasHg5qmahzEpz+ZyLumVSy6fIC0PB03gzXyYJQxjfHlyrt/
-   k6eyZwo2NiBX1aWKnsDDDWrVo5gKTdzZhoyLyBRzgpOxN26AD93IzZbI+
-   qQcYuDOhP+XP2glq6Z7kL9pg09aGyXMrYwTP1tSaKEQMRXS3nZ0bmtwT+
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="345695538"
-X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="345695538"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 03:04:51 -0700
-X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
-   d="scan'208";a="617134907"
-Received: from nherzalx-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.96.221])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 03:04:45 -0700
-Message-ID: <2b676b19db423b995a21c7f215ed117c345c60d9.camel@intel.com>
-Subject: Re: [PATCH v5 02/22] cc_platform: Add new attribute to prevent ACPI
- CPU hotplug
-From:   Kai Huang <kai.huang@intel.com>
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm-devel <kvm@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S245666AbiF1KIs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 06:08:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D7C72F38D
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 03:08:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656410926;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u+o55GKWidSxIU5eLLFrD8Z2HcDtDkzMZqRenvhiXG4=;
+        b=eMHCycrk+sHT6y/DT6uayX4Y8xui+XKpbN2F2OJtud8jI4PiOb8fo46GuXtEvL3DtOmrFF
+        AYcFRSzcXufoMpDE2GtDvgIALsw4l1k/plzcIs1OqA4Hw4FabtnsJWUpjvPzp2i1HTJZh9
+        Lq/jXf6rzAHyUvxSZluvUwaVc8w6VkI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-121-i4EVvDy-P9KgTow_syPA8Q-1; Tue, 28 Jun 2022 06:08:43 -0400
+X-MC-Unique: i4EVvDy-P9KgTow_syPA8Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BBFCB1C00AC6;
+        Tue, 28 Jun 2022 10:08:42 +0000 (UTC)
+Received: from starship (unknown [10.40.194.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 690BE1121314;
+        Tue, 28 Jun 2022 10:08:40 +0000 (UTC)
+Message-ID: <b2e294055f792ec77c907ea27f8a9b21e3b3477c.camel@redhat.com>
+Subject: Re: [PATCH 00/14] KVM: nVMX: Use vmcs_config for setting up nested
+ VMX MSRs
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Len Brown <len.brown@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Rafael Wysocki <rafael.j.wysocki@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        isaku.yamahata@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
-        Tianyu.Lan@microsoft.com, Randy Dunlap <rdunlap@infradead.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Yue Haibing <yuehaibing@huawei.com>, dongli.zhang@oracle.com
-Date:   Tue, 28 Jun 2022 22:04:43 +1200
-In-Reply-To: <20220627100155.71a7b34c@redhat.com>
-References: <cover.1655894131.git.kai.huang@intel.com>
-         <f4bff93d83814ea1f54494f51ce3e5d954cf0f5b.1655894131.git.kai.huang@intel.com>
-         <CAJZ5v0jV8ODcxuLL+iSpYbW7w=GFtUSakN-n8CO5Zmun3K-Erg@mail.gmail.com>
-         <d3ba563f3f4e7aaf90fb99d20c651b5751972f7b.camel@intel.com>
-         <20220627100155.71a7b34c@redhat.com>
+        Sean Christopherson <seanjc@google.com>
+Date:   Tue, 28 Jun 2022 13:08:39 +0300
+In-Reply-To: <87h745umst.fsf@redhat.com>
+References: <20220627160440.31857-1-vkuznets@redhat.com>
+         <0739589fe08c75c563e10cb41388640c7e050a52.camel@redhat.com>
+         <87h745umst.fsf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -86,154 +68,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-06-27 at 10:01 +0200, Igor Mammedov wrote:
-> On Thu, 23 Jun 2022 12:01:48 +1200
-> Kai Huang <kai.huang@intel.com> wrote:
->=20
-> > On Wed, 2022-06-22 at 13:42 +0200, Rafael J. Wysocki wrote:
-> > > On Wed, Jun 22, 2022 at 1:16 PM Kai Huang <kai.huang@intel.com> wrote=
-: =20
-> > > >=20
-> > > > Platforms with confidential computing technology may not support AC=
-PI
-> > > > CPU hotplug when such technology is enabled by the BIOS.  Examples
-> > > > include Intel platforms which support Intel Trust Domain Extensions
-> > > > (TDX).
-> > > >=20
-> > > > If the kernel ever receives ACPI CPU hotplug event, it is likely a =
-BIOS
-> > > > bug.  For ACPI CPU hot-add, the kernel should speak out this is a B=
-IOS
-> > > > bug and reject the new CPU.  For hot-removal, for simplicity just a=
-ssume
-> > > > the kernel cannot continue to work normally, and BUG().
-> > > >=20
-> > > > Add a new attribute CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED to indicate t=
-he
-> > > > platform doesn't support ACPI CPU hotplug, so that kernel can handl=
-e
-> > > > ACPI CPU hotplug events for such platform.  The existing attribute
-> > > > CC_ATTR_HOTPLUG_DISABLED is for software CPU hotplug thus doesn't f=
-it.
-> > > >=20
-> > > > In acpi_processor_{add|remove}(), add early check against this attr=
-ibute
-> > > > and handle accordingly if it is set.
-> > > >=20
-> > > > Also take this chance to rename existing CC_ATTR_HOTPLUG_DISABLED t=
-o
-> > > > CC_ATTR_CPU_HOTPLUG_DISABLED as it is for software CPU hotplug.
-> > > >=20
-> > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > > > ---
-> > > >  arch/x86/coco/core.c          |  2 +-
-> > > >  drivers/acpi/acpi_processor.c | 23 +++++++++++++++++++++++
-> > > >  include/linux/cc_platform.h   | 15 +++++++++++++--
-> > > >  kernel/cpu.c                  |  2 +-
-> > > >  4 files changed, 38 insertions(+), 4 deletions(-)
-> > > >=20
-> > > > diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
-> > > > index 4320fadae716..1bde1af75296 100644
-> > > > --- a/arch/x86/coco/core.c
-> > > > +++ b/arch/x86/coco/core.c
-> > > > @@ -20,7 +20,7 @@ static bool intel_cc_platform_has(enum cc_attr at=
-tr)
-> > > >  {
-> > > >         switch (attr) {
-> > > >         case CC_ATTR_GUEST_UNROLL_STRING_IO:
-> > > > -       case CC_ATTR_HOTPLUG_DISABLED:
-> > > > +       case CC_ATTR_CPU_HOTPLUG_DISABLED:
-> > > >         case CC_ATTR_GUEST_MEM_ENCRYPT:
-> > > >         case CC_ATTR_MEM_ENCRYPT:
-> > > >                 return true;
-> > > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_proc=
-essor.c
-> > > > index 6737b1cbf6d6..b960db864cd4 100644
-> > > > --- a/drivers/acpi/acpi_processor.c
-> > > > +++ b/drivers/acpi/acpi_processor.c
-> > > > @@ -15,6 +15,7 @@
-> > > >  #include <linux/kernel.h>
-> > > >  #include <linux/module.h>
-> > > >  #include <linux/pci.h>
-> > > > +#include <linux/cc_platform.h>
-> > > >=20
-> > > >  #include <acpi/processor.h>
-> > > >=20
-> > > > @@ -357,6 +358,17 @@ static int acpi_processor_add(struct acpi_devi=
-ce *device,
-> > > >         struct device *dev;
-> > > >         int result =3D 0;
-> > > >=20
-> > > > +       /*
-> > > > +        * If the confidential computing platform doesn't support A=
-CPI
-> > > > +        * memory hotplug, the BIOS should never deliver such event=
- to
-> > > > +        * the kernel.  Report ACPI CPU hot-add as a BIOS bug and i=
-gnore
-> > > > +        * the new CPU.
-> > > > +        */
-> > > > +       if (cc_platform_has(CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED)) { =
-=20
-> > >=20
-> > > This will affect initialization, not just hotplug AFAICS.
-> > >=20
-> > > You should reset the .hotplug.enabled flag in processor_handler to
-> > > false instead. =20
-> >=20
-> > Hi Rafael,
-> >=20
-> > Thanks for the review.  By "affect initialization" did you mean this
-> > acpi_processor_add() is also called during kernel boot when any logical=
- cpu is
-> > brought up?  Or do you mean ACPI CPU hotplug can also happen during ker=
-nel boot
-> > (after acpi_processor_init())?
-> >=20
-> > I see acpi_processor_init() calls acpi_processor_check_duplicates() whi=
-ch calls
-> > acpi_evaluate_object() but I don't know details of ACPI so I don't know=
- whether
-> > this would trigger acpi_processor_add().
-> >=20
-> > One thing is TDX doesn't support ACPI CPU hotplug is an architectural t=
-hing, so
-> > it is illegal even if it happens during kernel boot.  Dave's idea is th=
-e kernel
-> > should  speak out loudly if physical CPU hotplug indeed happened on (BI=
-OS) TDX-
-> > enabled platforms.  Otherwise perhaps we can just give up initializing =
-the ACPI
-> > CPU hotplug in acpi_processor_init(), something like below?
->=20
-> The thing is that by the time ACPI machinery kicks in, physical hotplug
-> has already happened and in case of (kvm+qemu+ovmf hypervisor combo)
-> firmware has already handled it somehow and handed it over to ACPI.
-> If you say it's architectural thing then cpu hotplug is platform/firmware
-> bug and should be disabled there instead of working around it in the kern=
-el.
->=20
-> Perhaps instead of 'preventing' hotplug, complain/panic and be done with =
-it.
+On Tue, 2022-06-28 at 12:04 +0200, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> 
+> > On Mon, 2022-06-27 at 18:04 +0200, Vitaly Kuznetsov wrote:
+> > > Changes since RFC:
+> > > - "KVM: VMX: Extend VMX controls macro shenanigans" PATCH added and the
+> > >   infrastructure is later used in other patches [Sean] PATCHes 1-3 added
+> > >   to support the change.
+> > > - "KVM: VMX: Clear controls obsoleted by EPT at runtime, not setup" PATCH
+> > >   added [Sean].
+> > > - Commit messages added.
+> > > 
+> > > vmcs_config is a sanitized version of host VMX MSRs where some controls are
+> > > filtered out (e.g. when Enlightened VMCS is enabled, some know bugs are 
+> > > discovered, some inconsistencies in controls are detected,...) but
+> > > nested_vmx_setup_ctls_msrs() uses raw host MSRs instead. This may end up
+> > > in exposing undesired controls to L1. Switch to using vmcs_config instead.
+> > > 
+> > > Sean Christopherson (1):
+> > >   KVM: VMX: Clear controls obsoleted by EPT at runtime, not setup
+> > > 
+> > > Vitaly Kuznetsov (13):
+> > >   KVM: VMX: Check VM_ENTRY_IA32E_MODE in setup_vmcs_config()
+> > >   KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING in
+> > >     setup_vmcs_config()
+> > >   KVM: VMX: Tweak the special handling of SECONDARY_EXEC_ENCLS_EXITING
+> > >     in setup_vmcs_config()
+> > >   KVM: VMX: Extend VMX controls macro shenanigans
+> > >   KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering out of
+> > >     setup_vmcs_config()
+> > >   KVM: VMX: Add missing VMEXIT controls to vmcs_config
+> > >   KVM: VMX: Add missing VMENTRY controls to vmcs_config
+> > >   KVM: VMX: Add missing CPU based VM execution controls to vmcs_config
+> > >   KVM: nVMX: Use sanitized allowed-1 bits for VMX control MSRs
+> > >   KVM: VMX: Store required-1 VMX controls in vmcs_config
+> > >   KVM: nVMX: Use sanitized required-1 bits for VMX control MSRs
+> > >   KVM: VMX: Cache MSR_IA32_VMX_MISC in vmcs_config
+> > >   KVM: nVMX: Use cached host MSR_IA32_VMX_MISC value for setting up
+> > >     nested MSR
+> > > 
+> > >  arch/x86/kvm/vmx/capabilities.h |  16 +--
+> > >  arch/x86/kvm/vmx/nested.c       |  37 +++---
+> > >  arch/x86/kvm/vmx/nested.h       |   2 +-
+> > >  arch/x86/kvm/vmx/vmx.c          | 198 ++++++++++++++------------------
+> > >  arch/x86/kvm/vmx/vmx.h          | 118 +++++++++++++++++++
+> > >  5 files changed, 229 insertions(+), 142 deletions(-)
+> > > 
+> > Sorry that I was a bit out of loop on this, so before I review it,
+> > does this patch series solve the eVMCS issue we had alone,
+> > or we still need the eVMCS version patch series as well?
+> 
+> "[PATCH 00/11] KVM: VMX: Support TscScaling and EnclsExitingBitmap whith
+> eVMCS" adds new features, namely TSC scaling for both KVM-on-Hyper-V and
+> Hyper-V-on-KVM. This series doesn't add any features but avoids the
+> problem reported by Anirudh by properly filtering values in L1 VMX MSRs.
+> 
+> TL;DR: Both series are needed.
+> 
 
-Hi Igor,
+Roger that!
 
-Thanks for feedback.  Yes the current implementation actually reports CPU h=
-ot-
-add as BIOS bug.  I think I can report BIOS bug for hot-removal too.  And
-currently I actually used BUG() for the hot-removal case.  For hot-add I di=
-dn't
-use BUG() but rejected the new CPU as the latter is more conservative.=20
-
-Hi Rafael,
-
-I am not sure I got what you mean by "This will affect initialization, not =
-just
-hotplug AFAICS", could you elaborate a little bit?  Thanks.
-
-
---=20
-Thanks,
--Kai
-
+Best regards,
+	Maxim Levitsky
 
