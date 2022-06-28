@@ -2,407 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88C1E55E486
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:39:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B11655E489
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:39:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346401AbiF1N3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 09:29:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57116 "EHLO
+        id S1346439AbiF1NaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 09:30:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346424AbiF1N2b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 09:28:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C08ABDBA;
-        Tue, 28 Jun 2022 06:28:08 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SDNAoT030332;
-        Tue, 28 Jun 2022 13:28:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9g8LeguO+QAkdNpce2uyIpU26i1yVeR9+/lrxk/JDHo=;
- b=j8Xiz0YWwuirnRwF6TmAFVzrTCREgIIib12MMcbgjarwV8MdfMpirg+GylBexnYAcfi7
- wJbjdO5Vobj/GSedqggAxR+eTwDNYwlayMGPOtL1+WxuMY2AHu6KdU1LRSvr68c0UV7x
- f2Mmr09X0OlCT5d66h5OQfs7nATViHTAE1leH519jLoEV/RXB39r/fqzm+qREJce8lIk
- 0dybbTbV+sNzIoqpZA95I8H1Kgtit0K6FnNcxOgpKjSkMWoMjCgYTXUGxBkpXDcs8B8e
- q7wkhrHsm9ja48BnC22ZjIXmPIhP9okYLw61xcicdcEMPZJmaB+NhvNLYeoHsz6Yvwa/ dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02fxg644-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 13:28:04 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SDO3r1032642;
-        Tue, 28 Jun 2022 13:28:03 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h02fxg63d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 13:28:03 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SDJkL4003023;
-        Tue, 28 Jun 2022 13:28:03 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma05wdc.us.ibm.com with ESMTP id 3gwt09wgyq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 13:28:03 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SDS2vQ7733562
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Jun 2022 13:28:02 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 74F26AC064;
-        Tue, 28 Jun 2022 13:28:02 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD93DAC05B;
-        Tue, 28 Jun 2022 13:27:56 +0000 (GMT)
-Received: from [9.163.8.193] (unknown [9.163.8.193])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 28 Jun 2022 13:27:56 +0000 (GMT)
-Message-ID: <beff8d5e-a670-8015-028f-a704627a2b16@linux.ibm.com>
-Date:   Tue, 28 Jun 2022 09:27:55 -0400
+        with ESMTP id S1346479AbiF1N3P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 09:29:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C2AFD2182E
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:28:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656422898;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PH7wMQRYi1ZWFVxyL/3d+sZ7rcf181kH7ObPj88vxe0=;
+        b=TCjYsq9XEdoy0jbmQXqcg2qcWB13azoELplc8JkC1XvnSHTnfhJRBpfavpM1tYh48xmR/Q
+        CIPK/tgpSd3BU0vCJ+UOHUfGOdyMLYlLNBsDcIHCpqHxYpThXR4LxX+m4dw+ozZW0gtP0j
+        WK4lYd4EgaQLkEg3Le00JgezpVx8Goc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-304-EcWJGqfhMOyzA9mDqlu7zQ-1; Tue, 28 Jun 2022 09:28:17 -0400
+X-MC-Unique: EcWJGqfhMOyzA9mDqlu7zQ-1
+Received: by mail-wm1-f72.google.com with SMTP id p6-20020a05600c358600b003a0483b3c2eso3741727wmq.3
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 06:28:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=PH7wMQRYi1ZWFVxyL/3d+sZ7rcf181kH7ObPj88vxe0=;
+        b=GwcLI2NnpTWpyZtRfnHy4v2cPVHQMIGnR8dtgv2aGD8KHxCdAi5/y+83aKnxUiVQdc
+         SunUWHp6tca47jMyJrxffNQQQPIEfINp/n9GQ+IUlaqOIDjEw5R4ok/aBXghdKYy/X1x
+         AZxge/Hzlvv7hbS9Jw8ISjHpgohsmtuEi1rPjlJVc9lpBJVhBaDH/Ttov2wq9wjJlYM+
+         cS7lpSEY7WdjkNo3D9NzV9J6CJ9oRmJdnro7I4BYL53CST13apvHh+nbMPlBnzo1Jtwv
+         Jwip/rkIq6eIqVtX6SWuflXtL3Ah7k9zi9wk8G+xQFMkZysfo788X4R/3UTyB4GDqSzk
+         WXLQ==
+X-Gm-Message-State: AJIora+Gt2DOgFO1aQTv4SDm8YpkrizhkEAxT/DdiBDo//nlosP8LwOb
+        I7NTu+3e9Et56ncvcVxGZPD61OxGs8Fod79ezdHM6JyduKqCzGJKDnrsa7eEHJupnmdPurcnK7C
+        wTbOuyupcyxyV
+X-Received: by 2002:a5d:5047:0:b0:21b:92b2:f34f with SMTP id h7-20020a5d5047000000b0021b92b2f34fmr17127821wrt.677.1656422896238;
+        Tue, 28 Jun 2022 06:28:16 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tqVf5A7KSxbTw31AFhCSUb6QIduyx0h8n4yb62+NQ1QBxlS5VZpJjh7TfSMSbhzJ+0xSz+Vw==
+X-Received: by 2002:a5d:5047:0:b0:21b:92b2:f34f with SMTP id h7-20020a5d5047000000b0021b92b2f34fmr17127781wrt.677.1656422895955;
+        Tue, 28 Jun 2022 06:28:15 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id w9-20020a5d6089000000b0020e5b4ebaecsm13771290wrt.4.2022.06.28.06.28.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jun 2022 06:28:15 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 14:28:12 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 36/49] KVM: SVM: Add support to handle GHCB GPA
+ register VMGEXIT
+Message-ID: <YrsB7G4NSgJ+vKVw@work-vm>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <c2c4d365b4616c83ab2fb91b7c89d13535de8c0a.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v9 16/21] KVM: s390: pci: add routines to start/stop
- interpretive execution
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
- <20220606203325.110625-17-mjrosato@linux.ibm.com>
- <7a9990ca-b591-1351-8848-8d7c59449b12@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <7a9990ca-b591-1351-8848-8d7c59449b12@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _iNB2a_hk9BxPqrJ8pJ-lOn4G88jWJ2o
-X-Proofpoint-ORIG-GUID: A5RmqVfNa3oFbCqkZ09xv3u70fQU8Mqt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-28_07,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 lowpriorityscore=0 clxscore=1015
- bulkscore=0 spamscore=0 priorityscore=1501 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206280055
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c2c4d365b4616c83ab2fb91b7c89d13535de8c0a.1655761627.git.ashish.kalra@amd.com>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/28/22 6:53 AM, Pierre Morel wrote:
+* Ashish Kalra (Ashish.Kalra@amd.com) wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
+> SEV-SNP guests are required to perform a GHCB GPA registration. Before
+> using a GHCB GPA for a vCPU the first time, a guest must register the
+> vCPU GHCB GPA. If hypervisor can work with the guest requested GPA then
+> it must respond back with the same GPA otherwise return -1.
 > 
-> On 6/6/22 22:33, Matthew Rosato wrote:
->> These routines will be invoked at the time an s390x vfio-pci device is
->> associated with a KVM (or when the association is removed), allowing
->> the zPCI device to enable or disable load/store intepretation mode;
->> this requires the host zPCI device to inform firmware of the unique
->> token (GISA designation) that is associated with the owning KVM.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h |  18 ++++
->>   arch/s390/include/asm/pci.h      |   1 +
->>   arch/s390/kvm/kvm-s390.c         |  15 +++
->>   arch/s390/kvm/pci.c              | 162 +++++++++++++++++++++++++++++++
->>   arch/s390/kvm/pci.h              |   5 +
->>   arch/s390/pci/pci.c              |   4 +
->>   6 files changed, 205 insertions(+)
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h 
->> b/arch/s390/include/asm/kvm_host.h
->> index 8e381603b6a7..6e83d746bae2 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -19,6 +19,7 @@
->>   #include <linux/kvm.h>
->>   #include <linux/seqlock.h>
->>   #include <linux/module.h>
->> +#include <linux/pci.h>
->>   #include <asm/debug.h>
->>   #include <asm/cpu.h>
->>   #include <asm/fpu/api.h>
->> @@ -967,6 +968,8 @@ struct kvm_arch{
->>       DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
->>       struct kvm_s390_gisa_interrupt gisa_int;
->>       struct kvm_s390_pv pv;
->> +    struct list_head kzdev_list;
->> +    spinlock_t kzdev_list_lock;
->>   };
->>   #define KVM_HVA_ERR_BAD        (-1UL)
->> @@ -1017,4 +1020,19 @@ static inline void 
->> kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->>   static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->>   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
->> +#define __KVM_HAVE_ARCH_VM_FREE
->> +void kvm_arch_free_vm(struct kvm *kvm);
->> +
->> +#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
->> +int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
->> +void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
->> +#else
->> +static inline int kvm_s390_pci_register_kvm(struct zpci_dev *dev,
->> +                        struct kvm *kvm)
->> +{
->> +    return -EPERM;
->> +}
->> +static inline void kvm_s390_pci_unregister_kvm(struct zpci_dev *dev) {}
->> +#endif
->> +
->>   #endif
->> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
->> index 322060a75d9f..85eb0ef9d4c3 100644
->> --- a/arch/s390/include/asm/pci.h
->> +++ b/arch/s390/include/asm/pci.h
->> @@ -194,6 +194,7 @@ struct zpci_dev {
->>       /* IOMMU and passthrough */
->>       struct s390_domain *s390_domain; /* s390 IOMMU domain data */
->>       struct kvm_zdev *kzdev;
->> +    struct mutex kzdev_lock;
+> On VMEXIT, Verify that GHCB GPA matches with the registered value. If a
+> mismatch is detected then abort the guest.
 > 
-> I guess that since it did not exist before the lock is not there to 
-> protect the zpci_dev struct.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev-common.h |  8 ++++++++
+>  arch/x86/kvm/svm/sev.c            | 27 +++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.h            |  7 +++++++
+>  3 files changed, 42 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 539de6b93420..0a9055cdfae2 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -59,6 +59,14 @@
+>  #define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
+>  #define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	GENMASK_ULL(51, 0)
+>  
+> +/* Preferred GHCB GPA Request */
+> +#define GHCB_MSR_PREF_GPA_REQ		0x010
+> +#define GHCB_MSR_GPA_VALUE_POS		12
+> +#define GHCB_MSR_GPA_VALUE_MASK		GENMASK_ULL(51, 0)
 
-Right, not the zpci_dev itself but it is protecting the contents of the 
-kzdev (including the pointer to the zdev e.g. kzdev->zdev)
+Are the magic 51's in here fixed ?
 
-> May be add a comment to say what it is protecting.
+Dave
 
-Sure
-
+> +#define GHCB_MSR_PREF_GPA_RESP		0x011
+> +#define GHCB_MSR_PREF_GPA_NONE		0xfffffffffffff
+> +
+>  /* GHCB GPA Register */
+>  #define GHCB_MSR_REG_GPA_REQ		0x012
+>  #define GHCB_MSR_REG_GPA_REQ_VAL(v)			\
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index c70f3f7e06a8..6de48130e414 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3331,6 +3331,27 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  				  GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
+>  		break;
+>  	}
+> +	case GHCB_MSR_PREF_GPA_REQ: {
+> +		set_ghcb_msr_bits(svm, GHCB_MSR_PREF_GPA_NONE, GHCB_MSR_GPA_VALUE_MASK,
+> +				  GHCB_MSR_GPA_VALUE_POS);
+> +		set_ghcb_msr_bits(svm, GHCB_MSR_PREF_GPA_RESP, GHCB_MSR_INFO_MASK,
+> +				  GHCB_MSR_INFO_POS);
+> +		break;
+> +	}
+> +	case GHCB_MSR_REG_GPA_REQ: {
+> +		u64 gfn;
+> +
+> +		gfn = get_ghcb_msr_bits(svm, GHCB_MSR_GPA_VALUE_MASK,
+> +					GHCB_MSR_GPA_VALUE_POS);
+> +
+> +		svm->sev_es.ghcb_registered_gpa = gfn_to_gpa(gfn);
+> +
+> +		set_ghcb_msr_bits(svm, gfn, GHCB_MSR_GPA_VALUE_MASK,
+> +				  GHCB_MSR_GPA_VALUE_POS);
+> +		set_ghcb_msr_bits(svm, GHCB_MSR_REG_GPA_RESP, GHCB_MSR_INFO_MASK,
+> +				  GHCB_MSR_INFO_POS);
+> +		break;
+> +	}
+>  	case GHCB_MSR_TERM_REQ: {
+>  		u64 reason_set, reason_code;
+>  
+> @@ -3381,6 +3402,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+>  		return 1;
+>  	}
+>  
+> +	/* SEV-SNP guest requires that the GHCB GPA must be registered */
+> +	if (sev_snp_guest(svm->vcpu.kvm) && !ghcb_gpa_is_registered(svm, ghcb_gpa)) {
+> +		vcpu_unimpl(&svm->vcpu, "vmgexit: GHCB GPA [%#llx] is not registered.\n", ghcb_gpa);
+> +		return -EINVAL;
+> +	}
+> +
+>  	ret = sev_es_validate_vmgexit(svm, &exit_code);
+>  	if (ret)
+>  		return ret;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index c80352c9c0d6..54ff56cb6125 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -206,6 +206,8 @@ struct vcpu_sev_es_state {
+>  	 */
+>  	u64 ghcb_sw_exit_info_1;
+>  	u64 ghcb_sw_exit_info_2;
+> +
+> +	u64 ghcb_registered_gpa;
+>  };
+>  
+>  struct vcpu_svm {
+> @@ -334,6 +336,11 @@ static inline bool sev_snp_guest(struct kvm *kvm)
+>  	return sev_es_guest(kvm) && sev->snp_active;
+>  }
+>  
+> +static inline bool ghcb_gpa_is_registered(struct vcpu_svm *svm, u64 val)
+> +{
+> +	return svm->sev_es.ghcb_registered_gpa == val;
+> +}
+> +
+>  static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
+>  {
+>  	vmcb->control.clean = 0;
+> -- 
+> 2.25.1
 > 
-> 
->>   };
->>   static inline bool zdev_enabled(struct zpci_dev *zdev)
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index a66da3f66114..4758bb731199 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2790,6 +2790,14 @@ static void sca_dispose(struct kvm *kvm)
->>       kvm->arch.sca = NULL;
->>   }
->> +void kvm_arch_free_vm(struct kvm *kvm)
->> +{
->> +    if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
->> +        kvm_s390_pci_clear_list(kvm);
->> +
->> +    __kvm_arch_free_vm(kvm);
->> +}
->> +
->>   int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>   {
->>       gfp_t alloc_flags = GFP_KERNEL_ACCOUNT;
->> @@ -2872,6 +2880,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned 
->> long type)
->>       kvm_s390_crypto_init(kvm);
->> +    if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)) {
->> +        mutex_lock(&kvm->lock);
->> +        kvm_s390_pci_init_list(kvm);
->> +        kvm_s390_vcpu_pci_enable_interp(kvm);
->> +        mutex_unlock(&kvm->lock);
->> +    }
->> +
->>       mutex_init(&kvm->arch.float_int.ais_lock);
->>       spin_lock_init(&kvm->arch.float_int.lock);
->>       for (i = 0; i < FIRQ_LIST_COUNT; i++)
->> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
->> index b232c8cbaa81..24211741deb0 100644
->> --- a/arch/s390/kvm/pci.c
->> +++ b/arch/s390/kvm/pci.c
->> @@ -12,7 +12,9 @@
->>   #include <asm/pci.h>
->>   #include <asm/pci_insn.h>
->>   #include <asm/pci_io.h>
->> +#include <asm/sclp.h>
->>   #include "pci.h"
->> +#include "kvm-s390.h"
->>   struct zpci_aift *aift;
->> @@ -423,6 +425,166 @@ static void kvm_s390_pci_dev_release(struct 
->> zpci_dev *zdev)
->>       kfree(kzdev);
->>   }
->> +
->> +/*
->> + * Register device with the specified KVM. If interpetation 
->> facilities are
->> + * available, enable them and let userspace indicate whether or not 
->> they will
->> + * be used (specify SHM bit to disable).
->> + */
->> +int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
->> +{
->> +    int rc;
->> +
->> +    if (!zdev)
->> +        return -EINVAL;
->> +
->> +    mutex_lock(&zdev->kzdev_lock);
->> +
->> +    if (zdev->kzdev || zdev->gisa != 0 || !kvm) {
->> +        mutex_unlock(&zdev->kzdev_lock);
->> +        return -EINVAL;
->> +    }
->> +
->> +    kvm_get_kvm(kvm);
->> +
->> +    mutex_lock(&kvm->lock);
-> 
-> Why do we need to lock KVM here?
-
-Hmm, good point, now that we get a reference this seems unnecessary
-
-> 
-> just a question, I do not think it is a big problem.
-> 
->> +
->> +    rc = kvm_s390_pci_dev_open(zdev);
->> +    if (rc)
->> +        goto err;
->> +
->> +    /*
->> +     * If interpretation facilities aren't available, add the device to
->> +     * the kzdev list but don't enable for interpretation.
->> +     */
->> +    if (!kvm_s390_pci_interp_allowed())
->> +        goto out;
->> +
->> +    /*
->> +     * If this is the first request to use an interpreted device, 
->> make the
->> +     * necessary vcpu changes
->> +     */
->> +    if (!kvm->arch.use_zpci_interp)
->> +        kvm_s390_vcpu_pci_enable_interp(kvm);
->> +
->> +    if (zdev_enabled(zdev)) {
->> +        rc = zpci_disable_device(zdev);
->> +        if (rc)
->> +            goto err;
->> +    }
->> +
->> +    /*
->> +     * Store information about the identity of the kvm guest allowed to
->> +     * access this device via interpretation to be used by host CLP
->> +     */
->> +    zdev->gisa = (u32)virt_to_phys(&kvm->arch.sie_page2->gisa);
->> +
->> +    rc = zpci_enable_device(zdev);
->> +    if (rc)
->> +        goto clear_gisa;
->> +
->> +    /* Re-register the IOMMU that was already created */
->> +    rc = zpci_register_ioat(zdev, 0, zdev->start_dma, zdev->end_dma,
->> +                virt_to_phys(zdev->dma_table));
->> +    if (rc)
->> +        goto clear_gisa;
->> +
->> +out:
->> +    zdev->kzdev->kvm = kvm;
->> +
->> +    spin_lock(&kvm->arch.kzdev_list_lock);
->> +    list_add_tail(&zdev->kzdev->entry, &kvm->arch.kzdev_list);
->> +    spin_unlock(&kvm->arch.kzdev_list_lock);
->> +
->> +    mutex_unlock(&kvm->lock);
->> +    mutex_unlock(&zdev->kzdev_lock);
->> +    return 0;
->> +
->> +clear_gisa:
->> +    zdev->gisa = 0;
->> +err:
->> +    if (zdev->kzdev)
->> +        kvm_s390_pci_dev_release(zdev);
->> +    mutex_unlock(&kvm->lock);
->> +    mutex_unlock(&zdev->kzdev_lock);
->> +    kvm_put_kvm(kvm);
->> +    return rc;
->> +}
->> +EXPORT_SYMBOL_GPL(kvm_s390_pci_register_kvm);
->> +
->> +void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
->> +{
->> +    struct kvm *kvm;
->> +
->> +    if (!zdev)
->> +        return;
->> +
->> +    mutex_lock(&zdev->kzdev_lock);
->> +
->> +    if (WARN_ON(!zdev->kzdev)) {
-> 
-> When can this happen ?
-> 
-
-It cannot today, nor should it ever (hence the WARN_ON) -- if we do, 
-it's a case of programming error introduced somewhere (vfio has a KVM 
-reference but we never built a kzdev via kvm_s390_pci_register_kvm or 
-lost it somehow)
-
->> +        mutex_unlock(&zdev->kzdev_lock);
->> +        return;
->> +    }
->> +
->> +    kvm = zdev->kzdev->kvm;
->> +    mutex_lock(&kvm->lock);
->> +
->> +    /*
->> +     * A 0 gisa means interpretation was never enabled, just remove the
->> +     * device from the list.
->> +     */
->> +    if (zdev->gisa == 0)
->> +        goto out;
->> +
->> +    /* Forwarding must be turned off before interpretation */
->> +    if (zdev->kzdev->fib.fmt0.aibv != 0)
->> +        kvm_s390_pci_aif_disable(zdev, true);
->> +
->> +    /* Remove the host CLP guest designation */
->> +    zdev->gisa = 0;
->> +
->> +    if (zdev_enabled(zdev)) {
->> +        if (zpci_disable_device(zdev))
->> +            goto out;
-> 
-> NIT debug trace ?
-
-We should at least get a trace entry in from clp_disable_fh() if 
-something goes wrong here.
-
-> 
->> +    }
->> +
->> +    if (zpci_enable_device(zdev))
->> +        goto out;
-> 
-> NIT debug trace?
-
-And similarly, a trace entry from clp_enable_fh() here.  So I think 
-these are OK for now.
-
-I am consdering a follow-on to add new s390dbf entries for 'kvm-pci' or 
-so, these might make sense there for additional context, but let's leave 
-that for after this series.
-
-> 
-> Only some questions, otherwise, LGTM
-> 
-> Acked-by: Pierre Morel <pmorel@linux.ibm.com>
-> 
-
-Thanks!
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
