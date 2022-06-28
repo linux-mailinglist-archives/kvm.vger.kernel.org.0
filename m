@@ -2,162 +2,379 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4087F55D038
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:07:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E095A55CCF8
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:02:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345107AbiF1Kut (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 06:50:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49944 "EHLO
+        id S1345071AbiF1KtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 06:49:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236568AbiF1Kus (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 06:50:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3FADB24F34
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 03:50:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656413446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fBnpEBJJsEjj4xp1XzlNmSDPEps8RE1TeLCO9pCV3b8=;
-        b=Nh5/HTIO1DVp5K2HoxqI0LjyfaE3XWL7WDfmyZNVK+2bg42oD4Dm13FHxP6rPK1BQUiBRN
-        xqTyifWfaTP9w5MF85p7aeEEYg0HMQREZhQzlKI4RYQXuJsd4saDPoenvpVPOJmnVxqDmO
-        W+sOXi4gAOD7dJEwjXO4MeDM9E9UGus=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-372-GC5ovy_mNAyQcQPdutcz-w-1; Tue, 28 Jun 2022 06:50:45 -0400
-X-MC-Unique: GC5ovy_mNAyQcQPdutcz-w-1
-Received: by mail-wr1-f71.google.com with SMTP id q15-20020a5d61cf000000b0021bc2461141so1113839wrv.5
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 03:50:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=fBnpEBJJsEjj4xp1XzlNmSDPEps8RE1TeLCO9pCV3b8=;
-        b=eTlzhmi5hOR2rCWH3kk8wi979Px7x0XastFANjWhJ7QmUaFMs4xnyOZoKGTM1uFpNk
-         FtQVaLrTFDwDYMlqxjzbf71StGlM/xzEidq3WxSNpzoa9omchwOc9E1yKAZrK7wmlQRY
-         A3+J9LUu5sxIkD48/4W4x7dNLH3Jv2Y83Kcl3Qbi2BoVBgc+DJ+iVgjj6hGCOmjigP8X
-         r8Y/MHt8Ovm5AXWRODg4fyxUhCwxOTGCd3TNA1tP7CdyFuJR58/17nuxngI7MNYALL7k
-         gOj5A2pXGJOVBtcDz9Se43bkxktgVI65Ym1bGtfpyf7NQwtB9LezaX5yHuiOFIjEcayM
-         13WQ==
-X-Gm-Message-State: AJIora/Syb+l9icCZPxpijNeyppVWOvss0HQNPeS/yK76HWhnzkVTeFK
-        g8yOs7UmjLD58wDQ0FRWKe5omevh5OjBZay0D40cO9ToWUTkp+JmiiXl+Lb7J2YcfX2iUNU1ymO
-        JC015L2eFOa0C
-X-Received: by 2002:a05:600c:1547:b0:39c:7fc6:3082 with SMTP id f7-20020a05600c154700b0039c7fc63082mr26228171wmg.189.1656413442948;
-        Tue, 28 Jun 2022 03:50:42 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sOc62+TwZm4Lysu7PiidKj6NprJiStBGJ45lIax1y18ihr6TTIBSDrSl64O72de4xS9gTWfQ==
-X-Received: by 2002:a05:600c:1547:b0:39c:7fc6:3082 with SMTP id f7-20020a05600c154700b0039c7fc63082mr26228150wmg.189.1656413442750;
-        Tue, 28 Jun 2022 03:50:42 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id s11-20020a5d4ecb000000b0020fe61acd09sm13521418wrv.12.2022.06.28.03.50.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 03:50:42 -0700 (PDT)
-Date:   Tue, 28 Jun 2022 11:50:39 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Message-ID: <Yrrc/6x70wa14c5t@work-vm>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
- <YrH0ca3Sam7Ru11c@work-vm>
- <SN6PR12MB2767FBF0848B906B9F0284D28EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
- <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+        with ESMTP id S1345069AbiF1KtS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 06:49:18 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD2F642D;
+        Tue, 28 Jun 2022 03:49:14 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SAiLsd003735;
+        Tue, 28 Jun 2022 10:49:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=fmpb0wcBdoPIzWzuYUqjEOmeD8LGLBFtvd3wORyXxAw=;
+ b=p6DycO9WfUbZ44RxatRdkYN5YtK367nQxEfAlAK9Il4A8qbQ2nndNJOfg+6/uq6ehzp6
+ 6LcUy6qB+IqAuX1OLin88SKeNOkrs1gsNLXG5zXMF7IW0vOZgyJPH/ihPAaS9JR6KnQy
+ yzjCG79jGimIGFaUgh9+PVN+837N6II06/eiLDywmwBLhvAGM7Kt7LTC5/ANR9Po66XB
+ zAgPfbTeq4HSw7lyB9duDIJVoFNO94TDpauWq7/chilw4/E6OfxXCT9YrC/GfyG80fUC
+ 3JJMrIxt0FK/6PHfROLndXeTkrl8H0L1X9KQB4nlmrZ6/xuAidpWENCGaNVLkFkfgwtk 0Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h005er44v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 10:49:12 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SAk8u0013577;
+        Tue, 28 Jun 2022 10:49:11 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h005er440-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 10:49:11 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SAYuFS013631;
+        Tue, 28 Jun 2022 10:49:08 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3gwt08vpc7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Jun 2022 10:49:08 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SAn5o916580944
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jun 2022 10:49:05 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9124AAE045;
+        Tue, 28 Jun 2022 10:49:05 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3EEEAAE04D;
+        Tue, 28 Jun 2022 10:49:04 +0000 (GMT)
+Received: from [9.171.41.104] (unknown [9.171.41.104])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Jun 2022 10:49:04 +0000 (GMT)
+Message-ID: <7a9990ca-b591-1351-8848-8d7c59449b12@linux.ibm.com>
+Date:   Tue, 28 Jun 2022 12:53:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
-User-Agent: Mutt/2.2.6 (2022-06-05)
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v9 16/21] KVM: s390: pci: add routines to start/stop
+ interpretive execution
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
+        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
+ <20220606203325.110625-17-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220606203325.110625-17-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: AIQL6y6-jHRgvurYtbZJhww-7X7lCgwN
+X-Proofpoint-GUID: T7_4ryaPSEX1_2JxnPiYa-SkIYvZyhHV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-28_05,2022-06-24_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ spamscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 mlxlogscore=999 malwarescore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206280044
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Kalra, Ashish (Ashish.Kalra@amd.com) wrote:
-> [AMD Official Use Only - General]
-> 
-> >>>  /*
-> >>>   * The RMP entry format is not architectural. The format is defined 
-> >>> in PPR @@ -126,6 +128,15 @@ struct snp_guest_platform_data {
-> >>>  	u64 secrets_gpa;
-> >>>  };
-> >>>  
-> >>> +struct rmpupdate {
-> >>> +	u64 gpa;
-> >>> +	u8 assigned;
-> >>> +	u8 pagesize;
-> >>> +	u8 immutable;
-> >>> +	u8 rsvd;
-> >>> +	u32 asid;
-> >>> +} __packed;
-> 
-> >>I see above it says the RMP entry format isn't architectural; is this 'rmpupdate' structure? If not how is this going to get handled when we have a couple >of SNP capable CPUs with different layouts?
-> 
-> >Architectural implies that it is defined in the APM and shouldn't change in such a way as to not be backward compatible. 
-> >I probably think the wording here should be architecture independent or more precisely platform independent.
-> 
-> Some more clarity on this: 
-> 
-> Actually, the PPR for family 19h Model 01h, Rev B1 defines the RMP entry format as below:
-> 
-> 2.1.4.2 RMP Entry Format
-> Architecturally the format of RMP entries are not specified in APM. In order to assist software, the following table specifies select portions of the RMP entry format for this specific product. Each RMP entry is 16B in size and is formatted as follows. Software should not rely on any field definitions not specified in this table and the format of an RMP entry may change in future processors. 
-> 
-> Architectural implies that it is defined in the APM and shouldn't change in such a way as to not be backward compatible. So non-architectural in this context means that it is only defined in our PPR.
-> 
-> So actually this RPM entry definition is platform dependent and will need to be changed for different AMD processors and that change has to be handled correspondingly in the dump_rmpentry() code. 
 
-You'll need a way to make that fail cleanly when run on a newer CPU
-with different layout, and a way to build kernels that can handle
-more than one layout.
 
-Dave
-
-> Thanks,
-> Ashish
+On 6/6/22 22:33, Matthew Rosato wrote:
+> These routines will be invoked at the time an s390x vfio-pci device is
+> associated with a KVM (or when the association is removed), allowing
+> the zPCI device to enable or disable load/store intepretation mode;
+> this requires the host zPCI device to inform firmware of the unique
+> token (GISA designation) that is associated with the owning KVM.
 > 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h |  18 ++++
+>   arch/s390/include/asm/pci.h      |   1 +
+>   arch/s390/kvm/kvm-s390.c         |  15 +++
+>   arch/s390/kvm/pci.c              | 162 +++++++++++++++++++++++++++++++
+>   arch/s390/kvm/pci.h              |   5 +
+>   arch/s390/pci/pci.c              |   4 +
+>   6 files changed, 205 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 8e381603b6a7..6e83d746bae2 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -19,6 +19,7 @@
+>   #include <linux/kvm.h>
+>   #include <linux/seqlock.h>
+>   #include <linux/module.h>
+> +#include <linux/pci.h>
+>   #include <asm/debug.h>
+>   #include <asm/cpu.h>
+>   #include <asm/fpu/api.h>
+> @@ -967,6 +968,8 @@ struct kvm_arch{
+>   	DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
+>   	struct kvm_s390_gisa_interrupt gisa_int;
+>   	struct kvm_s390_pv pv;
+> +	struct list_head kzdev_list;
+> +	spinlock_t kzdev_list_lock;
+>   };
+>   
+>   #define KVM_HVA_ERR_BAD		(-1UL)
+> @@ -1017,4 +1020,19 @@ static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>   static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+>   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>   
+> +#define __KVM_HAVE_ARCH_VM_FREE
+> +void kvm_arch_free_vm(struct kvm *kvm);
+> +
+> +#ifdef CONFIG_VFIO_PCI_ZDEV_KVM
+> +int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm);
+> +void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev);
+> +#else
+> +static inline int kvm_s390_pci_register_kvm(struct zpci_dev *dev,
+> +					    struct kvm *kvm)
+> +{
+> +	return -EPERM;
+> +}
+> +static inline void kvm_s390_pci_unregister_kvm(struct zpci_dev *dev) {}
+> +#endif
+> +
+>   #endif
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index 322060a75d9f..85eb0ef9d4c3 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -194,6 +194,7 @@ struct zpci_dev {
+>   	/* IOMMU and passthrough */
+>   	struct s390_domain *s390_domain; /* s390 IOMMU domain data */
+>   	struct kvm_zdev *kzdev;
+> +	struct mutex kzdev_lock;
+
+I guess that since it did not exist before the lock is not there to 
+protect the zpci_dev struct.
+May be add a comment to say what it is protecting.
+
+
+>   };
+>   
+>   static inline bool zdev_enabled(struct zpci_dev *zdev)
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index a66da3f66114..4758bb731199 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2790,6 +2790,14 @@ static void sca_dispose(struct kvm *kvm)
+>   	kvm->arch.sca = NULL;
+>   }
+>   
+> +void kvm_arch_free_vm(struct kvm *kvm)
+> +{
+> +	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
+> +		kvm_s390_pci_clear_list(kvm);
+> +
+> +	__kvm_arch_free_vm(kvm);
+> +}
+> +
+>   int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   {
+>   	gfp_t alloc_flags = GFP_KERNEL_ACCOUNT;
+> @@ -2872,6 +2880,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   
+>   	kvm_s390_crypto_init(kvm);
+>   
+> +	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)) {
+> +		mutex_lock(&kvm->lock);
+> +		kvm_s390_pci_init_list(kvm);
+> +		kvm_s390_vcpu_pci_enable_interp(kvm);
+> +		mutex_unlock(&kvm->lock);
+> +	}
+> +
+>   	mutex_init(&kvm->arch.float_int.ais_lock);
+>   	spin_lock_init(&kvm->arch.float_int.lock);
+>   	for (i = 0; i < FIRQ_LIST_COUNT; i++)
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+> index b232c8cbaa81..24211741deb0 100644
+> --- a/arch/s390/kvm/pci.c
+> +++ b/arch/s390/kvm/pci.c
+> @@ -12,7 +12,9 @@
+>   #include <asm/pci.h>
+>   #include <asm/pci_insn.h>
+>   #include <asm/pci_io.h>
+> +#include <asm/sclp.h>
+>   #include "pci.h"
+> +#include "kvm-s390.h"
+>   
+>   struct zpci_aift *aift;
+>   
+> @@ -423,6 +425,166 @@ static void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
+>   	kfree(kzdev);
+>   }
+>   
+> +
+> +/*
+> + * Register device with the specified KVM. If interpetation facilities are
+> + * available, enable them and let userspace indicate whether or not they will
+> + * be used (specify SHM bit to disable).
+> + */
+> +int kvm_s390_pci_register_kvm(struct zpci_dev *zdev, struct kvm *kvm)
+> +{
+> +	int rc;
+> +
+> +	if (!zdev)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&zdev->kzdev_lock);
+> +
+> +	if (zdev->kzdev || zdev->gisa != 0 || !kvm) {
+> +		mutex_unlock(&zdev->kzdev_lock);
+> +		return -EINVAL;
+> +	}
+> +
+> +	kvm_get_kvm(kvm);
+> +
+> +	mutex_lock(&kvm->lock);
+
+Why do we need to lock KVM here?
+
+just a question, I do not think it is a big problem.
+
+> +
+> +	rc = kvm_s390_pci_dev_open(zdev);
+> +	if (rc)
+> +		goto err;
+> +
+> +	/*
+> +	 * If interpretation facilities aren't available, add the device to
+> +	 * the kzdev list but don't enable for interpretation.
+> +	 */
+> +	if (!kvm_s390_pci_interp_allowed())
+> +		goto out;
+> +
+> +	/*
+> +	 * If this is the first request to use an interpreted device, make the
+> +	 * necessary vcpu changes
+> +	 */
+> +	if (!kvm->arch.use_zpci_interp)
+> +		kvm_s390_vcpu_pci_enable_interp(kvm);
+> +
+> +	if (zdev_enabled(zdev)) {
+> +		rc = zpci_disable_device(zdev);
+> +		if (rc)
+> +			goto err;
+> +	}
+> +
+> +	/*
+> +	 * Store information about the identity of the kvm guest allowed to
+> +	 * access this device via interpretation to be used by host CLP
+> +	 */
+> +	zdev->gisa = (u32)virt_to_phys(&kvm->arch.sie_page2->gisa);
+> +
+> +	rc = zpci_enable_device(zdev);
+> +	if (rc)
+> +		goto clear_gisa;
+> +
+> +	/* Re-register the IOMMU that was already created */
+> +	rc = zpci_register_ioat(zdev, 0, zdev->start_dma, zdev->end_dma,
+> +				virt_to_phys(zdev->dma_table));
+> +	if (rc)
+> +		goto clear_gisa;
+> +
+> +out:
+> +	zdev->kzdev->kvm = kvm;
+> +
+> +	spin_lock(&kvm->arch.kzdev_list_lock);
+> +	list_add_tail(&zdev->kzdev->entry, &kvm->arch.kzdev_list);
+> +	spin_unlock(&kvm->arch.kzdev_list_lock);
+> +
+> +	mutex_unlock(&kvm->lock);
+> +	mutex_unlock(&zdev->kzdev_lock);
+> +	return 0;
+> +
+> +clear_gisa:
+> +	zdev->gisa = 0;
+> +err:
+> +	if (zdev->kzdev)
+> +		kvm_s390_pci_dev_release(zdev);
+> +	mutex_unlock(&kvm->lock);
+> +	mutex_unlock(&zdev->kzdev_lock);
+> +	kvm_put_kvm(kvm);
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_s390_pci_register_kvm);
+> +
+> +void kvm_s390_pci_unregister_kvm(struct zpci_dev *zdev)
+> +{
+> +	struct kvm *kvm;
+> +
+> +	if (!zdev)
+> +		return;
+> +
+> +	mutex_lock(&zdev->kzdev_lock);
+> +
+> +	if (WARN_ON(!zdev->kzdev)) {
+
+When can this happen ?
+
+> +		mutex_unlock(&zdev->kzdev_lock);
+> +		return;
+> +	}
+> +
+> +	kvm = zdev->kzdev->kvm;
+> +	mutex_lock(&kvm->lock);
+> +
+> +	/*
+> +	 * A 0 gisa means interpretation was never enabled, just remove the
+> +	 * device from the list.
+> +	 */
+> +	if (zdev->gisa == 0)
+> +		goto out;
+> +
+> +	/* Forwarding must be turned off before interpretation */
+> +	if (zdev->kzdev->fib.fmt0.aibv != 0)
+> +		kvm_s390_pci_aif_disable(zdev, true);
+> +
+> +	/* Remove the host CLP guest designation */
+> +	zdev->gisa = 0;
+> +
+> +	if (zdev_enabled(zdev)) {
+> +		if (zpci_disable_device(zdev))
+> +			goto out;
+
+NIT debug trace ?
+
+> +	}
+> +
+> +	if (zpci_enable_device(zdev))
+> +		goto out;
+
+NIT debug trace?
+
+Only some questions, otherwise, LGTM
+
+Acked-by: Pierre Morel <pmorel@linux.ibm.com>
+
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Pierre Morel
+IBM Lab Boeblingen
