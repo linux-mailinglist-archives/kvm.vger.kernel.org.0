@@ -2,67 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0AA955C68D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:52:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A30A55C397
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:48:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242561AbiF1Ahu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jun 2022 20:37:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36840 "EHLO
+        id S241712AbiF1Ak7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jun 2022 20:40:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241838AbiF1Ahk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jun 2022 20:37:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B0013D21
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 17:37:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 395F26167F
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 00:37:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 894B9C341CB
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 00:37:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656376658;
-        bh=gxljIcSe8pPlqca3AJXaTO3ycWa1tjokMcqpG54Ir18=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=LzEHN/SkH0RpN7MYeDboXZ6lQVQ56DSiQnDxn5jAiClpcx+7xVrDP9YjgxGCOWV3s
-         Z3E5q6y2SjYfRXQ/SajEkZcM5UpJ1hySGh5ZeV46+DZAynKbktyRQBHdslbMJ7cIyB
-         owjZFEPZiTDkdmRIf3C6rPpt+K4Buskat81mrUoqR3Nz0Ao4lA/jmX74z/g3HgvSTg
-         dU3lHDkQZSsQ20yUJbSLpsltNIDTQLrBV8Z+LXHb0laACNI8QDv7/h11icY/UlL+cI
-         /gpGw0+hXZBIUWy7lqI1MyYWfNFkV419VojG/7tiJ+ACJ/fwgt1gaHfKvwUmz9uRJJ
-         KFdAfXTDf3Djg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 651E2CC13B1; Tue, 28 Jun 2022 00:37:38 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216177] kvm-unit-tests vmx has about 60% of failure chance
-Date:   Tue, 28 Jun 2022 00:37:38 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: nadav.amit@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216177-28872-0YxWIFzQZY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216177-28872@https.bugzilla.kernel.org/>
-References: <bug-216177-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S240542AbiF1Ak6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jun 2022 20:40:58 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89522BC2D
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 17:40:55 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id z7so8557659qko.8
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 17:40:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=nrCjPCGAs4MTUiLBt7Ijf/MJPuIyH6lM8yqPhdyhJD8=;
+        b=QGfGz2XeyaJLxS6IycR7jteyzbs2f9vu4fQQcftWhoNW5sUtbyuMKwRS5XXshn3Hg2
+         yZubOZXW72TGsXoMKBc9lhqncUYMSH0Z6bymz383cNPRRHeF7rKM5RXMNm4Eaw5tsGTg
+         BQX0bHWNlf6m2F5J4oWG32dxQT2CTBmnGX6tl+1lipYgts8fc/1uUmHwN5t3zZzoA6Qn
+         DTeDwoNVOxWo0hy32OR9hFE/UO0/97qh5eo+5ewqu/iIRVMFQ1AIctopaFBuZOm9BPLs
+         HAx/pGMXLvvVO6Cb9sesF2T5smUMb44u7gsx78px69APS8fFzY4PmSgo/WM3D328ZbRr
+         X/FA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=nrCjPCGAs4MTUiLBt7Ijf/MJPuIyH6lM8yqPhdyhJD8=;
+        b=YHkfIlysHkD3bfSgpoB/q553QMzxSX5iMF/U2sMhWTVbxBU/tq7/ILPxSg7+1zRNux
+         YspLBPnXWZkcVmtwuDq5/BcQhx2s1WAoZj19BHgHgcEl7fWsZOAHA6XU5n8lZyxydkSl
+         63ui2szqiN4zWYvmJf/5k6CdcWGNdjT/vxiBRaWZ/iMZ9dfCXc7PVDJIbI1r8bFodMTF
+         hh/Tki8hVep3k7teu59CWvtggLE62aaEf+2BfiNCNP/Qe8JmQsDao0fLHgSWiOMI8HXP
+         F/Z/OFYLQCLFBjqJDM7sl09SawmzpsH9TyztfjDZf6ZQ6s3FqUbITOw488KIvvjjqpUM
+         GtBA==
+X-Gm-Message-State: AJIora/DwR325QjX8osoW/VkcOanKBwJNQxIyLyGCmxP6bHeWvvvu65e
+        ojKbox0NEhgkBxNSzPGib2ZA/g==
+X-Google-Smtp-Source: AGRyM1vTCFcIzhygOqc0dfz0XQz9dolsiNFu6n34Zw7Kl9e9LRh00tD6U1uaxZUOgaZBY5Ks0qTgkA==
+X-Received: by 2002:a05:620a:1450:b0:6af:1999:5f4c with SMTP id i16-20020a05620a145000b006af19995f4cmr7538467qkl.301.1656376854703;
+        Mon, 27 Jun 2022 17:40:54 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id x11-20020a05620a448b00b006a768c699adsm10335849qkp.125.2022.06.27.17.40.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 17:40:53 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1o5zHg-002iu4-9Z; Mon, 27 Jun 2022 21:40:52 -0300
+Date:   Mon, 27 Jun 2022 21:40:52 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Daniel Borkmann <daniel@iogearbox.net>
+Cc:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        linux-kernel@vger.kernel.org, x86@kernel.org, dm-devel@redhat.com,
+        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, io-uring@vger.kernel.org,
+        lvs-devel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        kasan-dev@googlegroups.com, linux-mmc@vger.kernel.org,
+        nvdimm@lists.linux.dev, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, linux-perf-users@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, linux-rdma@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] treewide: uapi: Replace zero-length arrays with
+ flexible-array members
+Message-ID: <20220628004052.GM23621@ziepe.ca>
+References: <20220627180432.GA136081@embeddedor>
+ <6bc1e94c-ce1d-a074-7d0c-8dbe6ce22637@iogearbox.net>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6bc1e94c-ce1d-a074-7d0c-8dbe6ce22637@iogearbox.net>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,34 +95,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216177
+On Mon, Jun 27, 2022 at 08:27:37PM +0200, Daniel Borkmann wrote:
+> On 6/27/22 8:04 PM, Gustavo A. R. Silva wrote:
+> > There is a regular need in the kernel to provide a way to declare
+> > having a dynamically sized set of trailing elements in a structure.
+> > Kernel code should always use “flexible array members”[1] for these
+> > cases. The older style of one-element or zero-length arrays should
+> > no longer be used[2].
+> > 
+> > This code was transformed with the help of Coccinelle:
+> > (linux-5.19-rc2$ spatch --jobs $(getconf _NPROCESSORS_ONLN) --sp-file script.cocci --include-headers --dir . > output.patch)
+> > 
+> > @@
+> > identifier S, member, array;
+> > type T1, T2;
+> > @@
+> > 
+> > struct S {
+> >    ...
+> >    T1 member;
+> >    T2 array[
+> > - 0
+> >    ];
+> > };
+> > 
+> > -fstrict-flex-arrays=3 is coming and we need to land these changes
+> > to prevent issues like these in the short future:
+> > 
+> > ../fs/minix/dir.c:337:3: warning: 'strcpy' will always overflow; destination buffer has size 0,
+> > but the source string has length 2 (including NUL byte) [-Wfortify-source]
+> > 		strcpy(de3->name, ".");
+> > 		^
+> > 
+> > Since these are all [0] to [] changes, the risk to UAPI is nearly zero. If
+> > this breaks anything, we can use a union with a new member name.
+> > 
+> > [1] https://en.wikipedia.org/wiki/Flexible_array_member
+> > [2] https://www.kernel.org/doc/html/v5.16/process/deprecated.html#zero-length-and-one-element-arrays
+> > 
+> > Link: https://github.com/KSPP/linux/issues/78
+> > Build-tested-by: https://lore.kernel.org/lkml/62b675ec.wKX6AOZ6cbE71vtF%25lkp@intel.com/
+> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> > ---
+> > Hi all!
+> > 
+> > JFYI: I'm adding this to my -next tree. :)
+> 
+> Fyi, this breaks BPF CI:
+> 
+> https://github.com/kernel-patches/bpf/runs/7078719372?check_suite_focus=true
+> 
+>   [...]
+>   progs/map_ptr_kern.c:314:26: error: field 'trie_key' with variable sized type 'struct bpf_lpm_trie_key' not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
+>           struct bpf_lpm_trie_key trie_key;
+>                                   ^
 
---- Comment #2 from Nadav Amit (nadav.amit@gmail.com) ---
-> On Jun 27, 2022, at 5:28 PM, bugzilla-daemon@kernel.org wrote:
->=20
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D216177
->=20
-> Sean Christopherson (seanjc@google.com) changed:
->=20
->           What    |Removed                     |Added
-> -------------------------------------------------------------------------=
----
->                 CC|                            |seanjc@google.com
->=20
-> --- Comment #1 from Sean Christopherson (seanjc@google.com) ---
-> It's vmx_preemption_timer_expiry_test, which is known to be flaky (though
-> IIRC
-> it's KVM that's at fault).
->=20
-> Test suite: vmx_preemption_timer_expiry_test
-> FAIL: Last stored guest TSC (28067103426) < TSC deadline (28067086048)
+This will break the rdma-core userspace as well, with a similar
+error:
 
-For the record:
+/usr/bin/clang-13 -DVERBS_DEBUG -Dibverbs_EXPORTS -Iinclude -I/usr/include/libnl3 -I/usr/include/drm -g -O2 -fdebug-prefix-map=/__w/1/s=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -Wmissing-prototypes -Wmissing-declarations -Wwrite-strings -Wformat=2 -Wcast-function-type -Wformat-nonliteral -Wdate-time -Wnested-externs -Wshadow -Wstrict-prototypes -Wold-style-definition -Werror -Wredundant-decls -g -fPIC   -std=gnu11 -MD -MT libibverbs/CMakeFiles/ibverbs.dir/cmd_flow.c.o -MF libibverbs/CMakeFiles/ibverbs.dir/cmd_flow.c.o.d -o libibverbs/CMakeFiles/ibverbs.dir/cmd_flow.c.o   -c ../libibverbs/cmd_flow.c
+In file included from ../libibverbs/cmd_flow.c:33:
+In file included from include/infiniband/cmd_write.h:36:
+In file included from include/infiniband/cmd_ioctl.h:41:
+In file included from include/infiniband/verbs.h:48:
+In file included from include/infiniband/verbs_api.h:66:
+In file included from include/infiniband/ib_user_ioctl_verbs.h:38:
+include/rdma/ib_user_verbs.h:436:34: error: field 'base' with variable sized type 'struct ib_uverbs_create_cq_resp' not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
+        struct ib_uverbs_create_cq_resp base;
+                                        ^
+include/rdma/ib_user_verbs.h:644:34: error: field 'base' with variable sized type 'struct ib_uverbs_create_qp_resp' not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
+        struct ib_uverbs_create_qp_resp base;
 
-https://lore.kernel.org/kvm/D121A03E-6861-4736-8070-5D1E4FEE1D32@gmail.com/
+Which is why I gave up trying to change these..
 
---=20
-You may reply to this email to add a comment.
+Though maybe we could just switch off -Wgnu-variable-sized-type-not-at-end  during configuration ?
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Jason
