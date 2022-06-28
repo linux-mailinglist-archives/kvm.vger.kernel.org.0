@@ -2,120 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 630F055CB6F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 14:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BA8D55DAC4
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:23:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344574AbiF1LSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 07:18:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
+        id S241987AbiF1LfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 07:35:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345454AbiF1LSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 07:18:09 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9E0CCFA;
-        Tue, 28 Jun 2022 04:18:08 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SBENMi030294;
-        Tue, 28 Jun 2022 11:18:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=s2tecT5NkWFR+AMcnuSlYE3BxfjRsEHcAzcdT3QzzNM=;
- b=FeM0WobmYtaJyjr3LVJxjXVGgsJxFC6iFORNiujKvBAOh3V+3/uLD3ga/NPgREJkYzVv
- ImbgFVmGzhhqQlXGk09PQvyIevIWGy48N1Lp649yBh8A9H57g1OYLBbthjeeaQ6riHx1
- FY+Ou4apVFhkNqw1YnzvepDycEAVZL28d/5Qo2ayxsY2ZzD8PIPnPIEmNKHf2VRZgGfl
- 8RjKyuX6qMNiCBie9lln5h6Ngguga1Y10vOgdjXVVaQJPEM0pGN7jlyg1r6qx94s1NOH
- BPGlLdtHobmADOumCP6oAYuM59vEsNmyrGRFIZiZdmT7+dB1X6wQ3Dj83LmzmTdcbuYX Bw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h00kb832u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 11:18:05 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SBGLrW006925;
-        Tue, 28 Jun 2022 11:18:05 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h00kb8329-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 11:18:05 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SB54EX005702;
-        Tue, 28 Jun 2022 11:18:03 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gwt08vqn5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 11:18:03 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SBI0lC22348222
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Jun 2022 11:18:00 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 46E7FAE045;
-        Tue, 28 Jun 2022 11:18:00 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5B2DAE051;
-        Tue, 28 Jun 2022 11:17:58 +0000 (GMT)
-Received: from [9.171.41.104] (unknown [9.171.41.104])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 28 Jun 2022 11:17:58 +0000 (GMT)
-Message-ID: <3bde716c-0432-cf2d-6057-2d60fb86c3e8@linux.ibm.com>
-Date:   Tue, 28 Jun 2022 13:22:26 +0200
+        with ESMTP id S236261AbiF1LfB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 07:35:01 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2DF32FFE8;
+        Tue, 28 Jun 2022 04:34:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656416099; x=1687952099;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=SeZjE9dIzHv7ak+kD31OSIPBtrgZc4gdk0+yPRC0Dmw=;
+  b=aVmPdVZ0U7rOMKOnO4RH8tSKt3bbJ7zuTqa3TXZFl2xWtXbR6EARU3H2
+   u5wVk8CHpJ8Uom3ACfBjKJJUYK0EMoKj36JnSzE6AeW6Nbna+J70ujkPk
+   DKeM0j1TQWUt9oSjnmb9J80o2DCnvWm3HiyMFn1D68Oy0PTSVpu65FE0b
+   WJNI/kq+Ywhs9denZYwfFvAFhPwc11A4xci/8Je3A5gbwOrouf+sM+Hi1
+   FqtkJ+J0ACRQmrTRIum/4JAWFQS4aV8KPpEHPh7k8Hj/9ypdA5npXSQe3
+   WltpAkA5euINWTLuaZNxfN3h7fywBDYWY2oHgxpPjXVrQG6ff8BiUl1PS
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="270465555"
+X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
+   d="scan'208";a="270465555"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 04:34:59 -0700
+X-IronPort-AV: E=Sophos;i="5.92,227,1650956400"; 
+   d="scan'208";a="680009884"
+Received: from nherzalx-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.96.221])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 04:34:57 -0700
+Message-ID: <2ecd255ac85fac7ffa1b90975c9e08f11ddee149.camel@intel.com>
+Subject: Re: [PATCH v7 029/102] KVM: TDX: allocate/free TDX vcpu structure
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue, 28 Jun 2022 23:34:55 +1200
+In-Reply-To: <dad0333516bcdb0fdeccc9d1483299aeae8d80fd.1656366338.git.isaku.yamahata@intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <dad0333516bcdb0fdeccc9d1483299aeae8d80fd.1656366338.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v9 17/21] vfio-pci/zdev: add open/close device hooks
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, corbet@lwn.net,
-        jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <20220606203325.110625-1-mjrosato@linux.ibm.com>
- <20220606203325.110625-18-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220606203325.110625-18-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8XOJy1_v7XTjGRREvuJ48lgxv2DAmHpF
-X-Proofpoint-GUID: 8qh8hc_BBG9W-qQwYiAmmiYNSVUfNtXd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-28_06,2022-06-24_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0
- phishscore=0 clxscore=1015 priorityscore=1501 impostorscore=0 spamscore=0
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206280046
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>=20
+> The next step of TDX guest creation is to create vcpu.  Allocate TDX vcpu
+> structures, initialize it.  Allocate pages of TDX vcpu for the TDX module=
+.
+>=20
+> In the case of the conventional case, cpuid is empty at the initializatio=
+n.
+> and cpuid is configured after the vcpu initialization.  Because TDX
+> supports only X2APIC mode, cpuid is forcibly initialized to support X2API=
+C
+> on the vcpu initialization.
 
+The patch title and commit message of this patch are identical to the previ=
+ous
+patch.
 
-On 6/6/22 22:33, Matthew Rosato wrote:
-> During vfio-pci open_device, pass the KVM associated with the vfio group
-> (if one exists).  This is needed in order to pass a special indicator
-> (GISA) to firmware to allow zPCI interpretation facilities to be used
-> for only the specific KVM associated with the vfio-pci device.  During
-> vfio-pci close_device, unregister the notifier.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+What happened? Did you forget to squash two patches together?
+=20
+>=20
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/vmx/main.c    | 40 ++++++++++++++++++++++++++++++++++----
+>  arch/x86/kvm/vmx/x86_ops.h |  8 ++++++++
+>  2 files changed, 44 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 067f5de56c53..4f4ed4ad65a7 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -73,6 +73,38 @@ static void vt_vm_free(struct kvm *kvm)
+>  		return tdx_vm_free(kvm);
+>  }
+> =20
+> +static int vt_vcpu_precreate(struct kvm *kvm)
+> +{
+> +	if (is_td(kvm))
+> +		return 0;
+> +
+> +	return vmx_vcpu_precreate(kvm);
+> +}
+> +
+> +static int vt_vcpu_create(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_td_vcpu(vcpu))
+> +		return tdx_vcpu_create(vcpu);
+> +
+> +	return vmx_vcpu_create(vcpu);
+> +}
+> +
+> +static void vt_vcpu_free(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_td_vcpu(vcpu))
+> +		return tdx_vcpu_free(vcpu);
+> +
+> +	return vmx_vcpu_free(vcpu);
+> +}
+> +
+> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> +{
+> +	if (is_td_vcpu(vcpu))
+> +		return tdx_vcpu_reset(vcpu, init_event);
+> +
+> +	return vmx_vcpu_reset(vcpu, init_event);
+> +}
+> +
+>  static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>  	if (!is_td(kvm))
+> @@ -98,10 +130,10 @@ struct kvm_x86_ops vt_x86_ops __initdata =3D {
+>  	.vm_destroy =3D vt_vm_destroy,
+>  	.vm_free =3D vt_vm_free,
+> =20
+> -	.vcpu_precreate =3D vmx_vcpu_precreate,
+> -	.vcpu_create =3D vmx_vcpu_create,
+> -	.vcpu_free =3D vmx_vcpu_free,
+> -	.vcpu_reset =3D vmx_vcpu_reset,
+> +	.vcpu_precreate =3D vt_vcpu_precreate,
+> +	.vcpu_create =3D vt_vcpu_create,
+> +	.vcpu_free =3D vt_vcpu_free,
+> +	.vcpu_reset =3D vt_vcpu_reset,
+> =20
+>  	.prepare_switch_to_guest =3D vmx_prepare_switch_to_guest,
+>  	.vcpu_load =3D vmx_vcpu_load,
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index ef6115ae0e88..42b634971544 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -138,6 +138,10 @@ int tdx_vm_init(struct kvm *kvm);
+>  void tdx_mmu_release_hkid(struct kvm *kvm);
+>  void tdx_vm_free(struct kvm *kvm);
+> =20
+> +int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+> +void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+> +
+>  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+>  #else
+>  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { retu=
+rn 0; }
+> @@ -150,6 +154,10 @@ static inline void tdx_mmu_release_hkid(struct kvm *=
+kvm) {}
+>  static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
+>  static inline void tdx_vm_free(struct kvm *kvm) {}
+> =20
+> +static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNO=
+TSUPP; }
+> +static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+> +static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event=
+) {}
+> +
+>  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { ret=
+urn -EOPNOTSUPP; }
+>  #endif
+> =20
 
-
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
