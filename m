@@ -2,60 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D53B55CE25
-	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:04:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 641FB55DCE1
+	for <lists+kvm@lfdr.de>; Tue, 28 Jun 2022 15:26:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245154AbiF1FqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 01:46:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57908 "EHLO
+        id S245326AbiF1GHv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 02:07:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245152AbiF1FqN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 01:46:13 -0400
+        with ESMTP id S245325AbiF1GHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 02:07:47 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 12315275CA
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 22:46:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D881D2317E
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 23:07:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656395161;
+        s=mimecast20190719; t=1656396463;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7XDCFUsIiO1RHnxPVoHQ+XTC5yX5gOLEJx5jlzpdwhw=;
-        b=bTL1f2JK2MhZM8Tm8dVOQbmxkgwC3Pa7s8wN1jr4tXHcZevbuO4aBufO6UKfBX38xPe1UE
-        jPdiksBjFQAEP9FOLIrv2RBn80rlF2pH8iNyA9aOxekxyqajf3sZDElMBFjb8f8etJsD2c
-        D6JSXAtbV4Ni1LyiRP7oEm8PW4xdxrA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=KUT1KDRsQCbghYqw5mAjvKAipnK8+qvq4+LEkef6mwI=;
+        b=Du04u4zhc9ZRJZhKm1iTicPX1EddZSVBsh/n1aKqlt8rnzyj99hbM0LuDIy6RtYvVV4tze
+        UXXmZLYm8m9/L1FZxwnip2svnDwU2IXO/lw1UafFFsUpiRip6g+Hdr07/uvAStftyHc1YI
+        PU85neXedQgdA0dtJluE3UzWvH/UAm0=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-557-cNAgdjJ_NVmxPr1Lqu7IAw-1; Tue, 28 Jun 2022 01:46:00 -0400
-X-MC-Unique: cNAgdjJ_NVmxPr1Lqu7IAw-1
-Received: by mail-wr1-f69.google.com with SMTP id u9-20020adfa189000000b0021b8b3c8f74so1463982wru.12
-        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 22:46:00 -0700 (PDT)
+ us-mta-629-e1Mnu75LNSKQC5oYUdPVJg-1; Tue, 28 Jun 2022 02:07:41 -0400
+X-MC-Unique: e1Mnu75LNSKQC5oYUdPVJg-1
+Received: by mail-lf1-f69.google.com with SMTP id v5-20020a05651203a500b0047faf076d1dso5712054lfp.8
+        for <kvm@vger.kernel.org>; Mon, 27 Jun 2022 23:07:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7XDCFUsIiO1RHnxPVoHQ+XTC5yX5gOLEJx5jlzpdwhw=;
-        b=PJEfd2nOeWPqqxYaX0BT7EqLOh4DKngpQGnMrPFpc33QH8eA2CmFNz7m66mPMwoJvI
-         78OcPhUtpfAcucbdhWnudktfp+BY7LNOqt0oGTG/sOz3ycVpBF8A5bLtFXQusj5ohp1H
-         7t2TWyVfQaeLq49k8g6NOFDUoRKPtFSYy03eV/6YXmo6gDIJp32n0CXJh1X5sXL5y5Sf
-         zrklIkackQVF/D8xXA7os8yYcIWLEkpJSn/2xXt5FwxW3ulZj0YtGcLZiOj2KmtAY3Nm
-         LE5iPnMOf+7yY8HKUfVJrX/5+CNwp/RxgmI69DinNTDt7bLuVFranefEpZWsno5C8+G3
-         NulQ==
-X-Gm-Message-State: AJIora/tE63nvzHuNcIlWyKctrjpQNnkH5m0I/ZwT0fQAC887CgmHd0u
-        LmXm1GyxvwBgwUKn6QeiC67m6tUO7B5CNhe6F+K7WQCB9YhP/h5n4xhqbXVvN5i/iEuGjxTd040
-        bGsVqXnS+k/lV
-X-Received: by 2002:a05:600c:21ca:b0:3a0:48e6:60cb with SMTP id x10-20020a05600c21ca00b003a048e660cbmr12064716wmj.195.1656395159393;
-        Mon, 27 Jun 2022 22:45:59 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1u1kNy6ksKWTPEZ6IXDwV0UKlQdlBRLnRI/epxlGzaTFb6xBerM5hZUzFha89n6poU/6PoMPw==
-X-Received: by 2002:a05:600c:21ca:b0:3a0:48e6:60cb with SMTP id x10-20020a05600c21ca00b003a048e660cbmr12064664wmj.195.1656395159084;
-        Mon, 27 Jun 2022 22:45:59 -0700 (PDT)
-Received: from redhat.com ([2.52.23.204])
-        by smtp.gmail.com with ESMTPSA id 7-20020a05600c024700b003a03e63e428sm15257206wmj.36.2022.06.27.22.45.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jun 2022 22:45:58 -0700 (PDT)
-Date:   Tue, 28 Jun 2022 01:45:51 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KUT1KDRsQCbghYqw5mAjvKAipnK8+qvq4+LEkef6mwI=;
+        b=mDiS+QV1OBFp2+NFXryUfhai8jzxAtSlTzsfTxm5pldKS/DReQhBWUG2DhWpNV90Wm
+         BMbzwmnHQSDvjPSnUy48w1iqErDYbdXEDtHtDR9ciGdgKXsNhe97/fp6RKMN3Xg/m5Iv
+         n9NWWql8u9zAvF+avpJ5lRrqz2BJ6JHhDojUxZ9agxMZGE7CgjURon6GWHzHeHtFAxo4
+         3TPcHFIVSKmC+V2RwEdMdywWwiObww3heO/lwmJb8glIT6FTAafdzX5r7zlKw9IZ0QeS
+         xIl220SD2GHLG2pYDqCTolQ/WNv/THg+qIYkxAcSm2WVo7sn8NkYRfaxYzLb3TjFPAke
+         Id+Q==
+X-Gm-Message-State: AJIora/5HYcevaU/zgpm0onDuqzJhnceoGWsgPfFv6lnKPR8wgpqgMk6
+        c35fh5sqe/uhYxzEgdKB6NalfnfYoEqMl1VWdr6dXeNmt+PN0guW4S9o+s32VRqtfr1rDzkB9T4
+        Gtm6An9261b72nFFqX0XDD2K00pZC
+X-Received: by 2002:a05:651c:895:b0:250:c5ec:bc89 with SMTP id d21-20020a05651c089500b00250c5ecbc89mr8315141ljq.251.1656396460135;
+        Mon, 27 Jun 2022 23:07:40 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uv1ZBawh+P9oWSPBH26qPWCIYjS9uNve6lqad17cW1vkQvItG6ZzBL6RQ0GxzhIXXq3N271R2bfg7ykwVXyRw=
+X-Received: by 2002:a05:651c:895:b0:250:c5ec:bc89 with SMTP id
+ d21-20020a05651c089500b00250c5ecbc89mr8315105ljq.251.1656396459820; Mon, 27
+ Jun 2022 23:07:39 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220624025621.128843-1-xuanzhuo@linux.alibaba.com>
+ <20220624025621.128843-26-xuanzhuo@linux.alibaba.com> <20220624025817-mutt-send-email-mst@kernel.org>
+ <CACGkMEseptD=45j3kQr0yciRxR679Jcig=292H07-RYC2vXmFQ@mail.gmail.com>
+ <20220627023841-mutt-send-email-mst@kernel.org> <CACGkMEvy8xF2T_vubKeUEPC2aroO_fbB0Xe8nnxK4OBUgAS+Gw@mail.gmail.com>
+ <20220627034733-mutt-send-email-mst@kernel.org> <CACGkMEtpjUBaUML=fEs5hR66rzNTBhBXOmfpzyXV1F-6BqvsGg@mail.gmail.com>
+ <20220627074723-mutt-send-email-mst@kernel.org> <CACGkMEv0zdgG6SAaxRwkpObEFX_KRB1ovezNiHX+QXsYhE=qaQ@mail.gmail.com>
+ <20220628014309-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220628014309-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 28 Jun 2022 14:07:28 +0800
+Message-ID: <CACGkMEuzrmVsM5Xa3N_9n0-XOqyMAz65AON8oxkgmjnXb_bAFg@mail.gmail.com>
+Subject: Re: [PATCH v10 25/41] virtio_pci: struct virtio_pci_common_cfg add queue_notify_data
+To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
         virtualization <virtualization@lists.linux-foundation.org>,
         Richard Weinberger <richard@nod.at>,
@@ -89,26 +97,10 @@ Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
         kvm <kvm@vger.kernel.org>,
         "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
         kangjie.xu@linux.alibaba.com
-Subject: Re: [PATCH v10 25/41] virtio_pci: struct virtio_pci_common_cfg add
- queue_notify_data
-Message-ID: <20220628014309-mutt-send-email-mst@kernel.org>
-References: <20220624025621.128843-1-xuanzhuo@linux.alibaba.com>
- <20220624025621.128843-26-xuanzhuo@linux.alibaba.com>
- <20220624025817-mutt-send-email-mst@kernel.org>
- <CACGkMEseptD=45j3kQr0yciRxR679Jcig=292H07-RYC2vXmFQ@mail.gmail.com>
- <20220627023841-mutt-send-email-mst@kernel.org>
- <CACGkMEvy8xF2T_vubKeUEPC2aroO_fbB0Xe8nnxK4OBUgAS+Gw@mail.gmail.com>
- <20220627034733-mutt-send-email-mst@kernel.org>
- <CACGkMEtpjUBaUML=fEs5hR66rzNTBhBXOmfpzyXV1F-6BqvsGg@mail.gmail.com>
- <20220627074723-mutt-send-email-mst@kernel.org>
- <CACGkMEv0zdgG6SAaxRwkpObEFX_KRB1ovezNiHX+QXsYhE=qaQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEv0zdgG6SAaxRwkpObEFX_KRB1ovezNiHX+QXsYhE=qaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -116,108 +108,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 11:50:37AM +0800, Jason Wang wrote:
-> On Mon, Jun 27, 2022 at 7:53 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Jun 27, 2022 at 04:14:20PM +0800, Jason Wang wrote:
-> > > On Mon, Jun 27, 2022 at 3:58 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Mon, Jun 27, 2022 at 03:45:30PM +0800, Jason Wang wrote:
-> > > > > On Mon, Jun 27, 2022 at 2:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > >
-> > > > > > On Mon, Jun 27, 2022 at 10:30:42AM +0800, Jason Wang wrote:
-> > > > > > > On Fri, Jun 24, 2022 at 2:59 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Fri, Jun 24, 2022 at 10:56:05AM +0800, Xuan Zhuo wrote:
-> > > > > > > > > Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
-> > > > > > > > > here https://github.com/oasis-tcs/virtio-spec/issues/89
+On Tue, Jun 28, 2022 at 1:46 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Jun 28, 2022 at 11:50:37AM +0800, Jason Wang wrote:
+> > On Mon, Jun 27, 2022 at 7:53 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Mon, Jun 27, 2022 at 04:14:20PM +0800, Jason Wang wrote:
+> > > > On Mon, Jun 27, 2022 at 3:58 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > >
+> > > > > On Mon, Jun 27, 2022 at 03:45:30PM +0800, Jason Wang wrote:
+> > > > > > On Mon, Jun 27, 2022 at 2:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > >
+> > > > > > > On Mon, Jun 27, 2022 at 10:30:42AM +0800, Jason Wang wrote:
+> > > > > > > > On Fri, Jun 24, 2022 at 2:59 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 > > > > > > > > >
-> > > > > > > > > For not breaks uABI, add a new struct virtio_pci_common_cfg_notify.
+> > > > > > > > > On Fri, Jun 24, 2022 at 10:56:05AM +0800, Xuan Zhuo wrote:
+> > > > > > > > > > Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
+> > > > > > > > > > here https://github.com/oasis-tcs/virtio-spec/issues/89
+> > > > > > > > > >
+> > > > > > > > > > For not breaks uABI, add a new struct virtio_pci_common_cfg_notify.
+> > > > > > > > >
+> > > > > > > > > What exactly is meant by not breaking uABI?
+> > > > > > > > > Users are supposed to be prepared for struct size to change ... no?
 > > > > > > > >
-> > > > > > > > What exactly is meant by not breaking uABI?
-> > > > > > > > Users are supposed to be prepared for struct size to change ... no?
+> > > > > > > > Not sure, any doc for this?
+> > > > > > > >
+> > > > > > > > Thanks
 > > > > > > >
-> > > > > > > Not sure, any doc for this?
 > > > > > > >
-> > > > > > > Thanks
+> > > > > > > Well we have this:
+> > > > > > >
+> > > > > > >         The drivers SHOULD only map part of configuration structure
+> > > > > > >         large enough for device operation.  The drivers MUST handle
+> > > > > > >         an unexpectedly large \field{length}, but MAY check that \field{length}
+> > > > > > >         is large enough for device operation.
 > > > > > >
+> > > > > > Yes, but that's the device/driver interface. What's done here is the
+> > > > > > userspace/kernel.
 > > > > > >
-> > > > > > Well we have this:
+> > > > > > Userspace may break if it uses e.g sizeof(struct virtio_pci_common_cfg)?
 > > > > > >
-> > > > > >         The drivers SHOULD only map part of configuration structure
-> > > > > >         large enough for device operation.  The drivers MUST handle
-> > > > > >         an unexpectedly large \field{length}, but MAY check that \field{length}
-> > > > > >         is large enough for device operation.
+> > > > > > Thanks
 > > > > >
-> > > > > Yes, but that's the device/driver interface. What's done here is the
-> > > > > userspace/kernel.
-> > > > >
-> > > > > Userspace may break if it uses e.g sizeof(struct virtio_pci_common_cfg)?
-> > > > >
-> > > > > Thanks
+> > > > > Hmm I guess there's risk... but then how are we going to maintain this
+> > > > > going forward?  Add a new struct on any change?
 > > > >
-> > > > Hmm I guess there's risk... but then how are we going to maintain this
-> > > > going forward?  Add a new struct on any change?
+> > > > This is the way we have used it for the past 5 or more years. I don't
+> > > > see why this must be handled in the vq reset feature.
+> > > >
+> > > > >Can we at least
+> > > > > prevent this going forward somehow?
+> > > >
+> > > > Like have some padding?
+> > > >
+> > > > Thanks
 > > >
-> > > This is the way we have used it for the past 5 or more years. I don't
-> > > see why this must be handled in the vq reset feature.
-> > >
-> > > >Can we at least
-> > > > prevent this going forward somehow?
-> > >
-> > > Like have some padding?
-> > >
-> > > Thanks
+> > > Maybe - this is what QEMU does ...
 > >
-> > Maybe - this is what QEMU does ...
-> 
-> Do you want this to be addressed in this series (it's already very huge anyhow)?
-> 
-> Thanks
+> > Do you want this to be addressed in this series (it's already very huge anyhow)?
+> >
+> > Thanks
+>
+> Let's come up with a solution at least. QEMU does not seem to need the struct.
 
-Let's come up with a solution at least. QEMU does not seem to need the struct. Let's just put
-it in virtio_pci_modern.h for now then?
+If we want to implement it in Qemu we need that:
 
-> >
-> > > >
-> > > >
-> > > > > >
-> > > > > >
-> > > > > >
+https://github.com/fengidri/qemu/commit/39b79335cb55144d11a3b01f93d46cc73342c6bb
+
+> Let's just put
+> it in virtio_pci_modern.h for now then?
+
+Does this mean userspace needs to define the struct by their own
+instead of depending on the uapi in the future?
+
+Thanks
+
+>
+> > >
+> > > > >
+> > > > >
+> > > > > > >
+> > > > > > >
 > > > > > > >
 > > > > > > > >
-> > > > > > > >
-> > > > > > > > > Since I want to add queue_reset after queue_notify_data, I submitted
-> > > > > > > > > this patch first.
 > > > > > > > > >
-> > > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > > > > > > ---
-> > > > > > > > >  include/uapi/linux/virtio_pci.h | 7 +++++++
-> > > > > > > > >  1 file changed, 7 insertions(+)
 > > > > > > > > >
-> > > > > > > > > diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-> > > > > > > > > index 3a86f36d7e3d..22bec9bd0dfc 100644
-> > > > > > > > > --- a/include/uapi/linux/virtio_pci.h
-> > > > > > > > > +++ b/include/uapi/linux/virtio_pci.h
-> > > > > > > > > @@ -166,6 +166,13 @@ struct virtio_pci_common_cfg {
-> > > > > > > > >       __le32 queue_used_hi;           /* read-write */
-> > > > > > > > >  };
+> > > > > > > > > > Since I want to add queue_reset after queue_notify_data, I submitted
+> > > > > > > > > > this patch first.
+> > > > > > > > > >
+> > > > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > > > > > > ---
+> > > > > > > > > >  include/uapi/linux/virtio_pci.h | 7 +++++++
+> > > > > > > > > >  1 file changed, 7 insertions(+)
+> > > > > > > > > >
+> > > > > > > > > > diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
+> > > > > > > > > > index 3a86f36d7e3d..22bec9bd0dfc 100644
+> > > > > > > > > > --- a/include/uapi/linux/virtio_pci.h
+> > > > > > > > > > +++ b/include/uapi/linux/virtio_pci.h
+> > > > > > > > > > @@ -166,6 +166,13 @@ struct virtio_pci_common_cfg {
+> > > > > > > > > >       __le32 queue_used_hi;           /* read-write */
+> > > > > > > > > >  };
+> > > > > > > > > >
+> > > > > > > > > > +struct virtio_pci_common_cfg_notify {
+> > > > > > > > > > +     struct virtio_pci_common_cfg cfg;
+> > > > > > > > > > +
+> > > > > > > > > > +     __le16 queue_notify_data;       /* read-write */
+> > > > > > > > > > +     __le16 padding;
+> > > > > > > > > > +};
+> > > > > > > > > > +
+> > > > > > > > > >  /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
+> > > > > > > > > >  struct virtio_pci_cfg_cap {
+> > > > > > > > > >       struct virtio_pci_cap cap;
+> > > > > > > > > > --
+> > > > > > > > > > 2.31.0
 > > > > > > > > >
-> > > > > > > > > +struct virtio_pci_common_cfg_notify {
-> > > > > > > > > +     struct virtio_pci_common_cfg cfg;
-> > > > > > > > > +
-> > > > > > > > > +     __le16 queue_notify_data;       /* read-write */
-> > > > > > > > > +     __le16 padding;
-> > > > > > > > > +};
-> > > > > > > > > +
-> > > > > > > > >  /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
-> > > > > > > > >  struct virtio_pci_cfg_cap {
-> > > > > > > > >       struct virtio_pci_cap cap;
-> > > > > > > > > --
-> > > > > > > > > 2.31.0
-> > > > > > > >
-> > > > > >
-> > > >
-> >
+> > > > > > >
+> > > > >
+> > >
+>
 
