@@ -2,225 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8539F55FE5A
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 13:17:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CE5055FFA3
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 14:19:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230179AbiF2LRC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 07:17:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51904 "EHLO
+        id S233487AbiF2MSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 08:18:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiF2LRC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 07:17:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1BEE63E5D0
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 04:17:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656501420;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FXLoEvEnMaWJAAWZz9xO07LVm1h+eXNsfUhntDr1uvU=;
-        b=YK7J05fO0kxhjjjbG2NRBXm1E0qcoVSdCwWgrYN1ftJt5tHVoYfBFzqSd3QPgemGogvTx4
-        TmrEIYRLxY5RE6lWOFjbt1KsJK5hh94yMvrbu1tsTyZoB8MM83vAisZebDhVJHCR62FxS0
-        QoNV6oQgR52/zF4d1NXoSOGaKuPOp38=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-604-nMBH4o-SM9mnV5zZMfqJTQ-1; Wed, 29 Jun 2022 07:16:56 -0400
-X-MC-Unique: nMBH4o-SM9mnV5zZMfqJTQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 681BD100EDD5;
-        Wed, 29 Jun 2022 11:16:56 +0000 (UTC)
-Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E1C541121314;
-        Wed, 29 Jun 2022 11:16:53 +0000 (UTC)
-Message-ID: <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
-Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Wed, 29 Jun 2022 14:16:52 +0300
-In-Reply-To: <20220614204730.3359543-1-seanjc@google.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S233453AbiF2MRs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 08:17:48 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2060.outbound.protection.outlook.com [40.107.92.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6827231340;
+        Wed, 29 Jun 2022 05:17:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DyrMJ5aK/aw9W+Mr5EDicVikmTCX1WsIe0Pkhlw4rCi6+wVr5ON0CxF4+iLxHnMoGoh+zOE6Q8cf2f6vcG29/eHN4wwZgi968TYQ63+A4tlG7hbmYiDaen11/PA40I3lAv/EH5exOll5QuziuEFrUzvgTOkPI2pB4AYsf4ce24JfB95p1BFC1wd0Nr3afte5a9dv9QE+/ftYJFc6xccaDM86qSZcyQXwlShcDmG7S7iuExgV0Q0q9jPFVa2CwOf9nsf5UsD3QOhd+umNIx+1bUmMdsLfGKPzR4u1RhF4Uf9nJgjngZvTLW29L0TObvPm/gU0WtF/AAJnpe4R4NyujQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=csq6VlZcJEO5HlTS49064aX5FhKLh5OFmvCMk7SyhYg=;
+ b=N41wH9OXOD3NcA+8QCQVFRM2xtkTWSPgdUPSsRhoZRbMZYtGl9q17FfEPI6mcUlvlvT5ioFEs/xQXSg5JS3FZueQKmgQFqB9xwfoRnf0RqXuA9RMXXFEsdaBkXVm3LT4oB7oSkyg/jd2t2hfwIUXNQgW3mMCa2JvKFBzXVTKJvxmRTU3YYw0N/O3B59TQUyEHLa13al+f50RSqBeZ8utej4obIgQw7adxrr87m/cI7C1oUAHd30n+FC6vTTSIG7GKLM1nyuCRH+SXCIX90Rxg5gIoIO2n0R0TccKHojcDUPXsUOyGus83iA2f1WLW0jWAa2OJEc61+JKnk5KXfd5RQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=csq6VlZcJEO5HlTS49064aX5FhKLh5OFmvCMk7SyhYg=;
+ b=ogwjbCVBY9OStXn8wRpnfGP23GGyapfCCilhevx16Wy0ZY4G4WuSzba0TMSmi6XZJIZX05zot9DNx7JxjP9GPxyf2CwG6EcZINrVqDvGpuUurzAWfYM9xMcD1brPMgiUfYdNnA4bUZYrehfQAMzyEugeyuu0NIgFCsq/5fSnMBFdMNfQrg+yvCf1cUfH1WCHjsl9w3lOm2YXcukQzaOr1U4uCSMqptpUUPJvXzS3xV5Rn4poXuHw2C6Z5PULZ5O5zR7MXfo+glD3L3JNdTksUpCjLJM6qSMj+93wKN2B/wt/NQxG8BnEn93u0/YGwJsxcnSQXZtSYamLpKnXKl89zw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CH0PR12MB5372.namprd12.prod.outlook.com (2603:10b6:610:d7::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Wed, 29 Jun
+ 2022 12:17:10 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5373.022; Wed, 29 Jun 2022
+ 12:17:10 +0000
+Date:   Wed, 29 Jun 2022 09:17:09 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        Kevin Tian <kevin.tian@intel.com>
+Subject: Re: [PATCH 04/13] vfio/mdev: simplify mdev_type handling
+Message-ID: <20220629121709.GI693670@nvidia.com>
+References: <20220628051435.695540-1-hch@lst.de>
+ <20220628051435.695540-5-hch@lst.de>
+ <20220628155915.060ba2d9.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220628155915.060ba2d9.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR01CA0026.prod.exchangelabs.com (2603:10b6:208:10c::39)
+ To MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2df90611-0a08-4d03-885d-08da59c94ab9
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5372:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oK95/DwLuS+PqFSv5tYTvXxgWNiuRRwolKVKMM6MoBZ2c36Aekdo4wg+TUOTYODpuYW9N00pgbNVgVtw0nwNOZPNaOhPuU5Nb9+yKG6NAkMepB1bbhbMY1yAtaN/Lb1bjm23wlV9umjzIf/4R/Qt8o3E9+sRSHg7igXCxsNlMBoKQA1+X8bbOeJLLoBar0p1F3TXl4MUC4RDJvCQ0m+MV+r5+DJ57FU//wVypVj8wRtG23UIDfSpdggq4My0KpC5WIdHBWp4mSFz7NAtmv+zEAc55wUQzIy3loRYaHfd/DiaKlQt4cbqQWC7+X9Vp81NrV33FRzuynC25j3r5ArhYMg6xCuEwHpyv7SeSS3iVzZltaz4EX1NgfjI2nHgzTaT0LTdohJ7a1ZgLlWd7UhfpE7TiFHCsOGDRXhZ+C1rdlFVvSRaJ6aj7SHdwfRjEPIOpcy62KSxRMqdnmK3v8UQSIUJGnm/w3cxWRLZe1bUUJ0TcfMaGvv99K0wjJxZx931qATFkJ4cP9ZhZ1bex4sB6NTNcqITUTaeVq630RgpIZbExunkrMp+uq7z3Qn7xZL8ccT9RXrDZxg3zMBsAZKVArh6fuIo3naie6fAJqd+y69XBiIIbTU3rs90MKclzzdWExTUM9cGoyCRsyRhKbOGFDFpVVHAg/eteFgm8ku9r00f+Eg4NmUiwmF+C3uqJ5+1+WaKOlOknedpk0BdT1/mwLz0lwSKIpSOTqnxiYTei3vE0lP3wxfQzs+owwA2aWkc/eE12msgLK6FP9l8xcVMLSg2Z2FbH6zSYC12+KkKygs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(396003)(376002)(366004)(346002)(5660300002)(1076003)(41300700001)(2616005)(7416002)(8936002)(186003)(478600001)(6506007)(86362001)(33656002)(4744005)(6486002)(2906002)(26005)(6512007)(36756003)(54906003)(38100700002)(6916009)(66556008)(66476007)(4326008)(8676002)(66946007)(316002)(83380400001)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DjIeAfBOqEctSvuzHKa13UmmcWMxwgyl48qdIEgqKEnLYp3egPGMI3GtG1CI?=
+ =?us-ascii?Q?t5zKfKXFljDc5dhzFgnnqbFZCJvX5397DGTybW4ZDJlRXJPDVDt1ZSODI+VI?=
+ =?us-ascii?Q?NzNnJIBoVSAe7E0Bri/hoaa7GG1PBUyWIkx45IQHc0Oxm8Diw7OHYayYQu8s?=
+ =?us-ascii?Q?VpGmoA9Tq/6/noGz3qSLTlc+BvyinTBG+HoIc301Eqd73bYQ/l0Wau8Mwnnf?=
+ =?us-ascii?Q?qxaqxaIxPqxj37UtvncZo5MDHbooycMMq3s0pdEWRPaHQrwn4r0RY6bmCy+X?=
+ =?us-ascii?Q?Q1Z5/fWzskC6/4tMvzo05IPbC/MblLYojHOEGzc0l8TXwjFQ3EHlIUHVJd6I?=
+ =?us-ascii?Q?OtHwAt42MgIe0TQEF5bp5jj9ZVVhqcToDEvTE+yd6WpZ2nR2usj1Tn/yP+nJ?=
+ =?us-ascii?Q?4bgTutXFM+jTVBpXMH1VgFR1uNA37FU16bA6b0QwEq/5kmx/7tp6PY6nsTwX?=
+ =?us-ascii?Q?PCMDC31fPjAUIxGe8sfBBRedIbD1RJ5dI1D77il/+Zk6vw+eyXdqUINrhrfK?=
+ =?us-ascii?Q?SLEwDnoJIWOtcxFYOivCtrG+7nfF5vPqw+Z1Fb4k6iPs0+e/W/NylY8UroJQ?=
+ =?us-ascii?Q?6vbl4Zlek4m8zoYa01wxMpn2KOR2fxv0JaVh81CruVIKor+9HLDON2Kf+SyN?=
+ =?us-ascii?Q?+ZI4byHMDjWRJMj6hhhiIlxXB6rvAI5vaKYPgUgobtUnh3PUzlnl2tE4K1b0?=
+ =?us-ascii?Q?gPUxLiKgp8Omxy/d7E3T3ItjMGl4zprLgjwX59FAg8BR0oLKeIHbWAoRA8cQ?=
+ =?us-ascii?Q?qMTNPBH2xzeqIqh6Ngjuhh+NLnhcDbio7nWRroqY3xrzwkMXqPWGhNiLPUnk?=
+ =?us-ascii?Q?oNJxLsG7DcGHcaefhavwInDYhFTr/oGhaZrllOgVYXwR/McroCwMaZvHJEuo?=
+ =?us-ascii?Q?E6i/PBIL1Wncqaw47Ev/N8lw0t8PDKo4y32km8OgpgKd8nJHKrUWYXGCxW5z?=
+ =?us-ascii?Q?H/ei1f98rNO/++68/9zZlGelpSOPKvZ46Ijx0pODexF/+882imBnI9FmWGmB?=
+ =?us-ascii?Q?NSzd+I35skfcQ7rZ0uQR7eyhw+bAlc1Fs8GS8AmOhUS3c7F99tRCNQGt9O0n?=
+ =?us-ascii?Q?M8syCsm3BgNhDgaut4s6fQpJIEih/spBtK8YhW/ONHPHohvFNScNR9siJyIf?=
+ =?us-ascii?Q?Ggzg8Ljhs+T4XlIxyfANE3febi9BRIaAJAAnGKz2Tbf+6RNniU7Q6+PK2Vzw?=
+ =?us-ascii?Q?hQjPn/3NWSDQkkSzdCkadXKXJjC5iF97ai5pW0yT/pH/GMWP0c6vNtcSvVJm?=
+ =?us-ascii?Q?xFcnj9WKz+RtmvTJnfBA6sc/BQed85DjRgCOghpgiveyyN6/bH6oFvr8izdj?=
+ =?us-ascii?Q?qS2fjAIGrHAVSZ+3vUl3m2JL+aLLLnW5IcJOuAUBk2aJEaMqh0vEpHeU10B2?=
+ =?us-ascii?Q?lqd0ymq3WNSi/rCsBguR3d7dYvW/B7+vUDs20ZtQgYU0I9ZkKGIXpJHtaxWz?=
+ =?us-ascii?Q?WaoqP9b4JFhHHjbmE6wwYuO2uH7owO3IV1AFdbFSnPVDQAThIEgK/eFBpqTm?=
+ =?us-ascii?Q?9fZbMfNH2c+qdR4Xx7f2iIHPkRQGaRqDdL2X44likux3+hK22y3GJLXicOeB?=
+ =?us-ascii?Q?z4akJjDmvHN2+iRE5h5roqFRbGtfqTzxdY+iIvNs?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2df90611-0a08-4d03-885d-08da59c94ab9
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2022 12:17:10.4712
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fiJ2I/rdf0NyRLt2JwyYcpX1Y6Sgc1foPg3Vggwi/1H2x+2h/QTWgSNlUwgzyJRM
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5372
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> The main goal of this series is to fix KVM's longstanding bug of not
-> honoring L1's exception intercepts wants when handling an exception that
-> occurs during delivery of a different exception.  E.g. if L0 and L1 are
-> using shadow paging, and L2 hits a #PF, and then hits another #PF while
-> vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
-> KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
-> so that the #PF is routed to L1, not injected into L2 as a #DF.
+On Tue, Jun 28, 2022 at 03:59:15PM -0600, Alex Williamson wrote:
+> > +	strcpy(matrix_dev->mdev_type.sysfs_name, VFIO_AP_MDEV_TYPE_HWVIRT);
 > 
-> nVMX has hacked around the bug for years by overriding the #PF injector
-> for shadow paging to go straight to VM-Exit, and nSVM has started doing
-> the same.  The hacks mostly work, but they're incomplete, confusing, and
-> lead to other hacky code, e.g. bailing from the emulator because #PF
-> injection forced a VM-Exit and suddenly KVM is back in L1.
-> 
-> Everything leading up to that are related fixes and cleanups I encountered
-> along the way; some through code inspection, some through tests.
-> 
-> v2:
->   - Rebased to kvm/queue (commit 8baacf67c76c) + selftests CPUID
->     overhaul.
->     https://lore.kernel.org/all/20220614200707.3315957-1-seanjc@google.com
->   - Treat KVM_REQ_TRIPLE_FAULT as a pending exception.
-> 
-> v1: https://lore.kernel.org/all/20220311032801.3467418-1-seanjc@google.com
-> 
-> Sean Christopherson (21):
->   KVM: nVMX: Unconditionally purge queued/injected events on nested
->     "exit"
->   KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
->   KVM: x86: Don't check for code breakpoints when emulating on exception
->   KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
->   KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
->   KVM: x86: Treat #DBs from the emulator as fault-like (code and
->     DR7.GD=1)
->   KVM: x86: Use DR7_GD macro instead of open coding check in emulator
->   KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
->   KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
->   KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
->   KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
->   KVM: x86: Make kvm_queued_exception a properly named, visible struct
->   KVM: x86: Formalize blocking of nested pending exceptions
->   KVM: x86: Use kvm_queue_exception_e() to queue #DF
->   KVM: x86: Hoist nested event checks above event injection logic
->   KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
->     VM-Exit
->   KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
->   KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions
->   KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
->     behavior
->   KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
->   KVM: selftests: Add an x86-only test to verify nested exception
->     queueing
-> 
->  arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
->  arch/x86/include/asm/kvm_host.h               |  35 +-
->  arch/x86/kvm/emulate.c                        |   3 +-
->  arch/x86/kvm/svm/nested.c                     | 102 ++---
->  arch/x86/kvm/svm/svm.c                        |  18 +-
->  arch/x86/kvm/vmx/nested.c                     | 319 +++++++++-----
->  arch/x86/kvm/vmx/sgx.c                        |   2 +-
->  arch/x86/kvm/vmx/vmx.c                        |  53 ++-
->  arch/x86/kvm/x86.c                            | 404 +++++++++++-------
->  arch/x86/kvm/x86.h                            |  11 +-
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/include/x86_64/svm_util.h   |   7 +-
->  .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
->  .../kvm/x86_64/nested_exceptions_test.c       | 295 +++++++++++++
->  15 files changed, 886 insertions(+), 418 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
-> 
-> 
-> base-commit: 816967202161955f398ce379f9cbbedcb1eb03cb
+> And then this might as well be an snprintf() as well too.
 
-Hi Sean and everyone!
- 
- 
-Before I continue reviewing the patch series, I would like you to check if
-I understand the monitor trap/pending debug exception/event injection
-logic on VMX correctly. I was looking at the spec for several hours and I still have more
-questions that answers about it.
- 
-So let me state what I understand:
- 
-1. Event injection (aka eventinj in SVM terms):
- 
-  (VM_ENTRY_INTR_INFO_FIELD/VM_ENTRY_EXCEPTION_ERROR_CODE/VM_ENTRY_INSTRUCTION_LEN)
- 
-  If I understand correctly all event injections types just like on SVM just inject,
-  and never create something pending, and/or drop the injection if event is not allowed
-  (like if EFLAGS.IF is 0). VMX might have some checks that could fail VM entry,
-  if for example you try to inject type 0 (hardware interrupt) and EFLAGS.IF is 0,
-  I haven't checked this)
- 
-  All event injections happen right away, don't deliver any payload (like DR6), etc.
- 
-  Injection types 4/5/6, do the same as injection types 0/2/3 but in addition to that,
-  type 4/6 do a DPL check in IDT, and also these types can promote the RIP prior
-  to pushing it to the exception stack using VM_ENTRY_INSTRUCTION_LEN to be consistent
-  with cases when these trap like events are intercepted, where the interception happens
-  on the start of the instruction despite exceptions being trap-like.
- 
- 
-2. #DB is the only trap like exception that can be pending for one more instruction
-   if MOV SS shadow is on (any other cases?).
-   (AMD just ignores the whole thing, rightfully)
- 
-   That is why we have the GUEST_PENDING_DBG_EXCEPTIONS vmcs field.
-   I understand that it will be written by CPU in case we have VM exit at the moment
-   where #DB is already pending but not yet delivered.
- 
-   That field can also be (sadly) used to "inject" #DB to the guest, if the hypervisor sets it,
-   and this #DB will actually update DR6 and such, and might be delayed/lost.
- 
- 
-3. Facts about MTF:
- 
-   * MTF as a feature is basically 'single step the guest by generating MTF VM exits after each executed
-     instruction', and is enabled in primary execution controls.
- 
-   * MTF is also an 'event', and it can be injected separately by the hypervisor with event type 7,
-     and that has no connection to the 'feature', although usually this injection will be useful
-     when the hypervisor does some kind of re-injection, triggered by the actual MTF feature.
- 
-   * MTF event can be lost, if higher priority VM exit happens, this is why the SDM says about 'pending MTF',
-     which means that MTF vmexit should happen unless something else prevents it and/or higher priority VM exit
-     overrides it.
- 
-   * MTF event is raised (when the primary execution controls bit is enabled) when:
- 
-	- after an injected (vectored), aka eventinj/VM_ENTRY_INTR_INFO_FIELD, done updating the guest state
-	  (that is stack was switched, stuff was pushed to new exception stack, RIP updated to the handler)
-	  I am not 100% sure about this but this seems to be what PRM implies:
- 
-	  "If the “monitor trap flag” VM-execution control is 1 and VM entry is injecting a vectored event (see Section
-	  26.6.1), an MTF VM exit is pending on the instruction boundary before the first instruction following the
-	  VM entry."
- 
-	- If an interrupt and or #DB exception happens prior to executing first instruction of the guest,
-	  then once again MTF will happen on first instruction of the exception/interrupt handler
- 
-	  "If the “monitor trap flag” VM-execution control is 1, VM entry is not injecting an event, and a pending event
-	  (e.g., debug exception or interrupt) is delivered before an instruction can execute, an MTF VM exit is pending
-	  on the instruction boundary following delivery of the event (or any nested exception)."
- 
-	  That means that #DB has higher priority that MTF, but not specified if fault DB or trap DB
- 
-	- If instruction causes exception, once again, on first instruction of the exception handler MTF will happen.
- 
-	- Otherwise after an instruction (or REP iteration) retires.
- 
+Kees has setup FORTIFY so the above will actually throw a compile
+warning in build bots if the array size is too small. Changing it to
+snprintf would loose this and cause undetected string truncation.
 
-If you have more facts about MTF and related stuff and/or if I made a mistake in the above, I am all ears to listen!
-
-Best regards,
-	Maxim Levitsky
-
+Jason
