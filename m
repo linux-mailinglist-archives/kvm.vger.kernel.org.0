@@ -2,66 +2,311 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 356FE5601A2
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 15:45:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CCFB560196
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 15:43:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232787AbiF2No7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 09:44:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47670 "EHLO
+        id S233324AbiF2NnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 09:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232507AbiF2No5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 09:44:57 -0400
-Received: from www2055.sakura.ne.jp (www2055.sakura.ne.jp [59.106.171.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E63B12A94;
-        Wed, 29 Jun 2022 06:44:56 -0700 (PDT)
-Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
-        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD6s1066631;
-        Wed, 29 Jun 2022 22:13:07 +0900 (JST)
-        (envelope-from 1955@kkden.co.jp)
-Received: from www2055.sakura.ne.jp (59.106.171.65)
- by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
- Wed, 29 Jun 2022 22:13:06 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
-Received: from www2055.sakura.ne.jp (localhost [127.0.0.1])
-        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD5Nj066609;
-        Wed, 29 Jun 2022 22:13:06 +0900 (JST)
-        (envelope-from 1955@kkden.co.jp)
-Received: (from kkden@localhost)
-        by www2055.sakura.ne.jp (8.15.2/8.15.2/Submit) id 25TDD5BD066608;
-        Wed, 29 Jun 2022 22:13:05 +0900 (JST)
-        (envelope-from 1955@kkden.co.jp)
-Message-Id: <202206291313.25TDD5BD066608@www2055.sakura.ne.jp>
-X-Authentication-Warning: www2055.sakura.ne.jp: kkden set sender to 1955@kkden.co.jp using -f
-Subject: THIS IS VERY CONFIDENTIAL
-From:   Steve Dibenedetto <1955@kkden.co.jp>
-To:     stevedibenedetto177@gmail.com
+        with ESMTP id S232080AbiF2NnF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 09:43:05 -0400
+Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C031031516
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 06:43:03 -0700 (PDT)
+Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-101ec2d6087so21487768fac.3
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 06:43:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=2yMeDvydOd8o9MQPRkESiRqVPPamowZNOPYRsnNSJKo=;
+        b=bZ+LdSwGTFg7v+ZiioGCfZ7Hh/6j4wC6erUzlz44lQ4NlzajXUlK1iXw4XwjKeRAXG
+         tivhYU0SHkfa904s+o4AyDtpGIoLknBzAszL5QyeONih1pSePrGohrxn8D9k8+viFLey
+         avSX/b1gbGNmNSCRt5ybF/xqc4S0xnEgYvIjW9F2zXwaZAZ0146Glf5FEmy+WyxZzCfO
+         3927zOm7fePhd+eW9zbd4MVqhCNksFEVTJ+jiQ1bzzJ3nC2oCPSsMOyOhD0cbX8VjdWx
+         CM/K5TMxx5y1HvZVRVrvuQz0VE1A/RasfuLzQ53GQY/FlZfq921xjJ+Cy0We2jd9oYRh
+         A4ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=2yMeDvydOd8o9MQPRkESiRqVPPamowZNOPYRsnNSJKo=;
+        b=OZLaIXEvaIJl2ptUmbsNRhUelbZRAA4OpF0FpkwDTLjmtLDGA7s9agFv54+bdEg0Vc
+         Ffdtq6ncDDd5qsJBLcDqlkhjz0iQdoNxSJAKHpLGD9EFshFNYCRD3zZcrXS+npidiEGv
+         vHH2O9TOxBgzHoAYu9u8yPIjdJcEZnmMBS+vvmN4UtP4CMmiEoqVEsRg3sHKYF/K4byV
+         e4ukkXhEpZoCY0d5gPLEpDwznFsSDXUXUSKaTFYaI5Le1cCB3SqT3JJDJckDKqfhE5rP
+         Zrqkaz1PUoc/ioAgNoW0aBHTXjYlZePPzBovwIF80WKnb5L/T9hMYHgxWTwZS3uSPEyB
+         NlCg==
+X-Gm-Message-State: AJIora8B3y9GMDgUfY8hYfBb77kQSUvlNFKvGN5zGL9atAeiu/vMEwdk
+        RLEwWA/cH6vRGdHwrKE/cj0l9s+Q+ljfSU2gSEwPXg==
+X-Google-Smtp-Source: AGRyM1vTsVOAFkyrE/6MzNa7xwMP0d+bgNSaf6jXHzIBwLUxEqBDW5sWwzrJqTNYJg/mito6qQ/VQgcwpzIQCOMPxpc=
+X-Received: by 2002:a05:6870:d3c7:b0:104:9120:8555 with SMTP id
+ l7-20020a056870d3c700b0010491208555mr1887228oag.181.1656510182889; Wed, 29
+ Jun 2022 06:43:02 -0700 (PDT)
 MIME-Version: 1.0
-Date:   Wed, 29 Jun 2022 22:13:05 +0900
-Content-Type: text/plain; charset="ISO-2022-JP"
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_50,SPF_HELO_NONE,
-        SPF_NONE,SUBJ_ALL_CAPS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: *
+References: <20220614204730.3359543-1-seanjc@google.com> <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
+In-Reply-To: <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 29 Jun 2022 06:42:51 -0700
+Message-ID: <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com>
+Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jun 29, 2022 at 4:17 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>
+> On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
+> > The main goal of this series is to fix KVM's longstanding bug of not
+> > honoring L1's exception intercepts wants when handling an exception tha=
+t
+> > occurs during delivery of a different exception.  E.g. if L0 and L1 are
+> > using shadow paging, and L2 hits a #PF, and then hits another #PF while
+> > vectoring the first #PF due to _L1_ not having a shadow page for the ID=
+T,
+> > KVM needs to check L1's intercepts before morphing the #PF =3D> #PF =3D=
+> #DF
+> > so that the #PF is routed to L1, not injected into L2 as a #DF.
+> >
+> > nVMX has hacked around the bug for years by overriding the #PF injector
+> > for shadow paging to go straight to VM-Exit, and nSVM has started doing
+> > the same.  The hacks mostly work, but they're incomplete, confusing, an=
+d
+> > lead to other hacky code, e.g. bailing from the emulator because #PF
+> > injection forced a VM-Exit and suddenly KVM is back in L1.
+> >
+> > Everything leading up to that are related fixes and cleanups I encounte=
+red
+> > along the way; some through code inspection, some through tests.
+> >
+> > v2:
+> >   - Rebased to kvm/queue (commit 8baacf67c76c) + selftests CPUID
+> >     overhaul.
+> >     https://lore.kernel.org/all/20220614200707.3315957-1-seanjc@google.=
+com
+> >   - Treat KVM_REQ_TRIPLE_FAULT as a pending exception.
+> >
+> > v1: https://lore.kernel.org/all/20220311032801.3467418-1-seanjc@google.=
+com
+> >
+> > Sean Christopherson (21):
+> >   KVM: nVMX: Unconditionally purge queued/injected events on nested
+> >     "exit"
+> >   KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
+> >   KVM: x86: Don't check for code breakpoints when emulating on exceptio=
+n
+> >   KVM: nVMX: Treat General Detect #DB (DR7.GD=3D1) as fault-like
+> >   KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
+> >   KVM: x86: Treat #DBs from the emulator as fault-like (code and
+> >     DR7.GD=3D1)
+> >   KVM: x86: Use DR7_GD macro instead of open coding check in emulator
+> >   KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
+> >   KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
+> >   KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
+> >   KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
+> >   KVM: x86: Make kvm_queued_exception a properly named, visible struct
+> >   KVM: x86: Formalize blocking of nested pending exceptions
+> >   KVM: x86: Use kvm_queue_exception_e() to queue #DF
+> >   KVM: x86: Hoist nested event checks above event injection logic
+> >   KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
+> >     VM-Exit
+> >   KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
+> >   KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions
+> >   KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
+> >     behavior
+> >   KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
+> >   KVM: selftests: Add an x86-only test to verify nested exception
+> >     queueing
+> >
+> >  arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+> >  arch/x86/include/asm/kvm_host.h               |  35 +-
+> >  arch/x86/kvm/emulate.c                        |   3 +-
+> >  arch/x86/kvm/svm/nested.c                     | 102 ++---
+> >  arch/x86/kvm/svm/svm.c                        |  18 +-
+> >  arch/x86/kvm/vmx/nested.c                     | 319 +++++++++-----
+> >  arch/x86/kvm/vmx/sgx.c                        |   2 +-
+> >  arch/x86/kvm/vmx/vmx.c                        |  53 ++-
+> >  arch/x86/kvm/x86.c                            | 404 +++++++++++-------
+> >  arch/x86/kvm/x86.h                            |  11 +-
+> >  tools/testing/selftests/kvm/.gitignore        |   1 +
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> >  .../selftests/kvm/include/x86_64/svm_util.h   |   7 +-
+> >  .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
+> >  .../kvm/x86_64/nested_exceptions_test.c       | 295 +++++++++++++
+> >  15 files changed, 886 insertions(+), 418 deletions(-)
+> >  create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exception=
+s_test.c
+> >
+> >
+> > base-commit: 816967202161955f398ce379f9cbbedcb1eb03cb
+>
+> Hi Sean and everyone!
+>
+>
+> Before I continue reviewing the patch series, I would like you to check i=
+f
+> I understand the monitor trap/pending debug exception/event injection
+> logic on VMX correctly. I was looking at the spec for several hours and I=
+ still have more
+> questions that answers about it.
+>
+> So let me state what I understand:
+>
+> 1. Event injection (aka eventinj in SVM terms):
+>
+>   (VM_ENTRY_INTR_INFO_FIELD/VM_ENTRY_EXCEPTION_ERROR_CODE/VM_ENTRY_INSTRU=
+CTION_LEN)
+>
+>   If I understand correctly all event injections types just like on SVM j=
+ust inject,
+>   and never create something pending, and/or drop the injection if event =
+is not allowed
+>   (like if EFLAGS.IF is 0). VMX might have some checks that could fail VM=
+ entry,
+>   if for example you try to inject type 0 (hardware interrupt) and EFLAGS=
+.IF is 0,
+>   I haven't checked this)
 
-Hello,
+The event is never just "dropped." If it is illegal to deliver the
+event, VM-entry fails. See the second bullet under section 26.2.1.3:
+VM-Entry Control Fields, in the SDM, volume 3.
 
-My name is Steve Dibenedetto.
-I apologize to have contacted you this way without a direct relationship. There is an opportunity to collaborate with me in the sourcing of some materials needed by our company for production of the different medicines we are researching.
 
-I'm aware that this might be totally outside your professional specialization, but it will be a great source for generating extra revenue. I  discovered a manufacturer who can supply us at a lower rate than our company's previous purchases.
-I will give you more specific details when/if I receive feedback from you showing interest.
+>   All event injections happen right away, don't deliver any payload (like=
+ DR6), etc.
 
-Warm Regards  
-Steve Dibenedetto
-Production & Control Manager,
-Green Field Laboratories
-Gothic House, Barker Gate,
-Nottingham, NG1 1JU,
-United Kingdom.
+Correct.
+
+>   Injection types 4/5/6, do the same as injection types 0/2/3 but in addi=
+tion to that,
+>   type 4/6 do a DPL check in IDT, and also these types can promote the RI=
+P prior
+>   to pushing it to the exception stack using VM_ENTRY_INSTRUCTION_LEN to =
+be consistent
+>   with cases when these trap like events are intercepted, where the inter=
+ception happens
+>   on the start of the instruction despite exceptions being trap-like.
+
+Unlike the AMD "INTn intercept," these trap intercepts *do not* happen
+at the start of the instruction. In early Intel VT-x parts, one could
+not easily reinject an intercepted software interrupt or exception
+using event injection, because VM-entry required a non-zero
+instruction length, and the guest RIP had already advanced. On CPUs
+that support a non-zero instruction length, one can now reinject a
+software interrupt or exception, by setting the VM-entry instruction
+length to 0.
+
+> 2. #DB is the only trap like exception that can be pending for one more i=
+nstruction
+>    if MOV SS shadow is on (any other cases?).
+
+I believe that's it. I'm not entirely sure about RTM,though.
+
+>    (AMD just ignores the whole thing, rightfully)
+
+When you say "ignores," do you mean that AMD ignores a data breakpoint
+or single-step trap generated by MOV-SS, or it ignores the fact that
+delivering such a #DB trap between the MOV-SS and the subsequent
+MOV-ESP will create a stack frame in the wrong place?
+
+>    That is why we have the GUEST_PENDING_DBG_EXCEPTIONS vmcs field.
+>    I understand that it will be written by CPU in case we have VM exit at=
+ the moment
+>    where #DB is already pending but not yet delivered.
+>
+>    That field can also be (sadly) used to "inject" #DB to the guest, if t=
+he hypervisor sets it,
+>    and this #DB will actually update DR6 and such, and might be delayed/l=
+ost.
+
+Injecting a #DB this way (if the hypervisor just emulated MOV-SS) is
+easier than emulating the next instruction or using MTF to step
+through the next instruction, and getting all of the deferred #DB
+delivery rules right. :-)
+
+>
+> 3. Facts about MTF:
+>
+>    * MTF as a feature is basically 'single step the guest by generating M=
+TF VM exits after each executed
+>      instruction', and is enabled in primary execution controls.
+>
+>    * MTF is also an 'event', and it can be injected separately by the hyp=
+ervisor with event type 7,
+>      and that has no connection to the 'feature', although usually this i=
+njection will be useful
+>      when the hypervisor does some kind of re-injection, triggered by the=
+ actual MTF feature.
+>
+>    * MTF event can be lost, if higher priority VM exit happens, this is w=
+hy the SDM says about 'pending MTF',
+>      which means that MTF vmexit should happen unless something else prev=
+ents it and/or higher priority VM exit
+>      overrides it.
+
+Hence, the facility for injecting a "pending MTF"--so that it won't be "los=
+t."
+
+>    * MTF event is raised (when the primary execution controls bit is enab=
+led) when:
+>
+>         - after an injected (vectored), aka eventinj/VM_ENTRY_INTR_INFO_F=
+IELD, done updating the guest state
+>           (that is stack was switched, stuff was pushed to new exception =
+stack, RIP updated to the handler)
+>           I am not 100% sure about this but this seems to be what PRM imp=
+lies:
+>
+>           "If the =E2=80=9Cmonitor trap flag=E2=80=9D VM-execution contro=
+l is 1 and VM entry is injecting a vectored event (see Section
+>           26.6.1), an MTF VM exit is pending on the instruction boundary =
+before the first instruction following the
+>           VM entry."
+>
+>         - If an interrupt and or #DB exception happens prior to executing=
+ first instruction of the guest,
+>           then once again MTF will happen on first instruction of the exc=
+eption/interrupt handler
+>
+>           "If the =E2=80=9Cmonitor trap flag=E2=80=9D VM-execution contro=
+l is 1, VM entry is not injecting an event, and a pending event
+>           (e.g., debug exception or interrupt) is delivered before an ins=
+truction can execute, an MTF VM exit is pending
+>           on the instruction boundary following delivery of the event (or=
+ any nested exception)."
+>
+>           That means that #DB has higher priority that MTF, but not speci=
+fied if fault DB or trap DB
+
+These are single-step, I/O and data breakpoint traps.
+
+>         - If instruction causes exception, once again, on first instructi=
+on of the exception handler MTF will happen.
+>
+>         - Otherwise after an instruction (or REP iteration) retires.
+>
+>
+> If you have more facts about MTF and related stuff and/or if I made a mis=
+take in the above, I am all ears to listen!
+
+You might be interested in my augmented Table 6-2 (from volume 3 of
+the SDM): https://docs.google.com/spreadsheets/d/e/2PACX-1vR8TkbSl4TqXtD62a=
+gRUs1QY3SY-98mKtOh-s8vYDzaDmDOcdfyTvlAxF9aVnHWRu7uyGhRwvHUziXT/pubhtml
