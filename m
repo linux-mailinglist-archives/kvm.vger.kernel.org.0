@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 253F755F4E1
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 06:13:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95D0155F509
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 06:21:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbiF2EKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 00:10:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58946 "EHLO
+        id S231875AbiF2ENb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 00:13:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbiF2EKs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 00:10:48 -0400
+        with ESMTP id S231529AbiF2ENC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 00:13:02 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C2D535ABF
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 21:10:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 57EEB3A724
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 21:12:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656475847;
+        s=mimecast20190719; t=1656475964;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bg6heNJXq50eL6WsFIMxRV6MiBd1t5LqWZMr8mmOcec=;
-        b=TCpZHVJ3ivj+IeKzkj7z6dLwyDYdKVZlzNdadB+WYozqswSUtzFHJ/F03HwVh2G70l776L
-        noCUqHaTWHPev4GirHSFxeyMO100ViHkNuYZ+9hla9Vj9iIhavilwu8uqBXYylNPCQGtyQ
-        O1i2RdeHqyDhaa5ykdvvzn033UfCVl8=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=GNM+BbnxY/R2xbw+iRFV6Wl10CXwSKS8xeWt77Ki534=;
+        b=LErCZfp2nKpakADTdPJ8cVNrXsAOWv4OqBrK8DjK4TL4+0Uf9eyriRG9KPMZJz65nxU4gf
+        ZWm8E2Oa9zZU/8mo6vooeFTGJhXjROaXUYqtOtLywnCRpWUhKcuLoLLOKVnrCOfgGlFKtN
+        43A1B11AVUW1LitsyCD1VV6OTj20h88=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-65-r0ayhm6CNhybzOk2LATTiA-1; Wed, 29 Jun 2022 00:10:45 -0400
-X-MC-Unique: r0ayhm6CNhybzOk2LATTiA-1
-Received: by mail-lf1-f70.google.com with SMTP id v5-20020a05651203a500b0047faf076d1dso7092319lfp.8
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 21:10:45 -0700 (PDT)
+ us-mta-363-HD2IqWMfPDacil_yC9jXpg-1; Wed, 29 Jun 2022 00:12:40 -0400
+X-MC-Unique: HD2IqWMfPDacil_yC9jXpg-1
+Received: by mail-lf1-f72.google.com with SMTP id bp15-20020a056512158f00b0047f603e5f92so7176649lfb.20
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 21:12:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=bg6heNJXq50eL6WsFIMxRV6MiBd1t5LqWZMr8mmOcec=;
-        b=42bnQ7ZZDfe9Pescqt63pm3fBzlvT0j/87IG/e2Rc90WtzCEJin/9XpBj7Z7hjLC9Y
-         rGFz8V1YidsOT6lXnS+pylQYpOCo6itf2ZDA996LpYxCNlQlZKNs46V4jKbsfZFAgd9U
-         anFkA+zsFBvZLYnccRja4E+JCGylGJ9VLK37momUWbyWZjhJRwW+pN3zNNQvYllRiBxr
-         bgnqmRuFog57lk0HAQREqtatXr3IMi3icG3KmlBYWyQzOh7Me+OdtkIrEV5UlMozdw9V
-         rJQGXScxWHQn8UFLRu9FUEUob+bcDssw+sp1rnGZf/EzkkwXkLvoGGirPYXaotF/tj9Y
-         CbmQ==
-X-Gm-Message-State: AJIora+NtQ5JUDVXVTWcggwNVvGkCfgsAsq0Iz+sauJckduZ27MKUXjv
-        /sE5mrDscxjg527pglGpHE61MEd7NE7xBD4iCCix/2gq/Y61B4tB0l387hfbcfDY+uoOwMfu5GU
-        pNb430dx4wQeVsFddS7p6W/J3tfo8
-X-Received: by 2002:a05:651c:1610:b0:25a:75fa:f9cc with SMTP id f16-20020a05651c161000b0025a75faf9ccmr615167ljq.243.1656475843986;
-        Tue, 28 Jun 2022 21:10:43 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tsRfqKSJ5WREAe866tYR2Av6sXWiFQwf7Na0t+bQDdXFNQBHVv7PWUm2aQHXPC9OFidZUGp5C/19n3ZUbyfXY=
-X-Received: by 2002:a05:651c:1610:b0:25a:75fa:f9cc with SMTP id
- f16-20020a05651c161000b0025a75faf9ccmr615131ljq.243.1656475843670; Tue, 28
- Jun 2022 21:10:43 -0700 (PDT)
+        bh=GNM+BbnxY/R2xbw+iRFV6Wl10CXwSKS8xeWt77Ki534=;
+        b=wJdd5DGP6QVR9zXaFmL8rzUyn505VqLj7GSO3HIGyC/pRiDfGdhXJmN+VKjOfXPYNw
+         4IaAJcXfGSmh/FWFwjqkNRrTqCRUiJiX26WwYJHGKgitwDgabU7u1r8VTudZrGx6jktE
+         qw/Oo0ZYX9h8oIxka+PW9uO72fLtZ6HI4LZ0Z7O26ssIPs4xmijwyczKIA61S149YJ+D
+         44ZwzUhfcQ1rzf/bJ/5DVP5PSeMR7T/dmt3KNwBPvv22PnQt0ItWwQ9mndh7heg+ntMa
+         lqc/UDAjtDXc6vBmO67BJbpo4JwecjnrzCxXEvJZPcJ46+RvoNMAWYBPFjAe0tWvtEZy
+         Gtjw==
+X-Gm-Message-State: AJIora/DUIys0A1guHxTiXgY/8bIk2xl7LkpLzHw1XHCcexLc94gIst6
+        ysq2AJk2b8rYl8A++DzJdoZYDlxoPoHwJIK2j8gl7KT5sSZUPzRt8gQ/ep8tV7ol0G9Q3MUglET
+        UCHezDRrkh86aDvd+VfPNVcMTDCmB
+X-Received: by 2002:a05:651c:895:b0:250:c5ec:bc89 with SMTP id d21-20020a05651c089500b00250c5ecbc89mr574053ljq.251.1656475958717;
+        Tue, 28 Jun 2022 21:12:38 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tHRCeQEYFeDihZwqrb3gPA69zDi6jWiWd/DBiz6ym7vRZ1l6srncfxGDke2JCiHZCDM5Ja741bHC00eazMkAU=
+X-Received: by 2002:a05:651c:895:b0:250:c5ec:bc89 with SMTP id
+ d21-20020a05651c089500b00250c5ecbc89mr574045ljq.251.1656475958454; Tue, 28
+ Jun 2022 21:12:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220623160738.632852-1-eperezma@redhat.com> <20220623160738.632852-2-eperezma@redhat.com>
-In-Reply-To: <20220623160738.632852-2-eperezma@redhat.com>
+References: <20220623160738.632852-1-eperezma@redhat.com> <20220623160738.632852-3-eperezma@redhat.com>
+In-Reply-To: <20220623160738.632852-3-eperezma@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 29 Jun 2022 12:10:32 +0800
-Message-ID: <CACGkMEv+yFLCzo-K7eSaVPJqLCa5SxfVCmB=piQ3+6R3=oDz-w@mail.gmail.com>
-Subject: Re: [PATCH v6 1/4] vdpa: Add suspend operation
+Date:   Wed, 29 Jun 2022 12:12:27 +0800
+Message-ID: <CACGkMEtNC=4KeigQXr4NuaiuVGkxK2ruQTk6-Fbr3B1MqHieTA@mail.gmail.com>
+Subject: Re: [PATCH v6 2/4] vhost-vdpa: introduce SUSPEND backend feature bit
 To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
 Cc:     netdev <netdev@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
@@ -96,48 +96,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 24, 2022 at 12:07 AM Eugenio P=C3=A9rez <eperezma@redhat.com> w=
+On Fri, Jun 24, 2022 at 12:08 AM Eugenio P=C3=A9rez <eperezma@redhat.com> w=
 rote:
 >
-> This operation is optional: It it's not implemented, backend feature bit
-> will not be exposed.
-
-A question, do we allow suspending a device without DRIVER_OK?
-
-Thanks
-
+> Userland knows if it can suspend the device or not by checking this featu=
+re
+> bit.
+>
+> It's only offered if the vdpa driver backend implements the suspend()
+> operation callback, and to offer it or userland to ack it if the backend
+> does not offer that callback is an error.
 >
 > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 > ---
->  include/linux/vdpa.h | 4 ++++
->  1 file changed, 4 insertions(+)
+>  drivers/vhost/vdpa.c             | 16 +++++++++++++++-
+>  include/uapi/linux/vhost_types.h |  2 ++
+>  2 files changed, 17 insertions(+), 1 deletion(-)
 >
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index 7b4a13d3bd91..d282f464d2f1 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -218,6 +218,9 @@ struct vdpa_map_file {
->   * @reset:                     Reset device
->   *                             @vdev: vdpa device
->   *                             Returns integer: success (0) or error (< =
-0)
-> + * @suspend:                   Suspend or resume the device (optional)
-> + *                             @vdev: vdpa device
-> + *                             Returns integer: success (0) or error (< =
-0)
->   * @get_config_size:           Get the size of the configuration space i=
-ncludes
->   *                             fields that are conditional on feature bi=
-ts.
->   *                             @vdev: vdpa device
-> @@ -319,6 +322,7 @@ struct vdpa_config_ops {
->         u8 (*get_status)(struct vdpa_device *vdev);
->         void (*set_status)(struct vdpa_device *vdev, u8 status);
->         int (*reset)(struct vdpa_device *vdev);
-> +       int (*suspend)(struct vdpa_device *vdev);
->         size_t (*get_config_size)(struct vdpa_device *vdev);
->         void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
->                            void *buf, unsigned int len);
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 23dcbfdfa13b..3d636e192061 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -347,6 +347,14 @@ static long vhost_vdpa_set_config(struct vhost_vdpa =
+*v,
+>         return 0;
+>  }
+>
+> +static bool vhost_vdpa_can_suspend(const struct vhost_vdpa *v)
+> +{
+> +       struct vdpa_device *vdpa =3D v->vdpa;
+> +       const struct vdpa_config_ops *ops =3D vdpa->config;
+> +
+> +       return ops->suspend;
+> +}
+> +
+>  static long vhost_vdpa_get_features(struct vhost_vdpa *v, u64 __user *fe=
+aturep)
+>  {
+>         struct vdpa_device *vdpa =3D v->vdpa;
+> @@ -577,7 +585,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *f=
+ilep,
+>         if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
+>                 if (copy_from_user(&features, featurep, sizeof(features))=
+)
+>                         return -EFAULT;
+> -               if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+> +               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+> +                                BIT_ULL(VHOST_BACKEND_F_SUSPEND)))
+> +                       return -EOPNOTSUPP;
+> +               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+> +                    !vhost_vdpa_can_suspend(v))
+
+Do we need to advertise this to the management?
+
+Thanks
+
+>                         return -EOPNOTSUPP;
+>                 vhost_set_backend_features(&v->vdev, features);
+>                 return 0;
+> @@ -628,6 +640,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *fi=
+lep,
+>                 break;
+>         case VHOST_GET_BACKEND_FEATURES:
+>                 features =3D VHOST_VDPA_BACKEND_FEATURES;
+> +               if (vhost_vdpa_can_suspend(v))
+> +                       features |=3D BIT_ULL(VHOST_BACKEND_F_SUSPEND);
+>                 if (copy_to_user(featurep, &features, sizeof(features)))
+>                         r =3D -EFAULT;
+>                 break;
+> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_=
+types.h
+> index 634cee485abb..1bdd6e363f4c 100644
+> --- a/include/uapi/linux/vhost_types.h
+> +++ b/include/uapi/linux/vhost_types.h
+> @@ -161,5 +161,7 @@ struct vhost_vdpa_iova_range {
+>   * message
+>   */
+>  #define VHOST_BACKEND_F_IOTLB_ASID  0x3
+> +/* Device can be suspended */
+> +#define VHOST_BACKEND_F_SUSPEND  0x4
+>
+>  #endif
 > --
 > 2.31.1
 >
