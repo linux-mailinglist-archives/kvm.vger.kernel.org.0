@@ -2,224 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D0165600E7
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 15:10:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 356FE5601A2
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 15:45:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233698AbiF2NHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 09:07:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39098 "EHLO
+        id S232787AbiF2No7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 09:44:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233693AbiF2NHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 09:07:09 -0400
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874C62B1AB;
-        Wed, 29 Jun 2022 06:07:05 -0700 (PDT)
-Received: from xenbits.xenproject.org ([104.239.192.120])
-        by mail.xenproject.org with esmtp (Exim 4.92)
-        (envelope-from <pdurrant@amazon.com>)
-        id 1o6XOw-00033l-V4; Wed, 29 Jun 2022 13:06:38 +0000
-Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=debian.cbg12.amazon.com)
-        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <pdurrant@amazon.com>)
-        id 1o6XOw-0003LW-Ia; Wed, 29 Jun 2022 13:06:38 +0000
-From:   Paul Durrant <pdurrant@amazon.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v5] KVM: x86/xen: Update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
-Date:   Wed, 29 Jun 2022 14:05:13 +0100
-Message-Id: <20220629130514.15780-1-pdurrant@amazon.com>
-X-Mailer: git-send-email 2.20.1
+        with ESMTP id S232507AbiF2No5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 09:44:57 -0400
+Received: from www2055.sakura.ne.jp (www2055.sakura.ne.jp [59.106.171.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E63B12A94;
+        Wed, 29 Jun 2022 06:44:56 -0700 (PDT)
+Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
+        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD6s1066631;
+        Wed, 29 Jun 2022 22:13:07 +0900 (JST)
+        (envelope-from 1955@kkden.co.jp)
+Received: from www2055.sakura.ne.jp (59.106.171.65)
+ by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
+ Wed, 29 Jun 2022 22:13:06 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
+Received: from www2055.sakura.ne.jp (localhost [127.0.0.1])
+        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD5Nj066609;
+        Wed, 29 Jun 2022 22:13:06 +0900 (JST)
+        (envelope-from 1955@kkden.co.jp)
+Received: (from kkden@localhost)
+        by www2055.sakura.ne.jp (8.15.2/8.15.2/Submit) id 25TDD5BD066608;
+        Wed, 29 Jun 2022 22:13:05 +0900 (JST)
+        (envelope-from 1955@kkden.co.jp)
+Message-Id: <202206291313.25TDD5BD066608@www2055.sakura.ne.jp>
+X-Authentication-Warning: www2055.sakura.ne.jp: kkden set sender to 1955@kkden.co.jp using -f
+Subject: THIS IS VERY CONFIDENTIAL
+From:   Steve Dibenedetto <1955@kkden.co.jp>
+To:     stevedibenedetto177@gmail.com
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_ADSP_ALL,
-        RCVD_IN_DNSWL_MED,SPF_FAIL,SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Date:   Wed, 29 Jun 2022 22:13:05 +0900
+Content-Type: text/plain; charset="ISO-2022-JP"
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_50,SPF_HELO_NONE,
+        SPF_NONE,SUBJ_ALL_CAPS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The scaling information in subleaf 1 should match the values set by KVM in
-the 'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info)
-which is shared with the guest, but is not directly available to the VMM.
-The offset values are not set since a TSC offset is already applied.
-The TSC frequency should also be set in sub-leaf 2.
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: David Woodhouse <dwmw2@infradead.org>
+Hello,
 
-v5:
- - Drop the caching of the CPUID entry pointers and only update the
-   sub-leaves if the CPU frequency has actually changed
+My name is Steve Dibenedetto.
+I apologize to have contacted you this way without a direct relationship. There is an opportunity to collaborate with me in the sourcing of some materials needed by our company for production of the different medicines we are researching.
 
-v4:
- - Update commit comment
+I'm aware that this might be totally outside your professional specialization, but it will be a great source for generating extra revenue. I  discovered a manufacturer who can supply us at a lower rate than our company's previous purchases.
+I will give you more specific details when/if I receive feedback from you showing interest.
 
-v3:
- - Add leaf limit check in kvm_xen_set_cpuid()
-
-v2:
- - Make sure sub-leaf pointers are NULLed if the time leaf is removed
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/cpuid.c            |  2 ++
- arch/x86/kvm/x86.c              |  1 +
- arch/x86/kvm/xen.c              | 51 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/xen.h              | 10 +++++++
- 5 files changed, 65 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 88a3026ee163..abb0a39f60eb 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -638,6 +638,7 @@ struct kvm_vcpu_xen {
- 	struct hrtimer timer;
- 	int poll_evtchn;
- 	struct timer_list poll_timer;
-+	u32 cpuid_tsc_info;
- };
- 
- struct kvm_vcpu_arch {
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index d47222ab8e6e..544d0f823ee5 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -25,6 +25,7 @@
- #include "mmu.h"
- #include "trace.h"
- #include "pmu.h"
-+#include "xen.h"
- 
- /*
-  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
-@@ -310,6 +311,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
- 
- 	kvm_hv_set_cpuid(vcpu);
-+	kvm_xen_after_set_cpuid(vcpu);
- 
- 	/* Invoke the vendor callback only after the above state is updated. */
- 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 031678eff28e..29ed665c51db 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3110,6 +3110,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 				   &vcpu->hv_clock.tsc_shift,
- 				   &vcpu->hv_clock.tsc_to_system_mul);
- 		vcpu->hw_tsc_khz = tgt_tsc_khz;
-+		kvm_xen_setup_tsc_info(v);
- 	}
- 
- 	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 610beba35907..c84424d5c8b6 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -10,6 +10,9 @@
- #include "xen.h"
- #include "hyperv.h"
- #include "lapic.h"
-+#include "cpuid.h"
-+
-+#include <asm/xen/cpuid.h>
- 
- #include <linux/eventfd.h>
- #include <linux/kvm_host.h>
-@@ -1855,3 +1858,51 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
- 	if (kvm->arch.xen_hvm_config.msr)
- 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
- }
-+
-+void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	u32 base = 0;
-+	u32 limit;
-+	u32 function;
-+
-+	vcpu->arch.xen.cpuid_tsc_info = 0;
-+
-+	for_each_possible_hypervisor_cpuid_base(function) {
-+		struct kvm_cpuid_entry2 *entry = kvm_find_cpuid_entry(vcpu, function, 0);
-+
-+		if (entry &&
-+		    entry->ebx == XEN_CPUID_SIGNATURE_EBX &&
-+		    entry->ecx == XEN_CPUID_SIGNATURE_ECX &&
-+		    entry->edx == XEN_CPUID_SIGNATURE_EDX) {
-+			base = function;
-+			limit = entry->eax;
-+			break;
-+		}
-+	}
-+	if (!base)
-+		return;
-+
-+	function = base | XEN_CPUID_LEAF(3);
-+	if (function > limit)
-+		return;
-+
-+	vcpu->arch.xen.cpuid_tsc_info = function;
-+}
-+
-+void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+
-+	if (!vcpu->arch.xen.cpuid_tsc_info)
-+		return;
-+
-+	entry = kvm_find_cpuid_entry(vcpu, vcpu->arch.xen.cpuid_tsc_info, 1);
-+	if (entry) {
-+		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
-+		entry->edx = vcpu->arch.hv_clock.tsc_shift;
-+	}
-+
-+	entry = kvm_find_cpuid_entry(vcpu, vcpu->arch.xen.cpuid_tsc_info, 2);
-+	if (entry)
-+		entry->eax = vcpu->arch.hw_tsc_khz;
-+}
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 532a535a9e99..b2ca434431d6 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -32,6 +32,8 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
- int kvm_xen_setup_evtchn(struct kvm *kvm,
- 			 struct kvm_kernel_irq_routing_entry *e,
- 			 const struct kvm_irq_routing_entry *ue);
-+void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu);
-+void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu);
- 
- static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
- {
-@@ -135,6 +137,14 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
- {
- 	return false;
- }
-+
-+static inline void kvm_xen_after_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+static inline void kvm_xen_setup_tsc_info(struct kvm_vcpu *vcpu)
-+{
-+}
- #endif
- 
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
--- 
-2.20.1
-
+Warm Regards  
+Steve Dibenedetto
+Production & Control Manager,
+Green Field Laboratories
+Gothic House, Barker Gate,
+Nottingham, NG1 1JU,
+United Kingdom.
