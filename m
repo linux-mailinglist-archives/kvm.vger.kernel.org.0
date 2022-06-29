@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DB9455FD36
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 12:33:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2DA755FD41
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 12:33:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233330AbiF2K35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 06:29:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
+        id S233354AbiF2KaQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 06:30:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbiF2K34 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 06:29:56 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14492621;
-        Wed, 29 Jun 2022 03:29:55 -0700 (PDT)
+        with ESMTP id S232565AbiF2KaP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 06:30:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C47B3DDD5;
+        Wed, 29 Jun 2022 03:30:14 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 74AADB8227D;
-        Wed, 29 Jun 2022 10:29:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E71AC34114;
-        Wed, 29 Jun 2022 10:29:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A4A1E60ED3;
+        Wed, 29 Jun 2022 10:30:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DCD3C34114;
+        Wed, 29 Jun 2022 10:30:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656498593;
-        bh=6t4Qww5gQL2dPbX3lWrf1eT1qNVh0NYZw5CcQii/4dM=;
+        s=k20201202; t=1656498613;
+        bh=f+r5AD87A2KzRDAwsZTkOVMjV07LTP4CTwRCJZQva5s=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=nvDqmPQ6eBKyTUKtozYUlsMzXrump4i5EVvFFIkTkP4/jSoJzd2ro8PLYBFW362Mj
-         09dLnzVJ1RBJIqoRvakCpzH7jvr2a3OYquFglJCocMOwPRxfXkZIO4Jj7d4RAWO1vY
-         LDKGc4+cPyW1yZ159pyhUr3Gxa+30RByCwS+FI8+9+n+xUuM1z5uAQ2eAJqgPaXuFM
-         uyQ175SDqmHxSNcDppdDbIFGv20UX1/gQbmiLW0m4f92bY0OOCprHBsNzQgLjQg3+x
-         LoqmwaPmDGkJLxdhgkeXsgvBwGSJJeJLo+yQupwk03grJMn5nSqh302TLrLAqd/ihr
-         UfpW+K4y5g1pw==
+        b=YsUnTHzkvp2/drvVhLka9zIWtKrSY9ZgFAcl4J1yb9YwfwFx2FV07LjpSKR2rhSEt
+         v8sXw9gJoFZjONHN+tjOulSyKtKPlQ8sx6lF1YvDxSIHw/72YaVvYkbU40fY8Whzjq
+         ZdV1l5iaOtb+7RdSzLnuX1PzYckmPmz97AT5RPyPArEJnK1oPtXKr4mo9EBJhx6KCC
+         Ve6nnbmTpJ+27B79sMo71q6tmgCRvdz1G+TYFhw5OkMWmNt6EYv6JkjlYaAIDv0u0T
+         RD4XUvxWgV8WhokhE2P6WgdNnISAGlkAFHp7AuKG7JWIC3dJz+Gis0QnIK9OFltolk
+         U/ajRDsfjVZ3g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1o6UxC-0042RV-W7;
-        Wed, 29 Jun 2022 11:29:51 +0100
-Date:   Wed, 29 Jun 2022 11:29:50 +0100
-Message-ID: <8735fn3gpt.wl-maz@kernel.org>
+        id 1o6UxX-0042Se-3o;
+        Wed, 29 Jun 2022 11:30:11 +0100
+Date:   Wed, 29 Jun 2022 11:30:10 +0100
+Message-ID: <871qv73gp9.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Yosry Ahmed <yosryahmed@google.com>
 Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
@@ -61,10 +61,10 @@ Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
         linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-mm@kvack.org
-Subject: Re: [PATCH v6 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary page table uses.
-In-Reply-To: <20220628220938.3657876-2-yosryahmed@google.com>
+Subject: Re: [PATCH v6 2/4] KVM: mmu: add a helper to account memory used by KVM MMU.
+In-Reply-To: <20220628220938.3657876-3-yosryahmed@google.com>
 References: <20220628220938.3657876-1-yosryahmed@google.com>
-        <20220628220938.3657876-2-yosryahmed@google.com>
+        <20220628220938.3657876-3-yosryahmed@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -84,49 +84,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 Jun 2022 23:09:35 +0100,
+On Tue, 28 Jun 2022 23:09:36 +0100,
 Yosry Ahmed <yosryahmed@google.com> wrote:
 > 
-> We keep track of several kernel memory stats (total kernel memory, page
-> tables, stack, vmalloc, etc) on multiple levels (global, per-node,
-> per-memcg, etc). These stats give insights to users to how much memory
-> is used by the kernel and for what purposes.
-> 
-> Currently, memory used by kvm mmu is not accounted in any of those
-> kernel memory stats. This patch series accounts the memory pages
-> used by KVM for page tables in those stats in a new
-> NR_SECONDARY_PAGETABLE stat. This stat can be later extended to account
-> for other types of secondary pages tables (e.g. iommu page tables).
-> 
-> KVM has a decent number of large allocations that aren't for page
-> tables, but for most of them, the number/size of those allocations
-> scales linearly with either the number of vCPUs or the amount of memory
-> assigned to the VM. KVM's secondary page table allocations do not scale
-> linearly, especially when nested virtualization is in use.
-> 
-> From a KVM perspective, NR_SECONDARY_PAGETABLE will scale with KVM's
-> per-VM pages_{4k,2m,1g} stats unless the guest is doing something
-> bizarre (e.g. accessing only 4kb chunks of 2mb pages so that KVM is
-> forced to allocate a large number of page tables even though the guest
-> isn't accessing that much memory). However, someone would need to either
-> understand how KVM works to make that connection, or know (or be told) to
-> go look at KVM's stats if they're running VMs to better decipher the stats.
-> 
-> Furthermore, having NR_PAGETABLE side-by-side with NR_SECONDARY_PAGETABLE
-> is informative. For example, when backing a VM with THP vs. HugeTLB,
-> NR_SECONDARY_PAGETABLE is roughly the same, but NR_PAGETABLE is an order
-> of magnitude higher with THP. So having this stat will at the very least
-> prove to be useful for understanding tradeoffs between VM backing types,
-> and likely even steer folks towards potential optimizations.
-> 
-> The original discussion with more details about the rationale:
-> https://lore.kernel.org/all/87ilqoi77b.wl-maz@kernel.org
-> 
-> This stat will be used by subsequent patches to count KVM mmu
-> memory usage.
+> Add a helper to account pages used by KVM for page tables in memory
+> secondary pagetable stats. This function will be used by subsequent
+> patches in different archs.
 > 
 > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> Acked-by: Shakeel Butt <shakeelb@google.com>
 
 Acked-by: Marc Zyngier <maz@kernel.org>
 
