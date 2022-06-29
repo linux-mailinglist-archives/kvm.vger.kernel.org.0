@@ -2,233 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DF71560461
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 17:21:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BA4D5604DF
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 17:47:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232813AbiF2PVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 11:21:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60848 "EHLO
+        id S233964AbiF2Prh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 11:47:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230213AbiF2PVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 11:21:09 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FFEE2C660
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 08:21:08 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25TF75Rf022167;
-        Wed, 29 Jun 2022 15:20:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=siSid0w+D2HhHGFKVu7TmM1pnBnE7dewK4Af9O9NPwU=;
- b=F3KTvwyKPhmf1hqtigftxuES5p81gYMfgYnNtn9lzl1yhxvTGXIeVuYNkKCyny+JvXPu
- ZBeKx7A0Y4Fz/QpnZzZNDhBjtKYWlOH9iSbUufxFFSlafsmPGbDH2rncoVa131YAJFsO
- r4HFurdYJT2CCYkytG5K6adHDNs8xqq9Y5LwHZenXCsSovGC0JxPxOIE/PiFvpmblYIZ
- zMCakSeEqW74mBFcdJtqAPj8P9lx/o/XX0lhoPnj0fOUuWKnocLa4PZRkTHpFHim3/zx
- O0yXqbFK2s6S9OsEIcwHBntTfNh3hGSzgGxxB9MZ4BmcscUvDff7EuClgNHT4rxXg0/Y xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h0r25agn4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jun 2022 15:20:58 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25TFA8eg012350;
-        Wed, 29 Jun 2022 15:20:58 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h0r25agkr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jun 2022 15:20:58 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25TF5EfT013000;
-        Wed, 29 Jun 2022 15:20:55 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3gwsmj6s2k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jun 2022 15:20:55 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25TFKqkM19399144
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 Jun 2022 15:20:52 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC4134C044;
-        Wed, 29 Jun 2022 15:20:51 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E1514C040;
-        Wed, 29 Jun 2022 15:20:51 +0000 (GMT)
-Received: from [9.152.222.245] (unknown [9.152.222.245])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 29 Jun 2022 15:20:51 +0000 (GMT)
-Message-ID: <72aba814-2901-7d06-131d-8c1f660e3830@linux.ibm.com>
-Date:   Wed, 29 Jun 2022 17:25:19 +0200
+        with ESMTP id S232098AbiF2Prf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 11:47:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1362226560
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 08:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656517654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=U8Ds3TbgTN/BrvT8Bwf0Lryi8VbFB5ioWWlf5jjfYQo=;
+        b=D8c8PakH6L0C4svJ1dKfkTLCpxDoimpziNrXoY5P/0+TpdArUkUT8Q2VW3nepErlQfSuQP
+        eorQRih/AMrwUr8yDjNycqLxamzQqS/ZfNmu8pRYFmFZ/yWUfSjt3n4cnBbUwQVp67SvNr
+        zO3463NmHnTmHv6NBr1rBa+EEc/LQTg=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-145-fkDbHEaJN_OKb2UAs19TZQ-1; Wed, 29 Jun 2022 11:47:33 -0400
+X-MC-Unique: fkDbHEaJN_OKb2UAs19TZQ-1
+Received: by mail-il1-f197.google.com with SMTP id o17-20020a056e02115100b002d95d6881e4so9126442ill.19
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 08:47:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=U8Ds3TbgTN/BrvT8Bwf0Lryi8VbFB5ioWWlf5jjfYQo=;
+        b=hiL1mtZDpFCLBOa9C1mqTSqpW1uOVjuP7n3qR/8tGJoPaJ+Lmb9waytO0Qjg+U/PJV
+         MucB4bWsL3d2aWNH4d/bAez3uyLxN0xkvYBIWOVfieI0ylEfATnf3tds5VMGI4Ddx3Nb
+         eO2XqyIB4Vmg+CzAHcg4+EB8Bsbr7kuGwbo4IMCgob+zKkJNlj7VmRRdbTKLp6Og3S2J
+         nbwmRD6fFSqnaB0wpuf2/GUwVM9KK7VP18Es9W6L5OKk/VOLcjvNTDuhFjSNKtoJRoI0
+         OZ/IhWnj+XJSqXmEVd7T4+Zjf3DN2nDgh4ra83THnrIBkir7KBBm1ulTlNm5IxsDAq/t
+         KAYA==
+X-Gm-Message-State: AJIora/FuITuxGURYMQypCjyV6RBSNrHaPfQw3GVITH6axKK5QPDfuwJ
+        w28bBHlFVLM88BHEZcffcMHgX2I63kzsJ+3C33j+rSvFJjRQf3tlMhBSnBzPFPwEDQ+NBgG9HdZ
+        xX6I3uZz+nYas
+X-Received: by 2002:a05:6602:2cce:b0:675:544e:da0b with SMTP id j14-20020a0566022cce00b00675544eda0bmr1865132iow.123.1656517652115;
+        Wed, 29 Jun 2022 08:47:32 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uu/XLV/wT9doTP58QoaWMZhzxtKJWV9+WuLdJ85w0ChD+SfmtkCnXBya/7EZkV1EBDilbTMQ==
+X-Received: by 2002:a05:6602:2cce:b0:675:544e:da0b with SMTP id j14-20020a0566022cce00b00675544eda0bmr1865111iow.123.1656517651766;
+        Wed, 29 Jun 2022 08:47:31 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id a22-20020a027356000000b00331cfbce17csm7439570jae.100.2022.06.29.08.47.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 08:47:30 -0700 (PDT)
+Date:   Wed, 29 Jun 2022 11:47:29 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Hildenbrand <david@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
+Message-ID: <Yrx0ETyb2kk4fO4M@xz-m1.local>
+References: <20220622213656.81546-1-peterx@redhat.com>
+ <20220622213656.81546-2-peterx@redhat.com>
+ <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
+ <YrtXGf20oa5eYgIU@xz-m1.local>
+ <16c181d3-09ef-ace4-c910-0a13fc245e48@nvidia.com>
+ <YruBzuJf9s/Nmr6W@xz-m1.local>
+ <177284f9-416d-c142-a826-e9a497751fca@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
- structures
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220620140352.39398-1-pmorel@linux.ibm.com>
- <20220620140352.39398-3-pmorel@linux.ibm.com>
- <35c562e1-cdcd-41ce-1957-bd35c72a78ca@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <35c562e1-cdcd-41ce-1957-bd35c72a78ca@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: U0693rXTSa57Mu3TYCuvbBekoYNBeEk3
-X-Proofpoint-ORIG-GUID: JxqLcdWWCBpbVvJ6zll-7_zY8LWJaWG3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-29_17,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 clxscore=1015 bulkscore=0
- lowpriorityscore=0 phishscore=0 impostorscore=0 mlxscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206290055
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <177284f9-416d-c142-a826-e9a497751fca@nvidia.com>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jun 28, 2022 at 05:31:43PM -0700, John Hubbard wrote:
+> On 6/28/22 15:33, Peter Xu wrote:
+> > > The key point is the connection between "locked" and killable. If the comment
+> > > explained why "locked" means "killable", that would help clear this up. The
+> > > NOWAIT sentence is also confusing to me, and adding "mostly NOWAIT" does not
+> > > clear it up either... :)
+> > 
+> > Sorry to have a comment that makes it feels confusing.  I tried to
+> > explicitly put the comment to be after setting FAULT_FLAG_KILLABLE but
+> > obviously I didn't do my job well..
+> > 
+> > Maybe that NOWAIT thing adds more complexity but not even necessary.
+> > 
+> > Would below one more acceptable?
+> > 
+> > 		/*
+> > 		 * We'll only be able to respond to signals when "locked !=
+> > 		 * NULL".  When with it, we'll always respond to SIGKILL
+> > 		 * (as implied by FAULT_FLAG_KILLABLE above), and we'll
+> > 		 * respond to non-fatal signals only if the GUP user has
+> > 		 * specified FOLL_INTERRUPTIBLE.
+> > 		 */
+> 
+> 
+> It looks like part of this comment is trying to document a pre-existing
+> concept, which is that faultin_page() only ever sets FAULT_FLAG_KILLABLE
+> if locked != NULL.
 
+I'd say that's not what I wanted to comment.. I wanted to express that
+INTERRUPTIBLE should rely on KILLABLE, that's also why I put the comment to
+be after KILLABLE, not before.  IMHO it makes sense already to have
+"interruptible" only if "killable", no matter what's the pre-requisite for
+KILLABLE (in this case it's having "locked" being non-null).
 
-On 6/27/22 15:31, Janosch Frank wrote:
-> On 6/20/22 16:03, Pierre Morel wrote:
->> We use new objects to have a dynamic administration of the CPU topology.
->> The highest level object in this implementation is the s390 book and
->> in this first implementation of CPU topology for S390 we have a single
->> book.
->> The book is built as a SYSBUS bridge during the CPU initialization.
->> Other objects, sockets and core will be built after the parsing
->> of the QEMU -smp argument.
->>
->> Every object under this single book will be build dynamically
->> immediately after a CPU has be realized if it is needed.
->> The CPU will fill the sockets once after the other, according to the
->> number of core per socket defined during the smp parsing.
->>
->> Each CPU inside a socket will be represented by a bit in a 64bit
->> unsigned long. Set on plug and clear on unplug of a CPU.
->>
->> For the S390 CPU topology, thread and cores are merged into
->> topology cores and the number of topology cores is the multiplication
->> of cores by the numbers of threads.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> 
-> [...]
-> 
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 7d6d01325b..216adfde26 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -565,6 +565,53 @@ typedef union SysIB {
->>   } SysIB;
->>   QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
->> +/* CPU type Topology List Entry */
->> +typedef struct SysIBTl_cpu {
->> +        uint8_t nl;
->> +        uint8_t reserved0[3];
->> +        uint8_t reserved1:5;
->> +        uint8_t dedicated:1;
->> +        uint8_t polarity:2;
->> +        uint8_t type;
->> +        uint16_t origin;
->> +        uint64_t mask;
->> +} SysIBTl_cpu;
->> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
->> +
->> +/* Container type Topology List Entry */
->> +typedef struct SysIBTl_container {
->> +        uint8_t nl;
->> +        uint8_t reserved[6];
->> +        uint8_t id;
->> +} QEMU_PACKED SysIBTl_container;
->> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
->> +
->> +/* Generic Topology List Entry */
->> +typedef union SysIBTl_entry {
->> +        uint8_t nl;
-> 
-> This union member is unused, isn't it?
-> 
->> +        SysIBTl_container container;
->> +        SysIBTl_cpu cpu;
->> +} SysIBTl_entry;
->> +
->> +#define TOPOLOGY_NR_MAG  6
-> 
-> TOPOLOGY_TOTAL_NR_MAGS ?
-> 
->> +#define TOPOLOGY_NR_MAG6 0
-> 
-> TOPOLOGY_NR_TLES_MAG6 ?
-> 
-> I'm open to other suggestions but we need to differentiate between the 
-> number of mag array entries and the number of TLEs in the MAGs.
+> The problem I am (personally) having is that I don't yet understand why
+> or how those are connected: what is it about having locked non-NULL that
+> means the process is killable? (Can you explain why that is?)
 
+Firstly RETRY_KILLABLE relies on ALLOW_RETRY, because if we don't allow
+retry at all it means we'll never wait in handle_mm_fault() anyway, then no
+need to worry on being interrupted by any kind of signal (fatal or not).
 
-typedef enum {
-         TOPOLOGY_MAG6 = 0,
-         TOPOLOGY_MAG5 = 1,
-         TOPOLOGY_MAG4 = 2,
-         TOPOLOGY_MAG3 = 3,
-         TOPOLOGY_MAG2 = 4,
-         TOPOLOGY_MAG1 = 5,
-         TOPOLOGY_TOTAL_MAGS = 6,
-};
+Then if we allow retry, we need some way to know "whether mmap_sem is
+released or not" during the process for the caller (because the caller
+cannot see VM_FAULT_RETRY).  That's why we added "locked" parameter, so
+that we can set *locked=false to tell the caller we have released mmap_sem.
 
+I think that's why we have "locked" defined as "we allow this page fault
+request to retry and wait, during wait we can always allow fatal signals".
+I think that's defined throughout the gup call interfaces too, and
+faultin_page() is the last step to talk to handle_mm_fault().
 
-oder enum with TOPOLOGY_NR_TLES_MAGx ?
+To make this whole picture complete, NOWAIT is another thing that relies on
+ALLOW_RETRY but just to tell "oh please never release the mmap_sem at all".
+For example, when we want to make sure no vma will be released after
+faultin_page() returned.
 
 > 
->> +#define TOPOLOGY_NR_MAG5 1
->> +#define TOPOLOGY_NR_MAG4 2
->> +#define TOPOLOGY_NR_MAG3 3
->> +#define TOPOLOGY_NR_MAG2 4
->> +#define TOPOLOGY_NR_MAG1 5
-> 
-> I'd appreciate a \n here.
+> If that were clear, I think I could suggest a good comment wording.
 
-OK
+IMHO it's a little bit weird to explain "locked" here, especially after
+KILLABLE is set, that's why I didn't try to mention "locked" in my 2nd
+attempt.  There are some comments for "locked" above the definition of
+faultin_page(), I think that'll be a nicer place to enrich explanations for
+"locked", and it seems even more suitable as a separate patch?
 
-> 
->> +/* Configuration topology */
->> +typedef struct SysIB_151x {
->> +    uint8_t  res0[2];
-> 
-> You're using "reserved" everywhere but now it's "rev"?
-
-OK I will keep reserved
-
-> 
->> +    uint16_t length;
->> +    uint8_t  mag[TOPOLOGY_NR_MAG];
->> +    uint8_t  res1;
->> +    uint8_t  mnest;
->> +    uint32_t res2;
->> +    SysIBTl_entry tle[0];
->> +} SysIB_151x;
->> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
->> +
->>   /* MMU defines */
->>   #define ASCE_ORIGIN           (~0xfffULL) /* segment table 
->> origin             */
->>   #define ASCE_SUBSPACE         0x200       /* subspace group 
->> control           */
-> 
-> 
+Thanks,
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Peter Xu
+
