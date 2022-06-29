@@ -2,100 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36D895605E6
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 18:32:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEF3A5607DA
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 19:54:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231480AbiF2Qb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 12:31:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43656 "EHLO
+        id S231447AbiF2Ryu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 13:54:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229833AbiF2QbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 12:31:25 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B9113467D
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 09:31:24 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-101ab23ff3fso22200629fac.1
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 09:31:24 -0700 (PDT)
+        with ESMTP id S230170AbiF2Ryt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 13:54:49 -0400
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D412180E
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 10:54:48 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id z16so7762820qkj.7
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 10:54:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=q7thwy75XNsSCRPOWOozhMPbtUuFfDHqmCqTx7JYJDo=;
-        b=XM+oHc1X7p1kNP/j9n6X2RjMFNVAgMi7Hl3RaZl7JOddM8RA2JxXBhUSZiA4OiquM5
-         M2KlQCVxrnDLkjeugS1ikqmgd1pl7G/IAQ723Zy6R4AGzaaAOBmDeuUqHSrV304NOr1F
-         UhiO7+/m+8LzUKmraoQGoHjHrforgc5lurae2h31n1RvtunY6unl53g73xAMbl0NcI5g
-         n9i5oGNpcF7GD5Ry3X+iU4rW1icOI4AwoqslgQEh4YRMsH5ICJoqOWAiAhgO+QUPEAcV
-         NgfLHgA2OS7hcHgz7U24ipW4WFjxYUC2+cds0E3mZHrOJjNOCPmI4ONJ1JnvA/Uvhzq/
-         22Tg==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1fsl8to06dogIPqUQjmSvbiVa6q0GzvolownxJAZN2o=;
+        b=jmFVNkgq0O81qfLOajkc6SLpytRvNa3u/VcTc09RKl+SDNfWua4GjSHs5vRkwJQPps
+         EtfEqGSzxQ1iGfThunfK1OHQu+iP+4vD+sTQBecS1fM6IXFQZRE43q8kk5/puKiCgSn9
+         wA5ES2MLczklmjIYC/LaM8+piOb33PKGUQ1GkfRI0Hwav1pC7EFr45grNIRiane9T/UM
+         5HwIj6ks3hoFw/sU0v7VuIJsq9s7ODXli3cWoHVnjP1hGkvWX1ZpBlmkfpiMLeZKxuHc
+         PFIPjc51fUIe9IJ5atTBsELiYbQdPh56dy8GjXz0k1Izasu8A0wBwcmdCQunv9hT2mtg
+         Ckwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=q7thwy75XNsSCRPOWOozhMPbtUuFfDHqmCqTx7JYJDo=;
-        b=1BKqClmYEp9Ses6cduaiHD+XPEzZAgFUSBlI/Z6Gs2O8ke2rEl+8sW5vILjFhveFqW
-         gjatYSCjQ2xYCnFcSq1Nyete1zu5Nxuweb6vtd90P+bPSAjGk5qYpDhPZkbn6u0GWzmM
-         Isnx3z1jJQBpC5hKn0URE+bXYPStgtGBWC/Kd8yE1x4glU4FZrVfOrPO9pCmJtwGPygM
-         uiT2ylyi00wNCcl8IVN1xNrDQBOKoD98zrH3Sqm4PWMgZlUMpbNVN2krP6Oqslflj7Fc
-         2zm4nednuSgPDJyKGVWqtRytwPBWWDTe+GEa5jEI3RaZnrNUjFOGMwSEB+oRZDyf350u
-         EAeQ==
-X-Gm-Message-State: AJIora9gI9mHrG6cxOT71fTEs66KJEb1ET4G1aqMIRTEgGTo8tYXqQb2
-        Zr6yFAQKlWEmN1PGYdMR7dKWblEym+5fm3bQTZcUnQ==
-X-Google-Smtp-Source: AGRyM1u9TD9lOx2AIm1cqMUMRT2gwTyLTDprchu9bU7eiWqc2WXJ4sjR9kPK2AzybmpZbNtc5ympPlJJjJNqTtuNnkw=
-X-Received: by 2002:a05:6870:c596:b0:101:6409:ae62 with SMTP id
- ba22-20020a056870c59600b001016409ae62mr3543919oab.112.1656520283337; Wed, 29
- Jun 2022 09:31:23 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1fsl8to06dogIPqUQjmSvbiVa6q0GzvolownxJAZN2o=;
+        b=XEskpYeBKmB+4yVttGSCYxZWfj0LB5tqS9220gL0BNBege3tSmyzIiqWqEinNeOg9h
+         mqzyJu5Q7r89tXXUPSWqiNwOlb0J/CmF4ukjNtKc+gKqPiy5bO/qb4NI+wCTCGc2+pb7
+         ID5BZlTmFoE5CLqoWnt1IzcghCYrl4AkTNZnRhhn+fRwlztC6NeXy76TRhFq5b6cnOK0
+         Vop5TA711L9vHvIF8MNrb70tVC3lvYHffzb8aLTSjEpBKRlHh9AFZPotkQj9zBSIfFby
+         RP9SP2AA0d1NRK+5JElAjkGI4dRm/TE3RgRoyWy9AbYqLamzKeTvWvRza7Rg01aCwkDk
+         YvNw==
+X-Gm-Message-State: AJIora9le42TeYO1Yn1+F2/vTUfWK90DpKtyzZ8GJ1VB0I6ARpRaO/bH
+        RK8LqR6uY3N4D7oSRujUhnqO5tRDGWEt/Q==
+X-Google-Smtp-Source: AGRyM1s3giy4qA8reYkPdnnUv03x6Kvxir+MsCRluYDAZYS7sfECqklFOO+ac87j7/NQTnAgVwjSkQ==
+X-Received: by 2002:a05:620a:4451:b0:6ae:fd29:149d with SMTP id w17-20020a05620a445100b006aefd29149dmr3115223qkp.724.1656525287652;
+        Wed, 29 Jun 2022 10:54:47 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id u16-20020a05620a431000b006a7284e5741sm13625849qko.54.2022.06.29.10.54.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 10:54:47 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1o6btm-003b76-By; Wed, 29 Jun 2022 14:54:46 -0300
+Date:   Wed, 29 Jun 2022 14:54:46 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Liam Ni <zhiguangni01@gmail.com>
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio: check iommu_group_set_name() return value
+Message-ID: <20220629175446.GT23621@ziepe.ca>
+References: <20220625114239.9301-1-zhiguangni01@gmail.com>
 MIME-Version: 1.0
-References: <20220621150902.46126-1-mlevitsk@redhat.com> <20220621150902.46126-12-mlevitsk@redhat.com>
-In-Reply-To: <20220621150902.46126-12-mlevitsk@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 29 Jun 2022 09:31:12 -0700
-Message-ID: <CALMp9eSe5jtvmOPWLYCcrMmqyVBeBkg90RwtR4bwxay99NAF3g@mail.gmail.com>
-Subject: Re: [PATCH v2 11/11] KVM: x86: emulator/smm: preserve interrupt
- shadow in SMRAM
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        x86@kernel.org, Kees Cook <keescook@chromium.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220625114239.9301-1-zhiguangni01@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 21, 2022 at 8:09 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> When #SMI is asserted, the CPU can be in interrupt shadow
-> due to sti or mov ss.
->
-> It is not mandatory in  Intel/AMD prm to have the #SMI
-> blocked during the shadow, and on top of
-> that, since neither SVM nor VMX has true support for SMI
-> window, waiting for one instruction would mean single stepping
-> the guest.
->
-> Instead, allow #SMI in this case, but both reset the interrupt
-> window and stash its value in SMRAM to restore it on exit
-> from SMM.
->
-> This fixes rare failures seen mostly on windows guests on VMX,
-> when #SMI falls on the sti instruction which mainfest in
-> VM entry failure due to EFLAGS.IF not being set, but STI interrupt
-> window still being set in the VMCS.
+On Sat, Jun 25, 2022 at 07:42:39PM +0800, Liam Ni wrote:
+> As iommu_group_set_name() can fail,we should check the return value.
+> 
+> Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
+> ---
+>  drivers/vfio/vfio.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-I think you're just making stuff up! See Note #5 at
-https://sandpile.org/x86/inter.htm.
+I prefer this - but notice it is not a bug because if
+iommu_group_set_name() fails then iommu_group_add_device() will return
+-ENOMEM.
 
-Can you reference the vendors' documentation that supports this change?
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason
