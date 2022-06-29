@@ -2,137 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D049655FCB4
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 11:59:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58ABF55FCEA
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 12:15:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233120AbiF2J7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 05:59:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44948 "EHLO
+        id S232959AbiF2KOC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 06:14:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233027AbiF2J7D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 05:59:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEF13BA7B
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 02:59:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DA91161EAF
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 09:59:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38CF9C34114;
-        Wed, 29 Jun 2022 09:59:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656496741;
-        bh=nY7o6DVvZ1bAaRA8HXKQAmY4gSEE88K0s1E72bjMaY8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fGNtKI9mPFmXhyYZUIreeQ/5jujAqtlde9QCb2FMmrH3bt/rvRPATrbgXa5zVSQYw
-         w+gug1eogD7fa+n9Yt2Bu/Ip+QZgtxX/oFiN0XYQ89iHKUx4iNJC3mIwqZ9tbl5ahn
-         u5Qr1nC4tMPaWWKiI+yjO2u4isWrVzwbIYCDWmzNelnkpKkiGgtKj9JyMNvo2GwFsP
-         b7ho/q+kA3NIGXPjnp/xIfjmHzBFfnPejjUOK62fwbsPB+fBSgfBIm0xbo0p7et7Ce
-         ioncavBYUf1V/j4Zq/bE2tfvuSKKe37Eu1DnP/oo/5Uu75RQhwUFqGRUhaJCE1cQem
-         6L7c0624/NS+w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1o6UTL-0041zc-1W;
-        Wed, 29 Jun 2022 10:58:59 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
-Cc:     Fuad Tabba <tabba@google.com>, Reiji Watanabe <reijiw@google.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com,
-        James Morse <james.morse@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v2 00/19] KVM/arm64: Refactoring the vcpu flags
-Date:   Wed, 29 Jun 2022 10:58:56 +0100
-Message-Id: <165649672001.296498.9919845207061200295.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220610092838.1205755-1-maz@kernel.org>
-References: <20220610092838.1205755-1-maz@kernel.org>
+        with ESMTP id S230071AbiF2KOB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 06:14:01 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB7027CC8;
+        Wed, 29 Jun 2022 03:14:00 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id r1so13652506plo.10;
+        Wed, 29 Jun 2022 03:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6ssz5ul1QxHBEW/Ftglcn8GTDr/5c5SXlVf5jD8qbcI=;
+        b=ZYguFwcPfSq5u/hXIoSPbB1Ol/IScrgaK3FjTkLwDq0acReFAxkJeMo4JrHaifPiGj
+         Bz3WuHNNoLatTdI71hec5BhL6ZgnvCef1xDf9rTVAVeI6fcDl7cdbt6uAjyl8wudTaVu
+         EmYHL6lL9+Z9oRupRrVQ59IB3HOwY3NpgMymkj06yj9LhCbF0smqNs0XEI9LfCxBdYwJ
+         ycjbCm1MB8/pqVoHouPsn0f1SzBjG6a+PJhnkABM8WQ2JZx7+KU0v3uevO+pNWLYQoN6
+         Q2tZYIDSIjb0uGE1naGei0Wkxz51EDgHeaqJWfnW86eQAnUzfxyufa2G5PDXK+IA7zaC
+         qH7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6ssz5ul1QxHBEW/Ftglcn8GTDr/5c5SXlVf5jD8qbcI=;
+        b=ILtyQoWE2bprn071/hYxDWN2K6lBQI30Y8pMsnljVcWuyxrLvQ9bbuoo8iAyaDG8/z
+         MDeD2QAF7rFHHNrzeP0hpSS+UgDM+rf4trg/TcMFEEJF2btu8pSdOBMNquakgoEWBZcO
+         iLvNse5us4k5IQc4WsqmPsy4FpWAgIdDW/BZ7enA4Z4wlo9ekZ6uvj4hLN2XDH+XZaFX
+         jgPw+ssEl0hBEwoBhwsgS+LKaYGmnnweGcGOieFfmvsvaW2Ia1Px+CHFyESnLQkv9hyB
+         1y7BEteAIvsjKv/6Bz+cB3xbSouP0bRPPnYY4c5GCjBrcIy3NaI/DyVfQG/I69jw4Juu
+         S3+Q==
+X-Gm-Message-State: AJIora9/fb0o05t/yMQHIdrS94UsCwMAlupBoDCDHKoXDQKRx3QPBbmr
+        t1yn/5+NRd93EIDaBUprdv0=
+X-Google-Smtp-Source: AGRyM1uOV3bmitBLA+3fOBVJSOzewdGKIGu4RWQco3/TjeOfMdPvDvjvcLUFquhpOBzcbmUVghMSrQ==
+X-Received: by 2002:a17:903:2cb:b0:14f:4fb6:2fb0 with SMTP id s11-20020a17090302cb00b0014f4fb62fb0mr9698257plk.172.1656497639008;
+        Wed, 29 Jun 2022 03:13:59 -0700 (PDT)
+Received: from localhost (fmdmzpr02-ext.fm.intel.com. [192.55.54.37])
+        by smtp.gmail.com with ESMTPSA id h24-20020a635318000000b0040dffa7e3d7sm5460901pgb.16.2022.06.29.03.13.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 03:13:57 -0700 (PDT)
+Date:   Wed, 29 Jun 2022 03:13:56 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Sagi Shahar <sagis@google.com>
+Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH v6 090/104] KVM: TDX: Handle TDX PV CPUID hypercall
+Message-ID: <20220629101356.GA882746@ls.amr.corp.intel.com>
+References: <cover.1651774250.git.isaku.yamahata@intel.com>
+ <98939c0ec83a109c8f49045e82096d6cdd5dafa3.1651774251.git.isaku.yamahata@intel.com>
+ <CAAhR5DHPk2no0PVFX6P1NnZdwtVccjmdn4RLg4wKSmfpjD6Qkg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org, kvm@vger.kernel.org, tabba@google.com, reijiw@google.com, will@kernel.org, kernel-team@android.com, james.morse@arm.com, broonie@kernel.org, oupton@google.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAAhR5DHPk2no0PVFX6P1NnZdwtVccjmdn4RLg4wKSmfpjD6Qkg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Jun 2022 10:28:19 +0100, Marc Zyngier wrote:
-> This is a iteration on [1], which aims at making the vcpu flags suck a
-> bit less.
+On Tue, Jun 14, 2022 at 11:15:00AM -0700,
+Sagi Shahar <sagis@google.com> wrote:
+
+> On Thu, May 5, 2022 at 11:16 AM <isaku.yamahata@intel.com> wrote:
+> >
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >
+> > Wire up TDX PV CPUID hypercall to the KVM backend function.
+> >
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++++++++
+> >  1 file changed, 22 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index 9c712f661a7c..c7cdfee397ec 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -946,12 +946,34 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
+> >         return 1;
+> >  }
+> >
+> > +static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
+> > +{
+> > +       u32 eax, ebx, ecx, edx;
+> > +
+> > +       /* EAX and ECX for cpuid is stored in R12 and R13. */
+> > +       eax = tdvmcall_a0_read(vcpu);
+> > +       ecx = tdvmcall_a1_read(vcpu);
+> > +
+> > +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
 > 
-> * From v1 [1]:
->   - Rebased onto v5.19-rc1
->   - Took the first two patches into kvmarm-fixes, included here for
->     completeness
->   - Additional patch to move system_supports_fpsimd() outside of
->     the run path (Reiji)
->   - Expanded on comments (Reiji)
->   - New kvm_pend_exception() accessor (Fuad)
->   - Various bracketing fixups (Reiji)
->   - Some renaming (Reiji, Broonie)
->   - Collected RBs, with thanks
+> According to the GHCI spec section 3.6
+> (TDG.VP.VMCALL<Instruction.CPUID>) we should return
+> VMCALL_INVALID_OPERAND if an invalid CPUID is requested.
 > 
-> [...]
+> kvm_cpuid already returns false in this case so we should use that
+> return value to set the tdvmcall return code in case of invalid leaf.
 
-Applied to next, thanks!
+Based on CPUID instruction, cpuid results in #UD when lock prefix is used or
+earlier CPU that doesn't support cpuid instruction.
+So I'm not sure what CPUID input result in INVALID_OPERAND error.
+Does the following make sense for you?
 
-[01/19] KVM: arm64: Always start with clearing SVE flag on load
-        commit: d52d165d67c5aa26c8c89909003c94a66492d23d
-[02/19] KVM: arm64: Always start with clearing SME flag on load
-        commit: 039f49c4cafb785504c678f28664d088e0108d35
-[03/19] KVM: arm64: Drop FP_FOREIGN_STATE from the hypervisor code
-        commit: e9ada6c208c15c907afe5afb1aa82e23e81eb8ba
-[04/19] KVM: arm64: Move FP state ownership from flag to a tristate
-        commit: f8077b0d59230cbb58e0b98839e04b564529a5ac
-[05/19] KVM: arm64: Add helpers to manipulate vcpu flags among a set
-        commit: e87abb73e5946379896cf49b10f6b57e02937a4c
-[06/19] KVM: arm64: Add three sets of flags to the vcpu state
-        commit: 690bacb83bc30d14821bd32cac1c5839b4a9ac6c
-[07/19] KVM: arm64: Move vcpu configuration flags into their own set
-        commit: 4c0680d394d8a77868049931101e4a59372346b5
-[08/19] KVM: arm64: Move vcpu PC/Exception flags to the input flag set
-        commit: 699bb2e0c6f3796549dabac329501df7ffd99439
-[09/19] KVM: arm64: Move vcpu debug/SPE/TRBE flags to the input flag set
-        commit: b1da49088ac68a21c613efd734dada8272ec0b00
-[10/19] KVM: arm64: Move vcpu SVE/SME flags to the state flag set
-        commit: 0affa37fcd1d6f701a0fe805c4ceb7f348d377d5
-[11/19] KVM: arm64: Move vcpu ON_UNSUPPORTED_CPU flag to the state flag set
-        commit: aff3ccd7320eed5814d317fcb80244f474d66a84
-[12/19] KVM: arm64: Move vcpu WFIT flag to the state flag set
-        commit: eebc538d8e07e0ec759823664cbe2011a8bd885d
-[13/19] KVM: arm64: Kill unused vcpu flags field
-        commit: 781e3ae148fd2f9b0cf9b5b94f6c32f2361eb7c0
-[14/19] KVM: arm64: Convert vcpu sysregs_loaded_on_cpu to a state flag
-        commit: 30b6ab45f81334e83dcb440451b6a4c4a753a118
-[15/19] KVM: arm64: Warn when PENDING_EXCEPTION and INCREMENT_PC are set together
-        commit: e19f2c6cd14668c0d5b1cef280632b7ca5893118
-[16/19] KVM: arm64: Add build-time sanity checks for flags
-        commit: 5a3984f4ec73d1c7cf31a4cee46cca7d4c75deee
-[17/19] KVM: arm64: Reduce the size of the vcpu flag members
-        commit: 54ddda919c4bc37c113727034619c4e15c184334
-[18/19] KVM: arm64: Document why pause cannot be turned into a flag
-        commit: 0fa4a3137e943cd6acab386ff26cd8d5e94e9559
-[19/19] KVM: arm64: Move the handling of !FP outside of the fast path
-        commit: b4da91879e98bdd5998ee84f47f02426ac50a729
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -1347,7 +1347,7 @@ static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
+        eax = tdvmcall_a0_read(vcpu);
+        ecx = tdvmcall_a1_read(vcpu);
 
-Cheers,
+-       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
++       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 
-	M.
+        tdvmcall_a0_write(vcpu, eax);
+        tdvmcall_a1_write(vcpu, ebx);
+
+thanks,
+
 -- 
-Marc Zyngier <maz@kernel.org>
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
