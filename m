@@ -2,124 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62A465609D6
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 20:57:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7091C560A27
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 21:16:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbiF2S4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 14:56:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42042 "EHLO
+        id S230527AbiF2TPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 15:15:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbiF2S4v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 14:56:51 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA3A72BB19
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 11:56:50 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-101e1a33fe3so22613701fac.11
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 11:56:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5p870x4sNIuh+XUc5mOSvBDrkyHrhB4Hd3tt75IAjfA=;
-        b=UUooucx0ccngcWB8VSsOa2u/k1LGuqvJP+libwKuXia3x3OyoLVO44bFMx/uxUeanz
-         ZUGraFLwk5TmFGNbtWP/mAjU0r+M+xxAv8+3fm6gbEaSHM4pTKUad1dndi0LrotCdd9m
-         AohEFOPScHRcLu0EqYCrgvdZoh4Eajoc76Rgvgvu+CacPIGaFGhbX5ScFozpyiK2lBu8
-         Wo01f3UwDb89mDvvGDR1zsx1iAvTYSZ7IjFrBtCNHA3QnAWNZuH2Ic1JV7dycIrhvC9J
-         DCdMC6O/GGc1BygckQugPSiphL5P0cy3GAuJ7onw6ljJ70mg6RiiaCiOv601U5i5pNNe
-         cFsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5p870x4sNIuh+XUc5mOSvBDrkyHrhB4Hd3tt75IAjfA=;
-        b=FX6tNJfiYCmt5fZV4mhli+JQwXHxbtLtHvwy2xCUGGec5Lpknsvp5KU6ff8v/u+QLM
-         yx49Dtx7QHKCtYMrllyu3FwIANoyinKUynBiGB8owvH693sV9zZuBnOJE1v5/19avg9Q
-         u1LeEFATjGnH9fr0IObsfmt07VXRvzC3JGaPsRsKbicLQvEEYmH189gyp2Q6Wn+NqumY
-         9YaRBzAIzZORiVi8MFOFpGNUEqYPFNH9+tCWwDvwSO5v8EH2eFlCL6UF1d1FVZYcvvaw
-         ZTY9C6MM/v1KPz4Jee+MKR1XRXefAIxzmdkUEqxZeIWVVbsI6xujY41tdaMwr0pVE+Br
-         neHQ==
-X-Gm-Message-State: AJIora9DGhYZaKDe0ge3A8RUPgntpfQBEYv4tNUcb2jEc/L6Sq9DY7Xg
-        auRYa0CzHXc6ppAgn1bjpDlUqACbEF8pNHkyALOhRxW2Vd8=
-X-Google-Smtp-Source: AGRyM1sSX+/x4ZUI5F+rgABEpZPnoRUQplDBXBh1k9TvYrHW5wV7Zl0uk9sDKEVl9e7TqEKOK5sbutSFxpkYXpkjUIc=
-X-Received: by 2002:a05:6870:c596:b0:101:6409:ae62 with SMTP id
- ba22-20020a056870c59600b001016409ae62mr3941507oab.112.1656529010120; Wed, 29
- Jun 2022 11:56:50 -0700 (PDT)
+        with ESMTP id S230520AbiF2TPR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 15:15:17 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A283DA44
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 12:15:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A237EB82652
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 19:15:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59E06C34114;
+        Wed, 29 Jun 2022 19:15:11 +0000 (UTC)
+Date:   Wed, 29 Jun 2022 20:15:07 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Peter Collingbourne <pcc@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Michael Roth <michael.roth@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>,
+        Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+Message-ID: <Yryku0/XU2GkcjvY@arm.com>
+References: <20220623234944.141869-1-pcc@google.com>
+ <YrXu0Uzi73pUDwye@arm.com>
+ <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+ <YrmXzHXv4babwbNZ@arm.com>
+ <CAMn1gO5s2m-AkoYpY0dcLkKVyEAGeC2borZfgT09iqc=w_LZxQ@mail.gmail.com>
+ <YrtBIX0/0jyAdgnz@arm.com>
+ <CAMn1gO7aC1zqWDt1bAk_ds8ejuhx2obo-LE-2UwFXch=uNFoAA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-17-vkuznets@redhat.com>
-In-Reply-To: <20220629150625.238286-17-vkuznets@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 29 Jun 2022 11:56:38 -0700
-Message-ID: <CALMp9eS_iAijAk4pdK1tjLbRp3XH-PhR1mX4gaSXztWPXJpfkA@mail.gmail.com>
-Subject: Re: [PATCH v2 16/28] KVM: VMX: Tweak the special handling of
- SECONDARY_EXEC_ENCLS_EXITING in setup_vmcs_config()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMn1gO7aC1zqWDt1bAk_ds8ejuhx2obo-LE-2UwFXch=uNFoAA@mail.gmail.com>
+X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> SECONDARY_EXEC_ENCLS_EXITING is conditionally added to the 'optional'
-> checklist in setup_vmcs_config() but there's little value in doing so.
-> First, as the control is optional, we can always check for its
-> presence, no harm done. Second, the only real value cpu_has_sgx() check
-> gives is that on the CPUs which support SECONDARY_EXEC_ENCLS_EXITING but
-> don't support SGX, the control is not getting enabled. It's highly unlikely
-> such CPUs exist but it's possible that some hypervisors expose broken vCPU
-> models.
->
-> Preserve cpu_has_sgx() check but filter the result of adjust_vmx_controls()
-> instead of the input.
->
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 89a3bbafa5af..e32d91006b80 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2528,9 +2528,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->                         SECONDARY_EXEC_PT_CONCEAL_VMX |
->                         SECONDARY_EXEC_ENABLE_VMFUNC |
->                         SECONDARY_EXEC_BUS_LOCK_DETECTION |
-> -                       SECONDARY_EXEC_NOTIFY_VM_EXITING;
-> -               if (cpu_has_sgx())
-> -                       opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
-> +                       SECONDARY_EXEC_NOTIFY_VM_EXITING |
-> +                       SECONDARY_EXEC_ENCLS_EXITING;
-> +
->                 if (adjust_vmx_controls(min2, opt2,
->                                         MSR_IA32_VMX_PROCBASED_CTLS2,
->                                         &_cpu_based_2nd_exec_control) < 0)
-> @@ -2577,6 +2577,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->                 vmx_cap->vpid = 0;
->         }
->
-> +       if (!cpu_has_sgx())
-> +               _cpu_based_2nd_exec_control &= ~SECONDARY_EXEC_ENCLS_EXITING;
+On Tue, Jun 28, 2022 at 11:54:51AM -0700, Peter Collingbourne wrote:
+> On Tue, Jun 28, 2022 at 10:58 AM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+> > That's why it would be interesting to see
+> > the effect of using DC GZVA instead of DC ZVA for page zeroing.
+> >
+> > I suspect on Android you'd notice the fork() penalty a bit more with all
+> > the copy-on-write having to copy tags. But we can't tell until we do
+> > some benchmarks. If the penalty is indeed significant, we'll go back to
+> > assessing the races here.
+> 
+> Okay, I can try to measure it. I do feel rather strongly though that
+> we should try to avoid tagging pages as much as possible even ignoring
+> the potential performance implications.
+> 
+> Here's one more idea: we can tag pages eagerly as you propose, but
+> introduce an opt-out. For example, we introduce a MAP_NOMTE flag,
+> which would prevent tag initialization as well as causing any future
+> attempt to mprotect(PROT_MTE) to fail. Allocators that know that the
+> memory will not be used for MTE in the future can set this flag. For
+> example, Scudo can start setting this flag once MTE has been disabled
+> as it has no mechanism for turning MTE back on once disabled. And that
+> way we will end up with no tags on the heap in the processes with MTE
+> disabled. Mappings with MAP_NOMTE would not be permitted in the guest
+> memory space of MTE enabled guests. For executables mapped by the
+> kernel we may consider adding a bit to the ELF program headers to
+> enable MAP_NOMTE.
 
-NYC, but why is there a leading underscore here?
+I don't like such negative flags and we should aim for minimal changes
+to code that doesn't care about MTE. If there's a performance penalty
+with zeroing the tags, we'll keep looking at the lazy tag
+initialisation.
 
->         if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
->                 u64 opt3 = TERTIARY_EXEC_IPI_VIRT;
->
-> --
-> 2.35.3
->
-Reviewed-by: Jim Mattson <jmattson@google.com>
+In the meantime, I'll think some more about the lazy stuff. We need at
+least mte_sync_tags() fixed to set the PG_mte_tagged after the tags have
+been updated (fixes the CoW + mprotect() race but probably breaks
+concurrent MAP_SHARED mprotect()). We'd have to add some barriers (maybe
+in a new function, set_page_tagged()). Some cases like restoring from
+swap (both private and shared) have the page lock held. KVM doesn't seem
+to take any page lock, so it can race with the VMM.
+
+Anyway, I doubt we can get away with a single bit. We can't make use of
+PG_locked either since set_pte_at() is called with the page either
+locked or unlocked.
+
+-- 
+Catalin
