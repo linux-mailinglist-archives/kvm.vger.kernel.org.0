@@ -2,64 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3505255F365
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 04:34:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F12255F369
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 04:34:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229978AbiF2CaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jun 2022 22:30:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43156 "EHLO
+        id S230079AbiF2Ccu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jun 2022 22:32:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiF2CaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jun 2022 22:30:00 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 591531EAF0;
-        Tue, 28 Jun 2022 19:29:58 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 2so7945301qvc.0;
-        Tue, 28 Jun 2022 19:29:58 -0700 (PDT)
+        with ESMTP id S229455AbiF2Ccu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jun 2022 22:32:50 -0400
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEC3248EF
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 19:32:49 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-101ab23ff3fso19658330fac.1
+        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 19:32:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=AMyKmTlvqND+T1BlaEPR/v+ZycnfrQ/4rwr6Zw6iK2Q=;
-        b=SrRuAA/akPpo8sjb1hOJCDmonbgt7RHeS5k6SHMPIZxd+eEDop2ORlqWMeeHrUwlps
-         nGsRK4xePl22f6685/bDJzcFVHCfxHYGydOS4FIit30yiy8m0X6HihSbuacTaszk231M
-         optvxWHar0UTmqkP+aX7DdKQA0DWohUanoLjn1o8P9GUG8BF3c70s+9o9qMv5Q+FeUKU
-         Zx78kzL1/Ss6YLM3WESX43fx8u3e1decDuLtPbJ/ZyQ8AI4/o9zbzGf+LIfbmbAUt7G1
-         P97AI29SYTuO8CigFuWjGJR8je4yvxrjs98nOEDdqa/wbv3An3RQ3wtOs/jbq9hy0sS2
-         1dsQ==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BGM8ETk9R3AnWsXEnehBm/qaTyX0MHE57aKC6QUY6Zw=;
+        b=J3xfhWTCaOL9WECQaONqRlcn47jFJuVl/27j1BUe1H0jyiyez5RHIZL8iLV2kehbPU
+         ouoCG8tXZ6VtoRt7oCwssDzCwsO54sp69XdYaLlQu9RPrxU5w8LmQvC6HsWVloB+zfdw
+         Da0xorvATisQZUYc80MqMjhZFjiXUif7hV4YTp1l9C5MWbN06/vvaxYLBrX0MX6Jr1h+
+         ROd4zwn4vM1z0IHys2t5KRWKRPVf+bYmuOeAeuxmIiW0pskhfolFJ3wJZZgRzxSbgHRE
+         2hpLeq8F7LlHWpuYh7B0Ej6hwpYDrcgRGRm/yBr/vLVB2JuwEiL/v+gYkfO9K8ySv5xW
+         JKiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=AMyKmTlvqND+T1BlaEPR/v+ZycnfrQ/4rwr6Zw6iK2Q=;
-        b=Zts9tLNsiP3c1AHyiAW7kF/AuYLuQ0oxVNQ+Bx/d2dZMBdOijlPVFHQzIfZGTfo4iV
-         epIrcU74Dbx3UL66j0eGEh0QBzWbxA+nmUuMxLsMWQ/fJHNh3HIixl+AeOOK9ikgZwEV
-         Iyq1gPTa3gFjUVH1rD3NWKnjAI7GJsbYmsXCaWvGyCZTKR4R5jLdO/9v6/Imwvw6f9DV
-         sA4GxZqjjMh7hY2AgZokditkupllwkfNeIcCsXEc10RO1PDPTfHYt7IkLxhjnjlqxbQx
-         UZZu+Cyyx8K4ajlqzVKImI8BV/Yy9bovrzA6hidFFM79SMn/XA3ue3Q8y31Ix8FLFlKd
-         0Iqw==
-X-Gm-Message-State: AJIora/7FqbxeFyhQjbySL71vaX997RMSAZ2lcXvOTIEy5Hh0rg3oRx/
-        NLT/clTOYzw7ksYWx6zxYtboEs5+6jpF0g==
-X-Google-Smtp-Source: AGRyM1s1Kji+f3gri8bUQoZbCOlFohwqWozoD0aj4cIL3uFl6Lg7J4Oxux8T/uj3IwKtxxzqXfuPmw==
-X-Received: by 2002:a05:622a:60c:b0:307:c887:2253 with SMTP id z12-20020a05622a060c00b00307c8872253mr785428qta.216.1656469797470;
-        Tue, 28 Jun 2022 19:29:57 -0700 (PDT)
-Received: from MBP.hobot.cc (ec2-13-59-0-164.us-east-2.compute.amazonaws.com. [13.59.0.164])
-        by smtp.gmail.com with ESMTPSA id p20-20020ac84614000000b00304fe96c7aasm6823272qtn.24.2022.06.28.19.29.54
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 Jun 2022 19:29:56 -0700 (PDT)
-From:   Schspa Shi <schspa@gmail.com>
-To:     alex.williamson@redhat.com, cohuck@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Schspa Shi <schspa@gmail.com>
-Subject: [PATCH v3] vfio: Clear the caps->buf to NULL after free
-Date:   Wed, 29 Jun 2022 10:29:48 +0800
-Message-Id: <20220629022948.55608-1-schspa@gmail.com>
-X-Mailer: git-send-email 2.29.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BGM8ETk9R3AnWsXEnehBm/qaTyX0MHE57aKC6QUY6Zw=;
+        b=p1JSSA426D674WnrjFq9fUC5rwb2ZvYuQj7SW1GXK5DKu9KBVsm02uAb9XWj9XR8eP
+         Hirb+0GPocrSTyqb2OdWdQ+xwbJ2xZeaCdFKxAGj61Bub8HC2W7Y3Qo0B4E90utYeI3g
+         Hi5GrDT4Mtmim/hn2yQ408jWA2xmcCVN8lwTwOWc2ePueZst2BWnJnUcHzTTYFs0VK9I
+         yEYo7/zfiTV5PI0wUW6GYSJcJ9lMO1HW6MhLwirNtcBnKhCHq/loGHrQrW06ZQEMh/q+
+         ZtKtMWWkradtgcRNKn3OwPG2zWqkslz4F8ZTR+iPIjJ9E5RV45MLTCCPSv7RXfoZq/q9
+         MTog==
+X-Gm-Message-State: AJIora8N9wUv96flmiehmptVe2yZFQRkbk89lVdWwRUQhYGK4pC45Gei
+        zuvKdTlymC5riS4pfnIeJoxcsRwzq8wkQVL6VbUUXYDFJ1I=
+X-Google-Smtp-Source: AGRyM1t2xSJylOSv//Y1xLDAD0giTT623ES9bCrAAbwwSs+DvTPoxYcBHzUO6SBfHRI49+9PHDAv1dRxeRmNQS4+tlI=
+X-Received: by 2002:a05:6870:d3c7:b0:104:9120:8555 with SMTP id
+ l7-20020a056870d3c700b0010491208555mr605703oag.181.1656469968481; Tue, 28 Jun
+ 2022 19:32:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <bug-216177-28872@https.bugzilla.kernel.org/> <bug-216177-28872-n8HEVR7IoW@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216177-28872-n8HEVR7IoW@https.bugzilla.kernel.org/>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 28 Jun 2022 19:32:37 -0700
+Message-ID: <CALMp9eS5MnFHOtjb8TQstR8n6jJmegahUmMcb2dgbLcb9qPPKA@mail.gmail.com>
+Subject: Re: [Bug 216177] kvm-unit-tests vmx has about 60% of failure chance
+To:     bugzilla-daemon@kernel.org
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,36 +65,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On buffer resize failure, vfio_info_cap_add() will free the buffer,
-report zero for the size, and return -ENOMEM.  As additional
-hardening, also clear the buffer pointer to prevent any chance of a
-double free.
-
-Signed-off-by: Schspa Shi <schspa@gmail.com>
-
--- 
-
-Changelog:
-v1 -> v2:
-        - Remove incorrect double free report in commit message.
-v2 -> v3:
-        - Update commit comment as Alex advised.
----
- drivers/vfio/vfio.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 61e71c1154be..a0fb93866f61 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -1812,6 +1812,7 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
- 	buf = krealloc(caps->buf, caps->size + size, GFP_KERNEL);
- 	if (!buf) {
- 		kfree(caps->buf);
-+		caps->buf = NULL;
- 		caps->size = 0;
- 		return ERR_PTR(-ENOMEM);
- 	}
--- 
-2.29.0
-
+On Tue, Jun 28, 2022 at 5:22 PM <bugzilla-daemon@kernel.org> wrote:
+>
+> https://bugzilla.kernel.org/show_bug.cgi?id=216177
+>
+> --- Comment #11 from Yang Lixiao (lixiao.yang@intel.com) ---
+> (In reply to Jim Mattson from comment #10)
+> > On Mon, Jun 27, 2022 at 11:32 PM <bugzilla-daemon@kernel.org> wrote:
+> > >
+> > > https://bugzilla.kernel.org/show_bug.cgi?id=216177
+> > >
+> > > --- Comment #9 from Yang Lixiao (lixiao.yang@intel.com) ---
+> > > (In reply to Jim Mattson from comment #8)
+> > > > On Mon, Jun 27, 2022 at 8:54 PM Nadav Amit <nadav.amit@gmail.com> wrote:
+> > > >
+> > > > > The failure on bare-metal that I experienced hints that this is either
+> > a
+> > > > test
+> > > > > bug or (much less likely) a hardware bug. But I do not think it is
+> > likely
+> > > > to
+> > > > > be
+> > > > > a KVM bug.
+> > > >
+> > > > KVM does not use the VMX-preemption timer to virtualize L1's
+> > > > VMX-preemption timer (and that is why KVM is broken). The KVM bug was
+> > > > introduced with commit f4124500c2c1 ("KVM: nVMX: Fully emulate
+> > > > preemption timer"), which uses an L0 CLOCK_MONOTONIC hrtimer to
+> > > > emulate L1's VMX-preemption timer. There are many reasons that this
+> > > > cannot possibly work, not the least of which is that the
+> > > > CLOCK_MONOTONIC timer is subject to time slew.
+> > > >
+> > > > Currently, KVM reserves L0's VMX-preemption timer for emulating L1's
+> > > > APIC timer. Better would be to determine whether L1's APIC timer or
+> > > > L1's VMX-preemption timer is scheduled to fire first, and use L0's
+> > > > VMX-preemption timer to trigger a VM-exit on the nearest alarm.
+> > > > Alternatively, as Sean noted, one could perhaps arrange for the
+> > > > hrtimer to fire early enough that it won't fire late, but I don't
+> > > > really think that's a viable solution.
+> > > >
+> > > > I can't explain the bare-metal failures, but I will note that the test
+> > > > assumes the default treatment of SMIs and SMM. The test will likely
+> > > > fail with the dual-monitor treatment of SMIs and SMM. Aside from the
+> > > > older CPUs with broken VMX-preemption timers, I don't know of any
+> > > > relevant errata.
+> > > >
+> > > > Of course, it is possible that the test itself is buggy. For the
+> > > > person who reported bare-metal failures on Ice Lake and Cooper Lake,
+> > > > how long was the test in VMX non-root mode past the VMX-preemption
+> > > > timer deadline?
+> > >
+> > > On the first Ice lake:
+> > > Test suite: vmx_preemption_timer_expiry_test
+> > > FAIL: Last stored guest TSC (28067103426) < TSC deadline (28067086048)
+> > >
+> > > On the second Ice lake:
+> > > Test suite: vmx_preemption_timer_expiry_test
+> > > FAIL: Last stored guest TSC (27014488614) < TSC deadline (27014469152)
+> > >
+> > > On Cooper lake:
+> > > Test suite: vmx_preemption_timer_expiry_test
+> > > FAIL: Last stored guest TSC (29030585690) < TSC deadline (29030565024)
+> >
+> > Wow! Those are *huge* overruns. What is the value of MSR 0x9B on these hosts?
+>
+> All of the values of MSR 0x9B on the three hosts are 0.
+>
+> --
+> You may reply to this email to add a comment.
+>
+> You are receiving this mail because:
+> You are watching the assignee of the bug.
+Doh! There is a glaring bug in the test. I'll post a fix soon.
