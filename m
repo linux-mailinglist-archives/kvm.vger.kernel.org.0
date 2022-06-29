@@ -2,133 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CE5055FFA3
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 14:19:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFB87560008
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 14:36:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233487AbiF2MSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 08:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48812 "EHLO
+        id S233222AbiF2Me3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 08:34:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233453AbiF2MRs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 08:17:48 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2060.outbound.protection.outlook.com [40.107.92.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6827231340;
-        Wed, 29 Jun 2022 05:17:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DyrMJ5aK/aw9W+Mr5EDicVikmTCX1WsIe0Pkhlw4rCi6+wVr5ON0CxF4+iLxHnMoGoh+zOE6Q8cf2f6vcG29/eHN4wwZgi968TYQ63+A4tlG7hbmYiDaen11/PA40I3lAv/EH5exOll5QuziuEFrUzvgTOkPI2pB4AYsf4ce24JfB95p1BFC1wd0Nr3afte5a9dv9QE+/ftYJFc6xccaDM86qSZcyQXwlShcDmG7S7iuExgV0Q0q9jPFVa2CwOf9nsf5UsD3QOhd+umNIx+1bUmMdsLfGKPzR4u1RhF4Uf9nJgjngZvTLW29L0TObvPm/gU0WtF/AAJnpe4R4NyujQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=csq6VlZcJEO5HlTS49064aX5FhKLh5OFmvCMk7SyhYg=;
- b=N41wH9OXOD3NcA+8QCQVFRM2xtkTWSPgdUPSsRhoZRbMZYtGl9q17FfEPI6mcUlvlvT5ioFEs/xQXSg5JS3FZueQKmgQFqB9xwfoRnf0RqXuA9RMXXFEsdaBkXVm3LT4oB7oSkyg/jd2t2hfwIUXNQgW3mMCa2JvKFBzXVTKJvxmRTU3YYw0N/O3B59TQUyEHLa13al+f50RSqBeZ8utej4obIgQw7adxrr87m/cI7C1oUAHd30n+FC6vTTSIG7GKLM1nyuCRH+SXCIX90Rxg5gIoIO2n0R0TccKHojcDUPXsUOyGus83iA2f1WLW0jWAa2OJEc61+JKnk5KXfd5RQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=csq6VlZcJEO5HlTS49064aX5FhKLh5OFmvCMk7SyhYg=;
- b=ogwjbCVBY9OStXn8wRpnfGP23GGyapfCCilhevx16Wy0ZY4G4WuSzba0TMSmi6XZJIZX05zot9DNx7JxjP9GPxyf2CwG6EcZINrVqDvGpuUurzAWfYM9xMcD1brPMgiUfYdNnA4bUZYrehfQAMzyEugeyuu0NIgFCsq/5fSnMBFdMNfQrg+yvCf1cUfH1WCHjsl9w3lOm2YXcukQzaOr1U4uCSMqptpUUPJvXzS3xV5Rn4poXuHw2C6Z5PULZ5O5zR7MXfo+glD3L3JNdTksUpCjLJM6qSMj+93wKN2B/wt/NQxG8BnEn93u0/YGwJsxcnSQXZtSYamLpKnXKl89zw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CH0PR12MB5372.namprd12.prod.outlook.com (2603:10b6:610:d7::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Wed, 29 Jun
- 2022 12:17:10 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5373.022; Wed, 29 Jun 2022
- 12:17:10 +0000
-Date:   Wed, 29 Jun 2022 09:17:09 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH 04/13] vfio/mdev: simplify mdev_type handling
-Message-ID: <20220629121709.GI693670@nvidia.com>
-References: <20220628051435.695540-1-hch@lst.de>
- <20220628051435.695540-5-hch@lst.de>
- <20220628155915.060ba2d9.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220628155915.060ba2d9.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR01CA0026.prod.exchangelabs.com (2603:10b6:208:10c::39)
- To MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+        with ESMTP id S233055AbiF2Me0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 08:34:26 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D2D25E9C
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 05:34:24 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id v9so6657179wrp.7
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 05:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RMd3beZelLDV4ezdXlil9kUUgFUc4WQ7K60RuFKw/HY=;
+        b=HFmBaReI/awGH6JxHKqA0o52Y+nCod1lVVxfWiH3shSbFiyHLla0MRYnSnu4q5JFrb
+         pbesCQB/VAWWKhlG44+uPHWsAK8kVQwBzQKG2iqOxe0+hvAJ3XrzG+QosKPe2++K2ic9
+         x6jQrhQpOyizj2mujtCW7y7EZcvF14yE5o4JLM1mO0UU2x0+JKcgqxlIaN+n5s9ldGd+
+         58rB9NtKG/Xcbc6qzcki4hpQhA2IJOBs0vj5LGuwCa6lBtNVuBkP+sfAb56SRs+q3TNN
+         cYRCEV6z3ob5N4N0KzC+mlEQuemepjFmB+rKy9LXsHry+gvAQxHAx+rILCbMkFcm6XmT
+         B/tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RMd3beZelLDV4ezdXlil9kUUgFUc4WQ7K60RuFKw/HY=;
+        b=KbFzfXAqr5VNvQkH+eaMADsX8ME5RgpIsjuO/trUuZ13GaVStV8OoaHFQ0cEMpV+kC
+         ft1T27aCQBxdNMXU++BI7Tq94UJFCItymYhuS1+PauNH8HJikqQMY9tWXWiuP40pJMyh
+         Q1QVAwrpz+dNprtI/JsQf7PGgSOyFJJiVYRoe/4hP3T9YrafpiEVGG5KcnWndIqaijzH
+         K1rXYmQCJG1ri/pnh6xV2iCl9DFmGI818CoMh7ox11epwO8MLDCIm9sInMbZnHkDpfXk
+         ItZ0hLLoshrsU9PbBi+O1aU81v2r947Y1iWwtSGs7SnNBmHzBkfyyi8Qal08DxmPhJbY
+         fdPA==
+X-Gm-Message-State: AJIora/1+Y42AQ6BuWmnS0rvY9Rnj9+IDGpu3qlL+BsLnLBhGCE3gBTM
+        TCxD7AslvTiXPtU4bir6z/gRw8Q22qPSIRHmNwMKNQ==
+X-Google-Smtp-Source: AGRyM1vHzEYK7IrZRPnLMo7jwGLEHZdyKlPQc/XxGbF7tfOWTgbjqH9u+T/F4WwdgU+B5/nG0P1vjFNjGYxAy24rfgc=
+X-Received: by 2002:a5d:4532:0:b0:21b:ab1e:e9fa with SMTP id
+ j18-20020a5d4532000000b0021bab1ee9famr2902041wra.214.1656506062697; Wed, 29
+ Jun 2022 05:34:22 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2df90611-0a08-4d03-885d-08da59c94ab9
-X-MS-TrafficTypeDiagnostic: CH0PR12MB5372:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oK95/DwLuS+PqFSv5tYTvXxgWNiuRRwolKVKMM6MoBZ2c36Aekdo4wg+TUOTYODpuYW9N00pgbNVgVtw0nwNOZPNaOhPuU5Nb9+yKG6NAkMepB1bbhbMY1yAtaN/Lb1bjm23wlV9umjzIf/4R/Qt8o3E9+sRSHg7igXCxsNlMBoKQA1+X8bbOeJLLoBar0p1F3TXl4MUC4RDJvCQ0m+MV+r5+DJ57FU//wVypVj8wRtG23UIDfSpdggq4My0KpC5WIdHBWp4mSFz7NAtmv+zEAc55wUQzIy3loRYaHfd/DiaKlQt4cbqQWC7+X9Vp81NrV33FRzuynC25j3r5ArhYMg6xCuEwHpyv7SeSS3iVzZltaz4EX1NgfjI2nHgzTaT0LTdohJ7a1ZgLlWd7UhfpE7TiFHCsOGDRXhZ+C1rdlFVvSRaJ6aj7SHdwfRjEPIOpcy62KSxRMqdnmK3v8UQSIUJGnm/w3cxWRLZe1bUUJ0TcfMaGvv99K0wjJxZx931qATFkJ4cP9ZhZ1bex4sB6NTNcqITUTaeVq630RgpIZbExunkrMp+uq7z3Qn7xZL8ccT9RXrDZxg3zMBsAZKVArh6fuIo3naie6fAJqd+y69XBiIIbTU3rs90MKclzzdWExTUM9cGoyCRsyRhKbOGFDFpVVHAg/eteFgm8ku9r00f+Eg4NmUiwmF+C3uqJ5+1+WaKOlOknedpk0BdT1/mwLz0lwSKIpSOTqnxiYTei3vE0lP3wxfQzs+owwA2aWkc/eE12msgLK6FP9l8xcVMLSg2Z2FbH6zSYC12+KkKygs=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(396003)(376002)(366004)(346002)(5660300002)(1076003)(41300700001)(2616005)(7416002)(8936002)(186003)(478600001)(6506007)(86362001)(33656002)(4744005)(6486002)(2906002)(26005)(6512007)(36756003)(54906003)(38100700002)(6916009)(66556008)(66476007)(4326008)(8676002)(66946007)(316002)(83380400001)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DjIeAfBOqEctSvuzHKa13UmmcWMxwgyl48qdIEgqKEnLYp3egPGMI3GtG1CI?=
- =?us-ascii?Q?t5zKfKXFljDc5dhzFgnnqbFZCJvX5397DGTybW4ZDJlRXJPDVDt1ZSODI+VI?=
- =?us-ascii?Q?NzNnJIBoVSAe7E0Bri/hoaa7GG1PBUyWIkx45IQHc0Oxm8Diw7OHYayYQu8s?=
- =?us-ascii?Q?VpGmoA9Tq/6/noGz3qSLTlc+BvyinTBG+HoIc301Eqd73bYQ/l0Wau8Mwnnf?=
- =?us-ascii?Q?qxaqxaIxPqxj37UtvncZo5MDHbooycMMq3s0pdEWRPaHQrwn4r0RY6bmCy+X?=
- =?us-ascii?Q?Q1Z5/fWzskC6/4tMvzo05IPbC/MblLYojHOEGzc0l8TXwjFQ3EHlIUHVJd6I?=
- =?us-ascii?Q?OtHwAt42MgIe0TQEF5bp5jj9ZVVhqcToDEvTE+yd6WpZ2nR2usj1Tn/yP+nJ?=
- =?us-ascii?Q?4bgTutXFM+jTVBpXMH1VgFR1uNA37FU16bA6b0QwEq/5kmx/7tp6PY6nsTwX?=
- =?us-ascii?Q?PCMDC31fPjAUIxGe8sfBBRedIbD1RJ5dI1D77il/+Zk6vw+eyXdqUINrhrfK?=
- =?us-ascii?Q?SLEwDnoJIWOtcxFYOivCtrG+7nfF5vPqw+Z1Fb4k6iPs0+e/W/NylY8UroJQ?=
- =?us-ascii?Q?6vbl4Zlek4m8zoYa01wxMpn2KOR2fxv0JaVh81CruVIKor+9HLDON2Kf+SyN?=
- =?us-ascii?Q?+ZI4byHMDjWRJMj6hhhiIlxXB6rvAI5vaKYPgUgobtUnh3PUzlnl2tE4K1b0?=
- =?us-ascii?Q?gPUxLiKgp8Omxy/d7E3T3ItjMGl4zprLgjwX59FAg8BR0oLKeIHbWAoRA8cQ?=
- =?us-ascii?Q?qMTNPBH2xzeqIqh6Ngjuhh+NLnhcDbio7nWRroqY3xrzwkMXqPWGhNiLPUnk?=
- =?us-ascii?Q?oNJxLsG7DcGHcaefhavwInDYhFTr/oGhaZrllOgVYXwR/McroCwMaZvHJEuo?=
- =?us-ascii?Q?E6i/PBIL1Wncqaw47Ev/N8lw0t8PDKo4y32km8OgpgKd8nJHKrUWYXGCxW5z?=
- =?us-ascii?Q?H/ei1f98rNO/++68/9zZlGelpSOPKvZ46Ijx0pODexF/+882imBnI9FmWGmB?=
- =?us-ascii?Q?NSzd+I35skfcQ7rZ0uQR7eyhw+bAlc1Fs8GS8AmOhUS3c7F99tRCNQGt9O0n?=
- =?us-ascii?Q?M8syCsm3BgNhDgaut4s6fQpJIEih/spBtK8YhW/ONHPHohvFNScNR9siJyIf?=
- =?us-ascii?Q?Ggzg8Ljhs+T4XlIxyfANE3febi9BRIaAJAAnGKz2Tbf+6RNniU7Q6+PK2Vzw?=
- =?us-ascii?Q?hQjPn/3NWSDQkkSzdCkadXKXJjC5iF97ai5pW0yT/pH/GMWP0c6vNtcSvVJm?=
- =?us-ascii?Q?xFcnj9WKz+RtmvTJnfBA6sc/BQed85DjRgCOghpgiveyyN6/bH6oFvr8izdj?=
- =?us-ascii?Q?qS2fjAIGrHAVSZ+3vUl3m2JL+aLLLnW5IcJOuAUBk2aJEaMqh0vEpHeU10B2?=
- =?us-ascii?Q?lqd0ymq3WNSi/rCsBguR3d7dYvW/B7+vUDs20ZtQgYU0I9ZkKGIXpJHtaxWz?=
- =?us-ascii?Q?WaoqP9b4JFhHHjbmE6wwYuO2uH7owO3IV1AFdbFSnPVDQAThIEgK/eFBpqTm?=
- =?us-ascii?Q?9fZbMfNH2c+qdR4Xx7f2iIHPkRQGaRqDdL2X44likux3+hK22y3GJLXicOeB?=
- =?us-ascii?Q?z4akJjDmvHN2+iRE5h5roqFRbGtfqTzxdY+iIvNs?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2df90611-0a08-4d03-885d-08da59c94ab9
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2022 12:17:10.4712
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fiJ2I/rdf0NyRLt2JwyYcpX1Y6Sgc1foPg3Vggwi/1H2x+2h/QTWgSNlUwgzyJRM
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5372
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20220622192710.2547152-1-pbonzini@redhat.com> <20220622192710.2547152-22-pbonzini@redhat.com>
+In-Reply-To: <20220622192710.2547152-22-pbonzini@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Wed, 29 Jun 2022 18:04:12 +0530
+Message-ID: <CAAhSdy0iVQH__-nD6-ioGSDbAaCaeMxbBp2+-06=wJjDOcxPOQ@mail.gmail.com>
+Subject: Re: [PATCH v7 21/23] KVM: Allow for different capacities in
+ kvm_mmu_memory_cache structs
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        KVM General <kvm@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 03:59:15PM -0600, Alex Williamson wrote:
-> > +	strcpy(matrix_dev->mdev_type.sysfs_name, VFIO_AP_MDEV_TYPE_HWVIRT);
-> 
-> And then this might as well be an snprintf() as well too.
+On Thu, Jun 23, 2022 at 12:57 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> From: David Matlack <dmatlack@google.com>
+>
+> Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
+> declaration time rather than being fixed for all declarations. This will
+> be used in a follow-up commit to declare an cache in x86 with a capacity
+> of 512+ objects without having to increase the capacity of all caches in
+> KVM.
+>
+> This change requires each cache now specify its capacity at runtime,
+> since the cache struct itself no longer has a fixed capacity known at
+> compile time. To protect against someone accidentally defining a
+> kvm_mmu_memory_cache struct directly (without the extra storage), this
+> commit includes a WARN_ON() in kvm_mmu_topup_memory_cache().
+>
+> In order to support different capacities, this commit changes the
+> objects pointer array to be dynamically allocated the first time the
+> cache is topped-up.
+>
+> While here, opportunistically clean up the stack-allocated
+> kvm_mmu_memory_cache structs in riscv and arm64 to use designated
+> initializers.
+>
+> No functional change intended.
+>
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> Message-Id: <20220516232138.1783324-22-dmatlack@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Kees has setup FORTIFY so the above will actually throw a compile
-warning in build bots if the array size is too small. Changing it to
-snprintf would loose this and cause undetected string truncation.
+For KVM RISC-V
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Tested-by: Anup Patel <anup@brainfault.org>
 
-Jason
+Regards,
+Anup
+
+> ---
+>  arch/arm64/kvm/mmu.c      |  2 +-
+>  arch/riscv/kvm/mmu.c      |  5 +----
+>  include/linux/kvm_host.h  |  1 +
+>  include/linux/kvm_types.h |  6 +++++-
+>  virt/kvm/kvm_main.c       | 33 ++++++++++++++++++++++++++++++---
+>  5 files changed, 38 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index f5651a05b6a8..87f1cd0df36e 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -786,7 +786,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  {
+>         phys_addr_t addr;
+>         int ret = 0;
+> -       struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+> +       struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+>         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+>         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+>                                      KVM_PGTABLE_PROT_R |
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 1c00695ebee7..081f8d2b9cf3 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -350,10 +350,7 @@ static int gstage_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
+>         int ret = 0;
+>         unsigned long pfn;
+>         phys_addr_t addr, end;
+> -       struct kvm_mmu_memory_cache pcache;
+> -
+> -       memset(&pcache, 0, sizeof(pcache));
+> -       pcache.gfp_zero = __GFP_ZERO;
+> +       struct kvm_mmu_memory_cache pcache = { .gfp_zero = __GFP_ZERO };
+>
+>         end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+>         pfn = __phys_to_pfn(hpa);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index a2bbdf3ab086..3554e48406e4 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1356,6 +1356,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm);
+>
+>  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+>  int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
+> +int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min);
+>  int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
+>  void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+>  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index f328a01db4fe..4d933518060f 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -85,12 +85,16 @@ struct gfn_to_pfn_cache {
+>   * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
+>   * holding MMU locks.  Note, these caches act more like prefetch buffers than
+>   * classical caches, i.e. objects are not returned to the cache on being freed.
+> + *
+> + * The @capacity field and @objects array are lazily initialized when the cache
+> + * is topped up (__kvm_mmu_topup_memory_cache()).
+>   */
+>  struct kvm_mmu_memory_cache {
+>         int nobjs;
+>         gfp_t gfp_zero;
+>         struct kmem_cache *kmem_cache;
+> -       void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
+> +       int capacity;
+> +       void **objects;
+>  };
+>  #endif
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5b8ae83e09d7..45188d11812c 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -396,14 +396,31 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+>                 return (void *)__get_free_page(gfp_flags);
+>  }
+>
+> -int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> +int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+>  {
+> +       gfp_t gfp = GFP_KERNEL_ACCOUNT;
+>         void *obj;
+>
+>         if (mc->nobjs >= min)
+>                 return 0;
+> -       while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+> -               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
+> +
+> +       if (unlikely(!mc->objects)) {
+> +               if (WARN_ON_ONCE(!capacity))
+> +                       return -EIO;
+> +
+> +               mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
+> +               if (!mc->objects)
+> +                       return -ENOMEM;
+> +
+> +               mc->capacity = capacity;
+> +       }
+> +
+> +       /* It is illegal to request a different capacity across topups. */
+> +       if (WARN_ON_ONCE(mc->capacity != capacity))
+> +               return -EIO;
+> +
+> +       while (mc->nobjs < mc->capacity) {
+> +               obj = mmu_memory_cache_alloc_obj(mc, gfp);
+>                 if (!obj)
+>                         return mc->nobjs >= min ? 0 : -ENOMEM;
+>                 mc->objects[mc->nobjs++] = obj;
+> @@ -411,6 +428,11 @@ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+>         return 0;
+>  }
+>
+> +int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> +{
+> +       return __kvm_mmu_topup_memory_cache(mc, KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, min);
+> +}
+> +
+>  int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc)
+>  {
+>         return mc->nobjs;
+> @@ -424,6 +446,11 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+>                 else
+>                         free_page((unsigned long)mc->objects[--mc->nobjs]);
+>         }
+> +
+> +       kvfree(mc->objects);
+> +
+> +       mc->objects = NULL;
+> +       mc->capacity = 0;
+>  }
+>
+>  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+> --
+> 2.31.1
+>
+>
