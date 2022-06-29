@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2DA755FD41
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 12:33:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 371F555FD4B
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 12:33:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233354AbiF2KaQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 06:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40174 "EHLO
+        id S233336AbiF2Kai (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 06:30:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232565AbiF2KaP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 06:30:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C47B3DDD5;
-        Wed, 29 Jun 2022 03:30:14 -0700 (PDT)
+        with ESMTP id S229828AbiF2Kah (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 06:30:37 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0F23DDD7;
+        Wed, 29 Jun 2022 03:30:36 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A4A1E60ED3;
-        Wed, 29 Jun 2022 10:30:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DCD3C34114;
-        Wed, 29 Jun 2022 10:30:13 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8B619B8227C;
+        Wed, 29 Jun 2022 10:30:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADA7C341C8;
+        Wed, 29 Jun 2022 10:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656498613;
-        bh=f+r5AD87A2KzRDAwsZTkOVMjV07LTP4CTwRCJZQva5s=;
+        s=k20201202; t=1656498634;
+        bh=FWingHSiicpAR3nuU10lYv4eU+baMLYlpSa5drYSn54=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=YsUnTHzkvp2/drvVhLka9zIWtKrSY9ZgFAcl4J1yb9YwfwFx2FV07LjpSKR2rhSEt
-         v8sXw9gJoFZjONHN+tjOulSyKtKPlQ8sx6lF1YvDxSIHw/72YaVvYkbU40fY8Whzjq
-         ZdV1l5iaOtb+7RdSzLnuX1PzYckmPmz97AT5RPyPArEJnK1oPtXKr4mo9EBJhx6KCC
-         Ve6nnbmTpJ+27B79sMo71q6tmgCRvdz1G+TYFhw5OkMWmNt6EYv6JkjlYaAIDv0u0T
-         RD4XUvxWgV8WhokhE2P6WgdNnISAGlkAFHp7AuKG7JWIC3dJz+Gis0QnIK9OFltolk
-         U/ajRDsfjVZ3g==
+        b=MoC+YDJ3ltoGd49syVpPFS76B0w4Ai9FjIw+k7zrNavvqWXc9B14SZ/kTf1KbNIdL
+         ZdjpELi4vH8X2q86nonqL0vvy+Mwhx9gOKQicN2pFXoKTlFRVMcdweCJQp3xC41ewU
+         DWNpHzh3/akaC66ltPyjUfUFd/ApRyCibrC4be03PUlkxMTALSCMTGh0ET+eroEBDN
+         foK6cJjRES98IZ+5jFtKn6947tsOrDbDev1WAaKaX54TCPY8xw5OB1SbZ3tVoSgmYW
+         Zv07anQ2bUq4PQ8a2gQ8gSfq6Y71asIa4qNDuGC+ydS+ncnSNpSWYilQwESJsnmul2
+         Q/ecmAo3pNGEw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1o6UxX-0042Se-3o;
-        Wed, 29 Jun 2022 11:30:11 +0100
-Date:   Wed, 29 Jun 2022 11:30:10 +0100
-Message-ID: <871qv73gp9.wl-maz@kernel.org>
+        id 1o6Uxr-0042Tm-Ts;
+        Wed, 29 Jun 2022 11:30:32 +0100
+Date:   Wed, 29 Jun 2022 11:30:31 +0100
+Message-ID: <87zghv2248.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Yosry Ahmed <yosryahmed@google.com>
 Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
@@ -60,18 +60,18 @@ Cc:     Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
         Shaoqin <shaoqin.huang@intel.com>, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v6 2/4] KVM: mmu: add a helper to account memory used by KVM MMU.
-In-Reply-To: <20220628220938.3657876-3-yosryahmed@google.com>
+        linux-mm@kvack.org, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v6 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in secondary pagetable stats
+In-Reply-To: <20220628220938.3657876-5-yosryahmed@google.com>
 References: <20220628220938.3657876-1-yosryahmed@google.com>
-        <20220628220938.3657876-3-yosryahmed@google.com>
+        <20220628220938.3657876-5-yosryahmed@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yosryahmed@google.com, tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, akpm@linux-foundation.org, mhocko@kernel.org, roman.gushchin@linux.dev, shakeelb@google.com, oupton@google.com, Huang@google.com, shaoqin.huang@intel.com, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-mm@kvack.org
+X-SA-Exim-Rcpt-To: yosryahmed@google.com, tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, akpm@linux-foundation.org, mhocko@kernel.org, roman.gushchin@linux.dev, shakeelb@google.com, oupton@google.com, Huang@google.com, shaoqin.huang@intel.com, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-mm@kvack.org, oliver.upton@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -84,16 +84,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 Jun 2022 23:09:36 +0100,
+On Tue, 28 Jun 2022 23:09:38 +0100,
 Yosry Ahmed <yosryahmed@google.com> wrote:
 > 
-> Add a helper to account pages used by KVM for page tables in memory
-> secondary pagetable stats. This function will be used by subsequent
-> patches in different archs.
+> Count the pages used by KVM in arm64 for stage2 mmu in memory stats
+> under secondary pagetable stats (e.g. "SecPageTables" in /proc/meminfo)
+> to give better visibility into the memory consumption of KVM mmu in a
+> similar way to how normal user page tables are accounted.
 > 
 > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
