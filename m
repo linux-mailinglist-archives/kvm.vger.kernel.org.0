@@ -2,229 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4097955F507
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 06:21:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3CCD55F569
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 06:53:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231341AbiF2ESv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 00:18:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38888 "EHLO
+        id S230118AbiF2ExM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 00:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230484AbiF2ESr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 00:18:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C53015A23
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 21:18:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656476324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2h8ccNqJU95HAa4G/EVV71yAZ0Ts5Xe8taofTuRNpD4=;
-        b=NURFtJqRXoDXTBLtcpVwwk6qQ5iyQEkrFLFTmTFhEdt4x71gjfT/OwYobfW7nWn8UXm/ke
-        G0Db4F7mDSIb6KLbLxCiL95wg2l/vFKkiH9rXrWQNXqY4cw3bTnWHzcPdRdcA4VErd8sVo
-        2UEJ9n6YCqdY1k6wFRxsaGx5ozVlcuU=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-369-Ksru2X3CPWSgN3CmqWDYWQ-1; Wed, 29 Jun 2022 00:18:40 -0400
-X-MC-Unique: Ksru2X3CPWSgN3CmqWDYWQ-1
-Received: by mail-lf1-f71.google.com with SMTP id bq4-20020a056512150400b0047f7f36efc6so7115599lfb.9
-        for <kvm@vger.kernel.org>; Tue, 28 Jun 2022 21:18:40 -0700 (PDT)
+        with ESMTP id S229475AbiF2ExL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 00:53:11 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B29F3A;
+        Tue, 28 Jun 2022 21:53:07 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id e63so14202776pgc.5;
+        Tue, 28 Jun 2022 21:53:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version;
+        bh=vvrW+kUlTZ7MKpOPos9PlIMBtA7/T3veu3b/qNQ3HBk=;
+        b=RWls3DRvSuIvp4MMFexG8NTzv3f1yWJIbObXr8wAJtU1b77K3wjS3hgzGiIV9baW5W
+         g0jeNMYYxJ9WUnguMI0eghGrDXzZiJ2NkOdu5oHzaxhR6TfDkHu/lejMNdAmg9ICpPYM
+         mmxwiGbUbFKadjN9UsyUopgydT5mMlfE2aMZMbghSYeCvnwOkXcj2u92diZ2bgvvS5qr
+         /WNZQrj5JgLoB9vvsr0fQO5Cgc6ipOZ2xmg5fS/GMT0GrSPh4yHjHocFnetz1bEmRTIC
+         ixEjpBMmmmQahyDb+kutGg2JVBqLkKbyZYYtsW1YTR7hcx84OpvCevyaH03iM+ZAApe7
+         PUqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2h8ccNqJU95HAa4G/EVV71yAZ0Ts5Xe8taofTuRNpD4=;
-        b=O77ZHn6TtFoLkGKCP8oieLICwZSxipkzwHT2AMjS3DhCu82KYqHtPKTMarpYbWwUkS
-         POxQRgy7KQ+Rwe67qmnkNghjSBgoerwrk5VB2g/ghAScWtRgA9b7O9qSD2JDCstUURV/
-         3SbJUfxJo/AnS2E/BlCNkF2c8O3+D3c7Ca8nV3OvOhEbRDKlmz4S1RIdAt19p4T7AKUX
-         MSruASQKwfFvACUPN7iWSxsH9UWcw3lh35fnqLr3c0Nzceln9j04nv5lL4c8KEwDmatP
-         8d/y/v0qwxSS+0Lwnl4sBAwHR2LJj3wWfu0GJksw4jmvfUz4PB1dMg7CoH007TL1x+dT
-         m3bw==
-X-Gm-Message-State: AJIora9kBM1XtDK/diLj63Zn5BaStIkG4txyFLZSk8q9OP1itGSZ4PR/
-        o0lbOUwAYfl6F+xYS7X/yx+mTEXZi/TFDn5+e0Lhe6wSEipqGlDnuYNCFly2jxA9na3AAKftves
-        CQyx3Px8MpT+VbV2IGbaKLqguYGgU
-X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id bp13-20020a056512158d00b0047f718c28b5mr811903lfb.397.1656476318727;
-        Tue, 28 Jun 2022 21:18:38 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vZ6G4jroIyi6EDss7eqJRupKjJ6aAZH6PLBk1sX8uk6DRDfTN14oyEf9afhAJidDtEIQTSOcMcEre11YiA3MQ=
-X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id
- bp13-20020a056512158d00b0047f718c28b5mr811892lfb.397.1656476318523; Tue, 28
- Jun 2022 21:18:38 -0700 (PDT)
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version;
+        bh=vvrW+kUlTZ7MKpOPos9PlIMBtA7/T3veu3b/qNQ3HBk=;
+        b=x5Vpt6m2Z+olqKQ6f8awRBhaMnGRgJsMoFICNb3mQClN6OqoACNcZDa8/sgnWQgvFo
+         mOu7cyPxxbPbFfP4FEJTNBr+BWTZV8jX52//JAWUq48OVOCh3RHjy6qvx05D0K5J1WiQ
+         kIYZt0WN0+onxffk6dlD3rIIptnHi+5i4NJa5HG+YnrieBz4E+fGJbtO4LjD0AI8rnS5
+         /2naKZU2GpI3+Jd5KxlV8sbrBcG1C1o+nTf9g4eIZ7CrTV2E7W65m80jPl0dkYff9KmM
+         EuI5jGBk0Ngr/Ne+0VUTtQC987dvB6RezD+rnKXHG4D3y23gYYsGKCt2af8jhdZwl7KI
+         BJAQ==
+X-Gm-Message-State: AJIora/jPIuGbAnDtRnFN9ZhWLOoyy0AUNIz9nuGh94Gzj4Rn+Kv58Jt
+        1dZxzgpJrXVj6dy7vdhlKeTwhGbI3uX5Ew==
+X-Google-Smtp-Source: AGRyM1tnQGZi67BTH5gEF2rN33/J4Y2Hvf2lwTTX4fq//ZWPUQYRzpCWWL/0D6hWTbaGZsbsk0j0ag==
+X-Received: by 2002:a63:8b43:0:b0:40d:1da6:948e with SMTP id j64-20020a638b43000000b0040d1da6948emr1372257pge.355.1656478386887;
+        Tue, 28 Jun 2022 21:53:06 -0700 (PDT)
+Received: from MBP ([39.170.101.209])
+        by smtp.gmail.com with ESMTPSA id ip11-20020a17090b314b00b001ec84b0f199sm4990001pjb.1.2022.06.28.21.53.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jun 2022 21:53:06 -0700 (PDT)
+References: <20220628152429.286-1-schspa@gmail.com>
+ <20220628095013.266d4a40.alex.williamson@redhat.com>
+ <87ilokbx12.fsf@redhat.com>
+User-agent: mu4e 1.6.10; emacs 27.2
+From:   Schspa Shi <schspa@gmail.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] vfio: Clear the caps->buf to NULL after free
+Date:   Wed, 29 Jun 2022 12:51:51 +0800
+In-reply-to: <87ilokbx12.fsf@redhat.com>
+Message-ID: <m2h744rryw.fsf@gmail.com>
 MIME-Version: 1.0
-References: <20220623160738.632852-1-eperezma@redhat.com> <20220623160738.632852-5-eperezma@redhat.com>
-In-Reply-To: <20220623160738.632852-5-eperezma@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 29 Jun 2022 12:18:27 +0800
-Message-ID: <CACGkMEtbukb4gcCHytotZr7FA+Dp1cFs4BpPJatR98zqAnNZjA@mail.gmail.com>
-Subject: Re: [PATCH v6 4/4] vdpa_sim: Implement suspend vdpa op
-To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Cc:     netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Cindy Lu <lulu@redhat.com>,
-        "Kamde, Tanuj" <tanuj.kamde@amd.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        "Uminski, Piotr" <Piotr.Uminski@intel.com>,
-        habetsm.xilinx@gmail.com, "Dawar, Gautam" <gautam.dawar@amd.com>,
-        Pablo Cascon Katchadourian <pabloc@xilinx.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Longpeng <longpeng2@huawei.com>,
-        Dinan Gunawardena <dinang@xilinx.com>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Martin Porter <martinpo@xilinx.com>,
-        Eli Cohen <elic@nvidia.com>, ecree.xilinx@gmail.com,
-        Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Zhang Min <zhang.min9@zte.com.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; format=flowed
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 24, 2022 at 12:08 AM Eugenio P=C3=A9rez <eperezma@redhat.com> w=
-rote:
->
-> Implement suspend operation for vdpa_sim devices, so vhost-vdpa will
-> offer that backend feature and userspace can effectively suspend the
-> device.
->
-> This is a must before get virtqueue indexes (base) for live migration,
-> since the device could modify them after userland gets them. There are
-> individual ways to perform that action for some devices
-> (VHOST_NET_SET_BACKEND, VHOST_VSOCK_SET_RUNNING, ...) but there was no
-> way to perform it for any vhost device (and, in particular, vhost-vdpa).
->
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> ---
->  drivers/vdpa/vdpa_sim/vdpa_sim.c     | 21 +++++++++++++++++++++
->  drivers/vdpa/vdpa_sim/vdpa_sim.h     |  1 +
->  drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  3 +++
->  drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  3 +++
->  4 files changed, 28 insertions(+)
->
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdp=
-a_sim.c
-> index 0f2865899647..213883487f9b 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -107,6 +107,7 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
->         for (i =3D 0; i < vdpasim->dev_attr.nas; i++)
->                 vhost_iotlb_reset(&vdpasim->iommu[i]);
->
-> +       vdpasim->running =3D true;
->         spin_unlock(&vdpasim->iommu_lock);
->
->         vdpasim->features =3D 0;
-> @@ -505,6 +506,24 @@ static int vdpasim_reset(struct vdpa_device *vdpa)
->         return 0;
->  }
->
-> +static int vdpasim_suspend(struct vdpa_device *vdpa)
-> +{
-> +       struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
-> +       int i;
-> +
-> +       spin_lock(&vdpasim->lock);
-> +       vdpasim->running =3D false;
-> +       if (vdpasim->running) {
-> +               /* Check for missed buffers */
-> +               for (i =3D 0; i < vdpasim->dev_attr.nvqs; ++i)
-> +                       vdpasim_kick_vq(vdpa, i);
 
-This seems only valid if we allow resuming?
+Cornelia Huck <cohuck@redhat.com> writes:
 
-Thanks
-
-> +
-> +       }
-> +       spin_unlock(&vdpasim->lock);
-> +
-> +       return 0;
-> +}
-> +
->  static size_t vdpasim_get_config_size(struct vdpa_device *vdpa)
->  {
->         struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
-> @@ -694,6 +713,7 @@ static const struct vdpa_config_ops vdpasim_config_op=
-s =3D {
->         .get_status             =3D vdpasim_get_status,
->         .set_status             =3D vdpasim_set_status,
->         .reset                  =3D vdpasim_reset,
-> +       .suspend                =3D vdpasim_suspend,
->         .get_config_size        =3D vdpasim_get_config_size,
->         .get_config             =3D vdpasim_get_config,
->         .set_config             =3D vdpasim_set_config,
-> @@ -726,6 +746,7 @@ static const struct vdpa_config_ops vdpasim_batch_con=
-fig_ops =3D {
->         .get_status             =3D vdpasim_get_status,
->         .set_status             =3D vdpasim_set_status,
->         .reset                  =3D vdpasim_reset,
-> +       .suspend                =3D vdpasim_suspend,
->         .get_config_size        =3D vdpasim_get_config_size,
->         .get_config             =3D vdpasim_get_config,
->         .set_config             =3D vdpasim_set_config,
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdp=
-a_sim.h
-> index 622782e92239..061986f30911 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> @@ -66,6 +66,7 @@ struct vdpasim {
->         u32 generation;
->         u64 features;
->         u32 groups;
-> +       bool running;
->         /* spinlock to synchronize iommu table */
->         spinlock_t iommu_lock;
->  };
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim=
-/vdpa_sim_blk.c
-> index 42d401d43911..bcdb1982c378 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-> @@ -204,6 +204,9 @@ static void vdpasim_blk_work(struct work_struct *work=
-)
->         if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
->                 goto out;
+> On Tue, Jun 28 2022, Alex Williamson 
+> <alex.williamson@redhat.com> wrote:
 >
-> +       if (!vdpasim->running)
-> +               goto out;
-> +
->         for (i =3D 0; i < VDPASIM_BLK_VQ_NUM; i++) {
->                 struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[i];
+>> On Tue, 28 Jun 2022 23:24:29 +0800
+>> Schspa Shi <schspa@gmail.com> wrote:
+>>
+>>> API vfio_info_cap_add will free caps->buf, clear it to NULL 
+>>> after
+>>> free.
+>>
+>> Should this be something like:
+>>
+>>     On buffer resize failure, vfio_info_cap_add() will free the 
+>>     buffer,
+>>     report zero for the size, and return -ENOMEM.  As 
+>>     additional
+>>     hardening, also clear the buffer pointer to prevent any 
+>>     chance of a
+>>     double free.
 >
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa_sim=
-/vdpa_sim_net.c
-> index 5125976a4df8..886449e88502 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
-> @@ -154,6 +154,9 @@ static void vdpasim_net_work(struct work_struct *work=
-)
+> I like that better. With that,
 >
->         spin_lock(&vdpasim->lock);
->
-> +       if (!vdpasim->running)
-> +               goto out;
-> +
->         if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
->                 goto out;
->
-> --
-> 2.31.1
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 >
 
+I have send a V3 patch for this comment change, please review it.
+
+>>
+>> Thanks,
+>> Alex
+>>  
+>>> Signed-off-by: Schspa Shi <schspa@gmail.com>
+>>> ---
+>>>  drivers/vfio/vfio.c | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>> 
+>>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+>>> index 61e71c1154be..a0fb93866f61 100644
+>>> --- a/drivers/vfio/vfio.c
+>>> +++ b/drivers/vfio/vfio.c
+>>> @@ -1812,6 +1812,7 @@ struct vfio_info_cap_header 
+>>> *vfio_info_cap_add(struct vfio_info_cap *caps,
+>>>  	buf = krealloc(caps->buf, caps->size + size, GFP_KERNEL);
+>>>  	if (!buf) {
+>>>  		kfree(caps->buf);
+>>> +		caps->buf = NULL;
+>>>  		caps->size = 0;
+>>>  		return ERR_PTR(-ENOMEM);
+>>>  	}
+
+-- 
+BRs
+Schspa Shi
