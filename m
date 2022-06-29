@@ -2,133 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43680560B05
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 22:28:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 990EB560B35
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 22:40:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbiF2U2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 16:28:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54164 "EHLO
+        id S230042AbiF2Uks (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 16:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiF2U2f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 16:28:35 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67210140B8
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 13:28:34 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id q11so23162964oih.10
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 13:28:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KimsAoqWoBrckvrcWpjK4MOnhaDZP2RBKEz3EuP/iv0=;
-        b=QHei7/5WL4hfbeuAzCg4LaoNAqlQ2HGQMzjAP0kBgkQJ5H5joM7A64WoPajiwd+Nx+
-         s8o6ZDbyUw3coAAFdaWkwagdkTSSy1V8gYj4lxaqO5xIl/hMMi+/fHzAC9NonvcY3W1f
-         2gqs9vB5JhKGTIuVKeWbwQZm+OsR+mz+BNOj2QNi1zChQxJmCUPTSe8nuZ2yQMuVFm1o
-         +0/vMxfMP4wnXc8B7vxMS7GzZ9xZyhUZGsX9znUXgHwJ2xuNicMKx/yljOJGxVFX2rl3
-         0r6zYQ2nC6gKwjNIGKM2m2qvFc3EVDsP6dvht4lpI0Z1w9EcKX74Huo1hSapRM2+8xFX
-         7sWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KimsAoqWoBrckvrcWpjK4MOnhaDZP2RBKEz3EuP/iv0=;
-        b=DgVhRQdn7JL1hx+odS8l8KXW0Vu/aJr6GK/7ApenB33Fi5N9r3B7pGRHcqMB7uduGd
-         6P+D1UvhynWx2i3unSicbBp+awGI7kRQueynI48eHIQcEM4e1AVautaFE16yUdxcgE5i
-         xzcidEpPwio/fg4vr+Q5n6OLN0zY/f38OAZNsAX3I+8DJmsFkTX5qmNaL3xUvFK5bjuA
-         GvfRVYyK5VoNCGgAWK95Vo71pRQvn4+0JpMZSWc3mdjZfj8xhHCSYau6Te3EGCP81sqt
-         yjqwm+zWKyh6ztiqzhsnsD+jOaJHBaaANKhhh8Pdx0pLf/A3HYKqBoaTOTLICVnWyI3i
-         g9Gw==
-X-Gm-Message-State: AJIora9qKXSGN7MbUmGJaMNiDmVd+vUl0WUXdxcoTiG2gJu5c4YcAB7u
-        q21oTuBMgueEAn8gvnwwyNala3oC2+gKuDKJD1WIag==
-X-Google-Smtp-Source: AGRyM1u0hjO1hiivU9zp5lyMVFAHT9bs3enwDIbNjIaz38j/SCm8ezqQYsGur2WDnSfxG9bJLrv+n90SrLQNKQ6uMrQ=
-X-Received: by 2002:a05:6808:2124:b0:335:7483:f62d with SMTP id
- r36-20020a056808212400b003357483f62dmr4297123oiw.112.1656534513612; Wed, 29
- Jun 2022 13:28:33 -0700 (PDT)
+        with ESMTP id S229492AbiF2Ukr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 16:40:47 -0400
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA92E18E39
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 13:40:46 -0700 (PDT)
+Received: from pps.filterd (m0148663.ppops.net [127.0.0.1])
+        by mx0a-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25TKXsoa020052;
+        Wed, 29 Jun 2022 20:39:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pps0720;
+ bh=E86g9OTi+9GSwfglC6D+sQ1dmzDovgLH/QYZj84UJuw=;
+ b=H8TEdWs1YZ22WF6oETmM6/i73FZvSrjgNdfV3axSX9VISG9ZpzjKj11Pi/07za/PVOhu
+ gAgown6iWhQ51Sq1HzMJ0G5+TwgxF0arRwkXh5pudcfZ6YlzCANz8VtLY+mhcHq6NAeb
+ nnBysHdxnX8JrC1ztPqJti6mGIEaaffvXIMv6J8sZFMbE9qThO7yk3Q5hYpxIxgWraj/
+ Y7ZAOm/TO9B/GvOy6HEPLhpubcy5BuRNy0qr3QrpIgO1oPnxWFxLYJ5HgImYjce+NBmj
+ jLHBMw+wOty8Fp7FRDwrgZUc1AGa/UPV2HGPuYKo5WlXVhSywo+L94S9YpSmIJSco7Nf 1w== 
+Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
+        by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3h0wkvg7nx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Jun 2022 20:39:42 +0000
+Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 1BBC680020D;
+        Wed, 29 Jun 2022 20:39:41 +0000 (UTC)
+Received: from cat.eag.rdlabs.hpecorp.net (unknown [16.231.227.36])
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id C4FAE809406;
+        Wed, 29 Jun 2022 20:39:40 +0000 (UTC)
+Received: by cat.eag.rdlabs.hpecorp.net (Postfix, from userid 48777)
+        id 1B5D595217; Wed, 29 Jun 2022 15:39:40 -0500 (CDT)
+From:   Kyle Meyer <kyle.meyer@hpe.com>
+To:     seanjc@google.com
+Cc:     bp@alien8.de, dave.hansen@linux.intel.com, dmatlack@google.com,
+        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, kyle.meyer@hpe.com, mingo@redhat.com,
+        payton@hpe.com, russ.anderson@hpe.com, steve.wahl@hpe.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Subject: [PATCH v2] KVM: x86: Increase KVM_MAX_VCPUS to 4096
+Date:   Wed, 29 Jun 2022 15:38:24 -0500
+Message-Id: <20220629203824.150259-1-kyle.meyer@hpe.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <YqthQ6QmK43ZPfkM@google.com>
+References: <YqthQ6QmK43ZPfkM@google.com>
 MIME-Version: 1.0
-References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-15-vkuznets@redhat.com>
-In-Reply-To: <20220629150625.238286-15-vkuznets@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 29 Jun 2022 13:28:22 -0700
-Message-ID: <CALMp9eRZAJ3srAtEXFy2nZ4ms9xPz=Zqi6B=tXo9_kHRLvoAMg@mail.gmail.com>
-Subject: Re: [PATCH v2 14/28] KVM: VMX: Check VM_ENTRY_IA32E_MODE in setup_vmcs_config()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: FbU_7HazLKfe-6kKmSct4P5Zn54vttM3
+X-Proofpoint-ORIG-GUID: FbU_7HazLKfe-6kKmSct4P5Zn54vttM3
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-29_22,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=900 priorityscore=1501 suspectscore=0 adultscore=0 mlxscore=0
+ phishscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0 clxscore=1011
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206290071
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> VM_ENTRY_IA32E_MODE control is toggled dynamically by vmx_set_efer()
-> and setup_vmcs_config() doesn't check its existence. On the contrary,
-> nested_vmx_setup_ctls_msrs() doesn set it on x86_64. Add the missing
-> check and filter the bit out in vmx_vmentry_ctrl().
->
-> No (real) functional change intended as all existing CPUs supporting
-> long mode and VMX are supposed to have it.
->
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 83feb70d44a9..da8bbba38d0e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2610,6 +2610,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->                 _pin_based_exec_control &= ~PIN_BASED_POSTED_INTR;
->
->         min = VM_ENTRY_LOAD_DEBUG_CONTROLS;
-> +#ifdef CONFIG_X86_64
-> +       min |= VM_ENTRY_IA32E_MODE;
-> +#endif
->         opt = VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
->               VM_ENTRY_LOAD_IA32_PAT |
->               VM_ENTRY_LOAD_IA32_EFER |
-> @@ -4242,9 +4245,15 @@ static u32 vmx_vmentry_ctrl(void)
->         if (vmx_pt_mode_is_system())
->                 vmentry_ctrl &= ~(VM_ENTRY_PT_CONCEAL_PIP |
->                                   VM_ENTRY_LOAD_IA32_RTIT_CTL);
-> -       /* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
-> -       return vmentry_ctrl &
-> -               ~(VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VM_ENTRY_LOAD_IA32_EFER);
-> +       /*
-> +        * Loading of EFER, VM_ENTRY_IA32E_MODE, and PERF_GLOBAL_CTRL
-> +        * are toggled dynamically.
-> +        */
-Nit: Previously, this could be read as "loading of (EFER and
-PERF_GLOBAL_CTRL)." Since "loading" doesn't apply to IA32e mode,
-you've lost "loading" of PERF_GLOBAL_CONTROL. Also, why drop the
-VM_ENTRY prefix from the MSRs and not from IA32e mode?
-Perhaps:
+Increase KVM_MAX_VCPUS to 4096 when the maximum number of supported CPUs
+(NR_CPUS) is greater than 1024.
 
-/*
- * IA32e mode, and loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically.
- */
+The Hyper-V TLFS doesn't allow more than 64 sparse banks, which allows a
+maximum of 4096 virtual CPUs. Limit KVM's maximum number of virtual CPUs
+to 4096 to avoid exceeding that limit.
 
-> +       vmentry_ctrl &= ~(VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +                         VM_ENTRY_LOAD_IA32_EFER |
-> +                         VM_ENTRY_IA32E_MODE);
-> +
-> +       return vmentry_ctrl;
->  }
->
->  static u32 vmx_vmexit_ctrl(void)
-> --
-> 2.35.3
->
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Notable changes:
+
+* KVM_MAX_VCPU_IDS will increase from 4096 to 16384.
+* KVM_HV_MAX_SPARSE_VCPU_SET_BITS will increase from 16 to 64.
+
+* CPUID[HYPERV_CPUID_IMPLEMENT_LIMITS (00x40000005)].EAX will now be 4096.
+
+* struct kvm will increase from 40336 B to 40720 B.
+* struct kvm_ioapic will increase from 5240 B to 19064 B.
+
+* vcpu_mask in kvm_hv_flush_tlb will increase from 128 B to 512 B.
+* vcpu_bitmap in ioapic_write_indirect will increase from 128 B to 512 B.
+* vp_bitmap in sparse_set_to_vcpu_mask will increase from 128 B to 512 B.
+
+Signed-off-by: Kyle Meyer <kyle.meyer@hpe.com>
+---
+ arch/x86/include/asm/kvm_host.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9217bd6cf0d1..867a945f0152 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -38,7 +38,11 @@
+ 
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ 
++#if NR_CPUS < 1024
+ #define KVM_MAX_VCPUS 1024
++#else
++#define KVM_MAX_VCPUS 4096
++#endif
+ 
+ /*
+  * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
+-- 
+2.26.2
+
