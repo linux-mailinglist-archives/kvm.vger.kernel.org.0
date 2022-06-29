@@ -2,167 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B299156027F
-	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 16:23:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCBD35603D6
+	for <lists+kvm@lfdr.de>; Wed, 29 Jun 2022 17:06:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbiF2OXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 10:23:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
+        id S233216AbiF2PGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 11:06:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229654AbiF2OXr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 10:23:47 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B842019A;
-        Wed, 29 Jun 2022 07:23:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656512626; x=1688048626;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=VZ40xQw0fMQsaP9afTcE5BSHMDKFla4/EFEXM7mjbWU=;
-  b=TKsJ3vJ6LMlJ5Ypf/NO8OGsf3O0G+h5pQZsohnVYGxagmWk/TtYBsTHd
-   Scsp5HZ6WPD4FUfdYUxbfRDr4dMOtGq5KAJ7E2h5Ne6fu0jx1bwGB6Jdh
-   vVSae3CX9BDBgsUwBOj85laitAaUQd8aD+LdGzWgHfhnpV1NTFpyHzYd+
-   8yx1uSqltflxRZF1InzHcBiM8lcyIc4E35d9kFTNFe6pTdwiYlLuU4FVn
-   aCUCjnSMr0Bc4oQr4ntHQoGdItp9SQZSfMK10s1Nb53Kp92NTjRf/lXoI
-   9L2H0OZogVOXitY3QJj75WFETkjOwhxRbjH5SRBAZ7LBQ2dJZj53i4YJI
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10392"; a="262447052"
-X-IronPort-AV: E=Sophos;i="5.92,231,1650956400"; 
-   d="scan'208";a="262447052"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2022 07:23:46 -0700
-X-IronPort-AV: E=Sophos;i="5.92,231,1650956400"; 
-   d="scan'208";a="617588085"
-Received: from staibmic-mobl1.amr.corp.intel.com (HELO [10.209.67.166]) ([10.209.67.166])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2022 07:23:45 -0700
-Message-ID: <a2277c2f-91a1-871f-08f1-42950bca53b3@intel.com>
-Date:   Wed, 29 Jun 2022 07:22:34 -0700
+        with ESMTP id S230213AbiF2PGe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 11:06:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 314AB13CD3
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 08:06:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656515192;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rVgaRC1iHp+TixDi6SmECfMb1vkUScvqSyrOozckYA8=;
+        b=c2JvxTPOpH0/EG76RE8PvHG/SnsCsh5edWUkxgitBBuuQu4SV63/U13XnULJwTQE1eripW
+        VABa9uO/99VD8iSfXTY2UUCssJ188Pzr17UCxqb3vbw0i8MaZ7InDxDm2W4jXmwteoyCp+
+        Wp+Ftr3mdFzPVVvecttyTpeMUxh33/o=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-306-wJTPDIUQMzivuzqhkwJ-wA-1; Wed, 29 Jun 2022 11:06:29 -0400
+X-MC-Unique: wJTPDIUQMzivuzqhkwJ-wA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 593781C0898F;
+        Wed, 29 Jun 2022 15:06:28 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.192.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A347040EC002;
+        Wed, 29 Jun 2022 15:06:26 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/28] KVM: VMX: Support TscScaling and EnclsExitingBitmap with eVMCS + use vmcs_config for L1 VMX MSRs
+Date:   Wed, 29 Jun 2022 17:05:57 +0200
+Message-Id: <20220629150625.238286-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v5 04/22] x86/virt/tdx: Prevent ACPI CPU hotplug and ACPI
- memory hotplug
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com, len.brown@intel.com,
-        tony.luck@intel.com, rafael.j.wysocki@intel.com,
-        reinette.chatre@intel.com, dan.j.williams@intel.com,
-        peterz@infradead.org, ak@linux.intel.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        isaku.yamahata@intel.com, thomas.lendacky@amd.com,
-        Tianyu.Lan@microsoft.com
-References: <cover.1655894131.git.kai.huang@intel.com>
- <3a1c9807d8c140bdd550cd5736664f86782cca64.1655894131.git.kai.huang@intel.com>
- <20220624014112.GA15566@gao-cwp>
- <951da5eeb4214521635602ce3564246ad49018f5.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <951da5eeb4214521635602ce3564246ad49018f5.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/24/22 04:21, Kai Huang wrote:
-> Personally I don't quite like this way.  To me having separate function for host
-> and guest is more clear and more flexible.  And I don't think having
-> #ifdef/endif has any problem.  I would like to leave to maintainers.
+This series combines previously sent:
+- "[PATCH 00/11] KVM: VMX: Support TscScaling and EnclsExitingBitmap
+ with eVMCS" 
+(https://lore.kernel.org/kvm/20220621155830.60115-1-vkuznets@redhat.com/)
+and 
+- "[PATCH 00/14] KVM: nVMX: Use vmcs_config for setting up nested VMX MSRs"
+(https://lore.kernel.org/kvm/20220627160440.31857-1-vkuznets@redhat.com/)
 
-It has problems.
+this is done to address Jim's concern that any changes to L1 VMX control
+MSRs will inevitably break live migration. This version should not produce
+changes.
 
-Let's go through some of them.  First, this:
+Original description:
 
-> +#ifdef CONFIG_INTEL_TDX_HOST
-> +static bool intel_tdx_host_has(enum cc_attr attr)
-> +{
-> +	switch (attr) {
-> +	case CC_ATTR_ACPI_CPU_HOTPLUG_DISABLED:
-> +	case CC_ATTR_ACPI_MEMORY_HOTPLUG_DISABLED:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +#endif
+Enlightened VMCS v1 definition was updates to include fields for the
+following features:
+    - PerfGlobalCtrl
+    - EnclsExitingBitmap
+    - TSC scaling
+    - GuestLbrCtl
+    - CET
+    - SSP
 
-What does that #ifdef get us?  I suspect you're back to trying to
-silence compiler warnings with #ifdefs.  The compiler *knows* that it's
-only used in this file.  It's also used all of once.  If you make it
-'static inline', you'll likely get the same code generation, no
-warnings, and don't need an #ifdef.
+Add support for EnclsExitingBitmap and TSC scaling to KVM. PerfGlobalCtrl 
+doesn't work correctly with Win11, don't enable it yet. SSP, CET and 
+GuestLbrCtl are not currently supported by KVM.
 
-The other option is to totally lean on the compiler to figure things
-out.  Compile this program, then disassemble it and see what main() does.
+Note: adding new field for KVM on Hyper-V case is easy but adding them to
+Hyper-V on KVM requires some work to not break live migration as we never
+expected this to happen without eVMCS version update. The series introduces
+new KVM_CAP_HYPERV_ENLIGHTENED_VMCS2 capability and a notion of KVM 
+internal 'Enlightened VMCS revision'.
 
-static void func(void)
-{
-	printf("I am func()\n");
-}
+While on it, implement Sean's idea to use vmcs_config for setting up
+L1 VMX control MSRs instead of re-reading host MSRs.
 
-void main(int argc, char **argv)
-{
-	if (0)
-		func();
-}
+Sean Christopherson (1):
+  KVM: VMX: Clear controls obsoleted by EPT at runtime, not setup
 
-Then, do:
+Vitaly Kuznetsov (27):
+  KVM: x86: hyper-v: Expose access to debug MSRs in the partition
+    privilege flags
+  x86/hyperv: Fix 'struct hv_enlightened_vmcs' definition
+  x86/hyperv: Update 'struct hv_enlightened_vmcs' definition
+  KVM: VMX: Define VMCS-to-EVMCS conversion for the new fields
+  KVM: nVMX: Support several new fields in eVMCSv1
+  KVM: nVMX: Introduce KVM_CAP_HYPERV_ENLIGHTENED_VMCS2
+  KVM: selftests: Switch to KVM_CAP_HYPERV_ENLIGHTENED_VMCS2
+  KVM: VMX: Support TSC scaling with enlightened VMCS
+  KVM: selftests: Add ENCLS_EXITING_BITMAP{,HIGH} VMCS fields
+  KVM: selftests: Switch to updated eVMCSv1 definition
+  KVM: selftests: Enable TSC scaling in evmcs selftest
+  KVM: VMX: Enable VM_{EXIT,ENTRY}_LOAD_IA32_PERF_GLOBAL_CTRL for KVM on
+    Hyper-V
+  KVM: VMX: Get rid of eVMCS specific VMX controls sanitization
+  KVM: VMX: Check VM_ENTRY_IA32E_MODE in setup_vmcs_config()
+  KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING in
+    setup_vmcs_config()
+  KVM: VMX: Tweak the special handling of SECONDARY_EXEC_ENCLS_EXITING
+    in setup_vmcs_config()
+  KVM: VMX: Extend VMX controls macro shenanigans
+  KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering out of
+    setup_vmcs_config()
+  KVM: VMX: Add missing VMEXIT controls to vmcs_config
+  KVM: VMX: Add missing VMENTRY controls to vmcs_config
+  KVM: VMX: Add missing CPU based VM execution controls to vmcs_config
+  KVM: VMX: Move LOAD_IA32_PERF_GLOBAL_CTRL errata handling out of
+    setup_vmcs_config()
+  KVM: nVMX: Use sanitized allowed-1 bits for VMX control MSRs
+  KVM: VMX: Store required-1 VMX controls in vmcs_config
+  KVM: nVMX: Use sanitized required-1 bits for VMX control MSRs
+  KVM: VMX: Cache MSR_IA32_VMX_MISC in vmcs_config
+  KVM: nVMX: Use cached host MSR_IA32_VMX_MISC value for setting up
+    nested MSR
 
--	if (0)
-+	if (argc)
+ Documentation/virt/kvm/api.rst                |  43 ++-
+ arch/x86/include/asm/hyperv-tlfs.h            |  19 +-
+ arch/x86/include/asm/kvm_host.h               |   2 +-
+ arch/x86/kvm/hyperv.c                         |   1 +
+ arch/x86/kvm/vmx/capabilities.h               |  16 +-
+ arch/x86/kvm/vmx/evmcs.c                      | 135 ++++++---
+ arch/x86/kvm/vmx/evmcs.h                      |  34 ++-
+ arch/x86/kvm/vmx/nested.c                     |  80 ++++--
+ arch/x86/kvm/vmx/nested.h                     |   2 +-
+ arch/x86/kvm/vmx/vmx.c                        | 269 +++++++++---------
+ arch/x86/kvm/vmx/vmx.h                        | 133 ++++++++-
+ arch/x86/kvm/x86.c                            |  15 +-
+ include/asm-generic/hyperv-tlfs.h             |   2 +
+ include/uapi/linux/kvm.h                      |   3 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   8 +
+ .../selftests/kvm/include/x86_64/evmcs.h      |  46 ++-
+ .../selftests/kvm/include/x86_64/vmx.h        |   2 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   5 +-
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  33 ++-
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       |   2 +-
+ .../kvm/x86_64/vmx_set_nested_state_test.c    |   2 +-
+ 21 files changed, 597 insertions(+), 255 deletions(-)
 
-and run it again.  What changed in the disassembly?
+-- 
+2.35.3
 
-> +static bool intel_cc_platform_has(enum cc_attr attr)
-> +{
-> +#ifdef CONFIG_INTEL_TDX_GUEST
-> +	if (boot_cpu_has(X86_FEATURE_TDX_GUEST))
-> +		return intel_tdx_guest_has(attr);
-> +#endif
-
-Make this check cpu_feature_enabled(X86_FEATURE_TDX_GUEST).  That has an
-#ifdef built in to it.  That gets rid of this #ifdef.  You have
-
-> +#ifdef CONFIG_INTEL_TDX_HOST
-> +	if (platform_tdx_enabled())
-> +		return intel_tdx_host_has(attr);
-> +#endif
-> +	return false;
-> +}
-
-Now, let's turn our attention to platform_tdx_enabled().  Here's its
-stub and declaration:
-
-> +#ifdef CONFIG_INTEL_TDX_HOST
-> +bool platform_tdx_enabled(void);
-> +#else  /* !CONFIG_INTEL_TDX_HOST */
-> +static inline bool platform_tdx_enabled(void) { return false; }
-> +#endif /* CONFIG_INTEL_TDX_HOST */
-
-It already has an #ifdef CONFIG_INTEL_TDX_HOST, so that #ifdef can just
-go away.
-
-Kai, the reason that we have the rule that Yuan cited:
-
-> "Wherever possible, don't use preprocessor conditionals (#if, #ifdef) in .c"
-> From Documentation/process/coding-style.rst, 21) Conditional Compilation.
-
-is not because there are *ZERO* #ifdefs in .c files.  It's because
-#ifdefs in .c files hurt readability and are usually avoidable.  How do
-you avoid them?  Well, you take a moment and look at the code and see
-how other folks have made it readable.  It takes refactoring of code to
-banish #ifdefs to headers or replace them with compiler constructs so
-that the compiler can do the work behind the scenes.
-
-Kai, could you please take the information I gave you in this message
-and try to apply it across this series?  Heck, can you please take it
-and use it to review others' code to make sure they don't encounter the
-same pitfalls?
