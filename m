@@ -2,63 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A09C561FC0
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 17:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61AEF561FC9
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 17:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235985AbiF3Pzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 11:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35304 "EHLO
+        id S236291AbiF3P5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 11:57:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236232AbiF3Pzo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 11:55:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6B0CD39817
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 08:55:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656604542;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nRvPip85gUSbUJnsZ8cTFSvmkrYw0M7WomwTPU0jwws=;
-        b=B6UCXX1D+JLJUnyIbQHkPxuW1SZIeB7PA/OkmpdIB8aWQNiHSrSMYGB2JoVeyGTXgNGDtt
-        SYQub5N5xP7Nf5wgcuAiwx680NdQD5eQXGI2/VFagqW2ZA4PtHepzAzjRpzp4rROz5GRWk
-        R29fRoll4WRXrC+zFHoH/orHhI3JJ9s=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-357-zHtl7fHHORa_8sUJbxyC8g-1; Thu, 30 Jun 2022 11:55:40 -0400
-X-MC-Unique: zHtl7fHHORa_8sUJbxyC8g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F03D42919ECB;
-        Thu, 30 Jun 2022 15:55:39 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A2F702166B26;
-        Thu, 30 Jun 2022 15:55:39 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Auger <eauger@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC 1/2] arm/kvm: enable MTE if available
-In-Reply-To: <9dfbfd42-6a40-80d2-8d9d-f5849de0b726@redhat.com>
-Organization: Red Hat GmbH
-References: <20220512131146.78457-1-cohuck@redhat.com>
- <20220512131146.78457-2-cohuck@redhat.com>
- <a3d0a093-3d59-5882-c9c8-6619e5aeb3ab@redhat.com>
- <877d5jskmw.fsf@redhat.com>
- <9dfbfd42-6a40-80d2-8d9d-f5849de0b726@redhat.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date:   Thu, 30 Jun 2022 17:55:38 +0200
-Message-ID: <87o7ya2lj9.fsf@redhat.com>
+        with ESMTP id S236228AbiF3P5N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 11:57:13 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D94703B2A2
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 08:57:11 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE37A1063;
+        Thu, 30 Jun 2022 08:57:11 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E7773F66F;
+        Thu, 30 Jun 2022 08:57:10 -0700 (PDT)
+Date:   Thu, 30 Jun 2022 16:57:39 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        andrew.jones@linux.dev, pbonzini@redhat.com, jade.alglave@arm.com,
+        ricarkol@google.com
+Subject: Re: [kvm-unit-tests PATCH v3 15/27] arm/arm64: mmu_disable: Clean
+ and invalidate before disabling
+Message-ID: <Yr3H4HM/bMaahFk2@monolith.localdoman>
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-16-nikos.nikoleris@arm.com>
+ <Yr1480um3Blh078q@monolith.localdoman>
+ <16eda3c9-ec36-cd45-5c1a-0307f60dbc5f@arm.com>
+ <Yr2H3AiNGHeKReP2@monolith.localdoman>
+ <218172cd-25fc-8888-96cc-a7b5a9c65f73@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <218172cd-25fc-8888-96cc-a7b5a9c65f73@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -67,46 +49,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29 2022, Eric Auger <eauger@redhat.com> wrote:
+Hi,
 
-> Hi Connie,
->
-> On 6/14/22 10:40, Cornelia Huck wrote:
->> On Fri, Jun 10 2022, Eric Auger <eauger@redhat.com> wrote:
->> 
->>> Hi Connie,
->>> On 5/12/22 15:11, Cornelia Huck wrote:
->>>> We need to disable migration, as we do not yet have a way to migrate
->>>> the tags as well.
->>>
->>> This patch does much more than adding a migration blocker ;-) you may
->>> describe the new cpu option and how it works.
->> 
->> I admit this is a bit terse ;) The idea is to control mte at the cpu
->> level directly (and not indirectly via tag memory at the machine
->> level). I.e. the user gets whatever is available given the constraints
->> (host support etc.) if they don't specify anything, and they can
->> explicitly turn it off/on.
->
-> Could the OnOffAuto property value be helpful?
+On Thu, Jun 30, 2022 at 04:16:09PM +0100, Nikos Nikoleris wrote:
+> Hi Alex,
+> 
+> On 30/06/2022 12:24, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > On Thu, Jun 30, 2022 at 12:08:41PM +0100, Nikos Nikoleris wrote:
+> > > Hi Alex,
+> > > 
+> > > On 30/06/2022 11:20, Alexandru Elisei wrote:
+> > > > Hi,
+> > > > 
+> > > > On Thu, Jun 30, 2022 at 11:03:12AM +0100, Nikos Nikoleris wrote:
+> > > > > From: Andrew Jones <drjones@redhat.com>
+> > > > > 
+> > > > > The commit message of commit 410b3bf09e76 ("arm/arm64: Perform dcache
+> > > > > clean + invalidate after turning MMU off") justifies cleaning and
+> > > > > invalidating the dcache after disabling the MMU by saying it's nice
+> > > > > not to rely on the current page tables and that it should still work
+> > > > > (per the spec), as long as there's an identity map in the current
+> > > > > tables. Doing the invalidation after also somewhat helped with
+> > > > > reenabling the MMU without seeing stale data, but the real problem
+> > > > > with reenabling was because the cache needs to be disabled with
+> > > > > the MMU, but it wasn't.
+> > > > > 
+> > > > > Since we have to trust/validate that the current page tables have an
+> > > > > identity map anyway, then there's no harm in doing the clean
+> > > > > and invalidate first (it feels a little better to do so, anyway,
+> > > > > considering the cache maintenance instructions take virtual
+> > > > > addresses). Then, also disable the cache with the MMU to avoid
+> > > > > problems when reenabling. We invalidate the Icache and disable
+> > > > > that too for good measure. And, a final TLB invalidation ensures
+> > > > > we're crystal clean when we return from asm_mmu_disable().
+> > > > 
+> > > > I'll point you to my previous reply [1] to this exact patch which explains
+> > > > why it's incorrect and is only papering over another problem.
+> > > > 
+> > > > [1] https://lore.kernel.org/all/Yn5Z6Kyj62cUNgRN@monolith.localdoman/
+> > > > 
+> > > 
+> > > Apologies, I didn't mean to ignore your feedback on this. There was a
+> > > parallel discussion in [2] which I thought makes the problem more concrete.
+> > 
+> > No problem, I figured as much :).
+> > 
+> > > 
+> > > This is Drew's patch as soon as he confirms he's also happy with the change
+> > > you suggested in the patch description I am happy to make it.
+> > > 
+> > > Generally, a test will start off with the MMU enabled. At this point, we
+> > > access code, use and modify data (EfiLoaderData, EfiLoaderCode). Any of the
+> > > two regions could be mapped as any type of memory (I need to have another
+> > > look to confirm if it's Normal Memory). Then we want to take over control of
+> > > the page tables and for that reason we have to switch off the MMU. And any
+> > > access to code or data will be with Device-nGnRnE as you pointed out. If we
+> > > don't clean and invalidate, instructions and data might be in the cache and
+> > > we will be mixing memory attributes, won't we?
+> > 
+> > I missed that comment, sorry. I've replied to that comment made in v2,
+> > here, in this ieration, in patch #19 ("arm/arm64: Add a setup sequence for
+> > systems that boot through EFI").
+> > 
+> > This is the second time you've mentioned mixed memory attributes, so I'm
+> > going to reiterate the question I asked in patch #19: what do you mean by
+> > "mixing memory attributes" and what is wrong with it? Because it looks to
+> > me like you're saying that you cannot access data written with the MMU on
+> > when the MMU is off (and I assume the other way around, you cannot data
+> > written with the MMU off when the MMU is on).
+> > 
+> 
+> What I mean by mixing memory attributes is illustrated by the following
+> example.
+> 
+> Take a memory location x, for which the page table entry maps to a physical
+> location as Normal, Inner-Shareable, Inner-writeback and Outer-writeback. If
+> we access it when the MMU is on and subquently when the MMU is off (treated
+> as Device-nGnRnE), then we have two accesses with mismatched memory
+> attributes to the same location. There is a whole section in the Arm ARM on
+> why this needs to be avoided (B2.8 Mismatched memory attributes) but the
+> result is "a loss of the uniprocessor semantics, ordering, or coherency". As
+> I understand, the solution to this is:
+> 
+> "If the mismatched attributes for a Location mean that multiple cacheable
+> accesses to the Location might be made with different shareability
+> attributes, then uniprocessor semantics, ordering, and coherency are
+> guaranteed only if:
+> • Software running on a PE cleans and invalidates a Location from cache
+> before and after each read or write to that Location by that PE.
+> • A DMB barrier with scope that covers the full shareability of the accesses
+> is placed between any accesses to the same memory Location that use
+> different attributes."
 
-I completely forgot that this exists; I hacked up something (still
-untested), and it seems to be able to do what I want.
+Ok, so this is about *mismatched* memory attributes. I searched the Arm ARM
+for the string "mixed" and nothing relevant came up.
 
-I'll post it after I've verified that it actually works :)
+Device-whatever memory is outer shareable and kvm-unit-tests maps memory as
+inner shareable, so that matches the "different shareability attributes"
+part of the paragraph.
 
->> The big elefant in the room is how migration will end up
->> working... after reading the disscussions in
->> https://lore.kernel.org/all/CAJc+Z1FZxSYB_zJit4+0uTR-88VqQL+-01XNMSEfua-dXDy6Wg@mail.gmail.com/
->> I don't think it will be as "easy" as I thought, and we probably require
->> some further fiddling on the kernel side.
-> Yes maybe the MTE migration process shall be documented and discussed
-> separately on the ML? Is Haibu Xu's address bouncing?
+But I would like to point out that there is only one type of cacheable
+access that is being performed, when the MMU is on. When the MMU is off,
+the access is not cacheable. So there are two types of accesses being
+performed:
 
-Yes, that address is bouncing...
+- cacheable + inner-shareable (MMU on)
+- non-cacheable + outer-shareable (MMU off)
 
-I've piggybacked onto a recent kvm discussion in
-https://lore.kernel.org/all/875ykmcd8q.fsf@redhat.com/ -- I guess there
-had not been any change for migration in the meantime, we need to find a
-way to tie page data + metadata together.
+It looks to me like the paragraph doesn't apply to our case, because there
+are no "multiple cacheable accesses [..] made with different shareability
+attributes". Do you agree?
 
+> 
+> So unless UEFI maps all memory as Device-nGnRnE we have to do something. I
+> will try to find out more about UEFI's page tables.
+
+That's important to know, especially regarding the text section of the
+image. If UEFI doesnt' clean it to PoC, kvm-unit-tests must do it in order
+to execute correctly with the MMU off.
+
+Thanks,
+Alex
+
+> 
+> Thanks,
+> 
+> Nikos
+> 
+> 
+> > Thanks,
+> > Alex
