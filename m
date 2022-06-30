@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A2CF561A2F
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 14:18:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1B77561A34
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 14:21:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234445AbiF3MR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 08:17:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58394 "EHLO
+        id S233647AbiF3MU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 08:20:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232946AbiF3MRy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 08:17:54 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0282F25C79
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:17:54 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id y77so25777983oia.3
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:17:53 -0700 (PDT)
+        with ESMTP id S232473AbiF3MU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 08:20:56 -0400
+Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D0F420F4D
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:20:55 -0700 (PDT)
+Received: by mail-oo1-xc36.google.com with SMTP id r8-20020a4abf08000000b00425b1256454so1811344oop.13
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=u5tIsV8u+afIygl4LGgEyn31BQu6or2e1DFLWifTLb4=;
-        b=jkzg5f2lhbm9TiiTnMcXrVL0ddpAEo0ONr55x2LPbQ7RwoW7IC5NcmcPHxSOzEHAow
-         Ps2NxV7cVGZbfP5sdtkitqxI6vFndhWpt1/BzNLmL6h7wTK8qg4xT1+3ctkx/oxEOOlq
-         DXQ25fVLXxUYW6UGY/sIS2clU66jysClPKkREMY/pm5IVcedyqRMXDC7j65wMVnC6xLN
-         d7NbAmAofDZfK/XU6fkB89yvuhu/Xk/7+ukueh1sdIfCfWZ9b4Iyge88zeqMRnvkV7bJ
-         OZCstgXDwLxwDsDa8MjcYM/Wb/mAf2U7ILmTTCpeJgpxYN/b4THAmM7jIC9txi015/TG
-         sexg==
+        bh=JUW4jEINb79G6fZ0psu80KzN+ByrVZtzYVyL3ZG8d6c=;
+        b=Fuqkt29l4izjw3eglRszJHoi91Vvjag/dTICHrTdpAVIpjz/jBKpFtnqUgrbsd87qt
+         2uLLVSaDmUcSlPFrIdn9w+dQdI7ScgpWwIY8pLJq8DFrfqXoExYxe5UrHWnjIEhEMNNk
+         7i03Et79pZitXulV8F5Tpyi4qAuaj2RFknak+BQ8X9mwVB/mGLiTc/J+qulYvIhtUpu/
+         x+34rTHO5hpltf3dyDzzvi4liRJu2dCipyshYx5HUGIEELctPc+pYPgMfMIDoB8AgiJK
+         +MUdlNlpHQ3x7td8GjJHPcHpwPnaj5m+OuWA18862gBHizX+oHX47HZpUfxUzyzB5nvH
+         ZWCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=u5tIsV8u+afIygl4LGgEyn31BQu6or2e1DFLWifTLb4=;
-        b=PGUZbTvXaZkQtG/blUeGXKTUB3mEQPIHjenlcz7C8sZ7o1qs6oiu0UjZ4lMFSAbqTt
-         vk2huF89SCAO75ocu50d5G0WS8ecvghAiff2Dt8UlJcELurnvy++fqTXRkXNLpgyEaO8
-         dQV7VGuJmf2w3ssM1glkrYm3BTEkBHXOWrggIGdsGlqEYZd5qWssBvTwBytabvhHbedj
-         gcN7254fbxnLW0GLcSw6Gr3spHdqHyoKCKyzqTAEmA5D5RroerB90NO8KmLsexxtyfpX
-         yLnIkz5lM5H6S8W2nQH4BjOrmzgyd8nVZOqE5nTdj5g/Uc4BrE29FZPJPso3QfeWH2lC
-         E+dQ==
-X-Gm-Message-State: AJIora86g98sZHRKUWElNGluxGpHWOmaee/RCY1SRVKIOGZIo6QmK0/7
-        8A90IFY4Nbmcxj0mXT/YIsRdSwrF7Bf/igsDNLYNPQ==
-X-Google-Smtp-Source: AGRyM1ugUxFgtkvnaPkLMhDnfpFG/0QasMyvUj7YGbvR8PEB+1f1ON7P1y7gzi3xqGrRml6d/QTYQE9REm+Rf8+mCXY=
-X-Received: by 2002:a05:6808:3089:b0:32e:f7fd:627d with SMTP id
- bl9-20020a056808308900b0032ef7fd627dmr4992399oib.181.1656591473130; Thu, 30
- Jun 2022 05:17:53 -0700 (PDT)
+        bh=JUW4jEINb79G6fZ0psu80KzN+ByrVZtzYVyL3ZG8d6c=;
+        b=FkJaB5+M5h4T9K3PLYGScGuFasgLaISK28sBjX2rM2QCR2FttvxdATLy4OMDNZUiQ8
+         ntCGiDFIam3ZVjJmvLYMQZJQUJOwXAnYU474MqAE1hI7Yhl91lG9V74fBTy+KV3FjLUB
+         UlK2oP6xzQe8M0nR48ixfLN0iLCL/LsQQeVW4WkN6sJSnecNRgZHVOqUA7lFhsXR0Wdd
+         yREDxZdmxorMdH9yxhTqkmcn8sbufzcV/XJFcsiAVgH2GWWLtCoqjH4mNKV6ZTSuCrHk
+         BbWT/jljh+dyn30g0ZABLRKL2zJ3ZRvOb9UlTXRtxc++HkzFE0USYQeqIGq1IlQ4yO4X
+         xS6g==
+X-Gm-Message-State: AJIora+PDr+qGucCZH2TkGBH2q9TkbQhWMz/9Y+b4NtV71we+Efrl0Na
+        IbID/2PqBTDZd7rJ5sgKvK4xR30C/OXRbHi8ZDOj/w==
+X-Google-Smtp-Source: AGRyM1ugYwGf8QObcJFeoodBaF0ml7JBvXxTHg+CSp32AI+BET/209D3TiHBTGz48E8bksakxkhoF2Jp9f0XG6nLU24=
+X-Received: by 2002:a4a:e82b:0:b0:330:cee9:4a8a with SMTP id
+ d11-20020a4ae82b000000b00330cee94a8amr3645347ood.31.1656591654007; Thu, 30
+ Jun 2022 05:20:54 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220614204730.3359543-1-seanjc@google.com> <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
- <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com> <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
-In-Reply-To: <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
+ <CALMp9eQQROfYW7tNPaYCL5umjDr5ntsXuQ3BmorD8BWQiUGjdw@mail.gmail.com> <e04341912abfa1590edd4ee7c33efde6e227b93f.camel@redhat.com>
+In-Reply-To: <e04341912abfa1590edd4ee7c33efde6e227b93f.camel@redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 30 Jun 2022 05:17:42 -0700
-Message-ID: <CALMp9eQkA-YeUFd=6Q+bRbtDT+UZO0jtPkEoZbqU1uDqMGp+xw@mail.gmail.com>
+Date:   Thu, 30 Jun 2022 05:20:43 -0700
+Message-ID: <CALMp9eQ3EvQJFfyg2VW3Bb3-W9XGWnhtaS9zLPT4354yhroC2g@mail.gmail.com>
 Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -72,8 +72,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 1:22 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+On Thu, Jun 30, 2022 at 1:24 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
 
-> I can't access this document for some reason (from my redhat account, which is gmail as well).
-
-Try this one: https://docs.google.com/spreadsheets/d/13Yp7Cdg3ZyKoeZ3Qebp3uWi7urlPNmo5CQU5zFlayzs
+> Neither can I access this document sadly :(
+Try this one: https://docs.google.com/spreadsheets/d/1u6yjgj0Fshd31YKFJ524mwle7BhxB3yuEy9fhdSoh-0
