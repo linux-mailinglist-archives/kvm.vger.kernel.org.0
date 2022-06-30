@@ -2,188 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3C4B561B7C
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 15:41:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4799561BD1
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 15:51:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234580AbiF3Nk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 09:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42604 "EHLO
+        id S235420AbiF3NtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 09:49:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232297AbiF3Nk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 09:40:56 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0371F615;
-        Thu, 30 Jun 2022 06:40:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656596456; x=1688132456;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3tqDNzAvRt+iYSdl6PYwgkVAx/EfI7NU9igHBoFrI5Y=;
-  b=Zl2QdcvHM5xUYJeyH7RFBoPKEm4bfnN3v67ePdeuUH2aqzhR+DnaXY2A
-   VoMwlxEpbZznGM/a7+MCYv8Y6xaw3YU/t6Jf4M7lCIWc6GiR3puNPV3Go
-   Fk4c4JmAxIxZlc/wziOH2RPCyHZ11wmStcUEVqHvYySx2kV76O1bN1z+C
-   djFQa69DepkY5KbpHe0ctIvRUrLKctbbVjlbR4OqqFyqy9xk3v2Qf84W5
-   1PIJy/aKsGL2cxX9tNsSjrrl1/IPAsWJA/zCYzeeTGcDGMCXkbfi/xY25
-   h18qZmBXDmciPNir0K91mmWZJqHxlkm3hrDE2mRMpt8BfRnHw0MABmmtN
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="283083329"
-X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
-   d="scan'208";a="283083329"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 06:40:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
-   d="scan'208";a="718222089"
-Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 30 Jun 2022 06:40:52 -0700
-Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o6uPc-000Co8-0I;
-        Thu, 30 Jun 2022 13:40:52 +0000
-Date:   Thu, 30 Jun 2022 21:40:01 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com
-Cc:     kbuild-all@lists.01.org, saeedm@nvidia.com, kvm@vger.kernel.org,
+        with ESMTP id S235359AbiF3Nsb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 09:48:31 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2040.outbound.protection.outlook.com [40.107.243.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18D336556;
+        Thu, 30 Jun 2022 06:48:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OlUp7dC0La+S7socJYJHynON0EsXhjfvgWtIUPKH8em90QzbdfFuQP4k0tZtDPV5g+jDiXQFiMhEegVOWqqk8+3gz39DhXyUYcxpvOSlJ9z9itsf4xUz2MCLBeUMYE8tbuesOemxSnW4fN7FYM1JerZDnAqWAPFbRWmhF1iP12iEAeIcZwIBB0GMh8OmPA6bpsR1plJ312lsTxrlSJUwO+2NASabYxAvOwPa7ONReZgm+z4xCZERzOG9nXZp/t04qbshewiRE4DfuHGjIU6rTzVws9tiPqpgTEU2yVS54Rg3Jk4aNNLL6iALui53zBcfiOoLDaXpxCIiEtaY3bXuLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ztHAXmvCJTitQ0huIxeK5rArLpUgqRGWEQHXOVVmtqM=;
+ b=IXi7zXDQRdsrv6mygkUcg4PKJggCf7+OLfqx8RuCiMA/GH9c86qjZsdjUbyeWH8aMX/hjvLki+Ii2JqXsDeiClGOzZ1LHhizJgKj4r7LRHYeZhPxUxxb9Zdpy+5Q/0Qz5wVKsivISgVin4I9Du4qIReIu67hqCe7bL0rkbiT4ZfrAB94DuYjkFVcc29/XkapnzTjRh/qbomDCJfi2+f5QuB2jcY3UIL5fGrdMAfd4NLUtGcRTctRb9Wn5qmvSA/YrH2tpuMFMprjrZUcuIdtMRpxf1+spZzemmonPYYRbJK+ZcPkKqc7nWB08QrNUKrD51nkgM6ASWCrgFX1TBugIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ztHAXmvCJTitQ0huIxeK5rArLpUgqRGWEQHXOVVmtqM=;
+ b=ry5hWBSUBOhVHuiaFhTybTf4EFTbfJb19OoQO4AJkgla4GyGpvcMutPULgTMXSx/nnVF2xG5OjXLDtAeq434LlSgXRO1ocG72mzt8Gz09a6OFAO2d2sy9cSn/S2LJQrlMkUvejC3hKIk04iIt0W6yvcwtuWDG3veEBSIWQtC94XyUnxDemQ0wKP5xUvvcTSwMiuzkR4rYHVO00Zq5LYaokY2kBgp3tACwDxA4I9gUvOaO6M6wfJ9HN0jNltl3DKIqzDmowWIG61wfIyc8KsbBdduTu8jwB/MGSRmWQUK8NrX3B8ZWRtclxK0/4WhVLFH6DgJI4FAK+HdNxK6K0cisg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SJ0PR12MB5454.namprd12.prod.outlook.com (2603:10b6:a03:304::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Thu, 30 Jun
+ 2022 13:48:25 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.015; Thu, 30 Jun 2022
+ 13:48:25 +0000
+Date:   Thu, 30 Jun 2022 10:48:24 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        kbuild-all@lists.01.org, saeedm@nvidia.com, kvm@vger.kernel.org,
         netdev@vger.kernel.org, kuba@kernel.org, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, yishaih@nvidia.com,
-        maorg@nvidia.com, cohuck@redhat.com
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com,
+        cohuck@redhat.com
 Subject: Re: [PATCH vfio 08/13] vfio: Introduce the DMA logging feature
  support
-Message-ID: <202206302140.XlWYhlXa-lkp@intel.com>
+Message-ID: <20220630134824.GK693670@nvidia.com>
 References: <20220630102545.18005-9-yishaih@nvidia.com>
-MIME-Version: 1.0
+ <202206302140.XlWYhlXa-lkp@intel.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220630102545.18005-9-yishaih@nvidia.com>
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <202206302140.XlWYhlXa-lkp@intel.com>
+X-ClientProxiedBy: MN2PR03CA0004.namprd03.prod.outlook.com
+ (2603:10b6:208:23a::9) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0dcdf5e0-ad6a-4925-dcce-08da5a9f3459
+X-MS-TrafficTypeDiagnostic: SJ0PR12MB5454:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: n00hlrZ3YRJZeb6J0y3sE6PHGAhbCXpE8dQC5Wj0jfhuOZELMZMXL/HI4vzLtOpWy7RZapiVeDmCK/TY5qiiEG4/zQpqNmW4errCf9wkTT2fZMYp4TumiOgkllgXlxflf90uDvBwRnyhHu5ItEACdOB3fkIJvB6GJaMv+oViPb+ws44aroZU5iX2kBxZMF9nG60b1BKdrZ/ZHICdES8EqU6p+M0iURdqZ7YY2sQU2jrNz+hYhzi9qRY9bd2FlnEFP0jFBG8lXAzYojbal8Gs+CS+xJ3j7R5SJPevjcykr32Hg0JQl1MihJsRqloQiU1I86UFhR1nPon4MDxEEl0hrOpbSaMSlaEAO5tmCffawAgjEGluWyYut7zFnEGhe+A/oSb1X3CifUMMxvlqDJKC9jpUEQxR2ac84H5muadrv7K2kVjyA8u28EKxkhi/Pv/Hy5m6k2bcmD+obi7BVzScimctHFIc0d9DKrV1QUbwZ8RPZqWipMmPaHc8c6uR+ibGQ+yLu60uyqrrMeyNMhnEnc3KhA6Ey7hhYC4EkTLKHBcdSibsblIaM5cjzAd+Vi4VvCIogl10BpEFEbJrXGgmfYPVYoPRdrHJYRsriGlLnG+WjzybpcYlkd2Qd0e+igd7d6CyvYbsDzXT3Fn4njrusicnTrCq72znxWdohoydN2A/tlIcNlxgk/rK6AdbvsXZwfA3roeCGgEX6Tu865KEGtyZB2XORDqJQfLE35fxa41cKnnJxFAmjjqQC6pNNYgJSR2JcTM2nPGIz8sdZwFm4R1Un9JaA/9gOqQKfvj/E0HaPbq975ctvn3bV042Rc6l
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(346002)(366004)(136003)(376002)(396003)(478600001)(6486002)(38100700002)(86362001)(41300700001)(6512007)(66946007)(6506007)(33656002)(26005)(36756003)(186003)(66476007)(6916009)(316002)(66556008)(2616005)(1076003)(8676002)(4744005)(8936002)(5660300002)(2906002)(4326008)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vsaBFhdsscqyteD8AO+0RnKZcm8ek32ALZ4lnq+e9tI3UYBv8ruidupH1Ufr?=
+ =?us-ascii?Q?a0J3rZQYOHjfTn65B8WG4U4zXT/8c9Q1lfb/+v4U0bqKRUmStcrXRLjcVHpF?=
+ =?us-ascii?Q?8j5ILTLoLBpRnzdy5o9I2fYobbbTM9DzIClqca+TQgIY8Y2wCUc7SoUiTwP6?=
+ =?us-ascii?Q?DnlNbJ9CRHK2qi8K0eV/OAbDvsXdRsW/zMJMr2PQm3qezl6p3CZ/eaXAsOWt?=
+ =?us-ascii?Q?9Wgz9oq6WMfc7/Udr3xu3tqr6BPhMVCqMO+LBZPXYNPcWfYKHoIz+06ZbXM4?=
+ =?us-ascii?Q?eem58Udp3OQX2QyPhZzi9p63rD4m6PKCbLX+o5gShXDEp9Z5riiUZBUdt8P+?=
+ =?us-ascii?Q?Kj4vpvEt4Vy0OYT3BIWIRJfdW2c/xTwEguJxZ5ifpnUYPPoUh6w4QA3Mgy+q?=
+ =?us-ascii?Q?kx2hFR1ULNPYWxuhk6oqUXtxa/7RNvMw2gUo24dJy7hWKshGBYpL8sBLlNWi?=
+ =?us-ascii?Q?urTgnWX8IPUBQ49gOF81vyVNxj/HVm7x4NryIn/weFqpLB3JsUROEwnYDK1z?=
+ =?us-ascii?Q?U6TYpCIJsRNYRi1q7ghBXRhHsRelA3STqUDC7lFUjxlj3SPvKhbiO3h1qvuB?=
+ =?us-ascii?Q?izNfkO2tEsoBO30SXypT/UcWeM00LGgAb0wexNTAGwfCvavfnkVN/oZVxfkT?=
+ =?us-ascii?Q?p/VvzWEcWeVukntd0hXpRSry5Njr7Y+VMV8ELclemIr4veUkzED8DAICDyZu?=
+ =?us-ascii?Q?OJeh4PQ/fs175ANnKeAZ8tXVDhdGMChle3JmR5AdPFREWRHM2XMgQwU9jXXa?=
+ =?us-ascii?Q?tqDmv5GmtWWBO1qYzGsiG33U1SE6Z1DEEUH/MIOtagKGSKEGSveCG50ZRsAH?=
+ =?us-ascii?Q?fmJsDZ1I/LkXjKDqFFZSM/yy3GHgUzF+IctHpnd7un7xfybSSWiON7PXzuzA?=
+ =?us-ascii?Q?MuX52Y+3ECccRiWKlryBB5fF7UTMJsS8lhat7rmCDmszq8uY5A7nzCT0cCh6?=
+ =?us-ascii?Q?z/rjoETJidSVK9i7jolICFCOfeO4F5CgRqzRqwfj/W+1D1Df3ExAKzGoSZQy?=
+ =?us-ascii?Q?ogtLB5FgyJ0X/YC4pyUaTxFYGSSsURL16jtcHfBMYKML//BZ8aUIvOR3jADZ?=
+ =?us-ascii?Q?MEJmHEC8AFX3iSiQi1sJf8si5019qDUsl4KUDuXCOg98k22fcpnxyK+XQ+51?=
+ =?us-ascii?Q?iCRxCA4HtGuqKMKMl9iE6+j6GlhyKGkoburWXqI92mfiourG5oAfCtkDuUX+?=
+ =?us-ascii?Q?GXFbCqbdCxzveUR2BY+Hx2qBhix/gNP/2GG4kl9boGGtWCTnWe2l+d3UWm7M?=
+ =?us-ascii?Q?mJSkip5sgnyD+wcHaDsZoX/t/uKow0u7bnrde0C3B/vtron4okUboixBXxiQ?=
+ =?us-ascii?Q?8/gAh0+r219cRdeTNy/kgRY0L2+i7oSk+6YpfNXtQrBjb61WmjqQruNZ+k9V?=
+ =?us-ascii?Q?6V90bJrMqF95PHawd+AE934FX0iTbrtx1BEA2TQMJA/G+I3RbXCMkXIvz2zg?=
+ =?us-ascii?Q?AMJFZXgzzKX+V1fteSWsm0iRE9TIlmJ+MCREVtLPEJ3MPMhFH0V8r767qElU?=
+ =?us-ascii?Q?twl8paQEHHv4Hws8T0U9rngUX7PlZ1Y7yC7JifPKcs6PTu/FZs476FYC/rkj?=
+ =?us-ascii?Q?GIIkqv4kXqeT+CjsZ/Ure4cxUCe7WHA5xUI+uR59?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0dcdf5e0-ad6a-4925-dcce-08da5a9f3459
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2022 13:48:25.2044
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m6OoNmXaOEDWZUw+TJwRK0eETw6xIXUazH6J5Q3uYMgbKnE8nq+fVFYOnyn2WEMS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5454
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yishai,
+On Thu, Jun 30, 2022 at 09:40:01PM +0800, kernel test robot wrote:
 
-I love your patch! Perhaps something to improve:
+>   1636		nnodes = control.num_ranges;
+>   1637		if (!nnodes || nnodes > LOG_MAX_RANGES)
+>   1638			return -EINVAL;
+>   1639	
+> > 1640		ranges = (struct vfio_device_feature_dma_logging_range __user *)
+>   1641									control.ranges;
 
-[auto build test WARNING on awilliam-vfio/next]
-[also build test WARNING on linus/master v5.19-rc4 next-20220630]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Things like this should always use u64_to_user_ptr()
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
-base:   https://github.com/awilliam/linux-vfio.git next
-config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20220630/202206302140.XlWYhlXa-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/fea20efca2795fd8480cb0755c54062bad2ea322
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
-        git checkout fea20efca2795fd8480cb0755c54062bad2ea322
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/vfio/
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
-   drivers/vfio/vfio_main.c: In function 'vfio_ioctl_device_feature_logging_start':
->> drivers/vfio/vfio_main.c:1640:18: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-    1640 |         ranges = (struct vfio_device_feature_dma_logging_range __user *)
-         |                  ^
-   drivers/vfio/vfio_main.c: In function 'vfio_ioctl_device_feature_logging_report':
-   drivers/vfio/vfio_main.c:1730:37: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-    1730 |                                     (unsigned long __user *)report.bitmap);
-         |                                     ^
-
-
-vim +1640 drivers/vfio/vfio_main.c
-
-  1607	
-  1608	static int
-  1609	vfio_ioctl_device_feature_logging_start(struct vfio_device *device,
-  1610						u32 flags, void __user *arg,
-  1611						size_t argsz)
-  1612	{
-  1613		size_t minsz =
-  1614			offsetofend(struct vfio_device_feature_dma_logging_control,
-  1615				    ranges);
-  1616		struct vfio_device_feature_dma_logging_range __user *ranges;
-  1617		struct vfio_device_feature_dma_logging_control control;
-  1618		struct vfio_device_feature_dma_logging_range range;
-  1619		struct rb_root_cached root = RB_ROOT_CACHED;
-  1620		struct interval_tree_node *nodes;
-  1621		u32 nnodes;
-  1622		int i, ret;
-  1623	
-  1624		if (!device->log_ops)
-  1625			return -ENOTTY;
-  1626	
-  1627		ret = vfio_check_feature(flags, argsz,
-  1628					 VFIO_DEVICE_FEATURE_SET,
-  1629					 sizeof(control));
-  1630		if (ret != 1)
-  1631			return ret;
-  1632	
-  1633		if (copy_from_user(&control, arg, minsz))
-  1634			return -EFAULT;
-  1635	
-  1636		nnodes = control.num_ranges;
-  1637		if (!nnodes || nnodes > LOG_MAX_RANGES)
-  1638			return -EINVAL;
-  1639	
-> 1640		ranges = (struct vfio_device_feature_dma_logging_range __user *)
-  1641									control.ranges;
-  1642		nodes = kmalloc_array(nnodes, sizeof(struct interval_tree_node),
-  1643				      GFP_KERNEL);
-  1644		if (!nodes)
-  1645			return -ENOMEM;
-  1646	
-  1647		for (i = 0; i < nnodes; i++) {
-  1648			if (copy_from_user(&range, &ranges[i], sizeof(range))) {
-  1649				ret = -EFAULT;
-  1650				goto end;
-  1651			}
-  1652			if (!IS_ALIGNED(range.iova, control.page_size) ||
-  1653			    !IS_ALIGNED(range.length, control.page_size)) {
-  1654				ret = -EINVAL;
-  1655				goto end;
-  1656			}
-  1657			nodes[i].start = range.iova;
-  1658			nodes[i].last = range.iova + range.length - 1;
-  1659			if (interval_tree_iter_first(&root, nodes[i].start,
-  1660						     nodes[i].last)) {
-  1661				/* Range overlapping */
-  1662				ret = -EINVAL;
-  1663				goto end;
-  1664			}
-  1665			interval_tree_insert(nodes + i, &root);
-  1666		}
-  1667	
-  1668		ret = device->log_ops->log_start(device, &root, nnodes,
-  1669						 &control.page_size);
-  1670		if (ret)
-  1671			goto end;
-  1672	
-  1673		if (copy_to_user(arg, &control, sizeof(control))) {
-  1674			ret = -EFAULT;
-  1675			device->log_ops->log_stop(device);
-  1676		}
-  1677	
-  1678	end:
-  1679		kfree(nodes);
-  1680		return ret;
-  1681	}
-  1682	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Jason
