@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3EA1561D67
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:16:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C4C0561CE5
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:16:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235578AbiF3ONs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 10:13:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40596 "EHLO
+        id S237011AbiF3ONt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 10:13:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237466AbiF3ONR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 10:13:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB0D112ADE
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:58:07 -0700 (PDT)
+        with ESMTP id S237474AbiF3ONS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 10:13:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53AF61EC7D
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:58:11 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4826FB82AEF
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 13:58:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BABA0C341CB;
-        Thu, 30 Jun 2022 13:58:01 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0F75BB82AD8
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 13:58:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83526C341CC;
+        Thu, 30 Jun 2022 13:58:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656597485;
-        bh=CGAYlm140TLjTsKj1pjG8aKb8iu3Aml36A9Qr4wRzmg=;
+        s=k20201202; t=1656597488;
+        bh=yadXOfubMUxLUzRkyxEAup5usFqPCH4T2xXyNSgVPtw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XspaDEvsZuFNNTyleQt8+dPtY3ge5fn5Ul2s8DJXkA3le/YemYo96lThuC7JJZrn2
-         Cv1kViRakFl0XkCxswQdZ1leknhMDEGDD7YMWegfcaQOiRfcB07oa4nJG39avCne5m
-         QNzqEV2Q0jByX6oyeMic32oijHe07wpP72Ug5pqOpBW8Z+EVkt35QrTgGb947oXDji
-         UzeW+3yQ2qEK2Q1Ze7zm4LU/cT5WGJc+oz854b3dP0XIRj/uSVdTixb+iSp6JPJSm0
-         yTu5pIZavoy+2uHLq5MuPfp3mcZtVXxUBLTxudj7utPXFOyTvaJq3iydcbmFzH0XMj
-         hTMu2mRBcAy4g==
+        b=g5X7ki+Y2Iy3DsMlQSU47oCGLslPC8BXKPiNdBsuha0zfhvZriVDYnqaMkXUD4fqm
+         2MKbrKYs574+R4I9Ce/DhzDa1lWOaILCtu0sqh+8xd7i9Aq8T1o+2mL6Yfdnwz+syW
+         EWOY/rXh7Q9Lc+fOlK80RUsCaiUAUmJ36Ecjuj+nGAOZN4f4M7vF0FLCjqAYMsdXCB
+         iR4L8UHqytGxe4gggGLQmJeFpGP6aTBn8vKDKMnyYqJBB4di1rNGb6AR73XuonBpHs
+         CxIMpn2I8Cw5ZaVStk5gphHEuZJilIS/piD9o1Cu0x1FoPq9rEEx6LkxktNYDjEams
+         eKj0a69NV7uPQ==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 02/24] KVM: arm64: Allow non-coalescable pages in a hyp_pool
-Date:   Thu, 30 Jun 2022 14:57:25 +0100
-Message-Id: <20220630135747.26983-3-will@kernel.org>
+Subject: [PATCH v2 03/24] KVM: arm64: Add flags to struct hyp_page
+Date:   Thu, 30 Jun 2022 14:57:26 +0100
+Message-Id: <20220630135747.26983-4-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220630135747.26983-1-will@kernel.org>
 References: <20220630135747.26983-1-will@kernel.org>
@@ -68,52 +68,121 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Quentin Perret <qperret@google.com>
 
-All the contiguous pages used to initialize a hyp_pool are considered
-coalescable, which means that the hyp page allocator will actively
-try to merge them with their buddies on the hyp_put_page() path.
-However, using hyp_put_page() on a page that is not part of the inital
-memory range given to a hyp_pool() is currently unsupported.
-
-In order to allow dynamically extending hyp pools at run-time, add a
-check to __hyp_attach_page() to allow inserting 'external' pages into
-the free-list of order 0. This will be necessary to allow lazy
-donation of pages from the host to the hypervisor when allocating guest
-stage-2 page-table pages at EL2.
+Add a 'flags' field to struct hyp_page, and reduce the size of the order
+field to u8 to avoid growing the struct size.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/page_alloc.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  6 +++---
+ arch/arm64/kvm/hyp/include/nvhe/memory.h |  3 ++-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 14 +++++++-------
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+index 0a048dc06a7d..9330b13075f8 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+@@ -7,7 +7,7 @@
+ #include <nvhe/memory.h>
+ #include <nvhe/spinlock.h>
+ 
+-#define HYP_NO_ORDER	USHRT_MAX
++#define HYP_NO_ORDER	0xff
+ 
+ struct hyp_pool {
+ 	/*
+@@ -19,11 +19,11 @@ struct hyp_pool {
+ 	struct list_head free_area[MAX_ORDER];
+ 	phys_addr_t range_start;
+ 	phys_addr_t range_end;
+-	unsigned short max_order;
++	u8 max_order;
+ };
+ 
+ /* Allocation */
+-void *hyp_alloc_pages(struct hyp_pool *pool, unsigned short order);
++void *hyp_alloc_pages(struct hyp_pool *pool, u8 order);
+ void hyp_split_page(struct hyp_page *page);
+ void hyp_get_page(struct hyp_pool *pool, void *addr);
+ void hyp_put_page(struct hyp_pool *pool, void *addr);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+index 418b66a82a50..2681f632e1c1 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+@@ -9,7 +9,8 @@
+ 
+ struct hyp_page {
+ 	unsigned short refcount;
+-	unsigned short order;
++	u8 order;
++	u8 flags;
+ };
+ 
+ extern u64 __hyp_vmemmap;
 diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index 1ded09fc9b10..0d15227aced8 100644
+index 0d15227aced8..e6e4b550752b 100644
 --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
 +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -93,11 +93,15 @@ static inline struct hyp_page *node_to_page(struct list_head *node)
- static void __hyp_attach_page(struct hyp_pool *pool,
+@@ -32,7 +32,7 @@ u64 __hyp_vmemmap;
+  */
+ static struct hyp_page *__find_buddy_nocheck(struct hyp_pool *pool,
+ 					     struct hyp_page *p,
+-					     unsigned short order)
++					     u8 order)
+ {
+ 	phys_addr_t addr = hyp_page_to_phys(p);
+ 
+@@ -51,7 +51,7 @@ static struct hyp_page *__find_buddy_nocheck(struct hyp_pool *pool,
+ /* Find a buddy page currently available for allocation */
+ static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
+ 					   struct hyp_page *p,
+-					   unsigned short order)
++					   u8 order)
+ {
+ 	struct hyp_page *buddy = __find_buddy_nocheck(pool, p, order);
+ 
+@@ -94,8 +94,8 @@ static void __hyp_attach_page(struct hyp_pool *pool,
  			      struct hyp_page *p)
  {
-+	phys_addr_t phys = hyp_page_to_phys(p);
- 	unsigned short order = p->order;
+ 	phys_addr_t phys = hyp_page_to_phys(p);
+-	unsigned short order = p->order;
  	struct hyp_page *buddy;
++	u8 order = p->order;
  
  	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
  
-+	if (phys < pool->range_start || phys >= pool->range_end)
-+		goto insert;
-+
- 	/*
- 	 * Only the first struct hyp_page of a high-order page (otherwise known
- 	 * as the 'head') should have p->order set. The non-head pages should
-@@ -116,6 +120,7 @@ static void __hyp_attach_page(struct hyp_pool *pool,
- 		p = min(p, buddy);
- 	}
+@@ -128,7 +128,7 @@ static void __hyp_attach_page(struct hyp_pool *pool,
  
-+insert:
- 	/* Mark the new head, and insert it */
- 	p->order = order;
- 	page_add_to_list(p, &pool->free_area[order]);
+ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
+ 					   struct hyp_page *p,
+-					   unsigned short order)
++					   u8 order)
+ {
+ 	struct hyp_page *buddy;
+ 
+@@ -182,7 +182,7 @@ void hyp_get_page(struct hyp_pool *pool, void *addr)
+ 
+ void hyp_split_page(struct hyp_page *p)
+ {
+-	unsigned short order = p->order;
++	u8 order = p->order;
+ 	unsigned int i;
+ 
+ 	p->order = 0;
+@@ -194,10 +194,10 @@ void hyp_split_page(struct hyp_page *p)
+ 	}
+ }
+ 
+-void *hyp_alloc_pages(struct hyp_pool *pool, unsigned short order)
++void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
+ {
+-	unsigned short i = order;
+ 	struct hyp_page *p;
++	u8 i = order;
+ 
+ 	hyp_spin_lock(&pool->lock);
+ 
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
