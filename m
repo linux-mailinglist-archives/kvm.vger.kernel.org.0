@@ -2,86 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1408A561C46
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 15:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB510561DAE
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:17:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235538AbiF3Nwz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 09:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52594 "EHLO
+        id S236487AbiF3OI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 10:08:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235806AbiF3Nwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 09:52:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 42FFE43EC8
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:49:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656596979;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kAIsAO8/q3xt7t8QmRZnKGg22p7TRVULhh/Oocusryo=;
-        b=YfnsrSjAeJ44q5QhuCTU0dHtE3oLjGNW229Tn53xxhrJ53uOT1P9AyjVK3c2vT1SNrgfFO
-        ohyDG2Rj4b5Ur8sk9jM0VlQ1mV0ljuTQYS0sY92dWmog6Srb1jiY5x5GYuOEqHh91pX2k6
-        CoVU3LoLWZHzIWWNHaMbPYUlAFMyU6k=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-55--7-Ux14nPtOsQjEtbJj5tQ-1; Thu, 30 Jun 2022 09:49:37 -0400
-X-MC-Unique: -7-Ux14nPtOsQjEtbJj5tQ-1
-Received: by mail-il1-f199.google.com with SMTP id b11-20020a92340b000000b002d3dbbc7b15so10553126ila.5
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:49:37 -0700 (PDT)
+        with ESMTP id S236918AbiF3OHu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 10:07:50 -0400
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BAD5238A
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:54:52 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id l11so33834081ybu.13
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:54:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/jxJKSEEZPwLWnGCYB3czxKxexehqWgULIniyW8Vusc=;
+        b=IvnKLOrpM7ZzFd+3S8iyTwTWK3oLRfRUh4NLGrpOhLbWRKdhwgtFBt6JU+iG8Pc/zm
+         alrs9JLmKKnlyyyCCjPLI2s1Qez5UvZ8fKBTaNb4ot3oJCscPSpvtEmMSF6XA5xUIyn1
+         XDCmd4O2Ln6YywpMsY1n2wgyRrYnP302RTOxEOSePQumvKA5N5kBpHMj7l/i/6M1jCzv
+         hK6RPb1nKvedu1KEW8GAy7S8ZEgxGpeYJYItdOBXStnBxM4KpTLx92jQNNJTFZLqWX4+
+         TSgdrG68hLa0yM0oACKCsrB4JWih4ZX11wGRicxQV0sjE1dOd0exP15juh0alFOKeAkA
+         KcAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kAIsAO8/q3xt7t8QmRZnKGg22p7TRVULhh/Oocusryo=;
-        b=QTQ05C86zIrL8DBvNt8UUC21x1AYOPwBsHZp5D2nkky6DtuXNm7ZR1kcR5SuNdzZgn
-         3gKhw1HHEgzjQI8ZR02FzuaedzS0nSVa1aseaavD9m+2cMlQPNlIzdICxQ41OZI/e6oN
-         TD/ZNNILGl7yKVZLrW2X3OGqllxFZ8o2/PoV2QtU5+pEqjYmLKsaPoRzekhqNimHkK2M
-         DBBrHjJAwd5tEzOZt6q05d/iXgI4DtB5Yc3FUr8igm4d3nR3BccrcDmE9HQ8dr6PN7X6
-         cfQAybH3gA+OUgvlI2Ht1XUfSwYXEsS2dpnvpKcJCvdlV2SDxJKpD5mS6xBBjvDnTEeL
-         B5qg==
-X-Gm-Message-State: AJIora+4tX15oVA2wX6Ug/dY0SBWBu8p4r67mGcfajOXjxDZdH0F7SLj
-        xajY2oMXQmeZs5wWTkjJFw1oRE1IiwaEGSCB1zu38rvxMPp+Bjxb3LAACmH848M6Duk/hWiNnTH
-        esQH/Fr5WZfY2
-X-Received: by 2002:a05:6638:264d:b0:33c:ba2d:72e6 with SMTP id n13-20020a056638264d00b0033cba2d72e6mr5277436jat.173.1656596976982;
-        Thu, 30 Jun 2022 06:49:36 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tD4itwXAHEpqybOS05iyJ+cl7zul4Mwu95L2o5RF+XJkhqbNNhgR6ApJoHe/080Tk2rhwsPw==
-X-Received: by 2002:a05:6638:264d:b0:33c:ba2d:72e6 with SMTP id n13-20020a056638264d00b0033cba2d72e6mr5277419jat.173.1656596976660;
-        Thu, 30 Jun 2022 06:49:36 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id g18-20020a05663810f200b00339d5108b60sm8680220jae.17.2022.06.30.06.49.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 06:49:36 -0700 (PDT)
-Date:   Thu, 30 Jun 2022 09:49:34 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Message-ID: <Yr2p7sR3IjiGTGd3@xz-m1.local>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-2-peterx@redhat.com>
- <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
- <YrtXGf20oa5eYgIU@xz-m1.local>
- <16c181d3-09ef-ace4-c910-0a13fc245e48@nvidia.com>
- <YruBzuJf9s/Nmr6W@xz-m1.local>
- <177284f9-416d-c142-a826-e9a497751fca@nvidia.com>
- <Yrx0ETyb2kk4fO4M@xz-m1.local>
- <17f9eae0-01bb-4793-201e-16ee267c07f2@nvidia.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/jxJKSEEZPwLWnGCYB3czxKxexehqWgULIniyW8Vusc=;
+        b=hVgY1H/Rc9oOKcBzCVPVMKPxKly0xqx1FtA+J1HwJMij7FKwonyfeJNTx18n6SRTO8
+         /SrRwhwvO6BGAqkW3XZwpzEAsFRpjPGqTKY4Xi2N7CIBW4hT7vLIiPp/KJ24++m2Hj3w
+         sF/5RgntpINQci/Na2lcEyxPuE0UpFHth3icMq2mhLffL/geo1wxQIFjW0ppMyiAjPGK
+         w5gvISO20L+y2eJbGpMMp+pAOd2HR2CzJcAHVNLeSnFNqGjJYcA5zVa0LFpiVlfOcMj0
+         y8UjRqXrw/zt4BBBX6lv25LdYKTHJ4ooRvgtMqc2ACAEu/9ANPS3UzywJuZfywL9hua/
+         kNrQ==
+X-Gm-Message-State: AJIora8sH/x20kC9ygfxhEBIhW+NGBef+MGBILoHn899f7xllFzYyKap
+        dD2/TBlyrBK7F9m98tU8KUEcWP3WBGLNURbt+Q9beA==
+X-Google-Smtp-Source: AGRyM1sByVtJbc7VM6TcfEj2dxzmGpvDdobwJarP6Z2wkcthbUNMrgRR0ecLlvEEmZfLSOYPP7FB29tiDrjwnAXlYxI=
+X-Received: by 2002:a25:6641:0:b0:669:b4ae:a15f with SMTP id
+ z1-20020a256641000000b00669b4aea15fmr9916992ybm.241.1656597290275; Thu, 30
+ Jun 2022 06:54:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <17f9eae0-01bb-4793-201e-16ee267c07f2@nvidia.com>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+References: <20220609071956.5183-1-quic_neeraju@quicinc.com> <Yqdxz9lZo5qedTG4@e120937-lin>
+In-Reply-To: <Yqdxz9lZo5qedTG4@e120937-lin>
+From:   Vincent Guittot <vincent.guittot@linaro.org>
+Date:   Thu, 30 Jun 2022 15:54:38 +0200
+Message-ID: <CAKfTPtDNmYiSy=WsSiDvtQXvB_bpS0f-Z4FwB=rbpTC-PjRPJg@mail.gmail.com>
+Subject: Re: [RFC 0/3] SCMI Vhost and Virtio backend implementation
+To:     Cristian Marussi <cristian.marussi@arm.com>
+Cc:     Neeraj Upadhyay <quic_neeraju@quicinc.com>, mst@redhat.com,
+        jasowang@redhat.com, sudeep.holla@arm.com,
+        quic_sramana@quicinc.com, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org,
+        Souvik Chakravarty <Souvik.Chakravarty@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,119 +69,248 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 06:53:30PM -0700, John Hubbard wrote:
-> On 6/29/22 08:47, Peter Xu wrote:
-> > > It looks like part of this comment is trying to document a pre-existing
-> > > concept, which is that faultin_page() only ever sets FAULT_FLAG_KILLABLE
-> > > if locked != NULL.
-> > 
-> > I'd say that's not what I wanted to comment.. I wanted to express that
-> > INTERRUPTIBLE should rely on KILLABLE, that's also why I put the comment to
-> > be after KILLABLE, not before.  IMHO it makes sense already to have
-> > "interruptible" only if "killable", no matter what's the pre-requisite for
-> > KILLABLE (in this case it's having "locked" being non-null).
-> > 
-> 
-> OK, I think I finally understand both the intention of the comment,
-> and (thanks to your notes, below) the interaction between *locked and
-> _RETRY, _KILLABLE, and _INTERRUPTIBLE. Really appreciate your leading
-> me by the nose through that. The pre-existing code is abusing *locked
-> a bit, by treating it as a flag when really it is a side effect of
-> flags, but at least now that's clear to me.
+Hi Neeraj and Cristian,
 
-I agree, alternatively we could have some other FOLL_ flags to represent
-"locked != NULL" and do sanity check to make sure when the flag is there
-locked is always set correctly.  Current code is a more "dense" way to do
-this, even though it could be slightly harder to follow.
+On Mon, 13 Jun 2022 at 19:20, Cristian Marussi <cristian.marussi@arm.com> wrote:
+>
+> +CC: Souvik
+>
+> On Thu, Jun 09, 2022 at 12:49:53PM +0530, Neeraj Upadhyay wrote:
+> > This RFC series, provides ARM System Control and Management Interface (SCMI)
+> > protocol backend implementation for Virtio transport. The purpose of this
+>
+> Hi Neeraj,
+>
+> Thanks for this work, I only glanced through the series at first to
+> grasp a general understanding of it (without goind into much details for
+> now) and I'd have a few questions/concerns that I'll noted down below.
+>
+> I focused mainly on the backend server aims/functionalities/issues ignoring
+> at first the vhost-scmi entry-point since the vost-scmi accelerator is just
+> a (more-or-less) standard means of configuring and grabbing SCMI traffic
+> from the VMs into the Host Kernel and so I found more interesting at first
+> to understand what we can do with such traffic at first.
+> (IOW the vhost-scmi layer is welcome but remain to see what to do with it...)
+>
+> > feature is to provide para-virtualized interfaces to guest VMs, to various
+> > hardware blocks like clocks, regulators. This allows the guest VMs to
+> > communicate their resource needs to the host, in the absence of direct
+> > access to those resources.
 
-> 
-> Anyway...this leads to finally getting into the comment, which I now
-> think is not quite what we want: there is no need for a hierarchy of
-> "_INTERRUPTIBLE should depend upon _KILLABLE". That is: even though an
-> application allows a fatal signal to get through, it's not clear to me
-> that that implies that non-fatal signal handling should be prevented.
-> 
-> The code is only vaguely enforcing such a thing, because it just so
-> happens that both cases require the same basic prerequisites. So the
-> code looks good, but I don't see a need to claim a hierarchy in the
-> comments.
-> 
-> So I'd either delete the comment entirely, or go with something that is
-> doesn't try to talk about hierarchy nor locked/retry either. Does this
-> look reasonable to you:
-> 
-> 
-> 	/*
-> 	 * FAULT_FLAG_INTERRUPTIBLE is opt-in: kernel callers must set
-> 	 * FOLL_INTERRUPTIBLE. That's because some callers may not be
-> 	 * prepared to handle early exits caused by non-fatal signals.
-> 	 */
-> 
-> ?
+IIUC, you want to leverage on the drivers already developed in the
+kernel for those resources instead of developing a dedicated SCMI
+server. The main concern is that this also provides full access to
+these resources from userspace without any control which is a concern
+also described by Cristian below. It would be good to describe how you
+want to manage resources availability and permission access.This is
+the main open point in your RFC so far
 
-Looks good to me, I'd tune a bit to make it less ambiguous on a few places:
-
-		/*
-		 * FAULT_FLAG_INTERRUPTIBLE is opt-in. GUP callers must set
-		 * FOLL_INTERRUPTIBLE to enable FAULT_FLAG_INTERRUPTIBLE.
-		 * That's because some callers may not be prepared to
-		 * handle early exits caused by non-fatal signals.
-		 */
-
-Would that be okay to you?
-
-> 
-> > > The problem I am (personally) having is that I don't yet understand why
-> > > or how those are connected: what is it about having locked non-NULL that
-> > > means the process is killable? (Can you explain why that is?)
-> > 
-> > Firstly RETRY_KILLABLE relies on ALLOW_RETRY, because if we don't allow
-> > retry at all it means we'll never wait in handle_mm_fault() anyway, then no
-> > need to worry on being interrupted by any kind of signal (fatal or not).
-> > 
-> > Then if we allow retry, we need some way to know "whether mmap_sem is
-> > released or not" during the process for the caller (because the caller
-> > cannot see VM_FAULT_RETRY).  That's why we added "locked" parameter, so
-> > that we can set *locked=false to tell the caller we have released mmap_sem.
-> > 
-> > I think that's why we have "locked" defined as "we allow this page fault
-> > request to retry and wait, during wait we can always allow fatal signals".
-> > I think that's defined throughout the gup call interfaces too, and
-> > faultin_page() is the last step to talk to handle_mm_fault().
-> > 
-> > To make this whole picture complete, NOWAIT is another thing that relies on
-> > ALLOW_RETRY but just to tell "oh please never release the mmap_sem at all".
-> > For example, when we want to make sure no vma will be released after
-> > faultin_page() returned.
-> > 
-> 
-> Again, thanks for taking the time to explain that for me. :)
-
-My thanks for reviewing!
-
-> 
-> > > 
-> > > If that were clear, I think I could suggest a good comment wording.
-> > 
-> > IMHO it's a little bit weird to explain "locked" here, especially after
-> > KILLABLE is set, that's why I didn't try to mention "locked" in my 2nd
-> > attempt.  There are some comments for "locked" above the definition of
-> > faultin_page(), I think that'll be a nicer place to enrich explanations for
-> > "locked", and it seems even more suitable as a separate patch?
-> > 
-> 
-> Totally agreed. I didn't intend to ask for that kind of documentation
-> here.
-> 
-> For that, I'm thinking a combination of cleaning up *locked a little
-> bit, plus maybe some higher level notes like what you wrote above, added
-> to either pin_user_pages.rst or a new get_user_pages.rst or some .rst
-> anyway. Definitely a separately thing.
-
-Sounds good.
-
-Thanks,
-
--- 
-Peter Xu
-
+>
+> In an SCMI stack the agents (like VMs) issue requests to an SCMI platform
+> backend that is in charge of policying and armonizing such requests
+> eventually denying some of these (possibly malicious) while allowing others
+> (possibly armonizing/merging such reqs); with your solution basically the
+> SCMI backend in Kernel marshals/conveys all of such SCMI requests to the
+> proper Linux Kernel subsystem that is usually in charge of it, using
+> dedicated protocol handlers that basically translates SCMI requests to
+> Linux APIs calls to the Host. (I may have oversimplified or missed
+> something...)
+>
+> At the price of a bit of overhead and code-duplication introduced by
+> this SCMI Backend you can indeed leverage the existing mechanisms for
+> resource accounting and sharing included in such Linux subsystems (like
+> Clock framework), and that's nice and useful, BUT how do you policy/filter
+> (possibly dinamically as VMs come and go) what these VMs can see and do
+> with these resources ?
+>
+> ... MORE importantly how do you protect the Host (or another VM) from
+> unacceptable (or possibly malicious) requests conveyed from one VM request
+> vqueue into the Linux subsystems (like clocks) ?
+>
+> I saw you have added a good deal of DT bindings for the backend
+> describing protocols, so you could just expose only some protocols via
+> the backend (if I get it right) but you cannot anyway selectively expose
+> only a subset of resources to the different agents, so, if you expose the
+> clock protocol, that will be visible by any VMs and an agent could potentially
+> kill the Host or mount some clock related attack acting on the right clock.
+> (I mean you cannot describe in the Host DT a number X of clocks to be
+> supported by the Host Linux Clock framework BUT then expose selectively to
+> the SCMI agents only a subset Y < X to shield the Host from misbehaviour...
+> ...at least not in a dynamic way avoiding to bake a fixed policy into
+> the backend...or maybe I'm missing how you can do that, in such a case
+> please explain...)
+>
+> Moreover, in a normal SCMI stack the server resides out of reach from the
+> OSPM agents since the server, wherever it sits, has the last word and can
+> deny and block unreasonable/malicious requests while armonizing others: this
+> means the typical SCMI platform fw is configured in such a way that clearly
+> defines a set of policies to be enforced between the access of the various
+> agents. (and it can reside in the trusted codebase given its 'reduced'
+> size...even though this policies are probably at the moment not so
+> dynamically modificable there either...)
+>
+> With your approach of a Linux Kernel based SCMI platform backend you are
+> certainly using all the good and well proven mechanisms offered by the
+> Kernel to share and co-ordinate access to such resources, which is good
+> (.. even though Linux is not so small in term of codebase to be used as
+> a TCB to tell the truth :D), BUT I don't see the same level of policying
+> or filtering applied anywhere in the proposed RFCs, especially to protect
+> the Host which at the end is supposed to use the same Linux subsystems and
+> possibly share some of those resources for its own needs.
+>
+> I saw the Base protocol basic implementation you provided to expose the
+> supported backend protocols to the VMs, it would be useful to see how
+> you plan to handle something like the Clock protocol you mention in the
+> example below. (if you have Clock protocol backend that as WIP already
+> would be interesting to see it...)
+>
+> Another issue/criticality that comes to my mind is how do you gather in
+> general basic resources states/descriptors from the existing Linux subsystems
+> (even leaving out any policying concerns): as an example, how do you gather
+> from the Host Clock framework the list of available clocks and their rates
+> descriptors that you're going expose to a specific VMs once this latter will
+> issue the related SCMI commands to get to know which SCMI Clock domain are
+> available ?
+> (...and I mean in a dynamic way not using a builtin per-platform baked set of
+>  resources known to be made available... I doubt that any sort of DT
+>  description would be accepted in this regards ...)
+>
+> >
+> > 1. Architecture overview
+> > ---------------------
+> >
+> > Below diagram shows the overall software architecture of SCMI communication
+> > between guest VM and the host software. In this diagram, guest is a linux
+> > VM; also, host uses KVM linux.
+> >
+> >          GUEST VM                   HOST
+> >  +--------------------+    +---------------------+    +--------------+
+> >  |   a. Device A      |    |   k. Device B       |    |      PLL     |
+> >  |  (Clock consumer)  |    |  (Clock consumer)   |    |              |
+> >  +--------------------+    +---------------------+    +--------------+
+> >           |                         |                         ^
+> >           v                         v                         |
+> >  +--------------------+    +---------------------+    +-----------------+
+> >  | b. Clock Framework |    | j. Clock Framework  | -->| l. Clock Driver |
+> >  +-- -----------------+    +---------------------+    +-----------------+
+> >           |                         ^
+> >           v                         |
+> >  +--------------------+    +------------------------+
+> >  |  c. SCMI Clock     |    | i. SCMI Virtio Backend |
+> >  +--------------------+    +------------------------+
+> >           |                         ^
+> >           v                         |
+> >  +--------------------+    +----------------------+
+> >  |  d. SCMI Virtio    |    |   h. SCMI Vhost      |<-----------+
+> >  +--------------------+    +----------------------+            |
+> >           |                         ^                          |
+> >           v                         |                          |
+> > +-------------------------------------------------+    +-----------------+
+> > |              e. Virtio Infra                    |    |    g. VMM       |
+> > +-------------------------------------------------+    +-----------------+
+> >           |                         ^                           ^
+> >           v                         |                           |
+> > +-------------------------------------------------+             |
+> > |                f. Hypervisor                    |-------------
+> > +-------------------------------------------------+
+> >
+>
+> Looking at the above schema and thinking out loud where any dynamic
+> policying against the resources can fit (..and trying desperately NOT to push
+> that into the Kernel too :P...) ... I think that XEN was trying something similar
+> (with a real backend SCMI platform FW at the end of the pipe though I think...) and
+> in their case the per-VMs resource allocation was performed using SCMI
+> BASE_SET_DEVICE_PERMISSIONS commands issued by the Hypervisor/VMM itself
+> I think or by a Dom0 elected as a trusted agent and so allowed to configure
+> such resource partitioning ...
+>
+> https://www.mail-archive.com/xen-devel@lists.xenproject.org/msg113868.html
+>
+> ...maybe a similar approach, with some sort of SCMI Trusted Agent living within
+> the VMM and in charge of directing such resources' partitioning between
+> VMs by issuing BASE_SET_DEVICE_PERMISSIONS towards the Kernel SCMI Virtio
+> Backend, could help keeping at least the policy bits related to the VMs out of
+> the kernel/DTs and possibly dynamically configurable following VMs lifecycle.
+>
+> Even though, in our case ALL the resource management by device ID would have to
+> happen in the Kernel SCMI backend at the end, given that is where the SCMI
+> platform resides indeed, BUT at least you could keep the effective policy out of
+> kernel space, doing something like:
+>
+> 1. VMM/TrustedAgent query Kernel_SCMI_Virtio_backend for available resources
+>
+> 2. VMM/TrustedAg decides resources allocation between VMs (and/or possibly the Host
+>    based on some configured policy)
+>
+> 3. VMM/TrustedAgent issues BASE_SET_DEVICE_PERMISSIONS/PROTOCOLS to the
+>    Kernel_SCMI_Virtio_backend
+>
+> 4. Kernel_SCMI_Virtio_backend enforces resource partioning and sharing
+>    when processing subsequent VMs SCMI requests coming via Vhost-SCMI
+>
+> ...where the TrustedAgent here could be (I guess) the VMM or the Host or
+> both with different level of privilege if you don't want the VMM to be able
+> to configure resources access for the whole Host.
+>
+> > a. Device A             This is the client kernel driver in guest VM,
+> >                         for ex. diplay driver, which uses standard
+> >                         clock framework APIs to vote for a clock.
+> >
+> > b. Clock Framework      Underlying kernel clock framework on
+> >                         guest.
+> >
+> > c. SCMI Clock           SCMI interface based clock driver.
+> >
+> > d. SCMI Virtio          Underlying SCMI framework, using Virtio as
+> >                         transport driver.
+> >
+> > e. Virtio Infra         Virtio drivers on guest VM. These drivers
+> >                         initiate virtqueue requests over Virtio
+> >                         transport (MMIO/PCI), and forwards response
+> >                         to SCMI Virtio registered callbacks.
+> >
+> > f. Hypervisor           Hosted Hypervisor (KVM for ex.), which traps
+> >                         and forwards requests on virtqueue ring
+> >                         buffers to the VMM.
+> >
+> > g. VMM                  Virtual Machine Monitor, running on host userspace,
+> >                         which manages the lifecycle of guest VMs, and forwards
+> >                         guest initiated virtqueue requests as IOCTLs to the
+> >                         Vhost driver on host.
+> >
+> > h. SCMI Vhost           In kernel driver, which handles SCMI virtqueue
+> >                         requests from guest VMs. This driver forwards the
+> >                         requests to SCMI Virtio backend driver, and returns
+> >                         the response from backend, over the virtqueue ring
+> >                         buffers.
+> >
+> > i. SCMI Virtio Backend  SCMI backend, which handles the incoming SCMI messages
+> >                         from SCMI Vhost driver, and forwards them to the
+> >                         backend protocols like clock and voltage protocols.
+> >                         The backend protocols uses the host apis for those
+> >                         resources like clock APIs provided by clock framework,
+> >                         to vote/request for the resource. The response from
+> >                         the host api is parceled into a SCMI response message,
+> >                         and is returned to the SCMI Vhost driver. The SCMI
+> >                         Vhost driver in turn, returns the reponse over the
+> >                         Virtqueue reponse buffers.
+> >
+>
+> Last but not least, this SCMI Virtio Backend layer in charge of
+> processing incoming SCMI packets, interfacing with the Linux subsystems
+> final backend and building SCMI replies from Linux will introduce a
+> certain level of code/funcs duplication given that this same SCMI basic
+> processing capabilities have been already baked in the SCMI stacks found in
+> SCP and in TF-A (.. and maybe a few other other proprietary backends)...
+>
+> ... but this is something maybe to be addressed in general in a
+> different context not something that can be addressed by this series.
+>
+> Sorry for the usual flood of words :P ... I'll have a more in deep
+> review of the series in the next days, for now I wanted just to share my
+> concerns and (maybe wrong) understanding and see what you or Sudeep and
+> Souvik think about.
+>
+> Thanks,
+> Cristian
+>
