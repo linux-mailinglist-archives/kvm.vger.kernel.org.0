@@ -2,182 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB887561939
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 13:31:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83DC6561957
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 13:37:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235085AbiF3LbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 07:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45120 "EHLO
+        id S235184AbiF3Lhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 07:37:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235034AbiF3LbI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 07:31:08 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BB251B29;
-        Thu, 30 Jun 2022 04:31:07 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25UBBv2B027286;
-        Thu, 30 Jun 2022 11:31:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=UzEvxgWBqw6ksQ5MpQmL5dA2oLRVIVB75s4SlyEP1e0=;
- b=KdoFq5j6SDnum74kNYTz4aI+hUKukqZZcdUsStNa2tF2So6ckF4lwtsH02of271OO62B
- W8z+f7V9GXWAh7NHqDUdiqj5Qq5l3JsDw5hek18aq/Sc9WDqT99G85jy/cF0k4GMRR28
- cPWAlDGsMUxqPyNgotdOWZhzdHBnZrSJ8YYezFXZyKh4kcvON1bCgdVGV1gChXN3BrIM
- FppjYhPPnBdhmhGrQzNZ2iE01F6RSgex102FLITzgfpl0mvDZIcPmu5iYBrdWXj0qcFk
- HxoY/dJa4Z1SIkJwCKHWYQ9SozkuO5rvbeSS/R8EZOL+jKpOq7jRqv4IS5hrhLlP5sY/ CQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1ar68gjg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 11:31:06 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25UBLMHE005106;
-        Thu, 30 Jun 2022 11:31:06 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1ar68gh7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 11:31:06 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25UBKU6H017342;
-        Thu, 30 Jun 2022 11:31:03 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3gwt08x0cw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 11:31:03 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25UBV0YV17236476
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jun 2022 11:31:00 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 771B2A405F;
-        Thu, 30 Jun 2022 11:31:00 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D24EA405C;
-        Thu, 30 Jun 2022 11:31:00 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 30 Jun 2022 11:31:00 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v1 3/3] s390x: add pgm spec interrupt loop test
-Date:   Thu, 30 Jun 2022 13:30:59 +0200
-Message-Id: <20220630113059.229221-4-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220630113059.229221-1-nrb@linux.ibm.com>
-References: <20220630113059.229221-1-nrb@linux.ibm.com>
+        with ESMTP id S235074AbiF3LhU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 07:37:20 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91B715A44F;
+        Thu, 30 Jun 2022 04:37:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656589039; x=1688125039;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=cJOc9pifRuPqoq93Kxnv9kcuAQi7B+at/0gDeNXNrbw=;
+  b=g/VEfy35U6moKwPaE49uV1lTfha11Ef4GJbu6GYXAAhXp43mPUm5S5Tu
+   ZO0kv1LZapu2FcPlltrw58uNGkO2r4U33eANz7N936XOYS+SV7GGNgs/r
+   FfasxhulYmjrGHoV+hvN8rw2AsPhnMxZ0TylisBxVbneeVQTPJtgvayT1
+   qhJvc/mfuAYlLOmWFFySLsyjWQth+4lSPXs1H1cIACkt40SevffzdpNV1
+   I5Kmv28gbSOUwMO69fsbe1D42eBoIBhnCRwqqTVrbB/ZgwjwrK/6c7aAk
+   gGONoUlYSKQLGino2tweJIW7QitegZq3bkBwcZ9l3KSIPSEH2FjOaZMfD
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="262121654"
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="262121654"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 04:37:19 -0700
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="617947907"
+Received: from zhihuich-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.49.124])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 04:37:17 -0700
+Message-ID: <cfeb3b8b02646b073d5355495ec8842ac33aeae5.camel@intel.com>
+Subject: Re: [PATCH v7 035/102] KVM: x86/mmu: Explicitly check for MMIO spte
+ in fast page fault
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Thu, 30 Jun 2022 23:37:15 +1200
+In-Reply-To: <71e4c19d1dff8135792e6c5a17d3a483bc99875b.1656366338.git.isaku.yamahata@intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <71e4c19d1dff8135792e6c5a17d3a483bc99875b.1656366338.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ptMOOHpqhw3AvAfYXAIm1GmA4Fvx2eNw
-X-Proofpoint-ORIG-GUID: B7yiun4N6e9Ds9FdxOB4lwqk7FHk34-z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-30_07,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- mlxscore=0 suspectscore=0 clxscore=1015 mlxlogscore=739 priorityscore=1501
- phishscore=0 adultscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206300045
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-An invalid PSW causes a program interrupt. When an invalid PSW is
-introduced in the pgm_new_psw, an interrupt loop occurs as soon as a
-program interrupt is caused.
+On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>=20
+> Explicitly check for an MMIO spte in the fast page fault flow.  TDX will
+> use a not-present entry for MMIO sptes, which can be mistaken for an
+> access-tracked spte since both have SPTE_SPECIAL_MASK set.
 
-QEMU should detect that and panick the guest, hence add a test for it.
+SPTE_SPECIAL_MASK has been removed in latest KVM code.  The changelog needs
+update.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/Makefile      |  1 +
- s390x/pgmint-loop.c | 46 +++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |  4 ++++
- 3 files changed, 51 insertions(+)
- create mode 100644 s390x/pgmint-loop.c
+In fact, if I understand correctly, I don't think this changelog is correct=
+:
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 92a020234c9f..a600dbfb3f4c 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -35,6 +35,7 @@ tests += $(TEST_DIR)/pv-attest.elf
- tests += $(TEST_DIR)/migration-cmm.elf
- tests += $(TEST_DIR)/migration-skey.elf
- tests += $(TEST_DIR)/extint-loop.elf
-+tests += $(TEST_DIR)/pgmint-loop.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/pgmint-loop.c b/s390x/pgmint-loop.c
-new file mode 100644
-index 000000000000..5b74f26dbc3d
---- /dev/null
-+++ b/s390x/pgmint-loop.c
-@@ -0,0 +1,46 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Program interrupt loop test
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+#include <libcflat.h>
-+#include <bitops.h>
-+#include <asm/interrupt.h>
-+#include <asm/barrier.h>
-+
-+static void pgm_int_handler(void)
-+{
-+	/*
-+	 * return to pgm_old_psw. This gives us the chance to print the return_fail
-+	 * in case something goes wrong.
-+	 */
-+	asm volatile (
-+		"lpswe %[pgm_old_psw]\n"
-+		:
-+		: [pgm_old_psw] "Q"(lowcore.pgm_old_psw)
-+		: "memory"
-+	);
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("pgmint-loop");
-+
-+	lowcore.pgm_new_psw.addr = (uint64_t) pgm_int_handler;
-+	/* bit 12 set is invalid */
-+	lowcore.pgm_new_psw.mask = extract_psw_mask() | BIT(63 - 12);
-+	mb();
-+
-+	/* cause a pgm int */
-+	*((int *)-4) = 0x42;
-+	mb();
-+
-+	report_fail("survived pgmint loop");
-+
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 7d408f2d5310..c3073bfc4363 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -188,3 +188,7 @@ groups = migration
- [extint-loop]
- file = extint-loop.elf
- groups = panic
-+
-+[pgmint-loop]
-+file = pgmint-loop.elf
-+groups = panic
--- 
-2.36.1
+The existing code doesn't check is_mmio_spte() because:
+
+1) If MMIO caching is enabled, MMIO fault is always handled in
+handle_mmio_page_fault() before reaching here;=20
+
+2) If MMIO caching is disabled, is_shadow_present_pte() always returns fals=
+e for
+MMIO spte, and is_mmio_spte() also always return false for MMIO spte, so th=
+ere's
+no need check here.
+
+"A non-present entry for MMIO spte" doesn't necessarily mean
+is_shadow_present_pte() will return true for it, and there's no explanation=
+ at
+all that for TDX guest a MMIO spte could reach here and is_shadow_present_p=
+te()
+returns true for it.
+
+If this patch is ever needed, it should come with or after the patch (patch=
+es)
+that handles MMIO fault for TD guest.
+
+Hi Sean, Paolo,
+
+Did I miss anything?
+
+>=20
+> MMIO sptes are handled in handle_mmio_page_fault for non-TDX VMs, so this
+> patch does not affect them.  TDX will handle MMIO emulation through a
+> hypercall instead.
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 17252f39bd7c..51306b80f47c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3163,7 +3163,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, s=
+truct kvm_page_fault *fault)
+>  		else
+>  			sptep =3D fast_pf_get_last_sptep(vcpu, fault->addr, &spte);
+> =20
+> -		if (!is_shadow_present_pte(spte))
+> +		if (!is_shadow_present_pte(spte) || is_mmio_spte(spte))
+>  			break;
+> =20
+>  		sp =3D sptep_to_sp(sptep);
 
