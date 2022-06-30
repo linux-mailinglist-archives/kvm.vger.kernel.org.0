@@ -2,40 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1D66561894
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 12:54:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6741F5618AF
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 13:04:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233845AbiF3KyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 06:54:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41436 "EHLO
+        id S234308AbiF3LED (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 07:04:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233793AbiF3KyU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 06:54:20 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F46139695
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 03:54:19 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 36E051063;
-        Thu, 30 Jun 2022 03:54:19 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC1BB3F5A1;
-        Thu, 30 Jun 2022 03:54:17 -0700 (PDT)
-Date:   Thu, 30 Jun 2022 11:54:47 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
-        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 19/27] arm/arm64: Add a setup sequence
- for systems that boot through EFI
-Message-ID: <Yr2A93BF+KIVjFqB@monolith.localdoman>
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <20220630100324.3153655-20-nikos.nikoleris@arm.com>
+        with ESMTP id S232115AbiF3LEC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 07:04:02 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04587403F1;
+        Thu, 30 Jun 2022 04:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656587041; x=1688123041;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=zBkQVD1l3klVmreBbrNvATuDUwnRV2Z8rRl2L41UUkE=;
+  b=XN52xjCeHGE9K0dIZFwL4ma2aTXGP2SkkkD9hp/JNHANVMNnDqLjiTrZ
+   ERBlMkXJnKRktkdgWL9pWC61wiiWpJ85t3T0dg7Y6zjryFXIWKhfhzM96
+   DyqCl+Oz1v19u7CoJtG3mDUwX1u33WfslDhI41DJJtV0M39uy1HkbqLMf
+   VzH7430VYmPF2ub+4C29rBG+fSxvpFEyujy6Pu0Ff3B3WNqE/feOGYwP9
+   CTYTirj1MwBrf8JQfW9owM9Fdn+xqNf390ZV8b2lbWmBoAbWvVxXgO15t
+   jStSi0Eprb5DudmfcC7b9rMV7FuFeupvssyiRLrP7kcRJaxcxEJwIk5+Q
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="262115866"
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="262115866"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 04:04:00 -0700
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="680933124"
+Received: from zhihuich-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.49.124])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 04:03:59 -0700
+Message-ID: <9340e6e23a2564d971786207773134507cb3db4e.camel@intel.com>
+Subject: Re: [PATCH v7 036/102] KVM: x86/mmu: Allow non-zero value for
+ non-present SPTE
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Thu, 30 Jun 2022 23:03:56 +1200
+In-Reply-To: <f74b05eca8815744ce1ad672c66033101be7369c.1656366338.git.isaku.yamahata@intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <f74b05eca8815744ce1ad672c66033101be7369c.1656366338.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220630100324.3153655-20-nikos.nikoleris@arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -43,237 +62,464 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>=20
+> TDX introduced a new ETP, Secure-EPT, in addition to the existing EPT.
+> Secure-EPT maps protected guest memory, which is called private. Since
+> Secure-EPT page tables is also protected, those page tables is also calle=
+d
+> private.  The existing EPT is often called shared EPT to distinguish from
+> Secure-EPT.  And also page tables for share EPT is also called shared.
 
-I missed your reply [1] to my comment [2] regarding v2 of this patch, I'm
-going to do my best to reply here. I'll try to copy your reply, I hope it
-doesn't turn into something unreadable.
+Does this patch has anything to do with secure-EPT?
 
-You mentioned the stack in your reply [1], that got me thinking. I guess I
-have a question now, are you using the stack set by EFI or another stack
-that you have control over? If you're using the EFI stack, then there
-should be a set of properties for that stack that EFI guarantees. What are
-those guarantees?
+>=20
+> Virtualization Exception, #VE, is a new processor exception in VMX non-ro=
+ot
 
-[1] https://lore.kernel.org/all/6c5a3ef7-3742-c4e9-5a94-c702a5b3ebca@arm.com/
-[2] https://lore.kernel.org/all/Yn5dhgVGoZUgYGUi@monolith.localdoman/
+#VE isn't new.  It's already in pre-TDX public spec AFAICT.
 
-On Thu, Jun 30, 2022 at 11:03:16AM +0100, Nikos Nikoleris wrote:
-> This change implements an alternative setup sequence for the system
-> when we are booting through EFI. The memory map is discovered through
-> EFI boot services and devices through ACPI.
-> 
-> This change is based on a change initially proposed by
-> Andrew Jones <drjones@redhat.com>
-> 
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> operation.  In certain virtualizatoin-related conditions, #VE is injected
+> into guest instead of exiting from guest to VMM so that guest is given a
+> chance to inspect it.  One important one is EPT violation.  When
+> "ETP-violation #VE" VM-execution is set, "#VE suppress bit" in EPT entry
+> is cleared, #VE is injected instead of EPT violation.
+
+We already know such fact based on pre-TDX public spec.  Instead of repeati=
+ng it
+here, why not focusing on saying what's new in TDX, so your below paragraph=
+ of
+setting a non-zero value for non-present SPTE can be justified?
+
+>=20
+> Because guest memory is protected with TDX, VMM can't parse instructions
+> in the guest memory.  Instead, MMIO hypercall is used for guest to pass
+> necessary information to VMM.
+>=20
+> To make unmodified device driver work, guest TD expects #VE on accessing
+> shared GPA.  The #VE handler converts MMIO access into MMIO hypercall wit=
+h
+> the EPT entry of enabled "#VE" by clearing "suppress #VE" bit.  Before VM=
+M
+> enabling #VE, it needs to figure out the given GPA is for MMIO by EPT
+> violation. =C2=A0
+>=20
+
+As I said above, before here, you need to explain in TDX VMCS is controlled=
+ by
+the TDX module and it always sets the "EPT-violation #VE" in execution cont=
+rol
+bit.
+
+> So the execution flow looks like
+>=20
+> - Allocate unused shared EPT entry with suppress #VE bit set.
+> - EPT violation on that GPA.
+> - VMM figures out the faulted GPA is for MMIO.
+> - VMM clears the suppress #VE bit.
+> - Guest TD gets #VE, and converts MMIO access into MMIO hypercall.
+> - If the GPA maps guest memory, VMM resolves it with guest pages.
+>=20
+> For both cases, SPTE needs suppress #VE" bit set initially when it
+> is allocated or zapped, therefore non-zero non-present value for SPTE
+> needs to be allowed.
+>=20
+> This change requires to update FNAME(sync_page) for shadow EPT.
+> "if(!sp->spte[i])" in FNAME(sync_page) means that the spte entry is the
+> initial value.  With the introduction of shadow_nonpresent_value which ca=
+n
+> be non-zero, it doesn't hold any more. Replace zero check with
+> "!is_shadow_present_pte() && !is_mmio_spte()".
+
+I don't think you need to mention above paragraph.  It's absolutely unclear=
+ how
+is_mmio_spte() will be impacted by this patch by reading above paragraphs.
+
+From the "execution flow" you mentioned above, you will change MMIO fault f=
+rom
+EPT misconfiguration to EPT violation (in order to get #VE), so theoretical=
+ly
+you may effectively disable MMIO caching, in which case, if I understand
+correctly, is_mmio_spte() always returns false.
+
+I guess you can just change to check:
+
+	if (sp->spte[i] !=3D shadow_nonpresent_value)
+
+Anyway, IMO you can just comment in the code.
+
+After all, what is shadow_nonpresent_value, given you haven't explained wha=
+t it
+is?
+
+>=20
+> When "if (!spt[i])" doesn't hold, but the entry value is
+> shadow_nonpresent_value, the entry is wrongly synchronized from non-prese=
+nt
+> to non-present with (wrongly) pfn changed and tries to remove rmap wrongl=
+y
+> and BUG_ON() is hit.
+
+Ditto.
+
+>=20
+> TDP MMU uses REMOVED_SPTE =3D 0x5a0ULL as special constant to indicate th=
+e
+> intermediate value to indicate one thread is operating on it and the valu=
+e
+> should be semi-arbitrary value.  For TDX (more correctly to use #VE), the
+> value should include suppress #VE value which is SHADOW_NONPRESENT_VALUE.
+
+What is SHADOW_NONPRESENT_VALUE?
+
+> Rename REMOVED_SPTE to __REMOVED_SPTE and define REMOVED_SPTE as
+> SHADOW_NONPRESENT_VALUE | REMOVED_SPTE to set suppress #VE bit.
+
+Ditto. IMHO you don't even need to mention REMOVED_SPTE in changelog.
+
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->  lib/linux/efi.h     |   1 +
->  lib/arm/asm/setup.h |   2 +
->  lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
->  arm/cstart.S        |   1 +
->  arm/cstart64.S      |   1 +
->  5 files changed, 184 insertions(+), 2 deletions(-)
-> 
-> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-> index 53748dd..89f9a9e 100644
-> --- a/lib/linux/efi.h
-> +++ b/lib/linux/efi.h
-> @@ -63,6 +63,7 @@ typedef guid_t efi_guid_t;
->  	(c) & 0xff, ((c) >> 8) & 0xff, d } }
->  
->  #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
-> +#define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
->  
->  #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
->  
-> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-> index 64cd379..c4cd485 100644
-> --- a/lib/arm/asm/setup.h
-> +++ b/lib/arm/asm/setup.h
-> @@ -6,6 +6,7 @@
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
->  #include <libcflat.h>
-> +#include <efi.h>
->  #include <asm/page.h>
->  #include <asm/pgtable-hwdef.h>
->  
-> @@ -37,5 +38,6 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
->  #define SMP_CACHE_BYTES		L1_CACHE_BYTES
->  
->  void setup(const void *fdt, phys_addr_t freemem_start);
-> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
->  
->  #endif /* _ASMARM_SETUP_H_ */
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 13513d0..30d04d0 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -34,7 +34,7 @@
->  #define NR_EXTRA_MEM_REGIONS	16
->  #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
->  
-> -extern unsigned long _etext;
-> +extern unsigned long _text, _etext, _data, _edata;
->  
->  char *initrd;
->  u32 initrd_size;
-> @@ -44,7 +44,10 @@ int nr_cpus;
->  
->  static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
->  struct mem_region *mem_regions = __initial_mem_regions;
-> -phys_addr_t __phys_offset, __phys_end;
-> +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
-> +
-> +extern void exceptions_init(void);
-> +extern void asm_mmu_disable(void);
->  
->  int mpidr_to_cpu(uint64_t mpidr)
->  {
-> @@ -272,3 +275,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
->  	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
->  		setup_vm();
+>  arch/x86/kvm/mmu/mmu.c         | 55 ++++++++++++++++++++++++++++++----
+>  arch/x86/kvm/mmu/paging_tmpl.h |  3 +-
+>  arch/x86/kvm/mmu/spte.c        |  5 +++-
+>  arch/x86/kvm/mmu/spte.h        | 37 ++++++++++++++++++++---
+>  arch/x86/kvm/mmu/tdp_mmu.c     | 23 +++++++++-----
+>  5 files changed, 105 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 51306b80f47c..f239b6cb5d53 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -668,6 +668,44 @@ static void walk_shadow_page_lockless_end(struct kvm=
+_vcpu *vcpu)
+>  	}
 >  }
-> +
-> +#ifdef CONFIG_EFI
-> +
-> +#include <efi.h>
-> +
-> +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
+> =20
+> +static inline void kvm_init_shadow_page(void *page)
 > +{
-> +	efi_status_t status;
-> +	struct rsdp_descriptor *rsdp;
+> +#ifdef CONFIG_X86_64
+> +	int ign;
 > +
-> +	/*
-> +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
-> +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
-> +	 * copy the data structure to another memory region to prevent
-> +	 * unintentional overwrite.
-> +	 */
-> +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
-> +	if (status != EFI_SUCCESS)
-> +		return status;
-> +
-> +	set_efi_rsdp(rsdp);
-> +
-> +	return EFI_SUCCESS;
+> +	WARN_ON_ONCE(shadow_nonpresent_value !=3D SHADOW_NONPRESENT_VALUE);
+> +	asm volatile (
+> +		"rep stosq\n\t"
+> +		: "=3Dc"(ign), "=3DD"(page)
+> +		: "a"(SHADOW_NONPRESENT_VALUE), "c"(4096/8), "D"(page)
+> +		: "memory"
+> +	);
+> +#else
+> +	BUG();
+> +#endif
 > +}
 > +
-> +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+> +static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
 > +{
-> +	int i;
-> +	unsigned long free_mem_pages = 0;
-> +	unsigned long free_mem_start = 0;
-> +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
-> +	efi_memory_desc_t *buffer = *map->map;
-> +	efi_memory_desc_t *d = NULL;
-> +	phys_addr_t base, top;
-> +	struct mem_region *r;
-> +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
-> +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
+> +	struct kvm_mmu_memory_cache *mc =3D &vcpu->arch.mmu_shadow_page_cache;
+> +	int start, end, i, r;
+> +	bool is_tdp_mmu =3D is_tdp_mmu_enabled(vcpu->kvm);
 > +
-> +	/*
-> +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
-> +	 * which will be used to set up the memory allocator, so that
-> +	 * the memory allocator can work in the largest free
-> +	 * continuous memory region.
-> +	 */
-> +	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
-> +		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
+> +	if (is_tdp_mmu && shadow_nonpresent_value)
+> +		start =3D kvm_mmu_memory_cache_nr_free_objects(mc);
 > +
-> +		r->start = d->phys_addr;
-> +		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
+> +	r =3D kvm_mmu_topup_memory_cache(mc, PT64_ROOT_MAX_LEVEL);
+> +	if (r)
+> +		return r;
 > +
-> +		switch (d->type) {
-> +		case EFI_RESERVED_TYPE:
-> +		case EFI_LOADER_DATA:
-> +		case EFI_BOOT_SERVICES_CODE:
-> +		case EFI_BOOT_SERVICES_DATA:
-> +		case EFI_RUNTIME_SERVICES_CODE:
-> +		case EFI_RUNTIME_SERVICES_DATA:
-> +		case EFI_UNUSABLE_MEMORY:
-> +		case EFI_ACPI_RECLAIM_MEMORY:
-> +		case EFI_ACPI_MEMORY_NVS:
-> +		case EFI_PAL_CODE:
-> +			r->flags = MR_F_RESERVED;
-> +			break;
-> +		case EFI_MEMORY_MAPPED_IO:
-> +		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
-> +			r->flags = MR_F_IO;
-> +			break;
-> +		case EFI_LOADER_CODE:
-> +			if (r->start <= text && r->end > text) {
-> +				/* This is the unit test region. Flag the code separately. */
-> +				phys_addr_t tmp = r->end;
-> +
-> +				assert(etext <= data);
-> +				assert(edata <= r->end);
-> +				r->flags = MR_F_CODE;
-> +				r->end = data;
-> +				++r;
-> +				r->start = data;
-> +				r->end = tmp;
-> +			} else {
-> +				r->flags = MR_F_RESERVED;
-> +			}
-> +			break;
-> +		case EFI_CONVENTIONAL_MEMORY:
-> +			if (free_mem_pages < d->num_pages) {
-> +				free_mem_pages = d->num_pages;
-> +				free_mem_start = d->phys_addr;
-> +			}
-> +			break;
-> +		}
-> +
-> +		if (!(r->flags & MR_F_IO)) {
-> +			if (r->start < __phys_offset)
-> +				__phys_offset = r->start;
-> +			if (r->end > __phys_end)
-> +				__phys_end = r->end;
-> +		}
+> +	if (is_tdp_mmu && shadow_nonpresent_value) {
+> +		end =3D kvm_mmu_memory_cache_nr_free_objects(mc);
+> +		for (i =3D start; i < end; i++)
+> +			kvm_init_shadow_page(mc->objects[i]);
 > +	}
-> +	__phys_end &= PHYS_MASK;
->
-> I think, there is much more that we need to clean, we're still using the
-> same stack, we've loaded the code with the MMU on and we're using some
 
-The assembly routing to disable the MMU doesn't use the stack, so I'm not
-really sure what you trying to say here. If you're worried that the region
-described by __phys_offset and __phys_end doesn't include the stack, then
-that means that mmu_disable() will never work for a test (it will not clean
-+ invalidate the stack), and that should be definitely fixed.
+I think you can just extend this to legacy MMU too, but not only TDP MMU.
 
-> memory up until the point we got here. I don't think, it would be safe to
-> clean only __phys_offset and __phys_end and move on. Unless what you're
-> suggesting is to clean __phys_offset and __phys_end after we switch the MMU
+After all, before this patch, where have you declared that TDX only support=
+s TDP
+MMU?  This is only enforced in:
 
-The purpose of cleaning __phys_offset and __phys_end is to for the latest
-values to be in memory. It doesn't matter if it's done with the MMU off or
-on, as long as it's done after the last write to the variables, and before
-they are loaded, obviously.
+	[PATCH v7 043/102] KVM: x86/mmu: Focibly use TDP MMU for TDX
 
-> off. But then I have two questions:
-> * If the CPU can still speculatively load __phys_offset and __phys_end at
-> least the invalidate operation is still questionable.
+Which is 7 patches later.
 
-Like I've said above, the purpose of the clean (you don't need an
-invalidate) is to make sure that the CPU loads the latest values from
-memory when the MMU is off. It doesn't matter if the value is in the cache,
-as the subsequent clean + invalidate sequence will invalidate it. Which
-also does not matter since this is the last time kvm-unit-tests writes to
-the variables (the invalidate is needed so the CPU sees the values written
-with the MMU off instead of stale values in the cache).
+Also, shadow_nonpresent_value is only used in couple of places, while
+SHADOW_NONPRESENT_VALUE is used directly in more places.  Does it make more
+sense to always use shadow_nonpresent_value, instead of using
+SHADOW_NONPRESENT_VALUE?
 
-> * If we switch off the MMU and then clean the cache, are we causing
-> coherence issues by issuing the CMOs with different memory attributes
-> (Device-nGnRnE vs Normal Write-back).
+Similar to other shadow values, we can provide a function to let caller
+(VMX/SVM) to decide whether it wants to use non-zero for non-present SPTE.
 
-This is interesting, but I find it very vague. Would you care to elaborate
-how that might happen? A specific scenario would be helpful here, I
-believe.
+	void kvm_mmu_set_non_present_value(u64 value)
+	{
+		shadow_nonpresent_value =3D value;
+	}
 
-> +	asm_mmu_disable();
 
-Thanks,
-Alex
+> +	return 0;
+> +}
+> +
+>  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_ind=
+irect)
+>  {
+>  	int r;
+> @@ -677,8 +715,7 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *v=
+cpu, bool maybe_indirect)
+>  				       1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
+>  	if (r)
+>  		return r;
+> -	r =3D kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
+> -				       PT64_ROOT_MAX_LEVEL);
+> +	r =3D mmu_topup_shadow_page_cache(vcpu);
+>  	if (r)
+>  		return r;
+>  	if (maybe_indirect) {
+> @@ -5521,9 +5558,16 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_fo=
+rced_root_level,
+>  	 * what is used by the kernel for any given HVA, i.e. the kernel's
+>  	 * capabilities are ultimately consulted by kvm_mmu_hugepage_adjust().
+>  	 */
+> -	if (tdp_enabled)
+> +	if (tdp_enabled) {
+> +		/*
+> +		 * For TDP MMU, always set bit 63 for TDX support. See the
+> +		 * comment on SHADOW_NONPRESENT_VALUE.
+> +		 */
+> +#ifdef CONFIG_X86_64
+> +		shadow_nonpresent_value =3D SHADOW_NONPRESENT_VALUE;
+> +#endif
+
+'tdp_enabled' doesn't mean TDP MMU, right?=20
+
+>  		max_huge_page_level =3D tdp_huge_page_level;
+> -	else if (boot_cpu_has(X86_FEATURE_GBPAGES))
+> +	} else if (boot_cpu_has(X86_FEATURE_GBPAGES))
+>  		max_huge_page_level =3D PG_LEVEL_1G;
+>  	else
+>  		max_huge_page_level =3D PG_LEVEL_2M;
+> @@ -5654,7 +5698,8 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mmu_page_header_cache.kmem_cache =3D mmu_page_header_cache;
+>  	vcpu->arch.mmu_page_header_cache.gfp_zero =3D __GFP_ZERO;
+> =20
+> -	vcpu->arch.mmu_shadow_page_cache.gfp_zero =3D __GFP_ZERO;
+> +	if (!(is_tdp_mmu_enabled(vcpu->kvm) && shadow_nonpresent_value))
+> +		vcpu->arch.mmu_shadow_page_cache.gfp_zero =3D __GFP_ZERO;
+> =20
+>  	vcpu->arch.mmu =3D &vcpu->arch.root_mmu;
+>  	vcpu->arch.walk_mmu =3D &vcpu->arch.root_mmu;
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmp=
+l.h
+> index fe35d8fd3276..ee2fb0c073f3 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -1031,7 +1031,8 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, =
+struct kvm_mmu_page *sp)
+>  		gpa_t pte_gpa;
+>  		gfn_t gfn;
+> =20
+> -		if (!sp->spt[i])
+> +		if (!is_shadow_present_pte(sp->spt[i]) &&
+> +		    !is_mmio_spte(sp->spt[i]))
+>  			continue;
+
+As I said in the changelog, I don't think this is correct.
+
+I guess you can just change to check:
+
+	if (sp->spte[i] !=3D shadow_nonpresent_value)
+
+> =20
+>  		pte_gpa =3D first_pte_gpa + i * sizeof(pt_element_t);
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index cda1851ec155..bd441458153f 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -36,6 +36,9 @@ u64 __read_mostly shadow_present_mask;
+>  u64 __read_mostly shadow_me_value;
+>  u64 __read_mostly shadow_me_mask;
+>  u64 __read_mostly shadow_acc_track_mask;
+> +#ifdef CONFIG_X86_64
+> +u64 __read_mostly shadow_nonpresent_value;
+> +#endif
+> =20
+>  u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
+>  u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
+> @@ -360,7 +363,7 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 m=
+mio_mask, u64 access_mask)
+>  	 * not set any RWX bits.
+>  	 */
+>  	if (WARN_ON((mmio_value & mmio_mask) !=3D mmio_value) ||
+> -	    WARN_ON(mmio_value && (REMOVED_SPTE & mmio_mask) =3D=3D mmio_value)=
+)
+> +	    WARN_ON(mmio_value && (__REMOVED_SPTE & mmio_mask) =3D=3D mmio_valu=
+e))
+>  		mmio_value =3D 0;
+> =20
+>  	if (!mmio_value)
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 0127bb6e3c7d..1bfedbe0585f 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -140,6 +140,19 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS =3D=3D 8 && MMI=
+O_SPTE_GEN_HIGH_BITS =3D=3D 11);
+> =20
+>  #define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SP=
+TE_GEN_HIGH_BITS - 1, 0)
+> =20
+> +/*
+> + * non-present SPTE value for both VMX and SVM for TDP MMU.
+> + * For SVM NPT, for non-present spte (bit 0 =3D 0), other bits are ignor=
+ed.
+> + * For VMX EPT, bit 63 is ignored if #VE is disabled.
+> + *              bit 63 is #VE suppress if #VE is enabled.
+> + */
+> +#ifdef CONFIG_X86_64
+> +#define SHADOW_NONPRESENT_VALUE	BIT_ULL(63)
+> +static_assert(!(SHADOW_NONPRESENT_VALUE & SPTE_MMU_PRESENT_MASK));
+> +#else
+> +#define SHADOW_NONPRESENT_VALUE	0ULL
+> +#endif
+> +
+>  extern u64 __read_mostly shadow_host_writable_mask;
+>  extern u64 __read_mostly shadow_mmu_writable_mask;
+>  extern u64 __read_mostly shadow_nx_mask;
+> @@ -154,6 +167,12 @@ extern u64 __read_mostly shadow_present_mask;
+>  extern u64 __read_mostly shadow_me_value;
+>  extern u64 __read_mostly shadow_me_mask;
+> =20
+> +#ifdef CONFIG_X86_64
+> +extern u64 __read_mostly shadow_nonpresent_value;
+> +#else
+> +#define shadow_nonpresent_value	0ULL
+> +#endif
+> +
+>  /*
+>   * SPTEs in MMUs without A/D bits are marked with SPTE_TDP_AD_DISABLED_M=
+ASK;
+>   * shadow_acc_track_mask is the set of bits to be cleared in non-accesse=
+d
+> @@ -174,9 +193,12 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_m=
+ask;
+> =20
+>  /*
+>   * If a thread running without exclusive control of the MMU lock must pe=
+rform a
+> - * multi-part operation on an SPTE, it can set the SPTE to REMOVED_SPTE =
+as a
+> + * multi-part operation on an SPTE, it can set the SPTE to __REMOVED_SPT=
+E as a
+>   * non-present intermediate value. Other threads which encounter this va=
+lue
+> - * should not modify the SPTE.
+> + * should not modify the SPTE.  For the case that TDX is enabled,
+> + * SHADOW_NONPRESENT_VALUE, which is "suppress #VE" bit set because TDX =
+module
+> + * always enables "EPT violation #VE".  The bit is ignored by non-TDX ca=
+se as
+> + * present bit (bit 0) is cleared.
+>   *
+>   * Use a semi-arbitrary value that doesn't set RWX bits, i.e. is not-pre=
+sent on
+>   * bot AMD and Intel CPUs, and doesn't set PFN bits, i.e. doesn't create=
+ a L1TF
+> @@ -184,10 +206,17 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_=
+mask;
+>   *
+>   * Only used by the TDP MMU.
+>   */
+> -#define REMOVED_SPTE	0x5a0ULL
+> +#define __REMOVED_SPTE	0x5a0ULL
+> =20
+>  /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
+> -static_assert(!(REMOVED_SPTE & SPTE_MMU_PRESENT_MASK));
+> +static_assert(!(__REMOVED_SPTE & SPTE_MMU_PRESENT_MASK));
+> +static_assert(!(__REMOVED_SPTE & SHADOW_NONPRESENT_VALUE));
+
+I don't think you need this.  My understanding of the reason REMOVED_SPTE i=
+s
+checked against SPTE_MMU_PRESENT_MASK is because they both at low 12 bits.=
+=20
+SHADOW_NONPRESENT_VALUE is bit 63 so it's not possible to conflict with
+REMOVED_SPTE, which by comment only uses low bits.
+
+> +
+> +/*
+> + * See above comment around __REMOVED_SPTE.  REMOVED_SPTE is the actual
+> + * intermediate value set to the removed SPET.  it sets the "suppress #V=
+E" bit.
+> + */
+> +#define REMOVED_SPTE	(SHADOW_NONPRESENT_VALUE | __REMOVED_SPTE)
+> =20
+>  static inline bool is_removed_spte(u64 spte)
+>  {
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 7b9265d67131..2ca03ec3bf52 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -692,8 +692,16 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm=
+ *kvm,
+>  	 * overwrite the special removed SPTE value. No bookkeeping is needed
+>  	 * here since the SPTE is going from non-present to non-present.  Use
+>  	 * the raw write helper to avoid an unnecessary check on volatile bits.
+> +	 *
+> +	 * Set non-present value to SHADOW_NONPRESENT_VALUE, rather than 0.
+> +	 * It is because when TDX is enabled, TDX module always
+> +	 * enables "EPT-violation #VE", so KVM needs to set
+> +	 * "suppress #VE" bit in EPT table entries, in order to get
+> +	 * real EPT violation, rather than TDVMCALL.  KVM sets
+> +	 * SHADOW_NONPRESENT_VALUE (which sets "suppress #VE" bit) so it
+> +	 * can be set when EPT table entries are zapped.
+>  	 */
+> -	__kvm_tdp_mmu_write_spte(iter->sptep, 0);
+> +	__kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
+> =20
+>  	return 0;
+>  }
+> @@ -870,8 +878,8 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struc=
+t kvm_mmu_page *root,
+>  			continue;
+> =20
+>  		if (!shared)
+> -			tdp_mmu_set_spte(kvm, &iter, 0);
+> -		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
+> +			tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
+> +		else if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
+>  			goto retry;
+>  	}
+>  }
+> @@ -927,8 +935,9 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_m=
+mu_page *sp)
+>  	if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
+>  		return false;
+> =20
+> -	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
+> -			   sp->gfn, sp->role.level + 1, true, true);
+> +	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte,
+> +			   SHADOW_NONPRESENT_VALUE, sp->gfn, sp->role.level + 1,
+> +			   true, true);
+> =20
+>  	return true;
+>  }
+> @@ -965,7 +974,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct=
+ kvm_mmu_page *root,
+>  		    !is_last_spte(iter.old_spte, iter.level))
+>  			continue;
+> =20
+> -		tdp_mmu_set_spte(kvm, &iter, 0);
+> +		tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
+>  		flush =3D true;
+>  	}
+> =20
+> @@ -1330,7 +1339,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct td=
+p_iter *iter,
+>  	 * invariant that the PFN of a present * leaf SPTE can never change.
+>  	 * See __handle_changed_spte().
+>  	 */
+> -	tdp_mmu_set_spte(kvm, iter, 0);
+> +	tdp_mmu_set_spte(kvm, iter, SHADOW_NONPRESENT_VALUE);
+> =20
+>  	if (!pte_write(range->pte)) {
+>  		new_spte =3D kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
+
