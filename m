@@ -2,115 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18BB7561490
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 10:19:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFAA05614DC
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 10:23:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232760AbiF3IR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 04:17:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42484 "EHLO
+        id S232387AbiF3IWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 04:22:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233176AbiF3IQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 04:16:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68F7A42A35
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 01:14:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656576875;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=sHOROkkDPVycREOjaX84DcrqMqdz1IXTlosFpoNNS6s=;
-        b=gVbW3vg6S54Zl0R6379xEnL4E9KfELuVmpjr0OaIM3QKoNY5i4xHd7gTMe32mDUx/B3CXn
-        wJeBnFxJE6+cef7OAKyzCl7+lU7RTjiJaGoyNVMwK5nHxbWHqfwOVC6698V3UFC0AZSHXm
-        wzifd/485dVPaW8my08v22IPPDiugtc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-641-fylKwONuN0SX24-oFzDzeQ-1; Thu, 30 Jun 2022 04:14:31 -0400
-X-MC-Unique: fylKwONuN0SX24-oFzDzeQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2A06F1C00131;
-        Thu, 30 Jun 2022 08:14:31 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E9FDB2026D64;
-        Thu, 30 Jun 2022 08:14:28 +0000 (UTC)
-Date:   Thu, 30 Jun 2022 09:14:26 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Dionna Glaze <dionnaglaze@google.com>
-Cc:     qemu-devel@nongnu.org, Xu@google.com, Min M <min.m.xu@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Thomas Lendacky <Thomas.Lendacky@amd.com>,
-        Gerd Hoffman <kraxel@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2] target/i386: Add unaccepted memory configuration
-Message-ID: <Yr1bYiA1w/lMX76k@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20220629193701.734154-1-dionnaglaze@google.com>
+        with ESMTP id S233644AbiF3IWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 04:22:19 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E1AD102;
+        Thu, 30 Jun 2022 01:21:53 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC83F1BCB;
+        Thu, 30 Jun 2022 01:21:52 -0700 (PDT)
+Received: from [10.57.85.25] (unknown [10.57.85.25])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D6A263F66F;
+        Thu, 30 Jun 2022 01:21:47 -0700 (PDT)
+Message-ID: <e5799215-8b55-90a8-7ca4-35f85ffb5969@arm.com>
+Date:   Thu, 30 Jun 2022 09:21:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220629193701.734154-1-dionnaglaze@google.com>
-User-Agent: Mutt/2.2.6 (2022-06-05)
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v3 1/5] iommu: Return -EMEDIUMTYPE for incompatible domain
+ and device/group
+Content-Language: en-GB
+To:     Nicolin Chen <nicolinc@nvidia.com>, Yong Wu <yong.wu@mediatek.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "jordan@cosmicpenguin.net" <jordan@cosmicpenguin.net>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "alyssa@rosenzweig.io" <alyssa@rosenzweig.io>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "zhang.lyra@gmail.com" <zhang.lyra@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "jonathanh@nvidia.com" <jonathanh@nvidia.com>,
+        "yangyingliang@huawei.com" <yangyingliang@huawei.com>,
+        "orsonzhai@gmail.com" <orsonzhai@gmail.com>,
+        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+        "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "marcan@marcan.st" <marcan@marcan.st>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolin.wang7@gmail.com" <baolin.wang7@gmail.com>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>
+References: <20220623200029.26007-1-nicolinc@nvidia.com>
+ <20220623200029.26007-2-nicolinc@nvidia.com>
+ <270eec00-8aee-2288-4069-d604e6da2925@linux.intel.com>
+ <YrUk8IINqDEZLfIa@Asurada-Nvidia>
+ <8a5e9c81ab1487154828af3ca21e62e39bcce18c.camel@mediatek.com>
+ <BN9PR11MB527629DEF740C909A7B7BEB38CB49@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <19cfb1b85a347c70c6b0937bbbca4a176a724454.camel@mediatek.com>
+ <20220624181943.GV4147@nvidia.com> <YrysUpY4mdzA0h76@Asurada-Nvidia>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <YrysUpY4mdzA0h76@Asurada-Nvidia>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 07:37:01PM +0000, Dionna Glaze wrote:
-> For SEV-SNP, an OS is "SEV-SNP capable" without supporting this UEFI
-> v2.9 memory type. In order for OVMF to be able to avoid pre-validating
-> potentially hundreds of gibibytes of data before booting, it needs to
-> know if the guest OS can support its use of the new type of memory in
-> the memory map.
+On 2022-06-29 20:47, Nicolin Chen wrote:
+> On Fri, Jun 24, 2022 at 03:19:43PM -0300, Jason Gunthorpe wrote:
+>> On Fri, Jun 24, 2022 at 06:35:49PM +0800, Yong Wu wrote:
+>>
+>>>>> It's not used in VFIO context. "return 0" just satisfy the iommu
+>>>>> framework to go ahead. and yes, here we only allow the shared
+>>>>> "mapping-domain" (All the devices share a domain created
+>>>>> internally).
+>>
+>> What part of the iommu framework is trying to attach a domain and
+>> wants to see success when the domain was not actually attached ?
+>>
+>>>> What prevent this driver from being used in VFIO context?
+>>>
+>>> Nothing prevent this. Just I didn't test.
+>>
+>> This is why it is wrong to return success here.
+> 
+> Hi Yong, would you or someone you know be able to confirm whether
+> this "return 0" is still a must or not?
 
-This talks about something supported for SEV-SNP, but....
+ From memory, it is unfortunately required, due to this driver being in 
+the rare position of having to support multiple devices in a single 
+address space on 32-bit ARM. Since the old ARM DMA code doesn't 
+understand groups, the driver sets up its own canonical 
+dma_iommu_mapping to act like a default domain, but then has to politely 
+say "yeah OK" to arm_setup_iommu_dma_ops() for each device so that they 
+do all end up with the right DMA ops rather than dying in screaming 
+failure (the ARM code's per-device mappings then get leaked, but we 
+can't really do any better).
 
->  static void
->  sev_guest_class_init(ObjectClass *oc, void *data)
->  {
-> @@ -376,6 +401,14 @@ sev_guest_class_init(ObjectClass *oc, void *data)
->                                     sev_guest_set_kernel_hashes);
->      object_class_property_set_description(oc, "kernel-hashes",
->              "add kernel hashes to guest firmware for measured Linux boot");
-> +    object_class_property_add_enum(oc, "accept-all-memory",
-> +                                   "MemoryAcceptance",
-> +                                   &memory_acceptance_lookup,
-> +        sev_guest_get_accept_all_memory, sev_guest_set_accept_all_memory);
-> +    object_class_property_set_description(
-> +        oc, "accept-all-memory",
-> +        "false: Accept all memory, true: Accept up to 4G and leave the rest unaccepted (UEFI"
-> +        " v2.9 memory type), default: default firmware behavior.");
->  }
+The whole mess disappears in the proper default domain conversion, but 
+in the meantime, it's still safe to assume that nobody's doing VFIO with 
+embedded display/video codec/etc. blocks that don't even have reset drivers.
 
-..this is adding a property to the 'sev-guest' object, which only
-targets SEV/SEV-ES currently AFAIK.
-
-The most recent patches I recall for SEV-SNP introduced a new
-'sev-snp-guest' object instead of overloading the existing
-'sev-guest' object:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2021-08/msg04757.html
-
-
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Thanks,
+Robin.
