@@ -2,125 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD7B2562049
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 18:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACE7E5620F0
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 19:11:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236187AbiF3Q2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 12:28:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37018 "EHLO
+        id S235411AbiF3RLU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 13:11:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236124AbiF3Q2t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 12:28:49 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BF4734643
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 09:28:48 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id i3so2423351oif.13
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 09:28:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DuU0Oc6sEw1/gSI0hNRo//d9uDydGl0aHe9l6WG2Fv0=;
-        b=OHv55hkJS4mGKcPWvgYa/NIZRvchN42QRzsIBMvgBRHeJTy+9oMiCGHykvLd2/cyAn
-         +VQ0nHlZyG+1vX1MgWtSan5/r8A7m+pIvx6sXHKr6Z9Is5Fo2/zW3pNuK67FY9EkkPQw
-         6l06MaNRVBFLLgU1mkxJuMCMs4ianACLY0dPiuYTql79zczbx9f9HLZq2woeI6blZnhW
-         pXpmhEB8qAk5oURPj1k3+9sYJJIgac/00eWdwvppUwp8gRlEHXfFvB+3cdZhv7EQECvA
-         kDi6keH741MiOGrPZsAcKTgCpKj0HLnAZIx5QYlxC4oGATMEeniAavK0i3ZkO++8poQ5
-         QS+Q==
+        with ESMTP id S235463AbiF3RLS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 13:11:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2351D3EF31
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 10:11:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656609075;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JUOdzSO2oUbBwTqVsnQybwkshzKjPN1FQaK1nqX25to=;
+        b=aGXD9F5F5PXAknVJSAZSuXSXJRX3vMmPT+q4ZRFuAj/7iZwWt7OLQNQgcLxoWZBWSwIeGN
+        78vY4CkTAP43ShIvUEC1Zkkkz4ywx0jB7vEEvXbWduISkaoVJZb5H+o8ARUbi+DAtqO5f+
+        tzNLyIKex5IFatfHnbB5koZm7HH+COM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-448-s7RmowzkPruPU1cMCE7ivA-1; Thu, 30 Jun 2022 13:11:12 -0400
+X-MC-Unique: s7RmowzkPruPU1cMCE7ivA-1
+Received: by mail-wm1-f70.google.com with SMTP id v8-20020a05600c214800b003a1819451b1so1166756wml.7
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 10:11:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DuU0Oc6sEw1/gSI0hNRo//d9uDydGl0aHe9l6WG2Fv0=;
-        b=TqkAV7GXPTRBSU6xhmDucuwqM1KSLOKu0Ggywn+e/Cn90+l/Yv8zUHKZBe8yRXDJjz
-         JAGpC9Myznv5Dodi9JtqyMoTTYiLRD7VXcTPsT0/TcN/PQHKmKzzNJHnRj+xCkzfB2Hb
-         VNYcI3hIUS52llv1WMwLV6Nygx8qB0ANdSo4uYQG68mU6xkP16OVGMu754yttVkZLyHg
-         m7AmZyqIluXl8Ps9n2ojO+dXXLGkBEOC59PY0GeAA++xPOdAId+yjoagqtlhVJkias3+
-         9ILqhUMA7WyTBI+3YWFjQbTuMIq9wWekDNNfznPCccobjJJW+tL6E7B+o3qiO3EbSLwS
-         hx3Q==
-X-Gm-Message-State: AJIora9Mzi8KyyGjgXsYK66vDLPvAPBoPc5v9YcINTPgIG5YHRBQgTb1
-        M1P/k+L04ZOz6egIkVf4PjtuG/5oKDb6z/iAk+ifLWHaojY=
-X-Google-Smtp-Source: AGRyM1vWLRRpGLxd1Gwz4jLwKOh5tvgeuqr2BlgmNuw6Pko4Iq0RPZuH85KFREDhdDvSMChjwLCWmwH3Gt0EO+9DvEI=
-X-Received: by 2002:a05:6808:3089:b0:32e:f7fd:627d with SMTP id
- bl9-20020a056808308900b0032ef7fd627dmr5742640oib.181.1656606527413; Thu, 30
- Jun 2022 09:28:47 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=JUOdzSO2oUbBwTqVsnQybwkshzKjPN1FQaK1nqX25to=;
+        b=2hxd+DCKjVkMXl4Hnm62WHk581faPsiAtNrTdGdfNTdjr25N5IAZmkHNPi5qDwukk7
+         JWygGO26xl22mX1mw909GJcJzW57Xq45hUi5LrmumCZv37QndZCOR+ZkBLvytrR0rKAE
+         JEa6pAF6CwxMMs9zMMatujPaJEtOQot+b8k6lLy5O1x75pkfkzB81aU9YEN2NcLxHZqJ
+         Yd4otXSnJqtJSSwfR6qyqgngW27kuBBCDrmFExhgVUNeWf70nPQwInQKiQk4bQhHrAq3
+         w5sEz+Tdqjva0RfN2emuvPGnIwWf/FVKEnyPf0JzQK6wDWp6ZHm9OrW1SysK2+OiqjAd
+         Iqcg==
+X-Gm-Message-State: AJIora/bDS889covy3bAxQ+nmejEdGMtgeHMRzKK/FSF/JxUWfmJJjRw
+        V1vkJR0XmYlPtfbaIVpl9WkO6ltnXTw46kvfrDcJJ5dWTaObycCvmhqvk7Cd6Hvd5u/StkKmpMk
+        +p8Yoh7ZSjYrE
+X-Received: by 2002:a05:600c:1d96:b0:3a0:30b6:bb1a with SMTP id p22-20020a05600c1d9600b003a030b6bb1amr12787107wms.93.1656609070902;
+        Thu, 30 Jun 2022 10:11:10 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1s10GRhnhicYja7eIwUqagyOtGj985hy18rMk27XChhm0UIb5PrlgWH3C/QnwSYivs8HJgcbQ==
+X-Received: by 2002:a05:600c:1d96:b0:3a0:30b6:bb1a with SMTP id p22-20020a05600c1d9600b003a030b6bb1amr12787092wms.93.1656609070585;
+        Thu, 30 Jun 2022 10:11:10 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-179-66.web.vodafone.de. [109.43.179.66])
+        by smtp.gmail.com with ESMTPSA id m9-20020a056000024900b0020c5253d907sm3704470wrz.83.2022.06.30.10.11.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jun 2022 10:11:09 -0700 (PDT)
+Message-ID: <c58d2ce5-66c0-2072-5788-9463a6003888@redhat.com>
+Date:   Thu, 30 Jun 2022 19:11:08 +0200
 MIME-Version: 1.0
-References: <20220614204730.3359543-1-seanjc@google.com> <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
- <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com> <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
-In-Reply-To: <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 30 Jun 2022 09:28:36 -0700
-Message-ID: <CALMp9eSWkjHyer9CZL7UN4s8Ashc1svZsAnEgJDd2Q9voSz7HQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [kvm-unit-tests PATCH v1 3/3] s390x: add pgm spec interrupt loop
+ test
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20220630113059.229221-1-nrb@linux.ibm.com>
+ <20220630113059.229221-4-nrb@linux.ibm.com>
+ <dd270d92-a5dc-8a75-0edc-e9fdbb254cc9@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <dd270d92-a5dc-8a75-0edc-e9fdbb254cc9@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 1:22 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> On Wed, 2022-06-29 at 06:42 -0700, Jim Mattson wrote:
+On 30/06/2022 16.38, Janis Schoetterl-Glausch wrote:
+> On 6/30/22 13:30, Nico Boehr wrote:
+>> An invalid PSW causes a program interrupt. When an invalid PSW is
+>> introduced in the pgm_new_psw, an interrupt loop occurs as soon as a
+>> program interrupt is caused.
+>>
+>> QEMU should detect that and panick the guest, hence add a test for it.
+> 
+> Why is that, after all in LPAR it would just spin, right?
 
-> > Unlike the AMD "INTn intercept," these trap intercepts *do not* happen
-> > at the start of the instruction.
->
-> Are you sure about that?
+Not sure what the LPAR is doing, but the guest is certainly completely 
+unusable, so a panic event is the right thing to do here for QEMU.
 
-I had been sure when I wrote that, but now that I see your response, I
-have to question my memory. The SDM is definitely more authoritative
-than I am.
+> Also, panicK.
+> How do you assert that the guest doesn't spin forever, is there a timeout?
 
-> > When you say "ignores," do you mean that AMD ignores a data breakpoint
-> > or single-step trap generated by MOV-SS, or it ignores the fact that
-> > delivering such a #DB trap between the MOV-SS and the subsequent
-> > MOV-ESP will create a stack frame in the wrong place?
->
-> Two things which can be infered from the SVM spec.
->         - AMD doesn't distinguish between MOV SS and STI int shadow.
->         - AMD has no 'pending debug exception field' in the vmcb.
->
-> I don't know what AMD does for #DB that happens on MOV SS, nor if it
-> does distinguish these internally,
-> probably just drops the #DB or something.
+I agree, it would be good to have a "timeout" set in the unittests.cfg for 
+this test here (some few seconds should be enough).
 
-Without carrying pending debug exceptions, it seems that the only two
-choices are to deliver the #DB, with the exception frame in an
-unintended location or to drop the #DB. The latter seems preferable,
-but neither one seems good. What I don't understand is why you claim
-that AMD does this "rightfully." Are you saying that anyone with the
-audacity to run a debugger on legacy code deserves to be thrown in
-front of a moving train?
+  Thomas
 
-> > Hence, the facility for injecting a "pending MTF"--so that it won't be "lost."
-> Yes, though that is would be mostly useful for nesting.
->
-> For not nesting hypervisor, if the hypervisor figured out that a higher priority event overrode
-> the MTF, it can just process the MTF - why to re-inject it?
-
-You're right. The facility is probably just there to make MTF
-virtualizable. Intel was paying much closer attention to
-virtualizability by the time MTF came along.
-
-> >
-> > These are single-step, I/O and data breakpoint traps.
->
-> I am not sure what you mean. single-step, IO, data breakpoints are indeed the trap #DB,
-> while "general detect", code breakpoint are fault #DB, and we also have the task switch #DB, but since the hardware doesn't
-> emulate the task switches, this has to be injected.
-
-Just enumerating. No more, no less.
