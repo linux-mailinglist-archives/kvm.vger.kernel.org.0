@@ -2,136 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F9E6562037
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 18:24:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD7B2562049
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 18:29:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235549AbiF3QYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 12:24:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33282 "EHLO
+        id S236187AbiF3Q2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 12:28:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbiF3QYS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 12:24:18 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131763152A;
-        Thu, 30 Jun 2022 09:24:14 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25UFrHBn016677;
-        Thu, 30 Jun 2022 16:24:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=VsXVub7i69OlSmt75b8fF6Rqo68g9H4j1XIDXGV7yoU=;
- b=JN/6JAfGGaa4KrUM1TuAJWE26nr9KGqWfuuhTdmKa5zXfi0hIMUUed+sba9QSNDqP8Hc
- 3YJPMaBlHEGDRbn8MMRJdRBv0v2eFFNYIfT6G1LXmnCAyMP5zEGkOSVh8wRZ5dxzhJ2V
- xYSksb5jKjaCP0x6kWiZHBsnZbS4gQegki7+8JyOJ5n85NCxKKkGfDEjn0Xx5doAs9Zv
- ivppMSpvv/r0E2rNaFJrvLqUwEQydhArEKcHqIW4rIEjSeqPQ3kf/tehYMwRdIA0IVQ7
- hzZQn+iu4ByGyTBgxTXar1B6XmRWYfzP9JNbfEN3lle2Pi3ru1Q5uA2/s41Evz1ywHUE ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1ev590u3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 16:24:05 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25UFrv7a018774;
-        Thu, 30 Jun 2022 16:24:05 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1ev590tf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 16:24:05 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25UGMCmg030961;
-        Thu, 30 Jun 2022 16:24:04 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma03dal.us.ibm.com with ESMTP id 3gwt0b36dk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 16:24:04 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25UGO2UL27525502
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jun 2022 16:24:02 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B7426BE051;
-        Thu, 30 Jun 2022 16:24:02 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8791CBE04F;
-        Thu, 30 Jun 2022 16:24:01 +0000 (GMT)
-Received: from [9.160.92.179] (unknown [9.160.92.179])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 30 Jun 2022 16:24:01 +0000 (GMT)
-Message-ID: <17a7c3f9-4566-899e-ed29-4e4c0d25ad7f@linux.ibm.com>
-Date:   Thu, 30 Jun 2022 12:24:01 -0400
+        with ESMTP id S236124AbiF3Q2t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 12:28:49 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BF4734643
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 09:28:48 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id i3so2423351oif.13
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 09:28:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DuU0Oc6sEw1/gSI0hNRo//d9uDydGl0aHe9l6WG2Fv0=;
+        b=OHv55hkJS4mGKcPWvgYa/NIZRvchN42QRzsIBMvgBRHeJTy+9oMiCGHykvLd2/cyAn
+         +VQ0nHlZyG+1vX1MgWtSan5/r8A7m+pIvx6sXHKr6Z9Is5Fo2/zW3pNuK67FY9EkkPQw
+         6l06MaNRVBFLLgU1mkxJuMCMs4ianACLY0dPiuYTql79zczbx9f9HLZq2woeI6blZnhW
+         pXpmhEB8qAk5oURPj1k3+9sYJJIgac/00eWdwvppUwp8gRlEHXfFvB+3cdZhv7EQECvA
+         kDi6keH741MiOGrPZsAcKTgCpKj0HLnAZIx5QYlxC4oGATMEeniAavK0i3ZkO++8poQ5
+         QS+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DuU0Oc6sEw1/gSI0hNRo//d9uDydGl0aHe9l6WG2Fv0=;
+        b=TqkAV7GXPTRBSU6xhmDucuwqM1KSLOKu0Ggywn+e/Cn90+l/Yv8zUHKZBe8yRXDJjz
+         JAGpC9Myznv5Dodi9JtqyMoTTYiLRD7VXcTPsT0/TcN/PQHKmKzzNJHnRj+xCkzfB2Hb
+         VNYcI3hIUS52llv1WMwLV6Nygx8qB0ANdSo4uYQG68mU6xkP16OVGMu754yttVkZLyHg
+         m7AmZyqIluXl8Ps9n2ojO+dXXLGkBEOC59PY0GeAA++xPOdAId+yjoagqtlhVJkias3+
+         9ILqhUMA7WyTBI+3YWFjQbTuMIq9wWekDNNfznPCccobjJJW+tL6E7B+o3qiO3EbSLwS
+         hx3Q==
+X-Gm-Message-State: AJIora9Mzi8KyyGjgXsYK66vDLPvAPBoPc5v9YcINTPgIG5YHRBQgTb1
+        M1P/k+L04ZOz6egIkVf4PjtuG/5oKDb6z/iAk+ifLWHaojY=
+X-Google-Smtp-Source: AGRyM1vWLRRpGLxd1Gwz4jLwKOh5tvgeuqr2BlgmNuw6Pko4Iq0RPZuH85KFREDhdDvSMChjwLCWmwH3Gt0EO+9DvEI=
+X-Received: by 2002:a05:6808:3089:b0:32e:f7fd:627d with SMTP id
+ bl9-20020a056808308900b0032ef7fd627dmr5742640oib.181.1656606527413; Thu, 30
+ Jun 2022 09:28:47 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH 08/13] vfio/mdev: remove mtype_get_parent_dev
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        Kevin Tian <kevin.tian@intel.com>
-References: <20220628051435.695540-1-hch@lst.de>
- <20220628051435.695540-9-hch@lst.de>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220628051435.695540-9-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ySV7g_ZkRnY77ocr37erDuKsnPOV1GRq
-X-Proofpoint-ORIG-GUID: cuwRpwHpbp7COLTm-QA_wxCYQf8N7Ocq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-30_11,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 clxscore=1011 lowpriorityscore=0 adultscore=0 spamscore=0
- impostorscore=0 phishscore=0 bulkscore=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206300064
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220614204730.3359543-1-seanjc@google.com> <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
+ <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com> <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
+In-Reply-To: <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 30 Jun 2022 09:28:36 -0700
+Message-ID: <CALMp9eSWkjHyer9CZL7UN4s8Ashc1svZsAnEgJDd2Q9voSz7HQ@mail.gmail.com>
+Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/28/22 01:14, Christoph Hellwig wrote:
-> Just open code the dereferences in the only user.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
-> ---
->   drivers/s390/cio/vfio_ccw_ops.c |  3 +--
->   drivers/vfio/mdev/mdev_core.c   | 10 ----------
->   include/linux/mdev.h            |  2 --
->   3 files changed, 1 insertion(+), 14 deletions(-)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-> index 25b8d42a522ac..43d53736dfe3c 100644
-> --- a/drivers/s390/cio/vfio_ccw_ops.c
-> +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> @@ -88,8 +88,7 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
->   					struct mdev_type_attribute *attr,
->   					char *buf)
->   {
-> -	struct vfio_ccw_private *private =
-> -		dev_get_drvdata(mtype_get_parent_dev(mtype));
-> +	struct vfio_ccw_private *private = dev_get_drvdata(mtype->parent->dev);
->   
->   	return sprintf(buf, "%d\n", atomic_read(&private->avail));
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+On Thu, Jun 30, 2022 at 1:22 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>
+> On Wed, 2022-06-29 at 06:42 -0700, Jim Mattson wrote:
 
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+> > Unlike the AMD "INTn intercept," these trap intercepts *do not* happen
+> > at the start of the instruction.
+>
+> Are you sure about that?
+
+I had been sure when I wrote that, but now that I see your response, I
+have to question my memory. The SDM is definitely more authoritative
+than I am.
+
+> > When you say "ignores," do you mean that AMD ignores a data breakpoint
+> > or single-step trap generated by MOV-SS, or it ignores the fact that
+> > delivering such a #DB trap between the MOV-SS and the subsequent
+> > MOV-ESP will create a stack frame in the wrong place?
+>
+> Two things which can be infered from the SVM spec.
+>         - AMD doesn't distinguish between MOV SS and STI int shadow.
+>         - AMD has no 'pending debug exception field' in the vmcb.
+>
+> I don't know what AMD does for #DB that happens on MOV SS, nor if it
+> does distinguish these internally,
+> probably just drops the #DB or something.
+
+Without carrying pending debug exceptions, it seems that the only two
+choices are to deliver the #DB, with the exception frame in an
+unintended location or to drop the #DB. The latter seems preferable,
+but neither one seems good. What I don't understand is why you claim
+that AMD does this "rightfully." Are you saying that anyone with the
+audacity to run a debugger on legacy code deserves to be thrown in
+front of a moving train?
+
+> > Hence, the facility for injecting a "pending MTF"--so that it won't be "lost."
+> Yes, though that is would be mostly useful for nesting.
+>
+> For not nesting hypervisor, if the hypervisor figured out that a higher priority event overrode
+> the MTF, it can just process the MTF - why to re-inject it?
+
+You're right. The facility is probably just there to make MTF
+virtualizable. Intel was paying much closer attention to
+virtualizability by the time MTF came along.
+
+> >
+> > These are single-step, I/O and data breakpoint traps.
+>
+> I am not sure what you mean. single-step, IO, data breakpoints are indeed the trap #DB,
+> while "general detect", code breakpoint are fault #DB, and we also have the task switch #DB, but since the hardware doesn't
+> emulate the task switches, this has to be injected.
+
+Just enumerating. No more, no less.
