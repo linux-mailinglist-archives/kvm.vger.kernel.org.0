@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFE1B561D84
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6412561D03
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:16:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237116AbiF3OOI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 10:14:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40712 "EHLO
+        id S237129AbiF3OOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 10:14:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237517AbiF3ONY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S237518AbiF3ONY (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 30 Jun 2022 10:13:24 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7360D1AF23
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:58:49 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D0D11EAEB
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:58:51 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 24DDDB82AF0
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 13:58:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71259C3411E;
-        Thu, 30 Jun 2022 13:58:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1B66A6218F
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 13:58:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BF78C341CD;
+        Thu, 30 Jun 2022 13:58:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656597526;
-        bh=q0Htei9aMsmdFnftkiVNQa8nf0uhmXaK1/sf4iK03Uw=;
+        s=k20201202; t=1656597530;
+        bh=ImX+07VIs5/ywt24lHtORtVCTgqMYbIoz08sSw7dG5o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=obVow5sCNdyrGBuLk2gi2/GrvGAVfAkB+X092uBU/qbnNVnz4xOe38V4ikZS1CNQM
-         la+ZKutCgnjnMRLejK0Y521btvtb+LwS00X1Jf6EY5jCKCMZprlj/xD+RhlvL+pEye
-         WcmB16Qq87GPchcgVKgdXwxr8tfsaffPsdZ9TFeIPDqcHaYbE/52DS2MOuNoUVi/yc
-         ++hVdSv5jOjsxzgsntTYW2eN+dtKea2o44XYi25BX1X0PzKkLva7/jJnTL6SYBnXhI
-         mLFEOiC4Vqdn6uFJEpjzKduE9nNos3XgA6U8odki0SuLa/DkgdLLt5aS01JpHG+ctT
-         R4XFQyH+PwQhA==
+        b=ootCpjVRtnqzVmn1mwhZUMtV8bYTxenIQKgiaKFTfCOWzVtLOlGukUgK11Y/QxETv
+         DG/XEDFz/0pNp/+wZK1c2FyiU4zNitzt2vfF9PzkndCP9j0GvTa6V6LEKSRCV6aevu
+         KtmTKlAHDPkvtmcb5a1QULTPxXQtRxtLyefDNMZtydnUFFegyInKie9BZUE34oLANK
+         PhW+PgAlZ0wXGeUgHVaaXeBMrx8C+QhbJxPMWjcvizwhzfhyDqHNWLYdzsS0QfiKwG
+         EcNvudZnUPEPbMW2RAp6ybhehuvN1goNMvErHjySZKVSPh67mOaelr5GPWRWbrXIAZ
+         UpZDzftYs7G7w==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 13/24] KVM: arm64: Instantiate VM shadow data from EL1
-Date:   Thu, 30 Jun 2022 14:57:36 +0100
-Message-Id: <20220630135747.26983-14-will@kernel.org>
+Subject: [PATCH v2 14/24] KVM: arm64: Add pcpu fixmap infrastructure at EL2
+Date:   Thu, 30 Jun 2022 14:57:37 +0100
+Message-Id: <20220630135747.26983-15-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220630135747.26983-1-will@kernel.org>
 References: <20220630135747.26983-1-will@kernel.org>
@@ -66,245 +66,175 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Fuad Tabba <tabba@google.com>
+From: Quentin Perret <qperret@google.com>
 
-Now that EL2 provides calls to create and destroy shadow VM structures,
-plumb these into the KVM code at EL1 so that a shadow VM is created on
-first vCPU run and destroyed later along with the 'struct kvm' at
-teardown time.
+We will soon need to temporarily map pages into the hypervisor stage-1
+in nVHE protected mode. To do this efficiently, let's introduce a
+per-cpu fixmap allowing to map a single page without needing to take any
+lock or to allocate memory.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h  |   6 ++
- arch/arm64/include/asm/kvm_pkvm.h  |   4 ++
- arch/arm64/kvm/arm.c               |  14 ++++
- arch/arm64/kvm/hyp/hyp-constants.c |   3 +
- arch/arm64/kvm/pkvm.c              | 112 +++++++++++++++++++++++++++++
- 5 files changed, 139 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |  4 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  1 -
+ arch/arm64/kvm/hyp/nvhe/mm.c                  | 72 +++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  4 ++
+ 5 files changed, 82 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 41348ac728f9..e91456f63161 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -117,6 +117,12 @@ struct kvm_smccc_features {
- 
- struct kvm_protected_vm {
- 	unsigned int shadow_handle;
-+	struct mutex shadow_lock;
-+
-+	struct {
-+		void *pgd;
-+		void *shadow;
-+	} hyp_donations;
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 3a0817b5c739..d11d9d68a680 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -59,6 +59,8 @@ enum pkvm_component_id {
+ 	PKVM_ID_HYP,
  };
  
- struct kvm_arch {
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 11526e89fe5c..1dc7372950b1 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -14,6 +14,10 @@
- 
- #define HYP_MEMBLOCK_REGIONS 128
- 
-+int kvm_init_pvm(struct kvm *kvm);
-+int kvm_shadow_create(struct kvm *kvm);
-+void kvm_shadow_destroy(struct kvm *kvm);
++extern unsigned long hyp_nr_cpus;
 +
- extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
- extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
+ int __pkvm_prot_finalize(void);
+ int __pkvm_host_share_hyp(u64 pfn);
+ int __pkvm_host_unshare_hyp(u64 pfn);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+index b2ee6d5df55b..882c5711eda5 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+@@ -13,6 +13,10 @@
+ extern struct kvm_pgtable pkvm_pgtable;
+ extern hyp_spinlock_t pkvm_pgd_lock;
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a9dd7ec38f38..66e1d37858f1 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -37,6 +37,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_pkvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/sections.h>
- 
-@@ -150,6 +151,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (ret)
- 		goto out_free_stage2_pgd;
- 
-+	ret = kvm_init_pvm(kvm);
-+	if (ret)
-+		goto out_free_stage2_pgd;
++int hyp_create_pcpu_fixmap(void);
++void *hyp_fixmap_map(phys_addr_t phys);
++int hyp_fixmap_unmap(void);
 +
- 	if (!zalloc_cpumask_var(&kvm->arch.supported_cpus, GFP_KERNEL))
- 		goto out_free_stage2_pgd;
- 	cpumask_copy(kvm->arch.supported_cpus, cpu_possible_mask);
-@@ -185,6 +190,9 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ int hyp_create_idmap(u32 hyp_va_bits);
+ int hyp_map_vectors(void);
+ int hyp_back_vmemmap(phys_addr_t back);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 9baf731736be..a0af23de2640 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -21,7 +21,6 @@
  
- 	kvm_vgic_destroy(kvm);
+ #define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_NOFWB | KVM_PGTABLE_S2_IDMAP)
  
-+	if (is_protected_kvm_enabled())
-+		kvm_shadow_destroy(kvm);
-+
- 	kvm_destroy_vcpus(kvm);
+-extern unsigned long hyp_nr_cpus;
+ struct host_kvm host_kvm;
  
- 	kvm_unshare_hyp(kvm, kvm + 1);
-@@ -567,6 +575,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return ret;
- 
-+	if (is_protected_kvm_enabled()) {
-+		ret = kvm_shadow_create(kvm);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	if (!irqchip_in_kernel(kvm)) {
- 		/*
- 		 * Tell the rest of the code that there are userspace irqchip
-diff --git a/arch/arm64/kvm/hyp/hyp-constants.c b/arch/arm64/kvm/hyp/hyp-constants.c
-index b3742a6691e8..eee79527f901 100644
---- a/arch/arm64/kvm/hyp/hyp-constants.c
-+++ b/arch/arm64/kvm/hyp/hyp-constants.c
-@@ -2,9 +2,12 @@
- 
- #include <linux/kbuild.h>
+ static struct hyp_pool host_s2_pool;
+diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+index d3a3b47181de..17d689483ec4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mm.c
++++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+@@ -14,6 +14,7 @@
+ #include <nvhe/early_alloc.h>
+ #include <nvhe/gfp.h>
  #include <nvhe/memory.h>
-+#include <nvhe/pkvm.h>
++#include <nvhe/mem_protect.h>
+ #include <nvhe/mm.h>
+ #include <nvhe/spinlock.h>
  
- int main(void)
- {
- 	DEFINE(STRUCT_HYP_PAGE_SIZE,	sizeof(struct hyp_page));
-+	DEFINE(KVM_SHADOW_VM_SIZE,	sizeof(struct kvm_shadow_vm));
-+	DEFINE(KVM_SHADOW_VCPU_STATE_SIZE, sizeof(struct kvm_shadow_vcpu_state));
+@@ -24,6 +25,7 @@ struct memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
+ unsigned int hyp_memblock_nr;
+ 
+ static u64 __io_map_base;
++static DEFINE_PER_CPU(void *, hyp_fixmap_base);
+ 
+ static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+ 				  unsigned long phys, enum kvm_pgtable_prot prot)
+@@ -212,6 +214,76 @@ int hyp_map_vectors(void)
  	return 0;
  }
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 3947063cc3a1..b4466b31d7c8 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -6,6 +6,7 @@
  
- #include <linux/kvm_host.h>
- #include <linux/memblock.h>
-+#include <linux/mutex.h>
- #include <linux/sort.h>
- 
- #include <asm/kvm_pkvm.h>
-@@ -94,3 +95,114 @@ void __init kvm_hyp_reserve(void)
- 	kvm_info("Reserved %lld MiB at 0x%llx\n", hyp_mem_size >> 20,
- 		 hyp_mem_base);
- }
-+
-+/*
-+ * Allocates and donates memory for EL2 shadow structs.
-+ *
-+ * Allocates space for the shadow state, which includes the shadow vm as well as
-+ * the shadow vcpu states.
-+ *
-+ * Stores an opaque handler in the kvm struct for future reference.
-+ *
-+ * Return 0 on success, negative error code on failure.
-+ */
-+static int __kvm_shadow_create(struct kvm *kvm)
++void *hyp_fixmap_map(phys_addr_t phys)
 +{
-+	struct kvm_vcpu *vcpu, **vcpu_array;
-+	unsigned int shadow_handle;
-+	size_t pgd_sz, shadow_sz;
-+	void *pgd, *shadow_addr;
-+	unsigned long idx;
++	void *addr = *this_cpu_ptr(&hyp_fixmap_base);
++	int ret = kvm_pgtable_hyp_map(&pkvm_pgtable, (u64)addr, PAGE_SIZE,
++				      phys, PAGE_HYP);
++	return ret ? NULL : addr;
++}
++
++int hyp_fixmap_unmap(void)
++{
++	void *addr = *this_cpu_ptr(&hyp_fixmap_base);
++	int ret = kvm_pgtable_hyp_unmap(&pkvm_pgtable, (u64)addr, PAGE_SIZE);
++
++	return (ret != PAGE_SIZE) ? -EINVAL : 0;
++}
++
++static int __pin_pgtable_cb(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++			    enum kvm_pgtable_walk_flags flag, void * const arg)
++{
++	if (!kvm_pte_valid(*ptep) || level != KVM_PGTABLE_MAX_LEVELS - 1)
++		return -EINVAL;
++	hyp_page_ref_inc(hyp_virt_to_page(ptep));
++
++	return 0;
++}
++
++static int hyp_pin_pgtable_pages(u64 addr)
++{
++	struct kvm_pgtable_walker walker = {
++		.cb	= __pin_pgtable_cb,
++		.flags	= KVM_PGTABLE_WALK_LEAF,
++	};
++
++	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
++}
++
++int hyp_create_pcpu_fixmap(void)
++{
++	unsigned long addr, i;
 +	int ret;
 +
-+	if (kvm->created_vcpus < 1)
-+		return -EINVAL;
++	for (i = 0; i < hyp_nr_cpus; i++) {
++		ret = pkvm_alloc_private_va_range(PAGE_SIZE, &addr);
++		if (ret)
++			return ret;
 +
-+	pgd_sz = kvm_pgtable_stage2_pgd_size(kvm->arch.vtcr);
-+	/*
-+	 * The PGD pages will be reclaimed using a hyp_memcache which implies
-+	 * page granularity. So, use alloc_pages_exact() to get individual
-+	 * refcounts.
-+	 */
-+	pgd = alloc_pages_exact(pgd_sz, GFP_KERNEL_ACCOUNT);
-+	if (!pgd)
-+		return -ENOMEM;
++		/*
++		 * Create a dummy mapping, to get the intermediate page-table
++		 * pages allocated, then take a reference on the last level
++		 * page to keep it around at all times.
++		 */
++		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PAGE_SIZE,
++					  __hyp_pa(__hyp_bss_start), PAGE_HYP);
++		if (ret)
++			return ret;
 +
-+	/* Allocate memory to donate to hyp for the kvm and vcpu state. */
-+	shadow_sz = PAGE_ALIGN(KVM_SHADOW_VM_SIZE +
-+			       KVM_SHADOW_VCPU_STATE_SIZE * kvm->created_vcpus);
-+	shadow_addr = alloc_pages_exact(shadow_sz, GFP_KERNEL_ACCOUNT);
-+	if (!shadow_addr) {
-+		ret = -ENOMEM;
-+		goto free_pgd;
++		ret = hyp_pin_pgtable_pages(addr);
++		if (ret)
++			return ret;
++
++		ret = kvm_pgtable_hyp_unmap(&pkvm_pgtable, addr, PAGE_SIZE);
++		if (ret != PAGE_SIZE)
++			return -EINVAL;
++
++		*per_cpu_ptr(&hyp_fixmap_base, i) = (void *)addr;
 +	}
 +
-+	/* Stash the vcpu pointers into the PGD */
-+	BUILD_BUG_ON(KVM_MAX_VCPUS > (PAGE_SIZE / sizeof(u64)));
-+	vcpu_array = pgd;
-+	kvm_for_each_vcpu(idx, vcpu, kvm) {
-+		/* Indexing of the vcpus to be sequential starting at 0. */
-+		if (WARN_ON(vcpu->vcpu_idx != idx)) {
-+			ret = -EINVAL;
-+			goto free_shadow;
-+		}
-+
-+		vcpu_array[idx] = vcpu;
-+	}
-+
-+	/* Donate the shadow memory to hyp and let hyp initialize it. */
-+	ret = kvm_call_hyp_nvhe(__pkvm_init_shadow, kvm, shadow_addr, shadow_sz,
-+				pgd);
-+	if (ret < 0)
-+		goto free_shadow;
-+
-+	shadow_handle = ret;
-+
-+	/* Store the shadow handle given by hyp for future call reference. */
-+	kvm->arch.pkvm.shadow_handle = shadow_handle;
-+	kvm->arch.pkvm.hyp_donations.pgd = pgd;
-+	kvm->arch.pkvm.hyp_donations.shadow = shadow_addr;
-+	return 0;
-+
-+free_shadow:
-+	free_pages_exact(shadow_addr, shadow_sz);
-+free_pgd:
-+	free_pages_exact(pgd, pgd_sz);
-+	return ret;
-+}
-+
-+int kvm_shadow_create(struct kvm *kvm)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&kvm->arch.pkvm.shadow_lock);
-+	if (!kvm->arch.pkvm.shadow_handle)
-+		ret = __kvm_shadow_create(kvm);
-+	mutex_unlock(&kvm->arch.pkvm.shadow_lock);
-+
-+	return ret;
-+}
-+
-+void kvm_shadow_destroy(struct kvm *kvm)
-+{
-+	size_t pgd_sz, shadow_sz;
-+
-+	if (kvm->arch.pkvm.shadow_handle)
-+		WARN_ON(kvm_call_hyp_nvhe(__pkvm_teardown_shadow,
-+					  kvm->arch.pkvm.shadow_handle));
-+
-+	kvm->arch.pkvm.shadow_handle = 0;
-+
-+	shadow_sz = PAGE_ALIGN(KVM_SHADOW_VM_SIZE +
-+			       KVM_SHADOW_VCPU_STATE_SIZE * kvm->created_vcpus);
-+	pgd_sz = kvm_pgtable_stage2_pgd_size(kvm->arch.vtcr);
-+
-+	free_pages_exact(kvm->arch.pkvm.hyp_donations.shadow, shadow_sz);
-+	free_pages_exact(kvm->arch.pkvm.hyp_donations.pgd, pgd_sz);
-+}
-+
-+int kvm_init_pvm(struct kvm *kvm)
-+{
-+	mutex_init(&kvm->arch.pkvm.shadow_lock);
 +	return 0;
 +}
++
+ int hyp_create_idmap(u32 hyp_va_bits)
+ {
+ 	unsigned long start, end;
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index fb0eff15a89f..3f689ffb2693 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -321,6 +321,10 @@ void __noreturn __pkvm_init_finalise(void)
+ 	if (ret)
+ 		goto out;
+ 
++	ret = hyp_create_pcpu_fixmap();
++	if (ret)
++		goto out;
++
+ 	hyp_shadow_table_init(shadow_table_base);
+ out:
+ 	/*
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
