@@ -2,83 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D409561B0D
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 15:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3C4B561B7C
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 15:41:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235160AbiF3NLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 09:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
+        id S234580AbiF3Nk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 09:40:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235110AbiF3NLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 09:11:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 754922CDF5
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:11:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656594664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jV/u9DidSFdfO13oE75Yy4sdwZ39Z5PR0U85p6rtOgg=;
-        b=L9EliN3y+tiYSifp8zVDk/cCRKvoSk59abzzjc0vBJuWXVgrXSuOsRD4LuE2Yqsbq18uTE
-        5uedSxhyP29zIQhMoGI5fdnVZMFworyHWXF9ZDIQC6eJkhNKGOPosyWDxA/aqOhg9D+rbT
-        kSayRUQe36eABg0rGXdzHSW2Oe+73Y8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-100-nDUhfL2wNSG3Sf4GqyTzVw-1; Thu, 30 Jun 2022 09:11:03 -0400
-X-MC-Unique: nDUhfL2wNSG3Sf4GqyTzVw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 997511C1BD22;
-        Thu, 30 Jun 2022 13:11:01 +0000 (UTC)
-Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1FA309D63;
-        Thu, 30 Jun 2022 13:10:58 +0000 (UTC)
-Message-ID: <b11b2a29824e69d57f6b9bb5675aa957e4c081ce.camel@redhat.com>
-Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Thu, 30 Jun 2022 16:10:58 +0300
-In-Reply-To: <CALMp9eQkA-YeUFd=6Q+bRbtDT+UZO0jtPkEoZbqU1uDqMGp+xw@mail.gmail.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
-         <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
-         <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com>
-         <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
-         <CALMp9eQkA-YeUFd=6Q+bRbtDT+UZO0jtPkEoZbqU1uDqMGp+xw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S232297AbiF3Nk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 09:40:56 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0371F615;
+        Thu, 30 Jun 2022 06:40:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656596456; x=1688132456;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3tqDNzAvRt+iYSdl6PYwgkVAx/EfI7NU9igHBoFrI5Y=;
+  b=Zl2QdcvHM5xUYJeyH7RFBoPKEm4bfnN3v67ePdeuUH2aqzhR+DnaXY2A
+   VoMwlxEpbZznGM/a7+MCYv8Y6xaw3YU/t6Jf4M7lCIWc6GiR3puNPV3Go
+   Fk4c4JmAxIxZlc/wziOH2RPCyHZ11wmStcUEVqHvYySx2kV76O1bN1z+C
+   djFQa69DepkY5KbpHe0ctIvRUrLKctbbVjlbR4OqqFyqy9xk3v2Qf84W5
+   1PIJy/aKsGL2cxX9tNsSjrrl1/IPAsWJA/zCYzeeTGcDGMCXkbfi/xY25
+   h18qZmBXDmciPNir0K91mmWZJqHxlkm3hrDE2mRMpt8BfRnHw0MABmmtN
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="283083329"
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="283083329"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 06:40:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="718222089"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 30 Jun 2022 06:40:52 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o6uPc-000Co8-0I;
+        Thu, 30 Jun 2022 13:40:52 +0000
+Date:   Thu, 30 Jun 2022 21:40:01 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com
+Cc:     kbuild-all@lists.01.org, saeedm@nvidia.com, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, yishaih@nvidia.com,
+        maorg@nvidia.com, cohuck@redhat.com
+Subject: Re: [PATCH vfio 08/13] vfio: Introduce the DMA logging feature
+ support
+Message-ID: <202206302140.XlWYhlXa-lkp@intel.com>
+References: <20220630102545.18005-9-yishaih@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220630102545.18005-9-yishaih@nvidia.com>
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-06-30 at 05:17 -0700, Jim Mattson wrote:
-> On Thu, Jun 30, 2022 at 1:22 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> 
-> > I can't access this document for some reason (from my redhat account, which is gmail as well).
-> 
-> Try this one: https://docs.google.com/spreadsheets/d/13Yp7Cdg3ZyKoeZ3Qebp3uWi7urlPNmo5CQU5zFlayzs
-> 
-Thanks, now I can access both documents.
+Hi Yishai,
 
-Best regards,
-	Maxim Levitsky
+I love your patch! Perhaps something to improve:
 
+[auto build test WARNING on awilliam-vfio/next]
+[also build test WARNING on linus/master v5.19-rc4 next-20220630]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
+base:   https://github.com/awilliam/linux-vfio.git next
+config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20220630/202206302140.XlWYhlXa-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/fea20efca2795fd8480cb0755c54062bad2ea322
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
+        git checkout fea20efca2795fd8480cb0755c54062bad2ea322
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/vfio/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   drivers/vfio/vfio_main.c: In function 'vfio_ioctl_device_feature_logging_start':
+>> drivers/vfio/vfio_main.c:1640:18: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+    1640 |         ranges = (struct vfio_device_feature_dma_logging_range __user *)
+         |                  ^
+   drivers/vfio/vfio_main.c: In function 'vfio_ioctl_device_feature_logging_report':
+   drivers/vfio/vfio_main.c:1730:37: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+    1730 |                                     (unsigned long __user *)report.bitmap);
+         |                                     ^
+
+
+vim +1640 drivers/vfio/vfio_main.c
+
+  1607	
+  1608	static int
+  1609	vfio_ioctl_device_feature_logging_start(struct vfio_device *device,
+  1610						u32 flags, void __user *arg,
+  1611						size_t argsz)
+  1612	{
+  1613		size_t minsz =
+  1614			offsetofend(struct vfio_device_feature_dma_logging_control,
+  1615				    ranges);
+  1616		struct vfio_device_feature_dma_logging_range __user *ranges;
+  1617		struct vfio_device_feature_dma_logging_control control;
+  1618		struct vfio_device_feature_dma_logging_range range;
+  1619		struct rb_root_cached root = RB_ROOT_CACHED;
+  1620		struct interval_tree_node *nodes;
+  1621		u32 nnodes;
+  1622		int i, ret;
+  1623	
+  1624		if (!device->log_ops)
+  1625			return -ENOTTY;
+  1626	
+  1627		ret = vfio_check_feature(flags, argsz,
+  1628					 VFIO_DEVICE_FEATURE_SET,
+  1629					 sizeof(control));
+  1630		if (ret != 1)
+  1631			return ret;
+  1632	
+  1633		if (copy_from_user(&control, arg, minsz))
+  1634			return -EFAULT;
+  1635	
+  1636		nnodes = control.num_ranges;
+  1637		if (!nnodes || nnodes > LOG_MAX_RANGES)
+  1638			return -EINVAL;
+  1639	
+> 1640		ranges = (struct vfio_device_feature_dma_logging_range __user *)
+  1641									control.ranges;
+  1642		nodes = kmalloc_array(nnodes, sizeof(struct interval_tree_node),
+  1643				      GFP_KERNEL);
+  1644		if (!nodes)
+  1645			return -ENOMEM;
+  1646	
+  1647		for (i = 0; i < nnodes; i++) {
+  1648			if (copy_from_user(&range, &ranges[i], sizeof(range))) {
+  1649				ret = -EFAULT;
+  1650				goto end;
+  1651			}
+  1652			if (!IS_ALIGNED(range.iova, control.page_size) ||
+  1653			    !IS_ALIGNED(range.length, control.page_size)) {
+  1654				ret = -EINVAL;
+  1655				goto end;
+  1656			}
+  1657			nodes[i].start = range.iova;
+  1658			nodes[i].last = range.iova + range.length - 1;
+  1659			if (interval_tree_iter_first(&root, nodes[i].start,
+  1660						     nodes[i].last)) {
+  1661				/* Range overlapping */
+  1662				ret = -EINVAL;
+  1663				goto end;
+  1664			}
+  1665			interval_tree_insert(nodes + i, &root);
+  1666		}
+  1667	
+  1668		ret = device->log_ops->log_start(device, &root, nnodes,
+  1669						 &control.page_size);
+  1670		if (ret)
+  1671			goto end;
+  1672	
+  1673		if (copy_to_user(arg, &control, sizeof(control))) {
+  1674			ret = -EFAULT;
+  1675			device->log_ops->log_stop(device);
+  1676		}
+  1677	
+  1678	end:
+  1679		kfree(nodes);
+  1680		return ret;
+  1681	}
+  1682	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
