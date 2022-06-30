@@ -2,242 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C4EB561D7D
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:16:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A807561DCF
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:27:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237042AbiF3OOZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 10:14:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41968 "EHLO
+        id S235824AbiF3OXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 10:23:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236905AbiF3ONo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 10:13:44 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B840122533
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 06:59:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 45BD6621A9
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 13:59:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CA8BC341CD;
-        Thu, 30 Jun 2022 13:59:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656597568;
-        bh=kxCDmTH0o3+9EBgJlfZ5dZqqigAuso9J63UT5faR1Ws=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=H1dlMQYRAejf1JRYiR/6kbT1CFEVnB9mdVTS5qoxUUf9xSNYOCyu9hMxkkgupJwKG
-         TeYWVefugAwxQQyWoQRbzvBtAmoHW67txnmGJxEBnOHWLJ9JfajstvgbfVBTDpZ3OB
-         nd1+EAv65AVf80y4oFtwV+iR+WlGA7uOoDUyquEFL68HxxIafVCvlBxwoQifMz/nYI
-         M4rgplrQo7vW++ahbU1dmOQbD8aGJH0+6b2INBBq8Bas6XozYfZW4cbspMQT2L8RJQ
-         BDjoz/Qpc59aA5fL+xwSpWqUDTiiw5J1wW+ftMJmCs1YBw5Wy3G3TCviEiYSfm9NUW
-         z8T2Ki5SN20Mg==
-From:   Will Deacon <will@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [RFC PATCH v2 24/24] KVM: arm64: Use the shadow vCPU structure in handle___kvm_vcpu_run()
-Date:   Thu, 30 Jun 2022 14:57:47 +0100
-Message-Id: <20220630135747.26983-25-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20220630135747.26983-1-will@kernel.org>
-References: <20220630135747.26983-1-will@kernel.org>
+        with ESMTP id S236082AbiF3OWM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 10:22:12 -0400
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2796B264
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 07:05:35 -0700 (PDT)
+Received: by mail-vk1-xa2a.google.com with SMTP id j15so9029873vkp.5
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 07:05:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/U/mkkXuvUzhtldzXstVOCwXdZiwLEMR3JjS1TBXjxw=;
+        b=p3sUogtXJGGFvnOxm2FYtij4BHfWcsq3LPvrta1R3LOtVy7aiv1WBVYCWylzgpc/Y/
+         o89fb+7T3fyhyXfZwi3c4oP3oAgBH5oJ38o8zmzf2wFH93PZykG68Mt/Ca4aj1tHfoGV
+         nK0kz9AZAP2MJLIUFuliFWf7zfmSz7dgM5sCi+vPSjqCvUKy1WmF1br2ws64kp21gHkI
+         vuLtokdOKnINFyUDHfya3YpF4/wy/SNNLoyLKqWTRH7q0HXI4FMlTdhLPZAKVu+Wel3V
+         runGc1a2nOXOp/8XlRdifY1dhqUod23Xq95EaOiqbKKBqRiOJEhOLXds84RilD4choR1
+         4YqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/U/mkkXuvUzhtldzXstVOCwXdZiwLEMR3JjS1TBXjxw=;
+        b=3pSS9SfdNK81yawx9yokoT6UjRj/uZF3iOP/6tTOr5r91h6lhRxiD75F5nwqLaxKWv
+         sC0oetV/WaJaVQKRXRzVMFvyKMbTunLjScdQN3IGGvFWy3viMekcwccCTCwjnrSv6dVY
+         mouuUf+HgKMGqeuPhyI1dm1UQrTiT0YwYCQcTFCvlJ4gCgVfW3S/ZT+P8dhcRUcYUxtg
+         mNmYzQAw9ZzBGGqITw2RhX6xWHyO04Q6KlSOwDcYlrA0RLipIm50WzKpHyyiU74wja2F
+         Yd7svnvWzKgcdDAsgeKAbV007V0l27JBGkcDEvDKWus6CfjvuQOm/Oh9uY0sVsSOqV+M
+         tE3g==
+X-Gm-Message-State: AJIora+JH+o6/54f9Pj0X2SUBvunx6YuTkmpBtO1L+fzUciYL3fSNXg8
+        zATQoyl97PDniSQqKQsjR5jgCGxgsvtctE6FiRQtPQ==
+X-Google-Smtp-Source: AGRyM1sR1OyBUWl2tb/e7ziZ7Z1dq2HirLBD4w5/cirv+fMOXdA0wzmSs2KVe7ihYpsFNpiB/Sjy8BqHpg2sYpBL7Xw=
+X-Received: by 2002:a1f:5f45:0:b0:36b:fda2:2db4 with SMTP id
+ t66-20020a1f5f45000000b0036bfda22db4mr7489689vkb.22.1656597933986; Thu, 30
+ Jun 2022 07:05:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220610171134.772566-1-juew@google.com> <33bda32a-9342-2f5d-b8ee-8a92c4be592b@intel.com>
+In-Reply-To: <33bda32a-9342-2f5d-b8ee-8a92c4be592b@intel.com>
+From:   Jue Wang <juew@google.com>
+Date:   Thu, 30 Jun 2022 07:05:22 -0700
+Message-ID: <CAPcxDJ6UF8NTVtVKY_rkQyJCQaQ_GNWb0ew5xzmW_UNAJxzAcQ@mail.gmail.com>
+Subject: Re: [PATCH v5 0/8] KVM: x86: Add CMCI and UCNA emulation
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Matlack <dmatlack@google.com>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        Greg Thelen <gthelen@google.com>,
+        Jiaqi Yan <jiaqiyan@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As a stepping stone towards deprivileging the host's access to the
-guest's vCPU structures, introduce some naive flush/sync routines to
-copy most of the host vCPU into the shadow vCPU on vCPU run and back
-again on return to EL1.
+On Thu, Jun 30, 2022 at 6:48 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>
+> On 6/11/2022 1:11 AM, Jue Wang wrote:
+> > This patch series implement emulation for Corrected Machine Check
+> > Interrupt (CMCI) signaling and UnCorrectable No Action required (UCNA)
+> > error injection.
+> >
+>
+> It seems the main purpose of this series is to allow UCNA error
+> injection and notify it to guest via CMCI.
+>
+> But it doesn't emulate CMCI fully. E.g., guest's error threshold of
+> MCi_CTL2 doesn't work. It's still controlled by host's value.
+>
+Both of the above points are correct.
 
-This allows us to run using the shadow structure when KVM is initialised
-in protected mode.
+In fact, this series does not enable injecting corrected errors into a
+KVM guest at all, for:
 
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  4 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 84 +++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 28 +++++++++
- 3 files changed, 114 insertions(+), 2 deletions(-)
+1. It is not necessary since corrected errors are transparent to
+software executions (host / guest).
+2. Corrected errors can be fully managed on the host side (monitor, re-act).
+3. Prevent guest initiated row-hammer attack based on the injected
+corrected errors feedback loop.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index c0e32a750b6e..0edb3faa4067 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -63,4 +63,8 @@ int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
- 		       size_t shadow_size, unsigned long pgd_hva);
- int __pkvm_teardown_shadow(unsigned int shadow_handle);
- 
-+struct kvm_shadow_vcpu_state *
-+pkvm_load_shadow_vcpu_state(unsigned int shadow_handle, unsigned int vcpu_idx);
-+void pkvm_put_shadow_vcpu_state(struct kvm_shadow_vcpu_state *shadow_state);
-+
- #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index a1fbd11c8041..39d66c7b0560 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -22,11 +22,91 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
- void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
- 
-+static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
-+{
-+	struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
-+	struct kvm_vcpu *host_vcpu = shadow_state->host_vcpu;
-+
-+	shadow_vcpu->arch.ctxt		= host_vcpu->arch.ctxt;
-+
-+	shadow_vcpu->arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
-+	shadow_vcpu->arch.sve_max_vl	= host_vcpu->arch.sve_max_vl;
-+
-+	shadow_vcpu->arch.hw_mmu	= host_vcpu->arch.hw_mmu;
-+
-+	shadow_vcpu->arch.hcr_el2	= host_vcpu->arch.hcr_el2;
-+	shadow_vcpu->arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
-+	shadow_vcpu->arch.cptr_el2	= host_vcpu->arch.cptr_el2;
-+
-+	shadow_vcpu->arch.iflags	= host_vcpu->arch.iflags;
-+	shadow_vcpu->arch.fp_state	= host_vcpu->arch.fp_state;
-+
-+	shadow_vcpu->arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
-+	shadow_vcpu->arch.host_fpsimd_state = host_vcpu->arch.host_fpsimd_state;
-+
-+	shadow_vcpu->arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
-+
-+	shadow_vcpu->arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
-+}
-+
-+static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
-+{
-+	struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
-+	struct kvm_vcpu *host_vcpu = shadow_state->host_vcpu;
-+	struct vgic_v3_cpu_if *shadow_cpu_if = &shadow_vcpu->arch.vgic_cpu.vgic_v3;
-+	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	unsigned int i;
-+
-+	host_vcpu->arch.ctxt		= shadow_vcpu->arch.ctxt;
-+
-+	host_vcpu->arch.hcr_el2		= shadow_vcpu->arch.hcr_el2;
-+	host_vcpu->arch.cptr_el2	= shadow_vcpu->arch.cptr_el2;
-+
-+	host_vcpu->arch.fault		= shadow_vcpu->arch.fault;
-+
-+	host_vcpu->arch.iflags		= shadow_vcpu->arch.iflags;
-+	host_vcpu->arch.fp_state	= shadow_vcpu->arch.fp_state;
-+
-+	host_cpu_if->vgic_hcr		= shadow_cpu_if->vgic_hcr;
-+	for (i = 0; i < shadow_cpu_if->used_lrs; ++i)
-+		host_cpu_if->vgic_lr[i] = shadow_cpu_if->vgic_lr[i];
-+}
-+
- static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
- {
--	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-+	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
-+	int ret;
-+
-+	host_vcpu = kern_hyp_va(host_vcpu);
-+
-+	if (unlikely(is_protected_kvm_enabled())) {
-+		struct kvm_shadow_vcpu_state *shadow_state;
-+		struct kvm_vcpu *shadow_vcpu;
-+		struct kvm *host_kvm;
-+		unsigned int handle;
-+
-+		host_kvm = kern_hyp_va(host_vcpu->kvm);
-+		handle = host_kvm->arch.pkvm.shadow_handle;
-+		shadow_state = pkvm_load_shadow_vcpu_state(handle,
-+							   host_vcpu->vcpu_idx);
-+		if (!shadow_state) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		shadow_vcpu = &shadow_state->shadow_vcpu;
-+		flush_shadow_state(shadow_state);
-+
-+		ret = __kvm_vcpu_run(shadow_vcpu);
-+
-+		sync_shadow_state(shadow_state);
-+		pkvm_put_shadow_vcpu_state(shadow_state);
-+	} else {
-+		ret = __kvm_vcpu_run(host_vcpu);
-+	}
- 
--	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
-+out:
-+	cpu_reg(host_ctxt, 1) =  ret;
- }
- 
- static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 571334fd58ff..bf92f4443c92 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -247,6 +247,33 @@ static struct kvm_shadow_vm *find_shadow_by_handle(unsigned int shadow_handle)
- 	return shadow_table[shadow_idx];
- }
- 
-+struct kvm_shadow_vcpu_state *
-+pkvm_load_shadow_vcpu_state(unsigned int shadow_handle, unsigned int vcpu_idx)
-+{
-+	struct kvm_shadow_vcpu_state *shadow_state = NULL;
-+	struct kvm_shadow_vm *vm;
-+
-+	hyp_spin_lock(&shadow_lock);
-+	vm = find_shadow_by_handle(shadow_handle);
-+	if (!vm || vm->kvm.created_vcpus <= vcpu_idx)
-+		goto unlock;
-+
-+	shadow_state = &vm->shadow_vcpu_states[vcpu_idx];
-+	hyp_page_ref_inc(hyp_virt_to_page(vm));
-+unlock:
-+	hyp_spin_unlock(&shadow_lock);
-+	return shadow_state;
-+}
-+
-+void pkvm_put_shadow_vcpu_state(struct kvm_shadow_vcpu_state *shadow_state)
-+{
-+	struct kvm_shadow_vm *vm = shadow_state->shadow_vm;
-+
-+	hyp_spin_lock(&shadow_lock);
-+	hyp_page_ref_dec(hyp_virt_to_page(vm));
-+	hyp_spin_unlock(&shadow_lock);
-+}
-+
- static void unpin_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
- 			     unsigned int nr_vcpus)
- {
-@@ -304,6 +331,7 @@ static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
- 		shadow_vcpu->vcpu_idx = i;
- 
- 		shadow_vcpu->arch.hw_mmu = &vm->kvm.arch.mmu;
-+		shadow_vcpu->arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
- 	}
- 
- 	return 0;
--- 
-2.37.0.rc0.161.g10f37bed90-goog
-
+Thanks,
+-Jue
