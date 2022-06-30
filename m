@@ -2,164 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25303562288
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 21:03:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A01D65622D4
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 21:14:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236776AbiF3TB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 15:01:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40282 "EHLO
+        id S232887AbiF3TOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 15:14:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236758AbiF3TB5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 15:01:57 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0E2A1EC5E;
-        Thu, 30 Jun 2022 12:01:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=crCbM8a/xcbcu4iRkfj7uvmN0MXvCtTlW5n7bi7WL5rhhQTdSEJ7vOkro55lbPkmSP4zXn7mmgeJd64zDf1Z7/hUZATT2YZO3hTyAzbTehpDAiYbsRq5oH0vFDTLcx/PplbVXME8UkHNafcslNJRtZmU4pp8r7nl4kqTsSOLc7Om+KHBIyKrA/dRCLQWSfUU4cbqvKQLPAvPA/9Of0p9sv7JRjzfn7mtJedA2JTdMtTDFv/Npo2XEvMZzXcMRi6dZ5BR5nRmeLMtIIlRjlUEKOB1TzwnovdBt2C0NxNUy/ap23e2cRZ0QOu4Elb8IsH+d1BjE31qa2tYfceQQD/G+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8NPYHSBiZN972ACrXZKFkFLLL/jxJviSlN39x1lUt/k=;
- b=cRBVGn+t/C9U9P64t+hNEd5Sn2SnvaGxGdoLhpARM6mCWIi4ETBuuvkQgMehcmwLoV7atOAKhMGNSOD6MHPWiL7iKs7pCRcEsPmXeJuMP3ci50Xobl3Hr/yRa1uFRRZD/2Aeze+51ywC5oqXupNsjs+mXej+0RUNzzt9NOsOn1D5ukH1RSNcr7rr9+aYU8ZtHroYRcLA74xTEbtKaUs3E3VZPY1xWM7AW/S6LC4gpxmGiFDeRTsGGiyCruY5MxyWM22Y8y7Z+A6ugA34FT+LbWUKYA0AGUxzp5qnsgz7VehE2u1DaZu3Igh3+jDn1YwabT0Z9n73T5WXjp/7iA3Rhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8NPYHSBiZN972ACrXZKFkFLLL/jxJviSlN39x1lUt/k=;
- b=gyAWvohwyXfknIH3d8Q6W7L0YkZEbZrocqXxVXmRkxBXlYdFsI5uD5yHankxUt5aCAYYKnwN/g4VrhXG9hZH7OqYcGPctitoHwgFkQ7b7s4sHExIakgd/ibbD7c/hOlPKhnJQ+F6HFiF3EXyv6JWkqENyRq77y0RZ0yWzecw95PRFk8a0+8W81+SvIY2AmP+yCz54qUcsUa7RgTL/P7ROjCaw7DzzWGHWUzgKWzRc2pee6DfLpt8i66lC9+g8gMjrFJOfHM7YyCTX71+ttneJCR/GuKUwc18aXDLAbhM0BrGHDvpcxY9qWdBObLckv9B1Te1CFET3Th2XkoQ6001nw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by DM4PR12MB5088.namprd12.prod.outlook.com (2603:10b6:5:38b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15; Thu, 30 Jun
- 2022 19:01:55 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::28d4:3575:5db:6910]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::28d4:3575:5db:6910%5]) with mapi id 15.20.5395.015; Thu, 30 Jun 2022
- 19:01:55 +0000
-Message-ID: <0183984a-c95f-c92e-629e-775071b5cd23@nvidia.com>
-Date:   Thu, 30 Jun 2022 12:01:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Content-Language: en-US
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-2-peterx@redhat.com>
- <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
- <YrtXGf20oa5eYgIU@xz-m1.local>
- <16c181d3-09ef-ace4-c910-0a13fc245e48@nvidia.com>
- <YruBzuJf9s/Nmr6W@xz-m1.local>
- <177284f9-416d-c142-a826-e9a497751fca@nvidia.com>
- <Yrx0ETyb2kk4fO4M@xz-m1.local>
- <17f9eae0-01bb-4793-201e-16ee267c07f2@nvidia.com>
- <Yr2p7sR3IjiGTGd3@xz-m1.local>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <Yr2p7sR3IjiGTGd3@xz-m1.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR20CA0029.namprd20.prod.outlook.com
- (2603:10b6:a03:1f4::42) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+        with ESMTP id S232227AbiF3TO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 15:14:26 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A739039B89
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 12:14:24 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id 65so300506pfw.11
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 12:14:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CseVMsc9DMcvnremI2IMCVn9RXMEwKZ3PfQxnseEk1Y=;
+        b=L86qxID6q2M+JSm6WJlw/ywbiK2Bd4F4OqP2crvM+fBErSUs7vAk8+S+Iq/oWCc3S3
+         A/zD733aSeW/NQtqDBUXacjPlB7RxpFMnf6lRRa/+NdtBmLjMtHmcPsoOWwkq8KCWT59
+         Wrjd2sZMC+z5N1mQaKCk8s3sRW71BeCnVhZwSRy715zMP+SNJe7eU9WYohudOv1KNRGA
+         /2Hl1gt/4XtlScYZ3mwC111MIu9O+AEpZ9xmxnKCHZmdZRhh6DrJvNuc5sQfRD0Ka1kU
+         JrjpbfOKNuX8+d69m9LSTBv0r1O0mwEp5rUB+SIBwil7KVtufeEqPNZkhvO1MatEsuMw
+         lriQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CseVMsc9DMcvnremI2IMCVn9RXMEwKZ3PfQxnseEk1Y=;
+        b=OvDAuJ822azjm4Bfg/p5ZkQqc+O2ARinh+L8IJOITPJNeKDWBJZLVaiUQG996816uE
+         ttWeBfuwP5yfuQmfJ/aiaRlcEPCemjSp1vLC4VLHnGKMF3hnUIUmUzdNSjOOIZN2TFlg
+         Upp5ft3Y8W/lTh1oi+rDGPgJRiyzJ7CPu/LRGm+RrCNMzM0+5xquuRZIftl11Cx2Y6sv
+         gVQ0mRGH5GNtnctlsGcc12mH1aGuGm0RQgwBRs+cu8zAgJnhTBAlJIApcG6+YPm/X8EK
+         14RwUq7K1KYQSQ+X729DpUycyYK26dPosgnZ+CNU/SN1QAr/RCb97sER5T0vwosw8M2Q
+         OsLQ==
+X-Gm-Message-State: AJIora/cG2liwTDRhcHbbUVKLw2k08+icWypwff8Zng+MIBJLimZctoT
+        HVCFTBY00Ju33W/yemtklN+SOU2jt38BvMthjW1mEQ==
+X-Google-Smtp-Source: AGRyM1sSw2bcuHVxuECIXV0dhinx7eNbwu+6Xk72mVPwUCDEPf65Qjtbn+gPrnXqf1ZcPTdHgl0RAcjI8NMysu55SIM=
+X-Received: by 2002:a65:6b8a:0:b0:3db:7dc5:fec2 with SMTP id
+ d10-20020a656b8a000000b003db7dc5fec2mr8746604pgw.223.1656616463900; Thu, 30
+ Jun 2022 12:14:23 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ea10d29a-c539-43de-f89a-08da5acb0031
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5088:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ST6NcLY0OA6ZPhsSPBZJE94HUfZ8koquPdq+GH/+q+pCm+clH+bbC84lPwqmDoxwjfqPllfvXcNqcnCGyRRxsw7Am4xxqpq+akPXYUGW6pgplSkPUSSV2ydKra/7shT0DTsJVOlD2B8sT2opDdf2y9XAVPqUHubVkeBuIegimWqyiXVCJEz1UaMJAldHzWzn/N6o5DqE0XXEukkdeotbDAxq1LIn+KZskeKSha9Ebmo3Ckood60LaqcGZV4hPWK/sXeRTSry5rTZhazxSMSg0HL8BAod0hmBjRw6hzI6L+7QQkeABK+cGxgw8xS+/80bMbUDAVD9s6o3Aca26lDAm3emcDWq2dmEbVf7QgHG7VxwCuE590swXMzAjlVH8e1FZ6HY6ZMEgDyY9bdTVPoWp921jmoKAIu1na+lSyvbnD6LGhied8arUSpeEbiV/fh+Vax0QXKN4yOfHQX5fDM+u07AGoZhMGDRlQ0JUydQ/AK56FLAVTiUMM2GCwejaWTcF3fERkn5L+T64v1YThfUholh+Dhneg83nHzlnjJdNT/TRdHpR3XyEnoYMm2EQVGAOoXUYxHc5db3iC1mceFMKrBi0j58oWe6zK5aUuATuWz9CzY0LnEWpWPWX7vR+GQ8IFZXWvfjecmPamvU4+nqOXBoVeTxGbDmMbScVM7GuIHZL7C7y+1t3ftEqATol2lvXe6cy/jZE2wuaFSw3pIi7nhRsolgokjHX1LdHMId2h/cxIgAxdnCOdk4qbCHYRVQ0ju8MHaZWjd3gTustoDamVwiAHK1nPtFpDN69gTAJwfzU86CeEHYudbjRnhM4e9Ics7cHtZL+GKPkOcO/CbjURAaFWOuj9eYY/PMcw3fCxo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(346002)(39860400002)(366004)(396003)(41300700001)(2616005)(66476007)(4326008)(36756003)(2906002)(6486002)(8676002)(38100700002)(186003)(31686004)(53546011)(6512007)(6506007)(8936002)(4744005)(26005)(86362001)(66946007)(66556008)(5660300002)(31696002)(478600001)(7416002)(54906003)(316002)(6916009)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VHh2Z2RnZ0Njdnk0UnFqVWRFQlpjMUF0aiswVE1tVDBHUkI5cU9OeUVNQ2U3?=
- =?utf-8?B?MDRvcUdwV0QyVEE5MmZZTHQ1MGw4Q09STjkxZVZGcXNKT0NLdmxaV0VsWnBN?=
- =?utf-8?B?VHFlNlp3UnZScUUyLzMwM0NaLytjbWl4aEhSenlTUlpEeVRYN3hQZ1BoNFpT?=
- =?utf-8?B?THZjN0VxbFFqY2pDdTJUbEVybnVtSSs0bWFid01DQ3cwbHhCVHlSNWFTS3ds?=
- =?utf-8?B?R1ViYm8rM3RoTnFwaGowakJUbWN1dmQrdWE1Y3NjcW5UTUd2VnZBYXNKVVpl?=
- =?utf-8?B?U1NXVjVOdmNwQVJRY3BRSkpzS01Oc01PUWRZaVE5bTNEU2hVTjFnQnE2VElp?=
- =?utf-8?B?UE05K0RKQUk2QkFFbWpBN0NMWE5JditLTjRja1hZTkkySVBidkFsRWpWaDh5?=
- =?utf-8?B?U2pvOWFMdzhCK2xmMkdFQW43N3Y4TTRab1lKOUpBNlV4N3A0MmhpMkxOelNJ?=
- =?utf-8?B?Y29QekFuZmVPY2Z3K0s1SUlJZ2QySGJ0VEQreXJsTmFtVXJycXRaWTJ6UzRD?=
- =?utf-8?B?bU1uNlhJeFpCcFlNMHlhZ3hPYWRvRGlLdXFZTm5HQndXMU4vMEhpZHhRWG0z?=
- =?utf-8?B?WEErRHd5M3pxeDFDUHBpVzVZTUgydDloMk5iajUzWXhGUlBQcitEOXVLTG1t?=
- =?utf-8?B?UVhmVERtL2s4N0J6M3pRYWdjRUNXZisrZ2dmUzRNdWhJbzlCY1hMMUQ2d0hX?=
- =?utf-8?B?NVFnQ1gyRWYwVHVFaGdMemJQU0tGd1VUeFpKcEtKZ2lINmdqUnlkcnlEOTFj?=
- =?utf-8?B?VGFrUE5RU1pabHp4czNhcHpZc1A4WDhTTVNyNTFuYVorWUt5dnFGeEY2ZzFi?=
- =?utf-8?B?SFkxeURNSHYvdEZRM2hGUlNkQU9va2F4a3lKWGJQdWFpWThWd01wWDNaYWRr?=
- =?utf-8?B?MGR3WDlzT29ZaE9ZOXdWR0NIaDhaT0NvYmY4Z0hBOWt3eFFOa1FTeGk3dWtZ?=
- =?utf-8?B?TU9IZVpReVNiSzBtS2N0b0VxdWNhYUd2NW9nSjRqUU1RZGt3YXk4SWdLY0pn?=
- =?utf-8?B?bDFMTXQ0cWVuR2x0L0xGOUtzaHY3clJBb01yRy9Bbm5TU0hhSzU3N3RIQ0Vk?=
- =?utf-8?B?R3M5Q0Y3MlExOWd4YndKaElUQi9uWVZ1SndjbzRGUVhIaDRzNmRjMXJKb2Nl?=
- =?utf-8?B?VitRSTlza05Mb1RZS0U0Zk1SVkJPMFRZbnpDUGlDY2cyMmJFQVdqZVJ0RDZP?=
- =?utf-8?B?NzRNbGd2a0Z0b0NFcngwM3VaekMxMUc2QVZtaERkNzhtczJZeUdidlEvMzBm?=
- =?utf-8?B?Z2IvZ0pNMlBIbVFaemp0bEcyclF3dTg1VlZ4NzQ4MUFlRTN5SFEyWEwra0dC?=
- =?utf-8?B?TzZyb3JxZVhpOFkrS0hSZldRK3J4bk1XWmRlaHl6WDdSU0pHbXR3STJzOG5V?=
- =?utf-8?B?YjcxWlRpWlYvS20reG5zU1VaV0xYSFhZdUdEejZpamVZMkxGY3JTdGc1L3Jn?=
- =?utf-8?B?WjFRZWFsc1FhUlZDZTkyRm5HbGswaUc3ZElCTHZ1NG02Rk50NnJ2N1g1NkIv?=
- =?utf-8?B?YXV0bWlvTDMxckZYeHhhNGRma2ZvRXg4d2Y3VzZEejc5eGhhZ2h3YnpzY1dS?=
- =?utf-8?B?L0RhS3RrTTBTc0tZa2R4MFlZSUxiQndSQ0t3NU1uMmZucFRZV1VCQnprQUo2?=
- =?utf-8?B?dm9XOHFwZ2RldFVKN09NMW0ra2hoK0xBUkNMWm1nWVpKd1ZTRkhQV0RuNDFi?=
- =?utf-8?B?ZjZNZWJZKzF0dmtpa2RLL3JmTnpCSW9IOTI5K1BpaVhpTUlpS2JrRDBsS3Uz?=
- =?utf-8?B?SlZqVmZLWW1aOWRrbEZXamNhMXFXbGl2dDdyZk5wZHBUa3FqaGpPRzExb1dW?=
- =?utf-8?B?QkV3bm91Y2xsTzhIOVZqcFdQdEtQbHZYdXM1OWVmS2w1dTMydkFkS0pveEVr?=
- =?utf-8?B?VU1zUmt4MmpiZ1ozOU1UT3B5MklQaG9kdGtla1lBL1BXdlJKOFZOblRhbDdJ?=
- =?utf-8?B?UEp0bzEzRXo2TURmMTVVdmw5VUM2UHprY1ljRG5QMFduZkVGejB4Z0NvNlZZ?=
- =?utf-8?B?L0tvQ3VUSGdRQWNRbG5oalBlNmtYU0R5U3ZUZUpPZld5dVRoZWdNVzRmbklR?=
- =?utf-8?B?UENCQURGTTVFa1cvZmJIaDVvUHRxOUpiRVR0RFkzSVJhZjFpczI3RkE4LytX?=
- =?utf-8?Q?GomH2GuK+6rgeEVOYxsL3ZGGw?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea10d29a-c539-43de-f89a-08da5acb0031
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2022 19:01:55.6043
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: krVu5kwn0wlnZ7DSC+7RBtGnQ+ij7kaTfGxAPzgGyiM3mSVYkAbpbo9d7L0RuxQdYNJpNKIiQrM40bMHf0QBYg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5088
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <20220519153713.819591-7-chao.p.peng@linux.intel.com> <b3ce0855-0e4b-782a-599c-26590df948dd@amd.com>
+ <20220624090246.GA2181919@chaop.bj.intel.com>
+In-Reply-To: <20220624090246.GA2181919@chaop.bj.intel.com>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Thu, 30 Jun 2022 12:14:13 -0700
+Message-ID: <CAGtprH82H_fjtRbL0KUxOkgOk4pgbaEbAydDYfZ0qxz41JCnAQ@mail.gmail.com>
+Subject: Re: [PATCH v6 6/8] KVM: Handle page fault for private memory
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     "Nikunj A. Dadhania" <nikunj@amd.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/30/22 06:49, Peter Xu wrote:
-> Looks good to me, I'd tune a bit to make it less ambiguous on a few places:
-> 
-> 		/*
-> 		 * FAULT_FLAG_INTERRUPTIBLE is opt-in. GUP callers must set
-> 		 * FOLL_INTERRUPTIBLE to enable FAULT_FLAG_INTERRUPTIBLE.
-> 		 * That's because some callers may not be prepared to
-> 		 * handle early exits caused by non-fatal signals.
-> 		 */
-> 
-> Would that be okay to you?
-> 
+...
+> > >     /*
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index afe18d70ece7..e18460e0d743 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -2899,6 +2899,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> > >     if (max_level == PG_LEVEL_4K)
+> > >             return PG_LEVEL_4K;
+> > >
+> > > +   if (kvm_slot_is_private(slot))
+> > > +           return max_level;
+> >
+> > Can you explain the rationale behind the above change?
+> > AFAIU, this overrides the transparent_hugepage=never setting for both
+> > shared and private mappings.
+>
+> As Sean pointed out, this should check against fault->is_private instead
+> of the slot. For private fault, the level is retrieved and stored to
+> fault->max_level in kvm_faultin_pfn_private() instead of here.
+>
+> For shared fault, it will continue to query host_level below. For
+> private fault, the host level has already been accounted in
+> kvm_faultin_pfn_private().
+>
+> Chao
+> >
 
-Yes, looks good. With that change, please feel free to add:
+With transparent_hugepages=always setting I see issues with the
+current implementation.
 
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+Scenario:
+1) Guest accesses a gfn range 0x800-0xa00 as private
+2) Guest calls mapgpa to convert the range 0x84d-0x86e as shared
+3) Guest tries to access recently converted memory as shared for the first time
+Guest VM shutdown is observed after step 3 -> Guest is unable to
+proceed further since somehow code section is not as expected
 
+Corresponding KVM trace logs after step 3:
+VCPU-0-61883   [078] ..... 72276.115679: kvm_page_fault: address
+84d000 error_code 4
+VCPU-0-61883   [078] ..... 72276.127005: kvm_mmu_spte_requested: gfn
+84d pfn 100b4a4d level 2
+VCPU-0-61883   [078] ..... 72276.127008: kvm_tdp_mmu_spte_changed: as
+id 0 gfn 800 level 2 old_spte 100b1b16827 new_spte 100b4a00ea7
+VCPU-0-61883   [078] ..... 72276.127009: kvm_mmu_prepare_zap_page: sp
+gen 0 gfn 800 l1 8-byte q0 direct wux nxe ad root 0 sync
+VCPU-0-61883   [078] ..... 72276.127009: kvm_tdp_mmu_spte_changed: as
+id 0 gfn 800 level 1 old_spte 1003eb27e67 new_spte 5a0
+VCPU-0-61883   [078] ..... 72276.127010: kvm_tdp_mmu_spte_changed: as
+id 0 gfn 801 level 1 old_spte 10056cc8e67 new_spte 5a0
+VCPU-0-61883   [078] ..... 72276.127010: kvm_tdp_mmu_spte_changed: as
+id 0 gfn 802 level 1 old_spte 10056fa2e67 new_spte 5a0
+VCPU-0-61883   [078] ..... 72276.127010: kvm_tdp_mmu_spte_changed: as
+id 0 gfn 803 level 1 old_spte 0 new_spte 5a0
+....
+ VCPU-0-61883   [078] ..... 72276.127089: kvm_tdp_mmu_spte_changed: as
+id 0 gfn 9ff level 1 old_spte 100a43f4e67 new_spte 5a0
+ VCPU-0-61883   [078] ..... 72276.127090: kvm_mmu_set_spte: gfn 800
+spte 100b4a00ea7 (rwxu) level 2 at 10052fa5020
+ VCPU-0-61883   [078] ..... 72276.127091: kvm_fpu: unload
 
+Looks like with transparent huge pages enabled kvm tried to handle the
+shared memory fault on 0x84d gfn by coalescing nearby 4K pages
+to form a contiguous 2MB page mapping at gfn 0x800, since level 2 was
+requested in kvm_mmu_spte_requested.
+This caused the private memory contents from regions 0x800-0x84c and
+0x86e-0xa00 to get unmapped from the guest leading to guest vm
+shutdown.
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+Does getting the mapping level as per the fault access type help
+address the above issue? Any such coalescing should not cross between
+private to
+shared or shared to private memory regions.
+
+> > >     host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
+> > >     return min(host_level, max_level);
+> > >  }
+> >
+
+Regards,
+Vishal
