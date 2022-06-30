@@ -2,162 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A2D95624C2
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 23:02:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA8AF562539
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 23:29:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235026AbiF3VCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 17:02:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53554 "EHLO
+        id S237466AbiF3V1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 17:27:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237256AbiF3VCc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 17:02:32 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 126C54D154
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:02:31 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id k7so294476wrc.12
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VtUlpkuhliUwoUgmaGEH+kEoEeunaS6PJnDK/W1XYz4=;
-        b=JfrrtzAQjyLxnw8RtQ5sQiSNUfohoaMNZW2kYvifXlmGWgHr7XJMl/LQ5yWh4ZDLRh
-         EIUPHXZDb5Va4mirbCSRVDZCPMlakbWCUXbrVx3s9CYunFEZ1slL1J+n0+lLyBmkjvq6
-         dywxS4/phRbyRQsua97BR94hWDn23Q49DbtcSC9+zkt3E5pfCOfz49pW3hhqdvrjGdv+
-         pKKf1x3hKQqAQrlbcPos/8s8jUYluEAVcvGGsPGpoOXyv0wrj0LnCa606tZy9ddxQBAt
-         cF8lFcME2E999BhE7foEKF9XdpoRPCaTJec6Ks6Sa9LMwb5hg+yO+AGHFhUc1+iXyNs+
-         Ct9g==
+        with ESMTP id S237225AbiF3V1h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 17:27:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B0F6B35AA9
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:27:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656624455;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Wd1ki83p3SXylkpu3EgQoI69vBxY8no6C/MZWnJcErg=;
+        b=VlxOTAqLEPo1xuRDRR/dg76LNpWP1wXxflag94wdkZnxhepasM08EGh9RkPXmCUmmH8DwA
+        D73bYKIuC2T13oll1YtrpbzyQBBv/0j99r/UoCHu+JT4uHnTVZi0fyKnM7zcgSWRleGrJm
+        4+3DJX6FOXvIjJ0NLGFZON7ol1og6i4=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-78-TdR4cO4wOt63WdycKHhNiw-1; Thu, 30 Jun 2022 17:27:34 -0400
+X-MC-Unique: TdR4cO4wOt63WdycKHhNiw-1
+Received: by mail-il1-f199.google.com with SMTP id i2-20020a056e021b0200b002dadf6a0a0eso139034ilv.12
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:27:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VtUlpkuhliUwoUgmaGEH+kEoEeunaS6PJnDK/W1XYz4=;
-        b=0BSZWnqDG0ziiklreo/7AQhmjntwlpjP40/dg/JsJAFc1uVusSZv8rt+uJy1RgIxvY
-         XiPa8TM4ytbMP9ZVaf7vLJkLCmb/TAXgKhApTUY4glhOGwXXq98FCepo9WyrKar61olv
-         SabQJeZTiJ1zv346Fmq2RB8jgwAKHIuUSshuCWZFFwtqYveyxC9FYOYUHoNG06OYIsWN
-         8C+rc57tbwSTwLoCKgVgxhFvyNgLK6qyCwU9LpDNSR7fakD/kbt4IHAnB7Za8vEqQh4+
-         hNH7ytIOqZYayfiwxsld8PVABySX6/d1pcUlBfHOXL+bbpNoKJU2H9QK8eGnCgJkmU8T
-         AFAg==
-X-Gm-Message-State: AJIora86wDJ7ywvskfTZRSpNCHv/tOxOIJBxQgEzqCx7I525TvhGXY4y
-        MUsxTqLTq+1hIi8vrdu8qdxTntTvz8vKOrRUbTLuig==
-X-Google-Smtp-Source: AGRyM1tplZDxrLp9WaTGqMe3midVuGQbVARcYH1sMixpR7FPn6Bu0DJJ+rFZvHMXvlCiQJACUGtNy4P+3OS3+ElQNfs=
-X-Received: by 2002:a05:6000:a1e:b0:21b:8c8d:3cb5 with SMTP id
- co30-20020a0560000a1e00b0021b8c8d3cb5mr10358939wrb.372.1656622949489; Thu, 30
- Jun 2022 14:02:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220628220938.3657876-1-yosryahmed@google.com>
-In-Reply-To: <20220628220938.3657876-1-yosryahmed@google.com>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Thu, 30 Jun 2022 14:01:52 -0700
-Message-ID: <CAJD7tkb3bDwt0gzOhS+3sSiy20Qy=G_AD8jZeY5DYh4=NyX3Bg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] KVM: mm: count KVM mmu usage in memory stats
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Wd1ki83p3SXylkpu3EgQoI69vBxY8no6C/MZWnJcErg=;
+        b=wSI1wS3E2+AXA3Jn9+rP4nXT+TMPkro0TKIGI+T2PIxXRJ9QYUzmvPEezY0L3XLASz
+         rgFCkNWjV11ZDlVE8Rn6Isbl447WEtI0AKXULWcsNjYliJIYFeeePbo48tpqVGxNNnik
+         li9A26aU94rwHtFV+uUVIYuNI+s2L2d4S1DiD9PaLnco82P+DFOcQwsAfXMIfBz+E+23
+         +xTx+kptx13FEw5Nm7qCXRIkdCandP/HYstcQEpQpJUnwQjSuM6EGVfb7gsnLgO8rit/
+         gLatMNoNxUtISsqik61TdiqU5Nw4o2Uu5jqviJrA9PoOKMQvPfhemVbjTaMAXnx3mAb0
+         tdhg==
+X-Gm-Message-State: AJIora/7YTa8Ak/HJRoxsvxCxXf34+XVehprtEMzFph/ttoioqvYqwiR
+        gtE/oPvFglsMJbguidHQL7UGTKwLPl8osEUBwByz1pdXL0bRdBV74k9S+/znfNlS8xOHAnyF6+M
+        qmNzu0QdvdU5Q
+X-Received: by 2002:a6b:fb05:0:b0:657:655e:a287 with SMTP id h5-20020a6bfb05000000b00657655ea287mr5835540iog.211.1656624453803;
+        Thu, 30 Jun 2022 14:27:33 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1t78+bU25q9esv1lcWaU4zBR2o8PbPeqMIreeppu9DzAo0eFqpPx7c+rMK82ivDZlWfZZexEQ==
+X-Received: by 2002:a6b:fb05:0:b0:657:655e:a287 with SMTP id h5-20020a6bfb05000000b00657655ea287mr5835526iog.211.1656624453577;
+        Thu, 30 Jun 2022 14:27:33 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id e98-20020a02866b000000b00331598832besm9005563jai.25.2022.06.30.14.27.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jun 2022 14:27:32 -0700 (PDT)
+Date:   Thu, 30 Jun 2022 17:27:30 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     Huang@google.com, Tejun Heo <tj@kernel.org>,
-        Shaoqin <shaoqin.huang@intel.com>,
-        Cgroups <cgroups@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Shakeel Butt <shakeelb@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morse <james.morse@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Oliver Upton <oupton@google.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-        Zefan Li <lizefan.x@bytedance.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        David Hildenbrand <david@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
+Message-ID: <Yr4VQqTIu1bMEAji@xz-m1.local>
+References: <20220622213656.81546-2-peterx@redhat.com>
+ <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
+ <YrtXGf20oa5eYgIU@xz-m1.local>
+ <16c181d3-09ef-ace4-c910-0a13fc245e48@nvidia.com>
+ <YruBzuJf9s/Nmr6W@xz-m1.local>
+ <177284f9-416d-c142-a826-e9a497751fca@nvidia.com>
+ <Yrx0ETyb2kk4fO4M@xz-m1.local>
+ <17f9eae0-01bb-4793-201e-16ee267c07f2@nvidia.com>
+ <Yr2p7sR3IjiGTGd3@xz-m1.local>
+ <0183984a-c95f-c92e-629e-775071b5cd23@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0183984a-c95f-c92e-629e-775071b5cd23@nvidia.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If/when this patchset gets merged, would it be through the mm tree or
-kvm tree? It is based on the kvm-queue branch so I am guessing it
-could be easier to go through kvm but I am not sure what the policy is
-here. Andrew or Paolo, do you mind clarifying the policy on such
-patchsets? Thanks!
+On Thu, Jun 30, 2022 at 12:01:53PM -0700, John Hubbard wrote:
+> On 6/30/22 06:49, Peter Xu wrote:
+> > Looks good to me, I'd tune a bit to make it less ambiguous on a few places:
+> > 
+> > 		/*
+> > 		 * FAULT_FLAG_INTERRUPTIBLE is opt-in. GUP callers must set
+> > 		 * FOLL_INTERRUPTIBLE to enable FAULT_FLAG_INTERRUPTIBLE.
+> > 		 * That's because some callers may not be prepared to
+> > 		 * handle early exits caused by non-fatal signals.
+> > 		 */
+> > 
+> > Would that be okay to you?
+> > 
+> 
+> Yes, looks good. With that change, please feel free to add:
+> 
+> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 
-On Tue, Jun 28, 2022 at 3:09 PM Yosry Ahmed <yosryahmed@google.com> wrote:
->
-> Add NR_SECONDARY_PAGETABLE memory stat and use it to account KVM mmu
-> usage as the first type of accounted secondary page tables. This stat
-> can be later extended to account for other types of secondary pages
-> tables (e.g. iommu page tables).
->
-> Rationale behind why this is useful and link to extended discussion in
-> the first patch.
->
-> ---
->
-> Changes in V6:
-> - Rebased on top of kvm/queue and fixed conflicts.
-> - Fixed docs spaces and tabs (Sean).
-> - More narrative commit logs (Sean and Oliver).
-> - Updated kvm_account_pgtable_pages() documentation to describe the
->   rules of using it more clearly (Sean).
-> - Collected Acks and Reviewed-by's by Shakeel and Oliver (Thanks!)
->
-> Changes in V5:
-> - Updated cover letter to explain more the rationale behind the change
->   (Thanks to contributions by Sean Christopherson).
-> - Removed extraneous + in arm64 patch (Oliver Upton, Marc Zyngier).
-> - Shortened secondary_pagetables to sec_pagetables (Shakeel Butt).
-> - Removed dependency on other patchsets (applies to queue branch).
->
-> Changes in V4:
-> - Changed accounting hooks in arm64 to only account s2 page tables and
->   refactored them to a much cleaner form, based on recommendations from
->   Oliver Upton and Marc Zyngier.
-> - Dropped patches for mips and riscv. I am not interested in those archs
->   anyway and don't have the resources to test them. I posted them for
->   completeness but it doesn't seem like anyone was interested.
->
-> Changes in V3:
-> - Added NR_SECONDARY_PAGETABLE instead of piggybacking on NR_PAGETABLE
->   stats.
->
-> Changes in V2:
-> - Added accounting stats for other archs than x86.
-> - Changed locations in the code where x86 KVM page table stats were
->   accounted based on suggestions from Sean Christopherson.
->
-> ---
->
-> Yosry Ahmed (4):
->   mm: add NR_SECONDARY_PAGETABLE to count secondary page table uses.
->   KVM: mmu: add a helper to account memory used by KVM MMU.
->   KVM: x86/mmu: count KVM mmu usage in secondary pagetable stats.
->   KVM: arm64/mmu: count KVM s2 mmu usage in secondary pagetable stats
->
->  Documentation/admin-guide/cgroup-v2.rst |  5 ++++
->  Documentation/filesystems/proc.rst      |  4 +++
->  arch/arm64/kvm/mmu.c                    | 36 ++++++++++++++++++++++---
->  arch/x86/kvm/mmu/mmu.c                  | 16 +++++++++--
->  arch/x86/kvm/mmu/tdp_mmu.c              | 12 +++++++++
->  drivers/base/node.c                     |  2 ++
->  fs/proc/meminfo.c                       |  2 ++
->  include/linux/kvm_host.h                | 10 +++++++
->  include/linux/mmzone.h                  |  1 +
->  mm/memcontrol.c                         |  1 +
->  mm/page_alloc.c                         |  6 ++++-
->  mm/vmstat.c                             |  1 +
->  12 files changed, 89 insertions(+), 7 deletions(-)
->
-> --
-> 2.37.0.rc0.161.g10f37bed90-goog
->
+Will do, thanks!
+
+-- 
+Peter Xu
+
