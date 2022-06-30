@@ -2,96 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C6195612A8
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 08:40:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89E7A561348
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 09:33:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232377AbiF3GkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 02:40:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44554 "EHLO
+        id S232259AbiF3Hcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 03:32:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232386AbiF3GkS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 02:40:18 -0400
+        with ESMTP id S232086AbiF3Hcq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 03:32:46 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C63322E9DE
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 23:40:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E26E396B5
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 00:32:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656571216;
+        s=mimecast20190719; t=1656574364;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=jAHrr0+GxDfej1qVCdn75eKSnjxER8aot4sqAySqnyU=;
-        b=Oo3ryxbYhjMRU4GeMSGk2FfioiMTH0El4VRsR94NLhqA4QpDxWAuBUof6yPymtfkGYauQz
-        r7/s4y1IUeaKMnB8O+VAV4weR+9cE/mDwvHqqjS/VPBNOg1B5jvPdhTowJLqYQUauhKKKE
-        BJV0e+ZIGypGkIJSUfMk8WS4mJus1mY=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=kqEEUMLIpCgFyqW1I7pVlBIg/VcqZRs+Rv7NEYalj0g=;
+        b=eSAovH0b1vW+wzpfaRaMTs4hgoCmKkm4gzZcsBmhAA/XYw9yO2F0AJjp/dpPBIoSxN7NF5
+        8KrSMeCczzEL4ecCzBVh7KrkghhYHhs2kOjXU7SYZGcLWG4Yho3LbJ5IPSl7vGLZX4u/U/
+        kkxcscKgzJJT+SErcWe/701V8eEYR1c=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-665-6GDcuStDPnSDEA5pNtIAIA-1; Thu, 30 Jun 2022 02:40:15 -0400
-X-MC-Unique: 6GDcuStDPnSDEA5pNtIAIA-1
-Received: by mail-lj1-f198.google.com with SMTP id t21-20020a2e8e75000000b0025aa8875fbeso2757230ljk.22
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 23:40:15 -0700 (PDT)
+ us-mta-39-NISGE_C3OsiEQS3AwlEznA-1; Thu, 30 Jun 2022 03:32:42 -0400
+X-MC-Unique: NISGE_C3OsiEQS3AwlEznA-1
+Received: by mail-wm1-f70.google.com with SMTP id t20-20020a1c7714000000b003a032360873so1039943wmi.0
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 00:32:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jAHrr0+GxDfej1qVCdn75eKSnjxER8aot4sqAySqnyU=;
-        b=5Krakhxdl8cGJ+WNnlFkDdee+N1V2ysCRQRihL9vS/Ciw5Mh+4Y6lfR/i8avOC5Y7z
-         ewAw4vkGfe4K50mRG9F0bDfKuOM16K5zyjWJL1Me9RoFytHFFO4qPOBobYmJGwYHm2vg
-         Pdk9/VbUUhJPqaP8msUQqTmVsU2sSonm66pN7vnddzvnbJlKNwpvlncTFywUiaGkAYMM
-         v0Vxwaz+cKeioDOS0pEHaU6m9Wz+k7s8fgysdSR4cALnSHAT2z/jibXTTclMwgeBrF86
-         MPQ6rIDVw99aNdyhA2IZnhWsDStkAPQ8sUCIVq4L70VYtv7gwKisTM8ymi/BJnn6Njse
-         +KHQ==
-X-Gm-Message-State: AJIora/Dv16sIh1zTqilz54v1wdGp5go5kAF/60ufrKDOf3tRRQiyWEg
-        DVKNTGrzRYcW52bGzTDalrmpBilqOWXyEEFUH9Y9l7HG4i5cfCZQqhAUuceoYjOU3nhhP8nl+xp
-        jQFvjkFer3Z3W2rI6ftnmqDVWtqer
-X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id bp13-20020a056512158d00b0047f718c28b5mr4753543lfb.397.1656571213824;
-        Wed, 29 Jun 2022 23:40:13 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tAA0XU6ZzbOAb5pqi3g/cuvZsx0P7N9Yp/LWOT+IpPh+uRjEGCtW9glE4GIh09HeOKg0ELev5VqROwEDkQfbM=
-X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id
- bp13-20020a056512158d00b0047f718c28b5mr4753513lfb.397.1656571213588; Wed, 29
- Jun 2022 23:40:13 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=kqEEUMLIpCgFyqW1I7pVlBIg/VcqZRs+Rv7NEYalj0g=;
+        b=uCn2W7S/0Auy3cgwm8ESvu3GZvq8DNtS1wozwwTS00xcEnR55fw9eQIiA/K9ZXmwUJ
+         MTVm7xChlHyMcfgWZPtNPz8dqrGMhbkneFRvVYG3pm0CicZWEyl1ZW0sbJvD63Mx2xrV
+         b/4a/p5Z6jAXEj1eDiXNzzn4VtlM8laT27ye916i/Imwccg3NBjzBF31XToapNLRjPmS
+         OR+jYDGtVT84EebzabOU6nUA9Gr5Zz2vzqu4QQsyaQwZGO8iW3xPjafIJ/VwtR6jWddw
+         9VRN4j//txdFMIx5mK4JOcWiNUevAfPh4aCHpSI+JticEIAiaO3nFQwEdmEKiOluI9xo
+         6mTQ==
+X-Gm-Message-State: AJIora+3xiINHIJqsdwzyyPqDcd1UmNQwwVa569LehibFPui3qm1Kr1t
+        VM+Aj86VVQWvPcEttUHZ9Wd2U9LXUJaXxNAFMQfFhxyPChrUXS9fAE92Mx4shpt2CoWnhXz/NFE
+        XbpNd0TxR4g3r
+X-Received: by 2002:a5d:43c7:0:b0:21d:1e01:e9ac with SMTP id v7-20020a5d43c7000000b0021d1e01e9acmr6691772wrr.187.1656574361276;
+        Thu, 30 Jun 2022 00:32:41 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uugW08aJHQzNn79zj+aesKxAUlGlhNhpOSU/8IbtFyE4VGJLptXuhE0UbQzVn4tFe8gz809w==
+X-Received: by 2002:a5d:43c7:0:b0:21d:1e01:e9ac with SMTP id v7-20020a5d43c7000000b0021d1e01e9acmr6691743wrr.187.1656574361002;
+        Thu, 30 Jun 2022 00:32:41 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n30-20020a05600c501e00b0039c454067ddsm5775414wmr.15.2022.06.30.00.32.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jun 2022 00:32:40 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 16/28] KVM: VMX: Tweak the special handling of
+ SECONDARY_EXEC_ENCLS_EXITING in setup_vmcs_config()
+In-Reply-To: <CALMp9eS_iAijAk4pdK1tjLbRp3XH-PhR1mX4gaSXztWPXJpfkA@mail.gmail.com>
+References: <20220629150625.238286-1-vkuznets@redhat.com>
+ <20220629150625.238286-17-vkuznets@redhat.com>
+ <CALMp9eS_iAijAk4pdK1tjLbRp3XH-PhR1mX4gaSXztWPXJpfkA@mail.gmail.com>
+Date:   Thu, 30 Jun 2022 09:32:39 +0200
+Message-ID: <87wncysj1k.fsf@redhat.com>
 MIME-Version: 1.0
-References: <20220629065656.54420-1-xuanzhuo@linux.alibaba.com> <20220629065656.54420-6-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20220629065656.54420-6-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 30 Jun 2022 14:40:02 +0800
-Message-ID: <CACGkMEvfFV8w34=SiS4XFyEH5+EEkb9JqYg0t_rKpU1rRBMLiQ@mail.gmail.com>
-Subject: Re: [PATCH v11 05/40] virtio_ring: split vring_virtqueue
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc:     virtualization <virtualization@lists.linux-foundation.org>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm <kvm@vger.kernel.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-        kangjie.xu@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -102,159 +81,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 2:57 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
->
-> Separate the two inline structures(split and packed) from the structure
-> vring_virtqueue.
->
-> In this way, we can use these two structures later to pass parameters
-> and retain temporary variables.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Jim Mattson <jmattson@google.com> writes:
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+> On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>>
+>> SECONDARY_EXEC_ENCLS_EXITING is conditionally added to the 'optional'
+>> checklist in setup_vmcs_config() but there's little value in doing so.
+>> First, as the control is optional, we can always check for its
+>> presence, no harm done. Second, the only real value cpu_has_sgx() check
+>> gives is that on the CPUs which support SECONDARY_EXEC_ENCLS_EXITING but
+>> don't support SGX, the control is not getting enabled. It's highly unlikely
+>> such CPUs exist but it's possible that some hypervisors expose broken vCPU
+>> models.
+>>
+>> Preserve cpu_has_sgx() check but filter the result of adjust_vmx_controls()
+>> instead of the input.
+>>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/vmx/vmx.c | 9 ++++++---
+>>  1 file changed, 6 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 89a3bbafa5af..e32d91006b80 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -2528,9 +2528,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>>                         SECONDARY_EXEC_PT_CONCEAL_VMX |
+>>                         SECONDARY_EXEC_ENABLE_VMFUNC |
+>>                         SECONDARY_EXEC_BUS_LOCK_DETECTION |
+>> -                       SECONDARY_EXEC_NOTIFY_VM_EXITING;
+>> -               if (cpu_has_sgx())
+>> -                       opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
+>> +                       SECONDARY_EXEC_NOTIFY_VM_EXITING |
+>> +                       SECONDARY_EXEC_ENCLS_EXITING;
+>> +
+>>                 if (adjust_vmx_controls(min2, opt2,
+>>                                         MSR_IA32_VMX_PROCBASED_CTLS2,
+>>                                         &_cpu_based_2nd_exec_control) < 0)
+>> @@ -2577,6 +2577,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>>                 vmx_cap->vpid = 0;
+>>         }
+>>
+>> +       if (!cpu_has_sgx())
+>> +               _cpu_based_2nd_exec_control &= ~SECONDARY_EXEC_ENCLS_EXITING;
+>
+> NYC, but why is there a leading underscore here?
 
-> ---
->  drivers/virtio/virtio_ring.c | 116 ++++++++++++++++++-----------------
->  1 file changed, 60 insertions(+), 56 deletions(-)
+No idea to be honest, this goes way back to 2007 when
+setup_vmcs_config() was introduced:
+
+commit 1c3d14fe0ab75337a3f6c06b6bc18bcbc2b3d0bc
+Author: Yang, Sheng <sheng.yang@intel.com>
+Date:   Sun Jul 29 11:07:42 2007 +0300
+
+    KVM: VMX: Improve the method of writing vmcs control
+
 >
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index bb4e8ae09c9b..2806e033a651 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -85,6 +85,64 @@ struct vring_desc_extra {
->         u16 next;                       /* The next desc state in a list. */
->  };
+>>         if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
+>>                 u64 opt3 = TERTIARY_EXEC_IPI_VIRT;
+>>
+>> --
+>> 2.35.3
+>>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
 >
-> +struct vring_virtqueue_split {
-> +       /* Actual memory layout for this queue. */
-> +       struct vring vring;
-> +
-> +       /* Last written value to avail->flags */
-> +       u16 avail_flags_shadow;
-> +
-> +       /*
-> +        * Last written value to avail->idx in
-> +        * guest byte order.
-> +        */
-> +       u16 avail_idx_shadow;
-> +
-> +       /* Per-descriptor state. */
-> +       struct vring_desc_state_split *desc_state;
-> +       struct vring_desc_extra *desc_extra;
-> +
-> +       /* DMA address and size information */
-> +       dma_addr_t queue_dma_addr;
-> +       size_t queue_size_in_bytes;
-> +};
-> +
-> +struct vring_virtqueue_packed {
-> +       /* Actual memory layout for this queue. */
-> +       struct {
-> +               unsigned int num;
-> +               struct vring_packed_desc *desc;
-> +               struct vring_packed_desc_event *driver;
-> +               struct vring_packed_desc_event *device;
-> +       } vring;
-> +
-> +       /* Driver ring wrap counter. */
-> +       bool avail_wrap_counter;
-> +
-> +       /* Avail used flags. */
-> +       u16 avail_used_flags;
-> +
-> +       /* Index of the next avail descriptor. */
-> +       u16 next_avail_idx;
-> +
-> +       /*
-> +        * Last written value to driver->flags in
-> +        * guest byte order.
-> +        */
-> +       u16 event_flags_shadow;
-> +
-> +       /* Per-descriptor state. */
-> +       struct vring_desc_state_packed *desc_state;
-> +       struct vring_desc_extra *desc_extra;
-> +
-> +       /* DMA address and size information */
-> +       dma_addr_t ring_dma_addr;
-> +       dma_addr_t driver_event_dma_addr;
-> +       dma_addr_t device_event_dma_addr;
-> +       size_t ring_size_in_bytes;
-> +       size_t event_size_in_bytes;
-> +};
-> +
->  struct vring_virtqueue {
->         struct virtqueue vq;
->
-> @@ -124,64 +182,10 @@ struct vring_virtqueue {
->
->         union {
->                 /* Available for split ring */
-> -               struct {
-> -                       /* Actual memory layout for this queue. */
-> -                       struct vring vring;
-> -
-> -                       /* Last written value to avail->flags */
-> -                       u16 avail_flags_shadow;
-> -
-> -                       /*
-> -                        * Last written value to avail->idx in
-> -                        * guest byte order.
-> -                        */
-> -                       u16 avail_idx_shadow;
-> -
-> -                       /* Per-descriptor state. */
-> -                       struct vring_desc_state_split *desc_state;
-> -                       struct vring_desc_extra *desc_extra;
-> -
-> -                       /* DMA address and size information */
-> -                       dma_addr_t queue_dma_addr;
-> -                       size_t queue_size_in_bytes;
-> -               } split;
-> +               struct vring_virtqueue_split split;
->
->                 /* Available for packed ring */
-> -               struct {
-> -                       /* Actual memory layout for this queue. */
-> -                       struct {
-> -                               unsigned int num;
-> -                               struct vring_packed_desc *desc;
-> -                               struct vring_packed_desc_event *driver;
-> -                               struct vring_packed_desc_event *device;
-> -                       } vring;
-> -
-> -                       /* Driver ring wrap counter. */
-> -                       bool avail_wrap_counter;
-> -
-> -                       /* Avail used flags. */
-> -                       u16 avail_used_flags;
-> -
-> -                       /* Index of the next avail descriptor. */
-> -                       u16 next_avail_idx;
-> -
-> -                       /*
-> -                        * Last written value to driver->flags in
-> -                        * guest byte order.
-> -                        */
-> -                       u16 event_flags_shadow;
-> -
-> -                       /* Per-descriptor state. */
-> -                       struct vring_desc_state_packed *desc_state;
-> -                       struct vring_desc_extra *desc_extra;
-> -
-> -                       /* DMA address and size information */
-> -                       dma_addr_t ring_dma_addr;
-> -                       dma_addr_t driver_event_dma_addr;
-> -                       dma_addr_t device_event_dma_addr;
-> -                       size_t ring_size_in_bytes;
-> -                       size_t event_size_in_bytes;
-> -               } packed;
-> +               struct vring_virtqueue_packed packed;
->         };
->
->         /* How to notify other side. FIXME: commonalize hcalls! */
-> --
-> 2.31.0
->
+
+Thanks!
+
+-- 
+Vitaly
 
