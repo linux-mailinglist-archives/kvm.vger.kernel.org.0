@@ -2,231 +2,391 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AEB2560ED6
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 03:55:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE3A0560EE5
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 04:01:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbiF3Bxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jun 2022 21:53:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52834 "EHLO
+        id S230432AbiF3CBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jun 2022 22:01:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230284AbiF3Bxl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jun 2022 21:53:41 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2067.outbound.protection.outlook.com [40.107.92.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA3C13CFEC;
-        Wed, 29 Jun 2022 18:53:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BS2WAayVX8ZNSQYdlYsNB7KI8jPylV0mIzAL5/qQTp8nbYI//UXiehpGKgB7Bkw4trVp3yvZWAgNEJ9W1+BqVU/EZDwxaCwYdSy/oFri4YWFYW0WINuDiI6XOZnTYtEptr8IHpik1MY3yU8mYAa+dxwUTT4j3/trDMk//wMkcwMnyk2OSB/EzCs4A/FfwfL3a8mSEPfdMnZSrV0ZIBKop/pByE8Z9lI1MtbrJ/oy1tdHv+ON//DvjcIso8qFOpVqphjNG0/PUshkSD0dtMbV7d2VWHOVtHv5te/6d156wd1Y+MalIf2kTZTZfVYBQB3BcsodrjI7ojbGKBXKsbQrbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=T4nwGocQP0hm/+OlqRDslQl/3JS6WGFh4GoyiK6bbfU=;
- b=mwWVD7IXNZ5X37z8mghJ8iUIGVVfTMhnOlCY8Fl+CsXvc4OLlKWVCOkxyB22GruVijTHH0TLxYSdbkOkWfBwtxJm1Hfpoq+xTStD1uWj6XDBE3MNNhrwIM2bXUZpNcswutZPxq6k0XBVhXenUEnkLQozuznmMgJZDqPREdgj1SPgZwDBEfhPGQH4WBQr98tG81nbFIGBrpVVAhZ2m49sY6EhjLNgVlpWJML2pGz1oN739/SZlwb+Kn5HLg+aRE+EZ9QAOmUzaAv32l8j+aCces8CpbZpMX4aKf9tkDVO09T8BxutEMWvABpX8WJq3fH2m67UZTMtZTLpDYONVZDISg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T4nwGocQP0hm/+OlqRDslQl/3JS6WGFh4GoyiK6bbfU=;
- b=iAFPSy7ddY68E6PwFHXTJq4KJTiWe1f7yj3BJr3sC7zGwA5a+Wk107VIoBq9U7DVqJGaj1q8DVtrs874tqcnAIOTx6QyZr9wWJs0WlrJX+9xrQ2PiOyp1l4OhsPDqihtIsK5g1LJOmG8u3tikUXsWrB5vhTF91Jh6dRFVT0LsElQvGbQ8z6CpMOOrxaDbjLwO1Ohyo0ApQUK7yCPS4ogikHDI2JYNqVEPBA0B/LKk1QHuBxN3MUvFvXoKnM+sHZ4YUfUV2aXXN4KdtPAUTcIN+ow9C7WNtLq/+3c5Ty5RuRKhtPA5QC4A0lPKabHyLJFJP/bnvfnmIMpBBg2/FQhuQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by BN8PR12MB3076.namprd12.prod.outlook.com (2603:10b6:408:61::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Thu, 30 Jun
- 2022 01:53:33 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::28d4:3575:5db:6910]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::28d4:3575:5db:6910%5]) with mapi id 15.20.5395.015; Thu, 30 Jun 2022
- 01:53:33 +0000
-Message-ID: <17f9eae0-01bb-4793-201e-16ee267c07f2@nvidia.com>
-Date:   Wed, 29 Jun 2022 18:53:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Content-Language: en-US
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>
-References: <20220622213656.81546-1-peterx@redhat.com>
- <20220622213656.81546-2-peterx@redhat.com>
- <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
- <YrtXGf20oa5eYgIU@xz-m1.local>
- <16c181d3-09ef-ace4-c910-0a13fc245e48@nvidia.com>
- <YruBzuJf9s/Nmr6W@xz-m1.local>
- <177284f9-416d-c142-a826-e9a497751fca@nvidia.com>
- <Yrx0ETyb2kk4fO4M@xz-m1.local>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <Yrx0ETyb2kk4fO4M@xz-m1.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY3PR10CA0021.namprd10.prod.outlook.com
- (2603:10b6:a03:255::26) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+        with ESMTP id S229489AbiF3CBe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jun 2022 22:01:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 393293B00D
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 19:01:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656554491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=siz7WrYvb8LkyacUeeNLloNPDn/nazktAAvEBoYIVXM=;
+        b=XbIA9+eLT13Yt3zhdnsv0Vhao29dy6KbfX/J3dGShuyQcaGpm8Rom6w1ueEiY7xpwWowl5
+        eRkHaeMe0aBuW711OHc7frb2A+mBjMRWsZ7/QC0FaPdqtmJAEQqbe+uIKaWfPzynOOKsyi
+        BS0s0BWu+2HnzDMpmp7UGg7Laxi2MPs=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-6-Hdc1QXG5MwiFPrQ7W0G8Cg-1; Wed, 29 Jun 2022 22:01:29 -0400
+X-MC-Unique: Hdc1QXG5MwiFPrQ7W0G8Cg-1
+Received: by mail-lj1-f200.google.com with SMTP id w23-20020a2e9bd7000000b0025bd31b7fe7so1495657ljj.16
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 19:01:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=siz7WrYvb8LkyacUeeNLloNPDn/nazktAAvEBoYIVXM=;
+        b=vnnzHIM6tCtdMy27F7jsLV9GtucK+GOEvlxGpll/M8rASDpQdDtmcE9vqTcQwYvzfB
+         8SEK00FHf9SGFEFiD67AN3KGUcLYd9dvnv/5OSe9b0zSF2IUlg3Epgnh4qXVlKa5rLau
+         mLcdAdsb9A31zMLsoVFw//gQd8LLSirDRpx5JYU1mUCM/6VXser9bFnwjYkQZD+gT/sZ
+         i+cpg/Zl0ufKoD8FYMvvSANlHDFC3iP46xHqWffc6w63YE4s2RBlqPH4cJWxUyEHsQDL
+         5xidwYeC7A0BHW58neWfZGXSSMMDsnEK3hKwxOb6MM/5ut1IEkVNPlM1WPWWuJN6dOiT
+         ku7w==
+X-Gm-Message-State: AJIora8AYfeQ7O4ngYAGCrH7OrkonNizy4udfSKRFhlh8FoyTheoenGD
+        fdHllJn0LxTnG3nZ+oGdANogcwJAHRxkA0/Kh6armm3woc+l2nSbczcXNlTEGFl/ebXUK3HOtnh
+        bvg7fBs0SqBBrgBkFOa2OdHdy61OG
+X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id bp13-20020a056512158d00b0047f718c28b5mr4175586lfb.397.1656554487957;
+        Wed, 29 Jun 2022 19:01:27 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tjUkdchbJhSeBgs/Z1JSiqkCHXviv351LNPgd53SJ8UROkAl3qmLhmyB3zzmalF0rEsqMWYqERweaXeBGLHaw=
+X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id
+ bp13-20020a056512158d00b0047f718c28b5mr4175562lfb.397.1656554487568; Wed, 29
+ Jun 2022 19:01:27 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eab4e8c7-491b-4681-00e1-08da5a3b568e
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3076:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ho5Lgdjo/8BmboQg3NK+F+yNC784XPPQsjtnXBmQc+J++GUkOSQ9YICI1G40WCeYxbAj/QoX7qj0fClnuA5Mc529UAmaMPGTRcqM/tDjQL+JUX0bWJgiI5APL00uHo9Jd3oTQY3qoWHIjejaHI8QYgjNzUNIhKMCzn95jOMLdtr5Y73NJA3crpZxQoa8bCtuYpU5DlJKLMEgwuhHnkv1IbF4d7NYApbQmkf3mEo65/snXVb9Gvk4UNUaLZ3goVsIdw5elWOkMAl672rDN9nVzsAHR8zsNI203CJQ9R1tfroV91rZhfh16b1cWVn0eQgksjwCzjDG6gOoVuWPd16DHEEY6vBTMo4iysCR0xK5ELWU4O8XU03g/I4CgZSK/OL9gTFP4RiAXr0xXLCHqZrM08/f8cQPORaP0xQ/kNInWceOEKHSwjH7dUbSejnOKgxtwhu9Pu2+sosaxBYbNU6yq0Pbfe3+7XTZOU1WIOdZjkft6hfD2MPBweFv9eXhcYDq73dT3WGIbowjB2dEsJiU6XCuhHSQOtdnK7bFRQBxd4t/0npb2LX3J/u6LMz1rnXjN+YGjxQhAHy1qIlNCZrQnZtjfHHFf8PMWaRdjboROP5/AqslTWCf71agRfEEI+g0JIZdGKoeXMMY13gqLQi9oMQsV818RVlAnt+hDQZg18sLKHcwsFLlctGICj/Q4FUs4UlgSO4szfgHQSjsGN7m35HaAG2VL6gcNH7apCzNWr5eIp+ZEj6xbYyakbhLAq2O/WhqfAwilEMdwZ183zcb4VaDZecmFe3Qy4CA4zNgWWI4/r/4qVmFo4MwDXm19rR4GLSRfwBaRzTzcms2nKGAMg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(396003)(376002)(136003)(39860400002)(366004)(478600001)(26005)(2906002)(6486002)(6512007)(6916009)(4326008)(54906003)(316002)(36756003)(7416002)(8936002)(31686004)(5660300002)(86362001)(66476007)(66556008)(2616005)(66946007)(8676002)(31696002)(83380400001)(186003)(6506007)(38100700002)(53546011)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UHc0alNNakVtVnljQ3htMUlKejN3bkd2bHp4TFh2d3p2NWVrcys3VkJGSThD?=
- =?utf-8?B?c2pzdkg2eE5NYUkzN2VUbk5rRDRYWmMxdDkzek5tTDlZajROTzRRQXlLOC96?=
- =?utf-8?B?Vnl4dVhZUzBxVmRxcVp4OHhaZXZwWGZjckthcVpHOC9yRkdaZGFLc0Qxc05x?=
- =?utf-8?B?aW92bXNKMG5sWWFnWlZ0NzUwSERtZXJtMDBsZGJxK3hrTmFiTW9aTTE5QkxF?=
- =?utf-8?B?WG1tK1l6VWF4N3VDOFRTK3lSaXZ0am1mazN4UGpRdC94bTZqR2lxSEE0OXcv?=
- =?utf-8?B?YnR2MGtFaW9qQTN5N2RsQnA3TlBTSUVhblVNN1grVnE0MVdrN1hLSWFMcGtZ?=
- =?utf-8?B?Y2FOM1UrUXk0cUJkcktiZm9oK3lrZkhlcExndVFPTlUwTVo1TWJZREQrOUh1?=
- =?utf-8?B?OHExWmd1c0dkSEtSN0hQZ2tpNWViNWt2SThZeUJxRmF4bSs3Snl5bUR0bnZj?=
- =?utf-8?B?eGJwOUkvVUNKckd3QkRSNnFOWGtnbkpRWU8ySFZOVjAxdXdIbTF3MGttbVVF?=
- =?utf-8?B?QklnTVdqbU5DdGZiVHRudTdxSjFmbkoxM3NuUk9hZ2hBNTB3VUpLR0dwNFVl?=
- =?utf-8?B?RlVFMk1wWE1PeHJaRkExRkFKYU5mc2RWbVIzTnlJVXY3akFLNEgvYmhQaVFs?=
- =?utf-8?B?WGdNRVdQU3dWOWpSaU5RVUp0cldrR0M3YXVvcGI5VzZ1N3o4aGhZM21Fakc1?=
- =?utf-8?B?UVptRzVtTDJWQkRNM05ObHV5M2lYb0t4M003cWZ5ZEJmaUJ6QU90QTJ3bkJt?=
- =?utf-8?B?VUV6cjhJbGcwVmhQT3RUWUdqdG1ITnBVQ01hL3pQeXpGajNRcVBkSDhVMFYz?=
- =?utf-8?B?bC9qVHpTenRNbElBQnQ5ZzZQcmJZMlQwcVVId0tDUzVEaVpRTkRMS2ZVemhL?=
- =?utf-8?B?bEtqa3BNTExhaDdNbjJqdTFXVElVbkU0V2lBTHArdTFlOW42RGI5WDJtMkxo?=
- =?utf-8?B?V2pjMHRxYTBDQ1dkT0N4czNuVkFwRzhuZ2RtWDBxK0hwTHhrZm1TTGtnNkVQ?=
- =?utf-8?B?dUZNUUxOMnZEVG9NRXkxODNiWVY5UjlyU1owT0RNcElQamlQd3pXQjI2WG9I?=
- =?utf-8?B?elFHT296TjVhQlE0UTJ2Sm0zd2QrSGFobDR2S28zRXZmWW43K2xMUVJNbXVm?=
- =?utf-8?B?MnNJajl6bUhPUjdPNUgvQm9EWHd5WCtCdVF0Z2tId0VvYnVBNWdOVDZnbkw2?=
- =?utf-8?B?RnJqM2pNMUgxMWpMMkp0UHZKSHpZM2xWWXNCVHVCUDVKVHJTSExhR1JZOUpu?=
- =?utf-8?B?MmtaZjVnaTZCK09rbHRlZ1JDUHk5Y3EwRHNCMTJDRkc1RlVxUERoSkFlNTNI?=
- =?utf-8?B?cWxZNFkxbWFGWHFsZVE1UGoybG1VYU54VmpKR1V3TkhCSHlPRVVYU2hnOXdY?=
- =?utf-8?B?Zm51OVZlVkxmV3NsZGo3MkV2MjN0UTZPanRWMmpSblNsYjNUdnpmTnB1ZjhE?=
- =?utf-8?B?UjNJbXdhQTlLaWdHcjAycFBOV3BidFQ4aEVybld5VjNTb1Bwa0hEYTJpTWcx?=
- =?utf-8?B?YzFiMXZuV2FUL29LVHpSenB1TDgzNnNpaU5kT2gyNXNEaS9scmdMSWlPSVNH?=
- =?utf-8?B?MXJsL2xjRU9vRTFDM3JxOXNtQU5OR3VOUVQ5ckRNRXJyWG44K01PblVBcDJm?=
- =?utf-8?B?RGk2N0NVNEZpVTBzNEE2ZWhkaVJZWTQ0UWsxZmV2TG92MiswcDl3R091eFMx?=
- =?utf-8?B?L3c1Y2RrdTA4cDBMM2ZWdExWRlBuOFBrQU42bmNQZWxBemdpenhVRTAycloy?=
- =?utf-8?B?ZHdaUlVwQXg2ZE1LalVUemMvY2JuVERta2hOSnppREpNWmd3S0NIOXZ1NFVB?=
- =?utf-8?B?eG5FV25pM2JIemdUVVRUWlpFelRnZi9kenV3Zlp4d2xoQXV4U0dMNmI5bjBt?=
- =?utf-8?B?YTc3TVJmczMxOW51UWRDS3pxRzRITnZ1YXNGVHZWakZ2cWdZZmViUkRQTGp6?=
- =?utf-8?B?N2JGbE5HN1U1Z0VxZUtzUWc4blhOMVg0YTExUEQ3NlFTa2Y1Szk4OHlKYlFm?=
- =?utf-8?B?QkdlMGdWcDFiQmJjWEVITjZyUTZTRzNUMkY4cndYSjRhaUx2ZUc4ZFJKZ3BZ?=
- =?utf-8?B?cW80ZjhhR3NoNFJ0cnlFdGc2L1dFUnNWNmdDNlVmbDdIcjZJTjExWDZVNnhH?=
- =?utf-8?Q?xVYFQI4Th2eUJwL+a4yAchBV9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eab4e8c7-491b-4681-00e1-08da5a3b568e
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2022 01:53:32.9157
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cRpRq/C5ncU6Bujq9p/oYlvh4YdVNtP34/RLt8FZgaHN/tUWVmRlnRfCrtLbFqxJh09YW6ziP58CBxqy5rbbyg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3076
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+References: <CACGkMEvrDXDN7FH1vKoYCob2rkxUsctE_=g61kzHSZ8tNNr6vA@mail.gmail.com>
+ <20220627053820-mutt-send-email-mst@kernel.org> <CACGkMEvcs+9_SHmO1s3nyzgU7oq7jhU2gircVVR3KDsGDikh5Q@mail.gmail.com>
+ <20220628004614-mutt-send-email-mst@kernel.org> <CACGkMEsC4A+3WejLSOZoH3enXtai=+JyRNbxcpzK4vODYzhaFw@mail.gmail.com>
+ <CACGkMEvu0D0XD7udz0ebVjNM0h5+K9Rjd-5ed=PY_+-aduzG2g@mail.gmail.com>
+ <20220629022223-mutt-send-email-mst@kernel.org> <CACGkMEuwvzkbPUSFueCOjit7pRJ81v3-W3SZD+7jQJN8btEFdg@mail.gmail.com>
+ <20220629030600-mutt-send-email-mst@kernel.org> <CACGkMEvnUj622FyROUftifSB47wytPg0YAdVO7fdRQmCE+WuBg@mail.gmail.com>
+ <20220629044514-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220629044514-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 30 Jun 2022 10:01:16 +0800
+Message-ID: <CACGkMEsW02a1LeiWwUgHfVmDEnC8i49h1L7qHmeoLyJyRS6-zA@mail.gmail.com>
+Subject: Re: [PATCH V3] virtio: disable notification hardening by default
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>,
+        David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/29/22 08:47, Peter Xu wrote:
->> It looks like part of this comment is trying to document a pre-existing
->> concept, which is that faultin_page() only ever sets FAULT_FLAG_KILLABLE
->> if locked != NULL.
-> 
-> I'd say that's not what I wanted to comment.. I wanted to express that
-> INTERRUPTIBLE should rely on KILLABLE, that's also why I put the comment to
-> be after KILLABLE, not before.  IMHO it makes sense already to have
-> "interruptible" only if "killable", no matter what's the pre-requisite for
-> KILLABLE (in this case it's having "locked" being non-null).
+On Wed, Jun 29, 2022 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Jun 29, 2022 at 04:34:36PM +0800, Jason Wang wrote:
+> > On Wed, Jun 29, 2022 at 3:15 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Wed, Jun 29, 2022 at 03:02:21PM +0800, Jason Wang wrote:
+> > > > On Wed, Jun 29, 2022 at 2:31 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > >
+> > > > > On Wed, Jun 29, 2022 at 12:07:11PM +0800, Jason Wang wrote:
+> > > > > > On Tue, Jun 28, 2022 at 2:17 PM Jason Wang <jasowang@redhat.com> wrote:
+> > > > > > >
+> > > > > > > On Tue, Jun 28, 2022 at 1:00 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Tue, Jun 28, 2022 at 11:49:12AM +0800, Jason Wang wrote:
+> > > > > > > > > > Heh. Yea sure. But things work fine for people. What is the chance
+> > > > > > > > > > your review found and fixed all driver bugs?
+> > > > > > > > >
+> > > > > > > > > I don't/can't audit all bugs but the race between open/close against
+> > > > > > > > > ready/reset. It looks to me a good chance to fix them all but if you
+> > > > > > > > > think differently, let me know
+> > > > > > > > >
+> > > > > > > > > > After two attempts
+> > > > > > > > > > I don't feel like hoping audit will fix all bugs.
+> > > > > > > > >
+> > > > > > > > > I've started the auditing and have 15+ patches in the queue. (only
+> > > > > > > > > covers bluetooth, console, pmem, virtio-net and caif). Spotting the
+> > > > > > > > > issue is not hard but the testing, It would take at least the time of
+> > > > > > > > > one release to finalize I guess.
+> > > > > > > >
+> > > > > > > > Absolutely. So I am looking for a way to implement hardening that does
+> > > > > > > > not break existing drivers.
+> > > > > > >
+> > > > > > > I totally agree with you to seek a way without bothering the drivers.
+> > > > > > > Just wonder if this is possbile.
+> > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > The reason config was kind of easy is that config interrupt is rarely
+> > > > > > > > > > > > vital for device function so arbitrarily deferring that does not lead to
+> > > > > > > > > > > > deadlocks - what you are trying to do with VQ interrupts is
+> > > > > > > > > > > > fundamentally different. Things are especially bad if we just drop
+> > > > > > > > > > > > an interrupt but deferring can lead to problems too.
+> > > > > > > > > > >
+> > > > > > > > > > > I'm not sure I see the difference, disable_irq() stuffs also delay the
+> > > > > > > > > > > interrupt processing until enable_irq().
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > Absolutely. I am not at all sure disable_irq fixes all problems.
+> > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > Consider as an example
+> > > > > > > > > > > >     virtio-net: fix race between ndo_open() and virtio_device_ready()
+> > > > > > > > > > > > if you just defer vq interrupts you get deadlocks.
+> > > > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > I don't see a deadlock here, maybe you can show more detail on this?
+> > > > > > > > > >
+> > > > > > > > > > What I mean is this: if we revert the above commit, things still
+> > > > > > > > > > work (out of spec, but still). If we revert and defer interrupts until
+> > > > > > > > > > device ready then ndo_open that triggers before device ready deadlocks.
+> > > > > > > > >
+> > > > > > > > > Ok, I guess you meant on a hypervisor that is strictly written with spec.
+> > > > > > > >
+> > > > > > > > I mean on hypervisor that starts processing queues after getting a kick
+> > > > > > > > even without DRIVER_OK.
+> > > > > > >
+> > > > > > > Oh right.
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > So, thinking about all this, how about a simple per vq flag meaning
+> > > > > > > > > > > > "this vq was kicked since reset"?
+> > > > > > > > > > >
+> > > > > > > > > > > And ignore the notification if vq is not kicked? It sounds like the
+> > > > > > > > > > > callback needs to be synchronized with the kick.
+> > > > > > > > > >
+> > > > > > > > > > Note we only need to synchronize it when it changes, which is
+> > > > > > > > > > only during initialization and reset.
+> > > > > > > > >
+> > > > > > > > > Yes.
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > If driver does not kick then it's not ready to get callbacks, right?
+> > > > > > > > > > > >
+> > > > > > > > > > > > Sounds quite clean, but we need to think through memory ordering
+> > > > > > > > > > > > concerns - I guess it's only when we change the value so
+> > > > > > > > > > > >         if (!vq->kicked) {
+> > > > > > > > > > > >                 vq->kicked = true;
+> > > > > > > > > > > >                 mb();
+> > > > > > > > > > > >         }
+> > > > > > > > > > > >
+> > > > > > > > > > > > will do the trick, right?
+> > > > > > > > > > >
+> > > > > > > > > > > There's no much difference with the existing approach:
+> > > > > > > > > > >
+> > > > > > > > > > > 1) your proposal implicitly makes callbacks ready in virtqueue_kick()
+> > > > > > > > > > > 2) my proposal explicitly makes callbacks ready via virtio_device_ready()
+> > > > > > > > > > >
+> > > > > > > > > > > Both require careful auditing of all the existing drivers to make sure
+> > > > > > > > > > > no kick before DRIVER_OK.
+> > > > > > > > > >
+> > > > > > > > > > Jason, kick before DRIVER_OK is out of spec, sure. But it is unrelated
+> > > > > > > > > > to hardening
+> > > > > > > > >
+> > > > > > > > > Yes but with your proposal, it seems to couple kick with DRIVER_OK somehow.
+> > > > > > > >
+> > > > > > > > I don't see how - my proposal ignores DRIVER_OK issues.
+> > > > > > >
+> > > > > > > Yes, what I meant is, in your proposal, the first kick after rest is a
+> > > > > > > hint that the driver is ok (but actually it could not).
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > > and in absence of config interrupts is generally easily
+> > > > > > > > > > fixed just by sticking virtio_device_ready early in initialization.
+> > > > > > > > >
+> > > > > > > > > So if the kick is done before the subsystem registration, there's
+> > > > > > > > > still a window in the middle (assuming we stick virtio_device_ready()
+> > > > > > > > > early):
+> > > > > > > > >
+> > > > > > > > > virtio_device_ready()
+> > > > > > > > > virtqueue_kick()
+> > > > > > > > > /* the window */
+> > > > > > > > > subsystem_registration()
+> > > > > > > >
+> > > > > > > > Absolutely, however, I do not think we really have many such drivers
+> > > > > > > > since this has been known as a wrong thing to do since the beginning.
+> > > > > > > > Want to try to find any?
+> > > > > > >
+> > > > > > > Yes, let me try and update.
+> > > > > >
+> > > > > > This is basically the device that have an RX queue, so I've found the
+> > > > > > following drivers:
+> > > > > >
+> > > > > > scmi, mac80211_hwsim, vsock, bt, balloon.
+> > > > >
+> > > > > Looked and I don't see it yet. Let's consider
+> > > > > ./net/vmw_vsock/virtio_transport.c for example. Assuming we block
+> > > > > callbacks until the first kick, what is the issue with probe exactly?
+> > > >
+> > > > We need to make sure the callback can survive when it runs before sub
+> > > > system registration.
+> > >
+> > > With my proposal no - only if we also kick before registration.
+> > > So I do not see the issue yet.
+> > >
+> > > Consider ./net/vmw_vsock/virtio_transport.c
+> > >
+> > > kicks: virtio_transport_send_pkt_work,
+> > > virtio_vsock_rx_fill, virtio_vsock_event_fill
+> > >
+> > > which of these triggers before we are ready to
+> > > handle callbacks?
+> >
+> > So:
+> >
+> > virtio_vsock_vqs_init()
+> >     virtio_device_ready()
+> >     virtio_vsock_rx_fill() /* kick there */
+> > rcu_assign_pointer(the_virtio_vsock, vsock)
+> >
+> > It means at least virtio_vsock_rx_done()/virtio_vsock_workqueue needs
+> > to survive. I don't say it has a bug but we do need to audit the code
+> > in this case. The implication is: the virtqueue callback should be
+> > written with no assumption that the driver has registered in the
+> > subsystem. We don't or can't assume all drivers are written in this
+> > way.
+>
+>
+> I thought you said you audited code and found bugs.
+>
+> My claim is that simply because qemu starts processing
+> packets immediately upon kick, if bugs like this
+> existed we would have noticed by now.
+
+This is true for a well behaved hypervisor. But what we want to deal
+with is the buggy/malicious hypervisors.
+
+>
+> In this case the_virtio_vsock is used for xmit things,
+> callbacks do not seem to use it at all.
+
+So the hypervisor can trigger the notification just after the kick and
+the work function seems to be safe.
+
+One another example for this is in virtcons_probe():
+
+        spin_lock_init(&portdev->ports_lock);
+        INIT_LIST_HEAD(&portdev->ports);
+        INIT_LIST_HEAD(&portdev->list);
+
+        virtio_device_ready(portdev->vdev);
+
+        INIT_WORK(&portdev->config_work, &config_work_handler);
+        INIT_WORK(&portdev->control_work, &control_work_handler);
+
+in control_intr() we had:
+
+static void control_intr(struct virtqueue *vq)
+{
+        struct ports_device *portdev;
+
+        portdev = vq->vdev->priv;
+        schedule_work(&portdev->control_work);
+}
+
+So we might crash if the notification is raised just after
+virtio_device_ready().
+
+This is not an exact example of when a callback is not ready after
+kick, but it demonstrates that the callback could have assumed that
+all setup has been done when it is called.
+
+Thanks
+
+>
+> > >
+> > >
+> > > > >
+> > > > >
+> > > > > > >
+> > > > > > > >I couldn't ... except maybe bluetooth
+> > > > > > > > but that's just maintainer nacking fixes saying he'll fix it
+> > > > > > > > his way ...
+> > > > > > > >
+> > > > > > > > > And during remove(), we get another window:
+> > > > > > > > >
+> > > > > > > > > subsysrem_unregistration()
+> > > > > > > > > /* the window */
+> > > > > > > > > virtio_device_reset()
+> > > > > > > >
+> > > > > > > > Same here.
+> > > > > >
+> > > > > > Basically for the drivers that set driver_ok before registration,
+> > > > >
+> > > > > I don't see what does driver_ok have to do with it.
+> > > >
+> > > > I meant for those driver, in probe they do()
+> > > >
+> > > > virtio_device_ready()
+> > > > subsystem_register()
+> > > >
+> > > > In remove() they do
+> > > >
+> > > > subsystem_unregister()
+> > > > virtio_device_reset()
+> > > >
+> > > > for symmetry
+> > >
+> > > Let's leave remove alone for now. I am close to 100% sure we have *lots*
+> > > of issues around it, but while probe is unavoidable remove can be
+> > > avoided by blocking hotplug.
+> >
+> > Unbind can trigger this path as well.
+> >
+> > >
+> > >
+> > > > >
+> > > > > > so
+> > > > > > we have a lot:
+> > > > > >
+> > > > > > blk, net, mac80211_hwsim, scsi, vsock, bt, crypto, gpio, gpu, i2c,
+> > > > > > iommu, caif, pmem, input, mem
+> > > > > >
+> > > > > > So I think there's no easy way to harden the notification without
+> > > > > > auditing the driver one by one (especially considering the driver may
+> > > > > > use bh or workqueue). The problem is the notification hardening
+> > > > > > depends on a correct or race-free probe/remove. So we need to fix the
+> > > > > > issues in probe/remove then do the hardening on the notification.
+> > > > > >
+> > > > > > Thanks
+> > > > >
+> > > > > So if drivers kick but are not ready to get callbacks then let's fix
+> > > > > that first of all, these are racy with existing qemu even ignoring
+> > > > > spec compliance.
+> > > >
+> > > > Yes, (the patches I've posted so far exist even with a well-behaved device).
+> > > >
+> > > > Thanks
+> > >
+> > > patches you posted deal with DRIVER_OK spec compliance.
+> > > I do not see patches for kicks before callbacks are ready to run.
+> >
+> > Yes.
+> >
+> > Thanks
+> >
+> > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > MST
+> > > > >
+> > >
 >
 
-OK, I think I finally understand both the intention of the comment,
-and (thanks to your notes, below) the interaction between *locked and
-_RETRY, _KILLABLE, and _INTERRUPTIBLE. Really appreciate your leading
-me by the nose through that. The pre-existing code is abusing *locked
-a bit, by treating it as a flag when really it is a side effect of
-flags, but at least now that's clear to me.
-
-Anyway...this leads to finally getting into the comment, which I now
-think is not quite what we want: there is no need for a hierarchy of
-"_INTERRUPTIBLE should depend upon _KILLABLE". That is: even though an
-application allows a fatal signal to get through, it's not clear to me
-that that implies that non-fatal signal handling should be prevented.
-
-The code is only vaguely enforcing such a thing, because it just so
-happens that both cases require the same basic prerequisites. So the
-code looks good, but I don't see a need to claim a hierarchy in the
-comments.
-
-So I'd either delete the comment entirely, or go with something that is
-doesn't try to talk about hierarchy nor locked/retry either. Does this
-look reasonable to you:
-
-
-	/*
-	 * FAULT_FLAG_INTERRUPTIBLE is opt-in: kernel callers must set
-	 * FOLL_INTERRUPTIBLE. That's because some callers may not be
-	 * prepared to handle early exits caused by non-fatal signals.
-	 */
-
-?
-
->> The problem I am (personally) having is that I don't yet understand why
->> or how those are connected: what is it about having locked non-NULL that
->> means the process is killable? (Can you explain why that is?)
-> 
-> Firstly RETRY_KILLABLE relies on ALLOW_RETRY, because if we don't allow
-> retry at all it means we'll never wait in handle_mm_fault() anyway, then no
-> need to worry on being interrupted by any kind of signal (fatal or not).
-> 
-> Then if we allow retry, we need some way to know "whether mmap_sem is
-> released or not" during the process for the caller (because the caller
-> cannot see VM_FAULT_RETRY).  That's why we added "locked" parameter, so
-> that we can set *locked=false to tell the caller we have released mmap_sem.
-> 
-> I think that's why we have "locked" defined as "we allow this page fault
-> request to retry and wait, during wait we can always allow fatal signals".
-> I think that's defined throughout the gup call interfaces too, and
-> faultin_page() is the last step to talk to handle_mm_fault().
-> 
-> To make this whole picture complete, NOWAIT is another thing that relies on
-> ALLOW_RETRY but just to tell "oh please never release the mmap_sem at all".
-> For example, when we want to make sure no vma will be released after
-> faultin_page() returned.
-> 
-
-Again, thanks for taking the time to explain that for me. :)
-
->>
->> If that were clear, I think I could suggest a good comment wording.
-> 
-> IMHO it's a little bit weird to explain "locked" here, especially after
-> KILLABLE is set, that's why I didn't try to mention "locked" in my 2nd
-> attempt.  There are some comments for "locked" above the definition of
-> faultin_page(), I think that'll be a nicer place to enrich explanations for
-> "locked", and it seems even more suitable as a separate patch?
-> 
-
-Totally agreed. I didn't intend to ask for that kind of documentation
-here.
-
-For that, I'm thinking a combination of cleaning up *locked a little
-bit, plus maybe some higher level notes like what you wrote above, added
-to either pin_user_pages.rst or a new get_user_pages.rst or some .rst
-anyway. Definitely a separately thing.
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
