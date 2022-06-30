@@ -2,77 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1B77561A34
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 14:21:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A66E5561A4D
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 14:27:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233647AbiF3MU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 08:20:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60798 "EHLO
+        id S234529AbiF3M1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 08:27:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232473AbiF3MU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 08:20:56 -0400
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D0F420F4D
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:20:55 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id r8-20020a4abf08000000b00425b1256454so1811344oop.13
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:20:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JUW4jEINb79G6fZ0psu80KzN+ByrVZtzYVyL3ZG8d6c=;
-        b=Fuqkt29l4izjw3eglRszJHoi91Vvjag/dTICHrTdpAVIpjz/jBKpFtnqUgrbsd87qt
-         2uLLVSaDmUcSlPFrIdn9w+dQdI7ScgpWwIY8pLJq8DFrfqXoExYxe5UrHWnjIEhEMNNk
-         7i03Et79pZitXulV8F5Tpyi4qAuaj2RFknak+BQ8X9mwVB/mGLiTc/J+qulYvIhtUpu/
-         x+34rTHO5hpltf3dyDzzvi4liRJu2dCipyshYx5HUGIEELctPc+pYPgMfMIDoB8AgiJK
-         +MUdlNlpHQ3x7td8GjJHPcHpwPnaj5m+OuWA18862gBHizX+oHX47HZpUfxUzyzB5nvH
-         ZWCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JUW4jEINb79G6fZ0psu80KzN+ByrVZtzYVyL3ZG8d6c=;
-        b=FkJaB5+M5h4T9K3PLYGScGuFasgLaISK28sBjX2rM2QCR2FttvxdATLy4OMDNZUiQ8
-         ntCGiDFIam3ZVjJmvLYMQZJQUJOwXAnYU474MqAE1hI7Yhl91lG9V74fBTy+KV3FjLUB
-         UlK2oP6xzQe8M0nR48ixfLN0iLCL/LsQQeVW4WkN6sJSnecNRgZHVOqUA7lFhsXR0Wdd
-         yREDxZdmxorMdH9yxhTqkmcn8sbufzcV/XJFcsiAVgH2GWWLtCoqjH4mNKV6ZTSuCrHk
-         BbWT/jljh+dyn30g0ZABLRKL2zJ3ZRvOb9UlTXRtxc++HkzFE0USYQeqIGq1IlQ4yO4X
-         xS6g==
-X-Gm-Message-State: AJIora+PDr+qGucCZH2TkGBH2q9TkbQhWMz/9Y+b4NtV71we+Efrl0Na
-        IbID/2PqBTDZd7rJ5sgKvK4xR30C/OXRbHi8ZDOj/w==
-X-Google-Smtp-Source: AGRyM1ugYwGf8QObcJFeoodBaF0ml7JBvXxTHg+CSp32AI+BET/209D3TiHBTGz48E8bksakxkhoF2Jp9f0XG6nLU24=
-X-Received: by 2002:a4a:e82b:0:b0:330:cee9:4a8a with SMTP id
- d11-20020a4ae82b000000b00330cee94a8amr3645347ood.31.1656591654007; Thu, 30
- Jun 2022 05:20:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220614204730.3359543-1-seanjc@google.com> <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
- <CALMp9eQQROfYW7tNPaYCL5umjDr5ntsXuQ3BmorD8BWQiUGjdw@mail.gmail.com> <e04341912abfa1590edd4ee7c33efde6e227b93f.camel@redhat.com>
-In-Reply-To: <e04341912abfa1590edd4ee7c33efde6e227b93f.camel@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 30 Jun 2022 05:20:43 -0700
-Message-ID: <CALMp9eQ3EvQJFfyg2VW3Bb3-W9XGWnhtaS9zLPT4354yhroC2g@mail.gmail.com>
-Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
+        with ESMTP id S234428AbiF3M13 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 08:27:29 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985472E093;
+        Thu, 30 Jun 2022 05:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656592048; x=1688128048;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=xglr6z6rG58iyrwjggW9uB/gwlKhg1Fwzpc6u5yhoCk=;
+  b=l0s3yoit+CIsC+f0sf85B/qbFjmPodTdWC3Pv9JoHk9KqZxIuGY2eNA/
+   bnEI7f2NUhzVH43oEpiaAv1C/oht1jJoqEDk00fDS72wsIclyrbEMWvap
+   PRszqIh+d3f5HeaRm9dnOd8qrA8ymol9908dp8hdXTbRG0nR63ZJZzbiN
+   0g0lhTL5Chi7VIA7Hxvd27olmIR5zPHW0/aYNdb5gEodajGgDTr4Idc7O
+   vFWYnXkKw/TQu+aNZYMcs81s7bhIR6I+kUi3LX0wGxHatrBnfdeiVxLcv
+   SYxFZ3zjyjzq+bAjet0tdNw2OzL6hr1M+LZYg1TCq0PsOsPA8p+hSmXGS
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="265367605"
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="265367605"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 05:27:28 -0700
+X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
+   d="scan'208";a="565835847"
+Received: from zhihuich-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.49.124])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 05:27:26 -0700
+Message-ID: <8227079db11c0473f1c368b305e40a94a73fc109.camel@intel.com>
+Subject: Re: [PATCH v7 039/102] KVM: x86/mmu: Allow per-VM override of the
+ TDP max page level
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Fri, 01 Jul 2022 00:27:24 +1200
+In-Reply-To: <e686602e7b57ed0c3600c663d03a9bf76190db0c.1656366338.git.isaku.yamahata@intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <e686602e7b57ed0c3600c663d03a9bf76190db0c.1656366338.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+MIME-Version: 1.0
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 1:24 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>=20
+> TODO: This is a transient workaround patch until the large page support f=
+or
+> TDX is implemented.  Support large page for TDX and remove this patch.
 
-> Neither can I access this document sadly :(
-Try this one: https://docs.google.com/spreadsheets/d/1u6yjgj0Fshd31YKFJ524mwle7BhxB3yuEy9fhdSoh-0
+I don't understand.  How does this patch have anything to do with what you =
+are
+talking about here?
+
+If you want to remove this patch later, then why not just explain the reaso=
+n to
+remove when you actually have that patch?
+
+>=20
+> At this point, large page for TDX isn't supported, and need to allow gues=
+t
+> TD to work only with 4K pages.  On the other hand, conventional VMX VMs
+> should continue to work with large page.  Allow per-VM override of the TD=
+P
+> max page level.
+
+At which point/previous patch have you made/declared "large page for TDX is=
+n't
+supported"?
+
+If you want to declare you don't want to support large page for TDX, IMHO j=
+ust
+declare it here, for instance:
+
+"For simplicity, only support 4K page for TD guest."
+ =20
+>=20
+> In the existing x86 KVM MMU code, there is already max_level member in
+> struct kvm_page_fault with KVM_MAX_HUGEPAGE_LEVEL initial value.  The KVM
+> page fault handler denies page size larger than max_level.
+>=20
+> Add per-VM member to indicate the allowed maximum page size with
+> KVM_MAX_HUGEPAGE_LEVEL as default value and initialize max_level in struc=
+t
+> kvm_page_fault with it.  For the guest TD, the set per-VM value for allow=
+s
+> maximum page size to 4K page size.  Then only allowed page size is 4K.  I=
+t
+> means large page is disabled.
+
+To me it's overcomplicated.  You just need simple sentences for such simple
+infrastructural patch.  For instance:
+
+"TDX requires special handling to support large private page.  For simplici=
+ty,
+only support 4K page for TD guest for now.  Add per-VM maximum page level
+support to support different maximum page sizes for TD guest and convention=
+al
+VMX guest."
+
+Just for your reference.
+
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 1 +
+>  arch/x86/kvm/mmu/mmu.c          | 1 +
+>  arch/x86/kvm/mmu/mmu_internal.h | 2 +-
+>  3 files changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 39215daa8576..f4d4ed41641b 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1146,6 +1146,7 @@ struct kvm_arch {
+>  	unsigned long n_requested_mmu_pages;
+>  	unsigned long n_max_mmu_pages;
+>  	unsigned int indirect_shadow_pages;
+> +	int tdp_max_page_level;
+>  	u8 mmu_valid_gen;
+>  	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
+>  	struct list_head active_mmu_pages;
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e0aa5ad3931d..80d7c7709af3 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5878,6 +5878,7 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+>  	node->track_write =3D kvm_mmu_pte_write;
+>  	node->track_flush_slot =3D kvm_mmu_invalidate_zap_pages_in_memslot;
+>  	kvm_page_track_register_notifier(kvm, node);
+> +	kvm->arch.tdp_max_page_level =3D KVM_MAX_HUGEPAGE_LEVEL;
+>  	kvm_mmu_set_mmio_spte_mask(kvm, shadow_default_mmio_mask,
+>  				   shadow_default_mmio_mask,
+>  				   ACC_WRITE_MASK | ACC_USER_MASK);
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
+nal.h
+> index bd2a26897b97..44a04fad4bed 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -244,7 +244,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vc=
+pu *vcpu, gpa_t cr2_or_gpa,
+>  		.is_tdp =3D likely(vcpu->arch.mmu->page_fault =3D=3D kvm_tdp_page_faul=
+t),
+>  		.nx_huge_page_workaround_enabled =3D is_nx_huge_page_enabled(),
+> =20
+> -		.max_level =3D KVM_MAX_HUGEPAGE_LEVEL,
+> +		.max_level =3D vcpu->kvm->arch.tdp_max_page_level,
+>  		.req_level =3D PG_LEVEL_4K,
+>  		.goal_level =3D PG_LEVEL_4K,
+>  	};
+
