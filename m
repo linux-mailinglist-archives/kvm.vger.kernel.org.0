@@ -2,173 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A66E5561A4D
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 14:27:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E61AB561A52
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 14:28:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234529AbiF3M1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 08:27:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37212 "EHLO
+        id S234233AbiF3M2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 08:28:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234428AbiF3M13 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 08:27:29 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985472E093;
-        Thu, 30 Jun 2022 05:27:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656592048; x=1688128048;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=xglr6z6rG58iyrwjggW9uB/gwlKhg1Fwzpc6u5yhoCk=;
-  b=l0s3yoit+CIsC+f0sf85B/qbFjmPodTdWC3Pv9JoHk9KqZxIuGY2eNA/
-   bnEI7f2NUhzVH43oEpiaAv1C/oht1jJoqEDk00fDS72wsIclyrbEMWvap
-   PRszqIh+d3f5HeaRm9dnOd8qrA8ymol9908dp8hdXTbRG0nR63ZJZzbiN
-   0g0lhTL5Chi7VIA7Hxvd27olmIR5zPHW0/aYNdb5gEodajGgDTr4Idc7O
-   vFWYnXkKw/TQu+aNZYMcs81s7bhIR6I+kUi3LX0wGxHatrBnfdeiVxLcv
-   SYxFZ3zjyjzq+bAjet0tdNw2OzL6hr1M+LZYg1TCq0PsOsPA8p+hSmXGS
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="265367605"
-X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
-   d="scan'208";a="265367605"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 05:27:28 -0700
-X-IronPort-AV: E=Sophos;i="5.92,234,1650956400"; 
-   d="scan'208";a="565835847"
-Received: from zhihuich-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.49.124])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 05:27:26 -0700
-Message-ID: <8227079db11c0473f1c368b305e40a94a73fc109.camel@intel.com>
-Subject: Re: [PATCH v7 039/102] KVM: x86/mmu: Allow per-VM override of the
- TDP max page level
-From:   Kai Huang <kai.huang@intel.com>
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Date:   Fri, 01 Jul 2022 00:27:24 +1200
-In-Reply-To: <e686602e7b57ed0c3600c663d03a9bf76190db0c.1656366338.git.isaku.yamahata@intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
-         <e686602e7b57ed0c3600c663d03a9bf76190db0c.1656366338.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+        with ESMTP id S234158AbiF3M2J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 08:28:09 -0400
+Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D2D2E093
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:28:04 -0700 (PDT)
+Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-1048b8a38bbso25515481fac.12
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 05:28:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Fars46ihWldzKhsiNp4tOcZid3mM1cwp7AwPJo3kkUU=;
+        b=bTOtzm38zOtR3lMJW1aUnOeqOXAUTvOMcGRyLA35X+GYu3K7EZz4uGRDNM2vzbbqjh
+         L7JLqK8qBPUQeSkSuoTYml3Gh8QEP6uFYZduWKa9pLcI7C5poyh5Yh7yoA/PMkxN2Uj9
+         ioPX/n+0mjFoTzx7Q4v8Q2ApT8aBTBhAJ1mv8bNDH8O2G5H7aHRNvgJEiJqZb0XWexM2
+         /7BLF+h9ajFd85J0ib+Ji8Tf/NF4utGZzBfrXV/tViCcEI2YY980y0HJFYgJrgnYRIlj
+         Y6gY7n/JhxOtE3rhYHqU/joag5k2eFjwUXYfz9R7d7LpOVjy3XUCSuqCue7/n5RjaSYc
+         RRXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Fars46ihWldzKhsiNp4tOcZid3mM1cwp7AwPJo3kkUU=;
+        b=eUnMO9SI2sl/gaN+GYmszCiVHIweAsq0ABDHrmTWwMIv2BGOGqkyeYyiKS+4v3Erx8
+         mS5Kns7w8LwHd54L/2fNVOtF12qWniSXG0QNAFr5OfndV7nxKisCOlehmWP9+Zkd9jmR
+         1Cw6TCKvgq/6rtH1ZcK+ueTbOqvereBYq10oZ2tcUYwFTXu6W5m9VbyTuuhiPMoDkPFt
+         IS2yLb1myVVGIKmSl/i37qWE7Aa0cQQBFUx9VNLu83mvAfUZkWUCSs6F+7B83r3JUDiT
+         5QkY1lox8d/ZtF2xASB089Qt3JYTQituJ8+c3c71Q2revI9fWZDnyzlCiWijtllAU3gB
+         yeaA==
+X-Gm-Message-State: AJIora/nOFns4xUXL6w0bmLG/V0xiEEXtEt7YvMMbiYu2OoQajejP/aY
+        1bPDdvUG7aqDGXwowJxEJGT7///wMw8enIH3otdQXg==
+X-Google-Smtp-Source: AGRyM1v1MxDC1t3LTB6jb9AsKX5TiYcjEhwXDUUunBTCUOP5R8BGTgMAFtLCPbF2ta6bXigG8/gfBLKUJSoOFCozPIU=
+X-Received: by 2002:a05:6870:c596:b0:101:6409:ae62 with SMTP id
+ ba22-20020a056870c59600b001016409ae62mr6252583oab.112.1656592083389; Thu, 30
+ Jun 2022 05:28:03 -0700 (PDT)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-29-vkuznets@redhat.com>
+ <CALMp9eRCbgYVGtAwpDWhytQSjeGeAOuqKZXVg3RpV92uKV5u0A@mail.gmail.com> <87tu82siuw.fsf@redhat.com>
+In-Reply-To: <87tu82siuw.fsf@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 30 Jun 2022 05:27:52 -0700
+Message-ID: <CALMp9eQ+L1HPXcw1mysx3tYeN-=mGrZCxjZWDcJwtdfZZ6z8Dg@mail.gmail.com>
+Subject: Re: [PATCH v2 28/28] KVM: nVMX: Use cached host MSR_IA32_VMX_MISC
+ value for setting up nested MSR
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->=20
-> TODO: This is a transient workaround patch until the large page support f=
-or
-> TDX is implemented.  Support large page for TDX and remove this patch.
+On Thu, Jun 30, 2022 at 12:36 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Jim Mattson <jmattson@google.com> writes:
+>
+> > On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >>
+> >> vmcs_config has cased host MSR_IA32_VMX_MISC value, use it for setting
+> >> up nested MSR_IA32_VMX_MISC in nested_vmx_setup_ctls_msrs() and avoid the
+> >> redundant rdmsr().
+> >>
+> >> No (real) functional change intended.
+> >
+> > Just imaginary functional change? :-)
+> >
+>
+> Well, yea) The assumption here is that MSR_IA32_VMX_MISC's value doesn't
+> change underneath KVM, caching doesn't change anything then. It is, of
+> course, possible that when KVM runs as a nested hypervisor on top of
+> something else, it will observe different values. I truly hope this is
+> purely imaginary :-)
 
-I don't understand.  How does this patch have anything to do with what you =
-are
-talking about here?
-
-If you want to remove this patch later, then why not just explain the reaso=
-n to
-remove when you actually have that patch?
-
->=20
-> At this point, large page for TDX isn't supported, and need to allow gues=
-t
-> TD to work only with 4K pages.  On the other hand, conventional VMX VMs
-> should continue to work with large page.  Allow per-VM override of the TD=
-P
-> max page level.
-
-At which point/previous patch have you made/declared "large page for TDX is=
-n't
-supported"?
-
-If you want to declare you don't want to support large page for TDX, IMHO j=
-ust
-declare it here, for instance:
-
-"For simplicity, only support 4K page for TD guest."
- =20
->=20
-> In the existing x86 KVM MMU code, there is already max_level member in
-> struct kvm_page_fault with KVM_MAX_HUGEPAGE_LEVEL initial value.  The KVM
-> page fault handler denies page size larger than max_level.
->=20
-> Add per-VM member to indicate the allowed maximum page size with
-> KVM_MAX_HUGEPAGE_LEVEL as default value and initialize max_level in struc=
-t
-> kvm_page_fault with it.  For the guest TD, the set per-VM value for allow=
-s
-> maximum page size to 4K page size.  Then only allowed page size is 4K.  I=
-t
-> means large page is disabled.
-
-To me it's overcomplicated.  You just need simple sentences for such simple
-infrastructural patch.  For instance:
-
-"TDX requires special handling to support large private page.  For simplici=
-ty,
-only support 4K page for TD guest for now.  Add per-VM maximum page level
-support to support different maximum page sizes for TD guest and convention=
-al
-VMX guest."
-
-Just for your reference.
-
->=20
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 +
->  arch/x86/kvm/mmu/mmu.c          | 1 +
->  arch/x86/kvm/mmu/mmu_internal.h | 2 +-
->  3 files changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 39215daa8576..f4d4ed41641b 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1146,6 +1146,7 @@ struct kvm_arch {
->  	unsigned long n_requested_mmu_pages;
->  	unsigned long n_max_mmu_pages;
->  	unsigned int indirect_shadow_pages;
-> +	int tdp_max_page_level;
->  	u8 mmu_valid_gen;
->  	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
->  	struct list_head active_mmu_pages;
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e0aa5ad3931d..80d7c7709af3 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5878,6 +5878,7 @@ int kvm_mmu_init_vm(struct kvm *kvm)
->  	node->track_write =3D kvm_mmu_pte_write;
->  	node->track_flush_slot =3D kvm_mmu_invalidate_zap_pages_in_memslot;
->  	kvm_page_track_register_notifier(kvm, node);
-> +	kvm->arch.tdp_max_page_level =3D KVM_MAX_HUGEPAGE_LEVEL;
->  	kvm_mmu_set_mmio_spte_mask(kvm, shadow_default_mmio_mask,
->  				   shadow_default_mmio_mask,
->  				   ACC_WRITE_MASK | ACC_USER_MASK);
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
-nal.h
-> index bd2a26897b97..44a04fad4bed 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -244,7 +244,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vc=
-pu *vcpu, gpa_t cr2_or_gpa,
->  		.is_tdp =3D likely(vcpu->arch.mmu->page_fault =3D=3D kvm_tdp_page_faul=
-t),
->  		.nx_huge_page_workaround_enabled =3D is_nx_huge_page_enabled(),
-> =20
-> -		.max_level =3D KVM_MAX_HUGEPAGE_LEVEL,
-> +		.max_level =3D vcpu->kvm->arch.tdp_max_page_level,
->  		.req_level =3D PG_LEVEL_4K,
->  		.goal_level =3D PG_LEVEL_4K,
->  	};
-
+It is also theoretically possible that a late-loadable microcode patch
+could change the value of the MSR, but Intel wouldn't do that to us,
+would they?
