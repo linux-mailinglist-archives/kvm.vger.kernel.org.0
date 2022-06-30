@@ -2,68 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D7C856122D
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 08:00:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A73BB561289
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 08:35:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232690AbiF3GAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 02:00:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46800 "EHLO
+        id S232106AbiF3Gf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 02:35:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232636AbiF3GAx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 02:00:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B3F8FB7DF
-        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 23:00:52 -0700 (PDT)
+        with ESMTP id S232568AbiF3Gf4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 02:35:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 585442DA93
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 23:35:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656568851;
+        s=mimecast20190719; t=1656570954;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=C6sLvcSkC4sYai7lQnjjjc7faknX9mP9HryqZU9+9oc=;
-        b=QU8a0PuHImUMRDTsLlSQDhKNOLxAKe9aKPQ3FhGHYsPx9wcfOFqEjhn2t7suIoTX7j7JNB
-        soHGtIc9rj/c0bViNtA2oqLmIeaQvAns8ZClMtkDlvr6w3XsjTYEjEt2Va9QWtxQPb6Qxj
-        HiiUXk8WHittjcHgbgZ7cklh93jW1a0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=njLH7GFfaOXROEX4o3ayXFUqakNk2re9lthQMqB92Q8=;
+        b=Hg4d5uCoaHu/KWLe/t2tRKmke+XtMjLRuo3ZSN5ELsXsCcHU1CQ54wTJ2SZ5FemOcDnqkW
+        zkxO2R4NcLiPEZARASd12RV6c1ghcc3X7nPIO55K/WPetlUY7owGzPjeC71BWr3xFfQTIY
+        oi3BG3HiJSi4a5aCh/SPFribXXVhCzc=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-GCNN6YYLOfyDvhtlwV6bDA-1; Thu, 30 Jun 2022 02:00:46 -0400
-X-MC-Unique: GCNN6YYLOfyDvhtlwV6bDA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5FF1B101A588;
-        Thu, 30 Jun 2022 06:00:45 +0000 (UTC)
-Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C389141510C;
-        Thu, 30 Jun 2022 06:00:41 +0000 (UTC)
-Message-ID: <42da1631c8cdd282e5d9cfd0698b6df7deed2daf.camel@redhat.com>
-Subject: Re: [PATCH v2 11/11] KVM: x86: emulator/smm: preserve interrupt
- shadow in SMRAM
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        x86@kernel.org, Kees Cook <keescook@chromium.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Date:   Thu, 30 Jun 2022 09:00:40 +0300
-In-Reply-To: <CALMp9eSe5jtvmOPWLYCcrMmqyVBeBkg90RwtR4bwxay99NAF3g@mail.gmail.com>
-References: <20220621150902.46126-1-mlevitsk@redhat.com>
-         <20220621150902.46126-12-mlevitsk@redhat.com>
-         <CALMp9eSe5jtvmOPWLYCcrMmqyVBeBkg90RwtR4bwxay99NAF3g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-161-gZHuq_Q7MeW9umwwyPJcTQ-1; Thu, 30 Jun 2022 02:35:52 -0400
+X-MC-Unique: gZHuq_Q7MeW9umwwyPJcTQ-1
+Received: by mail-lj1-f200.google.com with SMTP id y8-20020a2eb008000000b0025bf6ec0c6cso171484ljk.20
+        for <kvm@vger.kernel.org>; Wed, 29 Jun 2022 23:35:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=njLH7GFfaOXROEX4o3ayXFUqakNk2re9lthQMqB92Q8=;
+        b=JVe9EWIaTaDcLa25Ivbm38wt/J/CHq1PMjOt2F1ONTpImD3nw/IZRVp0Q7mK3wv2IF
+         aO5/4OhTBh60OwNbMwHD30ULZCj2KOwf6w54Tvp9swU2/B/gsgtsExAnlv1Sfijjvfi8
+         rFbpREQC1giYvShw6dkQH7WewAEtL5iEyCDh63FZeFjsKxUIvRdyd6zx+DjRPF7Vj/mp
+         VLLAKOnfgViI00dxQNHNeb0QQjQv2RmO/a+uLOOQ+r9I5a1R15NXS7262fN+QAu2Posb
+         GK6R6DbC34mX7w8RkxfRiXuhZBAAVnFs17Bv/CDiXGL2BSwYaYx1Q6LzaQu0YoWifuGe
+         LP3Q==
+X-Gm-Message-State: AJIora+gCjcB/dTmo5FaHx3Cg5PDYhb1B6Fc2ePFsEkiYLJ/GMwuX89V
+        mVMQShKp6GAmfQNZHIu+gSvw7sj+Ur545SHupUO8kD0GD60w09BX03g0sObydkk6kxkmv2Qerw8
+        y/guciCVFS85PGHpxZKOe7LYwpnvl
+X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id bp13-20020a056512158d00b0047f718c28b5mr4745091lfb.397.1656570950074;
+        Wed, 29 Jun 2022 23:35:50 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tJKVtY+Zl0/40XEr/wn6beDS0TB6Ve6wa1Oo7+BpbGVCUvzB09kLNntuaMrZWqNzwTBjf08mKnZiCH+Ir+mBo=
+X-Received: by 2002:a05:6512:158d:b0:47f:718c:28b5 with SMTP id
+ bp13-20020a056512158d00b0047f718c28b5mr4745069lfb.397.1656570949818; Wed, 29
+ Jun 2022 23:35:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+References: <20220629065656.54420-1-xuanzhuo@linux.alibaba.com> <20220629065656.54420-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20220629065656.54420-2-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 30 Jun 2022 14:35:38 +0800
+Message-ID: <CACGkMEuWK5i4pyvzN306v2ijstFQQbuspNCcNRJrw0kskvcozg@mail.gmail.com>
+Subject: Re: [PATCH v11 01/40] virtio: add helper virtqueue_get_vring_max_size()
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc:     virtualization <virtualization@lists.linux-foundation.org>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev <netdev@vger.kernel.org>,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm <kvm@vger.kernel.org>,
+        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+        kangjie.xu@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -72,60 +102,188 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-06-29 at 09:31 -0700, Jim Mattson wrote:
-> On Tue, Jun 21, 2022 at 8:09 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> > When #SMI is asserted, the CPU can be in interrupt shadow
-> > due to sti or mov ss.
-> > 
-> > It is not mandatory in  Intel/AMD prm to have the #SMI
-> > blocked during the shadow, and on top of
-> > that, since neither SVM nor VMX has true support for SMI
-> > window, waiting for one instruction would mean single stepping
-> > the guest.
-> > 
-> > Instead, allow #SMI in this case, but both reset the interrupt
-> > window and stash its value in SMRAM to restore it on exit
-> > from SMM.
-> > 
-> > This fixes rare failures seen mostly on windows guests on VMX,
-> > when #SMI falls on the sti instruction which mainfest in
-> > VM entry failure due to EFLAGS.IF not being set, but STI interrupt
-> > window still being set in the VMCS.
-> 
-> I think you're just making stuff up! See Note #5 at
-> https://sandpile.org/x86/inter.htm.
-> 
-> Can you reference the vendors' documentation that supports this change?
-> 
+On Wed, Jun 29, 2022 at 2:57 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>
+> Record the maximum queue num supported by the device.
+>
+> virtio-net can display the maximum (supported by hardware) ring size in
+> ethtool -g eth0.
+>
+> When the subsequent patch implements vring reset, it can judge whether
+> the ring size passed by the driver is legal based on this.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  arch/um/drivers/virtio_uml.c             |  1 +
+>  drivers/platform/mellanox/mlxbf-tmfifo.c |  2 ++
+>  drivers/remoteproc/remoteproc_virtio.c   |  2 ++
+>  drivers/s390/virtio/virtio_ccw.c         |  3 +++
+>  drivers/virtio/virtio_mmio.c             |  2 ++
+>  drivers/virtio/virtio_pci_legacy.c       |  2 ++
+>  drivers/virtio/virtio_pci_modern.c       |  2 ++
+>  drivers/virtio/virtio_ring.c             | 14 ++++++++++++++
+>  drivers/virtio/virtio_vdpa.c             |  2 ++
+>  include/linux/virtio.h                   |  2 ++
+>  10 files changed, 32 insertions(+)
+>
+> diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> index 82ff3785bf69..e719af8bdf56 100644
+> --- a/arch/um/drivers/virtio_uml.c
+> +++ b/arch/um/drivers/virtio_uml.c
+> @@ -958,6 +958,7 @@ static struct virtqueue *vu_setup_vq(struct virtio_device *vdev,
+>                 goto error_create;
+>         }
+>         vq->priv = info;
+> +       vq->num_max = num;
+>         num = virtqueue_get_vring_size(vq);
+>
+>         if (vu_dev->protocol_features &
+> diff --git a/drivers/platform/mellanox/mlxbf-tmfifo.c b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> index 38800e86ed8a..1ae3c56b66b0 100644
+> --- a/drivers/platform/mellanox/mlxbf-tmfifo.c
+> +++ b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> @@ -959,6 +959,8 @@ static int mlxbf_tmfifo_virtio_find_vqs(struct virtio_device *vdev,
+>                         goto error;
+>                 }
+>
+> +               vq->num_max = vring->num;
+> +
+>                 vqs[i] = vq;
+>                 vring->vq = vq;
+>                 vq->priv = vring;
+> diff --git a/drivers/remoteproc/remoteproc_virtio.c b/drivers/remoteproc/remoteproc_virtio.c
+> index d43d74733f0a..0f7706e23eb9 100644
+> --- a/drivers/remoteproc/remoteproc_virtio.c
+> +++ b/drivers/remoteproc/remoteproc_virtio.c
+> @@ -125,6 +125,8 @@ static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
+>                 return ERR_PTR(-ENOMEM);
+>         }
+>
+> +       vq->num_max = num;
+> +
+>         rvring->vq = vq;
+>         vq->priv = rvring;
+>
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 161d3b141f0d..6b86d0280d6b 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -530,6 +530,9 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+>                 err = -ENOMEM;
+>                 goto out_err;
+>         }
+> +
+> +       vq->num_max = info->num;
+> +
+>         /* it may have been reduced */
+>         info->num = virtqueue_get_vring_size(vq);
+>
+> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> index 083ff1eb743d..a20d5a6b5819 100644
+> --- a/drivers/virtio/virtio_mmio.c
+> +++ b/drivers/virtio/virtio_mmio.c
+> @@ -403,6 +403,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
+>                 goto error_new_virtqueue;
+>         }
+>
+> +       vq->num_max = num;
+> +
+>         /* Activate the queue */
+>         writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+>         if (vm_dev->version == 1) {
+> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> index a5e5721145c7..2257f1b3d8ae 100644
+> --- a/drivers/virtio/virtio_pci_legacy.c
+> +++ b/drivers/virtio/virtio_pci_legacy.c
+> @@ -135,6 +135,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>         if (!vq)
+>                 return ERR_PTR(-ENOMEM);
+>
+> +       vq->num_max = num;
+> +
+>         q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
+>         if (q_pfn >> 32) {
+>                 dev_err(&vp_dev->pci_dev->dev,
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 623906b4996c..e7e0b8c850f6 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -218,6 +218,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>         if (!vq)
+>                 return ERR_PTR(-ENOMEM);
+>
+> +       vq->num_max = num;
+> +
+>         /* activate the queue */
+>         vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
+>         vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index a5ec724c01d8..4cac600856ad 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -2385,6 +2385,20 @@ void vring_transport_features(struct virtio_device *vdev)
+>  }
+>  EXPORT_SYMBOL_GPL(vring_transport_features);
+>
+> +/**
+> + * virtqueue_get_vring_max_size - return the max size of the virtqueue's vring
+> + * @_vq: the struct virtqueue containing the vring of interest.
+> + *
+> + * Returns the max size of the vring.
+> + *
+> + * Unlike other operations, this need not be serialized.
+> + */
+> +unsigned int virtqueue_get_vring_max_size(struct virtqueue *_vq)
+> +{
+> +       return _vq->num_max;
+> +}
+> +EXPORT_SYMBOL_GPL(virtqueue_get_vring_max_size);
+> +
+>  /**
+>   * virtqueue_get_vring_size - return the size of the virtqueue's vring
+>   * @_vq: the struct virtqueue containing the vring of interest.
+> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+> index c40f7deb6b5a..9670cc79371d 100644
+> --- a/drivers/virtio/virtio_vdpa.c
+> +++ b/drivers/virtio/virtio_vdpa.c
+> @@ -183,6 +183,8 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
+>                 goto error_new_virtqueue;
+>         }
+>
+> +       vq->num_max = max_num;
+> +
+>         /* Setup virtqueue callback */
+>         cb.callback = callback ? virtio_vdpa_virtqueue_cb : NULL;
+>         cb.private = info;
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index d8fdf170637c..a82620032e43 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -31,6 +31,7 @@ struct virtqueue {
+>         struct virtio_device *vdev;
+>         unsigned int index;
+>         unsigned int num_free;
+> +       unsigned int num_max;
 
-First of all, just to note that the actual issue here was that 
-we don't clear the shadow bits in the guest interruptability field 
-in the vmcb on SMM entry, that triggered a consistency check because
-we do clear EFLAGS.IF.
-Preserving the interrupt shadow is just nice to have.
+A question, since we export virtqueue to drivers, this means they can
+access vq->num_max directly.
 
+So we probably don't need a helper here.
 
-That what Intel's spec says for the 'STI':
+Thanks
 
-"The IF flag and the STI and CLI instructions do not prohibit the generation of exceptions and nonmaskable inter-
-rupts (NMIs). However, NMIs (and system-management interrupts) may be inhibited on the instruction boundary
-following an execution of STI that begins with IF = 0."
-
-Thus it is likely that #SMI are just blocked when in shadow, but it is easier to implement
-it this way (avoids single stepping the guest) and without any user visable difference,
-which I noted in the patch description, I noted that there are two ways to solve this,
-and preserving the int shadow in SMRAM is just more simple way.
-
-
-As for CPUS that neither block SMI nor preserve the int shadaw, in theory they can, but that would
-break things, as noted in this mail
-
-https://lore.kernel.org/lkml/1284913699-14986-1-git-send-email-avi@redhat.com/
-
-It is possible though that real cpu supports HLT restart flag, which makes this a non issue,
-still. I can't rule out that a real cpu doesn't preserve the interrupt shadow on SMI, but
-I don't see why we can't do this to make things more robust.
-
-Best regards,
-	Maxim Levitsky
+>         void *priv;
+>  };
+>
+> @@ -80,6 +81,7 @@ bool virtqueue_enable_cb_delayed(struct virtqueue *vq);
+>
+>  void *virtqueue_detach_unused_buf(struct virtqueue *vq);
+>
+> +unsigned int virtqueue_get_vring_max_size(struct virtqueue *vq);
+>  unsigned int virtqueue_get_vring_size(struct virtqueue *vq);
+>
+>  bool virtqueue_is_broken(struct virtqueue *vq);
+> --
+> 2.31.0
+>
 
