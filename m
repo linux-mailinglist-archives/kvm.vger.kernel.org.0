@@ -2,64 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 394735614F3
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 10:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8174B561547
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 10:38:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbiF3IZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 04:25:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52148 "EHLO
+        id S233984AbiF3Iis (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 04:38:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233732AbiF3IYk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 04:24:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B7ECDDF42
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 01:24:39 -0700 (PDT)
+        with ESMTP id S233962AbiF3Iir (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 04:38:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5A9FA1C93B
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 01:38:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656577478;
+        s=mimecast20190719; t=1656578324;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hqIzgmR5tuOUBDBCfoAqKMfRDeawIdE7bmJ0sAWUGNs=;
-        b=FQ7tMj4Dw5PdXA5JntLJqDkecw7r7MZJzwljwc65nl0LKhGisvwpuaH0kF6aEPq6u56vax
-        gVRpaCUCGrTaWOx/mpxc7boCRaxo+xvL6sF/tfRRXjFltHR0TFrAu8UQHp8wKstklvYUqQ
-        z1PvmjyP/GuAds4oRSlkwhgTwnEKI2Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=6WRm3fy0BcnwI+eUjjLUjBr4KAT2RKMxDsER6An9Fd0=;
+        b=WUVLC4vb0WSno0HsWrFbrjHzw3mPiVqW3XvwERpfTPhg3TMglC0eaFCDy5ZeYZKkaHT4jB
+        +bWBVL132/q3I40gDHpG+EZ/wMnxzgF6mUxaZ0hw/w6NhT8Ygjleo5CSy8xWmbG5zCAOeo
+        bZCXTqmr/djNoV0Muhb3oCu8/4nXMYY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-249-1U9-LxXeOyGGoyxZ1ALiTA-1; Thu, 30 Jun 2022 04:24:37 -0400
-X-MC-Unique: 1U9-LxXeOyGGoyxZ1ALiTA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E05B93C1174C;
-        Thu, 30 Jun 2022 08:24:36 +0000 (UTC)
-Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 932F4112131B;
-        Thu, 30 Jun 2022 08:24:34 +0000 (UTC)
-Message-ID: <e04341912abfa1590edd4ee7c33efde6e227b93f.camel@redhat.com>
-Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Thu, 30 Jun 2022 11:24:33 +0300
-In-Reply-To: <CALMp9eQQROfYW7tNPaYCL5umjDr5ntsXuQ3BmorD8BWQiUGjdw@mail.gmail.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
-         <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
-         <CALMp9eQQROfYW7tNPaYCL5umjDr5ntsXuQ3BmorD8BWQiUGjdw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-362-C38TIhbVMB6BCm-Eyl9m2A-1; Thu, 30 Jun 2022 04:38:43 -0400
+X-MC-Unique: C38TIhbVMB6BCm-Eyl9m2A-1
+Received: by mail-wm1-f72.google.com with SMTP id i5-20020a1c3b05000000b003a02b027e53so1086111wma.7
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 01:38:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6WRm3fy0BcnwI+eUjjLUjBr4KAT2RKMxDsER6An9Fd0=;
+        b=507mx/pfXlDcJ/lVgnjWClElD9jsWyirNXGJGA2o/YGF2cg4kIdABpVNQ+QTxZGGGS
+         ZM5sQr/pcBGnisbah+sl5I914k1B5q+Nly4aKHcQbzM51TteG9YkbKg3W/5026x/zZVk
+         jxK2Hr21jXHhbGicPSIicLeOgkdtq31J8jGEHicwhPwoY1gOPKllb29z730byAFFHURN
+         t+Eu+vHtEGZKCmCXvvyG+tyC+TUtEo3DNd/KmvcsBJh1uDTcL8PZ6VKdGLvhUsStu1wp
+         Pzba3CjKmfv42R0T6cuODo07gExiaDcIqlS0VuYaa/UyPTWmne5FsAvo9xs6Ae1MoOEc
+         rkJQ==
+X-Gm-Message-State: AJIora/1Cn8LrjeT8lD9VD0ufB/t7wxzKADXwkXMh9JIo6WPGVxrVq7B
+        TZ1zdhABVhdK3uGkRrlsLQyJzWdd7iX3xg3sSEv5524zHjes7UqoqfPLN04YRQMdk1i8MAqYoeE
+        smgtEbH+6/CHF
+X-Received: by 2002:a5d:648a:0:b0:21d:2cd8:8b87 with SMTP id o10-20020a5d648a000000b0021d2cd88b87mr6207553wri.241.1656578321492;
+        Thu, 30 Jun 2022 01:38:41 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1uB84dWCFdhoY44YSl6bFb5ed+fxro/40jg+eh3ILhMT4LSSay2jdLu2/BfAO2TW+O++ICTBA==
+X-Received: by 2002:a5d:648a:0:b0:21d:2cd8:8b87 with SMTP id o10-20020a5d648a000000b0021d2cd88b87mr6207525wri.241.1656578321151;
+        Thu, 30 Jun 2022 01:38:41 -0700 (PDT)
+Received: from redhat.com ([2.55.3.188])
+        by smtp.gmail.com with ESMTPSA id j22-20020a05600c1c1600b003a046549a85sm1869077wms.37.2022.06.30.01.38.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jun 2022 01:38:40 -0700 (PDT)
+Date:   Thu, 30 Jun 2022 04:38:35 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH V3] virtio: disable notification hardening by default
+Message-ID: <20220630043219-mutt-send-email-mst@kernel.org>
+References: <CACGkMEvcs+9_SHmO1s3nyzgU7oq7jhU2gircVVR3KDsGDikh5Q@mail.gmail.com>
+ <20220628004614-mutt-send-email-mst@kernel.org>
+ <CACGkMEsC4A+3WejLSOZoH3enXtai=+JyRNbxcpzK4vODYzhaFw@mail.gmail.com>
+ <CACGkMEvu0D0XD7udz0ebVjNM0h5+K9Rjd-5ed=PY_+-aduzG2g@mail.gmail.com>
+ <20220629022223-mutt-send-email-mst@kernel.org>
+ <CACGkMEuwvzkbPUSFueCOjit7pRJ81v3-W3SZD+7jQJN8btEFdg@mail.gmail.com>
+ <20220629030600-mutt-send-email-mst@kernel.org>
+ <CACGkMEvnUj622FyROUftifSB47wytPg0YAdVO7fdRQmCE+WuBg@mail.gmail.com>
+ <20220629044514-mutt-send-email-mst@kernel.org>
+ <CACGkMEsW02a1LeiWwUgHfVmDEnC8i49h1L7qHmeoLyJyRS6-zA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEsW02a1LeiWwUgHfVmDEnC8i49h1L7qHmeoLyJyRS6-zA@mail.gmail.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,175 +94,322 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-06-29 at 08:53 -0700, Jim Mattson wrote:
-> On Wed, Jun 29, 2022 at 4:17 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> > On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> > > The main goal of this series is to fix KVM's longstanding bug of not
-> > > honoring L1's exception intercepts wants when handling an exception that
-> > > occurs during delivery of a different exception.  E.g. if L0 and L1 are
-> > > using shadow paging, and L2 hits a #PF, and then hits another #PF while
-> > > vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
-> > > KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
-> > > so that the #PF is routed to L1, not injected into L2 as a #DF.
-> > > 
-> > > nVMX has hacked around the bug for years by overriding the #PF injector
-> > > for shadow paging to go straight to VM-Exit, and nSVM has started doing
-> > > the same.  The hacks mostly work, but they're incomplete, confusing, and
-> > > lead to other hacky code, e.g. bailing from the emulator because #PF
-> > > injection forced a VM-Exit and suddenly KVM is back in L1.
-> > > 
-> > > Everything leading up to that are related fixes and cleanups I encountered
-> > > along the way; some through code inspection, some through tests.
-> > > 
-> > > v2:
-> > >   - Rebased to kvm/queue (commit 8baacf67c76c) + selftests CPUID
-> > >     overhaul.
-> > >     https://lore.kernel.org/all/20220614200707.3315957-1-seanjc@google.com
-> > >   - Treat KVM_REQ_TRIPLE_FAULT as a pending exception.
-> > > 
-> > > v1: https://lore.kernel.org/all/20220311032801.3467418-1-seanjc@google.com
-> > > 
-> > > Sean Christopherson (21):
-> > >   KVM: nVMX: Unconditionally purge queued/injected events on nested
-> > >     "exit"
-> > >   KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
-> > >   KVM: x86: Don't check for code breakpoints when emulating on exception
-> > >   KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
-> > >   KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
-> > >   KVM: x86: Treat #DBs from the emulator as fault-like (code and
-> > >     DR7.GD=1)
-> > >   KVM: x86: Use DR7_GD macro instead of open coding check in emulator
-> > >   KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
-> > >   KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
-> > >   KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
-> > >   KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
-> > >   KVM: x86: Make kvm_queued_exception a properly named, visible struct
-> > >   KVM: x86: Formalize blocking of nested pending exceptions
-> > >   KVM: x86: Use kvm_queue_exception_e() to queue #DF
-> > >   KVM: x86: Hoist nested event checks above event injection logic
-> > >   KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
-> > >     VM-Exit
-> > >   KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
-> > >   KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions
-> > >   KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
-> > >     behavior
-> > >   KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
-> > >   KVM: selftests: Add an x86-only test to verify nested exception
-> > >     queueing
-> > > 
-> > >  arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
-> > >  arch/x86/include/asm/kvm_host.h               |  35 +-
-> > >  arch/x86/kvm/emulate.c                        |   3 +-
-> > >  arch/x86/kvm/svm/nested.c                     | 102 ++---
-> > >  arch/x86/kvm/svm/svm.c                        |  18 +-
-> > >  arch/x86/kvm/vmx/nested.c                     | 319 +++++++++-----
-> > >  arch/x86/kvm/vmx/sgx.c                        |   2 +-
-> > >  arch/x86/kvm/vmx/vmx.c                        |  53 ++-
-> > >  arch/x86/kvm/x86.c                            | 404 +++++++++++-------
-> > >  arch/x86/kvm/x86.h                            |  11 +-
-> > >  tools/testing/selftests/kvm/.gitignore        |   1 +
-> > >  tools/testing/selftests/kvm/Makefile          |   1 +
-> > >  .../selftests/kvm/include/x86_64/svm_util.h   |   7 +-
-> > >  .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
-> > >  .../kvm/x86_64/nested_exceptions_test.c       | 295 +++++++++++++
-> > >  15 files changed, 886 insertions(+), 418 deletions(-)
-> > >  create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
-> > > 
-> > > 
-> > > base-commit: 816967202161955f398ce379f9cbbedcb1eb03cb
-> > 
-> > Hi Sean and everyone!
-> > 
-> > 
-> > Before I continue reviewing the patch series, I would like you to check if
-> > I understand the monitor trap/pending debug exception/event injection
-> > logic on VMX correctly. I was looking at the spec for several hours and I still have more
-> > questions that answers about it.
-> > 
-> > So let me state what I understand:
-> > 
-> > 1. Event injection (aka eventinj in SVM terms):
-> > 
-> >   (VM_ENTRY_INTR_INFO_FIELD/VM_ENTRY_EXCEPTION_ERROR_CODE/VM_ENTRY_INSTRUCTION_LEN)
-> > 
-> >   If I understand correctly all event injections types just like on SVM just inject,
-> >   and never create something pending, and/or drop the injection if event is not allowed
-> >   (like if EFLAGS.IF is 0). VMX might have some checks that could fail VM entry,
-> >   if for example you try to inject type 0 (hardware interrupt) and EFLAGS.IF is 0,
-> >   I haven't checked this)
-> > 
-> >   All event injections happen right away, don't deliver any payload (like DR6), etc.
-> > 
-> >   Injection types 4/5/6, do the same as injection types 0/2/3 but in addition to that,
-> >   type 4/6 do a DPL check in IDT, and also these types can promote the RIP prior
-> >   to pushing it to the exception stack using VM_ENTRY_INSTRUCTION_LEN to be consistent
-> >   with cases when these trap like events are intercepted, where the interception happens
-> >   on the start of the instruction despite exceptions being trap-like.
-> > 
-> > 
-> > 2. #DB is the only trap like exception that can be pending for one more instruction
-> >    if MOV SS shadow is on (any other cases?).
-> >    (AMD just ignores the whole thing, rightfully)
-> > 
-> >    That is why we have the GUEST_PENDING_DBG_EXCEPTIONS vmcs field.
-> >    I understand that it will be written by CPU in case we have VM exit at the moment
-> >    where #DB is already pending but not yet delivered.
-> > 
-> >    That field can also be (sadly) used to "inject" #DB to the guest, if the hypervisor sets it,
-> >    and this #DB will actually update DR6 and such, and might be delayed/lost.
-> > 
-> > 
-> > 3. Facts about MTF:
-> > 
-> >    * MTF as a feature is basically 'single step the guest by generating MTF VM exits after each executed
-> >      instruction', and is enabled in primary execution controls.
-> > 
-> >    * MTF is also an 'event', and it can be injected separately by the hypervisor with event type 7,
-> >      and that has no connection to the 'feature', although usually this injection will be useful
-> >      when the hypervisor does some kind of re-injection, triggered by the actual MTF feature.
-> > 
-> >    * MTF event can be lost, if higher priority VM exit happens, this is why the SDM says about 'pending MTF',
-> >      which means that MTF vmexit should happen unless something else prevents it and/or higher priority VM exit
-> >      overrides it.
-> > 
-> >    * MTF event is raised (when the primary execution controls bit is enabled) when:
-> > 
-> >         - after an injected (vectored), aka eventinj/VM_ENTRY_INTR_INFO_FIELD, done updating the guest state
-> >           (that is stack was switched, stuff was pushed to new exception stack, RIP updated to the handler)
-> >           I am not 100% sure about this but this seems to be what PRM implies:
-> > 
-> >           "If the “monitor trap flag” VM-execution control is 1 and VM entry is injecting a vectored event (see Section
-> >           26.6.1), an MTF VM exit is pending on the instruction boundary before the first instruction following the
-> >           VM entry."
-> > 
-> >         - If an interrupt and or #DB exception happens prior to executing first instruction of the guest,
-> >           then once again MTF will happen on first instruction of the exception/interrupt handler
-> > 
-> >           "If the “monitor trap flag” VM-execution control is 1, VM entry is not injecting an event, and a pending event
-> >           (e.g., debug exception or interrupt) is delivered before an instruction can execute, an MTF VM exit is pending
-> >           on the instruction boundary following delivery of the event (or any nested exception)."
-> > 
-> >           That means that #DB has higher priority that MTF, but not specified if fault DB or trap DB
-> > 
-> >         - If instruction causes exception, once again, on first instruction of the exception handler MTF will happen.
-> > 
-> >         - Otherwise after an instruction (or REP iteration) retires.
-> > 
-> > 
-> > If you have more facts about MTF and related stuff and/or if I made a mistake in the above, I am all ears to listen!
+On Thu, Jun 30, 2022 at 10:01:16AM +0800, Jason Wang wrote:
+> On Wed, Jun 29, 2022 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Wed, Jun 29, 2022 at 04:34:36PM +0800, Jason Wang wrote:
+> > > On Wed, Jun 29, 2022 at 3:15 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Wed, Jun 29, 2022 at 03:02:21PM +0800, Jason Wang wrote:
+> > > > > On Wed, Jun 29, 2022 at 2:31 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Wed, Jun 29, 2022 at 12:07:11PM +0800, Jason Wang wrote:
+> > > > > > > On Tue, Jun 28, 2022 at 2:17 PM Jason Wang <jasowang@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Tue, Jun 28, 2022 at 1:00 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Tue, Jun 28, 2022 at 11:49:12AM +0800, Jason Wang wrote:
+> > > > > > > > > > > Heh. Yea sure. But things work fine for people. What is the chance
+> > > > > > > > > > > your review found and fixed all driver bugs?
+> > > > > > > > > >
+> > > > > > > > > > I don't/can't audit all bugs but the race between open/close against
+> > > > > > > > > > ready/reset. It looks to me a good chance to fix them all but if you
+> > > > > > > > > > think differently, let me know
+> > > > > > > > > >
+> > > > > > > > > > > After two attempts
+> > > > > > > > > > > I don't feel like hoping audit will fix all bugs.
+> > > > > > > > > >
+> > > > > > > > > > I've started the auditing and have 15+ patches in the queue. (only
+> > > > > > > > > > covers bluetooth, console, pmem, virtio-net and caif). Spotting the
+> > > > > > > > > > issue is not hard but the testing, It would take at least the time of
+> > > > > > > > > > one release to finalize I guess.
+> > > > > > > > >
+> > > > > > > > > Absolutely. So I am looking for a way to implement hardening that does
+> > > > > > > > > not break existing drivers.
+> > > > > > > >
+> > > > > > > > I totally agree with you to seek a way without bothering the drivers.
+> > > > > > > > Just wonder if this is possbile.
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > The reason config was kind of easy is that config interrupt is rarely
+> > > > > > > > > > > > > vital for device function so arbitrarily deferring that does not lead to
+> > > > > > > > > > > > > deadlocks - what you are trying to do with VQ interrupts is
+> > > > > > > > > > > > > fundamentally different. Things are especially bad if we just drop
+> > > > > > > > > > > > > an interrupt but deferring can lead to problems too.
+> > > > > > > > > > > >
+> > > > > > > > > > > > I'm not sure I see the difference, disable_irq() stuffs also delay the
+> > > > > > > > > > > > interrupt processing until enable_irq().
+> > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > Absolutely. I am not at all sure disable_irq fixes all problems.
+> > > > > > > > > > >
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Consider as an example
+> > > > > > > > > > > > >     virtio-net: fix race between ndo_open() and virtio_device_ready()
+> > > > > > > > > > > > > if you just defer vq interrupts you get deadlocks.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > I don't see a deadlock here, maybe you can show more detail on this?
+> > > > > > > > > > >
+> > > > > > > > > > > What I mean is this: if we revert the above commit, things still
+> > > > > > > > > > > work (out of spec, but still). If we revert and defer interrupts until
+> > > > > > > > > > > device ready then ndo_open that triggers before device ready deadlocks.
+> > > > > > > > > >
+> > > > > > > > > > Ok, I guess you meant on a hypervisor that is strictly written with spec.
+> > > > > > > > >
+> > > > > > > > > I mean on hypervisor that starts processing queues after getting a kick
+> > > > > > > > > even without DRIVER_OK.
+> > > > > > > >
+> > > > > > > > Oh right.
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > So, thinking about all this, how about a simple per vq flag meaning
+> > > > > > > > > > > > > "this vq was kicked since reset"?
+> > > > > > > > > > > >
+> > > > > > > > > > > > And ignore the notification if vq is not kicked? It sounds like the
+> > > > > > > > > > > > callback needs to be synchronized with the kick.
+> > > > > > > > > > >
+> > > > > > > > > > > Note we only need to synchronize it when it changes, which is
+> > > > > > > > > > > only during initialization and reset.
+> > > > > > > > > >
+> > > > > > > > > > Yes.
+> > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > If driver does not kick then it's not ready to get callbacks, right?
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Sounds quite clean, but we need to think through memory ordering
+> > > > > > > > > > > > > concerns - I guess it's only when we change the value so
+> > > > > > > > > > > > >         if (!vq->kicked) {
+> > > > > > > > > > > > >                 vq->kicked = true;
+> > > > > > > > > > > > >                 mb();
+> > > > > > > > > > > > >         }
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > will do the trick, right?
+> > > > > > > > > > > >
+> > > > > > > > > > > > There's no much difference with the existing approach:
+> > > > > > > > > > > >
+> > > > > > > > > > > > 1) your proposal implicitly makes callbacks ready in virtqueue_kick()
+> > > > > > > > > > > > 2) my proposal explicitly makes callbacks ready via virtio_device_ready()
+> > > > > > > > > > > >
+> > > > > > > > > > > > Both require careful auditing of all the existing drivers to make sure
+> > > > > > > > > > > > no kick before DRIVER_OK.
+> > > > > > > > > > >
+> > > > > > > > > > > Jason, kick before DRIVER_OK is out of spec, sure. But it is unrelated
+> > > > > > > > > > > to hardening
+> > > > > > > > > >
+> > > > > > > > > > Yes but with your proposal, it seems to couple kick with DRIVER_OK somehow.
+> > > > > > > > >
+> > > > > > > > > I don't see how - my proposal ignores DRIVER_OK issues.
+> > > > > > > >
+> > > > > > > > Yes, what I meant is, in your proposal, the first kick after rest is a
+> > > > > > > > hint that the driver is ok (but actually it could not).
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > > and in absence of config interrupts is generally easily
+> > > > > > > > > > > fixed just by sticking virtio_device_ready early in initialization.
+> > > > > > > > > >
+> > > > > > > > > > So if the kick is done before the subsystem registration, there's
+> > > > > > > > > > still a window in the middle (assuming we stick virtio_device_ready()
+> > > > > > > > > > early):
+> > > > > > > > > >
+> > > > > > > > > > virtio_device_ready()
+> > > > > > > > > > virtqueue_kick()
+> > > > > > > > > > /* the window */
+> > > > > > > > > > subsystem_registration()
+> > > > > > > > >
+> > > > > > > > > Absolutely, however, I do not think we really have many such drivers
+> > > > > > > > > since this has been known as a wrong thing to do since the beginning.
+> > > > > > > > > Want to try to find any?
+> > > > > > > >
+> > > > > > > > Yes, let me try and update.
+> > > > > > >
+> > > > > > > This is basically the device that have an RX queue, so I've found the
+> > > > > > > following drivers:
+> > > > > > >
+> > > > > > > scmi, mac80211_hwsim, vsock, bt, balloon.
+> > > > > >
+> > > > > > Looked and I don't see it yet. Let's consider
+> > > > > > ./net/vmw_vsock/virtio_transport.c for example. Assuming we block
+> > > > > > callbacks until the first kick, what is the issue with probe exactly?
+> > > > >
+> > > > > We need to make sure the callback can survive when it runs before sub
+> > > > > system registration.
+> > > >
+> > > > With my proposal no - only if we also kick before registration.
+> > > > So I do not see the issue yet.
+> > > >
+> > > > Consider ./net/vmw_vsock/virtio_transport.c
+> > > >
+> > > > kicks: virtio_transport_send_pkt_work,
+> > > > virtio_vsock_rx_fill, virtio_vsock_event_fill
+> > > >
+> > > > which of these triggers before we are ready to
+> > > > handle callbacks?
+> > >
+> > > So:
+> > >
+> > > virtio_vsock_vqs_init()
+> > >     virtio_device_ready()
+> > >     virtio_vsock_rx_fill() /* kick there */
+> > > rcu_assign_pointer(the_virtio_vsock, vsock)
+> > >
+> > > It means at least virtio_vsock_rx_done()/virtio_vsock_workqueue needs
+> > > to survive. I don't say it has a bug but we do need to audit the code
+> > > in this case. The implication is: the virtqueue callback should be
+> > > written with no assumption that the driver has registered in the
+> > > subsystem. We don't or can't assume all drivers are written in this
+> > > way.
+> >
+> >
+> > I thought you said you audited code and found bugs.
+> >
+> > My claim is that simply because qemu starts processing
+> > packets immediately upon kick, if bugs like this
+> > existed we would have noticed by now.
 > 
-> Here's a comprehensive spreadsheet on virtualizing MTF, compiled by
-> Peter Shier. (Just in case anyone is interested in *truly*
-> virtualizing the feature under KVM, rather than just setting a
-> VM-execution control bit in vmcs02 and calling it done.)
+> This is true for a well behaved hypervisor. But what we want to deal
+> with is the buggy/malicious hypervisors.
+
+
+
+
+> >
+> > In this case the_virtio_vsock is used for xmit things,
+> > callbacks do not seem to use it at all.
 > 
-> https://docs.google.com/spreadsheets/d/e/2PACX-1vQYP3PgY_JT42zQaR8uMp4U5LCey0qSlvMb80MLwjw-kkgfr31HqLSqAOGtdZ56aU2YdVTvfkruhuon/pubhtml
-
-Neither can I access this document sadly :(
-
-Best regards,
-	Maxim Levitsky
-
+> So the hypervisor can trigger the notification just after the kick and
+> the work function seems to be safe.
 > 
+> One another example for this is in virtcons_probe():
+> 
+>         spin_lock_init(&portdev->ports_lock);
+>         INIT_LIST_HEAD(&portdev->ports);
+>         INIT_LIST_HEAD(&portdev->list);
+> 
+>         virtio_device_ready(portdev->vdev);
+> 
+>         INIT_WORK(&portdev->config_work, &config_work_handler);
+>         INIT_WORK(&portdev->control_work, &control_work_handler);
+> 
+> in control_intr() we had:
+> 
+> static void control_intr(struct virtqueue *vq)
+> {
+>         struct ports_device *portdev;
+> 
+>         portdev = vq->vdev->priv;
+>         schedule_work(&portdev->control_work);
+> }
+> 
+> So we might crash if the notification is raised just after
+> virtio_device_ready().
 
+Yes! But this is not my proposal. This is yours.
+Your patches block interrupts until virtio_device_ready.
+
+My proposal is to block them until kick.
+
+In this case kick is in fill_queue after INIT_WORK.
+
+
+> This is not an exact example of when a callback is not ready after
+> kick, but it demonstrates that the callback could have assumed that
+> all setup has been done when it is called.
+> 
+> Thanks
+
+So if there are not examples of callbacks not ready after kick
+then let us block callbacks until first kick. That is my idea.
+
+
+> >
+> > > >
+> > > >
+> > > > > >
+> > > > > >
+> > > > > > > >
+> > > > > > > > >I couldn't ... except maybe bluetooth
+> > > > > > > > > but that's just maintainer nacking fixes saying he'll fix it
+> > > > > > > > > his way ...
+> > > > > > > > >
+> > > > > > > > > > And during remove(), we get another window:
+> > > > > > > > > >
+> > > > > > > > > > subsysrem_unregistration()
+> > > > > > > > > > /* the window */
+> > > > > > > > > > virtio_device_reset()
+> > > > > > > > >
+> > > > > > > > > Same here.
+> > > > > > >
+> > > > > > > Basically for the drivers that set driver_ok before registration,
+> > > > > >
+> > > > > > I don't see what does driver_ok have to do with it.
+> > > > >
+> > > > > I meant for those driver, in probe they do()
+> > > > >
+> > > > > virtio_device_ready()
+> > > > > subsystem_register()
+> > > > >
+> > > > > In remove() they do
+> > > > >
+> > > > > subsystem_unregister()
+> > > > > virtio_device_reset()
+> > > > >
+> > > > > for symmetry
+> > > >
+> > > > Let's leave remove alone for now. I am close to 100% sure we have *lots*
+> > > > of issues around it, but while probe is unavoidable remove can be
+> > > > avoided by blocking hotplug.
+> > >
+> > > Unbind can trigger this path as well.
+> > >
+> > > >
+> > > >
+> > > > > >
+> > > > > > > so
+> > > > > > > we have a lot:
+> > > > > > >
+> > > > > > > blk, net, mac80211_hwsim, scsi, vsock, bt, crypto, gpio, gpu, i2c,
+> > > > > > > iommu, caif, pmem, input, mem
+> > > > > > >
+> > > > > > > So I think there's no easy way to harden the notification without
+> > > > > > > auditing the driver one by one (especially considering the driver may
+> > > > > > > use bh or workqueue). The problem is the notification hardening
+> > > > > > > depends on a correct or race-free probe/remove. So we need to fix the
+> > > > > > > issues in probe/remove then do the hardening on the notification.
+> > > > > > >
+> > > > > > > Thanks
+> > > > > >
+> > > > > > So if drivers kick but are not ready to get callbacks then let's fix
+> > > > > > that first of all, these are racy with existing qemu even ignoring
+> > > > > > spec compliance.
+> > > > >
+> > > > > Yes, (the patches I've posted so far exist even with a well-behaved device).
+> > > > >
+> > > > > Thanks
+> > > >
+> > > > patches you posted deal with DRIVER_OK spec compliance.
+> > > > I do not see patches for kicks before callbacks are ready to run.
+> > >
+> > > Yes.
+> > >
+> > > Thanks
+> > >
+> > > >
+> > > > > >
+> > > > > >
+> > > > > > --
+> > > > > > MST
+> > > > > >
+> > > >
+> >
 
