@@ -2,333 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C36B562440
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 22:37:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1271F5624B6
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 23:00:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235499AbiF3UhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 16:37:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59302 "EHLO
+        id S237103AbiF3VAl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 17:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236967AbiF3Ug7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 16:36:59 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2527D45519;
-        Thu, 30 Jun 2022 13:36:58 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25UJX0vD022321;
-        Thu, 30 Jun 2022 20:36:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=jhlBGWWZA7EqJvCGbnRXRCBRrNuXvnvjVKbiEHnqDC8=;
- b=qn6SOyBl+TshkEWWwJpsizQXhXLu4noHb5XQ1hL2QoGogtcC9v3+MFVp0Mkw7LJfR+Ba
- 0gBm3fa7MTSBHX85HPdOsInhZuI2gjUFIe+nkDI92AwmyjBKFaJfmRqUx4Rag7wDtIUN
- DGOellEjePQOpB3HsR+E4+meXW4m3wq36JostkonpumY6mVjbfw+7ENywNYnuE5/HpnD
- BQAmoOW83wCWMAIBVCNQq3TFcNI5EMmRdvIeagg5uES6hi7sHgPfumrSIJ7IHWNEXVr5
- 374yuBlYkdxDshjZT+Y+DaY8H2X9RqkSd7Dede3BqShg6ApO5W4x6eL8mumiG7/zlkpa jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1j392297-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 20:36:55 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25UJY6te030906;
-        Thu, 30 Jun 2022 20:36:54 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1j39228c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 20:36:54 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25UKL9Mf010061;
-        Thu, 30 Jun 2022 20:36:53 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04fra.de.ibm.com with ESMTP id 3gwt096fvg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 20:36:52 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25UKanXC16253226
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jun 2022 20:36:49 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6990CA4054;
-        Thu, 30 Jun 2022 20:36:49 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47A16A405B;
-        Thu, 30 Jun 2022 20:36:49 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 30 Jun 2022 20:36:49 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 109F9E02D1; Thu, 30 Jun 2022 22:36:49 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v3 11/11] vfio/ccw: Move FSM open/close to MDEV open/close
-Date:   Thu, 30 Jun 2022 22:36:47 +0200
-Message-Id: <20220630203647.2529815-12-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220630203647.2529815-1-farman@linux.ibm.com>
-References: <20220630203647.2529815-1-farman@linux.ibm.com>
+        with ESMTP id S236786AbiF3VAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 17:00:40 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F0AD4D158
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:00:39 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id s206so492832pgs.3
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:00:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=glTDnYjItqLfny8iWt7QuauUYNw+sI+czBNtwZqbRGg=;
+        b=CrYN13mmUcZnBcrFJl7hETioGstd6NnSORG00INxT1zUYbocQz5nf2cBCHpPEOC7B+
+         NQHIVOBDSaoO5rdJPdbg0miDk1FDFYTNIqpcgqLiuZLYUFTpLhm4jM1VIGyi68ooyljB
+         6P1dA6cLN2vuV6BfC6HTK9eY6bnNLiFVrCxmQXyxlk9cr7TSIHCUOOyz/xRI0Od1okDI
+         3IGCj0ItlvK4icAcKUS8Ze0pPgTJegxcc6A2DjL848asAF+1VqQ3KnEluZ6eUstJX6MC
+         r59Jz8ocGhHU/n6lzYnqcA0cpOBsO8fE6wO2Nsgei43TAraOau8JeEqzBM/KVVZSV2VJ
+         vVEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=glTDnYjItqLfny8iWt7QuauUYNw+sI+czBNtwZqbRGg=;
+        b=l/A1MkGob5ZU7kXJHbcRAoezIRSxuufCk7IqYh7vxGxYxhADWp5wkk2TqHT9iyNMiO
+         j8briYtgiYG7jiWMQzZNZf8zdTCTzS6PtHn1JDJEdT+x277ybeBy/I0WKXXF1YfPcYZ8
+         34ZIKE1WfVxP/3rvHdO+Z5V84PP529gkKmRdkEpd4W4r6h9A+AUYy7ytra2NaKu/Z7o2
+         4+WNnw3XDi457X4sD5VXJHF+V0DTaHswPV6xnp1QvtnbIQa1If15m3f1DYBP9g3+9jyW
+         lYaShIRwEsEm6c7EUZWI4u3/FrT62J2WWFCoYwmmwpBCMZL+hbvwMI0sfB53rIdH2Dw8
+         jg7Q==
+X-Gm-Message-State: AJIora8ubYh/60r6W82JgowKUVEVNGRGiQo/CSsuih+TTs/4nLUhZnZy
+        TzIVQTLmTFxhFTyNsoAPXMSjtP+GBh58cEUShYfw/w==
+X-Google-Smtp-Source: AGRyM1uRjBRHlyoqB+nuPe0+Or9vp6fLCk+VrWwqfN5R1SDm7JnYk8I/e9lKO/JYbEqCng+siojBRDrtWuS/LqpPYOc=
+X-Received: by 2002:a63:1943:0:b0:411:5e12:4e4f with SMTP id
+ 3-20020a631943000000b004115e124e4fmr9154187pgz.400.1656622838523; Thu, 30 Jun
+ 2022 14:00:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hCkGemxhXL2eZ4KXIRtrCYNZFahe9yZi
-X-Proofpoint-GUID: RzDka_P7HRHRDgHqGXV78xFqBZcROOc8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-30_14,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxscore=0 suspectscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- clxscore=1015 mlxlogscore=999 spamscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206300077
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220330174621.1567317-1-bgardon@google.com> <20220330174621.1567317-3-bgardon@google.com>
+ <YlCSWH4pob00vZq3@google.com>
+In-Reply-To: <YlCSWH4pob00vZq3@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Thu, 30 Jun 2022 14:00:27 -0700
+Message-ID: <CAL715W+9U=5rp3+j3wG46t0Uvq-UAOFduC-AXz-Z9ZJVQXDzDg@mail.gmail.com>
+Subject: Re: [PATCH v3 02/11] KVM: selftests: Dump VM stats in binary stats test
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ben Gardon <bgardon@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Part of the confusion that has existed is the FSM lifecycle of
-subchannels between the common CSS driver and the vfio-ccw driver.
-During configuration, the FSM state goes from NOT_OPER to STANDBY
-to IDLE, but then back to NOT_OPER. For example:
+On Fri, Apr 8, 2022 at 12:52 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Mar 30, 2022, Ben Gardon wrote:
+> > Add kvm_util library functions to read KVM stats through the binary
+> > stats interface and then dump them to stdout when running the binary
+> > stats test. Subsequent commits will extend the kvm_util code and use it
+> > to make assertions in a test for NX hugepages.
+>
+> Why?  Spamming my console with info that has zero meaning to me and is useless
+> when the test passes is not helpful.  Even on failure, I don't see what the user
+> is going to do with this information, all of the asserts are completly unrelated
+> to the stats themselves.
 
-	vfio_ccw_sch_probe:		VFIO_CCW_STATE_NOT_OPER
-	vfio_ccw_sch_probe:		VFIO_CCW_STATE_STANDBY
-	vfio_ccw_mdev_probe:		VFIO_CCW_STATE_IDLE
-	vfio_ccw_mdev_remove:		VFIO_CCW_STATE_NOT_OPER
-	vfio_ccw_sch_remove:		VFIO_CCW_STATE_NOT_OPER
-	vfio_ccw_sch_shutdown:		VFIO_CCW_STATE_NOT_OPER
+Debugging could be another reason, I suspect? I remember when I tried
+to use the interface, there is really no API that tells me "did I add
+this stat successfully and/or correctly?" I think having a general
+print so that developer/debugging folk could just 'grep mystat' to
+verify that would be helpful in the future.
 
-Rearrange the open/close events to align with the mdev open/close,
-to better manage the memory and state of the devices as time
-progresses. Specifically, make mdev_open() perform the FSM open,
-and mdev_close() perform the FSM close instead of reset (which is
-both close and open).
-
-This makes the NOT_OPER state a dead-end path, indicating the
-device is probably not recoverable without fully probing and
-re-configuring the device.
-
-This has the nice side-effect of removing a number of special-cases
-where the FSM state is managed outside of the FSM itself (such as
-the aforementioned mdev_close() routine).
-
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/s390/cio/vfio_ccw_drv.c | 11 +++--------
- drivers/s390/cio/vfio_ccw_fsm.c | 32 +++++++++++++++++++++++---------
- drivers/s390/cio/vfio_ccw_ops.c | 26 +++++++++++---------------
- 3 files changed, 37 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index f98c9915e73d..4804101ccb0f 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -138,7 +138,7 @@ static struct vfio_ccw_private *vfio_ccw_alloc_private(struct subchannel *sch)
- 
- 	private->sch = sch;
- 	mutex_init(&private->io_mutex);
--	private->state = VFIO_CCW_STATE_NOT_OPER;
-+	private->state = VFIO_CCW_STATE_STANDBY;
- 	INIT_LIST_HEAD(&private->crw);
- 	INIT_WORK(&private->io_work, vfio_ccw_sch_io_todo);
- 	INIT_WORK(&private->crw_work, vfio_ccw_crw_todo);
-@@ -222,21 +222,15 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
- 
- 	dev_set_drvdata(&sch->dev, private);
- 
--	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
--	if (private->state == VFIO_CCW_STATE_NOT_OPER)
--		goto out_free;
--
- 	ret = mdev_register_device(&sch->dev, &vfio_ccw_mdev_driver);
- 	if (ret)
--		goto out_disable;
-+		goto out_free;
- 
- 	VFIO_CCW_MSG_EVENT(4, "bound to subchannel %x.%x.%04x\n",
- 			   sch->schid.cssid, sch->schid.ssid,
- 			   sch->schid.sch_no);
- 	return 0;
- 
--out_disable:
--	cio_disable_subchannel(sch);
- out_free:
- 	dev_set_drvdata(&sch->dev, NULL);
- 	vfio_ccw_free_private(private);
-@@ -264,6 +258,7 @@ static void vfio_ccw_sch_shutdown(struct subchannel *sch)
- 	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
- 
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
- }
- 
- /**
-diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-index 89eb3feffa41..472e77f1bb6e 100644
---- a/drivers/s390/cio/vfio_ccw_fsm.c
-+++ b/drivers/s390/cio/vfio_ccw_fsm.c
-@@ -175,6 +175,7 @@ static void fsm_notoper(struct vfio_ccw_private *private,
- 	 */
- 	css_sched_sch_todo(sch, SCH_TODO_UNREG);
- 	private->state = VFIO_CCW_STATE_NOT_OPER;
-+	cp_free(&private->cp);
- }
- 
- /*
-@@ -379,9 +380,16 @@ static void fsm_open(struct vfio_ccw_private *private,
- 	spin_lock_irq(sch->lock);
- 	sch->isc = VFIO_CCW_ISC;
- 	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
--	if (!ret)
--		private->state = VFIO_CCW_STATE_STANDBY;
-+	if (ret)
-+		goto err_unlock;
-+
-+	private->state = VFIO_CCW_STATE_IDLE;
- 	spin_unlock_irq(sch->lock);
-+	return;
-+
-+err_unlock:
-+	spin_unlock_irq(sch->lock);
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
- }
- 
- static void fsm_close(struct vfio_ccw_private *private,
-@@ -393,16 +401,22 @@ static void fsm_close(struct vfio_ccw_private *private,
- 	spin_lock_irq(sch->lock);
- 
- 	if (!sch->schib.pmcw.ena)
--		goto out_unlock;
-+		goto err_unlock;
- 
- 	ret = cio_disable_subchannel(sch);
- 	if (ret == -EBUSY)
- 		vfio_ccw_sch_quiesce(sch);
-+	if (ret)
-+		goto err_unlock;
- 
--out_unlock:
--	private->state = VFIO_CCW_STATE_NOT_OPER;
-+	private->state = VFIO_CCW_STATE_STANDBY;
- 	spin_unlock_irq(sch->lock);
- 	cp_free(&private->cp);
-+	return;
-+
-+err_unlock:
-+	spin_unlock_irq(sch->lock);
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
- }
- 
- /*
-@@ -414,16 +428,16 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
- 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
- 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
- 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
--		[VFIO_CCW_EVENT_OPEN]		= fsm_open,
-+		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
- 		[VFIO_CCW_EVENT_CLOSE]		= fsm_nop,
- 	},
- 	[VFIO_CCW_STATE_STANDBY] = {
- 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
- 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
- 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
--		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
--		[VFIO_CCW_EVENT_OPEN]		= fsm_notoper,
--		[VFIO_CCW_EVENT_CLOSE]		= fsm_close,
-+		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
-+		[VFIO_CCW_EVENT_OPEN]		= fsm_open,
-+		[VFIO_CCW_EVENT_CLOSE]		= fsm_notoper,
- 	},
- 	[VFIO_CCW_STATE_IDLE] = {
- 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 4673b7ddfe20..bc2176421dc5 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -24,17 +24,12 @@ static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
- 	/*
- 	 * If the FSM state is seen as Not Operational after closing
- 	 * and re-opening the mdev, return an error.
--	 *
--	 * Otherwise, change the FSM from STANDBY to IDLE which is
--	 * normally done by vfio_ccw_mdev_probe() in current lifecycle.
- 	 */
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
- 	if (private->state == VFIO_CCW_STATE_NOT_OPER)
- 		return -EINVAL;
- 
--	private->state = VFIO_CCW_STATE_IDLE;
--
- 	return 0;
- }
- 
-@@ -121,8 +116,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- 	vfio_init_group_dev(&private->vdev, &mdev->dev,
- 			    &vfio_ccw_dev_ops);
- 
--	private->state = VFIO_CCW_STATE_IDLE;
--
- 	VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: create\n",
- 			   private->sch->schid.cssid,
- 			   private->sch->schid.ssid,
-@@ -137,7 +130,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- err_atomic:
- 	vfio_uninit_group_dev(&private->vdev);
- 	atomic_inc(&private->avail);
--	private->state = VFIO_CCW_STATE_STANDBY;
- 	return ret;
- }
- 
-@@ -165,6 +157,10 @@ static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
- 	unsigned long events = VFIO_IOMMU_NOTIFY_DMA_UNMAP;
- 	int ret;
- 
-+	/* Device cannot simply be opened again from this state */
-+	if (private->state == VFIO_CCW_STATE_NOT_OPER)
-+		return -EINVAL;
-+
- 	private->nb.notifier_call = vfio_ccw_mdev_notifier;
- 
- 	ret = vfio_register_notifier(vdev, VFIO_IOMMU_NOTIFY,
-@@ -184,6 +180,12 @@ static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
- 	if (ret)
- 		goto out_unregister;
- 
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
-+	if (private->state == VFIO_CCW_STATE_NOT_OPER) {
-+		ret = -EINVAL;
-+		goto out_unregister;
-+	}
-+
- 	return ret;
- 
- out_unregister:
-@@ -197,13 +199,7 @@ static void vfio_ccw_mdev_close_device(struct vfio_device *vdev)
- 	struct vfio_ccw_private *private =
- 		container_of(vdev, struct vfio_ccw_private, vdev);
- 
--	if ((private->state != VFIO_CCW_STATE_NOT_OPER) &&
--	    (private->state != VFIO_CCW_STATE_STANDBY)) {
--		if (!vfio_ccw_mdev_reset(private))
--			private->state = VFIO_CCW_STATE_STANDBY;
--		/* The state will be NOT_OPER on error. */
--	}
--
-+	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
- 	vfio_ccw_unregister_dev_regions(private);
- 	vfio_unregister_notifier(vdev, VFIO_IOMMU_NOTIFY, &private->nb);
- }
--- 
-2.32.0
-
+Otherwise, they have to write code themselves to do the dirty print...
