@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CF545614DE
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 10:23:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 394735614F3
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 10:27:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233190AbiF3IWq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 04:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49688 "EHLO
+        id S230199AbiF3IZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 04:25:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232342AbiF3IWi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 04:22:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BDE9CB0D
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 01:22:36 -0700 (PDT)
+        with ESMTP id S233732AbiF3IYk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 04:24:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B7ECDDF42
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 01:24:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656577355;
+        s=mimecast20190719; t=1656577478;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SpvDJDYrWiyEX6j/kWWghxQHe9L8KW/2pv5AGZNAv4U=;
-        b=i15kVdQaUhS/0yRyX30lhBAeEAJSPLXCrNzN+oMdY9TI/NEiVC7l8AT1ngm1zMDRIHhvMA
-        +srRGedPEI8B+LcsSHIqzP+UokIbTuYArF8127Fxxm3WlSfgGfb8hVmAHdO9R2dTfdZMrx
-        AHSvPw2leonrq2TpjIJHVuSIz2hPNq8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=hqIzgmR5tuOUBDBCfoAqKMfRDeawIdE7bmJ0sAWUGNs=;
+        b=FQ7tMj4Dw5PdXA5JntLJqDkecw7r7MZJzwljwc65nl0LKhGisvwpuaH0kF6aEPq6u56vax
+        gVRpaCUCGrTaWOx/mpxc7boCRaxo+xvL6sF/tfRRXjFltHR0TFrAu8UQHp8wKstklvYUqQ
+        z1PvmjyP/GuAds4oRSlkwhgTwnEKI2Q=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-672-uHb135smPzeUQPkxIZiYgg-1; Thu, 30 Jun 2022 04:22:32 -0400
-X-MC-Unique: uHb135smPzeUQPkxIZiYgg-1
+ us-mta-249-1U9-LxXeOyGGoyxZ1ALiTA-1; Thu, 30 Jun 2022 04:24:37 -0400
+X-MC-Unique: 1U9-LxXeOyGGoyxZ1ALiTA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E87CE19705A7;
-        Thu, 30 Jun 2022 08:22:31 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E05B93C1174C;
+        Thu, 30 Jun 2022 08:24:36 +0000 (UTC)
 Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6FAB11121314;
-        Thu, 30 Jun 2022 08:22:29 +0000 (UTC)
-Message-ID: <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 932F4112131B;
+        Thu, 30 Jun 2022 08:24:34 +0000 (UTC)
+Message-ID: <e04341912abfa1590edd4ee7c33efde6e227b93f.camel@redhat.com>
 Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Jim Mattson <jmattson@google.com>
@@ -48,18 +48,18 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
         Peter Shier <pshier@google.com>
-Date:   Thu, 30 Jun 2022 11:22:28 +0300
-In-Reply-To: <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com>
+Date:   Thu, 30 Jun 2022 11:24:33 +0300
+In-Reply-To: <CALMp9eQQROfYW7tNPaYCL5umjDr5ntsXuQ3BmorD8BWQiUGjdw@mail.gmail.com>
 References: <20220614204730.3359543-1-seanjc@google.com>
          <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
-         <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com>
+         <CALMp9eQQROfYW7tNPaYCL5umjDr5ntsXuQ3BmorD8BWQiUGjdw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,7 +68,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-06-29 at 06:42 -0700, Jim Mattson wrote:
+On Wed, 2022-06-29 at 08:53 -0700, Jim Mattson wrote:
 > On Wed, Jun 29, 2022 at 4:17 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
 > > On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
 > > > The main goal of this series is to fix KVM's longstanding bug of not
@@ -164,96 +164,28 @@ On Wed, 2022-06-29 at 06:42 -0700, Jim Mattson wrote:
 > >   (like if EFLAGS.IF is 0). VMX might have some checks that could fail VM entry,
 > >   if for example you try to inject type 0 (hardware interrupt) and EFLAGS.IF is 0,
 > >   I haven't checked this)
-> 
-> The event is never just "dropped." If it is illegal to deliver the
-> event, VM-entry fails. See the second bullet under section 26.2.1.3:
-> VM-Entry Control Fields, in the SDM, volume 3.
-Yes, that is what I wanted to confirm.
-
-
-> 
-> 
+> > 
 > >   All event injections happen right away, don't deliver any payload (like DR6), etc.
-> 
-> Correct.
-> 
+> > 
 > >   Injection types 4/5/6, do the same as injection types 0/2/3 but in addition to that,
 > >   type 4/6 do a DPL check in IDT, and also these types can promote the RIP prior
 > >   to pushing it to the exception stack using VM_ENTRY_INSTRUCTION_LEN to be consistent
 > >   with cases when these trap like events are intercepted, where the interception happens
 > >   on the start of the instruction despite exceptions being trap-like.
-> 
-> Unlike the AMD "INTn intercept," these trap intercepts *do not* happen
-> at the start of the instruction.
-
-Are you sure about that? 
-
-
-This is what the SDM says for direct intercepts.
-
-27.3.3 Saving RIP, RSP, RFLAGS, and SSP
-
-"If the VM exit is due to a software exception (due to an execution of INT3 or INTO) or a privileged software
-exception (due to an execution of INT1), the value saved references the INT3, INTO, or INT1 instruction
-that caused that exception."
-
-
-If these events were intecepted indirectly (via IDT_VECTORING_INFO_FIELD),
-its hard to understand from the PRM where the RIP points, but at least we at KVM,
-do read VM_EXIT_INSTRUCTION_LEN, and then stuff it into the VM_ENTRY_INSTRUCTION_LEN
-when we re-inject the event.
-(look at __vmx_complete_interrupts)
-
-
-Also note that you can't intercept INTn on Intel at all,
-but they can be intercepted indirectly via the IDT vectoring field.
-
-
-> In early Intel VT-x parts, one could
-> not easily reinject an intercepted software interrupt or exception
-> using event injection, because VM-entry required a non-zero
-> instruction length, and the guest RIP had already advanced. On CPUs
-> that support a non-zero instruction length, one can now reinject a
-> software interrupt or exception, by setting the VM-entry instruction
-> length to 0.
-> 
+> > 
+> > 
 > > 2. #DB is the only trap like exception that can be pending for one more instruction
 > >    if MOV SS shadow is on (any other cases?).
-> 
-> I believe that's it. I'm not entirely sure about RTM,though.
-> 
 > >    (AMD just ignores the whole thing, rightfully)
-> 
-> When you say "ignores," do you mean that AMD ignores a data breakpoint
-> or single-step trap generated by MOV-SS, or it ignores the fact that
-> delivering such a #DB trap between the MOV-SS and the subsequent
-> MOV-ESP will create a stack frame in the wrong place?
-
-Two things which can be infered from the SVM spec. 
-	- AMD doesn't distinguish between MOV SS and STI int shadow.
-	- AMD has no 'pending debug exception field' in the vmcb.
-
-I don't know what AMD does for #DB that happens on MOV SS, nor if it
-does distinguish these internally, 
-probably just drops the #DB or something.
-
-
-
-> 
+> > 
 > >    That is why we have the GUEST_PENDING_DBG_EXCEPTIONS vmcs field.
 > >    I understand that it will be written by CPU in case we have VM exit at the moment
 > >    where #DB is already pending but not yet delivered.
 > > 
 > >    That field can also be (sadly) used to "inject" #DB to the guest, if the hypervisor sets it,
 > >    and this #DB will actually update DR6 and such, and might be delayed/lost.
-> 
-> Injecting a #DB this way (if the hypervisor just emulated MOV-SS) is
-> easier than emulating the next instruction or using MTF to step
-> through the next instruction, and getting all of the deferred #DB
-> delivery rules right. :-)
-
-
-> 
+> > 
+> > 
 > > 3. Facts about MTF:
 > > 
 > >    * MTF as a feature is basically 'single step the guest by generating MTF VM exits after each executed
@@ -266,15 +198,7 @@ probably just drops the #DB or something.
 > >    * MTF event can be lost, if higher priority VM exit happens, this is why the SDM says about 'pending MTF',
 > >      which means that MTF vmexit should happen unless something else prevents it and/or higher priority VM exit
 > >      overrides it.
-> 
-> Hence, the facility for injecting a "pending MTF"--so that it won't be "lost."
-Yes, though that is would be mostly useful for nesting.
-
-For not nesting hypervisor, if the hypervisor figured out that a higher priority event overrode
-the MTF, it can just process the MTF - why to re-inject it?
-
-
-> 
+> > 
 > >    * MTF event is raised (when the primary execution controls bit is enabled) when:
 > > 
 > >         - after an injected (vectored), aka eventinj/VM_ENTRY_INTR_INFO_FIELD, done updating the guest state
@@ -293,14 +217,7 @@ the MTF, it can just process the MTF - why to re-inject it?
 > >           on the instruction boundary following delivery of the event (or any nested exception)."
 > > 
 > >           That means that #DB has higher priority that MTF, but not specified if fault DB or trap DB
-> 
-> These are single-step, I/O and data breakpoint traps.
-
-I am not sure what you mean. single-step, IO, data breakpoints are indeed the trap #DB,
-while "general detect", code breakpoint are fault #DB, and we also have the task switch #DB, but since the hardware doesn't
-emulate the task switches, this has to be injected.
-
-> 
+> > 
 > >         - If instruction causes exception, once again, on first instruction of the exception handler MTF will happen.
 > > 
 > >         - Otherwise after an instruction (or REP iteration) retires.
@@ -308,16 +225,18 @@ emulate the task switches, this has to be injected.
 > > 
 > > If you have more facts about MTF and related stuff and/or if I made a mistake in the above, I am all ears to listen!
 > 
-> You might be interested in my augmented Table 6-2 (from volume 3 of
-> the SDM): https://docs.google.com/spreadsheets/d/e/2PACX-1vR8TkbSl4TqXtD62agRUs1QY3SY-98mKtOh-s8vYDzaDmDOcdfyTvlAxF9aVnHWRu7uyGhRwvHUziXT/pubhtml
+> Here's a comprehensive spreadsheet on virtualizing MTF, compiled by
+> Peter Shier. (Just in case anyone is interested in *truly*
+> virtualizing the feature under KVM, rather than just setting a
+> VM-execution control bit in vmcs02 and calling it done.)
 > 
+> https://docs.google.com/spreadsheets/d/e/2PACX-1vQYP3PgY_JT42zQaR8uMp4U5LCey0qSlvMb80MLwjw-kkgfr31HqLSqAOGtdZ56aU2YdVTvfkruhuon/pubhtml
 
-I can't access this document for some reason (from my redhat account, which is gmail as well).
+Neither can I access this document sadly :(
 
-Thanks for the info,
 Best regards,
 	Maxim Levitsky
 
-
+> 
 
 
