@@ -2,75 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17E0E562391
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 21:53:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09412562397
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 21:53:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236974AbiF3Twp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 15:52:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50412 "EHLO
+        id S236934AbiF3Twl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 15:52:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236931AbiF3Twm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 15:52:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A66E344753
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 12:52:41 -0700 (PDT)
+        with ESMTP id S236823AbiF3Twi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 15:52:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9721B44756
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 12:52:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656618760;
+        s=mimecast20190719; t=1656618756;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oijUa/doj+rHJYQ7agDv94IkOqnu9hT+3btxZ5EWLOU=;
-        b=X1x9zNq9NJVJR0pR64Lz79I6Y9xWPLiZTUOWqbNozP2BQdpASBx7OBxj/yI0xBWKQUHfmE
-        QibetILkvmV0owCd7BOX1akQxLEisGd2hzfuYvXGyvwa6undMWlJkXJ7O64/Un63FeE7ty
-        BdV8J5Vk6BnOc8gmehYfwiBI/F3TqjM=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=YuG2y2ZB4QP84uKg4ters0wFa448pqv2dml+Y1Tj1iM=;
+        b=bbGg14TriMozqQUBrki4ABjKf3xuzVUmUFtUEPLp7rhnsgHAmAMHQmhyyRzLQliNaeYwp2
+        TvolyWwNa5H9w9N1ZX/SpW5lKtIIb84WgvKNKAm3zWZn6Xd5MuPAHDkLuFQTxJFpBURjV+
+        XOGjOmfvVOCOBDKkC3oBTIVbQhwnm9Y=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-330-v4FvfVgqNCO5F2-pk4Fdwg-1; Thu, 30 Jun 2022 15:52:39 -0400
-X-MC-Unique: v4FvfVgqNCO5F2-pk4Fdwg-1
-Received: by mail-io1-f69.google.com with SMTP id o11-20020a6bcf0b000000b0067328c4275bso106064ioa.8
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 12:52:39 -0700 (PDT)
+ us-mta-315-94VrKiC4MGurHBEBtBGQNw-1; Thu, 30 Jun 2022 15:52:35 -0400
+X-MC-Unique: 94VrKiC4MGurHBEBtBGQNw-1
+Received: by mail-io1-f70.google.com with SMTP id p123-20020a6bbf81000000b00674f66cf13aso77701iof.23
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 12:52:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=oijUa/doj+rHJYQ7agDv94IkOqnu9hT+3btxZ5EWLOU=;
-        b=wSZsWjdBPtH7WM6n2X5KmroapwoeCN2Nu+Sa5EuYdbI9EqDiPKo/seEW/WgYfajZvx
-         nPhlUz8hYLJx/IVyVvGkNnn2zlLhYh7EtRaygj8iRKdwAVD5nwaJVMAjAp/yg3mI7e88
-         0R0UEn9MQrrqliQJZDVZlwO2CWqhB/KTKzsPabrJ8usYnvIa3fj/j4KuDxxQQ7jSn9jM
-         uHZG8vALh/6KGwvrw0kjMM3+5TK572taaeX43DCB/UtLB/Ma6c6Q0oQnA12TOXk2mdqj
-         wz8zB79zi1NzA4KpdOeaSMt2Sydg8uyp8mQFxtxiwnaI/QKy3KwYagL2L6T29aaFrFgN
-         oJ8Q==
-X-Gm-Message-State: AJIora/xzgQi3HtwVNbEZRfJdTLhp2Bisf56AQdKujhBCWw0eaf3khGG
-        snFLWQS7/FZYqZ4tvx7jkSLh0+iKuNW7YTj9bOPUuxrCVG2gAcq/dlG0rAWzNRuuD6NCbBIwfam
-        +k3SXR4hvSq9/
-X-Received: by 2002:a05:6638:460e:b0:33b:12ee:21dd with SMTP id bw14-20020a056638460e00b0033b12ee21ddmr6682160jab.78.1656618758657;
-        Thu, 30 Jun 2022 12:52:38 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1s040rInVr/4GAKeW9JmeAzlx2T2zBRDB/znZYCLldJKIifBMCRPFbn28+EC9Wj1gm43q4KOA==
-X-Received: by 2002:a05:6638:460e:b0:33b:12ee:21dd with SMTP id bw14-20020a056638460e00b0033b12ee21ddmr6682145jab.78.1656618758457;
-        Thu, 30 Jun 2022 12:52:38 -0700 (PDT)
+        bh=YuG2y2ZB4QP84uKg4ters0wFa448pqv2dml+Y1Tj1iM=;
+        b=yFGkNdQVccyotAj1Pi8QKv+6GpQsl2Agpbk+ne3rn6dL8uUTYOgcvX9tdcm3vjQPJF
+         1vqpSCbSIyh2ihA7UTaL9p0kktiFf5jVQ1rAdGS3Bv0MfMSAL7f3c//X0lL7vD8Nc0Gi
+         OBw/9d8d1ZTjXuTXFg06YPM5s1AoRddkHqNw3MV+f6PmYxuXQR45CPtHjBwUtlET6h5D
+         aGEJIXX7sjYUOZm2McoZdozqOTvxNjwCtanNv0JcMOirUDKTiYrB7t1xzbovA9Isblt4
+         1Hp81H6rGe0mG37BtSiYMAl3eaIQaSXeXBVj1pnnY9WoLNYjQiXnnC4HRmnmXDniFt8w
+         sVwA==
+X-Gm-Message-State: AJIora8ekR0swfB172YSLASR+RWv+HYPHA44WWf0LYwgHRXR7rkw6tct
+        78i9k6zgSREqJxt7C/ld1lUR6P0VGJVHC3XvXSHfDEG4TIX3aGxTyyLEgb5sCygaDUIlWw/o4RL
+        mHv4Cgj4bDWuA
+X-Received: by 2002:a05:6638:2104:b0:33c:be1e:8d67 with SMTP id n4-20020a056638210400b0033cbe1e8d67mr6449867jaj.196.1656618754204;
+        Thu, 30 Jun 2022 12:52:34 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vbucyqQv+gwXM0W06NeNVvHRpysJftS4fb0I3/j0Q3zn/CNWBBDNBOEgMD60z7AaBt5n5aTg==
+X-Received: by 2002:a05:6638:2104:b0:33c:be1e:8d67 with SMTP id n4-20020a056638210400b0033cbe1e8d67mr6449858jaj.196.1656618753954;
+        Thu, 30 Jun 2022 12:52:33 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id x42-20020a0294ad000000b00330c5581c03sm8880286jah.1.2022.06.30.12.52.37
+        by smtp.gmail.com with ESMTPSA id x42-20020a0294ad000000b00330c5581c03sm8880286jah.1.2022.06.30.12.52.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 12:52:37 -0700 (PDT)
-Date:   Thu, 30 Jun 2022 13:51:42 -0600
+        Thu, 30 Jun 2022 12:52:33 -0700 (PDT)
+Date:   Thu, 30 Jun 2022 13:51:43 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <maorg@nvidia.com>,
-        <cohuck@redhat.com>, <kevin.tian@intel.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <liulongfang@huawei.com>
-Subject: Re: [PATCH V3 vfio 0/2] Migration few enhancements
-Message-ID: <20220630135142.1f90a3ee.alex.williamson@redhat.com>
-In-Reply-To: <20220628155910.171454-1-yishaih@nvidia.com>
-References: <20220628155910.171454-1-yishaih@nvidia.com>
+To:     Bo Liu <liubo03@inspur.com>
+Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/1] vfio: check vfio_register_iommu_driver() return
+ value
+Message-ID: <20220630135143.585d3575.alex.williamson@redhat.com>
+In-Reply-To: <20220622045651.5416-1-liubo03@inspur.com>
+References: <20220622045651.5416-1-liubo03@inspur.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,59 +78,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 Jun 2022 18:59:08 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
+On Wed, 22 Jun 2022 00:56:51 -0400
+Bo Liu <liubo03@inspur.com> wrote:
 
-> This series includes few enhancements in the migration area and some
-> fixes in mlx5 driver as of below.
+> As vfio_register_iommu_driver() can fail, we should check the return value.
 > 
-> It splits migration ops from the main device ops, this enables a driver
-> to safely set its migration's ops only when migration is supported and
-> leave the other code around (e.g., core, driver) clean.
+> Signed-off-by: Bo Liu <liubo03@inspur.com>
+> ---
+>  Changes from v1:
+>  -move the pr_info()
+>  -move  #endif above the ret test
+>  -remove #ifdefs above the err_driver_register
 > 
-> Registering different structs based on the device capabilities might
-> start to hit combinatorial explosion when we'll introduce ops for dirty
-> logging that may be optional too.
-> 
-> As part of that, adapt mlx5 to this scheme and fix some issues around
-> its migration capable usage.
-> 
-> V3:
-> - Fix a typo in vfio_pci_core_register_device(), to check for both set & get 'mig_ops'.
-> 
-> V2: https://lore.kernel.org/all/20220616170118.497620ba.alex.williamson@redhat.com/T/
-> - Validate ops construction and migration mandatory flags on
->   registration as was asked by Kevin and Jason.
-> - As of the above move to use a single 'mig_ops' check in vfio before
->   calling the driver.
-> 
-> V1: https://lore.kernel.org/all/20220626083958.54175-1-yishaih@nvidia.com/
-> - Add a comment about the required usage of 'mig_ops' as was suggested
->   by Alex.
-> - Add Kevin's Reviewed-by tag.
-> 
-> V0:
-> https://lore.kernel.org/all/20220616170118.497620ba.alex.williamson@redhat.com/T/
-> 
-> Yishai
-> Yishai Hadas (2):
->   vfio/mlx5: Protect mlx5vf_disable_fds() upon close device
->   vfio: Split migration ops from main device ops
-> 
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 11 +++++--
->  drivers/vfio/pci/mlx5/cmd.c                   | 14 ++++++++-
->  drivers/vfio/pci/mlx5/cmd.h                   |  4 ++-
->  drivers/vfio/pci/mlx5/main.c                  | 11 ++++---
->  drivers/vfio/pci/vfio_pci_core.c              |  7 +++++
->  drivers/vfio/vfio.c                           | 11 ++++---
->  include/linux/vfio.h                          | 30 ++++++++++++-------
->  7 files changed, 63 insertions(+), 25 deletions(-)
-> 
+>  drivers/vfio/vfio.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 
-I see these are included in your new longer series, where the only
-change was my suggested removal of parentheses, so I went ahead and
-merged this to my next branch for v5.20 and we can drop them from the
-other series.  Thanks,
+Applied to vfio next branch for v5.20.  Thanks,
 
 Alex
+
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 61e71c1154be..8f435c0d7748 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -2156,13 +2156,17 @@ static int __init vfio_init(void)
+>  	if (ret)
+>  		goto err_alloc_chrdev;
+>  
+> -	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+> -
+>  #ifdef CONFIG_VFIO_NOIOMMU
+> -	vfio_register_iommu_driver(&vfio_noiommu_ops);
+> +	ret = vfio_register_iommu_driver(&vfio_noiommu_ops);
+>  #endif
+> +	if (ret)
+> +		goto err_driver_register;
+> +
+> +	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+>  	return 0;
+>  
+> +err_driver_register:
+> +	unregister_chrdev_region(vfio.group_devt, MINORMASK + 1);
+>  err_alloc_chrdev:
+>  	class_destroy(vfio.class);
+>  	vfio.class = NULL;
 
