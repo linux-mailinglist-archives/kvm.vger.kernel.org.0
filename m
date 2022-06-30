@@ -2,108 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52235561E43
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 16:41:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C46B6561EEC
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 17:16:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235195AbiF3Ok6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 10:40:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50130 "EHLO
+        id S234766AbiF3PQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 11:16:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235661AbiF3Ok4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 10:40:56 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF076F5A;
-        Thu, 30 Jun 2022 07:40:54 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25UEdoWd020667;
-        Thu, 30 Jun 2022 14:40:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=zYLZgOWTdHHsmhGe0o5e/QxU17Rm38z1CjnF0eFzBR0=;
- b=RQh716WcTiJAuX4yC59At33IGLsYc1Z59TzjpO5/hiXQE24xFTSxBgJ8dAVf8asETfsp
- bL1owh1jvZLPEFGuksW5na5eV6d6wkLutopo6+UYQEKKLa8ucL87un3IrBEQg2C6u4EP
- NQZPHLY4YLihUW248xoQIEJJ7fxLnIeEMqh1Vy4hDbrqDW9Ka0JXKlIXIFkfJmT2hTCR
- NRYJ0W0ByBZGVGoQyaxw85LNaFh/p7Ryb5YjyFCAE1eIp8DWg8GzhvXhEkvg0MW3IIa0
- 6v7OBrphxwbUvyvpqnP0HqMX1QtpCDFh5bFIGUelyIRTo6/K5i1mkA7jgEnUMuX1HNeT 5w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1dqf0fjc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 14:40:53 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25UEdoMF020655;
-        Thu, 30 Jun 2022 14:39:50 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1dqf0cs7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 14:39:50 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25UELDFj001069;
-        Thu, 30 Jun 2022 14:38:53 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3gwt090a4g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Jun 2022 14:38:52 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25UEcnUY19792144
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jun 2022 14:38:49 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3EAD4C044;
-        Thu, 30 Jun 2022 14:38:49 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AF974C040;
-        Thu, 30 Jun 2022 14:38:49 +0000 (GMT)
-Received: from [9.171.59.186] (unknown [9.171.59.186])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 30 Jun 2022 14:38:47 +0000 (GMT)
-Message-ID: <dd270d92-a5dc-8a75-0edc-e9fdbb254cc9@linux.ibm.com>
-Date:   Thu, 30 Jun 2022 16:38:47 +0200
+        with ESMTP id S232458AbiF3PQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 11:16:15 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 575292CCAC
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 08:16:14 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EBD51063;
+        Thu, 30 Jun 2022 08:16:14 -0700 (PDT)
+Received: from [10.57.40.118] (unknown [10.57.40.118])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CB5603F66F;
+        Thu, 30 Jun 2022 08:16:11 -0700 (PDT)
+Message-ID: <218172cd-25fc-8888-96cc-a7b5a9c65f73@arm.com>
+Date:   Thu, 30 Jun 2022 16:16:09 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [kvm-unit-tests PATCH v1 3/3] s390x: add pgm spec interrupt loop
- test
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-References: <20220630113059.229221-1-nrb@linux.ibm.com>
- <20220630113059.229221-4-nrb@linux.ibm.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-In-Reply-To: <20220630113059.229221-4-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3Vef5SMmWYC9kEeMcn4NT88EivoQhGsK
-X-Proofpoint-ORIG-GUID: KrWS-4rg3G800Ax0su7tYUePHjOnEeKW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-30_09,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=872
- impostorscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0
- clxscore=1015 priorityscore=1501 malwarescore=0 mlxscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206300057
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [kvm-unit-tests PATCH v3 15/27] arm/arm64: mmu_disable: Clean and
+ invalidate before disabling
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        andrew.jones@linux.dev, pbonzini@redhat.com, jade.alglave@arm.com,
+        ricarkol@google.com
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-16-nikos.nikoleris@arm.com>
+ <Yr1480um3Blh078q@monolith.localdoman>
+ <16eda3c9-ec36-cd45-5c1a-0307f60dbc5f@arm.com>
+ <Yr2H3AiNGHeKReP2@monolith.localdoman>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <Yr2H3AiNGHeKReP2@monolith.localdoman>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/30/22 13:30, Nico Boehr wrote:
-> An invalid PSW causes a program interrupt. When an invalid PSW is
-> introduced in the pgm_new_psw, an interrupt loop occurs as soon as a
-> program interrupt is caused.
+Hi Alex,
+
+On 30/06/2022 12:24, Alexandru Elisei wrote:
+> Hi,
 > 
-> QEMU should detect that and panick the guest, hence add a test for it.
+> On Thu, Jun 30, 2022 at 12:08:41PM +0100, Nikos Nikoleris wrote:
+>> Hi Alex,
+>>
+>> On 30/06/2022 11:20, Alexandru Elisei wrote:
+>>> Hi,
+>>>
+>>> On Thu, Jun 30, 2022 at 11:03:12AM +0100, Nikos Nikoleris wrote:
+>>>> From: Andrew Jones <drjones@redhat.com>
+>>>>
+>>>> The commit message of commit 410b3bf09e76 ("arm/arm64: Perform dcache
+>>>> clean + invalidate after turning MMU off") justifies cleaning and
+>>>> invalidating the dcache after disabling the MMU by saying it's nice
+>>>> not to rely on the current page tables and that it should still work
+>>>> (per the spec), as long as there's an identity map in the current
+>>>> tables. Doing the invalidation after also somewhat helped with
+>>>> reenabling the MMU without seeing stale data, but the real problem
+>>>> with reenabling was because the cache needs to be disabled with
+>>>> the MMU, but it wasn't.
+>>>>
+>>>> Since we have to trust/validate that the current page tables have an
+>>>> identity map anyway, then there's no harm in doing the clean
+>>>> and invalidate first (it feels a little better to do so, anyway,
+>>>> considering the cache maintenance instructions take virtual
+>>>> addresses). Then, also disable the cache with the MMU to avoid
+>>>> problems when reenabling. We invalidate the Icache and disable
+>>>> that too for good measure. And, a final TLB invalidation ensures
+>>>> we're crystal clean when we return from asm_mmu_disable().
+>>>
+>>> I'll point you to my previous reply [1] to this exact patch which explains
+>>> why it's incorrect and is only papering over another problem.
+>>>
+>>> [1] https://lore.kernel.org/all/Yn5Z6Kyj62cUNgRN@monolith.localdoman/
+>>>
+>>
+>> Apologies, I didn't mean to ignore your feedback on this. There was a
+>> parallel discussion in [2] which I thought makes the problem more concrete.
+> 
+> No problem, I figured as much :).
+> 
+>>
+>> This is Drew's patch as soon as he confirms he's also happy with the change
+>> you suggested in the patch description I am happy to make it.
+>>
+>> Generally, a test will start off with the MMU enabled. At this point, we
+>> access code, use and modify data (EfiLoaderData, EfiLoaderCode). Any of the
+>> two regions could be mapped as any type of memory (I need to have another
+>> look to confirm if it's Normal Memory). Then we want to take over control of
+>> the page tables and for that reason we have to switch off the MMU. And any
+>> access to code or data will be with Device-nGnRnE as you pointed out. If we
+>> don't clean and invalidate, instructions and data might be in the cache and
+>> we will be mixing memory attributes, won't we?
+> 
+> I missed that comment, sorry. I've replied to that comment made in v2,
+> here, in this ieration, in patch #19 ("arm/arm64: Add a setup sequence for
+> systems that boot through EFI").
+> 
+> This is the second time you've mentioned mixed memory attributes, so I'm
+> going to reiterate the question I asked in patch #19: what do you mean by
+> "mixing memory attributes" and what is wrong with it? Because it looks to
+> me like you're saying that you cannot access data written with the MMU on
+> when the MMU is off (and I assume the other way around, you cannot data
+> written with the MMU off when the MMU is on).
+> 
 
-Why is that, after all in LPAR it would just spin, right?
-Also, panicK.
-How do you assert that the guest doesn't spin forever, is there a timeout?
+What I mean by mixing memory attributes is illustrated by the following 
+example.
+
+Take a memory location x, for which the page table entry maps to a 
+physical location as Normal, Inner-Shareable, Inner-writeback and 
+Outer-writeback. If we access it when the MMU is on and subquently when 
+the MMU is off (treated as Device-nGnRnE), then we have two accesses 
+with mismatched memory attributes to the same location. There is a whole 
+section in the Arm ARM on why this needs to be avoided (B2.8 Mismatched 
+memory attributes) but the result is "a loss of the uniprocessor 
+semantics, ordering, or coherency". As I understand, the solution to 
+this is:
+
+"If the mismatched attributes for a Location mean that multiple 
+cacheable accesses to the Location might be made with different 
+shareability attributes, then uniprocessor semantics, ordering, and 
+coherency are guaranteed only if:
+• Software running on a PE cleans and invalidates a Location from cache 
+before and after each read or write to that Location by that PE.
+• A DMB barrier with scope that covers the full shareability of the 
+accesses is placed between any accesses to the same memory Location that 
+use different attributes."
+
+So unless UEFI maps all memory as Device-nGnRnE we have to do something. 
+I will try to find out more about UEFI's page tables.
+
+Thanks,
+
+Nikos
 
 
+> Thanks,
+> Alex
