@@ -2,114 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA8AF562539
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 23:29:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 045765625FB
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 00:22:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237466AbiF3V1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 17:27:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47658 "EHLO
+        id S230483AbiF3WWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 18:22:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237225AbiF3V1h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 17:27:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B0F6B35AA9
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:27:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656624455;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Wd1ki83p3SXylkpu3EgQoI69vBxY8no6C/MZWnJcErg=;
-        b=VlxOTAqLEPo1xuRDRR/dg76LNpWP1wXxflag94wdkZnxhepasM08EGh9RkPXmCUmmH8DwA
-        D73bYKIuC2T13oll1YtrpbzyQBBv/0j99r/UoCHu+JT4uHnTVZi0fyKnM7zcgSWRleGrJm
-        4+3DJX6FOXvIjJ0NLGFZON7ol1og6i4=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-78-TdR4cO4wOt63WdycKHhNiw-1; Thu, 30 Jun 2022 17:27:34 -0400
-X-MC-Unique: TdR4cO4wOt63WdycKHhNiw-1
-Received: by mail-il1-f199.google.com with SMTP id i2-20020a056e021b0200b002dadf6a0a0eso139034ilv.12
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 14:27:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Wd1ki83p3SXylkpu3EgQoI69vBxY8no6C/MZWnJcErg=;
-        b=wSI1wS3E2+AXA3Jn9+rP4nXT+TMPkro0TKIGI+T2PIxXRJ9QYUzmvPEezY0L3XLASz
-         rgFCkNWjV11ZDlVE8Rn6Isbl447WEtI0AKXULWcsNjYliJIYFeeePbo48tpqVGxNNnik
-         li9A26aU94rwHtFV+uUVIYuNI+s2L2d4S1DiD9PaLnco82P+DFOcQwsAfXMIfBz+E+23
-         +xTx+kptx13FEw5Nm7qCXRIkdCandP/HYstcQEpQpJUnwQjSuM6EGVfb7gsnLgO8rit/
-         gLatMNoNxUtISsqik61TdiqU5Nw4o2Uu5jqviJrA9PoOKMQvPfhemVbjTaMAXnx3mAb0
-         tdhg==
-X-Gm-Message-State: AJIora/7YTa8Ak/HJRoxsvxCxXf34+XVehprtEMzFph/ttoioqvYqwiR
-        gtE/oPvFglsMJbguidHQL7UGTKwLPl8osEUBwByz1pdXL0bRdBV74k9S+/znfNlS8xOHAnyF6+M
-        qmNzu0QdvdU5Q
-X-Received: by 2002:a6b:fb05:0:b0:657:655e:a287 with SMTP id h5-20020a6bfb05000000b00657655ea287mr5835540iog.211.1656624453803;
-        Thu, 30 Jun 2022 14:27:33 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1t78+bU25q9esv1lcWaU4zBR2o8PbPeqMIreeppu9DzAo0eFqpPx7c+rMK82ivDZlWfZZexEQ==
-X-Received: by 2002:a6b:fb05:0:b0:657:655e:a287 with SMTP id h5-20020a6bfb05000000b00657655ea287mr5835526iog.211.1656624453577;
-        Thu, 30 Jun 2022 14:27:33 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id e98-20020a02866b000000b00331598832besm9005563jai.25.2022.06.30.14.27.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 14:27:32 -0700 (PDT)
-Date:   Thu, 30 Jun 2022 17:27:30 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        with ESMTP id S229531AbiF3WWE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 18:22:04 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2077.outbound.protection.outlook.com [40.107.223.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C17B3A2;
+        Thu, 30 Jun 2022 15:22:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R1o6k544A11JQIULQrl3DckEqCaQA3hj76EyHnYr4tp9njCrVKf8dHbYrkXFHfM+LRus2qsboHt/6OuXjE+oGJy6vIzFwdvuc+BG00HmU93YzgSaAhA+hVZk3KQFfdVXT1FaCrPIaxWJ0ZWyd++Bd9jgvATmgL17d6sSAwy824r1NbFHedhmiAuf+btmCp4i4wk+Mng/FFzTGoUDhoW9+KbE1tszBMeqghIlxNA0oIV4p9cN2JjQEHx1+3XXzNleN621QGJKUK/rLGo+PPbWtxMxWfxqr7PcPm8iEUzYFFQLAeOpfCS9KsP+Mh+URmd1S2f+8m/snNFN7fJrfBGWNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vDdvE/+qLXuAvKitUqu8CFVheNxtCtHZvfWwUHG1068=;
+ b=jHQjWnt3s50X0zoJWkbB04WeIXbUw9iSH6IBaRwJrgGTIAnG1IJYewCMhOIUBdsO1VnTXa0YsMUSIUNFqiggsCwNRCQYxPTA2wJ+fdzsoIs7OI9tv/CMYQW7fSSbztRPzpCF8c+0zZydgm9Sy6BZE64dYZXRXYFA/8RMcyFyRRwxx9rq5J49kRQG+/gZIgwhjIyH6Ep11iEmrSyaff7Hl4j2Rc/OJCu8q4gs+xl+SGAaG3Q1jhh0mTAVtJ2EExxgu40KXLE5njaOkB/fDdZEqwr3cxknN01hFxVWM0USf+/i35uLzunh2m6wZHCS1Z45iDe1uynWnbXSVaURYN6Icw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vDdvE/+qLXuAvKitUqu8CFVheNxtCtHZvfWwUHG1068=;
+ b=NPD+cmFuHwFd21SkLbknHj1F39ac/FNDuXtzhmvMBIDcI2yr+KJiLlWvrb29wc3om6Y6Q7N6qIJyRYFD/gTJnANwaic/U5hjhHwIVecVXSiWu36zgWNfdEKzBw7JXIwyCCmdG4+gABilVbl/m0HAst/eFZaK/LzmmzPCtJT4aiE=
+Received: from BN9P220CA0023.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:13e::28)
+ by DM6PR12MB4089.namprd12.prod.outlook.com (2603:10b6:5:213::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.17; Thu, 30 Jun
+ 2022 22:22:00 +0000
+Received: from BN8NAM11FT040.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13e:cafe::62) by BN9P220CA0023.outlook.office365.com
+ (2603:10b6:408:13e::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15 via Frontend
+ Transport; Thu, 30 Jun 2022 22:22:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT040.mail.protection.outlook.com (10.13.177.166) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5395.14 via Frontend Transport; Thu, 30 Jun 2022 22:22:00 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Thu, 30 Jun
+ 2022 17:21:59 -0500
+Date:   Thu, 30 Jun 2022 17:21:40 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+CC:     Chao Peng <chao.p.peng@linux.intel.com>,
+        "Nikunj A. Dadhania" <nikunj@amd.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-api@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <qemu-devel@nongnu.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Linux MM Mailing List <linux-mm@kvack.org>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 1/4] mm/gup: Add FOLL_INTERRUPTIBLE
-Message-ID: <Yr4VQqTIu1bMEAji@xz-m1.local>
-References: <20220622213656.81546-2-peterx@redhat.com>
- <c196a140-6ee4-850c-004a-9c9d1ff1faa6@nvidia.com>
- <YrtXGf20oa5eYgIU@xz-m1.local>
- <16c181d3-09ef-ace4-c910-0a13fc245e48@nvidia.com>
- <YruBzuJf9s/Nmr6W@xz-m1.local>
- <177284f9-416d-c142-a826-e9a497751fca@nvidia.com>
- <Yrx0ETyb2kk4fO4M@xz-m1.local>
- <17f9eae0-01bb-4793-201e-16ee267c07f2@nvidia.com>
- <Yr2p7sR3IjiGTGd3@xz-m1.local>
- <0183984a-c95f-c92e-629e-775071b5cd23@nvidia.com>
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86 <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Steven Price" <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Jun Nakajima" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Andi Kleen" <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, <aarcange@redhat.com>,
+        <ddutile@redhat.com>, <dhildenb@redhat.com>,
+        "Quentin Perret" <qperret@google.com>, <mhocko@suse.com>
+Subject: Re: [PATCH v6 6/8] KVM: Handle page fault for private memory
+Message-ID: <20220630222140.of4md7bufd5jv5bh@amd.com>
+References: <20220519153713.819591-1-chao.p.peng@linux.intel.com>
+ <20220519153713.819591-7-chao.p.peng@linux.intel.com>
+ <b3ce0855-0e4b-782a-599c-26590df948dd@amd.com>
+ <20220624090246.GA2181919@chaop.bj.intel.com>
+ <CAGtprH82H_fjtRbL0KUxOkgOk4pgbaEbAydDYfZ0qxz41JCnAQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <0183984a-c95f-c92e-629e-775071b5cd23@nvidia.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CAGtprH82H_fjtRbL0KUxOkgOk4pgbaEbAydDYfZ0qxz41JCnAQ@mail.gmail.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d5fecce7-6f56-4080-cfa6-08da5ae6f3ae
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4089:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Z2QpwV8hL6dMAI9riXKR5ZLlDlOA+N4IsIvDs2cG6vwUsCuUwB5piVkHhPRMUmxec0BpSIf2dn+9teTt0w9OH7eK6lgym0sa479giZjgGKH9Qrc3UJeyIP1usR6VNKLvi8NS4G1hUUf1rhUuI8t656nXygxYdtPTNNOYTPs2VZxi6ltEeGyCv6FKyM2Vwh9YDkU/o+/fsustHg8MHhRyaEevWYAltL4dMC9iYIqELYfwMS+6QbFI0+aY98978dksFsFwTjCQ+tIlhNmeDKSUM6F/ZKTS74utfp1OEMsgRgBHAn97BGcE2hZ2ehAbMpjdF8Jar/uBUxpVh4hBNU20f2Fqo0alSHGJiKCqT9ceI4xFdaJHFbHi56mrDvWuoJsaR5WVVTvh4GUKNPJ/tS5uHUpI5XGxpMbpIcHSgAcQsiBKIJJxpmNlicGyiiPKQ1w+Kv6X6POJJOGjcCh+yFkwjs4Eos9ZL11Vsqkngkq8LIPoxE3yqpfCgUijxcWUlVRmiMbNc2/W7zj0EQF/ECZAsZkBNMKfrdqaTajRk05O94RZUb76PBS4X6eozgdc8FdZgrdMsCtx5dxUaB4yygv2/tguO40XaFCvv2hZETKfSntGepWrs+EvH95hC1aKWvsTdCq9IRFQpsJkq4FMB5DGslE6WCzjHRYhHFhv1dmFGh+EqmuySyMYLtQ2otbe/PbEGr7W/QwakdQO6peHt+qAkXVTc+SLYc498p9IB7+3+AG6H8xoXkQadJ4csHubsm6A+el1yw6PUdmOsL5KBii2gVrd90NFsn8sdMbn0dTabvjbiKxcbiErd4yKk4jrmTaho4/x7UYDiB5NiUGfnTpjD0MyF0I4xTqSeMNOzEFvCRLRZnT+qVef0Tj278fbgTu5
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(39860400002)(346002)(376002)(40470700004)(36840700001)(46966006)(40480700001)(356005)(6916009)(81166007)(336012)(1076003)(44832011)(316002)(36860700001)(40460700003)(36756003)(5660300002)(7416002)(82740400003)(41300700001)(70586007)(82310400005)(8676002)(966005)(70206006)(7406005)(4326008)(86362001)(16526019)(426003)(186003)(2616005)(2906002)(83380400001)(6666004)(8936002)(47076005)(478600001)(26005)(54906003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2022 22:22:00.2863
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5fecce7-6f56-4080-cfa6-08da5ae6f3ae
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT040.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4089
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 12:01:53PM -0700, John Hubbard wrote:
-> On 6/30/22 06:49, Peter Xu wrote:
-> > Looks good to me, I'd tune a bit to make it less ambiguous on a few places:
-> > 
-> > 		/*
-> > 		 * FAULT_FLAG_INTERRUPTIBLE is opt-in. GUP callers must set
-> > 		 * FOLL_INTERRUPTIBLE to enable FAULT_FLAG_INTERRUPTIBLE.
-> > 		 * That's because some callers may not be prepared to
-> > 		 * handle early exits caused by non-fatal signals.
-> > 		 */
-> > 
-> > Would that be okay to you?
-> > 
+On Thu, Jun 30, 2022 at 12:14:13PM -0700, Vishal Annapurve wrote:
+> With transparent_hugepages=always setting I see issues with the
+> current implementation.
 > 
-> Yes, looks good. With that change, please feel free to add:
+> Scenario:
+> 1) Guest accesses a gfn range 0x800-0xa00 as private
+> 2) Guest calls mapgpa to convert the range 0x84d-0x86e as shared
+> 3) Guest tries to access recently converted memory as shared for the first time
+> Guest VM shutdown is observed after step 3 -> Guest is unable to
+> proceed further since somehow code section is not as expected
 > 
-> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+> Corresponding KVM trace logs after step 3:
+> VCPU-0-61883   [078] ..... 72276.115679: kvm_page_fault: address
+> 84d000 error_code 4
+> VCPU-0-61883   [078] ..... 72276.127005: kvm_mmu_spte_requested: gfn
+> 84d pfn 100b4a4d level 2
+> VCPU-0-61883   [078] ..... 72276.127008: kvm_tdp_mmu_spte_changed: as
+> id 0 gfn 800 level 2 old_spte 100b1b16827 new_spte 100b4a00ea7
+> VCPU-0-61883   [078] ..... 72276.127009: kvm_mmu_prepare_zap_page: sp
+> gen 0 gfn 800 l1 8-byte q0 direct wux nxe ad root 0 sync
+> VCPU-0-61883   [078] ..... 72276.127009: kvm_tdp_mmu_spte_changed: as
+> id 0 gfn 800 level 1 old_spte 1003eb27e67 new_spte 5a0
+> VCPU-0-61883   [078] ..... 72276.127010: kvm_tdp_mmu_spte_changed: as
+> id 0 gfn 801 level 1 old_spte 10056cc8e67 new_spte 5a0
+> VCPU-0-61883   [078] ..... 72276.127010: kvm_tdp_mmu_spte_changed: as
+> id 0 gfn 802 level 1 old_spte 10056fa2e67 new_spte 5a0
+> VCPU-0-61883   [078] ..... 72276.127010: kvm_tdp_mmu_spte_changed: as
+> id 0 gfn 803 level 1 old_spte 0 new_spte 5a0
+> ....
+>  VCPU-0-61883   [078] ..... 72276.127089: kvm_tdp_mmu_spte_changed: as
+> id 0 gfn 9ff level 1 old_spte 100a43f4e67 new_spte 5a0
+>  VCPU-0-61883   [078] ..... 72276.127090: kvm_mmu_set_spte: gfn 800
+> spte 100b4a00ea7 (rwxu) level 2 at 10052fa5020
+>  VCPU-0-61883   [078] ..... 72276.127091: kvm_fpu: unload
+> 
+> Looks like with transparent huge pages enabled kvm tried to handle the
+> shared memory fault on 0x84d gfn by coalescing nearby 4K pages
+> to form a contiguous 2MB page mapping at gfn 0x800, since level 2 was
+> requested in kvm_mmu_spte_requested.
+> This caused the private memory contents from regions 0x800-0x84c and
+> 0x86e-0xa00 to get unmapped from the guest leading to guest vm
+> shutdown.
 
-Will do, thanks!
+Interesting... seems like that wouldn't be an issue for non-UPM SEV, since
+the private pages would still be mapped as part of that 2M mapping, and
+it's completely up to the guest as to whether it wants to access as
+private or shared. But for UPM it makes sense this would cause issues.
 
--- 
-Peter Xu
+> 
+> Does getting the mapping level as per the fault access type help
+> address the above issue? Any such coalescing should not cross between
+> private to
+> shared or shared to private memory regions.
 
+Doesn't seem like changing the check to fault->is_private would help in
+your particular case, since the subsequent host_pfn_mapping_level() call
+only seems to limit the mapping level to whatever the mapping level is
+for the HVA in the host page table.
+
+Seems like with UPM we need some additional handling here that also
+checks that the entire 2M HVA range is backed by non-private memory.
+
+Non-UPM SNP hypervisor patches already have a similar hook added to
+host_pfn_mapping_level() which implements such a check via RMP table, so
+UPM might need something similar:
+
+  https://github.com/AMDESE/linux/commit/ae4475bc740eb0b9d031a76412b0117339794139
+
+-Mike
+
+> 
+> > > >     host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
+> > > >     return min(host_level, max_level);
+> > > >  }
+> > >
+> 
+> Regards,
+> Vishal
