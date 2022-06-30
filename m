@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7B4356172B
-	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 12:05:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31177561730
+	for <lists+kvm@lfdr.de>; Thu, 30 Jun 2022 12:05:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234246AbiF3KDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 06:03:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38854 "EHLO
+        id S234703AbiF3KD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 06:03:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234703AbiF3KDy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 06:03:54 -0400
+        with ESMTP id S234701AbiF3KD4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 06:03:56 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F4673B3C1
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 03:03:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD7D2443D2
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 03:03:52 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 63EC81063;
-        Thu, 30 Jun 2022 03:03:51 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 865941BF7;
+        Thu, 30 Jun 2022 03:03:52 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B6A33F5A1;
-        Thu, 30 Jun 2022 03:03:50 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 583623F5A1;
+        Thu, 30 Jun 2022 03:03:51 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     andrew.jones@linux.dev, drjones@redhat.com, pbonzini@redhat.com,
         jade.alglave@arm.com, alexandru.elisei@arm.com, ricarkol@google.com
-Subject: [kvm-unit-tests PATCH v3 01/27] lib: Fix style for acpi.{c,h}
-Date:   Thu, 30 Jun 2022 11:02:58 +0100
-Message-Id: <20220630100324.3153655-2-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH v3 02/27] x86: Avoid references to fields of ACPI tables
+Date:   Thu, 30 Jun 2022 11:02:59 +0100
+Message-Id: <20220630100324.3153655-3-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
 References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
@@ -42,283 +42,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+ACPI table definitions in <acpi.h> have to be packed.  However, once
+we do that, direct references to members of the packed struct might
+result in unaligned pointers and gcc complains about them. This change
+modifies the code to avoid such references in preparation for making
+the APCI table definitions packed.
+
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- lib/acpi.h | 148 ++++++++++++++++++++++++++---------------------------
- lib/acpi.c |  70 ++++++++++++-------------
- 2 files changed, 108 insertions(+), 110 deletions(-)
+ x86/s3.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-diff --git a/lib/acpi.h b/lib/acpi.h
-index 1e89840..456e62d 100644
---- a/lib/acpi.h
-+++ b/lib/acpi.h
-@@ -3,7 +3,7 @@
+diff --git a/x86/s3.c b/x86/s3.c
+index 378d37a..0bcbe18 100644
+--- a/x86/s3.c
++++ b/x86/s3.c
+@@ -2,15 +2,6 @@
+ #include "acpi.h"
+ #include "asm/io.h"
  
- #include "libcflat.h"
- 
--#define ACPI_SIGNATURE(c1, c2, c3, c4) \
-+#define ACPI_SIGNATURE(c1, c2, c3, c4)				\
- 	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
- 
- #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
-@@ -12,98 +12,98 @@
- #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
- 
- 
--#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8) \
--	((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |       \
-+#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8)	\
-+	((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |		\
- 	((uint64_t)(ACPI_SIGNATURE(c5, c6, c7, c8)) << 32)
- 
- #define RSDP_SIGNATURE_8BYTE (ACPI_SIGNATURE_8BYTE('R', 'S', 'D', ' ', 'P', 'T', 'R', ' '))
- 
--struct rsdp_descriptor {        /* Root System Descriptor Pointer */
--    u64 signature;              /* ACPI signature, contains "RSD PTR " */
--    u8  checksum;               /* To make sum of struct == 0 */
--    u8  oem_id [6];             /* OEM identification */
--    u8  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
--    u32 rsdt_physical_address;  /* 32-bit physical address of RSDT */
--    u32 length;                 /* XSDT Length in bytes including hdr */
--    u64 xsdt_physical_address;  /* 64-bit physical address of XSDT */
--    u8  extended_checksum;      /* Checksum of entire table */
--    u8  reserved [3];           /* Reserved field must be 0 */
-+struct rsdp_descriptor {		/* Root System Descriptor Pointer */
-+	u64 signature;			/* ACPI signature, contains "RSD PTR " */
-+	u8  checksum;			/* To make sum of struct == 0 */
-+	u8  oem_id [6];			/* OEM identification */
-+	u8  revision;			/* Must be 0 for 1.0, 2 for 2.0 */
-+	u32 rsdt_physical_address;	/* 32-bit physical address of RSDT */
-+	u32 length;			/* XSDT Length in bytes including hdr */
-+	u64 xsdt_physical_address;	/* 64-bit physical address of XSDT */
-+	u8  extended_checksum;		/* Checksum of entire table */
-+	u8  reserved [3];		/* Reserved field must be 0 */
- };
- 
--#define ACPI_TABLE_HEADER_DEF   /* ACPI common table header */ \
--    u32 signature;          /* ACPI signature (4 ASCII characters) */ \
--    u32 length;                 /* Length of table, in bytes, including header */ \
--    u8  revision;               /* ACPI Specification minor version # */ \
--    u8  checksum;               /* To make sum of entire table == 0 */ \
--    u8  oem_id [6];             /* OEM identification */ \
--    u8  oem_table_id [8];       /* OEM table identification */ \
--    u32 oem_revision;           /* OEM revision number */ \
--    u8  asl_compiler_id [4];    /* ASL compiler vendor ID */ \
--    u32 asl_compiler_revision;  /* ASL compiler revision number */
-+#define ACPI_TABLE_HEADER_DEF		/* ACPI common table header */			\
-+	u32 signature;			/* ACPI signature (4 ASCII characters) */	\
-+	u32 length;			/* Length of table, in bytes, including header */ \
-+	u8  revision;			/* ACPI Specification minor version # */	\
-+	u8  checksum;			/* To make sum of entire table == 0 */		\
-+	u8  oem_id [6];			/* OEM identification */			\
-+	u8  oem_table_id [8];		/* OEM table identification */			\
-+	u32 oem_revision;		/* OEM revision number */			\
-+	u8  asl_compiler_id [4];	/* ASL compiler vendor ID */			\
-+	u32 asl_compiler_revision;	/* ASL compiler revision number */
- 
- struct acpi_table {
--    ACPI_TABLE_HEADER_DEF
--    char data[0];
-+	ACPI_TABLE_HEADER_DEF
-+	char data[0];
- };
- 
- struct rsdt_descriptor_rev1 {
--    ACPI_TABLE_HEADER_DEF
--    u32 table_offset_entry[0];
-+	ACPI_TABLE_HEADER_DEF
-+	u32 table_offset_entry[1];
- };
- 
- struct fadt_descriptor_rev1
- {
--    ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
--    u32 firmware_ctrl;          /* Physical address of FACS */
--    u32 dsdt;                   /* Physical address of DSDT */
--    u8  model;                  /* System Interrupt Model */
--    u8  reserved1;              /* Reserved */
--    u16 sci_int;                /* System vector of SCI interrupt */
--    u32 smi_cmd;                /* Port address of SMI command port */
--    u8  acpi_enable;            /* Value to write to smi_cmd to enable ACPI */
--    u8  acpi_disable;           /* Value to write to smi_cmd to disable ACPI */
--    u8  S4bios_req;             /* Value to write to SMI CMD to enter S4BIOS state */
--    u8  reserved2;              /* Reserved - must be zero */
--    u32 pm1a_evt_blk;           /* Port address of Power Mgt 1a acpi_event Reg Blk */
--    u32 pm1b_evt_blk;           /* Port address of Power Mgt 1b acpi_event Reg Blk */
--    u32 pm1a_cnt_blk;           /* Port address of Power Mgt 1a Control Reg Blk */
--    u32 pm1b_cnt_blk;           /* Port address of Power Mgt 1b Control Reg Blk */
--    u32 pm2_cnt_blk;            /* Port address of Power Mgt 2 Control Reg Blk */
--    u32 pm_tmr_blk;             /* Port address of Power Mgt Timer Ctrl Reg Blk */
--    u32 gpe0_blk;               /* Port addr of General Purpose acpi_event 0 Reg Blk */
--    u32 gpe1_blk;               /* Port addr of General Purpose acpi_event 1 Reg Blk */
--    u8  pm1_evt_len;            /* Byte length of ports at pm1_x_evt_blk */
--    u8  pm1_cnt_len;            /* Byte length of ports at pm1_x_cnt_blk */
--    u8  pm2_cnt_len;            /* Byte Length of ports at pm2_cnt_blk */
--    u8  pm_tmr_len;             /* Byte Length of ports at pm_tm_blk */
--    u8  gpe0_blk_len;           /* Byte Length of ports at gpe0_blk */
--    u8  gpe1_blk_len;           /* Byte Length of ports at gpe1_blk */
--    u8  gpe1_base;              /* Offset in gpe model where gpe1 events start */
--    u8  reserved3;              /* Reserved */
--    u16 plvl2_lat;              /* Worst case HW latency to enter/exit C2 state */
--    u16 plvl3_lat;              /* Worst case HW latency to enter/exit C3 state */
--    u16 flush_size;             /* Size of area read to flush caches */
--    u16 flush_stride;           /* Stride used in flushing caches */
--    u8  duty_offset;            /* Bit location of duty cycle field in p_cnt reg */
--    u8  duty_width;             /* Bit width of duty cycle field in p_cnt reg */
--    u8  day_alrm;               /* Index to day-of-month alarm in RTC CMOS RAM */
--    u8  mon_alrm;               /* Index to month-of-year alarm in RTC CMOS RAM */
--    u8  century;                /* Index to century in RTC CMOS RAM */
--    u8  reserved4;              /* Reserved */
--    u8  reserved4a;             /* Reserved */
--    u8  reserved4b;             /* Reserved */
-+	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
-+	u32 firmware_ctrl;	/* Physical address of FACS */
-+	u32 dsdt;		/* Physical address of DSDT */
-+	u8  model;		/* System Interrupt Model */
-+	u8  reserved1;		/* Reserved */
-+	u16 sci_int;		/* System vector of SCI interrupt */
-+	u32 smi_cmd;		/* Port address of SMI command port */
-+	u8  acpi_enable;	/* Value to write to smi_cmd to enable ACPI */
-+	u8  acpi_disable;	/* Value to write to smi_cmd to disable ACPI */
-+	u8  S4bios_req;		/* Value to write to SMI CMD to enter S4BIOS state */
-+	u8  reserved2;		/* Reserved - must be zero */
-+	u32 pm1a_evt_blk;	/* Port address of Power Mgt 1a acpi_event Reg Blk */
-+	u32 pm1b_evt_blk;	/* Port address of Power Mgt 1b acpi_event Reg Blk */
-+	u32 pm1a_cnt_blk;	/* Port address of Power Mgt 1a Control Reg Blk */
-+	u32 pm1b_cnt_blk;	/* Port address of Power Mgt 1b Control Reg Blk */
-+	u32 pm2_cnt_blk;	/* Port address of Power Mgt 2 Control Reg Blk */
-+	u32 pm_tmr_blk;		/* Port address of Power Mgt Timer Ctrl Reg Blk */
-+	u32 gpe0_blk;		/* Port addr of General Purpose acpi_event 0 Reg Blk */
-+	u32 gpe1_blk;		/* Port addr of General Purpose acpi_event 1 Reg Blk */
-+	u8  pm1_evt_len;	/* Byte length of ports at pm1_x_evt_blk */
-+	u8  pm1_cnt_len;	/* Byte length of ports at pm1_x_cnt_blk */
-+	u8  pm2_cnt_len;	/* Byte Length of ports at pm2_cnt_blk */
-+	u8  pm_tmr_len;		/* Byte Length of ports at pm_tm_blk */
-+	u8  gpe0_blk_len;	/* Byte Length of ports at gpe0_blk */
-+	u8  gpe1_blk_len;	/* Byte Length of ports at gpe1_blk */
-+	u8  gpe1_base;		/* Offset in gpe model where gpe1 events start */
-+	u8  reserved3;		/* Reserved */
-+	u16 plvl2_lat;		/* Worst case HW latency to enter/exit C2 state */
-+	u16 plvl3_lat;		/* Worst case HW latency to enter/exit C3 state */
-+	u16 flush_size;		/* Size of area read to flush caches */
-+	u16 flush_stride;	/* Stride used in flushing caches */
-+	u8  duty_offset;	/* Bit location of duty cycle field in p_cnt reg */
-+	u8  duty_width;		/* Bit width of duty cycle field in p_cnt reg */
-+	u8  day_alrm;		/* Index to day-of-month alarm in RTC CMOS RAM */
-+	u8  mon_alrm;		/* Index to month-of-year alarm in RTC CMOS RAM */
-+	u8  century;		/* Index to century in RTC CMOS RAM */
-+	u8  reserved4;		/* Reserved */
-+	u8  reserved4a;		/* Reserved */
-+	u8  reserved4b;		/* Reserved */
- };
- 
- struct facs_descriptor_rev1
- {
--    u32 signature;           /* ACPI Signature */
--    u32 length;                 /* Length of structure, in bytes */
--    u32 hardware_signature;     /* Hardware configuration signature */
--    u32 firmware_waking_vector; /* ACPI OS waking vector */
--    u32 global_lock;            /* Global Lock */
--    u32 S4bios_f        : 1;    /* Indicates if S4BIOS support is present */
--    u32 reserved1       : 31;   /* Must be 0 */
--    u8  reserved3 [40];         /* Reserved - must be zero */
-+	u32 signature;			/* ACPI Signature */
-+	u32 length;			/* Length of structure, in bytes */
-+	u32 hardware_signature;		/* Hardware configuration signature */
-+	u32 firmware_waking_vector;	/* ACPI OS waking vector */
-+	u32 global_lock;		/* Global Lock */
-+	u32 S4bios_f	: 1;		/* Indicates if S4BIOS support is present */
-+	u32 reserved1	: 31;		/* Must be 0 */
-+	u8  reserved3 [40];		/* Reserved - must be zero */
- };
- 
- void set_efi_rsdp(struct rsdp_descriptor *rsdp);
-diff --git a/lib/acpi.c b/lib/acpi.c
-index de275ca..b7fd923 100644
---- a/lib/acpi.c
-+++ b/lib/acpi.c
-@@ -36,47 +36,45 @@ static struct rsdp_descriptor *get_rsdp(void)
- }
- #endif /* CONFIG_EFI */
- 
--void* find_acpi_table_addr(u32 sig)
-+void *find_acpi_table_addr(u32 sig)
- {
--    struct rsdp_descriptor *rsdp;
--    struct rsdt_descriptor_rev1 *rsdt;
--    void *end;
--    int i;
-+	struct rsdp_descriptor *rsdp;
-+	struct rsdt_descriptor_rev1 *rsdt;
-+	void *end;
-+	int i;
- 
--    /* FACS is special... */
--    if (sig == FACS_SIGNATURE) {
--        struct fadt_descriptor_rev1 *fadt;
--        fadt = find_acpi_table_addr(FACP_SIGNATURE);
--        if (!fadt) {
--            return NULL;
--        }
--        return (void*)(ulong)fadt->firmware_ctrl;
--    }
-+	/* FACS is special... */
-+	if (sig == FACS_SIGNATURE) {
-+		struct fadt_descriptor_rev1 *fadt;
-+		fadt = find_acpi_table_addr(FACP_SIGNATURE);
-+		if (!fadt)
-+			return NULL;
- 
--    rsdp = get_rsdp();
--    if (rsdp == NULL) {
--        printf("Can't find RSDP\n");
+-static u32* find_resume_vector_addr(void)
+-{
+-    struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+-    if (!facs)
 -        return 0;
--    }
-+		return (void *)(ulong)fadt->firmware_ctrl;
-+	}
+-    printf("FACS is at %p\n", facs);
+-    return &facs->firmware_waking_vector;
+-}
+-
+ #define RTC_SECONDS_ALARM       1
+ #define RTC_MINUTES_ALARM       3
+ #define RTC_HOURS_ALARM         5
+@@ -40,12 +31,14 @@ extern char resume_start, resume_end;
+ int main(int argc, char **argv)
+ {
+ 	struct fadt_descriptor_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
+-	volatile u32 *resume_vector_ptr = find_resume_vector_addr();
++	struct facs_descriptor_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
+ 	char *addr, *resume_vec = (void*)0x1000;
  
--    if (sig == RSDP_SIGNATURE) {
--        return rsdp;
--    }
-+	rsdp = get_rsdp();
-+	if (rsdp == NULL) {
-+		printf("Can't find RSDP\n");
-+		return NULL;
-+	}
+-	*resume_vector_ptr = (u32)(ulong)resume_vec;
++	assert(facs);
++	facs->firmware_waking_vector = (u32)(ulong)resume_vec;
  
--    rsdt = (void*)(ulong)rsdp->rsdt_physical_address;
--    if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
--        return 0;
-+	if (sig == RSDP_SIGNATURE)
-+		return rsdp;
- 
--    if (sig == RSDT_SIGNATURE) {
--        return rsdt;
--    }
-+	rsdt = (void *)(ulong)rsdp->rsdt_physical_address;
-+	if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
-+		return NULL;
-+
-+	if (sig == RSDT_SIGNATURE)
-+		return rsdt;
- 
--    end = (void*)rsdt + rsdt->length;
--    for (i=0; (void*)&rsdt->table_offset_entry[i] < end; i++) {
--        struct acpi_table *t = (void*)(ulong)rsdt->table_offset_entry[i];
--        if (t && t->signature == sig) {
--            return t;
--        }
--    }
--   return NULL;
-+	end = (void *)rsdt + rsdt->length;
-+	for (i = 0; (void *)&rsdt->table_offset_entry[i] < end; i++) {
-+		struct acpi_table *t = (void *)(ulong)rsdt->table_offset_entry[i];
-+		if (t && t->signature == sig) {
-+			return t;
-+		}
-+	}
-+	return NULL;
- }
+-	printf("resume vector addr is %p\n", resume_vector_ptr);
++	printf("FACS is at %p\n", facs);
++	printf("resume vector addr is %p\n", &facs->firmware_waking_vector);
+ 	for (addr = &resume_start; addr < &resume_end; addr++)
+ 		*resume_vec++ = *addr;
+ 	printf("copy resume code from %p\n", &resume_start);
 -- 
 2.25.1
 
