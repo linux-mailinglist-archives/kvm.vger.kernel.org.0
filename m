@@ -2,109 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6524F563113
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 12:12:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD57C563144
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 12:22:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235616AbiGAKMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 06:12:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35336 "EHLO
+        id S235567AbiGAKWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 06:22:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234852AbiGAKMl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 06:12:41 -0400
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 222D214D32
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 03:12:40 -0700 (PDT)
-Date:   Fri, 1 Jul 2022 12:12:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1656670358;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0klCRHa1TKXeYdIki8pgL7JbGn8L4SURehoCkZfEsrE=;
-        b=pOuzVe4gpAJp+k03DGDfh5yM8f0zBPpBJrNjT4oxcpJOTn5mHLqiVu575KQuQLko4k5BEh
-        fLXii7dajUlbUt2Bzhjh6kfN+lHPTbpRwNv9NoMHt3rQIiZQ+zDRcxaJjiysXTb8221fz9
-        38qEGZ/5yCG7ZzI9o9VeBosbdsFZ8QU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jade.alglave@arm.com,
-        alexandru.elisei@arm.com, ricarkol@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 01/27] lib: Fix style for acpi.{c,h}
-Message-ID: <20220701101237.qtz2ejlvj3rvj5oc@kamzik>
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <20220630100324.3153655-2-nikos.nikoleris@arm.com>
- <20220701092719.63g4kv6co65dnpnd@kamzik>
- <8c1c4e1b-6723-b7b2-065b-20959e9cc5cd@arm.com>
+        with ESMTP id S235453AbiGAKWA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 06:22:00 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C98EA1AD90;
+        Fri,  1 Jul 2022 03:21:58 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0D94113E;
+        Fri,  1 Jul 2022 03:21:58 -0700 (PDT)
+Received: from [10.57.85.162] (unknown [10.57.85.162])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ADFA03F66F;
+        Fri,  1 Jul 2022 03:21:52 -0700 (PDT)
+Message-ID: <fab41f28-8f48-9f40-09c8-fd5f0714a9e0@arm.com>
+Date:   Fri, 1 Jul 2022 11:21:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c1c4e1b-6723-b7b2-065b-20959e9cc5cd@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v4 1/5] iommu: Return -EMEDIUMTYPE for incompatible domain
+ and device/group
+Content-Language: en-GB
+To:     Nicolin Chen <nicolinc@nvidia.com>, joro@8bytes.org,
+        will@kernel.org, marcan@marcan.st, sven@svenpeter.dev,
+        robdclark@gmail.com, baolu.lu@linux.intel.com, orsonzhai@gmail.com,
+        baolin.wang7@gmail.com, zhang.lyra@gmail.com,
+        jean-philippe@linaro.org, alex.williamson@redhat.com,
+        jgg@nvidia.com, kevin.tian@intel.com
+Cc:     suravee.suthikulpanit@amd.com, alyssa@rosenzweig.io,
+        dwmw2@infradead.org, mjrosato@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, thierry.reding@gmail.com,
+        vdumpa@nvidia.com, jonathanh@nvidia.com, cohuck@redhat.com,
+        thunder.leizhen@huawei.com, christophe.jaillet@wanadoo.fr,
+        chenxiang66@hisilicon.com, john.garry@huawei.com,
+        yangyingliang@huawei.com, iommu@lists.linux-foundation.org,
+        iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+References: <20220630203635.33200-1-nicolinc@nvidia.com>
+ <20220630203635.33200-2-nicolinc@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20220630203635.33200-2-nicolinc@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2022-06-30 21:36, Nicolin Chen wrote:
+> Cases like VFIO wish to attach a device to an existing domain that was
+> not allocated specifically from the device. This raises a condition
+> where the IOMMU driver can fail the domain attach because the domain and
+> device are incompatible with each other.
+> 
+> This is a soft failure that can be resolved by using a different domain.
+> 
+> Provide a dedicated errno from the IOMMU driver during attach that the
+> reason attached failed is because of domain incompatability. EMEDIUMTYPE
+> is chosen because it is never used within the iommu subsystem today and
+> evokes a sense that the 'medium' aka the domain is incompatible.
+> 
+> VFIO can use this to know attach is a soft failure and it should continue
+> searching. Otherwise the attach will be a hard failure and VFIO will
+> return the code to userspace.
+> 
+> Update all drivers to return EMEDIUMTYPE in their failure paths that are
+> related to domain incompatability. Also remove adjacent error prints for
+> these soft failures, to prevent a kernel log spam, since -EMEDIUMTYPE is
+> clear enough to indicate an incompatability error.
+> 
+> Add kdocs describing this behavior.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+[...]
+> diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> index 2ed3594f384e..072cac5ab5a4 100644
+> --- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> +++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> @@ -1135,10 +1135,8 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
+>   	struct arm_smmu_device *smmu;
+>   	int ret;
+>   
+> -	if (!fwspec || fwspec->ops != &arm_smmu_ops) {
+> -		dev_err(dev, "cannot attach to SMMU, is it on the same bus?\n");
+> -		return -ENXIO;
+> -	}
+> +	if (!fwspec || fwspec->ops != &arm_smmu_ops)
+> +		return -EMEDIUMTYPE;
 
-(Dropping the drjones@redhat.com address from CC since, as of today,
-it's generating auto address-not-valid messages.)
-
-On Fri, Jul 01, 2022 at 10:52:28AM +0100, Nikos Nikoleris wrote:
-> Hi Drew
-> 
-> Thanks for the review!
-> 
-> On 01/07/2022 10:27, Andrew Jones wrote:
-> > Hi Nikos,
-> > 
-> > I guess you used Linux's scripts/Lindent or something for this
-> > conversion. Can you please specify what you used/did in the
-> > commit message?
-> > 
-> 
-> I fixed the style by hand but happy to use Lindent in the next iteration.
-
-Yeah, I recommend it. I used it for commit 0e9812980ee5 ("lib: Fix
-whitespace"). I did need to modify it to allow 100 columns instead of 80,
-though. Also, I then looked at the changes with 'git diff -b' and saw a
-few other things to modify by hand.
-
-> 
-> > On Thu, Jun 30, 2022 at 11:02:58AM +0100, Nikos Nikoleris wrote:
-> > > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> > > ---
-> > >   lib/acpi.h | 148 ++++++++++++++++++++++++++---------------------------
-> > >   lib/acpi.c |  70 ++++++++++++-------------
-> > >   2 files changed, 108 insertions(+), 110 deletions(-)
-> > 
-> > It looks like the series is missing the file move patch. Latest master
-> > still doesn't have lib/acpi.*
-> > 
-> 
-> I am sorry, I missed the first patch. The missing patch is doing a move of
-> acpi.{h,c} [1].
-> 
-> FWIW, I tried combining the patches in one but I ended up with a big diff. I
-> found it much easier to check that everything looks ok when the overall
-> change was split in two patches.
-
-Yes, please do it in two separate patches with the move patch generated
-with -M, as you've done in [1].
+This is the wrong check, you want the "if (smmu_domain->smmu != smmu)" 
+condition further down. If this one fails it's effectively because the 
+device doesn't have an IOMMU at all, and similar to patch #3 it will be 
+removed once the core code takes over properly (I even have both those 
+patches written now!)
 
 Thanks,
-drew
+Robin.
 
-> 
-> [1]: https://github.com/relokin/kvm-unit-tests/commit/959ca08c23dbaa490b936303b94b006352a29d43
-> 
-> Thanks,
-> 
-> Nikos
-> 
-> > Thanks,
-> > drew
+>   	/*
+>   	 * FIXME: The arch/arm DMA API code tries to attach devices to its own
