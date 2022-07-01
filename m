@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA2B956324C
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 13:10:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5F6D56323D
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 13:10:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237154AbiGALJG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 07:09:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39310 "EHLO
+        id S237236AbiGALJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 07:09:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237138AbiGALI6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 07:08:58 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2072.outbound.protection.outlook.com [40.107.220.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5099B13E3D;
-        Fri,  1 Jul 2022 04:08:54 -0700 (PDT)
+        with ESMTP id S237041AbiGALJD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 07:09:03 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9667013F18;
+        Fri,  1 Jul 2022 04:09:00 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KD09HPjys7g23cY9e3ppUGN5hfRE6RIBRSo13byP/IFqSN+HTK/JgZNXlopcoJhqCplap4MOHShP75xyJdUUdmm0xxaio7o1uEDkwRnnRc6E541qYr0voU0TDbcIOwJ+w49B3xD/Bobls0lXbZ6sfH7MdLlXbYp9VGaJEY6dxTo34bRKngMef+TnX5hFp01ZCgQ/4Z3ohcej7aakSGNhNpqzQ+4KSrGK2H19/TPgwgw8O8KK9vj9w+hFfwnYUUSsCv1e8LVKOu13S9BHNj8g/rFEw4auaYYn9ekcZa0RNXt8peKaiE09x309IsCpZ2ycVdRc0JrExGdn9y2mMVmRpQ==
+ b=UVZsEcQrD0VbQVO2AAF8Sall6Uss1qzNgArQL/X9+OkAMo8WiQv4DCutklIwwHQeCEan1phLuGcVg8OMTGSrJkPWflZ26ssqGdsidP8SLq9Qf+lbFp3ddKEKNQVYnheoGKe2CAUVva3protgpAwcLveWuPGQMiKlLWoCTH1t5ZULpfJQTHWbjluS7OGuhlPOjXEujWbbBV+fOX6gQJe9I5xx9NRrUaAkezciEMg/ItfCCTszD3IUvltWSEVy8D7QJfr/I/mK0/LiNVGzIfsOEnqgv3WMQ5B7OqTGBO/AEq2LyO4X2ENzr8zkuBFATwja4MBDJ8EhINYbCP++HjBqzA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PuEBACjnHYDVEjBgT8z6HSA0SSdtjlTt0DdeJK7DyPY=;
- b=jBsMiW2JSqrc8OUammkUGhQohVHREXr3jKZ+350PiKjklROkRh8FBUcmwN9zhplkWeKn318mAvt+gVikt1xvWMDe3FMY9zsKtTX6kr8nQMWvJOkDjmWr1nWRweTbLKC9b8BSlQqxWGImgfnfuiPk48prubwzUYcspiBFsjXNJcVeVoHF2cvGPmRCQzQM/4QIWa3EbbZVDgwLUS5Psw0u/3CPKZWnRJQ9jp9Gsi/1D8be3wHxwQ09fvIJctNeJdbJf44z3HXV5oWCgShP06KIY0ltt0jwixhpbqAxkqz+ZStBpTq5DjpFrnrGbQAus6M0JyjIJFZTuJUquzaehSWQDg==
+ bh=iCE5cFy902njAAaC+/8i+2QQAsppvJHr5YO5yZN4ihg=;
+ b=AbH0H8NSXuOwweZPBAzjqxNYUTLLmAiMIJ9TY9UvVU24k2ywbSirdT1NlGXj9ITKIJGOP6mNuKnIqK1GkBVh6OIfrQd2ItBaXcIqgEup1EL2hZlu3gePA4Cd9LE6hwHJqd/4q4Yd7gTsiZ5lMEubOh1NybxPU45rR4MSOZBySWcilcKrtsRrpmmxdFqdjGZ/HKCggiJhKEaK6/HIiTt7aoyGwOViRZqaQk3KVx8J7mNiDbyY02NoLyADZ0TorfUGn6j7CXINjXNztZn3k0OaRdv087XFZO7SZ6oHFaTV2ElG+PvHNnyo9QF8L2l5g3a5cYYW4+diFie1qJpCdUKdrQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 12.22.5.238) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PuEBACjnHYDVEjBgT8z6HSA0SSdtjlTt0DdeJK7DyPY=;
- b=gxOUDA0u03WZjbTsLz2UmpZQCRihs0OxeUhplcK3fQc6j/N1G5hF8rfBMRdUGWV7A9Jp+K8f3G4jChSEAnvCaI6ErOPA2MMUfrBxBmoBGZ/zs56ktesFlmx1X5CuDwdDpZx6ncEDHwKkmaNCPH0iS5GOlO5oJVB+R4sDM7JYP5wulrL/iaZ4qBL2+Q3I5ha3QxKdL8g3M8ZR0O3yMeqCI7pksWIWaqrgE0Z/Hk8FPEbGS0CMYjkrYpzV19sSnAv3NPhH/HsveYaIIk/NYo5mBNQLHv4Qr0KBp83aQA9fKSzpNey30LUFqA2SvSCgozJqqkcTJKpP+EYwQz6nSae09w==
-Received: from DM6PR07CA0041.namprd07.prod.outlook.com (2603:10b6:5:74::18) by
- BN8PR12MB2995.namprd12.prod.outlook.com (2603:10b6:408:41::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5373.17; Fri, 1 Jul 2022 11:08:52 +0000
-Received: from DM6NAM11FT034.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:74:cafe::95) by DM6PR07CA0041.outlook.office365.com
- (2603:10b6:5:74::18) with Microsoft SMTP Server (version=TLS1_2,
+ bh=iCE5cFy902njAAaC+/8i+2QQAsppvJHr5YO5yZN4ihg=;
+ b=HWGzhNNDQ0Uag4wQIuxb1yU7y1o1ZopUPIMc5mWQhxRjWBFPxaWt2vXqNaxvA0RZHBJq11lWuMbgVRVKsNSD5wfJTEMs5Fyxo/q8xiBj8Tkqd8RVmqdc5+UtUzUM94W0KEYXslNjdRHKMd+yt+D1U0zjbMPYLTdK3oFnelSYz6t4Cd/nAJr/7EJlFPcfLAgWOjszt4D5Pj13vncNGC1j0Sxfjedqlq7DbJA8pptgCmbqa1CxmNPJQZGZQtxvKZ8f1KmIAqRWz1NmmFTn/1+x9gdycGuRQOwxnQoxAFrp2YnVn8CqhH+YOnL3ztLdq+MRUc6URxADN/QHL6F8QcQK2g==
+Received: from MWHPR12CA0046.namprd12.prod.outlook.com (2603:10b6:301:2::32)
+ by MN2PR12MB3440.namprd12.prod.outlook.com (2603:10b6:208:d0::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Fri, 1 Jul
+ 2022 11:08:58 +0000
+Received: from CO1NAM11FT051.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:301:2:cafe::53) by MWHPR12CA0046.outlook.office365.com
+ (2603:10b6:301:2::32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14 via Frontend
- Transport; Fri, 1 Jul 2022 11:08:52 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
+ Transport; Fri, 1 Jul 2022 11:08:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- DM6NAM11FT034.mail.protection.outlook.com (10.13.173.47) with Microsoft SMTP
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.238) by
+ CO1NAM11FT051.mail.protection.outlook.com (10.13.174.114) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5395.17 via Frontend Transport; Fri, 1 Jul 2022 11:08:52 +0000
+ 15.20.5395.17 via Frontend Transport; Fri, 1 Jul 2022 11:08:58 +0000
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
- DRHQMAIL101.nvidia.com (10.27.9.10) with Microsoft SMTP Server (TLS) id
- 15.0.1497.32; Fri, 1 Jul 2022 11:08:51 +0000
+ DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.32; Fri, 1 Jul 2022 11:08:57 +0000
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
  drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.26; Fri, 1 Jul 2022 04:08:50 -0700
+ 15.2.986.26; Fri, 1 Jul 2022 04:08:56 -0700
 Received: from nvidia-abhsahu-1.nvidia.com (10.127.8.12) by mail.nvidia.com
  (10.126.190.181) with Microsoft SMTP Server id 15.2.986.26 via Frontend
- Transport; Fri, 1 Jul 2022 04:08:45 -0700
+ Transport; Fri, 1 Jul 2022 04:08:50 -0700
 From:   Abhishek Sahu <abhsahu@nvidia.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
@@ -72,9 +73,9 @@ CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
         <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         <linux-pm@vger.kernel.org>, <linux-pci@vger.kernel.org>,
         Abhishek Sahu <abhsahu@nvidia.com>
-Subject: [PATCH v4 5/6] vfio/pci: Prevent low power re-entry without guest driver
-Date:   Fri, 1 Jul 2022 16:38:13 +0530
-Message-ID: <20220701110814.7310-6-abhsahu@nvidia.com>
+Subject: [PATCH v4 6/6] vfio/pci: Add support for virtual PME
+Date:   Fri, 1 Jul 2022 16:38:14 +0530
+Message-ID: <20220701110814.7310-7-abhsahu@nvidia.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220701110814.7310-1-abhsahu@nvidia.com>
 References: <20220701110814.7310-1-abhsahu@nvidia.com>
@@ -83,23 +84,23 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 44422f5e-9e02-4a46-eae1-08da5b5214e5
-X-MS-TrafficTypeDiagnostic: BN8PR12MB2995:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88f1e34e-f7d5-4f8a-6422-08da5b521888
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3440:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QhoApFnRVOiMUOY8QW9C4NupsH+48q5rcgk0X+q1gGDCYK0L4P/u2/C3hJwfPxizQ+jvix/x95lYDKKbIPSzEylcz1eiEdRhi0BjGmaLreJciypKx8ZEhQHlgCOX7O9lXBYQluqjACvQ985hhAlePcxK1xK6W3GioG8Sw+6CTWSX1S0N2WmnqZfS0fb2MheswGiOUYeWQ5CBeMqzrNpfIGeN525Dc+R3blAkUQg7BBhwmrHh/1vxaFFMlKY1jmwdW8suOUZY38mGOSH6arMXu2Gb2WVsnmqhbdPVQhrLM+7+rgm8HezflnPIdiF+fWLeYiV39pmtMBlAomIyK0qoftwapU7HrV6yM0ZW1eD23sEb3wiXxJd5VYegD7eWw2b1p5pj5MqXe8ybV3b3hdm5oB5h3JSz4IcAhUI7W+meGOAhl6MnrmYbiIJ0UL9/FpFzvUnKzPwYOKd3B2T0A0Ba4kRKym43qjhx/upojKPPcj8d+LfUUweacE/7ncP84AoFE6WPeT2VsIKDz06DoAmfpee9/npAs/s8q4KmO3hA01fHXabXn+hi7EB7hl0qiUzbObMM0x1v+auxEyIMWwZH7dBl1o4xDnzSqO7tJs4mQZYCzqrK+AfXz2P29d0NR6KSoE/XyPW5AxV3St8NGzgwKLC/6tbfGBVCb6+GhJla9CcP458G5CLQIa76Aptmxyjp3Y3QK43F/FqYQlaZERUBtZ04PwkFcjBWkBDeQHHqRBJqC6v6489wkZEK9uuYhPe/dDx6gYGsYazsCrCXuEDwFliHBmdAjkLDxUKnt6ZUHO/aCOUXUvVqx92JRpdRIJ3T3r7K9KtyoapM1dqBoDivyYmZJHfQ15ni7foyy936A7Q=
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(346002)(396003)(376002)(36840700001)(40470700004)(46966006)(47076005)(70206006)(7416002)(40480700001)(316002)(336012)(86362001)(426003)(1076003)(110136005)(186003)(2616005)(2906002)(5660300002)(36860700001)(54906003)(7696005)(41300700001)(6666004)(83380400001)(356005)(8676002)(107886003)(81166007)(36756003)(26005)(478600001)(8936002)(40460700003)(82740400003)(70586007)(82310400005)(4326008)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 75x93W5fMLZVOYwL8zqtTOsnk0ZFlsrTPdxIqoyPxDF+x/WEMohLtWf2phireV2fjWKTmuSe2lS+473EEZR/JvJD5kkHjBEaQPFATMAc3f/2NWPFdc6dn+EQ2xLZkX8NjtPxXxQNXJE6cIsmmT+5XnjqcGkR5u/Jthe2f11nF17CWPFDOFA6o0X/Pi/E74FfazCLiFSbPBgJKl/S/gBrAstUuYnWcMOnBcpqa88/O4NAjW3ucqqu5h/dHlct8v8sul1fCtP8JkKhtSLUduXOrW0nsRP3UEQpue4xtgwDMMJjp3ghwrJEMTgGLgnFhmabX2P/RPs6G2Qg5CsbPLTPlJB1K7VVCoqwRHPC51Faj8YrG2sZvUsdO86OZG1PL/hVDJPt34hEH12I48e0JwSpcLiAVpfqv+Olk7VuMQTW4bHEGhRVzaGxRw3mKZp87xx7okKU3/gFrXGCEYQ6fBpgqxuU/XaEPFxm1zyhOGvIQM9Kxwnn4NWDVwGLKNRYghIPifsatZ3RUxtP06J9+07IljDhFFMotCfYGX4b26OFuxhN4TT3UpW1Dyl51S/EISSlUeakYZemi7aWTGMIoYG1+zic4WXccUMqCJ+PkgGLczFehyoBMf3exyPcTp6QbxkJwt4dwuQHCk4lp1TYKdpdG549/PaCP+2OITq1j6avZmLatSwOi4zY2yye+lGp+CgGT5UPLUhHRfnCcIe9b+Gcs7rvFp88XEbLrWatXQeB4IFv3iDgM6kDFPT+g54XuWiYM42zC8l/xLN3ENEHWlTcDenlU96RSudld4GauHKpZoVIIGKkTkNZvj1/IaYr9q4OO8wkwmEevoiexLVTp2LDm0RqQ2P0aAj09SgGbr69Zy8=
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(376002)(396003)(346002)(36840700001)(40470700004)(46966006)(40480700001)(7416002)(7696005)(30864003)(5660300002)(40460700003)(36860700001)(426003)(41300700001)(83380400001)(8936002)(478600001)(6666004)(2906002)(186003)(47076005)(336012)(82310400005)(316002)(82740400003)(2616005)(86362001)(54906003)(107886003)(356005)(4326008)(36756003)(110136005)(81166007)(26005)(1076003)(70206006)(8676002)(70586007)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2022 11:08:52.0842
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2022 11:08:58.1977
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44422f5e-9e02-4a46-eae1-08da5b5214e5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88f1e34e-f7d5-4f8a-6422-08da5b521888
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT034.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT051.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB2995
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3440
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -110,219 +111,308 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some devices (Like NVIDIA VGA or 3D controller) require driver
-involvement each time before going into D3cold. In the regular flow,
-the guest driver do all the required steps inside the guest OS and
-then the IOCTL will be called for D3cold entry by the hypervisor. Now,
-if there is any activity on the host side (For example user has run
-lspci, dump the config space through sysfs, etc.), then the runtime PM
-framework will resume the device first, perform the operation and then
-suspend the device again. This second time suspend will be without
-guest driver involvement. This patch adds the support to prevent
-second-time runtime suspend if there is any wake-up. This prevention
-is either based on the predefined vendor/class id list or the user can
-specify the flag (VFIO_PM_LOW_POWER_REENTERY_DISABLE) during entry for
-the same.
+If the PCI device is in low power state and the device requires
+wake-up, then it can generate PME (Power Management Events). Mostly
+these PME events will be propagated to the root port and then the
+root port will generate the system interrupt. Then the OS should
+identify the device which generated the PME and should resume
+the device.
 
-'pm_runtime_reentry_allowed' flag tracks if this re-entry is allowed.
-It will be set during the entry time.
+We can implement a similar virtual PME framework where if the device
+already went into the runtime suspended state and then there is any
+wake-up on the host side, then it will send the virtual PME
+notification to the guest. This virtual PME will be helpful for the cases
+where the device will not be suspended again if there is any wake-up
+triggered by the host. Following is the overall approach regarding
+the virtual PME.
 
-'pm_runtime_resumed' flag tracks if there is any wake-up before the
-guest performs the wake-up. If re-entry is not allowed, then during
-runtime resume, the runtime PM count will be incremented, and this
-flag will be set. This flag will be checked during guest D3cold exit
-and then skip the runtime PM-related handling if this flag is set.
+1. Add one more event like VFIO_PCI_ERR_IRQ_INDEX named
+   VFIO_PCI_PME_IRQ_INDEX and do the required code changes to get/set
+   this new IRQ.
 
-During guest low power exit time, all vdev power-related flags are
-accessed under 'memory_lock' and usage count will be incremented. The
-resume will be triggered after releasing the lock since the runtime
-resume callback again requires the lock. pm_runtime_get_noresume()/
-pm_runtime_resume() have been used instead of
-pm_runtime_resume_and_get() to handle the following scenario during
-the race condition.
+2. From the guest side, the guest needs to enable eventfd for the
+   virtual PME notification.
 
- a. The guest triggered the low power exit.
- b. The guest thread got the lock and cleared the vdev related
-    flags and released the locks.
- c. Before pm_runtime_resume_and_get(), the host lspci thread got
-    scheduled and triggered the runtime resume.
- d. Now, all the vdev related flags are cleared so there won't be
-    any extra handling inside the runtime resume.
- e. The runtime PM put the device again into the suspended state.
- f. The guest triggered pm_runtime_resume_and_get() got called.
+3. In the vfio-pci driver, the PME support bits are currently
+   virtualized and set to 0. We can set PME capability support for all
+   the power states. This PME capability support is independent of the
+   physical PME support.
 
-So, at step (e), the suspend is happening without the guest driver
-involvement. Now, by using pm_runtime_get_noresume() before releasing
-'memory_lock', the runtime PM framework can't suspend the device due
-to incremented usage count.
+4. The PME enable (PME_En bit in Power Management Control/Status
+   Register) and PME status (PME_Status bit in Power Management
+   Control/Status Register) are also virtualized currently.
+   The write support for PME_En bit can be enabled.
+
+5. The PME_Status bit is a write-1-clear bit where the write with
+   zero value will have no effect and write with 1 value will clear the
+   bit. The write for this bit will be trapped inside
+   vfio_pm_config_write() similar to PCI_PM_CTRL write for PM_STATES.
+
+6. When the host gets a request for resuming the device other than from
+   low power exit feature IOCTL, then PME_Status bit will be set.
+   According to [PCIe v5 7.5.2.2],
+     "PME_Status - This bit is Set when the Function would normally
+      generate a PME signal. The value of this bit is not affected by
+      the value of the PME_En bit."
+
+   So even if PME_En bit is not set, we can set PME_Status bit.
+
+7. If the guest has enabled PME_En and registered for PME events
+   through eventfd, then the usage count will be incremented to prevent
+   the device to go into the suspended state and notify the guest through
+   eventfd trigger.
+
+The virtual PME can help in handling physical PME also. When
+physical PME comes, then also the runtime resume will be called. If
+the guest has registered for virtual PME, then it will be sent in this
+case also.
+
+* Implementation for handling the virtual PME on the hypervisor:
+
+If we take the implementation in Linux OS, then during runtime suspend
+time, then it calls __pci_enable_wake(). It internally enables PME
+through pci_pme_active() and also enables the ACPI side wake-up
+through platform_pci_set_wakeup(). To handle the PME, the hypervisor has
+the following two options:
+
+1. Create a virtual root port for the VFIO device and trigger
+   interrupt when the PME comes. It will call pcie_pme_irq() which will
+   resume the device.
+
+2. Create a virtual ACPI _PRW resource and associate it with the device
+   itself. In _PRW, any GPE (General Purpose Event) can be assigned for
+   the wake-up. When PME comes, then GPE can be triggered by the
+   hypervisor. GPE interrupt will call pci_acpi_wake_dev() function
+   internally and it will resume the device.
 
 Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci_core.c | 87 ++++++++++++++++++++++++++++++--
- include/linux/vfio_pci_core.h    |  2 +
- 2 files changed, 84 insertions(+), 5 deletions(-)
+ drivers/vfio/pci/vfio_pci_config.c | 39 +++++++++++++++++++++------
+ drivers/vfio/pci/vfio_pci_core.c   | 43 ++++++++++++++++++++++++------
+ drivers/vfio/pci/vfio_pci_intrs.c  | 18 +++++++++++++
+ include/linux/vfio_pci_core.h      |  2 ++
+ include/uapi/linux/vfio.h          |  1 +
+ 5 files changed, 87 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 8c17ca41d156..1ddaaa6ccef5 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -191,6 +191,20 @@ static bool vfio_pci_nointx(struct pci_dev *pdev)
- 	return false;
- }
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 21a4743d011f..a06375a03758 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -719,6 +719,20 @@ static int vfio_pm_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 	if (count < 0)
+ 		return count;
  
-+static bool vfio_pci_low_power_reentry_allowed(struct pci_dev *pdev)
-+{
 +	/*
-+	 * The NVIDIA display class requires driver involvement for every
-+	 * D3cold entry. The audio and other classes can go into D3cold
-+	 * without driver involvement.
++	 * PME_STATUS is write-1-clear bit. If PME_STATUS is 1, then clear the
++	 * bit in vconfig. The PME_STATUS is in the upper byte of the control
++	 * register and user can do single byte write also.
 +	 */
-+	if (pdev->vendor == PCI_VENDOR_ID_NVIDIA &&
-+	    ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY))
-+		return false;
-+
-+	return true;
-+}
-+
- static void vfio_pci_probe_power_state(struct vfio_pci_core_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
-@@ -295,6 +309,27 @@ static int vfio_pci_core_runtime_resume(struct device *dev)
- 	if (vdev->pm_intx_masked)
- 		vfio_pci_intx_unmask(vdev);
- 
-+	down_write(&vdev->memory_lock);
-+
-+	/*
-+	 * The runtime resume callback will be called for one of the following
-+	 * two cases:
-+	 *
-+	 * - If the user has called IOCTL explicitly to move the device out of
-+	 *   the low power state or closed the device.
-+	 * - If there is device access on the host side.
-+	 *
-+	 * For the second case, check if re-entry to the low power state is
-+	 * allowed. If not, then increment the usage count so that runtime PM
-+	 * framework won't suspend the device and set the 'pm_runtime_resumed'
-+	 * flag.
-+	 */
-+	if (vdev->pm_runtime_engaged && !vdev->pm_runtime_reentry_allowed) {
-+		pm_runtime_get_noresume(dev);
-+		vdev->pm_runtime_resumed = true;
++	if (offset <= PCI_PM_CTRL + 1 && offset + count > PCI_PM_CTRL + 1) {
++		if (le32_to_cpu(val) &
++		    (PCI_PM_CTRL_PME_STATUS >> (offset - PCI_PM_CTRL) * 8)) {
++			__le16 *ctrl = (__le16 *)&vdev->vconfig
++					[vdev->pm_cap_offset + PCI_PM_CTRL];
++			*ctrl &= ~cpu_to_le16(PCI_PM_CTRL_PME_STATUS);
++		}
 +	}
-+	up_write(&vdev->memory_lock);
 +
+ 	if (offset == PCI_PM_CTRL) {
+ 		pci_power_t state;
+ 
+@@ -771,14 +785,16 @@ static int __init init_pci_cap_pm_perm(struct perm_bits *perm)
+ 	 * the user change power state, but we trap and initiate the
+ 	 * change ourselves, so the state bits are read-only.
+ 	 *
+-	 * The guest can't process PME from D3cold so virtualize PME_Status
+-	 * and PME_En bits. The vconfig bits will be cleared during device
+-	 * capability initialization.
++	 * The guest can't process physical PME from D3cold so virtualize
++	 * PME_Status and PME_En bits. These bits will be used for the
++	 * virtual PME between host and guest. The vconfig bits will be
++	 * updated during device capability initialization. PME_Status is
++	 * write-1-clear bit, so it is read-only. We trap and update the
++	 * vconfig bit manually during write.
+ 	 */
+ 	p_setd(perm, PCI_PM_CTRL,
+ 	       PCI_PM_CTRL_PME_ENABLE | PCI_PM_CTRL_PME_STATUS,
+-	       ~(PCI_PM_CTRL_PME_ENABLE | PCI_PM_CTRL_PME_STATUS |
+-		 PCI_PM_CTRL_STATE_MASK));
++	       ~(PCI_PM_CTRL_STATE_MASK | PCI_PM_CTRL_PME_STATUS));
+ 
  	return 0;
  }
- #endif /* CONFIG_PM */
-@@ -415,9 +450,12 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- 	 */
- 	down_write(&vdev->memory_lock);
- 	if (vdev->pm_runtime_engaged) {
-+		if (!vdev->pm_runtime_resumed) {
-+			pm_runtime_get_noresume(&pdev->dev);
-+			do_resume = true;
+@@ -1454,8 +1470,13 @@ static void vfio_update_pm_vconfig_bytes(struct vfio_pci_core_device *vdev,
+ 	__le16 *pmc = (__le16 *)&vdev->vconfig[offset + PCI_PM_PMC];
+ 	__le16 *ctrl = (__le16 *)&vdev->vconfig[offset + PCI_PM_CTRL];
+ 
+-	/* Clear vconfig PME_Support, PME_Status, and PME_En bits */
+-	*pmc &= ~cpu_to_le16(PCI_PM_CAP_PME_MASK);
++	/*
++	 * Set the vconfig PME_Support bits. The PME_Status is being used for
++	 * virtual PME support and is not dependent upon the physical
++	 * PME support.
++	 */
++	*pmc |= cpu_to_le16(PCI_PM_CAP_PME_MASK);
++	/* Clear vconfig PME_Support and PME_En bits */
+ 	*ctrl &= ~cpu_to_le16(PCI_PM_CTRL_PME_ENABLE | PCI_PM_CTRL_PME_STATUS);
+ }
+ 
+@@ -1582,8 +1603,10 @@ static int vfio_cap_init(struct vfio_pci_core_device *vdev)
+ 		if (ret)
+ 			return ret;
+ 
+-		if (cap == PCI_CAP_ID_PM)
++		if (cap == PCI_CAP_ID_PM) {
++			vdev->pm_cap_offset = pos;
+ 			vfio_update_pm_vconfig_bytes(vdev, pos);
 +		}
-+		vdev->pm_runtime_resumed = false;
- 		vdev->pm_runtime_engaged = false;
--		pm_runtime_get_noresume(&pdev->dev);
--		do_resume = true;
+ 
+ 		prev = &vdev->vconfig[pos + PCI_CAP_LIST_NEXT];
+ 		pos = next;
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 1ddaaa6ccef5..6c1225bc2aeb 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -319,14 +319,35 @@ static int vfio_pci_core_runtime_resume(struct device *dev)
+ 	 *   the low power state or closed the device.
+ 	 * - If there is device access on the host side.
+ 	 *
+-	 * For the second case, check if re-entry to the low power state is
+-	 * allowed. If not, then increment the usage count so that runtime PM
+-	 * framework won't suspend the device and set the 'pm_runtime_resumed'
+-	 * flag.
++	 * For the second case:
++	 * - The virtual PME_STATUS bit will be set. If PME_ENABLE bit is set
++	 *   and user has registered for virtual PME events, then send the PME
++	 *   virtual PME event.
++	 * - Check if re-entry to the low power state is not allowed.
++	 *
++	 * For the above conditions, increment the usage count so that
++	 * runtime PM framework won't suspend the device and set the
++	 * 'pm_runtime_resumed' flag.
+ 	 */
+-	if (vdev->pm_runtime_engaged && !vdev->pm_runtime_reentry_allowed) {
+-		pm_runtime_get_noresume(dev);
+-		vdev->pm_runtime_resumed = true;
++	if (vdev->pm_runtime_engaged) {
++		bool pme_triggered = false;
++		__le16 *ctrl = (__le16 *)&vdev->vconfig
++				[vdev->pm_cap_offset + PCI_PM_CTRL];
++
++		*ctrl |= cpu_to_le16(PCI_PM_CTRL_PME_STATUS);
++		if (le16_to_cpu(*ctrl) & PCI_PM_CTRL_PME_ENABLE) {
++			mutex_lock(&vdev->igate);
++			if (vdev->pme_trigger) {
++				pme_triggered = true;
++				eventfd_signal(vdev->pme_trigger, 1);
++			}
++			mutex_unlock(&vdev->igate);
++		}
++
++		if (!vdev->pm_runtime_reentry_allowed || pme_triggered) {
++			pm_runtime_get_noresume(dev);
++			vdev->pm_runtime_resumed = true;
++		}
  	}
  	up_write(&vdev->memory_lock);
  
-@@ -1227,12 +1265,17 @@ static int vfio_pci_pm_validate_flags(u32 flags)
- 	if (!flags)
- 		return -EINVAL;
- 	/* Only valid flags should be set */
--	if (flags & ~(VFIO_PM_LOW_POWER_ENTER | VFIO_PM_LOW_POWER_EXIT))
-+	if (flags & ~(VFIO_PM_LOW_POWER_ENTER | VFIO_PM_LOW_POWER_EXIT |
-+		      VFIO_PM_LOW_POWER_REENTERY_DISABLE))
- 		return -EINVAL;
- 	/* Both enter and exit should not be set */
- 	if ((flags & (VFIO_PM_LOW_POWER_ENTER | VFIO_PM_LOW_POWER_EXIT)) ==
- 	    (VFIO_PM_LOW_POWER_ENTER | VFIO_PM_LOW_POWER_EXIT))
- 		return -EINVAL;
-+	/* re-entry disable can only be set with enter */
-+	if ((flags & VFIO_PM_LOW_POWER_REENTERY_DISABLE) &&
-+	    !(flags & VFIO_PM_LOW_POWER_ENTER))
-+		return -EINVAL;
- 
- 	return 0;
+@@ -586,6 +607,10 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+ 		eventfd_ctx_put(vdev->req_trigger);
+ 		vdev->req_trigger = NULL;
+ 	}
++	if (vdev->pme_trigger) {
++		eventfd_ctx_put(vdev->pme_trigger);
++		vdev->pme_trigger = NULL;
++	}
+ 	mutex_unlock(&vdev->igate);
  }
-@@ -1255,10 +1298,17 @@ static int vfio_pci_core_feature_pm(struct vfio_device *device, u32 flags,
+ EXPORT_SYMBOL_GPL(vfio_pci_core_close_device);
+@@ -639,7 +664,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_typ
+ 	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX) {
+ 		if (pci_is_pcie(vdev->pdev))
+ 			return 1;
+-	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
++	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX ||
++		   irq_type == VFIO_PCI_PME_IRQ_INDEX) {
+ 		return 1;
+ 	}
  
- 	if (flags & VFIO_DEVICE_FEATURE_GET) {
- 		down_read(&vdev->memory_lock);
--		if (vdev->pm_runtime_engaged)
-+		if (vdev->pm_runtime_engaged) {
- 			vfio_pm.flags = VFIO_PM_LOW_POWER_ENTER;
--		else
-+			if (!vdev->pm_runtime_reentry_allowed)
-+				vfio_pm.flags |=
-+					VFIO_PM_LOW_POWER_REENTERY_DISABLE;
-+		} else {
- 			vfio_pm.flags = VFIO_PM_LOW_POWER_EXIT;
-+			if (!vfio_pci_low_power_reentry_allowed(pdev))
-+				vfio_pm.flags |=
-+					VFIO_PM_LOW_POWER_REENTERY_DISABLE;
-+		}
- 		up_read(&vdev->memory_lock);
+@@ -985,6 +1011,7 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+ 		switch (info.index) {
+ 		case VFIO_PCI_INTX_IRQ_INDEX ... VFIO_PCI_MSIX_IRQ_INDEX:
+ 		case VFIO_PCI_REQ_IRQ_INDEX:
++		case VFIO_PCI_PME_IRQ_INDEX:
+ 			break;
+ 		case VFIO_PCI_ERR_IRQ_INDEX:
+ 			if (pci_is_pcie(vdev->pdev))
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 1a37db99df48..db4180687a74 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -639,6 +639,17 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
+ 					       count, flags, data);
+ }
  
- 		if (copy_to_user(arg, &vfio_pm, sizeof(vfio_pm)))
-@@ -1286,6 +1336,19 @@ static int vfio_pci_core_feature_pm(struct vfio_device *device, u32 flags,
++static int vfio_pci_set_pme_trigger(struct vfio_pci_core_device *vdev,
++				    unsigned index, unsigned start,
++				    unsigned count, uint32_t flags, void *data)
++{
++	if (index != VFIO_PCI_PME_IRQ_INDEX || start != 0 || count > 1)
++		return -EINVAL;
++
++	return vfio_pci_set_ctx_trigger_single(&vdev->pme_trigger,
++					       count, flags, data);
++}
++
+ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+ 			    unsigned index, unsigned start, unsigned count,
+ 			    void *data)
+@@ -688,6 +699,13 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+ 			break;
  		}
- 
- 		vdev->pm_runtime_engaged = true;
-+		vdev->pm_runtime_resumed = false;
-+
-+		/*
-+		 * If there is any access when the device is in the runtime
-+		 * suspended state, then the device will be resumed first
-+		 * before access and then the device will be suspended again.
-+		 * Check if this second time suspend is allowed and track the
-+		 * same in 'pm_runtime_reentry_allowed' flag.
-+		 */
-+		vdev->pm_runtime_reentry_allowed =
-+			vfio_pci_low_power_reentry_allowed(pdev) &&
-+			!(vfio_pm.flags & VFIO_PM_LOW_POWER_REENTERY_DISABLE);
-+
- 		up_write(&vdev->memory_lock);
- 		pm_runtime_put(&pdev->dev);
- 	} else if (vfio_pm.flags & VFIO_PM_LOW_POWER_EXIT) {
-@@ -1296,6 +1359,20 @@ static int vfio_pci_core_feature_pm(struct vfio_device *device, u32 flags,
- 		}
- 
- 		vdev->pm_runtime_engaged = false;
-+		if (vdev->pm_runtime_resumed) {
-+			vdev->pm_runtime_resumed = false;
-+			up_write(&vdev->memory_lock);
-+			return 0;
+ 		break;
++	case VFIO_PCI_PME_IRQ_INDEX:
++		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
++		case VFIO_IRQ_SET_ACTION_TRIGGER:
++			func = vfio_pci_set_pme_trigger;
++			break;
 +		}
-+
-+		/*
-+		 * The 'memory_lock' will be acquired again inside the runtime
-+		 * resume callback. So, increment the usage count inside the
-+		 * lock and call pm_runtime_resume() after releasing the lock.
-+		 * If there is any race condition between the wake-up generated
-+		 * at the host and the current path. Then the incremented usage
-+		 * count will prevent the device to go into the suspended state.
-+		 */
- 		pm_runtime_get_noresume(&pdev->dev);
- 		up_write(&vdev->memory_lock);
- 		ret = pm_runtime_resume(&pdev->dev);
++		break;
+ 	}
+ 
+ 	if (!func)
 diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index bf4823b008f9..18cc83b767b8 100644
+index 18cc83b767b8..ee2646d820c2 100644
 --- a/include/linux/vfio_pci_core.h
 +++ b/include/linux/vfio_pci_core.h
-@@ -126,6 +126,8 @@ struct vfio_pci_core_device {
- 	bool			needs_pm_restore;
- 	bool			pm_intx_masked;
- 	bool			pm_runtime_engaged;
-+	bool			pm_runtime_resumed;
-+	bool			pm_runtime_reentry_allowed;
- 	struct pci_saved_state	*pci_saved_state;
- 	struct pci_saved_state	*pm_save;
+@@ -102,6 +102,7 @@ struct vfio_pci_core_device {
+ 	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
+ 	u8			*pci_config_map;
+ 	u8			*vconfig;
++	u8			pm_cap_offset;
+ 	struct perm_bits	*msi_perm;
+ 	spinlock_t		irqlock;
+ 	struct mutex		igate;
+@@ -133,6 +134,7 @@ struct vfio_pci_core_device {
  	int			ioeventfds_nr;
+ 	struct eventfd_ctx	*err_trigger;
+ 	struct eventfd_ctx	*req_trigger;
++	struct eventfd_ctx	*pme_trigger;
+ 	struct list_head	dummy_resources_list;
+ 	struct mutex		ioeventfds_lock;
+ 	struct list_head	ioeventfds_list;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 7e00de5c21ea..08170950d655 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -621,6 +621,7 @@ enum {
+ 	VFIO_PCI_MSIX_IRQ_INDEX,
+ 	VFIO_PCI_ERR_IRQ_INDEX,
+ 	VFIO_PCI_REQ_IRQ_INDEX,
++	VFIO_PCI_PME_IRQ_INDEX,
+ 	VFIO_PCI_NUM_IRQS
+ };
+ 
 -- 
 2.17.1
 
