@@ -2,109 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2CB8562A9B
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 06:41:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AE64562AAF
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 06:56:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232809AbiGAElI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 00:41:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
+        id S233056AbiGAE4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 00:56:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbiGAElH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 00:41:07 -0400
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC2B60513
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:41:06 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id k25so1252196vso.6
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:41:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LgtIJLhIlObEf1prge4Y6yPa4LwrycdDF8GNVdUS6O4=;
-        b=Bg/NLdtV+LwV8ZZi7pbMf0ofCXdMwliaiJXQHtH5+dLa72SzhXmu3/9Y+l1Yz+lTaM
-         mT4G7oavD1J3NQ3TlLFZ4NqTUFg39pkNd7T3YZQIlpPj+sO3uq1zH7d8xSCtm91Frzcs
-         /BAaiQh5a7WmugYUqHvj+jD0Z8A0HKxwE0j8OfTaZF6fvKXkt5HQD6C2rH1wSno22aXf
-         Dj/YMKBALtU4F1dvPibeKUu8PF8RSG0UFZfMPAJ/tbQzfT4S66Sr85cKeJvPiTjyd9Jd
-         bTR2dbrObzzViZJ/Xd+9eIIdVkwhiB9dU6i5QHX6Bx8wgHDtPyc0qrr3+jWD2mEZ/j0p
-         KC2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LgtIJLhIlObEf1prge4Y6yPa4LwrycdDF8GNVdUS6O4=;
-        b=aeYmjxQ8iCREg5MXLXk+nN8Ppu+65lSzP5UB/zJrfdWwln1QlctWJD28naLj61nxEG
-         seVTMY0OgCxIFXsxy1brQE6Gg03u8NL2BxVDBPAz3z16J5LnVW0taA3AFtjsuAeQZWA6
-         zpWjpRDkhJ0lkpjT2PNxKplKgNGr9XCMrX5Cc2yPBwgL/a7thSWqi1CVaaAedIzx1M+w
-         sU8EKQ27jR/3jV1Tr4KIeaKsz1LB7wtjA3WfuOSZlJ3p8awxZ937mQcc/kjA3N5VnOCR
-         pH4OIfUfOdCuYvUTMOC6eXgzn+p6uC67FDHppkNHz7mox2k3W+6MEVjRgQsco0XuWyb8
-         p4NQ==
-X-Gm-Message-State: AJIora+kbYgIJREPslT8zrUJRNiUdC3c+XSSU0eNMZZ4aLN2peBqd44G
-        FPcMu165rHJ7SQdUVT4boYqoAPTF0tsaqYVjEJqrJA==
-X-Google-Smtp-Source: AGRyM1uT5bcbSSc6gZfVz1EffEzzssL2tqzBwZDhkBA8i//7HyWRA+8T6iIR7bMEr5y3QMrZvFHXrvxQraSB5sqV2fk=
-X-Received: by 2002:a05:6102:3548:b0:354:34a1:e8f1 with SMTP id
- e8-20020a056102354800b0035434a1e8f1mr10021492vss.53.1656650465658; Thu, 30
- Jun 2022 21:41:05 -0700 (PDT)
+        with ESMTP id S229481AbiGAE4b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 00:56:31 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D670677E3;
+        Thu, 30 Jun 2022 21:56:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656651390; x=1688187390;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CrIYIf0a1cqjSWMnrAcca4kVYNqSSfezjSi2ARPubUY=;
+  b=HJoASXP7bvtK5WTJ6epwaeftLYpvwxIKrcp5T9F6G4C6gJdc+qxSwR2Y
+   SJqbtGJsBcSAw5L6M4bmX71RdNBq2p55KUMFtA4kVeYhYxHD+3J8E3WTP
+   15pe9VpwtNPeRrfpvvya8ptL3L+OvgAR+GD3vCRZld1HhIqdiDkKKMBxM
+   FeYTMQczxISyVihIGAAgPHJsyCSD5jXlnhvRbWJRA9BdGd24IStvKAtXC
+   kAd4AlK83IdEIZjLPWNaKhgzvY0qYBdgCAZ6vVmesHUckRYvkPspsitR3
+   vh8rX/0v+be2ZW7DyZZp3NHIH4VE1ffKMCyQGk/KKZIjWtB7rRn3KqC3I
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10394"; a="344238376"
+X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
+   d="scan'208";a="344238376"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 21:56:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
+   d="scan'208";a="596101169"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 30 Jun 2022 21:56:26 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o78he-000DZ0-7k;
+        Fri, 01 Jul 2022 04:56:26 +0000
+Date:   Fri, 1 Jul 2022 12:55:25 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com
+Cc:     kbuild-all@lists.01.org, saeedm@nvidia.com, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, yishaih@nvidia.com,
+        maorg@nvidia.com, cohuck@redhat.com
+Subject: Re: [PATCH vfio 08/13] vfio: Introduce the DMA logging feature
+ support
+Message-ID: <202207011231.1oPQhSzo-lkp@intel.com>
+References: <20220630102545.18005-9-yishaih@nvidia.com>
 MIME-Version: 1.0
-References: <20220610171134.772566-1-juew@google.com> <20220610171134.772566-5-juew@google.com>
- <958774eb-90df-34e9-e025-959c3eb60614@intel.com>
-In-Reply-To: <958774eb-90df-34e9-e025-959c3eb60614@intel.com>
-From:   Jue Wang <juew@google.com>
-Date:   Thu, 30 Jun 2022 21:40:54 -0700
-Message-ID: <CAPcxDJ6PJGfZ6pZZQ074OZujLKz2GPeYZ5Bgyrh_YRGqZ-7dsA@mail.gmail.com>
-Subject: Re: [PATCH v5 4/8] KVM: x86: Add Corrected Machine Check Interrupt
- (CMCI) emulation to lapic.
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Matlack <dmatlack@google.com>,
-        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
-        Greg Thelen <gthelen@google.com>,
-        Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220630102545.18005-9-yishaih@nvidia.com>
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 7:07 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> On 6/11/2022 1:11 AM, Jue Wang wrote:
-> ...
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 4790f0d7d40b..a08693808729 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -4772,6 +4772,8 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
-> >       /* Init IA32_MCi_CTL to all 1s */
-> >       for (bank = 0; bank < bank_num; bank++)
-> >               vcpu->arch.mce_banks[bank*4] = ~(u64)0;
-> > +     vcpu->arch.apic->nr_lvt_entries =
-> > +             KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
->
-> vcpu->arch.apic->nr_lvt_entries needs to be initialized as
-> KVM_APIC_MAX_NR_LVT_ENTREIS - 1 when creating lapic.
->
-> What if userspace doesn't call KVM_X86_SETUP_MCE at all?
-Good catch.
+Hi Yishai,
 
-Paolo / Sean, should another patch be sent to fix this or do you
-recommend some other means to address the nr_lvt_entries
-initialization issue that Xiaoyao pointed out?
+I love your patch! Yet something to improve:
 
-Thanks a lot,
--Jue
->
-> >
-> >       static_call(kvm_x86_setup_mce)(vcpu);
-> >   out:
->
+[auto build test ERROR on awilliam-vfio/next]
+[also build test ERROR on linus/master v5.19-rc4 next-20220630]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
+base:   https://github.com/awilliam/linux-vfio.git next
+config: arm-randconfig-r005-20220629 (https://download.01.org/0day-ci/archive/20220701/202207011231.1oPQhSzo-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/fea20efca2795fd8480cb0755c54062bad2ea322
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
+        git checkout fea20efca2795fd8480cb0755c54062bad2ea322
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   arm-linux-gnueabi-ld: drivers/vfio/vfio_main.o: in function `vfio_ioctl_device_feature_logging_start':
+>> vfio_main.c:(.text+0x61a): undefined reference to `interval_tree_iter_first'
+>> arm-linux-gnueabi-ld: vfio_main.c:(.text+0x62e): undefined reference to `interval_tree_insert'
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
