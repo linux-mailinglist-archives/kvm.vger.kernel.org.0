@@ -2,105 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AE64562AAF
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 06:56:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F960562AB2
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 06:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233056AbiGAE4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 00:56:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50554 "EHLO
+        id S233471AbiGAE5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 00:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiGAE4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 00:56:31 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D670677E3;
-        Thu, 30 Jun 2022 21:56:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656651390; x=1688187390;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=CrIYIf0a1cqjSWMnrAcca4kVYNqSSfezjSi2ARPubUY=;
-  b=HJoASXP7bvtK5WTJ6epwaeftLYpvwxIKrcp5T9F6G4C6gJdc+qxSwR2Y
-   SJqbtGJsBcSAw5L6M4bmX71RdNBq2p55KUMFtA4kVeYhYxHD+3J8E3WTP
-   15pe9VpwtNPeRrfpvvya8ptL3L+OvgAR+GD3vCRZld1HhIqdiDkKKMBxM
-   FeYTMQczxISyVihIGAAgPHJsyCSD5jXlnhvRbWJRA9BdGd24IStvKAtXC
-   kAd4AlK83IdEIZjLPWNaKhgzvY0qYBdgCAZ6vVmesHUckRYvkPspsitR3
-   vh8rX/0v+be2ZW7DyZZp3NHIH4VE1ffKMCyQGk/KKZIjWtB7rRn3KqC3I
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10394"; a="344238376"
-X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
-   d="scan'208";a="344238376"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 21:56:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
-   d="scan'208";a="596101169"
-Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 30 Jun 2022 21:56:26 -0700
-Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o78he-000DZ0-7k;
-        Fri, 01 Jul 2022 04:56:26 +0000
-Date:   Fri, 1 Jul 2022 12:55:25 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com
-Cc:     kbuild-all@lists.01.org, saeedm@nvidia.com, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, yishaih@nvidia.com,
-        maorg@nvidia.com, cohuck@redhat.com
-Subject: Re: [PATCH vfio 08/13] vfio: Introduce the DMA logging feature
- support
-Message-ID: <202207011231.1oPQhSzo-lkp@intel.com>
-References: <20220630102545.18005-9-yishaih@nvidia.com>
+        with ESMTP id S229481AbiGAE5m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 00:57:42 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A67677E8
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:57:39 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id m2so1317104plx.3
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:57:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=NOQXYB9rVtqMbvMp0KZP/NXMDdG6KY+bHR2qpMf2XHA=;
+        b=7OyJBILUprUR9iDklBoQBQpLducUR42bx72zwhlY9m+b9yAQyxIlMFxqW/mgn++w65
+         We1HnbnuNAMJq0G5M7MVZJKumIbFt5Yu6Fu7sT75nBEKm5DUjjZED+5Wm8+8MnINDzdT
+         ZzpBIYqeIwIoPpRtGWI29+G1yE0bsTTJ68Dcykscu1KNi9XSar7iMDAXIjdvLULCz0Os
+         oSzd0c5eJ9bwTStTU1nD6NGsF4NtYXQ8gflxDZryr223QWBfGC4ByDBWiyt8IOcVpEau
+         BWNhtKTVxZsFmm7CFh4GsvGg6H9RyoyzWVKbJtufFKmnTA3ABZYTQiI5WoSc7kaSKUx1
+         sAfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=NOQXYB9rVtqMbvMp0KZP/NXMDdG6KY+bHR2qpMf2XHA=;
+        b=oTNuPYrA3N5XL1HHvesbApW0asFf4h13CIyaFLMJfGIfYKCTYy9aGBydT9FKb05CW8
+         PjIOYDA4Mycs9VurdSIK8+0MduWSSdM6G435FxLSy56ynXrnTEWJoVzYKlwNE5f7HEdF
+         vcXkChMc4Whb5uBSkhVAuJ0oluSEOBNpz2xGDGsjACJic7HoXTFA/plDWYuCCU/YCKL0
+         jJl0vNg38wUklw0f899Nl4t4acst+5DMvYh4RGR4OcUE6GKJaQ9BsjmgSohMueuZ0xuo
+         9DkIgIhhMaVYLV4ZqDHBrT9BMalZa+rVhiWYXhE377d2T8VlkLRpvmscdbGAN7lj4/g/
+         i+8w==
+X-Gm-Message-State: AJIora9qUqVE2YG1a2FvD4EPFecgrUJxgTX8tweXmIn6F/5eJL5kIdcz
+        xiMbiMGxrCeAA9DDo6o5YKSm4w==
+X-Google-Smtp-Source: AGRyM1sVGvDA3ns0++pkE+BFdtHLCQLsuxT1sVa57tgF9DUpwyoflMPLWsNwhMGEc9AtFWBtCnuoHA==
+X-Received: by 2002:a17:902:b287:b0:16b:85cd:ef6b with SMTP id u7-20020a170902b28700b0016b85cdef6bmr18021195plr.8.1656651458842;
+        Thu, 30 Jun 2022 21:57:38 -0700 (PDT)
+Received: from [10.61.2.177] (110-175-254-242.static.tpgi.com.au. [110.175.254.242])
+        by smtp.gmail.com with ESMTPSA id b7-20020a62cf07000000b0051835ccc008sm14562343pfg.115.2022.06.30.21.57.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jun 2022 21:57:38 -0700 (PDT)
+Message-ID: <b39e78e4-05d3-8e83-cf40-be6de3a41909@ozlabs.ru>
+Date:   Fri, 1 Jul 2022 14:57:32 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220630102545.18005-9-yishaih@nvidia.com>
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0
+Subject: Re: [PATCH v2 4/4] vfio: Require that devices support DMA cache
+ coherence
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        iommu@lists.linux-foundation.org, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <4-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <4-v2-f090ae795824+6ad-intel_no_snoop_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yishai,
 
-I love your patch! Yet something to improve:
 
-[auto build test ERROR on awilliam-vfio/next]
-[also build test ERROR on linus/master v5.19-rc4 next-20220630]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+On 4/8/22 01:23, Jason Gunthorpe via iommu wrote:
+> IOMMU_CACHE means that normal DMAs do not require any additional coherency
+> mechanism and is the basic uAPI that VFIO exposes to userspace. For
+> instance VFIO applications like DPDK will not work if additional coherency
+> operations are required.
+> 
+> Therefore check IOMMU_CAP_CACHE_COHERENCY like vdpa & usnic do before
+> allowing an IOMMU backed VFIO device to be created.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
-base:   https://github.com/awilliam/linux-vfio.git next
-config: arm-randconfig-r005-20220629 (https://download.01.org/0day-ci/archive/20220701/202207011231.1oPQhSzo-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/fea20efca2795fd8480cb0755c54062bad2ea322
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220630-182957
-        git checkout fea20efca2795fd8480cb0755c54062bad2ea322
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+This just broke VFIO on POWER which does not use iommu_ops.
 
-All errors (new ones prefixed by >>):
 
-   arm-linux-gnueabi-ld: drivers/vfio/vfio_main.o: in function `vfio_ioctl_device_feature_logging_start':
->> vfio_main.c:(.text+0x61a): undefined reference to `interval_tree_iter_first'
->> arm-linux-gnueabi-ld: vfio_main.c:(.text+0x62e): undefined reference to `interval_tree_insert'
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>   drivers/vfio/vfio.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index a4555014bd1e72..9edad767cfdad3 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -815,6 +815,13 @@ static int __vfio_register_dev(struct vfio_device *device,
+>   
+>   int vfio_register_group_dev(struct vfio_device *device)
+>   {
+> +	/*
+> +	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
+> +	 * restore cache coherency.
+> +	 */
+> +	if (!iommu_capable(device->dev->bus, IOMMU_CAP_CACHE_COHERENCY))
+> +		return -EINVAL;
+> +
+>   	return __vfio_register_dev(device,
+>   		vfio_group_find_or_alloc(device->dev));
+>   }
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Alexey
