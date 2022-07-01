@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EA49563597
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 16:31:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01FDF56359A
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 16:31:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232937AbiGAOay (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 10:30:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40810 "EHLO
+        id S233234AbiGAObK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 10:31:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232741AbiGAO3k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 10:29:40 -0400
+        with ESMTP id S233233AbiGAOak (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 10:30:40 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 09A4D3EA98
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 07:25:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1742D7125C
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 07:25:51 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B82F415A1;
-        Fri,  1 Jul 2022 07:25:26 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 592DB1BF7;
+        Fri,  1 Jul 2022 07:25:28 -0700 (PDT)
 Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1F28B3F792;
-        Fri,  1 Jul 2022 07:25:24 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BB5A13F792;
+        Fri,  1 Jul 2022 07:25:26 -0700 (PDT)
 From:   Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 To:     will@kernel.org
 Cc:     andre.przywara@arm.com, alexandru.elisei@arm.com,
         kvm@vger.kernel.org, suzuki.poulose@arm.com, sashal@kernel.org,
         jean-philippe@linaro.org
-Subject: [PATCH kvmtool v2 04/12] virtio/pci: Use the correct eventfd for vhost notification
-Date:   Fri,  1 Jul 2022 15:24:26 +0100
-Message-Id: <20220701142434.75170-5-jean-philippe.brucker@arm.com>
+Subject: [PATCH kvmtool v2 05/12] virtio/net: Set vhost backend after queue address
+Date:   Fri,  1 Jul 2022 15:24:27 +0100
+Message-Id: <20220701142434.75170-6-jean-philippe.brucker@arm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220701142434.75170-1-jean-philippe.brucker@arm.com>
 References: <20220701142434.75170-1-jean-philippe.brucker@arm.com>
@@ -42,54 +42,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Legacy virtio drivers write to the I/O port BAR, and the modern virtio
-device uses the MMIO BAR. Since vhost can only listen on one ioeventfd,
-select the one that the guest will use.
+We currently call VHOST_SET_BACKEND from notify_vq_gsi(), which can't
+work with modern virtio because vhost checks that the virtqueue is
+accessible when handling VHOST_SET_BACKEND, and the modern driver
+initializes the MSIs before setting up the virtqueue. Move
+VHOST_SET_BACKEND to init_vq().
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- virtio/pci.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ virtio/net.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/virtio/pci.c b/virtio/pci.c
-index c02534a6..320865c1 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -83,7 +83,7 @@ static int virtio_pci__init_ioeventfd(struct kvm *kvm, struct virtio_device *vde
- 	u16 port_addr = virtio_pci__port_addr(vpci);
- 	off_t offset = vpci->doorbell_offset;
- 	int r, flags = 0;
--	int fd;
-+	int pio_fd, mmio_fd;
+diff --git a/virtio/net.c b/virtio/net.c
+index f8c40d40..dcf9210d 100644
+--- a/virtio/net.c
++++ b/virtio/net.c
+@@ -601,6 +601,7 @@ static bool is_ctrl_vq(struct net_dev *ndev, u32 vq)
+ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
+ {
+ 	struct vhost_vring_state state = { .index = vq };
++	struct vhost_vring_file file = { .index = vq };
+ 	struct net_dev_queue *net_queue;
+ 	struct vhost_vring_addr addr;
+ 	struct net_dev *ndev = dev;
+@@ -656,6 +657,11 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
+ 	if (r < 0)
+ 		die_perror("VHOST_SET_VRING_ADDR failed");
  
- 	vpci->ioeventfds[vq] = (struct virtio_pci_ioevent_param) {
- 		.vdev		= vdev,
-@@ -107,7 +107,7 @@ static int virtio_pci__init_ioeventfd(struct kvm *kvm, struct virtio_device *vde
- 	/* ioport */
- 	ioevent.io_addr	= port_addr + offset;
- 	ioevent.io_len	= sizeof(u16);
--	ioevent.fd	= fd = eventfd(0, 0);
-+	ioevent.fd	= pio_fd = eventfd(0, 0);
- 	r = ioeventfd__add_event(&ioevent, flags | IOEVENTFD_FLAG_PIO);
- 	if (r)
- 		return r;
-@@ -115,13 +115,14 @@ static int virtio_pci__init_ioeventfd(struct kvm *kvm, struct virtio_device *vde
- 	/* mmio */
- 	ioevent.io_addr	= mmio_addr + offset;
- 	ioevent.io_len	= sizeof(u16);
--	ioevent.fd	= eventfd(0, 0);
-+	ioevent.fd	= mmio_fd = eventfd(0, 0);
- 	r = ioeventfd__add_event(&ioevent, flags);
- 	if (r)
- 		goto free_ioport_evt;
- 
- 	if (vdev->ops->notify_vq_eventfd)
--		vdev->ops->notify_vq_eventfd(kvm, vpci->dev, vq, fd);
-+		vdev->ops->notify_vq_eventfd(kvm, vpci->dev, vq,
-+					     vdev->legacy ? pio_fd : mmio_fd);
++	file.fd = ndev->tap_fd;
++	r = ioctl(ndev->vhost_fd, VHOST_NET_SET_BACKEND, &file);
++	if (r < 0)
++		die_perror("VHOST_NET_SET_BACKEND failed");
++
  	return 0;
+ }
  
- free_ioport_evt:
+@@ -713,11 +719,6 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
+ 	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_CALL, &file);
+ 	if (r < 0)
+ 		die_perror("VHOST_SET_VRING_CALL failed");
+-	file.fd = ndev->tap_fd;
+-	r = ioctl(ndev->vhost_fd, VHOST_NET_SET_BACKEND, &file);
+-	if (r != 0)
+-		die("VHOST_NET_SET_BACKEND failed %d", errno);
+-
+ }
+ 
+ static void notify_vq_eventfd(struct kvm *kvm, void *dev, u32 vq, u32 efd)
 -- 
 2.36.1
 
