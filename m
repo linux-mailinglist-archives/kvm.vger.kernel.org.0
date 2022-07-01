@@ -2,82 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09699562A38
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 06:14:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5495562B0B
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 07:48:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbiGAEOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 00:14:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54550 "EHLO
+        id S233921AbiGAFsh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 01:48:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiGAEOx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 00:14:53 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BE721E19
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:14:52 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id s13-20020a0568301e0d00b00616ad12fee7so961061otr.10
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:14:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ohGS/GHjNx6gKBxjpOLnl3kUH/TQygNHmQFNpt5O95s=;
-        b=GuELxlwIpzpiKD2YPx5S9btLkqNl6v08gJXYXRJGHFF1f66CnWPQ+VhHnxgOwvZpUD
-         SsiI7teOiWo6y3ihKRF/hSaI4nzEoB3dMDXnSONCa13yka7pK3SHf/LXJjiqUAJu6u97
-         rjgo19RxR3a9kcnUjrqU/2/UvQYLgknm+nguYSvdiUnxcPEavtdVFkRoFiWzLziZigo2
-         T8SdyW+XfKzqDJ5gLSWP0fGxGGfclbgvp0u0OeEUDrgqmoDthyzaO1bvFTw/484qfnBO
-         J6FXiBr2WlOTUf3B6wVOwwao311dr866KSo6u+OemWstFMgdGU5Tf+coPHgJ0sOQfIiB
-         Hdzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ohGS/GHjNx6gKBxjpOLnl3kUH/TQygNHmQFNpt5O95s=;
-        b=nx1eh00qhW8JoolN07bLkKzDWXucbiJjRCPhM00csIJHf6E2YXRTpsRoyM/sVtJ0Re
-         1rGo1GubpYUtawQaYGOsgtcpWWVfWkryBSdaMr4RHptx4KnoYX6AUMICsUvoQBExcDDG
-         +Vt9GeuA+UHD9Uin28odxaIKR44mnRZI188o1PFJCS6IcGEfXLLcbmzKghAg05ivc5ML
-         +j7LSk8n47+ZR2BaL8eKu4JRSbd6D2Ydm4rBcMLtRUR0c7BoNX1oHqujal4YV2z2BA0i
-         tp1OL8YxyZaecO15ebIWJM9mt17aBK2afUrL2ubLsM8wFzO1nOehxnSC92SbML47eZvV
-         sVKA==
-X-Gm-Message-State: AJIora8yVpWTBRfgI03cTBV3N+w59A41Jqt4dPzJK1izPtfdPCfnE4ky
-        SjPmIztyT7Io8HrVfEquAW5yoUkgWRd0ouJwdoF0tRYBxW4=
-X-Google-Smtp-Source: AGRyM1uVQkyvpZqWDwzmoKsksd5X4YjrjaWxlBJlYHpBkAj0z5nN/XbtMv/wWV3AOCs3/mFOVaWht/cbshz/KM0rpXI=
-X-Received: by 2002:a05:6830:14:b0:616:dcbd:e53e with SMTP id
- c20-20020a056830001400b00616dcbde53emr5370409otp.267.1656648891911; Thu, 30
- Jun 2022 21:14:51 -0700 (PDT)
+        with ESMTP id S231426AbiGAFse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 01:48:34 -0400
+Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E3F32F2;
+        Thu, 30 Jun 2022 22:48:29 -0700 (PDT)
+Received: from ([60.208.111.195])
+        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id VCX00123;
+        Fri, 01 Jul 2022 13:48:23 +0800
+Received: from localhost.localdomain (10.200.104.97) by
+ jtjnmail201607.home.langchao.com (10.100.2.7) with Microsoft SMTP Server id
+ 15.1.2507.9; Fri, 1 Jul 2022 13:48:22 +0800
+From:   Bo Liu <liubo03@inspur.com>
+To:     <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+        <x86@kernel.org>, <hpa@zytor.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Bo Liu <liubo03@inspur.com>
+Subject: [PATCH] KVM: x86/mmu: Return true/false from bool function
+Date:   Fri, 1 Jul 2022 00:21:22 -0400
+Message-ID: <20220701042122.5273-1-liubo03@inspur.com>
+X-Mailer: git-send-email 2.18.2
 MIME-Version: 1.0
-References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-19-vkuznets@redhat.com>
-In-Reply-To: <20220629150625.238286-19-vkuznets@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 30 Jun 2022 21:14:40 -0700
-Message-ID: <CALMp9eRhxvquDMn3ROUqdNL4bG769eG+ZJ4o3t8rwne8pkKbiw@mail.gmail.com>
-Subject: Re: [PATCH v2 18/28] KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING
- filtering out of setup_vmcs_config()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.200.104.97]
+tUid:   20227011348236a2f1c9ffd7be92f9e8e0b4b6e725e20
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> As a preparation to reusing the result of setup_vmcs_config() in
-> nested VMX MSR setup, move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering
-> to vmx_exec_control().
->
-> No functional change intended.
->
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Return boolean values ("true" or "false") instead of integer values
+from bool function.
+
+Signed-off-by: Bo Liu <liubo03@inspur.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index bfb50262fd37..572e0c487376 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1024,7 +1024,7 @@ static bool rmap_can_add(struct kvm_vcpu *vcpu)
+ 	struct kvm_mmu_memory_cache *mc;
+ 
+ 	mc = &vcpu->arch.mmu_pte_list_desc_cache;
+-	return kvm_mmu_memory_cache_nr_free_objects(mc);
++	return !!kvm_mmu_memory_cache_nr_free_objects(mc);
+ }
+ 
+ static void rmap_remove(struct kvm *kvm, u64 *spte)
+-- 
+2.27.0
+
