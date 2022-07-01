@@ -2,105 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CDB2563849
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D42B656384D
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:51:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232036AbiGAQu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 12:50:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44078 "EHLO
+        id S232168AbiGAQv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 12:51:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229768AbiGAQu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 12:50:56 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D2E3EF02
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 09:50:55 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2eb7d137101so22764587b3.12
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 09:50:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=6WBuqBxN71rHL177gapA5k+g6PwRD2S0jU9i7UbBI/0=;
-        b=aUFHTHfr6d/Kekk4YLScyBzica1U3L9RnB2HAFV54RFdXst5ikdvgRa2M6YPHR+wyo
-         vkrI8Bbxx2L8PVRU+Vc2iVUT5lhxDENc5phF/38iSrRelpOKR/WFtmA5o6bX9r1IND/c
-         x9w7x/45h9/n0tl1Dq9yDShswSHKCnj7eR/R2rthEAAZw7lT8LjPldhDb3BKWwJqwHzv
-         6qS2S1nmDl31eUSuQY07vbOMUuwmE4/yJ0vyOs0VPIPxpOPuZ0ZJUM7C0mMubFhL8IB7
-         2ZgLu9lJNg0UUOaANFzi9z1G9eEGxKfuzZER5t3+Z3WtKstjDrrKQNx60Or8yevfg3Yf
-         gRrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=6WBuqBxN71rHL177gapA5k+g6PwRD2S0jU9i7UbBI/0=;
-        b=5dJqGN2UM+4VRgP7WgINpGx/kselC4NTRNgMiPCI5lHU6o6uVbN+oJjet+Ko1tW7+s
-         VM1nzYF33evzKR9UpdvtlXdahGY/G+NgNXGTcmupg4eXKj1D594K/0NaSZ2JapHDblRQ
-         gdZb5K0EYgmV07Cn1e4khIo4bV1/cQPMwiStjesUgJqM4JjH6olMmS1AZhaZ86OHWVO7
-         YiyS4/pxngynvpJYnHHJ12BDGJJPODD6W1Ni3jJhzQs3RhGL3bQrbA1vCiMuBuFuLhXH
-         6mUafOQm9lUVtpBRYG/2VjxZBbSnb23J4CopI4tpSm8h9zPXtNIT0UGzMWtoXDU/8nIP
-         gTnw==
-X-Gm-Message-State: AJIora/th9sfih2ZdUoFq5BfOZHE+QNcf6WGO9FVoTvoelxtmuO1ie1w
-        x3oFgLwIY9XOZJbgdTwWqC7DUY67
-X-Google-Smtp-Source: AGRyM1uZj0EVVwwCYYe/nQsYZ0kegws8/U9l9DfRwuf89myMXkQixOy821tLyoy8cph34F+P2+ugqMCe
-X-Received: from juew-desktop.sea.corp.google.com ([2620:15c:100:202:7200:c2cb:2999:20c])
- (user=juew job=sendgmr) by 2002:a05:6902:708:b0:66d:2871:c574 with SMTP id
- k8-20020a056902070800b0066d2871c574mr17721648ybt.439.1656694255078; Fri, 01
- Jul 2022 09:50:55 -0700 (PDT)
-Date:   Fri,  1 Jul 2022 09:50:45 -0700
-In-Reply-To: <20220701165045.4074471-1-juew@google.com>
-Message-Id: <20220701165045.4074471-2-juew@google.com>
-Mime-Version: 1.0
-References: <20220701165045.4074471-1-juew@google.com>
-X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
-Subject: [PATCH 2/2] KVM: x86: Fix access to vcpu->arch.apic when the irqchip
- is not in kernel
-From:   Jue Wang <juew@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S229476AbiGAQvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 12:51:24 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A5D44A0A;
+        Fri,  1 Jul 2022 09:51:23 -0700 (PDT)
+Received: from zn.tnic (p200300ea970ff648329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:970f:f648:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 43EFA1EC064A;
+        Fri,  1 Jul 2022 18:51:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1656694277;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=LsRagpxJ0d6m6LED7HHfWRzzrUzw8aGp7k8R8oF5VaQ=;
+        b=kVgbaLHTIsuv3Te5Rsh4ZkmUq+hTiJvlWYa0pGnkSJ1yBJNazGmA2MlsU8d0LXoBgXZDOs
+        BK/Mwzu4AfZefSG/tFTr/kXyg/+2uZlvmUlaGKGG9Ycsc+noYabQkfcWzq5iRgMug9P5/h
+        w9QwkfALpCmGSrcjBNsjLmOwQ/3hJ1w=
+Date:   Fri, 1 Jul 2022 18:51:13 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Matlack <dmatlack@google.com>,
-        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
-        Jiaqi Yan <jiaqiyan@google.com>, Jue Wang <juew@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v12 19/46] x86/kernel: Make the .bss..decrypted section
+ shared in RMP table
+Message-ID: <Yr8mARnQT+VZK0iy@zn.tnic>
+References: <20220307213356.2797205-1-brijesh.singh@amd.com>
+ <20220307213356.2797205-20-brijesh.singh@amd.com>
+ <YqfabnTRxFSM+LoX@google.com>
+ <YqistMvngNKEJu2o@google.com>
+ <daaf7a84-4204-48ca-e40c-7ba296b4789c@amd.com>
+ <YqizrTCk460kov/X@google.com>
+ <6db51d45-e17a-38dd-131d-e43132c55dfb@amd.com>
+ <Yqjm/b3deMlxxePh@google.com>
+ <9abe9a71-242d-91d5-444a-b56c8b9b6d90@amd.com>
+ <YqtdIf7OSivLxFL0@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YqtdIf7OSivLxFL0@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix an access to vcpu->arch.apic when KVM_X86_SETUP_MCE is called
-without KVM_CREATE_IRQCHIP called or KVM_CAP_SPLIT_IRQCHIP is
-enabled.
+On Thu, Jun 16, 2022 at 04:41:05PM +0000, Sean Christopherson wrote:
+> > I worry that another use of cc_platform_has() could creep in at some point
+> > and cause the same issue. Not sure how bad it would be, performance-wise, to
+> > remove the jump table optimization for arch/x86/coco/core.c.
 
-Fixes: 4b903561ec49 ("KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to lapic.")
-Signed-off-by: Jue Wang <juew@google.com>
----
- arch/x86/kvm/x86.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Is there a gcc switch for that?
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4322a1365f74..d81020dd0fea 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4820,8 +4820,9 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
- 		if (mcg_cap & MCG_CMCI_P)
- 			vcpu->arch.mci_ctl2_banks[bank] = 0;
- 	}
--	vcpu->arch.apic->nr_lvt_entries =
--		KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
-+	if (vcpu->arch.apic)
-+		vcpu->arch.apic->nr_lvt_entries =
-+			KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
- 
- 	static_call(kvm_x86_setup_mce)(vcpu);
- out:
+> One thought would be to initialize "vendor" to a bogus value, disallow calls to
+> cc_set_vendor() until after the kernel as gotten to a safe point, and then WARN
+> (or panic?) if cc_platform_has() is called before "vendor" is explicitly set.
+> New calls can still get in, but they'll be much easier to detect and less likely
+> to escape initial testing.
+
+The invalid vendor thing makes sense but I don't think it'll help in
+this case.
+
+We set vendor in sme_enable() which comes before the
+
+__startup_64 -> sme_postprocess_startup
+
+path you're hitting.
+
+We could do only the aspect of checking whether it hasn't been set yet
+and warn then, in order to make the usage more robust...
+
 -- 
-2.37.0.rc0.161.g10f37bed90-goog
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
