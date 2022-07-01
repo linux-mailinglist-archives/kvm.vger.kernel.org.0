@@ -2,303 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14ADB56329E
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 13:34:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E056563394
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 14:41:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233748AbiGALeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 07:34:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36560 "EHLO
+        id S235533AbiGAMkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 08:40:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233234AbiGALes (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 07:34:48 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 682C274361
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 04:34:47 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5CE76113E;
-        Fri,  1 Jul 2022 04:34:47 -0700 (PDT)
-Received: from [10.57.41.245] (unknown [10.57.41.245])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F4653F66F;
-        Fri,  1 Jul 2022 04:34:45 -0700 (PDT)
-Message-ID: <4d2e29b6-3bf8-4c6a-96f9-3bbebbc7608f@arm.com>
-Date:   Fri, 1 Jul 2022 12:34:43 +0100
+        with ESMTP id S233243AbiGAMkn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 08:40:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B2E3B540;
+        Fri,  1 Jul 2022 05:40:43 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 261CKC8A000600;
+        Fri, 1 Jul 2022 12:40:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=LTKKI4nMpgZNM50IuzDP1xnM+CykHKeaetkxxpY2J+8=;
+ b=nnp1HAW/hwf8VquvEbkfQH6mBEwYJL9b3+Fv5TAW/YhreyaVNR9+vBiI6lbooFlysT2G
+ KsEmjrk9//C1JiN4KZpR9TRvj+6MwvfJNb0iwSJPw8g58SOHKGK1EmYBMCJyO4S4iXVP
+ eh1QLZo4xWj09BunvqAJsYVlo337lqpNIZkh5jCxEDYQ2a4rWPW2dSDAkbqOS9W4Ud9F
+ 98HBwCCnZtm5J48Ha7jX4WttXlDsrVUTcVAIjPyPWoejp6cSZVsd6Z7kPa5SyuTDke4q
+ W8wkmyKBCv+K3esHTKjTjnmMZadHHqbBixqrunsr1Tz+Rg5EDm2i0o0Q2IFzU3JHjtji tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h20ue8q0t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 12:40:40 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 261CL2UJ001872;
+        Fri, 1 Jul 2022 12:40:40 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h20ue8q05-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 12:40:40 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 261CaO7G002123;
+        Fri, 1 Jul 2022 12:40:39 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma02dal.us.ibm.com with ESMTP id 3gwt0bbfrv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 12:40:39 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 261Cec8C44105994
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Jul 2022 12:40:38 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B4E56AC05F;
+        Fri,  1 Jul 2022 12:40:38 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A8228AC059;
+        Fri,  1 Jul 2022 12:40:36 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.163.2.135])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri,  1 Jul 2022 12:40:36 +0000 (GMT)
+Message-ID: <e8f1748eb1bae3e90521b0d5d4471266f4ea7c98.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 00/11] s390/vfio-ccw rework
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+Date:   Fri, 01 Jul 2022 08:40:35 -0400
+In-Reply-To: <20220630234411.GM693670@nvidia.com>
+References: <20220630203647.2529815-1-farman@linux.ibm.com>
+         <20220630234411.GM693670@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4r6sYsvNt6mAxD59uyr8bd6lUWD5z1Wq
+X-Proofpoint-GUID: fT-1GOcbBxxm1pkXMiTmPX8FrXfhtJv7
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [kvm-unit-tests PATCH v3 15/27] arm/arm64: mmu_disable: Clean and
- invalidate before disabling
-Content-Language: en-GB
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>
-Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
-        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <20220630100324.3153655-16-nikos.nikoleris@arm.com>
- <Yr1480um3Blh078q@monolith.localdoman>
- <16eda3c9-ec36-cd45-5c1a-0307f60dbc5f@arm.com>
- <Yr2H3AiNGHeKReP2@monolith.localdoman>
- <218172cd-25fc-8888-96cc-a7b5a9c65f73@arm.com>
- <Yr3H4HM/bMaahFk2@monolith.localdoman>
- <20220701091214.savjgllxfcjk2l7g@kamzik>
- <Yr7LbKN4BK7G2LD2@monolith.localdoman>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <Yr7LbKN4BK7G2LD2@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-01_07,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ malwarescore=0 priorityscore=1501 mlxscore=0 impostorscore=0
+ suspectscore=0 adultscore=0 clxscore=1015 phishscore=0 mlxlogscore=593
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207010048
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/07/2022 11:24, Alexandru Elisei wrote:
-> Hi,
+On Thu, 2022-06-30 at 20:44 -0300, Jason Gunthorpe wrote:
+> On Thu, Jun 30, 2022 at 10:36:36PM +0200, Eric Farman wrote:
+> > Here's an updated pass through the first chunk of vfio-ccw rework.
+> > 
+> > As with v2, this is all internal to vfio-ccw, with the exception of
+> > the removal of mdev_uuid from include/linux/mdev.h in patch 1.
+> > 
+> > There is one conflict with the vfio-next branch [2], on patch 6.
 > 
-> On Fri, Jul 01, 2022 at 11:12:14AM +0200, Andrew Jones wrote:
->> On Thu, Jun 30, 2022 at 04:57:39PM +0100, Alexandru Elisei wrote:
->>> Hi,
->>>
->>> On Thu, Jun 30, 2022 at 04:16:09PM +0100, Nikos Nikoleris wrote:
->>>> Hi Alex,
->>>>
->>>> On 30/06/2022 12:24, Alexandru Elisei wrote:
->>>>> Hi,
->>>>>
->>>>> On Thu, Jun 30, 2022 at 12:08:41PM +0100, Nikos Nikoleris wrote:
->>>>>> Hi Alex,
->>>>>>
->>>>>> On 30/06/2022 11:20, Alexandru Elisei wrote:
->>>>>>> Hi,
->>>>>>>
->>>>>>> On Thu, Jun 30, 2022 at 11:03:12AM +0100, Nikos Nikoleris wrote:
->>>>>>>> From: Andrew Jones <drjones@redhat.com>
->>>>>>>>
->>>>>>>> The commit message of commit 410b3bf09e76 ("arm/arm64: Perform dcache
->>>>>>>> clean + invalidate after turning MMU off") justifies cleaning and
->>>>>>>> invalidating the dcache after disabling the MMU by saying it's nice
->>>>>>>> not to rely on the current page tables and that it should still work
->>>>>>>> (per the spec), as long as there's an identity map in the current
->>>>>>>> tables. Doing the invalidation after also somewhat helped with
->>>>>>>> reenabling the MMU without seeing stale data, but the real problem
->>>>>>>> with reenabling was because the cache needs to be disabled with
->>>>>>>> the MMU, but it wasn't.
->>>>>>>>
->>>>>>>> Since we have to trust/validate that the current page tables have an
->>>>>>>> identity map anyway, then there's no harm in doing the clean
->>>>>>>> and invalidate first (it feels a little better to do so, anyway,
->>>>>>>> considering the cache maintenance instructions take virtual
->>>>>>>> addresses). Then, also disable the cache with the MMU to avoid
->>>>>>>> problems when reenabling. We invalidate the Icache and disable
->>>>>>>> that too for good measure. And, a final TLB invalidation ensures
->>>>>>>> we're crystal clean when we return from asm_mmu_disable().
->>>>>>>
->>>>>>> I'll point you to my previous reply [1] to this exact patch which explains
->>>>>>> why it's incorrect and is only papering over another problem.
->>>>>>>
->>>>>>> [1] https://lore.kernel.org/all/Yn5Z6Kyj62cUNgRN@monolith.localdoman/
->>>>>>>
->>>>>>
->>>>>> Apologies, I didn't mean to ignore your feedback on this. There was a
->>>>>> parallel discussion in [2] which I thought makes the problem more concrete.
->>>>>
->>>>> No problem, I figured as much :).
->>>>>
->>>>>>
->>>>>> This is Drew's patch as soon as he confirms he's also happy with the change
->>>>>> you suggested in the patch description I am happy to make it.
->>>>>>
->>>>>> Generally, a test will start off with the MMU enabled. At this point, we
->>>>>> access code, use and modify data (EfiLoaderData, EfiLoaderCode). Any of the
->>>>>> two regions could be mapped as any type of memory (I need to have another
->>>>>> look to confirm if it's Normal Memory). Then we want to take over control of
->>>>>> the page tables and for that reason we have to switch off the MMU. And any
->>>>>> access to code or data will be with Device-nGnRnE as you pointed out. If we
->>>>>> don't clean and invalidate, instructions and data might be in the cache and
->>>>>> we will be mixing memory attributes, won't we?
->>>>>
->>>>> I missed that comment, sorry. I've replied to that comment made in v2,
->>>>> here, in this ieration, in patch #19 ("arm/arm64: Add a setup sequence for
->>>>> systems that boot through EFI").
->>>>>
->>>>> This is the second time you've mentioned mixed memory attributes, so I'm
->>>>> going to reiterate the question I asked in patch #19: what do you mean by
->>>>> "mixing memory attributes" and what is wrong with it? Because it looks to
->>>>> me like you're saying that you cannot access data written with the MMU on
->>>>> when the MMU is off (and I assume the other way around, you cannot data
->>>>> written with the MMU off when the MMU is on).
->>>>>
->>>>
->>>> What I mean by mixing memory attributes is illustrated by the following
->>>> example.
->>>>
->>>> Take a memory location x, for which the page table entry maps to a physical
->>>> location as Normal, Inner-Shareable, Inner-writeback and Outer-writeback. If
->>>> we access it when the MMU is on and subquently when the MMU is off (treated
->>>> as Device-nGnRnE), then we have two accesses with mismatched memory
->>>> attributes to the same location. There is a whole section in the Arm ARM on
->>>> why this needs to be avoided (B2.8 Mismatched memory attributes) but the
->>>> result is "a loss of the uniprocessor semantics, ordering, or coherency". As
->>>> I understand, the solution to this is:
->>>>
->>>> "If the mismatched attributes for a Location mean that multiple cacheable
->>>> accesses to the Location might be made with different shareability
->>>> attributes, then uniprocessor semantics, ordering, and coherency are
->>>> guaranteed only if:
->>>> • Software running on a PE cleans and invalidates a Location from cache
->>>> before and after each read or write to that Location by that PE.
->>>> • A DMB barrier with scope that covers the full shareability of the accesses
->>>> is placed between any accesses to the same memory Location that use
->>>> different attributes."
->>>
->>> Ok, so this is about *mismatched* memory attributes. I searched the Arm ARM
->>> for the string "mixed" and nothing relevant came up.
->>>
->>> Device-whatever memory is outer shareable and kvm-unit-tests maps memory as
->>> inner shareable, so that matches the "different shareability attributes"
->>> part of the paragraph.
->>>
->>> But I would like to point out that there is only one type of cacheable
->>> access that is being performed, when the MMU is on. When the MMU is off,
->>> the access is not cacheable. So there are two types of accesses being
->>> performed:
->>>
->>> - cacheable + inner-shareable (MMU on)
->>> - non-cacheable + outer-shareable (MMU off)
->>>
->>> It looks to me like the paragraph doesn't apply to our case, because there
->>> are no "multiple cacheable accesses [..] made with different shareability
->>> attributes". Do you agree?
->>>
+> What tree do you plan to take it through?
 
-No, I think the rules on mismatched memory attributes still apply.
-
-"Physical memory locations are accessed with mismatched attributes if 
-all accesses to the location do not use a common definition of all of 
-the following attributes of that location:
-• Memory type: Device-nGnRnE, Device-nGnRE, Device-nGRE, Device-GRE or 
-Normal."
-
-When we're switching off the MMU, we're changing the type of memory for 
-many of the efi regions and therefore the rules on mismatched memory 
-attributes still apply.
-
->>>>
->>>> So unless UEFI maps all memory as Device-nGnRnE we have to do something. I
->>>> will try to find out more about UEFI's page tables.
->>>
->>> That's important to know, especially regarding the text section of the
->>> image. If UEFI doesnt' clean it to PoC, kvm-unit-tests must do it in order
->>> to execute correctly with the MMU off.
->>>
-
-Drew confirmed that UEFI page tables map most memory as Normal, Cacheable.
-
->>
->> Hi Alex and Nikos,
->>
->> Indeed my experiments on bare-metal made this change necessary. I'm happy
->> to see this discussion, though, as this patch could be tweaked or at least
->> the commit message improved in order to better explain what's going on and
->> why the changes are necessary. IOW, I have no problem with this patch
-> 
-> If you fix the commit message to be architecturally correct then you will
-> come to the conclusion that the patch is architecturally incorrect because
-> while it fixes the problem you were seeing, it breaks asm_mmu_disable in
-> all other cases.
-> > The problem you were seeing according to my investigation was this:
-> 
-> __phys_offset and __phys_end are written with the MMU on and the most up to
-> date value is in the cache. When the MMU is turned off, the value that
-> asm_mmu_disable reads is the stale value from main memory and it will not
-> clean + invalidate all the memory, which is what we want. This assumes that
-> UEFI cleaned the image to PoC, otherwise, that will need to be cleaned too
-> by kvm-unit-tests before turning off the MMU.
-
-The clean and/or invalidate instructions are also affected by the Memory 
-type attributes so any operation after we switch off the MMU will be 
-affected. Having said that, we might be fine:
-
-"For Device memory and Normal memory that is Inner Non-cacheable, Outer 
-Non-cacheable, these instructions must affect the caches of all PEs in 
-the Outer Shareable shareability domain of the PE on which the 
-instruction is operating."
+Don't know. I know Matt's PCI series has a conflict with this same
+patch also, but I haven't seen resolution to that. @Christian,
+thoughts?
 
 > 
-> This was explained before, both on your original UEFI support series on
-> github [1], and on this list.
+> > The remainder of the work that Jason Gunthorpe originally started
+> > [1]
+> > in this space remains for a future day.
 > 
-> As for why it breaks asm_mmu_disable for all other cases:
+> Lets see.. These were already applied:
 > 
-> The purpose of the clean in asm_mmu_disable is for the CPU to sync the
-> caches with main memory when the MMU is turned off (to propagate the most
-> up-to-date value from the cache to main memory); the purpose of the
-> invalidate is to make sure that the CPU reads from main memory instead of
-> the cache once the MMU is turned back on - if the cache line is still
-> valid, the CPU wll read the values written *before* the MMU was turned
-> off, not the values written *after* the MMU was turned off.
+>   vfio/ccw: Remove unneeded GFP_DMA
+>   vfio/ccw: Use functions for alloc/free of the vfio_ccw_private
+>   vfio/ccw: Pass vfio_ccw_private not mdev_device to various
+> functions
+>   vfio/ccw: Convert to use vfio_register_emulated_iommu_dev()
 > 
-> If you do the dcache clean + invalidate *before* turning the MMU on, the
-> CPU can speculate a read and allocate a new cache line before the MMU is
-> turned off, which would make the invalidate useless. Speculation is
-> prohibited with the MMU off, that's why the invalidate must be done with
-> the MMU off.
+> This series replaces this one:
+>   vfio/ccw: Make the FSM complete and synchronize it to the mdev
 > 
-> Because of this reason I believe the patch is incorrect.
-> 
+> Christoph recently re-posted this:
+> https://lore.kernel.org/kvm/20220628051435.695540-10-hch@lst.de/
+>   vfio/mdev: Consolidate all the device_api sysfs into the core code
 
-Given the effect of the DC instructions for Device Memory maybe keeping 
-the invalidation after switching the MMU off seems to be the right 
-approach. We only need to clean anything we use during the clean and 
-invalidate as you suggest.
+Correct. Same for "vfio/mdev: Add mdev available instance checking to
+the core" which you originally had proposed.
 
->> being dropped and replaced by one of you with something that "makes
->> more sense" as long as the outcome (coherent execution on bare-metal)
->> still works.
 > 
-> Hmm... maybe an experiment will work. I propose the following:
-> > 1. Revert this patch.
-> 2. Apply this diff on top of the series:
+> So this is still left ?
+>   vfio/ccw: Remove private->mdev
+
+This is by this series (patch 1-4).
+
+>   vfio: Export vfio_device_try_get()
+>   vfio/ccw: Move the lifecycle of the struct vfio_ccw_private to the
+>     mdev
 > 
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 30d04d0eb100..913f4088d96c 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -374,6 +374,11 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->                  }
->          }
->          __phys_end &= PHYS_MASK;
-> +
-> +       asm volatile("dc cvau, %0\n" :: "r" (&__phys_offset) : "memory");
-> +       asm volatile("dc cvau, %0\n" :: "r" (&__phys_end) : "memory");
+> IIRC Kevin's team needs those for their device FD patches?
 
-These need to be dc cvac.
+That's my understanding too. 
 
-> +       dsb(sy);
-> +
->          asm_mmu_disable();
-> 
->          if (free_mem_pages == 0)
-> 
-> This is the solution, based on an architectural explanation of what we were
-> observing, that I proposed on your github branch, a solution that you've
-> tested with the result:
-> 
-> "I tested at least 10 times (lost count) with a build where "arm/arm64:
-> mmu_disable: Clean and invalidate before disabling" was reverted from the
-> target-efi branch and your hack was applied. It worked every time."
->
-
-FWIW, I don't think running 10 times on one machine shows much about the 
-architectural correctness of either solution.
-
-Thanks,
-
-Nikos
-
-> [1] https://github.com/rhdrjones/kvm-unit-tests/commit/fc58684bc47b7d07d75098fdfddb6083e9b12104#commitcomment-44222926
 > 
 > Thanks,
-> Alex
+> Jason
+
