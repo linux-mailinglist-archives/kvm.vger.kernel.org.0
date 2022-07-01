@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 717C15637B7
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:22:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D58605637B5
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:22:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232000AbiGAQVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 12:21:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43334 "EHLO
+        id S232021AbiGAQVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 12:21:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231909AbiGAQVj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 12:21:39 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E56CF3F33D;
-        Fri,  1 Jul 2022 09:21:38 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 261F8q0T021734;
-        Fri, 1 Jul 2022 16:21:38 GMT
+        with ESMTP id S229570AbiGAQVk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 12:21:40 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAECE3F33E;
+        Fri,  1 Jul 2022 09:21:39 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 261GBwgQ006493;
+        Fri, 1 Jul 2022 16:21:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=5JF6AL+4EBIUqA2TpFmYJYvKzaNL5oQBYsGCpOpSFqE=;
- b=k9yBsLGPtjcUevCHBcyoyd/5jbjkCO9ScQ6aEx8lMWxx4F03kQEE1oOro2sRjkIlvezY
- cyEx01bkQ2wFy+6iG4C6/z308F92cNV83j6cGVDMMDA/3nJpxDgzgQmFLMupGllUPRcY
- 9/yq/bHohTduFDwmewJMY+4mwg+TbUpC9XeOao0RcdR8qnP+RHJOze0SDAki+K35zrXX
- 8Iv8nsWNbEnQgJuUvk5VJaXDD7hUZxEdAi2Gd/6Jk/bErqhTCAv/MY+wDaePUKZkoXzv
- FN4O15GEwHw1vYR+r7W1yjZ8fCWubQ5EYgN8sAizFEmr/lplTsgj4Uq8UOTGn6i0f0rm PQ== 
+ bh=D3uDiaOs0hT2pDuFulsMwLE1lpSWPOjmwWxTi9bN0hI=;
+ b=ow6wB1c95cfPdTf7Jrgc3CQ6rGO6KPulDawWt2VkUvlrJWcG0V7RLMb09SzJLT/fRTEp
+ WXjNYrokwBQ8tI51b9FomB/283X8EZPQilKPanF/FMdRoSSsfPcBolmP4O8ppXHt3xXp
+ zuXHM3OtfvLPrFEmQeqNV0gg+Ek2xCibmsNGdSzzzvbarfd2iKvCHQxxjgmxMJd9wtwZ
+ zIWAyrNb5G6d3cb2PvxJzK+m/2JnS6+Hru/1vt0nSwjgNhj+GA2Dlbuz9B75LQWr3F0l
+ 4ElWKa6ppPjzxXfHYEaW06Cnu2iPVulcZPJQpVHckQeRTuEWaChBuRT6xR2m9DZHWnjD PA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h2329k68h-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h247wra25-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 16:21:39 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 261GFNOE003982;
+        Fri, 1 Jul 2022 16:21:38 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h247wra0y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 01 Jul 2022 16:21:38 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 261FsOZi037834;
-        Fri, 1 Jul 2022 16:21:37 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h2329k677-1
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 261G6nM8032312;
+        Fri, 1 Jul 2022 16:21:36 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3gwt08yeg8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Jul 2022 16:21:37 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 261G7AnY002534;
-        Fri, 1 Jul 2022 16:21:35 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3gwsmhyev0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Jul 2022 16:21:35 +0000
+        Fri, 01 Jul 2022 16:21:36 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 261GLWuO14746048
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 261GLeiX26214828
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Jul 2022 16:21:32 GMT
+        Fri, 1 Jul 2022 16:21:40 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1A23A4054;
-        Fri,  1 Jul 2022 16:21:31 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C8F30A4054;
+        Fri,  1 Jul 2022 16:21:32 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 345D0A405B;
-        Fri,  1 Jul 2022 16:21:31 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 01866A405B;
+        Fri,  1 Jul 2022 16:21:32 +0000 (GMT)
 Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.92.56])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
         Fri,  1 Jul 2022 16:21:31 +0000 (GMT)
@@ -65,25 +65,25 @@ Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         hca@linux.ibm.com, gor@linux.ibm.com, pmorel@linux.ibm.com,
         wintera@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
         scgl@linux.ibm.com
-Subject: [PATCH v11 2/3] KVM: s390: guest support for topology function
-Date:   Fri,  1 Jul 2022 18:25:58 +0200
-Message-Id: <20220701162559.158313-3-pmorel@linux.ibm.com>
+Subject: [PATCH v11 3/3] KVM: s390: resetting the Topology-Change-Report
+Date:   Fri,  1 Jul 2022 18:25:59 +0200
+Message-Id: <20220701162559.158313-4-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220701162559.158313-1-pmorel@linux.ibm.com>
 References: <20220701162559.158313-1-pmorel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rrfB9Sa9WvnP9e8TJ4NE9xk0ER7yYiRd
-X-Proofpoint-ORIG-GUID: trDVw3xyQ5Vx77KS6uMtRWKoQS8wXWjg
+X-Proofpoint-GUID: aRa7ZIkIZiaoENiwNbHt1zrezNpTec4S
+X-Proofpoint-ORIG-GUID: 4sv5i44wHhKZebExXuF1u0LXCecCHaIv
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-07-01_08,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1015 impostorscore=0
- spamscore=0 mlxscore=0 malwarescore=0 adultscore=0 bulkscore=0
- phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2204290000 definitions=main-2207010064
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 impostorscore=0 adultscore=0 malwarescore=0 mlxscore=0
+ phishscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207010064
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -93,198 +93,200 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We report a topology change to the guest for any CPU hotplug.
+During a subsystem reset the Topology-Change-Report is cleared.
 
-The reporting to the guest is done using the Multiprocessor
-Topology-Change-Report (MTCR) bit of the utility entry in the guest's
-SCA which will be cleared during the interpretation of PTF.
+Let's give userland the possibility to clear the MTCR in the case
+of a subsystem reset.
 
-On every vCPU creation we set the MCTR bit to let the guest know the
-next time he uses the PTF with command 2 instruction that the
-topology changed and that he should use the STSI(15.1.x) instruction
-to get the topology details.
+To migrate the MTCR, we give userland the possibility to
+query the MTCR state.
 
-STSI(15.1.x) gives information on the CPU configuration topology.
-Let's accept the interception of STSI with the function code 15 and
-let the userland part of the hypervisor handle it when userland
-support the CPU Topology facility.
+We indicate KVM support for the CPU topology facility with a new
+KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 ---
- arch/s390/include/asm/kvm_host.h | 18 +++++++++++++---
- arch/s390/kvm/kvm-s390.c         | 36 ++++++++++++++++++++++++++++++++
- arch/s390/kvm/priv.c             | 16 ++++++++++----
- arch/s390/kvm/vsie.c             |  8 +++++++
- 4 files changed, 71 insertions(+), 7 deletions(-)
+ Documentation/virt/kvm/api.rst   | 25 +++++++++++++++
+ arch/s390/include/uapi/asm/kvm.h | 10 ++++++
+ arch/s390/kvm/kvm-s390.c         | 53 ++++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h         |  1 +
+ 4 files changed, 89 insertions(+)
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 766028d54a3e..ae6bd3d607de 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -93,19 +93,30 @@ union ipte_control {
- 	};
- };
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 11e00a46c610..5e086125d8ad 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7956,6 +7956,31 @@ should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
+ When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
+ type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
  
-+union sca_utility {
-+	__u16 val;
-+	struct {
-+		__u16 mtcr : 1;
-+		__u16 reserved : 15;
-+	};
++8.37 KVM_CAP_S390_CPU_TOPOLOGY
++------------------------------
++
++:Capability: KVM_CAP_S390_CPU_TOPOLOGY
++:Architectures: s390
++:Type: vm
++
++This capability indicates that KVM will provide the S390 CPU Topology
++facility which consist of the interpretation of the PTF instruction for
++the function code 2 along with interception and forwarding of both the
++PTF instruction with function codes 0 or 1 and the STSI(15,1,x)
++instruction to the userland hypervisor.
++
++The stfle facility 11, CPU Topology facility, should not be indicated
++to the guest without this capability.
++
++When this capability is present, KVM provides a new attribute group
++on vm fd, KVM_S390_VM_CPU_TOPOLOGY.
++This new attribute allows to get, set or clear the Modified Change
++Topology Report (MTCR) bit of the SCA through the kvm_device_attr
++structure.
++
++When getting the Modified Change Topology Report value, the attr->addr
++must point to a byte where the value will be stored.
++
+ 9. Known KVM API problems
+ =========================
+ 
+diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+index 7a6b14874d65..df5e8279ffd0 100644
+--- a/arch/s390/include/uapi/asm/kvm.h
++++ b/arch/s390/include/uapi/asm/kvm.h
+@@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+ #define KVM_S390_VM_CRYPTO		2
+ #define KVM_S390_VM_CPU_MODEL		3
+ #define KVM_S390_VM_MIGRATION		4
++#define KVM_S390_VM_CPU_TOPOLOGY	5
+ 
+ /* kvm attributes for mem_ctrl */
+ #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+@@ -171,6 +172,15 @@ struct kvm_s390_vm_cpu_subfunc {
+ #define KVM_S390_VM_MIGRATION_START	1
+ #define KVM_S390_VM_MIGRATION_STATUS	2
+ 
++/* kvm attributes for cpu topology */
++#define KVM_S390_VM_CPU_TOPO_MTCR_CLEAR	0
++#define KVM_S390_VM_CPU_TOPO_MTCR_SET	1
++
++struct kvm_cpu_topology {
++	__u16 mtcr : 1;
++	__u16 reserved : 15;
 +};
 +
- struct bsca_block {
- 	union ipte_control ipte_control;
- 	__u64	reserved[5];
- 	__u64	mcn;
--	__u64	reserved2;
-+	union sca_utility utility;
-+	__u8	reserved2[6];
- 	struct bsca_entry cpu[KVM_S390_BSCA_CPU_SLOTS];
- };
- 
- struct esca_block {
- 	union ipte_control ipte_control;
--	__u64   reserved1[7];
-+	__u64   reserved1[6];
-+	union sca_utility utility;
-+	__u8	reserved2[6];
- 	__u64   mcn[4];
--	__u64   reserved2[20];
-+	__u64   reserved3[20];
- 	struct esca_entry cpu[KVM_S390_ESCA_CPU_SLOTS];
- };
- 
-@@ -249,6 +260,7 @@ struct kvm_s390_sie_block {
- #define ECB_SPECI	0x08
- #define ECB_SRSI	0x04
- #define ECB_HOSTPROTINT	0x02
-+#define ECB_PTF		0x01
- 	__u8	ecb;			/* 0x0061 */
- #define ECB2_CMMA	0x80
- #define ECB2_IEP	0x20
+ /* for KVM_GET_REGS and KVM_SET_REGS */
+ struct kvm_regs {
+ 	/* general purpose regs for s390 */
 diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 8fcb56141689..ee59b03f2e45 100644
+index ee59b03f2e45..5029fe40adbd 100644
 --- a/arch/s390/kvm/kvm-s390.c
 +++ b/arch/s390/kvm/kvm-s390.c
-@@ -1691,6 +1691,31 @@ static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
- 	return ret;
+@@ -606,6 +606,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_S390_PROTECTED:
+ 		r = is_prot_virt_host();
+ 		break;
++	case KVM_CAP_S390_CPU_TOPOLOGY:
++		r = test_facility(11);
++		break;
+ 	default:
+ 		r = 0;
+ 	}
+@@ -817,6 +820,20 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+ 		icpt_operexc_on_all_vcpus(kvm);
+ 		r = 0;
+ 		break;
++	case KVM_CAP_S390_CPU_TOPOLOGY:
++		r = -EINVAL;
++		mutex_lock(&kvm->lock);
++		if (kvm->created_vcpus) {
++			r = -EBUSY;
++		} else if (test_facility(11)) {
++			set_kvm_facility(kvm->arch.model.fac_mask, 11);
++			set_kvm_facility(kvm->arch.model.fac_list, 11);
++			r = 0;
++		}
++		mutex_unlock(&kvm->lock);
++		VM_EVENT(kvm, 3, "ENABLE: CPU TOPOLOGY %s",
++			 r ? "(not available)" : "(success)");
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -1716,6 +1733,33 @@ static void kvm_s390_update_topology_change_report(struct kvm *kvm, bool val)
+ 	read_unlock(&kvm->arch.sca_lock);
  }
  
-+/**
-+ * kvm_s390_update_topology_change_report - update CPU topology change report
-+ * @kvm: guest KVM description
-+ * @val: set or clear the MTCR bit
-+ *
-+ * Updates the Multiprocessor Topology-Change-Report bit to signal
-+ * the guest with a topology change.
-+ * This is only relevant if the topology facility is present.
-+ *
-+ * The SCA version, bsca or esca, doesn't matter as offset is the same.
-+ */
-+static void kvm_s390_update_topology_change_report(struct kvm *kvm, bool val)
++static int kvm_s390_set_topology(struct kvm *kvm, struct kvm_device_attr *attr)
 +{
-+	struct bsca_block *sca = kvm->arch.sca;
-+	union sca_utility new, old;
++	if (!test_kvm_facility(kvm, 11))
++		return -ENXIO;
 +
-+	read_lock(&kvm->arch.sca_lock);
-+	do {
-+		old = READ_ONCE(sca->utility);
-+		new = old;
-+		new.mtcr = val;
-+	} while (cmpxchg(&sca->utility.val, old.val, new.val) != old.val);
-+	read_unlock(&kvm->arch.sca_lock);
++	kvm_s390_update_topology_change_report(kvm, !!attr->attr);
++	return 0;
++}
++
++static int kvm_s390_get_topology(struct kvm *kvm, struct kvm_device_attr *attr)
++{
++	union sca_utility utility;
++	struct bsca_block *sca = kvm->arch.sca;
++	__u8 topo;
++
++	if (!test_kvm_facility(kvm, 11))
++		return -ENXIO;
++
++	utility.val = READ_ONCE(sca->utility.val);
++	topo = utility.mtcr;
++
++	if (copy_to_user((void __user *)attr->addr, &topo, sizeof(topo)))
++		return -EFAULT;
++
++	return 0;
 +}
 +
  static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
  {
  	int ret;
-@@ -2877,6 +2902,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kvm_clear_async_pf_completion_queue(vcpu);
- 	if (!kvm_is_ucontrol(vcpu->kvm))
- 		sca_del_vcpu(vcpu);
-+	kvm_s390_update_topology_change_report(vcpu->kvm, 1);
- 
- 	if (kvm_is_ucontrol(vcpu->kvm))
- 		gmap_remove(vcpu->arch.gmap);
-@@ -3272,6 +3298,14 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
- 		vcpu->arch.sie_block->ecb |= ECB_HOSTPROTINT;
- 	if (test_kvm_facility(vcpu->kvm, 9))
- 		vcpu->arch.sie_block->ecb |= ECB_SRSI;
-+	/*
-+	 * CPU Topology
-+	 * This facility only uses the utility field of the SCA and none
-+	 * of the cpu entries that are problematic with the other
-+	 * interpretation facilities so we can pass it through.
-+	 */
-+	if (test_kvm_facility(vcpu->kvm, 11))
-+		vcpu->arch.sie_block->ecb |= ECB_PTF;
- 	if (test_kvm_facility(vcpu->kvm, 73))
- 		vcpu->arch.sie_block->ecb |= ECB_TE;
- 	if (!kvm_is_ucontrol(vcpu->kvm))
-@@ -3403,6 +3437,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	rc = kvm_s390_vcpu_setup(vcpu);
- 	if (rc)
- 		goto out_ucontrol_uninit;
-+
-+	kvm_s390_update_topology_change_report(vcpu->kvm, 1);
- 	return 0;
- 
- out_ucontrol_uninit:
-diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-index 12c464c7cddf..046afee1be94 100644
---- a/arch/s390/kvm/priv.c
-+++ b/arch/s390/kvm/priv.c
-@@ -873,10 +873,13 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
- 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
- 
--	if (fc > 3) {
--		kvm_s390_set_psw_cc(vcpu, 3);
--		return 0;
--	}
-+	/* Bailout forbidden function codes */
-+	if (fc > 3 && (fc != 15 || kvm_s390_pv_cpu_is_protected(vcpu)))
-+		goto out_no_data;
-+
-+	/* fc 15 is provided with PTF/CPU topology support */
-+	if (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))
-+		goto out_no_data;
- 
- 	if (vcpu->run->s.regs.gprs[0] & 0x0fffff00
- 	    || vcpu->run->s.regs.gprs[1] & 0xffff0000)
-@@ -910,6 +913,11 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
- 			goto out_no_data;
- 		handle_stsi_3_2_2(vcpu, (void *) mem);
+@@ -1736,6 +1780,9 @@ static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+ 	case KVM_S390_VM_MIGRATION:
+ 		ret = kvm_s390_vm_set_migration(kvm, attr);
  		break;
-+	case 15: /* fc 15 is fully handled in userspace */
-+		if (vcpu->kvm->arch.user_stsi)
-+			insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
-+		trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
-+		return -EREMOTE;
- 	}
- 	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
- 		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index dada78b92691..94138f8f0c1c 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -503,6 +503,14 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	/* Host-protection-interruption introduced with ESOP */
- 	if (test_kvm_cpu_feat(vcpu->kvm, KVM_S390_VM_CPU_FEAT_ESOP))
- 		scb_s->ecb |= scb_o->ecb & ECB_HOSTPROTINT;
-+	/*
-+	 * CPU Topology
-+	 * This facility only uses the utility field of the SCA and none of
-+	 * the cpu entries that are problematic with the other interpretation
-+	 * facilities so we can pass it through
-+	 */
-+	if (test_kvm_facility(vcpu->kvm, 11))
-+		scb_s->ecb |= scb_o->ecb & ECB_PTF;
- 	/* transactional execution */
- 	if (test_kvm_facility(vcpu->kvm, 73) && wants_tx) {
- 		/* remap the prefix is tx is toggled on */
++	case KVM_S390_VM_CPU_TOPOLOGY:
++		ret = kvm_s390_set_topology(kvm, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -1761,6 +1808,9 @@ static int kvm_s390_vm_get_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+ 	case KVM_S390_VM_MIGRATION:
+ 		ret = kvm_s390_vm_get_migration(kvm, attr);
+ 		break;
++	case KVM_S390_VM_CPU_TOPOLOGY:
++		ret = kvm_s390_get_topology(kvm, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -1834,6 +1884,9 @@ static int kvm_s390_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+ 	case KVM_S390_VM_MIGRATION:
+ 		ret = 0;
+ 		break;
++	case KVM_S390_VM_CPU_TOPOLOGY:
++		ret = test_kvm_facility(kvm, 11) ? 0 : -ENXIO;
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5088bd9f1922..33317d820032 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1157,6 +1157,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_VM_TSC_CONTROL 214
+ #define KVM_CAP_SYSTEM_EVENT_DATA 215
+ #define KVM_CAP_ARM_SYSTEM_SUSPEND 216
++#define KVM_CAP_S390_CPU_TOPOLOGY 217
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.31.1
 
