@@ -2,60 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD0CB562D4C
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 10:00:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 700EB562D7C
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 10:11:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235509AbiGAH6w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 03:58:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56978 "EHLO
+        id S235229AbiGAIK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 04:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235796AbiGAH6v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 03:58:51 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D16564D6A
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 00:58:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656662331; x=1688198331;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=VJejyouKW9/czk6l1Lmvad6clDecjfEujTrLe/gh4Zc=;
-  b=KfetSCn9vtMPzZKcOU78YUhSV7BCTO4eM56Bfk/u2Tm4/D2mT+O8/JcK
-   +1Mj484yKlX9uzqOCWyf5NzWIA6csOTByDpvFPWTakv6vu5Y5xNMksiuT
-   3Q+24ggOYwbYiEONv+yMu8U8o7McRoVfOa7xP3RP2OisZfbsDw+JM7zWi
-   whPevN8hhJi3utdh3pSHXVCb9S3yo3+WrdrnCyxrrwam9SPmCcMe2kcEm
-   AwSvkLbSltwaBsHHE4r4MZ7XWIvJ1sYu3/0kTk66UNqLH2Z/x7/16DRNM
-   gkNkak9e/1Ufr6AWHADBfAcLhjX2VYIHEXTeUgI2pV31oo/9AIVdGuP0S
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10394"; a="283316803"
-X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
-   d="scan'208";a="283316803"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2022 00:58:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
-   d="scan'208";a="681310234"
-Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 01 Jul 2022 00:58:33 -0700
-Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o7BXs-000DiF-Ea;
-        Fri, 01 Jul 2022 07:58:32 +0000
-Date:   Fri, 1 Jul 2022 15:57:34 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: [awilliam-vfio:next 2/11] drivers/vfio/vfio_iommu_type1.c:2147:35:
- warning: cast to smaller integer type 'enum iommu_cap' from 'void *'
-Message-ID: <202207011538.py9XU340-lkp@intel.com>
+        with ESMTP id S235408AbiGAIKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 04:10:25 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942DF6F379
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 01:10:23 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26180XCq018308
+        for <kvm@vger.kernel.org>; Fri, 1 Jul 2022 08:10:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : from : cc : to : message-id : date; s=pp1;
+ bh=67ZRHg9gXprtn/nZHoe0zO+ABW+zU3Yfve7AmvEni4U=;
+ b=qYndaYi7Az7H0dJ1bMkZqK+Es7IWkSSFCgEhgHH02rpnsRgHOvxFKDdzhsiI8fEZbQG1
+ t9hqmjwlScA2jJg5o3NdmfYhZ9YPLkcC8PLTaCYkazes8QmeuW4feVdppTIUGVZoiu/t
+ WikYuq57SswRjTz4VoCE91YlbyfKKZH6lOzSDqEH8RfJMD3YtbEQFGpncTTxzDb7acrm
+ m1Zowmnj9Fo6jHG/bqxWCjkMdqAH3cTbMyCQawlF4yihnS6NsUPX/+H8eK8+YU0tPbvm
+ HMVEVIB9SER6mQSA6T9Sg1Rxf5rL4nbQyNNujhFIxYsHTp8d8OcL3miSdr8jqPMg4+1x jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1w1k8c0e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 08:10:22 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26182Ime025307
+        for <kvm@vger.kernel.org>; Fri, 1 Jul 2022 08:10:22 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1w1k8byg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 08:10:22 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26186OoQ002924;
+        Fri, 1 Jul 2022 08:10:20 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3gwt0970tv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 08:10:20 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2618AH3X23658928
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Jul 2022 08:10:17 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 00C2552054;
+        Fri,  1 Jul 2022 08:10:17 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.42.232])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D9A2E5204E;
+        Fri,  1 Jul 2022 08:10:16 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <dd270d92-a5dc-8a75-0edc-e9fdbb254cc9@linux.ibm.com>
+References: <20220630113059.229221-1-nrb@linux.ibm.com> <20220630113059.229221-4-nrb@linux.ibm.com> <dd270d92-a5dc-8a75-0edc-e9fdbb254cc9@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 3/3] s390x: add pgm spec interrupt loop test
+From:   Nico Boehr <nrb@linux.ibm.com>
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+To:     kvm@vger.kernel.org
+Message-ID: <165666301667.83789.2996985444782675194@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Fri, 01 Jul 2022 10:10:16 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: TFVsqtyNsrFyEbtBCc6iEVshjlpySf9L
+X-Proofpoint-GUID: bQyVzBp_mS4CCCQwBsvhCkpeL300d7hO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-01_05,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ lowpriorityscore=0 suspectscore=0 impostorscore=0 adultscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 mlxlogscore=698
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207010028
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,43 +86,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://github.com/awilliam/linux-vfio.git next
-head:   7654a8881a54c335f176c7dc0a923480228497de
-commit: eed20c782aea57b7efb42af2905dc381268b21e9 [2/11] vfio/type1: Simplify bus_type determination
-config: x86_64-randconfig-a001 (https://download.01.org/0day-ci/archive/20220701/202207011538.py9XU340-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project a9119143a2d1f4d0d0bc1fe0d819e5351b4e0deb)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/awilliam/linux-vfio/commit/eed20c782aea57b7efb42af2905dc381268b21e9
-        git remote add awilliam-vfio https://github.com/awilliam/linux-vfio.git
-        git fetch --no-tags awilliam-vfio next
-        git checkout eed20c782aea57b7efb42af2905dc381268b21e9
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/vfio/
+Quoting Janis Schoetterl-Glausch (2022-06-30 16:38:47)
+> On 6/30/22 13:30, Nico Boehr wrote:
+> > An invalid PSW causes a program interrupt. When an invalid PSW is
+> > introduced in the pgm_new_psw, an interrupt loop occurs as soon as a
+> > program interrupt is caused.
+> >=20
+> > QEMU should detect that and panick the guest, hence add a test for it.
+>=20
+> Why is that, after all in LPAR it would just spin, right?
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+The test doesn't spin for me under LPAR so it seems like LPAR can detect th=
+is as well. KVM has code to detect this situation, see handle_prog() in int=
+ercept.c, which then exits to userspace.
 
-All warnings (new ones prefixed by >>):
+> Also, panicK.
 
->> drivers/vfio/vfio_iommu_type1.c:2147:35: warning: cast to smaller integer type 'enum iommu_cap' from 'void *' [-Wvoid-pointer-to-enum-cast]
-           return device_iommu_capable(dev, (enum iommu_cap)data);
-                                            ^~~~~~~~~~~~~~~~~~~~
-   1 warning generated.
+Right, fixed.
 
+> How do you assert that the guest doesn't spin forever, is there a timeout?
 
-vim +2147 drivers/vfio/vfio_iommu_type1.c
-
-  2143	
-  2144	/* Redundantly walks non-present capabilities to simplify caller */
-  2145	static int vfio_iommu_device_capable(struct device *dev, void *data)
-  2146	{
-> 2147		return device_iommu_capable(dev, (enum iommu_cap)data);
-  2148	}
-  2149	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+There is the default kvm-unit-tests timeout of 90 seconds, but that is prob=
+ably too much for this test. I think 5 seconds should be plenty, will add.
