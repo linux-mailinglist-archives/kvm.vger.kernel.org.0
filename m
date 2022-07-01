@@ -2,102 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0F925631A9
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 12:43:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 984045631E0
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 12:48:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233605AbiGAKnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 06:43:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35414 "EHLO
+        id S233948AbiGAKsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 06:48:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235453AbiGAKmq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 06:42:46 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F0147BD1B;
-        Fri,  1 Jul 2022 03:42:45 -0700 (PDT)
-Received: from zn.tnic (p200300ea970ff648329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:970f:f648:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 856321EC059D;
-        Fri,  1 Jul 2022 12:42:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1656672159;
+        with ESMTP id S232356AbiGAKsN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 06:48:13 -0400
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28DB238BA
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 03:48:12 -0700 (PDT)
+Date:   Fri, 1 Jul 2022 12:48:09 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1656672490;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=SWhCxOJUAdsvqOpxyv8QTMa/YznelRxtMa+3KCBAmCU=;
-        b=VfMj79baSekma4xFxVrkmV7L+rj6Z2maopnfrFmPEjLleGOALxaW+uTtB/VaB/rc6JrFGe
-        QSa+TzpouUp17YdzBr1v5gYQ4aUh8yCBG2g5HBWefZ4qFd+8Jf7s7Vy21LRImaayFJasOj
-        mDBhXy2Dcy9SCUdJdWZpwx/+FjBmdwc=
-Date:   Fri, 1 Jul 2022 12:42:35 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, michael.roth@amd.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Message-ID: <Yr7Pm/E9WsAjirV0@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=zXlrN3nFpmgIQhTgAf37F9YHqwMmPRCNvfBXuvlMA4E=;
+        b=UBMMeGWXEArD/boDjdOBrAT+KBOJgY/obJqJm780J0hcJgpKyD18X9yfIk+xGGYwm4mIaG
+        wnyJftO5wAuR0cHrTqHTATUZLJwAW6QhK8MnObcvxpj/r42As8LUb/JNUARtcaqxR0769v
+        IOe1e3CNczd2bcNVp5OD2FHpf2Tmzq4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
+        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
+Subject: Re: [kvm-unit-tests PATCH v3 26/27] lib: arm: Print test exit status
+Message-ID: <20220701104809.zypqks76yeo4lit7@kamzik>
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-27-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220630100324.3153655-27-nikos.nikoleris@arm.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 10:59:19PM +0000, Ashish Kalra wrote:
-> +bool iommu_sev_snp_supported(void)
-> +{
-> +	struct amd_iommu *iommu;
-> +
+On Thu, Jun 30, 2022 at 11:03:23AM +0100, Nikos Nikoleris wrote:
+> From: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> The arm tests can be run under kvmtool, which doesn't emulate a chr-testdev
+> device. Print the test exit status to make it possible for the runner
+> scripts to pick it up when they have support for it.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  lib/arm/io.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/lib/arm/io.c b/lib/arm/io.c
+> index a91f116..337cf1b 100644
+> --- a/lib/arm/io.c
+> +++ b/lib/arm/io.c
+> @@ -138,6 +138,12 @@ extern void halt(int code);
+>  
+>  void exit(int code)
+>  {
 > +	/*
-> +	 * The SEV-SNP support requires that IOMMU must be enabled, and is
-> +	 * not configured in the passthrough mode.
+> +	 * Print the test return code in the format used by chr-testdev so the
+> +	 * runner can pick it up if there is chr-testdev is not present.
+
+nit: The comment isn't worded quite right...
+
+The printed format ("EXIT: STATUS=") isn't chr-testdev's format, but it
+is the format we want, because it's consistent with powerpc and s390x.
+The exit code format '(code << 1) | 1' is chr-testdev's and
+isa-debug-exit's exit format.
+
 > +	 */
-> +	if (no_iommu || iommu_default_passthrough()) {
-> +		pr_err("SEV-SNP: IOMMU is either disabled or configured in passthrough mode.\n");
-> +		return false;
-> +	}
+> +	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
 > +
-> +	/*
-> +	 * Iterate through all the IOMMUs and verify the SNPSup feature is
-> +	 * enabled.
-> +	 */
-> +	for_each_iommu(iommu) {
-> +		if (!iommu_feature(iommu, FEATURE_SNP)) {
-> +			pr_err("SNPSup is disabled (devid: %02x:%02x.%x)\n",
-> +			       PCI_BUS_NUM(iommu->devid), PCI_SLOT(iommu->devid),
-> +			       PCI_FUNC(iommu->devid));
-> +			return false;
-> +		}
-> +	}
-> +
-> +	return true;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_sev_snp_supported);
+>  	chr_testdev_exit(code);
+>  	psci_system_off();
+>  	halt(code);
+> -- 
+> 2.25.1
+>
 
-Why is this function exported?
+Anyway,
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
