@@ -2,49 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCE03563719
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 17:41:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62E2B56371D
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 17:42:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiGAPlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 11:41:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38242 "EHLO
+        id S230291AbiGAPl5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 11:41:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229609AbiGAPls (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 11:41:48 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B18583FBF7
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 08:41:45 -0700 (PDT)
+        with ESMTP id S230436AbiGAPlz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 11:41:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8240E3FBF7
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 08:41:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5C84DB83093
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 15:41:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50929C385A5;
-        Fri,  1 Jul 2022 15:41:41 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E2716248A
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 15:41:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AEB2C341C8;
+        Fri,  1 Jul 2022 15:41:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656690103;
-        bh=KtpcW/Ij79Xo4GJ+n802wbSYDEeHSXn8ShvdFzaWm2E=;
+        s=k20201202; t=1656690113;
+        bh=og68YfdXPEH3qKNVeVsGI9srdVkkQqbXkGUG4yvFvG4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ExWPAZscdSHmU86zgOAGVKTzNkyQUySq20+/UNsDN9USyAVTM8wu1jjCUpZLK/keL
-         nLrTYFXoN5kHae8RQY3w1XDTz9QbVlq6rav7d0/aFVyT9DGT7DCmEp28x/kx+xFs+K
-         xrBPPQ27bApY2+pmIk3uAXygCVcAgdZMtcAyyyP+Vq7BP2T2jqwqLFYh5JysrAMlB1
-         GAyR9wPucZeUb1S2SAaWViUGSVl3nzRdZ/SQiYE1FStGb9M0VMSUlfIe2RwIU+4Ukx
-         Bao4AmQtPWJyO1ub6+8bXGRgPpAm3YYwFQjoR/pxDxteYq8PcBb4nSxrS+kzjZIRqN
-         dr+pRI4mXdNiA==
+        b=cNW5yJMnC/kmRsIqGaeKijiYm7shqg6ShDVI6uyix23FOtMQmLa2OjUKlfK7FdnIl
+         GzCOWV8kRsc+WeevE+L4Cw9UAlSLMNgWKyXbAyIfCxqdZnlwCj/hkyvKXiR5GywzGj
+         2xwUbfmKicrN3Qr0LC34PVdt3iZsccY/joCtwWfI8nn2UUSz1sHKQAnGhMm+m9NsmH
+         MB/cVRG6mSEsMS/+YdUzEKRvPCQQTRbYBIN6cdqLzsOWGtuBK/1M4BQpRRuzNdZWey
+         Vo5Rgukl4rWn+XHYU37coXekIUVwa4u0MqJG5gD29Z4GqKS0l66TOWhSU1OHIQrpAj
+         vI/GKll7ITnUQ==
 From:   Will Deacon <will@kernel.org>
-To:     Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andre Przywara <andre.przywara@arm.com>
+To:     Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Cc:     catalin.marinas@arm.com, kernel-team@android.com,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH kvmtool] arm: gic: fdt: fix PPI CPU mask calculation
-Date:   Fri,  1 Jul 2022 16:41:25 +0100
-Message-Id: <165668798833.3744902.12084627427900181326.b4-ty@kernel.org>
+        Will Deacon <will@kernel.org>, andre.przywara@arm.com,
+        kvm@vger.kernel.org, sashal@kernel.org, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, jean-philippe@linaro.org
+Subject: Re: [PATCH kvmtool v2 00/12] Virtio v1 support
+Date:   Fri,  1 Jul 2022 16:41:29 +0100
+Message-Id: <165668814104.3745495.15985302997775885106.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20220616145526.3337196-1-andre.przywara@arm.com>
-References: <20220616145526.3337196-1-andre.przywara@arm.com>
+In-Reply-To: <20220701142434.75170-1-jean-philippe.brucker@arm.com>
+References: <20220701142434.75170-1-jean-philippe.brucker@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -58,31 +56,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 Jun 2022 15:55:26 +0100, Andre Przywara wrote:
-> The GICv2 DT binding describes the third cell in each interrupt
-> descriptor as holding the trigger type, but also the CPU mask that this
-> IRQ applies to, in bits [15:8]. However this is not the case for GICv3,
-> where we don't use a CPU mask in the third cell: a simple mask wouldn't
-> fit for the many more supported cores anyway.
+On Fri, 1 Jul 2022 15:24:22 +0100, Jean-Philippe Brucker wrote:
+> This is version 2 of the modern virtio support for kvmtool.
 > 
-> At the moment we fill this CPU mask field regardless of the GIC type,
-> for the PMU and arch timer DT nodes. This is not only the wrong thing to
-> do in case of a GICv3, but also triggers UBSAN splats when using more
-> than 30 cores, as we do shifting beyond what a u32 can hold:
-> $ lkvm run -k Image -c 31 --pmu
-> arm/timer.c:13:22: runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
-> arm/timer.c:13:38: runtime error: signed integer overflow: -2147483648 - 1 cannot be represented in type 'int'
-> arm/timer.c:13:43: runtime error: left shift of 2147483647 by 8 places cannot be represented in type 'int'
-> arm/aarch64/pmu.c:202:22: runtime error: left shift of 1 by 31 places cannot be represented in type 'int'
-> arm/aarch64/pmu.c:202:38: runtime error: signed integer overflow: -2147483648 - 1 cannot be represented in type 'int'
-> arm/aarch64/pmu.c:202:43: runtime error: left shift of 2147483647 by 8 places cannot be represented in type 'int'
+> Since v1 [1]:
+> * Repaired vhost-net for pci-modern, by adding patches 4 and 5
+> * Added patch 6 that extends the feature fields and simplifies modern
+>   features handling
+> * Added patch 12, a small cleanup
 > 
 > [...]
 
 Applied to kvmtool (master), thanks!
 
-[1/1] arm: gic: fdt: fix PPI CPU mask calculation
-      https://git.kernel.org/will/kvmtool/c/d9fdaad02dfd
+[01/12] virtio/pci: Delete MSI routes
+        https://git.kernel.org/will/kvmtool/c/c6590f782be6
+[02/12] virtio: Extract init_vq() for PCI and MMIO
+        https://git.kernel.org/will/kvmtool/c/d0607293c937
+[03/12] virtio/pci: Make doorbell offset dynamic
+        https://git.kernel.org/will/kvmtool/c/21c9bc744087
+[04/12] virtio/pci: Use the correct eventfd for vhost notification
+        https://git.kernel.org/will/kvmtool/c/73fd13686e22
+[05/12] virtio/net: Set vhost backend after queue address
+        https://git.kernel.org/will/kvmtool/c/de166e5f7edc
+[06/12] virtio: Prepare for more feature bits
+        https://git.kernel.org/will/kvmtool/c/3c8f82b8d4a7
+[07/12] virtio: Move PCI transport to pci-legacy
+        https://git.kernel.org/will/kvmtool/c/930876d51193
+[08/12] virtio: Add support for modern virtio-pci
+        https://git.kernel.org/will/kvmtool/c/b0d56e3c994a
+[09/12] virtio: Move MMIO transport to mmio-legacy
+        https://git.kernel.org/will/kvmtool/c/22a0823676f1
+[10/12] virtio: Add support for modern virtio-mmio
+        https://git.kernel.org/will/kvmtool/c/5fe5eb04de80
+[11/12] virtio/pci: Initialize all vectors to VIRTIO_MSI_NO_VECTOR
+        https://git.kernel.org/will/kvmtool/c/3d5cefc2eb3e
+[12/12] virtio/pci: Remove VIRTIO_PCI_F_SIGNAL_MSI
+        https://git.kernel.org/will/kvmtool/c/c86ef0b86366
 
 Cheers,
 -- 
