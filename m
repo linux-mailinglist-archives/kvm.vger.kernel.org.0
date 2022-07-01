@@ -2,209 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 788EC5637D9
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10562563836
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232160AbiGAQ0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 12:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49178 "EHLO
+        id S232564AbiGAQnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 12:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232082AbiGAQ0p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 12:26:45 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A312C4163E
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 09:26:43 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1048b8a38bbso4122974fac.12
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 09:26:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=K26MwrAuUteiZyWEOzDvbm+FiqummBqIOV2xCXu76yM=;
-        b=Ixmg3++rgJ8IUJE7we0mxCXtZMmmsiY6hst+fVyftGVwB60OGjmkQodnPu56rSx26x
-         AzHgNxP6GiQdmczQ7Bp8/Zni0M9iKk6KvYkBtr8/Ur1zNzuArnrGSaZfQE7+ehh+AqGz
-         O7VW/P4YJkz0y6i59iigxbpO10P9ogp7SYgzb7y8uZoZtvG2EQel/v4LgNCfsuAV/v4O
-         O8afSWKTcvg0JsuU+fKaxZqdlnTIDaViI8MdxbHcDLUAdLHyneysHfldfmbXen1l8tI5
-         o0WMlhmThr7f4GF3lf9xjsTeiEv3tx93rUY/C8Dk19cQ/1/Asy4Rsq/pcnLA6LEsjLNl
-         azsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=K26MwrAuUteiZyWEOzDvbm+FiqummBqIOV2xCXu76yM=;
-        b=vGdqgYppUbnuyhD4/sFh/ukAJy+nL3iVKCaJjvab7Y3FCG506bz3AGdJpZ9BzaPRAk
-         aCKjVp3SUE1c9xBckofAC1hSLD52vb4GIf5z5fUNhnEqrAu1aBTcAiEkfoRs9Oet4OVP
-         8B6NgOsl6xgwV+3KFPL03aity/BmHKqHoH3yuD8vpIBvkZNBq6AOFHXrgLH+SJ632sHA
-         FT8vLbnxaoMPhNRaV6Uv2AktHYTRQDcAJanM0B2pb9rCYGyv7gEfd+A49yJXaefZtltM
-         JwYbU7brX/6M9X1hrQ1oV0NFayDNY35M9ybenEUQ9OIgMw4aW8G4Ha1PIUPFAvtXRBtG
-         PjwA==
-X-Gm-Message-State: AJIora/YRj46Lzo3kjGOqZ0v7xEUwUsFBwKfoHc6BZPIXPZDhtGSyw5p
-        6RwS66e7ksiOCjmMSWNdgstagH+pnk0AjTHCsOg/Pw==
-X-Google-Smtp-Source: AGRyM1v52Mm1Cwsg5w6e8h2FpdML7f7TtaQZ5JZagakdFptTcCoj3+hl7//M3/+nWSpUjkRcOmP69M304ybLd1p4xuM=
-X-Received: by 2002:a05:6870:d3c7:b0:104:9120:8555 with SMTP id
- l7-20020a056870d3c700b0010491208555mr8825797oag.181.1656692802766; Fri, 01
- Jul 2022 09:26:42 -0700 (PDT)
+        with ESMTP id S229544AbiGAQnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 12:43:17 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2051.outbound.protection.outlook.com [40.107.101.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91BAB1CFC1;
+        Fri,  1 Jul 2022 09:43:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A8AEb8XbrJmBWLqZ+/Lr/Fypl7HFl3Rg+e3NJIuVpIgkCxzOHOrwmPvVRXOUE5p6IljzHbJpl403m88wxHFHHg5hlMwAZOv/RutSlq3mRKOVQeH9A+u/TRwsGgzVxNnkwUvG19R0K7LY+aKu7GRV0g+24e17TXIwUfOJ5spwBtO8Jvjpme3X/B99xwjJYmrc/QKQv9t4OMBI5Oz1Xb1upET5YMY5z3e5sBZvDWO/WiZ3bRRkUATb1u5hr2KgME6/5/xywpcj9PBL/cAjrdbiRiMX4Q80rxyH8qmZdajydLp//67WRlBMPwnjFtOQmL/LeoImPA4qVFzayPByagNmHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J96Z1IiyrT4233SGqgBUZQywiRvohREcngH7MVSfyIk=;
+ b=XBhYvivFekujPTqwmR0Dmm2b9LZUFb96vFK0jbhuNfLIHAhcwJ56FoGwcGc7L7aDOYrWu/7Q+c8N8ZlQV0M+MQKf8ViLjcpa0nkL61dXhEidAV3NfM5Ic7e8E33ooasOfuJHN/owb5Tio3L143j5S7k37CEFKeuqV2OVSTSJbCoNhChAyh8zn7Vv9JshSsw8M8p2f1ZEDB+JzQqNQTX8unpvB34b+GWzcJtDNTxFtwLBojXkg6GEai2IPscWM0soqD4LvYJr+hNIBOlmR2QKbDD8ywJrKvf0I0MiJ9On9ekK1H5F0zHH4G3cm7odwpycDDVx0uqzxprlmqx0wFPIJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.235) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
+ (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J96Z1IiyrT4233SGqgBUZQywiRvohREcngH7MVSfyIk=;
+ b=HshpNoOKDpZXSWvMZC95Wbtx6PuDO/okXp4geWGfpQ6jDBVNJFKSHR0x4TtIyGOfPTn75LBnuZfSPYmPEqkbytLaFp8nZGLBROXzQQSW9vhZr6NrQcKqqrB8ROJb56VkAX5VL/wLabIcFFe5LcAeR53MtdtpjFn4hce8WK0d+oaWAT2a9tza++gQwqn0AZUVkQfAIawFLwap2GO0mKce2dRLHaX1FfX0NeAiciZPAwle2EZE6wAyBag0YfpN36Q8OBuv9EmydjsnM2qJry4Ztl7riLSCDm8NB3lX2guoSB6Q+xXSvisbjQJCJBNZt2Av9kjuAOGqiaKURl7a68m2lg==
+Received: from BN9PR03CA0886.namprd03.prod.outlook.com (2603:10b6:408:13c::21)
+ by DM6PR12MB5698.namprd12.prod.outlook.com (2603:10b6:5:78::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15; Fri, 1 Jul
+ 2022 16:43:15 +0000
+Received: from BN8NAM11FT013.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13c:cafe::90) by BN9PR03CA0886.outlook.office365.com
+ (2603:10b6:408:13c::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14 via Frontend
+ Transport; Fri, 1 Jul 2022 16:43:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.235) by
+ BN8NAM11FT013.mail.protection.outlook.com (10.13.176.182) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5395.14 via Frontend Transport; Fri, 1 Jul 2022 16:43:14 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ DRHQMAIL107.nvidia.com (10.27.9.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.32; Fri, 1 Jul 2022 16:43:13 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.26; Fri, 1 Jul 2022 09:43:13 -0700
+Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26 via Frontend
+ Transport; Fri, 1 Jul 2022 09:43:12 -0700
+Date:   Fri, 1 Jul 2022 09:43:10 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+CC:     <joro@8bytes.org>, <will@kernel.org>, <marcan@marcan.st>,
+        <sven@svenpeter.dev>, <robdclark@gmail.com>,
+        <baolu.lu@linux.intel.com>, <orsonzhai@gmail.com>,
+        <baolin.wang7@gmail.com>, <zhang.lyra@gmail.com>,
+        <jean-philippe@linaro.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <kevin.tian@intel.com>,
+        <suravee.suthikulpanit@amd.com>, <alyssa@rosenzweig.io>,
+        <dwmw2@infradead.org>, <mjrosato@linux.ibm.com>,
+        <gerald.schaefer@linux.ibm.com>, <thierry.reding@gmail.com>,
+        <vdumpa@nvidia.com>, <jonathanh@nvidia.com>, <cohuck@redhat.com>,
+        <thunder.leizhen@huawei.com>, <christophe.jaillet@wanadoo.fr>,
+        <chenxiang66@hisilicon.com>, <john.garry@huawei.com>,
+        <yangyingliang@huawei.com>, <iommu@lists.linux-foundation.org>,
+        <iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-tegra@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 1/5] iommu: Return -EMEDIUMTYPE for incompatible
+ domain and device/group
+Message-ID: <Yr8kHnK7xRx2DZus@Asurada-Nvidia>
+References: <20220630203635.33200-1-nicolinc@nvidia.com>
+ <20220630203635.33200-2-nicolinc@nvidia.com>
+ <fab41f28-8f48-9f40-09c8-fd5f0714a9e0@arm.com>
 MIME-Version: 1.0
-References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-24-vkuznets@redhat.com>
-In-Reply-To: <20220629150625.238286-24-vkuznets@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 1 Jul 2022 09:26:31 -0700
-Message-ID: <CALMp9eTmRLHQej1a4bFtpmRxaLaEJfwpDdvcZGbR54PFRjx+6g@mail.gmail.com>
-Subject: Re: [PATCH v2 23/28] KVM: VMX: Move LOAD_IA32_PERF_GLOBAL_CTRL errata
- handling out of setup_vmcs_config()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <fab41f28-8f48-9f40-09c8-fd5f0714a9e0@arm.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: da8342bf-82d6-4b41-f875-08da5b80cb07
+X-MS-TrafficTypeDiagnostic: DM6PR12MB5698:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uYPWP9gbgnY7z1BsnckcbY42Y4appJ7ERQesmeL0i4m5N0+A4QC4DdTgxw6O5yiHWHnz7fH7X9nPzn8pyT9iQgeTJ1bxkGbwqyfyxAYQTlYPoIf4g8lra7tMSVa9Kj90nyCafWnoviIrGzwRTHsIie7sGszG1BL0rnh9RAhqqe+1JNjNmNm/YJknZGWMgSc4xYrN+z+oKw7Z0Gxi+K9K6qjE6jGPNqluYxRLZRGaca+Gm/zLM9LzTgvUZLrCq8l0sUY09ieoGl8v0QXXWC3cMaMGY2iL6jAF7Q9KU9FVdDewI4VF8Lhn+e2XouuxV5KFftLnHBXCJ41GGpgADKcofZ32fkA3h39EU50lM7WzhJ+UTzZrkbG9u3jQAXvY5+MV/kR1kGvd/aFX+2ZA6xiHmju8k8m5zsO7I4bwHsRTOkrr1liGl3Lryp2/jTtLd8FqnMAu6TbRb4ZqRDi3kkMrb8M189j66VIZGwnZP30M9x1QVCNzgM91EK0fVS93PlVgcvnHQkFr2XG/XHuh0AVXG/JoaHWyngGlL6ShP+rj5qb6LenXwL5AAEZEiU3EsQFXqHd4EmyTCZJLL7tsJ8YVOatktDNI9ybBS3JXHnZ7IPy45eOFtImCr1w/iLw8xsW35V0VbuunIrZLQWXb104xQvF1gYmMfwkj0aGyY2blWwIwJWczJMinpp5zqhXU9EDnu/nD12cFW6NpsZozq72g8qScgtAP1KReN5M2tr3qqX1R6CsrZCNiKpGt0NOU3SLE+0RErRqVqJOsIpWNM9yyvhufM6A+vOPjnBeKSB5g2bCORpmz308tA75K8BV9xREJxwq1y+ySNAfDd3mpVEJiGj/i/WcD3Fip5ZdH35CVXPE=
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(39860400002)(376002)(396003)(40470700004)(36840700001)(46966006)(6916009)(2906002)(41300700001)(54906003)(7406005)(81166007)(5660300002)(40480700001)(82740400003)(55016003)(8936002)(7416002)(26005)(9686003)(186003)(33716001)(316002)(40460700003)(478600001)(356005)(86362001)(426003)(47076005)(70586007)(336012)(36860700001)(82310400005)(70206006)(4326008)(8676002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2022 16:43:14.4710
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: da8342bf-82d6-4b41-f875-08da5b80cb07
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT013.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5698
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> As a preparation to reusing the result of setup_vmcs_config() for setting
-> up nested VMX control MSRs, move LOAD_IA32_PERF_GLOBAL_CTRL errata handling
-> to vmx_vmexit_ctrl()/vmx_vmentry_ctrl() and print the warning from
-> hardware_setup(). While it seems reasonable to not expose
-> LOAD_IA32_PERF_GLOBAL_CTRL controls to L1 hypervisor on buggy CPUs,
-> such change would inevitably break live migration from older KVMs
-> where the controls are exposed. Keep the status quo for know, L1 hypervisor
-> itself is supposed to take care of the errata.
+On Fri, Jul 01, 2022 at 11:21:48AM +0100, Robin Murphy wrote:
 
-It can only do that if L1 doesn't lie about the model. This is why
-F/M/S checks are, in general, evil.
+> > diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> > index 2ed3594f384e..072cac5ab5a4 100644
+> > --- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> > +++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> > @@ -1135,10 +1135,8 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
+> >       struct arm_smmu_device *smmu;
+> >       int ret;
+> > 
+> > -     if (!fwspec || fwspec->ops != &arm_smmu_ops) {
+> > -             dev_err(dev, "cannot attach to SMMU, is it on the same bus?\n");
+> > -             return -ENXIO;
+> > -     }
+> > +     if (!fwspec || fwspec->ops != &arm_smmu_ops)
+> > +             return -EMEDIUMTYPE;
+> 
+> This is the wrong check, you want the "if (smmu_domain->smmu != smmu)"
+> condition further down. If this one fails it's effectively because the
+> device doesn't have an IOMMU at all, and similar to patch #3 it will be
 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 62 ++++++++++++++++++++++++++----------------
->  1 file changed, 38 insertions(+), 24 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index fb58b0be953d..5f7ef1f8d2c6 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2416,6 +2416,31 @@ static bool cpu_has_sgx(void)
->         return cpuid_eax(0) >= 0x12 && (cpuid_eax(0x12) & BIT(0));
->  }
->
-> +/*
-> + * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
-> + * can't be used due to an errata where VM Exit may incorrectly clear
+Thanks for the review! I will fix that. The "on the same bus" is
+quite eye-catching.
 
-Nit: erratum (singular), or drop the 'an' to refer to errata (plural).
+> removed once the core code takes over properly (I even have both those
+> patches written now!)
 
-> + * IA32_PERF_GLOBAL_CTRL[34:32].  Workaround the errata by using the
-
-Nit: workaround (one word) is a noun. The verb form is "work around."
-
-> + * MSR load mechanism to switch IA32_PERF_GLOBAL_CTRL.
-> + */
-> +static bool cpu_has_perf_global_ctrl_bug(void)
-> +{
-> +       if (boot_cpu_data.x86 == 0x6) {
-> +               switch (boot_cpu_data.x86_model) {
-> +               case 26: /* AAK155 */
-> +               case 30: /* AAP115 */
-> +               case 37: /* AAT100 */
-> +               case 44: /* BC86,AAY89,BD102 */
-> +               case 46: /* BA97 */
-
-Nit: Replace decimal model numbers with mnemonics. See
-https://lore.kernel.org/kvm/20220629222221.986645-1-jmattson@google.com/.
-
-> +                       return true;
-> +               default:
-> +                       break;
-> +               }
-> +       }
-> +
-> +       return false;
-> +}
-
-Is it worth either (a) memoizing the result, or (b) toggling a static
-branch? Or am I prematurely optimizing?
-
-> +
-> +
->  static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
->                                       u32 msr, u32 *result)
->  {
-> @@ -2572,30 +2597,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->                 _vmexit_control &= ~x_ctrl;
->         }
->
-> -       /*
-> -        * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
-> -        * can't be used due to an errata where VM Exit may incorrectly clear
-> -        * IA32_PERF_GLOBAL_CTRL[34:32].  Workaround the errata by using the
-> -        * MSR load mechanism to switch IA32_PERF_GLOBAL_CTRL.
-> -        */
-> -       if (boot_cpu_data.x86 == 0x6) {
-> -               switch (boot_cpu_data.x86_model) {
-> -               case 26: /* AAK155 */
-> -               case 30: /* AAP115 */
-> -               case 37: /* AAT100 */
-> -               case 44: /* BC86,AAY89,BD102 */
-> -               case 46: /* BA97 */
-> -                       _vmentry_control &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-> -                       _vmexit_control &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> -                       pr_warn_once("kvm: VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL "
-> -                                       "does not work properly. Using workaround\n");
-> -                       break;
-> -               default:
-> -                       break;
-> -               }
-> -       }
-> -
-> -
->         rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
->
->         /* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
-> @@ -4188,6 +4189,10 @@ static u32 vmx_vmentry_ctrl(void)
->                           VM_ENTRY_LOAD_IA32_EFER |
->                           VM_ENTRY_IA32E_MODE);
->
-> +
-> +       if (cpu_has_perf_global_ctrl_bug())
-> +               vmentry_ctrl &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +
->         return vmentry_ctrl;
->  }
->
-> @@ -4202,6 +4207,10 @@ static u32 vmx_vmexit_ctrl(void)
->         if (vmx_pt_mode_is_system())
->                 vmexit_ctrl &= ~(VM_EXIT_PT_CONCEAL_PIP |
->                                  VM_EXIT_CLEAR_IA32_RTIT_CTL);
-> +
-> +       if (cpu_has_perf_global_ctrl_bug())
-> +               vmexit_ctrl &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +
->         /* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
->         return vmexit_ctrl &
->                 ~(VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VM_EXIT_LOAD_IA32_EFER);
-> @@ -8117,6 +8126,11 @@ static __init int hardware_setup(void)
->         if (setup_vmcs_config(&vmcs_config, &vmx_capability) < 0)
->                 return -EIO;
->
-> +       if (cpu_has_perf_global_ctrl_bug()) {
-> +               pr_warn_once("kvm: VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL "
-> +                            "does not work properly. Using workaround\n");
-> +       }
-> +
->         if (boot_cpu_has(X86_FEATURE_NX))
->                 kvm_enable_efer_bits(EFER_NX);
->
-> --
-> 2.35.3
->
+Actually in my v1 the proposal for ops check returned -EMEDIUMTYPE
+also upon an ops mismatch, treating that too as an incompatibility.
+Do you mean that we should have fine-grained it further?
