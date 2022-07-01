@@ -2,111 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57373562D8A
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 10:13:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03212562D9A
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 10:17:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236229AbiGAIMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 04:12:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40724 "EHLO
+        id S234569AbiGAIRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 04:17:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236207AbiGAIMd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 04:12:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2DE1C70AD2
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 01:12:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656663151;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z/AmvOZyV6QrDA7wpE31jhK9NIwk6H7+U8kbekS2CX4=;
-        b=iUnRAoNiE1KAFhHRNCnNfvZyABa3m+0Ahijql50R4Z6WNDv1n2BLeMQ+zCfl30BK+My5/s
-        LWiBd9Ia7MLktE5wY7ybb+y0+FRgW2Jbk1t/EEDAYLf0toDeNTB4xacDXUkxJ17FeMe1lz
-        GtCRPEFY3WTB2UUxb2XBDoOy3NEaOS8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-396-VQUtXSRGPqOax2Cq7Eko5Q-1; Fri, 01 Jul 2022 04:12:30 -0400
-X-MC-Unique: VQUtXSRGPqOax2Cq7Eko5Q-1
-Received: by mail-wr1-f71.google.com with SMTP id s1-20020a5d69c1000000b0021b9f3abfebso198644wrw.2
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 01:12:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Z/AmvOZyV6QrDA7wpE31jhK9NIwk6H7+U8kbekS2CX4=;
-        b=3PDQuJ+HTsnEXr+DlUkIl99K/8qNyyb2A3HNlefW9F3k88Y0XiyHGkQQ3vEDBw0Qcd
-         0TwkeEeRkCFIj+MKD0I1GbZTwtmFMq54MGoC6qcIa7JkYHBwT9/b0bGDaG+Sp2icxUOM
-         jL912Jjv3BfILMUV6kYYYfDakRAV8XIcVd5+IZ4jCRT6uLJt+0PbMlIPCMkRJriT2P2g
-         iekhXR4dJ82QG7FMMwXiuCvteFlVYbRqFTY5LIMzzCKzyY8nB+/iVxxWgRxHaJhcMffp
-         YbJQS0+p8roAXSPofJJ9Qql4tCBwubMXhOJ5OOKRCsGYG0nsW/vAH+Ssq8GK/8xn2Slo
-         ZccQ==
-X-Gm-Message-State: AJIora/pD9DkC0zIQXWcjGgqgaiO6smoCTr0Imv9P9g3NlbQvY7RkIHW
-        OSdTTfPvpekQaE1Y/99KEbr8CboApYZbGDA5wEUU9gohyYulPDOsobjJf6q+32LR7G/jHkvExti
-        utHZp5YVgn29Z
-X-Received: by 2002:a5d:48ce:0:b0:21b:9f34:f297 with SMTP id p14-20020a5d48ce000000b0021b9f34f297mr12409457wrs.351.1656663149014;
-        Fri, 01 Jul 2022 01:12:29 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uPWo0xmhO7Sqt29ZDdDqBVBiI91YlLkKsb9zDgKgODfne6Ky2CuYV/YqnDSO9FRwIJuR4dlQ==
-X-Received: by 2002:a5d:48ce:0:b0:21b:9f34:f297 with SMTP id p14-20020a5d48ce000000b0021b9f34f297mr12409431wrs.351.1656663148790;
-        Fri, 01 Jul 2022 01:12:28 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id l34-20020a05600c1d2200b003a03e63e428sm7220233wms.36.2022.07.01.01.12.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Jul 2022 01:12:28 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 15/28] KVM: VMX: Check
- CPU_BASED_{INTR,NMI}_WINDOW_EXITING in setup_vmcs_config()
-In-Reply-To: <CALMp9eSTv8e5=vwXRouhLubx8k6q9sH4X8z0CgFsKTv54VFdSA@mail.gmail.com>
-References: <20220629150625.238286-1-vkuznets@redhat.com>
- <20220629150625.238286-16-vkuznets@redhat.com>
- <CALMp9eSTv8e5=vwXRouhLubx8k6q9sH4X8z0CgFsKTv54VFdSA@mail.gmail.com>
-Date:   Fri, 01 Jul 2022 10:12:27 +0200
-Message-ID: <87edz5s13o.fsf@redhat.com>
+        with ESMTP id S236117AbiGAIR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 04:17:27 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 613E270AF2
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 01:17:26 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2618GR1s004902
+        for <kvm@vger.kernel.org>; Fri, 1 Jul 2022 08:17:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : from : cc : to : message-id : date; s=pp1;
+ bh=pNP/FrFO3XWJI0GhpQflluLdbr2PfubcaRnkaLoiA58=;
+ b=gccgeJ/YD5XZg/8y8h6vDjxalfoWljbSGiOoYdLaiabDVjmCPfHkXCiO2THxGwg+LccZ
+ Xo3aNVdZJyUVczkxfs0KcnmJoZsTNRsrWDjTrV6rVlEs/75N8CL5GpZ7lobzWPhIoCyX
+ y23cDZpx0z8dJaWfzN8i6hpSMI92e54ExgGfbLRlmmmPuDeJOChj7NDy8yn8jA5eC7ie
+ MjmV8prLnwr+sCp+hljCxrchi3OSq4HChTQyQSfsXrnx7I1PyoJbvLhsY68D6xE42iCd
+ 1xl2wogMsB7QChfOuawBREWnLNVIcf6+9+IWa/UNVho7lA4NFxRCCQ3gpNOOrci6314R yQ== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1w8wr0g0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 08:17:25 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26186HZu027350
+        for <kvm@vger.kernel.org>; Fri, 1 Jul 2022 08:17:23 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 3gwt08y14d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 08:17:23 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2618HROf24248604
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Jul 2022 08:17:27 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE5D9A4040;
+        Fri,  1 Jul 2022 08:17:19 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B3439A4053;
+        Fri,  1 Jul 2022 08:17:19 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.42.232])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  1 Jul 2022 08:17:19 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <069be6f0-2f3a-3fea-3eca-d42f99e98220@redhat.com>
+References: <20220630113059.229221-1-nrb@linux.ibm.com> <20220630113059.229221-4-nrb@linux.ibm.com> <069be6f0-2f3a-3fea-3eca-d42f99e98220@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v1 3/3] s390x: add pgm spec interrupt loop test
+From:   Nico Boehr <nrb@linux.ibm.com>
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+To:     kvm@vger.kernel.org
+Message-ID: <165666343873.83789.4449236370360446232@localhost.localdomain>
+User-Agent: alot/0.8.1
+Date:   Fri, 01 Jul 2022 10:17:18 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rGQAFnZJqgd_c6gVm4Dxh7thE5J3MPfo
+X-Proofpoint-ORIG-GUID: rGQAFnZJqgd_c6gVm4Dxh7thE5J3MPfo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-01_05,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ adultscore=0 bulkscore=0 spamscore=0 clxscore=1015 suspectscore=0
+ mlxscore=0 priorityscore=1501 lowpriorityscore=0 malwarescore=0
+ mlxlogscore=292 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207010028
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jim Mattson <jmattson@google.com> writes:
+Quoting Thomas Huth (2022-06-30 19:25:57)
+> On 30/06/2022 13.30, Nico Boehr wrote:
+> > An invalid PSW causes a program interrupt. When an invalid PSW is
+> > introduced in the pgm_new_psw, an interrupt loop occurs as soon as a
+> > program interrupt is caused.
+> >=20
+> > QEMU should detect that and panick the guest, hence add a test for it.
+> >=20
+> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> > ---
+> ....
+> > +int main(void)
+> > +{
+> > +     report_prefix_push("pgmint-loop");
+> > +
+> > +     lowcore.pgm_new_psw.addr =3D (uint64_t) pgm_int_handler;
+> > +     /* bit 12 set is invalid */
+> > +     lowcore.pgm_new_psw.mask =3D extract_psw_mask() | BIT(63 - 12);
+>=20
+> Basically patch looks fine to me ... just an idea for an extension (but t=
+hat=20
+> could also be done later):
+>=20
+> Looking at the is_valid_psw() function in the Linux kernel sources, there=
+=20
+> are a couple of additional condition that could cause a PGM interrupt loo=
+p=20
+> ... you could maybe check them here, too, e.g. by adding a "extra_params =
+=3D=20
+> -append '...'" in the unittests.cfg file to select the indiviual tests vi=
+a=20
+> argv[] ?
 
-> On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>
->> CPU_BASED_{INTR,NMI}_WINDOW_EXITING controls are toggled dynamically by
->> vmx_enable_{irq,nmi}_window, handle_interrupt_window(), handle_nmi_window()
->> but setup_vmcs_config() doesn't check their existence. Add the check and
->> filter the controls out in vmx_exec_control().
->>
->> No (real) functional change intended as all existing CPUs supporting
->> VMX are supposed to have these controls.
->
-> I'm pretty sure vIrtual NMIs and NMI-window exiting are not available
-> on Prescott or Yonah.
->
-
-I seemed to have questioned their existence :-) But you're right, I
-should've said something like "all CPUs supported by KVM" instead (as
-pre-patch KVM toggles these controls unconditionally).
-
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
->
-
-Thanks!
-
--- 
-Vitaly
-
+It is a good idea, I have it on my TODO and will address it in a upcoming p=
+atchset.
