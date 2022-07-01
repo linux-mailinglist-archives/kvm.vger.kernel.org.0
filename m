@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 631ED5629F4
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 05:59:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09699562A38
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 06:14:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbiGAD65 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 23:58:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37944 "EHLO
+        id S229549AbiGAEOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 00:14:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233813AbiGAD6h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 23:58:37 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65626759A
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 20:58:34 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-1048b8a38bbso1937729fac.12
-        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 20:58:34 -0700 (PDT)
+        with ESMTP id S229531AbiGAEOx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 00:14:53 -0400
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BE721E19
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:14:52 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id s13-20020a0568301e0d00b00616ad12fee7so961061otr.10
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:14:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ruHWSICItOOOzz9oeqwcmH/daMECIiVWPxSJOAyV7js=;
-        b=m1mnoAwq1Mz+7F2ZWGVsdA1mC1MDfoBSfFtK8gdwQdYt+PtKI0zGONjgJH4xfeq2f/
-         UptHxw8wAd4Vhwb9Y7mN3lrlerVmPsGHbOD02tubdy1hGDotjlKA2JFeXWhdy1vbsYJO
-         QA6a6uJA7Jr9W7WQnZzxoGYpvepJmRyBa8mknSNMoj3LAca6a3iJnQCc7ftmfRl4kj2H
-         YL3GR56Uv8tLWzuRD9YT5aSUd2A8uW40U0J54M7qkUtiiv101iuXzFMG5sbI5/tQNCy1
-         ZtgpGNfn7vPpGYHWdRPkG4FU2Owy5HDoyZcsj1xrjZTK9Of8k0k7SdnRUJ9aIn8sYRLT
-         5uWw==
+        bh=ohGS/GHjNx6gKBxjpOLnl3kUH/TQygNHmQFNpt5O95s=;
+        b=GuELxlwIpzpiKD2YPx5S9btLkqNl6v08gJXYXRJGHFF1f66CnWPQ+VhHnxgOwvZpUD
+         SsiI7teOiWo6y3ihKRF/hSaI4nzEoB3dMDXnSONCa13yka7pK3SHf/LXJjiqUAJu6u97
+         rjgo19RxR3a9kcnUjrqU/2/UvQYLgknm+nguYSvdiUnxcPEavtdVFkRoFiWzLziZigo2
+         T8SdyW+XfKzqDJ5gLSWP0fGxGGfclbgvp0u0OeEUDrgqmoDthyzaO1bvFTw/484qfnBO
+         J6FXiBr2WlOTUf3B6wVOwwao311dr866KSo6u+OemWstFMgdGU5Tf+coPHgJ0sOQfIiB
+         Hdzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ruHWSICItOOOzz9oeqwcmH/daMECIiVWPxSJOAyV7js=;
-        b=OdgC1EzN1q5wEqG71px4ohhU4u05bR7Zb9SMdMDkvg4toM3L/lJg57e+BbU5jUOuds
-         61FezOxpF/pew/QEcsEUWqCI1P9ZjyyPE9u7sssJIDo6LPgcPJBOh3yHOvIFCczeBlL0
-         8OyCeOXSv02QmZQeqnmnBUPNwhRACUnX3BCFuJ4WOz15biBV6vBye4MGLjKxQVfvFqWh
-         awdIlRjxOBiOdXNYC2N0rkhZdsa0Gn6uXoxpxL82NEV23BOZJfeXCk0HsPq/VaLtrVvF
-         lgJnPx9VpqhWJ8xVEFRHJWEMTeSULkNc8e8CXAd4bLegx8EJMZVpljec6/Pc3teCP/1k
-         TbHQ==
-X-Gm-Message-State: AJIora9Yh3GdSavFRrPp1OmZZ9NzgQrPjxUmxsmVeTqP+yA14P1JVLek
-        WaSpueV4VqSVrQSO7WhjUart2Gmlb52g5mnAMznuSw==
-X-Google-Smtp-Source: AGRyM1uQ3Y13RfTBcDzsIlfFEesyltOqgOwVG4aGRr8OgC9gDgN1NYQqWTvakGrr4DL3ssw5NY7gC+z4Lw9Q8r1uwSY=
-X-Received: by 2002:a05:6870:c596:b0:101:6409:ae62 with SMTP id
- ba22-20020a056870c59600b001016409ae62mr8646289oab.112.1656647912312; Thu, 30
- Jun 2022 20:58:32 -0700 (PDT)
+        bh=ohGS/GHjNx6gKBxjpOLnl3kUH/TQygNHmQFNpt5O95s=;
+        b=nx1eh00qhW8JoolN07bLkKzDWXucbiJjRCPhM00csIJHf6E2YXRTpsRoyM/sVtJ0Re
+         1rGo1GubpYUtawQaYGOsgtcpWWVfWkryBSdaMr4RHptx4KnoYX6AUMICsUvoQBExcDDG
+         +Vt9GeuA+UHD9Uin28odxaIKR44mnRZI188o1PFJCS6IcGEfXLLcbmzKghAg05ivc5ML
+         +j7LSk8n47+ZR2BaL8eKu4JRSbd6D2Ydm4rBcMLtRUR0c7BoNX1oHqujal4YV2z2BA0i
+         tp1OL8YxyZaecO15ebIWJM9mt17aBK2afUrL2ubLsM8wFzO1nOehxnSC92SbML47eZvV
+         sVKA==
+X-Gm-Message-State: AJIora8yVpWTBRfgI03cTBV3N+w59A41Jqt4dPzJK1izPtfdPCfnE4ky
+        SjPmIztyT7Io8HrVfEquAW5yoUkgWRd0ouJwdoF0tRYBxW4=
+X-Google-Smtp-Source: AGRyM1uVQkyvpZqWDwzmoKsksd5X4YjrjaWxlBJlYHpBkAj0z5nN/XbtMv/wWV3AOCs3/mFOVaWht/cbshz/KM0rpXI=
+X-Received: by 2002:a05:6830:14:b0:616:dcbd:e53e with SMTP id
+ c20-20020a056830001400b00616dcbde53emr5370409otp.267.1656648891911; Thu, 30
+ Jun 2022 21:14:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-16-vkuznets@redhat.com>
-In-Reply-To: <20220629150625.238286-16-vkuznets@redhat.com>
+References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-19-vkuznets@redhat.com>
+In-Reply-To: <20220629150625.238286-19-vkuznets@redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 30 Jun 2022 20:58:21 -0700
-Message-ID: <CALMp9eSTv8e5=vwXRouhLubx8k6q9sH4X8z0CgFsKTv54VFdSA@mail.gmail.com>
-Subject: Re: [PATCH v2 15/28] KVM: VMX: Check CPU_BASED_{INTR,NMI}_WINDOW_EXITING
- in setup_vmcs_config()
+Date:   Thu, 30 Jun 2022 21:14:40 -0700
+Message-ID: <CALMp9eRhxvquDMn3ROUqdNL4bG769eG+ZJ4o3t8rwne8pkKbiw@mail.gmail.com>
+Subject: Re: [PATCH v2 18/28] KVM: VMX: Move CPU_BASED_CR8_{LOAD,STORE}_EXITING
+ filtering out of setup_vmcs_config()
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -73,16 +73,11 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 >
-> CPU_BASED_{INTR,NMI}_WINDOW_EXITING controls are toggled dynamically by
-> vmx_enable_{irq,nmi}_window, handle_interrupt_window(), handle_nmi_window()
-> but setup_vmcs_config() doesn't check their existence. Add the check and
-> filter the controls out in vmx_exec_control().
+> As a preparation to reusing the result of setup_vmcs_config() in
+> nested VMX MSR setup, move CPU_BASED_CR8_{LOAD,STORE}_EXITING filtering
+> to vmx_exec_control().
 >
-> No (real) functional change intended as all existing CPUs supporting
-> VMX are supposed to have these controls.
-
-I'm pretty sure vIrtual NMIs and NMI-window exiting are not available
-on Prescott or Yonah.
-
+> No functional change intended.
+>
 > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
