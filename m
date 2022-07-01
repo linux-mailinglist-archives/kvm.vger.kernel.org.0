@@ -2,52 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CF16563848
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:50:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CDB2563849
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:51:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231836AbiGAQux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 12:50:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44042 "EHLO
+        id S232036AbiGAQu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 12:50:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229768AbiGAQux (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 12:50:53 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6D5D3ED20
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 09:50:51 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id j5-20020a170902da8500b0016b90578019so1655429plx.5
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 09:50:51 -0700 (PDT)
+        with ESMTP id S229768AbiGAQu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 12:50:56 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D2E3EF02
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 09:50:55 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2eb7d137101so22764587b3.12
+        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 09:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=jiCbfvBKJiHEBlhpaNZGJF4HgSeCbeiVR31YCzi16jI=;
-        b=jCtTNYHwSgzz1NowKJ5IEgRPVBNFutMo51n4JUE+pFkEFVKaKLN5IbmWCJCvxXwOkX
-         2ElO6d+BOPrf3nAQmBznyQHZGKFWB3CVARiF9yAO559PE485r3u2Dp8t4zoo+Q/WQSdJ
-         3UQRufrmsr69RU3r7X7obEoH2C/Fl4Ri8xEGRgtxz1FRD0kVqexL0+T3aLSlqXAd7UVw
-         FzSkdqZVEL70tCCQO5vMoRmOGEqu2E3T4TcC3efPfdMVZIIs01DLLL4GEu+VfgqeB3V3
-         xWP9esZOKT22sWoPNRCDC0WjFpxO0RZ78x9SIXFRPfquCzNu7gwa1vni0oftsVI4OgNk
-         FiKw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=6WBuqBxN71rHL177gapA5k+g6PwRD2S0jU9i7UbBI/0=;
+        b=aUFHTHfr6d/Kekk4YLScyBzica1U3L9RnB2HAFV54RFdXst5ikdvgRa2M6YPHR+wyo
+         vkrI8Bbxx2L8PVRU+Vc2iVUT5lhxDENc5phF/38iSrRelpOKR/WFtmA5o6bX9r1IND/c
+         x9w7x/45h9/n0tl1Dq9yDShswSHKCnj7eR/R2rthEAAZw7lT8LjPldhDb3BKWwJqwHzv
+         6qS2S1nmDl31eUSuQY07vbOMUuwmE4/yJ0vyOs0VPIPxpOPuZ0ZJUM7C0mMubFhL8IB7
+         2ZgLu9lJNg0UUOaANFzi9z1G9eEGxKfuzZER5t3+Z3WtKstjDrrKQNx60Or8yevfg3Yf
+         gRrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=jiCbfvBKJiHEBlhpaNZGJF4HgSeCbeiVR31YCzi16jI=;
-        b=3a2WVfSu9SpD+XhPxeC9mvMlHEsCvThpbdFeUUQHPFYov0rhBpMkuaKblE/FqMyk+P
-         T8hYX/OIZbbAhTiKt+DnPkclJj7q3StgKHoQjYG8UDjALsdq9JljxuuOCSXYNGNVYgIm
-         e2lgMqSG//m7MqfmovOi6KimRnamrJGpmkTT1aWRWN4OF5l2Kp0aKkoOf1+3Cos6DuuM
-         KuhX8SNLINrS1y/YZZMtN79zjeNyGVIgFjQeXTJUW2dvGyuRqRudcGjxacjBQIeIE0Xm
-         419pAqp4XzdH4TvlGj3Io2poaS9G9kBHKwk8iEPW3dA5DQS/r1vPrOQiAXM4db+Oh2xc
-         4s8g==
-X-Gm-Message-State: AJIora+53iHJ97SO4mLs8TDl5pEE20iShhbIbQIOQoTyUAhsKwU9dLwO
-        OuaUe1E45IN4Wao3x2IfoGgVrdyI
-X-Google-Smtp-Source: AGRyM1u7m4XrfjDCZ74m2pBz9xr/zDLFcbOI3IJRU0JefiEXZXjPidifknjGF60DpJeX2tSmC9httumR
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=6WBuqBxN71rHL177gapA5k+g6PwRD2S0jU9i7UbBI/0=;
+        b=5dJqGN2UM+4VRgP7WgINpGx/kselC4NTRNgMiPCI5lHU6o6uVbN+oJjet+Ko1tW7+s
+         VM1nzYF33evzKR9UpdvtlXdahGY/G+NgNXGTcmupg4eXKj1D594K/0NaSZ2JapHDblRQ
+         gdZb5K0EYgmV07Cn1e4khIo4bV1/cQPMwiStjesUgJqM4JjH6olMmS1AZhaZ86OHWVO7
+         YiyS4/pxngynvpJYnHHJ12BDGJJPODD6W1Ni3jJhzQs3RhGL3bQrbA1vCiMuBuFuLhXH
+         6mUafOQm9lUVtpBRYG/2VjxZBbSnb23J4CopI4tpSm8h9zPXtNIT0UGzMWtoXDU/8nIP
+         gTnw==
+X-Gm-Message-State: AJIora/th9sfih2ZdUoFq5BfOZHE+QNcf6WGO9FVoTvoelxtmuO1ie1w
+        x3oFgLwIY9XOZJbgdTwWqC7DUY67
+X-Google-Smtp-Source: AGRyM1uZj0EVVwwCYYe/nQsYZ0kegws8/U9l9DfRwuf89myMXkQixOy821tLyoy8cph34F+P2+ugqMCe
 X-Received: from juew-desktop.sea.corp.google.com ([2620:15c:100:202:7200:c2cb:2999:20c])
- (user=juew job=sendgmr) by 2002:a05:6a00:22d6:b0:525:74b3:d020 with SMTP id
- f22-20020a056a0022d600b0052574b3d020mr20664091pfj.80.1656694251211; Fri, 01
- Jul 2022 09:50:51 -0700 (PDT)
-Date:   Fri,  1 Jul 2022 09:50:44 -0700
-Message-Id: <20220701165045.4074471-1-juew@google.com>
+ (user=juew job=sendgmr) by 2002:a05:6902:708:b0:66d:2871:c574 with SMTP id
+ k8-20020a056902070800b0066d2871c574mr17721648ybt.439.1656694255078; Fri, 01
+ Jul 2022 09:50:55 -0700 (PDT)
+Date:   Fri,  1 Jul 2022 09:50:45 -0700
+In-Reply-To: <20220701165045.4074471-1-juew@google.com>
+Message-Id: <20220701165045.4074471-2-juew@google.com>
 Mime-Version: 1.0
+References: <20220701165045.4074471-1-juew@google.com>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
-Subject: [PATCH 1/2] KVM: x86: Initialize nr_lvt_entries to a proper default value
+Subject: [PATCH 2/2] KVM: x86: Fix access to vcpu->arch.apic when the irqchip
+ is not in kernel
 From:   Jue Wang <juew@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -70,27 +75,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set the default value of nr_lvt_entries to KVM_APIC_MAX_NR_LVT_ENTRIES-1
-to address the cases when KVM_X86_SETUP_MCE is not called.
+Fix an access to vcpu->arch.apic when KVM_X86_SETUP_MCE is called
+without KVM_CREATE_IRQCHIP called or KVM_CAP_SPLIT_IRQCHIP is
+enabled.
 
 Fixes: 4b903561ec49 ("KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to lapic.")
 Signed-off-by: Jue Wang <juew@google.com>
 ---
- arch/x86/kvm/lapic.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/kvm/x86.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 8537b66cc646..257366b8e3ae 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2524,6 +2524,7 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4322a1365f74..d81020dd0fea 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4820,8 +4820,9 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+ 		if (mcg_cap & MCG_CMCI_P)
+ 			vcpu->arch.mci_ctl2_banks[bank] = 0;
+ 	}
+-	vcpu->arch.apic->nr_lvt_entries =
+-		KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
++	if (vcpu->arch.apic)
++		vcpu->arch.apic->nr_lvt_entries =
++			KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
  
- 	vcpu->arch.apic = apic;
- 
-+	apic->nr_lvt_entries = KVM_APIC_MAX_NR_LVT_ENTRIES - 1;
- 	apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
- 	if (!apic->regs) {
- 		printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
+ 	static_call(kvm_x86_setup_mce)(vcpu);
+ out:
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
