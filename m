@@ -2,45 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 984045631E0
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 12:48:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB7CF5631E4
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 12:49:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233948AbiGAKsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 06:48:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46098 "EHLO
+        id S235003AbiGAKtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 06:49:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232356AbiGAKsN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 06:48:13 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28DB238BA
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 03:48:12 -0700 (PDT)
-Date:   Fri, 1 Jul 2022 12:48:09 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1656672490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zXlrN3nFpmgIQhTgAf37F9YHqwMmPRCNvfBXuvlMA4E=;
-        b=UBMMeGWXEArD/boDjdOBrAT+KBOJgY/obJqJm780J0hcJgpKyD18X9yfIk+xGGYwm4mIaG
-        wnyJftO5wAuR0cHrTqHTATUZLJwAW6QhK8MnObcvxpj/r42As8LUb/JNUARtcaqxR0769v
-        IOe1e3CNczd2bcNVp5OD2FHpf2Tmzq4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
-        pbonzini@redhat.com, jade.alglave@arm.com, ricarkol@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 26/27] lib: arm: Print test exit status
-Message-ID: <20220701104809.zypqks76yeo4lit7@kamzik>
-References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
- <20220630100324.3153655-27-nikos.nikoleris@arm.com>
+        with ESMTP id S232356AbiGAKtY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 06:49:24 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0746A7BD3D;
+        Fri,  1 Jul 2022 03:49:21 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 261ACRt2019277;
+        Fri, 1 Jul 2022 10:49:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zPINr949dnnELpd5DVQwmjn6rB0Vu0as7xO884ft0Y4=;
+ b=W6uU0cESn2YTQzAeD8sfrdQD9Y1G3NzntjXqeLrVfcHSjzbnmf2NZPuvLRug8EDDC2f3
+ 2FG1od0q2fpw1lgO7NNsu2XBPIAqZeBhXEUcx03wN4mgWIOfP6IcVpnpBOD/u6470cwp
+ TVru2EBuOYX53+Kc9UGXzig2vlwgn9PRICXdxD0ZIM31CC/FMvGLa2WBpV8K+iZToHyq
+ +WGufwVjtEmlGJ5ZKLQhBIofDtHCVf3rM/tGAyoZNsO7fmtgURsDf14QpzhXeB0owLc8
+ QZZyBl6FAUJ5CPy/XKRo++ytMNlwUHn6SQFPdRtM7JGfko6mcPwByta57n05T3te/AE2 3w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1xy9105v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 10:49:21 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 261AgBCJ026384;
+        Fri, 1 Jul 2022 10:49:20 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1xy9104u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 10:49:20 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 261AZmJa003706;
+        Fri, 1 Jul 2022 10:49:18 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3gwt091j4t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 10:49:18 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 261AnFEJ22413652
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Jul 2022 10:49:15 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 178624C044;
+        Fri,  1 Jul 2022 10:49:15 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0EFA4C040;
+        Fri,  1 Jul 2022 10:49:14 +0000 (GMT)
+Received: from [9.155.196.57] (unknown [9.155.196.57])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  1 Jul 2022 10:49:14 +0000 (GMT)
+Message-ID: <ffe96c56-29c8-2f43-0518-677f2055e127@linux.ibm.com>
+Date:   Fri, 1 Jul 2022 12:49:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220630100324.3153655-27-nikos.nikoleris@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [kvm-unit-tests PATCH v1 3/3] s390x: add pgm spec interrupt loop
+ test
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20220630113059.229221-1-nrb@linux.ibm.com>
+ <20220630113059.229221-4-nrb@linux.ibm.com>
+ <dd270d92-a5dc-8a75-0edc-e9fdbb254cc9@linux.ibm.com>
+ <c58d2ce5-66c0-2072-5788-9463a6003888@redhat.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <c58d2ce5-66c0-2072-5788-9463a6003888@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: iJVRHXr0kstmlW3hVyRZ9ZkTuPb7PtHo
+X-Proofpoint-GUID: XW_VyVoCzyTCEVAL3KrqkB8fwyQXdIDI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-01_06,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
+ clxscore=1015 suspectscore=0 malwarescore=0 spamscore=0 adultscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207010039
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -49,48 +97,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 11:03:23AM +0100, Nikos Nikoleris wrote:
-> From: Alexandru Elisei <alexandru.elisei@arm.com>
+On 6/30/22 19:11, Thomas Huth wrote:
+> On 30/06/2022 16.38, Janis Schoetterl-Glausch wrote:
+>> On 6/30/22 13:30, Nico Boehr wrote:
+>>> An invalid PSW causes a program interrupt. When an invalid PSW is
+>>> introduced in the pgm_new_psw, an interrupt loop occurs as soon as a
+>>> program interrupt is caused.
+>>>
+>>> QEMU should detect that and panick the guest, hence add a test for it.
+>>
+>> Why is that, after all in LPAR it would just spin, right?
 > 
-> The arm tests can be run under kvmtool, which doesn't emulate a chr-testdev
-> device. Print the test exit status to make it possible for the runner
-> scripts to pick it up when they have support for it.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> ---
->  lib/arm/io.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/lib/arm/io.c b/lib/arm/io.c
-> index a91f116..337cf1b 100644
-> --- a/lib/arm/io.c
-> +++ b/lib/arm/io.c
-> @@ -138,6 +138,12 @@ extern void halt(int code);
->  
->  void exit(int code)
->  {
-> +	/*
-> +	 * Print the test return code in the format used by chr-testdev so the
-> +	 * runner can pick it up if there is chr-testdev is not present.
+> Not sure what the LPAR is doing, but the guest is certainly completely unusable, so a panic event is the right thing to do here for QEMU.
 
-nit: The comment isn't worded quite right...
+I suppose some other kind of interrupt could fix things up somehow, but I guess in practice
+panicking does indeed make more sense.
 
-The printed format ("EXIT: STATUS=") isn't chr-testdev's format, but it
-is the format we want, because it's consistent with powerpc and s390x.
-The exit code format '(code << 1) | 1' is chr-testdev's and
-isa-debug-exit's exit format.
-
-> +	 */
-> +	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-> +
->  	chr_testdev_exit(code);
->  	psci_system_off();
->  	halt(code);
-> -- 
-> 2.25.1
->
-
-Anyway,
-
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
