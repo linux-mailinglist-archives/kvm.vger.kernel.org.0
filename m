@@ -2,153 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C0DB56273B
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 01:44:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 697D15627CD
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 02:44:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232504AbiF3XoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jun 2022 19:44:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34470 "EHLO
+        id S231735AbiGAAn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jun 2022 20:43:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230310AbiF3XoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jun 2022 19:44:19 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A670313BB;
-        Thu, 30 Jun 2022 16:44:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RZDubsS8zNcdIAqbxYGMBkPwRnU/UkrLQiDvnSH7ojYNjRjuL31cpWPtgA+8Lg8AXFfcpAPcqMvzZxKgWEqn5WxVeuHRZo7g+tpWWZ8YbGCjlucGbF5IfFTzW66+g9jiJDbI31FA3s5+OTQv5tKm9ZF+65Vgyfk9a+fb7HwPyQ8YHccwi8HYbZxNuNgQHZe97++5IajF9rUCXOy66tbA7at6wT/awLxBzU2udYO37O5Wly+re932gZ+byAQtp/f8TXmC6KlJopoGC9sCB+/Pw8iOZo/X8kFNazbxXzzyAou/DfP9fm1NoKrNZ4GuFw8AqFeqIaN5Gi8I6TIKGZsY8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8ThiCwWD73k0/5iUyogczMz517on0EPPXyN3KVIEfvc=;
- b=ZHDElqUVIOx8cd+snOTvLEyJ+4GJaIe42RKXDiipcR/J6DlIbvlTVDcvCPLcl1GV7iiYLEmGd1IZau+j1Klhu+9sOu4LiQR7Xu1ZsuWMZAtwQNzTgTJxFg5Ll+jdfDjHa+y2RKzm7HGb74aGe2a+2Ry1DmwLYBQLK/zO2wj9VkVcrygkpImI5ted0uasESSLYf32THEzJHSu/KIJik/SmvqWgJnevUIMdswaLYC52sPUhlavC6rxDCceJtyBzWN2uCWqSALsRPjzPGxNJzSMoJ2Gi3CfP5fe4hwBGbsp+Cx2yuZjHQi2tBQhK9cZPubPBNCqqICA51HKoYwDwVkrog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8ThiCwWD73k0/5iUyogczMz517on0EPPXyN3KVIEfvc=;
- b=Rt9YLz/EAoakn6EBwQlpxWkGkCsdljdiF3UUU+TaNckxHeUwvLP5wM0u9dyjPeIa0z9Dq4l4zYAhN96WxERd2GQ8zCdpk5Z6cqfcbdK6pXfXwa+kYXXX1jx+QocTUfDdEGDKeB8eD97++SCUhO6B23quVqhhO4XPSAM2SICznUi7pIX/dRIV6bK7V/Vs6R6dbZWOrExqw4wDb78/1vzFHF+Xcn13D70oVoLmsUO+S0Y1ALH9qc/Q/KO8PXZghiX9TalhN6lgcsRApG/hbv/X4TX+rZ+vgdSm70XNCeQ2niS4oYmPHmDSfUMue2oYGuQkknv/KnBSDIaw8IHDZ2LSxg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CY5PR12MB6621.namprd12.prod.outlook.com (2603:10b6:930:43::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Thu, 30 Jun
- 2022 23:44:13 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.015; Thu, 30 Jun 2022
- 23:44:13 +0000
-Date:   Thu, 30 Jun 2022 20:44:11 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v3 00/11] s390/vfio-ccw rework
-Message-ID: <20220630234411.GM693670@nvidia.com>
-References: <20220630203647.2529815-1-farman@linux.ibm.com>
+        with ESMTP id S231298AbiGAAn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jun 2022 20:43:57 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3B62497B
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 17:43:53 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d5so843216plo.12
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 17:43:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qHbDamHfdCmLVB+hBdidQaC4pQGp6BoEwn9SpFp6hCQ=;
+        b=WXmwqFIa3DbqcS0hOjmq8Mo6SHrwHQVKO+gov77oBwMdrr8iahLJ7Yd3ztcoGIFMPq
+         L4gAJ1eiyEoCAWxzGqsbDMExjYgEvORpFrdSnGndU1gWXR8ZMCWCvZa0YZR5njtWLadA
+         aDDhN3IJ2I42Sc8chPYvsHvKGD4HpjU+anIQhMjVq8e/rqwK4DXjec3WbUJwnyqYctMv
+         c7TUjDSYp/gI8L/7Dt78JpybGyXsaFqyH131UqiDRUkwsWFxrGs+JJYpQcrz1tYD2g77
+         QgyDYN+LGdzb/cD5eSs69vyohf7LcWN2LUSdO6jvCnfWtibQsBDz0Fnj41AJ2eyOLhHs
+         P3Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qHbDamHfdCmLVB+hBdidQaC4pQGp6BoEwn9SpFp6hCQ=;
+        b=H58h3Vg91spvZqgKw6rnngPHKD6izO8EbXgvowLIKMyGNv9VzcTvEQQu+/GbXFSnc1
+         9cJzjqzqrc7kbPPpqYIrtGcZt7cAeQCe2rSy1FrLDcINwFaOn/O7owSONn/g3inVSORf
+         8tFn2a/V7a02hHFMoPGVGglGK+LZjQUrMDYpRHbjMrBSoY2fWsX6UXa1Cnq69TRSqhsk
+         L7aJb8d7k5bnyfSaJO+CpJ8VFSn3l8THn9RDKelmUaBvwtfL0d3RVtFPX7uWpNCJuX85
+         9+G4Wq9yE7alolH2abS0WVF+tFkyrwr3XbneISjw5Dvs0neYQSAh1A/ZT+SLvjNDuFkg
+         ofKA==
+X-Gm-Message-State: AJIora+V/aUTZ33gYajuFw6lTLuFU2ErnELBVFv+j9VBlyunb9n4Lgre
+        i075e5CdzukVyO0/zF+BHbun6Q==
+X-Google-Smtp-Source: AGRyM1t4PlEZvbTFZ4AqC53lXcF7ogLAVeGQ/l3KXE1SwwKCbWsv3nGjOQClkwK+f3g5nViOXTA3Vg==
+X-Received: by 2002:a17:90a:4f0f:b0:1ee:f746:eca7 with SMTP id p15-20020a17090a4f0f00b001eef746eca7mr14840900pjh.122.1656636232660;
+        Thu, 30 Jun 2022 17:43:52 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902680600b00163ffe73300sm14080711plk.137.2022.06.30.17.43.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jun 2022 17:43:52 -0700 (PDT)
+Date:   Thu, 30 Jun 2022 17:43:49 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
+        pbonzini@redhat.com, jade.alglave@arm.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 22/27] arm64: Use code from the gnu-efi
+ when booting with EFI
+Message-ID: <Yr5DRYxK65G4R8Zh@google.com>
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-23-nikos.nikoleris@arm.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220630203647.2529815-1-farman@linux.ibm.com>
-X-ClientProxiedBy: BL1PR13CA0002.namprd13.prod.outlook.com
- (2603:10b6:208:256::7) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: acc1941d-ba98-4631-b57a-08da5af26fb7
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6621:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8ZHIT7qr5h6QipyL+FYesq8eyvRmkaSSUINN4b6943tIUo6t3EFdv9wf1k2v1mnRaOc8kAHbQLLpoVqEKOSKIyth3HrgQeKR9M+WHHxoBvbi+VQeza0XJ50zEcQ63Rw9vKhiGufPsHFcNURLj+bVzDY9W4t34rP8EA6U+JLrTNOP4o8CD0YhYzxr3GgYnpUqSDtihixBgl/bWNqaoB8CTpk5Hbm+qz9jzeQScIYsrWyeaaars6HK4nlpgVZwyCerX3lvnb6S8BgI/m45H5Wtf7X8vptjinxrg4B4B1lxvJ7bHkGVy/RRFDzTRrE2uwC/w2mQ745849BqQYNmYhfHks1Sfu2VQ7CpzIQLxm7MGjTASLcojmsRtqbY3at0hYmWl7Th4bswHqiNzYiY9rHboIR4yT5clyqFN7YuYI4taFF8uXrJuBF8VxWzofxnYte0ALIU1rLJ+0isO8C4Vj/S7Ooxi6N33f5yWd1MN8UH55MaG7VNjsrthpd72QbyN0IX9ZYDs1SHdfEJJnWESLa03zAI8dqtVccTda75Yw1qM/E9tuWnPoArnR4sDGdZjpvlGbgwnUs15aN4V3x2ukO+OaBS8WNNa18SJ+CCHvCxeWDnyUTcPD4TjAFJnNSRius+mpQL7MJXOW7jmF/r5eTFczD6G/A/pWpDcER1X3CjWbDlzwv0Iu2YNnqt8PsGNJYWjU3dFhWK3OogCz62Hl2kaaySvnqiYk0leyJrJ+uZF8BQdJzK4Z3AeeOgplC/PP9EY9mjr2TvfLfj+k094xcqJYtXd+MMZYzpz9HrAmNOatTxr2NN+0Tg9ek4oygUBgQo5KSzY1dD/0GMCkcxvPN39clBglRpcYDJDwoQvvlS88+8ep0PM5YpecCgC4DgR5HT/J8kIvKuD244sUtZewnI3A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(396003)(376002)(136003)(39860400002)(366004)(6486002)(478600001)(966005)(2906002)(4326008)(26005)(6512007)(6916009)(316002)(54906003)(8936002)(86362001)(5660300002)(8676002)(2616005)(107886003)(66556008)(1076003)(36756003)(66946007)(66476007)(33656002)(83380400001)(186003)(6506007)(38100700002)(41300700001)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/9YH30lXtC9sW3TBTa3O3Nbw8f+YXpJDLhkCTuh0XDo2vkcOHjm2Q274iBS4?=
- =?us-ascii?Q?RJA5ViSx7hM7u/5EREuN5Tdct2KDeLHBmcEOVbeESi4EY5oahtUPPOR061lK?=
- =?us-ascii?Q?DEL31zNZMXsH8XY/Uxv2vnFAZzfeymQr/6T3H4nzy7V35+3PImwjHaC1uye8?=
- =?us-ascii?Q?+ieeI1stK+mcX9r/ah6Jta/GrqhzdadHGstn8qzQy8SyMee0f8/uRh42vlaZ?=
- =?us-ascii?Q?8XkPkXD1Opq4QUqYuwUbadgPUlj7IFbchh7oJNmsziBzjZOSdpn0NqoncaMz?=
- =?us-ascii?Q?9iHQBQXZwaKAeyBWX80DOcDvyUtKA+RoGQr2AntXvyuQwxlBzvDW7xA/Anhq?=
- =?us-ascii?Q?1cUETkHWNyc8XtDAohbWhL8LtRgRACew392fvYGqWFiiq9+QqluKgc+0YUdK?=
- =?us-ascii?Q?Thx/olkk/J04bJrgY2/UNieyqFKtq3VnOEheKPmBioPmYji7zsXnBxdl71Mr?=
- =?us-ascii?Q?3BlUp5Re0eUX89AAyVxoGwcr4Q4XVtAwVcAP39oPqFfWSsilGQxXbKIQMCZf?=
- =?us-ascii?Q?B/OiD5gi7wdnrUu1dyinVv8Cs9mzPOWygrL4dMQx0ht+vB6zngK0Kb0uLgsn?=
- =?us-ascii?Q?ro32RcZ76LwKC4xmITBHrUKAdHpvHUKVE4ZiUCWOD+Vku8M6dudvgEC947oA?=
- =?us-ascii?Q?QZkrEFdlnFBPFOBWsQMu5WB4juWdBFAixuOIaiTtHQWSXE27sDNBHjoHgKNc?=
- =?us-ascii?Q?8tzgXgs5vKHkZ+rxjuqt1WE9aSg4fNlANVQyqns03Vod2ySs3jHd0IR/2ZW/?=
- =?us-ascii?Q?WIyFHvluoKPFhVBQ78tmQCh6WIX7faVl9ezsAlnSus5dFqFKmW9QfuPfKT3M?=
- =?us-ascii?Q?pGG/JIc7SXjE5GaM5tD9wLKf+AX6zpRX6PNA1bJscmgACA0ta8d0FDdFvNgG?=
- =?us-ascii?Q?QWNceyWefVaH90TJuOwFRGRzAcP4D7PSJmHc0BKdVEo+77tjyWgpNZT9XXMg?=
- =?us-ascii?Q?fTFzBEIr0RQ+oJyIdb8n7KkMF+pf3Qb05fTddlEF04yC1qiceKSaBnjS4ksO?=
- =?us-ascii?Q?XhV5cd65xTn41a1G9Ebfi7w/V2gBhOsPj1Sl8uxpDFCHp/ih5NxAtSitrs8C?=
- =?us-ascii?Q?IAov6Fp6t3xWFXnOtZMjbichyun0JLhhkFMPKA65kfmoMbQlTJU4vOgC6qij?=
- =?us-ascii?Q?rPkAdoMHwvCELQS1TQg8omZoyok54gDv+Qt5Z0x+sSd6zi+zjBy0DATuiXYc?=
- =?us-ascii?Q?Z/UIfWca7JX1ImBjGoIOu3+naQwwVOKONmsE3WrFxocFFkBl1ktBbGrMtfLW?=
- =?us-ascii?Q?M2h5gn2sNhw/RJaokhsYLOmh4qTYQhAxlkTmmjDPRs118qNv2nf+ZNUSiFek?=
- =?us-ascii?Q?WfDuFzIfqZalmHM/SXfPM5xULBiebF4WZ3KAjLtX06T7sYQeyN8/oe2mtkhk?=
- =?us-ascii?Q?uZxwfG+5fwbFvs4Jw5OnZQ+du7+dIv2DN9IuL9RluS4HcVqeF/aqV1M07php?=
- =?us-ascii?Q?eWK2DMNjQ9XUjXHwl7x72j2D8qoCdat7miqZ4tpLG0B2g0SX10Wv1KMTJ6Sa?=
- =?us-ascii?Q?KWRM5g8PQfbMVAUzJlkibJ0KWNHf63bXCbH8oXchHM4N00HVkv3TY6IQAitu?=
- =?us-ascii?Q?Tok+5rOu6TvAyYe6bUt9ICcgDiYP68XOqYpZzPfr?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: acc1941d-ba98-4631-b57a-08da5af26fb7
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2022 23:44:13.0961
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V+XH6ke9fRIze4eJBahubwpIIfVrPIncK0y8v0bwSyWPfek94EfY5ui+0pvk03W9
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6621
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20220630100324.3153655-23-nikos.nikoleris@arm.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 10:36:36PM +0200, Eric Farman wrote:
-> Here's an updated pass through the first chunk of vfio-ccw rework.
+On Thu, Jun 30, 2022 at 11:03:19AM +0100, Nikos Nikoleris wrote:
+> arm/efi/crt0-efi-aarch64.S defines the header and the handover
+> sequence from EFI to a efi_main. This change includes the whole file
+> in arm/cstart64.S when we compile with EFI support.
 > 
-> As with v2, this is all internal to vfio-ccw, with the exception of
-> the removal of mdev_uuid from include/linux/mdev.h in patch 1.
+> In addition, we change the handover code in arm/efi/crt0-efi-aarch64.S
+> to align the stack pointer. This alignment is necessary because we
+> make assumptions about cpu0's stack alignment and most importantly we
+> place its thread_info at the bottom of this stack.
 > 
-> There is one conflict with the vfio-next branch [2], on patch 6.
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  arm/cstart64.S             |  6 ++++++
+>  arm/efi/crt0-efi-aarch64.S | 21 +++++++++++++++++----
+>  2 files changed, 23 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 55b41ea..08cf02f 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -15,6 +15,10 @@
+>  #include <asm/thread_info.h>
+>  #include <asm/sysreg.h>
+>  
+> +#ifdef CONFIG_EFI
+> +#include "efi/crt0-efi-aarch64.S"
+> +#else
+> +
+>  .macro zero_range, tmp1, tmp2
+>  9998:	cmp	\tmp1, \tmp2
+>  	b.eq	9997f
+> @@ -107,6 +111,8 @@ start:
+>  	bl	exit
+>  	b	halt
+>  
+> +#endif
+> +
+>  .text
+>  
+>  /*
+> diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
+> index d50e78d..03d29b0 100644
+> --- a/arm/efi/crt0-efi-aarch64.S
+> +++ b/arm/efi/crt0-efi-aarch64.S
+> @@ -111,10 +111,19 @@ section_table:
+>  
+>  	.align		12
+>  _start:
+> -	stp		x29, x30, [sp, #-32]!
+> +	stp		x29, x30, [sp, #-16]!
+> +
+> +	/* Align sp; this is necessary due to way we store cpu0's thread_info */
+>  	mov		x29, sp
+> +	and		x29, x29, #THREAD_MASK
+> +	mov		x30, sp
+> +	mov		sp, x29
+> +	str		x30, [sp, #-16]!
+> +
+> +	mov             x29, sp
 
-What tree do you plan to take it through?
+I wasn't sure what was this x29 for. But after some googling, this is
+what I found [0]:
 
-> The remainder of the work that Jason Gunthorpe originally started [1]
-> in this space remains for a future day.
+	The frame pointer (X29) should point to the previous frame pointer saved
+	on stack, with the saved LR (X30) stored after it. 
 
-Lets see.. These were already applied:
+The old code ended up with x29 pointing to the right place: the previous
+(x29,x30).
 
-  vfio/ccw: Remove unneeded GFP_DMA
-  vfio/ccw: Use functions for alloc/free of the vfio_ccw_private
-  vfio/ccw: Pass vfio_ccw_private not mdev_device to various functions
-  vfio/ccw: Convert to use vfio_register_emulated_iommu_dev()
+	|   ...  |
+	|   x1   |
+	|   x0   |
+	|   x30  |
+x29 ->	|   x29  |
 
-This series replaces this one:
-  vfio/ccw: Make the FSM complete and synchronize it to the mdev
+In the new code x29 is pointing to:
 
-Christoph recently re-posted this:
-https://lore.kernel.org/kvm/20220628051435.695540-10-hch@lst.de/
-  vfio/mdev: Consolidate all the device_api sysfs into the core code
+	|   ...  |
+	|   x30  |
+old_sp->|   x29  |
+	|   ...  |
+	|   x1   |
+	|   x0   |
+	|   pad  |
+x29 ->	| old_sp |
 
-So this is still left ?
-  vfio/ccw: Remove private->mdev
-  vfio: Export vfio_device_try_get()
-  vfio/ccw: Move the lifecycle of the struct vfio_ccw_private to the
-    mdev
+I think the new version can be fixed by setting x29 to the old_sp,
+conveniently stored in x30:
 
-IIRC Kevin's team needs those for their device FD patches?
++	mov             x30, sp
 
-Thanks,
-Jason
+> +
+> +	stp		x0, x1, [sp, #-16]!
+>  
+> -	stp		x0, x1, [sp, #16]
+>  	mov		x2, x0
+>  	mov		x3, x1
+>  	adr		x0, ImageBase
+> @@ -123,8 +132,12 @@ _start:
+>  	bl		_relocate
+>  	cbnz		x0, 0f
+>  
+> -	ldp		x0, x1, [sp, #16]
+> +	ldp		x0, x1, [sp], #16
+>  	bl		efi_main
+>  
+> -0:	ldp		x29, x30, [sp], #32
+> +	/* Restore sp */
+> +	ldr		x30, [sp], #16
+> +	mov             sp, x30
+> +
+> +0:	ldp		x29, x30, [sp], #16
+>  	ret
+> -- 
+> 2.25.1
+> 
+
+[0] https://developer.arm.com/documentation/den0024/a/The-ABI-for-ARM-64-bit-Architecture/Register-use-in-the-AArch64-Procedure-Call-Standard/Indirect-result-location
