@@ -2,166 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2CE256322A
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 13:05:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 015C6563232
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 13:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234866AbiGALFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 07:05:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36212 "EHLO
+        id S236600AbiGALIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 07:08:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232951AbiGALFa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 07:05:30 -0400
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53F80804A1
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 04:05:29 -0700 (PDT)
-Received: by mail-il1-f197.google.com with SMTP id l4-20020a056e021aa400b002dab8f7402dso1018605ilv.18
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 04:05:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=z5RdBJQHG68csQDp7gblrc3gvG+TNI2btP6vjR/yROQ=;
-        b=t9r5gsW7cA7MQej6j0shQ80N/67d9HRj/Ll4eJ/0ffMS5q+XtGGR0CZdWO/v+LavCi
-         dGoB+6z8vFf7G4Jez/6cBAcXi4ERcM0BnBvdBQ18n5+d3x/KMVCV+kAeImxqb9Epe33P
-         HhjVVR1nVKfzVjlnFdU3oF6DOb9h4syXe55bhqoFP5U8eKA/c1pTpLpmTrAYrAGgBk0G
-         Wb0vgPFcvH4A9V1dS09kxSdQTC5lJskQjXGZMcX1hxjcoyALI+QiRk+ncnOnMyOLAqJd
-         rT6gt5qsIhaApLJI924kqTP4+2ZVFL4EsjfN9j2g905TBVKuhqRD7EB1rRLRP3867jrY
-         55TA==
-X-Gm-Message-State: AJIora93rZFRIXtlLEipdl6zAG7vX+kqeb+xyavrVC48JIGj7YPGjd1B
-        k6KRF1ODwu8azSEDcf+QllZmlqEH964AXuHiKd139bw3XbeB
-X-Google-Smtp-Source: AGRyM1vN6NdaoJ4FdCSTFfRgrMJr1jPuvYOhNnAF2hzvENLr4gVCmzr8iiPQBQxNHugB/sWGrKUh8/XBnfRsbU5E9efkAszcHieg
+        with ESMTP id S236519AbiGALIa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 07:08:30 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF1EFE31;
+        Fri,  1 Jul 2022 04:08:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TvDukBd5PMKy0y1KwTM0O7rlfuKzJOhfNAGipbjViqtkimKlszUXdpLCHJoriGon3CFToTQAwAznGrviM1UsbMlUBEK6FdVfgD9+Zx7zIpqVBWDiXpYQsH8dYj1FZBPD5dZO2najg9K1mkvb3ozTd07CgcgQuQ+jlh63/tbkzRxm9Afr18fnXK4HB/zNtN9gqQl4iTqueP/mInd62NW6bG0uJ6F8qjnD0BnnVAAUn7G9RV2mv+TIB8xt5Kv/p1SP84p33ifa9ZSwrL2ywMPHg2x+RdkpfIcJQr50mSAPowLULSl0lN5YeN3z7p9WuVty+6zDN5oOzT/PAmAKWG3g7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sLRGBI0PTd4/f8j6mcsZXjahkT2S1E2ZDgGthYMtpSM=;
+ b=OC5FetZVI07HwRW1Q2YsXwT6v4HGgGn++ICyfXRVmP5RjcKgdYscHj6xeEuTeA3tTVpuP2on9yX+LXTCVbtSKP68uwSbFEHlO57Nke/FRKWwBJou4iNWnHUoy1TfATBCw8l6+JU4MrBBJe82lnlwbdAnjmZq+asYlpDbP/uzG2DVwvfRVk+Q8JQLOMBdGmQp+Sg/gViDR0zZi7rIVBOSN6tT6s3MbdlUm1+tFdnTxAw7xQufjfg048m2inm7Bw998foY6GYyvUuRvvwwRFaowt7RW24H5K3IaHbQ2qsAXZmxuE3wv3bKm1CdkWHcndTBixJSmp0k+5xPOI2XLBvX5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.238) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sLRGBI0PTd4/f8j6mcsZXjahkT2S1E2ZDgGthYMtpSM=;
+ b=UWtrwco6unUVjANJvyqaTWzmmVFpatucGcLJqLgujYj/5d+EcA3f4onI0gucJY0r1QmVw9jbDNsTt/CcXVHvBq5jRAPMM4gBWtbD2sxxmp3/XewcNGMxCSjpIMlbq7YggreLybx79NBCYv5h02aepGPxSwaM6gxKa7Cu1JA7yWTTH/4rpyRmDMLZPcCOSNFHdGxLq0CHeUAmtpTSC6yjl4dXPGoyNv0blfGqP/fUwIr7hdzFdqUTRX+NUi/lRZspzRv8M+SSOkLGiJQ4dLFNO5TCaVL7m/tThiwnCatjraQgAndIrGZjadCrhYKDqcKAlzcUs4QWH6X6FIfEfq2XOg==
+Received: from MWHPR04CA0048.namprd04.prod.outlook.com (2603:10b6:300:ee::34)
+ by DM4PR12MB5200.namprd12.prod.outlook.com (2603:10b6:5:397::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Fri, 1 Jul
+ 2022 11:08:26 +0000
+Received: from CO1NAM11FT049.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:300:ee:cafe::5d) by MWHPR04CA0048.outlook.office365.com
+ (2603:10b6:300:ee::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14 via Frontend
+ Transport; Fri, 1 Jul 2022 11:08:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.238) by
+ CO1NAM11FT049.mail.protection.outlook.com (10.13.175.50) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5395.14 via Frontend Transport; Fri, 1 Jul 2022 11:08:25 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.32; Fri, 1 Jul 2022 11:08:24 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.26; Fri, 1 Jul 2022 04:08:22 -0700
+Received: from nvidia-abhsahu-1.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.986.26 via Frontend
+ Transport; Fri, 1 Jul 2022 04:08:17 -0700
+From:   Abhishek Sahu <abhsahu@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>
+CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+        Abhishek Sahu <abhsahu@nvidia.com>
+Subject: [PATCH v4 0/6] vfio/pci: power management changes
+Date:   Fri, 1 Jul 2022 16:38:08 +0530
+Message-ID: <20220701110814.7310-1-abhsahu@nvidia.com>
+X-Mailer: git-send-email 2.17.1
+X-NVConfidentiality: public
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1083:b0:2d9:2241:3e18 with SMTP id
- r3-20020a056e02108300b002d922413e18mr8096330ilj.93.1656673528681; Fri, 01 Jul
- 2022 04:05:28 -0700 (PDT)
-Date:   Fri, 01 Jul 2022 04:05:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002f9d9c05e2bc5d8a@google.com>
-Subject: [syzbot] general protection fault in kvm_arch_vcpu_ioctl
-From:   syzbot <syzbot+8cdad6430c24f396f158@syzkaller.appspotmail.com>
-To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        jarkko@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 114c044e-4e57-4002-3f29-08da5b5204fa
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5200:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?l3lWBGxjtlDUdpWc4DSF0WZcix1AAjLwrar7OhgEV/rG/AoVRJP2L3TwlJSA?=
+ =?us-ascii?Q?wWya7tXbTvLpSYl/nlU6udxE/h9EqeU2PK3HnAZdhw6F/WZzIuFfVonRIX53?=
+ =?us-ascii?Q?/QZChohY35+iSqWTAX6rlW8lzSuc1a9k1wu7QSiMJufQ5dO5F1P0wazk3rsw?=
+ =?us-ascii?Q?FFgVWFqryOfOSTVgHRhZPWYvVWtGN2njXgFJexpt0BT9w6mHiSw6xzFr6xL+?=
+ =?us-ascii?Q?yKNPiDkVtvlsQFJxClcFng6+/Nr2UvpNsvLa9DQhUdQebSVUaLLGi1XBMq5H?=
+ =?us-ascii?Q?ErlJgqiyPDmomj6TV57aaFfHfp87KLuGYdW6PAwO8m/tmUUUH96T7pkqBCqk?=
+ =?us-ascii?Q?vgXsVULN5B2eEN/DhEcIY7zeJgqOWGY1Dn+y0h6RclOy7NqFFO2kGJE2EtoP?=
+ =?us-ascii?Q?TvFi0VR8YXy96zeHV4u23U3RkC5Zy5E3lnZcysIX4um6xFApopD1GipyCEoM?=
+ =?us-ascii?Q?G6AzomDHBSYeHv9lgnoGUECdij2aHYP39NK+nuwwF2YSP+qGreh2zI8OquQA?=
+ =?us-ascii?Q?c6xlerzbpn2Y1lt2v5Oa4IhAJoERzaecKlIUJ9/rZzdXrXEEl5+Rjt1EtP+1?=
+ =?us-ascii?Q?7lk00QHkcY3DIakYifZFlqkNQ6RRbQzLUKX39jfYpajhDMFKlJjDaX6gbKYa?=
+ =?us-ascii?Q?QXmM+iVNdWttpeeX50u5p7WCr8Y6bDTcieu7H2OWkUwnStqhSf519n55X4Xj?=
+ =?us-ascii?Q?jsPxCVlKZPse1NjBzCAg0NwBAaLNupamqIjcyGLqzQ2kDbliyV3Pyd28Dt+e?=
+ =?us-ascii?Q?lYAblbQQ8TMjKNbHA3BtE2iBBug3v6KFLuYd/yQtPuEeVoH/CPvLQoMdQ7lN?=
+ =?us-ascii?Q?HtBJkSHuKzq/ovzdrViZ4LmhhShHXXW+0jKFsKW4KgkSfbDOuMnjG5gMAekr?=
+ =?us-ascii?Q?5lskyvD0vkHVHk5D6FELvSDQhitYZZ5goTBUZESMzDYaymsWklw5vlAxCN1/?=
+ =?us-ascii?Q?a0XCA9enmPAV0WzPaKsI8pi3VnmH9iwWHkR3J74JO9Y=3D?=
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(39860400002)(396003)(346002)(36840700001)(46966006)(40470700004)(83380400001)(47076005)(336012)(426003)(7696005)(36860700001)(186003)(6666004)(107886003)(2616005)(40460700003)(36756003)(1076003)(26005)(966005)(70586007)(2906002)(8676002)(478600001)(41300700001)(70206006)(4326008)(81166007)(82740400003)(356005)(82310400005)(7416002)(110136005)(316002)(86362001)(40480700001)(5660300002)(8936002)(54906003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2022 11:08:25.4207
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 114c044e-4e57-4002-3f29-08da5b5204fa
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT049.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5200
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+This is part 2 for the vfio-pci driver power management support.
+Part 1 of this patch series was related to adding D3cold support
+when there is no user of the VFIO device and has already merged in the
+mainline kernel. If we enable the runtime power management for
+vfio-pci device in the guest OS, then the device is being runtime
+suspended (for linux guest OS) and the PCI device will be put into
+D3hot state (in function vfio_pm_config_write()). If the D3cold
+state can be used instead of D3hot, then it will help in saving
+maximum power. The D3cold state can't be possible with native
+PCI PM. It requires interaction with platform firmware which is
+system-specific. To go into low power states (Including D3cold),
+the runtime PM framework can be used which internally interacts
+with PCI and platform firmware and puts the device into the
+lowest possible D-States.
 
-syzbot found the following issue on:
+This patch series adds the support to engage runtime power management
+initiated by the user. Since D3cold state can't be achieved by writing
+PCI standard PM config registers, so a feature has been added in
+DEVICE_FEATURE IOCTL for power management related handling. It
+includes different flags which can be used for moving the device into
+low power state and out of low power state. For the PCI device, this
+low power state will be D3cold (if platform supports the D3cold
+state). The hypervisors can implement virtual ACPI methods to make the
+integration with guest OS. For example, in guest Linux OS if PCI device
+ACPI node has _PR3 and _PR0 power resources with _ON/_OFF method,
+then guest Linux OS makes the _OFF call during D3cold transition and
+then _ON during D0 transition. The hypervisor can tap these virtual
+ACPI calls and then do the low power related IOCTL.
 
-HEAD commit:    aab35c3d5112 Add linux-next specific files for 20220627
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=129388e0080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6a874f114a1e4a6b
-dashboard link: https://syzkaller.appspot.com/bug?extid=8cdad6430c24f396f158
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10840388080000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15793588080000
+Some devices (Like NVIDIA VGA or 3D controller) require driver
+involvement each time before going into D3cold. Once the guest put the
+device into D3cold, then the user can run some commands on the host side
+(like lspci). The runtime PM framework will resume the device before
+accessing the device and will suspend the device again. Now, this
+second time suspend will be without guest driver involvement. vfio-pci
+driver won't suspend the device if re-entry to low power is not
+allowed. This patch series also adds virtual PME (power management
+event) support which can be used to notify the guest OS for such kind
+of host access. The guest can then put the device again into the
+suspended state.
 
-Bisection is inconclusive: the first bad commit could be any of:
+* Changes in v4
 
-987f625e0799 KVM: x86: Add APIC_LVTx() macro.
-4b903561ec49 KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to lapic.
+- Rebased patches on v5.19-rc4.
+- Added virtual PME support.
+- Used flags for low power entry and exit instead of explicit variable.
+- Add the support to keep NVIDIA display related controllers in active
+  state if there is any activity on the host side.
+- Add a flag that can be set by the user to keep the device in the active
+  state if there is any activity on the host side.
+- Split the D3cold patch into smaller patches.
+- Kept the runtime PM usage count incremented for all the IOCTL
+  (except power management IOCTL) and all the PCI region access.
+- Masked the runtime errors behind -EIO.
+- Refactored logic in runtime suspend/resume routine and for power
+  management device feature IOCTL.
+- Add helper function for pm_runtime_put() also in the
+  drivers/vfio/vfio.c and use the 'struct vfio_device' for the
+  function parameter.
+- Removed the requirement to move the device into D3hot before calling
+  low power entry.
+- Renamed power management related new members in the structure.
+- Used 'pm_runtime_engaged' check in __vfio_pci_memory_enabled().
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1395cb88080000
+* Changes in v3
+  (https://lore.kernel.org/lkml/20220425092615.10133-1-abhsahu@nvidia.com)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8cdad6430c24f396f158@syzkaller.appspotmail.com
+- Rebased patches on v5.18-rc3.
+- Marked this series as PATCH instead of RFC.
+- Addressed the review comments given in v2.
+- Removed the limitation to keep device in D0 state if there is any
+  access from host side. This is specific to NVIDIA use case and
+  will be handled separately.
+- Used the existing DEVICE_FEATURE IOCTL itself instead of adding new
+  IOCTL for power management.
+- Removed all custom code related with power management in runtime
+  suspend/resume callbacks and IOCTL handling. Now, the callbacks
+  contain code related with INTx handling and few other stuffs and
+  all the PCI state and platform PM handling will be done by PCI core
+  functions itself.
+- Add the support of wake-up in main vfio layer itself since now we have
+  more vfio/pci based drivers.
+- Instead of assigning the 'struct dev_pm_ops' in individual parent
+  driver, now the vfio_pci_core tself assigns the 'struct dev_pm_ops'. 
+- Added handling of power management around SR-IOV handling.
+- Moved the setting of drvdata in a separate patch.
+- Masked INTx before during runtime suspended state.
+- Changed the order of patches so that Fix related things are at beginning
+  of this patch series.
+- Removed storing the power state locally and used one new boolean to
+  track the d3 (D3cold and D3hot) power state 
+- Removed check for IO access in D3 power state.
+- Used another helper function vfio_lock_and_set_power_state() instead
+  of touching vfio_pci_set_power_state().
+- Considered the fixes made in
+  https://lore.kernel.org/lkml/20220217122107.22434-1-abhsahu@nvidia.com
+  and updated the patches accordingly.
 
-L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
-general protection fault, probably for non-canonical address 0xdffffc000000001d: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x00000000000000e8-0x00000000000000ef]
-CPU: 0 PID: 3601 Comm: syz-executor163 Not tainted 5.19.0-rc4-next-20220627-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:kvm_vcpu_ioctl_x86_setup_mce arch/x86/kvm/x86.c:4899 [inline]
-RIP: 0010:kvm_arch_vcpu_ioctl+0x10d1/0x3d40 arch/x86/kvm/x86.c:5608
-Code: 80 3c 02 00 0f 85 91 28 00 00 4d 8b ac 24 b0 02 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d bd ec 00 00 00 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 62
-RSP: 0018:ffffc90002eaf960 EFLAGS: 00010207
-RAX: dffffc0000000000 RBX: 0000000000000006 RCX: 0000000000000000
-RDX: 000000000000001d RSI: ffffffff8110c6ee RDI: 00000000000000ec
-RBP: ffffc90002eafd20 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000000 R11: 1ffffffff1fc765f R12: ffff888078e10000
-R13: 0000000000000000 R14: 1ffff920005d5f36 R15: dffffc0000000000
-FS:  0000555556de0300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fc02f8affb8 CR3: 0000000075d2c000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- kvm_vcpu_ioctl+0x973/0xf30 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4200
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x7fc02f868b69
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcc8febd88 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fc02f868b69
-RDX: 0000000020000040 RSI: 000000004008ae9c RDI: 0000000000000005
-RBP: 00007fc02f82cd10 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fc02f82cda0
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:kvm_vcpu_ioctl_x86_setup_mce arch/x86/kvm/x86.c:4899 [inline]
-RIP: 0010:kvm_arch_vcpu_ioctl+0x10d1/0x3d40 arch/x86/kvm/x86.c:5608
-Code: 80 3c 02 00 0f 85 91 28 00 00 4d 8b ac 24 b0 02 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d bd ec 00 00 00 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 62
-RSP: 0018:ffffc90002eaf960 EFLAGS: 00010207
-RAX: dffffc0000000000 RBX: 0000000000000006 RCX: 0000000000000000
-RDX: 000000000000001d RSI: ffffffff8110c6ee RDI: 00000000000000ec
-RBP: ffffc90002eafd20 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000000 R11: 1ffffffff1fc765f R12: ffff888078e10000
-R13: 0000000000000000 R14: 1ffff920005d5f36 R15: dffffc0000000000
-FS:  0000555556de0300(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056206923aa70 CR3: 0000000075d2c000 CR4: 00000000003526e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   4:	0f 85 91 28 00 00    	jne    0x289b
-   a:	4d 8b ac 24 b0 02 00 	mov    0x2b0(%r12),%r13
-  11:	00
-  12:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  19:	fc ff df
-  1c:	49 8d bd ec 00 00 00 	lea    0xec(%r13),%rdi
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	0f b6 14 02          	movzbl (%rdx,%rax,1),%edx <-- trapping instruction
-  2e:	48 89 f8             	mov    %rdi,%rax
-  31:	83 e0 07             	and    $0x7,%eax
-  34:	83 c0 03             	add    $0x3,%eax
-  37:	38 d0                	cmp    %dl,%al
-  39:	7c 08                	jl     0x43
-  3b:	84 d2                	test   %dl,%dl
-  3d:	0f                   	.byte 0xf
-  3e:	85                   	.byte 0x85
-  3f:	62                   	.byte 0x62
+* Changes in v2
+  (https://lore.kernel.org/lkml/20220124181726.19174-1-abhsahu@nvidia.com)
 
+- Rebased patches on v5.17-rc1.
+- Included the patch to handle BAR access in D3cold.
+- Included the patch to fix memory leak.
+- Made a separate IOCTL that can be used to change the power state from
+  D3hot to D3cold and D3cold to D0.
+- Addressed the review comments given in v1.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Abhishek Sahu (6):
+  vfio/pci: Mask INTx during runtime suspend
+  vfio: Add a new device feature for the power management
+  vfio: Increment the runtime PM usage count during IOCTL call
+  vfio/pci: Add the support for PCI D3cold state
+  vfio/pci: Prevent low power re-entry without guest driver
+  vfio/pci: Add support for virtual PME
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+ drivers/vfio/pci/vfio_pci_config.c |  41 +++-
+ drivers/vfio/pci/vfio_pci_core.c   | 312 +++++++++++++++++++++++++++--
+ drivers/vfio/pci/vfio_pci_intrs.c  |  24 ++-
+ drivers/vfio/vfio.c                |  82 +++++++-
+ include/linux/vfio_pci_core.h      |   8 +-
+ include/uapi/linux/vfio.h          |  56 ++++++
+ 6 files changed, 492 insertions(+), 31 deletions(-)
+
+-- 
+2.17.1
+
