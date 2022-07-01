@@ -2,148 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33EC8562CCB
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 09:37:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD0CB562D4C
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 10:00:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235154AbiGAHhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 03:37:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34648 "EHLO
+        id S235509AbiGAH6w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 03:58:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230523AbiGAHhm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 03:37:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 48A9C6D566
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 00:37:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656661060;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7YSpU59gT8QB4BAcnl2JJyxyCcYteDUajcj+60eh/hA=;
-        b=EnnGxrdp/RBNO0bU6jA54V8zRof+PcCWpQGeyUnYUgM0luLb0hsv3zw18+iSOEa4axyjs/
-        VWzA8ERYcgBxRqh3Nn7e30OH32rGifkdf/WVuGtinkH0NCAIM810ZOzXlleVuNIlJckLR7
-        8aLjQgyW3KG9rPZvw/y28Y0R/VWm1VE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-575-0oeNBz39MeyGRLFmQh2JLg-1; Fri, 01 Jul 2022 03:37:38 -0400
-X-MC-Unique: 0oeNBz39MeyGRLFmQh2JLg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2BCF83C0D873;
-        Fri,  1 Jul 2022 07:37:38 +0000 (UTC)
-Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A6ACB1121314;
-        Fri,  1 Jul 2022 07:37:35 +0000 (UTC)
-Message-ID: <53b6874517a76d8d046e665c1f2f378769b721a0.camel@redhat.com>
-Subject: Re: [PATCH v2 00/21] KVM: x86: Event/exception fixes and cleanups
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Fri, 01 Jul 2022 10:37:34 +0300
-In-Reply-To: <CALMp9eSWkjHyer9CZL7UN4s8Ashc1svZsAnEgJDd2Q9voSz7HQ@mail.gmail.com>
-References: <20220614204730.3359543-1-seanjc@google.com>
-         <7e05e0befa13af05f1e5f0fd8658bc4e7bdf764f.camel@redhat.com>
-         <CALMp9eSkdj=kwh=4WHPsWZ1mKr9+0VSB527D5CMEx+wpgEGjGw@mail.gmail.com>
-         <f55889a50ba404381e3edc1a192770f2779d40f1.camel@redhat.com>
-         <CALMp9eSWkjHyer9CZL7UN4s8Ashc1svZsAnEgJDd2Q9voSz7HQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S235796AbiGAH6v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 03:58:51 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D16564D6A
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 00:58:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656662331; x=1688198331;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=VJejyouKW9/czk6l1Lmvad6clDecjfEujTrLe/gh4Zc=;
+  b=KfetSCn9vtMPzZKcOU78YUhSV7BCTO4eM56Bfk/u2Tm4/D2mT+O8/JcK
+   +1Mj484yKlX9uzqOCWyf5NzWIA6csOTByDpvFPWTakv6vu5Y5xNMksiuT
+   3Q+24ggOYwbYiEONv+yMu8U8o7McRoVfOa7xP3RP2OisZfbsDw+JM7zWi
+   whPevN8hhJi3utdh3pSHXVCb9S3yo3+WrdrnCyxrrwam9SPmCcMe2kcEm
+   AwSvkLbSltwaBsHHE4r4MZ7XWIvJ1sYu3/0kTk66UNqLH2Z/x7/16DRNM
+   gkNkak9e/1Ufr6AWHADBfAcLhjX2VYIHEXTeUgI2pV31oo/9AIVdGuP0S
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10394"; a="283316803"
+X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
+   d="scan'208";a="283316803"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2022 00:58:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
+   d="scan'208";a="681310234"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Jul 2022 00:58:33 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o7BXs-000DiF-Ea;
+        Fri, 01 Jul 2022 07:58:32 +0000
+Date:   Fri, 1 Jul 2022 15:57:34 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: [awilliam-vfio:next 2/11] drivers/vfio/vfio_iommu_type1.c:2147:35:
+ warning: cast to smaller integer type 'enum iommu_cap' from 'void *'
+Message-ID: <202207011538.py9XU340-lkp@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-06-30 at 09:28 -0700, Jim Mattson wrote:
-> On Thu, Jun 30, 2022 at 1:22 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> > On Wed, 2022-06-29 at 06:42 -0700, Jim Mattson wrote:
-> > > Unlike the AMD "INTn intercept," these trap intercepts *do not* happen
-> > > at the start of the instruction.
-> > 
-> > Are you sure about that?
-> 
-> I had been sure when I wrote that, but now that I see your response, I
-> have to question my memory. The SDM is definitely more authoritative
-> than I am.
+tree:   https://github.com/awilliam/linux-vfio.git next
+head:   7654a8881a54c335f176c7dc0a923480228497de
+commit: eed20c782aea57b7efb42af2905dc381268b21e9 [2/11] vfio/type1: Simplify bus_type determination
+config: x86_64-randconfig-a001 (https://download.01.org/0day-ci/archive/20220701/202207011538.py9XU340-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project a9119143a2d1f4d0d0bc1fe0d819e5351b4e0deb)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/awilliam/linux-vfio/commit/eed20c782aea57b7efb42af2905dc381268b21e9
+        git remote add awilliam-vfio https://github.com/awilliam/linux-vfio.git
+        git fetch --no-tags awilliam-vfio next
+        git checkout eed20c782aea57b7efb42af2905dc381268b21e9
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/vfio/
 
-x86 is like a fractal, the more I know it more I realize I don't.
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-> 
-> > > When you say "ignores," do you mean that AMD ignores a data breakpoint
-> > > or single-step trap generated by MOV-SS, or it ignores the fact that
-> > > delivering such a #DB trap between the MOV-SS and the subsequent
-> > > MOV-ESP will create a stack frame in the wrong place?
-> > 
-> > Two things which can be infered from the SVM spec.
-> >         - AMD doesn't distinguish between MOV SS and STI int shadow.
-> >         - AMD has no 'pending debug exception field' in the vmcb.
-> > 
-> > I don't know what AMD does for #DB that happens on MOV SS, nor if it
-> > does distinguish these internally,
-> > probably just drops the #DB or something.
-> 
-> Without carrying pending debug exceptions, it seems that the only two
-> choices are to deliver the #DB, with the exception frame in an
-> unintended location or to drop the #DB. The latter seems preferable,
-> but neither one seems good. What I don't understand is why you claim
-> that AMD does this "rightfully." Are you saying that anyone with the
-> audacity to run a debugger on legacy code deserves to be thrown in
-> front of a moving train?
+All warnings (new ones prefixed by >>):
 
-I understand what you mean, its a tradeof of 100% compliant implementation
-vs complexity the corner cases introduce. #DB can already be missed in some
-cases I think, especially from my experience from debuggers, and even more especially
-when debugging an OS.
-
-It is a pain, as the OS naturally tries to switch tasks and process
-interrupts all the time, I even added that _BLOCKIRQ flag to KVM to make it a bit better.
-
-But still I understand what you mean, so maybe indeed VMX did it better.
-
-> 
-> > > Hence, the facility for injecting a "pending MTF"--so that it won't be "lost."
-> > Yes, though that is would be mostly useful for nesting.
-> > 
-> > For not nesting hypervisor, if the hypervisor figured out that a higher priority event overrode
-> > the MTF, it can just process the MTF - why to re-inject it?
-> 
-> You're right. The facility is probably just there to make MTF
-> virtualizable. Intel was paying much closer attention to
-> virtualizability by the time MTF came along.
-
-That makes sense.
+>> drivers/vfio/vfio_iommu_type1.c:2147:35: warning: cast to smaller integer type 'enum iommu_cap' from 'void *' [-Wvoid-pointer-to-enum-cast]
+           return device_iommu_capable(dev, (enum iommu_cap)data);
+                                            ^~~~~~~~~~~~~~~~~~~~
+   1 warning generated.
 
 
-> 
-> > > These are single-step, I/O and data breakpoint traps.
-> > 
-> > I am not sure what you mean. single-step, IO, data breakpoints are indeed the trap #DB,
-> > while "general detect", code breakpoint are fault #DB, and we also have the task switch #DB, but since the hardware doesn't
-> > emulate the task switches, this has to be injected.
-> 
-> Just enumerating. No more, no less.
-> 
+vim +2147 drivers/vfio/vfio_iommu_type1.c
 
-All right, thank you very much for the help, especialy for the tables you provided,
-all of this should be enough now for me to review the patch series.
+  2143	
+  2144	/* Redundantly walks non-present capabilities to simplify caller */
+  2145	static int vfio_iommu_device_capable(struct device *dev, void *data)
+  2146	{
+> 2147		return device_iommu_capable(dev, (enum iommu_cap)data);
+  2148	}
+  2149	
 
-Thanks,
-Best regards,
-	Maxim Levitsky
-
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
