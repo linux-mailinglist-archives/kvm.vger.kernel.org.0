@@ -2,291 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D58605637B5
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:22:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 788EC5637D9
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:26:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232021AbiGAQVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 12:21:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
+        id S232160AbiGAQ0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 12:26:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiGAQVk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 12:21:40 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAECE3F33E;
-        Fri,  1 Jul 2022 09:21:39 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 261GBwgQ006493;
-        Fri, 1 Jul 2022 16:21:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=D3uDiaOs0hT2pDuFulsMwLE1lpSWPOjmwWxTi9bN0hI=;
- b=ow6wB1c95cfPdTf7Jrgc3CQ6rGO6KPulDawWt2VkUvlrJWcG0V7RLMb09SzJLT/fRTEp
- WXjNYrokwBQ8tI51b9FomB/283X8EZPQilKPanF/FMdRoSSsfPcBolmP4O8ppXHt3xXp
- zuXHM3OtfvLPrFEmQeqNV0gg+Ek2xCibmsNGdSzzzvbarfd2iKvCHQxxjgmxMJd9wtwZ
- zIWAyrNb5G6d3cb2PvxJzK+m/2JnS6+Hru/1vt0nSwjgNhj+GA2Dlbuz9B75LQWr3F0l
- 4ElWKa6ppPjzxXfHYEaW06Cnu2iPVulcZPJQpVHckQeRTuEWaChBuRT6xR2m9DZHWnjD PA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h247wra25-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Jul 2022 16:21:39 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 261GFNOE003982;
-        Fri, 1 Jul 2022 16:21:38 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h247wra0y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Jul 2022 16:21:38 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 261G6nM8032312;
-        Fri, 1 Jul 2022 16:21:36 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3gwt08yeg8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 01 Jul 2022 16:21:36 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 261GLeiX26214828
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Jul 2022 16:21:40 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C8F30A4054;
-        Fri,  1 Jul 2022 16:21:32 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 01866A405B;
-        Fri,  1 Jul 2022 16:21:32 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.92.56])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Jul 2022 16:21:31 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, pmorel@linux.ibm.com,
-        wintera@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com
-Subject: [PATCH v11 3/3] KVM: s390: resetting the Topology-Change-Report
-Date:   Fri,  1 Jul 2022 18:25:59 +0200
-Message-Id: <20220701162559.158313-4-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220701162559.158313-1-pmorel@linux.ibm.com>
-References: <20220701162559.158313-1-pmorel@linux.ibm.com>
+        with ESMTP id S232082AbiGAQ0p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 12:26:45 -0400
+Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A312C4163E
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 09:26:43 -0700 (PDT)
+Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1048b8a38bbso4122974fac.12
+        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 09:26:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=K26MwrAuUteiZyWEOzDvbm+FiqummBqIOV2xCXu76yM=;
+        b=Ixmg3++rgJ8IUJE7we0mxCXtZMmmsiY6hst+fVyftGVwB60OGjmkQodnPu56rSx26x
+         AzHgNxP6GiQdmczQ7Bp8/Zni0M9iKk6KvYkBtr8/Ur1zNzuArnrGSaZfQE7+ehh+AqGz
+         O7VW/P4YJkz0y6i59iigxbpO10P9ogp7SYgzb7y8uZoZtvG2EQel/v4LgNCfsuAV/v4O
+         O8afSWKTcvg0JsuU+fKaxZqdlnTIDaViI8MdxbHcDLUAdLHyneysHfldfmbXen1l8tI5
+         o0WMlhmThr7f4GF3lf9xjsTeiEv3tx93rUY/C8Dk19cQ/1/Asy4Rsq/pcnLA6LEsjLNl
+         azsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=K26MwrAuUteiZyWEOzDvbm+FiqummBqIOV2xCXu76yM=;
+        b=vGdqgYppUbnuyhD4/sFh/ukAJy+nL3iVKCaJjvab7Y3FCG506bz3AGdJpZ9BzaPRAk
+         aCKjVp3SUE1c9xBckofAC1hSLD52vb4GIf5z5fUNhnEqrAu1aBTcAiEkfoRs9Oet4OVP
+         8B6NgOsl6xgwV+3KFPL03aity/BmHKqHoH3yuD8vpIBvkZNBq6AOFHXrgLH+SJ632sHA
+         FT8vLbnxaoMPhNRaV6Uv2AktHYTRQDcAJanM0B2pb9rCYGyv7gEfd+A49yJXaefZtltM
+         JwYbU7brX/6M9X1hrQ1oV0NFayDNY35M9ybenEUQ9OIgMw4aW8G4Ha1PIUPFAvtXRBtG
+         PjwA==
+X-Gm-Message-State: AJIora/YRj46Lzo3kjGOqZ0v7xEUwUsFBwKfoHc6BZPIXPZDhtGSyw5p
+        6RwS66e7ksiOCjmMSWNdgstagH+pnk0AjTHCsOg/Pw==
+X-Google-Smtp-Source: AGRyM1v52Mm1Cwsg5w6e8h2FpdML7f7TtaQZ5JZagakdFptTcCoj3+hl7//M3/+nWSpUjkRcOmP69M304ybLd1p4xuM=
+X-Received: by 2002:a05:6870:d3c7:b0:104:9120:8555 with SMTP id
+ l7-20020a056870d3c700b0010491208555mr8825797oag.181.1656692802766; Fri, 01
+ Jul 2022 09:26:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aRa7ZIkIZiaoENiwNbHt1zrezNpTec4S
-X-Proofpoint-ORIG-GUID: 4sv5i44wHhKZebExXuF1u0LXCecCHaIv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-01_08,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 impostorscore=0 adultscore=0 malwarescore=0 mlxscore=0
- phishscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2207010064
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-24-vkuznets@redhat.com>
+In-Reply-To: <20220629150625.238286-24-vkuznets@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 1 Jul 2022 09:26:31 -0700
+Message-ID: <CALMp9eTmRLHQej1a4bFtpmRxaLaEJfwpDdvcZGbR54PFRjx+6g@mail.gmail.com>
+Subject: Re: [PATCH v2 23/28] KVM: VMX: Move LOAD_IA32_PERF_GLOBAL_CTRL errata
+ handling out of setup_vmcs_config()
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-During a subsystem reset the Topology-Change-Report is cleared.
+On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> As a preparation to reusing the result of setup_vmcs_config() for setting
+> up nested VMX control MSRs, move LOAD_IA32_PERF_GLOBAL_CTRL errata handling
+> to vmx_vmexit_ctrl()/vmx_vmentry_ctrl() and print the warning from
+> hardware_setup(). While it seems reasonable to not expose
+> LOAD_IA32_PERF_GLOBAL_CTRL controls to L1 hypervisor on buggy CPUs,
+> such change would inevitably break live migration from older KVMs
+> where the controls are exposed. Keep the status quo for know, L1 hypervisor
+> itself is supposed to take care of the errata.
 
-Let's give userland the possibility to clear the MTCR in the case
-of a subsystem reset.
+It can only do that if L1 doesn't lie about the model. This is why
+F/M/S checks are, in general, evil.
 
-To migrate the MTCR, we give userland the possibility to
-query the MTCR state.
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 62 ++++++++++++++++++++++++++----------------
+>  1 file changed, 38 insertions(+), 24 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index fb58b0be953d..5f7ef1f8d2c6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2416,6 +2416,31 @@ static bool cpu_has_sgx(void)
+>         return cpuid_eax(0) >= 0x12 && (cpuid_eax(0x12) & BIT(0));
+>  }
+>
+> +/*
+> + * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
+> + * can't be used due to an errata where VM Exit may incorrectly clear
 
-We indicate KVM support for the CPU topology facility with a new
-KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+Nit: erratum (singular), or drop the 'an' to refer to errata (plural).
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst   | 25 +++++++++++++++
- arch/s390/include/uapi/asm/kvm.h | 10 ++++++
- arch/s390/kvm/kvm-s390.c         | 53 ++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h         |  1 +
- 4 files changed, 89 insertions(+)
+> + * IA32_PERF_GLOBAL_CTRL[34:32].  Workaround the errata by using the
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 11e00a46c610..5e086125d8ad 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7956,6 +7956,31 @@ should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
- When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
- type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
- 
-+8.37 KVM_CAP_S390_CPU_TOPOLOGY
-+------------------------------
-+
-+:Capability: KVM_CAP_S390_CPU_TOPOLOGY
-+:Architectures: s390
-+:Type: vm
-+
-+This capability indicates that KVM will provide the S390 CPU Topology
-+facility which consist of the interpretation of the PTF instruction for
-+the function code 2 along with interception and forwarding of both the
-+PTF instruction with function codes 0 or 1 and the STSI(15,1,x)
-+instruction to the userland hypervisor.
-+
-+The stfle facility 11, CPU Topology facility, should not be indicated
-+to the guest without this capability.
-+
-+When this capability is present, KVM provides a new attribute group
-+on vm fd, KVM_S390_VM_CPU_TOPOLOGY.
-+This new attribute allows to get, set or clear the Modified Change
-+Topology Report (MTCR) bit of the SCA through the kvm_device_attr
-+structure.
-+
-+When getting the Modified Change Topology Report value, the attr->addr
-+must point to a byte where the value will be stored.
-+
- 9. Known KVM API problems
- =========================
- 
-diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
-index 7a6b14874d65..df5e8279ffd0 100644
---- a/arch/s390/include/uapi/asm/kvm.h
-+++ b/arch/s390/include/uapi/asm/kvm.h
-@@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
- #define KVM_S390_VM_CRYPTO		2
- #define KVM_S390_VM_CPU_MODEL		3
- #define KVM_S390_VM_MIGRATION		4
-+#define KVM_S390_VM_CPU_TOPOLOGY	5
- 
- /* kvm attributes for mem_ctrl */
- #define KVM_S390_VM_MEM_ENABLE_CMMA	0
-@@ -171,6 +172,15 @@ struct kvm_s390_vm_cpu_subfunc {
- #define KVM_S390_VM_MIGRATION_START	1
- #define KVM_S390_VM_MIGRATION_STATUS	2
- 
-+/* kvm attributes for cpu topology */
-+#define KVM_S390_VM_CPU_TOPO_MTCR_CLEAR	0
-+#define KVM_S390_VM_CPU_TOPO_MTCR_SET	1
-+
-+struct kvm_cpu_topology {
-+	__u16 mtcr : 1;
-+	__u16 reserved : 15;
-+};
-+
- /* for KVM_GET_REGS and KVM_SET_REGS */
- struct kvm_regs {
- 	/* general purpose regs for s390 */
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index ee59b03f2e45..5029fe40adbd 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -606,6 +606,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_PROTECTED:
- 		r = is_prot_virt_host();
- 		break;
-+	case KVM_CAP_S390_CPU_TOPOLOGY:
-+		r = test_facility(11);
-+		break;
- 	default:
- 		r = 0;
- 	}
-@@ -817,6 +820,20 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		icpt_operexc_on_all_vcpus(kvm);
- 		r = 0;
- 		break;
-+	case KVM_CAP_S390_CPU_TOPOLOGY:
-+		r = -EINVAL;
-+		mutex_lock(&kvm->lock);
-+		if (kvm->created_vcpus) {
-+			r = -EBUSY;
-+		} else if (test_facility(11)) {
-+			set_kvm_facility(kvm->arch.model.fac_mask, 11);
-+			set_kvm_facility(kvm->arch.model.fac_list, 11);
-+			r = 0;
-+		}
-+		mutex_unlock(&kvm->lock);
-+		VM_EVENT(kvm, 3, "ENABLE: CPU TOPOLOGY %s",
-+			 r ? "(not available)" : "(success)");
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -1716,6 +1733,33 @@ static void kvm_s390_update_topology_change_report(struct kvm *kvm, bool val)
- 	read_unlock(&kvm->arch.sca_lock);
- }
- 
-+static int kvm_s390_set_topology(struct kvm *kvm, struct kvm_device_attr *attr)
-+{
-+	if (!test_kvm_facility(kvm, 11))
-+		return -ENXIO;
-+
-+	kvm_s390_update_topology_change_report(kvm, !!attr->attr);
-+	return 0;
-+}
-+
-+static int kvm_s390_get_topology(struct kvm *kvm, struct kvm_device_attr *attr)
-+{
-+	union sca_utility utility;
-+	struct bsca_block *sca = kvm->arch.sca;
-+	__u8 topo;
-+
-+	if (!test_kvm_facility(kvm, 11))
-+		return -ENXIO;
-+
-+	utility.val = READ_ONCE(sca->utility.val);
-+	topo = utility.mtcr;
-+
-+	if (copy_to_user((void __user *)attr->addr, &topo, sizeof(topo)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
- static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- {
- 	int ret;
-@@ -1736,6 +1780,9 @@ static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = kvm_s390_vm_set_migration(kvm, attr);
- 		break;
-+	case KVM_S390_VM_CPU_TOPOLOGY:
-+		ret = kvm_s390_set_topology(kvm, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -1761,6 +1808,9 @@ static int kvm_s390_vm_get_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = kvm_s390_vm_get_migration(kvm, attr);
- 		break;
-+	case KVM_S390_VM_CPU_TOPOLOGY:
-+		ret = kvm_s390_get_topology(kvm, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -1834,6 +1884,9 @@ static int kvm_s390_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = 0;
- 		break;
-+	case KVM_S390_VM_CPU_TOPOLOGY:
-+		ret = test_kvm_facility(kvm, 11) ? 0 : -ENXIO;
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 5088bd9f1922..33317d820032 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1157,6 +1157,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_VM_TSC_CONTROL 214
- #define KVM_CAP_SYSTEM_EVENT_DATA 215
- #define KVM_CAP_ARM_SYSTEM_SUSPEND 216
-+#define KVM_CAP_S390_CPU_TOPOLOGY 217
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.31.1
+Nit: workaround (one word) is a noun. The verb form is "work around."
 
+> + * MSR load mechanism to switch IA32_PERF_GLOBAL_CTRL.
+> + */
+> +static bool cpu_has_perf_global_ctrl_bug(void)
+> +{
+> +       if (boot_cpu_data.x86 == 0x6) {
+> +               switch (boot_cpu_data.x86_model) {
+> +               case 26: /* AAK155 */
+> +               case 30: /* AAP115 */
+> +               case 37: /* AAT100 */
+> +               case 44: /* BC86,AAY89,BD102 */
+> +               case 46: /* BA97 */
+
+Nit: Replace decimal model numbers with mnemonics. See
+https://lore.kernel.org/kvm/20220629222221.986645-1-jmattson@google.com/.
+
+> +                       return true;
+> +               default:
+> +                       break;
+> +               }
+> +       }
+> +
+> +       return false;
+> +}
+
+Is it worth either (a) memoizing the result, or (b) toggling a static
+branch? Or am I prematurely optimizing?
+
+> +
+> +
+>  static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+>                                       u32 msr, u32 *result)
+>  {
+> @@ -2572,30 +2597,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>                 _vmexit_control &= ~x_ctrl;
+>         }
+>
+> -       /*
+> -        * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
+> -        * can't be used due to an errata where VM Exit may incorrectly clear
+> -        * IA32_PERF_GLOBAL_CTRL[34:32].  Workaround the errata by using the
+> -        * MSR load mechanism to switch IA32_PERF_GLOBAL_CTRL.
+> -        */
+> -       if (boot_cpu_data.x86 == 0x6) {
+> -               switch (boot_cpu_data.x86_model) {
+> -               case 26: /* AAK155 */
+> -               case 30: /* AAP115 */
+> -               case 37: /* AAT100 */
+> -               case 44: /* BC86,AAY89,BD102 */
+> -               case 46: /* BA97 */
+> -                       _vmentry_control &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+> -                       _vmexit_control &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+> -                       pr_warn_once("kvm: VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL "
+> -                                       "does not work properly. Using workaround\n");
+> -                       break;
+> -               default:
+> -                       break;
+> -               }
+> -       }
+> -
+> -
+>         rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
+>
+>         /* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
+> @@ -4188,6 +4189,10 @@ static u32 vmx_vmentry_ctrl(void)
+>                           VM_ENTRY_LOAD_IA32_EFER |
+>                           VM_ENTRY_IA32E_MODE);
+>
+> +
+> +       if (cpu_has_perf_global_ctrl_bug())
+> +               vmentry_ctrl &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +
+>         return vmentry_ctrl;
+>  }
+>
+> @@ -4202,6 +4207,10 @@ static u32 vmx_vmexit_ctrl(void)
+>         if (vmx_pt_mode_is_system())
+>                 vmexit_ctrl &= ~(VM_EXIT_PT_CONCEAL_PIP |
+>                                  VM_EXIT_CLEAR_IA32_RTIT_CTL);
+> +
+> +       if (cpu_has_perf_global_ctrl_bug())
+> +               vmexit_ctrl &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +
+>         /* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
+>         return vmexit_ctrl &
+>                 ~(VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VM_EXIT_LOAD_IA32_EFER);
+> @@ -8117,6 +8126,11 @@ static __init int hardware_setup(void)
+>         if (setup_vmcs_config(&vmcs_config, &vmx_capability) < 0)
+>                 return -EIO;
+>
+> +       if (cpu_has_perf_global_ctrl_bug()) {
+> +               pr_warn_once("kvm: VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL "
+> +                            "does not work properly. Using workaround\n");
+> +       }
+> +
+>         if (boot_cpu_has(X86_FEATURE_NX))
+>                 kvm_enable_efer_bits(EFER_NX);
+>
+> --
+> 2.35.3
+>
