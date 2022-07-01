@@ -2,162 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0D6B563037
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 11:34:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A16A56303E
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 11:36:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234433AbiGAJeb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 05:34:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54230 "EHLO
+        id S235611AbiGAJft (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 05:35:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233550AbiGAJe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 05:34:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F9867478E
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 02:34:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656668066;
+        with ESMTP id S234917AbiGAJfr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 05:35:47 -0400
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7A07479B
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 02:35:46 -0700 (PDT)
+Date:   Fri, 1 Jul 2022 11:35:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1656668144;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TRbVMG9pe9kLTW8fXLQQcAgh1G0fF5UqNIzjXT/Ehks=;
-        b=frQjgV8eDQIyeBUP7eS5JJ11PoKKd/sdDRGarXN0U8VLdqFiQS6G7fxAwuZsIyCOLesowF
-        goJ9kjryM/ws2dCqbMHUP/ksV/KnIfR0FUrDZmLG0EJbQXIiEaMRUesHP42ktUVb+AKxsI
-        ZQVIE1BetqJNqMiq/uVuHlw+4b/E0rk=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-272-unx9IdBHMze1sP5j6irl9g-1; Fri, 01 Jul 2022 05:34:25 -0400
-X-MC-Unique: unx9IdBHMze1sP5j6irl9g-1
-Received: by mail-pg1-f199.google.com with SMTP id a185-20020a6390c2000000b0040cb1cddf13so1047432pge.19
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 02:34:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=TRbVMG9pe9kLTW8fXLQQcAgh1G0fF5UqNIzjXT/Ehks=;
-        b=EEXSdrDFOSmEi+WFNlMK1icme7T0KTd3PCKAGfWG9/usoQMn3HrvUog5uJyF/ldiXP
-         b2Nxtk7+wJ5AkzvetsPAANawSqqIzzzvBQzgjEQJdcdUFmdGzDnC/tSjmcZmqjRz8esX
-         pJILNK7tB9IwW3fVtyRggtBdyfKfKH9S0K/uy/jmT4mzAbKJTnDiI6B/j6+RuFkXf+59
-         FIdHS6u00WMaor8C9CR7IZ0+q30XS88OYBKpaHP7Ba0vynhQubyuQ+tKPNnTKhoLPCDj
-         FXXJUqNpprW1gfKOa+6wV2rVeIe9A4aSJunUtg/YT+pxg92uwfKwXcnlc3HrjMhB0G4y
-         956Q==
-X-Gm-Message-State: AJIora+e3DXLImbZxkPi4FyOZDkLUnkffknFNoD2tKNYjSeOuqaAlDoN
-        zvItNDfKSrVLYj7EOwY0PfwJC0zcbwFrhsM91leHxy1unLJ2VNPdcRNqwCnTUinNVyEzBBO3fj1
-        yw32bPWBYyxiv
-X-Received: by 2002:a63:be41:0:b0:40c:b4a8:dee9 with SMTP id g1-20020a63be41000000b0040cb4a8dee9mr11432184pgo.107.1656668064254;
-        Fri, 01 Jul 2022 02:34:24 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sE5v7ksf3buwxxjLGMpBCFIkErXWPc59l6I+VsrcgW6eytue9aR08XqOAivwqVk5DzrN+qQw==
-X-Received: by 2002:a63:be41:0:b0:40c:b4a8:dee9 with SMTP id g1-20020a63be41000000b0040cb4a8dee9mr11432146pgo.107.1656668063999;
-        Fri, 01 Jul 2022 02:34:23 -0700 (PDT)
-Received: from [10.72.13.237] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id x1-20020a636301000000b004085adf1372sm14860507pgb.77.2022.07.01.02.34.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Jul 2022 02:34:23 -0700 (PDT)
-Message-ID: <10281add-4d72-efe6-e94d-1f19ced9cb27@redhat.com>
-Date:   Fri, 1 Jul 2022 17:34:12 +0800
+        bh=t+Cbc3M8TCt/tDz9gw9vqaK3b23XPH4bNMdNK8MxsqE=;
+        b=DuRqcvPEriCRQMbqdQYDXN2pRE1GFhzvF2fUnG8P82CvAv8KixJE3rctHRNS+zz65UQdq/
+        ZU7QoPPmCyRcNaZYQ0ChojSaI2g0PrZSRF93e9yHKf0R1uSIxb6ZIn+lgaHTK8WNDOV3jE
+        93fD+zliXVWf24wo3F/94PLrD09tArQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, drjones@redhat.com, pbonzini@redhat.com,
+        jade.alglave@arm.com, alexandru.elisei@arm.com, ricarkol@google.com
+Subject: Re: [kvm-unit-tests PATCH v3 03/27] lib: Ensure all struct
+ definition for ACPI tables are packed
+Message-ID: <20220701093542.cexwhs3ypb6rrfzz@kamzik>
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-4-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH v11 24/40] virtio_pci: struct virtio_pci_common_cfg add
- queue_notify_data
-Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com
-References: <20220629065656.54420-1-xuanzhuo@linux.alibaba.com>
- <20220629065656.54420-25-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220629065656.54420-25-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220630100324.3153655-4-nikos.nikoleris@arm.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-在 2022/6/29 14:56, Xuan Zhuo 写道:
-> Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
-> here https://github.com/oasis-tcs/virtio-spec/issues/89
->
-> Since I want to add queue_reset after queue_notify_data, I submitted
-> this patch first.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
+On Thu, Jun 30, 2022 at 11:03:00AM +0100, Nikos Nikoleris wrote:
+> All ACPI table definitions are provided with precise definitions of
+> field sizes and offsets, make sure that no compiler optimization can
+> interfere with the memory layout of the corresponding structs.
+> 
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 > ---
->   include/linux/virtio_pci_modern.h | 2 ++
->   include/uapi/linux/virtio_pci.h   | 1 +
->   2 files changed, 3 insertions(+)
+>  lib/acpi.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/lib/acpi.h b/lib/acpi.h
+> index 456e62d..b853a55 100644
+> --- a/lib/acpi.h
+> +++ b/lib/acpi.h
+> @@ -3,6 +3,12 @@
+>  
+>  #include "libcflat.h"
+>  
+> +/*
+> + * All tables and structures must be byte-packed to match the ACPI
+> + * specification, since the tables are provided by the system BIOS
+> + */
+> +#pragma pack(1)
+> +
+>  #define ACPI_SIGNATURE(c1, c2, c3, c4)				\
+>  	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
+>  
+> @@ -106,6 +112,8 @@ struct facs_descriptor_rev1
+>  	u8  reserved3 [40];		/* Reserved - must be zero */
+>  };
+>  
+> +#pragma pack(0)
+> +
+>  void set_efi_rsdp(struct rsdp_descriptor *rsdp);
+>  void* find_acpi_table_addr(u32 sig);
+>  
+> -- 
+> 2.25.1
 >
-> diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-> index c4f7ffbacb4e..9f31dde46f57 100644
-> --- a/include/linux/virtio_pci_modern.h
-> +++ b/include/linux/virtio_pci_modern.h
-> @@ -29,6 +29,8 @@ struct virtio_pci_common_cfg {
->   	__le32 queue_avail_hi;		/* read-write */
->   	__le32 queue_used_lo;		/* read-write */
->   	__le32 queue_used_hi;		/* read-write */
-> +	__le16 queue_notify_data;	/* read-write */
-> +	__le16 padding;
->   };
 
-
-As previous patch, I think it's better to simple embed the uAPI 
-structure here.
-
-Thanks
-
-
->   
->   struct virtio_pci_modern_device {
-> diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-> index 247ec42af2c8..748b3eb62d2f 100644
-> --- a/include/uapi/linux/virtio_pci.h
-> +++ b/include/uapi/linux/virtio_pci.h
-> @@ -176,6 +176,7 @@ struct virtio_pci_cfg_cap {
->   #define VIRTIO_PCI_COMMON_Q_AVAILHI	44
->   #define VIRTIO_PCI_COMMON_Q_USEDLO	48
->   #define VIRTIO_PCI_COMMON_Q_USEDHI	52
-> +#define VIRTIO_PCI_COMMON_Q_NDATA	56
->   
->   #endif /* VIRTIO_PCI_NO_MODERN */
->   
-
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
