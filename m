@@ -2,72 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5495562B0B
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 07:48:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2CB8562A9B
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 06:41:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233921AbiGAFsh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 01:48:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
+        id S232809AbiGAElI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 00:41:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231426AbiGAFse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 01:48:34 -0400
-Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E3F32F2;
-        Thu, 30 Jun 2022 22:48:29 -0700 (PDT)
-Received: from ([60.208.111.195])
-        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id VCX00123;
-        Fri, 01 Jul 2022 13:48:23 +0800
-Received: from localhost.localdomain (10.200.104.97) by
- jtjnmail201607.home.langchao.com (10.100.2.7) with Microsoft SMTP Server id
- 15.1.2507.9; Fri, 1 Jul 2022 13:48:22 +0800
-From:   Bo Liu <liubo03@inspur.com>
-To:     <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-        <x86@kernel.org>, <hpa@zytor.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Bo Liu <liubo03@inspur.com>
-Subject: [PATCH] KVM: x86/mmu: Return true/false from bool function
-Date:   Fri, 1 Jul 2022 00:21:22 -0400
-Message-ID: <20220701042122.5273-1-liubo03@inspur.com>
-X-Mailer: git-send-email 2.18.2
+        with ESMTP id S229549AbiGAElH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 00:41:07 -0400
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC2B60513
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:41:06 -0700 (PDT)
+Received: by mail-vs1-xe32.google.com with SMTP id k25so1252196vso.6
+        for <kvm@vger.kernel.org>; Thu, 30 Jun 2022 21:41:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LgtIJLhIlObEf1prge4Y6yPa4LwrycdDF8GNVdUS6O4=;
+        b=Bg/NLdtV+LwV8ZZi7pbMf0ofCXdMwliaiJXQHtH5+dLa72SzhXmu3/9Y+l1Yz+lTaM
+         mT4G7oavD1J3NQ3TlLFZ4NqTUFg39pkNd7T3YZQIlpPj+sO3uq1zH7d8xSCtm91Frzcs
+         /BAaiQh5a7WmugYUqHvj+jD0Z8A0HKxwE0j8OfTaZF6fvKXkt5HQD6C2rH1wSno22aXf
+         Dj/YMKBALtU4F1dvPibeKUu8PF8RSG0UFZfMPAJ/tbQzfT4S66Sr85cKeJvPiTjyd9Jd
+         bTR2dbrObzzViZJ/Xd+9eIIdVkwhiB9dU6i5QHX6Bx8wgHDtPyc0qrr3+jWD2mEZ/j0p
+         KC2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LgtIJLhIlObEf1prge4Y6yPa4LwrycdDF8GNVdUS6O4=;
+        b=aeYmjxQ8iCREg5MXLXk+nN8Ppu+65lSzP5UB/zJrfdWwln1QlctWJD28naLj61nxEG
+         seVTMY0OgCxIFXsxy1brQE6Gg03u8NL2BxVDBPAz3z16J5LnVW0taA3AFtjsuAeQZWA6
+         zpWjpRDkhJ0lkpjT2PNxKplKgNGr9XCMrX5Cc2yPBwgL/a7thSWqi1CVaaAedIzx1M+w
+         sU8EKQ27jR/3jV1Tr4KIeaKsz1LB7wtjA3WfuOSZlJ3p8awxZ937mQcc/kjA3N5VnOCR
+         pH4OIfUfOdCuYvUTMOC6eXgzn+p6uC67FDHppkNHz7mox2k3W+6MEVjRgQsco0XuWyb8
+         p4NQ==
+X-Gm-Message-State: AJIora+kbYgIJREPslT8zrUJRNiUdC3c+XSSU0eNMZZ4aLN2peBqd44G
+        FPcMu165rHJ7SQdUVT4boYqoAPTF0tsaqYVjEJqrJA==
+X-Google-Smtp-Source: AGRyM1uT5bcbSSc6gZfVz1EffEzzssL2tqzBwZDhkBA8i//7HyWRA+8T6iIR7bMEr5y3QMrZvFHXrvxQraSB5sqV2fk=
+X-Received: by 2002:a05:6102:3548:b0:354:34a1:e8f1 with SMTP id
+ e8-20020a056102354800b0035434a1e8f1mr10021492vss.53.1656650465658; Thu, 30
+ Jun 2022 21:41:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.200.104.97]
-tUid:   20227011348236a2f1c9ffd7be92f9e8e0b4b6e725e20
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220610171134.772566-1-juew@google.com> <20220610171134.772566-5-juew@google.com>
+ <958774eb-90df-34e9-e025-959c3eb60614@intel.com>
+In-Reply-To: <958774eb-90df-34e9-e025-959c3eb60614@intel.com>
+From:   Jue Wang <juew@google.com>
+Date:   Thu, 30 Jun 2022 21:40:54 -0700
+Message-ID: <CAPcxDJ6PJGfZ6pZZQ074OZujLKz2GPeYZ5Bgyrh_YRGqZ-7dsA@mail.gmail.com>
+Subject: Re: [PATCH v5 4/8] KVM: x86: Add Corrected Machine Check Interrupt
+ (CMCI) emulation to lapic.
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Matlack <dmatlack@google.com>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        Greg Thelen <gthelen@google.com>,
+        Jiaqi Yan <jiaqiyan@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Return boolean values ("true" or "false") instead of integer values
-from bool function.
+On Thu, Jun 30, 2022 at 7:07 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>
+> On 6/11/2022 1:11 AM, Jue Wang wrote:
+> ...
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 4790f0d7d40b..a08693808729 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -4772,6 +4772,8 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+> >       /* Init IA32_MCi_CTL to all 1s */
+> >       for (bank = 0; bank < bank_num; bank++)
+> >               vcpu->arch.mce_banks[bank*4] = ~(u64)0;
+> > +     vcpu->arch.apic->nr_lvt_entries =
+> > +             KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
+>
+> vcpu->arch.apic->nr_lvt_entries needs to be initialized as
+> KVM_APIC_MAX_NR_LVT_ENTREIS - 1 when creating lapic.
+>
+> What if userspace doesn't call KVM_X86_SETUP_MCE at all?
+Good catch.
 
-Signed-off-by: Bo Liu <liubo03@inspur.com>
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Paolo / Sean, should another patch be sent to fix this or do you
+recommend some other means to address the nr_lvt_entries
+initialization issue that Xiaoyao pointed out?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index bfb50262fd37..572e0c487376 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1024,7 +1024,7 @@ static bool rmap_can_add(struct kvm_vcpu *vcpu)
- 	struct kvm_mmu_memory_cache *mc;
- 
- 	mc = &vcpu->arch.mmu_pte_list_desc_cache;
--	return kvm_mmu_memory_cache_nr_free_objects(mc);
-+	return !!kvm_mmu_memory_cache_nr_free_objects(mc);
- }
- 
- static void rmap_remove(struct kvm *kvm, u64 *spte)
--- 
-2.27.0
-
+Thanks a lot,
+-Jue
+>
+> >
+> >       static_call(kvm_x86_setup_mce)(vcpu);
+> >   out:
+>
