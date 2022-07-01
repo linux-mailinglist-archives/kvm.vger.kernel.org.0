@@ -2,127 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00448562C31
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 09:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9282562C5E
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 09:11:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235138AbiGAHCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 03:02:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60860 "EHLO
+        id S234394AbiGAHKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 03:10:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233268AbiGAHCs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 03:02:48 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A06677C4
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 00:02:48 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2616ohGn011767
-        for <kvm@vger.kernel.org>; Fri, 1 Jul 2022 07:02:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : from : cc : to : message-id : date; s=pp1;
- bh=918mngXZ88Y7llU8WSZTyUKOuvqK88Pw7+H6Rt2bPkU=;
- b=cKSXLyQPgow+Uscz/YXbtiABO3PJ/j+BDLk0k7KOuIN1cZsTA7tjDnjTSiThQDIiCNSQ
- +N98uZqHLPq7OppddHpvyTo8i/EJd2C6csZ7m6yZIV+Y852Fvojhvq5DLhywzP14fwy+
- RqoY5L9BxFKJ1XXTqXfoeB7CVK16+FR+2s1LdvlidUrxCaZBtZs2atXo4pokYxRJMQ8p
- zoMZipwyCtYOMjfXX9oL2mwO4vtsLp8QAvFkij/BJJ+XNOmf+dkBr4g5t+PLA6YgSYU6
- n0mdWh4ELX9g4iXJnbVrdobpvvQF/4DNR8uPvsfWvVYMikbfQnRAIoWF5ju6QOnIR1// kw== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1v0y0ahj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 07:02:47 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2616b1p3021655
-        for <kvm@vger.kernel.org>; Fri, 1 Jul 2022 07:02:45 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3gwsmhxyf8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 07:02:45 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26172gFa23134550
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Jul 2022 07:02:42 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 151314C046;
-        Fri,  1 Jul 2022 07:02:42 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EDE904C044;
-        Fri,  1 Jul 2022 07:02:41 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.42.232])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Jul 2022 07:02:41 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+        with ESMTP id S230523AbiGAHKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 03:10:52 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D76568A1F;
+        Fri,  1 Jul 2022 00:10:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656659452; x=1688195452;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=7xdf4ZnjzdWZ1FqcK8UcEN6070uZyJmegHGwZbPOlGY=;
+  b=Zk+ie9LGxBpXzNo7XdjLjxXL9v0axVn2OyAyfdFFz1b5xBC4W5unbQl4
+   tYf7gQh3nR2rWUEepXsDI8UjLN+GqUTjjkXiEPDqBn0Al0ZnlLLwfw3Ae
+   3/OmkiP07J0oCDDiVQAmMzEQTcMgFoGwPbC8GatH7C3uAM+iqcfcJwVUe
+   dVrvnSmhs9VSSGqMJeoankdSfJYI5yOAe00b0kagax2qycFkb11W29Ibd
+   D2RnH+B6DhIOOR/zHgvicVNLymJZeZ9poF2AB6KBNznxIwgV92KW/87+I
+   UySwXKoi1wTTJS00NKJEdcvpGuVVzAEINhchuB3i2JAy0TqByNAFefQG3
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10394"; a="281336636"
+X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
+   d="scan'208";a="281336636"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2022 00:10:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,236,1650956400"; 
+   d="scan'208";a="541634686"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga003.jf.intel.com with ESMTP; 01 Jul 2022 00:10:48 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Fri, 1 Jul 2022 00:10:48 -0700
+Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Fri, 1 Jul 2022 00:10:47 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Fri, 1 Jul 2022 00:10:47 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.44) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Fri, 1 Jul 2022 00:10:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N7q6NJADq5WVDwue58mvj1gZDO4ZXAkClAnU1761GuR3/DsicgA48v/VrsvY1ltxsquuNbAKrSUdni1vF7JNWczEIQ0eePDd4PKXM/m3BoqHS6qd5X8OQ+vJYnAQXk6iuFrxJ+YFrW6mZ8MB834onwUSWOFxF/3Nt4UNQjjJ/CUmwt703gQRr0d9PRgHk6zlPCHGpSPqtnsrk69WQQZcPtRlXlUzILhEib/qElS+029VDKPwxKwEJqkcJBVPjrsHYifeiwSgSAKolJWYv2VEPD+Z2xcDR8G7jtkgO+Kki+OL7IFvvZs/ure/OJLSX8T34ykZusB1aSOrZxC8ygPf4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7xdf4ZnjzdWZ1FqcK8UcEN6070uZyJmegHGwZbPOlGY=;
+ b=i5ROzc3AkO/POGfPl+BvRq2HAzXov9efPmgeuhA3axE8PRDgYGRobWeIld/2fYY09qGUk6funLuLPhdOWbCtMoCDU4r+XsBQbiI4kAYpJv7Ba2rHLxkiWPrpT84XRCOGm72KdJKWlYO9dK+Hvv5VkWKuZgRxy/ySGZ539Y2pxSipos4SCGOsQhBbxD7t2IZ3H8jeakGOXqZSAmZ+9i5whcvSAtwHAfGU/lGKUJBQICYKxLHTAH0//AA5OSNEbvymAV01Cfec4qY5tQ8OgcIkKIfzCuvjNETYwlU60mKADfbx0Ju9pGD+F1veUQ6Whm0lAasj4uq6yub3B3+7E9mY6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SJ0PR11MB5894.namprd11.prod.outlook.com (2603:10b6:a03:42a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15; Fri, 1 Jul
+ 2022 07:10:45 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::8435:5a99:1e28:b38c]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::8435:5a99:1e28:b38c%2]) with mapi id 15.20.5395.015; Fri, 1 Jul 2022
+ 07:10:45 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     Robin Murphy <robin.murphy@arm.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "Rodel, Jorg" <jroedel@suse.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Subject: RE: [RFC PATCH kernel] vfio: Skip checking for
+ IOMMU_CAP_CACHE_COHERENCY on POWER and more
+Thread-Topic: [RFC PATCH kernel] vfio: Skip checking for
+ IOMMU_CAP_CACHE_COHERENCY on POWER and more
+Thread-Index: AQHYjRJW3CSa5JgkkEy1u1YUe1sfEa1pEyjQ
+Date:   Fri, 1 Jul 2022 07:10:45 +0000
+Message-ID: <BN9PR11MB527622E1CD94C59829D5CF398CBD9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220701061751.1955857-1-aik@ozlabs.ru>
+In-Reply-To: <20220701061751.1955857-1-aik@ozlabs.ru>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.500.17
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f268cece-246b-4425-f48f-08da5b30d11d
+x-ms-traffictypediagnostic: SJ0PR11MB5894:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: OvzJ/qJG/5c0oicMvuMUryfWNeXKhNTENT1sG9X+FhpYrqBcWou8U6uvMxEEGsOjB5AMRJO+3ziquoQDn7jMoBv5mCixJVmHpNdH3XxWq92hMYsk8MGQP3Utq2BhlqzorNan/PfbPUputLV0/EqtpNCI8Q9pbIEvQ5xhGY9tDtVKX72WMQ3kEQ4qQVHoRpGJZaAoT/CkFpcHi9MJ5hCuC1dEYKaZ1wSrAAPPdVrelWomtODTblsYRQ0LI9zlVcPRqiRxtymdO1srGSmlE3pw/zu/v+p4ANht5V5vsoLEWJi7WFBoGs+Vzp5L9ppur8xYWu/V9xfathm3iN6BhqqNE/ZGt8581ySFtnN9pU9rmK8meGc2kp6U646pO6V4BloyPgXhLIH+SjAYLlN1VmAg1Zt5VoW6j90CZm2ziLwdYUs+i7hgbB4U9XNwVvFXOt05pYc99wKGdA47MARjJzuEXb526DjL2MqEoSmj0YfYU55Re3Ia7qtbGyV6bTpNb+bttaQV+j7G08atx0zDeX7nF2mwJbEulhNpGyt1YlQbRZdasveeYBbka+u5aVK7TPzOD1iiEjgd2PCj39yCAO9ee8czgcXMTIvz7YG55XKDvqmbz4L+t5AOhkLA6Y2XqUfrnw/ifAILI/zg1G9GY9KWbxN/eLqBuNJj7TI6UCpGYgpZzlOnpfq9JZGFqZap4Q10yq9ozo8NW/FKVgKKE5cGCY5+BGx0FfP+cXi9aHGMnTugGY8nn6XGVsgilw9l7IIyjVNrPJMcKkhGQQHOgY4D9Sw/VhTSl3hFml5zFQk5YsA2yXy24noK203XxHZ1nLKX
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(366004)(39860400002)(346002)(376002)(136003)(396003)(66476007)(66556008)(66446008)(64756008)(4326008)(8676002)(66946007)(76116006)(316002)(55016003)(54906003)(110136005)(8936002)(5660300002)(83380400001)(478600001)(71200400001)(9686003)(41300700001)(52536014)(26005)(33656002)(6506007)(7696005)(186003)(122000001)(2906002)(38070700005)(82960400001)(38100700002)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?J/NM/zoZcVEVqYnxB9f2INDBrOBxaJY5e3H8AepTG5C5WDttJKuDilWnCLbl?=
+ =?us-ascii?Q?ast5f0dFu5yLoCAqB1gzd6wikqn9THZFuwSFKHnXDvKBJSaeBpDdSvcFH5RT?=
+ =?us-ascii?Q?8VKU/Lo3HzfW5tR4n14myP8/C/NhebMzXyRbWIQ3hWXqOCcM2YdUYHXbbF9I?=
+ =?us-ascii?Q?V1g1Z7f2NkH4bEZ5D2naKjdeKuGhcFyskcMUjaHJuuKctw756U9OvMEV7AVJ?=
+ =?us-ascii?Q?KrH27qtFS4xwIXecsrV2UrjbjZt+z6WXqg6lTSsUVS0/85EGpweQBYPbqOnP?=
+ =?us-ascii?Q?tiP4iZU9feaQ0bjBaGHKObHeQ+WR6NvLOJLuLY+zBmKMllIawxNlQ7+xDoZy?=
+ =?us-ascii?Q?t6aKezPtW3MsPfXnQ1nsoxfgn1hWfGYKUwkG7qivbcmwtOMvZdTYAP7gaQQW?=
+ =?us-ascii?Q?5nyIs/LTn8hNMqr31nMKtpDFBtK+D+XJCGV7Jp/Ml1YQ8HZgLCnRqFz9YDeJ?=
+ =?us-ascii?Q?AQkdkPk5lJM+0BuQiqZMwomcrDrLqMEHHW9BoH3Crq1W1MQ8uoNmoAc2GVHi?=
+ =?us-ascii?Q?EB7nEpTraGtYFUnMsqErkTQVghvDUpOCsm4f8OCYY1vGyUUnwE1Db9KU2VD+?=
+ =?us-ascii?Q?+1Ofy/3gWR2z/yGaTnum4dS0Png0I9AyvPjvaOAhuiddxtyNh+3+vp+SAD4q?=
+ =?us-ascii?Q?BsEDxaoAVZAZZCiUkE3+c4NpP3xZAK1h0TP8otNTk4noqA/K0eJ/tecCB8bO?=
+ =?us-ascii?Q?GjxrRIjaMCiXvw6ePQtLyxKzgI0fQOKXZlk/eTZlCJrCg9TLbxcl48V0mSbQ?=
+ =?us-ascii?Q?pIGfFsq21NZm8i7ED6rzle/YuSdVyEFdBb5k9icCBzlEJ/JbwILzJ5+bhjTa?=
+ =?us-ascii?Q?rxtkCMc6N22oiQJr7h2hELDsSKRR42878HH+oi4ctlazUl5y1PAqFAQ3t48k?=
+ =?us-ascii?Q?PTxqrQQxc+7qAAQZ2BSXHQd1zGxr4NGI1OoI2V7fHgvazfYmh2WtA55Q4LJz?=
+ =?us-ascii?Q?uQ4uFK95TvpDMl0n2AyEFXT49Rqf4ekrLpUfY8nj80uzzqAEHv6tK0eTczQT?=
+ =?us-ascii?Q?sI0PI0Ve9ZkGY36IbeJDQBXpsvzfr7ufwF03iBUOOgVEcfuPu9m+4oK+EKse?=
+ =?us-ascii?Q?VNaTOfxWnVPhmDdYr2g+c2JHwje7CCFlyVjSqbp79adxekZv2SUJ1/kQZYxi?=
+ =?us-ascii?Q?hX6CBIDPsoccZWN5hqS9eNMvYmP0dSXJsCO3y+6YkamF9Jg2Q6lQlDqZJNrs?=
+ =?us-ascii?Q?osSUYb1r8lThTXWk73/0P/Ik8+CUovQ3gUFrjb3Yq1MZp+wvraeOkd1eWh5v?=
+ =?us-ascii?Q?sfIV65qjO/v9xx0+a8BjD+Smr/NQ61ITTj5rHeKcMbNa/XOVpuy3JVL8BUYt?=
+ =?us-ascii?Q?2AT5PmNV+QQ9uMucvKRxeaiZLrpartdiwDrfagU5JxZ+V6hYPySy4JLXe+ni?=
+ =?us-ascii?Q?woDoFXV6KbH5xdp0Qe1E8ZPAYFIr+LFEch77yHm7VOussqh5AxpuAT2ONWg/?=
+ =?us-ascii?Q?36M7gr3MiXl+CmC6fbthTo6rFR4CGSrhJ+0VkSHQEHvHtxI+xjSRmj8Ka0Bn?=
+ =?us-ascii?Q?bzVrBx2fNo1eI1+UM0+0WJKMj8y4MoGs/mMgmn+yEt4letA23LC/wYB+G41v?=
+ =?us-ascii?Q?ldRF+Cfnf9wWSpK6COMHc5FiQq3AtDE9u+Di2XDL?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <60f5b2f9-7c97-865c-075b-cb690bdcb082@redhat.com>
-References: <20220630113059.229221-1-nrb@linux.ibm.com> <20220630113059.229221-2-nrb@linux.ibm.com> <60f5b2f9-7c97-865c-075b-cb690bdcb082@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v1 1/3] runtime: add support for panic tests
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
-To:     kvm@vger.kernel.org
-Message-ID: <165665896175.83789.13004690806751071854@localhost.localdomain>
-User-Agent: alot/0.8.1
-Date:   Fri, 01 Jul 2022 09:02:41 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: DXsxO6Mkx2GhaUBIGH0w-Hmz1TVOB-oL
-X-Proofpoint-GUID: DXsxO6Mkx2GhaUBIGH0w-Hmz1TVOB-oL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-01_04,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- suspectscore=0 mlxlogscore=999 mlxscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 spamscore=0 impostorscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2207010024
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f268cece-246b-4425-f48f-08da5b30d11d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2022 07:10:45.0836
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: q8TyCgva20MY+xLK2QT0qWLX87qz6WOK6xYJFDw7bjUkhm2cmhfr5LsA2DOkccph21NfzanC30Md8ME7JYAJow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5894
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Thomas Huth (2022-06-30 19:49:45)
-> On 30/06/2022 13.30, Nico Boehr wrote:
-> > QEMU suports a guest state "guest-panicked" which indicates something in
+> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Sent: Friday, July 1, 2022 2:18 PM
 >=20
-> s/suports/supports/
-
-Fixed.
-
-> > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> > index 0dfaf017db0a..5663a1ddb09e 100644
-> > --- a/scripts/arch-run.bash
-> > +++ b/scripts/arch-run.bash
-> > @@ -104,6 +104,12 @@ qmp ()
-> >       echo '{ "execute": "qmp_capabilities" }{ "execute":' "$2" '}' | n=
-cat -U $1
-> >   }
-> >  =20
-> > +qmp_events ()
-> > +{
-> > +     while ! test -S "$1"; do sleep 0.1; done
-> > +     echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' | n=
-cat --no-shutdown -U $1 | jq -c 'select(has("event"))'
+> VFIO on POWER does not implement iommu_ops and therefore
+> iommu_capable()
+> always returns false and __iommu_group_alloc_blocking_domain() always
+> fails.
 >=20
-> Break the long line into two or three?
-
-Fixed.
-
-> > +run_panic ()
-> > +{
-[...]
-> > +     panic_event_count=3D$(qmp_events ${qmp} | jq -c 'select(.event =
-=3D=3D "GUEST_PANICKED")' | wc -l)
-> > +     if [ $panic_event_count -lt 1 ]; then
+> iommu_group_claim_dma_owner() in setting container fails for the same
+> reason - it cannot allocate a domain.
 >=20
-> Maybe put double-quotes around $panic_event_count , just to be sure?
-
-Yes, quoting is a bit broken anyways, but we have to start somewhere, thank=
-s.
-
-> With the nits fixed:
+> This skips the check for platforms supporting VFIO without implementing
+> iommu_ops which to my best knowledge is POWER only.
 >=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> This also allows setting container in absence of iommu_ops.
+>=20
+> Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
+> Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache
+> coherence")
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>=20
+> Not quite sure what the proper small fix is and implementing iommu_ops
+> on POWER is not going to happen any time soon or ever :-/
 
-Thanks.
+I'm not sure how others feel about checking bus->iommu_ops outside
+of iommu subsystem. This sounds a bit non-modular to me and it's not
+obvious from the caller side why lacking of iommu_ops implies the two
+relevant APIs are not usable.
+
+Simply returning success when bus->iommu_ops=3D=3DNULL in the two
+APIs is also problematic in concept.
+
+Probably what we really require is an indicator to the caller that the
+related operations are irrelevant hence can be skipped when=20
+called on a particular iommu driver. This reminds me whether
+ -EMEDIUMTYPE can be leveraged here.=20
+
+Nicolin introduced it in another series for detecting incompatible
+domain attach. This errno is not currently used in iommu subsystem
+and introduced as a benign error so the caller can check it to retry
+another domain.
+
+Similarly we may return -EMEDIUMTYPE when iommu_ops is NULL in
+iommu_capable() and iommu_group_claim_dma_owner() then vfio
+can safely move forward when this error is returned.
+
+Thanks
+Kevin
