@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30CC656375D
-	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:06:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F2B5563770
+	for <lists+kvm@lfdr.de>; Fri,  1 Jul 2022 18:11:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229476AbiGAQGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Jul 2022 12:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57496 "EHLO
+        id S230334AbiGAQL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Jul 2022 12:11:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiGAQGC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Jul 2022 12:06:02 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450D722BE6
-        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 09:06:02 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id l9-20020a056830268900b006054381dd35so2173018otu.4
-        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 09:06:02 -0700 (PDT)
+        with ESMTP id S230081AbiGAQLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Jul 2022 12:11:25 -0400
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094982253C
+        for <kvm@vger.kernel.org>; Fri,  1 Jul 2022 09:11:23 -0700 (PDT)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1048b8a38bbso4069606fac.12
+        for <kvm@vger.kernel.org>; Fri, 01 Jul 2022 09:11:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=tA1We13n/kM82sx0YkjNZewIMefOanocSsCM/govz+0=;
-        b=HVBgkL2ltgMWKb+Ud9xDGdc/ePbGYT9TfJqKmZF2NnExOSDq9GD90EH0Ovmb7srZmJ
-         ZpjLCVbLKK5qzBb0g2ihopTVCOZ+UsKiv8/PpIYNlynL41GScN9X1T/b9f0quwMCr1gr
-         8u2pkT5+RDwXkqmGw4Em1grpppr/gQom1iZeBLc+muWCkh+upOL+ENLK2Q1z989Eixei
-         BMn2SzHw6wqiVVSUbCYc5y/OG7CqvEptn8V9h0Ffe94UU3c8p6brvEuUpRrMod/7FtSP
-         a/0WBXDjTMa/C9aBSPjfR6tm3r79QGTYc7SOmtr8gCbqD0rh+gYGujKTWCkBU6dhrYXn
-         pUww==
+        bh=th/OZKsYSESx9TWxFTTi5dH44gpyPseNGCExyUZ8aDM=;
+        b=LoOMWKLvTVcyZJc4X3JvlhF56XLwUnl+kOwd70ngWyYFDVoG1vb/R/9xqh+b5DwIxg
+         u2uu0Ql+QCP39i1zC42qNL7t9oOGap2JtxyT6Df7YtDQDOGtivSQk10ndMFfFOWdCpBa
+         X+hepZEAI6YvlOVNCpAougBgpeb1XnbCWcgaEINrajBiv1CVpmK76D5Hcvh7Zo4xv53I
+         ky91MfSV2ugj3kPLCTC87wHfQfw2haNcLr53bKZgOrwmFHUEgrfCXSl05fCQAwkx4V3l
+         XFuLuNxSeMB80/QVdFqE27kkL3g+VXHJ31XQlfHs3pCF2xkRFfFNGw2KeYyxAkZHwcuV
+         xKYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=tA1We13n/kM82sx0YkjNZewIMefOanocSsCM/govz+0=;
-        b=C6/9q7C/9d+ZXXtmxcjHxPAPjhuMeNDnmjAasSaq2V9wImu5F1Cf/tBq7IXQ/pSzXx
-         rYnTURdG55a0xl8lW39RD2OzJCrS9m2Rnv4eqwT0A18DqE0BWJpk7eHJCBXCKX7yBXHg
-         r67eEMpkp0xlY1A4SRRvTf+ND33djTgzMtcQ3MqXjH7kbcUoSfnia8NDijWT2PEX3vwv
-         RALkwqizzjJJbCRp3ZJLMIfx6u7Iv8I8iuWvxQMyBV3iZVf6Z2FkFsxCs6cs1VzTPLwK
-         +Fi6xxeqscbK64qxAH0XaW6OvpOkNmdN6Z4XNISDZ/wKOWbq1ncgcXCK26+ZNTQSFM/s
-         JP0Q==
-X-Gm-Message-State: AJIora8uPX/PkzlkNTrd9cwb9qCw7tKG+DDQJWGPxciAFLT139eORPXC
-        BhEa98HHzU+jiUOsB2j7s6kLTs9pDAZw6/z/ITToxg==
-X-Google-Smtp-Source: AGRyM1vO9dokoKBnHxwFww77KA9btH7PjekLij6H512iD8tpl8+XaDfN/gT0wirOwEoKkiShKCKK4bdDBXGs2nNmuAk=
-X-Received: by 2002:a05:6830:1d5b:b0:616:de98:2556 with SMTP id
- p27-20020a0568301d5b00b00616de982556mr7173527oth.367.1656691561453; Fri, 01
- Jul 2022 09:06:01 -0700 (PDT)
+        bh=th/OZKsYSESx9TWxFTTi5dH44gpyPseNGCExyUZ8aDM=;
+        b=22EyMlODwHiZMURhtTYXrPx7clnmpK4XC7wkZJwfXwAsBIBnJBT+XSecbrkJHu76UJ
+         mZCyOmNccdqCcJ1oJ6c1qDToPg+biUH/g09hQQ9JI4I2rw8ueg1IIVGiEGqril4ckSdK
+         lNEm6CrezI0detUk66FAL/kDWtuoSo7LlAYC8TNOrsKAJ3fkbVhDZw/YE5LPYOwYAwMD
+         +CBnRytKnbdTu7nYz3FUJ3qcWH2ym3aCkma+aV/MVsypbEfZcJ+rumn5O0l39C4np2Ck
+         m+X9bzul3+rdc1c+MbIsy4NpwkteZgSRah+iZhzzX9nwhGwV0++qjSgwsizLM5FzPjwG
+         Vo/Q==
+X-Gm-Message-State: AJIora/qvauiJdYJzziCZsjl4tp53/t4ShpghLmuyxqx30D5DFTyt0iC
+        cK5rcqP8MzpfpTaM4ZJyeGv2n3JWtYhCnaFck0jpLg==
+X-Google-Smtp-Source: AGRyM1v1dypOfwQzuDbf/FEZzJjt9K7fM75kBXYp8UrdBkcNPky7TWEsADN9EJewLVvxwLiZlhT+oUa6bkBUcOUErfI=
+X-Received: by 2002:a05:6870:d3c7:b0:104:9120:8555 with SMTP id
+ l7-20020a056870d3c700b0010491208555mr8784189oag.181.1656691882207; Fri, 01
+ Jul 2022 09:11:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-22-vkuznets@redhat.com>
-In-Reply-To: <20220629150625.238286-22-vkuznets@redhat.com>
+References: <20220629150625.238286-1-vkuznets@redhat.com> <20220629150625.238286-23-vkuznets@redhat.com>
+In-Reply-To: <20220629150625.238286-23-vkuznets@redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 1 Jul 2022 09:05:50 -0700
-Message-ID: <CALMp9eRuYt0qjD-xkDZJYyu5zxUMTy5wVARzaGmP5nGtDZmqYg@mail.gmail.com>
-Subject: Re: [PATCH v2 21/28] KVM: VMX: Add missing CPU based VM execution
- controls to vmcs_config
+Date:   Fri, 1 Jul 2022 09:11:11 -0700
+Message-ID: <CALMp9eRA0v6BK6KG81ZE_iLKF6VNXxemN=E4gAE4AM-V4gkdHQ@mail.gmail.com>
+Subject: Re: [PATCH v2 22/28] KVM: VMX: Clear controls obsoleted by EPT at
+ runtime, not setup
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -73,12 +73,16 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Jun 29, 2022 at 8:07 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 >
-> As a preparation to reusing the result of setup_vmcs_config() in
-> nested VMX MSR setup, add the CPU based VM execution controls which KVM
-> doesn't use but supports for nVMX to KVM_OPT_VMX_CPU_BASED_VM_EXEC_CONTROL
-> and filter them out in vmx_exec_control().
+> From: Sean Christopherson <seanjc@google.com>
 >
-> No functional change intended.
+> Clear the CR3 and INVLPG interception controls at runtime based on
+> whether or not EPT is being _used_, as opposed to clearing the bits at
+> setup if EPT is _supported_ in hardware, and then restoring them when EPT
+> is not used.  Not mucking with the base config will allow using the base
+> config as the starting point for emulating the VMX capability MSRs.
 >
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Nit: These controls aren't "obsoleted" by EPT; they're just no longer required.
+
 Reviewed-by: Jim Mattson <jmattson@google.com>
