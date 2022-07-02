@@ -2,99 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAD005660C5
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 03:48:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22CA2563FAF
+	for <lists+kvm@lfdr.de>; Sat,  2 Jul 2022 13:08:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233424AbiGEBsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 21:48:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60262 "EHLO
+        id S232168AbiGBLH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Jul 2022 07:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230265AbiGEBsH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 21:48:07 -0400
-Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91FA0101DB;
-        Mon,  4 Jul 2022 18:48:04 -0700 (PDT)
-Received: from ([60.208.111.195])
-        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id ZYA00152;
-        Tue, 05 Jul 2022 09:47:52 +0800
-Received: from localhost.localdomain (10.200.104.82) by
- jtjnmail201611.home.langchao.com (10.100.2.11) with Microsoft SMTP Server id
- 15.1.2507.9; Tue, 5 Jul 2022 09:47:53 +0800
-From:   Deming Wang <wangdeming@inspur.com>
-To:     <alex.williamson@redhat.com>
-CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Deming Wang <wangdeming@inspur.com>
-Subject: [PATCH] vfio/spapr_tce: Remove the unused parameters container
-Date:   Sat, 2 Jul 2022 02:46:13 -0400
-Message-ID: <20220702064613.5293-1-wangdeming@inspur.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S232083AbiGBLHw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Jul 2022 07:07:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9029615A39;
+        Sat,  2 Jul 2022 04:07:50 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 23BA760DF2;
+        Sat,  2 Jul 2022 11:07:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E09AC341D9;
+        Sat,  2 Jul 2022 11:07:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656760068;
+        bh=GXTCFNGJ/qi6q84KgPXHTPGckjOATtaMykjkvdiZ8ns=;
+        h=From:To:Cc:Subject:Date:From;
+        b=DrrTnbY+g/95s2OoeUYPgsUS7r9KhEaNN9bCC94hZDu/RhdENgPzZoSE1bFGIeu8f
+         A7Y7GS2fdeuCvgSTgrN/C3Xk/UA4AOOR8PKrhHb1bqaCJDPjmbmDyW0ool3TYK7/Hd
+         CxINUJxSqKohLK3IuucJQULpCltifiDOZOyZyfbIOGyhrjN6eL4nHdwjPVWdsBmNQr
+         m10KGXrSflXIA+909EoSQweUfDbpYP0KDii/iawMcZOW08nSgdAA6iekKm5+xmvGOt
+         qZOWRpYYA6Df/o1E/Rs8oS6M9Sd+dj4RU3q++vdjNLnLFq1bzTTJ2BD2bq9KC1xlYu
+         xlTWaJKAO8emw==
+Received: from mchehab by mail.kernel.org with local (Exim 4.95)
+        (envelope-from <mchehab@kernel.org>)
+        id 1o7ayX-007gro-J8;
+        Sat, 02 Jul 2022 12:07:45 +0100
+From:   Mauro Carvalho Chehab <mchehab@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
+        "Theodore Ts'o" <tytso@mit.edu>, Alasdair Kergon <agk@redhat.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Brendan Higgins <brendanhiggins@google.com>,
+        Dipen Patel <dipenp@nvidia.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Takashi Iwai <tiwai@suse.com>,
+        alsa-devel@alsa-project.org, dm-devel@redhat.com,
+        kunit-dev@googlegroups.com, kvm@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-tegra@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH 00/12] Fix several documentation build warnings with Sphinx 2.4.4
+Date:   Sat,  2 Jul 2022 12:07:32 +0100
+Message-Id: <cover.1656759988.git.mchehab@kernel.org>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.200.104.82]
-tUid:   2022705094752f058e025d35fdeb4e1095acbc5a59066
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The parameter of container has been unused for tce_iommu_unuse_page.
-So, we should delete it.
+This series is against next-20220701. It fixes several warnings
+that are currently produced while building html docs.
 
-Signed-off-by: Deming Wang <wangdeming@inspur.com>
----
- drivers/vfio/vfio_iommu_spapr_tce.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Each patch in this series is independent from the others, as
+each one touches a different file.
 
-diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-index 708a95e61831..ea3d17a94e94 100644
---- a/drivers/vfio/vfio_iommu_spapr_tce.c
-+++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-@@ -378,8 +378,7 @@ static void tce_iommu_release(void *iommu_data)
- 	kfree(container);
- }
- 
--static void tce_iommu_unuse_page(struct tce_container *container,
--		unsigned long hpa)
-+static void tce_iommu_unuse_page(unsigned long hpa)
- {
- 	struct page *page;
- 
-@@ -474,7 +473,7 @@ static int tce_iommu_clear(struct tce_container *container,
- 			continue;
- 		}
- 
--		tce_iommu_unuse_page(container, oldhpa);
-+		tce_iommu_unuse_page(oldhpa);
- 	}
- 
- 	iommu_tce_kill(tbl, firstentry, pages);
-@@ -524,7 +523,7 @@ static long tce_iommu_build(struct tce_container *container,
- 		ret = iommu_tce_xchg_no_kill(container->mm, tbl, entry + i,
- 				&hpa, &dirtmp);
- 		if (ret) {
--			tce_iommu_unuse_page(container, hpa);
-+			tce_iommu_unuse_page(hpa);
- 			pr_err("iommu_tce: %s failed ioba=%lx, tce=%lx, ret=%ld\n",
- 					__func__, entry << tbl->it_page_shift,
- 					tce, ret);
-@@ -532,7 +531,7 @@ static long tce_iommu_build(struct tce_container *container,
- 		}
- 
- 		if (dirtmp != DMA_NONE)
--			tce_iommu_unuse_page(container, hpa);
-+			tce_iommu_unuse_page(hpa);
- 
- 		tce += IOMMU_PAGE_SIZE(tbl);
- 	}
+Mauro Carvalho Chehab (12):
+  docs: ext4: blockmap.rst: fix a broken table
+  docs: tegra194-hte.rst: don't include gpiolib.c twice
+  docs: device-mapper: add a blank line at writecache.rst
+  docs: PCI: pci-vntb-function.rst: Properly include ascii artwork
+  docs: PCI: pci-vntb-howto.rst: fix a title markup
+  docs: virt: kvm: fix a title markup at api.rst
+  docs: ABI: sysfs-bus-nvdimm
+  kunit: test.h: fix a kernel-doc markup
+  net: mac80211: fix a kernel-doc markup
+  docs: alsa: alsa-driver-api.rst: remove a kernel-doc file
+  docs: arm: index.rst: add google/chromebook-boot-flow
+  docs: leds: index.rst: add leds-qcom-lpg to it
+
+ Documentation/ABI/testing/sysfs-bus-nvdimm             | 2 ++
+ Documentation/PCI/endpoint/pci-vntb-function.rst       | 2 +-
+ Documentation/PCI/endpoint/pci-vntb-howto.rst          | 2 +-
+ Documentation/admin-guide/device-mapper/writecache.rst | 1 +
+ Documentation/arm/index.rst                            | 2 ++
+ Documentation/driver-api/hte/tegra194-hte.rst          | 3 +--
+ Documentation/filesystems/ext4/blockmap.rst            | 2 +-
+ Documentation/leds/index.rst                           | 1 +
+ Documentation/sound/kernel-api/alsa-driver-api.rst     | 1 -
+ Documentation/virt/kvm/api.rst                         | 6 +++---
+ include/kunit/test.h                                   | 2 +-
+ include/net/mac80211.h                                 | 2 +-
+ 12 files changed, 15 insertions(+), 11 deletions(-)
+
 -- 
-2.27.0
+2.36.1
+
 
