@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E261656497E
+	by mail.lfdr.de (Postfix) with ESMTP id 9A6E356497D
 	for <lists+kvm@lfdr.de>; Sun,  3 Jul 2022 21:16:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232686AbiGCTQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Jul 2022 15:16:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43276 "EHLO
+        id S232711AbiGCTQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Jul 2022 15:16:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232443AbiGCTQs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Jul 2022 15:16:48 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46954617A
-        for <kvm@vger.kernel.org>; Sun,  3 Jul 2022 12:16:48 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id b13-20020a170902e94d00b001692fd82122so3855678pll.14
-        for <kvm@vger.kernel.org>; Sun, 03 Jul 2022 12:16:48 -0700 (PDT)
+        with ESMTP id S229986AbiGCTQv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Jul 2022 15:16:51 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4AD86243
+        for <kvm@vger.kernel.org>; Sun,  3 Jul 2022 12:16:50 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id q132-20020a632a8a000000b00411eb01811fso2340510pgq.3
+        for <kvm@vger.kernel.org>; Sun, 03 Jul 2022 12:16:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=PJho9CZvmlpqVROBIgjr58I6W6rS70wBDTVWcl2x88M=;
-        b=dhfgXlXI+DKmrDGLYwp9oOHhs6iNnxgr/7LrX1Czf60haKVLts/OWxV1q1W0WtjlPx
-         rpq0sZUrRepj8TAHoOI7TJMBUXRFaBpc+aLRh0G7c0FEF7L2/z54a0qiPvmczqkpsE22
-         YzZYdQjx6LXrALy4kxfRBAWBlEBNjt7Se8qaLhmRirl5baAOiGUV8e5huGh/EVdcBt+7
-         tMvK1NkhrXodKPyYa98L+5eA32FkWc1rEf9jha2iTKzcKzVM4Y6+U4zhT6yLSyDR1L3v
-         NNZHDxDTd/ukUKB5ysOItJVfC/wR+axxVDbNWPsI253zvoj9eqgIu5Di1OX/NZqA023m
-         rsfw==
+        bh=vazLTlsYU+mYFnCPz/KZ8cOdjR8SVTeoUYL47/gBt1w=;
+        b=ZodkwlLK0IT7ofzMQt2k4WOZP0X2X2953VKOqvEd0vxi6qdy9w8JbnSHtEkZ+MNLTc
+         3hi56DCsho54HnXeg1DqaO0P0dtKOdkqzA+NOZs8hYb3GxSvVnUhLImYVQAhfj3BOz1b
+         CASv8AFIs4URYXNKLTeYjUMwXaglnE4D7wx1P0cLQm07n9KKcry/EXih0NX7IMqaFaQS
+         /Q6YxGhF/7hceKbsuFxBGg3UqCjokYAJ6yL9WHPmT6xGG0zq/ZI55YQrqrHkjAaMlODk
+         3iAT0TqjpE+wYV7x2rdzYz9+pMHYG6m94ZUP9YEDla8TINCfa23aFJZNuxtjAqFcm8DW
+         EXZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=PJho9CZvmlpqVROBIgjr58I6W6rS70wBDTVWcl2x88M=;
-        b=t1eJaoqDXvohK7laly45LCVrYCx2wAcqlMJ76YQcyfF3tx0eL4U4C/NQIBkrFKY+eO
-         JywgV0a6//ARGksurMt7RMRcPqfGpq4FdieYJ+/Hjnhlgiu9MxMtNg0TscblQpVk8bZE
-         63bsmvKuZuB1vsV87H0ISSJCAcNoGYeyFMNOY8G1DYDBgF6+H1LbOy9xxqHfaJlpEori
-         LcMGCtOi03Oj7MdAzeH6m3u4WZq1+MW9ude0CKEHNkq86wvQeE0FZvTFA363c8wv/CX0
-         pykx2/GOLYGpDpfWcJmVjxMQJvHDGLSrCuJ2BHofS8rhTxeQ1rZgh4ckhXTGw9Fv/prP
-         p3Xw==
-X-Gm-Message-State: AJIora+E0kZrQm9S4frHK/mQZ480kRt5BKg2tsohjAcmK4rhSV5waqx/
-        TX66zIb05iLizCBzbIsdjJnyHDjEcqGTyVE5o3KwiJD8sR189tICuleDK+t/X6Og2Y7jLTdGMzS
-        eLIV4icYywigfRa4AgsU5c5NAusNxzrQfKNGgp6AYaz6CRkokZSK/5sWTmRHjOOYbLxiW
-X-Google-Smtp-Source: AGRyM1thoph7A8CcRJheWKWoPcMNifgQHb9oCTYqRTCuGYJZOOJJ3jyU1vu0tH4vyPCe08oUq2p/S5anDsXmZfxp
+        bh=vazLTlsYU+mYFnCPz/KZ8cOdjR8SVTeoUYL47/gBt1w=;
+        b=FMjR9CMauFEdOyZRSdsRtSnP4/Jk9JzEY8UYNfrO5TXBlBZ+kSHOBtanNT3UVOPneE
+         +OGZmpbWApTuH2lbgTH6TR7UxvBD94MfBGuFn+RnkfoQoqBx7xBBoAhF3SEnTlGutObx
+         LgENrLNatTLJgzMdLx+lnFwj3IhwUsB6hC4bA5HSs1j2VzsmiVI6wPnK10TGWmFzCWs9
+         aokyasfN/f9nj9MJk76Iy7tK0R3rrVKfmKjzv4PEks6AzH3wf4YoSXROG/tQmSAT5JLT
+         Z/PJ7jqh9m2S/iWEX1uy+MHWbzR+kDzSg7thGGrdazKd1xojB6B2WyZHonmJVnPNCMOr
+         52vA==
+X-Gm-Message-State: AJIora9J4zIZU2BbsmuneXA5rh5N/Ii8fsHpQxVNDWdGVTBW310kCAx7
+        9rjiixVJ7wqlm+0iQ9xwSsKCaLzkVoZbFVy1abkBVu1LVjhZE7MSOKJKE+bC4/AnF2g07If5W7r
+        Xmr7oT874yw8KT6If/lYBacu4+vTDxhzrL2DfiU3p9qfgXEgAuRc+vIra6ix0dVPdG6w+
+X-Google-Smtp-Source: AGRyM1t2rgmG3fiYGGTFv0Zq47qwynn/K+X9urm5CuzTRvM9+BSrxYU2+zV3eNyA1ZpGq4br8lE/+UtavXMsx7F8
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a05:6a00:3027:b0:528:195f:11e2 with
- SMTP id ay39-20020a056a00302700b00528195f11e2mr18833258pfb.24.1656875807741;
- Sun, 03 Jul 2022 12:16:47 -0700 (PDT)
-Date:   Sun,  3 Jul 2022 19:16:35 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a17:902:cec4:b0:16a:16d6:f67f with SMTP
+ id d4-20020a170902cec400b0016a16d6f67fmr30334899plg.139.1656875810234; Sun,
+ 03 Jul 2022 12:16:50 -0700 (PDT)
+Date:   Sun,  3 Jul 2022 19:16:36 +0000
 In-Reply-To: <20220703191636.2159067-1-aaronlewis@google.com>
-Message-Id: <20220703191636.2159067-3-aaronlewis@google.com>
+Message-Id: <20220703191636.2159067-4-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20220703191636.2159067-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
-Subject: [PATCH 2/3] KVM: x86: update documentation for MSR filtering
+Subject: [PATCH 3/3] KVM: x86: Don't deflect MSRs to userspace that can't be filtered
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -68,51 +68,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the documentation to ensure best practices are used by VMM
-developers when using KVM_X86_SET_MSR_FILTER and
-KVM_CAP_X86_USER_SPACE_MSR.
+If an MSR is not permitted to be filtered and deflected to userspace,
+don't then allow it to be deflected to userspace by other means.  If an
+MSR that cannot be filtered #GP's, and KVM is configured to send all
+MSRs that #GP to userspace, that MSR will be sent to userspace as well.
+Prevent that from happening by filtering out disallowed MSRs from being
+deflected to userspace.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- Documentation/virt/kvm/api.rst | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/x86/kvm/x86.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 5c651a4e4e2c..bd7d081e960f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4178,7 +4178,14 @@ KVM does guarantee that vCPUs will see either the previous filter or the new
- filter, e.g. MSRs with identical settings in both the old and new filter will
- have deterministic behavior.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 031678eff28e..a84741f7d254 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1712,6 +1712,15 @@ void kvm_enable_efer_bits(u64 mask)
+ }
+ EXPORT_SYMBOL_GPL(kvm_enable_efer_bits);
  
-+When using filtering for the purpose of deflecting MSR accesses to userspace,
-+exiting[1] **must** be enabled for the lifetime of filtering.  That is to say,
-+exiting needs to be enabled before filtering is enabled, and exiting needs to
-+remain enabled until after filtering has been disabled.  Doing so avoids the
-+case where when an MSR access is filtered, instead of deflecting it to
-+userspace as intended a #GP is injected in the guest.
- 
-+[1] KVM_CAP_X86_USER_SPACE_MSR set with exit reason KVM_MSR_EXIT_REASON_FILTER.
- 
- 4.98 KVM_CREATE_SPAPR_TCE_64
- ----------------------------
-@@ -7191,6 +7198,16 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
- can then handle to implement model specific MSR handling and/or user notifications
- to inform a user that an MSR was not handled.
- 
-+When using filtering[1] for the purpose of deflecting MSR accesses to
-+userspace, exiting[2] **must** be enabled for the lifetime of filtering.  That
-+is to say, exiting needs to be enabled before filtering is enabled, and exiting
-+needs to remain enabled until after filtering has been disabled.  Doing so
-+avoids the case where when an MSR access is filtered, instead of deflecting it
-+to userspace as intended a #GP is injected in the guest.
++bool kvm_msr_filtering_disallowed(u32 index)
++{
++	/* x2APIC MSRs do not support filtering. */
++	if (index >= 0x800 && index <= 0x8ff)
++		return true;
 +
-+[1] Using KVM_X86_SET_MSR_FILTER
-+[2] KVM_CAP_X86_USER_SPACE_MSR set with exit reason KVM_MSR_EXIT_REASON_FILTER.
++	return false;
++}
 +
- 7.22 KVM_CAP_X86_BUS_LOCK_EXIT
- -------------------------------
+ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
+ {
+ 	struct kvm_x86_msr_filter *msr_filter;
+@@ -1721,8 +1730,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
+ 	int idx;
+ 	u32 i;
  
+-	/* x2APIC MSRs do not support filtering. */
+-	if (index >= 0x800 && index <= 0x8ff)
++	/* Prevent certain MSRs from using MSR Filtering. */
++	if (kvm_msr_filtering_disallowed(index))
+ 		return true;
+ 
+ 	idx = srcu_read_lock(&kvm->srcu);
+@@ -1962,6 +1971,9 @@ static int kvm_msr_user_space(struct kvm_vcpu *vcpu, u32 index,
+ 	if (!(vcpu->kvm->arch.user_space_msr_mask & msr_reason))
+ 		return 0;
+ 
++	if (kvm_msr_filtering_disallowed(index))
++		return 0;
++
+ 	vcpu->run->exit_reason = exit_reason;
+ 	vcpu->run->msr.error = 0;
+ 	memset(vcpu->run->msr.pad, 0, sizeof(vcpu->run->msr.pad));
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
