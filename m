@@ -2,148 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 463A4564377
-	for <lists+kvm@lfdr.de>; Sun,  3 Jul 2022 02:26:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 771695643B1
+	for <lists+kvm@lfdr.de>; Sun,  3 Jul 2022 05:26:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbiGCA0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Jul 2022 20:26:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60480 "EHLO
+        id S230388AbiGCD0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Jul 2022 23:26:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbiGCA0K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Jul 2022 20:26:10 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA65BC27
-        for <kvm@vger.kernel.org>; Sat,  2 Jul 2022 17:26:08 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id b125so4419579qkg.11
-        for <kvm@vger.kernel.org>; Sat, 02 Jul 2022 17:26:08 -0700 (PDT)
+        with ESMTP id S229486AbiGCD02 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Jul 2022 23:26:28 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF1B9FC3;
+        Sat,  2 Jul 2022 20:26:22 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id fz10so139247pjb.2;
+        Sat, 02 Jul 2022 20:26:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
+        d=gmail.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=K3vSxbxl3lm2+DTao4eU6rwROl43oXRaDxo+o6ITx1U=;
-        b=OeeUBKcg8jeqn1sISLjJiWuqgB43jbX0+5RsRX6f8fhvJUU49quxS2dEjkzDxMa1Vh
-         SwUu20VQ0Nzi0l+hlSg73oxntjyJUXOwHFfmSmStgACNHaoiyk2lolkLujD3FazQJ+DJ
-         IWQmjiYhGKqRzC2iQZjQ01Ro8rcWbMS6jqeoK7djzxPxwhj39o2TOPmE3+1GQI/PkZF5
-         /ucoz5p0VWbS0TB4vsBYszc7SUlQuIkJ6y0R2cmZYFBCMy6fYM2UvI/vp6AKv4MJpqbb
-         3yFwimVGqRFMwJumke+OrXYKLm9uOWv4oOG8sG/YsqKznALfVIiPRtAfnefcI9O0XkzT
-         FiMg==
+        bh=/LE3/OvnxwC10hHaqp2JoOJSN7rfZOpUu2WCyCiyCz4=;
+        b=Augt3VIV/iWcoU+DHx6Yl7vroOm9Hwz+XtZe2jvyXkhsx95p/JLAo0xcEd6ix1ZIVf
+         qIfg68MUyw+xLjl2gBsPYsbv6l3jY94RzOJD92gb6rxdLTyy5Av/dXPYvA/EXIhLOtLz
+         svOqPB75mbgpDTnbuNTXc8rdS2DrehpRBgIiYcfLEACt56jQqPD4OYEXOr+iSon97xBH
+         KYxD4XfgTiHC/xmDNEPOFfPpT2EHhts4G6H0Pm0fJr3aoQ7VOuwkBeKtFwd1B4K1k9D/
+         GdNdQLrWNIKMTC9YgyvhuIjL+GirhGz9Rbn2DEPjhAWabLVNFd+wt0MxRzds1x2rF4/L
+         8aeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=K3vSxbxl3lm2+DTao4eU6rwROl43oXRaDxo+o6ITx1U=;
-        b=DgKmF2dfwkYCbxQGsMlxGKridMWdkOdyJ+pHHEw81xJSYc7m13lLxod0Qae8tQhtUy
-         qzGMzivgP3/12kyNl9/GSgS80JxuOWt7s/6OA6H5MI/9zKWsyR1lbRhLz/QyPqPNbNlb
-         InlV74oRmBgBpJxJnSCbZ/lQLICHsCU2nanlXnHp/CQ1O0eXnZz9tZYBMR+ITzGqAHE/
-         5tEB1Q8hXZ+3OW3XZRGOXvyYcr/Uv/oj7+FRtum+14hKG5QJUK8k8ins3HsmKFg/VVqT
-         tUdDRMb+MvEW7tQnMousDO7qyjkUVzEFY94ORTs2nRl6AxAW3nimyq6lxNJrX9aFQG/g
-         FNmg==
-X-Gm-Message-State: AJIora+iXx2FwfJsjStsrI5vvVrGcopAupk4O2WP6FHy3XyYtsLvsG8f
-        TG8frntJRt4ePGrGqTGA3bJS8Q==
-X-Google-Smtp-Source: AGRyM1vCYzpxXTzOTcbe6JdZdBfIXU6kQ6zz5pdmBpvlmSQjX56oBU9gDbhPHokw+gxGPxLUoDYLAw==
-X-Received: by 2002:a05:620a:2456:b0:6af:31c6:c1af with SMTP id h22-20020a05620a245600b006af31c6c1afmr15370196qkn.25.1656807967980;
-        Sat, 02 Jul 2022 17:26:07 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id i14-20020a05620a248e00b006a6b374d8bbsm25052949qkn.69.2022.07.02.17.26.07
+        bh=/LE3/OvnxwC10hHaqp2JoOJSN7rfZOpUu2WCyCiyCz4=;
+        b=hSqHn4/XX/P/1YE7EvPtr7Y+Gdsa1DIREWmnADK9NoQy99dUPWRtADeOmp8jV5NVib
+         WBnRteh9EbmYjsDyBRgK8MiOR/LL3MxloBDohF3ox6rX4Ywo29ftvJkN0cTn84sWVVP4
+         evQ/7KuPFaoOm6FTu1uGu6I4xfvA0YhJzAftMKvnnOMhvyMr+B+rSXsMCAuMHgDTUq0a
+         D60ZfydIqmFzEmlgQ99aOyFFJ66m35ObaZ2GcAZoDMLIiTzcRoL06Qy/4yrpQ0pkevKi
+         OrInWrB1W2JRoNrczCaKDgYwbnqHFMS7bK1d1RvhMkjJURkI2ulbJ1mbG3IgRfR4mwHX
+         tBtA==
+X-Gm-Message-State: AJIora9XIOW8cd/kwEIuBr8xZHO3SqObbMGFfCEDNVp09OqOPg7BXXUf
+        ScwRSq1f3RsApXnEAA2R9+hy4tQUFJpMcg==
+X-Google-Smtp-Source: AGRyM1v/qGK0NX2/G7uiSvuhmywhBxQ+rRzGPCB7tQOWN8p4Gfx3qW4Qvkfllc0ImMReMYjkXPk5jA==
+X-Received: by 2002:a17:903:2c6:b0:16a:276a:ad81 with SMTP id s6-20020a17090302c600b0016a276aad81mr29074812plk.65.1656818782428;
+        Sat, 02 Jul 2022 20:26:22 -0700 (PDT)
+Received: from debian.me (subs32-116-206-28-33.three.co.id. [116.206.28.33])
+        by smtp.gmail.com with ESMTPSA id u17-20020a170902e81100b0016a0db8c5b4sm1866809plg.156.2022.07.02.20.26.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Jul 2022 17:26:07 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1o7nR8-005DKm-Nt; Sat, 02 Jul 2022 21:26:06 -0300
-Date:   Sat, 2 Jul 2022 21:26:06 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     kvm@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm-ppc@vger.kernel.org
-Subject: Re: [RFC PATCH kernel] vfio: Skip checking for
- IOMMU_CAP_CACHE_COHERENCY on POWER and more
-Message-ID: <20220703002606.GZ23621@ziepe.ca>
-References: <20220701061751.1955857-1-aik@ozlabs.ru>
+        Sat, 02 Jul 2022 20:26:21 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id EA78810390C; Sun,  3 Jul 2022 10:26:16 +0700 (WIB)
+Date:   Sun, 3 Jul 2022 10:26:16 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Alasdair Kergon <agk@redhat.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Brendan Higgins <brendanhiggins@google.com>,
+        Dipen Patel <dipenp@nvidia.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Takashi Iwai <tiwai@suse.com>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        alsa-devel@alsa-project.org, dm-devel@redhat.com,
+        kunit-dev@googlegroups.com, kvm@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-tegra@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 00/12] Fix several documentation build warnings with
+ Sphinx 2.4.4
+Message-ID: <YsEMWDYCdjxiUZ1P@debian.me>
+References: <cover.1656759988.git.mchehab@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220701061751.1955857-1-aik@ozlabs.ru>
+In-Reply-To: <cover.1656759988.git.mchehab@kernel.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 01, 2022 at 04:17:51PM +1000, Alexey Kardashevskiy wrote:
-> VFIO on POWER does not implement iommu_ops and therefore iommu_capable()
-> always returns false and __iommu_group_alloc_blocking_domain() always
-> fails.
+On Sat, Jul 02, 2022 at 12:07:32PM +0100, Mauro Carvalho Chehab wrote:
+> This series is against next-20220701. It fixes several warnings
+> that are currently produced while building html docs.
 > 
-> iommu_group_claim_dma_owner() in setting container fails for the same
-> reason - it cannot allocate a domain.
+> Each patch in this series is independent from the others, as
+> each one touches a different file.
 > 
-> This skips the check for platforms supporting VFIO without implementing
-> iommu_ops which to my best knowledge is POWER only.
+> Mauro Carvalho Chehab (12):
+>   docs: ext4: blockmap.rst: fix a broken table
+>   docs: tegra194-hte.rst: don't include gpiolib.c twice
+>   docs: device-mapper: add a blank line at writecache.rst
+>   docs: PCI: pci-vntb-function.rst: Properly include ascii artwork
+>   docs: PCI: pci-vntb-howto.rst: fix a title markup
+>   docs: virt: kvm: fix a title markup at api.rst
+>   docs: ABI: sysfs-bus-nvdimm
+>   kunit: test.h: fix a kernel-doc markup
+>   net: mac80211: fix a kernel-doc markup
+>   docs: alsa: alsa-driver-api.rst: remove a kernel-doc file
+>   docs: arm: index.rst: add google/chromebook-boot-flow
+>   docs: leds: index.rst: add leds-qcom-lpg to it
 > 
-> This also allows setting container in absence of iommu_ops.
-> 
-> Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
-> Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache coherence")
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> Not quite sure what the proper small fix is and implementing iommu_ops
-> on POWER is not going to happen any time soon or ever :-/
-> 
-> ---
->  drivers/vfio/vfio.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 61e71c1154be..71408ab26cd0 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -605,7 +605,8 @@ int vfio_register_group_dev(struct vfio_device *device)
->  	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
->  	 * restore cache coherency.
->  	 */
-> -	if (!iommu_capable(device->dev->bus, IOMMU_CAP_CACHE_COHERENCY))
-> +	if (device->dev->bus->iommu_ops &&
-> +	    !iommu_capable(device->dev->bus, IOMMU_CAP_CACHE_COHERENCY))
->  		return -EINVAL;
 
-This change should be guarded by some
-IS_ENABLED(CONFIG_VFIO_IOMMU_SPAPR_TCE)
+Hi Mauro,
 
-We want to do the this check here on every other
-configuration. Rejecting null iommu_ops is actually a desired side
-effect.
+Thanks for cleaning up these warning above. However, I have already
+submitted some of these cleanups (pending reviews or integration):
 
->  	return __vfio_register_dev(device,
-> @@ -934,7 +935,7 @@ static void __vfio_group_unset_container(struct vfio_group *group)
->  		driver->ops->detach_group(container->iommu_data,
->  					  group->iommu_group);
->  
-> -	if (group->type == VFIO_IOMMU)
-> +	if (group->type == VFIO_IOMMU && iommu_group_dma_owner_claimed(group->iommu_group))
->  		iommu_group_release_dma_owner(group->iommu_group);
->  
->  	group->container = NULL;
-> @@ -1010,9 +1011,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
->  	}
->  
->  	if (group->type == VFIO_IOMMU) {
-> -		ret = iommu_group_claim_dma_owner(group->iommu_group, f.file);
-> -		if (ret)
-> -			goto unlock_out;
-> +		if (iommu_group_claim_dma_owner(group->iommu_group, f.file))
-> +			pr_warn("Failed to claim DMA owner");
+[1]: https://lore.kernel.org/linux-doc/20220702042350.23187-1-bagasdotme@gmail.com/
+[2]: https://lore.kernel.org/linux-doc/20220612000125.9777-1-bagasdotme@gmail.com/
+[3]: https://lore.kernel.org/linux-doc/20220627095151.19339-1-bagasdotme@gmail.com/
+[4]: https://lore.kernel.org/linux-doc/20220627082928.11239-1-bagasdotme@gmail.com/
 
-We certainly cannot ignore this. As my other email you should make
-this succeed inside the iommu subsystem even though the ops are null.
+There's still a warning left:
 
-Thanks,
-Jason
+Documentation/ABI/testing/sysfs-bus-iio-sx9324:2: WARNING: Unexpected indentation.
+
+But I think the Date: field that triggered the warning above looks OK.
+
+Regardless of that, the build successed.
+
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+-- 
+An old man doll... just what I always wanted! - Clara
