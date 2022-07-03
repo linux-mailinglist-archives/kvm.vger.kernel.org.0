@@ -2,87 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66B6C5682C1
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 11:10:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42DC556483A
+	for <lists+kvm@lfdr.de>; Sun,  3 Jul 2022 17:00:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230523AbiGFJEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 05:04:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43148 "EHLO
+        id S231226AbiGCPAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Jul 2022 11:00:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230115AbiGFJEE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 05:04:04 -0400
-Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD6FE24;
-        Wed,  6 Jul 2022 02:04:02 -0700 (PDT)
-Received: from ([60.208.111.195])
-        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id BIK00057;
-        Wed, 06 Jul 2022 17:03:57 +0800
-Received: from localhost.localdomain (10.200.104.82) by
- jtjnmail201611.home.langchao.com (10.100.2.11) with Microsoft SMTP Server id
- 15.1.2507.9; Wed, 6 Jul 2022 17:03:58 +0800
-From:   Deming Wang <wangdeming@inspur.com>
-To:     <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-        <x86@kernel.org>
-CC:     <hpa@zytor.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Deming Wang <wangdeming@inspur.com>
-Subject: [PATCH] KVM: LAPIC: Separate the variable declaration and code logic
-Date:   Sun, 3 Jul 2022 00:54:10 -0400
-Message-ID: <20220703045410.9159-1-wangdeming@inspur.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S229550AbiGCPAI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Jul 2022 11:00:08 -0400
+X-Greylist: delayed 911 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 03 Jul 2022 08:00:06 PDT
+Received: from sender-of-o53.zoho.in (sender-of-o53.zoho.in [103.117.158.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1069B635D
+        for <kvm@vger.kernel.org>; Sun,  3 Jul 2022 08:00:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1656859448; cv=none; 
+        d=zohomail.in; s=zohoarc; 
+        b=JsgKEhVJt7J2/9hSIaZwMOKftZZnsqUY+93KNqLXjhfzypZVNlDbXqnCT3VhsvBvpd1e4UdY2Dnak+7XLNzYeQjsYgeiw6BJ5mq5Ws22S1xXe+elsazBoPUC5nBKFIGC+1cazZPnjbopw593wt5jpjhyptFgC/ET7H7m6Ws3z3g=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+        t=1656859448; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=Edog80gYaGd/Lw8yk6Ccfabu2w+M4QAbtCIhsIad0kY=; 
+        b=HXGjvayjMoBfa3W1tXjkupNAghKoZm32vpmAUVjCiIBXzdnAbQbac/IC+goKuehXOf0I04vNoS94jvfPBFPfPp3ENTYysIDmzcCOIw21QDVddlXzfyNfBJl+52deanRb5mx5pcQ9XqXuvrSTU4Teee2Rd87UMVzqGkU/TFuv6lo=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+        dkim=pass  header.i=siddh.me;
+        spf=pass  smtp.mailfrom=code@siddh.me;
+        dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1656859448;
+        s=zmail; d=siddh.me; i=code@siddh.me;
+        h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+        bh=Edog80gYaGd/Lw8yk6Ccfabu2w+M4QAbtCIhsIad0kY=;
+        b=ZZe8E8CDeVBX4MSJmFO+SevdvjZywKwzqIFMsDIUdPTqkF1CcXJ7cILYxEOlznZh
+        aMAmM6TsN8rE+QMx7C5ZhdSFgPOiNvs4Cl3mxeRma+6CZCIkfBfdJ8S7ZW5yWzbXCVE
+        1iCBZfgFIPwWUbFws3x6hq/IBlkTc80l+p8DJn5s=
+Received: from mail.zoho.in by mx.zoho.in
+        with SMTP id 1656859437645771.6899342493789; Sun, 3 Jul 2022 20:13:57 +0530 (IST)
+Date:   Sun, 03 Jul 2022 20:13:57 +0530
+From:   Siddh Raman Pant <code@siddh.me>
+To:     "Jue Wang" <juew@google.com>
+Cc:     "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        "Xiaoyao Li" <xiaoyao.li@intel.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        "David Matlack" <dmatlack@google.com>,
+        "Tony Luck" <tony.luck@intel.com>, "kvm" <kvm@vger.kernel.org>,
+        "Jiaqi Yan" <jiaqiyan@google.com>,
+        "linux-kernel" <linux-kernel@vger.kernel.org>
+Message-ID: <181c484aa33.6db8a9c7835812.4939150843849434525@siddh.me>
+In-Reply-To: <20220701165045.4074471-2-juew@google.com>
+References: <20220701165045.4074471-1-juew@google.com> <20220701165045.4074471-2-juew@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Fix access to vcpu->arch.apic when the
+ irqchip is not in kernel
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.200.104.82]
-tUid:   2022706170357e98e00458c131b46b68ac306b16c623e
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_RED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The function apic_has_interrupt_for_ppr and the function
-kvm_apic_is_broadcast_dest should follow the same style as other codes.
+On Fri, 01 Jul 2022 22:20:45 +0530  Jue Wang <juew@google.com> wrote
+> Fix an access to vcpu->arch.apic when KVM_X86_SETUP_MCE is called
+> without KVM_CREATE_IRQCHIP called or KVM_CAP_SPLIT_IRQCHIP is
+> enabled.
+> 
+> Fixes: 4b903561ec49 ("KVM: x86: Add Corrected Machine Check Interrupt (CMCI) emulation to lapic.")
+> Signed-off-by: Jue Wang <juew@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4322a1365f74..d81020dd0fea 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4820,8 +4820,9 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+>          if (mcg_cap & MCG_CMCI_P)
+>              vcpu->arch.mci_ctl2_banks[bank] = 0;
+>      }
+> -    vcpu->arch.apic->nr_lvt_entries =
+> -        KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
+> +    if (vcpu->arch.apic)
+> +        vcpu->arch.apic->nr_lvt_entries =
+> +            KVM_APIC_MAX_NR_LVT_ENTRIES - !(mcg_cap & MCG_CMCI_P);
+>  
+>      static_call(kvm_x86_setup_mce)(vcpu);
+>  out:
+> -- 
+> 2.37.0.rc0.161.g10f37bed90-goog
+> 
+>
 
-Signed-off-by: Deming Wang <wangdeming@inspur.com>
----
- arch/x86/kvm/lapic.c | 3 +++
- 1 file changed, 3 insertions(+)
+Hello Jue,
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index f03facc2ee3e..d8940486878d 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -739,12 +739,14 @@ static bool pv_eoi_test_and_clr_pending(struct kvm_vcpu *vcpu)
- static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
- {
- 	int highest_irr;
-+
- 	if (kvm_x86_ops.sync_pir_to_irr)
- 		highest_irr = static_call(kvm_x86_sync_pir_to_irr)(apic->vcpu);
- 	else
- 		highest_irr = apic_find_highest_irr(apic);
- 	if (highest_irr == -1 || (highest_irr & 0xF0) <= ppr)
- 		return -1;
-+
- 	return highest_irr;
- }
- 
-@@ -932,6 +934,7 @@ static bool kvm_apic_is_broadcast_dest(struct kvm *kvm, struct kvm_lapic **src,
- 			return true;
- 	} else {
- 		bool x2apic_ipi = src && *src && apic_x2apic_mode(*src);
-+
- 		if (irq->dest_id == (x2apic_ipi ?
- 		                     X2APIC_BROADCAST : APIC_BROADCAST))
- 			return true;
--- 
-2.27.0
+There is a syzkaller bug regarding null ptr dereference which is caused by
+vcpu->arch.apic being NULL, first reported on 27th June. You might want to
+add it's reported-by line so that it can be marked as fixed.
 
+Link: https://syzkaller.appspot.com/bug?id=10b9b238e087a6c9bef2cc48bee2375f58fabbfc
+
+I was looking at this bug too and fixed it (i.e. reproducer won't crash)
+using lapic_in_kernel(vcpu) as a condition instead of null ptr check on
+vcpu->arch.apic, as it makes more sense to the code reader (the lapic is
+not there since during kvm_arch_vcpu_create(), it isn't created due to
+irqchip_in_kernel() check being false).
+
+May I suggest that lapic_in_kernel(vcpu) be used instead of the null ptr
+check?
+
+Thanks,
+Siddh
