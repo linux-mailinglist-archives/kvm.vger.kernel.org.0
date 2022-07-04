@@ -2,181 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D3D1565511
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 14:22:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F204F5655E3
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 14:51:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234381AbiGDMWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 08:22:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60506 "EHLO
+        id S233736AbiGDMv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 08:51:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234412AbiGDMWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 08:22:43 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7D5B6;
-        Mon,  4 Jul 2022 05:22:42 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 6839C1FEE8;
-        Mon,  4 Jul 2022 12:22:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1656937361; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lMi/mKI3IgFFyMm2b4EJclOuQIMJXNAzxv7T3WptnrQ=;
-        b=ISxXfAdsRMMg0HEM4p33QLu7LIU6G2pycbgNVPYODQVHKhESlmtMGfia9Ti9kBRx0Aw+12
-        oZn7E52HFGBfUoeD3IEF4k8OsWjqrzKMpDzdmWHV76HdxqQrylFyo5NRfDDxiqlZtSZ0l9
-        BLI1N0DipXMOgFxarUb6JoXxcGTxx9I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1656937361;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lMi/mKI3IgFFyMm2b4EJclOuQIMJXNAzxv7T3WptnrQ=;
-        b=b3xmMnlf/SIALgu97V718o24klhIWzselU3QBQOEYsS16N4qNDFKF5nCmxs0r80j7ThoA7
-        iAzbuATfpd1dAQCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 27D9D13451;
-        Mon,  4 Jul 2022 12:22:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id nvFVCJHbwmK+KQAAMHmgww
-        (envelope-from <tzimmermann@suse.de>); Mon, 04 Jul 2022 12:22:41 +0000
-Message-ID: <70556947-1849-c73a-2b9a-6132aca1c055@suse.de>
-Date:   Mon, 4 Jul 2022 14:22:40 +0200
+        with ESMTP id S232129AbiGDMv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 08:51:57 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5ED1054D;
+        Mon,  4 Jul 2022 05:51:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=mQaCY3+Mowg2tD0+KKloxT+uQZbU8L2SJHLKrJJOWT4=; b=ObYVjvUtNKGv3K16cc1tk+NwbB
+        L2dPyo3RXPGZczkyv458MCfPNX9P1v5RIQxdTOKsW4/fnVMyYQF2/uA3vgAW+ymNqx8s9tL1kMiRd
+        EevJp9VeOrlSztCmbUcwCtfw/nmR7vhOypzzklONFvpUgDYnfApM/kE/9ivx1b7NhqtaU4nTXTxwy
+        eun8DAZJd0NztlViFrZNUix4XmYM/cPSjEHfqFanVNXU2BNVSBPHiGlCO+5omAMpgw/B6rKL/PsjN
+        f14wCVw8vBK8n0hMetokZCqqIpsJhNo0qVKaTJvWbmk31cUex3q1fOlPrsa2gMlbg0Mxn5DCwfMUq
+        uIEK2tqQ==;
+Received: from [2001:4bb8:189:3c4a:8758:74d9:4df6:6417] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o8LYI-008wAp-CW; Mon, 04 Jul 2022 12:51:46 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
+Subject: simplify the mdev interface v4
+Date:   Mon,  4 Jul 2022 14:51:30 +0200
+Message-Id: <20220704125144.157288-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v6 3/5] fbdev: Disable sysfb device registration when
- removing conflicting FBs
-Content-Language: en-US
-To:     Xi Ruoyao <xry111@linuxfromscratch.org>,
-        Javier Martinez Canillas <javierm@redhat.com>,
-        Zack Rusin <zackr@vmware.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "deller@gmx.de" <deller@gmx.de>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Linux-graphics-maintainer <Linux-graphics-maintainer@vmware.com>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
-        "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>,
-        "lersek@redhat.com" <lersek@redhat.com>
-References: <20220607182338.344270-1-javierm@redhat.com>
- <20220607182338.344270-4-javierm@redhat.com>
- <de83ae8cb6de7ee7c88aa2121513e91bb0a74608.camel@vmware.com>
- <38473dcd-0666-67b9-28bd-afa2d0ce434a@redhat.com>
- <603e3613b9b8ff7815b63f294510d417b5b12937.camel@vmware.com>
- <a633d605-4cb3-2e04-1818-85892cf6f7b0@redhat.com>
- <97565fb5-cf7f-5991-6fb3-db96fe239ee8@redhat.com>
- <711c88299ef41afd8556132b7c1dcb75ee7e6117.camel@vmware.com>
- <aa144e20-a555-5c30-4796-09713c12ab0e@redhat.com>
- <64c753c98488a64b470009e45769ceab29fd8130.camel@linuxfromscratch.org>
- <61f2e4e2af40cb9d853504d0a6fe01829ff8ca60.camel@linuxfromscratch.org>
- <fddf5ca6-77dc-88f9-c191-7de09717063c@redhat.com>
- <2ae767b0439133ca4e60885a1843ee72b69adfc5.camel@linuxfromscratch.org>
-From:   Thomas Zimmermann <tzimmermann@suse.de>
-In-Reply-To: <2ae767b0439133ca4e60885a1843ee72b69adfc5.camel@linuxfromscratch.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------CMy4IaEhlRt8kLCAyY4sgVL0"
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------CMy4IaEhlRt8kLCAyY4sgVL0
-Content-Type: multipart/mixed; boundary="------------ZK0o8Q57gaJmscwMaRrwtmgM";
- protected-headers="v1"
-From: Thomas Zimmermann <tzimmermann@suse.de>
-To: Xi Ruoyao <xry111@linuxfromscratch.org>,
- Javier Martinez Canillas <javierm@redhat.com>, Zack Rusin
- <zackr@vmware.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
- "deller@gmx.de" <deller@gmx.de>,
- "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- Linux-graphics-maintainer <Linux-graphics-maintainer@vmware.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>,
- "lersek@redhat.com" <lersek@redhat.com>
-Message-ID: <70556947-1849-c73a-2b9a-6132aca1c055@suse.de>
-Subject: Re: [PATCH v6 3/5] fbdev: Disable sysfb device registration when
- removing conflicting FBs
-References: <20220607182338.344270-1-javierm@redhat.com>
- <20220607182338.344270-4-javierm@redhat.com>
- <de83ae8cb6de7ee7c88aa2121513e91bb0a74608.camel@vmware.com>
- <38473dcd-0666-67b9-28bd-afa2d0ce434a@redhat.com>
- <603e3613b9b8ff7815b63f294510d417b5b12937.camel@vmware.com>
- <a633d605-4cb3-2e04-1818-85892cf6f7b0@redhat.com>
- <97565fb5-cf7f-5991-6fb3-db96fe239ee8@redhat.com>
- <711c88299ef41afd8556132b7c1dcb75ee7e6117.camel@vmware.com>
- <aa144e20-a555-5c30-4796-09713c12ab0e@redhat.com>
- <64c753c98488a64b470009e45769ceab29fd8130.camel@linuxfromscratch.org>
- <61f2e4e2af40cb9d853504d0a6fe01829ff8ca60.camel@linuxfromscratch.org>
- <fddf5ca6-77dc-88f9-c191-7de09717063c@redhat.com>
- <2ae767b0439133ca4e60885a1843ee72b69adfc5.camel@linuxfromscratch.org>
-In-Reply-To: <2ae767b0439133ca4e60885a1843ee72b69adfc5.camel@linuxfromscratch.org>
+Hi all,
 
---------------ZK0o8Q57gaJmscwMaRrwtmgM
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+this series signigicantly simplies the mdev driver interface by following
+the patterns for device model interaction used elsewhere in the kernel.
 
-SGkNCg0KQW0gMDQuMDcuMjIgdW0gMTQ6MTEgc2NocmllYiBYaSBSdW95YW86DQo+IE9uIE1v
-biwgMjAyMi0wNy0wNCBhdCAxMzowNCArMDIwMCwgSmF2aWVyIE1hcnRpbmV6IENhbmlsbGFz
-IHdyb3RlOg0KPj4gSGVsbG8gWGksDQo+Pj4NCj4+PiBXaXRoIENPTkZJR19TWVNGQl9TSU1Q
-TEVGQiBhbmQgQ09ORklHX0ZCX1NJTVBMRSBlbmFibGVkLCB0aGVyZSBpcyBubw0KPj4+IGlz
-c3VlLg0KPj4+DQo+Pj4gSSBndWVzcyBpdCdzIHNvbWV0aGluZyBnb2luZyB3cm9uZyBvbiBh
-ICJkcm0gLT4gZHJtIiBwYXNzIG92ZXIuwqAgRm9yIG5vdw0KPj4+IEknbGwgY29udGludWUg
-dG8gdXNlIHNpbXBsZWRybSB3aXRoIHRoaXMgY29tbWl0IHJldmVydGVkLg0KPj4+DQo+Pg0K
-Pj4gWWVzLCB3ZSBuZWVkIHRvIGFsc28gY2hlcnJ5LXBpY2sgYjg0ZWZhMjhhNDggKCJkcm0v
-YXBlcnR1cmU6IFJ1biBmYmRldg0KPj4gcmVtb3ZhbCBiZWZvcmUgaW50ZXJuYWwgaGVscGVy
-cyIpIG5vdyB0aGF0IHRoZSBzeXNmYl9kaXNhYmxlKCkgcGF0Y2hlcw0KPj4gYXJlIGluIHY1
-LjE5LXJjNS4NCj4gDQo+IEkgY29uZmlybSB0aGF0IGNoZXJyeS1waWNraW5nIGI4NGVmYTI4
-YTQ4IGZpeGVzIHRoZSBpc3N1ZSBmb3IgdjUuMTktcmM1Lg0KDQpJJ3ZlIGNoZXJyeS1waWNr
-ZWQgdGhlIGNvbW1pdCBpbnRvIGRybS1taXNjLWZpeGVzLiBJdCB3aWxsIHNob3cgdXAgaW4g
-DQptYWlubGluZSBzb29uLg0KDQpCZXN0IHJlZ2FyZHMNClRob21hcw0KDQotLSANClRob21h
-cyBaaW1tZXJtYW5uDQpHcmFwaGljcyBEcml2ZXIgRGV2ZWxvcGVyDQpTVVNFIFNvZnR3YXJl
-IFNvbHV0aW9ucyBHZXJtYW55IEdtYkgNCk1heGZlbGRzdHIuIDUsIDkwNDA5IE7DvHJuYmVy
-ZywgR2VybWFueQ0KKEhSQiAzNjgwOSwgQUcgTsO8cm5iZXJnKQ0KR2VzY2jDpGZ0c2bDvGhy
-ZXI6IEl2byBUb3Rldg0K
+Changes since v3:
+ - make the sysfs_name and pretty_name fields pointers instead of arrays
+ - add an i915 cleanup to prepare for the above
 
---------------ZK0o8Q57gaJmscwMaRrwtmgM--
+Changes since v2:
+ - rebased to vfio/next
+ - fix a pre-existing memory leak in i915 instead of making it worse
+ - never manipulate if ->available_instances if drv->get_available is
+   provided
+ - keep a parent reference for the mdev_type
+ - keep a few of the sysfs.c helper function around
+ - improve the documentation for the parent device lifetime
+ - minor spellig / formatting fixes
 
---------------CMy4IaEhlRt8kLCAyY4sgVL0
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+Changes since v1:
+ - embedd the mdev_parent into a different sub-structure in i916
+ - remove headers now inclued by mdev.h from individual source files
+ - pass an array of mdev_types to mdev_register_parent
+ - add additional patches to implement all attributes on the
+   mdev_type in the core code
 
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmLC25AFAwAAAAAACgkQlh/E3EQov+D6
-qw/8DMh/+FZ7015LO3/tn/cALCKklbd6z+cuLJOtvDIUldy+s05bX8zCarSv5mUWuGzuLd+wLwv3
-dqB2VYi+vs0ZfXZFfiDNiKLKtRFQQnV8nZS8uXX2ANQYvMqtAgFDAKnuDbEIRm+0Cspa7cyLaVqA
-HWa7qFVYuntlveO+f0j2ajsFybVDR7qcNcR0S5ZkpTR/FM46SrdHddkSdf4TpJ9GnzlT4tVpnzvp
-MiiQQlJJKtp4V5GDoBpMPfNz0MUWIXr3Vu+JObWDju2k2eS7SkFxIyFAIjpw7sO8kpnEOwETCwoa
-mbq6SeDQDtC4U/FsKjQ1RXLjngOL4aUxsbXgom17IxnEU1jVXjGhlMEtXYwQq4qmFYG5QRd7BjLE
-ugfow95aifWwdI5sLk9eJnEoacJ3/L0Z7lTZjLKAM71GgzpkoMEzJJjGK8yKyBv/kfp39PLOKpWK
-qH1bNhTqx8fsEg4U3+Z7BPwn5a34cxvZLCY4KfJedgqwhDe1SwadKwje2p0H27omuQQSYjLMQT5t
-VI2lFhUoCXh6ZJhgmsjX5M/9BEqceQWnJ9aO/dFv9A413Em9RwAIQkb/FraFEGmrMQYFXb5HcJpb
-vgxefroMjq2nWMYbaPJoXvovGl2+g/fZDkpGE16gYlmTRXt6Z6P1f27yAmU5j5mM5TxSitWeUduF
-8Fk=
-=I+c+
------END PGP SIGNATURE-----
-
---------------CMy4IaEhlRt8kLCAyY4sgVL0--
+Diffstat:
+ Documentation/driver-api/vfio-mediated-device.rst |   26 +-
+ Documentation/s390/vfio-ap.rst                    |    2 
+ Documentation/s390/vfio-ccw.rst                   |    2 
+ drivers/gpu/drm/i915/gvt/aperture_gm.c            |   20 +-
+ drivers/gpu/drm/i915/gvt/gvt.h                    |   42 ++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c                  |  168 ++++-------------
+ drivers/gpu/drm/i915/gvt/vgpu.c                   |  210 +++++++---------------
+ drivers/s390/cio/cio.h                            |    4 
+ drivers/s390/cio/vfio_ccw_drv.c                   |    3 
+ drivers/s390/cio/vfio_ccw_ops.c                   |   60 ------
+ drivers/s390/cio/vfio_ccw_private.h               |    2 
+ drivers/s390/crypto/vfio_ap_ops.c                 |   68 +------
+ drivers/s390/crypto/vfio_ap_private.h             |    6 
+ drivers/vfio/mdev/mdev_core.c                     |  185 ++++---------------
+ drivers/vfio/mdev/mdev_driver.c                   |    7 
+ drivers/vfio/mdev/mdev_private.h                  |   32 ---
+ drivers/vfio/mdev/mdev_sysfs.c                    |  186 ++++++++++---------
+ include/linux/mdev.h                              |   77 ++++----
+ samples/vfio-mdev/mbochs.c                        |  103 +++-------
+ samples/vfio-mdev/mdpy.c                          |  115 +++---------
+ samples/vfio-mdev/mtty.c                          |   94 +++------
+ 21 files changed, 458 insertions(+), 954 deletions(-)
