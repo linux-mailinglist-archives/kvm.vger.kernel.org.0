@@ -2,120 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E611565747
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 15:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED69856574C
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 15:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234906AbiGDNcT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 09:32:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39542 "EHLO
+        id S234797AbiGDNcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 09:32:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234834AbiGDNbq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 09:31:46 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2068.outbound.protection.outlook.com [40.107.223.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE69DFF5
-        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 06:27:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F1oGSwIREMSnTXU7ZaQu1f4Cy7m/Kjl+SWpMhV9mKJb0OYlMxEF1uX8SF6Rm4LxEyNLZEEShC3RdF2eQsuDxNjfBEz+cpcgLVmkC3aR93A1VG8h9WKgrSrID6yE7u1WbmQXvhHqHeAZXVQuh0AKqgWd2XMYspXnGBNBeqIEABWDhThoFJTmiFtVFT64iJ1NqP36dG89Kzs9F+9FfE+YRNKzIMEXDNAllLMLxW07DpqytmhglVzhpEkHB34nzBRkf21rOyeonoE2Hpa3jnkEFzjrm1pmE/6Z3pIoNPTtG32Ye4dq8KlSjpiDYjID/81+9g/50P3dhIqpqMeqbaUd8gQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TKF4HsI35KZr//52mwID1VihP4ZF36WwiEafY85fZ9k=;
- b=Cl4MA9DkW7svC2i63N3jK3oHEMcW5ik4V9DnMvIv0nkIzKanhlm3zZJuDv79DpKnd2jnHmUGaKFtYGFdp8i2Fj2MlhxZyJusmaRZNBOz/x/8cVx9AqdGT5X3rzWzBGimjJRzT8OP/hqvIWFHejNmM6EVLDSqTfkHH55H1JZaqyTwki7Rg2YhIvjnlkNJR8exT3JMARqNeDr6JKjAIrMjUU7KmXcc0Y94+SBuEKkLdH3xaiqDgAbgTthDhtHfjGdENeCFoa50YlddavKcC1EvI7cyGZr7m026G/dIOKJ56i+dfLr5mApbw8+fazWiXCLADkZjrUvUbW5QbiOYdQerXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TKF4HsI35KZr//52mwID1VihP4ZF36WwiEafY85fZ9k=;
- b=mODYAX8JIc6OvQcVx7r//TrZyOvTQev9p+XC6bwWtlEZa4DDQbXkA2mlSX6F4NhfL4//sfKoqijTMYSJpk6oqZfn4pC90k27WptT1BevtHuT6NP/bcWGygeLW2YEe7eSUIt7oC8uCuq6xoKZXVQNltBlit8bJ1x1thTbP4kjtad2TEGyEiLvko0b8A12No1AhNJq6KP4j/3cIUWSZjjkQC+hPDCOEc8sDxQfZ5CwZWMtnwPld6pYmJOWqaSZ2gD3Spp4YBiT6sV6v//cYnaKJSHM+F6TAYbEVdyPczkFb6rUTshWpUXX8VXXd5VqNOS4EVY+sZzU60UDk0q7WVFLeg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by MN2PR12MB3614.namprd12.prod.outlook.com (2603:10b6:208:c6::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15; Mon, 4 Jul
- 2022 13:27:40 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.020; Mon, 4 Jul 2022
- 13:27:40 +0000
-Date:   Mon, 4 Jul 2022 10:27:39 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "chenxiang (M)" <chenxiang66@hisilicon.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        iommu@lists.linux-foundation.org, Joerg Roedel <joro@8bytes.org>,
-        kvm@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 4/4] vfio: Require that devices support DMA cache
- coherence
-Message-ID: <20220704132739.GP693670@nvidia.com>
-References: <4-v3-2cf356649677+a32-intel_no_snoop_jgg@nvidia.com>
- <40454b70-11e1-f9a1-6c26-27e7340f2109@hisilicon.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <40454b70-11e1-f9a1-6c26-27e7340f2109@hisilicon.com>
-X-ClientProxiedBy: BL1PR13CA0013.namprd13.prod.outlook.com
- (2603:10b6:208:256::18) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234827AbiGDNcU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 09:32:20 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEE412AB7;
+        Mon,  4 Jul 2022 06:30:12 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 264DJedD016647;
+        Mon, 4 Jul 2022 13:30:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=hKSlHsgDMVdcqtZW8z47t7KRFmQPf3tQo7jZeyve4qM=;
+ b=Bx1eq2YoKmRr27DfDQ1crR+WKKQAKedFR9xPo7rhF699yqow+ZE7SZMmUCjFCDkdXm2U
+ yZOjrvwigm64DPcs+DDcVu9AAsUPph4Z1JP/2ZdpVCw4q97u3YtDOlYdQnuJhSD2RWBu
+ r4ZA723Y90dU6XK881/aILkaV3bzQ/AxZSDmrFxU+tm8eBH7Qfe+zQq2KJPDVELO8l9N
+ xtXdKZzZmQ02HZbc5+R7fwltejYFlD4NufrenKGaUkR1b6weNOP6XNH6E5magEjuIHfF
+ /Oct+mKO8pwMz4eU7PaYmVJRD24AJtNRSVwWoafdLKa2MXUkSt1OWbpWdA8vfztixk0/ +w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h410a88cm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jul 2022 13:30:11 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 264DLZFL022343;
+        Mon, 4 Jul 2022 13:30:11 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h410a88a7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jul 2022 13:30:11 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 264DLJ0w015056;
+        Mon, 4 Jul 2022 13:30:07 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3h2dn92rkt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jul 2022 13:30:06 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 264DU3ua14549344
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 4 Jul 2022 13:30:03 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1F3CE11C04C;
+        Mon,  4 Jul 2022 13:30:03 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C32B711C054;
+        Mon,  4 Jul 2022 13:30:02 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  4 Jul 2022 13:30:02 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [PATCH] s390x: split migration test into vector and gs test
+Date:   Mon,  4 Jul 2022 15:30:02 +0200
+Message-Id: <20220704133002.791395-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1174652e-db4b-4294-9df4-08da5dc0f7e5
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3614:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6UNmtelwqUvYfMXzxcn9TztwNIp1XpUBmsZhm+CTShaleV1Lfn6q+v550Y+rYxfDSo6cGpAhQcRIRYcj5Aslr3uTso95s3xXvm49Y36hFoWju5X3ZrF2WaEYuJ6AWB1UTHL3lwN9BawAymtsAAEMdJkueVhnVdeY7cTROI3Q/B9pNmNAXjcQsDoBaVzXx5SZwwqBCXLEgVQ/6ghz3qffFx0jBQtIKxEEBkr/MsztvKQUB/L8wFnm9Bqf3moDv/ryBkg+g7wVPU3ah7ps578HejuACBWAA/GJnv3XH7Nlre5FHpoDR59DpSImsKrH6MQtWGB37r9SOC5ZSRAo3xoF0yzu7ujyuOEE2DrrxQ4aqp8n4iH79seyI2LMm5BpYfRvvtnm9tNGFvY+YT8qm/RlzxBR87z1h/5JjrsZGmKqvYGETADuBXlcQMYYoU2CV8haZ2TZhC+PW+rmHs6V4X29fsTPxC/oyXH7xY7Ruf2tTL9WhxM0nH8MSn3J9SmYtAP186w3VZujDtfpoqtTD/hADMBNSJUmCFyIeGMAG/XKcIgwP7wHUvN20mL/w0zUhBAugIhKe3F+agz53olxaQTLfA7lLjYMjoS4V+dUvbIbAJ98DDVBKqr8WuMBQCZdCgj5GcS3HFDokL2GdU9KZqVin44YjwN2Q2+01QqHko4F3J+/49fP/HvVZGR5hC97MLUETd77swOs51y0BZRW4EJjskzCVhKatX5hz3mcyJwQhqHXXGx8sTlble7xZRUPuHOLV1Tu1iNVtPJzctDIVrPxOVtIrjl14hRsci4UOal4gzWozlqLEAObXILCGZM0xsUN
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(39860400002)(366004)(396003)(136003)(376002)(6486002)(478600001)(6512007)(66476007)(54906003)(66946007)(316002)(6916009)(5660300002)(2906002)(33656002)(7416002)(26005)(4744005)(66556008)(2616005)(4326008)(86362001)(6506007)(8936002)(8676002)(1076003)(36756003)(186003)(38100700002)(41300700001)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wub7iXJotPXJqEmDbnB/tWvJqdxVgKerxS311nNcDjbZpwWOmGgXqEzPTxxq?=
- =?us-ascii?Q?yu4WpxCllGukwdpSAvZ8vV5fX94KjrfTxo2wOBN3rRR0HviV61DEXso/8WDJ?=
- =?us-ascii?Q?7ncvKMsegmugalchVVlr9agUR0arS/fMNuFqs3AbIlbu4NBZugCNVMg5Ca33?=
- =?us-ascii?Q?Ia+3Mwj7T7Z1wdG9ZHFI37TzMgf39nLSBopIlJfdBXc5JglK8ncG3zzas/6e?=
- =?us-ascii?Q?rGt6mhGrxQ83MyuMNZOvh6HYeZQ6nNUpk4CVsUF6m/R6rq3U7X1P/bc3bQHi?=
- =?us-ascii?Q?560hPwNOOdQh2abNLZ5fnKmPxk77uwiUxguSzDv3OkknZ6coaWTn8FYHIDTO?=
- =?us-ascii?Q?Lw4Zmu7fEybaLRCu5OQmA3KVPETEjCvqbQxPf6w8Q0DIBudarkkhRGOEHhlx?=
- =?us-ascii?Q?HT7yokM7n0fLcyUZJp519mNmmkYH4D4c25OLS8t1FuM6Wm3cRpCKDUIBGBGY?=
- =?us-ascii?Q?yHMNUNNINVhpbYWAVXIVXJlS5Cf0ay/30pHyg70zQhiDXoxlbjP5+ADL7CsU?=
- =?us-ascii?Q?cvvegSN5fo04SGWeV52EouOHNrJFfoz4yuT5Z3PnhEXiWifN4br4rCKEl8Uu?=
- =?us-ascii?Q?9MPVNFEvJrX6nTgZGp+AUSEnGyMjVvTQvzZj9XB1i3tdbt5nOh99YYd5exOg?=
- =?us-ascii?Q?fBDueWeepHnuBYU6B68Nn7EDeyWU2SvGkc3m8ghC0TMD/qXJGgkf2s+yrnwY?=
- =?us-ascii?Q?hzg506Pdmqq2jFb30VpSK539/mcf7S6mm91kLyEKTd3ctMaKLsToGutOv3yd?=
- =?us-ascii?Q?v+GK9flQq6ScLBnN9FbkUTkReCY9mHNL7HF4m8fLlrPddR8ocqDUzTFeK5+d?=
- =?us-ascii?Q?5dzGPBTEgJCgba3uH/KZScG02msHU2sg62Qv6TkHJCk52vltRD6WIu3Yy2Zo?=
- =?us-ascii?Q?+6er0Io2sk6jY8ZD3rMwE9q40aSGERm/0GIMdN0SlLwSLSyRXIYQC5QvA/6y?=
- =?us-ascii?Q?vDtLZuOSUIven1hzEtNkWpJLrkYFy0K9jjgW3qHeoQH1pyz2meir7mWguMiG?=
- =?us-ascii?Q?f3ui9AJw2AcRwlE7ME6hCzd57BubZWsRuPPzjoF7x0SUnV1nTgHxwkW9QkMZ?=
- =?us-ascii?Q?JuBo5iTtrg+IqsX7Xnw02NC/w48ENRZqTHPBfMcUbZrgOAGZR7UW5eL48nmb?=
- =?us-ascii?Q?PHXYD7+H64Ep86XgKmFYDfkQTJcV1sWn3tuzmYomHCSspgp/X/IiwiNmbwIH?=
- =?us-ascii?Q?oT5bkMuNwcRSxIKZQ5mmwCBInfde/7LFzfGGzJo5JLioB6gsKuFgDRTyL+zD?=
- =?us-ascii?Q?L+PU5JKE6zTlmD8YTRfyEWYcKS/GZddzuvaTjbmHN7yI1vSeViG9ZNGDFzUk?=
- =?us-ascii?Q?haTJJwqBcp6tYj1/mDMMTai4pL786VTDXXC3t7jzLf/doZ5nSP56Ae1FEuDb?=
- =?us-ascii?Q?gMFKvDN0AL/8AeEKhZYPACE0cYSTQnf/wSwVa5A9UsqWHn2drlnajqg2fnPI?=
- =?us-ascii?Q?ITaDAjNM9ZIPdGs3+N7nU4FYWWtDVkLW9c95k3STYiDDq7QmmucVLMAmBoOc?=
- =?us-ascii?Q?PClQXParJxFl7jcyr36jZulHpfWzkxIOQgOQMjtWvPm5NYA6H3mB+Bmt9Z3m?=
- =?us-ascii?Q?jmDcwiZbuP13AeRXeH0CwpHyQ0jhvLP19G7KsTQN?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1174652e-db4b-4294-9df4-08da5dc0f7e5
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2022 13:27:40.1408
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rYaTlEoR/CekgBVcA71FMt+/xoZ5QOQv0ELc1UsW1ucBDvVlS0fU/dTBjdj3jk0Y
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3614
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DwfCYu8KGuASXrjj_RO4E8tOJOwExmsU
+X-Proofpoint-ORIG-GUID: alq8Jr-lFCfYWKjAWDUp9yq2uFKHPtWh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-04_11,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
+ suspectscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
+ adultscore=0 bulkscore=0 priorityscore=1501 spamscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207040057
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -123,30 +85,304 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 04, 2022 at 09:21:26PM +0800, chenxiang (M) wrote:
-> Hi,
-> 
-> We encounter a issue with the patch: our platform is ARM64, and we run DPDK
-> with smmu disable on VM (without iommu=smmuv3 etc),
-> 
-> so we use noiommu mode with enable_unsafe_noiommu_mode=1 to passthrough the
-> device to VM with following steps (those steps are on VM) :
-> 
-> insmod vfio.ko enable_unsafe_noiommu_mode=1
-> insmod vfio_virqfd.ko
-> insmod vfio-pci-core.ko
-> insmdo vfio-pci.ko
-> insmod vfio_iommu_type1.ko
-> 
-> echo vfio-pci > /sys/bus/pci/devices/0000:00:02.0/driver_override
-> echo 0000:00:02.0 > /sys/bus/pci/drivers_probe ------------------ failed
-> 
-> I find that vfio-pci device is not probed because of the additional check.
-> It works well without this patch.
-> 
-> Do we need to skip the check if enable_unsafe_noiommu_mode=1?
+Since we now have a few more migration tests, let's split migration.c
+into two files for vector and gs facilities. Since guarded-storage and vector
+facilities can be en-/disabled independant of each other, this simplifies the
+code a bit and makes it clear what the scope of the tests is.
 
-Yes, that is definately an unintended mistake.
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ s390x/Makefile                         |   3 +-
+ s390x/migration-gs.c                   | 122 +++++++++++++++++++++++++
+ s390x/{migration.c => migration-vec.c} |  54 +----------
+ s390x/unittests.cfg                    |  15 ++-
+ 4 files changed, 136 insertions(+), 58 deletions(-)
+ create mode 100644 s390x/migration-gs.c
+ rename s390x/{migration.c => migration-vec.c} (77%)
 
-Thanks,
-Jason
+diff --git a/s390x/Makefile b/s390x/Makefile
+index efd5e0c13102..90df45285b0b 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -30,10 +30,11 @@ tests += $(TEST_DIR)/spec_ex-sie.elf
+ tests += $(TEST_DIR)/firq.elf
+ tests += $(TEST_DIR)/epsw.elf
+ tests += $(TEST_DIR)/adtl-status.elf
+-tests += $(TEST_DIR)/migration.elf
+ tests += $(TEST_DIR)/pv-attest.elf
+ tests += $(TEST_DIR)/migration-cmm.elf
+ tests += $(TEST_DIR)/migration-skey.elf
++tests += $(TEST_DIR)/migration-gs.elf
++tests += $(TEST_DIR)/migration-vec.elf
+ 
+ pv-tests += $(TEST_DIR)/pv-diags.elf
+ 
+diff --git a/s390x/migration-gs.c b/s390x/migration-gs.c
+new file mode 100644
+index 000000000000..c702d7493635
+--- /dev/null
++++ b/s390x/migration-gs.c
+@@ -0,0 +1,122 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * s390x Migration Test for Guarded-Storage Extension
++ *
++ * Copyright IBM Corp. 2022
++ *
++ * Authors:
++ *  Nico Boehr <nrb@linux.ibm.com>
++ */
++#include <libcflat.h>
++#include <asm/arch_def.h>
++#include <asm/barrier.h>
++#include <asm/facility.h>
++#include <gs.h>
++#include <bitops.h>
++#include <smp.h>
++
++static struct gs_cb gs_cb;
++static struct gs_epl gs_epl;
++
++/* set by CPU1 to signal it has completed */
++static int flag_thread_complete;
++/* set by CPU0 to signal migration has completed */
++static int flag_migration_complete;
++
++static void write_gs_regs(void)
++{
++	const unsigned long gs_area = 0x2000000;
++	const unsigned long gsc = 25; /* align = 32 M, section size = 512K */
++
++	gs_cb.gsd = gs_area | gsc;
++	gs_cb.gssm = 0xfeedc0ffe;
++	gs_cb.gs_epl_a = (uint64_t) &gs_epl;
++
++	load_gs_cb(&gs_cb);
++}
++
++static void check_gs_regs(void)
++{
++	struct gs_cb gs_cb_after_migration;
++
++	store_gs_cb(&gs_cb_after_migration);
++
++	report_prefix_push("guarded-storage registers");
++
++	report(gs_cb_after_migration.gsd == gs_cb.gsd, "gsd matches");
++	report(gs_cb_after_migration.gssm == gs_cb.gssm, "gssm matches");
++	report(gs_cb_after_migration.gs_epl_a == gs_cb.gs_epl_a, "gs_epl_a matches");
++
++	report_prefix_pop();
++}
++
++static bool have_guarded_storage_facility(void)
++{
++	return test_facility(133);
++}
++
++static void test_func(void)
++{
++	if (have_guarded_storage_facility()) {
++		ctl_set_bit(2, CTL2_GUARDED_STORAGE);
++
++		write_gs_regs();
++	}
++
++	flag_thread_complete = 1;
++	while(!flag_migration_complete)
++		mb();
++
++	report_pass("Migrated");
++
++	if (have_guarded_storage_facility()) {
++		check_gs_regs();
++
++		report(stctg(2) & BIT(CTL2_GUARDED_STORAGE), "ctl2 guarded-storage bit set");
++
++		ctl_clear_bit(2, CTL2_GUARDED_STORAGE);
++	}
++
++	flag_thread_complete = 1;
++}
++
++int main(void)
++{
++	struct psw psw;
++
++	/* don't say migrate here otherwise we will migrate right away */
++	report_prefix_push("migration-gs");
++
++	if (smp_query_num_cpus() == 1) {
++		report_skip("need at least 2 cpus for this test");
++		goto done;
++	}
++
++	/* Second CPU does the actual tests */
++	psw.mask = extract_psw_mask();
++	psw.addr = (unsigned long)test_func;
++	smp_cpu_setup(1, psw);
++
++	/* wait for thread setup */
++	while(!flag_thread_complete)
++		mb();
++	flag_thread_complete = 0;
++
++	/* ask migrate_cmd to migrate (it listens for 'migrate') */
++	puts("Please migrate me, then press return\n");
++
++	/* wait for migration to finish, we will read a newline */
++	(void)getchar();
++
++	flag_migration_complete = 1;
++
++	/* wait for thread to complete assertions */
++	while(!flag_thread_complete)
++		mb();
++
++	smp_cpu_destroy(1);
++
++done:
++	report_prefix_pop();
++	return report_summary();
++}
+diff --git a/s390x/migration.c b/s390x/migration-vec.c
+similarity index 77%
+rename from s390x/migration.c
+rename to s390x/migration-vec.c
+index a45296374cd8..2aab540f781b 100644
+--- a/s390x/migration.c
++++ b/s390x/migration-vec.c
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+- * Migration Test for s390x
++ * s390x Migration Test for Vector Extensions
+  *
+  * Copyright IBM Corp. 2022
+  *
+@@ -12,55 +12,19 @@
+ #include <asm/vector.h>
+ #include <asm/barrier.h>
+ #include <asm/facility.h>
+-#include <gs.h>
+ #include <bitops.h>
+ #include <smp.h>
+ 
+-static struct gs_cb gs_cb;
+-static struct gs_epl gs_epl;
+-
+ /* set by CPU1 to signal it has completed */
+ static int flag_thread_complete;
+ /* set by CPU0 to signal migration has completed */
+ static int flag_migration_complete;
+ 
+-static void write_gs_regs(void)
+-{
+-	const unsigned long gs_area = 0x2000000;
+-	const unsigned long gsc = 25; /* align = 32 M, section size = 512K */
+-
+-	gs_cb.gsd = gs_area | gsc;
+-	gs_cb.gssm = 0xfeedc0ffe;
+-	gs_cb.gs_epl_a = (uint64_t) &gs_epl;
+-
+-	load_gs_cb(&gs_cb);
+-}
+-
+-static void check_gs_regs(void)
+-{
+-	struct gs_cb gs_cb_after_migration;
+-
+-	store_gs_cb(&gs_cb_after_migration);
+-
+-	report_prefix_push("guarded-storage registers");
+-
+-	report(gs_cb_after_migration.gsd == gs_cb.gsd, "gsd matches");
+-	report(gs_cb_after_migration.gssm == gs_cb.gssm, "gssm matches");
+-	report(gs_cb_after_migration.gs_epl_a == gs_cb.gs_epl_a, "gs_epl_a matches");
+-
+-	report_prefix_pop();
+-}
+-
+ static bool have_vector_facility(void)
+ {
+ 	return test_facility(129);
+ }
+ 
+-static bool have_guarded_storage_facility(void)
+-{
+-	return test_facility(133);
+-}
+-
+ static void test_func(void)
+ {
+ 	uint8_t expected_vec_contents[VEC_REGISTER_NUM][VEC_REGISTER_SIZE];
+@@ -69,12 +33,6 @@ static void test_func(void)
+ 	int i;
+ 	int vec_result = 0;
+ 
+-	if (have_guarded_storage_facility()) {
+-		ctl_set_bit(2, CTL2_GUARDED_STORAGE);
+-
+-		write_gs_regs();
+-	}
+-
+ 	if (have_vector_facility()) {
+ 		for (i = 0; i < VEC_REGISTER_NUM; i++) {
+ 			vec_reg = &expected_vec_contents[i][0];
+@@ -145,14 +103,6 @@ static void test_func(void)
+ 
+ 	report_pass("Migrated");
+ 
+-	if (have_guarded_storage_facility()) {
+-		check_gs_regs();
+-
+-		report(stctg(2) & BIT(CTL2_GUARDED_STORAGE), "ctl2 guarded-storage bit set");
+-
+-		ctl_clear_bit(2, CTL2_GUARDED_STORAGE);
+-	}
+-
+ 	flag_thread_complete = 1;
+ }
+ 
+@@ -161,7 +111,7 @@ int main(void)
+ 	struct psw psw;
+ 
+ 	/* don't say migrate here otherwise we will migrate right away */
+-	report_prefix_push("migration");
++	report_prefix_push("migration-vec");
+ 
+ 	if (smp_query_num_cpus() == 1) {
+ 		report_skip("need at least 2 cpus for this test");
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index 8e52f560bb1e..04d9f0761a1f 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -172,11 +172,6 @@ smp = 2
+ accel = tcg
+ extra_params = -cpu qemu,gs=off,vx=off
+ 
+-[migration]
+-file = migration.elf
+-groups = migration
+-smp = 2
+-
+ [migration-cmm]
+ file = migration-cmm.elf
+ groups = migration
+@@ -184,3 +179,13 @@ groups = migration
+ [migration-skey]
+ file = migration-skey.elf
+ groups = migration
++
++[migration-gs]
++file = migration-gs.elf
++groups = migration
++smp = 2
++
++[migration-vec]
++file = migration-vec.elf
++groups = migration
++smp = 2
+-- 
+2.36.1
+
