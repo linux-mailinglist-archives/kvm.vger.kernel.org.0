@@ -2,121 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC1E1565089
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 11:15:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A88D0565094
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 11:19:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233631AbiGDJOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 05:14:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44018 "EHLO
+        id S233510AbiGDJTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 05:19:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233497AbiGDJOp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 05:14:45 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24B55599;
-        Mon,  4 Jul 2022 02:14:44 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2648pG5Q026502;
-        Mon, 4 Jul 2022 09:14:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GYzYqnvthc4s5S3D0h8gYmjUMdJw6fZd+68wP/8HpnY=;
- b=Q5sS3Ylv9oqsTQImxEyY/RnC8g0CY8PWvOSGtVioUHV1TZagAkFzatLDEa0wF3Q6hGaZ
- r0JCzKZr8oI0wXoUS48t5yjq8nmeEPzEz4FJp+fS9R5UuC+Rs/HCrbetTPuvED8THYuI
- mW5x2Ap7s9xXbH9PflMF5msHAytF6OFh0tzwZ5FasRv0k12h4o1DQlMhqqHoDjwcvkiA
- kkTSOiUcuNeEgXic081MpxND/JCraMvhDa/BzRU5kmBwsbSY26Di6DyueotvF7fmbZDs
- xDMpIsbkC84WduQJ7ZmKvZKa92m2nOR8LA7CgXhgOGdykV9kdIHTI3UvUi7gre2Oivjk Lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h3w2f0g6b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jul 2022 09:14:44 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2648rLb4030611;
-        Mon, 4 Jul 2022 09:14:43 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h3w2f0g5r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jul 2022 09:14:43 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26496OjF008570;
-        Mon, 4 Jul 2022 09:14:41 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3h2dn8su5k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jul 2022 09:14:41 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2649EkMK20644126
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Jul 2022 09:14:46 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5279342042;
-        Mon,  4 Jul 2022 09:14:38 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD08C42049;
-        Mon,  4 Jul 2022 09:14:37 +0000 (GMT)
-Received: from [9.171.76.58] (unknown [9.171.76.58])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  4 Jul 2022 09:14:37 +0000 (GMT)
-Message-ID: <144ab6c1-3f5f-45f4-5267-c0fd4b5e9696@linux.ibm.com>
-Date:   Mon, 4 Jul 2022 11:14:37 +0200
+        with ESMTP id S229659AbiGDJTC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 05:19:02 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29A8A1A8
+        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 02:19:01 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34BB323A;
+        Mon,  4 Jul 2022 02:19:01 -0700 (PDT)
+Received: from [10.57.41.161] (unknown [10.57.41.161])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4FEA33F792;
+        Mon,  4 Jul 2022 02:18:59 -0700 (PDT)
+Message-ID: <85cd533a-019a-aa8f-c18d-6d2e02026467@arm.com>
+Date:   Mon, 4 Jul 2022 10:18:57 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v11 2/3] KVM: s390: guest support for topology function
-Content-Language: en-US
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220701162559.158313-1-pmorel@linux.ibm.com>
- <20220701162559.158313-3-pmorel@linux.ibm.com>
- <579337ac-d040-197f-3553-7c8ff202623a@linux.ibm.com>
-In-Reply-To: <579337ac-d040-197f-3553-7c8ff202623a@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [kvm-unit-tests PATCH v3 22/27] arm64: Use code from the gnu-efi
+ when booting with EFI
+Content-Language: en-GB
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, andrew.jones@linux.dev, drjones@redhat.com,
+        pbonzini@redhat.com, jade.alglave@arm.com, alexandru.elisei@arm.com
+References: <20220630100324.3153655-1-nikos.nikoleris@arm.com>
+ <20220630100324.3153655-23-nikos.nikoleris@arm.com>
+ <Yr5DRYxK65G4R8Zh@google.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <Yr5DRYxK65G4R8Zh@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oZ-3s6tgjbFUq1J04OIIpKJ6_pKvAOqL
-X-Proofpoint-ORIG-GUID: Iolh9Yg_7vXTZyFY_nG1DNY9brkOUYtu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-04_07,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- suspectscore=0 phishscore=0 adultscore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2207040038
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/4/22 11:08, Janis Schoetterl-Glausch wrote:
-> On 7/1/22 18:25, Pierre Morel wrote:
->> We report a topology change to the guest for any CPU hotplug.
+On 01/07/2022 01:43, Ricardo Koller wrote:
+> On Thu, Jun 30, 2022 at 11:03:19AM +0100, Nikos Nikoleris wrote:
+>> arm/efi/crt0-efi-aarch64.S defines the header and the handover
+>> sequence from EFI to a efi_main. This change includes the whole file
+>> in arm/cstart64.S when we compile with EFI support.
 >>
->> The reporting to the guest is done using the Multiprocessor
->> Topology-Change-Report (MTCR) bit of the utility entry in the guest's
->> SCA which will be cleared during the interpretation of PTF.
+>> In addition, we change the handover code in arm/efi/crt0-efi-aarch64.S
+>> to align the stack pointer. This alignment is necessary because we
+>> make assumptions about cpu0's stack alignment and most importantly we
+>> place its thread_info at the bottom of this stack.
 >>
->> On every vCPU creation we set the MCTR bit to let the guest know the
->> next time he uses the PTF with command 2 instruction that the> topology changed and that he should use the STSI(15.1.x) instruction
-> s/he/it (twice)
->> to get the topology details.
+>> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+>> ---
+>>   arm/cstart64.S             |  6 ++++++
+>>   arm/efi/crt0-efi-aarch64.S | 21 +++++++++++++++++----
+>>   2 files changed, 23 insertions(+), 4 deletions(-)
 >>
->> STSI(15.1.x) gives information on the CPU configuration topology.
->> Let's accept the interception of STSI with the function code 15 and
->> let the userland part of the hypervisor handle it when userland
->> support the CPU Topology facility.
+>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+>> index 55b41ea..08cf02f 100644
+>> --- a/arm/cstart64.S
+>> +++ b/arm/cstart64.S
+>> @@ -15,6 +15,10 @@
+>>   #include <asm/thread_info.h>
+>>   #include <asm/sysreg.h>
+>>   
+>> +#ifdef CONFIG_EFI
+>> +#include "efi/crt0-efi-aarch64.S"
+>> +#else
+>> +
+>>   .macro zero_range, tmp1, tmp2
+>>   9998:	cmp	\tmp1, \tmp2
+>>   	b.eq	9997f
+>> @@ -107,6 +111,8 @@ start:
+>>   	bl	exit
+>>   	b	halt
+>>   
+>> +#endif
+>> +
+>>   .text
+>>   
+>>   /*
+>> diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
+>> index d50e78d..03d29b0 100644
+>> --- a/arm/efi/crt0-efi-aarch64.S
+>> +++ b/arm/efi/crt0-efi-aarch64.S
+>> @@ -111,10 +111,19 @@ section_table:
+>>   
+>>   	.align		12
+>>   _start:
+>> -	stp		x29, x30, [sp, #-32]!
+>> +	stp		x29, x30, [sp, #-16]!
+>> +
+>> +	/* Align sp; this is necessary due to way we store cpu0's thread_info */
+>>   	mov		x29, sp
+>> +	and		x29, x29, #THREAD_MASK
+>> +	mov		x30, sp
+>> +	mov		sp, x29
+>> +	str		x30, [sp, #-16]!
+>> +
+>> +	mov             x29, sp
+> 
+> I wasn't sure what was this x29 for. But after some googling, this is
+> what I found [0]:
+> 
+> 	The frame pointer (X29) should point to the previous frame pointer saved
+> 	on stack, with the saved LR (X30) stored after it.
+> 
+> The old code ended up with x29 pointing to the right place: the previous
+> (x29,x30).
+> 
+> 	|   ...  |
+> 	|   x1   |
+> 	|   x0   |
+> 	|   x30  |
+> x29 ->	|   x29  |
+> 
+> In the new code x29 is pointing to:
+> 
+> 	|   ...  |
+> 	|   x30  |
+> old_sp->|   x29  |
+> 	|   ...  |
+> 	|   x1   |
+> 	|   x0   |
+> 	|   pad  |
+> x29 ->	| old_sp |
+> 
+> I think the new version can be fixed by setting x29 to the old_sp,
+> conveniently stored in x30:
 
-Oops, quoted my own comment, should have been:
+That's a good point, I'll swap x29 with x30 (x29 saves the old sp and 
+x30 is used to calculate the new value for sp) to make sure that x29 
+points to the right location in the stack.
 
-And the user STSI capability.
-Also: supportS.
+Thanks,
+
+Nikos
+
+> 
+> +	mov             x30, sp
+> 
+>> +
+>> +	stp		x0, x1, [sp, #-16]!
+>>   
+>> -	stp		x0, x1, [sp, #16]
+>>   	mov		x2, x0
+>>   	mov		x3, x1
+>>   	adr		x0, ImageBase
+>> @@ -123,8 +132,12 @@ _start:
+>>   	bl		_relocate
+>>   	cbnz		x0, 0f
+>>   
+>> -	ldp		x0, x1, [sp, #16]
+>> +	ldp		x0, x1, [sp], #16
+>>   	bl		efi_main
+>>   
+>> -0:	ldp		x29, x30, [sp], #32
+>> +	/* Restore sp */
+>> +	ldr		x30, [sp], #16
+>> +	mov             sp, x30
+>> +
+>> +0:	ldp		x29, x30, [sp], #16
+>>   	ret
+>> -- 
+>> 2.25.1
+>>
+> 
+> [0] https://developer.arm.com/documentation/den0024/a/The-ABI-for-ARM-64-bit-Architecture/Register-use-in-the-AArch64-Procedure-Call-Standard/Indirect-result-location
