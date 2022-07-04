@@ -2,69 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BECA9565107
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 11:38:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EED9565159
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 11:52:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231339AbiGDJgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 05:36:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33806 "EHLO
+        id S233013AbiGDJwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 05:52:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233798AbiGDJgo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 05:36:44 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CA57136
-        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 02:36:42 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id d16so6282485wrv.10
-        for <kvm@vger.kernel.org>; Mon, 04 Jul 2022 02:36:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=q0TyLnReruI9Wm2732Ut83Y4mOFAKXfOkqxOXkTD/V8=;
-        b=G1fWW/mpQ2bdGFNaIsSiqulbH86dbUIEM5HWmUU6f/ZgCaOYpV7OCKHesOvaS9YNmj
-         AdoUT51LYOQeWxO1vgRknFPkdXOIRzDq9asQ6ILdueOBVe9dWBnLnmBn7PT0ilhPkr4W
-         P1Qzki/cxPelPhc7+oB/wvESNGlC2E44VlUHGd/T0p2S93V/7425dJclQ78s+iuJRzac
-         hRkYG82SWkWehe9nCNcbagVvjAOcOsMQb+U7fTN3GTJ+43Qg/OfpSY0lptPVgp2liJU7
-         CpSfGwAJkXHzzvOA06buA/Ljk7zlp+vV1Rfqoj6monK5miuZwezvA2bqHNPEp9aGRkXi
-         HVAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=q0TyLnReruI9Wm2732Ut83Y4mOFAKXfOkqxOXkTD/V8=;
-        b=Zp+jTwQWEYf03Dq90P73O+ALXBF3qaZUf/RFsJIPG1Ae+PcL4FyX9PWs3GKTy0H/ax
-         DQpxhAwYSh4YMQTOLRUBtfU2pctue+9ncX2Flp4/+bVyPEYSxjrI8eFmPW1acDJE/yRE
-         PaiQMef5A7NULKm3NaqyQ65XDxLo7EoxugbkyTPdxUwQyQOlnssa1lnUvIJb/QmYMMkc
-         hED41UjZEdX0b5fhVPF/eP7z7WTrvDDzicdtYIEyTzVaR0AYSxtn4NbXA4kK0h+7cz23
-         xrjqX5BFLJ1FUkVwKTCTyIop4oPmlzb7vsr3cZQbEML6f3jvFPTKwqg+56enSidGpg+Y
-         xEuA==
-X-Gm-Message-State: AJIora9azE7sSzkXfI8dE1poWLNABRxol7Jy39j6oLTWkd0/Yc0YxkvP
-        0jKA2LJVxuRxoZPyDPXOoJi6bfbZ1oL0z/HOek/kGw==
-X-Google-Smtp-Source: AGRyM1txqFZ6XRw/gt33s19FIVnrJxgWXkN0MbkEtqzXTHsDz8SglQyeVKVBcetRPdHeC3qf3WE112AyqnLV4QHet+M=
-X-Received: by 2002:a5d:6b09:0:b0:21d:554f:b466 with SMTP id
- v9-20020a5d6b09000000b0021d554fb466mr11247084wrw.86.1656927400543; Mon, 04
- Jul 2022 02:36:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220615104025.941382-1-apatel@ventanamicro.com>
-In-Reply-To: <20220615104025.941382-1-apatel@ventanamicro.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 4 Jul 2022 15:06:28 +0530
-Message-ID: <CAAhSdy3gmnqB6La125i2hdVh6eNiwqG6saqz4RTTYF=2Gqo6cA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] Improve instruction and CSR emulation in KVM RISC-V
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+        with ESMTP id S231135AbiGDJwf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 05:52:35 -0400
+X-Greylist: delayed 921 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 04 Jul 2022 02:52:34 PDT
+Received: from smtp2.tsag.net (smtp2.tsag.net [208.118.68.91])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AA9DDE87;
+        Mon,  4 Jul 2022 02:52:34 -0700 (PDT)
+Received: from linuxfromscratch.org (rivendell.linuxfromscratch.org [208.118.68.85])
+        (user=smtprelay@linuxfromscratch.org mech=PLAIN bits=0)
+        by smtp2.tsag.net  with ESMTP id 2649aqN7013971-2649aqN9013971
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 4 Jul 2022 03:36:53 -0600
+Received: from [192.168.124.21] (unknown [113.140.29.6])
+        by linuxfromscratch.org (Postfix) with ESMTPSA id C33161C33D0;
+        Mon,  4 Jul 2022 09:36:46 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfromscratch.org;
+        s=cert4; t=1656927412;
+        bh=3QkRAk/rtlLuT2thgUbQAE2edONMPQV0DJmdezwylNk=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References;
+        b=osOSOfHtB0PqwShcsPEqL9Qe4l2l337q+dHrDoMqbi4409pHYoN71DCkQgHX/+Gl1
+         SBks7IioLmCWcklUuXVd68/tMa+g6ISl6aG/khyJdg5Bd3gkziP2leywa94HZw9ozV
+         AWfBHwmd3scuwftYLeRhj8HBUcSB2zXih0Pa66ieHVAJucr0rSacmH0eEzTSwe8DlT
+         CUQiFzAqClibOmxUUQVptOAoNISZaQ6XcCE2/+G4d6jWOBqtAXD5aLzn5vRcNEPIJb
+         3iPpP9slIt8AWxapoSwjXXXqxyikeUY4rYVuVqXsqXkHMLD59acMqD3D3Yqhfc6kCz
+         W57T/zTwQILRg==
+Message-ID: <64c753c98488a64b470009e45769ceab29fd8130.camel@linuxfromscratch.org>
+Subject: Re: [PATCH v6 3/5] fbdev: Disable sysfb device registration when
+ removing conflicting FBs
+From:   Xi Ruoyao <xry111@linuxfromscratch.org>
+To:     Javier Martinez Canillas <javierm@redhat.com>,
+        Zack Rusin <zackr@vmware.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "deller@gmx.de" <deller@gmx.de>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        Linux-graphics-maintainer <Linux-graphics-maintainer@vmware.com>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "tzimmermann@suse.de" <tzimmermann@suse.de>,
+        "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>,
+        "lersek@redhat.com" <lersek@redhat.com>
+Date:   Mon, 04 Jul 2022 17:36:31 +0800
+In-Reply-To: <aa144e20-a555-5c30-4796-09713c12ab0e@redhat.com>
+References: <20220607182338.344270-1-javierm@redhat.com>
+         <20220607182338.344270-4-javierm@redhat.com>
+         <de83ae8cb6de7ee7c88aa2121513e91bb0a74608.camel@vmware.com>
+         <38473dcd-0666-67b9-28bd-afa2d0ce434a@redhat.com>
+         <603e3613b9b8ff7815b63f294510d417b5b12937.camel@vmware.com>
+         <a633d605-4cb3-2e04-1818-85892cf6f7b0@redhat.com>
+         <97565fb5-cf7f-5991-6fb3-db96fe239ee8@redhat.com>
+         <711c88299ef41afd8556132b7c1dcb75ee7e6117.camel@vmware.com>
+         <aa144e20-a555-5c30-4796-09713c12ab0e@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 
+MIME-Version: 1.0
+X-FEAS-Auth-User: smtprelay@linuxfromscratch.org
+X-FEAS-DKIM: Valid
+Authentication-Results: smtp2.tsag.net;
+        dkim=pass header.i=@linuxfromscratch.org;
+        dmarc=pass header.from=linuxfromscratch.org
+X-FE-Policy-ID: 0:14:3:linuxfromscratch.org
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,48 +81,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 4:10 PM Anup Patel <apatel@ventanamicro.com> wrote:
->
-> Currently, the instruction emulation for MMIO traps and Virtual instruction
-> traps co-exist with general VCPU exit handling. The instruction and CSR
-> emulation will grow with upcoming SBI PMU, AIA, and Nested virtualization
-> in KVM RISC-V. In addition, we also need a mechanism to allow user-space
-> emulate certain CSRs under certain situation (example, host has AIA support
-> but user-space does not wants to use in-kernel AIA IMSIC and APLIC support).
->
-> This series improves instruction and CSR emulation in KVM RISC-V to make
-> it extensible based on above.
->
-> These patches can also be found in riscv_kvm_csr_v2 branch at:
-> https://github.com/avpatel/linux.git
->
-> Changes since v1:
->  - Added a switch-case in PATCH3 to process MMIO, CSR, and SBI returned
->    from user-space
->  - Removed hard-coding in PATCH3 for determining type of CSR instruction
->
-> Anup Patel (3):
->   RISC-V: KVM: Factor-out instruction emulation into separate sources
->   RISC-V: KVM: Add extensible system instruction emulation framework
->   RISC-V: KVM: Add extensible CSR emulation framework
+On Fri, 2022-06-17 at 08:46 +0200, Javier Martinez Canillas wrote:
+> Hello Zack,
+>=20
+> On 6/17/22 03:35, Zack Rusin wrote:
+> > On Fri, 2022-06-17 at 01:21 +0200, Javier Martinez Canillas wrote:
+> > > On 6/17/22 00:18, Javier Martinez Canillas wrote:
+> > > > On 6/16/22 23:03, Zack Rusin wrote:
+> > >=20
+> > > [snip]
+> > >=20
+> > > >=20
+> > > > I'll look at this tomorrow but in the meantime, could you please lo=
+ok if the following
+> > > > commits on top of drm-misc-next help ?
+> > > >=20
+> > > > d258d00fb9c7 fbdev: efifb: Cleanup fb_info in .fb_destroy rather th=
+an .remove
+> > > > 1b5853dfab7f fbdev: efifb: Fix a use-after-free due early fb_info c=
+leanup
+> > > >=20
+> > >=20
+> > > Scratch that. I see in your config now that you are not using efifb b=
+ut instead
+> > > simpledrm: CONFIG_DRM_SIMPLEDRM=3Dy, CONFIG_SYSFB_SIMPLEFB=3Dy and CO=
+NFIG_DRM_VMWGFX.
+> > >=20
+> > > Since you mentioned efifb I misunderstood that you are using it. Anyw=
+ays, as
+> > > said I'll investigate this tomorrow.
+> >=20
+> > Sounds good. Let me know if you'd like me to try it without SIMPLEFB.
+> >=20
+>=20
+> Yes, please do. Either with CONFIG_SYSFB_SIMPLEFB disabled and CONFIG_FB_=
+EFI
+> enabled (so that "efi-framebuffer" is registered and efifb probed) or wit=
+h
+> CONFIG_SYSFB_SIMPLEFB but CONFIG_FB_SIMPLE enabled (so "simple-framebuffe=
+r
+> is used too but with simplefb instead of simpledrm).
+> =C2=A0
+> I'm not able to reproduce, it would be useful to have another data point.
 
-I have queued this series for 5.20
+Also happening for me with CONFIG_SYSFB_SIMPLEFB, on a Intel Core i7-
+1065G7 (with iGPU).
 
-Thanks,
-Anup
-
->
->  arch/riscv/include/asm/kvm_host.h           |  16 +-
->  arch/riscv/include/asm/kvm_vcpu_insn.h      |  48 ++
->  arch/riscv/kvm/Makefile                     |   1 +
->  arch/riscv/kvm/vcpu.c                       |  34 +-
->  arch/riscv/kvm/vcpu_exit.c                  | 490 +----------------
->  arch/riscv/kvm/{vcpu_exit.c => vcpu_insn.c} | 563 +++++++++++---------
->  include/uapi/linux/kvm.h                    |   8 +
->  7 files changed, 392 insertions(+), 768 deletions(-)
->  create mode 100644 arch/riscv/include/asm/kvm_vcpu_insn.h
->  copy arch/riscv/kvm/{vcpu_exit.c => vcpu_insn.c} (63%)
->
-> --
-> 2.34.1
->
+Reverting this commit on top of 5.19-rc5 "fixes" the issue.
