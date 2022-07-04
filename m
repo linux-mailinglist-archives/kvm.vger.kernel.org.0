@@ -2,178 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BEE7564BB2
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 04:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BD1B564BD2
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 04:37:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232068AbiGDCXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Jul 2022 22:23:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52986 "EHLO
+        id S232438AbiGDChF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Jul 2022 22:37:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbiGDCXs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Jul 2022 22:23:48 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EE838BB;
-        Sun,  3 Jul 2022 19:23:46 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VIDvD9B_1656901419;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VIDvD9B_1656901419)
-          by smtp.aliyun-inc.com;
-          Mon, 04 Jul 2022 10:23:40 +0800
-Message-ID: <1656901409.0470793-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v11 23/40] virtio_pci: move struct virtio_pci_common_cfg to virtio_pci_modern.h
-Date:   Mon, 4 Jul 2022 10:23:29 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com,
-        virtualization@lists.linux-foundation.org
-References: <20220629065656.54420-1-xuanzhuo@linux.alibaba.com>
- <20220629065656.54420-24-xuanzhuo@linux.alibaba.com>
- <f35fdd60-8f69-6004-dd00-62e5fe8a8856@redhat.com>
-In-Reply-To: <f35fdd60-8f69-6004-dd00-62e5fe8a8856@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230152AbiGDChC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Jul 2022 22:37:02 -0400
+Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7C476560;
+        Sun,  3 Jul 2022 19:36:55 -0700 (PDT)
+Received: from ([60.208.111.195])
+        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id YZO00151;
+        Mon, 04 Jul 2022 10:36:51 +0800
+Received: from localhost.localdomain (10.200.104.97) by
+ jtjnmail201607.home.langchao.com (10.100.2.7) with Microsoft SMTP Server id
+ 15.1.2507.9; Mon, 4 Jul 2022 10:36:52 +0800
+From:   Bo Liu <liubo03@inspur.com>
+To:     <alex.williamson@redhat.com>, <cohuck@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Bo Liu <liubo03@inspur.com>
+Subject: [PATCH] vfio/pci: fix the wrong word
+Date:   Sun, 3 Jul 2022 22:36:49 -0400
+Message-ID: <20220704023649.3913-1-liubo03@inspur.com>
+X-Mailer: git-send-email 2.18.2
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.200.104.97]
+tUid:   202270410365109af86c3aca98813d1cd2d554f1f982d
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 1 Jul 2022 17:33:00 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/6/29 14:56, Xuan Zhuo =E5=86=99=E9=81=93:
-> > In order to facilitate the expansion of virtio_pci_common_cfg in the
-> > future, move it from uapi to virtio_pci_modern.h. In this way, we can
-> > freely expand virtio_pci_common_cfg in the future.
-> >
-> > Other projects using virtio_pci_common_cfg in uapi need to maintain a
-> > separate virtio_pci_common_cfg or use the offset macro defined in uapi.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   include/linux/virtio_pci_modern.h | 26 ++++++++++++++++++++++++++
-> >   include/uapi/linux/virtio_pci.h   | 26 --------------------------
-> >   2 files changed, 26 insertions(+), 26 deletions(-)
-> >
-> > diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_p=
-ci_modern.h
-> > index eb2bd9b4077d..c4f7ffbacb4e 100644
-> > --- a/include/linux/virtio_pci_modern.h
-> > +++ b/include/linux/virtio_pci_modern.h
-> > @@ -5,6 +5,32 @@
-> >   #include <linux/pci.h>
-> >   #include <linux/virtio_pci.h>
-> >
-> > +/* Fields in VIRTIO_PCI_CAP_COMMON_CFG: */
-> > +struct virtio_pci_common_cfg {
-> > +	/* About the whole device. */
-> > +	__le32 device_feature_select;	/* read-write */
-> > +	__le32 device_feature;		/* read-only */
-> > +	__le32 guest_feature_select;	/* read-write */
-> > +	__le32 guest_feature;		/* read-write */
-> > +	__le16 msix_config;		/* read-write */
-> > +	__le16 num_queues;		/* read-only */
-> > +	__u8 device_status;		/* read-write */
-> > +	__u8 config_generation;		/* read-only */
-> > +
-> > +	/* About a specific virtqueue. */
-> > +	__le16 queue_select;		/* read-write */
-> > +	__le16 queue_size;		/* read-write, power of 2. */
-> > +	__le16 queue_msix_vector;	/* read-write */
-> > +	__le16 queue_enable;		/* read-write */
-> > +	__le16 queue_notify_off;	/* read-only */
-> > +	__le32 queue_desc_lo;		/* read-write */
-> > +	__le32 queue_desc_hi;		/* read-write */
-> > +	__le32 queue_avail_lo;		/* read-write */
-> > +	__le32 queue_avail_hi;		/* read-write */
-> > +	__le32 queue_used_lo;		/* read-write */
-> > +	__le32 queue_used_hi;		/* read-write */
-> > +};
-> > +
-> >   struct virtio_pci_modern_device {
-> >   	struct pci_dev *pci_dev;
-> >
-> > diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virti=
-o_pci.h
-> > index 3a86f36d7e3d..247ec42af2c8 100644
-> > --- a/include/uapi/linux/virtio_pci.h
-> > +++ b/include/uapi/linux/virtio_pci.h
-> > @@ -140,32 +140,6 @@ struct virtio_pci_notify_cap {
-> >   	__le32 notify_off_multiplier;	/* Multiplier for queue_notify_off. */
-> >   };
-> >
-> > -/* Fields in VIRTIO_PCI_CAP_COMMON_CFG: */
-> > -struct virtio_pci_common_cfg {
-> > -	/* About the whole device. */
-> > -	__le32 device_feature_select;	/* read-write */
-> > -	__le32 device_feature;		/* read-only */
-> > -	__le32 guest_feature_select;	/* read-write */
-> > -	__le32 guest_feature;		/* read-write */
-> > -	__le16 msix_config;		/* read-write */
-> > -	__le16 num_queues;		/* read-only */
-> > -	__u8 device_status;		/* read-write */
-> > -	__u8 config_generation;		/* read-only */
-> > -
-> > -	/* About a specific virtqueue. */
-> > -	__le16 queue_select;		/* read-write */
-> > -	__le16 queue_size;		/* read-write, power of 2. */
-> > -	__le16 queue_msix_vector;	/* read-write */
-> > -	__le16 queue_enable;		/* read-write */
-> > -	__le16 queue_notify_off;	/* read-only */
-> > -	__le32 queue_desc_lo;		/* read-write */
-> > -	__le32 queue_desc_hi;		/* read-write */
-> > -	__le32 queue_avail_lo;		/* read-write */
-> > -	__le32 queue_avail_hi;		/* read-write */
-> > -	__le32 queue_used_lo;		/* read-write */
-> > -	__le32 queue_used_hi;		/* read-write */
-> > -};
-> > -
->
->
-> I think it's better not delete those from uAPI. We can embed this struct
-> in the private virito_pci_moden.h anyhow.
+This patch fixes a wrong word in comment.
 
-OK.
+Signed-off-by: Bo Liu <liubo03@inspur.com>
+---
+ drivers/vfio/pci/vfio_pci_config.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks.
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 9343f597182d..97e5ade6efb3 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -1728,7 +1728,7 @@ int vfio_config_init(struct vfio_pci_core_device *vdev)
+ 	/*
+ 	 * Config space, caps and ecaps are all dword aligned, so we could
+ 	 * use one byte per dword to record the type.  However, there are
+-	 * no requiremenst on the length of a capability, so the gap between
++	 * no requirements on the length of a capability, so the gap between
+ 	 * capabilities needs byte granularity.
+ 	 */
+ 	map = kmalloc(pdev->cfg_size, GFP_KERNEL);
+-- 
+2.27.0
 
->
-> Thanks
->
->
-> >   /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
-> >   struct virtio_pci_cfg_cap {
-> >   	struct virtio_pci_cap cap;
->
