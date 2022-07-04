@@ -2,198 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5150A56586C
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 16:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4F1C5658E7
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 16:47:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233392AbiGDOPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 10:15:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50616 "EHLO
+        id S233220AbiGDOrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 10:47:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229905AbiGDOPl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 10:15:41 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1FCA476;
-        Mon,  4 Jul 2022 07:15:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WFef6e6PjUG1Iue9gzlrjufESBaYw0Kwvyr+TklDBTNv+3pojX2eLUa29++R7PJXu+WXvr/PbQIno2UJ8ffhgvMFiP7ivg8+9bMjnDAb7GQfpvR0Bkhuxgi9cuvfqVccc19Q5IHssc6DePEWTuHjAzfhT1OzaJ0XIX13Cg4Kw8ixTQRiOgt1HRI2h6I8bI43Ts/Yna1Z15avOE0Qkyc0xhiLi6OsbYUe/GMkbpl7iQMkKzKCW7tjWwUohZVRSaChM537ynt8WJgl5mB25mpeJ0BDVOjDE3RaeRf/AQYDFdU3XzX/vpvfMExXQSkISgbO8V6ANVwWNbnOhvXPIVTtpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vBjDFR8+tjtNRnSbA+TPylOHslH03F7mW9ZjLfHNyPA=;
- b=ReoGMdL6Sytayref7EUwveXXJV9R27LhSByVRve/8iQkqCjbdqMkZx2S/0NopSu0Kh5k7S9jRzUUX/JgPpsj8XpgeXp+pLwQ6W+8/aYGtiwT358cAGu9+8Jjd6nE+uXreKFz9WiaFxQ3bThf+FUZOG9E3b6qeUenTsd9CD1ockHe0YrvR5U+3T32Go6UiT3jBIhEbIuvqrAYp6I4SHdIWLwD3si2ycIEKRI300T+X0CWkhSSIS9T40VES/NBfN276fTkggu7YKmK6dNPw1hr7FhQVFT49emUveiE/PWmmbWVkexMvS1NtrFwUgdq0TwUqIepO7VHaTwhosZwmbsDGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vBjDFR8+tjtNRnSbA+TPylOHslH03F7mW9ZjLfHNyPA=;
- b=cYkxtfyeEHYYNXJtOq3BOZ68m4jgukeCiDX0MNQDe4LPGdGWUAXL4mfaM2OA6B8QvXO9O4WAwhnFtMa8XLr/dDF8Qh6/mZp/b5WYzk0zRka8fsOiHYPh23hGrsoFigdRGo1+0S1ybKC53AOUGJ/htYBZzI2kmPMsvtnKtS5hO3Ti7NiUzzi8N++tRJFKrH3xIntn0ugylCNev8QAc4XRE8M0r9swCruqsY/3E+aUPlHFjOA5Fj87hwEN4aVjAUlvLAawAnFosVBMD2iS7Ab0LNgYKbNgYb0T6coKxbP0F9TJ37wyqu4KXkoT2doZ4Zc7kVPINv100UsWbpIKPAhlcw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB2684.namprd12.prod.outlook.com (2603:10b6:5:4a::33) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14; Mon, 4 Jul
- 2022 14:15:37 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.020; Mon, 4 Jul 2022
- 14:15:37 +0000
-Date:   Mon, 4 Jul 2022 11:15:36 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org
-Subject: Re: [PATCH 02/14] drm/i915/gvt: simplify vgpu configuration
- management
-Message-ID: <20220704141536.GB1423020@nvidia.com>
-References: <20220704125144.157288-1-hch@lst.de>
- <20220704125144.157288-3-hch@lst.de>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220704125144.157288-3-hch@lst.de>
-X-ClientProxiedBy: MN2PR08CA0029.namprd08.prod.outlook.com
- (2603:10b6:208:239::34) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234676AbiGDOrf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 10:47:35 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A1FAEE15
+        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 07:47:34 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 264EMVlp032693;
+        Mon, 4 Jul 2022 14:47:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=e28WBeLWF0JiTHYzOCaHml82yGcqc/97wk36FS4ltFg=;
+ b=Julq2ahRaGkRRFCVf7qvBj3W0ObtXWQKLJN7qbA8JZAzzjUCurqYFT+UHo5wlSnKPWnD
+ cFo0xGBzP94g8/5eT77ZwM0UoL19MgOtZ6/OUeA29f4xyvrU1Vus6HG+xEWXeUf0ZYC7
+ SBHJs+86nil9qwSJEu/HbvXrcx3s26xHMj128Q/NXNVAstzYCRiujqmNU2DI2CT8ZLHP
+ Sx+9tyU6yjlnIMzfZMkGALddfLE3ooZfbjLaauz2jqYDFiIeXzlrfcKtcmq7fuKsE9Ws
+ 5gogtwBJKI0T3IYzh7twFxheaN4/Ib0tUe6fsDMBBBCkIh8qk/8EPbqf7twcg28XPtZK EA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h41wf0gqu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jul 2022 14:47:17 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 264ERmeO024130;
+        Mon, 4 Jul 2022 14:47:17 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h41wf0gpy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jul 2022 14:47:17 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 264Ebm9o024064;
+        Mon, 4 Jul 2022 14:47:14 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3h2dn92u0g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jul 2022 14:47:14 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 264ElKkk33358258
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 4 Jul 2022 14:47:20 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95FE8A4053;
+        Mon,  4 Jul 2022 14:47:11 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B1ED7A4040;
+        Mon,  4 Jul 2022 14:47:10 +0000 (GMT)
+Received: from [9.171.11.185] (unknown [9.171.11.185])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  4 Jul 2022 14:47:10 +0000 (GMT)
+Message-ID: <a12e344f-29e4-8097-8510-88d74fb8bc22@linux.ibm.com>
+Date:   Mon, 4 Jul 2022 16:51:44 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cb74971c-2142-42d5-9dd4-08da5dc7aaff
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2684:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BM81tgmn/5m/2OIWoHM9aSutzTV8fYJBNG20DtDUtGBw5K4EeyrojbqqsZk57XkeCJ5Azg3Bh92+FqDCjV1Xct6jzrRfmGwFypVBwvMKXBcNX13IDGh7JwzvlBGq3GtNQ3jl3H1MnW3qtyevQjserAF7a+XgGi9vwzsNH3mv6EIjZIZZUEhhHOsH7wGq/xfKQh/PMJ7fmKuejyDAyLO5jfl8u37VJPNsQTWuSGGi9/Yomf3EUjMt1S+zY1PdnNnd16PYlK/KX98F0XAo9s5ulT8qkN6s1xza0TCrh/vGC2sK8m9OECzfiJOrtNt7mxb9NpWN8jQtqvQujOk1aaNCyXXC04CXfKMY6ATdN/fvBgdMmi8WXj2ZitfjvTJOiKHMYJgR904RQAvJ+zy/+6UsQwT7xfcmIr9LHZm3soulBHBDquIgFowPyICeMJvGXPRBnKDM/O6tC1EBM8c1+9SwlvHgD99U9piRSNWkbAw5+g4QtDlHm1YQAOxa+hFd8lk/oxR6p5jqP/0zncKScyuN4CYIQx+B3zBYs9/fB3lFa/z8KBReER6AAs3hEPMWjTrR31uxB0r3uIAxywEO4XsOHZh5htEPy4RRgroEfVVdhxLphv6v5eakVms/vah51pvKCaqcnsE39kOxYrepqRQBamCYWEqNYO/ctyMkSWvEYSned5Rq1PhQm2I1mE2iPWvTGiun7CySLav970eVtfxj11slrbdn179hnxt95+DGQiWVzgJBebfsDEhp/DgLNSkmT8gZMuKhQjSa7rQTso39kA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(366004)(346002)(136003)(396003)(39860400002)(6486002)(66946007)(66556008)(41300700001)(478600001)(8676002)(316002)(4326008)(86362001)(6916009)(66476007)(54906003)(186003)(2616005)(1076003)(6506007)(83380400001)(26005)(38100700002)(6512007)(8936002)(7416002)(36756003)(2906002)(5660300002)(33656002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2R2XkYBCSUzRYm5X2LVKxmGET8jvvJIX6rqvXjM4HqEmCM8Wimz/cfTStR7S?=
- =?us-ascii?Q?PRxDzAqeyif7jzGqKZJg8BvClyVJf9HrqXs+y758iH3d99dW9HjyzphvjdL0?=
- =?us-ascii?Q?MNldYLK1f7teLnSeQJTYozoWnvzvFVHi6M6avWM+Np99ReHvxwNge48DmFbW?=
- =?us-ascii?Q?COzNsq86K3Spnltoun7BSpz3o0MWm6SB3NmvMFzUN+bJfjkSbP9YOK5PF8IE?=
- =?us-ascii?Q?RIZEbqFzCgGkz8wHxlSQPmtzYAaiRr2EA23DClmT/xIQl4x0FR4NTgMAx67c?=
- =?us-ascii?Q?feIL+gGBPeC9jz1uslGhD+8HX7CWC01z2gPpulWIE4J4f9BWIbf5kT1SElO4?=
- =?us-ascii?Q?nmyw/EDMHmbp7SGxxKlvZynIC4jTk0Y9krpYAq9fumRfzLriAWAEOPXnf1Oi?=
- =?us-ascii?Q?ZiTcVGQY47wdOgoTM6LeurRUIZODIUSK81cbN9A0ZnhZURdBtyGtKB3uznkJ?=
- =?us-ascii?Q?viCu0sl19xsu4XLX3Rcxz4vwz00glWX9bE192pEprfG6JhaADw6r6rWG3vlb?=
- =?us-ascii?Q?ZM89BeXFfsO1CiKkLfVYb2sw7dCJPdEZU3VhI54gOitOc/+eqGcjlN8287P2?=
- =?us-ascii?Q?4QGfLVmkTD18TZdO9cvCIdZ5ioOVoPbSJNk6MvyvdYa3Tcvkh8O3iAWuQniv?=
- =?us-ascii?Q?BwO7vh5P5uGGmYbCrCqhJ5jCkXXSJMuEy+QCM8a/gVwNAoW6WW7EuArewFjA?=
- =?us-ascii?Q?Crt06s6tzGKPbwOBxgrORTzS0sT7c+VwMYRamD5gsxbBOXwiBSnPbBr4bTOX?=
- =?us-ascii?Q?EnbdINbheyVAUHSO15GjZ/SDqcWlLPk5bLc7wzE67Bkt+wBSnHAZUggEW7+C?=
- =?us-ascii?Q?fG4Anv7hKavLFRvPYNdcH/EyistgrGDd1sqXToGZ1YT61oFYCd8x+KXc1Wgu?=
- =?us-ascii?Q?1k4SvIU1g/pbQjwnBAe2HKLZdARAKgoHJ5PEQzXgQeU6XO4lQZLO61bwFHSS?=
- =?us-ascii?Q?7uwlfJrDqAYB09PS2O0pgkoHsR+YInJEjp5UZr29Khzkqku+ZMnFP/kLw3nu?=
- =?us-ascii?Q?Lf1yVJfBcGeGSVfF1YHkhN0WfRoZmTq5h1XVj+VLEHFfuzWcGbMD5J9zg3/y?=
- =?us-ascii?Q?M7LyyIOCHWcmEj4RWW5JKj0iNT84MeMcVGDg2yDawNA1mhLV5RYnDdIr6Oft?=
- =?us-ascii?Q?ee72CALJKSD7fIhvm2kNgVFeIyNqZw5naECAKlDvI5h/m5ThNDUoRlQ3JPpJ?=
- =?us-ascii?Q?ryNHZ8GdBrw2GvhpMfd9ENcWT30RP76oEKHGBuj2itXQAFUpva3iVcSej8KF?=
- =?us-ascii?Q?hPbdafvj9nFyKhoHxUuxOWxTUI5togk2K7XNBL/COctjdgu+gMwsec39dzB0?=
- =?us-ascii?Q?mPTb3Df7rMeLhjvm+E6Gx09DeFcLiNrxwBEpSETk1EJ55xLPY3fqTEU1Ccal?=
- =?us-ascii?Q?enU38/0c4yp83HfGype+lEGvSNRhZSEc7T2J9E83ll8cQw2MVTZG9o90DAiI?=
- =?us-ascii?Q?Lr1jM1F+yaGlFCvO8l3QHuTqBBMBO7wLPh1/kFbEKMDU1qy+x1y4RQq90n9i?=
- =?us-ascii?Q?d7cGFv8v1iOISFRLT2PZxJog0TFYc2jiyYKEVI2TCzmFjLgWnb4XGo8nRkxS?=
- =?us-ascii?Q?LZlYYkDYuWWGHa6TXdfc+jjn9ap97szYhtAveKwN?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb74971c-2142-42d5-9dd4-08da5dc7aaff
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2022 14:15:37.5726
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YkdXirzgaEtQVEJttaL/XE+pObSsdnCiuWQFkrSv+IT6xXiHIhZezlgs62Y52I7R
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2684
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v8 02/12] s390x/cpu_topology: CPU topology objects and
+ structures
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com
+References: <20220620140352.39398-1-pmorel@linux.ibm.com>
+ <20220620140352.39398-3-pmorel@linux.ibm.com>
+ <35c562e1-cdcd-41ce-1957-bd35c72a78ca@linux.ibm.com>
+ <72aba814-2901-7d06-131d-8c1f660e3830@linux.ibm.com>
+ <3e97dd7d-0a3f-c1ae-75d5-bef05c639038@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <3e97dd7d-0a3f-c1ae-75d5-bef05c639038@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: HAk5SN6VoNNg9uyBkBsNzK_TjCltbXDM
+X-Proofpoint-GUID: eyAQVB6B5Zj-RxLe8xREaM1KLCFKmud6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-04_14,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ bulkscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
+ mlxscore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2207040063
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 04, 2022 at 02:51:32PM +0200, Christoph Hellwig wrote:
 
-> +/*
-> + * vGPU type name is defined as GVTg_Vx_y which contains the physical GPU
-> + * generation type (e.g V4 as BDW server, V5 as SKL server).
-> + *
-> + * Depening on the physical SKU resource, we might see vGPU types like
-> + * GVTg_V4_8, GVTg_V4_4, GVTg_V4_2, etc. We can create different types of
-> + * vGPU on same physical GPU depending on available resource. Each vGPU
-> + * type will have a different number of avail_instance to indicate how
-> + * many vGPU instance can be created for this type.
-> + */
->  #define VGPU_MAX_WEIGHT 16
->  #define VGPU_WEIGHT(vgpu_num)	\
->  	(VGPU_MAX_WEIGHT / (vgpu_num))
->  
-> -static const struct {
-> -	unsigned int low_mm;
-> -	unsigned int high_mm;
-> -	unsigned int fence;
-> -
-> -	/* A vGPU with a weight of 8 will get twice as much GPU as a vGPU
-> -	 * with a weight of 4 on a contended host, different vGPU type has
-> -	 * different weight set. Legal weights range from 1 to 16.
-> -	 */
-> -	unsigned int weight;
-> -	enum intel_vgpu_edid edid;
-> -	const char *name;
-> -} vgpu_types[] = {
-> -/* Fixed vGPU type table */
-> +static const struct intel_vgpu_config intel_vgpu_configs[] = {
->  	{ MB_TO_BYTES(64), MB_TO_BYTES(384), 4, VGPU_WEIGHT(8), GVT_EDID_1024_768, "8" },
->  	{ MB_TO_BYTES(128), MB_TO_BYTES(512), 4, VGPU_WEIGHT(4), GVT_EDID_1920_1200, "4" },
->  	{ MB_TO_BYTES(256), MB_TO_BYTES(1024), 4, VGPU_WEIGHT(2), GVT_EDID_1920_1200, "2" },
-> @@ -106,63 +103,34 @@ static const struct {
->   */
 
-[..]
+On 7/4/22 13:47, Janosch Frank wrote:
+> On 6/29/22 17:25, Pierre Morel wrote:
+>>
+>>
+>> On 6/27/22 15:31, Janosch Frank wrote:
+>>> On 6/20/22 16:03, Pierre Morel wrote:
+>>>> We use new objects to have a dynamic administration of the CPU 
+>>>> topology.
+>>>> The highest level object in this implementation is the s390 book and
+>>>> in this first implementation of CPU topology for S390 we have a single
+>>>> book.
+>>>> The book is built as a SYSBUS bridge during the CPU initialization.
+>>>> Other objects, sockets and core will be built after the parsing
+>>>> of the QEMU -smp argument.
+>>>>
+>>>> Every object under this single book will be build dynamically
+>>>> immediately after a CPU has be realized if it is needed.
+>>>> The CPU will fill the sockets once after the other, according to the
+>>>> number of core per socket defined during the smp parsing.
+>>>>
+>>>> Each CPU inside a socket will be represented by a bit in a 64bit
+>>>> unsigned long. Set on plug and clear on unplug of a CPU.
+>>>>
+>>>> For the S390 CPU topology, thread and cores are merged into
+>>>> topology cores and the number of topology cores is the multiplication
+>>>> of cores by the numbers of threads.
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>
+>>> [...]
+>>>
+>>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>>>> index 7d6d01325b..216adfde26 100644
+>>>> --- a/target/s390x/cpu.h
+>>>> +++ b/target/s390x/cpu.h
+>>>> @@ -565,6 +565,53 @@ typedef union SysIB {
+>>>>    } SysIB;
+>>>>    QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
+>>>> +/* CPU type Topology List Entry */
+>>>> +typedef struct SysIBTl_cpu {
+>>>> +        uint8_t nl;
+>>>> +        uint8_t reserved0[3];
+>>>> +        uint8_t reserved1:5;
+>>>> +        uint8_t dedicated:1;
+>>>> +        uint8_t polarity:2;
+>>>> +        uint8_t type;
+>>>> +        uint16_t origin;
+>>>> +        uint64_t mask;
+>>>> +} SysIBTl_cpu;
+>>>> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
+>>>> +
+>>>> +/* Container type Topology List Entry */
+>>>> +typedef struct SysIBTl_container {
+>>>> +        uint8_t nl;
+>>>> +        uint8_t reserved[6];
+>>>> +        uint8_t id;
+>>>> +} QEMU_PACKED SysIBTl_container;
+>>>> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
+>>>> +
+>>>> +/* Generic Topology List Entry */
+>>>> +typedef union SysIBTl_entry {
+>>>> +        uint8_t nl;
+>>>
+>>> This union member is unused, isn't it?
+>>>
+>>>> +        SysIBTl_container container;
+>>>> +        SysIBTl_cpu cpu;
+>>>> +} SysIBTl_entry;
+>>>> +
+>>>> +#define TOPOLOGY_NR_MAG  6
+>>>
+>>> TOPOLOGY_TOTAL_NR_MAGS ?
+>>>
+>>>> +#define TOPOLOGY_NR_MAG6 0
+>>>
+>>> TOPOLOGY_NR_TLES_MAG6 ?
+>>>
+>>> I'm open to other suggestions but we need to differentiate between the
+>>> number of mag array entries and the number of TLEs in the MAGs.
+>>
+>>
+>> typedef enum {
+>>           TOPOLOGY_MAG6 = 0,
+>>           TOPOLOGY_MAG5 = 1,
+>>           TOPOLOGY_MAG4 = 2,
+>>           TOPOLOGY_MAG3 = 3,
+>>           TOPOLOGY_MAG2 = 4,
+>>           TOPOLOGY_MAG1 = 5,
+>>           TOPOLOGY_TOTAL_MAGS = 6,
+>> };
+>>
+>>
+>> oder enum with TOPOLOGY_NR_TLES_MAGx ?
+> 
+> I'd stick with the shorter first variant.
 
->  	for (i = 0; i < num_types; ++i) {
-> -		if (low_avail / vgpu_types[i].low_mm == 0)
-> -			break;
-> -
-> -		gvt->types[i].low_gm_size = vgpu_types[i].low_mm;
-> -		gvt->types[i].high_gm_size = vgpu_types[i].high_mm;
-> -		gvt->types[i].fence = vgpu_types[i].fence;
-> +		const struct intel_vgpu_config *conf = &intel_vgpu_configs[i];
->  
-> -		if (vgpu_types[i].weight < 1 ||
-> -					vgpu_types[i].weight > VGPU_MAX_WEIGHT)
-> +		if (low_avail / conf->low_mm == 0)
-> +			break;
-> +		if (conf->weight < 1 || conf->weight > VGPU_MAX_WEIGHT)
->  			goto out_free_types;
 
-This is now clearly impossible right? Maybe a BUILD_BUG_ON is all that
-is needed:
+OK, thanks
 
-  #define VGPU_WEIGHT(vgpu_num)	\
-         (VGPU_MAX_WEIGHT + BUILD_BUG_ON_ZERO((vgpu_num) > VGPU_MAX_WEIGHT) / (vgpu_num))
+> 
+>>
+>>>
+>>>> +#define TOPOLOGY_NR_MAG5 1
+>>>> +#define TOPOLOGY_NR_MAG4 2
+>>>> +#define TOPOLOGY_NR_MAG3 3
+>>>> +#define TOPOLOGY_NR_MAG2 4
+>>>> +#define TOPOLOGY_NR_MAG1 5
+>>>
+>>> I'd appreciate a \n here.
+>>
+>> OK
+>>
+>>>
+>>>> +/* Configuration topology */
+>>>> +typedef struct SysIB_151x {
+>>>> +    uint8_t  res0[2];
+>>>
+>>> You're using "reserved" everywhere but now it's "rev"?
+>>
+>> OK I will keep reserved
+>>
+>>>
+>>>> +    uint16_t length;
+>>>> +    uint8_t  mag[TOPOLOGY_NR_MAG];
+>>>> +    uint8_t  res1;
+>>>> +    uint8_t  mnest;
+>>>> +    uint32_t res2;
+>>>> +    SysIBTl_entry tle[0];
+>>>> +} SysIB_151x;
+>>>> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
+>>>> +
+>>>>    /* MMU defines */
+>>>>    #define ASCE_ORIGIN           (~0xfffULL) /* segment table
+>>>> origin             */
+>>>>    #define ASCE_SUBSPACE         0x200       /* subspace group
+>>>> control           */
+>>>
+>>>
+>>
+> 
 
-> +		sprintf(gvt->types[i].name, "GVTg_V%u_%s",
-> +			GRAPHICS_VER(gvt->gt->i915) == 8 ? 4 : 5, conf->name);
-> +		gvt->types->conf = conf;
-> +		gvt->types[i].avail_instance = min(low_avail / conf->low_mm,
-> +						   high_avail / conf->high_mm);
-
-snprintf and check for failure?
-
-Regardless, makes sense to me:
-
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-Jason
+-- 
+Pierre Morel
+IBM Lab Boeblingen
