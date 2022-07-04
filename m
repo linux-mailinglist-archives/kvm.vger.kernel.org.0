@@ -2,60 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B16DD564DBE
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 08:37:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00EBD564DCE
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 08:40:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231318AbiGDGhg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 02:37:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47924 "EHLO
+        id S232880AbiGDGke (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 02:40:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbiGDGhf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 02:37:35 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01FF5273D
-        for <kvm@vger.kernel.org>; Sun,  3 Jul 2022 23:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656916654; x=1688452654;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UIHLEUSLVrnILEbXWMK72N3tcxbxZd5RKq12P2sn7hc=;
-  b=Mpk/jUvjruiN3Mi13NM3YQh4Id2kBlVleXO7yBspeBw0tDwSzwXCqQMO
-   gV/SINAo5c7rTseyGe9HfLBuuUTtK4bxl0J8My9TN0mk39P1RVjjI5zFh
-   k955UeLCj/9KKBtU4LywRWq5s0r1z7jaD1dUAnf9NUrC53KgMaXNWbWK4
-   dRAksW9YbZi99NQYviqXGcKfxRDJ547fwJjFvTRVh9zEJMura4YqDi7FY
-   XdZ599XzBDz7IJm+7sao3gxXY+gj4CVhrPoy8fFcdCyn0azLaV9tHITiB
-   4VOC9T3dYCv5s1dKktEFKufmqQdmDXRDTNqekTViBlw92ChJO6D/RAXQe
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10397"; a="283077249"
-X-IronPort-AV: E=Sophos;i="5.92,243,1650956400"; 
-   d="scan'208";a="283077249"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2022 23:37:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,243,1650956400"; 
-   d="scan'208";a="660091837"
-Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 03 Jul 2022 23:37:26 -0700
-Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o8Fi2-000HcF-5U;
-        Mon, 04 Jul 2022 06:37:26 +0000
-Date:   Mon, 4 Jul 2022 14:36:36 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, pbonzini@redhat.com, jmattson@google.com,
-        seanjc@google.com, Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH v2 1/4] kvm: x86/pmu: Introduce masked events to the pmu
- event filter
-Message-ID: <202207041456.bNLOWhOQ-lkp@intel.com>
-References: <20220606175248.1884041-2-aaronlewis@google.com>
+        with ESMTP id S231294AbiGDGkd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 02:40:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 37E62265F
+        for <kvm@vger.kernel.org>; Sun,  3 Jul 2022 23:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656916831;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qMOEw4DkVDPn98Rjv4lUmJsvQgI5ankcWzzn5AvogbY=;
+        b=M7nO6uEN5DxBFYmwWbE71uTRVH+cQHNbTSmzCfUG9k1ErSnxvVEIC+Pu3DLeie2Vnjaac8
+        Cxk7pnE05j5pwkwIEQCz41o5VHa19ZzAeOFAf5vNvOhofI3tDRMkC6GqiX6BZeadzO0lau
+        5AHtNfRNZJUbqwSsUa8WpuWrWw2aNVo=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-307-ISNlrstQOYmIBbkW5AwG5A-1; Mon, 04 Jul 2022 02:40:29 -0400
+X-MC-Unique: ISNlrstQOYmIBbkW5AwG5A-1
+Received: by mail-lj1-f199.google.com with SMTP id g25-20020a2e9e59000000b0025baf0470feso2426015ljk.8
+        for <kvm@vger.kernel.org>; Sun, 03 Jul 2022 23:40:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qMOEw4DkVDPn98Rjv4lUmJsvQgI5ankcWzzn5AvogbY=;
+        b=GWr3kT2d4U0ccgV3toCdFmBLCbOmeafZllY/IYmjXz55roJm2hdCuxCRhfoumiTlSs
+         JoZTceJ5fs3KT1735uMdDMFdk65aa29BRxvKG+gxJcdLz8wmjwMM/oKrL76AoKNwYssN
+         z8df5Z50Syul7aqXzyeNfGltzXIcjshiMDy3m04Q/QNMWIseReiNRwQNrO3r2KDQVpUP
+         qCEzOWCfD8isUa1AhLS9E0X1dSdwDXnb2EVpeNLK5M+iXiwe0HQ6IGSjJEiRwzFTs7g5
+         2yp3ulWbrna1GCU/NFHxo1BxlkCKpEZ8XopLRBVf9+eYTDAg18puj9HHrvkNuSzgwqFA
+         S2KQ==
+X-Gm-Message-State: AJIora+rpys4wcxx2dxFFUWPWv+5+/oYu/5d5dtbz20z5Vb8jpP/PCw2
+        iPVt/6IRbV3Tl5gsAYB0o9PtBOpX87H8m8IcDfaKEBrPgCxEyiNytAWF+TWtbiwDejcHIjnwju9
+        gCgzCJl0j8OkEXR6K+z11L4YoE+ql
+X-Received: by 2002:a05:6512:3f0f:b0:47f:6f89:326 with SMTP id y15-20020a0565123f0f00b0047f6f890326mr16831249lfa.124.1656916827641;
+        Sun, 03 Jul 2022 23:40:27 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sppZhtxMRB1b8yVzweWY5H/6xxlxkDGQ6ZEQ0ZTAxznZHDFs4TDHotunAxKLZpFvYHKvkNwdjwao4UXuarT50=
+X-Received: by 2002:a05:6512:3f0f:b0:47f:6f89:326 with SMTP id
+ y15-20020a0565123f0f00b0047f6f890326mr16831229lfa.124.1656916827448; Sun, 03
+ Jul 2022 23:40:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220606175248.1884041-2-aaronlewis@google.com>
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+References: <CACGkMEsC4A+3WejLSOZoH3enXtai=+JyRNbxcpzK4vODYzhaFw@mail.gmail.com>
+ <CACGkMEvu0D0XD7udz0ebVjNM0h5+K9Rjd-5ed=PY_+-aduzG2g@mail.gmail.com>
+ <20220629022223-mutt-send-email-mst@kernel.org> <CACGkMEuwvzkbPUSFueCOjit7pRJ81v3-W3SZD+7jQJN8btEFdg@mail.gmail.com>
+ <20220629030600-mutt-send-email-mst@kernel.org> <CACGkMEvnUj622FyROUftifSB47wytPg0YAdVO7fdRQmCE+WuBg@mail.gmail.com>
+ <20220629044514-mutt-send-email-mst@kernel.org> <CACGkMEsW02a1LeiWwUgHfVmDEnC8i49h1L7qHmeoLyJyRS6-zA@mail.gmail.com>
+ <20220630043219-mutt-send-email-mst@kernel.org> <CACGkMEtgnHDEUOHQxqUFn2ngOpUGcVu4NSQBqfYYZRMPA2H2LQ@mail.gmail.com>
+ <20220704021950-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220704021950-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Mon, 4 Jul 2022 14:40:16 +0800
+Message-ID: <CACGkMEsVcmerW7xE01JvntnxkomxF5r4H2dQGDP8-xGNZJ87kw@mail.gmail.com>
+Subject: Re: [PATCH V3] virtio: disable notification hardening by default
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>,
+        David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -64,45 +87,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Aaron,
+On Mon, Jul 4, 2022 at 2:22 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Jul 04, 2022 at 12:23:27PM +0800, Jason Wang wrote:
+> > > So if there are not examples of callbacks not ready after kick
+> > > then let us block callbacks until first kick. That is my idea.
+> >
+> > Ok, let me try. I need to drain my queue of fixes first.
+> >
+> > Thanks
+>
+> If we do find issues, another option is blocking callbacks until the
+> first add. A bit higher overhead as add is a more common operation
+> but it has even less of a chance to introduce regressions.
 
-Thank you for the patch! Perhaps something to improve:
+So I understand that the case of blocking until first kick but if we
+block until add it means for drivers:
 
-[auto build test WARNING on mst-vhost/linux-next]
-[also build test WARNING on v5.19-rc5]
-[cannot apply to kvm/queue next-20220701]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+virtqueue_add()
+virtio_device_ready()
+virtqueue_kick()
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Aaron-Lewis/kvm-x86-pmu-Introduce-and-test-masked-events/20220607-020408
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-reproduce: make htmldocs
+We probably enlarge the window in this case.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+Thanks
 
-All warnings (new ones prefixed by >>):
+>
+> > >
+> > >
+> > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > >I couldn't ... except maybe bluetooth
+> > > > > > > > > > > > but that's just maintainer nacking fixes saying he'll fix it
+> > > > > > > > > > > > his way ...
+> > > > > > > > > > > >
+> > > > > > > > > > > > > And during remove(), we get another window:
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > subsysrem_unregistration()
+> > > > > > > > > > > > > /* the window */
+> > > > > > > > > > > > > virtio_device_reset()
+> > > > > > > > > > > >
+> > > > > > > > > > > > Same here.
+> > > > > > > > > >
+> > > > > > > > > > Basically for the drivers that set driver_ok before registration,
+> > > > > > > > >
+> > > > > > > > > I don't see what does driver_ok have to do with it.
+> > > > > > > >
+> > > > > > > > I meant for those driver, in probe they do()
+> > > > > > > >
+> > > > > > > > virtio_device_ready()
+> > > > > > > > subsystem_register()
+> > > > > > > >
+> > > > > > > > In remove() they do
+> > > > > > > >
+> > > > > > > > subsystem_unregister()
+> > > > > > > > virtio_device_reset()
+> > > > > > > >
+> > > > > > > > for symmetry
+> > > > > > >
+> > > > > > > Let's leave remove alone for now. I am close to 100% sure we have *lots*
+> > > > > > > of issues around it, but while probe is unavoidable remove can be
+> > > > > > > avoided by blocking hotplug.
+> > > > > >
+> > > > > > Unbind can trigger this path as well.
+> > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > > >
+> > > > > > > > > > so
+> > > > > > > > > > we have a lot:
+> > > > > > > > > >
+> > > > > > > > > > blk, net, mac80211_hwsim, scsi, vsock, bt, crypto, gpio, gpu, i2c,
+> > > > > > > > > > iommu, caif, pmem, input, mem
+> > > > > > > > > >
+> > > > > > > > > > So I think there's no easy way to harden the notification without
+> > > > > > > > > > auditing the driver one by one (especially considering the driver may
+> > > > > > > > > > use bh or workqueue). The problem is the notification hardening
+> > > > > > > > > > depends on a correct or race-free probe/remove. So we need to fix the
+> > > > > > > > > > issues in probe/remove then do the hardening on the notification.
+> > > > > > > > > >
+> > > > > > > > > > Thanks
+> > > > > > > > >
+> > > > > > > > > So if drivers kick but are not ready to get callbacks then let's fix
+> > > > > > > > > that first of all, these are racy with existing qemu even ignoring
+> > > > > > > > > spec compliance.
+> > > > > > > >
+> > > > > > > > Yes, (the patches I've posted so far exist even with a well-behaved device).
+> > > > > > > >
+> > > > > > > > Thanks
+> > > > > > >
+> > > > > > > patches you posted deal with DRIVER_OK spec compliance.
+> > > > > > > I do not see patches for kicks before callbacks are ready to run.
+> > > > > >
+> > > > > > Yes.
+> > > > > >
+> > > > > > Thanks
+> > > > > >
+> > > > > > >
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > --
+> > > > > > > > > MST
+> > > > > > > > >
+> > > > > > >
+> > > > >
+> > >
+>
 
->> Documentation/virt/kvm/api.rst:5023: WARNING: Unexpected indentation.
->> Documentation/virt/kvm/api.rst:5025: WARNING: Block quote ends without a blank line; unexpected unindent.
-
-vim +5023 Documentation/virt/kvm/api.rst
-
-  5015	
-  5016	:Capability: KVM_CAP_PMU_EVENT_FILTER
-  5017	:Architectures: x86
-  5018	:Type: vm ioctl
-  5019	:Parameters: struct kvm_pmu_event_filter (in)
-  5020	:Returns: 0 on success,
-  5021	    -EFAULT args[0] cannot be accessed.
-  5022	    -EINVAL args[0] contains invalid data in the filter or events field.
-> 5023	                    Note: event validation is only done for modes where
-  5024	                    the flags field is non-zero.
-> 5025	    -E2BIG nevents is too large.
-  5026	    -ENOMEM not enough memory to allocate the filter.
-  5027	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
