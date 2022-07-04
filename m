@@ -2,296 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F611564DDD
-	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 08:44:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61944564E1B
+	for <lists+kvm@lfdr.de>; Mon,  4 Jul 2022 09:00:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232952AbiGDGoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 02:44:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51638 "EHLO
+        id S232938AbiGDHAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 03:00:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232847AbiGDGoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 02:44:19 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DF5A3899;
-        Sun,  3 Jul 2022 23:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656917058; x=1688453058;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=kyif9vtz4zkl0pkVYJ151CZ4mMtl2C5MaCwh4sjRy0Q=;
-  b=Y/0nIuBAyBVfL0KRFQbNr39RUD/hfOV0byaua8ab62hRG4yXP5c0BjRi
-   c1/8B1GDH0oq2IFq1pnOQXGrCvyO8Cj6Ha8Zz1tH75xZ1eOqdsRSh2qfo
-   ksTmrFzD886Ldro/zu0cr7u/HTnGebdDGffxtZw2N0k20VE12XKclWk3Y
-   FWYhFW2OI0liDCpmyyLELVpDc+kOvfmnIjytXy6RA99S9Vzhs3/HOPlaI
-   Je2BHRtq79o0Zn6t5laymV8S/QcV3hshzwelVDFDXS4watfe4aQ+5hUOP
-   0Et80wIPHt6Tm0CK0dfi7pmon7FWrpr15aDV5OmcBkpdYPycha0o94DyC
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10397"; a="266074640"
-X-IronPort-AV: E=Sophos;i="5.92,243,1650956400"; 
-   d="scan'208";a="266074640"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2022 23:44:17 -0700
-X-IronPort-AV: E=Sophos;i="5.92,243,1650956400"; 
-   d="scan'208";a="592370977"
-Received: from fzafar-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.123.22])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2022 23:44:14 -0700
-Message-ID: <b6a196498b1e74688cb9239d332e9e0d60e9574d.camel@intel.com>
-Subject: Re: [PATCH v7 012/102] KVM: x86: Introduce vm_type to differentiate
- default VMs from confidential VMs
-From:   Kai Huang <kai.huang@intel.com>
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Date:   Mon, 04 Jul 2022 18:44:12 +1200
-In-Reply-To: <3c5d4e38b631a921006e44551fe1249339393e41.camel@intel.com>
-References: <cover.1656366337.git.isaku.yamahata@intel.com>
-         <5979d880dc074c7fa57e02da34a41a6905ebd89d.1656366338.git.isaku.yamahata@intel.com>
-         <3c5d4e38b631a921006e44551fe1249339393e41.camel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+        with ESMTP id S232772AbiGDHAw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 03:00:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6D78D5F42
+        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 00:00:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656918050;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QKFiYOhVLexNLZAnyygH6JGx6im3hhRGTkcpFvcfiv0=;
+        b=M4fHphM/2q+qW6AOPJSc5mh5jU9NR56MlYMu3kQ/tIrzh7zZOPd5vE+gKGlBvAlDfrguc5
+        Ur0gPhwCEZVTyT10SSyMBp4rWtZlStTwDEsXo4VQw4UXSqmbFcXDq9R/k8LuHmfcQLBBgl
+        Ebw6tGR9lFjBh4Cach60RQDv/xJc2n4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-197-aI2eDKpJMheJ1IwlNRQ6Ng-1; Mon, 04 Jul 2022 03:00:49 -0400
+X-MC-Unique: aI2eDKpJMheJ1IwlNRQ6Ng-1
+Received: by mail-wr1-f71.google.com with SMTP id u9-20020adfa189000000b0021b8b3c8f74so1177826wru.12
+        for <kvm@vger.kernel.org>; Mon, 04 Jul 2022 00:00:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QKFiYOhVLexNLZAnyygH6JGx6im3hhRGTkcpFvcfiv0=;
+        b=UiMBPs7aagJY/7pmILxPOp6QbEfMF7DbapzVqw1xrh+qOTL8ZQTrFPW7aOuZKD7A75
+         x7ab5P+hahCbVJXBzkucVBO5IrVJFlh/vCOKLohjM0ABHPwMVwE+w5edI3sbkmr985eu
+         0RH0muZCwt3kQIX83ZhkogY1+qVdowCHJcCttY8LafB38yZ+LfOV/FabuVgfjo/8OmUu
+         38qOZ1S2HutRlMNJ1093rCqdo/qf08bJifKLgqi96Em7h8C6kFgOyoNTdD/ChPxwiXJY
+         DFIjSCZiQVChME8LIS1qclpTRHvuwXWdMc8U38RL01OhY3GsFVuZKaKOfWp9F35f1Eip
+         StOA==
+X-Gm-Message-State: AJIora8ZxWGtPnoKJX9IvRhCJWdOngIgfT+Uv4hqpDfGj9RFGQxyJ57g
+        EU5BWUFKMeVRLpjGXMxODViMrr78m/lPGzObmcD6e6Z9+H4kHmIjDgzqJWLtA5GjQSNErV9ULwo
+        J6KFopVj0NFO9
+X-Received: by 2002:a5d:5050:0:b0:21b:a348:7c0 with SMTP id h16-20020a5d5050000000b0021ba34807c0mr24643678wrt.184.1656918048141;
+        Mon, 04 Jul 2022 00:00:48 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1spniD4B5iaafPVJ5gLTv4/pH5qJd/Sh/qNkdYesfjItgeUTWnDB2+innkMR9U68mUQU8qzzA==
+X-Received: by 2002:a5d:5050:0:b0:21b:a348:7c0 with SMTP id h16-20020a5d5050000000b0021ba34807c0mr24643655wrt.184.1656918047895;
+        Mon, 04 Jul 2022 00:00:47 -0700 (PDT)
+Received: from redhat.com ([2.55.3.188])
+        by smtp.gmail.com with ESMTPSA id o15-20020a05600c510f00b003971fc23185sm14891356wms.20.2022.07.04.00.00.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Jul 2022 00:00:47 -0700 (PDT)
+Date:   Mon, 4 Jul 2022 03:00:42 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH V3] virtio: disable notification hardening by default
+Message-ID: <20220704025850-mutt-send-email-mst@kernel.org>
+References: <20220629022223-mutt-send-email-mst@kernel.org>
+ <CACGkMEuwvzkbPUSFueCOjit7pRJ81v3-W3SZD+7jQJN8btEFdg@mail.gmail.com>
+ <20220629030600-mutt-send-email-mst@kernel.org>
+ <CACGkMEvnUj622FyROUftifSB47wytPg0YAdVO7fdRQmCE+WuBg@mail.gmail.com>
+ <20220629044514-mutt-send-email-mst@kernel.org>
+ <CACGkMEsW02a1LeiWwUgHfVmDEnC8i49h1L7qHmeoLyJyRS6-zA@mail.gmail.com>
+ <20220630043219-mutt-send-email-mst@kernel.org>
+ <CACGkMEtgnHDEUOHQxqUFn2ngOpUGcVu4NSQBqfYYZRMPA2H2LQ@mail.gmail.com>
+ <20220704021950-mutt-send-email-mst@kernel.org>
+ <CACGkMEsVcmerW7xE01JvntnxkomxF5r4H2dQGDP8-xGNZJ87kw@mail.gmail.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEsVcmerW7xE01JvntnxkomxF5r4H2dQGDP8-xGNZJ87kw@mail.gmail.com>
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-06-28 at 14:52 +1200, Kai Huang wrote:
-> On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> >=20
-> > Unlike default VMs, confidential VMs (Intel TDX and AMD SEV-ES) don't a=
-llow
-> > some operations (e.g., memory read/write, register state access, etc).
-> >=20
-> > Introduce vm_type to track the type of the VM to x86 KVM.  Other arch K=
-VMs
-> > already use vm_type, KVM_INIT_VM accepts vm_type, and x86 KVM callback
-> > vm_init accepts vm_type.  So follow them.  Further, a different policy =
-can
-> > be made based on vm_type.  Define KVM_X86_DEFAULT_VM for default VM as
-> > default and define KVM_X86_TDX_VM for Intel TDX VM.  The wrapper functi=
-on
-> > will be defined as "bool is_td(kvm) { return vm_type =3D=3D VM_TYPE_TDX=
-; }"
-> >=20
-> > Add a capability KVM_CAP_VM_TYPES to effectively allow device model,
-> > e.g. qemu, to query what VM types are supported by KVM.  This (introduc=
-e a
-> > new capability and add vm_type) is chosen to align with other arch KVMs
-> > that have VM types already.  Other arch KVMs uses different name to que=
-ry
-> > supported vm types and there is no common name for it, so new name was
-> > chosen.
-> >=20
-> > Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst        | 21 +++++++++++++++++++++
-> >  arch/x86/include/asm/kvm-x86-ops.h    |  1 +
-> >  arch/x86/include/asm/kvm_host.h       |  2 ++
-> >  arch/x86/include/uapi/asm/kvm.h       |  3 +++
-> >  arch/x86/kvm/svm/svm.c                |  6 ++++++
-> >  arch/x86/kvm/vmx/main.c               |  1 +
-> >  arch/x86/kvm/vmx/tdx.h                |  6 +-----
-> >  arch/x86/kvm/vmx/vmx.c                |  5 +++++
-> >  arch/x86/kvm/vmx/x86_ops.h            |  1 +
-> >  arch/x86/kvm/x86.c                    |  9 ++++++++-
-> >  include/uapi/linux/kvm.h              |  1 +
-> >  tools/arch/x86/include/uapi/asm/kvm.h |  3 +++
-> >  tools/include/uapi/linux/kvm.h        |  1 +
-> >  13 files changed, 54 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
-i.rst
-> > index 9cbbfdb663b6..b9ab598883b2 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -147,10 +147,31 @@ described as 'basic' will be available.
-> >  The new VM has no virtual cpus and no memory.
-> >  You probably want to use 0 as machine type.
-> > =20
-> > +X86:
-> > +^^^^
-> > +
-> > +Supported vm type can be queried from KVM_CAP_VM_TYPES, which returns =
-the
-> > +bitmap of supported vm types. The 1-setting of bit @n means vm type wi=
-th
-> > +value @n is supported.
->=20
->=20
-> Perhaps I am missing something, but I don't understand how the below chan=
-ges
-> (except the x86 part above) in Documentation are related to this patch.
->=20
-> > +
-> > +S390:
-> > +^^^^^
-> > +
-> >  In order to create user controlled virtual machines on S390, check
-> >  KVM_CAP_S390_UCONTROL and use the flag KVM_VM_S390_UCONTROL as
-> >  privileged user (CAP_SYS_ADMIN).
-> > =20
-> > +MIPS:
-> > +^^^^^
-> > +
-> > +To use hardware assisted virtualization on MIPS (VZ ASE) rather than
-> > +the default trap & emulate implementation (which changes the virtual
-> > +memory layout to fit in user mode), check KVM_CAP_MIPS_VZ and use the
-> > +flag KVM_VM_MIPS_VZ.
-> > +
-> > +ARM64:
-> > +^^^^^^
-> > +
-> >  On arm64, the physical address size for a VM (IPA Size limit) is limit=
-ed
-> >  to 40bits by default. The limit can be configured if the host supports=
- the
-> >  extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/=
-kvm-x86-ops.h
-> > index 75bc44aa8d51..a97cdb203a16 100644
-> > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > @@ -19,6 +19,7 @@ KVM_X86_OP(hardware_disable)
-> >  KVM_X86_OP(hardware_unsetup)
-> >  KVM_X86_OP(has_emulated_msr)
-> >  KVM_X86_OP(vcpu_after_set_cpuid)
-> > +KVM_X86_OP(is_vm_type_supported)
-> >  KVM_X86_OP(vm_init)
-> >  KVM_X86_OP_OPTIONAL(vm_destroy)
-> >  KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index aa11525500d3..089e0a4de926 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1141,6 +1141,7 @@ enum kvm_apicv_inhibit {
-> >  };
-> > =20
-> >  struct kvm_arch {
-> > +	unsigned long vm_type;
-> >  	unsigned long n_used_mmu_pages;
-> >  	unsigned long n_requested_mmu_pages;
-> >  	unsigned long n_max_mmu_pages;
-> > @@ -1434,6 +1435,7 @@ struct kvm_x86_ops {
-> >  	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
-> >  	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
-> > =20
-> > +	bool (*is_vm_type_supported)(unsigned long vm_type);
-> >  	unsigned int vm_size;
-> >  	int (*vm_init)(struct kvm *kvm);
-> >  	void (*vm_destroy)(struct kvm *kvm);
-> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/as=
-m/kvm.h
-> > index 50a4e787d5e6..9792ec1cc317 100644
-> > --- a/arch/x86/include/uapi/asm/kvm.h
-> > +++ b/arch/x86/include/uapi/asm/kvm.h
-> > @@ -531,4 +531,7 @@ struct kvm_pmu_event_filter {
-> >  #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter=
- (TSC) */
-> >  #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
-> > =20
-> > +#define KVM_X86_DEFAULT_VM	0
-> > +#define KVM_X86_TDX_VM		1
-> > +
-> >  #endif /* _ASM_X86_KVM_H */
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 247c0ad458a0..815a07c594f1 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -4685,6 +4685,11 @@ static void svm_vm_destroy(struct kvm *kvm)
-> >  	sev_vm_destroy(kvm);
-> >  }
-> > =20
-> > +static bool svm_is_vm_type_supported(unsigned long type)
-> > +{
-> > +	return type =3D=3D KVM_X86_DEFAULT_VM;
-> > +}
-> > +
-> >  static int svm_vm_init(struct kvm *kvm)
-> >  {
-> >  	if (!pause_filter_count || !pause_filter_thresh)
-> > @@ -4712,6 +4717,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata =
-=3D {
-> >  	.vcpu_free =3D svm_vcpu_free,
-> >  	.vcpu_reset =3D svm_vcpu_reset,
-> > =20
-> > +	.is_vm_type_supported =3D svm_is_vm_type_supported,
-> >  	.vm_size =3D sizeof(struct kvm_svm),
-> >  	.vm_init =3D svm_vm_init,
-> >  	.vm_destroy =3D svm_vm_destroy,
-> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> > index ac788af17d92..7be4941e4c4d 100644
-> > --- a/arch/x86/kvm/vmx/main.c
-> > +++ b/arch/x86/kvm/vmx/main.c
-> > @@ -43,6 +43,7 @@ struct kvm_x86_ops vt_x86_ops __initdata =3D {
-> >  	.hardware_disable =3D vmx_hardware_disable,
-> >  	.has_emulated_msr =3D vmx_has_emulated_msr,
-> > =20
-> > +	.is_vm_type_supported =3D vmx_is_vm_type_supported,
-> >  	.vm_size =3D sizeof(struct kvm_vmx),
-> >  	.vm_init =3D vmx_vm_init,
-> >  	.vm_destroy =3D vmx_vm_destroy,
-> > diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> > index 54d7a26ed9ee..2f43db5bbefb 100644
-> > --- a/arch/x86/kvm/vmx/tdx.h
-> > +++ b/arch/x86/kvm/vmx/tdx.h
-> > @@ -17,11 +17,7 @@ struct vcpu_tdx {
-> > =20
-> >  static inline bool is_td(struct kvm *kvm)
-> >  {
-> > -	/*
-> > -	 * TDX VM type isn't defined yet.
-> > -	 * return kvm->arch.vm_type =3D=3D KVM_X86_TDX_VM;
-> > -	 */
-> > -	return false;
-> > +	return kvm->arch.vm_type =3D=3D KVM_X86_TDX_VM;
-> >  }
->=20
-> If you put this patch before patch:
->=20
-> 	[PATCH v7 009/102] KVM: TDX: Add placeholders for TDX VM/vcpu structure
->=20
-> Then you don't need to introduce this chunk in above patch and then remov=
-e it
-> here, which is unnecessary and ugly.
->=20
-> And you can even only introduce KVM_X86_DEFAULT_VM but not KVM_X86_TDX_VM=
- in
-> this patch, so you can make this patch as a infrastructural patch to repo=
-rt VM
-> type.  The KVM_X86_TDX_VM can come with the patch where is_td() is introd=
-uced
-> (in your above patch 9). =C2=A0
->=20
-> To me, it's more clean way to write patch.  For instance, this infrastruc=
-tural
-> patch can be theoretically used by other series if they have similar thin=
-g to
-> support, but doesn't need to carry is_td() and KVM_X86_TDX_VM burden that=
- you
-> made.
+On Mon, Jul 04, 2022 at 02:40:16PM +0800, Jason Wang wrote:
+> On Mon, Jul 4, 2022 at 2:22 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Jul 04, 2022 at 12:23:27PM +0800, Jason Wang wrote:
+> > > > So if there are not examples of callbacks not ready after kick
+> > > > then let us block callbacks until first kick. That is my idea.
+> > >
+> > > Ok, let me try. I need to drain my queue of fixes first.
+> > >
+> > > Thanks
+> >
+> > If we do find issues, another option is blocking callbacks until the
+> > first add. A bit higher overhead as add is a more common operation
+> > but it has even less of a chance to introduce regressions.
+> 
+> So I understand that the case of blocking until first kick but if we
+> block until add it means for drivers:
+> 
+> virtqueue_add()
+> virtio_device_ready()
+> virtqueue_kick()
+> 
+> We probably enlarge the window in this case.
+> 
+> Thanks
 
-Sorry I missed this patch already has Paolo's Reviewed-by.  Please feel fre=
-e to
-ignore my comments.
+Yes but I don't know whether any drivers call add before they are ready
+to get a callback. The main thing with hardening is not to break
+drivers. Primum non nocere and all that.
 
 
---=20
-Thanks,
--Kai
-
+> >
+> > > >
+> > > >
+> > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > >I couldn't ... except maybe bluetooth
+> > > > > > > > > > > > > but that's just maintainer nacking fixes saying he'll fix it
+> > > > > > > > > > > > > his way ...
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > > And during remove(), we get another window:
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > subsysrem_unregistration()
+> > > > > > > > > > > > > > /* the window */
+> > > > > > > > > > > > > > virtio_device_reset()
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Same here.
+> > > > > > > > > > >
+> > > > > > > > > > > Basically for the drivers that set driver_ok before registration,
+> > > > > > > > > >
+> > > > > > > > > > I don't see what does driver_ok have to do with it.
+> > > > > > > > >
+> > > > > > > > > I meant for those driver, in probe they do()
+> > > > > > > > >
+> > > > > > > > > virtio_device_ready()
+> > > > > > > > > subsystem_register()
+> > > > > > > > >
+> > > > > > > > > In remove() they do
+> > > > > > > > >
+> > > > > > > > > subsystem_unregister()
+> > > > > > > > > virtio_device_reset()
+> > > > > > > > >
+> > > > > > > > > for symmetry
+> > > > > > > >
+> > > > > > > > Let's leave remove alone for now. I am close to 100% sure we have *lots*
+> > > > > > > > of issues around it, but while probe is unavoidable remove can be
+> > > > > > > > avoided by blocking hotplug.
+> > > > > > >
+> > > > > > > Unbind can trigger this path as well.
+> > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > so
+> > > > > > > > > > > we have a lot:
+> > > > > > > > > > >
+> > > > > > > > > > > blk, net, mac80211_hwsim, scsi, vsock, bt, crypto, gpio, gpu, i2c,
+> > > > > > > > > > > iommu, caif, pmem, input, mem
+> > > > > > > > > > >
+> > > > > > > > > > > So I think there's no easy way to harden the notification without
+> > > > > > > > > > > auditing the driver one by one (especially considering the driver may
+> > > > > > > > > > > use bh or workqueue). The problem is the notification hardening
+> > > > > > > > > > > depends on a correct or race-free probe/remove. So we need to fix the
+> > > > > > > > > > > issues in probe/remove then do the hardening on the notification.
+> > > > > > > > > > >
+> > > > > > > > > > > Thanks
+> > > > > > > > > >
+> > > > > > > > > > So if drivers kick but are not ready to get callbacks then let's fix
+> > > > > > > > > > that first of all, these are racy with existing qemu even ignoring
+> > > > > > > > > > spec compliance.
+> > > > > > > > >
+> > > > > > > > > Yes, (the patches I've posted so far exist even with a well-behaved device).
+> > > > > > > > >
+> > > > > > > > > Thanks
+> > > > > > > >
+> > > > > > > > patches you posted deal with DRIVER_OK spec compliance.
+> > > > > > > > I do not see patches for kicks before callbacks are ready to run.
+> > > > > > >
+> > > > > > > Yes.
+> > > > > > >
+> > > > > > > Thanks
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > --
+> > > > > > > > > > MST
+> > > > > > > > > >
+> > > > > > > >
+> > > > > >
+> > > >
+> >
 
