@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9DF65670C5
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 16:17:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89F365670EF
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 16:24:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232441AbiGEORx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jul 2022 10:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42592 "EHLO
+        id S231239AbiGEOYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jul 2022 10:24:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229809AbiGEORR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jul 2022 10:17:17 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C320AC2;
-        Tue,  5 Jul 2022 07:12:55 -0700 (PDT)
+        with ESMTP id S232919AbiGEOW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jul 2022 10:22:56 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5665E6;
+        Tue,  5 Jul 2022 07:22:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657030375; x=1688566375;
+  t=1657030975; x=1688566975;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=SIDIXWp+uLjdJ2JzYj8HE+pPOUBXDZ/g3Y7jU8UVF44=;
-  b=M0V30Fwp7t1OANCn0dBKxvN3XbGeFu27L7dKXpn/w2/Ammc2q45Svfu9
-   pmbKrpGJC3nw5Njk8qCYTuBFJ7Ufprtz41winCZY3sOe/3inmTs5gGP4B
-   pOB3Y+e3QzmFZsxi47rDxn6bY0G0fyrGcao5swFItO/dluFbJRdt779Wn
-   rF8Llo7fNqxPwIl6AJPU0QaxBWUv3yVdx3e2jvSlOPPX1MhfJXHKnJoxw
-   NEtifm82+IfPD/HhDMebZcdMM65i/6M0NLlKr6Eqh+9Xl2zW0K1U0k1bJ
-   i/OXx1cGbE4yAhCC6JIiZ2u6cOTwQ7Jni1r4h7hIdTBkS0AHqSRTqs148
+  bh=KxZS7Eqzucz3GLlm0/QQmLH1mpSw1o0eLbsqaMILkQs=;
+  b=MgP6iRUPhVY8An5k4jNthWre4LakCC9yyz/ZKpXXdMnjuC2vY+LFlY2y
+   57RhPPmc1iDKbbCcTINken1BeigND1PdF3WTH8DyBcB23XuHL1YG2GCI3
+   O2DO4cS+fjzZlsoieJUlpLqWAH3i0KBp7Ux90Xb9lBT350O1AY7iVTFtl
+   zOwKufi9WAxjU0f5XeW1Qjwsm9in3HxnHoPNxbsviFCXRiFnr+m557BXB
+   nHqJsMMgw2OiH2xWrAndG6CAVThqjaBcTN5XSdqR8IXVjWCYOpr9M6GhX
+   3RpQlM0T46lvwVVkjxdIvHcKWEEFuMekeRy9FKuAOajdBB724q1yVwSHB
    Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10398"; a="263785883"
+X-IronPort-AV: E=McAfee;i="6400,9594,10398"; a="283393624"
 X-IronPort-AV: E=Sophos;i="5.92,247,1650956400"; 
-   d="scan'208";a="263785883"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2022 07:12:55 -0700
+   d="scan'208";a="283393624"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2022 07:22:55 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.92,247,1650956400"; 
-   d="scan'208";a="592938074"
+   d="scan'208";a="919738743"
 Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 05 Jul 2022 07:12:52 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 05 Jul 2022 07:22:52 -0700
 Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
         (envelope-from <lkp@intel.com>)
-        id 1o8jIJ-000J9L-OE;
-        Tue, 05 Jul 2022 14:12:51 +0000
-Date:   Tue, 5 Jul 2022 22:11:51 +0800
+        id 1o8jS0-000JA5-55;
+        Tue, 05 Jul 2022 14:22:52 +0000
+Date:   Tue, 5 Jul 2022 22:22:08 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
         jgg@nvidia.com
@@ -51,14 +51,14 @@ Cc:     kbuild-all@lists.01.org, saeedm@nvidia.com, kvm@vger.kernel.org,
         maorg@nvidia.com, cohuck@redhat.com
 Subject: Re: [PATCH V1 vfio 06/11] vfio: Introduce the DMA logging feature
  support
-Message-ID: <202207052209.x00Iykkp-lkp@intel.com>
+Message-ID: <202207052211.ARFEDBEi-lkp@intel.com>
 References: <20220705102740.29337-7-yishaih@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20220705102740.29337-7-yishaih@nvidia.com>
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -80,8 +80,8 @@ https://git-scm.com/docs/git-format-patch]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/Add-device-DMA-logging-support-for-mlx5-driver/20220705-183119
 base:   https://github.com/awilliam/linux-vfio.git next
-config: openrisc-randconfig-r036-20220703 (https://download.01.org/0day-ci/archive/20220705/202207052209.x00Iykkp-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 11.3.0
+config: m68k-randconfig-r035-20220703 (https://download.01.org/0day-ci/archive/20220705/202207052211.ARFEDBEi-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 11.3.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
@@ -91,22 +91,21 @@ reproduce (this is a W=1 build):
         git checkout 12299d61a80f6adf70a2e76b8f4721f3b7bcd95a
         # save the config file
         mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=openrisc SHELL=/bin/bash
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
 
 If you fix the issue, kindly add following tag where applicable
 Reported-by: kernel test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   or1k-linux-ld: certs/system_keyring.o: in function `load_system_certificate_list':
-   system_keyring.c:(.init.text+0xc0): undefined reference to `x509_load_certificate_list'
-   system_keyring.c:(.init.text+0xc0): relocation truncated to fit: R_OR1K_INSN_REL_26 against undefined symbol `x509_load_certificate_list'
-   or1k-linux-ld: or1k-linux-ld: DWARF error: could not find abbrev number 36676422
-   drivers/vfio/vfio_main.o: in function `vfio_ioctl_device_feature_logging_start':
-   vfio_main.c:(.text+0x18c8): undefined reference to `interval_tree_iter_first'
-   vfio_main.c:(.text+0x18c8): relocation truncated to fit: R_OR1K_INSN_REL_26 against undefined symbol `interval_tree_iter_first'
->> or1k-linux-ld: vfio_main.c:(.text+0x18e4): undefined reference to `interval_tree_insert'
-   vfio_main.c:(.text+0x18e4): relocation truncated to fit: R_OR1K_INSN_REL_26 against undefined symbol `interval_tree_insert'
+   m68k-linux-ld: arch/m68k/kernel/machine_kexec.o: in function `machine_kexec':
+   machine_kexec.c:(.text+0x58): undefined reference to `m68k_mmutype'
+   m68k-linux-ld: machine_kexec.c:(.text+0x60): undefined reference to `m68k_cputype'
+   m68k-linux-ld: arch/m68k/kernel/relocate_kernel.o:(.m68k_fixup+0x0): undefined reference to `M68K_FIXUP_MEMOFFSET'
+   m68k-linux-ld: arch/m68k/kernel/relocate_kernel.o:(.m68k_fixup+0x8): undefined reference to `M68K_FIXUP_MEMOFFSET'
+   m68k-linux-ld: drivers/vfio/vfio_main.o: in function `vfio_ioctl_device_feature_logging_start':
+   vfio_main.c:(.text+0x105e): undefined reference to `interval_tree_iter_first'
+>> m68k-linux-ld: vfio_main.c:(.text+0x1074): undefined reference to `interval_tree_insert'
 
 -- 
 0-DAY CI Kernel Test Service
