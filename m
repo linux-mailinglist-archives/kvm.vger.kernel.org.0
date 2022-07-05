@@ -2,122 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE5C8565FB6
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 01:20:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C835556603B
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 02:58:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229725AbiGDXU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 19:20:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58208 "EHLO
+        id S231950AbiGEAtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 20:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233424AbiGDXU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 19:20:56 -0400
-X-Greylist: delayed 824 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 04 Jul 2022 16:20:55 PDT
-Received: from mx2.absolutedigital.net (mx2.absolutedigital.net [50.242.207.105])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AF2CA1057F
-        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 16:20:55 -0700 (PDT)
-Received: from lancer.cnet.absolutedigital.net (lancer.cnet.absolutedigital.net [10.7.5.10])
-        by luxor.inet.absolutedigital.net (8.14.4/8.14.4) with ESMTP id 264N6k0P020448
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=FAIL);
-        Mon, 4 Jul 2022 19:06:46 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by lancer.cnet.absolutedigital.net (8.17.1/8.17.1) with ESMTPS id 264N71sQ024557
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Mon, 4 Jul 2022 19:07:01 -0400
-Date:   Mon, 4 Jul 2022 19:07:01 -0400 (EDT)
-From:   Cal Peake <cp@absolutedigital.net>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>, linux-pci@vger.kernel.org,
+        with ESMTP id S233234AbiGEAtX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 20:49:23 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D9A91AC
+        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 17:49:21 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id h19so11731315qtp.6
+        for <kvm@vger.kernel.org>; Mon, 04 Jul 2022 17:49:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=q3paDzJi5zzEw3QKS2XN4fxvFnQ/vqjvAcG3eiMUei8=;
+        b=UWbvO6ZtItbh0AdvVy7iymQqSlvRnGbG03r6ZLE3bPIbnGB88/Bpo7DWEw+NDXEvj7
+         PmGWTxIJm2jUK3a0CGepEoTVZ/5tFuOwbd5Dy4xoBvStZ7MGWEkPcecHGLFgz0uqCWy3
+         i0c66yox5GEptajw8phz5NlVFOyc65ny13gu9QVOHim/yP3XkiVXZsyNeB/ptfYd8jjb
+         lbkUhlS5uNDOrvMvmE0fwxQUTe0Se7/4WolupftYzZkhmbANXe1E5tTjx4Sq4sJqKs81
+         0pFSq2XR7jJqV+/2kdpP5TQjGIhNyq/8Ky7JHJSfsEHkfdlUZFsTOpE0uT+zmxopfMvQ
+         7prw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=q3paDzJi5zzEw3QKS2XN4fxvFnQ/vqjvAcG3eiMUei8=;
+        b=iYugfePu6oFhWq2k+f5CzGvT5eoEqVcxMOLiW23fr0a6q3e+7WljGz59zLfxxG8e8Y
+         71kHOMeeXAIyuWf8U9VmZu+1K1ZHxROvq0jCl9RpxEHYpdwvxqySJzsVsiEUYq0EZYb+
+         tx0MAcRU4QDmE5/dZhmdGErifrKtOXmt5J929JeX+ILjK4MZrklYyBNd8MYHGsdCEWX7
+         GuuwZFrSUu2cIMKwzHlBLUXWBBm0mQszKV6emQNnmh0v562rHgfukfkdYUCgR/NclZX9
+         YXNzC/XK1HxjPEFvH4r4NDrwRxe9HVYHOXzkjLTkhbcNT2yfDCrJb/PmmVRu14/dvupH
+         Rq/g==
+X-Gm-Message-State: AJIora9Oe8jJiLJtwtRtkGwNicA0YjU2Ghpt5xYMMdBkt4sl1O8USr8i
+        bMRFWRRCpiVHH5Azt9iMQzNSeQ==
+X-Google-Smtp-Source: AGRyM1v5frr1uOWGkJNLK26qAXQwOq64RJvzJwbQq+FM7xK2HnzN7SunKJbtfAy4C3ywWOXCYBlXXQ==
+X-Received: by 2002:a05:6214:da6:b0:472:f008:af1c with SMTP id h6-20020a0562140da600b00472f008af1cmr8915098qvh.22.1656982160756;
+        Mon, 04 Jul 2022 17:49:20 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id 14-20020ac8594e000000b00304fc3d144esm22730700qtz.1.2022.07.04.17.49.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Jul 2022 17:49:20 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1o8Wkh-006I6B-Ig; Mon, 04 Jul 2022 21:49:19 -0300
+Date:   Mon, 4 Jul 2022 21:49:19 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "Rodel, Jorg" <jroedel@suse.de>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCHv2] vgaarb: Add module param to allow for choosing the
- boot VGA device
-In-Reply-To: <20220704213829.GA16883@bhelgaas>
-Message-ID: <17b4da8c-8847-857e-21ca-b8a53446c362@absolutedigital.net>
-References: <20220704213829.GA16883@bhelgaas>
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [RFC PATCH kernel] vfio: Skip checking for
+ IOMMU_CAP_CACHE_COHERENCY on POWER and more
+Message-ID: <20220705004919.GC23621@ziepe.ca>
+References: <20220701061751.1955857-1-aik@ozlabs.ru>
+ <BN9PR11MB527622E1CD94C59829D5CF398CBD9@BN9PR11MB5276.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527622E1CD94C59829D5CF398CBD9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 4 Jul 2022, Bjorn Helgaas wrote:
-
-> I cc'd KVM folks in case they have anything to add here because I'm
-> not a VFIO passthrough expert.
+On Fri, Jul 01, 2022 at 07:10:45AM +0000, Tian, Kevin wrote:
+> > From: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > Sent: Friday, July 1, 2022 2:18 PM
+> > 
+> > VFIO on POWER does not implement iommu_ops and therefore
+> > iommu_capable()
+> > always returns false and __iommu_group_alloc_blocking_domain() always
+> > fails.
+> > 
+> > iommu_group_claim_dma_owner() in setting container fails for the same
+> > reason - it cannot allocate a domain.
+> > 
+> > This skips the check for platforms supporting VFIO without implementing
+> > iommu_ops which to my best knowledge is POWER only.
+> > 
+> > This also allows setting container in absence of iommu_ops.
+> > 
+> > Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
+> > Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache
+> > coherence")
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > ---
+> > 
+> > Not quite sure what the proper small fix is and implementing iommu_ops
+> > on POWER is not going to happen any time soon or ever :-/
 > 
-> It sounds like the problem occurs when the VFIO driver claims the GPU.
-> I assume that happens after boot, when setting up for the virtual
-> machine?
+> I'm not sure how others feel about checking bus->iommu_ops outside
+> of iommu subsystem. This sounds a bit non-modular to me and it's not
+> obvious from the caller side why lacking of iommu_ops implies the two
+> relevant APIs are not usable.
 
-No, this is during boot, long before a VM is launched. As you can kinda 
-see from these lines from early on in the boot process:
+The more I think about this, the more I think POWER should implement
+partial iommu_ops to make this work. It would not support an UNMANAGED
+domain, or default domains, but it would support blocking and the
+coherency probe.
 
-[   22.066610] amdgpu 0000:0e:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=none:owns=none
-[   25.726469] vfio-pci 0000:0f:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
+This makes everything work properly and keeps the mess out of the core
+code.
 
-The vfio-pci driver claims the device like it was a typical GPU driver, 
-but since it isn't, the display output functionality of the card stops 
-because part of the vfio-pci driver's job is to make sure the card is in 
-an unused, preferably pristine-as-possible state for when the VM takes 
-control of it.
+It should not be hard to do if someone can share a bit about the ppc
+code and test it..
 
-If we go back earlier in the boot process, you'll see that second line again:
-
-[    9.226635] vfio-pci 0000:0f:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
-[    9.238385] vfio_pci: add [10de:1f06[ffffffff:ffffffff]] class 0x000000/00000000
-[    9.251529] vfio_pci: add [10de:10f9[ffffffff:ffffffff]] class 0x000000/00000000
-[    9.264328] vfio_pci: add [10de:1ada[ffffffff:ffffffff]] class 0x000000/00000000
-[    9.277162] vfio_pci: add [10de:1adb[ffffffff:ffffffff]] class 0x000000/00000000
-
-If that device is the one selected by the arbiter as boot device, then 
-that is the point where display output stops and everything goes to black.
-
->  If so, is there a way to avoid the problem at run-time so the admin 
-> doesn't have to decide at boot-time which GPU will be passed through to 
-> a VM?
-
-With the way that many people like me run this kind of setup, the 
-passthrough GPU gets reserved at boot-time anyway with the passing of a 
-line like:
-
-vfio_pci.ids=10de:1f06,10de:10f9,10de:1ada,10de:1adb
-
-on the kernel command-line from the bootloader. Doing a similar 
-reservation for the host GPU with something like 'vgaarb.bootdev=0e:00.0' 
-alongside it should be no big deal to anyone running a setup like this.
-
-You can bind/unbind devices to the vfio-pci driver at run-time using 
-sysfs[1], but as far as I can tell, there is no way to change the boot VGA 
-device at run-time.
-
->  Is it possible or desirable to pass through GPU A to VM A, then after 
-> VM A exits, pass through GPU B to VM B?
-
-Yeah, there are many ways one can run this setup. Some run with a single 
-GPU that gets passed-through and the host is headless. There's probably 
-some with more than two GPUs with multiple VMs each getting their own.
-
-The setup I'm running is pretty common: dedicated GPU for the host 
-(doesn't need to be anything special, just needs to handle workstation 
-duties) and a dedicated GPU for a Windows VM for gaming (something quite 
-powerful for those high FPS :-)
-
-As you can see, statically assigning the devices ahead of time is okay. 
-The real problem (for me anyway) is there's no way in the UEFI/BIOS to 
-tell the firmware which device should be used for boot. Sometimes it picks 
-the first GPU, sometimes the second. If if picks wrong, I get an unusable 
-system because the VGA arbiter deems the GPU selected by the firmware to 
-be the best choice for boot VGA device.
-
--- 
-Cal Peake
-
-[1] /sys/bus/pci/drivers/vfio-pci
+Jason
