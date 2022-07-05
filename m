@@ -2,70 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36563566124
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 04:23:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BD0256611A
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 04:17:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234452AbiGECXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jul 2022 22:23:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49718 "EHLO
+        id S234412AbiGECNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jul 2022 22:13:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231329AbiGECXK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jul 2022 22:23:10 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20B6B12639;
-        Mon,  4 Jul 2022 19:23:07 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VIPtdPZ_1656987780;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VIPtdPZ_1656987780)
-          by smtp.aliyun-inc.com;
-          Tue, 05 Jul 2022 10:23:01 +0800
-Message-ID: <1656987177.3209145-3-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v11 08/40] virtio_ring: split: extract the logic of alloc queue
-Date:   Tue, 5 Jul 2022 10:12:57 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com,
-        virtualization@lists.linux-foundation.org
-References: <20220629065656.54420-1-xuanzhuo@linux.alibaba.com>
- <20220629065656.54420-9-xuanzhuo@linux.alibaba.com>
- <3e36e44f-1f37-ad02-eb89-833a0856ec4e@redhat.com>
- <1656665158.0036178-3-xuanzhuo@linux.alibaba.com>
- <6daca7fd-ae2a-cd0c-2030-3c6e503a3200@redhat.com>
-In-Reply-To: <6daca7fd-ae2a-cd0c-2030-3c6e503a3200@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+        with ESMTP id S230364AbiGECNL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jul 2022 22:13:11 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D1311C27
+        for <kvm@vger.kernel.org>; Mon,  4 Jul 2022 19:13:05 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LcR3M5CXRzhYv7;
+        Tue,  5 Jul 2022 10:10:39 +0800 (CST)
+Received: from [10.40.193.166] (10.40.193.166) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 5 Jul 2022 10:13:03 +0800
+Subject: Re: [PATCH rc] vfio: Move IOMMU_CAP_CACHE_COHERENCY test to after we
+ know we have a group
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>
+References: <0-v1-e8934b490f36+f4-vfio_cap_fix_jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <cf74ad89-b33d-b459-be17-faab5b29fea6@hisilicon.com>
+Date:   Tue, 5 Jul 2022 10:13:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
+MIME-Version: 1.0
+In-Reply-To: <0-v1-e8934b490f36+f4-vfio_cap_fix_jgg@nvidia.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,236 +53,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 4 Jul 2022 11:59:03 +0800, Jason Wang <jasowang@redhat.com> wrote:
+ÔÚ 2022/7/5 9:10, Jason Gunthorpe Ð´µÀ:
+
+> The test isn't going to work if a group doesn't exist. Normally this isn't
+> a problem since VFIO isn't going to create a device if there is no group,
+> but the special CONFIG_VFIO_NOIOMMU behavior allows bypassing this
+> prevention. The new cap test effectively forces a group and breaks this
+> config option.
 >
-> =E5=9C=A8 2022/7/1 16:45, Xuan Zhuo =E5=86=99=E9=81=93:
-> > On Fri, 1 Jul 2022 16:26:25 +0800, Jason Wang <jasowang@redhat.com> wro=
-te:
-> >> =E5=9C=A8 2022/6/29 14:56, Xuan Zhuo =E5=86=99=E9=81=93:
-> >>> Separate the logic of split to create vring queue.
-> >>>
-> >>> This feature is required for subsequent virtuqueue reset vring.
-> >>>
-> >>> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> >>> ---
-> >>>    drivers/virtio/virtio_ring.c | 68 ++++++++++++++++++++++----------=
-----
-> >>>    1 file changed, 42 insertions(+), 26 deletions(-)
-> >>>
-> >>> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_rin=
-g.c
-> >>> index 49d61e412dc6..a9ceb9c16c54 100644
-> >>> --- a/drivers/virtio/virtio_ring.c
-> >>> +++ b/drivers/virtio/virtio_ring.c
-> >>> @@ -949,28 +949,19 @@ static void vring_free_split(struct vring_virtq=
-ueue_split *vring,
-> >>>    	kfree(vring->desc_extra);
-> >>>    }
-> >>>
-> >>> -static struct virtqueue *vring_create_virtqueue_split(
-> >>> -	unsigned int index,
-> >>> -	unsigned int num,
-> >>> -	unsigned int vring_align,
-> >>> -	struct virtio_device *vdev,
-> >>> -	bool weak_barriers,
-> >>> -	bool may_reduce_num,
-> >>> -	bool context,
-> >>> -	bool (*notify)(struct virtqueue *),
-> >>> -	void (*callback)(struct virtqueue *),
-> >>> -	const char *name)
-> >>> +static int vring_alloc_queue_split(struct vring_virtqueue_split *vri=
-ng,
-> >>> +				   struct virtio_device *vdev,
-> >>> +				   u32 num,
-> >>> +				   unsigned int vring_align,
-> >>> +				   bool may_reduce_num)
-> >>>    {
-> >>> -	struct virtqueue *vq;
-> >>>    	void *queue =3D NULL;
-> >>>    	dma_addr_t dma_addr;
-> >>> -	size_t queue_size_in_bytes;
-> >>> -	struct vring vring;
-> >>>
-> >>>    	/* We assume num is a power of 2. */
-> >>>    	if (num & (num - 1)) {
-> >>>    		dev_warn(&vdev->dev, "Bad virtqueue length %u\n", num);
-> >>> -		return NULL;
-> >>> +		return -EINVAL;
-> >>>    	}
-> >>>
-> >>>    	/* TODO: allocate each queue chunk individually */
-> >>> @@ -981,11 +972,11 @@ static struct virtqueue *vring_create_virtqueue=
-_split(
-> >>>    		if (queue)
-> >>>    			break;
-> >>>    		if (!may_reduce_num)
-> >>> -			return NULL;
-> >>> +			return -ENOMEM;
-> >>>    	}
-> >>>
-> >>>    	if (!num)
-> >>> -		return NULL;
-> >>> +		return -ENOMEM;
-> >>>
-> >>>    	if (!queue) {
-> >>>    		/* Try to get a single page. You are my only hope! */
-> >>> @@ -993,21 +984,46 @@ static struct virtqueue *vring_create_virtqueue=
-_split(
-> >>>    					  &dma_addr, GFP_KERNEL|__GFP_ZERO);
-> >>>    	}
-> >>>    	if (!queue)
-> >>> -		return NULL;
-> >>> +		return -ENOMEM;
-> >>> +
-> >>> +	vring_init(&vring->vring, num, queue, vring_align);
-> >>>
-> >>> -	queue_size_in_bytes =3D vring_size(num, vring_align);
-> >>> -	vring_init(&vring, num, queue, vring_align);
-> >>> +	vring->queue_dma_addr =3D dma_addr;
-> >>> +	vring->queue_size_in_bytes =3D vring_size(num, vring_align);
-> >>> +
-> >>> +	return 0;
-> >>> +}
-> >>> +
-> >>> +static struct virtqueue *vring_create_virtqueue_split(
-> >>> +	unsigned int index,
-> >>> +	unsigned int num,
-> >>> +	unsigned int vring_align,
-> >>> +	struct virtio_device *vdev,
-> >>> +	bool weak_barriers,
-> >>> +	bool may_reduce_num,
-> >>> +	bool context,
-> >>> +	bool (*notify)(struct virtqueue *),
-> >>> +	void (*callback)(struct virtqueue *),
-> >>> +	const char *name)
-> >>> +{
-> >>> +	struct vring_virtqueue_split vring =3D {};
-> >>> +	struct virtqueue *vq;
-> >>> +	int err;
-> >>> +
-> >>> +	err =3D vring_alloc_queue_split(&vring, vdev, num, vring_align,
-> >>> +				      may_reduce_num);
-> >>> +	if (err)
-> >>> +		return NULL;
-> >>>
-> >>> -	vq =3D __vring_new_virtqueue(index, vring, vdev, weak_barriers, con=
-text,
-> >>> -				   notify, callback, name);
-> >>> +	vq =3D __vring_new_virtqueue(index, vring.vring, vdev, weak_barrier=
-s,
-> >>> +				   context, notify, callback, name);
-> >>>    	if (!vq) {
-> >>> -		vring_free_queue(vdev, queue_size_in_bytes, queue,
-> >>> -				 dma_addr);
-> >>> +		vring_free_split(&vring, vdev);
-> >>>    		return NULL;
-> >>>    	}
-> >>>
-> >>> -	to_vvq(vq)->split.queue_dma_addr =3D dma_addr;
-> >>> -	to_vvq(vq)->split.queue_size_in_bytes =3D queue_size_in_bytes;
-> >>> +	to_vvq(vq)->split.queue_dma_addr =3D vring.queue_dma_addr;
-> >>
-> >> Nit: having two queue_dma_addr seems redundant (so did queue_size_in_b=
-ytes).
-> > two?
-> >
-> > Where is the problem I don't understand?
-> >
-> > Thanks.
+> Move the cap test to vfio_group_find_or_alloc() which is the earliest time
+> we know we have a group available and thus are not running in noiommu mode.
 >
+> Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache coherence")
+> Reported-by "chenxiang (M)" <chenxiang66@hisilicon.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+
+I have tested the patch separately in iommu mode and in noiommu mode, 
+and it works well, so please feel free to add:
+Tested-by: Xiang Chen <chenxiang66@hisilicon.com>
+
+> ---
+>   drivers/vfio/vfio.c | 17 ++++++++++-------
+>   1 file changed, 10 insertions(+), 7 deletions(-)
 >
-> I meant we had:
+> This should fixe the issue with dpdk on noiommu, but I've left PPC out.
 >
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vring.vring =3D _vring;
+> I think the right way to fix PPC is to provide the iommu_ops for the devices
+> groups it is creating. They don't have to be fully functional - eg they don't
+> have to to create domains, but if the ops exist they can correctly respond to
+> iommu_capable() and we don't need special code here to work around PPC being
+> weird.
 >
-> in __vring_new_virtqueue().
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index e43b9496464bbf..cbb693359502d9 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -552,6 +552,16 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
+>   	if (!iommu_group)
+>   		return ERR_PTR(-EINVAL);
+>   
+> +	/*
+> +	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
+> +	 * restore cache coherency. It has to be checked here because it is only
+> +	 * valid for cases where we are using iommu groups.
+> +	 */
+> +	if (!iommu_capable(dev->bus, IOMMU_CAP_CACHE_COHERENCY)) {
+> +		iommu_group_put(iommu_group);
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+>   	group = vfio_group_get_from_iommu(iommu_group);
+>   	if (!group)
+>   		group = vfio_create_group(iommu_group, VFIO_IOMMU);
+> @@ -604,13 +614,6 @@ static int __vfio_register_dev(struct vfio_device *device,
+>   
+>   int vfio_register_group_dev(struct vfio_device *device)
+>   {
+> -	/*
+> -	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
+> -	 * restore cache coherency.
+> -	 */
+> -	if (!iommu_capable(device->dev->bus, IOMMU_CAP_CACHE_COHERENCY))
+> -		return -EINVAL;
+> -
+>   	return __vfio_register_dev(device,
+>   		vfio_group_find_or_alloc(device->dev));
+>   }
 >
-> This means we'd better initialize vring fully before that?
->
-> E.g
->
-> vring.queue_dma_addr =3D dma_addr;
->
-> ...
->
-> __vring_new_virtqueue()
+> base-commit: e2475f7b57209e3c67bf856e1ce07d60d410fb40
 
-oh, my bad, maybe the repeated use of the name "vring" led to a
-misunderstanding.
-
-What is passed to __vring_new_virtqueue is the structure struct vring
-
-struct vring {
-	unsigned int num;
-
-	vring_desc_t *desc;
-
-	vring_avail_t *avail;
-
-	vring_used_t *used;
-};
-
-And what contains queue_dma_addr is our newly split structure struct
-vring_virtqueue_split
-
-struct vring_virtqueue_split {
-	/* Actual memory layout for this queue. */
-	struct vring vring;
-
-	/* Last written value to avail->flags */
-	u16 avail_flags_shadow;
-
-	/*
-	 * Last written value to avail->idx in
-	 * guest byte order.
-	 */
-	u16 avail_idx_shadow;
-
-	/* Per-descriptor state. */
-	struct vring_desc_state_split *desc_state;
-	struct vring_desc_extra *desc_extra;
-
-	/* DMA address and size information */
-	dma_addr_t queue_dma_addr;
-	size_t queue_size_in_bytes;
-
-	/*
-	 * The parameters for creating vrings are reserved for creating new
-	 * vring.
-	 */
-	u32 vring_align;
-	bool may_reduce_num;
-};
-
-We have no way to pass queue_dma_addr into __vring_new_virtqueue. But for t=
-he
-uniformity of the interface, I create a temporary struct vring_virtqueue_sp=
-lit
-vring_split(your suggestion) in __vring_new_virtqueue. Then assign the pass=
-ed
-in struct vring to it
-
-	vring.vring =3D _vring.
-
-So here vring is an empty temporary variable.
-
-As you have replied in other patches, my re-use of the name vring is a mist=
-ake,
-I will change some places to vring_split and vring_packed.
-
-Thanks.
-
-
->
-> Thanks
->
->
-> >
-> >> Thanks
-> >>
-> >>
-> >>> +	to_vvq(vq)->split.queue_size_in_bytes =3D vring.queue_size_in_bytes;
-> >>>    	to_vvq(vq)->we_own_ring =3D true;
-> >>>
-> >>>    	return vq;
->
