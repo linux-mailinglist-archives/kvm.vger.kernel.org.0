@@ -2,178 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A21F5669CC
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 13:39:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65F70566A63
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 13:58:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbiGELjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jul 2022 07:39:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47918 "EHLO
+        id S230346AbiGEL6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jul 2022 07:58:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230104AbiGELjg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jul 2022 07:39:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 894F413F7C
-        for <kvm@vger.kernel.org>; Tue,  5 Jul 2022 04:39:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657021174;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8pvPoWqIvsWl8w+U7M/aIkzJ6IsvvChEXLW+2arMSpA=;
-        b=POHx8hwJKryFHEE3EkiGctr28M/hwyoUEgmUmSXQRDETq2i+8dRYgEfBwHqjXk/pJNbeBV
-        E3SagL5r2xetGA8kfUtM31lcTDjZY3YetmQYKQD53yIqnp0etRKtnOg6/76wV/P341LUhV
-        WzKoDQfxhEv9U615G0m8uUyt1nrFaLk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-628-3XzB-i95MvuKSdDbWVIN9Q-1; Tue, 05 Jul 2022 07:39:33 -0400
-X-MC-Unique: 3XzB-i95MvuKSdDbWVIN9Q-1
-Received: by mail-wm1-f70.google.com with SMTP id bg6-20020a05600c3c8600b003a03d5d19e4so6654603wmb.1
-        for <kvm@vger.kernel.org>; Tue, 05 Jul 2022 04:39:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=8pvPoWqIvsWl8w+U7M/aIkzJ6IsvvChEXLW+2arMSpA=;
-        b=p8gylON+qovpNtUeSDbU9odhmkfA7GTojVpYivdzmEHjFe8NkMuIVadNGsXCYDd1kJ
-         LtRROQXoK12Wen28sNUQbnyXJiL/CbEnK94MV6Cew6f+XbtEtWFZ4j6YJ1k732pP8lP9
-         QG98JraPeXgEs823h1gHI3y176A1FAmFX0qlFHCm+A57D+6dQ4xY9Us+GHzF0R+QE3Pp
-         D7ztGI5wa+rMsjKkP2cPrP74b9zelBWSs2Y9NkhOplF6FKCeaAkafbUnqW2iJr63rF1M
-         U4zZpLApTfaTknFKdpLzIF/qHBcw2P7j/C8YD7MtcjfBA2t9gIzzHFY1kMBtLGub3dk3
-         cHLw==
-X-Gm-Message-State: AJIora+0pBP5PgDqjFXajGyKjIMzOJPIeGDaY0hXbjOf4WnlMBAAlfY8
-        hiIJvvZEKXymLrs7RWcbZ+Sillzh1wXYbQRGfPQzHwaHmyNX0LVkRJfLKTorL+t9p+JL8DjVVQh
-        RMh4n6k5coFAQ
-X-Received: by 2002:a05:6000:2c6:b0:21b:ad25:9c1b with SMTP id o6-20020a05600002c600b0021bad259c1bmr32896921wry.391.1657021172232;
-        Tue, 05 Jul 2022 04:39:32 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1v0Xx92gGvcRWsPIv9KSF1jDKYn0dtMQRjt1Mnn2btgQx1vAX/n03Joqo41BFJ7DMb28aow1Q==
-X-Received: by 2002:a05:6000:2c6:b0:21b:ad25:9c1b with SMTP id o6-20020a05600002c600b0021bad259c1bmr32896901wry.391.1657021172014;
-        Tue, 05 Jul 2022 04:39:32 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id l3-20020a1c7903000000b003a04962ad3esm19548302wme.31.2022.07.05.04.39.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Jul 2022 04:39:31 -0700 (PDT)
-Message-ID: <86df559c732a796b2e3da0136a643a212826229f.camel@redhat.com>
-Subject: Re: [PATCHv2] vgaarb: Add module param to allow for choosing the
- boot VGA device
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Cal Peake <cp@absolutedigital.net>,
-        Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>, linux-pci@vger.kernel.org,
+        with ESMTP id S230110AbiGEL55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jul 2022 07:57:57 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2055.outbound.protection.outlook.com [40.107.212.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE2EA17A89;
+        Tue,  5 Jul 2022 04:57:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OSYIZ++FU8WWZ19J3tAIU7tmEvHGGpXEqyOMVHa/sHKs91zWkjpE2h/EskUEvpsQKem/5aGD0OJw7ymtijcl6Tn9cjZESw96IVEQ+ZPE2NA324aaINxaTgHSd59rFhVf67Wow3Meb7HKDgrqYQHskhl6EU0X5P1LyJgwqN14GKLOxK7cOzjYM3LBEuu56c/sKSqQaqD1TDpqLsJcmpZ2Ekvqu7bPv0JS2M8Bp1D7/Ez3kONi4y3cJa8eW+Z05snetp2hy0GyEim2YWqdOYrqmso3Xp/Zq8slP+W4cw2lrj8+DoCkRI0vu4ohc9uAiytHxO+DTAOMCYIp2PenAzZmzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SEZ4XSxUHRmxfNscQCunRzyCKVseRaZTRokpRN9U7FU=;
+ b=IA8r6tGgb5UhiP1zAxUjEd1BGujOMRA59URGhZMrasy7Oy/CXow067lLIbn5Ynx/EKYn8XBZt8LCkgRuE4xEhvOmPWpOofYjM2zpJaT7gsnPV+UN4BANkghKCwwJ0mp0REvXnUHXnTTcSlYZgPfY4SJm0k6KctrlgaIoOlWSxQbIYivI+Zz0Va1302CFpxijkV5MAaswaNN6IcNuX6ELAipy9mA4K/ef0fhEzrXaceuURfu1R0nSWat68oQIcQfyigLEO0Lq6SLkozpxDGmTJjNHseZxVlagrCuvux08jiHdjstPJxKiu0f01LA1RKhN7bpWrmfZkt6JTC0/QQQaoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SEZ4XSxUHRmxfNscQCunRzyCKVseRaZTRokpRN9U7FU=;
+ b=RgE+8YDbxrR+GbnO4d2BKapQu+EqIlODeZJr8dCYVpGo4WXPFh9XlxJukarDUEdCBdGbo6IUQ3KG7rIW5NmKgQGnlMQt58GqbCVkC3eMpLDImQvnYwcxS4xXwRyq6W394fcYnGOgPgXYY7QvgN/ps623JEvr0v84fbS6wWxYllevfx6EsT1tnz0Crvz94Luu0dxwINw65pwK4uSLjcxXbbS5+kgWFskExmJjxuVj44yUtr/pufLc8LH3hqPYmn8urt2CpmV31B3fS41fdTYXGizRDlbpDW2w13DCitCp0cbdoX8CsyZxCf2WOBp9OFXxTtg9EKHLs0lvc5kYJTiGiQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CY5PR12MB6573.namprd12.prod.outlook.com (2603:10b6:930:43::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.21; Tue, 5 Jul
+ 2022 11:57:53 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.021; Tue, 5 Jul 2022
+ 11:57:53 +0000
+Date:   Tue, 5 Jul 2022 08:57:51 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev@lists.ozlabs.org, Robin Murphy <robin.murphy@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Date:   Tue, 05 Jul 2022 14:39:29 +0300
-In-Reply-To: <17b4da8c-8847-857e-21ca-b8a53446c362@absolutedigital.net>
-References: <20220704213829.GA16883@bhelgaas>
-         <17b4da8c-8847-857e-21ca-b8a53446c362@absolutedigital.net>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org
+Subject: Re: [PATCH kernel] powerpc/iommu: Add simple iommu_ops to report
+ capabilities
+Message-ID: <YsQnP/jBG22FnPMA@nvidia.com>
+References: <20220705062235.2276125-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220705062235.2276125-1-aik@ozlabs.ru>
+X-ClientProxiedBy: YT1PR01CA0147.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:2f::26) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 46229f79-0d2a-468e-b1f3-08da5e7d9720
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6573:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DKWEemuCdmHeg3GWX/HXm8QX1zqNO+X70eTbtAg7T/6SnnenhQUzheKm5Ieoim+ysgcIOBMPxvMKkdsUQBNUXIU8PHChCfAX60mHkD8tqvOg/259X2/HVo30qMpFPkGcPnHsHYvodVMj1D6zEksC8PoPP5GC4X7iTiL4sCEZNrDxdWDVIyER7zeahfjNAhVleq6XQJZkOzSRJzDfW+jNL88VjM6CCTHl68xvYsnU5pcx3Cp8Ghw50PteworUgE8lC3P2iBMmNDzANjfRLYg1GbnkJyMPXiy8KkntKaaBYbjL5BxLoyTZNu3OGiTv+B91mH+fAf3FGw7AVrNqjT7ymJaFjmGMwBeAMZzbcjI6ELiTouotabOAgAYFkEyR1DLH0cRhKD9A6Mq4X+OeWOerdD5TGUCwZMMyWSPNDarzY15XpfuMD1HWK1dKVrVrbLFgyTeCyykS4kUyMDIVqwrGlLh7xBdmp0/c0MNdbIRkg77ShlbAQbjJgJhUbfRMe+ZKE1IFzRQJhiwDCX5zIVKmPz1F7KhC9flo9upRkf06gx7vKWtTCHkQLnYS2EzuSTAse0cdL/MLtErbkVQOsKrEvos9w2Z2hmx2/Z0W+1AGrNDl0Ydgz1YRRfnpt+UFwXo5p9AVBfAFDvYGUzlIiNZ5T30mA6pH1VPffTO1LW6GfBY5MtJHaR9Zdo3qxHOvq+cY0kcNynfrfmX7PjYCgvbjukk/v0Vg/T7k7dVb7Luy2qmxOXjmPWGsF5TC8gRAPJTX
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(376002)(366004)(136003)(39860400002)(36756003)(26005)(2616005)(6506007)(6512007)(186003)(6486002)(83380400001)(478600001)(2906002)(38100700002)(4326008)(8676002)(66476007)(66556008)(66946007)(54906003)(41300700001)(86362001)(8936002)(7416002)(5660300002)(6916009)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?dMaEaxftgyw0NT27JsU2bY/IcOJfByfIKccrX063f8Ex1ShfXFX9vmTcjQY2?=
+ =?us-ascii?Q?n9WK7nkm2IQhhRR+63dEd7UP2IhC9AkouciNH4FDCvwtpwkypSK8M7hm7EnU?=
+ =?us-ascii?Q?JnnNI2ewOBZ7Dc3ybldKcZ1Z6JUGnzxP2MAsiYznMEdiE51zUAuLDK5hEboM?=
+ =?us-ascii?Q?uvOJPyZFFqcFlJKy626MSd+AGAcA8N8bjKud+uvUf+jU7F4PpXRp1K1TP+AR?=
+ =?us-ascii?Q?WRT+wgBFAHbV0Ei5mUzLiM/LpnCnNcV1VcKQiEFPNhC8PR8dGap2DOZnHZC1?=
+ =?us-ascii?Q?WHxta5BMnP63jzDDHIIpEZ0XBdTXGhWkHhFvpDQ38aCpvyjw8h/T8eL9c0IK?=
+ =?us-ascii?Q?uwyEU/94uetqrtHN+8bpzYG29nk5smMrPAZp0RPioJPZg45XKoFDnxJeczHx?=
+ =?us-ascii?Q?7CQhRxyEFgXMbzYg1RMT6HI4MltQQBbrOGHeqkVde+xNNL24Ofncn8I7Y/AE?=
+ =?us-ascii?Q?hyOtCCJGy67bidLjc98NNPUvFSGOh+1EGMHllxNCCULBcgPSJ6EGzGTGbOtL?=
+ =?us-ascii?Q?bzpURDyFSj/1IgGF0D7Y0XkMm4uY9Ysq3PH4gEb6f4k6ypygRQuQahRL28pE?=
+ =?us-ascii?Q?kkb2zJo66XTkcS0TdOWik5XWeWZiekyK4brlXnBNnNvt7oppw5BnO2vgLcTx?=
+ =?us-ascii?Q?uEbEfZV7vlZFupKBNSt2q8ku+KntBaNrGhn+Gm3QTw/CYF8t0vUJmtbo0mnZ?=
+ =?us-ascii?Q?qYqrcpDX3T3Z/qc400cFo6kmjFWuKYJELHqZmVyGLyLGcHyNZXwZmTsx7nP+?=
+ =?us-ascii?Q?Qfqt0DhhyijsNGD/glrrxbFKIq0+0In7gNju+eOb/eqLL7iggmdLFKI5IBsw?=
+ =?us-ascii?Q?nwLKl8LnuR5V30lLdP0QCrTDV+Gcvyu75R/5r16pwFbIEpqmmVMsgwWQ1ZfY?=
+ =?us-ascii?Q?knZWGjI0hEdjB52QtKObmJD0L/lPCcSHimlRNnHhI9M2dEe6HdRirEaOco6Y?=
+ =?us-ascii?Q?saY+XhS50VMpiqoYEe5CVdsN20R8pSM4wteggU11yTz1MH6ktaZz6fHMmR/4?=
+ =?us-ascii?Q?tin+VQKrJ0C0zE3P5Ji4W9MpJhJfmGSy27bTcGVZSGTpQ272yrOkkpC7w+px?=
+ =?us-ascii?Q?j93RYcvrpv9AbiOh+Ud2wH4LfgopDPBKfinB9KNgarLmLwdx696f55LiWjNc?=
+ =?us-ascii?Q?a2PhaafPtm8IoWn2VGCzdZc2ob9n7dUykzPD1YOpqgnPmNyvdI/4WAdvXRn8?=
+ =?us-ascii?Q?EEBoNFHQPgurF6ynuRD8ZU6ztIwHxYHXkDilhgRMyqTdzgNC9qkdkWq0zMmT?=
+ =?us-ascii?Q?SAQHm2/UjJS7F5g3HJsnZPm920pWb4gkPAfNIN5vr/PkVM1KMUKZPDw2S1Fr?=
+ =?us-ascii?Q?D9JAzeLoyE+TQj3DNxwLG8xvmsK6f28Ca5KDxS/Z+rJ2ko3PGtl3a+bo77RH?=
+ =?us-ascii?Q?S3wCH1kB83/C+Jva/cxletqKnLAcZQivONw0303H2ICnasOpdLmh67vdI5PA?=
+ =?us-ascii?Q?K3vSLAgPvTyU8yh4iIl5ubDBOy5vwJCb4x9vlbsP7yLvzsS60doK/CRtQuqa?=
+ =?us-ascii?Q?q92gHHvJ84FBODYQ15lHRTdpfOVICMiIrgL7o+PvWJeYnx0FHzZ+t2PWELZs?=
+ =?us-ascii?Q?Gz7iqO1R9PMlI1vkdSQ=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46229f79-0d2a-468e-b1f3-08da5e7d9720
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2022 11:57:52.9052
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: anCtLu6piYtef7P8C6+xBJi1ecQ10a44Y2nDlLjjfn80yBV8Kssmi0ORlMBgMouN
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6573
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-07-04 at 19:07 -0400, Cal Peake wrote:
-> On Mon, 4 Jul 2022, Bjorn Helgaas wrote:
-> 
-> > I cc'd KVM folks in case they have anything to add here because I'm
-> > not a VFIO passthrough expert.
-> > 
-> > It sounds like the problem occurs when the VFIO driver claims the GPU.
-> > I assume that happens after boot, when setting up for the virtual
-> > machine?
-> 
-> No, this is during boot, long before a VM is launched. As you can kinda 
-> see from these lines from early on in the boot process:
-> 
-> [   22.066610] amdgpu 0000:0e:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=none:owns=none
-> [   25.726469] vfio-pci 0000:0f:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
-> 
-> The vfio-pci driver claims the device like it was a typical GPU driver, 
-> but since it isn't, the display output functionality of the card stops 
-> because part of the vfio-pci driver's job is to make sure the card is in 
-> an unused, preferably pristine-as-possible state for when the VM takes 
-> control of it.
-> 
-> If we go back earlier in the boot process, you'll see that second line again:
-> 
-> [    9.226635] vfio-pci 0000:0f:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
-> [    9.238385] vfio_pci: add [10de:1f06[ffffffff:ffffffff]] class 0x000000/00000000
-> [    9.251529] vfio_pci: add [10de:10f9[ffffffff:ffffffff]] class 0x000000/00000000
-> [    9.264328] vfio_pci: add [10de:1ada[ffffffff:ffffffff]] class 0x000000/00000000
-> [    9.277162] vfio_pci: add [10de:1adb[ffffffff:ffffffff]] class 0x000000/00000000
-> 
-> If that device is the one selected by the arbiter as boot device, then 
-> that is the point where display output stops and everything goes to black.
-> 
-> >  If so, is there a way to avoid the problem at run-time so the admin 
-> > doesn't have to decide at boot-time which GPU will be passed through to 
-> > a VM?
-> 
-> With the way that many people like me run this kind of setup, the 
-> passthrough GPU gets reserved at boot-time anyway with the passing of a 
-> line like:
-> 
-> vfio_pci.ids=10de:1f06,10de:10f9,10de:1ada,10de:1adb
-> 
-> on the kernel command-line from the bootloader. Doing a similar 
-> reservation for the host GPU with something like 'vgaarb.bootdev=0e:00.0' 
-> alongside it should be no big deal to anyone running a setup like this.
-> 
-> You can bind/unbind devices to the vfio-pci driver at run-time using 
-> sysfs[1], but as far as I can tell, there is no way to change the boot VGA 
-> device at run-time.
-> 
-> >  Is it possible or desirable to pass through GPU A to VM A, then after 
-> > VM A exits, pass through GPU B to VM B?
-> 
-> Yeah, there are many ways one can run this setup. Some run with a single 
-> GPU that gets passed-through and the host is headless. There's probably 
-> some with more than two GPUs with multiple VMs each getting their own.
-> 
-> The setup I'm running is pretty common: dedicated GPU for the host 
-> (doesn't need to be anything special, just needs to handle workstation 
-> duties) and a dedicated GPU for a Windows VM for gaming (something quite 
-> powerful for those high FPS :-)
-> 
-> As you can see, statically assigning the devices ahead of time is okay. 
-> The real problem (for me anyway) is there's no way in the UEFI/BIOS to 
-> tell the firmware which device should be used for boot. Sometimes it picks 
-> the first GPU, sometimes the second. If if picks wrong, I get an unusable 
-> system because the VGA arbiter deems the GPU selected by the firmware to 
-> be the best choice for boot VGA device.
-> 
+On Tue, Jul 05, 2022 at 04:22:35PM +1000, Alexey Kardashevskiy wrote:
 
-My 0.2 semi unrelated cents:
+> I have not looked into the domains for ages, what is missing here? With this
+> on top of 5.19-rc1 VFIO works again on my POWER9 box. Thanks,
 
-On my desktop system I have two GPUS (AMD workstation GPU and a NVIDIA's gpu), 
-I sometimes use each of them (or even both) with VFIO,
+Does this solve all the problems or just coherency? It seems like it
+should solve everything now as there will be a IOMMU_DOMAIN_BLOCKED
+and the ref logic will succeed to assign it?
 
-But regardless of VFIO, I sometimes use one and sometimes another as my main GPU
-(I have all displays connected to each GPU, its quite complex setup with lot
-of cables and HDMI switches, but somehow it is actually quite robust)
+> +static struct iommu_domain *spapr_tce_iommu_domain_alloc(unsigned int type)
+> +{
+> +	struct iommu_domain *domain = kzalloc(sizeof(*domain), GFP_KERNEL);
+> +
+> +	if (!domain)
+> +		return NULL;
 
-Choosing boot GPU would be nice to have. On my system I setup it in such way
-that AMD GPU gets to be the boot GPU (I don't remember if I blacklisted the
-nvidia driver or something for that), and I have a script to dynamicallly
-swith them prior to starting X if in a config file I created, I specified that
-I want the nvidia GPU to be the default.
+This should only succeed if type is IOMMU_DOMAIN_BLOCKED
 
-So this is a use case which doesn't involve VFIO.
+> +static struct iommu_group *spapr_tce_iommu_device_group(struct device *dev)
+> +{
+> +	struct iommu_group *grp = dev->iommu_group;
+> +
+> +	if (!grp)
+> +		grp = ERR_PTR(-ENODEV);
 
-Best regards,
-	Maxim Levitsky
+It looks like this should just always fail since the code code already
+checks iommu_group before calling this? (Arguably ppc should be
+refactored to use the normal probe_device and device_group ops to
+create groups, but that doesn't seem critical for this.
 
-
-
+Thanks
+Jason
