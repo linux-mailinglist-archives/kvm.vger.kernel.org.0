@@ -2,197 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49D8C566EEC
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 15:07:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB739567012
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 15:58:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231338AbiGENHk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jul 2022 09:07:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58022 "EHLO
+        id S232021AbiGEN5A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jul 2022 09:57:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbiGENHI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jul 2022 09:07:08 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837B32E9DE;
-        Tue,  5 Jul 2022 05:33:44 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 265CKTll005802;
-        Tue, 5 Jul 2022 12:33:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bgoq8EPII743EkYcofatWiYppbAxA+BLYrQBrrDoKjw=;
- b=bKSO1s9tZgwi4AiP63WAoH2ZIuAFvtr7VTSS7dOP7iB392Wf9ZBtWCxgYFYbXc4cl0oo
- 9YKTlwOIdeYoTHCcuRNy+IOYuo+kVTcmxf/2puEBvOG/Cm0oR2JA6U1iEqG5TFhMWxev
- pe1eRDbiKEKE0Ji2IS9dgNTPlsU5fM2U7ZRAIvXbn5dMdsj1rWPvKxrHyZRzwa8cJVLn
- 2rbC+mHkG6x9D9FvMjsYQvSHe/xIIxBwST53gFkMagjcA4c+/jlQuXBtkUKL3Dsiptls
- f8wwFX2qo9O9Gswwhqiy1my3Pe0adWRh1m3C7DlHK8HSRy6LHocRK3w+91NM69s4Sczi Eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h4n7908bn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jul 2022 12:33:43 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 265CWIDt031713;
-        Tue, 5 Jul 2022 12:33:43 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h4n7908b8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jul 2022 12:33:42 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 265CLhPJ021433;
-        Tue, 5 Jul 2022 12:33:41 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3h2dn9416e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jul 2022 12:33:41 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 265CXbxJ25821466
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Jul 2022 12:33:37 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB15211C05C;
-        Tue,  5 Jul 2022 12:33:37 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 10B2711C050;
-        Tue,  5 Jul 2022 12:33:36 +0000 (GMT)
-Received: from [9.171.60.127] (unknown [9.171.60.127])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  5 Jul 2022 12:33:35 +0000 (GMT)
-Message-ID: <6d7514f4-8df1-c9b2-d4ca-a4830e9695b6@linux.ibm.com>
-Date:   Tue, 5 Jul 2022 14:38:09 +0200
+        with ESMTP id S230379AbiGEN43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jul 2022 09:56:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6710226AF9
+        for <kvm@vger.kernel.org>; Tue,  5 Jul 2022 06:38:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657028328;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=O7kOLpOC//2XPWtARO8F0+2P3N+C1ogosiaoWziVYEI=;
+        b=VmohKVIVCFb0KUygh1azwoYLbJk3ifFPZLbSWSnY9SgafH7nPfSplAD2g2kNnlYAXOwq/5
+        GTcur+EPA6CM3BGC++IiHOlxEx0+QneqsqisbmURB9rFShNz1M9hEpHEIBrkUZr4tPzVku
+        l6Q5HTRmaYef8qSr14FNAPpEgya9yYc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-548-rzlnoC6UMh6a6d_6NluVVg-1; Tue, 05 Jul 2022 09:38:47 -0400
+X-MC-Unique: rzlnoC6UMh6a6d_6NluVVg-1
+Received: by mail-wm1-f70.google.com with SMTP id v123-20020a1cac81000000b003a02a3f0beeso4495032wme.3
+        for <kvm@vger.kernel.org>; Tue, 05 Jul 2022 06:38:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=O7kOLpOC//2XPWtARO8F0+2P3N+C1ogosiaoWziVYEI=;
+        b=ApcsuNx8N3NLA23iyOCeM1rYYnZlnbWVpOGB47X63lmoVhSFfVcU4LWqZ92N2A4rql
+         FZu0TrReavbX6q1MOkpx0qBXrpEBkn8YKb3yYZ/9e0jECGcyEhN+ZFgtgCSPvm2bWn4k
+         ANazABG23cJLenARJTrp7Znl7pqDLpRcm1AMYWJbpfEgFSmye2oFTipUv/IpfE+W43C1
+         oUwE2IHj/n77KbZaXCWkxQbB6J9zZpdu3fM32hOAJM8olBP8VIUgf9tMYa998v2Hhhe+
+         VCHCkEiylmu9ioXsE2TgKEwKa7QYDnPj6XZfhAI1+5ipTh6UdePYUpHWA7owN3G3LPnZ
+         tzAQ==
+X-Gm-Message-State: AJIora+PMj8Z1w6Fip4VmbB9evOBOWDpJO3utk9Y+zYtGAS5rley1TD1
+        GVJVMhJK1/ycZLeTm2ftYQDETVdbcGwqXBxET6cvVC4ysYnpRUA5KmqacJAA6GZLH21cQLppWp9
+        b2u6cu9oHGrW7
+X-Received: by 2002:a5d:6b4b:0:b0:21d:7854:7755 with SMTP id x11-20020a5d6b4b000000b0021d78547755mr621186wrw.437.1657028326205;
+        Tue, 05 Jul 2022 06:38:46 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tKEx7TN7DtP87YGLkwEvS4LerNF65HvhibZJQE6l4wtQbWx4eKgqJN4nbA9ncaHzazblBC0w==
+X-Received: by 2002:a5d:6b4b:0:b0:21d:7854:7755 with SMTP id x11-20020a5d6b4b000000b0021d78547755mr621155wrw.437.1657028325976;
+        Tue, 05 Jul 2022 06:38:45 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id k1-20020a5d6281000000b0021b9e360523sm33778162wru.8.2022.07.05.06.38.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jul 2022 06:38:44 -0700 (PDT)
+Message-ID: <289c2dd941ecbc3c32514fc0603148972524b22d.camel@redhat.com>
+Subject: Re: [PATCH v2 11/11] KVM: x86: emulator/smm: preserve interrupt
+ shadow in SMRAM
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        x86@kernel.org, Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Date:   Tue, 05 Jul 2022 16:38:42 +0300
+In-Reply-To: <CALMp9eRNZ8D5aRyUEkc7CORz-=bqzfVCSf6nOGZhqQfWfte0dw@mail.gmail.com>
+References: <20220621150902.46126-1-mlevitsk@redhat.com>
+         <20220621150902.46126-12-mlevitsk@redhat.com>
+         <CALMp9eSe5jtvmOPWLYCcrMmqyVBeBkg90RwtR4bwxay99NAF3g@mail.gmail.com>
+         <42da1631c8cdd282e5d9cfd0698b6df7deed2daf.camel@redhat.com>
+         <CALMp9eRNZ8D5aRyUEkc7CORz-=bqzfVCSf6nOGZhqQfWfte0dw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v11 3/3] KVM: s390: resetting the Topology-Change-Report
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220701162559.158313-1-pmorel@linux.ibm.com>
- <20220701162559.158313-4-pmorel@linux.ibm.com>
- <d90e2aaa-05ad-6f3a-83f8-428677256673@linux.ibm.com>
- <1f3b404f-0bd6-31cb-57de-591d2e03dd76@linux.ibm.com>
- <d8033b41-ca12-8d28-3482-c716838f05d7@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <d8033b41-ca12-8d28-3482-c716838f05d7@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0gPu4w9yWVy9wZ2TlQjeEpgMu-AeMaiH
-X-Proofpoint-ORIG-GUID: sKnWUam3BcEi3K-94wDEkoufbz6zYhWD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-05_09,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 adultscore=0 mlxlogscore=999
- spamscore=0 priorityscore=1501 clxscore=1015 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2207050052
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/5/22 10:09, Janis Schoetterl-Glausch wrote:
-> On 7/4/22 15:56, Pierre Morel wrote:
->>
->>
->> On 7/4/22 11:35, Janis Schoetterl-Glausch wrote:
->>> On 7/1/22 18:25, Pierre Morel wrote:
->>>> During a subsystem reset the Topology-Change-Report is cleared.
->>>>
->>>> Let's give userland the possibility to clear the MTCR in the case
->>>> of a subsystem reset.
->>>>
->>>> To migrate the MTCR, we give userland the possibility to
->>>> query the MTCR state.
->>>>
->>>> We indicate KVM support for the CPU topology facility with a new
->>>> KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> ---
->>>>    Documentation/virt/kvm/api.rst   | 25 +++++++++++++++
->>>>    arch/s390/include/uapi/asm/kvm.h | 10 ++++++
->>>>    arch/s390/kvm/kvm-s390.c         | 53 ++++++++++++++++++++++++++++++++
->>>>    include/uapi/linux/kvm.h         |  1 +
->>>>    4 files changed, 89 insertions(+)
->>>>
->>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>>> index 11e00a46c610..5e086125d8ad 100644
->>>> --- a/Documentation/virt/kvm/api.rst
->>>> +++ b/Documentation/virt/kvm/api.rst
->>>> @@ -7956,6 +7956,31 @@ should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
->>>>    When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
->>>>    type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
->>>>    +8.37 KVM_CAP_S390_CPU_TOPOLOGY
->>>> +------------------------------
->>>> +
->>>> +:Capability: KVM_CAP_S390_CPU_TOPOLOGY
->>>> +:Architectures: s390
->>>> +:Type: vm
->>>> +
->>>> +This capability indicates that KVM will provide the S390 CPU Topology
->>>> +facility which consist of the interpretation of the PTF instruction for
->>>> +the function code 2 along with interception and forwarding of both the
->>>> +PTF instruction with function codes 0 or 1 and the STSI(15,1,x)
->>>> +instruction to the userland hypervisor.
->>> The latter only if the user STSI capability is also enabled.
->>
->> Hum, not sure about this.
->> we can not set facility 11 and return 3 to STSI(15) for valid selectors.
+On Thu, 2022-06-30 at 09:00 -0700, Jim Mattson wrote:
+> On Wed, Jun 29, 2022 at 11:00 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > 
+> > On Wed, 2022-06-29 at 09:31 -0700, Jim Mattson wrote:
+> > > On Tue, Jun 21, 2022 at 8:09 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > > > When #SMI is asserted, the CPU can be in interrupt shadow
+> > > > due to sti or mov ss.
+> > > > 
+> > > > It is not mandatory in  Intel/AMD prm to have the #SMI
+> > > > blocked during the shadow, and on top of
+> > > > that, since neither SVM nor VMX has true support for SMI
+> > > > window, waiting for one instruction would mean single stepping
+> > > > the guest.
+> > > > 
+> > > > Instead, allow #SMI in this case, but both reset the interrupt
+> > > > window and stash its value in SMRAM to restore it on exit
+> > > > from SMM.
+> > > > 
+> > > > This fixes rare failures seen mostly on windows guests on VMX,
+> > > > when #SMI falls on the sti instruction which mainfest in
+> > > > VM entry failure due to EFLAGS.IF not being set, but STI interrupt
+> > > > window still being set in the VMCS.
+> > > 
+> > > I think you're just making stuff up! See Note #5 at
+> > > https://sandpile.org/x86/inter.htm.
+> > > 
+> > > Can you reference the vendors' documentation that supports this change?
+> > > 
+> > 
+> > First of all, just to note that the actual issue here was that
+> > we don't clear the shadow bits in the guest interruptability field
+> > in the vmcb on SMM entry, that triggered a consistency check because
+> > we do clear EFLAGS.IF.
+> > Preserving the interrupt shadow is just nice to have.
+> > 
+> > 
+> > That what Intel's spec says for the 'STI':
+> > 
+> > "The IF flag and the STI and CLI instructions do not prohibit the generation of exceptions and nonmaskable inter-
+> > rupts (NMIs). However, NMIs (and system-management interrupts) may be inhibited on the instruction boundary
+> > following an execution of STI that begins with IF = 0."
+> > 
+> > Thus it is likely that #SMI are just blocked when in shadow, but it is easier to implement
+> > it this way (avoids single stepping the guest) and without any user visable difference,
+> > which I noted in the patch description, I noted that there are two ways to solve this,
+> > and preserving the int shadow in SMRAM is just more simple way.
 > 
-> I think the PoP allows for this:
-> 
-> When the specified function-code, selector-1, and
-> selector-2 combination is invalid (is other than as
-> shown in Figure 10-84),
+> It's not true that there is no user-visible difference. In your
+> implementation, the SMI handler can see that the interrupt was
+> delivered in the interrupt shadow.
 
-> or if it is valid but the
-> requested information is not available because the
-> specified level does not implement or does not fully
-> implement the instruction or because a necessary
-> part of the level is uninstalled or not initialized, and
-> provided that an exception is not recognized (see
-> “Special Conditions”), the condition code is set to 3.
+Most of the SMI save state area is reserved, and the handler has no way of knowing
+what CPU stored there, it can only access the fields that are reserved in the spec.
 
+Yes, if the SMI handler really insists it can see that the saved RIP points to an
+instruction that follows the STI, but does that really matter? It is allowed by the
+spec explicitly anyway.
 
-> When the function code is nonzero, the combination
-> is valid, the requested information is available, and
-> there is no exception, the requested information is
-> stored in a system-information block (SYSIB) at the
-> second-operand address.
-> 
-> So if user_stsi is off the information is not available because the level does not fully implement the instruction.
-> But I'm fine with KVM_CAP_S390_CPU_TOPOLOGY implying KVM_CAP_S390_USER_STSI, too.
+Plus our SMI layout (at least for 32 bit) doesn't confirm to the X86 spec anyway,
+we as I found out flat out write over the fields that have other meaning in the X86 spec.
 
-OK, I do like you say, return CC3 if no user_stsi is available
+Also I proposed to preserve the int shadow in internal kvm state and migrate
+it in upper 4 bits of the 'shadow' field of struct kvm_vcpu_events.
+Both Paolo and Sean proposed to store the int shadow in the SMRAM instead,
+and you didn't object to this, and now after I refactored and implemented
+the whole thing you suddently do.
 
-Thanks,
-Pierre
+BTW, just FYI, I found out that qemu doesn't migrate the 'shadow' field,
+this needs to be fixed (not related to the issue, just FYI).
 
 > 
->>
->> I think that it was right before, KVM_CAP_S390_CPU_TOPOLOGY and KVM_CAP_S390_USER_STSI are independent in KVM, userland can turn on one and not the other.
->> But KVM proposes both.
->>
->> Of course it is stupid to turn on only KVM_CAP_S390_CPU_TOPOLOGY but KVM is not responsible for this userland is.
->>
->> Otherwise, we need to check on KVM_CAP_S390_USER_STSI before authorizing  KVM_CAP_S390_CPU_TOPOLOGY and that looks even more complicated for me,
->> or we suppress the KVM_CAP_S390_CPU_TOPOLOGY and implement the all stsi(15) in the kernel what I really do not think is good because of the complexity of the userland API
+> The right fix for this problem is to block SMI in an interrupt shadow,
+> as is likely the case for all modern CPUs.
+
+Yes, I agree that this is the most correct fix. 
+
+However AMD just recently posted a VNMI patch series to avoid
+single stepping the CPU when NMI is blocked due to the same reason, because
+it is fragile.
+
+Do you really want KVM to single step the guest in this case, to deliver the #SMI?
+I can do it, but it is bound to cause lot of trouble.
+
+Note that I will have to do it on both Intel and AMD, as neither has support for SMI
+window, unless I were to use MTF, which is broken on nested virt as you know,
+so a nested hypervisor running a guest with SMI will now have to cope with broken MTF.
+
+Note that I can't use the VIRQ hack we use for interrupt window, because there
+is no guarantee that the guest's EFLAGS.IF is on.
+
+Best regards,	
+	Maxim Levitsky
+
 > 
-> [...]
+> > 
+> > As for CPUS that neither block SMI nor preserve the int shadaw, in theory they can, but that would
+> > break things, as noted in this mail
+> > 
+> > https://lore.kernel.org/lkml/1284913699-14986-1-git-send-email-avi@redhat.com/
+> > 
+> > It is possible though that real cpu supports HLT restart flag, which makes this a non issue,
+> > still. I can't rule out that a real cpu doesn't preserve the interrupt shadow on SMI, but
+> > I don't see why we can't do this to make things more robust.
+> 
+> Because, as I said, I think you're just making stuff up...unless, of
+> course, you have documentation to back this up.
 > 
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+
