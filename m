@@ -2,114 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9556F566292
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 07:01:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30F07566314
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 08:25:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbiGEFAe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jul 2022 01:00:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33084 "EHLO
+        id S229652AbiGEGWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jul 2022 02:22:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbiGEFAd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jul 2022 01:00:33 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 960C813CEA;
-        Mon,  4 Jul 2022 22:00:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656997232; x=1688533232;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bqRp1IxoetQDUHTUe7ctAtgUSeYkiq7MsRv1B+UfGX4=;
-  b=myuztOVgn5IZTCed9quutMVBlSj3gEqaSEyZWmzIMkh4Cub7wEKDcMqg
-   l0D6iCdZ92WC7EfGgk70DeV4k/mzv6jrOa3FoKW7T6idlBYdaL9lKoEN3
-   FXP0wFmXd4ssaoGGmKKlIcQXWvQ3R9HZVv0jpnHnunkSYCbQwRh75AAHr
-   RsY8IvflEwqK8Qbb7PYX8/K8WhXwzEinYpWR7g/sL63KaCs8TwXt72LyA
-   eTFNnbFGs1tQP+6Ce+Hi1R5YPNRoWVH0hWjKMfl8gSBBlMmpLuAMZ5bwf
-   2AxEOQtpi9TypmfXk2rgRoHNOLC59P3J9GUYqZ3RFJROy9k3woW6ybs2C
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10398"; a="280805516"
-X-IronPort-AV: E=Sophos;i="5.92,245,1650956400"; 
-   d="scan'208";a="280805516"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2022 22:00:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,245,1650956400"; 
-   d="scan'208";a="660403877"
-Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 04 Jul 2022 22:00:29 -0700
-Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o8afk-000Ilv-N6;
-        Tue, 05 Jul 2022 05:00:28 +0000
-Date:   Tue, 5 Jul 2022 12:59:55 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, jjherne@linux.ibm.com,
-        freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-Subject: Re: [PATCH v20 19/20] s390/Docs: new doc describing lock usage by
- the vfio_ap device driver
-Message-ID: <202207051236.URA7Qn9x-lkp@intel.com>
-References: <20220621155134.1932383-20-akrowiak@linux.ibm.com>
+        with ESMTP id S229643AbiGEGWn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jul 2022 02:22:43 -0400
+Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D08E660D8;
+        Mon,  4 Jul 2022 23:22:40 -0700 (PDT)
+Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 31B65804D3;
+        Tue,  5 Jul 2022 02:22:37 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Joerg Roedel <jroedel@suse.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org
+Subject: [PATCH kernel] powerpc/iommu: Add simple iommu_ops to report capabilities
+Date:   Tue,  5 Jul 2022 16:22:35 +1000
+Message-Id: <20220705062235.2276125-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220621155134.1932383-20-akrowiak@linux.ibm.com>
-X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Tony,
+Historically PPC64 managed to avoid using iommu_ops. The VFIO driver
+uses a SPAPR TCE sub-driver and all iommu_ops uses were kept in
+the Type1 VFIO driver. Recent development though has added a coherency
+capability check to the generic part of VFIO and essentially disabled
+VFIO on PPC64.
 
-I love your patch! Perhaps something to improve:
+This adds a simple iommu_ops stub which reports support for cache
+coherency. Because bus_set_iommu() triggers IOMMU probing of PCI devices,
+this provides minimum code for the probing to not crash.
 
-[auto build test WARNING on s390/features]
-[also build test WARNING on mst-vhost/linux-next linus/master v5.19-rc5 next-20220704]
-[cannot apply to kvms390/next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+The previous discussion is here:
+https://patchwork.ozlabs.org/project/kvm-ppc/patch/20220701061751.1955857-1-aik@ozlabs.ru/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tony-Krowiak/s390-vfio-ap-dynamic-configuration-support/20220621-235654
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git features
-reproduce: make htmldocs
+Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache coherence")
+Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+I have not looked into the domains for ages, what is missing here? With this
+on top of 5.19-rc1 VFIO works again on my POWER9 box. Thanks,
 
-All warnings (new ones prefixed by >>):
+---
+ arch/powerpc/include/asm/iommu.h |  2 +
+ arch/powerpc/kernel/iommu.c      | 70 ++++++++++++++++++++++++++++++++
+ arch/powerpc/kernel/pci_64.c     |  3 ++
+ 3 files changed, 75 insertions(+)
 
->> Documentation/s390/vfio-ap-locking.rst:10: WARNING: Inline emphasis start-string without end-string.
->> Documentation/s390/vfio-ap-locking.rst:15: WARNING: Title underline too short.
->> Documentation/s390/vfio-ap-locking.rst:22: WARNING: Definition list ends without a blank line; unexpected unindent.
-
-vim +10 Documentation/s390/vfio-ap-locking.rst
-
-     9	
-  > 10	struct ap_matrix_dev *matrix_dev;
-    11	struct ap_matrix_mdev *matrix_mdev;
-    12	struct kvm *kvm;
-    13	
-    14	The Matrix Devices Lock (drivers/s390/crypto/vfio_ap_private.h)
-  > 15	--------------------------------------------------------------
-    16	
-    17	struct ap_matrix_dev {
-    18		...
-    19		struct list_head mdev_list;
-    20		struct mutex mdevs_lock;
-    21		...
-  > 22	}
-    23	
-
+diff --git a/arch/powerpc/include/asm/iommu.h b/arch/powerpc/include/asm/iommu.h
+index 7e29c73e3dd4..4bdae0ee29d0 100644
+--- a/arch/powerpc/include/asm/iommu.h
++++ b/arch/powerpc/include/asm/iommu.h
+@@ -215,6 +215,8 @@ extern long iommu_tce_xchg_no_kill(struct mm_struct *mm,
+ 		enum dma_data_direction *direction);
+ extern void iommu_tce_kill(struct iommu_table *tbl,
+ 		unsigned long entry, unsigned long pages);
++
++extern const struct iommu_ops spapr_tce_iommu_ops;
+ #else
+ static inline void iommu_register_group(struct iommu_table_group *table_group,
+ 					int pci_domain_number,
+diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
+index 7e56ddb3e0b9..2205b448f7d5 100644
+--- a/arch/powerpc/kernel/iommu.c
++++ b/arch/powerpc/kernel/iommu.c
+@@ -1176,4 +1176,74 @@ void iommu_del_device(struct device *dev)
+ 	iommu_group_remove_device(dev);
+ }
+ EXPORT_SYMBOL_GPL(iommu_del_device);
++
++/*
++ * A simple iommu_ops to allow less cruft in generic VFIO code.
++ */
++static bool spapr_tce_iommu_capable(enum iommu_cap cap)
++{
++	switch (cap) {
++	case IOMMU_CAP_CACHE_COHERENCY:
++		return true;
++	default:
++		break;
++	}
++
++	return false;
++}
++
++static struct iommu_domain *spapr_tce_iommu_domain_alloc(unsigned int type)
++{
++	struct iommu_domain *domain = kzalloc(sizeof(*domain), GFP_KERNEL);
++
++	if (!domain)
++		return NULL;
++
++	domain->geometry.aperture_start = 0;
++	domain->geometry.aperture_end = ~0ULL;
++	domain->geometry.force_aperture = true;
++
++	return domain;
++}
++
++static struct iommu_device *spapr_tce_iommu_probe_device(struct device *dev)
++{
++	struct iommu_device *iommu_dev = kzalloc(sizeof(struct iommu_device), GFP_KERNEL);
++
++	iommu_dev->dev = dev;
++	iommu_dev->ops = &spapr_tce_iommu_ops;
++
++	return iommu_dev;
++}
++
++static void spapr_tce_iommu_release_device(struct device *dev)
++{
++}
++
++static int spapr_tce_iommu_attach_dev(struct iommu_domain *dom,
++				      struct device *dev)
++{
++	return 0;
++}
++
++static struct iommu_group *spapr_tce_iommu_device_group(struct device *dev)
++{
++	struct iommu_group *grp = dev->iommu_group;
++
++	if (!grp)
++		grp = ERR_PTR(-ENODEV);
++	return grp;
++}
++
++const struct iommu_ops spapr_tce_iommu_ops = {
++	.capable = spapr_tce_iommu_capable,
++	.domain_alloc = spapr_tce_iommu_domain_alloc,
++	.probe_device = spapr_tce_iommu_probe_device,
++	.release_device = spapr_tce_iommu_release_device,
++	.device_group = spapr_tce_iommu_device_group,
++	.default_domain_ops = &(const struct iommu_domain_ops) {
++		.attach_dev = spapr_tce_iommu_attach_dev,
++	}
++};
++
+ #endif /* CONFIG_IOMMU_API */
+diff --git a/arch/powerpc/kernel/pci_64.c b/arch/powerpc/kernel/pci_64.c
+index 19b03ddf5631..04bc0c52e45c 100644
+--- a/arch/powerpc/kernel/pci_64.c
++++ b/arch/powerpc/kernel/pci_64.c
+@@ -20,6 +20,7 @@
+ #include <linux/irq.h>
+ #include <linux/vmalloc.h>
+ #include <linux/of.h>
++#include <linux/iommu.h>
+ 
+ #include <asm/processor.h>
+ #include <asm/io.h>
+@@ -27,6 +28,7 @@
+ #include <asm/byteorder.h>
+ #include <asm/machdep.h>
+ #include <asm/ppc-pci.h>
++#include <asm/iommu.h>
+ 
+ /* pci_io_base -- the base address from which io bars are offsets.
+  * This is the lowest I/O base address (so bar values are always positive),
+@@ -69,6 +71,7 @@ static int __init pcibios_init(void)
+ 		ppc_md.pcibios_fixup();
+ 
+ 	printk(KERN_DEBUG "PCI: Probing PCI hardware done\n");
++	bus_set_iommu(&pci_bus_type, &spapr_tce_iommu_ops);
+ 
+ 	return 0;
+ }
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.30.2
+
