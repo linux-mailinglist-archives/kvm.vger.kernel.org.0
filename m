@@ -2,102 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEC06566801
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 12:29:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D063566902
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 13:17:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232506AbiGEK3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jul 2022 06:29:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53506 "EHLO
+        id S231318AbiGELRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jul 2022 07:17:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232083AbiGEK3R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jul 2022 06:29:17 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2060.outbound.protection.outlook.com [40.107.94.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E4B15802;
-        Tue,  5 Jul 2022 03:29:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=c6iAGiiNofvmvLhZTioDim/lmVqhWmKSQ9WTJae6b3CY0Gd+NzQDRHjFZpu8x0s2DKgBwfDj1LlvmQQwqAlcNIjQs2ZuLp0rwIWnN1agPJz7WZgr2yiMe2hXzfDXMW15E4QHjgJm62UmXiRmTLVVqYxYhpMzbpZdG6DInXHG6kZQ5UH+a9qBQowSZmKNZuaAyLDIioEc0bM9ub6IUiOB7F6O8OaRkm7e3aqHY2pkA8XfKO9cSLrbvTzrEA3dgI7oRSndQglBaCUvf/tkEaYJOmYZ87BbA3dTJaYgEq44o4Kqg2sGQ7lMObXm8Xpb00HfQCWI08eDMYh/mcvC4u83UA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uE6sjx0oSA79BfIgkJVMlmUd3p6BL3oGNTJ2eCqwAtA=;
- b=TcLtc+r802t11w1T6l2daI45ZKfUg7T4lWcBXDFGKiK6fSKjenmKX6x8YWxtHEBEHfcIHtLD7Hj1xLdIIlqQcmZNjgTFfU7VPA7rBr3h5TwINPj46Um8EIY+b3Sq5MJEFYIgaKdKNx8Re+AJ98Qpfst4QrCImm8lXHKY0OJDnEZZH8KEDC1bp2v37SG9OZhxHAmCD2WkgJ3GeUchno70yIXUUFERa/o7zBSPJgtNYhTYYtn4XPQJ6OZdzY3929wgV+mElgGOa+3fVw/KqrIIEzJ4L46AZZJm3LJWZt5NrIcmJJHP8OQ6bi/IfP6r8tUZUZCcONa+UfT2f3jHSQZPJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.238) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com; dmarc=pass
- (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
- (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uE6sjx0oSA79BfIgkJVMlmUd3p6BL3oGNTJ2eCqwAtA=;
- b=hAyge6/Y4FF2jqFN/KqQ2enbhKpLb17KwLkg6JCPRQe89Z5uHssnKXggVPNzJRzY6mRJBzkzMgmIfDS/3ZUJ7ahAoaZaX+7EiTujsgrNTC5rO9jjIMa3i/8uV9IbEHPJy/MphFlyfizRsGMtkPlCuvL0WEQwZaamdlKbdj2uvZG9GzxWnEA1kr9S4OSu+JRY36EYRV+BghuNpD9sO9A1iz8tBs0oc6CTGseuWsiWw8+i1g23Id4C2T01WqtMEFikl/GyJAr+j+3RCqpZpN5vu1klbIPgpXbCR5UL/Uai2wDJF6JGfMf1bfXnM5igyW3UIr0cYsj/MhOzY+Eg1MF9PA==
-Received: from MWHPR14CA0015.namprd14.prod.outlook.com (2603:10b6:300:ae::25)
- by MN2PR12MB3069.namprd12.prod.outlook.com (2603:10b6:208:c4::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.18; Tue, 5 Jul
- 2022 10:29:01 +0000
-Received: from CO1NAM11FT060.eop-nam11.prod.protection.outlook.com
- (2603:10b6:300:ae:cafe::42) by MWHPR14CA0015.outlook.office365.com
- (2603:10b6:300:ae::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.14 via Frontend
- Transport; Tue, 5 Jul 2022 10:29:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.238) by
- CO1NAM11FT060.mail.protection.outlook.com (10.13.175.132) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5395.14 via Frontend Transport; Tue, 5 Jul 2022 10:29:00 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
- 15.0.1497.32; Tue, 5 Jul 2022 10:28:59 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.26; Tue, 5 Jul 2022 03:28:58 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.986.26 via Frontend
- Transport; Tue, 5 Jul 2022 03:28:55 -0700
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
-CC:     <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>,
-        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
-        <leonro@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
-        <cohuck@redhat.com>
-Subject: [PATCH V1 vfio 11/11] vfio/mlx5: Set the driver DMA logging callbacks
-Date:   Tue, 5 Jul 2022 13:27:40 +0300
-Message-ID: <20220705102740.29337-12-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20220705102740.29337-1-yishaih@nvidia.com>
-References: <20220705102740.29337-1-yishaih@nvidia.com>
+        with ESMTP id S229903AbiGELRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jul 2022 07:17:17 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1D11402B;
+        Tue,  5 Jul 2022 04:17:16 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2659FITj029257;
+        Tue, 5 Jul 2022 11:17:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=I36b3F611wmvBT+hAeI5/d8HXSvCoWzHSDh1HROzQEQ=;
+ b=MsRFGN7q06WGdbLUb7EbA53x3p4AGrd82SD4FC9Yo83M9VnMRzTkapwZ/tIJQMCZm/6w
+ uUY86qKGJBzvA0R9Ui5boiGMVfJVCzFHdVKRxirvYCdPnsNvw4kTmpp3GwQ/cx1kOrMG
+ V/cfOtnNEsGu+MydUA6ijvpJz6+mgFbjmPkGWRE7v8e+qBgsc89dru8H4BU+2TEVQZjX
+ i54Q6miVjDGZkJQJhjkl9iwRB9VOzEZFftzHD6LyZOuWc9FbmaqFBq/puiigXNhSsu+i
+ 5V5leL/85lrL9wPkpvOaC6JnW+xoteXq84kT3AeCJG9JZTEWqbbeZ+4hmVcA2IfBegC/ hA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h4jgs2m5f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jul 2022 11:17:15 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 265AW9aR006741;
+        Tue, 5 Jul 2022 11:17:15 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h4jgs2m4h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jul 2022 11:17:15 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 265B7Y8g011627;
+        Tue, 5 Jul 2022 11:17:13 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3h2dn8uwkq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jul 2022 11:17:12 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 265BH9cg23265734
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Jul 2022 11:17:10 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DDFDFA404D;
+        Tue,  5 Jul 2022 11:17:09 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9EDC7A4040;
+        Tue,  5 Jul 2022 11:17:09 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Jul 2022 11:17:09 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3] s390x: Add strict mode to specification exception interpretation test
+Date:   Tue,  5 Jul 2022 13:17:07 +0200
+Message-Id: <20220705111707.3772070-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e7d26620-f0d1-40ae-7bf9-08da5e712cfd
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3069:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EGwjK3YkHAjjI7ngwZvgQAf9lpVzeB4SS6r1+ysL6pPNTwdyxuqwSlIjKZcY6kqg114ToLQsDHyTNBadXEcs1+obr0JwWx/04UVNmVh04RoVzl0hzGLHxD5XRFioWrqaaP4hMTobko3+v4DvrrtYj+0J5TGNNKUItBkGw3dwQv56djg3bLuKnt5hg0Tstsdic67BmP+N0mFLgfky1NZZxTfNPXi7W0GtwNGBtI78NySvYqSe8xuIJAxKqsUtjR/79+39x3SbxvJ8B3w/nh16CdaGVQf2haTBtOo0FTkM30oZp9oRodtVUcDNxh4Dyy7tdOAlJl4Ln5kdU2dbgiEMg5WKv3Aq4CFrCbP+KPZjNqcoGRDBBVWQ/FsAhUuj/pd4/UL50nDbjEeZMP1RTfawbY6USlPVLY7ZMKrVjBZl8qN4aovWbTi9XjQt1X64aBvBtNzSvZAN4f/BqMHseuqgO4xYATWauxxnSSOHhPGCN8MB/+LOv5sUbTWTo+aQgNhWruQZLg5dHcRJ4UrylzMqZS4Z31sTGu+pdv8KDjL2/o6x2DMRTMBOa896TEatdh6bRw+s2glf9mMq/6FUmIOtRkjpJq3Nux/KDkg2sjS8NCb4QxwMKmzhksYmkwcZlbOnwVnygOMj6dR7NzQUEZnQL854jJWOSWmgS6HDTOkLyAHwqKjhDH8MZD2wLAi2Mt0OWMaUX54wQ952q4fjP/BYsHOpJYyFhoEEx+ais6xW8GWUbRxjpkNMv9S8R8r2ufS8VAE9vct6K3l79mXlRP+XnFtEryK4EOOiJikL8G7CwBKxlPu5DWdoVeq7kYmTQ9VuRp7subJE5JHPcROHtiKth1jvC6J4Gmzd0xUtskvfLEU=
-X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(346002)(376002)(136003)(46966006)(36840700001)(40470700004)(8676002)(4326008)(70586007)(70206006)(82310400005)(2906002)(86362001)(5660300002)(356005)(8936002)(40480700001)(81166007)(82740400003)(41300700001)(426003)(47076005)(336012)(83380400001)(26005)(2616005)(186003)(6666004)(7696005)(1076003)(36860700001)(40460700003)(316002)(110136005)(54906003)(6636002)(478600001)(36756003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2022 10:29:00.4378
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7d26620-f0d1-40ae-7bf9-08da5e712cfd
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT060.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3069
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: R5KFu4WyYBLn9usniyhVMAFLGX-MvF78
+X-Proofpoint-GUID: eRDlA1VjQXgQrFC0oCLzPtOv0IfUfwfz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-05_09,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ malwarescore=0 phishscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=999 mlxscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207050047
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -105,80 +89,195 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that everything is ready set the driver DMA logging callbacks if
-supported by the device.
+While specification exception interpretation is not required to occur,
+it can be useful for automatic regression testing to fail the test if it
+does not occur.
+Add a `--strict` argument to enable this.
+`--strict` takes a list of machine types (as reported by STIDP)
+for which to enable strict mode, for example
+`--strict 3931,8562,8561,3907,3906,2965,2964`
+will enable it for models z16 - z13.
+Alternatively, strict mode can be enabled for all but the listed machine
+types by prefixing the list with a `!`, for example
+`--strict !1090,1091,2064,2066,2084,2086,2094,2096,2097,2098,2817,2818,2827,2828`
+will enable it for z/Architecture models except those older than z13.
+`--strict !` will enable it always.
 
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 ---
- drivers/vfio/pci/mlx5/cmd.c  | 5 ++++-
- drivers/vfio/pci/mlx5/cmd.h  | 3 ++-
- drivers/vfio/pci/mlx5/main.c | 9 ++++++++-
- 3 files changed, 14 insertions(+), 3 deletions(-)
+v2 -> v3
+ * rebase on master
+ * global strict bool
+ * fix style issue
 
-diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index 3e92b4d92be2..c604b70437a5 100644
---- a/drivers/vfio/pci/mlx5/cmd.c
-+++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -126,7 +126,8 @@ void mlx5vf_cmd_remove_migratable(struct mlx5vf_pci_core_device *mvdev)
+Range-diff against v2:
+1:  e9c36970 ! 1:  c707481c s390x: Add strict mode to specification exception interpretation test
+    @@ Commit message
+         Add a `--strict` argument to enable this.
+         `--strict` takes a list of machine types (as reported by STIDP)
+         for which to enable strict mode, for example
+    -    `--strict 8562,8561,3907,3906,2965,2964`
+    -    will enable it for models z15 - z13.
+    +    `--strict 3931,8562,8561,3907,3906,2965,2964`
+    +    will enable it for models z16 - z13.
+         Alternatively, strict mode can be enabled for all but the listed machine
+         types by prefixing the list with a `!`, for example
+         `--strict !1090,1091,2064,2066,2084,2086,2094,2096,2097,2098,2817,2818,2827,2828`
+    @@ s390x/spec_ex-sie.c
+      #include <sclp.h>
+      #include <asm/page.h>
+      #include <asm/arch_def.h>
+    + #include <alloc_page.h>
+    + #include <sie.h>
+    + #include <snippet.h>
+    ++#include <hardware.h>
+    + 
+    + static struct vm vm;
+    + extern const char SNIPPET_NAME_START(c, spec_ex)[];
+    + extern const char SNIPPET_NAME_END(c, spec_ex)[];
+    ++static bool strict;
+    + 
+    + static void setup_guest(void)
+    + {
+     @@ s390x/spec_ex-sie.c: static void reset_guest(void)
+    - 	vm.sblk->icptcode = 0;
+    - }
+      
+    --static void test_spec_ex_sie(void)
+    -+static void test_spec_ex_sie(bool strict)
+    + static void test_spec_ex_sie(void)
+      {
+     +	const char *msg;
+     +
+    @@ s390x/spec_ex-sie.c: static void test_spec_ex_sie(void)
+     +	if (list[0] == '!') {
+     +		ret = true;
+     +		list++;
+    -+	} else
+    ++	} else {
+     +		ret = false;
+    ++	}
+     +	while (true) {
+     +		long input = 0;
+     +
+    @@ s390x/spec_ex-sie.c: static void test_spec_ex_sie(void)
+     +
+      int main(int argc, char **argv)
+      {
+    ++	strict = parse_strict(argc - 1, argv + 1);
+      	if (!sclp_facilities.has_sief2) {
+    -@@ s390x/spec_ex-sie.c: int main(int argc, char **argv)
+    + 		report_skip("SIEF2 facility unavailable");
+      		goto out;
+    - 	}
+    - 
+    --	test_spec_ex_sie();
+    -+	test_spec_ex_sie(parse_strict(argc - 1, argv + 1));
+    - out:
+    - 	return report_summary();
+    - }
+
+ s390x/spec_ex-sie.c | 53 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 51 insertions(+), 2 deletions(-)
+
+diff --git a/s390x/spec_ex-sie.c b/s390x/spec_ex-sie.c
+index d8e25e75..e5f39451 100644
+--- a/s390x/spec_ex-sie.c
++++ b/s390x/spec_ex-sie.c
+@@ -7,16 +7,19 @@
+  * specification exception interpretation is off/on.
+  */
+ #include <libcflat.h>
++#include <stdlib.h>
+ #include <sclp.h>
+ #include <asm/page.h>
+ #include <asm/arch_def.h>
+ #include <alloc_page.h>
+ #include <sie.h>
+ #include <snippet.h>
++#include <hardware.h>
+ 
+ static struct vm vm;
+ extern const char SNIPPET_NAME_START(c, spec_ex)[];
+ extern const char SNIPPET_NAME_END(c, spec_ex)[];
++static bool strict;
+ 
+ static void setup_guest(void)
+ {
+@@ -37,6 +40,8 @@ static void reset_guest(void)
+ 
+ static void test_spec_ex_sie(void)
+ {
++	const char *msg;
++
+ 	setup_guest();
+ 
+ 	report_prefix_push("SIE spec ex interpretation");
+@@ -60,16 +65,60 @@ static void test_spec_ex_sie(void)
+ 	report(vm.sblk->icptcode == ICPT_PROGI
+ 	       && vm.sblk->iprcc == PGM_INT_CODE_SPECIFICATION,
+ 	       "Received specification exception intercept");
+-	if (vm.sblk->gpsw.addr == 0xdeadbeee)
+-		report_info("Interpreted initial exception, intercepted invalid program new PSW exception");
++	msg = "Interpreted initial exception, intercepted invalid program new PSW exception";
++	if (strict)
++		report(vm.sblk->gpsw.addr == 0xdeadbeee, msg);
++	else if (vm.sblk->gpsw.addr == 0xdeadbeee)
++		report_info(msg);
+ 	else
+ 		report_info("Did not interpret initial exception");
+ 	report_prefix_pop();
+ 	report_prefix_pop();
  }
  
- void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
--			       const struct vfio_migration_ops *mig_ops)
-+			       const struct vfio_migration_ops *mig_ops,
-+			       const struct vfio_log_ops *log_ops)
- {
- 	struct pci_dev *pdev = mvdev->core_device.pdev;
- 	int ret;
-@@ -169,6 +170,8 @@ void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
- 		VFIO_MIGRATION_P2P;
- 	mvdev->core_device.vdev.mig_ops = mig_ops;
- 	init_completion(&mvdev->tracker_comp);
-+	if (MLX5_CAP_GEN(mvdev->mdev, adv_virtualization))
-+		mvdev->core_device.vdev.log_ops = log_ops;
- 
- end:
- 	mlx5_vf_put_core_dev(mvdev->mdev);
-diff --git a/drivers/vfio/pci/mlx5/cmd.h b/drivers/vfio/pci/mlx5/cmd.h
-index 8b0ae40c620c..921d5720a1e5 100644
---- a/drivers/vfio/pci/mlx5/cmd.h
-+++ b/drivers/vfio/pci/mlx5/cmd.h
-@@ -118,7 +118,8 @@ int mlx5vf_cmd_resume_vhca(struct mlx5vf_pci_core_device *mvdev, u16 op_mod);
- int mlx5vf_cmd_query_vhca_migration_state(struct mlx5vf_pci_core_device *mvdev,
- 					  size_t *state_size);
- void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
--			       const struct vfio_migration_ops *mig_ops);
-+			       const struct vfio_migration_ops *mig_ops,
-+			       const struct vfio_log_ops *log_ops);
- void mlx5vf_cmd_remove_migratable(struct mlx5vf_pci_core_device *mvdev);
- void mlx5vf_cmd_close_migratable(struct mlx5vf_pci_core_device *mvdev);
- int mlx5vf_cmd_save_vhca_state(struct mlx5vf_pci_core_device *mvdev,
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index a9b63d15c5d3..759a5f5f7b3f 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -579,6 +579,12 @@ static const struct vfio_migration_ops mlx5vf_pci_mig_ops = {
- 	.migration_get_state = mlx5vf_pci_get_device_state,
- };
- 
-+static const struct vfio_log_ops mlx5vf_pci_log_ops = {
-+	.log_start = mlx5vf_start_page_tracker,
-+	.log_stop = mlx5vf_stop_page_tracker,
-+	.log_read_and_clear = mlx5vf_tracker_read_and_clear,
-+};
++static bool parse_strict(int argc, char **argv)
++{
++	uint16_t machine_id;
++	char *list;
++	bool ret;
 +
- static const struct vfio_device_ops mlx5vf_pci_ops = {
- 	.name = "mlx5-vfio-pci",
- 	.open_device = mlx5vf_pci_open_device,
-@@ -602,7 +608,8 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
- 	if (!mvdev)
- 		return -ENOMEM;
- 	vfio_pci_core_init_device(&mvdev->core_device, pdev, &mlx5vf_pci_ops);
--	mlx5vf_cmd_set_migratable(mvdev, &mlx5vf_pci_mig_ops);
-+	mlx5vf_cmd_set_migratable(mvdev, &mlx5vf_pci_mig_ops,
-+				  &mlx5vf_pci_log_ops);
- 	dev_set_drvdata(&pdev->dev, &mvdev->core_device);
- 	ret = vfio_pci_core_register_device(&mvdev->core_device);
- 	if (ret)
++	if (argc < 1)
++		return false;
++	if (strcmp("--strict", argv[0]))
++		return false;
++
++	machine_id = get_machine_id();
++	if (argc < 2) {
++		printf("No argument to --strict, ignoring\n");
++		return false;
++	}
++	list = argv[1];
++	if (list[0] == '!') {
++		ret = true;
++		list++;
++	} else {
++		ret = false;
++	}
++	while (true) {
++		long input = 0;
++
++		if (strlen(list) == 0)
++			return ret;
++		input = strtol(list, &list, 16);
++		if (*list == ',')
++			list++;
++		else if (*list != '\0')
++			break;
++		if (input == machine_id)
++			return !ret;
++	}
++	printf("Invalid --strict argument \"%s\", ignoring\n", list);
++	return ret;
++}
++
+ int main(int argc, char **argv)
+ {
++	strict = parse_strict(argc - 1, argv + 1);
+ 	if (!sclp_facilities.has_sief2) {
+ 		report_skip("SIEF2 facility unavailable");
+ 		goto out;
+
+base-commit: ca85dda2671e88d34acfbca6de48a9ab32b1810d
 -- 
-2.18.1
+2.36.1
 
