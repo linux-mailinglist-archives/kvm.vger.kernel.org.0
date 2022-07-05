@@ -2,216 +2,521 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 449F4567059
-	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 16:07:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99F7E5670B1
+	for <lists+kvm@lfdr.de>; Tue,  5 Jul 2022 16:15:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbiGEOHn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jul 2022 10:07:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57088 "EHLO
+        id S233584AbiGEOOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jul 2022 10:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230264AbiGEOHT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jul 2022 10:07:19 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D257D2251C;
-        Tue,  5 Jul 2022 06:56:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KS+3TAcW5RAFU2Bn3jykVqkG32hGjVNDsdfUhH8VZKgTlNnqEvCyM1qqgb5N3DZgtbX3pHQy1UsNUtNz7pYIRUfN/0NBRjAhJNfwFqQjAGYs+m8zxJRK4JyHyFBqBdr7vUfQGh5rLyJOqn/pRYn3kn01NqjhpP/79KA0T6ROmXgwRwVPc6cr3srevWr2UZUw3s+fCE+xPj6XI96Shu2rz17wSYqwNIUP7DZv4RdoS/cEaeC54I/mnDk3iqeKlhYglhm/JozNH5hoZc4UY/PNjOjvtT6GbpEliDGOVNvdq/qeKXf47Bi/QyHuknMKkfkIPpyDZc4BoZxfSUPKSU8yxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qAiLVebQhyB2lpNSVBGxV1BPOMPRAA6nZwi28M9yDpQ=;
- b=MARtPV5ii7vd/7Qrt2KGtn/3QPwAimJRHPCiYgxo5xwWaQgIv7n1lux8YcsokffrV0sJzxhxohcgQR730cJ7dLnJx+o3qKS2BwYjzYEXJwsBrPsCrtTOe+iPuXDuu0mB5sHJED6b10bQQNQKIpDaF+4+Hb0suQBJRv38L7tKzpc/MQmd937/cm+va5/B9pil8u1X89xr0aJfjei5ubwTV3Ovl4z2/I9rXLtG1z+Itym3aeU5jnNYhayp23knn47+7SuXMaQaKAbTfpsUl5fJ1FjrHOMF/yRa/pyqZZ2us/7uMjNMuKBTVpPIoLeHMeTxc7Y2lov8SzzqLI0Tns8NJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qAiLVebQhyB2lpNSVBGxV1BPOMPRAA6nZwi28M9yDpQ=;
- b=dtA8ogFTYZ9n7SndFfxRA8KkQJBQUrkNAT6bbLWZG6Z6guHFNYeNMexTy8uWCYlYeAeu9K8MkTlbjLyPFYmD8BVsqOuV1hWJLsmD3v1uZ0OmqaPrc4Psvu2zZ4a7Nxukn2KyikH9V20YDjruepCxL4Mo8Hvf39f0lz4Rx1BUdzw=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by MN0PR12MB6149.namprd12.prod.outlook.com (2603:10b6:208:3c7::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.21; Tue, 5 Jul
- 2022 13:56:01 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d%7]) with mapi id 15.20.5395.021; Tue, 5 Jul 2022
- 13:56:00 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: RE: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Thread-Topic: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Thread-Index: AQHYjTdG/Jq12JdNiEyvNHxMVTEAQ61v0QXg
-Date:   Tue, 5 Jul 2022 13:56:00 +0000
-Message-ID: <SN6PR12MB27673AC95A577D5468A949598E819@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
- <Yr7Pm/E9WsAjirV0@zn.tnic>
-In-Reply-To: <Yr7Pm/E9WsAjirV0@zn.tnic>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-07-05T13:47:12Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=72928229-1ee3-4f8c-9dbf-f91643fa79cc;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-07-05T13:55:58Z
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: 88abcc46-2c3f-42c1-a93d-0c5982b903a0
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 21cfac18-9723-4053-f895-08da5e8e1811
-x-ms-traffictypediagnostic: MN0PR12MB6149:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HZOcC+g1dK0CkrQa6YWflR3P3Aj92ue+500EtmGiMN+J5hRCK4GIhzKNOTT+7KZqqQOEMeFfpIJffgBeV5TXixLfbvF9od9+zy2+zSLGARoelbxfJBldEkvCcOyGHIXGd99ctvid1M/6+TJSSFvzmJq5lTlT48DNA53ZwJK8DUaCZbS0vP15Fxd613Kht1kpCXiiP9jhbgLDa5dt2+c1oA7v4Yt19TeSfyFhifRCZJ2amDzseTa2KlgQdJ2szAHAVLRU3O6fvHD4ORS/JsTirbQYvEYBtzf3Zk5EPut1B30+/2J8vWZKv0GqlCi3mn7abBAjgRULaLvmSBOrPV7/uCyfjKjuIwqndUQbu8R/JW2fmbLkYHRTrxXL0QcGzNDU+0vyqV3UhHIjW6oqiN2ne0kDvgtpreNBFrLcHYcymtW7EFoD7CeOxtOHOmc89T738gV3MzfXdUE75TtK61Iwv78Q9xTVz8+hGB8gDp4KxYyq7TEf9RkGPI5+d1HnRi2tN8bG3UTOkaPX4fsv6z2aNgY5S9UFLOzDXhuOWZj2zTUcjPSzDQxWS0t8KYs5qZ1m1Z5xyFTSdAmFVAF7oWnXeEkxlLLPgQ6FZ4W12/l/JnFkGXWdAmB+rLuDPZWHyWgK8/J7+MfBk28G1BxNPCW3v5XnRfh8VUB11tfWNgBPLNYS2Q+yjtViGfr4ppjOQPPQa6aKkcTsD9scaCWol2elbPgl4ilnZruiq7MU0QSt+LNqeBnpI2QmcSqMInIYucmSVz8iuSBD37/hI9mYH3pEeswfgtWT9ihTJImoN/QHiHfYUbjsyXMfvDBDLgSB4MhA
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(366004)(39860400002)(376002)(346002)(396003)(52536014)(8936002)(7416002)(7406005)(5660300002)(54906003)(4326008)(8676002)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(86362001)(41300700001)(6916009)(316002)(71200400001)(186003)(38070700005)(26005)(9686003)(7696005)(6506007)(2906002)(122000001)(38100700002)(55016003)(33656002)(83380400001)(478600001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Wdm/Y9r5sphXB+Ko2k4CTwHCBjJDvvj2rI+/u6HVyIlptb/l2kXl3XrBLRn9?=
- =?us-ascii?Q?H3CnJeKvgO1O/aXKXJ7OsGk+uYjqTv78V7xQt++kfjhQstQwcFwlnBcEVAw5?=
- =?us-ascii?Q?53i/qrNQk6Ik+V/y7R7V0O6xy6WCGVPbQr1Nyr5UWjsSTn8D3QgxqkNz0jiy?=
- =?us-ascii?Q?O+1hGmbg5dnNJNvmhZxhUV6Bxnwf631XH5fTll38BC/ng9cQ5qoMw4aYCni+?=
- =?us-ascii?Q?cPV92t4k2gLblYiA/acTBj1KnMNnn3K4wTv5psdOCHLRWVb/BA5Mw1WRzYMx?=
- =?us-ascii?Q?+1mmsZeZx9IZ2JdlO2sAsuJNW6oPTxxTrIQahiF7TAvGpl/P5p9NvvNoo9GT?=
- =?us-ascii?Q?yIhZkp1SrYjIacOQqCaf/Lad1+vKNOIuTv54x8K/xomztH/mewwQkOMGqBPd?=
- =?us-ascii?Q?ocip4pHRfQmvTsVmnavQKFEX7RRDZMsx250kleDNnqs+CMcaPKYd0BMvSIqs?=
- =?us-ascii?Q?sdaSlQlURNG/Y19OxcHiB33BXrWyVAXzIg1dwElJP/HgHkBWIhoLetl/IvQS?=
- =?us-ascii?Q?igkmQXvoqvNjBYryM/eAvCdlbew6GVVIxj4XfDWhbmBeUaDB/EVLQcJKi5ZV?=
- =?us-ascii?Q?W8io7kz3RsqrZRIBbzuEiQLduk4O96M2KnpMP4talzmijC0lkYgYwzaRqwFb?=
- =?us-ascii?Q?J+bYXq+iUImfjZZtYyXnhD6yANzQRsSes2zRw3OyBcwqZQoNt/3SDH/3Fnl+?=
- =?us-ascii?Q?pyAc5BsAMwoygrc/jwe4c0PPTTciCpeaigY6HvfKx7aoqnv98s4LEuV2ZJH9?=
- =?us-ascii?Q?F+9Lhki2WwvNRHhpxcxuXOmNlckUBdap8uCa7kbtVnMnC537FljF6qKL3nQO?=
- =?us-ascii?Q?tY5H+cRjeBlRN1iUcpIa/W0shRsWhtqVdUZE5KxXflW8SBT6goZjdftGRkc6?=
- =?us-ascii?Q?ck1w0Agd3HmiGPk4b1wGF+cAIIaJ3dqo+jpKcD6MpvjucKlq707BxzOR19d6?=
- =?us-ascii?Q?I9JXwA55321N/avJW19KqDRSgFq3wa5Rfxm/mrDiJr3/nONY+kWHOs4JIh+D?=
- =?us-ascii?Q?zAXRqQroQoKVz3xiZxK0koyBJtY3MDFJRoLx0ixbhZo3vEY1Rs1Il9nX4+wU?=
- =?us-ascii?Q?SxNLAT6lejcABe4AfIELp1bq/0xEcyF6vPy+C2m2GhgU9JKGFnKB511YMQ79?=
- =?us-ascii?Q?BZ4UUfha3Czadt0PFTjtTZItWdPOQg00t1CopSOJItwji7uMq7a1qav27vEv?=
- =?us-ascii?Q?MWQKzcp73qXlOCBdkLudzRpbvxSCWDgbY7HbJ4SmPnMWt9uqhs7qHElnf3Dn?=
- =?us-ascii?Q?7b32+vK3HqPKr1acdTIy2KeL80ZcVbq9qMWHG1Jwih3IX9hHhr4wVeEs/WmP?=
- =?us-ascii?Q?kgsBtsZxifyG08fAYxT8zg3l0g4/5/XfgurgS1UGTUiXni1den47bsMbAxvX?=
- =?us-ascii?Q?Nyvk5JFzlyAiyfgP0I9nvm6o55ljgNPplGfv9meYkD6rAL09YZnjIxKp9mOq?=
- =?us-ascii?Q?bNuQjLmGQjz2nk6wsXR/bG9VvVvZM4YRCjVM7qKEYWPexW1qHyvkEEcLitFW?=
- =?us-ascii?Q?5BF0k9mQ4aNWzQWnUc/dYEn42kXkPXpjXLf8QT3bTEywhrewe5zIqV0oa0ch?=
- =?us-ascii?Q?oqf5NVgaZ5M79RVRP7w=3D?=
-Content-Type: text/plain; charset="us-ascii"
+        with ESMTP id S232732AbiGEONF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jul 2022 10:13:05 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B1DBE33;
+        Tue,  5 Jul 2022 07:07:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657030064; x=1688566064;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=zeZpdX7gwMqp9yiDW+FI+GnJcGGtkses+Ne4GHyi6w4=;
+  b=Z37BUohlj8AYbjiPN9kOqnc0HxLGMT6QUNlGrW9ZYQ4fOSRw0I4bBcD0
+   2dW4HRlnkHP3n5AkRJzO/BwmgxceKonL560NgbQ7kRj3QxhI7d8if5RC5
+   /FIBOURZrBrooKfRQ4wUKmzONu+GWj/2lKIfzMJ+deq3Iod/6b6HvzKXD
+   S1J2i4RvzmEf4Gy2vQhiGI/Ve+8ZgH431FpB1loauMikSQkTUyNoSGlrV
+   hQVVn8NWpkmfd4FPcIPeyNjLaP53N8TyD8H/KBMZvJw/4hXikMR84Wb3k
+   JJaDMvULz+nhw7Ubm1OXA29YUgr9S3mzP2ok51ISBIfxLVy2ejxEwKKlx
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10398"; a="282117376"
+X-IronPort-AV: E=Sophos;i="5.92,247,1650956400"; 
+   d="scan'208";a="282117376"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2022 07:06:31 -0700
+X-IronPort-AV: E=Sophos;i="5.92,247,1650956400"; 
+   d="scan'208";a="597304965"
+Received: from atornero-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.166.122])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2022 07:06:29 -0700
+Message-ID: <4c59eddd8f1d5029be8eeac84fbb75131b984568.camel@intel.com>
+Subject: Re: [PATCH v7 037/102] KVM: x86/mmu: Track shadow MMIO value/mask
+ on a per-VM basis
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Wed, 06 Jul 2022 02:06:27 +1200
+In-Reply-To: <242df8a7164b593d3702b9ba94889acd11f43cbb.1656366338.git.isaku.yamahata@intel.com>
+References: <cover.1656366337.git.isaku.yamahata@intel.com>
+         <242df8a7164b593d3702b9ba94889acd11f43cbb.1656366338.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21cfac18-9723-4053-f895-08da5e8e1811
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jul 2022 13:56:00.8388
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3IIzK/uViy1/vzuLDs/4vD5HN8RnLcWXAjxf4eb6PgF8jxnxyciAqT3Sc0c0yYJ4jrjxZ3prK5PN0coyCfqjww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6149
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[AMD Official Use Only - General]
+On Mon, 2022-06-27 at 14:53 -0700, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>=20
+> TDX will use a different shadow PTE entry value for MMIO from VMX.  Add
+> members to kvm_arch and track value for MMIO per-VM instead of global
+> variables.  By using the per-VM EPT entry value for MMIO, the existing VM=
+X
+> logic is kept working.
+>=20
+> In the case of VMX VM case, the EPT entry for MMIO is non-present PTE
+> (present bit cleared) without backing guest physical address (on EPT
+> violation, KVM searches backing guest memory and it finds there is no
+> backing guest page.) or the value to trigger EPT misconfiguration.  Once
+> MMIO is triggered on the EPT entry, the EPT entry is updated to trigger E=
+PT
+> misconfiguration for the future MMIO on the same GPA.  It allows KVM to
+> understand the memory access is for MMIO without searching backing guest
+> pages.). And then KVM parses guest instruction to figure out
+> address/value/width for MMIO.
+>=20
+> In the case of the guest TD, the guest memory is protected so that VMM
+> can't parse guest instruction to understand the value and access width fo=
+r
+> MMIO.  Instead, VMM sets up (Shared) EPT to trigger #VE by clearing
+> the VE-suppress bit.  When the guest TD issues MMIO, #VE is injected.  Gu=
+est VE
+> handler converts MMIO access into MMIO hypercall to pass
+> address/value/width for MMIO to VMM. (or directly paravirtualize MMIO int=
+o
+> hypercall.)  Then VMM can handle the MMIO hypercall without parsing guest
+> instructions.
 
-Hello Boris,
+To me only first paragraph is needed.  It already describes _why_ we need t=
+his
+patch and _how_ you are going to implement. =C2=A0
 
->> +bool iommu_sev_snp_supported(void)
->> +{
->> +	struct amd_iommu *iommu;
->> +
->> +	/*
->> +	 * The SEV-SNP support requires that IOMMU must be enabled, and is
->> +	 * not configured in the passthrough mode.
->> +	 */
->> +	if (no_iommu || iommu_default_passthrough()) {
->> +		pr_err("SEV-SNP: IOMMU is either disabled or configured in passthroug=
-h mode.\n");
->> +		return false;
->> +	}
->> +
->> +	/*
->> +	 * Iterate through all the IOMMUs and verify the SNPSup feature is
->> +	 * enabled.
->> +	 */
->> +	for_each_iommu(iommu) {
->> +		if (!iommu_feature(iommu, FEATURE_SNP)) {
->> +			pr_err("SNPSup is disabled (devid: %02x:%02x.%x)\n",
->> +			       PCI_BUS_NUM(iommu->devid), PCI_SLOT(iommu->devid),
->> +			       PCI_FUNC(iommu->devid));
->> +			return false;
->> +		}
->> +	}
->> +
->> +	return true;
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_sev_snp_supported);
+The last two paragraphs only elaborate the _why_ in the first paragraph, bu=
+t
+they does not say this patch will do more.  And they have been explained in
+previous patches so looks they are not mandatory here.
 
-> Why is this function exported?
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  4 ++++
+>  arch/x86/include/asm/vmx.h      |  1 +
+>  arch/x86/kvm/mmu.h              |  4 +++-
+>  arch/x86/kvm/mmu/mmu.c          | 20 ++++++++++++----
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
+>  arch/x86/kvm/mmu/spte.c         | 41 +++++++++++++++------------------
+>  arch/x86/kvm/mmu/spte.h         | 11 ++++-----
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  6 ++---
+>  arch/x86/kvm/svm/svm.c          |  2 +-
+>  arch/x86/kvm/vmx/vmx.c          |  8 +++++++
+>  10 files changed, 59 insertions(+), 40 deletions(-)
+>=20
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 2c47aab72a1b..39215daa8576 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1161,6 +1161,10 @@ struct kvm_arch {
+>  	 */
+>  	spinlock_t mmu_unsync_pages_lock;
+> =20
+> +	bool enable_mmio_caching;
+> +	u64 shadow_mmio_value;
+> +	u64 shadow_mmio_mask;
+> +
+>  	struct list_head assigned_dev_head;
+>  	struct iommu_domain *iommu_domain;
+>  	bool iommu_noncoherent;
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index c371ef695fcc..6231ef005a50 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -511,6 +511,7 @@ enum vmcs_field {
+>  #define VMX_EPT_IPAT_BIT    			(1ull << 6)
+>  #define VMX_EPT_ACCESS_BIT			(1ull << 8)
+>  #define VMX_EPT_DIRTY_BIT			(1ull << 9)
+> +#define VMX_EPT_SUPPRESS_VE_BIT			(1ull << 63)
 
-This function is required to ensure that IOMMU supports the SEV-SNP feature=
- before enabling the SNP feature
-and calling SNP_INIT. This IOMMU support check is done in the AMD IOMMU dri=
-ver with the=20
-iommu_sev_snp_supported() function so it is exported by the IOMMU driver an=
-d called by sev module
-later for SNP initialization in snp_rmptable_init().=20
+Both the patch title and the changelog say this patch only does per-VM MMIO
+value/mask tracking.  Why do we need this bit here?
 
-Thanks,
-Ashish
+>  #define VMX_EPT_RWX_MASK                        (VMX_EPT_READABLE_MASK |=
+       \
+>  						 VMX_EPT_WRITABLE_MASK |       \
+>  						 VMX_EPT_EXECUTABLE_MASK)
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index ccf0ba7a6387..9ba60fd79d33 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -108,7 +108,9 @@ static inline u8 kvm_get_shadow_phys_bits(void)
+>  	return boot_cpu_data.x86_phys_bits;
+>  }
+> =20
+> -void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 acces=
+s_mask);
+> +void kvm_mmu_set_mmio_spte_mask(struct kvm *kvm, u64 mmio_value, u64 mmi=
+o_mask,
+> +				u64 access_mask);
+> +void kvm_mmu_set_default_mmio_spte_mask(u64 mask);
+>  void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
+>  void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
+> =20
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index f239b6cb5d53..496d0d30839b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2287,7 +2287,7 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct=
+ kvm_mmu_page *sp,
+>  				return kvm_mmu_prepare_zap_page(kvm, child,
+>  								invalid_list);
+>  		}
+> -	} else if (is_mmio_spte(pte)) {
+> +	} else if (is_mmio_spte(kvm, pte)) {
+>  		mmu_spte_clear_no_track(spte);
+>  	}
+>  	return 0;
+> @@ -3067,8 +3067,13 @@ static int handle_abnormal_pfn(struct kvm_vcpu *vc=
+pu, struct kvm_page_fault *fau
+>  		 * by L0 userspace (you can observe gfn > L1.MAXPHYADDR if
+>  		 * and only if L1's MAXPHYADDR is inaccurate with respect to
+>  		 * the hardware's).
+> +		 *
+> +		 * Excludes the INTEL TD guest.  Because TD memory is
+> +		 * protected, the instruction can't be emulated.  Instead, use
+> +		 * SPTE value without #VE suppress bit cleared
+> +		 * (kvm->arch.shadow_mmio_value =3D 0).
+>  		 */
+
+Again, I don't think this chunk should be in this patch.  It's out-of-scope=
+ of
+what the patch claims to do.
+
+I see you will make below code change in later patch (couple of patches lat=
+er):
+
+-		if (unlikely(!vcpu->kvm->arch.enable_mmio_caching) ||
++		if (unlikely(!vcpu->kvm->arch.enable_mmio_caching &&
++			     !kvm_gfn_shared_mask(vcpu->kvm)) ||
+ 		    unlikely(fault->gfn > kvm_mmu_max_gfn()))
+ 			return RET_PF_EMULATE;
+
+So why not putting the comment and the code change together?
+
+> -		if (unlikely(!enable_mmio_caching) ||
+> +		if (unlikely(!vcpu->kvm->arch.enable_mmio_caching) ||
+>  		    unlikely(fault->gfn > kvm_mmu_max_gfn()))
+>  			return RET_PF_EMULATE;
+>  	}
+> @@ -3200,7 +3205,8 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, s=
+truct kvm_page_fault *fault)
+>  		else
+>  			sptep =3D fast_pf_get_last_sptep(vcpu, fault->addr, &spte);
+> =20
+> -		if (!is_shadow_present_pte(spte) || is_mmio_spte(spte))
+> +		if (!is_shadow_present_pte(spte) ||
+> +		    is_mmio_spte(vcpu->kvm, spte))
+>  			break;
+> =20
+>  		sp =3D sptep_to_sp(sptep);
+> @@ -3907,7 +3913,7 @@ static int handle_mmio_page_fault(struct kvm_vcpu *=
+vcpu, u64 addr, bool direct)
+>  	if (WARN_ON(reserved))
+>  		return -EINVAL;
+> =20
+> -	if (is_mmio_spte(spte)) {
+> +	if (is_mmio_spte(vcpu->kvm, spte)) {
+>  		gfn_t gfn =3D get_mmio_spte_gfn(spte);
+>  		unsigned int access =3D get_mmio_spte_access(spte);
+> =20
+> @@ -4350,7 +4356,7 @@ static unsigned long get_cr3(struct kvm_vcpu *vcpu)
+>  static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+>  			   unsigned int access)
+>  {
+> -	if (unlikely(is_mmio_spte(*sptep))) {
+> +	if (unlikely(is_mmio_spte(vcpu->kvm, *sptep))) {
+>  		if (gfn !=3D get_mmio_spte_gfn(*sptep)) {
+>  			mmu_spte_clear_no_track(sptep);
+>  			return true;
+> @@ -5864,6 +5870,10 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+>  	node->track_write =3D kvm_mmu_pte_write;
+>  	node->track_flush_slot =3D kvm_mmu_invalidate_zap_pages_in_memslot;
+>  	kvm_page_track_register_notifier(kvm, node);
+> +	kvm_mmu_set_mmio_spte_mask(kvm, shadow_default_mmio_mask,
+> +				   shadow_default_mmio_mask,
+> +				   ACC_WRITE_MASK | ACC_USER_MASK);
+> +
+
+This (along with shadow_default_mmio_mask) looks a little bit weird.  Pleas=
+e
+also see comments below.
+=20
+>  	return 0;
+>  }
+> =20
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmp=
+l.h
+> index ee2fb0c073f3..62ae590d4e5b 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -1032,7 +1032,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, =
+struct kvm_mmu_page *sp)
+>  		gfn_t gfn;
+> =20
+>  		if (!is_shadow_present_pte(sp->spt[i]) &&
+> -		    !is_mmio_spte(sp->spt[i]))
+> +		    !is_mmio_spte(vcpu->kvm, sp->spt[i]))
+>  			continue;
+> =20
+>  		pte_gpa =3D first_pte_gpa + i * sizeof(pt_element_t);
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index bd441458153f..5194aef60c1f 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -29,8 +29,7 @@ u64 __read_mostly shadow_x_mask; /* mutual exclusive wi=
+th nx_mask */
+>  u64 __read_mostly shadow_user_mask;
+>  u64 __read_mostly shadow_accessed_mask;
+>  u64 __read_mostly shadow_dirty_mask;
+> -u64 __read_mostly shadow_mmio_value;
+> -u64 __read_mostly shadow_mmio_mask;
+> +u64 __read_mostly shadow_default_mmio_mask;
+
+This shadow_default_mmio_mask looks a little bit weird.  Please also see be=
+low.
+
+>  u64 __read_mostly shadow_mmio_access_mask;
+>  u64 __read_mostly shadow_present_mask;
+>  u64 __read_mostly shadow_me_value;
+> @@ -62,10 +61,11 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, un=
+signed int access)
+>  	u64 spte =3D generation_mmio_spte_mask(gen);
+>  	u64 gpa =3D gfn << PAGE_SHIFT;
+> =20
+> -	WARN_ON_ONCE(!shadow_mmio_value);
+> +	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value &&
+> +		     !kvm_gfn_shared_mask(vcpu->kvm));
+
+Chunk shouldn't belong to  this patch.
+
+> =20
+>  	access &=3D shadow_mmio_access_mask;
+> -	spte |=3D shadow_mmio_value | access;
+> +	spte |=3D vcpu->kvm->arch.shadow_mmio_value | access;
+>  	spte |=3D gpa | shadow_nonpresent_or_rsvd_mask;
+>  	spte |=3D (gpa & shadow_nonpresent_or_rsvd_mask)
+>  		<< SHADOW_NONPRESENT_OR_RSVD_MASK_LEN;
+> @@ -337,7 +337,8 @@ u64 mark_spte_for_access_track(u64 spte)
+>  	return spte;
+>  }
+> =20
+> -void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 acces=
+s_mask)
+> +void kvm_mmu_set_mmio_spte_mask(struct kvm *kvm, u64 mmio_value, u64 mmi=
+o_mask,
+> +				u64 access_mask)
+>  {
+>  	BUG_ON((u64)(unsigned)access_mask !=3D access_mask);
+>  	WARN_ON(mmio_value & shadow_nonpresent_or_rsvd_lower_gfn_mask);
+> @@ -366,11 +367,9 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 =
+mmio_mask, u64 access_mask)
+>  	    WARN_ON(mmio_value && (__REMOVED_SPTE & mmio_mask) =3D=3D mmio_valu=
+e))
+>  		mmio_value =3D 0;
+> =20
+> -	if (!mmio_value)
+> -		enable_mmio_caching =3D false;
+> -
+> -	shadow_mmio_value =3D mmio_value;
+> -	shadow_mmio_mask  =3D mmio_mask;
+> +	kvm->arch.enable_mmio_caching =3D !!mmio_value;
+> +	kvm->arch.shadow_mmio_value =3D mmio_value;
+> +	kvm->arch.shadow_mmio_mask =3D mmio_mask;
+>  	shadow_mmio_access_mask =3D access_mask;
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_mask);
+> @@ -393,24 +392,18 @@ void kvm_mmu_set_ept_masks(bool has_ad_bits, bool h=
+as_exec_only)
+>  	shadow_dirty_mask	=3D has_ad_bits ? VMX_EPT_DIRTY_BIT : 0ull;
+>  	shadow_nx_mask		=3D 0ull;
+>  	shadow_x_mask		=3D VMX_EPT_EXECUTABLE_MASK;
+> -	shadow_present_mask	=3D has_exec_only ? 0ull : VMX_EPT_READABLE_MASK;
+> +	/* VMX_EPT_SUPPRESS_VE_BIT is needed for W or X violation. */
+> +	shadow_present_mask	=3D
+> +		(has_exec_only ? 0ull : VMX_EPT_READABLE_MASK) | VMX_EPT_SUPPRESS_VE_B=
+IT;
+
+Again, this chunk shouldn't be in this patch.
+
+>  	shadow_acc_track_mask	=3D VMX_EPT_RWX_MASK;
+>  	shadow_host_writable_mask =3D EPT_SPTE_HOST_WRITABLE;
+>  	shadow_mmu_writable_mask  =3D EPT_SPTE_MMU_WRITABLE;
+> -
+> -	/*
+> -	 * EPT Misconfigurations are generated if the value of bits 2:0
+> -	 * of an EPT paging-structure entry is 110b (write/execute).
+> -	 */
+> -	kvm_mmu_set_mmio_spte_mask(VMX_EPT_MISCONFIG_WX_VALUE,
+> -				   VMX_EPT_RWX_MASK, 0);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_mmu_set_ept_masks);
+> =20
+>  void kvm_mmu_reset_all_pte_masks(void)
+>  {
+>  	u8 low_phys_bits;
+> -	u64 mask;
+> =20
+>  	shadow_phys_bits =3D kvm_get_shadow_phys_bits();
+> =20
+> @@ -459,9 +452,13 @@ void kvm_mmu_reset_all_pte_masks(void)
+>  	 * PTEs and so the reserved PA approach must be disabled.
+>  	 */
+>  	if (shadow_phys_bits < 52)
+> -		mask =3D BIT_ULL(51) | PT_PRESENT_MASK;
+> +		shadow_default_mmio_mask =3D BIT_ULL(51) | PT_PRESENT_MASK;
+>  	else
+> -		mask =3D 0;
+> +		shadow_default_mmio_mask =3D 0;
+> +}
+
+Shadow_default_mmio_mask alone looks a little bit weird with per-VM MMIO
+tracking.  I think it can be removed by moving this code to vmx_vm_init(), =
+and
+call it as VM's MMIO mask/value for non-EPT case.  If EPT is enabled, it ca=
+n
+override using new mask/value.
+
+> =20
+> -	kvm_mmu_set_mmio_spte_mask(mask, mask, ACC_WRITE_MASK | ACC_USER_MASK);
+> +void kvm_mmu_set_default_mmio_spte_mask(u64 mask)
+> +{
+> +	shadow_default_mmio_mask =3D mask;
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_mmu_set_default_mmio_spte_mask);
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 1bfedbe0585f..96312ab4fffb 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -5,8 +5,6 @@
+> =20
+>  #include "mmu_internal.h"
+> =20
+> -extern bool __read_mostly enable_mmio_caching;
+> -
+>  /*
+>   * A MMU present SPTE is backed by actual memory and may or may not be p=
+resent
+>   * in hardware.  E.g. MMIO SPTEs are not considered present.  Use bit 11=
+, as it
+> @@ -160,8 +158,7 @@ extern u64 __read_mostly shadow_x_mask; /* mutual exc=
+lusive with nx_mask */
+>  extern u64 __read_mostly shadow_user_mask;
+>  extern u64 __read_mostly shadow_accessed_mask;
+>  extern u64 __read_mostly shadow_dirty_mask;
+> -extern u64 __read_mostly shadow_mmio_value;
+> -extern u64 __read_mostly shadow_mmio_mask;
+> +extern u64 __read_mostly shadow_default_mmio_mask;
+>  extern u64 __read_mostly shadow_mmio_access_mask;
+>  extern u64 __read_mostly shadow_present_mask;
+>  extern u64 __read_mostly shadow_me_value;
+> @@ -233,10 +230,10 @@ static inline bool is_removed_spte(u64 spte)
+>   */
+>  extern u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
+> =20
+> -static inline bool is_mmio_spte(u64 spte)
+> +static inline bool is_mmio_spte(struct kvm *kvm, u64 spte)
+>  {
+> -	return (spte & shadow_mmio_mask) =3D=3D shadow_mmio_value &&
+> -	       likely(enable_mmio_caching);
+> +	return (spte & kvm->arch.shadow_mmio_mask) =3D=3D kvm->arch.shadow_mmio=
+_value &&
+> +		likely(kvm->arch.enable_mmio_caching || kvm_gfn_shared_mask(kvm));
+>  }
+
+This chunk (checking kvm_gfn_shared_mask(kvm)) should not be in this patch.=
+=20
+
+> =20
+>  static inline bool is_shadow_present_pte(u64 pte)
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 2ca03ec3bf52..82f1bfac7ee6 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -569,8 +569,8 @@ static void __handle_changed_spte(struct kvm *kvm, in=
+t as_id, gfn_t gfn,
+>  		 * impact the guest since both the former and current SPTEs
+>  		 * are nonpresent.
+>  		 */
+> -		if (WARN_ON(!is_mmio_spte(old_spte) &&
+> -			    !is_mmio_spte(new_spte) &&
+> +		if (WARN_ON(!is_mmio_spte(kvm, old_spte) &&
+> +			    !is_mmio_spte(kvm, new_spte) &&
+>  			    !is_removed_spte(new_spte)))
+>  			pr_err("Unexpected SPTE change! Nonpresent SPTEs\n"
+>  			       "should not be replaced with another,\n"
+> @@ -1108,7 +1108,7 @@ static int tdp_mmu_map_handle_target_level(struct k=
+vm_vcpu *vcpu,
+>  	}
+> =20
+>  	/* If a MMIO SPTE is installed, the MMIO will need to be emulated. */
+> -	if (unlikely(is_mmio_spte(new_spte))) {
+> +	if (unlikely(is_mmio_spte(vcpu->kvm, new_spte))) {
+>  		vcpu->stat.pf_mmio_spte_created++;
+>  		trace_mark_mmio_spte(rcu_dereference(iter->sptep), iter->gfn,
+>  				     new_spte);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 815a07c594f1..0abc43d6a115 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4870,7 +4870,7 @@ static __init void svm_adjust_mmio_mask(void)
+>  	 */
+>  	mask =3D (mask_bit < 52) ? rsvd_bits(mask_bit, 51) | PT_PRESENT_MASK : =
+0;
+> =20
+> -	kvm_mmu_set_mmio_spte_mask(mask, mask, PT_WRITABLE_MASK | PT_USER_MASK)=
+;
+> +	kvm_mmu_set_default_mmio_spte_mask(mask);
+
+SVM doesn't need shadow_default_mmio_mask.  Instead, it can define a local
+variable in svm.c, and call kvm_mmu_set_mmio_spte_mask(mask, mask,
+PT_WRITABLE_MASK | PT_USER_MASK) in svm_vm_init().
+
+>  }
+> =20
+>  static __init void svm_set_cpu_caps(void)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 1d87885245cc..e2415ac55317 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7289,6 +7289,14 @@ int vmx_vm_init(struct kvm *kvm)
+>  	if (!ple_gap)
+>  		kvm->arch.pause_in_guest =3D true;
+> =20
+> +	/*
+> +	 * EPT Misconfigurations can be generated if the value of bits 2:0
+> +	 * of an EPT paging-structure entry is 110b (write/execute).
+> +	 */
+> +	if (enable_ept)
+> +		kvm_mmu_set_mmio_spte_mask(kvm, VMX_EPT_MISCONFIG_WX_VALUE,
+> +					   VMX_EPT_RWX_MASK, 0);
+> +
+
+As commented above, I think we can remove shadow_default_mmio_mask by movin=
+g the
+logic in kvm_mmu_reset_all_pte_mask() here.
+
+Or use SVM similar way, use a local variable 'mask' in vmx.c, calculate the
+'mask' during hardware_setup(), and use it here for non-EPT case.
+
+
+>  	if (boot_cpu_has(X86_BUG_L1TF) && enable_ept) {
+>  		switch (l1tf_mitigation) {
+>  		case L1TF_MITIGATION_OFF:
+
