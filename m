@@ -2,116 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD6FB56917C
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 20:13:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49396569182
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 20:15:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234364AbiGFSNy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 14:13:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57090 "EHLO
+        id S234376AbiGFSPl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 14:15:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234374AbiGFSNt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 14:13:49 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4F3B7D6
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 11:13:48 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-10bec750eedso14694254fac.8
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 11:13:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7fWRDNeX9MMfp7ZEnj1zISls/i3Z9E63XbcmRmnrtV4=;
-        b=LSY5fpPHj4ODjWxLFsQ9CCFHdMccQXXVWbagQg8W6sKSpRG79C61MjDBvwdytJYiP1
-         v/sOP4TlMEi9u8iCMRIvpNMnk5MDT30+cGLjsGLXmiI2SiSk+7ojKAmmRyYdGZWz/gKH
-         jyRYhjWDLxcCB4tk8HADZx8VemvH77M4nBLeqNxfXlkrDsVzmXIYbSVch2LVL5RzMDXF
-         vgDLZUpSMPj2TdbmuXkGJ+Q5hphs9i9pMD+RX2jt5UxnqjSeof3u1cu4LqnFJDTTEb9j
-         +RIB3tV1O8+E3L3JcHABdZKK4JPWtxLMy0cLIOjyQdvA5UCtCUCXZ860tRxOYl3nVMLM
-         Yt/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7fWRDNeX9MMfp7ZEnj1zISls/i3Z9E63XbcmRmnrtV4=;
-        b=7SMKaN+dGnIQjQy/8RSxHo0/XG6arMMR0DCrcXJkz+9mqP6Wy3jJ4b1F7GZWDgR+Hx
-         8dHFiyvai/t2LTiX4Z+CWtbFnqNnRdTaP6+607vsACyz8DPsiaN6oaK74cwouKGHR13N
-         szMQqAbi/LslFbZG8uRRgy84LJRfjCamhf+JiKBkvsOvoyPOfAJjc/b/b+Texx5dONB6
-         YCFDErK/jNbRySYlCpwG1dYYQ25gXlK0cLyDK8Qyt1olZbXrcqzvqZqniQtftLSW++nj
-         ksmdTH+hD3vtzPpgE+PgGzNkDnBv4PAc7KQnNNHw4aEuClhEmBsYvMZZ/jggR0EhAItS
-         PwZQ==
-X-Gm-Message-State: AJIora8n0g77Nt2cgas6uPs164nGK30yYACprNeUy+3zCdHj7TmXIkBL
-        /v9c7AU2bpoeGwFN4+5Zt3uC5ifeET16BBobtVfeyg==
-X-Google-Smtp-Source: AGRyM1sMShOFtGknX+KfS0VwLuvS48QVMtsbgqt5zd+qQNVYk34Z62nVt80xNGcx+pAMuQL76YDfGHMvR1Efkb0SOic=
-X-Received: by 2002:a05:6870:56aa:b0:10b:f4fb:8203 with SMTP id
- p42-20020a05687056aa00b0010bf4fb8203mr11908251oao.181.1657131227362; Wed, 06
- Jul 2022 11:13:47 -0700 (PDT)
+        with ESMTP id S229895AbiGFSPj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 14:15:39 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2078.outbound.protection.outlook.com [40.107.96.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDFF5FF0;
+        Wed,  6 Jul 2022 11:15:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V6tdbrQZwy1EALh+WeIRcr2ZRX+gTVnamo3wd+s+Hlq2IZrReX555uNbf+DhjL5K6UrzqOLy1/BGeu4/ZdXgK+7pBC3DvLWgQ+ozdo6SxE/eHH4Uu3YM4RjZ0bAPqG5VzVfS4OK8jWnS+QhgnTFxe4G8uQyCojLtBGkWNhZbbDw+Ue3K6RQhp8rWI4OA+EMAPrfbjMrDbkgZKbq7sZiH6nSkUICJXEexuHDzud/azuDWq6Bxht6lD4qDnATSHlrUiTlgi1dJx/4psbzNfrKyE3w3bS5+9VBzvBxbn0H+VEv/fUmAluGtgHc35GmaRLOmQVeuUKR30Imal+ST4hZYKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SHTWi9wBbPiA86pL11ydanPCadwNaja7MH7iXDeYKm4=;
+ b=Uk9rodDVggrxKRQo33sAFmJjQcLKePJvQY8RAo507Yo5YHAEGK2m/6pPFQpl6XZANKH7gJK2P6MaGtk1x7NhVQ+OJHBo3xM4xzouaExt/4YWgTPtOIO1EVBmntVCG/1Hz8Cph2RLukoyLmbY2W8VHvgt5ZGdiM9qrUQRxPJPL/c/Gnb60d87rF1NP0+kBlnG5Dn1rD8mVRKL0Si3b55HdoeNoUJDulx9rZLpqIE+i9/XmCp5tRcsdPpINxqv20l6Z2RFi/6ozDB9f2M9wgI1GUiNoSY9j/Hg421bO30cLpzPjT9JAtOn8wvWeF3RqBHprS9xoNxneAseZd6yC0+5xQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SHTWi9wBbPiA86pL11ydanPCadwNaja7MH7iXDeYKm4=;
+ b=VSqzNlpAnX8iTXTNJ6ggCqu250+rC/9Nx0As3TMD1TNXO0NlLQk6c80zuFJbPpBEagtY+D+FKYlQAfRDSQauW7BoZVhA4FxF1P7i7H6NIlp2YTX7cZ2XDuLOfkmmgthsBMiICq8JvvtuaYs0sKwaJzlCguJsrlm2NNY1RKgVi/25mDsIgpInJFLaGLgr/yVtfJLoFkhs9bWaUHmm88PFdFjm1aGmr4d9Hgc/T4B2YndI0Xo6uVw7ffIw48ljf4XCj1VfukPznh8/ifizE+AAN2O2+LHAs3I+mWv6hx2tz+a5GV5GJXPvf14iOq9+IjtMnTOlbz4U7C7I3Z5UxXEI1Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MN0PR12MB6149.namprd12.prod.outlook.com (2603:10b6:208:3c7::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.21; Wed, 6 Jul
+ 2022 18:15:36 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.021; Wed, 6 Jul 2022
+ 18:15:36 +0000
+Date:   Wed, 6 Jul 2022 15:15:34 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        kevin.tian@intel.com, hch@infradead.org, jchrist@linux.ibm.com,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [RFT][PATCH v2 7/9] vfio: Rename user_iova of vfio_dma_rw()
+Message-ID: <20220706181534.GO693670@nvidia.com>
+References: <20220706062759.24946-1-nicolinc@nvidia.com>
+ <20220706062759.24946-8-nicolinc@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220706062759.24946-8-nicolinc@nvidia.com>
+X-ClientProxiedBy: BL0PR0102CA0015.prod.exchangelabs.com
+ (2603:10b6:207:18::28) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <20220621150902.46126-1-mlevitsk@redhat.com> <20220621150902.46126-12-mlevitsk@redhat.com>
- <CALMp9eSe5jtvmOPWLYCcrMmqyVBeBkg90RwtR4bwxay99NAF3g@mail.gmail.com>
- <42da1631c8cdd282e5d9cfd0698b6df7deed2daf.camel@redhat.com>
- <CALMp9eRNZ8D5aRyUEkc7CORz-=bqzfVCSf6nOGZhqQfWfte0dw@mail.gmail.com> <289c2dd941ecbc3c32514fc0603148972524b22d.camel@redhat.com>
-In-Reply-To: <289c2dd941ecbc3c32514fc0603148972524b22d.camel@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 6 Jul 2022 11:13:36 -0700
-Message-ID: <CALMp9eS2gxzWU1+OpfBTqCZsmyq8qoCW_Qs84xv=rGo1ranG1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 11/11] KVM: x86: emulator/smm: preserve interrupt
- shadow in SMRAM
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        x86@kernel.org, Kees Cook <keescook@chromium.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d80e043f-c1bc-4bf6-a6b2-08da5f7b85fe
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6149:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YEhnC7iPzTel/SYXLWvTFdV6991RlSMlUquMcgWKiqGvU3v92aF3V1y1IvfidtJ3kXPDpxs0pauNC+PCTTrJPtP73kKs27ZVS7zGgySN1w1LjosMXKFgk8LGIpaYJJl8Dzud1Ja325Aw/YCEYRw9qtgn8nUjGN9mEqab6rqCpAnteUhOC9MHeKTYm7Exk/z17XGDM17EzUZOwtLAEP3qZdU60Uvr+Yc1GSTLfaJO24NM83Dw4oYVq9Hb6rPGQ1OOQJrbhKZNg7fLSxqVLdjnrNUiohBZEdH9Boa5AFmIOMcMuBrEc2wzFvXcaa5JPy7H8oFWqj4q+IkjB8cOSnhblt32S58D3a1l48s8OlYrvwdj30GVUDfEYeCFTag80EpzTIZ4bVTCMBULN/vl0BJMx4IfmKoB0zhJUz+jaKawxDMscgOpVmwxFU/KWfDZCHr+0UZNpaRcZk8qN5//1YLlOlpBBetJjSySgeetv7eNkCH1tO8LcxVHEa3I15w1XXRZMMoR+P2hCCLvCL8M/WmbjnG1erwOVyaDgEVymuIyRdP6z4xXyO0b8a1nib/DeeKiaIriOTINREY1jWQKXHyz4xrR6E+AxzJ6sRXGRDnUmAQY+Rj2ZuBQUGqGQlhpXoH8STxH14tidl0ysc1TaQk/F8eai5tJBtI8DIfkGoZf6FfKKeSUTqZsOoZm+pN6lhKwKS2HSLtJRRM0GA5J7I0NbYcsDIyxrwH3nyYLkQatLNsmZTgMjxejkmsrrE1d5e+Vh9GJ682FH7QNJdVQSiOkvc4rTokxtqJaxJdGS31rdX7aCiqj5aIghnbzMw073qTA
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(366004)(39860400002)(346002)(136003)(376002)(6862004)(8936002)(7416002)(5660300002)(86362001)(66476007)(66556008)(7406005)(8676002)(41300700001)(6636002)(4326008)(37006003)(66946007)(316002)(4744005)(2616005)(186003)(478600001)(26005)(36756003)(6486002)(6512007)(6506007)(2906002)(33656002)(38100700002)(83380400001)(1076003)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PRrBM3gxJnOqmOxhQKM62yXSALPgy5G04+kajMt2N+tOoqaiAZkdkDO/y05w?=
+ =?us-ascii?Q?Le5uATqGTAOekbmwKnIi30ydCfreEzqNMAR7JZ2nna+ZFj0v2FW1NUk6U0gF?=
+ =?us-ascii?Q?d3SNWG9kpDTC4SSTdFdU3dhtwx893lAxVDxPImohzHrjoGq3MY3yIuhpKO6Q?=
+ =?us-ascii?Q?FGGF6nvz/e+EqMx6VDb/Vlk9ugdnVn6z24FQ50c2gy51v+9FDQXfpz8Sni9U?=
+ =?us-ascii?Q?+b64IUgfJ9/EEq/VZmBjZ5EvPpSifpa5kt2kuz//Pf83r7ZDHzB9Mx2NuEBb?=
+ =?us-ascii?Q?ElJSkoAS3ufi130KqC3yWjAYot8DQlflEN77Qi59/FxPEzwrz+1332F7FfP3?=
+ =?us-ascii?Q?8wli8Ww4Z4GSKx78rDVjYjSyb0M9q/36b+GWTyRfu8x4IxCAv1B+LhkPbXtI?=
+ =?us-ascii?Q?TkfNuWk/vsVgoqw0XvF71KsbgzY7OpTWVUOM5CfHKI5wdOrL9tHONz+1/m37?=
+ =?us-ascii?Q?XBkq/Zo+TYSCGjwMuO7eo+T0sV16qggMC/AScx0tj4f/k/s1onsdhwyw+UB5?=
+ =?us-ascii?Q?GEbKlXf7ZuvOORBlBMaLxi3JQxLv6Enb6BI6UyjzImnnpWfJG0WiCv6834VS?=
+ =?us-ascii?Q?miqh3w5r8hd+nXMVa3kTE20opBAGmCE18iDnRcf7nWN6IthN7h/R2Wa/DJim?=
+ =?us-ascii?Q?fe2KRffiGxjjZYriiojNoI8EpG5/6AuZ/fsfamPccS5fQVj/MwlC9yS87EJt?=
+ =?us-ascii?Q?6sQS+j1IdiTBhIOpa7ZLf6nmSBPgdpx+ymbuaiYCit4TthISaV1M5tlxtO5R?=
+ =?us-ascii?Q?AT7qIofFCJmhJEmBVlfPayJkQof0eL5ooA+kciNO1fGehGoyKc1GCxXJ6mEi?=
+ =?us-ascii?Q?ANdjf60sqaXrUFIZTG+g6aaZwZzgr7o1+JWQq5JgUdaaLBFAQGE7CYhHOv+7?=
+ =?us-ascii?Q?dUCXWVRMPUln/DTOS7y8RDPJNfLuLyb8rwrmaI7zB+iooIfPe0zV2oBmN+GQ?=
+ =?us-ascii?Q?NjnDUDM5cvVQ8KPFrqJ4dKw7vafYR8qh2DMIYUa0/Yx5Ckeu8pM4AfOH6EMZ?=
+ =?us-ascii?Q?D0VME86zmfKWrAHmspZbHIAvUx//na8womP9j76PYgnTIs4ZQ6pU0leIc3fc?=
+ =?us-ascii?Q?qe42DxD+ppxxn9b7w26BXnQTbc74D53gsWfQDrvsvcemRTZw1dmiZKXCT4yp?=
+ =?us-ascii?Q?jhL6+BEOIyiWA9iAWORG1IC6iP7QFFC71f4DZaXKY4qVZjTBrMPUGDC+0GNW?=
+ =?us-ascii?Q?7+GoDpIpPjRO9jEGdKJRrovRZR51bMU6ZluNkMMz8gB2znInH0CwF3fLDVxe?=
+ =?us-ascii?Q?0EXjt3FiF3FnHyxkfowaYmrlXPj8PudoSJ7beQm24HEJ/6MBhYP8Ix2y6o6k?=
+ =?us-ascii?Q?JgTTIWSR99+Py3lsojjtXUnsALl/wzhVhCVUwERz0Bt7619btUsPOK32NXY9?=
+ =?us-ascii?Q?FKyTdo7B/KfODMn1MvEpDDV1yeAuq33TjRbCKHGQ7L+nJgiId+rgrN/DYNq6?=
+ =?us-ascii?Q?aDZhfFljNnjPEJOECx3hyTC/cWuLw9dXEZUQxGpun/drqnFN5HoeL8OJFxc6?=
+ =?us-ascii?Q?BJ6SEdeCFnFKxUC99UEdQM9jCBUyPsZIaR4TnVMF78McfbmXCnNqUrthOq5N?=
+ =?us-ascii?Q?zcyu8D3mveCy7fZGXzXjt3Cow2wM96f9fnE6AEew?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d80e043f-c1bc-4bf6-a6b2-08da5f7b85fe
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2022 18:15:36.1427
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WSELiQIX9taY+KDbw7BZMDQmZbSmbmZiCn6CuLbG733ytacBe66TEcDkU1RP4kpa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6149
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 5, 2022 at 6:38 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+On Tue, Jul 05, 2022 at 11:27:57PM -0700, Nicolin Chen wrote:
+> Following the updated vfio_pin/unpin_pages(), use the simpler "iova".
+> 
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+>  drivers/vfio/vfio.c  | 6 +++---
+>  include/linux/vfio.h | 2 +-
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 
-> Most of the SMI save state area is reserved, and the handler has no way of knowing
-> what CPU stored there, it can only access the fields that are reserved in the spec.
->
-> Yes, if the SMI handler really insists it can see that the saved RIP points to an
-> instruction that follows the STI, but does that really matter? It is allowed by the
-> spec explicitly anyway.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-I was just pointing out that the difference between blocking SMI and
-not blocking SMI is, in fact, observable.
-
-> Plus our SMI layout (at least for 32 bit) doesn't confirm to the X86 spec anyway,
-> we as I found out flat out write over the fields that have other meaning in the X86 spec.
-
-Shouldn't we fix that?
-
-> Also I proposed to preserve the int shadow in internal kvm state and migrate
-> it in upper 4 bits of the 'shadow' field of struct kvm_vcpu_events.
-> Both Paolo and Sean proposed to store the int shadow in the SMRAM instead,
-> and you didn't object to this, and now after I refactored and implemented
-> the whole thing you suddently do.
-
-I did not see the prior conversations. I rarely get an opportunity to
-read the list.
-
-> However AMD just recently posted a VNMI patch series to avoid
-> single stepping the CPU when NMI is blocked due to the same reason, because
-> it is fragile.
-
-The vNMI feature isn't available in any shipping processor yet, is it?
-
-> Do you really want KVM to single step the guest in this case, to deliver the #SMI?
-> I can do it, but it is bound to cause lot of trouble.
-
-Perhaps you could document this as a KVM erratum...one of many
-involving virtual SMI delivery.
+Jason
