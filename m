@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72E355692FB
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 22:03:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E96D5692FD
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 22:03:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbiGFUDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 16:03:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48840 "EHLO
+        id S234016AbiGFUDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 16:03:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233180AbiGFUDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 16:03:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5B27C19C2B
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 13:03:17 -0700 (PDT)
+        with ESMTP id S233386AbiGFUDb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 16:03:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3770A1AF38
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 13:03:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657137796;
+        s=mimecast20190719; t=1657137809;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QCu6837a/sy7u4lzaiqiFjYTgUMl7+kkVhKwaEZCn8I=;
-        b=Ocd68nRFk3itkb31D45NJ7RHT8ZwpL9K9iNuOT+dRVwAMYAB+PQZNalnekuU0JmL1mAZuT
-        nfW38Q0ftAgy1CoddOSf+1FuKF4PbN++WuQR+QC8Pzdep/aU+RQgPPWs6Abykfe5fjFE8+
-        FiJ14kaokM4+oyD8jqTWvDrZxfqa4zU=
+        bh=8Sr8k3PDlzkhDfTyq4SLY9EQEej76uPgXlyHbHD1UGE=;
+        b=CAEF1nCR19UtIfBniJYnsmBc5VpzU8xPyCDo3bIcxIlpUxxKiAFui71P5xYRKt88bj0tTo
+        9P6hFBjNMVgfwKbTLOgt98ho8YgJ+mQ6fyqWA2l5y8MqXSvQpsyfosiTdEdaUHDM05VXE+
+        6elpj0FM5OogaKMH87qvL6n1dfYYYhQ=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-450-dii7UTZnO5iLRemf68F3bg-1; Wed, 06 Jul 2022 16:03:13 -0400
-X-MC-Unique: dii7UTZnO5iLRemf68F3bg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-39-R612zF6dP1aeCwxl0Jr3Ow-1; Wed, 06 Jul 2022 16:03:28 -0400
+X-MC-Unique: R612zF6dP1aeCwxl0Jr3Ow-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B83C3833961;
-        Wed,  6 Jul 2022 20:03:12 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B159A101A54E;
+        Wed,  6 Jul 2022 20:03:27 +0000 (UTC)
 Received: from starship (unknown [10.40.194.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 66FC5140EBE3;
-        Wed,  6 Jul 2022 20:03:10 +0000 (UTC)
-Message-ID: <4069fcb7e559b0732681ecc9234f9910b59df411.camel@redhat.com>
-Subject: Re: [PATCH v2 09/21] KVM: nVMX: Unconditionally clear mtf_pending
- on nested VM-Exit
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 61AE6492C3B;
+        Wed,  6 Jul 2022 20:03:25 +0000 (UTC)
+Message-ID: <bcf100cadb7fccddf8261301d9179a38ba237b06.camel@redhat.com>
+Subject: Re: [PATCH v2 13/21] KVM: x86: Formalize blocking of nested pending
+ exceptions
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,20 +49,20 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
         Peter Shier <pshier@google.com>
-Date:   Wed, 06 Jul 2022 23:03:09 +0300
-In-Reply-To: <YsW8He/1b1xBWLwz@google.com>
+Date:   Wed, 06 Jul 2022 23:03:24 +0300
+In-Reply-To: <YsXIJ50adC+TVejy@google.com>
 References: <20220614204730.3359543-1-seanjc@google.com>
-         <20220614204730.3359543-10-seanjc@google.com>
-         <599b352e16c970885d3f6bfaf7d1a254627ef5dd.camel@redhat.com>
-         <YsW8He/1b1xBWLwz@google.com>
+         <20220614204730.3359543-14-seanjc@google.com>
+         <cd9be62e3c2018a4f779f65fed46954e9431e0b0.camel@redhat.com>
+         <YsXIJ50adC+TVejy@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,69 +70,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-07-06 at 16:45 +0000, Sean Christopherson wrote:
+On Wed, 2022-07-06 at 17:36 +0000, Sean Christopherson wrote:
 > On Wed, Jul 06, 2022, Maxim Levitsky wrote:
 > > On Tue, 2022-06-14 at 20:47 +0000, Sean Christopherson wrote:
-> > > Clear mtf_pending on nested VM-Exit instead of handling the clear on a
-> > > case-by-case basis in vmx_check_nested_events().  The pending MTF should
-> > > rever survive nested VM-Exit, as it is a property of KVM's run of the
-> > ^^ typo: never
+> > > Capture nested_run_pending as block_pending_exceptions so that the logic
+> > > of why exceptions are blocked only needs to be documented once instead of
+> > > at every place that employs the logic.
+> > > 
+> > > No functional change intended.
+> > > 
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/kvm/svm/nested.c | 20 ++++++++++----------
+> > >  arch/x86/kvm/vmx/nested.c | 23 ++++++++++++-----------
+> > >  2 files changed, 22 insertions(+), 21 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > > index 471d40e97890..460161e67ce5 100644
+> > > --- a/arch/x86/kvm/svm/nested.c
+> > > +++ b/arch/x86/kvm/svm/nested.c
+> > > @@ -1347,10 +1347,16 @@ static inline bool nested_exit_on_init(struct vcpu_svm *svm)
+> > >  
+> > >  static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+> > >  {
+> > > -	struct vcpu_svm *svm = to_svm(vcpu);
+> > > -	bool block_nested_events =
+> > > -		kvm_event_needs_reinjection(vcpu) || svm->nested.nested_run_pending;
+> > >  	struct kvm_lapic *apic = vcpu->arch.apic;
+> > > +	struct vcpu_svm *svm = to_svm(vcpu);
+> > > +	/*
+> > > +	 * Only a pending nested run blocks a pending exception.  If there is a
+> > > +	 * previously injected event, the pending exception occurred while said
+> > > +	 * event was being delivered and thus needs to be handled.
+> > > +	 */
 > > 
-> > Also it is not clear what the 'case by case' means.
+> > Tiny nitpick about the comment:
 > > 
-> > I see that the vmx_check_nested_events always clears it unless nested run is pending
-> > or we re-inject an event.
-> 
-> Those two "unless ..." are the "cases".  The point I'm trying to make in the changelog
-> is that there's no need for any conditional logic whatsoever.
-> 
-> > > @@ -3927,6 +3919,9 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> > >  		clear_bit(KVM_APIC_INIT, &apic->pending_events);
-> > >  		if (vcpu->arch.mp_state != KVM_MP_STATE_INIT_RECEIVED)
-> > >  			nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
-> > > +
-> > > +		/* MTF is discarded if the vCPU is in WFS. */
-> > > +		vmx->nested.mtf_pending = false;
-> > >  		return 0;
+> > One can say that if there is an injected event, this means that we
+> > are in the middle of handling it, thus we are not on instruction boundary,
+> > and thus we don't process events (e.g interrupts).
 > > 
-> > I guess MTF should also be discarded if we enter SMM, and I see that
-> > VMX also enter SMM with a pseudo VM exit (in vmx_enter_smm) which
-> > will clear the MTF. Good.
+> > So maybe write something like that?
 > 
-> No, a pending MTF should be preserved across SMI. 
-
-Indeed, now I see it:
-
-"If an MTF VM exit was pending at the time of the previous SMI, an MTF VM exit is pending on the instruction
-boundary following execution of RSM. The following items detail the treatment of MTF VM exits that may be
-pending following RSM:"
-
-You might also want to add it as some comment in the source.
-
-
-
->  It's not a regression because
-> KVM incorrectly prioritizes MTF (and trap-like #DBs) over SMI (and because if KVM
-> did prioritize SMI, the existing code would also drop the pending MTF).  Note, this
-> isn't the only flaw that needs to be addressed in order to correctly prioritize SMIs,
-> e.g. KVM_{G,S}ET_NESTED_STATE would need to save/restore a pending MTF if the vCPU is
-> in SMM after an SMI that arrived while L2 was active.
-
-When we fix this, should we store it to SMRAM, or to some KVM internal state?
-Or VMCS12, as noted in the other mail.
-
-
+> Hmm, that's another way to look at things.  My goal with the comment was to try
+> and call out that any pending exception is a continuation of the injected event,
+> i.e. that the injected event won't be lost.  Talking about instruction boundaries
+> only explains why non-exception events are blocked, it doesn't explain why exceptions
+> are _not_ blocked.
 > 
-> Tangentially related, KVM's pseudo VM-Exit on SMI emulation is completely wrong[*].
+> I'll add a second comment above block_nested_events to capture the instruction
+> boundary angle.
 > 
-> [*] https://lore.kernel.org/all/Yobt1XwOfb5M6Dfa@google.com
+> > > +	bool block_nested_exceptions = svm->nested.nested_run_pending;
+> > > +	bool block_nested_events = block_nested_exceptions ||
+> > > +				   kvm_event_needs_reinjection(vcpu);
+> > 
+> > Tiny nitpick: I don't like that much the name 'nested' as
+> > it can also mean a nested exception (e.g exception that
+> > happened while jumping to an exception  handler).
+> > 
+> > Here we mean just exception/events for the guest, so I would suggest
+> > to just drop the word 'nested'.
 > 
-
-
-I have seen a patch on the KVM mailing list recently exactly about preserving CET
-state in the SMRAM, I'll need to take a look.
-
-
+> I don't disagree, but I'd prefer to keep the current naming because the helper
+> itself is *_check_nested_events().  I'm not opposed to renaming things in the
+> future, but I don't want to do that in this series.
+> 
+Yep, makes sense.
 
 Best regards,
 	Maxim Levitsky
