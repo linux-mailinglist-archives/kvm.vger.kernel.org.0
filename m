@@ -2,101 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9DD2569555
-	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 00:30:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4C805695A1
+	for <lists+kvm@lfdr.de>; Thu,  7 Jul 2022 01:11:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234346AbiGFWaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 18:30:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36092 "EHLO
+        id S233982AbiGFXLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 19:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234048AbiGFWaM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 18:30:12 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B03015A32
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 15:30:11 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id bf13so2138047pgb.11
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 15:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iKA8akOzbkf4tNDc6jfn4CUsITOKN9yZnmEgDBs/SyQ=;
-        b=q6a3Irt0falLmlOdgWGFnxHk8Agc+WjZBDzCqkjggQvyzWvyJRYgbbruahzFU3UMAO
-         rijRQsr2J25PLeGwnp+Nykv+fu5KZ8KAIRn2Q00ZTduG2VN33D6+E27CZ57cDZdylV07
-         NGSStd34KnxDkaHKTrMxnFoF4CUspgWJjmiE4D/WBVxvDyAjl2H1FZ6p2AbC8JZY1oYF
-         erHmqIE7H/fr1T38eniUYrxC2g1AMIk390+P4dpRtGWvxFy6wzItDj0zY+M4iJdkYYRY
-         ypV3OPyDukfxEG109qbDOAESZ4G9jHLj7AoAPelNTdiXLGhTOATvm5xkVn0zI6l2OrF3
-         uABQ==
+        with ESMTP id S230029AbiGFXLo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 19:11:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D6C71CFC2
+        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 16:11:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657149101;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HIFp6H7U8H4zLlvFPiQ4cosgxwJdUp4h1jCTeNzWHAk=;
+        b=K1gIGB6QZQqcmAy/N2W2UjabMdd5vCXIEqaCm5bv9s0TZS1sCLxApoAjfvlejsMJXUeW7L
+        NmZJA39Jnxl5EGcJVZNCEuHpGZImnB0defDhEyJI9JZ59/ElLN7aw/13Py/961QqUJOE0c
+        ryEmefYMEACQqO984UnhMNjg5Nzp5Js=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-635-j2KOqJJ6Pv--4Y2-KC4IpQ-1; Wed, 06 Jul 2022 19:11:40 -0400
+X-MC-Unique: j2KOqJJ6Pv--4Y2-KC4IpQ-1
+Received: by mail-il1-f197.google.com with SMTP id b11-20020a92340b000000b002d3dbbc7b15so8374967ila.5
+        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 16:11:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iKA8akOzbkf4tNDc6jfn4CUsITOKN9yZnmEgDBs/SyQ=;
-        b=YjILY7x1hVFc8Oso0Qv4qOkWCJ4T3jnQtNwUreHatOXun2JcWIR6d04C7ILdFcCgha
-         5p0tGQbi3kzfT8fJNyyehhtycMXtPSx3gkCRQFCDUSFwLF9e2fiOVLCtwT4Owrr3GZmk
-         TYU5GCBKfMFvZYdPwjQckDwb6Cif9LVf00/Bh3vRp12+gezywohQTpzUNJmY7kc+w6jl
-         QC+OXODBLLUJV1m6QD+X5sv8RoY126genHxt+qMdWvr/aJeUMFEtWgMOKKb/mS2f5VLC
-         MBr2aQPm5ThUbqlouNPPLL5nE1Cp1ZwpZL1rLtSU9dH2TeXpQhZHYIDLEsp2qOAIEYpm
-         /pXQ==
-X-Gm-Message-State: AJIora8eaNGjrBBcyzLtvq+u9VatIjXeX6Xh66GzK5BZQUl07xrCKlgL
-        AS0gUz0PF27ONu6KLfLM3Ty8/w==
-X-Google-Smtp-Source: AGRyM1sLT1U7pR8GVCabA1hqq2+btL+DQYe73v4JeLKC365avmWaP7/FZnlh9V7Qy3kZGK00OgD8og==
-X-Received: by 2002:a17:902:dad1:b0:16a:75cb:5d97 with SMTP id q17-20020a170902dad100b0016a75cb5d97mr49535733plx.64.1657146610443;
-        Wed, 06 Jul 2022 15:30:10 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
-        by smtp.gmail.com with ESMTPSA id n11-20020a170902968b00b0016a11b9aeb3sm26092000plp.224.2022.07.06.15.30.09
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=HIFp6H7U8H4zLlvFPiQ4cosgxwJdUp4h1jCTeNzWHAk=;
+        b=6Lclczi9+DHLWxCAsYoPoX8ECGf2h2aKTYn+XCX1hYCydoBW6hicn+sg/g29QPpoTa
+         m2nWsQjMU/l3Gr58p5I8dATKfHO+JTyUoiY19OI/UkGs6hRO3xNA73/b6omo0jv6gWGz
+         bFpfbv2jo4ZxGdI+GmI5q9R5rPF+3wYFOXdWssTdsNy7rWlLaqN6aSezRB08KLk27Pwi
+         Sy/TVl9Jhj1KSf86mnXcH/MHDFzQRacmNaYzvVDmPkY508Z993zA+aWwMUoGD3ImNWBZ
+         sKXa1KPWuL4TBaBBH6Fpq4ddJa4lWVhmu9PDlA3KbwPSZrw+oLj92SDjN+Rz4dWZPjqB
+         aEnQ==
+X-Gm-Message-State: AJIora+0WRzH1XtXVP9zCkXP/KLbSWsu70KlUPbddKjIrL0yggTPJxNB
+        syyXp1WXmMjtcSUXeyxfJrJtUITAqGXssmhJLIxsy9gBI1yF8g/1XrYx09GPI63RQqmZsGVvbtF
+        YiM91huheCHEX
+X-Received: by 2002:a6b:c941:0:b0:672:734f:d05f with SMTP id z62-20020a6bc941000000b00672734fd05fmr21700442iof.87.1657149099784;
+        Wed, 06 Jul 2022 16:11:39 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sUYXLuk3UWGNawVyOpx/TmaNJ2nFfBX9aQU/SF56aO/Kg2TRfjIV+nR5aoaDdS7GE946l1hw==
+X-Received: by 2002:a6b:c941:0:b0:672:734f:d05f with SMTP id z62-20020a6bc941000000b00672734fd05fmr21700422iof.87.1657149099536;
+        Wed, 06 Jul 2022 16:11:39 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id u125-20020a022383000000b0033ebbb649fasm5678501jau.101.2022.07.06.16.11.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 15:30:09 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 22:30:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Anirudh Rayabharam <anrayabh@linux.microsoft.com>,
-        kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/14] KVM: nVMX: Use vmcs_config for setting up nested
- VMX MSRs
-Message-ID: <YsYM7VbPRQKflZrZ@google.com>
-References: <20220627160440.31857-1-vkuznets@redhat.com>
- <CALMp9eQL2a+mStk-cLwVX6NVqwAso2UYxAO7UD=Xi2TSGwUM2A@mail.gmail.com>
- <87y1xgubot.fsf@redhat.com>
- <CALMp9eSBLcvuNDquvSfUnaF3S3f4ZkzqDRSsz-v93ZeX=xnssg@mail.gmail.com>
- <87letgu68x.fsf@redhat.com>
- <CALMp9eQ35g8GpwObYBJRxjuxZAC8P_HNMMaC0v0uZeC+pMeW_Q@mail.gmail.com>
- <87czeru9cp.fsf@redhat.com>
- <CALMp9eQ5Sqv3RP8kipSbpfnvef_Sc1xr1+g53fwr0a=bhzgAhg@mail.gmail.com>
+        Wed, 06 Jul 2022 16:11:39 -0700 (PDT)
+Date:   Wed, 6 Jul 2022 17:11:37 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>
+Subject: Re: [PATCH V1 vfio 03/11] vfio: Introduce DMA logging uAPIs
+Message-ID: <20220706171137.47e4aa10.alex.williamson@redhat.com>
+In-Reply-To: <20220705102740.29337-4-yishaih@nvidia.com>
+References: <20220705102740.29337-1-yishaih@nvidia.com>
+        <20220705102740.29337-4-yishaih@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQ5Sqv3RP8kipSbpfnvef_Sc1xr1+g53fwr0a=bhzgAhg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 29, 2022, Jim Mattson wrote:
-> On Wed, Jun 29, 2022 at 2:06 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> 
-> > For PERF_GLOBAL_CTRL errata:
-> > - We can move the filtering to vmx_vmexit_ctrl()/vmx_vmentry_ctrl()
-> > preserving the status quo: KVM doesn't use the feature but it is exposed
-> > to L1 hypervisor (and L1 hypervisor presumably has the same check and
-> > doesn't use the feature. FWIW, the workaround was added in 2011 and the
-> > erratas it references appeared in 2010, this means that the affected
-> > CPUs are quite old, modern proprietary hypervisors won't likely boot
-> > there).
-> Sadly, Nehalem and Westmere are well-supported by KVM today, and we
-> will probably still continue to support them for at least another
-> decade. They both have EPT, unrestricted guest, and other VT-x2
-> features that KVM still considers optional.
+On Tue, 5 Jul 2022 13:27:32 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-Nehalem doesn't have unrestricted guest.  Nehalem is the only generation with EPT
-but not unrestricted guest.
+> DMA logging allows a device to internally record what DMAs the device is
+> initiating and report them back to userspace. It is part of the VFIO
+> migration infrastructure that allows implementing dirty page tracking
+> during the pre copy phase of live migration. Only DMA WRITEs are logged,
+> and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
+> 
+> This patch introduces the DMA logging involved uAPIs.
+> 
+> It uses the FEATURE ioctl with its GET/SET/PROBE options as of below.
+> 
+> It exposes a PROBE option to detect if the device supports DMA logging.
+> It exposes a SET option to start device DMA logging in given IOVAs
+> ranges.
+> It exposes a SET option to stop device DMA logging that was previously
+> started.
+> It exposes a GET option to read back and clear the device DMA log.
+> 
+> Extra details exist as part of vfio.h per a specific option.
+> 
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  include/uapi/linux/vfio.h | 79 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 79 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 733a1cddde30..81475c3e7c92 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -986,6 +986,85 @@ enum vfio_device_mig_state {
+>  	VFIO_DEVICE_STATE_RUNNING_P2P = 5,
+>  };
+>  
+> +/*
+> + * Upon VFIO_DEVICE_FEATURE_SET start device DMA logging.
+> + * VFIO_DEVICE_FEATURE_PROBE can be used to detect if the device supports
+> + * DMA logging.
+> + *
+> + * DMA logging allows a device to internally record what DMAs the device is
+> + * initiating and report them back to userspace. It is part of the VFIO
+> + * migration infrastructure that allows implementing dirty page tracking
+> + * during the pre copy phase of live migration. Only DMA WRITEs are logged,
+> + * and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
+> + *
+> + * When DMA logging is started a range of IOVAs to monitor is provided and the
+> + * device can optimize its logging to cover only the IOVA range given. Each
+> + * DMA that the device initiates inside the range will be logged by the device
+> + * for later retrieval.
+> + *
+> + * page_size is an input that hints what tracking granularity the device
+> + * should try to achieve. If the device cannot do the hinted page size then it
+> + * should pick the next closest page size it supports. On output the device
+> + * will return the page size it selected.
+> + *
+> + * ranges is a pointer to an array of
+> + * struct vfio_device_feature_dma_logging_range.
+> + */
+> +struct vfio_device_feature_dma_logging_control {
+> +	__aligned_u64 page_size;
+> +	__u32 num_ranges;
+> +	__u32 __reserved;
+> +	__aligned_u64 ranges;
+> +};
+
+num_ranges probably has a limit below 2^32-1, is it device specific?
+How does the user learn the limit?
+
+Presumably new ranges cannot be added while logging is already enabled,
+should we build this limitation into the uAPI or might some devices
+have the ability to dynamically add and remove logging ranges?  Thanks,
+
+Alex
+
+> +
+> +struct vfio_device_feature_dma_logging_range {
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +};
+> +
+> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_START 3
+> +
+> +/*
+> + * Upon VFIO_DEVICE_FEATURE_SET stop device DMA logging that was started
+> + * by VFIO_DEVICE_FEATURE_DMA_LOGGING_START
+> + */
+> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP 4
+> +
+> +/*
+> + * Upon VFIO_DEVICE_FEATURE_GET read back and clear the device DMA log
+> + *
+> + * Query the device's DMA log for written pages within the given IOVA range.
+> + * During querying the log is cleared for the IOVA range.
+> + *
+> + * bitmap is a pointer to an array of u64s that will hold the output bitmap
+> + * with 1 bit reporting a page_size unit of IOVA. The mapping of IOVA to bits
+> + * is given by:
+> + *  bitmap[(addr - iova)/page_size] & (1ULL << (addr % 64))
+> + *
+> + * The input page_size can be any power of two value and does not have to
+> + * match the value given to VFIO_DEVICE_FEATURE_DMA_LOGGING_START. The driver
+> + * will format its internal logging to match the reporting page size, possibly
+> + * by replicating bits if the internal page size is lower than requested.
+> + *
+> + * Bits will be updated in bitmap using atomic or to allow userspace to
+> + * combine bitmaps from multiple trackers together. Therefore userspace must
+> + * zero the bitmap before doing any reports.
+> + *
+> + * If any error is returned userspace should assume that the dirty log is
+> + * corrupted and restart.
+> + *
+> + * If DMA logging is not enabled, an error will be returned.
+> + *
+> + */
+> +struct vfio_device_feature_dma_logging_report {
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +	__aligned_u64 page_size;
+> +	__aligned_u64 bitmap;
+> +};
+> +
+> +#define VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT 5
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
+
