@@ -2,179 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DC795690E2
-	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61A2C56910E
+	for <lists+kvm@lfdr.de>; Wed,  6 Jul 2022 19:49:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234055AbiGFRma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jul 2022 13:42:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
+        id S234049AbiGFRt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jul 2022 13:49:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233941AbiGFRmY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jul 2022 13:42:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 351F024094
-        for <kvm@vger.kernel.org>; Wed,  6 Jul 2022 10:42:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657129342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bm6ni0e0Z3ZqDaHM6VmzfCaa2VxT43x1YW4zQJliK1o=;
-        b=ARIhqBTzHZQ3VgDQMRTAdHi9Y8jPgiIXohT0OxHDSwtw6gl1N1h3ET1DRL3mNkdAKR4gl6
-        XQbWPvIJwfAF+rAqbPWyMz8zjxbXnMlgxddojke0zmTnLcIx8i0t1Pk9r4FXhENIQ8ANqy
-        gM0XkDbbUUOpgle8EGk3Q9y5Rv5Z12k=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-437-opk7TiHhMZu_q7qFtdi3kw-1; Wed, 06 Jul 2022 13:42:21 -0400
-X-MC-Unique: opk7TiHhMZu_q7qFtdi3kw-1
-Received: by mail-il1-f197.google.com with SMTP id i8-20020a056e020d8800b002d931252904so8056173ilj.23
-        for <kvm@vger.kernel.org>; Wed, 06 Jul 2022 10:42:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=Bm6ni0e0Z3ZqDaHM6VmzfCaa2VxT43x1YW4zQJliK1o=;
-        b=f2Zy49NZYIQ/qLs6uFXkvSN76+BZJbUg3oA8KtgqYFIRyuF1KtWTG2MxwfLYEel3jj
-         jfWMN1fvRYWs0+f+I7q7APmYQtJNhl1V1HRA/Cd9XUJhGQX3ambEE3lRkBVTgVdBCaSj
-         J37NPK5qk30GPivaYwpZuKXGShKEL1Nwy7tJIcfZy+XvJ6ixaegv+lZfwJUOWkKqAiWl
-         CZo0QLVmhO/lufBXlWUoyOnQf1z3nyjJFzD4SBVLuEzoesN8txaQBS/Ag9kX9+OUlxwq
-         KhhiaQaAIOigOv8Crg38LQJ7zmUs+GznSf4ICyNvf8vOxYVO0+XnN9BWf9nZp2aUPIKO
-         JGxw==
-X-Gm-Message-State: AJIora9SVu5yishTEpiGAMqjlYSFjyxjpr2n52uILcPTfCy3QYUObAYr
-        qMO+WRP5zvR69WuKZ3RPaZi69AvXh9kmbj4GLFenJB66p4w/831jDxlYXDSGpZBxOBVo7OU88/J
-        kLdmWBJst6VYi
-X-Received: by 2002:a05:6e02:1be6:b0:2db:ea7f:10c4 with SMTP id y6-20020a056e021be600b002dbea7f10c4mr17220917ilv.248.1657129340280;
-        Wed, 06 Jul 2022 10:42:20 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tKW5hHrIbN8D8MKAPlov0FsaTgJJCZrivyPi82ikNP5NQmibHb26OWtdHiMispm5nOi3tbJA==
-X-Received: by 2002:a05:6e02:1be6:b0:2db:ea7f:10c4 with SMTP id y6-20020a056e021be600b002dbea7f10c4mr17220872ilv.248.1657129339926;
-        Wed, 06 Jul 2022 10:42:19 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i83-20020a6bb856000000b0065a47e16f53sm17005663iof.37.2022.07.06.10.42.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 10:42:19 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 11:42:17 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
+        with ESMTP id S233690AbiGFRt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jul 2022 13:49:26 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2088.outbound.protection.outlook.com [40.107.94.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2256D186CD;
+        Wed,  6 Jul 2022 10:49:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cB5SdIETHRGYkFI3tgV9fPsnElHfdKTk2ZdXCb7jzIlE1zNsfpLOJyPj7jDdf2vW/fjBV4GwhB2arwxsrWKBVVTLMIdPFJPBYeJv4HT0/KiEIwjAdDzFnwMBqVgMVPrM6TnPNb4nUb2qTz1WqJ0K3AbrZY6jjY9DJ6qy/rjNnCzOSXnspSRPzhddoWz9EYJavuacky7APqJ5e3mwKYkFhg/n8kcwTnY9P1VHaFdf0dC4cNMspmXmkf8uJnzACkAbSYk8884/NVGN6DEmSjI3O24+hzWq9gIYQF1lqGqzoyS+CmM24DcxBGQlG4NoqUhe+n/dQhTrdxd5dwT62Ad7xA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mkGUNaPgBfrHEINrHxbknatFmfH7HqvpCq2TWtVLctE=;
+ b=czx1zhQb3OkrDjWBiBnt7Q1LMvLNMLUIgpb59rizbLvpLUuE+tDBX0StVzA7800SqY6DOHj7eedBriTIYyBCGq7Hseqv9OzZa9xgjQhc6fs82sdHGSsUWKwfh4JWxKv16F9GWhHcN5RphjgxYTwfJ5FT94w1dFuutG1MrCIXPzZFeHoiHAca8Q3uKE9iw1zYK5zZQb8Lf4vbAUXKvEijr83liop2MrE4EgO0xNEs5sDprcJrLtkAyqL7yuNvuGCGCgYx02xya4/8KCfhrS23qGvsPv0DFosCLZxTVu8l89c1JcZkKmXtN/2hztpYHVFY++IDLk7xoPpZqtvFDofulA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mkGUNaPgBfrHEINrHxbknatFmfH7HqvpCq2TWtVLctE=;
+ b=BKfBuaWcnllwddx/CIzZMymNkrbtewVn5I/zhKjDhpuFK5f6u9/kZbmTlBNoadg6cVX9QMTSJJ7+MuD4RAvfJhkTxgD9UqS6eKCKS4JZhie0oCghlsmJslmhNQNQEgiYHFOBOrXI3wwAFhQa0FUeT6p573qxBWNmKpZsMaUFMn76ZXJGM5FsJdTl1dVw335gngMZmIQavMzaQWQcUw0SlTkWF5Reyna9qGPOZwTSG7pbytvVf1wesUyHLhs+dzMX+Gk4ICG200a4n9bxraEkGOAtuBycLDRvP+CvkS/yf2Scv8B0glyuTKBbD/Z58ayJuLOAGuen8+3zCIUYecIw9A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MN2PR12MB3821.namprd12.prod.outlook.com (2603:10b6:208:16f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.15; Wed, 6 Jul
+ 2022 17:49:24 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ac35:7c4b:3282:abfb%3]) with mapi id 15.20.5395.021; Wed, 6 Jul 2022
+ 17:49:24 +0000
+Date:   Wed, 6 Jul 2022 14:49:23 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     <joro@8bytes.org>, <will@kernel.org>, <marcan@marcan.st>,
-        <sven@svenpeter.dev>, <robin.murphy@arm.com>,
-        <robdclark@gmail.com>, <baolu.lu@linux.intel.com>,
-        <orsonzhai@gmail.com>, <baolin.wang7@gmail.com>,
-        <zhang.lyra@gmail.com>, <jean-philippe@linaro.org>,
-        <jgg@nvidia.com>, <kevin.tian@intel.com>,
-        <suravee.suthikulpanit@amd.com>, <alyssa@rosenzweig.io>,
-        <dwmw2@infradead.org>, <mjrosato@linux.ibm.com>,
-        <gerald.schaefer@linux.ibm.com>, <thierry.reding@gmail.com>,
-        <vdumpa@nvidia.com>, <jonathanh@nvidia.com>, <cohuck@redhat.com>,
-        <thunder.leizhen@huawei.com>, <christophe.jaillet@wanadoo.fr>,
-        <chenxiang66@hisilicon.com>, <john.garry@huawei.com>,
-        <yangyingliang@huawei.com>, <iommu@lists.linux.dev>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-tegra@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v5 0/5] cover-letter: Simplify vfio_iommu_type1
- attach/detach routine
-Message-ID: <20220706114217.105f4f61.alex.williamson@redhat.com>
-In-Reply-To: <20220701214455.14992-1-nicolinc@nvidia.com>
-References: <20220701214455.14992-1-nicolinc@nvidia.com>
-Organization: Red Hat
+Cc:     kwankhede@nvidia.com, corbet@lwn.net, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, tvrtko.ursulin@linux.intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        kevin.tian@intel.com, hch@infradead.org, jchrist@linux.ibm.com,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [RFT][PATCH v2 4/9] vfio: Pass in starting IOVA to
+ vfio_pin/unpin_pages API
+Message-ID: <20220706174923.GL693670@nvidia.com>
+References: <20220706062759.24946-1-nicolinc@nvidia.com>
+ <20220706062759.24946-5-nicolinc@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220706062759.24946-5-nicolinc@nvidia.com>
+X-ClientProxiedBy: MN2PR15CA0056.namprd15.prod.outlook.com
+ (2603:10b6:208:237::25) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ace99795-eb19-4b8b-fb0e-08da5f77dd58
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3821:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fWKd+BL1eIkRJUcqLNvSA0XzvqxrDDNPLb2CAhWSvBr7q+vcXh2t/NFR/nKaluU2cJhl2+VEG98o1nhTw4EJvMJRO/dCC2CgDq7A2McQDW3d+BX4rzzxHflWaHf4+pSnL5M/4TowzbRkWntNm8wG3FIjZxj40B/MogbRIH50IztILD79rrdeKsNXhs8qS9bCRmsNc5v2IJZMiA+yNhM1OjY9bT4o+6NAqVXL/AI9rgg3D20NVnhhaCtvUDAvuWhFHkODeCCLoEy2Xtf39JQN7D2m55EoAi/FCFN+B6TuDZfThHW8HOxDA7vWjZPodSRCUfmKvbM4Qh+PeWerxnBczbB0ij4U3vUfUnLL3LhrKt8X+KyWzpsDSz1Ec9s04cIPbB5DXA+eKoo52qZaTPT6ZOsxmuYjd1gBXhz+gIMI2OBCFJ3zN1ZLpxMfQEOrB3AfLI1JTAQIqkY9GJ1XAxbbabrT3uzd79VZshhQIqlGThscPPyqNKfzH72EP27Ae+u09HqUswXN3ayzm8d9QKHH39HaSR4pEQg2CAx/rC/jQOLieshI8FS8sY9TpmKyfAwWqeOXO1Mhdobsx8QmWhye/31R8UsKF9ePdyTmE9jR+Bp2WspdGT5xOWTuwZdBGaVJC+Jt/3I59CncdNRgF5WKQMvgvKZmMdm347qkTmz8AufIQZGxcz0L0Ilseaa3qOSiLVivzTwtjSsr/a5YBrN9+9u5G4r6Kjuc8Ny/MqAeyc/jLhoLnPXy1bfWu6IzYV/KUFVBILXCJdtMJE/1+OODQnld5KUXFOLfDXz7AdmS3mRWNIOOGQhMmnbmJXck6EEx
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(366004)(396003)(39860400002)(376002)(136003)(186003)(6512007)(7406005)(26005)(2616005)(7416002)(86362001)(316002)(38100700002)(5660300002)(1076003)(41300700001)(6506007)(6636002)(8676002)(478600001)(66556008)(2906002)(66476007)(66946007)(4326008)(33656002)(6486002)(36756003)(37006003)(6862004)(8936002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ylebMxc3sFSRYR5L7t99831UOIxTJn5R9Gm/CM3b21W90NPOZ+NOUUkVdyAC?=
+ =?us-ascii?Q?CGGjQMerbQsY5be2Cj3soX1Zk0cKhlAsnhK6WOU7/b1O5OQ27HWbC+4p0/Bm?=
+ =?us-ascii?Q?TdO3aWFl2VLxSbd9/Mk5w7FdZ0Pi96Dg1Shu/i3MC5R9IC0Jam8hjDvuSe5h?=
+ =?us-ascii?Q?kVryj3Ori4UrPvji1Mq1Slr2PhavgFzn3DKA6VcQvEhudihPE6vfweTReDek?=
+ =?us-ascii?Q?cRjl7BNa0WXbXz7pu/lrpH8uUR4q6IR1QqNgirRRN8EzTQFM3Lspv+/oOd9E?=
+ =?us-ascii?Q?eDAgt6lq9MJfogAAOAwNhvPeHhpOpF729iXVTJTRndFnTySHo0cN1CfhxAiW?=
+ =?us-ascii?Q?COt4COsaTSl7VXgZINHqAv1f9HgiW/kHmvFdMVK9OtPwOHb05XV3dX0yadw6?=
+ =?us-ascii?Q?iPmssrrnSpP+UhranGso6XjZOVlCsgllsV8hijdw8y1bS7FVIxjV3qwKxKR7?=
+ =?us-ascii?Q?FGvtTM8Rzbok/h/Ua5Qyfr7v7AjAwnvJCGtAlZVf5vLcRRM1jCuJtNP/KbzT?=
+ =?us-ascii?Q?PN5l7kgTpqSYnayxawU1JPeUCp6TVlS0pVao0iMMU74myyhaDrHZ/Rcho1YC?=
+ =?us-ascii?Q?Jn/gIPWLkKwe8J0WH2YGuSMjvhUMw0bwWFAlJcmlNS5aSyDM+FwaX1Eyn65e?=
+ =?us-ascii?Q?fwO0IfO/BH0r1ujWC9eaGTGyKPOFpTXFooD0UIZq6KjkfSFIiHuGTglfEus7?=
+ =?us-ascii?Q?RYHHonL1rUYUJUF8YRhcRVkTnSRHNgDAQMHfYBOOBicglsrnghxvnh0Vyk79?=
+ =?us-ascii?Q?4NFATfog4Eg8T0KeUFZgC++LB/X2RBWtc0jfREDvuvsJ4Q44XfLjfY1XT5De?=
+ =?us-ascii?Q?d9GJDLq2cPPiyxMoGwxkMBn1hlcJFN+LifNENlVkG57rRNXYSegL4HltQvZq?=
+ =?us-ascii?Q?WRhdM3CpfPx5cWhzOYrWQHor91EGmZd4+TFvohuCDwNQ7wa1hTY+3RTog22O?=
+ =?us-ascii?Q?t2t7dIxRsLTHBs2VsUTxAUUxJskdmiTvIzLzuLVMYHsGsOcBfMq753uG/NdB?=
+ =?us-ascii?Q?nB4fcGn8WNvONFUdO7FiPiwn+Zgz8i7fhcPJEtW5aqb0YLAlXjCAkParTYcE?=
+ =?us-ascii?Q?AeIZKcHxvxrD7Cjci+qkFpKs57IEDYY9J8xQRtLveD0sbQDzHZON5KWheMlI?=
+ =?us-ascii?Q?bkHxWN8od1uyshplSSVzTUdUFL/fwByUouhhs6tZYxqbl5S/UMDhxPdn/zA/?=
+ =?us-ascii?Q?AroffvMWZOylDXcXKcjx1x0D8T244CxueIx/ByaSMWEF88cLcJ+dTgkfrxxq?=
+ =?us-ascii?Q?KHBpkBzXpwmgOHUy8ndlob8dGKz6h0t021oT92NcvjXq3fWknl8hyPdfpwVo?=
+ =?us-ascii?Q?Go5sf8/mqDi2ZJjKJn14Y/RmTzdhQhpMULaWBK+qLAdlTbKL3Kv1FC8pI6Eg?=
+ =?us-ascii?Q?aKuXPwbDzXTL1RlSsxdQ5JdlZWiT5mW7Dqe8K4g59T29qlQN1v2gRfM5Xgf6?=
+ =?us-ascii?Q?iBgEzJGwEtojdDdQEzofqP622Sw78Fjlu7gerYYAQkA0HaRHIatVjxsDRqAO?=
+ =?us-ascii?Q?1RF57o2thKhtK90s+bh6vThrn3Mh2rhzYz7sH/4HM39rOIkXSlSlD/NBc7N/?=
+ =?us-ascii?Q?2DsE5U811KH5PrxAmSX3chAEf79pmoSvAT7+7HBS?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ace99795-eb19-4b8b-fb0e-08da5f77dd58
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2022 17:49:24.6939
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +JGywEs8Hvg85+LJcvQDzceikp8L5gx9lpNBIhK+GccnBX/2CQXBLWdy2bKTUqXr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3821
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 1 Jul 2022 14:44:50 -0700
-Nicolin Chen <nicolinc@nvidia.com> wrote:
+On Tue, Jul 05, 2022 at 11:27:54PM -0700, Nicolin Chen wrote:
 
-> This is a preparatory series for IOMMUFD v2 patches. It enforces error
-> code -EMEDIUMTYPE in iommu_attach_device() and iommu_attach_group() when
-> an IOMMU domain and a device/group are incompatible. It also drops the
-> useless domain->ops check since it won't fail in current environment.
-> 
-> These allow VFIO iommu code to simplify its group attachment routine, by
-> avoiding the extra IOMMU domain allocations and attach/detach sequences
-> of the old code.
-> 
-> Worths mentioning the exact match for enforce_cache_coherency is removed
-> with this series, since there's very less value in doing that as KVM will
-> not be able to take advantage of it -- this just wastes domain memory.
-> Instead, we rely on Intel IOMMU driver taking care of that internally.
-> 
-> This is on github:
-> https://github.com/nicolinc/iommufd/commits/vfio_iommu_attach
+>  These functions call back into the back-end IOMMU module by using the pin_pages
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 8c67c9aba82d..ea6041fa48ac 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -231,16 +231,8 @@ static void intel_gvt_cleanup_vgpu_type_groups(struct intel_gvt *gvt)
+>  static void gvt_unpin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
+>  		unsigned long size)
+>  {
+> -	int total_pages;
+> -	int npage;
+> -
+> -	total_pages = roundup(size, PAGE_SIZE) / PAGE_SIZE;
+> -
+> -	for (npage = 0; npage < total_pages; npage++) {
+> -		unsigned long cur_gfn = gfn + npage;
+> -
+> -		vfio_unpin_pages(&vgpu->vfio_device, &cur_gfn, 1);
+> -	}
+> +	vfio_unpin_pages(&vgpu->vfio_device, gfn << PAGE_SHIFT,
+> +			 roundup(size, PAGE_SIZE) / PAGE_SIZE);
 
-How do you foresee this going in, I'm imagining Joerg would merge the
-first patch via the IOMMU tree and provide a topic branch that I'd
-merge into the vfio tree along with the remaining patches.  Sound
-right?  Thanks,
+These maths are DIV_ROUND_UP()
 
-Alex
+Otherwise,
 
- 
-> Changelog
-> v5:
->  * Rebased on top of Robin's "Simplify bus_type determination".
->  * Fixed a wrong change returning -EMEDIUMTYPE in arm-smmu driver.
->  * Added Baolu's "Reviewed-by".
-> v4:
->  * Dropped -EMEDIUMTYPE change in mtk_v1 driver per Robin's input
->  * Added Baolu's and Kevin's Reviewed-by lines
-> v3: https://lore.kernel.org/kvm/20220623200029.26007-1-nicolinc@nvidia.com/
->  * Dropped all dev_err since -EMEDIUMTYPE clearly indicates what error.
->  * Updated commit message of enforce_cache_coherency removing patch.
->  * Updated commit message of domain->ops removing patch.
->  * Replaced "goto out_unlock" with simply mutex_unlock() and return.
->  * Added a line of comments for -EMEDIUMTYPE return check.
->  * Moved iommu_get_msi_cookie() into alloc_attach_domain() as a cookie
->    should be logically tied to the lifetime of a domain itself.
->  * Added Kevin's "Reviewed-by".
-> v2: https://lore.kernel.org/kvm/20220616000304.23890-1-nicolinc@nvidia.com/
->  * Added -EMEDIUMTYPE to more IOMMU drivers that fit the category.
->  * Changed dev_err to dev_dbg for -EMEDIUMTYPE to avoid kernel log spam.
->  * Dropped iommu_ops patch, and removed domain->ops in VFIO directly,
->    since there's no mixed-driver use case that would fail the sanity.
->  * Updated commit log of the patch removing enforce_cache_coherency.
->  * Fixed a misplace of "num_non_pinned_groups--" in detach_group patch.
->  * Moved "num_non_pinned_groups++" in PATCH-5 to the common path between
->    domain-reusing and new-domain pathways, like the code previously did.
->  * Fixed a typo in EMEDIUMTYPE patch.
-> v1: https://lore.kernel.org/kvm/20220606061927.26049-1-nicolinc@nvidia.com/
-> 
-> Jason Gunthorpe (1):
->   vfio/iommu_type1: Prefer to reuse domains vs match enforced cache
->     coherency
-> 
-> Nicolin Chen (4):
->   iommu: Return -EMEDIUMTYPE for incompatible domain and device/group
->   vfio/iommu_type1: Remove the domain->ops comparison
->   vfio/iommu_type1: Clean up update_dirty_scope in detach_group()
->   vfio/iommu_type1: Simplify group attachment
-> 
->  drivers/iommu/amd/iommu.c                   |   2 +-
->  drivers/iommu/apple-dart.c                  |   4 +-
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  15 +-
->  drivers/iommu/arm/arm-smmu/arm-smmu.c       |   5 +-
->  drivers/iommu/arm/arm-smmu/qcom_iommu.c     |   9 +-
->  drivers/iommu/intel/iommu.c                 |  10 +-
->  drivers/iommu/iommu.c                       |  28 ++
->  drivers/iommu/ipmmu-vmsa.c                  |   4 +-
->  drivers/iommu/omap-iommu.c                  |   3 +-
->  drivers/iommu/s390-iommu.c                  |   2 +-
->  drivers/iommu/sprd-iommu.c                  |   6 +-
->  drivers/iommu/tegra-gart.c                  |   2 +-
->  drivers/iommu/virtio-iommu.c                |   3 +-
->  drivers/vfio/vfio_iommu_type1.c             | 352 ++++++++++----------
->  14 files changed, 229 insertions(+), 216 deletions(-)
-> 
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
+Jason
